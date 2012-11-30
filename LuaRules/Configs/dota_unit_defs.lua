@@ -35,12 +35,44 @@ local config = {
     },    
     glave = {
       unitName = "armpw",
-      cost=100,
+      cost=250,
     },     
     zeus = {
       unitName = "armzeus",
-      cost=500,
+      cost=700,
+    },  
+    aspis  = {
+      unitName = "core_spectre",
+      cost=1200,
+    },     
+    thug  = {
+      unitName = "corthud",
+      cost=700,
+    },        
+    tarantula = {
+      unitName = "spideraa",
+      cost=600,
     },    
+    banshee = {
+      unitName = "armkam",
+      cost=1500,
+    },   
+    crabe = {
+      unitName = "armcrabe",
+      cost=1300,
+      ones=true,
+    },      
+    brawler = {
+      unitName = "armbrawl",
+      cost=1500,
+      ones=true,
+    }, 
+    outlaw = {
+      unitName = "cormak",
+      cost=300,
+      ones=true,
+    }, 
+    
   },
 }
 
@@ -65,6 +97,7 @@ function (x, z, teamID)
   Spring.SetUnitMaxHealth(turret, 3000)
   Spring.SetUnitHealth(turret, 3000)
   Spring.SetUnitNoSelect(turret, true)
+  return turret
 end
 
 turretDefs["turret2"].spawnFunction =
@@ -87,6 +120,7 @@ function (x, z, teamID)
   Spring.SetUnitMaxHealth(turret, 4500)
   Spring.SetUnitHealth(turret, 4500)
   Spring.SetUnitNoSelect(turret, true)
+  return turret
 end
 
 turretDefs["turret3"].spawnFunction =
@@ -111,6 +145,7 @@ function (x, z, teamID)
   Spring.SetUnitMaxHealth(turret, 6000)
   Spring.SetUnitHealth(turret, 6000)
   Spring.SetUnitNoSelect(turret, true)
+  return turret
 end
 
 

@@ -75,10 +75,27 @@ local creepcount    = mc.startingCreepCount -- current creep count per wave
 local creepbalance  = 0
 local creepWave     = 0
 
-local additionalCreep={{},{}} -- when player buy new creep, that crepp save in that array
+
 
 local protectedStructures = {}
 local creepDefIDs = {}
+
+local com_list={}
+
+---- dota shop ----
+
+-- creeps shop
+local additionalCreep={{},{}} -- bought creeps
+
+-- creeps spawne one time
+local ones_additionalCreep={{},{}}
+
+-- defense shop
+local defenseUnits={{},{}} 
+local defenseUpdateLevels={0,0} 
+
+-- com updates shop
+local comUpdates={}
 
 do
   local defID = UnitDefNames[ hqDef.unitName ].id
@@ -255,6 +272,9 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
       lastDamageDefID = 0,
     }
 
+	com_list[unitTeam]=unitID
+	
+	-- somethink strange
     local weapons = UnitDefs[unitDefID].weapons
     for w = 1, #weapons do
       local weaponDefID = weapons[w].weaponDef
@@ -267,6 +287,19 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
           range           = 0.8 * originalRange,
           projectileSpeed = 0.8 * originalProjectileSpeed,
         })
+        
+      -- apply com updates
+      
+      local originalRange = Spring.GetUnitWeaponState(unitID, w - 1, "range")
+      local originalReload = Spring.GetUnitWeaponState(unitID, w - 1, "reloadTime")      
+      rangeLvl=comUpdates[unitTeam].rangeLvl
+      attackSpeedLvl=comUpdates[unitTeam].attackSpeedLvl
+      
+      Spring.SetUnitWeaponState(unitID, w - 1, {
+          range           = originalRange*(1+rangeLvl*0.1), 
+          reloadTime = originalReload/math.sqrt(math.sqrt(attackSpeedLvl+1)), -- I think need some change
+        })
+      
       end
     end
 
@@ -282,22 +315,24 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
     --]]
   end
 
-  Spring.SetUnitCloak(unitID, false)
-  Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {0}, 0)
+	if UnitDefs[unitDefID].name~="wolverine_mine" then
+		Spring.SetUnitCloak(unitID, false)
+		Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {0}, 0)
 
-  local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
-  if (cmdDescID) then
-    Spring.GiveOrderToUnit(unitID, CMD_CLOAK_SHIELD, {0}, 0)
-    Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block area cloak
-  end
+		local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
+		if (cmdDescID) then
+			Spring.GiveOrderToUnit(unitID, CMD_CLOAK_SHIELD, {0}, 0)
+			Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block area cloak
+		end
 
-  for cmdID,_ in pairs(blockedCmds) do
-    local cmdDescID = Spring.FindUnitCmdDesc(unitID, cmdID)
-    if (cmdDescID) then
-      Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- disable terraform and some other commands
-      --Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
-    end
-  end
+		for cmdID,_ in pairs(blockedCmds) do
+			local cmdDescID = Spring.FindUnitCmdDesc(unitID, cmdID)
+			if (cmdDescID) then
+				Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- disable terraform and some other commands
+				--Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
+			end
+		end
+	end
 end
 
 
@@ -326,6 +361,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
   if (Spring.IsGameOver()) then return end
 
   _,_,_,_,_,allyteam = Spring.GetTeamInfo(unitTeam)
+  defenseUnits[unitID]=nil
   if (unitID == HQ[1] or unitID == HQ[2]) then
     local winnerAllyTeam = (unitID == HQ[2]) and 0 or 1
 
@@ -429,6 +465,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 
       local newUnitID = CreateUnitNearby(comName, td.comRespawnPoint, unitTeam, "comRespawn")
 
+		com_list[comsData[unitID].originalTeam]=comsData[unitID].originalTeam
       comsData[newUnitID].originalTeam = comsData[unitID].originalTeam
     end
 
@@ -484,8 +521,10 @@ function gadget:GamePreload()
       local turretDef  = turretDefs[turretName]
 
       if (turretDef.spawnFunction) then
-        turretDef.spawnFunction (turretData[1], turretData[2], teams[i])
+        local turretID=turretDef.spawnFunction (turretData[1], turretData[2], teams[i])
+        defenseUnits[i][turretID]={attackBonus=1}
       end
+      
     end
   end
 end
@@ -502,6 +541,9 @@ function gadget:GameStart()
       --Spring.SetTeamResource(teamList[i], "es", 1000)
 
       CreateUnitNearby("amphtele", spawnPoint, teamList[i])
+      
+      -- init com update list
+      comUpdates[i]={attackLvl=0,defLvl=0,rangeLvl=0,attackSpeedLvl=0}
     end
   end
 end
@@ -549,10 +591,28 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 
   -- used to be secret buffs to sprung for being "awesome"
   -- suck on this you cheating scum!!1
-  if (UnitDefs[unitDefID].name:find("c47367")) then damage = damage * 1.3 end
-  if (attackerDefID and UnitDefs[attackerDefID].name:find("c47367")) then damage = damage * 0.7 end
+  -- if (UnitDefs[unitDefID].name:find("c47367")) then damage = damage * 1.3 end
+  -- if (attackerDefID and UnitDefs[attackerDefID].name:find("c47367")) then damage = damage * 0.7 end
+	-- it's can't work with com updates
 
-  return damage
+	-- com update
+	if (comsData[attackerID]) then
+		local upd=comUpdates[attackerTeam]
+		damage=damage*(1+upd.attackLvl*0.2) -- each level add 20% dmg
+	elseif (comsData[unitID]) then
+		local upd=comUpdates[unitTeam]
+		damage=damage/math.sqrt(math.sqrt(upd.defLvl+1)) -- each level add less defense. Maybe use other function?
+	end
+	
+	-- defense update
+	local data=defenseUnits[1][attackerID]
+	if data==nil then data=defenseUnits[2][attackerID] end
+	
+	if data~=nil then
+		damage=damage*data.attackBonus
+	end
+	
+	return damage
 end
 
 
@@ -632,7 +692,13 @@ function gadget:GameFrame(n)
 		for j=1,#addCrep,1 do
 			table.insert(teamCreepCounts[t],{addCrep[j],1})
 		end
+		
+		local one_addCrep=ones_additionalCreep[t]
+		for j=1,#one_addCrep,1 do
+			table.insert(teamCreepCounts[t],{one_addCrep[j],1})
+		end
 	end
+	ones_additionalCreep={{},{}}
 	
     for path = 1, #creeperPathWaypoints do
       local creeperOrderArray = creeperOrderArrays[path]
@@ -666,6 +732,111 @@ function gadget:GameFrame(n)
   end
 end
 
+local function getPlayerHeadTeam(playerID)
+	local _,_,_,team,ally=Spring.GetPlayerInfo(playerID)
+	local _,_,_,_,_,al1=Spring.GetTeamInfo(team1)
+	local _,_,_,_,_,al2=Spring.GetTeamInfo(team2)
+	
+	if ally==al1 then
+		return team,1
+	elseif ally==al2 then
+		return team,2
+	else
+		return team,nil
+	end
+end
+
+local function comUpdate(playerID,upd)
+	local _,_,_,team=Spring.GetPlayerInfo(playerID)
+	local ul=comUpdates[team]
+	if ul~=nil then
+		local ulvl=ul[upd]
+		if ulvl~=10 then
+			local cost=ulvl*ulvl*100+100
+			local m=Spring.GetTeamResources(team,"metal")
+			if m>=cost then
+				Spring.UseTeamResource(team,"metal",cost)
+				ulvl=ulvl+1
+				ul[upd]=ulvl
+				
+				local comID=com_list[team]
+				if comID~=nil then
+					local comDefID=Spring.GetUnitDefID(comID)
+					if comDefID==nil then
+						return
+					end
+					
+					if upd=="rangeLvl" then
+						local weapons = UnitDefs[comDefID].weapons
+						for w = 1, #weapons do
+							local originalRange = Spring.GetUnitWeaponState(comID, w - 1, "range")
+							local range = originalRange*(1+ulvl*0.1)/(1+(ulvl-1)*0.1), 
+							Spring.SetUnitWeaponState(comID,w-1,"range",range)
+							Spring.Echo("W: "..tostring(w-1).." Range before "..tostring(originalRange).." range now "..tostring(range))
+						end
+					elseif upd=="attackSpeedLvl" then
+						local weapons = UnitDefs[comDefID].weapons
+						for w = 1, #weapons do
+							local originalReload = Spring.GetUnitWeaponState(comID, w - 1, "reloadTime")    
+							local reload=math.sqrt(math.sqrt(ulvl))*originalReload/math.sqrt(math.sqrt(ulvl+1))
+							Spring.SetUnitWeaponState(comID,w-1,"reloadTime",reload)
+							Spring.Echo("W: "..tostring(w-1).." Reload time before "..tostring(originalReload).." reload time now "..tostring(reload))
+						end
+						
+					end
+				end
+			end
+		end
+	end
+end
+
+local function defenseUpdate(playerID)
+	local team,d=getPlayerHeadTeam(playerID)
+	if d==nil then
+		return
+	end
+	
+	if defenseUpdateLevels[d]==4 then
+		return
+	end
+	
+	local updateCost=defenseUpdateLevels[d]*defenseUpdateLevels[d]*50+300
+	Spring.Echo("Def update: "..tostring(updateCost))
+	
+	local m=Spring.GetTeamResources(team,"metal")
+	if m>=updateCost then
+		Spring.UseTeamResource(team,"metal",updateCost)
+		defenseUpdateLevels[d]=defenseUpdateLevels[d]+1
+		local lvl=defenseUpdateLevels[d]
+		
+		for turret,data in pairs(defenseUnits[d]) do
+			local _,maxHP=Spring.GetUnitHealth(turret)
+			Spring.SetUnitMaxHealth(turret,maxHP*1.2)
+			Spring.SetUnitArmored(turret,true,1+lvl*0.1)
+			data.attackBonus=1+lvl*0.2
+			if lvl==4 then
+				-- setup shield
+			end
+		end
+	end
+end
+
+local function buyStorage(playerID)
+	local team,d=getPlayerHeadTeam(playerID)
+	if d==nil then
+		return
+	end
+	
+	local m,maxM=Spring.GetTeamResources(team,"metal")
+	local cost=maxM*0.8
+	-- Spring.Echo("Stor update cost: "..tostring(cost))
+	if m>=cost then
+		Spring.SetTeamResource(team,"ms",maxM+500)
+		Spring.UseTeamResource(team,"metal",cost)
+	end
+end
+
+
 local function buyUnit(playerID,unitName)
 	local crd=creepDefs[unitName]
 	if crd==nil then
@@ -674,27 +845,20 @@ local function buyUnit(playerID,unitName)
 		return
 	end
 	
-	local _,_,_,team,ally=Spring.GetPlayerInfo(playerID)
+	local team,d=getPlayerHeadTeam(playerID)
+	if d==nil then
+		return
+	end
 	
 	local me=Spring.GetTeamResources(team,"metal")
-	Spring.Echo("Metall: "..tostring(me));
 	if me>=crd.cost then
 		Spring.UseTeamResource(team,"metal",crd.cost)
-		local d
 		
-		local _,_,_,_,_,al1=Spring.GetTeamInfo(team1)
-		local _,_,_,_,_,al2=Spring.GetTeamInfo(team2)
-		
-		if ally==al1 then
-			d=1
-		elseif ally==al2 then
-			d=2
+		if crd.ones~=nil then
+			table.insert(ones_additionalCreep[d],unitName)
 		else
-			Spring.Echo("Can't add warrior")
-			return
+			table.insert(additionalCreep[d],unitName)
 		end
-		table.insert(additionalCreep[d],unitName)
-		Spring.Echo("Good")
 	end
 end
 
@@ -704,7 +868,37 @@ function gadget:RecvLuaMsg(msg, playerID)
 	elseif msg=="dotashop_buy_glave" then
 		buyUnit(playerID,"glave")	
 	elseif msg=="dotashop_buy_zeus" then
-		buyUnit(playerID,"zeus")				
+		buyUnit(playerID,"zeus")	 
+	elseif msg=="dotashop_buy_aspis" then
+		buyUnit(playerID,"aspis")	
+	elseif msg=="dotashop_buy_thug" then
+		buyUnit(playerID,"thug")		
+	elseif msg=="dotashop_buy_tarantula" then
+		buyUnit(playerID,"tarantula")	
+	elseif msg=="dotashop_buy_banshee" then
+		buyUnit(playerID,"banshee")		
+	elseif msg=="dotashop_buy_outlaw" then
+		buyUnit(playerID,"outlaw")	
+		
+	elseif msg=="dotashop_buy_crabe" then
+		buyUnit(playerID,"crabe")	
+	elseif msg=="dotashop_buy_brawler" then
+		buyUnit(playerID,"brawler")		
+				
+	elseif msg=="dotashop_buy_storage" then
+		buyStorage(playerID)
+	elseif msg=="dotashop_buy_defense" then
+		defenseUpdate(playerID)		
+		
+	elseif msg=="dotashop_buy_com_attack" then
+		comUpdate(playerID,"attackLvl")
+	elseif msg=="dotashop_buy_com_def" then
+		comUpdate(playerID,"defLvl")
+	elseif msg=="dotashop_buy_com_range" then
+		comUpdate(playerID,"rangeLvl")
+	elseif msg=="dotashop_buy_com_attackSpeed" then
+		comUpdate(playerID,"attackSpeedLvl")		
+		
 	end
 end
 --------------------------------------------------------------------------------
