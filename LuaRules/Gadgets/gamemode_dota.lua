@@ -97,6 +97,7 @@ local defenseUpdateLevels={0,0}
 -- com updates shop
 local comUpdates={}
 
+
 do
   local defID = UnitDefNames[ hqDef.unitName ].id
   protectedStructures[defID] = true
@@ -108,7 +109,7 @@ do
 
   for _, creepDef in pairs(creepDefs) do
     defID = UnitDefNames[ creepDef.unitName ].id
-    creepDefIDs[defID] = true
+    creepDefIDs[defID] = creepDef
   end
 end
 
@@ -475,10 +476,10 @@ end
 
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-  if (creepDefIDs[unitDefID]) then
+  if creepDefIDs[unitDefID]~=nil then
     if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
       local realDamage = damage + math.min(0, Spring.GetUnitHealth(unitID)) -- negative health means overkill
-      local reward = 50 * (realDamage / UnitDefs[unitDefID].health)
+      local reward = creepDefIDs[unitDefID].reward * (realDamage / UnitDefs[unitDefID].health)
       Spring.AddTeamResource(attackerTeam, "metal", reward)
       Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
     end
@@ -543,7 +544,7 @@ function gadget:GameStart()
       CreateUnitNearby("amphtele", spawnPoint, teamList[i])
       
       -- init com update list
-      comUpdates[i]={attackLvl=0,defLvl=0,rangeLvl=0,attackSpeedLvl=0}
+      comUpdates[teamList[i]]={attackLvl=0,defLvl=0,rangeLvl=0,attackSpeedLvl=0}
     end
   end
 end

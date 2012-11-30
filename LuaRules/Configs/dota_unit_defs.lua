@@ -22,55 +22,68 @@ local config = {
   creepDefs = {
     creep1 = {
       unitName = "spiderassault",
+      reward=50,
     },
     creep2 = {
       unitName = "corstorm",
+      reward=50,
     },
     creep3 = {
       unitName = "slowmort",
+      reward=50,
     },
     warrior = {
       unitName = "armwar",
       cost=400,
+      reward=50,
     },    
     glave = {
       unitName = "armpw",
       cost=250,
+      reward=10,
     },     
     zeus = {
       unitName = "armzeus",
       cost=700,
+      reward=50,
     },  
     aspis  = {
       unitName = "core_spectre",
       cost=1200,
+      reward=60,
     },     
     thug  = {
       unitName = "corthud",
       cost=700,
+      reward=40,
     },        
     tarantula = {
       unitName = "spideraa",
       cost=600,
+      reward=30,
     },    
     banshee = {
       unitName = "armkam",
       cost=1500,
+      reward=80,
     },   
     crabe = {
       unitName = "armcrabe",
       cost=1300,
       ones=true,
+      reward=90,
     },      
     brawler = {
       unitName = "armbrawl",
       cost=1500,
       ones=true,
+      reward=80,
     }, 
     outlaw = {
       unitName = "cormak",
       cost=300,
       ones=true,
+      reward=30,
     }, 
     
   },
