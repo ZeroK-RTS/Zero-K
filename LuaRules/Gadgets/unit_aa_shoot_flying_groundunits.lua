@@ -1,18 +1,20 @@
+--//Version 0.9
+local isEnable = false
 function gadget:GetInfo()
   return {
     name      = "AA shoot flying ground units",
     desc      = "Allow ground AA and air-superiority fighter to target and shot down any ground unit that is thrown up into air by Newton or explosion. AA targetting is triggered only by Newton or weapon explosion but can also be triggered externally thru GG table.",
     author    = "msafwan",
-    date      = "WIP",
+    date      = "1 Dec 2012",
     license   = "GNU GPL, v2 or later",
     layer     = -99,
-    enabled   = false --  loaded by default?
+    enabled   = isEnable  --  loaded by default?
   }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then -- SYNCED ---
+if (gadgetHandler:IsSyncedCode()) and isEnable then -- SYNCED ---
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spCreateUnit         = Spring.CreateUnit
@@ -34,6 +36,8 @@ local spGetUnitDirection  = Spring.GetUnitDirection
 local spGetUnitPosition  = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitIsCloaked  = Spring.GetUnitIsCloaked
+local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
+local spGetUnitVectors = Spring.GetUnitVectors
 
 local spGetUnitVelocity  = Spring.GetUnitVelocity
 --local spSetUnitPhysics  = Spring.SetUnitPhysics
@@ -44,7 +48,8 @@ local spMoveCtrlEnable = Spring.MoveCtrl.Enable
 local spMoveCtrlSetGravity = Spring.MoveCtrl.SetGravity
 local spMoveCtrlSetPosition = Spring.MoveCtrl.SetPosition
 --------------------------------------------------------------------------------
-local measureMapGravity ={1, fakeUnitID= nil, gravity=nil}
+--local measureMapGravity ={1, fakeUnitID= nil, gravity=nil}
+local gravity = -1*Game.gravity/30/30
 local flyingGroundUnitsID = {}
 local updateRate_2 = 5 --update rate for ground unit's free flying trajectory
 local updateRate_3 =1 --update rate for cloak status
@@ -75,20 +80,6 @@ GG.isflying_watchout = {} --allow other gadget to signal this gadget that this u
 --]]
 
 function gadget:GameFrame(n)
-	if n==1 and measureMapGravity[1] ==1 then --only took 2 frame to finish measurement
-		measureMapGravity.fakeUnitID = spCreateUnit("fakeunit_aatarget", 0, 200, 0, "n", 0)
-		spSetUnitNoSelect(measureMapGravity.fakeUnitID, true)
-		spSetUnitNoDraw(measureMapGravity.fakeUnitID, true)
-		spSetUnitNoMinimap(measureMapGravity.fakeUnitID, true)
-		measureMapGravity[1] = 2
-	elseif measureMapGravity[1] == 2 then
-		local gravity = select(2,spGetUnitVelocity(measureMapGravity.fakeUnitID))
-		spDestroyUnit(measureMapGravity.fakeUnitID, false, true)
-		measureMapGravity.gravity= gravity
-		Spring.Echo("(2)Planet gravity is: "..gravity.. " elmo-per-frame-per-frame")
-		measureMapGravity[1] = 3
-	end
-
 	if n%updateRate_2 == 0 then --check flying units position every 5 frame. ~6fps. ballistic trajectory rarely need updates (unless unit accelerate then its good for dodging!).
 		if #GG.isflying_watchout > 0 then
 			for unitID,_ in pairs(GG.isflying_watchout) do --retrieve any new AA target from outside
@@ -106,7 +97,7 @@ function gadget:GameFrame(n)
 			local velX,velY,velZ = spGetUnitVelocity(unitID)
 			local groundHeight = spGetGroundHeight(bx,bz)
 			local landed = false
-			if by < groundHeight+100 and math.abs(velY) < math.abs(measureMapGravity.gravity) then --if low-elevation and vertical speed is less than of gravity then: assume unit has landed.
+			if by < groundHeight+100 and math.abs(velY) < math.abs(gravity) then --if low-elevation and vertical speed is less than of gravity then: assume unit has landed.
 				landed = true
 			end
 			if not landed then
@@ -118,7 +109,7 @@ function gadget:GameFrame(n)
 							local unitTeam = flyingGroundUnitsID[unitID].unitTeam
 							local stealth = flyingGroundUnitsID[unitID].stealth
 							local cloaked = spGetUnitIsCloaked(unitID)
-							aaMarker = spCreateUnit("fakeunit_aatarget",mx,my+100,mz, "s", unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
+							aaMarker = spCreateUnit("fakeunit_aatarget",mx,(my+100),mz, "s", unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
 							spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
 							spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-100,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: target is higher than the flying unit (ie: +100 elmo)
 							spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
@@ -127,15 +118,15 @@ function gadget:GameFrame(n)
 							spSetUnitNoMinimap(aaMarker, true)
 							flyingGroundUnitsID[unitID].aaMarker = aaMarker
 							spMoveCtrlEnable(aaMarker) --needed because "spSetUnitVelocity" callins has issues (setting velocity in x & z axis didn't do anything)
-							spMoveCtrlSetGravity(aaMarker,measureMapGravity.gravity) --we use our measured gravity value. Conversion for gravity: "mapGravity/30/30" doesn't look like a valid conversion, thus we better make a system that is both compatible with future fixes and current system.
+							spMoveCtrlSetGravity(aaMarker,gravity) 
 							spSetUnitCloak(aaMarker,cloaked,0)
 							spSetUnitStealth(aaMarker,stealth)
 						end
 						--spSetUnitPhysics(aaMarker,mx, my+100,mz,velX,velY,velZ,0,0,0)
 						--spMoveCtrlSetPhysics(aaMarker,mx, my+100,mz,velX,velY,velZ,0,0,0) --NOTE: physics callins has issues setting velocity
 						spMoveCtrlSetVelocity(aaMarker,velX,velY,velZ)
-						spMoveCtrlSetPosition(aaMarker,mx, my+100,mz)
-						spSetUnitDirection(aaMarker,0,0,1) --make sure FAKE is exactly facing at right angle. This make sure that aiming point below it stays on the unit
+						spMoveCtrlSetPosition(aaMarker,mx, (my+100),mz)
+						spSetUnitDirection(aaMarker,1,0,0) --make sure FAKE is exactly facing at right angle. This make sure that aiming point below it stays on the unit
 					else --unit is not flying
 						if flyingGroundUnitsID[unitID].aaMarker then
 							spDestroyUnit(flyingGroundUnitsID[unitID].aaMarker, false, true)
@@ -167,7 +158,7 @@ function gadget:GameFrame(n)
 					local bx,by,bz,mx,my,mz = spGetUnitPosition(unitID, true)
 					local velX,velY,velZ = spGetUnitVelocity(unitID)
 					local stealth = flyingGroundUnitsID[unitID].stealth
-					aaMarker = spCreateUnit("fakeunit_aatarget",mx,my+100,mz, "s", flyingGroundUnitsID[unitID].unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
+					aaMarker = spCreateUnit("fakeunit_aatarget",mx,(my+100),mz, "s", flyingGroundUnitsID[unitID].unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
 					flyingGroundUnitsID[unitID].aaMarker = aaMarker
 					spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
 					spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-100,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
@@ -176,9 +167,9 @@ function gadget:GameFrame(n)
 					spSetUnitNoDraw(aaMarker, true) --don't hint player that FAKE exist
 					spSetUnitNoMinimap(aaMarker, true)
 					spMoveCtrlEnable(aaMarker) --needed because "spSetUnitVelocity" callins has issues (setting velocity in x & z axis didn't do anything)
-					spMoveCtrlSetGravity(aaMarker,measureMapGravity.gravity) --we use our measured gravity value. Conversion for gravity: "mapGravity/30/30" doesn't look like a valid conversion, thus we better make a system that is both compatible with future fixes and current system.
+					spMoveCtrlSetGravity(aaMarker,gravity) 
 					spMoveCtrlSetVelocity(aaMarker,velX,velY,velZ)
-					spSetUnitDirection(aaMarker,0,0,1) --make sure FAKE is exactly facing at right angle. This make sure that aiming point below it stays on the unit
+					spSetUnitDirection(aaMarker,1,0,0) --make sure FAKE is exactly facing at right angle. This make sure that aiming point below it stays on the unit
 					spSetUnitStealth(aaMarker,stealth)
 				elseif flyingGroundUnitsID[unitID].teamChange == 2 then --if flying unit is transfered to ally team, then: transfer FAKE AA
 					--// transfer unit instead of recreating, so that it doesn't get abused to mess with enemy AA
@@ -187,9 +178,20 @@ function gadget:GameFrame(n)
 					GG.allowTransfer = false
 				end
 				flyingGroundUnitsID[unitID].teamChange = nil
-				--// update cloak status
+				--// update cloak status & collision volume position
 				local cloaked = spGetUnitIsCloaked(unitID)
+				local _,_,_,offX,offY,offZ = spGetUnitCollisionVolumeData(unitID) 
+				if (offX~=0 or offY~=0 or offZ~=0) then
+					local front, top, right = spGetUnitVectors(unitID)
+					local offX_temp = offX
+					local offY_temp = offY
+					local offZ_temp = offZ
+					offX = front[1]*offX_temp + top[1]*offY_temp + right[1]*offZ_temp
+					offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
+					offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
+				end
 				spSetUnitCloak(aaMarker,cloaked,0)
+				spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,(-100+offY),offZ, true)
 			end
 		end
 	end
@@ -253,7 +255,53 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-else-- UNSYNCED ---
+elseif isEnable then -- UNSYNCED ---
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 end
+
+--[[
+--//Unused codes from trial and error:
+local function TranslateRotatedCartesianCoordinateIntoStandardCartesianCoordinate(relX,relY,relZ, dirX,dirY,dirZ)
+	--//find unit direction
+	local sphereRadius = math.sqrt(dirX*dirX+dirY*dirY+dirZ*dirZ) --Reference: http://stackoverflow.com/questions/5674149/3d-coordinates-on-a-sphere-to-latitude-and-longitude
+	local latitude = math.acos(dirY / sphereRadius); --polar coordinate of where unit is facing up or down
+	local longitude = math.atan2(dirX, dirZ); --polar coordinate of where unit is facing left or right
+	--
+	local stdX,stdY,stdZ = 0,0,0
+	
+	--//breakdown rotated x into standard (non-rotated) x y z
+	stdY = relX*math.cos(latitude) --breakdown vertical component
+	local stdXZ_temp = relX*math.sin(latitude) --breakdown horizontal component
+	stdX = stdXZ_temp*math.cos(longitude) --breakdown x component
+	stdZ = stdXZ_temp*math.sin(longitude) --breakdown z component
+	
+	--//breakdown rotated z into standard (non-rotated) x y z
+	stdY = stdY + relZ*math.cos(latitude) --breakdown vertical component
+	local stdXZ_temp = relZ*math.sin(latitude) --breakdown horizontal component
+	stdX = stdX + stdXZ_temp*math.sin(longitude) --breakdown x component
+	stdZ = stdZ + stdXZ_temp*math.cos(longitude) --breakdown z component
+	
+	--//breakdown rotated y into standard (non-rotated) x y z
+	stdY = stdY + relY*math.cos(latitude) --breakdown vertical component
+	local stdXZ_temp = relY*math.sin(latitude) --breakdown horizontal component
+	stdX = stdX + stdXZ_temp*math.sin(longitude) --breakdown x component
+	stdZ = stdZ + stdXZ_temp*math.cos(longitude) --breakdown z component	
+	
+	return stdX,stdY,stdZ
+end
+	--//measure gravity
+	if n==1 and measureMapGravity[1] ==1 then --only took 2 frame to finish measurement
+		measureMapGravity.fakeUnitID = spCreateUnit("fakeunit_aatarget", 0, 200, 0, "n", 0)
+		spSetUnitNoSelect(measureMapGravity.fakeUnitID, true)
+		spSetUnitNoDraw(measureMapGravity.fakeUnitID, true)
+		spSetUnitNoMinimap(measureMapGravity.fakeUnitID, true)
+		measureMapGravity[1] = 2
+	elseif measureMapGravity[1] == 2 then
+		local gravity = select(2,spGetUnitVelocity(measureMapGravity.fakeUnitID))
+		spDestroyUnit(measureMapGravity.fakeUnitID, false, true)
+		measureMapGravity.gravity= gravity
+		Spring.Echo("(2)Planet gravity is: "..gravity.. " elmo-per-frame-per-frame")
+		measureMapGravity[1] = 3
+	end
+--]]
