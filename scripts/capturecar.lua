@@ -4,7 +4,10 @@ local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
 local base, front, bigwheel, rear = piece('base', 'front', 'bigwheel', 'rear')
 local turret, arm_1, arm_2, arm_3, dish, panel_a1, panel_b1, panel_a2, panel_b2 = piece('turret', 'arm_1', 'arm_2', 'arm_3', 'dish', 'panel_a1', 'panel_b1', 'panel_a2', 'panel_b2')
-local tracks1, tracks2, tracks3, tracks4, wheels1, wheels2, wheels3, wheels4 = piece('tracks1', 'tracks2', 'tracks3', 'tracks4', 'wheels1', 'wheels2', 'wheels3', 'wheels4')
+local tracks1, tracks2, tracks3, tracks4 = piece('tracks1', 'tracks2', 'tracks3', 'tracks4')
+
+local wheels_s = { piece('wheels2', 'wheels3') }
+local wheels_m = { piece('wheels1', 'wheels4') }
 		
 local tracks = 1
 
@@ -20,8 +23,8 @@ local WHEEL_SPIN_SPEED_L = math.rad(180)
 local WHEEL_SPIN_ACCEL_S = math.rad(15)
 local WHEEL_SPIN_ACCEL_M = math.rad(10)
 local WHEEL_SPIN_ACCEL_L = math.rad(5)
-local WHEEL_SPIN_DECEL_S = math.rad(45)
-local WHEEL_SPIN_DECEL_M = math.rad(30)
+local WHEEL_SPIN_DECEL_S = math.rad(25)
+local WHEEL_SPIN_DECEL_M = math.rad(25)
 local WHEEL_SPIN_DECEL_L = math.rad(15)
 
 local DEPLOY_SPEED = math.rad(90)
@@ -71,6 +74,16 @@ local function AnimControl()
 			Hide( tracks4)
 			Show( tracks1)
 		end
+
+		for i=1,#wheels_s do
+			Spin( wheels_s[i] , x_axis, WHEEL_SPIN_SPEED_S, WHEEL_SPIN_ACCEL_S )
+		end
+		for i=1,#wheels_m do
+			Spin( wheels_m[i] , x_axis, WHEEL_SPIN_SPEED_M, WHEEL_SPIN_ACCEL_M )
+		end
+
+		Spin( bigwheel , x_axis, WHEEL_SPIN_SPEED_L, WHEEL_SPIN_ACCEL_L )
+		
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)
 		diffHeading = (currHeading - lastHeading)/15
@@ -179,12 +192,12 @@ end
 function script.StopMoving() 
 	Signal(SIG_ANIM)
 	StopSpin(bigwheel, x_axis, WHEEL_SPIN_DECEL_L)
-
-	StopSpin(wheels1, x_axis, WHEEL_SPIN_DECEL_M)
-	StopSpin(wheels4, x_axis, WHEEL_SPIN_DECEL_M)
-	
-	StopSpin(wheels2, x_axis, WHEEL_SPIN_DECEL_S)
-	StopSpin(wheels3, x_axis, WHEEL_SPIN_DECEL_S)
+	for i=1,#wheels_s do
+		StopSpin(wheels_s[i], x_axis, WHEEL_SPIN_DECEL_M)
+	end
+	for i=1,#wheels_m do
+		StopSpin(wheels_m[i], x_axis, WHEEL_SPIN_DECEL_M)
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)
