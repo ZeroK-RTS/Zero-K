@@ -99,7 +99,12 @@ function Close(commPicked)
 	if not commPicked then
 		Spring.Echo("Requesting baseline comm")
 		Spring.SendLuaRulesMsg("faction:basiccomm")
+		Spring.SendCommands("say a:I choose: Baseline Comm!!")
+		PlaySound("LuaUI/Sounds/Voices/move_arm_m_4", 1, 'ui')
+	else
+		--PlaySound("LuaUI/Sounds/Voices/move_arm_m_17", 0.7, 'ui')
 	end
+
 	--Spring_SendCommands("say: a:I chose " .. option.button})
 	if mainWindow then mainWindow:Dispose() end
 end
@@ -173,7 +178,7 @@ local function CreateWindow()
 		local closeButton = Button:New{
 			parent = mainWindow,
 			caption = "CLOSE  (defaults to baseline commander)",
-			tooltip = "CLOSE\nNo commander selection made, will use a basic Strike Commander",
+			tooltip = "CLOSE\nNo commander selection made, will use a Baseline Commander",
 			--caption = "CLOSE  (make no selection)",
 			--tooltip = "CLOSE\nNo commander selection made\nTo choose your commander later, open the Esc menu and go to Game Actions -> Select Comm",
 			width = cbWidth,

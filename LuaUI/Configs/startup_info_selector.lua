@@ -21,6 +21,7 @@ local optionData = {
 		button = function()
 			Spring.SendLuaRulesMsg("faction:strikecomm")
 			Spring.SendCommands({'say a:I choose: Strike Commander !'})
+			Spring.PlaySoundFile("LuaUI/Sounds/Voices/move_arm_m_17.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
@@ -33,6 +34,7 @@ local optionData = {
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:battlecomm")
 			Spring.SendCommands({'say a:I choose: Battle Commander !'})
+			Spring.PlaySoundFile("LuaUI/Sounds/Voices/attack_arm_m_13.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
@@ -45,6 +47,7 @@ local optionData = {
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:reconcomm")
 			Spring.SendCommands({'say a:I choose: Recon Commander !'})
+			Spring.PlaySoundFile("LuaUI/Sounds/Voices/move_arm_m_11.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
@@ -57,6 +60,7 @@ local optionData = {
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:supportcomm")
 			Spring.SendCommands({'say a:I choose: Support Commander !'})
+			Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
@@ -79,7 +83,13 @@ local optionData = {
 		poster = "LuaUI/Images/startup_info_selector/planetwars.png",
 		selector = "PlanetWars",-- set here for future modifications, even if unused at the moment
 		tooltip = "PlanetWars",
-	}
+	},
+	chickens = {
+		enabled = ReturnFalse,-- ReturnFalse = disabled. must use same ways as DOTA
+		poster = "LuaUI/Images/startup_info_selector/chickens.png",
+		selector = "Chickens",-- set here for future modifications, even if unused at the moment
+		tooltip = "Chickens tips",
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -145,6 +155,7 @@ local function CommSelectTemplate(num, seriesName, comm1Name)
 		button = function()
 			Spring.SendLuaRulesMsg("customcomm:"..seriesName)
 			Spring.SendCommands({'say a:I choose: '..seriesName..'!'})
+			--Spring.Echo ([UnitDefNames[comm1Name].customParams.statsname)
 			Close(true)
 		end
 	}
