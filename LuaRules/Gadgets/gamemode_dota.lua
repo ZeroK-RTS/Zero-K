@@ -83,6 +83,7 @@ local creepDefIDs = {}
 local com_list={}
 
 ---- dota shop ----
+_G.dotashop={}
 
 -- creeps shop
 local additionalCreep={{},{}} -- bought creeps
@@ -96,6 +97,7 @@ local defenseUpdateLevels={0,0}
 
 -- com updates shop
 local comUpdates={}
+
 
 
 do
@@ -265,7 +267,7 @@ end
 
 
 local function SpawnTurret(x,z,teamID,updLvl,turretName,lastID)
-	Spring.Echo("Spawn turret '"..turretName.."' lvl:"..tostring(updLvl))
+--	Spring.Echo("Spawn turret '"..turretName.."' lvl:"..tostring(updLvl))
 	
 	local unitDefName=turretDefs[turretName][updLvl].unitName
 	local unitDef = UnitDefNames[unitDefName]
@@ -275,7 +277,7 @@ local function SpawnTurret(x,z,teamID,updLvl,turretName,lastID)
 	local lastHP
 	if lastID~=nil then
 		lastHP=maxHP*Spring.GetUnitHealth(lastID)/lastMaxHP
-		Spring.DestroyUnit(lastID,false,true)
+		Spring.DestroyUnit(lastID,true,true)
 	else
 		lastHP=maxHP
 	end
@@ -286,7 +288,7 @@ local function SpawnTurret(x,z,teamID,updLvl,turretName,lastID)
 	Spring.SetUnitMaxHealth(turret, maxHP)
 	Spring.SetUnitHealth(turret, lastHP)
 
-	--Spring.SetUnitNoSelect(turret, true)
+	Spring.SetUnitNoSelect(turret, true)
 	return turret
 end
 
@@ -584,7 +586,6 @@ function gadget:GamePreload()
   end
 end
 
-
 function gadget:GameStart()
   -- djinns (cant spawn them at GamePreload because they are selectable and players could move them before game start...)
   for allyteam = 1, #teams do
@@ -599,8 +600,26 @@ function gadget:GameStart()
       
       -- init com update list
       comUpdates[teamList[i]]={attackLvl=0,defLvl=0,rangeLvl=0,attackSpeedLvl=0}
+      
+      
+		for val,data in pairs(creepDefs) do
+			if data.cost~=nil then
+				SendToUnsynced("ShopUpdate_Creep",teamList[i],val,data.cost,data.ones)
+			end
+		end
+		
+		for val,data in pairs(comUpdates[teamList[i]]) do
+			SendToUnsynced("ShopUpdate_comUpdate",teamList[i],val,data+1,data*data*100+100)
+		end
+		
+		SendToUnsynced("ShopUpdate_defenseUpdate",teamList[i],defenseUpdateLevels[allyteam]+1,defenseUpdateLevels[allyteam]*defenseUpdateLevels[allyteam]*50+300)
+		
+		local _,maxM=Spring.GetTeamResources(teamList[i],"metal")
+		SendToUnsynced("ShopUpdate_storageUpdate",teamList[i],maxM+500,maxM*0.8)		
     end
   end
+  
+  
 end
 
 
@@ -845,6 +864,7 @@ local function comUpdate(playerID,upd)
 						end
 						
 					end
+					SendToUnsynced("ShopUpdate_comUpdate",team,upd,ulvl+1,ulvl*ulvl*100+100)
 				end
 			end
 		end
@@ -862,14 +882,21 @@ local function defenseUpdate(playerID)
 	end
 	
 	local updateCost=defenseUpdateLevels[d]*defenseUpdateLevels[d]*50+300
-	Spring.Echo("Def update: "..tostring(updateCost))
+	--Spring.Echo("Def update: "..tostring(updateCost))
 	
 	local m=Spring.GetTeamResources(team,"metal")
 	if m>=updateCost then
 		Spring.UseTeamResource(team,"metal",updateCost)
 		defenseUpdateLevels[d]=defenseUpdateLevels[d]+1
 		needLevelUp[d]=true
+		
+		local teamList = Spring.GetTeamList(d - 1)
+		for i = 1, #teamList do
+			SendToUnsynced("ShopUpdate_defenseUpdate",teamList[i],defenseUpdateLevels[d]+1,defenseUpdateLevels[d]*defenseUpdateLevels[d]*50+300)
+		end
 	end
+	
+	
 end
 
 local function buyStorage(playerID)
@@ -884,6 +911,8 @@ local function buyStorage(playerID)
 	if m>=cost then
 		Spring.SetTeamResource(team,"ms",maxM+500)
 		Spring.UseTeamResource(team,"metal",cost)
+		maxM=maxM+500
+		SendToUnsynced("ShopUpdate_storageUpdate",team,maxM+500,maxM*0.8)	
 	end
 end
 
@@ -941,16 +970,17 @@ function gadget:RecvLuaMsg(msg, playerID)
 	elseif msg=="dotashop_buy_defense" then
 		defenseUpdate(playerID)		
 		
-	elseif msg=="dotashop_buy_com_attack" then
+	elseif msg=="dotashop_buy_attackLvl" then
 		comUpdate(playerID,"attackLvl")
-	elseif msg=="dotashop_buy_com_def" then
+	elseif msg=="dotashop_buy_defLvl" then
 		comUpdate(playerID,"defLvl")
-	elseif msg=="dotashop_buy_com_range" then
+	elseif msg=="dotashop_buy_rangeLvl" then
 		comUpdate(playerID,"rangeLvl")
-	elseif msg=="dotashop_buy_com_attackSpeed" then
+	elseif msg=="dotashop_buy_attackSpeedLvl" then
 		comUpdate(playerID,"attackSpeedLvl")		
-		
 	end
+	
+	
 end
 --------------------------------------------------------------------------------
 -- SYNCED
@@ -1013,6 +1043,38 @@ local function AddMarker(action, x, y, z, teamID, markerType)
   end
 end
 
+local function ShopUpdate_Creep(str,teamID,name,cost,ones)
+	if teamID~=Spring.GetLocalTeamID() then
+		return
+	end
+	
+	Script.LuaUI.dotashop_creepupdate(name,cost,ones)
+end
+
+local function ShopUpdate_comUpdate(str,teamID,name,cost)
+	if teamID~=Spring.GetLocalTeamID() then
+		return
+	end
+	
+	Script.LuaUI.dotashop_comupdate(name,cost)
+end
+local function ShopUpdate_defenseUpdate(str,teamID,lvl,cost)
+	Spring.Echo("Def upd GG")
+	if teamID~=Spring.GetLocalTeamID() then
+		return
+	end
+	
+	Script.LuaUI.dotashop_defenseupdate(lvl,cost)
+end
+local function ShopUpdate_storageUpdate(str,teamID,size,cost)
+	if teamID~=Spring.GetLocalTeamID() then
+		return
+	end
+	
+	Script.LuaUI.dotashop_storageupdate(size,cost)
+end
+
+
 
 local function ToggleDebugInfo (cmd, line, words, playerID)
   drawDebugInfo = not drawDebugInfo
@@ -1020,8 +1082,12 @@ end
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction("gamemode_dota_addmarker", AddMarker)
-
   gadgetHandler:AddChatAction("dota_debug", ToggleDebugInfo, "toggles DOTA gadget debug info drawing")
+  
+  gadgetHandler:AddSyncAction("ShopUpdate_Creep",ShopUpdate_Creep)
+  gadgetHandler:AddSyncAction("ShopUpdate_comUpdate",ShopUpdate_comUpdate)
+  gadgetHandler:AddSyncAction("ShopUpdate_defenseUpdate",ShopUpdate_defenseUpdate)
+  gadgetHandler:AddSyncAction("ShopUpdate_storageUpdate",ShopUpdate_storageUpdate)
   --Script.AddActionFallback("dota_debug" .. ' ', "toggles DOTA gadget debug info drawing") -- synced only
 end
 

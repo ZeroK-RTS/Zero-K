@@ -23,11 +23,11 @@ local config = {
 		[4]={unitName = "dota_corllt_upd2",},						      
     },
     turret3 = {
-		[0]={unitName = "dota_heavyturret_upd",},
+		[0]={unitName = "dota_heavyturret",},
 		[1]={unitName = "dota_heavyturret",},
-		[2]={unitName = "dota_heavyturret",},
-		[3]={unitName = "dota_heavyturret",},
-		[4]={unitName = "dota_heavyturret",},
+		[2]={unitName = "dota_heavyturret_upd",},
+		[3]={unitName = "dota_heavyturret_upd",},
+		[4]={unitName = "dota_heavyturret_upd2",},
     },
   },
 

@@ -51,11 +51,50 @@ local buttownSize=50
 
 local lastX=10
 local lastY=10
+local buttons={}
 
 local function newButtonLine()
 	lastX=10
 	lastY=lastY+buttownSize+5
 end
+
+local function dotashop_creepupdate(name,cost,ones)
+	Spring.Echo("Recv creep data")
+	--local creep=allyShop.creeps[i]
+	local btn=buttons[name]
+	local tooltip="Buy '"..name.."' "
+	if ones then
+		tooltip=tooltip.."only for one wave"
+	end
+	
+	tooltip=tooltip.."\nCost: "..tostring(cost)
+	btn.tooltip=tooltip
+end
+
+local function dotashop_defenseupdate(lvl,cost)
+	Spring.Echo("Def upd")
+	
+	local btn=buttons["defense"]
+	local tooltip
+	if cost==0 then
+		tooltip="You improved protection to the maximum"
+	else
+		tooltip="Next level: "..tostring(lvl).."\nCost: "..tostring(cost)
+	end
+	
+	btn.tooltip=tooltip
+end
+
+local function dotashop_comupdate(name,cost)
+	local btn=buttons[name]
+	local tooltip="Increase commander damage\nCost: "..tostring(cost)
+	btn.tooltip=tooltip
+end
+
+local function dotashop_storageupdate(size,cost)
+	buttons["storage"].tooltip="Next storage size: "..tostring(size).."\nCost: "..tostring(cost)
+end
+
 
 local function addButton(texture,unit,tooltip)
 	local button  = Chili.Button:New {
@@ -74,7 +113,7 @@ local function addButton(texture,unit,tooltip)
 			OnMouseDown = {buyUnit},
 			dotashop_unit=unit,
 			caption="",
-			--tooltip=tooltip,
+			tooltip=tooltip,
 	}
 	local image= Chili.Image:New {
 				x=0,
@@ -87,7 +126,8 @@ local function addButton(texture,unit,tooltip)
 	}
 	
 	lastX=lastX+button.width+5
-	return button
+	
+	buttons[unit]=button
 end
 
 function widget:Initialize()	
@@ -95,6 +135,12 @@ function widget:Initialize()
  		widgetHandler:RemoveWidget()
  		return
  	end
+ 	
+ 	widgetHandler:RegisterGlobal("dotashop_creepupdate", dotashop_creepupdate) 
+ 	widgetHandler:RegisterGlobal("dotashop_defenseupdate", dotashop_defenseupdate)  	
+ 	widgetHandler:RegisterGlobal("dotashop_comupdate", dotashop_comupdate)  	
+ 	widgetHandler:RegisterGlobal("dotashop_storageupdate", dotashop_storageupdate)  	
+ 	
  	
  	Chili      = WG.Chili
  	local screen0 = Chili.Screen0
@@ -129,9 +175,9 @@ function widget:Initialize()
 	addButton("armbrawl.png","brawler","Buy Brawler only for one wave\nCost: 1500m") 	
 	addButton("cormak.png","outlaw","Buy Outlwar only for one wave\nCost: 300m") 
 	--newButtonLine()
-	addButton("module_dmg_booster.png","com_attack","Increase commander damage\nCost: 100 + 100*lvl*lvl") 
-	addButton("module_heavy_armor.png","com_def","Increase commander defense\nCost: 100 + 100*lvl*lvl") 		
-	addButton("module_adv_targeting.png","com_range","Increase commander attack range\nCost: 100 + 100*lvl*lvl") 
-	addButton("weaponmod_autoflechette.png","com_attackSpeed","Increase commander attack speed\nCost: 100 + 100*lvl*lvl") 		
+	addButton("module_dmg_booster.png","attackLvl","Increase commander damage\nCost: 100 + 100*lvl*lvl") 
+	addButton("module_heavy_armor.png","defLvl","Increase commander defense\nCost: 100 + 100*lvl*lvl") 		
+	addButton("module_adv_targeting.png","rangeLvl","Increase commander attack range\nCost: 100 + 100*lvl*lvl") 
+	addButton("weaponmod_autoflechette.png","attackSpeedLvl","Increase commander attack speed\nCost: 100 + 100*lvl*lvl") 		
 	
  end
