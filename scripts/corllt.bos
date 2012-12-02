@@ -74,11 +74,15 @@ QueryPrimary(piecenum)
 	piecenum = flare;
 }
 
-SweetSpot(piecenum)
+QueryWeapon2(piecenum)
 {
 	piecenum = base;
 }
 
+AimWeapon2()
+{
+	return(1);
+}
 Killed(severity, corpsetype)
 {
 	hide flare;
