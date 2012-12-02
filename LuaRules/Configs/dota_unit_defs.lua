@@ -9,13 +9,25 @@ local config = {
 
   turretDefs = {
     turret1 = {
-      unitName = "corpre",
+		[0]={unitName = "corpre",},
+		[1]={unitName = "corpre",},
+		[2]={unitName = "corpre",},
+		[3]={unitName = "corpre",},
+		[4]={unitName = "corpre",},		
     },
     turret2 = {
-      unitName = "corllt",
+		[0]={unitName = "dota_corllt",},
+		[1]={unitName = "dota_corllt",},
+		[2]={unitName = "dota_corllt_upd",},		
+		[3]={unitName = "dota_corllt_upd",},		
+		[4]={unitName = "dota_corllt_upd2",},						      
     },
     turret3 = {
-      unitName = "heavyturret",
+		[0]={unitName = "dota_heavyturret_upd",},
+		[1]={unitName = "dota_heavyturret",},
+		[2]={unitName = "dota_heavyturret",},
+		[3]={unitName = "dota_heavyturret",},
+		[4]={unitName = "dota_heavyturret",},
     },
   },
 
@@ -54,34 +66,34 @@ local config = {
     },     
     thug  = {
       unitName = "corthud",
-      cost=700,
+      cost=500,
       reward=40,
     },        
     tarantula = {
       unitName = "spideraa",
-      cost=600,
+      cost=700,
       reward=30,
     },    
     banshee = {
       unitName = "armkam",
-      cost=1500,
+      cost=800,
       reward=80,
     },   
     crabe = {
       unitName = "armcrabe",
-      cost=1300,
+      cost=700,
       ones=true,
       reward=90,
     },      
     brawler = {
       unitName = "armbrawl",
-      cost=1500,
+      cost=600,
       ones=true,
       reward=80,
     }, 
     outlaw = {
       unitName = "cormak",
-      cost=300,
+      cost=100,
       ones=true,
       reward=30,
     }, 
@@ -91,76 +103,6 @@ local config = {
 
 local turretDefs = config.turretDefs
 local creepDefs  = config.creepDefs
-
-
-turretDefs["turret1"].spawnFunction =
-function (x, z, teamID)
-  local turret = Spring.CreateUnit("corpre", x, Spring.GetGroundHeight(x, z), z, 0, teamID)
-  Spring.SetUnitWeaponState(turret, 0, {
-    range = 600,
-    reloadTime = 0.03,
-  } )
-  local cost = 500
-  Spring.SetUnitCosts(turret, {
-    buildTime = cost,
-    metalCost = cost,
-    energyCost = cost,
-  } )
-  Spring.SetUnitSensorRadius(turret, "los", 600)
-  Spring.SetUnitMaxHealth(turret, 3000)
-  Spring.SetUnitHealth(turret, 3000)
-  Spring.SetUnitNoSelect(turret, true)
-  return turret
-end
-
-turretDefs["turret2"].spawnFunction =
-function (x, z, teamID)
-  local turret = Spring.CreateUnit("corllt", x, Spring.GetGroundHeight(x, z), z, 0, teamID)
-  Spring.SetUnitWeaponState(turret, 0, {
-    range = 600,
-    projectiles = 5,
-    burst = 8,
-    burstRate = 0.01,
-    sprayAngle = 0.1,
-  } )
-  local cost = 1000
-  Spring.SetUnitCosts(turret, {
-    buildTime = cost,
-    metalCost = cost,
-    energyCost = cost,
-  } )
-  Spring.SetUnitSensorRadius(turret, "los", 1000)
-  Spring.SetUnitMaxHealth(turret, 4500)
-  Spring.SetUnitHealth(turret, 4500)
-  Spring.SetUnitNoSelect(turret, true)
-  return turret
-end
-
-turretDefs["turret3"].spawnFunction =
-function (x, z, teamID)
-  local squareSize = Game.squareSize
-  local height = Spring.GetGroundHeight(x, z) + 30
-  Spring.LevelHeightMap(x - squareSize, z - squareSize, x + squareSize, z + squareSize, height)
-
-  local turret = Spring.CreateUnit("heavyturret", x, height, z, 0, teamID)
-  Spring.SetUnitResourcing(turret, "ume", 25) -- needs 25 E to fire like anni/ddm
-  Spring.SetUnitWeaponState(turret, 0, {
-    range = 750,
-    reloadTime = 8,
-  } )
-  local cost = 1500
-  Spring.SetUnitCosts(turret, {
-    buildTime = cost,
-    metalCost = cost,
-    energyCost = cost,
-  } )
-  Spring.SetUnitSensorRadius(turret, "los", 1250)
-  Spring.SetUnitMaxHealth(turret, 6000)
-  Spring.SetUnitHealth(turret, 6000)
-  Spring.SetUnitNoSelect(turret, true)
-  return turret
-end
-
 
 creepDefs["creep1"].setupFunction =
 function (creepID)

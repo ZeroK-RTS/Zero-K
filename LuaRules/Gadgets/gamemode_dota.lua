@@ -91,7 +91,7 @@ local additionalCreep={{},{}} -- bought creeps
 local ones_additionalCreep={{},{}}
 
 -- defense shop
-local defenseUnits={{},{}} 
+local defenseUnits={} 
 local defenseUpdateLevels={0,0} 
 
 -- com updates shop
@@ -102,10 +102,10 @@ do
   local defID = UnitDefNames[ hqDef.unitName ].id
   protectedStructures[defID] = true
 
-  for _, turretDef in pairs(turretDefs) do
+ --[[ for _, turretDef in pairs(turretDefs) do
     defID = UnitDefNames[ turretDef.unitName ].id
     protectedStructures[defID] = true
-  end
+  end]]
 
   for _, creepDef in pairs(creepDefs) do
     defID = UnitDefNames[ creepDef.unitName ].id
@@ -264,6 +264,60 @@ local function CreateUnitNearby(unitDef, spawnPoint, teamID, markerType)
 end
 
 
+local function SpawnTurret(x,z,teamID,updLvl,turretName,lastID)
+	Spring.Echo("Spawn turret '"..turretName.."' lvl:"..tostring(updLvl))
+	
+	local unitDefName=turretDefs[turretName][updLvl].unitName
+	local unitDef = UnitDefNames[unitDefName]
+	
+	local lastMaxHP=unitDef.health*(1+(updLvl-1)*0.3)
+	local maxHP=unitDef.health*(1+updLvl*0.3)
+	local lastHP
+	if lastID~=nil then
+		lastHP=maxHP*Spring.GetUnitHealth(lastID)/lastMaxHP
+		Spring.DestroyUnit(lastID,false,true)
+	else
+		lastHP=maxHP
+	end
+
+
+	local turret = Spring.CreateUnit(unitDefName, x, Spring.GetGroundHeight(x, z), z, 0, teamID)
+
+	Spring.SetUnitMaxHealth(turret, maxHP)
+	Spring.SetUnitHealth(turret, lastHP)
+
+	--Spring.SetUnitNoSelect(turret, true)
+	return turret
+end
+
+local needLevelUp={false,false}
+
+local function applyDefenseLevelUp(d)
+	local lvl=defenseUpdateLevels[d]
+
+	local newData={}
+	for turret,data in pairs(defenseUnits) do
+		if data.team_d==d then
+			local x,_,z=Spring.GetUnitPosition(turret)
+			local turretNew=SpawnTurret(x,z,Spring.GetUnitTeam(turret),lvl,data.defName,turret)
+			--defenseUnits[turret]=nil
+			--defenseUnits[turretNew]=data;
+			data.defBonus=1/math.sqrt(math.sqrt(lvl))
+			table.insert(newData,{
+								old=turret,
+								new=turretNew,
+								data=data
+								})
+		end
+	end
+	
+	for i=1,#newData,1 do
+		local nd=newData[i]
+		defenseUnits[nd.old]=nil
+		defenseUnits[nd.new]=nd.data;
+	end
+end
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   if (UnitDefs[unitDefID].customParams.commtype) then
     comsData[unitID] = {
@@ -373,16 +427,19 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     end
 
     Spring.GameOver({winnerAllyTeam})
-  elseif (UnitDefs[unitDefID].name == turretDefs["turret3"].unitName) then
-    local hq = HQ[allyteam+1]
-    _,_,_,eu = Spring.GetUnitResources(hq)
-    Spring.SetUnitResourcing(hq, "uue", eu - 25) -- stop hq from using up the free E from turret
+  elseif defenseUnits[unitID]~=nil then
+	defenseUnits[unitID]=nil
+	if defenseUnits[unitID].defName == "turret3" then
+		 local hq = HQ[allyteam+1]
+		_,_,_,eu = Spring.GetUnitResources(hq)
+		Spring.SetUnitResourcing(hq, "uue", eu - 25) -- stop hq from using up the free E from turret
 
-    if (allyteam == 0) then
-      creepbalance = creepbalance - 1
-    else
-      creepbalance = creepbalance + 1
-    end
+		if (allyteam == 0) then
+		  creepbalance = creepbalance - 1
+		else
+		  creepbalance = creepbalance + 1
+		end
+	end
   elseif (UnitDefs[unitDefID].name == "amphtele") then
     if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
       local reward = 100
@@ -423,6 +480,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
         Spring.Echo(killer .. " pwned " .. failer .. "!")
       end
     else
+		
       local damageDefID = comsData[unitID].lastDamageDefID
 
       if (Spring.GetUnitHealth(unitID) > 0) then -- was self-ded
@@ -514,18 +572,14 @@ function gadget:GamePreload()
     HQ[i] = hq
 
     Spring.SetUnitNoSelect(hq, true)
-    Spring.SetUnitResourcing(hq, "uue", 75) -- use 75 E to offset t3 turrets
+    --Spring.SetUnitResourcing(hq, "uue", 75) -- use 75 E to offset t3 turrets
     Spring.SetUnitSensorRadius(hq, "seismic", 4000)
 
     for _, turretData in ipairs(td.turretPositions) do
       local turretName = turretData[3]
       local turretDef  = turretDefs[turretName]
-
-      if (turretDef.spawnFunction) then
-        local turretID=turretDef.spawnFunction (turretData[1], turretData[2], teams[i])
-        defenseUnits[i][turretID]={attackBonus=1}
-      end
-      
+		local turretID=SpawnTurret(turretData[1], turretData[2], teams[i],0,turretName,nil)
+        defenseUnits[turretID]={defBonus=1,defName=turretName,team_d=i}
     end
   end
 end
@@ -562,16 +616,17 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
   end
 
   if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams[1] == 1) or -- block cloak
-    blockedCmds[cmdID] or cmdID < 0) then -- block reclaim, rez, build and terra
+   blockedCmds[cmdID] or cmdID < 0) then -- block reclaim, rez, build and terra
     return false
   end
 
   if ((cmdID == CMD.ATTACK or cmdID == CMD.MANUALFIRE) and #cmdParams == 1) then -- block attack orders on friendly HQs and turrets
+  
     local targetID    = cmdParams[1]
     local targetDefID = Spring.GetUnitDefID(targetID)
     local targetTeam  = Spring.GetUnitTeam(targetID)
 
-    if (targetDefID and protectedStructures[targetDefID] and Spring.AreTeamsAllied(unitTeam, targetTeam)) then
+    if (targetDefID and ( protectedStructures[targetDefID]~=nil or defenseUnits[targetID]~=nil ) and Spring.AreTeamsAllied(unitTeam, targetTeam)) then
       return false
     end
   end
@@ -606,11 +661,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	
 	-- defense update
-	local data=defenseUnits[1][attackerID]
-	if data==nil then data=defenseUnits[2][attackerID] end
-	
+	local data=defenseUnits[unitID]
 	if data~=nil then
-		damage=damage*data.attackBonus
+		damage=damage*data.defBonus
 	end
 	
 	return damage
@@ -731,6 +784,13 @@ function gadget:GameFrame(n)
       end
     end
   end
+  
+	for i=1,#needLevelUp,1 do
+		if needLevelUp[i] then
+			applyDefenseLevelUp(i)
+			needLevelUp[i]=false
+		end
+	end
 end
 
 local function getPlayerHeadTeam(playerID)
@@ -808,17 +868,7 @@ local function defenseUpdate(playerID)
 	if m>=updateCost then
 		Spring.UseTeamResource(team,"metal",updateCost)
 		defenseUpdateLevels[d]=defenseUpdateLevels[d]+1
-		local lvl=defenseUpdateLevels[d]
-		
-		for turret,data in pairs(defenseUnits[d]) do
-			local _,maxHP=Spring.GetUnitHealth(turret)
-			Spring.SetUnitMaxHealth(turret,maxHP*1.2)
-			Spring.SetUnitArmored(turret,true,1+lvl*0.1)
-			data.attackBonus=1+lvl*0.2
-			if lvl==4 then
-				-- setup shield
-			end
-		end
+		needLevelUp[d]=true
 	end
 end
 
@@ -966,11 +1016,6 @@ end
 
 local function ToggleDebugInfo (cmd, line, words, playerID)
   drawDebugInfo = not drawDebugInfo
-end
-
-
-function gadget:GotChatMsg(msg, player)
-	Spring.Echo("--> "..msg)
 end
 
 function gadget:Initialize()

@@ -16,6 +16,24 @@ end
 
 local Chili
  
+ --SendToUnsynced -> write in widgetglobal
+ --[[
+[20:35:47] <Anarchid> 1) get the data in synced context
+[20:35:47] <Anarchid> 2) send it to gadget unsynced context
+[20:35:47] <Anarchid> 3) in gadget unsynced, filter data for the local player, and write to some gadget-accessible location
+[20:35:47] <Anarchid> 4) in widget, process this data and do whatever you want
+]]
+
+-- http://code.google.com/p/zero-k/source/diff?spec=svn8389&r=8389&format=side&path=/trunk/mods/zk/LuaRules/Gadgets/start_unit_setup.lua&old_path=/trunk/mods/zk/LuaRules/Gadgets/start_unit_setup.lua&old=8378
+-- http://code.google.com/p/zero-k/source/diff?spec=svn7194&r=7194&format=side&path=/trunk/mods/zk/LuaUI/Widgets/gui_take_remind.lua
+--[[
+local commSeries = msg:sub(12) --get the name of selected commander
+806			commChoice[playerID] = name	807			_G.commSeries = commSeries --send comm name to unsynced part. Reference: http://answers.springlobby.info/questions/6/how-do-i-receive-synced-events-in-unsynced-luarules
+808			SendToUnsynced("CommSelected",playerID) --activate an event called "CommSelected" that can be detected in unsynced part
+809			_G.commSeries = nil --empty this vessel
+810			commChoice[playerID] = commSeries --remember this name for spawning commander at "GameStart()"
+]]
+
  -- MEMBERS
 local helloWorldLabel
 local warriorButton
@@ -56,7 +74,7 @@ local function addButton(texture,unit,tooltip)
 			OnMouseDown = {buyUnit},
 			dotashop_unit=unit,
 			caption="",
-			tooltip=tooltip,
+			--tooltip=tooltip,
 	}
 	local image= Chili.Image:New {
 				x=0,
