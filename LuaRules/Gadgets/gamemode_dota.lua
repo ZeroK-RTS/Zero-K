@@ -945,26 +945,31 @@ end
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg=="dotashop_buy_warrior" then
 		buyUnit(playerID,"warrior")
-	elseif msg=="dotashop_buy_glave" then
-		buyUnit(playerID,"glave")	
+	elseif msg=="dotashop_buy_bandit" then
+		buyUnit(playerID,"bandit")	
 	elseif msg=="dotashop_buy_zeus" then
 		buyUnit(playerID,"zeus")	 
 	elseif msg=="dotashop_buy_aspis" then
 		buyUnit(playerID,"aspis")	
 	elseif msg=="dotashop_buy_thug" then
 		buyUnit(playerID,"thug")		
-	elseif msg=="dotashop_buy_tarantula" then
-		buyUnit(playerID,"tarantula")	
+	elseif msg=="dotashop_buy_vandal" then
+		buyUnit(playerID,"vandal")	
 	elseif msg=="dotashop_buy_banshee" then
 		buyUnit(playerID,"banshee")		
-	elseif msg=="dotashop_buy_outlaw" then
-		buyUnit(playerID,"outlaw")	
+	elseif msg=="dotashop_buy_recluse" then
+		buyUnit(playerID,"recluse")			
 		
 	elseif msg=="dotashop_buy_crabe" then
 		buyUnit(playerID,"crabe")	
 	elseif msg=="dotashop_buy_brawler" then
 		buyUnit(playerID,"brawler")		
-				
+	elseif msg=="dotashop_buy_outlaw" then
+		buyUnit(playerID,"outlaw")	
+	elseif msg=="dotashop_buy_dante" then
+		buyUnit(playerID,"dante")			
+		
+		
 	elseif msg=="dotashop_buy_storage" then
 		buyStorage(playerID)
 	elseif msg=="dotashop_buy_defense" then
@@ -1051,15 +1056,14 @@ local function ShopUpdate_Creep(str,teamID,name,cost,ones)
 	Script.LuaUI.dotashop_creepupdate(name,cost,ones)
 end
 
-local function ShopUpdate_comUpdate(str,teamID,name,cost)
+local function ShopUpdate_comUpdate(str,teamID,name,lvl,cost)
 	if teamID~=Spring.GetLocalTeamID() then
 		return
 	end
 	
-	Script.LuaUI.dotashop_comupdate(name,cost)
+	Script.LuaUI.dotashop_comupdate(name,lvl,cost)
 end
 local function ShopUpdate_defenseUpdate(str,teamID,lvl,cost)
-	Spring.Echo("Def upd GG")
 	if teamID~=Spring.GetLocalTeamID() then
 		return
 	end

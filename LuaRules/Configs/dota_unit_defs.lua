@@ -49,8 +49,8 @@ local config = {
       cost=400,
       reward=50,
     },    
-    glave = {
-      unitName = "armpw",
+    bandit = {
+      unitName = "corak",
       cost=250,
       reward=10,
     },     
@@ -69,25 +69,30 @@ local config = {
       cost=500,
       reward=40,
     },        
-    tarantula = {
-      unitName = "spideraa",
-      cost=700,
-      reward=30,
+    vandal = {
+      unitName = "corcrash",
+      cost=200,
+      reward=10,
     },    
     banshee = {
       unitName = "armkam",
-      cost=800,
+      cost=700,
       reward=80,
     },   
+    recluse = {
+      unitName = "armsptk",
+      cost=400,
+      reward=80,
+    },  
     crabe = {
       unitName = "armcrabe",
-      cost=700,
+      cost=600,
       ones=true,
       reward=90,
     },      
     brawler = {
       unitName = "armbrawl",
-      cost=600,
+      cost=500,
       ones=true,
       reward=80,
     }, 
@@ -96,6 +101,12 @@ local config = {
       cost=100,
       ones=true,
       reward=30,
+    }, 
+    dante = {
+      unitName = "dante",
+      cost=2000,
+      ones=true,
+      reward=500,
     }, 
     
   },

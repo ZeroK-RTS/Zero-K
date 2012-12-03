@@ -59,9 +59,10 @@ local function newButtonLine()
 end
 
 local function dotashop_creepupdate(name,cost,ones)
-	Spring.Echo("Recv creep data")
 	--local creep=allyShop.creeps[i]
 	local btn=buttons[name]
+	if btn==nil then return end
+	
 	local tooltip="Buy '"..name.."' "
 	if ones then
 		tooltip=tooltip.."only for one wave"
@@ -72,8 +73,6 @@ local function dotashop_creepupdate(name,cost,ones)
 end
 
 local function dotashop_defenseupdate(lvl,cost)
-	Spring.Echo("Def upd")
-	
 	local btn=buttons["defense"]
 	local tooltip
 	if cost==0 then
@@ -85,9 +84,10 @@ local function dotashop_defenseupdate(lvl,cost)
 	btn.tooltip=tooltip
 end
 
-local function dotashop_comupdate(name,cost)
+local function dotashop_comupdate(name,lvl,cost)
 	local btn=buttons[name]
-	local tooltip="Increase commander damage\nCost: "..tostring(cost)
+	if btn==nil then return end
+	local tooltip=btn.baseText.."\nCost: "..tostring(cost)
 	btn.tooltip=tooltip
 end
 
@@ -96,7 +96,7 @@ local function dotashop_storageupdate(size,cost)
 end
 
 
-local function addButton(texture,unit,tooltip)
+local function addButton(texture,unit,baseText)
 	local button  = Chili.Button:New {
 			parent = helloWorldWindow,
 			x = lastX,
@@ -113,7 +113,8 @@ local function addButton(texture,unit,tooltip)
 			OnMouseDown = {buyUnit},
 			dotashop_unit=unit,
 			caption="",
-			tooltip=tooltip,
+			tooltip="",
+			baseText=baseText
 	}
 	local image= Chili.Image:New {
 				x=0,
@@ -157,27 +158,27 @@ function widget:Initialize()
  	}	
  	
  	addButton("armwar.png","warrior","Buy Warrir\nCost: 400m")
- 	addButton("armpw.png","glave","Buy Glave\nCost: 250m") 	
+ 	addButton("corak.png","bandit","Buy Glave\nCost: 250m") 	
  	addButton("armzeus.png","zeus","Buy Zeus\nCost: 700m") 	
  		 	
- 	addButton("core_spectre.png","aspis","Buy Aspis\nCost: 1200m") 	
+ 	--addButton("core_spectre.png","aspis","Buy Aspis\nCost: 1200m") 	
  	addButton("corthud.png","thug","Buy Thug\nCost: 700m") 		
- 	addButton("spideraa.png","tarantula","Buy Tarantula\nCost: 600m") 		
+ 	addButton("corcrash.png","vandal","Buy Tarantula\nCost: 600m") 		
  	addButton("armkam.png","banshee","Buy Banshee\nCost: 1500m") 	
- 	
+ 	addButton("armsptk.png","recluse","") 	
  	
 	newButtonLine()
 	addButton("armmstor.png","storage","Increase metal storage\nCost: 80% of the curent storage") 	
 	addButton("armanni.png","defense","Update base defense (Max 4 times) \nCost: 300m, 350m, 500m, 750m") 	
-		
 	--newButtonLine()
 	addButton("armcrabe.png","crabe","Buy Crabe only for one wave\nCost: 1300m") 
 	addButton("armbrawl.png","brawler","Buy Brawler only for one wave\nCost: 1500m") 	
 	addButton("cormak.png","outlaw","Buy Outlwar only for one wave\nCost: 300m") 
+	addButton("dante.png","dante","Buy Outlwar only for one wave\nCost: 300m")
 	--newButtonLine()
-	addButton("module_dmg_booster.png","attackLvl","Increase commander damage\nCost: 100 + 100*lvl*lvl") 
-	addButton("module_heavy_armor.png","defLvl","Increase commander defense\nCost: 100 + 100*lvl*lvl") 		
-	addButton("module_adv_targeting.png","rangeLvl","Increase commander attack range\nCost: 100 + 100*lvl*lvl") 
-	addButton("weaponmod_autoflechette.png","attackSpeedLvl","Increase commander attack speed\nCost: 100 + 100*lvl*lvl") 		
+	addButton("module_dmg_booster.png","attackLvl","Increase commander damage") 
+	addButton("module_heavy_armor.png","defLvl","Increase commander defense") 		
+	--addButton("module_adv_targeting.png","rangeLvl","Increase commander attack range\nCost: 100 + 100*lvl*lvl") 
+	addButton("weaponmod_autoflechette.png","attackSpeedLvl","Increase commander attack speed") 		
 	
  end
