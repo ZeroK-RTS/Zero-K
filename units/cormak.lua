@@ -106,25 +106,25 @@ unitDef = {
 
     BLAST    = {
       name                    = [[Disruptor Pulser]],
-      areaOfEffect            = 600,
+      areaOfEffect            = 550,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 75,
-        planes  = 75,
-        subs    = 5,
+        default = 50,
+        planes  = 50,
+        subs    = 2.5,
       },
 	  
       customParams           = {
-	lups_explodespeed = 0.3,
-	lups_explodelife = 1.15,
+	lups_explodespeed = 1,
+	lups_explodelife = 3,
 	nofriendlyfire = 1,
       },
 
-      edgeeffectiveness       = 0.95,
+      edgeeffectiveness       = 1,
       explosionGenerator      = [[custom:NONE]],
-      explosionSpeed          = 3,
+      explosionSpeed          = 12,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
