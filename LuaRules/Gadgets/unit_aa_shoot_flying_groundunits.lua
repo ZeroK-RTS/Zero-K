@@ -1,5 +1,5 @@
---//Version 0.9
-local isEnable = false
+--//Version 0.91
+local isEnable = true
 function gadget:GetInfo()
   return {
     name      = "AA shoot flying ground units",
@@ -59,20 +59,21 @@ GG.isflying_watchout = {} --allow other gadget to signal this gadget that this u
 	MANUAL:
 
 	Do this to trigger AA detection from other gadget:
-	1) make sure unit fulfill this condition: 
+	1) make sure unit fulfills this condition: 
 		- upward (or downward) velocity is > Game.gravity/30/30, OR the height below unit's feet is > 100 elmo (100 elmo from feet to ground).
-	2) add the following value:
-		- GG.isflying_watchout[unitID]=true
+	2) then add the following value to trigger detection:
+		- GG.isflying_watchout[unitID]=true, OR:
+		- Spring.AddUnitDamage(unitID, 0)
 		
 	The following happen:
-	1) gadget iterate over the "GG.isflying_watchout",
-	2) unitID(s) is added to a watchlist
+	1) gadget iterate over the "GG.isflying_watchout" or will check unit reporting damage,
+	2) unitID(s) is added to a temporary watchlist
 	2) "GG.isflying_watchout" is emptied
-	3) unitID get shot by AA when:
+	3) unitID will get shot by AA when:
 		- squareroot of its component-speed-squared combined is > 3.8 elmo-per-frame, AND the height below unit's feet is > 100 elmo.
-	4) unit become landed when:
+	4) unit is considered grounded when:
 		- upward (or downward) velocity is < Game.gravity/30/30, AND the height below unit's feet is < 100 elmo.
-	5) landed unitID(s) removed from watchlist
+	5) grounded unitID is immediately removed from watchlist
 		
 	You can exert velocity on any unit by:
 	1) Spring.AddUnitImpulse(unitID, +velx, +vely, +velz); or...
@@ -189,9 +190,9 @@ function gadget:GameFrame(n)
 					offX = front[1]*offX_temp + top[1]*offY_temp + right[1]*offZ_temp
 					offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
 					offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
+					spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,(-100+offY),offZ, true)
 				end
 				spSetUnitCloak(aaMarker,cloaked,0)
-				spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,(-100+offY),offZ, true)
 			end
 		end
 	end
@@ -290,7 +291,7 @@ local function TranslateRotatedCartesianCoordinateIntoStandardCartesianCoordinat
 	
 	return stdX,stdY,stdZ
 end
-	--//measure gravity
+	--//measure gravity or measure water drag
 	if n==1 and measureMapGravity[1] ==1 then --only took 2 frame to finish measurement
 		measureMapGravity.fakeUnitID = spCreateUnit("fakeunit_aatarget", 0, 200, 0, "n", 0)
 		spSetUnitNoSelect(measureMapGravity.fakeUnitID, true)
