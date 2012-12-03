@@ -206,7 +206,8 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 	if tele[unitID].teleportiee then
 		teleportingUnit[tele[unitID].teleportiee] = nil
 		Spring.MoveCtrl.Disable(tele[unitID].teleportiee) --used by floatating unit for sea launch into air
-		Spring.AddUnitImpulse(tele[unitID].teleportiee,0,2,0) --for smooth falling down to sea bottom
+		Spring.AddUnitImpulse(tele[unitID].teleportiee,0,1,0) --for smooth falling down to sea bottom
+		Spring.AddUnitImpulse(tele[unitID].teleportiee,0,-1,0) --for smooth falling down to sea bottom
 	end
 	tele[unitID].teleFrame = false
 	tele[unitID].cost = false
@@ -597,9 +598,9 @@ function gadget:GameFrame(f)
 							
 							--//used for floatating submerged unit for launching into air
 							local ux,uy,uz = Spring.GetUnitPosition(teleportiee)
-							local gy = Spring.GetGroundHeight(ux,uz)
-							if uy<0 and uy< gy+10 then
-								local floatationForce = (gy-0.5)*2/(cost*cost) --(negative) acceleration to surface. Reference: equation of motion, s=a*t*t/2
+							uy = uy - ud.waterline
+							if uy<0 then
+								local floatationForce = (uy-0.5)*2/(cost*cost) --(negative) acceleration to surface. Reference: equation of motion, s=a*t*t/2
 								floatationForce = floatationForce/0.11111111193895 --Spring drag "physic", we need this factor to overcome the sea eating unit velocity. (measured ingame, factor = endVelocity/initial_acceleration).
 								Spring.MoveCtrl.Enable(teleportiee)
 								Spring.MoveCtrl.SetGravity(teleportiee, floatationForce) --this will push unit to surface, then "MoveCtrl.Disabled(teleportiee)" and launch to air.
