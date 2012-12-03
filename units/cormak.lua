@@ -117,9 +117,9 @@ unitDef = {
       },
 	  
       customParams           = {
-	lups_explodespeed = 1,
-	lups_explodelife = 3,
-	nofriendlyfire = 1,
+	    lups_explodespeed = 1.1,
+	    lups_explodelife = 0.6,
+	    nofriendlyfire = 1,
       },
 
       edgeeffectiveness       = 1,

@@ -7,7 +7,7 @@ return {
       circlegrowth       = 14.4,
       flashalpha         = 0.8,
       flashsize          = 500,
-      ttl                = 25,
+      ttl                = 22,
       color = {
         [1]  = 0.3,
         [2]  = 0,
@@ -24,7 +24,7 @@ return {
         alpha              = 0.6,
         color              = [[0.3,0,0.4]],
         expansionspeed     = 14.4,
-        ttl                = 25,
+        ttl                = 22,
       },
     },
     muzzleflash = {

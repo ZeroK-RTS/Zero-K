@@ -25,17 +25,17 @@ if (gadgetHandler:IsSyncedCode()) then
       local speed = 1
       local life = 1
       if customParams.lups_explodespeed then
-	speed = wd.customParams.lups_explodespeed
+	    speed = wd.customParams.lups_explodespeed
       end
       if wd.customParams.lups_explodelife then
-	life = wd.customParams.lups_explodelife
+	    life = wd.customParams.lups_explodelife
       end
       if (wd.damageAreaOfEffect>70 and not wd.paralyzer) then
         Script.SetWatchWeapon(wd.id,true)
-	hasShockwave[wd.id] = {life = life, speed = speed}
+	    hasShockwave[wd.id] = {life = life, speed = speed}
       elseif (wd.type == "DGun") then
         Script.SetWatchWeapon(wd.id,true)
-	hasShockwave[wd.id] = {life = life, speed = speed}
+	    hasShockwave[wd.id] = {life = life, speed = speed}
       --elseif (wd.description:find("Clogger")) then
       --  Script.SetWatchWeapon(wd.id,true)
       end
