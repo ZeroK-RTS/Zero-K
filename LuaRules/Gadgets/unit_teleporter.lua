@@ -79,10 +79,13 @@ local function CapUnitSpeed(unitID, speedCap, slowPower)
 end
 
 local function Paralyze(unitID, frameCount)
-	local health, maxHealth, paralyzeDamage, captureProgress, buildProgress = Spring.GetUnitHealth(unitID)
+	local health, maxHealth, paralyzeDamage = Spring.GetUnitHealth(unitID)
 	local second = math.abs(frameCount*(1/30)) --because each frame took 1/30 second
 	second = second-1-1/16 --because at 0% it took 1 second to recover, and paralyze is in slow update (1/16)
-	local paralyze = health+health*second/40 --a full health of paralyzepoints represent 1 second of paralyze, additional health/40 paralyzepoints represent +1 second of paralyze. Reference: modrules.lua, Unit.cpp(spring).
+	--Note: ZK use 
+	--paralyzeAtMaxHealth=true, and 
+	--unitParalysisDeclineScale=40
+	local paralyze = maxHealth+maxHealth*second/40 --a full health of paralyzepoints represent 1 second of paralyze, additional health/40 paralyzepoints represent +1 second of paralyze. Reference: modrules.lua, Unit.cpp(spring).
 	Spring.SetUnitHealth(unitID, { paralyze = paralyze })
 end
 
