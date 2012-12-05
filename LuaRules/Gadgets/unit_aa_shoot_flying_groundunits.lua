@@ -1,11 +1,11 @@
---//Version 0.91
+--//Version 0.93
 local isEnable = true
 function gadget:GetInfo()
   return {
     name      = "AA shoot flying ground units",
     desc      = "Allow ground AA and air-superiority fighter to target and shot down any ground unit that is thrown up into air by Newton or explosion. AA targetting is triggered only by Newton or weapon explosion but can also be triggered externally thru GG table.",
     author    = "msafwan",
-    date      = "1 Dec 2012",
+    date      = "5 Dec 2012",
     license   = "GNU GPL, v2 or later",
     layer     = -99,
     enabled   = isEnable  --  loaded by default?
@@ -47,6 +47,8 @@ local spMoveCtrlEnable = Spring.MoveCtrl.Enable
 --local spMoveCtrlSetPhysics = Spring.MoveCtrl.SetPhysics
 local spMoveCtrlSetGravity = Spring.MoveCtrl.SetGravity
 local spMoveCtrlSetPosition = Spring.MoveCtrl.SetPosition
+local spMoveCtrlSetNoBlocking = Spring.MoveCtrl.SetNoBlocking
+local spMoveCtrlSetAirMoveTypeData  = Spring.MoveCtrl.SetAirMoveTypeData 
 --------------------------------------------------------------------------------
 --local measureMapGravity ={1, fakeUnitID= nil, gravity=nil}
 local gravity = -1*Game.gravity/30/30
@@ -114,6 +116,8 @@ function gadget:GameFrame(n)
 							spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
 							spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-100,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: target is higher than the flying unit (ie: +100 elmo)
 							spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
+							spMoveCtrlSetNoBlocking(aaMarker,false)
+							spMoveCtrlSetAirMoveTypeData(aaMarker, {collide=false})
 							spSetUnitNoSelect(aaMarker, true)  --don't allow player to use the FAKE
 							spSetUnitNoDraw(aaMarker, true) --don't hint player that FAKE exist
 							spSetUnitNoMinimap(aaMarker, true)
@@ -164,6 +168,8 @@ function gadget:GameFrame(n)
 					spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
 					spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-100,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
 					spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
+					spMoveCtrlSetNoBlocking(aaMarker,false)
+					spMoveCtrlSetAirMoveTypeData(aaMarker, {collide=false})
 					spSetUnitNoSelect(aaMarker, true)  --don't allow player to use the FAKE
 					spSetUnitNoDraw(aaMarker, true) --don't hint player that FAKE exist
 					spSetUnitNoMinimap(aaMarker, true)
