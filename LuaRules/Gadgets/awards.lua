@@ -1133,7 +1133,7 @@ function gadget:DrawScreen()
 						glPushMatrix()
 							
 							local border = 2
-							glColor(0,0,0,1)
+							glColor(0,0,0,0)
 							gl.Rect(0-border, 0-border, tWidth+border, tHeight+border)
 							glColor(1,1,1,1)	
 							glTexture('LuaRules/Images/awards/trophy_'.. awardType ..'.png')
