@@ -1,4 +1,4 @@
---//Version 0.93
+--//Version 0.934
 local isEnable = true
 function gadget:GetInfo()
   return {
@@ -22,7 +22,6 @@ local spDestroyUnit        = Spring.DestroyUnit
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spSetUnitNoMinimap   = Spring.SetUnitNoMinimap
 local spSetUnitNoSelect    = Spring.SetUnitNoSelect
-local spSetUnitBlocking = Spring.SetUnitBlocking
 local spSetUnitCloak  = Spring.SetUnitCloak 
 local spSetUnitStealth  = Spring.SetUnitStealth
 local spSetUnitRadiusAndHeight = Spring.SetUnitRadiusAndHeight
@@ -38,6 +37,9 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitIsCloaked  = Spring.GetUnitIsCloaked
 local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 local spGetUnitVectors = Spring.GetUnitVectors
+local spGetUnitRadius  = Spring.GetUnitRadius 
+local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
+local spSetUnitCollisionVolumeData = Spring.SetUnitCollisionVolumeData
 
 local spGetUnitVelocity  = Spring.GetUnitVelocity
 --local spSetUnitPhysics  = Spring.SetUnitPhysics
@@ -47,14 +49,16 @@ local spMoveCtrlEnable = Spring.MoveCtrl.Enable
 --local spMoveCtrlSetPhysics = Spring.MoveCtrl.SetPhysics
 local spMoveCtrlSetGravity = Spring.MoveCtrl.SetGravity
 local spMoveCtrlSetPosition = Spring.MoveCtrl.SetPosition
-local spMoveCtrlSetNoBlocking = Spring.MoveCtrl.SetNoBlocking
-local spMoveCtrlSetAirMoveTypeData  = Spring.MoveCtrl.SetAirMoveTypeData 
+
+-- local spSetUnitBlocking = Spring.SetUnitBlocking
+-- local spMoveCtrlSetNoBlocking = Spring.MoveCtrl.SetNoBlocking
+-- local spMoveCtrlSetAirMoveTypeData  = Spring.MoveCtrl.SetAirMoveTypeData 
 --------------------------------------------------------------------------------
 --local measureMapGravity ={1, fakeUnitID= nil, gravity=nil}
 local gravity = -1*Game.gravity/30/30
 local flyingGroundUnitsID = {}
-local updateRate_2 = 5 --update rate for ground unit's free flying trajectory
-local updateRate_3 =1 --update rate for cloak status
+local updateRate_2 =1 --update rate for free flying trajectory. Use lower value for unit that move erraticly
+local updateRate_3 =1 --update rate for cloak status & unit's team
 --------------------------------------------------------------------------------
 GG.isflying_watchout = {} --allow other gadget to signal this gadget that this unit is flying. ie: "unit_jumpjet.lua" can do "GG.isflying_watchout[unitID]=true" to indicate that such unit is flying and should be targeted by AA.
 --[[
@@ -90,7 +94,10 @@ function gadget:GameFrame(n)
 					local unitTeam = spGetUnitTeam(unitID)
 					local unitDefID = spGetUnitDefID(unitID)
 					local stealth = UnitDefs[unitDefID].stealth
-					flyingGroundUnitsID[unitID]={unitTeam=unitTeam,stealth=stealth, aaMarker=nil, teamChange=nil}
+					local sclX,sclY,sclZ = spGetUnitCollisionVolumeData(unitID) --get the diameter of the hit volume
+					local radX = spGetUnitRadius(unitID) --get the radius of the collision volume
+					local safeDistance = math.max(sclX/2+20,sclY/2+20,sclZ/2+20,radX+20,100)
+					flyingGroundUnitsID[unitID]={unitTeam=unitTeam,stealth=stealth, aaMarker=nil, teamChange=nil,safeDistance=safeDistance }
 					GG.isflying_watchout[unitID] = nil
 				end
 			end
@@ -104,20 +111,25 @@ function gadget:GameFrame(n)
 				landed = true
 			end
 			if not landed then
-				if groundHeight+100 < by then
-					local netVelocity = math.sqrt(velX*velX+velY*velY +velZ*velZ)
-					if netVelocity > 3.8 then --if flying unit is flying faster than the fastest "glaives", then mark it for AA. (Such floating unit look like airplane in radar dot.)  
+				if by > groundHeight+100 then
+					local netVelocity_sq = (velX*velX+velY*velY +velZ*velZ)
+					local glaiveSpeed_sq = 3.8*3.8
+					if netVelocity_sq >= glaiveSpeed_sq then --if flying unit is flying faster than the fastest "glaives", then mark it for AA. (Such floating unit look like airplane in radar dot.)  
 						local aaMarker = flyingGroundUnitsID[unitID].aaMarker
+						local fakePosition = flyingGroundUnitsID[unitID].safeDistance
 						if not aaMarker then --if flying unit not yet have FAKE AA marker:
 							local unitTeam = flyingGroundUnitsID[unitID].unitTeam
 							local stealth = flyingGroundUnitsID[unitID].stealth
 							local cloaked = spGetUnitIsCloaked(unitID)
-							aaMarker = spCreateUnit("fakeunit_aatarget",mx,(my+100),mz, "s", unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
+							aaMarker = spCreateUnit("fakeunit_aatarget",mx,(my+fakePosition),mz, "s", unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
+							spSetUnitCollisionVolumeData(aaMarker, 0,0,0,0,0,0,3,0,0) --set FAKE unit's hitbox as small as possible
 							spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
-							spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-100,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: target is higher than the flying unit (ie: +100 elmo)
-							spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
-							spMoveCtrlSetNoBlocking(aaMarker,false)
-							spMoveCtrlSetAirMoveTypeData(aaMarker, {collide=false})
+							spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-fakePosition,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: target is higher than the flying unit (ie: +100 elmo)
+							--//not working for free fall:
+							-- spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
+							-- spMoveCtrlSetNoBlocking(aaMarker,false)
+							-- spMoveCtrlSetAirMoveTypeData(aaMarker, {collide=false})
+							--//end
 							spSetUnitNoSelect(aaMarker, true)  --don't allow player to use the FAKE
 							spSetUnitNoDraw(aaMarker, true) --don't hint player that FAKE exist
 							spSetUnitNoMinimap(aaMarker, true)
@@ -130,7 +142,7 @@ function gadget:GameFrame(n)
 						--spSetUnitPhysics(aaMarker,mx, my+100,mz,velX,velY,velZ,0,0,0)
 						--spMoveCtrlSetPhysics(aaMarker,mx, my+100,mz,velX,velY,velZ,0,0,0) --NOTE: physics callins has issues setting velocity
 						spMoveCtrlSetVelocity(aaMarker,velX,velY,velZ)
-						spMoveCtrlSetPosition(aaMarker,mx, (my+100),mz)
+						spMoveCtrlSetPosition(aaMarker,mx, (my+fakePosition),mz)
 						spSetUnitDirection(aaMarker,1,0,0) --make sure FAKE is exactly facing at right angle. This make sure that aiming point below it stays on the unit
 					else --unit is not flying
 						if flyingGroundUnitsID[unitID].aaMarker then
@@ -156,6 +168,7 @@ function gadget:GameFrame(n)
 	if n%updateRate_3 == 0 then --update cloak status every 1 frame. ~30fps. depends on player's energy and ect.
 		for unitID,_ in pairs(flyingGroundUnitsID) do
 			local aaMarker = flyingGroundUnitsID[unitID].aaMarker
+			local fakePosition = flyingGroundUnitsID[unitID].safeDistance
 			if aaMarker then
 				if flyingGroundUnitsID[unitID].teamChange == 1 then --if flying unit is transfered to enemy team, then: recreate FAKE AA
 					--// recreate unit so that its targeting doesn't get fixated on FAKE AA (shooting ownself)
@@ -163,13 +176,16 @@ function gadget:GameFrame(n)
 					local bx,by,bz,mx,my,mz = spGetUnitPosition(unitID, true)
 					local velX,velY,velZ = spGetUnitVelocity(unitID)
 					local stealth = flyingGroundUnitsID[unitID].stealth
-					aaMarker = spCreateUnit("fakeunit_aatarget",mx,(my+100),mz, "s", flyingGroundUnitsID[unitID].unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
+					aaMarker = spCreateUnit("fakeunit_aatarget",mx,(my+fakePosition),mz, "s", flyingGroundUnitsID[unitID].unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
+					spSetUnitCollisionVolumeData(aaMarker, 0,0,0,0,0,0,3,0,0) --set FAKE unit's hitbox as small as possible
 					flyingGroundUnitsID[unitID].aaMarker = aaMarker
 					spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
-					spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-100,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
-					spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
-					spMoveCtrlSetNoBlocking(aaMarker,false)
-					spMoveCtrlSetAirMoveTypeData(aaMarker, {collide=false})
+					spSetUnitMidAndAimPos(aaMarker,0,0,0,0,-fakePosition,0, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
+					--//not working for free fall:
+					-- spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
+					-- spMoveCtrlSetNoBlocking(aaMarker,false)
+					-- spMoveCtrlSetAirMoveTypeData(aaMarker, {collide=false})
+					--//end
 					spSetUnitNoSelect(aaMarker, true)  --don't allow player to use the FAKE
 					spSetUnitNoDraw(aaMarker, true) --don't hint player that FAKE exist
 					spSetUnitNoMinimap(aaMarker, true)
@@ -196,7 +212,7 @@ function gadget:GameFrame(n)
 					offX = front[1]*offX_temp + top[1]*offY_temp + right[1]*offZ_temp
 					offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
 					offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
-					spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,(-100+offY),offZ, true)
+					spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,(-fakePosition+offY),offZ, true)
 				end
 				spSetUnitCloak(aaMarker,cloaked,0)
 			end
@@ -234,7 +250,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		if (not UnitDefs[unitDefID].isBuilding
 		and not UnitDefs[unitDefID].isFactory) then --precautionary check of units that shouldn't be in combat. 
 			local stealth = UnitDefs[unitDefID].stealth
-			flyingGroundUnitsID[unitID]={unitTeam=unitTeam,stealth=stealth, aaMarker=nil, teamChange=nil} --we check again later if they actually fly
+			local sclX,sclY,sclZ = spGetUnitCollisionVolumeData(unitID) --get the diameter of the hit volume
+			local radX = spGetUnitRadius(unitID) --get the radius of the collision volume
+			local safeDistance = math.max(sclX/2+20,sclY/2+20,sclZ/2+20,radX+20,100)
+			flyingGroundUnitsID[unitID]={unitTeam=unitTeam,stealth=stealth, aaMarker=nil, teamChange=nil,safeDistance=safeDistance} --we check again later if they actually fly
 		end
 	end
 	if flyingGroundUnitsID[unitID] and flyingGroundUnitsID[unitID].aaMarker and (weaponDefID>0 and damage > 0) and attackerTeam ~= unitTeam then --flying unit's AA marker is active

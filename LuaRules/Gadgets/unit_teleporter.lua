@@ -64,14 +64,17 @@ end
 
 local function CapUnitSpeed(unitID, speedCap, slowPower)
     local vx,vy,vz = Spring.GetUnitVelocity(unitID)
-    if(magnitudeOfThreeDVector(vx,vy,vz) > speedCap) then
+	local unitSpeed = magnitudeOfThreeDVector(vx,vy,vz)
+    if unitSpeed > speedCap then
+		local dx,dy,dz = vx/unitSpeed,vy/unitSpeed,vz/unitSpeed 
+		local capX,capY,capZ = dx*speedCap,dy*speedCap,dz*speedCap 
 		slowPower = math.min(slowPower,1)
 		local sgnX = vx/math.abs(vx) --get sign (+,-) for speed
 		local sgnY = vy/math.abs(vy)
 		local sgnZ = vz/math.abs(vz)
-		local newx = (math.min(speedCap^(1/3),math.abs(vx))*sgnX-vx)*slowPower --this allow unit to drift abit :P
-        local newy = (math.min(speedCap^(1/3),math.abs(vy))*sgnY-vy)*slowPower
-        local newz = (math.min(speedCap^(1/3),math.abs(vz))*sgnZ-vz)*slowPower
+		local newx = (math.min(math.abs(capX),math.abs(vx))*sgnX-vx)*slowPower --this allow unit to drift abit :P
+        local newy = (math.min(math.abs(capY),math.abs(vy))*sgnY-vy)*slowPower
+        local newz = (math.min(math.abs(capZ),math.abs(vz))*sgnZ-vz)*slowPower
 		-- local newx = -1*vx*slowPower --this has no drift effect :|
         -- local newy = -1*vy*slowPower
         -- local newz = -1*vz*slowPower
@@ -769,14 +772,14 @@ local function DrawBezierCurve(pointA, pointB, pointC,pointD)
 	-- Dr Thomas Sederberg, BYU Bézier curves, http://www.tsplines.com/resources/class_notes/Bezier_curves.pdf
 	-- http://en.wikipedia.org/wiki/B%C3%A9zier_curve
 	--// allow us to dynamically create smooth curve in realtime.
-	glVertex(pointA[1]+1,pointA[2]+1,pointA[3]+1) --redundant vertex to make polygon looks thicker
+	glVertex(pointA[1]+3,pointA[2]+3,pointA[3]+3) --redundant vertex to make polygon looks thicker
 	for i=0, 1, 0.1 do --generate 10 points of a curve
 		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
 		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
 		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
 		glVertex(x,y,z)
 	end
-	glVertex(pointD[1]+1,pointD[2]+1,pointD[3]+1)
+	glVertex(pointD[1]+3,pointD[2]+3,pointD[3]+3)
 end
 
 local function isUnitAirborne(unitID)
@@ -801,37 +804,39 @@ local function DrawWire()
 		--//draw reference: unit_shield_link.lua by lurker, minimap_events.lua by Dave Rodgers, http://springrts.com/wiki/Lua_ConstGL
 		local bid = data.link
 		local team = Spring.GetUnitTeam(tid)
-		if bid and data.deployed  and spIsUnitInView(tid) then --if teleport link is deployed & teleporter is visible: then draw beam wing
+		if bid and data.deployed then --if teleport link is deployed & teleporter is visible: then draw beam wing
 			local point={nil,nil,nil,nil} --this store 4 points at which a curve will drawn from
-			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
-			local topX, topY, topZ = GetUnitTop(tid, xxx,yyy,zzz, 50)
-			point[1] = {xxx,yyy,zzz} --points at teleporter's body
-			point[2] = {topX,topY,topZ} --points at teleporter's head
-			local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200,team) --Note; math.max(yyy,0) for sea launch
-			if(maybeFlyers ~= nil) then
-				for _,unitID in pairs(maybeFlyers) do
-					local ud = Spring.GetUnitDefID(unitID)
-					ud = ud and UnitDefs[ud]
-					if ((not (ud.canFly or unitID==tid)) and isUnitAirborne(unitID)) then
-						_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(unitID, true)
-						topX, topY, topZ = GetUnitTop(unitID,xxx,yyy,zzz,50) 
-						point[3] = {topX,topY,topZ} --points at unit's head
-						point[4] = {xxx,yyy,zzz}--points at unit's body
-						
-						gl.PushAttrib(GL.POLYGON_BITS)
-						gl.DepthTest(true)
-						gl.Color(0,0.75,1,math.random()*0.3+0.2) --draw flickering blueish *thing*
-						gl.BeginEnd(GL.POLYGON , DrawBezierCurve, point[1],point[2],point[3],point[4] )
-						gl.DepthTest(false)
-						gl.Color(1,1,1,1)
-						gl.PopAttrib()
+			if spIsUnitInView(tid) then 
+				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
+				local topX, topY, topZ = GetUnitTop(tid, xxx,yyy,zzz, 50)
+				point[1] = {xxx,yyy,zzz} --points at teleporter's body
+				point[2] = {topX,topY,topZ} --points at teleporter's head
+				local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200,team) --Note; math.max(yyy,0) for sea launch
+				if(maybeFlyers ~= nil) then
+					for _,unitID in pairs(maybeFlyers) do
+						local ud = Spring.GetUnitDefID(unitID)
+						ud = ud and UnitDefs[ud]
+						if ((not (ud.canFly or unitID==tid)) and isUnitAirborne(unitID)) then
+							_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(unitID, true)
+							topX, topY, topZ = GetUnitTop(unitID,xxx,yyy,zzz,50) 
+							point[3] = {topX,topY,topZ} --points at unit's head
+							point[4] = {xxx,yyy,zzz}--points at unit's body
+							
+							gl.PushAttrib(GL.POLYGON_BITS)
+							gl.DepthTest(true)
+							gl.Color(0,0.75,1,math.random()*0.3+0.2) --draw flickering blueish *thing*
+							gl.BeginEnd(GL.POLYGON , DrawBezierCurve, point[1],point[2],point[3],point[4] )
+							gl.DepthTest(false)
+							gl.Color(1,1,1,1)
+							gl.PopAttrib()
+						end
 					end
 				end
 			end
 			
-			if data.teleportiee and spIsUnitInView(bid) then --if teleport beacon is visible & is processing teleportiee: then draw beam wire
-				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
-				topX, topY, topZ = GetUnitTop(bid, xxx,yyy,zzz, 50)
+			if data.teleportiee and (spIsUnitInView(bid) or spIsUnitInView(data.teleportiee)) then --if teleport beacon is visible & is processing teleportiee: then draw beam wire
+				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
+				local topX, topY, topZ = GetUnitTop(bid, xxx,yyy,zzz, 50)
 				point[1] = {xxx,yyy,zzz}--points at teleporter's body
 				point[2] = {topX,topY,topZ}--points at teleporter's head
 				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(data.teleportiee, true)
