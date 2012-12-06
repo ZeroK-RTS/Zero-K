@@ -1,4 +1,4 @@
---//Version 0.934
+--//Version 0.935
 local isEnable = true
 function gadget:GetInfo()
   return {
@@ -165,7 +165,7 @@ function gadget:GameFrame(n)
 			end
 		end
 	end
-	if n%updateRate_3 == 0 then --update cloak status every 1 frame. ~30fps. depends on player's energy and ect.
+	if n%updateRate_3 == 0 then --update cloak status, teamChange,and unitDestroy every 1 frame. ~30fps.
 		for unitID,_ in pairs(flyingGroundUnitsID) do
 			local aaMarker = flyingGroundUnitsID[unitID].aaMarker
 			local fakePosition = flyingGroundUnitsID[unitID].safeDistance
@@ -201,20 +201,26 @@ function gadget:GameFrame(n)
 					GG.allowTransfer = false
 				end
 				flyingGroundUnitsID[unitID].teamChange = nil
-				--// update cloak status & collision volume position
-				local cloaked = spGetUnitIsCloaked(unitID)
-				local _,_,_,offX,offY,offZ = spGetUnitCollisionVolumeData(unitID) 
-				if (offX~=0 or offY~=0 or offZ~=0) then
-					local front, top, right = spGetUnitVectors(unitID)
-					local offX_temp = offX
-					local offY_temp = offY
-					local offZ_temp = offZ
-					offX = front[1]*offX_temp + top[1]*offY_temp + right[1]*offZ_temp
-					offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
-					offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
-					spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,(-fakePosition+offY),offZ, true)
+				if flyingGroundUnitsID[unitID].destroyfake then
+					--//destroy fakeAA
+					spDestroyUnit(aaMarker, false, true)
+					flyingGroundUnitsID[unitID] = nil
+				else
+					--//update fakeAA cloak status & collision volume position
+					local cloaked = spGetUnitIsCloaked(unitID)
+					local _,_,_,offX,offY,offZ = spGetUnitCollisionVolumeData(unitID) 
+					if (offX~=0 or offY~=0 or offZ~=0) then
+						local front, top, right = spGetUnitVectors(unitID)
+						local offX_temp = offX
+						local offY_temp = offY
+						local offZ_temp = offZ
+						offX = front[1]*offX_temp + top[1]*offY_temp + right[1]*offZ_temp
+						offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
+						offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
+						spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,(-fakePosition+offY),offZ, true)
+					end
+					spSetUnitCloak(aaMarker,cloaked,0)
 				end
-				spSetUnitCloak(aaMarker,cloaked,0)
 			end
 		end
 	end
@@ -238,9 +244,14 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if flyingGroundUnitsID[unitID] then
 		if flyingGroundUnitsID[unitID].aaMarker then
-			spDestroyUnit(flyingGroundUnitsID[unitID].aaMarker, false, true)
+			flyingGroundUnitsID[unitID].destroyfake = true --queue this fakeAA to be destroyed
+			if GG.wasMorphedTo and GG.wasMorphedTo[unitID] then
+				local newUnitID = GG.wasMorphedTo[unitID]
+				GG.isflying_watchout[newUnitID] = true --add this new unit into watchlist
+			end
+		else
+			flyingGroundUnitsID[unitID] = nil
 		end
-		flyingGroundUnitsID[unitID] = nil
 	end
 end
 
