@@ -1,5 +1,13 @@
 include("LuaRules/Configs/customcmds.h.lua")
 
+function turnAIOff(creepID)
+  local cmdDescID = Spring.FindUnitCmdDesc(creepID, CMD_UNIT_AI)
+  if (cmdDescID) then
+    Spring.GiveOrderToUnit(creepID, CMD_UNIT_AI, {0}, 0) -- disable Rogue autoskirm
+    Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
+  end
+end
+
 
 local config = {
   hqDef = {
@@ -39,6 +47,7 @@ local config = {
     creep2 = {
       unitName = "corstorm",
       reward=50,
+      setupFunction=turnAIOff,
     },
     creep3 = {
       unitName = "slowmort",
@@ -81,23 +90,27 @@ local config = {
     },  
     rogue = {
 		unitName = "corstorm",
-		cost=600,
+		cost=500,
 		reward=140,
+		setupFunction=turnAIOff,
     },
     recluse = {
       unitName = "armsptk",
-      cost=900,
+      cost=750,
       reward=200,
+      setupFunction=turnAIOff,
     },  
     hammer={
 		unitName = "armham",
-		cost=500,
+		cost=600,
 		reward=100,
+		setupFunction=turnAIOff,
     },
     crabe = {
       unitName = "armcrabe",
-      cost=1300,
+      cost=600,
       reward=220,
+      ones=true,
     },      
     
     brawler = {
@@ -130,15 +143,5 @@ function (creepID)
   --Spring.SetUnitWeaponState(creepID, 0, "reloadTime", 1.5)
   --Spring.MoveCtrl.SetGroundMoveTypeData(creepID, "maxSpeed", 1.95)
 end
-
-creepDefs["creep2"].setupFunction =
-function (creepID)
-  local cmdDescID = Spring.FindUnitCmdDesc(creepID, CMD_UNIT_AI)
-  if (cmdDescID) then
-    Spring.GiveOrderToUnit(creepID, CMD_UNIT_AI, {0}, 0) -- disable Rogue autoskirm
-    Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
-  end
-end
-
 
 return config
