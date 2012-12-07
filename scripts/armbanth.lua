@@ -65,7 +65,7 @@ local THIGH_BACK_ANGLE = math.rad(15)
 local THIGH_BACK_SPEED = math.rad(72) * PACE
 
 local SHIN_FRONT_ANGLE = math.rad(5)
-local SHIN_FRONT_SPEED = math.rad(180) * PACE
+local SHIN_FRONT_SPEED = math.rad(150) * PACE
 local SHIN_STRAIGHT_ANGLE = math.rad(6)
 local SHIN_STRAIGHT_SPEED = math.rad(90) * PACE
 local SHIN_MID_ANGLE = math.rad(95)
@@ -76,7 +76,7 @@ local SHIN_BACK_SPEED = math.rad(90) * PACE
 local TOEF_FRONT_ANGLE = math.rad(0)
 local TOEF_FRONT_SPEED = math.rad(90) * PACE
 local TOEF_BACK_ANGLE = math.rad(-15)
-local TOEF_BACK_SPEED = math.rad(90) * PACE
+local TOEF_BACK_SPEED = math.rad(80) * PACE
 
 local TOEB_FRONT_ANGLE = math.rad(15)
 local TOEB_FRONT_SPEED = math.rad(90) * PACE
@@ -87,9 +87,9 @@ local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
 
 local ARM_FRONT_ANGLE = math.rad(-15)
-local ARM_FRONT_SPEED = math.rad(25) * PACE
+local ARM_FRONT_SPEED = math.rad(35) * PACE
 local ARM_BACK_ANGLE = math.rad(10)
-local ARM_BACK_SPEED = math.rad(25) * PACE
+local ARM_BACK_SPEED = math.rad(35) * PACE
 local ARM_SIDE_ANGLE = math.rad(5)
 
 local isFiring = false
@@ -132,11 +132,15 @@ local function Contact(frontLeg, backLeg)
 		if (frontLeg == leftLeg) then
 			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
 			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
+			Turn(larmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
 			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
+			Turn(rarmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
 		else
 			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
 			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
+			Turn(larmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
 			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
+			Turn(rarmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
 		end
 	end
 
@@ -203,15 +207,17 @@ local function StopWalk()
 	-- and arms
 	Turn(larm, z_axis, 0, ARM_BACK_SPEED)
 	Turn(rarm, z_axis, 0, ARM_BACK_SPEED)
-	
-	Turn(body, z_axis, 0, 1)
-	Turn(torso, y_axis, 0, 4)
-	Move(pelvis, y_axis, 0, 4)
-	Turn(pelvis, z_axis, 0, 1)
-	Turn(larm, z_axis, 0, 1 )
-	Turn(rarm, z_axis, 0, 1 )
-	Turn(rarmgun, x_axis, 0, 1)
-	Turn(larmgun, x_axis, 0, 1)
+
+	if not(isFiring) then
+		Turn(body, z_axis, 0, 1)
+		Turn(torso, y_axis, 0, 4)
+		Move(pelvis, y_axis, 0, 4)
+		Turn(pelvis, z_axis, 0, 1)
+		Turn(larm, z_axis, 0, 1 )
+		Turn(rarm, z_axis, 0, 1 )
+		Turn(rarmgun, x_axis, 0, 1)
+		Turn(larmgun, x_axis, 0, 1)
+	end
 end
 
 function script.StartMoving()
