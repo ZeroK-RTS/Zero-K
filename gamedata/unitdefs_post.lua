@@ -104,23 +104,6 @@ for name, ud in pairs(UnitDefs) do
   end
 end 
 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Dota mode
---
-if Spring.GetModOptions().zkmode == "dota" then
-	for name, ud in pairs(UnitDefs) do
-		if ud.customparams.commtype~=nil then
-			ud.metalMake=3
-			ud.energyMake=3
-			ud.builder=false
-			ud.buildOptions={}
-		end
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

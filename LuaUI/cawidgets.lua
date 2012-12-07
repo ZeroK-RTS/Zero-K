@@ -1182,7 +1182,7 @@ function widgetHandler:FindWidget(name)
   end
   for k,v in ipairs(self.widgets) do
     if (name == v.whInfo.name) then
-    return v,k
+      return v,k
     end
   end
   return nil
@@ -1366,21 +1366,15 @@ function widgetHandler:AddConsoleLine(msg, priority)
       return
     end
   else
-	--censor message for muted player. This is mandatory, everyone is forced to close ears to muted players (ie: if it is optional, then everyone will opt to hear muted player for spec-cheat info. Thus it will defeat the purpose of mute)
+	--censor message for muted player (this is mandatory/not-per-player-option to prevent spec cheat. ie: player 1 see "um..", while player 2 see spec-cheat.) 
 	local newMsg = { text = msg, priority = priority }
 	MessageProcessor:ProcessConsoleLine(newMsg)
 	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' then 
-		local playerID_msg = newMsg.player and newMsg.player.id --retrieve playerID from message.
-		local customkeys = select(10, Spring.GetPlayerInfo(playerID_msg))
+		local playerID = newMsg.player and newMsg.player.id --retrieve playerID from message.
+		local customkeys = select(10, Spring.GetPlayerInfo(playerID))
 		if customkeys and customkeys.muted then
-			local myPlayerID = Spring.GetLocalPlayerID()
-			if myPlayerID == playerID_msg then --if I am the muted, then:
-				newMsg.argument="<your message was blocked by mute>"	--remind myself that I am muted.		
-				msg = "<your message was blocked by mute>" 
-			else --if I am NOT the muted, then: delete this message
-				return
-			end
-			--TODO: improve chili_chat2 spam-filter/dedupe-detection so that it could detect spamming across multiple chatline. So that we have better protection against spam.
+			newMsg.argument="<message blocked by mute>" --replace message with "um..." rather than nothing so that player knows his chat is not broken & can still respond to basic communication (ie: "can you hear me?" reply with:"um..."). 
+			msg = "<message blocked by mute>"
 		end
 	end
   

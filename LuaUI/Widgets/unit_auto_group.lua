@@ -1,9 +1,9 @@
-local versionNum = '3.05'
+local versionNum = '3.03'
 
 function widget:GetInfo()
   return {
 	name		= "Auto Group",
-	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Alt BACKQUOTE (~) remove units. View settings at: Settings/Interface/AutoGroup'", -- or Type '/luaui autogroup help' for help.",
+	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Alt BACKQUOTE (~) remove units. Type '/luaui autogroup help' for help or view settings at: Settings/Interface/AutoGroup'.",
 	author		= "Licho",
 	date		= "Mar 23, 2007",
 	license		= "GNU GPL, v2 or later",
@@ -15,8 +15,6 @@ end
 include("keysym.h.lua")
 
 ---- CHANGELOG -----
--- msafwan,			v3.05	(15nov2012)	: 	add option to allow factory & building to be autogrouped (is set to default OFF), this include tactical missile
---											automatically make idle missile to be really idle (this fix "widget:UnitIdle" not called for tactical missile).
 -- versus666,		v3.03	(17dec2011)	: 	Back to alt BACKQUOTE to remove selected units from group
 --											to please licho, changed help accordingly.
 -- versus666,		v3.02	(16dec2011)	: 	Fixed for 84, removed unused features, now alt backspace to remove
@@ -48,7 +46,7 @@ local helpText =
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
-options_order = { 'help', 'cleargroups', 'loadgroups', 'addall','allowFac', 'verbose', 'immediate', 'groupnumbers', }
+options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
 options_path = 'Settings/Interface/AutoGroup'
 options = {
 	loadgroups = {
@@ -64,8 +62,8 @@ options = {
 		end
 	},
 	addall = {
-		name = 'ReAdd All',
-		desc = 'Existing units will be added to group# when you set autogroup#.',
+		name = 'Add All',
+		desc = 'Existing units will be added to group# when setting autogroup#.',
 		type = 'bool',
 		value = false,
 	},
@@ -76,16 +74,10 @@ options = {
 	},
 	immediate = {
 		name = 'Immediate Mode',
-		desc = 'Units are added to autogroups immediately upon built instead of waiting them to be idle. Disable this to allow unit to rally to rally point first.',
+		desc = 'Units built/resurrected/received are added to autogroups immediately instead of waiting them to be idle.',
 		type = 'bool',
 		value = false,
 	},
-	allowFac = {
-		name = 'Allow Factory & Buildings',
-		desc = 'Allow Factory or Building to be autogroup-ed. This include tactical nuke, emp, napalm and seismic missile',
-		type = 'bool',
-		value = false,
-	},	
 	groupnumbers = {
 		name = 'Display Group Numbers',
 		type = 'bool',
@@ -175,10 +167,10 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (unitTeam == myTeam and unitID ~= nil) then
 		if (createdFrame[unitID] == GetGameFrame()) then
 			local gr = unit2group[unitDefID]
-			--printDebug("<AUTOGROUP>: Unit finished " ..  unitID) --
+--printDebug("<AUTOGROUP>: Unit finished " ..  unitID) --
 			if gr ~= nil then SetUnitGroup(unitID, gr) end
 		else 
-			finiGroup[unitID] = 1 --wait until unit is idle (widget:UnitIdle)
+			finiGroup[unitID] = 1
 		end
 	end
 end
@@ -195,7 +187,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
 			createdFrame[unitID] = GetGameFrame()
 			local gr = unit2group[unitDefID]
 			if gr ~= nil then SetUnitGroup(unitID, gr) end
-			--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
+--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
 		end
 	end
 end
@@ -226,27 +218,14 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	finiGroup[unitID] = nil
 end
 
-function widget:UnitIdle(unitID, unitDefID, unitTeam)
+function widget:UnitIdle(unitID, unitDefID, unitTeam) 
 	if (unitTeam == myTeam and finiGroup[unitID]~=nil) then
 		local gr = unit2group[unitDefID]
 		if gr ~= nil then SetUnitGroup(unitID, gr)
-		--printDebug("<AUTOGROUP> : Unit idle " ..  gr)
+--printDebug("<AUTOGROUP> : Unit idle " ..  gr)
 		end
-		finiGroup[unitID] = nil
+	finiGroup[unitID] = nil
 	end
-	if UDefTab[unitDefID].name == "missilesilo" then --fix idle state of missile in missile silo. This allow "widget:UnitIdle" to be called for the (idle) missiles, and also allow intermediate-mode (on or off) option to be functional (because this is called only when silo is idle/finish building all 4 missiles).	
-		local x,_, z = Spring.GetUnitPosition(unitID)
-		local rockets = Spring.GetUnitsInRectangle(x-39, z-39, x+39, z+39)
-		local idleIDs = {}
-		for i=1, #rockets do
-			local rocketID = rockets[i]
-			local queue = (Spring.GetCommandQueue(rocketID, 1))[1]
-			if queue==nil then
-				idleIDs[#idleIDs+1]=rocketID
-			end
-		end
-		Spring.GiveOrderArrayToUnitArray(idleIDs,{{CMD.STOP,{},{""}}}) 
-	end	
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
@@ -269,7 +248,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				local exec = false --set to true when there is at least one unit to process
 				for _, unitID in ipairs(GetSelectedUnits()) do
 					local udid = GetUnitDefID(unitID)
-					if (not UDefTab[udid]["isFactory"] and not UDefTab[udid]["isBuilding"]) or options.allowFac.value then --disallow factory & building (optional)
+					if ( not UDefTab[udid]["isFactory"] and not UDefTab[udid]["isBuilding"] ) then
 						selUnitDefIDs[udid] = true
 						unit2group[udid] = gr
 						--local x, y, z = Spring.GetUnitPosition(unitID)

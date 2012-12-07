@@ -6,11 +6,10 @@ function widget:GetInfo()
     name      = "State Icons",
     desc      = "Shows move and fire state icons",
     author    = "CarRepairer and GoogleFrog",
-    date      = "2012-01-28, Oct 31",
+    date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
     enabled   = true,
-	handler = true,--allow widget to use special widgetHandler's function
   }
 end
 
@@ -180,7 +179,7 @@ function widget:KeyRelease(key, modifier )
 	end
 end
 
---[[
+
 --needed if icon widget gets disabled/enabled after this one. find a better way?
 function widget:GameFrame(f)
 
@@ -188,7 +187,6 @@ function widget:GameFrame(f)
 		UpdateAllUnits()
 	end
 end
---]]
 
 
 --this needs work
@@ -200,9 +198,6 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 end
 
 function widget:Initialize()
-	if (not WG.icons) or (#WG.icons==0) then --if "Unit Icons" not enabled, then enable it.
-		widgetHandler:EnableWidget("Unit Icons")
-	end
 	
 	WG.icons.SetOrder( 'firestate', 5 )
 	WG.icons.SetOrder( 'firestate', 6 )

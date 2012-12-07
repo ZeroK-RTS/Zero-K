@@ -1,13 +1,5 @@
 include("LuaRules/Configs/customcmds.h.lua")
 
-function turnAIOff(creepID)
-  local cmdDescID = Spring.FindUnitCmdDesc(creepID, CMD_UNIT_AI)
-  if (cmdDescID) then
-    Spring.GiveOrderToUnit(creepID, CMD_UNIT_AI, {0}, 0) -- disable Rogue autoskirm
-    Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
-  end
-end
-
 
 local config = {
   hqDef = {
@@ -17,131 +9,113 @@ local config = {
 
   turretDefs = {
     turret1 = {
-		[0]={unitName = "corpre",},
-		[1]={unitName = "corpre",},
-		[2]={unitName = "corpre",},
-		[3]={unitName = "corpre",},
-		[4]={unitName = "corpre",},		
+      unitName = "corpre",
     },
     turret2 = {
-		[0]={unitName = "dota_corllt",},
-		[1]={unitName = "dota_corllt",},
-		[2]={unitName = "dota_corllt_upd",},		
-		[3]={unitName = "dota_corllt_upd",},		
-		[4]={unitName = "dota_corllt_upd2",},						      
+      unitName = "corllt",
     },
     turret3 = {
-		[0]={unitName = "dota_heavyturret",},
-		[1]={unitName = "dota_heavyturret",},
-		[2]={unitName = "dota_heavyturret_upd",},
-		[3]={unitName = "dota_heavyturret_upd",},
-		[4]={unitName = "dota_heavyturret_upd2",},
+      unitName = "heavyturret",
     },
   },
 
   creepDefs = {
     creep1 = {
       unitName = "spiderassault",
-      reward=50,
     },
     creep2 = {
       unitName = "corstorm",
-      reward=50,
-      setupFunction=turnAIOff,
     },
     creep3 = {
       unitName = "slowmort",
-      reward=50,
     },
-    warrior = {
-      unitName = "armwar",
-      cost=400,
-      reward=50,
-    },    
-    bandit = {
-      unitName = "corak",
-      cost=250,
-      reward=10,
-    },     
-    zeus = {
-      unitName = "armzeus",
-      cost=700,
-      reward=50,
-    },  
-    aspis  = {
-      unitName = "core_spectre",
-      cost=1200,
-      reward=60,
-    },     
-    thug  = {
-      unitName = "corthud",
-      cost=500,
-      reward=40,
-    },        
-    vandal = {
-      unitName = "corcrash",
-      cost=200,
-      reward=5,
-    },    
-    banshee = {
-      unitName = "armkam",
-      cost=700,
-      reward=80,
-    },  
-    rogue = {
-		unitName = "corstorm",
-		cost=500,
-		reward=140,
-		setupFunction=turnAIOff,
-    },
-    recluse = {
-      unitName = "armsptk",
-      cost=750,
-      reward=200,
-      setupFunction=turnAIOff,
-    },  
-    hammer={
-		unitName = "armham",
-		cost=600,
-		reward=100,
-		setupFunction=turnAIOff,
-    },
-    crabe = {
-      unitName = "armcrabe",
-      cost=600,
-      reward=220,
-      ones=true,
-    },      
-    
-    brawler = {
-      unitName = "armbrawl",
-      cost=500,
-      ones=true,
-      reward=80,
-    }, 
-    outlaw = {
-      unitName = "cormak",
-      cost=100,
-      ones=true,
-      reward=30,
-    }, 
-    dante = {
-      unitName = "dante",
-      cost=2000,
-      ones=true,
-      reward=500,
-    }, 
-    
   },
 }
 
 local turretDefs = config.turretDefs
 local creepDefs  = config.creepDefs
 
+
+turretDefs["turret1"].spawnFunction =
+function (x, z, teamID)
+  local turret = Spring.CreateUnit("corpre", x, Spring.GetGroundHeight(x, z), z, 0, teamID)
+  Spring.SetUnitWeaponState(turret, 0, {
+    range = 600,
+    reloadTime = 0.03,
+  } )
+  local cost = 500
+  Spring.SetUnitCosts(turret, {
+    buildTime = cost,
+    metalCost = cost,
+    energyCost = cost,
+  } )
+  Spring.SetUnitSensorRadius(turret, "los", 600)
+  Spring.SetUnitMaxHealth(turret, 3000)
+  Spring.SetUnitHealth(turret, 3000)
+  Spring.SetUnitNoSelect(turret, true)
+end
+
+turretDefs["turret2"].spawnFunction =
+function (x, z, teamID)
+  local turret = Spring.CreateUnit("corllt", x, Spring.GetGroundHeight(x, z), z, 0, teamID)
+  Spring.SetUnitWeaponState(turret, 0, {
+    range = 600,
+    projectiles = 5,
+    burst = 8,
+    burstRate = 0.01,
+    sprayAngle = 0.1,
+  } )
+  local cost = 1000
+  Spring.SetUnitCosts(turret, {
+    buildTime = cost,
+    metalCost = cost,
+    energyCost = cost,
+  } )
+  Spring.SetUnitSensorRadius(turret, "los", 1000)
+  Spring.SetUnitMaxHealth(turret, 4500)
+  Spring.SetUnitHealth(turret, 4500)
+  Spring.SetUnitNoSelect(turret, true)
+end
+
+turretDefs["turret3"].spawnFunction =
+function (x, z, teamID)
+  local squareSize = Game.squareSize
+  local height = Spring.GetGroundHeight(x, z) + 30
+  Spring.LevelHeightMap(x - squareSize, z - squareSize, x + squareSize, z + squareSize, height)
+
+  local turret = Spring.CreateUnit("heavyturret", x, height, z, 0, teamID)
+  Spring.SetUnitResourcing(turret, "ume", 25) -- needs 25 E to fire like anni/ddm
+  Spring.SetUnitWeaponState(turret, 0, {
+    range = 750,
+    reloadTime = 8,
+  } )
+  local cost = 1500
+  Spring.SetUnitCosts(turret, {
+    buildTime = cost,
+    metalCost = cost,
+    energyCost = cost,
+  } )
+  Spring.SetUnitSensorRadius(turret, "los", 1250)
+  Spring.SetUnitMaxHealth(turret, 6000)
+  Spring.SetUnitHealth(turret, 6000)
+  Spring.SetUnitNoSelect(turret, true)
+end
+
+
 creepDefs["creep1"].setupFunction =
 function (creepID)
   --Spring.SetUnitWeaponState(creepID, 0, "reloadTime", 1.5)
   --Spring.MoveCtrl.SetGroundMoveTypeData(creepID, "maxSpeed", 1.95)
 end
+
+creepDefs["creep2"].setupFunction =
+function (creepID)
+  local cmdDescID = Spring.FindUnitCmdDesc(creepID, CMD_UNIT_AI)
+  if (cmdDescID) then
+    Spring.GiveOrderToUnit(creepID, CMD_UNIT_AI, {0}, 0) -- disable Rogue autoskirm
+    Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
+  end
+end
+
 
 return config

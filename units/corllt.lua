@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Light Laser Tower]],
   acceleration                  = 0,
   brakeRate                     = 0,
+  buildAngle                    = 32768,
   buildCostEnergy               = 90,
   buildCostMetal                = 90,
   builder                       = false,
@@ -46,7 +47,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[llt.s3o]],
+  objectName                    = [[lotustest2.s3o]],
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 

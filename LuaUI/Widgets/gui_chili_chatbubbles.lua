@@ -261,7 +261,7 @@ function widget:AddChatMessage(msg)
 	local type = msg.msgtype
 	local text = msg.argument or ''
 	
-	if DuplicateMessage("chat", player, msg.argument, type) then 
+	if DuplicateMessage("chat", player, msg, type) then 
 		return
 	end
 
@@ -456,7 +456,6 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		OnMouseDown = {function()
 			local p = windows_points[window_id]
 			Spring.SetCameraTarget(p.x, p.y, p.z,1)
-			return true --capture click (don't allow window to pass the click). this prevent user from accidentally clicking on the ground while clicking on the window.
 		end},
 	}
 	function w:HitTest(x,y)  -- FIXME: chili hacked to allow OnMouseDown on window

@@ -81,7 +81,7 @@ unitDef = {
 
     SEISMIC_WEAPON = {
       name                    = [[Seismic]],
-      areaOfEffect            = 1024,
+      areaOfEffect            = 512,
       avoidFriendly           = false,
 	  cegTag                  = [[tactrail]],
       collideFriendly         = false,

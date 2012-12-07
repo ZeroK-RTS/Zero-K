@@ -663,7 +663,6 @@ local function FinishMorph(unitID, morphData)
   Spring.SetUnitBlocking(newUnit, true)
   
   GG.wasMorphedTo[unitID] = newUnit
-  Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
 end
 

@@ -11,10 +11,6 @@ function gadget:GetInfo()
   }
 end
 
---Changelog
--- Yanom & xponen,			28Nov - 3Dec 2012	: add unit launch into air & related functions
--- xponen(msafwan),			5Dec				: add launch VFX (capture wing FX and launch beam FX), thx to Penguinpanic for original idea.
-
 include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -51,78 +47,6 @@ local waitAtBeaconCmdDesc = {
 	tooltip = 'Wait to be teleported by a beacon.',
 }
 
-local function isUnitAirborne(unitID)
-    local x, y, z = Spring.GetUnitPosition(unitID) --using GetUnitPosition() instead of GetUnitBasePosition() because the later is going to be deprecated.
-	local gy = math.max(0,Spring.GetGroundHeight(x, z)) --math.max(0,Spring.GetGroundHeight(x, z)) for sea launch
-	local diff = y-gy
-    return diff>10 --using constant 10elmo rather than unit's Height because some unit is tall, and this cause them to fall at great height.
-end
-
-local function magnitudeOfThreeDVector(x,y,z)
-    return math.sqrt((x*x)+(y*y)+(z*z))
-end
-
-local function CapUnitSpeed(unitID, speedCap, slowPower)
-    local vx,vy,vz = Spring.GetUnitVelocity(unitID)
-	local unitSpeed = magnitudeOfThreeDVector(vx,vy,vz)
-    if unitSpeed > speedCap then
-		local dx,dy,dz = vx/unitSpeed,vy/unitSpeed,vz/unitSpeed 
-		local capX,capY,capZ = dx*speedCap,dy*speedCap,dz*speedCap 
-		slowPower = math.min(slowPower,1)
-		local sgnX = vx/math.abs(vx) --get sign (+,-) for speed
-		local sgnY = vy/math.abs(vy)
-		local sgnZ = vz/math.abs(vz)
-		local newx = (math.min(math.abs(capX),math.abs(vx))*sgnX-vx)*slowPower --this allow unit to drift abit :P
-        local newy = (math.min(math.abs(capY),math.abs(vy))*sgnY-vy)*slowPower
-        local newz = (math.min(math.abs(capZ),math.abs(vz))*sgnZ-vz)*slowPower
-		-- local newx = -1*vx*slowPower --this has no drift effect :|
-        -- local newy = -1*vy*slowPower
-        -- local newz = -1*vz*slowPower
-        Spring.AddUnitImpulse(unitID,newx,newy,newz)
-    end
-end
-
-local function Paralyze(unitID, frameCount)
-	local health, maxHealth, paralyzeDamage = Spring.GetUnitHealth(unitID)
-	local second = math.abs(frameCount*(1/30)) --because each frame took 1/30 second
-	second = second-1-1/16 --because at 0% it took 1 second to recover, and paralyze is in slow update (1/16)
-	--Note: ZK use 
-	--paralyzeAtMaxHealth=true, and 
-	--unitParalysisDeclineScale=40
-	local paralyze = maxHealth+maxHealth*second/40 --a full health of paralyzepoints represent 1 second of paralyze, additional health/40 paralyzepoints represent +1 second of paralyze. Reference: modrules.lua, Unit.cpp(spring).
-	Spring.SetUnitHealth(unitID, { paralyze = paralyze })
-end
-
-local function FindLaunchSpeed(gravity, relX,relY,relZ, apexHeight, startX, startY,startZ)
-        local yVel = math.sqrt(4*(gravity/2)*(-1*(math.max(apexHeight, apexHeight+relY)))) --Reference:equation of motions, derived from s=v*t+a*t*t/2
-        local timeOfFlight = (-yVel - math.sqrt(yVel^2 - 4*(gravity/2)*(-relY)))/(2*(-gravity/2)) --Reference: solving-quadratic-equation formula
-        local isPossible = "true"
-        if (timeOfFlight ~= timeOfFlight) then --NaN check
-                isPossible = "NeedNegativeGravity"
-                return
-        end
-        ----
-		timeOfFlight= math.abs(timeOfFlight)
-        local xzDistance = math.sqrt(relX*relX+relZ*relZ)
-        local xzVel = xzDistance/timeOfFlight
-        local directionxz_radian = math.atan2(relZ/xzDistance, relX/xzDistance) --Reference: trigonometric
-        local xVel = math.cos(directionxz_radian)*xzVel
-        local zVel = math.sin(directionxz_radian)*xzVel
-       
-        if startX and startZ and startZ then
-                local x =nil
-                local z =nil
-                for frame=0, timeOfFlight*0.75 do
-                        x = startX + xVel*frame
-                        z = startZ + zVel*frame
-                        if (Spring.GetGroundHeight(x,z) - 30) > startY+(yVel*frame + gravity*frame*frame/2) then
-                                isPossible = "obstacle"
-                                break
-                        end
-                end
-        end
-        return isPossible, xVel,yVel,zVel, timeOfFlight
-end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -155,7 +79,6 @@ local beacon = {}
 
 local beaconWaiter = {}
 local teleportingUnit = {}
-local launchedUnits = {}
 
 --[[
 local nearRead = 1
@@ -182,24 +105,6 @@ local function callScript(unitID, funcName, args)
 	return false
 end
 
-local function backUpTheDamnQueue(teleportieeID)
-    if launchedUnits[teleportieeID] and Spring.ValidUnitID(teleportieeID) and UnitDefs[unitDefID]  then --find out if this unit is in our launch list
-        local myQueue = launchedUnits[teleportieeID].queue --retrieve saved command queue
-        local tmpQueue ={}
-        tmpQueue[1]={CMD.STOP,{},{""}} --add 1st row with STOP (to flush existing command)
-        for i=2, #myQueue do --copied from unit_jumpjet.lua by quantum. Convert command queue readable by "Spring.GiveOrderArrayToUnitArray", also start at index 2 to skip "enter teleport beacon" command at 1st row
-            local cmd = myQueue[i]
-            local cmdOpt = cmd.options
-            local opts = {"shift"} -- appending
-            if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
-            if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
-            if (cmdOpt.right) then opts[#opts+1] = "right" end
-            tmpQueue[#tmpQueue+1] = {cmd.id, cmd.params, opts}
-        end
-        Spring.GiveOrderArrayToUnitArray({teleportieeID},tmpQueue) --restore old command queue
-    end
-end
-
 local function changeSpeed(tid, bid, speed)
 	local func = Spring.UnitScript.GetScriptEnv(tid).activity_mode
 	Spring.UnitScript.CallAsUnit(tid,func,speed)
@@ -212,10 +117,6 @@ end
 local function interruptTeleport(unitID, doNotChangeSpeed)
 	if tele[unitID].teleportiee then
 		teleportingUnit[tele[unitID].teleportiee] = nil
-		Spring.MoveCtrl.Disable(tele[unitID].teleportiee) --used by floatating unit for sea launch into air
-		Spring.AddUnitImpulse(tele[unitID].teleportiee,0,1,0) --for smooth falling down to sea bottom
-		Spring.AddUnitImpulse(tele[unitID].teleportiee,0,-1,0) --for smooth falling down to sea bottom
-		tele[unitID].teleportiee = false
 	end
 	tele[unitID].teleFrame = false
 	tele[unitID].cost = false
@@ -402,29 +303,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 end
 
 function gadget:GameFrame(f)
-	for i = 1, teleID.count do
-		local tid = teleID.data[i]
-		local bid = tele[tid].link	
-		if bid and tele[tid].deployed then
-			--Spring.Echo("activated teleporter!")
-			--checking for flyers
-			--Spring.Echo(f)
-			local xxx,yyy,zzz = Spring.GetUnitPosition(tid)
-			local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200,Spring.GetUnitTeam(tid)) --Note; math.max(yyy,0) for sea launch
-			if(maybeFlyers ~= nil) then
-				for index,value in pairs(maybeFlyers) do
-					local ud = Spring.GetUnitDefID(value)
-					ud = ud and UnitDefs[ud]
-					if ((not (ud.canFly or value==tid)) and isUnitAirborne(value)) then
-						CapUnitSpeed(value,2,0.75)
-						--Spring.Echo("capping unit speed")
-						--backup the damn queue
-						backUpTheDamnQueue(value)
-					end
-				end
-			end
-		end
-	end	
+	
 	for i = 1, teleID.count do
 		local tid = teleID.data[i]	
 		local bid = tele[tid].link
@@ -475,15 +354,15 @@ function gadget:GameFrame(f)
 						if ud then
 							local size = ud.xsize
 							local ux,uy,uz = Spring.GetUnitPosition(teleportiee)		
-							local tx, ty, tz = Spring.GetUnitPosition(tid)
+							local tx, _, tz = Spring.GetUnitPosition(tid)
 							local dx, dz = tx + offset[tele[tid].offsetIndex].x*(size*4+40), tz + offset[tele[tid].offsetIndex].z*(size*4+40)
 							local dy 
 							
-							--if ud.floater or ud.canFly then
-								dy = math.max(0, Spring.GetGroundHeight(dx,dz))
-							--else
-								--dy = Spring.GetGroundHeight(dx,dz)
-							--end
+							if ud.floater or ud.canFly then
+								dy = uy - math.max(0, Spring.GetGroundHeight(ux,uz)) +  math.max(0, Spring.GetGroundHeight(dx,dz))
+							else
+								dy = uy - Spring.GetGroundHeight(ux,uz) + Spring.GetGroundHeight(dx,dz)
+							end
 							
 							Spring.PlaySoundFile("sounds/misc/teleport.wav", 10, ux, uy, uz)
 							Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, dx, dy, dz)
@@ -494,36 +373,10 @@ function gadget:GameFrame(f)
 							teleportingUnit[teleportiee] = nil
 							
 							if not callScript(teleportiee, "unit_teleported", {dx, dy, dz}) then
-								                            
-								Spring.MoveCtrl.Disable(teleportiee) --used by floatating unit for sea launch into air.
-								
-								--this is where the magic happens
-								local thisGravity = -1*Game.gravity/30/30
-								local relX = dx-ux
-								local relY = dy-uy
-								local relZ = dz-uz
-								local trajectoryHeight = 3000
-								local isPossible, xvelocity, yvelocity, zvelocity, flightTime = FindLaunchSpeed(thisGravity, relX, relY, relZ, trajectoryHeight, ux, uy, uz)
-
-								Spring.SetUnitVelocity(teleportiee, 0,0.1,0) --it can only reset velocity, other value won't work. Bug
-								Spring.AddUnitImpulse(teleportiee,1,1,1)
-								Spring.AddUnitImpulse(teleportiee,-1,-1,-1)
-								Spring.AddUnitImpulse(teleportiee,xvelocity,yvelocity,zvelocity)
-								--Spring.Echo(isUnitAirborne(teleportiee))
-
-								local myQueue = Spring.GetCommandQueue(teleportiee) --backup current command queue
-								Spring.GiveOrderToUnit(teleportiee, CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, dx, dy, dz}, {"alt"}) --insert MOVE command toward destination for visual purpose
-								launchedUnits[teleportiee]={queue = myQueue, destinationx= dx, destinationy= dy, destinationz =dz} --for detecting ground collision
-								
-								local timeToJelly = flightTime-(math.sqrt((-trajectoryHeight)*2/thisGravity)-math.sqrt((-trajectoryHeight+200)*2/thisGravity)) --revise time estimate to get the time to reach jelly field. Reference: equation of motions, s=a*t*t/2
-								Paralyze(teleportiee, timeToJelly) --paralyze unit (to prevent weapon range hax)
-								Spring.AddUnitDamage(teleportiee, 0) --trigger AA targeting for this unit (handled by "unit_aa_shot_flying_groundunit.lua" by msafwan)
-								
-								--// teleport
-								-- Spring.SetUnitPosition(teleportiee, dx, dz) 
-								-- Spring.MoveCtrl.Enable(teleportiee)
-								-- Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
-								-- Spring.MoveCtrl.Disable(teleportiee)
+								Spring.SetUnitPosition(teleportiee, dx, dz)
+								Spring.MoveCtrl.Enable(teleportiee)
+								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
+								Spring.MoveCtrl.Disable(teleportiee)
 							end
 							
 							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
@@ -603,24 +456,6 @@ function gadget:GameFrame(f)
 							
 							local func = Spring.UnitScript.GetScriptEnv(bid).startTeleOutLoop
 							Spring.UnitScript.CallAsUnit(bid,func, teleportiee, tid)
-							
-							--//used for floatating submerged unit for launching into air
-							local ux,uy,uz = Spring.GetUnitPosition(teleportiee)
-							uy = uy - ud.waterline
-							local gy = math.max(0,Spring.GetGroundHeight(ux,uz))
-							if uy<0 then
-								local floatationForce = (uy-0.5)*2/(cost*cost) --(negative) acceleration to surface. Reference: equation of motion, s=a*t*t/2
-								floatationForce = floatationForce/0.11111111193895 --Spring drag "physic", we need this factor to overcome the sea eating unit velocity. (measured ingame, factor = endVelocity/initial_acceleration).
-								Spring.MoveCtrl.Enable(teleportiee)
-								Spring.MoveCtrl.SetGravity(teleportiee, floatationForce) --this will push unit to surface, then "MoveCtrl.Disabled(teleportiee)" and launch to air.
-								Spring.MoveCtrl.SetDrag(teleportiee,0)
-							elseif uy<gy+5 then
-								local floatationForce = (-20)*2/(cost*cost) --(negative) acceleration to float.
-								floatationForce = floatationForce/0.11111111193895 --Spring drag "physic", somehow if unit contact the ground it receive "drag".
-								Spring.MoveCtrl.Enable(teleportiee)
-								Spring.MoveCtrl.SetGravity(teleportiee, floatationForce) --this will push unit to air.
-								Spring.MoveCtrl.SetDrag(teleportiee,0)
-							end
 						end
 					else
 						if teleFinished then
@@ -632,26 +467,6 @@ function gadget:GameFrame(f)
 		end
 	end
 
-end
-
-function gadget:UnitPreDamaged(teleportieeID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --copied from "unit_fall_damage.lua" gadget by googlefrog.
-    if launchedUnits[teleportieeID] and (weaponDefID == -2) and attackerID == nil  and Spring.ValidUnitID(teleportieeID) and UnitDefs[unitDefID]  then --find out if this unit is in our launch list
-        local myQueue = launchedUnits[teleportieeID].queue --retrieve saved command queue
-        local tmpQueue ={}
-        tmpQueue[1]={CMD.STOP,{},{""}} --add 1st row with STOP (to flush existing command)
-        for i=2, #myQueue do --copied from unit_jumpjet.lua by quantum. Convert command queue readable by "Spring.GiveOrderArrayToUnitArray", also start at index 2 to skip "enter teleport beacon" command at 1st row
-            local cmd = myQueue[i]
-            local cmdOpt = cmd.options
-            local opts = {"shift"} -- appending
-            if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
-            if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
-            if (cmdOpt.right) then opts[#opts+1] = "right" end
-            tmpQueue[#tmpQueue+1] = {cmd.id, cmd.params, opts}
-        end
-        Spring.GiveOrderArrayToUnitArray({teleportieeID},tmpQueue) --restore old command queue
-		launchedUnits[teleportieeID] = nil --remove unit from launch list
-    end
-    return damage
 end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -710,10 +525,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		interruptTeleport(beacon[unitID].link)
 		beacon[unitID] = nil
 	end
-	
-	if launchedUnits[unitID] then --used by unit launching into air
-		launchedUnits[unitID]=nil --finish monitoring this unit
-	end
 end
 
 function gadget:Initialize()
@@ -753,109 +564,8 @@ local spGetMyTeamID		= Spring.GetMyTeamID
 local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
 local spGetModKeyState		= Spring.GetModKeyState
 local spAreTeamsAllied		= Spring.AreTeamsAllied
-local spGetTimer 			= Spring.GetTimer
-local spDiffTimers 			= Spring.DiffTimers
-local glCallList 			= gl.CallList
-local glCreateList 			= gl.CreateList 
-local glDeleteList 			= gl.DeleteList
-local spIsUnitInView       = Spring.IsUnitInView
 
 local myTeam = spGetMyTeamID()
-
-local lastWireUpdate =Spring.GetTimer()
-local wireGLlist
-local wireDrawInterval = 1/60 --60fps
-
-local function DrawBezierCurve(pointA, pointB, pointC,pointD)
-	--//REFERENCE: 
-	-- http://www.codeproject.com/Articles/31859/Draw-a-Smooth-Curve-through-a-Set-of-2D-Points-wit
-	-- Dr Thomas Sederberg, BYU Bézier curves, http://www.tsplines.com/resources/class_notes/Bezier_curves.pdf
-	-- http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-	--// allow us to dynamically create smooth curve in realtime.
-	glVertex(pointA[1]+3,pointA[2]+3,pointA[3]+3) --redundant vertex to make polygon looks thicker
-	for i=0, 1, 0.1 do --generate 10 points of a curve
-		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
-		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
-		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
-		glVertex(x,y,z)
-	end
-	glVertex(pointD[1]+3,pointD[2]+3,pointD[3]+3)
-end
-
-local function isUnitAirborne(unitID)
-    local x, y, z = Spring.GetUnitPosition(unitID)
-	local gy = math.max(0,Spring.GetGroundHeight(x, z)) --math.max(0,Spring.GetGroundHeight(x, z)) for sea launch
-	local diff = y-gy
-    return diff>10
-end
-
-local function GetUnitTop(unitID, x,y,z,height)
-	--//Translate something that's meant for unit's coordinate into real-world coordinate. This case only implement top of unit.
-	-- Reference: unit_aa_shoot_flying_groundunit.lua by msafwan
-	local _, top,_ = Spring.GetUnitVectors(unitID)
-	local offX = top[1]*height
-	local offY = top[2]*height
-	local offZ = top[3]*height
-	return x+offX,y+offY,z+offZ
-end
-
-local function DrawWire()
-	for tid, data in spairs(SYNCED.tele) do
-		--//draw reference: unit_shield_link.lua by lurker, minimap_events.lua by Dave Rodgers, http://springrts.com/wiki/Lua_ConstGL
-		local bid = data.link
-		local team = Spring.GetUnitTeam(tid)
-		if bid and data.deployed then --if teleport link is deployed & teleporter is visible: then draw beam wing
-			local point={nil,nil,nil,nil} --this store 4 points at which a curve will drawn from
-			if spIsUnitInView(tid) then 
-				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
-				local topX, topY, topZ = GetUnitTop(tid, xxx,yyy,zzz, 50)
-				point[1] = {xxx,yyy,zzz} --points at teleporter's body
-				point[2] = {topX,topY,topZ} --points at teleporter's head
-				local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200,team) --Note; math.max(yyy,0) for sea launch
-				if(maybeFlyers ~= nil) then
-					for _,unitID in pairs(maybeFlyers) do
-						local ud = Spring.GetUnitDefID(unitID)
-						ud = ud and UnitDefs[ud]
-						if ((not (ud.canFly or unitID==tid)) and isUnitAirborne(unitID)) then
-							_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(unitID, true)
-							topX, topY, topZ = GetUnitTop(unitID,xxx,yyy,zzz,50) 
-							point[3] = {topX,topY,topZ} --points at unit's head
-							point[4] = {xxx,yyy,zzz}--points at unit's body
-							
-							gl.PushAttrib(GL.POLYGON_BITS)
-							gl.DepthTest(true)
-							gl.Color(0,0.75,1,math.random()*0.3+0.2) --draw flickering blueish *thing*
-							gl.BeginEnd(GL.POLYGON , DrawBezierCurve, point[1],point[2],point[3],point[4] )
-							gl.DepthTest(false)
-							gl.Color(1,1,1,1)
-							gl.PopAttrib()
-						end
-					end
-				end
-			end
-			
-			if data.teleportiee and (spIsUnitInView(bid) or spIsUnitInView(data.teleportiee)) then --if teleport beacon is visible & is processing teleportiee: then draw beam wire
-				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
-				local topX, topY, topZ = GetUnitTop(bid, xxx,yyy,zzz, 50)
-				point[1] = {xxx,yyy,zzz}--points at teleporter's body
-				point[2] = {topX,topY,topZ}--points at teleporter's head
-				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(data.teleportiee, true)
-				topX, topY, topZ = GetUnitTop(data.teleportiee,xxx,yyy,zzz,50) 
-				point[3] = {topX,topY,topZ} --points at unit's head
-				point[4] = {xxx,yyy,zzz}--points at unit's body
-				
-				gl.PushAttrib(GL.LINE_BITS)
-				gl.DepthTest(true)
-				gl.Color(0,0.75,1,math.random()*0.3+0.2) --draw flickering blueish beam
-				gl.LineWidth(3)
-				gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1],point[2],point[3],point[4] )
-				gl.DepthTest(false)
-				gl.Color(1,1,1,1)
-				gl.PopAttrib()
-			end				
-		end	
-	end
-end
 
 local function DrawFunc(u1, u2)
 	glVertex(spGetUnitPosition(u1))
@@ -868,15 +578,6 @@ function gadget:DrawWorld()
 	spec = spec or fullview
 
 	if SYNCED.tele and snext(SYNCED.tele) then
-		if spDiffTimers(spGetTimer(),lastWireUpdate) >= wireDrawInterval then --update at 60fps only
-			glDeleteList(wireGLlist)
-			wireGLlist = glCreateList(DrawWire) --draw wire/line/beam that connect teleporter to transported unit
-			lastWireUpdate = spGetTimer()
-		end
-		if wireGLlist then 
-			glCallList(wireGLlist)
-		end
-
 		gl.PushAttrib(GL.LINE_BITS)
 		
 		gl.DepthTest(true)
@@ -908,5 +609,6 @@ function gadget:DrawWorld()
 	end
 	
 end
+
 
 end
