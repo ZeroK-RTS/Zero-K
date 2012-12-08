@@ -13,9 +13,6 @@ local rarm, rarmcannon, rarmbarrel1, rarmflare1, rarmbarrel2, rarmflare2, rarmba
 local leftLeg = { thigh=piece("lupleg"), knee=piece("lmidleg"), shin=piece("lleg"), foot=piece("lfoot"), toef=piece("lftoe"), toeb=piece("lbtoe") }
 local rightLeg = { thigh=piece("rupleg"), knee=piece("rmidleg"), shin=piece("rleg"), foot=piece("rfoot"), toef=piece("rftoe"), toeb=piece("rbtoe") }
 
-local leftLeg = { lupleg, lmidleg, lleg, lfoot, lftoe, lbtoe }
-local rightLeg = { rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe }
-
 smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
