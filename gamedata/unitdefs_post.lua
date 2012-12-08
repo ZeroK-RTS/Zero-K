@@ -237,7 +237,7 @@ for name, ud in pairs(UnitDefs) do
 			end
 		end
 	end
-	if (hasShield) then
+	if (hasShield or (((not ud.maxvelocity) or ud.maxvelocity == 0) and not ud.cloakcost)) then
 		ud.customparams.cannotcloak = 1
 		ud.mincloakdistance = 0
 		ud.cloakcost = nil
