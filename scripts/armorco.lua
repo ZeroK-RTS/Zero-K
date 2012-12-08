@@ -13,6 +13,9 @@ local rarm, rarmcannon, rarmbarrel1, rarmflare1, rarmbarrel2, rarmflare2, rarmba
 local lupleg, lmidleg, lleg, lfoot, lftoe, lbtoe = piece("lupleg", "lmidleg", "lleg", "lfoot", "lftoe", "lbtoe")
 local rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe = piece("rupleg", "rmidleg", "rleg", "rfoot", "rftoe", "rbtoe")
 
+local leftLeg = { lupleg, lmidleg, lleg, lfoot, lftoe, lbtoe }
+local rightLeg = { rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe }
+
 smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
@@ -34,19 +37,31 @@ local SIG_Restore = 1
 local SIG_Walk = 2
 local PACE = 1.1
 
-local THIGH_FRONT_ANGLE = -math.rad(40)
-local THIGH_FRONT_SPEED = math.rad(60) * PACE
-local THIGH_BACK_ANGLE = math.rad(20)
-local THIGH_BACK_SPEED = math.rad(60) * PACE
-local SHIN_FRONT_ANGLE = math.rad(35)
-local SHIN_FRONT_SPEED = math.rad(90) * PACE
-local SHIN_BACK_ANGLE = math.rad(5)
-local SHIN_BACK_SPEED = math.rad(90) * PACE
+-- four leg positions - each contains thigh, mid, shin, foot, fronttoe, backtoe
+                             --      THIGH           KNEE           SHIN           FOOT           TOEF           TOEB
+local LEG_FRONT_ANGLES    = { math.rad(-40), math.rad( 10), math.rad( 30), math.rad(  0), math.rad(  0), math.rad( 15) }
+local LEG_FRONT_SPEEDS    = { math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90) }
+
+local LEG_STRAIGHT_ANGLES = { math.rad( -5), math.rad(-19), math.rad( 32), math.rad( -5), math.rad(  0), math.rad(  0) }
+local LEG_STRAIGHT_SPEEDS = { math.rad( 80), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 30) }
+
+local LEG_BACK_ANGLES     = { math.rad( 20), math.rad(  0), math.rad( 15), math.rad(  0), math.rad(-40), math.rad(-10) }
+local LEG_BACK_SPEEDS     = { math.rad( 60), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 60), math.rad( 60) }
+
+local LEG_BENT_ANGLES     = { math.rad(-15), math.rad( 25), math.rad(-30), math.rad(  0), math.rad(  0), math.rad(  0) }
+local LEG_BENT_SPEEDS     = { math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90) }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
+local TORSO_TILT_ANGLE = math.rad(15)
+local TORSO_TILT_SPEED = math.rad(15)*PACE
 
-local ARM_FRONT_ANGLE = -math.rad(15)
+local PELVIS_LIFT_HEIGHT = 11
+local PELVIS_LIFT_SPEED = 33
+local PELVIS_LOWER_HEIGHT = 0
+local PELVIS_LOWER_SPEED = 22
+
+local ARM_FRONT_ANGLE = math.rad(-15)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
 local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(22.5) * PACE
@@ -72,52 +87,94 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
+local function Contact(frontLeg, backLeg)
+
+	-- front leg out straight, back toe angled to meet the ground
+	for i=1,#frontLeg do
+		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
+	end
+	-- back leg out straight, front toe angled to leave the ground
+	for i=1,#backLeg do
+		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
+	end
+
+	-- swing arms and body
+	if not(isFiring) then
+		if (frontLeg == rightLeg) then
+			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
+			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(larmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+		else
+			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
+			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+			Turn(rarmcannon, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+		end
+	end
+
+	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED)
+	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED)
+
+	-- wait for leg rotations (ignore backheel of back leg - it's in the air)
+	for i=1, #frontLeg do
+		WaitForTurn(frontLeg[1], x_axis)
+	end
+	for i=1, #backLeg-1 do
+		WaitForTurn(backLeg[1], x_axis)
+	end
+end
+
+-- passing (front foot flat under body, back foot passing with bent knee)
+local function Passing(frontLeg, backLeg)
+	
+	for i=1,#frontLeg do
+		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
+	end
+	for i=1,#backLeg do
+		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
+	end
+
+	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
+	Turn(torso, x_axis, 0, TORSO_TILT_SPEED)
+
+	for i=1, #frontLeg-1 do
+		WaitForTurn(frontLeg[i], x_axis)
+	end
+	for i=1, #backLeg-1 do
+		WaitForTurn(backLeg[i], x_axis)
+	end
+end
 
 local function Walk()
 	SetSignalMask( SIG_Walk )
 	while ( true ) do
-		Turn(lupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(lleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		Turn(rupleg, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(rleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
-		if not(isFiring) then
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, 0.2, 0.5 )
-			Turn(rarm, x_axis, -0.2, 0.5 )
-			end	
-		WaitForTurn(lupleg, x_axis)
+
+--		Move(torso, y_axis, 50, 100)
+		Contact(leftLeg, rightLeg)
+		Passing(leftLeg, rightLeg)
 		Sleep(0)
 		
-		Turn(lupleg, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
-		Turn(rupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		if not(isFiring) then
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, -0.2, 0.5 )
-			Turn(rarm, x_axis, 0.2, 0.5 )
-		end
-		WaitForTurn(rupleg, x_axis)		
+		Contact(rightLeg, leftLeg)
+		Passing(rightLeg, leftLeg)
 		Sleep(0)	
 	end
 end
 
 local function StopWalk()
-	Turn( lupleg, x_axis, 0, 4)
-	Turn( lfoot, x_axis, 0, 4 )
-	Turn( lftoe, x_axis, 0, 4 )
-	Turn( lbtoe, x_axis, 0, 4 )	
-	Turn( lleg, x_axis, 0, 4 )
-	Turn( rupleg, x_axis, 0, 4)
-	Turn( rfoot, x_axis, 0, 4 )
-	Turn( rftoe, x_axis, 0, 4 )
-	Turn( rbtoe, x_axis, 0, 4 )	
-	Turn( rleg, x_axis, 0, 4 )
+	Move(torso, y_axis, 0, 100)
+	for i=1,#leftLeg do
+		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
+	end
+	for i=1,#rightLeg do
+		Turn(rightLeg[i], x_axis, 0, 2)
+	end
 	Turn( pelvis, z_axis, 0, 1)
+	Turn( torso, x_axis, 0, 1)
 	if not(isFiring) then
 		Turn( torso, y_axis, 0, 4)
 	end
-	Move( pelvis, y_axis, 0, 4)
+	Move( pelvis, y_axis, 0, 50)
 	Turn( rarm, x_axis, 0, 1)
 	Turn( larm, x_axis, 0, 1)
 end
