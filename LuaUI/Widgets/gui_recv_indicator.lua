@@ -1,10 +1,10 @@
-local versionName = "v1.292"
+local versionName = "v1.293"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
 --  brief:   a clustering algorithm
---  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and JÃ¶rg Sander
---	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, JÃ¶rg Sander and Xiaowei Xu
+--  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and Jörg Sander
+--	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, Jörg Sander and Xiaowei Xu
 --	code:  Msafwan
 --
 --  Licensed under the terms of the GNU GPL, v2 or later.
@@ -647,7 +647,7 @@ local function OrderSeedsUpdate(neighborsID, currentUnitID,objects, orderSeed,un
 	for i=1, #neighborsID do
 		objects[neighborsID[i]]=objects[neighborsID[i]] or {}
 		if (objects[neighborsID[i]].processed~=true) then
-			local new_r_dist = math.ceil(c_dist, Spring.GetUnitSeparation(currentUnitID, neighborsID[i]))
+			local new_r_dist = math.max(c_dist, Spring.GetUnitSeparation(currentUnitID, neighborsID[i]))
 			if objects[neighborsID[i]].reachability_distance==nil then
 				objects[neighborsID[i]].reachability_distance = new_r_dist
 				if useMergeSorter_gbl then
