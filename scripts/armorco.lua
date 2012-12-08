@@ -10,8 +10,8 @@ local larm, larmcannon, larmbarrel1, larmflare1, larmbarrel2, larmflare2, larmba
     "larmbarrel2", "larmflare2", "larmbarrel3", "larmflare3")
 local rarm, rarmcannon, rarmbarrel1, rarmflare1, rarmbarrel2, rarmflare2, rarmbarrel3, rarmflare3 = piece("rarm", "rarmcannon", "rarmbarrel1", "rarmflare1",
     "rarmbarrel2", "rarmflare2", "rarmbarrel3", "rarmflare3")
-local lupleg, lmidleg, lleg, lfoot, lftoe, lbtoe = piece("lupleg", "lmidleg", "lleg", "lfoot", "lftoe", "lbtoe")
-local rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe = piece("rupleg", "rmidleg", "rleg", "rfoot", "rftoe", "rbtoe")
+local leftLeg = { thigh=piece("lupleg"), knee=piece("lmidleg"), shin=piece("lleg"), foot=piece("lfoot"), toef=piece("lftoe"), toeb=piece("lbtoe") }
+local rightLeg = { thigh=piece("rupleg"), knee=piece("rmidleg"), shin=piece("rleg"), foot=piece("rfoot"), toef=piece("rftoe"), toeb=piece("rbtoe") }
 
 local leftLeg = { lupleg, lmidleg, lleg, lfoot, lftoe, lbtoe }
 local rightLeg = { rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe }
@@ -37,19 +37,18 @@ local SIG_Restore = 1
 local SIG_Walk = 2
 local PACE = 1.1
 
--- four leg positions - each contains thigh, mid, shin, foot, fronttoe, backtoe
-                             --      THIGH           KNEE           SHIN           FOOT           TOEF           TOEB
-local LEG_FRONT_ANGLES    = { math.rad(-40), math.rad( 10), math.rad( 30), math.rad(  0), math.rad(  0), math.rad( 15) }
-local LEG_FRONT_SPEEDS    = { math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90) }
+-- four leg positions - front to straight, then to back, then to bent (then front again)
+local LEG_FRONT_ANGLES    = { thigh=math.rad(-40), knee=math.rad( 10), shin=math.rad( 30), foot=math.rad(  0), toef=math.rad(  0), toeb=math.rad( 15) }
+local LEG_FRONT_SPEEDS    = { thigh=math.rad( 90)*PACE, knee=math.rad( 90)*PACE, shin=math.rad( 90)*PACE, foot=math.rad( 90)*PACE, toef=math.rad( 90)*PACE, toeb=math.rad( 90)*PACE }
 
-local LEG_STRAIGHT_ANGLES = { math.rad( -5), math.rad(-19), math.rad( 32), math.rad( -5), math.rad(  0), math.rad(  0) }
-local LEG_STRAIGHT_SPEEDS = { math.rad( 80), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 30) }
+local LEG_STRAIGHT_ANGLES = { thigh=math.rad( -5), knee=math.rad(-19), shin=math.rad( 32), foot=math.rad(  0), toef=math.rad(  0), toeb=math.rad(  0) }
+local LEG_STRAIGHT_SPEEDS = { thigh=math.rad( 70)*PACE, knee=math.rad( 90)*PACE, shin=math.rad( 90)*PACE, foot=math.rad( 90)*PACE, toef=math.rad( 90)*PACE, toeb=math.rad( 30)*PACE }
 
-local LEG_BACK_ANGLES     = { math.rad( 20), math.rad(  0), math.rad( 15), math.rad(  0), math.rad(-40), math.rad(-10) }
-local LEG_BACK_SPEEDS     = { math.rad( 60), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 60), math.rad( 60) }
+local LEG_BACK_ANGLES     = { thigh=math.rad( 10), knee=math.rad(  0), shin=math.rad( 15), foot=math.rad(  0), toef=math.rad(-20), toeb=math.rad(-10) }
+local LEG_BACK_SPEEDS     = { thigh=math.rad( 30)*PACE, knee=math.rad( 90)*PACE, shin=math.rad( 90)*PACE, foot=math.rad( 90)*PACE, toef=math.rad(120)*PACE, toeb=math.rad( 60)*PACE }
 
-local LEG_BENT_ANGLES     = { math.rad(-15), math.rad( 25), math.rad(-30), math.rad(  0), math.rad(  0), math.rad(  0) }
-local LEG_BENT_SPEEDS     = { math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90), math.rad( 90) }
+local LEG_BENT_ANGLES     = { thigh=math.rad(-15), knee=math.rad( 25), shin=math.rad(-30), foot=math.rad(  0), toef=math.rad(  0), toeb=math.rad(  0) }
+local LEG_BENT_SPEEDS     = { thigh=math.rad( 90)*PACE, knee=math.rad( 90)*PACE, shin=math.rad( 90)*PACE, foot=math.rad( 90)*PACE, toef=math.rad( 90)*PACE, toeb=math.rad( 90)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
@@ -57,9 +56,9 @@ local TORSO_TILT_ANGLE = math.rad(15)
 local TORSO_TILT_SPEED = math.rad(15)*PACE
 
 local PELVIS_LIFT_HEIGHT = 11
-local PELVIS_LIFT_SPEED = 33
+local PELVIS_LIFT_SPEED = 20
 local PELVIS_LOWER_HEIGHT = 0
-local PELVIS_LOWER_SPEED = 22
+local PELVIS_LOWER_SPEED = 33
 
 local ARM_FRONT_ANGLE = math.rad(-15)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
@@ -90,11 +89,11 @@ end
 local function Contact(frontLeg, backLeg)
 
 	-- front leg out straight, back toe angled to meet the ground
-	for i=1,#frontLeg do
+	for i,p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
 	end
 	-- back leg out straight, front toe angled to leave the ground
-	for i=1,#backLeg do
+	for i,p in pairs(backLeg) do
 		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
 	end
 
@@ -117,31 +116,31 @@ local function Contact(frontLeg, backLeg)
 	Turn(torso, x_axis, TORSO_TILT_ANGLE, TORSO_TILT_SPEED)
 
 	-- wait for leg rotations (ignore backheel of back leg - it's in the air)
-	for i=1, #frontLeg do
-		WaitForTurn(frontLeg[1], x_axis)
+	for i, p in pairs(frontLeg) do --=1, #frontLeg do
+		WaitForTurn(frontLeg[i], x_axis)
 	end
-	for i=1, #backLeg-1 do
-		WaitForTurn(backLeg[1], x_axis)
+	for i, p in pairs(frontLeg) do --i=1, #backLeg-1 do
+		WaitForTurn(backLeg[i], x_axis)
 	end
 end
 
 -- passing (front foot flat under body, back foot passing with bent knee)
 local function Passing(frontLeg, backLeg)
 	
-	for i=1,#frontLeg do
+	for i, p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
 	end
-	for i=1,#backLeg do
+	for i, p in pairs(backLeg) do
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
 	end
 
 	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
 	Turn(torso, x_axis, 0, TORSO_TILT_SPEED)
 
-	for i=1, #frontLeg-1 do
+	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 	end
-	for i=1, #backLeg-1 do
+	for i, p in pairs(backLeg) do
 		WaitForTurn(backLeg[i], x_axis)
 	end
 end
@@ -163,10 +162,10 @@ end
 
 local function StopWalk()
 	Move(torso, y_axis, 0, 100)
-	for i=1,#leftLeg do
+	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
 	end
-	for i=1,#rightLeg do
+	for i, p in pairs(rightLeg) do
 		Turn(rightLeg[i], x_axis, 0, 2)
 	end
 	Turn( pelvis, z_axis, 0, 1)

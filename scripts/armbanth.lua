@@ -25,21 +25,9 @@ local rarm_lgunclaw = piece "rarm_lgunclaw"
 local rarm_rgunclaw = piece "rarm_rgunclaw"
 local rarmflare = piece "rarmflare"
 
---left leg
-local lupleg = piece "lupleg"
-local lleg = piece "lleg"
-local lfoot = piece "lfoot"
-local ltoef = piece "ltoef"
-local ltoeb = piece "ltoer"
-local leftLeg = {lupleg, lleg, lfoot, ltoef, ltoeb}
-
---right leg
-local rupleg = piece "rupleg"
-local rleg = piece "rleg"
-local rfoot = piece "rfoot"
-local rtoef = piece "rtoef"
-local rtoeb = piece "rtoer"
-local rightLeg = {rupleg, rleg, rfoot, rtoef, rtoeb}
+-- legs
+local leftLeg = {thigh=piece("lupleg"), shin=piece("lleg"), foot=piece("lfoot"), toef=piece("ltoef"), toeb=piece("ltoer")}
+local rightLeg = {thigh=piece("rupleg"), shin=piece("rleg"), foot=piece("rfoot"), toef=piece("rtoef"), toeb=piece("rtoer")}
 
 smokePiece = { torso, rarmgun, larm_rgunclaw }
 
@@ -55,36 +43,26 @@ local armgun = false
 local missilegun = 1
 local PACE = 1.4
 
-local THIGH_FRONT_ANGLE = math.rad(-35)
-local THIGH_FRONT_SPEED = math.rad(80) * PACE
-local THIGH_STRAIGHT_ANGLE = math.rad(-6)
-local THIGH_STRAIGHT_SPEED = math.rad(90) * PACE
-local THIGH_MID_ANGLE = math.rad(-30)
-local THIGH_MID_SPEED = math.rad(120) * PACE
-local THIGH_BACK_ANGLE = math.rad(15)
-local THIGH_BACK_SPEED = math.rad(72) * PACE
+local LEG_FRONT_ANGLES    = { thigh=math.rad(-35), shin=math.rad(  5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
+local LEG_FRONT_SPEEDS    = { thigh=math.rad( 90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local SHIN_FRONT_ANGLE = math.rad(5)
-local SHIN_FRONT_SPEED = math.rad(150) * PACE
-local SHIN_STRAIGHT_ANGLE = math.rad(6)
-local SHIN_STRAIGHT_SPEED = math.rad(90) * PACE
-local SHIN_MID_ANGLE = math.rad(95)
-local SHIN_MID_SPEED = math.rad(285) * PACE
-local SHIN_BACK_ANGLE = math.rad(5)
-local SHIN_BACK_SPEED = math.rad(90) * PACE
+local LEG_STRAIGHT_ANGLES = { thigh=math.rad( -6), shin=math.rad(6), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_STRAIGHT_SPEEDS = { thigh=math.rad( 90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local TOEF_FRONT_ANGLE = math.rad(0)
-local TOEF_FRONT_SPEED = math.rad(90) * PACE
-local TOEF_BACK_ANGLE = math.rad(-15)
-local TOEF_BACK_SPEED = math.rad(80) * PACE
+local LEG_BACK_ANGLES     = { thigh=math.rad( 25), shin=math.rad(5), foot=math.rad(0), toef=math.rad(-25), toeb=math.rad(0) }
+local LEG_BACK_SPEEDS     = { thigh=math.rad( 72)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local TOEB_FRONT_ANGLE = math.rad(15)
-local TOEB_FRONT_SPEED = math.rad(90) * PACE
-local TOEB_BACK_ANGLE = math.rad(0)
-local TOEB_BACK_SPEED = math.rad(60) * PACE
+local LEG_BENT_ANGLES     = { thigh=math.rad(-30), shin=math.rad(95), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_BENT_SPEEDS     = { thigh=math.rad(120)*PACE, shin=math.rad(280)*PACE, foot=math.rad(90)*PACE, toef=math.rad(800)*PACE, toeb=math.rad(60)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
+
+-- body rise/fall with steps
+local PELVIS_LIFT_HEIGHT = 0
+local PELVIS_LIFT_SPEED = 8
+local PELVIS_LOWER_HEIGHT = -1
+local PELVIS_LOWER_SPEED = 5
 
 local ARM_FRONT_ANGLE = math.rad(-15)
 local ARM_FRONT_SPEED = math.rad(35) * PACE
@@ -116,17 +94,17 @@ end
 
 local function Contact(frontLeg, backLeg)
 	-- front leg out straight, back toe angled to meet the ground
-	Turn(frontLeg[1], x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-	Turn(frontLeg[2], x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-	Turn(frontLeg[4], x_axis, TOEF_FRONT_ANGLE, TOEF_FRONT_SPEED)
-	Turn(frontLeg[5], x_axis, TOEB_FRONT_ANGLE, TOEB_FRONT_SPEED)
-
+	for i, p in pairs(frontLeg) do
+		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
+	end
 	-- back leg out straight, front toe angled to leave the ground
-	Turn(backLeg[1], x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-	Turn(backLeg[2], x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
-	Turn(backLeg[4], x_axis, TOEF_BACK_ANGLE, TOEF_BACK_SPEED)
-	Turn(backLeg[5], x_axis, TOEB_BACK_ANGLE, TOEB_BACK_SPEED)
-
+	for i, p in pairs(backLeg) do
+		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
+	end
+	
+	--lower body at extended stride
+	Move(pelvis, y_axis, PELVIS_LOWER_HEIGHT, PELVIS_LOWER_SPEED)
+	
 	-- swing arms and body
 	if not(isFiring) then
 		if (frontLeg == leftLeg) then
@@ -145,30 +123,32 @@ local function Contact(frontLeg, backLeg)
 	end
 
 	-- wait for leg rotations (ignore backheel of back leg - it's in the air)
-	for i=1, #frontLeg do
+	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 	end
-	for i=1, #backLeg-1 do
+	for i, p in pairs(backLeg) do
 		WaitForTurn(backLeg[i], x_axis)
 	end
 end
 
--- passing (front foot flat under body, back foot passing with bent knee)
 local function Passing(frontLeg, backLeg)
-	Turn(frontLeg[1], x_axis, THIGH_STRAIGHT_ANGLE, THIGH_STRAIGHT_SPEED)
-	Turn(frontLeg[2], x_axis, SHIN_STRAIGHT_ANGLE, SHIN_STRAIGHT_SPEED)
-	Turn(frontLeg[4], x_axis, TOEF_FRONT_ANGLE, TOEF_FRONT_SPEED)
-	Turn(frontLeg[5], x_axis, TOEB_BACK_ANGLE, TOEB_BACK_SPEED)
-
-	Turn(backLeg[1], x_axis, THIGH_MID_ANGLE, THIGH_MID_SPEED)
-	Turn(backLeg[2], x_axis, SHIN_MID_ANGLE, SHIN_MID_SPEED)
-	Turn(backLeg[4], x_axis, TOEF_BACK_ANGLE, TOEF_BACK_SPEED)
-	Turn(backLeg[5], x_axis, TOEB_BACK_ANGLE, TOEB_BACK_SPEED)
-
-	for i=1, #frontLeg-1 do
+	
+	-- straight, foot flat on ground
+	for i, p in pairs(frontLeg) do
+		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
+	end
+	-- back knee bent, drags foot past front leg
+	for i, p in pairs(backLeg) do
+		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
+	end
+	
+	-- raise body as leg passes underneath
+	Move(pelvis, y_axis, PELVIS_LIFT_HEIGHT, PELVIS_LIFT_SPEED)
+	
+	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
 	end
-	for i=1, #backLeg-1 do
+	for i, p in pairs(backLeg) do
 		WaitForTurn(backLeg[i], x_axis)
 	end
 end
@@ -195,11 +175,11 @@ end
 
 local function StopWalk()
 	-- straighten legs
-	for i=1,#leftLeg do
+	for i, p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, 4)
 		Move(leftLeg[i], y_axis, 0, 4)
 	end
-	for i=1,#rightLeg do
+	for i, p in pairs(rightLeg) do
 		Turn(rightLeg[i], x_axis, 0, 4)
 		Move(rightLeg[i], y_axis, 0, 4)
 	end
