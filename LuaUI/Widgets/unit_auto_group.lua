@@ -40,6 +40,13 @@ include("keysym.h.lua")
 local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
+local groupableBuildings = {
+	[UnitDefNames["tacnuke"].id] = true,
+	[UnitDefNames["empmissile"].id] = true,
+	[UnitDefNames["napalmmissile"].id] = true,
+	[UnitDefNames["seismic"].id] = true,
+}
+
 local helpText =
 	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
 	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
@@ -181,8 +188,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
-	if options.immediate.value then
+function widget:UnitFromFactory(unitID, unitDefID, unitTeam) 
+	if options.immediate.value or groupableBuildings[unitDefID] then
 		if (unitTeam == myTeam) then
 			createdFrame[unitID] = GetGameFrame()
 			local gr = unit2group[unitDefID]
@@ -248,7 +255,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				local exec = false --set to true when there is at least one unit to process
 				for _, unitID in ipairs(GetSelectedUnits()) do
 					local udid = GetUnitDefID(unitID)
-					if ( not UDefTab[udid]["isFactory"] and not UDefTab[udid]["isBuilding"] ) then
+					if ( not UDefTab[udid]["isFactory"] and (groupableBuildings[udid] or not UDefTab[udid]["isBuilding"] )) then
 						selUnitDefIDs[udid] = true
 						unit2group[udid] = gr
 						--local x, y, z = Spring.GetUnitPosition(unitID)
