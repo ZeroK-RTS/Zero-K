@@ -127,7 +127,8 @@ path='Settings/Camera'
 	ShButton( 'Total War', 'viewtw' ) 
 	ShButton( 'Flip the TA Camera', 'viewtaflip' )
 	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
-	ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
+	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
+	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
 path='Settings/Reset Settings'
 	ShLabel( 'Reset graphic settings to minimum.')
