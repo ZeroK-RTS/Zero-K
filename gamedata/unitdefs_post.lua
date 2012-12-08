@@ -246,7 +246,7 @@ for name, ud in pairs(UnitDefs) do
 		ud.mincloakdistance = 0
 		ud.cloakcost = nil
 		ud.cloakcostmoving = nil
-                ud.cancloak = false
+		ud.cancloak = false
 	end
 end
 

@@ -70,6 +70,10 @@ local energyList		= {}	--unused
 local shareList			= {}
 local shareListTemp1	= {}
 local shareListTemp2	= {}
+local commsKilledList	= {}
+local dragonsKilledList	= {}
+local queenKilledList	= {}
+local nestsKilledList	= {}
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
@@ -137,6 +141,7 @@ function getMaxVal(valList)
 		if val and val > maxVal then
 			winTeam = team
 			maxVal = val
+			--Spring.Echo(" Team ".. winTeam .." maxVal ".. maxVal) --debug
 		end
 	end
 	return winTeam, floor(maxVal)
@@ -340,7 +345,11 @@ function gadget:Initialize()
 		shareList[team]			= 0
 		shareListTemp1[team]	= 0
 		shareListTemp2[team]	= 0
-		
+		commsKilledList[team]	= 0
+		dragonsKilledList[team]	= 0
+		queenKilledList[team]	= 0
+		nestsKilledList[team]	= 0
+		-- what for rage meter ?
 		awardList[team] = {}
 		
 		teamCount = teamCount + 1
@@ -400,12 +409,33 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	end
 end
 
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	local experience = spGetUnitExperience(unitID)
 	if experience > expUnitExp then
 		expUnitExp = experience
 		expUnitTeam = unitTeam
 		expUnitDefID = unitDefID
+	end
+	if (killerTeam == unitTeam) or (killerTeam == gaiaTeamID) or (unitTeam == gaiaTeamID) or (killerTeam == nil)
+	then return --echo("UnitDestroyed excluded")
+	else
+		--Spring.Echo('Killer Team ' .. killerTeam)
+		local ud = UnitDefs[unitDefID]
+		if ud.customParams.commtype then
+			commsKilledList[killerTeam] = commsKilledList[killerTeam] + 1
+		--	echo('Team ' .. killerTeam .. ' killed a commander, total value = ' .. commsKilledList[killerTeam])
+		elseif ud.name == "chicken_dragon" then --check unit filename
+			dragonsKilledList[killerTeam] = dragonsKilledList[killerTeam] + 1
+		--	echo("Team " .. killerTeam .. " killed a WD, value = ".. dragonsKilledList[killerTeam])
+		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
+			queenKilledList[killerTeam] = queenKilledList[killerTeam] + 1
+		--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKilledList[killerTeam])
+		elseif ud.name == "roost" then
+			nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
+		--	echo("Team " .. killerTeam .. " killed a nest, value = ".. nestsKilledList[killerTeam])
+		else
+		--echo("unimportant death: ".. ud.name)
+		end
 	end
 end
 
@@ -558,7 +588,7 @@ function gadget:GameFrame(n)
 	
 		FinalizeReclaimList()
 	
-		local pwnTeam, 	maxDamage 		= getMaxVal(damageList)		
+		local pwnTeam, 	maxDamage 		= getMaxVal(damageList)
 		local navyTeam, maxNavyDamage 	= getMaxVal(navyDamageList)
 		local airTeam, 	maxAirDamage 	= getMaxVal(airDamageList)
 		local nuxTeam, 	maxNuxDamage 	= getMaxVal(nuxDamageList)
@@ -579,6 +609,11 @@ function gadget:GameFrame(n)
 		local shareTeam, maxShare 		= getMaxVal(shareList)
 
 		local mexTeam, maxMex			= getMaxVal(mexList)
+		
+		local commsKilledTeam, maxCommsKilled		= getMaxVal(commsKilledList)
+		local dragonsKilledTeam, maxDragonsKilled	= getMaxVal(dragonsKilledList)
+		local queenKilledTeam, maxQueenKilled		= getMaxVal(queenKilledList)
+		local nestsKilledTeam, maxNestsKilled	= getMaxVal(nestsKilledList)
 		
 		local friendTeam
 		local maxFriendlyDamageRatio = 0
@@ -657,7 +692,7 @@ function gadget:GameFrame(n)
 			awardAward(kamTeam, 'kam', 'Damage: '.. comma_value(maxKamDamage))
 		end
 		if commTeam and maxCommDamage > getMeanDamageExcept(commTeam) * veryEasyFactor then
-			awardAward(commTeam, 'comm', 'Damage: '.. comma_value(maxCommDamage))
+			awardAward(commTeam, 'comm', 'Damage taken: '.. comma_value(maxCommDamage))
 		end
 		if fireTeam and maxFireDamage > getMeanDamageExcept(fireTeam) * easyFactor then
 			awardAward(fireTeam, 'fire', 'Damage: '.. comma_value(maxFireDamage))
@@ -683,7 +718,7 @@ function gadget:GameFrame(n)
 
 		--Spring.Echo(maxReclaim, getMeanMetalIncome())
 		if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
-			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. "m from wreckage")
+			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. " m from wreckage")
 		end
 		if friendTeam and maxFriendlyDamageRatio > minFriendRatio then
 			awardAward(friendTeam, 'friend', 'Damage inflicted on allies: '.. floor(maxFriendlyDamageRatio * 100) ..'%')
@@ -698,10 +733,21 @@ function gadget:GameFrame(n)
 			local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
 			--local expUnitExpRounded = ''..floor(expUnitExp * 10)/10
 			local expUnitExpRounded = ''..floor(expUnitExp * 10)
-			expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1) 
+			expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1)
 			awardAward(expUnitTeam, 'vet', vetName ..', '.. expUnitExpRounded ..' XP')
 		end
-
+		if commsKilledTeam and maxCommsKilled >= 3 then
+			awardAward(commsKilledTeam, 'head', maxCommsKilled .. ' Commanders eliminated')
+		end
+		if dragonsKilledTeam and maxDragonsKilled >= 3 then
+			awardAward(dragonsKilledTeam, 'dragon', maxDragonsKilled .. ' White Dragons annihilated')
+		end
+		if queenKilledTeam then
+			awardAward(queenKilledTeam, 'heart', 'Final strike to the Chicken Queen')
+		end
+		if nestsKilledTeam and (maxNestsKilled >= 20) then
+			awardAward(nestsKilledTeam, 'sweeper', maxNestsKilled .. ' Nests wiped out')
+		end
 		_G.awardList = awardList
 		sentAwards = true
 	end
@@ -787,6 +833,11 @@ local awardDescs =
 	kam		= 'Kamikaze Award',
 	comm	= 'Master and Commander',
 	mex		= 'Mineral Prospector',
+	rage	= 'Rage Master',
+	head	= 'Head Hunter',
+	dragon	= 'Dragon Slayer',
+	heart	= 'Heart Breaker',
+	sweeper	= 'Land Sweeper',
 }
 
 function gadget:Initialize()
@@ -1082,7 +1133,7 @@ function gadget:DrawScreen()
 						glPushMatrix()
 							
 							local border = 2
-							glColor(0,0,0,1)
+							glColor(0,0,0,0)
 							gl.Rect(0-border, 0-border, tWidth+border, tHeight+border)
 							glColor(1,1,1,1)	
 							glTexture('LuaRules/Images/awards/trophy_'.. awardType ..'.png')
