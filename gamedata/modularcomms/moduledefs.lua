@@ -624,6 +624,7 @@ decorations = {
 	skin_support_dark = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commsupport1dark.dds]]
+				unitDef.buildpic = "skin_support_dark.png"
 			end,
 	},
 	skin_support_green = {
