@@ -22,7 +22,7 @@ local gunFlares = {
     {headlaser1, headlaser2, headlaser3}
 }
 local barrels = {larmbarrel1, larmbarrel2, larmbarrel3, rarmbarrel1, rarmbarrel2, rarmbarrel3}
-local aimpoints = {torso, aaturret, shouldercannon, head}
+local aimpoints = {torso, aaturret, shoulderflare, head}
 
 local gunIndex = {1,1,1,1}
 
