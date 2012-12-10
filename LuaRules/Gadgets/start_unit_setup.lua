@@ -442,8 +442,8 @@ local function getMiddleOfStartBox(teamID)
 	local allyTeam = select(6, spGetTeamInfo(teamID))
 	local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
 	
-	local x = (x2 - x1)*0.5
-	local z = (z2 - z1)*0.5
+	local x = x1 + (x2 - x1)*0.5
+	local z = z1 + (z2 - z1)*0.5
 	local y = Spring.GetGroundHeight(x,z)
 
 	return x, y, z
