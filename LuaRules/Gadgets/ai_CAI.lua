@@ -3537,6 +3537,7 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 		teams = {},
 		aTeamOnThisTeam = 0,
 		ai = aiOnTeam,
+		listOfAis = {count = 0, data = {}},
 		
 		units = { -- most of these are unused - would be used in cheating AI
 			cost = 0,
@@ -3564,19 +3565,23 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 		}
 	}
 	
+	local at = allyTeamData[allyTeam]
+	
 	for _,t in pairs(spGetTeamList()) do
-		local _,_,_,_,_,at = spGetTeamInfo(t)
-		if at == allyTeam then
+		local _,_,_,_,_,myAllyTeam = spGetTeamInfo(t)
+		if myAllyTeam == allyTeam then
 			Spring.Echo("Team " .. t .. " on allyTeam " .. allyTeam)
-			allyTeamData[allyTeam].teams[t] = true
-			allyTeamData[allyTeam].aTeamOnThisTeam = t
+			at.teams[t] = true
+			at.aTeamOnThisTeam = t
+			if aiTeamData[t] then
+				at.listOfAis.count = at.listOfAis.count + 1
+				at.listOfAis.data[at.listOfAis.count] = t
+			end
 		end
 	end
 	
 	if aiOnTeam then
 		Spring.Echo("AI on ally team " .. allyTeam)
-		
-		local at = allyTeamData[allyTeam]
 		
 		at.fighterTarget = false
 		
@@ -3656,6 +3661,34 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 			end
 		end
 	
+	end
+end
+
+local function setAllyteamStartLocations(allyTeam)
+	if Game.startPosType == 2 then -- Apparently this is 'choose ingame'
+		local x1, y1, x2, y2 = Spring.GetAllyTeamStartBox(allyTeam)
+		
+		local at = allyTeamData[allyTeam]
+		local listOfAis = at.listOfAis
+		
+		local width = x2 - x1
+		local height = y2 - y1
+		
+		if width > height then
+			local mid = (y1+y2)*0.5
+			local mult = width/(listOfAis.count + 1)
+			for i = 1, listOfAis.count do
+				local team = listOfAis.data[i]
+				GG.SetStartLocation(team,x1 + i*mult,mid)
+			end
+		else
+			local mid = (x1+x2)*0.5
+			local mult = height/(listOfAis.count + 1)
+			for i = 1, listOfAis.count do
+				local team = listOfAis.data[i]
+				GG.SetStartLocation(team,mid,y1 + i*mult)
+			end
+		end
 	end
 end
 
@@ -3824,6 +3857,9 @@ function gadget:Initialize()
 	if usingAI then
 		for _,allyTeam in ipairs(spGetAllyTeamList()) do
 			initialiseAllyTeam(allyTeam, aiOnTeam[allyTeam])
+			if aiOnTeam[allyTeam] then
+				setAllyteamStartLocations(allyTeam)
+			end
 		end
 	else
 		gadgetHandler:RemoveGadget()

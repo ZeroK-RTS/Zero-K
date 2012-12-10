@@ -87,6 +87,7 @@ local createBeforeGameStart = {}
 local scheduledSpawn = {}
 local startPosition = {} -- [teamID] = {x, y, z}
 local shuffledStartPosition = {}
+local luaSetStartPositions = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams
 local teamSidesAI = {} 
@@ -478,7 +479,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   
   if startUnit then
     -- replace with shuffled position
-    local x,y,z = unpack(shuffledStartPosition[teamID])
+	local startPosition = luaSetStartPositions[teamID] or shuffledStartPosition[teamID]
+    local x,y,z = startPosition.x, startPosition.y, startPosition.z
 
     -- get facing direction
     local facing = GetFacingDirection(x, z, teamID)
@@ -828,7 +830,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end	
 end
 
--- used by CAI
+-- (no longer) used by CAI
 local function SetFaction(side, playerID, teamID)
     teamSidesAI[teamID] = side
 	teamSides[teamID] = side
@@ -837,6 +839,12 @@ local function SetFaction(side, playerID, teamID)
 	end
 end
 GG.SetFaction = SetFaction
+
+-- used by CAI. Could be extended to allow widgets to set start location? 
+local function SetStartLocation(teamID, x, z)
+    luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
+end
+GG.SetStartLocation = SetStartLocation
 
 function gadget:GameFrame(n)
   if n == (COMM_SELECT_TIMEOUT) then
