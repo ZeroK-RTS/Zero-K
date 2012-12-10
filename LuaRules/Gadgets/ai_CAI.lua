@@ -3666,16 +3666,16 @@ end
 
 local function setAllyteamStartLocations(allyTeam)
 	if Game.startPosType == 2 then -- Apparently this is 'choose ingame'
-		local x1, y1, x2, y2 = Spring.GetAllyTeamStartBox(allyTeam)
+		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
 		
 		local at = allyTeamData[allyTeam]
 		local listOfAis = at.listOfAis
 		
 		local width = x2 - x1
-		local height = y2 - y1
+		local height = z2 - z1
 		
 		if width > height then
-			local mid = (y1+y2)*0.5
+			local mid = (z1+z2)*0.5
 			local mult = width/(listOfAis.count + 1)
 			for i = 1, listOfAis.count do
 				local team = listOfAis.data[i]
@@ -3686,7 +3686,7 @@ local function setAllyteamStartLocations(allyTeam)
 			local mult = height/(listOfAis.count + 1)
 			for i = 1, listOfAis.count do
 				local team = listOfAis.data[i]
-				GG.SetStartLocation(team,mid,y1 + i*mult)
+				GG.SetStartLocation(team,mid,z1 + i*mult)
 			end
 		end
 	end

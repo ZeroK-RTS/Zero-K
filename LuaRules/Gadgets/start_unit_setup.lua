@@ -438,8 +438,19 @@ local function GetFacingDirection(x, z, teamID)
 	return facing
 end
 
+local function getMiddleOfStartBox(teamID)
+	local allyTeam = select(6, spGetTeamInfo(teamID))
+	local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
+	
+	local x = (x2 - x1)*0.5
+	local z = (z2 - z1)*0.5
+	local y = Spring.GetGroundHeight(x,z)
 
-local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
+	return x, y, z
+end
+
+
+local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
   local luaAI = Spring.GetTeamLuaAI(teamID)
   if luaAI and string.find(string.lower(luaAI), "chicken") then
     return false
@@ -482,6 +493,10 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 	local startPosition = luaSetStartPositions[teamID] or shuffledStartPosition[teamID]
     local x,y,z = startPosition.x, startPosition.y, startPosition.z
 
+	if notAtTheStartOfTheGame and Game.startPosType == 2 then
+		x, y, z = getMiddleOfStartBox(teamID)
+	end
+	
     -- get facing direction
     local facing = GetFacingDirection(x, z, teamID)
 
@@ -859,13 +874,13 @@ function gadget:GameFrame(n)
   if scheduledSpawn[n] then
 	for _, spawnData in pairs(scheduledSpawn[n]) do
     local teamID, playerID = spawnData[1], spawnData[2]
-    local canSpawn = SpawnStartUnit(teamID, playerID)
+    local canSpawn = SpawnStartUnit(teamID, playerID, false, false, true)
     
     if (canSpawn) then
       -- extra comms
       if playerID and customKeys[playerID] and customKeys[playerID].extracomm then
         for j=1, tonumber(customKeys[playerID].extracomm) do
-          SpawnStartUnit(teamID, playerID, false, true)
+          SpawnStartUnit(teamID, playerID, false, true, true)
         end
       end
     end
