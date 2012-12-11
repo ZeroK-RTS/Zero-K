@@ -17,7 +17,7 @@
 local version = "v1.31"
 function widget:GetInfo()
   return {
-    name      = "Central Build AI (exp)",
+    name      = "Central Build AI",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
     date      = "July 20, 2009, 27 Oct 2012",
