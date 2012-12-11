@@ -14,10 +14,10 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.3"
+local version = "v1.31"
 function widget:GetInfo()
   return {
-    name      = "Central Build AI",
+    name      = "Central Build AI (exp)",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
     date      = "July 20, 2009, 27 Oct 2012",
@@ -455,12 +455,14 @@ function CleanOrders(newCmd)
 		local newCmdID = abs ( newCmd.id )
 		x_newCmd = newCmd.x
 		z_newCmd = newCmd.z
-		if newCmd.h == 0 or newCmd.h == 2 then --get building facing. Reference: unit_prevent_lab_hax.lua by googlefrog
-			xSize = UnitDefs[newCmdID].xsize*4
-			zSize = UnitDefs[newCmdID].zsize*4
-		else
-			xSize = UnitDefs[newCmdID].zsize*4
-			zSize = UnitDefs[newCmdID].xsize*4
+		if x_newCmd then
+			if newCmd.h == 0 or newCmd.h == 2 then --get building facing. Reference: unit_prevent_lab_hax.lua by googlefrog
+				xSize = UnitDefs[newCmdID].xsize*4
+				zSize = UnitDefs[newCmdID].zsize*4
+			else
+				xSize = UnitDefs[newCmdID].zsize*4
+				zSize = UnitDefs[newCmdID].xsize*4
+			end
 		end
 	end
 	for key,myCmd in pairs(myQueue) do
@@ -473,7 +475,7 @@ function CleanOrders(newCmd)
 				canBuildThisThere = 0
 			end
 		end
-		if newCmd and (canBuildThisThere >= 1) then --check if build site overlap new queue
+		if newCmd and xSize and (canBuildThisThere >= 1) then --check if build site overlap new queue
 			if facing == 0 or facing == 2 then --check the size of the queued building
 				xSize_queue = UnitDefs[cmdID].xsize*4
 				zSize_queue = UnitDefs[cmdID].zsize*4
