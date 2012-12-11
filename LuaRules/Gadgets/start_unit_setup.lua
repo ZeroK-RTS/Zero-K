@@ -491,7 +491,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
   if startUnit then
     -- replace with shuffled position
 	local startPosition = luaSetStartPositions[teamID] or shuffledStartPosition[teamID]
-    local x,y,z = startPosition.x, startPosition.y, startPosition.z
+	local x,y,z = startPosition.x, startPosition.y, startPosition.z
 
 	if notAtTheStartOfTheGame and Game.startPosType == 2 then
 		x, y, z = getMiddleOfStartBox(teamID)
@@ -626,7 +626,8 @@ function Shuffle()
   for i=1,#teamIDs do
     teamID = teamIDs[i]
     if teamID ~= gaiateam then
-      startPosition[teamID] = {Spring.GetTeamStartPosition(teamID)}
+      local x, y, z = Spring.GetTeamStartPosition(teamID)
+      startPosition[teamID] = {x=x, y=y, z=z}
       shuffledStartPosition[teamID] = startPosition[teamID]
     end
   end
