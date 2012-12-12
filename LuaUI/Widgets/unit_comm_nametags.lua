@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "Evil4Zerggin and CarRepairer",
     date      = "18 April 2008",
     license   = "GNU GPL, v2 or later",
-    layer     = -10,
+    layer     = -9,
     enabled   = false  --  loaded by default?
   }
 end
