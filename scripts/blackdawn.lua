@@ -45,8 +45,9 @@ function script.Shot(num)
 	gun_1 = not gun_1
 end
 
-function script.Killed(severity, corpsetype)
-	if  severity <= .25  then
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity <= .25  then
 		Explode(base, sfxNone)
 		Explode(body, sfxNone)
 		return 1
