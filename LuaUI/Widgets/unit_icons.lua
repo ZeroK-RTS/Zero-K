@@ -4,22 +4,30 @@
 function widget:GetInfo()
   return {
     name      = "Unit Icons",
-    desc      = "v0.02 Shows icons above units",
+    desc      = "v0.1 Shows icons above units. Configure at: Settings/Interface/Hovering Icons \n\nThe following widget use this service:\nState Icons\nGadget Icons\nRank Icons 2",
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
     layer     = 4,--
     enabled   = true,  -- loaded by default?
+	handler   = true, --allow widget to use special widgetHandler's function
   }
 end
-
+--[[
+Changelog:
+msafwan			12 Dec 2012		:	initialize WG function at widget:initialize 
+									clear WG function at widget:shutdown
+									auto shutdown 'rank icon', 'state icon', and 'gadget icon' during widget:shutdown 
+									make state icon viewable even when unit is drawn as icons
+									make state icon follow camera rotation
+									
+--]]
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-local echo = Spring.Echo
-
-local GetUnitDefID         = Spring.GetUnitDefID
-local GetUnitDefDimensions = Spring.GetUnitDefDimensions
+local GetUnitDefID			= Spring.GetUnitDefID
+local GetUnitDefDimensions	= Spring.GetUnitDefDimensions
+local spValidUnitID 		= Spring.ValidUnitID
+local spGetUnitPosition 	= Spring.GetUnitPosition
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
@@ -29,12 +37,16 @@ local glTexRect        = gl.TexRect
 local glTranslate      = gl.Translate
 local glBillboard      = gl.Billboard
 local glDrawFuncAtUnit = gl.DrawFuncAtUnit
+local glDeleteList = gl.DeleteList
+local glCreateList = gl.CreateList
+local glCallList = gl.CallList
 
 local GL_GREATER = GL.GREATER
 
-local min   = math.min
-local floor = math.floor
-
+local spDiffTimers = Spring.DiffTimers
+local spGetTimer = Spring.GetTimer
+local lastIconUpdate = spGetTimer()
+local iconDrawInterval = 1/60 --60fps
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
@@ -43,7 +55,7 @@ options = {
 	iconsize = {
 		name = 'Hovering Icon Size',
 		type = 'number',
-		value = 30, min=10, max = 40,
+		value = 16, min=10, max = 40,
 	}
 }
 
@@ -63,13 +75,12 @@ local textureUnitsXshift = {}
 local textureIcons = {}
 local textureOrdered = {}
 
-local xshiftUnitTexture = {}
+--local xshiftUnitTexture = {}
 
 local hideIcons = {}
 
 
 WG.icons = {}
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -124,7 +135,7 @@ local function ReOrderIconsOnUnits()
 end
 
 
-function WG.icons.SetDisplay( iconName, show )
+local SetDisplay = function ( iconName, show )
 	local hide = (not show) or nil
 	curHide = hideIcons[iconName]
 	if curHide ~= hide then
@@ -133,12 +144,12 @@ function WG.icons.SetDisplay( iconName, show )
 	end
 end
 
-function WG.icons.SetOrder( iconName, order )
+local SetOrder = function ( iconName, order )
 	SetOrder(iconName, order)
 end
 
 
-function WG.icons.SetUnitIcon( unitID, data )
+local SetUnitIcon = function ( unitID, data )
 	local iconName = data.name
 	local texture = data.texture
 	
@@ -193,8 +204,7 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	unitHeights[unitID] = nil
-	xshiftUnitTexture[unitID] = nil
-	
+	--xshiftUnitTexture[unitID] = nil
 end
 
 
@@ -203,22 +213,23 @@ end
 
 
 -------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
+--DRAW-------------------------------------------------------------------------------
 
-local function DrawUnitFunc(xshift, yshift)
-  glTranslate(xshift,yshift,0)
-  glBillboard()
-  glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
+local function DrawUnitFunc(xshift, yshift,unitID)
+	local x,y,z = spGetUnitPosition(unitID)
+	glTranslate(x,y,z)
+	glTranslate(0,yshift,0)
+		gl.PushMatrix()
+		glBillboard()
+		glTranslate(xshift,20,0)
+		glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
+		glTranslate(-xshift,-20,0)
+		gl.PopMatrix()
+	glTranslate(0,-yshift,0)
+	glTranslate(-x,-y,-z)
 end
 
-
-function widget:DrawWorld()
-	if Spring.IsGUIHidden() then return end
-	
-	if (next(unitHeights) == nil) then
-		return -- avoid unnecessary GL calls
-	end
-	
+local function DrawIcon()
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
 	glDepthTest(true)
@@ -228,10 +239,12 @@ function widget:DrawWorld()
 		
 		glTexture( texture )
 		for unitID,xshift in pairs(units) do
-			if xshift and unitHeights and unitHeights[unitID] then
-				glDrawFuncAtUnit(unitID, false, DrawUnitFunc,
-					xshift,
-					unitHeights[unitID])
+			local unitIsValid = spValidUnitID(unitID)
+			if unitIsValid and xshift and unitHeights and unitHeights[unitID] then
+				DrawUnitFunc(xshift,unitHeights[unitID],unitID)
+			end
+			if not unitIsValid then
+				textureUnitsXshift[texture][unitID]=nil --clear it from memory
 			end
 		end
 	end
@@ -243,54 +256,42 @@ function widget:DrawWorld()
 	glDepthMask(false)
 end
 
--- drawscreen method
--- the problem with this one is it draws at same size regardless of how far away the unit is
---[[
-function widget:DrawScreenEffects()
+function widget:DrawWorld()
 	if Spring.IsGUIHidden() then return end
 	
 	if (next(unitHeights) == nil) then
 		return -- avoid unnecessary GL calls
 	end
 	
-	gl.Color(1,1,1,1)
-	glDepthMask(true)
-	glDepthTest(true)
-	glAlphaTest(GL_GREATER, 0.001)
-	
-	for texture, units in pairs(textureUnitsXshift) do
-		glTexture( texture )
-		for unitID,xshift in pairs(units) do
-			gl.PushMatrix()
-			local x,y,z = Spring.GetUnitPosition(unitID)
-			y = y + (unitHeights[unitID] or 0)
-			x,y,z = Spring.WorldToScreenCoords(x,y,z)
-			glTranslate(x,y,z)
-			if xshift and unitHeights then
-				glTranslate(xshift,0,0)
-				--glBillboard()
-				glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
-			end
-			gl.PopMatrix()
+	if spDiffTimers(spGetTimer(),lastIconUpdate) >= iconDrawInterval then --update at 60fps only
+		if iconGLlist then 
+			glDeleteList(iconGLlist)
 		end
+		iconGLlist = glCreateList(DrawIcon)
+		lastIconUpdate = spGetTimer()
 	end
-	
-	glTexture(false)
-	
-	glAlphaTest(false)
-	glDepthTest(false)
-	glDepthMask(false)
+	if iconGLlist then 
+		glCallList(iconGLlist)
+	end
 end
-
-]]
+-------------------------------------------------------------------------------------
+--INITIALIZE & SHUTDOWN---------------------------------------------------------------
 
 function widget:Initialize()
+	WG.icons.SetDisplay = SetDisplay --initialize WG.icons
+	WG.icons.SetOrder =  SetOrder
+	WG.icons.SetUnitIcon = SetUnitIcon
 end
 
 function widget:Shutdown()
 	for texture,_ in pairs(textureUnitsXshift) do
 		gl.DeleteTexture(texture)
 	end
+	local spSendCommands = Spring.SendCommands
+	spSendCommands("luaui disablewidget State Icons")
+	spSendCommands("luaui disablewidget Gadget Icons")
+	spSendCommands("luaui disablewidget Rank Icons 2")
+	WG.icons={} --empty WG.icons
 end
 
 -------------------------------------------------------------------------------------

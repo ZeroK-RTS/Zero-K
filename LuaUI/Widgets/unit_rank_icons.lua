@@ -6,13 +6,18 @@ function widget:GetInfo()
     name      = "Rank Icons 2",
     desc      = "Adds a rank icon depending on experience next to units (needs Unit Icons)",
     author    = "trepan (idea quantum,jK), CarRepairer tweak",
-    date      = "Feb, 2008",
+    date      = "Feb 2008",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
-    enabled   = true  -- loaded by default?
+    enabled   = true,  -- loaded by default?
+	handler	 = true, --allow widget to use special widgetHandler's function
   }
 end
-
+--[[
+Changelog:
+msafwan			12 Dec 2012			: auto start unit_icons.lua if not yet started
+									
+--]]
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -61,19 +66,21 @@ function PWCreate(unitID)
 end
 
 function widget:Initialize()
+	if (not WG.icons) or (#WG.icons==0) then --if "Unit Icons" not enabled, then enable it.
+		widgetHandler:EnableWidget("Unit Icons")
+	end
 
-  widgetHandler:RegisterGlobal("PWCreate", PWCreate)
-  
-  WG.icons.SetOrder( 'rank', 1 )
+	widgetHandler:RegisterGlobal("PWCreate", PWCreate)
+	WG.icons.SetOrder( 'rank', 1 )
 
-  for udid, ud in pairs(UnitDefs) do
-    -- 0.15+2/(1.2+math.exp(Unit.power/1000))
-    ud.power_xp_coeffient  = ((ud.power / 1000) ^ -0.2) / 6  -- dark magic
-  end
+	for udid, ud in pairs(UnitDefs) do
+		-- 0.15+2/(1.2+math.exp(Unit.power/1000))
+		ud.power_xp_coeffient  = ((ud.power / 1000) ^ -0.2) / 6  -- dark magic
+	end
 
-  for _,unitID in pairs( GetAllUnits() ) do
-    SetUnitRank(unitID)
-  end
+	for _,unitID in pairs( GetAllUnits() ) do
+		SetUnitRank(unitID)
+	end
 end
 
 function widget:Shutdown()
@@ -148,6 +155,7 @@ function widget:UnitGiven(unitID, unitDefID, oldTeam, newTeam)
   end
 end
 
+--[[
 --needed if icon widget gets disabled/enabled after this one. find a better way?
 function widget:GameFrame(f)
   if f%(32*5) == 0 then --5 seconds
@@ -156,5 +164,6 @@ function widget:GameFrame(f)
 	end
   end
 end
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
