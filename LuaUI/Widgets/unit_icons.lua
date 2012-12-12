@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
-    layer     = 4,--
+    layer     = -10,
     enabled   = true,  -- loaded by default?
 	handler   = true, --allow widget to use special widgetHandler's function
   }
