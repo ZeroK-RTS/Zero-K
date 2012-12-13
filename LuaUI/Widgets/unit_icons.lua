@@ -20,7 +20,7 @@ msafwan			12 Dec 2012		:	initialize WG function at widget:initialize
 									auto shutdown 'rank icon', 'state icon', and 'gadget icon' during widget:shutdown 
 									make state icon viewable even when unit is drawn as icons
 									make state icon follow camera rotation
-GoogleFrog      13 Dec 2012     :   Remove auto shutdown
+GoogleFrog      13 Dec 2012     :   Remove auto shutdown. Visible from far away is disabled by default. Remove FPS limit
 									
 --]]
 -------------------------------------------------------------------------------------
@@ -29,6 +29,7 @@ local GetUnitDefID			= Spring.GetUnitDefID
 local GetUnitDefDimensions	= Spring.GetUnitDefDimensions
 local spValidUnitID 		= Spring.ValidUnitID
 local spGetUnitPosition 	= Spring.GetUnitPosition
+local spIsUnitIcon          = Spring.IsUnitIcon
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
@@ -57,7 +58,13 @@ options = {
 		name = 'Hovering Icon Size',
 		type = 'number',
 		value = 30, min=10, max = 40,
-	}
+	},
+	forRadarIcons = {
+		name = 'Draw on Radar Icons',
+		desc = 'Draws state icons on units which are radar icons.',
+		type = 'bool',
+		value = false,
+	},
 }
 
 ----------------------------------------------------------------------------------------
@@ -241,7 +248,7 @@ local function DrawIcon()
 		glTexture( texture )
 		for unitID,xshift in pairs(units) do
 			local unitIsValid = spValidUnitID(unitID)
-			if unitIsValid and xshift and unitHeights and unitHeights[unitID] then
+			if unitIsValid and xshift and unitHeights and unitHeights[unitID] and (options.forRadarIcons.value or not spIsUnitIcon(unitID))then
 				DrawUnitFunc(xshift,unitHeights[unitID],unitID)
 			end
 			if not unitIsValid then
@@ -264,7 +271,7 @@ function widget:DrawWorld()
 		return -- avoid unnecessary GL calls
 	end
 	
-	if spDiffTimers(spGetTimer(),lastIconUpdate) >= iconDrawInterval then --update at 60fps only
+	if spDiffTimers(spGetTimer(),lastIconUpdate) >= iconDrawInterval or true then --update at 60fps only
 		if iconGLlist then 
 			glDeleteList(iconGLlist)
 		end
