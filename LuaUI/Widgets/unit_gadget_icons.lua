@@ -10,16 +10,21 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 5,
     enabled   = true,
-	handler   = true, --allow widget to use special widgetHandler's function
   }
 end
---[[
-Changelog:
-msafwan			12 Dec 2012			: auto start unit_icons.lua if not yet started
-									
---]]
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local echo = Spring.Echo
+
+
+local min   = math.min
+local floor = math.floor
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+
 
 local myAllyTeamID = 666
 
@@ -87,10 +92,6 @@ end
 
 
 function widget:Initialize()
-	if (not WG.icons) or (#WG.icons==0) then --if "Unit Icons" not enabled, then enable it.
-		widgetHandler:EnableWidget("Unit Icons")
-	end
-
 	WG.icons.SetOrder( 'lowpower', 2 )
 end
 

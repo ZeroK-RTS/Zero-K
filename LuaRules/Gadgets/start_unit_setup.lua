@@ -485,7 +485,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
   
   local keys = customKeys[playerID] or customKeys[select(2, spGetTeamInfo(teamID))]
   if keys and keys.jokecomm then
-	startUnit = JOKE_UNIT	
+	startUnit = DEFAULT_UNIT
   end    
   
   if startUnit then

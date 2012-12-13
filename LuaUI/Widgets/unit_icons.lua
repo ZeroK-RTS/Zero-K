@@ -20,6 +20,7 @@ msafwan			12 Dec 2012		:	initialize WG function at widget:initialize
 									auto shutdown 'rank icon', 'state icon', and 'gadget icon' during widget:shutdown 
 									make state icon viewable even when unit is drawn as icons
 									make state icon follow camera rotation
+GoogleFrog      13 Dec 2012     :   Remove auto shutdown
 									
 --]]
 -------------------------------------------------------------------------------------
@@ -55,7 +56,7 @@ options = {
 	iconsize = {
 		name = 'Hovering Icon Size',
 		type = 'number',
-		value = 16, min=10, max = 40,
+		value = 30, min=10, max = 40,
 	}
 }
 
@@ -287,10 +288,6 @@ function widget:Shutdown()
 	for texture,_ in pairs(textureUnitsXshift) do
 		gl.DeleteTexture(texture)
 	end
-	local spSendCommands = Spring.SendCommands
-	spSendCommands("luaui disablewidget State Icons")
-	spSendCommands("luaui disablewidget Gadget Icons")
-	spSendCommands("luaui disablewidget Rank Icons 2")
 	WG.icons={} --empty WG.icons
 end
 
