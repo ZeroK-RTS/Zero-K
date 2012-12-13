@@ -14,7 +14,6 @@
 --		filename to save, or else handle it themselves
 --	TODO
 --	- handle fac command queues
---	- handle team data, particularly resources
 --	- handle gadget data (CAI and chicken are particularly important)
 --	- handle nonexistent unitDefs
 --------------------------------------------------------------------------------
@@ -123,6 +122,11 @@ local function GetNewFeatureID(oldFeatureID)
 	return savedata.feature[oldFeatureID] and savedata.feature[oldFeatureID].newID
 end
 GG.SaveLoad.GetNewFeatureID = GetNewFeatureID
+
+local function GetSavedGameFrame()
+	return savedata.general.gameFrame
+end
+GG.SaveLoad.GetSavedGameFrame = GetSavedGameFrame
 
 -- FIXME: autodetection is fairly broken
 local function IsCMDTypeIconModeOrNumber(unitID, cmdID)
@@ -478,6 +482,8 @@ end
 local function SaveGeneralInfo()
 	local data = {}
 	
+	data.gameFrame = Spring.GetGameFrame()
+	
 	-- gameRulesParams
 	data.gameRulesParams = {}
 	local gameRulesParams = spGetGameRulesParams()
@@ -487,7 +493,7 @@ local function SaveGeneralInfo()
 		end
 	end
 	
-	-- team stuff - rulesparams, resources (TBD)
+	-- team stuff - rulesparams, resources
 	data.teams = {}
 	local teams = Spring.GetTeamList()
 	for i=1,#teams do

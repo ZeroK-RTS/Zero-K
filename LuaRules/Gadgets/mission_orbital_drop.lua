@@ -34,7 +34,7 @@ local function StartsWith(s, startString)
 end
 
 
-function GG.DropUnit(unitDefName, x, y, z, facing, teamID, teleport)
+function GG.DropUnit(unitDefName, x, y, z, facing, teamID)
   local gy = Spring.GetGroundHeight(x, z)
   if y < gy then y = gy end
   local unitID = Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)

@@ -31,7 +31,7 @@ local GADGETS_DIR = Script.GetName():gsub('US$', '') .. '/Gadgets/'
 local SCRIPT_DIR = Script.GetName() .. '/'
 
 
-local VFSMODE = VFS.ZIP_ONLY -- FIXME: ZIP_FIRST ?
+local VFSMODE = VFS.ZIP_ONLY
 if (Spring.IsDevLuaEnabled()) then
   VFSMODE = VFS.RAW_ONLY
 end
@@ -2042,7 +2042,7 @@ end
 -- FIXME: NOT IN BASE VERSION
 --
 
-function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) 
+function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) -- opts is a bitmask
   for _,g in ipairs(self.UnitCommandList) do
     g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) 
   end
