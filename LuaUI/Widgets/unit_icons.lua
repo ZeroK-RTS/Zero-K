@@ -249,31 +249,33 @@ local function DrawIcon()
 		glCallList(textureGLlist[texture]) --draw texture from graphic memory
 		for unitID,xshift in pairs(units) do
 			local unitIsValid = spValidUnitID(unitID)
-			local showOnIcon =(options.forRadarIcons.value or not spIsUnitIcon(unitID))
-			local unitInView = spIsUnitInView(unitID)
 			local iconHeight = unitHeights[unitID]
-			do
-				iconGLlist[texture] = iconGLlist[texture] or {}
-				iconGLlist[texture][iconHeight] = iconGLlist[texture][iconHeight] or {}
-				local state = iconGLlist[texture][iconHeight].update or 0
-				iconGLlist[texture][iconHeight].update = (forceUpdateNow and state + 1) or state
-			end
-			if showOnIcon and unitInView and xshift and iconHeight then
-				local drawiconGLlist = iconGLlist[texture][iconHeight][xshift]
-				local state = iconGLlist[texture][iconHeight].update
-				local x,y,z = spGetUnitPosition(unitID)
-				gl.PushMatrix() --memorize current coordinate/state
-					glTranslate(x,y,z)
-					if not drawiconGLlist or state>0 then 
-						if drawiconGLlist then
-							glDeleteList(drawiconGLlist)
+			if iconHeight then 
+				local unitInView = spIsUnitInView(unitID)
+				local showOnIcon =(options.forRadarIcons.value or not spIsUnitIcon(unitID))
+				do
+					iconGLlist[texture] = iconGLlist[texture] or {}
+					iconGLlist[texture][iconHeight] = iconGLlist[texture][iconHeight] or {}
+					local state = iconGLlist[texture][iconHeight].update or 0
+					iconGLlist[texture][iconHeight].update = (forceUpdateNow and state + 1) or state
+				end
+				if showOnIcon and unitInView and xshift then
+					local drawiconGLlist = iconGLlist[texture][iconHeight][xshift]
+					local state = iconGLlist[texture][iconHeight].update
+					local x,y,z = spGetUnitPosition(unitID)
+					gl.PushMatrix() --memorize current coordinate/state
+						glTranslate(x,y,z)
+						if not drawiconGLlist or state>0 then 
+							if drawiconGLlist then
+								glDeleteList(drawiconGLlist)
+							end
+							--Spring.Echo("UPDATED")
+							drawiconGLlist = glCreateList(DrawUnitFunc, xshift,iconHeight)
+							iconGLlist[texture][iconHeight][xshift] = drawiconGLlist
+							iconGLlist[texture][iconHeight].update = 0
 						end
-						--Spring.Echo("UPDATED")
-						drawiconGLlist = glCreateList(DrawUnitFunc, xshift,iconHeight)
-						iconGLlist[texture][iconHeight][xshift] = drawiconGLlist
-						iconGLlist[texture][iconHeight].update = 0
-					end
-				glCallList(drawiconGLlist) --cache, draw from graphic memory & restore coordinate
+					glCallList(drawiconGLlist) --cache, draw from graphic memory & restore coordinate
+				end
 			end
 			if not unitIsValid then
 				textureUnitsXshift[texture][unitID]=nil --clear it from memory
