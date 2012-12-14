@@ -92,7 +92,7 @@ unitDef = {
       },
 
       duration                = 0.02,
-      explosionGenerator      = [[custom:FLASH1yellow2]],
+      explosionGenerator      = [[custom:beamweapon_hit_yellow_small]],
       fireStarter             = 50,
       heightMod               = 1,
       impactOnly              = true,

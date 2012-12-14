@@ -98,7 +98,7 @@ unitDef = {
         subs    = 0.5,
       },
 
-      explosionGenerator      = [[custom:FLASH1yellow2]],
+      explosionGenerator      = [[custom:beamweapon_hit_yellow_tiny]],
       fireStarter             = 50,
       impactOnly              = true,
       impulseBoost            = 0,
