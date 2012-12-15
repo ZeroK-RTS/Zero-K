@@ -72,7 +72,7 @@ local shareListTemp1	= {}
 local shareListTemp2	= {}
 local commsKilledList	= {}
 local dragonsKilledList	= {}
-local queenKilledList	= {}
+local queenKillDamageList	= {}
 local nestsKilledList	= {}
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
@@ -347,7 +347,7 @@ function gadget:Initialize()
 		shareListTemp2[team]	= 0
 		commsKilledList[team]	= 0
 		dragonsKilledList[team]	= 0
-		queenKilledList[team]	= 0
+		queenKillDamageList[team]	= 0
 		nestsKilledList[team]	= 0
 		-- what for rage meter ?
 		awardList[team] = {}
@@ -428,8 +428,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			dragonsKilledList[killerTeam] = dragonsKilledList[killerTeam] + 1
 		--	echo("Team " .. killerTeam .. " killed a WD, value = ".. dragonsKilledList[killerTeam])
 		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
-			queenKilledList[killerTeam] = queenKilledList[killerTeam] + 1
-		--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKilledList[killerTeam])
+			queenKillDamageList[killerTeam] = queenKillDamageList[killerTeam] + 9*10^6 --mark the official Queen killer with a number: +9000000
+		--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKillDamageList[killerTeam])
 		elseif ud.name == "roost" then
 			nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
 		--	echo("Team " .. killerTeam .. " killed a nest, value = ".. nestsKilledList[killerTeam])
@@ -510,6 +510,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 		if paralyzer then
 			empDamageList[attackerTeam] = empDamageList[attackerTeam] + damage
 		else
+			local attackedDef= UnitDefs[unitDefID]
+			if attackedDef.name == "chickenflyerqueen" or attackedDef.name == "chickenlandqueen" then
+				if fullDamage> hp then --the damage is fatal to queen
+					queenKillDamageList[unitTeam] = queenKillDamageList[unitTeam] + fullDamage --store this 'last damage' value.
+				end
+			end
 			damageList[attackerTeam] = damageList[attackerTeam] + damage
 			ouchDamageList[unitTeam] = ouchDamageList[unitTeam] + damage
 			local ad = UnitDefs[attackerDefID]
@@ -612,7 +618,7 @@ function gadget:GameFrame(n)
 		
 		local commsKilledTeam, maxCommsKilled		= getMaxVal(commsKilledList)
 		local dragonsKilledTeam, maxDragonsKilled	= getMaxVal(dragonsKilledList)
-		local queenKilledTeam, maxQueenKilled		= getMaxVal(queenKilledList)
+		local queenKilledTeam, maxQueenKillDamage		= getMaxVal(queenKillDamageList)
 		local nestsKilledTeam, maxNestsKilled	= getMaxVal(nestsKilledList)
 		
 		local friendTeam
@@ -743,7 +749,8 @@ function gadget:GameFrame(n)
 			awardAward(dragonsKilledTeam, 'dragon', maxDragonsKilled .. ' White Dragons annihilated')
 		end
 		if queenKilledTeam then
-			awardAward(queenKilledTeam, 'heart', 'Final strike to the Chicken Queen')
+			maxQueenKillDamage = floor(maxQueenKillDamage - 9*10^6) --remove the queen killer signature: +9000000 from the total damage, and remove decimal
+			awardAward(queenKilledTeam, 'heart', 'Dealt a fatal final strike to Chicken Queen with '.. maxQueenKillDamage .. ' damage')
 		end
 		if nestsKilledTeam and (maxNestsKilled >= 20) then
 			awardAward(nestsKilledTeam, 'sweeper', maxNestsKilled .. ' Nests wiped out')
