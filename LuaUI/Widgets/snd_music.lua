@@ -78,6 +78,9 @@ local defeat = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function GetMusicType()
+	return musicType
+end
 
 local function StartTrack(track)
 	haltMusic = false
@@ -86,12 +89,14 @@ local function StartTrack(track)
 	local newTrack = previousTrack
 	if track then
 		newTrack = track	-- play specified track
+		musicType = 'unknown'
 	else
 		local tries = 0
 		repeat
 			if (not gameStarted) then
 				if (#briefingTracks == 0) then return end
 				newTrack = briefingTracks[math.random(1, #briefingTracks)]
+				musicType = "briefing"
 			elseif musicType == 'peace' then
 				if (#peaceTracks == 0) then return end
 				newTrack = peaceTracks[math.random(1, #peaceTracks)]
@@ -228,8 +233,8 @@ function widget:Update(dt)
 			--Spring.SetSoundStreamVolume( playedTime/5)
 		--end
 
-		if ( (musicType ~= previousTrackType and musicType == 'war')
-		 or (playedTime >= totalTime))
+		if ( previousTrackType == "peace" and musicType == 'war' )
+		 or (playedTime >= totalTime)
 		 and (not haltMusic) then	-- both zero means track stopped
 			previousTrackType = musicType
 			StartTrack()
@@ -237,7 +242,7 @@ function widget:Update(dt)
 			--Spring.Echo("Track: " .. newTrack)
 			newTrackWait = 0
 		end
-        local _, _, paused = Spring.GetGameSpeed()
+		local _, _, paused = Spring.GetGameSpeed()
 		if (paused ~= wasPaused) and options.pausemusic.value then
 			Spring.PauseSoundStream()
 			wasPaused = paused
@@ -260,6 +265,7 @@ function widget:Initialize()
 	WG.Music.StopTrack = StopTrack
 	WG.Music.SetWarThreshold = SetWarThreshold
 	WG.Music.SetPeaceThreshold = SetPeaceThreshold
+	WG.Music.GetMusicType = GetMusicType
 
 	-- Spring.Echo(math.random(), math.random())
 	-- Spring.Echo(os.clock())
@@ -347,10 +353,12 @@ function widget:GameOver()
 	-- FIXME: get a better way to detect who won
 	if not defeat then
 		if #victoryTracks <= 0 then return end
-		track = victoryTracks[math.random(1, #victoryTracks)]	
+		track = victoryTracks[math.random(1, #victoryTracks)]
+		musicType = "victory"
 	else
 		if #defeatTracks <= 0 then return end
 		track = defeatTracks[math.random(1, #defeatTracks)]
+		musicType = "defeat"
 	end
 	Spring.StopSoundStream()
 	Spring.PlaySoundStream(track,WG.music_volume or 0.5)
