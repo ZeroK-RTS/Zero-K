@@ -20,8 +20,8 @@ local weaponDef = {
 	},
 	
 	edgeEffectiveness       = 0.5,
-	explosionGenerator		= [[custom:napalm_firewalker]],
-	fireStarter				= 120,
+	explosionGenerator	= [[custom:napalm_firewalker]],
+	fireStarter		= 120,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,

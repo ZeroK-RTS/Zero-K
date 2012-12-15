@@ -2,7 +2,7 @@ local name = "commweapon_partillery"
 local weaponDef = {
 	name                    = [[Light Plasma Artillery]],
     accuracy                = 350,
-    areaOfEffect            = 48,
+    areaOfEffect            = 64,
 
     customParams			= {
     	muzzleEffectFire = [[custom:thud_fire_fx]],
@@ -12,13 +12,13 @@ local weaponDef = {
     craterMult              = 0,
 
     damage                  = {
-		default = 300,
-		planes  = 300,
-		subs    = 15,
+		default = 320,
+		planes  = 320,
+		subs    = 16,
     },
 
     edgeEffectiveness       = 0.5,
-    explosionGenerator      = [[custom:PLASMA_HIT_32]],
+    explosionGenerator      = [[custom:INGEBORG]],
     impulseBoost            = 0,
     impulseFactor           = 0.4,
     interceptedByShieldType = 1,
