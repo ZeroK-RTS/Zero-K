@@ -512,14 +512,6 @@ upgrades = {
 				unitDef.customparams.jumpclass = "commrecon2"
 			end,	
 	},
-	module_superspeed = {
-		name = "Marathon Motion Control",
-		description = "Increases speed by 50% of base",
-		func = function(unitDef, attributeMods)
-				attributeMods.speed = attributeMods.speed + 0.5
-		end,
-		--useWeaponSlot = true,
-	},
 	
 	module_radarnet = {
 		name = "Integrated Radar Network",
@@ -541,6 +533,27 @@ upgrades = {
 		useWeaponSlot = true,
 	},	
 
+	module_superspeed = {
+		name = "Marathon Motion Control",
+		description = "Increases speed by 50% of base",
+		func = function(unitDef, attributeMods)
+				attributeMods.speed = attributeMods.speed + 0.5
+		end,
+		useWeaponSlot = true,
+	},	
+	
+	module_longshot = {
+		name = "Longshot Fire Control",
+		description = "Extends range of all weapons by 40%",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					v.customparams.rangemod = v.customparams.rangemod + 0.4
+				end
+			end,	
+		useWeaponSlot = true,
+	},		
+		
 	module_super_nano = {
 		name = "Engineer's Revenge",
 		description = "Adds 20 metal/s build speed and 200 build range",
