@@ -94,7 +94,7 @@ overCategory = {
     range = 600, reload = 2, },
 	
 corclog = {
-	cannotJumpMidair = true},
+	cobscript = false, cannotJumpMidair = true},
 	
  armaak = {
     cobscript = false, cannotJumpMidair = true},	

@@ -53,6 +53,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[clogger.s3o]],
   ovradjust              = [[1]],
+  script				 = [[corclog.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
