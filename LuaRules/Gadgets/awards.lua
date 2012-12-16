@@ -750,7 +750,7 @@ function gadget:GameFrame(n)
 		end
 		if queenKilledTeam then
 			--maxQueenKillDamage = floor(maxQueenKillDamage - 9*10^9) --remove the queen killer signature: +9000000000 from the total damage, and remove decimal
-			awardAward(queenKilledTeam, 'heart', 'Damage Queen: '.. maxQueenKillDamage)
+			awardAward(queenKilledTeam, 'heart', 'Damage: '.. comma_value(maxQueenKillDamage))
 		end
 		if nestsKilledTeam and (maxNestsKilled >= 20) then
 			awardAward(nestsKilledTeam, 'sweeper', maxNestsKilled .. ' Nests wiped out')
@@ -843,8 +843,7 @@ local awardDescs =
 	rage	= 'Rage Master',
 	head	= 'Head Hunter',
 	dragon	= 'Dragon Slayer',
-	--heart	= 'Queen Heart Breaker',
-	heart	= 'Fully Prepared',
+	heart	= 'Queen Heart Breaker',
 	sweeper	= 'Land Sweeper',
 }
 
