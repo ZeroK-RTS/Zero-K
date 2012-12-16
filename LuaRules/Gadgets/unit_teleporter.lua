@@ -810,14 +810,15 @@ local spIsUnitInView       = Spring.IsUnitInView
 
 local myTeam = spGetMyTeamID()
 
-local function DrawBezierCurve(pointA, pointB, pointC,pointD)
+local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
 	--//REFERENCE: 
 	-- http://www.codeproject.com/Articles/31859/Draw-a-Smooth-Curve-through-a-Set-of-2D-Points-wit
 	-- Dr Thomas Sederberg, BYU Bézier curves, http://www.tsplines.com/resources/class_notes/Bezier_curves.pdf
 	-- http://en.wikipedia.org/wiki/B%C3%A9zier_curve
 	--// allow us to dynamically create smooth curve in realtime.
+	local step = 1/amountOfPoints
 	glVertex(pointA[1]+3,pointA[2]+3,pointA[3]+3) --redundant vertex to make polygon looks thicker
-	for i=0, 1, 0.1 do --generate 10 points of a curve
+	for i=0, 1, step do --generate 10 points of a curve
 		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
 		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
 		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
@@ -869,7 +870,7 @@ local function DrawWire()
 							gl.PushAttrib(GL.POLYGON_BITS)
 							gl.DepthTest(true)
 							gl.Color(0,0.75,1,math.random()*0.3+0.2) --draw flickering blueish *thing*
-							gl.BeginEnd(GL.POLYGON , DrawBezierCurve, point[1],point[2],point[3],point[4] )
+							gl.BeginEnd(GL.POLYGON , DrawBezierCurve, point[1],point[2],point[3],point[4],10)
 							gl.DepthTest(false)
 							gl.Color(1,1,1,1)
 							gl.PopAttrib()
@@ -892,7 +893,7 @@ local function DrawWire()
 				gl.DepthTest(true)
 				gl.Color(0,0.75,1,math.random()*0.3+0.2) --draw flickering blueish beam
 				gl.LineWidth(3)
-				gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1],point[2],point[3],point[4] )
+				gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1],point[2],point[3],point[4],10)
 				gl.DepthTest(false)
 				gl.Color(1,1,1,1)
 				gl.PopAttrib()
@@ -931,7 +932,7 @@ function gadget:DrawWorld()
 				--gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
 				local ax,ay,az = spGetUnitPosition(bid)
 				local bx,by,bz = spGetUnitPosition(tid)
-				gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, {ax,ay,az},{ax,ay+1500,az},{bx,by+1500,bz},{bx,by,bz}) --draw an arc in the sky.
+				gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, {ax,ay,az},{ax,ay+1500,az},{bx,by+1500,bz},{bx,by,bz},20) --draw an arc in the sky.
 				
 				local x,y,z = spGetUnitPosition(bid)
 				
