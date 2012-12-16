@@ -556,7 +556,7 @@ function gadget:GameFrame(f)
 									
 									local timeToJelly = flightTime-(math.sqrt((-trajectoryHeight)*2/thisGravity)-math.sqrt((-trajectoryHeight+200)*2/thisGravity)) --revise time estimate to get the time to reach jelly field. Reference: equation of motions, s=a*t*t/2
 									Paralyze(teleportiee, timeToJelly) --paralyze unit (to prevent weapon range hax)
-									Spring.AddUnitDamage(teleportiee, 0) --trigger AA targeting for this unit (handled by "unit_aa_shot_flying_groundunit.lua" by msafwan)
+									--Spring.AddUnitDamage(teleportiee, 0) --trigger AA targeting for this unit (handled by "unit_aa_shot_flying_groundunit.lua" by msafwan)
 									
 									wasLaunched= true
 								else

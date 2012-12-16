@@ -428,7 +428,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			dragonsKilledList[killerTeam] = dragonsKilledList[killerTeam] + 1
 		--	echo("Team " .. killerTeam .. " killed a WD, value = ".. dragonsKilledList[killerTeam])
 		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
-			queenKillDamageList[killerTeam] = queenKillDamageList[killerTeam] + 9*10^6 --mark the official Queen killer with a number: +9000000
+			--queenKillDamageList[killerTeam] = queenKillDamageList[killerTeam] + 9*10^9 --mark the official Queen killer with a number: +9000000000
 		--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKillDamageList[killerTeam])
 		elseif ud.name == "roost" then
 			nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
@@ -512,8 +512,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 		else
 			local attackedDef= UnitDefs[unitDefID]
 			if attackedDef.name == "chickenflyerqueen" or attackedDef.name == "chickenlandqueen" then
-				if fullDamage> hp then --the damage is fatal to queen
-					queenKillDamageList[unitTeam] = queenKillDamageList[unitTeam] + fullDamage --store this 'last damage' value.
+				if damage> 0 then --the damage to queen
+					queenKillDamageList[attackerTeam] = queenKillDamageList[attackerTeam] + damage --store damage.
 				end
 			end
 			damageList[attackerTeam] = damageList[attackerTeam] + damage
@@ -618,7 +618,7 @@ function gadget:GameFrame(n)
 		
 		local commsKilledTeam, maxCommsKilled		= getMaxVal(commsKilledList)
 		local dragonsKilledTeam, maxDragonsKilled	= getMaxVal(dragonsKilledList)
-		local queenKilledTeam, maxQueenKillDamage		= getMaxVal(queenKillDamageList)
+		local queenKilledTeam, maxQueenKillDamage		= getMaxVal(queenKillDamageList) --get the highest score
 		local nestsKilledTeam, maxNestsKilled	= getMaxVal(nestsKilledList)
 		
 		local friendTeam
@@ -749,8 +749,8 @@ function gadget:GameFrame(n)
 			awardAward(dragonsKilledTeam, 'dragon', maxDragonsKilled .. ' White Dragons annihilated')
 		end
 		if queenKilledTeam then
-			maxQueenKillDamage = floor(maxQueenKillDamage - 9*10^6) --remove the queen killer signature: +9000000 from the total damage, and remove decimal
-			awardAward(queenKilledTeam, 'heart', 'Dealt a fatal final strike to Chicken Queen with '.. maxQueenKillDamage .. ' damage')
+			--maxQueenKillDamage = floor(maxQueenKillDamage - 9*10^9) --remove the queen killer signature: +9000000000 from the total damage, and remove decimal
+			awardAward(queenKilledTeam, 'heart', 'Damage Queen: '.. maxQueenKillDamage)
 		end
 		if nestsKilledTeam and (maxNestsKilled >= 20) then
 			awardAward(nestsKilledTeam, 'sweeper', maxNestsKilled .. ' Nests wiped out')
@@ -843,7 +843,8 @@ local awardDescs =
 	rage	= 'Rage Master',
 	head	= 'Head Hunter',
 	dragon	= 'Dragon Slayer',
-	heart	= 'Heart Breaker',
+	--heart	= 'Queen Heart Breaker',
+	heart	= 'Fully Prepared',
 	sweeper	= 'Land Sweeper',
 }
 
