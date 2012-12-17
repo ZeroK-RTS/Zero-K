@@ -271,24 +271,25 @@ local function DrawFunc()
 	spec = spec or fullview
 	
 	for allyID, connections in spairs(SYNCED.shieldConnections) do
-
-	for _,con in sipairs(connections) do
-		local u1 = con[1]
-		local u2 = con[2]
-		
-		local l1
-		local l2
-		
-		if (spec or allyID == myAllyID) then
-			l1 = spIsUnitInView(u1)
-			l2 = spIsUnitInView(u2)
+		for _,con in sipairs(connections) do
+			local u1 = con[1]
+			local u2 = con[2]
+			
+			local l1
+			local l2
+			
+			if (spec or allyID == myAllyID) then
+				l1 = spIsUnitInView(u1)
+				l2 = spIsUnitInView(u2)
+			end
+	
+			if ((l1 or l2) and (spValidUnitID(u1) and spValidUnitID(u2))) then
+				local _,_,_,x1, y1, z1 = spGetUnitPosition(u1, true)
+				local _,_,_,x2, y2, z2 = spGetUnitPosition(u2, true)
+				glVertex(x1, y1, z1)
+				glVertex(x2, y2, z2)
+			end
 		end
-
-		if ((l1 or l2) and (spValidUnitID(u1) and spValidUnitID(u2))) then
-			glVertex(spGetUnitPosition(u1))
-			glVertex(spGetUnitPosition(u2))
-		end
-	end
 	end
 end 
 
