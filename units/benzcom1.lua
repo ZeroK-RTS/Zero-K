@@ -15,7 +15,7 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[corcom.png]],
+  buildPic            = [[benzcom.png]],
   buildTime           = 1200,
   canAttack           = true,
   canCloak            = false,
@@ -39,6 +39,7 @@ unitDef = {
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
+	commtype = [[5]],
   },
 
   energyMake          = 3.2,
