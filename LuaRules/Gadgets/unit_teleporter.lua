@@ -144,7 +144,7 @@ local function FindLaunchSpeed(gravity, relX,relY,relZ, apexHeight, startX, star
 				offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
 			end
 			local heightStep  =math.max(20,sclY)
-			local mx,my,mz = 0,(heightStep+heightStep/2),0 --set unit mid position
+			local mx,my,mz = 0,(heightStep/2),0 --set to unit mid position
 			local maxX,maxY,maxZ = (sclX/2 + offX),(sclY/2 + offY),(sclZ/2 + offZ)
 			local minX,minY,minZ = (-1*sclX/2 + offX),(-1*sclY/2 + offY),(-1*sclZ/2 + offZ)
 			while my<=200 do
@@ -152,8 +152,16 @@ local function FindLaunchSpeed(gravity, relX,relY,relZ, apexHeight, startX, star
 				mx =xVel*timeOfFlight
 				mz =zVel*timeOfFlight
 				local units = Spring.GetUnitsInBox(startX+mx+minX,startY+my+minY,startZ+mz+minZ,startX+mx+maxX,startY+my+maxY,startZ+mz+maxZ)
-				if units and #units>0 then
-					isPossible = "obstacle"
+				if units then
+					if #units==1 then
+						if units[1] ~= unitID then
+							isPossible = "obstacle"
+							break
+						end
+					elseif #units>1 then
+						isPossible = "obstacle"
+						break
+					end
 				end
 				my = my + heightStep
 			end
