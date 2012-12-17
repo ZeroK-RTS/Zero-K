@@ -354,7 +354,7 @@ for i=1,#UnitDefs do
 		elseif unitDef.customParams.commtype == "5" then 
 			local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 			effectUnitDefsXmas[unitDef.name] = {
-				{class='SantaHat', options={color={0.7,0,0,0.7}, pos={0,0,0}, emitVector={0,1,0}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="hat"}},
+				{class='SantaHat', options={color={0,0,0.7,1}, pos={0,0,0}, emitVector={0,1,0.1}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="hat"}},
 			}	    
 		end
 	end
