@@ -146,29 +146,55 @@ local copy = {
 	cremcom1 = {
 		cremcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 2750, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
-			customparams = {rangebonus = "0.025"},
+			mainstats = {maxdamage = 3000, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
+			customparams = {speedbonus = "0.05"},
 			wreckmodel = "armcom2_dead",
 		},
 		cremcom3 = {
 			level = 3,
-			mainstats = {maxdamage = 3150, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
-			customparams = {rangebonus = "0.05"},
+			mainstats = {maxdamage = 4000, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
+			customparams = {speedbonus = "0.1"},
 			wreckmodel = "armcom3_dead",
 		},
 		cremcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 3500, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
-			customparams = {rangebonus = "0.075"},
+			mainstats = {maxdamage = 5000, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
+			customparams = {speedbonus = "0.15"},
 			wreckmodel = "armcom4_dead",
 		},
 		cremcom5 = {
 			level = 5,
-			mainstats = {maxdamage = 4000, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
-			customparams = {rangebonus = "0.1"},
+			mainstats = {maxdamage = 6000, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
+			customparams = {speedbonus = "0.2"},
 			wreckmodel = "armcom5_dead",
 		},			
-	},	
+	},
+	benzcom1 = {
+		benzcom2 = {
+			level = 2,
+			mainstats = {maxdamage = 2600, objectname = "benzcom2.s3o"},
+			customparams = {rangebonus = "0.075"},
+			wreckmodel = "benzcom2_wreck.s3o",
+		},
+		benzcom3 = {
+			level = 3,
+			mainstats = {maxdamage = 3300, objectname = "benzcom3.s3o",},
+			customparams = {rangebonus = "0.15"},
+			wreckmodel = "benzcom3_wreck.s3o",
+		},
+		benzcom4 = {
+			level = 4,
+			mainstats = {maxdamage = 4000, objectname = "benzcom4.s3o",},
+			customparams = {rangebonus = "0.225"},
+			wreckmodel = "benzcom4_wreck.s3o",
+		},
+		benzcom5 = {
+			level = 5,
+			mainstats = {maxdamage = 4700,objectname = "benzcom5.s3o",},
+			customparams = {rangebonus = "0.3"},
+			wreckmodel = "benzcom5_wreck.s3o",
+		},
+	},
 }
 
 for sourceName, copyTable in pairs(copy) do

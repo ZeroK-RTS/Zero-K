@@ -151,7 +151,16 @@ local chassis = {
 	{
 		name = "cr4_",
 		value = "cremcom4",
-	},		
+	},
+	{
+		name = "b1_",
+		value = "benzcom1",
+	},
+	{
+		name = "b4_",
+		value = "benzcom4",
+	},
+	
 }
 
 for i = 1, #chassis do

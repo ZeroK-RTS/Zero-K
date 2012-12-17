@@ -181,7 +181,7 @@ local function RestoreDGun()
 	Signal( SIG_RESTORE_DGUN)
 	SetSignalMask( SIG_RESTORE_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
-	isLasering = false
+	isDgunning = false
 	Turn( larm , x_axis, 0, ARM_SPEED_PITCH )
 	Turn( lnanohand , x_axis, 0, ARM_SPEED_PITCH  )
 	Turn( rarm , x_axis, 0, ARM_SPEED_PITCH )
