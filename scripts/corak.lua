@@ -6,6 +6,8 @@ local l_gun = piece 'l_gun'
 local l_gun_barr = piece 'l_gun_barr' 
 local r_gun = piece 'r_gun' 
 local r_gun_barr = piece 'r_gun_barr'
+local l_thigh, l_leg, l_foot = piece('l_thigh', 'l_leg', 'l_foot')
+local r_thigh, r_leg, r_foot = piece('r_thigh', 'r_leg', 'r_foot')
 local leftLeg = { thigh=piece 'l_thigh', shin=piece'l_leg', foot=piece'l_foot' }
 local rightLeg = { thigh=piece 'r_thigh', shin=piece'r_leg', foot=piece'r_foot' }
 

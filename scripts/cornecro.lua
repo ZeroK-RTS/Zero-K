@@ -7,7 +7,9 @@ local base, pelvis, torso = piece('base', 'pelvis', 'torso' )
 local shield = piece 'shield' 
 local lathe = piece 'lathe' 
 local emit = piece 'emit' 
-local centerpoint = piece 'centerpoint' 
+local centerpoint = piece 'centerpoint'
+local rthigh, ruppercalf, rlowercalf, rfoot = piece('rthigh', 'ruppercalf', 'rlowercalf', 'rfoot')
+local lthigh, luppercalf, llowercalf, lfoot = piece('lthigh', 'luppercalf', 'llowercalf', 'lfoot')
 local rightLeg = { thigh=piece('rthigh'), uppercalf=piece('ruppercalf'), lowercalf=piece('rlowercalf'), foot=piece('rfoot') }
 local leftLeg = { thigh=piece('lthigh'), uppercalf=piece('luppercalf'), lowercalf=piece('llowercalf'), foot=piece('lfoot') }
 

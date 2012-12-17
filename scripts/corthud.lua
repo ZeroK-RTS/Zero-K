@@ -10,7 +10,9 @@ local r_gun = piece 'r_gun'
 local firept1 = piece 'firept1' 
 local r_barrel = piece 'r_barrel' 
 local firept2 = piece 'firept2' 
-local l_barrel = piece 'l_barrel' 
+local l_barrel = piece 'l_barrel'
+local l_leg, lf_lever, lb_lever, l_foot, l_heel, l_heeltoe = piece('l_leg', 'lf_lever', 'lb_lever', 'l_foot', 'l_heel', 'l_heeltoe')
+local r_leg, rf_lever, rb_lever, r_foot, r_heel, r_heeltoe = piece('r_leg', 'rf_lever', 'rb_lever', 'r_foot', 'r_heel', 'r_heeltoe')
 local leftLeg = { leg=piece'l_leg', flever=piece'lf_lever', blever=piece'lb_lever', foot=piece'l_foot', heel=piece'l_heel', heeltoe=piece'l_heeltoe'}
 local rightLeg = { leg=piece'r_leg', flever=piece'rf_lever', blever=piece'rb_lever', foot=piece'r_foot', heel=piece'r_heel', heeltoe=piece'r_heeltoe' }
 
@@ -154,18 +156,18 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(head, sfxNone)
 		Explode(l_gun, sfxNone)
 		Explode(r_gun, sfxFall + sfxExplodeOnHit )
-		Explode(l_leg, sfxFall + sfxExplodeOnHit )
-		Explode(r_leg, sfxNone)
-		Explode(l_foot, sfxNone)
-		Explode(r_foot, sfxNone)
-		Explode(lb_lever, sfxNone)
-		Explode(rb_lever, sfxNone)
-		Explode(lf_lever, sfxNone)
-		Explode(rf_lever, sfxNone)
-		Explode(l_heel, sfxNone)
-		Explode(r_heel, sfxNone)
-		Explode(l_heeltoe, sfxNone)
-		Explode(r_heeltoe, sfxNone)
+		Explode(leftLeg.leg, sfxFall + sfxExplodeOnHit )
+		Explode(rightLeg.leg, sfxNone)
+		Explode(leftLeg.foot, sfxNone)
+		Explode(rightLeg.foot, sfxNone)
+		Explode(leftLeg.blever, sfxNone)
+		Explode(rightLeg.blever, sfxNone)
+		Explode(leftLeg.flever, sfxNone)
+		Explode(rightLeg.flever, sfxNone)
+		Explode(leftLeg.heel, sfxNone)
+		Explode(rightLeg.heel, sfxNone)
+		Explode(leftLeg.heeltoe, sfxNone)
+		Explode(rightLeg.heeltoe, sfxNone)
 		return 1
 	else
 		Explode(head, sfxShatter + sfxFire  + sfxSmoke  + sfxExplodeOnHit )
