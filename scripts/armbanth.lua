@@ -25,6 +25,20 @@ local rarm_lgunclaw = piece "rarm_lgunclaw"
 local rarm_rgunclaw = piece "rarm_rgunclaw"
 local rarmflare = piece "rarmflare"
 
+-- left leg
+local lupleg = piece "lupleg"
+local lleg = piece "lleg"
+local lfoot = piece "lfoot"
+local ltoef = piece "ltoef"
+local ltoer = piece "ltoer"
+
+--right leg
+local rupleg = piece "rupleg"
+local rleg = piece "rleg"
+local rfoot = piece "rfoot"
+local rtoef = piece "rtoef"
+local rtoer = piece "rtoer"
+
 -- legs
 local leftLeg = {thigh=piece("lupleg"), shin=piece("lleg"), foot=piece("lfoot"), toef=piece("ltoef"), toeb=piece("ltoer")}
 local rightLeg = {thigh=piece("rupleg"), shin=piece("rleg"), foot=piece("rfoot"), toef=piece("rtoef"), toeb=piece("rtoer")}

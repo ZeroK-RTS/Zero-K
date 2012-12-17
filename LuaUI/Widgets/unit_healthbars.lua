@@ -428,7 +428,7 @@ do
     glBeginEnd(GL_QUADS,DrawGradient,-featureBarWidth, featureBarHeight+offsetY, progress_pos, offsetY, brightClr,color)
   end
 
-  function DrawStockpile(numStockpiled,numStockpileQued)
+  function DrawStockpile(numStockpiled,numStockpileQued, freeStockpile)
     --// DRAW STOCKPILED MISSLES
     glColor(1,1,1,1)
     glTexture("LuaUI/Images/nuke.png")
@@ -438,8 +438,11 @@ do
       xoffset = xoffset-8
     end
     glTexture(false)
-
-    glText(numStockpiled..'/'..numStockpileQued,barWidth+1.7,-(11*barHeight-2)-16,6.5,"cno")
+	if freeStockpile then
+      glText(numStockpiled,barWidth+1.7,-(11*barHeight-2)-16,7.5,"cno")
+	else
+	  glText(numStockpiled..'/'..numStockpileQued,barWidth+1.7,-(11*barHeight-2)-16,7.5,"cno")
+	end
   end
 
 end --//end do
@@ -595,6 +598,7 @@ do
         reloadTime    = ud.reloadTime,
         primaryWeapon = ud.primaryWeapon-1,
 		maxWaterTank  = ud.customParams.maxwatertank,
+		freeStockpile = (ud.customParams.freestockpile and true) or nil,
       }
     end
     ci = customInfo[unitDefID]
@@ -788,10 +792,10 @@ do
       if (numStockpiled) then
         if (barShader) then
           glMyText(1)
-          DrawStockpile(numStockpiled,numStockpileQued)
+          DrawStockpile(numStockpiled,numStockpileQued, ci.freeStockpile)
           glMyText(0)
         else
-          DrawStockpile(numStockpiled,numStockpileQued)
+          DrawStockpile(numStockpiled,numStockpileQued, ci.freeStockpile)
         end
       end
 

@@ -31,6 +31,7 @@ unitDef = {
     helptext_fr    = [[Leest un lance missile trcs longue portée. Ses missiles r tete chercheuse ultra rapides peuvent abattre r peu prcs nimporte quel avion d'un seul tir. L'ultime défense Anti-Air, de tous points de vue, met necessite de programmer la production de missiles Sol/Air dans son interface avant d'etre apte r faire feu.]],
 	helptext_de    = [[Der Screamer ist eine extrem weitreichende Flugabwehrwaffe, die eine klare Botschaft an die feindlichen Lufteinheiten sendet - hier kommst du nicht rein, Kleiner. Jeder Schuss muss auf Kosten der Ressourcen bevorratet werden. Dennoch ist all dies seinen Preis wert, denn mit ein paar schnellen Salven wird fast jeder Luftangriff zunichtegemacht.]],
 	modelradius    = [[37]],
+	freestockpile  = [[1]],
   },
 
   explodeAs                     = [[BIG_UNITEX]],

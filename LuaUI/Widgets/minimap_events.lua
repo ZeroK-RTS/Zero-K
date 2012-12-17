@@ -87,6 +87,12 @@ local spIsUnitAllied         = Spring.IsUnitAllied
 --  }
 --
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local stockpileExceptions = {
+	[UnitDefNames["screamer"].id] = true,
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -313,7 +319,7 @@ end
 
 function widget:StockpileChanged(unitID, unitDefID, unitTeam,
                                  weaponNum, oldCount, newCount)
-  if (newCount > oldCount) then
+  if (newCount > oldCount) and not stockpileExceptions[unitDefID] then
     AddEvent(unitID, unitDefID, stockpileColor, 100)
   end
 end
