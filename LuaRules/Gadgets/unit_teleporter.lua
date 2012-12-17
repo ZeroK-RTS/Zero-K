@@ -446,7 +446,7 @@ function gadget:GameFrame(f)
 			--checking for flyers
 			--Spring.Echo(f)
 			local xxx,yyy,zzz = Spring.GetUnitPosition(tid)
-			local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200,Spring.GetUnitTeam(tid)) --Note; math.max(yyy,0) for sea launch
+			local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200) --Note; math.max(yyy,0) for sea launch
 			if(maybeFlyers ~= nil) then
 				for index,value in pairs(maybeFlyers) do
 					local ud = Spring.GetUnitDefID(value)
@@ -805,6 +805,7 @@ local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID
 local spGetModKeyState		= Spring.GetModKeyState
 local spAreTeamsAllied		= Spring.AreTeamsAllied
 local spIsUnitInView       = Spring.IsUnitInView
+local spIsSphereInView  = Spring.IsSphereInView 
 
 
 
@@ -848,15 +849,14 @@ local function DrawWire()
 	for tid, data in spairs(SYNCED.tele) do
 		--//draw reference: unit_shield_link.lua by lurker, minimap_events.lua by Dave Rodgers, http://springrts.com/wiki/Lua_ConstGL
 		local bid = data.link
-		local team = Spring.GetUnitTeam(tid)
-		if bid and data.deployed then --if teleport link is deployed & teleporter is visible: then draw beam wing
+		if data.deployed then --if teleport link is deployed & teleporter is visible: then draw beam wing
 			local point={nil,nil,nil,nil} --this store 4 points at which a curve will drawn from
-			if spIsUnitInView(tid) then 
-				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
+			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
+			if spIsSphereInView(xxx,yyy,zzz,75) then -- or spIsUnitInView(tid) then 
 				local topX, topY, topZ = GetUnitTop(tid, xxx,yyy,zzz, 50)
 				point[1] = {xxx,yyy,zzz} --points at teleporter's body
 				point[2] = {topX,topY,topZ} --points at teleporter's head
-				local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200,team) --Note; math.max(yyy,0) for sea launch
+				local maybeFlyers = Spring.GetUnitsInSphere(xxx,math.max(yyy,0),zzz,200) --Note; math.max(yyy,0) for sea launch
 				if(maybeFlyers ~= nil) then
 					for _,unitID in pairs(maybeFlyers) do
 						local ud = Spring.GetUnitDefID(unitID)
@@ -880,7 +880,7 @@ local function DrawWire()
 			end
 			
 			if data.teleportiee and (spIsUnitInView(bid) or spIsUnitInView(data.teleportiee)) then --if teleport beacon is visible & is processing teleportiee: then draw beam wire
-				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
+				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
 				local topX, topY, topZ = GetUnitTop(bid, xxx,yyy,zzz, 50)
 				point[1] = {xxx,yyy,zzz}--points at teleporter's body
 				point[2] = {topX,topY,topZ}--points at teleporter's head
