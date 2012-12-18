@@ -58,6 +58,14 @@ end
 function script.Create()
 	gun_1 = true
 	StartThread(SmokeUnit)
+	Turn( rightLeg.thigh , x_axis, math.rad(60))
+	Turn( leftLeg.thigh , x_axis, math.rad(60))
+				
+	Move( rightLeg.shin , z_axis, 0)
+	Move( leftLeg.shin , z_axis, 0)
+	
+	Turn( rightLeg.foot , x_axis, math.rad(30))
+	Turn( leftLeg.foot , x_axis, math.rad(30))
 end
 
 function script.StartMoving()

@@ -393,7 +393,8 @@ end
 
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	lastJump[unitID]	= nil
+	lastJump[unitID] = nil
+	lastJump[unitID] = nil
 end
 
 
@@ -403,6 +404,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 1) == 0) then
 		return false
 	end
+	if goalSet[unitID] then
+		goalSet[unitID] = nil
+	end	
 	-- do no allow morphing while jumping
 	if (jumping[unitID] and GG.MorphInfo and cmdID >= CMD_MORPH and cmdID < CMD_MORPH+GG.MorphInfo["MAX_MORPH"]) then
 		-- allow to queue
@@ -415,18 +419,17 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return true -- allowed
 end
 
-
-function gadget:CommandFallback(unitID, unitDefID, teamID,		-- keeps getting 
-																cmdID, cmdParams, cmdOptions) -- called until
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
 	if (not jumpDefs[unitDefID]) then
 		return false
 	end
 	
-	if (cmdID ~= CMD_JUMP) then			-- you remove the
-		goalSet[unitID] = false
-		return false	-- command was not used	 -- order
-	end
-	
+	-- To future generations. This does not work because CommandFallback only calls for custom commands
+	--if (cmdID ~= CMD_JUMP) then			-- you remove the
+	--	  goalSet[unitID] = false
+	--	  return false	-- command was not used	 -- order
+	--end
+
 	if not Spring.ValidUnitID(unitID) then
 		return true, true
 	end
@@ -469,7 +472,8 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,		-- keeps getting
 		end
 	else
 		if not goalSet[unitID] then
-				Approach(unitID, cmdParams, range)
+			Spring.Echo("approaching")
+			Approach(unitID, cmdParams, range)
 			goalSet[unitID] = true
 		end
 	end
