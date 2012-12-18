@@ -18,7 +18,10 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
   if not gadgetHandler:IsSyncedCode() then
     return false -- no unsynced code
   end
-  
+
+  local facplops = {}
+  local ploppableDefs = {}  
+    
   GG.SetFaction = function() end
   
   function gadget:GameFrame(n)
@@ -29,6 +32,24 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
       end
     end
   end
+  
+  function GG.GiveFacplop(unitID)
+    if dotaMode then return end
+    facplops[unitID] = 1
+    Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
+  end
+  
+  function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+    if plop and ploppableDefs[unitDefID] and facplops[builderID] then
+      facplops[builderID] = nil
+      Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
+      local maxHealth = select(2,Spring.GetUnitHealth(unitID))
+      Spring.SetUnitHealth(unitID, {health = maxHealth*buildMult, build = buildMult })
+      local x,y,z = Spring.GetUnitPosition(unitID)
+      Spring.SpawnCEG("gate", x, y, z)
+    end
+  end
+  
   return
 end
 
