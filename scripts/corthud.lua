@@ -74,10 +74,14 @@ function script.StopMoving()
 	Signal( SIG_WALK )
 	Move( leftLeg.leg, z_axis, 0, 2)
 	Move( rightLeg.leg, z_axis, 0, 2)
-	for i=1, #leftLeg do
-		Turn( leftLeg[i] , x_axis, 0, math.rad(180) )
-		Turn( rightLeg[i] , x_axis, 0, math.rad(180) )
-	end
+	Turn( leftLeg.blever , x_axis, 0, math.rad(45))
+	Turn( leftLeg.foot , x_axis, 0, math.rad(45))
+	Turn( leftLeg.flever , x_axis, 0, math.rad(45))
+	Turn( leftLeg.heeltoe , x_axis, 0, math.rad(45))
+	Turn( rightLeg.blever , x_axis, 0, math.rad(45))
+	Turn( rightLeg.foot , x_axis, 0, math.rad(45))
+	Turn( rightLeg.flever , x_axis, 0, math.rad(45))
+	Turn( rightLeg.heeltoe , x_axis, 0, math.rad(45))
 end
 
 local function RestoreAfterDelay()
@@ -147,10 +151,18 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(head, sfxNone)
 		Explode(l_gun, sfxNone)
 		Explode(r_gun, sfxNone)
-		for i=1, #leftLeg do
-			Explode(leftLeg[i], sfxNone)
-			Explode(rightLeg[i], sfxNone)
-		end
+		Explode(leftLeg.leg, sfxNone)
+		Explode(leftLeg.flever, sfxNone)
+		Explode(leftLeg.blever, sfxNone)
+		Explode(leftLeg.foot, sfxNone)
+		Explode(leftLeg.heel, sfxNone)
+		Explode(leftLeg.heeltoe, sfxNone)
+		Explode(righttLeg.leg, sfxNone)
+		Explode(righttLeg.flever, sfxNone)
+		Explode(righttLeg.blever, sfxNone)
+		Explode(rightLeg.foot, sfxNone)
+		Explode(rightLeg.heel, sfxNone)
+		Explode(rightLeg.heeltoe, sfxNone)
 		return 1
 	elseif  severity <= 0.5  then
 		Explode(head, sfxNone)

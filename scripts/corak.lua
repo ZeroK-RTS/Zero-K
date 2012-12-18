@@ -145,10 +145,12 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(l_gun, sfxNone)
 		Explode(r_gun_barr, sfxNone)
 		Explode(r_gun, sfxNone)
-		for i=1,#leftLeg do
-			Explode(leftLeg[i], sfxNone)
-			Explode(rightLeg[i], sfxNone)
-		end
+		Explode(leftLeg.thigh, sfxNone)
+		Explode(leftLeg.shin, sfxNone)
+		Explode(leftLeg.foot, sfxNone)
+		Explode(rightLeg.thigh, sfxNone)
+		Explode(rightLeg.shin, sfxNone)
+		Explode(rightLeg.foot, sfxNone)
 		Explode(base, sfxNone)
 		return 1
 	elseif  severity <= 0.50  then
@@ -157,11 +159,13 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(l_gun, sfxFall)
 		Explode(l_gun_barr, sfxFall)
 		Explode(r_gun_barr, sfxFall)
+		Explode(leftLeg.thigh, sfxFall)
+		Explode(leftLeg.shin, sfxFall)
+		Explode(leftLeg.foot, sfxFall)
+		Explode(rightLeg.thigh, sfxFall)
+		Explode(rightLeg.shin, sfxFall)
+		Explode(rightLeg.foot, sfxFall)
 		Explode(base, sfxShatter)
-		for i=1,#leftLeg do
-			Explode(leftLeg[i], sfxFall)
-			Explode(rightLeg[i], sfxFall)
-		end
 		return 2
 	else 
 		Explode(r_gun, sfxShatter)

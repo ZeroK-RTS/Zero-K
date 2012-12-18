@@ -126,18 +126,26 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
 		Explode(torso, sfxFall)
-		for i=1, #leftLeg do
-			Explode(leftLeg[i], sfxNone)
-			Explode(rightLeg[i], sfxNone)
-		end
+		Explode(leftLeg.thigh, sfxNone)
+		Explode(leftLeg.uppercalf, sfxNone)
+		Explode(leftLeg.lowercalf, sfxNone)
+		Explode(leftLeg.foot, sfxNone)
+		Explode(rightLeg.thigh, sfxNone)
+		Explode(rightLeg.uppercalf, sfxNone)
+		Explode(rightLeg.lowercalf, sfxNone)
+		Explode(rightLeg.foot, sfxNone)
 		Explode(base, sfxFall)
 		return 1
 	else
 		Explode(torso, sfxShatter)
-		for i=1, #leftLeg do
-			Explode(leftLeg[i], sfxFall)
-			Explode(rightLeg[i], sfxFall)
-		end
+		Explode(leftLeg.thigh, sfxFall)
+		Explode(leftLeg.uppercalf, sfxFall)
+		Explode(leftLeg.lowercalf, sfxFall)
+		Explode(leftLeg.foot, sfxFall)
+		Explode(rightLeg.thigh, sfxFall)
+		Explode(rightLeg.uppercalf, sfxFall)
+		Explode(rightLeg.lowercalf, sfxFall)
+		Explode(rightLeg.foot, sfxFall)
 		Explode(base, sfxShatter)
 		return 2
 	end

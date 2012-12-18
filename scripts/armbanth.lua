@@ -106,13 +106,11 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
-local function Contact(frontLeg, backLeg)
+local function Step(frontLeg, backLeg)
 	-- front leg out straight, back toe angled to meet the ground
+	-- back leg out straight, front toe angled to leave the ground
 	for i, p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_FRONT_ANGLES[i], LEG_FRONT_SPEEDS[i])
-	end
-	-- back leg out straight, front toe angled to leave the ground
-	for i, p in pairs(backLeg) do
 		Turn(backLeg[i], x_axis, LEG_BACK_ANGLES[i], LEG_BACK_SPEEDS[i])
 	end
 	
@@ -139,20 +137,13 @@ local function Contact(frontLeg, backLeg)
 	-- wait for leg rotations (ignore backheel of back leg - it's in the air)
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
-	end
-	for i, p in pairs(backLeg) do
 		WaitForTurn(backLeg[i], x_axis)
 	end
-end
 
-local function Passing(frontLeg, backLeg)
-	
-	-- straight, foot flat on ground
+	-- front leg straight, foot flat on ground
+	-- back knee bent, drags foot past front leg
 	for i, p in pairs(frontLeg) do
 		Turn(frontLeg[i], x_axis, LEG_STRAIGHT_ANGLES[i], LEG_STRAIGHT_SPEEDS[i])
-	end
-	-- back knee bent, drags foot past front leg
-	for i, p in pairs(backLeg) do
 		Turn(backLeg[i], x_axis, LEG_BENT_ANGLES[i], LEG_BENT_SPEEDS[i])
 	end
 	
@@ -161,10 +152,12 @@ local function Passing(frontLeg, backLeg)
 	
 	for i, p in pairs(frontLeg) do
 		WaitForTurn(frontLeg[i], x_axis)
-	end
-	for i, p in pairs(backLeg) do
 		WaitForTurn(backLeg[i], x_axis)
 	end
+end
+
+local function Passing(frontLeg, backLeg)
+	
 end
 
 
@@ -177,12 +170,9 @@ local function Walk()
 
 	while ( true ) do
 		-- left leg
-		Contact(leftLeg, rightLeg)
-		Passing(leftLeg, rightLeg)
-
+		Step(leftLeg, rightLeg)
 		-- right leg
-		Contact(rightLeg, leftLeg)
-		Passing(rightLeg, leftLeg)
+		Step(rightLeg, leftLeg)
 
 	end
 end
@@ -192,8 +182,6 @@ local function StopWalk()
 	for i, p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, 4)
 		Move(leftLeg[i], y_axis, 0, 4)
-	end
-	for i, p in pairs(rightLeg) do
 		Turn(rightLeg[i], x_axis, 0, 4)
 		Move(rightLeg[i], y_axis, 0, 4)
 	end
@@ -343,19 +331,15 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(body, sfxNone)
 		Explode(head, sfxNone)
 		Explode(pelvis, sfxNone)
-		dead = true
-		
 		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(rarmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(larmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(larm, sfxShatter)
 		Explode(lmissiles, sfxShatter)
 		Explode(rmissiles, sfxShatter)
-		
 		Turn(torso, y_axis, 0, 50)
 		Turn(rarmgun, y_axis, 30, 20)	
 		Turn(larmgun, y_axis, 30, 20)
-		
 		Sleep(800)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then

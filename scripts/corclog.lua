@@ -171,12 +171,12 @@ end
 function script.StopMoving()
 	Signal( SIG_Walk )
 	Move( pelvis , y_axis, 0.000000 , 1.000000 )
-	for i,v in pairs(rightLeg) do
-		Turn( rightLeg[i], x_axis, 0, math.rad(200.000000) )
-	end
-	for i,v in pairs(leftLeg) do
-		Turn( leftLeg[i], x_axis, 0, math.rad(200.000000) )
-	end
+	Turn( rightLeg.thigh, x_axis, 0, math.rad(200) )
+	Turn( rightLeg.calf, x_axis, 0, math.rad(200) )
+	Turn( rightLeg.foot, x_axis, 0, math.rad(200) )
+	Turn( leftLeg.thigh, x_axis, 0, math.rad(200) )
+	Turn( leftLeg.calf, x_axis, 0, math.rad(200) )
+	Turn( leftLeg.foot, x_axis, 0, math.rad(200) )
 end
 
 function script.Killed(recentDamage, maxHealth)
