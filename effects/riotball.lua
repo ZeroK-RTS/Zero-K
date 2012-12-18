@@ -3,9 +3,9 @@ return {
     usedefaultexplosions = false,
     groundflash = {
       alwaysvisible      = false,
-      circlealpha        = 0.8,
+      circlealpha        = 0.2,
       circlegrowth       = 14.4,
-      flashalpha         = 0.8,
+      flashalpha         = 0.2,
       flashsize          = 500,
       ttl                = 22,
       color = {

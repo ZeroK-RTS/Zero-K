@@ -336,12 +336,12 @@ function script.FireWeapon(num)
 		local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
 		Spring.SetUnitWeaponState(unitID, 0, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 		dgunning = true
-		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.01)
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
 		GG.attUnits[unitID] = true
 		GG.UpdateUnitAttributes(unitID)
 		Sleep(SALVO_TIME)
 		dgunning = false
-		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 		GG.UpdateUnitAttributes(unitID)
 	end
 end

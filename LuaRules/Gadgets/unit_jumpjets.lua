@@ -395,7 +395,6 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	lastJump[unitID] = nil
-	lastJump[unitID] = nil
 end
 
 
@@ -425,11 +424,9 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return false
 	end
 	
-	-- To future generations. This does not work because CommandFallback only calls for custom commands
-	--if (cmdID ~= CMD_JUMP) then			-- you remove the
-	--	  goalSet[unitID] = false
-	--	  return false	-- command was not used	 -- order
-	--end
+	if (cmdID ~= CMD_JUMP) then
+		return false
+	end
 
 	if not Spring.ValidUnitID(unitID) then
 		return true, true
@@ -442,9 +439,9 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local x, y, z = spGetUnitBasePosition(unitID)
 	local distSqr = GetDist2Sqr({x, y, z}, cmdParams)
 	local jumpDef = jumpDefs[unitDefID]
-	local range	 = jumpDef.range
-	local reload	= jumpDef.reload or 0
-	local t			 = spGetGameSeconds()
+	local range   = jumpDef.range
+	local reload  = jumpDef.reload or 0
+	local t       = spGetGameSeconds()
 
 	if (distSqr < (range*range)) then
 		local cmdTag = spGetCommandQueue(unitID,1)[1].tag

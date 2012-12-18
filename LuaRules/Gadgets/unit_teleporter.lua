@@ -565,7 +565,6 @@ local spGetMyTeamID	    = Spring.GetMyTeamID
 local spGetMyAllyTeamID = Spring.GetMyAllyTeamID 	
 local spGetModKeyState	= Spring.GetModKeyState
 local spAreTeamsAllied	= Spring.AreTeamsAllied
-local spIsSphereInView  = Spring.IsSphereInView
 
 local myTeam = spGetMyTeamID()
 
@@ -633,8 +632,10 @@ local function DrawWire(spec)
 end
 
 local function DrawFunc(u1, u2)
-	glVertex(spGetUnitPosition(u1))
-	glVertex(spGetUnitPosition(u2))
+	local _,_,_,x1,y1,z1 = spGetUnitPosition(u1,true)
+	local _,_,_,x2,y2,z2 = spGetUnitPosition(u2,true)
+	glVertex(x1,y1,z1)
+	glVertex(x2,y2,z2)
 end
 
 function gadget:DrawWorld()

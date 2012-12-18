@@ -143,7 +143,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	
 end
 
-local function updateMovementSpeed(unitID, ud, speedFactor)	
+local function updateMovementSpeed(unitID, ud, speedFactor, turnFactor)	
 	local unitDefID = ud.id
 	if not origUnitSpeed[unitDefID] then
 	
@@ -178,6 +178,9 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 		speedFactor = 0
 		decFactor = 100000 -- a unit with 0 decRate will not deccelerate down to it's 0 maxVelocity
 	end
+	if turnFactor <= 0 then
+		turnFactor = 0
+	end
 	
 	if spMoveCtrlGetTag(unitID) == nil then
 		if state.movetype == 0 then
@@ -189,7 +192,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 			spSetGunshipMoveTypeData (unitID, {
 				maxSpeed        = state.origSpeed       *speedFactor,
 				--maxReverseSpeed = state.origReverseSpeed*speedFactor,
-				turnRate        = state.origTurnRate    *speedFactor,
+				turnRate        = state.origTurnRate    *turnFactor,
 				accRate         = state.origMaxAcc      *(speedFactor > 0.001 and speedFactor or 0.001),
 				--decRate         = state.origMaxDec      *(speedFactor > 0.01  and speedFactor or 0.01)
 			})
@@ -198,7 +201,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 				spSetGroundMoveTypeData (unitID, {
 					maxSpeed        = state.origSpeed       *speedFactor,
 					maxReverseSpeed = state.origReverseSpeed*speedFactor,
-					turnRate        = state.origTurnRate    *speedFactor,
+					turnRate        = state.origTurnRate    *turnFactor,
 					accRate         = state.origMaxAcc      *speedFactor,
 					decRate         = state.origMaxDec      *decFactor
 				})
@@ -237,22 +240,24 @@ function GG.UpdateUnitAttributes(unitID, frame)
 	
 	-- Unit speed change (like sprint) --
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
+	local selfTurnSpeedChange = spGetUnitRulesParam(unitID, "selfTurnSpeedChange")
 	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
 	
-	if selfReloadSpeedChange or selfMoveSpeedChange or slowState then
+	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange then
 		local slowMult   = 1-(slowState or 0)
 		local buildMult  = (slowMult)
 		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)
+		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)
 		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)
 	
 		GG.att_reload[unitID] = reloadMult
 	
 		updateReloadSpeed(unitID, ud, reloadMult, frame)
-		updateMovementSpeed(unitID,ud, moveMult)
+		updateMovementSpeed(unitID,ud, moveMult, turnMult)
 		updateBuildSpeed(unitID, ud, buildMult)
-		if buildMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 then
+		if buildMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 or turnMult ~= 1 then
 			changedAtt = true
 		end
 	end
