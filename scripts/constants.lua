@@ -35,6 +35,8 @@ pi34 = math.pi*1.5
 rad = math.rad
 abs = math.abs
 toDegrees = 180/pi
+frameToMs = 1000/30
+msToFrame = 30/1000
 
 -- Explosion generators
 UNIT_SFX1 = 1024

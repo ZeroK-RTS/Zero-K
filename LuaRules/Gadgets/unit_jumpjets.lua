@@ -206,6 +206,7 @@ local function Jump(unitID, goal, cmdTag)
 	
 	local speed = speed * lineDist/flightDist
 	local step = speed/lineDist
+	local duration = math.ceil(1/step)+1
 	
 	-- check if there is no wall in between
 	local x,z = start[1],start[3]
@@ -242,7 +243,7 @@ local function Jump(unitID, goal, cmdTag)
 		if cob then
 				spCallCOBScript( unitID, "BeginJump", 0)
 			else
-				Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
+				Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
 			end
 		if rotateMidAir then
 			mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
@@ -252,7 +253,7 @@ local function Jump(unitID, goal, cmdTag)
 		if cob then
 			spCallCOBScript( unitID, "PreJump", 0)
 		else
-			Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist)
+			Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist,duration)
 		end
 	end
 	spSetUnitRulesParam(unitID,"jumpReload",0)
@@ -472,7 +473,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		end
 	else
 		if not goalSet[unitID] then
-			Spring.Echo("approaching")
 			Approach(unitID, cmdParams, range)
 			goalSet[unitID] = true
 		end
