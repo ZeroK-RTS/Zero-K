@@ -59,9 +59,9 @@ local droneList = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function InitCarrier(unitDefID, unitAllyID)
+local function InitCarrier(unitDefID, unitTeamID)
 	local carrierData = carrierDefs[unitDefID]
-	return {unitDefID = unitDefID, unitAllyID = unitAllyID, droneCount = 0, reload = carrierData.reloadTime, drones = {}}
+	return {unitDefID = unitDefID, teamID = unitTeamID, droneCount = 0, reload = carrierData.reloadTime, drones = {}}
 end
 
 local function NewDrone(unitID, unitDefID, droneName)
@@ -69,7 +69,7 @@ local function NewDrone(unitID, unitDefID, droneName)
 	local angle = math.rad(random(1,360))
 	local xS = (x + (math.sin(angle) * 20))
 	local zS = (z + (math.cos(angle) * 20))
-	local droneID = CreateUnit(droneName,x,y,z,1,carrierList[unitID].unitAllyID)
+	local droneID = CreateUnit(droneName,x,y,z,1,carrierList[unitID].teamID)
 	carrierList[unitID].reload = carrierDefs[unitDefID].reloadTime
 	carrierList[unitID].droneCount = (carrierList[unitID].droneCount + 1)
 	carrierList[unitID].drones[droneID] = true
@@ -107,20 +107,12 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 end
 
+
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
-	if (droneList[unitID]) then 
-		if capture then
-			gadget:UnitDestroyed(unitID, unitDefID, oldTeam)
-			return true
-		end
-		return false
-	else
-		if (carrierList[unitID] ~= nil) then
-			gadget:UnitDestroyed(unitID, unitDefID, oldTeam)
-			gadget:UnitFinished(unitID, unitDefID, newTeam)
-		end		
-		return true
+	if carrierList[unitID] then
+		carrierList[unitID].teamID = newTeam
 	end
+	return true
 end
 
 local function GetDistance(x1, x2, y1, y2)
@@ -220,6 +212,18 @@ function gadget:GameFrame(n)
 	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) < 0.1) then
 		for i,_ in pairs(carrierList) do
 			UpdateCarrierTarget(i)
+		end
+	end
+end
+
+function gadget:Initialize()
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
+		if build == 1 then
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local team = Spring.GetUnitTeam(unitID)
+			
+			gadget:UnitFinished(unitID, unitDefID, team)
 		end
 	end
 end
