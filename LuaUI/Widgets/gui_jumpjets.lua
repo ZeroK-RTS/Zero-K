@@ -222,7 +222,7 @@ local function  DrawMouseArc(unitID, shift, groundPos, quality)
     local unitPos = {ux,uy,uz}
     local dist = GetDist2(unitPos, groundPos)
     local color = range > dist and green or pink
-    DrawArc(unitID, unitPos, groundPos, color, nil, range, quality)
+    DrawArc(unitID, unitPos, groundPos, color, nil, range, false, quality)
   elseif (shift) then
     local i = #queue
     while (ignore[queue[i].id] and i > 0) do

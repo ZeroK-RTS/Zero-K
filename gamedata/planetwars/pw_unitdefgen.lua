@@ -41,7 +41,7 @@ else
 	end
 end
 if err then 
-	Spring.Log("gamedata/modularcomms/unitdefgen.lua", LOG.WARNING, 'Planetwars warning: ' .. err)
+	Spring.Echo('Planetwars warning: ' .. err)
 end
 
 if not unitData then 

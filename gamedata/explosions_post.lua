@@ -15,9 +15,9 @@ for _, filename in ipairs(luaFiles) do
   setmetatable(edEnv, { __index = system })
   local success, eds = pcall(VFS.Include, filename, edEnv)
   if (not success) then
-    Spring.Log("explosions_post.lua", LOG.ERROR, 'Error parsing ' .. filename .. ': ' .. eds)
+    Spring.Echo('Error parsing ' .. filename .. ': ' .. eds)
   elseif (eds == nil) then
-    Spring.Log("explosions_post.lua", LOG.ERROR, 'Missing return table from: ' .. filename)
+    Spring.Echo('Missing return table from: ' .. filename)
   else
     for edName, ed in pairs(eds) do
       if ((type(edName) == 'string') and (type(ed) == 'table')) then
