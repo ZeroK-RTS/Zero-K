@@ -4,35 +4,22 @@
 function widget:GetInfo()
   return {
     name      = "Unit Icons",
-    desc      = "v0.17 Shows icons above units. Configure at: Settings/Interface/Hovering Icons \n\nThe following widget use this service:\nState Icons\nGadget Icons\nRank Icons 2",
+    desc      = "v0.02 Shows icons above units",
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
-    layer     = -10,
+    layer     = 4,--
     enabled   = true,  -- loaded by default?
-	handler   = true, --allow widget to use special widgetHandler's function
   }
 end
---[[
-Changelog:
-msafwan			12 Dec 2012		:	initialize WG function at widget:initialize 
-									clear WG function at widget:shutdown
-									auto shutdown 'rank icon', 'state icon', and 'gadget icon' during widget:shutdown 
-									make state icon viewable even when unit is drawn as icons
-									make state icon follow camera rotation
-GoogleFrog      13 Dec 2012     :   Remove auto shutdown. Visible from far away option is default OFF. Remove FPS limit
-msafwan      	14 Dec 2012    	:   Visible from far away option is default ON (this is a good feature!).
-									Add echo when widget shutdown.
-									Increase draw performance by ~20% by wraping both glTexture & glTexRect into display list & only update when camera rotate									
---]]
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-local GetUnitDefID			= Spring.GetUnitDefID
-local GetUnitDefDimensions	= Spring.GetUnitDefDimensions
-local spValidUnitID 		= Spring.ValidUnitID
-local spGetUnitPosition 	= Spring.GetUnitPosition
-local spIsUnitInView 		= Spring.IsUnitInView
-local spIsUnitIcon          = Spring.IsUnitIcon
+
+local echo = Spring.Echo
+
+local GetUnitDefID         = Spring.GetUnitDefID
+local GetUnitDefDimensions = Spring.GetUnitDefDimensions
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
@@ -42,13 +29,12 @@ local glTexRect        = gl.TexRect
 local glTranslate      = gl.Translate
 local glBillboard      = gl.Billboard
 local glDrawFuncAtUnit = gl.DrawFuncAtUnit
-local glDeleteList = gl.DeleteList
-local glCreateList = gl.CreateList
-local glCallList = gl.CallList
 
 local GL_GREATER = GL.GREATER
 
-local spGetCameraVectors  = Spring.GetCameraVectors 
+local min   = math.min
+local floor = math.floor
+
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
@@ -58,13 +44,7 @@ options = {
 		name = 'Hovering Icon Size',
 		type = 'number',
 		value = 30, min=10, max = 40,
-	},
-	forRadarIcons = {
-		name = 'Draw on Icons',
-		desc = 'Draws state icons on units which are icons.',
-		type = 'bool',
-		value = true,
-	},	
+	}
 }
 
 ----------------------------------------------------------------------------------------
@@ -83,14 +63,13 @@ local textureUnitsXshift = {}
 local textureIcons = {}
 local textureOrdered = {}
 
---local xshiftUnitTexture = {}
+local xshiftUnitTexture = {}
 
 local hideIcons = {}
 
-local textureGLlist = {} --store gl list index for each texture. storing scheme: textureGLlist[textureName]=glListNumber
-local iconGLlist = {} --store gl list index for each icon. storing scheme:iconGLlist[textureName][xshift][height] = glListNumber
 
-local previousCameraVector = {} -- check camera vector which will be responsible for triggering icon update
+WG.icons = {}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -145,7 +124,7 @@ local function ReOrderIconsOnUnits()
 end
 
 
-local SetDisplay = function ( iconName, show )
+function WG.icons.SetDisplay( iconName, show )
 	local hide = (not show) or nil
 	curHide = hideIcons[iconName]
 	if curHide ~= hide then
@@ -154,12 +133,12 @@ local SetDisplay = function ( iconName, show )
 	end
 end
 
-local SetOrder = function ( iconName, order )
+function WG.icons.SetOrder( iconName, order )
 	SetOrder(iconName, order)
 end
 
 
-local SetUnitIcon = function ( unitID, data )
+function WG.icons.SetUnitIcon( unitID, data )
 	local iconName = data.name
 	local texture = data.texture
 	
@@ -214,7 +193,8 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	unitHeights[unitID] = nil
-	--xshiftUnitTexture[unitID] = nil
+	xshiftUnitTexture[unitID] = nil
+	
 end
 
 
@@ -223,62 +203,35 @@ end
 
 
 -------------------------------------------------------------------------------------
---DRAW-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 local function DrawUnitFunc(xshift, yshift)
-		glTranslate(0,yshift,0) --translate icon to above unit's head
-		glBillboard() --activate the billboard mode
-		glTranslate(xshift,10,0)  --translate icon up or down on the billboard
-		glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9) --draw icon
-	gl.PopMatrix() --restore previous state
+  glTranslate(xshift,yshift,0)
+  glBillboard()
+  glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
 end
 
-local function DrawIcon()
+
+function widget:DrawWorld()
+	if Spring.IsGUIHidden() then return end
+	
+	if (next(unitHeights) == nil) then
+		return -- avoid unnecessary GL calls
+	end
+	
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
 	glDepthTest(true)
 	glAlphaTest(GL_GREATER, 0.001)
 	
-	local forward = spGetCameraVectors().forward
-	local forceUpdateNow = previousCameraVector[1] ~= forward[1] or previousCameraVector[2] ~= forward[2] or previousCameraVector[3] ~= forward[3]
-	previousCameraVector = forward
-	
 	for texture, units in pairs(textureUnitsXshift) do
-		if texture and not textureGLlist[texture] then 
-			textureGLlist[texture] = glCreateList(function() glTexture(texture) end) --save this texture as glList. 
-		end
-		glCallList(textureGLlist[texture]) --draw texture from graphic memory
+		
+		glTexture( texture )
 		for unitID,xshift in pairs(units) do
-			local unitIsValid = spValidUnitID(unitID)
-			local iconHeight = unitHeights[unitID]
-			if iconHeight then 
-				local unitInView = spIsUnitInView(unitID)
-				local showOnIcon =(options.forRadarIcons.value or not spIsUnitIcon(unitID))
-				do
-					iconGLlist[texture] = iconGLlist[texture] or {}
-					iconGLlist[texture][iconHeight] = iconGLlist[texture][iconHeight] or {}
-					local state = iconGLlist[texture][iconHeight].update or 0
-					iconGLlist[texture][iconHeight].update = (forceUpdateNow and state + 1) or state
-				end
-				if showOnIcon and unitInView and xshift then
-					local drawiconGLlist = iconGLlist[texture][iconHeight][xshift]
-					local state = iconGLlist[texture][iconHeight].update
-					local x,y,z = spGetUnitPosition(unitID)
-					gl.PushMatrix() --memorize current coordinate/state
-						glTranslate(x,y,z)
-						if not drawiconGLlist or state>0 then 
-							if drawiconGLlist then
-								glDeleteList(drawiconGLlist)
-							end
-							--Spring.Echo("UPDATED")
-							drawiconGLlist = glCreateList(DrawUnitFunc, xshift,iconHeight)
-							iconGLlist[texture][iconHeight][xshift] = drawiconGLlist
-							iconGLlist[texture][iconHeight].update = 0
-						end
-					glCallList(drawiconGLlist) --cache, draw from graphic memory & restore coordinate
-				end
-			end
-			if not unitIsValid then
-				textureUnitsXshift[texture][unitID]=nil --clear it from memory
+			if xshift and unitHeights and unitHeights[unitID] then
+				glDrawFuncAtUnit(unitID, false, DrawUnitFunc,
+					xshift,
+					unitHeights[unitID])
 			end
 		end
 	end
@@ -290,40 +243,54 @@ local function DrawIcon()
 	glDepthMask(false)
 end
 
-function widget:DrawWorld()
+-- drawscreen method
+-- the problem with this one is it draws at same size regardless of how far away the unit is
+--[[
+function widget:DrawScreenEffects()
 	if Spring.IsGUIHidden() then return end
 	
 	if (next(unitHeights) == nil) then
 		return -- avoid unnecessary GL calls
 	end
-	DrawIcon()
+	
+	gl.Color(1,1,1,1)
+	glDepthMask(true)
+	glDepthTest(true)
+	glAlphaTest(GL_GREATER, 0.001)
+	
+	for texture, units in pairs(textureUnitsXshift) do
+		glTexture( texture )
+		for unitID,xshift in pairs(units) do
+			gl.PushMatrix()
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			y = y + (unitHeights[unitID] or 0)
+			x,y,z = Spring.WorldToScreenCoords(x,y,z)
+			glTranslate(x,y,z)
+			if xshift and unitHeights then
+				glTranslate(xshift,0,0)
+				--glBillboard()
+				glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
+			end
+			gl.PopMatrix()
+		end
+	end
+	
+	glTexture(false)
+	
+	glAlphaTest(false)
+	glDepthTest(false)
+	glDepthMask(false)
 end
--------------------------------------------------------------------------------------
---INITIALIZE & SHUTDOWN---------------------------------------------------------------
+
+]]
 
 function widget:Initialize()
-	WG.icons = {}
-	WG.icons.SetDisplay = SetDisplay --initialize WG.icons
-	WG.icons.SetOrder =  SetOrder
-	WG.icons.SetUnitIcon = SetUnitIcon
 end
 
 function widget:Shutdown()
 	for texture,_ in pairs(textureUnitsXshift) do
 		gl.DeleteTexture(texture)
 	end
-	for _, glList in pairs(textureGLlist) do
-		glDeleteList(glList)
-	end
-	for _, iconHeight in pairs(iconGLlist) do
-		for _, xshift in pairs(iconHeight) do
-			for _,glList in pairs(xshift) do
-				glDeleteList(glList)
-			end
-		end
-	end
-	Spring.Echo("unit_icons.lua is shutting down. Terminating Icon service") --hint players that any widget that crash later is related to this widget.
-	WG.icons=nil --empty WG.icons
 end
 
 -------------------------------------------------------------------------------------

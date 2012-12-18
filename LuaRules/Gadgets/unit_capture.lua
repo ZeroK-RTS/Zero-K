@@ -490,10 +490,10 @@ local function drawFunc(drawing, drawingByID, spec)
 			local los1 = spGetUnitLosState(controliee, myTeam, false)
 			local los2 = spGetUnitLosState(controller, myTeam, false)
 			if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(controliee) or spIsUnitInView(controller)) then
-				 local _,_,_,x1, y1, z1 = spGetUnitPosition(controller, true)
-				 local _,_,_,x2, y2, z2 = spGetUnitPosition(controliee, true)
-				 glVertex(x1, y1, z1)
-				 glVertex(x2, y2, z2)
+				local _,_,_,x1, y1, z1 = spGetUnitPosition(controller, true)
+				local _,_,_,x2, y2, z2 = spGetUnitPosition(controliee, true)
+				glVertex(x1, y1, z1)
+				glVertex(x2, y2, z2)
 			end
 		end
 	end
