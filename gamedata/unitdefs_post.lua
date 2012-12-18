@@ -157,7 +157,7 @@ local function TagTree(unit, faction, newbuildoptions)
 end
 
 local function ProcessCommBuildOpts()
-	local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "cremcom"}
+	local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "cremcom", "benzcom"}
 	local commanders = {}
 	local numLevels = 5
 	
