@@ -23,6 +23,8 @@ local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) 
 local pwDataRaw = modOptions.planetwarsstructures
 local pwDataFunc, err, success, unitData
 
+pwDataRaw = pwDataRaw or TEST_DEF_STRING
+
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
 	err = "Planetwars data entry in modoption is empty or in invalid format"
 	unitData = {}
