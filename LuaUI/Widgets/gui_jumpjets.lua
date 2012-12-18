@@ -99,23 +99,29 @@ local function GetDist2(a, b)
   return ((a[1] - b[1])^2 + (a[3] - b[3])^2)^0.5
 end
 
-
 local function DrawLoop(start, vector, color, progress, step, height)
   glColor(color[1], color[2], color[3], color[4])
   for i=progress, 1, step do
-    
     local x = start[1] + vector[1]*i
     local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height
     local z = start[3] + vector[3]*i
     
     glVertex(x, y, z)
   end
+  
+  local x = start[1] + vector[1]
+  local y = start[2] + vector[2]
+  local z = start[3] + vector[3]
+    
+  glVertex(x, y, z)
 end
 
 
-local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimate)
+local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimate, quality)
 
   -- todo: display lists
+  
+  quality = quality or 1
   
   local step
   local progress
@@ -131,7 +137,7 @@ local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimat
   if (range) then
 	local col = isEstimate and orange or yellow
     glColor(col[1], col[2], col[3], col[4])
-    glDrawGroundCircle(start[1], start[2], start[3], range, 100)
+    glDrawGroundCircle(start[1], start[2], start[3], range, 100*quality)
   end
   
   if (jumpFrame) then
@@ -153,7 +159,7 @@ local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimat
     
   else
     progress         = 0
-    step             = 0.01
+    step             = 0.01/quality
   end
   
   glLineStipple('')
@@ -177,6 +183,7 @@ local function DrawLine(a, b, color)
 end
  
 -- unused
+--[[
 local function DrawQueue(unitID)
   local queue = spGetCommandQueue(unitID)
   if (not queue or not jumpDefs[spGetUnitDefID(unitID)]) then
@@ -201,9 +208,9 @@ local function DrawQueue(unitID)
     end
   end
 end
+--]]
 
-
-local function  DrawMouseArc(unitID, shift, groundPos)
+local function  DrawMouseArc(unitID, shift, groundPos, quality)
   local unitDefID = spGetUnitDefID(unitID)
   if (not groundPos or not jumpDefs[unitDefID]) then
     return
@@ -215,7 +222,7 @@ local function  DrawMouseArc(unitID, shift, groundPos)
     local unitPos = {ux,uy,uz}
     local dist = GetDist2(unitPos, groundPos)
     local color = range > dist and green or pink
-    DrawArc(unitID, unitPos, groundPos, color, nil, range)
+    DrawArc(unitID, unitPos, groundPos, color, nil, range, quality)
   elseif (shift) then
     local i = #queue
     while (ignore[queue[i].id] and i > 0) do
@@ -227,7 +234,7 @@ local function  DrawMouseArc(unitID, shift, groundPos)
 	  local cGood = isEstimate and yellow or green
 	  local cBad = isEstimate and orange or pink
       local color = range > dist and cGood or cBad
-      DrawArc(unitID, queue[i].params, groundPos, color, nil, range, isEstimate)
+      DrawArc(unitID, queue[i].params, groundPos, color, nil, range, isEstimate, quality)
     end
   end
 end
@@ -293,8 +300,12 @@ function widget:DrawWorld()
     local category, arg    = spTraceScreenRay(mouseX, mouseY)
     local _, _, _, shift   = spGetModKeyState()
     local units = spGetSelectedUnits()
+	local quality = 1
+	if #units > 50 then
+		quality = 0.5
+	end
     for i=1,#units do
-      DrawMouseArc(units[i], shift, category == 'ground' and arg)
+      DrawMouseArc(units[i], shift, category == 'ground' and arg, quality)
     end
   end
 end

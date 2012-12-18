@@ -34,6 +34,7 @@ unitDef = {
   explodeAs                     = [[SMALL_UNITEX]],
   footprintX                    = 1,
   footprintZ                    = 1,
+  iconType                      = [[cruisemissilesmall]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   mass                          = 226,
