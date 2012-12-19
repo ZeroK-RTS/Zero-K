@@ -21,7 +21,7 @@ return {
 
   ["heatray_hit"] = {
     usedefaultexplosions = false,
-    pop1 = {
+    cinder = {
       air                = true,
       class              = [[heatcloud]],
       count              = 1,
@@ -30,13 +30,43 @@ return {
       properties = {
         alwaysvisible      = true,
         heat               = [[d1 5]],
-        heatfalloff        = 1.1,
+        heatfalloff        = 1,
         maxheat            = 15,
         pos                = 0,
         size               = [[5]],
-        sizegrowth         = 0.0,
+        sizegrowth         = -0.05,
         speed              = [[0, 0, 0]],
         texture            = [[redexplo]],
+      },
+    },
+    airflash = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        alwaysvisible      = true,
+        heat               = [[d1 5]],
+        heatfalloff        = 2,
+        maxheat            = 15,
+        pos                = 0,
+        size               = [[3]],
+        sizegrowth         = 1,
+        speed              = [[0, 0, 0]],
+        texture            = [[redexplo]],
+      },
+    },
+    groundflash = {
+      circlealpha        = 1,
+      circlegrowth       = 0.125,
+      flashalpha         = 0.5,
+      flashsize          = 8,
+      ttl                = 64,
+      color = {
+        [1]  = 1,
+        [2]  = 0.25,
+        [3]  = 0,
       },
     },
     sparks = {
