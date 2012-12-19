@@ -28,7 +28,7 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        alwaysvisible      = true,
+        alwaysvisible      = false,
         heat               = [[d1 5]],
         heatfalloff        = 1,
         maxheat            = 15,
@@ -46,7 +46,7 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        alwaysvisible      = true,
+        alwaysvisible      = false,
         heat               = [[d1 5]],
         heatfalloff        = 2,
         maxheat            = 15,
