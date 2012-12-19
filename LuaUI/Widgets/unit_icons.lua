@@ -100,7 +100,7 @@ local function OrderIconsOnUnit(unitID )
 		if texture then
 		
 			if hideIcons[iconName] then
-				textureUnitsXshift[texture][unitID] = false
+				textureUnitsXshift[texture][unitID] = nil
 			else
 				textureUnitsXshift[texture][unitID] = xshift
 				xshift = xshift + options.iconsize.value
