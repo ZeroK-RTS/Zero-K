@@ -33,10 +33,14 @@ constant_electric.wav
 awesund:
 quick_lightning.wav
 
-Unkown:
+Unknown:
 other_lightning.wav
 hiss.wav
 
 burn_mixed.wav - Open LieroX & Nanoblobs
 torpedo.wav - Kanoba & freeloops
 torp_land.wav - Kanoba & Golgotha
+
+Anachrid (unknown):
+heatray_fire1.wav
+heatray_fire2.wav
