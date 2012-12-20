@@ -22,7 +22,7 @@ local unitBomberDiveState = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Dive State',
 	action  = 'divestate',
-	tooltip	= 'Toggles dive controls',
+	tooltip	= '\255\90\255\90Green\255\255\255\255:Dive For Shielded Target\n\255\255\255\90Yellow\255\255\255\255:Dive For All Target\n\255\255\90\90Red\255\255\255\255:Always Fly Low\n\255\90\90\90Grey\255\255\255\255:Always Fly High',
 	params 	= {0, 'Never','When Shielded','When Attacking','Constant'}
 }
 
