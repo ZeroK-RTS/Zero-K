@@ -218,11 +218,12 @@ end
 
 -------------------------------------------------------------------------------------
 --DRAW + display list system----------------------------------------------------------
+-- [[
 local function DrawUnitFunc(xshift, yshift)
 	glTranslate(0,yshift,0) --translate icon to above unit's head
 	glBillboard() --activate the billboard mode
-	glTranslate(xshift,10,0)  --translate icon up or down on the billboard
-	glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9) --draw icon
+	glTranslate(xshift,0,0)  --translate icon up or down on the billboard
+	glTexRect(-options.iconsize.value*0.5, -5, options.iconsize.value*0.5, options.iconsize.value-5) --draw icon (left, below, right, top)
 	gl.PopMatrix() --restore previous coordinate/state
 end
 
@@ -240,7 +241,7 @@ function widget:GameFrame(n) --iterate over texture & unit table, check camera v
 		for texture, units in pairs(textureUnitsXshift) do --iterate over a list of textures
 			if texture and not textureGLlist[texture] then --check if we have displaylist for testure
 				textureGLlist[texture] = glCreateList(function() --save this texture in graphic memory. Reference: http://fly.cc.fer.hr/~unreal/theredbook/appendixh.html , OpenGl Performance Tips
-						glTexture(":l:"..texture) --load texture with linear texture filtering 
+						glTexture(":c:"..texture) --load clamped texture 
 					end)
 				-- local success = gl.DeleteTexture(texture) --delete texture. You can delete texture after its stored in graphic memory.
 				-- Spring.Echo(success)					
@@ -320,7 +321,7 @@ function widget:DrawWorld()
 	screenUpdate = true
 	DrawIcon2()
 end
-
+--]]
 --[[ old method:
 local function DrawUnitFunc(xshift, yshift)
   glTranslate(xshift,yshift,0)
