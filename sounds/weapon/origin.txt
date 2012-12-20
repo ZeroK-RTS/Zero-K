@@ -41,6 +41,6 @@ burn_mixed.wav - Open LieroX & Nanoblobs
 torpedo.wav - Kanoba & freeloops
 torp_land.wav - Kanoba & Golgotha
 
-Anachrid (unknown):
-heatray_fire1.wav
+UFO:Alien Invasion(modified):
+heatray_fire1.wav 
 heatray_fire2.wav
