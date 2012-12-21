@@ -583,6 +583,8 @@ local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 			newval = not pathoptions[path][option.wname..option.key].value	
 			pathoptions[path][option.wname..option.key].value	= newval
 			
+			-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
+			
 			option.OnChange({checked=newval})
 			
 			if path == curPath then
