@@ -8,7 +8,6 @@ function widget:GetInfo()
 		license	= "GNU GPL, v2 or later",
 		layer		= 0,
 		enabled	= true,	--	loaded by default?
-		alwaysStart = true
 	}
 end
 
@@ -42,5 +41,6 @@ function widget:Initialize()
 end 
 
 function widget:Shutdown()
+	Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
 	WG.textToSpeechCtrl = nil
 end
