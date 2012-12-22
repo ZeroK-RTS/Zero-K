@@ -14,7 +14,7 @@ end
 -- partially based on Spring's unit spawn gadget
 include "LuaRules/Configs/start_setup.lua"
 
-if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage
+if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
   if not gadgetHandler:IsSyncedCode() then
     return false -- no unsynced code
   end
@@ -32,6 +32,18 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
       end
     end
   end
+
+  function gadget:Initialize()
+    for i, v in pairs(ploppables) do
+      local name = UnitDefNames[v]
+      if name then
+        local ud = name.id
+        if ud then
+          ploppableDefs[ud] = true
+        end
+      end
+    end
+  end
   
   function GG.GiveFacplop(unitID)
     if dotaMode then return end
@@ -40,11 +52,11 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
   end
   
   function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-    if plop and ploppableDefs[unitDefID] and facplops[builderID] then
+    if ploppableDefs[unitDefID] and facplops[builderID] then
       facplops[builderID] = nil
       Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
       local maxHealth = select(2,Spring.GetUnitHealth(unitID))
-      Spring.SetUnitHealth(unitID, {health = maxHealth*buildMult, build = buildMult })
+      Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
       local x,y,z = Spring.GetUnitPosition(unitID)
       Spring.SpawnCEG("gate", x, y, z)
     end
@@ -177,7 +189,6 @@ local function CheckForShutdown()
 	end
 end
 
-local buildMult = 1
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	--[[
 	if not gamestart then
@@ -198,17 +209,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	if plop and ploppableDefs[unitDefID] and facplops[builderID] then
 		facplops[builderID] = nil
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
-		-- 3 seconds to build with commander
-		--[[
-		Spring.SetUnitCosts(unitID, {
-			buildTime = 1,
-			metalCost = 1,
-			energyCost = 1
-		})
-		]]--
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
-		--Spring.SetUnitHealth(unitID, maxHealth-1)	-- can't be full health; else if you stop the construction you can't resume it!
-		Spring.SetUnitHealth(unitID, {health = maxHealth*buildMult, build = buildMult })
+		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
 		
