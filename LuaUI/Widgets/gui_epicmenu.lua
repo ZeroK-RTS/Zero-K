@@ -579,10 +579,23 @@ local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 	
 	if option.type == 'bool' then
 		kbfunc = function()
+			if not pathoptions[path] or not pathoptions[path][option.wname..option.key] then
+				Spring.Echo("Warning, detected keybind mishap. Please report this info and help us fix it:")
+				Spring.Echo("Option path is "..path)
+				Spring.Echo("Option name is "..option.wname..option.key)
+				if pathoptions[path] then --pathoptions[path] table still intact, but option table missing
+					Spring.Echo("case: option table was missing")
+					pathoptions[path][option.wname..option.key] = option --re-add option table
+				else --both option table & pathoptions[path] was missing, probably was never initialized
+					Spring.Echo("case: whole path was never initialized")
+					pathoptions[path] = {}
+					pathoptions[path][option.wname..option.key] = option
+				end
+				-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
+			end
 			local wname = option.wname
 			newval = not pathoptions[path][option.wname..option.key].value	
 			pathoptions[path][option.wname..option.key].value	= newval
-			
 			-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
 			
 			option.OnChange({checked=newval})
@@ -627,7 +640,7 @@ local function UnassignKeyBind(path, option)
 	
 	local actionName = GetActionName(path, option)
 	
-	if option.action then
+	if option.action then --if keybindings was hardcoded by widget:
 		local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
 		if uikey_hotkey_str then
 			-- unbindaction doesn't work on a command+params, must be command only!
@@ -636,11 +649,10 @@ local function UnassignKeyBind(path, option)
 			--echo('unassign', "unbind " .. uikey_hotkey_str .. ' ' .. actionName_cmd)
 			Spring.SendCommands("unbind " .. uikey_hotkey_str .. ' ' .. actionName_cmd) 
 		end
-	else 
+	else --if keybindings were supplied by users:
 		--echo('unassign', "unbindaction " .. actionName)
 		Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
 	end
-	
 	
 	settings.keybounditems[actionName] = 'none'
 end
@@ -724,7 +736,7 @@ local function AddOption(path, option, wname )
 	if option.type == 'button' then
 		controlfunc = 
 			function(self)
-				if option.action then
+				if option.action then --if keybindings supplied by widgets
 					Spring.SendCommands{option.action} 
 				end
 			end
@@ -735,7 +747,7 @@ local function AddOption(path, option, wname )
 				if self then
 					option.value = self.checked
 				end
-				if option.springsetting then
+				if option.springsetting then --if widget supplies option for springsettings
 					Spring.SetConfigInt( option.springsetting, BoolToInt(option.value) )
 				end
 				settings.config[fullkey] = option.value
@@ -1794,7 +1806,7 @@ function widget:Initialize()
 	AddOption('Settings/Interface/Mouse Cursor')
 	AddOption('Settings/Misc')
 
-	
+	-- Add pre-configured button/options found in epicmenu config file
 	local options_temp ={}
 	CopyTable(options_temp , epic_options);
 	for i=1, #options_temp do
@@ -1811,6 +1823,7 @@ function widget:Initialize()
 		echo 'Cleared all settings.'
 	end
 	
+	-- clear all keybindings
 	WG.crude.ResetKeys = function()
 		for actionName,_ in pairs(settings.keybounditems) do
 			--local actionNameL = actionName:lower()
@@ -1829,10 +1842,10 @@ function widget:Initialize()
 		echo 'Reset all hotkeys to default.'
 	end
 	
-	-- Add actions for keybinds
+	-- Add custom actions for the following keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
 	AddAction("exitwindow", ActionExitWindow, nil, "t")
-	-- replace default key binds
+	-- replace default keybinds for quitmenu
 	Spring.SendCommands({
 		"unbind esc quitmessage",
 		"unbind esc quitmenu", --Upgrading to 0.82 doesn't change existing uikeys so pre-0.82 keybinds still apply.
