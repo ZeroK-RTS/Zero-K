@@ -62,7 +62,7 @@ else
 	end
 end
 if err then 
-	Spring.Echo('Modular Comms warning: ' .. err)
+	Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
 end
 
 if not commData then commData = {} end
@@ -184,7 +184,7 @@ local function ProcessComm(name, config)
 						numWeapons = numWeapons + 1
 					end
 				else
-					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
+					Spring.Log("gamedata/modularcomms/unitdefgen.lua", LOG.ERROR, "\tERROR: Upgrade "..moduleName.." not found")
 				end
 			end
 			-- give unarmed comms a peashooter
@@ -229,7 +229,7 @@ local function ProcessComm(name, config)
 						decorations[decName].func(commDefs[name]) 
 					end
 				else
-					Spring.Echo("\tERROR: Decoration "..decName.." not found")
+					Spring.Log("gamedata/modularcomms/unitdefgen.lua", LOG.ERROR, "\tERROR: Decoration "..decName.." not found")
 				end
 			end
 		end		
