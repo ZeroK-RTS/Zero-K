@@ -53,6 +53,7 @@ local SIG_Walk = 2
 local SIG_Aim  = 4
 local SIG_Aim2  = 8
 local SIG_Aim3  = 16
+local SIG_Idle = 32
 local armgun = false
 local missilegun = 1
 local PACE = 1.4
@@ -104,6 +105,36 @@ function script.Create()
 	Turn( lmissileflare, z_axis, math.rad(-90))
 	Turn( rmissileflare, z_axis, math.rad(-90))	
 	StartThread(SmokeUnit)
+end
+
+local function IdleAnim()
+	Signal(SIG_Idle)
+	SetSignalMask(SIG_Idle)
+	Sleep(12000)
+	while true do
+		local shoulder, arm, lclaw, rclaw
+		if armgun then
+			shoulder, arm, lclaw, rclaw = larm, larmgun, larm_lgunclaw, larm_rgunclaw
+			Turn(head, y_axis, math.rad(30), math.rad(60))
+		else
+			shoulder, arm, lclaw, rclaw = rarm, rarmgun, rarm_lgunclaw, rarm_rgunclaw
+			Turn(head, y_axis, math.rad(-30), math.rad(60))
+		end
+		armgun = not armgun
+		Turn(arm,  x_axis, math.rad(-20), math.rad(45))
+		Turn(shoulder,  x_axis, math.rad(-20), math.rad(45))
+		Sleep(2000)
+		Turn(lclaw, y_axis, math.rad(30), math.rad(180))
+		Turn(rclaw, y_axis, math.rad(-30), math.rad(180))
+		Sleep(1500)
+		Turn(lclaw, y_axis, 0, math.rad(180))
+		Turn(rclaw, y_axis, 0, math.rad(180))
+		Sleep(2000)
+		Turn(arm,  x_axis, 0, math.rad(60))
+		Turn(shoulder,  x_axis, 0, math.rad(60))
+		Turn(head, y_axis, 0, math.rad(60))
+		Sleep(6500)
+	end
 end
 
 local function Step(frontLeg, backLeg)
@@ -199,10 +230,12 @@ local function StopWalk()
 		Turn(rarm, z_axis, 0, 1 )
 		Turn(rarmgun, x_axis, 0, 1)
 		Turn(larmgun, x_axis, 0, 1)
+		StartThread(IdleAnim)
 	end
 end
 
 function script.StartMoving()
+	Signal(SIG_Idle)
 	StartThread( Walk )
 end
 
@@ -221,6 +254,7 @@ local function RestoreAfterDelay()
 	Turn( larm, x_axis, 0, 3 )
 	Turn( rarm, x_axis, 0, 3 )
 	isFiring = false
+	StartThread(IdleAnim)
 end
 
 
@@ -238,8 +272,8 @@ local function armrecoil()
 		EmitSfx(larmflare, 1025)
 		
 		Move(larmgun, z_axis, -6)
-		Turn(larm_lgunclaw, y_axis, -45)
-		Turn(larm_rgunclaw, y_axis, 45)
+		Turn(larm_lgunclaw, y_axis, math.rad(45))
+		Turn(larm_rgunclaw, y_axis, math.rad(-45))
 
 		Move(larmgun, z_axis, 0, 3)
 		Turn(larm_lgunclaw, y_axis, 0, 0.5)
@@ -249,8 +283,8 @@ local function armrecoil()
 		EmitSfx(rarmflare, 1025)
 		
 		Move(rarmgun, z_axis, -6)
-		Turn(rarm_lgunclaw, y_axis, -45)
-		Turn(rarm_rgunclaw, y_axis, 45)
+		Turn(rarm_lgunclaw, y_axis, math.rad(45))
+		Turn(rarm_rgunclaw, y_axis, math.rad(-45))
 
 		Move(rarmgun, z_axis, 0, 3)
 		Turn(rarm_lgunclaw, y_axis, 0, 0.5)
@@ -282,6 +316,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch )
+	Signal(SIG_Idle)
 	if num == 1 then
 		Signal( SIG_Aim )
 		SetSignalMask( SIG_Aim )

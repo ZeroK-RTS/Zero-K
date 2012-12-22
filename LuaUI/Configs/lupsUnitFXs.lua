@@ -184,6 +184,14 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onActive = true, size=50})},
 	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=30, strength = .005, precision=50, repeatEffect=true, onActive=true}},	
   },
+  
+  armbanth = {
+	{class='StaticParticles', options=MergeTable(blinkyLightBlue, {piece="light", delay = 20, size = 25}) },
+  },
+  
+  armorco = {
+	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light", delay = 20, size = 30}) },
+  },
 
   -- length tag does nothing
   --// PLANES //----------------------------

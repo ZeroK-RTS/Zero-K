@@ -60,7 +60,7 @@ local SIG_AIM_2 = 4
 local SIG_AIM_3 = 8
 local SIG_AIM_4 = 16
 local SIG_RESTORE = 32
-local SIG_RELOAD = 64
+local SIG_IDLE = 64
 local RELOADTIME = 20000
 local SALVO_TIME = 1000
 
@@ -96,6 +96,32 @@ local function RestorePose()
 	Move(pelvis, y_axis, 0, 5)
 end
 
+local function IdleAnim()
+	Signal( SIG_IDLE )
+	SetSignalMask( SIG_IDLE )
+	Sleep(12000)
+	while true do
+		Turn(torso, y_axis, math.rad(15), math.rad(60))
+		--Turn(larm, y_axis, math.rad(15), math.rad(60))
+		--Turn(rarm, y_axis, math.rad(-10), math.rad(60))
+		Turn(luparm, x_axis, math.rad(-40), math.rad(120))
+		Turn(ruparm, x_axis, 0, math.rad(120))
+		Sleep(1500)
+		Turn(torso, y_axis, math.rad(-15), math.rad(90))
+		--Turn(larm, y_axis, math.rad(10), math.rad(60))
+		--Turn(rarm, y_axis, math.rad(-15), math.rad(60))
+		Turn(luparm, x_axis, 0, math.rad(120))
+		Turn(ruparm, x_axis, math.rad(-40), math.rad(120))
+		Sleep(1500)
+		Turn(torso, y_axis, 0, math.rad(60))
+		--Turn(larm, y_axis, 0, math.rad(60))
+		--Turn(rarm, y_axis, 0, math.rad(60))
+		Turn(luparm, x_axis, 0, math.rad(120))
+		Turn(ruparm, x_axis, 0, math.rad(120))
+		Sleep(7000)
+	end
+end
+
 local function RestoreAfterDelay()
 	Signal( SIG_RESTORE)
 	SetSignalMask( SIG_RESTORE)
@@ -120,12 +146,18 @@ local function RestoreAfterDelay()
 		Turn( larm , z_axis, math.rad(-(0)), math.rad(250) )       --up 22
 		RestorePose()
 	end
+	StartThread(IdleAnim)
 	armsFree = true
 end
 
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	Turn(torso, y_axis, 0, math.rad(90))
+	Turn(larm, y_axis, 0, math.rad(120))
+	Turn(rarm, y_axis, 0, math.rad(120))
+	Turn(luparm, x_axis, 0, math.rad(240))
+	Turn(ruparm, x_axis, 0, math.rad(240))
 	while true do
 		Turn( lupleg , x_axis, math.rad(20), math.rad(50.010989) )
 		Turn( rupleg , x_axis, math.rad(-20), math.rad(50.010989) )
@@ -239,11 +271,13 @@ end
 
 function script.StartMoving()
 	StartThread(Walk)
+	Signal(SIG_IDLE)
 end
 
 function script.StopMoving()
 	Signal(SIG_WALK)
 	RestorePose()
+	StartThread(IdleAnim)
 end
 
 function script.AimFromWeapon(num)
@@ -256,6 +290,7 @@ function script.QueryWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
+	Signal(SIG_IDLE)
 	if num == 1 then
 		if  dgunning  then return false end
 		Signal( SIG_AIM)
