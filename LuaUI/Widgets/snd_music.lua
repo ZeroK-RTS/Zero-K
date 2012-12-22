@@ -49,10 +49,13 @@ local windows = {}
 local warThreshold = 5000
 local peaceThreshold = 1000
 local PLAYLIST_FILE = 'sounds/music/playlist.lua'
+local LOOP_BUFFER = 0.015	-- if looping track is this close to the end, go ahead and loop
 
 local musicType = 'peace'
 local dethklok = {} -- keeps track of the number of doods killed in each time frame
 local timeframetimer = 0
+local timeframetimer_short = 0
+local loopTrack = ''
 local previousTrack = ''
 local previousTrackType = ''
 local newTrackWait = 1000
@@ -61,6 +64,9 @@ local fadeVol
 local curTrack	= "no name"
 local songText	= "no name"
 local haltMusic = false
+local looping = false
+local paused = false
+local lastTrackTime = -1
 
 local warTracks, peaceTracks, briefingTracks, victoryTracks, defeatTracks
 
@@ -82,8 +88,23 @@ local function GetMusicType()
 	return musicType
 end
 
+local function StartLoopingTrack(trackInit, trackLoop)
+	if not (VFS.FileExists(trackInit) and VFS.FileExists(trackLoop)) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Missing one or both tracks for looping")
+	end
+	haltMusic = true
+	Spring.StopSoundStream()
+	musicType = 'unknown'
+	
+	curTrack = trackInit
+	loopTrack = trackLoop
+	Spring.PlaySoundStream(trackInit, WG.music_volume or 0.5)
+	looping = 0.5
+end
+
 local function StartTrack(track)
 	haltMusic = false
+	looping = false
 	Spring.StopSoundStream()
 	
 	local newTrack = previousTrack
@@ -120,12 +141,12 @@ local function StartTrack(track)
 	-- end
 	curTrack = newTrack
 	Spring.PlaySoundStream(newTrack,WG.music_volume or 0.5)
-	playing = true
 	
 	WG.music_start_volume = WG.music_volume
 end
 
 local function StopTrack(noContinue)
+	looping = false
 	Spring.StopSoundStream()
 	if noContinue then
 		haltMusic = true
@@ -172,6 +193,23 @@ function widget:Update(dt)
 		briefingTracks  = briefingTracks or VFS.DirList('sounds/music/briefing/', '*.ogg', vfsMode)
 		victoryTracks	= victoryTracks or VFS.DirList('sounds/music/victory/', '*.ogg', vfsMode)
 		defeatTracks	= defeatTracks or VFS.DirList('sounds/music/defeat/', '*.ogg', vfsMode)
+	end
+	
+	timeframetimer_short = timeframetimer_short + dt
+	if timeframetimer_short > 0.03 then
+		local playedTime, totalTime = Spring.GetSoundStreamTime()
+		playedTime = tonumber( ("%.2f"):format(playedTime) )
+		paused = (playedTime == lastTrackTime)
+		lastTrackTime = playedTime
+		if looping then
+			if looping == 0.5 then
+				looping = 1
+			elseif playedTime >= totalTime - LOOP_BUFFER then
+				Spring.StopSoundStream()
+				Spring.PlaySoundStream(loopTrack,WG.music_volume or 0.5)
+			end
+		end
+		timeframetimer_short = 0
 	end
 	
 	timeframetimer = timeframetimer + dt
@@ -234,8 +272,8 @@ function widget:Update(dt)
 		--end
 
 		if ( previousTrackType == "peace" and musicType == 'war' )
-		 or (playedTime >= totalTime)
-		 and (not haltMusic) then	-- both zero means track stopped
+		 or (playedTime >= totalTime)	-- both zero means track stopped
+		 and not(haltMusic or looping) then
 			previousTrackType = musicType
 			StartTrack()
 			
@@ -262,6 +300,7 @@ end
 function widget:Initialize()
 	WG.Music = WG.Music or {}
 	WG.Music.StartTrack = StartTrack
+	WG.Music.StartLoopingTrack = StartLoopingTrack
 	WG.Music.StopTrack = StopTrack
 	WG.Music.SetWarThreshold = SetWarThreshold
 	WG.Music.SetPeaceThreshold = SetPeaceThreshold
@@ -360,6 +399,7 @@ function widget:GameOver()
 		track = defeatTracks[math.random(1, #defeatTracks)]
 		musicType = "defeat"
 	end
+	looping = false
 	Spring.StopSoundStream()
 	Spring.PlaySoundStream(track,WG.music_volume or 0.5)
 	WG.music_start_volume = WG.music_volume
