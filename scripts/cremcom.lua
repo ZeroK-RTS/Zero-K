@@ -95,6 +95,7 @@ end
 -- vars
 --------------------------------------------------------------------------------
 local isMoving, armsFree, shieldOn = false, true, true
+local restoreHeading = 0
 local gun_num = 0
 
 local flamers = {}
@@ -201,7 +202,7 @@ local function RestoreAfterDelay()
 	Turn( uparmR , x_axis, 0, ARM_SPEED_PITCH/2 )
 	Turn( forearmL , x_axis, 0, FOREARM_SPEED_PITCH/2 )
 	Turn( forearmR , x_axis, 0, FOREARM_SPEED_PITCH/2 )
-	Turn(torso, y_axis, 0, TORSO_SPEED_YAW/2)
+	Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW/2)
 	WaitForTurn(torso, y_axis)
 	armsFree = true
 end
@@ -266,10 +267,12 @@ end
 
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
+	restoreHeading= 0
 	StartThread(RestoreAfterDelay)
 end
 
-function script.StartBuilding(heading, pitch) 
+function script.StartBuilding(heading, pitch)
+	restoreHeading = heading
 	Turn( torso , y_axis, heading, ARM_SPEED_PITCH )
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end

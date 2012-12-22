@@ -75,6 +75,7 @@ local RESTORE_DELAY_DGUN = 2500
 -- vars
 --------------------------------------------------------------------------------
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
+local restoreHeading, restorePitch = heading, pitch
 
 local flamers = {}
 local wepTable = UnitDefs[unitDefID].weapons
@@ -166,9 +167,9 @@ local function RestoreLaser()
 	isLasering = false
 	Turn( larm , x_axis, 0, ARM_SPEED_PITCH )
 	Turn( lnanohand , x_axis, 0, ARM_SPEED_PITCH  )
-	Turn( rarm , x_axis, 0, ARM_SPEED_PITCH )
+	Turn( rarm , x_axis, restorePitch, ARM_SPEED_PITCH )
 	Turn( rhand , x_axis, 0, ARM_SPEED_PITCH  )
-	Turn( torso , y_axis, 0, TORSO_SPEED_YAW)
+	Turn( torso , y_axis, restoreHeading, TORSO_SPEED_YAW)
 	
 	if HAS_GATTLING then
 	    Spin( barrels , z_axis, 100)
@@ -184,9 +185,9 @@ local function RestoreDGun()
 	isDgunning = false
 	Turn( larm , x_axis, 0, ARM_SPEED_PITCH )
 	Turn( lnanohand , x_axis, 0, ARM_SPEED_PITCH  )
-	Turn( rarm , x_axis, 0, ARM_SPEED_PITCH )
+	Turn( rarm , x_axis, restorePitch, ARM_SPEED_PITCH )
 	Turn( rhand , x_axis, 0, ARM_SPEED_PITCH  )
-	Turn( torso , y_axis, 0, TORSO_SPEED_YAW)
+	Turn( torso , y_axis, restoreHeading, TORSO_SPEED_YAW)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -253,18 +254,20 @@ end
 
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-	Turn( rarm , x_axis, 0, ARM_SPEED_PITCH )
-	if not (isLasering or isDgunning) then Turn(torso, y_axis, 0 ,TORSO_SPEED_YAW) end
+	Turn( larm , x_axis, 0, ARM_SPEED_PITCH )
+	restoreHeading, restorePitch = 0, 0
+	StartThread(RestoreDGun)
 end
 
-function script.StartBuilding(heading, pitch) 
-	Turn( rarm , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
+function script.StartBuilding(heading, pitch)
+	restoreHeading, restorePitch = heading, pitch
+	Turn( larm , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
 
 function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),rcannon_flare)
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),lnanoflare)
 	return lnanoflare
 end
 

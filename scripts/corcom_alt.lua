@@ -70,6 +70,7 @@ local RESTORE_DELAY_DGUN = 2500
 -- vars
 --------------------------------------------------------------------------------
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
+local restoreHeading, restorePitch = 0, 0
 
 local flamers = {}
 local wepTable = UnitDefs[unitDefID].weapons
@@ -193,7 +194,7 @@ local function RestoreLaser()
 	Turn( luparm , x_axis, 0, ARM_SPEED_PITCH )
 	Turn( biggun , x_axis, math.rad(41), ARM_SPEED_PITCH  )
 	if not isDgunning then 
-		Turn( torso , y_axis, 0, TORSO_SPEED_YAW) 
+		Turn( torso , y_axis, restoreHeading, TORSO_SPEED_YAW) 
 	end
 end
 
@@ -202,10 +203,10 @@ local function RestoreDgun()
 	SetSignalMask( SIG_RESTORE_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
 	isDgunning = false
-	Turn( ruparm , x_axis, 0, ARM_SPEED_PITCH )
+	Turn( ruparm , x_axis, restorePitch, ARM_SPEED_PITCH )
 	Turn( nanolathe , x_axis, math.rad(36), ARM_SPEED_PITCH )
 	if not isLasering then 
-		Turn( torso , y_axis, 0, TORSO_SPEED_YAW) 
+		Turn( torso , y_axis, restoreHeading, TORSO_SPEED_YAW) 
 	end
 end
 
@@ -243,13 +244,14 @@ end
 
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-	Turn( ruparm , x_axis, 0, ARM_SPEED_PITCH )
-	if not (isLasering or isDgunning) then Turn(torso, y_axis, 0 ,TORSO_SPEED_YAW) end
+	restoreHeading, restorePitch = 0, 0
+	StartThread(RestoreLaser)
 end
 
 function script.StartBuilding(heading, pitch) 
 	Turn( ruparm , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
+	restoreHeading, restorePitch = heading, pitch
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
 
