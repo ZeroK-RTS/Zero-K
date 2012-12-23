@@ -160,6 +160,7 @@ function gadget:GameFrame(n)
 					spec = false
 					team = oldTeam[playerID]
 					oldTeam[playerID] = nil
+					Spring.Echo("oldTeam[playerID] and spec")
 				end
 			elseif team and not spec then
 				oldTeam[playerID] = team
