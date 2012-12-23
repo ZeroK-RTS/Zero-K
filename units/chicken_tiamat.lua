@@ -108,6 +108,7 @@ unitDef = {
     FLAMETHROWER = {
       name                    = [[Flame Thrower]],
       areaOfEffect            = 64,
+      avoidFriendly           = false,
       avoidFeature            = false,
       collideFeature          = false,
       craterBoost             = 0,
