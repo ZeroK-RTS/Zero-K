@@ -54,6 +54,8 @@ local function Create_Beacon_Thread(x,z)
 	GG.tele_createBeacon(unitID,x,z)
 	
 	Spring.SpawnCEG("teleport_in", x, y, z, 0, 0, 0, 1)
+	
+	DeployTeleport()
 end
 
 function Create_Beacon(x,z)
@@ -85,7 +87,6 @@ local function DeployTeleport_Thread()
 	Move( pelvis , y_axis, 0, 10 )
 	
 	Sleep(33)
-	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
 	
 	Sleep(33)
 	Turn( body , x_axis, math.rad(90), math.rad(90*DEPLOY_SPEED)  )
@@ -254,6 +255,7 @@ function script.StopMoving()
 		Turn( pelvis , z_axis, 0, math.rad(20)  )
 		Move( pelvis , y_axis, 0, 12 )
 	end
+	DeployTeleport()
 end
 
 function script.Create()
