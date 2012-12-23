@@ -37,8 +37,6 @@ if (gadgetHandler:IsSyncedCode()) then -- SYNCED ---
 local lineage = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner. 
 local afkTeams = {}
 local tickTockCounter = {} --remember how many second a player is in AFK mode. To add a delay before unit transfer commence.
-local unstablePlayerCounter = {} --remember how many times a player was AFK. To de-merit laggy player from receiving any units.
-local playerWantTake = {} --remember which player who request for a "TAKE". To add-merit for who want to receive unit.
 local unitAlreadyFinished = {}
 local oldTeam = {} -- team which player was on last frame
 
@@ -104,8 +102,6 @@ local pActivity = {}
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("AFK",1,true) then
 		pActivity[playerID] = tonumber(msg:sub(4))
-	elseif msg:find("TAKE",1,true) then
-		playerWantTake[playerID]= 250
 	end
 end
 
@@ -123,11 +119,8 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#teams do
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
-		local deductElo = (unstablePlayerCounter[leader] or 0)*250 --unstable player is deducted 250*times-lagging ELO
-		local addElo = (playerWantTake[leader] or 0) --player who want a "take" is added 250 ELO
-		playerWantTake[leader] = 0 --reset value
 		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
-			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo + addElo)}
+			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0))}
 		end
 	end
 
@@ -199,7 +192,6 @@ function gadget:GameFrame(n)
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
 							laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, units = units}
-							unstablePlayerCounter[playerID] = (unstablePlayerCounter[playerID] or 0) + 1 --mark player as unstable + 1
 						end
 					end
 				else --if not at all AFK or lagging: then...
