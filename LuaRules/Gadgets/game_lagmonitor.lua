@@ -159,8 +159,8 @@ function gadget:GameFrame(n)
 					active = false
 					spec = false
 					team = oldTeam[playerID]
+					oldTeam[playerID] = nil
 				end
-				oldTeam[playerID] = nil
 			elseif team and not spec then
 				oldTeam[playerID] = team
 			end
