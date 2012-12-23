@@ -155,6 +155,7 @@ function gadget:GameFrame(n)
 			local playerID = players[i]
 			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(playerID)
 			
+			local justResigned = false
 			if oldTeam[playerID] then
 				if spec then
 					active = false
@@ -163,6 +164,7 @@ function gadget:GameFrame(n)
 					allyTeam = oldAllyTeam[playerID]
 					oldTeam[playerID] = nil
 					oldAllyTeam[playerID] = nil
+					justResigned = true
 					Spring.Echo("oldTeam[playerID] and spec")
 				end
 			elseif team and not spec then
@@ -191,11 +193,13 @@ function gadget:GameFrame(n)
 					end 
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
+					Spring.Echo("not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD")
 					afkPlayer = afkPlayer .. (10000 + playerID*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
 					tickTockCounter[playerID] = (tickTockCounter[playerID] or 0) + 1 --tick tock counter ++. count-up 1
-					if tickTockCounter[playerID] >= 2 then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
+					if tickTockCounter[playerID] >= 2 or justResigned then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
+							Spring.Echo("adding lagger")
 							laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, units = units}
 						end
 					end
@@ -208,6 +212,7 @@ function gadget:GameFrame(n)
 		SendToUnsynced("LagmonitorAFK",afkPlayer) --tell widget about AFK list
 		
 		for playerID, data in pairs(laggers) do
+			Spring.Echo("detected a lagger")
 			-- FIRST! check if everyone else on the team is also lagging
 			local team = data.team
 			local allyTeam = data.allyTeam
@@ -219,13 +224,17 @@ function gadget:GameFrame(n)
 					break
 				end
 			end
+			Spring.Echo(team)
+			Spring.Echo(allyTeam)
 
 			-- no-one on team not lagging (the likely situation in absence of commshare), continue working
 			if not discontinue then
+				Spring.Echo("not discontinue")
 				recepientByAllyTeam[allyTeam] = recepientByAllyTeam[allyTeam] or GetRecepient(allyTeam, laggers)
 			
 				-- okay, we have someone to give to, prep transfer
 				if recepientByAllyTeam[allyTeam] then
+					Spring.Echo("we have someone to give to")
 					if (afkTeams[team] == nil) then -- if team was not an AFK-er (but now is an AFK-er) then process the following... else do nothing for the same AFK-er.
 						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[playerID]" will be filled twice for the same player (line 161) & normally unit will be sent (redirected) to the non-AFK-er (line 198), but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will also run twice for the AFK ally (line 193) and it will effect 'unit_mex_overdrive.lua on line 999'. 			
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
@@ -234,6 +243,7 @@ function gadget:GameFrame(n)
 					afkTeams[team] = true --mark team as AFK
 					local units = data.units or {}
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0
+						Spring.Echo("doing transfer")
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
 						for j=1,#units do
