@@ -67,6 +67,7 @@ local xshiftUnitTexture = {}
 
 local hideIcons = {}
 
+
 WG.icons = {}
 
 -------------------------------------------------------------------------------------
@@ -91,7 +92,7 @@ local function OrderIconsOnUnit(unitID )
 			iconCount = iconCount + 1
 		end
 	end
-	local shift = (0.5 - iconCount*0.5)*options.iconsize.value
+	local xshift = (0.5 - iconCount*0.5)*options.iconsize.value
 	
 	for i=1, #iconOrders_order do
 		local iconName = iconOrders_order[i]
@@ -101,8 +102,8 @@ local function OrderIconsOnUnit(unitID )
 			if hideIcons[iconName] then
 				textureUnitsXshift[texture][unitID] = nil
 			else
-				textureUnitsXshift[texture][unitID] = shift
-				shift = shift + options.iconsize.value
+				textureUnitsXshift[texture][unitID] = xshift
+				xshift = xshift + options.iconsize.value
 			end
 		end
 		
@@ -192,10 +193,10 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function DrawUnitFunc(xshift, yshift, zshift)
-	glTranslate(xshift,yshift,zshift)
+local function DrawUnitFunc(xshift, yshift)
+	glTranslate(0,yshift,0)
 	glBillboard()
-	glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
+	glTexRect(xshift - options.iconsize.value*0.5, -9, xshift + options.iconsize.value*0.5, options.iconsize.value-9)
 end
 
 
@@ -211,22 +212,15 @@ function widget:DrawWorld()
 	glDepthTest(true)
 	glAlphaTest(GL_GREATER, 0.001)
 	
-	local vectors = Spring.GetCameraVectors()
-	if vectors then
-		local right = vectors.right
-		if right then
-			for texture, units in pairs(textureUnitsXshift) do
-				
-				glTexture(texture)
-				for unitID,shift in pairs(units) do
-					local unitInView = spIsUnitInView(unitID)
-					if unitInView and shift and unitHeights and unitHeights[unitID] then
-						glDrawFuncAtUnit(unitID, false, DrawUnitFunc,
-							shift*right[1],
-							unitHeights[unitID],
-							shift*right[3])
-					end
-				end
+	for texture, units in pairs(textureUnitsXshift) do
+		
+		glTexture(texture)
+		for unitID,xshift in pairs(units) do
+			local unitInView = spIsUnitInView(unitID)
+			if unitInView and xshift and unitHeights and unitHeights[unitID] then
+				glDrawFuncAtUnit(unitID, false, DrawUnitFunc,
+					xshift,
+					unitHeights[unitID])
 			end
 		end
 	end
@@ -254,14 +248,14 @@ function widget:DrawScreenEffects()
 	
 	for texture, units in pairs(textureUnitsXshift) do
 		glTexture( texture )
-		for unitID,shift in pairs(units) do
+		for unitID,xshift in pairs(units) do
 			gl.PushMatrix()
 			local x,y,z = Spring.GetUnitPosition(unitID)
 			y = y + (unitHeights[unitID] or 0)
 			x,y,z = Spring.WorldToScreenCoords(x,y,z)
 			glTranslate(x,y,z)
-			if shift and unitHeights then
-				glTranslate(shift,0,0)
+			if xshift and unitHeights then
+				glTranslate(xshift,0,0)
 				--glBillboard()
 				glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
 			end
