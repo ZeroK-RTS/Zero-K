@@ -29,7 +29,7 @@ local spGetUnitDefID  = Spring.GetUnitDefID
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- This way looks faster, there is a lot less useless iteration
-
+--[[
 local maxHealth = {}
 
 for i=1,#UnitDefs do
@@ -47,13 +47,12 @@ end
 	end
 	return true
  end
-
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- This is the alternate way of doing things. It iterates over all units which 
 -- have been the target of a reclaim command and gives them back the health that
 -- they lost in being reclaimed.
---[[
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -107,6 +106,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 	end
 	return true -- allowed
 end
---]]
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
