@@ -39,6 +39,7 @@ local afkTeams = {}
 local tickTockCounter = {} --remember how many second a player is in AFK mode. To add a delay before unit transfer commence.
 local unitAlreadyFinished = {}
 local oldTeam = {} -- team which player was on last frame
+local oldAllyTeam = {} -- allyTeam which player was on last frame
 
 GG.Lagmonitor_activeTeams = {}
 
@@ -159,16 +160,19 @@ function gadget:GameFrame(n)
 					active = false
 					spec = false
 					team = oldTeam[playerID]
+					allyTeam = oldAllyTeam[playerID]
 					oldTeam[playerID] = nil
+					oldAllyTeam[playerID] = nil
 					Spring.Echo("oldTeam[playerID] and spec")
 				end
 			elseif team and not spec then
 				oldTeam[playerID] = team
+				oldAllyTeam[playerID] = allyTeam
 			end
 			
 			local afk = Spring.GetGameSeconds() - (pActivity[playerID] or 0)
 			local _,_,_,isAI,_,_ = Spring.GetTeamInfo(team)
-			if not spec  and not isAI then 
+			if not spec and not isAI then 
 				if (afkTeams[team] == true) then  -- team was AFK 
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
 						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
