@@ -224,6 +224,21 @@ upgrades = {
 				end
 			end,		
 	},
+	weaponmod_railaccel = {
+		name = "Rail Accelerator",
+		description = "Gauss Rifle: +10% damage, +20% range",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if v.customparams.idstring == "commweapon_gaussrifle" then
+						v.range = v.range * 1.2
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 1.1
+						end
+					end
+				end
+			end,		
+	},	
 	weaponmod_high_caliber_barrel = {
 		name = "High Caliber Barrel",
 		description = "Shotgun/Riot Cannon/Gauss Rifle/Assault Cannon/Plasma Artillery: +150% damage, +100% reload time",
