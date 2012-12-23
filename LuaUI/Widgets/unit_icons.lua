@@ -4,11 +4,11 @@
 function widget:GetInfo()
   return {
     name      = "Unit Icons",
-    desc      = "v0.02 Shows icons above units",
+    desc      = "v0.03 Shows icons above units",
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
-    layer     = 4,--
+    layer     = -10,--
     enabled   = true,  -- loaded by default?
   }
 end
@@ -20,6 +20,7 @@ local echo = Spring.Echo
 
 local spGetUnitDefID = Spring.GetUnitDefID
 local spIsUnitInView = Spring.IsUnitInView
+local spGetUnitPosition = Spring.GetUnitPosition
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
@@ -29,6 +30,8 @@ local glTexRect        = gl.TexRect
 local glTranslate      = gl.Translate
 local glBillboard      = gl.Billboard
 local glDrawFuncAtUnit = gl.DrawFuncAtUnit
+local glPushMatrix     = gl.PushMatrix
+local glPopMatrix      = gl.PopMatrix
 
 local GL_GREATER = GL.GREATER
 
@@ -44,7 +47,13 @@ options = {
 		name = 'Hovering Icon Size',
 		type = 'number',
 		value = 30, min=10, max = 40,
-	}
+	},
+	forRadarIcons = {
+		name = 'Draw on Icons',
+		desc = 'Draws state icons when zoomed out.',
+		type = 'bool',
+		value = true,
+	},		
 }
 
 ----------------------------------------------------------------------------------------
@@ -63,7 +72,7 @@ local textureUnitsXshift = {}
 local textureIcons = {}
 local textureOrdered = {}
 
-local xshiftUnitTexture = {}
+--local xshiftUnitTexture = {}
 
 local hideIcons = {}
 
@@ -187,11 +196,21 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	unitHeights[unitID] = nil
-	xshiftUnitTexture[unitID] = nil
+	--xshiftUnitTexture[unitID] = nil
 end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local function DrawFuncAtUnitIcon2(unitID, xshift, yshift)
+	local x,y,z = spGetUnitPosition(unitID)
+	glPushMatrix()
+		glTranslate(x,y,z)
+		glTranslate(0,yshift,0)
+		glBillboard()
+		glTexRect(xshift -options.iconsize.value*0.5, -5, xshift + options.iconsize.value*0.5, options.iconsize.value-5)
+	glPopMatrix()
+end
 
 local function DrawUnitFunc(xshift, yshift)
 	glTranslate(0,yshift,0)
@@ -218,9 +237,11 @@ function widget:DrawWorld()
 		for unitID,xshift in pairs(units) do
 			local unitInView = spIsUnitInView(unitID)
 			if unitInView and xshift and unitHeights and unitHeights[unitID] then
-				glDrawFuncAtUnit(unitID, false, DrawUnitFunc,
-					xshift,
-					unitHeights[unitID])
+				if  options.forRadarIcons.value then
+					DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
+				else
+					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID])
+				end
 			end
 		end
 	end
@@ -283,3 +304,4 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
