@@ -40,6 +40,7 @@ local tickTockCounter = {} --remember how many second a player is in AFK mode. T
 local unstablePlayerCounter = {} --remember how many times a player was AFK. To de-merit laggy player from receiving any units.
 local playerWantTake = {} --remember which player who request for a "TAKE". To add-merit for who want to receive unit.
 local unitAlreadyFinished = {}
+local oldTeam = {} -- team which player was on last frame
 
 GG.Lagmonitor_activeTeams = {}
 
@@ -157,8 +158,21 @@ function gadget:GameFrame(n)
 		local afkPlayer = "" -- remember which player is AFK/Lagg. Information will be sent to 'gui_take_remind.lua' as string
 		
 		for i=1,#players do
-			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
-			local afk = Spring.GetGameSeconds() - (pActivity[players[i]] or 0)
+			local playerID = players[i]
+			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(playerID)
+			
+			if oldTeam[playerID] then
+				if spec then
+					active = false
+					spec = false
+					team = oldTeam[playerID]
+				end
+				oldTeam[playerID] = nil
+			elseif team and not spec then
+				oldTeam[playerID] = team
+			end
+			
+			local afk = Spring.GetGameSeconds() - (pActivity[playerID] or 0)
 			local _,_,_,isAI,_,_ = Spring.GetTeamInfo(team)
 			if not spec  and not isAI then 
 				if (afkTeams[team] == true) then  -- team was AFK 
@@ -179,17 +193,17 @@ function gadget:GameFrame(n)
 					end 
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
-					afkPlayer = afkPlayer .. (10000 + players[i]*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
-					tickTockCounter[players[i]] = (tickTockCounter[players[i]] or 0) + 1 --tick tock counter ++. count-up 1
-					if tickTockCounter[players[i]] >= 2 then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
+					afkPlayer = afkPlayer .. (10000 + playerID*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
+					tickTockCounter[playerID] = (tickTockCounter[playerID] or 0) + 1 --tick tock counter ++. count-up 1
+					if tickTockCounter[playerID] >= 2 then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
-							laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
-							unstablePlayerCounter[players[i]] = (unstablePlayerCounter[players[i]] or 0) + 1 --mark player as unstable + 1
+							laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, units = units}
+							unstablePlayerCounter[playerID] = (unstablePlayerCounter[playerID] or 0) + 1 --mark player as unstable + 1
 						end
 					end
 				else --if not at all AFK or lagging: then...
-					tickTockCounter[players[i]] = nil -- empty tick-tock clock. We want to reset the counter when the player return.
+					tickTockCounter[playerID] = nil -- empty tick-tock clock. We want to reset the counter when the player return.
 				end
 			end
 		end
@@ -216,7 +230,7 @@ function gadget:GameFrame(n)
 				-- okay, we have someone to give to, prep transfer
 				if recepientByAllyTeam[allyTeam] then
 					if (afkTeams[team] == nil) then -- if team was not an AFK-er (but now is an AFK-er) then process the following... else do nothing for the same AFK-er.
-						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[players[i]]" will be filled twice for the same player (line 161) & normally unit will be sent (redirected) to the non-AFK-er (line 198), but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will also run twice for the AFK ally (line 193) and it will effect 'unit_mex_overdrive.lua on line 999'. 			
+						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[playerID]" will be filled twice for the same player (line 161) & normally unit will be sent (redirected) to the non-AFK-er (line 198), but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will also run twice for the AFK ally (line 193) and it will effect 'unit_mex_overdrive.lua on line 999'. 			
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
 						GG.Lagmonitor_activeTeams[allyTeam][team] = false
 					end
