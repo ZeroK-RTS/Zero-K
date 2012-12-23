@@ -120,7 +120,7 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#teams do
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
-		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
+		if active and not spectator and not laggers[leader] and not Spring.GetTeamRulesParam(teams[i], "WasKilled") then -- only consider giving to someone in position to take!
 			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0))}
 		end
 	end
