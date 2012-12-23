@@ -264,9 +264,9 @@ function gadget:DrawWorld()
 				local square = squareList.data[i]
 				local sx = square.x
 				local sz = square.z
-				if not (updatedSquareMap[sx] and updatedSquareMap[sz]) then
+				if not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
 					spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
-					--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,"Square Updated")
+					--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())
 					updatedSquareMap[sx] = updatedSquareMap[sx] or {}
 					updatedSquareMap[sx][sz] = true
 				end
