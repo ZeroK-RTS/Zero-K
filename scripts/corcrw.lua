@@ -201,24 +201,21 @@ function script.AimFromWeapon(num)
 	return gunpoints[num].aim
 end
 
-function Hacky_Stiletto_Workaround_stiletto_func(count)
-	--EmitSfx(subemit[0], DETO_W5)
-	if count < SPECIAL_FIRE_COUNT then
-		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-		if count + 1 < SPECIAL_FIRE_COUNT then
-			EmitSfx( subemit[0],  FIRE_W5 )
-			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
-		else
-			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 10, count + 1)
-		end
-	else
-		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-		GG.UpdateUnitAttributes(unitID)
+
+local function ClusterBombThread()
+	local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+	local sleepTime = 70/slowState
+	for i = 1, SPECIAL_FIRE_COUNT do
+		EmitSfx( subemit[0],  FIRE_W5 )
+		Sleep(sleepTime)
 	end
+	Sleep(330)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
 end
 
 function ClusterBomb()
-	Hacky_Stiletto_Workaround_stiletto_func(1)
+	StartThread(ClusterBombThread)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SLOWDOWN_FACTOR)
 	GG.attUnits[unitID] = true
 	GG.UpdateUnitAttributes(unitID)

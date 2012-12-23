@@ -35,45 +35,11 @@ function script.Deactivate()
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
 end
 
-function Hacky_Stiletto_Workaround_stiletto_func(count)
-
-	FakeUprightTurn(unitID, xp, zp, base, preDrop)
-
-	EmitSfx( drop,  FIRE_W2 )
-	
-	if sound_index == 0 then
-		local px, py, pz = Spring.GetUnitPosition(unitID)
-		Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz, 'sfx')
-	end
-	sound_index = sound_index + 1
-	if sound_index >= 6 then
-		sound_index = 0
-	end
-	
-	if count < 80 then
-		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(1/slowState), count + 1)
-	else
-		Reload()
-	end
-	
-end
-
 function script.FireWeapon1()
 	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
 	end
-	GG.Hacky_Stiletto_Workaround_gadget_func(unitID, BOMB_DELAY, 1)
-end
-
--- What the fire func should look like in a hax free world
--- The sleeps cause the script to crash if the EmitSfx hits any units
---[[
-function script.FireWeapon1()
-	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
-		return
-	end
-	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
+	
 	for i = 1, 80 do
 		local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
 		local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
@@ -99,13 +65,13 @@ function script.FireWeapon1()
 		if sound_index >= 6 then
 			sound_index = 0
 		end
+		
 		Sleep(35) -- fire density
 	end
-	Sleep( 500) --delay before fuel runs out, to let it retreat a little
+	
 	Reload()
-	--Spring.SetUnitFuel(unitID,0)
 end
---]]
+
 
 function script.QueryWeapon1()
 	return drop
