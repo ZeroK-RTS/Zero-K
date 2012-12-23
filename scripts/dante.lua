@@ -46,7 +46,7 @@ local weaponPieces = {
 	{aimFrom = torso, query = {rf1, lf1, rf2, lf2, rf3, lf3}, index = 1},
 	{aimFrom = torso, query = {flame1, flame2}, index = 1},
 	{aimFrom = torso, query = {rf1, lf1, rf2, lf2, rf3, lf3}, index = 1},
-	{aimFrom = flagellum, query = {flagellum}, index = 1},
+	{aimFrom = torso, query = {fix}, index = 1},
 }
 
 local missileEmits = {{lbak1, lbak2}, {rbak1, rbak2}}
