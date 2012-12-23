@@ -28,7 +28,9 @@ local spGetUnitDefID  = Spring.GetUnitDefID
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- This way looks faster, there is a lot less useless iteration
+-- This is the allowUnitBuildStep method. It is a seamless solution but turns 
+-- out to be dramatically slower than the second solution. 
+-- AllowUnitBuildStep is really really expensive.
 --[[
 local maxHealth = {}
 

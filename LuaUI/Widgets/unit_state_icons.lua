@@ -10,21 +10,22 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 5,
     enabled   = true,
-	handler = true,--allow widget to use special widgetHandler's function
   }
 end
---[[
-Changelog:
-msafwan			12 Dec 2012			: auto start unit_icons.lua if not yet started
-									
---]]
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local echo = Spring.Echo
+
 local GetUnitDefID         = Spring.GetUnitDefID
 local GetUnitExperience    = Spring.GetUnitExperience
 local GetAllUnits          = Spring.GetAllUnits
 local IsUnitAllied         = Spring.IsUnitAllied
 local GetSpectatingState   = Spring.GetSpectatingState
+
+local min   = math.min
+local floor = math.floor
 
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ options = {
 		name = "Show move/fire states on shift",
 		desc = "When holding shift, icons appear over units indicating move state and fire state.",
 		type = 'bool',
-		value = true,
+		value = false,
 	},
 	showarmorstateonshift = {
 		name = "Show armor state on shift",
@@ -178,7 +179,7 @@ function widget:KeyRelease(key, modifier )
 	end
 end
 
---[[
+
 --needed if icon widget gets disabled/enabled after this one. find a better way?
 function widget:GameFrame(f)
 
@@ -186,7 +187,6 @@ function widget:GameFrame(f)
 		UpdateAllUnits()
 	end
 end
---]]
 
 
 --this needs work
@@ -198,9 +198,6 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 end
 
 function widget:Initialize()
-	if (not WG.icons) then --if "Unit Icons" not enabled, then enable it.
-		widgetHandler:EnableWidget("Unit Icons")
-	end
 	
 	WG.icons.SetOrder( 'firestate', 5 )
 	WG.icons.SetOrder( 'firestate', 6 )
