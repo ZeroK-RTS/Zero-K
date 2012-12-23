@@ -1,4 +1,4 @@
-local versionName = "v2.73"
+local versionName = "v2.79"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "Nov 15, 2012",
+    date      = "Dec 23, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -72,14 +72,14 @@ local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half th
 
 -- Graph constant:
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
-local safetyMarginCONSTANTunitG = 0.175 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.175 radian)
-local smCONSTANTunitG		= 0.175  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.175 radian)
-local aCONSTANTg			= {math.pi/10 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2 (because both contribution from obstacle & target will sum to math.pi)).
-local obsCONSTANTg			= {math.pi/10, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD & ATTACK)). 
+local safetyMarginCONSTANTunitG = 0.175 --obstacle graph windower (a "safety margin" constant). Shape the obstacle graph so that its fatter and more sloppier at extremities: ie: probably causing unit to prefer to turn more left or right (default = 0.175 radian)
+local smCONSTANTunitG		= 0.175  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right??? (default = 0.175 radian)
+local aCONSTANTg			= {math.pi/4 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2 (because both contribution from obstacle & target will sum to math.pi)).
+local obsCONSTANTg			= {math.pi/4, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD & ATTACK)). 
 --aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction. Activated by 'graphCONSTANTtrigger[1]'
 --an antagonist to aCONSTANg (obsCONSTANTg or obstacle graph) also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy, but already normalized. Activated by 'graphCONSTANTtrigger[2]'
 local windowingFuncMultG = 1 --? (default = 1 multiplier)
-local normalizeObsGraphG = false --// if 'true': normalize turn angle to a maximum of "obsCONSTANTg", if 'false': allow turn angle to grow as big as it can (depend on number of enemy, limited by "maximumTurnAngleG").
+local normalizeObsGraphG = true --// if 'true': normalize turn angle to a maximum of "obsCONSTANTg", if 'false': allow turn angle to grow as big as it can (depend on number of enemy, limited by "maximumTurnAngleG").
 local stdDecloakDist_fG = 75 --//a decloak distance size for Scythe is put as standard. If other unit has bigger decloak distance then it will be scalled based on this
 
 -- Obstacle/Target competetive interaction constant:
@@ -126,6 +126,11 @@ local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calcu
 --Command Timeout constants:
 local commandTimeoutG = 2
 local consRetreatTimeoutG = 15
+
+--NOTE:
+--angle measurement and direction setting is based on right-hand coordinate system, but Spring uses left-hand coordinate system.
+--So, math.sin is for x, and math.cos is for z, and math.atan2 input is x,z (is swapped with respect to the usual x y convention).
+--those swap conveniently translate left-hand coordinate system into right-hand coordinate system.
 
 --------------------------------------------------------------------------------
 --Variables:
@@ -211,9 +216,9 @@ options = {
 	dbg_IgnoreSelectedCons ={
 		name = 'Debug: Ignore current selection',
 		type = 'bool',
-		value = true,
+		value = false,
 		desc = "Selected constructor(s) will be ignored by widget.\nNote: there's a second delay before unit is ignored/re-acquire after selection/de-selection.\n\nDefault:Off",
-		advanced = true,
+		--advanced = true,
 	},
 }
 
@@ -516,7 +521,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, ski
 							needToCancelOrder = true --skip widget's command
 						end
 					end
-				else Spring.Echo("cQueueSyncTest == nil!") --//under an unknown circumstances the unit's commandQueue became nil (??).
+				else Spring.Echo("Dynamic Avoidance: cQueueSyncTest == nil!") --//under an unknown circumstances the unit's commandQueue became nil (??).
 				end
 				if not needToCancelOrder then --//if unit receive new command then widget need to stop issuing command based on old information. This prevent user from being annoyed by widget overriding their command.
 					local unitSpeed= surroundingOfActiveUnit[i][7]
@@ -1133,8 +1138,16 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+		elseif cQueue[queueIndex].params[1]~= nil then --check whether its refering to a nanoframe
+			local nanoframeID = cQueue[queueIndex].params[1]
+			targetPosX, targetPosY, targetPosZ = spGetUnitPosition(nanoframeID)
+			if (turnOnEcho == 2)then Spring.Echo("ExtractTarget, MoveCommand: is using nanoframeID") end
 		else
-			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target") end
+			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target") 
+				Spring.Echo(cQueue[queueIndex].params[1])
+				Spring.Echo(cQueue[queueIndex].params[2])
+				Spring.Echo(cQueue[queueIndex].params[3])
+			end
 		end
 		boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
@@ -1143,7 +1156,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --//if reclaim or ressurect then identify area reclaim
 				if cQueue[queueIndex].params[1]==cQueue[queueIndex+1].params[1]
 					and cQueue[queueIndex].params[2]==cQueue[queueIndex+1].params[2]
-					and cQueue[queueIndex].params[3]==cQueue[queueIndex+1].params[3] then --area reclaim should have no "nil", and will equal to retreat coordinate when retreating to center of area reclaim.
+					and cQueue[queueIndex].params[3]==cQueue[queueIndex+1].params[3] then --area reclaim will have no "nil", and will equal to retreat coordinate when retreating to center of area reclaim.
 					targetPosX, targetPosY, targetPosZ = -1, -1, -1 --//if area reclaim under the above condition, then avoid forever in presence of enemy
 					boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 				end
@@ -1357,13 +1370,13 @@ function GetTargetSubtendedAngle(unitID, targetCoordinate)
 	if(unitDef~=nil) then unitSize = unitDef.xsize*8 end --8 is the actual Distance per square, times the unit's square
 
 	local targetDistance= Distance(tx,tz,x,z)
-	local targetSubtendedAngle = math.atan(unitSize*2/targetDistance) --target is same size as unit's
+	local targetSubtendedAngle = math.atan(unitSize*2/targetDistance) --target is same size as unit's. Usually target do not has size at all, because they are simply move command on ground
 	return targetSubtendedAngle
 end
 
 --sum the contribution from all enemy unit
 function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius, obsCONSTANT)
-	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG
+	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG -- make the slopes in the extremeties of obstacle graph more sloppy (refer to "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas)
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
 	local normalizeObsGraph = normalizeObsGraphG
@@ -1374,7 +1387,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 	if (surroundingUnits[1]~=nil) then --don't execute if no enemy unit exist
 		local graphSample={}
 		if normalizeObsGraph then --an option (default OFF) allow the obstacle graph to be normalized for experimenting purposes 
-			for i=1, 360+1, 1 do
+			for i=1, 180+1, 1 do
 				graphSample[i]=0 --initialize content 360 points
 			end
 		end
@@ -1389,31 +1402,31 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					Spring.Echo(unitSeparation <unitsSeparation[unitRectangleID])
 				end
 				if unitSeparation <(unitsSeparation[unitRectangleID] or 999) then --see if the enemy is maintaining distance
-					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID)
-					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius)
+					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID) -- obstacle's angular position with respect to our coordinate
+					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius) -- obstacle & our unit's angular size 
 
 					--get obstacle/ enemy/repulsor wave function
-					if impatienceTrigger==0 then --zero means that unit is impatient
+					if impatienceTrigger==0 then --impatienceTrigger reach zero means that unit is impatient
 						distanceCONSTANT=distanceCONSTANT/2
 					end
-					local ri, wi, di = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT)
+					local ri, wi, di,diff1 = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT)
 					local fObstacle = ri*wi*di
 					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
 
 					--get second obstacle/enemy/repulsor wave function to calculate slope
-					local ri2, wi2, di2 = GetRiWiDi (unitDirection+0.05, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT)
+					local ri2, wi2, di2, diff2= GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT, true)
 					local fObstacle2 = ri2*wi2*di2
 					
 					--create a snapshot of the entire graph. Resolution: 360 datapoint
 					local dI = math.exp(-1*unitSeparation/distanceCONSTANT) --distance multiplier
 					local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
 					if normalizeObsGraph then
-						for i=-180, 180, 1 do --sample the entire 360 degree graph
-							local differenceInAngle = (unitDirection+i*math.pi/180)-relativeAngle
+						for i=-90, 90, 1 do --sample the entire 360 degree graph
+							local differenceInAngle = (unitDirection-relativeAngle)+i*math.pi/180
 							local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
 							local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
-							graphSample[i+180+1]=graphSample[i+180+1]+ (rI*wI*dI)
-							--[[
+							graphSample[i+90+1]=graphSample[i+90+1]+ (rI*wI*dI)
+							--[[ <<--can uncomment this and comment the 2 "normalizeObsGraph" switch above for debug info
 							Spring.Echo((rI*wI*dI) .. " (rI*wI*dI) (SumAllUnitAroundUnitID)")
 							if i==0 then
 								Spring.Echo("CENTER")
@@ -1423,7 +1436,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					end
 
 					--get repulsor wavefunction's slope
-					local fObstacleSlope = GetFObstacleSlope(fObstacle2, fObstacle, unitDirection+0.05, unitDirection)
+					local fObstacleSlope = GetFObstacleSlope(fObstacle2, fObstacle, diff2, diff1)
 
 					--sum all repulsor's wavefunction from every enemy/obstacle within this loop
 					wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange= DoAllSummation (wi, fObstacle, fObstacleSlope, di,wTotal, unitDirection, unitSeparation, relativeAngle, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange)
@@ -1432,7 +1445,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 		end
 		if normalizeObsGraph then
 			local biggestValue=0
-			for i=1, 360+1, 1 do --find maximum value from graph
+			for i=1, 180+1, 1 do --find maximum value from graph
 				if biggestValue<graphSample[i] then
 					biggestValue = graphSample[i]
 				end
@@ -1678,6 +1691,9 @@ function GetUnitDirection(unitID, lastPosition) --give unit direction in radian,
 	end
 	local dxdz = math.sqrt(dx*dx + dz*dz) --hypothenus for xz direction
 	local unitDirection = math.atan2(dx/dxdz, dz/dxdz)
+	if (turnOnEcho == 1) then
+		Spring.Echo("direction(GetUnitDirection) " .. unitDirection*180/math.pi)
+	end
 	return unitDirection, currentY, usingLastPosition
 end
 
@@ -1725,18 +1741,29 @@ function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius)
 end
 
 --calculate enemy's wavefunction
-function GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDistance, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT)
-	local differenceInAngle = unitDirection-relativeAngle
-	--Spring.Echo(differenceInAngle*180/math.pi .. "angle, unitDirection (GetRiWiDi)")
+function GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDistance, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT, isForSlope)
+	unitDirection = unitDirection + math.pi --temporarily add a half of a circle to remove the negative part which could skew with circle-arithmetic
+	relativeAngle = relativeAngle + math.pi
+	local differenceInAngle = relativeAngle - unitDirection --relative difference
+	if differenceInAngle > math.pi then --select difference that is smaller than half a circle
+		differenceInAngle = differenceInAngle - 2*math.pi
+	elseif differenceInAngle < -1*math.pi then
+		differenceInAngle = 2*math.pi + differenceInAngle
+	end
+	if isForSlope then
+		differenceInAngle = differenceInAngle + 0.05
+	end
+	--Spring.Echo("differenceInAngle(GetRiWiDi) "..  differenceInAngle*180/math.pi)
 	local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle)) -- ratio of enemy-direction over the size-of-the-enemy
 	local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
 	local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window. Tanh graph multiplied by obsCONSTANT
 	local dI = math.exp(-1*separationDistance/distanceCONSTANT) --distance multiplier
-	return rI, wI, dI
+	return rI, wI, dI, differenceInAngle
 end
 --calculate wavefunction's slope
-function GetFObstacleSlope (fObstacle2, fObstacle, unitDirection2, unitDirection)
-	local fObstacleSlope= (fObstacle2 -fObstacle)/(unitDirection2-unitDirection)
+function GetFObstacleSlope (fObstacle2, fObstacle, diff2, diff1)
+	--local fObstacleSlope= (fObstacle2 -fObstacle)/((unitDirection+0.05)-unitDirection)
+	local fObstacleSlope= (fObstacle2 -fObstacle)/(diff2-diff1)
 	return fObstacleSlope
 end
 --sum the wavefunction from all enemy units
@@ -1756,20 +1783,27 @@ function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, 
 	local angleFromTarget = math.abs(wTarget)*fTarget
 	local angleFromObstacle = math.abs(wObstacle)*fObstacleSum
 	--Spring.Echo(math.modf(angleFromObstacle))
-	local angleFromNoise = (noiseAngleG)*(GaussianNoise()*2-1)
-	local unitAngleDerived= angleFromTarget + angleFromObstacle + angleFromNoise --add wave-amplitude, and add noise between -ve & +ve noiseAngle
+	local angleFromNoise = (-1)*Sgn(angleFromObstacle)*(noiseAngleG)*GaussianNoise() --(noiseAngleG)*(GaussianNoise()*2-1) --for random in negative & positive direction
+	local unitAngleDerived= angleFromTarget + (-1)*angleFromObstacle + angleFromNoise --add attractor amplitude, add repulsive amplitude, and add noise between -ve & +ve noiseAngle. NOTE: somehow "angleFromObstacle" have incorrect sign (telling unit to turn in opposite direction)
 	if math.abs(unitAngleDerived) > maximumTurnAngleG then --to prevent excess in avoidance causing overflow in angle changes (maximum angle should be pi, but useful angle should be pi/2 eg: 90 degree)
 		--Spring.Echo("Dynamic Avoidance warning: total angle changes excess")
 		unitAngleDerived = Sgn(unitAngleDerived)*maximumTurnAngleG 
 	end
+	unitDirection = unitDirection+math.pi --temporarily remove negative hemisphere so that arithmetic with negative angle won't skew the result
 	local newUnitAngleDerived= unitDirection +unitAngleDerived --add derived angle into current unit direction plus some noise
-	--Spring.Echo(unitAngleDerived*180/math.pi .. "angle, unitAngleDerived (GetNewAngle)")
-	if (turnOnEcho == 1) then 
-		Spring.Echo("fTarget (getNewAngle)" .. fTarget)
-		Spring.Echo("fObstacleSum (getNewAngle)" ..fObstacleSum)
-		Spring.Echo("unitAngleDerived (getNewAngle)" ..unitAngleDerived)
-		Spring.Echo("unitAngleDerived(GetNewAngle) " .. unitAngleDerived) 
-		Spring.Echo("newUnitAngleDerived(GetNewAngle) " .. newUnitAngleDerived)
+	newUnitAngleDerived = newUnitAngleDerived - math.pi --readd negative hemisphere
+	if newUnitAngleDerived > math.pi then --add residual angle (angle > 2 circle) to respective negative or positive hemisphere
+		newUnitAngleDerived = newUnitAngleDerived - 2*math.pi
+	elseif newUnitAngleDerived < -1*math.pi then
+		newUnitAngleDerived = newUnitAngleDerived + 2*math.pi
+	end
+	if (turnOnEcho == 1) then
+		Spring.Echo("unitAngleDerived (getNewAngle)" ..unitAngleDerived*180/math.pi)
+		Spring.Echo("newUnitAngleDerived (getNewAngle)" .. newUnitAngleDerived*180/math.pi)
+		--Spring.Echo("fTarget (getNewAngle)" .. fTarget)
+		--Spring.Echo("fObstacleSum (getNewAngle)" ..fObstacleSum)
+		--Spring.Echo("unitAngleDerived(GetNewAngle) " .. unitAngleDerived) 
+		--Spring.Echo("newUnitAngleDerived(GetNewAngle) " .. newUnitAngleDerived)
 	end
 	return newUnitAngleDerived --sent out derived angle
 end
@@ -1839,8 +1873,8 @@ end
 ---------------------------------Level5
 function SumRiWiDiCalculation (wi, fObstacle, fObstacleSlope, di, wTotal, dSum, fObstacleSum, dFobstacle)
 	wTotal = wTotal +wi
-	fObstacleSum= fObstacleSum +fObstacle
-	dFobstacle= dFobstacle + fObstacleSlope
+	fObstacleSum= fObstacleSum +(fObstacle)
+	dFobstacle= dFobstacle + (fObstacleSlope)
 	--Spring.Echo(dFobstacle)
 	dSum= dSum +di
 	return wTotal, dSum, fObstacleSum, dFobstacle
@@ -1907,39 +1941,6 @@ end
 --11
 -- Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average (rolling average)
 --------------------------------------------------------------------------------
---Method Index:
---  widget:Initialize()
---  widget:PlayerChanged(playerID)
---  widget:Update()
---  RefreshUnitList(attacker)
---  GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
---  DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
---  widget:RecvLuaMsg(msg, playerID)
---  ReportedNetworkDelay(playerIDa, defaultDelay)
---  CalculateNetworkDelay(reportingIn, skippingTimer,doCalculation_then_gps_delay,gps_then_DoCalculation_delay, now)
---  RetrieveAttackerList (unitID, attacker)
---  CheckWeaponsAndShield (unitDef)
---  GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
---  IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
---  TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger, lastPosition)
---  GetUnitLOSRadius(unitID)
---  GetAllUnitsInRectangle(unitID, losRadius, attacker)
---  ...
---  CatalogueMovingObject(surroundingUnits, unitID, lastPosition)
---  ...
---  Round(num) --Reference: http://lua-users.org/wiki/SimpleRound
---  dNil(x)
---  Distance(x1,z1,x2,z2)
---  GetUnitSubtendedAngle (unitIDmain, unitID2)
---  GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDistance, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT)
---  GetFObstacleSlope (fObstacle2, fObstacle, unitDirection2, unitDirection)
---  DoAllSummation (wi, fObstacle, fObstacleSlope, di,wTotal, unitDirection, unitSeparation, relativeAngle, dSum, fObstacleSum, dFobstacle, nearestFrontObstacleRange)
---  ConstantInitialize(fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal)
---  GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor)
---  ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity)
---  SumRiWiDiCalculation (wi, fObstacle, fObstacleSlope, di, wTotal, dSum, fObstacleSum, dFobstacle)
---  GaussianNoise()
---  Sgn(x)
 --------------------------------------------------------------------------------
 --Feature Tracking:
 -- Constructor under area reclaim will return to center of area command when sighting an enemy
@@ -1951,4 +1952,4 @@ end
 -- Area repair will cause unit auto-avoid from point to point (unit to repair); this is contrast to area reclaim.
 -- Area Reclaim/ressurect tolerance < area repair tolerance < move tolerance (unit within certain radius of target will ignore enemy/not avoid)
 -- Individual repair/reclaim command queue has same tolerance as area repair tolerance
--- 
+-- ???
