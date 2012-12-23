@@ -261,7 +261,7 @@ unitConfigs = {
     unfold = false,
   },
   [UnitDefNames.armorco.id] = {
-    rot    = 28,
+    rot    = 20,
     angle  = 10,
   },
   [UnitDefNames.armbanth.id] = {
