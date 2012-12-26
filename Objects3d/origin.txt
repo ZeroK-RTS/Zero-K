@@ -39,16 +39,22 @@ Beherith's bots - ?
  * Felon
  * Puppy
 
-Chris Mackey - CC-BY-SA except where otherwise specified
- * All shieldbots except Felon and Dirtbag
-  * Rogue - CC-BY-NC
-  * Roach - CC-BY
+maackey (Chris Mackey) - CC-BY
+ * Shieldbots:
+  * Bandit
+  * Thug
+  * Rogue
+  * Roach
+  * Aspis
+  * Vandal
  * Pyro (retextured by smoth)
  * Sumo
- * Advanced Radar - CC-BY
+ * Jack
  * Blastwing
- * Aegis - CC-BY-NC-SA
- * Singularity Reactor - CC-BY-NC
+ * Advanced Radar
+ * Aegis
+ * Singularity Reactor
+ * Defender
  
 Smoth - ?
  * Moderator
