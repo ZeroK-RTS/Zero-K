@@ -197,7 +197,7 @@ function gadget:GameFrame(n)
 					if tickTockCounter[playerID] >= 2 or justResigned then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
-							laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, units = units}
+							laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, units = units, resigned = justResigned}
 						end
 					end
 				else --if not at all AFK or lagging: then...
@@ -241,7 +241,11 @@ function gadget:GameFrame(n)
 							lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
 							spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
-						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
+						if data.resigned then
+							Spring.Echo(recepientByAllyTeam[allyTeam].name .. " resigned, giving all units to "..data.name .. " (ally #".. allyTeam ..")")
+						else
+							Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
+						end
 						GG.allowTransfer = false
 					end
 				end	-- if

@@ -17,10 +17,10 @@ unitDef = {
   buildPic                      = [[CAFUS.png]],
   buildTime                     = 4000,
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[112 128 112]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylY]],
+  --collisionVolumeOffsets        = [[0 0 0]],
+  --collisionVolumeScales         = [[112 128 112]],
+  --collisionVolumeTest           = 1,
+  --collisionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
