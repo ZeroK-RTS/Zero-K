@@ -25,7 +25,8 @@ Engines of War by bobthedinosaur - Public Domain?
  * Support Commander
  * Dante
  
-BA Remake by Mr. Bob - CC-BY-NC (confirm)
+BA Remake by Mr. Bob - CC-BY-NC?
+-subsequent models (those not already in ZK) are CC-BY-NC-ND
  * Behemoth
  * Zenith
  * Jumpjet/Specialist Plant
@@ -47,7 +48,7 @@ maackey (Chris Mackey) - CC-BY
   * Roach
   * Aspis
   * Vandal
- * Pyro (retextured by smoth)
+ * Pyro (retextured by smoth -PD)
  * Sumo
  * Jack
  * Blastwing
@@ -56,7 +57,7 @@ maackey (Chris Mackey) - CC-BY
  * Singularity Reactor
  * Defender
  
-Smoth - ?
+Smoth - Public Domain
  * Moderator
  
 Mr. D - ?
@@ -70,7 +71,7 @@ Mr. D - ?
  * Battle Commander
  
 Saktoth (Oscar Evans) - ?
- * Spherebots
+ * Spherebots (texture by Lynx/Wolf in Exile -license unknown)
  * Banshee
  * Hacksaw 
  * Missile Silo
