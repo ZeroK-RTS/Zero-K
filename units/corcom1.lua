@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[corcom1]],
-  name                = [[Battle Commander]],
+  name                = [[Phalanx Commander]],
   description         = [[Heavy Combat Commander, Builds at 10 m/s]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
@@ -32,9 +32,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	description_de = [[Schwerer Kampfkommandant, Baut mit 12 M/s]],
-	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment.]],
-	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
+	description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
+	helptext       = [[The Phalanx Commander emphasizes firepower and armor, at the expense of speed and support equipment.]],
+	helptext_de    = [[Der Phalanx Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterst?zungsausr?tung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[1]],
 	statsname = [[corcom1]],
 	soundok = [[heavy_bot_move]],
@@ -74,7 +74,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
-	  [[custom:LEVLRMUZZLE]],
+      [[custom:LEVLRMUZZLE]],
       [[custom:RAIDMUZZLE]],
     },
 

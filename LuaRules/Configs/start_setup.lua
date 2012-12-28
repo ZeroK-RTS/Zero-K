@@ -1,9 +1,11 @@
 startUnits = {
-	strikecomm = 'armcom1',
-	battlecomm = 'corcom1',
-	supportcomm = 'commsupport1',
-	reconcomm = 'commrecon1',
-	basiccomm = 'commbasic'
+	armcom = 'armcom1',
+	corcom = 'corcom1',
+	commsupport = 'commsupport1',
+	commrecon = 'commrecon1',
+	benzcom = 'benzcom1',
+	cremcom = 'cremcom1',
+	commbasic = 'commbasic',
 }
 
 startUnitsAI = {

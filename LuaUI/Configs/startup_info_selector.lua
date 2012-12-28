@@ -13,58 +13,71 @@ local function ReturnNoCustomComms()
 end
 
 local optionData = {
-	strikecomm = {
+	armcom = {
 		enabled = ReturnNoCustomComms, --function() return (not Spring.GetSpectatingState()) end, -- enabled = true is not spec
 		poster = "LuaUI/Images/startup_info_selector/armcom.jpg",--will be used as option.poster
 		selector = "Strike Comm",--will be used as option.selector
-		tooltip = "Strike Commander\nUses beam laser, has a greater speed but less health.",--will be used as option.tooltip
+		tooltip = "Strike Commander\nUses beam laser, well-balanced with good speed and health.",--will be used as option.tooltip
 		button = function()
-			Spring.SendLuaRulesMsg("faction:strikecomm")
-			Spring.SendCommands({'say a:I choose: Strike Commander !'})
+			Spring.SendLuaRulesMsg("faction:armcom")
+			Spring.SendCommands({'say a:I choose: Strike Commander!'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/move_arm_m_17.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
 
-	battlecomm = {
+	corcom = {
 		enabled = ReturnNoCustomComms,	-- function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/corcom.jpg",
-		selector ="Battle Comm",
-		tooltip = "Battle Commander\nUses a riot cannon; has more health but slower speed.",
+		selector ="Phalanx Comm",
+		tooltip = "Phalanx Commander\nUses a riot cannon; high firepower with mediocre speed and health.",
 		button = function() 
-			Spring.SendLuaRulesMsg("faction:battlecomm")
-			Spring.SendCommands({'say a:I choose: Battle Commander !'})
+			Spring.SendLuaRulesMsg("faction:corcom")
+			Spring.SendCommands({'say a:I choose: Phalanx Commander!'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/attack_arm_m_13.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
 
-	reconcomm = {
+	commrecon = {
 		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/commrecon.jpg",
 		selector ="Recon Comm",
 		tooltip = "Recon Commander\nUses a slow-ray, has high mobility but with lower income and reduced health.",
 		button = function() 
-			Spring.SendLuaRulesMsg("faction:reconcomm")
-			Spring.SendCommands({'say a:I choose: Recon Commander !'})
+			Spring.SendLuaRulesMsg("faction:commrecon")
+			Spring.SendCommands({'say a:I choose: Recon Commander!'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/move_arm_m_11.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
 
-	supportcomm = {
+	commsupport = {
 		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/commsupport.jpg",
 		selector = "Support Comm",--because of the way spring handle font this text ("pp") is a shown few pixels higher than expected, nothing lethal.
-		tooltip = "Support Commander\nUses a railgun (pierces units), has increased income and build range but low health and speed. Comes with free storage.",
+		tooltip = "Support Commander\nUses a gauss rifle (pierces units), has increased income and build range but low health and speed.",
 		button = function() 
-			Spring.SendLuaRulesMsg("faction:supportcomm")
+			Spring.SendLuaRulesMsg("faction:commsupport")
 			Spring.SendCommands({'say a:I choose: Support Commander !'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
 			Close(true)
 		end 
 	},
 
+	benzcom = {
+		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
+		poster = "LuaUI/Images/startup_info_selector/benzcom.jpg",
+		selector = "Bombard Comm",
+		tooltip = "Bombard Commander\nUses an assault cannon; extended range and diminished speed with otherwise average stats.",
+		button = function() 
+			Spring.SendLuaRulesMsg("faction:benzcom")
+			Spring.SendCommands({'say a:I choose: Bombard Commander !'})
+			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
+			Close(true)
+		end 
+	},	
+	
 	communism = {
 		enabled = ReturnFalse, -- always enabled - so we hide it
 		poster = "LuaUI/Images/startup_info_selector/communism.jpg",
@@ -106,10 +119,12 @@ end
 table.sort(commDataOrdered, function(a,b) return a[1] < b[1] end)
 
 local chassisImages = {
-	armcom1 = "LuaUI/Images/startup_info_selector/chassis_strike.png",
-	corcom1 = "LuaUI/Images/startup_info_selector/chassis_battle.png",
-	commrecon1 = "LuaUI/Images/startup_info_selector/chassis_recon.png",
-	commsupport1 = "LuaUI/Images/startup_info_selector/chassis_support.png",
+	armcom1 = "LuaUI/Images/startup_info_selector/chassis_armcom.png",
+	corcom1 = "LuaUI/Images/startup_info_selector/chassis_corcom.png",
+	commrecon1 = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
+	commsupport1 = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
+	benzcom1 = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
+	cremcom1 = "LuaUI/Images/startup_info_selector/chassis_cremcom.png",
 }
 
 local colorWeapon = "\255\255\32\32"
