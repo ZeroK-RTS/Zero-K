@@ -13,7 +13,7 @@ local function ReturnNoCustomComms()
 end
 
 local optionData = {
-	armcom = {
+	{	--armcom
 		enabled = ReturnNoCustomComms, --function() return (not Spring.GetSpectatingState()) end, -- enabled = true is not spec
 		poster = "LuaUI/Images/startup_info_selector/armcom.jpg",--will be used as option.poster
 		selector = "Strike Comm",--will be used as option.selector
@@ -25,8 +25,7 @@ local optionData = {
 			Close(true)
 		end 
 	},
-
-	corcom = {
+	{	--corcom
 		enabled = ReturnNoCustomComms,	-- function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/corcom.jpg",
 		selector ="Phalanx Comm",
@@ -38,8 +37,7 @@ local optionData = {
 			Close(true)
 		end 
 	},
-
-	commrecon = {
+	{	-- commrecon
 		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/commrecon.jpg",
 		selector ="Recon Comm",
@@ -52,7 +50,7 @@ local optionData = {
 		end 
 	},
 
-	commsupport = {
+	{	-- commsupport
 		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/commsupport.jpg",
 		selector = "Support Comm",--because of the way spring handle font this text ("pp") is a shown few pixels higher than expected, nothing lethal.
@@ -65,7 +63,7 @@ local optionData = {
 		end 
 	},
 
-	benzcom = {
+	{	-- benzcom
 		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/benzcom.jpg",
 		selector = "Bombard Comm",
@@ -78,26 +76,26 @@ local optionData = {
 		end 
 	},	
 	
-	communism = {
+	{	-- communism
 		enabled = ReturnFalse, -- always enabled - so we hide it
 		poster = "LuaUI/Images/startup_info_selector/communism.jpg",
 		selector = "Communism Mode",-- set here for future modifications, even is unused at the moment
 		tooltip = "Communism Mode",
 		sound = "LuaUI/Sounds/communism/sovnat1.wav" -- only for communism -- effective sound play in LuaUI\Widgets\gui_startup_info_selector.lua
 	},
-	shuffle = {
+	{	-- shuffle
 		enabled = ReturnFalse, -- Reminder panel now dedicated to commander selection.
 		poster = "LuaUI/Images/startup_info_selector/shuffle.png",
 		selector = "Commander Shuffle",-- set here for future modifications, even if unused at the moment
 		tooltip = "Commander Shuffle",
 	},
-	planetwars = {
+	{	-- planetwars
 		enabled = ReturnFalse,
 		poster = "LuaUI/Images/startup_info_selector/planetwars.png",
 		selector = "PlanetWars",-- set here for future modifications, even if unused at the moment
 		tooltip = "PlanetWars",
 	},
-	chickens = {
+	{	-- chickens
 		enabled = ReturnFalse,-- ReturnFalse = disabled. must use same ways as DOTA
 		poster = "LuaUI/Images/startup_info_selector/chickens.png",
 		selector = "Chickens",-- set here for future modifications, even if unused at the moment

@@ -112,7 +112,7 @@ local function CreateWindow()
 	printDebug("<gui_startup_info_selector DEBUG >: create window.")
 	-- count options
 	local active = 0
-	for name,option in pairs(optionData) do
+	for index,option in pairs(optionData) do
 		if option:enabled() then
 			active = active + 1
 		end
@@ -135,7 +135,7 @@ local function CreateWindow()
 		
 		-- add posters
 		local i = 0
-		for name,option in pairs(optionData) do
+		for index,option in ipairs(optionData) do
 			if option:enabled() then
 				local image = Image:New{
 					parent = mainWindow,
