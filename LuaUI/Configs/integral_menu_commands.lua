@@ -185,9 +185,9 @@ local overrides = {
 }]]
 
 local overrides = {
-	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png'},
+	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Force Fire: Attacks a unit or position on the ground"},
 	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png'},
-	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png'},
+	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = "Attack-Move: Order the unit to take action while moving to a position"},
 	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
