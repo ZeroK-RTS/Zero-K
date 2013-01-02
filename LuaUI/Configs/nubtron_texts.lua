@@ -34,7 +34,7 @@ return {
 			intro3 = [[Practice zooming the camera in and out with your mouse's scroll wheel or <Page Down> and <Page Up>. <(Click next to continue)>]],
 			intro4 = [[Practice panning the camera by holding down the middle mouse button and dragging. <(Click next to continue)>]],
 			intro5 =  [[Place your starting position by clicking on a nice flat spot on the map.]],
-			selectComm = [[Select only your commander by clicking on it.]],
+			selectComm = [[Select only your commander by clicking on it or pressing <ctrl+c>.]],
 			showMetalMap = [[View the metal map by pressing <F4>.]],
 			hideMetalMap = [[Hide the metal map by pressing <F4>.]],
 			selectBotLab = [[Select only your Bot Lab by clicking on it (the blue circles will help you find it).]],
