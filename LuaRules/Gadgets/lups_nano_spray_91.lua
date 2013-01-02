@@ -325,7 +325,7 @@ local factionsNanoFx = {
     for unitID,nanoInfo in spairs(SYNCED.nanoEmitters[offset]) do
       local type, target, isFeature = Utils_GetUnitNanoTarget(unitID)
 
-      if (target) then
+      if (target and Lups) then
         local cmdTag = GetCmdTag(unitID)
 		
         if (nanoInfo.cmdTag == cmdTag) then
