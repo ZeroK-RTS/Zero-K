@@ -23,7 +23,7 @@ local pylonDefs = {}
 local linkdefs = {}
 local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 
-local communismOverdrive = true or odSharingModOptions == "communism"
+local communismOverdrive = odSharingModOptions == "communism"
 
 include("LuaRules/Configs/constants.lua")
 include("LuaRules/Configs/mex_overdrive.lua")
