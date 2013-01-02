@@ -28,11 +28,11 @@ local optionData = {
 	{	--corcom
 		enabled = ReturnNoCustomComms,	-- function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/corcom.jpg",
-		selector ="Phalanx Comm",
-		tooltip = "Phalanx Commander\nUses a riot cannon; high firepower with mediocre speed and health.",
+		selector ="Battle Comm",
+		tooltip = "Battle Commander\nUses a riot cannon; high firepower with mediocre speed and health.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:corcom")
-			Spring.SendCommands({'say a:I choose: Phalanx Commander!'})
+			Spring.SendCommands({'say a:I choose: Battle Commander!'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/attack_arm_m_13.wav", 0.7, 'ui')
 			Close(true)
 		end 
