@@ -242,7 +242,7 @@ function gadget:GameFrame(n)
 							spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
 						if data.resigned then
-							Spring.Echo(recepientByAllyTeam[allyTeam].name .. " resigned, giving all units to "..data.name .. " (ally #".. allyTeam ..")")
+							Spring.Echo(data.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name .. " (ally #".. allyTeam ..")")
 						else
 							Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
 						end
