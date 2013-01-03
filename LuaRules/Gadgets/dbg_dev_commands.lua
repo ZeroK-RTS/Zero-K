@@ -25,6 +25,7 @@ end
 
 -- '/luarules give'
 -- '/luarules gk'
+-- '/luarules clear'
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -63,7 +64,23 @@ local function gentleKill(cmd,line,words,player)
 	end
 end
 
+local function clear(cmd,line,words,player)
+	if spIsCheatingEnabled() then
+		local units = Spring.GetAllUnits()
+		for i=1, #units do
+			local unitID = units[i]
+			Spring.DestroyUnit(unitID, false, true)
+		end
+		local features = Spring.GetAllFeatures()
+		for i=1, #features do
+			local featureID = features[i]
+			Spring.DestroyFeature(featureID)
+		end
+	end
+end
+
 function gadget:Initialize()
 	gadgetHandler:AddChatAction("give",give,"Like give all but without all the crap.")
 	gadgetHandler:AddChatAction("gk",gentleKill,"Gently kills everything.")
+	gadgetHandler:AddChatAction("clear",clear,"Clears all units and wreckage.")
 end
