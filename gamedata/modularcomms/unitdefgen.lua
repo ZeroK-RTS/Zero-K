@@ -187,10 +187,6 @@ local function ProcessComm(name, config)
 					Spring.Log("gamedata/modularcomms/unitdefgen.lua", LOG.ERROR, "\tERROR: Upgrade "..moduleName.." not found")
 				end
 			end
-			-- give unarmed comms a peashooter
-			if (tonumber(cp.level) >= 3 and numWeapons == 1) or numWeapons == 0 then
-				ApplyWeapon(commDefs[name], "commweapon_peashooter")
-			end
 		end
 		
 		-- apply attributemods

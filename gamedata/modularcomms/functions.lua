@@ -19,17 +19,6 @@ mapWeaponToCEG = {
 	[5] = {1,2},
 }
 
-function RemoveWeapons(unitDef) 
--- because for some reason comms have a default weapon with no purpose and I don't want to screw with that
-	if unitDef.weapons then
-		for i=3,6 do
-			if unitDef.weapons[i] then
-				unitDef.weapons[i] = nil
-			end
-		end
-	end
-end
-
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	weapons[weapon].customparams = weapons[weapon].customparams or {}
 	local wcp = weapons[weapon].customparams
@@ -93,6 +82,24 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	if (not isDgun) and not dualwield then
 		unitDef.customparams.alreadyhasweapon = true
 	end
+end
+
+function RemoveWeapons(unitDef) 
+-- because for some reason comms have a default weapon with no purpose and I don't want to screw with that
+	if unitDef.weapons then
+		for i=3,6 do
+			if unitDef.weapons[i] then
+				unitDef.weapons[i] = nil
+			end
+		end
+	end
+	
+	-- give unarmed comms a peashooter or two
+	ApplyWeapon(unitDef, "commweapon_peashooter", false, 5)
+	if (tonumber(unitDef.customparams.level) or 0 >= 3) then
+		ApplyWeapon(unitDef, "commweapon_peashooter", false, 3)
+	end
+	unitDef.customparams.alreadyhasweapon = nil
 end
 
 function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
