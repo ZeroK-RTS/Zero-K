@@ -93,7 +93,9 @@ local function getUnitState(unitID,data,cQueue)
 	end
 	
 	local fightTwo = (#cQueue > 1 and cQueue[2].id == CMD_FIGHT)
-	if cQueue[1].id == CMD_ATTACK and (movestate ~= 0 or fightTwo) then -- if I attack 
+	if cQueue[1].id == CMD_FIGHT then
+		return -1, false
+	elseif cQueue[1].id == CMD_ATTACK and (movestate ~= 0 or fightTwo) then -- if I attack 
 		local target,check = cQueue[1].params[1],cQueue[1].params[2]
 		if (not check) and spValidUnitID(target) then -- if I target a unit
 			local los = spGetUnitLosState(target,data.allyTeam,false)
@@ -114,7 +116,7 @@ local function getUnitState(unitID,data,cQueue)
 		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
 			local fightThree = (#cQueue > 2 and cQueue[3].id == CMD_FIGHT)
-			if cQueue[2].id == CMD_ATTACK and (movestate ~= 0 or fightThree) then -- if the next command is attack, patrol or fight
+			if fightTwo or (cQueue[2].id == CMD_ATTACK and (movestate ~= 0 or fightThree)) then -- if the next command is attack, patrol or fight
 				local target,check = cQueue[2].params[1],cQueue[2].params[2]
 				if not check then -- if I target a unit
 					local los = spGetUnitLosState(target,data.allyTeam,false)
@@ -155,7 +157,7 @@ local function swarmEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n)
 
 	local data = unit[unitID]
 	local behaviour = unitAIBehaviour[data.udID]
-	
+
 	if enemy and los then
 	
 		local pointDis = spGetUnitSeparation (enemy,unitID,true)
@@ -446,7 +448,7 @@ local function updateUnits(n)
 					end
 					enemyUnitDef = spGetUnitDefID(enemy)
 				end
-				
+
 				if (enemy and los and unitAIBehaviour[data.udID].swarms[enemyUnitDef]) or (((#cQueue > 0 and cQueue[1].id == CMD_FIGHT) or move) and unitAIBehaviour[data.udID].alwaysJinkFight ) then
 					--Spring.Echo("unit checking swarm")
 					if not swarmEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n) then
