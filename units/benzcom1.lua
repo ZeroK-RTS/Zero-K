@@ -31,7 +31,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	--description_de = [[Schwerer Kampfkommandant, Baut mit 12 M/s]],
+	--description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
 	helptext       = [[The Bombard Commander is optimized for pummeling the enemy from a distance. Its low speed and armor leave it vulnerable in a knife fight.]],
 	--helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[1]],
