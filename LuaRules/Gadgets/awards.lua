@@ -714,11 +714,11 @@ function gadget:GameFrame(n)
 			awardAward(shareTeam, 'share', 'Shared value: '.. comma_value(maxShare))
 		end
 		
-		if terraTeam and maxTerra > 250 then
+		if terraTeam and maxTerra > 1000 then
 			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
 		end
 
-		if rezzTeam and maxRezz >= 1000 then
+		if rezzTeam and maxRezz >= 3000 then
 			awardAward(rezzTeam, 'rezz', 'Resurrected value: '.. comma_value(maxRezz))
 		end
 
@@ -840,7 +840,7 @@ local awardDescs =
 	kam		= 'Kamikaze Award',
 	comm	= 'Master and Commander',
 	mex		= 'Mineral Prospector',
-	rage	= 'Rage Master',
+	rage	= 'Rage Inducer',
 	head	= 'Head Hunter',
 	dragon	= 'Dragon Slayer',
 	heart	= 'Queen Heart Breaker',
@@ -1143,7 +1143,7 @@ function gadget:DrawScreen()
 							glColor(0,0,0,0)
 							gl.Rect(0-border, 0-border, tWidth+border, tHeight+border)
 							glColor(1,1,1,1)	
-							glTexture('LuaRules/Images/awards/trophy_'.. awardType ..'.png')
+							glTexture(':l:LuaRules/Images/awards/trophy_'.. awardType ..'.png')
 							glTexRect(0, 0, tWidth, tHeight )
 							
 							glTranslate(tWidth+margin,(fontHeight+margin),0)
