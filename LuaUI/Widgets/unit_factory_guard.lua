@@ -27,6 +27,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 -- Automatically generated local definitions
 
 local CMD_GUARD            = CMD.GUARD
@@ -41,7 +43,7 @@ local spSetUnitGroup       = Spring.SetUnitGroup
 local spGetUnitDefID	   = Spring.GetUnitDefID
 local spGetTeamUnits	   = Spring.GetTeamUnits
 
-local CMD_FACTORY_GUARD = 13921
+
 
 local factoryDefs = {
 	[UnitDefNames["factorycloak"].id] = 0,

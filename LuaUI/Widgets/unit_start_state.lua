@@ -285,6 +285,17 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_autorepairlevel_factory"
 	end
 	
+	if ud.isFactory then
+		options[defName .. "_repeat"] = {
+			name = "  Rpeat",
+			desc = "Repeat: check box to turn it on",
+			type = 'bool',
+			value = false,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_repeat"
+	end
+	
 	if ud.customParams and ud.customParams.airstrafecontrol then
 		options[defName .. "_airstrafe"] = {
 			name = "  Air Strafe",
@@ -514,6 +525,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					-- Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {0}, {"shift"})
 					orderArray[#orderArray + 1] = {CMD.AUTOREPAIRLEVEL, {0}, {"shift"}}
 				end
+			end
+			
+			if options[name .. "_repeat"] and options[name .. "_repeat"].value ~= nil then
+				-- Spring.GiveOrderToUnit(unitID, CMD.REPEAT, {options[name .. "_repeat"].value and 1 or 0}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD.REPEAT, {options[name .. "_repeat"].value and 1 or 0}, {"shift"}}
 			end
 
 			if options[name .. "_airstrafe"] and options[name .. "_airstrafe"].value ~= nil then

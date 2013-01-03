@@ -178,7 +178,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
   
   -- http://springrts.com/mantis/view.php?id=2871
-  local _,_,_,ux, uy, uz  = spGetUnitPosition(unitID, true)
+  local ux,_,uz,_, uy, _  = spGetUnitPosition(unitID, true)
   local facing = spGetUnitBuildFacing(unitID)
   if not AllowUnitCreation(unitDefID, nil, nil, ux, uy, uz, facing) then
     Spring.DestroyUnit(unitID, false, true)
@@ -189,7 +189,7 @@ function gadget:UnitCreated(unitID, unitDefID)
   local ud = UnitDefs[unitDefID]
   local name = ud.name
   if (ud.isFactory == true) and not (EXCEPTION_LIST[name]) then
-	local _,_,_,ux, uy, uz  = spGetUnitPosition(unitID, true)
+	local ux,_,uz,_, uy, _  = spGetUnitPosition(unitID, true)
 	
 	if uy > -22 then
 		local face = spGetUnitBuildFacing(unitID)
