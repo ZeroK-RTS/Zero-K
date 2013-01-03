@@ -183,8 +183,9 @@ function WG.icons.SetUnitIcon( unitID, data )
 		local ud = UnitDefs[spGetUnitDefID(unitID)]
 		if (ud == nil) then
 			unitHeights[unitID] = nil
+		else
+			unitHeights[unitID] = ud.height + iconoffset
 		end
-		unitHeights[unitID] = ud.height + iconoffset
 	end
 
 	OrderIconsOnUnit(unitID)
