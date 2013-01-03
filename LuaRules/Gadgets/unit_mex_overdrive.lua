@@ -57,7 +57,7 @@ local MEX_DIAMETER = Game.extractorRadius*2
 local function paybackFactorFunction(repayRatio)
 	-- Must map [0,1) to (0,1]
 	-- Must not have any sequences on the domain that converge to 0 in the codomain.
-	local repay =  1 - repayRatio
+	local repay =  0.8 - repayRatio*0.6
 	if repay > 0.5 then
 		return 0.5
 	else
