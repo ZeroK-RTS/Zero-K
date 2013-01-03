@@ -93,7 +93,7 @@ unitDef = {
   terraformSpeed      = 600,
   turnRate            = 1148,
   upright             = true,
-  workerTime          = 12,
+  workerTime          = 10,
 
   weapons             = {
     [1] = {
