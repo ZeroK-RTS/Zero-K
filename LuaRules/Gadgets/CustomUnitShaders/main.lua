@@ -60,7 +60,7 @@ if (gadgetHandler:IsSyncedCode()) then
   local blockFirst = {}
   function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, part)
     if (part < 0) then
-      local inbuild = not select(3,Spring.GetUnitIsStunned(unitID))
+      local inbuild = select(3,Spring.GetUnitIsStunned(unitID))
       if (not inbuild) then
         gadget:UnitReverseBuild(unitID,unitDefID,Spring.GetUnitTeam(unitID))
         if (not blockFirst[unitID]) then
