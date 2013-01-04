@@ -4,8 +4,8 @@ local commtypeTable = {
 		["1"] = {
 			{	
 				piece = "torso",
-				image = 'LuaUI/Images/friendly.png',
-				size = 10,
+				height = 10,
+				width = 10,
 				rotation = 180,
 				rotVector = {0,1,0},
 				offset = {0, 0, -13},
@@ -13,8 +13,8 @@ local commtypeTable = {
 			},
 			{	
 				piece = "torso",
-				image = 'LuaUI/Images/friendly.png',
-				size = 5,
+				height = 10,
+				width = 5,
 				rotation = 180,
 				rotVector = {0,0,0},
 				offset = {0, 0, 6},
@@ -22,8 +22,8 @@ local commtypeTable = {
 			},
 			{	
 				piece = "torso",
-				image = 'LuaUI/Images/ccc/arrows.png',
-				size = 5,
+				height = 5,
+				width = 5,
 				rotation = 90,
 				rotVector = {1,0,0},
 				offset = {10, 6.3, 0},
@@ -31,8 +31,8 @@ local commtypeTable = {
 			},
 			{	
 				piece = "torso",
-				image = 'LuaUI/Images/ccc/arrows.png',
-				size = 5,
+				height = 5,
+				width = 5,
 				rotation = 90,
 				rotVector = {1,0,0},
 				offset = {-10, 6.3, 0},

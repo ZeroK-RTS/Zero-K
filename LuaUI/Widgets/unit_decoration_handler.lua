@@ -33,11 +33,19 @@ local glScale          = gl.Scale
 
 local commtypeTable = include("Configs/decoration_handler_defs.lua")
 local textures = {} 
+local unitAlreadyAdded = {}
+
+local imagePath = 'LuaUI/Configs/Decorations/'
+local imageFormat = '.png'
 
 -------------------
 -- Unit Handling
 
-local function AddUnit(unitID, attributes, tex)
+local function AddUnitTexture(unitID, attributes, tex)
+	if (not VFS.FileExists(tex)) then
+		return
+	end
+	
 	local pieceMap = spGetUnitPieceMap(unitID)
 	if not textures[tex] then
 		textures[tex] = {units = {}, count = 0}
@@ -51,9 +59,11 @@ local function AddUnit(unitID, attributes, tex)
 	textures[tex].units[unitID].count = textures[tex].units[unitID].count + 1
 	textures[tex].units[unitID].data[textures[tex].units[unitID].count] = {
 		piece = pieceMap[attributes.piece],
-		size = attributes.size,
+		width = attributes.width,
+		height = attributes.height,
 		rotation = attributes.rotation,
 		rotVector = attributes.rotVector,
+
 		offset = attributes.offset,
 		alpha = attributes.alpha,
 	}
@@ -68,15 +78,19 @@ local function RemoveUnit(unitID, attributes, tex)
 end
 
 local function SetupPossibleCommander(unitID,  unitDefID)
-	if unitDefID then
-		ud = UnitDefs[unitDefID]
+	if unitDefID and not unitAlreadyAdded[unitID] then
+		unitAlreadyAdded[unitID] = true
+		local ud = UnitDefs[unitDefID]
 		if ud.customParams and ud.customParams.commtype and ud.customParams.level then
 			local commtype = ud.customParams.commtype
 			local level = ud.customParams.level
 			if commtypeTable[commtype] and commtypeTable[commtype][level] then
 				local points = commtypeTable[commtype][level]
 				for i = 1, #points do
-					AddUnit(unitID, points[i],  points[i].image)
+					if ud.customParams["decoration_" .. i] then
+						local image = imagePath .. ud.customParams["decoration_" .. i] .. imageFormat
+						AddUnitTexture(unitID, points[i],  image)
+					end
 				end
 			end
 		end
@@ -85,18 +99,27 @@ end
 
 local function RemovePossibleCommander(unitID,  unitDefID)
 	if unitDefID then
-		ud = UnitDefs[unitDefID]
+		unitAlreadyAdded[unitID] = nil
+		local ud = UnitDefs[unitDefID]
 		if ud.customParams and ud.customParams.commtype and ud.customParams.level then
 			local commtype = ud.customParams.commtype
 			local level = ud.customParams.level
 			if commtypeTable[commtype] and commtypeTable[commtype][level] then
 				local points = commtypeTable[commtype][level]
 				for i = 1, #points do
-					RemoveUnit(unitID, points[i],  points[i].image)
+					if ud.customParams["decoration_" .. i] then
+						local image = imagePath .. ud.customParams["decoration_" .. i] .. imageFormat
+						RemoveUnit(unitID, points[i],  image)
+					end
 				end
 			end
 		end
 	end
+end
+
+function widget:UnitEnteredLos(unitID, unitTeam)
+	local unitDefID = spGetUnitDefID(unitID)
+	SetupPossibleCommander(unitID,  unitDefID)
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
@@ -136,7 +159,7 @@ function widget:DrawWorld()
 				glTranslate(attributes.offset[1],attributes.offset[2],attributes.offset[3])
 				glRotate(attributes.rotation,attributes.rotVector[1],attributes.rotVector[2],attributes.rotVector[3])
 				glColor(1,1,1,attributes.alpha)
-				glTexRect(-attributes.size, -attributes.size, attributes.size, attributes.size)
+				glTexRect(-attributes.width, -attributes.height, attributes.width, attributes.height)
 				glPopMatrix()
 			end
 		end
