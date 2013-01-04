@@ -24,18 +24,27 @@ local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitLosState 	= Spring.GetUnitLosState
+
+--------------------------------------------------------------------------------
+-- Config
+
+-- Unseen targets will be removed after at least UNSEEN_TIMEOUT*USEEN_UPDATE_FREQUENCY frames 
+-- and at most (UNSEEN_TIMEOUT+1)*USEEN_UPDATE_FREQUENCY frames/
+local USEEN_UPDATE_FREQUENCY = 150
+local UNSEEN_TIMEOUT = 2 
+
+--------------------------------------------------------------------------------
+-- Globals
 
 local validUnits = {}
 
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if (not (ud.canFly and ud.isBomber)) and ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0  then
+	if ((not (ud.canFly and ud.isBomber)) and ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
 		validUnits[i] = true
 	end
 end
-
---------------------------------------------------------------------------------
--- Globals
 
 local unitById = {} -- unitById[unitID] = position of unitID in unit
 local unit = {count = 0, data = {}} -- data holds all unitID data
@@ -56,7 +65,7 @@ local unitSetTargetCmdDesc = {
 	action  = 'settarget',
     cursor  = 'Attack',
 	tooltip	= 'Sets target for unit, not removed by move commands',
-	hidden = false,
+	hidden = true,
 }
 
 local unitSetTargetCircleCmdDesc = {
@@ -66,7 +75,7 @@ local unitSetTargetCircleCmdDesc = {
 	action  = 'settargetcircle',
     cursor  = 'Attack',
 	tooltip	= 'Sets target for unit, not removed by move commands, circle version',
-	hidden = true,
+	hidden = false,
 }
 
 local unitCancelTargetCmdDesc = {
@@ -86,7 +95,7 @@ function GG.GetUnitTarget(unitID)
 end
 
 --------------------------------------------------------------------------------
--- Target setting
+-- Target Handling
 
 local function unitInRange(unitID, targetID, range)
     local dis = Spring.GetUnitSeparation(unitID, targetID) -- 2d range
@@ -113,6 +122,23 @@ local function setTarget(data)
         end
     end
     return true
+end
+
+local function removeUnseenTarget(data)
+	if data.targetID and not data.alwaysSeen and spValidUnitID(data.targetID) then
+		local los = spGetUnitLosState(data.targetID, data.allyTeam, false)
+		if not (los and (los.los or los.radar)) then
+			if data.unseenTargetTimer == UNSEEN_TIMEOUT then
+				return true
+			elseif not data.unseenTargetTimer then
+				data.unseenTargetTimer = 1
+			else
+				data.unseenTargetTimer = data.unseenTargetTimer + 1
+			end
+		elseif data.unseenTargetTimer then
+			data.unseenTargetTimer = nil
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -174,14 +200,15 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
-    if unitById[facID] and validUnits[unitDefID]	then
-        local data = unit.data[unitById[facID]]
+    if unitById[facID] and validUnits[unitDefID] then
+		local data = unit.data[unitById[facID]]
         addUnit(unitID, {
             id = unitID, 
             targetID = data.targetID, 
             x = data.x, y = data.y, z = data.z,
             allyTeam = spGetUnitAllyTeam(unitID), 
-            range = UnitDefs[unitDefID].maxWeaponRange
+            range = UnitDefs[unitDefID].maxWeaponRange,
+			alwaysSeen = data.alwaysSeen,
         })
     end
 end
@@ -225,11 +252,14 @@ local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
 	end
 	
 	if bestUnit then
-		 addUnit(unitID, {
+		local targetUnitDef = spGetUnitDefID(bestUnit)
+		local tud = targetUnitDef and UnitDefs[targetUnitDef]
+		addUnit(unitID, {
 			id = unitID, 
 			targetID = bestUnit, 
 			allyTeam = spGetUnitAllyTeam(unitID), 
-			range = UnitDefs[unitDefID].maxWeaponRange
+			range = UnitDefs[unitDefID].maxWeaponRange,
+			alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
 		})
 	end
 end
@@ -292,11 +322,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
                     range = UnitDefs[unitDefID].maxWeaponRange
                 })
             elseif #cmdParams == 1 then
-                addUnit(unitID, {
+                local targetUnitDef = spGetUnitDefID(cmdParams[1])
+				local tud = targetUnitDef and UnitDefs[targetUnitDef]
+				addUnit(unitID, {
                     id = unitID, 
                     targetID = cmdParams[1], 
                     allyTeam = spGetUnitAllyTeam(unitID), 
-                    range = UnitDefs[unitDefID].maxWeaponRange
+                    range = UnitDefs[unitDefID].maxWeaponRange,
+					alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
                 })
             end
         end
@@ -318,7 +351,7 @@ function gadget:GameFrame(n)
         -- 15 causes attack command to override target command
         -- 0 causes target command to take precedence
         
-        toRemove = {count = 0, data = {}}
+        local toRemove = {count = 0, data = {}}
         for i = 1, unit.count do
             if not setTarget(unit.data[i]) then
                 toRemove.count = toRemove.count + 1
@@ -330,6 +363,20 @@ function gadget:GameFrame(n)
             removeUnit(toRemove.data[i])
         end
     end
+	
+	if n%USEEN_UPDATE_FREQUENCY == 0 then
+		local toRemove = {count = 0, data = {}}
+		for i = 1, unit.count do
+			if removeUnseenTarget(unit.data[i]) then
+				toRemove.count = toRemove.count + 1
+                toRemove.data[toRemove.count] = unit.data[i].id
+			end
+		end
+		for i = 1, toRemove.count do
+            removeUnit(toRemove.data[i])
+        end
+	end
+	
 end
 
 --------------------------------------------------------------------------------

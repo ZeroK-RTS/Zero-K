@@ -13,6 +13,10 @@ end
 local CMD_UNIT_SET_TARGET = 34923
 local CMD_UNIT_CANCEL_TARGET = 34924
 
+local function isValidType(ud)
+	return ud and not (ud.isBomber or ud.isFactory)
+end
+
 function widget:CommandNotify(id, params, options)
     if id == CMD.SET_WANTED_MAX_SPEED then
         return false -- FUCK CMD.SET_WANTED_MAX_SPEED
@@ -23,8 +27,7 @@ function widget:CommandNotify(id, params, options)
             local unitID = units[i]
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local ud = UnitDefs[unitDefID]
-			local isValidType = not (ud and ud.isBomber)
-            if isValidType and Spring.ValidUnitID(unitID) then
+            if isValidType(ud) and Spring.ValidUnitID(unitID) then
                 local cmd = Spring.GetCommandQueue(unitID, 1)
                 if cmd and #cmd ~= 0 and cmd[1].id == CMD.ATTACK and #cmd[1].params == 1 and not cmd[1].options.internal then
 					Spring.GiveOrderToUnit(unitID,CMD_UNIT_SET_TARGET,cmd[1].params,{})
@@ -35,7 +38,7 @@ function widget:CommandNotify(id, params, options)
         local units = Spring.GetSelectedUnits()
         for i = 1, #units do
             local unitID = units[i]
-            if Spring.ValidUnitID(unitID) then
+            if isValidType(ud) and Spring.ValidUnitID(unitID) then
                 Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,{})
             end
         end
