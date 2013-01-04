@@ -235,18 +235,26 @@ function gadget:GameFrame(n)
 					afkTeams[team] = true --mark team as AFK
 					local units = data.units or {}
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0
+						-- Transfer Units
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
 						for j=1,#units do
 							lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
 							spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
+						GG.allowTransfer = false
+						
+						-- Transfer metal to reviever, engine handles excess going to allies if it occurs.
+						local spareMetal = select(1,Spring.GetTeamResources(team,"m"))
+						Spring.UseTeamResource(team,"m",-spareMetal)
+						Spring.AddTeamResource(recepientByAllyTeam[allyTeam].team,"m",spareMetal)
+						
+						-- Send message
 						if data.resigned then
 							Spring.Echo(data.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name .. " (ally #".. allyTeam ..")")
 						else
 							Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
 						end
-						GG.allowTransfer = false
 					end
 				end	-- if
 			end	-- if
