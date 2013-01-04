@@ -11,7 +11,7 @@ function widget:GetInfo()
 end
 
 -- Config
-local defaultSpacing = 0
+local defaultSpacing = 2
 
 -- Globals
 local lastCmdID = nil
