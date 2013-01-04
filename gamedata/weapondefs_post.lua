@@ -139,7 +139,7 @@ end
 -- default noSelfDamage
 --
  for _, weaponDef in pairs(WeaponDefs) do
-    weaponDef.noselfdamage = weaponDef.noselfdamage or true
+    weaponDef.noselfdamage = (weaponDef.noselfdamage ~= false)
  end
  
 --------------------------------------------------------------------------------
