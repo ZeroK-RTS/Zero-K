@@ -143,7 +143,6 @@ local function GetRecepient(allyTeam, laggers)
 end
 
 function gadget:GameFrame(n)
- 
 	if n%UPDATE_PERIOD == 0 then --check every UPDATE_PERIOD-th frame
 		local laggers = {}
 		local players = Spring.GetPlayerList()
@@ -245,9 +244,10 @@ function gadget:GameFrame(n)
 						GG.allowTransfer = false
 						
 						-- Transfer metal to reviever, engine handles excess going to allies if it occurs.
-						local spareMetal = select(1,Spring.GetTeamResources(team,"m"))
-						Spring.UseTeamResource(team,"m",-spareMetal)
-						Spring.AddTeamResource(recepientByAllyTeam[allyTeam].team,"m",spareMetal)
+						local spareMetal = Spring.GetTeamResources(team,"metal") or 0
+						Spring.Echo(spareMetal)
+						Spring.UseTeamResource(team,"metal",-spareMetal)
+						Spring.AddTeamResource(recepientByAllyTeam[allyTeam].team,"metal",spareMetal)
 						
 						-- Send message
 						if data.resigned then

@@ -51,7 +51,7 @@ function GG.PokeDecloakUnit(unitID, duration)
 			recloakUnits = recloakUnits + 1
 			recloakUnit[recloakUnits] = {id = unitID, frames = duration}
 			recloakUnitID[unitID] = recloakUnits
-			Spring.SetUnitCloak(unitID, false, 10000)
+			spSetUnitCloak(unitID, false, 10000)
 		end
 	end
 
@@ -77,7 +77,7 @@ function gadget:GameFrame(n)
 	while i <= recloakUnits do
 		recloakUnit[i].frames = recloakUnit[i].frames - 1
 		if recloakUnit[i].frames <= 0 then
-			Spring.SetUnitCloak(recloakUnit[i].id, false, false)
+			spSetUnitCloak(recloakUnit[i].id, false, false)
 
 			-- remove current unit and move last one to current position
 
