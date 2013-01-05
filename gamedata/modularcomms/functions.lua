@@ -22,7 +22,7 @@ mapWeaponToCEG = {
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	weapons[weapon].customparams = weapons[weapon].customparams or {}
 	local wcp = weapons[weapon].customparams
-	local slot = tonumber(wcp.slot) or 4
+	local slot = tonumber(wcp.slot) or 5
 	local isDgun = (tonumber(wcp.slot) == 3)
 	local altslot = tonumber(wcp.altslot or 3)
 	local dualwield = false
@@ -47,8 +47,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 		unitDef.candgun = true
 	end
 	
-	-- upgrade by level
-	
+	-- upgrade by level -- no longer used
 	local level = (tonumber(unitDef.customparams.level) - 1) or 0
 	local wd = unitDef.weapondefs[weapon]
 	--[[
@@ -59,15 +58,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 		wd.damage.default = wd.damage.default + (wd.customparams.damageperlevel or 0) * level
 	end
 	]]--
-	
-	-- clear other weapons
-	--[[
-	for i=4,6 do	-- subject to change
-		if unitDef.weapons[i] and i ~= slot then
-			unitDef.weapons[i] = nil
-		end
-	end
-	]]--
+
 	-- add CEGs
 	if mapWeaponToCEG[slot] and unitDef.sfxtypes and unitDef.sfxtypes.explosiongenerators then
 		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffectfire or [[custom:NONE]]
@@ -79,7 +70,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	wcp2.reloadmod = 0
 	wcp2.damagemod = 0
 	
-	if (not isDgun) and not dualwield then
+	if (not isDgun) and not (dualwield or replace) then
 		unitDef.customparams.alreadyhasweapon = true
 	end
 end
@@ -95,11 +86,11 @@ function RemoveWeapons(unitDef)
 	end
 	
 	-- give unarmed comms a peashooter or two
-	ApplyWeapon(unitDef, "commweapon_peashooter", false, 5)
-	if (tonumber(unitDef.customparams.level) or 0 >= 3) then
-		ApplyWeapon(unitDef, "commweapon_peashooter", false, 3)
+	ApplyWeapon(unitDef, "commweapon_peashooter", true, 5)
+	if ((tonumber(unitDef.customparams.level) or 0) >= 3) then
+		ApplyWeapon(unitDef, "commweapon_peashooter", true, 3)
 	end
-	unitDef.customparams.alreadyhasweapon = nil
+	--unitDef.customparams.alreadyhasweapon = nil
 end
 
 function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
@@ -108,7 +99,7 @@ function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
 	for i,v in pairs(weapons) do
  		if v.def and weaponDefs[v.def] and (weaponDefs[v.def].customparams.idstring == oldWeapon) then
 			--Spring.Echo("replacing " .. oldWeapon .. " with " .. newWeapon)
-			ApplyWeapon(unitDef, newWeapon, false, i)
+			ApplyWeapon(unitDef, newWeapon, true, i)
 			break -- one conversion, one weapon changed. Get 2 if you want 2
 		end
 	end

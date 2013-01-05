@@ -147,11 +147,12 @@ local function ProcessComm(name, config)
 			reload = 0,
 		}
 		
+		RemoveWeapons(commDefs[name])
+		
 		-- process modules
 		if config.modules then
 			local modules = CopyTable(config.modules)
 			local numWeapons = 0
-			RemoveWeapons(commDefs[name])
 			if config.prev then
 				modules = MergeModuleTables(modules, config.prev)
 			end
