@@ -246,7 +246,7 @@ function gadget:GameFrame(n)
 						-- Transfer metal to reviever, engine handles excess going to allies if it occurs.
 						local spareMetal = Spring.GetTeamResources(team,"metal") or 0
 						Spring.Echo(spareMetal)
-						Spring.UseTeamResource(team,"metal",-spareMetal)
+						Spring.UseTeamResource(team,"metal",spareMetal)
 						Spring.AddTeamResource(recepientByAllyTeam[allyTeam].team,"metal",spareMetal)
 						
 						-- Send message
