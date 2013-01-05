@@ -45,28 +45,29 @@ local function AddUnitTexture(unitID, attributes, tex)
 	if (not VFS.FileExists(tex)) then
 		return
 	end
-	
+
 	local pieceMap = spGetUnitPieceMap(unitID)
 	if not textures[tex] then
 		textures[tex] = {units = {}, count = 0}
 	end
 	if not textures[tex].units[unitID] then
 		textures[tex].count = textures[tex].count + 1
-	end
-	if not textures[tex].units[unitID] then
 		textures[tex].units[unitID] = {data = {}, count = 0}
+	end	
+		
+	for i=1,#attributes do
+		textures[tex].units[unitID].count = textures[tex].units[unitID].count + 1
+		textures[tex].units[unitID].data[textures[tex].units[unitID].count] = {
+			piece = pieceMap[attributes[i].piece],
+			width = attributes[i].width,
+			height = attributes[i].height,
+			rotation = attributes[i].rotation,
+			rotVector = attributes[i].rotVector,
+	
+			offset = attributes[i].offset,
+			alpha = attributes[i].alpha,
+		}
 	end
-	textures[tex].units[unitID].count = textures[tex].units[unitID].count + 1
-	textures[tex].units[unitID].data[textures[tex].units[unitID].count] = {
-		piece = pieceMap[attributes.piece],
-		width = attributes.width,
-		height = attributes.height,
-		rotation = attributes.rotation,
-		rotVector = attributes.rotVector,
-
-		offset = attributes.offset,
-		alpha = attributes.alpha,
-	}
 end
 
 local function RemoveUnit(unitID, attributes, tex)
@@ -86,10 +87,13 @@ local function SetupPossibleCommander(unitID,  unitDefID)
 			local level = ud.customParams.level
 			if commtypeTable[commtype] and commtypeTable[commtype][level] then
 				local points = commtypeTable[commtype][level]
-				for i = 1, #points do
-					if ud.customParams["decoration_" .. i] then
-						local image = imagePath .. ud.customParams["decoration_" .. i] .. imageFormat
-						AddUnitTexture(unitID, points[i],  image)
+				local decIconFunc, err = loadstring("return" .. (ud.customParams.decorationicons or ""))
+				local decIcons = decIconFunc() or {}
+				for pointName, data in pairs(points) do
+					local imageName = decIcons[pointName]
+					if imageName then
+						local image = imagePath .. imageName .. imageFormat
+						AddUnitTexture(unitID, data,  image)
 					end
 				end
 			end
@@ -106,10 +110,11 @@ local function RemovePossibleCommander(unitID,  unitDefID)
 			local level = ud.customParams.level
 			if commtypeTable[commtype] and commtypeTable[commtype][level] then
 				local points = commtypeTable[commtype][level]
-				for i = 1, #points do
-					if ud.customParams["decoration_" .. i] then
-						local image = imagePath .. ud.customParams["decoration_" .. i] .. imageFormat
-						RemoveUnit(unitID, points[i],  image)
+				for pointName, data in pairs(points) do
+					local imageName = (ud.customParams.decorationicons or {}).pointName
+					if imageName then
+						local image = imagePath .. imageName .. imageFormat
+						AddUnitTexture(unitID, data,  image)
 					end
 				end
 			end

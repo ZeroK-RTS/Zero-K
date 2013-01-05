@@ -690,7 +690,17 @@ decorations = {
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
 				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldViolet")	
 			end,
-	}
+	},
+	
+	icon_shoulders = {
+		func = function(unitDef, config)
+				if config.decorations and config.decorations.icon_shoulders then
+					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
+					unitDef.customparams.decorationicons.shoulders = config.decorations.icon_shoulders.image
+				end
+				Spring.Echo(unitDef.customparams.decorationicons.shoulders)
+			end,	
+	},
 }
 
 for name,data in pairs(upgrades) do

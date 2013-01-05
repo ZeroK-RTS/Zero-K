@@ -220,13 +220,18 @@ local function ProcessComm(name, config)
 		
 		-- apply decorations
 		if config.decorations then
-			for _,decName in ipairs(config.decorations) do
+			for key,dec in pairs(config.decorations) do
+				local decName = dec
+				if type(dec) == "table" then
+					decName = dec.name or key
+				end
+				
 				if decorations[decName] then
 					if decorations[decName].func then --apply upgrade function
-						decorations[decName].func(commDefs[name]) 
+						decorations[decName].func(commDefs[name], config) 
 					end
 				else
-					Spring.Log("gamedata/modularcomms/unitdefgen.lua", LOG.ERROR, "\tERROR: Decoration "..decName.." not found")
+					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "error", "\tERROR: Decoration "..decName.." not found")
 				end
 			end
 		end		

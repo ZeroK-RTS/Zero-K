@@ -41,11 +41,8 @@ unitDef = {
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
-    commtype = [[1]],
-	--decoration_1 = [[friendly]], -- example decorations
-	--decoration_2 = [[friendly]],
-	--decoration_3 = [[arrows-dot]],
-	--decoration_4 = [[arrows-dot]],
+	commtype = [[1]],
+	decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
   },
 
   energyMake             = 3.2,

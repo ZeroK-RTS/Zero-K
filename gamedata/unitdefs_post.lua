@@ -87,21 +87,42 @@ VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
 -- Convert all CustomParams to strings
 --
 
+-- FIXME: breaks with table keys
+-- but why would you be using those anyway?
+local function TableToString(tbl)
+    local str = "{"
+	for i,v in pairs(tbl) do
+	    if type(i) == "number" then
+		str = str .. "[" .. i .. "] = "
+	    else
+		str = str .. [[["]]..i..[["] = ]]
+	    end
+	    
+	    if type(v) == "table" then
+		str = str .. TableToString(v)
+	    elseif type(v) == "boolean" then
+		str = str .. tostring(v) .. ";"
+	    elseif type(v) == "string" then
+		str = str .. "[[" .. v .. "]];"
+	    else
+		str = str .. v .. ";"
+	    end
+	end
+    str = str .. "};"
+    return str
+end
+
 for name, ud in pairs(UnitDefs) do
-  if (ud.customparams) then
-    for tag,v in pairs(ud.customparams) do
-      if (type(v) == "table") then
-	    local str = "{"
-		for i=1,#v do
-			str = str .. [["]] .. v[i] .. [[", ]]
-		end
-		str = str .. "}"
-        ud.customparams[tag] = str
-      elseif (type(v) ~= "string") then
-        ud.customparams[tag] = tostring(v)
-      end
+    if (ud.customparams) then
+	for tag,v in pairs(ud.customparams) do
+	    if (type(v) == "table") then
+		local str = TableToString(v)
+		ud.customparams[tag] = str
+	    elseif (type(v) ~= "string") then
+		ud.customparams[tag] = tostring(v)
+	    end
+	end
     end
-  end
 end 
 
 --------------------------------------------------------------------------------
