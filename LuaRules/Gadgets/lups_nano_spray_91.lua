@@ -4,13 +4,13 @@
 
 function gadget:GetInfo()
   return {
-    name      = "LupsNanoSpray",
+    name      = "LupsNanoSpray91",
     desc      = "Wraps the nano spray to LUPS",
     author    = "jK",
     date      = "2008-2010",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = Game.version == '91.0'  --  loaded by default?
   }
 end
 
