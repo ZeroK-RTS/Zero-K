@@ -46,7 +46,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[hoverriot.s3o]],
-  onoffable           = true,
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
