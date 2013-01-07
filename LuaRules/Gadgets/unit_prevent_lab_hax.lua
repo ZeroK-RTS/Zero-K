@@ -236,10 +236,11 @@ function gadget:UnitCreated(unitID, unitDefID)
 		--Spring.MarkerAddLine(lab[unitID].minx,0,lab[unitID].minz,lab[unitID].minx,0,lab[unitID].maxz)
 		--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].maxx,0,lab[unitID].minz)
 		--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
-
-		lab[unitID].miny = spGetGroundHeight(ux,uz)
-		lab[unitID].maxy = lab[unitID].miny+100
-		end
+		
+		local offsetY = select(5,Spring.GetUnitCollisionVolumeData(unitID)) or 0 --find if unit's hitbox is different from unit's position
+		lab[unitID].miny = uy + offsetY -20 --set the box bottom -20 elmo below the factory
+		lab[unitID].maxy = lab[unitID].miny + 40 --set the box height +20 elmo above the factory
+	end
   end
   
 end
