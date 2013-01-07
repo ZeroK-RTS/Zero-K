@@ -428,8 +428,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			dragonsKilledList[killerTeam] = dragonsKilledList[killerTeam] + 1
 		--	echo("Team " .. killerTeam .. " killed a WD, value = ".. dragonsKilledList[killerTeam])
 		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
-			--queenKillDamageList[killerTeam] = queenKillDamageList[killerTeam] + 9*10^9 --mark the official Queen killer with a number: +9000000000
-		--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKillDamageList[killerTeam])
+			for killerFrienz, _ in pairs(queenKillDamageList) do --give +9000000000 points for all frienz that kill queen and won
+				queenKillDamageList[killerFrienz] = queenKillDamageList[killerFrienz] + 9*10^9  --the extra points is for id purpose
+			end
+			--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKillDamageList[killerTeam])
 		elseif ud.name == "roost" then
 			nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
 		--	echo("Team " .. killerTeam .. " killed a nest, value = ".. nestsKilledList[killerTeam])
@@ -748,8 +750,8 @@ function gadget:GameFrame(n)
 		if dragonsKilledTeam and maxDragonsKilled >= 3 then
 			awardAward(dragonsKilledTeam, 'dragon', maxDragonsKilled .. ' White Dragons annihilated')
 		end
-		if queenKilledTeam then
-			--maxQueenKillDamage = floor(maxQueenKillDamage - 9*10^9) --remove the queen killer signature: +9000000000 from the total damage, and remove decimal
+		if queenKilledTeam and (maxQueenKillDamage > 9*10^9) then
+			maxQueenKillDamage = floor(maxQueenKillDamage - 9*10^9) --remove the queen kill signature: +9000000000 from the total damage, and remove decimal
 			awardAward(queenKilledTeam, 'heart', 'Damage: '.. comma_value(maxQueenKillDamage))
 		end
 		if nestsKilledTeam and (maxNestsKilled >= 20) then
