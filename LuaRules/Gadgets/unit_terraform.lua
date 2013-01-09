@@ -218,7 +218,7 @@ local rampCmdDesc = {
   name    = 'Ramp',
   cursor  = 'Repair', 
   action  = 'rampground',
-  tooltip = 'Build a Ramp between 2 positions, click 2x - start and end of ramp',
+  tooltip = 'Build a Ramp between 2 positions, click 2 times: start and end of ramp',
 }
 
 local levelCmdDesc = {
@@ -265,6 +265,26 @@ local bumpyCmdDesc = {
   action  = 'bumpifyground',
   tooltip = 'Makes the ground bumpy',
 }
+
+local cmdDescsArray = {
+  rampCmdDesc,
+  levelCmdDesc,
+  raiseCmdDesc,
+  smoothCmdDesc,
+  restoreCmdDesc,
+  --bumpyCmdDesc,
+}
+
+
+if (not Game.mapDamage) then  -- map has "notDeformable = true", or "disablemapdamage = 1" modoption was set in the startscript
+  include("LuaRules/colors.h.lua")
+  local disabledText = '\n' .. RedStr .. "DISABLED" .. PinkStr .. "  (map not deformable)"
+
+  for _, cmdDesc in ipairs(cmdDescsArray) do
+    cmdDesc.disabled = true
+    cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
+  end
+end
 
 --------------------------------------------------------------------------------
 -- Terraform Calculation Functions
@@ -3352,12 +3372,9 @@ function gadget:UnitCreated(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
 	if ud.builder and not ud.isFactory and not exceptionArray[unitDefID] then
-		spInsertUnitCmdDesc(unitID, rampCmdDesc)
-		spInsertUnitCmdDesc(unitID, levelCmdDesc)
-		spInsertUnitCmdDesc(unitID, raiseCmdDesc)
-		spInsertUnitCmdDesc(unitID, smoothCmdDesc)
-		spInsertUnitCmdDesc(unitID, restoreCmdDesc)
-		--spInsertUnitCmdDesc(unitID, bumpyCmdDesc)
+		for _, cmdDesc in ipairs(cmdDescsArray) do
+			spInsertUnitCmdDesc(unitID, cmdDesc)
+		end
 		
 		local aTeam = spGetUnitAllyTeam(unitID)
 		
