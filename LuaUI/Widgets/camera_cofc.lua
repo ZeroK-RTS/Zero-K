@@ -21,6 +21,7 @@ include("keysym.h.lua")
 
 local init = true
 local trackmode = false --before options
+local thirdperson_trackunit = false 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -62,8 +63,11 @@ options_order = {
 	'freemode',
 	
 	'trackmode',
+	'persistenttrackmode',
 	'thirdpersontrack',
 	'resetcam',
+	
+	'enableCycleView',
 
 }
 
@@ -262,14 +266,25 @@ options = {
         hotkey = {key='t', mod='alt+'},
 		OnChange = function(self) trackmode = true; end,
 	},
+	
+	persistenttrackmode = {
+		name = "Persistent trackmode state",
+		desc = "Trackmode will not cancel unless user press midclick",
+		type = 'bool',
+		value = false,
+	},
     
     thirdpersontrack = {
 		name = "Enter 3rd Person Trackmode",
 		desc = "Track the selected unit (midclick to cancel)",
 		type = 'button',
 		OnChange = function(self)
-            Spring.SendCommands('viewfps')
-            Spring.SendCommands('track')
+			local selUnits = Spring.GetSelectedUnits()
+			if selUnits and selUnits[1] then --check for unit first before changing into FPS mode
+				Spring.SendCommands('viewfps')
+				Spring.SendCommands('track')
+				thirdperson_trackunit = selUnits[1]
+			end
         end,
 	},
     
@@ -286,6 +301,19 @@ options = {
 		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
 		type = 'bool',
 		value = false,
+	},
+	
+	enableCycleView = {
+		name = "Group recall cycle within group",
+		type = 'bool',
+		value = false,
+		path='Settings/Camera',
+		desc = "Cycle camera focus among group units when same number is pressed more than once. Note: This option will automatically enable \'Receive Indicator\' widget (for its cluster detection feature).",
+		OnChange = function(self) 
+			if self.value==true then
+				Spring.SendCommands("luaui enablewidget Receive Units Indicator")
+			end
+		end,
 	},
 	
 }
@@ -729,7 +757,7 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
 		end
 		
         -- [[
-        if trackmode then
+        if trackmode then --always rotate world instead of camera in trackmode
             lock = true
             ls_have = false
             SetLockSpot2(cs)
@@ -869,11 +897,13 @@ function widget:Update(dt)
 	end
 	
 	trackcycle = trackcycle %(4) + 1
-	if trackcycle == 1 and trackmode then
+	if trackcycle == 1 and trackmode and (not rotate) then --update trackmode during normal/non-rotating state (doing both will cause a zoomed-out bug)
 		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
 			local x,y,z = spGetUnitPosition( selUnits[1] )
 			spSetCameraTarget(x,y,z, 0.2)
+		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
+			trackmode=false --exit trackmode
 		end
 	end
 	
@@ -1040,11 +1070,16 @@ function widget:MousePress(x, y, button)
 	if (button ~= 2) then
 		return false
 	end
-	Spring.SendCommands('trackoff')
-    spSendCommands('viewfree')
-	trackmode = false
 	
 	local a,c,m,s = spGetModKeyState()
+	
+	Spring.SendCommands('trackoff')
+    spSendCommands('viewfree')
+	if not (options.persistenttrackmode.value and (c or a)) then --only check for Ctrl or Alt if using persistent trackmode, else: always execute.
+		trackmode = false
+	end
+	thirdperson_trackunit = false
+	
 	
 	-- Reset --
 	if a and c and s then
@@ -1297,4 +1332,118 @@ function widget:TextCommand(command)
 	return false
 end   
 
+function widget:UnitDestroyed(unitID)
+	if thirdperson_trackunit and thirdperson_trackunit == unitID then --return user to normal view if tracked unit is destroyed
+		spSendCommands('trackoff')
+		spSendCommands('viewfree')
+		thirdperson_trackunit = false
+	end
+end
+
 --------------------------------------------------------------------------------
+--Group Recall Fix--- (by msafwan, 9 Jan 2013)
+--Remake Spring's group recall to trigger ZK's custom Spring.SetCameraTarget (which work for freestyle camera mode).
+--------------------------------------------------------------------------------
+local spGetTimer = Spring.GetTimer 
+local spDiffTimers = Spring.DiffTimers
+local spGetUnitGroup = Spring.GetUnitGroup
+local spGetGroupList  = Spring.GetGroupList 
+
+
+include("keysym.h.lua")
+local previousGroup =99
+local currentIteration = 1
+local previousKey = 99
+local previousTime = spGetTimer()
+
+function widget:KeyPress(key, modifier, isRepeat)
+	if ( not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
+		local gr
+		if (key == KEYSYMS.N_0) then gr = 0 
+		elseif (key == KEYSYMS.N_1) then gr = 1
+		elseif (key == KEYSYMS.N_2) then gr = 2 
+		elseif (key == KEYSYMS.N_3) then gr = 3
+		elseif (key == KEYSYMS.N_4) then gr = 4
+		elseif (key == KEYSYMS.N_5) then gr = 5
+		elseif (key == KEYSYMS.N_6) then gr = 6
+		elseif (key == KEYSYMS.N_7) then gr = 7
+		elseif (key == KEYSYMS.N_8) then gr = 8
+		elseif (key == KEYSYMS.N_9) then gr = 9
+		end
+		if (gr ~= nil) then
+			local selectedUnit = spGetSelectedUnits()
+			local groupCount = spGetGroupList()
+			if groupCount[gr] ~= #selectedUnit then
+				return false
+			end
+			for i=1,#selectedUnit do
+				local unitGroup = spGetUnitGroup(selectedUnit[i])
+				if unitGroup~=gr then
+					return false
+				end
+			end
+			if previousKey == key and (spDiffTimers(spGetTimer(),previousTime) > 2) then
+				currentIteration = 0 --reset cycle if delay between 2 similar tap took too long.
+			end
+			previousKey = key
+			previousTime = spGetTimer()
+			
+			if options.enableCycleView.value and WG.recvIndicator then 
+				local slctUnitUnordered = {}
+				for i=1 , #selectedUnit do
+					local unitID = selectedUnit[i]
+					local x,y,z = spGetUnitPosition(unitID)
+					slctUnitUnordered[unitID] = {x,y,z}
+				end
+				selectedUnit = nil
+				local cluster, lonely = WG.recvIndicator.OPTICS_cluster(slctUnitUnordered, 600,2, Spring.GetMyTeamID(),300) --//find clusters with atleast 2 unit per cluster and with at least within 300-elmo from each other with 600-elmo detection range
+				if previousGroup == gr then
+					currentIteration = currentIteration +1
+					if currentIteration > (#cluster + #lonely) then
+						currentIteration = 1
+					end
+				else
+					currentIteration = 1
+				end
+				if currentIteration <= #cluster then
+					local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
+					for unitIndex=1, #cluster[currentIteration] do
+						local unitID = cluster[currentIteration][unitIndex]
+						local x,y,z= slctUnitUnordered[unitID][1],slctUnitUnordered[unitID][2],slctUnitUnordered[unitID][3] --// get stored unit position
+						sumX= sumX+x
+						sumY = sumY+y
+						sumZ = sumZ+z
+						unitCount=unitCount+1
+					end
+					meanX = sumX/unitCount --//calculate center of cluster
+					meanY = sumY/unitCount
+					meanZ = sumZ/unitCount
+					Spring.SetCameraTarget(meanX, meanY, meanZ,0.5)
+				else
+					local unitID = lonely[currentIteration-#cluster]
+					local x,y,z= slctUnitUnordered[unitID][1],slctUnitUnordered[unitID][2],slctUnitUnordered[unitID][3] --// get stored unit position
+					Spring.SetCameraTarget(x,y,z,0.5)
+				end
+				cluster=nil
+				slctUnitUnordered = nil
+			else --conventional method:
+				local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
+				for i=1, #selectedUnit do
+					local unitID = selectedUnit[i]
+					local x,y,z= spGetUnitPosition(unitID)
+					sumX= sumX+x
+					sumY = sumY+y
+					sumZ = sumZ+z
+					unitCount=unitCount+1
+				end
+				meanX = sumX/unitCount --//calculate center
+				meanY = sumY/unitCount
+				meanZ = sumZ/unitCount
+				Spring.SetCameraTarget(meanX, meanY, meanZ,0.5) --is overriden by Spring.SetCameraTarget() at cache.lua.
+			end
+			previousGroup= gr
+			return true
+		end
+	end
+end
+
