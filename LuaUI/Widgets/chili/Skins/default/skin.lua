@@ -305,7 +305,7 @@ function DrawItemBkGnd(obj,x,y,w,h,state)
   end
   glRect(x,y,x+w,y+h)
 
-  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, x,y,w,h, 1, obj.borderColor1, obj.borderColor2)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, x,y,w,h, 1, obj.borderColor, obj.borderColor2)
 end
 
 
@@ -364,7 +364,7 @@ function DrawCheckbox(obj)
   glColor(obj.backgroundColor)
   glRect(rect[1]+1,rect[2]+1,rect[1]+1+rect[3]-2,rect[2]+1+rect[4]-2)
 
-  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, rect[1],rect[2],rect[3],rect[4], 1, obj.borderColor1, obj.borderColor2)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, rect[1],rect[2],rect[3],rect[4], 1, obj.borderColor, obj.borderColor2)
 
   if (obj.state.checked) then
     glBeginEnd(GL_TRIANGLE_STRIP,_DrawCheck,rect)
@@ -404,7 +404,7 @@ function DrawColorbars(obj)
   glColor(color)
   glRect(barswidth + 2,obj.height,obj.width - 2,0)
 
-  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, barswidth + 2,0,obj.width - barswidth - 4,obj.height, 1, obj.borderColor1,obj.borderColor2)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, barswidth + 2,0,obj.width - barswidth - 4,obj.height, 1, obj.borderColor,obj.borderColor2)
 
   glPopMatrix()
 end
