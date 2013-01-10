@@ -706,6 +706,9 @@ end
 
 
 function Object:ScreenToClient(x,y)
+  if (not self.parent) then
+    return self:ParentToClient(x,y)
+  end
   return self:ParentToClient((self.parent):ScreenToClient(x,y))
 end
 
