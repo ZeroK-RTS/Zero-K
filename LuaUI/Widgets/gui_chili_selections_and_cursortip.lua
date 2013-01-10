@@ -1378,7 +1378,8 @@ local function BuildTooltip2(ttname, ttdata, sel)
 				autosize  = true,
 				--tweakDraggable = true,
 				backgroundColor = color.tooltip_bg, 
-				children = { stack_leftbar_temp, stack_main_temp, }
+				children = { stack_leftbar_temp, stack_main_temp, },
+				savespace = true
 			}
 		end
 		if sel then
@@ -2166,6 +2167,7 @@ function widget:Initialize()
 		children = { stack_leftbar, stack_main, },
 		minHeight = 32,
 		minWidth = 32,
+		savespace = true,
 	}
 	--FontChanged()
 	spSendCommands({"tooltip 0"})

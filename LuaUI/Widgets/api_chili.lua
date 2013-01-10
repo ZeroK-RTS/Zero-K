@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Framework",
-    desc      = "Hot GUI Framework (DO NOT DISABLE)",
+    desc      = "Hot GUI Framework",
     author    = "jK & quantum",
     date      = "WIP",
     license   = "GPLv2",

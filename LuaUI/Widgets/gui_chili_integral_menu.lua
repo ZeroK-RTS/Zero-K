@@ -907,9 +907,7 @@ end
 local function MakeMenuTab(i, alpha)
 	local button = Button:New{
 		parent = menuTabRow;
-		x = ((16.5*i)-16.5).."%",
 		y = 0,
-		width = "16%",
 		height = "100%",
 --		font = {
 --			shadow = true
@@ -1288,9 +1286,10 @@ function widget:Initialize()
 	menuTabRow = StackPanel:New{
 		parent = window,
 		resizeItems = true;
+		columns = 6;
 		orientation   = "horizontal";
 		height = "15%";
-		width = "100%";
+		width = "99%";
 		x = '1%';
 		y = 0;
 		padding = {0, 0, 0, 0},
@@ -1306,6 +1305,7 @@ function widget:Initialize()
 		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "vertical";
+		rows = 3;
 		height = "98%";
 		width = COMMAND_SECTION_WIDTH.."%";
 		x = "1.5%";
@@ -1334,6 +1334,7 @@ function widget:Initialize()
 		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "horizontal";
+		columns = 3;
 		height = "96%";
 		width = (STATE_SECTION_WIDTH).."%";
 		--x = tostring(100-STATE_SECTION_WIDTH).."%";

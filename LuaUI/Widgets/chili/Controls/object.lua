@@ -140,17 +140,8 @@ function Object:Dispose()
     if (UnlinkSafe(self.parent)) then
       self.parent:RemoveChild(self)
     end
-    self.parent = nil
-
-    local children = self.children
-    local cn = #children
-    for i=cn,1,-1 do
-      local child = children[i]
-      --if (child.parent == self) then
-        child:SetParent(nil)
-      --end
-    end
-    self.children = {}
+    self:SetParent(nil)
+    self:ClearChildren()
   end
 end
 
@@ -211,9 +202,7 @@ function Object:AddChild(obj, dontUpdate)
   local objDirect = UnlinkSafe(obj)
 
   if (self.children[objDirect]) then
-    --if (self.debug) then
-      Spring.Echo("Chili: tried to add the same child multiple times (".. (obj.name or "") ..")")
-    --end
+    Spring.Echo(("Chili: tried to add multiple times \"%s\" to \"%s\"!"):format(obj.name, self.name))
     return
   end
 
@@ -226,7 +215,7 @@ function Object:AddChild(obj, dontUpdate)
     self.childrenByName[obj.name] = objDirect
   end
 
-  if Unlink(obj.parent) then
+  if UnlinkSafe(obj.parent) then
     obj.parent:RemoveChild(obj)
   end
   obj:SetParent(self)
@@ -234,7 +223,7 @@ function Object:AddChild(obj, dontUpdate)
   local children = self.children
   local i = #children+1
   children[i] = objDirect
-  children[obj] = i --FIXME (unused/unuseful?)
+  children[obj] = i --FIXME
   children[objDirect] = i
   self:Invalidate()
 end
@@ -245,11 +234,23 @@ function Object:RemoveChild(child)
     child:SetParent(nil)
   end
 
+  local childDirect = UnlinkSafe(child)
+
+  if (not self.children[childDirect]) then
+    --Spring.Echo(("Chili: tried remove none child \"%s\" from \"%s\"!"):format(child.name, self.name))
+    --Spring.Echo(DebugHandler.Stacktrace())
+    return false
+  end
+
   if (child.name) then
     self.childrenByName[child.name] = nil
   end
 
-  local childDirect = UnlinkSafe(child)
+  for i,v in pairs(self.children) do
+    if CompareLinks(childDirect,i) then
+      self.children[i] = nil
+    end
+  end
 
   local children = self.children
   local cn = #children
@@ -276,11 +277,6 @@ end
 
 
 function Object:ClearChildren()
-  --self:CallChildrenInverse("Dispose")
-
-  --FIXME instead of disposing perhaps just unlink from parent?
-  --FIXME clear hidden children too!
-
   --// make it faster
   local old = self.preserveChildrenOrder
   self.preserveChildrenOrder = false

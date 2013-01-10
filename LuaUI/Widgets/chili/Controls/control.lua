@@ -61,6 +61,16 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glCreateList    = gl.CreateList
+local glCallList      = gl.CallList
+local glDeleteList    = gl.DeleteList
+local glGetViewSizes  = gl.GetViewSizes
+local glPushMatrix    = gl.PushMatrix
+local glTranslate     = gl.Translate
+local glPopMatrix     = gl.PopMatrix
+
+--//=============================================================================
+
 local function FontBackwardCompa(obj)
   obj.font.outline = obj.font.outline or obj.fontOutline
   obj.font.color = obj.font.color or obj.captionColor
@@ -87,6 +97,7 @@ function Control:New(obj)
   local minimumSize = obj.minimumSize or {}
   obj.minWidth = obj.minWidth or minimumSize[1]
   obj.minHeight = obj.minHeight or minimumSize[2]
+
   --// load the skin for this control
   obj.classname = self.classname
   theme.LoadThemeDefaults(obj)
@@ -129,15 +140,15 @@ end
 
 function Control:Dispose()
   if (self._all_dlist) then
-    gl.DeleteList(self._all_dlist)
+    glDeleteList(self._all_dlist)
     self._all_dlist = nil
   end
   if (self._children_dlist) then
-    gl.DeleteList(self._children_dlist)
+    glDeleteList(self._children_dlist)
     self._children_dlist = nil
   end
   if (self._own_dlist) then
-    gl.DeleteList(self._own_dlist)
+    glDeleteList(self._own_dlist)
     self._own_dlist = nil
   end
 
@@ -149,9 +160,7 @@ end
 
 function Control:SetParent(obj)
   inherited.SetParent(self,obj)
-  if (self:RequestRealign()) then
-    return
-  end
+  self:RequestRealign()
 end
 
 function Control:AddChild(obj, dontUpdate)
@@ -431,9 +440,11 @@ if (self.debug) then
   Spring.Echo(self.name, neededWidth, neededHeight, self._savespace)
 end
 
-    local _,_, maxRight,maxBottom = self:GetChildrenCurrentExtents() --cap window size to children's maximum extent (save space)
-    neededWidth = math.min( maxRight,neededWidth)
-    neededHeight = math.min(maxBottom,neededHeight )
+	if self.savespace then	-- FIXME: there needs to be some connection between savespace and _savespace!
+    	local _,_, maxRight,maxBottom = self:GetChildrenCurrentExtents() --cap window size to children's maximum extent (save space)
+    	neededWidth = math.min( maxRight,neededWidth)
+    	neededHeight = math.min(maxBottom,neededHeight )
+	end
 
     self:Resize(neededWidth, neededHeight, true, true)
     self:RealignChildren()
@@ -829,11 +840,11 @@ function Control:_UpdateOwnDList()
 
   if (self._needRedraw) then
     if (self._own_dlist) then
-      gl.DeleteList(self._own_dlist)
+      glDeleteList(self._own_dlist)
       self._own_dlist = nil
     end
 
-    self._own_dlist = gl.CreateList(self.DrawControl, self)
+    self._own_dlist = glCreateList(self.DrawControl, self)
 
     self._needRedraw = nil
   end
@@ -842,10 +853,10 @@ end
 --[[
 function Control:_UpdateChildrenDList()
   if (self._children_dlist) then
-    gl.DeleteList(self._children_dlist)
+    glDeleteList(self._children_dlist)
     self._children_dlist = nil
   end
-  self._children_dlist = gl.CreateList(self.CallChildrenInverse, self, 'DrawForList')
+  self._children_dlist = glCreateList(self.CallChildrenInverse, self, 'DrawForList')
 end
 --]]
 
@@ -960,10 +971,6 @@ end
 
 
 function Control:DrawControl()
-  if self.snapToGrid then
-    self.x = math.floor(self.x) + 0.5
-    self.y = math.floor(self.y) + 0.5
-  end
   self:DrawBackground()
   self:DrawBorder()
 end
@@ -971,7 +978,7 @@ end
 
 function Control:DrawForList()
   if (self._own_dlist) then
-    gl.CallList(self._own_dlist);
+    glCallList(self._own_dlist);
   else
     self:DrawControl();
   end
@@ -997,7 +1004,7 @@ function Control:Draw()
   end
 
   if (self._own_dlist) then
-    gl.CallList(self._own_dlist);
+    glCallList(self._own_dlist);
   else
     self:DrawControl();
   end

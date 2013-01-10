@@ -23,8 +23,12 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glGetViewSizes = gl.GetViewSizes
+
+--//=============================================================================
+
 function Screen:New(obj)
-  local vsx,vsy = gl.GetViewSizes()
+  local vsx,vsy = glGetViewSizes()
   if ((obj.width or -1) <= 0) then
     obj.width = vsx
   end
@@ -106,8 +110,8 @@ end
 function Screen:Update(...)
 	--//FIXME create a passive MouseMove event and use it instead?
 	self:RequestUpdate()
-	local hoveredControl = Unlink(self.hoveredControl)
-	local activeControl = Unlink(self.activeControl)
+	local hoveredControl = UnlinkSafe(self.hoveredControl)
+	local activeControl = UnlinkSafe(self.activeControl)
 	if hoveredControl and (not activeControl) then
 		local x, y = Spring.GetMouseState()
 		y = select(2,gl.GetViewSizes()) - y
@@ -118,12 +122,12 @@ end
 
 
 function Screen:IsAbove(x,y,...)
-  local activeControl = Unlink(self.activeControl)
+  local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     return true
   end
 
-  y = select(2,gl.GetViewSizes()) - y
+  y = select(2,glGetViewSizes()) - y
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
   --// tooltip
@@ -156,7 +160,7 @@ end
 
 
 function Screen:MouseDown(x,y,...)
-  y = select(2,gl.GetViewSizes()) - y
+  y = select(2,glGetViewSizes()) - y
   local activeControl = inherited.MouseDown(self,x,y,...)
   self.activeControl = MakeWeakLink(activeControl)
   if self.focusedControl then
@@ -173,14 +177,14 @@ end
 
 
 function Screen:MouseUp(x,y,...)
-  y = select(2,gl.GetViewSizes()) - y
-  local activeControl = Unlink(self.activeControl)
+  y = select(2,glGetViewSizes()) - y
+  local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
     local now = Spring.GetTimer()
     local obj
 
-    local hoveredControl = Unlink(self.hoveredControl)
+    local hoveredControl = UnlinkSafe(self.hoveredControl)
     if (hoveredControl == activeControl) then
       --//FIXME send this to controls too, when they didn't `return self` in MouseDown!
       if (math.abs(x - self._lastClickedX)<3) and
@@ -207,8 +211,8 @@ end
 
 
 function Screen:MouseMove(x,y,dx,dy,...)
-  y = select(2,gl.GetViewSizes()) - y
-  local activeControl = Unlink(self.activeControl)
+  y = select(2,glGetViewSizes()) - y
+  local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
     local obj = activeControl:MouseMove(cx,cy,dx,-dy,...)
@@ -227,8 +231,8 @@ end
 
 
 function Screen:MouseWheel(x,y,...)
-  y = select(2,gl.GetViewSizes()) - y
-  local activeControl = Unlink(self.activeControl)
+  y = select(2,glGetViewSizes()) - y
+  local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
     local obj = activeControl:MouseWheel(cx,cy,...)

@@ -300,9 +300,7 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	end
 	array[i].button = Button:New{
 		parent = stack_main;
-		x = (pos)*(100/options.maxbuttons.value).."%",
 		y = 0,
-		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
 		caption = '',
 		OnMouseDown = {	function (self, x, y, mouse) 
@@ -866,9 +864,10 @@ function widget:Initialize()
 		padding = {0,0,0,0},
 		--itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
+		columns = options.maxbuttons.value,
 		width= '100%',
 		height = '100%',
-		resizeItems = true,
+		resizeItems = false,
 		orientation = 'horizontal',
 		--autoArrangeH = true,
 		centerItems = false,
@@ -941,9 +940,8 @@ function widget:Initialize()
 	
 	conButton.button = Button:New{
 		parent = stack_main;
-		x = 0,
 		caption = '',
-		width = (100/options.maxbuttons.value).."%",
+		height = "100%",
 		OnMouseDown = {	function (self, x, y, mouse) 
 				if mouse == 1 then
 					-- FIXME: commanders will still be selected even if not monitored! (category detection donut work)
@@ -980,9 +978,7 @@ function widget:Initialize()
 	}
 	conButton.image = Image:New {
 		parent = conButton.button,
-		width="91%";
 		height="91%";
-		x="6%";
 		y="6%";
 		file = buildIcon,	--'#'..idleBuilderDefID,
 		--file2 = "bitmaps/icons/frame_cons.png",

@@ -32,14 +32,28 @@ function TreeViewNode:New(obj)
     obj.padding = {0,0,0,0}
   end
 
+  assert(obj.treeview)
+  obj.treeview = MakeWeakLink(obj.treeview)
   obj = inherited.New(self,obj)
   return obj
 end
 
 
+function TreeViewNode:SetParent(obj)
+  obj = UnlinkSafe(obj)
+  local typ = type(obj)
+
+  if (typ ~= "table") then
+    self.treeview = nil --FIXME code below in this file doesn't check for nil!
+  end
+
+  inherited.SetParent(self, obj)
+end
+
+
 function TreeViewNode:AddChild(obj, isNode)
   if (isNode~=false) then
-    self.nodes[#self.nodes+1] = obj
+    self.nodes[#self.nodes+1] = MakeWeakLink(obj)
   end
   if self.parent and self.parent.RequestRealign then self.parent:RequestRealign() end
   return inherited.AddChild(self,obj)
@@ -100,7 +114,7 @@ end
 
 
 function TreeViewNode:Select()
-  if (self.root) then
+  if (self.root)or(not self.treeview) then
     return
   end
 
@@ -112,7 +126,7 @@ end
 
 
 function TreeViewNode:Toggle()
-  if (self.root) then
+  if (self.root)or(not self.treeview) then
     return
   end
 
@@ -125,7 +139,7 @@ end
 
 
 function TreeViewNode:Expand()
-  if (self.root) then
+  if (self.root)or(not self.treeview) then
     return
   end
 
@@ -145,7 +159,7 @@ end
 
 
 function TreeViewNode:Collapse()
-  if (self.root) then
+  if (self.root)or(not self.treeview) then
     return
   end
 
@@ -310,12 +324,16 @@ end
 --//=============================================================================
 
 function TreeViewNode:DrawNode()
-  self.treeview.DrawNode(self)
+	if (self.treeview) then
+		self.treeview.DrawNode(self)
+	end
 end
 
 
 function TreeViewNode:DrawNodeTree()
-  self.treeview.DrawNodeTree(self)
+	if (self.treeview) then
+		self.treeview.DrawNodeTree(self)
+	end
 end
 
 

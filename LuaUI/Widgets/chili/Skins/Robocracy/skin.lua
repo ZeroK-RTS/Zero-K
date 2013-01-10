@@ -130,6 +130,8 @@ skin.scrollpanel = {
 
   KnobColorSelected = {1,0.7,0.1,0.8},
 
+  padding = {5, 5, 5, 0},
+
   scrollbarSize = 11,
   DrawControl = DrawScrollPanel,
   DrawControlPostChildren = DrawScrollPanelBorder,

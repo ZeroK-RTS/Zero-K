@@ -89,15 +89,12 @@ function MakeHardLink(obj,gc)
 end
 
 
-function Unlink(link)
-  --// this doesn't do a type check!
-  --// you have to be 100% sure it is a link!
-  return link and link()
-end
-
-
 function UnlinkSafe(link)
-  return ((type(link) == "userdata") and link()) or link
+	local link = link
+	while (type(link) == "userdata") do
+		link = link()
+	end
+	return link
 end
 
 
