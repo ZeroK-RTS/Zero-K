@@ -20,12 +20,6 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-local glPushMatrix	= gl.PushMatrix
-local glScale		= gl.Scale
-local glPopMatrix	= gl.PopMatrix
-
---//=============================================================================
-
 function Font:New(obj)
   obj = inherited.New(self,obj)
 
@@ -55,6 +49,32 @@ end
 
 --//=============================================================================
 
+local function NotEqual(v1, v2)
+	local t1 = type(v1)
+	local t2 = type(v2)
+
+	if (t1 ~= t2) then
+		return true
+	end
+
+	local isindexable = (t=="table")or(t=="metatable")or(t=="userdata")
+	if (not isindexable) then
+		return (t1 ~= t2)
+	end
+
+	for i,v in pairs(v1) do
+		if (v ~= v2[i]) then
+			return true
+		end
+	end
+	for i,v in pairs(v2) do
+		if (v ~= v1[i]) then
+			return true
+		end
+	end
+end
+
+
 do
   --// Create some Set... methods (e.g. SetColor, SetSize, SetFont, ...)
 
@@ -77,6 +97,8 @@ do
     Font[funcname] = function(self,value,...)
       local t = type(value)
 
+      local oldValue = self[param]
+
       if (t == "table") then
         self[param] = table.shallowcopy(value)
       else
@@ -98,7 +120,7 @@ do
           p:RequestRealign() 
         end
       else
-        if (p) then
+        if (p)and NotEqual(oldValue, self[param]) then
           p:Invalidate() 
         end
       end
@@ -111,16 +133,16 @@ end
 --//=============================================================================
 
 function Font:GetLineHeight(size)
-  return (self._font and self._font.size and self._font.lineheight * (size or self.size)) or 0
+  return self._font.lineheight * (size or self.size)
 end
 
 function Font:GetAscenderHeight(size)
   local font = self._font
-  return (font and font.size and (font.lineheight + font.descender) * (size or self.size)) or 0
+  return (font.lineheight + font.descender) * (size or self.size)
 end
 
 function Font:GetTextWidth(text, size)
-  return (self._font and self._font.size and (self._font):GetTextWidth(text) * (size or self.size)) or 0 -- still has "attempt to use a deleted font" here
+  return (self._font):GetTextWidth(text) * (size or self.size)
 end
 
 function Font:GetTextHeight(text, size)
@@ -216,15 +238,15 @@ function Font:Draw(text, x, y, align, valign)
 	extra = extra .. 's'
   end
 
-  glPushMatrix()
-    glScale(1,-1,1)
+  gl.PushMatrix()
+    gl.Scale(1,-1,1)
     font:Begin()
       font:SetTextColor(self.color)
       font:SetOutlineColor(self.outlineColor)
       font:SetAutoOutlineColor(self.autoOutlineColor)
         font:Print(text, x, -y, self.size, extra)
     font:End()
-  glPopMatrix()
+  gl.PopMatrix()
 end
 
 
@@ -245,15 +267,15 @@ function Font:DrawInBox(text, x, y, w, h, align, valign)
 
   y = y + 1 --// FIXME: if this isn't done some chars as 'R' get truncated at the top
 
-  glPushMatrix()
-    glScale(1,-1,1)
+  gl.PushMatrix()
+    gl.Scale(1,-1,1)
     font:Begin()
       font:SetTextColor(self.color)
       font:SetOutlineColor(self.outlineColor)
       font:SetAutoOutlineColor(self.autoOutlineColor)
         font:Print(text, x, -y, self.size, extra)
     font:End()
-  glPopMatrix()
+  gl.PopMatrix()
 end
 
 Font.Print = Font.Draw

@@ -45,7 +45,7 @@ function TreeView:New(obj)
 
   obj = inherited.New(self,obj)
 
-  obj.root = TreeViewNode:New{treeview = obj, root = true; minHeight = obj.minItemHeight; expanded = self.defaultExpanded}
+  obj.root = TreeViewNode:New{treeview = obj, root = true; minHeight = obj.minItemHeight; expanded = obj.defaultExpanded}
   if (nodes) then
     ParseInitTable(obj.root, nodes)
   end
@@ -64,46 +64,14 @@ end
 
 --//=============================================================================
 
-function TreeView:GetNodeByCaption(caption, _node)
-  if (not _node) then
-    return self:GetNodeByCaption(caption, self.root)
-  end
-
-  for i=1,#_node.nodes do
-    local n = _node.nodes[i]
-    if (n.caption == caption) then
-      return n
-    end
-
-    local result = self:GetNodeByCaption(caption, n, _i)
-    if (result) then
-      return result
-    end
-  end
+function TreeView:GetNodeByCaption(caption)
+  return self.root:GetNodeByCaption(caption)
 end
 
 
-function TreeView:GetNodeByIndex(index, _node, _i)
-  if (not _node) then
-    local result = self:GetNodeByIndex(index, self.root, 0) --// 0, cause we don't count the root node! (-> it really starts with 1!)
-    return (not IsNumber(result)) and result
-  end
-
-  for i=1,#_node.nodes do
-    _i = _i + 1
-    if (_i == index) then
-      return _node.nodes[i]
-    end
-
-    local result = self:GetNodeByIndex(index, _node.nodes[i], _i)
-    if (IsNumber(result)) then
-      _i = result
-    else
-      return result
-    end
-  end
-
-  return _i
+function TreeView:GetNodeByIndex(index)
+  local result = self.root:GetNodeByIndex(index, 0)
+  return (not IsNumber(result)) and result
 end
 
 --//=============================================================================

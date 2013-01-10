@@ -14,6 +14,8 @@ TreeViewNode = Control:Inherit{
 
   treeview  = nil,
 
+  _nodes_hidden = {},
+
   OnSelectChange = {},
   OnCollapse     = {},
   OnExpand       = {},
@@ -39,6 +41,7 @@ function TreeViewNode:AddChild(obj, isNode)
   if (isNode~=false) then
     self.nodes[#self.nodes+1] = obj
   end
+  if self.parent and self.parent.RequestRealign then self.parent:RequestRealign() end
   return inherited.AddChild(self,obj)
 end
 
@@ -57,6 +60,26 @@ function TreeViewNode:RemoveChild(obj)
   return result
 end
 
+
+function TreeViewNode:ClearChildren()
+	local caption
+	if not(self.root) then
+		caption = self.children[1]
+		self.children[1] = self.children[#self.children]
+		self.children[#self.children] = nil
+	end
+
+	local collapsed = not self.expanded
+	self:Expand()
+	inherited.ClearChildren(self)
+	if (collapsed) then self:Collapse() end
+
+	if not(self.root) then
+		self.children[1] = caption
+	end
+end
+
+TreeViewNode.Clear = TreeViewNode.ClearChildren
 
 --//=============================================================================
 
@@ -109,6 +132,15 @@ function TreeViewNode:Expand()
   self:CallListeners(self.OnExpand)
   self.expanded = true
   self.treeview:RequestRealign()
+
+  for i=#self._nodes_hidden, 1, -1 do
+    local c = self._nodes_hidden[i]
+    self.children[#self.children + 1] = c
+  end
+
+  for i=#self._nodes_hidden, 1, -1 do
+    self._nodes_hidden[i] = nil
+  end
 end
 
 
@@ -120,6 +152,46 @@ function TreeViewNode:Collapse()
   self:CallListeners(self.OnCollapse)
   self.expanded = false
   self.treeview:RequestRealign()
+
+  for i=#self.children, 2, -1 do
+    local c = self.children[i]
+    self.children[i] = nil
+    self._nodes_hidden[#self._nodes_hidden + 1] = c
+  end
+end
+
+--//=============================================================================
+
+function TreeViewNode:GetNodeByCaption(caption)
+  for i=1,#self.nodes do
+    local n = self.nodes[i]
+    if (n.caption == caption) then
+      return n
+    end
+
+    local result = n:GetNodeByCaption(caption)
+    if (result) then
+      return result
+    end
+  end
+end
+
+function TreeViewNode:GetNodeByIndex(index, _i)
+  for i=1,#self.nodes do
+    _i = _i + 1
+    if (_i == index) then
+      return self.nodes[i]
+    end
+
+    local result = self.nodes[i]:GetNodeByIndex(index, _i)
+    if (IsNumber(result)) then
+      _i = result
+    else
+      return result
+    end
+  end
+
+  return _i
 end
 
 --//=============================================================================
@@ -128,22 +200,14 @@ function TreeViewNode:UpdateLayout()
   local clientWidth = self.clientWidth
   local children = self.children
 
-  if (not self.expanded)and(children[1])and(not self.root) then
-    local c = children[1]
-    c:_UpdateConstraints(0, 0, clientWidth)
-    c:Realign()
-    self:Resize(nil, c.height, true, true)
-
-    --//FIXME this still calls UpdateLayout -> slow
-    --//    better override CallChildrenXYZ!
-
-    if (children[2])and(children[2].x < 1e9) then
-      --// hide the subnodes in nirvana
-      for i=2,#children do
-        c = children[i]
-        c:_UpdateConstraints(1e9, 1e9)
-        c:Realign()
-      end
+  if (not self.expanded)and(not self.root) then
+    if (children[1]) then
+      local c = children[1]
+      c:_UpdateConstraints(0, 0, clientWidth)
+      c:Realign()
+      self:Resize(nil, c.height, true, true)
+    else
+      self:Resize(nil, 10, true, true)
     end
 
     return true
@@ -151,7 +215,7 @@ function TreeViewNode:UpdateLayout()
 
 
   local y = 0
-  for i=1,#children do
+  for i=1, #children do
     local c = children[i]
     c:_UpdateConstraints(0, y, clientWidth)
     c:Realign()

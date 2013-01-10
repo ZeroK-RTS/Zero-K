@@ -1,53 +1,55 @@
 local includes = {
-  --"Headers/autolocalizer.lua",
-  "Headers/util.lua",
-  "Headers/links.lua",
+  --"headers/autolocalizer.lua",
+  "headers/util.lua",
+  "headers/links.lua",
 
-  "Handlers/debughandler.lua",
-  "Handlers/taskhandler.lua",
-  "Handlers/skinhandler.lua",
-  "Handlers/themehandler.lua",
-  "Handlers/fonthandler.lua",
-  "Handlers/texturehandler.lua",
+  "handlers/debughandler.lua",
+  "handlers/taskhandler.lua",
+  "handlers/skinhandler.lua",
+  "handlers/themehandler.lua",
+  "handlers/fonthandler.lua",
+  "handlers/texturehandler.lua",
 
-  "Controls/object.lua",
-  "Controls/font.lua",
-  "Controls/control.lua",
-  "Controls/screen.lua",
-  "Controls/window.lua",
-  "Controls/label.lua",
-  "Controls/button.lua",
-  "Controls/textbox.lua",
-  "Controls/checkbox.lua",
-  "Controls/trackbar.lua",
-  "Controls/colorbars.lua",
-  "Controls/scrollpanel.lua",
-  "Controls/image.lua",
-  "Controls/textbox.lua",
-  "Controls/layoutpanel.lua",
-  "Controls/grid.lua",
-  "Controls/stackpanel.lua",
-  "Controls/imagelistview.lua",
-  "Controls/progressbar.lua",
-  "Controls/multiprogressbar.lua",
-  "Controls/scale.lua",
-  "Controls/panel.lua",
-  "Controls/treeviewnode.lua",
-  "Controls/treeview.lua",
+  "controls/object.lua",
+  "controls/font.lua",
+  "controls/control.lua",
+  "controls/screen.lua",
+  "controls/window.lua",
+  "controls/label.lua",
+  "controls/button.lua",
+  "controls/textbox.lua",
+  "controls/checkbox.lua",
+  "controls/trackbar.lua",
+  "controls/colorbars.lua",
+  "controls/scrollpanel.lua",
+  "controls/image.lua",
+  "controls/textbox.lua",
+  "controls/layoutpanel.lua",
+  "controls/grid.lua",
+  "controls/stackpanel.lua",
+  "controls/imagelistview.lua",
+  "controls/progressbar.lua",
+  "controls/multiprogressbar.lua",
+  "controls/scale.lua",
+  "controls/panel.lua",
+  "controls/treeviewnode.lua",
+  "controls/treeview.lua",
+  "controls/editbox.lua",
 }
 
 local Chili = widget
 
-Chili.CHILI_DIRNAME = LUAUI_DIRNAME.."Widgets/chili/"
+Chili.CHILI_DIRNAME = CHILI_DIRNAME or (LUAUI_DIRNAME .. "Widgets/chili/")
+Chili.SKIN_DIRNAME  =  SKIN_DIRNAME or (CHILI_DIRNAME .. "skins/")
 
 if (-1>0) then
   Chili = {}
   -- make the table strict
-  VFS.Include(Chili.CHILI_DIRNAME .. "Headers/strict.lua")(Chili, widget)
+  VFS.Include(Chili.CHILI_DIRNAME .. "headers/strict.lua")(Chili, widget)
 end
 
 for _, file in ipairs(includes) do
-  VFS.Include(Chili.CHILI_DIRNAME .. file, Chili)
+  VFS.Include(Chili.CHILI_DIRNAME .. file, Chili, VFS.RAW_FIRST)
 end
 
 

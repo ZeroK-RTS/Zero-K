@@ -36,7 +36,6 @@ LayoutPanel = Control:Inherit{
        - e.g. "component1.weight = 1, component2.weight = 2" => component2 will be 2 times larger than component1
        - if all components have same weight -> same layout as without weightedResize
        - default value is 1 (nil interpreted as 1)
-       - with manageWeights the weight is automatically set depending on number of children
   ]]
   weightedResize = false,
 
@@ -55,19 +54,6 @@ LayoutPanel = Control:Inherit{
 
 local this = LayoutPanel
 local inherited = this.inherited
-
---//=============================================================================
-
-local glPushMatrix    = gl.PushMatrix
-local glColor         = gl.Color
-local glLineWidth     = gl.LineWidth
-local glPolygonMode   = gl.PolygonMode
-local glRect          = gl.Rect
-local glTranslate     = gl.Translate
-local glPopMatrix     = gl.PopMatrix
-
-local GL_FRONT_AND_BACK = GL.FRONT_AND_BACK
-local GL_FILL           = GL.FILL
 
 --//=============================================================================
 
@@ -98,33 +84,38 @@ end
 
 function LayoutPanel:_JustCenterItemsH(startCell,endCell,freeSpace)
   local _cells = self._cells
-  local perItemHalfAlloc = (freeSpace/2) / ((endCell+1) - startCell)
+  local perItemAlloc = freeSpace / ((endCell - startCell) + 1)
+  local n=0
+
   for i=startCell,endCell do
     local cell = _cells[i]
     --if (self.orientation == "horizontal") then
-      cell[1] = cell[1] + perItemHalfAlloc
+      cell[1] = cell[1] + n * perItemAlloc
+      cell[3] = cell[3] + perItemAlloc
     --else
-    --  cell[2] = cell[2] + perItemHalfAlloc
+    --  cell[2] = cell[2] + n * perItemHalfAlloc
+    --  cell[4] = cell[4] + perItemHalfAlloc
     --end
+    n = n+1
   end
 end
 
 function LayoutPanel:_JustCenterItemsV(startCell,endCell,freeSpace)
---[[
   local _cells = self._cells
-  --local startCell = 1
-  --local endCell = #_cells
+  local perItemAlloc = freeSpace / ((endCell - startCell) + 1)
+  local n=0
 
-  local perItemHalfAlloc = (freeSpace/2) / ((endCell+1) - startCell)
   for i=startCell,endCell do
     local cell = _cells[i]
     --if (self.orientation == "horizontal") then
-      cell[2] = cell[2] + perItemHalfAlloc
+      cell[2] = cell[2] + n * perItemAlloc
+      cell[4] = cell[4] + perItemAlloc
     --else
-    --  cell[1] = cell[1] + perItemHalfAlloc
+    --  cell[1] = cell[1] + n * perItemHalfAlloc
+    --  cell[3] = cell[3] + perItemHalfAlloc
     --end
+    n = n+1
   end
---]]
 end
 
 
@@ -230,14 +221,12 @@ function LayoutPanel:_AutoArrangeAbscissa(startCell,endCell,freeSpace)
     end
 
     shortestCellSize = nextCellSize
-
   end
 end
 
 
 function LayoutPanel:_AutoArrangeOrdinate(freeSpace)
   if (not self.autoArrangeV) then
---[[
     if (self.centerItems) then
       local startCell = 1
       local endCell = 1
@@ -247,7 +236,6 @@ function LayoutPanel:_AutoArrangeOrdinate(freeSpace)
         startCell = endCell + 1
       end
     end
---]]
     return
   end
 
@@ -321,7 +309,6 @@ function LayoutPanel:_AutoArrangeOrdinate(freeSpace)
     end
 
     shortestLineSize = nextLineSize
-
   end
 end
 
@@ -369,9 +356,23 @@ function LayoutPanel:GetMaxWeight()
   return mweightx,mweighty,weightx, weighty
 end
 
---//=============================================================================
 
 function LayoutPanel:_GetMaxChildConstraints(child)
+--[[ FIXME: break button size
+  local children = self.children
+
+  if (self._cells and not self._inUpdateLayout) then
+    for i=1, #children do
+      if CompareLinks(children[i], child) then
+        local cell = self._cells[i]
+        if (cell) then
+          return unpack4(cell)
+        end
+      end
+    end
+  end
+--]]
+
   local itemPadding = self.itemPadding
   local margin      = child.margin or self.itemMargin
   local maxChildWidth  = -margin[1] - itemPadding[1] + self.clientWidth  - itemPadding[3] - margin[3]
@@ -379,7 +380,347 @@ function LayoutPanel:_GetMaxChildConstraints(child)
   return margin[1] + itemPadding[1], margin[2] + itemPadding[2], maxChildWidth, maxChildHeight
 end
 
+--//=============================================================================
 
+function LayoutPanel:GetMinimumExtents()
+--[[
+  local old = self.autosize
+  self.autosize = false
+  local minWidth, minHeight = inherited.GetMinimumExtents(self)
+  self.autosize = old
+
+  return minWidth, minHeight
+--]]
+  if (not self.autosize) then
+    local right  = self.x + self.width
+    local bottom = self.y + self.height
+
+    return right, bottom
+  else
+--FIXME!!!
+    local right  = self.x + self.width
+    local bottom = self.y + self.height
+
+    return right, bottom
+  end
+end
+
+--//=============================================================================
+--// Note: there are two different layput functions depending on resizeItems
+
+function LayoutPanel:_LayoutChildrenResizeItems()
+  local cn = self.children
+  local cn_count = #cn
+
+  local max_ix = math.floor(self.clientArea[3]/self.minItemWidth)
+  local max_iy = math.floor(self.clientArea[4]/self.minItemHeight)
+
+  if (max_ix*max_iy < cn_count)or
+     (max_ix<(self.columns or 0))or
+     (max_iy<(self.rows or 0))
+  then
+    --FIXME add autoEnlarge/autoAdjustSize?
+    --error"LayoutPanel: not enough space"
+  end
+
+  --FIXME take minWidth/height maxWidth/Height into account! (and try to reach a 1:1 pixel ratio)
+  if self.columns and self.rows then
+    self._columns = self.columns
+    self._rows    = self.rows
+  elseif (not self.columns) and self.rows then
+    self._columns = math.ceil(cn_count/self.rows)
+    self._rows    = self.rows
+  elseif (not self.rows) and self.columns then
+    self._columns = self.columns
+    self._rows    = math.ceil(cn_count/self.columns)
+  else
+    local size    = math.ceil(cn_count^0.5)
+    self._columns = size
+    self._rows    = math.ceil(cn_count/size)
+  end
+
+  local childWidth  = self.clientArea[3]/self._columns
+  local childHeight = self.clientArea[4]/self._rows
+  local childPosx = 0
+  local childPosy = 0
+
+  self._cells  = {}
+  local _cells = self._cells
+
+  local weightsx,weightsy, maxweightx, maxweighty
+  if (self.weightedResize) then
+    weightsx,weightsy, maxweightx, maxweighty = self:GetMaxWeight()
+    --// special setup for weightedResize
+    childWidth = 0
+    childHeight = 0
+  end
+
+  local dir1,dir2
+  if (self.orientation == "vertical") then
+    dir1,dir2 = self._columns,self._rows
+  else
+    dir1,dir2 = self._rows,self._columns
+  end
+
+  local n,x,y = 1
+  for i=1, dir1 do
+    for j=1, dir2 do
+      local child = cn[n]
+      if not child then break end
+      local margin = child.margin or self.itemMargin
+
+      if (self.orientation == "vertical") then
+        x,y = i,j
+      else
+        x,y = j,i
+      end
+
+      if (self.weightedResize) then
+        --// weighted Position
+        if dir1 == 1 then
+          childPosx = 0
+        else
+          childPosx = childPosx + childWidth
+        end
+        if dir2 == 1 then
+          childPosy = 0
+        else
+          childPosy = childPosy + childHeight
+        end
+        childWidth  = (self.clientArea[3]) * weightsx[x]/maxweightx
+        childHeight = (self.clientArea[4]) * weightsy[y]/maxweighty
+      else
+        --// position without weightedResize
+        childPosx = childWidth * (x-1)
+        childPosy = childHeight * (y-1)
+      end
+
+
+      local childBox = {
+        childPosx + margin[1],
+        childPosy + margin[2],
+        childWidth - margin[1] - margin[3],
+        childHeight - margin[2] - margin[4]
+      }
+      child:_UpdateConstraints(unpack4(childBox))
+      _cells[n] = childBox
+      n = n+1
+    end
+  end
+end
+
+
+function LayoutPanel:_LayoutChildren()
+  local cn = self.children
+  local cn_count = #cn
+
+  self._lines  = {1}
+  local _lines = self._lines
+  self._cells  = {}
+  local _cells = self._cells
+
+  local itemMargin  = self.itemMargin
+  local itemPadding = self.itemPadding
+
+  local cur_x,cur_y = 0,0
+  local curLine, curLineSize = 1,self.minItemHeight
+  local totalChildWidth,totalChildHeight = 0
+  local cell_left,cell_top,cell_width,cell_height = 0,0,0,0
+  local lineHeights = {}
+  local lineWidths = {}
+
+  --// Handle orientations
+  local X,Y,W,H = "x","y","width","height"
+  local LEFT,TOP,RIGHT,BOTTOM = 1,2,3,4
+  local WIDTH, HEIGHT = 3,4
+  local minItemWidth, minItemHeight = self.minItemWidth, self.minItemHeight
+  local clientAreaWidth,clientAreaHeight = self.clientArea[3],self.clientArea[4]
+
+  --// FIXME: finish me (use those vars in the loops below!)
+--[[
+  if (self.orientation ~= "horizontal") then
+    X,Y,W,H = "y","x","height","width"
+    LEFT,TOP,RIGHT,BOTTOM = 2,1,4,3
+    WIDTH, HEIGHT = 4,3
+    curLineSize = minItemWidth
+    minItemWidth, minItemHeight = minItemHeight, minItemWidth
+    clientAreaWidth,clientAreaHeight = clientAreaHeight, clientAreaWidth
+  end
+--]]
+
+--[[FIXME breaks ListImageView!
+  if (self.autosize) then
+    local maxChildWidth = minItemWidth
+    for i=1, cn_count do
+      local child = cn[i]
+
+      local childWidth = math.max(child[W], minItemWidth)
+      if (child.GetMinimumExtents) then
+        local extents = {child:GetMinimumExtents()}
+	childWidth = math.max(extents[LEFT], childWidth)
+      end
+
+      maxChildWidth = math.max(childWidth, maxChildWidth)
+    end
+    totalMaxChildWidth  = itemPadding[LEFT] +  maxChildWidth  + itemPadding[RIGHT]
+
+    if (self.orientation == "horizontal") then
+      self:Resize(nil, totalMaxChildWidth, true, true)
+      clientAreaWidth,clientAreaHeight = self.clientArea[4],self.clientArea[3]
+    else
+      self:Resize(totalMaxChildWidth, nil, true, true)
+      clientAreaWidth,clientAreaHeight = self.clientArea[3],self.clientArea[4]
+    end
+  end
+--]]
+
+  for i=1, cn_count do
+    local child = cn[i]
+    if not child then break end
+    local margin = child.margin or itemMargin
+
+    local childWidth  = math.max(child[W],minItemWidth)
+    local childHeight = math.max(child[H],minItemHeight)
+
+    totalChildWidth  = margin[LEFT] + itemPadding[LEFT] +  childWidth  + itemPadding[RIGHT] + margin[RIGHT] --// FIXME add margin just for non-border controls
+    totalChildHeight = itemPadding[TOP] + childHeight + itemPadding[BOTTOM]
+
+    if (curLine > 1) then
+      totalChildHeight = margin[TOP] + totalChildHeight
+    end
+    if (i < cn_count) then --// check for lastLine and not last control!
+      totalChildHeight = totalChildHeight + margin[BOTTOM]
+    end
+
+    cell_top    = cur_y + itemPadding[TOP]
+    if (curLine > 1) then
+      cell_top = cell_top + margin[TOP]
+    end
+    cell_left   = cur_x + margin[LEFT] + itemPadding[LEFT]
+    cell_width  = childWidth
+    cell_height = childHeight
+
+    cur_x = cur_x + totalChildWidth
+
+    if
+      (i>1)and
+      (self.columns and ((i+1)%self.columns < 1))or
+      ((not self.columns) and (cur_x > clientAreaWidth))
+    then
+      lineHeights[curLine] = curLineSize
+      lineWidths[curLine]  = cur_x - totalChildWidth
+
+      --// start a new line
+      cur_x = totalChildWidth
+      cur_y = cur_y + curLineSize
+
+      curLine = curLine+1
+      curLineSize = math.max(minItemHeight,totalChildHeight)
+      cell_top  = cur_y + margin[TOP] + itemPadding[TOP]
+      cell_left = margin[LEFT] + itemPadding[LEFT]
+      _lines[curLine] = i
+    end
+
+    _cells[i] = {cell_left,cell_top,cell_width,cell_height}
+
+    if (totalChildHeight > curLineSize) then
+      curLineSize = totalChildHeight
+    end
+  end
+
+  lineHeights[curLine] = curLineSize
+  lineWidths[curLine]  = cur_x
+
+  --// Move cur_y to the bottom of the new ClientArea/ContentArea
+  cur_y = cur_y + curLineSize
+
+  --// Share remaining free space between items
+  if (self.centerItems or self.autoArrangeH or self.autoArrangeV) then
+    for i=1,#lineWidths do
+      local startcell = _lines[i]
+      local endcell   = (_lines[i+1] or (#cn+1)) - 1
+      local freespace = clientAreaWidth - lineWidths[i]
+      self:_AutoArrangeAbscissa(startcell, endcell, freespace)
+    end
+
+    for i=1,#lineHeights do
+      local lineHeight = lineHeights[i]
+      local startcell  = _lines[i]
+      local endcell    = (_lines[i+1] or (#cn+1)) - 1
+      self:_EnlargeToLineHeight(startcell, endcell, lineHeight)
+    end
+    self:_AutoArrangeOrdinate(clientAreaHeight - cur_y)
+  end
+
+  --// Resize the LayoutPanel if needed
+  --FIXME do this in resize too!
+  if (self.autosize) then
+    --if (self.orientation == "horizontal") then
+      self:Resize(nil, cur_y, true, true)
+      --FIXME self:Resize(cur_y, nil, true, true)
+    --else
+    --  self:Resize(nil, cur_y, true, true)
+    --end
+  elseif (cur_y > clientAreaHeight) then
+    --Spring.Echo(debug.traceback())
+  end
+
+  --// Update the Children constraints
+  for i=1, cn_count do
+    local child = cn[i]
+    if not child then break end
+
+    local cell = _cells[i]
+    local cposx,cposy = cell[LEFT],cell[TOP]
+    if (self.centerItems) then
+      cposx = cposx + (cell[WIDTH] - child[W]) * 0.5
+      cposy = cposy + (cell[HEIGHT] - child[H]) * 0.5
+    end
+
+    --if (self.orientation == "horizontal") then
+      --FIXME use child:Resize or something like that 
+      child:_UpdateConstraints(cposx,cposy)
+    --else
+    --  child:_UpdateConstraints(cposy,cposx)
+    --end
+  end
+end
+
+
+--//=============================================================================
+
+function LayoutPanel:UpdateLayout()
+  if (not self.children[1]) then
+--FIXME redundant?
+    if (self.autosize) then
+      if (self.orientation == "horizontal") then
+        self:Resize(0, nil, false)
+      else
+        self:Resize(nil, 0, false)
+      end
+    end
+    return
+  end
+
+  self._inUpdateLayout = true
+
+  self:RealignChildren()
+
+  --FIXME add check if any item.width > maxItemWidth (+Height) & add a new autosize tag for it
+
+  if (self.resizeItems) then
+    self:_LayoutChildrenResizeItems()
+  else
+    self:_LayoutChildren()
+  end
+
+  self._inUpdateLayout = false
+
+  self:RealignChildren() --FIXME split SetPos from AlignControl!!!
+
+  return true
+end
+--[[ OLD
 function LayoutPanel:UpdateLayout()
   local cn = self.children
   local cn_count = #cn
@@ -625,6 +966,7 @@ function LayoutPanel:UpdateLayout()
 
   return true
 end
+--]]
 
 --//=============================================================================
 
@@ -645,19 +987,19 @@ function LayoutPanel:DrawChildren()
   local cn = self.children
   if (not cn[1]) then return end
 
-  glPushMatrix()
-  glTranslate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
+  gl.PushMatrix()
+  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end
   if (self.debug) then
-    glColor(1,0,0,0.5)
+    gl.Color(1,0,0,0.5)
     for i=1,#self._cells do
       local x,y,w,h = unpack4(self._cells[i])
-      glRect(x,y,x+w,y+h)
+      gl.Rect(x,y,x+w,y+h)
     end
   end
-  glPopMatrix()
+  gl.PopMatrix()
 
   self:_DrawChildrenInClientArea('Draw')
 end
@@ -668,27 +1010,27 @@ function LayoutPanel:DrawChildrenForList()
   if (not cn[1]) then return end
 
   if (self.debug) then
-    glColor(0,1,0,0.5)
-    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE)
-    glLineWidth(2)
-    glRect(self.x,self.y,self.x+self.width,self.y+self.height)
-    glLineWidth(1)
-    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL)
+    gl.Color(0,1,0,0.5)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
+    gl.LineWidth(2)
+    gl.Rect(self.x,self.y,self.x+self.width,self.y+self.height)
+    gl.LineWidth(1)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
   end
 
-  glPushMatrix()
-  glTranslate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
+  gl.PushMatrix()
+  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end
   if (self.debug) then
-    glColor(1,0,0,0.5)
+    gl.Color(1,0,0,0.5)
     for i=1,#self._cells do
       local x,y,w,h = unpack4(self._cells[i])
-      glRect(x,y,x+w,y+h)
+      gl.Rect(x,y,x+w,y+h)
     end
   end
-  glPopMatrix()
+  gl.PopMatrix()
 
   self:_DrawChildrenInClientArea('DrawForList')
 end

@@ -2,7 +2,6 @@ Window = Control:Inherit{
   classname = 'window',
   resizable = true,
   draggable = true,
-  minimizable = false,
 
   minWidth  = 50,
   minHeight = 50,
@@ -14,17 +13,6 @@ local this = Window
 local inherited = this.inherited
 
 --//=============================================================================
-
-local glBeginEnd	= gl.BeginEnd
-local glGetViewSizes	= gl.GetViewSizes
-local glColor		= gl.Color
-local glTexture		= gl.Texture
-local glTextureInfo	= gl.TextureInfo
-
-local GL_TRIANGLE_STRIP	= GL.TRIANGLE_STRIP
-
---//=============================================================================
-
 --[[
 function Window:UpdateClientArea()
   this.inherited.UpdateClientArea(self)
@@ -35,7 +23,7 @@ function Window:UpdateClientArea()
     WG['blur_api'].RemoveBlurRect(self.blurId)
   end
 
-  local screeny = select(2,glGetViewSizes()) - self.y
+  local screeny = select(2,gl.GetViewSizes()) - self.y
 
   self.blurId = WG['blur_api'].InsertBlurRect(self.x,screeny,self.x+self.width,screeny-self.height)
 end
@@ -57,10 +45,10 @@ function Window:MouseDown(...)
   return inherited.MouseDown(self,...)
 end
 
-VFS.Include(CHILI_DIRNAME .. "Headers/skinutils.lua")
+VFS.Include(CHILI_DIRNAME .. "headers/skinutils.lua", nil, VFS.RAW_FIRST)
 
 function Window:TweakDraw()
-  glColor(0.6,1,0.6,0.65)
+  gl.Color(0.6,1,0.6,0.65)
 
   local x = self.x
   local y = self.y
@@ -68,13 +56,13 @@ function Window:TweakDraw()
   local h = self.height
 
   if (self.resizable or self.tweakResizable) then
-    TextureHandler.LoadTexture(0,"LuaUI/Widgets/chili/Skins/default/tweak_overlay_resizable.png",self)
+    TextureHandler.LoadTexture(0,"LuaUI/Widgets/chili/skins/default/tweak_overlay_resizable.png",self)
   else
-    TextureHandler.LoadTexture(0,"LuaUI/Widgets/chili/Skins/default/tweak_overlay.png",self)
+    TextureHandler.LoadTexture(0,"LuaUI/Widgets/chili/skins/default/tweak_overlay.png",self)
   end
-    local texInfo = glTextureInfo("LuaUI/Widgets/chili/Skins/default/tweak_overlay.png") or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo("LuaUI/Widgets/chili/skins/default/tweak_overlay.png") or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, 31,31,31,31, tw,th, 0)
-  glTexture(0,false)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, 31,31,31,31, tw,th, 0)
+  gl.Texture(0,false)
 end

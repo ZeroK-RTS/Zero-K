@@ -25,7 +25,6 @@ end
 
 local GL_LINE_LOOP = GL.LINE_LOOP
 local GL_LINES = GL.LINES
-local GL_TRIANGLE_STRIP = GL.TRIANGLE_STRIP
 local glPushMatrix = gl.PushMatrix
 local glPopMatrix  = gl.PopMatrix
 local glTranslate  = gl.Translate
@@ -64,7 +63,7 @@ function Colorbars:DrawControl()
   glColor(self.color)
   glRect(barswidth + 2,self.height,self.width - 2,0)
 
-  glBeginEnd(GL_TRIANGLE_STRIP, theme.DrawBorder_, barswidth + 2,0,self.width - barswidth - 4,self.height, 1, self.borderColor1,self.borderColor2)
+  gl.BeginEnd(GL.TRIANGLE_STRIP, theme.DrawBorder_, barswidth + 2,0,self.width - barswidth - 4,self.height, 1, self.borderColor, self.borderColor2)
 
   glPopMatrix()
 end

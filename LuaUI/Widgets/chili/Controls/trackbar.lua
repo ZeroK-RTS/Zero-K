@@ -20,6 +20,7 @@ local this = Trackbar
 local inherited = this.inherited
 
 --//=============================================================================
+
 local function FormatNum(num)
   if (num == 0) then
     return "0"
@@ -44,11 +45,11 @@ function Trackbar:New(obj)
 
   if ((not obj.tooltip) or (obj.tooltip == '')) and (useValueTooltip ~= false) then
     obj.useValueTooltip = true
-  end  
-  
+  end
+
   obj:SetMinMax(obj.min,obj.max)
   obj:SetValue(obj.value)
-  
+
   return obj
 end
 

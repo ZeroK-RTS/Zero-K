@@ -9,20 +9,12 @@ ScrollPanel = Control:Inherit{
   scrollPosY    = 0,
   verticalScrollbar   = true,
   horizontalScrollbar = true,
-  verticalSmartScroll = false, -- if control is crolled to bottom, keep scroll when layout changes
+  verticalSmartScroll = false, -- if control is scrolled to bottom, keep scroll when layout changes
+  ignoreMouseWheel = false,
 }
 
 local this = ScrollPanel
 local inherited = this.inherited
-
---//=============================================================================
-
-local glPushMatrix    = gl.PushMatrix
-local glColor         = gl.Color
-local glRect          = gl.Rect
-local glTranslate     = gl.Translate
-local glPopMatrix     = gl.PopMatrix
-local glGetViewSizes  = gl.GetViewSizes
 
 --//=============================================================================
 
@@ -75,8 +67,25 @@ end
 
 --//=============================================================================
 
+function ScrollPanel:GetCurrentExtents()
+  local left = self.x
+  local top  = self.y
+  local right  = self.x + self.width
+  local bottom = self.y + self.height
+
+  if (left   < minLeft)   then minLeft   = left end
+  if (top    < minTop )   then minTop    = top end
+
+  if (right  > maxRight)  then maxRight  = right end
+  if (bottom > maxBottom) then maxBottom = bottom end
+
+  return minLeft, minTop, maxRight, maxBottom
+end
+
+--//=============================================================================
+
 function ScrollPanel:_DetermineContentArea()
-  local maxRight,maxBottom = self:GetChildrenExtents()
+  local minLeft, minTop, maxRight, maxBottom = self:GetChildrenCurrentExtents()
 
   self.contentArea = {
     0,
@@ -157,14 +166,28 @@ end
 
 --//=============================================================================
 
-function ScrollPanel:IsInView(child)
-  local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
 
-  return (child.y - self.scrollPosY <= clientHeight)and
-         (child.y + child.height - self.scrollPosY >= 0)and
-         (child.x - self.scrollPosX <= clientWidth)and
-         (child.x + child.width - self.scrollPosX >= 0);
+function ScrollPanel:IsRectInView(x,y,w,h)
+	if (not self.parent) then
+		return false
+	end
+
+	--//FIXME 1. don't create tables 2. merge somehow into Control:IsRectInView
+	local cx = x - self.scrollPosX
+	local cy = y - self.scrollPosY
+
+	local rect1 = {cx,cy,w,h}
+	local rect2 = {0,0,self.clientArea[3],self.clientArea[4]}
+	local inview = AreRectsOverlapping(rect1,rect2)
+
+	if not(inview) then
+		return false
+	end
+
+	local px,py = self:ClientToParent(x,y)
+	return (self.parent):IsRectInView(px,py,w,h)
 end
+
 
 --//=============================================================================
 
@@ -178,19 +201,15 @@ function ScrollPanel:_DrawInClientArea(fnc,...)
 
   if (self.safeOpengl) then
     local sx,sy = self:LocalToScreen(clientX,clientY)
+    sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
 
-    --glColor(1,0.1,0,0.2)
-    --glRect(self.x + clientX, self.y + clientY, self.x + clientX + clientWidth, self.y + clientY + clientHeight)
-
-    sy = select(2,glGetViewSizes()) - (sy + clientHeight)
     PushScissor(sx,sy,clientWidth,clientHeight)
   end
 
-  glPushMatrix()
-  glTranslate(math.floor(self.x + clientX - self.scrollPosX),math.floor(self.y + clientY - self.scrollPosY),0)
+  gl.PushMatrix()
+  gl.Translate(math.floor(self.x + clientX - self.scrollPosX),math.floor(self.y + clientY - self.scrollPosY),0)
   fnc(...)
-  --self:CallChildrenInverseCheckFunc(self.IsInView,...)
-  glPopMatrix()
+  gl.PopMatrix()
 
   if (self.safeOpengl) then
     PopScissor()
@@ -268,6 +287,14 @@ function ScrollPanel:MouseMove(x, y, dx, dy, ...)
     return self
   end
 
+  local old = (self._hHovered and 1 or 0) + (self._vHovered and 2 or 0)
+  self._hHovered = self:IsAboveHScrollbars(x,y)
+  self._vHovered = self:IsAboveVScrollbars(x,y)
+  local new = (self._hHovered and 1 or 0) + (self._vHovered and 2 or 0)
+  if (new ~= old) then
+    self:Invalidate()
+  end
+
   return inherited.MouseMove(self, x, y, dx, dy, ...)
 end
 
@@ -297,7 +324,7 @@ end
 
 
 function ScrollPanel:MouseWheel(x, y, up, value, ...)
-  if self._vscrollbar and not self.noMouseWheel then
+  if self._vscrollbar and not self.ignoreMouseWheel then
     self.scrollPosY = self.scrollPosY - value*30
     self.scrollPosY = clamp(0, self.contentArea[4] - self.clientArea[4], self.scrollPosY)
     self:Invalidate()
@@ -305,4 +332,12 @@ function ScrollPanel:MouseWheel(x, y, up, value, ...)
   end
 
   return inherited.MouseWheel(self, x, y, up, value, ...)
+end
+
+
+function ScrollPanel:MouseOut(...)
+	inherited.MouseOut(self, ...)
+	self._hHovered = false
+	self._vHovered = false
+	self:Invalidate()
 end

@@ -4,18 +4,11 @@
 SkinHandler = {}
 
 --//=============================================================================
---// Some important folders
-
-local skinFolder = CHILI_DIRNAME .. "Skins/"
-
-SkinHandler.skinFolder = skinFolder
-
---//=============================================================================
 --// load shared skin utils
 
 local SkinUtilsEnv = {}
 setmetatable(SkinUtilsEnv,{__index = getfenv()})
-VFS.Include(CHILI_DIRNAME .. "Headers/skinutils.lua", SkinUtilsEnv)
+VFS.Include(CHILI_DIRNAME .. "headers/skinutils.lua", SkinUtilsEnv)
 
 --//=============================================================================
 --// translates the skin's FileNames to the correct FilePaths
@@ -58,7 +51,7 @@ knownSkins = {}
 SkinHandler.knownSkins = knownSkins
 
 local n = 1
-local skinDirs = VFS.SubDirs(skinFolder , "*", VFS.RAW_FIRST)
+local skinDirs = VFS.SubDirs(SKIN_DIRNAME , "*", VFS.RAW_FIRST)
 for i,dir in ipairs(skinDirs) do
   local skinCfgFile = dir .. 'skin.lua'
 
@@ -69,7 +62,7 @@ for i,dir in ipairs(skinDirs) do
     setmetatable(senv,{__index = SkinUtilsEnv})
 
     --// load the skin
-    local skinConfig = VFS.Include(skinCfgFile,senv)
+    local skinConfig = VFS.Include(skinCfgFile,senv, VFS.RAW_FIRST)
     if (skinConfig)and(type(skinConfig)=="table")and(type(skinConfig.info)=="table") then
       skinConfig.info.dir = dir
       SkinHandler.knownSkins[n] = skinConfig
@@ -97,7 +90,7 @@ for i,skinConfig in ipairs(SkinHandler.knownSkins) do
   end
 
   --// add the default skindir to the end
-  dirs[#dirs+1] = skinFolder .. 'default/'
+  dirs[#dirs+1] = SKIN_DIRNAME .. 'default/'
 
   --// finally translate all paths
   TranslateFilePaths(skinConfig, dirs)

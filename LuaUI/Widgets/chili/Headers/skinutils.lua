@@ -1,19 +1,4 @@
 --//=============================================================================
-
-local glClipPlane	= gl.ClipPlane
-local glColor		= gl.Color
-local glTexture		= gl.Texture
-local glTexRect		= gl.TexRect
-local glTextureInfo	= gl.TextureInfo
-local glMultiTexCoord	= gl.MultiTexCoord
-local glVertex		= gl.Vertex
-local glBeginEnd	= gl.BeginEnd
-
-local GL_TRIANGLE_STRIP	= GL.TRIANGLE_STRIP
-local GL_TRIANGLES	= GL.TRIANGLES
-local GL_LINES		= GL.LINES
-
---//=============================================================================
 --//
 
 function _DrawTextureAspect(x,y,w,h ,tw,th)
@@ -36,7 +21,7 @@ function _DrawTextureAspect(x,y,w,h ,tw,th)
   x = math.ceil(x)
   y = math.ceil(y)
 
-  glTexRect(x,y,right,bottom,false,true)
+  gl.TexRect(x,y,right,bottom,false,true)
 end
 local _DrawTextureAspect = _DrawTextureAspect
 
@@ -61,66 +46,66 @@ function _DrawTiledTexture(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, te
     end
 
     --//topleft
-    glMultiTexCoord(texIndex,0,0)
-    glVertex(x,      y)
-    glMultiTexCoord(texIndex,0,txTop)
-    glVertex(x,      y+skTop)
-    glMultiTexCoord(texIndex,txLeft,0)
-    glVertex(x+skLeft, y)
-    glMultiTexCoord(texIndex,txLeft,txTop)
-    glVertex(x+skLeft, y+skTop)
+    gl.MultiTexCoord(texIndex,0,0)
+    gl.Vertex(x,      y)
+    gl.MultiTexCoord(texIndex,0,txTop)
+    gl.Vertex(x,      y+skTop)
+    gl.MultiTexCoord(texIndex,txLeft,0)
+    gl.Vertex(x+skLeft, y)
+    gl.MultiTexCoord(texIndex,txLeft,txTop)
+    gl.Vertex(x+skLeft, y+skTop)
 
     --//topcenter
-    glMultiTexCoord(texIndex,1-txRight,0)
-    glVertex(x+w-skRight, y)
-    glMultiTexCoord(texIndex,1-txRight,txTop)
-    glVertex(x+w-skRight, y+skTop)
+    gl.MultiTexCoord(texIndex,1-txRight,0)
+    gl.Vertex(x+w-skRight, y)
+    gl.MultiTexCoord(texIndex,1-txRight,txTop)
+    gl.Vertex(x+w-skRight, y+skTop)
 
     --//topright
-    glMultiTexCoord(texIndex,1,0)
-    glVertex(x+w,       y)
-    glMultiTexCoord(texIndex,1,txTop)
-    glVertex(x+w,       y+skTop)
+    gl.MultiTexCoord(texIndex,1,0)
+    gl.Vertex(x+w,       y)
+    gl.MultiTexCoord(texIndex,1,txTop)
+    gl.Vertex(x+w,       y+skTop)
 
     --//right center
-    glMultiTexCoord(texIndex,1,1-txBottom)
-    glVertex(x+w,       y+h-skBottom)    --//degenerate
-    glMultiTexCoord(texIndex,1-txRight,txTop)
-    glVertex(x+w-skRight, y+skTop)
-    glMultiTexCoord(texIndex,1-txRight,1-txBottom)
-    glVertex(x+w-skRight, y+h-skBottom)
+    gl.MultiTexCoord(texIndex,1,1-txBottom)
+    gl.Vertex(x+w,       y+h-skBottom)    --//degenerate
+    gl.MultiTexCoord(texIndex,1-txRight,txTop)
+    gl.Vertex(x+w-skRight, y+skTop)
+    gl.MultiTexCoord(texIndex,1-txRight,1-txBottom)
+    gl.Vertex(x+w-skRight, y+h-skBottom)
 
     --//background
-    glMultiTexCoord(texIndex,txLeft,txTop)
-    glVertex(x+skLeft,    y+skTop)
-    glMultiTexCoord(texIndex,txLeft,1-txBottom)
-    glVertex(x+skLeft,    y+h-skBottom)
+    gl.MultiTexCoord(texIndex,txLeft,txTop)
+    gl.Vertex(x+skLeft,    y+skTop)
+    gl.MultiTexCoord(texIndex,txLeft,1-txBottom)
+    gl.Vertex(x+skLeft,    y+h-skBottom)
 
     --//left center
-    glMultiTexCoord(texIndex,0,txTop)
-    glVertex(x,    y+skTop)
-    glMultiTexCoord(texIndex,0,1-txBottom)
-    glVertex(x,    y+h-skBottom)
+    gl.MultiTexCoord(texIndex,0,txTop)
+    gl.Vertex(x,    y+skTop)
+    gl.MultiTexCoord(texIndex,0,1-txBottom)
+    gl.Vertex(x,    y+h-skBottom)
 
     --//bottom right
-    glMultiTexCoord(texIndex,0,1)
-    glVertex(x,      y+h)    --//degenerate
-    glMultiTexCoord(texIndex,txLeft,1-txBottom)
-    glVertex(x+skLeft, y+h-skBottom)
-    glMultiTexCoord(texIndex,txLeft,1)
-    glVertex(x+skLeft, y+h)
+    gl.MultiTexCoord(texIndex,0,1)
+    gl.Vertex(x,      y+h)    --//degenerate
+    gl.MultiTexCoord(texIndex,txLeft,1-txBottom)
+    gl.Vertex(x+skLeft, y+h-skBottom)
+    gl.MultiTexCoord(texIndex,txLeft,1)
+    gl.Vertex(x+skLeft, y+h)
 
     --//bottom center
-    glMultiTexCoord(texIndex,1-txRight,1-txBottom)
-    glVertex(x+w-skRight, y+h-skBottom)
-    glMultiTexCoord(texIndex,1-txRight,1)
-    glVertex(x+w-skRight, y+h)
+    gl.MultiTexCoord(texIndex,1-txRight,1-txBottom)
+    gl.Vertex(x+w-skRight, y+h-skBottom)
+    gl.MultiTexCoord(texIndex,1-txRight,1)
+    gl.Vertex(x+w-skRight, y+h)
 
     --//bottom right
-    glMultiTexCoord(texIndex,1,1-txBottom)
-    glVertex(x+w, y+h-skBottom)
-    glMultiTexCoord(texIndex,1,1)
-    glVertex(x+w, y+h)
+    gl.MultiTexCoord(texIndex,1,1-txBottom)
+    gl.Vertex(x+w, y+h-skBottom)
+    gl.MultiTexCoord(texIndex,1,1)
+    gl.Vertex(x+w, y+h)
 end
 local _DrawTiledTexture = _DrawTiledTexture
 
@@ -145,65 +130,65 @@ function _DrawTiledBorder(x,y,w,h, skLeft,skTop,skRight,skBottom, texw,texh, tex
   end
 
   --//topleft
-  glMultiTexCoord(texIndex,0,0)
-  glVertex(x,      y)
-  glMultiTexCoord(texIndex,0,txTop)
-  glVertex(x,      y+skTop)
-  glMultiTexCoord(texIndex,txLeft,0)
-  glVertex(x+skLeft, y)
-  glMultiTexCoord(texIndex,txLeft,txTop)
-  glVertex(x+skLeft, y+skTop)
+  gl.MultiTexCoord(texIndex,0,0)
+  gl.Vertex(x,      y)
+  gl.MultiTexCoord(texIndex,0,txTop)
+  gl.Vertex(x,      y+skTop)
+  gl.MultiTexCoord(texIndex,txLeft,0)
+  gl.Vertex(x+skLeft, y)
+  gl.MultiTexCoord(texIndex,txLeft,txTop)
+  gl.Vertex(x+skLeft, y+skTop)
 
   --//topcenter
-  glMultiTexCoord(texIndex,1-txRight,0)
-  glVertex(x+w-skRight, y)
-  glMultiTexCoord(texIndex,1-txRight,txTop)
-  glVertex(x+w-skRight, y+skTop)
+  gl.MultiTexCoord(texIndex,1-txRight,0)
+  gl.Vertex(x+w-skRight, y)
+  gl.MultiTexCoord(texIndex,1-txRight,txTop)
+  gl.Vertex(x+w-skRight, y+skTop)
 
   --//topright
-  glMultiTexCoord(texIndex,1,0)
-  glVertex(x+w,       y)
-  glMultiTexCoord(texIndex,1,txTop)
-  glVertex(x+w,       y+skTop)
+  gl.MultiTexCoord(texIndex,1,0)
+  gl.Vertex(x+w,       y)
+  gl.MultiTexCoord(texIndex,1,txTop)
+  gl.Vertex(x+w,       y+skTop)
 
   --//right center
-  glVertex(x+w,         y+skTop)    --//degenerate
-  glMultiTexCoord(texIndex,1-txRight,txTop)
-  glVertex(x+w-skRight, y+skTop)
-  glMultiTexCoord(texIndex,1,1-txBottom)
-  glVertex(x+w,         y+h-skBottom)
-  glMultiTexCoord(texIndex,1-txRight,1-txBottom)
-  glVertex(x+w-skRight, y+h-skBottom)
+  gl.Vertex(x+w,         y+skTop)    --//degenerate
+  gl.MultiTexCoord(texIndex,1-txRight,txTop)
+  gl.Vertex(x+w-skRight, y+skTop)
+  gl.MultiTexCoord(texIndex,1,1-txBottom)
+  gl.Vertex(x+w,         y+h-skBottom)
+  gl.MultiTexCoord(texIndex,1-txRight,1-txBottom)
+  gl.Vertex(x+w-skRight, y+h-skBottom)
 
   --//bottom right
-  glMultiTexCoord(texIndex,1,1)
-  glVertex(x+w,         y+h)
-  glMultiTexCoord(texIndex,1-txRight,1)
-  glVertex(x+w-skRight, y+h)
+  gl.MultiTexCoord(texIndex,1,1)
+  gl.Vertex(x+w,         y+h)
+  gl.MultiTexCoord(texIndex,1-txRight,1)
+  gl.Vertex(x+w-skRight, y+h)
 
   --//bottom center
-  glVertex(x+w-skRight, y+h)    --//degenerate
-  glMultiTexCoord(texIndex,1-txRight,1-txBottom)
-  glVertex(x+w-skRight, y+h-skBottom)
-  glMultiTexCoord(texIndex,txLeft,1)
-  glVertex(x+skLeft,    y+h)
-  glMultiTexCoord(texIndex,txLeft,1-txBottom)
-  glVertex(x+skLeft,    y+h-skBottom)
+  gl.Vertex(x+w-skRight, y+h)    --//degenerate
+  gl.MultiTexCoord(texIndex,1-txRight,1-txBottom)
+  gl.Vertex(x+w-skRight, y+h-skBottom)
+  gl.MultiTexCoord(texIndex,txLeft,1)
+  gl.Vertex(x+skLeft,    y+h)
+  gl.MultiTexCoord(texIndex,txLeft,1-txBottom)
+  gl.Vertex(x+skLeft,    y+h-skBottom)
 
   --//bottom left
-  glMultiTexCoord(texIndex,0,1)
-  glVertex(x,        y+h)
-  glMultiTexCoord(texIndex,0,1-txBottom)
-  glVertex(x,        y+h-skBottom)
+  gl.MultiTexCoord(texIndex,0,1)
+  gl.Vertex(x,        y+h)
+  gl.MultiTexCoord(texIndex,0,1-txBottom)
+  gl.Vertex(x,        y+h-skBottom)
 
   --//left center
-  glVertex(x,        y+h-skBottom)    --//degenerate
-  glMultiTexCoord(texIndex,0,txTop)
-  glVertex(x,        y+skTop)
-  glMultiTexCoord(texIndex,txLeft,1-txBottom)
-  glVertex(x+skLeft, y+h-skBottom)
-  glMultiTexCoord(texIndex,txLeft,txTop)
-  glVertex(x+skLeft, y+skTop)
+  gl.Vertex(x,        y+h-skBottom)    --//degenerate
+  gl.MultiTexCoord(texIndex,0,txTop)
+  gl.Vertex(x,        y+skTop)
+  gl.MultiTexCoord(texIndex,txLeft,1-txBottom)
+  gl.Vertex(x+skLeft, y+h-skBottom)
+  gl.MultiTexCoord(texIndex,txLeft,txTop)
+  gl.Vertex(x+skLeft, y+skTop)
 end
 local _DrawTiledBorder = _DrawTiledBorder
 
@@ -214,24 +199,24 @@ local function _DrawDragGrip(obj)
   local w = obj.dragGripSize[1]
   local h = obj.dragGripSize[2]
 
-  glColor(0.8,0.8,0.8,0.9)
-  glVertex(x, y + h*0.5)
-  glVertex(x + w*0.5, y)
-  glVertex(x + w*0.5, y + h*0.5)
+  gl.Color(0.8,0.8,0.8,0.9)
+  gl.Vertex(x, y + h*0.5)
+  gl.Vertex(x + w*0.5, y)
+  gl.Vertex(x + w*0.5, y + h*0.5)
 
-  glColor(0.3,0.3,0.3,0.9)
-  glVertex(x + w*0.5, y + h*0.5)
-  glVertex(x + w*0.5, y)
-  glVertex(x + w, y + h*0.5)
+  gl.Color(0.3,0.3,0.3,0.9)
+  gl.Vertex(x + w*0.5, y + h*0.5)
+  gl.Vertex(x + w*0.5, y)
+  gl.Vertex(x + w, y + h*0.5)
 
-  glVertex(x + w*0.5, y + h)
-  glVertex(x, y + h*0.5)
-  glVertex(x + w*0.5, y + h*0.5)
+  gl.Vertex(x + w*0.5, y + h)
+  gl.Vertex(x, y + h*0.5)
+  gl.Vertex(x + w*0.5, y + h*0.5)
 
-  glColor(0.1,0.1,0.1,0.9)
-  glVertex(x + w*0.5, y + h)
-  glVertex(x + w*0.5, y + h*0.5)
-  glVertex(x + w, y + h*0.5)
+  gl.Color(0.1,0.1,0.1,0.9)
+  gl.Vertex(x + w*0.5, y + h)
+  gl.Vertex(x + w*0.5, y + h*0.5)
+  gl.Vertex(x + w, y + h*0.5)
 end
 
 
@@ -244,29 +229,37 @@ local function _DrawResizeGrip(obj)
 
     x = x-1
     y = y-1
-    glColor(1,1,1,0.2)
-      glVertex(x + resizeBox[1], y + resizeBox[4])
-      glVertex(x + resizeBox[3], y + resizeBox[2])
+    gl.Color(1,1,1,0.2)
+      gl.Vertex(x + resizeBox[1], y + resizeBox[4])
+      gl.Vertex(x + resizeBox[3], y + resizeBox[2])
 
-      glVertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.33), y + resizeBox[4])
-      glVertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.33))
+      gl.Vertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.33), y + resizeBox[4])
+      gl.Vertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.33))
 
-      glVertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.66), y + resizeBox[4])
-      glVertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.66))
+      gl.Vertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.66), y + resizeBox[4])
+      gl.Vertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.66))
 
     x = x+1
     y = y+1
-    glColor(0.1, 0.1, 0.1, 0.9)
-      glVertex(x + resizeBox[1], y + resizeBox[4])
-      glVertex(x + resizeBox[3], y + resizeBox[2])
+    gl.Color(0.1, 0.1, 0.1, 0.9)
+      gl.Vertex(x + resizeBox[1], y + resizeBox[4])
+      gl.Vertex(x + resizeBox[3], y + resizeBox[2])
 
-      glVertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.33), y + resizeBox[4])
-      glVertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.33))
+      gl.Vertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.33), y + resizeBox[4])
+      gl.Vertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.33))
 
-      glVertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.66), y + resizeBox[4])
-      glVertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.66))
+      gl.Vertex(x + resizeBox[1] + math.ceil((resizeBox[3] - resizeBox[1])*0.66), y + resizeBox[4])
+      gl.Vertex(x + resizeBox[3], y + resizeBox[2] + math.ceil((resizeBox[4] - resizeBox[2])*0.66))
   end
 end
+
+local function _DrawCursor(x, y, w, h)
+	gl.Vertex(x, y)
+	gl.Vertex(x, y + h)
+	gl.Vertex(x + w, y)
+	gl.Vertex(x + w, y + h)
+end
+
 
 --//=============================================================================
 --//
@@ -281,16 +274,16 @@ function DrawWindow(obj)
 
   local c = obj.color
   if (c) then
-    glColor(c)
+    gl.Color(c)
   else
-    glColor(1,1,1,1)
+    gl.Color(1,1,1,1)
   end
   TextureHandler.LoadTexture(0,obj.TileImage,obj)
-    local texInfo = glTextureInfo(obj.TileImage) or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo(obj.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th)
-  glTexture(0,false)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th)
+  gl.Texture(0,false)
 
   if (obj.caption) then
     obj.font:Print(obj.caption, x+w*0.5, y+9, "center")
@@ -308,33 +301,114 @@ function DrawButton(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  if (obj.state=="pressed") then
-    glColor(mulColor(obj.backgroundColor,0.4))
+  if (obj.state.pressed) then
+    gl.Color(mulColor(obj.backgroundColor,0.4))
+  elseif (obj.state.hovered) then
+    gl.Color(obj.focusColor)
   else
-    glColor(obj.backgroundColor)
+    gl.Color(obj.backgroundColor)
   end
   TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
-    local texInfo = glTextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
-  if (obj.state=="pressed") then
-    glColor(0.6,0.6,0.6,1)
+  if (obj.state.pressed) then
+    gl.Color(0.6,0.6,0.6,1) --FIXME
+  elseif (obj.state.hovered) then
+    gl.Color(obj.focusColor)
   else
-    glColor(1,1,1,1)
+    gl.Color(obj.borderColor)
   end
   TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
-    local texInfo = glTextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  glTexture(0,false)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  gl.Texture(0,false)
 
   if (obj.caption) then
     obj.font:Print(obj.caption, x+w*0.5, y+h*0.5, "center", "center")
   end
+end
+
+
+function DrawEditBox(obj)
+	local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
+
+	gl.Color(obj.backgroundColor)
+	TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+	local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+	local tw,th = texInfo.xsize, texInfo.ysize
+	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x, obj.y, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
+	--gl.Texture(0,false)
+
+	if obj.state.focused or obj.state.hovered then
+		gl.Color(obj.focusColor)
+	else
+		gl.Color(obj.borderColor)
+	end
+	TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
+	local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
+	local tw,th = texInfo.xsize, texInfo.ysize
+	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x, obj.y, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
+	gl.Texture(0,false)
+
+	if (obj.text) then
+		if (obj.offset > obj.cursor) then
+			obj.offset = obj.cursor
+		end
+
+		local clientX,clientY,clientWidth,clientHeight = unpack4(obj.clientArea)
+
+		--// make cursor pos always visible (when text is longer than editbox!)
+		repeat
+			local txt = obj.text:sub(obj.offset, obj.cursor)
+			local wt = obj.font:GetTextWidth(txt)
+			if (wt <= clientWidth) then
+				break
+			end
+			if (obj.offset >= obj.cursor) then
+				break
+			end
+			obj.offset = obj.offset + 1
+		until (false)
+
+		local txt = obj.text:sub(obj.offset)
+
+		--// strip part at the end that exceeds the editbox
+		local lsize = math.max(0, obj.font:WrapText(txt, clientWidth, clientHeight):len() - 3) -- find a good start (3 dots at end if stripped)
+		while (lsize <= txt:len()) do
+			local wt = obj.font:GetTextWidth(txt:sub(1, lsize))
+			if (wt > clientWidth) then
+				break
+			end
+			lsize = lsize + 1
+		end
+		txt = txt:sub(1, lsize - 1)
+
+		gl.Color(1,1,1,1)
+		obj.font:DrawInBox(txt, obj.x + clientX, obj.y + clientY, clientWidth, clientHeight, obj.align, obj.valign)
+
+		if obj.state.focused then
+			local cursorTxt = obj.text:sub(obj.offset, obj.cursor - 1)
+			local cursorX = obj.font:GetTextWidth(cursorTxt)
+
+			local as = math.sin(os.clock() * 4);
+			local ac = math.cos(os.clock() * 4);
+			if (as < 0) then as = 0 end
+			if (ac < 0) then ac = 0 end
+			local alpha = as + ac
+			if (alpha > 1) then alpha = 1 end
+			alpha = 0.8 * alpha
+
+			local cc = obj.cursorColor
+			gl.Color(cc[1], cc[2], cc[3], cc[4] * alpha)
+			gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, obj.x + cursorX + clientX - 1, obj.y + clientY, 3, clientHeight)
+		end
+	end
 end
 
 --//=============================================================================
@@ -348,21 +422,21 @@ function DrawPanel(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  glColor(obj.backgroundColor)
+  gl.Color(obj.backgroundColor)
   TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
-    local texInfo = glTextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
-  glColor(1,1,1,1)
+  gl.Color(obj.borderColor)
   TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
-    local texInfo = glTextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  glTexture(0,false)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  gl.Texture(0,false)
 end
 
 --//=============================================================================
@@ -371,26 +445,27 @@ end
 function DrawItemBkGnd(obj,x,y,w,h,state)
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  local texInfo = glTextureInfo(obj.imageFG) or {xsize=1, ysize=1}
-  local tw,th = texInfo.xsize, texInfo.ysize
-
   if (state=="selected") then
-    glColor(obj.colorBK_selected)
+    gl.Color(obj.colorBK_selected)
   else
-    glColor(obj.colorBK)
+    gl.Color(obj.colorBK)
   end
   TextureHandler.LoadTexture(0,obj.imageBK,obj)
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    local texInfo = gl.TextureInfo(obj.imageBK) or {xsize=1, ysize=1}
+    local tw,th = texInfo.xsize, texInfo.ysize
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
   if (state=="selected") then
-    glColor(obj.colorFG_selected)
+    gl.Color(obj.colorFG_selected)
   else
     gl.Color(obj.colorFG)
   end
   TextureHandler.LoadTexture(0,obj.imageFG,obj)
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  glTexture(0,false)
+    local texInfo = gl.TextureInfo(obj.imageFG) or {xsize=1, ysize=1}
+    local tw,th = texInfo.xsize, texInfo.ysize
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  gl.Texture(0,false)
 end
 
 --//=============================================================================
@@ -400,13 +475,9 @@ function DrawScrollPanelBorder(self)
   local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
   local contX,contY,contWidth,contHeight = unpack4(self.contentArea)
 
-  
-  glColor(self.backgroundColor)
-  --glColor(1,1,1,1)
-
   do
       TextureHandler.LoadTexture(0,self.BorderTileImage,self)
-      local texInfo = glTextureInfo(self.BorderTileImage) or {xsize=1, ysize=1}
+      local texInfo = gl.TextureInfo(self.BorderTileImage) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
 
       local skLeft,skTop,skRight,skBottom = unpack4(self.bordertiles)
@@ -420,8 +491,9 @@ function DrawScrollPanelBorder(self)
         height = clientHeight + self.padding[2] - 1
       end
 
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledBorder, self.x,self.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
-      glTexture(0,false)
+      gl.Color(self.borderColor)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledBorder, self.x,self.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.Texture(0,false)
   end
 end
 
@@ -432,12 +504,9 @@ function DrawScrollPanel(obj)
   local clientX,clientY,clientWidth,clientHeight = unpack4(obj.clientArea)
   local contX,contY,contWidth,contHeight = unpack4(obj.contentArea)
 
-  glColor(obj.backgroundColor)
-  --glColor(1,1,1,1)
-
   if (obj.BackgroundTileImage) then
       TextureHandler.LoadTexture(0,obj.BackgroundTileImage,obj)
-      local texInfo = glTextureInfo(obj.BackgroundTileImage) or {xsize=1, ysize=1}
+      local texInfo = gl.TextureInfo(obj.BackgroundTileImage) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
 
       local skLeft,skTop,skRight,skBottom = unpack4(obj.bkgndtiles)
@@ -451,11 +520,10 @@ function DrawScrollPanel(obj)
         height = clientHeight + obj.padding[2] - 1
       end
 
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, obj.x,obj.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
-      glTexture(0,false)
+      gl.Color(obj.backgroundColor)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x,obj.y,width,height, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.Texture(0,false)
   end
-  
-  glColor(1,1,1,1)
 
   if obj._vscrollbar then
     local x = obj.x + clientX + clientWidth
@@ -466,18 +534,20 @@ function DrawScrollPanel(obj)
     local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
     TextureHandler.LoadTexture(0,obj.TileImage,obj)
-      local texInfo = glTextureInfo(obj.TileImage) or {xsize=1, ysize=1}
+      local texInfo = gl.TextureInfo(obj.TileImage) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
 
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --glTexture(0,false)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    --gl.Texture(0,false)
 
-    if obj._vscrolling then
-      glColor(obj.KnobColorSelected)
+    if obj._vscrolling or obj._vHovered then
+      gl.Color(obj.KnobColorSelected)
+    else
+      gl.Color(1,1,1,1)
     end
 
     TextureHandler.LoadTexture(0,obj.KnobTileImage,obj)
-      texInfo = glTextureInfo(obj.KnobTileImage) or {xsize=1, ysize=1}
+      texInfo = gl.TextureInfo(obj.KnobTileImage) or {xsize=1, ysize=1}
       tw,th = texInfo.xsize, texInfo.ysize
 
       skLeft,skTop,skRight,skBottom = unpack4(obj.KnobTiles)
@@ -486,13 +556,15 @@ function DrawScrollPanel(obj)
       local visible = clientHeight/contHeight
       local gripy = y + clientHeight * pos
       local griph = clientHeight * visible
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,gripy,obj.scrollbarSize,griph, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --glTexture(0,false)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,gripy,obj.scrollbarSize,griph, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    --gl.Texture(0,false)
 
-    glColor(1,1,1,1)
+    gl.Color(1,1,1,1)
   end
 
   if obj._hscrollbar then
+    gl.Color(1,1,1,1)  
+
     local x = obj.x
     local y = obj.y + clientY + clientHeight
     local w = obj.width
@@ -501,18 +573,20 @@ function DrawScrollPanel(obj)
     local skLeft,skTop,skRight,skBottom = unpack4(obj.htiles)
 
     TextureHandler.LoadTexture(0,obj.HTileImage,obj)
-      local texInfo = glTextureInfo(obj.HTileImage) or {xsize=1, ysize=1}
+      local texInfo = gl.TextureInfo(obj.HTileImage) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
 
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --glTexture(0,false)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    --gl.Texture(0,false)
 
-    if obj._hscrolling then
-      glColor(obj.KnobColorSelected)
+    if obj._hscrolling or obj._hHovered then
+      gl.Color(obj.KnobColorSelected)
+    else
+      gl.Color(1,1,1,1)
     end
 
     TextureHandler.LoadTexture(0,obj.HKnobTileImage,obj)
-      texInfo = glTextureInfo(obj.HKnobTileImage) or {xsize=1, ysize=1}
+      texInfo = gl.TextureInfo(obj.HKnobTileImage) or {xsize=1, ysize=1}
       tw,th = texInfo.xsize, texInfo.ysize
 
       skLeft,skTop,skRight,skBottom = unpack4(obj.HKnobTiles)
@@ -521,11 +595,11 @@ function DrawScrollPanel(obj)
       local visible = clientWidth/contWidth
       local gripx = x + clientWidth * pos
       local gripw = clientWidth * visible
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, gripx,y,gripw,obj.scrollbarSize, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --glTexture(0,false)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, gripx,y,gripw,obj.scrollbarSize, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    --gl.Texture(0,false)
   end
 
-  glTexture(0,false)
+  gl.Texture(0,false)
 end
 
 --//=============================================================================
@@ -540,24 +614,26 @@ function DrawCheckbox(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  glColor(1,1,1,1)
+
+  if (obj.state.hovered) then
+    gl.Color(obj.focusColor)
+  else
+    gl.Color(1,1,1,1)
+  end
   TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 
-  -- fixes issue #54
-  --local texInfo = glTextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
-  --local tw,th = texInfo.xsize, texInfo.ysize  
   local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
-  
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  --glTexture(0,false)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  --gl.Texture(0,false)
 
-  if (obj.checked) then
+  if (obj.state.checked) then
     TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   end
-  glTexture(0,false)
+  gl.Texture(0,false)
 
+  gl.Color(1,1,1,1)
   if (obj.caption) then
     local vc = obj.height*0.5 --//verticale center
     local tx = 0
@@ -580,26 +656,23 @@ function DrawProgressbar(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  glColor(obj.backgroundColor)
-  if not obj.noSkin then
-    TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
-    local texInfo = glTextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+  gl.Color(obj.backgroundColor)
+  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+    local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --glTexture(0,false)
-  end
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  --gl.Texture(0,false)
 
-  glColor(obj.color)
+  gl.Color(obj.color)
   TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
-    local texInfo = glTextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
+    local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    -- workaround for catalyst 12.6 drivers: do the "clipping" by multiplying width by percentage in glBeginEnd instead of using glClipPlane
-    --glClipPlane(1, -1,0,0, x+w*percent)
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --glClipPlane(1, false)
-  glTexture(0,false)
+    gl.ClipPlane(1, -1,0,0, x+w*percent)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.ClipPlane(1, false)
+  gl.Texture(0,false)
 
   if (obj.caption) then
     (obj.font):Print(obj.caption, x+w*0.5, y+h*0.5, "center", "center")
@@ -619,17 +692,15 @@ function DrawTrackbar(self)
   local skLeft,skTop,skRight,skBottom = unpack4(self.tiles)
   local pdLeft,pdTop,pdRight,pdBottom = unpack4(self.hitpadding)
 
-  glColor(1,1,1,1)
-  if not self.noDrawBar then
-    TextureHandler.LoadTexture(0,self.TileImage,self)
-    local texInfo = glTextureInfo(self.TileImage) or {xsize=1, ysize=1}
+  gl.Color(1,1,1,1)
+
+  TextureHandler.LoadTexture(0,self.TileImage,self)
+    local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
-    glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  end
-    
-  if not self.noDrawStep then
-    TextureHandler.LoadTexture(0,self.StepImage,self)
-    local texInfo = glTextureInfo(self.StepImage) or {xsize=1, ysize=1}
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+
+  TextureHandler.LoadTexture(0,self.StepImage,self)
+    local texInfo = gl.TextureInfo(self.StepImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
     --// scale the thumb down if we don't have enough space
@@ -661,15 +732,19 @@ function DrawTrackbar(self)
       local my = y+h*0.5
       local mx = x+pdLeft+stepWidth
       while (mx<(x+pdLeft+barWidth)) do
-        glTexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
+        gl.TexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
         mx = mx+stepWidth
       end
     end
+
+  if (self.state.hovered) then
+    gl.Color(self.focusColor)
+  else
+    gl.Color(1,1,1,1)
   end
 
-  if not self.noDrawThumb then
-    TextureHandler.LoadTexture(0,self.ThumbImage,self)
-    local texInfo = glTextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
+  TextureHandler.LoadTexture(0,self.ThumbImage,self)
+    local texInfo = gl.TextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
     --// scale the thumb down if we don't have enough space
@@ -685,10 +760,9 @@ function DrawTrackbar(self)
     local barWidth = w - (pdLeft + pdRight)
     local mx = x+pdLeft+barWidth*percent
     local my = y+h*0.5
-    glTexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
-  end
-  
-  glTexture(0,false)
+    gl.TexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
+
+  gl.Texture(0,false)
 end
 
 --//=============================================================================
@@ -703,25 +777,25 @@ function DrawTreeviewNode(self)
 
     local skLeft,skTop,skRight,skBottom = unpack4(self.treeview.tiles)
 
-    glColor(1,1,1,1)
+    gl.Color(1,1,1,1)
     TextureHandler.LoadTexture(0,self.treeview.ImageNodeSelected,self)
-      local texInfo = glTextureInfo(self.treeview.ImageNodeSelected) or {xsize=1, ysize=1}
+      local texInfo = gl.TextureInfo(self.treeview.ImageNodeSelected) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
 
-      glBeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    glTexture(0,false)
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.Texture(0,false)
   end
 end
 
 
 local function _DrawLineV(x, y1, y2, width, next_func, ...)
-  glVertex(x-width*0.5, y1)
-  glVertex(x+width*0.5, y1)
-  glVertex(x-width*0.5, y2)
+  gl.Vertex(x-width*0.5, y1)
+  gl.Vertex(x+width*0.5, y1)
+  gl.Vertex(x-width*0.5, y2)
 
-  glVertex(x+width*0.5, y1)
-  glVertex(x-width*0.5, y2)
-  glVertex(x+width*0.5, y2)
+  gl.Vertex(x+width*0.5, y1)
+  gl.Vertex(x-width*0.5, y2)
+  gl.Vertex(x+width*0.5, y2)
 
   if (next_func) then
     next_func(...)
@@ -730,13 +804,13 @@ end
 
 
 local function _DrawLineH(x1, x2, y, width, next_func, ...)
-  glVertex(x1, y-width*0.5)
-  glVertex(x1, y+width*0.5)
-  glVertex(x2, y-width*0.5)
+  gl.Vertex(x1, y-width*0.5)
+  gl.Vertex(x1, y+width*0.5)
+  gl.Vertex(x2, y-width*0.5)
 
-  glVertex(x1, y+width*0.5)
-  glVertex(x2, y-width*0.5)
-  glVertex(x2, y+width*0.5)
+  gl.Vertex(x1, y+width*0.5)
+  gl.Vertex(x2, y-width*0.5)
+  gl.Vertex(x2, y+width*0.5)
 
   if (next_func) then
     next_func(...)
@@ -755,25 +829,25 @@ function DrawTreeviewNodeTree(self)
     y2 = y3
   end
 
-  glColor(self.treeview.treeColor)
-  glBeginEnd(GL_TRIANGLES, _DrawLineV, x1-0.5, y1, y2, 1, _DrawLineH, x1, x2, y3-0.5, 1)
+  gl.Color(self.treeview.treeColor)
+  gl.BeginEnd(GL.TRIANGLES, _DrawLineV, x1-0.5, y1, y2, 1, _DrawLineH, x1, x2, y3-0.5, 1)
 
   if (not self.nodes[1]) then
     return
   end
 
-  glColor(1,1,1,1)
+  gl.Color(1,1,1,1)
   local image = self.ImageExpanded or self.treeview.ImageExpanded
   if (not self.expanded) then
     image = self.ImageCollapsed or self.treeview.ImageCollapsed
   end
 
   TextureHandler.LoadTexture(0, image, self)
-  local texInfo = glTextureInfo(image) or {xsize=1, ysize=1}
+  local texInfo = gl.TextureInfo(image) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
 
   _DrawTextureAspect(self.x,self.y,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
-  glTexture(0,false)
+  gl.Texture(0,false)
 end
 
 
@@ -781,12 +855,12 @@ end
 --// 
 
 function DrawDragGrip(obj)
-  glBeginEnd(GL_TRIANGLES, _DrawDragGrip, obj)
+  gl.BeginEnd(GL.TRIANGLES, _DrawDragGrip, obj)
 end
 
 
 function DrawResizeGrip(obj)
-  glBeginEnd(GL_LINES, _DrawResizeGrip, obj)
+  gl.BeginEnd(GL.LINES, _DrawResizeGrip, obj)
 end
 
 --//=============================================================================

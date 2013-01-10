@@ -30,17 +30,15 @@ function Button:HitTest(x,y)
 end
 
 function Button:MouseDown(...)
-  self._down = true
-  self.state = 'pressed'
+  self.state.pressed = true
   inherited.MouseDown(self, ...)
   self:Invalidate()
   return self
 end
 
 function Button:MouseUp(...)
-  if (self._down) then
-    self._down = false
-    self.state = 'normal'
+  if (self.state.pressed) then
+    self.state.pressed = false
     inherited.MouseUp(self, ...)
     self:Invalidate()
     return self

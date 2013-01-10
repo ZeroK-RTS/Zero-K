@@ -21,6 +21,7 @@
 --//=============================================================================
 
 local wmeta =  {__mode = "v"}
+local newproxy = newproxy or getfenv(0).newproxy
 
 function MakeWeakLink(obj,wlink)
   --// 2nd argument is optional, if it's given it will reuse the given link (-> less garbage)

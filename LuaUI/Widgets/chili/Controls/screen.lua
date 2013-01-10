@@ -2,12 +2,13 @@ Screen = Object:Inherit{
   classname = 'screen',
   x         = 0,
   y         = 0,
-  width     = 1e9,
-  height    = 1e9,
+  width     = 0,
+  height    = 0,
 
   preserveChildrenOrder = true,
 
   activeControl = nil,
+  focusedControl = nil,
   hoveredControl = nil,
   currentTooltip = nil,
   _lastHoveredControl = nil,
@@ -22,17 +23,19 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-local glGetViewSizes = gl.GetViewSizes
-
---//=============================================================================
-
 function Screen:New(obj)
-  local vsx,vsy = glGetViewSizes()
-  obj.width  = vsx
-  obj.height = vsy
+  local vsx,vsy = gl.GetViewSizes()
+  if ((obj.width or -1) <= 0) then
+    obj.width = vsx
+  end
+  if ((obj.height or -1) <= 0) then
+    obj.height = vsy
+  end
+
   obj = inherited.New(self,obj)
 
   TaskHandler.RequestGlobalDispose(obj)
+  obj:RequestUpdate()
 
   return obj
 end
@@ -49,6 +52,10 @@ function Screen:OnGlobalDispose(obj)
 
   if (UnlinkSafe(self._lastHoveredControl) == obj) then
     self._lastHoveredControl = nil
+  end
+
+  if (UnlinkSafe(self.focusedControl) == obj) then
+    self.focusedControl = nil
   end
 end
 
@@ -85,14 +92,49 @@ function Screen:ClientToScreen(x,y)
   return x, y
 end
 
+
+function Screen:IsRectInView(x,y,w,h)
+	return
+		(x <= self.width) and
+		(x + w >= 0) and
+		(y <= self.height) and
+		(y + h >= 0)
+end
+
 --//=============================================================================
 
+function Screen:Update(...)
+	--//FIXME create a passive MouseMove event and use it instead?
+	self:RequestUpdate()
+	local hoveredControl = Unlink(self.hoveredControl)
+	local activeControl = Unlink(self.activeControl)
+	if hoveredControl and (not activeControl) then
+		local x, y = Spring.GetMouseState()
+		y = select(2,gl.GetViewSizes()) - y
+		local cx,cy = hoveredControl:ScreenToLocal(x, y)
+		hoveredControl:MouseMove(cx, cy, 0, 0)
+	end
+end
+
+
 function Screen:IsAbove(x,y,...)
-  y = select(2,glGetViewSizes()) - y
+  local activeControl = Unlink(self.activeControl)
+  if activeControl then
+    return true
+  end
+
+  y = select(2,gl.GetViewSizes()) - y
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
   --// tooltip
   if (UnlinkSafe(hoveredControl) ~= UnlinkSafe(self._lastHoveredControl)) then
+    if self._lastHoveredControl then
+      self._lastHoveredControl:MouseOut()
+    end
+    if hoveredControl then
+      hoveredControl:MouseOver()
+    end
+
     self.hoveredControl = MakeWeakLink(hoveredControl)
     if (hoveredControl) then
       local control = hoveredControl
@@ -114,15 +156,24 @@ end
 
 
 function Screen:MouseDown(x,y,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
   local activeControl = inherited.MouseDown(self,x,y,...)
   self.activeControl = MakeWeakLink(activeControl)
+  if self.focusedControl then
+    self.focusedControl.state.focused = false
+    self.focusedControl:Invalidate()
+  end
+  self.focusedControl = nil
+  if self.activeControl then
+    self.focusedControl = MakeWeakLink(activeControl)
+    self.focusedControl.state.focused = true
+  end
   return (not not activeControl)
 end
 
 
 function Screen:MouseUp(x,y,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
   local activeControl = Unlink(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -156,7 +207,7 @@ end
 
 
 function Screen:MouseMove(x,y,dx,dy,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
   local activeControl = Unlink(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -176,7 +227,7 @@ end
 
 
 function Screen:MouseWheel(x,y,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
   local activeControl = Unlink(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -192,6 +243,13 @@ function Screen:MouseWheel(x,y,...)
   end
 
   return (not not inherited.MouseWheel(self,x,y,...))
+end
+
+function Screen:KeyPress(...)
+    if self.focusedControl then
+      return (not not self.focusedControl:KeyPress(...))
+    end
+    return (not not inherited:KeyPress(...))
 end
 
 --//=============================================================================

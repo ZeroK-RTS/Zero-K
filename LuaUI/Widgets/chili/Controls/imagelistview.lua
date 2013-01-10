@@ -160,9 +160,7 @@ function ImageListView:ScanDir()
 
   self:DisableRealign()
     --// clear old
-    for i=#self.children,1,-1 do
-      self:RemoveChild(self.children[i])
-    end
+    self:ClearChildren()
 
     --// add ".."
     self:_AddFile('..',self.imageFolderUp)

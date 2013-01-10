@@ -6,12 +6,15 @@ Object = {
   --y         = 0,
   --width     = 10,
   --height    = 10,
-  defaultWidth  = 10,
+  defaultWidth  = 10, --FIXME really needed?
   defaultHeight = 10,
+
+  visible = true,
 
   preserveChildrenOrder = false, --// if false adding/removing children is much faster, but also the order (in the .children array) isn't reliable anymore
 
   children    = {},
+  children_hidden = {},
   childrenByName = CreateWeakTable(),
 
   OnDispose    = {},
@@ -21,6 +24,9 @@ Object = {
   OnMouseUp    = {},
   OnMouseMove  = {},
   OnMouseWheel = {},
+  OnMouseOver  = {},
+  OnMouseOut   = {},
+  OnKeyPress   = {},
 
   disableChildrenHitTest = false, --// if set childrens are not clickable/draggable etc - their mouse events are not processed
 }
@@ -49,6 +55,7 @@ local function GetUniqueId(classname)
 end
 
 --//=============================================================================
+
 function Object:New(obj)
   obj = obj or {}
 
@@ -109,9 +116,6 @@ function Object:New(obj)
   for i=1,#cn do
     obj:AddChild(cn[i],true)
   end
-
-  --// link some general events as Update()
-  --TaskHandler.AddObject(obj)
 
   --// sets obj._widget
   DebugHandler:RegisterObject(obj)
@@ -272,8 +276,26 @@ end
 
 
 function Object:ClearChildren()
-  self:CallChildrenInverse("Dispose") --FIXME instead of disposing perhaps just unlink from parent?
-  self.children = {}
+  --self:CallChildrenInverse("Dispose")
+
+  --FIXME instead of disposing perhaps just unlink from parent?
+  --FIXME clear hidden children too!
+
+  --// make it faster
+  local old = self.preserveChildrenOrder
+  self.preserveChildrenOrder = false
+
+  --// remove all children  
+    for i=1,#self.children_hidden do
+      self:ShowChild(self.children_hidden[i])
+    end
+
+    for i=#self.children,1,-1 do
+      self:RemoveChild(self.children[i])
+    end
+
+  --// restore old state
+  self.preserveChildrenOrder = old
 end
 
 
@@ -283,13 +305,113 @@ end
 
 --//=============================================================================
 
-function Object:SetLayer(child,layer)
+function Object:HideChild(obj)
+  --FIXME cause of performance reasons it would be usefull to use the direct object, but then we need to cache the link somewhere to avoid the auto calling of dispose
+  local objDirect = UnlinkSafe(obj)
+
+  if (not self.children[objDirect]) then
+    --if (self.debug) then
+      Spring.Echo("Chili: tried to hide a non-child (".. (obj.name or "") ..")")
+    --end
+    return
+  end
+
+  if (self.children_hidden[objDirect]) then
+    --if (self.debug) then
+      Spring.Echo("Chili: tried to hide the same child multiple times (".. (obj.name or "") ..")")
+    --end
+    return
+  end
+
+  local children = self.children
+  local cn = #children
+  for i=1,cn do
+    if CompareLinks(objDirect,children[i]) then
+      self.children_hidden[objDirect] =  {child, i, children[i-1], children[i+1]} --FIXME use weakLinks!
+      break
+    end
+  end
+
+  self:RemoveChild(obj)
+  obj.parent = self
+end
+
+
+function Object:ShowChild(obj)
+  --FIXME cause of performance reasons it would be usefull to use the direct object, but then we need to cache the link somewhere to avoid the auto calling of dispose
+  local objDirect = UnlinkSafe(obj)
+
+  if (not self.children_hidden[objDirect]) then
+    --if (self.debug) then
+      Spring.Echo("Chili: tried to show a non-child (".. (obj.name or "") ..")")
+    --end
+    return
+  end
+
+  if (self.children[objDirect]) then
+    --if (self.debug) then
+      Spring.Echo("Chili: tried to show the same child multiple times (".. (obj.name or "") ..")")
+    --end
+    return
+  end
+
+  local params = self.children_hidden[objDirect]
+  self.children_hidden[objDirect] = nil
+
+  local children = self.children
+  local cn = #children
+
+  if (params[3]) then
+    for i=1,cn do
+      if CompareLinks(params[3],children[i]) then
+        self:AddChild(obj)
+        self:SetChildLayer(obj,i+1)
+        return true
+      end
+    end
+  end
+
+  self:AddChild(obj)
+  self:SetChildLayer(obj,params[2])
+  return true
+end
+
+
+function Object:SetVisibility(visible)
+  if (visible) then
+    self.parent:ShowChild(self)
+  else
+    self.parent:HideChild(self)
+  end
+  self.visible = visible
+end
+
+
+function Object:Hide()
+  self:SetVisibility(false)
+end
+
+
+function Object:Show()
+  self:SetVisibility(true)
+end
+
+
+function Object:ToggleVisibility()
+  self:SetVisibility(not self.visible)
+end
+
+--//=============================================================================
+
+function Object:SetChildLayer(child,layer)
   child = UnlinkSafe(child)
   local children = self.children
 
+  layer = math.min(layer, #children)
+
   --// it isn't at the same pos anymore, search it!
   for i=1,#children do
-    if (UnlinkSafe(children[i]) == child) then
+    if CompareLinks(children[i], child) then
       table.remove(children,i)
       break
     end
@@ -299,10 +421,15 @@ function Object:SetLayer(child,layer)
 end
 
 
-function Object:BringToFront()
+function Object:SetLayer(layer)
   if (self.parent) then
-    (self.parent):SetLayer(self,1)
+    (self.parent):SetChildLayer(self, layer)
   end
+end
+
+
+function Object:BringToFront()
+  self:SetLayer(1)
 end
 
 --//=============================================================================
@@ -475,6 +602,9 @@ end
 
 
 function Object:CallChildrenHT(eventname, x, y, ...)
+  if self.disableChildrenHitTest then
+    return nil
+  end
   local children = self.children
   for i=1,#children do
     local c = children[i]
@@ -492,6 +622,9 @@ end
 
 
 function Object:CallChildrenHTWeak(eventname, x, y, ...)
+  if self.disableChildrenHitTest then
+    return nil
+  end
   local children = self.children
   for i=1,#children do
     local c = children[i]
@@ -512,7 +645,7 @@ end
 function Object:RequestUpdate()
   --// we have something todo in Update
   --// so we register this object in the taskhandler
-  TaskHandler.AddObject(self)
+  TaskHandler.RequestUpdate(self)
 end
 
 
@@ -668,9 +801,28 @@ function Object:MouseWheel(...)
   return self:CallChildrenHTWeak('MouseWheel', ...)
 end
 
+
+function Object:MouseOver(...)
+  if (self:CallListeners(self.OnMouseOver, ...)) then
+    return self
+  end
+end
+
+
+function Object:MouseOut(...)
+  if (self:CallListeners(self.OnMouseOut, ...)) then
+    return self
+  end
+end
+
+
+function Object:KeyPress(...)
+  if (self:CallListeners(self.OnKeyPress, ...)) then
+    return self
+  end
+
+  return false
+end
+
 --//=============================================================================
-
-
-
-
 

@@ -12,22 +12,10 @@ function widget:GetInfo()
     enabled   = true,  --  loaded by default?
     handler   = true,
     api       = true,
-    alwaysStart = true,
+    alwaysStart    = true,
   }
 end
 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local glGetViewSizes	= gl.GetViewSizes
-local glPushMatrix	= gl.PushMatrix
-local glScale		= gl.Scale
-local glTranslate	= gl.Translate
-local glPopMatrix	= gl.PopMatrix
-
-local spGetModKeyState	= Spring.GetModKeyState
-local spGetMouseState	= Spring.GetMouseState
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -36,16 +24,30 @@ local Chili
 local screen0
 local th
 local tk
+local tf
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Chili's location
+
+local function GetDirectory(filepath) 
+    return filepath and filepath:gsub("(.*/)(.*)", "%1") 
+end 
+
+local source = debug and debug.getinfo(1).source
+local DIR = GetDirectory(source) or (LUAUI_DIRNAME.."Widgets/")
+CHILI_DIRNAME = DIR .. "chili/"
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-  Chili = VFS.Include(LUAUI_DIRNAME.."Widgets/chili/core.lua")
+  Chili = VFS.Include(CHILI_DIRNAME .. "core.lua", nil, VFS.RAW_FIRST)
 
   screen0 = Chili.Screen:New{}
   th = Chili.TextureHandler
   tk = Chili.TaskHandler
+  tf = Chili.FontHandler
 
   --// Export Widget Globals
   WG.Chili = Chili
@@ -71,30 +73,31 @@ end
 
 function widget:DrawScreen()
   if (not screen0:IsEmpty()) then
-    glPushMatrix()
-    local vsx,vsy = glGetViewSizes()
-    glTranslate(0,vsy,0)
-    glScale(1,-1,1)
+    gl.PushMatrix()
+    local vsx,vsy = gl.GetViewSizes()
+    gl.Translate(0,vsy,0)
+    gl.Scale(1,-1,1)
     screen0:Draw()
-    glPopMatrix()
+    gl.PopMatrix()
   end
 end
 
 
 function widget:TweakDrawScreen()
   if (not screen0:IsEmpty()) then
-    glPushMatrix()
-    local vsx,vsy = glGetViewSizes()
-    glTranslate(0,vsy,0)
-    glScale(1,-1,1)
+    gl.PushMatrix()
+    local vsx,vsy = gl.GetViewSizes()
+    gl.Translate(0,vsy,0)
+    gl.Scale(1,-1,1)
     screen0:TweakDraw()
-    glPopMatrix()
+    gl.PopMatrix()
   end
 end
 
 
 function widget:Update()
   tk.Update()
+  tf.Update()
 end
 
 
@@ -110,7 +113,7 @@ end
 
 local mods = {}
 function widget:MousePress(x,y,button)
-  local alt, ctrl, meta, shift = spGetModKeyState()
+  local alt, ctrl, meta, shift = Spring.GetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 
   return screen0:MouseDown(x,y,button,mods)
@@ -118,7 +121,7 @@ end
 
 
 function widget:MouseRelease(x,y,button)
-  local alt, ctrl, meta, shift = spGetModKeyState()
+  local alt, ctrl, meta, shift = Spring.GetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 
   return screen0:MouseUp(x,y,button,mods)
@@ -126,7 +129,7 @@ end
 
 
 function widget:MouseMove(x,y,dx,dy,button)
-  local alt, ctrl, meta, shift = spGetModKeyState()
+  local alt, ctrl, meta, shift = Spring.GetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 
   return screen0:MouseMove(x,y,dx,dy,button,mods)
@@ -134,11 +137,25 @@ end
 
 
 function widget:MouseWheel(up,value)
-  local x,y = spGetMouseState()
+  local x,y = Spring.GetMouseState()
   local alt, ctrl, meta, shift = Spring.GetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 
   return screen0:MouseWheel(x,y,up,value,mods)
+end
+
+
+local keyPressed = true
+function widget:KeyPress(key, mods, isRepeat, label, unicode)
+  keyPressed = screen0:KeyPress(key, mods, isRepeat, label, unicode)
+  return keyPressed
+end
+
+
+function widget:KeyRelease()
+  local _keyPressed = keyPressed
+  keyPressed = false
+  return _keyPressed -- block engine actions when we processed it
 end
 
 
