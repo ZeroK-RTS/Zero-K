@@ -138,7 +138,7 @@ skin.scrollpanel = {
 }
 
 skin.trackbar = {
-  TileImage = ":cl:trackbar.png",
+  TileImage = ":cn:trackbar.png",
   tiles     = {10, 14, 10, 14}, --// tile widths: left,top,right,bottom
 
   ThumbImage = ":cl:trackbar_thumb.png",

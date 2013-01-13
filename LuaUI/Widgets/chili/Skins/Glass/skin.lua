@@ -16,6 +16,8 @@ skin.general = {
   --font        = "FreeSansBold.ttf",
   fontsize    = 13,
   textColor   = {0.1,0.1,0.1,1},
+  focusColor   = {0.35, 0.35, 1.0, 0.9},
+  borderColor  = {1.0, 1.0, 1.0, 1.0},
 
   --padding         = {5, 5, 5, 5}, --// padding: left, top, right, bottom
   backgroundColor = {0.1, 0.1, 0.1, 0.7},
@@ -44,6 +46,12 @@ skin.button = {
   backgroundColor = {0.1, 0.1, 0.1, 0.7},
 
   DrawControl = DrawButton,
+}
+
+skin.editbox = {
+  textColor       = {1.0, 1.0, 1.0, 1.0},
+  backgroundColor = {0.1, 0.1, 0.1, 0.7},
+  cursorColor     = {0.35, 0.35, 1.0, 0.9},
 }
 
 skin.checkbox = {
@@ -116,7 +124,7 @@ skin.scrollpanel = {
   HKnobTileImage = ":cl:scrollbar_knob.png",
   HKnobTiles     = {6,7,6,9},
 
-  KnobColorSelected = {0.65,0.65,1,1},
+  KnobColorSelected = {0.35, 0.35, 1.0, 0.9},
 
   padding       = {1,1,1,1},
 

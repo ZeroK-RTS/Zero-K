@@ -358,7 +358,6 @@ end
 
 
 function LayoutPanel:_GetMaxChildConstraints(child)
---[[ FIXME: break button size
   local children = self.children
 
   if (self._cells and not self._inUpdateLayout) then
@@ -371,7 +370,6 @@ function LayoutPanel:_GetMaxChildConstraints(child)
       end
     end
   end
---]]
 
   local itemPadding = self.itemPadding
   local margin      = child.margin or self.itemMargin
@@ -386,10 +384,10 @@ function LayoutPanel:GetMinimumExtents()
 --[[
   local old = self.autosize
   self.autosize = false
-  local minWidth, minHeight = inherited.GetMinimumExtents(self)
+  local right, bottom = inherited.GetMinimumExtents(self)
   self.autosize = old
 
-  return minWidth, minHeight
+  return right, bottom
 --]]
   if (not self.autosize) then
     local right  = self.x + self.width

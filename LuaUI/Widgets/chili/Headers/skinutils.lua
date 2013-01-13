@@ -332,8 +332,8 @@ function DrawButton(obj)
 
   if (obj.state.pressed) then
     glColor(0.6,0.6,0.6,1) --FIXME
-  elseif (obj.state.hovered) then
-    glColor(obj.focusColor)
+  --elseif (obj.state.hovered) then
+  --  glColor(obj.focusColor)
   else
     glColor(obj.borderColor)
   end
@@ -572,8 +572,8 @@ function DrawScrollPanel(obj)
 
       local pos = obj.scrollPosY / contHeight
       local visible = clientHeight / contHeight
-      local gripy = y + h * pos
-      local griph = h * visible
+      local gripy = math.floor(y + h * pos) + 0.5
+      local griph = math.floor(h * visible)
       glBeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,gripy,obj.scrollbarSize,griph, skLeft,skTop,skRight,skBottom, tw,th, 0)
     --glTexture(0,false)
 
@@ -614,8 +614,8 @@ function DrawScrollPanel(obj)
 
       local pos = obj.scrollPosX / contWidth
       local visible = clientWidth / contWidth
-      local gripx = x + w * pos
-      local gripw = w * visible
+      local gripx = math.floor(x + w * pos) + 0.5
+      local gripw = math.floor(w * visible)
       glBeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, gripx,y,gripw,obj.scrollbarSize, skLeft,skTop,skRight,skBottom, tw,th, 0)
     --glTexture(0,false)
   end
@@ -775,14 +775,8 @@ function DrawTrackbar(self)
     local tw,th = texInfo.xsize, texInfo.ysize
 
     --// scale the thumb down if we don't have enough space
-    if (th>h) then
-      tw = math.ceil(tw*(h/th))
-      th = h
-    end
-    if (tw>w) then
-      th = math.ceil(th*(w/tw))
-      tw = w
-    end
+    tw = math.ceil(tw * (h / th))
+    th = h
 
     local barWidth = w - (pdLeft + pdRight)
     local mx = x+pdLeft+barWidth*percent

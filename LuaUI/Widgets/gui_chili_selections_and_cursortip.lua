@@ -1346,7 +1346,7 @@ local function BuildTooltip2(ttname, ttdata, sel)
 					itemMargin = {0,0,0,0},
 					resizeItems=false,
 					autosize=true,
-					width = 70,
+					width = 96,
 					children = children_leftbar,
 				}
 			leftside = true

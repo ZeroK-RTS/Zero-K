@@ -1,20 +1,16 @@
--- TODO: make EPIC save changed options somehow!
--- TODO: add missing command icons
 -- TODO: commandschanged gets called 2x for some reason, investigate
--- TODO: display which unit is currently selected
 -- TODO: proper tooltips for queue buttons
--- TODO: make tab scrolling with keyboard detect actions prevmenu and nextmenu instead of KeyPress
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.352 Integral Command Menu",
+    desc      = "v0.36 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
     layer     = math.huge-1,
     enabled   = true,
-	handler   = true,
+    handler   = true,
   }
 end
 
@@ -30,8 +26,8 @@ HOW IT WORKS:
 		Tabs are buttons in main window, just above fake window.
 		Currently selected tab is highlighted, when tab is changed all tabs are removed and regenerated.
 		
-		Two parent StackPanels (children of fake window), a column for normal commands and a row for state commands.
-		<numRows> (or <numStateColumns>) more StackPanels are nested in each of the parents, at right angles.
+		Two parent Panels (children of fake window), a column for normal commands and a row for state commands.
+		<numRows> (or <numStateColumns>) StackPanels are nested in each of the parents, at right angles.
 		When sorting commands, it splits commands into batches of <MAX_COLUMNS> and assigns them to children
 			so if there are 10 commands, it puts 6 in first row and 4 in second row
 			Build orders work a little differently, they have a predefined row in the config.
@@ -1301,9 +1297,9 @@ function widget:Initialize()
 	end
 	ColorTabs()
 	
-	commands_main = StackPanel:New{
+	commands_main = Panel:New{
 		parent = fakewindow,
-		resizeItems = true;
+		backgroundColor = {0, 0, 0, 0},
 		orientation   = "vertical";
 		rows = 3;
 		height = "98%";
@@ -1330,11 +1326,11 @@ function widget:Initialize()
 		--Spring.Echo("Command row "..i.." created")
 	end
 	
-	states_main = StackPanel:New{
+	states_main = Panel:New{
 		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "horizontal";
-		columns = 3;
+		backgroundColor = {0, 0, 0, 0},
 		height = "96%";
 		width = (STATE_SECTION_WIDTH).."%";
 		--x = tostring(100-STATE_SECTION_WIDTH).."%";
