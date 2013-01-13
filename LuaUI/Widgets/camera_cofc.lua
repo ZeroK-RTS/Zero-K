@@ -1163,6 +1163,11 @@ function widget:MouseWheel(up, value)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
+	local intercept = GroupRecallFix(key, modifier, isRepeat)
+	if intercept then
+		return true
+	end
+
 	--ls_have = false
 	tilting = false
 	
@@ -1350,13 +1355,13 @@ local spGetUnitGroup = Spring.GetUnitGroup
 local spGetGroupList  = Spring.GetGroupList 
 
 
-include("keysym.h.lua")
+--include("keysym.h.lua")
 local previousGroup =99
 local currentIteration = 1
 local previousKey = 99
 local previousTime = spGetTimer()
 
-function widget:KeyPress(key, modifier, isRepeat)
+function GroupRecallFix(key, modifier, isRepeat)
 	if ( not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
 		local gr
 		if (key == KEYSYMS.N_0) then gr = 0 
