@@ -8,7 +8,9 @@ cannon_fire2.wav
 cannon_fire3.wav
 cannon_fire4.wav
 cannon_hit1.wav
+cannon_hit4.wav
 reaper_hit.wav
+reaper_hit_boost.wav
 tremor_fire.wav
 supergun.wav
 supergun_bass_boost.wav
