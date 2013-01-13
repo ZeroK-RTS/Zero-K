@@ -356,8 +356,10 @@ options = {
 		value = { 0, 0, 0, 0},
 		OnChange = function(self) 
 			scrollpanel1.backgroundColor = self.value
+			scrollpanel1.borderColor = self.value
 			scrollpanel1:Invalidate()
 			inputspace.backgroundColor = self.value
+			inputspace.borderColor = self.value
 			inputspace:Invalidate()
 		end,
 	},
@@ -822,6 +824,7 @@ function widget:Initialize()
 		right = 5,
 		height = inputsize,
 		backgroundColor = options.color_background.value,
+		borderColor = options.color_background.value,
 		--backgroundColor = {1,1,1,1},
 	}
 	
@@ -835,6 +838,7 @@ function widget:Initialize()
 		verticalSmartScroll = true,
 -- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
 		backgroundColor = options.color_background.value,
+		borderColor = options.color_background.value,
 		noMouseWheel = not options.mousewheel.value,
 		children = {
 			stack_console,

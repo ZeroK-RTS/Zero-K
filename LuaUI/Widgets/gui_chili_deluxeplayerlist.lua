@@ -68,6 +68,7 @@ options = {
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			scroll_cpl.backgroundColor = {1,1,1,self.value}
+			scroll_cpl.borderColor = {1,1,1,self.value}
 			scroll_cpl:Invalidate()
 		end,
 	},
@@ -1254,6 +1255,7 @@ SetupScrollPanel = function ()
 		--width = "100%",
 		--height = "100%",
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
+		borderColor = {1,1,1,options.backgroundOpacity.value},
 		padding = {0, 5, 0, 5},
 		--autosize = true,
 		--right = 0,

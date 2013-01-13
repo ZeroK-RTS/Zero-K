@@ -1401,6 +1401,7 @@ end
 
 local lastCmd = nil  -- last active command 
 local lastColor = nil  -- original color of button with last active command
+local lastFocusColor = nil
 
 -- this is needed to highlight active command
 function widget:DrawScreen()
@@ -1409,12 +1410,15 @@ function widget:DrawScreen()
 		if cmdid and commandButtons[cmdid]  then 
 			local but = commandButtons[cmdid].button
 			lastColor = but.backgroundColor
-			but.backgroundColor = {0.8, 0, 0, 1};
+			lastFocusColor = but.focusColor
+			but.backgroundColor = {0.8, 0, 0, 1}
+			but.focusColor = {0.8, 0, 0, 1}
 			but:Invalidate()
 		end 
 		if lastCmd ~= nil and commandButtons[lastCmd] then 
 			local but = commandButtons[lastCmd].button
 			but.backgroundColor = lastColor
+			but.focusColor = lastFocusColor
 			but:Invalidate()
 		end 
 		lastCmd = cmdid
