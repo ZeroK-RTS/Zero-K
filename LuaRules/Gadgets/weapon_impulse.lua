@@ -214,6 +214,8 @@ function gadget:GameFrame(f)
 					end
 				--end
 			else
+				Spring.AddUnitImpulse(unitID, 1,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
+				Spring.AddUnitImpulse(unitID, -1,0,0) --remove dummy impulse
 				Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
 				--GG.UnitEcho(unitID,data.y)
 			end
