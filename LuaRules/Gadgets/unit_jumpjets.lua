@@ -262,28 +262,28 @@ local function Jump(unitID, goal, cmdTag)
 	
 		if delay > 0 then
 			for i=delay, 1, -1 do
-			Sleep()
-		end
+				Sleep()
+			end
 		
-		if cob then
-			spCallCOBScript( unitID, "BeginJump", 0)
-		else
-			Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
-		end
+			if cob then
+				spCallCOBScript( unitID, "BeginJump", 0)
+			else
+				Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
+			end
 
-		if rotateMidAir then
-			mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
-			mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
-		end
+			if rotateMidAir then
+				mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
+				mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
+			end
 		
-		--fakeUnitID = spCreateUnit(
-		--"fakeunit_aatarget", start[1], start[2], start[3], "n", teamID)
-		--mcEnable(fakeUnitID)
-		--spSetUnitNoSelect(fakeUnitID, true)
-		--spSetUnitBlocking(fakeUnitID, false)
-		--spSetUnitNoDraw(fakeUnitID, true)
-		--spSetUnitNoMinimap(fakeUnitID, true)
-	end
+			--fakeUnitID = spCreateUnit(
+			--"fakeunit_aatarget", start[1], start[2], start[3], "n", teamID)
+			--mcEnable(fakeUnitID)
+			--spSetUnitNoSelect(fakeUnitID, true)
+			--spSetUnitBlocking(fakeUnitID, false)
+			--spSetUnitNoDraw(fakeUnitID, true)
+			--spSetUnitNoMinimap(fakeUnitID, true)
+		end
 	
 		local halfJump
 		for i=0, 1, step do
@@ -296,17 +296,19 @@ local function Jump(unitID, goal, cmdTag)
 			local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height -- parabola
 			local z = start[3] + vector[3]*i
 			mcSetPosition(unitID, x, y, z)
-		if x0 then
-			spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
-		end
+			if x0 then
+				spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
+			end
 		
-		if cob then
-			spCallCOBScript(unitID, "Jumping", 1, i * 100)
-		else
-			Spring.UnitScript.CallAsUnit(unitID,env.jumping)
-		end
+			if cob then
+				spCallCOBScript(unitID, "Jumping", 1, i * 100)
+			else
+				Spring.UnitScript.CallAsUnit(unitID,env.jumping)
+			end
 		
-		if (fakeUnitID) then mcSetPosition(fakeUnitID, x, y, z) end
+			if (fakeUnitID) then 
+				mcSetPosition(fakeUnitID, x, y, z) 
+			end
 			if (not halfJump and i > 0.5) then
 				if cob then
 					spCallCOBScript( unitID, "HalfJump", 0)
