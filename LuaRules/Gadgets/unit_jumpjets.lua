@@ -261,6 +261,32 @@ local function Jump(unitID, goal, cmdTag)
 	local function JumpLoop()
 	
 		if delay > 0 then
+			if GG.wasMorphedTo[unitID] then
+				local oldUnitID = unitID --previous unitID
+				unitID = GG.wasMorphedTo[unitID] --new unitID
+				local unitDefID = spGetUnitDefID(unitID)
+				if (not jumpDefs[unitDefID]) then --check if new unit can jump
+					jumping[oldUnitID] = nil
+					lastJump[oldUnitID] = nil
+					return --exit JumpLoop() if unit can't jump
+				end
+				cob = jumpDefs[unitDefID].cobscript --script type
+				rotateMidAir = jumpDefs[unitDefID].rotateMidAir --unit rotate to face new direction?
+				delay = jumpDefs[unitDefID].delay --prejump delay
+				speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
+				height = jumpDefs[unitDefID].height --max height
+				reloadTime = (jumpDefs[unitDefID].reload or 0)*30 --jump reload time
+				if not cob then
+					env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
+				end
+				step = speed/lineDist --resolution of JumpLoop() update
+				mcEnable(unitID) --enable MoveCtrl for new unit
+				SetLeaveTracks(unitID, false) --set no track
+				jumping[unitID] = true --flag unit as jumping
+				lastJump[unitID] = lastJump[oldUnitID] --copy last jump timestamp to new unit
+				jumping[oldUnitID] = nil --empty old unit's data
+				lastJump[oldUnitID] = nil
+			end
 			for i=delay, 1, -1 do
 				Sleep()
 			end
@@ -286,7 +312,35 @@ local function Jump(unitID, goal, cmdTag)
 		end
 	
 		local halfJump
-		for i=0, 1, step do
+		local i = 0
+		while i <= 1 do
+			if GG.wasMorphedTo[unitID] then
+				local oldUnitID = unitID
+				unitID = GG.wasMorphedTo[unitID]
+				local unitDefID = spGetUnitDefID(unitID)
+				if (not jumpDefs[unitDefID]) then
+					jumping[oldUnitID] = nil
+					lastJump[oldUnitID] = nil
+					return
+				end
+				cob = jumpDefs[unitDefID].cobscript
+				speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
+				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
+				if not cob then
+					env = Spring.UnitScript.GetScriptEnv(unitID)
+				end
+				step = speed/lineDist --resolution of JumpLoop() update
+				mcEnable(unitID)
+				SetLeaveTracks(unitID, false)
+				jumping[unitID] = true
+				lastJump[unitID] = lastJump[oldUnitID]
+				jumping[oldUnitID] = nil
+				lastJump[oldUnitID] = nil				
+				halfJump = nil --reset halfjump flag. Redo halfjump script for new unit
+				if rotateMidAir then 
+					mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0) --resume unit rotation mid air
+				end
+			end
 			if ((not spGetUnitTeam(unitID)) and fakeUnitID) then
 				spDestroyUnit(fakeUnitID, false, true)
 				return -- unit died
@@ -318,6 +372,7 @@ local function Jump(unitID, goal, cmdTag)
 				halfJump = true
 			end
 			Sleep()
+			i = i + step
 		end
 
 		if (fakeUnitID) then 
@@ -329,7 +384,8 @@ local function Jump(unitID, goal, cmdTag)
 		else
 			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
 		end
-		lastJump[unitID] = spGetGameSeconds()
+		local jumpEndTime = spGetGameSeconds()
+		lastJump[unitID] = jumpEndTime
 		jumping[unitID] = false
 		SetLeaveTracks(unitID, true)
 		mcDisable(unitID)
@@ -339,11 +395,17 @@ local function Jump(unitID, goal, cmdTag)
 	
 		ReloadQueue(unitID, oldQueue, cmdTag)
 	
-		local reloadTimeInv = 1/reloadTime
-		for i=1, reloadTime do
-			spSetUnitRulesParam(unitID,"jumpReload",i*reloadTimeInv)
+		for j=1, reloadTime do
+			if GG.wasMorphedTo[unitID] then
+				local oldUnitID = unitID
+				unitID = GG.wasMorphedTo[unitID]
+				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
+				lastJump[unitID] = jumpEndTime --copy last jump timestamp to new unit
+				jumping[oldUnitID] = nil --empty old unit's data
+			end
+			spSetUnitRulesParam(unitID,"jumpReload",j/reloadTime)
 			Sleep()
-			if i == 1 then
+			if j == 1 then
 				if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
 					Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
 				end
@@ -396,7 +458,9 @@ end
 
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	lastJump[unitID] = nil
+	if not (jumping[unitID] and GG.wasMorphedTo[unitID]) then --do not clear the "lastJump[]" table if unit is just morphing & not dying.
+		lastJump[unitID] = nil
+	end
 end
 
 
