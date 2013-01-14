@@ -533,17 +533,17 @@ local function FinishMorph(unitID, morphData)
       z = z+8
     end
     newUnit = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
-  if not newUnit then
-    StopMorph(unitID, morphData)
-    return
-  end
+    if not newUnit then
+       StopMorph(unitID, morphData)
+       return
+    end
     Spring.SetUnitPosition(newUnit, x, y, z)
   else
     newUnit = Spring.CreateUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, isBeingBuilt)
-  if not newUnit then
-    StopMorph(unitID, morphData)
-    return
-  end
+    if not newUnit then
+       StopMorph(unitID, morphData)
+       return
+    end
     Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768, 0)
     Spring.SetUnitPosition(newUnit, px, py, pz)
   end
@@ -664,7 +664,12 @@ local function FinishMorph(unitID, morphData)
   
   GG.wasMorphedTo[unitID] = newUnit
   Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
+  local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
+  
+  Spring.AddUnitImpulse(newUnit,0,1,0) --dummy impulse (applying impulse>1 stop engine from forcing any unit to stick on map surface)
+  Spring.AddUnitImpulse(newUnit,0,-1,0) --negate dummy impulse
+  Spring.AddUnitImpulse(newUnit,velX,velY,velZ) --restore speed
 end
 
 
