@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armmerl]],
-  name                = [[Merl]],
-  description         = [[Mobile Cruise Missile Launcher]],
+  name                = [[Impaler]],
+  description         = [[Kinetic Missile Artillery]],
   acceleration        = 0.042,
   brakeRate           = 0.08,
   buildCostEnergy     = 700,
@@ -21,11 +21,11 @@ unitDef = {
     description_fr = [[Lanceur de Missile de Croisi?re Mobile]],
     description_pl = [[Mobilna Wyrzutnia Rakiet Manewruj?cych]],
 	description_de = [[Mobile Marschflugkörperabschussrampe]],
-    helptext       = [[The Merl fires vertically a high damage, high accuracy missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Merl to kill specific buildings.]],
+    helptext       = [[The Impale fires vertically a high damage, high accuracy kinetic missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Impaler to kill specific buildings.]],
     helptext_bp    = [[Merl dispara verticalmente um míssel de grande precis?o, dano e alcançe. Seu alto ângulo disparo o faz capaz de atirar sobre qualquer obstáculo, mas como consequ?ncia o tempo de voo é t?o longo que é quase impossível acertar alvos móveis. Use-o para matar construç?es específicas. ]],
-    helptext_fr    = [[Le Merl tire verticallement des missiles de croisi?res qui retombent exactement sur leur cible, causant de puissant dommages sur une tr?s petite zone. Cependant le temps de voyage des missiles le rends inefficace contre les unit?s mobiles. ]],
-    helptext_pl    = [[Merl jest wyrzutni? ci?kich rakiet artyleryjskich du?ego zasi?gu. Po wystrzeleniu rakieta wznosi si? wysoko w powietrze, a nast?pnie opada na wcze?niej wyznaczony punkt. Pozwala to omin?? wi?kszo?? przeszk?d i uderzy? z du?? moc? w konkretny budynek. Niestety Merl jest absolutnie bezu?yteczny przeciwko mobilnym jednostkom.]],
-	helptext_de    = [[Der Merl feuert seine Raketen senkrecht ab. Ihn zeichnen seine hohe Präzision und die lange Reichweite seiner Flugkörper, sowie die Möglichkeit über Hindernisse zu schießen, aus. Die große Flugzeit macht ihn aber nutzlos gegenüber sich bewegenden Einheiten. Nutze den Merl, um spezielle Einheiten/Gebäude zu zerstören.]],
+    helptext_fr    = [[Le Impaler tire verticallement des missiles de croisi?res qui retombent exactement sur leur cible, causant de puissant dommages sur une tr?s petite zone. Cependant le temps de voyage des missiles le rends inefficace contre les unit?s mobiles. ]],
+    helptext_pl    = [[Impaler jest wyrzutni? ci?kich rakiet artyleryjskich du?ego zasi?gu. Po wystrzeleniu rakieta wznosi si? wysoko w powietrze, a nast?pnie opada na wcze?niej wyznaczony punkt. Pozwala to omin?? wi?kszo?? przeszk?d i uderzy? z du?? moc? w konkretny budynek. Niestety Merl jest absolutnie bezu?yteczny przeciwko mobilnym jednostkom.]],
+	helptext_de    = [[Der Impaler feuert seine Raketen senkrecht ab. Ihn zeichnen seine hohe Präzision und die lange Reichweite seiner Flugkörper, sowie die Möglichkeit über Hindernisse zu schießen, aus. Die große Flugzeit macht ihn aber nutzlos gegenüber sich bewegenden Einheiten. Nutze den Merl, um spezielle Einheiten/Gebäude zu zerstören.]],
   },
 
   explodeAs           = [[BIG_UNITEX_MERL]],
@@ -84,23 +84,33 @@ unitDef = {
   weaponDefs          = {
 
     CORTRUCK_ROCKET = {
-      name                    = [[Cruise Missile]],
+      name                    = [[Kinetic Missile]],
       areaOfEffect            = 24,
       cegTag                  = [[raventrail]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
-      damage                  = {
+      damage         = {
         default = 800,
         planes  = 800,
         subs    = 4,
       },
-
+      
+      customParams = {
+		trail_burnout = 64, -- two seconds of vertical ascension
+		trail_burnout_ceg = [[missiletrailredsmall]],
+      },
+      
+	  texture1=[[null.tga]],
+	  texture2=[[null.tga]],
+	  texture3=[[null.tga]],
+	  texture4=[[null.tga]],
+	  
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:DOT_Merl_Explo]],
       fireStarter             = 100,
-      flighttime              = 14,
+      flighttime              = 100,
 	  impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

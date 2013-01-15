@@ -11,6 +11,7 @@
 -- raventrail
 -- banishertrail
 -- bdtrail
+-- voidtrail
 
 return {
   ["missiletrailredsmall"] = {
@@ -855,5 +856,10 @@ return {
       },
     },
   },
-
+  ["voidtrail"] = {
+    alwaysvisible        = false,
+    usedefaultexplosions = false,
+  },
 }
+
+
