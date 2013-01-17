@@ -367,7 +367,7 @@ options = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
-		OnChange = function(self) scrollpanel1.noMouseWheel = not self.value; end,
+		OnChange = function(self) scrollpanel1.ignoreMouseWheel = not self.value; end,
 	},
 	defaultAllyChat = {
 		name = "Default ally chat",
