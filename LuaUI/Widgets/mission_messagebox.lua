@@ -44,7 +44,7 @@ local convoExpireFrame
 
 local vsx, vsy = gl.GetViewSizes()
 
-function WG.ShowMessageBox(text, width, height, fontsize, pause)  
+local function ShowMessageBox(text, width, height, fontsize, pause)  
   local vsx, vsy = gl.GetViewSizes()
   
   -- reverse compatibility
@@ -102,18 +102,15 @@ function WG.ShowMessageBox(text, width, height, fontsize, pause)
   }
 end
 
-function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)  
+local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)  
 	local vsx, vsy = gl.GetViewSizes()
-	
 	--local x = math.floor((vsx - width)/2)
 	local y = math.floor((vsy - height)/2)
 	
 	if not width then
-		--Spring.Echo("Width is nil")
 		width = 320
 	end
 	if not height then
-		--Spring.Echo("Height is nil")
 		height = 100
 	end
 	
@@ -208,7 +205,7 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 	scrollPersistent:AddChild(textPersistent)
 end
 
-function WG.HidePersistentMessageBox()
+local function HidePersistentMessageBox()
 	if msgBoxPersistent then
 		msgBoxPersistent:Dispose()
 		msgBoxPersistent = nil
@@ -307,12 +304,12 @@ local function ClearConvoBox(noContinue)
   end
 end
 
-function WG.AddConvo(text, fontsize, image, sound, time)
+local function AddConvo(text, fontsize, image, sound, time)
   convoQueue[#convoQueue+1] = {text = text, fontsize = fontsize, image = image, sound = sound, time = time}
   if #convoQueue == 1 then ShowConvoBox(convoQueue[1]) end
 end
 
-function WG.ClearConvoQueue()
+local function ClearConvoQueue()
   ClearConvoBox(true)
   convoQueue = {}
 end
@@ -419,11 +416,7 @@ local str2 = 'Enemy nuclear silo spotted!'
 
 function widget:Initialize()
   Chili = WG.Chili
-  -- testing
-  --WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")	
-  --WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
-  --WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
-  
+
   -- hook widgetHandler to allow us to override the DrawScreen callin
   --local wh = widgetHandler
   --
@@ -432,9 +425,24 @@ function widget:Initialize()
   --  widget:DrawScreenForce()
   --  wh:oldDrawScreenWH()
   --end
+  
+  if Chili then
+    WG.ShowMessageBox = ShowMessageBox
+    WG.ShowPersistentMessageBox = ShowPersistentMessageBox
+    WG.HidePersistentMessageBox = HidePersistentMessageBox
+  end
+  WG.AddConvo = AddConvo
+  WG.ClearConvoQueue = ClearConvoQueue
+  
   if WG.AddNoHideWidget then
     WG.AddNoHideWidget(self)
   end
+  
+  -- testing
+  --WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")	
+  --WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
+  --WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
+  
 end
 
 function widget:Shutdown()
@@ -445,6 +453,12 @@ function widget:Shutdown()
   --local wh = widgetHandler
   --wh.DrawScreen = wh.oldDrawScreenWH
   --wh.oldDrawScreenWH = nil
+  
+  WG.ShowMessageBox = nil
+  WG.ShowPersistentMessageBox = nil
+  WG.HidePersistentMessageBox = nil
+  WG.AddConvo = nil
+  WG.ClearConvoQueue = nil
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
