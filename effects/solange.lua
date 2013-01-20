@@ -9,6 +9,7 @@ return {
       count              = 150,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[0  i4]],
         explosiongenerator = [[custom:SOLANGE_PILLAR]],
@@ -24,6 +25,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.97,
         alwaysvisible      = true,

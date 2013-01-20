@@ -12,6 +12,7 @@ return {
       count              = 30,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.97,
         alwaysvisible      = true,
@@ -58,6 +59,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = 100,
         explosiongenerator = [[custom:LONDON_FLAMES]],
@@ -82,18 +84,20 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[0 i10]],
         explosiongenerator = [[custom:LONDON_GLOW]],
         pos                = [[0, 0, 0]],
       },
     },
-    shere = {
+    sphere = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = 50,
         explosiongenerator = [[custom:LONDON_SPHERE]],
@@ -106,6 +110,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = 100,
         explosiongenerator = [[custom:ZOE]],
@@ -133,6 +138,7 @@ return {
       count              = 0,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alpha              = 0.8,
         alphadecay         = 0.03,
@@ -148,6 +154,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alpha              = 0.8,
         color              = [[0.8,0.8,0.6]],
@@ -164,6 +171,7 @@ return {
       count              = 3,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 1,
         alwaysvisible      = true,

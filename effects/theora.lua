@@ -11,6 +11,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.97,
         colormap           = [[0 0 0  0.01   0.8 0.8 0.8 1       0.8 0.8 0.8 1      0.8 0.8 0.8 1       0.8 0.8 0.8 1      0.8 0.8 0.8 1      0.8 0.8 0.8 1       0 0 0 0.01]],
@@ -41,6 +42,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.97,
         colormap           = [[0 0 0  0.01     1 0.6 0 1 	1 0.7 0.3 1 	1 0.7 0.5 1 	1 0.8 0.6 1     0.8 0.8 0.8 1       0 0 0 0.01]],
@@ -71,6 +73,7 @@ return {
       count              = 150,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[0  i4]],
         explosiongenerator = [[custom:TRANSTHEORA_PILLAR]],
@@ -86,6 +89,7 @@ return {
       count              = 150,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[0  i4]],
         explosiongenerator = [[custom:THEORA_PILLAR]],

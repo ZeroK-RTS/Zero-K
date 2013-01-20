@@ -13,6 +13,7 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.96,
         alwaysvisible      = true,
@@ -44,6 +45,7 @@ return {
       count              = 0,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.98,
         alwaysvisible      = true,
@@ -71,6 +73,7 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.98,
         alwaysvisible      = true,
@@ -102,6 +105,7 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.98,
         alwaysvisible      = true,
@@ -133,6 +137,7 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.97,
         alwaysvisible      = true,
@@ -161,6 +166,7 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.98,
         alwaysvisible      = true,
@@ -192,6 +198,7 @@ return {
       count              = 50,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[0 i4]],
         explosiongenerator = [[custom:ZOE_CAP]],
@@ -204,6 +211,7 @@ return {
       count              = 50,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[200 i4]],
         explosiongenerator = [[custom:ZOE_CAP2]],
@@ -216,6 +224,7 @@ return {
       count              = 50,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[400 i4]],
         explosiongenerator = [[custom:ZOE_CAP3]],
@@ -228,6 +237,7 @@ return {
       count              = 50,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[600 i4]],
         explosiongenerator = [[custom:ZOE_CAP4]],
@@ -240,6 +250,7 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[330 i4]],
         explosiongenerator = [[custom:ZOE_RING]],
@@ -252,6 +263,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[0 i200]],
         explosiongenerator = [[custom:SOLANGE]],
@@ -264,6 +276,7 @@ return {
       count              = 2,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[400 i200]],
         explosiongenerator = [[custom:THEORA]],
@@ -276,6 +289,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = [[200 i200]],
         explosiongenerator = [[custom:TRANSTHEORA]],
@@ -291,6 +305,7 @@ return {
       count              = 10,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         airdrag            = 0.96,
         alwaysvisible      = true,
