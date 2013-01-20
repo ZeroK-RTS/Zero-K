@@ -149,6 +149,7 @@ local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		textPersistent.font.size = fontsize or 12
 		textPersistent:Invalidate()	-- for some reason the text can fail to update without this
 		
+		scrollPersistent:SetScrollPos(nil, 0)
 		msgBoxPersistent:Invalidate()
 		return	-- done here, exit
 	end
