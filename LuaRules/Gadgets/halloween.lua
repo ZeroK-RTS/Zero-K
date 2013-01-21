@@ -75,7 +75,7 @@ local spGetUnitDefID	    = Spring.GetUnitDefID
 --local spGetUnitBasePosition = Spring.GetUnitBasePosition
 local spEcho                = Spring.Echo
 
-local spGetPlayerList	    = Spring.GetPlayerList
+--local spGetPlayerList	    = Spring.GetPlayerList
 local spGetTeamList	    = Spring.GetTeamList
 local spGetTeamInfo	    = Spring.GetTeamInfo
 local spGetPlayerInfo	    = Spring.GetPlayerInfo
@@ -146,25 +146,14 @@ function gadget:GameStart()
     if (GG.metalSpots and halloweenGhostIncomeBasedOnMexCount) then
       --------------------------------------------------------------------------
       local playerCount = 0
-      local playerlist = spGetPlayerList()
       local teamsSorted = spGetTeamList()
       for i=1,#teamsSorted do
 	local teamID = teamsSorted[i]
 	if teamID ~= spGetGaiaTeamID() then
-	  local _,_,_,isAI,_,_ = spGetTeamInfo(teamID)
-	  if isAI then
-	    playerCount = playerCount + 1
-	  end
-	end
-      end
-      for i=1, #playerlist do
-	local playerID = playerlist[i]
-	local _,_,spectator,_,_,_,_,_,_ = spGetPlayerInfo(playerID)
-	if not spectator then
 	  playerCount = playerCount + 1
 	end
       end
-      --spEcho("Debug non-spec player + ai count: " .. playerCount .. ".")
+      spEcho("[Debug] non-spec players: " .. playerCount .. ".")
       --------------------------------------------------------------------------
       halloweenGhostCurrentIncome = floor(0.5 + (#GG.metalSpots / 32.0 * playerCount)) -- subject to balance
       --spEcho("Debug: mc: " .. #GG.metalSpots .. ", gi: " .. halloweenGhostCurrentIncome .. ".")
@@ -284,38 +273,16 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
     -- if unit is possessed, but health drops to 33% or EMPed even slightly - return to owner
     if (unitTeam == spGetGaiaTeamID() and spGetUnitIsDead(unitID) == false and PossessedUnitList[unitID] ~= nil) then
       if (GhostIsHealthy(unitID) == false) then
-	-- interesting thing, if this is player or ai that is dead, return unit to attacker and NOT player
 	--------------------------------------------------------------------------
-	local playerlist = spGetPlayerList()
+	-- interesting thing, if owner is player or ai that is dead, return unit to attacker and NOT player
+	-- TODO possible another gamemode option to keep such units as possessed forever
 	local teamsSorted = spGetTeamList()
-	local found = false
 	for i=1,#teamsSorted do
 	  local teamID = teamsSorted[i]
 	  if teamID ~= spGetGaiaTeamID() then
-	    local _,_,isDead,isAI,_,_ = spGetTeamInfo(teamID)
-	    if (PossessedUnitList[unitID] == teamID and isAI and isDead) then
-	      if (attackerTeam ~= spGetGaiaTeamID()) then
-		PossessedUnitList[unitID] = attackerID
-		found = true -- so we don't enter next for loop
-	      else
-		PossessedUnitList[unitID] = nil
-		deletePossession(unitID)
-	      end
-	      break
-	    end
-	  end
-	end
-	if (found == false) then
-	  for i=1, #playerlist do
-	    local playerID = playerlist[i]
-	    local _,active,spectator,_,_,_,_,_,_ = spGetPlayerInfo(playerID)
-	    if ((PossessedUnitList[unitID] == playerID) and (spectator or not active)) then
-	      if (attackerTeam ~= spGetGaiaTeamID()) then
-		PossessedUnitList[unitID] = attackerID
-	      else
-		PossessedUnitList[unitID] = nil
-		deletePossession(unitID)
-	      end
+	    local _,_,isDead,_,_,_ = spGetTeamInfo(teamID)
+	    if (PossessedUnitList[unitID] == teamID and isDead and attackerTeam ~= spGetGaiaTeamID()) then
+	      PossessedUnitList[unitID] = attackerTeam
 	      break
 	    end
 	  end
