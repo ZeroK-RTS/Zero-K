@@ -120,7 +120,7 @@ local PossessedCount = {}
 local waveNumber = 0
 local possessGoal = 0
 local ownedThings = 0 -- owned in like "pwned"
-local graceTimer = (modOptions.graceperiod or 30)
+local graceTimer = (modOptions.ghostgraceperiod or 30)
 local bossWave = 10
 
 function gadget:Initialize()
