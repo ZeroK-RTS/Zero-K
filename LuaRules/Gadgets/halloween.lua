@@ -29,6 +29,7 @@ end
   Also nightmare difficulty is something to convert every map to duke nukem. :)
 
 TODO:
+- Public demanded commanders to become possessable, so make it as an option in some near future.
 - Figure out how to give unlimited resources (or is it even needed?) to "ghosts".
 - Unit actual expirience should also act as ghost resistant, so more elite unit is, the more expensive it is for ghosts to possess.
 - Sounds/markers/music(?) anything to notify players what happens.
@@ -384,7 +385,7 @@ function HellBreaksLoose()
 	  iunitID = teamUnits[i]
 	  iunitDefID = spGetUnitDefID(iunitID)
 	  -- maybe make it so only units but not structures count towards possessable things?
-	  if ((GhostIsHealthy(iunitID)) and (not nanoframed(iunitID)) and (not morphing(iunitID)) and IsntCom(iunitDefID) and (not unpossassableUnitsDef[iunitDefID])) then
+	  if ((GhostIsHealthy(iunitID)) and (not nanoframed(iunitID)) and (not morphing(iunitID)) and (not unpossassableUnitsDef[iunitDefID])) then
 	    possessableCount = possessableCount + 1
 	  end
 	  -- to make loop end faster
