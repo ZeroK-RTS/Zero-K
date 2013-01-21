@@ -153,7 +153,7 @@ function gadget:GameStart()
 	  playerCount = playerCount + 1
 	end
       end
-      spEcho("[Debug] non-spec players: " .. playerCount .. ".")
+      --spEcho("[Debug] non-spec players: " .. playerCount .. ".")
       --------------------------------------------------------------------------
       halloweenGhostCurrentIncome = floor(0.5 + (#GG.metalSpots / 32.0 * playerCount)) -- subject to balance
       --spEcho("Debug: mc: " .. #GG.metalSpots .. ", gi: " .. halloweenGhostCurrentIncome .. ".")
