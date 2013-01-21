@@ -229,6 +229,17 @@ local options = {
     section= 'hwg',
   },
   {
+    key    = 'ghostgraceperiod',
+    name   = 'Halloween ghosts initial grace time',
+    desc   = 'Number of seconds ghosts will not harass anyone, since game started.',
+    type   = 'number',
+    def    = 30,
+    min    = 0,
+    max    = 7200,
+    step   = 1.0,
+    section= 'hwg',
+  },
+  {
     key = "ghostdiff",
     name = "Halloween ghosts difficulty",
     desc = "Affects almost everything: grace, waves, income, some values are based on mex count (if enabled).",
