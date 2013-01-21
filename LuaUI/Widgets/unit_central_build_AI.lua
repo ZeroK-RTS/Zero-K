@@ -14,7 +14,7 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.31"
+local version = "v1.32"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -357,6 +357,12 @@ end
 
 function widget:UnitIdle(unitID, unitDefID, teamID)
 	if ( myUnits[unitID] ) then
+		for unit2,myCmd in pairs(myUnits) do
+			if ( myCmd == "asst "..unitID ) then  --check if this unit is being GUARDed
+				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
+				myUnits[unit2] = "idle" --set as "idle"
+			end
+		end		
 		myUnits[unitID] = "idle"
 		nextFrame = spGetGameFrame() + ping() --find new work
 	end
@@ -602,12 +608,25 @@ function GetWorkFor(unitID)
 			if ( ud.canFly ) then busyDist = busyDist * 0.50 end
 			--if ( ud.canHover ) then busyDist = busyDist * 0.75 end
 			local theCmd = myUnits[busyClosestID]
-			local myCmd = myQueue[theCmd]
-			if myCmd then --see if unit can use the same build queue from CentralBuildQueue
+			local myCmd = myQueue[theCmd] --get orders stored in CBA's queue
+			local canBuild = false	-- flag if unit can assist by copying order instead of GUARD.
+			if myCmd then
+				local acmd = abs(myCmd.id)
+				for _, options in ipairs(ud.buildOptions) do
+					if ( options == acmd ) then canBuild = true break end	-- if found, escape loop and mark as "canBuild=true".
+				end
+			end
+			if canBuild then --see if unit can use the same build queue from CBA's queue
 				return { unitID, myCmd.id, { myCmd.x, myCmd.y, myCmd.z, myCmd.h }, busyDist, theCmd } --assist the busy unit by copying order.
 			else
-				local cmd1 = GetFirstCommand(busyClosestID)
-				if cmd1 then --see if unit can use the same exact queue from the unit to be assisted
+				local cmd1 = GetFirstCommand(busyClosestID) --get orders stored in unit's queue
+				if cmd1 then
+					local acmd = abs(cmd1.id)
+					for _, options in ipairs(ud.buildOptions) do
+						if ( options == acmd ) then canBuild = true break end	-- if found, escape loop and mark as "canBuild=true".
+					end
+				end
+				if canBuild then --see if unit can use the same exact queue from the unit to be assisted
 					return { unitID, cmd1.id, { cmd1.params[1], cmd1.params[2], cmd1.params[3], cmd1.params[4] }, busyDist, theCmd } --assist the busy unit by copying order.
 				else --simply GUARD the unit to be assisted when all fail
 					return { unitID, CMD_GUARD, { busyClosestID }, busyDist, 0 } --assist the busy unit by GUARDING it.
@@ -661,13 +680,13 @@ function UnitGoByeBye(unitID)
 end
 
 --	Prevent CBAI from canceling orders that just haven't made it to host yet
---	because of high ping.  May no longer be necessary.  Donated by SkyStar.
+--	because of high ping. Donated by SkyStar.
 
 function ping()
 	local playerID = spGetLocalPlayerID()
 	local tname, _, tspec, tteam, tallyteam, tping, tcpu = spGetPlayerInfo(playerID)  
 	tping = (tping*1000-((tping*1000)%1)) /100 * 4
-	return max( tping, 15 )
+	return max( tping, 15 ) --wait minimum 0.5 sec delay
 end
 
 --	Generate unique key value for each command using its parameters.
