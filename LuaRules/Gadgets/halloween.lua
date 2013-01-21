@@ -120,7 +120,7 @@ local PossessedCount = {}
 local waveNumber = 0
 local possessGoal = 0
 local ownedThings = 0 -- owned in like "pwned"
-local graceTimer = (modOptions.halloweenInitialGracePeriod or 30)
+local graceTimer = (modOptions.graceperiod or 30)
 local bossWave = 10
 
 function gadget:Initialize()
@@ -141,7 +141,7 @@ function gadget:GameStart()
     end
     
     spEcho("Halloween - Ghost Possession gamemode detected.")
-    spEcho("After " .. (modOptions.halloweenInitialGracePeriod or 30) .. " seconds, ghosts will start to harass you, players.")
+    spEcho("After " .. graceTimer .. " seconds, ghosts will start to harass you, players.")
     -- interesting thing, probably on lolcat or speedmetal players need to specify StartIncome like 10x times :D
     if (GG.metalSpots and halloweenGhostIncomeBasedOnMexCount) then
       --------------------------------------------------------------------------
