@@ -110,6 +110,7 @@ local halloweenGhostMinBank = 0
 local halloweenGhostCurrentIncome = (modOptions.ghoststartincome or 1.0)
 local halloweenGhostIncomeBasedOnMexCount = (modOptions.ghostincomebasedonmex or true)
 local halloweenGhostCurrentDeviation = (modOptions.ghostincomesingularity or 1.1)
+local halloweenGhostInitialGrace = (modOptions.ghostgraceperiod or 30.0)
 local halloweenHellMode = false
 
 local halloweenGhostDifficulty = (modOptions.ghostdiff or "normal")
@@ -120,7 +121,7 @@ local PossessedCount = {}
 local waveNumber = 0
 local possessGoal = 0
 local ownedThings = 0 -- owned in like "pwned"
-local graceTimer = (modOptions.ghostgraceperiod or 30.0)
+local graceTimer = tonumber(halloweenGhostInitialGrace) -- ...
 local bossWave = 10
 
 function gadget:Initialize()
