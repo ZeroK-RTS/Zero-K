@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "UnitNoStuckInFactory",
-    desc      = "DEBUG: Always move unit away from factory's build yard. Prevent case of unit stuck in factory",
+    desc      = "Always move unit away from factory's build yard. Prevent case of unit stuck in factory",
     author    = "msafwan",
     date      = "23 Jan 2013",
     license   = "none",
