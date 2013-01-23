@@ -481,6 +481,7 @@ local morphDefs = {
 --------------------------------------------------------------------------------
 -- modular commander handling
 --------------------------------------------------------------------------------
+if Spring then --check if code is running under Spring or something else. If something else then don't create this morph def:
 local comMorph = {	-- not needed
 	[1] = {
 		time = 20,
@@ -590,6 +591,7 @@ for id, playerData in pairs(customComms) do
 			end
 		end
 	end
+end
 end
 
 --check that the morphs were actually inserted
