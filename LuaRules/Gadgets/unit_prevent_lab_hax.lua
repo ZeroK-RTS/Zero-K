@@ -238,9 +238,10 @@ function gadget:UnitCreated(unitID, unitDefID)
 		--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].maxx,0,lab[unitID].minz)
 		--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
 
-		lab[unitID].miny = spGetGroundHeight(ux,uz)
-		lab[unitID].maxy = lab[unitID].miny+100
-		end
+		local _,sizeY,_,_,offsetY = Spring.GetUnitCollisionVolumeData(unitID)
+		lab[unitID].miny = uy + offsetY - sizeY/2 --set the box bottom
+		lab[unitID].maxy = uy + offsetY + 20 --set the box height +20 elmo above the factory midpoint
+	end
   end
   
 end
