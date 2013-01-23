@@ -159,10 +159,10 @@ local function AllowUnitCreation(unitDefID, builderID, builderTeam, ux, uy, uz, 
             maxz = uz+xsize
         end        
 		
-       	Spring.MarkerAddLine(minx,0,minz,maxx,0,minz)
-		Spring.MarkerAddLine(minx,0,minz,minx,0,maxz)
-		Spring.MarkerAddLine(maxx,0,maxz,maxx,0,minz)
-		Spring.MarkerAddLine(maxx,0,maxz,minx,0,maxz)
+       	--Spring.MarkerAddLine(minx,0,minz,maxx,0,minz)
+		--Spring.MarkerAddLine(minx,0,minz,minx,0,maxz)
+		--Spring.MarkerAddLine(maxx,0,maxz,maxx,0,minz)
+		--Spring.MarkerAddLine(maxx,0,maxz,minx,0,maxz)
 		
         for Lid,Lv in pairs(lab) do  
             -- intersection of 2 rectangles
