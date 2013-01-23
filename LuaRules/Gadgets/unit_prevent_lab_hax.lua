@@ -38,7 +38,6 @@ local min = math.min
 local terraunitDefID = UnitDefNames["terraunit"].id
 
 local EXCEPTION_LIST = {
-  factoryplane = true,
   factorygunship = true,
   missilesilo = true,
   armasp = true,
@@ -61,10 +60,28 @@ function checkLabs()
 	  local fly = UnitDefs[ud].canFly
 	  local team = spGetUnitAllyTeam(id)
 	  if (team ~= Lv.team) and not fly then
-	  
+
 	    local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(id, true, true)
 		if aimY > -15 then
-		  if (Lv.face == 1) then
+		  local l = abs(ux-Lv.minx)
+		  local r = abs(ux-Lv.maxx)
+		  local t = abs(uz-Lv.minz)
+		  local b = abs(uz-Lv.maxz)
+		  
+		  local side = min(l,r,t,b)
+		  
+		  if (side == l) then
+		    spSetUnitPosition(id, Lv.minx, uz, true)
+		  elseif (side == r) then
+		    spSetUnitPosition(id, Lv.maxx, uz, true)
+		  elseif (side == t) then
+		    spSetUnitPosition(id, ux, Lv.minz, true)
+		  else
+		    spSetUnitPosition(id, ux, Lv.maxz, true)
+		  end
+		
+		--[[
+		if (Lv.face == 1) then
 		    local l = abs(ux-Lv.minx)
 		    local r = abs(ux-Lv.maxx)
 		    
@@ -83,25 +100,9 @@ function checkLabs()
 		      spSetUnitPosition(id, ux, Lv.maxz, true)
 		    end
 		  end
-		end
-		--[[
-		local l = abs(ux-Lv.minx)
-		local r = abs(ux-Lv.maxx)
-		local t = abs(uz-Lv.minz)
-		local b = abs(uz-Lv.maxz)
 		
-		local side = min(l,r,t,b)
-		
-		if (side == l) then
-		  spSetUnitPosition(id, Lv.minx, uz)
-		elseif (side == r) then
-		  spSetUnitPosition(id, Lv.maxx, uz)
-		elseif (side == t) then
-		  spSetUnitPosition(id, ux, Lv.minz)
-		else
-		  spSetUnitPosition(id, ux, Lv.maxz)
-		end
 		--]]
+		end
 	  end
 	end
 	
@@ -158,10 +159,10 @@ local function AllowUnitCreation(unitDefID, builderID, builderTeam, ux, uy, uz, 
             maxz = uz+xsize
         end        
 		
-       	--Spring.MarkerAddLine(minx,0,minz,maxx,0,minz)
-		--Spring.MarkerAddLine(minx,0,minz,minx,0,maxz)
-		--Spring.MarkerAddLine(maxx,0,maxz,maxx,0,minz)
-		--Spring.MarkerAddLine(maxx,0,maxz,minx,0,maxz)
+       	Spring.MarkerAddLine(minx,0,minz,maxx,0,minz)
+		Spring.MarkerAddLine(minx,0,minz,minx,0,maxz)
+		Spring.MarkerAddLine(maxx,0,maxz,maxx,0,minz)
+		Spring.MarkerAddLine(maxx,0,maxz,minx,0,maxz)
 		
         for Lid,Lv in pairs(lab) do  
             -- intersection of 2 rectangles
