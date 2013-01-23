@@ -929,9 +929,12 @@ function ColorTabs(arg)
 	arg = arg or menuChoice
 	RemoveChildren(menuTabRow)
 	for i=1,6 do
-		if i ~= arg then menuTabs[i] = MakeMenuTab(i, 0.4) end
+		if i == arg then
+			menuTabs[arg] = MakeMenuTab(arg, 1)
+		else
+			menuTabs[i] = MakeMenuTab(i, 0.4)
+		end
 	end
-	menuTabs[arg] = MakeMenuTab(arg, 1)
 end
 
 local function SmartTabSelect()
