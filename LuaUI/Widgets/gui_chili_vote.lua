@@ -27,8 +27,8 @@ local Control
 local Font
 
 -- elements
-local window, stack_main, label_title
-local stack_vote, label_vote, button_vote, progress_vote = {}, {}, {}, {}
+local window, panel_main, label_title
+local panel_vote, label_vote, button_vote, progress_vote = {}, {}, {}, {}
 local button_end, button_end_image
 
 --------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ function widget:Initialize()
 	Label = Chili.Label
 	Colorbars = Chili.Colorbars
 	Window = Chili.Window
-	StackPanel = Chili.StackPanel
+	Panel = Chili.Panel
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
 	Control = Chili.Control
@@ -189,7 +189,7 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
 	}
-	stack_main = StackPanel:New{
+	panel_main = Panel:New{
 		parent = window,
 		resizeItems = true;
 		orientation   = "vertical";
@@ -197,9 +197,10 @@ function widget:Initialize()
 		width =  "100%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
+		backgroundColor = {0, 0, 0, 0},
 	}
 	label_title = Label:New{
-		parent = stack_main,
+		parent = panel_main,
 		autosize=false;
 		align="center";
 		valign="top";
@@ -208,8 +209,8 @@ function widget:Initialize()
 		width = "100%";
 	}
 	for i=1,2 do
-		stack_vote[i] = StackPanel:New{
-			parent = stack_main,
+		panel_vote[i] = Panel:New{
+			parent = panel_main,
 			resizeItems = true;
 			orientation   = "horizontal";
 			y = (40*(i-1))+15 ..'%',
@@ -217,10 +218,11 @@ function widget:Initialize()
 			width =  "100%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
+			backgroundColor = {0, 0, 0, 0},
 		}
 		--[[
 		label_vote[i] = Label:New{
-			parent = stack_vote[i],
+			parent = panel_vote[i],
 			autosize=false;
 			align="left";
 			valign="center";
@@ -230,7 +232,7 @@ function widget:Initialize()
 		}
 		]]--
 		progress_vote[i] = Progressbar:New{
-			parent = stack_vote[i],
+			parent = panel_vote[i],
 			x		= "0%",
 			width   = "80%";
 			height	= "100%",
@@ -239,7 +241,7 @@ function widget:Initialize()
 			color   = (i == 1 and {0.2,0.9,0.3,1}) or {0.9,0.15,0.2,1};
 		}
 		button_vote[i] = Button:New{
-			parent = stack_vote[i],
+			parent = panel_vote[i],
 			x = "80%",
 			width = "20%",
 			height = "100%",
