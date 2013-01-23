@@ -55,7 +55,7 @@ modConfig["ZK"]["unitList"] =
 	armarch = { weapons = { 2 } },		--packo (unused)
 	armcir = { weapons = { 2 } },		--chainsaw
 	armdl = { weapons = { 1 } },		--anemone (unused)
-	corrl = { weapons = { 4 } },		--pulveriser
+	corrl = { weapons = { 4 } },		--defender
 	corllt = { weapons = { 1 } },		--LLT
 	corhlt = { weapons = { 1 } },		--HLT
 	corpre = { weapons = { 1 } },		--scorcher (unused)
@@ -69,6 +69,8 @@ modConfig["ZK"]["unitList"] =
 	corbhmth = { weapons = { 1 } },		--behemoth
 	cortl = { weapons = { 1 } },		--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
+	corgrav = { weapons = { 1 } },		--newton
+	
 }
 
 local unitDefIDRemap = {
