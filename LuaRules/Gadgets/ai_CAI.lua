@@ -2748,42 +2748,46 @@ end
 
 function gadget:GameFrame(n)
 
-	for team,_ in pairs(aiTeamData) do
+	for team,data in pairs(aiTeamData) do
 	
 		initialiseFaction(team)
-	
-		if n%60 == 0 + team then
-			updateTeamResourcing(team)
-			executeControlFunction(team, n)
-			conJobAllocator(team)
-		end
 		
-		if n%40 == 15 + team then
-			battleGroupHandler(team, n, n%200 == 15)
-		end
+		if not data.suspend then
 		
-		if n%40 == (35 + team)%40 then
-			raiderJobHandler(team)
-			combatJobHandler(team)
-			artyJobHandler(team)
-			bomberJobHandler(team)
-			fighterJobHandler(team)
-			gunshipJobHandler(team)
-		end
-		
-		if n%30 == 0 + team then
-			conJobHandler(team)
-			factoryJobHandler(team)
-			scoutJobHandler(team)
-		end
-		
-		if n%200 == 0 + team then
-			if debugData.showConJobList[team] then
-				echoConJobList(team)
+			if n%60 == 0 + team then
+				updateTeamResourcing(team)
+				executeControlFunction(team, n)
+				conJobAllocator(team)
 			end
-			if debugData.showFacJobList[team] then
-				echoFacJobList(team)
+			
+			if n%40 == 15 + team then
+				battleGroupHandler(team, n, n%200 == 15)
 			end
+			
+			if n%40 == (35 + team)%40 then
+				raiderJobHandler(team)
+				combatJobHandler(team)
+				artyJobHandler(team)
+				bomberJobHandler(team)
+				fighterJobHandler(team)
+				gunshipJobHandler(team)
+			end
+			
+			if n%30 == 0 + team then
+				conJobHandler(team)
+				factoryJobHandler(team)
+				scoutJobHandler(team)
+			end
+			
+			if n%200 == 0 + team then
+				if debugData.showConJobList[team] then
+					echoConJobList(team)
+				end
+				if debugData.showFacJobList[team] then
+					echoFacJobList(team)
+				end
+			end
+		
 		end
 		
 	end
@@ -3479,6 +3483,7 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 			airpadByID = {},
 		},
 		
+		suspend = false
 	}
 	
 	local a = aiTeamData[team]
@@ -3662,6 +3667,13 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 		end
 	
 	end
+end
+
+local function SuspendAI(team, bool)
+	if not aiTeamData[team] then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "attempt to suspend a non-existent CAI team")
+	end
+	aiTeamData[team].suspend = (bool and bool) or (not aiTeamData[team].suspend)
 end
 
 local function setAllyteamStartLocations(allyTeam)
@@ -3868,6 +3880,9 @@ function gadget:Initialize()
 	
 	SetupCmdChangeAIDebug()
 	
+	GG.CAI = GG.CAI or {}
+	GG.CAI.SuspendAI = SuspendAI
+	
 	--// mex spot detection
 	GG.metalSpots = GG.metalSpots
 	if not GG.metalSpots then
@@ -3888,7 +3903,11 @@ function gadget:Initialize()
 		end
 		--x,_,z = spGetUnitPosition(unitID)
 	end
+	
+end
 
+function gadget:Shutdown()
+	GG.CAI = nil
 end
 
 function gadget:Load(zip)
