@@ -16,15 +16,15 @@ LayoutPanel = Control:Inherit{
 
   itemMargin    = {5, 5, 5, 5},
   itemPadding   = {5, 5, 5, 5},
-  minItemWidth  = 0,
+  minItemWidth  = 1,
   maxItemWidth  = 0,
-  minItemHeight = 0,
+  minItemHeight = 1,
   maxItemHeight = 0,
 
   autosize = false,
 
-  rows = nil,
-  columns = nil,
+  rows          = nil,
+  columns       = nil,
   orientation   = "horizontal", --// "horizontal" or "vertical"
   autoArrangeH  = false, --FIXME rename
   autoArrangeV  = false, --FIXME rename
@@ -121,11 +121,13 @@ end
 
 function LayoutPanel:_EnlargeToLineHeight(startCell, endCell, lineHeight)
   local _cells = self._cells
+  local _cellPaddings = self._cellPaddings
 
   for i=startCell,endCell do
     local cell = _cells[i]
+    local padding = _cellPaddings[i]
     --if (self.orientation == "horizontal") then
-      cell[4] = lineHeight
+      cell[4] = lineHeight - padding[2] - padding[4]
     --else
     --  cell[3] = lineHeight
     --end
@@ -410,12 +412,12 @@ function LayoutPanel:_LayoutChildrenResizeItems()
   local cn = self.children
   local cn_count = #cn
 
-  local max_ix = math.floor(self.clientArea[3]/self.minItemWidth)
-  local max_iy = math.floor(self.clientArea[4]/self.minItemHeight)
+  local max_ix = math.floor(self.clientArea[3] / self.minItemWidth)
+  local max_iy = math.floor(self.clientArea[4] / self.minItemHeight)
 
-  if (max_ix*max_iy < cn_count)or
-     (max_ix<(self.columns or 0))or
-     (max_iy<(self.rows or 0))
+  if (max_ix * max_iy < cn_count)   or
+     (max_ix < (self.columns or 0)) or
+     (max_iy < (self.rows or 0))
   then
     --FIXME add autoEnlarge/autoAdjustSize?
     --error"LayoutPanel: not enough space"
@@ -516,6 +518,8 @@ function LayoutPanel:_LayoutChildren()
   local _lines = self._lines
   self._cells  = {}
   local _cells = self._cells
+  self._cellPaddings  = {}
+  local _cellPaddings = self._cellPaddings
 
   local itemMargin  = self.itemMargin
   local itemPadding = self.itemPadding
@@ -523,7 +527,6 @@ function LayoutPanel:_LayoutChildren()
   local cur_x,cur_y = 0,0
   local curLine, curLineSize = 1,self.minItemHeight
   local totalChildWidth,totalChildHeight = 0
-  local cell_left,cell_top,cell_width,cell_height = 0,0,0,0
   local lineHeights = {}
   local lineWidths = {}
 
@@ -580,29 +583,24 @@ function LayoutPanel:_LayoutChildren()
     local childWidth  = math.max(child[W],minItemWidth)
     local childHeight = math.max(child[H],minItemHeight)
 
+    local itemMarginL = margin[LEFT]
+    local itemMarginT = (curLine > 1) and margin[TOP] or 0
+    local itemMarginR = margin[RIGHT]
+    local itemMarginB = (i < cn_count) and margin[BOTTOM] or 0
+
     totalChildWidth  = margin[LEFT] + itemPadding[LEFT] +  childWidth  + itemPadding[RIGHT] + margin[RIGHT] --// FIXME add margin just for non-border controls
-    totalChildHeight = itemPadding[TOP] + childHeight + itemPadding[BOTTOM]
+    totalChildHeight = itemMarginT + itemPadding[TOP] + childHeight + itemPadding[BOTTOM] + itemMarginB
 
-    if (curLine > 1) then
-      totalChildHeight = margin[TOP] + totalChildHeight
-    end
-    if (i < cn_count) then --// check for lastLine and not last control!
-      totalChildHeight = totalChildHeight + margin[BOTTOM]
-    end
-
-    cell_top    = cur_y + itemPadding[TOP]
-    if (curLine > 1) then
-      cell_top = cell_top + margin[TOP]
-    end
-    cell_left   = cur_x + margin[LEFT] + itemPadding[LEFT]
-    cell_width  = childWidth
-    cell_height = childHeight
+    local cell_top    = cur_y + itemPadding[TOP]  + itemMarginT
+    local cell_left   = cur_x + itemPadding[LEFT] + itemMarginL
+    local cell_width  = childWidth
+    local cell_height = childHeight
 
     cur_x = cur_x + totalChildWidth
 
     if
       (i>1)and
-      (self.columns and ((i+1)%self.columns < 1))or
+      (self.columns and (((i - 1) % self.columns) < 1))or
       ((not self.columns) and (cur_x > clientAreaWidth))
     then
       lineHeights[curLine] = curLineSize
@@ -613,13 +611,14 @@ function LayoutPanel:_LayoutChildren()
       cur_y = cur_y + curLineSize
 
       curLine = curLine+1
-      curLineSize = math.max(minItemHeight,totalChildHeight)
-      cell_top  = cur_y + margin[TOP] + itemPadding[TOP]
-      cell_left = margin[LEFT] + itemPadding[LEFT]
+      curLineSize = math.max(minItemHeight, totalChildHeight)
+      cell_top  = cur_y + itemMarginT + itemPadding[TOP]
+      cell_left = itemMarginL + itemPadding[LEFT]
       _lines[curLine] = i
     end
 
-    _cells[i] = {cell_left,cell_top,cell_width,cell_height}
+    _cells[i] = {cell_left, cell_top, cell_width, cell_height}
+    _cellPaddings[i] = {itemMarginL + itemPadding[LEFT], itemMarginT + itemPadding[TOP], itemMarginR + itemPadding[RIGHT], itemMarginB + itemPadding[BOTTOM]}
 
     if (totalChildHeight > curLineSize) then
       curLineSize = totalChildHeight
@@ -655,7 +654,6 @@ function LayoutPanel:_LayoutChildren()
   if (self.autosize) then
     --if (self.orientation == "horizontal") then
       self:Resize(nil, cur_y, true, true)
-      --FIXME self:Resize(cur_y, nil, true, true)
     --else
     --  self:Resize(nil, cur_y, true, true)
     --end
