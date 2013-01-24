@@ -102,8 +102,7 @@ function Object:New(obj)
   setmetatable(obj,{__index = self})
 
   --// auto dispose remaining Dlists etc. when garbage collector frees this object
-  --FIXMElocal hobj = MakeHardLink(obj,function() obj:Dispose(); obj=nil; end)
-  local hobj = obj
+  local hobj = MakeHardLink(obj,function() obj:Dispose(); obj=nil; end)
 
   --// handle children & parent
   local parent = obj.parent
@@ -450,12 +449,6 @@ function Object:GetChildByName(name)
       return cn[i]
     end
   end
-
-  for c in pairs(self.children_hidden) do
-    if (name == c.name) then
-      return MakeWeakLink(c)
-    end
-  end
 end
 
 --// Backward-Compability
@@ -464,24 +457,11 @@ Object.GetChild = Object.GetChildByName
 
 --// Resursive search to find an object by its name
 function Object:GetObjectByName(name)
-  local r = self.childrenByName[name]
-  if r then return r end
-
-  for i=1,#self.children do
-    local c = self.children[i]
+  local cn = self.children
+  for i=1,#cn do
+    local c = cn[i]
     if (name == c.name) then
       return c
-    else
-      local result = c:GetObjectByName(name)
-      if (result) then
-        return result
-      end
-    end
-  end
-
-  for c in pairs(self.children_hidden) do
-    if (name == c.name) then
-      return MakeWeakLink(c)
     else
       local result = c:GetObjectByName(name)
       if (result) then
