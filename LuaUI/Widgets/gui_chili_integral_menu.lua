@@ -1303,8 +1303,6 @@ function widget:Initialize()
 	commands_main = Panel:New{
 		parent = fakewindow,
 		backgroundColor = {0, 0, 0, 0},
-		orientation   = "vertical";
-		rows = 3;
 		height = "98%";
 		width = COMMAND_SECTION_WIDTH.."%";
 		x = "1.5%";
@@ -1331,8 +1329,6 @@ function widget:Initialize()
 	
 	states_main = Panel:New{
 		parent = fakewindow,
-		resizeItems = true;
-		orientation   = "horizontal";
 		backgroundColor = {0, 0, 0, 0},
 		height = "96%";
 		width = (STATE_SECTION_WIDTH).."%";
@@ -1365,9 +1361,8 @@ function widget:Initialize()
 		}
 	end
 	
-	buildRow = StackPanel:New{
+	buildRow = Panel:New{
 		parent = commands_main,
-		resizeItems = true;
 		orientation   = "horizontal";
 		height = (math.floor(100/numRows)).."%";
 		width = "100%";
@@ -1375,7 +1370,7 @@ function widget:Initialize()
 		y = (math.floor(100/numRows))*(numRows-1).."%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
-		backgroundColor = {0.2, 0.2, 0.2, 0.6}
+		backgroundColor = {0, 0, 0, 0}
 	}
 
 	buildProgress = Progressbar:New{
@@ -1392,7 +1387,7 @@ function widget:Initialize()
 		skinName='default',
 	},
 	
-	commands_main:RemoveChild(buildRow);
+	commands_main:RemoveChild(buildRow)
 	for i=1,MAX_COLUMNS do
 		buildRowButtons[i] = {}
 	end
