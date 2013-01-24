@@ -102,10 +102,10 @@ unitDef = {
 		trail_burnout_ceg = [[missiletrailredsmall]],
       },
       
-	  texture1=[[null.tga]],
-	  texture2=[[null.tga]],
-	  texture3=[[null.tga]],
-	  texture4=[[null.tga]],
+      texture1=[[null]],
+      texture2=[[null]],
+      texture3=[[null]],
+      texture4=[[null]],
 	  
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:DOT_Merl_Explo]],

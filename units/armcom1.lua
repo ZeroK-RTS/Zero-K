@@ -42,7 +42,7 @@ unitDef = {
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
 	commtype = [[1]],
-	decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
+	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
   },
 
   energyMake             = 3.2,
