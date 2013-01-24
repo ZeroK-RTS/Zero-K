@@ -23,12 +23,8 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-local glGetViewSizes = gl.GetViewSizes
-
---//=============================================================================
-
 function Screen:New(obj)
-  local vsx,vsy = glGetViewSizes()
+  local vsx,vsy = gl.GetViewSizes()
   if ((obj.width or -1) <= 0) then
     obj.width = vsx
   end
@@ -127,7 +123,7 @@ function Screen:IsAbove(x,y,...)
     return true
   end
 
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
   --// tooltip
@@ -139,7 +135,7 @@ function Screen:IsAbove(x,y,...)
       hoveredControl:MouseOver()
     end
 
-    self.hoveredControl = MakeWeakLink(hoveredControl)
+    self.hoveredControl = MakeWeakLink(hoveredControl, self.hoveredControl)
     if (hoveredControl) then
       local control = hoveredControl
       --// find tooltip in hovered control or its parents
@@ -160,32 +156,39 @@ end
 
 
 function Screen:MouseDown(x,y,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
+
   local activeControl = inherited.MouseDown(self,x,y,...)
-  self.activeControl = MakeWeakLink(activeControl)
-  if self.focusedControl then
-    self.focusedControl.state.focused = false
-    self.focusedControl:Invalidate()
-  end
-  self.focusedControl = nil
-  if self.activeControl then
-    self.focusedControl = MakeWeakLink(activeControl)
-    self.focusedControl.state.focused = true
+  self.activeControl = MakeWeakLink(activeControl, self.activeControl)
+  if not CompareLinks(self.activeControl, self.focusedControl) then
+      local focusedControl = UnlinkSafe(self.focusedControl)
+      if focusedControl then
+          focusedControl.state.focused = false
+          focusedControl:FocusUpdate() --rename FocusLost()
+      end
+      self.focusedControl = nil
+      if self.activeControl then
+          self.focusedControl = MakeWeakLink(activeControl, self.focusedControl)
+          self.focusedControl.state.focused = true
+          self.focusedControl:FocusUpdate() --rename FocusGain()
+      end
   end
   return (not not activeControl)
 end
 
 
 function Screen:MouseUp(x,y,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
+
   local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
     local now = Spring.GetTimer()
     local obj
 
-    local hoveredControl = UnlinkSafe(self.hoveredControl)
-    if (hoveredControl == activeControl) then
+    local hoveredControl = inherited.IsAbove(self,x,y,...)
+
+    if CompareLinks(hoveredControl, activeControl) then
       --//FIXME send this to controls too, when they didn't `return self` in MouseDown!
       if (math.abs(x - self._lastClickedX)<3) and
          (math.abs(y - self._lastClickedY)<3) and
@@ -211,7 +214,7 @@ end
 
 
 function Screen:MouseMove(x,y,dx,dy,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
   local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -219,7 +222,7 @@ function Screen:MouseMove(x,y,dx,dy,...)
     if (obj==false) then
       self.activeControl = nil
     elseif (not not obj)and(obj ~= activeControl) then
-      self.activeControl = MakeWeakLink(obj)
+      self.activeControl = MakeWeakLink(obj, self.activeControl)
       return true
     else
       return true
@@ -231,7 +234,7 @@ end
 
 
 function Screen:MouseWheel(x,y,...)
-  y = select(2,glGetViewSizes()) - y
+  y = select(2,gl.GetViewSizes()) - y
   local activeControl = UnlinkSafe(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -239,7 +242,7 @@ function Screen:MouseWheel(x,y,...)
     if (obj==false) then
       self.activeControl = nil
     elseif (not not obj)and(obj ~= activeControl) then
-      self.activeControl = MakeWeakLink(obj)
+      self.activeControl = MakeWeakLink(obj, self.activeControl)
       return true
     else
       return true
@@ -250,10 +253,11 @@ function Screen:MouseWheel(x,y,...)
 end
 
 function Screen:KeyPress(...)
-    if self.focusedControl then
-      return (not not self.focusedControl:KeyPress(...))
-    end
-    return (not not inherited:KeyPress(...))
+	local focusedControl = UnlinkSafe(self.focusedControl)
+	if focusedControl then
+		return (not not focusedControl:KeyPress(...))
+	end
+	return (not not inherited:KeyPress(...))
 end
 
 --//=============================================================================

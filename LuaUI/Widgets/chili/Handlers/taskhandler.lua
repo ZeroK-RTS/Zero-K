@@ -93,7 +93,7 @@ function TaskHandler.Update()
 			obj.__inUpdateQueue = false
 			local Update = obj.Update
 			if (Update) then
-				Update(obj)
+				SafeCall(Update, obj)
 			end
 		end
 	end
@@ -110,7 +110,7 @@ function TaskHandler.Update()
 				obj.__inUpdateQueue = false
 				local InstantUpdate = obj.InstantUpdate
 				if (InstantUpdate) then
-					InstantUpdate(obj)
+					SafeCall(InstantUpdate, obj)
 				end
 			end
 		end

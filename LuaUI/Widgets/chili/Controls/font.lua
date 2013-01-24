@@ -180,7 +180,8 @@ function Font:AdjustPosToAlignment(x, y, width, height, align, valign)
     --// ascender
     extra = 'a'
   end
-
+  --FIXME add baseline 'd'
+  
   --// horizontal alignment
   if align == "left" then
     --do nothing

@@ -9,7 +9,9 @@ ScrollPanel = Control:Inherit{
   scrollPosY    = 0,
   verticalScrollbar   = true,
   horizontalScrollbar = true,
-  verticalSmartScroll = false, -- if control is scrolled to bottom, keep scroll when layout changes
+  verticalSmartScroll = false, --// if control is scrolled to bottom, keep scroll when layout changes
+  smoothScroll     = true,
+  smoothScrollTime = 0.7, --// in seconds
   ignoreMouseWheel = false,
 }
 
@@ -18,16 +20,18 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-local glPushMatrix    = gl.PushMatrix
-local glColor         = gl.Color
-local glRect          = gl.Rect
-local glTranslate     = gl.Translate
-local glPopMatrix     = gl.PopMatrix
-local glGetViewSizes  = gl.GetViewSizes
+local function smoothstep(x)
+  return x*x*(3 - 2*x)
+end
 
 --//=============================================================================
 
 function ScrollPanel:SetScrollPos(x,y,inview)
+  if (self.smoothScroll) then
+    self._oldScrollPosX = self.scrollPosX
+    self._oldScrollPosY = self.scrollPosY
+  end
+
   if (x) then
     if (inview) then
       x = x - self.clientArea[3] * 0.5
@@ -46,7 +50,40 @@ function ScrollPanel:SetScrollPos(x,y,inview)
       self.scrollPosY = clamp(0, self.contentArea[4] - self.clientArea[4], self.scrollPosY)
     end
   end
+
+  if (self.smoothScroll) then
+    if (self._oldScrollPosX ~= self.scrollPosX)or(self._oldScrollPosY ~= self.scrollPosY) then
+      self._smoothScrollEnd = Spring.GetTimer()
+      self._newScrollPosX = self.scrollPosX
+      self._newScrollPosY = self.scrollPosY
+      self.scrollPosX = self._oldScrollPosX
+      self.scrollPosY = self._oldScrollPosY
+    end
+  end
+
   self:Invalidate()
+end
+
+
+function ScrollPanel:Update(...)
+	local trans = 1
+	if self.smoothScroll and self._smoothScrollEnd then
+		local trans = Spring.DiffTimers(Spring.GetTimer(), self._smoothScrollEnd)
+		trans = trans / self.smoothScrollTime
+
+		if (trans >= 1) then
+			self.scrollPosX = self._newScrollPosX
+			self.scrollPosY = self._newScrollPosY
+			self._smoothScrollEnd = nil
+		else
+			for n=1,3 do trans = smoothstep(trans) end
+			self.scrollPosX = self._oldScrollPosX * (1 - trans) + self._newScrollPosX * trans
+			self.scrollPosY = self._oldScrollPosY * (1 - trans) + self._newScrollPosY * trans
+			self:Invalidate()
+		end
+	end
+
+	inherited.Update(self, ...)
 end
 
 --//=============================================================================
@@ -215,10 +252,10 @@ function ScrollPanel:_DrawInClientArea(fnc,...)
     PushScissor(sx,sy,clientWidth,clientHeight)
   end
 
-  glPushMatrix()
-  glTranslate(math.floor(self.x + clientX - self.scrollPosX),math.floor(self.y + clientY - self.scrollPosY),0)
+  gl.PushMatrix()
+  gl.Translate(math.floor(self.x + clientX - self.scrollPosX),math.floor(self.y + clientY - self.scrollPosY),0)
   fnc(...)
-  glPopMatrix()
+  gl.PopMatrix()
 
   if (self.safeOpengl) then
     PopScissor()

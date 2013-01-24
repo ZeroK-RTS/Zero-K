@@ -5,9 +5,10 @@ function widget:GetInfo()
   return {
     name      = "Chili Framework",
     desc      = "Hot GUI Framework",
-    author    = "jK & quantum",
+    author    = "jK",
     date      = "WIP",
     license   = "GPLv2",
+    version   = "2.0",
     layer     = 1000,
     enabled   = true,  --  loaded by default?
     handler   = true,

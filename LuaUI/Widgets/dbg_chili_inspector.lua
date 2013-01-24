@@ -25,26 +25,32 @@ local label0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function trace(children, node)
+local function GetBooleanStr(b)
+	return (b and "true") or "false"
+end
+
+local function trace(children, node, level, max_level)
 	if not node then return end
+	if (level or 0) > (max_level or math.huge) then return end
 	for i=1,#children do
 		local obj = children[i]
-		if obj.name ~= "wnd_inspector" then
+		if obj and (obj.name ~= "wnd_inspector") then
 			local caption = ("%s: %s (redrawn: %i)"):format(obj.classname, obj.name, obj._redrawCounter or 0)
 			local nodec = node:Add(caption)
-			trace(obj.children, nodec)
+			trace(obj.children, nodec, (level or 0) + 1, max_level)
 		end
 	end
 end
 
 
 local function traceLost(node)
+	
 	for i,obj in pairs(Chili.DebugHandler.allObjects) do
 		if obj.name ~= "wnd_inspector" then
 			if (not obj.parent)and(not obj:InheritsFrom("screen")) then
-				local caption = ("%s: %s (redrawn: %i)"):format(obj.classname, obj.name, obj._redrawCounter or 0)
+				local caption = ("%s: %s (redrawn: %i; disposed: %s)"):format(obj.classname, obj.name, obj._redrawCounter or 0, GetBooleanStr(obj.disposed))
 				local nodec = node:Add(caption)
-				trace(obj.children, nodec)
+				trace(obj.children, nodec, 1, 1)
 			end
 		end
 	end
@@ -52,6 +58,7 @@ end
 
 
 local function tracePerWidget(node)
+	collectgarbage("collect")
 	for w,t in pairs(Chili.DebugHandler.objectsOwnedByWidgets) do
 		if (w.whInfo.name ~= widget.whInfo.name) then
 			local caption = ("%s"):format(w.whInfo.name)
@@ -142,7 +149,9 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	window0:Dispose()
+	if (window0) then
+		window0:Dispose()
+	end
 end
 
 local next = -math.huge

@@ -22,13 +22,11 @@ skin.general = {
   --padding         = {5, 5, 5, 5}, --// padding: left, top, right, bottom
   backgroundColor = {0.1, 0.1, 0.1, 0.7},
 
---[[
   font = {
-    outlineColor     = {0,1,0,1},
-    autoOutlineColor = false,
-    shadow           = true,
+    outlineColor     = {0.2,0.2,0.2,0.3},
+    --autoOutlineColor = false,
+    --shadow           = true,
   },
---]]
 }
 
 skin.icons = {
@@ -47,6 +45,40 @@ skin.button = {
 
   DrawControl = DrawButton,
 }
+
+
+skin.combobox = {
+	TileImageFG = ":cl:glassFG.png",
+	TileImageBK = ":cl:glassBK.png",
+	TileImageArrow = ":cl:combobox_ctrl_arrow.png",
+	tiles       = {17,15,17,20},
+	padding     = {10, 10, 26, 10},
+
+	textColor = {1,1,1,1},
+	backgroundColor = {0.1, 0.1, 0.1, 0.7},
+
+	DrawControl = DrawComboBox,
+}
+
+
+skin.combobox_window = {
+	clone     = "window";
+	TileImage = ":cl:combobox_wnd.png",
+	padding   = {4, 3, 3, 4};
+}
+
+
+skin.combobox_scrollpanel = {
+	clone       = "scrollpanel";
+	borderColor = {1, 1, 1, 0};
+	padding     = {0, 0, 0, 0};
+}
+
+
+skin.combobox_item = {
+	clone       = "button";
+}
+
 
 skin.editbox = {
   textColor       = {1.0, 1.0, 1.0, 1.0},
@@ -123,7 +155,7 @@ skin.scrollpanel = {
   htiles     = {3,6,3,6},
   HKnobTileImage = ":cl:scrollbar_knob.png",
   HKnobTiles     = {6,7,6,9},
-
+  
   KnobColorSelected = {0.35, 0.35, 1.0, 0.9},
 
   padding       = {1,1,1,1},
@@ -179,7 +211,14 @@ skin.window = {
   DrawResizeGrip = DrawResizeGrip,
 }
 
-
+skin.line = {
+  TileImage = ":cl:glass_line.png",
+  tiles = {0, 0, 0, 0},
+  TileImageV = ":cl:glass_line_vert.png",
+  tilesV = {0, 0, 0, 0},
+  DrawControl = DrawLine,
+}
+  
 skin.control = skin.general
 
 

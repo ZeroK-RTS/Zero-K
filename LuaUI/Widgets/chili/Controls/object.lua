@@ -17,16 +17,17 @@ Object = {
   children_hidden = {},
   childrenByName = CreateWeakTable(),
 
-  OnDispose    = {},
-  OnClick      = {},
-  OnDblClick   = {},
-  OnMouseDown  = {},
-  OnMouseUp    = {},
-  OnMouseMove  = {},
-  OnMouseWheel = {},
-  OnMouseOver  = {},
-  OnMouseOut   = {},
-  OnKeyPress   = {},
+  OnDispose       = {},
+  OnClick         = {},
+  OnDblClick      = {},
+  OnMouseDown     = {},
+  OnMouseUp       = {},
+  OnMouseMove     = {},
+  OnMouseWheel    = {},
+  OnMouseOver     = {},
+  OnMouseOut      = {},
+  OnKeyPress      = {},
+  OnFocusUpdate   = {},
 
   disableChildrenHitTest = false, --// if set childrens are not clickable/draggable etc - their mouse events are not processed
 }
@@ -101,7 +102,8 @@ function Object:New(obj)
   setmetatable(obj,{__index = self})
 
   --// auto dispose remaining Dlists etc. when garbage collector frees this object
-  local hobj = MakeHardLink(obj,function() obj:Dispose(); obj=nil; end)
+  --FIXMElocal hobj = MakeHardLink(obj,function() obj:Dispose(); obj=nil; end)
+  local hobj = obj
 
   --// handle children & parent
   local parent = obj.parent
@@ -205,7 +207,6 @@ function Object:AddChild(obj, dontUpdate)
     Spring.Echo(("Chili: tried to add multiple times \"%s\" to \"%s\"!"):format(obj.name, self.name))
     return
   end
-
 
   if (obj.name) then
     if (self.childrenByName[obj.name]) then
@@ -449,6 +450,12 @@ function Object:GetChildByName(name)
       return cn[i]
     end
   end
+
+  for c in pairs(self.children_hidden) do
+    if (name == c.name) then
+      return MakeWeakLink(c)
+    end
+  end
 end
 
 --// Backward-Compability
@@ -457,11 +464,24 @@ Object.GetChild = Object.GetChildByName
 
 --// Resursive search to find an object by its name
 function Object:GetObjectByName(name)
-  local cn = self.children
-  for i=1,#cn do
-    local c = cn[i]
+  local r = self.childrenByName[name]
+  if r then return r end
+
+  for i=1,#self.children do
+    local c = self.children[i]
     if (name == c.name) then
       return c
+    else
+      local result = c:GetObjectByName(name)
+      if (result) then
+        return result
+      end
+    end
+  end
+
+  for c in pairs(self.children_hidden) do
+    if (name == c.name) then
+      return MakeWeakLink(c)
     else
       local result = c:GetObjectByName(name)
       if (result) then
@@ -712,6 +732,18 @@ function Object:ScreenToClient(x,y)
   return self:ParentToClient((self.parent):ScreenToClient(x,y))
 end
 
+
+function Object:LocalToObject(x, y, obj)
+  if CompareLinks(self,obj) then
+    return x, y
+  end
+  if (not self.parent) then
+    return -1,-1
+  end
+  x, y = self:LocalToParent(x, y)
+  return self.parent:LocalToObject(x, y, obj)
+end
+
 --//=============================================================================
 
 function Object:_GetMaxChildConstraints(child)
@@ -817,6 +849,15 @@ end
 
 function Object:KeyPress(...)
   if (self:CallListeners(self.OnKeyPress, ...)) then
+    return self
+  end
+
+  return false
+end
+
+
+function Object:FocusUpdate(...)
+  if (self:CallListeners(self.OnFocusUpdate, ...)) then
     return self
   end
 

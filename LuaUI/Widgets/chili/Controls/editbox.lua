@@ -26,6 +26,7 @@ local inherited = this.inherited
 
 function EditBox:New(obj)
 	obj = inherited.New(self,obj)
+	obj._interactedTime = Spring.GetTimer()
 	obj:SetText(obj.text)
 	obj:RequestUpdate()
 	return obj
@@ -40,6 +41,8 @@ end
 function EditBox:SetText(newtext)
 	if (self.text == newtext) then return end
 	self.text = newtext
+	self.cursor = 1
+	self.offset = 1
 	self:UpdateLayout()
 	self:Invalidate()
 end
@@ -92,10 +95,13 @@ function EditBox:Update(...)
 
 	--// redraw every few frames for blinking cursor
 	inherited.Update(self, ...)
-	self:RequestUpdate()
-	if (self.state.focused and (os.clock() >= (self._nextCursorRedraw or -math.huge))) then
-		self._nextCursorRedraw = os.clock() + 0.1 --10FPS
-		self:Invalidate()
+
+	if self.state.focused then
+		self:RequestUpdate()
+		if (os.clock() >= (self._nextCursorRedraw or -math.huge)) then
+			self._nextCursorRedraw = os.clock() + 0.1 --10FPS
+			self:Invalidate()
+		end
 	end
 end
 
@@ -110,6 +116,7 @@ function EditBox:MouseDown(x, y, ...)
 			break
 		end
 	end
+	self._interactedTime = Spring.GetTimer()
 	inherited.MouseDown(self, x, y, ...)
 	self:Invalidate()
 	return self
@@ -163,6 +170,7 @@ function EditBox:KeyPress(key, mods, isRepeat, label, unicode, ...)
 			return false
 		end
 	end
+	self._interactedTime = Spring.GetTimer()
 	inherited.KeyPress(self, key, mods, isRepeat, label, unicode, ...)
 	self:UpdateLayout()
 	self:Invalidate()

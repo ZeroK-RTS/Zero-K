@@ -357,8 +357,25 @@ function InvertColor(c)
   return {1 - c[1], 1 - c[2], 1 - c[3], c[4]}
 end
 
-function mulColor(c,s)
+function math.mix(x, y, a)
+	return y * a + x * (1 - a)
+end
+
+function mulColor(c, s)
   return {s * c[1], s * c[2], s * c[3], c[4]}
+end
+
+function mulColors(c1, c2)
+  return {c1[1] * c2[1], c1[2] * c2[2], c1[3] * c2[3], c1[4] * c2[4]}
+end
+
+function mixColors(c1, c2, a)
+	return {
+		math.mix(c1[1], c2[1], a),
+		math.mix(c1[2], c2[2], a),
+		math.mix(c1[3], c2[3], a),
+		math.mix(c1[4], c2[4], a)
+	}
 end
 
 function color2incolor(r,g,b,a)

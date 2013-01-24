@@ -13,12 +13,16 @@ local skin = {
 --//
 
 skin.general = {
-  --font        = "FreeSansBold.ttf",
-  fontOutline = false,
-  fontsize    = 13,
   textColor   = {1,1,1,1},
   focusColor   = {1.0, 0.7, 0.1, 0.8},
   borderColor  = {1.0, 1.0, 1.0, 1.0},
+
+  font = {
+    font    = SKINDIR .. "fonts/n019003l.pfb",
+    outline = false,
+    shadow  = true,
+    size    = 14,
+  },
 
   --padding         = {5, 5, 5, 5}, --// padding: left, top, right, bottom
 }
@@ -29,15 +33,51 @@ skin.icons = {
 }
 
 skin.button = {
-  TileImageBK = ":cl:tech_button.png",
-  TileImageFG = ":cl:empty.png",
+  TileImageBK = ":cl:tech_button_bk.png",
+  TileImageFG = ":cl:tech_button_fg.png",
   tiles = {22, 22, 22, 22}, --// tile widths: left,top,right,bottom
   padding = {10, 10, 10, 10},
 
   backgroundColor = {1, 1, 1, 0.7},
+  borderColor = {1,1,1,0},
 
   DrawControl = DrawButton,
 }
+
+skin.combobox = {
+	TileImageBK = ":cl:combobox_ctrl.png",
+	TileImageFG = ":cl:combobox_ctrl_fg.png",
+	TileImageArrow = ":cl:combobox_ctrl_arrow.png",
+	tiles   = {22, 22, 48, 22},
+	padding = {10, 10, 24, 10},
+
+	backgroundColor = {1, 1, 1, 0.7},
+	borderColor = {1,1,1,0},
+
+	DrawControl = DrawComboBox,
+}
+
+
+skin.combobox_window = {
+	clone     = "window";
+	TileImage = ":cl:combobox_wnd.png";
+	tiles     = {10, 10, 10, 10};
+	padding   = {4, 3, 3, 4};
+}
+
+
+skin.combobox_scrollpanel = {
+	clone       = "scrollpanel";
+	borderColor = {1, 1, 1, 0};
+	padding     = {0, 0, 0, 0};
+}
+
+
+skin.combobox_item = {
+	clone       = "button";
+	borderColor = {1, 1, 1, 0};
+}
+
 
 skin.checkbox = {
   TileImageFG = ":cl:tech_checkbox_checked.png",
@@ -187,6 +227,14 @@ skin.window = {
   DrawControl = DrawWindow,
   DrawDragGrip = function() end,
   DrawResizeGrip = DrawResizeGrip,
+}
+
+skin.line = {
+  TileImage = ":cl:tech_line.png",
+  tiles = {0, 0, 0, 0},
+  TileImageV = ":cl:tech_line_vert.png",
+  tilesV = {0, 0, 0, 0},
+  DrawControl = DrawLine,
 }
 
 

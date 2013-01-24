@@ -9,7 +9,7 @@ Label = Control:Inherit{
   padding = {0,0,0,0},
 
   autosize = true,
-  autoObeyLineHeight = false, --// (needs autosize) if true, autosize will obey the lineHeight (-> texts with the same line count will have the same height) 
+  autoObeyLineHeight = true, --// (needs autosize) if true, autosize will obey the lineHeight (-> texts with the same line count will have the same height) 
 
   align    = "left",
   valign   = "linecenter", --// usefull too "ascender"
@@ -45,6 +45,7 @@ function Label:UpdateLayout()
     local w = font:GetTextWidth(self.caption);
     local h, d, numLines = font:GetTextHeight(self.caption);
 
+    h = h + 1
     if (self.autoObeyLineHeight) then
       h = math.ceil(numLines * font:GetLineHeight())
     else

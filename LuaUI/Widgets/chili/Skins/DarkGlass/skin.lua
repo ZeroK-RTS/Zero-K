@@ -42,6 +42,12 @@ skin.window = {
   DrawResizeGrip = DrawResizeGrip,
 }
 
+skin.combobox_window = {
+	clone     = "window";
+	TileImage = ":cl:combobox_wnd.png",
+	padding   = {4, 3, 3, 4};
+}
+
 --//=============================================================================
 --//
 

@@ -471,7 +471,7 @@ function CreateWindow()
 	}
 
 	--// METAL
-    trkbar_metal = 	Chili.Trackbar:New{
+	trkbar_metal = 	Chili.Trackbar:New{
 		parent = window,
 		height = p(100/bars),
 		right  = 26,
@@ -486,8 +486,8 @@ function CreateWindow()
 				updateReserveBars(true, mouse ~= 3, trkbar_metal.value)
 			end
 			}, 
-        noDrawStep = true,
-        noDrawBar = true,
+		noDrawStep = true,
+		noDrawBar = true,
 		noDrawThumb = true,
 	}
 	
@@ -505,16 +505,16 @@ function CreateWindow()
 		color  = {0.5,0.5,0.5,0.5},
 		height = p(100/bars),
 		right  = 26,
-        min = 0,
-        max = 1,
-        value  = 0,
+		min = 0,
+		max = 1,
+		value  = 0,
 		x      = 110,
 		y      = p(100/bars),
-        noSkin = true,
-        font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+		noSkin = true,
+		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
 	
-    bar_metal = Chili.Progressbar:New{
+	bar_metal = Chili.Progressbar:New{
 		parent = window,
 		color  = col_metal,
 		height = p(100/bars),
@@ -571,8 +571,8 @@ function CreateWindow()
 		parent = window,
 		height = p(100/bars),
 		right  = 36,
-        x      = 100,
-        y      = 1,	 
+		x      = 100,
+		y      = 1,	 
 		value = 0,
 		min=0, 
 		max=1, 
@@ -582,8 +582,8 @@ function CreateWindow()
 				updateReserveBars(mouse ~= 3, true, trkbar_energy.value)
 			end
 		}, 
-        noDrawStep = true,
-        noDrawBar = true,
+		noDrawStep = true,
+		noDrawBar = true,
 		noDrawThumb = true,
 	}
 	
@@ -596,17 +596,17 @@ function CreateWindow()
 		file   = 'LuaUI/Images/energy.png',
 	}
     
-    bar_energy_overlay = Chili.Progressbar:New{
+	bar_energy_overlay = Chili.Progressbar:New{
 		parent = window,
 		color  = col_energy,
 		height = p(100/bars),
-        value  = 100,
-        color  = {0,0,0,0},
+		value  = 100,
+		color  = {0,0,0,0},
 		right  = 36,
-        x      = 100,
-        y      = 1,
-        noSkin = true,
-        font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+		x      = 100,
+		y      = 1,
+		noSkin = true,
+		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
 	
 	bar_energy_reserve_overlay = Chili.Progressbar:New{
@@ -615,13 +615,13 @@ function CreateWindow()
 		height = p(100/bars),
 		right  = 26,
 		 value = 0,
-        min = 0,
-        max = 1,
+		min = 0,
+		max = 1,
 		right  = 36,
-        x      = 100,
-        y      = 1,
-        noSkin = true,
-        font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+		x      = 100,
+		y      = 1,
+		noSkin = true,
+		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
     
 	bar_energy = Chili.Progressbar:New{

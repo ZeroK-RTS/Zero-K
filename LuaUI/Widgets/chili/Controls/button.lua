@@ -13,6 +13,7 @@ local inherited = this.inherited
 --//=============================================================================
 
 function Button:SetCaption(caption)
+  if (self.caption == caption) then return end
   self.caption = caption
   self:Invalidate()
 end

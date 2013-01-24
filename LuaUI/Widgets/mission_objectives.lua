@@ -109,7 +109,7 @@ local function AddObjective(id, title, details, pos, status, color)
 	function obj.panel:MouseDown(...)
 		local inherited = obj.panel.inherited
 		self._down = true
-		self.state = 'pressed'
+		self.state.pressed = true
 		inherited.MouseDown(self, ...)
 		self:Invalidate()
 		return self

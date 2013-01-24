@@ -10,7 +10,7 @@ Control = Object:Inherit{
   focusColor      = {0.2, 0.2, 1.0, 0.6},
 
   autosize        = false,
-  savespace       = false, --// if autosize==true, it shrinks the control to the minimum needed space, if disabled autosize _normally_ only enlarges the control
+  savespace       = true, --// if autosize==true, it shrinks the control to the minimum needed space, if disabled autosize _normally_ only enlarges the control
   resizeGripSize  = {11, 11},
   dragGripSize    = {10, 10},
 
@@ -62,16 +62,6 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-local glCreateList    = gl.CreateList
-local glCallList      = gl.CallList
-local glDeleteList    = gl.DeleteList
-local glGetViewSizes  = gl.GetViewSizes
-local glPushMatrix    = gl.PushMatrix
-local glTranslate     = gl.Translate
-local glPopMatrix     = gl.PopMatrix
-
---//=============================================================================
-
 local function FontBackwardCompa(obj)
   obj.font.outline = obj.font.outline or obj.fontOutline
   obj.font.color = obj.font.color or obj.captionColor
@@ -95,14 +85,11 @@ function Control:New(obj)
     obj.font = {}
   end
   FontBackwardCompa(obj)
-  local minimumSize = obj.minimumSize or {}
-  obj.minWidth = obj.minWidth or minimumSize[1]
-  obj.minHeight = obj.minHeight or minimumSize[2]
 
   --// load the skin for this control
   obj.classname = self.classname
   theme.LoadThemeDefaults(obj)
-  SkinHandler.LoadSkin(obj)
+  SkinHandler.LoadSkin(obj, self)
 
   --// call it twice, so skins can use old standards, too
   FontBackwardCompa(obj)
@@ -141,15 +128,15 @@ end
 
 function Control:Dispose()
   if (self._all_dlist) then
-    glDeleteList(self._all_dlist)
+    gl.DeleteList(self._all_dlist)
     self._all_dlist = nil
   end
   if (self._children_dlist) then
-    glDeleteList(self._children_dlist)
+    gl.DeleteList(self._children_dlist)
     self._children_dlist = nil
   end
   if (self._own_dlist) then
-    glDeleteList(self._own_dlist)
+    gl.DeleteList(self._own_dlist)
     self._own_dlist = nil
   end
 
@@ -273,9 +260,9 @@ end
 
 
 function Control:GetRelativeBox(savespace)
-  local t = {self.x,self.y,self.width,self.height}
+  local t = {self.x, self.y, self.width, self.height}
   if (savespace) then
-    t = {0,0,0,0}
+    t = {0,0,self.minWidth,self.minHeight}
   end
 
   if (not self._isRelative) then
@@ -294,8 +281,8 @@ function Control:GetRelativeBox(savespace)
   local relBounds = self._relativeBounds
   local left   = self.x
   local top    = self.y
-  local width  = self.width
-  local height = self.height
+  local width  = (savespace and self.minWidth) or self.width
+  local height = (savespace and self.minHeight) or self.height
 
   --// ProcessRelativeCoord is defined in util.lua
   if (relBounds.left) then
@@ -418,7 +405,7 @@ function Control:UpdateLayout()
 
     local neededWidth, neededHeight = self:GetChildrenMinimumExtents()
 
-    local relativeBox = self:GetRelativeBox(self._savespace)
+    local relativeBox = self:GetRelativeBox(self._savespace or self.savespace)
     neededWidth  = math.max(relativeBox[3], neededWidth)
     neededHeight = math.max(relativeBox[4], neededHeight)
 
@@ -426,8 +413,9 @@ function Control:UpdateLayout()
     neededHeight = neededHeight - self.padding[2] - self.padding[4]
 
     if (self.debug) then
+      local cminextW, cminextH = self:GetChildrenMinimumExtents()
       Spring.Echo("Control:UpdateLayout", self.name,
-		      "GetChildrenMinimumExtents", neededWidth, neededHeight,
+		      "GetChildrenMinimumExtents", cminextW, cminextH,
 		      "GetRelativeBox", relativeBox[3], relativeBox[4],
 		      "savespace", self._savespace)
     end
@@ -829,11 +817,11 @@ function Control:_UpdateOwnDList()
 
   if (self._needRedraw) then
     if (self._own_dlist) then
-      glDeleteList(self._own_dlist)
+      gl.DeleteList(self._own_dlist)
       self._own_dlist = nil
     end
 
-    self._own_dlist = glCreateList(self.DrawControl, self)
+    self._own_dlist = gl.CreateList(self.DrawControl, self)
 
     self._needRedraw = nil
   end
@@ -842,10 +830,10 @@ end
 --[[
 function Control:_UpdateChildrenDList()
   if (self._children_dlist) then
-    glDeleteList(self._children_dlist)
+    gl.DeleteList(self._children_dlist)
     self._children_dlist = nil
   end
-  self._children_dlist = glCreateList(self.CallChildrenInverse, self, 'DrawForList')
+  self._children_dlist = gl.CreateList(self.CallChildrenInverse, self, 'DrawForList')
 end
 --]]
 
@@ -889,7 +877,7 @@ end
 
 
 function Control:IsInView()
-	if self.parent then
+	if UnlinkSafe(self.parent) then
 		return self.parent:IsRectInView(self.x, self.y, self.width, self.height)
 	end
 	return false
@@ -961,10 +949,6 @@ end
 
 
 function Control:DrawControl()
-  if self.snapToGrid then 
-     self.x = math.floor(self.x) + 0.5 
-     self.y = math.floor(self.y) + 0.5 
-   end
   self:DrawBackground()
   self:DrawBorder()
 end
@@ -972,7 +956,7 @@ end
 
 function Control:DrawForList()
   if (self._own_dlist) then
-    glCallList(self._own_dlist);
+    gl.CallList(self._own_dlist);
   else
     self:DrawControl();
   end
@@ -998,7 +982,7 @@ function Control:Draw()
   end
 
   if (self._own_dlist) then
-    glCallList(self._own_dlist);
+    gl.CallList(self._own_dlist);
   else
     self:DrawControl();
   end
@@ -1174,6 +1158,11 @@ end
 
 function Control:KeyPress(...)
   return inherited.KeyPress(self, ...)
+end
+
+
+function Control:FocusUpdate(...)
+  return inherited.FocusUpdate(self, ...)
 end
 
 
