@@ -1135,12 +1135,12 @@ local function MakeHotkeyedControl(control, path, option)
 	local hklength = math.max( hotkeystring:len() * 10, 20)
 	local control2 = control
 	control.x = 0
-	control.right = hklength+2
+	control.right = hklength+2 --room for hotkey button on right side?
 	control:DetectRelativeBounds()
 	
 	local hkbutton = Button:New{
 		minHeight = 30,
-		right=0,
+		--right=0, --Note: uncommenting this entry cause hotkey-button's position to overlap with control-button's position. It happen after Chili merge/update (???)
 		width = hklength,
 		--x=-30,
 		caption = hotkeystring, 
@@ -1158,7 +1158,7 @@ local function MakeHotkeyedControl(control, path, option)
 		autosize = true,
 		itemMargin = {0,0,0,0},
 		margin = {0,0,0,0},
-		itemPadding = {2,0,0,0},
+		itemPadding = {2,0,-hklength-2,0}, --{left,top,right,bottom}. Note: removing -hklength-2 padding causes wide empty space to appear between control-buttons and hotkey-buttons. This happen after Chili update/merge (???)
 		padding = {0,0,0,0},
 		children={
 			control2,

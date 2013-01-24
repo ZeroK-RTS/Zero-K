@@ -238,29 +238,30 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
-	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
+	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	-- local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
+	-- local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
 	
-	local labelHeight = 24
-	local fontSize = 16
+	-- local labelHeight = 24
+	-- local fontSize = 16
 
 	window = Window:New{
 		--parent = screen0,
 		name   = 'rejoinProgress';
 		color = {0, 0, 0, 0},
-		width = 300;
-		height = 120;
-		left = 2; 
-		y = "45%";
-		dockable = true;
-		draggable = false,
+		width = 260,
+		height = 60,
+		left = 2, --dock left?
+		y = "40%", --halfway on screen?
+		dockable = true,
+		draggable = false, --disallow drag to avoid capturing mouse click
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
 		minWidth = MIN_WIDTH, 
 		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
+		savespace = true, --probably could save space?
 		--itemMargin  = {0, 0, 0, 0},
 	}
 	stack_main = StackPanel:New{
@@ -281,6 +282,7 @@ function widget:Initialize()
 		height = 16,
 		width = "100%";
 	}
+	--[[
 	stack_vote = StackPanel:New{
 		parent = stack_main,
 		resizeItems = true;
@@ -291,10 +293,12 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
+	--]]
 	progress_vote = Progressbar:New{
-		parent = stack_vote,
+		parent = stack_main,
 		x		= "0%",
-		width   = "80%";
+		y 		= '40%', --position at 40% of the window's height
+		width   = "100%"; --maximum width
 		height	= "100%",
 		max     = 1;
 		caption = "?/?";
