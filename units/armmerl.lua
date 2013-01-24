@@ -98,8 +98,8 @@ unitDef = {
       },
       
       customParams = {
-		trail_burnout = 64, -- two seconds of vertical ascension
-		trail_burnout_ceg = [[missiletrailredsmall]],
+		--trail_burnout = 64, -- two seconds of vertical ascension
+		--trail_burnout_ceg = [[missiletrailredsmall]],
       },
       
       texture1=[[null]],
