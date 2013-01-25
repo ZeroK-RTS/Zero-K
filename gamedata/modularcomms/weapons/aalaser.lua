@@ -9,7 +9,7 @@ local weaponDef = {
 	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
-	cylinderTargetting      = 1,
+	cylinderTargeting      = 1,
 	
 	customParams			= {
 		slot = [[5]],

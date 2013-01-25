@@ -11,7 +11,7 @@ local weaponDef = {
 		muzzleEffectFire = [[custom:zeus_fire_fx]],
 	},
 	
-	cylinderTargetting      = 0,
+	cylinderTargeting      = 0,
 	
 	damage                  = {
 		default        = 640,

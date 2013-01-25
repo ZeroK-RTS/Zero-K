@@ -6,7 +6,7 @@ local weaponDef = {
     cegTag                  = [[missiletrailblue]],
     craterBoost             = 1,
     craterMult              = 2,
-    cylinderTargetting      = 1,
+    cylinderTargeting      = 1,
 
     customParams			= {
 	slot = [[5]],
