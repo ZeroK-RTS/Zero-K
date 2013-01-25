@@ -15,9 +15,9 @@
 function widget:GetInfo()
   return {
     name      = "TeamCommEnds & Lavarise indicator",
-    desc      = "Indicate Team Comm Ends state & Lavarise state (at game start) & Halloween state",
+    desc      = "Indicate Team Comm Ends state & Lavarise state & Halloween state (at game start)",
     author    = "trepan, dizekat, Tom Fyuri",
-    date      = "Jul 9 2008, 2012 (lavarise), 2013 halloween",
+    date      = "Jul 9 2008, 2012 (lavarise), 2013 (halloween)",
     license   = "GNU GPL, v2 or later",
     layer     = -3,
     enabled   = true,  --  loaded by default?
@@ -94,7 +94,7 @@ function widget:DrawScreen()
 	else
 	  mainText = "Halloween mode! NIGHTMARE DIFFICULTY! HE COMES!"
 	end
-    	secondText = "Ghosts will randomly possess units! Damage(<34%hp)/EMP(>0%) ghosted units to unpossess them!"
+    	secondText = "Ghosts will randomly possess units! Damage (<34%hp)/EMP(>0%) ghosted units to unpossess them!"
       end
     elseif endmode then
       mainText = "Team Commander Ends!"
@@ -108,7 +108,7 @@ function widget:DrawScreen()
       else
 	mainText = "Halloween mode! NIGHTMARE DIFFICULTY! HE COMES!"
       end
-      secondText = "Ghosts will randomly possess units! Damage(<34%hp)/EMP(>0%) ghosted units to unpossess them!"
+      secondText = "Ghosts will randomly possess units! Damage (<34%hp)/EMP(>0%) ghosted units to unpossess them!"
     end
     local msg = colorStr .. mainText
     glPushMatrix()
