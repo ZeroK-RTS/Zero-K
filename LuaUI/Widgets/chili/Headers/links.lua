@@ -62,18 +62,18 @@ end
 
 
 function MakeHardLink(obj,gc)
+  obj = UnlinkSafe(obj) --// unlink hard-/weak-links -> faster (else it would have to go through multiple metatables)
+
   if (not isindexable(obj)) then
     return obj
   end
-
-  obj = UnlinkSafe(obj) --// unlink hard-/weak-links -> faster (else it would have to go through multiple metatables)
 
   local hlink = newproxy(true)
   local mtab = getmetatable(hlink)
   mtab._islink = true
   mtab._ishard = true
   mtab._obj = obj
-  mtab.__gc = gc
+  mtab.__gc = gc or function() if not obj._hlinks or not next(obj._hlinks) then obj:AutoDispose() end end
   mtab.__index = obj
   mtab.__newindex = obj
   mtab.__call = function() return mtab._obj end

@@ -907,7 +907,54 @@ function DrawLine(self)
     end
 
   gl.Texture(0,false)
+end
 
+--//=============================================================================
+--//
+
+function DrawTabBarItem(obj)
+  local x = obj.x
+  local y = obj.y
+  local w = obj.width
+  local h = obj.height
+
+  local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
+
+  if (obj.state.pressed) then
+    gl.Color(mulColor(obj.backgroundColor,0.4))
+  elseif (obj.state.hovered) then
+    gl.Color(obj.focusColor)
+  elseif (obj.state.selected) then
+    gl.Color(obj.focusColor)
+  else
+    gl.Color(obj.backgroundColor)
+  end
+  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+    local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+    local tw,th = texInfo.xsize, texInfo.ysize
+
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  --gl.Texture(0,false)
+
+  if (obj.state.pressed) then
+    gl.Color(0.6,0.6,0.6,1) --FIXME
+  elseif (obj.state.selected) then
+    gl.Color(obj.focusColor)
+  else
+    gl.Color(obj.borderColor)
+  end
+
+  TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
+    local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
+    local tw,th = texInfo.xsize, texInfo.ysize
+
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  gl.Texture(0,false)
+
+  if (obj.caption) then
+    local cx,cy,cw,ch = unpack4(obj.clientArea)
+    obj.font:DrawInBox(obj.caption, x + cx, y + cy, cw, ch, "center", "center")
+  end
 end
 
 --//=============================================================================

@@ -13,7 +13,7 @@ local refCounts = {}
 --//  maximum fontsize difference
 --// when we don't find the wanted font rendered with the wanted fontsize
 --// (in respect to this threshold) then recreate a new one
-local fontsize_threshold = 1 
+local fontsize_threshold = 2
 
 --//=============================================================================
 --// Destroy
@@ -67,7 +67,7 @@ function FontHandler.LoadFont(fontname,size,outwidth,outweight)
     local font = loadedFonts[i]
     if
       ((font.path == fontname)or(font.path == 'fonts/'..fontname))
-      and(math.abs(font.size - size) <= fontsize_threshold)
+      and(font.size - size >= 0) and (font.size - size <= fontsize_threshold)
       and((not outwidth)or(font.outlinewidth == outwidth))
       and((not outweight)or(font.outlineweight == outweight))
     then

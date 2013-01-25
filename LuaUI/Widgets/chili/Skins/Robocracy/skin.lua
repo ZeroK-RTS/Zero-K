@@ -237,6 +237,20 @@ skin.line = {
   DrawControl = DrawLine,
 }
 
+skin.tabbar = {
+  padding = {3, 1, 1, 0},
+}
+
+skin.tabbaritem = {
+  TileImageBK = ":cl:tech_tabbaritem_bk.png",
+  TileImageFG = ":cl:tech_tabbaritem_fg.png",
+  tiles = {10, 10, 10, 0}, --// tile widths: left,top,right,bottom
+  padding = {5, 3, 3, 2},
+  backgroundColor = {1, 1, 1, 1.0},
+
+  DrawControl = DrawTabBarItem,
+}
+
 
 skin.control = skin.general
 

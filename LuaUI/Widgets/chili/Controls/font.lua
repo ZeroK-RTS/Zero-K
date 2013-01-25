@@ -30,11 +30,11 @@ function Font:New(obj)
 end
 
 
-function Font:Dispose()
+function Font:Dispose(...)
   if (not self.disposed) then
     FontHandler.UnloadFont(self._font)  
   end
-  inherited.Dispose(self)
+  inherited.Dispose(self,...)
 end
 
 --//=============================================================================

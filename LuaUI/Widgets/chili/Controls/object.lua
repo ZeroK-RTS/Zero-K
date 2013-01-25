@@ -102,7 +102,7 @@ function Object:New(obj)
   setmetatable(obj,{__index = self})
 
   --// auto dispose remaining Dlists etc. when garbage collector frees this object
-  local hobj = MakeHardLink(obj,function() obj:Dispose(); obj=nil; end)
+  local hobj = MakeHardLink(obj)
 
   --// handle children & parent
   local parent = obj.parent
@@ -129,8 +129,20 @@ end
 -- children are disposed too
 -- todo: use scream, in case the user forgets
 -- nil -> nil
-function Object:Dispose()
+function Object:Dispose(_internal)
   if (not self.disposed) then
+
+    --// check if the control is still referenced (if so it would indicate a bug in chili's gc)
+    if _internal then
+      if self._hlinks and next(self._hlinks) then
+        local hlinks_cnt = table.size(self._hlinks)
+        local i,v = next(self._hlinks)
+        if hlinks_cnt > 1 or (v ~= self) then --// check if user called Dispose() directly
+          Spring.Echo(("Chili: tried to dispose \"%s\"! It's still referenced %i times!"):format(self.name, hlinks_cnt))
+        end
+      end
+    end
+ 
     self:CallListeners(self.OnDispose)
 
     self.disposed = true
@@ -144,6 +156,11 @@ function Object:Dispose()
     self:SetParent(nil)
     self:ClearChildren()
   end
+end
+
+
+function Object:AutoDispose()
+  self:Dispose(true)
 end
 
 
@@ -199,7 +216,6 @@ end
 
 
 function Object:AddChild(obj, dontUpdate)
-  --FIXME cause of performance reasons it would be usefull to use the direct object, but then we need to cache the link somewhere to avoid the auto calling of dispose
   local objDirect = UnlinkSafe(obj)
 
   if (self.children[objDirect]) then
@@ -207,12 +223,14 @@ function Object:AddChild(obj, dontUpdate)
     return
   end
 
+  local hobj = MakeHardLink(objDirect)
+
   if (obj.name) then
     if (self.childrenByName[obj.name]) then
       error(("Chili: There is already a control with the name `%s` in `%s`!"):format(obj.name, self.name))
       return
     end
-    self.childrenByName[obj.name] = objDirect
+    self.childrenByName[obj.name] = hobj
   end
 
   if UnlinkSafe(obj.parent) then
@@ -223,18 +241,27 @@ function Object:AddChild(obj, dontUpdate)
   local children = self.children
   local i = #children+1
   children[i] = objDirect
-  children[obj] = i --FIXME
+  children[hobj] = i
   children[objDirect] = i
   self:Invalidate()
 end
 
 
 function Object:RemoveChild(child)
+  if not isindexable(child) then
+    return child
+  end
+
   if CompareLinks(child.parent,self) then
     child:SetParent(nil)
   end
 
   local childDirect = UnlinkSafe(child)
+
+  if (self.children_hidden[childDirect]) then
+    self.children_hidden[childDirect] = nil
+    return true
+  end
 
   if (not self.children[childDirect]) then
     --Spring.Echo(("Chili: tried remove none child \"%s\" from \"%s\"!"):format(child.name, self.name))
@@ -319,16 +346,20 @@ function Object:HideChild(obj)
     return
   end
 
+  local hobj = MakeHardLink(objDirect)
+  local pos = {hobj, 0, nil, nil}
+
   local children = self.children
   local cn = #children
-  for i=1,cn do
+  for i=1,cn+1 do
     if CompareLinks(objDirect,children[i]) then
-      self.children_hidden[objDirect] =  {child, i, children[i-1], children[i+1]} --FIXME use weakLinks!
+      pos = {hobj, i, MakeWeakLink(children[i-1]), MakeWeakLink(children[i+1])}
       break
     end
   end
 
   self:RemoveChild(obj)
+  self.children_hidden[objDirect] = pos
   obj.parent = self
 end
 
@@ -449,6 +480,12 @@ function Object:GetChildByName(name)
       return cn[i]
     end
   end
+
+  for c in pairs(self.children_hidden) do
+    if (name == c.name) then
+      return MakeWeakLink(c)
+    end
+  end
 end
 
 --// Backward-Compability
@@ -457,11 +494,24 @@ Object.GetChild = Object.GetChildByName
 
 --// Resursive search to find an object by its name
 function Object:GetObjectByName(name)
-  local cn = self.children
-  for i=1,#cn do
-    local c = cn[i]
+  local r = self.childrenByName[name]
+  if r then return r end
+
+  for i=1,#self.children do
+    local c = self.children[i]
     if (name == c.name) then
       return c
+    else
+      local result = c:GetObjectByName(name)
+      if (result) then
+        return result
+      end
+    end
+  end
+
+  for c in pairs(self.children_hidden) do
+    if (name == c.name) then
+      return MakeWeakLink(c)
     else
       local result = c:GetObjectByName(name)
       if (result) then

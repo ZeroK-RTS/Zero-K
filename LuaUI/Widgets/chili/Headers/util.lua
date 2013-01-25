@@ -330,6 +330,14 @@ function table:iequal(table2)
   return true
 end
 
+function table:size()
+  local cnt = 0
+  for _ in pairs(self) do
+    cnt = cnt + 1
+  end
+  return cnt
+end
+
 --//=============================================================================
 
 local weak_meta = {__mode='v'}

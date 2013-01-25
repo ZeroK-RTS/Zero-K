@@ -27,7 +27,7 @@ setmetatable(DebugHandler.objectsOwnedByWidgets, {
     local st = {};
     setmetatable(st,{__mode="v"});
     if (not i) then
-      Spring.Log("chili/debughandler.lua", LOG.ERROR, "WAAA",debug.traceback())
+      Spring.Echo("WAAA",debug.traceback())
     end
     t[i] = st;
     return st;
@@ -86,21 +86,21 @@ local function ChiliErrorHandler(msg,...)
   if (control) then
     local w = control._widget
     if (w) then
-      Spring.Log("chili/debughandler.lua", LOG.ERROR, ("Chili-Error in `%s`:%s : %s"):format(w.whInfo.name, control.name, msg))
-      Spring.Log("chili/debughandler.lua", LOG.ERROR, DebugHandler.Stacktrace())
+      Spring.Echo(("Chili-Error in `%s`:%s : %s"):format(w.whInfo.name, control.name, msg))
+      Spring.Echo(DebugHandler.Stacktrace())
 
       --// this also unloads all owned chili objects
-      Spring.Log("chili/debughandler.lua", LOG.ERROR, "Removed widget: " .. w.whInfo.name)
+      Spring.Echo("Removed widget: " .. w.whInfo.name)
       widgetHandler:RemoveWidget(w)
     else
-      Spring.Log("chili/debughandler.lua", LOG.ERROR, ("Chili-Error in `%s` (couldn't detect the owner widget): %s"):format(control.name, msg))
-      Spring.Log("chili/debughandler.lua", LOG.ERROR, DebugHandler.Stacktrace())
+      Spring.Echo(("Chili-Error in `%s` (couldn't detect the owner widget): %s"):format(control.name, msg))
+      Spring.Echo(DebugHandler.Stacktrace())
       control:Dispose()
     end
   else
     --// error in Chili itself
-    Spring.Log("chili/debughandler.lua", LOG.ERROR, ("Chili-Error: %s"):format(msg))
-    Spring.Log("chili/debughandler.lua", LOG.ERROR, DebugHandler.Stacktrace())
+    Spring.Echo(("Chili-Error: %s"):format(msg))
+    Spring.Echo(DebugHandler.Stacktrace())
 
     if (os.clock() - lastError < 5) then
       numChiliErrors = numChiliErrors + 1
@@ -111,7 +111,7 @@ local function ChiliErrorHandler(msg,...)
 
     --// unload Chili to avoid error spam
     if (numChiliErrors>=DebugHandler.maxChiliErrors) then
-      Spring.Log("chili/debughandler.lua", LOG.ERROR, "Removed widget: " .. widget.whInfo.name)
+      Spring.Echo("Removed widget: " .. widget.whInfo.name)
       widgetHandler:RemoveWidget(widget)
     end
   end

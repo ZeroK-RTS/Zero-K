@@ -209,6 +209,46 @@ function _DrawBackground(obj)
 end
 
 
+function _DrawTabBackground(obj)
+  local x = obj.x
+  local y = obj.y
+  local w = obj.width
+  local h = obj.height
+  local bt= 2
+
+  gl.Color(obj.backgroundColor)
+  gl.Vertex(x+bt,   y+bt)
+  gl.Vertex(x+bt,   y+h)
+  gl.Vertex(x+w-bt, y+bt)
+  gl.Vertex(x+w-bt, y+h)
+end
+
+
+local function _DrawTabBorder(obj, state)
+  local x = obj.x
+  local y = obj.y
+  local w = obj.width
+  local h = obj.height
+  local bt= 2
+
+  gl.Color(obj.borderColor)
+  gl.Vertex(x,      y+h)
+  gl.Vertex(x+bt,   y+h)
+  gl.Vertex(x,      y+bt)
+  gl.Vertex(x+bt,   y+bt)
+  gl.Vertex(x+bt,   y)
+  gl.Vertex(x+w-bt, y+bt)
+  gl.Vertex(x+w-bt, y)
+
+  gl.Color(obj.borderColor2)
+  gl.Vertex(x+w-bt, y)
+  gl.Vertex(x+w-bt, y+bt)
+  gl.Vertex(x+w,    y+bt)
+  gl.Vertex(x+w-bt, y+h)
+  gl.Vertex(x+w,    y+h)
+end
+
+
 --//=============================================================================
 --// Control Renderer
 
@@ -541,6 +581,30 @@ function DrawTreeviewNodeTree(self)
   gl.Texture(0,false)
 end
 
+--//=============================================================================
+--//
+
+function DrawTabBarItem(self)
+	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTabBackground, self, self.state)
+	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTabBorder, self, self.state)
+
+	if self.caption then
+		local x = self.x
+		local y = self.y
+		local w = self.width
+		local h = self.height
+		local bt= 2
+
+		local oldColor = self.font.color
+		if self.state.selected then
+			self.font:SetColor(self.focusColor)
+		end
+		self.font:Print(self.caption, x+w*0.5, y+bt+h*0.5, "center", "center")
+		if self.state.selected then
+			self.font:SetColor(oldColor)
+		end
+	end
+end
 
 --//=============================================================================
 --//
@@ -622,6 +686,15 @@ skin.window = {
   DrawControl = DrawWindow,
   DrawDragGrip = DrawDragGrip,
   DrawResizeGrip = DrawResizeGrip,
+
+  hitpadding = {4, 4, 4, 4},
+  boxes = {
+    resize = {-21, -21, -10, -10},
+    drag = {0, 0, "100%", 10},
+  },
+  NCHitTest = NCHitTestWithPadding,
+  NCMouseDown = WindowNCMouseDown,
+  NCMouseDownPostChildren = WindowNCMouseDownPostChildren,
 }
 
 skin.editbox = {
@@ -635,6 +708,14 @@ skin.combobox = {
 
 skin.line = {
   DrawControl = DrawLine,
+}
+
+skin.tabbaritem = {
+  borderColor     = {1.0, 1.0, 1.0, 0.8},
+  borderColor2    = {0.0, 0.0, 0.0, 0.8},
+  backgroundColor = {0.8, 0.8, 1.0, 0.7},
+  textColor       = {0.1, 0.1, 0.1, 1.0},
+  DrawControl = DrawTabBarItem,
 }
 
 skin.control = skin.general

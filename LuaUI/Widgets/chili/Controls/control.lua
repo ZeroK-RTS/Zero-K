@@ -126,7 +126,7 @@ function Control:New(obj)
 end
 
 
-function Control:Dispose()
+function Control:Dispose(...)
   if (self._all_dlist) then
     gl.DeleteList(self._all_dlist)
     self._all_dlist = nil
@@ -140,8 +140,8 @@ function Control:Dispose()
     self._own_dlist = nil
   end
 
-  inherited.Dispose(self)
-  self.font:Dispose()
+  inherited.Dispose(self,...)
+  self.font:SetParent()
 end
 
 --//=============================================================================

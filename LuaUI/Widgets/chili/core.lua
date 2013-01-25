@@ -37,6 +37,8 @@ local includes = {
   "controls/editbox.lua",
   "controls/line.lua",
   "controls/combobox.lua",
+  "controls/tabbaritem.lua",
+  "controls/tabbar.lua",
 }
 
 local Chili = widget
