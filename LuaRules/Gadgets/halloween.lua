@@ -102,7 +102,8 @@ local unpossassableUnitsDef = {
 }
 
 -- these are to remember original value
-local halloweenGhostSavingsDeviation = (modOptions.ghostsavingsrate or 0.02) -- anything that's cheaper than savebank is unlikely to being bought
+local halloweenGhostSavingsDeviation = (modOptions.ghostsavingsrate or 0.00) -- anything that's cheaper than savebank is unlikely to being bought
+local halloweenGhostInitialGrace = (modOptions.ghostgraceperiod or 30.0)
 
 -- these are values may or may not be modified during the game on fly
 local halloweenGhostBank = (modOptions.ghostmoney or 0)
@@ -110,7 +111,6 @@ local halloweenGhostMinBank = 0
 local halloweenGhostCurrentIncome = (modOptions.ghoststartincome or 1.0)
 local halloweenGhostIncomeBasedOnMexCount = (modOptions.ghostincomebasedonmex or true)
 local halloweenGhostCurrentDeviation = (modOptions.ghostincomesingularity or 1.1)
-local halloweenGhostInitialGrace = (modOptions.ghostgraceperiod or 30.0)
 local halloweenHellMode = false
 
 local halloweenGhostDifficulty = (modOptions.ghostdiff or "normal")

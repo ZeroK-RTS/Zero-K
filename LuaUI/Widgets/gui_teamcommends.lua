@@ -15,9 +15,9 @@
 function widget:GetInfo()
   return {
     name      = "TeamCommEnds & Lavarise indicator",
-    desc      = "Indicate Team Comm Ends state & Lavarise state (at game start)",
-    author    = "trepan, dizekat",
-    date      = "Jul 9 2008, 2012(lavarise)",
+    desc      = "Indicate Team Comm Ends state & Lavarise state (at game start) & Halloween state",
+    author    = "trepan, dizekat, Tom Fyuri",
+    date      = "Jul 9 2008, 2012 (lavarise), 2013 halloween",
     license   = "GNU GPL, v2 or later",
     layer     = -3,
     enabled   = true,  --  loaded by default?
@@ -63,8 +63,10 @@ function widget:DrawScreen()
   
   local endmode = (Spring.GetModOptions().commends) == "1"
   local lavamode = (Spring.GetModOptions().zkmode) == "lavarise"
+  local halloween = (Spring.GetModOptions().zkmode) == "halloween" -- only lavamode OR halloween can be true at the same time
+  local halloween_difficulty = Spring.GetModOptions().ghostdiff
   
-  if endmode or lavamode then
+  if endmode or lavamode or halloween then
     local timer = widgetHandler:GetHourTimer()
     local colorStr
     --if (math.fmod(timer, 0.5) < 0.25) then
@@ -82,12 +84,31 @@ function widget:DrawScreen()
     	mainText = "Lava Rise mode!"
     	secondText = "Lava will rise from the ground and will gradually consume everything!"
       end
+    elseif endmode and halloween then
+      if (math.fmod(timer, 6) < 3) then
+    	mainText = "Team Commander Ends!"
+    	secondText = "When all commanders in a team are killed, team loses!"
+      else 
+	if (halloween_difficulty ~= "nightmare") then
+	  mainText = "Halloween mode!"
+	else
+	  mainText = "Halloween mode! NIGHTMARE DIFFICULTY! HE COMES!"
+	end
+    	secondText = "Ghosts will randomly possess units! Damage(<34%hp)/EMP(>0%) ghosted units to unpossess them!"
+      end
     elseif endmode then
       mainText = "Team Commander Ends!"
       secondText = "When all commanders in a team are killed, team loses!"
     elseif lavamode then
       mainText = "Lava Rise mode!"
       secondText = "Lava will rise from the ground and will gradually consume everything!"
+    elseif halloween then
+      if (halloween_difficulty ~= "nightmare") then
+	mainText = "Halloween mode!"
+      else
+	mainText = "Halloween mode! NIGHTMARE DIFFICULTY! HE COMES!"
+      end
+      secondText = "Ghosts will randomly possess units! Damage(<34%hp)/EMP(>0%) ghosted units to unpossess them!"
     end
     local msg = colorStr .. mainText
     glPushMatrix()
