@@ -444,6 +444,8 @@ function gadget:Initialize()
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
+	
+	GG.wasMoprhedTo = GG.wasMorphedTo or {}
 end
 
 
