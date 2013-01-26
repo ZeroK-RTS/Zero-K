@@ -703,9 +703,11 @@ function DrawProgressbar(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.ClipPlane(1, -1,0,0, x+w*percent)
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    gl.ClipPlane(1, false)
+    -- workaround for catalyst >12.6 drivers: do the "clipping" by multiplying width by percentage in glBeginEnd instead of using glClipPlane
+    -- fuck AMD
+    --gl.ClipPlane(1, -1,0,0, x+w*percent)
+    gl.BeginEnd(GL_TRIANGLE_STRIP, _DrawTiledTexture, x,y,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    --gl.ClipPlane(1, false)
   gl.Texture(0,false)
 
   if (obj.caption) then
