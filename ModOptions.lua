@@ -191,7 +191,7 @@ local options = {
     type   = 'number',
     def    = 30.0,
     min    = 0.0,
-    max    = 7200.0,
+    max    = 28800.0,
     step   = 1.0,
     section= 'hwg',
   },
