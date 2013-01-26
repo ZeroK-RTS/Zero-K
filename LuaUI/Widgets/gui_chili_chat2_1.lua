@@ -839,7 +839,7 @@ function widget:Initialize()
 -- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
 		backgroundColor = options.color_background.value,
 		borderColor = options.color_background.value,
-		noMouseWheel = not options.mousewheel.value,
+		ignoreMouseWheel = not options.mousewheel.value,
 		children = {
 			stack_console,
 		},
