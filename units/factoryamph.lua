@@ -1,7 +1,7 @@
 unitDef = {
   unitname         = [[factoryamph]],
   name             = [[Amphibious Operations Plant]],
-  description      = [[Produces Amphibious Bots and Subs, Builds at 10 m/s]],
+  description      = [[Produces Amphibious Bots, Builds at 10 m/s]],
   acceleration     = 0,
   bmcode           = [[0]],
   brakeRate        = 0,
@@ -37,8 +37,8 @@ unitDef = {
   corpse           = [[DEAD]],
 
   customParams     = {
-    --description_de = [[Produziert Aerogleiter, Baut mit 6 M/s]],
-    helptext       = [[The Amphibious Operations Plant builds amphibious bots and submarines (when underwater), providing an alternative approach to land/sea warfare.]],
+    --description_de = [[Produziert Aerogleiter, Baut mit 10 M/s]],
+    helptext       = [[The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare.]],
 	--helptext_de    = [[Die Amphibious Operations Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Halberd, Mace, Penetrator]],
     sortName = [[8]],
   },
