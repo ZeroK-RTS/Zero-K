@@ -445,7 +445,7 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
 	end
 	
-	GG.wasMoprhedTo = GG.wasMorphedTo or {}
+	GG.wasMorphedTo = GG.wasMorphedTo or {}
 end
 
 
