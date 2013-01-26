@@ -182,9 +182,21 @@ function gadget:GameStart()
     else
       spEcho("Have... IT COMES! YOU CAN'T SURVIVE! NOOO!!!")
       -- for lulz
-      local zalgo
-      local x = random(0,Game.mapSizeX)
-      local z = random(0,Game.mapSizeZ)
+      local zalgo,x,z
+      -- after some consideration i decided to make detri spawn at the center of any map
+      -- TODO add some checkings to make sure no players are present at center, and if they are -- spawn it in some furthest corner (for silly maps)
+      -- or smth like it
+      local xmin,xmax
+      local zmin,zmax
+      xmin = floor(Game.mapSizeX/2 - Game.mapSizeX/8)
+      zmin = floor(Game.mapSizeZ/2 - Game.mapSizeZ/8)
+      xmax = floor(Game.mapSizeX/2 + Game.mapSizeX/8)
+      zmax = floor(Game.mapSizeZ/2 + Game.mapSizeZ/8)
+      for i=1,random(1,10) do -- adding slightly more random spawn position
+	x = random(xmin,xmax)
+	z = random(zmin,zmax)
+	-- TODO add water level check to make it prefer land to water
+      end
 
       zalgo = spCreateUnit("armorco",x,10000,z,"n",spGetGaiaTeamID())
       if (zalgo ~= nil) then
