@@ -67,7 +67,7 @@ local fragmentShaderSource = {
 		  vec4 origColor = texture2D(screencopy, texCoord);
 		  float intensity = getIntensity(origColor);
 		  intensity = intensity * 1.5;
-		  if (intensity > 1) intensity = 0;
+		  if (intensity > 1) intensity = 1;
 		  if (intensity < 0.5) {
 			if (intensity < 0.2) {
 			  gl_FragColor = vec4(intensity*0.15, intensity*0.15, intensity*0.15, 0.9);
@@ -81,10 +81,10 @@ local fragmentShaderSource = {
 			  if (mod(gl_FragCoord.y, 4.0) < 2.0) {
 				gl_FragColor = vec4(intensity*0.5, intensity*0.8, intensity*0.3, 0.9);
 			  } else {
-				gl_FragColor = vec4(intensity*0.1, intensity*1.0, intensity*0.4, 0.9);
+				gl_FragColor = vec4(intensity*0.2, intensity, intensity*0.4, 1);
 			  }
 			} else {
-			  gl_FragColor = vec4(0.5, 1.0, 0.7, 1.0);
+			  gl_FragColor = vec4(intensity*0.5, intensity, intensity*0.7, 0.9);
 			}
 		  }
 		}
