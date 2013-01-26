@@ -31,7 +31,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   mass                = 164,
-  maxDamage           = 550,
+  maxDamage           = 680,
   maxSlope            = 36,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
@@ -89,7 +89,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 178,
+        default = 220,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -129,7 +129,7 @@ unitDef = {
       description      = [[Wreckage - Moderator]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 550,
+      damage           = 680,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -150,7 +150,7 @@ unitDef = {
       description = [[Debris - Moderator]],
       blocking    = false,
       category    = [[heaps]],
-      damage      = 550,
+      damage      = 680,
       energy      = 0,
       footprintX  = 2,
       footprintZ  = 2,

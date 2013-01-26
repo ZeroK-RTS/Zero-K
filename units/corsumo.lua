@@ -84,7 +84,7 @@ unitDef = {
     },  
   
     {
-      def                = [[HEATRAY]],
+      def                = [[PARTICLEBEAM]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[-1 0 0]],
       maxAngleDif        = 222,
@@ -92,7 +92,7 @@ unitDef = {
     },
 
     {
-      def                = [[HEATRAY]],
+      def                = [[PARTICLEBEAM]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[1 0 0]],
       maxAngleDif        = 222,
@@ -138,7 +138,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       proximityPriority       = 10,
-      range                   = 375,
+      range                   = 305,
       reloadtime              = 0.11,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
@@ -194,7 +194,39 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 500,
     },
+	
+	PARTICLEBEAM = {
+      name                    = [[Auto Particle Beam]],
+      beamDecay               = 0.85,
+      beamTime                = 0.01,
+      beamttl                 = 45,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 
+      damage                  = {
+        default = 60,
+        subs    = 3,
+      },
+
+      explosionGenerator      = [[custom:flash1red]],
+      fireStarter             = 100,
+      impactOnly              = true,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      laserFlareSize          = 7.5,
+      minIntensity            = 1,
+      pitchtolerance          = 8192,
+      range                   = 320,
+      reloadtime              = 0.5,
+      rgbColor                = [[1 0 0]],
+      soundStart              = [[weapon/laser/mini_laser]],
+      soundStartVolume        = 6,
+      thickness               = 5,
+      tolerance               = 8192,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+    },
 
     LANDING = {
       name                    = [[Sumo Landing]],

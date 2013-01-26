@@ -433,9 +433,9 @@ function script.BlockShot(num)
 	return (num == 1) or (num == 4)	-- don't allow weapon 1 or 4 to fire
 end
 
-function script.FireWeapon(num)
-	EmitSfx( weaponPieces[num].flare, muzzle_flash )
-end
+--function script.FireWeapon(num)
+--	EmitSfx( weaponPieces[num].flare, muzzle_flash )
+--end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth

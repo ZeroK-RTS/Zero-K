@@ -4,10 +4,10 @@ return {
     groundflash = {
       alwaysvisible      = false,
       circlealpha        = 0.2,
-      circlegrowth       = 14.4,
+      circlegrowth       = 13.2,
       flashalpha         = 0.2,
       flashsize          = 500,
-      ttl                = 22,
+      ttl                = 24,
       color = {
         [1]  = 0.3,
         [2]  = 0,
@@ -23,8 +23,8 @@ return {
       properties = {
         alpha              = 0.6,
         color              = [[0.3,0,0.4]],
-        expansionspeed     = 14.4,
-        ttl                = 22,
+        expansionspeed     = 13.2,
+        ttl                = 24,
       },
     },
     muzzleflash = {
