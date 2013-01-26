@@ -481,7 +481,6 @@ local morphDefs = {
 --------------------------------------------------------------------------------
 -- modular commander handling
 --------------------------------------------------------------------------------
-if Spring then --check if code is running under Spring or something else. If something else then don't create this morph def:
 local comMorph = {	-- not needed
 	[1] = {
 		time = 20,
@@ -512,6 +511,9 @@ local comMorphTree = {
 local customComms = {}
 
 local function InitUnsafe()
+	if not Spring.GetPlayerList then
+		return
+	end
 	for name, id in pairs(Spring.GetPlayerList()) do	-- pairs(playerIDsByName) do
 		-- copied from PlanetWars
 		local commData, success
@@ -591,7 +593,6 @@ for id, playerData in pairs(customComms) do
 			end
 		end
 	end
-end
 end
 
 --check that the morphs were actually inserted
