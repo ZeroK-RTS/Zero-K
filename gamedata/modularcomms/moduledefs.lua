@@ -698,8 +698,34 @@ decorations = {
 					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
 					unitDef.customparams.decorationicons.shoulders = config.decorations.icon_shoulders.image
 				end
-				Spring.Echo(unitDef.customparams.decorationicons.shoulders)
 			end,	
+	},
+	
+	icon_chest = {
+		func = function(unitDef, config)
+				if config.decorations and config.decorations.icon_chest then
+					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
+					unitDef.customparams.decorationicons.chest = config.decorations.icon_chest.image
+				end
+			end,		
+	},
+	
+	icon_back = {
+		func = function(unitDef, config)
+				if config.decorations and config.decorations.icon_back then
+					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
+					unitDef.customparams.decorationicons.back = config.decorations.icon_back.image
+				end
+			end,		
+	},
+	
+	icon_overhead = {
+		func = function(unitDef, config)
+				if config.decorations and config.decorations.icon_overhead then
+					unitDef.customparams.decorationicons = unitDef.customparams.decorationicons or {}
+					unitDef.customparams.decorationicons.overhead = config.decorations.icon_overhead.image
+				end
+			end,
 	},
 }
 
