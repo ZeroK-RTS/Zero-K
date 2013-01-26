@@ -2,17 +2,17 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-    name      = "Modular Comm Info",
-    desc      = "Helper widget that provides info on modular comms.",
-    author    = "KingRaptor",
-    date      = "2011",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    api       = true,
-    enabled   = true,
-	alwaysStart = true,
-  }
+	return {
+		name      = "Modular Comm Info",
+		desc      = "Helper widget that provides info on modular comms.",
+		author    = "KingRaptor",
+		date      = "2011",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		api       = true,
+		enabled   = true,
+		--alwaysStart = true,
+	}
 end
 
 Spring.Utilities = Spring.Utilities or {}
@@ -79,6 +79,19 @@ WG.commData = commData
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
+local commsWithModules = {}
+for i=1,#UnitDefs do
+	if UnitDefs[i].customParams.modules then
+		local modules = {}
+		local modulesInternalFunc = loadstring("return ".. UnitDefs[i].customParams.modules)
+		local modulesInternal = modulesInternalFunc()
+		for i=1, #modulesInternal do
+			local modulename = modulesInternal[i]
+			modules[i] = upgrades[modulename].name
+		end
+		commsWithModules[UnitDefs[i].name] = modules
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function RemoveDuplicates(base, delete)
@@ -149,6 +162,7 @@ local function GetCommUnitInfo(unitDef)
 end
 WG.GetCommUnitInfo = GetCommUnitInfo
 
+-- returns the raw module table
 local function GetCommUpgradeList()
 	return upgrades
 end
@@ -156,6 +170,13 @@ WG.GetCommUpgradeList = GetCommUpgradeList
 
 local function GetCommModules(unitDef)
 	if type(unitDef) == "number" then unitDef = UnitDefs[unitDef].name end
+	if commsWithModules[unitDef] then
+		for i=1,#commsWithModules do
+			Spring.Echo(i, commsWithModules[i])
+		end
+		return commsWithModules[unitDef]
+	end
+	
 	if commDataGlobal[unitDef] then
 		local modules = {}
 		local modulesInternal = commDataGlobal[unitDef] and commDataGlobal[unitDef].modules or {}

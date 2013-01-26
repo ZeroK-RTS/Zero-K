@@ -188,6 +188,8 @@ local function ProcessComm(name, config)
 					Spring.Log("gamedata/modularcomms/unitdefgen.lua", LOG.ERROR, "\tERROR: Upgrade "..moduleName.." not found")
 				end
 			end
+			
+			cp.modules = config.modules
 		end
 		
 		-- apply attributemods
@@ -217,6 +219,7 @@ local function ProcessComm(name, config)
 		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
 		commDefs[name].buildcostenergy = commDefs[name].buildcostenergy + config.cost
 		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
+		cp.cost = config.cost
 		
 		-- apply decorations
 		if config.decorations then
@@ -234,7 +237,7 @@ local function ProcessComm(name, config)
 					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "error", "\tERROR: Decoration "..decName.." not found")
 				end
 			end
-		end		
+		end
 	end
 end
 

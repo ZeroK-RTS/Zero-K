@@ -406,7 +406,7 @@ function widget:Initialize()
 		height = 175;
 		width =  260;
 		x = 20,
-		y = 20,
+		y = 10,
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
