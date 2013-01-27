@@ -22,9 +22,12 @@ local msgBoxPersistent
 local imagePersistent
 local scrollPersistent
 local textPersistent
+local stackPersistent
 local msgBoxConvo
 
 local convoQueue = {}
+local persistentMsgHistory = {}	-- {text = text, width = width, height = height, fontsize = fontsize, image = imageDir}
+local persistentMsgIndex = {}
 
 local useChiliConvo = false
 
@@ -35,12 +38,14 @@ local oldDrawScreenWH
 local TIME_TO_FLASH = 3	-- seconds
 local CONVO_BOX_HEIGHT = 96
 local CONVO_BOX_WIDTH_MIN = 400
+local PERSISTENT_SUBBAR_HEIGHT = 24
 
 local convoString 	-- for non-Chili convobox; stores the current string to display
 local convoImg		-- for non-Chili convobox; stores the current image to display
 local convoFontsize = 14
 local flashTime
 local convoExpireFrame
+
 
 local vsx, vsy = gl.GetViewSizes()
 
@@ -102,7 +107,7 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
   }
 end
 
-local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)  
+local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 	local vsx, vsy = gl.GetViewSizes()
 	--local x = math.floor((vsx - width)/2)
 	local y = math.floor((vsy - height)/2)
@@ -120,13 +125,10 @@ local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 	--	msgBoxPersistent:Dispose()
 	--end	
 	
-	flashTime = TIME_TO_FLASH
-	Spring.PlaySoundFile("sounds/message_team.wav", 1, "ui")
-	
 	-- we have an existing box, modify that one instead of making a new one
 	if msgBoxPersistent then
 		msgBoxPersistent.width = width
-		msgBoxPersistent.height = height
+		msgBoxPersistent.height = height + PERSISTENT_SUBBAR_HEIGHT
 		msgBoxPersistent.x = vsx - width
 		--msgBoxPersistent:Invalidate()
 		if imageDir then
@@ -150,6 +152,7 @@ local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		textPersistent:Invalidate()	-- for some reason the text can fail to update without this
 		
 		scrollPersistent:SetScrollPos(nil, 0)
+		countLabelPersistent:SetCaption(persistentMsgIndex .. "/" .. #persistentMsgHistory)
 		msgBoxPersistent:Invalidate()
 		return	-- done here, exit
 	end
@@ -159,7 +162,7 @@ local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		parent = Chili.Screen0,
 		name   = 'msgWindow';
 		width = width,
-		height = height,
+		height = height + PERSISTENT_SUBBAR_HEIGHT,
 		y = y,
 		right = 0; 
 		dockable = true;
@@ -204,6 +207,69 @@ local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		},
 	}	
 	scrollPersistent:AddChild(textPersistent)
+	
+	stackPersistent = Chili.StackPanel:New{
+		parent = msgBoxPersistent,
+		padding = {0,0,0,0},
+		--itemPadding = {0, 0, 0, 0},
+		itemMargin = {0, 0, 0, 0},
+		columns = 3,
+		width= '100%',
+		y = height - 4,
+		height = 20,
+		resizeItems = false,
+		orientation = 'horizontal',
+		centerItems = true,
+	}
+
+	buttonPrevPersistent = Chili.Button:New{
+		parent = stackPersistent,
+		width = 32,
+		caption = "<",
+		OnClick = {function(self, x, y, mouse)
+				if mouse ~= 1 then return end
+				-- TODO add shift modifier
+				if persistentMsgIndex == 1 then
+					return
+				end
+				persistentMsgIndex = persistentMsgIndex - 1
+				local data = persistentMsgHistory[persistentMsgIndex]
+				_ShowPersistentMessageBox(data.text, data.width, data.height, data.fontsize, data.image)
+			end
+		}
+	}	
+		
+	countLabelPersistent = Chili.Label:New{
+		parent = stackPersistent,
+		caption = persistentMsgIndex .. "/" .. #persistentMsgHistory,
+		y = height,
+		align = center,
+	}
+	
+	buttonNextPersistent = Chili.Button:New{
+		parent = stackPersistent,
+		width = 32,
+		caption = ">",
+		OnClick = {function(self, x, y, mouse)
+				if mouse ~= 1 then return end
+				-- TODO add shift modifier
+				if persistentMsgIndex == #persistentMsgHistory then
+					return
+				end
+				persistentMsgIndex = persistentMsgIndex + 1
+				local data = persistentMsgHistory[persistentMsgIndex]
+				_ShowPersistentMessageBox(data.text, data.width, data.height, data.fontsize, data.image)
+			end
+		}
+	}
+end
+
+local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
+	persistentMsgIndex = #persistentMsgHistory + 1
+	persistentMsgHistory[persistentMsgIndex] = {text = text, width = width, height = height, fontsize = fontsize, image = imageDir}
+	flashTime = TIME_TO_FLASH
+	Spring.PlaySoundFile("sounds/message_team.wav", 1, "ui")
+	_ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 end
 
 local function HidePersistentMessageBox()
@@ -211,6 +277,11 @@ local function HidePersistentMessageBox()
 		msgBoxPersistent:Dispose()
 		msgBoxPersistent = nil
 	end
+end
+
+local function ClearPersistentMessageHistory()
+	HidePersistentMessageBox()
+	persistentMsgHistory = {}
 end
 
 local function ShowConvoBoxNoChili(data)
@@ -411,10 +482,6 @@ function widget:DrawScreen()
   end
 end
 
-
-local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"—yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
-local str2 = 'Enemy nuclear silo spotted!'
-
 function widget:Initialize()
   Chili = WG.Chili
 
@@ -440,9 +507,15 @@ function widget:Initialize()
   end
   
   -- testing
-  --WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")	
+  --[[
+  local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"—yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
+  local str2 = 'Enemy nuclear silo spotted!'
+  
+  WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
+  WG.ShowPersistentMessageBox(str2, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
   --WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
   --WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
+  ]]
   
 end
 
