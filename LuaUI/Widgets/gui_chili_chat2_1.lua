@@ -564,8 +564,9 @@ local function displayMessage(msg, remake)
 		}
 		
 		if msg.point and options.clickable_points.value then
-			textbox.OnMouseDown = {function(self, x, y, mouse) 
-				if mouse == 1 then
+			textbox.OnMouseDown = {function(self, x, y, mouse)
+				local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
+				if (mouse == 1 and click_on_text) then
 					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 				end
 			end}
