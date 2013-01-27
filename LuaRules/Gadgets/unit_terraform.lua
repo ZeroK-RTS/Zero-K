@@ -367,6 +367,22 @@ local function updateBorderWithPoint(border, x, z)
 	end
 end
 
+local function getPointInsideMap(x,z)
+	if x < 1 then
+		x = 1
+	end
+	if x > mapWidth-1 then
+		x = mapWidth-1
+	end
+	if z < 1 then
+		z = 1
+	end
+	if z > mapHeight-1 then
+		z = mapHeight-1
+	end
+	return x, z
+end
+
 local function setupTerraunit(unitID, team, x, y, z)
 
 	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
@@ -773,6 +789,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
 			
+				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
 				blocks = blocks + 1
@@ -1258,6 +1275,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
             
             if id then
 			
+				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
 				blocks = blocks + 1
@@ -1819,6 +1837,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				aveX = aveX + segment[i].position.x
 				aveZ = aveZ + segment[i].position.z
 				
+				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
 				blocks = blocks + 1
@@ -2953,6 +2972,7 @@ function gadget:GameFrame(n)
 									local x,z = tpos.x + scale*vx, tpos.z + scale*vz
 									local y = CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 									
+									x, z = getPointInsideMap(x,z)
 									terraformUnit[cQueue[i].params[1] ].position = {x = x, z = z}
 									spSetUnitPosition(cQueue[i].params[1], x, y , z)
 									--Spring.MoveCtrl.Enable(cQueue[i].params[1])
