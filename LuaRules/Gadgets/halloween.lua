@@ -341,7 +341,8 @@ function morphing(unitID)
 end
 
 function IsntCom(unitDefID)
-  if (UnitDefs[unitDefID].commander or UnitDefs[unitDefID].customParams.level) then
+  --if (UnitDefs[unitDefID].commander or UnitDefs[unitDefID].customParams.level) then
+  if (UnitDefs[unitDefID].customParams.commtype) then
     return false
   else
     return true
