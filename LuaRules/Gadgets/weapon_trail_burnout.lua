@@ -11,7 +11,7 @@ function gadget:GetInfo()
 end
 
 ------ SYNCED -------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then 
+if (gadgetHandler:IsSyncedCode() and enabled) then 
 
 local defaultCeg = ''
 local burnoutWeapon = {}
@@ -44,6 +44,10 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 			burnoutCeg = burnoutWeapon[weaponID].burnoutCeg or defaultCeg
 		}
 	end
+end	
+
+function gadget:ProjectileDestroyed(proID, proOwnerID, weaponID)
+	burnoutProjectile[proID] = nil
 end	
 
 function gadget:GameFrame(f)
