@@ -705,54 +705,54 @@ local function CreateVisibleFxList()
       for unitID,UnitEffects in pairs(Units) do
         if (unitID>-1) then
           local x,y,z      = spGetUnitViewPosition(unitID)
-
-          local unitActive = -1
-
-          local unitRadius = 0
-          local maxVisibleRadius = -1
-          local minNotVisibleRadius = 1e9
-
-          --// check effects
-          for i=1,#UnitEffects do
-            local fx = UnitEffects[i]
-
-            if (fx.onActive and (unitActive == -1)) then
-              unitActive = spGetUnitIsActive(unitID)
-              if (unitActive == nil) then
-                unitActive = true
-              end
-            end
-
-            if (not fx.onActive)or(unitActive) then
-			  if fx.alwaysVisible then
-				fx.visible = true
-              elseif (fx.Visible) then
-                fx.visible = fx:Visible()
-              else
-                unitRadius = unitRadius or (spGetUnitRadius(unitID) + 40)
-
-                local r = fx.radius or 0
-                if (r > maxVisibleRadius)and(r < minNotVisibleRadius) then
-                  if spIsSphereInView(x,y,z,unitRadius + r) then
-                    maxVisibleRadius = r
-                  else
-                    minNotVisibleRadius = r
-                  end
+          if x and y and z then
+            local unitActive = -1
+            
+            local unitRadius = 0
+            local maxVisibleRadius = -1
+            local minNotVisibleRadius = 1e9
+            
+            --// check effects
+            for i=1,#UnitEffects do
+              local fx = UnitEffects[i]
+            
+              if (fx.onActive and (unitActive == -1)) then
+                unitActive = spGetUnitIsActive(unitID)
+                if (unitActive == nil) then
+                  unitActive = true
                 end
-
-                fx.visible = (r <= maxVisibleRadius)
               end
-
-              if (fx.visible) then
-                if (not anyFXVisible) then anyFXVisible = true end
-                anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
+            
+              if (not fx.onActive)or(unitActive) then
+			    if fx.alwaysVisible then
+			  	  fx.visible = true
+                elseif (fx.Visible) then
+                  fx.visible = fx:Visible()
+                else
+                  unitRadius = unitRadius or (spGetUnitRadius(unitID) + 40)
+            
+                  local r = fx.radius or 0
+                  if (r > maxVisibleRadius)and(r < minNotVisibleRadius) then
+                    if spIsSphereInView(x,y,z,unitRadius + r) then
+                      maxVisibleRadius = r
+                    else
+                      minNotVisibleRadius = r
+                    end
+                  end
+            
+                  fx.visible = (r <= maxVisibleRadius)
+                end
+            
+                if (fx.visible) then
+                  if (not anyFXVisible) then anyFXVisible = true end
+                  anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
+                end
+              else
+                fx.visible = fx.alwaysVisible
+			    if (not anyFXVisible) then anyFXVisible = fx.alwaysVisible end
               end
-            else
-              fx.visible = fx.alwaysVisible
-			  if (not anyFXVisible) then anyFXVisible = fx.alwaysVisible end
             end
           end
-
         else
 
           for i=1,#UnitEffects do
