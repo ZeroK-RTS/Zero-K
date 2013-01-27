@@ -57,13 +57,13 @@ if (gadgetHandler:IsSyncedCode()) then
 --local sin    = math.sin
 local random = math.random
 local floor  = math.floor
+local GaiaTeamID 	    = Spring.GetGaiaTeamID()
 local spGetAllUnits         = Spring.GetAllUnits
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitTeam	    = Spring.GetUnitTeam
 local spGetTeamUnits 	    = Spring.GetTeamUnits
 local spGetUnitHealth	    = Spring.GetUnitHealth
 local spTransferUnit        = Spring.TransferUnit
-local spGetGaiaTeamID 	    = Spring.GetGaiaTeamID
 local spGetUnitIsDead	    = Spring.GetUnitIsDead
 local spGiveOrderToUnit	    = Spring.GiveOrderToUnit
 local spGetUnitHealth	    = Spring.GetUnitHealth
@@ -150,7 +150,7 @@ function gadget:GameStart()
       local teamsSorted = spGetTeamList()
       for i=1,#teamsSorted do
 	local teamID = teamsSorted[i]
-	if teamID ~= spGetGaiaTeamID() then
+	if teamID ~= GaiaTeamID then
 	  playerCount = playerCount + 1
 	end
       end
@@ -198,7 +198,7 @@ function gadget:GameStart()
 	-- TODO add water level check to make it prefer land to water
       end
 
-      zalgo = spCreateUnit("armorco",x,10000,z,"n",spGetGaiaTeamID())
+      zalgo = spCreateUnit("armorco",x,10000,z,"n",GaiaTeamID)
       if (zalgo ~= nil) then
 	spGiveOrderToUnit(zalgo,CMD.REPEAT,{1},{})
 	spGiveOrderToUnit(zalgo,CMD.MOVE_STATE,{2},{})
@@ -284,7 +284,7 @@ end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
     -- if unit is possessed, but health drops to 33% or EMPed even slightly - return to owner
-    if (unitTeam == spGetGaiaTeamID() and spGetUnitIsDead(unitID) == false and PossessedUnitList[unitID] ~= nil) then
+    if (unitTeam == GaiaTeamID and spGetUnitIsDead(unitID) == false and PossessedUnitList[unitID] ~= nil) then
       if (GhostIsHealthy(unitID) == false) then
 	--------------------------------------------------------------------------
 	-- interesting thing, if owner is player or ai that is dead, return unit to attacker and NOT player
@@ -292,9 +292,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local teamsSorted = spGetTeamList()
 	for i=1,#teamsSorted do
 	  local teamID = teamsSorted[i]
-	  if teamID ~= spGetGaiaTeamID() then
+	  if teamID ~= GaiaTeamID then
 	    local _,_,isDead,_,_,_ = spGetTeamInfo(teamID)
-	    if (PossessedUnitList[unitID] == teamID and isDead and attackerTeam ~= spGetGaiaTeamID()) then
+	    if (PossessedUnitList[unitID] == teamID and isDead and attackerTeam ~= GaiaTeamID) then
 	      PossessedUnitList[unitID] = attackerTeam
 	      break
 	    end
@@ -353,7 +353,7 @@ function HellBreaksLoose()
   local anythingpossessed = false
   if (#allUnits > 1) then
     local unitID = allUnits[random(1,#allUnits)]
-    if (spGetUnitIsDead(unitID) == false and spGetUnitTeam(unitID) ~= spGetGaiaTeamID()) then
+    if (spGetUnitIsDead(unitID) == false and spGetUnitTeam(unitID) ~= GaiaTeamID) then
       local unitDefID = spGetUnitDefID(unitID)
       if ((GhostIsHealthy(unitID)) and (not nanoframed(unitID)) and (not morphing(unitID)) and IsntCom(unitDefID) and (not unpossassableUnitsDef[unitDefID])) then
 	-- we found unit, and it's possessable, now check how much units that player has and how much unit costs
@@ -403,7 +403,7 @@ function Possess(unitID, unitDefID, owner, price)
   -- add to list
   addPossession(unitID, owner)
   -- transfer ownership
-  spTransferUnit(unitID, spGetGaiaTeamID(), false)
+  spTransferUnit(unitID, GaiaTeamID, false)
   -- TODO find out if unit is actually something that can't fight at all or maybe silencer/silo.
   if (spGetUnitIsDead(unitID) == false and UnitDefs[unitDefID]["canMove"]) then
     spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
