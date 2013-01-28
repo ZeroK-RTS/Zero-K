@@ -40,10 +40,6 @@ return {
     desc = 'A chicken experience customizable using modoptions'
   },
   {
-	name = 'Chicken: Speed',
-	desc = 'High speed chicken! (20 minutes) (intended for testing)'
-  },
-  {
 	name ='Null AI',
 	desc = 'Empty AI for testing purposes'
   }

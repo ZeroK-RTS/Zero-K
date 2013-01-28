@@ -180,7 +180,7 @@ function SendData(statsData)
 end 
 
 function gadget:GameOver()
-	if GG.chicken then
+	if GG.Chicken then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Chicken game; unit stats disabled")
 		return	-- don't report stats in chicken
 	end

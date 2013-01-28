@@ -59,6 +59,7 @@ for chickenName, color in pairs(chickenColorSet) do
 end
 
 local eggs = (Spring.GetModOptions().eggs == '1')
+local speed = (Spring.GetModOptions().speedchicken == '1')
 
 -- include the synced (gadget) config data
 VFS.Include("LuaRules/Configs/spawn_defs.lua", nil, VFS.ZIP)
@@ -271,7 +272,17 @@ local function UpdateRules()
 							tooltipBurrowRespawn
 	
 	if (gameInfo.lagging == 1) then label_mode:SetCaption(red.."Anti-Lag Enabled\008")
-	else label_mode:SetCaption("Mode: " .. configs.difficulties[gameInfo.difficulty] .. (eggs and " (Eggs)" or '')) end
+	else
+	  local substr = ''
+	  if eggs and speed then
+	    substr = " (Speed Eggs)"
+	  elseif eggs then
+	    substr = " (Eggs)"
+	  elseif speed then
+	    substr = " (Speed)"
+	  end
+	  label_mode:SetCaption("Mode: " .. configs.difficulties[gameInfo.difficulty] .. substr)
+	end
 end
 
 --------------------------------------------------------------------------------

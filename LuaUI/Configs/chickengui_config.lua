@@ -8,9 +8,8 @@ configs.difficulties = {
     [2] = 'Easy',
     [3] = 'Normal',
     [4] = 'Hard',
-	[5] = 'Suicidal',
-	[6] = 'Custom',
-	[7] = 'Speed'
+    [5] = 'Suicidal',
+    [6] = 'Custom',
 }
 
 configs.colorSet = {

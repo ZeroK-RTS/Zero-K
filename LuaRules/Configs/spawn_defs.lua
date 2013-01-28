@@ -187,67 +187,67 @@ difficulties = {
     chickenSpawnRate = 120, 
     burrowSpawnRate  = 60,
     gracePeriod      = 300,
-	waveSizeMult	 = 0.9,
+    waveSizeMult	 = 0.9,
     timeSpawnBonus   = .02,     -- how much each time level increases spawn size
-	queenTime		 = 40*60,
-	queenName        = "chicken_dragon",
-	queenMorphName	 = '',
-	miniQueenName	 = "chicken_tiamat",
-	maxBurrows       = 12,
-	specialPowers	 = {},
-	scoreMult		 = 0.25,
+    queenTime		 = 40*60,
+    queenName        = "chicken_dragon",
+    queenMorphName	 = '',
+    miniQueenName	 = "chicken_tiamat",
+    maxBurrows       = 12,
+    specialPowers	 = {},
+    scoreMult		 = 0.25,
   },
 
   ['Chicken: Easy'] = {
     chickenSpawnRate = 60, 
     burrowSpawnRate  = 50,
     gracePeriod      = 180,
-	waveSizeMult	 = 0.8,
+    waveSizeMult	 = 0.8,
     timeSpawnBonus   = .03,
-	queenHealthMod	 = 0.5,
-	techAccelPerPlayer = 4,
-	scoreMult		 = 0.66,
+    queenHealthMod	 = 0.5,
+    techAccelPerPlayer = 4,
+    scoreMult		 = 0.66,
   },
 
   ['Chicken: Normal'] = {
     chickenSpawnRate = 50, 
     burrowSpawnRate  = 45,
     timeSpawnBonus   = .04,
-	miniQueenTime		= {0.6},	
+    miniQueenTime    = {0.6},	
   },
 
   ['Chicken: Hard'] = {
     chickenSpawnRate = 45, 
     burrowSpawnRate  = 45,
-	waveSizeMult	 = 1.2,
+    waveSizeMult	 = 1.2,
     timeSpawnBonus   = .05,
-	burrowWaveSize	 = 1.4,
-	queenHealthMod	 = 1.5,
-	queenSpawnMult   = 5,
-	miniQueenTime	 = {0.5},
-	techAccelPerPlayer	= 5,
-	scoreMult		 = 1.25,
-	timeModifier	 = 0.875,
+    burrowWaveSize	 = 1.4,
+    queenHealthMod	 = 1.5,
+    queenSpawnMult   = 5,
+    miniQueenTime	 = {0.5},
+    techAccelPerPlayer	= 5,
+    scoreMult		 = 1.25,
+    timeModifier	 = 0.875,
   },
   
   ['Chicken: Suicidal'] = {
     chickenSpawnRate = 45, 
     burrowSpawnRate  = 40,
-	waveSizeMult	 = 1.5,	
+    waveSizeMult	 = 1.5,	
     timeSpawnBonus   = .06,
-	burrowWaveSize	 = 1.6,	
-	gracePeriod		 = 150,
-	gracePeriodMin	 = 30,
-	burrowRespawnChance = 0.25,
-	burrowRegressTime	= 50,
-	queenSpawnMult   = 5,
-	queenTime		 = 50*60,
-	queenHealthMod	 = 2,
-	miniQueenTime	 = {0.45}, --{0.37, 0.75},
-	endMiniQueenWaves	= 6,
-	techAccelPerPlayer	= 6,
-	timeModifier	 = 0.75,
-	scoreMult		 = 2,
+    burrowWaveSize	 = 1.6,	
+    gracePeriod		 = 150,
+    gracePeriodMin	 = 30,
+    burrowRespawnChance = 0.25,
+    burrowRegressTime	= 50,
+    queenSpawnMult   = 5,
+    queenTime		 = 50*60,
+    queenHealthMod	 = 2,
+    miniQueenTime	 = {0.45}, --{0.37, 0.75},
+    endMiniQueenWaves	= 6,
+    techAccelPerPlayer	= 6,
+    timeModifier	 = 0.75,
+    scoreMult		 = 2,
   },
 
   ['Chicken: Custom'] = {
@@ -265,26 +265,6 @@ difficulties = {
 	timeModifier	= modoptions.techtimemult or 1,
 	scoreMult		= 0,
   },
-  
-  ['Chicken: Speed'] = {
-    chickenSpawnRate = 50, 
-    burrowSpawnRate  = 45,  
-	waveSizeMult	 = 0.85,	
-	gracePeriod		 = 90,
-	gracePenalty	 = 10,
-	gracePeriodMin	 = 20,
-	burrowRespawnChance	= 0,
-	queenTime		 = 20*60,
-	queenHealthMod	 = 0.3,
-	miniQueenTime	 = {},
-	endMiniQueenWaves	= 6,
-	techAccelPerPlayer	= 0,
-	humanAggroQueenTimeFactor	= 0.35,
-	humanAggroTechTimeProgress	= 7,
-	burrowRegressTime	= 12,
-	queenSpawnMult	 = 2.5, 
-	timeModifier	 = 0.35,
-  },  
 }
 
 -- minutes to seconds
@@ -311,6 +291,22 @@ for _, d in pairs(difficulties) do
   d.defenders = Copy(defenders)
   d.supporters = Copy(supporters)
   d.specialPowers = d.specialPowers or Copy(specialPowers)
+
+  if modoptions.speedchicken == "1" then
+    d.timeModifier = (d.timeModifier or 1)*0.5
+    d.waveSizeMult = (d.waveSizeMult or waveSizeMult)*0.85
+    d.gracePeriod = (d.gracePeriod or gracePeriod)*0.5
+    d.queenTime = (d.queenTime or queenTime)*0.5
+    Spring.Echo("whee", d.queenTime)
+    d.queenHealthMod = (d.queenHealthMod or 1)*0.4
+    d.miniQueenTime = {}
+    d.endMiniQueenWaves = (d.endMiniQueenWaves or endMiniQueenWaves) - 1
+    d.burrowQueenTime = (d.burrowQueenTime or burrowQueenTime)*0.5
+    d.techAccelPerPlayer = (d.techAccelPerPlayer or techAccelPerPlayer)*0.5
+    d.humanAggroTechTimeProgress = (d.humanAggroTechTimeProgress or humanAggroTechTimeProgress)*0.5
+    d.burrowRegressTime = (d.burrowRegressTime or burrowRegressTime)*0.5
+    d.queenSpawnMult = (d.queenSpawnMult or queenSpawnMult)*0.4
+  end
   
   TimeModifier(d.chickenTypes, d.timeModifier or 1)
   TimeModifier(d.defenders, d.timeModifier or 1)

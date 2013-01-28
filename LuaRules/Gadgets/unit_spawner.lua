@@ -15,11 +15,11 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local SAVE_FILE = "Gadgets/unit_spawner.lua"
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 -- BEGIN SYNCED
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -81,7 +81,6 @@ local humanTeams          = {}
 local lagging             = false
 local cpuUsages           = {}
 local chickenBirths       = {}
-local kills               = {}
 local timeOfLastSpawn     = 0    -- when the last burrow was spawned
 local waveSchedule		  = math.huge	--{}	-- indexed by gameframe, true/nil
 local waveNumber		  = 0
@@ -105,6 +104,7 @@ local morphFrame = -1
 local morphed = false
 local specialPowerCooldown = 0
 
+local gameFrameOffset = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -205,7 +205,7 @@ end
 
 if (luaAI == 0) then return false end
 
-GG.chicken = true
+GG.Chicken = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -226,7 +226,6 @@ SetGlobals(luaAI or defaultDifficulty) -- set difficulty
 local playerCount = SetCount(humanTeams)
 local malus     = playerCount^playerMalus
 Spring.SetGameRulesParam("malus", malus)
-GG.malus = malus
 
 burrowRegressTime = burrowRegressTime/playerCount
 humanAggroPerBurrow = humanAggroPerBurrow/playerCount
@@ -411,7 +410,7 @@ end
 -- used to generate eggs from burrows
 local function SpawnEggs(x, y, z)
   local choices,choisesN = {},0
-  local now = spGetGameSeconds()
+  local now = spGetGameSeconds() + math.floor(gameFrameOffset/30)
 
   for name in pairs(chickenTypes) do
     if (not chickenTypes[name].noegg and chickenTypes[name].time <= now) then
@@ -518,7 +517,7 @@ end
 
 
 local function ChooseChicken(units, useTech)
-  local s = spGetGameSeconds()
+  local s = spGetGameSeconds() + math.floor(gameFrameOffset/30)
   local units = units or chickenTypes
   local choices,choisesN = {},0
   local techMod = 0
@@ -665,48 +664,48 @@ local function SpawnBurrow(number, burrowLevel, loc)	-- last two args are curren
     local x, y, z
     local tries = 0
 
-	repeat
-	  x = random(spawnSquare, Game.mapSizeX - spawnSquare)
-	  z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
-	  y = Spring.GetGroundHeight(x, z)
-	  tries = tries + 1
-	  local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
-	  if (blocking == 2) then
-		if (lava and Spring.GetGroundHeight(x,z) <= 0) then
-			blocking = 1
-		end
-	  
-	    local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
-	    local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
-	    local humanUnitsInVicinity = false
-	    local humanUnitsInProximity = false
-	    for i=1, #vicinity, 1 do
-	  	if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
-	  	  humanUnitsInVicinity = true
-	  	  break
-	  	end
-	    end
-  
-	    for i=1, #proximity, 1 do
-	  	if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
-	  	  humanUnitsInProximity = true
-	  	  break
-	  	end
-	    end
-  
-	    if (humanUnitsInProximity or not humanUnitsInVicinity) then
-			blocking = 1
-	    end
+    repeat
+      x = random(spawnSquare, Game.mapSizeX - spawnSquare)
+      z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
+      y = Spring.GetGroundHeight(x, z)
+      tries = tries + 1
+      local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
+      if (blocking == 2) then
+	if (lava and Spring.GetGroundHeight(x,z) <= 0) then
+	  blocking = 1
+	end
+      
+	local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
+	local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
+	local humanUnitsInVicinity = false
+	local humanUnitsInProximity = false
+	for i=1, #vicinity, 1 do
+	  if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
+	    humanUnitsInVicinity = true
+	    break
 	  end
-	until (blocking == 2 or tries > maxTriesSmall or loc)
+	end
+      
+	for i=1, #proximity, 1 do
+	  if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+	    humanUnitsInProximity = true
+	    break
+	  end
+	end
+      
+	if (humanUnitsInProximity or not humanUnitsInVicinity) then
+	  blocking = 1
+	end
+      end
+    until (blocking == 2 or tries > maxTriesSmall or loc)
 
     local unitID = spCreateUnit(burrowName, x, y, z, "n", chickenTeamID)
     burrows[unitID] = {targetID = unitID, targetDistance = 100000}
-	UpdateBurrowTarget(unitID, nil)
+    UpdateBurrowTarget(unitID, nil)
     Spring.SetUnitBlocking(unitID, false)
   end
-  
 end
+GG.Chicken.SpawnBurrow = SpawnBurrow
 
 -- spawns arbitrary unit(s) obeying min and max distance from human units
 -- supports spawning in batches
@@ -1288,7 +1287,51 @@ function gadget:GameOver()
 		score = score + math.max(60*60 - time, 0) + 250	-- +250 points for winning, +1 point for each second under par
 	end
 	score = math.floor(score * scoreMult)	-- multiply by mult
-	Spring.SendCommands("wbynum 255 SPRINGIE:score,ID: "..Spring.Utilities.Base64Encode(tostring(Spring.GetGameFrame()).."/"..tostring(math.floor(score))))
+	Spring.SendCommands("wbynum 255 SPRINGIE:score,ID: "..Spring.Utilities.Base64Encode(tostring(spGetGameFrame() + gameFrameOffset).."/"..tostring(math.floor(score))))
+end
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Chicken Spawner failed to access save/load API")
+		return
+	end
+	
+	gameFrameOffset = GG.SaveLoad.GetSavedGameFrame()
+	
+	local data = GG.SaveLoad.ReadFile(zip, "Chicken", SAVE_FILE) or {}
+	queenID = GG.SaveLoad.GetNewUnitID(data.queenID)
+	miniQueenNum = data.miniQueenNum
+	--targetCache = data.targetCache	-- not needed
+	for unitID, targetData in pairs(data.burrows) do
+		burrows[GG.SaveLoad.GetNewUnitID(unitID)] = targetData
+	end
+	for unitID, birthTime in pairs(data.chickenBirths) do
+		chickenBirths[GG.SaveLoad.GetNewUnitID(unitID)] = birthTime - math.floor(gameFrameOffset/30)
+	end
+	timeOfLastSpawn = data.timeOfLastSpawn - math.floor(gameFrameOffset/30)
+	waveSchedule = data.waveSchedule - gameFrameOffset
+	waveNumber = data.waveNumber
+	for featureID, time in pairs(data.eggDecay) do
+		eggDecay[GG.SaveLoad.GetNewFeatureID(featureID)] = time - math.floor(gameFrameOffset/30)
+	end
+	for unitID, targetTeam in pairs(data.targets) do
+		targets[GG.SaveLoad.GetNewUnitID(unitID)] = targetTeam
+	end
+	totalTechAccel = data.totalTechAccel
+	defensePool = data.defensePool
+	defenseQuota = data.defenseQuota
+	
+	humanAggro = data.humanAggro
+	humanAggroDelta = data.humanAggroDelta
+	humanAggroPerWave = data.humanAggroPerWave
+	
+	endgame = data.endgame
+	victory = data.victory
+	endMiniQueenNum = data.endMiniQueenNum
+	
+	morphFrame = data.morphFrame - gameFrameOffset
+	morphed = data.morphed
+	specialPowerCooldown = data.specialPowerCooldown
 end
 
 --------------------------------------------------------------------------------
@@ -1318,7 +1361,24 @@ function gadget:Initialize()
   gadgetHandler:AddSyncAction('ChickenEvent', WrapToLuaUI)
 end
 
-
+local function MakeRealTable(proxy)
+	local ret = {}
+	for i,v in spairs(proxy) do
+		ret[i] = v
+	end
+	return ret
+end
+--[[
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Chicken Spawner failed to access save/load API")
+		return
+	end
+	
+	local chickenTable = {}
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, chickenTable)
+end
+]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 end

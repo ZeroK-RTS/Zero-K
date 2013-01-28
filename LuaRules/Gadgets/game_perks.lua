@@ -244,7 +244,7 @@ local function InitUnsafe()
 end
 
 function gadget:Initialize()
-	if (GG.chicken) then
+	if (GG.Chicken) then
 		--gadgetHandler:RemoveGadget()
 	end
 	local teams = Spring.GetTeamList()
