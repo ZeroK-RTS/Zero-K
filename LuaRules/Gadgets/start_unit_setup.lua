@@ -142,10 +142,12 @@ local commSpawnedPlayer = {}
 -- allow gadget:Save (unsynced) to reach them
 _G.facplops = facplops
 _G.waitingForComm = waitingForComm
---_G.scheduledSpawn = scheduledSpawn
---_G.playerSides = playerSides
---_G.teamSides = teamSides
---_G.teamSidesAI = teamSidesAI
+_G.scheduledSpawn = scheduledSpawn
+_G.playerSides = playerSides
+_G.teamSides = teamSides
+_G.teamSidesAI = teamSidesAI
+_G.commSpawnedTeam = commSpawnedTeam
+_G.commSpawnedPlayer = commSpawnedPlayer
 
 local loadGame = false	-- was this loaded from a savegame?
 
@@ -479,22 +481,6 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
     return false
   end
   -- get start unit
-  
-  -- no getting double comms now!
-  --[[
-  if playerID then
-	Spring.Echo(Spring.GetGameRulesParam("commSpawnedPlayer"..playerID), commSpawnedPlayer[playerID])
-  end
-  Spring.Echo(Spring.GetGameRulesParam("commSpawnedTeam"..teamID), commSpawnedTeam[teamID])
-  ]]--
-  
-  --[[
-  if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
-  or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1))
-  and not bonusSpawn then
-	return 
-  end
-  ]]
   local startUnit = GetStartUnit(teamID, playerID, isAI)
   
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
@@ -533,10 +519,10 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("teleport_in", x, y, z) end
 	
 	if not bonusSpawn then
-		Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
+		Spring.SetTeamRulesParam(teamID, "commSpawned", 1, {allied = true})
 		commSpawnedTeam[teamID] = true
 		if playerID then
-		  Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1)
+		  Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1, {allied = true})
 		  commSpawnedPlayer[playerID] = true 
 		end
 		waitingForComm[teamID] = nil
@@ -932,6 +918,8 @@ function gadget:Load(zip)
 	playerSides = data.playerSides or {}
 	teamSides = data.teamSides or {}
 	teamSidesAI = data.teamSidesAI or {}
+	commSpawnedPlayer = data.commSpawnedPlayer or {}
+	commSpawnedTeam = data.commSpawnedTeam or {}
 	
 	-- these require special handling because they involve unitIDs
 	for oldID in pairs(data.boost) do
@@ -940,7 +928,7 @@ function gadget:Load(zip)
 	end
 	for oldID in pairs(data.facplops) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
-		GG.GiveFacplop(unitID)
+		GG.GiveFacplop(newID)
 	end	
 end
 
@@ -1063,10 +1051,12 @@ function gadget:Save(zip)
 		boost = boost,
 		facplops = MakeRealTable(SYNCED.facplops),
 		waitingForComm = MakeRealTable(SYNCED.waitingForComm),
-		--scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
-		--playerSides = MakeRealTable(SYNCED.playerSides),
-		--teamSides = MakeRealTable(SYNCED.teamSides),
-		--teamSidesAI = MakeRealTable(SYNCED.teamSidesAI),		
+		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
+		playerSides = MakeRealTable(SYNCED.playerSides),
+		teamSides = MakeRealTable(SYNCED.teamSides),
+		teamSidesAI = MakeRealTable(SYNCED.teamSidesAI),
+		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer),
+		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam),
 	}
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end

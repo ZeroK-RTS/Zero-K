@@ -207,7 +207,7 @@ function widget:Initialize()
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
 	if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
-	or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
+	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)	then 
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
 	PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
