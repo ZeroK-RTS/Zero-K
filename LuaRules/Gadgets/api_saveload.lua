@@ -151,7 +151,7 @@ local function LoadUnits()
 			py = Spring.GetGroundHeight(px, pz)
 		end
 		local isNanoFrame = data.buildProgress < 1
-		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame)
+		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, oldID)
 		data.newID = newID
 		-- position and velocity
 		spSetUnitVelocity(newID, unpack(data.vel))
@@ -190,6 +190,8 @@ local function LoadUnits()
 		end
 		-- is neutral
 		spSetUnitNeutral(newID, data.neutral)
+		
+		Spring.Echo("unitID check", oldID, newID)
 	end
 	
 	-- second pass for orders
@@ -233,7 +235,7 @@ local function LoadFeatures()
 	for oldID, data in pairs(savedata.feature) do
 		local px, py, pz = unpack(data.pos)
 		local featureDefID = FeatureDefNames[data.featureDefName].id
-		local newID = spCreateFeature(data.featureDefName, px, py, pz)
+		local newID = spCreateFeature(data.featureDefName, px, py, pz, data.heading, data.allyTeam, oldID)
 		data.newID = newID
 		spSetFeatureDirection(newID, unpack(data.dir))
 		-- health
@@ -323,7 +325,7 @@ local spGetUnitVelocity		= Spring.GetUnitVelocity
 local spGetUnitExperience	= Spring.GetUnitExperience
 local spGetUnitWeaponState	= Spring.GetUnitWeaponState
 local spGetFeatureDefID		= Spring.GetFeatureDefID
-local spGetFeatureTeam		= Spring.GetFeatureTeam
+local spGetFeatureAllyTeam	= Spring.GetFeatureAllyTeam
 local spGetFeatureHealth	= Spring.GetFeatureHealth
 local spGetFeatureDirection	= Spring.GetFeatureDirection
 local spGetFeaturePosition	= Spring.GetFeaturePosition
@@ -466,8 +468,8 @@ local function SaveFeatures()
 		-- basic feature information
 		local featureDefID = spGetFeatureDefID(featureID)
 		featureInfo.featureDefName = FeatureDefs[featureDefID].name
-		local featureTeam = spGetFeatureTeam(featureID)
-		featureInfo.featureTeam = featureTeam
+		local allyTeam = spGetFeatureAllyTeam(featureID)
+		featureInfo.allyTeam = allyTeam
 		-- save position/velocity
 		featureInfo.pos = {spGetFeaturePosition(featureID)}
 		featureInfo.dir = {spGetFeatureDirection(featureID)}
