@@ -27,6 +27,7 @@ local barrels = {larmbarrel1, larmbarrel2, larmbarrel3, rarmbarrel1, rarmbarrel2
 local aimpoints = {torso, aaturret, shoulderflare, head}
 
 local gunIndex = {1,1,1,1}
+local flareIndex = {1,1,1,1}
 
 local lastTorsoHeading = 0
 --------------------------------------------------------------------------------
@@ -180,11 +181,11 @@ local function RestoreAfterDelay()
 end
 
 function script.AimFromWeapon(num)
-    return aimpoints[num]
+	return aimpoints[num]
 end
 
 function script.QueryWeapon(num)
-    return gunFlares[num][ gunIndex[num] ]
+	return gunFlares[num][ flareIndex[num] ]
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -227,9 +228,10 @@ function script.Shot(num)
 	if num == 1 then
 		Move(barrels[gunIndex[1]], z_axis, -20)
 		Move(barrels[gunIndex[1]], z_axis, 0, 20)
-    end
-    gunIndex[num] = gunIndex[num] + 1
-    if gunIndex[num] > #gunFlares[num] then
+	end 
+	flareIndex[num] = gunIndex[num] -- store current gunIndex in flareIndex 
+	gunIndex[num] = gunIndex[num] + 1
+	if gunIndex[num] > #gunFlares[num] then 
 		gunIndex[num] = 1
     end
 end
