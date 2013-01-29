@@ -473,8 +473,8 @@ local function StopMorph(unitID, morphData)
   morphUnits[unitID] = nil
   if not morphData.combatMorph then 
     Spring.SetUnitHealth(unitID, { paralyze = -1})
-    Spring.SetUnitRulesParam(unitID, "morphing", 0)
   end
+  Spring.SetUnitRulesParam(unitID, "morphing", 0)
   local scale = morphData.progress * stopPenalty
   local unitDefID = Spring.GetUnitDefID(unitID)
 
