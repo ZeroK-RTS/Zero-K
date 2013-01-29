@@ -66,7 +66,6 @@ local spGetUnitHealth	    = Spring.GetUnitHealth
 local spTransferUnit        = Spring.TransferUnit
 local spGetUnitIsDead	    = Spring.GetUnitIsDead
 local spGiveOrderToUnit	    = Spring.GiveOrderToUnit
-local spGetUnitHealth	    = Spring.GetUnitHealth
 local spSetTeamResources    = Spring.SetTeamResources
 local spGetTeamResources    = Spring.GetTeamResources
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
