@@ -21,7 +21,7 @@ local weaponDef = {
 		default = 225,
     },
 
-    explosionGenerator      = [[custom:flash2purple]],
+    explosionGenerator      = [[custom:flashslow]],
     fireStarter             = 30,
     impactOnly              = true,
     impulseBoost            = 0,

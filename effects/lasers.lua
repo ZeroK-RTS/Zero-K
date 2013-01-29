@@ -689,7 +689,7 @@ return {
       },
     },
   },
-
+  
   ["flash1red"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -1025,5 +1025,90 @@ return {
     },
   },
   
+  ["flashslow"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      circlealpha        = 0,
+      circlegrowth       = 0,
+      flashalpha         = 1,
+      flashsize          = 15,
+      ttl                = 3,
+      color = {
+        [1]  = 0.6,
+        [2]  = 0,
+        [3]  = 0.7,
+      },
+    },
+    meltage = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:SLOW_MELT]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+    pikes = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 5,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.05,
+        color              = [[0.4,0,0.5]],
+        dir                = [[-1 r2,-1 r2,-1 r2]],
+        length             = 4,
+        width              = 8,
+      },
+    },
+    sparks = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.97,
+        colormap           = [[1.0 0.2 1.0 0.01   0.9 0.3 0.9 0.01   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 80,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, -0.1, 0]],
+        numparticles       = 5,
+        particlelife       = 7,
+        particlelifespread = 3,
+        particlesize       = 5,
+        particlesizespread = 2.5,
+        particlespeed      = 3,
+        particlespeedspread = 2,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[plasma]],
+      },
+    },
+  },
+  
+  
+  ["slow_melt"] = {
+    groundflash = {
+      circlealpha        = 1,
+      circlegrowth       = -0.02,
+      flashalpha         = 0.4,
+      flashsize          = 6,
+      ttl                = 80,
+      color = {
+        [1]  = 1,
+        [2]  = 0.0,
+        [3]  = 1,
+      },
+    },
+  },
 }
 
