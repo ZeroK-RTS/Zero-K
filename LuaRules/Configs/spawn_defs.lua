@@ -297,7 +297,6 @@ for _, d in pairs(difficulties) do
     d.waveSizeMult = (d.waveSizeMult or waveSizeMult)*0.85
     d.gracePeriod = (d.gracePeriod or gracePeriod)*0.5
     d.queenTime = (d.queenTime or queenTime)*0.5
-    Spring.Echo("whee", d.queenTime)
     d.queenHealthMod = (d.queenHealthMod or 1)*0.4
     d.miniQueenTime = {}
     d.endMiniQueenWaves = (d.endMiniQueenWaves or endMiniQueenWaves) - 1

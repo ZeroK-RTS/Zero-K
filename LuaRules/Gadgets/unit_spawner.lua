@@ -386,8 +386,10 @@ local function KillAllComputerUnits()
     --for i=1,#teamUnits do
     --  Spring.DestroyUnit(teamUnits[i])
     --end
-	local allyTeam = select(6, Spring.GetTeamInfo(teamID))
-	GG.DestroyAlliance(allyTeam)
+    local allyTeam = select(6, Spring.GetTeamInfo(teamID))
+    if GG.DestroyAlliance then
+      GG.DestroyAlliance(allyTeam)
+    end
   end
 end
 
@@ -654,56 +656,62 @@ local function SpawnSupport(burrowID, support, number, force)
   end
 end
 
-local function SpawnBurrow(number, burrowLevel, loc)	-- last two args are currently unused
+local function SpawnBurrow(number, loc, burrowLevel)
   if (victory or endgame) then return end
   
   local t     = spGetGameSeconds()
+  local unitID
   --if t < (gracePeriod/4) then return end
     
   for i=1, (number or 1) do
     local x, y, z
     local tries = 0
-
-    repeat
-      x = random(spawnSquare, Game.mapSizeX - spawnSquare)
-      z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
-      y = Spring.GetGroundHeight(x, z)
-      tries = tries + 1
-      local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
-      if (blocking == 2) then
-	if (lava and Spring.GetGroundHeight(x,z) <= 0) then
-	  blocking = 1
-	end
-      
-	local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
-	local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
-	local humanUnitsInVicinity = false
-	local humanUnitsInProximity = false
-	for i=1, #vicinity, 1 do
-	  if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
-	    humanUnitsInVicinity = true
-	    break
+    if loc then
+      x, y, z = unpack(loc)
+    else
+  
+      repeat
+	x = random(spawnSquare, Game.mapSizeX - spawnSquare)
+	z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
+	y = Spring.GetGroundHeight(x, z)
+	tries = tries + 1
+	local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
+	if (blocking == 2) then
+	  if (lava and Spring.GetGroundHeight(x,z) <= 0) then
+	    blocking = 1
+	  end
+	
+	  local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
+	  local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
+	  local humanUnitsInVicinity = false
+	  local humanUnitsInProximity = false
+	  for i=1, #vicinity, 1 do
+	    if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
+	      humanUnitsInVicinity = true
+	      break
+	    end
+	  end
+	
+	  for i=1, #proximity, 1 do
+	    if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+	      humanUnitsInProximity = true
+	      break
+	    end
+	  end
+	
+	  if (humanUnitsInProximity or not humanUnitsInVicinity) then
+	    blocking = 1
 	  end
 	end
-      
-	for i=1, #proximity, 1 do
-	  if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
-	    humanUnitsInProximity = true
-	    break
-	  end
-	end
-      
-	if (humanUnitsInProximity or not humanUnitsInVicinity) then
-	  blocking = 1
-	end
-      end
-    until (blocking == 2 or tries > maxTriesSmall or loc)
+      until (blocking == 2 or tries > maxTriesSmall)
+    end
 
-    local unitID = spCreateUnit(burrowName, x, y, z, "n", chickenTeamID)
+    unitID = spCreateUnit(burrowName, x, y, z, "n", chickenTeamID)
     burrows[unitID] = {targetID = unitID, targetDistance = 100000}
     UpdateBurrowTarget(unitID, nil)
     Spring.SetUnitBlocking(unitID, false)
   end
+  return unitID
 end
 GG.Chicken.SpawnBurrow = SpawnBurrow
 
@@ -1268,7 +1276,8 @@ function gadget:GameOver()
 	local modopts = Spring.GetModOptions()
 	local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 	local energymult = tonumber(Spring.GetModOptions().energymult) or 1
-	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne(modopts.terracostmult + 0.001)) or ExceedsOne(modopts.wreckagemult) or (not ExceedsOne(modopts.factorycostmult + 0.001)) then
+	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne((modopts.terracostmult or 1) + 0.001))
+	or ExceedsOne(modopts.wreckagemult) or (not ExceedsOne((modopts.factorycostmult or 1) + 0.001)) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Chicken> Cheating modoptions, no score sent")
 		return
 	end

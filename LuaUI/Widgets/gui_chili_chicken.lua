@@ -275,7 +275,7 @@ local function UpdateRules()
 	else
 	  local substr = ''
 	  if eggs and speed then
-	    substr = " (Speed Eggs)"
+	    substr = " (Spd Eggs)"
 	  elseif eggs then
 	    substr = " (Eggs)"
 	  elseif speed then
