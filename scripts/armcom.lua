@@ -211,6 +211,7 @@ function script.AimWeapon(num, heading, pitch)
 		if not isDgunning then 
 			Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
 		end
+		Turn( nanolath , x_axis, math.rad(-40), ARM_SPEED_PITCH )
 		Turn( luparm , x_axis, math.rad(-50) - pitch, ARM_SPEED_PITCH )
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(luparm, x_axis)
@@ -220,6 +221,7 @@ function script.AimWeapon(num, heading, pitch)
 		Signal( SIG_DGUN)
 		SetSignalMask( SIG_DGUN)
 		isDgunning = true
+		Turn( biggun , x_axis, math.rad(-62.5), ARM_SPEED_PITCH )
 		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
 		Turn( ruparm , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
 		WaitForTurn(torso, y_axis)
