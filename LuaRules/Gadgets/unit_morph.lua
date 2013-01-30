@@ -857,7 +857,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
   if (updateButtons) then UpdateMorphReqs(teamID) end
 end
 
-
+-- no real point to these now that tech levels aren't in use
+--[[
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
   self:UnitCreated(unitID, unitDefID, teamID)
   if (isFinished(unitID)) then
@@ -869,6 +870,7 @@ end
 function gadget:UnitGiven(unitID, unitDefID, newTeamID, oldTeamID)
   self:UnitDestroyed(unitID, unitDefID, oldTeamID)
 end
+]]
 
 
 function UnitRanked(unitID,unitDefID,teamID,newRank,oldRank)
