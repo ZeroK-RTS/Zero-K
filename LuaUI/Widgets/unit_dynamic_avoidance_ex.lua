@@ -1,4 +1,4 @@
-local versionName = "v2.79"
+local versionName = "v2.8"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "Dec 23, 2012",
+    date      = "Jan 30, 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -89,7 +89,7 @@ local gammaCONSTANT2and1g	= {0.05,0.05,0.05} -- balancing constant; effect behav
 local alphaCONSTANT1g		= {500,0.4,0.4} -- balancing constant; effect behaviour. (default = 500x (All), 0.4x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
 
 --Move Command constant:
-local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
+local halfTargetBoxSize_g = {400, 0, 185, 50} --aka targetReachBoxSizeTrigger, set the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
 local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if it overlap with existing command)
 local dummyIDg = "[]" --fake ping id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
 
@@ -338,7 +338,8 @@ function RefreshUnitList(attacker, commandTTL)
 	local selectedUnits_Meta = {}
 	local selectedCons_Meta = {}
 	for i = 1, #selectedUnits, 1 do
-		selectedUnits_Meta[selectedUnits[i]]=true
+		local unitID = selectedUnits[i]
+		selectedUnits_Meta[unitID]=true
 	end
 	local metaForVisibleUnits = {}
 	local visibleUnits=spGetVisibleUnits(myTeamID_gbl)
@@ -366,11 +367,10 @@ function RefreshUnitList(attacker, commandTTL)
 					local isBuilder_ignoreTrue = false
 					if unitDef["builder"] then
 						isBuilder_ignoreTrue = (options.dbg_IgnoreSelectedCons.value == true and selectedUnits_Meta[unitID] == true) --is (epicMenu force-selection-ignore is true? AND unit is a constructor?)
-						if selectedUnits_Meta[unitID] == true then
+						if selectedUnits_Meta[unitID] then
 							selectedCons_Meta[unitID] = true --remember selected Constructor
 						end
 					end
-					
 					if (unitDef["builder"] and options.enableCons.value==false) or (isBuilder_ignoreTrue) then --//if ((Cons epicmenu option is false) OR (epicMenu force-selection-ignore is true)) AND it is a constructor, then... exclude (this) Cons
 						unitType = 0 --//this unit-type excluded from avoidance
 					end
@@ -435,21 +435,22 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 			local unitID= unitInMotion[i][1] --get unitID for commandqueue
 			if spGetUnitIsDead(unitID)==false then --prevent execution if unit died during transit
 				local cQueue = spGetCommandQueue(unitID)
-				local executionAllow, cQueueTemp = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i]) --filter/alter unwanted unit state by reading the command queue
+				local executionAllow, cQueueTemp, isReloadAvoidance = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i]) --filter/alter unwanted unit state by reading the command queue
 				if executionAllow then
 					cQueue = cQueueTemp --cQueueTemp has been altered for identification, copy it to cQueue for use (actual command is not yet issued)
 					--local boxSizeTrigger= unitInMotion[i][2]
 					local fixedPointCONSTANTtrigger = unitInMotion[i][4] --//using fixedPointType to trigger different fixed point constant for each unit type
-					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable,fixedPointCONSTANTtrigger) --check old or new command
+					local unitVisible = (unitInMotion[i].isVisible == "yes")
+					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --check old or new command
 					local currentX,_,currentZ = spGetUnitPosition(unitID)
 					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
-					if selectedCons_Meta[unitID] and boxSizeTrigger~= 4 then --if unitIsSelected and NOT using GUARD 'halfboxsize' then:
+					if selectedCons_Meta[unitID] and boxSizeTrigger~= 4 then --if unitIsSelected and NOT using GUARD 'halfboxsize' (ie: is not guarding) then:
 						boxSizeTrigger = 1 -- override all reclaim/ressurect/repair's deactivation 'halfboxsize' with the one for MOVE command (give more tolerance when unit is selected)
 					end
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
 					local losRadius	= GetUnitLOSRadius(unitID) --get LOS
 					local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
-					if (cQueue[1].id == CMD_MOVE and unitInMotion[i].isVisible ~= "yes") then --if unit has move Command and is outside user's view
+					if (cQueue[1].id == CMD_MOVE and not unitVisible) then --if unit has move Command and is outside user's view
 						reachedTarget = false --force unit to continue avoidance despite close to target (try to circle over target until seen by user)
 					end
 					if reachedTarget then --if reached target
@@ -702,43 +703,47 @@ end
 
 function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 	local allowExecution = false
+	local returnReload = false -- indicate to way way downstream processes whether avoidance is based on weapon reload/shieldstate 
 	if cQueue~=nil then --prevent ?. Forgot...
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
-		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and currently idle/with-singular-mono-command (eg: widget's move order), or is reloading and currently idle/with-singular-mono-command (eg: auto-attack) then:
-			if (holdPosition== false) then --if not "hold position"
-				cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --replace with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit
+		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading) then --if unit is out of user's vision OR is reloading, and: 
+			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
+				if (holdPosition== false) then --if unit is not "hold position", then:
+					cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --flag unit with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit. Note: this is not real command, its here just to trigger avoidance.
+				end
 			end
 		end
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
 			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
 			--local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes" and unitInMotionSingleUnit[2]~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
-			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes")--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision)
+			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes")--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
 			local _2ndAttackSignature = false --attack command signature
 			local _2ndGuardSignature = false --guard command signature
 			if #cQueue >=2 then --check if the command-queue is masked by widget's previous command, but the actual originality check will be performed by TargetBoxReached() later.
 				_2ndAttackSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)
 				_2ndGuardSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_GUARD)
 			end
-			local isReloadingState = (isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
+			local isReloadingAttack = (isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (cQueue[1].id == CMD_GUARD or _2ndGuardSignature)
-			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState and not holdPosition) or (isGuardState) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or for: any unit outside visibility... or on any unit with any command which is reloading.
-				local isReloadAvoidance = (isReloadingState and not holdPosition)
+			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingAttack and not holdPosition) or (isGuardState) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or for: any unit outside visibility... or on any unit with any command which is reloading.
+				local isReloadAvoidance = (isReloadingAttack and not holdPosition)
 				if isReloadAvoidance or #cQueue>=2 then --check cQueue for lenght to prevent STOP command from short circuiting the system 
 					if isReloadAvoidance or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						allowExecution = true --allow execution
+						returnReload = isReloadAvoidance
 					end --if cQueue[2].id~=false
-						if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
+					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
 				end --if #cQueue>=2
 			end --if ((cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and (unitInMotion[i][2]==1 or unitInMotion[i].isVisible == nil)
 		end --if cQueue[1]~=nil
 	end --if cQueue~=nil	
-	return allowExecution, cQueue --disallow execution
+	return allowExecution, cQueue,returnReload --disallow/allow execution
 end
 
 --check if widget's command or user's command
-function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable, fixedPointCONSTANTtrigger) --//used by GetPreliminarySeparation()
+function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable, fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --//used by GetPreliminarySeparation()
 	local targetCoordinate = {nil,nil,nil}
 	local boxSizeTrigger=0
 	local graphCONSTANTtrigger = {}
@@ -769,20 +774,25 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable, fixedPoi
 		end
 	end
 	if newCommand then	--if user's new command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger)
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance)
 		commandIndexTable[unitID]["patienceIndexA"]=0 --//reset impatience counter
 	else  --if widget's previous command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger)	
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance)	
 	end
 	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger --return target coordinate
 end
 
 --ignore command set on this box
 function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger, lastPosition)
+	----Global Cpnstant----
+	local halfTargetBoxSize = halfTargetBoxSize_g
+	-----------------------
 	local currentX, currentZ = lastPosition[1], lastPosition[2]
 	local targetX = dNil(targetCoordinate[1]) -- use dNil if target asynchronously/spontaneously disappear: in that case it will replace "nil" with -1 
 	local targetZ =targetCoordinate[3]
-	if targetX==-1 then return false end --if target is invalid (-1) then assume target not-yet-reached, return false (default state), and continue avoidance 
+	if targetX==-1 then 
+		return false 
+	end --if target is invalid (-1) then assume target not-yet-reached, return false (default state), and continue avoidance 
 	local xDistanceToTarget = math.abs(currentX -targetX)
 	local zDistanceToTarget = math.abs(currentZ -targetZ)
 	if (turnOnEcho == 1) then
@@ -794,7 +804,8 @@ function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger, lastPositio
 		Spring.Echo("(xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger])(TargetBoxReached):")
 		Spring.Echo((xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger]))
 	end
-	return (xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger]) --only command greater than this box return false
+	local withinTargetBox = (xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger])
+	return withinTargetBox --command outside this box return false
 end
 
 -- get LOS
@@ -1131,41 +1142,37 @@ function dNil(x)
 	return x
 end
 
-function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate, fixedPointCONSTANTtrigger) --//used by IdentifyTargetOnCommandQueue()
-	local boxSizeTrigger=0
+function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate, fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --//used by IdentifyTargetOnCommandQueue()
+	local boxSizeTrigger=0 --an arbitrary constant/variable, which trigger some other action/choice way way downstream. The purpose is to control when avoidance must be cut-off using custom value (ie: 1,2,3,4) for specific cases.
 	local graphCONSTANTtrigger = {}
 	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then --move or building stuff
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
-		elseif cQueue[queueIndex].params[1]~= nil then --check whether its refering to a nanoframe
-			local nanoframeID = cQueue[queueIndex].params[1]
-			targetPosX, targetPosY, targetPosZ = spGetUnitPosition(nanoframeID)
-			if (turnOnEcho == 2)then Spring.Echo("ExtractTarget, MoveCommand: is using nanoframeID") end
+		-- elseif cQueue[queueIndex].params[1]~= nil then --check whether its refering to a nanoframe
+			-- local nanoframeID = cQueue[queueIndex].params[1]
+			-- targetPosX, targetPosY, targetPosZ = spGetUnitPosition(nanoframeID)
+			-- if (turnOnEcho == 2)then Spring.Echo("ExtractTarget, MoveCommand: is using nanoframeID") end
 		else
-			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target") 
-				Spring.Echo(cQueue[queueIndex].params[1])
-				Spring.Echo(cQueue[queueIndex].params[2])
-				Spring.Echo(cQueue[queueIndex].params[3])
-			end
+			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance move target is nil: fallback to no target") end
 		end
 		boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 		graphCONSTANTtrigger[2] = 1
 		if #cQueue >= queueIndex+1 then
-			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --//if reclaim or ressurect then identify area reclaim
+			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --//reclaim command has 2 stage: 1 is move back to base, 2 is going reclaim. If detected reclaim or ressurect at 2nd queue then identify as area reclaim
 				if cQueue[queueIndex].params[1]==cQueue[queueIndex+1].params[1]
 					and cQueue[queueIndex].params[2]==cQueue[queueIndex+1].params[2]
 					and cQueue[queueIndex].params[3]==cQueue[queueIndex+1].params[3] then --area reclaim will have no "nil", and will equal to retreat coordinate when retreating to center of area reclaim.
-					targetPosX, targetPosY, targetPosZ = -1, -1, -1 --//if area reclaim under the above condition, then avoid forever in presence of enemy
+					targetPosX, targetPosY, targetPosZ = -1, -1, -1 --//if area reclaim under the above condition, then avoid forever in presence of enemy, ELSE if no enemy (no avoidance): it reach retreat point and resume reclaiming
 					boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 				end
 			end
 		end
-		targetCoordinate={targetPosX, targetPosY, targetPosZ } --use first queue as target
-		commandIndexTable[unitID]["backupTargetX"]=cQueue[queueIndex].params[1] --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=cQueue[queueIndex].params[2]
-		commandIndexTable[unitID]["backupTargetZ"]=cQueue[queueIndex].params[3]
+		targetCoordinate={targetPosX, targetPosY, targetPosZ } --send away the target for move command
+		commandIndexTable[unitID]["backupTargetX"]=targetPosX --backup the target
+		commandIndexTable[unitID]["backupTargetY"]=targetPosY
+		commandIndexTable[unitID]["backupTargetZ"]=targetPosZ
 	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
@@ -1250,10 +1257,10 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[2] = 1
 		boxSizeTrigger=2 --use deactivation 'halfboxsize' for RECLAIM/RESSURECT command
 		
-		--if not areaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --signature for discrete RECLAIM/RESSURECT command. *used by Method 1*
-		if notAreaMode then
+		--if not areaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --*used by Method 1* signature for discrete RECLAIM/RESSURECT command.
+		if notAreaMode then --*used by Method 2*
 			boxSizeTrigger = 1 --change to deactivation 'halfboxsize' similar to MOVE command if user queued a discrete reclaim/ressurect command
-			--graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
+			--graphCONSTANTtrigger[1] = 1 --override: use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 			--graphCONSTANTtrigger[2] = 1
 		end
 	elseif cQueue[queueIndex].id==40 then --repair command
@@ -1298,8 +1305,20 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[1] = 2 --//use more aggressive attraction because it GUARD units. It need big result.
 		graphCONSTANTtrigger[2] = 1	--//use less aggressive avoidance because need to stay close to units. It need not stray.
 	elseif cQueue[queueIndex].id == CMD_ATTACK then
-		targetCoordinate={-1, -1, -1}
-		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached", calculation skipped (no nil error)
+		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
+		boxSizeTrigger = nil --//value not needed when target is "-1" which always return "not reached" (a case where boxSizeTrigger is not used)
+		if unitVisible and not isReloadAvoidance then --*Note: this is needed if "GateKeeperOrCommandFilter" miss filtering out attack command* if unit is visible & not reloadAvoidance (ie: is cloaked and is issued direct attack), then set enemy as target and check for "target reached" properly.
+			local enemyID = cQueue[queueIndex].params[1]
+			local x,y,z = spGetUnitPosition(enemyID)
+			if x then
+				targetPosX, targetPosY, targetPosZ = x,y,z --set target to enemy
+				boxSizeTrigger = 1 --if user initiate an attack and unit is not reloading, then set deactivation 'halfboxsize' for MOVE command (ie: 400m range)
+			end
+		end
+		targetCoordinate={targetPosX, targetPosY, targetPosZ} --set target to enemy unit or none
+		commandIndexTable[unitID]["backupTargetX"]=targetPosX --backup the target
+		commandIndexTable[unitID]["backupTargetY"]=targetPosY
+		commandIndexTable[unitID]["backupTargetZ"]=targetPosZ
 		graphCONSTANTtrigger[1] = 1 --//this value doesn't matter because 'CMD_ATTACK' don't use attractor (-1 already disabled the attractor calculation, and 'fixedPointCONSTANTtrigger' ignore attractor). Needed because "fTarget" is tied to this variable in "AvoidanceCalculator()".
 		graphCONSTANTtrigger[2] = 2	--//use more aggressive avoidance because it often run just once or twice. It need big result.
 		fixedPointCONSTANTtrigger = 3 --//use behaviour that promote avoidance/ignore attractor (incase -1 is not enough)
@@ -1307,7 +1326,10 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
 		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
-		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached", , calculation is skipped (no nil error)
+		boxSizeTrigger = nil --//value not needed when target is "-1" which always return "not reached" (a case where boxSizeTrigger is not used)
+		commandIndexTable[unitID]["backupTargetX"]=-1 --backup the target
+		commandIndexTable[unitID]["backupTargetY"]=-1
+		commandIndexTable[unitID]["backupTargetZ"]=-1
 		graphCONSTANTtrigger[1] = 1  --//needed because "fTarget" is tied to this variable in "AvoidanceCalculator()". This value doesn't matter because -1 already skip attractor calculation & 'fixedPointCONSTANTtrigger' already ignore attractor values.
 		graphCONSTANTtrigger[2] = 1
 		fixedPointCONSTANTtrigger = 3
