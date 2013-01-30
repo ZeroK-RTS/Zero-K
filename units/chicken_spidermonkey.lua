@@ -141,6 +141,11 @@ unitDef = {
     WEB    = {
       name                    = [[Web Weapon]],
       accuracy                = 800,
+      
+      customParams            = {
+	impulse = [[-200]],
+      },
+      
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -155,8 +160,6 @@ unitDef = {
       fixedlauncher           = true,
       flightTime              = 3,
       impactOnly              = true,
-      impulseBoost            = 35,
-      impulseFactor           = -140,
       interceptedByShieldType = 2,
       range                   = 600,
       reloadtime              = 0.1,
