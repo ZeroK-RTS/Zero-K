@@ -47,7 +47,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:RAIDMUZZLE]],
+      [[custom:RAIDMUZZLE]]
     },
 
   },
@@ -76,7 +76,7 @@ unitDef = {
       name                    = [[EMP Missile]],
       areaOfEffect            = 280,
       avoidFriendly           = false,
-	  cegTag                  = [[bigemptrail]],
+      cegTag                  = [[bigemptrail]],
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
@@ -88,7 +88,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 1,
-      explosionGenerator      = [[custom:POWERPLANT_EXPLOSION]],
+      explosionGenerator      = [[custom:EMPMISSILE_EXPLOSION]],
       fireStarter             = 0,
       impulseBoost            = 0,
       impulseFactor           = 0,
