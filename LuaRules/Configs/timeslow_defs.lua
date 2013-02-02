@@ -20,12 +20,13 @@ local UPDATE_PERIOD = 15 -- I'd prefer if this was not changed
 local weapons = {
 	slowmort_slowbeam = { slowDamage = 220, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	corgol_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	cormak_blast = { slowDamage = 75, noDeathBlast = true, scaleSlow = true },
+	cormak_blast = { slowDamage = 60, noDeathBlast = true, scaleSlow = true },
 	corcrw_timedistort = { slowDamage = 100, onlySlow = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },
 	raveparty_violet_slugger = { slowDamage = 2500, noDeathBlast = true, scaleSlow = true },
-	chicken_spidermonkey_web = { slowDamage = 30, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	amphfloater_cannon = { slowDamage = 250, scaleSlow = true},
+	chicken_spidermonkey_web = { slowDamage = 30, onlySlow = true, smartRetarget = 0.33, scaleSlow = true },
+	amphfloater_cannon = { slowDamage = 250, scaleSlow = true },
+	capturecar_stunray = { slowDamage = 10, scaleSlow = false },
 }
 
 -- reads from customParams and copies to weapons as appropriate - needed for procedurally generated comms

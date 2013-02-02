@@ -196,7 +196,7 @@ unitDef = {
     },
 	
 	PARTICLEBEAM = {
-      name                    = [[Auto Particle Beam]],
+      name                    = [[Particle Beam]],
       beamDecay               = 0.85,
       beamTime                = 0.01,
       beamttl                 = 45,
@@ -205,7 +205,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 60,
+        default = 75,
         subs    = 3,
       },
 
@@ -222,7 +222,7 @@ unitDef = {
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
       soundStartVolume        = 6,
-      thickness               = 5,
+      thickness               = 6,
       tolerance               = 8192,
       turret                  = true,
       weaponType              = [[BeamLaser]],
