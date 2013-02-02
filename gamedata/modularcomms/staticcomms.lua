@@ -27,7 +27,7 @@ local comms = {
   comm_stun_cai = {
     chassis = "armcom1",
     name = "Exotic Assault",
-    modules = { "commweapon_lightninggun", "module_autorepair",},
+    modules = { "commweapon_lightninggun", "module_high_power_servos",},
     cost = 250,
   },
   
