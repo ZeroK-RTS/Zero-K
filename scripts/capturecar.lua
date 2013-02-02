@@ -3,7 +3,7 @@ include "constants.lua"
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
 local base, front, bigwheel, rear = piece('base', 'front', 'bigwheel', 'rear')
-local turret, arm_1, arm_2, arm_3, dish, panel_a1, panel_b1, panel_a2, panel_b2 = piece('turret', 'arm_1', 'arm_2', 'arm_3', 'dish', 'panel_a1', 'panel_b1', 'panel_a2', 'panel_b2')
+local turret, arm_1, arm_2, arm_3, dish, panel_a1, panel_b1, panel_a2, panel_b2, flare = piece('turret', 'arm_1', 'arm_2', 'arm_3', 'dish', 'panel_a1', 'panel_b1', 'panel_a2', 'panel_b2', 'flare')
 local tracks1, tracks2, tracks3, tracks4 = piece('tracks1', 'tracks2', 'tracks3', 'tracks4')
 
 local wheels_s = { piece('wheels2', 'wheels3') }
@@ -130,8 +130,8 @@ function script.AimWeapon(num, heading, pitch)
 	return (spGetUnitRulesParam(unitID, "cantfire") == 0)	--checks for max capture
 end
 
-function script.AimFromWeapon(num) return dish end
-function script.QueryWeapon(num) return dish end
+function script.AimFromWeapon(num) return flare end
+function script.QueryWeapon(num) return flare end
 
 function script.Create()
 	StartThread(SmokeUnit)
