@@ -62,37 +62,14 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-local function FontBackwardCompa(obj)
-  obj.font.outline = obj.font.outline or obj.fontOutline
-  obj.font.color = obj.font.color or obj.captionColor
-  obj.font.color = obj.font.color or obj.textColor
-  obj.font.size = obj.font.size or obj.fontSize
-  obj.font.size = obj.font.size or obj.fontsize
-  obj.font.shadow = obj.font.shadow or obj.fontShadow
-  obj.fontOutline = nil
-  obj.textColor = nil
-  obj.captionColor = nil
-  obj.fontSize = nil
-  obj.fontsize = nil
-  obj.fontShadow = nil
-end
-
---//=============================================================================
-
 function Control:New(obj)
   --// backward compability
-  if (not obj.font) then
-    obj.font = {}
-  end
-  FontBackwardCompa(obj)
+  BackwardCompa(obj)
 
   --// load the skin for this control
   obj.classname = self.classname
   theme.LoadThemeDefaults(obj)
   SkinHandler.LoadSkin(obj, self)
-
-  --// call it twice, so skins can use old standards, too
-  FontBackwardCompa(obj)
 
   --// we want to initialize the children ourself (see downwards)
   local cn = obj.children

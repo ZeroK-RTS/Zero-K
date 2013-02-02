@@ -135,6 +135,7 @@ end
 local function MergeProperties(obj, skin, classname)
 	local skinclass = skin[classname]
 	if not skinclass then return end
+	BackwardCompa(skinclass)
 	table.merge(obj, skinclass)
 	MergeProperties(obj, skin, skinclass.clone)
 end

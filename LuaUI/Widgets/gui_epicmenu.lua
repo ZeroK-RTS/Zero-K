@@ -1305,6 +1305,7 @@ MakeSubWindow = function(path)
 			
 		elseif option.type == 'list' then	
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
+			local items = {};
 			for i=1, #option.items do
 				local item = option.items[i]
 				settings_height = settings_height + B_HEIGHT 
@@ -1318,6 +1319,11 @@ MakeSubWindow = function(path)
 						tooltip=item.desc,
 					}
 			end
+			--[[
+			tree_children[#tree_children+1] = ComboBox:New {
+				items = items;
+			}
+			]]--
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
