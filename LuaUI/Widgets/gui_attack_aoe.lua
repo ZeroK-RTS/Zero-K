@@ -247,7 +247,7 @@ local function SetupUnitDef(unitDefID, unitDef)
         if (num == 3 and unitDef.canManualFire) then
           dgunInfo[unitDefID] = getWeaponInfo(weaponDef, unitDef)
         elseif (not weaponDef.isShield 
-                and not ToBool(weaponDef.interceptor)
+                and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
                 and (aoe > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
           maxSpread = max(aoe, weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle))
           maxWeaponDef = weaponDef

@@ -256,6 +256,10 @@ unitDef = {
       turret                  = false,
       weaponType              = [[Cannon]],
       weaponVelocity          = 5,
+      
+      customParams            = {
+        hidden = true
+      }
     },
 
   },
