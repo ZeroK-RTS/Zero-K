@@ -337,8 +337,9 @@ local builders = {}
 
 						for j=1,#nanoPieces do
 							local nanoPieceID = nanoPieces[j]
+							local nanoPieceIDAlt = Spring.GetUnitScriptPiece(unitID, nanoPieceID)
 							if (unitID+frame)%60 == 0 then
-								Spring.Echo("Nanopiece nums (output)", j, UnitDefs[unitDefID].name, nanoPieceID)
+								Spring.Echo("Nanopiece nums (output)", j, UnitDefs[unitDefID].name, nanoPieceID, nanoPieceIDAlt)
 							end
 
 							local nanoParams = {
