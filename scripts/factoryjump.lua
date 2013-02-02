@@ -50,6 +50,7 @@ local function Close()
 end
 
 function script.Create()
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	Move(center1, z_axis, 20)
 	Move(center2, z_axis, 20)
 	Move(side1, z_axis, 20)

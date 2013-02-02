@@ -63,7 +63,8 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)	
+	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 local function RestoreAfterDelay()

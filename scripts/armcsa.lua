@@ -13,12 +13,14 @@ local nanopoint = piece 'nanopoint'
 include "constants.lua"
 
 smokePiece = {fuselage}
+local nanoPieces = {nanopoint}
 
 -- Signal definitions
 local SIG_MOVE = 1
 
 function script.Create()
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Activate()

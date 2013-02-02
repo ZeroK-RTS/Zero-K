@@ -36,6 +36,7 @@ local nanospray = piece 'nanospray'
 local grenade = piece 'grenade' 
 
 smokePiece = {torso}
+local nanoPieces = {nanospray}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -57,6 +58,9 @@ for index, weapon in pairs(wepTable) do
 		flamers[index] = true
 	end
 end
+
+local restoreHeading, restorePitch = 0, 0
+
 wepTable = nil
 local canDgun = UnitDefs[unitDefID].canDgun
 
@@ -71,44 +75,64 @@ bJumping = false
 --------------------------------------------------------------------------------
 -- funcs
 --------------------------------------------------------------------------------
+local function BuildPose(heading, pitch)
+	Turn( luparm , x_axis, math.rad(-60), math.rad(250) )
+	Turn( luparm , y_axis, math.rad(-15), math.rad(250) )
+	Turn( luparm , z_axis, math.rad(-10), math.rad(250) )
+	
+	Turn( larm , x_axis, math.rad(5), math.rad(250) )
+	Turn( larm , y_axis, math.rad(-30), math.rad(250) )
+	Turn( larm , z_axis, math.rad(26), math.rad(250) )
+	
+	Turn( lloarm , y_axis, math.rad(-37), math.rad(250) )
+	Turn( lloarm , z_axis, math.rad(-152), math.rad(450) )
+
+	Turn( turret , y_axis, heading, math.rad(350) )
+	Turn( lloarm , x_axis, -pitch, math.rad(250) )
+end
+
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(6000)
 	if not dead then
-		Turn( turret , x_axis, 0, math.rad(150) )
-		Turn( turret , y_axis, 0, math.rad(150) )
-		--torso	
-		Turn( torso , x_axis, 0, math.rad(250) )
-		Turn( torso , y_axis, 0, math.rad(250) )
-		Turn( torso , z_axis, 0, math.rad(250) )	
-		--head	
-		Turn( head , x_axis, 0, math.rad(250) )
-		Turn( head , y_axis, 0, math.rad(250) )
-		Turn( head , z_axis, 0, math.rad(250) )
-		
-		-- at ease pose
-		Turn( armhold , x_axis, math.rad(-45), math.rad(250) ) --upspring at -45
-		Turn( ruparm , x_axis, 0, math.rad(250) ) 
-		Turn( ruparm , y_axis, 0, math.rad(250) ) 
-		Turn( ruparm , z_axis, 0, math.rad(250) ) 
-		Turn( rarm , x_axis, math.rad(2), math.rad(250) )      --up 2
-		Turn( rarm , y_axis, 0, math.rad(250) )  
-		Turn( rarm , z_axis, math.rad(-(-12)), math.rad(250) )    --up -12
-		Turn( rloarm , x_axis, math.rad(47), math.rad(250) )   --up 47
-		Turn( rloarm , y_axis, math.rad(76), math.rad(250) )   --up 76
-		Turn( rloarm , z_axis, math.rad(-(-47)), math.rad(250) )   --up -47
-		Turn( luparm , x_axis, math.rad(-9), math.rad(250) )       --up -9
-		Turn( luparm , y_axis, 0, math.rad(250) )  
-		Turn( luparm , z_axis, 0, math.rad(250) )  
-		Turn( larm , x_axis, math.rad(5), math.rad(250) )       --up 5
-		Turn( larm , y_axis, math.rad(-3), math.rad(250) )       --up -3
-		Turn( larm , z_axis, math.rad(-(22)), math.rad(250) )       --up 22
-		Turn( lloarm , x_axis, math.rad(92), math.rad(250) )    -- up 82
-		Turn( lloarm , y_axis, 0, math.rad(250) )  
-		Turn( lloarm , z_axis, math.rad(-(94)), math.rad(250) )  --upspring 94
-		-- done at ease
-		Sleep(100)
+		if GetUnitValue(COB.INBUILDSTANCE) == 1 then
+			BuildPose(restoreHeading, restorePitch)
+		else
+			Turn( turret , x_axis, 0, math.rad(150) )
+			Turn( turret , y_axis, 0, math.rad(150) )
+			--torso	
+			Turn( torso , x_axis, 0, math.rad(250) )
+			Turn( torso , y_axis, 0, math.rad(250) )
+			Turn( torso , z_axis, 0, math.rad(250) )	
+			--head	
+			Turn( head , x_axis, 0, math.rad(250) )
+			Turn( head , y_axis, 0, math.rad(250) )
+			Turn( head , z_axis, 0, math.rad(250) )
+			
+			-- at ease pose
+			Turn( armhold , x_axis, math.rad(-45), math.rad(250) ) --upspring at -45
+			Turn( ruparm , x_axis, 0, math.rad(250) ) 
+			Turn( ruparm , y_axis, 0, math.rad(250) ) 
+			Turn( ruparm , z_axis, 0, math.rad(250) ) 
+			Turn( rarm , x_axis, math.rad(2), math.rad(250) )      --up 2
+			Turn( rarm , y_axis, 0, math.rad(250) )  
+			Turn( rarm , z_axis, math.rad(-(-12)), math.rad(250) )    --up -12
+			Turn( rloarm , x_axis, math.rad(47), math.rad(250) )   --up 47
+			Turn( rloarm , y_axis, math.rad(76), math.rad(250) )   --up 76
+			Turn( rloarm , z_axis, math.rad(-(-47)), math.rad(250) )   --up -47
+			Turn( luparm , x_axis, math.rad(-9), math.rad(250) )       --up -9
+			Turn( luparm , y_axis, 0, math.rad(250) )  
+			Turn( luparm , z_axis, 0, math.rad(250) )  
+			Turn( larm , x_axis, math.rad(5), math.rad(250) )       --up 5
+			Turn( larm , y_axis, math.rad(-3), math.rad(250) )       --up -3
+			Turn( larm , z_axis, math.rad(-(22)), math.rad(250) )       --up 22
+			Turn( lloarm , x_axis, math.rad(92), math.rad(250) )    -- up 82
+			Turn( lloarm , y_axis, 0, math.rad(250) )  
+			Turn( lloarm , z_axis, math.rad(-(94)), math.rad(250) )  --upspring 94
+			-- done at ease
+			Sleep(100)
+		end
 		bAiming = false
 	end
 end
@@ -303,6 +327,7 @@ function script.Create()
 	StartThread(MotionControl)
 	StartThread(RestoreAfterDelay)
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.StartMoving()
@@ -463,6 +488,7 @@ end
 
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
+	restoreHeading, restorePitch = 0, 0
 	if not bAiming then
 		StartThread(RestoreAfterDelay)
 	end
@@ -470,20 +496,10 @@ end
 
 function script.StartBuilding(heading, pitch) 
 	--larm
-	Turn( luparm , x_axis, math.rad(-60), math.rad(250) )
-	Turn( luparm , y_axis, math.rad(-15), math.rad(250) )
-	Turn( luparm , z_axis, math.rad(-(10)), math.rad(250) )
-	
-	Turn( larm , x_axis, math.rad(5), math.rad(250) )
-	Turn( larm , y_axis, math.rad(-30), math.rad(250) )
-	Turn( larm , z_axis, math.rad(-(-26)), math.rad(250) )
-	
-	Turn( lloarm , y_axis, math.rad(-37), math.rad(250) )
-	Turn( lloarm , z_axis, math.rad(-(152)), math.rad(450) )
-
-	Turn( turret , y_axis, math.rad(heading ), math.rad(350) )
-	Turn( lloarm , x_axis, -pitch, math.rad(250) )
+	restoreHeading, restorePitch = heading, pitch
+	BuildPose(heading, pitch)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
+	restoreHeading, restorePitch = heading, pitch
 end
 
 function script.QueryNanoPiece()

@@ -69,7 +69,6 @@ if (gadgetHandler:IsSyncedCode()) then
 	if (alreadyWarned<10) then
 		alreadyWarned = alreadyWarned + 1
 		Spring.Log(LOG.WARNING, "LUS/COB: QueryNanoPiece is deprecated! Use Spring.SetUnitNanoPieces() instead!")
-		Spring.Echo("LUS/COB: QueryNanoPiece is deprecated! Use Spring.SetUnitNanoPieces() instead!")
 	end
   end
 
@@ -211,6 +210,7 @@ end
 --
 
 local nanoParticles = {}
+local maxEngineParticles = Spring.GetConfigInt("MaxNanoParticles", 10000)
 
 local function GetFaction(udid)
   --local udef_factions = UnitDefs[udid].factions or {}
@@ -297,7 +297,7 @@ local builders = {}
 		for i=1,#builders do
 			local unitID = builders[i]
 			if ((unitID + frame) % 30 < 1) then --// only update once per second
-				local strength = Spring.GetUnitCurrentBuildPower(unitID)
+				local strength = Spring.GetUnitCurrentBuildPower(unitID) * 16
 				if (strength > 0) then
 					local type, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 
@@ -324,7 +324,7 @@ local builders = {}
 
 						if (type=="reclaim") then
 							--// reclaim is done always at full speed
-							strength = 30
+							strength = 1
 						end
 
 						local cmdTag = GetCmdTag(unitID)
@@ -337,6 +337,9 @@ local builders = {}
 
 						for j=1,#nanoPieces do
 							local nanoPieceID = nanoPieces[j]
+							if (unitID+frame)%60 == 0 then
+								Spring.Echo("Nanopiece nums (output)", j, UnitDefs[unitDefID].name, nanoPieceID)
+							end
 
 							local nanoParams = {
 								targetID     = target,
@@ -435,12 +438,15 @@ end
     gadgetHandler:AddSyncAction("nano_GameFrame", GameFrame)
     gadgetHandler:AddSyncAction("nano_BuilderFinished", BuilderFinished)
     gadgetHandler:AddSyncAction("nano_BuilderDestroyed", BuilderDestroyed)
+    --maxEngineParticles = Spring.GetConfigInt("MaxNanoParticles", 10000)
+    --Spring.SetConfigInt("MaxNanoParticles", 0)
   end
 
   function gadget:Shutdown()
     gadgetHandler:RemoveSyncAction("nano_GameFrame")
     gadgetHandler:RemoveSyncAction("nano_BuilderFinished")
     gadgetHandler:RemoveSyncAction("nano_BuilderDestroyed")
+    --Spring.SetConfigInt("MaxNanoParticles", maxEngineParticles)
   end
 
 -------------------------------------------------------------------------------------

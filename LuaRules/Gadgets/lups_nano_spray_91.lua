@@ -253,6 +253,8 @@ end
 --  «« NanoSpray handling »»
 --
 
+local maxEngineParticles = Spring.GetConfigInt("MaxNanoParticles", 10000)
+
 local nanoParticles = {}
 
 local function GetFaction(udid)
@@ -452,10 +454,13 @@ end
 
   function gadget:Initialize()
     gadgetHandler:AddSyncAction("nano_GameFrame",      GameFrame)
+    --maxEngineParticles = Spring.GetConfigInt("MaxNanoParticles", 10000)
+    --Spring.SetConfigInt("MaxNanoParticles", 0)
   end
 
   function gadget:Shutdown()
     gadgetHandler:RemoveSyncAction("nano_GameFrame")
+    --Spring.SetConfigInt("MaxNanoParticles", maxEngineParticles)
   end
 
 -------------------------------------------------------------------------------------

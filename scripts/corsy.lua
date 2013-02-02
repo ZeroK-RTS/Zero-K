@@ -66,6 +66,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, emitPieces)
 end
 
 function script.QueryNanoPiece()

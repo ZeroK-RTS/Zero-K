@@ -6,6 +6,7 @@ local nozzle = piece 'nozzle'
 local nano = piece 'nano' 
 
 smokePiece = {body, engine1, engine2}
+local nanoPieces = {nano}
 
 include "constants.lua"
 
@@ -13,6 +14,7 @@ function script.Create()
 	Turn(engine1, x_axis, rad(-45))	
 	Turn(engine2, x_axis, rad(-45))	
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Activate()

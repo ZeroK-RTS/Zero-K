@@ -14,6 +14,7 @@ local leg6 = piece 'leg6' 	-- front left
 local platform, gun, elevator, elevator2, panel_r, panel_l, cover_r, cover_l, flare = piece('platform', 'gun', 'elevator', 'elevator2', 'panel_r', 'panel_l', 'cover_r', 'cover_l', 'flare')
 
 smokePiece = {base, gun}
+local nanoPieces = {flare}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -75,6 +76,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.StartMoving()

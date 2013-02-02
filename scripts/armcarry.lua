@@ -32,6 +32,7 @@ local muzzle5 = piece 'muzzle5'
 include "constants.lua"
 
 smokePiece = {body,landpad1,landpad2,landpad3,landpad4,landpad5,landpad6,landpad7,landpad8,landpad9}
+--local nanoPieces = {}
 
 local missileSpots = {
 	{hole = hole1, hatch = hatch2, muzzle = muzzle1},

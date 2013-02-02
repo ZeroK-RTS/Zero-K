@@ -8,6 +8,7 @@ local land3 = piece 'land3'
 local land4 = piece 'land4' 
 local radar = piece 'radar' 
 
+local nanoPiece = {radar}
 smokePiece = {base,land1,land2,land3,land4}
 
 local function SpinRadar()
@@ -20,6 +21,7 @@ end
 function script.Create()
 	StartThread(SmokeUnit)
 	StartThread(SpinRadar)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.QueryLandingPads()

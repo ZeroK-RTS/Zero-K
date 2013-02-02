@@ -22,6 +22,7 @@ local lleg = piece 'lleg'
 local ground = piece 'ground' 
 
 smokePiece = {torso}
+local nanoPieces = {nanospray}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -155,6 +156,7 @@ function script.Create()
 	Turn(rbigflash, x_axis, math.rad(145))
 	
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.StartMoving() 

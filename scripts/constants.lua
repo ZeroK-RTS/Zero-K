@@ -102,3 +102,8 @@ function onWater()
 	end
 	return false
 end
+
+local function noFunc()
+end
+
+Spring.SetUnitNanoPieces = Spring.SetUnitNanoPieces or noFunc

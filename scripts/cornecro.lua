@@ -13,6 +13,9 @@ local lthigh, luppercalf, llowercalf, lfoot = piece('lthigh', 'luppercalf', 'llo
 local rightLeg = { thigh=piece('rthigh'), uppercalf=piece('ruppercalf'), lowercalf=piece('rlowercalf'), foot=piece('rfoot') }
 local leftLeg = { thigh=piece('lthigh'), uppercalf=piece('luppercalf'), lowercalf=piece('llowercalf'), foot=piece('lfoot') }
 
+smokePiece = {torso}
+local nanoPieces = {emit}
+
 -- signals
 local SIG_BUILD = 1
 local SIG_MOVE = 2
@@ -60,6 +63,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.StartMoving()
