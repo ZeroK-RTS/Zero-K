@@ -94,7 +94,7 @@ function constructionAndEconomyHandler(a, at, frame)
 	end
 
 	if averagedEcon.aveMInc > 20 or at.enemyOffense.totalCost > 1000 then
-		facJob[5].importance = 5 * at.relativeEnemyForceComposition.unit.groundDefence
+		facJob[5].importance = 6 * at.relativeEnemyForceComposition.unit.groundDefence
 		facJob[6].importance = (5/3) * (at.relativeEnemyForceComposition.unit.assault + 2*at.relativeEnemyForceComposition.unit.riot)
 		facJob[7].importance = 5 * at.relativeEnemyForceComposition.unit.raider
 	else
@@ -106,7 +106,7 @@ function constructionAndEconomyHandler(a, at, frame)
 	if at.relativeEnemyForceComposition.unit.air > 1 then 
 		facJob[8].importance = 1.4
 	else 
-		facJob[8].importance = 0.6	
+		facJob[8].importance = 0.4	
 	end
 	
 	conJob.factory.airFactor = 0.3

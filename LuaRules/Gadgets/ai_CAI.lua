@@ -33,6 +33,7 @@ local spGetUnitHealth		= Spring.GetUnitHealth
 local spTestBuildOrder		= Spring.TestBuildOrder		
 local spGetUnitBuildFacing	= Spring.GetUnitBuildFacing
 local spGetUnitRadius		= Spring.GetUnitRadius
+local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
 local spGetFactoryCommands	= Spring.GetFactoryCommands
 local spGetUnitSeparation	= Spring.GetUnitSeparation
 local spIsPosInLos			= Spring.IsPosInLos
@@ -108,14 +109,16 @@ local function ModifyTable(original, modify)   -- Warning: circular table refere
 		end
 	end
 end
-
+--------------------------------------------------------------------------------
 -- *** Config
 
 include "LuaRules/Configs/cai/general.lua"
-
+--------------------------------------------------------------------------------
 -- *** 'Globals'
 
 local usingAI -- whether there is AI in the game
+
+local gameframe = spGetGameFrame()
 
 -- array of allyTeams to draw heatmap data for
 local debugData = {
@@ -132,7 +135,8 @@ local aiTeamData = {} -- all the information a single AI stores
 local allyTeamData = {} -- all the information that each ally team is required to store
 -- some information is stored by all. Other info is stored only be allyTeams with AI
 
--- is this even needed any more?
+-- is this even needed to transmit to unsynced any more?
+_G.debugData = debugData
 _G.aiTeamData = aiTeamData
 _G.allyTeamData = allyTeamData
 
@@ -146,8 +150,8 @@ mapWidth = Game.mapSizeX
 mapHeight = Game.mapSizeZ
 
 -- elements in array
-heatArrayWidth = math.ceil(mapWidth/heatSquareMinSize)
-heatArrayHeight = math.ceil(mapHeight/heatSquareMinSize)
+heatArrayWidth = math.ceil(mapWidth/HEATSQUARE_MIN_SIZE)
+heatArrayHeight = math.ceil(mapHeight/HEATSQUARE_MIN_SIZE)
 -- size of a single square in elmos
 heatSquareWidth = mapWidth/heatArrayWidth
 heatSquareHeight = mapHeight/heatArrayHeight
@@ -167,6 +171,8 @@ for i = 1,heatArrayWidth do -- init array
 		heatmapPosition[i][j].y = spGetGroundHeight(heatmapPosition[i][j].x,heatmapPosition[i][j].z)
 	end
 end
+
+_G.heatmapPosition = heatmapPosition
 
 -- area of a command placed in the centre of the map
 local areaCommandRadius = math.sqrt( (mapWidth/2)^2 + (mapHeight/2)^2 )
@@ -520,6 +526,49 @@ local function nearDefence(team,tx,tz,distance)
 	return false
 end
 
+-- check if a spot is covered by enemies within attack range
+-- FIXME: this actually involves maphax - 'course it wouldn't need to if it remembered where bad guy turrets are...
+local function isPosThreatened(allyTeam, x, z)
+	local cache = allyTeamData[allyTeam].isPosThreatenedCache
+	local threatened = false
+	
+	if cache[x] and cache[x][z] then
+		if cache[x][z].time + CACHE_POS_THREATENED_TTL < gameframe then
+			return cache[x][z].isThreatened or false
+		else
+			cache[x][z] = nil
+		end
+	end
+	
+	local units = spGetUnitsInCylinder(x, z, RADIUS_CHECK_POS_FOR_ENEMY_DEF)
+	for i=1,#units do
+		local unitID = units[i]
+		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
+		if unitAllyTeam ~= allyTeam then
+			local ud = UnitDefs[spGetUnitDefID(unitID)]
+			if ud.maxWeaponRange > MIN_RANGE_TO_THREATEN_SPOT and ud.weapons[1].onlyTargets.land then
+				if ud.speed == 0 then	-- fixed def
+					local px, py, pz = spGetUnitPosition(unitID)
+					local dist = disSQ(x, z, px, pz)
+					if dist < ud.maxWeaponRange + 50 then
+						threatened = true
+						break
+					end
+				else	-- armed mobile
+					threatened = true
+					break
+				end
+			end
+		end
+	end
+	
+	cache[x] = cache[x] or {}
+	cache[x][z] = cache[x][z] or {}
+	cache[x][z] = {isThreatened = threatened, time = gameframe}
+	--Spring.Echo(x, z, threatened)
+	return threatened
+end
+
 -- checks if the location is within distance of map edge
 local function nearMapEdge(tx,tz,distance)
 	if tx <= distance or tz <= distance or mapWidth - tx <= distance or mapHeight - tz <= distance then
@@ -649,7 +698,7 @@ local function makeWantedDefence(team,unitID,searchRange, maxDistance, priorityD
 	end
 	
 	
-	local minDefDisSQ = false
+	local minDefDisSQ
 	local minPriority = 0
 	local minDeftID = 0
 	
@@ -703,7 +752,7 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 		end
 	end
 	
-	local minDisSQ = false
+	local minDisSQ
 	local minID = 0
 	
 	--x = x + math.random(-searchRange,searchRange)
@@ -889,7 +938,7 @@ local function makeMex(team, unitID)
 	for i = 1, #GG.metalSpots do
 		if CallAsTeam(team, function () return spTestBuildOrder(buildDefs.mexIds[1].ID, GG.metalSpots[i].x, 0 ,GG.metalSpots[i].z, 1) ~= 0 end) then
 			local dis = disSQ(GG.metalSpots[i].x,GG.metalSpots[i].z,x,z)
-			if (not minMexSpotDisSQ) or dis < minMexSpotDisSQ then
+			if (not minMexSpotDisSQ) or ((dis < minMexSpotDisSQ) and (not isPosThreatened(a.allyTeam, GG.metalSpots[i].x, GG.metalSpots[i].z))) then
 				minMexSpotDisSQ = dis
 				minMexSpotID = i
 			end
@@ -926,9 +975,9 @@ local function makeNano(team,unitID)
 		end
 	end
 	
-	closestFactory = false
-	minDis = false
-	minNanoCount = false
+	local closestFactory = nil
+	local minDis = nil
+	local minNanoCount = nil
 	
 	for i = 1, factory.count do
 		local fid = factory[i]
@@ -2174,7 +2223,7 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 			local data = scoutingHeatmap[i][j]
 			if spIsPosInLos(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,allyTeam) then
 				if debugData.drawScoutmap[allyTeam] and not data.scouted then
-					Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,"now scouted") 
+					--Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,"now scouted") 
 				end
 				if removeEmpty then -- called infrequently
 					local units = CallAsTeam(at.aTeamOnThisTeam, 
@@ -2219,7 +2268,7 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 					end
 					data.scouted = false
 					if debugData.drawScoutmap[allyTeam] then
-						Spring.MarkerErasePosition (heatmapPosition[i][j].x,0,heatmapPosition[i][j].z)
+						--Spring.MarkerErasePosition (heatmapPosition[i][j].x,0,heatmapPosition[i][j].z)
 					end
 				end
 				
@@ -2448,11 +2497,11 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange, priorit
 	local at = allyTeamData[a.allyTeam]
 	
 	--SOS code
-	if not a.sosTimeout[unitID] or a.sosTimeout[unitID] < spGetGameFrame() then
+	if not a.sosTimeout[unitID] or a.sosTimeout[unitID] < gameframe then
 		if UnitDefs[Spring.GetUnitDefID(unitID)].commander then callRange = callRange * 2 end
-		a.sosTimeout[unitID] = spGetGameFrame() + sosTime
+		a.sosTimeout[unitID] = gameframe + SOS_TIME
 		local dx, dy, dz = spGetUnitPosition(attackerID)
-		local friendlies = Spring.GetUnitsInCylinder(dx, dz, callRange, team)
+		local friendlies = spGetUnitsInCylinder(dx, dz, callRange, team)
 		if friendlies then
 			for i=1, #friendlies do
 				fid = friendlies[i]
@@ -2560,7 +2609,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 	end
 	
 	if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and ud.speed > 0 then
-		at.enemyMobileAA[unitID] = {x = x, z = z, rangeSQ = ud.maxWeaponRange^2, range = ud.maxWeaponRange, cost = ud.metalCost, spottedFrame = spGetGameFrame()}
+		at.enemyMobileAA[unitID] = {x = x, z = z, rangeSQ = ud.maxWeaponRange^2, range = ud.maxWeaponRange, cost = ud.metalCost, spottedFrame = gameframe}
 	end
 
 end
@@ -2591,9 +2640,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		spotEnemyUnit(a.allyTeam, attackerID, attackerDefID, false)
 	
 		if prioritySosArray[unitDefID] then
-			callForMobileDefence(unitTeam, unitID, attackerID, prioritySosRadius, 1)
+			callForMobileDefence(unitTeam, unitID, attackerID, PRIORITY_SOS_RADIUS, 1)
 		else
-			callForMobileDefence(unitTeam, unitID, attackerID, sosRadius, 0)
+			callForMobileDefence(unitTeam, unitID, attackerID, SOS_RADIUS, 0)
 		end
 		
 	
@@ -2747,7 +2796,7 @@ local function echoFacJobList(team)
 end
 
 function gadget:GameFrame(n)
-
+	gameframe = n
 	for team,data in pairs(aiTeamData) do
 	
 		initialiseFaction(team)
@@ -2906,7 +2955,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
                     controlledUnit.nano.cost = controlledUnit.nano.cost - ud.metalCost
 					local index = controlledUnit.nanoByID[unitID].index
                     controlledUnit.nanoByID[controlledUnit.nano[controlledUnit.nano.count]].index = index
-					closestFactory = controlledUnit.nanoByID[unitID].closestFactory
+					local closestFactory = controlledUnit.nanoByID[unitID].closestFactory
 					if a.controlledUnit.factoryByID[closestFactory] then
 						a.controlledUnit.factoryByID[closestFactory].nanoCount = a.controlledUnit.factoryByID[closestFactory].nanoCount - 1
 					end
@@ -3111,8 +3160,8 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					local x,y,z = spGetUnitPosition(unitID)
 					controlledUnit.nano.count = controlledUnit.nano.count + 1
 					controlledUnit.nano[controlledUnit.nano.count] = unitID
-					closestFactory = false
-					minDis = false
+					local closestFactory = nil
+					local minDis = nil
 					for i = 1, a.controlledUnit.factory.count do
 						local fid = a.controlledUnit.factory[i]
 						local data = a.controlledUnit.factoryByID[fid]
@@ -3567,7 +3616,9 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 			turretByID = {},
 			--[[nano = {count = 0,},
 			nanoByID = {},--]]
-		}
+		},
+		
+		isPosThreatenedCache = {},	-- [x] = { [z] = {isThreatened = false, time = timeCreated} }
 	}
 	
 	local at = allyTeamData[allyTeam]
@@ -3712,7 +3763,7 @@ local function changeAIscoutmapDrawing(cmd,line,words,player)
 	local allyTeam=tonumber(words[1])
 	if allyTeam and allyTeamData[allyTeam] and allyTeamData[allyTeam].ai then
 		if debugData.drawScoutmap[allyTeam] then
-			debugData.drawScoutmap[allyTeam] = false
+			debugData.drawScoutmap[allyTeam] = nil
 			Spring.Echo("CAI scoutmap drawing for allyTeam " .. allyTeam .. " OFF")
 		else
 			debugData.drawScoutmap[allyTeam] = true
@@ -3931,6 +3982,28 @@ local function MakeRealTable(proxy)
 		ret[i] = v
 	end
 	return ret
+end
+
+local heatmapPosition = MakeRealTable(SYNCED.heatmapPosition)
+
+-- draw scoutmap
+-- FIXME: could use some big time optimizations
+function gadget:DrawWorldPreUnit()
+	local scoutmaps = SYNCED.debugData.drawScoutmap
+	for allyTeam in spairs(scoutmaps) do
+		local scoutmap = SYNCED.allyTeamData[allyTeam].scoutingHeatmap
+		for x,xdata in spairs(scoutmap) do
+			for z,zdata in spairs(xdata) do
+				local px, pz = heatmapPosition[x][z].x, heatmapPosition[x][z].z
+				if not zdata.scouted then
+					gl.Color(0,0,0,0.5)
+					gl.DrawGroundQuad(px-256,pz-256,px+256,pz+256)
+				end
+			end
+		end
+		gl.Color(1,1,1,1)
+		break
+	end
 end
 
 function gadget:Save(zip)
