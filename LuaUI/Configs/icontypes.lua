@@ -698,7 +698,7 @@ local icontypes = {
   --Penetrator
   mobiletachyon = {
     bitmap='icons/mobiletachyon.dds',
-    size=2,
+    size=2.3,
   },
 
 
