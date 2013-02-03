@@ -1,5 +1,4 @@
 --//Version 0.935
-local isEnable = true
 function gadget:GetInfo()
   return {
     name      = "Newton Throw Speed Damage",
@@ -8,13 +7,13 @@ function gadget:GetInfo()
     date      = "3 Feb 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = isEnable  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) and isEnable then -- SYNCED ---
+if (gadgetHandler:IsSyncedCode()) then -- SYNCED ---
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --Speedup

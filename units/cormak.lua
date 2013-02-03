@@ -131,7 +131,7 @@ unitDef = {
       myGravity               = 10,
       noSelfDamage            = true,
       range                   = 300,
-      reloadtime              = 0.9,
+      reloadtime              = 0.95,
       renderType              = 4,
       soundHitVolume          = 1,
       startsmoke              = [[1]],
@@ -159,7 +159,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 32,
-      reloadtime              = 0.9,
+      reloadtime              = 0.95,
       size                    = 1E-06,
       smokeTrail              = false,
 
@@ -197,7 +197,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 300,
-      reloadtime              = 0.9,
+      reloadtime              = 0.95,
       size                    = 1E-06,
       smokeTrail              = false,
 
