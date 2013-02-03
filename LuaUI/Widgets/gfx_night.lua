@@ -442,14 +442,20 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   vsy = viewSizeY
 end
 
+local update = 0
+local updatePeriod = 0.25
 function widget:Update(dt)
   local _, speedFactor, paused = GetGameSpeed()
   if (not paused) then
+    update = update + dt
     searchlightBuildingAngle = searchlightBuildingAngle + dt * speedFactor
-    if (options.cycle.value) then
-      currDayTime = currDayTime + dt * speedFactor / secondsPerDay
-      currDayTime = currDayTime - math.floor(currDayTime)
-      UpdateColors()
+    if update > updatePeriod then
+      if (options.cycle.value) then
+	currDayTime = currDayTime + update * speedFactor / secondsPerDay
+	currDayTime = currDayTime - math.floor(currDayTime)
+	UpdateColors()
+      end
+      update = 0
     end
   end
 end
