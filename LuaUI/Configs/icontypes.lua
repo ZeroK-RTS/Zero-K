@@ -144,7 +144,7 @@ local icontypes = {
   --kbots
   kbotjammer = {
     bitmap='icons/kbotjammer.dds',
-    size=1.8,
+    size=2.0,
   },
   kbotshield = {
     bitmap='icons/kbotshield.dds',
@@ -285,7 +285,7 @@ local icontypes = {
   },
   walkerarty = {
     bitmap='icons/walkerarty.dds',
-    size=2,
+    size=1.6,
   },
   walkerlrarty = {
     bitmap='icons/walkerlrarty.dds',
@@ -371,7 +371,7 @@ local icontypes = {
   },
   tanklrarty = {
     bitmap='icons/tanklrarty.dds',
-    size=2.0,
+    size=2.2,
   },
   tanklrm = {
     bitmap='icons/tanklrm.dds',
@@ -445,7 +445,7 @@ local icontypes = {
   },
   spiderassault = {
     bitmap='icons/spiderassault.dds',
-    size=1.5,
+    size=1.8,
   },
   spiderarty = {
     bitmap='icons/spiderarty.dds',
