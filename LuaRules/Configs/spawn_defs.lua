@@ -296,6 +296,9 @@ for _, d in pairs(difficulties) do
     d.timeModifier = (d.timeModifier or 1)*0.5
     d.waveSizeMult = (d.waveSizeMult or waveSizeMult)*0.85
     d.gracePeriod = (d.gracePeriod or gracePeriod)*0.5
+    d.gracePenalty = (d.gracePenalty or gracePenalty)*0.5
+    d.gracePeriodMin = (d.gracePeriodMin or gracePeriodMin)*0.5
+    d.timeSpawnBonus = (d.timeSpawnBonus or 1)*1.5
     d.queenTime = (d.queenTime or queenTime)*0.5
     d.queenHealthMod = (d.queenHealthMod or 1)*0.4
     d.miniQueenTime = {}
