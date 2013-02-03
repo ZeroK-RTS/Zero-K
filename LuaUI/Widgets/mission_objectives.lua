@@ -119,7 +119,7 @@ local function AddObjective(id, title, details, pos, status, color)
 		local inherited = obj.panel.inherited
 		if (self._down) then
 			self._down = false
-			self.state = 'normal'
+			self.state.pressed = false
 			inherited.MouseUp(self, ...)
 			self:Invalidate()
 			return self
