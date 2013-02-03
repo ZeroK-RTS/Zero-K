@@ -51,6 +51,10 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
     Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
   end
   
+  function GG.HasFacplop(unitID)
+    return plop and facplops[unitID]
+  end
+  
   function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
     if ploppableDefs[unitDefID] and facplops[builderID] then
       facplops[builderID] = nil

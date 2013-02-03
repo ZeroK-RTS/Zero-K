@@ -510,7 +510,7 @@ local function FinishMorph(unitID, morphData)
   if buildProgress < 1 then
     isBeingBuilt = true
   end
-  local facplop = GG.HasFacplop(unitID)
+  local facplop = GG.HasFacplop and GG.HasFacplop(unitID)
 
   local newUnit
 
