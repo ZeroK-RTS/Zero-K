@@ -610,7 +610,7 @@ end
 for name, ud in pairs(UnitDefs) do
   if tobool(ud.builder) then
 	ud.canrestore = false
-	ud.shownanospray = true
+	--ud.shownanospray = true
   end
 end
 

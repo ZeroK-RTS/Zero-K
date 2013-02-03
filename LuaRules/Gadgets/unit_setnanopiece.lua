@@ -48,8 +48,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
     for i=1,#units[unitDefID] do
       local pieceName = units[unitDefID][i]
       local pieceNum = pieceMap[pieceName]
-      local pieceNumAlt = Spring.GetUnitScriptPiece(unitID, pieceNum)
-      Spring.Echo("Nanopiece nums (input)", i, UnitDefs[unitDefID].name, pieceNum, pieceNumAlt)
+      --local pieceNumAlt = Spring.GetUnitScriptPiece(unitID, pieceNum)
+      --Spring.Echo("Nanopiece nums (input)", i, UnitDefs[unitDefID].name, pieceNum, pieceNumAlt)
       nanoPieces[#nanoPieces+1] = pieceNum
     end
     Spring.SetUnitNanoPieces(unitID, nanoPieces)
