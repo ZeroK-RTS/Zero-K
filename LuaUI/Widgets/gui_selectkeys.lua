@@ -85,6 +85,45 @@ options = {
 	},
 
 	
+		
+	lowhealth = { type = 'button',
+		name = '30% Health',
+		desc = '',
+		action = 'select PrevSelection+_Not_RelativeHealth_30+_ClearSelection_SelectAll+',
+	},
+	----
+	-- the below are from uikeys, I don't know what they do
+	
+	uikey1 = { type = 'button',
+		name = 'Unknown uikey 1 - aircraft?',
+		desc = '',
+		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Weapons_Not_NameContain_Vamp_Not_Radar+_ClearSelection_SelectAll+',
+	},
+	uikey2 = { type = 'button',
+		name = 'Unknown uikey 2 - vamp?',
+		desc = '',
+		action = 'select AllMap+_NameContain_Vamp+_ClearSelection_SelectAll+',
+	},
+	uikey3 = { type = 'button',
+		name = 'Unknown uikey 3 - not builder?',
+		desc = '',
+		action = 'select AllMap+_Not_Builder_Not_Building+_ClearSelection_SelectAll+',
+	},
+	uikey4 = { type = 'button',
+		name = 'Unknown uikey 3 - radar?',
+		desc = '',
+		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Radar+_ClearSelection_SelectAll+',
+	},
+	uikey5 = { type = 'button',
+		name = 'Unknown uikey 5 - transport?',
+		desc = '',
+		action = 'select AllMap+_Not_Builder_Not_Building_Transport_Aircraft+_ClearSelection_SelectAll+',
+	},
+	uikey6 = { type = 'button',
+		name = 'Unknown uikey 6 - allunits?',
+		desc = '',
+		action = 'select AllMap+_InPrevSel_Not_InHotkeyGroup+_SelectAll+',
+	},
 	
 	
 }
