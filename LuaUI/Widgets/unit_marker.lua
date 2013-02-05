@@ -197,9 +197,12 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	if ( unitList[curModID] ~= nil ) and ( unitList[curModID][udef.name] ~= nil ) and  ( unitList[curModID][udef.name]["markerText"] ~= nil ) then
 		--the unit is in the list -> has to get marked
 		local delayedRefresh = unitList[curModID][udef.name]["delayedRefresh"] --check if this unit can refresh its marker
-		if delayedRefresh and delayedRefresh >= spGetGameSeconds() then --check if this unit is overdue for marker refreshing
-			knownUnits[unitID] = nil -- forget that this unit ever had a marker
-			unitList[curModID][udef.name]["delayedRefresh"] = spGetGameSeconds() + 10 --set next refresh 10 second later
+		if delayedRefresh then
+			knownUnits[unitID] = udefId --give defID to unit (block/prevent marker)
+			if delayedRefresh >= spGetGameSeconds() then --check if this unit is overdue for marker refreshing
+				knownUnits[unitID] = nil -- forget defID for this unit (force add marker)
+				unitList[curModID][udef.name]["delayedRefresh"] = spGetGameSeconds() + 5 --set next refresh 5 second later
+			end
 		end
 		if ( knownUnits[unitID] == nil ) or ( knownUnits[unitID] ~= udefId ) then
 			--unit wasnt marked already or unit changed
