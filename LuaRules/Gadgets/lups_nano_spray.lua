@@ -322,10 +322,12 @@ local builders = {}
 							inversed  = true
 						end
 
-						if (type=="reclaim") then
+						--[[
+						if (type=="reclaim") and (strength > 0) then
 							--// reclaim is done always at full speed
 							strength = 1
 						end
+						]]--
 
 						local cmdTag = GetCmdTag(unitID)
 						local teamID = Spring.GetUnitTeam(unitID)
