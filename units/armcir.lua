@@ -81,7 +81,7 @@ unitDef = {
       cegTag                  = [[chainsawtrail]],
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 2,
 
       damage                  = {
         default = 25,
@@ -114,7 +114,7 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 550,
-      weaponTimer             = 3,
+      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 800,
     },

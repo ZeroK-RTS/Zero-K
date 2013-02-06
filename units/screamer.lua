@@ -78,7 +78,7 @@ unitDef = {
       cegTag                  = [[screamertrail]],
       craterBoost             = 1,
       craterMult              = 2,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 3.2,
 
       damage                  = {
         default    = 175,

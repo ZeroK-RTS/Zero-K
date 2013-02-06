@@ -147,7 +147,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 6,
 
       damage                  = {
         default = 11,

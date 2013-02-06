@@ -50,20 +50,23 @@ function script.StopMoving()
 	Turn(engineR, x_axis, 0, 1)
 end
 
-function script.QueryWeapon1()
-	if gun then return missR
-	else return missL end
+function script.QueryWeapon(num)
+	if gun then 
+		return missR
+	else 
+		return missL 
+	end
 end
 
-function script.AimFromWeapon1() 
+function script.AimFromWeapon(num) 
 	return base 
 end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	return not (GetUnitValue(COB.CRASHING) == 1) 
 end
 
-function script.Shot1()
+function script.Shot(num)
 	gun = not gun
 end
 
@@ -95,7 +98,7 @@ local function RestoreAfterDelay()
 	end
 end
 
-function script.BlockShot1()
+function script.BlockShot(num)
 	if GetUnitValue(CRASHING) == 1 then
 		return true
 	else
