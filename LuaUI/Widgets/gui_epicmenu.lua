@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.302 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.306 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02",
+    date      = "2009-06-02", --2013-02-07
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -12,6 +12,17 @@ function widget:GetInfo()
 	alwaysStart = true,
   }
 end
+
+--CRUDE EXPLAINATION (third party comment) on how things work: (by Msafwan)
+--1) first... a container called "OPTION" is shipped into epicMenuFactory from various sources (from widgets or epicmenu_conf.lua)
+--Note: "OPTION" contain a smaller container called "OnChange" (which is the most important content). 
+--2) "OPTION" is then brought into epicMenuFactory\AddOption() which then attach a tracker which calls "SETTINGS" whenever "OnChange" is called.
+--Note: "SETTINGS" is container which come and go from epicMenuFactory. Its destination is at CAWidgetFactory which save into "Zk_data.lua".
+--4) "OPTION" are then brought into epicMenuFactory\MakeSubWindow() which then wrap the content(s) into regular buttons/checkboxes. This include the modified "OnChange"
+--5) then Hotkey buttons is created in epicMenuFactory\MakeHotkeyedControl() and attached to regular buttons horizontally (thru 'StackPanel') which then sent back to  epicMenuFactory\MakeSubWindow()
+--6) then epicMenuFactory\MakeSubWindow() attaches all created button(s) to main "Windows" and finished the job. (now waiting for ChiliFactory to render them all).
+--Note: hotkey button press is handled by Spring, but its registration & attachment with "OnChange" is handled by epicMenuFactory
+--Note: all button rendering & clicking is handled by ChiliFactory (which receive button settings & call "OnChange" if button is pressed)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -148,6 +159,7 @@ local settings = {
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
+	keybounditems = {},
 }
 
 --------------------------------------------------------------------------------
@@ -596,8 +608,7 @@ local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 			local wname = option.wname
 			newval = not pathoptions[path][option.wname..option.key].value	
 			pathoptions[path][option.wname..option.key].value	= newval
-			-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
-			
+						
 			option.OnChange({checked=newval})
 			
 			if path == curPath then
@@ -709,7 +720,7 @@ local function AddOption(path, option, wname )
 			newval = IntToBool(newval)
 		end
 	else
-		--load option from widget settings
+		--load option from widget settings (ie: 'settings' == ZK_data.lua. Read/write is handled by cawidget which sent 'settings' here thru WG.SetConfigData and sent it away thru WG.GetConfigData)
 		if settings.config[fullkey] ~= nil then --nil check as it can be false
 			newval = settings.config[fullkey]
 		end
@@ -752,6 +763,7 @@ local function AddOption(path, option, wname )
 				end
 				settings.config[fullkey] = option.value
 			end
+
 	elseif option.type == 'number' then
 		if option.valuelist then
 			option.min 	= 1
@@ -794,17 +806,26 @@ local function AddOption(path, option, wname )
 				option.value = key
 				settings.config[fullkey] = option.value
 			end
-	
+	elseif option.type == 'listBool' then
+		controlfunc = 
+			function(key)
+				option.value = key
+				settings.config[fullkey] = option.value
+				
+				if path == curPath then
+					MakeSubWindow(path) --remake button/checkbox
+				end
+			end			
 	end
-	option.OnChange = function(self)
-		controlfunc(self)
+	option.OnChange = function(self) 
+		controlfunc(self) --note: 'self' in this context will be refer to the button/checkbox/slider state provided by Chili UI
 		origOnChange(option)
 	end
 	
 	--call onchange once
 	if valuechanged and option.type ~= 'button' and (origOnChange ~= nil) 
-	--and not option.springsetting --need a different solution
-	then 
+		--and not option.springsetting --need a different solution
+		then 
 		origOnChange(option)
 	end
 	
@@ -829,14 +850,42 @@ local function AddOption(path, option, wname )
 			end
 			AssignKeyBind(hotkey, path, option, false)
 		end 
+	elseif option.type == 'listBool' then --if its a list of checkboxes:
+		for i=1, #option.items do
+			local item = {} 
+			item.wname = wname -- wname is needed by Hotkey to 'AddAction'
+			item.key = option.items[i].key
+			item.hotkey = option.items[i].hotkey
+			item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item's key). Is needed for Hotkey
+			
+			local actionName = GetActionName(path, item)
+			
+			local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
+			local uikey_hotkey = uikey_hotkey_str and HotkeyFromUikey(uikey_hotkey_str)
+			
+			if item.hotkey then
+			  local orig_hotkey = {}
+			  CopyTable(orig_hotkey, item.hotkey)
+			  item.orig_hotkey = orig_hotkey
+			  echo(item.key, item.orig_hotkey.key)
+			end
+			
+			local hotkey = settings.keybounditems[actionName] or item.hotkey or uikey_hotkey
+			if hotkey and hotkey ~= 'none' then
+				if uikey_hotkey then
+					UnassignKeyBind(path, item)
+				end
+				AssignKeyBind(hotkey, path, item, false)
+			end
+			--finishing:
+			alloptions[path..wname..item.key] = item --is used for reset keybinds		
+		end			
 	end
 	
-	pathoptions[path][wname..option.key] = option
-	alloptions[path..wname..option.key] = option
+	pathoptions[path][wname..option.key] = option --is used for epicMenu button(s) remake (is epicMenu's memory)
+	alloptions[path..wname..option.key] = option --is used for reset keybinds
 	local temp = #(pathorders[path])
-	pathorders[path][temp+1] = wname..option.key
-	
-	
+	pathorders[path][temp+1] = wname..option.key --is used for layout???
 end
 
 local function RemOption(path, option, wname )
@@ -853,6 +902,12 @@ local function RemOption(path, option, wname )
 	end
 	pathoptions[path][wname..option.key] = nil
 	alloptions[path..wname..option.key] = nil
+	if option.type == 'listBool' then
+		for i=1, #option.items do
+			local itemsKey = option.items[i].key
+			alloptions[path..wname..itemsKey] = nil
+		end
+	end
 end
 
 
@@ -1063,7 +1118,7 @@ local function MakeKeybindWindow( path, option, hotkey )
 	kb_mindex = i
 	kb_item = item
 	
-	kb_option = option
+	kb_option = option --send to global, wait for widget:KeyPress
 	kb_path = path
 		
 	window_getkey = Window:New{
@@ -1175,7 +1230,7 @@ local function ResetWinSettings(path)
 				option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
 				option.checked = option.value
 				option.OnChange(option)
-			elseif option.type == 'list' then
+			elseif option.type == 'list' or option.type == 'listBool' then
 				option.value = option.default
 				option.OnChange(option.default)
 			elseif option.type == 'colors' then
@@ -1202,6 +1257,7 @@ end
 -- Make submenu window based on index from flat window list
 --local function MakeSubWindow(key)
 MakeSubWindow = function(path)
+	
 	if not pathoptions[path] then return end
 	
 	local explodedpath = explode('/', path)
@@ -1302,15 +1358,13 @@ MakeSubWindow = function(path)
 					tooltip=option.desc 
 				}
 			
-			
 		elseif option.type == 'list' then	
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
 			local items = {};
 			for i=1, #option.items do
 				local item = option.items[i]
-				settings_height = settings_height + B_HEIGHT 
-				tree_children[#tree_children+1] = 
-					Button:New{
+				settings_height = settings_height + B_HEIGHT
+				tree_children[#tree_children+1] = Button:New{
 						width = "100%",
 						caption = item.name, 
 						OnMouseUp = { function(self) option.OnChange(item.key) end },
@@ -1324,6 +1378,27 @@ MakeSubWindow = function(path)
 				items = items;
 			}
 			]]--
+		elseif option.type == 'listBool' then	
+			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
+			for i=1, #option.items do
+				local item = {} 
+				item.wname = option.wname -- wname is needed by Hotkey to 'AddAction'
+				item.name = option.items[i].name --is needed by checkbox caption
+				item.key = option.items[i].key --is needed to set checkbox status
+				item.desc = option.items[i].desc --is needed for checkbox tooltip
+				item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item.key). Is needed for Hotkey
+				settings_height = settings_height + B_HEIGHT
+				tree_children[#tree_children+1] = MakeHotkeyedControl(
+					Checkbox:New{
+						x=0,
+						right = 35,
+						caption = item.name, 
+						checked = (option.value == item.key), 
+						OnMouseUp = {function(self) option.OnChange(item.key) end},
+						textColor = color.sub_fg,
+						tooltip=item.desc,
+					}, path, item)
+			end			
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }

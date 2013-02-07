@@ -84,6 +84,20 @@ local function ShButton( caption, action2, tooltip, advanced )
 	})
 end
 
+--a form of checkbox that act like multiple choice question
+local function ShTick2( caption, items,defValue, action2, advanced) 
+	AddOption({
+		type='listBool', 
+		name=caption,
+		key=caption,
+		items = items or {},
+		value = defValue or '',
+		action = (type(action2) == 'string' and action2 or nil),
+		OnChange = (type(action2) ~= 'string' and action2 or nil),
+		advanced = advanced,
+	})
+end
+
 local function ShLabel( caption )
 	AddOption({
 		type='label',
@@ -119,12 +133,37 @@ path='Game/Screenshots'
 
 
 path='Settings/Camera'
-	ShLabel( 'Camera Type') 
-	ShButton( 'Total Annihilation', 'viewta' ) 
-	ShButton( 'FPS', 'viewfps' ) 
-	ShButton( 'Free', 'viewfree' ) 
-	ShButton( 'Rotatable Overhead', 'viewrot' ) 
-	ShButton( 'Total War', 'viewtw' ) 
+	--ShLabel( 'Camera Type') 
+	-- ShButton( 'Total Annihilation', 'viewta' ) 
+	-- ShButton( 'FPS', 'viewfps' ) 
+	-- ShButton( 'Free', 'viewfree' ) 
+	-- ShButton( 'Rotatable Overhead', 'viewrot' ) 
+	-- ShButton( 'Total War', 'viewtw' )
+	ShTick2( 'Camera Type', {
+			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
+			{name = 'FPS',key='FPS', desc='FPS camera', hotkey=nil},
+			{name = 'Free',key='Free', desc='Freestyle camera', hotkey=nil},
+			{name = 'Rotatable Overhead',key='Rotatable Overhead', desc='Rotatable Overhead camera', hotkey=nil},
+			{name = 'Total War',key='Total War', desc='TW camera', hotkey=nil},
+			{name = 'COFC',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+		},'Total Annihilation',
+		function(self)
+			local key = self.value
+			if key == 'Total Annihilation' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewta"}
+			elseif key == 'FPS' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfps"}
+			elseif key == 'Free' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfree"}
+			elseif key == 'Rotatable Overhead' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewrot"}
+			elseif key == 'Total War' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewtw"}
+			elseif key == 'COFC' then
+				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
+			end
+		end
+		)		
 	ShButton( 'Flip the TA Camera', 'viewtaflip' )
 	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
