@@ -13,16 +13,16 @@ unitDef = {
   buildingGroundDecalType       = [[factorygunship_aoplane.dds]],
 
   buildoptions                  = {
-    [[armca]],
+    [[crane]],
     [[blastwing]],
     [[bladew]],
     [[armkam]],
-    [[corape]],
+    [[rapier]],
     [[armbrawl]],
     [[blackdawn]],
     [[corcrw]],
-    [[corvalk]],
-    [[corbtrans]],
+    [[transport]],
+    [[largeTransport]],
   },
 
   buildPic                      = [[factorygunship.png]],
