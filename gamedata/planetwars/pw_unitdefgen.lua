@@ -60,8 +60,8 @@ local function makeTechStructure(def, name)
 	if techName then
 		def.name = techName.name .. " Technology Facility"
 		def.description = "Gives planet owner the ability to construct " .. techName.name 
-		structureConfig["generic_tech"](def)
 	end
+	structureConfig["generic_tech"](def)
 end
 
 --for name in pairs(unitData) do
