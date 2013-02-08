@@ -34,7 +34,7 @@ include("utils.lua")
 includeZIPFirst("system.lua")
 includeZIPFirst("cache.lua")
 include("callins.lua")
-include("savetable.lua")
+include("savetable.lua") --for reference: file is in "Spring\LuaUI\"
 
 local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName:upper() .. '_order.lua'
 local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName:upper() .. '_data.lua'
@@ -61,6 +61,34 @@ local glPopAttrib  = gl.PopAttrib
 local glPushAttrib = gl.PushAttrib
 local pairs = pairs
 local ipairs = ipairs
+
+-- create backup for ZK_data.lua and ZK_order.lua to workaround against case of file corruption if it happen (ie: bluescreen cause file corruption)
+do
+ 	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
+	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'}
+	for i=1, #fileToCheck do
+		local chunk, err = loadfile(fileToCheck[i])
+		if (chunk) then --if original content is LUA OK:
+		    local tmp = {}
+			setfenv(chunk, tmp)
+			table.save(chunk(),fileToCheck[i]..".bak",extraText[i]) --write to backup
+		else --if original content is not LUA OK:
+			Spring.Log(HANDLER_BASENAME, LOG.ERROR, tostring(err) .. " (Now will attempt to use backup file)")
+			chunk, err = loadfile(fileToCheck[i]..".bak")
+			if (chunk) then --if backup content is LUA OK:
+				local tmp = {}
+				setfenv(chunk, tmp)
+				table.save(chunk(),fileToCheck[i],extraText[i]) --overwrite original
+				-- Spring.Echo(os.remove (fileToCheck[i]))
+				-- Spring.Echo(os.rename (fileToCheck[i]..".bak", fileToCheck[i]))
+			else --if backup content is also not LUA OK:
+				Spring.Log(HANDLER_BASENAME, LOG.ERROR, tostring(err) .. " (Now will delete file and hope ZIP archive has another copy)")
+				Spring.Echo(os.remove (fileToCheck[i])) --delete original
+				Spring.Echo(os.remove (fileToCheck[i]..".bak")) --delete backup
+			end
+		end
+	end
+end
 
 -- read local widgets config
 local localWidgetsFirst = false
