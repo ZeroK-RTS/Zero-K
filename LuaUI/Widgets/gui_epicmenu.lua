@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.306 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.307 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-02-07
     license   = "GNU GPL, v2 or later",
@@ -2115,5 +2115,20 @@ function WG.crude.ShowMenu() --// allow other widget to toggle-up Epic-Menu. Thi
 	if not settings.show_crudemenu then 
 		settings.show_crudemenu = true
 		ShowHideCrudeMenu()
+	end
+end
+
+do --Set our prefered camera mode when first screen frame is drawn. The engine always go to default TA at first screen frame, so we need to re-apply our camera settings.
+	if Spring.GetGameFrame() == 0 then  --we check if this code is run at midgame (due to /reload). In that case we don't need to re-apply settings (the camera mode is already set at gui_epicmenu.lua\AddOption()).
+		local screenFrame = 0
+		function widget:DrawScreen() --game event: Draw Screen
+			if screenFrame => 1 then --detect frame no.2
+				local option = alloptions["Settings/CameraSettings/CameraCamera Type"] --get camera option we saved earlier in gui_epicmenu.lua\AddOption()
+				option.OnChange(option.value) --re-apply our settings 
+				Spring.Echo("Epicmenu: Switching to " .. option.value .. " camera mode") --notify in log what happen.
+				widgetHandler:RemoveWidgetCallIn("DrawScreen", self) --stop updating "widget:DrawScreen()" event. Note: this is a special "widgetHandler:RemoveCallin" for widget that use "handler=true".
+			end
+			screenFrame = screenFrame+1
+		end
 	end
 end
