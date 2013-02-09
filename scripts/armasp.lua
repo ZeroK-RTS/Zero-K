@@ -8,7 +8,7 @@ local land3 = piece 'land3'
 local land4 = piece 'land4' 
 local radar = piece 'radar' 
 
-local nanoPiece = {radar}
+local nanoPieces = {radar}
 smokePiece = {base,land1,land2,land3,land4}
 
 local function SpinRadar()

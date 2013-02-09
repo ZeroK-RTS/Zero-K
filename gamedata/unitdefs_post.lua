@@ -269,11 +269,17 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Disable smoothmesh
+-- Disable smoothmesh; allow use of airpads
 -- 
 
 for name, ud in pairs(UnitDefs) do
-    if (ud.canfly) then ud.usesmoothmesh = false end
+    if (ud.canfly) then
+	ud.usesmoothmesh = false
+	if not ud.maxfuel then
+	    ud.maxfuel = 1000000
+	    ud.refueltime = ud.refueltime or 1
+	end
+    end
 end 
 
 --------------------------------------------------------------------------------

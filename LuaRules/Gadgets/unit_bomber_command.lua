@@ -14,8 +14,8 @@
 
 function gadget:GetInfo()
   return {
-    name      = "Bomber Command",
-    desc      = "Handles bomber refuelling",
+    name      = "Aircraft Command",
+    desc      = "Handles aircraft repair/rearm",
     author    = "KingRaptor",
     date      = "22 Jan 2011",
     license   = "GNU LGPL, v2.1 or later",
@@ -38,10 +38,10 @@ local spGetUnitFuel		= Spring.GetUnitFuel
 include "LuaRules/Configs/customcmds.h.lua"
 
 local bomberNames = {
-	"armstiletto_laser",
-	"corshad",
-	"corhurc2",
-	"armcybr",
+	armstiletto_laser = {},
+	corshad = {},
+	corhurc2 = {},
+	armcybr = {},
 }
 
 local airpadNames = {
@@ -53,13 +53,18 @@ local airpadNames = {
 local bomberDefs = {}
 local airpadDefs = {}
 
-for _,name in pairs(bomberNames) do
-	if UnitDefNames[name] then bomberDefs[UnitDefNames[name].id] = true end
+for name, data in pairs(bomberNames) do
+	if UnitDefNames[name] then bomberDefs[UnitDefNames[name].id] = data end
 end
 for name,data in pairs(airpadNames) do
 	if UnitDefNames[name] then airpadDefs[UnitDefNames[name].id] = data end
 end
 
+for i=1,#UnitDefs do
+  if UnitDefs[i].canFly then
+    bomberDefs[i] = {}
+  end
+end
 
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
@@ -79,7 +84,7 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.MANUALFIRE] = true,
 }
 
-local padRadius = 750 -- land if pad is within this range
+local padRadius = 400 -- land if pad is within this range
 local MAX_FUEL = 1000000 * 0.9	-- not exact to allow some fudge
 
 --------------------------------------------------------------------------------
@@ -235,7 +240,12 @@ end
 
 local function RequestRearm(unitID, team, forceNow)
 	team = team or spGetUnitTeam(unitID)
-	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then return end
+	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
+		local health, maxHealth = Spring.GetUnitHealth(unitID)
+		if health > maxHealth - 1 then
+			return
+		end
+	end
 	--Spring.Echo(unitID.." requesting rearm")
 	local queue = Spring.GetUnitCommands(unitID) or {}
 	local index = #queue + 1
@@ -389,8 +399,8 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_REARM then	-- return to pad
-		if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
-			return true, true -- attempting to rearm while already armed or refuelling, abort
+		if spGetUnitRulesParam(unitID, "noammo") == 2 then
+			return true, true -- attempting to rearm while already rearming, abort
 		end
 		--Spring.Echo("Returning to base")
 		local targetPad = cmdParams[1]
@@ -416,11 +426,12 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
-		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift) then -- don't allow rearming when already armed or refuelling
+		local health, maxHealth = Spring.GetUnitHealth(unitID)
+		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift and health > maxHealth - 1) then -- don't allow rearming unless damaged or need ammo
 			return false 
 		end	
 	else
-		if combatCommands[cmdID] then	-- trying to fight without ammo, go get ammo first!
+		if combatCommands[cmdID] and not bomberDefs[unitDefID].noAutoRearm then	-- trying to fight without ammo, go get ammo first!
 			scheduleRearmRequest[unitID] = true
 		end
 	end
