@@ -161,8 +161,7 @@ end
 
 
 function widget:ViewResize(vsx, vsy) 
-	screen0.width = vsx 
-	screen0.height= vsy
+	screen0:Resize(vsx, vsy)
 end 
 
 widget.TweakIsAbove      = widget.IsAbove

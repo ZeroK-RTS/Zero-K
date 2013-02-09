@@ -9,7 +9,8 @@ Object = {
   defaultWidth  = 10, --FIXME really needed?
   defaultHeight = 10,
 
-  visible = true,
+  visible  = true,
+  --hidden   = false, --// synonym for above
 
   preserveChildrenOrder = false, --// if false adding/removing children is much faster, but also the order (in the .children array) isn't reliable anymore
 
@@ -411,6 +412,7 @@ function Object:SetVisibility(visible)
     self.parent:HideChild(self)
   end
   self.visible = visible
+  self.hidden  = not visible
 end
 
 

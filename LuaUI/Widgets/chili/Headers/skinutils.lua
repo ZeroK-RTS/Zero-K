@@ -305,7 +305,7 @@ function DrawButton(obj)
   local bgcolor = obj.backgroundColor
   if (obj.state.pressed) then
     bgcolor = mulColor(bgcolor, 0.4)
-  elseif (obj.state.hovered) or (obj.state.focused) then
+  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
     bgcolor = obj.focusColor
     --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
   end
@@ -321,7 +321,7 @@ function DrawButton(obj)
   local fgcolor = obj.borderColor
   if (obj.state.pressed) then
     fgcolor = mulColor(fgcolor, 0.4)
-  elseif (obj.state.hovered) or (obj.state.focused) then
+  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
     fgcolor = obj.focusColor
   end
   gl.Color(fgcolor)
@@ -910,7 +910,6 @@ function DrawLine(self)
 
   gl.Texture(0,false)
 end
-
 --//=============================================================================
 --//
 

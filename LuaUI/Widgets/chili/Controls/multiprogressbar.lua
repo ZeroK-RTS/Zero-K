@@ -34,46 +34,6 @@ local inherited = this.inherited
 
 --//=============================================================================
 
-function Multiprogressbar:SetCaption(str)
-  if (self.caption ~= str) then
-    self.caption = str
-    self:Invalidate()
-  end
-end
-
-function Multiprogressbar:SetValue(b, p)
-  local oldvalue = self.bars[b].percent
-  if (p ~= oldvalue) then
-    self.bars[b].percent = p
-    self:Invalidate()
-  end
-end
-
-function Multiprogressbar:SetColor1(b, ...)
-  local color1 = _ParseColorArgs(...)
-  table.merge(color1,self.bars[b].color1)
-  if (not table.iequal(color1,self.bars[b].color1)) then
-    self.bars[b].color1 = color1
-    self:Invalidate()
-  end
-end
-
-function Multiprogressbar:SetColor2(b, ...)
-  local color2 = _ParseColorArgs(...)
-  table.merge(color2,self.bars[b].color2)
-  if (not table.iequal(color1,self.bars[b].color2)) then
-    self.bars[b].color2 = color2
-    self:Invalidate()
-  end
-end
-
-function Multiprogressbar:SetColor(b, ...)
-  self:SetColor2(b, ...)
-  self:SetColor1(b, ...)
-end
-
-
---//=============================================================================
 local glVertex = gl.Vertex
 local glColor = gl.Color
 local glBeginEnd = gl.BeginEnd

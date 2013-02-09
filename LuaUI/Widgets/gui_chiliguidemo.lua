@@ -256,6 +256,7 @@ President Morales has said the new constitution will pave the way for correcting
 		resizable = true,
 		draggable = true,
 		parent = Chili.Screen0,
+		dockable = true,
 		children = {
 		Chili.ScrollPanel:New{
 			width = 200,
@@ -276,6 +277,7 @@ President Morales has said the new constitution will pave the way for correcting
 		width  = 200,
 		height = 200,
 		parent = Chili.Screen0,
+		dockable = true,
 
 		children = {
 			Chili.TabBar:New{

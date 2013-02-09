@@ -2,7 +2,6 @@ Window = Control:Inherit{
   classname = 'window',
   resizable = true,
   draggable = true,
-  minimizable = false,
 
   minWidth  = 50,
   minHeight = 50,

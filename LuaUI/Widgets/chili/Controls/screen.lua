@@ -1,4 +1,5 @@
 Screen = Object:Inherit{
+--Screen = Control:Inherit{
   classname = 'screen',
   x         = 0,
   y         = 0,
@@ -100,6 +101,16 @@ function Screen:IsRectInView(x,y,w,h)
 		(y <= self.height) and
 		(y + h >= 0)
 end
+
+
+--//=============================================================================
+
+function Screen:Resize(w,h)
+	self.width = w
+	self.height = h
+	self:CallChildren("RequestRealign")
+end
+
 
 --//=============================================================================
 
