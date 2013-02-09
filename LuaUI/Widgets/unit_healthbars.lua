@@ -984,11 +984,13 @@ do
   local glMultiTexCoord      = gl.MultiTexCoord
 
   function widget:DrawWorld()
-	if not Spring.IsGUIHidden() then 
+    if not Spring.IsGUIHidden() then 
       if (#visibleUnits+#visibleFeatures==0) then
         return
       end
-      
+      if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+	return
+      end
       --gl.Fog(false)
       --gl.DepthTest(true)
       glDepthMask(true)

@@ -757,6 +757,9 @@ function DrawSelectedRanges()
 end
 
 function widget:DrawWorld()
+	if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+		return
+	end
 	if not spIsGUIHidden() then
 		-- def range routine
 		DrawRanges()
