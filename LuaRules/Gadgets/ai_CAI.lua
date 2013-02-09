@@ -786,7 +786,7 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 		local deID = chooseUnitDefID(buildDefs.airDefenceIds[defIndex])
 		
 		local r = buildDefs.airDefenceRange[defIndex]
-		local theta = math.random(twoPi)
+		local theta = math.random() * twoPi
 		
 		local ox = selfDefenceAirTask[minID].x
 		local oz = selfDefenceAirTask[minID].z
@@ -806,7 +806,7 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 		local searches = 0
 		
 		while spTestBuildOrder(deID, bx, 0 ,bz, 1) == 0 or nearFactory(team,bx,bz,250) or nearMexSpot(bx,bz,60) or nearMapEdge(bx,bz,300) do
-			theta = math.random(twoPi)
+			theta = math.random() * twoPi
 			bx = ox + r*math.sin(theta)
 			bz = oz + r*math.cos(theta)
 			searches = searches + 1

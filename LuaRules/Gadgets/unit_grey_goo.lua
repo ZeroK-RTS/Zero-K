@@ -189,7 +189,7 @@ function gadget:GameFrame(f)
 			if unit.progress >= unit.defs.cost then
 				unit.progress = unit.progress - unit.defs.cost
 				local x,y,z = spGetUnitPosition(unitIndex[i])
-				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(2*math.pi),spGetUnitTeam(unitIndex[i]))
+				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(0,3),spGetUnitTeam(unitIndex[i]))
 				local states = spGetUnitStates(unitIndex[i])
 				spGiveOrderToUnit(newId, CMD_FIRE_STATE, {states.firestate}, 0)
 				spGiveOrderToUnit(newId, CMD_MOVE_STATE, {states.movestate}, 0)
