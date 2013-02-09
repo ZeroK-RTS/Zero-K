@@ -280,9 +280,9 @@ local function DrawSearchlights()
 		local absHeight = py - groundy
 		local unitDefID = GetUnitDefID(unitID)
 		local unitDef = UnitDefs[unitDefID]
-		local speed = unitDef.speed
 		
-		if (absHeight > 0
+		if (unitDef
+			and absHeight > 0
 			and (not buildProgress or buildProgress >= 1)
 			and not noLightList[unitDefID]
 			and timeFromNoon > (0.25 + ((unitID * 97) % 256) / 8192)
@@ -294,6 +294,7 @@ local function DrawSearchlights()
 		  local ecc
 		  local heading
 		  local baseX, baseZ
+		  local speed = unitDef.speed
 		  
 		  if (not speed or speed == 0) then
 			heading = searchlightBuildingAngle * (0.5 + ((unitID * 137) % 256) / 512)
