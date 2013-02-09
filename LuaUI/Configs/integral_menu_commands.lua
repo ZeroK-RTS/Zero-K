@@ -304,6 +304,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	disembark=1,
 	oneclickwep=1,
 	settarget=1,
+	settargetcircle=1,
 	canceltarget=1,
 	setferry=1, 
 	radialmenu=1,

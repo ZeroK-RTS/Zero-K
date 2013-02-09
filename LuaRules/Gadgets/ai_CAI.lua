@@ -677,7 +677,12 @@ local function runAway(unitID, enemyID, range)
 	vectorX = vectorX/vectorMag
 	vectorZ = vectorZ/vectorMag
 	
-	spGiveOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
+	local jump = spGetUnitRulesParam(unitID, "jumpReload")
+	if ((not jump) or jump == 1) and jumpDefs[spGetUnitDefID(unitID)] then
+		spGiveOrderToUnit(unitID, CMD_JUMP, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
+	else
+		spGiveOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
+	end
 end
 
 -- makes defence using wantedDefence position
@@ -3984,7 +3989,7 @@ local function MakeRealTable(proxy)
 	return ret
 end
 
-local heatmapPosition = MakeRealTable(SYNCED.heatmapPosition)
+local heatmapPosition
 
 -- draw scoutmap
 -- FIXME: could use some big time optimizations
@@ -4004,6 +4009,10 @@ function gadget:DrawWorldPreUnit()
 		gl.Color(1,1,1,1)
 		break
 	end
+end
+
+function gadget:Initialize()
+	heatmapPosition = MakeRealTable(SYNCED.heatmapPosition)
 end
 
 function gadget:Save(zip)
