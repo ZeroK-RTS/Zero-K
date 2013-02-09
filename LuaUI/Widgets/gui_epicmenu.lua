@@ -2122,7 +2122,7 @@ do --Set our prefered camera mode when first screen frame is drawn. The engine a
 	if Spring.GetGameFrame() == 0 then  --we check if this code is run at midgame (due to /reload). In that case we don't need to re-apply settings (the camera mode is already set at gui_epicmenu.lua\AddOption()).
 		local screenFrame = 0
 		function widget:DrawScreen() --game event: Draw Screen
-			if screenFrame => 1 then --detect frame no.2
+			if screenFrame >= 1 then --detect frame no.2
 				local option = alloptions["Settings/CameraSettings/CameraCamera Type"] --get camera option we saved earlier in gui_epicmenu.lua\AddOption()
 				option.OnChange(option.value) --re-apply our settings 
 				Spring.Echo("Epicmenu: Switching to " .. option.value .. " camera mode") --notify in log what happen.
