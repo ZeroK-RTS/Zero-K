@@ -51,8 +51,8 @@ unitDef = {
   minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
-  objectName             = [[corape.s3o]],
-  scale                  = [[1]],
+  objectName             = [[rapier.s3o]],
+  script                 = [[corape.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -105,7 +105,6 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_m_maverick.s3o]],
-      pitchtolerance          = [[12000]],
       range                   = 360,
       reloadtime              = 4,
       smokeTrail              = true,
@@ -136,7 +135,6 @@ unitDef = {
       damage           = 1100,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
       height           = [[40]],
@@ -145,8 +143,6 @@ unitDef = {
       object           = [[rapier_d.s3o]],
       reclaimable      = true,
       reclaimTime      = 120,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     
@@ -156,7 +152,6 @@ unitDef = {
       category         = [[heaps]],
       damage           = 1100,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
       height           = [[4]],
@@ -165,8 +160,6 @@ unitDef = {
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 60,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

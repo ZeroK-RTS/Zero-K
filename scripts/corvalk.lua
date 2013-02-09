@@ -62,18 +62,11 @@ function closeDoors()
 	WaitForTurn( rUpperCl2, z_axis )
 end
 
-
-
-
-
-
 function script.Create()
-
 	StartThread(SmokeUnit)
 end
 
 function script.Activate()
-	
 end
 
 function script.Deactivate()
@@ -81,7 +74,7 @@ function script.Deactivate()
 end
 
 
-function QueryTransport ( passengerID )
+function script.QueryTransport( passengerID )
 	return link
 end
 
@@ -90,7 +83,7 @@ function getPassengerId()
 	local cmd=Spring.GetUnitCommands(unitID)
 	local unitId = nil	
 	
-    if cmd and cmd[1] then					
+	if cmd and cmd[1] then					
 		if  cmd[1]['id'] == 75  then -- CMDTYPE.LOAD_UNITS = 75
 			unitId = cmd[1]['params'][1]				
 		end
@@ -102,32 +95,27 @@ end
 
 --fetch id of command
 function getCommandId() 
-
 	local cmd=Spring.GetUnitCommands(unitID)		
-    if cmd and cmd[1] then		
+	if cmd and cmd[1] then		
 		return cmd[1]['id']		
 	end
-	
 	return nil
 end
 
 --fetch unit id of passenger (from the load command)
 function getDropPoint() 
-
 	local cmd=Spring.GetUnitCommands(unitID)
 	local dropx, dropy ,dropz = nil	
 	
-    if cmd and cmd[1] then					
+	if cmd and cmd[1] then					
 		if  cmd[1]['id'] == 81  then -- CMDTYPE.LOAD_UNITS = 75
 			dropx, dropy ,dropz = cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]				
 		end
 	end
-	
 	return {dropx, dropy ,dropz}
 end
 
 function isNearPickupPoint(passengerId)
-
 	if passengerId == nil then
 		return false
 	end
@@ -147,7 +135,6 @@ end
 
 
 function isNearDropPoint(transportUnitId)
-
 	if transportUnitId == nil then
 		return false
 	end
@@ -171,7 +158,6 @@ end
 
 
 function script.MoveRate(curRate)
-	
 	local passengerId = getPassengerId()
 
 	if getCommandId() == 75 and isNearPickupPoint(passengerId) then
@@ -181,16 +167,13 @@ function script.MoveRate(curRate)
 	end
 end
 
-
-
-
-function script.BeginTransport ( passengerID )
-	
+function script.BeginTransport( passengerID )
 	if loaded then 
 		return 
 	end
+	Move(link, y_axis, -Spring.GetUnitHeight(passengerID))
 
-	local px, py, pz = Spring.GetUnitBasePosition(passengerID)
+	--local px, py, pz = Spring.GetUnitBasePosition(passengerID)
 	SetUnitValue(COB.BUSY, 1)
 
 	AttachUnit(link, passengerID)
@@ -198,14 +181,13 @@ function script.BeginTransport ( passengerID )
 	loaded = true
 	
 	Sleep(500)
-	StartThread(closeDoors)
+	--StartThread(closeDoors)
 end
 
 -- note x, y z is in worldspace
 --function script.TransportDrop(passengerID, x, y, z)
-function script.EndTransport ( ) 
-
-	StartThread(openDoors)
+function script.EndTransport() 
+	--StartThread(openDoors)
 	if (unitLoaded ~= nil) then
 		DropUnit(unitLoaded)
 	end

@@ -14,7 +14,7 @@ unitDef = {
   buildingGroundDecalType       = [[factoryplane_aoplane.dds]],
 
   buildoptions                  = {
-    [[crane]],
+    [[armca]],
     [[fighter]],
     [[corvamp]],
 	[[corhurc2]],

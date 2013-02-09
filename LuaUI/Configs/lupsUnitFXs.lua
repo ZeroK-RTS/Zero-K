@@ -264,8 +264,8 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, piece="wingtip2"}},
   },
   corape = {
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="rthrust1", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="rthrust2", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust1", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust2", onActive=true}},
   },
   corhurc2 = {
     {class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true}},
@@ -281,6 +281,12 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=8, piece="wingtip1"}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2"}},
   },
+  corbtrans = {
+    {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, piece="engineEmit", onActive=true}},
+  }, 
+  corvalk = {
+    {class='AirJet', options={color={0.2,0.4,0.8}, width=3.5, length=22, piece="engineEmit", onActive=true}},
+  },  
   corawac = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="thrust", onActive=true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtipl"}},
