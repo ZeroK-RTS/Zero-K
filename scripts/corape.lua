@@ -37,7 +37,7 @@ function script.QueryWeapon(num)
 end
 
 function script.AimFromWeapon(num)
-	return body
+	return base
 end
 
 function script.AimWeapon(num, heading, pitch)
