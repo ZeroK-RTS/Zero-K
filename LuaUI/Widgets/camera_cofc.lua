@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.101 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.102 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16",
+    date      = "2011-03-16", --2013-02-10
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -234,8 +234,8 @@ options = {
 		OnChange = function(self) init = true; end
 	},
 	freemode = {
-		name = "FreeMode (RISKY)",
-		desc = "Be free. (USE AT YOUR OWN RISK!)",
+		name = "FreeMode (risky)",
+		desc = "Be free. Camera movement not bound to map edge. USE AT YOUR OWN RISK!",
 		type = 'bool',
 		advanced = true,
 		value = false,
@@ -424,6 +424,7 @@ local hideCursor = false
 
 
 local mwidth, mheight = Game.mapSizeX, Game.mapSizeZ
+local averageEdgeHeight = (spGetGroundHeight(mwidth/2,0) + spGetGroundHeight(0,mheight/2) + spGetGroundHeight(mwidth/2,mheight) +spGetGroundHeight(mwidth,mheight/2))/4
 local mcx, mcz 	= mwidth / 2, mheight / 2
 local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(mheight, mwidth) * 2
@@ -455,7 +456,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
+--[[ --NOTE: is not yet used for the moment
 local function MoveRotatedCam(cs, mxm, mym)
 	if not cs.dy then
 		return cs
@@ -477,8 +478,8 @@ local function MoveRotatedCam(cs, mxm, mym)
 	local ddx = (mxm * drx) + (mym * dfx)
 	local ddz = (mxm * drz) + (mym * dfz)
 	
-	local gx1, gz1 = cs.px + vecDist*cs.dx,			cs.pz + vecDist*cs.dz
-	local gx2, gz2 = cs.px + vecDist*cs.dx + ddx,	cs.pz + vecDist*cs.dz + ddz
+	local gx1, gz1 = cs.px + vecDist*cs.dx,			cs.pz + vecDist*cs.dz --note me: what does cs.dx mean?
+	local gx2, gz2 = cs.px + vecDist*cs.dx + ddx,	cs.pz + vecDist*cs.dz + ddz 
 	
 	local extra = 500
 	
@@ -498,9 +499,10 @@ local function MoveRotatedCam(cs, mxm, mym)
 	cs.pz = cs.pz + ddz
 	return cs
 end
+--]]
 
 --Note: If the x,y is not pointing at an onmap point, this function traces a virtual ray to an
---          offmap position using the camera direction and disregards the x,y parameters. Fixme.
+--          offmap position using the camera direction and disregards the x,y parameters.
 local function VirtTraceRay(x,y, cs)
 	local _, gpos = spTraceScreenRay(x, y, true)
 	
@@ -510,7 +512,7 @@ local function VirtTraceRay(x,y, cs)
 		
 		--gy = spGetSmoothMeshHeight (gx,gz)
 		
-		if gx < 0 or gx > mwidth or gz < 0 or gz > mheight then
+		if gx < 0 or gx > mwidth or gz < 0 or gz > mheight then --out of map
 			return false, gx, gy, gz	
 		else
 			return true, gx, gy, gz
@@ -520,33 +522,42 @@ local function VirtTraceRay(x,y, cs)
 	if not cs or not cs.dy or cs.dy == 0 then
 		return false, false
 	end
+	--[[ 
 	local vecDist = (- cs.py) / cs.dy
-	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz
+	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
+	--]]
+	---===Convert camera angle into estimated ground position (by Msafwan)===
+	local camTilt = math.min(1.5550425, PI/2 + cs.rx)
+	local xzDist = math.tan(camTilt)*(cs.py-averageEdgeHeight) --the ground distance (at xz-plane) between FreeStyle camera and the target.
+	local xDist = sin(cs.ry)*xzDist ----break down "xzDist" into x and z component.
+	local zDist = cos(cs.ry)*xzDist
+	gx, gy, gz = cs.px+xDist,averageEdgeHeight,cs.pz+zDist --estimated ground position infront of camera (if outside map)
+	---===
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
 end
 
-local function SetLockSpot2(cs, x, y)
+local function SetLockSpot2(cs, x, y) --set an anchor on the ground for camera rotation 
 	if ls_have then
 		return
 	end
 	
 	local x, y = x, y
 	if not x then
-		x, y = cx, cy
+		x, y = cx, cy --center of screen
 	end
 
 	--local gpos
 	--_, gpos = spTraceScreenRay(x, y, true)
-	local onmap, gx,gy,gz = VirtTraceRay(x, y, cs)
+	local onmap, gx,gy,gz = VirtTraceRay(x, y, cs) --convert screen coordinate to ground coordinate
 	
 	if gx then
 		ls_x,ls_y,ls_z = gx,gy,gz
 		local px,py,pz = cs.px,cs.py,cs.pz
 		local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
 		ls_onmap = onmap
-		ls_dist = sqrt(dx*dx + dy*dy + dz*dz)
+		ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
 		ls_have = true
 	end
 end
@@ -555,15 +566,15 @@ end
 local function UpdateCam(cs)
 	local cs = cs
 	if not (cs.rx and cs.ry and ls_dist) then
-		--return cs
+		--return cs 
 		return false
 	end
 	
-	local opp = sin(cs.rx) * ls_dist
-	local alt = sqrt(ls_dist * ls_dist - opp * opp)
-	cs.px = ls_x - sin(cs.ry) * alt
-	cs.py = ls_y - opp
-	cs.pz = ls_z - cos(cs.ry) * alt
+	local alt = sin(cs.rx) * ls_dist
+	local opp = cos(cs.rx) * ls_dist --OR: sqrt(ls_dist * ls_dist - alt * alt)
+	cs.px = ls_x - sin(cs.ry) * opp
+	cs.py = ls_y - alt
+	cs.pz = ls_z - cos(cs.ry) * opp
 	
 	if not options.freemode.value then
 		local gndheight = spGetGroundHeight(cs.px, cs.pz)+5
@@ -580,7 +591,7 @@ local function UpdateCam(cs)
 	return cs
 end
 
-local function Zoom(zoomin, s, forceCenter)
+local function Zoom(zoomin, shift, forceCenter)
 	local zoomin = zoomin
 	if options.invertzoom.value then
 		zoomin = not zoomin
@@ -607,21 +618,21 @@ local function Zoom(zoomin, s, forceCenter)
 				return false
 			end
             
-			local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (s and 3 or 1)
+			local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
 			
-			local new_px = cs.px + dx * sp
+			local new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the target.
 			local new_py = cs.py + dy * sp
 			local new_pz = cs.pz + dz * sp
 			
 			if not options.freemode.value then
-                if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then
+                if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then --zooming underground?
                     sp = (spGetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
-                    new_px = cs.px + dx * sp
+                    new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the ground.
                     new_py = cs.py + dy * sp
                     new_pz = cs.pz + dz * sp
-                elseif (not zoomin) and new_py > maxDistY then
+                elseif (not zoomin) and new_py > maxDistY then --zoom out to space?
                     sp = (maxDistY - cs.py) / dy
-                    new_px = cs.px + dx * sp
+                    new_px = cs.px + dx * sp --a zoom-out that get slower the closer you are to the ceiling?
                     new_py = cs.py + dy * sp
                     new_pz = cs.pz + dz * sp
                 end
@@ -645,13 +656,13 @@ local function Zoom(zoomin, s, forceCenter)
 		return
 	end
     
-	if zoomin and not ls_onmap then
-		return
+	if zoomin and not ls_onmap then --do "return" to prevent zooming into null area (outside map)
+		--return
 	end
     
-	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (s and 3 or 1)
+	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
 	
-	local ls_dist_new = ls_dist + ls_dist*sp
+	local ls_dist_new = ls_dist + ls_dist*sp -- a zoom in that get faster the further away from target
 	ls_dist_new = math.max(ls_dist_new, 20)
 	ls_dist_new = math.min(ls_dist_new, maxDistY)
 	
@@ -826,11 +837,13 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_x = ls_x + ddx
 	ls_z = ls_z + ddz
 	
-	ls_x = math.min(ls_x, mwidth-3)
-	ls_x = math.max(ls_x, 3)
-	
-	ls_z = math.min(ls_z, mheight-3)
-	ls_z = math.max(ls_z, 3)
+	if not options.freemode.value then
+		ls_x = math.min(ls_x, mwidth-3) --limit camera movement to map area
+		ls_x = math.max(ls_x, 3)
+		
+		ls_z = math.min(ls_z, mheight-3)
+		ls_z = math.max(ls_z, 3)
+	end
 	
 	if options.smoothmeshscroll.value then
 		ls_y = spGetSmoothMeshHeight(ls_x, ls_z) or 0
@@ -885,7 +898,7 @@ function widget:Update(dt)
 				local _, playerID = Spring.GetTeamInfo(teamID)
 				local pp = WG.alliedCursorsPos[ playerID ]
 				if pp then 
-					Spring.SetCameraTarget(pp[1], 0, pp[2], 5)
+					spSetCameraTarget(pp[1], 0, pp[2], 5)
 				end 
 			end 
 		end
@@ -1151,15 +1164,15 @@ end
 
 function widget:MouseWheel(up, value)
     if fpsmode then return end
-	local a,c,m,s = spGetModKeyState()
+	local alt,ctrl,m,shift = spGetModKeyState()
 	
-	if c then
-		return Tilt(s, up and 1 or -1)
-	elseif a then
-		return Altitude(up, s)
+	if ctrl then
+		return Tilt(shift, up and 1 or -1)
+	elseif alt then
+		return Altitude(up, shift)
 	end
 	
-	return Zoom(not up, s)
+	return Zoom(not up, shift)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
@@ -1451,4 +1464,3 @@ function GroupRecallFix(key, modifier, isRepeat)
 		end
 	end
 end
-
