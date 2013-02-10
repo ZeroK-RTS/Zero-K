@@ -264,7 +264,7 @@ function script.Killed(recentDamage, maxHealth)
     Spring.MoveCtrl.SetPosition(unitID, x, Spring.GetGroundHeight(x, z) - 1000, z)
     
     -- spawn wreck
-    local wreckDef = FeatureDefNames[ud.wreckName].id
+    local wreckDef = FeatureDefNames[ud.wreckName]
     while (wreckLevel > 1 and wreckDef) do
       wreckDef   = FeatureDefs[ wreckDef.deathFeatureID ]
       wreckLevel = wreckLevel - 1
