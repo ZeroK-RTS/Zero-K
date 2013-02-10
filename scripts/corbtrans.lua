@@ -61,11 +61,14 @@ local Lflare2		= piece 'Lflare2'
 local engineEmit 	= piece 'engineEmit'
 local link 			= piece 'link'
 
+local dust1, dust2	= piece('dust1', 'dust2')
+
 local AttachUnit = Spring.UnitScript.AttachUnit
 local DropUnit = Spring.UnitScript.DropUnit
 
 local loaded = false
 local unitLoaded = nil
+local takeoffOrLanding = false
 
 local SIG_OPENDOORS = 1
 local SIG_CLOSEDOORS = 2
@@ -73,6 +76,7 @@ local SIG_AIM = 4
 local SIG_AIM2 = 8
 local SIG_AIM3 = 16
 local SIG_RESTORE = 32
+local SIG_TOL = 64
 
 local doorSpeed = 3
 
@@ -217,8 +221,24 @@ function closeDoors()
 	]]
 end
 
+local function DustLoop()
+	while true do
+		if (takeoffOrLanding) then
+			EmitSfx(dust1, 1025)
+			EmitSfx(dust2, 1025)
+		else
+			--EmitSfx(dust1, 1025)
+			--EmitSfx(dust2, 1025)
+		end
+		Sleep(66)
+	end
+end
+
 function script.Create()
+	Turn(dust1, x_axis, math.rad(90))
+	Turn(dust2, x_axis, math.rad(90))
 	StartThread(SmokeUnit)
+	--StartThread(DustLoop)	-- looks stupid
 	
 	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
 	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
@@ -229,10 +249,20 @@ function script.Create()
 	Move(RTurretBase, x_axis, -10, 14) --11
 end
 
+local function TakeOffOrLand()
+	Signal(SIG_TOL)
+	SetSignalMask(SIG_TOL)
+	takeoffOrLanding = true
+	Sleep(1200)
+	takeoffOrLanding = false
+end
+
 function script.Activate()
+	StartThread(TakeOffOrLand)
 end
 
 function script.Deactivate()
+	StartThread(TakeOffOrLand)
 	StartThread(closeDoors)
 end
 
@@ -410,6 +440,9 @@ function script.Shot(num)
 		index = 1
 	end
 	weaponPieces[num].index = index
+	if num < 3 then
+		EmitSfx(weaponPieces[num].query[index], 1026)
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)

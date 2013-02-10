@@ -283,6 +283,14 @@ effectUnitDefs = {
   },
   corbtrans = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, piece="engineEmit", onActive=true}},
+    {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav1", onActive=true})},
+    {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav1", onActive=true})},
+    {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav2", onActive=true})},
+    {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav2", onActive=true})},
+    {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav3", onActive=true})},
+    {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav3", onActive=true})},
+    {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav4", onActive=true})},
+    {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav4", onActive=true})},
   }, 
   corvalk = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=3.5, length=22, piece="engineEmit", onActive=true}},
