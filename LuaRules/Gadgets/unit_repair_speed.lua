@@ -67,20 +67,19 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 		local bt = UnitDefs[unitDefID].buildTime
 		uncombatTimes[newDone][unitID] = true
 		combatUnits[unitID] = {done = newDone, bt = bt}
-		--if select(5,spGetUnitHealth(unitID)) == 1 then
+		if select(5,spGetUnitHealth(unitID)) == 1 then
 			spSetUnitCosts(unitID, {buildTime = bt*REPAIR_PENALTY})
-		--end
+		end
 	end
 	
 end
 
---[[
+
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if combatUnits[unitID] then
 		spSetUnitCosts(unitID, {buildTime = combatUnits[unitID].bt*REPAIR_PENALTY})
 	end
 end
-]]
 
 function gadget:GameFrame(n)
 	if uncombatTimes[n] then
