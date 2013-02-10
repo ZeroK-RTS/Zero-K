@@ -77,9 +77,9 @@ local SIG_RESTORE = 32
 local doorSpeed = 3
 
 local weaponPieces = {
-	{aimFrom = FrontTurret, query = {fflare1,fflare2,fflare3,fflare4}, index = 1},
-	{aimFrom = LTurretBase, query = {Lflare1, Lflare2}, index = 1},
 	{aimFrom = RTurretBase, query = {Rflare1, Rflare2}, index = 1},
+	{aimFrom = LTurretBase, query = {Lflare1, Lflare2}, index = 1},
+	{aimFrom = FrontTurret, query = {fflare1,fflare2,fflare3,fflare4}, index = 1},
 }
 
 smokePiece = {body, engineEmit}
@@ -219,6 +219,10 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
+	
+	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
+	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
+	
 	Move(LTurretDoor, y_axis, 3)
 	Move(LTurretBase, x_axis, 10)
 	Move(RTurretDoor, y_axis, 3, 10)
@@ -357,13 +361,6 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-		Signal( SIG_AIM)
-		SetSignalMask( SIG_AIM)
-		Turn(FrontGun1,x_axis, -pitch,6)
-		Turn(FrontGun2,x_axis, -pitch,6)
-		WaitForTurn( FrontGun1, x_axis )
-		return true
-	elseif num == 2 then
 		Signal( SIG_AIM2)
 		SetSignalMask( SIG_AIM2)
 		
@@ -372,7 +369,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(LTurretHinge, y_axis)
 		WaitForTurn(LTurretVHinge, z_axis)
 		return true
-	elseif num == 3 then
+	elseif num == 2 then
 		Signal( SIG_AIM3)
 		SetSignalMask( SIG_AIM3)
 		
@@ -380,6 +377,13 @@ function script.AimWeapon(num, heading, pitch)
 		Turn( RTurretVHinge , z_axis, -pitch, 10)
 		WaitForTurn(RTurretHinge, y_axis)
 		WaitForTurn(RTurretVHinge, z_axis)
+		return true
+	elseif num == 3 then
+		Signal( SIG_AIM)
+		SetSignalMask( SIG_AIM)
+		Turn(FrontGun1,x_axis, -pitch,6)
+		Turn(FrontGun2,x_axis, -pitch,6)
+		WaitForTurn( FrontGun1, x_axis )
 		return true
 	end
 	

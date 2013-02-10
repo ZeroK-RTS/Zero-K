@@ -74,7 +74,7 @@ unitDef = {
   sightDistance       = 380,
   smoothAnim          = true,
   terraformSpeed      = 240,
-  turnRate            = 110,
+  turnRate            = 500,
   workerTime          = 4,
 
   featureDefs         = {

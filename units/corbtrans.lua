@@ -4,6 +4,7 @@ unitDef = {
   description            = [[Armed Heavy Air Transport]],
   acceleration           = 0.2,
   amphibious             = true,
+  airStrafe              = 0,
   brakeRate              = 6.25,
   buildCostEnergy        = 500,
   buildCostMetal         = 500,
@@ -28,7 +29,6 @@ unitDef = {
   cruiseAlt              = 250,
 
   customParams           = {
-    airstrafecontrol = [[1]],
     description_bp = [[Transporte aéreo pesado armado]],
     description_fr = [[Transport Aerien Arm? Lourd]],
 	description_de = [[Schwerer, bewaffneter Lufttransport]],
@@ -78,6 +78,7 @@ unitDef = {
   transportSize          = 25,
   turninplace            = 0,
   turnRate               = 420,
+  upright                = true,
   verticalSpeed          = 30,
   workerTime             = 0,
 
@@ -85,25 +86,27 @@ unitDef = {
 
 	{
       def                = [[LASER]],
-      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+	  mainDir            = [[-1 -1 1]],
+      maxAngleDif        = 200,
+    },
+
+
+    {
+      def                = [[LASER]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+	  mainDir            = [[1 -1 1]],
+      maxAngleDif        = 200,
+    },
+	
+	
+	{
+      def                = [[AALASER]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
       mainDir            = [[0 -1 1]],
-      maxAngleDif        = 120,
-    },
-    
-    {
-      def                = [[AALASER]],
-      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
-      mainDir            = [[-1 -1 1]],
-      maxAngleDif        = 180,
-    },
-
-
-    {
-      def                = [[AALASER]],
-      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
-      mainDir            = [[1 -1 1]],
-      maxAngleDif        = 180,
+      maxAngleDif        = 160,
     },
 
   },
@@ -112,29 +115,33 @@ unitDef = {
   weaponDefs             = {
 
     LASER = {
-      name                    = [[Laser Blaster]],
+      name                    = [[Light Laser Blaster]],
       areaOfEffect            = 8,
+      avoidFeature            = false,
+      beamWeapon              = true,
+      collideFriendly         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
         default = 10,
-        planes  = 10,
         subs    = 0.5,
       },
 
       duration                = 0.02,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
       fireStarter             = 50,
-      heightMod               = 1,
       impactOnly              = true,
+	  heightMod               = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      lineOfSight             = true,
       noSelfDamage            = true,
-      range                   = 100,	-- gadget modifies to 300
-      reloadtime              = 0.166,
+      range                   = 100,
+      reloadtime              = 0.2,
+      renderType              = 0,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/lasercannon_fire]],
@@ -144,7 +151,7 @@ unitDef = {
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 880,
+      weaponVelocity          = 2400,
     },
 	
     AALASER  = {
