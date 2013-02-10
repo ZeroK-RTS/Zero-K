@@ -698,6 +698,7 @@ end
 
 local function IsUnitFXVisible(fx)
 	local unitActive = true
+        local unitID = fx.unit
 	if fx.onActive then
 		unitActive = spGetUnitIsActive(unitID)
 		if (unitActive == nil) then
@@ -761,7 +762,7 @@ local function CreateVisibleFxList()
 		end
 	end
   end
-  Spring.Echo("Lups fx cnt", foo)
+  --Spring.Echo("Lups fx cnt", foo)
 
   for i=1,removeCnt-1 do
     RemoveParticles(removeFX[i])
