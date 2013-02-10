@@ -191,6 +191,12 @@ function NanoParticles:Draw()
   local startPos  = self.pos
   local endPosNew = self.targetpos
   local endPosOld = self.targetposStart
+  
+  if (not self.pos) or (not self.targetpos) or (not self.targetposStart) then
+    self._dead = true
+    return
+  end
+  
   glMultiTexCoord(0,  startPos[1],  startPos[2],  startPos[3], 1)
   glMultiTexCoord(1, endPosNew[1], endPosNew[2], endPosNew[3], 1)
   glMultiTexCoord(2, endPosOld[1], endPosOld[2], endPosOld[3], 1)

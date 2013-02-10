@@ -105,7 +105,7 @@ function UpdateNanoParticles(self)
     local startPos = self.pos
     local endPos   = self.targetpos
 
-    if (not endPos) then
+    if (not startPos) or (not endPos) then
       --//this just happens when the target feature/unit was already dead when the fx was created
       self._dead = true
       RemoveParticles(self.id)
