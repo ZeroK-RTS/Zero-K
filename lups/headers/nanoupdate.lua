@@ -36,13 +36,11 @@ end
 
 
 function UpdateNanoParticles(self)
-
   --// UPDATE START- & FINALPOS
-  local lastup = self._lastupdate
-  if (not lastup)or(thisGameFrame-lastup > 1) then
+  local lastup = self._lastupdate or (thisGameFrame - 1)
+  if (not self._dead)and(thisGameFrame - lastup >= 1) then
     self._lastupdate = thisGameFrame
 
-	
     --// UPDATE STARTPOS
     local uid = self.unitID
     if Spring.ValidUnitID(uid) then
@@ -81,31 +79,29 @@ function UpdateNanoParticles(self)
         end
       end
     end
-	
-	
 
     local cmdTag = GetCmdTag(self.unitID)
     if (cmdTag == 0 or cmdTag ~= self.cmdTag) then
         self._dead = true
         return
     end
-	
   end
 
 
 
   --// UPDATE LOS
   local allied = (self.allyID==LocalAllyTeamID)or(LocalAllyTeamID==Script.ALL_ACCESS_TEAM)
-  local lastup_los = self._lastupdate_los
-  if (not lastup_los)or
-     ((thisGameFrame-lastup_los > 16)and(not allied))
+  local lastup_los = self._lastupdate_los or (thisGameFrame - 16)
+  if
+    (not self._lastupdate_los) or
+    ((thisGameFrame - lastup_los > 16)and(not allied))
   then
     self._lastupdate_los = thisGameFrame
 
     local startPos = self.pos
     local endPos   = self.targetpos
 
-    if (not startPos) or (not endPos) then
+    if (not endPos) then
       --//this just happens when the target feature/unit was already dead when the fx was created
       self._dead = true
       RemoveParticles(self.id)

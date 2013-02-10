@@ -294,7 +294,7 @@ end
 
 --// saves all particles
 particles = {}
-local particles = particles 
+local particles = particles
 local particlesCount = 0
 
 local RenderSequence = {}  --// mult-dim table with: [layer][partClass][unitID][fx]
@@ -696,99 +696,76 @@ local function IsPosInLos(x,y,z)
   return (inLos)
 end
 
+local function IsUnitFXVisible(fx)
+	local unitActive = true
+	if fx.onActive then
+		unitActive = spGetUnitIsActive(unitID)
+		if (unitActive == nil) then
+			unitActive = true
+		end
+	end
+
+	if (not fx.onActive)or(unitActive) then
+		if fx.alwaysVisible then
+			return true
+		elseif (fx.Visible) then
+			return fx:Visible()
+		else
+			local unitRadius = (spGetUnitRadius(unitID) + 40)
+			local r = fx.radius or 0
+			return Spring.IsUnitVisible(unitID, unitRadius + r)
+		end
+	else
+		return fx.alwaysVisible
+	end
+end
+
+
+local function IsWorldFXVisible(fx)
+	if fx.alwaysVisible then
+		return true
+	elseif (fx.Visible) then
+		return fx:Visible()
+	elseif (fx.pos) then
+		local pos = fx.pos
+		if (IsPosInLos(pos[1],pos[2],pos[3]))and
+			(spIsSphereInView(pos[1],pos[2],pos[3],(fx.radius or 200)+100))
+		then
+			return true
+		end
+	end
+end
+
+
 local function CreateVisibleFxList()
   local removeFX = {}
   local removeCnt = 1
 
-  for layerID,layer in pairs(RenderSequence) do
-    for partClass,Units in pairs(layer) do
-      for unitID,UnitEffects in pairs(Units) do
-        if (unitID>-1) then
-          local x,y,z      = spGetUnitViewPosition(unitID)
-          if x and y and z then
-            local unitActive = -1
-            
-            local unitRadius = 0
-            local maxVisibleRadius = -1
-            local minNotVisibleRadius = 1e9
-            
-            --// check effects
-            for i=1,#UnitEffects do
-              local fx = UnitEffects[i]
-            
-              if (fx.onActive and (unitActive == -1)) then
-                unitActive = spGetUnitIsActive(unitID)
-                if (unitActive == nil) then
-                  unitActive = true
-                end
-              end
-            
-              if (not fx.onActive)or(unitActive) then
-			    if fx.alwaysVisible then
-			  	  fx.visible = true
-                elseif (fx.Visible) then
-                  fx.visible = fx:Visible()
-                else
-                  unitRadius = unitRadius or (spGetUnitRadius(unitID) + 40)
-            
-                  local r = fx.radius or 0
-                  if (r > maxVisibleRadius)and(r < minNotVisibleRadius) then
-                    if spIsSphereInView(x,y,z,unitRadius + r) then
-                      maxVisibleRadius = r
-                    else
-                      minNotVisibleRadius = r
-                    end
-                  end
-            
-                  fx.visible = (r <= maxVisibleRadius)
-                end
-            
-                if (fx.visible) then
-                  if (not anyFXVisible) then anyFXVisible = true end
-                  anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
-                end
-              else
-                fx.visible = fx.alwaysVisible
-			    if (not anyFXVisible) then anyFXVisible = fx.alwaysVisible end
-              end
-            end
-          end
-        else
+  local foo = 0
+  for _,fx in pairs(particles) do
+	foo = foo + 1
+	if (fx.unit > -1) then
+		fx.visible = IsUnitFXVisible(fx)
+		if (fx.visible) then
+			if (not anyFXVisible) then anyFXVisible = true end
+			if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+		end
+	else
+		fx.visible = IsWorldFXVisible(fx)
+		if (fx.visible) then
+			if (not anyFXVisible) then anyFXVisible = true end
+			if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+		elseif (fx.Valid and (not fx:Valid())) then
+			removeFX[removeCnt] = fx.id
+			removeCnt = removeCnt + 1
+		end
+	end
+  end
+  Spring.Echo("Lups fx cnt", foo)
 
-          for i=1,#UnitEffects do
-            local fx = UnitEffects[i]
-            fx.visible = fx.alwaysVisible
-
-			if fx.alwaysVisible then
-				if (not anyFXVisible) then anyFXVisible = true end
-                anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
-            elseif (fx.Visible) then
-              if (fx:Visible()) then
-                fx.visible = true
-                if (not anyFXVisible) then anyFXVisible = true end
-                anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
-              end
-            elseif (fx.pos) then
-              local pos = fx.pos
-              if (IsPosInLos(pos[1],pos[2],pos[3]))and
-                 (spIsSphereInView(pos[1],pos[2],pos[3],(fx.radius or 200)+100))
-              then
-                fx.visible = true
-                if (not anyFXVisible) then anyFXVisible = true end
-                anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
-              end
-            end
-
-            if (not fx.visible)and(fx.Valid and (not fx:Valid())) then
-              removeFX[removeCnt] = fx.id
-              removeCnt = removeCnt + 1
-            end
-          end
-
-        end --if
-      end --for
-    end --for
-  end --for
+  for i=1,removeCnt-1 do
+    RemoveParticles(removeFX[i])
+  end
 end
 
 --------------------------------------------------------------------------------
