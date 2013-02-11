@@ -431,11 +431,12 @@ end
 --
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.turnrate > 700 then
-		ud.turninplace = 0
+		ud.turninplace = false
 		ud.turninplacespeedlimit = (ud.maxvelocity or 0)
 	else
-		ud.turninplace = 1
-		ud.turninplaceanglelimit = 140
+		ud.turninplace = false	-- true
+		ud.turninplacespeedlimit = (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
+		--ud.turninplaceanglelimit = 180
 	end
  
 
