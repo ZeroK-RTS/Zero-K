@@ -745,7 +745,7 @@ local function CreateVisibleFxList()
   local foo = 0
   for _,fx in pairs(particles) do
 	foo = foo + 1
-	if (fx.unit > -1) then
+	if ((fx.unit or 0) > -1) then
 		fx.visible = IsUnitFXVisible(fx)
 		if (fx.visible) then
 			if (not anyFXVisible) then anyFXVisible = true end
