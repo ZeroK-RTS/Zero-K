@@ -19,7 +19,6 @@ unitDef = {
 
   customParams           = {
     helptext       = [[The Racketeer launches long range EMP missiles that can stun key enemy defenses before assaulting them. Since its missiles do not track or even lead, it is only useful against enemy units that are standing still. Only one Racketeer is needed to keep a target stunned, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields.]],
-
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -78,7 +77,7 @@ unitDef = {
 
 
   weaponDefs             = {
-	EMP_ROCKET = {
+    EMP_ROCKET = {
       name                    = [[EMP Cruise Missile]],
       areaOfEffect            = 96,
       cegTag                  = [[emptrail]],
@@ -92,6 +91,7 @@ unitDef = {
         empresistant99 = 15,
         planes         = 1500,
       },
+      
 
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
@@ -100,22 +100,18 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
-      lineOfSight             = true,
       metalpershot            = 0,
       model                   = [[wep_merl.s3o]],
-      noautorange             = [[1]],
       noSelfDamage            = true,
-	  paralyzer               = true,
+      paralyzer               = true,
       paralyzeTime            = 8,
       range                   = 940,
       reloadtime              = 5,
-      renderType              = 1,
-      selfprop                = true,
-      smokedelay              = [[0.1]],
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_emp_hit]],
       soundStart              = [[weapon/missile/missile_launch_high]],
       startsmoke              = [[1]],
+      texture1                = [[null]], --flare
       tolerance               = 4000,
       weaponAcceleration      = 300,
       weaponTimer             = 1.6,

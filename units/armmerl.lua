@@ -96,17 +96,15 @@ unitDef = {
         planes  = 800,
         subs    = 4,
       },
-	  --Want to remove engine's FX and rely on CEG??? NOTE: issues with CEG: http://springrts.com/mantis/view.php?id=3401 (invisible CEGs can block all visible CEGs if MaxParticles is low. Not cool...)
-      --[[
+      
+      --Want to remove engine's FX and rely on CEG??? NOTE: issues with CEG: http://springrts.com/mantis/view.php?id=3401 (invisible CEGs can block all visible CEGs if MaxParticles is low. Not cool...)
       customParams = {
-		trail_burnout = 64, -- two seconds of vertical ascension
-		trail_burnout_ceg = [[missiletrailredsmall]],
+		--trail_burnout = 64, -- two seconds of vertical ascension
+		--trail_burnout_ceg = [[missiletrailredsmall]],
       },
-	  texture1=[[null]], --flare, reference: http://springrts.com/wiki/Weapon_Variables#Texture_Tags
-      texture2=[[null]], --smoketrail
-      texture3=[[null]], --flame
-      texture4=[[null]],
-	  --]]
+      texture1=[[null]], --flare, reference: http://springrts.com/wiki/Weapon_Variables#Texture_Tags
+      --texture2=[[null]], --smoketrail
+      --texture3=[[null]], --flame
 	  
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:DOT_Merl_Explo]],
