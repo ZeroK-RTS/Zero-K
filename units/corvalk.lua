@@ -2,7 +2,7 @@ unitDef = {
   unitname            = [[corvalk]],
   name                = [[Valkyrie]],
   description         = [[Air Transport]],
-  acceleration        = 0.12,
+  acceleration        = 0.15,
   amphibious          = true,
   brakeRate           = 7.5,
   buildCostEnergy     = 80,
@@ -73,7 +73,7 @@ unitDef = {
   transportSize       = 4,
   turninplace         = 0,
   turnRate            = 550,
-  verticalSpeed       = 12,
+  verticalSpeed       = 30,
 
   featureDefs         = {
 

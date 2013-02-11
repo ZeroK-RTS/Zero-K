@@ -28,13 +28,17 @@ local spGetUnitStates = Spring.GetUnitStates
 local CMD_IDLEMODE = CMD.IDLEMODE
 local CMD_REPEAT = CMD.REPEAT
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+
+--local BALLISTIC_GUNSHIP_GRAVITY = -0.2
+--local BALLISTIC_GUNSHIP_HEIGHT = 600000
+
 --local spAreTeamsAllied = Spring.AreTeamsAllied
 
-local GUNSHIP_VERTICAL_MULT = 0.5 -- prevents rediculus gunship climb
+local GUNSHIP_VERTICAL_MULT = 0.25 -- prevents rediculus gunship climb
 
 local impulseMult = {
 	[0] = 0.022, -- fixedwing
-	[1] = 0.0054, -- gunships
+	[1] = 0.004, -- gunships
 	[2] = 0.0032, -- other
 }
 local impulseWeaponID = {}
@@ -78,6 +82,81 @@ local unit = {}
 local transportMass = {}
 local inTransport = {}
 
+--local risingByID = {count = 0, data = {}}
+--local rising = {}
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- General Functionss
+
+local function AddGadgetImpulse(unitID, unitDefID, x, y, z, moveType) -- could be GG if needed.
+	moveType = moveType or moveTypeByID[unitDefID]
+	if not unit[unitID] then
+		unit[unitID] = {
+			moveType = moveType,
+			x = x, y = y, z = z
+		}
+		unitByID.count = unitByID.count + 1
+		unitByID.data[unitByID.count] = unitID
+	else
+		unit[unitID].x = unit[unitID].x + x
+		unit[unitID].y = unit[unitID].y + y
+		unit[unitID].z = unit[unitID].z + z
+	end
+	thereIsStuffToDo = true
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Space Gunship Handling
+--[[
+local function CheckSpaceGunships(f)
+	local i = 1
+	while i <= risingByID.count do
+		local unitID = risingByID.data[i]
+		local data = rising[unitID]
+		local removeEntry = false
+		
+		if Spring.ValidUnitID(unitID) then
+		
+			local _,_,_, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
+			local groundHeight = Spring.GetGroundHeight(ux,uz)
+			
+			if (uy-groundHeight) > BALLISTIC_GUNSHIP_HEIGHT then
+				if not data.inSpace then
+					--Spring.SetUnitRulesParam(unitID, "inSpace", 1)
+					GG.attUnits[unitID] = true
+					GG.UpdateUnitAttributes(unitID)
+					data.inSpace = true
+				end
+				AddGadgetImpulse(unitID, 0, 0, BALLISTIC_GUNSHIP_GRAVITY, 0, 1)
+			else
+				if data.inSpace then
+					--Spring.SetUnitRulesParam(unitID, "inSpace", 0)
+					GG.attUnits[unitID] = true
+					GG.UpdateUnitAttributes(unitID)
+					data.inSpace = false
+				end
+				local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+				if vy < 0 then
+					removeEntry = true
+				end
+			end
+		else
+			removeEntry = false
+		end
+		
+		if removeEntry then
+			risingByID.data[i] = risingByID.data[risingByID.count]
+			risingByID.data[risingByID.count] = nil
+			risingByID.count = risingByID.count - 1
+			rising[unitID] = nil
+		else
+			i = i + 1
+		end
+	end
+end
+--]]
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Transport Handling
@@ -135,6 +214,7 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Main Impulse Handling
 
 local function distance(x1,y1,z1,x2,y2,z2)
 	return math.sqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2)
@@ -170,24 +250,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(8*myMass), (uz-az)*mag
 		end
 		
-		if not unit[unitID] then
-			unit[unitID] = {
-				moveType = moveTypeByID[unitDefID],
-				x = x, y = y, z = z
-			}
-			unitByID.count = unitByID.count + 1
-			unitByID.data[unitByID.count] = unitID
-		else
-			unit[unitID].x = unit[unitID].x + x
-			unit[unitID].y = unit[unitID].y + y
-			unit[unitID].z = unit[unitID].z + z
-		end
+		AddGadgetImpulse(unitID, unitDefID, x, y, z)
 		
 		--if moveTypeByID[unitDefID] == 1 and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam) then
 		--	unit[unitID].allied	= true
 		--end
-		
-		thereIsStuffToDo = true
 		
 		if impulseWeaponID[weaponDefID].normalDamage then
 			return damage
@@ -198,7 +265,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	return damage
 end
 
-function gadget:GameFrame(f)
+local function AddImpulses()
 	if thereIsStuffToDo then
 		for i = 1, unitByID.count do
 			local unitID = unitByID.data[i]
@@ -213,6 +280,13 @@ function gadget:GameFrame(f)
 						spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
 					end
 				--end
+				--[[
+				if vy + data.y > 0 and not rising[unitID] then
+					rising[unitID] = {inSpace = false}
+					risingByID.count = risingByID.count + 1
+					risingByID.data[risingByID.count] = unitID
+				end
+				--]]
 			else
 				Spring.AddUnitImpulse(unitID, 1,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
 				Spring.AddUnitImpulse(unitID, -1,0,0) --remove dummy impulse
@@ -224,4 +298,13 @@ function gadget:GameFrame(f)
 		unit = {}
 		thereIsStuffToDo = false
 	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Game Frame
+
+function gadget:GameFrame(f)
+	--CheckSpaceGunships()
+	AddImpulses()
 end
