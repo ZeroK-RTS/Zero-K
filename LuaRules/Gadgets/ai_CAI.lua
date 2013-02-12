@@ -1372,7 +1372,9 @@ local function setUnitPosting(team, unitID)
 	
 end
 
-local function getPositionTowardsMiddle(unitID, range)
+local function getPositionTowardsMiddle(unitID, range, inc, count)
+	
+	count = count or 4
 	
 	local x,y,z = spGetUnitPosition(unitID)
 	local vectorX = mapWidth*0.5 - x
@@ -1383,8 +1385,14 @@ local function getPositionTowardsMiddle(unitID, range)
 		vectorMag = 1
 	end
 	vectorMag = 1/vectorMag
+	local i = 1
 	while spTestBuildOrder(waypointTester, x + vectorX*range*vectorMag, 0, z + vectorZ*range*vectorMag, 1) == 0 do
-		range = range + 25
+		Spring.MarkerAddPoint(x + vectorX*range*vectorMag, 0, z + vectorZ*range*vectorMag,"test")
+		range = range + inc
+		i = i + 1
+		if i > count then
+			break
+		end
 	end
 	
 	return x + vectorX*range*vectorMag, y, z + vectorZ*range*vectorMag 
@@ -3137,9 +3145,9 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					ud = ud, x = x, y = y, z = z, cost = ud.metalCost, onDefenceHeatmap = not built}
 			elseif ud.isFactory then -- factory
 				local x,y,z = spGetUnitPosition(unitID)
-				local mx,my,mz = getPositionTowardsMiddle(unitID, 500)
-				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250)
-				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250)
+				local mx,my,mz = getPositionTowardsMiddle(unitID, 500, 25)
+				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
+				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250, -25)
 				if not built then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1,1)
 				end
@@ -3276,7 +3284,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 			units.mex.count = units.mex.count + 1
 			units.mexByID[unitID] = true
 		elseif ud.isFactory then -- factory
-			local mx,my,mz = getPositionTowardsMiddle(unitID, 450)
+			local mx,my,mz = getPositionTowardsMiddle(unitID, 450, 25)
 			units.factoryByID[unitID] = {wayX = mx, wayY = my, wayZ = mz}
 			--mapEcho(unitID,"factory added")
 		elseif ud.buildSpeed > 0 then
