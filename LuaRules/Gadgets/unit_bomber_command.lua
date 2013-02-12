@@ -242,7 +242,7 @@ local function RequestRearm(unitID, team, forceNow)
 	team = team or spGetUnitTeam(unitID)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		if health > maxHealth - 1 then
+		if health and maxHealth and health > maxHealth - 1 then
 			return
 		end
 	end
