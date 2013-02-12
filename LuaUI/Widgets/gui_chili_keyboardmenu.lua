@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.010 Chili Keyboard Menu",
+    desc      = "v0.011 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -68,7 +68,6 @@ local curCommands = {}
 local selectedUnits = {}
 
 --radial build menu
-local CMD_RADIALBUILDMENU = 10002
 local advance_builder = false
 local builder_types = {}
 local builder_types_i = {}
@@ -134,6 +133,7 @@ options_order = {
 	'uikey6',
 	
 	'qwertz',
+	'showRemainingCommands',
 }
 options = {
 
@@ -148,6 +148,13 @@ options = {
 		value = false,
 	},
 	
+	showRemainingCommands = {
+		name = 'Show Remaining Commands',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		path = 'Settings/Interface/KB Menu',
+	},
 
 	--selectkey options
 	lbl_main = { type = 'label', name = 'By Total' },
@@ -263,6 +270,12 @@ local function CapCase(str)
 		function(x) return (' ' .. x):upper(); end
 		)
 	return str
+end
+
+local function BuildPrev()
+	if last_cmdid then
+		Spring.SetActiveCommand(last_cmdid)
+	end
 end
 
 local function AddHotkeyOptions()
@@ -711,12 +724,22 @@ local function AddCustomCommands(selectedUnits)
 				params  = { }, 
 				--texture = 'LuaUI/Images/commands/Bold/retreat.png',
 		
-				pos = {CMD_MOVE_STATE,CMD_FIRE_STATE, }, 
+				pos = {CMD.MOVE_STATE,CMD.FIRE_STATE, }, 
 			})
-	
+			table.insert(widgetHandler.customCommands, {
+				id      = CMD_BUILDPREV,
+				name	= 'Build Previous',
+				type    = CMDTYPE.ICON,
+				tooltip = 'Build the previous structure.',
+				cursor  = 'Repair',
+				action  = 'buildprev',
+				params  = { }, 
+				pos = {CMD.MOVE_STATE,CMD.FIRE_STATE, }, 
+			})
 		end
 	end
 end
+
 
 
 local function SetupTabs()
@@ -900,7 +923,7 @@ end
 
 local function SetupCommands( modifier )
 
-	--AddCustomCommands(selectedUnits)
+	--AddCustomCommands(Spring.GetSelectedUnits())
 	BuildMode(false)
 	
     local commands = widgetHandler.commands
@@ -935,7 +958,9 @@ local function SetupCommands( modifier )
 	local unboundKeys = table.concat( keyRows )
 	local unboundKeyList = explode( '', unboundKeys )
 	local unboundKeyIndex = 1
-		
+	
+	local ignore = {}
+	
 	for i, cmd in ipairs( curCommands ) do
 		local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 		
@@ -956,6 +981,7 @@ local function SetupCommands( modifier )
 		
 		if modifier == '' and cmd.id == CMD_RADIALBUILDMENU then
 			AddBuildButton()
+			ignore['D'] = true
 		elseif hotkey_mod == modifier and key_buttons[hotkey_key] then
 			local override = overrides[cmd.id]  -- command overrides
 			local texture = override and override.texture or cmd.texture
@@ -978,10 +1004,13 @@ local function SetupCommands( modifier )
 				hotkey = 'Morph'
 			end
 			UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+			ignore[hotkey_key] = true
 		end
 		commandButtons[cmd.id] = key_buttons[hotkey_key]
 		
 	end
+	
+	
 	for i, selection in ipairs(selections) do
 		local option = options[selection]
 		local hotkey = WG.crude.GetHotkey(option.action) or ''
@@ -990,6 +1019,29 @@ local function SetupCommands( modifier )
 			local override = overrides[selection]  -- command overrides
 			local texture = override and override.texture
 			UpdateButton( hotkey_key, hotkey, option.name, function() Spring.SendCommands(option.action) end, option.tooltip, texture )
+			ignore[hotkey_key] = true
+		end
+	end
+	
+	--testing
+	if options.showRemainingCommands.value then
+		for hotkey_key, _ in pairs(key_buttons) do
+			local actions
+			if( modifier == '' or modifier == 'unbound' ) then
+				actions = Spring.GetKeyBindings(hotkey_key)
+			else
+				actions = Spring.GetKeyBindings(modifier .. '+' .. hotkey_key)
+			end
+			if not ignore[hotkey_key] and actions and #actions > 0 then
+				for i,v in ipairs(actions) do
+					for actionCmd, actionExtra in pairs(v) do
+						local label = actionCmd
+						local hotkey = actionCmd and WG.crude.GetHotkey(actionCmd) or ''
+						local hotkey = hotkey_key
+						UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( actionCmd ); end, '> ' .. label .. ' ' .. actionExtra, nil, black_table )
+					end
+				end
+			end
 		end
 	end
 	
@@ -1057,6 +1109,11 @@ function widget:Initialize()
 	if not customKeyBind then
 		Spring.SendCommands("bind d radialbuildmenu")
 	end
+	
+	widgetHandler:AddAction("buildprev", BuildPrev, nil, "t")
+	if not customKeyBind then
+		--Spring.SendCommands("bind d buildprev")
+	end
 end 
 
 function widget:Shutdown()
@@ -1066,6 +1123,12 @@ function widget:Shutdown()
 		Spring.SendCommands("unbind d radialbuildmenu")
 	end
 	widgetHandler:RemoveAction("radialbuildmenu")
+	
+	if not customKeyBind then
+		--Spring.SendCommands("unbind d buildprev")
+	end
+	widgetHandler:RemoveAction("buildprev")
+	
 end
 
 function widget:KeyPress(key, modifier)
@@ -1183,6 +1246,9 @@ end
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_RADIALBUILDMENU then
 		MakeBuildMenu()
+		return true
+	elseif cmdID == CMD_BUILDPREV then
+		BuildPrev()
 		return true
 	elseif cmdID < 0 then
 		UpdateButtons()

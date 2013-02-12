@@ -309,6 +309,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	setferry=1, 
 	radialmenu=1,
 	placebeacon=1,
+	buildprev=1,
 	
 	-- terraform
 	rampground=1,
