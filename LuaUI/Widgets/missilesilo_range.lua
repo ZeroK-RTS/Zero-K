@@ -187,10 +187,7 @@ local function DrawActiveCommandRangesMinimap()
 			
 	end
 	
-	glLineStipple(false)
-	glLineWidth(1)
-	glColor(1, 1, 1, 1)
-	
+	glPopMatrix()
 end
 
 
