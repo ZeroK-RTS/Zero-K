@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.102 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.106 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16", --2013-02-10
+    date      = "2011-03-16", --2013-02-12 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -65,6 +65,8 @@ options_order = {
 	'trackmode',
 	'persistenttrackmode',
 	'thirdpersontrack',
+	'thirdpersonedgescroll',
+	--'persistentthirdpersontrackmode',
 	'resetcam',
 	
 	'enableCycleView',
@@ -278,17 +280,31 @@ options = {
 		name = "Enter 3rd Person Trackmode",
 		desc = "Track the selected unit (midclick to cancel)",
 		type = 'button',
+		hotkey = {key='k', mod='alt+'},
 		OnChange = function(self)
 			local selUnits = Spring.GetSelectedUnits()
-			if selUnits and selUnits[1] then --check for unit first before changing into FPS mode
+			if selUnits and selUnits[1] and thirdperson_trackunit ~= selUnits[1] then --check if 3rd Person into same unit or if there's any unit at all
 				Spring.SendCommands('viewfps')
 				Spring.SendCommands('track')
 				thirdperson_trackunit = selUnits[1]
+				local cs = Spring.GetCameraState()
+				cs.px,cs.py,cs.pz =Spring.GetUnitPosition(selUnits[1]) --place FPS camera on the ground (prevent out of LOD case)
+				cs.py = cs.py + 25
+				Spring.SetCameraState(cs,0)
+			else
+				Spring.SendCommands('trackoff')
+				Spring.SendCommands('viewfree')
+				thirdperson_trackunit = false
 			end
         end,
 	},
     
-    
+ 	thirdpersonedgescroll = {
+		name = "3rd Person Edge Scroll",
+		desc = "Use edge screen & arrow key to jump to nearby unit.",
+		type = 'bool',
+		value = true,
+	},
 	resetcam = {
 		name = "Reset Camera",
 		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Shift> + <Middleclick>",
@@ -356,6 +372,8 @@ local spTraceScreenRay		= Spring.TraceScreenRay
 local spWarpMouse			= Spring.WarpMouse
 local spGetCameraDirection	= Spring.GetCameraDirection
 local spSetCameraTarget		= Spring.SetCameraTarget
+local spGetTimer 			= Spring.GetTimer
+local spDiffTimers 			= Spring.DiffTimers
 
 local abs	= math.abs
 local min 	= math.min
@@ -370,10 +388,10 @@ local helpText = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local ls_x, ls_y, ls_z
-local ls_dist, ls_have, ls_onmap
+local ls_x, ls_y, ls_z --lockspot position
+local ls_dist, ls_have, ls_onmap --lockspot flag
 local tilting
-local overview_mode, last_rx, last_ls_dist
+local overview_mode, last_rx, last_ls_dist --overview_mode's variable
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -428,8 +446,11 @@ local averageEdgeHeight = (spGetGroundHeight(mwidth/2,0) + spGetGroundHeight(0,m
 local mcx, mcz 	= mwidth / 2, mheight / 2
 local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(mheight, mwidth) * 2
-
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
+local last_move = spGetTimer() --switch for reset lockspot for edgescroll
+local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trackmode edge screen scroll"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -539,7 +560,7 @@ local function VirtTraceRay(x,y, cs)
 end
 
 local function SetLockSpot2(cs, x, y) --set an anchor on the ground for camera rotation 
-	if ls_have then
+	if ls_have then --if lockspot is locked
 		return
 	end
 	
@@ -571,7 +592,7 @@ local function UpdateCam(cs)
 	end
 	
 	local alt = sin(cs.rx) * ls_dist
-	local opp = cos(cs.rx) * ls_dist --OR: sqrt(ls_dist * ls_dist - alt * alt)
+	local opp = cos(cs.rx) * ls_dist --OR same as: sqrt(ls_dist * ls_dist - alt * alt)
 	cs.px = ls_x - sin(cs.ry) * opp
 	cs.py = ls_y - alt
 	cs.pz = ls_z - cos(cs.ry) * opp
@@ -650,15 +671,15 @@ local function Zoom(zoomin, shift, forceCenter)
 		
 	end
 	--]]
-	ls_have = false
-	SetLockSpot2(cs)
+	ls_have = false --unlock lockspot 
+	SetLockSpot2(cs) --set lockspot
 	if not ls_have then
 		return
 	end
     
-	if zoomin and not ls_onmap then --do "return" to prevent zooming into null area (outside map)
-		--return
-	end
+	-- if zoomin and not ls_onmap then --prevent zooming into null area (outside map)
+		-- return
+	-- end
     
 	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
 	
@@ -727,18 +748,19 @@ OverviewAction = function()
 		cs.pz = Game.mapSizeZ/2
 		cs.rx = -HALFPI
 		spSetCameraState(cs, 1)
-	else
+	else --if in overview mode
+		local cs = spGetCameraState()
 		mx, my = spGetMouseState()
-		local onmap, gx, gy, gz = VirtTraceRay(mx,my)
-		if gx and onmap then
+		local onmap, gx, gy, gz = VirtTraceRay(mx,my,cs) --create a lockstop point.
+		if gx then --Note:  Now VirtTraceRay can extrapolate coordinate in null space (no need to check for onmap)
 			local cs = spGetCameraState()			
 			cs.rx = last_rx
 			ls_dist = last_ls_dist 
 			ls_x = gx
 			ls_z = gz
-			ls_y = spGetGroundHeight(ls_x, ls_z)
+			ls_y = gy
 			ls_have = true
-			local cstemp = UpdateCam(cs)
+			local cstemp = UpdateCam(cs) --set camera position & orientation based on lockstop point
 			if cstemp then cs = cstemp; end
 			spSetCameraState(cs, 1)
 		end
@@ -788,6 +810,63 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
 	end
 end
 
+local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump between unit by edge scrolling (by msafwan)
+	local initRadius = 50
+	--local camVecs = spGetCameraVectors()
+	local isSpec = Spring.GetSpectatingState()
+	local teamID = (not isSpec and Spring.GetMyTeamID()) --get teamID if not spec
+	local foundUnit
+	local forwardOffset,backwardOffset,leftOffset,rightOffset
+	if move.right or rot.right then --content of move & rot table is set in Update() and in KeyPress(). Is global. Is used to start scrolling & rotation (initiated in Update()) 
+		rightOffset =initRadius
+	elseif move.up or rot.up then
+		forwardOffset = initRadius
+	elseif move.left or rot.left then
+		leftOffset =initRadius
+	elseif move.down or rot.down then
+		backwardOffset = initRadius
+	end
+	for i=1, 5 do --create a (detection) sphere of increasing size (x5) in scroll direction
+		local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
+		local x,y,z = spGetUnitPosition(thirdperson_trackunit) 
+		y = y+25
+		local offX_temp = (forwardOffset and forwardOffset+25) or (backwardOffset and -backwardOffset-25) or 0 --set direction where sphere must grow in x,y,z (global) direction.
+		local offY_temp = 0
+		local offZ_temp = (rightOffset and rightOffset+25) or (leftOffset and -leftOffset-25) or 0
+		local offX = front[1]*offX_temp + top[1]*offY_temp + right[1]*offZ_temp --rotate (translate) the global right/left/forward/backward into a direction relative to current unit
+		local offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
+		local offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
+		local selUnits = Spring.GetUnitsInSphere(x+offX,y+offY,z+offZ, initRadius,teamID) --create sphere that detect unit in area of this direction
+		Spring.SelectUnitArray({selUnits[1]}) --test select unit (in case its not selectable)
+		selUnits = spGetSelectedUnits()
+		if selUnits and selUnits[1] then --find unit in that area
+			foundUnit = selUnits[1]
+			break
+		end
+		if forwardOffset then --increase distance of detection sphere away into selected direction
+			forwardOffset =forwardOffset*2
+		elseif backwardOffset then
+			backwardOffset =backwardOffset*2
+		elseif leftOffset then
+			leftOffset =leftOffset*2
+		elseif rightOffset then
+			rightOffset =rightOffset*2
+		end
+		initRadius =initRadius*2 --increase size of detection sphere
+	end
+	if not foundUnit then --if no unit in the area: use current unit (as target)
+		foundUnit = thirdperson_trackunit
+		Spring.Echo("COFC: no unit in that direction to jump to!")
+	end
+	Spring.SelectUnitArray({foundUnit}) --give selection order to player
+	spSendCommands('viewfps')
+	spSendCommands('track')
+	thirdperson_trackunit = foundUnit --remember current unitID
+	cs.px,cs.py,cs.pz=spGetUnitPosition(foundUnit) --move FPS camera to ground level (prevent out of LOD problem where unit turn into icons)
+	cs.py = cs.py+25
+	spSetCameraState(cs,0)
+	thirdPerson_transit = spGetTimer() --block access to edge scroll until camera focus on unit
+end
 
 local function Tilt(s, dir)
 	if not tilting then
@@ -821,7 +900,7 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	-- forward, up, right, top, bottom, left, right
 	local camVecs = spGetCameraVectors()
 	local cf = camVecs.forward
-	local len = sqrt((cf[1] * cf[1]) + (cf[3] * cf[3]))
+	local len = sqrt((cf[1] * cf[1]) + (cf[3] * cf[3])) --get hypotenus of x & z vector only
 	local dfx = cf[1] / len
 	local dfz = cf[3] / len
 	local cr = camVecs.right
@@ -927,7 +1006,10 @@ function widget:Update(dt)
 
 	local a,c,m,s = spGetModKeyState()
 	
-	if rot.right or rot.left or rot.up or rot.down then
+	if 	(not thirdperson_trackunit and  --block 3rd Person 
+		(rot.right or rot.left or rot.up or rot.down))
+		then
+		
 		local speed = options.rotfactor.value * (s and 400 or 150)
 		if rot.right then
 			RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true)
@@ -943,9 +1025,10 @@ function widget:Update(dt)
 		
 	end
 	
-	if smoothscroll
-		or move.right or move.left or move.up or move.down
-		or use_lockspringscroll
+	if (not thirdperson_trackunit and  --block 3rd Person 
+		(smoothscroll or
+		move.right or move.left or move.up or move.down or
+		use_lockspringscroll))
 		then
 		
 		local x, y, lmb, mmb, rmb = spGetMouseState()
@@ -976,7 +1059,7 @@ function widget:Update(dt)
 			mym = speed * (y - my) * dir
 			
 			spWarpMouse(cx, cy)		
-		else
+		else --edge screen scroll
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
 			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor, 1 )
 			
@@ -992,6 +1075,11 @@ function widget:Update(dt)
 				mym = -speed
 			end
 			smoothlevel = options.smoothness.value
+			
+			if spDiffTimers(spGetTimer(),last_move)>1 then --if edge scroll is 'first time': unlock lockspot once 
+				ls_have = false
+			end			
+			last_move = spGetTimer()
 		end
 		
 		ScrollCam(cs, mxm, mym, smoothlevel)
@@ -1001,12 +1089,12 @@ function widget:Update(dt)
 	mx, my = spGetMouseState()
 	
 	if options.edgemove.value then
-		if not movekey then
+		if not movekey then --if not doing arrow key on keyboard: reset
 			move = {}
 		end
 		
 		if mx > vsx-2 then 
-			move.right = true 
+			move.right = true
 		elseif mx < 2 then
 			move.left = true
 		end
@@ -1030,6 +1118,30 @@ function widget:Update(dt)
 		end
 	end
 	
+	if 	(thirdperson_trackunit and 
+		(move.right or move.left or move.up or move.down or
+		rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
+		then
+		
+		if options.thirdpersonedgescroll.value and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --edge scroll will 3rd Person nearby unit
+			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
+		else --not 3rdPerson-edge-Scroll: edge scroll won't effect tracking
+			local selUnits = spGetSelectedUnits()
+			if selUnits and selUnits[1] then -- re-issue 3rd person for selected unit
+				spSendCommands('viewfps')
+				spSendCommands('track')
+				thirdperson_trackunit = selUnits[1]
+				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
+				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+				spSetCameraState(cs,0)
+			else --no unit selected: return to freeStyle camera
+				spSendCommands('trackoff')
+				spSendCommands('viewfree')
+				thirdperson_trackunit = false
+			end
+		end
+	end
+	
 	fpsmode = cs.name == "fps"
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
 		init = false
@@ -1045,10 +1157,15 @@ function widget:Update(dt)
 end
 
 function widget:MouseMove(x, y, dx, dy, button)
-    if fpsmode then return end
 	if rotate then
+		local smoothed
+		if rotate_transit then --if "rotateAtCursor" flag is True, then this will run 'once' to smoothen camera motion
+			if spDiffTimers(spGetTimer(),rotate_transit)<1 then --smooth camera for in-transit effect
+				smoothed = true
+			end
+		end
 		if abs(dx) > 0 or abs(dy) > 0 then
-			RotateCamera(x, y, dx, dy, false, ls_have)
+			RotateCamera(x, y, dx, dy, smoothed, ls_have)
 		end
 		
 		spWarpMouse(msx, msy)
@@ -1070,7 +1187,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 end
 
 
-function widget:MousePress(x, y, button)
+function widget:MousePress(x, y, button) --called once when pressed, not repeated
 	ls_have = false
 	--overview_mode = false
     --if fpsmode then return end
@@ -1086,9 +1203,9 @@ function widget:MousePress(x, y, button)
 	
 	local a,c,m,s = spGetModKeyState()
 	
-	Spring.SendCommands('trackoff')
+	spSendCommands('trackoff')
     spSendCommands('viewfree')
-	if not (options.persistenttrackmode.value and (c or a)) then --only check for Ctrl or Alt if using persistent trackmode, else: always execute.
+	if not (options.persistenttrackmode.value and (c or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
 		trackmode = false
 	end
 	thirdperson_trackunit = false
@@ -1122,14 +1239,15 @@ function widget:MousePress(x, y, button)
 	end
 	-- Rotate World --
 	if c then
-	
-		if options.targetmouse.value then
+		rotate_transit = nil
+		if options.targetmouse.value then --if "rotateAtCursor": trigger smoot in-transit effect
 			
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
 			if gx and onmap then
 				SetLockSpot2(cs,x,y)
 				
 				spSetCameraTarget(gx,gy,gz, 1)
+				rotate_transit = spGetTimer()
 			end
 		end
 		spWarpMouse(cx, cy)
@@ -1162,17 +1280,35 @@ function widget:MouseRelease(x, y, button)
 	end
 end
 
-function widget:MouseWheel(up, value)
+function widget:MouseWheel(wheelUp, value)
     if fpsmode then return end
 	local alt,ctrl,m,shift = spGetModKeyState()
 	
 	if ctrl then
-		return Tilt(shift, up and 1 or -1)
+		return Tilt(shift, wheelUp and 1 or -1)
 	elseif alt then
-		return Altitude(up, shift)
+		if overview_mode then --cancel overview_mode if Overview_mode + descending 
+			local zoomin = not wheelUp
+			if options.invertalt.value then
+				zoomin = not zoomin
+			end
+			if zoomin then 
+				overview_mode = false
+			else return; end-- skip wheel if Overview_mode + ascending
+		end
+		return Altitude(wheelUp, shift)
 	end
 	
-	return Zoom(not up, shift)
+	if overview_mode then --cancel overview_mode if Overview_mode + ZOOM-in
+		local zoomin = not wheelUp
+		if options.invertzoom.value then
+			zoomin = not zoomin
+		end
+		if zoomin then
+			overview_mode = false
+		else return; end --skip wheel if Overview_mode + ZOOM-out
+	end
+	return Zoom(not wheelUp, shift)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
@@ -1184,6 +1320,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 	--ls_have = false
 	tilting = false
 	
+	if thirdperson_trackunit then  --move key for edge Scroll in 3rd person trackmode
+		if keys[key] and not (modifier.ctrl or modifier.alt) then
+			movekey = true
+			move[keys[key]] = true
+		end
+	end
 	if fpsmode then return end
 	if keys[key] then
 		if modifier.ctrl or modifier.alt then
@@ -1350,11 +1492,41 @@ function widget:TextCommand(command)
 	return false
 end   
 
-function widget:UnitDestroyed(unitID)
+function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other unit or exit to freeStyle view
 	if thirdperson_trackunit and thirdperson_trackunit == unitID then --return user to normal view if tracked unit is destroyed
-		spSendCommands('trackoff')
-		spSendCommands('viewfree')
-		thirdperson_trackunit = false
+		local isSpec = Spring.GetSpectatingState()
+		local attackerID= Spring.GetUnitLastAttacker(unitID)
+		if not isSpec then
+			spSendCommands('trackoff')
+			spSendCommands('viewfree')
+			thirdperson_trackunit = false
+			return
+		end
+		if Spring.ValidUnitID(attackerID) then --shift tracking toward attacker if it is alive (cinematic).
+			Spring.SelectUnitArray({attackerID})
+		end
+		local selUnits = spGetSelectedUnits()--test select unit
+		if not (selUnits and selUnits[1]) then --if can't select, then, check any unit in vicinity
+			local x,y,z = spGetUnitPosition(unitID)
+			local units = Spring.GetUnitsInCylinder(x,y,z, 100)
+			if units and units[1] then
+				Spring.SelectUnitArray({units[1]})
+			end
+		end
+		selUnits = spGetSelectedUnits()--test select unit
+		if selUnits and selUnits[1] then
+			spSendCommands('viewfps')
+			spSendCommands('track')
+			thirdperson_trackunit = attackerID
+			local cs = spGetCameraState()
+			cs.px,cs.py,cs.pz=spGetUnitPosition(attackerID)
+			cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+			spSetCameraState(cs,0)
+		else
+			spSendCommands('trackoff')
+			spSendCommands('viewfree')
+			thirdperson_trackunit = false
+		end
 	end
 end
 
@@ -1362,8 +1534,6 @@ end
 --Group Recall Fix--- (by msafwan, 9 Jan 2013)
 --Remake Spring's group recall to trigger ZK's custom Spring.SetCameraTarget (which work for freestyle camera mode).
 --------------------------------------------------------------------------------
-local spGetTimer = Spring.GetTimer 
-local spDiffTimers = Spring.DiffTimers
 local spGetUnitGroup = Spring.GetUnitGroup
 local spGetGroupList  = Spring.GetGroupList 
 
