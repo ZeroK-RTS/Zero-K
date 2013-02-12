@@ -1387,7 +1387,7 @@ local function getPositionTowardsMiddle(unitID, range, inc, count)
 	vectorMag = 1/vectorMag
 	local i = 1
 	while spTestBuildOrder(waypointTester, x + vectorX*range*vectorMag, 0, z + vectorZ*range*vectorMag, 1) == 0 do
-		Spring.MarkerAddPoint(x + vectorX*range*vectorMag, 0, z + vectorZ*range*vectorMag,"test")
+		--Spring.MarkerAddPoint(x + vectorX*range*vectorMag, 0, z + vectorZ*range*vectorMag,"test")
 		range = range + inc
 		i = i + 1
 		if i > count then
