@@ -129,8 +129,8 @@ unitDef = {
       burst                   = 15,
       burstrate               = 0.09,
       collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0,
+      craterMult              = 0,
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
