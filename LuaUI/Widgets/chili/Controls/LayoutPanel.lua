@@ -248,6 +248,9 @@ function LayoutPanel:_AutoArrangeOrdinate(freeSpace)
   local lineSizes = {}
   for i=1,#_lines do
     local first_cell_in_line = _cells[ _lines[i] ]
+    if not first_cell_in_line then
+      break
+    end
     if (self.orientation == "horizontal") then --FIXME
       lineSizes[i] = {i,first_cell_in_line[4]}
     else
