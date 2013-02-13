@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.106 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16", --2013-02-12 (msafwan)
+    date      = "2011-03-16", --2013-02-13 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -737,6 +737,10 @@ options.resetcam.OnChange = ResetCam
 
 OverviewAction = function()
 	if not overview_mode then
+		if thirdperson_trackunit then --exit 3rd person to show map overview
+			spSendCommands('trackoff')
+			spSendCommands('viewfree')
+		end
 		
 		local cs = spGetCameraState()
 		SetLockSpot2(cs)
@@ -763,6 +767,24 @@ OverviewAction = function()
 			local cstemp = UpdateCam(cs) --set camera position & orientation based on lockstop point
 			if cstemp then cs = cstemp; end
 			spSetCameraState(cs, 1)
+		end
+		
+		if thirdperson_trackunit then
+			local selUnits = spGetSelectedUnits() --player's new unit to track
+			if not (selUnits and selUnits[1]) then --if player has no new unit to track
+				Spring.SelectUnitArray({thirdperson_trackunit}) --select the original unit
+				selUnits = spGetSelectedUnits()
+			end
+			thirdperson_trackunit = false
+			if selUnits and selUnits[1] then 
+				spSendCommands('viewfps')
+				spSendCommands('track') -- re-issue 3rd person for selected unit
+				thirdperson_trackunit = selUnits[1]
+				local cs = spGetCameraState()	
+				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1]) --move camera to unit position so no "out of LOD" case
+				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+				spSetCameraState(cs,0)
+			end
 		end
 	end
 	
@@ -1119,6 +1141,7 @@ function widget:Update(dt)
 	end
 	
 	if 	(thirdperson_trackunit and 
+		not overview_mode and --block 3rd person scroll when in overview mode
 		(move.right or move.left or move.up or move.down or
 		rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
 		then
@@ -1507,8 +1530,8 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 		end
 		local selUnits = spGetSelectedUnits()--test select unit
 		if not (selUnits and selUnits[1]) then --if can't select, then, check any unit in vicinity
-			local x,y,z = spGetUnitPosition(unitID)
-			local units = Spring.GetUnitsInCylinder(x,y,z, 100)
+			local x,_,z = spGetUnitPosition(unitID)
+			local units = Spring.GetUnitsInCylinder(x,z, 100)
 			if units and units[1] then
 				Spring.SelectUnitArray({units[1]})
 			end
@@ -1517,9 +1540,9 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 		if selUnits and selUnits[1] then
 			spSendCommands('viewfps')
 			spSendCommands('track')
-			thirdperson_trackunit = attackerID
+			thirdperson_trackunit = selUnits[1]
 			local cs = spGetCameraState()
-			cs.px,cs.py,cs.pz=spGetUnitPosition(attackerID)
+			cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
 			cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 			spSetCameraState(cs,0)
 		else
