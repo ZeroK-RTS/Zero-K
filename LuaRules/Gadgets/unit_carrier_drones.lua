@@ -59,20 +59,29 @@ local droneList = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function InitCarrier(unitDefID, unitTeamID)
+local function InitCarrier(unitDefID, teamID)
 	local carrierData = carrierDefs[unitDefID]
-	return {unitDefID = unitDefID, teamID = unitTeamID, droneCount = 0, reload = carrierData.reloadTime, drones = {}}
+	local toReturn  = {unitDefID = unitDefID, teamID = teamID, droneSets = {}}
+	for i=1,#carrierData do
+		toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
+		toReturn.droneSets[i].reload = toReturn.droneSets[i].reloadTime
+		toReturn.droneSets[i].droneCount = 0
+		toReturn.droneSets[i].drones = {}
+		--Spring.Echo("new drone set",i)
+	end
+	return toReturn
 end
 
-local function NewDrone(unitID, unitDefID, droneName)
-	local x, y, z = GetUnitPosition(unitID)
+local function NewDrone(unitID, unitDefID, droneName, setNum)
+	local _, _, _, x, y, z = GetUnitPosition(unitID, true)
 	local angle = math.rad(random(1,360))
 	local xS = (x + (math.sin(angle) * 20))
 	local zS = (z + (math.cos(angle) * 20))
 	local droneID = CreateUnit(droneName,x,y,z,1,carrierList[unitID].teamID)
-	carrierList[unitID].reload = carrierDefs[unitDefID].reloadTime
-	carrierList[unitID].droneCount = (carrierList[unitID].droneCount + 1)
-	carrierList[unitID].drones[droneID] = true
+	local droneSet = carrierList[unitID].droneSets[setNum]
+	droneSet.reload = carrierDefs[unitDefID][setNum].reloadTime
+	droneSet.droneCount = droneSet.droneCount + 1
+	droneSet.drones[droneID] = true
 	
 	SetUnitPosition(droneID, xS, zS, true)
 	GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, {})
@@ -83,20 +92,26 @@ local function NewDrone(unitID, unitDefID, droneName)
 		
 	SetUnitNoSelect(droneID,true)
 	
-	droneList[droneID] = unitID
+	droneList[droneID] = {carrier = unitID, set = setNum}
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (carrierList[unitID]) then
-		for droneID in pairs(carrierList[unitID].drones) do
-			droneList[droneID] = nil
-			AddUnitDamage(droneID,1000)
+		local carrier = carrierList[unitID]
+		for i=1,#carrier.droneSets do
+			local set = carrier.droneSets[i]
+			for droneID in pairs(set.drones) do
+				droneList[droneID] = nil
+				AddUnitDamage(droneID,1000)
+			end
 		end
 		carrierList[unitID] = nil
 	elseif (droneList[unitID]) then
-		local i = droneList[unitID]
-		carrierList[i].droneCount = (carrierList[i].droneCount - 1)
-		carrierList[i].drones[unitID] = nil
+		local carrierID = droneList[unitID].carrier
+		local setID = droneList[unitID].set
+		local droneSet = carrierList[carrierID].droneSets[setID]
+		droneSet.droneCount = (droneSet.droneCount - 1)
+		droneSet.drones[unitID] = nil
 		droneList[unitID] = nil
 	end
 end
@@ -135,44 +150,50 @@ local function UpdateCarrierTarget(carrierID)
 		end
 		-- check range
 		local dist = GetDistance(ox,px,oz,pz)
-		if dist > carrierDefs[carrierList[carrierID].unitDefID].range then
-			return
-		end
 		
-		for droneID in pairs(carrierList[carrierID].drones) do
-			--[[
-			local cQueue = GetCommandQueue(droneID, 1)
-			local engaged = false
-			if cQueue and cQueue[1] and cQueue[1].id == CMD_ATTACK then
-				engaged = true
-			end
-			]]--
-			--if not engaged then
-				--Spring.Echo("Ordering drone " .. droneID .. " to attack")
-			droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-			GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
-			GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-			droneList[droneID] = carrierID
-			--end 
-		end
-	else
-		for droneID in pairs(carrierList[carrierID].drones) do
-			local cQueue = GetCommandQueue(droneID)
-			local engaged = false
-			for i=1, (cQueue and #cQueue or 0) do
-				if cQueue[i].id == CMD.FIGHT then
-					engaged = true
-					break
+		
+		for i=1,#carrierList[carrierID].droneSets do
+			local set = carrierList[carrierID].droneSets[i]
+			if dist < set.range then
+				for droneID in pairs(set.drones) do
+					--[[
+					local cQueue = GetCommandQueue(droneID, 1)
+					local engaged = false
+					if cQueue and cQueue[1] and cQueue[1].id == CMD_ATTACK then
+						engaged = true
+					end
+					]]--
+					--if not engaged then
+						--Spring.Echo("Ordering drone " .. droneID .. " to attack")
+					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
+					GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
+					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
+					droneList[droneID] = {carrier = carrierID, set = i}
+					--end
 				end
 			end
-			if not engaged then
-				local px,py,pz = GetUnitPosition(carrierID)
-				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-				GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
-				GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-				droneList[droneID] = carrierID
+		end
+	else
+		for i=1,#carrierList[carrierID].droneSets do
+			local set = carrierList[carrierID].droneSets[i]
+			for droneID in pairs(set.drones) do
+				local cQueue = GetCommandQueue(droneID)
+				local engaged = false
+				for i=1, (cQueue and #cQueue or 0) do
+					if cQueue[i].id == CMD.FIGHT then
+						engaged = true
+						break
+					end
+				end
+				if not engaged then
+					local px,py,pz = GetUnitPosition(carrierID)
+					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
+					GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
+					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
+					droneList[droneID] = {carrier = carrierID, set = i}
+				end
 			end
-		end	
+		end
 	end
 end
 
@@ -194,17 +215,21 @@ end
 
 function gadget:GameFrame(n)
 	if (((n+1) % 30) < 0.1) then
-		for i,_ in pairs(carrierList) do
-			local carrier = carrierList[i]
-			local carrierDef = carrierDefs[carrier.unitDefID]
-			if (carrier.reload > 0) then
-				carrier.reload = (carrier.reload - 1)
-			elseif (carrier.droneCount < carrierDef.maxDrones) then
-				for n=1,carrierDef.spawnSize do
-					if (carrier.droneCount >= carrierDef.maxDrones) then
-						break
+		for carrierID, carrier in pairs(carrierList) do
+			--Spring.Echo("alpha", carrierID)
+			for i=1,#carrier.droneSets do
+				--Spring.Echo("bravo", carrierID, i)
+				local carrierDef = carrierDefs[carrier.unitDefID][i]
+				local set = carrier.droneSets[i]
+				if (set.reload > 0) then
+					set.reload = (set.reload - 1)
+				elseif (set.droneCount < carrierDef.maxDrones) then
+					for n=1,carrierDef.spawnSize do
+						if (set.droneCount >= set.maxDrones) then
+							break
+						end
+						NewDrone(carrierID, carrier.unitDefID, carrierDef.drone, i ) 
 					end
-					NewDrone(i, carrier.unitDefID, carrierDef.drone) 
 				end
 			end
 		end

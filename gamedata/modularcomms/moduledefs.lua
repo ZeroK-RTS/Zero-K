@@ -417,7 +417,16 @@ upgrades = {
 		name = "Companion Drone",
 		description = "Spawns a pair of attack drones",
 		func = function(unitDef)
-				unitDef.customparams.drone_preset = "module_companion_drone"
+				unitDef.customparams.drones = unitDef.customparams.drones or {}
+				unitDef.customparams.drones[#unitDef.customparams.drones+1] = "module_companion_drone"
+			end,
+	},
+	module_battle_drone = {
+		name = "Battle Drone",
+		description = "Spawns an advanced combat drone",
+		func = function(unitDef)
+				unitDef.customparams.drones = unitDef.customparams.drones or {}
+				unitDef.customparams.drones[#unitDef.customparams.drones+1] = "module_battle_drone"
 			end,
 	},	
 	module_dmg_booster = {
