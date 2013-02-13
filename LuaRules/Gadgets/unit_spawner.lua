@@ -400,7 +400,6 @@ end
 -- Spawn Dynamics
 --
 
-
 local function IsPlayerUnitNear(x, z, r)
   for teamID in pairs(humanTeams) do   
     if (spGetUnitsInCylinder(x, z, r, teamID)[1]) then
@@ -430,8 +429,8 @@ local function SpawnEggs(x, y, z)
   for i=1, burrowEggs do
     local choice = choices[random(choisesN)]
     local rx, rz = random(-30, 30), random(-30, 30)
-	local eggID = Spring.CreateFeature(choice.."_egg", x+rx, y, z+rz, random(-32000, 32000))
-	--if (eggID and (not eggs)) then eggDecay[eggID] = spGetGameSeconds() + eggDecayTime end
+    local eggID = Spring.CreateFeature(choice.."_egg", x+rx, y, z+rz, random(-32000, 32000))
+    --if (eggID and (not eggs)) then eggDecay[eggID] = spGetGameSeconds() + eggDecayTime end
   end
 end
 
@@ -610,15 +609,15 @@ local function SpawnTurret(burrowID, turret, number, force)
     until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
     
     local unitID = spCreateUnit(turret, x, by, z, "n", chickenTeamID) -- FIXME
-	turretDef = UnitDefs[spGetUnitDefID(unitID)]
-	if turretDef.canMove then
-		local burrowTarget  = Spring.GetUnitNearestEnemy(burrowID, 20000, false)
-		if (burrowTarget) then
-			local tloc = ChooseTarget(burrowTarget)
-			spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
-		end
-	else
-		Spring.SetUnitBlocking(unitID, false)
+    turretDef = UnitDefs[spGetUnitDefID(unitID)]
+    if turretDef.canMove then
+      local burrowTarget  = Spring.GetUnitNearestEnemy(burrowID, 20000, false)
+      if (burrowTarget) then
+        local tloc = ChooseTarget(burrowTarget)
+        spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
+      end
+    else
+      Spring.SetUnitBlocking(unitID, false)
     end
   end
 end

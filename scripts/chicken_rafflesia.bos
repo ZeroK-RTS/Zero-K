@@ -1,0 +1,106 @@
+//Chicken K'Vart Script
+
+// This script is hereby released under GPL v. 2 or later by Wolfe Games, 2008
+// All contents were created by Wolfe Games.
+
+piece base, body, tentacles;
+piece rotator01;
+piece glow01;
+
+piece center, explode_point01, explode_point02, explode_point03, explode_point04, explode_point05, explode_point06, explode_point07, explode_point08;
+
+#define dirt3 1024+9
+
+static-var RandomPitch, amAttacking;
+
+
+twitch()
+{
+	while(TRUE)
+	{
+		turn body to x-axis <10> speed <10>;
+		wait-for-turn body around x-axis;
+		turn body to x-axis <-10> speed <10>;
+		wait-for-turn body around x-axis;	
+	}
+}
+
+spinMe()
+{
+	var randomWait, randomVal;
+	while(TRUE)
+	{
+		randomWait = rand(2000,6000);
+		
+		randomVal = rand(60,90);
+		move glow01 to x-axis [1]*randomVal speed [5];
+		randomVal = rand(20,45);
+		turn rotator01 to z-axis <1>*randomVal speed <5>;
+		
+		randomVal = rand(-35,35);
+		if (randomVal < 0 and randomVal > -15)
+		{
+			randomVal = -15;
+		}
+		if (randomVal > 0 and randomVal < 15)
+		{
+			randomVal = 15;
+		}		
+		spin rotator01 around y-axis speed <1>*randomVal;	
+
+		sleep randomWait;				
+	}
+}
+
+Create()
+{
+	amAttacking = 0;
+
+	var RandomTurn, RandomWay;
+	RandomTurn = rand(0,359);
+	turn base to y-axis <1>*RandomTurn now;	
+	
+	RandomTurn = rand(0,359);
+	turn tentacles to y-axis <1>*RandomTurn now;
+
+	RandomPitch = rand(5,20);
+	turn body to x-axis <1>*RandomPitch now;
+	
+	RandomWay = rand(45,85);	
+	move glow01 to x-axis [1]*RandomWay now;
+
+	//call-script lua_CreateLightMe(glow01, 0, 128, 255, 160);
+			
+	start-script twitch();
+	start-script spinMe();
+	//start-script glow();
+	//start-script RandomTarget();
+}
+
+AimFromWeapon1(piecenum)
+{	
+	piecenum=body;	
+}
+
+QueryWeapon1(piecenum)
+{	
+	piecenum=body;
+}
+
+AimWeapon1(heading,pitch)
+{
+	return(TRUE);
+}
+	
+HitByWeaponId()
+{
+	emit-sfx 1024 from body;
+	return 100;
+}
+
+Killed(severity,corpsetype)
+{
+	emit-sfx 1026 from base;
+	emit-sfx 1025 from body;
+	return (0);
+}

@@ -154,8 +154,7 @@ local chickenTypes = {
 local defenders = {
   chickend = {time = 10, squadSize = 0.6, cost = 1 },
   chicken_dodo = {time = 25,  squadSize = 2, cost = 1}, 
-  chicken_spidermonkey =  {time = 20, squadSize = 0.6, cost = 1},
-  --chicken_rafflesia =  {time = 30, squadSize = 0.4 },
+  chicken_rafflesia =  {time = 25, squadSize = 0.4, cost = 2 },
 }
 
 local supporters = {
