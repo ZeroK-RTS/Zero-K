@@ -74,11 +74,43 @@ local statswindows = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---[[
-options = {
+
+
+local function MakeStatsWindow() end
+options_order = {}
+options_path = 'Help/Unit Descriptions'
+options = {}
+local ignoreList = {
+	['firebug']=1,
 }
-options_path = 'Settings/Interface'
---]]
+local UnitDefsList = {}
+for i=1,#UnitDefs do
+	local ud = UnitDefs[i]
+	local unitName = ud.humanName
+	if not unitName:find('test') and not ignoreList[unitName] then
+		UnitDefsList[#UnitDefsList+1] = {unitName=unitName, ud=ud}
+	end
+end
+table.sort(UnitDefsList, function(t1,t2)
+	return t1.unitName < t2.unitName
+end)
+for i=1,#UnitDefsList do
+	local item = UnitDefsList[i]
+	local unitName = item.unitName
+	local ud = item.ud
+	local optionName = unitName .. 'help'
+	options[optionName] = {
+		name=unitName,
+		type='button',
+		desc = "Description For " .. unitName,
+		OnChange = function(self)
+			MakeStatsWindow(ud)
+		end,
+		path = unitHelpPath,
+	}
+	options_order[#options_order + 1] = optionName
+end
+UnitDefsList = nil
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -623,11 +655,16 @@ local function KillStatsWindow(num)
 	statswindows[num] = nil
 end
 
-local function MakeStatsWindow(ud, x,y)
+MakeStatsWindow = function(ud, x,y)
 	hideWindow(window_unitcontext)
-
-	local y = scrH-y
 	local x = x
+	local y = y
+	if x then
+		y = scrH-y
+	else
+		x = scrH / 3
+		y = scrH / 3
+	end
 	
 	local window_width = 450
 	local window_height = 450
