@@ -6,3 +6,6 @@ teleport2_reverse.wav
 
 - freeloops
 teleport_loop.wav
+
+- Meep
+resurrect.wav

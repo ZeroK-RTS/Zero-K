@@ -4,9 +4,9 @@
 
 function gadget:GetInfo()
   return {
-    name      = "Rezz Hp changer",
+    name      = "Rezz Hp changer + effect",
     desc      = "Sets rezzed units to full hp",
-    author    = "Google Frog, modified by Rafal",
+    author    = "Google Frog, modified by Rafal & Meep",
     date      = "Nov 30, 2008",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
@@ -46,16 +46,31 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 
     if (command and command.id == CMD_RESURRECT) then
       --spSetUnitHealth(unitID, maxHealth)  -- does nothing, hp overwritten by engine
+      
+      -- queue resurrected unit
       unitsCount = unitsCount + 1
       units[unitsCount] = unitID
+      
+      -- award calculation
       if GG.Awards then
-        GG.Awards.UnitResurrected (unitDefID, teamID)
+        GG.Awards.UnitResurrected(unitDefID, teamID)
+      end
+      
+      -- add CEG and play sound
+      local ud = Spring.GetUnitDefID(unitID)
+      ud = ud and UnitDefs[ud]
+      if ud then
+        local size = ud.xsize
+        local ux, uy, uz = Spring.GetUnitPosition(unitID)
+        Spring.SpawnCEG("resurrect", ux, uy, uz, 0, 0, 0, size)
+        Spring.PlaySoundFile("sounds/misc/resurrect.wav", 15, ux, uy, uz)
       end
     end
   end
 end
 
 function gadget:GameFrame(n)
+  -- apply pending unit health changes
   if (unitsCount ~= 0) then
     for i = 1, unitsCount do
       local health, maxHealth = spGetUnitHealth(units[i])
