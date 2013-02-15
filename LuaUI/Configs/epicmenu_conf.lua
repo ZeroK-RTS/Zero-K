@@ -113,7 +113,6 @@ path='Game'
 
 	ShButton( 'Pause/Unpause', 'pause' )
 	ShLabel('') 
-	ShButton( 'Last Message Position', 'lastmsgpos' )
 	ShButton( 'Share Dialog...', 'sharedialog' ) 
 	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
 
@@ -202,7 +201,7 @@ path='Settings'
 
 path='Settings/Interface/Interface Skin'
 	AddOption({
-		name = 'Skin Sets',
+		name = 'Skin Sets (Requires LuaUI Reload)',
 		type = 'list',
 		OnChange = function (self)
 			WG.crude.SetSkin( self.value );
