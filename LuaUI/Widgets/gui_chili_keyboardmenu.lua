@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.011 Chili Keyboard Menu",
+    desc      = "v0.012 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -105,6 +105,7 @@ local function SetupKeybuttons() end
 
 
 options_path = 'Game/Selections'
+local KBMenuPath = 'Settings/Interface/KB Menu'
 options_order = {
 	'lbl_main',
 	'select_all',
@@ -134,13 +135,15 @@ options_order = {
 	
 	'qwertz',
 	'showRemainingCommands',
+	'goToCommands',
+	'goToSelections',
 }
 options = {
 
 	qwertz = {
 		name = 'QWERTZ layout',
 		type = 'bool',
-		path = 'Settings/Interface/KB Menu',
+		path = KBMenuPath,
 		OnChange = function(self)
 			SetupKeybuttons()
 			UpdateButtons()
@@ -153,8 +156,25 @@ options = {
 		type = 'bool',
 		value = false,
 		advanced = true,
-		path = 'Settings/Interface/KB Menu',
+		path = KBMenuPath,
 	},
+	goToCommands = {
+		name = 'Commands...',
+		type = 'button',
+		path = KBMenuPath,
+		OnChange = function(self)
+			WG.crude.OpenPath('Game/Commands')
+		end
+	},
+	goToSelections = {
+		name = 'Selections...',
+		type = 'button',
+		path = KBMenuPath,
+		OnChange = function(self)
+			WG.crude.OpenPath('Game/Selections')
+		end
+	},
+	
 
 	--selectkey options
 	lbl_main = { type = 'label', name = 'By Total' },
@@ -766,19 +786,20 @@ local function SetupTabs()
 			caption = caption, 
 			--tooltip = '',
 			backgroundColor = white_table,
+			--[[
 			OnMouseDown = { function()
 				
 				local _,_, meta,_ = Spring.GetModKeyState()
 				if meta then 
-					WG.crude.OpenPath('Game/Commands')
+					WG.crude.OpenPath('Settings/Interface/KB Menu')
 					WG.crude.ShowMenu() --make epic Chili menu appear.
 					return false
 				end
 				
 				SetCurTab(tab)
 				
-			end }, 
-			--OnMouseUp = { func }, 
+			end },
+			--]]
 
 			x = (width * (i-1)) .. '%',
 			bottom = 0,
@@ -1095,6 +1116,31 @@ function widget:Initialize()
 		fixedRatio = true,
 		color = {0.4, 0.4, 0.4, 0.4}
 	}
+	local configButton = Button:New{
+		parent = window_main,
+		caption = '', 
+		tooltip = 'Configure Hotkeys',
+		backgroundColor = white_table,
+		OnClick = { function()
+			WG.crude.OpenPath('Settings/Interface/KB Menu')
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+		end }, 
+		bottom = tabHeight .. '%',
+		x = 0,
+		width = (tabHeight/2) .. '%',
+		height = tabHeight.. '%',
+	}
+	local image = Image:New {
+		width="100%",
+		height= "100%",
+		--bottom = nil,
+		--y="5%"; x="5%",
+		keepAspect = true,
+		file = 'LuaUI/Images/epicmenu/settings.png',
+		parent = configButton,
+	}
+		
+	
 	SetupKeybuttons()
 	SetupTabs()
 	
