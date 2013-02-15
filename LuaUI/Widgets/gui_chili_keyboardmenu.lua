@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.012 Chili Keyboard Menu",
+    desc      = "v0.013 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -786,20 +786,20 @@ local function SetupTabs()
 			caption = caption, 
 			--tooltip = '',
 			backgroundColor = white_table,
-			--[[
+			
 			OnMouseDown = { function()
-				
+				--[[	
 				local _,_, meta,_ = Spring.GetModKeyState()
 				if meta then 
 					WG.crude.OpenPath('Settings/Interface/KB Menu')
 					WG.crude.ShowMenu() --make epic Chili menu appear.
 					return false
 				end
-				
+				--]]	
 				SetCurTab(tab)
 				
 			end },
-			--]]
+			
 
 			x = (width * (i-1)) .. '%',
 			bottom = 0,
@@ -1057,8 +1057,8 @@ local function SetupCommands( modifier )
 				for i,v in ipairs(actions) do
 					for actionCmd, actionExtra in pairs(v) do
 						local label = actionCmd
-						local hotkey = actionCmd and WG.crude.GetHotkey(actionCmd) or ''
-						local hotkey = hotkey_key
+						local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd 
+						hotkey = actionCmd and WG.crude.GetHotkey(action ) or '-'
 						UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( actionCmd ); end, '> ' .. label .. ' ' .. actionExtra, nil, black_table )
 					end
 				end

@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.070 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.071 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1412,6 +1412,7 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 		globalitems[globalitem_name] = Image:New{
 			file = "#" .. ud.id,
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
+			tooltip = 'Middle-click: Goto',
 			keepAspect = false,
 			height  = 55*(4/5),
 			width   = 55,
