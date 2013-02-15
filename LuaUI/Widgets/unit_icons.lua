@@ -41,7 +41,7 @@ local floor = math.floor
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Hovering Icons'
+options_path = 'Settings/Misc/Hovering Icons'
 options = {
 	iconsize = {
 		name = 'Hovering Icon Size',

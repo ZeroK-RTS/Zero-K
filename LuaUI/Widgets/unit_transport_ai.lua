@@ -58,7 +58,7 @@ local function IgBuilderChanged()
   CONST_IGNORE_BUILDERS = options.ignoreBuilders.value
 end
 
-options_path = 'Game/Settings'
+options_path = 'Game'
 options = {
 	ignoreBuilders = {
 		name = "Transport AI: Ignore Builders",

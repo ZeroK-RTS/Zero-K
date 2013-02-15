@@ -116,14 +116,14 @@ path='Game'
 	ShButton( 'Share Dialog...', 'sharedialog' ) 
 	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
 
-path='Game/View'
+path='Settings/Misc/Spectating'
 	ShLabel('Spectator View/Selection')
 	ShButton('View Chosen Player', function() spSendCommands{"specfullview 0"} end )
 	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
 	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
 	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
 
-path='Game/Screenshots'	
+path='Settings/Misc/Screenshots'	
 	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
 	ShButton( 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots' )
 	ShButton( 'Create Video', 'createvideo', 'Find your video under the Spring folder.' ) 
@@ -213,7 +213,7 @@ path='Settings/Interface/Interface Skin'
 		},
 	})
 
-path='Settings/Interface/Mouse Cursor'
+path='Settings/Misc/Mouse Cursor'
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
 	AddOption({ 	
 		name = 'Hardware Cursor',
@@ -224,6 +224,7 @@ path='Settings/Interface/Mouse Cursor'
 	
 path='Settings/Misc'
 	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
+path='Settings/Interface'
 	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 
 path='Settings/Graphics'
@@ -318,7 +319,7 @@ path='Settings/Graphics/Map'
 	ShButton('Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
 	ShButton('Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')	
 	
-path='Settings/Interface'
+path='Settings/Misc'
 	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
 	
 path='Help'

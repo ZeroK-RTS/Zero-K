@@ -99,11 +99,12 @@ local glUnit = gl.Unit
 
 local showAlly = false
 
-options_path = 'Settings/Interface'
+options_path = 'Settings/Misc'
 options = {
 	showally = {
 		name = 'XHS - Show Ally Selections',
 		type = 'bool',
+		desc = 'Highlight in yellow the units your allies currently have selected.',
 		value = false,
 		OnChange = function(self) 
 			visibleAllySelUnits = {}

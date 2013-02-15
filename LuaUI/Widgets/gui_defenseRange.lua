@@ -114,7 +114,7 @@ colorConfig["ally"] = colorConfig["enemy"]
 --end of DEFAULT COLOR CONFIG
 
 local Chili
-options_path = 'Settings/Interface/Defense Ranges'
+options_path = 'Settings/Misc/Defense Ranges'
 
 options = { 
 	showselectedunitrange = {name = 'Show selected unit(s) range(s)', type = 'bool', value = false},
