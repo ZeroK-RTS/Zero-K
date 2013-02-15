@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.084 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.085 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
