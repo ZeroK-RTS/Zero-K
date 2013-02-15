@@ -63,7 +63,8 @@ unitDef = {
 
     {
       def                = [[ADVSAM]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP SATELLITE]],
+      badTargetCategory  = [[FAKEAATARGET]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP SATELLITE FAKEAATARGET]],
     },
 
   },
@@ -81,7 +82,7 @@ unitDef = {
       cylinderTargeting       = 3.2,
 
       damage                  = {
-        default    = 175,
+        default    = 1750,
         planes     = 1750,
         satellites = 1750,
         subs       = 87.5,

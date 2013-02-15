@@ -64,13 +64,15 @@ unitDef = {
 
     [1] = {
       def                = [[AALASER]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      badTargetCategory  = [[FAKEAATARGET]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
     },
 
 
     [2] = {
       def                = [[AALASER]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      badTargetCategory  = [[FAKEAATARGET]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
     },
 
   },
@@ -91,7 +93,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 1.5,
+        default = 15,
         planes  = 15,
         subs    = 0.6,
       },
@@ -165,7 +167,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 10,
+        default = 100,
         planes  = 100,
         subs    = 2.5,
       },

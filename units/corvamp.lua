@@ -64,10 +64,10 @@ unitDef = {
 
     {
       def                = [[LASER]],
-      badTargetCategory  = [[GUNSHIP]],
+      badTargetCategory  = [[GUNSHIP FAKEAATARGET]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 90,
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
     },
 
   },
@@ -92,7 +92,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 1.35,
+        default = 13.5,
         planes  = 13.5,
         subs    = 0.675,
       },

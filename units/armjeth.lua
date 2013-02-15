@@ -87,8 +87,8 @@ unitDef = {
 
     {
       def                = [[AA_LASER]],
-      --badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
+      badTargetCategory  = [[FAKEAATARGET]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
     },
 
   },
@@ -108,7 +108,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 2.09,
+        default = 20.9,
         planes  = 20.9,
         subs    = 1,
       },
