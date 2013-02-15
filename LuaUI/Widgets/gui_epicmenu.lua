@@ -1884,7 +1884,6 @@ function widget:Initialize()
 	AddOption('Settings/Camera')
 	AddOption('Settings/Graphics')	
 	AddOption('Settings/Interface')
-	AddOption('Settings/Interface/Mouse Cursor')
 	AddOption('Settings/Misc')
 
 	-- Add pre-configured button/options found in epicmenu config file

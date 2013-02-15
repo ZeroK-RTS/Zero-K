@@ -23,7 +23,7 @@ local echo = Spring.Echo
 function RestoreCursor() end
 function SetCursor(cursorSet) end
 
-options_path = 'Settings/Interface/Mouse Cursor'
+options_path = 'Settings/Misc/Mouse Cursor'
 options = {
 	cursorsets = {
 		name = 'Cursor Sets',
