@@ -89,7 +89,7 @@ unitDef = {
         subs    = 7.5,
       },
       
-      explosionGenerator      = [[custom:flash2purple]],
+      explosionGenerator      = [[custom:flashslowwithsparks]],
       fireStarter             = 180,
       impactOnly              = true,
       impulseBoost            = 0,
