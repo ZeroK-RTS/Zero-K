@@ -114,66 +114,7 @@ end
 
 -- SETUP MENU HERE
 
-path='Game'
-
-	ShButton( 'Pause/Unpause', 'pause' )
-	ShLabel('') 
-	ShButton( 'Share Dialog...', 'sharedialog' ) 
-	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
-
-path='Settings/Misc/Spectating'
-	ShLabel('Spectator View/Selection')
-	ShButton('View Chosen Player', function() spSendCommands{"specfullview 0"} end )
-	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
-	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
-	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
-
-path='Settings/Misc/Screenshots'	
-	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
-	ShButton( 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots' )
-	ShButton( 'Create Video', 'createvideo', 'Find your video under the Spring folder.' ) 
-	
---path='Game'
---	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end ) 
-
-
-path='Settings/Camera'
-	--ShLabel( 'Camera Type') 
-	-- ShButton( 'Total Annihilation', 'viewta' ) 
-	-- ShButton( 'FPS', 'viewfps' ) 
-	-- ShButton( 'Free', 'viewfree' ) 
-	-- ShButton( 'Rotatable Overhead', 'viewrot' ) 
-	-- ShButton( 'Total War', 'viewtw' )
-	ShTick2( 'Camera Type', {
-			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
-			{name = 'FPS',key='FPS', desc='FPS camera', hotkey=nil},
-			{name = 'Free',key='Free', desc='Freestyle camera', hotkey=nil},
-			{name = 'Rotatable Overhead',key='Rotatable Overhead', desc='Rotatable Overhead camera', hotkey=nil},
-			{name = 'Total War',key='Total War', desc='TW camera', hotkey=nil},
-			{name = 'COFC',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
-		},'Total Annihilation',
-		function(self)
-			local key = self.value
-			if key == 'Total Annihilation' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewta"}
-			elseif key == 'FPS' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfps"}
-			elseif key == 'Free' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfree"}
-			elseif key == 'Rotatable Overhead' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewrot"}
-			elseif key == 'Total War' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewtw"}
-			elseif key == 'COFC' then
-				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
-			end
-		end
-		)		
-	ShButton( 'Flip the TA Camera', 'viewtaflip' )
-	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
-	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
-	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
-
+--- GENERAL SETTINGS ---
 path='Settings/Reset Settings'
 	ShLabel( 'Reset graphic settings to minimum.')
 	ShButton( 'Reset graphic settings',function()
@@ -204,6 +145,51 @@ path='Settings'
 		value = false,
 	})
 
+--- GAME --- Stuff for gameplay only. Spectator would never need to open this
+path='Game' 
+
+	ShButton( 'Pause/Unpause', 'pause' )
+	ShLabel('') 
+	ShButton( 'Share Dialog...', 'sharedialog' ) 
+	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
+--	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end ) 
+
+--- CAMERA ---
+path='Settings/Camera'
+	ShTick2( 'Camera Type', {
+			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
+			{name = 'FPS',key='FPS', desc='FPS camera', hotkey=nil},
+			{name = 'Free',key='Free', desc='Freestyle camera', hotkey=nil},
+			{name = 'Rotatable Overhead',key='Rotatable Overhead', desc='Rotatable Overhead camera', hotkey=nil},
+			{name = 'Total War',key='Total War', desc='TW camera', hotkey=nil},
+			{name = 'COFC',key='COFC', desc='Combo Overhead/Free Camera', hotkey=nil},
+		},'Total Annihilation',
+		function(self)
+			local key = self.value
+			if key == 'Total Annihilation' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewta"}
+			elseif key == 'FPS' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfps"}
+			elseif key == 'Free' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfree"}
+			elseif key == 'Rotatable Overhead' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewrot"}
+			elseif key == 'Total War' then
+				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewtw"}
+			elseif key == 'COFC' then
+				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
+			end
+		end
+		)		
+	ShButton( 'Flip the TA Camera', 'viewtaflip' )
+	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
+	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
+	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
+
+--- SETTINGS --- Only settings that pertain to windows/icons at the drawscreen level should go here.
+path='Settings/Interface'
+	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
+
 path='Settings/Interface/Interface Skin'
 	AddOption({
 		name = 'Skin Sets (Requires LuaUI Reload)',
@@ -220,6 +206,11 @@ path='Settings/Interface/Interface Skin'
 	})
 	ShButton('Reloadl LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
 
+--- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
+path='Settings/Misc'
+	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
+	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
+	
 path='Settings/Misc/Mouse Cursor'
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
 	AddOption({ 	
@@ -228,12 +219,20 @@ path='Settings/Misc/Mouse Cursor'
 		springsetting = 'HardwareCursor',
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	} )	
-	
-path='Settings/Misc'
-	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
-path='Settings/Interface'
-	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
+path='Settings/Misc/Spectating'
+	ShLabel('Spectator View/Selection')
+	ShButton('View Chosen Player', function() spSendCommands{"specfullview 0"} end )
+	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
+	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
+	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
 
+path='Settings/Misc/Screenshots'	
+	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
+	ShButton( 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots' )
+	ShButton( 'Create Video', 'createvideo', 'Find your video under the Spring folder.' ) 
+	
+	
+--- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 path='Settings/Graphics'
 	ShLabel('Lups (Lua Particle System)')
 	ShButton('Toggle Lups', function() spSendCommands{'luaui togglewidget LupsManager'} end )
@@ -327,9 +326,7 @@ path='Settings/Graphics/Map'
 	ShButton('Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
 	ShButton('Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')	
 	
-path='Settings/Misc'
-	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
-	
+--- HELP ---
 path='Help'
 	AddOption({
 		type='text',
