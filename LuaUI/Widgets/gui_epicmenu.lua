@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.307 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.308 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-02-07
     license   = "GNU GPL, v2 or later",
@@ -1520,13 +1520,13 @@ local function MakeMenuBar()
     local exit_menu_cancel_width = exit_menu_btn_width/2
     local exit_menu_cancel_height = 2*exit_menu_btn_height/3
 
-	local crude_width = 425
+	local crude_width = 445
 	local crude_height = B_HEIGHT+10
 	
 
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header,  }
-	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', textColor = color.sub_header, align="center" }
-	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 35, height=5, textColor = color.main_fg, autosize=false, }
+	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 45, height=5, textColor = color.sub_header,  }
+	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
 	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,4}  }
 	
 	local screen_width,screen_height = Spring.GetWindowGeometry()
@@ -1711,7 +1711,7 @@ local function MakeMenuBar()
 						orientation = 'horizontal',
 						columns = 2,
 						rows = 2,
-						width = 120,
+						width = 140,
 						height = '100%',
 						--height = 40,
 						resizeItems = true,
@@ -1743,7 +1743,7 @@ local function MakeMenuBar()
 							img_flag,
 							StackPanel:New{
 								orientation = 'horizontal',
-								width = 60,
+								width = 90,
 								height = '100%',
 								resizeItems = false,
 								autoArrangeV = false,
