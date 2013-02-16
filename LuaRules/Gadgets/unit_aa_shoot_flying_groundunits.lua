@@ -1,4 +1,4 @@
---//Version 0.942
+--//Version 0.943
 function gadget:GetInfo()
   return {
     name      = "AA shoot flying ground units",
@@ -26,6 +26,7 @@ local spSetUnitStealth  = Spring.SetUnitStealth
 local spSetUnitRadiusAndHeight = Spring.SetUnitRadiusAndHeight
 local spSetUnitMidAndAimPos  = Spring.SetUnitMidAndAimPos 
 local spSetUnitDirection  = Spring.SetUnitDirection 
+local spGetUnitTransporter  = Spring.GetUnitTransporter 
 local spTransferUnit = Spring.TransferUnit
 local spGetTeamInfo = Spring.GetTeamInfo
 local spGetUnitTeam = Spring.GetUnitTeam
@@ -114,9 +115,10 @@ function gadget:GameFrame(n)
 			local forced = flyingGroundUnitsID[unitID].forced
 			local landed = false
 			if by < groundHeight+100 and math.abs(velY) < math.abs(speedWatchout) then --if low-elevation and vertical speed is less than of gravity then: assume unit has landed.
-				landed = true
+				landed = true --TODO: replace with UnitEnterAir() and UnitLeftAir().
 			end
-			if not landed and (onlyTarget[unitName] or forced) then --only check for flying unit and unit in "onlyTarget" table (or unit with 'forced' flag).
+			local transported = spGetUnitTransporter(unitID)
+			if not landed and (onlyTarget[unitName] or forced) and not transported then --only check for flying unit and unit in "onlyTarget" table (or unit with 'forced' flag) and unit out of transport.
 				if by > groundHeight+100 then
 					local netVelocity_sq = (velX*velX+velY*velY +velZ*velZ)
 					local glaiveSpeed_sq = lockOnSpeed_sq
