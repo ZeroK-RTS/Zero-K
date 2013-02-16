@@ -58,14 +58,14 @@ unitDef = {
 
     {
       def                = [[LASER]],
-      badTargetCategory  = [[FAKEAATARGET]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
     {
       def                = [[EMG]],
-      badTargetCategory  = [[FAKEAATARGET]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
+      --badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
   },
@@ -84,7 +84,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 9,
+        default = 0.9,
         planes  = 9,
         subs    = 0.5,
       },
@@ -130,7 +130,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 18.8,
+        default = 1.88,
         planes  = 18.8,
         subs    = 0.94,
       },

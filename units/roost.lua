@@ -53,8 +53,7 @@ unitDef = {
 
     {
       def                = [[AEROSPORES]],
-      badTargetCategory  = [[FAKEAATARGET]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
   },

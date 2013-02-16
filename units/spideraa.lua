@@ -65,8 +65,8 @@ unitDef = {
 
     {
       def                = [[AA]],
-      badTargetCategory  = [[FAKEAATARGET]],
-      onlyTargetCategory = [[GUNSHIP FIXEDWING FAKEAATARGET]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
   },
@@ -84,7 +84,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 220,
+        default = 22,
         planes  = 220,
         subs    = 11,
       },

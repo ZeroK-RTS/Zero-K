@@ -77,8 +77,8 @@ unitDef = {
 
     {
       def                = [[FLAK]],
-      badTargetCategory  = [[FAKEAATARGET]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
+      --badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
   },
@@ -99,7 +99,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 95,
+        default = 9.5,
         planes  = 95,
         subs    = 5,
       },

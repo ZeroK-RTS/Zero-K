@@ -79,8 +79,8 @@ unitDef = {
 
     {
       def                = [[ARMKBOT_MISSILE]],
-      badTargetCategory  = [[FAKEAATARGET]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
   },
@@ -98,7 +98,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 70,
+        default = 7,
         planes  = 70,
         subs    = 3.5,
       },

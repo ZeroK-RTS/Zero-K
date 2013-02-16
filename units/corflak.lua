@@ -72,8 +72,8 @@ unitDef = {
 
     {
       def                = [[ARMFLAK_GUN]],
-      badTargetCategory  = [[FAKEAATARGET]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP FAKEAATARGET]],
+      --badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
   },
@@ -94,7 +94,7 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 145,
+        default = 14.5,
         planes  = 145,
         subs    = 7,
       },
