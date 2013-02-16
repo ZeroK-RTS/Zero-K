@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.072 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.073 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -178,7 +178,7 @@ local gi_label	--group info Chili label
 
 options_path = 'Settings/Interface/Tooltip'
 options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip','showDrawTools',
-  'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar'
+  'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar', 'color_background',
 }
 
 local function option_Deselect()
@@ -186,7 +186,7 @@ local function option_Deselect()
   Spring.SelectUnitMap({}, false)
   window_height = options.squarepics.value and 140 or 115
 end
-
+local selPath = 'Settings/Interface/Selected Units Window'
 options = {
 	tooltip_delay = {
 		name = 'Tooltip display delay (0 - 4s)',
@@ -253,27 +253,37 @@ options = {
 	},
 
 	groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
-		path = 'Settings/Interface/Selected Units Window',
+		path = selPath,
 	},
 	showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect,
-		path = 'Settings/Interface/Selected Units Window',
+		path = selPath,
 	},
 	squarepics = {name='Square Buildpics', type='bool', value=false, OnChange = option_Deselect,
-		path = 'Settings/Interface/Selected Units Window',
+		path = selPath,
 	},
 	unitCommand = {
 		name="Show Unit's Command",
 		type='bool',
 		value= false,
 		desc = "Display current command on unit's icon if selection isn't grouped (unit selection is grouped when unit count exceed 8)",
-		path = 'Settings/Interface/Selected Units Window',
+		path = selPath,
 	},
 	manualWeaponReloadBar = {
 		name="Show Unit's Reload Bar",
 		type='bool',
 		value= true,
 		desc = "Show reload progress for weapon that use manual trigger. *Only applies for ungrouped unit selection*",
-		path = 'Settings/Interface/Selected Units Window',
+		path = selPath,
+	},
+	color_background = {
+		name = "Background color",
+		type = "colors",
+		value = { 0, 0, 0, 0},
+		path = selPath,
+		OnChange = function(self) 
+			real_window_corner.color = self.value
+			real_window_corner:Invalidate()
+		end,
 	},
 }
 
@@ -2229,7 +2239,7 @@ function widget:Initialize()
 
     real_window_corner = Window:New{
 		name   = 'real_window_corner';
-		color = {0, 0, 0, 0},
+		color = options.color_background.value,
 		x = 0; 
 		bottom = 180;
         width = 450;
@@ -2250,6 +2260,7 @@ function widget:Initialize()
         name   = 'unitinfo2';
 		x = 0,
 		y = 0,
+		--backgroundColor = {0,0,0,1},
 		width = "100%";
 		height = "100%";
 		dockable = false,
