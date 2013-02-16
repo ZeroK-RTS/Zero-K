@@ -539,7 +539,8 @@ local function displayMessage(msg, remake)
 		local last = stack_console.children[#(stack_console.children)]
 		if last then
 			last:SetText(text)
-			last:UpdateClientArea()
+			-- UpdateClientArea() is not enough - last message keeps disappearing until new message is added
+			last:Invalidate()
 		end
 	else
 		local textbox = WG.Chili.TextBox:New{
@@ -555,7 +556,7 @@ local function displayMessage(msg, remake)
 			autoHeight=true,
 			autoObeyLineHeight=true,
 			--]]
-		
+
 			font = {
 				outlineWidth = 3,
 				outlineWeight = 10,
