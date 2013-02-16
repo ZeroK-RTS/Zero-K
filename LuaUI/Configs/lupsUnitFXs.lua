@@ -294,6 +294,14 @@ effectUnitDefs = {
   }, 
   corvalk = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=3.5, length=22, piece="engineEmit", onActive=true}},
+    {class='ShieldSphere', options=MergeTable(valkShieldSphere, {piece="agrav1", onActive=true})},
+    {class='StaticParticles', options=MergeTable(valkCorona, {piece="agrav1", onActive=true})},
+    {class='ShieldSphere', options=MergeTable(valkShieldSphere, {piece="agrav2", onActive=true})},
+    {class='StaticParticles', options=MergeTable(valkCorona, {piece="agrav2", onActive=true})},
+    {class='ShieldSphere', options=MergeTable(valkShieldSphere, {piece="agrav3", onActive=true})},
+    {class='StaticParticles', options=MergeTable(valkCorona, {piece="agrav3", onActive=true})},
+    {class='ShieldSphere', options=MergeTable(valkShieldSphere, {piece="agrav4", onActive=true})},
+    {class='StaticParticles', options=MergeTable(valkCorona, {piece="agrav4", onActive=true})},
   },  
   corawac = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="thrust", onActive=true}},

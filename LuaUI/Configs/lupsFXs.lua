@@ -159,6 +159,15 @@ teleShieldSphere = {
   repeatEffect=true
 }
 
+valkShieldSphere = {
+  life=20,
+  pos={0,0,0},
+  size=4,
+  colormap1 = { {0.9, 0.9, 1, 0.75},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 0.75} },
+  colormap2 = { {0.2, 0.2, 1, 0.7},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.7} },
+  repeatEffect=true
+}
+
 commandShieldSphere = {
   life			= math.huge,
   heightFactor	= 0.75,
@@ -295,6 +304,18 @@ teleCorona = {
   life        = math.huge,
   lifeSpread  = 0,
   size        = 50,
+  sizeGrowth  = 0,
+  colormap    = { {0, 0.4, 1, 0.01} },
+  texture     = 'bitmaps/GPL/groundflash.tga',
+  count       = 1,
+  repeatEffect = true,
+}
+
+valkCorona = {
+  pos	      = {0,0,0},
+  life        = math.huge,
+  lifeSpread  = 0,
+  size        = 30,
   sizeGrowth  = 0,
   colormap    = { {0, 0.4, 1, 0.01} },
   texture     = 'bitmaps/GPL/groundflash.tga',
