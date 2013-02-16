@@ -33,11 +33,11 @@ WhiteStr   = "\255\255\255\255"
 GreyStr    = "\255\210\210\210"
 GreenStr   = "\255\092\255\092"
 
-local buttonColor = {1, 1, 1, 1}
+local buttonColor = {nil, nil, nil, 1}
 local buttonColorFac = {0.6, 0.6, 0.6, 0.3}
 local buttonColorWarning = {1, 0.2, 0.1, 1}
 local buttonColorDisabled = {0.2,0.2,0.2,1}
-local imageColor = {1,1,1,1}
+local imageColor = {nil,nil,nil,1}
 local imageColorDisabled = {0.3, 0.3, 0.3, 1}
 
 local stateCommands = {	-- FIXME: is there a better way of doing this?

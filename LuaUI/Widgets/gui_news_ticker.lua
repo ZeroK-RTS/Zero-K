@@ -439,7 +439,7 @@ function widget:Initialize()
 		width  = "100%",
 		height = fontSize * 2,
 		parent = window_ticker,
-		backgroundColor = {1,1,1,options.backgroundOpacity.value or 0.7},
+		backgroundColor = {nil,nil,nil,options.backgroundOpacity.value or 0.7},
 		OnMouseDown={ function(self) --//shortcut to option menu.
 				local _,_, meta,_ = Spring.GetModKeyState()
 				if not meta then return false end

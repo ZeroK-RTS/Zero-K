@@ -1486,12 +1486,12 @@ end
 
 -- Show or hide menubar
 local function ShowHideCrudeMenu()
-	WG.crude.visible = settings.show_crudemenu -- HACK set it to wg to signal to player list 
+	--WG.crude.visible = settings.show_crudemenu -- HACK set it to wg to signal to player list 
 	if settings.show_crudemenu then
 		if window_crude then
 			screen0:AddChild(window_crude)
 			--WG.chat.showConsole()
-			window_crude:UpdateClientArea()
+			--window_crude:UpdateClientArea()
 		end
 		if window_sub_cur then
 			screen0:AddChild(window_sub_cur)
@@ -1543,7 +1543,7 @@ local function MakeMenuBar()
 		resizable = false,
 		minimizable = false,
 		backgroundColor = color.main_bg,
-		color = {1,1,1,0.5},
+		color = {nil,nil,nil,0.5},
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		
@@ -1608,7 +1608,7 @@ local function MakeMenuBar()
 		resizable = false,
 		minimizable = false,
 		backgroundColor = color.main_bg,
-		color = {1,1,1,0.5},
+		color = {nil,nil,nil,0.5},
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		
