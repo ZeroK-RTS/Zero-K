@@ -4,12 +4,12 @@
 function widget:GetInfo()
   return {
     name      = "CEG Spawner",
-    desc      = "v0.02 Spawn CEGs",
+    desc      = "v0.03 Spawn CEGs",
     author    = "CarRepairer",
     date      = "2010-11-07",
     license   = "GPLv2",
     layer     = 5,
-    enabled   = false,  --  loaded by default?
+    enabled   = true,  --  loaded by default?
   }
 end
 
@@ -22,9 +22,15 @@ local ALPHA = true
 local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-options_order = { 'xdir', 'ydir', 'zdir', 'radius', }
-options_path = 'Settings/Misc/CEG Spawner'
+options_order = { 'reload', 'xdir', 'ydir', 'zdir', 'radius', }
+options_path = 'Settings/Toolbox/CEG Spawner'
 options = {
+	reload = {
+		name = 'Reload CEGs',
+		type = 'button',
+		OnChange = function() Spring.SendCommands('reloadcegs') end,
+	},
+	
 	xdir = {
 		name = 'X (-1,1)',
 		type = 'number',
@@ -92,7 +98,7 @@ local function AddCEGButton(cegname)
 	}
 	
 	if ALPHA then
-		options[cegname].path = 'Settings/Misc/CEG Spawner/' .. cegname:sub(1,1):upper()	
+		options[cegname].path = options_path..'/' .. cegname:sub(1,1):upper()	
 		--echo ( options[cegname].path )
 	end
 end
