@@ -2,6 +2,7 @@
 --------------------------------------------------------------------------------
 
 -- note name and description are obtained from server and modified at runtime
+ALLOW_SERVER_OVERRIDE_UNIT_TEXT = true
 
 structureConfig = {
 	generic_tech = function(unitDef)
@@ -227,53 +228,68 @@ structureConfig = {
 }
 
 -- test data here
-TEST_DEF_STRING = "ew0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlNoaXAgRmFjdG9yeSIsDQogICAgZGVzY3JpcHRpb24gPSAiTWFrZXMgc2hpcHMiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2JvbWJlcmNvbnRyb2wiLA0KICAgIG5hbWUgPSAiQm9tYmVyIENvbnRyb2wiLA0KICAgIGRlc2NyaXB0aW9uID0gIkluY3JlYXNlcyBib21iZXIgbGltaXQiDQogIH0sDQogIHM1ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2Ryb3BkZXBvdCIsDQogICAgbmFtZSA9ICJGbGVldCBjb21tYW5kIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJJbmNyZWFzZXMgZHJvcHNoaXAgbGltaXQiDQogIH0sIA0KICBzOSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193YXJwZ2F0ZSIsDQogICAgbmFtZSA9ICJXYXJwZ2F0ZSIsDQogICAgZGVzY3JpcHRpb24gPSAiVGVsZXBvcnRzIDEgc2hpcCBhbnl3aGVyZSBpbiB0aGUgZ2FsYXh5Ig0KICB9LA0KICBzMTAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2VuZXJpY3RlY2giLA0KICAgIG5hbWUgPSAiVGVjaCBidWlsZGluZyIsDQogICAgZGVzY3JpcHRpb24gPSAiUHJvZHVjZXMgemUgcmVzZWFyY2giDQogIH0sICAgICAgDQogIHMxOCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZSIsDQogICAgbmFtZSA9ICJXb3JtaG9sZSBnZW5lcmF0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIHBsYW5ldHMgd2l0aCAyNSUgb2YgaW5mbHVlbmNlIg0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIHdvcm1ob2xlIHN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkltcHJvdmVzIGxpbmsgc3RyZW5ndGggdXAgdG8gNTAlIG9mIGluZmx1ZW5jZSINCiAgfSwNCiAgczIwID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyB3YXJwIGF0dGFja3MiDQogIH0sICANCiAgczk5ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2FydGVmYWN0IiwNCiAgICBuYW1lID0gIkFuY2llbnQgYXJ0ZWZhY3RzIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJDYXB0dXJlIGFsbCBzdWNoIHBsYW5ldHMgYW5kIGFsbCB0ZWNobm9sb2dpZXMgdG8gd2luLCBwcmV2ZW50cyBidXlpbmcgaW5mbHVlbmNlIGZyb20gbG9jYWxzIg0KICB9LCAgDQp9"
+TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHMxMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lIiwNCiAgICBuYW1lID0gIlBvd2VyIEdlbmVyYXRvciBVbml0IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaWdodCBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMiIsDQogICAgbmFtZSA9ICJBbm5paGlsYXRpb24gUGxhbnQiLA0KICAgIGRlc2NyaXB0aW9uID0gIk1lZGl1bSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMyIsDQogICAgbmFtZSA9ICJQbGFuZXRhcnkgR2VvdGhlcm1hbCBUYXAiLA0KICAgIGRlc2NyaXB0aW9uID0gIkhlYXZ5IEVuZXJneSBQcm9kdWNlciINCiAgfSwgIA0KICBzOTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYXJ0ZWZhY3QiLA0KICAgIG5hbWUgPSAiQW5jaWVudCBBcnRlZmFjdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTXlzdGVyaW91cyBSZWxpYyINCiAgfSwgIA0KfQ=="
 --[[
 {
+  s0 = {
+    unitname = "pw_generictech",
+    name = "Tech Building",
+    description = "Produces Research"
+  },  
   s1 = {
     unitname = "pw_dropfac",
-    name = "Ship Factory",
-    description = "Makes ships"
+    name = "Starship Factory",
+    description = "Produces Ships"
   },
-  s4 = {
+  s2 = {
+    unitname = "pw_dropdepot",
+    name = "Fleet Command",
+    description = "Increases Dropship Cap"
+  },
+  s3 = {
     unitname = "pw_bombercontrol",
     name = "Bomber Control",
-    description = "Increases bomber limit"
+    description = "Increases Bomber Cap"
   },
-  s5 = {
-    unitname = "pw_dropdepot",
-    name = "Fleet command",
-    description = "Increases dropship limit"
-  }, 
-  s9 = {
+  s4 = {
     unitname = "pw_warpgate",
-    name = "Warpgate",
-    description = "Teleports 1 ship anywhere in the galaxy"
-  },
-  s10 = {
-    unitname = "pw_generictech",
-    name = "Tech building",
-    description = "Produces ze research"
-  },      
-  s18 = {
+    name = "Warp Core Fabricator",
+    description = "Produces Warp Cores"
+  },    
+  s5 = {
     unitname = "pw_wormhole",
-    name = "Wormhole generator",
-    description = "Links planets with 25% of influence"
+    name = "Wormhole Generator",
+    description = "Links Planets; Spreads Influence"
   },
-  s19 = {
+  s6 = {
     unitname = "pw_wormhole2",
-    name = "Improved wormhole stabilizer",
-    description = "Improves link strength up to 50% of influence"
+    name = "Improved Wormhole Stabilizer",
+    description = "Links Planets; Spreads Greater Influence"
   },
-  s20 = {
+  s7 = {
     unitname = "pw_warpjammer",
     name = "Warp Jammer",
-    description = "Blocks warp attacks"
+    description = "Blocks Warp Attacks"
+  },
+  s10 = {
+    unitname = "pw_mine",
+    name = "Power Generator Unit",
+    description = "Light Energy Producer"
+  },
+  s11 = {
+    unitname = "pw_mine2",
+    name = "Annihilation Plant",
+    description = "Medium Energy Producer"
+  },
+  s12 = {
+    unitname = "pw_mine3",
+    name = "Planetary Geothermal Tap",
+    description = "Heavy Energy Producer"
   },  
   s99 = {
     unitname = "pw_artefact",
-    name = "Ancient artefacts",
-    description = "Capture all such planets and all technologies to win, prevents buying influence from locals"
+    name = "Ancient Artefact",
+    description = "Mysterious Relic"
   },  
 }
 ]]--

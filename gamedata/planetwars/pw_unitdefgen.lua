@@ -77,8 +77,10 @@ for _, info in pairs(unitData) do
 			makeTechStructure(structureDefs[info.unitname], info.unitname)
 			structureDefs[info.unitname].unitname = info.unitname
 		end
-		structureDefs[info.unitname].name = info.name
-		structureDefs[info.unitname].description = info.description
+		if ALLOW_SERVER_OVERRIDE_UNIT_TEXT then
+			structureDefs[info.unitname].name = info.name
+			structureDefs[info.unitname].description = info.description
+		end
 		
 		structureDefs[info.unitname].buildcostmetal = structureDefs[info.unitname].maxdamage
 		structureDefs[info.unitname].buildcostenergy = structureDefs[info.unitname].maxdamage
