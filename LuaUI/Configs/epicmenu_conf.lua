@@ -20,40 +20,45 @@ local color = {
 	transblack = {0,0,0,0.3},
 	transblack2 = {0,0,0,0.7},
 	transGray = {0.1,0.1,0.1,0.8},
+	
+	null = {nil, nil, nil, 1},
+	transnull = {nil, nil, nil, 0.3},
+	transnull3 = {nil, nil, nil, 0.8},
 }
-color.tooltip_bg = color.transGray
-color.tooltip_fg = color.white
+
+color.tooltip_bg = color.transnull3
+color.tooltip_fg = color.null
 color.tooltip_info = color.cyan
 color.tooltip_help = color.green
 
-color.main_bg = color.transblack
-color.main_fg = color.white
+color.main_bg = color.transnull
+color.main_fg = color.null
 
-color.menu_bg = color.grayblue
-color.menu_fg = color.white
+color.menu_bg = color.null
+color.menu_fg = color.null
 
-color.game_bg = color.gray
-color.game_fg = color.white
+color.game_bg = color.null
+color.game_fg = color.null
 
-color.sub_bg	= color.transblack
-color.sub_fg 	= color.white
+color.sub_bg	= color.transnull
+color.sub_fg 	= color.null
 color.sub_header = color.yellow
 
-color.sub_button_bg = color.gray
-color.sub_button_fg = color.white
+color.sub_button_bg = color.null
+color.sub_button_fg = color.null
 
-color.sub_back_bg = color.grayblue
-color.sub_back_fg = color.white
+color.sub_back_bg = color.null
+color.sub_back_fg = color.null
 
-color.sub_close_bg = color.grayblue
-color.sub_close_fg = color.white
+color.sub_close_bg = color.null
+color.sub_close_fg = color.null
 
 color.stats_bg = color.sub_bg
 color.stats_fg = color.sub_fg
 color.stats_header = color.sub_header
 
-color.context_bg = color.transblack
-color.context_fg = color.white
+color.context_bg = color.transnull
+color.context_fg = color.null
 color.context_header = color.yellow
 
 confdata.color = color
@@ -210,6 +215,7 @@ path='Settings/Interface/Interface Skin'
 			{ key = 'Carbon', name = 'Carbon', },
 			{ key = 'Robocracy', name = 'Robocracy', },
 			{ key = 'DarkHive', name = 'DarkHive', },
+			{ key = 'Twilight', name = 'Twilight', },
 		},
 	})
 	ShButton('Reloadl LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
@@ -313,6 +319,7 @@ path='Settings/Graphics'
 	
 path='Settings/Graphics/Effects'
 	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
+	ShButton('Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen' )
 	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )					
 
 path='Settings/Graphics/Map'	
@@ -336,6 +343,4 @@ path='Help'
 	ShButton('Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 
-
 return confdata
-
