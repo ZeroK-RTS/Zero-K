@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.014 Chili Keyboard Menu",
+    desc      = "v0.015 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -137,6 +137,7 @@ options_order = {
 	'showRemainingCommands',
 	'goToCommands',
 	'goToSelections',
+	'opacity',
 }
 options = {
 
@@ -173,6 +174,13 @@ options = {
 		OnChange = function(self)
 			WG.crude.OpenPath('Game/Selections')
 		end
+	},
+	opacity = {
+		name = "Opacity",
+		type = "number",
+		path = KBMenuPath,
+		value = 0.4, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) window_main.color = {1,1,1,self.value}; window_main:Invalidate() end,
 	},
 	
 
@@ -1114,7 +1122,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		dragUseGrip = false,
 		fixedRatio = true,
-		color = {0.4, 0.4, 0.4, 0.4}
+		color = {1,1,1,options.opacity.value},
 	}
 	local configButton = Button:New{
 		parent = window_main,
