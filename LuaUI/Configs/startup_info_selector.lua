@@ -29,7 +29,7 @@ local optionData = {
 		enabled = ReturnNoCustomComms,	-- function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/corcom.jpg",
 		selector ="Battle Comm",
-		tooltip = "Battle Commander\nUses a riot cannon; high firepower with mediocre speed and health.",
+		tooltip = "Battle Commander\nUses a riot cannon; good firepower and high health but mediocre speed.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:corcom")
 			Spring.SendCommands({'say a:I choose: Battle Commander!'})
