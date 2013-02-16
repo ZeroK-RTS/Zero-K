@@ -212,6 +212,7 @@ path='Settings/Interface/Interface Skin'
 			{ key = 'DarkHive', name = 'DarkHive', },
 		},
 	})
+	ShButton('Reloadl LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
 
 path='Settings/Misc/Mouse Cursor'
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )

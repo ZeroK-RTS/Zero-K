@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.884 Chili Minimap",
+    desc      = "v0.885 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -18,8 +18,10 @@ local Chili
 local glDrawMiniMap = gl.DrawMiniMap
 local glResetState = gl.ResetState
 local glResetMatrices = gl.ResetMatrices
+local echo = Spring.Echo
 
 local iconsize = 20
+local panelMargin = iconsize*0.2
 
 local tabbedMode = false
 
@@ -44,7 +46,8 @@ end
 
 options_path = 'Settings/Interface/Minimap'
 local radar_path = 'Settings/Graphics/Radar View Colors'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'opacity',
+'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -115,7 +118,12 @@ options = {
 		type = 'button',
 		action = 'togglelos',
 	},
-	
+	opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) window_minimap.color = {1,1,1,self.value}; window_minimap:Invalidate() end,
+	},
 	radar_color_label = { type = 'label', name = 'Note: These colors are additive.', path = radar_path,},
 	
 	radar_fog_color = {
@@ -236,7 +244,7 @@ local function MakeMinimapButton(file, pos, option)
 		caption="",
 		margin={0,0,0,0},
 		padding={4,3,2,2},
-		bottom=0, 
+		bottom=iconsize*0.3, 
 		right=iconsize*pos+5, 
 		
 		tooltip = ( options[option].name .. desc .. hotkey ),
@@ -281,7 +289,7 @@ MakeMinimapWindow = function()
 		name = "Minimap",
 		x = 0,  
 		y = 0,
-		color = {0,0,0,0},
+		color = {1,1,1,options.opacity.value},
 		padding = {0,0,0,0},
 		margin = {0,0,0,0},
 		width  = w,
@@ -300,7 +308,7 @@ MakeMinimapWindow = function()
 		children = {
 			
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
-			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}},
+			Chili.Panel:New {name='minimap panel', bottom = (iconsize+panelMargin), x = panelMargin, y = panelMargin, right = panelMargin, margin={0,0,0,0}, padding = {0,0,0,0}},
 			
 			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, 'lastmsgpos' ),
 			MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, 'viewstandard' ),
@@ -314,7 +322,7 @@ MakeMinimapWindow = function()
 				caption="",
 				margin={0,0,0,0},
 				padding={4,3,2,2},
-				bottom=0, 
+				bottom=iconsize*0.3, 
 				right=iconsize*8.5, 
 				
 				tooltip = "Toggle simplified teamcolours",
@@ -421,13 +429,14 @@ function widget:DrawScreen()
 		lw = 0
 		return 
 	end
-	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) then 
-		local cx,cy,cw,ch = Chili.unpack4(window_minimap.clientArea)
-		ch = ch-iconsize	
-		cx = cx + 8
-		cy = cy + 4
-		cw = cw - 16 
-		ch = ch - 12
+	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) then
+		window_minimap:Update() --required otherwise size stackpanel is calculated wrong when first loaded
+		
+		local cx,cy,cw,ch = Chili.unpack4(window_minimap:GetChildByName('minimap panel').clientArea)
+		cx = cx + panelMargin*3
+		cy = cy + panelMargin*3
+		cw = cw - panelMargin*4
+		ch = ch - panelMargin*4
 		--window_minimap.x, window_minimap.y, window_minimap.width, window_minimap.height
 		--Chili.unpack4(window_minimap.clientArea)
 		cx,cy = window_minimap:LocalToScreen(cx,cy)
