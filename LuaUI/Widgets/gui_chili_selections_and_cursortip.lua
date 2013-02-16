@@ -139,7 +139,7 @@ local windTooltips = {
 	["armwin"] = true,
 }
 
-local mexDefID = UnitDefNames["cormex"].id
+local mexDefID = UnitDefNames["cormex"] and UnitDefNames["cormex"].id or ''
 
 local terraCmds = {
 	Ramp=1,
