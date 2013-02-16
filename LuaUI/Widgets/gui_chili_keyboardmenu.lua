@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.013 Chili Keyboard Menu",
+    desc      = "v0.014 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -1007,7 +1007,7 @@ local function SetupCommands( modifier )
 			local override = overrides[cmd.id]  -- command overrides
 			local texture = override and override.texture or cmd.texture
 			local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
-			if isState then 
+			if isState and override then 
 				texture = override.texture[cmd.params[1]+1]
 			end
 			local _,cmdid,_,cmdname = Spring.GetActiveCommand()
