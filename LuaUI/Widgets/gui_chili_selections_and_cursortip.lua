@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.071 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.072 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -133,7 +133,7 @@ local iconFormat = ''
 local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
-local tildepressed, drawing, erasing
+local tildepressed, drawing, erasing, addingPoint
 
 local windTooltips = {
 	["armwin"] = true,
@@ -177,7 +177,7 @@ local gi_label	--group info Chili label
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Tooltip'
-options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip',
+options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip','showDrawTools',
   'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar'
 }
 
@@ -235,6 +235,15 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Show map-drawing tooltip when holding down the tilde (~).',
+	},
+	showDrawTools = {
+		name = "Show Drawing Tools When Drawing",
+		type = 'bool',
+		value = true,
+		desc = 'Show pencil or eraser when drawing or erasing.',
+		OnChange = function(self)
+			widget:UpdateCallIns(self.value)
+		end
 	},
 	showterratooltip = {
 		name = "Show Terraform Tooltip",
@@ -359,6 +368,47 @@ local function numformat(num, displayPlusMinus)
 end
 
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function DrawScreenDrawTools()
+	if not tildepressed then return end
+	local x, y, lmb, mmb, rmb = Spring.GetMouseState()
+	drawing = lmb
+	erasing = rmb
+	addingPoint = mmb
+	
+	local filefound
+
+	if erasing then
+		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png')
+	elseif addingPoint then
+		filefound = glTexture(LUAUI_DIRNAME .. 'Images/Crystal_Clear_action_flag.png')
+	else
+		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png')
+	end
+	
+	if filefound then
+		--do teamcolor?
+		glColor(1,1,1,1) 
+		Spring.SetMouseCursor('none')
+		glTexRect(x, y-cursor_size, x+cursor_size, y)
+		glTexture(false)
+		--glColor(1,1,1,1)
+	end
+end
+
+--ToggleDrawTools = function(enable)
+function widget:UpdateCallIns(enable)
+	if enable then
+		self.DrawScreen = DrawScreenDrawTools
+	else
+		self.DrawScreen = function() end
+	end
+	
+	widgetHandler:UpdateCallIn("DrawScreen")
+	widgetHandler:UpdateCallIn("DrawScreen")
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- group selection
@@ -2256,32 +2306,6 @@ function widget:KeyRelease(key)
 		tildepressed = false
 	end
 end
---[[
-function widget:DrawScreen()
-	if not tildepressed then return end
-	local x, y, lmb, mmb, rmb = Spring.GetMouseState()
-	drawing = lmb
-	erasing = rmb
-	
-	local filefound
-	if drawing then
-		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png')
-	elseif erasing then
-		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png')
-	end
-	
-	if filefound then
-		--do teamcolor?
-		--glColor(0,1,1,1) 
-		if drawing or erasing then
-			Spring.SetMouseCursor('none')
-		end
-		glTexRect(x, y-cursor_size, x+cursor_size, y)
-		glTexture(false)
-		--glColor(1,1,1,1)
-	end
-end
---]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
