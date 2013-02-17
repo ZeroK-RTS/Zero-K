@@ -106,8 +106,7 @@ StopMoving()
 
 Killed(severity, corpsetype)
 {
-	if (severity <= 50)
-		corpsetype = 1;
+	if (severity <= 50)	corpsetype = 1;
 	else corpsetype = 2;
 	explode base type 3;
 	explode cap type 3;
