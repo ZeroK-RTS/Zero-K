@@ -321,39 +321,14 @@ effectUnitDefs = {
   },
  }
 
-effectUnitDefsXmas = {
-  armcom = {
-    {class='SantaHat', options={color={0,0.7,0,1}, pos={0,4,0.35}, emitVector={0.3,1,0.2}, width=2.7, height=6, ballSize=0.7, piece="head"}},
-  },
-  corcom = {
-    {class='SantaHat', options={pos={0,6,2}, emitVector={0.4,1,0.2}, width=2.7, height=6, ballSize=0.7, piece="head"}},
-  },
-  armadvcom = {
-    {class='SantaHat', options={color={0,0.7,0,1}, pos={0,4,0.35}, emitVector={0.3,1,0.2}, width=2.7, height=6, ballSize=1, piece="head"}},
-  },
-  coradvcom = {
-    {class='SantaHat', options={pos={0,6,2}, emitVector={0.4,1,0.2}, width=2.7, height=6, ballSize=1, piece="head"}},
-  },
-  commsupport = {
-    {class='SantaHat', options={pos={0,3.8,0.35}, emitVector={0,1,0}, width=2.7, height=6, ballSize=0.7, piece="head"}},
-  },
-  commrecon = {
-    {class='SantaHat', options={color={0,0.7,0,1}, pos={1.5,4,0.5}, emitVector={0.7,1.6,0.2}, width=2.2, height=6, ballSize=0.7, piece="head"}},
-  },
-  commadvsupport = {
-    {class='SantaHat', options={pos={0,3.8,0.35}, emitVector={0,1,0}, width=2.7, height=6, ballSize=1, piece="head"}},
-  },
-  commadvrecon = {
-    {class='SantaHat', options={color={0,0.7,0,1}, pos={1.5,4,0.5}, emitVector={0.7,1.6,0.2}, width=2.2, height=6, ballSize=1, piece="head"}},
-  },
-}
+effectUnitDefsXmas = {}
 
 local levelScale = {
     1,
     1.1,
     1.2,
     1.25,
-	1.3,
+    1.3,
 }
 
 -- load presets from unitdefs
@@ -361,30 +336,30 @@ for i=1,#UnitDefs do
 	local unitDef = UnitDefs[i]
 	
 	if unitDef.customParams and unitDef.customParams.commtype then
+		local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 		if unitDef.customParams.commtype == "1" then
-			local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={color={0,0.7,0,1}, pos={0,4*s,0.35*s}, emitVector={0.3,1,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
 		elseif unitDef.customParams.commtype == "2" then
-			local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={pos={0,6*s,2*s}, emitVector={0.4,1,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
 		elseif unitDef.customParams.commtype == "3" then 
-			local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={color={0,0.7,0,1}, pos={1.5*s,4*s,0.5*s}, emitVector={0.7,1.6,0.2}, width=2.2*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
 		elseif unitDef.customParams.commtype == "4" then 
-			local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={pos={0,3.8*s,0.35*s}, emitVector={0,1,0}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
 		elseif unitDef.customParams.commtype == "5" then 
-			local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={color={0,0,0.7,1}, pos={0,0,0}, emitVector={0,1,0.1}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="hat"}},
+			}	    
+		elseif unitDef.customParams.commtype == "6" then 
+			effectUnitDefsXmas[unitDef.name] = {
+				{class='SantaHat', options={color={0,0,0.7,1}, pos={0,0,0}, emitVector={0,1,-0.1}, width=4.05*s, height=9*s, ballSize=1.05*s, piece="hat"}},
 			}	    
 		end
 	end

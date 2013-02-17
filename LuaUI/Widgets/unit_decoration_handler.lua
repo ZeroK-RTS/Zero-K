@@ -35,8 +35,22 @@ local commtypeTable = include("Configs/decoration_handler_defs.lua")
 local textures = {} 
 local unitAlreadyAdded = {}
 
-local imagePath = 'LuaUI/Configs/Decorations/'
+local imagePaths = {	-- tested in order
+  'LuaUI/Configs/Decorations/',
+  'LuaUI/Configs/Avatars/',
+  'LuaUI/Configs/Factions/',
+  'LuaUI/Configs/Clans/',
+}
 local imageFormat = '.png'
+
+local function GetImageDir(imageName)
+  for i=1,#imagePaths do
+    local dir = imagePaths[i] .. imageName .. imageFormat
+    if VFS.FileExists(dir) then
+      return dir
+    end
+  end
+end
 
 -------------------
 -- Unit Handling
@@ -92,7 +106,7 @@ local function SetupPossibleCommander(unitID,  unitDefID)
 				for pointName, data in pairs(points) do
 					local imageName = decIcons[pointName]
 					if imageName then
-						local image = imagePath .. imageName .. imageFormat
+						local image = GetImageDir(imageName)
 						AddUnitTexture(unitID, data,  image)
 					end
 				end
@@ -113,7 +127,7 @@ local function RemovePossibleCommander(unitID,  unitDefID)
 				for pointName, data in pairs(points) do
 					local imageName = (ud.customParams.decorationicons or {}).pointName
 					if imageName then
-						local image = imagePath .. imageName .. imageFormat
+						local image = GetImageDir(imageName)
 						AddUnitTexture(unitID, data,  image)
 					end
 				end
