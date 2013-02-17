@@ -229,8 +229,10 @@ path='Settings/Misc/Spectating'
 path='Settings/Misc/Screenshots'	
 	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
 	ShButton( 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots' )
-	ShButton( 'Create Video', 'createvideo', 'Find your video under the Spring folder.' ) 
-	
+	ShButton( 'Create Video (risky)', 'createvideo', 'Capture video directly from Spring and save them in Spring folder (without sound). '
+				..'Benefit: smooth video framerate without ingame stutter. '
+				..'Caution: Is safer to use in windowed mode (because the Encoder pop-up menu need to appear in the foreground window) and could crash the game with \"Fatal Error: Fail to Allocate memory\" after long recording. '
+				..'\n\nRecommendation (.esp low-end PC): After activating video recording select the fastest Encoder such as Microsoft Video (select this in the pop-up window) and record video in segments. You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other (opensource) video capture software like Taksi that you could try.') 
 	
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 path='Settings/Graphics'
