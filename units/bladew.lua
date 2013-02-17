@@ -123,6 +123,44 @@ unitDef = {
     },
 
   },
+	
+  featureDefs                   = {
+
+    DEAD = {
+      description      = [[Wreckage - Gnat]],
+      blocking         = false,
+      category         = [[corpses]],
+      damage           = 300,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      footprintX       = 1,
+      footprintZ       = 1,
+      height           = [[20]],
+      hitdensity       = [[100]],
+      metal            = 36,
+      object           = [[debris1x1a.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 36,
+    },
+
+
+    HEAP = {
+      description      = [[Debris - Gnat]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 300,
+      energy           = 0,
+      footprintX       = 1,
+      footprintZ       = 1,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 18,
+      object           = [[debris1x1b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 18,
+    },
+
+  },
 
 }
 

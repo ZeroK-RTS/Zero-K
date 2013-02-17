@@ -128,52 +128,7 @@ unitDef = {
     },
 
   },
-
-
-  featureDefs            = {
-
-    DEAD  = {
-      description      = [[Debris - Puppy]],
-      blocking         = false,
-      category         = [[corpses]],
-      damage           = 80,
-      energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 25,
-      object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 25,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Puppy]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 80,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 25,
-      object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 25,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-  },
-
+  
 }
 
 return lowerkeys({ puppy = unitDef })

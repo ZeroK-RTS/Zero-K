@@ -15,6 +15,7 @@ unitDef = {
   canPatrol           = true,
   category            = [[LAND]],
   cloakCost           = 0,
+  corpse              = [[DEAD]],
 
   customParams        = {
     description_bp = [[Robô batedor escalador]],
@@ -120,6 +121,44 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 600,
+    },
+	
+  },
+	
+  featureDefs                   = {
+
+    DEAD = {
+      description      = [[Wreckage - Flea]],
+      blocking         = false,
+      category         = [[corpses]],
+      damage           = 40,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      footprintX       = 1,
+      footprintZ       = 1,
+      height           = [[20]],
+      hitdensity       = [[100]],
+      metal            = 8,
+      object           = [[debris1x1a.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 8,
+    },
+
+
+    HEAP = {
+      description      = [[Debris - Flea]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 40,
+      energy           = 0,
+      footprintX       = 1,
+      footprintZ       = 1,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 4,
+      object           = [[debris1x1b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 4,
     },
 
   },

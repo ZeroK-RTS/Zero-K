@@ -19,8 +19,21 @@ local RIGHT_ANGLE = math.rad(90)
 smokePiece = { base, l_wing, r_wing }
 local burrowed = false
 
+local SIG_BURROW = 1
 
 local function Burrow()
+	Signal(SIG_BURROW)
+	SetSignalMask(SIG_BURROW)
+	
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	local height = Spring.GetGroundHeight(x,z)
+	
+	while height + 35 < y do
+		Sleep(500)
+		x,y,z = Spring.GetUnitPosition(unitID)
+		height = Spring.GetGroundHeight(x,z)
+	end
+	
 	burrowed = true
 	
 	--Spring.UnitScript.SetUnitValue( firestate, 0 )
@@ -34,6 +47,7 @@ local function Burrow()
 end
 
 local function UnBurrow()
+	Signal(SIG_BURROW)
 	burrowed = false
 	Spring.SetUnitCloak(unitID, 0)
 	Spring.SetUnitStealth(unitID, false)
