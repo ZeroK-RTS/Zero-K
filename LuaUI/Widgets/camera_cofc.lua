@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.106 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.107 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-02-13 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -300,8 +300,8 @@ options = {
 	},
     
  	thirdpersonedgescroll = {
-		name = "3rd Person Edge Scroll",
-		desc = "Use edge screen & arrow key to jump to nearby unit.",
+		name = "3rd Person Trackmode Retarget",
+		desc = "When in 3rd Person Trackmode, use the arrow keys to follow a nearby unit.",
 		type = 'bool',
 		value = true,
 	},
