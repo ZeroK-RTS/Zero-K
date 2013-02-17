@@ -7,7 +7,7 @@ local downbeam = piece 'downbeam'
 local shoop_da_woop = piece 'shoop_da_woop' 
 local flashpoint = piece 'flashpoint' 
 
-local on
+local on = false
 
 smokePiece = {base}
 
@@ -17,9 +17,9 @@ local TARGET_ALT = 143565270/2^16
 
 function TargetingLaser()
 	while on do
-		EmitSfx( mah_lazer,  FIRE_W2 )
-		EmitSfx( downbeam,  FIRE_W3 )
-		EmitSfx( flashpoint,  FIRE_W3 )	--fakes the laser flare
+		EmitSfx( mah_lazer,  FIRE_W3 )
+		EmitSfx( downbeam,  FIRE_W4 )
+		EmitSfx( flashpoint,  FIRE_W4 )	--fakes the laser flare
 		Sleep(30)
 	end
 end
@@ -61,6 +61,10 @@ end
 
 function script.QueryWeapon(num)
 	return mah_lazer
+end
+
+function script.FireWeapon(num)
+	EmitSfx( mah_lazer,  FIRE_W2 )
 end
 
 function script.AimFromWeapon(num)

@@ -4,8 +4,6 @@ unitDef = {
   description                   = [[Planetary Energy Chisel]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  antiweapons                   = [[1]],
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 32700,
   buildCostEnergy               = 35000,
@@ -18,7 +16,6 @@ unitDef = {
   buildPic                      = [[mahlazer.png]],
   buildTime                     = 35000,
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[120 120 120]],
@@ -35,7 +32,6 @@ unitDef = {
 	modelradius    = [[60]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 8,
   footprintZ                    = 8,
@@ -65,8 +61,6 @@ unitDef = {
 
   side                          = [[ARM]],
   sightDistance                 = 660,
-  smoothAnim                    = true,
-  TEDClass                      = [[FORT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -75,23 +69,26 @@ unitDef = {
   weapons                       = {
 
     {
-      def                = [[LAZER]],
+      def                = [[TARGETER]],
       badTargetCategory  = [[FIXEDWING GUNSHIP SATELLITE]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP SATELLITE]],
-    },
-
-
+    },  
+  
     {
-      def                = [[TARGETER]],
+      def                = [[LAZER]],
       onlyTargetCategory = [[NONE]],
     },
 
-
+    {
+      def                = [[CUTTER]],
+      onlyTargetCategory = [[NONE]],
+    },    
+    
     {
       def                = [[RELAY]],
       onlyTargetCategory = [[NONE]],
-    },
-
+    },   
+    
   },
 
 
@@ -104,7 +101,6 @@ unitDef = {
       areaOfEffect            = 140,
       avoidFeature            = false,
       avoidNeutral            = false,
-      beamlaser               = 1,
       beamTime                = 1,
       coreThickness           = 0.5,
       craterBoost             = 4,
@@ -123,7 +119,7 @@ unitDef = {
       laserFlareSize          = 10,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 9000,
+      range                   = 10000,	-- extra 1000 to prevent cutoff at max range
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser4]],
@@ -139,24 +135,21 @@ unitDef = {
       weaponVelocity          = 1400,
     },
 
-
-    RELAY    = {
-      name                    = [[Mah Relay Lazor]],
+    CUTTER    = {
+      name                    = [[Groovecutter]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
       avoidFeature            = false,
       avoidNeutral            = false,
-      beamlaser               = 1,
       beamTime                = 0.001,
       canattackground         = false,
       coreThickness           = 0.5,
-      --craterBoost             = 2,
-      --craterMult              = 4,
+      craterBoost             = 2,
+      craterMult              = 4,
       cylinderTargeting      = 8192,
 
       damage                  = {
         default = 100,
-        planes  = 100,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -166,7 +159,49 @@ unitDef = {
       largeBeamLaser          = true,
       laserFlareSize          = 12,
       minIntensity            = 1,
-      range                   = 9000,
+      range                   = 9000,	-- extra 1000 to prevent cutoff at max range
+      reloadtime              = 0.03,
+      rgbColor                = [[0.25 0 1]],
+      soundStart              = [[weapon/laser/laser_burn6]],
+      soundStartVolume        = 1,
+      soundTrigger            = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 16,
+      tolerance               = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 1400,
+    },    
+
+    RELAY    = {
+      name                    = [[Mah Relay Lazor (fake)]],
+      alwaysVisible           = 18,
+      areaOfEffect            = 56,
+      avoidFeature            = false,
+      avoidNeutral            = false,
+      beamTime                = 0.001,
+      canattackground         = false,
+      coreThickness           = 0.5,
+      --craterBoost             = 2,
+      --craterMult              = 4,
+      cylinderTargeting      = 8192,
+
+      damage                  = {
+        default = 100,
+      },
+
+      explosionGenerator      = [[custom:FLASHLAZER]],
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 12,
+      minIntensity            = 1,
+      range                   = 100,
       reloadtime              = 0.03,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/laser_burn6]],
@@ -186,25 +221,23 @@ unitDef = {
 
 
     TARGETER = {
-      name                    = [[Groovecutter]],
+      name                    = [[Aimer (fake)]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
       avoidFeature            = false,
       avoidNeutral            = false,
-      beamlaser               = 1,
       beamTime                = 0.001,
+      burst                   = 600,	-- to fool context menu
+      burstRate               = 0.03,
       canattackground         = false,
       coreThickness           = 0.5,
-      craterBoost             = 2,
-      craterMult              = 4,
       cylinderTargeting      = 8192,
 
       damage                  = {
-        default = 100,
-        planes  = 100,
+        default = -0.00001,
       },
 
-      explosionGenerator      = [[custom:FLASHLAZER]],
+      explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -212,16 +245,16 @@ unitDef = {
       laserFlareSize          = 12,
       minIntensity            = 1,
       range                   = 9000,
-      reloadtime              = 0.03,
+      reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-      soundStart              = [[weapon/laser/laser_burn6]],
-      soundStartVolume        = 1,
+      soundVolume             = 0,
+      soundStartVolume        = 0,
       soundTrigger            = true,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
       texture4                = [[smallflare]],
-      thickness               = 16,
+      thickness               = 0,
       tolerance               = 10000,
       turret                  = true,
       waterWeapon             = true,
