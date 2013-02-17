@@ -114,7 +114,7 @@ end
 
 -- SETUP MENU HERE
 
---- GENERAL SETTINGS ---
+--- GENERAL SETTINGS --- settings about settings
 path='Settings/Reset Settings'
 	ShLabel( 'Reset graphic settings to minimum.')
 	ShButton( 'Reset graphic settings',function()
@@ -186,11 +186,11 @@ path='Settings/Camera'
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
 	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
---- SETTINGS --- Only settings that pertain to windows/icons at the drawscreen level should go here.
-path='Settings/Interface'
+--- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
+path='Settings/HUD Panels'
 	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 
-path='Settings/Interface/Interface Skin'
+path='Settings/HUD Panels/HUD Skin'
 	AddOption({
 		name = 'Skin Sets (Requires LuaUI Reload)',
 		type = 'list',
@@ -209,9 +209,12 @@ path='Settings/Interface/Interface Skin'
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 path='Settings/Misc'
 	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
+
+
+--- Interface --- anything that's an interface but not a HUD Panel
+path='Settings/Interface'
 	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
-	
-path='Settings/Misc/Mouse Cursor'
+path='Settings/Interface/Mouse Cursor'
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
 	AddOption({ 	
 		name = 'Hardware Cursor',
@@ -219,7 +222,7 @@ path='Settings/Misc/Mouse Cursor'
 		springsetting = 'HardwareCursor',
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	} )	
-path='Settings/Misc/Spectating'
+path='Settings/Interface/Spectating'
 	ShLabel('Spectator View/Selection')
 	ShButton('View Chosen Player', function() spSendCommands{"specfullview 0"} end )
 	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
@@ -229,10 +232,11 @@ path='Settings/Misc/Spectating'
 path='Settings/Misc/Screenshots'	
 	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
 	ShButton( 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots' )
-	ShButton( 'Create Video (risky)', 'createvideo', 'Capture video directly from Spring and save them in Spring folder (without sound). '
-				..'Benefit: smooth video framerate without ingame stutter. '
-				..'Caution: Is safer to use in windowed mode (because the Encoder pop-up menu need to appear in the foreground window) and could crash the game with \"Fatal Error: Fail to Allocate memory\" after long recording. '
-				..'\n\nRecommendation (.esp low-end PC): After activating video recording select the fastest Encoder such as Microsoft Video (select this in the pop-up window) and record video in segments. You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other (opensource) video capture software like Taksi that you could try.') 
+	ShButton( 'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
+				..'Creates a smooth video framerate without ingame stutter. '
+				..'Caution: It\'s safer to use this in windowed mode because the encoder pop-up menu appears in the foreground window, and could crash the game with a "Fatal Error" after a long recording. '
+				..'\n\nRecommendation (especially for low-end PCs): After activating the video recording select the fastest encoder such as Microsoft Video and record the video in segments. '
+				..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.' ) 
 	
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 path='Settings/Graphics'
