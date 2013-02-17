@@ -57,7 +57,7 @@ local optionData = {
 		tooltip = "Support Commander\nUses a gauss rifle (pierces units), has increased income and build range but low health and speed.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:commsupport")
-			Spring.SendCommands({'say a:I choose: Support Commander !'})
+			Spring.SendCommands({'say a:I choose: Support Commander!'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
 			Close(true)
 		end 
@@ -70,7 +70,7 @@ local optionData = {
 		tooltip = "Bombard Commander\nUses an assault cannon; extended range and diminished speed with otherwise average stats.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:benzcom")
-			Spring.SendCommands({'say a:I choose: Bombard Commander !'})
+			Spring.SendCommands({'say a:I choose: Bombard Commander!'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
 			Close(true)
 		end 
