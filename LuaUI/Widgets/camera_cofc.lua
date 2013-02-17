@@ -74,6 +74,7 @@ options_order = {
 }
 
 local OverviewAction = function() end
+local SetFOV = function(fov) end
 
 options = {
 	
@@ -214,12 +215,12 @@ options = {
 		value = 0.2,
 	},
 	fov = {
-		name = 'Field of View',
-		desc = "FOV (35 deg - 100 deg). Requires restart to take effect.",
-		springsetting = 'CamFreeFOV',
+		name = 'Field of View (Degrees)',
+		--desc = "FOV (25 deg - 100 deg).",
 		type = 'number',
-		min = 35, max = 100, step = 5,
-		value = 45,
+		min = 10, max = 100, step = 5,
+		value = Spring.GetCameraFOV(),
+		OnChange = function(self) SetFOV(self.value) end
 	},
 	invertscroll = {
 		name = "Invert scrolling direction",
@@ -723,6 +724,11 @@ local function Altitude(up, s)
 	return true
 end
 
+SetFOV = function(fov)
+	local cs = spGetCameraState()
+	cs.fov = fov
+    spSetCameraState(cs,0)
+end
 
 local function ResetCam()
 	local cs = spGetCameraState()
