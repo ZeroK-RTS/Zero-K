@@ -87,7 +87,7 @@ local UnitDefsList = {}
 for i=1,#UnitDefs do
 	local ud = UnitDefs[i]
 	local unitName = ud.humanName
-	if not unitName:find('test') and not ignoreList[unitName] then
+	if not (unitName:find('test') or unitName:find('fake')) and not ignoreList[unitName] then
 		UnitDefsList[#UnitDefsList+1] = {unitName=unitName, ud=ud}
 	end
 end
