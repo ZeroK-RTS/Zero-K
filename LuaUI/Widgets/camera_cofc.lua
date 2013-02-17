@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.107 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.108 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-02-13 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -66,7 +66,7 @@ options_order = {
 	'persistenttrackmode',
 	'thirdpersontrack',
 	'thirdpersonedgescroll',
-	--'persistentthirdpersontrackmode',
+
 	'resetcam',
 	
 	'enableCycleView',
@@ -220,6 +220,7 @@ options = {
 		type = 'number',
 		min = 10, max = 100, step = 5,
 		value = Spring.GetCameraFOV(),
+		springsetting = 'CamFreeFOV', --save stuff in springsetting. reference: epicmenu_conf.lua
 		OnChange = function(self) SetFOV(self.value) end
 	},
 	invertscroll = {
@@ -443,10 +444,21 @@ local hideCursor = false
 
 
 local mwidth, mheight = Game.mapSizeX, Game.mapSizeZ
-local averageEdgeHeight = (spGetGroundHeight(mwidth/2,0) + spGetGroundHeight(0,mheight/2) + spGetGroundHeight(mwidth/2,mheight) +spGetGroundHeight(mwidth,mheight/2))/4
+local averageEdgeHeight = 0
 local mcx, mcz 	= mwidth / 2, mheight / 2
 local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(mheight, mwidth) * 2
+do
+	local northEdge = spGetGroundHeight(mwidth/2,0)
+	local eastEdge = spGetGroundHeight(0,mheight/2)
+	local southEdge = spGetGroundHeight(mwidth/2,mheight)
+	local westEdge = spGetGroundHeight(mwidth,mheight/2)
+	averageEdgeHeight =(northEdge+eastEdge+southEdge+westEdge)/4 --is used for estimating coordinate in null space
+	
+	local currentFOVhalf_rad = (Spring.GetCameraFOV()/2)*PI/180
+	local mapLenght = (max(mheight, mwidth)+4000)/2
+	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust TAB/Overview distance based on camera FOV
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
@@ -728,6 +740,11 @@ SetFOV = function(fov)
 	local cs = spGetCameraState()
 	cs.fov = fov
     spSetCameraState(cs,0)
+	Spring.Echo(fov .. " degree")
+	
+	local currentFOVhalf_rad = (fov/2)*PI/180
+	local mapLenght = (max(mheight, mwidth)+4000)/2
+	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust TAB/Overview distance based on camera FOV
 end
 
 local function ResetCam()
