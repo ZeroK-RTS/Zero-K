@@ -44,13 +44,16 @@ end
 local function MakeMinimapWindow()
 end
 
-options_path = 'Settings/Interface/Minimap'
-local radar_path = 'Settings/Graphics/Radar View Colors'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'opacity',
-'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
+options_path = 'Settings/Interface/Map'
+local minimap_path = 'Settings/HUD Panels/Minimap'
+--local radar_path = 'Settings/Interface/Map/Radar View Colors'
+local radar_path = 'Settings/Interface/Map'
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'viewstandard', 'opacity',
+'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
+'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
 	use_map_ratio = {
-		name = 'Minimap Keeps Aspect Ratio',
+		name = 'Keep Aspect Ratio',
 		type = 'bool',
 		value = true,
 		advanced = true,
@@ -61,6 +64,7 @@ options = {
 			end 
 			window_minimap.fixedRatio = self.value;			
 		end,
+		path = minimap_path,
 	},
 	--[[
 	simpleMinimapColors = {
@@ -118,13 +122,9 @@ options = {
 		type = 'button',
 		action = 'togglelos',
 	},
-	opacity = {
-		name = "Opacity",
-		type = "number",
-		value = 0, min = 0, max = 1, step = 0.01,
-		OnChange = function(self) window_minimap.color = {1,1,1,self.value}; window_minimap:Invalidate() end,
-	},
-	radar_color_label = { type = 'label', name = 'Note: These colors are additive.', path = radar_path,},
+	
+	radar_view_colors_label1 = { type = 'label', name = 'Radar View Colors', path = radar_path,},
+	radar_view_colors_label2 = { type = 'label', name = '* Note: These colors are additive.', path = radar_path,},
 	
 	radar_fog_color = {
 		name = "Fog Color",
@@ -200,6 +200,14 @@ options = {
 		advanced = true,
 		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end,
 		value = false,
+		path = minimap_path,
+	},
+	opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) window_minimap.color = {1,1,1,self.value}; window_minimap:Invalidate() end,
+		path = minimap_path,
 	},
 
 }

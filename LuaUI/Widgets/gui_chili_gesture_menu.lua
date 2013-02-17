@@ -83,7 +83,7 @@ local function OptionsChanged()
 end 
 
 
-options_path = 'Settings/Interface/Gestures'
+options_path = 'Settings/HUD Panels/Gestures'
 options_order = { 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', 'onlyOpenWithKeyboard', "qwertz", 'alternateconfig', 'allowMultiple'}
 options = {
 	

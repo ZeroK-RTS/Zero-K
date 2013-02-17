@@ -1881,10 +1881,13 @@ function widget:Initialize()
 
 	--this is done to establish order the correct button order
 	AddOption('Settings/Reset Settings')
+	AddOption('Settings/Audio')
 	AddOption('Settings/Camera')
 	AddOption('Settings/Graphics')	
+	AddOption('Settings/HUD Panels')
 	AddOption('Settings/Interface')
 	AddOption('Settings/Misc')
+	
 
 	-- Add pre-configured button/options found in epicmenu config file
 	local options_temp ={}

@@ -16,7 +16,7 @@ local Window
 local screen0
 
 local forceUpdate = false 
-options_path = 'Settings/Interface/Docking'
+options_path = 'Settings/HUD Panels/Docking'
 options_order = { 'dockEnabled', 'dockThreshold', }
 options = {
 	dockThreshold = {

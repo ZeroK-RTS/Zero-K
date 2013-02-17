@@ -79,13 +79,13 @@ local mouseOverClose = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Pause Screen'
+options_path = 'Settings/HUD Panels/Pause Screen'
 
 options = { 
 	hideimage = {
 		name='Disable Pause Screen', 
 		type='bool',
-		desc = 'Remember to not display pause-screen anymore. \n\nRemainder: you can revisit this configuration page at any time later at "Settings/Interface/Pause Screen" if needed.',
+		desc = 'Remember to not display pause-screen anymore. \n\nRemainder: you can revisit this configuration page at any time later at "Settings/HUD Panels/Pause Screen" if needed.',
 		value=false,
 		},
 	disablesound = {

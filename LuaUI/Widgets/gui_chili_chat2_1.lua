@@ -160,7 +160,7 @@ local wasSimpleColor = nil -- variable: indicate if simple color was toggled on 
 
 ----
 
-options_path = "Settings/Interface/Chat/Console"
+options_path = "Settings/HUD Panels/Chat/Console"
 options_order = {
 	'mousewheel', 'clickable_points',
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
@@ -570,10 +570,30 @@ local function displayMessage(msg, remake)
 				if (mouse == 1 and click_on_text) then
 					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 				end
+				--[[ testing - CarRep
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then return false end
+				WG.crude.OpenPath(options_path)
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				--]]
+			
 			end}
 			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
 				return self
 			end
+			--[[ testing - CarRep
+		else
+			textbox.OnMouseDown = {function(self, x, y, mouse)
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then return false end
+				WG.crude.OpenPath(options_path)
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+			
+			end}
+			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+				return self
+			end
+			--]]
 		end
 
 		stack_console:AddChild(textbox, false)
@@ -880,7 +900,7 @@ function widget:Initialize()
 			inputspace,
 		},
 		OnMouseDown = {
-			function(self) --//click on scroll bar shortcut to "Settings/Interface/Chat/Console".
+			function(self) --//click on scroll bar shortcut to "Settings/HUD Panels/Chat/Console".
 				local _,_, meta,_ = Spring.GetModKeyState()
 				if not meta then return false end
 				WG.crude.OpenPath(options_path)

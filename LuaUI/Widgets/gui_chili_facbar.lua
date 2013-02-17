@@ -50,7 +50,7 @@ local echo = Spring.Echo
 
 local function RecreateFacbar() end
 
-options_path = 'Settings/Interface/FactoryBar'
+options_path = 'Settings/HUD Panels/FactoryBar'
 options = {
 	maxVisibleBuilds = {
 		type = 'number',

@@ -13,7 +13,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Misc/Local Team Colors'
+options_path = 'Settings/Interface/Local Team Colors'
 options = {
 	simpleColors = {
 		name = "Simple Colors",

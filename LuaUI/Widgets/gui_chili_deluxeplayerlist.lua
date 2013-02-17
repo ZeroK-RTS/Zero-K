@@ -52,7 +52,7 @@ local incolor2color
 
 local window_cpl, scroll_cpl
 
-options_path = 'Settings/Interface/PlayerList'
+options_path = 'Settings/HUD Panels/PlayerList'
 options_order = { 'visible', 'backgroundOpacity', 'text_height', 'name_width', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {

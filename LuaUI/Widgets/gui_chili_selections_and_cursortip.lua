@@ -176,7 +176,7 @@ local gi_label	--group info Chili label
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Tooltip'
+options_path = 'Settings/HUD Panels/Tooltip'
 options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip','showDrawTools',
   'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar', 'color_background',
 }
@@ -186,7 +186,7 @@ local function option_Deselect()
   Spring.SelectUnitMap({}, false)
   window_height = options.squarepics.value and 140 or 115
 end
-local selPath = 'Settings/Interface/Selected Units Window'
+local selPath = 'Settings/HUD Panels/Selected Units Window'
 options = {
 	tooltip_delay = {
 		name = 'Tooltip display delay (0 - 4s)',
@@ -2269,7 +2269,7 @@ function widget:Initialize()
 		OnMouseDown={ function(self)
 			local _,_, meta,_ = Spring.GetModKeyState()
 			if not meta then return false end
-			WG.crude.OpenPath('Settings/Interface/Selected Units Window')
+			WG.crude.OpenPath('Settings/HUD Panels/Selected Units Window')
 			WG.crude.ShowMenu()
 			return true --skip button function, else clicking on build pic will also select the unit.
 		end },

@@ -54,7 +54,7 @@ local window_width  = 400
 local window_timeout = 10
 --]]
 --options_section = 'Interface'
-options_path = 'Settings/Interface/Chat/Bubbles'
+options_path = 'Settings/HUD Panels/Chat/Bubbles'
 options_order = {'setavatar','filterGlobalChat', 'filterAutohostMsg', 'text_height', 'window_margin', 'window_width', 'window_height', 'window_timeout', 'firstbubble_y',}
 options = {
 	setavatar = {
@@ -62,7 +62,7 @@ options = {
 		desc = 'Avatar to show next to your bubble. Requires the Avatar widget',
 		type = 'button',
 		OnChange = function() Spring.SendCommands{"luaui enablewidget Avatars", "setavatar"} end,
-		path = 'Settings/Interface/Chat',
+		path = 'Settings/HUD Panels/Chat',
 	},
 	filterGlobalChat = {
 		name = 'Filter Global Chat',
@@ -321,7 +321,7 @@ function widget:AddChatMessage(msg)
 		OnMouseDown = {function()
 			local _, _, meta, _ = Spring.GetModKeyState()
 			if meta then
-				WG.crude.OpenPath('Settings/Interface/Chat') --click + space will shortcut to option-menu
+				WG.crude.OpenPath('Settings/HUD Panels/Chat') --click + space will shortcut to option-menu
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
 			end		

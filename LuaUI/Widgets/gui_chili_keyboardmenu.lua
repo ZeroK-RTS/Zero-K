@@ -105,7 +105,7 @@ local function SetupKeybuttons() end
 
 
 options_path = 'Game/Selections'
-local KBMenuPath = 'Settings/Interface/KB Menu'
+local KBMenuPath = 'Settings/HUD Panels/KB Menu'
 options_order = {
 	'lbl_main',
 	'select_all',
@@ -796,14 +796,6 @@ local function SetupTabs()
 			backgroundColor = white_table,
 			
 			OnMouseDown = { function()
-				--[[	
-				local _,_, meta,_ = Spring.GetModKeyState()
-				if meta then 
-					WG.crude.OpenPath('Settings/Interface/KB Menu')
-					WG.crude.ShowMenu() --make epic Chili menu appear.
-					return false
-				end
-				--]]	
 				SetCurTab(tab)
 				
 			end },
@@ -1130,7 +1122,7 @@ function widget:Initialize()
 		tooltip = 'Configure Hotkeys',
 		backgroundColor = white_table,
 		OnClick = { function()
-			WG.crude.OpenPath('Settings/Interface/KB Menu')
+			WG.crude.OpenPath('Settings/HUD Panels/KB Menu')
 			WG.crude.ShowMenu() --make epic Chili menu appear.
 		end }, 
 		bottom = tabHeight .. '%',

@@ -619,7 +619,7 @@ function widget:DrawWorld()
 	
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
-	local peruse = spGetGameFrame() < 1 or spGetMapDrawMode() == 'metal' or (WG.GetWidgetOption and WG.GetWidgetOption('Chili Minimap','Settings/Interface/Minimap','alwaysDisplayMexes').value)
+	local peruse = spGetGameFrame() < 1 or spGetMapDrawMode() == 'metal' or (WG.GetWidgetOption and WG.GetWidgetOption('Chili Minimap','Settings/Interface/Map','alwaysDisplayMexes').value)
 	
 	local mx, my = spGetMouseState()
 	local _, pos = spTraceScreenRay(mx, my, true)

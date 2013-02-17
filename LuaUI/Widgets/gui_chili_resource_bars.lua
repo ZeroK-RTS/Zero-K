@@ -89,7 +89,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Resource Bars'
+options_path = 'Settings/HUD Panels/Resource Bars'
 
 local function option_workerUsageUpdate()
 	DestroyWindow()

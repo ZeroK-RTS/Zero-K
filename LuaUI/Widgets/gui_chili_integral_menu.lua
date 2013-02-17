@@ -47,7 +47,7 @@ NOTE FOR OTHER GAME DEVS:
 --  CONFIG
 ------------------------
 ------------------------
-options_path = 'Settings/Interface/Integral Menu'
+options_path = 'Settings/HUD Panels/Integral Menu'
 options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
 options = {
 	disablesmartselect = {
