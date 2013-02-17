@@ -17,9 +17,9 @@ local TARGET_ALT = 143565270/2^16
 
 function TargetingLaser()
 	while on do
-		EmitSfx( mah_lazer,  FIRE_W1 )
-		EmitSfx( downbeam,  FIRE_W2 )
-		EmitSfx( flashpoint,  FIRE_W2 )	--fakes the laser flare
+		EmitSfx( mah_lazer,  FIRE_W2 )
+		EmitSfx( downbeam,  FIRE_W3 )
+		EmitSfx( flashpoint,  FIRE_W3 )	--fakes the laser flare
 		Sleep(30)
 	end
 end
@@ -57,10 +57,6 @@ function script.AimWeapon(num, heading, pitch)
 		return true
 	end
 	return false
-end
-
-function script.BlockShot(num)
-	return true
 end
 
 function script.QueryWeapon(num)

@@ -73,11 +73,17 @@ unitDef = {
   yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
   weapons                       = {
-  
+
+    {
+      def                = [[LAZER]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP SATELLITE]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP SATELLITE]],
+    },
+
+
     {
       def                = [[TARGETER]],
-	  badTargetCategory  = [[FIXEDWING GUNSHIP SATELLITE]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP SATELLITE]],
+      onlyTargetCategory = [[NONE]],
     },
 
 
@@ -142,7 +148,7 @@ unitDef = {
       avoidNeutral            = false,
       beamlaser               = 1,
       beamTime                = 0.001,
-      canattackground         = true,
+      canattackground         = false,
       coreThickness           = 0.5,
       --craterBoost             = 2,
       --craterMult              = 4,
