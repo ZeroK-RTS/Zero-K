@@ -44,8 +44,7 @@ local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
-
-local USEFILEFORKEYBINDS = true -- instead of saving to zk_data, use a config file to save/load keybinds
+local keybind_file = confdata.keybind_file
 
 --------------------------------------------------------------------------------
 
@@ -2024,8 +2023,8 @@ end
 
 
 function widget:GetConfigData()
-	if USEFILEFORKEYBINDS then
-		table.save(settings.keybounditems, "LuaUI/configs/epicmenu_keybinds.lua" )
+	if keybind_file then
+		table.save(settings.keybounditems, keybind_file )
 	end
 	
 	return settings
@@ -2039,11 +2038,8 @@ function widget:SetConfigData(data)
 	end
 	WG.music_volume = settings.music_volume or 0.5
 	
-	if USEFILEFORKEYBINDS then
-		local path = 'LuaUI/configs/epicmenu_keybinds.lua'
-		if VFS.FileExists(path) then
-			settings.keybounditems = loadstring( VFS.LoadFile(path, VFS.RAW) )()
-		end
+	if keybind_file and VFS.FileExists(keybind_file) then
+		settings.keybounditems = loadstring( VFS.LoadFile(keybind_file, VFS.RAW) )()
 	end
 	
 end
