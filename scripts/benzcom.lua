@@ -76,7 +76,7 @@ local RESTORE_DELAY_DGUN = 2500
 -- vars
 --------------------------------------------------------------------------------
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
-local restoreHeading, restorePitch = heading, pitch
+local restoreHeading, restorePitch = 0, 0
 
 local flamers = {}
 local wepTable = UnitDefs[unitDefID].weapons
