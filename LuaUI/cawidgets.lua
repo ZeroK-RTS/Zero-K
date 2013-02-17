@@ -163,7 +163,9 @@ widgetHandler = {
 -- they are setup in UpdateCallIns()
 local flexCallIns = {
   'GameOver',
+  'GamePaused',
   'GameFrame',
+  'GameSetup',
   'TeamDied',
   'TeamChanged',
   'PlayerAdded',
@@ -172,7 +174,6 @@ local flexCallIns = {
   'ShockFront',
   'WorldTooltip',
   'MapDrawCmd',
-  'GameSetup',
   'DefaultCommand',
   'UnitCreated',
   'UnitFinished',
@@ -209,6 +210,7 @@ local flexCallIns = {
   'DrawWorldRefraction',
   'DrawScreenEffects',
   'DrawInMiniMap',
+  'RecvSkirmishAIMessage',
   'SelectionChanged',
   'AddTransmitLine',
   'AddConsoleMessage',
@@ -233,6 +235,10 @@ local callInLists = {
   'KeyRelease',
   'MousePress',
   'MouseWheel',
+  'JoyAxis',
+  'JoyHat',
+  'JoyButtonDown',
+  'JoyButtonUp',  
   'IsAbove',
   'GetTooltip',
   'GroupChanged',
@@ -1727,6 +1733,41 @@ function widgetHandler:MouseWheel(up, value)
   end
 end
 
+function widgetHandler:JoyAxis(axis, value)
+	for _,w in ipairs(self.JoyAxisList) do
+		if (w:JoyAxis(axis, value)) then
+		return true
+		end
+	end
+	return false
+end
+
+function widgetHandler:JoyHat(hat, value)
+	for _,w in ipairs(self.JoyHatList) do
+		if (w:JoyHat(hat, value)) then
+		return true
+		end
+	end
+	return false
+end
+
+function widgetHandler:JoyButtonDown(button, state)
+	for _,w in ipairs(self.JoyButtonDownList) do
+		if (w:JoyButtonDown(button, state)) then
+		return true
+		end
+	end
+	return false
+end
+
+function widgetHandler:JoyButtonUp(button, state)
+	for _,w in ipairs(self.JoyButtonUpList) do
+		if (w:JoyButtonUp(button, state)) then
+		return true
+		end
+	end
+	return false
+end
 
 function widgetHandler:IsAbove(x, y)
   if (self.tweakMode) then
@@ -1804,6 +1845,14 @@ function widgetHandler:GameOver()
 end
 
 
+function widgetHandler:GamePaused(playerID, paused)
+  for _,w in ipairs(self.GamePausedList) do
+    w:GamePaused(playerID, paused)
+  end
+  return
+end
+
+
 function widgetHandler:TeamDied(teamID)
   for _,w in ipairs(self.TeamDiedList) do
     w:TeamDied(teamID)
@@ -1860,6 +1909,14 @@ function widgetHandler:ShockFront(power, dx, dy, dz)
   return
 end
 
+function widgetHandler:RecvSkirmishAIMessage(aiTeam, dataStr)
+  for _,w in ipairs(self.RecvSkirmishAIMessageList) do
+    local dataRet = w:RecvSkirmishAIMessage(aiTeam, dataStr)
+    if (dataRet) then
+      return dataRet
+    end
+  end
+end
 
 function widgetHandler:WorldTooltip(ttType, ...)
   for _,w in ipairs(self.WorldTooltipList) do
