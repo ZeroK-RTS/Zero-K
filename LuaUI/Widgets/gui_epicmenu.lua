@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.308 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.309 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-02-07
     license   = "GNU GPL, v2 or later",
@@ -44,6 +44,8 @@ local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
+
+local USEFILEFORKEYBINDS = true -- instead of saving to zk_data, use a config file to save/load keybinds
 
 --------------------------------------------------------------------------------
 
@@ -2020,7 +2022,12 @@ function widget:Shutdown()
   Spring.SendCommands("unbind esc crudemenu")
 end
 
+
 function widget:GetConfigData()
+	if USEFILEFORKEYBINDS then
+		table.save(settings.keybounditems, "LuaUI/configs/epicmenu_keybinds.lua" )
+	end
+	
 	return settings
 end
 
@@ -2031,6 +2038,14 @@ function widget:SetConfigData(data)
 		end
 	end
 	WG.music_volume = settings.music_volume or 0.5
+	
+	if USEFILEFORKEYBINDS then
+		local path = 'LuaUI/configs/epicmenu_keybinds.lua'
+		if VFS.FileExists(path) then
+			settings.keybounditems = loadstring( VFS.LoadFile(path, VFS.RAW) )()
+		end
+	end
+	
 end
 
 function widget:Update()

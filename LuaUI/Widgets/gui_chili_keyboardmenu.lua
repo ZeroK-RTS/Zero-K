@@ -300,12 +300,6 @@ local function CapCase(str)
 	return str
 end
 
-local function BuildPrev()
-	if last_cmdid then
-		Spring.SetActiveCommand(last_cmdid)
-	end
-end
-
 local function AddHotkeyOptions()
 	local options_order_tmp_cmd = {}
 	local options_order_tmp_states = {}
@@ -423,6 +417,13 @@ end
 
 ------------------------------------------------
 --functions
+
+
+local function BuildPrev()
+	if last_cmdid then
+		Spring.SetActiveCommand(last_cmdid)
+	end
+end
 
 -- layout handler - its needed for custom commands to work and to delete normal spring menu
 local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
