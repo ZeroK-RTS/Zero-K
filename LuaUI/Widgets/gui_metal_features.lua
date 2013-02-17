@@ -17,12 +17,24 @@ function widget:GetInfo()
     name      = "MetalFeatures",
     desc      = "Highlights features with metal in the metal-map viewmode",
     author    = "trepan",
-    date      = "Aug 05, 2007",
+    date      = "Aug 05, 2007", --Feb 17, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = true,  --  loaded by default?
   }
 end
+
+--options for epicmenu:
+options_path = 'Settings/Interface/Metal Feature Highlight'
+options_order = {'autometalview',}
+options={
+	autometalview ={
+		name = 'Auto Metalmap Toggling',
+		desc = 'Automatically toggle metalmap view if you select RECLAIM command. This increase wreckage visibility',
+		type = 'bool',
+		value = false,
+	},
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -67,6 +79,37 @@ function widget:DrawWorld()
   gl.Fog(true)
 end
 
-
+----The following code auto-change any map-view into metalview when ordering RECLAIM, then return them to original (by msafwan):---
+local memPrevMapView = nil --remember any map-view prior to changes
+local currCmd =  Spring.GetActiveCommand() --remember current command
+function widget:Update()
+	if not options.autometalview.value then --Options
+		return
+	end
+	if currCmd == Spring.GetActiveCommand() then --if detect no change in command selection: --skip whole thing
+		return
+	end --else (command selection has change): perform check/automated-map-view-change
+	currCmd = Spring.GetActiveCommand() --update active command
+	if (not memPrevMapView) and (Spring.GetMapDrawMode() ~= 'metal') then --if not yet in metalview and not yet change to metalview: check for RECLAIM command
+		local activeCmd = Spring.GetActiveCmdDesc(currCmd) 
+		if activeCmd and activeCmd.name == "Reclaim" then --if current command is RECLAIM: remember present map-view & toggle metalview
+			memPrevMapView = Spring.GetMapDrawMode()
+			Spring.SendCommands("showmetalmap")
+		end
+	elseif memPrevMapView then --if have a memory of previous map-view: return to previous map-view
+		if (Spring.GetMapDrawMode() == 'metal') then --if still in metalview: exit metal view
+			if memPrevMapView == 'normal' then
+				Spring.SendCommands("showstandard")
+			elseif memPrevMapView == 'height' then
+				Spring.SendCommands("showelevation")
+			elseif memPrevMapView == 'pathTraversability' then
+				Spring.SendCommands("showpathtraversability")
+			elseif memPrevMapView == 'los' then
+				Spring.SendCommands("togglelos")
+			end
+		end
+		memPrevMapView = nil --forget about previous map-view
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
