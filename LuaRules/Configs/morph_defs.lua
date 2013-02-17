@@ -5,67 +5,6 @@
 local devolution = false
 
 local morphDefs = {
-
-  --[[ // sample definition1 with multiple possible morphs... you nest arrays inside the definition
-  armcom = {
-    {
-      into = 'armcomdgun',
-      time = 20,
-      metal = 10,
-      energy = 10,
-      tech = 1,
-      xp = 0,
-    },
-    {
-      into = 'corcom',
-      time = 20,
-      metal = 10,
-      energy = 10,
-      tech = 1,
-      xp = 0,
-    },
-  }
-  ]]--
-
-  --// commanders
---[[
-  armcom = {
-	{
-		into = 'armadvcom',
-		metal = 750,
-		energy = 750,
-		time = 75,
-	},
-  },
-  
-  corcom = {
-	{
-		into = 'coradvcom',
-		metal = 750,
-		energy = 750,
-		time = 75,
-	},
-  },
-  
-  commrecon = {
-	{
-		into = 'commadvrecon',
-		metal = 750,
-		energy = 750,
-		time = 75,
-	},
-  },
-
-  commsupport = {
-	{
-		into = 'commadvsupport',
-		metal = 750,
-		energy = 750,
-		time = 75,
-	},
-  },  
---]]
-  
   --// geos
   geo = {
     {
@@ -477,36 +416,43 @@ local morphDefs = {
   }, 
 }
 
+local baseComMorph = {
+	[1] = {	time = 25, cost = 250},
+	[2] = {	time = 30, cost = 300},
+	[3] = {	time = 40, cost = 400},
+	[4] = {	time = 50, cost = 500},
+}
+
+--------------------------------------------------------------------------------
+-- basic (non-modular) commander handling
+--------------------------------------------------------------------------------
+local comms = {"armcom", "corcom", "commrecon", "commsupport", "benzcom", "cremcom"}
+--[[
+for i=1,#comms do
+  for j=1,4 do
+    local source = comms[i]..j
+    local destination = comms[i]..(j+1)
+    morphDefs[source] = {
+      into = destination,
+      time = baseComMorph[j].time,
+      metal = baseComMorph[j].cost,
+      energy = baseComMorph[j].cost,
+      combatMorph = true,
+    }
+  end
+end
+]]
 
 --------------------------------------------------------------------------------
 -- modular commander handling
 --------------------------------------------------------------------------------
 local comMorph = {	-- not needed
-	[1] = {
-		time = 20,
-	},
-	[2] = {
-		time = 25,
-	},
-	[3] = {
-		time = 30,
-	},
-	[4] = {
-		time = 35,
-	},
-	[5] = {
-		time = 40,
-	},
+	[1] = {	time = 20,},
+	[2] = {	time = 25,},
+	[3] = {	time = 30,},
+	[4] = {	time = 35,},
+	[5] = {	time = 40,},
 }
-
---[[
-local comMorphTree = {
-	strike = {armcom, armadvcom},
-	battle = {corcom, coradvcom},
-	recon = {commrecon, commadvrecon},
-	support = {commsupport, commadvsupport},
-}
-]]--
 
 local customComms = {}
 
