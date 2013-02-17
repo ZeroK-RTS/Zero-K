@@ -150,8 +150,7 @@ path='Settings'
 path='Game' 
 
 	ShButton( 'Pause/Unpause', 'pause' )
-	ShLabel('') 
-	ShButton( 'Share Dialog...', 'sharedialog' ) 
+	ShLabel('')
 	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
 --	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end ) 
 
@@ -207,10 +206,6 @@ path='Settings/HUD Panels/HUD Skin'
 	})
 	ShButton('Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
 
---- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
-path='Settings/Misc'
-	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
-
 
 --- Interface --- anything that's an interface but not a HUD Panel
 path='Settings/Interface'
@@ -229,6 +224,12 @@ path='Settings/Interface/Spectating'
 	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
 	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
 	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
+
+--- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
+path='Settings/Misc'
+	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
+	ShButton( 'Game Info', "gameinfo", '', true )
+	ShButton( 'Share Dialog...', 'sharedialog', '', true ) 
 
 path='Settings/Misc/Screenshots'	
 	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
