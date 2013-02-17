@@ -204,7 +204,7 @@ path='Settings/Interface/Interface Skin'
 			{ key = 'Twilight', name = 'Twilight', },
 		},
 	})
-	ShButton('Reloadl LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
+	ShButton('Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
 
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 path='Settings/Misc'
