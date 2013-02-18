@@ -156,6 +156,12 @@ path='Game'
 
 --- CAMERA ---
 path='Settings/Camera'
+	--[[
+		the problem is "listBool" is not fully implemented to recognize the item "viewta" as an existing action,
+		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound.
+	--]]
+	--[[
+	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
 	ShTick2( 'Camera Type', {
 			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
 			{name = 'FPS',key='FPS', desc='FPS camera', hotkey=nil},
@@ -167,24 +173,32 @@ path='Settings/Camera'
 		function(self)
 			local key = self.value
 			if key == 'Total Annihilation' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewta"}
+				spSendCommands{cofcDisable ,"viewta"}
 			elseif key == 'FPS' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfps"}
+				spSendCommands{cofcDisable ,"viewfps"}
 			elseif key == 'Free' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfree"}
+				spSendCommands{cofcDisable ,"viewfree"}
 			elseif key == 'Rotatable Overhead' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewrot"}
+				spSendCommands{cofcDisable ,"viewrot"}
 			elseif key == 'Total War' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewtw"}
+				spSendCommands{cofcDisable ,"viewtw"}
 			elseif key == 'COFC' then
 				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
 			end
 		end
-		)		
+		)
+	--]]
+	
+	ShButton( 'Total Annihilation', 'viewta' )
+	ShButton( 'FPS', 'viewfps' )
+	ShButton( 'Free', 'viewfree' )
+	ShButton( 'Rotatable Overhead', 'viewrot' )
+	ShButton( 'Total War', 'viewtw' )
+	
 	ShButton( 'Flip the TA Camera', 'viewtaflip' )
 	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
-	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
+	ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 path='Settings/HUD Panels'
