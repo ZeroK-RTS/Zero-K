@@ -100,7 +100,7 @@ corclog = {
     cobscript = false, cannotJumpMidair = true},	
 	
  corsumo = {
-    delay = 30, height = 110, range = 360, reload = 18, cobscript = false, rotateMidAir = false, cannotJumpMidair = true},	
+    delay = 30, height = 110, range = 360, reload = 15, cobscript = false, rotateMidAir = false, cannotJumpMidair = true},	
 
  cadenza = {
     delay = 30, reload = 20, cobscript = false, rotateMidAir = false},
@@ -184,6 +184,7 @@ Spring.Echo(".. Jump Jet Defs checking complete")
 ------------------------------------------------------------------------------------------------------------------------------------------------
 for uName,uOvers in pairs(overCategory) do
 		if (UnitDefNames[uName]) then -- extra error checking because people are stupid
+			--[[
 			if ( uOvers.speed == jumpers[uName].speed) then
 				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded speed override )")
 			end
@@ -214,7 +215,8 @@ for uName,uOvers in pairs(overCategory) do
 
 			if ( uOvers.limitHeight == jumpers[uName].limitHeight) then
 				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded limitHeight override )")
-			end			
+			end	
+			--]]			
 			
 			jumpers[uName].speed	= ( uOvers.speed or jumpers[uName].speed)
 			
