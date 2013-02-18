@@ -132,6 +132,7 @@ options_order = {
 	'uikey4',
 	'uikey5',
 	'uikey6',
+	'uikey7',
 	
 	'qwertz',
 	'showRemainingCommands',
@@ -282,6 +283,11 @@ options = {
 		name = 'Unknown uikey 6 - allunits?',
 		desc = '',
 		action = 'select AllMap+_InPrevSel_Not_InHotkeyGroup+_SelectAll+',
+	},
+	uikey7 = { type = 'button',
+		name = 'Unknown uikey 7 - builder?',
+		desc = '',
+		action = 'select AllMap+_Builder_Idle+_ClearSelection_SelectOne+',
 	},
 	
 	
@@ -1037,6 +1043,7 @@ local function SetupCommands( modifier )
 		local option = options[selection]
 		local hotkey = WG.crude.GetHotkey(option.action) or ''
 		local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)
+		--echo(option.action, hotkey_key, hotkey_mod)
 		if hotkey_mod == modifier and key_buttons[hotkey_key] then
 			local override = overrides[selection]  -- command overrides
 			local texture = override and override.texture
