@@ -133,6 +133,7 @@ options_order = {
 	'uikey5',
 	'uikey6',
 	'uikey7',
+	'uikey8',
 	
 	'qwertz',
 	'showRemainingCommands',
@@ -288,6 +289,11 @@ options = {
 		name = 'Unknown uikey 7 - builder?',
 		desc = '',
 		action = 'select AllMap+_Builder_Idle+_ClearSelection_SelectOne+',
+	},
+	uikey8 = { type = 'button',
+		name = 'Unknown uikey 8 - not builder?',
+		desc = '',
+		action = 'select AllMap+_Not_Builder_Not_Commander_InPrevSel_Not_InHotkeyGroup+_SelectAll+',
 	},
 	
 	
