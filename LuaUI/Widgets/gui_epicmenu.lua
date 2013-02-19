@@ -47,6 +47,8 @@ local title_image = confdata.title_image
 local keybind_file = confdata.keybind_file
 local defaultkeybinds, defaultkeybind_date = VFS.Include(keybind_file, nil, VFS.ZIP)
 
+local _, _, _, _, _, _, _, _, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+
 --------------------------------------------------------------------------------
 
 -- Chili control classes
@@ -124,8 +126,8 @@ for k,v in pairs(KEYSYMS) do
 end
 --]]
 local get_key = false
-local kb_option
 local kb_path
+local kb_action
 
 local transkey = {
 	leftbracket 	= '[',
@@ -653,48 +655,7 @@ local function GetActionHotkey(action)
 	return nil
 end
 
--- Assign a keybinding to settings and other tables that keep track of related info
---local function AssignKeyBind(hotkey, menukey, itemindex, item, verbose)
-local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
-
-	--if not (hotkey.key and hotkey.mod) then
-	if type(hotkey) ~= 'string' then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Wacky assign keybind error #1')
-		return
-	end
-	
-	local kbfunc = option.OnChange
-	
-	if option.type == 'bool' then
-		kbfunc = function()
-			if not pathoptions[path] or not pathoptions[path][option.wname..option.key] then
-				Spring.Echo("Warning, detected keybind mishap. Please report this info and help us fix it:")
-				Spring.Echo("Option path is "..path)
-				Spring.Echo("Option name is "..option.wname..option.key)
-				if pathoptions[path] then --pathoptions[path] table still intact, but option table missing
-					Spring.Echo("case: option table was missing")
-					pathoptions[path][option.wname..option.key] = option --re-add option table
-				else --both option table & pathoptions[path] was missing, probably was never initialized
-					Spring.Echo("case: whole path was never initialized")
-					pathoptions[path] = {}
-					pathoptions[path][option.wname..option.key] = option
-				end
-				-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
-			end
-			local wname = option.wname
-			newval = not pathoptions[path][option.wname..option.key].value	
-			pathoptions[path][option.wname..option.key].value	= newval
-						
-			option.OnChange({checked=newval})
-			
-			if path == curPath then
-				MakeSubWindow(path)
-			end
-		end
-	end
-	
-	local actionName = GetActionName(path, option)
-	
+local function AssignKeyBindAction(hotkey, actionName, verbose)
 	if verbose then
 		--local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
 		local actions = Spring.GetKeyBindings(hotkey)
@@ -725,43 +686,80 @@ local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 		
 		if addToKeyboundItems then	
 			settings.keybounditems[actionName] = hotkey
-			--Spring.SendCommands("bind " .. hotkey.mod .. hotkey.key .. " " .. actionName)
 			Spring.SendCommands("bind " .. hotkey .. " " .. actionName)
 			
-			-- bind shift+hotkey as well if needed for unit commands
-			local alreadyShift = hotkey:find("S+")
-			if not alreadyShift then
-				if option.isUnitCommand then
-				      Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName)
-				elseif option.isUnitStateCommand or option.isUnitInstantCommand then
-				      Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName .. " queued")
+			if custom_cmd_actions[actionName] then
+				local number = custom_cmd_actions[actionName]
+				local isUnitCommand = number == 1
+				local isUnitStateCommand = number == 2
+				local isUnitInstantCommand = number == 3
+				
+				-- bind shift+hotkey as well if needed for unit commands
+				local alreadyShift = hotkey:find("S+")
+				if not alreadyShift then
+					if isUnitCommand then
+						  Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName)
+					elseif isUnitStateCommand or isUnitInstantCommand then
+						  Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName .. " queued")
+					end
 				end
 			end
+			
 		end
-		AddAction(actionName, kbfunc, nil, "t")
 	end
 end
 
--- Unsssign a keybinding from settings and other tables that keep track of related info
-local function UnassignKeyBind(path, option)
+--create spring action for this option
+local function CreateOptionAction(path, option)
+
+	local kbfunc = option.OnChange
 	
-	local actionName = GetActionName(path, option)
-	
-	if option.action then --if keybindings was hardcoded by widget:
-		local actionHotkey = GetActionHotkey(actionName)
-		if actionHotkey then
-			-- unbindaction doesn't work on a command+params, must be command only!
-			local actionName_split = explode(' ', actionName)
-			local actionName_cmd = actionName_split[1]
-			--echo('unassign', "unbind " .. actionHotkey .. ' ' .. actionName_cmd)
-			Spring.SendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd)
-			Spring.SendCommands("unbindaction " .. actionName_cmd:lower())
+	if option.type == 'bool' then
+		kbfunc = function()
+			if not pathoptions[path] or not pathoptions[path][option.wname..option.key] then
+				Spring.Echo("Warning, detected keybind mishap. Please report this info and help us fix it:")
+				Spring.Echo("Option path is "..path)
+				Spring.Echo("Option name is "..option.wname..option.key)
+				if pathoptions[path] then --pathoptions[path] table still intact, but option table missing
+					Spring.Echo("case: option table was missing")
+					pathoptions[path][option.wname..option.key] = option --re-add option table
+				else --both option table & pathoptions[path] was missing, probably was never initialized
+					Spring.Echo("case: whole path was never initialized")
+					pathoptions[path] = {}
+					pathoptions[path][option.wname..option.key] = option
+				end
+				-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
+			end
+			local wname = option.wname
+			newval = not pathoptions[path][wname..option.key].value	
+			pathoptions[path][wname..option.key].value	= newval
+						
+			option.OnChange({checked=newval})
+			
+			if path == curPath then
+				MakeSubWindow(path)
+			end
 		end
-	else --if keybindings were supplied by users:
-		--echo('unassign', "unbindaction " .. actionName)
-		Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
 	end
-	
+	local actionName = GetActionName(path, option)
+	AddAction(actionName, kbfunc, nil, "t")
+end
+
+-- Unsssign a keybinding from settings and other tables that keep track of related info
+local function UnassignKeyBind(actionName, verbose)
+	local verbose = true
+	local actionHotkey = GetActionHotkey(actionName)
+	if actionHotkey then
+		-- unbindaction doesn't work on a command+params, must be command only!
+		local actionName_split = explode(' ', actionName)
+		local actionName_cmd = actionName_split[1]
+		--echo('unassign', "unbind " .. actionHotkey .. ' ' .. actionName_cmd)
+		Spring.SendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd)
+		Spring.SendCommands("unbindaction " .. actionName_cmd:lower())
+		if verbose then
+			echo( 'Unbound hotkeys from action: ' .. actionName )
+		end
+	end
 	settings.keybounditems[actionName] = nil
 end
 
@@ -939,6 +937,8 @@ local function AddOption(path, option, wname )
 		  --echo(option.key, option.orig_hotkey.key)
 		end
 		
+		CreateOptionAction(path, option)
+		
 		if option.hotkey and type(option.hotkey) == 'table' then
 			option.hotkey = option.hotkey.mod .. option.hotkey.key
 		end
@@ -946,10 +946,12 @@ local function AddOption(path, option, wname )
 		local hotkey = settings.keybounditems[actionName] or option.hotkey or actionHotkey
 		if hotkey and hotkey ~= 'none' then
 			--if actionHotkey then
-				UnassignKeyBind(path, option)
+				UnassignKeyBind(actionName)
 			--end
-			AssignKeyBind(hotkey, path, option, false)
-		end 
+			AssignKeyBindAction(hotkey, actionName, false)
+		end
+		
+	--needs more work
 	elseif option.type == 'listBool' then --if its a list of checkboxes:
 		for i=1, #option.items do
 			local item = {} 
@@ -967,9 +969,9 @@ local function AddOption(path, option, wname )
 			local hotkey = settings.keybounditems[actionName] or item.hotkey or actionHotkey
 			if hotkey and hotkey ~= 'none' then
 				--if actionHotkey then
-					UnassignKeyBind(path, item)
+					UnassignKeyBind(actionName)
 				--end
-				AssignKeyBind(hotkey, path, item, false)
+				AssignKeyBindAction(hotkey, actionName, false)
 			end
 			--finishing:
 			alloptions[path..wname..item.key] = item --is used for reset keybinds		
@@ -1200,20 +1202,15 @@ end
 
 --Make little window to indicate user needs to hit a keycombo to save a keybinding
 local function MakeKeybindWindow( path, option, hotkey ) 
-	--if hotkey then
-		UnassignKeyBind(path, option)
-	--end
-	
 	local window_height = 80
 	local window_width = 300
 	
 	get_key = true
-	kb_mkey = menukey
-	kb_mindex = i
-	kb_item = item
-	
-	kb_option = option --send to global, wait for widget:KeyPress
 	kb_path = path
+	kb_action = GetActionName(path, option)
+	--if hotkey then
+		UnassignKeyBind(kb_action)	
+	--end
 		
 	window_getkey = Window:New{
 		caption = 'Set a HotKey',
@@ -2015,7 +2012,8 @@ function widget:Initialize()
 		
 		for _,option in pairs(alloptions) do
 		    if option.orig_hotkey and type(option.orig_hotkey) == 'string' then
-			  AssignKeyBind(option.orig_hotkey, option.path, option, false)
+				local actionName = GetActionName(option.path, option)
+				AssignKeyBindAction(option.orig_hotkey, actionName, false)
 		    end
 		end
 		
@@ -2215,10 +2213,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		local hotkey = modstring .. translatedkey	
 		
 		if key ~= KEYSYMS.ESCAPE then		
-			AssignKeyBind(hotkey, kb_path, kb_option, true) -- param4 = verbose
-		else
-			local actionName = GetActionName(kb_path, kb_option)
-			echo( 'Unbound hotkeys from action: ' .. actionName )
+			AssignKeyBindAction(hotkey, kb_action, true) -- param4 = verbose
 		end
 		
 		if kb_path == curPath then

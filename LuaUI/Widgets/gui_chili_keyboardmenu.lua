@@ -328,13 +328,13 @@ local function AddHotkeyOptions()
 		}
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
-			options[cmdnamel].isUnitStateCommand = true
+			--options[cmdnamel].isUnitStateCommand = true
 		elseif number == 3 then
 			options_order_tmp_cmd_instant[#options_order_tmp_cmd_instant+1] = cmdnamel
-			options[cmdnamel].isUnitInstantCommand = true
+			--options[cmdnamel].isUnitInstantCommand = true
 		else
 			options_order_tmp_cmd[#options_order_tmp_cmd+1] = cmdnamel
-			options[cmdnamel].isUnitCommand = true
+			--options[cmdnamel].isUnitCommand = true
 		end
 	end
 
