@@ -2155,9 +2155,11 @@ function widget:SetConfigData(data)
 	end
 	
 	--migrate from old logic
-	for actionName,hotkey in pairs(settings.keybounditems) do
-		if type( hotkey ) == 'table' then
-			settings.keybounditems[actionName] = hotkey.mod .. hotkey.key
+	if settings.keybounditems then
+		for actionName,hotkey in pairs(settings.keybounditems) do
+			if type( hotkey ) == 'table' then
+				settings.keybounditems[actionName] = hotkey.mod .. hotkey.key
+			end
 		end
 	end
 end
