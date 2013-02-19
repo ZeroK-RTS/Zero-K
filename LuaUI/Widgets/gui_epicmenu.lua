@@ -930,6 +930,11 @@ local function AddOption(path, option, wname )
 	if option.type == 'button' or option.type == 'bool' then
 		local actionName = GetActionName(path, option)
 		
+		--migrate from old logic
+		if option.hotkey and type(option.hotkey) == 'table' then
+			option.hotkey = option.hotkey.mod .. option.hotkey.key
+		end
+		
 		if option.hotkey then
 		  local orig_hotkey = ''
 		  orig_hotkey = option.hotkey
@@ -939,9 +944,6 @@ local function AddOption(path, option, wname )
 		
 		CreateOptionAction(path, option)
 		
-		if option.hotkey and type(option.hotkey) == 'table' then
-			option.hotkey = option.hotkey.mod .. option.hotkey.key
-		end
 		local actionHotkey = GetActionHotkey(actionName)
 		local hotkey = settings.keybounditems[actionName] or option.hotkey or actionHotkey
 		if hotkey and hotkey ~= 'none' then
