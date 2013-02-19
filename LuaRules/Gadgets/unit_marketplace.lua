@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "2010-07-22",
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = false -- loaded by default?
+    enabled   = false,
   }
 end
 
@@ -89,6 +89,8 @@ local function CheckOffers()
 			GG.AddDebt(customer, teamID, saleprice)
 			GG.shareunits[unitID] = true
 			Spring.TransferUnit(unitID, customer, true)
+			Spring.SetUnitRulesParam( unitID, 'buy'..teamID, price )
+			Spring.SetUnitRulesParam( unitID, 'sell'..teamID, price )
 		end
 		
 	end
@@ -98,25 +100,24 @@ end
 --Callins
 
 function gadget:RecvLuaMsg(msg, playerID)
-	local sellprefix = "$sell:"
-	local sell = (msg:find(sellprefix,1,true))
-	local buy = (msg:find("$buy :",1,true))
-	
+	local msgTable = explode( '|', msg )
+	local command = msgTable[1]
+	local sell = command == '$sell'
+	local buy = command == '$buy'
 	
 	if buy or sell then
 		local _,_,spec,teamID, allianceID = spGetPlayerInfo(playerID)
 		if spec then
 			return
 		end
-		local transdata = explode( '|', msg:sub(#sellprefix+1) )
 		
-		if( #transdata ~= 2 ) then
+		if( #msgTable ~= 3 ) then
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<MarketPlace> (A) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
 			return false
 		end
 		
-		local unitID = transdata[1]+0
-		local price = transdata[2]+0
+		local unitID = msgTable[2]+0
+		local price = msgTable[3]+0
 		
 		if( type(unitID) ~= 'number' or type(price) ~= 'number' ) then
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<MarketPlace> (B) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
@@ -134,14 +135,17 @@ function gadget:RecvLuaMsg(msg, playerID)
 			if unitTeamID ~= teamID then
 				echo ('<MarketPlace> You cannot sell a unit that\'s not yours, Player ' .. playerID .. ' on team ' .. teamID)
 				return
-			else				
+			else
+				echo 'put for sale'
 				market[unitID].sell = price > 0 and price or nil
+				Spring.SetUnitRulesParam( unitID, 'sell'..teamID, price )
 			end
 		elseif buy then
 			if not market[unitID].buy then
 				market[unitID].buy  = {}
 			end
 			market[unitID].buy[teamID] = price > 0 and price or nil
+			Spring.SetUnitRulesParam( unitID, 'buy'..teamID, price )
 		end
 	end
 	
@@ -162,14 +166,13 @@ function gadget:Initialize()
 	if TESTMODE then
 		local allUnits = Spring.GetAllUnits()
 		for _,unitID in ipairs(allUnits) do
+			local teamID = Spring.GetUnitTeam(unitID)
 			market[unitID] = {}
 			market[unitID].sell = 500
-			market[unitID].team = Spring.GetUnitTeam(unitID)
+			market[unitID].team = teamID
+			Spring.SetUnitRulesParam( unitID, 'sell'..teamID, 500 )
 		end
 	end
-	
-	_G.market = market
-
 end
 
 --[[
@@ -186,6 +189,7 @@ else  -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+--[[
 local SendLuaRulesMsg 		= Spring.SendLuaRulesMsg
 local spSendCommands		= Spring.SendCommands
 local spGetSpectatingState 	= Spring.GetSpectatingState
@@ -333,7 +337,7 @@ function gadget:Update()
 		market = SYNCED.market
 	end
 end
-
+--]]
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 end             

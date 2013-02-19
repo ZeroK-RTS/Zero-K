@@ -5,12 +5,13 @@ function gadget:GetInfo()
     author    = "CarRepairer",
     date      = "2010-07-25",
     license   = "GNU GPL, v2 or later",
-    layer     = 1,
-    enabled   = false -- loaded by default?
+    layer     = 2,
+    enabled   = false,
   }
 end
 
 local TESTMODE = false
+local BOUNTYTIME = 60*5
 
 if not tobool(Spring.GetModOptions().marketandbounty) then
 	return
@@ -62,29 +63,53 @@ end
 
 -------------------------------------------------------------------------------------
 
+local function AddBounty( unitID, teamID, price, timer )
+	if not bounty[unitID] then
+		bounty[unitID] = {}
+	end
+	if not bounty[unitID][teamID] then
+		bounty[unitID][teamID] = {price = 0}
+	end
+	
+	local newprice = math.max( price, bounty[unitID][teamID].price )
+	bounty[unitID][teamID] = {price = newprice, timer = timer,}
+	
+	Spring.SetUnitRulesParam( unitID, 'bounty'..teamID, newprice )
+	Spring.SetUnitRulesParam( unitID, 'bountyTimer'..teamID, timer )
+end
+
+
+local function RemoveBounty( unitID, teamID )
+	if not bounty[unitID] then
+		return
+	end
+	Spring.SetUnitRulesParam( unitID, 'bounty'..teamID, 0 )
+	Spring.SetUnitRulesParam( unitID, 'bountyTimer'..teamID, 0 )
+	bounty[unitID][teamID] = nil
+end
 
 -------------------------------------------------------------------------------------
 --Callins
 
 function gadget:RecvLuaMsg(msg, playerID)
-	local bounty_prefix = "$bounty:"
-	local bounty_msg = (msg:find(bounty_prefix,1,true))
+	local msgTable = explode( '|', msg )
+	local command = msgTable[1]
 	
-	if bounty_msg then
+	local bounty_prefix = "$bounty"
+	
+	if command == '$bounty' then
 		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID)
 		if spec then
 			return
 		end
-		--echo (msg)
-		local transdata = explode( '|', msg:sub(#bounty_prefix+1) )
 		
-		if( #transdata ~= 2 ) then
+		if( #msgTable ~= 3 ) then
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<Bounty> (A) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
 			return false
 		end
 		
-		local unitID = transdata[1]+0
-		local price = transdata[2]+0
+		local unitID = msgTable[2]+0
+		local price = msgTable[3]+0
 		
 		if( type(unitID) ~= 'number' or type(price) ~= 'number' ) then
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<Bounty> (B) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
@@ -99,14 +124,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 			return false
 		end
 		
-		if not bounty[unitID] then
-			bounty[unitID] = {
-				[teamID] = {price = 0}
-			}
-		end
-		
-		local newprice = math.max( price, bounty[unitID][teamID].price )
-		bounty[unitID][teamID] = {price = newprice, timer = 500,}
+		AddBounty( unitID, teamID, price, BOUNTYTIME )
 		
 	end
 
@@ -120,17 +138,13 @@ function gadget:Initialize()
 	if TESTMODE then
 		local allUnits = Spring.GetAllUnits()
 		for _,unitID in ipairs(allUnits) do
-			bounty[unitID] = {
-				[0] = {price = 500, timer=20,},
-				[1] = {price = 100, timer=500,},
-				[2] = {price = 200, timer=500,},
-			}
+			AddBounty( unitID, 0, 50, 20 )
+			--AddBounty( unitID, 1, 100, 20 )
+			AddBounty( unitID, 2, 100, 40 )
+			--AddBounty( unitID, 3, 50, 500 )
 			
 		end
 	end
-	
-	_G.bounty 	= bounty
-
 end
 
 local timerPeriod = 5
@@ -142,7 +156,8 @@ function gadget:GameFrame(f)
 			local bountiesLeft = false
 			for teamID, bData in pairs(teamData) do
 				if bData.timer <= timerPeriod then
-					bounty[unitID][teamID] = nil
+					--bounty[unitID][teamID] = nil
+					RemoveBounty(unitID, teamID)
 				else
 					bountiesLeft = true
 					bounty[unitID][teamID].timer = bData.timer - timerPeriod
@@ -160,7 +175,10 @@ function gadget:UnitDestroyed(unitID,unitDefID,unitTeam,attackerID, attackerDefI
 	local ubounty = bounty[unitID]
 	if ubounty then
 		for teamID, amount in pairs(ubounty) do
-			GG.AddDebt(teamID, attackerTeam, amount)
+			if attackerTeam then
+				GG.AddDebt(teamID, attackerTeam, amount)
+			end
+			RemoveBounty(unitID, teamID)
 		end
 		bounty[unitID] = nil
 	end
@@ -172,6 +190,8 @@ end
 else  -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+--[[
 
 local spSendCommands		= Spring.SendCommands
 local spGetSpectatingState 	= Spring.GetSpectatingState
@@ -248,7 +268,7 @@ local function GetBountyText(unitID, ubounty)
 
 	local text = '\255\255\255\255Bounty: '
 	for team, data in spairs(ubounty) do
-		text = text .. inColors[team] .. '($' .. data.price .. ' ' .. data.timer .. 's) '
+		--text = text .. inColors[team] .. '($' .. data.price .. ' ' .. data.timer .. 's) '
 	end
 	BountyTextCache[unitID] = text
 	return text
@@ -304,7 +324,7 @@ function gadget:Update()
 		bounty = SYNCED.bounty
 	end
 end
-
+--]]
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 end

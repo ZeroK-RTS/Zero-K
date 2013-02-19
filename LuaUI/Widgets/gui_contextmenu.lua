@@ -722,15 +722,15 @@ local function PriceWindow(unitID, action)
 	local window_width = 250
 	
 	local header = 'Offer For Sale'
-	local command = '$sell:'
+	local command = '$sell'
 	local cancelText = 'Cancel Sale'
 	if action == 'buy' then
 		header = 'Offer To Buy'
-		command = '$buy :'
+		command = '$buy'
 		cancelText = 'Cancel Offer'
 	elseif action == 'bounty' then
-		header = 'Place Bounty (Cannot cancel!)'
-		command = '$bounty:'
+		header = 'Place Bounty (5 Minutes - Cannot cancel!)'
+		command = '$bounty'
 	end
 	
 	local children = {}
@@ -745,11 +745,11 @@ local function PriceWindow(unitID, action)
 		if action == 'bounty' then
 			if dollar_amount ~= 0 then
 				caption = '$' .. dollar_amount
-				func = function() spSendLuaRulesMsg(  command .. unitID .. '|' .. dollar_amount ) end
+				func = function() spSendLuaRulesMsg(  command .. '|' .. unitID .. '|' .. dollar_amount ) end
 			end
 		else
 			caption = dollar_amount == 0 and cancelText or '$' .. dollar_amount
-			func = function() spSendLuaRulesMsg(  command .. unitID .. '|' .. dollar_amount) end
+			func = function() spSendLuaRulesMsg(  command .. '|' .. unitID .. '|' .. dollar_amount) end
 		end
 		if caption then
 			grid_children[#grid_children+1] = Button:New{ 
@@ -843,7 +843,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 	if marketandbounty then
 		if team == myTeamID then
 			children[#children+1] =  Button:New{ 
-				caption = 'Offer For Sale', 
+				caption = 'Set Sale Price', 
 				OnMouseUp = { function(self) PriceWindow(unitID, 'sell') end }, 
 				width=window_width, 
 				backgroundColor=color.sub_back_bg, 
