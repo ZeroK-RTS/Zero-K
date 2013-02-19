@@ -130,7 +130,6 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		msgBoxPersistent.width = width
 		msgBoxPersistent.height = height + PERSISTENT_SUBBAR_HEIGHT
 		msgBoxPersistent.x = vsx - width
-		--msgBoxPersistent:Invalidate()
 		if imageDir then
 			imagePersistent.width = height * 0.8
 			imagePersistent.height = height * 0.8
@@ -170,10 +169,11 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = false,
-		padding = {5, 0, 5, 0},
+		padding = {6, 0, 6, 0},
 		--minimizable = true,
 		--itemMargin  = {0, 0, 0, 0},
 	}
+	msgBoxPersistent.origColor = msgBoxPersistent.color
 
 	imagePersistent = Chili.Image:New {
 		width = height * 0.8,
@@ -191,7 +191,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		right	= 4,
 		y		= 8,
 		height	= height - 8 - 8,
-		width   = (width - x - 8),
+		width   = width - (height * 0.8) - 8,
 		horizontalScrollbar = false,
 		scrollbarSize = 6,
 	}
@@ -215,7 +215,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		itemMargin = {0, 0, 0, 0},
 		columns = 3,
 		width= '100%',
-		y = height - 4,
+		y = height - 6,
 		height = 20,
 		resizeItems = false,
 		orientation = 'horizontal',
@@ -426,11 +426,11 @@ function widget:Update(dt)
 	flashPhase = not flashPhase
 	if msgBoxPersistent and flashTime then
 		if flashTime > 0 then
-			msgBoxPersistent.color = (flashPhase and {0,0,0,1}) or {1,1,1,1}
+			msgBoxPersistent.color = (flashPhase and {0,0,0,1}) or msgBoxPersistent.origColor
 			msgBoxPersistent:Invalidate()
 			flashTime = flashTime - timer
 		else	-- done flashing, reset
-			msgBoxPersistent.color = {1,1,1,1}
+			msgBoxPersistent.color = msgBoxPersistent.origColor
 			msgBoxPersistent:Invalidate()
 			flasthTime = nil
 		end
