@@ -679,7 +679,7 @@ local function UnassignKeyBind(path, option)
 		Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
 	end
 	
-	settings.keybounditems[actionName] = 'none'
+	settings.keybounditems[actionName] = nil
 end
 
 
