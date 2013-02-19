@@ -24,7 +24,7 @@ unitDef = {
 
   customParams                  = {
     helptext       = [[The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!]],
-    helptext_de    = [[Der Disco Rave Party verschießt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Überraschung darstellt. Ein Spaß für die ganze Familie!]],
+    helptext_de    = [[Der Disco Rave Party verschießt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Überraschung darstellt. Ein Spa�?für die ganze Familie!]],
     description_de = [[Regenbogen-Überraschungs Superwaffe]],
 
 
@@ -110,6 +110,7 @@ unitDef = {
         default = 3000,
       },
 
+      edgeeffectiveness       = 0.5,
       explosionGenerator      = [[custom:NUKE_150]],
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
@@ -147,6 +148,7 @@ unitDef = {
         subs    = 15,
       },
 
+      edgeeffectiveness       = 0.25,
       explosionGenerator      = [[custom:napalm_drp]],
       impulseBoost            = 0.2,
       impulseFactor           = 0.1,
@@ -173,14 +175,15 @@ unitDef = {
       craterMult              = 1,
 
       damage                  = {
-        default = 0.1,
-        planes  = 0.1,
-        subs    = 0.1,
+        default = 800,
+        planes  = 800,
+        subs    = 800,
       },
 
+      edgeeffectiveness       = 0.5,
       explosionGenerator      = [[custom:330rlexplode]],
-      impulseBoost            = 20,
-      impulseFactor           = 150,
+      impulseBoost            = 400,
+      impulseFactor           = 4,
       interceptedByShieldType = 1,
       range                   = 7500,
 	  rgbColor                = [[0.7 0.7 0]],
@@ -281,6 +284,7 @@ unitDef = {
         subs    = 22.5,
       },
 
+      edgeeffectiveness       = 0.8,
       explosionGenerator      = [[custom:riotballplus2_purple]],
       holdtime                = [[1]],
       impulseBoost            = 0.2,

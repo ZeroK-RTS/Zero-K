@@ -27,6 +27,7 @@ local base = {
 		name = "gauss",
 		modules = {
 			"commweapon_gaussrifle",
+			"commweapon_concussion",
 			"conversion_shockrifle",
 			"module_personal_shield",
 			"module_personal_cloak",

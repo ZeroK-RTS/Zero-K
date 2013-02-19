@@ -21,8 +21,8 @@ local weaponDef = {
 
 	edgeEffectiveness		= 0.5,
     explosionGenerator      = [[custom:100rlexplode]],
-    impulseBoost            = 0.4,
-    impulseFactor           = 0.75,
+    impulseBoost            = 250,
+    impulseFactor           = 1,
     interceptedByShieldType = 0,
     range                   = 500,
     reloadtime              = 8,
