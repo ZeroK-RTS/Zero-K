@@ -129,6 +129,7 @@ end
 
 local function AddHotkeyOptions()
 	local options_order_tmp_cmd = {}
+	local options_order_tmp_cmd_instant = {}
 	local options_order_tmp_states = {}
 	for cmdname, number in pairs(custom_cmd_actions) do 
 			
@@ -142,21 +143,33 @@ local function AddHotkeyOptions()
 		}
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
+			options[cmdnamel].isUnitStateCommand = true
+		elseif number == 3 then
+			options_order_tmp_cmd_instant[#options_order_tmp_cmd_instant+1] = cmdnamel
+			options[cmdnamel].isUnitInstantCommand = true
 		else
 			options_order_tmp_cmd[#options_order_tmp_cmd+1] = cmdnamel
+			options[cmdnamel].isUnitCommand = true
 		end
 	end
 
-	options.lblcmd 			= { type='label', name='Instant Commands', path = 'Game/Commands',}
-	options['lblstate'] 	= { type='label', name='State Commands', path = 'Game/Commands',}
+	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Game/Commands',}
+	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Game/Commands',}
+	options.lblstate	= { type='label', name='State Commands', path = 'Game/Commands',}
 	
 	
 	table.sort(options_order_tmp_cmd)
+	table.sort(options_order_tmp_cmd_instant)
 	table.sort(options_order_tmp_states)
 
 	options_order[#options_order+1] = 'lblcmd'
 	for i=1, #options_order_tmp_cmd do
 		options_order[#options_order+1] = options_order_tmp_cmd[i]
+	end
+	
+	options_order[#options_order+1] = 'lblcmdinstant'
+	for i=1, #options_order_tmp_cmd_instant do
+		options_order[#options_order+1] = options_order_tmp_cmd_instant[i]
 	end
 	
 	options_order[#options_order+1] = 'lblstate'

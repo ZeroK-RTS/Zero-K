@@ -45,6 +45,7 @@ local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
 local keybind_file = confdata.keybind_file
+local defaultkeybinds, defaultkeybind_date = VFS.Include(keybind_file, nil, VFS.ZIP)
 
 --------------------------------------------------------------------------------
 
@@ -102,6 +103,16 @@ local exitWindowVisible = false
 
 --------------------------------------------------------------------------------
 -- Key bindings
+-- KEY BINDINGS AND YOU:
+-- First, Epic Menu checks for a keybind bound to the action in LuaUI/Configs/zk_keys.lua.
+-- 	If the local copy has a lower date value than the one in the mod,
+-- 	it overwrites ALL conflicting keybinds in the local config.
+--	Else it just adds any action-key pairs that are missing from the local config.
+--	zk_keys.lua is written to at the end of loading LuaUI and on LuaUI shutdown.
+-- Next, if it's a widget command, it checks if the widget specified a default keybind.
+--	If so, it uses that command.
+-- Lastly, it checks uikeys.txt (read-only).
+
 include("keysym.h.lua")
 local keysyms = {}
 for k,v in pairs(KEYSYMS) do
@@ -247,15 +258,16 @@ end
 
 local function GetIndex(t,v) local idx = 1; while (t[idx]<v)and(t[idx+1]) do idx=idx+1; end return idx end
 
-local function CopyTable(outtable,intable)
-  for i,v in pairs(intable) do 
-    if (type(v)=='table') then
-      if (type(outtable[i])~='table') then outtable[i] = {} end
-      CopyTable(outtable[i],v)
+local function CopyTable(tableToCopy, deep)
+  local copy = {}
+  for key, value in pairs(tableToCopy) do
+    if (deep and type(value) == "table") then
+      copy[key] = Spring.Utilities.CopyTable(value, true)
     else
-      outtable[i] = v
+      copy[key] = value
     end
   end
+  return copy
 end
 
 --[[
@@ -293,14 +305,6 @@ local function tableremove(table1, item)
 	end
 	return table2
 end
---[[
-local function MergeTable(table1,table2)
-  local ret = {}
-  CopyTable(ret,table2)
-  CopyTable(ret,table1)
-  return ret
-end
---]]
 
 -- function GetTimeString() taken from trepan's clock widget
 local function GetTimeString()
@@ -324,6 +328,65 @@ local function BoolToInt(bool)
 end
 local function IntToBool(int)
 	return int ~= 0
+end
+
+local function WriteIndents(num)
+	local str = ""
+	for i=1, num do
+		str = str .. "\t"
+	end
+	return str
+end
+
+local keywords = {
+	["repeat"] = true,
+}
+
+-- recursive function that write a Lua table to file in the correct format
+local function WriteTable(array, numIndents, endOfFile)
+	local str = ""	--WriteIndents(numIndents)
+	str = str .. "{\n"
+	for i,v in pairs(array) do
+		str = str .. WriteIndents(numIndents + 1)
+		if type(i) == "number" then
+			str = str .. "[" .. i .. "] = "
+		elseif keywords[i] or (type(i) == "string" and i:find("[/ ]")) then
+			str = str .. [[["]] .. i .. [["] ]] .. "= "
+		else
+			str = str .. i .. " = "
+		end
+		
+		if type(v) == "table" then
+			str = str .. WriteTable(v, numIndents + 1)
+		elseif type(v) == "boolean" then
+			str = str .. tostring(v) .. ",\n"
+		elseif type(v) == "string" then
+			str = str .. [["]] .. v .. [["]] .. ",\n"
+		else
+			str = str .. v .. ",\n"
+		end
+	end
+	str = str ..WriteIndents(numIndents) .. "}"
+	if not endOfFile then
+		str = str .. ",\n"
+	end
+	
+	return str
+end
+
+
+local function SaveKeybinds()
+	Spring.Echo("OLIOLIOLIOLIO!")
+	local file = io.open (keybind_file, "w")
+	if (file== nil) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
+		return
+	end
+	file:write ("local date = " .. settings.keybind_date .. "\n")
+	file:write ("local keybinds = " .. WriteTable(settings.keybounditems, 0, true))
+	file:write ("\nreturn keybinds, date")
+	file:flush()
+	file:close()
 end
 
 ----------------------------------------------------------------
@@ -583,8 +646,13 @@ local function GetReadableHotkey(hotkey)
 	local mod, key = HotKeyBreakdown(hotkey)
 	return GetReadableHotkeyMod(mod) .. CapCase(key)
 end
-
-
+local function GetActionHotkey(action)
+	local actionHotkeys = Spring.GetActionHotKeys(action)
+	if actionHotkeys and actionHotkeys[1] then
+		return (actionHotkeys[1])
+	end
+	return nil
+end
 
 -- Assign a keybinding to settings and other tables that keep track of related info
 --local function AssignKeyBind(hotkey, menukey, itemindex, item, verbose)
@@ -644,20 +712,35 @@ local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 	
 	--actionName = actionName:lower()
 	if type(hotkey) == 'string' then
-		settings.keybounditems[actionName] = hotkey
+		-- don't write to config unless it differs from uikeys
+		local addToKeyboundItems = true
+		--[[
+		local actionHotkeys = Spring.GetActionHotKeys(actionName) or {}
+		for i=1,#actionHotkeys do
+			if hotkey == actionHotkeys[i] then
+				addToKeyboundItems = false
+				break
+			end
+		end
+		]]
+		
+		if addToKeyboundItems then	
+			settings.keybounditems[actionName] = hotkey
+			--Spring.SendCommands("bind " .. hotkey.mod .. hotkey.key .. " " .. actionName)
+			Spring.SendCommands("bind " .. hotkey .. " " .. actionName)
+			
+			-- bind shift+hotkey as well if needed for unit commands
+			local alreadyShift = hotkey:find("S+")
+			if not alreadyShift then
+				if option.isUnitCommand then
+				      Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName)
+				elseif option.isUnitStateCommand or option.isUnitInstantCommand then
+				      Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName .. " queued")
+				end
+			end
+		end
 		AddAction(actionName, kbfunc, nil, "t")
-		--Spring.SendCommands("bind " .. hotkey.mod .. hotkey.key .. " " .. actionName)
-		Spring.SendCommands("bind " .. hotkey .. " " .. actionName)
 	end
-	
-end
-
-local function GetActionHotkey(action)
-	local actionHotkeys = Spring.GetActionHotKeys(action)
-	if actionHotkeys and actionHotkeys[1] then
-		return (actionHotkeys[1])
-	end
-	return false
 end
 
 -- Unsssign a keybinding from settings and other tables that keep track of related info
@@ -672,7 +755,8 @@ local function UnassignKeyBind(path, option)
 			local actionName_split = explode(' ', actionName)
 			local actionName_cmd = actionName_split[1]
 			--echo('unassign', "unbind " .. actionHotkey .. ' ' .. actionName_cmd)
-			Spring.SendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd) 
+			Spring.SendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd)
+			Spring.SendCommands("unbindaction " .. actionName_cmd:lower())
 		end
 	else --if keybindings were supplied by users:
 		--echo('unassign', "unbindaction " .. actionName)
@@ -734,7 +818,8 @@ local function AddOption(path, option, wname )
 			newval = IntToBool(newval)
 		end
 	else
-		--load option from widget settings (ie: 'settings' == ZK_data.lua. Read/write is handled by cawidget which sent 'settings' here thru WG.SetConfigData and sent it away thru WG.GetConfigData)
+		--load option from widget settings (LuaUI/Config/ZK_data.lua).
+		--Read/write is handled by widgethandler; see widget:SetConfigData and widget:GetConfigData
 		if settings.config[fullkey] ~= nil then --nil check as it can be false
 			newval = settings.config[fullkey]
 		end
@@ -1904,8 +1989,7 @@ function widget:Initialize()
 	
 
 	-- Add pre-configured button/options found in epicmenu config file
-	local options_temp ={}
-	CopyTable(options_temp , epic_options);
+	local options_temp = CopyTable(epic_options, true)
 	for i=1, #options_temp do
 		local option = options_temp[i]
 		AddOption(option.path, option)
@@ -2037,10 +2121,13 @@ end
 
 function widget:GetConfigData()
 	if keybind_file then
-		table.save(settings.keybounditems, keybind_file )
+		SaveKeybinds()
 	end
 	
-	return settings
+	local ret = CopyTable(settings, false)
+	ret.keybounditems = nil
+	ret.keybind_date = nil
+	return ret
 end
 
 function widget:SetConfigData(data)
@@ -2051,17 +2138,31 @@ function widget:SetConfigData(data)
 	end
 	WG.music_volume = settings.music_volume or 0.5
 	
-	if keybind_file and VFS.FileExists(keybind_file) then
-		settings.keybounditems = loadstring( VFS.LoadFile(keybind_file, VFS.RAW) )()
+	if keybind_file and VFS.FileExists(keybind_file, VFS.RAW) then
+		settings.keybounditems, settings.keybind_date = VFS.Include(keybind_file, nil, VFS.RAW)
+		settings.keybind_date = settings.keybind_date or defaultkeybind_date	-- reverse compat
 		
-		--migrate from old logic
-		for actionName,hotkey in pairs(settings.keybounditems) do
-			if type( hotkey ) == 'table' then
-				settings.keybounditems[actionName] = hotkey.mod .. hotkey.key
+		if settings.keybind_date < defaultkeybind_date then
+			settings.keybind_date = defaultkeybind_date
+			for action, keybind in pairs(defaultkeybinds) do
+			      settings.keybounditems[action] = keybind	-- forcibly override any user changes to default binds
+			end
+		else
+			for action, keybind in pairs(defaultkeybinds) do
+			      settings.keybounditems[action] = settings.keybounditems[action] or keybind	-- keep any existing user binds
 			end
 		end
+	else
+		settings.keybounditems = CopyTable(defaultkeybinds, true)
+		settings.keybind_date = defaultkeybind_date
 	end
 	
+	--migrate from old logic
+	for actionName,hotkey in pairs(settings.keybounditems) do
+		if type( hotkey ) == 'table' then
+			settings.keybounditems[actionName] = hotkey.mod .. hotkey.key
+		end
+	end
 end
 
 function widget:Update()
