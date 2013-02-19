@@ -376,7 +376,6 @@ end
 
 
 local function SaveKeybinds()
-	Spring.Echo("OLIOLIOLIOLIO!")
 	local file = io.open (keybind_file, "w")
 	if (file== nil) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")

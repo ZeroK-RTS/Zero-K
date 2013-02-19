@@ -304,6 +304,9 @@ end
 
 
 function widget:DrawScreen()
+  if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+    return
+  end
   local iCounter
 
   if updated then

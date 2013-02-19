@@ -222,6 +222,9 @@ local function AddEvent(str, unitDefID, color, sound, pos)
 	end
 	
 	if useSounds and soundTimeout < frame then
+		if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+			return
+		end
 		local soundInfo = sounds[sound]
 		if not soundInfo then return end
 		spPlaySoundFile(soundInfo.file, 1, 'ui')
