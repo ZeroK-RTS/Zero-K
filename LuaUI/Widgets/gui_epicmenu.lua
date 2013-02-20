@@ -686,6 +686,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		
 		if addToKeyboundItems then	
 			settings.keybounditems[actionName] = hotkey
+			--echo("bind " .. hotkey .. " " .. actionName)
 			Spring.SendCommands("bind " .. hotkey .. " " .. actionName)
 			
 			if custom_cmd_actions[actionName] then
@@ -750,12 +751,18 @@ local function UnassignKeyBind(actionName, verbose)
 	local verbose = true
 	local actionHotkey = GetActionHotkey(actionName)
 	if actionHotkey then
-		-- unbindaction doesn't work on a command+params, must be command only!
+		
+		--[[
+			unbind and unbindaction don't work on a command+params, only on the command itself
+		--]]
+		
 		local actionName_split = explode(' ', actionName)
 		local actionName_cmd = actionName_split[1]
-		--echo('unassign', "unbind " .. actionHotkey .. ' ' .. actionName_cmd)
-		Spring.SendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd)
-		Spring.SendCommands("unbindaction " .. actionName_cmd:lower())
+		
+		--echo("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) 
+		Spring.SendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) -- must be lowercase when calling unbind
+		--Spring.SendCommands("unbindaction " .. actionName )
+		
 		if verbose then
 			echo( 'Unbound hotkeys from action: ' .. actionName )
 		end
@@ -930,7 +937,7 @@ local function AddOption(path, option, wname )
 	if option.type == 'button' or option.type == 'bool' then
 		local actionName = GetActionName(path, option)
 		
-		--migrate from old logic
+		--migrate from old logic, make sure this is done before setting orig_key
 		if option.hotkey and type(option.hotkey) == 'table' then
 			option.hotkey = option.hotkey.mod .. option.hotkey.key
 		end
@@ -939,7 +946,6 @@ local function AddOption(path, option, wname )
 		  local orig_hotkey = ''
 		  orig_hotkey = option.hotkey
 		  option.orig_hotkey = orig_hotkey
-		  --echo(option.key, option.orig_hotkey.key)
 		end
 		
 		CreateOptionAction(path, option)
@@ -1127,17 +1133,16 @@ local function IntegrateWidget(w, addoptions, index)
 		w.options[k].value = nil
 		w.options[k].priv_value = value
 		
-		
 		--setmetatable( w.options[k], temp )
 		--local temp = w.options[k]
 		--w.options[k] = {}
 		w.options[k].__index = function(t, key)
 			if key == 'value' then
-				if(
-					not wname:find('Chili Chat')
-					) then
-					--echo ('get val', wname, k, key, t.priv_value)
+				--[[
+				if( not wname:find('Chili Chat') ) then
+					echo ('get val', wname, k, key, t.priv_value)
 				end
+				--]]
 				--return t.priv_value
 				return t.priv_value
 			end
@@ -2007,6 +2012,7 @@ function widget:Initialize()
 		for actionName,_ in pairs(settings.keybounditems) do
 			--local actionNameL = actionName:lower()
 			local actionNameL = actionName
+			--echo("unbindaction(1) " .. actionNameL)
 			Spring.SendCommands({"unbindaction " .. actionNameL})
 		end
 		
