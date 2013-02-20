@@ -402,6 +402,7 @@ local ls_x, ls_y, ls_z --lockspot position
 local ls_dist, ls_have, ls_onmap --lockspot flag
 local tilting
 local overview_mode, last_rx, last_ls_dist --overview_mode's variable
+local follow_timer = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -825,6 +826,9 @@ end
 
 
 local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camera while in follow cursor mode)
+	if follow_timer > 0 or smoothscroll or springscroll or rotate then
+		return
+	end
 	local teamID = Spring.GetLocalTeamID()
 	local _, playerID = Spring.GetTeamInfo(teamID)
 	local pp = WG.alliedCursorsPos[ playerID ]
@@ -1050,6 +1054,10 @@ function widget:Update(dt)
     if hideCursor then
         spSetMouseCursor('%none%')
     end
+	
+	if follow_timer > 0  then 
+		follow_timer = follow_timer - dt
+	end
 
 	if options.follow.value then --if follow selected player's cursor: do
 		camcycle = camcycle %(8) + 1
@@ -1296,6 +1304,8 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		return false
 	end
 	
+	follow_timer = 4
+	
 	local a,c,m,s = spGetModKeyState()
 	
 	spSendCommands('trackoff')
@@ -1368,6 +1378,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (button == 2) then
+		follow_timer = 4
 		rotate = nil
 		smoothscroll = false
 		springscroll = false
