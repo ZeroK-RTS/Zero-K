@@ -37,7 +37,6 @@ local buttonColor = {nil, nil, nil, 1}
 local buttonColorFac = {0.6, 0.6, 0.6, 0.3}
 local buttonColorWarning = {1, 0.2, 0.1, 1}
 local buttonColorDisabled = {0.2,0.2,0.2,1}
-local imageColor = {nil,nil,nil,1}
 local imageColorDisabled = {0.3, 0.3, 0.3, 1}
 
 local stateCommands = {	-- FIXME: is there a better way of doing this?
@@ -979,6 +978,7 @@ function widget:Initialize()
 		keepAspect = false,
 		color = (total == 0 and imageColorDisabled) or nil,
 	}
+	buttonColor = conButton.button.color
 	UpdateConsButton()
 
 	myTeamID = Spring.GetMyTeamID()
