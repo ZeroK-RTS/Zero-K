@@ -172,7 +172,7 @@ local copy = {
 	benzcom1 = {
 		benzcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 2600, objectname = "benzcom2.s3o"},
+			mainstats = {maxdamage = 2700, objectname = "benzcom2.s3o"},
 			customparams = {rangebonus = "0.075"},
 			wreckmodel = "benzcom2_wreck.s3o",
 		},
