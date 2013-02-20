@@ -1258,7 +1258,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	
 	
 	-- Reset --
-	if a and c and s then
+	if a and c then
 		ResetCam()
 		return true
 	end
