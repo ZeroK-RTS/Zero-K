@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.108 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.109 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-02-13 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -51,11 +51,12 @@ options_order = {
 	'zoomintocursor', 
 	'zoomoutfromcursor', 
 	'zoominfactor', 
-	'zoomoutfactor', 
+	'zoomoutfactor',
+	'followautozoom',	
 	
 	'lblMisc',
 	'overviewmode', 
-	'follow', 
+	'follow',
 	'smoothness',
 	'fov',
 	--'restrictangle',
@@ -189,10 +190,17 @@ options = {
 	},
 	follow = {
 		name = "Follow player's cursor",
-		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
+		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on). \n\nSee \"Advanced Camera Config\" (under Zoom subsection) to enable automatic Zoom option. ",
 		type = 'bool',
 		value = false,
+		hotkey = {key='l', mod='alt+'},
 		path = 'Settings/Camera',
+	},
+	followautozoom = {
+		name = "Auto zoom while follow cursor",
+		desc = "COFC will auto zoom in & out while in follow cursor mode (zoom level will represent player's focus). Work best using low to moderate zoom speed.",
+		type = 'bool',
+		value = false,
 	},	
 	rotfactor = {
 		name = 'Rotation speed',
@@ -697,8 +705,8 @@ local function Zoom(zoomin, shift, forceCenter)
 	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
 	
 	local ls_dist_new = ls_dist + ls_dist*sp -- a zoom in that get faster the further away from target
-	ls_dist_new = math.max(ls_dist_new, 20)
-	ls_dist_new = math.min(ls_dist_new, maxDistY)
+	ls_dist_new = max(ls_dist_new, 20)
+	ls_dist_new = min(ls_dist_new, maxDistY)
 	
 	ls_dist = ls_dist_new
 
@@ -816,6 +824,35 @@ end
 
 
 
+local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camera while in follow cursor mode)
+	local teamID = Spring.GetLocalTeamID()
+	local _, playerID = Spring.GetTeamInfo(teamID)
+	local pp = WG.alliedCursorsPos[ playerID ]
+	if pp then
+		local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
+		local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
+		local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
+		local camHeight = spGetCameraState().py - groundY --get camera height with respect to ground
+		local zoomin = true
+		if options.invertzoom.value then --if invert zoom:
+			zoomin = not zoomin
+		end
+		if (scrn_x<scrnsize_X*5/8 and scrn_x>scrnsize_X*3/8) and (scrn_y<scrnsize_Y*5/8 and scrn_y>scrnsize_Y*3/8) then --if cursor near center:
+			if camHeight >1000 then --if cam height from ground greater than 1000elmo: do
+				Zoom(zoomin, false, true) --slow zoom in
+			end
+		elseif (scrn_x>scrnsize_X*6/8 or scrn_x<scrnsize_X*2/8) or (scrn_y>scrnsize_Y*6/8 or scrn_y<scrnsize_Y*2/8) then --if cursor near edge: do
+			Zoom(not zoomin, false, true) --slow zoom out
+		end				
+		if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
+			Zoom(not zoomin, false, true) --slow zoom out 3 times! ~ equal to fast zoom out using SHIFT
+			Zoom(not zoomin, false, true)
+			spSetCameraTarget(pp[1], groundY, pp[2], 1) --fast go-to speed
+		else --if cursor within screen: do
+			spSetCameraTarget(pp[1], groundY, pp[2], 15) --slow go-to speed
+		end
+	end
+end
 
 local function RotateCamera(x, y, dx, dy, smooth, lock)
 	local cs = spGetCameraState()
@@ -962,11 +999,11 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_z = ls_z + ddz
 	
 	if not options.freemode.value then
-		ls_x = math.min(ls_x, mwidth-3) --limit camera movement to map area
-		ls_x = math.max(ls_x, 3)
+		ls_x = min(ls_x, mwidth-3) --limit camera movement to map area
+		ls_x = max(ls_x, 3)
 		
-		ls_z = math.min(ls_z, mheight-3)
-		ls_z = math.max(ls_z, 3)
+		ls_z = min(ls_z, mheight-3)
+		ls_z = max(ls_z, 3)
 	end
 	
 	if options.smoothmeshscroll.value then
@@ -1014,19 +1051,31 @@ function widget:Update(dt)
         spSetMouseCursor('%none%')
     end
 
-	if options.follow.value then
-		camcycle = camcycle %(32*6) + 1
+	if options.follow.value then --if follow selected player's cursor: do
+		camcycle = camcycle %(8) + 1
 		if camcycle == 1 then
 			if WG.alliedCursorsPos then 
-				local teamID = Spring.GetLocalTeamID()
-				local _, playerID = Spring.GetTeamInfo(teamID)
-				local pp = WG.alliedCursorsPos[ playerID ]
-				if pp then 
-					spSetCameraTarget(pp[1], 0, pp[2], 5)
-				end 
+				if options.followautozoom.value then
+					AutoZoomInOutToCursor()
+				else
+					local teamID = Spring.GetLocalTeamID()
+					local _, playerID = Spring.GetTeamInfo(teamID)
+					local pp = WG.alliedCursorsPos[ playerID ]
+					if pp then
+						local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
+						local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
+						local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
+						if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
+							spSetCameraTarget(pp[1], groundY, pp[2], 1) --fast go-to speed
+						else --if cursor within screen: do
+							spSetCameraTarget(pp[1], groundY, pp[2], 15) --slow go-to speed
+						end
+					end
+				end
 			end 
 		end
 	end
+	
 	cycle = cycle %(32*15) + 1
 	-- Periodic warning
 	if cycle == 1 then
