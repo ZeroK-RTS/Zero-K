@@ -529,8 +529,8 @@ end
 --]]
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_REARM)
-	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 1})
-	Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 1})
+	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 0.7})
+	Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 0.7})
 end
 
 end

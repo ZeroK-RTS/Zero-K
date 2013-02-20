@@ -119,7 +119,7 @@ else
 -- UNSYNCED
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TURN)
-	Spring.SetCustomCommandDrawData(CMD_TURN, "Patrol", {0,1,0,.8})
+	Spring.SetCustomCommandDrawData(CMD_TURN, "Patrol", {0,1,0,0.7})
 end
 
 end

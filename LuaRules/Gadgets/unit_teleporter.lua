@@ -551,8 +551,8 @@ function gadget:Initialize()
 	
 	Spring.AssignMouseCursor("Beacon", "cursorunload", true)
 	Spring.AssignMouseCursor("Beacon Queue", "cursorpickup", true)
-	Spring.SetCustomCommandDrawData(CMD_PLACE_BEACON, "Beacon", {0.2, 0.8, 0, 1})
-	Spring.SetCustomCommandDrawData(CMD_WAIT_AT_BEACON, "Beacon Queue", {0.1, 0.1, 1, 1})
+	Spring.SetCustomCommandDrawData(CMD_PLACE_BEACON, "Beacon", {0.2, 0.8, 0, 0.7})
+	Spring.SetCustomCommandDrawData(CMD_WAIT_AT_BEACON, "Beacon Queue", {0.1, 0.1, 1, 0.7})
 end
 
 

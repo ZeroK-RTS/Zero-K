@@ -438,7 +438,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:Initialize()
-	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 1})
+	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 0.7})
 	Spring.AssignMouseCursor("Jump", "cursorJump", true, true)
 	gadgetHandler:RegisterCMDID(CMD_JUMP)
 	for _, unitID in pairs(Spring.GetAllUnits()) do

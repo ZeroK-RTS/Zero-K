@@ -153,7 +153,7 @@ else
 --------------------------------------------------------------------------------
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_ONECLICK_WEAPON)
-	Spring.SetCustomCommandDrawData(CMD_ONECLICK_WEAPON, "dgun", {1, 1, 1, 1})
+	Spring.SetCustomCommandDrawData(CMD_ONECLICK_WEAPON, "dgun", {1, 1, 1, 0.7})
 	Spring.AssignMouseCursor("oneclickwep", "cursordgun", true, true)
 end
 
