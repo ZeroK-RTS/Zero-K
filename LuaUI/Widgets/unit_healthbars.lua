@@ -289,7 +289,7 @@ function widget:Initialize()
       ]],
     });
 
-    if (barShader) then
+    if (barShader and percent > 0) then
       barDList = gl.CreateList(function()
         gl.BeginEnd(GL.QUADS,function()
           gl.Vertex(-barWidth,0,        0,0);
@@ -753,7 +753,9 @@ do
 		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon , 'reloadTime')
 		  ci.reloadTime = reloadTime
           reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
-          AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
+		  if (reload >= 0) then
+            AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
+		  end
         end
       end
 
