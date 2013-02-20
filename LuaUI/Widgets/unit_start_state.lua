@@ -297,14 +297,14 @@ local function addUnit(defName, path)
 	end
 	
 	if ud.customParams and ud.customParams.airstrafecontrol then
-		options[defName .. "_airstrafe"] = {
+		options[defName .. "_airstrafe1"] = {
 			name = "  Air Strafe",
 			desc = "Air Strafe: check box to turn it on",
 			type = 'bool',
-			value = true,
+			value = ud.customParams.airstrafecontrol == "1",
 			path = path,
 		}
-		options_order[#options_order+1] = defName .. "_airstrafe"
+		options_order[#options_order+1] = defName .. "_airstrafe1"
 	end
 	
 	if ud.customParams and ud.customParams.floattoggle then
@@ -532,9 +532,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				orderArray[#orderArray + 1] = {CMD.REPEAT, {options[name .. "_repeat"].value and 1 or 0}, {"shift"}}
 			end
 
-			if options[name .. "_airstrafe"] and options[name .. "_airstrafe"].value ~= nil then
-				-- Spring.GiveOrderToUnit(unitID, CMD_AIR_STRAFE, {options[name .. "_airstrafe"].value and 1 or 0}, {"shift"})
-				orderArray[#orderArray + 1] = {CMD_AIR_STRAFE, {options[name .. "_airstrafe"].value and 1 or 0}, {"shift"}}
+			if options[name .. "_airstrafe1"] and options[name .. "_airstrafe1"].value ~= nil then
+				-- Spring.GiveOrderToUnit(unitID, CMD_AIR_STRAFE, {options[name .. "_airstrafe1"].value and 1 or 0}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_AIR_STRAFE, {options[name .. "_airstrafe1"].value and 1 or 0}, {"shift"}}
 			end
 			
 			if options[name .. "_floattoggle"] and options[name .. "_floattoggle"].value ~= nil then

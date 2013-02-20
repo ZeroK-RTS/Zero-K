@@ -32,7 +32,7 @@ unitDef = {
   cruiseAlt           = 80,
 
   customParams        = {
-    airstrafecontrol = [[1]],
+    airstrafecontrol = [[0]],
     landflystate   = [[1]],
     description_bp = [[Aeronave de construç?o, constrói a 4,8 m/s]],
     description_es = [[Avión de construcción, construye a 4.8 m/s]],

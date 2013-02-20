@@ -213,6 +213,9 @@ local function FindNearestAirpad(unitID, team)
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	local freePads = {}
 	local freePadCount = 0
+	if not airpadsPerAllyTeam[allyTeam] then
+		return
+	end
 	-- first go through all the pads to see which ones are unbooked
 	for airpadID in pairs(airpadsPerAllyTeam[allyTeam]) do
 		if not spGetUnitIsDead(airpadID) and airpads[airpadID].reservations.count < airpads[airpadID].cap then
