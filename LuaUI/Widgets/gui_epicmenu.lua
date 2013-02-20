@@ -2251,7 +2251,7 @@ function WG.crude.ShowMenu() --// allow other widget to toggle-up Epic-Menu. Thi
 	end
 end
 
---[[ see comments in epicmenu conf
+--// [[ see comments in epicmenu conf (about "listbool" camera option). UPDATE: propose re-enable "listbool" camera option
 do --Set our prefered camera mode when first screen frame is drawn. The engine always go to default TA at first screen frame, so we need to re-apply our camera settings.
 	if Spring.GetGameFrame() == 0 then  --we check if this code is run at midgame (due to /reload). In that case we don't need to re-apply settings (the camera mode is already set at gui_epicmenu.lua\AddOption()).
 		local screenFrame = 0

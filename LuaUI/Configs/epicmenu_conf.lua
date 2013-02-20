@@ -158,9 +158,10 @@ path='Game'
 path='Settings/Camera'
 	--[[
 		the problem is "listBool" is not fully implemented to recognize the item "viewta" as an existing action,
-		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound.
+		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound. A proposed solution is to enable both "listBool" 
+		& old camera button, but put the later in saperate category.
 	--]]
-	--[[
+
 	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
 	ShTick2( 'Camera Type', {
 			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
@@ -187,19 +188,19 @@ path='Settings/Camera'
 			end
 		end
 		)
-	--]]
-	
-	ShButton( 'Total Annihilation', 'viewta' )
-	ShButton( 'FPS', 'viewfps' )
-	ShButton( 'Free', 'viewfree' )
-	ShButton( 'Rotatable Overhead', 'viewrot' )
-	ShButton( 'Total War', 'viewtw' )
 	
 	ShButton( 'Flip the TA Camera', 'viewtaflip' )
 	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
-	ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
+	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
+path='Settings/Camera/Old Camera Shortcut'	
+	ShButton( 'Total Annihilation', 'viewta' )
+	ShButton( 'FPS', 'viewfps' )
+	ShButton( 'Free', 'viewfree' )
+	ShButton( 'Rotatable Overhead', 'viewrot' )
+	ShButton( 'Total War', 'viewtw' )	
+	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 path='Settings/HUD Panels'
 	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
