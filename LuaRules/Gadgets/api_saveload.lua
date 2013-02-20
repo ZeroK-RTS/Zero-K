@@ -261,7 +261,7 @@ local function LoadGeneralInfo()
 		
 		local rulesParams = teamData.rulesParams or {}
 		for name, value in pairs (rulesParams) do
-			spSetTeamRulesParams(teamID, name, value) 
+			spSetTeamRulesParam(teamID, name, value)
 		end
 	end
 end
@@ -504,7 +504,9 @@ local function SaveGeneralInfo()
 		local m, ms = Spring.GetTeamResources(teamID, "metal")
 		local e, es = Spring.GetTeamResources(teamID, "energy")
 		data.teams[teamID].resources = { m = m, e = e, ms = ms, es = es }
+		
 		local rulesParams = spGetTeamRulesParams(teamID) or {}
+		data.teams[teamID].rulesParams = {}
 		for j=1,#rulesParams do
 			for name,value in pairs(rulesParams[j]) do
 				data.teams[teamID].rulesParams[name] = value 

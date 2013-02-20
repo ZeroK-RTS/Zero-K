@@ -204,6 +204,9 @@ function widget:Initialize()
 	Image = Chili.Image
 	Button = Chili.Button
 	
+	-- FIXME: because this code runs before gadget:GameLoad(), the selector window pops up
+	-- even if comm is already selected
+	-- nothing serious, just annoying
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
 	if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
