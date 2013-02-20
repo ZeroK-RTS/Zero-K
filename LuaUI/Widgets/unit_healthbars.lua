@@ -289,7 +289,7 @@ function widget:Initialize()
       ]],
     });
 
-    if (barShader and percent > 0) then
+    if (barShader) then
       barDList = gl.CreateList(function()
         gl.BeginEnd(GL.QUADS,function()
           gl.Vertex(-barWidth,0,        0,0);
