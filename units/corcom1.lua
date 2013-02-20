@@ -173,9 +173,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 250,
-        planes  = 250,
-        subs    = 12.5,
+        default = 240,
+        planes  = 240,
+        subs    = 12,
       },
 
       edgeEffectiveness       = 0.75,
@@ -185,8 +185,8 @@ unitDef = {
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
-      range                   = 290,
-      reloadtime              = 2,
+      range                   = 270,
+      reloadtime              = 2.2,
       renderType              = 4,
       soundHit                = [[weapon/cannon/generic_cannon]],
       soundStart              = [[weapon/cannon/outlaw_gun]],

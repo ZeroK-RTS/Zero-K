@@ -427,7 +427,7 @@ local baseComMorph = {
 -- basic (non-modular) commander handling
 --------------------------------------------------------------------------------
 local comms = {"armcom", "corcom", "commrecon", "commsupport", "benzcom", "cremcom"}
---[[
+
 for i=1,#comms do
   for j=1,4 do
     local source = comms[i]..j
@@ -441,7 +441,7 @@ for i=1,#comms do
     }
   end
 end
-]]
+
 
 --------------------------------------------------------------------------------
 -- modular commander handling

@@ -280,6 +280,13 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- postprocessing
+-- add cloned template comms to processing list
+for name, data in pairs(UnitDefs) do
+	if data.customparams.commtype then
+		commDefs[name] = data
+	end
+end
+
 for name, data in pairs(commDefs) do
 	--Spring.Echo("\tPostprocessing commtype: ".. name)
 	
@@ -290,6 +297,7 @@ for name, data in pairs(commDefs) do
 	ModifyWeaponRange(data, rangeBonus, true)
 
 	if data.customparams.speedbonus then
+		commDefs[name].customparams.basespeed = commDefs[name].customparams.basespeed or commDefs[name].maxvelocity
 		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
 	end
 	
@@ -297,7 +305,7 @@ for name, data in pairs(commDefs) do
 	-- TODO: use for slow-beams
 	if data.weapondefs then
 		for name, weaponData in pairs(data.weapondefs) do
-			if weaponData.customparams.extra_damage_mult then
+			if (weaponData.customparams or {}).extra_damage_mult then
 				weaponData.customparams.extra_damage = weaponData.customparams.extra_damage_mult * weaponData.damage.default
 				weaponData.customparams.extra_damage_mult = nil
 			end
