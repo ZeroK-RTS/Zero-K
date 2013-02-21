@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.109 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16", --2013-02-13 (msafwan)
+    date      = "2011-03-16", --2013-02-22 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -1651,7 +1651,7 @@ local previousKey = 99
 local previousTime = spGetTimer()
 
 function GroupRecallFix(key, modifier, isRepeat)
-	if ( not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
+	if ( not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
 		local gr
 		if (key == KEYSYMS.N_0) then gr = 0 
 		elseif (key == KEYSYMS.N_1) then gr = 1
