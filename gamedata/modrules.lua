@@ -16,6 +16,7 @@ local modrules  = {
     allowCrushingAlliedUnits = false; -- defaults to false
     allowUnitCollisionDamage = true; -- defaults to false
     allowUnitCollisionOverlap = false,	-- defaults to true	-- this lets units clump close together when moving, after which they are pushed apart
+    allowGroundUnitGravity = false,
   },
   
   construction = {
