@@ -89,6 +89,7 @@ unitDef = {
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
+      isShield                = true,
       shieldAlpha             = 0.4,
       shieldBadColor          = [[1 0.1 0.1]],
       shieldGoodColor         = [[0.1 0.1 1]],
