@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.885 Chili Minimap",
+    desc      = "v0.886 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -14,6 +14,7 @@ end
 
 
 local window_minimap
+local map_panel 
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
 local glResetState = gl.ResetState
@@ -21,9 +22,10 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local panelMargin = iconsize*0.2
+local panelMargin = 0
 
 local tabbedMode = false
+local init = true
 
 local function toggleTeamColors()
 	if WG.LocalColor and WG.LocalColor.localTeamColorToggle then
@@ -206,7 +208,12 @@ options = {
 		name = "Opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
-		OnChange = function(self) window_minimap.color = {1,1,1,self.value}; window_minimap:Invalidate() end,
+		OnChange = function(self)
+			panelMargin = self.value > 0 and iconsize*0.2 or 0
+			MakeMinimapWindow()
+			--window_minimap.color = {1,1,1,self.value}
+			window_minimap:Invalidate()
+		end,
 		path = minimap_path,
 	},
 
@@ -276,6 +283,8 @@ MakeMinimapWindow = function()
 		window_minimap:Dispose()
 	end
 	
+	init = true
+	
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	
 	--local w,h = screenWidth*0.32,screenHeight*0.4+iconsize
@@ -292,6 +301,7 @@ MakeMinimapWindow = function()
 		end
 	end
 	
+	map_panel = Chili.Panel:New {bottom = (iconsize+panelMargin), x = panelMargin, y = panelMargin, right = panelMargin, margin={0,0,0,0}, padding = {0,0,0,0}, backgroundColor = {0,0,0,0} }
 	window_minimap = Chili.Window:New{  
 		dockable = true,
 		name = "Minimap",
@@ -316,7 +326,7 @@ MakeMinimapWindow = function()
 		children = {
 			
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
-			Chili.Panel:New {name='minimap panel', bottom = (iconsize+panelMargin), x = panelMargin, y = panelMargin, right = panelMargin, margin={0,0,0,0}, padding = {0,0,0,0}},
+			map_panel,
 			
 			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, 'lastmsgpos' ),
 			MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, 'viewstandard' ),
@@ -359,7 +369,7 @@ function widget:MousePress(x, y, button)
 		return false 
 	end
 	if Spring.GetActiveCommand() == 0 then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
-		WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+		WG.crude.OpenPath(minimap_path) --click + space will shortcut to option-menu
 		WG.crude.ShowMenu() --make epic Chili menu appear.
 		return true
 	else --//skip epicMenu when user have active command. User might be trying to queue/insert command using the minimap.
@@ -437,14 +447,18 @@ function widget:DrawScreen()
 		lw = 0
 		return 
 	end
-	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) then
-		window_minimap:Update() --required otherwise size stackpanel is calculated wrong when first loaded
+	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) or init then
+		if init then
+			window_minimap:Update() --required otherwise size stackpanel is calculated wrong when first loaded
+			init = false
+		end
 		
-		local cx,cy,cw,ch = Chili.unpack4(window_minimap:GetChildByName('minimap panel').clientArea)
-		cx = cx + panelMargin*3
-		cy = cy + panelMargin*3
-		cw = cw - panelMargin*4
-		ch = ch - panelMargin*4
+		local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
+		cx = cx + panelMargin
+		cy = cy + panelMargin*2
+		cw = cw - panelMargin
+		ch = ch - iconsize/2
+		
 		--window_minimap.x, window_minimap.y, window_minimap.width, window_minimap.height
 		--Chili.unpack4(window_minimap.clientArea)
 		cx,cy = window_minimap:LocalToScreen(cx,cy)
