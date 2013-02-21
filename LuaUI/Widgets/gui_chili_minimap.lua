@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.886 Chili Minimap",
+    desc      = "v0.887 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -22,7 +22,7 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local panelMargin = 0
+local bgColor_panel = {1,1,1,1}
 
 local tabbedMode = false
 --local init = true
@@ -209,9 +209,13 @@ options = {
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			panelMargin = self.value > 0 and iconsize*0.2 or 0
+			if self.value == 0 then
+				bgColor_panel = {1,1,1,1}
+			else
+				bgColor_panel = {0,0,0,0}
+			end
 			MakeMinimapWindow()
-			--window_minimap.color = {1,1,1,self.value}
+			
 			window_minimap:Invalidate()
 		end,
 		path = minimap_path,
@@ -301,7 +305,11 @@ MakeMinimapWindow = function()
 		end
 	end
 	
-	map_panel = Chili.Panel:New {bottom = (iconsize+panelMargin), x = panelMargin, y = panelMargin, right = panelMargin, margin={0,0,0,0}, padding = {0,0,0,0}, backgroundColor = {0,0,0,0} }
+	map_panel = Chili.Panel:New {bottom = (iconsize*1.3), x = 0, y = 0, right = 0,
+		margin={0,0,0,0},
+		padding = {8,5,8,8},
+		backgroundColor = bgColor_panel
+		}
 	window_minimap = Chili.Window:New{  
 		dockable = true,
 		name = "Minimap",
@@ -456,20 +464,16 @@ function widget:DrawScreen()
 			init = false
 		end
 		--]]
-		
-		cx = cx + panelMargin
-		cy = cy + panelMargin*2
-		cw = cw - panelMargin
-		ch = ch - iconsize/2
-		
-		cx,cy = window_minimap:LocalToScreen(cx,cy)
-		local vsx,vsy = gl.GetViewSizes()
-		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
-	
+			
 		lx = cx
 		ly = cy
 		lh = ch
 		lw = cw
+		
+		cx,cy = window_minimap:LocalToScreen(cx,cy)
+		local vsx,vsy = gl.GetViewSizes()
+		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
+
 		
 	end
 
