@@ -6,11 +6,11 @@ function widget:GetInfo()
     name      = "Bounty & Marketplace Icons",
     desc      = "Shows bounty and marketplace icons",
     author    = "CarRepairer",
-	version   = "0.02",
+	version   = "0.021",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
-    enabled   = true,
+    enabled   = false,
   }
 end
 
