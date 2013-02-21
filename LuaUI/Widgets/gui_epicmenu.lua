@@ -174,6 +174,7 @@ local settings = {
 	show_crudemenu = true,
 	music_volume = 0.5,
 	keybounditems = {},
+	keybind_date = 0,
 }
 
 --------------------------------------------------------------------------------
@@ -2129,7 +2130,7 @@ function widget:GetConfigData()
 		SaveKeybinds()
 	end
 	
-	local ret = CopyTable(settings, false)
+	local ret = CopyTable(settings, true)
 	ret.keybounditems = nil
 	ret.keybind_date = nil
 	return ret
@@ -2147,7 +2148,7 @@ function widget:SetConfigData(data)
 		settings.keybounditems, settings.keybind_date = VFS.Include(keybind_file, nil, VFS.RAW)
 		settings.keybind_date = settings.keybind_date or defaultkeybind_date	-- reverse compat
 		
-		if settings.keybind_date < defaultkeybind_date then
+		if not settings.keybind_date or settings.keybind_date == 0 or (settings.keybind_date+0) < defaultkeybind_date then
 			settings.keybind_date = defaultkeybind_date
 			for action, keybind in pairs(defaultkeybinds) do
 			      settings.keybounditems[action] = keybind	-- forcibly override any user changes to default binds
