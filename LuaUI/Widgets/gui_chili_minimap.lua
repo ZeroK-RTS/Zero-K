@@ -12,7 +12,6 @@ function widget:GetInfo()
   }
 end
 
-
 local window_minimap
 local map_panel 
 local Chili
