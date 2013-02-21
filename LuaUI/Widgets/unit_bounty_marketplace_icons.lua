@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Bounty & Marketplace Icons",
+    name      = "Bounty & Marketplace Icons (experimental)",
     desc      = "Shows bounty and marketplace icons",
     author    = "CarRepairer",
 	version   = "0.021",
