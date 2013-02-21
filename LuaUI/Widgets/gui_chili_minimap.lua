@@ -25,7 +25,7 @@ local iconsize = 20
 local panelMargin = 0
 
 local tabbedMode = false
-local init = true
+--local init = true
 
 local function toggleTeamColors()
 	if WG.LocalColor and WG.LocalColor.localTeamColorToggle then
@@ -283,7 +283,7 @@ MakeMinimapWindow = function()
 		window_minimap:Dispose()
 	end
 	
-	init = true
+	--init = true
 	
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	
@@ -447,27 +447,30 @@ function widget:DrawScreen()
 		lw = 0
 		return 
 	end
-	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) or init then
+	local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
+	--if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) or init then
+	if (lw ~= cx or lh ~= ch or lx ~= cx or ly ~= cy) then
+		--[[
 		if init then
 			window_minimap:Update() --required otherwise size stackpanel is calculated wrong when first loaded
 			init = false
 		end
+		--]]
 		
-		local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
 		cx = cx + panelMargin
 		cy = cy + panelMargin*2
 		cw = cw - panelMargin
 		ch = ch - iconsize/2
 		
-		--window_minimap.x, window_minimap.y, window_minimap.width, window_minimap.height
-		--Chili.unpack4(window_minimap.clientArea)
 		cx,cy = window_minimap:LocalToScreen(cx,cy)
 		local vsx,vsy = gl.GetViewSizes()
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
-		lx = window_minimap.x
-		ly = window_minimap.y
-		lh = window_minimap.height
-		lw = window_minimap.width
+	
+		lx = cx
+		ly = cy
+		lh = ch
+		lw = cw
+		
 	end
 
 	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
