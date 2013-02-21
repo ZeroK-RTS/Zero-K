@@ -41,7 +41,9 @@ options = {
 
 
 include("keysym.h.lua")
-
+local iconTypes = { 'bounty', 'buy', 'sell' }
+local teamList = {}
+local teamColors = {}
 local myAllyTeamID = 666
 
 local imageDir = 'LuaUI/Images/bountymarketplaceicons/'
@@ -49,31 +51,38 @@ local imageDir = 'LuaUI/Images/bountymarketplaceicons/'
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function SetIcons(unitID)
-	local iconTypes = { 'bounty', 'buy', 'sell' }
-	for _,iconType in ipairs( iconTypes ) do
-			
-		for _, teamID in ipairs(Spring.GetTeamList()) do
-			local price = Spring.GetUnitRulesParam( unitID, iconType .. teamID )
-			
-			if price and price > 0 then
-				local icon = imageDir .. iconType.. price ..'.png'
-				if not VFS.FileExists(icon) then
-					icon = imageDir .. iconType .. 'notfound.png'
-				end
-						
-				local teamColor = {Spring.GetTeamColor(teamID)}
-				WG.icons.SetUnitIcon( unitID, {name=iconType..teamID, texture=icon, color=teamColor } )
-			else
-				WG.icons.SetUnitIcon( unitID, {name=iconType..teamID, texture=nil } )
+function SetIcons(unitID, iconType)
+	--for _, teamID in ipairs(Spring.GetTeamList()) do
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local price = Spring.GetUnitRulesParam( unitID, iconType .. teamID )
+		
+		if price and price > 0 then
+			local icon = imageDir .. iconType.. price ..'.png'
+			if not VFS.FileExists(icon) then
+				icon = imageDir .. iconType .. 'notfound.png'
 			end
+					
+			local teamColor = teamColors[teamID] or {1,1,1,1}
+			WG.icons.SetUnitIcon( unitID, {name=iconType..teamID, texture=icon, color=teamColor } )
+		else
+			WG.icons.SetUnitIcon( unitID, {name=iconType..teamID, texture=nil } )
 		end
 	end
+	
 end
 
 local function UpdateAllUnits()
+	teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		teamColors[teamID] = {Spring.GetTeamColor(teamID)}
+	end
+	
 	for _,unitID in pairs( GetAllUnits() ) do
-		SetIcons(unitID)
+		for _,iconType in ipairs( iconTypes ) do
+			SetIcons(unitID, iconType )
+		end
 	end
 end
 
@@ -87,7 +96,7 @@ end
 
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	local iconTypes = { 'bounty', 'buy', 'sell' }
+	
 	for _,iconType in ipairs( iconTypes ) do
 		for _, teamID in ipairs(Spring.GetTeamList()) do
 			WG.icons.SetUnitIcon( unitID, {name=iconType.. teamID, texture=nil} )
