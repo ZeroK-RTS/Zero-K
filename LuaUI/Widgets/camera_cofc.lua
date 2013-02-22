@@ -197,7 +197,7 @@ options = {
 	},
 	follow = {
 		name = "Follow player's cursor",
-		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on). \n\nSee \"Advanced Camera Config\" (under Zoom subsection) to enable automatic Zoom option. ",
+		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on). \n\nSee \"Advanced Camera Config\" (under Follow Cursor subsection) for more option. ",
 		type = 'bool',
 		value = false,
 		hotkey = {key='l', mod='alt+'},
