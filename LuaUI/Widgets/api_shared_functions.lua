@@ -73,7 +73,7 @@ local function WriteTable(array, numIndents, endOfFile)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
 		elseif type(v) == "string" then
-			str = str .. "[[" .. v .. "]]" .. ",\n"
+			str = str .. "[=[" .. v .. "]=]" .. ",\n"
 		else
 			str = str .. v .. ",\n"
 		end
