@@ -167,13 +167,13 @@ end
 
 --------------------------------------------------------------------------------
 -- Luaui config settings
+local keybounditems = {}
 local settings = {
 	versionmin = 50,
 	lang = 'en',
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
-	keybounditems = {},
 	keybind_date = 0,
 }
 
@@ -340,7 +340,7 @@ local function SaveKeybinds()
 		return
 	end
 	file:write ("local date = " .. settings.keybind_date .. "\n")
-	file:write ("local keybinds = " .. WG.WriteTable(settings.keybounditems, 0, true))
+	file:write ("local keybinds = " .. WG.WriteTable(keybounditems, 0, true))
 	file:write ("\nreturn keybinds, date")
 	file:flush()
 	file:close()
@@ -641,7 +641,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		]]
 		
 		if addToKeyboundItems then	
-			settings.keybounditems[actionName] = hotkey
+			keybounditems[actionName] = hotkey
 			--echo("bind " .. hotkey .. " " .. actionName)
 			Spring.SendCommands("bind " .. hotkey .. " " .. actionName)
 			
@@ -723,7 +723,7 @@ local function UnassignKeyBind(actionName, verbose)
 			echo( 'Unbound hotkeys from action: ' .. actionName )
 		end
 	end
-	settings.keybounditems[actionName] = nil
+	keybounditems[actionName] = nil
 end
 
 
@@ -907,7 +907,7 @@ local function AddOption(path, option, wname )
 		CreateOptionAction(path, option)
 		
 		local actionHotkey = GetActionHotkey(actionName)
-		local hotkey = settings.keybounditems[actionName] or option.hotkey or actionHotkey
+		local hotkey = keybounditems[actionName] or option.hotkey or actionHotkey
 		if hotkey and hotkey ~= 'none' then
 			--if actionHotkey then
 				UnassignKeyBind(actionName)
@@ -930,7 +930,7 @@ local function AddOption(path, option, wname )
 			  item.orig_hotkey = orig_hotkey
 			end
 			local actionHotkey = GetActionHotkey(actionName)
-			local hotkey = settings.keybounditems[actionName] or item.hotkey or actionHotkey
+			local hotkey = keybounditems[actionName] or item.hotkey or actionHotkey
 			if hotkey and hotkey ~= 'none' then
 				--if actionHotkey then
 					UnassignKeyBind(actionName)
@@ -1194,7 +1194,7 @@ end
 
 WG.crude.GetHotkey = function(actionName)
 	local actionHotkey = GetActionHotkey(actionName)
-	local hotkey = settings.keybounditems[actionName] or actionHotkey
+	local hotkey = keybounditems[actionName] or actionHotkey
 	if not hotkey or hotkey == 'none' then
 		return ''
 	end
@@ -1205,7 +1205,7 @@ end
 --[[
 -- is this an improvement?
 WG.crude.GetHotkey = function(actionName)
-	local hotkey = settings.keybounditems[actionName]
+	local hotkey = keybounditems[actionName]
 	if not hotkey then
 		local fallback = Spring.GetActionHotKeys(actionName)
 		if fallback and fallback[1] then
@@ -1222,7 +1222,7 @@ end
 --Get hotkey action and readable hotkey string
 local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
-	local hotkey = settings.keybounditems[actionName]
+	local hotkey = keybounditems[actionName]
 	if hotkey and hotkey ~= 'none' then
 		return GetReadableHotkey(hotkey) 
 	end
@@ -1915,8 +1915,8 @@ function widget:Initialize()
 		settings.wl_x = (scrW - settings.wl_w)/2
 		settings.wl_y = (scrH - settings.wl_h)/2
 	end
-	if not settings.keybounditems then
-		settings.keybounditems = {}
+	if not keybounditems then
+		keybounditems = {}
 	end
 	if not settings.config then
 		settings.config = {}
@@ -1965,14 +1965,14 @@ function widget:Initialize()
 	
 	-- clear all keybindings
 	WG.crude.ResetKeys = function()
-		for actionName,_ in pairs(settings.keybounditems) do
+		for actionName,_ in pairs(keybounditems) do
 			--local actionNameL = actionName:lower()
 			local actionNameL = actionName
 			--echo("unbindaction(1) " .. actionNameL)
 			Spring.SendCommands({"unbindaction " .. actionNameL})
 		end
 		
-		settings.keybounditems = {}
+		keybounditems = {}
 		
 		for _,option in pairs(alloptions) do
 		    if option.orig_hotkey and type(option.orig_hotkey) == 'string' then
@@ -2086,8 +2086,6 @@ function widget:GetConfigData()
 	end
 	
 	local ret = CopyTable(settings, true)
-	ret.keybounditems = nil
-	ret.keybind_date = nil
 	return ret
 end
 
@@ -2100,29 +2098,29 @@ function widget:SetConfigData(data)
 	WG.music_volume = settings.music_volume or 0.5
 	
 	if keybind_file and VFS.FileExists(keybind_file, VFS.RAW) then
-		settings.keybounditems, settings.keybind_date = VFS.Include(keybind_file, nil, VFS.RAW)
+		keybounditems, settings.keybind_date = VFS.Include(keybind_file, nil, VFS.RAW)
 		settings.keybind_date = settings.keybind_date or defaultkeybind_date	-- reverse compat
 		
 		if not settings.keybind_date or settings.keybind_date == 0 or (settings.keybind_date+0) < defaultkeybind_date then
 			settings.keybind_date = defaultkeybind_date
 			for action, keybind in pairs(defaultkeybinds) do
-			      settings.keybounditems[action] = keybind	-- forcibly override any user changes to default binds
+			      keybounditems[action] = keybind	-- forcibly override any user changes to default binds
 			end
 		else
 			for action, keybind in pairs(defaultkeybinds) do
-			      settings.keybounditems[action] = settings.keybounditems[action] or keybind	-- keep any existing user binds
+			      keybounditems[action] = keybounditems[action] or keybind	-- keep any existing user binds
 			end
 		end
 	else
-		settings.keybounditems = CopyTable(defaultkeybinds, true)
+		keybounditems = CopyTable(defaultkeybinds, true)
 		settings.keybind_date = defaultkeybind_date
 	end
 	
 	--migrate from old logic
-	if settings.keybounditems then
-		for actionName,hotkey in pairs(settings.keybounditems) do
+	if keybounditems then
+		for actionName,hotkey in pairs(keybounditems) do
 			if type( hotkey ) == 'table' then
-				settings.keybounditems[actionName] = hotkey.mod .. hotkey.key
+				keybounditems[actionName] = hotkey.mod .. hotkey.key
 			end
 		end
 	end
