@@ -44,11 +44,10 @@ local HANDLER_BASENAME = "cawidgets.lua"
 local SELECTOR_BASENAME = 'selector.lua'
 
 if not VFS.FileExists(ORDER_FILENAME) then
-  --// someone was as smart to create CA_order.lua instead of using Game.modShortName
-  --// Game.modShortName is 'ca' and 'ca_order.lua' conflicts with 'CA_order.lua' on win plattforms
-  --// so just use this correct spelling for new created files
-  ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName .. '_order.lua'
-  CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName .. '_data.lua'
+  -- FIXME: hack fix for missions not using right config files
+  local modShortName = "ZK"	-- Game.modShortName
+  ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortName .. '_order.lua'
+  CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. modShortName .. '_data.lua'
 end
 
 local SAFEWRAP = 1
