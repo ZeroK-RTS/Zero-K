@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.109 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.110 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-02-22 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -51,8 +51,14 @@ options_order = {
 	'zoomintocursor', 
 	'zoomoutfromcursor', 
 	'zoominfactor', 
-	'zoomoutfactor',
-	'followautozoom',	
+	'zoomoutfactor',	
+	
+	'lblFollow',
+	'followautozoom',
+	'followmaxscrollspeed',
+	'followminscrollspeed',
+	'followzoominspeed',
+	'followzoomoutspeed',
 	
 	'lblMisc',
 	'overviewmode', 
@@ -83,6 +89,7 @@ options = {
 	lblRotate = {name='Rotation', type='label'},
 	lblScroll = {name='Scrolling', type='label'},
 	lblZoom = {name='Zooming', type='label'},
+	lblFollow = {name='Follow Cursor', type='label'},
 	lblMisc = {name='Misc.', type='label'},
 	
 	helpwindow = {
@@ -197,11 +204,39 @@ options = {
 		path = 'Settings/Camera',
 	},
 	followautozoom = {
-		name = "Auto zoom while follow cursor",
-		desc = "COFC will auto zoom in & out while in follow cursor mode (zoom level will represent player's focus). Work best using low to moderate zoom speed.",
+		name = "Auto zoom",
+		desc = "Auto zoom in & out while following cursor (zoom level will represent cursor's focus). Work best using low to moderate zoom speed.",
 		type = 'bool',
 		value = false,
+	},
+	followminscrollspeed = {
+		name = "On Screen Speed",
+		desc = "Scroll speed for on-screen cursor. Recommend: Lowest",
+		type = 'number',
+		min = 1, max = 14, step = 1,
+		value = 1,
 	},	
+	followmaxscrollspeed = {
+		name = "Off Screen Speed",
+		desc = "Scroll speed for off-screen cursor. Recommend: Highest",
+		type = 'number',
+		min = 2, max = 15, step = 1,
+		value = 15,
+	},
+	followzoominspeed = {
+		name = "Follow Zoom-in Speed",
+		desc = "Auto zoom-in factor. Recommend: Low",
+		type = 'number',
+		min = 0.1, max = 0.5, step = 0.05,
+		value = 0.2,
+	},
+	followzoomoutspeed = {
+		name = "Follow Zoom-out Speed",
+		desc = "Auto zoom-out factor. Recommend: Low",
+		type = 'number',
+		min = 0.1, max = 0.5, step = 0.05,
+		value = 0.2,
+	},		
 	rotfactor = {
 		name = 'Rotation speed',
 		type = 'number',
@@ -471,7 +506,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
-local last_move = spGetTimer() --switch for reset lockspot for edgescroll
+local last_move = spGetTimer() --switch for reseting lockspot for Edgescroll
+local last_zoom = spGetTimer() --switch for delaying zooming updates for FollowCursorAutoZoom
 local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trackmode edge screen scroll"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -829,6 +865,27 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	if follow_timer > 0 or smoothscroll or springscroll or rotate then
 		return
 	end
+	local lclZoom = function(cs,zoomin, smoothness)
+		if spDiffTimers(spGetTimer(),last_zoom)<1 then
+			return
+		end
+		last_zoom = spGetTimer()
+		ls_have = false --unlock lockspot 
+		SetLockSpot2(cs) --set lockspot
+		if not ls_have then
+			return
+		end
+		local sp = (zoomin and -1*options.followzoomoutspeed.value or options.followzoominspeed.value)
+		local ls_dist_new = ls_dist + ls_dist*sp
+		ls_dist_new = max(ls_dist_new, 20)
+		ls_dist_new = min(ls_dist_new, maxDistY)
+		ls_dist = ls_dist_new
+		local cstemp = UpdateCam(cs)
+		if cstemp then cs = cstemp; end
+		if zoomin or ls_dist < maxDistY then
+			spSetCameraState(cs, smoothness)
+		end
+	end
 	local teamID = Spring.GetLocalTeamID()
 	local _, playerID = Spring.GetTeamInfo(teamID)
 	local pp = WG.alliedCursorsPos[ playerID ]
@@ -836,24 +893,21 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
 		local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 		local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
-		local camHeight = spGetCameraState().py - groundY --get camera height with respect to ground
-		local zoomin = true
-		if options.invertzoom.value then --if invert zoom:
-			zoomin = not zoomin
-		end
-		if (scrn_x<scrnsize_X*5/8 and scrn_x>scrnsize_X*3/8) and (scrn_y<scrnsize_Y*5/8 and scrn_y>scrnsize_Y*3/8) then --if cursor near center:
+		local cs = spGetCameraState()
+		if (scrn_x<scrnsize_X*4/6 and scrn_x>scrnsize_X*2/6) and (scrn_y<scrnsize_Y*4/6 and scrn_y>scrnsize_Y*2/6) then --if cursor near center:
+			local camHeight = cs.py - groundY --get camera height with respect to ground
 			if camHeight >1000 then --if cam height from ground greater than 1000elmo: do
-				Zoom(zoomin, false, true) --slow zoom in
+				lclZoom(cs,true, 1) --zoom in
 			end
-		elseif (scrn_x>scrnsize_X*6/8 or scrn_x<scrnsize_X*2/8) or (scrn_y>scrnsize_Y*6/8 or scrn_y<scrnsize_Y*2/8) then --if cursor near edge: do
-			Zoom(not zoomin, false, true) --slow zoom out
+		elseif (scrn_x>scrnsize_X*5/6 or scrn_x<scrnsize_X*1/6) or (scrn_y>scrnsize_Y*5/6 or scrn_y<scrnsize_Y*1/6) then --if cursor near edge: do
+			lclZoom(cs,false, 1) --zoom out
 		end				
 		if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-			Zoom(not zoomin, false, true) --slow zoom out 3 times! ~ equal to fast zoom out using SHIFT
-			Zoom(not zoomin, false, true)
-			spSetCameraTarget(pp[1], groundY, pp[2], 1) --fast go-to speed
+			local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
 		else --if cursor within screen: do
-			spSetCameraTarget(pp[1], groundY, pp[2], 15) --slow go-to speed
+			local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
 		end
 	end
 end
@@ -1074,9 +1128,11 @@ function widget:Update(dt)
 						local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 						local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
 						if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-							spSetCameraTarget(pp[1], groundY, pp[2], 1) --fast go-to speed
+							local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+							spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
 						else --if cursor within screen: do
-							spSetCameraTarget(pp[1], groundY, pp[2], 15) --slow go-to speed
+							local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+							spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
 						end
 					end
 				end
