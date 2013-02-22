@@ -100,24 +100,24 @@ function SetUnitStateIcons(unitID)
 	if not states then return end
 	
 	local ud = Spring.GetUnitDefID(unitID)
+	if ud then
+		ud = UnitDefs[ud]
+	end
 	
 	if options.showstateonshift.value then
 		if ud then
-			ud = UnitDefs[ud]
-			if ud then
-				if ud.canAttack or ud.isFactory then
-					if not prevFirestate[unitID] or prevFirestate[unitID] ~= states.firestate then
-						prevFirestate[unitID] = states.firestate
-						local fireStateIcon = fireStateIcons[states.firestate]
-						WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
-					end
+			if ud.canAttack or ud.isFactory then
+				if not prevFirestate[unitID] or prevFirestate[unitID] ~= states.firestate then
+					prevFirestate[unitID] = states.firestate
+					local fireStateIcon = fireStateIcons[states.firestate]
+					WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
 				end
-				if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
-					if not prevMovestate[unitID] or prevMovestate[unitID] ~= states.movestate then
-						prevMovestate[unitID] = states.movestate
-						local moveStateIcon = moveStateIcons[states.movestate]
-						WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
-					end
+			end
+			if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
+				if not prevMovestate[unitID] or prevMovestate[unitID] ~= states.movestate then
+					prevMovestate[unitID] = states.movestate
+					local moveStateIcon = moveStateIcons[states.movestate]
+					WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
 				end
 			end
 		end
@@ -138,9 +138,16 @@ function SetUnitStateIcons(unitID)
 	if options.showpriorityonshift.value then
 		local armored, amount = Spring.GetUnitArmored(unitID)
 		local state = Spring.GetUnitRulesParam(unitID, "buildpriority")
+		if (not ud) or not (ud.canAssist and ud.buildSpeed ~= 0) then
+			local _,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
+			if buildProgress == 1 then
+				state = 1
+			end
+		end
 		
 		if not prevPriority[unitID] or prevPriority[unitID] ~= state then
 			if state == 1 then
+				prevPriority[unitID] = state
 				WG.icons.SetUnitIcon( unitID, {name='priority', texture=nil} )
 			else
 				prevPriority[unitID] = state
