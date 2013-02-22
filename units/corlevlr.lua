@@ -90,11 +90,11 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 0.5,
 
-	  customParams            = {
-	    gatherradius = [[90]],
-	    smoothradius = [[60]],
-		smoothmult   = [[0.08]],
-	  },
+      customParams            = {
+	gatherradius = [[90]],
+	smoothradius = [[60]],
+	smoothmult   = [[0.08]],
+      },
 	  
       damage                  = {
         default = 220,
@@ -104,18 +104,15 @@ unitDef = {
 
       edgeEffectiveness       = 0.75,
       explosionGenerator      = [[custom:FLASH64]],
-      impulseBoost            = 120,
-      impulseFactor           = 1.5,
+      impulseBoost            = 30,
+      impulseFactor           = 0.5,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 290,
       reloadtime              = 2,
-      renderType              = 4,
       soundHit                = [[weapon/cannon/generic_cannon]],
       soundStart              = [[weapon/cannon/outlaw_gun]],
       soundStartVolume        = 3,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 750,

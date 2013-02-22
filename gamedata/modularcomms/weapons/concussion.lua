@@ -8,22 +8,22 @@ local weaponDef = {
     craterBoost             = 1,
     craterMult              = 2,
 
-	customParams			= {
-		slot = [[3]],
-		muzzleEffectFire = [[custom:RAIDMUZZLE]],
-	},	
+    customParams			= {
+	slot = [[3]],
+	muzzleEffectFire = [[custom:RAIDMUZZLE]],
+    },	
 	
     damage                  = {
-		default = 750,
-		planes  = 750,
-		subs    = 37.5,
+	default = 750,
+	planes  = 750,
+	subs    = 37.5,
     },
 
-	edgeEffectiveness		= 0.5,
+    edgeEffectiveness       = 0.5,
     explosionGenerator      = [[custom:100rlexplode]],
     impulseBoost            = 250,
-    impulseFactor           = 1,
-    interceptedByShieldType = 0,
+    impulseFactor           = 0.5,
+    interceptedByShieldType = 1,
     range                   = 500,
     reloadtime              = 8,
     rgbColor                = [[1 0.6 0]],

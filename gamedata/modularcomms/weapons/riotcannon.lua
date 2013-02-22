@@ -1,6 +1,6 @@
 local name = "commweapon_riotcannon"
 local weaponDef = {
-	name                    = [[Riot Cannon]],
+    name                    = [[Riot Cannon]],
     areaOfEffect            = 144,
     avoidFeature            = true,
     avoidFriendly           = true,
@@ -15,16 +15,16 @@ local weaponDef = {
 	},
 
     damage                  = {
-      default = 240,
-      planes  = 240,
-      subs    = 12,
+		default = 240,
+		planes  = 240,
+		subs    = 12,
     },
 
     edgeEffectiveness       = 0.75,
     explosionGenerator      = [[custom:FLASH64]],
-	fireStarter				= 150,
-    impulseBoost            = 140,
-    impulseFactor           = 1.5,
+    fireStarter             = 150,
+    impulseBoost            = 60,
+    impulseFactor           = 0.5,
     interceptedByShieldType = 1,
     lineOfSight             = true,
     noSelfDamage            = true,
