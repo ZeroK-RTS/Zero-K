@@ -389,7 +389,7 @@ function gadget:GameFrame(n)
 end
 
 function gadget:UnitIdle(unitID, unitDefID, team)
-	if bomberDefs[unitDefID] then
+	if bomberDefs[unitDefID] and spGetUnitRulesParam(unitID, "noammo") == 1 then
 		scheduleRearmRequest[unitID] = true
 	end
 end
