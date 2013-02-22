@@ -9,6 +9,8 @@
 --------------------------------------------------------------------------------
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/base64.lua")
+
+Spring.Log = Spring.Log or function() end
 --------------------------------------------------------------------------------
 --	HOW IT WORKS: 
 --	First, it makes unitdefs as specified by the decoded modoption string, one for each unique comm type.

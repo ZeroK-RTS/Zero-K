@@ -62,7 +62,7 @@ local function WriteTable(array, numIndents, endOfFile)
 		str = str .. WriteIndents(numIndents + 1)
 		if type(i) == "number" then
 			str = str .. "[" .. i .. "] = "
-		elseif keywords[i] then
+		elseif keywords[i] or (type(i) == "string" and i:find("[/ ]")) then
 			str = str .. [[["]] .. i .. [["] ]] .. "= "
 		else
 			str = str .. i .. " = "
@@ -85,6 +85,8 @@ local function WriteTable(array, numIndents, endOfFile)
 	
 	return str
 end
+
+WG.WriteTable = WriteTable
 
 function WG.PrintTable(f, table)
 	file = io.open (f, "w")
