@@ -90,7 +90,6 @@ local function getStealableAlly(x, z, r, unitID, progress, team)
 end
 
 local function getClosestWreck(x, z, r) -- hopefully to be replaced
-
 	local features = spGetFeaturesInRectangle(x-r, z-r, x+r, z+r)
 	local rsq = r^2
 	
@@ -136,7 +135,7 @@ function gadget:GameFrame(f)
 			local x,_,z = spGetUnitPosition(unitID)
 			local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 			-- drain metal while quote not fulfilled
-			while quota > 0 and not stunned_or_inbuild do
+			while quota > 0 and (not stunned_or_inbuild) and x and z do
 				
 				local feature = getClosestWreck(x, z, unit.defs.range)
 				
