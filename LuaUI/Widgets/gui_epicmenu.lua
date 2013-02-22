@@ -333,51 +333,6 @@ local function IntToBool(int)
 	return int ~= 0
 end
 
-local function WriteIndents(num)
-	local str = ""
-	for i=1, num do
-		str = str .. "\t"
-	end
-	return str
-end
-
-local keywords = {
-	["repeat"] = true,
-}
-
--- recursive function that write a Lua table to file in the correct format
-local function WriteTable(array, numIndents, endOfFile)
-	local str = ""	--WriteIndents(numIndents)
-	str = str .. "{\n"
-	for i,v in pairs(array) do
-		str = str .. WriteIndents(numIndents + 1)
-		if type(i) == "number" then
-			str = str .. "[" .. i .. "] = "
-		elseif keywords[i] or (type(i) == "string" and i:find("[/ ]")) then
-			str = str .. [[["]] .. i .. [["] ]] .. "= "
-		else
-			str = str .. i .. " = "
-		end
-		
-		if type(v) == "table" then
-			str = str .. WriteTable(v, numIndents + 1)
-		elseif type(v) == "boolean" then
-			str = str .. tostring(v) .. ",\n"
-		elseif type(v) == "string" then
-			str = str .. [["]] .. v .. [["]] .. ",\n"
-		else
-			str = str .. v .. ",\n"
-		end
-	end
-	str = str ..WriteIndents(numIndents) .. "}"
-	if not endOfFile then
-		str = str .. ",\n"
-	end
-	
-	return str
-end
-
-
 local function SaveKeybinds()
 	local file = io.open (keybind_file, "w")
 	if (file== nil) then
@@ -385,7 +340,7 @@ local function SaveKeybinds()
 		return
 	end
 	file:write ("local date = " .. settings.keybind_date .. "\n")
-	file:write ("local keybinds = " .. WriteTable(settings.keybounditems, 0, true))
+	file:write ("local keybinds = " .. WG.WriteTable(settings.keybounditems, 0, true))
 	file:write ("\nreturn keybinds, date")
 	file:flush()
 	file:close()
