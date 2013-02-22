@@ -21,9 +21,9 @@ local armorDefs = {
     "coracsub",
     "armrecl",
     "correcl",
-	"cornukesub",
-	"serpent",
-	"lancelet",
+    "cornukesub",
+    "serpent",
+    "lancelet",
   },
 
   EMPRESISTANT99 = {
