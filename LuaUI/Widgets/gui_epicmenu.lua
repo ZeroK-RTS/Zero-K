@@ -44,7 +44,7 @@ local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
-local keybind_file = confdata.keybind_file
+local keybind_file = confdata.keybind_file or title_text .. '_keys.lua'
 local defaultkeybinds, defaultkeybind_date = VFS.Include(keybind_file, nil, VFS.ZIP)
 
 local _, _, _, _, _, _, _, _, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
@@ -168,13 +168,14 @@ end
 --------------------------------------------------------------------------------
 -- Luaui config settings
 local keybounditems = {}
+local keybind_date = 0
+
 local settings = {
 	versionmin = 50,
 	lang = 'en',
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
-	keybind_date = 0,
 }
 
 --------------------------------------------------------------------------------
@@ -339,11 +340,32 @@ local function SaveKeybinds()
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
 		return
 	end
-	file:write ("local date = " .. settings.keybind_date .. "\n")
+	file:write ("local date = " .. keybind_date .. "\n")
 	file:write ("local keybinds = " .. WG.WriteTable(keybounditems, 0, true))
 	file:write ("\nreturn keybinds, date")
 	file:flush()
 	file:close()
+end
+
+local function LoadKeybinds()
+	if VFS.FileExists(keybind_file, VFS.RAW) then
+		keybounditems, keybind_date = VFS.Include(keybind_file, nil, VFS.RAW)
+		keybind_date = keybind_date or defaultkeybind_date	-- reverse compat
+		
+		if not keybind_date or keybind_date == 0 or (keybind_date+0) < defaultkeybind_date then
+			keybind_date = defaultkeybind_date
+			for action, keybind in pairs(defaultkeybinds) do
+			      keybounditems[action] = keybind	-- forcibly override any user changes to default binds
+			end
+		else
+			for action, keybind in pairs(defaultkeybinds) do
+			      keybounditems[action] = keybounditems[action] or keybind	-- keep any existing user binds
+			end
+		end
+	else
+		keybounditems = CopyTable(defaultkeybinds, true)
+		keybind_date = defaultkeybind_date
+	end
 end
 
 ----------------------------------------------------------------
@@ -2081,12 +2103,8 @@ end
 
 
 function widget:GetConfigData()
-	if keybind_file then
-		SaveKeybinds()
-	end
-	
-	local ret = CopyTable(settings, true)
-	return ret
+	SaveKeybinds()
+	return settings
 end
 
 function widget:SetConfigData(data)
@@ -2096,34 +2114,7 @@ function widget:SetConfigData(data)
 		end
 	end
 	WG.music_volume = settings.music_volume or 0.5
-	
-	if keybind_file and VFS.FileExists(keybind_file, VFS.RAW) then
-		keybounditems, settings.keybind_date = VFS.Include(keybind_file, nil, VFS.RAW)
-		settings.keybind_date = settings.keybind_date or defaultkeybind_date	-- reverse compat
-		
-		if not settings.keybind_date or settings.keybind_date == 0 or (settings.keybind_date+0) < defaultkeybind_date then
-			settings.keybind_date = defaultkeybind_date
-			for action, keybind in pairs(defaultkeybinds) do
-			      keybounditems[action] = keybind	-- forcibly override any user changes to default binds
-			end
-		else
-			for action, keybind in pairs(defaultkeybinds) do
-			      keybounditems[action] = keybounditems[action] or keybind	-- keep any existing user binds
-			end
-		end
-	else
-		keybounditems = CopyTable(defaultkeybinds, true)
-		settings.keybind_date = defaultkeybind_date
-	end
-	
-	--migrate from old logic
-	if keybounditems then
-		for actionName,hotkey in pairs(keybounditems) do
-			if type( hotkey ) == 'table' then
-				keybounditems[actionName] = hotkey.mod .. hotkey.key
-			end
-		end
-	end
+	LoadKeybinds()
 end
 
 function widget:Update()
