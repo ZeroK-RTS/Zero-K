@@ -60,16 +60,17 @@ function widget:DrawWorldPreUnit()
   gl.Color(0, 1, 0)
   -- special function from ca's LuaUI Cache - no need to speed up
   local visibleUnitsRev = Spring.GetVisibleUnitsReverse(Spring.ALL_UNITS, nil, false)
-        for _,unitID in ipairs(Spring.GetSelectedUnits()) do
-                if (visibleUnitsRev[unitID] and not spGetUnitNoDraw(unitID)) then
-                        local udid = Spring.GetUnitDefID(unitID)
-                        local scalex = 4.0 * UnitDefs[udid]["xsize"]
-                        local scalez = 4.0 * UnitDefs[udid]["zsize"]
-                        local heading = Spring.GetUnitHeading(unitID)
-                        local dirx, diry, dirz = Spring.GetUnitDirection(unitID)
-                        local heading = Spring.GetHeadingFromVector(dirx, dirz)
-                        local degrot = math.acos(dirz) * 180 / math.pi
-                        gl.DrawListAtUnit(unitID, squareLines, false, scalex, 1.0, scalez, degrot, 0, heading, 0)                               
-                end
-        end
+  for _,unitID in ipairs(Spring.GetSelectedUnits()) do
+          if (visibleUnitsRev[unitID] and not spGetUnitNoDraw(unitID)) then
+                  local udid = Spring.GetUnitDefID(unitID)
+                  local scalex = 4.0 * UnitDefs[udid]["xsize"]
+                  local scalez = 4.0 * UnitDefs[udid]["zsize"]
+                  local heading = Spring.GetUnitHeading(unitID)
+                  local dirx, diry, dirz = Spring.GetUnitDirection(unitID)
+                  local heading = Spring.GetHeadingFromVector(dirx, dirz)
+                  local degrot = math.acos(dirz) * 180 / math.pi
+                  gl.DrawListAtUnit(unitID, squareLines, false, scalex, 1.0, scalez, degrot, 0, heading, 0)                               
+          end
+  end
+  gl.Color(1,1,1,1)
 end

@@ -665,7 +665,8 @@ function widget:DrawWorld()
 	if drawMexSpots then
 		glCallList(mainMexDrawList)
 	end
-
+	
+	gl.Color(1, 1, 1, 1)
 end
 
 function widget:DrawInMiniMap()

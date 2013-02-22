@@ -605,7 +605,7 @@ function widget:DrawWorld()
 	end
 	glDepthTest(false)
 	glLineWidth(0)
-	glColor(0,0,0,0)
+	glColor(1,1,1,1)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)

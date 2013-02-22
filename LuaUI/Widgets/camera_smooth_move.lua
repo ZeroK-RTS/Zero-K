@@ -249,6 +249,7 @@ function widget:DrawScreen()
 	glTexRect(x-icon_size, y-icon_size, x+icon_size, y+icon_size)
 	glTexture(false)
     --glPointSize(1)
+    glColor(1,1,1,1)
   end
 end
 

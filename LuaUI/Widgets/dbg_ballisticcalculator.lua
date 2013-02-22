@@ -165,6 +165,7 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 	glBeginEnd(GL_LINE_STRIP, DrawLoop, start, vector, green, dist, flightTime, yVelocity, horizontalSpeed, myGravity)
 	glLineStipple(false)
 	gl.DepthTest(false)
+	glColor(1, 1, 1, 1)
 
 end
 

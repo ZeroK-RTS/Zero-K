@@ -381,6 +381,7 @@ function widget:DrawWorld()
 	end
 	glLineStipple(false)
 	glDepthTest(false)
+	glColor(1,1,1,1)
 end
 
 --function widget:PlayerChanged(playerID)

@@ -207,6 +207,7 @@ function widget:DrawWorldPreUnit()
 			end
 		end
 	end
+	glColor(1,1,1,1)
 end
 
 

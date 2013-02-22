@@ -572,6 +572,7 @@ function widget:DrawWorld()
 		gl.BeginEnd(GL.LINE_STRIP, DrawPlacedRoute, pos)
 	end
 
+	gl.Color(1, 1, 1, 1)
 end
 
 
