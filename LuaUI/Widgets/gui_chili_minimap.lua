@@ -21,7 +21,7 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local bgColor_panel = {1,1,1,1}
+local bgColor_panel = {nil,nil,nil,1}
 
 local tabbedMode = false
 --local init = true
@@ -209,9 +209,9 @@ options = {
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			if self.value == 0 then
-				bgColor_panel = {1,1,1,1}
+				bgColor_panel = {nil,nil,nil,1}
 			else
-				bgColor_panel = {0,0,0,0}
+				bgColor_panel = {nil,nil,nil,0}
 			end
 			MakeMinimapWindow()
 			
@@ -314,7 +314,7 @@ MakeMinimapWindow = function()
 		name = "Minimap",
 		x = 0,  
 		y = 0,
-		color = {1,1,1,options.opacity.value},
+		color = {nil, nil, nil, options.opacity.value},
 		padding = {0,0,0,0},
 		margin = {0,0,0,0},
 		width  = w,
