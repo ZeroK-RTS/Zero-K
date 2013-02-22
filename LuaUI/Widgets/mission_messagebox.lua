@@ -191,7 +191,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		right	= 4,
 		y		= 8,
 		height	= height - 8 - 8,
-		width   = width - (height * 0.8) - 8,
+		width   = width - x - 8,
 		horizontalScrollbar = false,
 		scrollbarSize = 6,
 	}
@@ -515,7 +515,7 @@ function widget:Initialize()
   WG.ShowPersistentMessageBox(str2, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
   --WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
   --WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
-  ]]
+  --]]
   
 end
 
