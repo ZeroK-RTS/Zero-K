@@ -54,7 +54,7 @@ local Chili
 local Button
 local Label
 local Window
-local StackPanel
+local Panel
 local Image
 local Progressbar
 local screen0
@@ -293,7 +293,9 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	end
 	array[i].button = Button:New{
 		parent = stack_main;
+		x = (pos)*(100/options.maxbuttons.value).."%",
 		y = 0,
+		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
 		caption = '',
 		OnMouseDown = {	function (self, x, y, mouse) 
@@ -848,22 +850,23 @@ function widget:Initialize()
 	Button = Chili.Button
 	Label = Chili.Label
 	Window = Chili.Window
-	StackPanel = Chili.StackPanel
+	Panel = Chili.Panel
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
 	screen0 = Chili.Screen0
 
-	stack_main = StackPanel:New{
+	stack_main = Panel:New{
 		padding = {0,0,0,0},
 		--itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
 		columns = options.maxbuttons.value,
 		width= '100%',
 		height = '100%',
-		resizeItems = false,
-		orientation = 'horizontal',
+		backgroundColor = {0, 0, 0, 0},
+		--resizeItems = false,
+		--orientation = 'horizontal',
 		--autoArrangeH = true,
-		centerItems = false,
+		--centerItems = false,
 	}
 	window_selector = Window:New{
 		padding = {0,0,0,0},
@@ -934,6 +937,9 @@ function widget:Initialize()
 	conButton.button = Button:New{
 		parent = stack_main;
 		caption = '',
+		x = 0,
+		y = 0,
+		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
 		OnMouseDown = {	function (self, x, y, mouse) 
 				if mouse == 1 then
