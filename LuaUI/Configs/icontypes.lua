@@ -123,20 +123,6 @@ local icontypes = {
     size=1.6,
   },
 
-  --ships
-  lightship = {
-    bitmap='icons/lightship.dds',
-    size=2.2,
-  },
-  mediumship = {
-    bitmap='icons/mediumship.dds',
-    size=2.8,
-  },
-  heavyship = {
-    bitmap='icons/heavyship.dds',
-    size=3.5,
-  },
-
   --------------------------------------------------------------------------------
   -- CURRENT ICONS
   --------------------------------------------------------------------------------
@@ -792,7 +778,7 @@ local icontypes = {
     size=1.8,
   },
 
-  --boat icons
+  --ship icons
   scoutboat = {
     bitmap='icons/scoutboat.dds',
     size=2.2,
@@ -801,41 +787,45 @@ local icontypes = {
     bitmap='icons/corvette.dds',
     size=2.8,
   },
-  aaboat = {
-    bitmap='icons/aaboat.dds',
+  hunter = {
+    bitmap='icons/hunter.dds',
     size=2.8,
+  },
+  vanquisher = {
+    bitmap='icons/vanquisher.dds',
+    size=3.2,
   },
   destroyer = {
     bitmap='icons/destroyer.dds',
     size=3.2,
   },
-  battleship = {
-    bitmap='icons/battleship.dds',
-    size=4.0,
-  },
   aaship = {
     bitmap='icons/aaship.dds',
-    size=3.2,
+    size=2.9,
   },
-  missileship = {
-    bitmap='icons/missileship.dds',
+  enforcer = {
+    bitmap='icons/enforcer.dds',
     size=3.2,
   },
   submarine = {
     bitmap='icons/submarine.dds',
-    size=3.2,
+    size=3.0,
   },
-  bigsubmarine = {
-    bitmap='icons/submarine.dds',
-    size=4,
+  snipersub = {
+    bitmap='icons/snipersub.dds',
+    size=3.5,
   },
   missilesub = {
     bitmap='icons/missilesub.dds',
     size=4,
-  },  
+  },
+  battleship = {
+    bitmap='icons/battleship.dds',
+    size=4,
+  },
   carrier = {
     bitmap='icons/carrier.dds',
-    size=3.6,
+    size=4,
   },
   shiptransport = {
     bitmap='icons/shiptransport.dds',
