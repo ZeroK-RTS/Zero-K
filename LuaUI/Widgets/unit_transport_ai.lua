@@ -478,7 +478,7 @@ function CanTransport(transportID, unitID)
   end
   
 
-  local mass = 0 -- mass check
+  local mass = UnitDefs[udef].mass -- mass check
   for i=1, #trans do
     mass = mass + UnitDefs[GetUnitDefID(trans[i])].mass
   end
