@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "EPIC Menu",
     desc      = "v1.312 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-02-07
+    date      = "2009-06-02", --2013-02-24
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -999,7 +999,7 @@ local function AddOption(path, option, wname )
 				option.value = key
 				settings.config[fullkey] = option.value
 			end
-	elseif option.type == 'listBool' then
+	elseif option.type == 'radioButton' then
 		controlfunc = 
 			function(key)
 				option.value = key
@@ -1040,10 +1040,10 @@ local function AddOption(path, option, wname )
 		CreateOptionAction(path, option)
 		
 	--needs more work
-	elseif option.type == 'listBool' then --if its a list of checkboxes:
-		for i=1, #option.items do
+	elseif option.type == 'radioButton' then --if its a list of checkboxes:
+		for i=1, #option.items do --prepare keybinds for each of radioButton's checkbox
 			local item = {} 
-			item.wname = wname -- wname is needed by Hotkey to 'AddAction'
+			item.wname = wname.."radioButton" -- wname is needed by Hotkey to 'AddAction'
 			item.key = option.items[i].key
 			item.hotkey = option.items[i].hotkey
 			item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item's key). Is needed for Hotkey
@@ -1054,12 +1054,14 @@ local function AddOption(path, option, wname )
 			  item.orig_hotkey = orig_hotkey
 			end
 			
-			alloptions[path..wname..item.key] = item --is used for random stuff now, could be removed
+			CreateOptionAction(path,item)
+			
+			alloptions[path..wname..item.key] = item --is used to store options but will not be used to make button. Is for random stuff now.
 		end			
 	end
 	
-	otset( pathoptions[path], wname..option.key, option )--is used for epicMenu button(s) remake (is epicMenu's memory)
-	alloptions[path..wname..option.key] = option --is used for random stuff now, could be removed
+	otset( pathoptions[path], wname..option.key, option )--is used for remake epicMenu's button(s)
+	alloptions[path..wname..option.key] = option --is used for random stuff now.
 	
 end
 
@@ -1067,7 +1069,7 @@ local function RemOption(path, option, wname )
 	RemoveOptionAction(path, option)	
 	otset( pathoptions[path], wname..option.key, nil )
 	alloptions[path..wname..option.key] = nil
-	if option.type == 'listBool' then
+	if option.type == 'radioButton' then
 		for i=1, #option.items do
 			local itemsKey = option.items[i].key
 			alloptions[path..wname..itemsKey] = nil
@@ -1396,7 +1398,7 @@ local function ResetWinSettings(path)
 					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
 					option.checked = option.value
 					option.OnChange(option)
-				elseif option.type == 'list' or option.type == 'listBool' then
+				elseif option.type == 'list' or option.type == 'radioButton' then
 					option.value = option.default
 					option.OnChange(option.default)
 				elseif option.type == 'colors' then
@@ -1546,11 +1548,11 @@ MakeSubWindow = function(path)
 				items = items;
 			}
 			]]--
-		elseif option.type == 'listBool' then	
+		elseif option.type == 'radioButton' then	
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
 			for i=1, #option.items do
 				local item = {} 
-				item.wname = option.wname -- wname is needed by Hotkey to 'AddAction'
+				item.wname = option.wname.."radioButton"	-- wname is needed by Hotkey to 'AddAction'
 				item.name = option.items[i].name --is needed by checkbox caption
 				item.key = option.items[i].key --is needed to set checkbox status
 				item.desc = option.items[i].desc --is needed for checkbox tooltip
@@ -2283,7 +2285,7 @@ function WG.crude.ShowMenu() --// allow other widget to toggle-up Epic-Menu. Thi
 	end
 end
 
---// [[ see comments in epicmenu conf (about "listbool" camera option). UPDATE: propose re-enable "listbool" camera option
+--// [[ see comments in epicmenu conf (about "radioButton" camera option). UPDATE: propose re-enable "radioButton" camera option
 do --Set our prefered camera mode when first screen frame is drawn. The engine always go to default TA at first screen frame, so we need to re-apply our camera settings.
 	if Spring.GetGameFrame() == 0 then  --we check if this code is run at midgame (due to /reload). In that case we don't need to re-apply settings (the camera mode is already set at gui_epicmenu.lua\AddOption()).
 		local screenFrame = 0
