@@ -51,7 +51,6 @@ local TeamScale = {}  -- TeamScale[TeamID]= {0.1, 0.4}   how much to scale down 
 local TeamMetalReserved = {} -- how much metal is reserved for high priority in each team
 local TeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
-local CustomBuildSpeed = {} --buildspeed for custom unit added thru GG. function
 
 
 --------------------------------------------------------------------------------
@@ -183,6 +182,7 @@ function gadget:UnitDestroyed(UnitID, unitDefID, teamID)
     end
 end
 
+
 function PriorityCommand(unitID, cmdParams, cmdOptions)
 	local state = cmdParams[1]
 	if (cmdOptions.right) then 
@@ -260,6 +260,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	return true
 end
 
+
 function gadget:GameFrame(n) 
 	if n % 32 == 15 then 
 		TeamScale = {}
@@ -273,9 +274,9 @@ function gadget:GameFrame(n)
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if pri == 2 then 
-						prioSpending = prioSpending + (CustomBuildSpeed[unitID] or UnitDefs[unitDefID].buildSpeed)
+						prioSpending = prioSpending + UnitDefs[unitDefID].buildSpeed
 					else 
-						lowPrioSpending = lowPrioSpending + (CustomBuildSpeed[unitID] or UnitDefs[unitDefID].buildSpeed)
+						lowPrioSpending = lowPrioSpending + UnitDefs[unitDefID].buildSpeed
 					end 
 				end 
 			end 
@@ -352,35 +353,6 @@ function gadget:GameFrame(n)
 end
 
 --------------------------------------------------------------------------------
-function GG.AddMorphPriority(unitID,buildSpeed) --remotely add a priority command.
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
-	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if unit not suppose to have Priority command, then: force add priority command
-		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
-		SetPriorityState(unitID, DefaultState)
-	end
-	CustomBuildSpeed[unitID]=buildSpeed
-end
-
-function GG.RemoveMorphPriority(unitID) --remotely remove a forced priority command.
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
-	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if not suppose to have Priority command, then: remove priority command
-		UnitPriority[unitID] = nil
-		LastUnitFromFactory[unitID] = nil
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PRIORITY)
-		if (cmdDescID) then
-			spRemoveUnitCmdDesc(unitID, cmdDescID)
-			spSetUnitRulesParam(unitID, "buildpriority", 1) --reset to normal priority so that overhead icon doesn't show wrench
-		end			
-	end
-	CustomBuildSpeed[unitID] = nil
-end
-
-function GG.CheckMorphBuildStep(unitID)
-	local teamID = Spring.GetUnitTeam(unitID)
-	return gadget:AllowUnitBuildStep(unitID, teamID, unitID, -1, 1)
-end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
