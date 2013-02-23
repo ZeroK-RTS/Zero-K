@@ -456,7 +456,7 @@ upgrades = {
 	},
 	module_heavy_armor = {
 		name = "High Density Plating",
-		description = "Adds 1600 HP, slows comm by 10%",
+		description = "Adds 1600 HP, slows comm by +10%",
 		func = function(unitDef, attributeMods)
 				unitDef.maxdamage = unitDef.maxdamage + 1600
 				attributeMods.speed = attributeMods.speed - 0.1
@@ -464,9 +464,9 @@ upgrades = {
 	},
 	module_high_power_servos = {
 		name = "High Power Servos",
-		description = "More powerful leg actuators increase speed by 15% of base",
+		description = "More powerful leg actuators increase speed by 10% of base",
 		func = function(unitDef, attributeMods)
-				attributeMods.speed = attributeMods.speed + 0.15
+				attributeMods.speed = attributeMods.speed + 0.1
 			end,
 	},
 	module_personal_cloak = {
