@@ -512,7 +512,7 @@ local function nearDefence(team,tx,tz,distance)
 	
 	for unitID,_ in pairs(unitArray) do
 		local x,_,z = spGetUnitPosition(unitID)
-		if disSQ(x,z,tx,tz) < distance^2 then
+		if x and disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
 	end
