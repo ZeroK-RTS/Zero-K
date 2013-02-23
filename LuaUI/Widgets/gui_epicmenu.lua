@@ -97,17 +97,6 @@ local myCountry = 'wut'
 
 local pathoptions = {}	
 local alloptions = {}	
-local pathorders = {}
-
-WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
-	return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
-end 
-WG.SetWidgetOption = function(wname, path, key, value)  
-	if (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) then
-		local option = alloptions[path..wname .. key]
-		option.OnChange(value)
-	end
-end 
 
 local exitWindowVisible = false
 
@@ -186,19 +175,7 @@ local settings = {
 	music_volume = 0.5,
 }
 
---------------------------------------------------------------------------------
 
-WG.crude.SetSkin = function(Skin)
-  if Chili then
-    Chili.theme.skin.general.skinName = Skin
-  end
-end
-
---Reset custom widget settings, defined in Initialize
-WG.crude.ResetSettings 	= function() end
-
---Reset hotkeys, defined in Initialized
-WG.crude.ResetKeys 		= function() end
 
 ----------------------------------------------------------------
 -- Helper Functions
@@ -376,6 +353,32 @@ local function otvalidate(t)
 	return true
 end
 --end cool new framework
+
+--------------------------------------------------------------------------------
+
+WG.crude.SetSkin = function(Skin)
+  if Chili then
+    Chili.theme.skin.general.skinName = Skin
+  end
+end
+
+--Reset custom widget settings, defined in Initialize
+WG.crude.ResetSettings 	= function() end
+
+--Reset hotkeys, defined in Initialized
+WG.crude.ResetKeys 		= function() end
+
+WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
+	--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
+	return (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) or {}
+end 
+WG.SetWidgetOption = function(wname, path, key, value)  
+	if (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) then
+		local option = alloptions[path..wname .. key]
+		option.OnChange(value)
+	end
+end 
+
 
 local function SaveKeybinds()
 	--[[
@@ -784,6 +787,7 @@ local function CreateOptionAction(path, option)
 	
 	if option.type == 'bool' then
 		kbfunc = function()
+			--[[
 			if not pathoptions[path] or not pathoptions[path][option.wname..option.key] then
 				Spring.Echo("Warning, detected keybind mishap. Please report this info and help us fix it:")
 				Spring.Echo("Option path is "..path)
@@ -798,9 +802,12 @@ local function CreateOptionAction(path, option)
 				end
 				-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
 			end
+			--]]
 			local wname = option.wname
-			newval = not pathoptions[path][wname..option.key].value	
-			pathoptions[path][wname..option.key].value	= newval
+			local pathoption = otget( pathoptions[path], wname..option.key )
+			newval = not pathoption.value
+			pathoption.value = newval
+			otset( pathoptions[path], wname..option.key, pathoption )
 						
 			option.OnChange({checked=newval})
 			
@@ -812,6 +819,13 @@ local function CreateOptionAction(path, option)
 	local actionName = GetActionName(path, option)
 	AddAction(actionName, kbfunc, nil, "t")
 end
+
+--remove spring action for this option
+local function RemoveOptionAction(path, option)
+	local actionName = GetActionName(path, option)
+	RemoveAction(actionName)
+end
+
 
 -- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(actionName, verbose)
@@ -850,7 +864,6 @@ local function AddOption(path, option, wname )
 	if not option then
 		if not pathoptions[path] then
 			pathoptions[path] = {}
-			pathorders[path] = {}
 		end
 		local pathexploded = explode('/',path)
 		local pathend = pathexploded[#pathexploded]
@@ -897,13 +910,14 @@ local function AddOption(path, option, wname )
 		end
 	end
 	
-	if option.default == nil then
+	if option.type ~= 'button' and option.type ~= 'label' and option.default == nil then
 		if option.value ~= nil then
 			option.default = option.value
 		else
 			option.default = newval
 		end	
 	end
+	
 	
 	if newval ~= nil and option.value ~= newval then --must nilcheck newval
 		valuechanged = true
@@ -1056,25 +1070,13 @@ local function AddOption(path, option, wname )
 		end			
 	end
 	
-	pathoptions[path][wname..option.key] = option --is used for epicMenu button(s) remake (is epicMenu's memory)
+	--pathoptions[path][wname..option.key] = option --is used for epicMenu button(s) remake (is epicMenu's memory)
+	otset( pathoptions[path], wname..option.key, option )--is used for epicMenu button(s) remake (is epicMenu's memory)
 	alloptions[path..wname..option.key] = option --is used for reset keybinds
-	local temp = #(pathorders[path])
-	pathorders[path][temp+1] = wname..option.key --is used for layout???
 end
 
 local function RemOption(path, option, wname )
-	if not pathorders[path] then
-		--this occurs when a widget unloads itself inside :init
-		--echo ('<epic menu> error #333 ', wname, path)
-		--echo ('<epic menu> ...error #333 ', (option and option.key) )
-		return
-	end
-	for i=1, #pathorders[path] do
-		if pathorders[path][i] == (wname..option.key) then
-			table.remove(pathorders[path], i)
-		end
-	end
-	pathoptions[path][wname..option.key] = nil
+	otset( pathoptions[path], wname..option.key, nil )
 	alloptions[path..wname..option.key] = nil
 	if option.type == 'listBool' then
 		for i=1, #option.items do
@@ -1395,22 +1397,25 @@ local function MakeHotkeyedControl(control, path, option)
 end
 
 local function ResetWinSettings(path)
-	for _,optionkey in ipairs(pathorders[path]) do
-		local option = pathoptions[path][optionkey]
-		if option.default ~= nil then --fixme : need default
-			if option.type == 'bool' or option.type == 'number' then
-				option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
-				option.checked = option.value
-				option.OnChange(option)
-			elseif option.type == 'list' or option.type == 'listBool' then
-				option.value = option.default
-				option.OnChange(option.default)
-			elseif option.type == 'colors' then
-				option.color = option.default
-				option.OnChange(option)
+	for _,elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+		
+		if not ({button=1, label=1, menu=1})[option.type] then
+			if option.default ~= nil then --fixme : need default
+				if option.type == 'bool' or option.type == 'number' then
+					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
+					option.checked = option.value
+					option.OnChange(option)
+				elseif option.type == 'list' or option.type == 'listBool' then
+					option.value = option.default
+					option.OnChange(option.default)
+				elseif option.type == 'colors' then
+					option.color = option.default
+					option.OnChange(option)
+				end
+			else
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Error #627', option.name, option.type)
 			end
-		else
-			Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Error #627', option.name)
 		end
 	end
 end
@@ -1436,15 +1441,15 @@ MakeSubWindow = function(path)
 	explodedpath[#explodedpath] = nil
 	local parent_path = table.concat(explodedpath,'/')
 	
-	local settings_height = #(pathorders[path]) * B_HEIGHT
+	local settings_height = #(pathoptions[path]) * B_HEIGHT
 	local settings_width = 270
 	
 	local tree_children = {}
 	local hotkeybuttons = {}
 	
-	for _,optionkey in ipairs(pathorders[path]) do
-		local option = pathoptions[path][optionkey]
-		
+	for _,elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+
 		local optionkey = option.key
 		
 		--fixme: shouldn't be needed
@@ -1463,7 +1468,7 @@ MakeSubWindow = function(path)
 			
 			if option.wname == 'epic' then --menu
 				local menupath = option.desc
-				if pathorders[menupath] and #(pathorders[menupath]) == 0 then
+				if pathoptions[menupath] and #(pathoptions[menupath]) == 0 then
 					hide = true
 					settings_height = settings_height - B_HEIGHT
 				end
