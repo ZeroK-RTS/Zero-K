@@ -791,11 +791,13 @@ local function CreateOptionAction(path, option)
 				Spring.Echo("Option name is "..option.wname..option.key)
 				if pathoptions[path] then --pathoptions[path] table still intact, but option table missing
 					Spring.Echo("case: option table was missing")
-					pathoptions[path][option.wname..option.key] = option --re-add option table
+					--pathoptions[path][option.wname..option.key] = option --re-add option table
+					otset( pathoptions[path], option.wname..option.key, option ) --re-add option table
 				else --both option table & pathoptions[path] was missing, probably was never initialized
 					Spring.Echo("case: whole path was never initialized")
 					pathoptions[path] = {}
-					pathoptions[path][option.wname..option.key] = option
+					--pathoptions[path][option.wname..option.key] = option
+					otset( pathoptions[path], option.wname..option.key, option )
 				end
 				-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
 			end
