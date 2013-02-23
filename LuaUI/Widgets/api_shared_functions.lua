@@ -55,13 +55,19 @@ local keywords = {
 	["repeat"] = true,
 }
 
-local function WriteTable(array, numIndents, endOfFile)
+local function WriteTable(array, numIndents, endOfFile, concise)
 	local str = ""	--WriteIndents(numIndents)
-	str = str .. "{\n"
+	if not concise then
+	  str = str .. "{\n"
+	else
+	  str = str .. "{"
+	end
 	for i,v in pairs(array) do
 		str = str .. WriteIndents(numIndents + 1)
 		if type(i) == "number" then
-			str = str .. "[" .. i .. "] = "
+			if not concise then
+			  str = str .. "[" .. i .. "] = "
+			end
 		elseif keywords[i] or (type(i) == "string" --[[and i:find("[/.+-=><#%^*()]") ]] ) then
 			str = str .. [[["]] .. i .. [["] ]] .. "= "
 		else
@@ -69,11 +75,19 @@ local function WriteTable(array, numIndents, endOfFile)
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, numIndents + 1)
+			if not concise then
+			  str = str .. WriteTable(v, numIndents + 1, false, concise)
+			else
+			  str = str .. WriteTable(v, 0, false, concise)
+			end
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
 		elseif type(v) == "string" then
-			str = str .. "[=[" .. v .. "]=]" .. ",\n"
+			if not concise then
+			  str = str .. "[=[" .. v .. "]=]" .. ",\n"
+			else
+			  str = str .. "[=[" .. v .. "]=]" .. ", "
+			end
 		else
 			str = str .. v .. ",\n"
 		end

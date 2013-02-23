@@ -25,30 +25,30 @@ options = {
 	cheat = {	
 		name = "Cheat",
 		type = 'button',
-		OnChange = function(self) Spring.SendCommands({'cheat'}) end,
+		action = 'cheat',
 	},
 	nocost = {
 		name = "No Cost",
 		type = 'button',
-		OnChange = function(self) Spring.SendCommands({'nocost'}) end,
+		action = 'nocost',
 	},
 	
 	spectator = {
 		name = "Spectator",
 		type = 'button',
-		OnChange = function(self) Spring.SendCommands({'spectator'}) end,
+		action = 'spectator',
 	},
 	
 	godmode = {
 		name = "Godmode",
 		type = 'button',
-		OnChange = function(self) Spring.SendCommands({'godmode'}) end,
+		action = 'godmode',
 	},
 	
 	testunit = {
 		name = "Spawn Testunit",
 		type = 'button',
-		OnChange = function(self) Spring.SendCommands({'give testunit'}) end,
+		action = 'give testunit',
 	},
 	
 	luauireload = {
@@ -60,7 +60,7 @@ options = {
 	luarulesreload = {
 		name = "Reload LuaRules",
 		type = 'button',
-		OnChange = function(self) Spring.SendCommands({'luarules reload'}) end,
+		action = 'luarules reload',
 	},
 	
 	debug = {

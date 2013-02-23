@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.310 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.311 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-02-07
     license   = "GNU GPL, v2 or later",
@@ -45,7 +45,9 @@ local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
 local keybind_file = confdata.keybind_file or title_text .. '_keys.lua'
-local defaultkeybinds, defaultkeybind_date = VFS.Include(keybind_file, nil, VFS.ZIP)
+local file_return = VFS.Include(keybind_file, nil, VFS.ZIP)
+local defaultkeybinds, defaultkeybind_date = file_return.keybinds, file_return.date
+--file_return = nil
 
 local _, _, _, _, _, _, _, _, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
@@ -340,7 +342,43 @@ local function IntToBool(int)
 	return int ~= 0
 end
 
+-- cool new framework for ordered table that has keys
+local function otget(t,key)
+	for i=1,#t do
+		if not t[i] then
+			return
+		end
+		if t[i][1] == key then
+			return t[i][2]
+		end
+	end
+	return nil
+end
+local function otset(t, key, val)
+	for i=1,#t do
+		if t[i][1] == key then
+			if val == nil then
+				table.remove( t, i )
+			else
+				t[i][2] = val
+			end
+			return
+		end
+	end
+	t[#t+1] = {key, val}
+end
+local function otvalidate(t)
+	for i=1,#t do
+		if not t[i] then
+			return false
+		end
+	end
+	return true
+end
+--end cool new framework
+
 local function SaveKeybinds()
+	--[[
 	local file = io.open (keybind_file, "w")
 	if (file== nil) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
@@ -351,29 +389,72 @@ local function SaveKeybinds()
 	file:write ("\nreturn keybinds, date")
 	file:flush()
 	file:close()
+	--]]
+	
+	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
+	--table.save( keybindfile_table, keybind_file )
+	
+	local file = io.open (keybind_file, "w")
+	if (file== nil) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
+		return
+	end
+	file:write ("local keybinds = " .. WG.WriteTable(keybindfile_table, 0, true, true))
+	file:flush()
+	file:close()
+	
 end
 
 local function LoadKeybinds()
+	local loaded = false
 	if VFS.FileExists(keybind_file, VFS.RAW) then
-		keybounditems, keybind_date = VFS.Include(keybind_file, nil, VFS.RAW)
-		keybind_date = keybind_date or defaultkeybind_date	-- reverse compat
-		
-		if not keybind_date or keybind_date == 0 or (keybind_date+0) < defaultkeybind_date then
-			keybind_date = defaultkeybind_date
-			for action, keybind in pairs(defaultkeybinds) do
-			      keybounditems[action] = keybind	-- forcibly override any user changes to default binds
-			end
-		else
-			for action, keybind in pairs(defaultkeybinds) do
-			      keybounditems[action] = keybounditems[action] or keybind	-- keep any existing user binds
+		local file_return = VFS.Include(keybind_file, nil, VFS.RAW)
+		if file_return then
+			keybounditems, keybind_date = file_return.keybinds, file_return.date
+			if keybounditems and keybind_date then
+				loaded = true
+			
+				keybind_date = keybind_date or defaultkeybind_date	-- reverse compat
+				
+				if not keybind_date or keybind_date == 0 or (keybind_date+0) < defaultkeybind_date then
+					keybind_date = defaultkeybind_date
+					for action, keybind in pairs(defaultkeybinds) do
+						  --keybounditems[action] = keybind	-- forcibly override any user changes to default binds
+						  otset( keybounditems, action, keybind	)-- forcibly override any user changes to default binds
+					end
+				else
+					for action, keybind in pairs(defaultkeybinds) do
+						  --keybounditems[action] = keybounditems[action] or keybind	-- keep any existing user binds
+						  otset( keybounditems, action, otget( keybounditems, action ) or keybind )
+					end
+				end
 			end
 		end
-	else
+	end
+	
+	if not loaded then
 		keybounditems = CopyTable(defaultkeybinds, true)
 		keybind_date = defaultkeybind_date
 	end
+	
+	if not otvalidate(keybounditems) then
+		keybounditems = {}
+	end
 end
 
+--[[
+local function ReadUserUiKeys()
+	local fileName = 'Configs/uikeys.txt'
+	local file = io.open (fileName, "r")
+	while true do
+		local line = file:read()
+		if not line then 
+			break
+		end
+		if line:find()
+	end
+end
+--]]
 ----------------------------------------------------------------
 --May not be needed with new chili functionality
 local function AdjustWindow(window)
@@ -669,7 +750,9 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		]]
 		
 		if addToKeyboundItems then	
-			keybounditems[actionName] = hotkey
+			--keybounditems[actionName] = hotkey
+			otset( keybounditems, actionName, hotkey )
+			
 			--echo("bind " .. hotkey .. " " .. actionName)
 			Spring.SendCommands("bind " .. hotkey .. " " .. actionName)
 			
@@ -751,7 +834,8 @@ local function UnassignKeyBind(actionName, verbose)
 			echo( 'Unbound hotkeys from action: ' .. actionName )
 		end
 	end
-	keybounditems[actionName] = nil
+	--keybounditems[actionName] = nil
+	otset( keybounditems, actionName, nil )
 end
 
 
@@ -935,7 +1019,8 @@ local function AddOption(path, option, wname )
 		CreateOptionAction(path, option)
 		
 		local actionHotkey = GetActionHotkey(actionName)
-		local hotkey = keybounditems[actionName] or option.hotkey or actionHotkey
+		--local hotkey = keybounditems[actionName] or option.hotkey or actionHotkey
+		local hotkey = otget( keybounditems, actionName ) or option.hotkey or actionHotkey
 		if hotkey and hotkey ~= 'none' then
 			--if actionHotkey then
 				UnassignKeyBind(actionName)
@@ -958,7 +1043,8 @@ local function AddOption(path, option, wname )
 			  item.orig_hotkey = orig_hotkey
 			end
 			local actionHotkey = GetActionHotkey(actionName)
-			local hotkey = keybounditems[actionName] or item.hotkey or actionHotkey
+			--local hotkey = keybounditems[actionName] or item.hotkey or actionHotkey
+			local hotkey = otget( keybounditems, actionName ) or item.hotkey or actionHotkey
 			if hotkey and hotkey ~= 'none' then
 				--if actionHotkey then
 					UnassignKeyBind(actionName)
@@ -1222,7 +1308,8 @@ end
 
 WG.crude.GetHotkey = function(actionName)
 	local actionHotkey = GetActionHotkey(actionName)
-	local hotkey = keybounditems[actionName] or actionHotkey
+	--local hotkey = keybounditems[actionName] or actionHotkey
+	local hotkey = otget( keybounditems, actionName ) or actionHotkey
 	if not hotkey or hotkey == 'none' then
 		return ''
 	end
@@ -1250,7 +1337,8 @@ end
 --Get hotkey action and readable hotkey string
 local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
-	local hotkey = keybounditems[actionName]
+	--local hotkey = keybounditems[actionName]
+	local hotkey = otget( keybounditems, actionName )
 	if hotkey and hotkey ~= 'none' then
 		return GetReadableHotkey(hotkey) 
 	end
@@ -1993,7 +2081,9 @@ function widget:Initialize()
 	
 	-- clear all keybindings
 	WG.crude.ResetKeys = function()
-		for actionName,_ in pairs(keybounditems) do
+		--for actionName,_ in pairs(keybounditems) do
+		for _,elem in ipairs(keybounditems) do
+			local actionName = elem[1]
 			--local actionNameL = actionName:lower()
 			local actionNameL = actionName
 			--echo("unbindaction(1) " .. actionNameL)
@@ -2001,6 +2091,13 @@ function widget:Initialize()
 		end
 		
 		keybounditems = {}
+		keybounditems = CopyTable(defaultkeybinds, true)
+		
+		for _,elem in ipairs(keybounditems) do
+			local actionName = elem[1]
+			local hotkey = elem[2]
+			AssignKeyBindAction(hotkey, actionName, false)
+		end
 		
 		for _,option in pairs(alloptions) do
 		    if option.orig_hotkey and type(option.orig_hotkey) == 'string' then
