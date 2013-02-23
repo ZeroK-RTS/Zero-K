@@ -65,7 +65,6 @@ function widget:Initialize()
 	window = Window:New{
 		--parent = screen0,
 		name   = 'replaycontroller';
-		color = {255, 255, 255, 255},
 		width = 300;
 		height = 85;
 		right = 10; 
@@ -91,7 +90,7 @@ function widget:Initialize()
 		parent=window;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 0, 255},		
+		backgroundColor = {1, 1, 0, 1},		
 		caption=speeds[i] .."x",
 		tooltip = "play at " .. speeds[i] .. "x speed";
 		OnMouseDown = {function()
@@ -109,7 +108,6 @@ function widget:Initialize()
 		parent=window;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, 1},		
 		caption="skip pregame chatter",
 		tooltip = "Skip the pregame chat and startposition chosing, directly to the action!";
 		OnMouseDown = {function()
@@ -125,7 +123,6 @@ function widget:Initialize()
 		parent=window;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, 1},		
 		caption="pause", --pause/continue
 		tooltip = "pause or continue playback";
 		OnMouseDown = {function()
