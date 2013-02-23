@@ -416,6 +416,11 @@ local function LoadKeybinds()
 		if file_return then
 			keybounditems, keybind_date = file_return.keybinds, file_return.date
 			if keybounditems and keybind_date then
+				
+				if not otvalidate(keybounditems) then
+					keybounditems = {}
+				end
+				
 				loaded = true
 				keybind_date = keybind_date or defaultkeybind_date	-- reverse compat
 				
