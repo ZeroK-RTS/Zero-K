@@ -81,7 +81,7 @@ unitDef = {
 
     WEAPON = {
       name                    = [[Napalm Missile]],
-	  cegTag                  = [[tactrail]],
+	  cegTag                  = [[napalmtrail]],
       areaOfEffect            = 512,
       avoidFriendly           = false,
       collideFriendly         = false,
