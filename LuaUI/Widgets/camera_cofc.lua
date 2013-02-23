@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.110 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.111 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-02-22 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -205,34 +205,34 @@ options = {
 	},
 	followautozoom = {
 		name = "Auto zoom",
-		desc = "Auto zoom in & out while following cursor (zoom level will represent cursor's focus). Work best using low to moderate zoom speed.",
+		desc = "Auto zoom in & out while following player's cursor (zoom level will represent player's focus). \n\nIts best to use default follow speed for this option.",
 		type = 'bool',
 		value = false,
 	},
 	followminscrollspeed = {
 		name = "On Screen Speed",
-		desc = "Scroll speed for on-screen cursor. Recommend: Lowest",
+		desc = "Scroll speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
 		type = 'number',
 		min = 1, max = 14, step = 1,
 		value = 1,
 	},	
 	followmaxscrollspeed = {
 		name = "Off Screen Speed",
-		desc = "Scroll speed for off-screen cursor. Recommend: Highest",
+		desc = "Scroll speed for off-screen cursor. \n\nRecommend: Highest (prevent player cursor from being off-screen too much which is not suitable for auto-zoom function)",
 		type = 'number',
 		min = 2, max = 15, step = 1,
 		value = 15,
 	},
 	followzoominspeed = {
 		name = "Follow Zoom-in Speed",
-		desc = "Auto zoom-in factor. Recommend: Low",
+		desc = "Auto zoom-in factor. \n\nRecommend: Low (better leave this option to low for smoother zoom. Tweak follow speed instead!)",
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
 	},
 	followzoomoutspeed = {
 		name = "Follow Zoom-out Speed",
-		desc = "Auto zoom-out factor. Recommend: Low",
+		desc = "Auto zoom-out factor. \n\nRecommend: Low (better leave this option to low for smoother zoom. Use faster follow speed to prevent zoom-out)",
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
@@ -507,7 +507,7 @@ end
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
 local last_move = spGetTimer() --switch for reseting lockspot for Edgescroll
-local last_zoom = spGetTimer() --switch for delaying zooming updates for FollowCursorAutoZoom
+local last_zoom = {spGetTimer(),spGetTimer()} --switch for delaying zooming updates for FollowCursorAutoZoom
 local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trackmode edge screen scroll"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -865,11 +865,15 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	if follow_timer > 0 or smoothscroll or springscroll or rotate then
 		return
 	end
-	local lclZoom = function(cs,zoomin, smoothness)
-		if spDiffTimers(spGetTimer(),last_zoom)<1 then
+	local lclZoom = function(cs,zoomin, smoothness, no_2)
+		if not (spDiffTimers(spGetTimer(),last_zoom[1])>=1) and not (spDiffTimers(spGetTimer(),last_zoom[2])>=1 and no_2)  then
 			return
 		end
-		last_zoom = spGetTimer()
+		if no_2 then
+			last_zoom[2] = spGetTimer() --saperate update rate for special off-screen zoom-out
+		else
+			last_zoom[1] = spGetTimer()  --saperate update rate for on-screen zoom-out/zoom-in
+		end
 		ls_have = false --unlock lockspot 
 		SetLockSpot2(cs) --set lockspot
 		if not ls_have then
@@ -899,11 +903,13 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 			if camHeight >1000 then --if cam height from ground greater than 1000elmo: do
 				lclZoom(cs,true, 1) --zoom in
 			end
-		elseif (scrn_x>scrnsize_X*5/6 or scrn_x<scrnsize_X*1/6) or (scrn_y>scrnsize_Y*5/6 or scrn_y<scrnsize_Y*1/6) then --if cursor near edge: do
+		elseif (scrn_x<scrnsize_X*5/6 and scrn_x>scrnsize_X*1/6) and (scrn_y<scrnsize_Y*5/6 and scrn_y>scrnsize_Y*1/6) then --if cursor between center & edge: do nothing 
+		elseif (scrn_x<scrnsize_X*6/6 and scrn_x>scrnsize_X*0/6) and (scrn_y<scrnsize_Y*6/6 and scrn_y>scrnsize_Y*0/6) then --if cursor near edge: do
 			lclZoom(cs,false, 1) --zoom out
 		end				
 		if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
 			local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			lclZoom(cs,false, 1,true) --zoom out using special update rate
 			spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
 		else --if cursor within screen: do
 			local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
@@ -1630,6 +1636,9 @@ function widget:Initialize()
 	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
 	
 	spSendCommands("luaui disablewidget SmoothScroll")
+	if WG.SetWidgetOption then 
+		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC")
+	end
 end
 
 function widget:Shutdown()

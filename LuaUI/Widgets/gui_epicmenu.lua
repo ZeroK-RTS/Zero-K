@@ -100,6 +100,12 @@ local pathorders = {}
 WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
 	return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
 end 
+WG.SetWidgetOption = function(wname, path, key, value)  
+	if (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) then
+		local option = alloptions[path..wname .. key]
+		option.OnChange(value)
+	end
+end 
 
 local exitWindowVisible = false
 
