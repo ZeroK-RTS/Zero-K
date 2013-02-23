@@ -1,7 +1,7 @@
 local confdata = {}
 confdata.title = 'Z.K.'
 confdata.title_image = LUAUI_DIRNAME .. 'Images/ZK_logo.png'
-confdata.keybind_file = LUAUI_DIRNAME .. 'Configs/zk_keys.lua' -- leave nil to use springconfig instead
+confdata.keybind_file = LUAUI_DIRNAME .. 'Configs/zk_keys.lua'
 local color = {
 	white = {1,1,1,1},
 	yellow = {1,1,0,1},

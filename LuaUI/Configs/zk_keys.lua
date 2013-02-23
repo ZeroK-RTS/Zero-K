@@ -3,6 +3,7 @@ local date = 20130219	-- yyyymmdd
 			-- else just add any that are missing from local config
 local keybinds = {
 	-- only keybinds that differ from uikeys.txt need to be specified
+	{	[=[stop]=], 	[=[s]=], },
 }
 
-return keybinds, date
+return {keybinds=keybinds, date=date}
