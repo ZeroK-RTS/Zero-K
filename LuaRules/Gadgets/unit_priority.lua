@@ -286,7 +286,7 @@ function gadget:GameFrame(n)
 			prioUnits = TeamPriorityUnits[teamID] or {}
 			local prioSpending = 0
 			local lowPrioSpending = 0
-			for unitID, pri in pairs(prioUnits) do 
+			for unitID, pri in pairs(prioUnits) do  --add construction priority spending
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if pri == 2 then 
@@ -296,7 +296,7 @@ function gadget:GameFrame(n)
 					end 
 				end 
 			end
-			for unitID, _ in pairs(morphBuildSpeed) do 
+			for unitID, _ in pairs(morphBuildSpeed) do --add morph priority spending
 				local unitDefID = spGetUnitDefID(unitID)
 				local morphPriority = morphTeamPriorityUnits[teamID] and morphTeamPriorityUnits[teamID][unitID]
 				if unitDefID ~= nil and morphPriority then
@@ -353,7 +353,7 @@ function gadget:GameFrame(n)
 					TeamScale[teamID] = {0,0} --no  normal spending, no low-Priority spending
 				end
                 
-			elseif (prioSpending > 0 or lowPrioSpending > 0) then --normal situation (above reserve)
+			elseif (prioSpending > 0 or lowPrioSpending > 0) then --normal situation, or no reserve
 				
 				local normalSpending = pull - lowPrioSpending
 				
