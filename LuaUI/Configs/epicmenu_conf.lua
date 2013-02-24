@@ -150,9 +150,15 @@ path='Settings'
 path='Game' 
 
 	ShButton( 'Pause/Unpause', 'pause' )
+	path='Game/Game Speed' 
+		ShButton( 'Increase Speed', 'speedup' )
+		ShButton( 'Decrease Speed', 'slowdown' )
+		
+path='Game' 
 	ShLabel('')
 	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
---	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end ) 
+--	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end )
+
 
 --- CAMERA ---
 path='Settings/Camera'

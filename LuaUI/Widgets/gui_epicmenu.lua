@@ -134,13 +134,14 @@ local transkey = {
 	period 			= '.',
 	slash 			= '/',
 	backslash 			= '\\',
+	equals 			= '=',
 	
 	quote 			= "'",
 	
 	kp_multiply		= 'numpad*',
 	kp_divide		= 'numpad/',
-	kp_add			= 'numpad+',
-	kp_subract		= 'numpad-',
+	kp_plus			= 'numpad+',
+	kp_minus		= 'numpad-',
 	kp_period		= 'numpad.',
 	
 	kp0				= 'numpad0',
@@ -687,6 +688,7 @@ local function GetReadableHotkeyMod(mod)
 end
 
 local function HotKeyBreakdown(hotkey)
+	hotkey = hotkey:gsub('numpad%+', 'numpadplus')
 	local hotkey_table = explode('+', hotkey)
 	local alt, ctrl, meta, shift
 
@@ -706,6 +708,7 @@ local function HotKeyBreakdown(hotkey)
 		(shift and 'S+' or '')
 	
 	local key = hotkey_table[#hotkey_table]
+	key = key:gsub( 'numpadplus', 'numpad+')
 	
 	return mod, key
 end
