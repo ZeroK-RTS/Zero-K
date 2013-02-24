@@ -466,7 +466,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
   end
 
   SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-  GG.AddMorphPriority(unitID,morphDef.resTable["m"]) --is using unit_priority.lua gadget to handle morph priority. Note: morphDef.resTable["m"] act as buildspeed
+  GG.AddMorphPriority(unitID,(morphDef.metal/morphDef.time)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
 end
 
 
