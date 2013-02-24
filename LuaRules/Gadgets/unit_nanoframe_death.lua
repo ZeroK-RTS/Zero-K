@@ -60,7 +60,7 @@ local excludeDefID = {}
 --------------------------------------------------------------------------------
 
 local function ScrapUnit(unitID, unitDefID, team, progress, face)
-  if (unitDefID) then
+  if (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].wreckName and FeatureDefNames[UnitDefs[unitDefID].wreckName]) then
     local wreck = FeatureDefNames[UnitDefs[unitDefID].wreckName].id
     if (wreck and FeatureDefs[wreck]) then     
       local nextWreck = FeatureDefs[wreck].deathFeatureID
