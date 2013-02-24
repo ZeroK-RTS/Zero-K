@@ -61,15 +61,15 @@ local excludeDefID = {}
 
 local function ScrapUnit(unitID, unitDefID, team, progress, face)
   if (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].wreckName and FeatureDefNames[UnitDefs[unitDefID].wreckName]) then
-    local wreck = FeatureDefNames[UnitDefs[unitDefID].wreckName].id
-    if (wreck and FeatureDefs[wreck]) then     
-      local nextWreck = FeatureDefs[wreck].deathFeatureID
-	  if nextWreck and FeatureDefs[nextWreck] then
-        wreck = FeatureDefs[wreck].deathFeatureID
+    local wreck = UnitDefs[unitDefID].wreckName
+    if (wreck and FeatureDefNames[wreck]) then     
+      local nextWreck = FeatureDefNames[wreck].deathFeature
+	  if nextWreck and FeatureDefNames[nextWreck] then
+        wreck = FeatureDefNames[wreck].deathFeature
         if progress < 0.5 then
-          nextWreck = FeatureDefs[wreck].deathFeatureID
-          if nextWreck and FeatureDefs[nextWreck] then
-            wreck = FeatureDefs[wreck].deathFeatureID
+          nextWreck = FeatureDefNames[wreck].deathFeature
+          if nextWreck and FeatureDefNames[nextWreck] then
+            wreck = FeatureDefNames[wreck].deathFeature
             progress = progress * 2
           end
         end
@@ -80,7 +80,7 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
         progress = 0.001
       end
       local featureID = spCreateFeature(wreck, x, y, z) --  _, team
-      local maxHealth = FeatureDefs[wreck].maxHealth
+      local maxHealth = FeatureDefNames[wreck].maxHealth
       spSetFeatureReclaim(featureID, progress)
       --spSetFeatureResurrect(featureID, UnitDefs[unitDefID].name, face)
       spSetFeatureHealth(featureID, progress*maxHealth)
