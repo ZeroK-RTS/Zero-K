@@ -373,8 +373,8 @@ function gadget:GameFrame(n)
             
 		SendToUnsynced("ReserveState", teamID, TeamMetalReserved[teamID] or 0, TeamEnergyReserved[teamID] or 0) 
 		end
-
-		TeamPriorityUnits = {} --reset builder & spending list (will be checked every 32th frame)
+		morphTeamPriorityUnits = {} --reset morpher priority list
+		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame)
 		SendToUnsynced("PriorityStats", nil,  0, 0, n)   
 	end
 end
