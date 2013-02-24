@@ -144,6 +144,10 @@ local icontypes = {
     bitmap='icons/kbotraider.dds',
     size=1.8,
   },
+  kbotadvraider = {
+    bitmap='icons/kbotadvraider.dds',
+    size=2,
+  },
   kbotassault = {
     bitmap='icons/kbotassault.dds',
     size=2,
@@ -656,11 +660,6 @@ local icontypes = {
   sniper = {
     bitmap='icons/sniper.dds',
     size=2.4,
-  },
-  --Pole Bot
-  stealth = {
-    bitmap='icons/sniper.dds',
-    size=1.6,
   },
   
   --clogger icon
