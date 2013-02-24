@@ -1294,7 +1294,7 @@ local function MakeKeybindWindow( path, option, hotkey )
 	kb_path = path
 	kb_action = GetActionName(path, option)
 	
-	UnassignKeyBind(kb_action)
+	UnassignKeyBind(kb_action, true) -- 2nd param = verbose
 	otset( keybounditems, kb_action, nil )
 		
 	window_getkey = Window:New{
