@@ -135,6 +135,8 @@ local transkey = {
 	slash 			= '/',
 	backslash 			= '\\',
 	
+	quote 			= "'",
+	
 	kp_multiply		= 'numpad*',
 	kp_divide		= 'numpad/',
 	kp_add			= 'numpad+',
@@ -381,18 +383,6 @@ end
 
 
 local function SaveKeybinds()
-	--[[
-	local file = io.open (keybind_file, "w")
-	if (file== nil) then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
-		return
-	end
-	file:write ("local date = " .. keybind_date .. "\n")
-	file:write ("local keybinds = " .. WG.WriteTable(keybounditems, 0, true))
-	file:write ("\nreturn keybinds, date")
-	file:flush()
-	file:close()
-	--]]
 	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
 	--table.save( keybindfile_table, keybind_file )
 	
@@ -402,8 +392,7 @@ local function SaveKeybinds()
 		return
 	end
 	
-	--echo (to_string(keybounditems))
-	file:write ("return " .. WG.WriteTable(keybindfile_table, 0, true, true))
+	file:write ("return " .. WG.WriteTable(keybindfile_table, 0, true, true, true))
 	file:flush()
 	file:close()
 	
@@ -750,7 +739,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 	
 	--actionName = actionName:lower()
 	if type(hotkey) == 'string' then
-		otset( keybounditems, actionName, hotkey )
+		--otset( keybounditems, actionName, hotkey )
 		
 		--echo("bind " .. hotkey .. " " .. actionName)
 		spSendCommands("bind " .. hotkey .. " " .. actionName)
@@ -845,21 +834,27 @@ local function UnassignKeyBind(actionName, verbose)
 			echo( 'Unbound hotkeys from action: ' .. actionName )
 		end
 	end
-	--keybounditems[actionName] = nil
-	otset( keybounditems, actionName, nil )
+	--otset( keybounditems, actionName, nil )
 end
 
 --unassign and reassign keybinds
 local function ReApplyKeybinds()
+	--[[
+	To migrate from uikeys:
+	Find/Replace:
+	bind\s*(\S*)\s*(.*)
+	{ "\2", "\1" },
+	]]
 	--echo 'ReApplyKeybinds'
 	for _,elem in ipairs(keybounditems) do
 		local actionName = elem[1]
 		local hotkey = elem[2]
-		actionName = actionName:lower()
-		--echo("unbindaction(1) ", actionName)
+		--actionName = actionName:lower()
 		UnassignKeyBind(actionName, false)
-		--echo("bind(1) ", hotkey, actionName)
 		AssignKeyBindAction(hotkey, actionName, false)
+		
+		--echo("unbindaction(1) ", actionName)
+		--echo("bind(1) ", hotkey, actionName)
 	end
 end
 
@@ -1284,6 +1279,7 @@ local function MakeKeybindWindow( path, option, hotkey )
 	kb_action = GetActionName(path, option)
 	
 	UnassignKeyBind(kb_action)
+	otset( keybounditems, kb_action, nil )
 		
 	window_getkey = Window:New{
 		caption = 'Set a HotKey',
@@ -1982,8 +1978,8 @@ end
 
 function widget:Initialize()
 	
-	spSendCommands("unbindaction quitmenu") -- http://springrts.com/mantis/view.php?id=2944
-	--spSendCommands("unbindall") 
+	--spSendCommands("unbindaction quitmenu") -- http://springrts.com/mantis/view.php?id=2944
+	spSendCommands("unbindall") 
 	
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget)
@@ -2253,6 +2249,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 		if key ~= KEYSYMS.ESCAPE then
 			--otset( keybounditems, kb_action, hotkey )
 			AssignKeyBindAction(hotkey, kb_action, true) -- param4 = verbose
+			otset( keybounditems, kb_action, hotkey )
+	
 			ReApplyKeybinds()
 		end
 		

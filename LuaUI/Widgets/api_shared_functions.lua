@@ -55,7 +55,7 @@ local keywords = {
 	["repeat"] = true,
 }
 
-local function WriteTable(array, numIndents, endOfFile, concise)
+local function WriteTable(array, numIndents, endOfFile, concise, useDoubleQuote)
 	local str = ""	--WriteIndents(numIndents)
 	str = str .. (concise and "{" or "{\n")
 	for i,v in pairs(array) do
@@ -71,11 +71,15 @@ local function WriteTable(array, numIndents, endOfFile, concise)
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise)
+			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise, useDoubleQuote)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
 		elseif type(v) == "string" then
-			str = str .. "[=[" .. v .. "]=]" .. "," .. (concise and '' or "\n")
+			if useDoubleQuote then
+			  str = str .. '"' .. v:gsub('"', [[\"]]):gsub([[\]], [[\\]])  .. '"' .. "," .. (concise and '' or "\n")
+			else
+			  str = str .. "[=[" .. v .. "]=]" .. "," .. (concise and '' or "\n")
+			end
 		else
 			str = str .. v .. ",\n"
 		end
