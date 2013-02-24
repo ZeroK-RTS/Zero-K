@@ -14,7 +14,7 @@ function gadget:GetInfo()
     name      = "UnitPriority",
     desc      = "Adds controls to change spending priority on constructions/repairs etc",
     author    = "Licho",
-    date      = "19.4.2009",
+    date      = "19.4.2009", --24.2.2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -51,9 +51,10 @@ local TeamScale = {}  -- TeamScale[TeamID]= {0.1, 0.4}   how much to scale down 
 local TeamMetalReserved = {} -- how much metal is reserved for high priority in each team
 local TeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
+
 local morphBuildSpeed = {} --buildspeed for custom unit added thru GG. function
 local morphAllowBuildStep = {} --
-
+local morphTeamPriorityUnits = {} --unit morph that need priority handling
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -223,15 +224,20 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   return true, true  -- command was used, remove it
 end
 
-function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
+function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step,morph) 
 	if (step<0) then
 		--// Reclaiming isn't prioritized
 		return true
 	end
 
 	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then -- priority none/low
-		if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
-		TeamPriorityUnits[teamID][builderID] = 0
+		if morph == nil then
+			if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
+			TeamPriorityUnits[teamID][builderID] = 0
+		else
+			if (morphTeamPriorityUnits[teamID] == nil) then morphTeamPriorityUnits[teamID] = {} end
+			morphTeamPriorityUnits[teamID][unitID] = 0
+		end
 		local scale = TeamScale[teamID]
 		if scale ~= nil then 
 			if random() < scale[2] then  --if scale[2] is less than 1 then it has less chance of success. scale[2] is a ratio between available-resource and desired-spending.  scale[2] is less than 1 when desired-spending is bigger than available-resources.
@@ -244,8 +250,13 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	end
 
 	if (UnitPriority[unitID] == 2 or (UnitPriority[builderID] == 2 and (UnitPriority[unitID] or 1) == 1)) then  -- priority high
-		if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
-		TeamPriorityUnits[teamID][builderID] = 2		
+		if morph == nil then
+			if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
+			TeamPriorityUnits[teamID][builderID] = 2
+		else
+			if (morphTeamPriorityUnits[teamID] == nil) then morphTeamPriorityUnits[teamID] = {} end
+			morphTeamPriorityUnits[teamID][unitID] = 2
+		end
 		return true
 	end 
 	
@@ -265,7 +276,7 @@ end
 function gadget:GameFrame(n)
 	for unitID, _ in pairs(morphBuildSpeed) do --update morphAllowBuildStep when available. (is updated before prioSpending code below)
 		local teamID = Spring.GetUnitTeam(unitID)
-		morphAllowBuildStep[unitID] = gadget:AllowUnitBuildStep(unitID, teamID, unitID, -1, 1)
+		morphAllowBuildStep[unitID] = gadget:AllowUnitBuildStep(unitID, teamID, unitID, -1, 1, true)
 	end
 	if n % 32 == 15 then 
 		TeamScale = {}
@@ -279,9 +290,20 @@ function gadget:GameFrame(n)
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if pri == 2 then 
-						prioSpending = prioSpending + (morphBuildSpeed[unitID] or UnitDefs[unitDefID].buildSpeed)
+						prioSpending = prioSpending + UnitDefs[unitDefID].buildSpeed
 					else 
-						lowPrioSpending = lowPrioSpending + (morphBuildSpeed[unitID] or UnitDefs[unitDefID].buildSpeed)
+						lowPrioSpending = lowPrioSpending + UnitDefs[unitDefID].buildSpeed
+					end 
+				end 
+			end
+			for unitID, _ in pairs(morphBuildSpeed) do 
+				local unitDefID = spGetUnitDefID(unitID)
+				local morphPriority = morphTeamPriorityUnits[teamID] and morphTeamPriorityUnits[teamID][unitID]
+				if unitDefID ~= nil and morphPriority then
+					if morphPriority == 2 then 
+						prioSpending = prioSpending + morphBuildSpeed[unitID]
+					else 
+						lowPrioSpending = lowPrioSpending + morphBuildSpeed[unitID]
 					end 
 				end 
 			end 
