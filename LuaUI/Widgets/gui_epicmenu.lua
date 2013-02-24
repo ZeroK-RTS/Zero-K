@@ -344,7 +344,9 @@ local function otset(t, key, val)
 			return
 		end
 	end
-	t[#t+1] = {key, val}
+	if val ~= nil then
+		t[#t+1] = {key, val}
+	end
 end
 local function otvalidate(t)
 	for i=1,#t do
@@ -708,12 +710,14 @@ local function HotKeyBreakdown(hotkey)
 	return mod, key
 end
 local function GetReadableHotkey(hotkey)
-	if type(hotkey) ~= 'string' then
-		return 'None!'
-	end
 	local mod, key = HotKeyBreakdown(hotkey)
 	return GetReadableHotkeyMod(mod) .. CapCase(key)
 end
+
+local function GetActionHotkeys(action)
+	return Spring.GetActionHotKeys(action)
+end
+
 local function GetActionHotkey(action)
 	local actionHotkeys = Spring.GetActionHotKeys(action)
 	if actionHotkeys and actionHotkeys[1] then
@@ -751,7 +755,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 			local isUnitInstantCommand = number == 3
 			
 			-- bind shift+hotkey as well if needed for unit commands
-			local alreadyShift = hotkey:find("S+")
+			local alreadyShift = hotkey:lower():find("s+") or hotkey:lower():find("shift+") 
 			if not alreadyShift then
 				if isUnitCommand then
 					  spSendCommands("bind S+" .. hotkey .. " " .. actionName)
@@ -816,22 +820,24 @@ end
 
 -- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(actionName, verbose)
-	local actionHotkey = GetActionHotkey(actionName)
-	if actionHotkey then
-		
-		--[[
-			unbind and unbindaction don't work on a command+params, only on the command itself
-		--]]
-		
-		local actionName_split = explode(' ', actionName)
-		local actionName_cmd = actionName_split[1]
-		
-		--echo("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) 
-		spSendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) -- must be lowercase when calling unbind
-		--spSendCommands("unbindaction " .. actionName ) --don't do this
-		
-		if verbose then
-			echo( 'Unbound hotkeys from action: ' .. actionName )
+	local actionHotkeys = GetActionHotkeys(actionName)
+	if actionHotkeys then
+		for _,actionHotkey in ipairs(actionHotkeys) do
+				
+			--[[
+				unbind and unbindaction don't work on a command+params, only on the command itself
+			--]]
+			
+			local actionName_split = explode(' ', actionName)
+			local actionName_cmd = actionName_split[1]
+			
+			--echo("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) 
+			spSendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) -- must be lowercase when calling unbind
+			--spSendCommands("unbindaction " .. actionName ) --don't do this, unbinding one select would unbind all.
+			
+			if verbose then
+				echo( 'Unbound hotkeys from action: ' .. actionName )
+			end
 		end
 	end
 	--otset( keybounditems, actionName, nil )
@@ -851,7 +857,14 @@ local function ReApplyKeybinds()
 		local hotkey = elem[2]
 		--actionName = actionName:lower()
 		UnassignKeyBind(actionName, false)
-		AssignKeyBindAction(hotkey, actionName, false)
+		
+		if type(hotkey) == 'table' then
+			for _,hotkey2 in ipairs(hotkey) do
+				AssignKeyBindAction(hotkey2, actionName, false)
+			end
+		else
+			AssignKeyBindAction(hotkey, actionName, false)
+		end
 		
 		--echo("unbindaction(1) ", actionName)
 		--echo("bind(1) ", hotkey, actionName)
@@ -1305,6 +1318,9 @@ WG.crude.GetHotkey = function(actionName)
 	if not hotkey or hotkey == 'none' then
 		return ''
 	end
+	if type(hotkey) == 'table' then
+		hotkey = hotkey[1]
+	end
 	return GetReadableHotkey(hotkey) 
 end
 
@@ -1331,6 +1347,9 @@ local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
 	--local hotkey = keybounditems[actionName]
 	local hotkey = otget( keybounditems, actionName )
+	if type(hotkey) == 'table' then
+		hotkey = hotkey[1]
+	end
 	if hotkey and hotkey ~= 'none' then
 		return GetReadableHotkey(hotkey) 
 	end
@@ -2251,8 +2270,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 			AssignKeyBindAction(hotkey, kb_action, true) -- param4 = verbose
 			otset( keybounditems, kb_action, hotkey )
 	
-			ReApplyKeybinds()
 		end
+		ReApplyKeybinds()
 		
 		if kb_path == curPath then
 			MakeSubWindow(kb_path)
