@@ -93,7 +93,7 @@ end
 --a form of checkbox that act like multiple choice question
 local function ShTick2( caption, items,defValue, action2, advanced) 
 	AddOption({
-		type='radioButton', 
+		type='listBool', 
 		name=caption,
 		key=caption,
 		items = items or {},
@@ -157,8 +157,8 @@ path='Game'
 --- CAMERA ---
 path='Settings/Camera'
 	--[[
-		the problem is "radioButton" is not fully implemented to recognize the item "viewta" as an existing action,
-		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound. A proposed solution is to enable both "radioButton" 
+		the problem is "listBool" is not fully implemented to recognize the item "viewta" as an existing action,
+		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound. A proposed solution is to enable both "listBool" 
 		& old camera button, but put the later in saperate category.
 	--]]
 
