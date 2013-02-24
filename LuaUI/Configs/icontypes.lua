@@ -144,9 +144,9 @@ local icontypes = {
     bitmap='icons/kbotraider.dds',
     size=1.8,
   },
-  kbotadvraider = {
-    bitmap='icons/kbotadvraider.dds',
-    size=2,
+  kbotscythe = {
+    bitmap='icons/kbotscythe.dds',
+    size=1.8,
   },
   kbotassault = {
     bitmap='icons/kbotassault.dds',
