@@ -14,7 +14,7 @@ function gadget:GetInfo()
     name      = "UnitPriority",
     desc      = "Adds controls to change spending priority on constructions/repairs etc",
     author    = "Licho",
-    date      = "19.4.2009", --24.2.2013
+    date      = "19.4.2009",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -52,9 +52,6 @@ local TeamMetalReserved = {} -- how much metal is reserved for high priority in 
 local TeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
 
-local morphBuildSpeed = {} --buildspeed for custom unit added thru GG. function
-local morphAllowBuildStep = {} --
-local morphTeamPriorityUnits = {} --unit morph that need priority handling
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -224,23 +221,18 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   return true, true  -- command was used, remove it
 end
 
-function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step,morph) 
+function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
 	if (step<0) then
 		--// Reclaiming isn't prioritized
 		return true
 	end
 
-	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then -- priority none/low
-		if morph == nil then
-			if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
-			TeamPriorityUnits[teamID][builderID] = 0
-		else
-			if (morphTeamPriorityUnits[teamID] == nil) then morphTeamPriorityUnits[teamID] = {} end
-			morphTeamPriorityUnits[teamID][unitID] = 0
-		end
+	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then -- priority none
+		if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
+		TeamPriorityUnits[teamID][builderID] = 0
 		local scale = TeamScale[teamID]
 		if scale ~= nil then 
-			if random() < scale[2] then  --if scale[2] is less than 1 then it has less chance of success. scale[2] is a ratio between available-resource and desired-spending.  scale[2] is less than 1 when desired-spending is bigger than available-resources.
+			if random() < scale[2] then 
 				return true
 			else 
 				return false
@@ -250,34 +242,26 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step,mo
 	end
 
 	if (UnitPriority[unitID] == 2 or (UnitPriority[builderID] == 2 and (UnitPriority[unitID] or 1) == 1)) then  -- priority high
-		if morph == nil then
-			if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
-			TeamPriorityUnits[teamID][builderID] = 2
-		else
-			if (morphTeamPriorityUnits[teamID] == nil) then morphTeamPriorityUnits[teamID] = {} end
-			morphTeamPriorityUnits[teamID][unitID] = 2
-		end
+		if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
+		TeamPriorityUnits[teamID][builderID] = 2		
 		return true
 	end 
 	
 	local scale = TeamScale[teamID]
 	if scale ~= nil then 
-		if random() < scale[1] then
+		if random() < scale[1] then 
 			return true
 		else 
 			return false
 		end
 	end 
 	
-		
+	
 	return true
 end
 
-function gadget:GameFrame(n)
-	for unitID, _ in pairs(morphBuildSpeed) do --update morphAllowBuildStep when available. (is updated before prioSpending code below)
-		local teamID = Spring.GetUnitTeam(unitID)
-		morphAllowBuildStep[unitID] = gadget:AllowUnitBuildStep(unitID, teamID, unitID, -1, 1, true)
-	end
+
+function gadget:GameFrame(n) 
 	if n % 32 == 15 then 
 		TeamScale = {}
 		local teams = spGetTeamList()
@@ -286,24 +270,13 @@ function gadget:GameFrame(n)
 			prioUnits = TeamPriorityUnits[teamID] or {}
 			local prioSpending = 0
 			local lowPrioSpending = 0
-			for unitID, pri in pairs(prioUnits) do  --add construction priority spending
+			for unitID, pri in pairs(prioUnits) do 
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if pri == 2 then 
 						prioSpending = prioSpending + UnitDefs[unitDefID].buildSpeed
 					else 
 						lowPrioSpending = lowPrioSpending + UnitDefs[unitDefID].buildSpeed
-					end 
-				end 
-			end
-			for unitID, _ in pairs(morphBuildSpeed) do --add morph priority spending
-				local unitDefID = spGetUnitDefID(unitID)
-				local morphPriority = morphTeamPriorityUnits[teamID] and morphTeamPriorityUnits[teamID][unitID]
-				if unitDefID ~= nil and morphPriority then
-					if morphPriority == 2 then 
-						prioSpending = prioSpending + morphBuildSpeed[unitID]
-					else 
-						lowPrioSpending = lowPrioSpending + morphBuildSpeed[unitID]
 					end 
 				end 
 			end 
@@ -335,32 +308,32 @@ function gadget:GameFrame(n)
 				if spare > 0 then
 					if normalSpending <= 0 then
 					 if lowPrioSpending ~= 0 then
-						 TeamScale[teamID] = {0,spare/lowPrioSpending} --no normal spending, but mixed chance for low priority spending
+						 TeamScale[teamID] = {0,spare/lowPrioSpending}
 					 else
-						 TeamScale[teamID] = {0,0} --no normal spending, and no low priority spending, only hi-priority spending
+						 TeamScale[teamID] = {0,0}
 					 end
 					elseif spare > normalSpending then
 					 spare = spare - normalSpending
 					 if spare > 0 and lowPrioSpending ~= 0 then
-						 TeamScale[teamID] = {1,spare/lowPrioSpending} --full normal spending, and mixed chance low-priority spending
+						 TeamScale[teamID] = {1,spare/lowPrioSpending}
 					 else
-						 TeamScale[teamID] = {1,0} --full normal spending, but no low-priority spending
+						 TeamScale[teamID] = {1,0}
 					 end
 					elseif spare > 0 then
-					 TeamScale[teamID] = {spare/normalSpending,0} --mixed chance normal spending, and no low-priority spending
+					 TeamScale[teamID] = {spare/normalSpending,0}
 					end
 				else
-					TeamScale[teamID] = {0,0} --no  normal spending, no low-Priority spending
+					TeamScale[teamID] = {0,0}
 				end
                 
-			elseif (prioSpending > 0 or lowPrioSpending > 0) then --normal situation, or no reserve
+			elseif (prioSpending > 0 or lowPrioSpending > 0) then
 				
 				local normalSpending = pull - lowPrioSpending
 				
 				if pull > expense and level < expense and prioSpending < pull then 
 					TeamScale[teamID] = {
-						(income + recieved - prioSpending) / (pull - prioSpending - lowPrioSpending),  -- m stall  scale . spareNormal/normal-priority-spending
-						(income + recieved - normalSpending) / (lowPrioSpending)  -- m stall low scale . spareLow/low-priority-spending
+						(income + recieved - prioSpending) / (pull - prioSpending - lowPrioSpending),  -- m stall  scale
+						(income + recieved - normalSpending) / (lowPrioSpending)  -- m stall low scale
 					}
 					--Spring.Echo ("m_stall" .. TeamScale[teamID])
 				elseif epull > eexpense and elevel < eexpense and prioSpending < epull then 
@@ -373,42 +346,13 @@ function gadget:GameFrame(n)
             
 		SendToUnsynced("ReserveState", teamID, TeamMetalReserved[teamID] or 0, TeamEnergyReserved[teamID] or 0) 
 		end
-		morphTeamPriorityUnits = {} --reset morpher priority list
-		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame)
+
+		TeamPriorityUnits = {}
 		SendToUnsynced("PriorityStats", nil,  0, 0, n)   
 	end
 end
 
 --------------------------------------------------------------------------------
-function GG.AddMorphPriority(unitID,buildSpeed) --remotely add a priority command.
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
-	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if unit not suppose to have Priority command, then: force add priority command
-		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
-		SetPriorityState(unitID, DefaultState)
-	end
-	morphBuildSpeed[unitID]=buildSpeed
-	morphAllowBuildStep[unitID]=false
-end
-
-function GG.RemoveMorphPriority(unitID) --remotely remove a forced priority command.
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
-	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if not suppose to have Priority command, then: remove priority command
-		UnitPriority[unitID] = nil --clear build priority for this unit because we assume morpher no longer needed it (because only needed for unit under construction)
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PRIORITY)
-		if (cmdDescID) then
-			spRemoveUnitCmdDesc(unitID, cmdDescID)
-			spSetUnitRulesParam(unitID, "buildpriority", 1) --reset to normal priority so that overhead icon doesn't show wrench
-		end			
-	end
-	morphBuildSpeed[unitID] = nil
-	morphAllowBuildStep[unitID]= nil
-end
-
-function GG.CheckMorphBuildStep(unitID)
-	return morphAllowBuildStep[unitID] --tell unit_morph.lua about this morph status: allow/pause?
-end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

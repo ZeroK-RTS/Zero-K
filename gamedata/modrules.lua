@@ -77,7 +77,6 @@ local modrules  = {
     transportHover  = 1;   -- defaults to 0
     transportShip   = 1;  -- defaults to 0
     transportAir    = 0;  -- defaults to 0
-	targetableTransportedUnits = true;
   },
 
 
