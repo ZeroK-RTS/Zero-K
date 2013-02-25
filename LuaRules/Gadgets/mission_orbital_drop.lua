@@ -19,9 +19,9 @@ local Spring = Spring
 
 ----- Settings -----------------------------------------------------------------
 
-local timeToGround = 160 --customizable (frame)
+local timeToGround = 60 --customizable (frame)
 
-local fallGravity = -1*Game.gravity/30/30 --customizable (elmo/frame^2)
+local fallGravity = Game.gravity/30/30 --customizable (elmo/frame^2)
 local unitSpawnHeight = 3000 --customizable (elmo)
 local unitBrakeHeight = 500 --customizable (elmo)
 
