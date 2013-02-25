@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Select Keys",
-    desc      = "v0.033 Common SelectKey Hotkeys for EPIC Menu.",
+    desc      = "v0.034 Common SelectKey Hotkeys for EPIC Menu.", -- this functionality is included in KB Menu
     author    = "CarRepairer",
     date      = "2010-09-23",
     license   = "GNU GPL, v2 or later",
@@ -35,6 +35,16 @@ options_order = {
 	'lbl_w',
 	'select_landw',
 	'selectairw',
+	
+	'lbl_misc',
+	'uikey1',
+	'uikey2',
+	'uikey3',
+	'uikey4',
+	'uikey5',
+	'uikey6',
+	'uikey7',
+	'uikey8',
 }
 options = {
 
@@ -93,7 +103,7 @@ options = {
 	},
 	----
 	-- the below are from uikeys, I don't know what they do
-	
+	lbl_misc = { type = 'label', name = 'Misc ZK uikeys' },
 	uikey1 = { type = 'button',
 		name = 'Unknown uikey 1 - aircraft?',
 		desc = '',
@@ -124,7 +134,16 @@ options = {
 		desc = '',
 		action = 'select AllMap+_InPrevSel_Not_InHotkeyGroup+_SelectAll+',
 	},
-	
+	uikey7 = { type = 'button',
+		name = 'Unknown uikey 7 - builder?',
+		desc = '',
+		action = 'select AllMap+_Builder_Idle+_ClearSelection_SelectOne+',
+	},
+	uikey8 = { type = 'button',
+		name = 'Unknown uikey 8 - not builder?',
+		desc = '',
+		action = 'select AllMap+_Not_Builder_Not_Commander_InPrevSel_Not_InHotkeyGroup+_SelectAll+',
+	},
 	
 }
 

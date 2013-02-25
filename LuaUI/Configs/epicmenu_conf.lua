@@ -1,6 +1,7 @@
 local confdata = {}
 confdata.title = 'Z.K.'
 confdata.title_image = LUAUI_DIRNAME .. 'Images/ZK_logo.png'
+confdata.keybind_file = LUAUI_DIRNAME .. 'Configs/zk_keys.lua'
 local color = {
 	white = {1,1,1,1},
 	yellow = {1,1,0,1},
@@ -92,7 +93,7 @@ end
 --a form of checkbox that act like multiple choice question
 local function ShTick2( caption, items,defValue, action2, advanced) 
 	AddOption({
-		type='listBool', 
+		type='radioButton', 
 		name=caption,
 		key=caption,
 		items = items or {},
@@ -149,13 +150,25 @@ path='Settings'
 path='Game' 
 
 	ShButton( 'Pause/Unpause', 'pause' )
-	ShLabel('') 
-	ShButton( 'Share Dialog...', 'sharedialog' ) 
+	path='Game/Game Speed' 
+		ShButton( 'Increase Speed', 'speedup' )
+		ShButton( 'Decrease Speed', 'slowdown' )
+		
+path='Game' 
+	ShLabel('')
 	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
---	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end ) 
+--	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end )
+
 
 --- CAMERA ---
 path='Settings/Camera'
+	--[[
+		the problem is "radioButton" is not fully implemented to recognize the item "viewta" as an existing action,
+		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound. A proposed solution is to enable both "radioButton" 
+		& old camera button, but put the later in saperate category.
+	--]]
+
+	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
 	ShTick2( 'Camera Type', {
 			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
 			{name = 'FPS',key='FPS', desc='FPS camera', hotkey=nil},
@@ -167,25 +180,33 @@ path='Settings/Camera'
 		function(self)
 			local key = self.value
 			if key == 'Total Annihilation' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewta"}
+				spSendCommands{cofcDisable ,"viewta"}
 			elseif key == 'FPS' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfps"}
+				spSendCommands{cofcDisable ,"viewfps"}
 			elseif key == 'Free' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewfree"}
+				spSendCommands{cofcDisable ,"viewfree"}
 			elseif key == 'Rotatable Overhead' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewrot"}
+				spSendCommands{cofcDisable ,"viewrot"}
 			elseif key == 'Total War' then
-				spSendCommands{"luaui disablewidget Combo Overhead/Free Camera (experimental)","viewtw"}
+				spSendCommands{cofcDisable ,"viewtw"}
 			elseif key == 'COFC' then
 				spSendCommands{"luaui enablewidget Combo Overhead/Free Camera (experimental)",}
 			end
 		end
-		)		
+		)
+	
 	ShButton( 'Flip the TA Camera', 'viewtaflip' )
 	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
 	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
+path='Settings/Camera/Old Camera Shortcut'	
+	ShButton( 'Total Annihilation', 'viewta' )
+	ShButton( 'FPS', 'viewfps' )
+	ShButton( 'Free', 'viewfree' )
+	ShButton( 'Rotatable Overhead', 'viewrot' )
+	ShButton( 'Total War', 'viewtw' )	
+	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 path='Settings/HUD Panels'
 	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
@@ -206,10 +227,6 @@ path='Settings/HUD Panels/HUD Skin'
 	})
 	ShButton('Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
 
---- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
-path='Settings/Misc'
-	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
-
 
 --- Interface --- anything that's an interface but not a HUD Panel
 path='Settings/Interface'
@@ -228,6 +245,12 @@ path='Settings/Interface/Spectating'
 	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
 	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
 	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
+
+--- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
+path='Settings/Misc'
+	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
+	ShButton( 'Game Info', "gameinfo", '', true )
+	ShButton( 'Share Dialog...', 'sharedialog', '', true ) 
 
 path='Settings/Misc/Screenshots'	
 	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 

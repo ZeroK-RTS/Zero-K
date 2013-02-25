@@ -80,25 +80,21 @@ options = {
 		name = "Factory Tab",
 		desc = "Switches to factory tab, enables grid hotkeys",
 		type = 'button',
-        hotkey = {key='z', mod=''},
 	},
 	tab_economy = {
 		name = "Economy Tab",
 		desc = "Switches to economy tab, enables grid hotkeys",
 		type = 'button',
-        hotkey = {key='x', mod=''},
 	},
 	tab_defence = {
 		name = "Defence Tab",
 		desc = "Switches to defence tab, enables grid hotkeys",
 		type = 'button',
-        hotkey = {key='c', mod=''},
 	},
 	tab_special = {
 		name = "Special Tab",
 		desc = "Switches to special tab, enables grid hotkeys",
 		type = 'button',
-        hotkey = {key='v', mod=''},
 	},
 }
 
