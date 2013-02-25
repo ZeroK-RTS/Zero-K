@@ -374,6 +374,8 @@ local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
   local teamOwnsReqUnit = UnitReqCheck(teamID,morphDef.require)
   morphCmdDesc.tooltip = GetMorphToolTip(unitID, unitDefID, teamID, morphDef, teamTech, unitXP, unitRank, teamOwnsReqUnit)
   
+  GG.AddMiscPriorityUnit(unitID,teamID)
+  
   if morphDef.texture then
     morphCmdDesc.texture = "LuaRules/Images/Morph/".. morphDef.texture
     morphCmdDesc.name = ''
@@ -466,12 +468,12 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
   end
 
   SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-  GG.AddMorphPriority(unitID,teamID,(morphDef.metal/morphDef.time*32/30)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
+  GG.StartMiscPriorityResourcing(unitID,teamID,(morphDef.metal/morphDef.time*32/30)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
 end
 
 
 local function StopMorph(unitID, morphData)
-  GG.RemoveMorphPriority(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
+  GG.StopMiscPriorityResourcing(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
   morphUnits[unitID] = nil
   if not morphData.combatMorph then 
     Spring.SetUnitHealth(unitID, { paralyze = -1})
@@ -497,7 +499,7 @@ end
 
 
 local function FinishMorph(unitID, morphData)
-  GG.RemoveMorphPriority(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
+  GG.StopMiscPriorityResourcing(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
   local udDst = UnitDefs[morphData.def.into]
   local ud = UnitDefs[unitID]
   local defName = udDst.name
@@ -679,7 +681,7 @@ end
 local function UpdateMorph(unitID, morphData)
   if Spring.GetUnitTransporter(unitID) then return true end
   
-  local allow = GG.CheckMorphBuildStep(unitID, morphData.teamID, morphData.def.resTable.m) --use unit_priority.lua gadget to handle morph priority.
+  local allow = GG.CheckMiscPriorityBuildStep(unitID, morphData.teamID, morphData.def.resTable.m) --use unit_priority.lua gadget to handle morph priority.
   if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
     morphData.progress = morphData.progress + morphData.increment
   end
@@ -807,7 +809,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
     local useXPMorph = false
     for _,morphDef in pairs(morphDefSet) do
       if (morphDef) then
-        AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTechLevel[teamID])
+		AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTechLevel[teamID])
         useXPMorph = (morphDef.xp>0) or useXPMorph
       end
     end

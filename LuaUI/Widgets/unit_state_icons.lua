@@ -52,6 +52,12 @@ options = {
 		type = 'bool',
 		value = true,
 	},
+	showmiscpriorityonshift = {
+		name = "Show misc priorty on shift",
+		desc = "When holding shift, an icon appears over unit with low or high misc priority (morph or stockpile).",
+		type = 'bool',
+		value = true,
+	},
 }
 
 
@@ -76,6 +82,11 @@ local priorityIcons = {
   [1] = imageDir .. 'states/wrench_med.png',
   [2] = imageDir .. 'states/wrench_high.png',
 }
+local miscPriorityIcons = {
+  [0] = imageDir .. 'states/wrench_low_other.png',
+  [1] = imageDir .. 'states/wrench_med_other.png',
+  [2] = imageDir .. 'states/wrench_high_other.png',
+}
 
 local armoredTexture = 'Luaui/Images/commands/guard.png'
 
@@ -87,6 +98,7 @@ local hide = true
 local prevFirestate = {}
 local prevMovestate = {}
 local prevPriority = {}
+local prevMiscPriority = {}
 local lastArmored = {}
 local lastArmored = {}
 
@@ -136,7 +148,6 @@ function SetUnitStateIcons(unitID)
 	end
 	
 	if options.showpriorityonshift.value then
-		local armored, amount = Spring.GetUnitArmored(unitID)
 		local state = Spring.GetUnitRulesParam(unitID, "buildpriority")
 		if (not ud) or not (ud.canAssist and ud.buildSpeed ~= 0) then
 			local _,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
@@ -155,8 +166,23 @@ function SetUnitStateIcons(unitID)
 				WG.icons.SetUnitIcon( unitID, {name='priority', texture=priorityIcons} )
 			end
 		end
-		
 	end
+	
+	if options.showmiscpriorityonshift.value then
+		local state = Spring.GetUnitRulesParam(unitID, "miscpriority")
+		
+		if not prevMiscPriority[unitID] or prevMiscPriority[unitID] ~= state then
+			if state == 1 then
+				prevMiscPriority[unitID] = state
+				WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=nil} )
+			else
+				prevMiscPriority[unitID] = state
+				local miscPriorityIcons = miscPriorityIcons[state]
+				WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=miscPriorityIcons} )
+			end
+		end
+	end
+	
 end
 
 local function UpdateAllUnits()
@@ -201,6 +227,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 		if options.showpriorityonshift.value then
 			WG.icons.SetDisplay('priority', true)
 		end
+		if options.showmiscpriorityonshift.value then
+			WG.icons.SetDisplay('miscpriority', true)
+		end
 		
 		UpdateAllUnits()
 	end
@@ -217,6 +246,7 @@ function widget:KeyRelease(key, modifier )
 		WG.icons.SetDisplay('movestate', false)
 		WG.icons.SetDisplay('armored', false)
 		WG.icons.SetDisplay('priority', false)
+		WG.icons.SetDisplay('miscpriority', false)
 	end
 end
 

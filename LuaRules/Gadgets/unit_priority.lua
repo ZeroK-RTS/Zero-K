@@ -33,38 +33,55 @@ local Tooltips = {
 	'Construction High priority.',
 }
 local DefaultState = 1
+
 local CommandOrder = 123456
 local CommandDesc = {
-		id          = CMD_PRIORITY,
-		type        =  CMDTYPE.ICON_MODE,
-		name        = 'Priority',
-		action      = 'priority',
-		tooltip 	= Tooltips[DefaultState + 1],
-		params      = {DefaultState, 'Low','Normal','High'}
-	}
+	id          = CMD_PRIORITY,
+	type        = CMDTYPE.ICON_MODE,
+	name        = 'Priority',
+	action      = 'priority',
+	tooltip 	= Tooltips[DefaultState + 1],
+	params      = {DefaultState, 'Low','Normal','High'}
+}
+
+local MiscCommandOrder = 123457
+local MiscCommandDesc = {
+	id          = CMD_MISC_PRIORITY,
+	type        = CMDTYPE.ICON_MODE,
+	name        = 'Misc Priority',
+	action      = 'miscpriority',
+	tooltip 	= Tooltips[DefaultState + 1],
+	params      = {DefaultState, 'Low','Normal','High'}
+}
+
 local StateCount = #CommandDesc.params-1
 
-
 local UnitPriority = {}  --  UnitPriority[unitID] = 0,1,2     priority of the unit
+local UnitMiscPriority = {}  --  UnitMiscPriority[unitID] = 0,1,2     priority of the unit
 local TeamPriorityUnits = {}  -- TeamPriorityUnits[TeamID][UnitID] = 0,2    which units are low/high priority builders
 local TeamScale = {}  -- TeamScale[TeamID]= {0.1, 0.4}   how much to scale down production of lnormal and low prirotity units
 local TeamMetalReserved = {} -- how much metal is reserved for high priority in each team
 local TeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
 
-local morphMetalDrain = {} -- metal drain for custom unit added thru GG. function
-local morphTeamPriorityUnits = {} --unit morph that need priority handling
-local morphTeamDrain = {} -- morphTeamDrain[TeamID] = drain	  -- how much morph is actually draining
-local morphTeamPull = {} -- morphTeamPull[TeamID] = pull      -- how much morph is pulling
+local miscMetalDrain = {} -- metal drain for custom unit added thru GG. function
+local miscTeamPriorityUnits = {} --unit  that need priority handling
+local miscTeamDrain = {} -- miscTeamDrain[TeamID] = drain	  -- how much is actually draining
+local miscTeamPull = {} -- miscTeamPull[TeamID] = pull      -- how much is pulling
 
 do
 	local teams = Spring.GetTeamList()
 	for i=1,#teams do
 		local teamID = teams[i]
-		morphTeamDrain[teamID] = 0
-		morphTeamPull[teamID] = 0
+		miscTeamDrain[teamID] = 0
+		miscTeamPull[teamID] = 0
 	end
 end
+
+local priorityTypes = {
+	[CMD_PRIORITY] = {id = CMD_PRIORITY, param = "buildpriority", unitTable = UnitPriority},
+	[CMD_MISC_PRIORITY] = {id = CMD_MISC_PRIORITY, param = "miscpriority", unitTable = UnitMiscPriority},
+}
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -107,109 +124,30 @@ local function SetEnergyReserved(teamID, value)
 end
 
 
-local function SetPriorityState(unitID, state) 
-	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PRIORITY)
+local function SetPriorityState(unitID, state, prioID) 
+	local cmdDescID = spFindUnitCmdDesc(unitID, prioID)
 	if (cmdDescID) then
 		CommandDesc.params[1] = state
 		spEditUnitCmdDesc(unitID, cmdDescID, { params = CommandDesc.params, tooltip = Tooltips[1 + state%StateCount]})
-		spSetUnitRulesParam(unitID, "buildpriority", state)
+		spSetUnitRulesParam(unitID, priorityTypes[prioID].param, state)
 	end
-	UnitPriority[unitID] = state	
+	priorityTypes[prioID].unitTable[unitID] = state	
 end 
 
-
-
-function gadget:Initialize()
-	gadgetHandler:RegisterCMDID(CMD_PRIORITY)
-
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local teamID = Spring.GetUnitTeam(unitID)
-		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
-	end
-
-end
-
-function gadget:RecvLuaMsg(msg, playerID)
-	if msg:find("mreserve:",1,true) then
-		local _,_,spec,teamID = spGetPlayerInfo(playerID)
-		local amount = msg:sub(10)
-		if spec then return end
-		SetMetalReserved(teamID, amount*1)
-	end	
-	if msg:find("ereserve:",1,true) then
-		local _,_,spec,teamID = spGetPlayerInfo(playerID)
-		local amount = msg:sub(10)
-		if spec then return end
-		SetEnergyReserved(teamID, amount*1)
-	end
-end
-
-function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID) 
-	local prio  = DefaultState
-	if (builderID ~= nil)  then
-		local unitDefID = spGetUnitDefID(builderID)
-		if (unitDefID ~= nil and UnitDefs[unitDefID].isFactory) then 
-			prio = UnitPriority[builderID] or DefaultState  -- inherit priorty from factory
-			LastUnitFromFactory[builderID] = UnitID 
-		end
-	end 	
-	UnitPriority[UnitID] =  prio
-	CommandDesc.params[1] = prio
-	spInsertUnitCmdDesc(UnitID, CommandOrder, CommandDesc)
-end
-
-
-
-function gadget:UnitFinished(unitID, unitDefID, teamID) 
-	local ud = UnitDefs[unitDefID]
-	
-	if ((ud.isFactory or ud.builder) and ud.buildSpeed > 0) then 
-		SetPriorityState(unitID, DefaultState)
-	else  -- not a builder priority makes no sense now
-		UnitPriority[unitID] = nil
-		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PRIORITY)
-		if (cmdDescID) then
-			spRemoveUnitCmdDesc(unitID, cmdDescID)
-		end
-	end 
-
-end 
-
-function gadget:UnitDestroyed(UnitID, unitDefID, teamID) 
-	UnitPriority[UnitID] = nil
-	LastUnitFromFactory[UnitID] = nil
-    local ud = UnitDefs[unitDefID]
-    if ud then
-		if ud.metalStorage and ud.metalStorage > 0 and TeamMetalReserved[teamID] then
-			local _, sto = spGetTeamResources(teamID, "metal")
-			if sto and TeamMetalReserved[teamID] > sto - ud.metalStorage then
-				SetMetalReserved(teamID, sto - ud.metalStorage)
-			end
-		end
-		if ud.energyStorage and ud.energyStorage > 0 and TeamEnergyReserved[teamID] then
-			local _, sto = spGetTeamResources(teamID, "energy") - HIDDEN_STORAGE
-			if sto and TeamEnergyReserved[teamID] > sto - ud.energyStorage then
-				SetEnergyReserved(teamID, sto - ud.energyStorage)
-			end
-		end
-    end
-end
-
-
-function PriorityCommand(unitID, cmdParams, cmdOptions)
+function PriorityCommand(unitID, cmdID, cmdParams, cmdOptions)
 	local state = cmdParams[1]
 	if (cmdOptions.right) then 
 		state = state - 2
 	end
 	state = state % StateCount
 
-	SetPriorityState(unitID, state)
+	SetPriorityState(unitID, state, cmdID)
 	
 	local lastUnitID = LastUnitFromFactory[unitID]  
 	if lastUnitID ~= nil then 
 		local _, _, _, _, progress = spGetUnitHealth(lastUnitID)
 		if (progress ~= nil and progress < 1) then  -- we are building some unit ,set its priority too 
-			SetPriorityState(lastUnitID, state)
+			SetPriorityState(lastUnitID, state, cmdID)
 		end 
 	end 
 end
@@ -217,11 +155,11 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID,
                              cmdID, cmdParams, cmdOptions)
-  if (cmdID ~= CMD_PRIORITY) then
-    return true  -- command was not used
-  end
-  PriorityCommand(unitID, cmdParams, cmdOptions)  
-  return false  -- command was used
+	if (cmdID == CMD_PRIORITY or cmdID == CMD_MISC_PRIORITY) then
+		PriorityCommand(unitID, cmdID, cmdParams, cmdOptions)  
+		return false  -- command was used
+	end
+	return true  -- command was not used
 end
 
 
@@ -234,13 +172,13 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   return true, true  -- command was used, remove it
 end
 
-local function AllowMorphBuildStep(unitID,teamID)
+local function AllowMiscBuildStep(unitID,teamID)
 
-	if (UnitPriority[unitID] == 0) then -- priority none/low
-		if (morphTeamPriorityUnits[teamID] == nil) then 
-			morphTeamPriorityUnits[teamID] = {} 
+	if (UnitMiscPriority[unitID] == 0) then -- priority none/low
+		if (teamMiscPriorityUnits[teamID] == nil) then 
+			teamMiscPriorityUnits[teamID] = {} 
 		end
-		morphTeamPriorityUnits[teamID][unitID] = 0
+		teamMiscPriorityUnits[teamID][unitID] = 0
 		local scale = TeamScale[teamID]
 		if scale ~= nil then 
 			if random() < scale[2] then  --if scale[2] is less than 1 then it has less chance of success. scale[2] is a ratio between available-resource and desired-spending.  scale[2] is less than 1 when desired-spending is bigger than available-resources.
@@ -252,11 +190,11 @@ local function AllowMorphBuildStep(unitID,teamID)
 		return true
 	end
 
-	if (UnitPriority[unitID] == 2) then  -- priority high
-		if (morphTeamPriorityUnits[teamID] == nil) then 
-			morphTeamPriorityUnits[teamID] = {} 
+	if (UnitMiscPriority[unitID] == 2) then  -- priority high
+		if (teamMiscPriorityUnits[teamID] == nil) then 
+			teamMiscPriorityUnits[teamID] = {} 
 		end
-		morphTeamPriorityUnits[teamID][unitID] = 2
+		teamMiscPriorityUnits[teamID][unitID] = 2
 		return true
 	end 
 	
@@ -272,9 +210,9 @@ local function AllowMorphBuildStep(unitID,teamID)
 	return true
 end
 
-function GG.CheckMorphBuildStep(unitID, teamID, toSpend)
-	if AllowMorphBuildStep(unitID,teamID) then
-		morphTeamDrain[teamID] = morphTeamDrain[teamID] + toSpend
+function GG.CheckMiscPriorityBuildStep(unitID, teamID, toSpend)
+	if AllowMiscBuildStep(unitID,teamID) then
+		miscTeamDrain[teamID] = miscTeamDrain[teamID] + toSpend
 		return true
 	else
 		return false
@@ -345,14 +283,14 @@ function gadget:GameFrame(n)
 					end 
 				end 
 			end
-			for unitID, _ in pairs(morphMetalDrain) do --add morph priority spending
+			for unitID, _ in pairs(miscMetalDrain) do --add misc priority spending
 				local unitDefID = spGetUnitDefID(unitID)
-				local morphPriority = morphTeamPriorityUnits[teamID] and morphTeamPriorityUnits[teamID][unitID]
-				if unitDefID ~= nil and morphPriority then
-					if morphPriority == 2 then 
-						prioSpending = prioSpending + morphMetalDrain[unitID]
+				local pri = teamMiscPriorityUnits[teamID] and teamMiscPriorityUnits[teamID][unitID]
+				if unitDefID ~= nil and pri then
+					if pri == 2 then 
+						prioSpending = prioSpending + miscMetalDrain[unitID]
 					else 
-						lowPrioSpending = lowPrioSpending + morphMetalDrain[unitID]
+						lowPrioSpending = lowPrioSpending + miscMetalDrain[unitID]
 					end 
 				end 
 			end 
@@ -362,14 +300,14 @@ function gadget:GameFrame(n)
 			local level, _, pull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal")
 			local elevel, _, epull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy")
 			
-			-- Make sure the desire to morph is constantly pulling the same value regardless of whether resources are spent
-			pull = pull + morphTeamPull[teamID] - morphTeamDrain[teamID]
-			epull = epull + morphTeamPull[teamID] - morphTeamDrain[teamID]
+			-- Make sure the misc resoucing is constantly pulling the same value regardless of whether resources are spent
+			pull = pull + miscTeamPull[teamID] - miscTeamDrain[teamID]
+			epull = epull + miscTeamPull[teamID] - miscTeamDrain[teamID]
 			
 			--if i == 1 then
 			--	Spring.Echo("*Next Frame*")
-			--	Spring.Echo(morphTeamDrain[teamID])
-			--	Spring.Echo(morphTeamPull[teamID])
+			--	Spring.Echo(miscTeamDrain[teamID])
+			--	Spring.Echo(miscTeamPull[teamID])
 			--	Spring.Echo(pull)
 			--end
 			
@@ -415,7 +353,6 @@ function gadget:GameFrame(n)
 				else
 					TeamScale[teamID] = {0,0} --no  normal spending, no low-Priority spending
 				end
-                
 			elseif (prioSpending > 0 or lowPrioSpending > 0) then --normal situation, or no reserve
 				
 				local normalSpending = pull - lowPrioSpending
@@ -434,50 +371,136 @@ function gadget:GameFrame(n)
 				end 
 			end
 			
-			if i == 1 then
-				Spring.Echo(TeamScale[teamID])
-			end
-            
-			morphTeamDrain[teamID] = 0
+			miscTeamDrain[teamID] = 0
 			SendToUnsynced("ReserveState", teamID, TeamMetalReserved[teamID] or 0, TeamEnergyReserved[teamID] or 0) 
 		end
-		morphTeamPriorityUnits = {} --reset morpher priority list
+		teamMiscPriorityUnits = {} --reset priority list
 		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame)
 		SendToUnsynced("PriorityStats", nil,  0, 0, n)   
 	end
 end
 
 --------------------------------------------------------------------------------
-function GG.AddMorphPriority(unitID,teamID,metalDrain) --remotely add a priority command.
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
-	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if unit not suppose to have Priority command, then: force add priority command
-		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
-		SetPriorityState(unitID, DefaultState)
+function GG.AddMiscPriorityUnit(unitID,teamID) --remotely add a priority command.
+	if not UnitMiscPriority[unitID] then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local ud = UnitDefs[unitDefID]
+		spInsertUnitCmdDesc(unitID, MiscCommandOrder, MiscCommandDesc)
+		SetPriorityState(unitID, DefaultState, CMD_MISC_PRIORITY)
 	end
-	morphTeamPull[teamID] = morphTeamPull[teamID] + metalDrain
-	morphMetalDrain[unitID] = metalDrain
 end
 
-function GG.RemoveMorphPriority(unitID,teamID) --remotely remove a forced priority command.
-	local unitDefID = Spring.GetUnitDefID(unitID)
+function GG.StartMiscPriorityResourcing(unitID,teamID,metalDrain) --remotely add a priority command.
+	if not UnitMiscPriority[unitID] then
+		GG.AddMiscPriorityUnit(unitID,teamID)
+	end
+	miscTeamPull[teamID] = miscTeamPull[teamID] + metalDrain
+	miscMetalDrain[unitID] = metalDrain
+end
+
+function GG.StopMiscPriorityResourcing(unitID,teamID) --remotely remove a forced priority command.
+	miscTeamPull[teamID] = miscTeamPull[teamID] - miscMetalDrain[unitID]
+	miscMetalDrain[unitID] = nil
+end
+
+function GG.RemoveMiscPriorityUnit(unitID,teamID) --remotely remove a forced priority command.
+	if UnitMiscPriority[unitID] then
+		if miscMetalDrain[unitID] then
+			GG.StopMiscPriorityResourcing(unitID,teamID)
+		end
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local ud = UnitDefs[unitDefID]
+		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_MISC_PRIORITY)
+		if (cmdDescID) then
+			spRemoveUnitCmdDesc(unitID, cmdDescID)
+			spSetUnitRulesParam(unitID, "miscpriority", 1) --reset to normal priority so that overhead icon doesn't show wrench
+		end
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_PRIORITY)
+	gadgetHandler:RegisterCMDID(CMD_MISC_PRIORITY)
+
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local teamID = Spring.GetUnitTeam(unitID)
+		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
+	end
+
+end
+
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg:find("mreserve:",1,true) then
+		local _,_,spec,teamID = spGetPlayerInfo(playerID)
+		local amount = msg:sub(10)
+		if spec then return end
+		SetMetalReserved(teamID, amount*1)
+	end	
+	if msg:find("ereserve:",1,true) then
+		local _,_,spec,teamID = spGetPlayerInfo(playerID)
+		local amount = msg:sub(10)
+		if spec then return end
+		SetEnergyReserved(teamID, amount*1)
+	end
+end
+
+function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID) 
+	local prio  = DefaultState
+	if (builderID ~= nil)  then
+		local unitDefID = spGetUnitDefID(builderID)
+		if (unitDefID ~= nil and UnitDefs[unitDefID].isFactory) then 
+			prio = UnitPriority[builderID] or DefaultState  -- inherit priorty from factory
+			LastUnitFromFactory[builderID] = UnitID 
+		end
+	end 	
+	UnitPriority[UnitID] =  prio
+	CommandDesc.params[1] = prio
+	spInsertUnitCmdDesc(UnitID, CommandOrder, CommandDesc)
+end
+
+
+
+function gadget:UnitFinished(unitID, unitDefID, teamID) 
 	local ud = UnitDefs[unitDefID]
-	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if not suppose to have Priority command, then: remove priority command
-		UnitPriority[unitID] = nil --clear build priority for this unit because we assume morpher no longer needed it (because only needed for unit under construction)
+	
+	if ((ud.isFactory or ud.builder) and ud.buildSpeed > 0) then 
+		SetPriorityState(unitID, DefaultState, CMD_PRIORITY)
+	else  -- not a builder priority makes no sense now
+		UnitPriority[unitID] = nil
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PRIORITY)
 		if (cmdDescID) then
 			spRemoveUnitCmdDesc(unitID, cmdDescID)
-			spSetUnitRulesParam(unitID, "buildpriority", 1) --reset to normal priority so that overhead icon doesn't show wrench
-		end			
+		end
+	end 
+
+end 
+
+function gadget:UnitDestroyed(UnitID, unitDefID, teamID) 
+	UnitPriority[UnitID] = nil
+	LastUnitFromFactory[UnitID] = nil
+    local ud = UnitDefs[unitDefID]
+	if UnitMiscPriority[unitID] then
+		GG.RemoveMiscPriorityUnit(unitID,teamID)
 	end
-	morphTeamPull[teamID] = morphTeamPull[teamID] - morphMetalDrain[unitID]
-	morphMetalDrain[unitID] = nil
+    if ud then
+		if ud.metalStorage and ud.metalStorage > 0 and TeamMetalReserved[teamID] then
+			local _, sto = spGetTeamResources(teamID, "metal")
+			if sto and TeamMetalReserved[teamID] > sto - ud.metalStorage then
+				SetMetalReserved(teamID, sto - ud.metalStorage)
+			end
+		end
+		if ud.energyStorage and ud.energyStorage > 0 and TeamEnergyReserved[teamID] then
+			local _, sto = spGetTeamResources(teamID, "energy") - HIDDEN_STORAGE
+			if sto and TeamEnergyReserved[teamID] > sto - ud.energyStorage then
+				SetEnergyReserved(teamID, sto - ud.energyStorage)
+			end
+		end
+    end
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-
 
 --------------------------------------------------------------------------------
 --  END SYNCED

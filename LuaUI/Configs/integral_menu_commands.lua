@@ -3,6 +3,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --FIXME: use this table until state tooltip detection is fixed
 local tooltips = {
 	priority = "Priority: Set construction priority (low, normal, high)",
+	miscpriority = "Misc Priority: Set priority for morph or stockpile (low, normal, high)",
 	retreat = "Retreat: Retreat to closest retreat point at 30/60/90% of health (right-click to disable)",
 	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
 	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
@@ -238,6 +239,8 @@ local overrides = {
 	[CMD_STEALTH] = { texture = {imageDir .. 'states/stealth_off.png', imageDir .. 'states/stealth_on.png'}, text ='', },
 	[CMD_PRIORITY] = { texture = {imageDir .. 'states/wrench_low.png', imageDir .. 'states/wrench_med.png', imageDir .. 'states/wrench_high.png'},
 		text='', tooltip = tooltips.priority},
+	[CMD_MISC_PRIORITY] = { texture = {imageDir .. 'states/wrench_low_other.png', imageDir .. 'states/wrench_med_other.png', imageDir .. 'states/wrench_high_other.png'},
+		text='', tooltip = tooltips.miscpriority},
 	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
 		text='', tooltip = tooltips.factoryGuard,},
 	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, text='', tooltip = tooltips.moveState},
