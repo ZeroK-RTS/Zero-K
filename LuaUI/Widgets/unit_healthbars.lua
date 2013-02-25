@@ -595,6 +595,7 @@ do
         canJump       = (ud.customParams.canjump=="1")or(GetUnitRulesParam(unitID,"jumpReload")),
         maxShield     = ud.shieldPower,
         canStockpile  = ud.canStockpile,
+		gadgetStock   = ud.customParams.stockpiletime,
         reloadTime    = ud.reloadTime,
         primaryWeapon = ud.primaryWeapon-1,
 		maxWaterTank  = ud.customParams.maxwatertank,
@@ -667,7 +668,10 @@ do
       --// STOCKPILE
       if (ci.canStockpile) then
         local stockpileBuild
-        numStockpiled,numStockpileQued,stockpileBuild = GetUnitStockpile(unitID)
+		numStockpiled,numStockpileQued,stockpileBuild = GetUnitStockpile(unitID)
+		if ci.gadgetStock then
+			stockpileBuild = GetUnitRulesParam(unitID,"gadgetStockpile")
+		end
         if (numStockpiled) then
           stockpileBuild = stockpileBuild or 0
           if (stockpileBuild>0) then

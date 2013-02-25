@@ -59,6 +59,7 @@ local StateCount = #CommandDesc.params-1
 local UnitPriority = {}  --  UnitPriority[unitID] = 0,1,2     priority of the unit
 local UnitMiscPriority = {}  --  UnitMiscPriority[unitID] = 0,1,2     priority of the unit
 local TeamPriorityUnits = {}  -- TeamPriorityUnits[TeamID][UnitID] = 0,2    which units are low/high priority builders
+local teamMiscPriorityUnits = {} -- teamMiscPriorityUnits[TeamID][UnitID] = 0,2    which units are low/high priority builders
 local TeamScale = {}  -- TeamScale[TeamID]= {0.1, 0.4}   how much to scale down production of lnormal and low prirotity units
 local TeamMetalReserved = {} -- how much metal is reserved for high priority in each team
 local TeamEnergyReserved = {} -- ditto for energy
@@ -418,7 +419,11 @@ function GG.RemoveMiscPriorityUnit(unitID,teamID) --remotely remove a forced pri
 	end
 end
 
-
+function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
+	if miscMetalDrain[unitID] then
+		GG.StopMiscPriorityResourcing(unitID,oldTeamID)
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

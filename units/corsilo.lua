@@ -27,6 +27,8 @@ unitDef = {
     helptext       = [[The Silencer launches devastating nuclear missiles that can obliterate entire bases. However, it is easily defeated by enemy anti-nuke systems, which must be removed from the desired target area beforehand.]],
     helptext_fr    = [[Le Silencer est long a construire, et il faut qui plus est, ordonner la creation de missiles une fois celui-ci construit. Et pourtant, quel bonheur de r?duire tous vos ennemis en poussi?re en une seconde! Pensez ? v?rifier la pr?sence d'une contre mesure AntiNuke.]],
 	helptext_de    = [[Der Silencer verschießt verwüstende, atomare Raketen, die ganze Basen in Schutt und Asche legen können. Trotzdem kann es von einem feindlichen Anti-Atomsystem geschlagen werden. Aus diesem Grund solltest du dieses zunächst vernichten, bevor du deine Raketen abschießt.]],
+	stockpiletime  = [[180]],
+	stockpilecost  = [[3240]],
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -80,13 +82,11 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      energypershot           = 3240,
       explosionGenerator      = [[custom:LONDON]],
       fireStarter             = 0,
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 65,
-      metalpershot            = 3240,
       model                   = [[crblmsslr.s3o]],
       noSelfDamage            = false,
       range                   = 72000,
@@ -100,7 +100,7 @@ unitDef = {
       startsmoke              = [[1]],
       startVelocity           = 800,
       stockpile               = true,
-      stockpileTime           = 180,
+      stockpileTime           = 10^5,
       targetable              = 1,
       texture1                = [[null]], --flare
       tolerance               = 4000,
