@@ -52,9 +52,19 @@ local TeamMetalReserved = {} -- how much metal is reserved for high priority in 
 local TeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
 
-local morphBuildSpeed = {} --buildspeed for custom unit added thru GG. function
-local morphAllowBuildStep = {} --
+local morphMetalDrain = {} -- metal drain for custom unit added thru GG. function
 local morphTeamPriorityUnits = {} --unit morph that need priority handling
+local morphTeamDrain = {} -- morphTeamDrain[TeamID] = drain	  -- how much morph is actually draining
+local morphTeamPull = {} -- morphTeamPull[TeamID] = pull      -- how much morph is pulling
+
+do
+	local teams = Spring.GetTeamList()
+	for i=1,#teams do
+		local teamID = teams[i]
+		morphTeamDrain[teamID] = 0
+		morphTeamPull[teamID] = 0
+	end
+end
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -224,20 +234,13 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   return true, true  -- command was used, remove it
 end
 
-function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step,morph) 
-	if (step<0) then
-		--// Reclaiming isn't prioritized
-		return true
-	end
+local function AllowMorphBuildStep(unitID,teamID)
 
-	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then -- priority none/low
-		if morph == nil then
-			if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
-			TeamPriorityUnits[teamID][builderID] = 0
-		else
-			if (morphTeamPriorityUnits[teamID] == nil) then morphTeamPriorityUnits[teamID] = {} end
-			morphTeamPriorityUnits[teamID][unitID] = 0
+	if (UnitPriority[unitID] == 0) then -- priority none/low
+		if (morphTeamPriorityUnits[teamID] == nil) then 
+			morphTeamPriorityUnits[teamID] = {} 
 		end
+		morphTeamPriorityUnits[teamID][unitID] = 0
 		local scale = TeamScale[teamID]
 		if scale ~= nil then 
 			if random() < scale[2] then  --if scale[2] is less than 1 then it has less chance of success. scale[2] is a ratio between available-resource and desired-spending.  scale[2] is less than 1 when desired-spending is bigger than available-resources.
@@ -249,14 +252,11 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step,mo
 		return true
 	end
 
-	if (UnitPriority[unitID] == 2 or (UnitPriority[builderID] == 2 and (UnitPriority[unitID] or 1) == 1)) then  -- priority high
-		if morph == nil then
-			if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
-			TeamPriorityUnits[teamID][builderID] = 2
-		else
-			if (morphTeamPriorityUnits[teamID] == nil) then morphTeamPriorityUnits[teamID] = {} end
-			morphTeamPriorityUnits[teamID][unitID] = 2
+	if (UnitPriority[unitID] == 2) then  -- priority high
+		if (morphTeamPriorityUnits[teamID] == nil) then 
+			morphTeamPriorityUnits[teamID] = {} 
 		end
+		morphTeamPriorityUnits[teamID][unitID] = 2
 		return true
 	end 
 	
@@ -269,16 +269,65 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step,mo
 		end
 	end 
 	
-		
+	return true
+end
+
+function GG.CheckMorphBuildStep(unitID, teamID, toSpend)
+	if AllowMorphBuildStep(unitID,teamID) then
+		morphTeamDrain[teamID] = morphTeamDrain[teamID] + toSpend
+		return true
+	else
+		return false
+	end
+end
+
+
+
+function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
+	if (step<0) then
+		--// Reclaiming isn't prioritized
+		return true
+	end
+
+	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then -- priority none/low
+		if (TeamPriorityUnits[teamID] == nil) then 
+			TeamPriorityUnits[teamID] = {} 
+		end
+		TeamPriorityUnits[teamID][builderID] = 0
+		local scale = TeamScale[teamID]
+		if scale ~= nil then 
+			if random() < scale[2] then  --if scale[2] is less than 1 then it has less chance of success. scale[2] is a ratio between available-resource and desired-spending.  scale[2] is less than 1 when desired-spending is bigger than available-resources.
+				return true
+			else 
+				return false
+			end		
+		end
+		return true
+	end
+
+	if (UnitPriority[unitID] == 2 or (UnitPriority[builderID] == 2 and (UnitPriority[unitID] or 1) == 1)) then  -- priority high
+		if (TeamPriorityUnits[teamID] == nil) then 
+			TeamPriorityUnits[teamID] = {} 
+		end
+		TeamPriorityUnits[teamID][builderID] = 2
+		return true
+	end 
+	
+	local scale = TeamScale[teamID]
+	if scale ~= nil then 
+		if random() < scale[1] then
+			return true
+		else 
+			return false
+		end
+	end 
+	
+	
 	return true
 end
 
 function gadget:GameFrame(n)
-	for unitID, _ in pairs(morphBuildSpeed) do --update morphAllowBuildStep when available. (is updated before prioSpending code below)
-		local teamID = Spring.GetUnitTeam(unitID)
-		morphAllowBuildStep[unitID] = gadget:AllowUnitBuildStep(unitID, teamID, unitID, -1, 1, true)
-	end
-	if n % 32 == 15 then 
+	if n % 32 == 1 then 
 		TeamScale = {}
 		local teams = spGetTeamList()
 		for i=1,#teams do
@@ -296,14 +345,14 @@ function gadget:GameFrame(n)
 					end 
 				end 
 			end
-			for unitID, _ in pairs(morphBuildSpeed) do --add morph priority spending
+			for unitID, _ in pairs(morphMetalDrain) do --add morph priority spending
 				local unitDefID = spGetUnitDefID(unitID)
 				local morphPriority = morphTeamPriorityUnits[teamID] and morphTeamPriorityUnits[teamID][unitID]
 				if unitDefID ~= nil and morphPriority then
 					if morphPriority == 2 then 
-						prioSpending = prioSpending + morphBuildSpeed[unitID]
+						prioSpending = prioSpending + morphMetalDrain[unitID]
 					else 
-						lowPrioSpending = lowPrioSpending + morphBuildSpeed[unitID]
+						lowPrioSpending = lowPrioSpending + morphMetalDrain[unitID]
 					end 
 				end 
 			end 
@@ -313,11 +362,25 @@ function gadget:GameFrame(n)
 			local level, _, pull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal")
 			local elevel, _, epull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy")
 			
-			if (TeamMetalReserved[teamID] and level < TeamMetalReserved[teamID]) or (TeamEnergyReserved [teamID] and elevel < TeamEnergyReserved[teamID]) then 
+			-- Make sure the desire to morph is constantly pulling the same value regardless of whether resources are spent
+			pull = pull + morphTeamPull[teamID] - morphTeamDrain[teamID]
+			epull = epull + morphTeamPull[teamID] - morphTeamDrain[teamID]
+			
+			--if i == 1 then
+			--	Spring.Echo("*Next Frame*")
+			--	Spring.Echo(morphTeamDrain[teamID])
+			--	Spring.Echo(morphTeamPull[teamID])
+			--	Spring.Echo(pull)
+			--end
+			
+			local levelWithInc = (income + recieved + level)
+			local elevelWithInc = (eincome + erecieved + elevel)
+			
+			if (TeamMetalReserved[teamID] and levelWithInc < TeamMetalReserved[teamID]) or (TeamEnergyReserved [teamID] and elevelWithInc < TeamEnergyReserved[teamID]) then 
 				-- below reserved level, low and normal no spending
 				TeamScale[teamID] = {0,0}
-			elseif (TeamMetalReserved[teamID] and TeamMetalReserved[teamID] > 0 and level < TeamMetalReserved[teamID] + pull) or 
-					(TeamEnergyReserved[teamID] and TeamEnergyReserved[teamID] > 0 and elevel < TeamEnergyReserved[teamID] + epull) then -- approach reserved level, less low and normal spending
+			elseif (TeamMetalReserved[teamID] and TeamMetalReserved[teamID] > 0 and level <= TeamMetalReserved[teamID] + pull) or 
+					(TeamEnergyReserved[teamID] and TeamEnergyReserved[teamID] > 0 and elevel <= TeamEnergyReserved[teamID] + epull) then -- approach reserved level, less low and normal spending
                     
                 -- both these values are positive and at least one is less than 1
 				local mRatio = (level - (TeamMetalReserved[teamID] or 0))/pull
@@ -325,29 +388,29 @@ function gadget:GameFrame(n)
 				  
 				local spare
 				if mRatio < eRatio then 
-					spare = (income + recieved + level) - (TeamMetalReserved[teamID] or 0) - prioSpending
+					spare = levelWithInc - (TeamMetalReserved[teamID] or 0) - prioSpending
 				else
-					spare = (eincome + erecieved + elevel) - (TeamEnergyReserved[teamID] or 0) - prioSpending
+					spare = elevelWithInc - (TeamEnergyReserved[teamID] or 0) - prioSpending
 				end
 			
 				local normalSpending = pull - lowPrioSpending - prioSpending
-				
+				Spring.Echo(spare)
 				if spare > 0 then
 					if normalSpending <= 0 then
-					 if lowPrioSpending ~= 0 then
-						 TeamScale[teamID] = {0,spare/lowPrioSpending} --no normal spending, but mixed chance for low priority spending
-					 else
-						 TeamScale[teamID] = {0,0} --no normal spending, and no low priority spending, only hi-priority spending
-					 end
+						if lowPrioSpending ~= 0 then
+							TeamScale[teamID] = {0,spare/lowPrioSpending} --no normal spending, but mixed chance for low priority spending
+						else
+							TeamScale[teamID] = {0,0} --no normal spending, and no low priority spending, only hi-priority spending
+						end
 					elseif spare > normalSpending then
-					 spare = spare - normalSpending
-					 if spare > 0 and lowPrioSpending ~= 0 then
-						 TeamScale[teamID] = {1,spare/lowPrioSpending} --full normal spending, and mixed chance low-priority spending
-					 else
-						 TeamScale[teamID] = {1,0} --full normal spending, but no low-priority spending
-					 end
+						spare = spare - normalSpending
+						if spare > 0 and lowPrioSpending ~= 0 then
+							TeamScale[teamID] = {1,spare/lowPrioSpending} --full normal spending, and mixed chance low-priority spending
+						else
+							TeamScale[teamID] = {1,0} --full normal spending, but no low-priority spending
+						end
 					elseif spare > 0 then
-					 TeamScale[teamID] = {spare/normalSpending,0} --mixed chance normal spending, and no low-priority spending
+						TeamScale[teamID] = {spare/normalSpending,0} --mixed chance normal spending, and no low-priority spending
 					end
 				else
 					TeamScale[teamID] = {0,0} --no  normal spending, no low-Priority spending
@@ -370,8 +433,13 @@ function gadget:GameFrame(n)
 					}
 				end 
 			end
+			
+			if i == 1 then
+				Spring.Echo(TeamScale[teamID])
+			end
             
-		SendToUnsynced("ReserveState", teamID, TeamMetalReserved[teamID] or 0, TeamEnergyReserved[teamID] or 0) 
+			morphTeamDrain[teamID] = 0
+			SendToUnsynced("ReserveState", teamID, TeamMetalReserved[teamID] or 0, TeamEnergyReserved[teamID] or 0) 
 		end
 		morphTeamPriorityUnits = {} --reset morpher priority list
 		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame)
@@ -380,18 +448,18 @@ function gadget:GameFrame(n)
 end
 
 --------------------------------------------------------------------------------
-function GG.AddMorphPriority(unitID,buildSpeed) --remotely add a priority command.
+function GG.AddMorphPriority(unitID,teamID,metalDrain) --remotely add a priority command.
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local ud = UnitDefs[unitDefID]
 	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if unit not suppose to have Priority command, then: force add priority command
 		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 		SetPriorityState(unitID, DefaultState)
 	end
-	morphBuildSpeed[unitID]=buildSpeed
-	morphAllowBuildStep[unitID]=false
+	morphTeamPull[teamID] = morphTeamPull[teamID] + metalDrain
+	morphMetalDrain[unitID] = metalDrain
 end
 
-function GG.RemoveMorphPriority(unitID) --remotely remove a forced priority command.
+function GG.RemoveMorphPriority(unitID,teamID) --remotely remove a forced priority command.
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local ud = UnitDefs[unitDefID]
 	if ud and (not ((ud.isFactory or ud.builder) and ud.buildSpeed > 0)) then --if not suppose to have Priority command, then: remove priority command
@@ -402,13 +470,10 @@ function GG.RemoveMorphPriority(unitID) --remotely remove a forced priority comm
 			spSetUnitRulesParam(unitID, "buildpriority", 1) --reset to normal priority so that overhead icon doesn't show wrench
 		end			
 	end
-	morphBuildSpeed[unitID] = nil
-	morphAllowBuildStep[unitID]= nil
+	morphTeamPull[teamID] = morphTeamPull[teamID] - morphMetalDrain[unitID]
+	morphMetalDrain[unitID] = nil
 end
 
-function GG.CheckMorphBuildStep(unitID)
-	return morphAllowBuildStep[unitID] --tell unit_morph.lua about this morph status: allow/pause?
-end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
