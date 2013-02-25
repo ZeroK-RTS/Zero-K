@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.016 Chili Keyboard Menu",
+    desc      = "v0.015 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -767,7 +767,7 @@ end
 local function AddCustomCommands(selectedUnits)
 	for _, unitID in ipairs(selectedUnits) do
 		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if ud and ud.builder and build_menu_use[ud.name] then
+		if ud.builder and build_menu_use[ud.name] then
 			table.insert(widgetHandler.customCommands, {
 				id      = CMD_RADIALBUILDMENU,
 				name	= 'Build',

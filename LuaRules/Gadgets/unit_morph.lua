@@ -466,12 +466,10 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
   end
 
   SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-  GG.AddMorphPriority(unitID,(morphDef.metal/morphDef.time)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
 end
 
 
 local function StopMorph(unitID, morphData)
-  GG.RemoveMorphPriority(unitID) --is using unit_priority.lua gadget to handle morph priority.
   morphUnits[unitID] = nil
   if not morphData.combatMorph then 
     Spring.SetUnitHealth(unitID, { paralyze = -1})
@@ -497,7 +495,6 @@ end
 
 
 local function FinishMorph(unitID, morphData)
-  GG.RemoveMorphPriority(unitID) --is using unit_priority.lua gadget to handle morph priority.
   local udDst = UnitDefs[morphData.def.into]
   local ud = UnitDefs[unitID]
   local defName = udDst.name
@@ -679,8 +676,7 @@ end
 local function UpdateMorph(unitID, morphData)
   if Spring.GetUnitTransporter(unitID) then return true end
 
-  local allow = GG.CheckMorphBuildStep(unitID) --use unit_priority.lua gadget to handle morph priority.
-  if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
+  if (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
     morphData.progress = morphData.progress + morphData.increment
   end
   if (morphData.progress >= 1.0) then
