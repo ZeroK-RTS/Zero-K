@@ -260,18 +260,18 @@ local overrides = {
 	}
 
 -- noone really knows what this table does but it's needed for epic menu to get the hotkey
-local custom_cmd_actions = {
-	-- states are 2, targeted commands (e.g. attack) are 1, instant commands (e.g. selfd) are 3
-	-- can (probably) set to 1 instead of 3 if order doesn't need to be queueable
+local custom_cmd_actions = {	-- states are 2, not states are 1
+
 	--SPRING COMMANDS
-	selfd=3,
+
+	selfd=1,
 	attack=1,
-	stop=3,
+	stop=1,
 	fight=1,
 	guard=1,
 	move=1,
 	patrol=1,
-	wait=3,
+	wait=1,
 	repair=1,
 	reclaim=1,
 	resurrect=1,
@@ -291,21 +291,23 @@ local custom_cmd_actions = {
 	
 	      
 	--CUSTOM COMMANDS
+
 	sethaven=1,
 	--build=1,
 	areamex=1,
+	disembark=1,
 	mine=1,
 	build=1,
 	jump=1,
-	find_pad=3,
-	embark=3,
-	disembark=3,
-	oneclickwep=3,
+	find_pad=1,
+	embark=1,
+	disembark=1,
+	oneclickwep=1,
 	settarget=1,
 	settargetcircle=1,
-	canceltarget=3,
+	canceltarget=1,
 	setferry=1, 
-	radialmenu=3,
+	radialmenu=1,
 	placebeacon=1,
 	buildprev=1,
 	
@@ -317,8 +319,8 @@ local custom_cmd_actions = {
 	restoreground=1,
 	--terraform_internal=1,
 	
-	resetfire=3,
-	resetmove=3,
+	resetfire=1,
+	resetmove=1,
 	
 	--states
 --	stealth=2, --no longer applicable
@@ -336,6 +338,8 @@ local custom_cmd_actions = {
 	autoassist=2,	
 	airstrafe=2,
 	divestate=2,
+	
+	
 }
 
 
