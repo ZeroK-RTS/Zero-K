@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.073 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.074 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -470,10 +470,12 @@ local function UpdateDynamicGroupInfo()
 							gi_energydrain = gi_energydrain - (tonumber(s) or 0)
 						end 
 					else
-						gi_metalincome = gi_metalincome + mm
-						gi_metaldrain = gi_metaldrain + mu
-						gi_energyincome = gi_energyincome + em
-						gi_energydrain = gi_energydrain + eu
+						if mm then --failsafe when switching spectator view.
+							gi_metalincome = gi_metalincome + mm
+							gi_metaldrain = gi_metaldrain + mu
+							gi_energyincome = gi_energyincome + em
+							gi_energydrain = gi_energydrain + eu
+						end
 					end
 					
 					if ud.buildSpeed ~= 0 then
