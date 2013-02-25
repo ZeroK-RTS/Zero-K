@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.111 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.112 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-02-22 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -55,10 +55,10 @@ options_order = {
 	
 	'lblFollow',
 	'followautozoom',
-	'followmaxscrollspeed',
 	'followminscrollspeed',
-	'followzoominspeed',
-	'followzoomoutspeed',
+	'followmaxscrollspeed',
+	--'followzoominspeed',
+	--'followzoomoutspeed',
 	
 	'lblMisc',
 	'overviewmode', 
@@ -73,6 +73,7 @@ options_order = {
 	'persistenttrackmode',
 	'thirdpersontrack',
 	'thirdpersonedgescroll',
+	'followNextPlayer',
 
 	'resetcam',
 	
@@ -82,6 +83,7 @@ options_order = {
 
 local OverviewAction = function() end
 local SetFOV = function(fov) end
+local SelectNextPlayer = function() end
 
 options = {
 	
@@ -205,38 +207,44 @@ options = {
 	},
 	followautozoom = {
 		name = "Auto zoom",
-		desc = "Auto zoom in & out while following player's cursor (zoom level will represent player's focus). \n\nIts best to use default follow speed for this option.",
+		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus, zoom speed is independent of the settings in previous subsection). \n\nDo not enable this if you want fixed zoom level. If enabled, try to use the recommended follow cursor speed.",
 		type = 'bool',
 		value = false,
 	},
 	followminscrollspeed = {
-		name = "On Screen Speed",
-		desc = "Scroll speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
+		name = "On Screen Follow Speed",
+		desc = "Follow speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
 		type = 'number',
 		min = 1, max = 14, step = 1,
 		value = 1,
 	},	
 	followmaxscrollspeed = {
-		name = "Off Screen Speed",
-		desc = "Scroll speed for off-screen cursor. \n\nRecommend: Highest (prevent player cursor from being off-screen too much which is not suitable for auto-zoom function)",
+		name = "Off Screen Follow Speed",
+		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest if auto-zoom is enabled (faster tracking will prevent auto-zoom from zooming out too far)",
 		type = 'number',
 		min = 2, max = 15, step = 1,
 		value = 15,
 	},
 	followzoominspeed = {
 		name = "Follow Zoom-in Speed",
-		desc = "Auto zoom-in factor. \n\nRecommend: Low (better leave this option to low for smoother zoom. Tweak follow speed instead!)",
+		desc = "Zoom-in speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Tweak follow speed instead!)",
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
 	},
 	followzoomoutspeed = {
 		name = "Follow Zoom-out Speed",
-		desc = "Auto zoom-out factor. \n\nRecommend: Low (better leave this option to low for smoother zoom. Use faster follow speed to prevent zoom-out)",
+		desc = "Zoom-out speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Use faster follow speed to prevent zoom-out)",
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
-	},		
+	},
+	followNextPlayer = {
+		name = "Select Next Player",
+		desc = "Quickly select next player. Is useful when spectating using Follow Player Cursor mode & when this button is hotkeyed.",
+		type = 'button',
+		OnChange = function(self) SelectNextPlayer() end, 
+	},	
 	rotfactor = {
 		name = 'Rotation speed',
 		type = 'number',
@@ -780,6 +788,8 @@ local function Altitude(up, s)
 	spSetCameraState(cs, options.smoothness.value)
 	return true
 end
+--==End camera utility function^^ (a frequently used function. Function often used for controlling camera).
+
 
 SetFOV = function(fov)
 	local cs = spGetCameraState()
@@ -859,6 +869,36 @@ OverviewAction = function()
 	overview_mode = not overview_mode
 end
 
+SelectNextPlayer = function ()
+	local currentTeam = Spring.GetLocalTeamID()
+	local playerTableSortTeamID = Spring.GetPlayerRoster(2)
+	local currentTeamIndex, firstPlayerIndex, teamIDIndexGoto
+	for i=1, #playerTableSortTeamID do
+		local teamID = playerTableSortTeamID[i][3]
+		if currentTeam == teamID then --if current selection is this team:  mark this index
+			currentTeamIndex = i
+		end
+		if teamID~= 0 and not firstPlayerIndex then --if spectator portion has finished: mark this index
+			firstPlayerIndex = i
+		end
+	end
+	if currentTeamIndex < firstPlayerIndex then --if current selection is spectator: select random player
+		teamIndexGoto = math.random(firstPlayerIndex,#playerTableSortTeamID)
+	elseif currentTeamIndex < #playerTableSortTeamID then --if player list is still long: go to next index
+		teamIndexGoto = currentTeamIndex + 1
+	elseif currentTeamIndex == #playerTableSortTeamID then --if player list is at end: go to first index
+		teamIndexGoto = firstPlayerIndex
+	end
+	local teamsUnit = Spring.GetTeamUnits(playerTableSortTeamID[teamIndexGoto][3])
+	if teamsUnit and teamsUnit[1] then
+		Spring.SelectUnitArray({teamsUnit[math.random(1,#teamsUnit)],}) --select this player's unit
+	end
+	local selUnits = Spring.GetSelectedUnits()
+	if selUnits and selUnits[1] then
+		Spring.Echo("Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
+	end
+end
+--==End option menu function (function that is attached to epic menu button)^^
 
 
 local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camera while in follow cursor mode)
@@ -1104,7 +1144,7 @@ local function PeriodicWarning()
 		echo('<COFCam> *Periodic warning* Please disable other camera widgets: ' .. c_widgets)
 	end
 end
-
+--==End camera control function^^ (functions that actually do camera control)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
