@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.311 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.312 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-02-07
+    date      = "2009-06-02", --2013-02-24
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -97,17 +97,6 @@ local myCountry = 'wut'
 
 local pathoptions = {}	
 local alloptions = {}	
-local pathorders = {}
-
-WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
-	return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
-end 
-WG.SetWidgetOption = function(wname, path, key, value)  
-	if (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) then
-		local option = alloptions[path..wname .. key]
-		option.OnChange(value)
-	end
-end 
 
 local exitWindowVisible = false
 
@@ -145,11 +134,14 @@ local transkey = {
 	period 			= '.',
 	slash 			= '/',
 	backslash 			= '\\',
+	equals 			= '=',
+	
+	quote 			= "'",
 	
 	kp_multiply		= 'numpad*',
 	kp_divide		= 'numpad/',
-	kp_add			= 'numpad+',
-	kp_subract		= 'numpad-',
+	kp_plus			= 'numpad+',
+	kp_minus		= 'numpad-',
 	kp_period		= 'numpad.',
 	
 	kp0				= 'numpad0',
@@ -186,19 +178,7 @@ local settings = {
 	music_volume = 0.5,
 }
 
---------------------------------------------------------------------------------
 
-WG.crude.SetSkin = function(Skin)
-  if Chili then
-    Chili.theme.skin.general.skinName = Skin
-  end
-end
-
---Reset custom widget settings, defined in Initialize
-WG.crude.ResetSettings 	= function() end
-
---Reset hotkeys, defined in Initialized
-WG.crude.ResetKeys 		= function() end
 
 ----------------------------------------------------------------
 -- Helper Functions
@@ -365,7 +345,9 @@ local function otset(t, key, val)
 			return
 		end
 	end
-	t[#t+1] = {key, val}
+	if val ~= nil then
+		t[#t+1] = {key, val}
+	end
 end
 local function otvalidate(t)
 	for i=1,#t do
@@ -377,20 +359,33 @@ local function otvalidate(t)
 end
 --end cool new framework
 
-local function SaveKeybinds()
-	--[[
-	local file = io.open (keybind_file, "w")
-	if (file== nil) then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
-		return
+--------------------------------------------------------------------------------
+
+WG.crude.SetSkin = function(Skin)
+  if Chili then
+    Chili.theme.skin.general.skinName = Skin
+  end
+end
+
+--Reset custom widget settings, defined in Initialize
+WG.crude.ResetSettings 	= function() end
+
+--Reset hotkeys, defined in Initialized
+WG.crude.ResetKeys 		= function() end
+
+WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
+	--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
+	return (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) or {}
+end 
+WG.SetWidgetOption = function(wname, path, key, value)  
+	if (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) then
+		local option = alloptions[path..wname .. key]
+		option.OnChange(value)
 	end
-	file:write ("local date = " .. keybind_date .. "\n")
-	file:write ("local keybinds = " .. WG.WriteTable(keybounditems, 0, true))
-	file:write ("\nreturn keybinds, date")
-	file:flush()
-	file:close()
-	--]]
-	
+end 
+
+
+local function SaveKeybinds()
 	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
 	--table.save( keybindfile_table, keybind_file )
 	
@@ -399,7 +394,8 @@ local function SaveKeybinds()
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
 		return
 	end
-	file:write ("local keybinds = " .. WG.WriteTable(keybindfile_table, 0, true, true))
+	
+	file:write ("return " .. WG.WriteTable(keybindfile_table, 0, true, true, true))
 	file:flush()
 	file:close()
 	
@@ -412,20 +408,28 @@ local function LoadKeybinds()
 		if file_return then
 			keybounditems, keybind_date = file_return.keybinds, file_return.date
 			if keybounditems and keybind_date then
+				
+				if not otvalidate(keybounditems) then
+					keybounditems = {}
+				end
+				
 				loaded = true
-			
 				keybind_date = keybind_date or defaultkeybind_date	-- reverse compat
+				
+				--echo ('============OVERRIDE??', keybind_date, defaultkeybind_date)
 				
 				if not keybind_date or keybind_date == 0 or (keybind_date+0) < defaultkeybind_date then
 					keybind_date = defaultkeybind_date
-					for action, keybind in pairs(defaultkeybinds) do
-						  --keybounditems[action] = keybind	-- forcibly override any user changes to default binds
-						  otset( keybounditems, action, keybind	)-- forcibly override any user changes to default binds
+					for _,elem in ipairs(defaultkeybinds) do
+						local action = elem[1]
+						local keybind = elem[2]
+						otset( keybounditems, action, keybind)-- forcibly override any user changes to default binds
 					end
 				else
-					for action, keybind in pairs(defaultkeybinds) do
-						  --keybounditems[action] = keybounditems[action] or keybind	-- keep any existing user binds
-						  otset( keybounditems, action, otget( keybounditems, action ) or keybind )
+					for _, elem in ipairs(defaultkeybinds) do
+						local action = elem[1]
+						local keybind = elem[2]
+						otset( keybounditems, action, otget( keybounditems, action ) or keybind )
 					end
 				end
 			end
@@ -440,6 +444,7 @@ local function LoadKeybinds()
 	if not otvalidate(keybounditems) then
 		keybounditems = {}
 	end
+	
 end
 
 --[[
@@ -683,6 +688,7 @@ local function GetReadableHotkeyMod(mod)
 end
 
 local function HotKeyBreakdown(hotkey)
+	hotkey = hotkey:gsub('numpad%+', 'numpadplus')
 	local hotkey_table = explode('+', hotkey)
 	local alt, ctrl, meta, shift
 
@@ -702,16 +708,19 @@ local function HotKeyBreakdown(hotkey)
 		(shift and 'S+' or '')
 	
 	local key = hotkey_table[#hotkey_table]
+	key = key:gsub( 'numpadplus', 'numpad+')
 	
 	return mod, key
 end
 local function GetReadableHotkey(hotkey)
-	if type(hotkey) ~= 'string' then
-		return 'None!'
-	end
 	local mod, key = HotKeyBreakdown(hotkey)
 	return GetReadableHotkeyMod(mod) .. CapCase(key)
 end
+
+local function GetActionHotkeys(action)
+	return Spring.GetActionHotKeys(action)
+end
+
 local function GetActionHotkey(action)
 	local actionHotkeys = Spring.GetActionHotKeys(action)
 	if actionHotkeys and actionHotkeys[1] then
@@ -737,43 +746,28 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 	
 	--actionName = actionName:lower()
 	if type(hotkey) == 'string' then
-		-- don't write to config unless it differs from uikeys
-		local addToKeyboundItems = true
-		--[[
-		local actionHotkeys = Spring.GetActionHotKeys(actionName) or {}
-		for i=1,#actionHotkeys do
-			if hotkey == actionHotkeys[i] then
-				addToKeyboundItems = false
-				break
-			end
-		end
-		]]
+		--otset( keybounditems, actionName, hotkey )
 		
-		if addToKeyboundItems then	
-			--keybounditems[actionName] = hotkey
-			otset( keybounditems, actionName, hotkey )
+		--echo("bind " .. hotkey .. " " .. actionName)
+		spSendCommands("bind " .. hotkey .. " " .. actionName)
+		
+		if custom_cmd_actions[actionName] then
+			local number = custom_cmd_actions[actionName]
+			local isUnitCommand = number == 1
+			local isUnitStateCommand = number == 2
+			local isUnitInstantCommand = number == 3
 			
-			--echo("bind " .. hotkey .. " " .. actionName)
-			Spring.SendCommands("bind " .. hotkey .. " " .. actionName)
-			
-			if custom_cmd_actions[actionName] then
-				local number = custom_cmd_actions[actionName]
-				local isUnitCommand = number == 1
-				local isUnitStateCommand = number == 2
-				local isUnitInstantCommand = number == 3
-				
-				-- bind shift+hotkey as well if needed for unit commands
-				local alreadyShift = hotkey:find("S+")
-				if not alreadyShift then
-					if isUnitCommand then
-						  Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName)
-					elseif isUnitStateCommand or isUnitInstantCommand then
-						  Spring.SendCommands("bind S+" .. hotkey .. " " .. actionName .. " queued")
-					end
+			-- bind shift+hotkey as well if needed for unit commands
+			local alreadyShift = hotkey:lower():find("s+") or hotkey:lower():find("shift+") 
+			if not alreadyShift then
+				if isUnitCommand then
+					  spSendCommands("bind S+" .. hotkey .. " " .. actionName)
+				elseif isUnitStateCommand or isUnitInstantCommand then
+					  spSendCommands("bind S+" .. hotkey .. " " .. actionName .. " queued")
 				end
 			end
-			
 		end
+			
 	end
 end
 
@@ -784,23 +778,30 @@ local function CreateOptionAction(path, option)
 	
 	if option.type == 'bool' then
 		kbfunc = function()
-			if not pathoptions[path] or not pathoptions[path][option.wname..option.key] then
+		
+			local wname = option.wname
+			-- [[
+			if not pathoptions[path] or not otget( pathoptions[path], wname..option.key ) then
 				Spring.Echo("Warning, detected keybind mishap. Please report this info and help us fix it:")
 				Spring.Echo("Option path is "..path)
 				Spring.Echo("Option name is "..option.wname..option.key)
 				if pathoptions[path] then --pathoptions[path] table still intact, but option table missing
 					Spring.Echo("case: option table was missing")
-					pathoptions[path][option.wname..option.key] = option --re-add option table
+					--pathoptions[path][option.wname..option.key] = option --re-add option table
+					otset( pathoptions[path], option.wname..option.key, option ) --re-add option table
 				else --both option table & pathoptions[path] was missing, probably was never initialized
 					Spring.Echo("case: whole path was never initialized")
 					pathoptions[path] = {}
-					pathoptions[path][option.wname..option.key] = option
+					--pathoptions[path][option.wname..option.key] = option
+					otset( pathoptions[path], option.wname..option.key, option )
 				end
 				-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
 			end
-			local wname = option.wname
-			newval = not pathoptions[path][wname..option.key].value	
-			pathoptions[path][wname..option.key].value	= newval
+			--]]
+			local pathoption = otget( pathoptions[path], wname..option.key )
+			newval = not pathoption.value
+			pathoption.value = newval
+			otset( pathoptions[path], wname..option.key, pathoption )
 						
 			option.OnChange({checked=newval})
 			
@@ -813,35 +814,68 @@ local function CreateOptionAction(path, option)
 	AddAction(actionName, kbfunc, nil, "t")
 end
 
--- Unsssign a keybinding from settings and other tables that keep track of related info
-local function UnassignKeyBind(actionName, verbose)
-	local verbose = true
-	local actionHotkey = GetActionHotkey(actionName)
-	if actionHotkey then
-		
-		--[[
-			unbind and unbindaction don't work on a command+params, only on the command itself
-		--]]
-		
-		local actionName_split = explode(' ', actionName)
-		local actionName_cmd = actionName_split[1]
-		
-		--echo("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) 
-		Spring.SendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) -- must be lowercase when calling unbind
-		--Spring.SendCommands("unbindaction " .. actionName )
-		
-		if verbose then
-			echo( 'Unbound hotkeys from action: ' .. actionName )
-		end
-	end
-	--keybounditems[actionName] = nil
-	otset( keybounditems, actionName, nil )
+--remove spring action for this option
+local function RemoveOptionAction(path, option)
+	local actionName = GetActionName(path, option)
+	RemoveAction(actionName)
 end
 
 
-local function AddOption(path, option, wname )
---echo(path, wname, option)
+-- Unsssign a keybinding from settings and other tables that keep track of related info
+local function UnassignKeyBind(actionName, verbose)
+	local actionHotkeys = GetActionHotkeys(actionName)
+	if actionHotkeys then
+		for _,actionHotkey in ipairs(actionHotkeys) do
+				
+			--[[
+				unbind and unbindaction don't work on a command+params, only on the command itself
+			--]]
+			
+			local actionName_split = explode(' ', actionName)
+			local actionName_cmd = actionName_split[1]
+			
+			--echo("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) 
+			spSendCommands("unbind " .. actionHotkey .. ' ' .. actionName_cmd:lower()) -- must be lowercase when calling unbind
+			--spSendCommands("unbindaction " .. actionName ) --don't do this, unbinding one select would unbind all.
+			
+			if verbose then
+				echo( 'Unbound hotkeys from action: ' .. actionName )
+			end
+		end
+	end
+	--otset( keybounditems, actionName, nil )
+end
 
+--unassign and reassign keybinds
+local function ReApplyKeybinds()
+	--[[
+	To migrate from uikeys:
+	Find/Replace:
+	bind\s*(\S*)\s*(.*)
+	{ "\2", "\1" },
+	]]
+	--echo 'ReApplyKeybinds'
+	for _,elem in ipairs(keybounditems) do
+		local actionName = elem[1]
+		local hotkey = elem[2]
+		--actionName = actionName:lower()
+		UnassignKeyBind(actionName, false)
+		
+		if type(hotkey) == 'table' then
+			for _,hotkey2 in ipairs(hotkey) do
+				AssignKeyBindAction(hotkey2, actionName, false)
+			end
+		else
+			AssignKeyBindAction(hotkey, actionName, false)
+		end
+		
+		--echo("unbindaction(1) ", actionName)
+		--echo("bind(1) ", hotkey, actionName)
+	end
+end
+
+local function AddOption(path, option, wname )
+	--echo(path, wname, option)
 	if not wname then
 		wname = path
 	end
@@ -850,7 +884,6 @@ local function AddOption(path, option, wname )
 	if not option then
 		if not pathoptions[path] then
 			pathoptions[path] = {}
-			pathorders[path] = {}
 		end
 		local pathexploded = explode('/',path)
 		local pathend = pathexploded[#pathexploded]
@@ -897,13 +930,14 @@ local function AddOption(path, option, wname )
 		end
 	end
 	
-	if option.default == nil then
+	if option.type ~= 'button' and option.type ~= 'label' and option.default == nil then
 		if option.value ~= nil then
 			option.default = option.value
 		else
 			option.default = newval
 		end	
 	end
+	
 	
 	if newval ~= nil and option.value ~= newval then --must nilcheck newval
 		valuechanged = true
@@ -919,7 +953,7 @@ local function AddOption(path, option, wname )
 		controlfunc = 
 			function(self)
 				if option.action then --if keybindings supplied by widgets
-					Spring.SendCommands{option.action} 
+					spSendCommands{option.action} 
 				end
 			end
 	elseif option.type == 'bool' then
@@ -978,7 +1012,7 @@ local function AddOption(path, option, wname )
 				option.value = key
 				settings.config[fullkey] = option.value
 			end
-	elseif option.type == 'listBool' then
+	elseif option.type == 'radioButton' then
 		controlfunc = 
 			function(key)
 				option.value = key
@@ -1018,21 +1052,11 @@ local function AddOption(path, option, wname )
 		
 		CreateOptionAction(path, option)
 		
-		local actionHotkey = GetActionHotkey(actionName)
-		--local hotkey = keybounditems[actionName] or option.hotkey or actionHotkey
-		local hotkey = otget( keybounditems, actionName ) or option.hotkey or actionHotkey
-		if hotkey and hotkey ~= 'none' then
-			--if actionHotkey then
-				UnassignKeyBind(actionName)
-			--end
-			AssignKeyBindAction(hotkey, actionName, false)
-		end
-		
 	--needs more work
-	elseif option.type == 'listBool' then --if its a list of checkboxes:
-		for i=1, #option.items do
+	elseif option.type == 'radioButton' then --if its a list of checkboxes:
+		for i=1, #option.items do --prepare keybinds for each of radioButton's checkbox
 			local item = {} 
-			item.wname = wname -- wname is needed by Hotkey to 'AddAction'
+			item.wname = wname.."radioButton" -- wname is needed by Hotkey to 'AddAction'
 			item.key = option.items[i].key
 			item.hotkey = option.items[i].hotkey
 			item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item's key). Is needed for Hotkey
@@ -1042,41 +1066,23 @@ local function AddOption(path, option, wname )
 			  orig_hotkey = item.hotkey
 			  item.orig_hotkey = orig_hotkey
 			end
-			local actionHotkey = GetActionHotkey(actionName)
-			--local hotkey = keybounditems[actionName] or item.hotkey or actionHotkey
-			local hotkey = otget( keybounditems, actionName ) or item.hotkey or actionHotkey
-			if hotkey and hotkey ~= 'none' then
-				--if actionHotkey then
-					UnassignKeyBind(actionName)
-				--end
-				AssignKeyBindAction(hotkey, actionName, false)
-			end
-			--finishing:
-			alloptions[path..wname..item.key] = item --is used for reset keybinds		
+			
+			CreateOptionAction(path,item)
+			
+			alloptions[path..wname..item.key] = item --is used to store options but will not be used to make button. Is for random stuff now.
 		end			
 	end
 	
-	pathoptions[path][wname..option.key] = option --is used for epicMenu button(s) remake (is epicMenu's memory)
-	alloptions[path..wname..option.key] = option --is used for reset keybinds
-	local temp = #(pathorders[path])
-	pathorders[path][temp+1] = wname..option.key --is used for layout???
+	otset( pathoptions[path], wname..option.key, option )--is used for remake epicMenu's button(s)
+	alloptions[path..wname..option.key] = option --is used for random stuff now.
+	
 end
 
 local function RemOption(path, option, wname )
-	if not pathorders[path] then
-		--this occurs when a widget unloads itself inside :init
-		--echo ('<epic menu> error #333 ', wname, path)
-		--echo ('<epic menu> ...error #333 ', (option and option.key) )
-		return
-	end
-	for i=1, #pathorders[path] do
-		if pathorders[path][i] == (wname..option.key) then
-			table.remove(pathorders[path], i)
-		end
-	end
-	pathoptions[path][wname..option.key] = nil
+	RemoveOptionAction(path, option)	
+	otset( pathoptions[path], wname..option.key, nil )
 	alloptions[path..wname..option.key] = nil
-	if option.type == 'listBool' then
+	if option.type == 'radioButton' then
 		for i=1, #option.items do
 			local itemsKey = option.items[i].key
 			alloptions[path..wname..itemsKey] = nil
@@ -1118,7 +1124,6 @@ local function PreIntegrateWidget(w)
 			return
 		end
 		
-	
 		option.key = k
 		option.wname = wname
 	end
@@ -1249,6 +1254,9 @@ local function IntegrateWidget(w, addoptions, index)
 	
 	MakeSubWindow(curPath)
 	
+	
+	ReApplyKeybinds()
+	
 end
 
 --Store custom widget settings for all active widgets
@@ -1285,9 +1293,9 @@ local function MakeKeybindWindow( path, option, hotkey )
 	get_key = true
 	kb_path = path
 	kb_action = GetActionName(path, option)
-	--if hotkey then
-		UnassignKeyBind(kb_action)	
-	--end
+	
+	UnassignKeyBind(kb_action, true) -- 2nd param = verbose
+	otset( keybounditems, kb_action, nil )
 		
 	window_getkey = Window:New{
 		caption = 'Set a HotKey',
@@ -1312,6 +1320,9 @@ WG.crude.GetHotkey = function(actionName)
 	local hotkey = otget( keybounditems, actionName ) or actionHotkey
 	if not hotkey or hotkey == 'none' then
 		return ''
+	end
+	if type(hotkey) == 'table' then
+		hotkey = hotkey[1]
 	end
 	return GetReadableHotkey(hotkey) 
 end
@@ -1339,6 +1350,9 @@ local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
 	--local hotkey = keybounditems[actionName]
 	local hotkey = otget( keybounditems, actionName )
+	if type(hotkey) == 'table' then
+		hotkey = hotkey[1]
+	end
 	if hotkey and hotkey ~= 'none' then
 		return GetReadableHotkey(hotkey) 
 	end
@@ -1395,22 +1409,25 @@ local function MakeHotkeyedControl(control, path, option)
 end
 
 local function ResetWinSettings(path)
-	for _,optionkey in ipairs(pathorders[path]) do
-		local option = pathoptions[path][optionkey]
-		if option.default ~= nil then --fixme : need default
-			if option.type == 'bool' or option.type == 'number' then
-				option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
-				option.checked = option.value
-				option.OnChange(option)
-			elseif option.type == 'list' or option.type == 'listBool' then
-				option.value = option.default
-				option.OnChange(option.default)
-			elseif option.type == 'colors' then
-				option.color = option.default
-				option.OnChange(option)
+	for _,elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+		
+		if not ({button=1, label=1, menu=1})[option.type] then
+			if option.default ~= nil then --fixme : need default
+				if option.type == 'bool' or option.type == 'number' then
+					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
+					option.checked = option.value
+					option.OnChange(option)
+				elseif option.type == 'list' or option.type == 'radioButton' then
+					option.value = option.default
+					option.OnChange(option.default)
+				elseif option.type == 'colors' then
+					option.color = option.default
+					option.OnChange(option)
+				end
+			else
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Error #627', option.name, option.type)
 			end
-		else
-			Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Error #627', option.name)
 		end
 	end
 end
@@ -1436,15 +1453,15 @@ MakeSubWindow = function(path)
 	explodedpath[#explodedpath] = nil
 	local parent_path = table.concat(explodedpath,'/')
 	
-	local settings_height = #(pathorders[path]) * B_HEIGHT
+	local settings_height = #(pathoptions[path]) * B_HEIGHT
 	local settings_width = 270
 	
 	local tree_children = {}
 	local hotkeybuttons = {}
 	
-	for _,optionkey in ipairs(pathorders[path]) do
-		local option = pathoptions[path][optionkey]
-		
+	for _,elem in ipairs(pathoptions[path]) do
+		local option = elem[2]
+
 		local optionkey = option.key
 		
 		--fixme: shouldn't be needed
@@ -1463,7 +1480,7 @@ MakeSubWindow = function(path)
 			
 			if option.wname == 'epic' then --menu
 				local menupath = option.desc
-				if pathorders[menupath] and #(pathorders[menupath]) == 0 then
+				if pathoptions[menupath] and #(pathoptions[menupath]) == 0 then
 					hide = true
 					settings_height = settings_height - B_HEIGHT
 				end
@@ -1551,11 +1568,11 @@ MakeSubWindow = function(path)
 				items = items;
 			}
 			]]--
-		elseif option.type == 'listBool' then	
+		elseif option.type == 'radioButton' then	
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
 			for i=1, #option.items do
 				local item = {} 
-				item.wname = option.wname -- wname is needed by Hotkey to 'AddAction'
+				item.wname = option.wname.."radioButton"	-- wname is needed by Hotkey to 'AddAction'
 				item.name = option.items[i].name --is needed by checkbox caption
 				item.key = option.items[i].key --is needed to set checkbox status
 				item.desc = option.items[i].desc --is needed for checkbox tooltip
@@ -1846,7 +1863,7 @@ local function MakeMenuBar()
 								width=70,
 								trackColor = color.main_fg,
 								value = spGetConfigInt("snd_volmaster", 50),
-								OnChange = { function(self)	Spring.SendCommands{"set snd_volmaster " .. self.value} end	},
+								OnChange = { function(self)	spSendCommands{"set snd_volmaster " .. self.value} end	},
 							},
 							
 							Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width= 18,height= 18, },
@@ -1983,8 +2000,8 @@ end
 
 function widget:Initialize()
 	
-	Spring.SendCommands("unbindaction quitmenu") -- http://springrts.com/mantis/view.php?id=2944
-	--Spring.SendCommands("unbindall") 
+	--spSendCommands("unbindaction quitmenu") -- http://springrts.com/mantis/view.php?id=2944
+	spSendCommands("unbindall") 
 	
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget)
@@ -1993,8 +2010,8 @@ function widget:Initialize()
 	init = true
 	
 	
-	Spring.SendCommands("unbindaction hotbind")
-	Spring.SendCommands("unbindaction hotunbind")
+	spSendCommands("unbindaction hotbind")
+	spSendCommands("unbindaction hotunbind")
 	
 
 	-- setup Chili
@@ -2081,31 +2098,10 @@ function widget:Initialize()
 	
 	-- clear all keybindings
 	WG.crude.ResetKeys = function()
-		--for actionName,_ in pairs(keybounditems) do
-		for _,elem in ipairs(keybounditems) do
-			local actionName = elem[1]
-			--local actionNameL = actionName:lower()
-			local actionNameL = actionName
-			--echo("unbindaction(1) " .. actionNameL)
-			Spring.SendCommands({"unbindaction " .. actionNameL})
-		end
-		
 		keybounditems = {}
 		keybounditems = CopyTable(defaultkeybinds, true)
 		
-		for _,elem in ipairs(keybounditems) do
-			local actionName = elem[1]
-			local hotkey = elem[2]
-			AssignKeyBindAction(hotkey, actionName, false)
-		end
-		
-		for _,option in pairs(alloptions) do
-		    if option.orig_hotkey and type(option.orig_hotkey) == 'string' then
-				local actionName = GetActionName(option.path, option)
-				AssignKeyBindAction(option.orig_hotkey, actionName, false)
-		    end
-		end
-		
+		ReApplyKeybinds()
 		echo 'Reset all hotkeys to default.'
 	end
 	
@@ -2113,14 +2109,16 @@ function widget:Initialize()
 	AddAction("crudemenu", ActionMenu, nil, "t")
 	AddAction("exitwindow", ActionExitWindow, nil, "t")
 	-- replace default keybinds for quitmenu
-	Spring.SendCommands({
+	spSendCommands({
 		"unbind esc quitmessage",
 		"unbind esc quitmenu", --Upgrading to 0.82 doesn't change existing uikeys so pre-0.82 keybinds still apply.
 	})
-	Spring.SendCommands("bind esc crudemenu")
-	Spring.SendCommands("bind shift+esc exitwindow")
+	spSendCommands("bind esc crudemenu")
+	spSendCommands("bind shift+esc exitwindow")
 
 	MakeMenuBar()
+	
+	ReApplyKeybinds()
 	
 	-- Override widgethandler functions for the purposes of alerting crudemenu 
 	-- when widgets are loaded, unloaded or toggled
@@ -2196,12 +2194,12 @@ function widget:Shutdown()
  
   -- restore key binds
   --[[
-  Spring.SendCommands({
+  spSendCommands({
     "bind esc quitmessage",
     "bind esc quitmenu", -- FIXME made for licho, removed after 0.82 release
   })
   --]]
-  Spring.SendCommands("unbind esc crudemenu")
+  spSendCommands("unbind esc crudemenu")
 end
 
 
@@ -2270,9 +2268,13 @@ function widget:KeyPress(key, modifier, isRepeat)
 		--local hotkey = { key = translatedkey, mod = modstring, }		
 		local hotkey = modstring .. translatedkey	
 		
-		if key ~= KEYSYMS.ESCAPE then		
+		if key ~= KEYSYMS.ESCAPE then
+			--otset( keybounditems, kb_action, hotkey )
 			AssignKeyBindAction(hotkey, kb_action, true) -- param4 = verbose
+			otset( keybounditems, kb_action, hotkey )
+	
 		end
+		ReApplyKeybinds()
 		
 		if kb_path == curPath then
 			MakeSubWindow(kb_path)
@@ -2305,7 +2307,7 @@ function WG.crude.ShowMenu() --// allow other widget to toggle-up Epic-Menu. Thi
 	end
 end
 
---// [[ see comments in epicmenu conf (about "listbool" camera option). UPDATE: propose re-enable "listbool" camera option
+--// [[ see comments in epicmenu conf (about "radioButton" camera option). UPDATE: propose re-enable "radioButton" camera option
 do --Set our prefered camera mode when first screen frame is drawn. The engine always go to default TA at first screen frame, so we need to re-apply our camera settings.
 	if Spring.GetGameFrame() == 0 then  --we check if this code is run at midgame (due to /reload). In that case we don't need to re-apply settings (the camera mode is already set at gui_epicmenu.lua\AddOption()).
 		local screenFrame = 0

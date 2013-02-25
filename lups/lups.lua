@@ -346,7 +346,8 @@ function AddParticles(Class,Options   ,__id)
 
   --// piecename to piecenum conversion (spring >=76b1 only!)
   if (Options.unit and Options.piece) then
-    Options.piecenum = spGetUnitPieceMap(Options.unit)[Options.piece]
+    local pieceMap = spGetUnitPieceMap(Options.unit)
+    Options.piecenum = pieceMap and pieceMap[Options.piece] --added check. switching spectator view can cause "attempt to index a nil value"
     if (not Options.piecenum) then
       local udid = Spring.GetUnitDefID(Options.unit)
       if (not udid) then
