@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.112 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.111 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16", --2013-02-22 (msafwan)
+    date      = "2011-03-16", --2013-02-26 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -73,7 +73,6 @@ options_order = {
 	'persistenttrackmode',
 	'thirdpersontrack',
 	'thirdpersonedgescroll',
-	'followNextPlayer',
 
 	'resetcam',
 	
@@ -239,12 +238,6 @@ options = {
 		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
 	},
-	followNextPlayer = {
-		name = "Select Next Player",
-		desc = "Quickly select next player. Is useful when spectating using Follow Player Cursor mode & when this button is hotkeyed.",
-		type = 'button',
-		OnChange = function(self) SelectNextPlayer() end, 
-	},	
 	rotfactor = {
 		name = 'Rotation speed',
 		type = 'number',
@@ -867,36 +860,6 @@ OverviewAction = function()
 	end
 	
 	overview_mode = not overview_mode
-end
-
-SelectNextPlayer = function ()
-	local currentTeam = Spring.GetLocalTeamID()
-	local playerTableSortTeamID = Spring.GetPlayerRoster(2)
-	local currentTeamIndex, firstPlayerIndex, teamIDIndexGoto
-	for i=1, #playerTableSortTeamID do
-		local teamID = playerTableSortTeamID[i][3]
-		if currentTeam == teamID then --if current selection is this team:  mark this index
-			currentTeamIndex = i
-		end
-		if teamID~= 0 and not firstPlayerIndex then --if spectator portion has finished: mark this index
-			firstPlayerIndex = i
-		end
-	end
-	if currentTeamIndex < firstPlayerIndex then --if current selection is spectator: select random player
-		teamIndexGoto = math.random(firstPlayerIndex,#playerTableSortTeamID)
-	elseif currentTeamIndex < #playerTableSortTeamID then --if player list is still long: go to next index
-		teamIndexGoto = currentTeamIndex + 1
-	elseif currentTeamIndex == #playerTableSortTeamID then --if player list is at end: go to first index
-		teamIndexGoto = firstPlayerIndex
-	end
-	local teamsUnit = Spring.GetTeamUnits(playerTableSortTeamID[teamIndexGoto][3])
-	if teamsUnit and teamsUnit[1] then
-		Spring.SelectUnitArray({teamsUnit[math.random(1,#teamsUnit)],}) --select this player's unit
-	end
-	local selUnits = Spring.GetSelectedUnits()
-	if selUnits and selUnits[1] then
-		Spring.Echo("Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
-	end
 end
 --==End option menu function (function that is attached to epic menu button)^^
 

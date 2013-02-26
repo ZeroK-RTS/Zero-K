@@ -239,12 +239,6 @@ path='Settings/Interface/Mouse Cursor'
 		springsetting = 'HardwareCursor',
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	} )	
-path='Settings/Interface/Spectating'
-	ShLabel('Spectator View/Selection')
-	ShButton('View Chosen Player', function() spSendCommands{"specfullview 0"} end )
-	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
-	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
-	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
 
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 path='Settings/Misc'
