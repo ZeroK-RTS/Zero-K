@@ -228,7 +228,7 @@ function widgetHandler:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	etaTable[unitID] = nil
 end
 
-local terraunitDefID = UnitDefNames["terraunit"].id
+local terraunitDefID = UnitDefNames["terraunit"] and UnitDefNames["terraunit"].id
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if unitDefID ~= terraunitDefID then

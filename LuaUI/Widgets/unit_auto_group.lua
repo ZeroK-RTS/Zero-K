@@ -1,4 +1,4 @@
-local versionNum = '3.03'
+local versionNum = '3.031'
 
 function widget:GetInfo()
   return {
@@ -40,12 +40,15 @@ include("keysym.h.lua")
 local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
-local groupableBuildings = {
-	[UnitDefNames["tacnuke"].id] = true,
-	[UnitDefNames["empmissile"].id] = true,
-	[UnitDefNames["napalmmissile"].id] = true,
-	[UnitDefNames["seismic"].id] = true,
-}
+local groupableBuildingTypes = { 'tacnuke', 'empmissile', 'napalmmissile', 'seismic' }
+
+local groupableBuildings = {}
+for _, v in ipairs( groupableBuildingTypes ) do
+	if UnitDefNames[v] then
+		groupableBuildings[ UnitDefNames[v].id ] = true
+	end
+end
+
 
 local helpText =
 	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
