@@ -200,12 +200,18 @@ path='Settings/Camera'
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
 	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
-path='Settings/Camera/Old Camera Shortcut'	
+path='Settings/Camera/Old Camera Shortcuts'	
 	ShButton( 'Total Annihilation', 'viewta' )
 	ShButton( 'FPS', 'viewfps' )
 	ShButton( 'Free', 'viewfree' )
 	ShButton( 'Rotatable Overhead', 'viewrot' )
-	ShButton( 'Total War', 'viewtw' )	
+	ShButton( 'Total War', 'viewtw' )
+	ShLabel('')
+	ShButton( 'Move Forward', 'moveforward' )	
+	ShButton( 'Move Back', 'moveback' )	
+	ShButton( 'Move Left', 'moveleft' )	
+	ShButton( 'Move Right', 'moveright' )	
+	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 path='Settings/HUD Panels'
