@@ -1,8 +1,9 @@
 function widget:GetInfo()
   return {
     name     = "Spectate Selected Team",
-    desc     = "Automatically spectate team base on selected units.",
+    desc     = "Automatically spectate team based on selected units, and other spectate options.",
     author   = "SirMaverick",
+    version  = "0.200", --has added options
     date     = "2010", --2013
     license  = "GNU GPL, v2 or later",
     layer     = 0,
@@ -20,7 +21,7 @@ local team
 local SelectNextPlayer = function() end
 
 options_path = 'Settings/Interface/Spectating'
-options_order = {'followNextPlayer','speviesel',}
+options_order = {'followNextPlayer','specviewselection',}
 options={
 	followNextPlayer = {
 		name = "Select Next Player",
@@ -28,25 +29,25 @@ options={
 		type = 'button',
 		OnChange = function(self) SelectNextPlayer() end, 
 	},
-	speviesel = {
+	specviewselection = {
 		type='radioButton', 
 		name='Spectator View Selection',
 		items = {
-			{name = 'View Chosen Player',key='viechopla', desc="Strictly using point-of-view of current player.", hotkey=nil},
-			{name = 'View All',key='vieall', desc="Unlimited line-of-sight, but you can only select current player's unit.", hotkey=nil},
-			{name = 'Select Any Unit',key='selanyuni', desc="Point-on-view of current player, and you can select any unit.", hotkey=nil},
-			{name = 'View All & Select Any',key='vieallandselany', desc="Unlimited line-of-sight, and you can select any unit.", hotkey=nil},
+			{name = 'View Chosen Player',key='viewchosenplayer', desc="Point-of-view of current player and you can only select the current player's units.", hotkey=nil},
+			{name = 'View All',key='viewall', desc="Unlimited line-of-sight, but you can only select current player's units.", hotkey=nil},
+			{name = 'Select Any Unit',key='selectanyunit', desc="Point-of-view of current player, and you can select any unit.", hotkey=nil},
+			{name = 'View All & Select Any',key='viewallselectany', desc="Unlimited line-of-sight, and you can select any unit.", hotkey=nil},
 		},
-		value = 'vieallandselany',
+		value = 'viewallselectany',
 		OnChange = function(self)
 			local key = self.value
-			if key == 'viechopla' then
+			if key == 'viewchosenplayer' then
 				spSendCommands{"specfullview 0"}
-			elseif key == 'vieall' then
+			elseif key == 'viewall' then
 				spSendCommands{"specfullview 1"}
-			elseif key == 'selanyuni' then
+			elseif key == 'selectanyunit' then
 				spSendCommands{"specfullview 2"}
-			elseif key == 'vieallandselany' then
+			elseif key == 'viewallselectany' then
 				spSendCommands{"specfullview 3"}
 			end
 		end,
@@ -103,7 +104,7 @@ SelectNextPlayer = function ()
 		elseif currentTeamIndex == #playerTableSortTeamID then --if player list is at end: go to first index
 			teamIndexGoto = firstPlayerIndex
 		end
-		if (options.speviesel.value == 'vieallandselany') then --if View & select all, then: 
+		if (options.specviewselection.value == 'viewallselectany') then --if View & select all, then: 
 			local teamsUnit = Spring.GetTeamUnits(playerTableSortTeamID[teamIndexGoto][3])
 			if teamsUnit and teamsUnit[1] then
 				Spring.SelectUnitArray({teamsUnit[math.random(1,#teamsUnit)],}) --select this player's unit
