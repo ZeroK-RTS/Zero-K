@@ -27,6 +27,7 @@ local thirdperson_trackunit = false
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Camera/Advanced Camera Config'
+local cursorFollowPath = 'Settings/Camera/Cursor Following'
 options_order = { 
 	'helpwindow', 
 	
@@ -53,7 +54,8 @@ options_order = {
 	'zoominfactor', 
 	'zoomoutfactor',	
 	
-	'lblFollow',
+	--'lblFollow',
+	'follow',
 	'followautozoom',
 	'followminscrollspeed',
 	'followmaxscrollspeed',
@@ -62,7 +64,6 @@ options_order = {
 	
 	'lblMisc',
 	'overviewmode', 
-	'follow',
 	'smoothness',
 	'fov',
 	--'restrictangle',
@@ -90,7 +91,7 @@ options = {
 	lblRotate = {name='Rotation', type='label'},
 	lblScroll = {name='Scrolling', type='label'},
 	lblZoom = {name='Zooming', type='label'},
-	lblFollow = {name='Follow Cursor', type='label'},
+	--lblFollow = {name='Follow Cursor', type='label'},
 	lblMisc = {name='Misc.', type='label'},
 	
 	helpwindow = {
@@ -196,19 +197,22 @@ options = {
 		type = 'bool',
 		value = true,
 	},
+	
+	-- follow cursor
 	follow = {
 		name = "Follow player's cursor",
 		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on). \n\nSee \"Advanced Camera Config\" (under Follow Cursor subsection) for more option. ",
 		type = 'bool',
 		value = false,
 		hotkey = {key='l', mod='alt+'},
-		path = 'Settings/Camera',
+		path = cursorFollowPath,
 	},
 	followautozoom = {
 		name = "Auto zoom",
 		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus, zoom speed is independent of the settings in previous subsection). \n\nDo not enable this if you want fixed zoom level. If enabled, try to use the recommended follow cursor speed.",
 		type = 'bool',
 		value = false,
+		path = cursorFollowPath,
 	},
 	followminscrollspeed = {
 		name = "On Screen Follow Speed",
@@ -216,6 +220,7 @@ options = {
 		type = 'number',
 		min = 1, max = 14, step = 1,
 		value = 1,
+		path = cursorFollowPath,
 	},	
 	followmaxscrollspeed = {
 		name = "Off Screen Follow Speed",
@@ -223,6 +228,7 @@ options = {
 		type = 'number',
 		min = 2, max = 15, step = 1,
 		value = 15,
+		path = cursorFollowPath,
 	},
 	followzoominspeed = {
 		name = "Follow Zoom-in Speed",
@@ -230,6 +236,7 @@ options = {
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
+		path = cursorFollowPath,
 	},
 	followzoomoutspeed = {
 		name = "Follow Zoom-out Speed",
@@ -237,7 +244,10 @@ options = {
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
+		path = cursorFollowPath,
 	},
+	-- end follow cursor
+	
 	rotfactor = {
 		name = 'Rotation speed',
 		type = 'number',
@@ -353,7 +363,7 @@ options = {
 	},
 	resetcam = {
 		name = "Reset Camera",
-		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Shift> + <Middleclick>",
+		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Middleclick>",
 		type = 'button',
         -- OnChange defined later
 	},
