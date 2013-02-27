@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.016 Chili Keyboard Menu",
+    desc      = "v0.017 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -679,7 +679,7 @@ local function AddBuildStructureButton(item, index)
 		height = '80%',
 	})
 	if menu_level ~= 0 then
-		button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, bottom=0, fontShadow = true,  } )
+		button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', height='20%', fontSize = 11, bottom=0, fontShadow = true,  } )
 	end
 end
 
