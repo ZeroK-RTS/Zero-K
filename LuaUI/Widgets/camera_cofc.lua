@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.111 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.112 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-02-26 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -73,7 +73,6 @@ options_order = {
 	'trackmode',
 	'persistenttrackmode',
 	'thirdpersontrack',
-	'thirdpersonedgescroll',
 
 	'resetcam',
 	
@@ -201,7 +200,7 @@ options = {
 	-- follow cursor
 	follow = {
 		name = "Follow player's cursor",
-		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on). \n\nSee \"Advanced Camera Config\" (under Follow Cursor subsection) for more option. ",
+		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
 		type = 'bool',
 		value = false,
 		hotkey = {key='l', mod='alt+'},
@@ -209,7 +208,7 @@ options = {
 	},
 	followautozoom = {
 		name = "Auto zoom",
-		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus, zoom speed is independent of the settings in previous subsection). \n\nDo not enable this if you want fixed zoom level. If enabled, try to use the recommended follow cursor speed.",
+		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus). \n\nDo not enable this if you want fixed zoom level. If enabled, try to use the recommended follow cursor speed.",
 		type = 'bool',
 		value = false,
 		path = cursorFollowPath,
@@ -319,7 +318,7 @@ options = {
 	
 	trackmode = {
 		name = "Enter Trackmode",
-		desc = "Track the selected unit (midclick to cancel)",
+		desc = "Track the selected unit (mouse midclick to exit mode)",
 		type = 'button',
         hotkey = {key='t', mod='alt+'},
 		OnChange = function(self) trackmode = true; end,
@@ -327,14 +326,14 @@ options = {
 	
 	persistenttrackmode = {
 		name = "Persistent trackmode state",
-		desc = "Trackmode will not cancel unless user press midclick",
+		desc = "Trackmode will not cancel when deselect unit. Trackmode will always track new unit selection unless user press mouse midclick.",
 		type = 'bool',
 		value = false,
 	},
     
     thirdpersontrack = {
 		name = "Enter 3rd Person Trackmode",
-		desc = "Track the selected unit (midclick to cancel)",
+		desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, and move mouse to edge of screen to jump to current unit selection.",
 		type = 'button',
 		hotkey = {key='k', mod='alt+'},
 		OnChange = function(self)
@@ -353,13 +352,6 @@ options = {
 				thirdperson_trackunit = false
 			end
         end,
-	},
-    
- 	thirdpersonedgescroll = {
-		name = "3rd Person Trackmode Retarget",
-		desc = "When in 3rd Person Trackmode, use the arrow keys to follow a nearby unit.",
-		type = 'bool',
-		value = true,
 	},
 	resetcam = {
 		name = "Reset Camera",
@@ -1301,9 +1293,9 @@ function widget:Update(dt)
 		rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
 		then
 		
-		if options.thirdpersonedgescroll.value and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --edge scroll will 3rd Person nearby unit
+		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
-		else --not 3rdPerson-edge-Scroll: edge scroll won't effect tracking
+		else --not 3rdPerson-edge-Scroll: re-issue 3rd person
 			local selUnits = spGetSelectedUnits()
 			if selUnits and selUnits[1] then -- re-issue 3rd person for selected unit
 				spSendCommands('viewfps')
