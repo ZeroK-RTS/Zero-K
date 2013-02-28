@@ -127,6 +127,8 @@ local kb_path
 local kb_action
 
 local transkey = {
+	backquote 		= '`',
+	
 	leftbracket 	= '[',
 	rightbracket 	= ']',
 	--delete 			= 'del',
