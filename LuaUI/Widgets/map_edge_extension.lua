@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Map Edge Extension",
-    version   = "v0.4",
+    version   = "v0.5",
     desc      = "Draws a mirrored map next to the edges of the real map",
     author    = "Pako",
     date      = "2010.10.27 - 2011.10.29", --YYYY.MM.DD, created - updated
@@ -39,6 +39,12 @@ local island = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function ResetWidget()
+  gl.DeleteList(dList)
+  widget:Initialize()
+end
+
 options_path = 'Settings/Graphics/Map/Map Extension Config'
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
@@ -54,10 +60,7 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Use a shader when mirroring the map',
-		OnChange = function(self)
-			gl.DeleteList(dList)
-			widget:Initialize()
-		end, 		
+		OnChange = ResetWidget,
 	},
 	gridSize = {
 		name = "Tile size (32-512)",
@@ -68,73 +71,92 @@ options = {
 		step = 32,
 		value = 32,
 		desc = 'Sets tile size (smaller = more heightmap detail)\nStepsize is 32; recommend powers of 2',
-		OnChange = function(self)
-			gl.DeleteList(dList)
-			widget:Initialize()
-		end, 
+		OnChange = ResetWidget,
 	},
 	useRealTex = {
 		name = "Use realistic texture",
 		type = 'bool',
 		value = false,
 		desc = 'Use a realistic texture instead of a VR grid',
-		OnChange = function(self)
-			gl.DeleteList(dList)
-			widget:Initialize()
-		end, 		
+		OnChange = ResetWidget,
 	},	
 	northSouthText = {
 		name = "North, East, South, & West text",
 		type = 'bool',
 		value = false,
 		desc = 'Help you identify map direction under rotation by placing a "North/South/East/West" text on the map edges',
-		OnChange = function(self)
-			gl.DeleteList(dList)
-			widget:Initialize()
-		end, 		
-	},			
+		OnChange = ResetWidget,	
+	},
+	
+	fogEffect = {
+		name = "Edge Fog Effect",
+		type = 'bool',
+		value = true,
+		desc = 'Blurs the edges of the map slightly to distinguish it from the extension.',
+		OnChange = ResetWidget,
+	},
+	curvature = {
+		name = "Curvature Effect",
+		type = 'bool',
+		value = false,
+		desc = 'Add a curvature to the extension.',
+		OnChange = ResetWidget,
+	},
+	
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local shaderTable = {
-	uniform = {
-      mirrorX = 0,
-      mirrorZ = 0,
-      up = 0,
-      left = 0,
-    },
-	vertex = [[
-      // Application to vertex shader
-      uniform float mirrorX;
-      uniform float mirrorZ;
-      uniform float left;
-      uniform float up;
+local shaderTable
+local function SetupShaderTable()
+  shaderTable = {
+	  uniform = {
+		mirrorX = 0,
+		mirrorZ = 0,
+		up = 0,
+		left = 0,
+	  },
+	  vertex = (options.curvature.value and "#define curvature \n" or '')
+		.. (options.fogEffect.value and "#define edgeFog \n" or '')
+		.. [[
+		// Application to vertex shader
+		uniform float mirrorX;
+		uniform float mirrorZ;
+		uniform float left;
+		uniform float up;
+  
+		void main()
+		{
+		gl_TexCoord[0]= gl_TextureMatrix[0]*gl_MultiTexCoord0;
+		gl_Vertex.x = abs(mirrorX-gl_Vertex.x);
+		gl_Vertex.z = abs(mirrorZ-gl_Vertex.z);
+		
+		#ifdef curvature
+		  if(mirrorX)gl_Vertex.y -= pow(abs(gl_Vertex.x-left*mirrorX)/150, 2);
+		  if(mirrorZ)gl_Vertex.y -= pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2);
+		#endif
+  
+		float ff = 20000;
+		if((mirrorZ && mirrorX))
+		  ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
+		else if(mirrorX)
+		  ff=ff/(pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
+		else if(mirrorZ)
+		  ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+2);
+  
+		gl_Position  = gl_ModelViewProjectionMatrix*gl_Vertex;
+		gl_FogFragCoord = //gl_Position.z+ff;
+		
+		#ifdef edgeFog
+		  length((gl_ModelViewMatrix * gl_Vertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
+		#endif
+		
+		gl_FrontColor = gl_Color;
+		}
+	  ]],
+  }
+end
 
-      void main()
-      {
-      gl_TexCoord[0]= gl_TextureMatrix[0]*gl_MultiTexCoord0;
-      gl_Vertex.x = abs(mirrorX-gl_Vertex.x);
-      gl_Vertex.z = abs(mirrorZ-gl_Vertex.z);
-
-      float ff = 20000;
-      if((mirrorZ && mirrorX))
-        ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
-      else if(mirrorX)
-        ff=ff/(pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
-      else if(mirrorZ)
-        ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+2);
-
-      gl_Position  = gl_ModelViewProjectionMatrix*gl_Vertex;
-	  gl_FogFragCoord = //gl_Position.z+ff;
-	  length((gl_ModelViewMatrix * gl_Vertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
-      gl_FrontColor = gl_Color;
-	  }
-    ]],
-}
--- place this under gl_Vertex.z = abs(mirrorZ-gl_Vertex.z); in void main() for curvature effect
---if(mirrorX)gl_Vertex.y -= pow(abs(gl_Vertex.x-left*mirrorX)/150, 2);
---if(mirrorZ)gl_Vertex.y -= pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2);
 
 local function GetGroundHeight(x, z)
 	return spGetGroundHeight(x,z)
@@ -280,6 +302,7 @@ local function DrawOMap(useMirrorShader)
 end
 
 function widget:Initialize()
+  SetupShaderTable()
         Spring.SendCommands("luaui disablewidget External VR Grid")
         island = IsIsland()
 	if gl.CreateShader and options.useShader.value then
