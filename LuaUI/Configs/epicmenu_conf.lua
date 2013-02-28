@@ -249,6 +249,7 @@ path='Settings/Interface/Mouse Cursor'
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 path='Settings/Misc'
 	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
+	ShButton( 'Map Draw Key', "drawinmap", '', true )
 	ShButton( 'Game Info', "gameinfo", '', true )
 	ShButton( 'Share Dialog...', 'sharedialog', '', true ) 
 
