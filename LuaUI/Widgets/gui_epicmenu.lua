@@ -680,10 +680,10 @@ end
 
 local function GetReadableHotkeyMod(mod)
 	local modlowercase = mod:lower()
-	return (modlowercase:find('a+') and 'Alt+' or '') ..
-		(modlowercase:find('c+') and 'Ctrl+' or '') ..
-		(modlowercase:find('m+') and 'Meta+' or '') ..
-		(modlowercase:find('s+') and 'Shift+' or '') ..
+	return (modlowercase:find('a%+') and 'Alt+' or '') ..
+		(modlowercase:find('c%+') and 'Ctrl+' or '') ..
+		(modlowercase:find('m%+') and 'Meta+' or '') ..
+		(modlowercase:find('s%+') and 'Shift+' or '') ..
 		''		
 end
 
@@ -758,7 +758,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 			local isUnitInstantCommand = number == 3
 			
 			-- bind shift+hotkey as well if needed for unit commands
-			local alreadyShift = hotkey:lower():find("s+") or hotkey:lower():find("shift+") 
+			local alreadyShift = hotkey:lower():find("s%+") or hotkey:lower():find("shift%+") 
 			if not alreadyShift then
 				if isUnitCommand then
 					  spSendCommands("bind S+" .. hotkey .. " " .. actionName)
@@ -1360,6 +1360,10 @@ local function GetHotkeyData(path, option)
 		hotkey = hotkey[1]
 	end
 	if hotkey and hotkey ~= 'none' then
+		if hotkey:find('%+%+') then
+			hotkey = hotkey:gsub( '%+%+', '+plus' )
+		end
+		
 		return GetReadableHotkey(hotkey) 
 	end
 	
@@ -2114,14 +2118,7 @@ function widget:Initialize()
 	-- Add custom actions for the following keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
 	AddAction("exitwindow", ActionExitWindow, nil, "t")
-	-- replace default keybinds for quitmenu
-	spSendCommands({
-		"unbind esc quitmessage",
-		"unbind esc quitmenu", --Upgrading to 0.82 doesn't change existing uikeys so pre-0.82 keybinds still apply.
-	})
-	spSendCommands("bind esc crudemenu")
-	spSendCommands("bind shift+esc exitwindow")
-
+	
 	MakeMenuBar()
 	
 	ReApplyKeybinds()
