@@ -66,13 +66,13 @@ local function WriteTable(array, numIndents, endOfFile, concise)
 			  str = str .. "[" .. i .. "] = "
 			end
 		elseif keywords[i] or (type(i) == "string" --[[and i:find("[/.+-=><#%^*()]") ]] ) then
-			str = str .. string.format("%q", i) .. "= "
+			str = str .. string.format("%q", i):gsub('"', '') .. "= "
 		else
 			str = str .. i .. " = "
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise, useDoubleQuote)
+			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
 		elseif type(v) == "string" then

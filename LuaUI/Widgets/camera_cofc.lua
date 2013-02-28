@@ -26,8 +26,8 @@ local thirdperson_trackunit = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Camera/Advanced Camera Config'
-local cursorFollowPath = 'Settings/Camera/Cursor Following'
+options_path = 'Settings/Camera/Camera Controls'
+local cameraFollowPath = 'Settings/Camera/Camera Following'
 options_order = { 
 	'helpwindow', 
 	
@@ -52,15 +52,7 @@ options_order = {
 	'zoomintocursor', 
 	'zoomoutfromcursor', 
 	'zoominfactor', 
-	'zoomoutfactor',	
-	
-	--'lblFollow',
-	'follow',
-	'followautozoom',
-	'followminscrollspeed',
-	'followmaxscrollspeed',
-	--'followzoominspeed',
-	--'followzoomoutspeed',
+	'zoomoutfactor',
 	
 	'lblMisc',
 	'overviewmode', 
@@ -69,13 +61,22 @@ options_order = {
 	--'restrictangle',
 	--'mingrounddist',
 	'freemode',
+	'resetcam',
 	
+	--following:
+	
+	'lblFollowCursor',
+	'follow',
+	'followautozoom',
+	'followminscrollspeed',
+	'followmaxscrollspeed',
+	--'followzoominspeed',
+	--'followzoomoutspeed',
+	
+	'lblFollowUnit',
 	'trackmode',
 	'persistenttrackmode',
 	'thirdpersontrack',
-
-	'resetcam',
-	
 	'enableCycleView',
 
 }
@@ -90,8 +91,11 @@ options = {
 	lblRotate = {name='Rotation', type='label'},
 	lblScroll = {name='Scrolling', type='label'},
 	lblZoom = {name='Zooming', type='label'},
-	--lblFollow = {name='Follow Cursor', type='label'},
 	lblMisc = {name='Misc.', type='label'},
+	
+	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
+	lblFollowUnit = {name='Unit Following', type='label', path=cameraFollowPath},
+	
 	
 	helpwindow = {
 		name = 'COFCam Help',
@@ -197,55 +201,6 @@ options = {
 		value = true,
 	},
 	
-	-- follow cursor
-	follow = {
-		name = "Follow player's cursor",
-		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
-		type = 'bool',
-		value = false,
-		hotkey = {key='l', mod='alt+'},
-		path = cursorFollowPath,
-	},
-	followautozoom = {
-		name = "Auto zoom",
-		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus). \n\nDo not enable this if you want fixed zoom level. If enabled, try to use the recommended follow cursor speed.",
-		type = 'bool',
-		value = false,
-		path = cursorFollowPath,
-	},
-	followminscrollspeed = {
-		name = "On Screen Follow Speed",
-		desc = "Follow speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
-		type = 'number',
-		min = 1, max = 14, step = 1,
-		value = 1,
-		path = cursorFollowPath,
-	},	
-	followmaxscrollspeed = {
-		name = "Off Screen Follow Speed",
-		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest if auto-zoom is enabled (faster tracking will prevent auto-zoom from zooming out too far)",
-		type = 'number',
-		min = 2, max = 15, step = 1,
-		value = 15,
-		path = cursorFollowPath,
-	},
-	followzoominspeed = {
-		name = "Follow Zoom-in Speed",
-		desc = "Zoom-in speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Tweak follow speed instead!)",
-		type = 'number',
-		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.2,
-		path = cursorFollowPath,
-	},
-	followzoomoutspeed = {
-		name = "Follow Zoom-out Speed",
-		desc = "Zoom-out speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Use faster follow speed to prevent zoom-out)",
-		type = 'number',
-		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.2,
-		path = cursorFollowPath,
-	},
-	-- end follow cursor
 	
 	rotfactor = {
 		name = 'Rotation speed',
@@ -315,12 +270,78 @@ options = {
 		hotkey = {key='tab', mod=''},
 		OnChange = function(self) OverviewAction() end,
 	},
+	resetcam = {
+		name = "Reset Camera",
+		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Middleclick>",
+		type = 'button',
+        -- OnChange defined later
+	},
+	groundrot = {
+		name = "Rotate When Camera Hits Ground",
+		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
+		type = 'bool',
+		value = false,
+	},
 	
+	
+	
+	-- follow cursor
+	follow = {
+		name = "Follow player's cursor",
+		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
+		type = 'bool',
+		value = false,
+		hotkey = {key='l', mod='alt+'},
+		path = cameraFollowPath,
+	},
+	followautozoom = {
+		name = "Auto zoom",
+		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus). \n\nDo not enable this if you want fixed zoom level. If enabled, try to use the recommended follow cursor speed.",
+		type = 'bool',
+		value = false,
+		path = cameraFollowPath,
+	},
+	followminscrollspeed = {
+		name = "On Screen Follow Speed",
+		desc = "Follow speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
+		type = 'number',
+		min = 1, max = 14, step = 1,
+		value = 1,
+		path = cameraFollowPath,
+	},	
+	followmaxscrollspeed = {
+		name = "Off Screen Follow Speed",
+		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest if auto-zoom is enabled (faster tracking will prevent auto-zoom from zooming out too far)",
+		type = 'number',
+		min = 2, max = 15, step = 1,
+		value = 15,
+		path = cameraFollowPath,
+	},
+	followzoominspeed = {
+		name = "Follow Zoom-in Speed",
+		desc = "Zoom-in speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Tweak follow speed instead!)",
+		type = 'number',
+		min = 0.1, max = 0.5, step = 0.05,
+		value = 0.2,
+		path = cameraFollowPath,
+	},
+	followzoomoutspeed = {
+		name = "Follow Zoom-out Speed",
+		desc = "Zoom-out speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Use faster follow speed to prevent zoom-out)",
+		type = 'number',
+		min = 0.1, max = 0.5, step = 0.05,
+		value = 0.2,
+		path = cameraFollowPath,
+	},
+	-- end follow cursor
+	
+	-- follow unit
 	trackmode = {
 		name = "Enter Trackmode",
 		desc = "Track the selected unit (mouse midclick to exit mode)",
 		type = 'button',
         hotkey = {key='t', mod='alt+'},
+		path = cameraFollowPath,
 		OnChange = function(self) trackmode = true; end,
 	},
 	
@@ -329,6 +350,7 @@ options = {
 		desc = "Trackmode will not cancel when deselect unit. Trackmode will always track new unit selection unless user press mouse midclick.",
 		type = 'bool',
 		value = false,
+		path = cameraFollowPath,
 	},
     
     thirdpersontrack = {
@@ -336,6 +358,7 @@ options = {
 		desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, and move mouse to edge of screen to jump to current unit selection.",
 		type = 'button',
 		hotkey = {key='k', mod='alt+'},
+		path = cameraFollowPath,
 		OnChange = function(self)
 			local selUnits = Spring.GetSelectedUnits()
 			if selUnits and selUnits[1] and thirdperson_trackunit ~= selUnits[1] then --check if 3rd Person into same unit or if there's any unit at all
@@ -353,25 +376,12 @@ options = {
 			end
         end,
 	},
-	resetcam = {
-		name = "Reset Camera",
-		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Middleclick>",
-		type = 'button',
-        -- OnChange defined later
-	},
-	
-	groundrot = {
-		name = "Rotate When Camera Hits Ground",
-		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
-		type = 'bool',
-		value = false,
-	},
 	
 	enableCycleView = {
 		name = "Group recall cycle within group",
 		type = 'bool',
 		value = false,
-		path='Settings/Camera',
+		path = cameraFollowPath,
 		desc = "Cycle camera focus among group units when same number is pressed more than once. Note: This option will automatically enable \'Receive Indicator\' widget (for its cluster detection feature).",
 		OnChange = function(self) 
 			if self.value==true then
@@ -379,6 +389,7 @@ options = {
 			end
 		end,
 	},
+	-- end follow unit
 	
 }
 
