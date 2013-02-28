@@ -77,7 +77,6 @@ return {
 	{	"reclaim",	"e",},
 	{	"fight",	"f",},
 	{	"forcestart",	"Alt+f",},
-	{	"fight",	"Shift+f",},
 	{	"guard",	"g",},
 	{	"sharedialog",	"h",},
 	{	"gameinfo",	"Any+i",},
