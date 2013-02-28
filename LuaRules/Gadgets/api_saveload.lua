@@ -360,25 +360,28 @@ local keywords = {
 }
 
 -- recursive function that write a Lua table to file in the correct format
-local function WriteTable(array, numIndents, endOfFile)
+local function WriteTable(array, numIndents, endOfFile, concise)
+	numIndents = numIndents or 0
 	local str = ""	--WriteIndents(numIndents)
-	str = str .. "{\n"
+	str = str .. (concise and "{" or "{\n")
 	for i,v in pairs(array) do
 		str = str .. WriteIndents(numIndents + 1)
 		if type(i) == "number" then
-			str = str .. "[" .. i .. "] = "
+			if not concise then
+			  str = str .. "[" .. i .. "] = "
+			end
 		elseif keywords[i] or (type(i) == "string" --[[and i:find("[/.+-=><#%^*()]") ]] ) then
-			str = str .. [[["]] .. i .. [["] ]] .. "= "
+			str = str .. string.format("%q", i) .. "= "
 		else
 			str = str .. i .. " = "
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, numIndents + 1)
+			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise, useDoubleQuote)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
 		elseif type(v) == "string" then
-			str = str .. "[[" .. v .. "]]" .. ",\n"
+			str = str .. string.format("%q", v) .. "," .. (concise and '' or "\n")
 		else
 			str = str .. v .. ",\n"
 		end

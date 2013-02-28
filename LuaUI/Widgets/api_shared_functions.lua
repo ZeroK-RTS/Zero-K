@@ -55,7 +55,8 @@ local keywords = {
 	["repeat"] = true,
 }
 
-local function WriteTable(array, numIndents, endOfFile, concise, useDoubleQuote)
+local function WriteTable(array, numIndents, endOfFile, concise)
+	numIndents = numIndents or 0
 	local str = ""	--WriteIndents(numIndents)
 	str = str .. (concise and "{" or "{\n")
 	for i,v in pairs(array) do
@@ -65,7 +66,7 @@ local function WriteTable(array, numIndents, endOfFile, concise, useDoubleQuote)
 			  str = str .. "[" .. i .. "] = "
 			end
 		elseif keywords[i] or (type(i) == "string" --[[and i:find("[/.+-=><#%^*()]") ]] ) then
-			str = str .. [[["]] .. i .. [["] ]] .. "= "
+			str = str .. string.format("%q", i) .. "= "
 		else
 			str = str .. i .. " = "
 		end
@@ -75,11 +76,7 @@ local function WriteTable(array, numIndents, endOfFile, concise, useDoubleQuote)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
 		elseif type(v) == "string" then
-			if useDoubleQuote then
-			  str = str .. '"' .. v:gsub('"', [[\"]]):gsub([[\]], [[\\]])  .. '"' .. "," .. (concise and '' or "\n")
-			else
-			  str = str .. "[=[" .. v .. "]=]" .. "," .. (concise and '' or "\n")
-			end
+			str = str .. string.format("%q", v) .. "," .. (concise and '' or "\n")
 		else
 			str = str .. v .. ",\n"
 		end
