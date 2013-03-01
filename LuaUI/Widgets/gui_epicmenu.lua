@@ -863,12 +863,12 @@ local function ReApplyKeybinds()
 		--actionName = actionName:lower()
 		UnassignKeyBind(actionName, false)
 		
-		if type(hotkey) == 'table' then
-			for _,hotkey2 in ipairs(hotkey) do
+		local hotkeyTable = type(hotkey) == 'table' and hotkey or {hotkey}
+		
+		for _,hotkey2 in ipairs(hotkeyTable) do
+			if hotkey2 ~= 'None' then
 				AssignKeyBindAction(hotkey2, actionName, false)
 			end
-		else
-			AssignKeyBindAction(hotkey, actionName, false)
 		end
 		
 		--echo("unbindaction(1) ", actionName)
@@ -1303,7 +1303,8 @@ local function MakeKeybindWindow( path, option, hotkey )
 	kb_action = GetActionName(path, option)
 	
 	UnassignKeyBind(kb_action, true) -- 2nd param = verbose
-	otset( keybounditems, kb_action, nil )
+	--otset( keybounditems, kb_action, nil )
+	otset( keybounditems, kb_action, 'None' )
 		
 	window_getkey = Window:New{
 		caption = 'Set a HotKey',
