@@ -2012,9 +2012,6 @@ end
 
 function widget:Initialize()
 	
-	--spSendCommands("unbindaction quitmenu") -- http://springrts.com/mantis/view.php?id=2944
-	spSendCommands("unbindall") 
-	
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget)
 		return
@@ -2122,6 +2119,10 @@ function widget:Initialize()
 	AddAction("exitwindow", ActionExitWindow, nil, "t")
 	
 	MakeMenuBar()
+	
+	if not settings.config['epic_Settings/Misc_Use_uikeys.txt'] then
+		spSendCommands("unbindall")
+	end
 	
 	ReApplyKeybinds()
 	

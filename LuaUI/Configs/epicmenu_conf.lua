@@ -252,6 +252,14 @@ path='Settings/Misc'
 	ShButton( 'Map Draw Key', "drawinmap", '', true )
 	ShButton( 'Game Info', "gameinfo", '', true )
 	ShButton( 'Share Dialog...', 'sharedialog', '', true ) 
+	AddOption({
+		name = 'Use uikeys.txt',
+		desc = 'NOT RECOMMENDED! Enable this to use the engine\'s keybind file. This can break existing functionality. Requires restart.',
+		type = 'bool',
+		advanced = true,
+		value = false,
+	})
+
 
 path='Settings/Misc/Screenshots'	
 	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
