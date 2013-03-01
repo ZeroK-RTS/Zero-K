@@ -8,7 +8,7 @@ function gadget:GetInfo()
     author    = "quantum, improved by KingRaptor",
     date      = "April 29, 2008",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = 1000001,  -- must do the GameOver() thing only after gadget:awards.lua has finishes detect queen destroyed else queenKill award won't appear.
     enabled   = true --  loaded by default?
   }
 end
