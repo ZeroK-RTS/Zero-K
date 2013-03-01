@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		author    = "SirMaverick, Google Frog, KDR_11k, CarRepairer (unified by KingRaptor)",
 		date      = "2009",
 		license   = "GPL",
-		layer     = 1,
+		layer     = 1000001, -- must do the GameOver() thing only after gadget:awards.lua has finishes doing its job else queenKill award won't appear. 
 		enabled   = true  --  loaded by default?
 	}
 end
