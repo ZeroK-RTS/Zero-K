@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.017 Chili Keyboard Menu",
+    desc      = "v0.018 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -802,8 +802,8 @@ local function SetupTabs()
 		none = 'Commands',
 		ctrl = 'Selections (Ctrl)',
 		alt = 'States (Alt)',
-		meta = 'Other (Spacebar)',
-		unbound = 'Unbound',
+		meta = '(Spacebar)',
+		unbound = 'Other',
 	}
 	local tabs_i = { 'none', 'ctrl', 'alt', 'meta', 'unbound' }
 	
@@ -1014,7 +1014,7 @@ local function SetupCommands( modifier )
 		local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)
 		--echo(CMD[cmd.id], cmd.name, hotkey_key, hotkey_mod)
 		
-		if modifier == 'unbound' and hotkey_key == ''
+		if ( (modifier == 'unbound' and hotkey_key == '') or not key_buttons[hotkey_key] )
 			and cmd.type ~= CMDTYPE.NEXT and cmd.type ~= CMDTYPE.PREV
 			and cmd.id >= 0
 			and cmd.id ~= CMD_RADIALBUILDMENU
