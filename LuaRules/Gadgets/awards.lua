@@ -4,7 +4,7 @@ function gadget:GetInfo()
     name      = "Awards",
     desc      = "Awards players at end of battle with shiny trophies.",
     author    = "CarRepairer",
-    date      = "2008-10-15",
+    date      = "2008-10-15", --2013-03-02
     license   = "GNU GPL, v2 or later",
     layer     = 1000000, -- Must be after all other build steps
     enabled   = true -- loaded by default?
@@ -144,7 +144,8 @@ function getMaxVal(valList)
 			--Spring.Echo(" Team ".. winTeam .." maxVal ".. maxVal) --debug
 		end
 	end
-	return winTeam, floor(maxVal)
+
+	return winTeam, maxVal
 end
 
 function getMeanMetalIncome()
@@ -682,59 +683,75 @@ function gadget:GameFrame(n)
 		local minReclaimRatio = 0.15
 		
 		if pwnTeam then
+			maxDamage = floor(maxDamage)
 			awardAward(pwnTeam, 'pwn', 'Damage: '.. comma_value(maxDamage))
 		end
 		if navyTeam and maxNavyDamage > getMeanDamageExcept(navyTeam) then
+			maxNavyDamage = floor(maxNavyDamage)
 			awardAward(navyTeam, 'navy', 'Damage: '.. comma_value(maxNavyDamage))
 		end
 		if airTeam and maxAirDamage > getMeanDamageExcept(airTeam) then
+			maxAirDamage = floor(maxAirDamage)
 			awardAward(airTeam, 'air', 'Damage: '.. comma_value(maxAirDamage))
 		end
 		if t3Team and maxT3Damage > getMeanDamageExcept(t3Team) then
+			maxT3Damage = floor(maxT3Damage)
 			awardAward(t3Team, 't3', 'Damage: '.. comma_value(maxT3Damage))
 		end
 		if nuxTeam and maxNuxDamage > getMeanDamageExcept(nuxTeam) * veryEasyFactor then
+			maxNuxDamage = floor(maxNuxDamage)
 			awardAward(nuxTeam, 'nux', 'Damage: '.. comma_value(maxNuxDamage))
 		end
 		if shellTeam and maxStaticDamage > getMeanDamageExcept(shellTeam) * easyFactor then
+			maxStaticDamage = floor(maxStaticDamage)
 			awardAward(shellTeam, 'shell', 'Damage: '.. comma_value(maxStaticDamage))
 		end
 		if kamTeam and maxKamDamage > getMeanDamageExcept(kamTeam) * veryEasyFactor then
+			maxKamDamage = floor(maxKamDamage)
 			awardAward(kamTeam, 'kam', 'Damage: '.. comma_value(maxKamDamage))
 		end
 		if commTeam and maxCommDamage > getMeanDamageExcept(commTeam) * veryEasyFactor then
+			maxCommDamage = floor(maxCommDamage)
 			awardAward(commTeam, 'comm', 'Damage: '.. comma_value(maxCommDamage))
 		end
 		if fireTeam and maxFireDamage > getMeanDamageExcept(fireTeam) * easyFactor then
+			maxFireDamage = floor(maxFireDamage)
 			awardAward(fireTeam, 'fire', 'Damage: '.. comma_value(maxFireDamage))
 		end
 		if empTeam and maxEmpDamage/4 > getMeanDamageExcept(empTeam) * easyFactor then
+			maxEmpDamage = floor(maxEmpDamage)
 			awardAward(empTeam, 'emp', 'Damage: '.. comma_value(maxEmpDamage))
 		end
 		if capTeam and maxCap > 1000 then
+			maxCap = floor(maxCap)
 			awardAward(capTeam, 'cap', 'Captured value: '.. comma_value(maxCap))
 		end
 		
 		if shareTeam and maxShare > 5000 then
+			maxShare = floor(maxShare)
 			awardAward(shareTeam, 'share', 'Shared value: '.. comma_value(maxShare))
 		end
 		
 		if terraTeam and maxTerra > 1000 then
+			maxTerra = floor(maxTerra)
 			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
 		end
 
 		if rezzTeam and maxRezz >= 3000 then
+			maxRezz = floor(maxRezz)
 			awardAward(rezzTeam, 'rezz', 'Resurrected value: '.. comma_value(maxRezz))
 		end
 
 		--Spring.Echo(maxReclaim, getMeanMetalIncome())
 		if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
+			maxReclaim = floor(maxReclaim)
 			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. " m from wreckage")
 		end
 		if friendTeam and maxFriendlyDamageRatio > minFriendRatio then
 			awardAward(friendTeam, 'friend', 'Damage inflicted on allies: '.. floor(maxFriendlyDamageRatio * 100) ..'%')
 		end
 		if ouchTeam then
+			maxOuchDamage = floor(maxOuchDamage)
 			awardAward(ouchTeam, 'ouch', 'Damage: '.. comma_value(maxOuchDamage))
 		end
 		if mexTeam and maxMex > 15 then
