@@ -17,7 +17,7 @@ function widget:GetInfo()
     name      = "MetalFeatures",
     desc      = "Highlights features with metal in the metal-map viewmode",
     author    = "trepan",
-    date      = "Aug 05, 2007", --Feb 17, 2013
+    date      = "Aug 05, 2007", --March 2, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true,  --  loaded by default?
@@ -55,11 +55,11 @@ function widget:DrawWorld()
   local myAllyTeam = Spring.GetMyAllyTeamID()
 
   local features = Spring.GetAllFeatures()
-  for _, fID in ipairs(features) do
+  for _, fID in pairs(features) do
     local metal = Spring.GetFeatureResources(fID)
     if (metal and (metal > 0)) then
-      local aTeam = Spring.GetFeatureAllyTeam(fID)
-      if (aTeam ~= myAllyTeam) then
+      -- local aTeam = Spring.GetFeatureAllyTeam(fID)
+      -- if (aTeam ~= myAllyTeam) then
         local x100  = 100  / (100  + metal)
         local x1000 = 1000 / (1000 + metal)
         local r = 1 - x1000
@@ -69,7 +69,7 @@ function widget:DrawWorld()
         gl.Color(r, g, b, alpha)
         
         gl.Feature(fID, true)
-      end
+      -- end
     end
   end
 
