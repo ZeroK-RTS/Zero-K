@@ -67,6 +67,11 @@ local inherited = this.inherited
 function Control:New(obj)
   --// backward compability
   BackwardCompa(obj)
+  
+  --//minimum size from minimum size table when minWidth & minHeight is not set (backward compatibility)
+  local minimumSize = obj.minimumSize or {} 
+  obj.minWidth = obj.minWidth or minimumSize[1] 
+  obj.minHeight = obj.minHeight or minimumSize[2]
 
   --// load the skin for this control
   obj.classname = self.classname
@@ -929,6 +934,11 @@ end
 
 
 function Control:DrawControl()
+  --//an option to make panel position snap to an integer
+  if self.snapToGrid then 
+    self.x = math.floor(self.x) + 0.5 
+    self.y = math.floor(self.y) + 0.5 
+  end 
   self:DrawBackground()
   self:DrawBorder()
 end
@@ -1024,6 +1034,10 @@ function Control:HitTest(x,y)
             end
           end
         end
+      end
+      --//an option that allow you to mouse click on empty panel
+      if self.hitTestAllowEmpty then 
+      	return self 
       end
     end
   end

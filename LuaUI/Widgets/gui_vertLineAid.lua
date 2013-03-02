@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Vertical Line on Radar Dots",
     desc      = versionName .. " help you identify enemy units by adding vertical line on radar dots",
     author    = "msafwan",
-    date      = "April 2, 2012",
+    date      = "Nov 11, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -14,7 +14,7 @@ function widget:GetInfo()
 end
 
 local osClock = os.clock
-local mathCeil = math.ceil
+--local mathCeil = math.ceil
 local mathMax = math.max
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -30,7 +30,7 @@ local glBeginEnd    = gl.BeginEnd
 local glPopAttrib   = gl.PopAttrib 
 local glCreateList  = gl.CreateList 
 --local glCallList    = gl.CallList 
-local glDeleteList  = gl.DeleteList 
+--local glDeleteList  = gl.DeleteList 
 local GL_LINES      = GL.LINES 
 
 local dots_gbl = {} --//variable: store enemy position.
@@ -38,7 +38,6 @@ local dotsEnterLos_gbl = {} --//variable: remember if enemy is in LOS.
 local framePoll_gbl = {frame = 0, lastUpdate = 0} --// variable: 1st number represent number of frame soo far, 2nd number represent the time of last update
 local updateAtFrame_gbl = 0 --//variable: tell at which frame to update enemy position.
 local desiredDisplayInterval_gbl = 0.03 --// constant: the rest period (in second) between each update of enemy position.
-local iAmSpectator = false --// variable: indicate spec status. If spec will change how line is drawn.
 --local myAllyTeamID = -1
 -----------------------------------------
 function widget:Initialize()
@@ -48,14 +47,12 @@ function widget:Initialize()
 	local myPlayerID=Spring.GetMyPlayerID() --//get spec status. Will be used to determine how to draw lines.
 	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
 	if spec then 
-		iAmSpectator = true
 		widgetHandler:RemoveWidget()
 	end
 end
 
 function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then 
-		iAmSpectator = true
 		widgetHandler:RemoveWidget()
 	end
 end
@@ -103,7 +100,7 @@ end
 local function UpdateDotsContent (unitID, content) --//retrieve unit position.
 	local x, y, z = spGetUnitPosition(unitID)
 	if x == nil then 
-		return nil 
+		return nil --position didn't exist, delete content
 	end
 	local groundY = spGetGroundHeight(x,z)
 	local surfaceY = mathMax (groundY, 0) --//select water, or select terrain height depending on which is higher. 
@@ -125,8 +122,8 @@ local function GetAppropriateUpdateInterval (framePoll, updateAtFrame) --//poll 
 	local currentTime = osClock()
 	local secondPerFrame = (currentTime - framePoll.lastUpdate)/framePoll.frame
 	framePoll.lastUpdate = currentTime
-	local numberOfFrameForDesiredDisplayInterval = desiredDisplayInterval/secondPerFrame
-	updateAtFrame = mathCeil(numberOfFrameForDesiredDisplayInterval) --//either use the number of frame needed to satisfy the desired interval, or update every 1 frame (in case the frame number is a fraction, eg: <1). Prevent high FPS from updating dot position too much
+	updateAtFrame = desiredDisplayInterval/secondPerFrame
+	--updateAtFrame = mathCeil(numberOfFrameForDesiredDisplayInterval) --//either use the number of frame needed to satisfy the desired interval, or update every 1 frame (in case the frame number is a fraction, eg: <1). Prevent high FPS from updating dot position too much
 	
 	return framePoll, updateAtFrame
 end

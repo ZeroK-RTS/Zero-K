@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.112 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16", --2013-02-26 (msafwan)
+    date      = "2011-03-16", --2013-03-3 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -77,6 +77,8 @@ options_order = {
 	'trackmode',
 	'persistenttrackmode',
 	'thirdpersontrack',
+	
+	'lblMisc2',
 	'enableCycleView',
 
 }
@@ -95,6 +97,7 @@ options = {
 	
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
 	lblFollowUnit = {name='Unit Following', type='label', path=cameraFollowPath},
+	lblMisc2 = {name='Misc.', type='label', path = cameraFollowPath},
 	
 	
 	helpwindow = {
@@ -382,7 +385,7 @@ options = {
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
-		desc = "Cycle camera focus among group units when same number is pressed more than once. Note: This option will automatically enable \'Receive Indicator\' widget (for its cluster detection feature).",
+		desc = "Tap a number to pan camera view toward a unit(s) within a group number. This option use \'Receive Indicator\' widget to intelligently cycle focus within group unit.",
 		OnChange = function(self) 
 			if self.value==true then
 				Spring.SendCommands("luaui enablewidget Receive Units Indicator")
