@@ -919,7 +919,19 @@ function widget:MousePress(x,y,button)
 	local alt, ctrl, meta, shift = spGetModKeyState()
 	
 	if meta then
-		local cur_ttstr = screen0.currentTooltip or spGetCurrentTooltip()
+		----------
+		local groundTooltip
+		if WG.customToolTip then --find any custom ground tooltip placed on the ground
+			local _, pos = spTraceScreenRay(x,y, true) --return coordinate of the ground
+			for _, data in pairs(WG.customToolTip) do --iterate over WG.customToolTip
+				if data.box and pos and (pos[1]>= data.box.x1 and pos[1]<= data.box.x2) and (pos[3]>= data.box.z1 and pos[3]<= data.box.z2) then --check if within box side x & check if within box side z
+					groundTooltip = data.tooltip --copy tooltip
+					break
+				end
+			end
+		end
+		----------
+		local cur_ttstr = screen0.currentTooltip or groundTooltip or spGetCurrentTooltip()
 		local ud = tooltipBreakdown(cur_ttstr)
 		
 		local _,cmd_id = Spring.GetActiveCommand()
