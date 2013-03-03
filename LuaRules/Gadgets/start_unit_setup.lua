@@ -454,13 +454,13 @@ local function GetFacingDirection(x, z, teamID)
 		local midPosX = (enemyStartbox[1] + enemyStartbox[3]) * 0.5
 		local midPosZ = (enemyStartbox[2] + enemyStartbox[4]) * 0.5
 
-		local dirX = x - midPosX
-		local dirZ = z - midPosZ
+		local dirX = midPosX - x
+		local dirZ = midPosZ - z
 
-		if (math.abs(dirX) > math.abs(dirZ)) then
-			facing = (dirX < 0)and("west")or("east")
-		else
-			facing = (dirZ < 0)and("south")or("north")
+		if (math.abs(dirX) > math.abs(dirZ)) then --distance in X direction is greater than distance in Z direction?
+			facing = (dirX < 0)and("west")or("east") --is distance (X) in negative direction?
+		else --if distance in Z direction is greater, then:
+			facing = (dirZ < 0)and("south")or("north") --is distance (Z) in negative direction?
 		end
 	end
 
@@ -834,6 +834,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		end
 	elseif msg:find("customcomm:",1,true) then
 		local name = msg:sub(12)
+		SendToUnsynced("CommSelected",playerID, name) --activate an event called "CommSelected" that can be detected in unsynced part
 		commChoice[playerID] = name
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
 		if spec then return end
@@ -953,6 +954,7 @@ local boostMax = {}
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction("UpdateBoost",UpdateBoost)
+  gadgetHandler:AddSyncAction('CommSelected',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
 --[[
 --  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
 --  gadgetHandler:AddSyncAction("whisper", whisper)
@@ -968,6 +970,17 @@ end
 ]]--  
 end
   
+
+function CommSelection(_,playerID,commSeries)
+	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
+		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
+		local myAllyID = Spring.GetMyAllyTeamID() --receiver player's alliance?
+		local _,_,_,_, eventAllyID,_,_,_,_ = Spring.GetPlayerInfo(playerID) --source alliance?
+		if isSpec or myAllyID == eventAllyID then
+			Script.LuaUI.CommSelection(playerID, commSeries) --send to widgets as event
+		end
+	end
+end  
   
 function UpdateBoost(_, uid, value, valueMax) 
 	boost[uid] = value
