@@ -458,9 +458,9 @@ local function GetFacingDirection(x, z, teamID)
 		local dirZ = midPosZ - z
 
 		if (math.abs(dirX) > math.abs(dirZ)) then --distance in X direction is greater than distance in Z direction?
-			facing = (dirX < 0)and("west")or("east") --is distance (X) in negative direction?
+			facing = (dirX < 0)and("west")or("east") --is distance (X) in negative direction? (left?)
 		else --if distance in Z direction is greater, then:
-			facing = (dirZ < 0)and("south")or("north") --is distance (Z) in negative direction?
+			facing = (dirZ > 0)and("south")or("north") --is distance (Z) in positive direction? (down?)
 		end
 	end
 
