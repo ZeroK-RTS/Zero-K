@@ -4,7 +4,7 @@ function widget:GetInfo()
     name      = "Comm-n-Elo Startpos. Info",
     desc      = version .. " Show Commander information and Elo icons before game start.",
     author    = "msafwan",
-    date      = "2013 March 3",
+    date      = "2013 March 4",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -180,6 +180,7 @@ function widget:DrawScreenEffects() --Show icons on the screen. Reference: unit_
 	gl.DepthMask(false)
 end
 
+--[[
 local function SetupModelDrawing() --copied from gui_transporting.lua, SetupModelDrawing()
 	gl.DepthTest(true) 
 	gl.DepthMask(true)
@@ -202,13 +203,14 @@ local function RevertModelDrawing()
 	gl.DepthMask(false)
 	gl.DepthTest(false)
 end
+--]]
 
 --//Draw commander. Reference: unit_ghostRadar.lua by very_bad_soldier
 function widget:DrawWorldPreUnit()
 	--draw commander at startposition
 	--
 	
-	SetupModelDrawing()
+	--SetupModelDrawing()
 	gl.Color(1, 1, 1, 0.5)
 	for i = 1, #playerInfo do
 		local validEntry = playerInfo[i].validEntry --contain valid coordinate
@@ -223,6 +225,7 @@ function widget:DrawWorldPreUnit()
 				if comDefId then
 					gl.PushMatrix()
 					gl.Translate( x, y + 5 , z)
+					gl.Scale(1.4,1.4,1.4)
 					gl.UnitShape( comDefId, teamID )
 					gl.PopMatrix()
 				end
@@ -230,5 +233,5 @@ function widget:DrawWorldPreUnit()
 		end
 	end
 	gl.Color(1, 1, 1, 1)
-	RevertModelDrawing()
+	--RevertModelDrawing()
 end
