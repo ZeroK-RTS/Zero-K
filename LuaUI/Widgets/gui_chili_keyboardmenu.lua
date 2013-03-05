@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.019 Chili Keyboard Menu",
+    desc      = "v0.020 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -136,6 +136,7 @@ options_order = {
 	'uikey8',
 	
 	'qwertz',
+	'sevenperrow',
 	'showRemainingCommands',
 	'goToCommands',
 	'goToSelections',
@@ -146,6 +147,17 @@ options = {
 	qwertz = {
 		name = 'QWERTZ layout',
 		type = 'bool',
+		path = KBMenuPath,
+		OnChange = function(self)
+			SetupKeybuttons()
+			UpdateButtons()
+		end,
+		value = false,
+	},
+	sevenperrow = {
+		name = 'Rows of 7 keys',
+		type = 'bool',
+		desc = 'Each row has 7 keys instead of the 6 default.',
 		path = KBMenuPath,
 		OnChange = function(self)
 			SetupKeybuttons()
@@ -886,12 +898,23 @@ SetupKeybuttons = function()
 	key_buttons = {}
 	key_button_images = {}
 	
-	--keyRows = { 'QWERT', 'ASDFG', 'ZXCVB' }
-	keyRows = { 'QWERTY', 'ASDFGH', 'ZXCVBN' }
-	
 	if options.qwertz.value then
-		keyRows = { 'QWERTZ', 'ASDFGH', 'YXCVBN' }
+		keyRows = options.sevenperrow.value
+			and	{ 'QWERTZU', 'ASDFGHJ', 'YXCVBNM' }
+			or 	{ 'QWERTZ', 'ASDFGH', 'YXCVBN' }
+	else
+		keyRows = options.sevenperrow.value
+			and	{ 'QWERTYU', 'ASDFGHJ', 'ZXCVBNM' }
+			or 	{ 'QWERTY', 'ASDFGH', 'ZXCVBN' }
 	end
+	
+	local width, height
+	height = window_main.height
+	
+	local ratio = (keyRows[1]:len() + 0.8) / (3 + 0.5)
+	width = ratio * height
+	
+	window_main:Resize(width, height)
 	
 	local rows = keyRows
 	
