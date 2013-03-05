@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.018 Chili Keyboard Menu",
+    desc      = "v0.019 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -607,6 +607,46 @@ local function BuildMode(enable)
 	end
 end
 
+
+local function CommandFunction(cmdid)
+	local _,_,left,_,right = Spring.GetMouseState()
+	local alt,ctrl,meta,shift = Spring.GetModKeyState()
+	local index = Spring.GetCmdDescIndex(cmdid)
+	if (left) then
+		Spring.SetActiveCommand(index,1,left,right,alt,ctrl,meta,shift)
+	end
+	if (right) then
+		Spring.SetActiveCommand(index,3,left,right,alt,ctrl,meta,shift)
+	end
+end
+
+
+local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
+	local button1 = key_buttons[hotkey_key]
+	
+	local ud = UnitDefNames[unitName]
+	
+	button1.tooltip = 'Build: ' ..ud.humanName .. ' - ' .. ud.tooltip
+	
+	local label_hotkey
+	if index then
+		--local angle = KeyToAngle(index)
+		AddHotkeyLabel( index, index )
+	end 
+	button1:AddChild( Image:New {
+		file = "#"..ud.id,
+		file2 = WG.GetBuildIconFrame(ud),
+		keepAspect = false;
+		width = '100%',
+		height = '80%',
+	})
+	
+	button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', height='20%', fontSize = 11, bottom=0, fontShadow = true,  } )
+	
+	
+	button1.OnMouseDown = { function() CommandFunction( -(ud.id) ); end }
+end
+
 local function AddBuildStructureButton(item, index)
 	
 	if not item then
@@ -899,36 +939,25 @@ local function ProcessCommand(cmd)
 		elseif common_commands[cmd.id] then 
 			curCommands[#curCommands+1] = cmd
 		
-		elseif factory_commands[cmd.id] then
+		--elseif factory_commands[cmd.id] then
 		
-		elseif econ_commands[cmd.id] then
+		--elseif econ_commands[cmd.id] then
 		
-		elseif defense_commands[cmd.id] then
+		--elseif defense_commands[cmd.id] then
 		
-		elseif special_commands[cmd.id] then
+		elseif special_commands[cmd.id] then --curently terraform
 			curCommands[#curCommands+1] = cmd
 			
 		elseif UnitDefs[-(cmd.id)] then
-		
+			curCommands[#curCommands+1] = cmd
 		else
 			curCommands[#curCommands+1] = cmd
 		end
 	end
 end 
 
-local function CommandFunction(cmdid)
-	local _,_,left,_,right = Spring.GetMouseState()
-	local alt,ctrl,meta,shift = Spring.GetModKeyState()
-	local index = Spring.GetCmdDescIndex(cmdid)
-	if (left) then
-		Spring.SetActiveCommand(index,1,left,right,alt,ctrl,meta,shift)
-	end
-	if (right) then
-		Spring.SetActiveCommand(index,3,left,right,alt,ctrl,meta,shift)
-	end
-end 
-
 local function UpdateButton( hotkey_key, hotkey, name, fcn, tooltip, texture, color )
+
 	key_buttons[hotkey_key].OnMouseDown = { fcn }
 	key_buttons[hotkey_key].tooltip = tooltip
 	AddHotkeyLabel( hotkey_key, hotkey )
@@ -1007,7 +1036,7 @@ local function SetupCommands( modifier )
 	local unboundKeyIndex = 1
 	
 	local ignore = {}
-	
+		
 	for i, cmd in ipairs( curCommands ) do
 		local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 		
@@ -1050,7 +1079,14 @@ local function SetupCommands( modifier )
 			if cmd.name == 'Morph' then
 				hotkey = 'Morph'
 			end
-			UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+			
+			if cmd.id < 0 then
+				AddBuildStructureButtonBasic( cmd.name, hotkey_key, hotkey )
+			else
+				UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+			end
+			
+			
 			ignore[hotkey_key] = true
 		end
 		commandButtons[cmd.id] = key_buttons[hotkey_key]
