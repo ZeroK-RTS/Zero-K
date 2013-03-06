@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.312 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.313 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-02-24
     license   = "GNU GPL, v2 or later",
@@ -753,19 +753,26 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		--echo("bind " .. hotkey .. " " .. actionName)
 		spSendCommands("bind " .. hotkey .. " " .. actionName)
 		
+		local buildCommand = actionName:find('buildunit_')
+		local isUnitCommand
+		local isUnitStateCommand
+		local isUnitInstantCommand
+		
 		if custom_cmd_actions[actionName] then
 			local number = custom_cmd_actions[actionName]
-			local isUnitCommand = number == 1
-			local isUnitStateCommand = number == 2
-			local isUnitInstantCommand = number == 3
+			isUnitCommand = number == 1
+			isUnitStateCommand = number == 2
+			isUnitInstantCommand = number == 3
+		end
 			
+		if custom_cmd_actions[actionName] or buildCommand then
 			-- bind shift+hotkey as well if needed for unit commands
 			local alreadyShift = hotkey:lower():find("s%+") or hotkey:lower():find("shift%+") 
 			if not alreadyShift then
-				if isUnitCommand then
-					  spSendCommands("bind S+" .. hotkey .. " " .. actionName)
+				if isUnitCommand or buildCommand then
+					spSendCommands("bind S+" .. hotkey .. " " .. actionName)
 				elseif isUnitStateCommand or isUnitInstantCommand then
-					  spSendCommands("bind S+" .. hotkey .. " " .. actionName .. " queued")
+					spSendCommands("bind S+" .. hotkey .. " " .. actionName .. " queued")
 				end
 			end
 		end
