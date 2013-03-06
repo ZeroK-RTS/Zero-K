@@ -127,7 +127,7 @@ local visibleAllySelUnits = {}
 
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
-options_path = 'Settings/Graphics/Selection'
+options_path = 'Settings/Interface/Selection'
 options = {
 	showally = {
 		name = 'Show Ally Selections',

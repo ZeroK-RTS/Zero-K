@@ -99,7 +99,7 @@ local glUnit = gl.Unit
 
 local showAlly = false
 
-options_path = 'Settings/Graphics/Selection'
+options_path = 'Settings/Interface/Selection'
 options = {
 	showally = {
 		name = 'XHS - Show Ally Selections',
