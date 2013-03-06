@@ -16,13 +16,42 @@ function widget:GetInfo()
     name      = "XrayShader",
     desc      = "XrayShader",
     author    = "trepan",
-    date      = "Jul 15, 2007",
+    date      = "Jul 15, 2007", --March 2nd, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
   }
 end
 
+options_path = 'Settings/Graphics/Unit Visibility/XRay Shader'
+options = {
+        zMin = {
+                name = 'Minimum distance',
+                desc = 'Minimum distance for XRay effect to show up',
+                type = 'number',
+                min = 0, max = 10000, step = 100,
+                value = 1500,
+        },
+        zMax = {
+                name = 'Maximum distance',
+                desc = 'Distance at which XRay effect is at full strength',
+                type = 'number',
+                min = 0, max = 10000, step = 100,
+                value = 6000,
+        },
+}
+
+local zMin = 1500
+local zMax = 6000
+
+local function OnchangeFunc()
+        zMin              = options.zMin.value
+        zMax              = options.zMax.value
+end
+for key,option in pairs(options) do
+        option.OnChange = OnchangeFunc
+end
+OnchangeFunc()
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -81,6 +110,9 @@ local smoothPolys = glSmoothing and true
 
 local shader
 
+local shaderFragZMinLoc = nil
+local shaderFragZMaxLoc = nil
+
 
 function widget:Shutdown()
   glDeleteShader(shader)
@@ -93,6 +125,8 @@ function widget:Initialize()
 
     uniform = {
       edgeExponent = edgeExponent,
+      fragZMin = zMin,
+      fragZMax = zMax,
     },
 
     vertex = [[
@@ -100,6 +134,7 @@ function widget:Initialize()
       varying vec3 normal;
       varying vec3 eyeVec;
       varying vec3 color;
+      varying vec3 position;
       uniform mat4 camera;
       uniform mat4 caminv;
 
@@ -114,6 +149,7 @@ function widget:Initialize()
         color = gl_Color.rgb;
               
         gl_Position = gl_ProjectionMatrix * P;
+        position = gl_Position;
       }
     ]],  
  
@@ -121,14 +157,17 @@ function widget:Initialize()
       varying vec3 normal;
       varying vec3 eyeVec;
       varying vec3 color;
+      varying vec3 position;
 
       uniform float edgeExponent;
+      uniform float fragZMin;
+      uniform float fragZMax;
 
       void main()
       {
         float opac = dot(normalize(normal), normalize(eyeVec));
-        opac = 1.0 - abs(opac);
-        opac = pow(opac, edgeExponent);
+        opac = (1.0 - abs(opac));
+        opac = pow(opac, edgeExponent) * clamp((position.z - fragZMin) / max(fragZMax - fragZMin,0.01),0.0,1.0);
           
         gl_FragColor.rgb = color;
         gl_FragColor.a = opac;
@@ -141,6 +180,9 @@ function widget:Initialize()
     spEcho("Xray shader compilation failed.")
     widgetHandler:RemoveWidget()
   end
+
+  shaderFragZMinLoc = gl.GetUniformLocation(shader, "fragZMin")
+  shaderFragZMaxLoc = gl.GetUniformLocation(shader, "fragZMax")
 end
 
 
@@ -161,6 +203,9 @@ function widget:DrawWorld()
   glBlending(GL_SRC_ALPHA, GL_ONE)
 
   glPolygonOffset(-2, -2)
+
+  gl.Uniform(shaderFragZMinLoc, zMin)
+  gl.Uniform(shaderFragZMaxLoc, zMax)
 
   for _, teamID in ipairs(spGetTeamList()) do
     glColor(spGetTeamColor(teamID))
@@ -196,4 +241,3 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-

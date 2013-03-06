@@ -335,15 +335,6 @@ path='Settings/Graphics'
 	} )
 	
 	AddOption({
-		name = 'Icon Distance',
-		type = 'number',
-		min = 1, 
-		max = 1000,
-		springsetting = 'UnitIconDist',
-		OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
-	} )
-	
-	AddOption({
 		name = 'Draw Distance',
 		type = 'number',
 		min = 1, 
@@ -363,7 +354,28 @@ path='Settings/Graphics/Map'
 	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
 	ShButton('Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
 	ShButton('Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')	
-	
+path='Settings/Graphics/Unit Visibility'
+  ShLabel( 'Unit Visibility Options')
+  AddOption({
+    name = 'Icon Distance',
+    type = 'number',
+    min = 1, 
+    max = 1000,
+    springsetting = 'UnitIconDist',
+    OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
+	} ) 
+  ShLabel( 'Unit Visibility Widgets')
+  ShButton('Outline',function() spSendCommands{"luaui togglewidget Outline"} end, "Shows cartoon-like outline around units")
+  ShButton('Halo', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
+  ShButton('XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+  ShButton('Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
+
+path='Settings/Graphics/Selection'
+  ShLabel( 'Unit Selection Widgets')
+  ShButton('Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
+  ShButton('Selection Circles', function() spSendCommands{"luaui togglewidget SelectionCircle"} end, "Draws team-coloured circles under selected and hovered-over units")
+  ShButton('XRay & Halo on selections', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected and hovered-over units")	
+  ShButton('Team Platter', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 --- HELP ---
 path='Help'
 	AddOption({
