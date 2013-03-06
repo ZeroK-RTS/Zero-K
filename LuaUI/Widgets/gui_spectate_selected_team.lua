@@ -3,7 +3,7 @@ function widget:GetInfo()
     name     = "Spectate Selected Team",
     desc     = "Automatically spectate team based on selected units, and other spectate options.",
     author   = "SirMaverick",
-    version  = "0.200", --has added options
+    version  = "0.203", --has added options
     date     = "2010", --2013
     license  = "GNU GPL, v2 or later",
     layer     = 0,
@@ -81,41 +81,48 @@ function widget:SelectionChanged(selection)
   end
 end
 ----------------------------------------------------
---SelectNextPlayer button (26.2.2013 by msafwan)----
+--SelectNextPlayer button (7.3.2013 by msafwan)----
 
 SelectNextPlayer = function ()
 	local currentTeam = Spring.GetLocalTeamID()
 	local playerTableSortTeamID = Spring.GetPlayerRoster(2)
-	local currentTeamIndex, firstPlayerIndex, teamIDIndexGoto
+	local currentTeamIndex, firstPlayerIndex, teamIDIndexGoto = -1,nil,nil
 	for i=1, #playerTableSortTeamID do
 		local teamID = playerTableSortTeamID[i][3]
-		if currentTeam == teamID then --if current selection is this team:  mark this index
-			currentTeamIndex = i
-		end
-		if teamID~= 0 and not firstPlayerIndex then --if spectator portion has finished: mark this index
-			firstPlayerIndex = i-1 --(note: minus 1 to include teamID with 0, but note that all spectator has teamID 0 too)
+		local isSpec = playerTableSortTeamID[i][5]
+		if isSpec==0 then
+			if not firstPlayerIndex then --if spectator portion has finished: mark this index
+				firstPlayerIndex = i
+			end
+			if currentTeam == teamID then --if current selection is this team:  mark this index
+				currentTeamIndex = i
+				break
+			end
 		end
 	end
-	if currentTeamIndex and firstPlayerIndex then
-		if currentTeamIndex < firstPlayerIndex then --if current selection is spectator: select random player
+	if firstPlayerIndex then
+		if currentTeamIndex == -1 then --if current selection is spectator: select random player
 			teamIndexGoto = math.random(firstPlayerIndex,#playerTableSortTeamID)
-		elseif currentTeamIndex < #playerTableSortTeamID then --if player list is still long: go to next index
-			teamIndexGoto = currentTeamIndex + 1
-		elseif currentTeamIndex == #playerTableSortTeamID then --if player list is at end: go to first index
-			teamIndexGoto = firstPlayerIndex
+		elseif currentTeamIndex <= #playerTableSortTeamID then
+			teamIndexGoto = currentTeamIndex + 1 --if player list is at beginning: go to next index
+			for i=1,#playerTableSortTeamID - firstPlayerIndex do --find player that we can spectate
+				if teamIndexGoto > #playerTableSortTeamID then  --if player list is at end: go to first index
+					teamIndexGoto = firstPlayerIndex
+				end
+				local isSpec = playerTableSortTeamID[teamIndexGoto][5]
+				if isSpec==0 then
+					break
+				end
+				teamIndexGoto = teamIndexGoto + 1
+			end
 		end
-		if (options.specviewselection.value == 'viewallselectany') then --if View & select all, then: 
-			local teamsUnit = Spring.GetTeamUnits(playerTableSortTeamID[teamIndexGoto][3])
-			if teamsUnit and teamsUnit[1] then
-				Spring.SelectUnitArray({teamsUnit[math.random(1,#teamsUnit)],}) --select this player's unit
-			end
-			local selUnits = Spring.GetSelectedUnits()
-			if selUnits and selUnits[1] then
-				Spring.Echo("Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
-			end
+		spSendCommands("specteam "..playerTableSortTeamID[teamIndexGoto][3])
+		Spring.Echo("Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
+		local teamsUnit = Spring.GetTeamUnits(playerTableSortTeamID[teamIndexGoto][3])
+		if teamsUnit and teamsUnit[1] then
+			Spring.SelectUnitArray({teamsUnit[math.random(1,#teamsUnit)],}) --select this player's unit
 		else
-			spSendCommands("specteam "..playerTableSortTeamID[teamIndexGoto][3])
-			Spring.Echo("Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
+			Spring.SelectUnitArray({nil,})
 		end
 	end
 end
