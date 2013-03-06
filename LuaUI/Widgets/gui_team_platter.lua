@@ -103,7 +103,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Graphics/Selection/TeamPlatter'
+options_path = 'Settings/Interface/Selection/TeamPlatter'
 options = {
   outlineOpacity = {
       name = "Outline opacity (0 boosts performance)",
