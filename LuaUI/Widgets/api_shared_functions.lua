@@ -18,6 +18,8 @@ local unitTex    = ":n:bitmaps/icons/frame_unit.png"
 local diffTex    = ":n:bitmaps/icons/frame_diff.png"
 local frameTex   = ":n:bitmaps/icons/frame_slate.png"
 
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 local function GetBuildIconFrame(udef) 
   if (udef.builder and udef.speed>0) then
