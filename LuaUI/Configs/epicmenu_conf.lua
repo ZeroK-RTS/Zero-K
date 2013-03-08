@@ -246,12 +246,13 @@ path='Settings/Interface/Mouse Cursor'
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	} )	
 path='Settings/Interface/Selection'
-  ShLabel( 'Unit Selection Widgets')
-  ShButton('Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
-  ShButton('Selection Circles', function() spSendCommands{"luaui togglewidget SelectionCircle"} end, "Draws team-coloured circles under selected and hovered-over units")
-  ShButton('XRay & Halo on selections', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected and hovered-over units")	
-  ShButton('Team Platter', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
-
+	ShButton('Toggle Selection Circles', function() spSendCommands{"luaui togglewidget SelectionCircle"} end, "Draws team-coloured circles under selected and hovered-over units")
+	path='Settings/Interface/Selection/Selection Shapes'
+		ShButton('Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
+	path='Settings/Interface/Selection/Selection XRay&Halo'
+		ShButton('Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected and hovered-over units")	
+	path='Settings/Interface/Selection/Team Platters'
+		ShButton('Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 path='Settings/Misc'
@@ -353,14 +354,20 @@ path='Settings/Graphics'
 	ShButton('Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
 	
 path='Settings/Graphics/Effects'
-	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
-	ShButton('Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen' )
-	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )					
+	ShButton('Toggle Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen' )
+	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )
+	path='Settings/Graphics/Effects/Night View'
+		ShButton('Toggle Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
+	
 
 path='Settings/Graphics/Map'	
-	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
-	ShButton('Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
-	ShButton('Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')	
+	path='Settings/Graphics/Map/VR Grid'
+		ShButton('Toggle VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
+	path='Settings/Graphics/Map/Map Extension'
+		ShButton('Toggle Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
+	path='Settings/Graphics/Map/Edge Barrier'
+		ShButton('Toggle Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')
+	
 path='Settings/Graphics/Unit Visibility'
   ShLabel( 'Unit Visibility Options')
   AddOption({
@@ -388,7 +395,8 @@ path='Help'
 	})
 	ShButton('Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
 	ShButton('Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
-	ShButton('Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
+	path='Help/Clippy Comments'
+		ShButton('Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 
 return confdata
