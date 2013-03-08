@@ -283,31 +283,6 @@ path='Settings/Misc/Screenshots'
 	
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 path='Settings/Graphics'
-	ShLabel('Lups (Lua Particle System)')
-	ShButton('Toggle Lups', function() spSendCommands{'luaui togglewidget LupsManager'} end )
-	
-	ShLabel('Various')
-	AddOption({
-		name = 'Shiny Units',
-		type = 'bool',
-		springsetting = 'AdvUnitShading',
-		OnChange=function(self) spSendCommands{"advshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
-	} )
-	AddOption({ 	
-		name = 'Ground Decals',
-		type = 'bool',
-		springsetting = 'GroundDecals',
-		OnChange=function(self) spSendCommands{"grounddecals " .. (self.value and 1 or 0) } end, 
-	} )
-
-	AddOption({
-		name = 'Maximum Particles (100 - 20,000)',
-		type = 'number',
-		valuelist = {100,500,1000,2000,5000,10000,20000},
-		springsetting = 'MaxParticles',
-		OnChange=function(self) Spring.SendCommands{"maxparticles " .. self.value } end, 
-	} )
-	
 	ShLabel('View Radius')
 	
 	ShButton('Increase Radius', "increaseviewradius" )
@@ -328,11 +303,33 @@ path='Settings/Graphics'
 	ShButton('Bumpmapped', function() spSendCommands{"water 4"} end )
 
 	ShLabel('Shadow Settings')
-	ShButton('Disable Shadows', function() spSendCommands{"Shadows 0"} end )
-	ShButton('Toggle Terrain Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); if (curShadow<2) then curShadow=2 else curShadow=1 end; spSendCommands{"Shadows "..curShadow} end )
-	ShButton('Low Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 1024"} end )
-	ShButton('Medium Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 2048"} end )
-	ShButton('High Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 4096"} end )
+	
+	AddOption({
+		name = 'Shadow Detail (Slide left for off)',
+		type = 'number',
+		valuelist = {512, 1024, 2048, 4096},
+		springsetting = 'ShadowMapSize',
+		OnChange=function(self)
+			if self.value == 512 then
+				spSendCommands{"Shadows 0 0"} --doing this sets shadowmapsize to 512. It will look at the springsetting field and we'll turn shadows off if 512.
+				return
+			end
+			local curShadow = Spring.GetConfigInt("Shadows") or 0
+			curShadow=math.max(1,curShadow)
+			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
+		end, 
+	} )
+	ShButton('Enable Terrain Shadows',
+		function()
+			local curShadow=Spring.GetConfigInt("Shadows") or 0
+			if curShadow == 0 then
+				Spring.Echo 'Shadows are turned off. You must first enable them using the above slider.'
+				return
+			end
+			if (curShadow<2) then curShadow=2 else curShadow=1 end
+			spSendCommands{"Shadows "..curShadow}
+		end
+	)
 	
 	ShLabel('Various')
 	AddOption({
@@ -354,6 +351,27 @@ path='Settings/Graphics'
 		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
 	} )
 	
+	AddOption({
+		name = 'Shiny Units',
+		type = 'bool',
+		springsetting = 'AdvUnitShading',
+		OnChange=function(self) spSendCommands{"advshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
+	} )
+	AddOption({ 	
+		name = 'Ground Decals',
+		type = 'bool',
+		springsetting = 'GroundDecals',
+		OnChange=function(self) spSendCommands{"grounddecals " .. (self.value and 1 or 0) } end, 
+	} )
+
+	AddOption({
+		name = 'Maximum Particles (100 - 20,000)',
+		type = 'number',
+		valuelist = {100,500,1000,2000,5000,10000,20000},
+		springsetting = 'MaxParticles',
+		OnChange=function(self) Spring.SendCommands{"maxparticles " .. self.value } end, 
+	} )
+	ShButton('Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager'} end )
 	ShButton('Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
 	
 path='Settings/Graphics/Effects'
