@@ -253,6 +253,9 @@ path='Settings/Interface/Selection'
 		ShButton('Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected and hovered-over units")	
 	path='Settings/Interface/Selection/Team Platters'
 		ShButton('Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
+path='Settings/Interface/Command Visibility'
+  ShButton('Toggle Show all Commands', function() spSendCommands{"luaui togglewidget Show All Commands"} end, "Shows all unit commands")
+
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 path='Settings/Misc'
@@ -381,8 +384,9 @@ path='Settings/Graphics/Unit Visibility'
   ShLabel( 'Unit Visibility Widgets')
   ShButton('Outline',function() spSendCommands{"luaui togglewidget Outline"} end, "Shows cartoon-like outline around units")
   ShButton('Halo', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
-  ShButton('XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
   ShButton('Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
+	path='Settings/Graphics/Unit Visibility/XRay Shader'
+  	ShButton('Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
 
 --- HELP ---
 path='Help'

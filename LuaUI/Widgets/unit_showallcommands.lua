@@ -19,10 +19,11 @@ local spGetAllUnits = Spring.GetAllUnits
 local spSendLuaRulesMsg = Spring.SendLuaRulesMsg
 local spIsGUIHidden = Spring.IsGUIHidden
 local spGetModKeyState = Spring.GetModKeyState
+local spIsUnitSelected = Spring.IsUnitSelected
 
 local drawUnits = {}
 
-options_path = 'Settings/Interface/Show All Commands'
+options_path = 'Settings/Interface/Command Visibility'
 options_order = { 'showonlyonshift'}
 options = {
 	
@@ -36,9 +37,9 @@ options = {
 
 function widget:DrawWorld()
 
-	if not spIsGUIHidden() and (not options.showonlyonshift.value or select(4,spGetModKeyState())) then
+	if not spIsGUIHidden()  then
 		for i, v in pairs(drawUnits) do
-			if i then
+			if i and (not options.showonlyonshift.value or select(4,spGetModKeyState()) or (spIsUnitSelected(i) and true)) then
 				spDrawUnitCommands(i)
 			end
 		end
