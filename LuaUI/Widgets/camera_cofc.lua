@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.112 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16", --2013-03-3 (msafwan)
+    date      = "2011-03-16", --2013-March-9 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -1139,7 +1139,7 @@ function widget:Update(dt)
 	end
 
 	if options.follow.value then --if follow selected player's cursor: do
-		camcycle = camcycle %(8) + 1
+		camcycle = camcycle %(8) + 1 --automatically reset value to Zero (0) every 8th iteration.
 		if camcycle == 1 then
 			if WG.alliedCursorsPos then 
 				if options.followautozoom.value then
@@ -1171,12 +1171,18 @@ function widget:Update(dt)
 		PeriodicWarning()
 	end
 	
-	trackcycle = trackcycle %(4) + 1
+	trackcycle = trackcycle %(4) + 1 --automatically reset "trackcycle" value to Zero (0) every 4th iteration. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
 	if trackcycle == 1 and trackmode and (not rotate) then --update trackmode during normal/non-rotating state (doing both will cause a zoomed-out bug)
 		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
+			local vx,vy,vz = Spring.GetUnitVelocity(selUnits[1])
 			local x,y,z = spGetUnitPosition( selUnits[1] )
-			spSetCameraTarget(x,y,z, 0.2)
+			--MAINTENANCE NOTE: the following smooth value is obtained from trial-n-error. There's no formula to calculate and it could change depending on engine (currently Spring 91). 
+			--The following instruction explain how to get this smooth value:
+			--1) reset Spring.SetCameraTarget to: (x+vx,y+vy,z+vz, 0.0333)
+			--2) increase value A until camera motion is not jittery, then stop: (x+vx,y+vy,z+vz, 0.0333*A)
+			--3) increase value B until unit center on screen, then stop: (x+vx*B,y+vy*B,z+vz*B, 0.0333*A)
+			spSetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
 		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
 			trackmode=false --exit trackmode
 		end
