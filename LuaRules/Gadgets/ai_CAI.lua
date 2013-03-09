@@ -2848,6 +2848,10 @@ function gadget:GameFrame(n)
 				if debugData.showFacJobList[team] then
 					echoFacJobList(team)
 				end
+				local isDead = select(3, spGetTeamInfo(team))
+				if isDead then
+					aiTeamData[team] = nil	-- team is dead, stop working
+				end
 			end
 		
 		end
