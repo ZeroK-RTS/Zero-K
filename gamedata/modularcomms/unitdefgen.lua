@@ -229,6 +229,8 @@ local function ProcessComm(name, config)
 				local decName = dec
 				if type(dec) == "table" then
 					decName = dec.name or key
+				elseif type(dec) == "bool" then
+					decName = key
 				end
 				
 				if decorations[decName] then
@@ -236,7 +238,7 @@ local function ProcessComm(name, config)
 						decorations[decName].func(commDefs[name], config) 
 					end
 				else
-					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "error", "\tERROR: Decoration "..decName.." not found")
+					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", "\tDecoration "..decName.." not found")
 				end
 			end
 		end
