@@ -370,8 +370,8 @@ local function WriteTable(array, numIndents, endOfFile, concise)
 			if not concise then
 			  str = str .. "[" .. i .. "] = "
 			end
-		elseif keywords[i] or (type(i) == "string" --[[and i:find("[/.+-=><#%^*()]") ]] ) then
-			str = str .. string.format("%q", i) .. "= "
+		elseif keywords[i] or (type(i) == "string") then
+			str = str .. "[" .. string.format("%q", i) .. "]" .. "= "
 		else
 			str = str .. i .. " = "
 		end
