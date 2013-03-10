@@ -47,6 +47,7 @@ local title_image = confdata.title_image
 local keybind_file = confdata.keybind_file or title_text .. '_keys.lua'
 local file_return = VFS.Include(keybind_file, nil, VFS.ZIP)
 local defaultkeybinds, defaultkeybind_date = file_return.keybinds, file_return.date
+local useUiKeys = false
 --file_return = nil
 
 local _, _, _, _, _, _, _, _, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
@@ -864,6 +865,11 @@ local function ReApplyKeybinds()
 	{ "\2", "\1" },
 	]]
 	--echo 'ReApplyKeybinds'
+	
+	if useUiKeys then
+		return
+	end
+	
 	for _,elem in ipairs(keybounditems) do
 		local actionName = elem[1]
 		local hotkey = elem[2]
@@ -2128,8 +2134,12 @@ function widget:Initialize()
 	
 	MakeMenuBar()
 	
-	if not settings.config['epic_Settings/Misc_Use_uikeys.txt'] then
+	useUiKeys = settings.config['epic_Settings/Misc_Use_uikeys.txt']
+	
+	if not useUiKeys then
 		spSendCommands("unbindall")
+	else
+		echo('You have opted to use the engine\'s uikeys.txt. The menu keybind system will not be used.')
 	end
 	
 	ReApplyKeybinds()
