@@ -1,16 +1,16 @@
 -- $Id: unit_jumpjets.lua 4056 2009-03-11 02:59:18Z quantum $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local moveCtrlJump = not (Spring.GetModOptions().impulsejump  == "1")
+local isImpulseJump = (Spring.GetModOptions().impulsejump  == "1") --ImpulseJump
 function gadget:GetInfo()
 	return {
-		name    = "Jumpjets",
-		desc    = "Gives units the jump ability",
-		author  = "quantum",
-		date    = "May 14, 2008",
+		name    = "Impulse Jumpjets",
+		desc    = "Gives units the impulse jump ability",
+		author  = "quantum, modified by msafwan (impulsejump)",
+		date    = "May 14 2008, March 11 2013",
 		license = "GNU GPL, v2 or later",
-		layer   = 0,
-		enabled = moveCtrlJump, -- loaded by default?
+		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage)
+		enabled = isImpulseJump,
 	}
 end
 
@@ -37,22 +37,23 @@ include("LuaRules/Configs/customcmds.h.lua")
 -- needed for checks
 
 local Spring    = Spring
-local MoveCtrl  = Spring.MoveCtrl
 local coroutine = coroutine
 local Sleep	    = coroutine.yield
 local pairs     = pairs
 local assert    = assert
 
-local pi2    = math.pi*2
+local RADperROT = math.pi*2/2^16
 local random = math.random
 local abs    = math.abs
 
 local CMD_STOP = CMD.STOP
+local CMD_WAIT = CMD.WAIT
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
-local spGetUnitBasePosition  = Spring.GetUnitBasePosition
+local spGetUnitPosition  = Spring.GetUnitPosition
 local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spSetUnitNoMinimap   = Spring.SetUnitNoMinimap
 local spGetCommandQueue    = Spring.GetCommandQueue
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
@@ -72,11 +73,9 @@ local spGetUnitTeam        = Spring.GetUnitTeam
 local spDestroyUnit        = Spring.DestroyUnit
 local spCreateUnit         = Spring.CreateUnit
 
-local mcSetRotationVelocity = MoveCtrl.SetRotationVelocity
-local mcSetPosition	        = MoveCtrl.SetPosition
-local mcSetRotation         = MoveCtrl.SetRotation
-local mcDisable	            = MoveCtrl.Disable
-local mcEnable	            = MoveCtrl.Enable
+local spAddUnitImpulse      = Spring.AddUnitImpulse
+local spSetUnitRotation  	= Spring.SetUnitRotation 
+local spGetUnitVelocity		= Spring.GetUnitVelocity
 
 local SetLeaveTracks = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks --0.82 compatiblity
 
@@ -88,6 +87,8 @@ local landBoxSize = 60
 local jumps = {}
 local jumping = {}
 local goalSet = {}
+local impulseQueue = {} --used by impulse jump to queue unit impulses outside coroutine. Note: Doing impulses inside coroutine cause Newton to be nonfunctional toward jumping unit.
+local unitCmdQueue = {} --only used in impulse jump. It remember command queue issued while unit is jumping. A workaround for an issue where unit automatically try to return to the place where they started jumping.
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -106,7 +107,7 @@ local jumpCmdDesc = {
 	name		= 'Jump',
 	cursor	= 'Jump',	-- add with LuaUI?
 	action	= 'jump',
-	tooltip = 'Jump to selected position.',
+	tooltip = 'Impulse Jump to selected position.',
 }
 
 	
@@ -169,16 +170,42 @@ local function ReloadQueue(unitID, queue, cmdTag)
 	
 end
 
+local function FindLaunchSpeedAndAcceleration(flightTime, vectorY, jumpHeight,groundDistance, vectorX, vectorZ)
+	--Given value:
+	local wantedTime = flightTime
+	local diffHeight = vectorY
+	local apexHeight = jumpHeight
+	local dx = vectorX
+	local dz = vectorZ
+	local unitID = unitID
+	--Input conversion
+	apexHeight = math.max(apexHeight, diffHeight) --safety, if apexHeight too small it cause negative sqrt
+	diffHeight = math.min(diffHeight, apexHeight) --safety, if diffHeight too big it cause negative sqrt
+	local dxdz = math.sqrt(dx*dx + dz*dz) --hypothenus for xz direction
+	local unitDirection = math.atan2(dx/dxdz, dz/dxdz)
+	--Formula
+	local constant3 = (diffHeight/wantedTime)
+	local constant1 = (wantedTime/(4*apexHeight))
+	local quadraticSolution = (1 + math.sqrt(1*1 - 4*constant1*constant3))/(2*constant1)
+	local horizontalVelocity = groundDistance/wantedTime
+	--Result
+	local verticalLaunchVel = quadraticSolution
+	local gravity = verticalLaunchVel*verticalLaunchVel/(2*apexHeight)
+	local xVelocity = math.sin(unitDirection)*horizontalVelocity --x is math.sin (not math.cos) because Spring's coordinate is: positive-x toward the right and positive-z toward the bottom
+	local zVelocity = math.cos(unitDirection)*horizontalVelocity
+	return verticalLaunchVel, gravity, xVelocity, zVelocity
+end
+
 local function Jump(unitID, goal, cmdTag)
 	goal[2]						 = spGetGroundHeight(goal[1],goal[3])
-	local start				 = {spGetUnitBasePosition(unitID)}
+	local start				 = {spGetUnitPosition(unitID)}
 
 	local fakeUnitID
 	local unitDefID		 = spGetUnitDefID(unitID)
 	local jumpDef			 = jumpDefs[unitDefID]
 	local speed				 = jumpDef.speed
-	local delay				= jumpDef.delay
 	local height				= jumpDef.height
+	local limitHeight		= jumpDef.limitHeight
 	local cannotJumpMidair		= jumpDef.cannotJumpMidair
 	local reloadTime		= (jumpDef.reload or 0)*30
 	local teamID				= spGetUnitTeam(unitID)
@@ -187,58 +214,60 @@ local function Jump(unitID, goal, cmdTag)
 		return false, true
 	end
 	
-	local rotateMidAir	= jumpDef.rotateMidAir
-	local cob 	 		= jumpDef.cobscript
-	local env
-
 	local vector = {goal[1] - start[1],
 					goal[2] - start[2],
 					goal[3] - start[3]}
-	
-	-- vertex of the parabola
+					
+	if not limitHeight then
+		height = math.max(height, vector[2]+height) --is always higher than the present or the target location
+	end
+
+	-- vertex of a parabola. This is for flightDist estimate, not need to be too accurate
 	local vertex = {start[1] + vector[1]*0.5,
-					start[2] + vector[2]*0.5 + (1-(2*0.5-1)^2)*height,
+					start[2] + height,
 					start[3] + vector[3]*0.5}
-	
-	local lineDist = GetDist3(start, goal)
-	if lineDist == 0 then lineDist = 0.00001 end
+					
+	local lineDist = GetDist3({start[1],0,start[3]}, {goal[1],0,goal[3]})
 	local flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
+	local duration = flightDist/speed
 	
-	local speed = speed * lineDist/flightDist
-	local step = speed/lineDist
-	local duration = math.ceil(1/step)+1
-	
+	local verticalLaunchVel, gravity, xVelocity, zVelocity = FindLaunchSpeedAndAcceleration(duration, vector[2],height,lineDist,vector[1],vector[3])
+
 	-- check if there is no wall in between
-	local x,z = start[1],start[3]
-	for i=0, 1, step do
-		x = x + vector[1]*step
-		z = z + vector[3]*step
-		if ( (spGetGroundHeight(x,z) - 30) > (start[2] + vector[2]*i + (1-(2*i-1)^2)*height)) then
+	local x,z
+	for i=10, duration-10 do
+		x = start[1] + xVelocity*i
+		z = start[3] + zVelocity*i
+		if ( (spGetGroundHeight(x,z) - 30) > (start[2] + verticalLaunchVel*i - gravity*i*i/2)) then
 			return false, false -- FIXME: should try to use SetMoveGoal instead of jumping!
 		end
 	end
 
 	-- pick shortest turn direction
-	local rotUnit			 = 2^16 / (pi2)
-	local startHeading	= spGetUnitHeading(unitID) + 2^15
-	local goalHeading	 = spGetHeadingFromVector(vector[1], vector[3]) + 2^15
-	if (goalHeading	>= startHeading + 2^15) then
-		startHeading = startHeading + 2^16
-	elseif (goalHeading	< startHeading - 2^15)	then
-		goalHeading	= goalHeading	+ 2^16
+	local startHeading = spGetUnitHeading(unitID)
+	local goalHeading = spGetHeadingFromVector(vector[1], vector[3])
+	local turn
+	do
+		local fullCirle     = 2^16
+		local halfCircle    = 2^15
+		local startHeadingB = startHeading + halfCircle
+		local goalHeadingB = goalHeading + halfCircle
+		if (startHeadingB + halfCircle <= goalHeadingB) then
+			startHeadingB = startHeadingB + fullCirle
+		elseif (goalHeadingB + halfCircle < startHeadingB)	then
+			goalHeadingB	= goalHeadingB	+ fullCirle
+		end
+		turn = goalHeadingB - startHeadingB
 	end
-	local turn = goalHeading - startHeading
 	
-	jumping[unitID] = true
-
-	mcEnable(unitID)
-	Spring.SetUnitVelocity(unitID,0,0,0)
-	SetLeaveTracks(unitID, false)
-
+	local cob			= jumpDef.cobscript
+	local delay			= jumpDef.delay
+	local env
+	local rotateMidAir	= jumpDef.rotateMidAir
+	
 	if not cob then
 		env = Spring.UnitScript.GetScriptEnv(unitID)
 	end
-	
 	if (delay == 0) then
 		if cob then
 				spCallCOBScript( unitID, "BeginJump", 0)
@@ -246,8 +275,7 @@ local function Jump(unitID, goal, cmdTag)
 				Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
 			end
 		if rotateMidAir then
-			mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
-			mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
+			spSetUnitRotation(unitID, 0, -1*startHeading*RADperROT, 0) -- keep current heading. Note: need to be negative because of bug? not needed for MoveCtrl.SetUnitRotation() apparently
 		end
 	else
 		if cob then
@@ -256,40 +284,45 @@ local function Jump(unitID, goal, cmdTag)
 			Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist,duration)
 		end
 	end
+	
+	jumping[unitID] = true
 	spSetUnitRulesParam(unitID,"jumpReload",0)
 
 	local function JumpLoop()
-	
 		if delay > 0 then
-			for i=delay, 1, -1 do
+			local countUp = 1
+			while (countUp <= delay ) do
 				if GG.wasMorphedTo[unitID] then
 					local oldUnitID = unitID --previous unitID
 					unitID = GG.wasMorphedTo[unitID] --new unitID
 					local unitDefID = spGetUnitDefID(unitID)
 					if (not jumpDefs[unitDefID]) then --check if new unit can jump
-						jumping[oldUnitID] = nil
-						lastJump[oldUnitID] = nil
 						return --exit JumpLoop() if unit can't jump
 					end
 					cob = jumpDefs[unitDefID].cobscript --script type
 					rotateMidAir = jumpDefs[unitDefID].rotateMidAir --unit rotate to face new direction?
 					delay = jumpDefs[unitDefID].delay --prejump delay
-					speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
 					height = jumpDefs[unitDefID].height --max height
+					speed = jumpDefs[unitDefID].speed --speed from point A to B to C
 					reloadTime = (jumpDefs[unitDefID].reload or 0)*30 --jump reload time
+					limitHeight = jumpDefs[unitDefID].limitHeight --limit height to height?
+					if not limitHeight then
+						height = math.max(height, vector[2]+height) --is always higher than the present or the target location
+					end
+					vertex[2] = (start[2] + height)
+					flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
+					local newDuration = flightDist/speed
+					if newDuration ~= duration then
+						verticalLaunchVel, gravity, xVelocity, zVelocity = FindLaunchSpeedAndAcceleration(duration, vector[2],height,lineDist,vector[1],vector[3])
+						duration = newDuration
+					end
+					spSetUnitRulesParam(unitID,"jumpReload",0)
 					if not cob then
 						env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
 					end
-					step = speed/lineDist --resolution of JumpLoop() update
-					mcEnable(unitID) --enable MoveCtrl for new unit
-					SetLeaveTracks(unitID, false) --set no track
-					jumping[unitID] = true --flag unit as jumping
-					lastJump[unitID] = lastJump[oldUnitID] --copy last jump timestamp to new unit
-					jumping[oldUnitID] = nil --empty old unit's data
-					lastJump[oldUnitID] = nil
-					spSetUnitRulesParam(unitID,"jumpReload",0)
-				end			
+				end
 				Sleep()
+				countUp = countUp +1
 			end
 		
 			if cob then
@@ -299,73 +332,78 @@ local function Jump(unitID, goal, cmdTag)
 			end
 
 			if rotateMidAir then
-				mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
-				mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
+				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0) -- keep current heading.. Note: need to be negative because of bug? not needed for MoveCtrl.SetUnitRotation() apparently
 			end
-		
-			--fakeUnitID = spCreateUnit(
-			--"fakeunit_aatarget", start[1], start[2], start[3], "n", teamID)
-			--mcEnable(fakeUnitID)
-			--spSetUnitNoSelect(fakeUnitID, true)
-			--spSetUnitBlocking(fakeUnitID, false)
-			--spSetUnitNoDraw(fakeUnitID, true)
-			--spSetUnitNoMinimap(fakeUnitID, true)
 		end
-	
+		
+		SetLeaveTracks(unitID, false)
+		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {}) --we give wait so that unit stop, thus its speed don't interfere with jumping. Note; flying unit wont be effected
+			Sleep()
+			Sleep()
+			impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+			impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
+		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {}) --continue move
+		unitCmdQueue[unitID] = spGetCommandQueue(unitID)
+		
 		local halfJump
 		local i = 0
-		while i <= 1 do
+		while i <= duration*1.5 do
 			if GG.wasMorphedTo[unitID] then
 				local oldUnitID = unitID
 				unitID = GG.wasMorphedTo[unitID]
 				local unitDefID = spGetUnitDefID(unitID)
 				if (not jumpDefs[unitDefID]) then
-					jumping[oldUnitID] = nil
-					lastJump[oldUnitID] = nil
 					return
 				end
 				cob = jumpDefs[unitDefID].cobscript
-				speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
 				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
+				spSetUnitRulesParam(unitID,"jumpReload",0)
+				SetLeaveTracks(unitID, false)			
 				if not cob then
 					env = Spring.UnitScript.GetScriptEnv(unitID)
 				end
-				step = speed/lineDist --resolution of JumpLoop() update
-				mcEnable(unitID)
-				SetLeaveTracks(unitID, false)
-				jumping[unitID] = true
-				lastJump[unitID] = lastJump[oldUnitID]
-				jumping[oldUnitID] = nil
-				lastJump[oldUnitID] = nil				
 				halfJump = nil --reset halfjump flag. Redo halfjump script for new unit
-				if rotateMidAir then 
-					mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0) --resume unit rotation mid air
+			end
+			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then
+				return --unit died
+			end
+			if not jumping[unitID] then
+				break --jump aborted (skip to refreshing reload bar)
+			end
+
+			if type(jumping[unitID])== 'number'  then --if collision detected?	skip trajectory maintenance
+				if jumping[unitID] > 0 then
+					if jumping[unitID] == 1 then
+						local _,vy,_= spGetUnitVelocity(unitID)
+						impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+						impulseQueue[#impulseQueue+1] = {unitID, 0, -vy-1, 0} --add correction impulse
+					end
+					jumping[unitID] = jumping[unitID]-1				
+				else
+					jumping[unitID] = true
 				end
-				spSetUnitRulesParam(unitID,"jumpReload",0)
-			end
-			if ((not spGetUnitTeam(unitID)) and fakeUnitID) then
-				spDestroyUnit(fakeUnitID, false, true)
-				return -- unit died
-			end
-			local x0, y0, z0 = spGetUnitBasePosition(unitID)
-			local x = start[1] + vector[1]*i
-			local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height -- parabola
-			local z = start[3] + vector[3]*i
-			mcSetPosition(unitID, x, y, z)
-			if x0 then
-				spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
+			else 
+				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
+				local _,vy,_= spGetUnitVelocity(unitID)
+				local speedDiffer =desiredVerticalSpeed - vy --calculate correction
+				local sign = math.abs(speedDiffer)/speedDiffer
+				speedDiffer = sign*math.min(math.abs(speedDiffer),10) --cap maximum correction to 10 impulse safety against 'physic glitch' (violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
+				impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+				impulseQueue[#impulseQueue+1] = {unitID, 0, speedDiffer-1, 0} --add correction impulse
 			end
 		
+			if rotateMidAir then -- allow unit to maintain posture in the air
+				spSetUnitRotation(unitID, 0, (-1*startHeading-turn*i/duration)*RADperROT, 0) -- step by step rotation. Note: need to be negative because of bug? not needed for MoveCtrl.SetUnitRotation() apparently
+			else
+				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0)-- keep current heading .
+			end
+			
 			if cob then
-				spCallCOBScript(unitID, "Jumping", 1, i * 100)
+				spCallCOBScript(unitID, "Jumping", 1, i/duration * 100)
 			else
 				Spring.UnitScript.CallAsUnit(unitID,env.jumping)
 			end
-		
-			if (fakeUnitID) then 
-				mcSetPosition(fakeUnitID, x, y, z) 
-			end
-			if (not halfJump and i > 0.5) then
+			if (not halfJump and i/duration > 0.5) then
 				if cob then
 					spCallCOBScript( unitID, "HalfJump", 0)
 				else
@@ -374,11 +412,7 @@ local function Jump(unitID, goal, cmdTag)
 				halfJump = true
 			end
 			Sleep()
-			i = i + step
-		end
-
-		if (fakeUnitID) then 
-			spDestroyUnit(fakeUnitID, false, true) 
+			i = i + 1 --next frame
 		end
 		
 		if cob then
@@ -390,31 +424,22 @@ local function Jump(unitID, goal, cmdTag)
 		lastJump[unitID] = jumpEndTime
 		jumping[unitID] = false
 		SetLeaveTracks(unitID, true)
-		mcDisable(unitID)
 	
-		--mcSetPosition(unitID, start[1] + vector[1],start[2] + vector[2]-6,start[3] + vector[3])
-		local oldQueue = spGetCommandQueue(unitID)
-	
-		ReloadQueue(unitID, oldQueue, cmdTag)
+		ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --reload the order given during jump. This override the unit's tendency to return to their jumping position
+		unitCmdQueue[unitID] = nil
 	
 		for j=1, reloadTime do
 			if GG.wasMorphedTo[unitID] then
 				local oldUnitID = unitID
 				unitID = GG.wasMorphedTo[unitID]
+				local unitDefID = spGetUnitDefID(unitID)
 				if (not jumpDefs[unitDefID]) then --check if new unit can jump
 					break
 				end
 				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
-				lastJump[unitID] = jumpEndTime --copy last jump timestamp to new unit
-				jumping[oldUnitID] = nil --empty old unit's data
 			end
 			spSetUnitRulesParam(unitID,"jumpReload",j/reloadTime)
 			Sleep()
-			if j == 1 then
-				if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-					Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
-				end
-			end
 		end
 	end
 	
@@ -441,6 +466,26 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- weaponDefID -1 --> debris collision
+-- weaponDefID -2 --> ground collision
+-- weaponDefID -3 --> object collision
+-- weaponDefID -4 --> fire damage
+-- weaponDefID -5 --> kill damage
+--Detect ground landing:
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
+	-- unit or wreck collision
+	if jumping[unitID] and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
+		jumping[unitID] = 3 --skip jump impulse for several cycle to escape 'physic glitch'
+		return math.random()  -- no collision damage. use random return so that unit_fall_damage.lua do not use pairs of zero to calculate collision damage.
+	end
+	-- ground collision
+	if jumping[unitID] and weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
+		spSetUnitVelocity(unitID,0,Game.gravity*3/30/30,0) --add some bounce upward to escape 'physic glitch'
+		jumping[unitID] = false --abort jump
+		return 0  -- no collision damage.
+	end
+	return damage
+end
 
 function gadget:Initialize()
 	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 0.7})
@@ -453,7 +498,6 @@ function gadget:Initialize()
 	GG.wasMorphedTo = GG.wasMorphedTo or {}
 end
 
-
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (not jumpDefs[unitDefID]) then
 		return
@@ -463,20 +507,29 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
 end
 
-
-function gadget:UnitDestroyed(unitID, unitDefID)
-	if not (jumping[unitID] and GG.wasMorphedTo[unitID]) then --do not clear the "lastJump[]" table if unit is just morphing & not dying.
-		lastJump[unitID] = nil
+function gadget:UnitDestroyed(oldUnitID, unitDefID)
+	if jumping[oldUnitID] and GG.wasMorphedTo[oldUnitID] then
+		local newUnitID = GG.wasMorphedTo[oldUnitID]
+		jumping[newUnitID] = jumping[oldUnitID] --copy last jump state to new unit
+		lastJump[newUnitID] = lastJump[oldUnitID] --copy last jump timestamp to new unit
+		unitCmdQueue[newUnitID] = unitCmdQueue[oldUnitID]
+	end
+	if lastJump[oldUnitID] then
+		lastJump[oldUnitID] = nil
+		jumping[oldUnitID] = nil --empty old unit's data
+		unitCmdQueue[oldUnitID] = nil
 	end
 end
 
-
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == CMD_JUMP and 
-		spTestBuildOrder(
-			unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 1) == 0) then
-		return false
+	if unitCmdQueue[unitID] then
+		unitCmdQueue[unitID] = spGetCommandQueue(unitID) --save the order given during jump. Which will be reloaded later upon landing.
 	end
+	-- if (cmdID == CMD_JUMP and 
+		-- spTestBuildOrder(
+			-- unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 1) == 0) then
+		-- return false --block jumping into blocked position
+	-- end
 	if goalSet[unitID] then
 		goalSet[unitID] = nil
 	end	
@@ -504,12 +557,12 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if not Spring.ValidUnitID(unitID) then
 		return true, true
 	end
-
+	
 	if (jumping[unitID]) then
 		return true, false -- command was used but don't remove it
 	end
-
-	local x, y, z = spGetUnitBasePosition(unitID)
+	
+	local x, y, z = spGetUnitPosition(unitID)
 	local distSqr = GetDist2Sqr({x, y, z}, cmdParams)
 	local jumpDef = jumpDefs[unitDefID]
 	local range   = jumpDef.range
@@ -554,4 +607,8 @@ end
 
 function gadget:GameFrame(n)
 	UpdateCoroutines()
+	for i=#impulseQueue, 1, -1 do --we need to apply impulse outside a coroutine thread like this because we don't want impulses in a coroutine to cancel any newton's impulses that is occuring in main thread. We wanted all them to add up.
+		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4])
+		impulseQueue[i]=nil
+	end
 end

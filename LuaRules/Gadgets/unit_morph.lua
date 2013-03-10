@@ -509,14 +509,14 @@ local function FinishMorph(unitID, morphData)
   Spring.SetUnitBlocking(unitID, false)
   morphUnits[unitID] = nil
 
+  --// copy health
   local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(unitID)
   
   local isBeingBuilt = false
   if buildProgress < 1 then
     isBeingBuilt = true
   end
-  local facplop = GG.HasFacplop and GG.HasFacplop(unitID)
-
+  
   local newUnit
 
   if udDst.isBuilding or udDst.isFactory then
@@ -571,9 +571,56 @@ local function FinishMorph(unitID, morphData)
     Spring.SetUnitRotation(newUnit, 0, -h * math.pi / 32768, 0)
   end
 
-
+  --// copy lineage
+  --local lineage = Spring.GetUnitLineage(unitID) 
+  --// copy facplop
+  local facplop = GG.HasFacplop(unitID)  
+  --//copy command queue
+  local cmds = Spring.GetUnitCommands(unitID)
+  --//copy some state
+  local states = Spring.GetUnitStates(unitID)
+  --// copy shield power
+  local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)
   --//copy experience
-  local newXp = Spring.GetUnitExperience(unitID)*XpScale
+  local newXp = Spring.GetUnitExperience(unitID)*XpScale 
+  --//copy unit speed
+  local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
+  
+  --// FIXME: - re-attach to current transport?
+  --// update selection
+  SendToUnsynced("unit_morph_finished", unitID, newUnit)
+  GG.wasMorphedTo[unitID] = newUnit
+  Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
+  
+  Spring.SetUnitBlocking(newUnit, true)  
+  Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
+  
+  --//copy lineage
+  --Spring.SetUnitLineage(newUnit,lineage,true)
+  --//copy unit speed
+  Spring.AddUnitImpulse(newUnit,0,1,0) --dummy impulse (applying impulse>1 stop engine from forcing any unit to stick on map surface)
+  Spring.AddUnitImpulse(newUnit,0,-1,0) --negate dummy impulse
+  Spring.AddUnitImpulse(newUnit,velX,velY,velZ) --restore speed
+  --// copy facplop
+  if facplop then GG.GiveFacplop(newUnit) end  
+  --// copy health
+  -- old health is declared far above
+  local _,newMaxHealth         = Spring.GetUnitHealth(newUnit)
+  local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
+  if newHealth <= 1 then 
+    newHealth = 1 
+  end
+  
+  local newPara = 0
+  if morphData.combatMorph then
+	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
+	local slowDamage = GG.getSlowDamage(unitID)
+	if slowDamage then
+	  GG.addSlowDamage(newUnit, slowDamage)
+	end
+  end
+  Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})  
+  --//copy experience
   local nextMorph = morphDefs[morphData.def.into]
   if nextMorph~= nil and nextMorph.into ~= nil then nextMorph = {morphDefs[morphData.def.into]} end
   if (nextMorph) then --//determine the lowest xp req. of all next possible morphs
@@ -591,9 +638,11 @@ local function FinishMorph(unitID, morphData)
     newXp = math.min( newXp, maxXp*0.9)
   end
   Spring.SetUnitExperience(newUnit, newXp)
-
+  --// copy shield power
+  if oldShieldState and Spring.GetUnitShieldState(newUnit) then
+    Spring.SetUnitShieldState(newUnit, enabled,oldShieldState)
+  end
   --//copy some state
-  local states = Spring.GetUnitStates(unitID)
   Spring.GiveOrderArrayToUnitArray({ newUnit }, {
     { CMD.FIRE_STATE, { states.firestate },             { } },
     { CMD.MOVE_STATE, { states.movestate },             { } },
@@ -602,9 +651,9 @@ local function FinishMorph(unitID, morphData)
     { CMD.ONOFF,      { 1 },                            { } },
     { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, { } },
   })
-
+  --//reassign assist commands to new unit
+  ReAssignAssists(newUnit,unitID)
   --//copy command queue
-  local cmds = Spring.GetUnitCommands(unitID)
   for i = 1, #cmds do
     local cmd = cmds[i]
 	if i == 1 and cmd.id < 0 then -- repair case for construction
@@ -626,55 +675,6 @@ local function FinishMorph(unitID, morphData)
 		Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
 	end
   end
-
-  --//reassign assist commands to new unit
-  ReAssignAssists(newUnit,unitID)
-
-  --// copy health
-  -- old health is declared above
-  local _,newMaxHealth         = Spring.GetUnitHealth(newUnit)
-  local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
-  if newHealth <= 1 then 
-    newHealth = 1 
-  end
-  
-  local newPara = 0
-  if morphData.combatMorph then
-	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
-	local slowDamage = GG.getSlowDamage(unitID)
-	if slowDamage then
-	  GG.addSlowDamage(newUnit, slowDamage)
-	end
-  end
-  
-  Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
-
-  --// copy shield power
-  local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)
-  if oldShieldState and Spring.GetUnitShieldState(newUnit) then
-    Spring.SetUnitShieldState(newUnit, enabled,oldShieldState)
-  end
-
-  --local lineage = Spring.GetUnitLineage(unitID)
-  --Spring.SetUnitLineage(newUnit,lineage,true)
-
-  --// copy facplop
-  if facplop then GG.GiveFacplop(newUnit) end
-  
-  --// FIXME: - re-attach to current transport?
-  --// update selection
-  SendToUnsynced("unit_morph_finished", unitID, newUnit)
-
-  Spring.SetUnitBlocking(newUnit, true)
-  
-  GG.wasMorphedTo[unitID] = newUnit
-  Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
-  local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
-  Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
-  
-  Spring.AddUnitImpulse(newUnit,0,1,0) --dummy impulse (applying impulse>1 stop engine from forcing any unit to stick on map surface)
-  Spring.AddUnitImpulse(newUnit,0,-1,0) --negate dummy impulse
-  Spring.AddUnitImpulse(newUnit,velX,velY,velZ) --restore speed
 end
 
 
