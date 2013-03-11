@@ -275,7 +275,15 @@ local function MakeMinimapButton(file, pos, option)
 		tooltip = ( options[option].name .. desc .. hotkey ),
 		
 		--OnClick={ function(self) options[option].OnChange() end }, 
-		OnClick={ function(self) Spring.SendCommands( action ); end },
+		OnClick={ function(self)
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if meta then
+				WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return true
+			end
+			Spring.SendCommands( action )
+		end },
 		children={
 			Chili.Image:New{
 				file=file,
