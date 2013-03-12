@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "UnitNoStuckInFactory",
     desc      = "Always move unit away from factory's build yard. Prevent case of unit stuck in factory",
     author    = "msafwan",
-    date      = "28 Feb 2013",
+    date      = "13 Feb 2013",
     license   = "none",
 	handler   = false,
     layer     = 1,
@@ -24,9 +24,10 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 				local x,y,z = Spring.GetUnitPosition(unitID)
 				dx = dx*100 --Note: don't need trigonometry here because factory direction is either {0+-,1+-} or {1+-,0+-} (1 or 0), so multiply both with 100 elmo is enough
 				dz = dz*100
+				--note to self: CMD.OPT_META is spacebar, CMD.OPT_INTERNAL is widget. If we use CMD.OPT_INTERNAL Spring might return unit to where it originally started but the benefit is it don't effected by Repeat state (reference: cmd_retreat.lua widget by CarRepairer).
 				Spring.GiveOrderArrayToUnitArray( {unitID},{
-						{CMD.INSERT, {0, CMD.MOVE, CMD.OPT_SHIFT, x+dx, y, z+dz}, {"alt"}}, --note to self: CMD.OPT_META is spacebar, CMD.OPT_INTERNAL is widget, CMD.OPT_RIGHT is ???!!! (if we use CMD.OPT_INTERNAL Spring will return unit to where it originally started. Probably is a safety feature), 
-						{CMD.INSERT, {1, CMD.STOP, CMD.OPT_SHIFT, x+dx, y, z+dz}, {"alt"}}, --add stop so that any unit that initially idle can "stop" and register himself as idle (needed for Autogroup widget)
+						{CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
+						{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}}, --force to be idle (may not work).
 						})--insert move-stop command behind existing command
 				--Spring.Echo(CMD[firstCommand.id])
 			end
