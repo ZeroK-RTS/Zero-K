@@ -572,7 +572,7 @@ local options = {
   {
     key		= "impulsejump",
     name	= "Impulses Jump",
-    desc	= "Allow jumps that is effected by gravity and Newton, else will use a cleaner but rigid motion sequence",
+    desc	= "Allow jumps that is effected by gravity and Newton, else will use a cleaner but rigid motion sequence. CAUTION: partial engine support in Spring 91, no engine support above Spring 91 until Spring 93.1.1++develop (not released)",
     type	= "bool",
     def		= false,
     section	= "experimental",
