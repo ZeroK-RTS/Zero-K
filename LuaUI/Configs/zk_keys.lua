@@ -161,5 +161,6 @@ return {
 	{	"epic_chili_integral_menu_tab_defence",	"c",},
 	{	"epic_chili_integral_menu_tab_special",	"v",},
 	{	"markingmenu",	"b",},
+	{	"exitwindow",	"escape",},
 },
 }
