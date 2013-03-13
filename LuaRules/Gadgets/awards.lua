@@ -109,7 +109,37 @@ local kamikaze = {
 			
 local flamerWeaponDefs = {}
 
-function comma_value(amount)
+-------------------
+-- Resource tracking
+
+include("LuaRules/Configs/constants.lua")
+
+local allyTeamInfo = {} 
+local resourceInfo = {count = 0, data = {}}
+
+do
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i=1,#allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		allyTeamInfo[allyTeamID] = {
+			team = {},
+			teams = 0,
+		}
+		
+		local teamList = Spring.GetTeamList(allyTeamID)
+		for j=1,#teamList do
+			local teamID = teamList[j]
+			allyTeamInfo[allyTeamID].teams = allyTeamInfo[allyTeamID].teams + 1
+			allyTeamInfo[allyTeamID].team[allyTeamInfo[allyTeamID].teams] = teamID
+		end
+	end
+end
+
+
+------------------------------------------------
+-- functions
+
+local function comma_value(amount)
 	local formatted = amount .. ''
 	local k
 	while true do  
@@ -121,7 +151,7 @@ function comma_value(amount)
   	return formatted
 end
 
-function getMeanDamageExcept(excludeTeam)
+local function getMeanDamageExcept(excludeTeam)
 	local mean = 0
 	local count = 0
 	for team,dmg in pairs(damageList) do
@@ -135,7 +165,7 @@ function getMeanDamageExcept(excludeTeam)
 	return (count>0) and (mean/count) or 0
 end
 
-function getMaxVal(valList)
+local function getMaxVal(valList)
 	local winTeam, maxVal = false,0
 	for team,val in pairs(valList) do
 		if val and val > maxVal then
@@ -148,7 +178,7 @@ function getMaxVal(valList)
 	return winTeam, maxVal
 end
 
-function getMeanMetalIncome()
+local function getMeanMetalIncome()
 	local num, sum = 0, 0
 	for _,team in pairs(totalTeamList) do
 		sum = sum + select(2, Spring.GetTeamResourceStats(team, "metal"))
@@ -157,7 +187,7 @@ function getMeanMetalIncome()
 	return (sum/num)
 end
 
-function awardAward(team, awardType, record)
+local function awardAward(team, awardType, record)
 	awardList[team][awardType] = record
 	
 	if TESTMODE then
@@ -187,31 +217,7 @@ local function UpdateShareList()
 	shareListTemp2 = CopyTable(shareListTemp1)
 end
 
--------------------
--- Resource tracking
 
-include("LuaRules/Configs/constants.lua")
-
-local allyTeamInfo = {} 
-local resourceInfo = {count = 0, data = {}}
-
-do
-	local allyTeamList = Spring.GetAllyTeamList()
-	for i=1,#allyTeamList do
-		local allyTeamID = allyTeamList[i]
-		allyTeamInfo[allyTeamID] = {
-			team = {},
-			teams = 0,
-		}
-		
-		local teamList = Spring.GetTeamList(allyTeamID)
-		for j=1,#teamList do
-			local teamID = teamList[j]
-			allyTeamInfo[allyTeamID].teams = allyTeamInfo[allyTeamID].teams + 1
-			allyTeamInfo[allyTeamID].team[allyTeamInfo[allyTeamID].teams] = teamID
-		end
-	end
-end
 
 local function UpdateResourceStats(t)
 
@@ -301,13 +307,43 @@ local function UpdateResourceStats(t)
 		aRes.energy_spend_construction = aRes.metal_spend_construction
 		aRes.energy_spend_other = aRes.energy_spend_total - (aRes.energy_spend_overdrive + aRes.energy_spend_construction + aRes.energy_spend_waste)		
 	end
-end
+end --UpdateResourceStats
 
 local function AddTerraformCost(teamID, value)
 	terraformList[teamID] = terraformList[teamID] + value
 end
 
 GG.Awards.AddTerraformCost = AddTerraformCost
+
+local function AddFeatureReclaim(featureID)
+  local featureData = reclaimListByFeature[featureID]
+  local metal = featureData.metal
+  featureData.metal = nil
+
+  for team, part in pairs(featureData) do
+    if (part < 0) then  --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
+      reclaimList[team] = reclaimList[team] - metal * part
+    end
+  end
+end
+
+
+local function FinalizeReclaimList()
+  for featureID, _ in pairs(reclaimListByFeature) do
+    AddFeatureReclaim(featureID)
+  end
+  reclaimListByFeature = {}
+end
+
+
+
+local function UnitResurrected (unitDefID, teamID)
+  local ud = UnitDefs[unitDefID]
+  resurrectList[teamID] = resurrectList[teamID] + (ud and ud.metalCost or 0)
+end
+
+GG.Awards.UnitResurrected = UnitResurrected
+
 -------------------
 -- Callins
 
@@ -387,7 +423,7 @@ function gadget:Initialize()
 
  end
  
-end
+end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	-- Units given to neutral?
@@ -440,7 +476,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 		--echo("unimportant death: ".. ud.name)
 		end
 	end
-end
+end --UnitDestroyed
 
 --[[
 function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, step) 
@@ -461,24 +497,6 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
   return true
 end
 
-local function AddFeatureReclaim(featureID)
-  local featureData = reclaimListByFeature[featureID]
-  local metal = featureData.metal
-  featureData.metal = nil
-
-  for team, part in pairs(featureData) do
-    if (part < 0) then  --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
-      reclaimList[team] = reclaimList[team] - metal * part
-    end
-  end
-end
-
-local function FinalizeReclaimList()
-  for featureID, _ in pairs(reclaimListByFeature) do
-    AddFeatureReclaim(featureID)
-  end
-  reclaimListByFeature = {}
-end
 
 function gadget:FeatureDestroyed (featureID, allyTeam)
   if (reclaimListByFeature[featureID]) then
@@ -487,13 +505,6 @@ function gadget:FeatureDestroyed (featureID, allyTeam)
   end
 end
 
-
-local function UnitResurrected (unitDefID, teamID)
-  local ud = UnitDefs[unitDefID]
-  resurrectList[teamID] = resurrectList[teamID] + (ud and ud.metalCost or 0)
-end
-
-GG.Awards.UnitResurrected = UnitResurrected
 
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
@@ -561,7 +572,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			end	
 		end
 	end
-end
+end --UnitDamaged
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if unitDefID == mexDefID then
@@ -780,7 +791,7 @@ function gadget:GameFrame(n)
 		_G.awardList = awardList
 		sentAwards = true
 	end
-end
+end --GameFrame
 
 
 function gadget:GameOver()
