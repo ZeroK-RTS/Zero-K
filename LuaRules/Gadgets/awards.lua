@@ -1,4 +1,4 @@
--- $Id$
+
 function gadget:GetInfo()
   return {
     name      = "Awards",
@@ -48,32 +48,70 @@ local mexCost = UnitDefNames["cormex"].metalCost
 
 GG.Awards = GG.Awards or {}
 
-local airDamageList		= {}
-local friendlyDamageList= {}
-local damageList 		= {}
-local empDamageList		= {}
-local fireDamageList	= {}
-local navyDamageList	= {}
-local nuxDamageList		= {}
-local defDamageList		= {}
-local t3DamageList		= {}
-local captureList		= {}
-local reclaimList		= {}
 local reclaimListByFeature = {}
-local resurrectList		= {}
-local terraformList		= {}
-local ouchDamageList	= {}
-local kamDamageList		= {}
-local commDamageList	= {}
-local mexList			= {}
-local energyList		= {}	--unused
-local shareList			= {}
 local shareListTemp1	= {}
 local shareListTemp2	= {}
-local commsKilledList	= {}
-local dragonsKilledList	= {}
-local queenKillDamageList	= {}
-local nestsKilledList	= {}
+
+--new
+local awardData = {}
+local awardDescs = 
+{
+	pwn 	= 'Complete Annihilation Award', 
+	navy 	= 'Fleet Admiral', 
+	air 	= 'Airforce General', 
+	nux 	= 'Apocalyptic Achievement Award', 
+	friend 	= 'Friendly Fire Award', 
+	shell 	= 'Turtle Shell Award', 
+	fire 	= 'Master Grill-Chef',
+	emp 	= 'EMP Wizard',
+	t3 		= 'Experimental Engineer',
+	cap 	= 'Capture Award',
+	share 	= 'Share Bear',
+	terra	= 'Legendary Landscaper',
+	reclaim = 'Spoils of War',
+	rezz	= 'Necromancy Award',
+	vet 	= 'Decorated Veteran',
+	ouch 	= 'Big Purple Heart',
+	kam		= 'Kamikaze Award',
+	comm	= 'Master and Commander',
+	mex		= 'Mineral Prospector',
+	rage	= 'Rage Inducer',
+	head	= 'Head Hunter',
+	dragon	= 'Dragon Slayer',
+	heart	= 'Queen Heart Breaker',
+	sweeper	= 'Land Sweeper',
+}
+local basicEasyFactor = 0.5
+local veryEasyFactor = 0.3
+local empFactor = veryEasyFactor*4
+local minFriendRatio = 0.25
+local minReclaimRatio = 0.15
+
+local awardAbsolutes = {
+	cap 		= 1000,
+	share		= 5000,
+	terra		= 1000,
+	rezz		= 3000,
+	mex			= 15,
+	head		= 3,
+	dragon		= 3,
+	sweeper		= 20,
+	heart		= 9*10^9,
+	vet			= 3,
+}
+
+local awardEasyFactors = {
+	shell	 	= basicEasyFactor,
+	fire	 	= basicEasyFactor,
+	
+	nux		 	= veryEasyFactor,
+	kam 		= veryEasyFactor,
+	comm 		= veryEasyFactor,
+	
+	empFactor	= empFactor,
+}
+-- end new
+
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
@@ -154,7 +192,8 @@ end
 local function getMeanDamageExcept(excludeTeam)
 	local mean = 0
 	local count = 0
-	for team,dmg in pairs(damageList) do
+	--for team,dmg in pairs(damageList) do
+	for team,dmg in pairs(awardData.pwn) do
 		if team ~= excludeTeam 
 			and dmg > 100
 		then
@@ -213,7 +252,7 @@ local function CopyTable(original)   -- Warning: circular table references lead 
 end
 
 local function UpdateShareList()
-	shareList = CopyTable(shareListTemp2)
+	awardData.share = CopyTable(shareListTemp2)
 	shareListTemp2 = CopyTable(shareListTemp1)
 end
 
@@ -309,8 +348,14 @@ local function UpdateResourceStats(t)
 	end
 end --UpdateResourceStats
 
+
+local function AddAwardPoints( awardType, teamID, amount )
+	awardData[awardType][teamID] = awardData[awardType][teamID] + amount
+end
+
 local function AddTerraformCost(teamID, value)
-	terraformList[teamID] = terraformList[teamID] + value
+	--terraformList[teamID] = terraformList[teamID] + value
+	AddAwardPoints( 'terra', teamID, value )
 end
 
 GG.Awards.AddTerraformCost = AddTerraformCost
@@ -322,7 +367,10 @@ local function AddFeatureReclaim(featureID)
 
   for team, part in pairs(featureData) do
     if (part < 0) then  --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
-      reclaimList[team] = reclaimList[team] - metal * part
+      --reclaimList[team] = reclaimList[team] - metal * part
+	  if metal then
+		AddAwardPoints( 'reclaim', team, - metal * part )
+	  end
     end
   end
 end
@@ -336,13 +384,105 @@ local function FinalizeReclaimList()
 end
 
 
-
 local function UnitResurrected (unitDefID, teamID)
   local ud = UnitDefs[unitDefID]
-  resurrectList[teamID] = resurrectList[teamID] + (ud and ud.metalCost or 0)
+  --resurrectList[teamID] = resurrectList[teamID] + (ud and ud.metalCost or 0)
+  AddAwardPoints( 'rezz', teamID, (ud and ud.metalCost or 0) )
 end
 
 GG.Awards.UnitResurrected = UnitResurrected
+
+
+
+local function ProcessAwardData()
+	
+	for awardType, data in pairs(awardData) do
+		local winningTeam
+		local maxVal
+		local easyFactor = awardEasyFactors[awardType] or 1
+		local absolute = awardAbsolutes[awardType]
+		local message
+		
+		if awardType == 'vet' then
+			maxVal = expUnitExp
+			winningTeam = expUnitTeam
+		elseif awardType == 'friend' then
+			
+			maxVal = 0
+			for team,dmg in pairs(data) do
+				
+				--local totalDamage = dmg+damageList[team]
+				local totalDamage = dmg + awardData.pwn[team]
+				local damageRatio = totalDamage>0 and dmg/totalDamage or 0
+				
+				if  damageRatio > maxVal then
+					winningTeam = team
+					maxVal = damageRatio
+				end
+			end
+			
+		else
+			winningTeam, maxVal = getMaxVal(data)
+			
+		end
+		
+		if winningTeam then
+			
+			local compare
+			if absolute then
+				compare = absolute
+				
+			elseif awardType == 'reclaim' then
+				compare = getMeanMetalIncome() * easyFactor
+			else
+				compare = getMeanDamageExcept(winningTeam) * easyFactor
+			end
+			
+			--if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
+			if maxVal > compare then
+				maxVal = floor(maxVal)
+				maxValWrite = comma_value(maxVal)
+				message = 'Damage: '.. maxValWrite
+				if awardType == 'cap' then
+					message = 'Captured value: ' .. maxValWrite
+				elseif awardType == 'share' then
+					message = 'Shared value: ' .. maxValWrite
+				elseif awardType == 'terra' then
+					message = 'Terraform: ' .. maxValWrite
+				elseif awardType == 'rezz' then
+					message = 'Resurrected value: ' .. maxValWrite
+				elseif awardType == 'reclaim' then
+					message = maxValWrite .. " m from wreckage"
+				elseif awardType == 'friend' then
+					message = 'Damage inflicted on allies: '.. floor(maxVal * 100) ..'%'
+				elseif awardType == 'mex' then
+					message = 'Mexes: '.. maxVal .. ' built'
+				elseif awardType == 'head' then
+					message = maxVal .. ' Commanders eliminated'
+				elseif awardType == 'dragon' then
+					message = maxVal .. ' White Dragons annihilated'
+				elseif awardType == 'dragon' then
+					local maxQueenKillDamage = floor(maxVal - 9*10^9) --remove the queen kill signature: +9000000000 from the total damage, and remove decimal
+					message = 'Damage: '.. comma_value(maxQueenKillDamage)
+				elseif awardType == 'sweeper' then
+					message = maxVal .. ' Nests wiped out'
+					
+					
+				elseif awardType == 'vet' then
+					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
+					local expUnitExpRounded = ''..floor(expUnitExp * 10)
+					expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1)
+					message = vetName ..', '.. expUnitExpRounded ..' XP'
+				end
+				
+			end
+		end --if winningTeam
+		if message then
+			awardAward(winningTeam, awardType, message)
+		end
+		
+	end
+end
 
 -------------------
 -- Callins
@@ -360,37 +500,25 @@ function gadget:Initialize()
 			totalTeamList[team] = team
 		end
 	end
-		
+	
+	--new
+	for awardType, _ in pairs(awardDescs) do
+		awardData[awardType] = {}
+	end
 	for _,team in pairs(totalTeamList) do
-		airDamageList[team] 	= 0
-		friendlyDamageList[team]= 0
-		damageList[team] 		= 0
-		empDamageList[team] 	= 0
-		fireDamageList[team] 	= 0
-		navyDamageList[team] 	= 0
-		nuxDamageList[team] 	= 0
-		defDamageList[team] 	= 0
-		t3DamageList[team] 		= 0
-		captureList[team]		= 0
-		reclaimList[team]		= 0
-		resurrectList[team]		= 0
-		terraformList[team] 	= 0
-		ouchDamageList[team]	= 0
-		kamDamageList[team]		= 0
-		commDamageList[team]	= 0
-		mexList[team]			= 0
-		shareList[team]			= 0
+		awardList[team] = {}
+		teamCount = teamCount + 1
+		
 		shareListTemp1[team]	= 0
 		shareListTemp2[team]	= 0
-		commsKilledList[team]	= 0
-		dragonsKilledList[team]	= 0
-		queenKillDamageList[team]	= 0
-		nestsKilledList[team]	= 0
-		-- what for rage meter ?
-		awardList[team] = {}
 		
-		teamCount = teamCount + 1
+		for awardType, _ in pairs(awardDescs) do	
+			awardData[awardType][team] = 0
+		end
+		
+		
 	end
+	
 
 	local boatFacs = {'armsy', 'corsy', } --'armasy', 'corasy'}
 	for _, boatFac in pairs(boatFacs) do
@@ -434,14 +562,21 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		if captureList[newTeam] then
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost or 0
-			captureList[newTeam] = captureList[newTeam] + mCost
+			--captureList[newTeam] = captureList[newTeam] + mCost
+			AddAwardPoints( 'cap', newTeam, mCost )
 		end
 	else -- teams are allied
 		if shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost or 0
+			
 			shareListTemp1[oldTeam] = shareListTemp1[oldTeam] + mCost
 			shareListTemp1[newTeam] = shareListTemp1[newTeam] - mCost
+			
+			--[[
+			AddAwardPoints( 'share', oldTeam, mCost )
+			AddAwardPoints( 'share', newTeam, 0-mCost )
+			--]]
 		end
 	end
 end
@@ -459,18 +594,23 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 		--Spring.Echo('Killer Team ' .. killerTeam)
 		local ud = UnitDefs[unitDefID]
 		if ud.customParams.commtype then
-			commsKilledList[killerTeam] = commsKilledList[killerTeam] + 1
+			--commsKilledList[killerTeam] = commsKilledList[killerTeam] + 1
+			AddAwardPoints( 'head', killerTeam, 1 )
 		--	echo('Team ' .. killerTeam .. ' killed a commander, total value = ' .. commsKilledList[killerTeam])
 		elseif ud.name == "chicken_dragon" then --check unit filename
-			dragonsKilledList[killerTeam] = dragonsKilledList[killerTeam] + 1
+			--dragonsKilledList[killerTeam] = dragonsKilledList[killerTeam] + 1
+			AddAwardPoints( 'dragon', killerTeam, 1 )
+			
 		--	echo("Team " .. killerTeam .. " killed a WD, value = ".. dragonsKilledList[killerTeam])
 		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
 			for killerFrienz, _ in pairs(queenKillDamageList) do --give +9000000000 points for all frienz that kill queen and won
-				queenKillDamageList[killerFrienz] = queenKillDamageList[killerFrienz] + 9*10^9  --the extra points is for id purpose
+				--queenKillDamageList[killerFrienz] = queenKillDamageList[killerFrienz] + 9*10^9  --the extra points is for id purpose
+				AddAwardPoints( 'heart', killerFrienz, 9*10^9 )
 			end
 			--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKillDamageList[killerTeam])
 		elseif ud.name == "roost" then
-			nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
+			--nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
+			AddAwardPoints( 'sweeper', killerTeam, 1 )
 		--	echo("Team " .. killerTeam .. " killed a nest, value = ".. nestsKilledList[killerTeam])
 		else
 		--echo("unimportant death: ".. ud.name)
@@ -509,7 +649,6 @@ end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
 		attackerID, attackerDefID, attackerTeam)
-	
 	if (not attackerTeam) 
 		or (attackerTeam == unitTeam)
 		or (attackerTeam == gaiaTeamID) 
@@ -521,11 +660,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 	
 	if spAreTeamsAllied(attackerTeam, unitTeam) then
 		if not paralyzer then
-			friendlyDamageList[attackerTeam] = friendlyDamageList[attackerTeam] + damage
+			--friendlyDamageList[attackerTeam] = friendlyDamageList[attackerTeam] + damage
+			AddAwardPoints( 'friend', attackerTeam, damage )
 		end
 	else
 		if paralyzer then
-			empDamageList[attackerTeam] = empDamageList[attackerTeam] + damage
+			--empDamageList[attackerTeam] = empDamageList[attackerTeam] + damage
+			AddAwardPoints( 'emp', attackerTeam, damage )
 		else
 			local attackedDef= UnitDefs[unitDefID]
 			if attackedDef.name == "chickenflyerqueen" or attackedDef.name == "chickenlandqueen" then
@@ -533,12 +674,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 					queenKillDamageList[attackerTeam] = queenKillDamageList[attackerTeam] + damage --store damage.
 				end
 			end
-			damageList[attackerTeam] = damageList[attackerTeam] + damage
-			ouchDamageList[unitTeam] = ouchDamageList[unitTeam] + damage
+			AddAwardPoints( 'pwn', attackerTeam, damage )
+			AddAwardPoints( 'ouch', unitTeam, damage )
 			local ad = UnitDefs[attackerDefID]
 			
 			if (flamerWeaponDefs[weaponID]) then				
-				fireDamageList[attackerTeam] = fireDamageList[attackerTeam] + damage	
+				AddAwardPoints( 'fire', attackerTeam, damage )
 			end
 			
 			-- Static Weapons
@@ -546,28 +687,27 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			
 				-- bignukes, zenith, starlight
 				if staticO_big[ad.name] then
-					nuxDamageList[attackerTeam] = nuxDamageList[attackerTeam] + damage
+					AddAwardPoints( 'nux', attackerTeam, damage )
 					
 				-- not lrpc, tacnuke, emp missile
 				elseif not staticO_small[ad.name] then
-					defDamageList[attackerTeam] = defDamageList[attackerTeam] + damage
-					
+					AddAwardPoints( 'shell', attackerTeam, damage )
 				end
 				
 			elseif kamikaze[ad.name] then
-				kamDamageList[attackerTeam] = kamDamageList[attackerTeam] + damage
+				AddAwardPoints( 'kam', attackerTeam, damage )
 			
 			elseif ad.canFly then
-				airDamageList[attackerTeam] = airDamageList[attackerTeam] + damage
+				AddAwardPoints( 'air', attackerTeam, damage )
 				
 			elseif boats[attackerDefID] then
-				navyDamageList[attackerTeam] = navyDamageList[attackerTeam] + damage
+				AddAwardPoints( 'navy', attackerTeam, damage )
 			
 			elseif t3Units[attackerDefID] then
-				t3DamageList[attackerTeam] = t3DamageList[attackerTeam] + damage
+				AddAwardPoints( 't3', attackerTeam, damage )
 
 			elseif comms[attackerDefID] then
-				commDamageList[attackerTeam] = commDamageList[attackerTeam] + damage
+				AddAwardPoints( 'comm', attackerTeam, damage )
 				
 			end	
 		end
@@ -576,7 +716,8 @@ end --UnitDamaged
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if unitDefID == mexDefID then
-		mexList[teamID] = mexList[teamID] + 1
+		--mexList[teamID] = mexList[teamID] + 1
+		AddAwardPoints( 'mex', teamID, 1 )
 	end
 end
 
@@ -610,184 +751,18 @@ function gadget:GameFrame(n)
 		end
 	
 		FinalizeReclaimList()
+		
+		
+		--new
+		ProcessAwardData()
 	
-		local pwnTeam, 	maxDamage 		= getMaxVal(damageList)
-		local navyTeam, maxNavyDamage 	= getMaxVal(navyDamageList)
-		local airTeam, 	maxAirDamage 	= getMaxVal(airDamageList)
-		local nuxTeam, 	maxNuxDamage 	= getMaxVal(nuxDamageList)
-		local shellTeam,maxStaticDamage = getMaxVal(defDamageList)
-		local fireTeam, maxFireDamage 	= getMaxVal(fireDamageList)
-		local empTeam, 	maxEmpDamage 	= getMaxVal(empDamageList)
-		local t3Team, 	maxT3Damage 	= getMaxVal(t3DamageList)
-		local kamTeam, 	maxKamDamage 	= getMaxVal(kamDamageList)
-		local commTeam, maxCommDamage 	= getMaxVal(commDamageList)
-		
-		local reclaimTeam, 	maxReclaim 	= getMaxVal(reclaimList)
-		local rezzTeam, maxRezz			= getMaxVal(resurrectList)
-		local terraTeam, maxTerra		= getMaxVal(terraformList)
-		
-		local ouchTeam, maxOuchDamage 	= getMaxVal(ouchDamageList)
-		
-		local capTeam, 	maxCap	 		= getMaxVal(captureList)
-		local shareTeam, maxShare 		= getMaxVal(shareList)
-
-		local mexTeam, maxMex			= getMaxVal(mexList)
-		
-		local commsKilledTeam, maxCommsKilled		= getMaxVal(commsKilledList)
-		local dragonsKilledTeam, maxDragonsKilled	= getMaxVal(dragonsKilledList)
-		local queenKilledTeam, maxQueenKillDamage		= getMaxVal(queenKillDamageList) --get the highest score
-		local nestsKilledTeam, maxNestsKilled	= getMaxVal(nestsKilledList)
-		
-		local friendTeam
-		local maxFriendlyDamageRatio = 0
-		for team,dmg in pairs(friendlyDamageList) do
-			
-			local totalDamage = dmg+damageList[team]
-			local damageRatio = totalDamage>0 and dmg/totalDamage or 0
-			
-			if  damageRatio > maxFriendlyDamageRatio then
-				friendTeam = team
-				maxFriendlyDamageRatio = damageRatio
-			end
-		end
-	
-		
 		--test values
 		if TESTMODE then
 			local testteam = 0
-			--expUnitTeam, expUnitExp			= testteam+0	,113.59444
-			--expUnitDefID = 2
-			--shareTeam, 	maxShare 			= testteam+0	,5144
-			--[[				
-			pwnTeam, 	maxDamage 			= testteam+0	,1
-			navyTeam, 	maxNavyDamage 		= testteam+1	,1
-			t3Team, 	maxT3Damage 		= testteam+1	,1
-			capTeam, 	maxCap	 			= testteam+0	,2
-
-			expUnitTeam, expUnitExp			= testteam+0	,2.4444
-				expUnitDefID = 35
-	
-			airTeam, 	maxAirDamage 		= testteam+2	,2
-			nuxTeam, 	maxNuxDamage 		= testteam+0	,333333333
-
-			shellTeam, 	maxStaticDamage 	= testteam+0	,1
-			mTeam,  mMax 					= testteam+0	,1
-			eTeam, eMax						= testteam+0	,11111111
-			friendTeam, maxFriendlyDamageRatio = testteam+0	,0.5
-			fireTeam, maxFireDamage			= testteam+0	,1
-			empTeam, maxEmpDamage			= testteam+0	,1
-		
-			pwnTeam, 	maxDamage 			= testteam	,1
-			navyTeam, 	maxNavyDamage 	= testteam	,1
-			airTeam, 	maxAirDamage 		= testteam	,1
-			nuxTeam, 	maxNuxDamage 		= testteam	,1
-			shellTeam, 	maxStaticDamage = testteam	,1
-			friendTeam, maxFriendlyDamageRatio = testteam,1
-			fireTeam, maxFireDamage		= testteam	,1
-			empTeam, maxEmpDamage			= testteam	,1
+			
 		--]]	
 		end
-	
-		local easyFactor = 0.5
-		local veryEasyFactor = 0.3
-		local minFriendRatio = 0.25
-		local minReclaimRatio = 0.15
 		
-		if pwnTeam then
-			maxDamage = floor(maxDamage)
-			awardAward(pwnTeam, 'pwn', 'Damage: '.. comma_value(maxDamage))
-		end
-		if navyTeam and maxNavyDamage > getMeanDamageExcept(navyTeam) then
-			maxNavyDamage = floor(maxNavyDamage)
-			awardAward(navyTeam, 'navy', 'Damage: '.. comma_value(maxNavyDamage))
-		end
-		if airTeam and maxAirDamage > getMeanDamageExcept(airTeam) then
-			maxAirDamage = floor(maxAirDamage)
-			awardAward(airTeam, 'air', 'Damage: '.. comma_value(maxAirDamage))
-		end
-		if t3Team and maxT3Damage > getMeanDamageExcept(t3Team) then
-			maxT3Damage = floor(maxT3Damage)
-			awardAward(t3Team, 't3', 'Damage: '.. comma_value(maxT3Damage))
-		end
-		if nuxTeam and maxNuxDamage > getMeanDamageExcept(nuxTeam) * veryEasyFactor then
-			maxNuxDamage = floor(maxNuxDamage)
-			awardAward(nuxTeam, 'nux', 'Damage: '.. comma_value(maxNuxDamage))
-		end
-		if shellTeam and maxStaticDamage > getMeanDamageExcept(shellTeam) * easyFactor then
-			maxStaticDamage = floor(maxStaticDamage)
-			awardAward(shellTeam, 'shell', 'Damage: '.. comma_value(maxStaticDamage))
-		end
-		if kamTeam and maxKamDamage > getMeanDamageExcept(kamTeam) * veryEasyFactor then
-			maxKamDamage = floor(maxKamDamage)
-			awardAward(kamTeam, 'kam', 'Damage: '.. comma_value(maxKamDamage))
-		end
-		if commTeam and maxCommDamage > getMeanDamageExcept(commTeam) * veryEasyFactor then
-			maxCommDamage = floor(maxCommDamage)
-			awardAward(commTeam, 'comm', 'Damage: '.. comma_value(maxCommDamage))
-		end
-		if fireTeam and maxFireDamage > getMeanDamageExcept(fireTeam) * easyFactor then
-			maxFireDamage = floor(maxFireDamage)
-			awardAward(fireTeam, 'fire', 'Damage: '.. comma_value(maxFireDamage))
-		end
-		if empTeam and maxEmpDamage/4 > getMeanDamageExcept(empTeam) * easyFactor then
-			maxEmpDamage = floor(maxEmpDamage)
-			awardAward(empTeam, 'emp', 'Damage: '.. comma_value(maxEmpDamage))
-		end
-		if capTeam and maxCap > 1000 then
-			maxCap = floor(maxCap)
-			awardAward(capTeam, 'cap', 'Captured value: '.. comma_value(maxCap))
-		end
-		
-		if shareTeam and maxShare > 5000 then
-			maxShare = floor(maxShare)
-			awardAward(shareTeam, 'share', 'Shared value: '.. comma_value(maxShare))
-		end
-		
-		if terraTeam and maxTerra > 1000 then
-			maxTerra = floor(maxTerra)
-			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
-		end
-
-		if rezzTeam and maxRezz >= 3000 then
-			maxRezz = floor(maxRezz)
-			awardAward(rezzTeam, 'rezz', 'Resurrected value: '.. comma_value(maxRezz))
-		end
-
-		--Spring.Echo(maxReclaim, getMeanMetalIncome())
-		if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
-			maxReclaim = floor(maxReclaim)
-			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. " m from wreckage")
-		end
-		if friendTeam and maxFriendlyDamageRatio > minFriendRatio then
-			awardAward(friendTeam, 'friend', 'Damage inflicted on allies: '.. floor(maxFriendlyDamageRatio * 100) ..'%')
-		end
-		if ouchTeam then
-			maxOuchDamage = floor(maxOuchDamage)
-			awardAward(ouchTeam, 'ouch', 'Damage: '.. comma_value(maxOuchDamage))
-		end
-		if mexTeam and maxMex > 15 then
-			awardAward(mexTeam, 'mex', 'Mexes: '.. maxMex .. ' built')
-		end
-		if expUnitExp >= 3.0 then
-			local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
-			--local expUnitExpRounded = ''..floor(expUnitExp * 10)/10
-			local expUnitExpRounded = ''..floor(expUnitExp * 10)
-			expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1)
-			awardAward(expUnitTeam, 'vet', vetName ..', '.. expUnitExpRounded ..' XP')
-		end
-		if commsKilledTeam and maxCommsKilled >= 3 then
-			awardAward(commsKilledTeam, 'head', maxCommsKilled .. ' Commanders eliminated')
-		end
-		if dragonsKilledTeam and maxDragonsKilled >= 3 then
-			awardAward(dragonsKilledTeam, 'dragon', maxDragonsKilled .. ' White Dragons annihilated')
-		end
-		if queenKilledTeam and (maxQueenKillDamage > 9*10^9) then
-			maxQueenKillDamage = floor(maxQueenKillDamage - 9*10^9) --remove the queen kill signature: +9000000000 from the total damage, and remove decimal
-			awardAward(queenKilledTeam, 'heart', 'Damage: '.. comma_value(maxQueenKillDamage))
-		end
-		if nestsKilledTeam and (maxNestsKilled >= 20) then
-			awardAward(nestsKilledTeam, 'sweeper', maxNestsKilled .. ' Nests wiped out')
-		end
 		_G.awardList = awardList
 		sentAwards = true
 	end
@@ -999,27 +974,7 @@ function gadget:GameOver()
 
 	--// Resources
 	SendEconomyDataToWidget()
-	
-	--[[
-	gadget.IsAbove = gadget.IsAbove_
-	gadget.MouseMove = gadget.MouseMove_
-	gadget.MousePress = gadget.MousePress_
-	gadget.MouseRelease = gadget.MouseRelease_
-	gadget.DrawScreen = gadget.DrawScreen_
 
-
-	function UC(name)
-		--// bug in gadgetHandler workaround
-		gadgetHandler:UpdateCallIn(name)
-		gadgetHandler:UpdateCallIn(name)
-        end
-
-	UC("IsAbove")
-	UC("MouseMove")
-	UC("MousePress")
-	UC("MouseRelease")
-	UC("DrawScreen")
-	]]--
 end
 
 
