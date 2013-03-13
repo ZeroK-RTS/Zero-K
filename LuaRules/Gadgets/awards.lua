@@ -23,6 +23,35 @@ local echo = Spring.Echo
 local totalTeams = 0
 local totalTeamList = {}
 
+
+local awardDescs = 
+{
+	pwn 	= 'Complete Annihilation Award', 
+	navy 	= 'Fleet Admiral', 
+	air 	= 'Airforce General', 
+	nux 	= 'Apocalyptic Achievement Award', 
+	friend 	= 'Friendly Fire Award', 
+	shell 	= 'Turtle Shell Award', 
+	fire 	= 'Master Grill-Chef',
+	emp 	= 'EMP Wizard',
+	t3 		= 'Experimental Engineer',
+	cap 	= 'Capture Award',
+	share 	= 'Share Bear',
+	terra	= 'Legendary Landscaper',
+	reclaim = 'Spoils of War',
+	rezz	= 'Necromancy Award',
+	vet 	= 'Decorated Veteran',
+	ouch 	= 'Big Purple Heart',
+	kam		= 'Kamikaze Award',
+	comm	= 'Master and Commander',
+	mex		= 'Mineral Prospector',
+	rage	= 'Rage Inducer',
+	head	= 'Head Hunter',
+	dragon	= 'Dragon Slayer',
+	heart	= 'Queen Heart Breaker',
+	sweeper	= 'Land Sweeper',
+}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then 
@@ -54,33 +83,6 @@ local shareListTemp2	= {}
 
 --new
 local awardData = {}
-local awardDescs = 
-{
-	pwn 	= 'Complete Annihilation Award', 
-	navy 	= 'Fleet Admiral', 
-	air 	= 'Airforce General', 
-	nux 	= 'Apocalyptic Achievement Award', 
-	friend 	= 'Friendly Fire Award', 
-	shell 	= 'Turtle Shell Award', 
-	fire 	= 'Master Grill-Chef',
-	emp 	= 'EMP Wizard',
-	t3 		= 'Experimental Engineer',
-	cap 	= 'Capture Award',
-	share 	= 'Share Bear',
-	terra	= 'Legendary Landscaper',
-	reclaim = 'Spoils of War',
-	rezz	= 'Necromancy Award',
-	vet 	= 'Decorated Veteran',
-	ouch 	= 'Big Purple Heart',
-	kam		= 'Kamikaze Award',
-	comm	= 'Master and Commander',
-	mex		= 'Mineral Prospector',
-	rage	= 'Rage Inducer',
-	head	= 'Head Hunter',
-	dragon	= 'Dragon Slayer',
-	heart	= 'Queen Heart Breaker',
-	sweeper	= 'Land Sweeper',
-}
 local basicEasyFactor = 0.5
 local veryEasyFactor = 0.3
 local empFactor = veryEasyFactor*4
@@ -826,34 +828,6 @@ local awardList
 local maxRow 		= 8
 local fontHeight 	= 16
 
-
-local awardDescs = 
-{
-	pwn 	= 'Complete Annihilation Award', 
-	navy 	= 'Fleet Admiral', 
-	air 	= 'Airforce General', 
-	nux 	= 'Apocalyptic Achievement Award', 
-	friend 	= 'Friendly Fire Award', 
-	shell 	= 'Turtle Shell Award', 
-	fire 	= 'Master Grill-Chef',
-	emp 	= 'EMP Wizard',
-	t3 		= 'Experimental Engineer',
-	cap 	= 'Capture Award',
-	share 	= 'Share Bear',
-	terra	= 'Legendary Landscaper',
-	reclaim = 'Spoils of War',
-	rezz	= 'Necromancy Award',
-	vet 	= 'Decorated Veteran',
-	ouch 	= 'Big Purple Heart',
-	kam		= 'Kamikaze Award',
-	comm	= 'Master and Commander',
-	mex		= 'Mineral Prospector',
-	rage	= 'Rage Inducer',
-	head	= 'Head Hunter',
-	dragon	= 'Dragon Slayer',
-	heart	= 'Queen Heart Breaker',
-	sweeper	= 'Land Sweeper',
-}
 
 function gadget:Initialize()
 	local tempTeamList = Spring.GetTeamList()
