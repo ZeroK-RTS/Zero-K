@@ -561,10 +561,9 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		return
 	end
 	if not spAreTeamsAllied(oldTeam,newTeam) then
-		if captureList[newTeam] then
+		if awardData['cap'][newTeam] then --if team exist, then:
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost or 0
-			--captureList[newTeam] = captureList[newTeam] + mCost
 			AddAwardPoints( 'cap', newTeam, mCost )
 		end
 	else -- teams are allied
