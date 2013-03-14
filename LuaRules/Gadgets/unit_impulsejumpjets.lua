@@ -195,7 +195,7 @@ local function FindLaunchSpeedAndAcceleration(flightTime, vectorY, jumpHeight,gr
 	local zVelocity = math.cos(unitDirection)*horizontalVelocity
 	return verticalLaunchVel, gravity, xVelocity, zVelocity
 end
-
+--local speedProfile = {0,}
 local function Jump(unitID, goal, cmdTag)
 	goal[2]						 = spGetGroundHeight(goal[1],goal[3])
 	local start				 = {spGetUnitPosition(unitID)}
@@ -375,8 +375,8 @@ local function Jump(unitID, goal, cmdTag)
 				if jumping[unitID] > 0 then
 					if jumping[unitID] == 1 then
 						local _,vy,_= spGetUnitVelocity(unitID)
-						impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
-						impulseQueue[#impulseQueue+1] = {unitID, 0, -vy-1, 0} --add correction impulse
+						impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
+						impulseQueue[#impulseQueue+1] = {unitID, 0, -vy-4, 0} --add correction impulse
 					end
 					jumping[unitID] = jumping[unitID]-1				
 				else
@@ -384,12 +384,15 @@ local function Jump(unitID, goal, cmdTag)
 				end
 			else 
 				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
+				--Spring.Echo("----")
 				local _,vy,_= spGetUnitVelocity(unitID)
+				--speedProfile[#speedProfile+1]=vy
 				local speedDiffer =desiredVerticalSpeed - vy --calculate correction
 				local sign = math.abs(speedDiffer)/speedDiffer
 				speedDiffer = sign*math.min(math.abs(speedDiffer),10) --cap maximum correction to 10 impulse safety against 'physic glitch' (violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
-				impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
-				impulseQueue[#impulseQueue+1] = {unitID, 0, speedDiffer-1, 0} --add correction impulse
+				impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
+				impulseQueue[#impulseQueue+1] = {unitID, 0, speedDiffer-4, 0} --add correction impulse
+				--Spring.Echo(speedDiffer)
 			end
 		
 			if rotateMidAir then -- allow unit to maintain posture in the air
@@ -608,7 +611,10 @@ end
 function gadget:GameFrame(n)
 	UpdateCoroutines()
 	for i=#impulseQueue, 1, -1 do --we need to apply impulse outside a coroutine thread like this because we don't want impulses in a coroutine to cancel any newton's impulses that is occuring in main thread. We wanted all them to add up.
-		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4])
+		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4],0.001) --0.001 impulse decay rate (meaning: negligible residual impulse)
 		impulseQueue[i]=nil
 	end
+	-- if #speedProfile-1>0 and speedProfile[#speedProfile-1] and speedProfile[#speedProfile] then
+		-- Spring.Echo(speedProfile[#speedProfile] - speedProfile[#speedProfile-1])
+	-- end
 end
