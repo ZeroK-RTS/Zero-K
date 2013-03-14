@@ -1,5 +1,4 @@
 
-
 local rgbSpecMults = {0.25, 0.25, 0.25} -- specular RGB scales
 
 local dynLightDefs = {
@@ -14,7 +13,7 @@ local dynLightDefs = {
 									ttl               = 6 * Game.gameSpeed,
 									decayFunctionType = {0.0, 0.0, 0.0},
 									altitudeOffset    = 0.0,
-									altitudeClimb     = 10,
+									altitudeClimb     = 1.0,
 							},
 					},
 					["corsilo_crblmssl"] = {
@@ -26,7 +25,7 @@ local dynLightDefs = {
 									ttl               = 20 * Game.gameSpeed,
 									decayFunctionType = {0.0, 0.0, 0.0},
 									altitudeOffset    = 150.0,
-									altitudeClimb     = 7.0,
+									altitudeClimb     = 1.0,
 							},
 					},
 			},
