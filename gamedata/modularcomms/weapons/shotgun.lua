@@ -12,6 +12,12 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		miscEffectFire = [[custom:RIOT_SHELL_L]],
+		altforms = {
+			green = {
+				explosionGenerator = [[custom:BEAMWEAPON_HIT_GREEN]],
+				rgbColor = [[0 1 0]],
+			},
+		}
 	},
 	
 	damage                  = {

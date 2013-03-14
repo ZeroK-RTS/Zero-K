@@ -11,7 +11,12 @@ local weaponDef = {
 	customParams			= {
 		slot = [[5]],
 		muzzleEffectShot = [[custom:WARMUZZLE]],
-		miscEffectShot = [[custom:DEVA_SHELLS]],		
+		miscEffectShot = [[custom:DEVA_SHELLS]],
+		altforms = {
+			lime = {
+				rgbColor = [[0.2 1 0]],
+			},
+		}
 	},
 	
 	damage                  = {
