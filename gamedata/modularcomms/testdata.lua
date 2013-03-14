@@ -49,16 +49,8 @@ local base = {
 	{
 		name = "hmg",
 		modules = {
-			"commweapon_heavymachinegun",
+			"commweapon_heavymachinegun_lime",
 			"commweapon_disruptorbomb",
-			"module_autorepair",
-			"module_autorepair",
-			"module_autorepair",
-			"module_autorepair",
-			"module_autorepair",
-			"module_autorepair",
-			"module_autorepair",
-			"module_autorepair",
 		}
 	},
 	{
