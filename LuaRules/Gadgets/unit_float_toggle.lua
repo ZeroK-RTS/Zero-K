@@ -52,25 +52,6 @@ local sinkCommand = {
 
 local floatDefs = include("LuaRules/Configs/float_defs.lua")
 
-do --add weapon duration info to floatDefs
-	for unitDefID, _ in pairs(floatDefs) do
-		local weaponNo1 = UnitDefs[unitDefID].weapons[1] --select weapon no.1 only
-		local weaponDuration = 1
-		if weaponNo1 then
-			local weaponDefinition = WeaponDefs[weaponNo1.weaponDef]
-			if weaponDefinition.type == "MissileLauncher" or  weaponDefinition.type == "Cannon" then
-				weaponDuration = weaponDefinition.salvoSize*weaponDefinition.salvoDelay*30 --how many frame weapon fire,
-			elseif weaponDefinition.type == "BeamLaser" then
-				if weaponDefinition.beamBurst then
-					weaponDuration = weaponDefinition.salvoSize*weaponDefinition.salvoDelay*30
-				else
-					weaponDuration = weaponDefinition.beamtime*30 --how many frame weapon fire. second*frame-per-second
-				end
-			end
-		end
-		floatDefs[unitDefID].weaponDuration = weaponDuration --add weapon duration info to floatDefs
-	end
-end
 --------------------------------------------------------------------------------
 -- Local Vars
 
@@ -137,7 +118,6 @@ end
 local function setSurfaceState(unitID, unitDefID, surfacing)
 	local stun = float[unitID].paraData.para or Spring.GetUnitIsStunned(unitID)
 	local data = float[unitID]
-	surfacing = surfacing and true --true if surfacing is not false, else false
 	if not stun then
 		data.surfacing = surfacing
 	else
@@ -183,7 +163,7 @@ function GG.Floating_StopMoving(unitID)
 	end
 end
 
-function GG.Floating_AimWeapon(unitID) --will be called until weapon reload
+function GG.Floating_AimWeapon(unitID)
 	if floatState[unitID] == FLOAT_ATTACK and not select(1, Spring.GetUnitIsStunned(unitID)) then
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local cQueue = Spring.GetCommandQueue(unitID, 1)
@@ -192,7 +172,7 @@ function GG.Floating_AimWeapon(unitID) --will be called until weapon reload
 			addFloat(unitID, unitDefID)
 		end
 	end
-	aimWeapon[unitID] = Spring.GetGameFrame()
+	aimWeapon[unitID] = true
 end
 
 
@@ -366,14 +346,8 @@ function gadget:GameFrame(f)
 		end
 	end
 	
-	if f%16 == 12 then -- repeat every 16 frame at the 12th frame
-		for unitID, weaponlastfire in pairs(aimWeapon) do --iterate content of aimWeapon
-			local unitDefID = float[unitID].unitDefID
-			local weaponDuration = floatDefs[unitDefID].weaponDuration
-			if f >= weaponlastfire + weaponDuration then --clear aimWeapon list by basing on expire date. Clear when current frame is > weapon last fire 
-				aimWeapon[unitID] = nil
-			end
-		end
+	if f%16 == 12 then
+		aimWeapon = {}
 	end
 end
 

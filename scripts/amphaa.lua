@@ -334,7 +334,8 @@ function script.FireWeapon(num)
 end
 
 function script.Shot(num)
-        EmitSfx(firepoints[gun_1], 1024)
+	EmitSfx(firepoints[gun_1], 1024)
+	GG.Floating_AimWeapon(unitID)
 	if num == 1 then
 		gun_1 = gun_1 + 1
 		if gun_1 > 4 then gun_1 = 1 end
