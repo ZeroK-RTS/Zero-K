@@ -333,7 +333,7 @@ function gadget:GameFrame(n)
 				end
 			
 				local normalSpending = pull - lowPrioSpending - prioSpending
-				Spring.Echo(spare)
+				--Spring.Echo(spare)
 				if spare > 0 then
 					if normalSpending <= 0 then
 						if lowPrioSpending ~= 0 then
