@@ -74,13 +74,13 @@ function gadget:GameFrame(n)
 	end
 end
 
-function gadget:UnitCreated(unitID, unitDefID, teamID)
+function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] then
 		local def = stockpileUnitDefID[unitDefID]
 		units.count = units.count + 1
 		units.data[units.count] = unitID
 		unitsByID[unitID] = {
-			id = units.count,
+			id = units.count, --the "id" is the index in units.data table
 			progress = def.stockTime, 
 			unitDefID = unitDefID, 
 			teamID = teamID, 
@@ -93,7 +93,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] then
 		units.data[unitsByID[unitID].id] = units.data[units.count]
-		unitsByID[units.data[units.count]].id = unitsByID[unitID].id
+		unitsByID[units.data[units.count]].id = unitsByID[unitID].id --shift last entry into empty space
 		units.data[units.count]	= nil
 		units.count = units.count - 1
 		unitsByID[unitID] = nil
