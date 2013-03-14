@@ -94,10 +94,10 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 1500,
-        empresistant75 = 375,
-        empresistant99 = 15,
-        planes         = 1500,
+        default        = 1350,
+        empresistant75 = 337.5,
+        empresistant99 = 12.5,
+        planes         = 1350,
       },
 
       edgeEffectiveness       = 0.4,
@@ -111,7 +111,7 @@ unitDef = {
       laserFlareSize          = 5,
       minIntensity            = 1,
       paralyzer               = true,
-      paralyzeTime            = 15,
+      paralyzeTime            = 13,
       range                   = 730,
       reloadtime              = 10,
       rgbColor                = [[1 1 0]],
