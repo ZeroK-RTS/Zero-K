@@ -16,7 +16,7 @@ function gadget:GetInfo()
     author    = "Licho",
     date      = "19.4.2009", --24.2.2013
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = -2, --must start before unit_morph.lua gadget to register GG.AddMiscPriority() first
     enabled   = true
   }
 end

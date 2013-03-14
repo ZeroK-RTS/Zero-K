@@ -19,7 +19,7 @@ function gadget:GetInfo()
     author    = "trepan (improved by jK, Licho, aegis, CarRepairer)",
     date      = "Jan, 2008",
     license   = "GNU GPL, v2 or later",
-    layer     = -1,
+    layer     = -1, --must start after unit_priority.lua gadget to use GG.AddMiscPriority()
     enabled   = true
   }
 end

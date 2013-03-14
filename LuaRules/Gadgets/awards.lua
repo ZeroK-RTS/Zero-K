@@ -6,7 +6,7 @@ function gadget:GetInfo()
     author    = "CarRepairer",
     date      = "2008-10-15", --2013-03-02
     license   = "GNU GPL, v2 or later",
-    layer     = 1000000, -- Must be after all other build steps
+    layer     = 1000000, -- Must be after all other build steps and before unit_spawner.lua for queen kill award.
     enabled   = true -- loaded by default?
   }
 end
@@ -98,7 +98,7 @@ local awardAbsolutes = {
 	head		= 3,
 	dragon		= 3,
 	sweeper		= 20,
-	heart		= 9*10^9,
+	heart		= 1*10^9, --we should not exceed 2*10^9 because math.floor-ing the value will return integer -2147483648. Reference: https://code.google.com/p/zero-k/source/detail?r=9681
 	vet			= 3,
 }
 
@@ -463,8 +463,8 @@ local function ProcessAwardData()
 					message = maxVal .. ' Commanders eliminated'
 				elseif awardType == 'dragon' then
 					message = maxVal .. ' White Dragons annihilated'
-				elseif awardType == 'dragon' then
-					local maxQueenKillDamage = floor(maxVal - 9*10^9) --remove the queen kill signature: +9000000000 from the total damage, and remove decimal
+				elseif awardType == 'heart' then
+					local maxQueenKillDamage = maxVal - absolute --remove the queen kill signature: +1000000000 from the total damage
 					message = 'Damage: '.. comma_value(maxQueenKillDamage)
 				elseif awardType == 'sweeper' then
 					message = maxVal .. ' Nests wiped out'
@@ -605,11 +605,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 			
 		--	echo("Team " .. killerTeam .. " killed a WD, value = ".. dragonsKilledList[killerTeam])
 		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
-			for killerFrienz, _ in pairs(queenKillDamageList) do --give +9000000000 points for all frienz that kill queen and won
-				--queenKillDamageList[killerFrienz] = queenKillDamageList[killerFrienz] + 9*10^9  --the extra points is for id purpose
-				AddAwardPoints( 'heart', killerFrienz, 9*10^9 )
+			for killerFrienz, _ in pairs(awardData['heart']) do --give +1000000000 points for all frienz that kill queen and won
+				AddAwardPoints( 'heart', killerFrienz, awardAbsolutes['heart']) --the extra points is for id purpose. Will deduct later
 			end
-			--	echo("Team " .. killerTeam .. " killed the Queen, value = ".. queenKillDamageList[killerTeam])
 		elseif ud.name == "roost" then
 			--nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
 			AddAwardPoints( 'sweeper', killerTeam, 1 )
@@ -673,7 +671,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			local attackedDef= UnitDefs[unitDefID]
 			if attackedDef.name == "chickenflyerqueen" or attackedDef.name == "chickenlandqueen" then
 				if damage> 0 then --the damage to queen
-					queenKillDamageList[attackerTeam] = queenKillDamageList[attackerTeam] + damage --store damage.
+					AddAwardPoints( 'heart', attackerTeam, damage ) --store damage.
 				end
 			end
 			AddAwardPoints( 'pwn', attackerTeam, damage )
