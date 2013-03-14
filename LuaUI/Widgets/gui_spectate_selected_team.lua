@@ -82,6 +82,7 @@ function widget:SelectionChanged(selection)
 end
 ----------------------------------------------------
 --SelectNextPlayer button (7.3.2013 by msafwan)----
+--note: Spring 91's PlayerRoster return isSpec as number 1 or 0, in Spring 93.2 it return boolean.
 
 SelectNextPlayer = function ()
 	local currentTeam = Spring.GetLocalTeamID()
@@ -90,7 +91,7 @@ SelectNextPlayer = function ()
 	for i=1, #playerTableSortTeamID do
 		local teamID = playerTableSortTeamID[i][3]
 		local isSpec = playerTableSortTeamID[i][5]
-		if isSpec==0 then
+		if not isSpec then
 			if not firstPlayerIndex then --if spectator portion has finished: mark this index
 				firstPlayerIndex = i
 			end
@@ -110,7 +111,7 @@ SelectNextPlayer = function ()
 					teamIndexGoto = firstPlayerIndex
 				end
 				local isSpec = playerTableSortTeamID[teamIndexGoto][5]
-				if isSpec==0 then
+				if not isSpec then
 					break
 				end
 				teamIndexGoto = teamIndexGoto + 1

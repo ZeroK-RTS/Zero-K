@@ -611,7 +611,7 @@ end
 function gadget:GameFrame(n)
 	UpdateCoroutines()
 	for i=#impulseQueue, 1, -1 do --we need to apply impulse outside a coroutine thread like this because we don't want impulses in a coroutine to cancel any newton's impulses that is occuring in main thread. We wanted all them to add up.
-		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4],0.001) --0.001 impulse decay rate (meaning: negligible residual impulse)
+		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4])
 		impulseQueue[i]=nil
 	end
 	-- if #speedProfile-1>0 and speedProfile[#speedProfile-1] and speedProfile[#speedProfile] then
