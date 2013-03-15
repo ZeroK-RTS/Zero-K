@@ -84,6 +84,8 @@ local priorityTypes = {
 	[CMD_MISC_PRIORITY] = {id = CMD_MISC_PRIORITY, param = "miscpriority", unitTable = UnitMiscPriority},
 }
 
+local reportedError = false
+
 --------------------------------------------------------------------------------
 --  COMMON
 --------------------------------------------------------------------------------
@@ -400,7 +402,11 @@ function GG.StartMiscPriorityResourcing(unitID,teamID,metalDrain) --remotely add
 end
 
 function GG.StopMiscPriorityResourcing(unitID,teamID) --remotely remove a forced priority command.
-	miscTeamPull[teamID] = miscTeamPull[teamID] - miscMetalDrain[unitID]
+	miscTeamPull[teamID] = miscTeamPull[teamID] - (miscMetalDrain[unitID] or 0)
+	if (not reportedError) and (not miscMetalDrain[unitID]) then
+		Spring.Echo("StopMiscPriorityResourcing nil miscMetalDrain")
+		reportedError = true
+	end
 	miscMetalDrain[unitID] = nil
 end
 

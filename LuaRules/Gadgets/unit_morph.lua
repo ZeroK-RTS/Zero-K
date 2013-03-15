@@ -499,7 +499,7 @@ end
 
 
 local function FinishMorph(unitID, morphData)
-  GG.StopMiscPriorityResourcing(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
+
   local udDst = UnitDefs[morphData.def.into]
   local ud = UnitDefs[unitID]
   local defName = udDst.name
