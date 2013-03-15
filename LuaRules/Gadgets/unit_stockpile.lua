@@ -49,7 +49,8 @@ function gadget:GameFrame(n)
 		local unitID = units.data[i]
 		local data = unitsByID[unitID]
 		local stocked, queued = Spring.GetUnitStockpile(unitID)
-		if queued > stocked then
+		local stunned_or_inbuild, stunned, inbuild = Spring.GetUnitIsStunned(unitID)
+		if (not stunned_or_inbuild) and queued > stocked then
 			local def = stockpileUnitDefID[data.unitDefID]
 			if not data.active then
 				GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
@@ -74,7 +75,7 @@ function gadget:GameFrame(n)
 	end
 end
 
-function gadget:UnitFinished(unitID, unitDefID, teamID)
+function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] then
 		local def = stockpileUnitDefID[unitDefID]
 		units.count = units.count + 1
