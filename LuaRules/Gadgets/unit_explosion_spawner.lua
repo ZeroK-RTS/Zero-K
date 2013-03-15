@@ -78,6 +78,12 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	
 end
 
+
+function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
+  expireList[unitID] = nil
+end
+
+
 function gadget:GameFrame(f)
 	for i,c in pairs(createList) do
 		if c.feature then
@@ -94,7 +100,6 @@ function gadget:GameFrame(f)
     for i, e in pairs(expireList) do
       if (f > e) then
         Spring.DestroyUnit(i, true)
-        expireList[i] = nil
       end
     end
   end
