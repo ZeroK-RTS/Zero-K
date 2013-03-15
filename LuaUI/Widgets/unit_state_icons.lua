@@ -202,8 +202,12 @@ end
 
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	-- There should be a better way to do this, lazy fix.
 	WG.icons.SetUnitIcon( unitID, {name='firestate', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='movestate', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='armored', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='priority', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='miscpriority', texture=nil} )
 end
 
 function widget:KeyPress(key, modifier, isRepeat)

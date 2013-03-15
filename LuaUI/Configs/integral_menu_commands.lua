@@ -329,6 +329,7 @@ local custom_cmd_actions = {
 	retreat=2,
 	['luaui noretreat']=2,
 	priority=2,
+	miscpriority=2,
 	ap_fly_state=2,
 	ap_autorepairlevel=2,
 	floatstate=2,
