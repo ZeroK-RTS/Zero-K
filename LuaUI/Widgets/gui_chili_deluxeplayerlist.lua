@@ -1168,7 +1168,7 @@ SetupPlayerNames = function()
 			if allyTeamsDead[b] and allyTeamsDead[a] and allyTeams[a] and allyTeams[b] then
 				local teamIDa = allyTeams[a][1]
 				local teamIDb = allyTeams[b][1]
-				if teamIDa and teamIDb then
+				if teamIDa and teamIDb and teams[teamIDa].roster and teams[teamIDb].roster then
 					if teams[teamIDa].roster[1].isActive and not teams[teamIDb].roster[1].isActive then return true end
 					if teams[teamIDb].roster[1].isActive and not teams[teamIDa].roster[1].isActive then return false end
 				end
