@@ -405,8 +405,11 @@ function gadget:UnitDestroyed(unitID)
 	
 	if capturedUnits[unitID] then
 		if capturedUnits[unitID].controllerID then
-			removeThingFromIterable(unitID, controllers[capturedUnits[unitID].controllerID].units, controllers[capturedUnits[unitID].controllerID].unitByID)
+			local oldController = capturedUnits[unitID].controllerID
+			removeThingFromIterable(unitID, controllers[oldController].units, controllers[oldController].unitByID)
+			removeThingFromDoubleTable(unitID, drawing, drawingByID)
 		end
+		capturedUnits[unitID] = nil
 	end
 	
 	if unitDamage[unitID] then
