@@ -149,7 +149,7 @@ local metalSpotsNil = true
 ------------------------------------------------------------
 -- Functions
 ------------------------------------------------------------
-local function GetClosestMetalSpot(x, z)
+local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
 	local bestSpot
 	local bestDist = math.huge
 	local bestIndex 
@@ -278,7 +278,7 @@ function widget:CommandNotify(cmdID, params, options)
 		for i = 1, #WG.metalSpots do		
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (not spotData[i]) and (Distance(cx,cz,mex.x,mex.z) < cr^2) then -- circle area, slower
+			if (not spotData[i]) and (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
@@ -302,8 +302,10 @@ function widget:CommandNotify(cmdID, params, options)
 		for i = 1, #units do 
 			local unitID = units[i]
 			if mexBuilder[unitID] then
+				local commandArrayToIssue={}
 				if not shift then 
-					spGiveOrderToUnit(unitID, CMD.STOP, {} , 0 )
+					commandArrayToIssue[1] = {CMD.STOP, {} , {}}
+					--spGiveOrderToUnit(unitID, CMD.STOP, {} , 0 )
 				end
 				for i, command in ipairs(orderedCommands) do
                     local x = command.x
@@ -312,10 +314,11 @@ function widget:CommandNotify(cmdID, params, options)
 					if buildable ~= 0 then
 						local handledExternally = false
 						if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-							handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options)
+							handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options , true) --add additional flag "true" for additional logic for "central_build_AI.lua"
 						end
 						if ( not handledExternally ) then
-							spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
+							commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,0,z,0} , {"shift"}}
+							--spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
 						end
 					else
 						local mexes = spGetUnitsInRectangle(x-1,z-1,x+1,z+1)
@@ -324,13 +327,15 @@ function widget:CommandNotify(cmdID, params, options)
 							local udid = spGetUnitDefID(aid)
 							if spGetUnitAllyTeam(aid) == myAllyTeam and mexDefID == udid then
 								if select(5, spGetUnitHealth(aid)) ~= 1 then
-									spGiveOrderToUnit(unitID, CMD.REPAIR, {aid} , {"shift"})
+									commandArrayToIssue[#commandArrayToIssue+1] = {CMD.REPAIR, {aid} , {"shift"}}
+									--spGiveOrderToUnit(unitID, CMD.REPAIR, {aid} , {"shift"})
 									break
 								end
 							end
 						end
 					end
 				end
+				Spring.GiveOrderArrayToUnitArray({unitID},commandArrayToIssue)
 			end
 		end
   
