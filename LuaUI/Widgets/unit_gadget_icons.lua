@@ -79,6 +79,12 @@ function SetIcons(unitID)
 	end
 end
 
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	-- There should be a better way to do this, lazy fix.
+	WG.icons.SetUnitIcon( unitID, {name='lowpower', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
