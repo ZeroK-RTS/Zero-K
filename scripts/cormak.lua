@@ -282,3 +282,47 @@ function script.Killed(recentDamage, maxHealth)
     return 10 -- don't spawn second wreck
   end
 end
+
+if Game.version:find('91.0') and (Game.version:find('91.0.1') == nil) then
+	script.Killed = function(recentDamage, maxHealth)
+	  -- spawn debris etc.
+	  local wreckLevel = Killed(recentDamage, maxHealth)
+	  
+	  local framesUntilLastWave = (lastWaveFrame + WAVE_TIMEOUT) - spGetGameFrame()
+	  
+	  if (framesUntilLastWave <= 0) then -- no active waves left, no need for hax
+		return wreckLevel
+	  else
+		local ud = UnitDefs[unitDefID]
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		
+		-- hide unit
+		Spring.SetUnitNoSelect(unitID, true)
+		Spring.SetUnitNoDraw(unitID, true)
+		Spring.SetUnitNoMinimap(unitID, true)
+		Spring.SetUnitSensorRadius(unitID, "los", 0)
+		Spring.SetUnitSensorRadius(unitID, "airLos", 0)
+		Spring.MoveCtrl.Enable(unitID, true)
+		Spring.MoveCtrl.SetNoBlocking(unitID, true)
+		Spring.MoveCtrl.SetPosition(unitID, x, Spring.GetGroundHeight(x, z) - 1000, z)
+		
+		-- spawn wreck
+		local wreckDef = FeatureDefNames[ ud.wreckName ]
+		while (wreckLevel > 1 and wreckDef) do
+		  wreckDef   = FeatureDefNames[ wreckDef.deathFeature ]
+		  wreckLevel = wreckLevel - 1
+		end
+		if (wreckDef) then
+		  local heading   = Spring.GetUnitHeading(unitID)
+		  local teamID    = Spring.GetUnitTeam(unitID)
+		  local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
+		  Spring.SetFeatureResurrect(featureID, ud.name)
+		  -- engine also sets speed and smokeTime for wrecks, but there are no lua functions for these
+		end
+		
+		Sleep(framesUntilLastWave * (1000 / Game.gameSpeed)) -- wait until all waves hit
+		
+		return 10 -- don't spawn second wreck
+	  end
+	end
+end
