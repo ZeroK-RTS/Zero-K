@@ -981,6 +981,8 @@ end --//end do
 
 local visibleFeatures = {}
 local visibleUnits = {}
+local destroyedFeatures = {}
+local destroyedUnits = {}
 
 do
   local ALL_UNITS            = Spring.ALL_UNITS
@@ -1008,39 +1010,46 @@ do
       --// draw bars of units
       local unitID,unitDefID,unitDef
       for i=1,#visibleUnits do
-        unitID    = visibleUnits[i]
-        unitDefID = GetUnitDefID(unitID)
-        unitDef   = UnitDefs[unitDefID or -1]
-        if (unitDef) then
-          DrawUnitInfos(unitID, unitDefID, unitDef)
-        end
+	    unitID    = visibleUnits[i]
+	    if (not destroyedUnits[unitID] ) then
+          unitDefID = GetUnitDefID(unitID)
+          unitDef   = UnitDefs[unitDefID or -1]
+          if (unitDef) then
+            DrawUnitInfos(unitID, unitDefID, unitDef)
+          end
+		end
       end
       
       --// draw bars for features
-      local wx, wy, wz, dx, dy, dz, dist
+      local wx, wy, wz, dx, dy, dz, dist, featureID
       local featureInfo
       for i=1,#visibleFeatures do
-        featureInfo = visibleFeatures[i]
-        wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
-        dx, dy, dz = wx-cx, wy-cy, wz-cz
-        dist = dx*dx + dy*dy + dz*dz
-        if (dist < 6000000) then
-          if (dist < infoDistance) then
-            DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx,wy,wz)
-          else
-            DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx,wy,wz)
-          end
-        end
+		featureInfo = visibleFeatures[i]
+		featureID = featureInfo[4]
+		if (not destroyedFeatures[featureID] ) then
+			wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
+			dx, dy, dz = wx-cx, wy-cy, wz-cz
+			dist = dx*dx + dy*dy + dz*dz
+			if (dist < 6000000) then
+			  if (dist < infoDistance) then
+				DrawFeatureInfos(featureID, featureInfo[5], true, wx,wy,wz)
+			  else
+				DrawFeatureInfos(featureID, featureInfo[5], false, wx,wy,wz)
+			  end
+			end
+		end
       end
 	else
 	  local unitID,unitDefID,unitDef
       for i=1,#visibleUnits do
-        unitID    = visibleUnits[i]
-        unitDefID = GetUnitDefID(unitID)
-        unitDef   = UnitDefs[unitDefID or -1]
-        if (unitDef) then
-          JustGetOverlayInfos(unitID, unitDefID, unitDef)
-        end
+	    unitID    = visibleUnits[i]
+	    if (not destroyedUnits[unitID] ) then
+          unitDefID = GetUnitDefID(unitID)
+          unitDef   = UnitDefs[unitDefID or -1]
+          if (unitDef) then
+            JustGetOverlayInfos(unitID, unitDefID, unitDef)
+          end
+		end
       end
 	end
 
@@ -1068,25 +1077,27 @@ do
   local sec2 = 0
   local sec3 = 0
 
-  local videoFrame   = 0
+  --local videoFrame   = 0
   local _1GameFrameSecond = 0.033
 
   function widget:Update(dt)
     sec=sec+dt
-    blink = (sec%1)<0.5
+    blink = (sec%1)<0.5 --blink for emp
 
     gameFrame = GetGameFrame()
 
-    videoFrame = videoFrame+1
+    --videoFrame = videoFrame+1
     sec3 = sec3 +dt
     if sec3 > _1GameFrameSecond then
         sec3 = 0
+		destroyedUnits={}
         visibleUnits = GetVisibleUnits(-1,nil,false)
     end
 
     sec2=sec2+dt
     if (sec2>1/3) then
       sec2 = 0
+	  destroyedFeatures = {}
       visibleFeatures = GetVisibleFeatures(-1,nil,false,false)
       local cnt = #visibleFeatures
       local featureID,featureDefID,featureDef
@@ -1109,6 +1120,14 @@ do
     end
 
   end
+  
+  function widget:UnitDestroyed(unitID)
+    destroyedUnits[unitID] = true
+  end
+  
+  function widget:FeatureDestroyed(featureID)
+    destroyedFeatures[featureID] = true
+  end    
 
 end --//end do
 
