@@ -14,13 +14,13 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.321"
+local version = "v1.322"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 16 March 2013",
+    date      = "July 20, 2009, 18 March 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -60,6 +60,7 @@ local myGroupId = 0	--//Constant: a group number (0 to 9) will be controlled by 
 local hotkey = string.byte( "g" )	--//Constant: a custom hotkey to add unit to custom group. NOTE: set myGroupId to "-1" to use this hotkey.
 local checkFeatures = false --//Constant: if true, Central Build will reject any build queue on top of allied features (eg: ally's wreck & dragon teeth).
 
+local Echo					= Spring.Echo
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetGroupList		= Spring.GetGroupList
 local spGetGroupUnits		= Spring.GetGroupUnits
@@ -115,6 +116,7 @@ local max	= math.max
 local nextFrame	= spGetGameFrame() +30
 local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
+local debugEcho1 = false
 
 --	"global" for this widget.  This is probably not a recommended practice.
 local myUnits = {}	--  list of units in the Central Build group
@@ -287,11 +289,10 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
 					local isOverlap = CleanOrders(myCmd) -- check if current queue overlap with existing queue, and clear up any invalid queue 
 					if not isOverlap then
-						if not params[3] then
-							-- Spring.Echo(CMD[id])
-							-- Spring.Echo(id)
-							-- Spring.Echo("A")
-							--Unknown build command that has nil parameter 
+						if not params[3] then --note: if multiple unit get same build order, then only 1 of them get params while others only get cmdId
+							if debugEcho1 then --Unknown build command that has nil parameter
+								Spring.Echo(id); local abID = math.abs(id); local ud = UnitDefs[abID or -1]; if ud then Spring.Echo(ud.humanName) end; Spring.Echo("A")
+							end
 						else
 							local hash = hash(myCmd)
 							--[[
@@ -316,10 +317,10 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 				if ( id < 0 ) and ( not isAreaMex ) then --direct command of building stuff
 					local x, y, z, h = params[1], params[2], params[3], params[4]
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
-					if not params[3] then
-						-- Spring.Echo(CMD[id])
-						-- Spring.Echo(id)
-						-- Spring.Echo("B")
+					if not params[3] then --Unknown build command that has nil parameter
+							if debugEcho1 then
+								Spring.Echo(id); local abID = math.abs(id); local ud = UnitDefs[abID or -1]; if ud then	Spring.Echo(ud.humanName) end; Spring.Echo("B")
+							end
 					else
 						local hash = hash(myCmd)
 						myUnits[unitID] = hash --remember what command this unit is having
@@ -383,17 +384,19 @@ end
 --  One at a time, assign idle builders new tasks.
 
 function FindIdleUnits(myUnits, thisFrame)
-	for unitID,myCmd in pairs(myUnits) do --check if unit really idle because UnitIdle() can be triggered by other widget and overriden with new command afterward (ie: cmd_mex_placement.lua, area mex widget)
+	local idle_myUnits = {}
+	local idle_assigned = {}
+	local numberOfIdle = 0
+	for unitID,myCmd in pairs(myUnits) do --check if unit really idle or is actually busy, because UnitIdle() can be triggered by other widget and is overriden with new command afterward, thus making unit look idle but is busy (ie: cmd_mex_placement.lua, area mex widget)
 		if myCmd == "idle" then --if unit is marked as idle, then double check it
 			local cmd1 = GetFirstCommand(unitID)
 			if ( cmd1 ) then
 				if ( cmd1.id < 0 ) then
 					local unitCmd = {id=cmd1.id,x=cmd1.params[1],y=cmd1.params[2],z=cmd1.params[3],h=cmd1.params[4]}
 					if not cmd1.params[3] then
-						-- Spring.Echo(CMD[cmd1.id])
-						-- Spring.Echo(cmd1.id)
-						-- Spring.Echo("C")
-						--Unknown build command that has nil parameter 
+						if debugEcho1 then --Unknown build command that has nil parameter
+							Spring.Echo(cmd1.id); local abID = math.abs(cmd1.id); local ud = UnitDefs[abID or -1]; if ud then Spring.Echo(ud.humanName) end; Spring.Echo("C")
+						end
 					else
 						local hash = hash(unitCmd)
 						myUnits[unitID] = hash
@@ -401,19 +404,27 @@ function FindIdleUnits(myUnits, thisFrame)
 				else
 					myUnits[unitID] = 'busy'
 				end
+			else
+				if numberOfIdle <= 10 then
+					numberOfIdle = numberOfIdle +1
+					--NOTE: only allow up to 10 idler to be processed to prevent super lag.
+					--The amount of external loop will be (numberOfmyunit^2+numberOfQueue)*numberOfIdle^2.
+					--ie: if all variable were 50, then the amount of loop in total is 6375000 loop (6 million).
+					idle_myUnits[numberOfIdle] = unitID
+				end
 			end
 		end
 	end
 
 	--HOW THIS WORK:
-	--*loopA for all CBA unit,
-	--	*loopB for all CBA unit,
-	--		*for each CBA unit: find nearest job (FOR_cba)
+	--*loopA for all idle CBA unit,
+	--	*loopB for all idle CBA unit,
+	--		*for each idle CBA unit: find nearest job (forA)
 	--			>check nearest job for assisting other working constructor
 	--			>check nearest job for building-stuff that not yet done by any working constructor
 	--			>check whether assisting or construction is nearest
-	--		*FOR_cba return nearest job for each CBA unit
-	--	*loopB return all nearest jobs for all CBA units
+	--		*forA return nearest job for each idle CBA unit
+	--	*loopB return all nearest jobs for all idle CBA units
 	--	>check how many constructor has job order
 	--	>check which constructor is most nearest to its job
 	--	>register that constructor as working constructor
@@ -422,15 +433,16 @@ function FindIdleUnits(myUnits, thisFrame)
 	CleanOrders()	-- check build site for blockage. In case something's changed since last we checked.
 	local orderArray={}
 	local unitArray={}
-	for _,_ in pairs(myUnits) do
+	for i=1,numberOfIdle do
 		local nearestOrders = {}
-		for unitID,myCmd in pairs(myUnits) do
+		for i=1,numberOfIdle do
 			--[[
 			local cmd1 = GetFirstCommand(unitID)
 			if ( cmd1 == nil ) then		-- no orders?  Must be idle.
 				myUnits[unitID] = "idle"
 			--]]
-			if myCmd == "idle" then --if unit is marked as idle, then use it.
+			local unitID = idle_myUnits[i] --if unit is marked as idle, then use it.
+			if (not idle_assigned[unitID] ) then --unit not yet assigned in previous iteration? find work
 				local tmp = GetWorkFor(unitID)
 				if ( tmp ~= nil ) then
 					table.insert( nearestOrders, tmp )	-- indexed okay here
@@ -449,15 +461,17 @@ function FindIdleUnits(myUnits, thisFrame)
 			end
 		end
 		--spGiveOrderToUnit( close[1], close[2], close[3], { "" } )
-		unitArray[#unitArray+1]=close[1]
+		local assignUnitID = close[1]
+		unitArray[#unitArray+1]= assignUnitID
 		orderArray[#orderArray+1]={close[2], close[3], { "" }}
-		if ( close[5] == 0 ) then
-			myUnits[close[1]] = "asst "..unpack(close[3])	--  unitID we're assisting
+		if ( close[5] == 0 ) then --if GUARD command: then,
+			myUnits[assignUnitID] = "asst "..unpack(close[3])	--  unitID we're assisting
 			--Echo(close[3])
-		else
-			myUnits[close[1]] = close[5]	--  hash of command we're executing
+		else --if regular assisting: then,
+			myUnits[assignUnitID] = close[5]	--  hash of command we're executing
 			--Echo(close[5])
 		end
+		idle_assigned[assignUnitID] = true
 	end
 	if #orderArray > 0 then --we should not give empty command else it will delete all unit's existing queue
 		Spring.GiveOrderArrayToUnitArray (unitArray,orderArray, true) --send command to bulk of constructor
@@ -557,51 +571,58 @@ function GetWorkFor(unitID)
 		if ( busyUnitID ~= unitID ) then --if not observing ourself
 			local cmd1 = GetFirstCommand(busyUnitID)
 			local myCmd = myQueue[busyCmd1]
-			if ( myCmd ) then --when busy unit has CentralBuild command
+			if ( myCmd ) then --when busy unit has CentralBuild command (is using SHIFT)
 				local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
 				if ( cmd  and cmd < 0 ) then
 					local x2, y2, z2 = spGetUnitPosition( busyUnitID)	-- location of busy unit
 					local numOfAssistant = 0.0
 					for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
-						local prefix = assistantCmd1:sub(1,4)
-						if prefix ~= "asst" then
-							if (assistantCmd1 == busyCmd1) then
-								numOfAssistant = numOfAssistant + 0.1
-							end
-						else
-							-- assistantCmd1:sub(1,5) == "asst "
-							local assisting = tonumber(assistantCmd1:sub(6))
-							if (assisting == busyUnitID) then
-								numOfAssistant = numOfAssistant + 0.1
+						if ( busyUnitID ~= assistantUnitID ) then --if busyUnit not observing itself
+							local prefix = assistantCmd1:sub(1,4)
+							if prefix ~= "asst" then
+								if (assistantCmd1 == busyCmd1) then
+									numOfAssistant = numOfAssistant + 0.11
+								end
+							else
+								-- assistantCmd1:sub(1,5) == "asst "
+								local assisting = tonumber(assistantCmd1:sub(6))
+								if (assisting == busyUnitID) then
+									numOfAssistant = numOfAssistant + 0.11
+								end
 							end
 						end
 					end
-					local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2 --distance between busy unit & self,and btwn structure & self, and between structure & busy unit.
-					dist = dist + dist*numOfAssistant
+					local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2 --distance btwn busy unit & self,and btwn structure & self, and btwn structure & busy unit. A distance that is no less than btwn structure & busy unit but is 1.5 when opposite to the structure & the busy unit OR when is further away than btwn structure & busy unit
+					--local dist = Distance(ux,uz,x,z) --distance btwn structure & self
+					dist = dist + dist*numOfAssistant --make the distance look further away than it actually is if there's too many assistance
 					if ( dist < busyDist ) then
 						busyClosestID = busyUnitID	-- busy unit who needs help
 						busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
 					end
 				end
-			elseif ( cmd1 and cmd1.id < 0) then --when busy unit is currently building a structure
+			elseif ( cmd1 and cmd1.id < 0) then --when busy unit is currently building a structure, is "busy" and not using SHIFT
 				local x2, y2, z2 = spGetUnitPosition(busyUnitID)	-- location of busy unit
+				--local x, z = cmd1.params[1], cmd1.params[3]
 				local numOfAssistant = 0.0
 				for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
-					local prefix = assistantCmd1:sub(1,4)
-					if prefix ~= "asst" then
-						local cmd2 = GetFirstCommand(assistantUnitID)
-						if (cmd2 and (cmd2 == cmd1)) then
-							numOfAssistant = numOfAssistant + 0.1
-						end
-					else
-						-- assistantCmd1:sub(1,5) == "asst "
-						local assisting = tonumber(assistantCmd1:sub(6))
-						if (assisting == busyUnitID) then
-							numOfAssistant = numOfAssistant + 0.1
+					if ( busyUnitID ~= assistantUnitID ) then --if busyUnit not observing itself
+						local prefix = assistantCmd1:sub(1,4)
+						if prefix ~= "asst" then
+							local cmd2 = GetFirstCommand(assistantUnitID) --check using unit's command queue when we dont have its command stored
+							if (cmd2 and (cmd2 == cmd1)) then
+								numOfAssistant = numOfAssistant + 0.11
+							end
+						else
+							-- assistantCmd1:sub(1,5) == "asst "
+							local assisting = tonumber(assistantCmd1:sub(6))
+							if (assisting == busyUnitID) then
+								numOfAssistant = numOfAssistant + 0.11
+							end
 						end
 					end
 				end
 				local dist = Distance(ux,uz,x2,z2) * 1.5 --distance between busy unit & self
+				--local dist = Distance(ux,uz,x,z) --distance btwn structure & self
 				dist = dist + dist*numOfAssistant
 				if ( dist < busyDist ) then
 					busyClosestID = busyUnitID	-- busy unit who needs help
@@ -628,7 +649,7 @@ function GetWorkFor(unitID)
 			for _, options in ipairs(ud.buildOptions) do
 				if ( options == acmd ) then canBuild = true break end	-- only one to find.
 			end
-			local dist = Distance(ux,uz,x,z)
+			local dist = Distance(ux,uz,x,z) --distance btwn current unit & project to be started
 			if ( dist < queueDist and canBuild ) then
 				queueClose = index	-- # of the project we'll be starting
 				queueDist = dist

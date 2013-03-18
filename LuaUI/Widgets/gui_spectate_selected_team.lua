@@ -3,7 +3,7 @@ function widget:GetInfo()
     name     = "Spectate Selected Team",
     desc     = "Automatically spectate team based on selected units, and other spectate options.",
     author   = "SirMaverick",
-    version  = "0.203", --has added options
+    version  = "0.204", --has added options
     date     = "2010", --2013
     license  = "GNU GPL, v2 or later",
     layer     = 0,
@@ -87,11 +87,14 @@ end
 SelectNextPlayer = function ()
 	local currentTeam = Spring.GetLocalTeamID()
 	local playerTableSortTeamID = Spring.GetPlayerRoster(2)
+	local isSpring91 = type(playerTableSortTeamID[1][5])=='number'
 	local currentTeamIndex, firstPlayerIndex, teamIDIndexGoto = -1,nil,nil
 	for i=1, #playerTableSortTeamID do
 		local teamID = playerTableSortTeamID[i][3]
 		local isSpec = playerTableSortTeamID[i][5]
-		if not isSpec then
+		if ( isSpring91 ) then isSpec = ( isSpec==1 ) 
+		end
+		if (not isSpec ) then
 			if not firstPlayerIndex then --if spectator portion has finished: mark this index
 				firstPlayerIndex = i
 			end
@@ -110,8 +113,10 @@ SelectNextPlayer = function ()
 				if teamIndexGoto > #playerTableSortTeamID then  --if player list is at end: go to first index
 					teamIndexGoto = firstPlayerIndex
 				end
-				local isSpec = playerTableSortTeamID[teamIndexGoto][5]
-				if not isSpec then
+				local isSpec = playerTableSortTeamID[teamIndexGoto][5] 
+				if ( isSpring91 ) then isSpec = ( isSpec==1 )
+				end
+				if (not isSpec ) then --not spectator
 					break
 				end
 				teamIndexGoto = teamIndexGoto + 1
