@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.113 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
-    date      = "2011-03-16", --2013-March-9 (msafwan)
+    date      = "2011-03-16", --2013-March-19 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -345,7 +345,7 @@ options = {
 		type = 'button',
         hotkey = {key='t', mod='alt+'},
 		path = cameraFollowPath,
-		OnChange = function(self) trackmode = true; end,
+		OnChange = function(self) trackmode = true; Spring.Echo("COFC: Unit tracking ON") end,
 	},
 	
 	persistenttrackmode = {
@@ -1154,6 +1154,7 @@ function widget:Update(dt)
 			isTrackingUnit = true
 		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
 			trackmode=false --exit trackmode
+			Spring.Echo("COFC: Unit tracking OFF")
 		end
 	end
 	
@@ -1411,6 +1412,9 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	spSendCommands('trackoff')
     spSendCommands('viewfree')
 	if not (options.persistenttrackmode.value and (c or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
+		if trackmode then
+			Spring.Echo("COFC: Unit tracking OFF")
+		end
 		trackmode = false
 	end
 	thirdperson_trackunit = false
@@ -1723,7 +1727,7 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			end
 		end
 		selUnits = spGetSelectedUnits()--test select unit
-		if selUnits and selUnits[1] then
+		if selUnits and selUnits[1] and (not Spring.GetUnitIsDead(selUnits[1]) ) then --if we can select unit, and those unit is not dead in this frame, then: track them
 			spSendCommands('viewfps')
 			spSendCommands('track')
 			thirdperson_trackunit = selUnits[1]

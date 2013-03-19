@@ -1,4 +1,4 @@
-local version= "v0.941"
+local version= "v0.942"
 function widget:GetInfo()
   return {
     name      = "Comm-n-Elo Startpos. Info",
@@ -110,7 +110,8 @@ function widget:Update(dt)
 			local prvsComDefName = playerInfo[i].comDefNamePrvs --reference to this table (this is not a value)
 			local active = select(2,Spring.GetPlayerInfo(leadPlayerID))
 			local x,y,z = Spring.GetTeamStartPosition(teamID) --update player's start position (if available).
-			local validEntry = not (x==y and x==z) and elo and active -- invalidate symmetrical coordinate (since they are not humanly possible), and invalidate "nil" elo, and invalidate disconnected players
+			x,y,z = x or 0 ,y or 0, z or 0 --safety for spectating using restricted LOS
+			local validEntry = not (x==y and x==z) and elo and active -- invalidate symmetrical coordinate (since they are not humanly possible, probably indicate issues), and invalidate "nil" elo, and invalidate disconnected players
 			playerInfo[i].xyz = {x,y,z}
 			playerInfo[i].validEntry = validEntry
 			if comDefName then

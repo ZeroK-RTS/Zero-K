@@ -33,10 +33,10 @@ options={
 		type='radioButton', 
 		name='Spectator View Selection',
 		items = {
-			{name = 'View Chosen Player',key='viewchosenplayer', desc="Point-of-view of current player and you can only select the current player's units.", hotkey=nil},
-			{name = 'View All',key='viewall', desc="Unlimited line-of-sight, but you can only select current player's units.", hotkey=nil},
-			{name = 'Select Any Unit',key='selectanyunit', desc="Point-of-view of current player, and you can select any unit.", hotkey=nil},
-			{name = 'View All & Select Any',key='viewallselectany', desc="Unlimited line-of-sight, and you can select any unit.", hotkey=nil},
+			{name = 'View Chosen Player',key='viewchosenplayer', desc="Point of view of current player, and you can only select the current player's units.", hotkey=nil},
+			{name = 'View All',key='viewall', desc="Unlimited line of sight, but you can only select current player's units.", hotkey=nil},
+			{name = 'Select Any Unit',key='selectanyunit', desc="Point of view of current player, and you can select any unit.", hotkey=nil},
+			{name = 'View All & Select Any',key='viewallselectany', desc="Unlimited line of sight, and you can select any unit.", hotkey=nil},
 		},
 		value = 'viewallselectany',
 		OnChange = function(self)

@@ -289,7 +289,7 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
 					local isOverlap = CleanOrders(myCmd) -- check if current queue overlap with existing queue, and clear up any invalid queue 
 					if not isOverlap then
-						if not params[3] then --note: if multiple unit get same build order, then only 1 of them get params while others only get cmdId
+						if not params[3] then
 							if debugEcho1 then --Unknown build command that has nil parameter
 								Spring.Echo(id); local abID = math.abs(id); local ud = UnitDefs[abID or -1]; if ud then Spring.Echo(ud.humanName) end; Spring.Echo("A")
 							end

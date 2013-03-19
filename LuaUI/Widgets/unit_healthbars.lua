@@ -981,8 +981,8 @@ end --//end do
 
 local visibleFeatures = {}
 local visibleUnits = {}
-local destroyedFeatures = {}
-local destroyedUnits = {}
+--local destroyedFeatures = {}
+--local destroyedUnits = {}
 
 do
   local ALL_UNITS            = Spring.ALL_UNITS
@@ -997,7 +997,7 @@ do
         return
       end
       if WG.Cutscene and WG.Cutscene.IsInCutscene() then
-	return
+        return
       end
       --gl.Fog(false)
       --gl.DepthTest(true)
@@ -1011,7 +1011,9 @@ do
       local unitID,unitDefID,unitDef
       for i=1,#visibleUnits do
 	    unitID    = visibleUnits[i]
-	    if (not destroyedUnits[unitID] ) then
+		local dead = Spring.GetUnitIsDead(unitID)
+		local valid = Spring.ValidUnitID(unitID)		
+	    if ( not dead and valid ) then --if valid and not dead in current gameframe then allow draw
           unitDefID = GetUnitDefID(unitID)
           unitDef   = UnitDefs[unitDefID or -1]
           if (unitDef) then
@@ -1026,7 +1028,8 @@ do
       for i=1,#visibleFeatures do
 		featureInfo = visibleFeatures[i]
 		featureID = featureInfo[4]
-		if (not destroyedFeatures[featureID] ) then
+		local valid = Spring.ValidFeatureID(featureID)
+		if ( valid ) then --if valid in current gameframe then allow draw
 			wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
 			dx, dy, dz = wx-cx, wy-cy, wz-cz
 			dist = dx*dx + dy*dy + dz*dz
@@ -1043,7 +1046,9 @@ do
 	  local unitID,unitDefID,unitDef
       for i=1,#visibleUnits do
 	    unitID    = visibleUnits[i]
-	    if (not destroyedUnits[unitID] ) then
+		local dead = Spring.GetUnitIsDead(unitID)
+		local valid = Spring.ValidUnitID(unitID)
+	    if ( not dead and valid ) then
           unitDefID = GetUnitDefID(unitID)
           unitDef   = UnitDefs[unitDefID or -1]
           if (unitDef) then
@@ -1090,14 +1095,14 @@ do
     sec3 = sec3 +dt
     if sec3 > _1GameFrameSecond then
         sec3 = 0
-		destroyedUnits={}
+		--destroyedUnits={}
         visibleUnits = GetVisibleUnits(-1,nil,false)
     end
 
     sec2=sec2+dt
     if (sec2>1/3) then
       sec2 = 0
-	  destroyedFeatures = {}
+	  --destroyedFeatures = {}
       visibleFeatures = GetVisibleFeatures(-1,nil,false,false)
       local cnt = #visibleFeatures
       local featureID,featureDefID,featureDef
@@ -1120,7 +1125,7 @@ do
     end
 
   end
-  
+  --[[
   function widget:UnitDestroyed(unitID)
     destroyedUnits[unitID] = true
   end
@@ -1128,7 +1133,7 @@ do
   function widget:FeatureDestroyed(featureID)
     destroyedFeatures[featureID] = true
   end    
-
+  --]]
 end --//end do
 
 --------------------------------------------------------------------------------
