@@ -1,10 +1,10 @@
-local version= "v0.94"
+local version= "v0.941"
 function widget:GetInfo()
   return {
     name      = "Comm-n-Elo Startpos. Info",
     desc      = version .. " Show Commander information and Elo icons before game start.",
     author    = "msafwan",
-    date      = "2013 March 4",
+    date      = "2013 March 18",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -91,7 +91,7 @@ function widget:Initialize()
 		local elo = (customKey and tonumber(customKey.elo)) or nil
 		local eloLevel = (elo and math.min(4, math.max(1, math.floor((elo-1000) / 200)))) or nil -- for example: elo= 1500. elo 1500 minus 1000 = 500. 500 divide by 200 = 2.5. Floor 2.5 = 2. Thus show 2 bar. If less than 1 show 1 (math.max), if greater than 4 show 4 (math.min)
 		local validEntry = not (x==y and x==z) and elo -- invalidate same coordinate (since they are not humanly possible), and also invalidate entry with "nil" elo.
-		playerInfo[#playerInfo +1] = {elo=elo, eloLevel=eloLevel,xyz={x,y,z},leadPlayerID=leadPlayerID,teamID=teamID, validEntry=validEntry, comDefName=nil,comDefId=nil} 
+		playerInfo[#playerInfo +1] = {elo=elo, eloLevel=eloLevel,xyz={x,y,z},leadPlayerID=leadPlayerID,teamID=teamID, validEntry=validEntry, comDefName=nil,comDefId=nil, comDefNamePrvs= {}} 
 	end
 	WG.customToolTip = WG.customToolTip or {} --initialize table to communicate to other widget of our custom Tooltips points
 end
@@ -107,6 +107,7 @@ function widget:Update(dt)
 			local elo = playerInfo[i].eloLevel
 			local leadPlayerID = playerInfo[i].leadPlayerID
 			local comDefName = playerInfo[i].comDefName
+			local prvsComDefName = playerInfo[i].comDefNamePrvs --reference to this table (this is not a value)
 			local active = select(2,Spring.GetPlayerInfo(leadPlayerID))
 			local x,y,z = Spring.GetTeamStartPosition(teamID) --update player's start position (if available).
 			local validEntry = not (x==y and x==z) and elo and active -- invalidate symmetrical coordinate (since they are not humanly possible), and invalidate "nil" elo, and invalidate disconnected players
@@ -114,6 +115,14 @@ function widget:Update(dt)
 			playerInfo[i].validEntry = validEntry
 			if comDefName then
 				WG.customToolTip[comDefName] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="Build  ".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
+			end
+			--Spring.Echo(teamID .. " " .. #prvsComDefName)
+			for i=#prvsComDefName,1,-1 do --start at end of table, iterate downward while emptying table content
+				local previousCom = prvsComDefName[i]
+				prvsComDefName[i]=nil
+				if previousCom ~= comDefName then
+					WG.customToolTip[previousCom] = nil --empty this tooltip entry
+				end
 			end
 		end
 		elapsedSecond = 0
@@ -133,6 +142,9 @@ function CommSelection(playerID, commSeries) --receive from start_unit_setup.lua
 	end
 	for i=1, #playerInfo do
 		if playerID == playerInfo[i].leadPlayerID then
+			local previousCom = playerInfo[i].comDefName
+			local tableIndex = #playerInfo[i].comDefNamePrvs
+			playerInfo[i].comDefNamePrvs[tableIndex + 1] = previousCom --store list of previous selection. ie {com1, com2, com1,...}
 			playerInfo[i].comDefName = sixthDefName
 			playerInfo[i].comDefId = comDefId
 		end

@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.112 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.113 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16", --2013-March-9 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -340,7 +340,7 @@ options = {
 	
 	-- follow unit
 	trackmode = {
-		name = "Enter Trackmode",
+		name = "Activate Trackmode",
 		desc = "Track the selected unit (mouse midclick to exit mode)",
 		type = 'button',
         hotkey = {key='t', mod='alt+'},
@@ -350,7 +350,7 @@ options = {
 	
 	persistenttrackmode = {
 		name = "Persistent trackmode state",
-		desc = "Trackmode will not cancel when deselect unit. Trackmode will always track new unit selection unless user press mouse midclick.",
+		desc = "Trackmode will not cancel when deselecting unit. Trackmode will always attempt to track newly selected unit. Press mouse midclick to cancel this mode.",
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
@@ -385,7 +385,7 @@ options = {
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
-		desc = "Tap a number to pan camera view toward a unit(s) within a group number. This option use \'Receive Indicator\' widget to intelligently cycle focus within group unit.",
+		desc = "Tap the same group numbers to focus camera view toward each units within the same group. This option use \'Receive Indicator\' widget to intelligently cycle focus when appropriate.",
 		OnChange = function(self) 
 			if self.value==true then
 				Spring.SendCommands("luaui enablewidget Receive Units Indicator")
@@ -1133,46 +1133,14 @@ function widget:Update(dt)
     if hideCursor then
         spSetMouseCursor('%none%')
     end
-	
-	if follow_timer > 0  then 
-		follow_timer = follow_timer - dt
-	end
 
-	if options.follow.value then --if follow selected player's cursor: do
-		camcycle = camcycle %(8) + 1 --automatically reset value to Zero (0) every 8th iteration.
-		if camcycle == 1 then
-			if WG.alliedCursorsPos then 
-				if options.followautozoom.value then
-					AutoZoomInOutToCursor()
-				else
-					local teamID = Spring.GetLocalTeamID()
-					local _, playerID = Spring.GetTeamInfo(teamID)
-					local pp = WG.alliedCursorsPos[ playerID ]
-					if pp then
-						local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
-						local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
-						local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
-						if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-							local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-							spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
-						else --if cursor within screen: do
-							local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-							spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
-						end
-					end
-				end
-			end 
-		end
-	end
-	
-	cycle = cycle %(32*15) + 1
-	-- Periodic warning
-	if cycle == 1 then
-		PeriodicWarning()
-	end
-	
+	--//HANDLE TRACK UNIT
+	local isTrackingUnit
 	trackcycle = trackcycle %(4) + 1 --automatically reset "trackcycle" value to Zero (0) every 4th iteration. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
-	if trackcycle == 1 and trackmode and (not rotate) then --update trackmode during normal/non-rotating state (doing both will cause a zoomed-out bug)
+	if (trackcycle == 1 and --update trackmode every 4th iteration
+		trackmode and 
+		not thirdperson_trackunit and
+		(not rotate)) then --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
 		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
 			local vx,vy,vz = Spring.GetUnitVelocity(selUnits[1])
@@ -1183,9 +1151,49 @@ function widget:Update(dt)
 			--2) increase value A until camera motion is not jittery, then stop: (x+vx,y+vy,z+vz, 0.0333*A)
 			--3) increase value B until unit center on screen, then stop: (x+vx*B,y+vy*B,z+vz*B, 0.0333*A)
 			spSetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
+			isTrackingUnit = true
 		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
 			trackmode=false --exit trackmode
 		end
+	end
+	
+	if follow_timer > 0  then 
+		follow_timer = follow_timer - dt
+	end
+	
+	--//HANDLE TRACK CURSOR
+	camcycle = camcycle %(8) + 1 --automatically reset value to Zero (0) every 8th iteration. NOTE: a reset value a multiple of trackcycle's reset is good to prevent conflict 
+	if (camcycle == 1 and --update track cursor every 8th iteration
+		not isTrackingUnit and --if currently not tracking unit, and
+		not thirdperson_trackunit and
+		options.follow.value) then --if follow selected player's cursor: do
+		if WG.alliedCursorsPos then 
+			if options.followautozoom.value then
+				AutoZoomInOutToCursor()
+			else
+				local teamID = Spring.GetLocalTeamID()
+				local _, playerID = Spring.GetTeamInfo(teamID)
+				local pp = WG.alliedCursorsPos[ playerID ]
+				if pp then
+					local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
+					local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
+					local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
+					if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
+						local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+						spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
+					else --if cursor within screen: do
+						local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+						spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
+					end
+				end
+			end
+		end
+	end
+	
+	cycle = cycle %(32*15) + 1
+	-- Periodic warning
+	if cycle == 1 then
+		PeriodicWarning()
 	end
 	
 
@@ -1195,6 +1203,7 @@ function widget:Update(dt)
 
 	local a,c,m,s = spGetModKeyState()
 	
+	--//HANDLE ROTATE CAMERA
 	if 	(not thirdperson_trackunit and  --block 3rd Person 
 		(rot.right or rot.left or rot.up or rot.down))
 		then
@@ -1214,6 +1223,7 @@ function widget:Update(dt)
 		
 	end
 	
+	--//HANDLE MOVE CAMERA
 	if (not thirdperson_trackunit and  --block 3rd Person 
 		(smoothscroll or
 		move.right or move.left or move.up or move.down or
@@ -1277,6 +1287,7 @@ function widget:Update(dt)
 	
 	mx, my = spGetMouseState()
 	
+	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
 	if options.edgemove.value then
 		if not movekey then --if not doing arrow key on keyboard: reset
 			move = {}
@@ -1307,6 +1318,7 @@ function widget:Update(dt)
 		end
 	end
 	
+	--//HANDLE MOUSE/KEYBOARD'S 3RD-PERSON (TRACK UNIT) RETARGET
 	if 	(thirdperson_trackunit and 
 		not overview_mode and --block 3rd person scroll when in overview mode
 		(move.right or move.left or move.up or move.down or
@@ -1315,9 +1327,9 @@ function widget:Update(dt)
 		
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
-		else --not 3rdPerson-edge-Scroll: re-issue 3rd person
+		else --not using movekey for 3rdPerson-edge-Scroll (ie:is using mouse): re-issue 3rd person
 			local selUnits = spGetSelectedUnits()
-			if selUnits and selUnits[1] then -- re-issue 3rd person for selected unit
+			if selUnits and selUnits[1] then -- re-issue 3rd person for selected unit (we need to reissue this because in normal case mouse edge scroll will exit trackmode)
 				spSendCommands('viewfps')
 				spSendCommands('track')
 				thirdperson_trackunit = selUnits[1]
@@ -1332,6 +1344,7 @@ function widget:Update(dt)
 		end
 	end
 	
+	--//MISC
 	fpsmode = cs.name == "fps"
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
 		init = false

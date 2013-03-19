@@ -210,7 +210,9 @@ path='Settings/Camera/Old Camera Shortcuts'
 	ShButton( 'Move Forward', 'moveforward' )	
 	ShButton( 'Move Back', 'moveback' )	
 	ShButton( 'Move Left', 'moveleft' )	
-	ShButton( 'Move Right', 'moveright' )	
+	ShButton( 'Move Right', 'moveright' )
+	ShLabel(' ')
+	ShButton( 'TA camera track unit', 'track' )
 	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.

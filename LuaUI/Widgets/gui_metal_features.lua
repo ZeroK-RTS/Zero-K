@@ -32,7 +32,7 @@ options={
 		name = 'Auto Metalmap Toggling',
 		desc = 'Automatically toggle metalmap view if you select RECLAIM command. This increase wreckage visibility',
 		type = 'bool',
-		value = false,
+		value = true,
 	},
 }
 
