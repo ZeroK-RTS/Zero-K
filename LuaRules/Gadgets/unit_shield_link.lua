@@ -56,7 +56,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 		local x,y,z = spGetUnitPosition(unitID)
 		local allyTeam = spGetUnitAllyTeam(unitID)
 		shieldTeams[allyTeam] = shieldTeams[allyTeam] or {}
-		shieldUnit = {
+		local shieldUnit = {
 			shieldPower = shieldWep.shieldPower,
 			shieldRadius = shieldWep.shieldRadius,
 			shieldOn = true,
@@ -86,8 +86,9 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local ud = UnitDefs[unitDefID]
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
 	if ud.shieldWeaponDef then
+		local shieldUnit
 		if shieldTeams[oldAllyTeam] and shieldTeams[oldAllyTeam][unitID] then
-			local shieldUnit = shieldTeams[oldAllyTeam][unitID]
+			shieldUnit = shieldTeams[oldAllyTeam][unitID]
 			shieldTeams[oldAllyTeam][unitID] = nil
 			shieldUnit.link[unitID] = nil
 			shieldUnit.link = {}
@@ -95,7 +96,7 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 			
 		local allyTeam = spGetUnitAllyTeam(unitID)
 		shieldTeams[allyTeam] = shieldTeams[allyTeam] or {}
-		shieldTeams[allyTeam][unitID] = shieldUnit
+		shieldTeams[allyTeam][unitID] = shieldUnit --Note: wont be problem when NIL because is always filled with new value when unit finish (ie: when unit captured before finish) 
 	end
 end
 
@@ -136,32 +137,32 @@ local function AdjustLinks()
 
 		for ud1,su in pairs(shieldUnits) do
 
-			repeat
+			repeat --Is clever hax for making "break" behave like "continue"
 				if unitStat[ud1] == nil then
 					unitStat[ud1] = linkable(ud1)
 				end
-				if not unitStat[ud1] then break end -- continue
+				if not unitStat[ud1] then break end -- continue to next unit
 
-				for ud2,su2 in pairs(shieldUnits) do
+				for ud2,su2 in pairs(shieldUnits) do --iterate over all shield unit, find anyone that's in range.
 
 					if unitStat[ud2] == nil then
 						unitStat[ud2] = linkable(ud2)
 					end
 
-					if su.link ~= su2.link and unitStat[ud2] then
-						if su.valid and ((su.x - su2.x)^2 + (su.y - su2.y)^2 + (su.z - su2.z)^2) ^ 0.5 < (su.shieldRadius + su2.shieldRadius) then
+					if su.link ~= su2.link and unitStat[ud2] then --if new list isn't old list, and if this unit is linkable, then: 
+						if su.valid and ((su.x - su2.x)^2 + (su.y - su2.y)^2 + (su.z - su2.z)^2) ^ 0.5 < (su.shieldRadius + su2.shieldRadius) then --if this unit is in range of old unit:
 								
 							sc[cnt] = {ud1,ud2}
 							cnt = cnt + 1
 		
 							for unitID,linksu in pairs(su2.link) do
-								su.link[unitID] = linksu
-								linksu.link = su.link
+								su.link[unitID] = linksu --copy content from new list to old list
+								linksu.link = su.link --assign (a more completed) old list to new unit
 							end
 						end
 					end
 				end -- for ud2
-			until true
+			until true --exit repeat
 		end	-- for ud1
 	end
 end
@@ -169,7 +170,7 @@ end
 local RECHARGE_KOEF = 0.01
 
 function gadget:GameFrame(n)
-	if n%30 == 18 then AdjustLinks() end 
+	if n%30 == 18 then AdjustLinks() end --update every 30 frame at the 18th frame
 
 	-- cache
 	local unitStat = {}
@@ -177,7 +178,7 @@ function gadget:GameFrame(n)
 	for allyTeam,shieldUnits in pairs(shieldTeams) do
 		local processedLinks = {} --DO NOT USE PAIRS ON THIS
 		for unitID,su in pairs(shieldUnits) do
-			repeat
+			repeat --doesn't do loop but make "break" behave like "continue"
 				if not processedLinks[su.link] then
 					processedLinks[su.link] = true
 
@@ -229,7 +230,7 @@ function gadget:GameFrame(n)
 						end
 					end 
 				end
-			until true
+			until true --exit repeat
 		end
 	end
 end
