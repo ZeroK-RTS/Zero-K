@@ -63,6 +63,7 @@ local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
 local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
+local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spCallCOBScript      = Spring.CallCOBScript
@@ -262,13 +263,14 @@ local function Jump(unitID, goal, cmdTag)
 	
 		if delay > 0 then
 			for i=delay, 1, -1 do
+				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 				if GG.wasMorphedTo[unitID] then
 					local oldUnitID = unitID --previous unitID
-					unitID = GG.wasMorphedTo[unitID] --new unitID
+					unitID = GG.wasMorphedTo[unitID] --new unitID. NOTE: UnitDestroyed() already updated jumping & lastJump table with new value
 					local unitDefID = spGetUnitDefID(unitID)
 					if (not jumpDefs[unitDefID]) then --check if new unit can jump
-						jumping[oldUnitID] = nil
-						lastJump[oldUnitID] = nil
+						jumping[unitID] = nil
+						lastJump[unitID] = nil
 						return --exit JumpLoop() if unit can't jump
 					end
 					cob = jumpDefs[unitDefID].cobscript --script type
@@ -283,10 +285,6 @@ local function Jump(unitID, goal, cmdTag)
 					step = speed/lineDist --resolution of JumpLoop() update
 					mcEnable(unitID) --enable MoveCtrl for new unit
 					SetLeaveTracks(unitID, false) --set no track
-					jumping[unitID] = true --flag unit as jumping
-					lastJump[unitID] = lastJump[oldUnitID] --copy last jump timestamp to new unit
-					jumping[oldUnitID] = nil --empty old unit's data
-					lastJump[oldUnitID] = nil
 					spSetUnitRulesParam(unitID,"jumpReload",0)
 				end			
 				Sleep()
@@ -315,13 +313,14 @@ local function Jump(unitID, goal, cmdTag)
 		local halfJump
 		local i = 0
 		while i <= 1 do
+			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 			if GG.wasMorphedTo[unitID] then
 				local oldUnitID = unitID
 				unitID = GG.wasMorphedTo[unitID]
 				local unitDefID = spGetUnitDefID(unitID)
 				if (not jumpDefs[unitDefID]) then
-					jumping[oldUnitID] = nil
-					lastJump[oldUnitID] = nil
+					jumping[unitID] = nil
+					lastJump[unitID] = nil
 					return
 				end
 				cob = jumpDefs[unitDefID].cobscript
@@ -333,12 +332,10 @@ local function Jump(unitID, goal, cmdTag)
 				step = speed/lineDist --resolution of JumpLoop() update
 				mcEnable(unitID)
 				SetLeaveTracks(unitID, false)
-				jumping[unitID] = true
-				lastJump[unitID] = lastJump[oldUnitID]
-				jumping[oldUnitID] = nil
-				lastJump[oldUnitID] = nil				
 				halfJump = nil --reset halfjump flag. Redo halfjump script for new unit
-				if rotateMidAir then 
+				if rotateMidAir then
+					local h = spGetUnitHeading(unitID)
+					mcSetRotation(unitID, 0, h/rotUnit, 0) -- keep current heading
 					mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0) --resume unit rotation mid air
 				end
 				spSetUnitRulesParam(unitID,"jumpReload",0)
@@ -402,11 +399,11 @@ local function Jump(unitID, goal, cmdTag)
 				local oldUnitID = unitID
 				unitID = GG.wasMorphedTo[unitID]
 				if (not jumpDefs[unitDefID]) then --check if new unit can jump
+					jumping[unitID] = nil
+					lastJump[unitID] = nil
 					break
 				end
 				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
-				lastJump[unitID] = jumpEndTime --copy last jump timestamp to new unit
-				jumping[oldUnitID] = nil --empty old unit's data
 			end
 			spSetUnitRulesParam(unitID,"jumpReload",j/reloadTime)
 			Sleep()
@@ -463,13 +460,19 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
 end
 
-
-function gadget:UnitDestroyed(unitID, unitDefID)
-	if not (jumping[unitID] and GG.wasMorphedTo[unitID]) then --do not clear the "lastJump[]" table if unit is just morphing & not dying.
-		lastJump[unitID] = nil
+function gadget:UnitDestroyed(oldUnitID, unitDefID)
+	--NOTE: its really important to map old table to new id ASAP to prevent CommandFallback() from executing jump twice for morphed unit. 
+	--UnitDestroyed() is called before CommandFallback() when unit is morphed (unit_morph.lua must destroy unit before issuing command) 
+	if jumping[oldUnitID] and GG.wasMorphedTo[oldUnitID] then
+		local newUnitID = GG.wasMorphedTo[oldUnitID]
+		jumping[newUnitID] = jumping[oldUnitID] --copy last jump state to new unit
+		lastJump[newUnitID] = lastJump[oldUnitID] --copy last jump timestamp to new unit
+	end
+	if lastJump[oldUnitID] then
+		lastJump[oldUnitID] = nil
+		jumping[oldUnitID] = nil --empty old unit's data
 	end
 end
-
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == CMD_JUMP and 
@@ -520,15 +523,21 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
 		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
 			local coords = table.concat(cmdParams)
+			local currFrame = spGetGameFrame()
+			for allCoords, oldStuff in pairs(jumps) do
+				if currFrame-oldStuff[2] > 150 then 
+					jumps[allCoords] = nil --empty jump table (used for randomization) after 5 second. Use case: If infinite wave of unit has same jump coordinate then jump coordinate won't get infinitely random
+				end
+			end
 			if (not jumps[coords]) then
 				local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
 				if not didJump then
 					return true, true -- command was used, don't remove it
 				end
-				jumps[coords] = 1
+				jumps[coords] = {1, currFrame}
 				return true, keepCommand -- command was used, remove it 
 			else
-				local r = landBoxSize*jumps[coords]^0.5/2
+				local r = landBoxSize*jumps[coords][1]^0.5/2
 				local randpos = {
 					cmdParams[1] + random(-r, r),
 					cmdParams[2],
@@ -537,7 +546,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				if not didJump then
 					return true, true -- command was used, don't remove it
 				end
-				jumps[coords] = jumps[coords] + 1
+				jumps[coords][1] = jumps[coords][1] + 1
 				return true, keepCommand -- command was used, remove it 
 			end
 		end
@@ -552,6 +561,11 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 end
 
 
-function gadget:GameFrame(n)
+function gadget:GameFrame(currFrame)
 	UpdateCoroutines()
+	for coords, queue_n_age in pairs(jumps) do 
+		if currFrame-queue_n_age[2] > 300 then
+			jumps[coords] = nil
+		end
+	end
 end

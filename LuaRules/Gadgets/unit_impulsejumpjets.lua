@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		author  = "quantum, modified by msafwan (impulsejump)",
 		date    = "May 14 2008, March 11 2013",
 		license = "GNU GPL, v2 or later",
-		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage)
+		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
 		enabled = isImpulseJump,
 	}
 end
@@ -64,6 +64,7 @@ local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
 local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
+local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spCallCOBScript      = Spring.CallCOBScript
@@ -292,11 +293,14 @@ local function Jump(unitID, goal, cmdTag)
 		if delay > 0 then
 			local countUp = 1
 			while (countUp <= delay ) do
+				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 				if GG.wasMorphedTo[unitID] then
 					local oldUnitID = unitID --previous unitID
 					unitID = GG.wasMorphedTo[unitID] --new unitID
 					local unitDefID = spGetUnitDefID(unitID)
 					if (not jumpDefs[unitDefID]) then --check if new unit can jump
+						jumping[unitID] = nil
+						lastJump[unitID] = nil
 						return --exit JumpLoop() if unit can't jump
 					end
 					cob = jumpDefs[unitDefID].cobscript --script type
@@ -348,11 +352,14 @@ local function Jump(unitID, goal, cmdTag)
 		local halfJump
 		local i = 0
 		while i <= duration*1.5 do
+			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 			if GG.wasMorphedTo[unitID] then
 				local oldUnitID = unitID
 				unitID = GG.wasMorphedTo[unitID]
 				local unitDefID = spGetUnitDefID(unitID)
 				if (not jumpDefs[unitDefID]) then
+					jumping[unitID] = nil
+					lastJump[unitID] = nil
 					return
 				end
 				cob = jumpDefs[unitDefID].cobscript
@@ -367,7 +374,7 @@ local function Jump(unitID, goal, cmdTag)
 			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then
 				return --unit died
 			end
-			if not jumping[unitID] then
+			if (not jumping[unitID] ) or ( jumping[unitID]=="landed" ) then
 				break --jump aborted (skip to refreshing reload bar)
 			end
 
@@ -437,6 +444,8 @@ local function Jump(unitID, goal, cmdTag)
 				unitID = GG.wasMorphedTo[unitID]
 				local unitDefID = spGetUnitDefID(unitID)
 				if (not jumpDefs[unitDefID]) then --check if new unit can jump
+					jumping[unitID] = nil
+					lastJump[unitID] = nil				
 					break
 				end
 				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
@@ -484,7 +493,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- ground collision
 	if jumping[unitID] and weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
 		spSetUnitVelocity(unitID,0,Game.gravity*3/30/30,0) --add some bounce upward to escape 'physic glitch'
-		jumping[unitID] = false --abort jump
+		jumping[unitID] = "landed" --abort jump. Note: we do not assign NIL because jump is not yet completed and we do not want a 2nd mid-air jump just because CommandFallback() sees NIL.
 		return 0  -- no collision damage.
 	end
 	return damage
@@ -511,6 +520,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
+	--NOTE: its really important to map old table to new id ASAP to prevent CommandFallback() from executing jump twice for morphed unit. 
+	--UnitDestroyed() is called before CommandFallback() when unit is morphed (unit_morph.lua must destroy unit before issuing command) 
 	if jumping[oldUnitID] and GG.wasMorphedTo[oldUnitID] then
 		local newUnitID = GG.wasMorphedTo[oldUnitID]
 		jumping[newUnitID] = jumping[oldUnitID] --copy last jump state to new unit
@@ -549,7 +560,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
-	if (not jumpDefs[unitDefID]) then
+	if (not jumpDefs[unitDefID]) then --ignore non-jumpable unit
 		return false
 	end
 	
@@ -575,16 +586,29 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if (distSqr < (range*range)) then
 		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
 		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
+			local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
+			if not didJump then
+				return true, true -- command was used, don't remove it
+			end
+			return true, keepCommand -- command was used, remove it 
+			
+			--[[ with Jump randomizer:
 			local coords = table.concat(cmdParams)
+			local currFrame = spGetGameFrame()
+			for allCoords, oldStuff in pairs(jumps) do
+				if currFrame-oldStuff[2] > 150 then 
+					jumps[allCoords] = nil --empty jump table (used for randomization) after 5 second. Use case: If infinite wave of unit has same jump coordinate then jump coordinate won't get infinitely random
+				end
+			end
 			if (not jumps[coords]) then
 				local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
 				if not didJump then
 					return true, true -- command was used, don't remove it
 				end
-				jumps[coords] = 1
+				jumps[coords] = {1,currFrame}
 				return true, keepCommand -- command was used, remove it 
 			else
-				local r = landBoxSize*jumps[coords]^0.5/2
+				local r = landBoxSize*jumps[coords][1]^0.5/2
 				local randpos = {
 					cmdParams[1] + random(-r, r),
 					cmdParams[2],
@@ -593,9 +617,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				if not didJump then
 					return true, true -- command was used, don't remove it
 				end
-				jumps[coords] = jumps[coords] + 1
-				return true, keepCommand -- command was used, remove it 
+				jumps[coords][1] = jumps[coords][1] + 1
+				return true, keepCommand -- command was used, remove it
 			end
+			--]]
 		end
 	else
 		if not goalSet[unitID] then
@@ -608,7 +633,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 end
 
 
-function gadget:GameFrame(n)
+function gadget:GameFrame(currFrame)
 	UpdateCoroutines()
 	for i=#impulseQueue, 1, -1 do --we need to apply impulse outside a coroutine thread like this because we don't want impulses in a coroutine to cancel any newton's impulses that is occuring in main thread. We wanted all them to add up.
 		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4])
