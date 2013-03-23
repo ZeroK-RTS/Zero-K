@@ -267,7 +267,7 @@ options = {
 	},
 	
 	overviewmode = {
-		name = "Overview",
+		name = "COFC Overview",
 		desc = "Go to overview mode, then restore view to cursor position.",
 		type = 'button',
 		hotkey = {key='tab', mod=''},
@@ -455,6 +455,7 @@ local ls_dist, ls_have, ls_onmap --lockspot flag
 local tilting
 local overview_mode, last_rx, last_ls_dist --overview_mode's variable
 local follow_timer = 0
+local epicmenuHkeyComp = {} --for saving & reapply hotkey system handled by epicmenu.lua
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1666,7 +1667,6 @@ function widget:DrawScreen()
 	end
 end
 
-
 function widget:Initialize()
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
@@ -1677,9 +1677,23 @@ function widget:Initialize()
 	spSendCommands( 'unbindaction track' )
 	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
 	
+	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
+	if WG.crude.GetHotkey then
+		epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview") --get hotkey
+		epicmenuHkeyComp[2] = WG.crude.GetHotkey("trackmode")
+		epicmenuHkeyComp[3] = WG.crude.GetHotkey("track")
+		epicmenuHkeyComp[4] = WG.crude.GetHotkey("mousestate")
+	end
+	if 	WG.crude.SetHotkey then
+		WG.crude.SetHotkey("toggleoverview",nil) --unbind hotkey
+		WG.crude.SetHotkey("trackmode",nil)
+		WG.crude.SetHotkey("track",nil)
+		WG.crude.SetHotkey("mousestate",nil)
+	end
+	
 	spSendCommands("luaui disablewidget SmoothScroll")
-	if WG.SetWidgetOption then 
-		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC")
+	if WG.SetWidgetOption then
+		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
 end
 
@@ -1689,6 +1703,14 @@ function widget:Shutdown()
 	spSendCommands( 'bind any+t track' )
 	spSendCommands( 'bind ctrl+t trackmode' )
 	spSendCommands( 'bind backspace mousestate' ) --//re-enable screen-panning-mode toggled by 'backspace' key
+	
+	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
+	if WG.crude.SetHotkey then
+		WG.crude.SetHotkey("toggleoverview",epicmenuHkeyComp[1]) --rebind hotkey
+		WG.crude.SetHotkey("trackmode",epicmenuHkeyComp[2])
+		WG.crude.SetHotkey("track",epicmenuHkeyComp[3])
+		WG.crude.SetHotkey("mousestate",epicmenuHkeyComp[4])
+	end
 end
 
 function widget:TextCommand(command)

@@ -213,6 +213,8 @@ path='Settings/Camera/Old Camera Shortcuts'
 	ShButton( 'Move Right', 'moveright' )
 	ShLabel(' ')
 	ShButton( 'TA camera track unit', 'track' )
+	ShButton( 'Overview mode', 'toggleoverview' )
+	ShButton( 'Panning mode','mousestate', 'Note: must be bound to a key for use')
 	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.

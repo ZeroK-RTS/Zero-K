@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.313 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.314 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-02-24
     license   = "GNU GPL, v2 or later",
@@ -331,7 +331,7 @@ local function otget(t,key)
 		if not t[i] then
 			return
 		end
-		if t[i][1] == key then
+		if t[i][1] == key then --key stored in index 1, while value at index 2
 			return t[i][2]
 		end
 	end
@@ -339,7 +339,7 @@ local function otget(t,key)
 end
 local function otset(t, key, val)
 	for i=1,#t do
-		if t[i][1] == key then
+		if t[i][1] == key then --key stored in index 1, while value at index 2
 			if val == nil then
 				table.remove( t, i )
 			else
@@ -375,6 +375,28 @@ WG.crude.ResetSettings 	= function() end
 
 --Reset hotkeys, defined in Initialized
 WG.crude.ResetKeys 		= function() end
+
+--Get hotkey by actionname, defined in Initialize()
+WG.crude.GetHotkey = function() end
+
+--Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here will return empty pathoptions table.
+WG.crude.SetHotkey =  function() end 
+
+--[[
+-- is this an improvement?
+WG.crude.GetHotkey = function(actionName)
+	local hotkey = keybounditems[actionName]
+	if not hotkey then
+		local fallback = Spring.GetActionHotKeys(actionName)
+		if fallback and fallback[1] then
+			return CapCase(fallback[1])
+		else
+			return ''
+		end
+	end
+	return GetReadableHotkey(hotkey) 
+end
+--]]
 
 WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
 	--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
@@ -690,7 +712,7 @@ local function GetReadableHotkeyMod(mod)
 		''		
 end
 
-local function HotKeyBreakdown(hotkey)
+local function HotKeyBreakdown(hotkey) --convert hotkey string into a standardized hotkey string
 	hotkey = hotkey:gsub('numpad%+', 'numpadplus')
 	local hotkey_table = explode('+', hotkey)
 	local alt, ctrl, meta, shift
@@ -781,7 +803,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 	end
 end
 
---create spring action for this option
+--create spring action for this option. Note: this is used by AddOption()
 local function CreateOptionAction(path, option)
 
 	local kbfunc = option.OnChange
@@ -790,7 +812,7 @@ local function CreateOptionAction(path, option)
 		kbfunc = function()
 		
 			local wname = option.wname
-			-- [[
+			-- [[ Note: following code between -- [[ and  --]] is just to catch an exception. Is not part of code's logic.
 			if not pathoptions[path] or not otget( pathoptions[path], wname..option.key ) then
 				Spring.Echo("Warning, detected keybind mishap. Please report this info and help us fix it:")
 				Spring.Echo("Option path is "..path)
@@ -822,6 +844,14 @@ local function CreateOptionAction(path, option)
 	end
 	local actionName = GetActionName(path, option)
 	AddAction(actionName, kbfunc, nil, "t")
+	
+	if option.hotkey then
+		local existingRegister = otget( keybounditems, actionName) --check whether existing actionname is already bound with a custom hotkey in zkkey
+		if existingRegister == nil then
+			Spring.Echo("Epicmenu: " .. option.hotkey .. " (" .. option.key .. ", " .. option.wname..")") --tell user (in infolog.txt) that a widget is adding hotkey
+			otset(keybounditems, actionName, option.hotkey ) --save new hotkey if no existing key found (not yet applied. Will be applied in IntegrateWidget())
+		end
+	end
 end
 
 --remove spring action for this option
@@ -889,7 +919,7 @@ local function ReApplyKeybinds()
 	end
 end
 
-local function AddOption(path, option, wname )
+local function AddOption(path, option, wname ) --Note: this is used when loading widgets and in Initialize()
 	--echo(path, wname, option)
 	if not wname then
 		wname = path
@@ -1056,7 +1086,7 @@ local function AddOption(path, option, wname )
 		
 		--migrate from old logic, make sure this is done before setting orig_key
 		if option.hotkey and type(option.hotkey) == 'table' then
-			option.hotkey = option.hotkey.mod .. option.hotkey.key
+			option.hotkey = option.hotkey.mod .. option.hotkey.key --change hotkey table into string
 		end
 		
 		if option.hotkey then
@@ -1067,7 +1097,7 @@ local function AddOption(path, option, wname )
 		
 		CreateOptionAction(path, option)
 		
-	--needs more work
+	--Keybinds for radiobuttons
 	elseif option.type == 'radioButton' then --if its a list of checkboxes:
 		for i=1, #option.items do --prepare keybinds for each of radioButton's checkbox
 			local item = {} 
@@ -1276,7 +1306,7 @@ local function IntegrateWidget(w, addoptions, index)
 	MakeSubWindow(curPath)
 	
 	
-	ReApplyKeybinds()
+	ReApplyKeybinds() --reapply keybinds when widget load/removed (incase widget alter keybinds)
 	
 end
 
@@ -1336,38 +1366,7 @@ local function MakeKeybindWindow( path, option, hotkey )
 	}
 end
 
-WG.crude.GetHotkey = function(actionName)
-	local actionHotkey = GetActionHotkey(actionName)
-	--local hotkey = keybounditems[actionName] or actionHotkey
-	local hotkey = otget( keybounditems, actionName ) or actionHotkey
-	if not hotkey or hotkey == 'none' then
-		return ''
-	end
-	if type(hotkey) == 'table' then
-		hotkey = hotkey[1]
-	end
-	return GetReadableHotkey(hotkey) 
-end
-
-
---[[
--- is this an improvement?
-WG.crude.GetHotkey = function(actionName)
-	local hotkey = keybounditems[actionName]
-	if not hotkey then
-		local fallback = Spring.GetActionHotKeys(actionName)
-		if fallback and fallback[1] then
-			return CapCase(fallback[1])
-		else
-			return ''
-		end
-	end
-	return GetReadableHotkey(hotkey) 
-end
---]]
-
-
---Get hotkey action and readable hotkey string
+--Get hotkey action and readable hotkey string. Note: this is used in MakeHotkeyedControl() which make hotkey handled by Chili.
 local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
 	--local hotkey = keybounditems[actionName]
@@ -1375,18 +1374,19 @@ local function GetHotkeyData(path, option)
 	if type(hotkey) == 'table' then
 		hotkey = hotkey[1]
 	end
-	if hotkey and hotkey ~= 'none' then
+	if hotkey and hotkey ~= 'none' then --if ZKkey contain definitive hotkey: return zkkey's hotkey
 		if hotkey:find('%+%+') then
 			hotkey = hotkey:gsub( '%+%+', '+plus' )
 		end
 		
 		return GetReadableHotkey(hotkey) 
 	end
+	if (not hotkey ) and option.hotkey then  --if widget supplied default hotkey: return widget's hotkey (this only effect hotkey on Chili menu)
+		return option.hotkey
+	end
 	
-	return 'None'
+	return 'None' --show "none" on epicmenu's menu
 end
-
-
 
 --Make a stack with control and its hotkey button
 local function MakeHotkeyedControl(control, path, option)
@@ -2122,10 +2122,70 @@ function widget:Initialize()
 	-- clear all keybindings
 	WG.crude.ResetKeys = function()
 		keybounditems = {}
-		keybounditems = CopyTable(defaultkeybinds, true)
+		keybounditems = CopyTable(defaultkeybinds, true) --restore with mods zkkey's default value
 		
-		ReApplyKeybinds()
+		--restore with widget's default value:
+		for path, subtable in pairs ( pathoptions) do
+			for _,element in ipairs(subtable) do
+				local option = element[2]
+				local defaultHotkey = option.orig_hotkey
+				if defaultHotkey then
+					option.hotkey = defaultHotkey --make chili menu display the default hotkey
+					local actionName = GetActionName(path, option)
+					otset( keybounditems, actionName, defaultHotkey) --save default hotkey to zkkey
+				end
+			end
+		end
+		
+		ReApplyKeybinds() --unbind all hotkey and re-attach with stuff in keybounditems table 
 		echo 'Reset all hotkeys to default.'
+	end
+	
+	-- get hotkey
+	WG.crude.GetHotkey = function(actionName) --Note: declared here because keybounditems must not be empty
+		local actionHotkey = GetActionHotkey(actionName)
+		--local hotkey = keybounditems[actionName] or actionHotkey
+		local hotkey = otget( keybounditems, actionName ) or actionHotkey
+		if not hotkey or hotkey == 'none' then
+			return ''
+		end
+		if type(hotkey) == 'table' then
+			hotkey = hotkey[1]
+		end
+		return GetReadableHotkey(hotkey) 
+	end
+	
+	-- set hotkey
+	WG.crude.SetHotkey =  function(actionName, hotkey, func) --Note: declared here because pathoptions must not be empty
+		if hotkey then
+			hotkey = GetReadableHotkey(hotkey) --standardize hotkey (just in case stuff happen)
+		end
+		if hotkey == '' then 
+			hotkey = nil --convert '' into NIL.
+		end
+		if func then
+			if hotkey then
+				AddAction(actionName, func, nil, "t") --attach function to action
+			else
+				RemoveAction(actionName) --detach function from action
+			end
+		end
+		if hotkey then
+			AssignKeyBindAction(hotkey, actionName, false) --attach action to keybinds
+		else
+			UnassignKeyBind(actionName,false) --detach action from keybinds
+		end
+		otset(keybounditems, actionName, hotkey) --update epicmenu's hotkey table
+		for path, subtable in pairs (pathoptions) do 
+			for _,element in ipairs(subtable) do
+				local option = element[2]
+				local indirectActionName = GetActionName(path, option)
+				local directActionName = option.action
+				if indirectActionName==actionName or directActionName == actionName then
+					option.hotkey = hotkey or "None" --update pathoption hotkey for Chili menu display & prevent conflict with hotkey registerd by Chili . Note: LUA is referencing table, so we don't need to change same table elsewhere.
+				end
+			end
+		end
 	end
 	
 	-- Add custom actions for the following keybinds
