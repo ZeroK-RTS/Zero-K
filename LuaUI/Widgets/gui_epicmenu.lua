@@ -379,8 +379,11 @@ WG.crude.ResetKeys 		= function() end
 --Get hotkey by actionname, defined in Initialize()
 WG.crude.GetHotkey = function() end
 
---Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here will return empty pathoptions table.
+--Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here (at least if running epicmenu.lua in local copy) will return empty pathoptions table.
 WG.crude.SetHotkey =  function() end 
+
+--Set callin often used for space+click shortcut, defined in Initialize(). Is defined in Initialize() because it help with testing epicmenu.lua in local copy
+WG.crude.OpenPath = function() end
 
 --[[
 -- is this an improvement?
@@ -2011,10 +2014,6 @@ RemakeEpicMenu = function()
 	end
 end
 
-function WG.crude.OpenPath(path)
-	MakeSubWindow(path)
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -2251,6 +2250,11 @@ function widget:Initialize()
 		return ret
 	end
 	init = false
+	
+	--intialize remote menu trigger
+	WG.crude.OpenPath = function(path) --Note: declared here so that it work in local copy
+		MakeSubWindow(path)
+	end
 end
 
 function widget:Shutdown()

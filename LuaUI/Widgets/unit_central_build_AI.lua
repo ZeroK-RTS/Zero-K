@@ -14,7 +14,7 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.339"
+local version = "v1.340"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -117,7 +117,6 @@ local nextFrame	= spGetGameFrame() +30
 local nextPathCheck = spGetGameFrame() + 400 --is used to check whether constructor can go to construction site
 local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
-local debugEcho1 = false
 
 --	"global" for this widget.  This is probably not a recommended practice.
 local myUnits = {}	--  list of units in the Central Build group
@@ -386,22 +385,16 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
 					local isOverlap = CleanOrders(myCmd) -- check if current queue overlap with existing queue, and clear up any invalid queue 
 					if not isOverlap then
-						if not params[3] then
-							if debugEcho1 then --build unit command that has nil parameter (only for factory)
-								Spring.Echo(id); local abID = math.abs(id); local ud = UnitDefs[abID or -1]; if ud then Spring.Echo(ud.humanName) end; Spring.Echo("A")
-							end
-						else
-							local hash = hash(myCmd)
-							--[[ crude delete-duplicate-command code. Now is handled by CleanOrder():
-							if ( myQueue[hash] ) then	-- if dupe of existing order
-								myQueue[hash] = nil		-- must want to cancel
-							else						-- if not a dupe
-								myQueue[hash] = myCmd	-- add to CB queue
-							end
-							--]]
+						local hash = hash(myCmd)
+						--[[ crude delete-duplicate-command code. Now is handled by CleanOrder():
+						if ( myQueue[hash] ) then	-- if dupe of existing order
+							myQueue[hash] = nil		-- must want to cancel
+						else						-- if not a dupe
 							myQueue[hash] = myCmd	-- add to CB queue
-							UpdateUnitsPathabilityForOneQueue(hash)
 						end
+						--]]
+						myQueue[hash] = myCmd	-- add to CB queue
+						UpdateUnitsPathabilityForOneQueue(hash)
 					end
 					nextFrame = spGetGameFrame() + 30 --wait 1 more second before distribute work, so user can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
@@ -412,17 +405,11 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					-- do NOT return here because there may be more units.  Let Spring handle.
 				end
 			else
-				if ( id < 0 ) and ( not isAreaMex ) then --direct command of building stuff
+				if ( id < 0 ) and (not isAreaMex ) then --is building stuff & is direct command/not an area mex command
 					local x, y, z, h = params[1], params[2], params[3], params[4]
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
-					if not params[3] then --build unit command that has nil parameter (only for factory)
-							if debugEcho1 then
-								Spring.Echo(id); local abID = math.abs(id); local ud = UnitDefs[abID or -1]; if ud then	Spring.Echo(ud.humanName) end; Spring.Echo("B")
-							end
-					else
-						local hash = hash(myCmd)
-						myUnits[unitID] = hash --remember what command this unit is having
-					end
+					local hash = hash(myCmd)
+					myUnits[unitID] = hash --remember what command this unit is having
 				else
 					myUnits[unitID] = "busy"	-- direct command of something else.
 				end
@@ -489,13 +476,9 @@ function FindIdleUnits(myUnits, thisFrame)
 		if myCmd == "idle" then --if unit is marked as idle, then double check it
 			local cmd1 = GetFirstCommand(unitID)
 			if ( cmd1 ) then
-				if ( cmd1.id < 0 ) then
-					local unitCmd = {id=cmd1.id,x=cmd1.params[1],y=cmd1.params[2],z=cmd1.params[3],h=cmd1.params[4]}
-					if not cmd1.params[3] then
-						if debugEcho1 then --build unit command that has nil parameter (only for factory)
-							Spring.Echo(cmd1.id); local abID = math.abs(cmd1.id); local ud = UnitDefs[abID or -1]; if ud then Spring.Echo(ud.humanName) end; Spring.Echo("C")
-						end
-					else
+				if ( cmd1.id < 0 ) then --is build (any) stuff
+					if ( cmd1.params[3] ) then --is not build unit command (build unit command has nil parameter (only for factory))
+						local unitCmd = {id=cmd1.id,x=cmd1.params[1],y=cmd1.params[2],z=cmd1.params[3],h=cmd1.params[4]}
 						local hash = hash(unitCmd)
 						myUnits[unitID] = hash
 					end
@@ -643,19 +626,22 @@ function CleanOrders(newCmd)
 				minTolerance = zSize_queue + zSize --check minimum tolerance in z direction
 				axisDist = abs (z - z_newCmd) -- check actual separation in z direction
 				if axisDist < minTolerance then --if too close in z direction
-					canBuildThisThere = 0 --remove queue
-					isOverlap = true
+					canBuildThisThere = 0 --flag this queue for removal
+					isOverlap = true --return true
+					
+					local unitArray = {}
+					for unitID, queueKey in pairs(myUnits) do
+						if queueKey == key then
+							unitArray[#unitArray+1] = unitID
+						end
+						myQueueUnreachable[unitID][key] = nil --clear the pathability table of this queue for all unit
+					end
+					Spring.GiveOrderToUnitArray (unitArray,CMD_STOP, {}, {}) --send STOP to units assigned to this queue. A scenario: user delete this queue thru overlap method and it stop any unit trying to build this queue
 				end
 			end
 		end
 		if (canBuildThisThere < 1) then --if queue is flagged for removal
 			myQueue[key] = nil  --remove queue
-			for unitID, queueKey in pairs(myUnits) do
-				if queueKey == key then
-					spGiveOrderToUnit(unitID, CMD_STOP, {}, {}) --send STOP to only unit assigned to this queue
-				end
-				myQueueUnreachable[unitID][key] = nil --clear for each unit
-			end
 		end
 	end
 	
