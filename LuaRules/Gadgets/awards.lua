@@ -646,7 +646,7 @@ end
 
 
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponDefID, projectileID, 
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponDefID,
 		attackerID, attackerDefID, attackerTeam)
 	if (not attackerTeam) 
 		or (attackerTeam == unitTeam)

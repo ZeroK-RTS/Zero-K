@@ -137,7 +137,7 @@ end
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID,  projectileID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if unitsByID[unitID] and not paralyzer then
 		unitsByID[unitID].totalDamage = (unitsByID[unitID].totalDamage or 0) + damage
 		if attackerTeam then

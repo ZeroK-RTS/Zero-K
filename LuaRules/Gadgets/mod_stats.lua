@@ -52,7 +52,7 @@ local drones = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponDefID, projectileID,  attackerID, attackerDefID, attackerTeam)
+                            weaponDefID, attackerID, attackerDefID, attackerTeam)
 
 	if unitTeam == gaiaTeamID then
 		return

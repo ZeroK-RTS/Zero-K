@@ -58,7 +58,7 @@ function GG.PokeDecloakUnit(unitID, duration)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponDefID, projectileID,  attackerID, attackerDefID, attackerTeam)
+                            weaponDefID, attackerID, attackerDefID, attackerTeam)
 	
 	if damage > 0 and
 		not (attackerTeam and

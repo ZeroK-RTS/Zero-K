@@ -1379,11 +1379,11 @@ end
 
 
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponDefID, projectileID, 
+                                   damage, paralyzer, weaponDefID,
                                    attackerID, attackerDefID, attackerTeam)
   for _,g in ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,
-                  damage, paralyzer, weaponDefID, projectileID, 
+                  damage, paralyzer, weaponDefID,
                   attackerID, attackerDefID, attackerTeam)
   end
   return
