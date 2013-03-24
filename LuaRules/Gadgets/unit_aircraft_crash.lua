@@ -48,7 +48,7 @@ function gadget:GameFrame(n)
 	end
 end
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID,  projectileID, attackerID, attackerDefID, attackerTeam)
 	if (not recentDamage[unitID]) or select(3, spGetUnitIsStunned(unitID)) then return end
 	--Spring.Echo("Plane damaged")
 	recentDamage[unitID][gameFrame] = (recentDamage[unitID][gameFrame] or 0) + damage

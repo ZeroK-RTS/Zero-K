@@ -2627,7 +2627,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 
 end
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID,  attackerID, attackerDefID, attackerTeam)
 
 	if (not aiTeamData[unitTeam]) or allyTeamData[aiTeamData[unitTeam].allyTeam].teams[attackerTeam] then
 		return

@@ -66,7 +66,7 @@ end
 
 
 
-function gadget:UnitDamaged(uID, uDefID, teamID, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitDamaged(uID, uDefID, teamID, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
 
     if attackerID and UnitDefs[attackerDefID].name == affectedUnitName and
 	not (attackerTeam == teamID or spAreTeamsAllied(teamID, attackerTeam)) then

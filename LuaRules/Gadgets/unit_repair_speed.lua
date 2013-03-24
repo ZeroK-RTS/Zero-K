@@ -41,7 +41,7 @@ local spGetUnitHealth = Spring.GetUnitHealth
 local spSetUnitCosts = Spring.SetUnitCosts
 local spValidUnitID = Spring.ValidUnitID
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
 
 	if (attackerDefID and 
 		UnitDefs[attackerDefID].customParams and 

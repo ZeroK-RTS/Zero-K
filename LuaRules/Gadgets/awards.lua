@@ -646,7 +646,7 @@ end
 
 
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponDefID, projectileID, 
 		attackerID, attackerDefID, attackerTeam)
 	if (not attackerTeam) 
 		or (attackerTeam == unitTeam)
@@ -677,7 +677,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			AddAwardPoints( 'ouch', unitTeam, damage )
 			local ad = UnitDefs[attackerDefID]
 			
-			if (flamerWeaponDefs[weaponID]) then				
+			if (flamerWeaponDefs[weaponDefID]) then				
 				AddAwardPoints( 'fire', attackerTeam, damage )
 			end
 			
