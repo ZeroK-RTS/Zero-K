@@ -21,6 +21,7 @@ unitDef = {
   collisionVolumeScales  = [[34 45 27]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
+  corpse                 = [[DEAD]],
 
   customParams           = {
     canjump        = [[1]],
@@ -43,7 +44,7 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   mass                   = 97,
-  maxDamage              = 650,
+  maxDamage              = 550,
   maxSlope               = 36,
   maxVelocity            = 2.5,
   maxWaterDepth          = 22,
@@ -59,7 +60,7 @@ unitDef = {
   selfDestructCountdown  = 0,
   shootme                = [[1]],
   side                   = [[CORE]],
-  sightDistance          = 200,
+  sightDistance          = 400,
   smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -77,66 +78,36 @@ unitDef = {
   featureDefs            = {
 
     DEAD       = {
-      description      = [[Debris - Clogger]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 12500,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
+      description      = [[Wreckage - Clogger]],
+      blocking         = true,
+      damage           = 550,
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
+      height           = [[5]],
       hitdensity       = [[100]],
-      metal            = 1,
-      object           = [[debris1x1b.s3o]],
+      metal            = 8,
+      object           = [[clogger_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 1,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
+      reclaimTime      = 8,
     },
-
-
-    RockTeeth  = {
+	
+    HEAP      = {
       description      = [[Debris - Clogger]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 12500,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
+      damage           = 550,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
+      height           = [[5]],
       hitdensity       = [[100]],
-      metal            = 1,
+      metal            = 4,
       object           = [[debris1x1b.s3o]],
       reclaimable      = true,
-      reclaimTime      = 1,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    SLAB_HEAP1 = {
-      description      = [[Debris - Clogger]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 12500,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 1,
-      object           = [[debris1x1b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
+      reclaimTime      = 4,
     },
 
   },
-
+  
 }
 
 return lowerkeys({ corclog = unitDef })
