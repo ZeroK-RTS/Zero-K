@@ -146,8 +146,8 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 		defenderTeam = spGetUnitTeam(shieldCarrierUnitID)
 		defenderDefID = spGetUnitDefID(shieldCarrierUnitID)
 	end
-	-- we don't actually have the weaponID, but can assume it is puppyWeaponID
-	gadget:UnitPreDamaged(shieldCarrierID, defenderDefID, defenderTeam, 0, false, puppyWeaponID, proOwnerID, attackerDefID, attackerTeam)
+	-- we don't actually have the weaponID, but can assume it is puppyWeaponID,
+	gadget:UnitPreDamaged(shieldCarrierID, defenderDefID, defenderTeam, 0, false, puppyWeaponID,proID, proOwnerID, attackerDefID, attackerTeam)
 	return false
 end
 

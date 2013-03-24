@@ -484,7 +484,7 @@ end
 -- weaponDefID -4 --> fire damage
 -- weaponDefID -5 --> kill damage
 --Detect ground landing:
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID,projectileID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision
 	if jumping[unitID] and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
 		jumping[unitID] = 3 --skip jump impulse for several cycle to escape 'physic glitch'

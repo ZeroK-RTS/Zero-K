@@ -79,8 +79,8 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	end
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if weaponID and bomberWeaponDefs[weaponID] then
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID,projectileID, attackerID, attackerDefID, attackerTeam)
+	if weaponDefID and bomberWeaponDefs[weaponDefID] then
 		return 0
 	end
 end

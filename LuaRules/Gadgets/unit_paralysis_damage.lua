@@ -32,7 +32,7 @@ for i=1,#WeaponDefs do
 end 
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponID, attackerID, attackerDefID, attackerTeam)
+                            weaponID,projectileID, attackerID, attackerDefID, attackerTeam)
 	
 	if paralyzer then -- the weapon deals paralysis damage
 		

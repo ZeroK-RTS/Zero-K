@@ -83,7 +83,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 --We identify any units that might accelerate to extreme speed due to Newton, explosion, or collision with other units. 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) -- example: "Fall Damage" & "Weapon Impulse", unit_fall_damage.lua & weapon_impulse.lua, by GoogleFrog 
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam) -- example: "Fall Damage" & "Weapon Impulse", unit_fall_damage.lua & weapon_impulse.lua, by GoogleFrog 
 	if 	not UnitDefs[unitDefID].isBuilding and 
 		not UnitDefs[unitDefID].isFactory then --exclude airplane, exclude factory
 		local canFly = UnitDefs[unitDefID].canFly

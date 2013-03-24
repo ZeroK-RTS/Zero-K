@@ -254,7 +254,7 @@ end
 
 -- invulnerable facplopee
 --[[
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID,projectileID, attackerID, attackerDefID, attackerTeam)
 	if plop and facplopsrunning[unitID] then return 0 end
 	return damage	
 end

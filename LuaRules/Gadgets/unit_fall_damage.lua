@@ -75,7 +75,7 @@ local clearTable = false
 -- weaponDefID -4 --> fire damage
 -- weaponDefID -5 --> kill damage
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID,attackerID, attackerDefID, attackerTeam)
 	-- unit or wreck collision
 	if (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
 		

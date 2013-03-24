@@ -574,7 +574,7 @@ local options = {
     name	= "Impulses Jump",
     desc	= "Allow jumps that is effected by Newton and can jump anywhere (no restriction). Compatible for Spring 93.2 and above",
     type	= "bool",
-    def		= false,
+    def		= true,
     section	= "experimental",
   },  
   {

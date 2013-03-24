@@ -184,10 +184,10 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID)
 	spGiveOrderToUnit(unitID, CMD_STOP, {}, {})
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID,projectileID,
                             attackerID, attackerDefID, attackerTeam)
         
-	if (not weaponID) or (not captureWeaponDefs[weaponID]) then 
+	if (not weaponDefID) or (not captureWeaponDefs[weaponDefID]) then 
 		return damage
 	end
 
@@ -225,9 +225,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	
 	-- check damage (armourmod, range falloff) if enabled
-	local newCaptureDamage = captureWeaponDefs[weaponID].captureDamage
-	if captureWeaponDefs[weaponID].scaleDamage then 
-		newCaptureDamage = newCaptureDamage * (damage/WeaponDefs[weaponID].damages[0]) 
+	local newCaptureDamage = captureWeaponDefs[weaponDefID].captureDamage
+	if captureWeaponDefs[weaponDefID].scaleDamage then 
+		newCaptureDamage = newCaptureDamage * (damage/WeaponDefs[weaponDefID].damages[0]) 
 	end	--scale damage based on real damage (i.e. take into account armortypes etc.)
 	-- scale damage based on target health
 	local health, maxHealth = spGetUnitHealth(unitID)

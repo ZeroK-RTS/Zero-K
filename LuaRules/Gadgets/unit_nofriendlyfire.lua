@@ -51,7 +51,7 @@ local spSetUnitHealth  = Spring.SetUnitHealth
 
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponID, attackerID, attackerDefID, attackerTeam)
+                            weaponID,projectileID, attackerID, attackerDefID, attackerTeam)
 	if (weaponID and
 		noFFWeaponDefs[weaponID] and
 		attackerID ~= unitID and
