@@ -3047,7 +3047,7 @@ function gadget:GameFrame(n)
 end	
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponDefID,projectileID, attackerID, attackerDefID, attackerTeam)
+                            weaponDefID, attackerID, attackerDefID, attackerTeam)
 							
 	if unitDefID == terraunitDefID then
 		return -0.0001 -- terraunit starts on 0 HP. If a unit is damaged and has 0 HP it dies

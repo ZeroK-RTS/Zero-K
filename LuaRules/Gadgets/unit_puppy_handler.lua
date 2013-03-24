@@ -146,14 +146,14 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 		defenderTeam = spGetUnitTeam(shieldCarrierUnitID)
 		defenderDefID = spGetUnitDefID(shieldCarrierUnitID)
 	end
-	-- we don't actually have the weaponID, but can assume it is puppyWeaponID,
-	gadget:UnitPreDamaged(shieldCarrierID, defenderDefID, defenderTeam, 0, false, puppyWeaponID,proID, proOwnerID, attackerDefID, attackerTeam)
+	-- we don't actually have the weaponID, but can assume it is puppyWeaponID
+	gadget:UnitPreDamaged(shieldCarrierID, defenderDefID, defenderTeam, 0, false, puppyWeaponID, proOwnerID, attackerDefID, attackerTeam, proID)
 	return false
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponID, projectileID, attackerID, attackerDefID, attackerTeam)
-  if weaponID == puppyWeaponID and spValidUnitID(attackerID) then
+                            weaponDefID, attackerID, attackerDefID, attackerTeam,projectileID)
+  if weaponDefID == puppyWeaponID and spValidUnitID(attackerID) then
     if attackerTeam and unitTeam then
       -- attacker and attacked units are known (both units are alive)
       if spAreTeamsAllied(unitTeam, attackerTeam) then

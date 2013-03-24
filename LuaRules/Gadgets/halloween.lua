@@ -281,7 +281,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     end
 end
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
     -- if unit is possessed, but health drops to 33% or EMPed even slightly - return to owner
     if (unitTeam == GaiaTeamID and spGetUnitIsDead(unitID) == false and PossessedUnitList[unitID] ~= nil) then
       if (GhostIsHealthy(unitID) == false) then

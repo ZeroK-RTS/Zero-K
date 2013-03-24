@@ -32,15 +32,15 @@ for i=1,#WeaponDefs do
 end 
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponID,projectileID, attackerID, attackerDefID, attackerTeam)
+                            weaponDefID, attackerID, attackerDefID, attackerTeam)
 	
 	if paralyzer then -- the weapon deals paralysis damage
 		
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		if extraNormalDamageList[weaponID] then
+		if extraNormalDamageList[weaponDefID] then
 			attackerID = attackerID or -1
 			-- be careful; this line can cause recursion! don't make it do paralyzer damage
-			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID, weaponID)
+			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponDefID], 0, attackerID, weaponDefID)
 		end
 		if health and maxHealth and health ~= 0 then -- taking no chances.
 			return damage*maxHealth/health
@@ -152,15 +152,15 @@ end
 GG.addParalysisDamageToUnit = addParalysisDamageToUnit -- morph uses this
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponID, projectileID, attackerID, attackerDefID, attackerTeam)
+                            weaponDefID, attackerID, attackerDefID, attackerTeam)
 	
 	if paralyzer then -- the weapon deals paralysis damage
 		
-		addParalysisDamageToUnit(unitID, damage, WeaponDefs[weaponID].damages.paralyzeDamageTime*FRAMES_PER_SECOND)
+		addParalysisDamageToUnit(unitID, damage, WeaponDefs[weaponDefID].damages.paralyzeDamageTime*FRAMES_PER_SECOND)
 		
-		if extraNormalDamageList[weaponID] then
+		if extraNormalDamageList[weaponDefID] then
 			attackerID = attackerID or -1
-			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID, weaponID)
+			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponDefID], 0, attackerID, weaponDefID)
 		end
 		return 0
 	end
