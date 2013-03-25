@@ -181,5 +181,5 @@ end
 
 function script.Killed(recentDamage, maxHealth)
     Explode(box, sfxShatter + sfxSmoke)
-	return 1
+    return 4 --leave no wreckage
 end
