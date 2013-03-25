@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.074 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.075 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02",
+    date      = "2009-06-02", --25 March 2013 Msafwan
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -269,7 +269,7 @@ options = {
 		path = selPath,
 	},
 	manualWeaponReloadBar = {
-		name="Show Unit's Reload Bar",
+		name="Show Unit's DGun Status",
 		type='bool',
 		value= true,
 		desc = "Show reload progress for weapon that use manual trigger. *Only applies for ungrouped unit selection*",
@@ -421,6 +421,24 @@ function widget:UpdateCallIns(enable)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--get reload status for selected weapon
+local function GetWeaponReloadStatus(unitID, weapNum)
+	local unitDefID = spGetUnitDefID(unitID)
+	local unitDef = UnitDefs[unitDefID]
+	local weaponNoX = (unitDef.weapons[weapNum]) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
+		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
+		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum-1) --select weapon no.X, but we use X-1 because somehow table start at 0. eg: 0,1,2, This happen in other widget also.
+		local currentFrame, _ = spGetGameFrame() 
+		local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
+		local reloadFraction =1 - remainingTime/reloadTime
+		return reloadFraction, remainingTime
+	end
+	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- group selection
 
 --updates cost, HP, and resourcing info for group info
@@ -527,13 +545,26 @@ local function WriteGroupInfo()
 	if gi_label then
 		window_corner:RemoveChild(gi_label)
 	end
+	local dgunStatus = ''
+	if stt_unitID and numSelectedUnits == 1 and options.manualWeaponReloadBar.value then
+		local reloadFraction, remainingTime = GetWeaponReloadStatus(stt_unitID,3)  --select weapon no.3 (slot 3 is by ZK convention is usually used for user controlled weapon)
+		if reloadFraction then
+			if reloadFraction < 0.99 then
+				remainingTime = math.floor(remainingTime)
+				dgunStatus = "\nDGun\255\255\90\90 Reloading\255\255\255\255(" .. remainingTime .. "s)"  --red and white
+			else
+				dgunStatus = "\nDGun\255\90\255\90 Ready\255\255\255\255"
+			end
+		end
+	end
+	local metal = (tonumber(gi_metalincome)>0 or tonumber(gi_metaldrain)>0) and ("\nMetal \255\0\255\0+" .. gi_metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  gi_metaldrain  .. "\255\255\255\255") or '' --have metal or ''
+	local energy = (tonumber(gi_energyincome)>0 or tonumber(gi_energydrain)>0) and ("\nEnergy \255\0\255\0+" .. gi_energyincome .. "\255\255\255\255 / \255\255\0\0-" .. gi_energydrain .. "\255\255\255\255") or '' --have energy or ''
+	local buildpower = (tonumber(gi_totalbp)>0) and ("\nBuild Power " .. gi_usedbp .. " / " ..  gi_totalbp) or ''  --have buildpower or ''
 	gi_str = 
-		"Selected Units " .. gi_count .. "\n" ..
-		"Health " .. gi_hp .. " / " ..  gi_maxhp  .. "\n" ..
-		"Cost " .. gi_cost .. " / " ..  gi_finishedcost .. "\n" ..
-		"Metal \255\0\255\0+" .. gi_metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  gi_metaldrain  .. "\255\255\255\255\n" ..
-		"Energy \255\0\255\0+" .. gi_energyincome .. "\255\255\255\255 / \255\255\0\0-" .. gi_energydrain .. "\255\255\255\255\n" ..
-		"Build Power " .. gi_usedbp .. " / " ..  gi_totalbp 
+		"Selected Units " .. gi_count ..
+		"\nHealth " .. gi_hp .. " / " ..  gi_maxhp ..
+		"\nCost " .. gi_cost .. " / " ..  gi_finishedcost ..
+		metal .. energy ..	buildpower .. dgunStatus
 		
 	gi_label = Label:New{
 		parent = window_corner;
@@ -708,7 +739,7 @@ local function MakeUnitGroupSelectionToolTip()
 		--columns = 5;
 		itemPadding = {0,0,0,0};
 		itemMargin  = {0,0,2,2};
-		tooltip = "Left Click: Just select clicked unit(s)\nRight Click: Deselect unit(s)";
+		tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
 	}
 	--if check is done in target function
 	--if options.showgroupinfo.value then
@@ -758,16 +789,9 @@ local function UpdateSelectedUnitsTooltip()
 					
 					--RELOAD_BAR: start-- , by msafwan. Function: show tiny reload bar for clickable weapon in unit selection list
 					if options.manualWeaponReloadBar.value then
-						local unitDefID = spGetUnitDefID(unitid)
-						local unitDef = UnitDefs[unitDefID]
-						local weaponNo3 = (unitDef.weapons[3]) --select weapon no.3 (slot 3 usually used for user controlled weapon)
-						if (weaponNo3 ~= nil) and WeaponDefs[weaponNo3.weaponDef].manualFire then
-							local reloadTime = WeaponDefs[weaponNo3.weaponDef].reload
-							local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitid, 2) --select weapon no.3, but we use 2 because somehow table start at 0. eg: 0,1,2, Also in: cmd_dynamic_avoidance.lua
-							local currentFrame, _ = spGetGameFrame() 
-							local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
+						local reloadFraction,remainingTime = GetWeaponReloadStatus(unitid, 3)
+						if reloadFraction then
 							local reloadMiniBar = unitIcon.childrenByName['reloadMiniBar']
-							local reloadFraction =1 - remainingTime/reloadTime
 							if reloadMiniBar and reloadFraction < 0.99 then --update value IF already have the miniBar & is reloading weapon
 								reloadMiniBar:SetValue(reloadFraction)
 								miniReloadBarPresent = true
@@ -2038,7 +2062,7 @@ function widget:Update(dt)
 	
 	timer = timer + dt
 	if timer >= updateFrequency  then
-		UpdateSelectedUnitsTooltip()
+		UpdateSelectedUnitsTooltip() --this has numSelectedUnits check. Will only run with numSelectedUnits > 1
 		UpdateDynamicGroupInfo()
 		WriteGroupInfo()
 		
@@ -2110,14 +2134,14 @@ function widget:Update(dt)
 													{{35171},"Teleport",{0,0.6,0.6,1}},
 												}										
 							for i=1, #commandList, 1 do --iterate over the commandList so we could find a match with unit's current command.
-								if #commandList[i][1] == 1 then
+								if #commandList[i][1] == 1 then --if commandList don't have sub-table at first row
 									if commandList[i][1][1] == commandID then
 										commandName = commandList[i][2]
 										color = commandList[i][3]
 										break
 									end
 								else
-									if commandList[i][1][1] == commandID or commandList[i][1][2] == commandID then
+									if commandList[i][1][1] == commandID or commandList[i][1][2] == commandID then --if commandList has sub-table with 2 content at first row
 										commandName = commandList[i][2]
 										color = commandList[i][3]
 										break

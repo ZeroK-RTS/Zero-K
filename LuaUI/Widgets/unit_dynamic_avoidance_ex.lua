@@ -1,4 +1,4 @@
-local versionName = "v2.82"
+local versionName = "v2.83"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -549,7 +549,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, ski
 							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand,decloakScaling) --calculate move solution
 							local newY=spGetGroundHeight(newX,newZ)
 							--Inserting command queue:--
-							if cQueue[1].id == cMD_DummyG then
+							if (cQueueSyncTest==nil or #cQueueSyncTest<2) and cQueue[1].id == cMD_DummyG then --if #cQueueSyncTest is less than 2 mean unit has widget's mono-command or is really idle:
 								orderArray[#orderArray+1]={CMD_MOVE, {newX, newY, newZ}, {}} --if avoiding while idle : give move order directly away from enemy rather than sandwich move order between old command. This prevent unit from returning to old position.
 							else
 								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
