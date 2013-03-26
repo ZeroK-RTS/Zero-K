@@ -14,13 +14,13 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.340"
+local version = "v1.341"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 18 March 2013",
+    date      = "July 20, 2009, 26 March 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -293,8 +293,11 @@ function UpdateOneUnitPathability(unitID)
 	local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
 	for queue, location in pairs(myQueue) do
 		local x, y, z = location.x, location.y, location.z
-		local path = Spring.RequestPath( moveID,ux,uy,uz,x,y,z, 128)
 		local reach = true --Note: first assume Spring.RequestPath() always broke and target always reachable
+		local path
+		if moveID then --Note: crane/air-constructor do not have moveID!
+			path = Spring.RequestPath( moveID,ux,uy,uz,x,y,z, 128)
+		end
 		if path then --unknown why sometimes NIL
 			reach = false --Note: assume non-reachable until waypoint tell otherwise
 			local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box but high chance to hit 128x128 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
@@ -339,9 +342,12 @@ function UpdateUnitsPathabilityForOneQueue(queueKey)
 	for unitID, _ in pairs(myUnits) do
 		local udid = spGetUnitDefID(unitID)
 		local moveID = UnitDefs[udid].moveData.id
-		local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
-		local path = Spring.RequestPath( moveID,ux,uy,uz,x,y,z, 128)
-		local reach = true
+		local reach = true --Note: first assume Spring.RequestPath() always broke and target always reachable
+		local path
+		if moveID then --Note: crane/air-constructor do not have moveID!
+			local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
+			path = Spring.RequestPath( moveID,ux,uy,uz,x,y,z, 128)
+		end
 		if path then --unknown why sometimes NIL
 			reach = false
 			local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
@@ -373,7 +379,7 @@ end
 --  Thanks to Niobium for pointing out CommandNotify().
 
 function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
-	if id < 0 and params[1]==nil and params[2]==nil and params[3]==nil then --CentralBuildAI can't handle unit-build command (for factory) for the moment (is buggy).
+	if id < 0 and params[1]==nil and params[2]==nil and params[3]==nil then --CentralBuildAI can't handle unit-build command for factory for the moment (is buggy).
 		return
 	end
 	local selectedUnits = spGetSelectedUnits()
