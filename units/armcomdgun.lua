@@ -35,7 +35,7 @@ unitDef = {
   },
 
   energyUse              = 0,
-  explodeAs              = [[BIG_UNIT]],
+  explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[corcommander]],
@@ -46,7 +46,7 @@ unitDef = {
   mass                   = 444,
   maxDamage              = 2000,
   maxSlope               = 36,
-  maxVelocity            = 1.8,
+  maxVelocity            = 1.45,
   maxWaterDepth          = 5000,
   minCloakDistance       = 100,
   movementClass          = [[AKBOT2]],
@@ -54,7 +54,7 @@ unitDef = {
   objectName             = [[noruas]],
   script                 = [[armcomdgun.lua]],
   seismicSignature       = 16,
-  selfDestructAs         = [[BIG_UNIT]],
+  selfDestructAs         = [[ESTOR_BUILDING]],
 
   sfxtypes               = {
 
