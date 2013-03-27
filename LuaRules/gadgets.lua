@@ -1357,15 +1357,29 @@ end
 
 
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponDefID, projectileID,
-                                   attackerID, attackerDefID, attackerTeam)
+                                   damage, paralyzer, weaponDefID,
+								   a, b, c, d)
+  local projectileID,attackerID
+  local attackerDefID,attackerTeam
+  if Game.version:find('91.0') then 
+	attackerID = a 
+    attackerDefID = b
+    attackerTeam = c
+  else
+    projectileID = a
+    attackerID = b
+    attackerDefID = c
+    attackerTeam = d
+  end
+  
   local rDam = damage
   local rImp = 1.0
 
   for _,g in ipairs(self.UnitPreDamagedList) do
     dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
                   rDam, paralyzer, weaponDefID,
-                  attackerID, attackerDefID, attackerTeam,projectileID)
+                  attackerID, attackerDefID, attackerTeam,
+				  projectileID)
     if (dam ~= nil) then
       rDam = dam
     end
