@@ -110,10 +110,6 @@ unitDef = {
         planes  = 200,
         subs    = 10,
       },
-      
-      customparams			  = {
-		single_hit = true,
-      },
 
       explosionGenerator      = [[custom:gauss_hit_h]],
       groundbounce            = 1,
