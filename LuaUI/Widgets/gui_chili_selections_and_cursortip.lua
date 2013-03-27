@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.075 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.076 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --25 March 2013 Msafwan
+    date      = "2009-06-02", --27 March 2013 Msafwan
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -117,7 +117,6 @@ local tweakShow = false
 local window_height = 130
 local real_window_corner
 local window_corner
-local numSelectedUnits = 0
 local selectedUnitsByDefCounts = {}
 local selectedUnitsByDef = {}
 local selectedUnits = {}
@@ -156,6 +155,7 @@ local terraTips = {}
 
 local selectedUnits = {}
 local numSelectedUnits = 0
+local maxPicFit = 12
 
 local gi_count = 0
 local gi_cost = 0
@@ -727,6 +727,8 @@ end
 local function MakeUnitGroupSelectionToolTip()
 	window_corner:ClearChildren();
 	
+	--Idea Note: a suggestion is to add scrollpanel as parent to barGrid (like playerlist)
+	--but IMO selection bar is a reflex UI and thus only need only visible element and not hidden rows. 
 	local barGrid = LayoutPanel:New{
 		name     = 'Bars';
 		resizeItems = false;
@@ -735,18 +737,25 @@ local function MakeUnitGroupSelectionToolTip()
 		height  = "100%";
 		x=0,
 		--width   = "100%";
-		right=options.showgroupinfo.value and 120 or 0,
+		right=options.showgroupinfo.value and 120 or 0, --expand to right
 		--columns = 5;
 		itemPadding = {0,0,0,0};
 		itemMargin  = {0,0,2,2};
 		tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
 	}
+	do --check how many picture can fit into the selection grid (estimated!)
+		local maxRight, maxBottom = barGrid:GetMinimumExtents()
+		maxRight = maxRight - (options.showgroupinfo.value and 120 or 0)
+		local horizontalFit = maxRight/50
+		local verticalFit = maxBottom/50
+		maxPicFit = horizontalFit*verticalFit --Note: maxPicFit not need to round to nearest integer.
+	end
 	--if check is done in target function
 	--if options.showgroupinfo.value then
 		WriteGroupInfo()
 	--end
 
-	if ((numSelectedUnits<8) and (not options.groupalways.value)) then
+	if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
 			local unitid = selectedUnits[i]
 			local defid  = spGetUnitDefID(unitid)
@@ -774,7 +783,7 @@ local function UpdateSelectedUnitsTooltip()
 	if (numSelectedUnits>1) then
 			local barsContainer = window_corner.childrenByName['Bars']
 
-			if ((numSelectedUnits<8) and (not options.groupalways.value)) then
+			if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
 				for i=1,numSelectedUnits do
 					local unitid = selectedUnits[i]
 					--Spring.Echo(unitid)
@@ -1114,8 +1123,15 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 				energy = energy + tonumber(s)
 			end 
 		end 
-		
 	end
+	
+	--Skip metal/energy rendering for unit selection bar when unit has no metal and energy
+	if tooltip_type == 'selunit' and metal==0 and energy==0 then
+		if globalitems['resources_selunit'] then
+			globalitems['resources_selunit'] = nil
+		end
+		return
+	end	
 	
 	if tooltip_type == 'feature' or tooltip_type == 'corpse' then
 		color_m = {1,1,1,1}
@@ -1287,7 +1303,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 		local empty = false
 		
 		if item.directcontrol then
-			local directitem = globalitems[item.directcontrol]
+			local directitem = globalitems[item.directcontrol] --copy new chili element from this global table (is updated everywhere around this widget)
 			stack_children[#stack_children+1] = directitem
 
 		elseif item.text or item.icon then
@@ -1637,7 +1653,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	local iconPath		= GetUnitIcon(stt_ud)
 	
-	UpdateResourceStack( 'selunit', unitID, stt_ud, tooltip )
+	UpdateResourceStack( 'selunit', unitID, stt_ud, tooltip)
 	
 	
 	
@@ -2070,7 +2086,7 @@ function widget:Update(dt)
 		if stt_unitID then
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
-			UpdateResourceStack( 'selunit', stt_unitID, stt_ud, tooltip )
+			UpdateResourceStack( 'selunit', stt_unitID, stt_ud, tooltip)
 			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
@@ -2093,7 +2109,7 @@ function widget:Update(dt)
 	--UNIT.STATUS start (by msafwan), function: add/show units task whenever individual pic is shown.
 	timer2 = timer2 + dt
 	if timer2 >= updateFrequency2  then
-		if options.unitCommand.value == true and ((numSelectedUnits<8) and (not options.groupalways.value)) then
+		if options.unitCommand.value == true and ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
 			for i=1,numSelectedUnits do --//iterate over all selected unit *this variable is updated by 'widget:SelectionChanged()'
 				local unitID = selectedUnits[i]
 				local barGridItem = nil
@@ -2394,7 +2410,7 @@ function widget:SelectionChanged(newSelection)
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
 			
-			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1], tooltip)
+			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1], tooltip) --healthbar/resource consumption/ect chili element
 			if cur1 then
 				window_corner:ClearChildren()
 				window_corner:AddChild(cur1)

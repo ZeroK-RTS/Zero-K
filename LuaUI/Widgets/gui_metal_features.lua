@@ -17,7 +17,7 @@ function widget:GetInfo()
     name      = "MetalFeatures",
     desc      = "Highlights features with metal in the metal-map viewmode",
     author    = "trepan",
-    date      = "Aug 05, 2007", --March 2, 2013
+    date      = "Aug 05, 2007", --March 27, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true,  --  loaded by default?
@@ -32,7 +32,7 @@ options={
 		name = 'Auto Metalmap Toggling',
 		desc = 'Automatically toggle metalmap view if you select RECLAIM command. This increase wreckage visibility',
 		type = 'bool',
-		value = true,
+		value = false,
 	},
 }
 
@@ -54,7 +54,7 @@ function widget:DrawWorld()
 
   local myAllyTeam = Spring.GetMyAllyTeamID()
 
-  local features = Spring.GetAllFeatures()
+  local features = Spring.GetVisibleFeatures()
   for _, fID in pairs(features) do
     local metal = Spring.GetFeatureResources(fID)
     if (metal and (metal > 0)) then
