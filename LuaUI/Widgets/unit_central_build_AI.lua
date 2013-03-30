@@ -14,7 +14,7 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.341"
+local version = "v1.342"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -342,22 +342,18 @@ function UpdateUnitsPathabilityForOneQueue(queueKey)
 	for unitID, _ in pairs(myUnits) do
 		local udid = spGetUnitDefID(unitID)
 		local moveID = UnitDefs[udid].moveData.id
-		local reach = true --Note: first assume Spring.RequestPath() always broke and target always reachable
-		local path
+		local reach = true --Note: first assume unit is flying and/or target always reachable
 		if moveID then --Note: crane/air-constructor do not have moveID!
 			local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
-			path = Spring.RequestPath( moveID,ux,uy,uz,x,y,z, 128)
-		end
-		if path then --unknown why sometimes NIL
-			reach = false
-			local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
-			local finalCoord = waypoint[#waypoint]
-			if finalCoord then --unknown why sometimes NIL
-				local dx, dz = finalCoord[1]-x, finalCoord[3]-z
-				if dx*dx + dz*dz < 128*128 then --is within 128 radius?
-					reach = true
+			local result,finCoord = IsTargetReachable(moveID, ux,uy,uz,x,y,z,128)
+			if result == "outofreach" then --if result not reachable (and we'll have the closest coordinate), then:
+				result = IsTargetReachable(moveID, finCoord[1],finCoord[2],finCoord[3],x,y,z,8) --refine pathing
+				if result ~= "reach" then --if result still not reach, then:
+					reach = false --target is unreachable
 				end
+			else -- Spring.PathRequest() non-functional? (unsynced blocked?)
 			end
+			--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, may change in different version)
 		end
 		if not reach then
 			myQueueUnreachable[unitID][queueKey]=true
@@ -365,6 +361,31 @@ function UpdateUnitsPathabilityForOneQueue(queueKey)
 			myQueueUnreachable[unitID][queueKey]=nil
 		end
 	end
+end
+
+--This function process result of Spring.PathRequest() to say whether target is reachable or not
+function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
+	local returnValue1,returnValue2
+	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
+	if path then
+		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
+		local finalCoord = waypoint[#waypoint]
+		if finalCoord then --unknown why sometimes NIL
+			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
+			local dist = math.sqrt(dx*dx + dz*dz)
+			if dist < radius then --is within radius?
+				returnValue1 = "reach"
+				returnValue2 = finalCoord
+			else
+				returnValue1 = "outofreach"
+				returnValue2 = finalCoord
+			end
+		end
+	else
+		returnValue1 = "noreturn"
+		returnValue2 = nil
+	end
+	return returnValue1,returnValue2
 end
 
 --	A compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue

@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by msafwan (impulsejump)",
-		date    = "May 14 2008, March 11 2013",
+		date    = "May 14 2008, March 30 2013",
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
 		enabled = isImpulseJump,
@@ -340,13 +340,16 @@ local function Jump(unitID, goal, cmdTag)
 			end
 		end
 		
+		do
+			local x,y,z =spGetUnitPosition(unitID)
+			local grndh =spGetGroundHeight(x,z)
+			if y<=grndh+1 then
+				spSetUnitVelocity(unitID,0,0,0) --thus its speed don't interfere with jumping (prevent range increase while running). Note; flying unit wont be effected
+			end
+		end
 		SetLeaveTracks(unitID, false)
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {}) --we give wait so that unit stop, thus its speed don't interfere with jumping. Note; flying unit wont be effected
-			Sleep()
-			Sleep()
-			impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
-			impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {}) --continue move
+		impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+		impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
 		unitCmdQueue[unitID] = spGetCommandQueue(unitID)
 		
 		local halfJump

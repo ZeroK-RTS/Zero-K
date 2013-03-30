@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007",
+    date      = "1.11.2007, 30.3.2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -39,7 +39,6 @@ local ST_STOPPED = 3 -- unit is enroute from factory but stopped
 
 local timer = 0
 local myTeamID 
-
 
 local GetUnitPosition = Spring.GetUnitPosition
 local GetUnitDefID = Spring.GetUnitDefID
@@ -338,7 +337,7 @@ function widget:Update(deltaTime)
   local todel = {}
   for i, d in pairs(priorityUnits) do
 --    Echo ("checking prio " ..i)
-    if (IsEmbarkCommand(i)) then
+    if (IsEmbarkCommand(i)) then --Check for CMD_WAIT
 --      Echo ("prio called " ..i)
       waitingUnits[i] = {ST_PRIORITY, d}
       AssignTransports(0, i)
@@ -433,16 +432,17 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
   GiveOrderToUnit(unitID, CMD.STOP, {}, {})
   
   if (vl ~= nil) then 
-    GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {vl[1], vl[2], vl[3], CONST_UNLOAD_RADIUS}, {"shift"})
+    GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {vl[1], vl[2], vl[3], CONST_UNLOAD_RADIUS}, {"shift"}) --unload unit at its destination
     
     local i = #torev
     while (i > 0) do 
-      GiveOrderToUnit(transportID, CMD.MOVE, torev[i], {"shift"})      
+      GiveOrderToUnit(transportID, CMD.MOVE, torev[i], {"shift"}) -- move in zig zaq (if queued)
       i = i -1
     end
 
     local x,y,z = GetUnitPosition(transportID)
     GiveOrderToUnit(transportID, CMD.MOVE, {x,y,z}, {"shift"})
+	GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"}) --unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
   end
 
 end
@@ -508,7 +508,7 @@ function AssignTransports(transportID, unitID)
          if (val[1]==ST_PRIORITY) then 
            benefit = benefit + CONST_PRIORITY_BENEFIT
          end
-  --       Echo ("   "..transportID .. " " .. id .. "  " .. benefit)
+         --Echo ("   "..transportID .. " " .. id .. "  " .. benefit)
 
          if (benefit > CONST_BENEFIT_LIMIT) then TableInsert(best, {benefit, transportID, id}) end
        end 
@@ -529,7 +529,7 @@ function AssignTransports(transportID, unitID)
           benefit = benefit + CONST_PRIORITY_BENEFIT
         end
 
---         Echo ("   "..id.. " " .. unitID .. "  " .. benefit)
+         --Echo ("   "..id.. " " .. unitID .. "  " .. benefit)
 
         if (benefit > CONST_BENEFIT_LIMIT) then TableInsert(best, {benefit, id, unitID}) end
       end
@@ -582,12 +582,39 @@ function GetPathLength(unitID)
 
   local d = 0
   local queue = GetCommandQueue(unitID);
+  local udid = Spring.GetUnitDefID(unitID)
+  local moveID = UnitDefs[udid].moveData.id
   if (queue == nil) then return 0 end
   for k=1, #queue do
     local v = queue[k]
     if (v.id == CMD.MOVE or v.id==CMD.WAIT) then
       if (v.id == CMD.MOVE) then 
-        d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3])
+		local reachable = true --always assume target reachable
+		local waypoints
+		if moveID then --unit has compatible moveID?
+			local path = Spring.RequestPath( moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
+			local result, lastwaypoint
+			result, lastwaypoint, waypoints = IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
+			if result == "outofreach" then --abit out of reach?
+				result = IsTargetReachable(moveID,lastwaypoint[1],lastwaypoint[2],lastwaypoint[3],v.params[1],v.params[2],v.params[3],8) --refine pathing
+				if result ~= "reach" then --still not reachable?
+					reachable=false --target is unreachable!
+				end
+			end
+		end
+		if reachable then 
+			if waypoints then --we have waypoint to destination?
+				local way1,way2,way3 = px,py,pz
+				for i=1, #waypoints do --sum all distance in waypoints
+					d = d + Dist(way1,way2,way3, waypoints[i][1],waypoints[i][2],waypoints[i][3])
+					way1,way2,way3 = waypoints[i][1],waypoints[i][2],waypoints[i][3]
+				end
+			else --so we don't have waypoint?
+				d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3]) --we don't have waypoint then measure straight line
+			end
+		else --pathing says target unreachable?!
+			d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3]) + 9999 --target unreachable!
+		end
         px = v.params[1]
         py = v.params[2]
         pz = v.params[3]
@@ -602,6 +629,34 @@ function GetPathLength(unitID)
 
   d = d + (maxi - mini) * CONST_HEIGHT_MULTIPLIER 
   return d
+end
+
+--This function process result of Spring.PathRequest() to say whether target is reachable or not
+function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
+	local returnValue1,returnValue2, returnValue3
+	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
+	if path then
+		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
+		local finalCoord = waypoint[#waypoint]
+		if finalCoord then --unknown why sometimes NIL
+			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
+			local dist = math.sqrt(dx*dx + dz*dz)
+			if dist < radius then --is within radius?
+				returnValue1 = "reach"
+				returnValue2 = finalCoord
+				returnValue3 = waypoint
+			else
+				returnValue1 = "outofreach"
+				returnValue2 = finalCoord
+				returnValue3 = waypoint
+			end
+		end
+	else
+		returnValue1 = "noreturn"
+		returnValue2 = nil
+		returnValue3 = nil
+	end
+	return returnValue1,returnValue2, returnValue3
 end
 
 
@@ -634,20 +689,38 @@ end ]]--
 
 
 function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
-  if (teamID ~= myTeamID) then return end
-
-  if (not shift) then
-    widget:UnitDestroyed(unitID, GetUnitDefID(unitID), myTeamID)
-  end
-
+	if (teamID ~= myTeamID) then return end
+	
+	if (not shift) then
+		widget:UnitDestroyed(unitID, GetUnitDefID(unitID), myTeamID) --remove existing command ASAP
+	end
+	
+	local queue = GetCommandQueue(unitID)
+	if (queue == nil) then  --unit has no command at all?!
+		Spring.SetActiveCommand("transportto") --Force user to add move command. See unit_transport_ai_buttons.lua for more info.
+		return false --wait until user select destination
+	else
+		local hasMoveCommand
+		for k=1, #queue do
+			local v = queue[k]
+			if (v.id == CMD.MOVE) or (v.id == 31200) or (v.id == 31201) or (v.id == 31202) then
+				hasMoveCommand = true
+				break
+			end
+		end
+		if not hasMoveCommand then --unit has no move command?!
+			Spring.SetActiveCommand("transportto") --Force user to add move command. 
+			return false --wait until user select destination
+		end
+	end
   
-  if (embark) then
-    local def = GetUnitDefID(unitID)
-    local ud = UnitDefs[def]
-    if (ud ~= nil and not ud.isFactory) then 
-      priorityUnits[unitID] = def
-    end
-  end
+	if (embark) then
+		local def = GetUnitDefID(unitID)
+		local ud = UnitDefs[def]
+		if (ud ~= nil and not ud.isFactory) and not waitingUnits[unitID] then
+			priorityUnits[unitID] = def --add to priority list (will be read in Widget:Update())
+		end
+	end
 end
 
 
