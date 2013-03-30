@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 30.3.2013",
+    date      = "1.11.2007, 31.3.2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -72,6 +72,24 @@ local function TableInsert(tab, toInsert)
   tab[#tab+1] = toInsert
 end
 
+local function ExtractModifiedOptions(options) --FIXME: pls check again if I'm really needed. This is a respond to https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than local)
+	local alt,ctrl,shift,internal,right
+	for i,value in pairs(options) do 
+		if value == "alt" then
+			alt = true
+		elseif value== "ctrl" then
+			ctrl = true
+		elseif value == "shift" then
+			shift =true
+		elseif value == "internal" then
+			internal = true
+		elseif value == "right" then
+			right = true
+		end
+	end
+	return alt,ctrl,shift,internal,right
+end
+
 function IsTransport(unitDefID) 
   ud = UnitDefs[unitDefID]
   return (ud ~= nil and (ud.transportCapacity >= 1) and ud.canFly)
@@ -94,25 +112,31 @@ function IsEmbarkCommand(unitID)
 end
 
 function IsEmbark(cmd)
-  if (cmd.id == CMD.WAIT and cmd.options.alt and not cmd.options.ctrl) then 
+  local alt,ctrl = ExtractModifiedOptions(cmd.options)
+  if (cmd.id == CMD.WAIT and (cmd.options.alt or alt) and not (cmd.options.ctrl or ctrl)) then 
     return true
   end
   return false
 end
 
 function IsDisembark(cmd)
-  if (cmd.id == CMD.WAIT and cmd.options.alt and cmd.options.ctrl) then
+  local alt,ctrl = ExtractModifiedOptions(cmd.options)
+  if (cmd.id == CMD.WAIT and (cmd.options.alt or alt) and (cmd.options.ctrl or ctrl)) then
     return true
   end
   return false
 end
   
 function IsWaitCommand(unitID)
- local queue = GetCommandQueue(unitID, 1);        
- if (queue ~= nil and queue[1].id == CMD.WAIT and not queue[1].options.alt) then 
-   return true
- end
- return false
+	local queue = GetCommandQueue(unitID, 1);
+	local alt
+	if queue then
+		alt = ExtractModifiedOptions(queue[1].options)
+	end
+	if (queue ~= nil and queue[1].id == CMD.WAIT and not (queue[1].options.alt or alt)) then 
+		return true
+	end
+	return false
 end
 
 function IsIdle(unitID) 
@@ -309,7 +333,8 @@ end
 
 function widget:CommandNotify(id, params, options) 
   local sel = nil
-  if (not options.shift) then
+  local alt,ctrl,shift = ExtractModifiedOptions(options)
+  if not (options.shift or shift) then
     sel = GetSelectedUnits()
     for i=1,#sel do
       local uid = sel[i]
@@ -317,7 +342,7 @@ function widget:CommandNotify(id, params, options)
     end
   end
 
-  if (id == CMD.WAIT and options.alt) then
+  if (id == CMD.WAIT and (options.alt or alt)) then
     if (sel == nil) then sel = GetSelectedUnits() end
     for i=1,#sel do
       local uid = sel[i]
@@ -402,7 +427,8 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
   local cnt = 0
   for k=1, #queue do
     local v = queue[k]
-    if (not v.options.internal) then 
+	local alt,ctrl,shift,internal,right = ExtractModifiedOptions(v.options)
+    if not (v.options.internal or internal) then  --not other widget's command
       if ((v.id == CMD.MOVE or (v.id==CMD.WAIT) or v.id == CMD.SET_WANTED_MAX_SPEED) and not ender) then
         cnt = cnt +1
         if (v.id == CMD.MOVE) then 
@@ -420,9 +446,9 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
         if (v.ID ~= CMD.WAIT) then
           local opts = {}
           TableInsert(opts, "shift") -- appending
-          if (v.options.alt)   then TableInsert(opts, "alt")   end
-          if (v.options.ctrl)  then TableInsert(opts, "ctrl")  end
-          if (v.options.right) then TableInsert(opts, "right") end
+          if (v.options.alt or alt)   then TableInsert(opts, "alt")   end
+          if (v.options.ctrl or ctrl)  then TableInsert(opts, "ctrl")  end
+          if (v.options.right or right) then TableInsert(opts, "right") end
           TableInsert(storedQueue[unitID], {v.id, v.params, opts})
         end
       end
@@ -718,6 +744,7 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 		local def = GetUnitDefID(unitID)
 		local ud = UnitDefs[def]
 		if (ud ~= nil and not ud.isFactory) and not waitingUnits[unitID] then
+			Spring.Echo("TEST A")
 			priorityUnits[unitID] = def --add to priority list (will be read in Widget:Update())
 		end
 	end
