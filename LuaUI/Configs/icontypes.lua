@@ -661,6 +661,11 @@ local icontypes = {
     bitmap='icons/sniper.dds',
     size=2.4,
   },
+  --Pole Bot
+  stealth = {
+    bitmap='icons/sniper.dds',
+    size=1.6,
+  },  
   
   --clogger icon
   clogger = {
