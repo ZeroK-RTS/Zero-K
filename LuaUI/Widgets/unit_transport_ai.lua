@@ -744,7 +744,6 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 		local def = GetUnitDefID(unitID)
 		local ud = UnitDefs[def]
 		if (ud ~= nil and not ud.isFactory) and not waitingUnits[unitID] then
-			Spring.Echo("TEST A")
 			priorityUnits[unitID] = def --add to priority list (will be read in Widget:Update())
 		end
 	end
