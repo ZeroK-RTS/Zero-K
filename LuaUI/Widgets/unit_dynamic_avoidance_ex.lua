@@ -1,4 +1,4 @@
-local versionName = "v2.832"
+local versionName = "v2.833"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -562,9 +562,10 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, ski
 							local newY=spGetGroundHeight(newX,newZ)
 							--Inserting command queue:--
 							if (cQueueSyncTest==nil or #cQueueSyncTest<2) and cQueueGKPed[1].id == cMD_DummyG then --if #cQueueSyncTest is less than 2 mean unit has widget's mono-command, and cMD_DummyG mean its idle:
-								orderArray[#orderArray+1]={CMD_MOVE, {newX, newY, newZ}, {}} --if avoiding while idle : give move order directly away from enemy rather than sandwich move order between old command. This prevent unit from returning to old position.
+								--orderArray[#orderArray+1]={CMD_MOVE, {newX, newY, newZ}, {}} --if avoiding while idle : give move order directly away from enemy rather than sandwich move order between old command. This prevent unit from returning to old position.
+								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD.OPT_SHIFT, newX, newY, newZ}, {"alt"}} -- NOTE: we NEED to use insert because in high-ping situation (where user's command do not register until last minute) user's command can get overriden if a simple move command is used.
 							else
-								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
+								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command (CMD_OPT_INTERNAL is used mark that command is widget issued and need not special treatment like user's command. It won't repeat if Repeat state is used.)
 							end
 							local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
 							commandTTL[unitID][lastIndx+1] = {countDown = commandTimeoutG, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
