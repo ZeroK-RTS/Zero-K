@@ -3,7 +3,7 @@ function gadget:GetInfo()
     name      = "Orbital Drop",
     desc      = "Makes units spawned with GG.DropUnit fall from the sky.",
     author    = "quantum, msafwan", --msafwan add dynamic/configurable orbital drop
-    date      = "November 2010", --February 2013
+    date      = "November 2010", --April 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true,  --  loaded by default?
@@ -115,7 +115,7 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID,useSetUnitVelocity,tim
 		Spring.MoveCtrl.SetVelocity(unitID,0,speedProfile[1],0) --apply initial velocity & first gravity
 		Spring.MoveCtrl.SetGravity(unitID,0)
 	end
-	units[unitID] = {3,absBrakeHeight+gy,heading,useSetUnitVelocity,speedProfile} --store speed profile index, store braking height , store heading , store speed profile
+	units[unitID] = {2,absBrakeHeight+gy,heading,useSetUnitVelocity,speedProfile} --store speed profile index, store braking height , store heading , store speed profile
   end
   return unitID
 end
@@ -136,9 +136,11 @@ function gadget:GameFrame(frame)
 		units[unitID][1] = controlValue[1] +1 -- ++index 
 	  end
 	  if useSetUnitVelocity then
+	    Spring.SetUnitVelocity(unitID,0,0,0) --Note: adding zero speed first & then desired speed later will make unit obey speed more accurately! 
 		Spring.SetUnitVelocity(unitID,0,speedProfile[index],0)
 		Spring.SetUnitRotation(unitID,0,heading,0)
 	  else
+	    Spring.MoveCtrl.SetVelocity(unitID,0,0,0) --Note: adding zero speed first & then desired speed later will make unit obey speed more accurately! 
 		Spring.MoveCtrl.SetVelocity(unitID,0,speedProfile[index],0)
 	  end
       

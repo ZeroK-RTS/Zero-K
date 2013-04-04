@@ -291,7 +291,7 @@ options = {
 	-- follow cursor
 	follow = {
 		name = "Follow player's cursor",
-		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
+		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on). Mouse midclick to pause tracking for 4 second.",
 		type = 'bool',
 		value = false,
 		hotkey = {key='l', mod='alt+'},

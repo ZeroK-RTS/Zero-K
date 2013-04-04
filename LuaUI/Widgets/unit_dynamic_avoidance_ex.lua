@@ -1,4 +1,4 @@
-local versionName = "v2.833"
+local versionName = "v2.834"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "March 26, 2013",
+    date      = "April 3, 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -454,14 +454,14 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 					--local boxSizeTrigger= unitInMotion[i][2]
 					local fixedPointCONSTANTtrigger = unitInMotion[i][4] --//using fixedPointType to trigger different fixed point constant for each unit type
 					local unitVisible = (unitInMotion[i].isVisible == "yes")
-					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger=IdentifyTargetOnCommandQueue(cQueue,cQueueTemp, unitID, commandIndexTable,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --check old or new command
+					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case=IdentifyTargetOnCommandQueue(cQueue,cQueueTemp, unitID, commandIndexTable,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --check old or new command
 					local currentX,_,currentZ = spGetUnitPosition(unitID)
 					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
 					if selectedCons_Meta[unitID] and boxSizeTrigger~= 4 then --if unitIsSelected and NOT using GUARD 'halfboxsize' (ie: is not guarding) then:
 						boxSizeTrigger = 1 -- override all reclaim/ressurect/repair's deactivation 'halfboxsize' with the one for MOVE command (give more tolerance when unit is selected)
 					end
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
-					local losRadius	= GetUnitLOSRadius(unitID) --get LOS
+					local losRadius	= GetUnitLOSRadius(unitID,case,unitInMotion[i]["reloadableWeaponIndex"]) --get LOS. also custom LOS for case=="attack" & weapon range >0
 					local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
 					if (cQueueTemp[1].id == CMD_MOVE and not unitVisible) then --if unit has move Command and is outside user's view
 						reachedTarget = false --force unit to continue avoidance despite close to target (try to circle over target until seen by user)
@@ -561,11 +561,10 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, ski
 							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand,decloakScaling) --calculate move solution
 							local newY=spGetGroundHeight(newX,newZ)
 							--Inserting command queue:--
-							if (cQueueSyncTest==nil or #cQueueSyncTest<2) and cQueueGKPed[1].id == cMD_DummyG then --if #cQueueSyncTest is less than 2 mean unit has widget's mono-command, and cMD_DummyG mean its idle:
-								--orderArray[#orderArray+1]={CMD_MOVE, {newX, newY, newZ}, {}} --if avoiding while idle : give move order directly away from enemy rather than sandwich move order between old command. This prevent unit from returning to old position.
-								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD.OPT_SHIFT, newX, newY, newZ}, {"alt"}} -- NOTE: we NEED to use insert because in high-ping situation (where user's command do not register until last minute) user's command can get overriden if a simple move command is used.
+							if (cQueueSyncTest==nil or #cQueueSyncTest<2) and cQueueGKPed[1].id == cMD_DummyG then --if #cQueueSyncTest is less than 2 mean unit has widget's mono-command, and cMD_DummyG mean its idle & out of view:
+								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD.OPT_SHIFT, newX, newY, newZ}, {"alt"}} -- using SHIFT prevent unit from returning to old position. NOTE: we NEED to use insert here (rather than use direct move command) because in high-ping situation (where user's command do not register until last minute) user's command will get overriden if both widget's and user's command arrive at same time.
 							else
-								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command (CMD_OPT_INTERNAL is used mark that command is widget issued and need not special treatment like user's command. It won't repeat if Repeat state is used.)
+								orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}),  insert new command (Note: CMD_OPT_INTERNAL is used to mark that this command is widget issued and need not special treatment. ie: It won't get repeated if Repeat state is used.)
 							end
 							local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
 							commandTTL[unitID][lastIndx+1] = {countDown = commandTimeoutG, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
@@ -707,7 +706,7 @@ function CheckWeaponsAndShield (unitDef)
 	for currentWeaponIndex, weapons in ipairs(unitDef.weapons) do --reference: gui_contextmenu.lua by CarRepairer
 		local weaponsID = weapons.weaponDef
 		local weaponsDef = WeaponDefs[weaponsID]
-		if weaponsDef.name and not weaponsDef.name:find('fake') and not weaponsDef.name:find('noweapon') then --reference: gui_contextmenu.lua by CarRepairer
+		if weaponsDef.name and not (weaponsDef.name:find('fake') or weaponsDef.name:find('noweapon')) then --reference: gui_contextmenu.lua by CarRepairer
 			if weaponsDef.isShield then 
 				unitShieldPower = weaponsDef.shieldPower --remember the shield power of this unit
 			else --if not shield then this is conventional weapon
@@ -741,8 +740,8 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading) then --if unit is out of user's vision OR is reloading, and: 
 			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
 				if (holdPosition== false) then --if unit is not "hold position", then:
-					local isIdleOrWidgetDodge = cQueue[1]==nil or cQueue[1].id==CMD_MOVE
-					local dummyCmd = (isIdleOrWidgetDodge and cMD_DummyG) or cMD_Dummy_atkG --select cMD_Dummy_atkG if is processing widget mono-command like auto-attack command
+					local isOutOfView = (unitInMotionSingleUnit.isVisible ~= "yes") -- out of view? 
+					local dummyCmd = (isOutOfView and cMD_DummyG) or cMD_Dummy_atkG --select cMD_DummyG is unit is out of view, or select cMD_Dummy_atkG if idle & is auto-attack reloading
 					cQueue={{id = dummyCmd, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --flag unit with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit. Note: this is not real command, its here just to trigger avoidance.
 					--Note2: negative target only deactivate attraction function, but it still initiate avoidance function & output new coordinate if enemy is around
 				end
@@ -781,6 +780,7 @@ function IdentifyTargetOnCommandQueue(cQueueOri, cQueueGKPed,unitID,commandIndex
 	local boxSizeTrigger=0
 	local graphCONSTANTtrigger = {}
 	local newCommand=true -- immediately assume user's command
+	local case=''
 	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros
 		commandIndexTable[unitID]={widgetX=0, widgetZ=0 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
 	else
@@ -811,12 +811,12 @@ function IdentifyTargetOnCommandQueue(cQueueOri, cQueueGKPed,unitID,commandIndex
 		end
 	end
 	if newCommand then	--if user's new command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (1, unitID,cQueueGKPed,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance)
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case = ExtractTarget (1, unitID,cQueueGKPed,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance)
 		commandIndexTable[unitID]["patienceIndexA"]=0 --//reset impatience counter
 	else  --if widget's previous command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (2, unitID,cQueueGKPed,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance)	
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case = ExtractTarget (2, unitID,cQueueGKPed,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance)	
 	end
-	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger --return target coordinate
+	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case --return target coordinate
 end
 
 --ignore command set on this box
@@ -846,15 +846,44 @@ function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger, lastPositio
 end
 
 -- get LOS
-function GetUnitLOSRadius(unitID)
+function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 	local unitDefID= spGetUnitDefID(unitID)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
 	if unitDef~=nil then --if unitDef is not empty then use the following LOS
-		losRadius= unitDef.losRadius*32 --for some reason it was times 32
-		if unitDef["builder"] then losRadius = losRadius + extraLOSRadiusCONSTANTg end --add additional detection range for constructors
+		losRadius= unitDef.losRadius*32 --in normal case use real LOS. Note: for some reason it was times 32
+		losRadius= losRadius + extraLOSRadiusCONSTANTg --add extra detection range for beyond LOS (radar)
+		if case=="attack" then --if avoidance is for attack enemy: use special LOS
+			local unitFastestReloadableWeapon = reloadableWeaponIndex --retrieve the quickest reloadable weapon index
+			if unitFastestReloadableWeapon ~= -1 then
+				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range") --retrieve weapon range
+				losRadius = math.min(weaponRange*0.75, losRadius) --reduce avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the smallest (Note: we need this minimum detection range to avoid disturbing maximum range artillery unit)
+			end			
+			--[[
+			local unitShieldRange,fastWeaponRange =-1, -1 --assume unit has no shield and no weapon
+			local fastestReloadTime = 999 --temporary variables
+			for _, weapons in ipairs(unitDef["weapons"]) do --reference: gui_contextmenu.lua by CarRepairer
+				local weaponsID = weapons["weaponDef"]
+				local weaponsDef = WeaponDefs[weaponsID]
+				if weaponsDef["name"] and not (weaponsDef["name"]:find('fake') or weaponsDef["name"]:find('noweapon')) then --reference: gui_contextmenu.lua by CarRepairer
+					if weaponsDef["isShield"] then 
+						unitShieldRange = weaponsDef["shieldRadius"] --remember the shield radius of this unit
+					else --if not shield then this is conventional weapon
+						local reloadTime = weaponsDef["reload"]
+						if reloadTime < fastestReloadTime then --find the weapon with the smallest reload time
+							fastestReloadTime = reloadTime
+							fastWeaponRange = weaponsDef["range"] --remember the range of the fastest weapon. 
+						end
+					end
+				end
+			end
+			--]]
+		end
+		if unitDef["builder"] then 
+			losRadius = losRadius + extraLOSRadiusCONSTANTg --add additional/more detection range for constructors for quicker reaction vs enemy radar dot
+		end 
 	end
-	return (losRadius + extraLOSRadiusCONSTANTg)
+	return losRadius
 end
 
 --return a table of surrounding enemy
@@ -1088,13 +1117,11 @@ function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, command
 	local queueIndex=1
 	local avoidanceCommand = true
 	if not newCommand then  --if widget's command then delete it
-		if cQueueGKPed[1].id~=cMD_DummyG then
-			orderArray[1] = {CMD_REMOVE, {cQueue[1].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
-			local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
-			commandTTL[unitID][lastIndx] = nil --//delete the last watchdog entry (the "not newCommand" means that previous widget's command haven't changed yet (nothing has interrupted this unit, same is with commandTTL), and so if command is to delete then it is good opportunity to also delete its timeout info at *commandTTL* too). Deleting this entry mean that this particular command will no longer be checked for timeout.
-			commandTTL[unitID][1] = lastIndx -1 --refresh table lenght
-			--Technical note: emptying commandTTL[unitID][#commandTTL[unitID]] is not technically required (not emptying it only make commandTTL countdown longer, but a mistake in emptying a commandTTL could make unit more prone to stuck when fleeing to impassable coordinate.
-		end
+		orderArray[1] = {CMD_REMOVE, {cQueue[1].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
+		local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
+		commandTTL[unitID][lastIndx] = nil --//delete the last watchdog entry (the "not newCommand" means that previous widget's command haven't changed yet (nothing has interrupted this unit, same is with commandTTL), and so if command is to delete then it is good opportunity to also delete its timeout info at *commandTTL* too). Deleting this entry mean that this particular command will no longer be checked for timeout.
+		commandTTL[unitID][1] = lastIndx -1 --refresh table lenght
+		-- Technical note: emptying commandTTL[unitID][#commandTTL[unitID]] is not technically required (not emptying it only make commandTTL countdown longer, but a mistake in emptying a commandTTL could make unit more prone to stuck when fleeing to impassable coordinate.
 		queueIndex=2 --skip index 1 of stored command. Skip widget's command
 	end
 	if (#cQueue>=queueIndex+1) then --if is queue={reclaim, area reclaim,stop}, or: queue={move,reclaim, area reclaim,stop}, or: queue={area reclaim, stop}, or:queue={move, area reclaim, stop}.
@@ -1191,6 +1218,7 @@ end
 function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate, fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --//used by IdentifyTargetOnCommandQueue()
 	local boxSizeTrigger=0 --an arbitrary constant/variable, which trigger some other action/choice way way downstream. The purpose is to control when avoidance must be cut-off using custom value (ie: 1,2,3,4) for specific cases.
 	local graphCONSTANTtrigger = {}
+	local case=""
 	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then --move or building stuff
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
@@ -1227,6 +1255,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetX"]=targetPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=targetPosY
 		commandIndexTable[unitID]["backupTargetZ"]=targetPosZ
+		case = 'movebuild'
 	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
@@ -1317,6 +1346,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			--graphCONSTANTtrigger[1] = 1 --override: use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 			--graphCONSTANTtrigger[2] = 1
 		end
+		case = 'reclaimressurect'
 	elseif cQueue[queueIndex].id==40 then --repair command
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID=cQueue[queueIndex].params[1]
@@ -1335,12 +1365,14 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		boxSizeTrigger=3 --change to deactivation 'halfboxsize' similar to REPAIR command
 		graphCONSTANTtrigger[1] = 1
 		graphCONSTANTtrigger[2] = 1
+		case = 'repair'
 	elseif (cQueue[1].id == cMD_DummyG) or (cQueue[1].id == cMD_Dummy_atkG) then
 		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
 		boxSizeTrigger = nil --//value not needed; because 'halfboxsize' for a "-1" target always return "not reached" (infinite avoidance), calculation is skipped (no nil error)
 		graphCONSTANTtrigger[1] = 1 --//this value doesn't matter because 'cMD_DummyG' don't use attractor (-1 disabled the attractor calculation, and 'fixedPointCONSTANTtrigger' behaviour ignore attractor). Needed because "fTarget" is tied to this variable in "AvoidanceCalculator()". 
 		graphCONSTANTtrigger[2] = 1
 		fixedPointCONSTANTtrigger = 3 --//use behaviour that promote avoidance/ignore attractor
+		case = 'cmddummys'
 	elseif cQueue[queueIndex].id == CMD_GUARD then
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID = cQueue[queueIndex].params[1]
@@ -1358,6 +1390,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		boxSizeTrigger = 4 --//deactivation 'halfboxsize' for GUARD command
 		graphCONSTANTtrigger[1] = 2 --//use more aggressive attraction because it GUARD units. It need big result.
 		graphCONSTANTtrigger[2] = 1	--//use less aggressive avoidance because need to stay close to units. It need not stray.
+		case = 'guard'
 	elseif cQueue[queueIndex].id == CMD_ATTACK then
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		boxSizeTrigger = nil --//value not needed when target is "-1" which always return "not reached" (a case where boxSizeTrigger is not used)
@@ -1376,6 +1409,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[1] = 1 --//this value doesn't matter because 'CMD_ATTACK' don't use attractor (-1 already disabled the attractor calculation, and 'fixedPointCONSTANTtrigger' ignore attractor). Needed because "fTarget" is tied to this variable in "AvoidanceCalculator()".
 		graphCONSTANTtrigger[2] = 2	--//use more aggressive avoidance because it often run just once or twice. It need big result.
 		fixedPointCONSTANTtrigger = 3 --//use behaviour that promote avoidance/ignore attractor (incase -1 is not enough)
+		case = 'attack'
 	else --if queue has no match/ is empty: then use no-target. eg: A case where undefined command is allowed into the system, or when engine delete the next queues of a valid command and widget expect it to still be there.
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
@@ -1387,8 +1421,9 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[1] = 1  --//needed because "fTarget" is tied to this variable in "AvoidanceCalculator()". This value doesn't matter because -1 already skip attractor calculation & 'fixedPointCONSTANTtrigger' already ignore attractor values.
 		graphCONSTANTtrigger[2] = 1
 		fixedPointCONSTANTtrigger = 3
+		case = 'none'
 	end
-	return commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger
+	return commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case
 end
 
 function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
