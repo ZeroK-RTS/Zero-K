@@ -5,7 +5,7 @@ static-var bMoving, gun_1;
 // Signal definitions
 #define SIG_AIM				2
 #define SIG_AIM_2			4
-#define SIG_MOVE			16
+#define SIG_MOVE			8
 #define SIG_BUILD;
 	
 #include "sfxtype.h"
@@ -157,6 +157,8 @@ StartMoving()
 
 StopMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = FALSE;
 	start-script stopwalk();
 }
