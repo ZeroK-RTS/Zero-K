@@ -14,6 +14,10 @@ piece		base, body, turret, sleeve1, sleeve2, barrel1, barrel2, firepoint1, firep
 static-var	moving, once, animCount, gun1, gun_1_yaw;
 
 #define SIG_AIM1						1
+#define SIG_MOVE						2		//Signal to prevent duplicate moving. Ref for sig number: http://pastebin.com/raw.php?i=qEPRtcD9
+#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_TILT_Z				8		//Signal to prevent multiple rocking. REPLACE!
+
 #define ANIM_SPEED						50
 #define RESTORE_DELAY					3000
 
@@ -27,10 +31,6 @@ static-var	moving, once, animCount, gun1, gun_1_yaw;
 #define WHEEL_TURN_SPEED2				<480>
 #define WHEEL_TURN_SPEED2_ACCELERATION	<15>	
 #define WHEEL_TURN_SPEED2_DECELERATION	<30>
-
-
-#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
-#define SIG_TILT_Z				8		//Signal to prevent multiple rocking. REPLACE!
 
 //rocking
 #define ROCK_PIECE				base	//piece to rock. REPLACE!
@@ -129,6 +129,9 @@ AnimationControl()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+
 	moving = TRUE;
 	animCount = 0;
 	
@@ -144,6 +147,9 @@ StartMoving()
 
 StopMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+
 	moving = FALSE;
 	
 	// I don't like insta braking. It's not perfect but works for most cases.

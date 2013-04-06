@@ -11,6 +11,7 @@ static-var  gun_1, restore_delay, bMoving, gun_1_yaw;
 
 // Signal definitions
 #define SIG_AIM					4
+#define SIG_MOVE				1
 
 #define DEPTHCHARGE_Y			[0.9]
 #define DEPTHCHARGE_Z			[3.95]
@@ -102,12 +103,18 @@ RestoreAfterDelay()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+
 	bMoving = TRUE;
 	spin propeller around z-axis speed <720>;
 }
 
 StopMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+
 	bMoving = FALSE;
 	stop-spin propeller around z-axis;
 }

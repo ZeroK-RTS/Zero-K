@@ -10,6 +10,7 @@ piece	base,
 static-var	tracks, isMoving, gun_2;
 
 #define SIG_AIM					2
+#define SIG_MOVE				16		//Signal to prevent multiple track motion
 
 #define RESTORE_DELAY			3000
 #define RECOIL_DISTANCE			[-12]
@@ -110,6 +111,8 @@ Create()
 }
 
 StartMoving() {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	isMoving = 1;
 	start-script TrackControl();
 	spin wheels1 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;

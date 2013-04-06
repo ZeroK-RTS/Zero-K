@@ -12,8 +12,8 @@ static-var bMoving, lasthit, counter;
 
 walk()
 {		
-	if (bMoving)
-			{
+	while (bMoving)
+		{
 //			bMoving = FALSE;
 			turn lthigh to x-axis <70> speed<230>;
 			turn lknee to x-axis <-40> speed<270>;
@@ -85,8 +85,7 @@ walk()
 			wait-for-turn rshin around x-axis;
 			
 //			bMoving = FALSE;
-			start-script walk();
-			}
+		}
 }
 
 stopwalk ()
@@ -103,6 +102,8 @@ stopwalk ()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = TRUE;
 	start-script walk();
 }

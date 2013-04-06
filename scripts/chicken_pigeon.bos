@@ -14,7 +14,7 @@ static-var bMoving;
 
 fly()
 {
-	if (bMoving)
+	while (bMoving)
 		{
 			turn lwing to z-axis <-40> speed<120>;
 			turn rwing to z-axis <40> speed<120>;
@@ -22,7 +22,6 @@ fly()
 			turn lwing to z-axis <40> speed<240>;
 			turn rwing to z-axis <-40> speed<240>;
 			wait-for-turn lwing around z-axis;
-			start-script fly();
 		}
 }
 
@@ -53,6 +52,8 @@ Stop()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = TRUE;
 	start-script fly();
 }

@@ -13,6 +13,7 @@ static-var	moving, once, animCount, gun_1_yaw;
 #define SIG_AIM3				16
 #define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
 #define SIG_TILT_Z				8		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_MOVE				32		//Signal to prevent duplicate moving. Ref for sig number: http://pastebin.com/raw.php?i=qEPRtcD9
 #define ANIM_SPEED				50
 #define RESTORE_DELAY			3000
 #define LARGE_MUZZLE_FLASH_FX	1024
@@ -110,6 +111,9 @@ AnimationControl()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	
 	moving = TRUE;
 	animCount = 0;
 
@@ -124,6 +128,9 @@ StartMoving()
 
 StopMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	
 	moving = FALSE;
 	
 	// I don't like insta braking. It's not perfect but works for most cases.
