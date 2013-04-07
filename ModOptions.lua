@@ -610,6 +610,14 @@ local options = {
     type   = 'section',
   },
   {
+    key = "playerchickens",
+    name = "Players as chickens",
+    desc = "Shared chickens with players, take commanders away",
+    type = "bool",
+    def = false,
+    section = 'chicken',
+  },
+  {
     key	= "eggs",
     name = "Chicken Eggs",
     desc = "Enables eggs mode (applies to all chicken difficulties)",
