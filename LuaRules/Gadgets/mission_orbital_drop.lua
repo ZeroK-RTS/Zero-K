@@ -3,7 +3,7 @@ function gadget:GetInfo()
     name      = "Orbital Drop",
     desc      = "Makes units spawned with GG.DropUnit fall from the sky.",
     author    = "quantum, msafwan", --msafwan add dynamic/configurable orbital drop
-    date      = "November 2010", --April 2013
+    date      = "November 2010", --7 April 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true,  --  loaded by default?
@@ -52,7 +52,7 @@ local function GetFallProfile(timeToGround, fallGravity,unitSpawnHeight,unitBrak
 		local nextEstimateFallPeriod =fallPeriod_est
 		count = 0
 		repeat --find exact fall period:
-			--THIS IS NEWTON METHOD: x_next = x_current - f(x_current)/f'(x_current) (TO SOLVE POLYNOMIAL EQUATION SUCH AS FINDING SQUARE ROOT)
+			--THIS IS NEWTON METHOD: x_next = x_current - f(x_current)/f'(x_current) (USED TO SOLVE POLYNOMIAL EQUATION SUCH AS FINDING SQUARE ROOT, LIKE IN CALCULATOR)
 			estimateFallPeriod = nextEstimateFallPeriod
 			nextEstimateFallPeriod = estimateFallPeriod - ((timeToGround-estimateFallPeriod)*a*(estimateFallPeriod^2) + b*estimateFallPeriod - c)/((timeToGround-estimateFallPeriod)*a*2*estimateFallPeriod + b)
 			count = count +1
@@ -89,6 +89,10 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID,useSetUnitVelocity,tim
     y = gy 
   end
   local unitID = Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
+  if not Spring.ValidUnitID(unitID) then
+    Spring.Echo("Orbital Drop error: unitID from" .. unitDefName .." is invalid. No orbital drop for this unit.")
+	return
+  end
   if type(unitDefName)=='number' then --incase other gadget use unitDefID, then convert to unitDefNames
     unitDefName = UnitDefs[unitDefName].name
   end  

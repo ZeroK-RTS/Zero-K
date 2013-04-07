@@ -154,8 +154,25 @@ function AutoAttack_Thread()
 			lastWaveFrame = gameFrame
 			EmitSfx( emit,  UNIT_SFX1 )
 			EmitSfx( emit,  DETO_W2 )
+			Vibrate()
 		end
 	end
+end
+
+function Vibrate()
+	--Vibrate
+	Move(base, x_axis, 1, 20)
+	WaitForMove(base, x_axis)
+	Move(base, x_axis, 0, 20)
+	Move(base, z_axis, 1, 20)
+	WaitForMove(base, z_axis)
+	Move(base, z_axis, 0, 20)
+	Move(base, x_axis, -1, 20)
+	WaitForMove(base, x_axis)
+	Move(base, x_axis, 0, 20)
+	Move(base, z_axis, -1, 20)
+	WaitForMove(base, z_axis)
+	Move(base, z_axis, 0, 20)		
 end
 
 function script.Activate()
@@ -179,6 +196,7 @@ function script.FireWeapon(num)
 		lastWaveFrame = spGetGameFrame()
 		EmitSfx( emit,  UNIT_SFX1 )
 		EmitSfx( emit,  DETO_W2 )
+		Vibrate()
 	end
 end
 

@@ -1,4 +1,4 @@
-local versionName = "v2.834"
+local versionName = "v2.835"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "April 3, 2013",
+    date      = "April 7, 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -520,31 +520,8 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, ski
 				local newCommand=surroundingOfActiveUnit[i][7]
 				
 				--do sync test. Ensure stored command not changed during last delay. eg: it change if user issued new command
-				local cQueueSyncTest = spGetCommandQueue(unitID)
-				local needToCancelOrder = false
-				if cQueueSyncTest then
-					if #cQueueSyncTest>=2 then --if new command is longer than or equal to 2 (eg: 1st = any command, 2nd = stop command) then it is indicative of user's NEW command (command like auto-attack or idle has only 1 queue and should be ignored as an overriding force).
-						--if #cQueueSyncTest~=#cQueue or --if command queue lenght is not same as original (is indicative of user's NEW command, but may just mean that user queued new command on top of old one) 
-						local cQueueParam1, cQueueParam3
-						if cQueue[1] then
-							cQueueParam1 = cQueue[1].params[1]
-							cQueueParam3 = cQueue[1].params[3]
-						end
-						if (cQueueSyncTest[1].params[1]~=cQueueParam1 or cQueueSyncTest[1].params[3]~=cQueueParam3) or -- if first queue has different content (is definitive of user's NEW command)
-							(cQueueSyncTest[1]==nil) then --or, if somehow the unit queued an idle state (not sure...)
-							--newCommand=true
-							--cQueue=cQueueSyncTest
-							commandIndexTable[unitID]=nil --empty commandIndex (command history) for this unit. CommandIndex store widget's previous command, which become irrelevant when user override the widget.
-							if (not newCommand) then --if the last command that was overriden was made by this widget:
-								local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
-								commandTTL[unitID][lastIndx]=nil --delete the last watchdog's entry for this unit. That last entry contain a timeout-info on unit's last command, but user probably has overriden that unit's last command, so its not needed.
-								commandTTL[unitID][1] = lastIndx-1 --refresh commandTTL[unitID]'s table lenght
-							end
-							needToCancelOrder = true --skip widget's command
-						end
-					end
-				else Spring.Echo("Dynamic Avoidance: cQueueSyncTest == nil!") --//under an unknown circumstances the unit's commandQueue became nil. Probably due to unit death, or when unit received invalid command (the whole queue will disappear).
-				end
+				local needToCancelOrder,commandIndexTable,commandTTL = CheckForUserOverride(unitID,cQueue,newCommand,commandIndexTable,commandTTL)
+				
 				if not needToCancelOrder then --//if unit receive new command then widget need to stop issuing command based on old information. This prevent user from being annoyed by widget overriding their command.
 					local unitSpeed= surroundingOfActiveUnit[i][8]
 					local impatienceTrigger= surroundingOfActiveUnit[i][9]
@@ -781,8 +758,8 @@ function IdentifyTargetOnCommandQueue(cQueueOri, cQueueGKPed,unitID,commandIndex
 	local graphCONSTANTtrigger = {}
 	local newCommand=true -- immediately assume user's command
 	local case=''
-	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros
-		commandIndexTable[unitID]={widgetX=0, widgetZ=0 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
+	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros or non-significant number
+		commandIndexTable[unitID]={widgetX=-2, widgetZ=-2 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
 	else
 		local a = -1
 		local b = -1
@@ -1000,6 +977,39 @@ function GetImpatience(newCommand, unitID, commandIndexTable)
 	end
 	if (turnOnEcho == 1) then Spring.Echo("commandIndexTable[unitID][patienceIndexA] (GetImpatienceLevel) " .. commandIndexTable[unitID]["patienceIndexA"]) end
 	return impatienceTrigger, commandIndexTable
+end
+
+function CheckForUserOverride(unitID,cQueue,newCommand,commandIndexTable,commandTTL)
+	local cQueueSyncTest = spGetCommandQueue(unitID)
+	local needToCancelOrder = false
+	if cQueueSyncTest then
+		if #cQueueSyncTest>=2 then --if new command is longer than or equal to 2 (eg: 1st = any command, 2nd = stop command) then it is indicative of user's NEW command (command like auto-attack or idle has only 1 queue and should be ignored as an overriding force).
+			--if #cQueueSyncTest~=#cQueue or --if command queue lenght is not same as original (is indicative of user's NEW command, but may just mean that user queued new command on top of old one) 
+			local cQueueParam1, cQueueParam3
+			if cQueue[1] then
+				cQueueParam1 = cQueue[1].params[1]
+				cQueueParam3 = cQueue[1].params[3]
+			end
+			if (cQueueSyncTest[1].params[1]~=cQueueParam1 or cQueueSyncTest[1].params[3]~=cQueueParam3) or -- if first queue has different content (is definitive of user's NEW command)
+			(cQueueSyncTest[1]==nil) then --or, if somehow the unit queued an idle state (not sure...)
+				--newCommand=true
+				--cQueue=cQueueSyncTest
+				needToCancelOrder = true --skip widget's command
+			end
+		elseif #cQueueSyncTest==0 and (not newCommand) then --if existing queue (ie: not newCommand) suddenly turned into empty queue then it mean user order forcefully empty command queue.
+			needToCancelOrder = true --skip widget's command
+		end
+		if needToCancelOrder then
+			commandIndexTable[unitID]=nil --empty commandIndex (command history) for this unit. CommandIndex store widget's previous command, which become irrelevant when user override the widget.
+			if (not newCommand) then --if the last command that was overriden was made by this widget:
+				local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
+				commandTTL[unitID][lastIndx]=nil --delete the last watchdog's entry for this unit. That last entry contain a timeout-info on unit's last command, but user probably has overriden that unit's last command, so its not needed.
+				commandTTL[unitID][1] = lastIndx-1 --refresh commandTTL[unitID]'s table lenght
+			end
+		end
+	else Spring.Echo("Dynamic Avoidance: cQueueSyncTest == nil!") --//under an unknown circumstances the unit's commandQueue became nil. Probably due to unit death, or when unit received invalid command (the whole queue will disappear).
+	end
+	return needToCancelOrder, commandIndexTable, commandTTL
 end
 
 function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand, decloakScaling)
