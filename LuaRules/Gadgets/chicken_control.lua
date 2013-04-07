@@ -95,7 +95,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
       --if (GiveToTeam > 0) then
       spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
       GiveToTeam=GiveToTeam+1
-      if (GiveToTeam >= #ChickenPlayers) then
+      if (GiveToTeam > #ChickenPlayers) then
 	GiveToTeam = 0
       end
       --end
