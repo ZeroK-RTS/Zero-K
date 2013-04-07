@@ -26,7 +26,8 @@ if(not Spring.GetModOptions()) then
 end
 
 local modOptions = Spring.GetModOptions()
-if (modOptions.playerchickens == false) then
+local playerchickens = modOptions.playerchickens or false
+if (playerchickens == false) then
       return
 end
 
@@ -58,7 +59,7 @@ local GiveToTeam
 local ChickenPlayers = {}
 
 function gadget:Initialize()
-  if(modOptions.playerchickens == false) then
+  if(playerchickens == false) then
       gadgetHandler:RemoveGadget()
   end
   local teams = spGetTeamList()
@@ -68,6 +69,7 @@ function gadget:Initialize()
       break
     end
   end
+  if (ChickenTeam == nil) then gadgetHandler:RemoveGadget() end
   ChickenAllyTeam = select(6,spGetTeamInfo(ChickenTeam))
   local j = -1
   for i=1,#teams do
