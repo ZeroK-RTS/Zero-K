@@ -22,21 +22,18 @@ that's all.
 ]]--
 
 if(not Spring.GetModOptions()) then
-      return false
+  return false
 end
 
 local modOptions = Spring.GetModOptions()
-local playerchickens = (modOptions.playerchickens or false)
-if (playerchickens ~= true) then
-      return
-end
+local playerchickens = tobool(modOptions.playerchickens) -- i'm an idiot, lol (didn't know about tobool)
+
+-- and so players get a share
+if (gadgetHandler:IsSyncedCode()) then
 
 local IgnoreUnits = {
   [ UnitDefNames['roost'].id ] = true,
 }
-
--- and so players get a share
-if (gadgetHandler:IsSyncedCode()) then
 
 local spGetTeamInfo     = Spring.GetTeamInfo
 local spGetTeamList	= Spring.GetTeamList
