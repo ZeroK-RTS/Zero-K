@@ -1775,27 +1775,43 @@ local function MakeMenuBar()
                 y = 2*exit_menu_height/64,
 				align="center",
 				textColor = color.main_fg },
-				
+			
 			Button:New{
-                caption = "Resign and spectate",
+                caption = "Vote Resign",
+                OnMouseUp = { function()
+						spSendCommands("say !voteresign") --after this gui_chili_vote.lua will handle vote GUI
+						screen0:RemoveChild(window_exit)
+						exitWindowVisible = false
+					end, },
+				tooltip = "Ask teammate to resign",
+				height=exit_menu_btn_height, 
+				width=exit_menu_btn_width,
+                x = exit_menu_width/2 - exit_menu_btn_width/2, 
+                y = 20*exit_menu_height/64 - exit_menu_btn_height/2, 
+			},
+			
+			Button:New{
+                caption = "Resign and Spectate",
                 OnMouseUp = { function()
 						spSendCommands{"spectator"}
 						screen0:RemoveChild(window_exit)
 						exitWindowVisible = false
-					end, }, 
+					end, },
+				tooltip = "Abandon team and be spectator",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2, 
-                y = 24*exit_menu_height/64 - exit_menu_btn_height/2, 
+                y = 30*exit_menu_height/64 - exit_menu_btn_height/2, 
 			},
 			
 			
 			Button:New{
 				caption = "Exit game", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, },
+				tooltip = "Kill Spring.exe",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2,  
-                y = 36*exit_menu_height/64 - exit_menu_btn_height/2,
+                y = 40*exit_menu_height/64 - exit_menu_btn_height/2,
 			},
 			
 			Button:New{
