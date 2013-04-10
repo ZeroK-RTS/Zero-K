@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 31.3.2013",
+    date      = "1.11.2007, 10.4.2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -667,7 +667,7 @@ function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
 		if finalCoord then --unknown why sometimes NIL
 			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
 			local dist = math.sqrt(dx*dx + dz*dz)
-			if dist < radius then --is within radius?
+			if dist <= radius+10 then --is within radius?
 				returnValue1 = "reach"
 				returnValue2 = finalCoord
 				returnValue3 = waypoint

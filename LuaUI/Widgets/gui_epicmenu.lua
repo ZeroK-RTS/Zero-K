@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "EPIC Menu",
     desc      = "v1.314 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-02-24
+    date      = "2009-06-02", --2013-04-10
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -382,8 +382,12 @@ WG.crude.GetHotkey = function() end
 --Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here (at least if running epicmenu.lua in local copy) will return empty pathoptions table.
 WG.crude.SetHotkey =  function() end 
 
---Set callin often used for space+click shortcut, defined in Initialize(). Is defined in Initialize() because it help with testing epicmenu.lua in local copy
+--Callin often used for space+click shortcut, defined in Initialize(). Is defined in Initialize() because it help with testing epicmenu.lua in local copy
 WG.crude.OpenPath = function() end
+
+--Allow other widget to toggle-up/show Epic-Menu remotely, defined in Initialize()
+WG.crude.ShowMenu = function() end --// allow other widget to toggle-up Epic-Menu which allow access to game settings' Menu via click on other GUI elements.
+
 
 --[[
 -- is this an improvement?
@@ -2270,6 +2274,14 @@ function widget:Initialize()
 	--intialize remote menu trigger
 	WG.crude.OpenPath = function(path) --Note: declared here so that it work in local copy
 		MakeSubWindow(path)
+	end
+	
+	--intialize remote menu trigger 2
+	WG.crude.ShowMenu = function()  --Note: declared here so that it work in local copy
+		if not settings.show_crudemenu then 
+			settings.show_crudemenu = true
+			ShowHideCrudeMenu()
+		end
 	end
 end
 

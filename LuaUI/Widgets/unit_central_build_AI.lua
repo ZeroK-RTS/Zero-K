@@ -20,7 +20,7 @@ function widget:GetInfo()
     name      = "Central Build AI",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 26 March 2013",
+    date      = "July 20, 2009, 10 April 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -351,7 +351,7 @@ function UpdateUnitsPathabilityForOneQueue(queueKey)
 				if result ~= "reach" then --if result still not reach, then:
 					reach = false --target is unreachable
 				end
-			else -- Spring.PathRequest() non-functional? (unsynced blocked?)
+			else -- Spring.PathRequest() must be non-functional. (unsynced blocked?)
 			end
 			--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, may change in different version)
 		end
@@ -373,7 +373,7 @@ function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
 		if finalCoord then --unknown why sometimes NIL
 			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
 			local dist = math.sqrt(dx*dx + dz*dz)
-			if dist < radius then --is within radius?
+			if dist <= radius+10 then --is within radius?
 				returnValue1 = "reach"
 				returnValue2 = finalCoord
 			else
@@ -418,10 +418,11 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 							myQueue[hash] = nil		-- must want to cancel
 						else						-- if not a dupe
 							myQueue[hash] = myCmd	-- add to CB queue
+							UpdateUnitsPathabilityForOneQueue(hash)
 						end
 						--]]
 						myQueue[hash] = myCmd	-- add to CB queue
-						UpdateUnitsPathabilityForOneQueue(hash)
+						UpdateUnitsPathabilityForOneQueue(hash) --check if build site is reachable
 					end
 					nextFrame = spGetGameFrame() + 30 --wait 1 more second before distribute work, so user can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
@@ -632,13 +633,16 @@ function CleanOrders(newCmd)
 	for key,myCmd in pairs(myQueue) do
 		local cmdID = abs( myCmd.id )
 		local x, y, z, facing = myCmd.x, myCmd.y, myCmd.z, myCmd.h
-		
 		local canBuildThisThere,featureID = spTestBuildOrder(cmdID,x,y,z,facing) --check if build site is blocked by buildings & terrain
+		
+		--for prevent build on ally feature
 		if ( checkFeatures ) and ( featureID ) then --check if build site is blocked by feature
 			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't reclaim or build there. (ie: dragon-teeth's wall)
 				canBuildThisThere = 0
 			end
 		end
+		--end feature check
+		
 		if newCmd and xSize and (canBuildThisThere >= 1) then --check if build site overlap new queue
 			if facing == 0 or facing == 2 then --check the size of the queued building
 				xSize_queue = UnitDefs[cmdID].xsize*4

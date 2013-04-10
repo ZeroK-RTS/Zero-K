@@ -1,4 +1,4 @@
-local versionName = "v2.835"
+local versionName = "v2.837"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "April 7, 2013",
+    date      = "April 10, 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -41,6 +41,7 @@ local spGetFeaturePosition = Spring.GetFeaturePosition
 local spValidFeatureID = Spring.ValidFeatureID
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetUnitStates = Spring.GetUnitStates
+local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 local spGetUnitTeam = Spring.GetUnitTeam
 local spSendLuaUIMsg = Spring.SendLuaUIMsg
 local spGetUnitLastAttacker = Spring.GetUnitLastAttacker
@@ -161,25 +162,25 @@ options = {
 		name = 'Enable for constructors',
 		type = 'bool',
 		value = true,
-		desc = 'Enable constructor\'s avoidance feature. Constructor will return to base when given area-reclaim/area-ressurect, and partial avoidance while having build/repair/reclaim queue.\n\nTips: order area-reclaim to the whole map, work best for cloaked constructor, but buggy for flying constructor. Default:On',
+		desc = 'Enable constructor\'s avoidance feature (DO NOT include Athena or Commander).\n\nConstructor will return to base when encountering enemy while having area-reclaim or area-ressurect command, and will try to avoid enemy while having build/repair/reclaim queue.\n\nTips: order area-reclaim to the whole map, work best for cloaked constructor, but buggy for flying constructor. Default:On',
 	},
 	enableCloaky = {
 		name = 'Enable for cloakies',
 		type = 'bool',
 		value = true,
-		desc = 'Enable cloakies\' avoidance feature. Cloakable bots will avoid enemy when given move order, but units with hold-position state is excluded.\n\nTips: is optimized for Sycthe- your Sycthe will less likely to be detected. Default:On',
+		desc = 'Enable cloakies\' avoidance feature.\n\nCloakable bots will avoid enemy while having move order, but units with hold-position state is excluded.\n\nTips: is optimized for Sycthe- your Sycthe will less likely to accidentally bump into enemy unit. Default:On',
 	},
 	enableGround = {
 		name = 'Enable for ground units',
 		type = 'bool',
 		value = true,
-		desc = 'Enable for ground units. All ground unit will avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded.\n\nTips:\n1) is optimized for masses of thug or shielded unit.\n2) Use Guard to make your unit cover other unit in presence of enemy.\nDefault:On',
+		desc = 'Enable for ground units (INCLUDE Commander).\n\nAll ground unit will avoid enemy while being outside camera view OR while reloading, but units with hold position state is excluded.\n\nTips:\n1) is optimized for masses of Thug or Zeus.\n2) You can use Guard to make your unit swarm the guarded unit in presence of enemy.\nDefault:On',
 	},
 	enableGunship = {
 		name = 'Enable for gunships',
 		type = 'bool',
 		value = false,
-		desc = 'Enable gunship\'s avoidance behaviour. Gunship avoid enemy while outside camera view OR when reloading, but units with hold-position state is excluded.\n\nTips: to optimize the hit-&-run behaviour- set the fire-state options to hold-fire. Default:Off',
+		desc = 'Enable gunship\'s avoidance behaviour (INCLUDE Athena).\n\nGunship while avoid enemy while outside camera view OR while reloading, but units with hold-position state is excluded.\n\nTips: to optimize the hit-&-run behaviour- set the fire-state options to hold-fire (can be buggy). Default:Off',
 	},
 	-- enableAmphibious = {
 		-- name = 'Enable for amphibious',
@@ -191,7 +192,7 @@ options = {
 		name = "Find base",
 		type = 'bool',
 		value = true,
-		desc = "Allow constructor to return to base when having area-reclaim/area-ressurect command, else it will return to center of the circle when retreating. Enabling this function will also enable the \'Receive Indicator\' widget. \n\nTips: build 3 new buildings at new location to identify as base, unit will automatically select nearest base. Default:On",
+		desc = "Allow constructor to return to base when having area-reclaim or area-ressurect command, else it will return to center of the circle when retreating. Enabling this function will also enable the \'Receive Indicator\' widget. \n\nTips: build 3 new buildings at new location to identify as base, unit will automatically select nearest base. Default:On",
 		OnChange = function(self) 
 			if self.value==true then
 				spSendCommands("luaui enablewidget Receive Units Indicator")
@@ -336,6 +337,9 @@ function widget:UnitDestroyed(unitID)
 	if commandTTL_G[unitID] then --empty watch list for this unit when unit die
 		commandTTL_G[unitID] = nil
 	end
+	if commandIndexTableG[unitID] then
+		commandIndexTableG[unitID] = nil
+	end
 end
 
 ---------------------------------Level 0 Top level
@@ -374,7 +378,7 @@ function RefreshUnitList(attacker, commandTTL)
 			if (unitSpeed>0) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype and unitDef["name"]~="armcsa" then --include only constructor and cloakies, and not com and not Athena
 					unitType =1 --//this unit-type will do avoidance even in camera view
 					
 					local isBuilder_ignoreTrue = false
@@ -690,7 +694,7 @@ function CheckWeaponsAndShield (unitDef)
 				local reloadTime = weaponsDef.reload
 				if reloadTime < fastestReloadTime then --find the weapon with the smallest reload time
 					fastestReloadTime = reloadTime
-					fastWeaponIndex = currentWeaponIndex-1 --remember the index of the fastest weapon. Somehow the weapon table actually start at "0", so minus 1 from actual value (ZK)
+					fastWeaponIndex = currentWeaponIndex --remember the index of the fastest weapon.
 				end
 			end
 		end
@@ -717,10 +721,15 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading) then --if unit is out of user's vision OR is reloading, and: 
 			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
 				if (holdPosition== false) then --if unit is not "hold position", then:
-					local isOutOfView = (unitInMotionSingleUnit.isVisible ~= "yes") -- out of view? 
-					local dummyCmd = (isOutOfView and cMD_DummyG) or cMD_Dummy_atkG --select cMD_DummyG is unit is out of view, or select cMD_Dummy_atkG if idle & is auto-attack reloading
+					local idleOrIsDodging = (cQueue[1] == nil) or (#cQueue == 1 and cQueue[1].id == CMD_MOVE) --is idle completely, or is given widget's CMD_MOVE (note: CMD_MOVE or any other command will not end with CMD_STOP when its widget issued)
+					local dummyCmd
+					if idleOrIsDodging then
+						dummyCmd = cMD_DummyG  --select cMD_DummyG if unit is fleeing while out of view,
+					else
+						dummyCmd = cMD_Dummy_atkG --select cMD_Dummy_atkG if unit is auto-attack reloading (as in: isReloading + (cQueue[1] == nil or #cQueue == 1))
+					end
 					cQueue={{id = dummyCmd, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --flag unit with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit. Note: this is not real command, its here just to trigger avoidance.
-					--Note2: negative target only deactivate attraction function, but it still initiate avoidance function & output new coordinate if enemy is around
+					--Note2: negative target only deactivate attraction function, but avoidance function is still active & output new coordinate if enemy is around
 				end
 			end
 		end
@@ -736,7 +745,8 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 			end
 			local isReloadingAttack = (isReloading and (cQueue[1].id == CMD_ATTACK or (cQueue[1].id == cMD_DummyG or cQueue[1].id == cMD_Dummy_atkG) or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (cQueue[1].id == CMD_GUARD or _2ndGuardSignature)
-			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingAttack and not holdPosition) or (isGuardState) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or for: any unit outside visibility... or on any unit with any command which is reloading.
+			local isForceCloaked = spGetUnitIsCloaked(unitID) and (unitInMotionSingleUnit[2]==2 or unitInMotionSingleUnit[2]==3) --any unit with type 3 (gunship) or type 2 (ground units except cloaky) that is cloaked.
+			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingAttack and not holdPosition) or (isGuardState) or (isForceCloaked and cQueue[1].id==CMD_MOVE) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or any unit outside visibility... OR on any unit which is reloading & not holding position... OR is guarding another unit... OR any normal unit being cloaked and is moving.
 				local isReloadAvoidance = (isReloadingAttack and not holdPosition)
 				if isReloadAvoidance or #cQueue>=2 then --check cQueue for lenght to prevent STOP command from short circuiting the system 
 					if isReloadAvoidance or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
@@ -1204,7 +1214,7 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 		end
 		local unitFastestReloadableWeapon = unitInMotionSingleUnitTable.reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 		if unitFastestReloadableWeapon ~= -1 then
-			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon)
+			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-1) --Somehow the weapon table actually start at "0", so minus 1 from actual value
 			local currentFrame, _ = spGetGameFrame() 
 			local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
 			weaponIsEmpty = (remainingTime> minimumRemainingReloadTime)
