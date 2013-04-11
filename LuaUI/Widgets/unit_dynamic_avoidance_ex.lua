@@ -1,4 +1,4 @@
-local versionName = "v2.837"
+local versionName = "v2.85"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -100,7 +100,7 @@ local dummyIDg = "[]" --fake ping id for Lua Message to check lag (prevent proce
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
 local noiseAngleG =0.1 --(default is pi/36 rad); add random angle (range from 0 to +-math.pi/36) to the new angle. To prevent a rare state that contribute to unit going straight toward enemy
 local collisionAngleG= 0.1 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/366) where auto-reverse will activate 
-local fleeingAngleG= 0.7 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered as fleeing(to de-activate avoidance to perform chase). Set to 0 to de-activate.
+local fleeingAngleG= 0.7 --(default is pi/4 rad) angle of enemy with respect to unit (range from 0 to +-math.pi/4) where unit is considered as facing a fleeing enemy (to de-activate avoidance to perform chase). Set to 0 to de-activate.
 local maximumTurnAngleG = math.pi --(default is pi rad) safety measure. Prevent overturn (eg: 360+xx degree turn)
 --pi is 180 degrees
 
@@ -112,7 +112,7 @@ local gps_then_DoCalculation_delayG = 0.25  --elapsed second (Wait) before issui
 local timeToContactCONSTANTg= doCalculation_then_gps_delayG + gps_then_DoCalculation_delayG --time scale for move command; to calculate collision calculation & command lenght (default = 0.5 second). Will change based on user's Ping
 local safetyDistanceCONSTANT_fG=205 --range toward an obstacle before unit auto-reverse (default = 205 meter, ie: half of ZK's stardust range) reference:80 is a size of BA's solar
 local extraLOSRadiusCONSTANTg=205 --add additional distance for unit awareness over the default LOS. (default = +205 meter radius, ie: to 'see' radar blip).. Larger value measn unit detect enemy sooner, else it will rely on its own LOS.
-local velocityScalingCONSTANTg=1 --scale command lenght. (default= 1 multiplier) *Small value cause avoidance to jitter & stop prematurely*
+local velocityScalingCONSTANTg=1.1 --scale command lenght. (default= 1 multiplier) *Small value cause avoidance to jitter & stop prematurely*
 local velocityAddingCONSTANTg=50 --add or remove command lenght (default = 50 elmo/second) *Small value cause avoidance to jitter & stop prematurely*
 
 --Engine based wreckID correction constant: *Update: replaced with Game.maxUnit
@@ -162,25 +162,25 @@ options = {
 		name = 'Enable for constructors',
 		type = 'bool',
 		value = true,
-		desc = 'Enable constructor\'s avoidance feature (DO NOT include Athena or Commander).\n\nConstructor will return to base when encountering enemy while having area-reclaim or area-ressurect command, and will try to avoid enemy while having build/repair/reclaim queue.\n\nTips: order area-reclaim to the whole map, work best for cloaked constructor, but buggy for flying constructor. Default:On',
+		desc = 'Enable constructor\'s avoidance feature (WILL NOT include Commander).\n\nConstructors will avoid enemy while having move order. Constructor also return to base when encountering enemy during area-reclaim or area-ressurect command, and will try to avoid enemy while having build or repair or reclaim queue except when hold-position is issued.\n\nTips: order area-reclaim to the whole map, work best for cloaked constructor, but buggy for flying constructor. Default:On',
 	},
 	enableCloaky = {
 		name = 'Enable for cloakies',
 		type = 'bool',
 		value = true,
-		desc = 'Enable cloakies\' avoidance feature.\n\nCloakable bots will avoid enemy while having move order, but units with hold-position state is excluded.\n\nTips: is optimized for Sycthe- your Sycthe will less likely to accidentally bump into enemy unit. Default:On',
+		desc = 'Enable cloakies\' avoidance feature.\n\nCloakable bots will avoid enemy while having move order. Cloakable will also flee from enemy when idle except when hold-position state is used.\n\nTips: is optimized for Sycthe- your Sycthe will less likely to accidentally bump into enemy unit. Default:On',
 	},
 	enableGround = {
 		name = 'Enable for ground units',
 		type = 'bool',
 		value = true,
-		desc = 'Enable for ground units (INCLUDE Commander).\n\nAll ground unit will avoid enemy while being outside camera view OR while reloading, but units with hold position state is excluded.\n\nTips:\n1) is optimized for masses of Thug or Zeus.\n2) You can use Guard to make your unit swarm the guarded unit in presence of enemy.\nDefault:On',
+		desc = 'Enable for ground units (INCLUDE Commander).\n\nAll ground unit will avoid enemy while being outside camera view and/or while reloading except when hold-position state is used.\n\nTips:\n1) is optimized for masses of Thug or Zeus.\n2) You can use Guard to make your unit swarm the guarded unit in presence of enemy.\nDefault:On',
 	},
 	enableGunship = {
 		name = 'Enable for gunships',
 		type = 'bool',
 		value = false,
-		desc = 'Enable gunship\'s avoidance behaviour (INCLUDE Athena).\n\nGunship while avoid enemy while outside camera view OR while reloading, but units with hold-position state is excluded.\n\nTips: to optimize the hit-&-run behaviour- set the fire-state options to hold-fire (can be buggy). Default:Off',
+		desc = 'Enable gunship\'s avoidance behaviour .\n\nGunship will avoid enemy while outside camera view and/or while reloading except when hold-position state is used.\n\nTips: to create a hit-&-run behaviour- set the fire-state options to hold-fire (can be buggy). Default:Off',
 	},
 	-- enableAmphibious = {
 		-- name = 'Enable for amphibious',
@@ -378,7 +378,7 @@ function RefreshUnitList(attacker, commandTTL)
 			if (unitSpeed>0) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype and unitDef["name"]~="armcsa" then --include only constructor and cloakies, and not com and not Athena
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
 					unitType =1 --//this unit-type will do avoidance even in camera view
 					
 					local isBuilder_ignoreTrue = false
@@ -467,8 +467,11 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
 					local losRadius	= GetUnitLOSRadius(unitID,case,unitInMotion[i]["reloadableWeaponIndex"]) --get LOS. also custom LOS for case=="attack" & weapon range >0
 					local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
-					if (cQueueTemp[1].id == CMD_MOVE and not unitVisible) then --if unit has move Command and is outside user's view
+					
+					if ((newCommand and cQueueTemp[1].id==CMD_MOVE) or cQueueTemp[2].id==CMD_MOVE) and not unitVisible then --if unit is issued a move Command and is outside user's view. Note: is using cQueueTemp because cQueue can be NIL
 						reachedTarget = false --force unit to continue avoidance despite close to target (try to circle over target until seen by user)
+					elseif (case == "none") then
+						reachedTarget = true --do not process unhandled command. This fix a case of unwanted behaviour when ZK's SmartAI issued a fight command on top of Avoidance's order and cause conflicting behaviour. 
 					end
 					if reachedTarget then --if reached target
 						commandIndexTable[unitID]=nil --empty the commandIndex (command history)
@@ -572,7 +575,7 @@ end
 
 function widget:RecvLuaMsg(msg, playerID) --receive echo from server ('LUA message Receive')
 	if msg:sub(1,3) == dummyIDg and playerID == myPlayerID then
-		local skippingTimer = skippingTimerG
+		local skippingTimer = skippingTimerG --is global table
 		-----
 		
 		--Spring.Echo(dummyIDg)
@@ -585,7 +588,7 @@ function widget:RecvLuaMsg(msg, playerID) --receive echo from server ('LUA messa
 		--Method 2: use rolling average [[
 		skippingTimer.storedDelay[skippingTimer.index] = skippingTimer.networkDelay --store network delay value in a rolling table
 		skippingTimer.index = skippingTimer.index+1 --table index ++
-		if skippingTimer.index >= 12 then --roll the table/wrap around, so that the index circle the table. The 11-th sequence is for storing the oldest value, 1-st to 10-th sequence is for the average
+		if skippingTimer.index > 11 then --roll the table/wrap around, so that the index circle the table. The 11-th sequence is for storing the oldest value, 1-st to 10-th sequence is for the average
 			skippingTimer.index = 1
 		end
 		skippingTimer.averageDelay = skippingTimer.averageDelay + skippingTimer.networkDelay/10 - (skippingTimer.storedDelay[skippingTimer.index] or 0.3)/10 --add new delay and minus old delay, also use 0.3sec as the old delay if nothing is stored yet.
@@ -718,15 +721,15 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
-		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading) then --if unit is out of user's vision OR is reloading, and: 
+		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading or unitInMotionSingleUnit[2] == 1) then --if unit is out of user's vision OR is reloading OR is cloaky, and: 
 			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
 				if (holdPosition== false) then --if unit is not "hold position", then:
 					local idleOrIsDodging = (cQueue[1] == nil) or (#cQueue == 1 and cQueue[1].id == CMD_MOVE) --is idle completely, or is given widget's CMD_MOVE (note: CMD_MOVE or any other command will not end with CMD_STOP when its widget issued)
 					local dummyCmd
 					if idleOrIsDodging then
-						dummyCmd = cMD_DummyG  --select cMD_DummyG if unit is fleeing while out of view,
+						dummyCmd = cMD_DummyG  --select cMD_DummyG if unit is to flee without need to return to old position,
 					else
-						dummyCmd = cMD_Dummy_atkG --select cMD_Dummy_atkG if unit is auto-attack reloading (as in: isReloading + (cQueue[1] == nil or #cQueue == 1))
+						dummyCmd = cMD_Dummy_atkG --select cMD_Dummy_atkG if unit is auto-attack & reloading (as in: isReloading + (no command or mono command)) and doesn't mind being bound to old position 
 					end
 					cQueue={{id = dummyCmd, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --flag unit with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit. Note: this is not real command, its here just to trigger avoidance.
 					--Note2: negative target only deactivate attraction function, but avoidance function is still active & output new coordinate if enemy is around
@@ -734,7 +737,8 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 			end
 		end
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
-			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
+			local isConstructorCmd = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == 125)
+			local isValidCommand = ((isConstructorCmd and not holdPosition) or cQueue[1].id == CMD_MOVE or  cQueue[1].id == cMD_DummyG) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
 			--local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes" and unitInMotionSingleUnit[2]~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
 			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes")--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
 			local _2ndAttackSignature = false --attack command signature
@@ -843,7 +847,7 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
 			local unitFastestReloadableWeapon = reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 			if unitFastestReloadableWeapon ~= -1 then
-				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range") --retrieve weapon range
+				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-1, "range") --retrieve weapon range
 				losRadius = math.min(weaponRange*0.75, losRadius) --reduce avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the smallest (Note: we need this minimum detection range to avoid disturbing maximum range artillery unit)
 			end			
 			--[[
@@ -1220,7 +1224,7 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 			weaponIsEmpty = (remainingTime> minimumRemainingReloadTime)
 			if (turnOnEcho == 1) then --debugging
 				Spring.Echo(unitFastestReloadableWeapon)
-				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range"))
+				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-1, "range"))
 			end
 		end			
 	--end
