@@ -38,6 +38,8 @@ local playerchickens = tobool(modOptions.playerchickens) -- :D
 -- and so players get a share
 if (gadgetHandler:IsSyncedCode()) then
 
+local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
+
 local NoSelfDUnits = {
   [ UnitDefNames['roost'].id ] = true,
 }
@@ -91,25 +93,24 @@ function gadget:Initialize()
   --Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
 end
 
---[[function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced)
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced)
   -- question? if chicken roost belongs to chicken team than we should block selfd command, but if it was captured? allow? probably
-  if ((cmdID == CMD.SELFD) and (NoSelfDUnits[unitDefID]) and (ChickenAllyTeam == select(6,spGetTeamInfo(unitTeam)))) then
+  local allyTeam = spGetUnitAllyTeam(unitID)
+  if ((cmdID == CMD.SELFD) and (NoSelfDUnits[unitDefID]) and (allyTeam == ChickenAllyTeam)) then
     return false
   end
   return true
-end]]--
+end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-  local allyTeam = select(6,spGetTeamInfo(unitTeam))
+  local allyTeam = spGetUnitAllyTeam(unitID)
   --Spring.Echo("Unit spawned and ally team is "..allyTeam)
   if (unitTeam == ChickenTeam) then
     -- as a testing let's just cycle through recievers
-    if (not NoSelfDUnits[unitDefID]) then -- now i block selfd cmd NOT
-      spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
-      GiveToTeam=GiveToTeam+1
-      if (GiveToTeam > #ChickenPlayers) then
-    	GiveToTeam = 1
-      end
+    spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
+    GiveToTeam=GiveToTeam+1
+    if (GiveToTeam > #ChickenPlayers) then
+      GiveToTeam = 1
     end
   elseif (allyTeam == ChickenAllyTeam) then
     local ud = UnitDefs[unitDefID]
