@@ -172,6 +172,16 @@ if (not gameMode) then -- set human and computer teams
   luaAI            = 0 --defaultDifficulty
 else
   local teams = Spring.GetTeamList()
+  local firstChickenTeam = nil
+  -- the problem is with human controlled chickens, otherwise it counts them as robot-players and difficulty increases very much
+  -- probably, ideally this needs to be taught to differentiate between human chickens and human robots...
+  for _, teamID in pairs(teams) do
+    local luaAI = Spring.GetTeamLuaAI(teamID)
+    if luaAI and string.find(string.lower(luaAI), "chicken") then
+      firstChickenTeam = teamID
+      break
+    end
+  end
   local highestLevel = 0
   for _, teamID in pairs(teams) do
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
@@ -181,8 +191,10 @@ else
       highestLevel = CompareDifficulty(teamLuaAI, highestLevel)
       chickenTeamID = teamID
       computerTeams[teamID] = true
-    elseif not (chickenTeamID and Spring.AreTeamsAllied(teamID, chickenTeamID))
-	then
+    elseif firstChickenTeam and Spring.AreTeamsAllied(teamID,firstChickenTeam) then
+      computerTeams[teamID] = true -- count as computer
+    else --if not (chickenTeamID and Spring.AreTeamsAllied(teamID, chickenTeamID))
+	--then -- well as far as I understood this means to check whether team is chicken enemy then do next
       humanTeams[teamID]    = true
     end
   end
