@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "Chicken control",
-    desc      = "v0.001 Silly mode to allow players play as chickens a bit...",
+    desc      = "v0.002 Silly mode to allow players play as chickens a bit...",
     author    = "Tom Fyuri",
     date      = "Apr 2013",
     license   = "GPL v2 or later",
@@ -19,6 +19,13 @@ that's all.
 2) block take command and allow computer chicken to play as well...
 3) don't give chickens to afk and resigned players...
 4) have fun...
+
+-- changelog 0.002:
+attemption to block roost self-d-bility.
+
+-- changelog 0.001:
+initial release.
+
 ]]--
 
 if(not Spring.GetModOptions()) then
@@ -31,7 +38,7 @@ local playerchickens = tobool(modOptions.playerchickens) -- i'm an idiot, lol (d
 -- and so players get a share
 if (gadgetHandler:IsSyncedCode()) then
 
-local IgnoreUnits = {
+local NoSelfDUnits = {
   [ UnitDefNames['roost'].id ] = true,
 }
 
@@ -85,20 +92,27 @@ function gadget:Initialize()
   --Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
 end
 
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced)
+  -- question? if chicken roost belongs to chicken team than we should block selfd command, but if it was captured? allow? probably
+  if (cmdID == CMD.SELFD) and (NoSelfDUnits[unitDefID]) and (ChickenAllyTeam == select(6,spGetTeamInfo(unitTeam)) then
+    return false
+  end
+end
+
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
   local allyTeam = select(6,spGetTeamInfo(unitTeam))
   --Spring.Echo("Unit spawned and ally team is "..allyTeam)
   if (unitTeam == ChickenTeam) then
     -- as a testing let's just cycle through recievers
-    if (not IgnoreUnits[unitDefID]) then
+    --if (not NoSelfDUnits[unitDefID]) then -- now i block selfd cmd
       --if (GiveToTeam > 0) then
       spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
       GiveToTeam=GiveToTeam+1
       if (GiveToTeam > #ChickenPlayers) then
-	GiveToTeam = 0
+    	GiveToTeam = 0
       end
       --end
-    end
+    --end
   elseif (allyTeam == ChickenAllyTeam) then
     local ud = UnitDefs[unitDefID]
     if (ud.customParams.commtype) then
