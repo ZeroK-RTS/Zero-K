@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "Chicken control",
-    desc      = "v0.002 Silly mode to allow players play as chickens a bit...",
+    desc      = "v0.003 Silly mode to allow players play as chickens a bit...",
     author    = "Tom Fyuri",
     date      = "Apr 2013",
     license   = "GPL v2 or later",
@@ -16,9 +16,12 @@ that's all.
 
 -- TODO list:
 1) as far as i know there can be multiple chicken bots on different teams, but only one of them will play, if that's the case, handle it...
-2) block take command and allow computer chicken to play as well...
+2) probably allow computer chicken to play as well...
 3) don't give chickens to afk and resigned players...
 4) have fun...
+
+-- changelog 0.003:
+revertion of previous action, now roosts should belong to AI always.
 
 -- changelog 0.002:
 attemption to block roost self-d-bility.
@@ -38,9 +41,7 @@ local playerchickens = tobool(modOptions.playerchickens) -- :D
 -- and so players get a share
 if (gadgetHandler:IsSyncedCode()) then
 
-local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
-
-local NoSelfDUnits = {
+local NotGivingToPlayersUnits = {
   [ UnitDefNames['roost'].id ] = true,
 }
 
@@ -50,6 +51,7 @@ local spGetTeamLuaAI	= Spring.GetTeamLuaAI
 local spGetPlayerInfo	= Spring.GetPlayerInfo
 local spDestroyUnit	= Spring.DestroyUnit
 local spTransferUnit     = Spring.TransferUnit
+local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
   
 local function GetTeamIsChicken(teamID)
   local luaAI = spGetTeamLuaAI(teamID)
@@ -93,10 +95,9 @@ function gadget:Initialize()
   --Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
 end
 
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced)
-  -- question? if chicken roost belongs to chicken team than we should block selfd command, but if it was captured? allow? probably
-  local allyTeam = spGetUnitAllyTeam(unitID)
-  if ((cmdID == CMD.SELFD) and (NoSelfDUnits[unitDefID]) and (allyTeam == ChickenAllyTeam)) then
+function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
+  -- refuse /take for roosts...
+  if (oldTeam == ChickenTeam) and (NotGivingToPlayersUnits[unitDefID]) then
     return false
   end
   return true
@@ -107,10 +108,12 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
   --Spring.Echo("Unit spawned and ally team is "..allyTeam)
   if (unitTeam == ChickenTeam) then
     -- as a testing let's just cycle through recievers
-    spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
-    GiveToTeam=GiveToTeam+1
-    if (GiveToTeam > #ChickenPlayers) then
-      GiveToTeam = 1
+    if (not NotGivingToPlayersUnits[unitDefID]) then
+      spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
+      GiveToTeam=GiveToTeam+1
+      if (GiveToTeam > #ChickenPlayers) then
+	GiveToTeam = 1
+      end
     end
   elseif (allyTeam == ChickenAllyTeam) then
     local ud = UnitDefs[unitDefID]
