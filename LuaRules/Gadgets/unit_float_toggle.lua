@@ -4,7 +4,7 @@ function gadget:GetInfo()
     name      = "Float Toggle",
     desc      = "Adds a float/sink toggle to units, currently static while floating",
     author    = "Google Frog", --Msafwan (impulse based float)
-    date      = "9 March 2012, 4 April 2013",
+    date      = "9 March 2012, 12 April 2013",
     license   = "GNU GPL, v2 or later",
     layer     = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
     enabled   = true  --  loaded by default?
@@ -67,6 +67,7 @@ local floatState = {}
 local aimWeapon = {}
 local gRAVITY = Game.gravity/30/30
 local rAD_PER_ROT = (math.pi/(2^15))
+local fLY_THRESHOLD = gRAVITY*8
 
 --------------------------------------------------------------------------------
 -- Communication to script
@@ -80,29 +81,33 @@ end
 --------------------------------------------------------------------------------
 -- Float Table Manipulation
 
-local function addFloat(unitID, unitDefID)
+local function addFloat(unitID, unitDefID, isFlying)
 	if not float[unitID] then
 		local def = floatDefs[unitDefID]
 		local x,y,z = Spring.GetUnitPosition(unitID)
-		if y < def.depthRequirement then
-			Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
-			floatByID.count = floatByID.count + 1
-			floatByID.data[floatByID.count] = unitID
-			float[unitID] = {
-				index = floatByID.count,
-				surfacing = true,
-				prevSurfacing = true,
-				onSurface = false,
-				justStarted = true,
-				sinkTank = 0,
-				nextSpecialDrag = 1,
-				speed = def.initialRiseSpeed,
-				x = x, y = y, z = z,
-				unitDefID = unitDefID,
-				paraData = {want = false, para = false},
-			}
-			local headingInRadian = Spring.GetUnitHeading(unitID)*rAD_PER_ROT
-			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
+		if y < def.depthRequirement or isFlying then
+			local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
+			if place == 2 or place == 1 then
+				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
+				floatByID.count = floatByID.count + 1
+				floatByID.data[floatByID.count] = unitID
+				float[unitID] = {
+					index = floatByID.count,
+					surfacing = true,
+					prevSurfacing = true,
+					onSurface = false,
+					justStarted = true,
+					sinkTank = 0,
+					nextSpecialDrag = 1,
+					speed = def.initialRiseSpeed, --desired speed
+					x = x, y = y, z = z,
+					unitDefID = unitDefID,
+					isFlying = isFlying,
+					paraData = {want = false, para = false},
+				}
+				local headingInRadian = Spring.GetUnitHeading(unitID)*rAD_PER_ROT
+				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
+			end
 		end
 	end
 end
@@ -217,8 +222,36 @@ function gadget:GameFrame(f)
 	local i = 1
 	while i <= floatByID.count do
 		local unitID = floatByID.data[i]
-
-		if Spring.ValidUnitID(unitID) then
+		local isValidUnitID = Spring.ValidUnitID(unitID)
+		local isFlying = isValidUnitID and float[unitID]["isFlying"]
+		
+		if isFlying then --check if unit has landed or not
+			local data = float[unitID] --(get reference to data table)
+			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
+			local height = Spring.GetGroundHeight(data.x, data.z)
+			if data.y == height then --touch down on land
+				removeFloat(unitID)
+				i = i - 1
+			elseif data.y <= 0 then --touch down on water level
+				local dx,dy,dz = Spring.GetUnitVelocity(unitID)
+				dx,dz =dx/2,dz/2 --arbitrary tweak (reduce speed to make less bounce)
+				data.speed = math.sqrt(dy*dy + dx*dx + dz*dz) --Note: data.speed is designed for speed on y axis only but we include x,y,z just for fun! (higher speed mean better bounce when hitting water).
+				data.isFlying = false
+				local cmdQueue = Spring.GetUnitCommands(unitID);
+				if (#cmdQueue>0) then 
+					local cmdOpt = cmdQueue[1].options
+					if cmdQueue[1].id == CMD.MOVE and cmdOpt.coded == 16 and cmdOpt.right then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
+						--Spring.GiveOrderToUnit(unitID,CMD.REMOVE, {cmdQueue[1].tag}, {}) --clear Spring's command that desire unit to return to old position	
+						Spring.GiveOrderArrayToUnitArray( {unitID},{
+							{CMD.REMOVE, {cmdQueue[1].tag}, {}},--clear Spring's command that desire unit to return to old position	
+							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, {"alt"}},
+						})
+					end
+				end
+			end
+			i = i + 1
+			
+		elseif isValidUnitID and not isFlying then --perform float/sink behaviour
 			local data = float[unitID]
 			local def = floatDefs[data.unitDefID]
 			
@@ -302,7 +335,7 @@ function gadget:GameFrame(f)
 					else
 						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag
 						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
-						data.speed = (data.speed + def.sinkAccel*(data.sinkTank/def.sinkTankRequirement) +drag) --sink as fast as possible
+						data.speed = (data.speed + def.sinkAccel*(data.sinkTank/def.sinkTankRequirement) +drag) --sink as fast as sinktank fill
 					end
 				else --rising
 					local dragFactors = (data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag
@@ -356,8 +389,8 @@ function gadget:GameFrame(f)
 			--Apply desired speed
 			local dx,dy,dz = Spring.GetUnitVelocity(unitID)
 			local dyCorrection = data.speed+gRAVITY-dy
-			local headingInRadian = Spring.GetUnitHeading(unitID)*rAD_PER_ROT
-			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
+			local headingInRadian = Spring.GetUnitHeading(unitID)*rAD_PER_ROT --get current heading
+			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
 			Spring.AddUnitImpulse(unitID, 0,-4,0) --Note: -4/+4 hax is for impulse capacitor  (Spring 91 only need -1/+1, Spring 94 require at least -4/+4). TODO: remove -4/+4 hax if no longer needed
 			Spring.AddUnitImpulse(unitID, 0,4+dyCorrection,0)
 			
@@ -421,7 +454,7 @@ end
 ---------------------------------------------------------------------
 --Updates that prevent collision damage when surfacing
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note: argument list is based on Spring91 (compatibility with Spring 94 is maintained by gadget.lua). Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision. Prevent collision damage when surfacing (usefull when unit rise too fast and bump on another unit's bottom)
 	if float[unitID] and (not float[unitID].onSurface) and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
 		return math.random()  -- no collision damage. use random return so that unit_fall_damage.lua do not use pairs of zero to calculate collision damage.
@@ -429,4 +462,16 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	return damage
 end
 
+---------------------------------------------------------------------
+--Updates that check whether unit is flying
 
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+	-- unit or wreck collision. Prevent collision damage when surfacing (usefull when unit rise too fast and bump on another unit's bottom)
+	if floatDefs[unitDefID] and not float[unitID] then
+		local _,dy = Spring.GetUnitVelocity(unitID)
+		if dy>= fLY_THRESHOLD then
+			addFloat(unitID, unitDefID, true)
+		end
+	end
+	return damage
+end
