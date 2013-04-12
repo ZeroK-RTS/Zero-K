@@ -97,6 +97,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
   if ((cmdID == CMD.SELFD) and (NoSelfDUnits[unitDefID]) and (ChickenAllyTeam == select(6,spGetTeamInfo(unitTeam)))) then
     return false
   end
+  return true
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
