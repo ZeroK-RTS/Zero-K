@@ -33,7 +33,7 @@ if(not Spring.GetModOptions()) then
 end
 
 local modOptions = Spring.GetModOptions()
-local playerchickens = tobool(modOptions.playerchickens) -- i'm an idiot, lol (didn't know about tobool)
+local playerchickens = tobool(modOptions.playerchickens) -- :D
 
 -- and so players get a share
 if (gadgetHandler:IsSyncedCode()) then
@@ -94,7 +94,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced)
   -- question? if chicken roost belongs to chicken team than we should block selfd command, but if it was captured? allow? probably
-  if (cmdID == CMD.SELFD) and (NoSelfDUnits[unitDefID]) and (ChickenAllyTeam == select(6,spGetTeamInfo(unitTeam)) then
+  if ((cmdID == CMD.SELFD) and (NoSelfDUnits[unitDefID]) and (ChickenAllyTeam == select(6,spGetTeamInfo(unitTeam)))) then
     return false
   end
 end
