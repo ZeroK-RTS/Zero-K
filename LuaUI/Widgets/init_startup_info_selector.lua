@@ -32,7 +32,6 @@ local Echo	= Spring.Echo
 
 local coop = (Spring.GetModOptions().coop == 1) or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
-local playerChickens = (Spring.GetModOptions().playerchickens == 1) or false
 
 local Chili
 local Window
@@ -216,19 +215,6 @@ function widget:Initialize()
 	end
 	PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
 
-	if (playerChickens) then
-	  -- find latest chicken teamID is player is allied to it -> do not show com selection
-	  local chickenTeamID
-	  for _,t in pairs(Spring.GetTeamList()) do
-	    local luaAI = Spring.GetTeamLuaAI(t)
-	    if luaAI and string.find(string.lower(luaAI), "chicken") then
-	      chickenTeamID = t
-	    end
-	  end
-	  if (Spring.AreTeamsAllied(teamID,chickenTeamID)) then
-	    noComm = true
-	  end
-	end
 
 	vsx, vsy = widgetHandler:GetViewSizes()
 

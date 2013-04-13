@@ -63,7 +63,7 @@ local function GetTeamIsChicken(teamID)
   return false
 end
 
-local ChickenTeam = 0
+local ChickenTeam = nil
 local ChickenAllyTeam
 local GiveToTeam
 local ChickenPlayers = {}
@@ -80,7 +80,7 @@ function gadget:Initialize()
       --break
     end
   end
-  if (ChickenTeam == 0) then gadgetHandler:RemoveGadget() end
+  if (ChickenTeam == nil) then gadgetHandler:RemoveGadget() end
   ChickenAllyTeam = select(6,spGetTeamInfo(ChickenTeam))
   local j = 0
   for i=1,#teams do
@@ -93,6 +93,7 @@ function gadget:Initialize()
   if (j>0) then
     GiveToTeam = 1
   else
+    --Spring.Echo("chicken_control gadget quit, did not find chicken")
     gadgetHandler:RemoveGadget()
   end
   MaxLoop = #ChickenPlayers+1
@@ -118,14 +119,17 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
       while (condition) do
 	if (ChickenPlayers[GiveToTeam] ~= nil) then
 	  local leader = select(2, spGetTeamInfo(ChickenPlayers[GiveToTeam]))
-	  local _, active, spectator = spGetPlayerInfo(leader)
-	  if not spectator then
+	  local active = select(2, spGetPlayerInfo(leader))
+	  if (leader >= 0) then -- otherwise spec
 	    anyone_not_spec = true
+	    --Spring.Echo("chicken_control "..leader.." not spectator")
 	    if active then
 	      condition = false
+	      --Spring.Echo("chicken_control "..leader.." is active")
 	      spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
 	    end
 	  else
+	    --Spring.Echo("chicken_control "..leader.." is spectator")
 	    ChickenPlayers[GiveToTeam] = nil
 	  end
 	end
@@ -137,17 +141,20 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (curLoop > MaxLoop) then
 	  condition = false
 	  if not anyone_not_spec then
+	    --Spring.Echo("chicken_control gadget quit")
 	    gadgetHandler:RemoveGadget() -- probably noone alive ?
 	  end
 	end
       end
     end
-  elseif (allyTeam == ChickenAllyTeam) then
-    local ud = UnitDefs[unitDefID]
-    if (ud.customParams.commtype) then
-      spDestroyUnit(unitID, false, true) -- bye bye commander
-    end
   end
+-- -- now thats legacy - commander is not given in the first place
+--   elseif (allyTeam == ChickenAllyTeam) then
+--     local ud = UnitDefs[unitDefID]
+--     if (ud.customParams.commtype) then
+--       spDestroyUnit(unitID, false, true) -- bye bye commander
+--     end
+--   end
 end
 
 end

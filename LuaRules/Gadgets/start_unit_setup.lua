@@ -96,6 +96,7 @@ local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
 local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
+local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
 
 --Spring.Echo(coop == 1, coop == 0)
 
@@ -483,7 +484,21 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
   local luaAI = Spring.GetTeamLuaAI(teamID)
   if luaAI and string.find(string.lower(luaAI), "chicken") then
     return false
+  elseif playerChickens then
+    -- allied to latest chicken team? no com for you
+    local chickenTeamID
+    for _,t in pairs(Spring.GetTeamList()) do
+      local luaAI = Spring.GetTeamLuaAI(t)
+      if luaAI and string.find(string.lower(luaAI), "chicken") then
+	chickenTeamID = t
+      end
+    end
+    if (Spring.AreTeamsAllied(teamID,chickenTeamID)) then
+      --Spring.Echo("chicken_control detected no com for "..playerID)
+      return false
+    end
   end
+  
   -- get start unit
   local startUnit = GetStartUnit(teamID, playerID, isAI)
   
