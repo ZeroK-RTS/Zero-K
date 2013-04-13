@@ -1,3 +1,4 @@
+
 -- $Id: ModOptions.lua 4642 2009-05-22 05:32:36Z carrepairer $
 
 --  Custom Options Definition Table format
@@ -569,6 +570,14 @@ local options = {
     def		= true,
     section	= "experimental",
   },
+  {
+    key		= "impulsefloat",
+    name	= "Impulses Float",
+    desc	= "Allow amphibious floatation that is effected by Archer and can be pushed by other moving objects. Compatible for Spring 91, or Spring 95 and above",
+    type	= "bool",
+    def		= false,
+    section	= "experimental",
+  },    
   {
     key		= "impulsejump",
     name	= "Impulses Jump",
