@@ -39,7 +39,7 @@ if(not Spring.GetModOptions()) then
 end
 
 local modOptions = Spring.GetModOptions()
-local playerChickens = (modOptions.playerchickens == 1) or false
+local playerChickens = tobool(modOptions.playerchickens) or false
 
 -- and so players get a share
 if (gadgetHandler:IsSyncedCode()) then
@@ -71,8 +71,9 @@ local ChickenPlayers = {}
 local MaxLoop
 
 function gadget:Initialize()
-  if (not playerChickens) then
-      gadgetHandler:RemoveGadget()
+  if (playerChickens == false) then
+    --Spring.Echo("chicken_control gadget quit, modoption disabled")
+    gadgetHandler:RemoveGadget()
   end
   local teams = spGetTeamList()
   for i=1,#teams do
@@ -81,7 +82,10 @@ function gadget:Initialize()
       --break
     end
   end
-  if (ChickenTeam == -1) then gadgetHandler:RemoveGadget() end
+  if (ChickenTeam == -1) then 
+    --Spring.Echo("chicken_control gadget quit. did not find chicken")
+    gadgetHandler:RemoveGadget()
+  end
   ChickenAllyTeam = select(6,spGetTeamInfo(ChickenTeam))
   local j = 0
   for i=1,#teams do
@@ -94,11 +98,11 @@ function gadget:Initialize()
   if (j>0) then
     GiveToTeam = 1
   else
-    --Spring.Echo("chicken_control gadget quit, did not find chicken")
+    --Spring.Echo("chicken_control gadget quit, did not find chicken players")
     gadgetHandler:RemoveGadget()
   end
   MaxLoop = #ChickenPlayers+1
-  --Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
+  ----Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
 end
 
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
