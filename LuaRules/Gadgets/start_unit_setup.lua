@@ -486,14 +486,14 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
     return false
   elseif playerChickens then
     -- allied to latest chicken team? no com for you
-    local chickenTeamID
+    local chickenTeamID = -1
     for _,t in pairs(Spring.GetTeamList()) do
       local luaAI = Spring.GetTeamLuaAI(t)
       if luaAI and string.find(string.lower(luaAI), "chicken") then
 	chickenTeamID = t
       end
     end
-    if (Spring.AreTeamsAllied(teamID,chickenTeamID)) then
+    if (chickenTeamID > -1) and (Spring.AreTeamsAllied(teamID,chickenTeamID)) then
       --Spring.Echo("chicken_control detected no com for "..playerID)
       return false
     end

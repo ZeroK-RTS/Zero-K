@@ -39,7 +39,7 @@ if(not Spring.GetModOptions()) then
 end
 
 local modOptions = Spring.GetModOptions()
-local playerchickens = tobool(modOptions.playerchickens) -- :D
+local playerChickens = (modOptions.playerchickens == 1) or false
 
 -- and so players get a share
 if (gadgetHandler:IsSyncedCode()) then
@@ -64,14 +64,14 @@ local function GetTeamIsChicken(teamID)
   return false
 end
 
-local ChickenTeam = nil
+local ChickenTeam = -1
 local ChickenAllyTeam
 local GiveToTeam
 local ChickenPlayers = {}
 local MaxLoop
 
 function gadget:Initialize()
-  if(playerchickens ~= true) then
+  if (not playerChickens) then
       gadgetHandler:RemoveGadget()
   end
   local teams = spGetTeamList()
@@ -81,7 +81,7 @@ function gadget:Initialize()
       --break
     end
   end
-  if (ChickenTeam == nil) then gadgetHandler:RemoveGadget() end
+  if (ChickenTeam == -1) then gadgetHandler:RemoveGadget() end
   ChickenAllyTeam = select(6,spGetTeamInfo(ChickenTeam))
   local j = 0
   for i=1,#teams do
