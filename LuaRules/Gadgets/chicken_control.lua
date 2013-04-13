@@ -17,7 +17,8 @@ that's all.
 -- TODO list:
 1) probably allow computer chicken to play as well... maybe not?
 2) don't give chickens to afk and resigned players...
-3) have fun...
+3) is it possible to disable com selection screen for chicken players?
+4) have fun...
 
 -- changelog 0.004:
 attemption to ignore afk/resigned players when giving chickens.
@@ -119,8 +120,8 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
       while (condition) do
 	if (ChickenPlayers[GiveToTeam] ~= nil) then
 	  local leader = select(2, spGetTeamInfo(ChickenPlayers[GiveToTeam]))
-	  local active = select(2, spGetPlayerInfo(leader))
 	  if (leader >= 0) then -- otherwise spec
+	    local active = select(2, spGetPlayerInfo(leader))
 	    anyone_not_spec = true
 	    --Spring.Echo("chicken_control "..leader.." not spectator")
 	    if active then
