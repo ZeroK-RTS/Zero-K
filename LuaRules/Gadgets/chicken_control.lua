@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "Chicken control",
-    desc      = "v0.003 Silly mode to allow players play as chickens a bit...",
+    desc      = "v0.004 Silly mode to allow players play as chickens a bit...",
     author    = "Tom Fyuri",
     date      = "Apr 2013",
     license   = "GPL v2 or later",
@@ -15,10 +15,12 @@ players can use only chickens. rules are same as chickens. also someone eventual
 that's all.
 
 -- TODO list:
-1) as far as i know there can be multiple chicken bots on different teams, but only one of them will play, if that's the case, handle it...
-2) probably allow computer chicken to play as well...
-3) don't give chickens to afk and resigned players...
-4) have fun...
+1) probably allow computer chicken to play as well... maybe not?
+2) don't give chickens to afk and resigned players...
+3) have fun...
+
+-- changelog 0.004:
+attemption to ignore afk/resigned players when giving chickens.
 
 -- changelog 0.003:
 revertion of previous action, now roosts should belong to AI always.
@@ -65,6 +67,7 @@ local ChickenTeam = 0
 local ChickenAllyTeam
 local GiveToTeam
 local ChickenPlayers = {}
+local MaxLoop
 
 function gadget:Initialize()
   if(playerchickens ~= true) then
@@ -74,7 +77,7 @@ function gadget:Initialize()
   for i=1,#teams do
     if GetTeamIsChicken(teams[i]) then
       ChickenTeam = teams[i]
-      break
+      --break
     end
   end
   if (ChickenTeam == 0) then gadgetHandler:RemoveGadget() end
@@ -92,6 +95,7 @@ function gadget:Initialize()
   else
     gadgetHandler:RemoveGadget()
   end
+  MaxLoop = #ChickenPlayers+1
   --Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
 end
 
@@ -106,13 +110,36 @@ end
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
   local allyTeam = spGetUnitAllyTeam(unitID)
   --Spring.Echo("Unit spawned and ally team is "..allyTeam)
+  local curLoop = 0
+  local anyone_not_spec = false
+  local condition = true
   if (unitTeam == ChickenTeam) then
-    -- as a testing let's just cycle through recievers
     if (not NotGivingToPlayersUnits[unitDefID]) then
-      spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
-      GiveToTeam=GiveToTeam+1
-      if (GiveToTeam > #ChickenPlayers) then
-	GiveToTeam = 1
+      while (condition) do
+	if (ChickenPlayers[GiveToTeam] ~= nil) then
+	  local leader = select(2, spGetTeamInfo(ChickenPlayers[GiveToTeam]))
+	  local _, active, spectator = spGetPlayerInfo(leader)
+	  if not spectator then
+	    anyone_not_spec = true
+	    if active then
+	      condition = false
+	      spTransferUnit(unitID, ChickenPlayers[GiveToTeam], false)
+	    end
+	  else
+	    ChickenPlayers[GiveToTeam] = nil
+	  end
+	end
+	GiveToTeam=GiveToTeam+1
+	if (GiveToTeam > #ChickenPlayers) then
+	  GiveToTeam = 1
+	end
+	curLoop=curLoop+1
+	if (curLoop > MaxLoop) then
+	  condition = false
+	  if not anyone_not_spec then
+	    gadgetHandler:RemoveGadget() -- probably noone alive ?
+	  end
+	end
       end
     end
   elseif (allyTeam == ChickenAllyTeam) then
