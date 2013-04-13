@@ -15,6 +15,7 @@ players can use only chickens. rules are same as chickens. also someone eventual
 that's all.
 
 -- TODO list:
+0) !!! chicken queen is different in walkingand flying modes, make sure only one players controls both !!!
 1) probably allow computer chicken to play as well... maybe not?
 2) don't give chickens to afk and resigned players...
 3) is it possible to disable com selection screen for chicken players?
@@ -102,7 +103,7 @@ function gadget:Initialize()
     gadgetHandler:RemoveGadget()
   end
   MaxLoop = #ChickenPlayers+1
-  ----Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
+  --Spring.Echo("Chicken allyteam is "..ChickenAllyTeam)
 end
 
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
