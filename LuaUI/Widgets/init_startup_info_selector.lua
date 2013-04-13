@@ -32,7 +32,7 @@ local Echo	= Spring.Echo
 
 local coop = (Spring.GetModOptions().coop == 1) or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
-local playerChickens = tobool(Spring.GetModOptions().playerchickens)
+local playerChickens = (Spring.GetModOptions().playerchickens == 1) or false
 
 local Chili
 local Window
