@@ -4,7 +4,6 @@
 -- beamweapon_hit_yellow_groundflash
 -- beamweapon_hit_yellow_tiny
 -- beamweapon_hit_yellow_small
--- beamweapon_hit_green
 -- beamweapon_hit_blue
 -- beamweapon_hit_red
 -- beamweapon_hit_orange_steam
@@ -20,7 +19,11 @@
 -- beamweapon_muzzle_blue
 -- beamweapon_muzzle_purple
 
-return {
+Spring = Spring or {}
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
+
+local cegs = {
   ["beamlaser_hit_blue"] = {
     usedefaultexplosions = false,
     glow = {
@@ -1061,44 +1064,6 @@ return {
     },
   },
 
-  ["beamweapon_muzzle_green"] = {
-    usedefaultexplosions = false,
-    glow = {
-      air                = true,
-      class              = [[explspike]],
-      count              = 12,
-      ground             = true,
-      water              = true,
-      properties = {
-        alpha              = 1,
-        alphadecay         = 0.125,
-        alwaysvisible      = false,
-        color              = [[0,1,0]],
-        dir                = [[-4 r8, -4 r8, -4 r8]],
-        length             = 1,
-        lengthgrowth       = 1,
-        width              = 4,
-      },
-    },
-    white = {
-      air                = true,
-      class              = [[explspike]],
-      count              = 2,
-      ground             = true,
-      water              = true,
-      properties = {
-        alpha              = 1,
-        alphadecay         = 0.125,
-        alwaysvisible      = false,
-        color              = [[1,1,1]],
-        dir                = [[-2 r4, -2 r4, -2 r4]],
-        length             = 1,
-        lengthgrowth       = 1,
-        width              = 2,
-      },
-    },
-  },
-  
   ["beamweapon_muzzle_purple"] = {
     usedefaultexplosions = false,
     glow = {
@@ -1174,6 +1139,56 @@ return {
       },
     },
   },
- 
 }
 
+-- CEG cloning
+local colors = {
+  beamweapon_hit_green = {
+    source = "beamweapon_hit_yellow",
+    data = {
+      groundflash = {color = {0.5, 1, 0} },
+      pikes = {
+	properties = {explosionGenerator = "BEAMWEAPON_MUZZLE_GREEN"},
+      },
+      sparks = {
+	properties = {colormap = "0 1 0.2 0.01   0.01 0.01 0.005 0.01"},
+      },
+    },
+  },
+  beamweapon_hit_turquoise = {
+    source = "beamweapon_hit_yellow",
+    data = {
+      groundflash = {color = {0, 1, 0.7} },
+      pikes = {
+	properties = {explosionGenerator = "BEAMWEAPON_MUZZLE_TURQUOISE"},
+      },
+      sparks = {
+	properties = {colormap = "0.2 1 0.8 0.01   0.01 0.01 0.005 0.01"},
+      },
+    },
+  },
+  beamweapon_muzzle_green = {
+    source = "beamweapon_muzzle_blue",
+    data = {
+      glow = {
+	properties = {color = "0, 1, 0",},
+      },
+    },
+  },
+  beamweapon_muzzle_turquoise = {
+    source = "beamweapon_muzzle_blue",
+    data = {
+      glow = {
+	properties = {color = "0, 0.8, 0.6",},
+      },
+    },
+  },
+}
+
+for color, info in pairs(colors) do
+  local tab = Spring.Utilities.CopyTable(info.data, true)
+  Spring.Utilities.MergeTable(tab, cegs[info.source], true)
+  cegs[color] = tab
+end
+
+return cegs

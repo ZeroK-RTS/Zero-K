@@ -198,6 +198,10 @@ upgrades = {
 							--v.rgbcolor = [[0.1 0.65 0.9]]
 							--v.explosiongenerator = [[custom:BURNTEAL]]
 						end
+						if i == "commweapon_shotgun_green" or i == "commweapon_heavymachinegun_lime" then
+							v.rgbcolor = "0 1 0.7"
+							v.explosiongenerator = [[custom:BEAMWEAPON_HIT_TURQUOISE]]
+						end
 					end
 				end
 			end,	
