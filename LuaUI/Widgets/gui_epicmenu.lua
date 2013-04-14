@@ -1811,7 +1811,7 @@ local function MakeMenuBar()
 			
 			Button:New{
 				caption = "Exit game", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, },
-				tooltip = "Kill Spring.exe",
+				tooltip = "Leave game completely.",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2,  
