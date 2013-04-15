@@ -5,8 +5,8 @@ function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.113 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
-    author    = "CarRepairer",
-    date      = "2011-03-16", --2013-March-19 (msafwan)
+    author    = "CarRepairer, msafwan",
+    date      = "2011-03-16", --2013-April-15
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -309,6 +309,7 @@ options = {
 		desc = "Follow speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
 		type = 'number',
 		min = 1, max = 14, step = 1,
+		mid = ((14-1)/2) + 1,
 		value = 1,
 		path = cameraFollowPath,
 	},	
@@ -317,6 +318,7 @@ options = {
 		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest if auto-zoom is enabled (faster tracking will prevent auto-zoom from zooming out too far)",
 		type = 'number',
 		min = 2, max = 15, step = 1,
+		mid = ((15-2)/2) + 2,
 		value = 15,
 		path = cameraFollowPath,
 	},
@@ -1137,7 +1139,7 @@ function widget:Update(dt)
 
 	--//HANDLE TRACK UNIT
 	local isTrackingUnit
-	trackcycle = trackcycle %(4) + 1 --automatically reset "trackcycle" value to Zero (0) every 4th iteration. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
+	trackcycle = trackcycle %(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
 	if (trackcycle == 1 and --update trackmode every 4th iteration
 		trackmode and 
 		not thirdperson_trackunit and
@@ -1164,7 +1166,7 @@ function widget:Update(dt)
 	end
 	
 	--//HANDLE TRACK CURSOR
-	camcycle = camcycle %(8) + 1 --automatically reset value to Zero (0) every 8th iteration. NOTE: a reset value a multiple of trackcycle's reset is good to prevent conflict 
+	camcycle = camcycle %(12) + 1 --automatically reset value to Zero (0) every 8th iteration. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
 	if (camcycle == 1 and --update track cursor every 8th iteration
 		not isTrackingUnit and --if currently not tracking unit, and
 		not thirdperson_trackunit and
@@ -1181,10 +1183,10 @@ function widget:Update(dt)
 					local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 					local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
 					if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-						local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+						local fastSpeed = (options.followmaxscrollspeed.mid - options.followmaxscrollspeed.value)+options.followmaxscrollspeed.mid --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 						spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
 					else --if cursor within screen: do
-						local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+						local slowSpeed = (options.followminscrollspeed.mid - options.followminscrollspeed.value)+options.followminscrollspeed.mid --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 						spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
 					end
 				end

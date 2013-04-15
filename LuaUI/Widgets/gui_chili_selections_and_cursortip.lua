@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.076 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.077 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --27 March 2013 Msafwan
+    date      = "2009-06-02", --15 April 2013 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -727,8 +727,7 @@ end
 local function MakeUnitGroupSelectionToolTip()
 	window_corner:ClearChildren();
 	
-	--Idea Note: a suggestion is to add scrollpanel as parent to barGrid (like playerlist)
-	--but IMO selection bar is a reflex UI and thus only need only visible element and not hidden rows. 
+	--IDEA: add scrollpanel as parent to barGrid (like playerlist)? but IMO selection bar is a reflex UI and thus only need only visible element and not hidden rows. 
 	local barGrid = LayoutPanel:New{
 		name     = 'Bars';
 		resizeItems = false;
@@ -755,7 +754,27 @@ local function MakeUnitGroupSelectionToolTip()
 		WriteGroupInfo()
 	--end
 
-	if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
+	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
+	do --add a button that allow you to change alwaysgroup value on the interface directly
+		local gi_groupingbutton = Button:New{
+			parent = window_corner;
+			bottom= 1,
+			right = 110,
+			minHeight = 30,
+			width = 30,
+			backgroundColor = {0,0,0,0.1},
+			fontSize = 12,
+			caption = pictureWithinCapacity and (options.groupalways.value and "[...]" or "...") or "[xxx]", 
+			OnMouseUp = {pictureWithinCapacity and function(self) 
+				options.groupalways.value = not options.groupalways.value
+				local selUnits = spGetSelectedUnits()
+				widget:SelectionChanged(selUnits) --this will recreate all buttons
+				end or function() end},
+			textColor = {1,1,1,0.75}, 
+			tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit group based on type" or "Unit not grouped") or "Bar is full, unit group based on type",
+		}
+	end
+	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
 			local unitid = selectedUnits[i]
 			local defid  = spGetUnitDefID(unitid)
@@ -2424,7 +2443,7 @@ function widget:SelectionChanged(newSelection)
 	else
 		stt_unitID = nil
 		window_corner:ClearChildren()
-        screen0:RemoveChild(real_window_corner)
+		screen0:RemoveChild(real_window_corner)
 	end
 end
 --------------------------------------------------------------------------------
