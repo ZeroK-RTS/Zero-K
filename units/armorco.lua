@@ -156,7 +156,11 @@ unitDef = {
         planes  = 22.5,
         subs    = 1.125,
       },
-
+      
+      customParams = {
+        single_hit = true,
+      },
+      
       explosionGenerator      = [[custom:flash_teal7]],
       fireStarter             = 100,
       impactOnly              = true,

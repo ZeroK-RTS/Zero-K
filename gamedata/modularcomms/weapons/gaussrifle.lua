@@ -13,6 +13,7 @@ local weaponDef = {
 	customParams			= {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:flashmuzzle1]],
+		single_hit = true,
 	},
 	
     damage                  = {
