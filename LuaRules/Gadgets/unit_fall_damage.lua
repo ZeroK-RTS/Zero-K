@@ -18,6 +18,18 @@ if (not gadgetHandler:IsSyncedCode()) then
     return
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- CONFIG
+local NeedWaitWait = {
+	[UnitDefNames["chicken"].id] = true,
+}
+
+local NoDamageToSelf = {
+	[UnitDefNames["chicken"].id] = true,
+}
+
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -81,6 +93,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		if unitCollide[damage] then
 			local data = unitCollide[damage]
+			if NoDamageToSelf[unitDefID] and NoDamageToSelf[data.unitDefID] then
+				return 0
+			end
 			local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 			if data.certainDamage or math.sqrt(vx^2 + vy^2 + vz^2) > UNIT_UNIT_SPEED then
 				local speed = math.sqrt((vx - data.vx)^2 + (vy - data.vy)^2 + (vz - data.vz)^2)
@@ -125,6 +140,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		Spring.SetUnitVelocity(unitID,vx,vy,vz)
 		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)
 	
+		if NeedWaitWait[unitDefID] then
+			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+		end
+		
 		return speedToDamage(unitID, unitDefID, damgeSpeed) + outsideMapDamage(unitID, unitDefID)
 	end
 	return damage
