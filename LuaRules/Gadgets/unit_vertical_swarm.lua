@@ -24,8 +24,8 @@ end
 
 local CHECK_FREQUENCY = 200 -- How often a single chicken is checked in frames
 local RADIUS = 70 -- The checking radius
-local NEAR_REQ = 7 -- How many units have to be in range to swarm (ALL UNITS with the same teamID)
-local SNAP_HEIGHT = 50 -- How far up a chicken is placed
+local NEAR_REQ = 8 -- How many units have to be in range to swarm (ALL UNITS with the same teamID)
+local SNAP_HEIGHT = 40 -- How far up a chicken is placed
 local HORIZONTAL_IMPULSE = 2 -- Impulse applied after snap
 local VERTICAL_IMPULSE = 1.2 -- Impulse applied after snap
 
