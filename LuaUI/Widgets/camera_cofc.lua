@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.113 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.114 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-April-15
     license   = "GNU GPL, v2 or later",
@@ -21,7 +21,7 @@ include("keysym.h.lua")
 
 local init = true
 local trackmode = false --before options
-local thirdperson_trackunit = false 
+local thirdperson_trackunit = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1132,15 +1132,20 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Update(dt)
-
-    if hideCursor then
+	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
+    
+	if hideCursor then
         spSetMouseCursor('%none%')
     end
 
 	--//HANDLE TRACK UNIT
 	local isTrackingUnit
-	trackcycle = trackcycle %(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
-	if (trackcycle == 1 and --update trackmode every 4th iteration
+	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
+	trackcycle = trackcycle + framePassed 
+	if trackcycle >=6 then 
+		trackcycle = 0 --reset value to Zero (0) every 6th frame. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
+	end
+	if (trackcycle == 0 and
 		trackmode and 
 		not thirdperson_trackunit and
 		(not rotate)) then --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
@@ -1166,8 +1171,12 @@ function widget:Update(dt)
 	end
 	
 	--//HANDLE TRACK CURSOR
-	camcycle = camcycle %(12) + 1 --automatically reset value to Zero (0) every 8th iteration. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
-	if (camcycle == 1 and --update track cursor every 8th iteration
+	--camcycle = camcycle%(12) + 1  --automatically reset "camcycle" value to Zero (0) every 12th iteration.
+	camcycle = camcycle + framePassed 
+	if camcycle >=12 then
+		camcycle = 0 --reset value to Zero (0) every 12th frame. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
+	end
+	if (camcycle == 0 and
 		not isTrackingUnit and --if currently not tracking unit, and
 		not thirdperson_trackunit and
 		options.follow.value) then --if follow selected player's cursor: do
@@ -1194,9 +1203,13 @@ function widget:Update(dt)
 		end
 	end
 	
-	cycle = cycle %(32*15) + 1
+	--cycle = cycle%(32*15) + framePassed --automatically reset "cycle" value to Zero (0) every 32*15th iteration.
+	cycle = cycle + framePassed
+	if cycle >=32*15 then
+		cycle = 0 --reset value to Zero (0) every 32*15th frame.
+	end	
 	-- Periodic warning
-	if cycle == 1 then
+	if cycle == 0 then
 		PeriodicWarning()
 	end
 	
