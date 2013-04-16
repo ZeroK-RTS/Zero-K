@@ -115,7 +115,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 100,
+        default        = 98,
       },
 
       explosionGenerator      = [[custom:flash2purple]],

@@ -26,6 +26,7 @@ unitDef = {
 
   buildPic                      = [[factoryplane.png]],
   buildTime                     = 600,
+  canAttack                     = true,
   canMove                       = true,
   canPatrol                     = true,
   canstop                       = [[1]],
