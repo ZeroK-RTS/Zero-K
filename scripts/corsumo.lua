@@ -51,6 +51,8 @@ local rb_ankle = piece "rb_ankle"
 local rb_pump = piece "rb_pump"
 local rb_foot = piece "rb_foot"
 
+local emit = piece "emit"
+
 smokePiece = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
 
 local weaponPieces = {
@@ -327,14 +329,14 @@ end
 
 
 function endJump()
-	Move( b_dome, x_axis, 22)
-	Move( b_dome, y_axis, -30)
-	Move( b_dome, z_axis, 12)
+	--Move( b_dome, x_axis, 22)
+	--Move( b_dome, y_axis, -30)
+	--Move( b_dome, z_axis, 12)
 	
-	EmitSfx( b_dome, crater )
-	Move( b_dome, x_axis, 0)
-	Move( b_dome, y_axis, 0)
-	Move( b_dome, z_axis, 0)
+	EmitSfx( emit, crater )
+	--Move( b_dome, x_axis, 0)
+	--Move( b_dome, y_axis, 0)
+	--Move( b_dome, z_axis, 0)
 	
 	EmitSfx( rf_foot, dirtfling )
 	EmitSfx( lf_foot, dirtfling )
