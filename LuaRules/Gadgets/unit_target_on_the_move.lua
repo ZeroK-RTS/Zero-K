@@ -145,7 +145,7 @@ end
 -- Unit adding/removal
 
 local function addUnit(unitID, data)
-    if spValidUnitID(unitID) then
+	if spValidUnitID(unitID) then
         spSetUnitTarget(unitID,deadUnitID)
         if setTarget(data) then
             if unitById[unitID] then
@@ -267,7 +267,7 @@ end
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
     if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
-        if validUnits[unitDefID] then
+		if validUnits[unitDefID] then
             if #cmdParams == 6 then
 				local team = Spring.GetUnitTeam(unitID)
 				
@@ -297,6 +297,16 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					return Spring.GetUnitsInRectangle(left,top,right,bot) end)
 				
 				setTargetClosestFromList(unitID, unitDefID, team, units)
+				
+			elseif #cmdParams == 3 or (#cmdParams == 4 and cmdParams[4] == 0) then
+                addUnit(unitID, {
+                    id = unitID, 
+                    x = cmdParams[1], 
+                    y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
+                    z = cmdParams[3], 
+                    allyTeam = spGetUnitAllyTeam(unitID), 
+                    range = UnitDefs[unitDefID].maxWeaponRange
+                })
 			
 			elseif #cmdParams == 4 then
 			
@@ -312,15 +322,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					
 				setTargetClosestFromList(unitID, unitDefID, team, units)
 				
-			elseif #cmdParams == 3 then
-                addUnit(unitID, {
-                    id = unitID, 
-                    x = cmdParams[1], 
-                    y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
-                    z = cmdParams[3], 
-                    allyTeam = spGetUnitAllyTeam(unitID), 
-                    range = UnitDefs[unitDefID].maxWeaponRange
-                })
             elseif #cmdParams == 1 then
                 local targetUnitDef = spGetUnitDefID(cmdParams[1])
 				local tud = targetUnitDef and UnitDefs[targetUnitDef]
