@@ -60,6 +60,7 @@ unitDef = {
   showNanoSpray                 = false,
   side                          = [[ARM]],
   sightDistance                 = 273,
+  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,

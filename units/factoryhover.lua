@@ -20,6 +20,7 @@ unitDef = {
 
   buildPic         = [[factoryhover.png]],
   buildTime        = 600,
+  canAttack        = true,
   canMove          = true,
   canPatrol        = true,
   canstop          = [[1]],
@@ -62,6 +63,7 @@ unitDef = {
   side             = [[ARM]],
   sightDistance    = 273,
   smoothAnim       = true,
+  TEDClass         = [[PLANT]],
   turnRate         = 0,
   waterline        = 1,
   workerTime       = 10,
