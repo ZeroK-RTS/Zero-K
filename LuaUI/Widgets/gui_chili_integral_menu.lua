@@ -783,7 +783,7 @@ local function ManageBuildRow()
 					fontSize = 16;
 					fontShadow = true;
 				}
-				buttonArray.label:SetCaption(caption)	-- workaround for vanishing text
+				buttonArray.label:SetCaption(caption)	-- do it here as workaround for vanishing text
 			end
 			
 			if i == 1 then
