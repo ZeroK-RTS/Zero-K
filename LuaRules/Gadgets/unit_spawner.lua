@@ -974,6 +974,7 @@ local function MorphQueen()
 	local xp = Spring.GetUnitExperience(tempID)
 	local heading = Spring.GetUnitHeading(tempID)
 	local cmdQueue = spGetUnitCommands(tempID)
+	local queenOwner = spGetUnitTeam(tempID)
 	
 	if (paralyzeDamage or 0) >= (oldHealth or 0) then	-- postpone morph
 		morphFrame = morphFrame + 60
@@ -984,9 +985,9 @@ local function MorphQueen()
 	queenID = nil
 	Spring.DestroyUnit(tempID, false, true)
 	if morphed == true then
-		queenID = spCreateUnit(queenName, x, y, z, "n", chickenTeamID)
+		queenID = spCreateUnit(queenName, x, y, z, "n", queenOwner)
 	else
-		queenID = spCreateUnit(queenMorphName, x, y, z, "n", chickenTeamID)
+		queenID = spCreateUnit(queenMorphName, x, y, z, "n", queenOwner)
 	end
 	morphed = not morphed
 	SetMorphFrame()
