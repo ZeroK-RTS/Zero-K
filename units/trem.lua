@@ -93,6 +93,7 @@ unitDef = {
       accuracy                = 1400,
       areaOfEffect            = 160,
 	  avoidFeature            = false,
+	  avoidGround             = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 	  

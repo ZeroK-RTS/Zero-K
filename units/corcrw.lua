@@ -124,6 +124,7 @@ unitDef = {
       name                    = [[Laserbeam]],
       areaOfEffect            = 8,
       avoidFeature            = false,
+      canattackground         = true,
       collideFriendly         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
