@@ -160,7 +160,7 @@ do
       for i, weapon in pairs(ud.weapons) do
 		--Spring.Echo(ud.name)
         local wd = WeaponDefs[weapon.name:lower()]
-        if ((not wd.weapontype == "Shield") and 
+        if ((not (wd.weapontype == "Shield")) and 
             (not wd.interceptor)) then
           return true
         end
