@@ -252,7 +252,7 @@ for name, ud in pairs(UnitDefs) do
 	local hasShield = false
 	if ud.weapondefs then
 		for _, wd in pairs(ud.weapondefs) do      
-			if wd.isshield then
+			if wd.weapontype == "Shield" then
 				hasShield = true
 				break
 			end

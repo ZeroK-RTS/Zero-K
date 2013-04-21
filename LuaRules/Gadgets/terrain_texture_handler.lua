@@ -211,6 +211,7 @@ function gadget:DrawWorld()
 				local tex = texturePool[block.tex]
 				local sx = floor(x/SQUARE_SIZE)
 				local sz = floor(z/SQUARE_SIZE)
+
 				if not mapTex[sx] then
 					mapTex[sx] = {}
 				end
@@ -321,7 +322,6 @@ end
 
 
 function gadget:Initialize()
-	
 	gadgetHandler:AddSyncAction("changeBlockList", changeBlockList)
 	gadgetHandler:AddSyncAction("Shutdown", Shutdown)
 
