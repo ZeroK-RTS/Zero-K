@@ -70,7 +70,7 @@ function AddShot(shotID, unitID, target, damage)
   --Echo("Added shot", shotID, unitID, target, damage)
   if target ~= nil then
     shot[shotID] = {id = shotID, owner = unitID, target = target, damage = damage}
-	if airtargets[target] ~= target then
+	if airtargets[target] ~= nil then
 	  airtargets[target].incoming[shotID] = shotID
 	  airtargets[target].receivingdamage = airtargets[target].receivingdamage + damage
 	end
@@ -80,8 +80,10 @@ end
 function RemoveShot(shotID)
   --Echo("Removed shot", shotID)
   local target = shot[shotID].target
-  airtargets[target].incoming[shotID] = nil
-  airtargets[target].receivingdamage = airtargets[target].receivingdamage - shot[shotID].damage
+  if airtargets[target] ~= nil then
+    airtargets[target].incoming[shotID] = nil
+    airtargets[target].receivingdamage = airtargets[target].receivingdamage - shot[shotID].damage
+  end
   shot[shotID] = nil
 end
 
