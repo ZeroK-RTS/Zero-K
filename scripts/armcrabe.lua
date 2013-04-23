@@ -107,6 +107,8 @@ end
 local function Curl()
 	if nocurl then return end
 	--Spring.Echo("Initiating curl")
+	
+	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
 	Sleep(100)
@@ -251,7 +253,6 @@ end
 function script.StopMoving()
 	--Spring.Echo("Stopped moving")
 	bMoving = false
-	Signal(SIG_MOVE)
 	StartThread(Curl)
 end
 

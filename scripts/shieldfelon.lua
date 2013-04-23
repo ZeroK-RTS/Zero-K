@@ -58,6 +58,7 @@ local bAiming = false
 -- functions
 --------------------------------------------------------------------------------
 local function Walk()
+	Signal( SIG_WALK )
 	SetSignalMask( SIG_WALK )
     
 	while ( true ) do
@@ -114,6 +115,9 @@ local function Walk()
 end
 
 local function StopWalk()
+	Signal( SIG_WALK )
+	SetSignalMask( SIG_WALK )
+	
 	Move(pelvis, y_axis, 0, 8)
 	
 	Turn( l_thigh, x_axis, 0, 2 )
@@ -130,7 +134,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( SIG_WALK )
 	StartThread( StopWalk )
 end
 

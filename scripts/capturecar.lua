@@ -56,6 +56,7 @@ end
 local function AnimControl() 
 	Signal(SIG_ANIM)
 	SetSignalMask(SIG_ANIM)
+	
 	local lastHeading, currHeading, diffHeading, pivotAngle
 	lastHeading = GetUnitValue(COB.HEADING)
 	while true do
@@ -185,12 +186,10 @@ function script.Deactivate()
 	Turn( arm_1 , x_axis, 0, DEPLOY_SPEED )
 end
 
-function script.StartMoving() 
-	StartThread(AnimControl)
-end
-
-function script.StopMoving() 
+local function Stopping()
 	Signal(SIG_ANIM)
+	SetSignalMask(SIG_ANIM)
+	
 	StopSpin(bigwheel, x_axis, WHEEL_SPIN_DECEL_L)
 	for i=1,#wheels_s do
 		StopSpin(wheels_s[i], x_axis, WHEEL_SPIN_DECEL_M)
@@ -198,6 +197,14 @@ function script.StopMoving()
 	for i=1,#wheels_m do
 		StopSpin(wheels_m[i], x_axis, WHEEL_SPIN_DECEL_M)
 	end
+end
+
+function script.StartMoving() 
+	StartThread(AnimControl)
+end
+
+function script.StopMoving() 
+	StartThread(Stopping)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -88,6 +88,7 @@ local walk = 2
 local SIG_Aim = { [2] = 4, [3] = 8 }
 
 local function Walk()
+	Signal( walk )
 	SetSignalMask( walk )
 	
 	Turn( lf_pump, x_axis, -p_angle, 1.4 )
@@ -356,13 +357,10 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
-function script.StartMoving()
-	StartThread( Walk )
-end
-
-function script.StopMoving()
+local function Stopping()
 	Signal( walk )
-	--StartThread( RAD )
+	SetSignalMask( walk )
+	
 	Move( t_dome, y_axis, 0, 10 )
 	Move( b_dome, y_axis, 0, 20 )
 
@@ -402,6 +400,15 @@ function script.StopMoving()
 	Turn( rf_foot, x_axis, 0, sp1 )
 	Turn( lb_foot, x_axis, 0, sp1 )
 	Turn( rb_foot, x_axis, 0, sp1 )
+end
+
+function script.StartMoving()
+	StartThread( Walk )
+end
+
+function script.StopMoving()
+	--StartThread( RAD )
+	StartThread(Stopping)
 end
 
 function script.QueryWeapon(num) 

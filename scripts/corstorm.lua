@@ -127,6 +127,7 @@ end
 local function stopWalk()
 	Signal( SIG_MOVE)
 	SetSignalMask( SIG_MOVE)
+	
 	--move all the pieces to their original spots
 	Turn( r_thigh , x_axis, math.rad(18), math.rad(200) )
 	Turn( r_leg , x_axis, math.rad(30), math.rad(200) )

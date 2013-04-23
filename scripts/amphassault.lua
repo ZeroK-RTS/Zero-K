@@ -252,12 +252,9 @@ local function Walk()
 	end
 end
 
-function script.StartMoving()
-	StartThread(Walk)
-end
-
-function script.StopMoving()
+local function Stopping()
 	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
 	
 	Turn( rfleg, x_axis, math.rad(0),math.rad(60))
 	Turn( rffoot, x_axis, math.rad(0),math.rad(60))
@@ -276,7 +273,14 @@ function script.StopMoving()
 	
 	Move( lfleg, y_axis, 0,1)
 	Move( lbleg, y_axis, 0,1)
-	
+end
+
+function script.StartMoving()
+	StartThread(Walk)
+end
+
+function script.StopMoving()
+	StartThread(Stopping)
 	GG.Floating_StopMoving(unitID)
 end
 

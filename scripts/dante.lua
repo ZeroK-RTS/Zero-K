@@ -269,15 +269,21 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
+local function Stopping()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
+	RestorePose()
+	StartThread(IdleAnim)
+end
+
 function script.StartMoving()
 	StartThread(Walk)
 	Signal(SIG_IDLE)
 end
 
 function script.StopMoving()
-	Signal(SIG_WALK)
-	RestorePose()
-	StartThread(IdleAnim)
+	StartThread(Stopping)
 end
 
 function script.AimFromWeapon(num)

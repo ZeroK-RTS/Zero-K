@@ -177,6 +177,7 @@ end
 
 local function StopWalk()
 	Signal(SIG_Move)
+	SetSignalMask(SIG_Move)
 	Turn( rightThigh , x_axis, 0, math.rad(160) )
 	Turn( rightKnee , x_axis, 0, math.rad(145) )
 	Turn( rightShin , x_axis, 0, math.rad(250) )

@@ -27,7 +27,6 @@ local PACE = 1.4
 
 local SIG_Walk = 1
 local SIG_Aim = 2
-local SIG_Walk = 4
 
 --constants
 local PI = math.pi
@@ -63,6 +62,7 @@ local function RestoreAfterDelay()
 end
 
 local function Walk()
+	Signal(SIG_Walk)
 	SetSignalMask( SIG_Walk )
 	while ( true ) do
 
@@ -108,40 +108,39 @@ local function Walk()
 	end
 end
 
-	local function StopWalk()
-        Move( base, y_axis,  0, 4*up )	
-     	Turn( lfrontleg, y_axis, 0 )   	-- right front forward
-		Turn( lfrontleg, z_axis, 0, up )
-		Turn( lfrontleg1, z_axis, 0, up )
-		
-		Turn( laftleg, y_axis, 0 ) 	-- right back backward
-		Turn( laftleg, z_axis, 0, up )
-		Turn( laftleg1, z_axis, 0, up )
-		
-		Turn( rfrontleg, y_axis, 0 ) 	-- left front backward
-		Turn( rfrontleg, z_axis, 0, up ) 
-		Turn( rfrontleg1, z_axis, 0, up )
-		
-		Turn( raftleg, y_axis, 0 ) 	-- left back forward
-		Turn( raftleg, z_axis, 0, up ) 
-		Turn( raftleg1, z_axis, 0, up )
+local function StopWalk()
+	Signal(SIG_Walk)
+	SetSignalMask( SIG_Walk )
+	Move( base, y_axis,  0, 4*up )	
+	Turn( lfrontleg, y_axis, 0 )   	-- right front forward
+	Turn( lfrontleg, z_axis, 0, up )
+	Turn( lfrontleg1, z_axis, 0, up )
+	
+	Turn( laftleg, y_axis, 0 ) 	-- right back backward
+	Turn( laftleg, z_axis, 0, up )
+	Turn( laftleg1, z_axis, 0, up )
+	
+	Turn( rfrontleg, y_axis, 0 ) 	-- left front backward
+	Turn( rfrontleg, z_axis, 0, up ) 
+	Turn( rfrontleg1, z_axis, 0, up )
+	
+	Turn( raftleg, y_axis, 0 ) 	-- left back forward
+	Turn( raftleg, z_axis, 0, up ) 
+	Turn( raftleg1, z_axis, 0, up )
 
 
-		Turn( lfrontleg, y_axis, math.rad(45), forward ) 
-		Turn( rfrontleg, y_axis, math.rad(-45), forward ) 
-		Turn( laftleg, y_axis, math.rad(-45), forward ) 
-		Turn( raftleg, y_axis, math.rad(45), forward ) 
+	Turn( lfrontleg, y_axis, math.rad(45), forward ) 
+	Turn( rfrontleg, y_axis, math.rad(-45), forward ) 
+	Turn( laftleg, y_axis, math.rad(-45), forward ) 
+	Turn( raftleg, y_axis, math.rad(45), forward ) 
 
-		end
+end
 
 function script.StartMoving()
-	--SetSignalMask( walk )
 	StartThread( Walk )
 end
 
 function script.StopMoving()
-	Signal( SIG_Walk )
-	--SetSignalMask( SIG_Walk )
 	StartThread( StopWalk )
 end	
 	

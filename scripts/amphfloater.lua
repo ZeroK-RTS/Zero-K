@@ -168,8 +168,10 @@ local function Unpack()
     bUnpacked = true
 end
 
-function script.StopMoving()
+local function Stopping()
 	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
 	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
 	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
 	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
@@ -183,6 +185,10 @@ function script.StopMoving()
 	GG.Floating_StopMoving(unitID)
 	
 	StartThread(Unpack)
+end
+
+function script.StopMoving()
+	StartThread(Stopping)
 end
 
 function script.Create()

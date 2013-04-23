@@ -117,7 +117,16 @@ local function IdleAnim()
 	end
 end
 	
-
+local function Stopping()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
+	Turn(thighl, x_axis, 0, math.rad(60*PACE))
+	Turn(shinl, x_axis, 0, math.rad(60*PACE))
+	Turn(thighr, x_axis, 0, math.rad(60*PACE))
+	Turn(shinr, x_axis, 0, math.rad(60*PACE))	
+	StartThread(IdleAnim)	
+end
 
 function script.StartMoving()
 	StartThread(Walk)
@@ -125,12 +134,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal(SIG_WALK)
-	Turn(thighl, x_axis, 0, math.rad(60*PACE))
-	Turn(shinl, x_axis, 0, math.rad(60*PACE))
-	Turn(thighr, x_axis, 0, math.rad(60*PACE))
-	Turn(shinr, x_axis, 0, math.rad(60*PACE))	
-	StartThread(IdleAnim)	
+	StartThread(Stopping)
 end
 
 ----------------------------------------------------

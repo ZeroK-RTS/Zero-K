@@ -95,6 +95,9 @@ local function Walk()
 end
 
 local function ResetLegs()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+
 	Turn(lfleg, x_axis, 0, math.rad(80))
 	Turn(lffoot, x_axis, 0, math.rad(80))
 	Turn(rfleg, x_axis, 0, math.rad(80))
@@ -148,8 +151,7 @@ end
 
 function script.StopMoving()
 	--Spring.Echo("Stopped moving")
-	Signal(SIG_WALK)
-	ResetLegs()
+	StartThread(ResetLegs)
 end
 
 local function RestoreAfterDelay()

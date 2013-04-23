@@ -46,7 +46,13 @@ local aim = 1
 local cloaked = COB.CLOAKED
 local stealth = COB.STEALTH
 
+--signals
+local SIG_Walk = 2
+
 local function Burrow()
+	Signal( SIG_Walk )
+	SetSignalMask( SIG_Walk )
+	
 	burrowed = true
 	EmitSfx( digger, dirtfling )
 	
@@ -146,10 +152,17 @@ function script.Create()
 	
 end
 
-function script.StartMoving()
+local function Moving()
+	Signal( SIG_Walk )
+	SetSignalMask( SIG_Walk )
+	
 	StartThread( UnBurrow )
 	walking = true
 	StartThread( Walk )
+end
+
+function script.StartMoving()
+	StartThread( Moving )
 	--StartThread( Talk )
 end
 

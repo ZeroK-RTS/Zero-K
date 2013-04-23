@@ -66,12 +66,10 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
-function script.StartMoving()
-	StartThread(Walk)
-end
-
-function script.StopMoving()
+local function Stopping()
 	Signal( SIG_WALK )
+	SetSignalMask( SIG_WALK )
+	
 	Move( leftLeg.leg, z_axis, 0, 2)
 	Move( rightLeg.leg, z_axis, 0, 2)
 	Turn( leftLeg.blever , x_axis, 0, math.rad(45))
@@ -82,6 +80,14 @@ function script.StopMoving()
 	Turn( rightLeg.foot , x_axis, 0, math.rad(45))
 	Turn( rightLeg.flever , x_axis, 0, math.rad(45))
 	Turn( rightLeg.heeltoe , x_axis, 0, math.rad(45))
+end
+
+function script.StartMoving()
+	StartThread(Walk)
+end
+
+function script.StopMoving()
+	StartThread(Stopping)
 end
 
 local function RestoreAfterDelay()
