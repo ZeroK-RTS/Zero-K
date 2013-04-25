@@ -257,6 +257,8 @@ path='Settings/Interface/Selection'
 		ShButton('Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected and hovered-over units")	
 	path='Settings/Interface/Selection/Team Platters'
 		ShButton('Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
+	path='Settings/Interface/Selection/Blurry Halo Selections'
+		ShButton('Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Puts team-coloured disk below units")
 path='Settings/Interface/Command Visibility'
   ShButton('Toggle Show all Commands', function() spSendCommands{"luaui togglewidget Show All Commands"} end, "Shows all unit commands")
 
@@ -323,7 +325,7 @@ path='Settings/Graphics'
 			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
 		end, 
 	} )
-	ShButton('Enable Terrain Shadows',
+	ShButton('Toggle Terrain Shadows',
 		function()
 			local curShadow=Spring.GetConfigInt("Shadows") or 0
 			if curShadow == 0 then
