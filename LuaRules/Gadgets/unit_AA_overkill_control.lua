@@ -123,7 +123,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
-  Echo("AA anti-bait Gadget Enabled")
+  Echo("AA overkill control Gadget Enabled")
   for _, unitID in pairs(Spring.GetAllUnits()) do
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	gadget:UnitCreated(unitID, unitDefID)
