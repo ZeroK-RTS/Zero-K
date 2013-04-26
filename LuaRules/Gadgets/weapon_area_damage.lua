@@ -18,6 +18,11 @@ local frameNum
 local explosionList = {}
 local DAMAGE_PERIOD ,weaponInfo = include("LuaRules/Configs/area_damage_defs.lua")
 
+--misc
+local rowCount = 0 --remember the lenght of explosionList table
+local emptyRow = {count=0} --remember empty position in explosionList table.
+--
+
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
 	if (weaponInfo[weaponID]) then
 		local w = {
@@ -30,7 +35,15 @@ function gadget:Explosion(weaponID, px, py, pz, ownerID)
 			pos = {x = px, y = py, z = pz},
 			owner=ownerID,
 		}
-		table.insert(explosionList,w)
+		if emptyRow.count > 0 then
+			local emptyPos = emptyRow[emptyRow.count]
+			emptyRow.count = emptyRow.count-1
+			emptyRow[emptyPos] = nil
+			explosionList[emptyPos] = w --insert new data at empty position in explosionList table
+		else
+			rowCount = rowCount + 1
+			explosionList[rowCount] = w --insert new data at a new position at end of explosionList table
+		end
 	end
 	return false
 end
@@ -41,14 +54,15 @@ function gadget:GameFrame(f)
 	frameNum=f
 	if (f%DAMAGE_PERIOD == 0) then
 		for i,w in pairs(explosionList) do
-			local ulist = Spring.GetUnitsInSphere(w.pos.x, w.pos.y, w.pos.z, w.radius)
+			local pos = w.pos
+			local ulist = Spring.GetUnitsInSphere(pos.x, pos.y, pos.z, w.radius)
 			if (ulist) then
 				for j=1, #ulist do
 					local u = ulist[j]
 					local ux, uy, uz = Spring.GetUnitPosition(u)
 					local damage = w.damage
 					if w.rangeFall ~= 0 then
-						damage = damage - damage*w.rangeFall*math.sqrt((ux-w.pos.x)^2 + (uy-w.pos.y)^2 + (uz-w.pos.z)^2)/w.radius
+						damage = damage - damage*w.rangeFall*math.sqrt((ux-pos.x)^2 + (uy-pos.y)^2 + (uz-pos.z)^2)/w.radius
 					end
 					Spring.AddUnitDamage(u, damage, 0, w.owner, w.id, 0, 0, 0)
 				end
@@ -56,6 +70,8 @@ function gadget:GameFrame(f)
 			w.damage = w.damage - w.timeLoss
 			if f >= w.expiry then
 				explosionList[i] = nil
+				emptyRow.count = emptyRow.count + 1
+				emptyRow[emptyRow.count] = i --remember where is all empty position in explosionList table
 			end
 		end
 	end

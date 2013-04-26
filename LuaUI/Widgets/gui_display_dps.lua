@@ -15,9 +15,9 @@
 function widget:GetInfo()
   return {
     name      = "Display DPS",
-    desc      = "Displays damage per second done to your allies units v2.1",
+    desc      = "Displays damage per second done to your allies units v2.11",
     author    = "TheFatController",
-    date      = "May 27, 2008",
+    date      = "May 27, 2008", --24 April 2013 (colored text fix)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -135,18 +135,18 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
   if (damage < 1.5) then return end
   
   if (UnitDefs[unitDefID] == nil) then return end
-    
+
   if paralyzer then
     if unitParalyze[unitID] then
       unitParalyze[unitID].damage = (unitParalyze[unitID].damage + damage)
+	  return
     end
-    return
   elseif unitDamage[unitID] then
     unitDamage[unitID].damage = (unitDamage[unitID].damage + damage)
     return
   end
-    
-  if paralyze then 
+
+  if paralyzer then 
     unitParalyze[unitID] = {}
     unitParalyze[unitID].damage = damage
     unitParalyze[unitID].time = (lastTime + 0.1)
@@ -181,12 +181,17 @@ local function drawDeathDPS(damage,ux,uy,uz,textSize,red,alpha)
   gl.MultiTexCoord(1, 0.25 + (0.5 * alpha))
   
   if red then
-    glColor(1, 0, 0)
+    glColor(1, 0.5, 0.5)
   else
     glColor(1, 1, 1)
   end
-  
-  glText(damage, 0, 0, textSize, "cno")
+  gl.PushMatrix()
+	fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16") --Reference: modfonts.lua, and unit_comm_nametags.lua (the colored nametagg)
+	local fontDefaultSize = fontHandler.GetFontSize()
+    gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
+    fontHandler.DrawCentered(tostring(damage), 0,0)
+  gl.PopMatrix()
+  --glText(damage, 0, 0, textSize, "cno")
   
   glPopMatrix()
 end
@@ -199,12 +204,36 @@ local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
   glBillboard()
   gl.MultiTexCoord(1, 0.25 + (0.5 * alpha))
   if paralyze then
-    glColor(0, 0, 1)
-    glText(damage, 0, 0, textSize, 'cnO')
+    glColor(0.5, 0.5, 1)
+	  gl.PushMatrix()
+		fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16")
+		local fontDefaultSize = fontHandler.GetFontSize()
+		gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
+		fontHandler.DrawCentered(tostring(damage), 0,0)
+	  gl.PopMatrix()
+	--glColor(0, 0, 1)
+    --glText(damage, 0, 0, textSize, 'cnO')
   else
     glColor(1, 1, 1)
-    glText(damage, 0, 0, textSize, 'cno')
+	  gl.PushMatrix()
+		fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16")
+		local fontDefaultSize = fontHandler.GetFontSize()
+		gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
+		fontHandler.DrawCentered(tostring(damage), 0,0)
+	  gl.PopMatrix()	
+    --glText(damage, 0, 0, textSize, 'cno')
   end
+end
+
+local function DrawUnitFunc2(unitID, yshift, xshift, damage, textSize, alpha, paralyze)
+	if Spring.IsGUIHidden() then
+		return
+	end
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	glPushMatrix()
+		glTranslate(x,y,z)
+		DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
+	glPopMatrix()
 end
 
 function widget:DrawWorld()
@@ -236,8 +265,10 @@ function widget:DrawWorld()
     if (damage.lifeSpan <= 0) then 
       table.remove(damageTable,i)
     else
-      glDrawFuncAtUnit(damage.unitID, false, DrawUnitFunc, (damage.height + damage.heightOffset), 
-                       damage.offset, damage.damage, damage.textSize, damage.lifeSpan, damage.paralyze)
+      -- glDrawFuncAtUnit(damage.unitID, false, DrawUnitFunc, (damage.height + damage.heightOffset), 
+                       -- damage.offset, damage.damage, damage.textSize, damage.lifeSpan, damage.paralyze) --draw on unit
+	  DrawUnitFunc2(damage.unitID, (damage.height + damage.heightOffset), 
+                       damage.offset, damage.damage, damage.textSize, damage.lifeSpan, damage.paralyze) --draw on unit + on unit icon
       if not paused then
         if damage.paralyze then 
           damage.lifeSpan = (damage.lifeSpan - 0.05)

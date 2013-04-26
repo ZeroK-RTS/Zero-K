@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Widget Selector", --needs epic menu to dynamically update widget checkbox colors.
-    desc      = "v1.0 Chili Widget Selector", 
+    desc      = "v1.01 Chili Widget Selector", 
     author    = "CarRepairer",
-    date      = "2012-01-11",
+    date      = "2012-01-11", --2013-04-25 (add crude filter/search capability)
     license   = "GNU GPL, v2 or later",
     layer     = -100000,
     handler   = true,
@@ -76,6 +76,7 @@ local screen0
 
 
 local widget_categorize = true
+local filterUserInsertedTerm = "" --the term used to filter down the list of widget
 
 --------------------------------------------------------------------------------
 -- Misc
@@ -182,6 +183,7 @@ KillWidgetList = function()
 	end
 	window_widgetlist:Dispose()
 	window_widgetlist = nil
+	filterUserInsertedTerm = ""
 end
 
 -- Make widgetlist window
@@ -195,35 +197,51 @@ MakeWidgetList = function()
 
 	local widget_children = {}
 	local widgets_cats = {}
+	local listIsEmpty = true
 	
 	
 	local buttonWidth = window_w - 20
 	
-	for name,data in pairs(widgetHandler.knownWidgets) do if not data.alwaysStart then 
-		local name = name
-		local name_display = name .. (data.fromZip and ' (mod)' or '')
-		local data = data
-		local _, _, category = string.find(data.basename, "([^_]*)")
-		
-		if not groupDescs[category] then
-			category = 'ungrouped'
-		end
-		local catdesc = groupDescs[category]
-		if not widget_categorize then
-			catdesc = 'Ungrouped'
-		end
-		widgets_cats[catdesc] = widgets_cats[catdesc] or {}
+	for name,data in pairs(widgetHandler.knownWidgets) do 
+		if not data.alwaysStart then 
+			local name = name
+			local name_display = name .. (data.fromZip and ' (mod)' or '')
+			local data = data
+			local _, _, category = string.find(data.basename, "([^_]*)")
 			
-		widgets_cats[catdesc][#(widgets_cats[catdesc])+1] = 
-		{	
-			catname 		= catdesc,
-			name_display	= name_display,
-			name		 	= name,
-			active 			= data.active,
-			desc 			= data.desc,
-			author 			= data.author,
-		}
-	end 
+			local lowercase_name = name:lower()
+			local lowercase_category = category:lower()
+			local lowercase_display = name_display:lower()
+			local lowercase_desc = data.desc:lower()
+			local lowercase_author = data.author:lower()
+			if filterUserInsertedTerm == "" or 
+				lowercase_name:find(filterUserInsertedTerm) or
+				lowercase_display:find(filterUserInsertedTerm) or
+				lowercase_desc:find(filterUserInsertedTerm) or
+				lowercase_author:find(filterUserInsertedTerm) or
+				lowercase_category:find(filterUserInsertedTerm) then
+			
+				if not groupDescs[category] then
+					category = 'ungrouped'
+				end
+				local catdesc = groupDescs[category]
+				if not widget_categorize then
+					catdesc = 'Ungrouped'
+				end
+				widgets_cats[catdesc] = widgets_cats[catdesc] or {}
+					
+				widgets_cats[catdesc][#(widgets_cats[catdesc])+1] = 
+				{	
+					catname 		= catdesc,
+					name_display	= name_display,
+					name		 	= name,
+					active 			= data.active,
+					desc 			= data.desc,
+					author 			= data.author,
+				}
+				listIsEmpty = false
+			end
+		end 
 	end 
 	
 	local widgets_cats_i = {}
@@ -265,6 +283,12 @@ MakeWidgetList = function()
 			checkWidget(wdata.name) --sets color of label for this widget checkbox
 		end
 	end
+	if listIsEmpty then
+		widget_children[1] = 
+			Label:New{ caption = "- no match for \"" .. filterUserInsertedTerm .."\" -", align='center', }
+		widget_children[2] = 
+			Label:New{ caption = " ", align='center', }
+	end
 	
 	window_widgetlist = Window:New{
 		x = window_x,
@@ -273,7 +297,7 @@ MakeWidgetList = function()
 		clientHeight = window_h,
 		parent = screen0,
 		backgroundColor = color.sub_bg,
-		caption = 'Widget List (F11)',
+		caption = 'Widget List (F11)\nPress Enter to do Search',
 		minWidth = 300,
 		minHeight = 400,
 		
@@ -376,4 +400,21 @@ function widget:Shutdown()
   Spring.SendCommands({
     "bind f11  luaui selector"
   })
+end
+
+function widget:TextCommand(command)
+	if window_widgetlist and command:sub(1,7) == "search:" then
+		filterUserInsertedTerm = command:sub(8)
+		filterUserInsertedTerm = filterUserInsertedTerm:lower() --Reference: http://lua-users.org/wiki/StringLibraryTutorial
+		Spring.Echo("Widget Selector: filtering \"" .. filterUserInsertedTerm.."\"")
+		MakeWidgetList()
+		return true
+	end
+	return false
+end
+
+function widget:KeyRelease(key)
+	if window_widgetlist and key ==13 then --Note: "13" equal to "Enter". Could this be different in different keyboard?
+		Spring.SendCommands("PasteText /search:" )
+	end
 end

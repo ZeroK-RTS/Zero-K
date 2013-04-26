@@ -15,7 +15,7 @@ function widget:GetInfo()
     name      = "HealthBars",
     desc      = "Gives various informations about units in form of bars.",
     author    = "jK",
-    date      = "2009",
+    date      = "2009", --2013 April 25
     license   = "GNU GPL, v2 or later",
     layer     = -10,
     enabled   = true  --  loaded by default?
@@ -561,6 +561,7 @@ do
   function JustGetOverlayInfos(unitID,unitDefID, ud)
     
 	ux, uy, uz = GetUnitViewPosition(unitID)
+	if not ux then return end
     dx, dy, dz = ux-cx, uy-cy, uz-cz
     dist = dx*dx + dy*dy + dz*dz
 	
@@ -606,6 +607,7 @@ do
 
     fullText = true
     ux, uy, uz = GetUnitViewPosition(unitID)
+	if not ux then return end
     dx, dy, dz = ux-cx, uy-cy, uz-cz
     dist = dx*dx + dy*dy + dz*dz
     if (dist > infoDistance) then

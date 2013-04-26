@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "April 10, 2013",
+    date      = "April 24, 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -1005,7 +1005,7 @@ function CheckForUserOverride(unitID,cQueue,newCommand,commandIndexTable,command
 				cQueueParam3 = cQueue[1].params[3]
 			end
 			if (cQueueSyncTest[1].params[1]~=cQueueParam1 or cQueueSyncTest[1].params[3]~=cQueueParam3) or -- if first queue has different content (is definitive of user's NEW command)
-			(cQueueSyncTest[1]==nil) then --or, if somehow the unit queued an idle state (not sure...)
+				(cQueueSyncTest[1]==nil) then --or, if somehow the unit queued an idle state (not sure...)
 				--newCommand=true
 				--cQueue=cQueueSyncTest
 				needToCancelOrder = true --skip widget's command
@@ -1016,12 +1016,13 @@ function CheckForUserOverride(unitID,cQueue,newCommand,commandIndexTable,command
 		if needToCancelOrder then
 			commandIndexTable[unitID]=nil --empty commandIndex (command history) for this unit. CommandIndex store widget's previous command, which become irrelevant when user override the widget.
 			if (not newCommand) then --if the last command that was overriden was made by this widget:
-				local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
+				local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght. Note: no need for precaution against 0 index because this commandTTL is related to existing command queue (commandTTL entry is deleted when command queue deleted or command queue is deleted when commandTTL is refreshed in RefreshWatchdogList(). 
 				commandTTL[unitID][lastIndx]=nil --delete the last watchdog's entry for this unit. That last entry contain a timeout-info on unit's last command, but user probably has overriden that unit's last command, so its not needed.
 				commandTTL[unitID][1] = lastIndx-1 --refresh commandTTL[unitID]'s table lenght
 			end
 		end
 	else Spring.Echo("Dynamic Avoidance: cQueueSyncTest == nil!") --//under an unknown circumstances the unit's commandQueue became nil. Probably due to unit death, or when unit received invalid command (the whole queue will disappear).
+		needToCancelOrder = true
 	end
 	return needToCancelOrder, commandIndexTable, commandTTL
 end
@@ -1918,7 +1919,7 @@ function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, 
 	local angleFromTarget = math.abs(wTarget)*fTarget
 	local angleFromObstacle = math.abs(wObstacle)*fObstacleSum
 	--Spring.Echo(math.modf(angleFromObstacle))
-	local angleFromNoise = (-1)*Sgn(angleFromObstacle)*(noiseAngleG)*GaussianNoise() --(noiseAngleG)*(GaussianNoise()*2-1) --for random in negative & positive direction
+	local angleFromNoise = Sgn((-1)*angleFromObstacle)*(noiseAngleG)*GaussianNoise() --(noiseAngleG)*(GaussianNoise()*2-1) --for random in negative & positive direction
 	local unitAngleDerived= angleFromTarget + (-1)*angleFromObstacle + angleFromNoise --add attractor amplitude, add repulsive amplitude, and add noise between -ve & +ve noiseAngle. NOTE: somehow "angleFromObstacle" have incorrect sign (telling unit to turn in opposite direction)
 	if math.abs(unitAngleDerived) > maximumTurnAngleG then --to prevent excess in avoidance causing overflow in angle changes (maximum angle should be pi, but useful angle should be pi/2 eg: 90 degree)
 		--Spring.Echo("Dynamic Avoidance warning: total angle changes excess")

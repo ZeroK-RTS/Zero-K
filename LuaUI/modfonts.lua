@@ -11,6 +11,7 @@
 -- 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Update on 25/4/2013 (fix outline option)
 
 
 -- ":n:" sets it to nearest texture filtering
@@ -158,31 +159,26 @@ local function MakeOutlineDisplayLists(fontSpecs)
   local th = fontSpecs.yTexSize
 
   for _,gi in pairs(fontSpecs.glyphs) do
-    local w = gi.xmax - gi.xmin
-    local h = gi.ymax - gi.ymin
-    local txn = gi.xmin / tw
-    local tyn = gi.ymax / th
-    local txp = gi.xmax / tw
-    local typ = gi.ymin / th
+    local texa = gi.txn / tw
+    local texb = 1.0 - (gi.tyn / th)
+    local texc = gi.txp / tw
+    local texd = 1.0 - (gi.typ / th)
+    local width = gi.adv
+	local weight = fontSpecs.outlineWeight
     
     local list = glCreateList(function ()
-      glTranslate(gi.initDist, 0, 0)
+      local o = fontSpecs.outlineRadius
+	  glTranslate((gi.initDist or 0), 0, 0)
 
-      glColor(0, 0, 0, 0.75)
-      local o = 2
-      glTexRect( o,  o, w, h, txn, tyn, txp, typ)
-      glTexRect(-o,  o, w, h, txn, tyn, txp, typ)
-      glTexRect( o,  0, w, h, txn, tyn, txp, typ)
-      glTexRect(-o,  0, w, h, txn, tyn, txp, typ)
-      glTexRect( o, -o, w, h, txn, tyn, txp, typ)
-      glTexRect(-o, -o, w, h, txn, tyn, txp, typ)
-      glTexRect( 0,  o, w, h, txn, tyn, txp, typ)
-      glTexRect( 0, -o, w, h, txn, tyn, txp, typ)
+	  gl.Blending (GL.SRC_COLOR, GL.ONE_MINUS_SRC_ALPHA) --blending for color (for making black & pure color)
+	  gl.PushAttrib(GL.CURRENT_BIT) --remember user defined color. Reference:http://opengl.czweb.org/ch14/462-465.html
+		  glColor(0, 0, 0, weight/134) --set to BLACK. Note: 100/134 alpha == 0.75 alpha
+		  glTexRect(gi.oxn-o, gi.oyn-o, gi.oxp+o, gi.oyp+o, texa,texb,texc,texd)
+	  gl.PopAttrib() --restore user defined color.
+	  gl.Blending (GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA) --reset to default blending
+      glTexRect(gi.oxn, gi.oyn, gi.oxp, gi.oyp, texa,texb,texc,texd)
 
-      glColor(1, 1, 1, 1)
-      glTexRect( 0,  0, w, h, txn, tyn, txp, typ)
-
-      glTranslate(gi.width + gi.whitespace, 0, 0)
+      glTranslate(width + (gi.whitespace or 0), 0, 0)
     end)
 
     lists[gi.num] = list
