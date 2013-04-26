@@ -39,8 +39,8 @@ local GetUnitCmdDesc     = Spring.GetUnitCmdDescs
 local InsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 
 local hpthreshold        = 650 -- maxhp below which an air unit is considered bait
-local baitexceptions     = {["phoenix"] = 1} -- units which are never considered bait
-local alwaysbait         = {["corvamp"] = 1} -- units which are always considered bait
+local baitexceptions     = {["phoenix"] = {["missiletower"] = 1, ["screamer"] = 1}} -- units which are never considered bait, "name" = 1 means that tower will consider the target to be part of this category
+local alwaysbait         = {["corvamp"] = {["missiletower"] = 1, ["screamer"] = 1}} -- units which are always considered bait
 
 local AAunittypes        = {["missiletower"] = 300, ["screamer"] = 300} -- what is valid for anti-bait behaviour
 -- number is the threshold of "points" above which a turret is considered escorted if it has at least that amount within half range
@@ -78,8 +78,26 @@ function Isair(ud)
   return ud.canFly or false
 end
 
-function IsBait(unitDef)
-  return (Isair(unitDef) and ((unitDef.health < 650 and baitexceptions[unitDef.name] == nil) or alwaysbait[unitDef.name] ~= nil)) or false
+function IsBait(AAname, unitDef)
+  if not Isair(unitDef) then
+    return false
+  end
+  if unitDef.health < 650 then
+    if baitexceptions[unitDef.name] == nil then
+	  return true
+	end
+	Echo(baitexceptions[unitDef.name][AAname])
+	if baitexceptions[unitDef.name][AAname] == nil then
+	  return true
+	end
+  end
+  if alwaysbait[unitDef.name] ~= nil then
+	Echo(alwaysbait[unitDef.name][AAname])
+    if alwaysbait[unitDef.name][AAname] ~= nil then
+	  return true
+	end
+  end
+  return false
 end
 
 function IsMicroCMD(unitID)
@@ -119,7 +137,7 @@ function updateAA(AAunitID, index)
     local unitDefID = GetUnitDefID(unitID)
 	local ud = UnitDefs[unitDefID]
     if AAescort[ud.name] ~= nil then
-	  threshold = threshold - AAescort[ud.name]
+	  threshold = threshold - AAescort[ud.name] --ud.metalCost
 	  if threshold <= 0 then
 	    AA[index].escorted = true
 	    return nil
@@ -175,7 +193,7 @@ function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attac
     --Echo(AA[AAref[attackerID]].escorted)
     local tunitDefID = Spring.GetUnitDefID(targetID)
     local tud = UnitDefs[tunitDefID]
-    if IsBait(tud) then
+    if IsBait(ud.name, tud) then
 	  --Echo("bait")
 	  return false, 1
     end
