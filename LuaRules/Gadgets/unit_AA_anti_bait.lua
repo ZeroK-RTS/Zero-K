@@ -86,13 +86,13 @@ function IsBait(AAname, unitDef)
     if baitexceptions[unitDef.name] == nil then
 	  return true
 	end
-	Echo(baitexceptions[unitDef.name][AAname])
+	--Echo(baitexceptions[unitDef.name][AAname])
 	if baitexceptions[unitDef.name][AAname] == nil then
 	  return true
 	end
   end
   if alwaysbait[unitDef.name] ~= nil then
-	Echo(alwaysbait[unitDef.name][AAname])
+	--Echo(alwaysbait[unitDef.name][AAname])
     if alwaysbait[unitDef.name][AAname] ~= nil then
 	  return true
 	end
