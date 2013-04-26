@@ -17,7 +17,7 @@ function widget:GetInfo()
     name      = "Display DPS",
     desc      = "Displays damage per second done to your allies units v2.11",
     author    = "TheFatController",
-    date      = "May 27, 2008", --24 April 2013 (colored text fix)
+    date      = "May 27, 2008", --26 April 2013 (colored text fix)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -262,7 +262,7 @@ function widget:DrawWorld()
   gl.Texture(1, LUAUI_DIRNAME .. "images/gradient_alpha_2.png")
 
   for i, damage in pairs(damageTable) do
-    if (damage.lifeSpan <= 0) then 
+    if (damage.lifeSpan <= 0) or not Spring.ValidUnitID(damage.unitID) then 
       table.remove(damageTable,i)
     else
       -- glDrawFuncAtUnit(damage.unitID, false, DrawUnitFunc, (damage.height + damage.heightOffset), 
