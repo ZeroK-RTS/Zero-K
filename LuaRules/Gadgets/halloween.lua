@@ -42,21 +42,18 @@ TODO:
 
 ]]--
 
-math.randomseed(os.time()) -- this should make it more random...?
-
--- actually i don't see any need for these 2 if statements
-if(not Spring.GetModOptions()) then
-      return false
-end
-
-local modOptions = Spring.GetModOptions()
-if (modOptions.zkmode ~= "halloween") then
-      return
+-- Seed unsynced random number generator.
+-- Credits https://github.com/tvo/craig/blob/master/LuaRules/Gadgets/craig/main.lua
+if (math.randomseed ~= nil) then
+  local r = Spring.DiffTimers(Spring.GetTimer(), Script.CreateScream())
+  math.random()
+  math.randomseed(r)
 end
 
 --SYNCED-------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 
+local modOptions = Spring.GetModOptions()
 --local sin    = math.sin
 local random = math.random
 local floor  = math.floor
@@ -204,7 +201,7 @@ function gadget:GameStart()
       if (zalgo ~= nil) then
 	spGiveOrderToUnit(zalgo,CMD.REPEAT,{1},{})
 	spGiveOrderToUnit(zalgo,CMD.MOVE_STATE,{2},{})
-	for i=1,10 do
+	for i=1,random(10,30) do -- make this more random and more.. fun?
 	  if (spGetUnitIsDead(zalgo) == false) then
 	    x = random(0,Game.mapSizeX)
 	    z = random(0,Game.mapSizeZ)
