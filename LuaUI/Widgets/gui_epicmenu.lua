@@ -2221,6 +2221,7 @@ function widget:Initialize()
 		echo('You have opted to use the engine\'s uikeys.txt. The menu keybind system will not be used.')
 	end
 	
+	LoadKeybinds()
 	ReApplyKeybinds()
 	
 	-- Override widgethandler functions for the purposes of alerting crudemenu 
