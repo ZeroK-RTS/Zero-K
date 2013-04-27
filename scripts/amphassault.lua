@@ -332,7 +332,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-		local reloadState = Spring.GetUnitWeaponState(unitID, 0 , 'reloadState')
+		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
 		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 90 then
 			GG.Floating_AimWeapon(unitID)
 		end

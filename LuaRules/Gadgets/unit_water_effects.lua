@@ -39,7 +39,7 @@ local function updateWeaponFromTank(unitID)
 	local proportion = unit[unitID].storage/effect.tankMax
 
 	-- these numbers are configable too!!!
-	Spring.SetUnitWeaponState(unitID, 0, {
+	Spring.SetUnitWeaponState(unitID, 1, {
 		range = proportion*300 + 100,
 		projectileSpeed = proportion*10+8,
 		projectiles = math.floor(proportion*6.5)+2,
@@ -77,7 +77,7 @@ function shotWaterWeapon(unitID)
 	--	reloadFrames = math.ceil(reloadFrames)
 	--end
 	--
-	--Spring.SetUnitWeaponState(unitID, 0, {
+	--Spring.SetUnitWeaponState(unitID, 1, {
 	--	reloadFrame = Spring.GetGameFrame() + reloadFrames,
 	--})
 	

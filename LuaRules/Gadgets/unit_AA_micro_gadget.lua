@@ -817,7 +817,7 @@ function WeaponReady(unitID, allyteam)
   local AAdefbuff = AAdef[allyteam].units[unitID]
   local reloadtime = getReloadTime(AAdefbuff.name)
   local lowestreloading
-  _, ready, _, _, _ = WeaponState(unitID, 0)
+  _, ready, _, _, _ = WeaponState(unitID, 1)
   local rframe = AAdefbuff.frame
   if IsDPSAA(AAdefbuff.name) then
     return true, 0

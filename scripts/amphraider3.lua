@@ -160,7 +160,7 @@ end
 function script.FireWeapon(num)
     local toChange = 3 - num
 	local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-    Spring.SetUnitWeaponState(unitID, toChange-1, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
+    Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 	if num == 2 then
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		if py < -8 then

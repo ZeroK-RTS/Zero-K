@@ -143,12 +143,12 @@ function AutoAttack_Thread()
 	SetSignalMask(SIG_ACTIVATE)
 	while true do
 		Sleep(100)
-		local reloaded = select(2, spGetUnitWeaponState(unitID,2))
+		local reloaded = select(2, spGetUnitWeaponState(unitID,3))
 		if reloaded then
 			local gameFrame   = spGetGameFrame()
 			local reloadMult  = GG.att_reload[unitID] or 1.0
 			local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
-			spSetUnitWeaponState(unitID, 2, {reloadFrame = reloadFrame} )
+			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame} )
 			GG.PokeDecloakUnit(unitID,30)
 			
 			lastWaveFrame = gameFrame

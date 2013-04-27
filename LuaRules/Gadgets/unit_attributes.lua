@@ -96,7 +96,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	
 		origUnitReload[unitDefID] = {
 			weapon = {},
-			weaponCount = #ud.weapons-1,
+			weaponCount = #ud.weapons,
 		}
 		local state = origUnitReload[unitDefID]
 		
@@ -117,7 +117,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	
 	local state = origUnitReload[unitDefID]
 	
-	for i = 0, state.weaponCount do
+	for i = 1, state.weaponCount do
 		local w = state.weapon[i]
 		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
 		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')

@@ -117,11 +117,11 @@ local function WeaponRangeUpdate()
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		if height < -20 then
 			if not longRange then
-				Spring.SetUnitWeaponState(unitID, 0, {range = torpRange})
+				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
 				longRange = true
 			end
 		elseif longRange then
-			Spring.SetUnitWeaponState(unitID, 0, {range = shotRange})
+			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
 			longRange = false
 		end
 		Sleep(200)
@@ -135,11 +135,11 @@ function script.Create()
 	local height = select(2, Spring.GetUnitPosition(unitID))
 	if height < -20 then
 		if not longRange then
-			Spring.SetUnitWeaponState(unitID, 0, {range = torpRange})
+			Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
 			longRange = true
 		end
 	elseif longRange then
-		Spring.SetUnitWeaponState(unitID, 0, {range = shotRange})
+		Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
 		longRange = false
 	end
 end
