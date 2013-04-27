@@ -42,6 +42,9 @@ TODO:
 
 ]]--
 
+math.randomseed(os.time()) -- this should make it more random...?
+
+-- actually i don't see any need for these 2 if statements
 if(not Spring.GetModOptions()) then
       return false
 end
