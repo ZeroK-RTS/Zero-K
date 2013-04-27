@@ -27,6 +27,7 @@ local spGetAllyTeamList     = Spring.GetAllyTeamList
 local spSendLuaRulesMsg     = Spring.SendLuaRulesMsg
 local spGetLocalAllyTeamID	= Spring.GetLocalAllyTeamID
 local spGetLocalTeamID		= Spring.GetLocalTeamID
+local spGetUnitsInRectangle		= Spring.GetUnitsInRectangle
 
 if not WG.rzones then
 	WG.rzones = {
