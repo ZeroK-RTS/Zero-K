@@ -784,10 +784,6 @@ for i=1,#weaponsList do
 			upgrades[newName] = CopyTable(upgrades[name], true)
 			
 			local weapon2 = weapons[newName]
-			for i,v in pairs(mods) do
-				Spring.Echo(i,v)
-			end
-			
 			local modded = CopyTable(mods)
 			MergeTable(modded, weapon2, true)
 			weapons[newName] = modded
