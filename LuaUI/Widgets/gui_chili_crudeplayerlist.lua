@@ -66,6 +66,12 @@ end
 	
 local cf = IsFFA()
 
+if not WG.rzones then
+	WG.rzones = {
+		rZonePlaceMode = false
+	}
+end
+
 local x_icon_country	= 0
 local x_icon_rank		= x_icon_country + 20
 local x_icon_clan		= x_icon_rank + 16
@@ -351,7 +357,7 @@ local function AddCfCheckbox(allyTeam)
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
 			tooltip = CfTooltip(allyTeam),
 			OnChange = { function(self)
-				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
+				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. ':' .. allyTeam)
 				self.tooltip = CfTooltip(allyTeam)
 			end },
 		}

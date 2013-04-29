@@ -340,7 +340,7 @@ function widget:Update()
 			for _, alliance in ipairs(alliances) do
 				if Spring.GetGameRulesParam('cf_' .. myAllyID .. '_' .. alliance) == 1 then
 					if inRZones(alliance) then
-						spSendLuaRulesMsg('ceasefire:n'..alliance)
+						spSendLuaRulesMsg('ceasefire:n:'..alliance)
 					end
 				end
 			end

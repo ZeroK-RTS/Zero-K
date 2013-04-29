@@ -68,6 +68,22 @@ local antinukeZoneCmdDesc = {
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+
+local function explode(div,str)
+  if (div=='') then return false end
+  local pos,arr = 0,{}
+  -- for each divider found
+  for st,sp in function() return string.find(str,div,pos,true) end do
+    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
+    pos = sp + 1 -- Jump past current divider
+  end
+  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
+  return arr
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 local function SetCeasefireOffered(a1, a2, value)
 	--echo('setcfoffer', a1, a2, value)
 
@@ -231,16 +247,19 @@ end
 
 function gadget:RecvLuaMsg(msg, playerID)
 	--echo('recv',msg, playerID)
-	local msg_token = "ceasefire:"
-	local msg_token_len = msg_token:len()
-	if msg:find(msg_token,1,true) then
-		local _,_,_,teamID, allianceID = spGetPlayerInfo(playerID)
-		local vote = msg:sub(msg_token_len+1,msg_token_len+1)
-		local actionAlliance = tonumber( msg:sub(msg_token_len+2,msg_token_len+2) ) --fixme, alliance might be larger than 2 chars
-		if cfData[allianceID] and cfData[allianceID][actionAlliance] then
-			--SetVote(allianceID, actionAlliance, teamID, not cfData[allianceID][actionAlliance].votes[teamID] )
-			SetVote(allianceID, actionAlliance, teamID, vote=='y')
-		end
+	local msg_table = explode(':', msg)
+	if msg_table[1] ~= 'ceasefire' then
+		return
+	end
+	local _,_,isSpec,teamID, allianceID = spGetPlayerInfo(playerID)
+	if isSpec then
+		return
+	end
+	
+	local vote = msg_table[2]
+	local actionAlliance = tonumber( msg_table[3] )
+	if cfData[allianceID] and cfData[allianceID][actionAlliance] then
+		SetVote(allianceID, actionAlliance, teamID, vote=='y')
 	end
 end
 
