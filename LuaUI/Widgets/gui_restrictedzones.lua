@@ -212,6 +212,47 @@ local function calculateAreaPoints()
 	
 end
 
+-- THE BIT THAT DOES THE CHECK FOR "ALLIED" UNITS
+local function unitInRZones(cAlliance)
+	local teamList = Spring.GetTeamList(cAlliance)
+	for _,teamID in ipairs(teamList) do
+		for i = 1, zoneID.count do
+			local zone = zoneID.data[i]
+			local units = spGetUnitsInRectangle(zone.x, zone.z, zone.x+size, zone.z+size, teamID)
+			if units and units[1] then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+local function nukeInRectangle(x1,z1,x2,z2,teamID)
+	--[[
+	local teamNukes = getTeamNukes( teamID ) --make a function when system in place
+	for teamNuke,_ in pairs(teamNukes) do
+		local x,y,z
+		if x > x1 and x < x2 and z < z1 and z < z2 then
+			return true
+		end
+	end
+	--]]
+	return false
+end
+
+local function nukeInRZones(cAlliance)
+	local teamList = Spring.GetTeamList(cAlliance)
+	for _,teamID in ipairs(teamList) do
+		for i = 1, zoneID.count do
+			local zone = zoneID.data[i]
+			if nukeInRectangle(zone.x, zone.z, zone.x+size, zone.z+size, teamID) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function widget:MousePress(mx, my, button)
 	
 	if WG.rzones.rZonePlaceMode and (button == 1 or button == 3) and not drawingLasso then
@@ -303,21 +344,6 @@ function widget:MouseRelease(mx, my, button)
 	
 end
 
-------------------------------------------------------------------
--- THE BIT THAT DOES THE CHECK FOR "ALLIED" UNITS
-
-function inRZones(cAlliance)
-	local teamList = Spring.GetTeamList(cAlliance)
-	for _,teamID in ipairs(teamList) do
-		for i = 1, zoneID.count do
-			local units = spGetUnitsInRectangle(zoneID.data[i].x, zoneID.data[i].z, zoneID.data[i].x+size, zoneID.data[i].z+size, teamID)
-			if units and units[1] then
-				return true
-			end
-		end
-	end
-	return false
-end
 
 function widget:Update()
 
@@ -339,7 +365,7 @@ function widget:Update()
 			local alliances = spGetAllyTeamList()
 			for _, alliance in ipairs(alliances) do
 				if Spring.GetGameRulesParam('cf_' .. myAllyID .. '_' .. alliance) == 1 then
-					if inRZones(alliance) then
+					if unitInRZones(alliance) or nukeInRZones(alliance) then
 						spSendLuaRulesMsg('ceasefire:n:'..alliance)
 					end
 				end

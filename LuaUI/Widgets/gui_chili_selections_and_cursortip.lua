@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.077 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.078 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --15 April 2013 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -240,6 +240,7 @@ options = {
 		name = "Show Drawing Tools When Drawing",
 		type = 'bool',
 		value = true,
+		path = 'Settings/Interface/Mouse Cursor',
 		desc = 'Show pencil or eraser when drawing or erasing.',
 		OnChange = function(self)
 			widget:UpdateCallIns(self.value)
@@ -2249,6 +2250,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	
+	widget:UpdateCallIns(options.showDrawTools.value)
 	
 	SetupTerraTips()
 	

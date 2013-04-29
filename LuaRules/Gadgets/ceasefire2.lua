@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local TESTMODE = false
+local TESTMODE = true
 local testOnce = true
 
 if tobool(Spring.GetModOptions().noceasefire) or Spring.FixedAllies() then
@@ -49,21 +49,8 @@ local gaiaAlliance, gaiaTeam
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-local antinukeDefs = {}
-local antinukeNames = {'armamd', 'armscab', 'cormabm', 'corfmd', 'cornukesub', 'armcarry'}
 local nukeDefs = {}
-local nukeNames = {'armsilo', 'corsilo'}
-local antinukeZones = {}
-
-local antinukeZoneCmdDesc = {
-  id      = CMD_ANTINUKEZONE,
-  type    = CMDTYPE.ICON_MODE,
-  name    = 'Antinuke Zone',
-  cursor  = 'CloakShield', 
-  action  = 'antinukezone',
-  tooltip = 'NoNuke zone: Nuke attacks within range of this unit will break ceasefires.',
-  params  = {'0', 'NoNukeZone', 'NoNukeZone' }
-}
+local nukeNames = { 'corsilo', }
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -104,33 +91,6 @@ local function SetVote(a1, a2, teamID, value)
 	spSetTeamRulesParam(teamID, 'cf_vote_' ..a2, value and 1 or 0)
 end	
 
-local function AddAntinukeZoneCmdDesc(unitID)
-  local insertID = 123456 -- back of the pack
-  spInsertUnitCmdDesc(unitID, insertID + 1, antinukeZoneCmdDesc)
-end
-
-local function AddZone(unitID, cmdParams, range)
-	if (type(cmdParams[1]) ~= 'number') then
-		return false
-	end
-	
-	local allianceID = spGetUnitAllyTeam(unitID)
-	local state = (cmdParams[1] == 1)
-	
-	if state then
-		local x,_,z = spGetUnitPosition(unitID)
-		antinukeZones[unitID] = {
-			allianceID=allianceID, x=x,z=z,range=range
-		}		
-	else
-		antinukeZones[unitID] = nil
-	end
-	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_ANTINUKEZONE)
-	if (cmdDescID) then
-		antinukeZoneCmdDesc.params[1] = (state and '1') or '0'
-		spEditUnitCmdDesc(unitID, cmdDescID, { params = antinukeZoneCmdDesc.params})
-	end	
-end
 
 function clearVotes(alliance, enAlliance)
 	local teamList = cfData[alliance][enAlliance].votes
@@ -232,6 +192,22 @@ local function checkNukeAttack(unitID, cmdParams)
 	end
 end
 
+
+local function broadcastNuke(unitID, cmdParams)
+	local allianceID = spGetUnitAllyTeam(unitID)
+	local teamID = Spring.GetUnitTeam(unitID)
+	local x,z
+	if cmdParams[2] then
+		x,z = cmdParams[1],cmdParams[3]
+	else
+		x,_,z = spGetUnitPosition(cmdParams[1])
+	end
+	if not x then return false end
+	
+	--todo, broadcast nuke position to allies, gui_restrictedzones widget will use this to break ceasefire if in restricted zone.
+	--Spring.SetTeamRulesParam( teamID, 'nuke', xyz, {allied=true} )
+	
+end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -318,15 +294,6 @@ function gadget:Initialize()
 		end
 	end
 	
-	
-	for _,name in pairs(antinukeNames) do
-		local ud = UnitDefNames[name]
-		if ud then
-			local weaponDef = ud.weapons[1].weaponDef
-			local coverage = WeaponDefs[weaponDef].coverageRange
-			antinukeDefs[ud.id] = coverage
-		end
-	end
 	for _,name in pairs(nukeNames) do
 		local ud = UnitDefNames[name]
 		if ud then
@@ -334,15 +301,6 @@ function gadget:Initialize()
 		end
 	end
 	
-	gadgetHandler:RegisterCMDID(CMD_ANTINUKEZONE)
-	local allUnits = spGetAllUnits()
-	for _, unitID in ipairs(allUnits) do
-		local unitDefID = spGetUnitDefID(unitID)
-		if (antinukeDefs[unitDefID]) then
-			AddAntinukeZoneCmdDesc(unitID)
-		end
-	end
-
 	checkAllianceSizes()
 	checkVotes()
 	_G.cfData = cfData
@@ -350,24 +308,10 @@ function gadget:Initialize()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
-	local range = antinukeDefs[unitDefID]
-	if cmdID == CMD_ANTINUKEZONE and range then
-		AddZone(unitID, cmdParams, range)  
-		return false  -- command was used
-	elseif cmdID == CMD_ATTACK and nukeDefs[unitDefID] then
-		checkNukeAttack(unitID, cmdParams)
+	if cmdID == CMD_ATTACK and nukeDefs[unitDefID] then
+		broadcastNuke(unitID, cmdParams)
 	end
 	return true  -- command was not used
-end
-
-function gadget:UnitCreated(unitID, unitDefID)
-	if antinukeDefs[unitDefID] then
-		AddAntinukeZoneCmdDesc(unitID)
-	end
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	antinukeZones[unitID] = nil
 end
 
 -------------------------------------------------------------------------------------
