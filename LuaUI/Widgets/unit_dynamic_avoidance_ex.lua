@@ -847,7 +847,7 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
 			local unitFastestReloadableWeapon = reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 			if unitFastestReloadableWeapon ~= -1 then
-				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-1, "range") --retrieve weapon range
+				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range") --retrieve weapon range
 				losRadius = math.min(weaponRange*0.75, losRadius) --reduce avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the smallest (Note: we need this minimum detection range to avoid disturbing maximum range artillery unit)
 			end			
 			--[[
@@ -1219,13 +1219,13 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 		end
 		local unitFastestReloadableWeapon = unitInMotionSingleUnitTable.reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 		if unitFastestReloadableWeapon ~= -1 then
-			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-1) --Somehow the weapon table actually start at "0", so minus 1 from actual value
+			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon) --Somehow the weapon table actually start at "0", so minus 1 from actual value
 			local currentFrame, _ = spGetGameFrame() 
 			local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
 			weaponIsEmpty = (remainingTime> minimumRemainingReloadTime)
 			if (turnOnEcho == 1) then --debugging
 				Spring.Echo(unitFastestReloadableWeapon)
-				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-1, "range"))
+				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range"))
 			end
 		end			
 	--end

@@ -217,7 +217,7 @@ function widget:Initialize()
   --// find real primary weapon and its reloadtime
   for _,ud in pairs(UnitDefs) do
     ud.reloadTime    = 0;
-    ud.primaryWeapon = 0;
+    ud.primaryWeapon = 1;
     ud.shieldPower   = 0;
 
     for i=1,#ud.weapons do
@@ -598,7 +598,7 @@ do
         canStockpile  = ud.canStockpile,
 		gadgetStock   = ud.customParams.stockpiletime,
         reloadTime    = ud.reloadTime,
-        primaryWeapon = ud.primaryWeapon-1,
+        primaryWeapon = ud.primaryWeapon,
 		maxWaterTank  = ud.customParams.maxwatertank,
 		freeStockpile = (ud.customParams.freestockpile and true) or nil,
       }

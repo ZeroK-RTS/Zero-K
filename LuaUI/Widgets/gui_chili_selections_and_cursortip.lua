@@ -428,7 +428,7 @@ local function GetWeaponReloadStatus(unitID, weapNum)
 	local weaponNoX = (unitDef.weapons[weapNum]) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
 	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
 		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
-		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum-1) --select weapon no.X, but we use X-1 because somehow table start at 0. eg: 0,1,2, This happen in other widget also.
+		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum) --select weapon no.X
 		local currentFrame, _ = spGetGameFrame() 
 		local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
 		local reloadFraction =1 - remainingTime/reloadTime
