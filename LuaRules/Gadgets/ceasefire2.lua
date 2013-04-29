@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local TESTMODE = true
+local TESTMODE = false
 local testOnce = true
 
 if tobool(Spring.GetModOptions().noceasefire) or Spring.FixedAllies() then
