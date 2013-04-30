@@ -198,14 +198,15 @@ local function broadcastNuke(unitID, cmdParams)
 	local teamID = Spring.GetUnitTeam(unitID)
 	local x,z
 	if cmdParams[2] then
-		x,z = cmdParams[1],cmdParams[3]
+		x,y,z = cmdParams[1],cmdParams[2],cmdParams[3]
 	else
-		x,_,z = spGetUnitPosition(cmdParams[1])
+		x,y,z = spGetUnitPosition(cmdParams[1])
 	end
 	if not x then return false end
 	
-	--todo, broadcast nuke position to allies, gui_restrictedzones widget will use this to break ceasefire if in restricted zone.
-	--Spring.SetTeamRulesParam( teamID, 'nuke', xyz, {allied=true} )
+	local luaMsg = 'nukelaunch|' .. allianceID .. '|' .. x .. '|' .. y .. '|' .. z
+	CallAsTeam(teamID, function () return Spring.SendLuaUIMsg (luaMsg, 'a' ) end) --sends to allies only?
+	
 	
 end
 -------------------------------------------------------------------------------------
