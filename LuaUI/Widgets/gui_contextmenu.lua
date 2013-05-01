@@ -951,6 +951,7 @@ function widget:MousePress(x,y,button)
 			
 			if marketandbounty then
 				MakeUnitContextMenu(unitID,x,y)
+				return
 			end
 			
 			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
