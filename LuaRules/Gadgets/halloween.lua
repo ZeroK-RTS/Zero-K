@@ -82,22 +82,25 @@ local spGetPlayerInfo	    = Spring.GetPlayerInfo
 -- actually im not sure what com names are exactly so
 local unpossassableUnitsDef = {
   -- commander excludement went to if statement in respective places
-	--[ UnitDefNames['corcom1'].id ] = true, -- battle commander
-	--[ UnitDefNames['commsupport1'].id ] = true, -- support commander
-	--[ UnitDefNames['commrecon1'].id ] = true, -- recon commander
-	--[ UnitDefNames['armcom1'].id ] = true, -- strike commander
-	--[ UnitDefNames['benzcom1'].id ] = true, -- bombard commander
-	[ UnitDefNames['terraunit'].id ] = true, -- terraform thing
-	-- other commanders, singleplayer and whatnot
-	--[ UnitDefNames['armcom3'].id ] = true,
-	--[ UnitDefNames['armcom2'].id ] = true,
-	--[ UnitDefNames['corcom2'].id ] = true,
-	--[ UnitDefNames['commrecon2'].id ] = true,
-	--[ UnitDefNames['armcom2'].id ] = true,
-	--[ UnitDefNames['commsupport2'].id ] = true,
-	--[ UnitDefNames['corcom2'].id ] = true,
-	--[ UnitDefNames['commrecon2'].id ] = true,
-	--[ UnitDefNames['commsupport2'].id ] = true,
+  --[ UnitDefNames['corcom1'].id ] = true, -- battle commander
+  --[ UnitDefNames['commsupport1'].id ] = true, -- support commander
+  --[ UnitDefNames['commrecon1'].id ] = true, -- recon commander
+  --[ UnitDefNames['armcom1'].id ] = true, -- strike commander
+  --[ UnitDefNames['benzcom1'].id ] = true, -- bombard commander
+  [ UnitDefNames['terraunit'].id ] = true, -- terraform thing
+  -- other commanders, singleplayer and whatnot
+  --[ UnitDefNames['armcom3'].id ] = true,
+  --[ UnitDefNames['armcom2'].id ] = true,
+  --[ UnitDefNames['corcom2'].id ] = true,
+  --[ UnitDefNames['commrecon2'].id ] = true,
+  --[ UnitDefNames['armcom2'].id ] = true,
+  --[ UnitDefNames['commsupport2'].id ] = true,
+  --[ UnitDefNames['corcom2'].id ] = true,
+  --[ UnitDefNames['commrecon2'].id ] = true,
+  --[ UnitDefNames['commsupport2'].id ] = true,
+  [ UnitDefNames['pw_generic'].id ] = true,
+  [ UnitDefNames['pw_hq'].id ] = true,
+  [ UnitDefNames['tele_beacon'].id ] = true, -- TODO test how djin works, lol
 }
 
 -- these are to remember original value
