@@ -501,6 +501,8 @@ local options = {
     section= 'experimental',
     def    = false,
   },
+  --]]
+ 
   {
     key    = 'specialdecloak',
     name   = 'Special Decloak Behavior (buggy)',
@@ -509,7 +511,6 @@ local options = {
     section= 'experimental',
     def    = false,
   },
-]]--
   {
     key    = 'fun',
     name   = 'Fun Stuff',
