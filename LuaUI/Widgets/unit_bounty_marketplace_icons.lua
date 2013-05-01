@@ -91,7 +91,9 @@ end
 
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	SetIcons(unitID)
+	for _,iconType in ipairs( iconTypes ) do
+		SetIcons(unitID, iconType )
+	end
 end
 
 

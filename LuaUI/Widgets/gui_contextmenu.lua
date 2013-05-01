@@ -871,7 +871,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 
 	
 	if ceasefires and myAlliance ~= alliance then
-		window_height = window_height + B_HEIGHT*2
+		--window_height = window_height + B_HEIGHT*2 --error no such window_height!
 		children[#children+1] = Button:New{ caption = 'Vote for ceasefire', OnMouseUp = { function() spSendLuaRulesMsg('cf:y'..alliance) end }, width=window_width}
 		children[#children+1] = Button:New{ caption = 'Break ceasefire/unvote', OnMouseUp = { function() spSendLuaRulesMsg('cf:n'..alliance) spSendLuaRulesMsg('cf:b'..alliance) end }, width=window_width}
 	end
