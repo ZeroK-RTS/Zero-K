@@ -246,10 +246,10 @@ local function CfTooltip(allyTeam)
 		local name = Spring.GetPlayerInfo(playerID) or '-'
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
-		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote 
+		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote ..'\n'
 	end
 	
-	tooltip = tooltip .. '\n\n'
+	tooltip = tooltip .. '\n'
 	
 	tooltip = tooltip .. 'Check this box to vote for a ceasefire with '.. yellow ..'<Team ' .. (allyTeam+1) .. '>'..white..'. \n\n'
 		..'If everyone votes Yes, an offer will be made. If there is a ceasefire, '
