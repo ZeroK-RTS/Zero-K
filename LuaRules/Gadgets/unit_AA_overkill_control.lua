@@ -124,10 +124,6 @@ end
 
 function gadget:Initialize()
   Echo("AA overkill control Gadget Enabled")
-  for _, unitID in pairs(Spring.GetAllUnits()) do
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	gadget:UnitCreated(unitID, unitDefID)
-  end
   for unitname in pairs(AAunittypes) do
 	local damage = 0
     for i = 1,#WeaponDefs do
@@ -141,6 +137,10 @@ function gadget:Initialize()
 	  end
 	end
 	AAunittypes[unitname] = damage
+  end
+  for _, unitID in pairs(Spring.GetAllUnits()) do
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	gadget:UnitCreated(unitID, unitDefID)
   end
 end
 
