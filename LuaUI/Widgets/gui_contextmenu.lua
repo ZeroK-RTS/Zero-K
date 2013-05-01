@@ -948,11 +948,17 @@ function widget:MousePress(x,y,button)
 		local type, data = spTraceScreenRay(x, y)
 		if (type == 'unit') then
 			local unitID = data
+			
+			if marketandbounty then
+				MakeUnitContextMenu(unitID,x,y)
+			end
+			
 			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+			
 			if ud then
 				MakeStatsWindow(ud,x,y)
 			end
-			-- FIXME enable later when does not show useless info MakeUnitContextMenu(unitID,x,y)
+			-- FIXME enable later when does not show useless info
 			return true
 		elseif (type == 'feature') then
 			local fdid = Spring.GetFeatureDefID(data)
