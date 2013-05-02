@@ -126,6 +126,8 @@ local ownedThings = 0 -- owned in like "pwned"
 local graceTimer = tonumber(halloweenGhostInitialGrace) -- ...
 local bossWave = 10
 
+local zalgo = nil
+
 function gadget:Initialize()
     if(modOptions.zkmode ~= "halloween") then
 	gadgetHandler:RemoveGadget()
@@ -184,7 +186,7 @@ function gadget:GameStart()
     else
       spEcho("Have... IT COMES! YOU CAN'T SURVIVE! NOOO!!!")
       -- for lulz
-      local zalgo,x,z
+      local x,z
       -- after some consideration i decided to make detri spawn at the center of any map
       -- TODO add some checkings to make sure no players are present at center, and if they are -- spawn it in some furthest corner (for silly maps)
       -- or smth like it
@@ -213,6 +215,21 @@ function gadget:GameStart()
 	end
       end
     end
+end
+
+function gadget:UnitIdle(unitID, unitDefID, team)
+  if ((zalgo ~= nil) and (unitID == zalgo) and (team == GaiaTeamID)) then
+    local x,z
+    spGiveOrderToUnit(zalgo,CMD.REPEAT,{1},{})
+    spGiveOrderToUnit(zalgo,CMD.MOVE_STATE,{2},{})
+    for i=1,random(10,30) do
+      if (spGetUnitIsDead(zalgo) == false) then
+	x = random(0,Game.mapSizeX)
+	z = random(0,Game.mapSizeZ)
+	spGiveOrderToUnit(zalgo,CMD.INSERT,{-1,CMD.FIGHT,CMD.OPT_SHIFT,x,0,z},{"alt"});
+      end
+    end
+  end
 end
 
 function gadget:GameFrame (f)
@@ -277,11 +294,14 @@ function gadget:GameFrame (f)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-    -- unit destroyed, but was possessed? forget about owner, doesn't matter anymore
-    if (PossessedUnitList[unitID] ~= nil) then
-	PossessedCount[unitID] = nil -- it's dead Sam
-	deletePossession(unitID)
-    end
+  -- unit destroyed, but was possessed? forget about owner, doesn't matter anymore
+  if (PossessedUnitList[unitID] ~= nil) then
+      PossessedCount[unitID] = nil -- it's dead Sam
+      deletePossession(unitID)
+  end
+  if (unitID == zalgo) then
+    zalgo = nil
+  end
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
