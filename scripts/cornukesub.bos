@@ -1,6 +1,6 @@
 #include "constants.h"
 
-piece  base, door1, door2, missile, firepoint;
+piece  base, door1, door2, missile, aimpoint;
 
 // Signal definitions
 #define SIG_MOVE			2
@@ -54,12 +54,12 @@ FireWeapon1()
 
 AimFromWeapon1(piecenum)
 {
-	piecenum = firepoint;
+	piecenum = aimpoint;
 }
 
 QueryWeapon1(piecenum)
 {
-	piecenum = firepoint;
+	piecenum = missile;
 }
 
 AimWeapon2()
@@ -83,12 +83,12 @@ FireWeapon2()
 
 AimFromWeapon2(piecenum)
 {
-	piecenum = firepoint;
+	piecenum = aimpoint;
 }
 
 QueryWeapon2(piecenum)
 {
-	piecenum = firepoint;
+	piecenum = missile;
 }
 
 SweetSpot(piecenum)
