@@ -217,7 +217,8 @@ function gadget:GameStart()
     end
 end
 
-function gadget:UnitIdle(unitID, unitDefID, team)
+function gadget:UnitUnloaded(unitID, unitDefID, team, transport)
+  -- TODO probably copy/paste previous orders? also for other ghosted units too...
   if ((zalgo ~= nil) and (unitID == zalgo) and (team == GaiaTeamID)) then
     local x,z
     spGiveOrderToUnit(zalgo,CMD.REPEAT,{1},{})
