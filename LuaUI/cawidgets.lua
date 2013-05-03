@@ -63,8 +63,9 @@ local ipairs = ipairs
 
 -- create backup for ZK_data.lua and ZK_order.lua to workaround against case of file corruption if it happen (ie: bluescreen cause file corruption)
 do
- 	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
-	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'}
+	local zkkeysLocation = LUAUI_DIRNAME .. 'Configs/' .. 'zk_keys.lua'
+ 	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME,zkkeysLocation}
+	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data',''} --this is a header text that is appended to start of file
 	for i=1, #fileToCheck do
 		local chunk, err = loadfile(fileToCheck[i])
 		if (chunk) then --if original content is LUA OK:
