@@ -650,11 +650,19 @@ decorations = {
 	skin_recon_dark = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commrecon1dark.dds]]
+				unitDef.buildpic = "skin_recon_dark.png"
 			end,
 	},
 	skin_recon_red = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commrecon1red.dds]]
+				unitDef.buildpic = "skin_recon_red.png"
+			end,
+	},
+	skin_recon_leopard = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commrecon1leopard.dds]]
+				unitDef.buildpic = "skin_recon_leopard.png"
 			end,
 	},
 	skin_battle_blue = {
@@ -662,6 +670,12 @@ decorations = {
 				unitDef.customparams.altskin = [[unittextures/core_commander_1blue.dds]]
 			end,
 	},
+	skin_battle_camo = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/core_commander_1camo.dds]]
+				unitDef.buildpic = "skin_battle_camo.png"
+			end,
+	},	
 	skin_support_dark = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commsupport1dark.dds]]
@@ -671,6 +685,13 @@ decorations = {
 	skin_support_green = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commsupport1green.dds]]
+				unitDef.buildpic = "skin_support_green.png"
+			end,
+	},
+	skin_support_hotrod = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commsupport1hotrod.dds]]
+				unitDef.buildpic = "skin_support_hotrod.png"
 			end,
 	},
 	
