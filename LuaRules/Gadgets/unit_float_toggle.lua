@@ -390,6 +390,14 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 	end
 end
 
+function gadget:AllowCommand_GetWantedCommand()	
+	return {[CMD_UNIT_FLOAT_STATE] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID ~= CMD_UNIT_FLOAT_STATE) then
 		return true  -- command was not used

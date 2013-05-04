@@ -1139,7 +1139,8 @@ end
 function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
                                     cmdID, cmdParams, cmdOptions, cmdTag, synced)
   for _,g in ipairs(self.AllowCommandList) do
-    if (not g:AllowCommand(unitID, unitDefID, unitTeam,
+
+	if (not g:AllowCommand(unitID, unitDefID, unitTeam,
                            cmdID, cmdParams, cmdOptions, cmdTag, synced)) then
       return false
     end
@@ -1932,10 +1933,27 @@ function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdPa
   return true  -- remove the command
 end
 
+local AllowCommand_WantedCommand = {}
+local AllowCommand_WantedUnitDefID = {}
+
 function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced) 	-- ours
 --function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)	-- base
   for _,g in ipairs(self.AllowCommandList) do
-	if (not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, fromSynced)) then	-- ours
+	if not AllowCommand_WantedCommand[g] then
+		AllowCommand_WantedCommand[g] = g:AllowCommand_GetWantedCommand()
+	end
+	if not AllowCommand_WantedUnitDefID[g] then
+		AllowCommand_WantedUnitDefID[g] = g:AllowCommand_GetWantedUnitDefID()
+	end
+	local wantedCommand = AllowCommand_WantedCommand[g]
+	local wantedUnitDefID = AllowCommand_WantedUnitDefID[g]
+
+	--if g:GetBadCommand() then
+	--	Spring.Echo(g:GetBadCommand())
+	--end
+	if ((wantedCommand == true) or wantedCommand[cmdID]) and
+		((wantedUnitDefID == true) or wantedUnitDefID[unitDefID]) and
+		(not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, fromSynced)) then	-- ours
 	--if (not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)) then	-- base
       return false
     end

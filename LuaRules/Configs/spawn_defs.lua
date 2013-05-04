@@ -27,10 +27,11 @@ burrowEggs           = 15       -- number of eggs each burrow spawns
 gameMode		= true	--Spring.GetModOption("zkmode")
 tooltipMessage	= "Kill chickens and collect their eggs to get metal."
 
+mexesUnitDefID = {
+  [-UnitDefNames.cormex.id] = true, 
+}
 mexes = {
-  "cormex", 
-  "armmex",
-  --"armestor"	--pylon; needed for annis etc.
+  "cormex",
 }
 noTarget = {
 	terraunit=true,

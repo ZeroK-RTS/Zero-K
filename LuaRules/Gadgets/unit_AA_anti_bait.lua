@@ -201,6 +201,14 @@ function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attac
   return true, 1
 end
 
+function gadget:AllowCommand_GetWantedCommand()	return 
+	{[CMD_UNIT_AI] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   local ud = UnitDefs[unitDefID]
   if IsAA(ud.name) then

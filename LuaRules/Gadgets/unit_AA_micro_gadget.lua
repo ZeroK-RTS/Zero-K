@@ -1468,6 +1468,14 @@ function gadget:GameFrame()
   checkAAdef()
 end
 
+function gadget:AllowCommand_GetWantedCommand()	
+	return true
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   local ud = UnitDefs[unitDefID]
   if IsAA(ud.name) then

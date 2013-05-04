@@ -82,6 +82,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
+function gadget:AllowCommand_GetWantedCommand()	
+	return true
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return true
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	turning[unitID] = nil -- Abort turn if another command issued directly (not queued)
 	return true

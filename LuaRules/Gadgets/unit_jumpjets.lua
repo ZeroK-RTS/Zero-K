@@ -474,6 +474,18 @@ function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	end
 end
 
+function gadget:AllowCommand_GetWantedCommand()	
+	return true
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	boolDef = {}
+	for udid,_ in pairs(jumpDefs) do
+		boolDef[udid] = true
+	end
+	return boolDef
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == CMD_JUMP and 
 		spTestBuildOrder(

@@ -42,13 +42,16 @@ local airtargets         = {} -- {id = unitID, incoming = {shotID}, receivingdam
 local shot               = {} -- {id = shotID, unitID = ownerunitID, target = targetunitID, damage = int)
 
 local AAunittypes        = {["corrl"] = 1, ["missiletower"] = 1, ["armcir"] = 1, ["screamer"] = 1} -- number = shot damage
+local IsAA = {
+	[UnitDefNames.corrl.id] = true, 
+	[UnitDefNames.missiletower.id] = true, 
+	[UnitDefNames.armcir.id] = true, 
+	[UnitDefNames.screamer.id] = true
+}
 
 local Echo = Spring.Echo
 
 -------------------FUNCTIONS------------------
-function IsAA(name)
-  return (AAunittypes[name] ~= nil)
-end
 
 function Isair(ud)
   return ud.canFly or false
@@ -105,7 +108,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   local ud = UnitDefs[unitDefID]
-  if IsAA(ud.name) then
+  if IsAA[unitDefID] then
     InsertUnitCmdDesc(unitID, unitAICmdDesc)
     local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
     EditUnitCmdDesc(unitID, cmdDescID, {params = {0, 'AI Off','AI On'}})
@@ -148,7 +151,7 @@ function gadget:ProjectileCreated(projID, unitID)
   local unitDefID = GetUnitDefID(unitID)
   local ud = UnitDefs[unitDefID]
   --Echo(ud.name)
-  if IsAA(ud.name) then
+  if IsAA[unitDefID] then
     AddShot(projID, unitID, GetTarget(projID), AAunittypes[ud.name])
   end
 end
@@ -162,7 +165,7 @@ end
 function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
   local unitDefID = Spring.GetUnitDefID(attackerID)
   local ud = UnitDefs[unitDefID]
-  if IsAA(ud.name) and IsMicroCMD(attackerID) then
+  if IsAA[unitDefID] and IsMicroCMD(attackerID) then
     --Echo(attackerID, targetID)
     local tunitDefID = Spring.GetUnitDefID(targetID)
     local tud = UnitDefs[tunitDefID]
@@ -177,9 +180,17 @@ function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attac
   return true, 1
 end
 
+function gadget:AllowCommand_GetWantedCommand()
+	return true
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return IsAA
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   local ud = UnitDefs[unitDefID]
-  if IsAA(ud.name) then
+  if IsAA[unitDefID] then
     if cmdID == CMD_UNIT_AI then
 	  local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
 	  if cmdParams[1] == 0 then
