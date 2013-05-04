@@ -650,18 +650,21 @@ decorations = {
 	skin_recon_dark = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commrecon1dark.dds]]
+				unitDef.customparams.altskin2 = [[unittextures/commrecon2alt.dds]]
 				unitDef.buildpic = "skin_recon_dark.png"
 			end,
 	},
 	skin_recon_red = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commrecon1red.dds]]
+				unitDef.customparams.altskin2 = [[unittextures/commrecon2alt.dds]]
 				unitDef.buildpic = "skin_recon_red.png"
 			end,
 	},
 	skin_recon_leopard = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commrecon1leopard.dds]]
+				unitDef.customparams.altskin2 = [[unittextures/commrecon2alt.dds]]
 				unitDef.buildpic = "skin_recon_leopard.png"
 			end,
 	},
