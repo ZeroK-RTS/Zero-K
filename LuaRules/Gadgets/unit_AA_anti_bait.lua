@@ -67,12 +67,16 @@ local AAref              = {} -- {[unitID] = index in AA table}
 local updatespeed        = 30 -- frames over which the escort states will be updated
 local updatecount        = 1
 
+local remUnitDefID = {}
+
 local Echo = Spring.Echo
 
+local IsAA = {
+	[UnitDefnames.missiletower.id] = true,
+	[UnitDefnames.screamer.id] = true,
+}
+
 -------------------FUNCTIONS------------------
-function IsAA(name)
-  return (AAunittypes[name] ~= nil)
-end
 
 function Isair(ud)
   return ud.canFly or false
@@ -150,6 +154,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   local ud = UnitDefs[unitDefID]
+  remUnitDefID[unitID] = unitDefID
   if IsAA(ud.name) then
     InsertUnitCmdDesc(unitID, unitAICmdDesc)
     local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
@@ -160,6 +165,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   local ud = UnitDefs[unitDefID]
+  remUnitDefID[unitID] = nil
   if IsAA(ud.name) then
     removeAA(unitID)
   end
@@ -187,10 +193,10 @@ function gadget:GameFrame()
 end
 
 function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-  local unitDefID = Spring.GetUnitDefID(attackerID)
-  local ud = UnitDefs[unitDefID]
-  if IsAA(ud.name) and IsMicroCMD(attackerID) and AA[AAref[attackerID]].escorted then
-    --Echo(AA[AAref[attackerID]].escorted)
+  local unitDefID = remUnitDefID[attackerID]
+  if IsAA[unitDefID] and IsMicroCMD(attackerID) and AA[AAref[attackerID]].escorted then
+	local ud = UnitDefs[unitDefID]
+	--Echo(AA[AAref[attackerID]].escorted)
     local tunitDefID = Spring.GetUnitDefID(targetID)
     local tud = UnitDefs[tunitDefID]
     if IsBait(ud.name, tud) then

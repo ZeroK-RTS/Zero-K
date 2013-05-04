@@ -49,13 +49,18 @@ local IsAA = {
 	[UnitDefNames.screamer.id] = true
 }
 
+local Isair = {}
+for i=1,#UnitDefs do
+  if UnitDefs[i].canFly then
+	Isair[i] = true
+  end
+end
+
+local remUnitDefID = {}
+
 local Echo = Spring.Echo
 
 -------------------FUNCTIONS------------------
-
-function Isair(ud)
-  return ud.canFly or false
-end
 
 function IsMicroCMD(unitID)
 if unitID ~= nil then
@@ -107,20 +112,22 @@ end
 -------------------CALL INS-------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-  local ud = UnitDefs[unitDefID]
+  remUnitDefID[unitID] = unitDefID
   if IsAA[unitDefID] then
-    InsertUnitCmdDesc(unitID, unitAICmdDesc)
+    local ud = UnitDefs[unitDefID]
+	InsertUnitCmdDesc(unitID, unitAICmdDesc)
     local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
     EditUnitCmdDesc(unitID, cmdDescID, {params = {0, 'AI Off','AI On'}})
   end
-  if Isair(ud) then
+  if Isair[unitDefID] then
     AddAir(unitID, ud)
   end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   local ud = UnitDefs[unitDefID]
-  if Isair(ud) then
+  remUnitDefID[unitID] = unitDefID
+  if Isair[unitDefID] then
     removeAir(unitID)
   end
 end
@@ -163,13 +170,13 @@ function gadget:ProjectileDestroyed(projID)
 end
 
 function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-  local unitDefID = Spring.GetUnitDefID(attackerID)
-  local ud = UnitDefs[unitDefID]
+  local unitDefID = remUnitDefID[attackerID]
   if IsAA[unitDefID] and IsMicroCMD(attackerID) then
+	local ud = UnitDefs[unitDefID]
     --Echo(attackerID, targetID)
     local tunitDefID = Spring.GetUnitDefID(targetID)
     local tud = UnitDefs[tunitDefID]
-    if Isair(tud) then
+    if Isair[tunitDefID] then
 	  hp = GetHP(targetID)
 	  if hp < airtargets[targetID].receivingdamage then
 	    --Echo("preventing overkill")
