@@ -378,7 +378,10 @@ end
     end
 
     local vsx, vsy = gl.GetViewSizes()
-    local x,y = vsx-300, vsy-80
+    local x,y = vsx-1000, vsy-60
+	local sX = vsx-600
+	local fSize = 10
+	local fSpacing = 12
 
     local maximum_ = (maximumSYNCED > maximum) and (maximumSYNCED) or (maximum)
 
@@ -390,23 +393,23 @@ end
         local v = sortedList[i]
         local wname = v[1]
         local tLoad = v[2]
-		if tLoad > 0.2 then
+		--if tLoad > 0.05 then
 			if maximum > 0 then
-			  gl.Rect(x+100-tLoad/maximum_*100, y+1-(12)*index1, x+100, y+9-(12)*index1)
+			  gl.Rect(x+100-tLoad/maximum_*100, y+1-(fSpacing)*index1, x+100, y+9-(fSpacing)*index1)
 			end
-			gl.Text(wname, x+150, y+1-(12)*index1, 10)
-			gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(12)*index1, 10)
+			gl.Text(wname, x+150, y+1-(fSpacing)*index1, fSize)
+			gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(fSpacing)*index1, fSize)
 			index1 = index1 + 1
-		end
+		--end
       end
     end
 	local index2 = 1
     if (profile_synced) then
-      local j = index1 + 1
+      local j = 1
 
-      gl.Rect(x, y+5-(12)*j, x+230, y+4-(12)*j)
+      gl.Rect(sX, y+5-(fSpacing)*j, sX+230, y+4-(fSpacing)*j)
       gl.Color(1,0,0)   
-      gl.Text("SYNCED", x+115, y-3-(12)*j, 12, "nOc")
+      gl.Text("SYNCED", sX+115, y-(fSpacing)*j, fSize, "nOc")
       gl.Color(1,1,1,1)
       j = j
 
@@ -414,22 +417,22 @@ end
         local v = sortedListSYNCED[i]
         local wname = v[1]
         local tLoad = v[2]
-		if tLoad > 0.2 then
+		--if tLoad > 0.05 then
 			if maximum > 0 then
-			  gl.Rect(x+100-tLoad/maximum_*100, y+1-(12)*(j+index2), x+100, y+9-(12)*(j+index2))
+			  gl.Rect(sX+100-tLoad/maximum_*100, y+1-(fSpacing)*(j+index2), sX+100, y+9-(fSpacing)*(j+index2))
 			end
-			gl.Text(wname, x+150, y+1-(12)*(j+index2), 10)
-			gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(12)*(j+index2), 10)
+			gl.Text(wname, sX+150, y+1-(fSpacing)*(j+index2), fSize)
+			gl.Text(('%.3f%%'):format(tLoad), sX+105, y+1-(fSpacing)*(j+index2), fSize)
 			index2 = index2 + 1
-		end
+		--end
       end
     end
-    local i = index1 + index2 + 2
-    gl.Text("\255\255\064\064total time", x+150, y-1-(12)*i, 10)
-    gl.Text("\255\255\064\064"..('%.3fs'):format(allOverTimeSec), x+105, y-1-(12)*i, 10)
+    local i = index1 + 2
+    gl.Text("\255\255\064\064total time", x+150, y-1-(fSpacing)*i, fSize)
+    gl.Text("\255\255\064\064"..('%.3fs'):format(allOverTimeSec), x+105, y-1-(fSpacing)*i, fSize)
     i = i+1
-    gl.Text("\255\255\064\064total FPS cost", x+150, y-1-(12)*i, 10)
-    gl.Text("\255\255\064\064"..('%.1f%%'):format(allOverTime+allOverTimeSYNCED), x+105, y-1-(12)*i, 10)
+    gl.Text("\255\255\064\064total FPS cost", x+150, y-1-(fSpacing)*i, fSize)
+    gl.Text("\255\255\064\064"..('%.1f%%'):format(allOverTime+allOverTimeSYNCED), x+105, y-1-(fSpacing)*i, fSize)
     gl.EndText()
   end
 
