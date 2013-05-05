@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.114 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.115 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-April-15
+    date      = "2011-03-16", --2013-May-5
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -884,7 +884,7 @@ end
 
 
 local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camera while in follow cursor mode)
-	if follow_timer > 0 or smoothscroll or springscroll or rotate then
+	if smoothscroll or springscroll or rotate then
 		return
 	end
 	local lclZoom = function(cs,zoomin, smoothness, no_2)
@@ -1137,16 +1137,50 @@ function widget:Update(dt)
 	if hideCursor then
         spSetMouseCursor('%none%')
     end
-
-	--//HANDLE TRACK UNIT
-	local isTrackingUnit
-	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
+	
+	--//HANDLE TIMER FOR VARIOUS SECTION
+	--timer to block tracking when using mouse
+	if follow_timer > 0  then 
+		follow_timer = follow_timer - dt
+	end
+	--timer to block unit tracking
 	trackcycle = trackcycle + framePassed 
 	if trackcycle >=6 then 
 		trackcycle = 0 --reset value to Zero (0) every 6th frame. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
 	end
+	--timer to block cursor tracking
+	camcycle = camcycle + framePassed 
+	if camcycle >=12 then
+		camcycle = 0 --reset value to Zero (0) every 12th frame. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
+	end
+	--tweak to timer:
+	if trackcycle==0 and camcycle> 0 then
+		camcycle = 6 --prevent trackcyle & camcycle from out of sync with each other.
+		--Example:
+		--[[
+			estFrame   =   +4    +3     +3    +3    +3    +5   
+			camcycle   = 0 ... 4 ... 7 ... 0 ... 3 ... 6 ... 0
+			trackcycle = 0 ... 4 ... 7 ... 10... 13... 0 ... 5
+			             ^                             ^     ^
+			             sync                           unsync
+			camcycle   = 0 ... 4 ... 7 ... 0 ... 3 ... 6 ... 0
+			trackcycle = 0 ... 4 ... 7 ... 6 ... 9 ... 12... 0
+			             ^                                   ^
+			             sync                               sync						 
+		--]]
+	end
+	--timer to block periodic warning
+	cycle = cycle + framePassed
+	if cycle >=32*15 then
+		cycle = 0 --reset value to Zero (0) every 32*15th frame.
+	end	
+
+	--//HANDLE TRACK UNIT
+	local isTrackingUnit
+	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
 	if (trackcycle == 0 and
-		trackmode and 
+		trackmode and
+		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 		not thirdperson_trackunit and
 		(not rotate)) then --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
 		local selUnits = spGetSelectedUnits()
@@ -1166,18 +1200,11 @@ function widget:Update(dt)
 		end
 	end
 	
-	if follow_timer > 0  then 
-		follow_timer = follow_timer - dt
-	end
-	
 	--//HANDLE TRACK CURSOR
 	--camcycle = camcycle%(12) + 1  --automatically reset "camcycle" value to Zero (0) every 12th iteration.
-	camcycle = camcycle + framePassed 
-	if camcycle >=12 then
-		camcycle = 0 --reset value to Zero (0) every 12th frame. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
-	end
 	if (camcycle == 0 and
 		not isTrackingUnit and --if currently not tracking unit, and
+		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 		not thirdperson_trackunit and
 		options.follow.value) then --if follow selected player's cursor: do
 		if WG.alliedCursorsPos then 
@@ -1203,16 +1230,12 @@ function widget:Update(dt)
 		end
 	end
 	
-	--cycle = cycle%(32*15) + framePassed --automatically reset "cycle" value to Zero (0) every 32*15th iteration.
-	cycle = cycle + framePassed
-	if cycle >=32*15 then
-		cycle = 0 --reset value to Zero (0) every 32*15th frame.
-	end	
+	
 	-- Periodic warning
+	--cycle = cycle%(32*15) + framePassed --automatically reset "cycle" value to Zero (0) every 32*15th iteration.
 	if cycle == 0 then
 		PeriodicWarning()
 	end
-	
 
 	local cs = spGetCameraState()
 	
@@ -1390,6 +1413,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 		
 		spWarpMouse(msx, msy)
 		
+		follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	elseif springscroll then
 		
 		if abs(dx) > 0 or abs(dy) > 0 then
@@ -1403,6 +1427,8 @@ function widget:MouseMove(x, y, dx, dy, button)
 		local mxm = speed * dx * dir
 		local mym = speed * dy * dir
 		ScrollCam(cs, mxm, mym, 0)
+		
+		follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	end
 end
 
@@ -1421,7 +1447,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		return false
 	end
 	
-	follow_timer = 4
+	follow_timer = 3 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
 	
 	local a,c,m,s = spGetModKeyState()
 	
@@ -1498,7 +1524,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (button == 2) then
-		follow_timer = 4
+		follow_timer = 3 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
 		rotate = nil
 		smoothscroll = false
 		springscroll = false
@@ -1534,6 +1560,8 @@ function widget:MouseWheel(wheelUp, value)
 			overview_mode = false
 		else return; end --skip wheel if Overview_mode + ZOOM-out
 	end
+	
+	follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	return Zoom(not wheelUp, shift)
 end
 
