@@ -11,13 +11,13 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+local version = "v2.12"
 function widget:GetInfo()
   return {
     name      = "Display DPS",
-    desc      = "Displays damage per second done to your allies units v2.11",
+    desc      = version .. " Displays damage per second done to your allies units",
     author    = "TheFatController",
-    date      = "May 27, 2008", --26 April 2013 (colored text fix)
+    date      = "May 27, 2008", --6 May 2013 (colored text fix)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -36,6 +36,8 @@ local GetMyTeamID          = Spring.GetMyTeamID
 local GetGameSpeed         = Spring.GetGameSpeed
 local GetGameSeconds       = Spring.GetGameSeconds
 local GetUnitViewPosition  = Spring.GetUnitViewPosition
+local spIsSphereInView 	   = Spring.IsSphereInView
+local spIsUnitInView 	   = Spring.IsUnitInView
 
 local glTranslate      = gl.Translate
 local glColor          = gl.Color
@@ -174,32 +176,33 @@ local function calcDPS(inTable, paralyze, theTime)
 end
 
 local function drawDeathDPS(damage,ux,uy,uz,textSize,red,alpha)
-  
-  glPushMatrix()
-  glTranslate(ux, uy, uz)
-  glBillboard()
-  gl.MultiTexCoord(1, 0.25 + (0.5 * alpha))
-  
-  if red then
-    glColor(1, 0.5, 0.5)
-  else
-    glColor(1, 1, 1)
+  if spIsSphereInView(ux,uy,uz,8) then
+	  glPushMatrix()
+	  glTranslate(ux, uy, uz)
+	  glBillboard()
+	  gl.MultiTexCoord(1, 0.25 + (0.5 * alpha))
+	  
+	  if red then
+		glColor(1, 0.5, 0.5)
+	  else
+		glColor(1, 1, 1)
+	  end
+	  gl.PushMatrix()
+		fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16") --Reference: modfonts.lua, and unit_comm_nametags.lua (the colored nametagg)
+		local fontDefaultSize = fontHandler.GetFontSize()
+		gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
+		fontHandler.DrawCentered(tostring(damage), 0,0)
+	  gl.PopMatrix()
+	  --glText(damage, 0, 0, textSize, "cno")
+	  
+	  glPopMatrix()
   end
-  gl.PushMatrix()
-	fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16") --Reference: modfonts.lua, and unit_comm_nametags.lua (the colored nametagg)
-	local fontDefaultSize = fontHandler.GetFontSize()
-    gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
-    fontHandler.DrawCentered(tostring(damage), 0,0)
-  gl.PopMatrix()
-  --glText(damage, 0, 0, textSize, "cno")
-  
-  glPopMatrix()
 end
 
 local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
-  if Spring.IsGUIHidden() then
-    return
-  end
+  -- if Spring.IsGUIHidden() or (not spIsUnitInView(unitID))  then
+    -- return
+  -- end
   glTranslate(xshift, yshift, 0)
   glBillboard()
   gl.MultiTexCoord(1, 0.25 + (0.5 * alpha))
@@ -226,7 +229,7 @@ local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
 end
 
 local function DrawUnitFunc2(unitID, yshift, xshift, damage, textSize, alpha, paralyze)
-	if Spring.IsGUIHidden() then
+	if Spring.IsGUIHidden() or (not spIsUnitInView(unitID)) then
 		return
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID)

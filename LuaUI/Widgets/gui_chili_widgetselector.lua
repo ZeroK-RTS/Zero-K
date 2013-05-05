@@ -167,9 +167,8 @@ local function checkWidget(widget)
 		wcheck.font:SetColor(hilite_color)
 	end
 end
-WG.cws_checkWidget = function(widget)
-	checkWidget(widget)
-end
+
+WG.cws_checkWidget = function() end --function is declared in widget:Initialized()
 
 -- Kill Widgetlist window
 KillWidgetList = function()
@@ -387,6 +386,9 @@ function widget:Initialize()
 		"unbindkeyset f11"
 	})
 	
+	WG.cws_checkWidget = function(widget)
+		checkWidget(widget)
+	end
 end
 
 function widget:ViewResize(vsx, vsy)

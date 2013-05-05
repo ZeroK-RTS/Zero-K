@@ -125,6 +125,7 @@ path='Settings/Reset Settings'
 						"advshading 0",
 						"grounddecals 0",
 						'luaui disablewidget LupsManager',
+						"luaui disablewidget Lups",
 						"luaui disablewidget Display DPS",
 						"luaui disablewidget SelectionHalo",
 						"luaui disablewidget SelectionCircle",
@@ -377,7 +378,7 @@ path='Settings/Graphics'
 		springsetting = 'MaxParticles',
 		OnChange=function(self) Spring.SendCommands{"maxparticles " .. self.value } end, 
 	} )
-	ShButton('Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager'} end )
+	ShButton('Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager','luaui togglewidget Lups'} end )
 	ShButton('Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
 	
 path='Settings/Graphics/Effects'
