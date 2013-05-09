@@ -1,4 +1,4 @@
-local versionName = "v2.85"
+local versionName = "v2.851"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "April 24, 2013",
+    date      = "May 5, 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -69,6 +69,7 @@ local mathRandom = math.random
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
+local isOldSpring_g = 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
 local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
 local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
@@ -151,7 +152,8 @@ local attackerG= {} --for recording last attacker
 local commandTTL_G = {} --for recording command's age. To check for expiration. Note: Each table entry is indexed by unitID
 local iNotLagging_gbl = true --//variable: indicate if player(me) is lagging in current game. If lagging then do not process anything.
 local selectedCons_Meta_gbl = {} --//variable: remember which Constructor is selected by player.
-local unitWasDead_gbl = {} --//variable:remember last case of unit death as precaution against Spring93.1 quick unitID recycling
+local unitWasDead_gbl = {} --//variable: remember last case of unit death as precaution against Spring93.1 quick unitID recycling (especially if unitID is reuses again in less than 1.1 second period)
+
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -264,6 +266,7 @@ function widget:Update()
 	local doCalculation_then_gps_delay = doCalculation_then_gps_delayG
 	local gps_then_DoCalculation_delay = gps_then_DoCalculation_delayG
 	local unitWasDead = unitWasDead_gbl
+	local myTeamID = myTeamID_gbl
 	-----
 	if iNotLagging_gbl then
 		local now=spGetGameSeconds()
@@ -271,7 +274,7 @@ function widget:Update()
 		if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 			unitWasDead = {}
-			unitInMotion, attacker, commandTTL, selectedCons_Meta =RefreshUnitList(attacker, commandTTL,unitWasDead) --create unit list
+			unitInMotion, attacker, commandTTL, selectedCons_Meta =RefreshUnitList(attacker, commandTTL) --create unit list
 			
 			local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --create list every 1.1 second OR every (0+latency) second, depending on which is greater.
 			skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
@@ -280,7 +283,7 @@ function widget:Update()
 		--GATHER SOME INFORMATION ON UNITS-- *part 1, start*
 		if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --wait until 'skippingTimer[2] second', and wait for 'LUA message received', and wait for 'cycle==1', then do "GetPreliminarySeparation()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
-			surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta,unitWasDead)
+			surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta,unitWasDead,myTeamID)
 			cycle=2 --set to 'cycle==2'
 			
 			skippingTimer[2] = now + gps_then_DoCalculation_delay --wait until 'gps_then_DoCalculation_delayG'. The longer the better. The delay allow reliable unit direction to be derived from unit's motion
@@ -290,7 +293,7 @@ function widget:Update()
 		if (now >=skippingTimer[2] and cycle==2) then --wait until 'skippingTimer[2] second', and wait for 'cycle==2', then do "DoCalculation()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 			local isAvoiding = nil
-			commandIndexTable, commandTTL,isAvoiding =DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, skippingTimer, now, commandTTL,unitWasDead) --initiate avoidance system
+			commandIndexTable, commandTTL,isAvoiding =DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, skippingTimer, now, commandTTL,unitWasDead, myTeamID) --initiate avoidance system
 			cycle=1 --set to 'cycle==1'
 			
 			if isAvoiding then  
@@ -342,9 +345,20 @@ function widget:UnitDestroyed(unitID)
 	end
 end
 
+function widget:UnitGiven(unitID, unitDefID, unitTeamID)
+	if unitTeamID == myTeamID_gbl then
+		if commandTTL_G[unitID] then --empty watch list for this unit is shared away
+			commandTTL_G[unitID] = nil
+		end
+		if commandIndexTableG[unitID] then
+			commandIndexTableG[unitID] = nil
+		end
+	end
+end
+
 ---------------------------------Level 0 Top level
 ---------------------------------Level1 Lower level
--- return a refreshed unit list, else return nil
+-- return a refreshed unit list, else return a table containing NIL
 function RefreshUnitList(attacker, commandTTL)
 	local stdDecloakDist = stdDecloakDist_fG
 	----------------------------------------------------------
@@ -444,13 +458,13 @@ function RefreshUnitList(attacker, commandTTL)
 end
 
 -- detect initial enemy separation to detect "fleeing enemy"  later
-function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta,unitWasDead)
+function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta,unitWasDead,myTeamID)
 	local surroundingOfActiveUnit={}
 	if unitInMotion[1]~=nil then --don't execute if no unit present
 		local arrayIndex=1
 		for i=2, unitInMotion[1], 1 do --array index 1 contain the array's lenght, start from 2
 			local unitID= unitInMotion[i][1] --get unitID for commandqueue
-			if spGetUnitIsDead(unitID)==false or unitWasDead[unitID]==nil then --prevent execution if unit died during transit
+			if not (spGetUnitIsDead(unitID) or unitWasDead[unitID]) and (spGetUnitTeam(unitID)==myTeamID) then --prevent execution if unit died during transit
 				local cQueue = spGetCommandQueue(unitID)
 				local executionAllow, cQueueTemp, isReloadAvoidance = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i]) --filter/alter unwanted unit state by reading the command queue
 				if executionAllow then
@@ -513,12 +527,12 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 end
 
 --perform the actual collision avoidance calculation and send the appropriate command to unit
-function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, skippingTimer, now, commandTTL,unitWasDead)
+function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, skippingTimer, now, commandTTL,unitWasDead,myTeamID)
 	local isAvoiding = nil
 	if surroundingOfActiveUnit[1]~=nil then --if flagged as nil then no stored content then this mean there's no relevant unit
 		for i=2,surroundingOfActiveUnit[1], 1 do --index 1 is for array's lenght
 			local unitID=surroundingOfActiveUnit[i][1]
-			if spGetUnitIsDead(unitID)==false and unitWasDead[unitID]==nil then --prevent unit death from short circuiting the system
+			if not (spGetUnitIsDead(unitID) or unitWasDead[unitID]) and (spGetUnitTeam(unitID)==myTeamID) then --prevent unit death from short circuiting the system
 				local unitSSeparation=surroundingOfActiveUnit[i][2]
 				local targetCoordinate=surroundingOfActiveUnit[i][3]
 				local losRadius=surroundingOfActiveUnit[i][4]
@@ -812,7 +826,7 @@ end
 
 --ignore command set on this box
 function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger, lastPosition)
-	----Global Cpnstant----
+	----Global Constant----
 	local halfTargetBoxSize = halfTargetBoxSize_g
 	-----------------------
 	local currentX, currentZ = lastPosition[1], lastPosition[2]
@@ -838,6 +852,9 @@ end
 
 -- get LOS
 function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
+	----Global Constant----
+	local isOldSpring = isOldSpring_g --for Spring < 95 compatibility
+	-----------------------
 	local unitDefID= spGetUnitDefID(unitID)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
@@ -847,7 +864,7 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
 			local unitFastestReloadableWeapon = reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 			if unitFastestReloadableWeapon ~= -1 then
-				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range") --retrieve weapon range
+				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon -isOldSpring, "range") --retrieve weapon range
 				losRadius = math.min(weaponRange*0.75, losRadius) --reduce avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the smallest (Note: we need this minimum detection range to avoid disturbing maximum range artillery unit)
 			end			
 			--[[
@@ -883,7 +900,7 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
 	local iAmConstructor = unitDef["builder"]
-	local unitState = spGetUnitStates(unitID)
+	local unitState = spGetUnitStates(unitID) --unitID is "this" unit (our unit)
 	local iAmNotCloaked = not unitState["cloak"]
 	
 	if (turnOnEcho == 1) then
@@ -1198,10 +1215,11 @@ end
 ---------------------------------Level3 (low-level function)
 --check if unit is vulnerable/reloading
 function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
-	------
-	local criticalShieldLevel =criticalShieldLevelG --global constant
+	---Global Constant---
+	local criticalShieldLevel =criticalShieldLevelG 
 	local minimumRemainingReloadTime =minimumRemainingReloadTimeG
 	local secondPerGameFrame =secondPerGameFrameG
+	local isOldSpring = isOldSpring_g --for Spring < 95 compatibility
 	------
 	--local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
 	local shieldIsCritical =false
@@ -1219,13 +1237,13 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 		end
 		local unitFastestReloadableWeapon = unitInMotionSingleUnitTable.reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 		if unitFastestReloadableWeapon ~= -1 then
-			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon) --Somehow the weapon table actually start at "0", so minus 1 from actual value
+			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-isOldSpring) --Somehow the weapon table actually start at "0", so minus 1 from actual value
 			local currentFrame, _ = spGetGameFrame() 
 			local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
 			weaponIsEmpty = (remainingTime> minimumRemainingReloadTime)
 			if (turnOnEcho == 1) then --debugging
 				Spring.Echo(unitFastestReloadableWeapon)
-				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range"))
+				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-isOldSpring, "range"))
 			end
 		end			
 	--end

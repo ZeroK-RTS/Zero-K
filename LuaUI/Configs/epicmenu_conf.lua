@@ -122,11 +122,12 @@ path='Settings/Reset Settings'
 					spSendCommands{"water 0",
 						"Shadows 0",
 						"maxparticles 100",
-						"advshading 0",
+						"advmodelshading 0",
 						"grounddecals 0",
 						'luaui disablewidget LupsManager',
 						"luaui disablewidget Lups",
 						"luaui disablewidget Display DPS",
+						"luaui disablewidget Map Edge Extension",
 						"luaui disablewidget SelectionHalo",
 						"luaui disablewidget SelectionCircle",
 						"luaui disablewidget UnitShapes",
@@ -362,7 +363,7 @@ path='Settings/Graphics'
 		name = 'Shiny Units',
 		type = 'bool',
 		springsetting = 'AdvUnitShading',
-		OnChange=function(self) spSendCommands{"advshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
+		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
 	AddOption({ 	
 		name = 'Ground Decals',

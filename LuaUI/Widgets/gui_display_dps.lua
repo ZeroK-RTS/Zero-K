@@ -17,7 +17,7 @@ function widget:GetInfo()
     name      = "Display DPS",
     desc      = version .. " Displays damage per second done to your allies units",
     author    = "TheFatController",
-    date      = "May 27, 2008", --6 May 2013 (colored text fix)
+    date      = "May 27, 2008", --7 May 2013 (colored text fix)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -229,7 +229,7 @@ local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
 end
 
 local function DrawUnitFunc2(unitID, yshift, xshift, damage, textSize, alpha, paralyze)
-	if Spring.IsGUIHidden() or (not spIsUnitInView(unitID)) then
+	if (not spIsUnitInView(unitID)) then
 		return
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID)
