@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by msafwan (impulsejump)",
-		date    = "May 14 2008, March 30 2013",
+		date    = "May 14 2008, May 11 2013",
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
 		enabled = isImpulseJump,
@@ -110,7 +110,6 @@ local jumpCmdDesc = {
 	action	= 'jump',
 	tooltip = 'Impulse Jump to selected position.',
 }
-
 	
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -381,28 +380,21 @@ local function Jump(unitID, goal, cmdTag)
 				break --jump aborted (skip to refreshing reload bar)
 			end
 
-			if type(jumping[unitID])== 'number'  then --if collision detected?	skip trajectory maintenance
-				if jumping[unitID] > 0 then
-					if jumping[unitID] == 1 then
-						local _,vy,_= spGetUnitVelocity(unitID)
-						impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
-						impulseQueue[#impulseQueue+1] = {unitID, 0, -vy-4, 0} --add correction impulse
-					end
-					jumping[unitID] = jumping[unitID]-1				
-				else
-					jumping[unitID] = true
-				end
-			else 
+			do
 				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
-				--Spring.Echo("----")
 				local _,vy,_= spGetUnitVelocity(unitID)
-				--speedProfile[#speedProfile+1]=vy
+				local collide = type(jumping[unitID])== 'number'
+				jumping[unitID] = true
 				local speedDiffer =desiredVerticalSpeed - vy --calculate correction
+				if collide and abs(speedDiffer) > 2 then
+					spSetUnitVelocity(unitID,0,0,0) --stop unit
+					break --jump aborted (skip to refreshing reload bar)
+				end
 				local sign = math.abs(speedDiffer)/speedDiffer
 				speedDiffer = sign*math.min(math.abs(speedDiffer),10) --cap maximum correction to 10 impulse safety against 'physic glitch' (violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
 				impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
 				impulseQueue[#impulseQueue+1] = {unitID, 0, speedDiffer-4, 0} --add correction impulse
-				--Spring.Echo(speedDiffer)
+				----Spring.Echo("----"); speedProfile[#speedProfile+1]=vy; Spring.Echo(speedDiffer)
 			end
 		
 			if rotateMidAir then -- allow unit to maintain posture in the air
@@ -490,7 +482,7 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision
 	if jumping[unitID] and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
-		jumping[unitID] = 3 --skip jump impulse for several cycle to escape 'physic glitch'
+		jumping[unitID] = 1 --signal to jump loop that a collision is occurring (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
 		return math.random()  -- no collision damage. use random return so that unit_fall_damage.lua do not use pairs of zero to calculate collision damage.
 	end
 	-- ground collision
