@@ -675,11 +675,13 @@ local function DrawFormationLines(vertFunction, lineStipple)
 	if #fNodes > 1 then
 		SetColor(usingCmd, 1.0)
 		glBeginEnd(GL_LINE_STRIP, vertFunction, fNodes)
+		glColor(1,1,1,1)
 	end
 	
 	if #dimmNodes > 1 then
 		SetColor(dimmCmd, dimmAlpha)
 		glBeginEnd(GL_LINE_STRIP, vertFunction, dimmNodes)
+		glColor(1,1,1,1)
 	end
 	
 	glLineWidth(1.0)
