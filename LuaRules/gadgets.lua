@@ -1910,33 +1910,10 @@ function gadgetHandler:RegisterCMDID(gadget, id)
   self.CMDIDs[id] = gadget
 end
 
-function gadgetHandler:AllowResourceTransfer(oldTeam, newTeam, type, amount)	-- ours
---function gadgetHandler:AllowResourceTransfer(teamID, res, level)	-- base
-  for _,g in ipairs(self.AllowResourceTransferList) do
-    if (not g:AllowResourceTransfer(oldTeam, newTeam, type, amount)) then	-- ours
-	--if (not g:AllowResourceTransfer(teamID, res, level)) then	-- base
-      return false
-    end
-  end
-  return true
-end
-
---function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)	-- ours
-function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)	-- base
-  for _,g in ipairs(self.CommandFallbackList) do
-  	--local used, remove = g:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)	-- ours
-    local used, remove = g:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)	-- base
-    if (used) then
-      return remove
-    end
-  end
-  return true  -- remove the command
-end
-
 local AllowCommand_WantedCommand = {}
 local AllowCommand_WantedUnitDefID = {}
 
-function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced) 	-- ours
+function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced) 	-- ours
 --function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)	-- base
   for _,g in ipairs(self.AllowCommandList) do
 	if not AllowCommand_WantedCommand[g] then
@@ -1953,7 +1930,7 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParam
 	--end
 	if ((wantedCommand == true) or wantedCommand[cmdID]) and
 		((wantedUnitDefID == true) or wantedUnitDefID[unitDefID]) and
-		(not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, fromSynced)) then	-- ours
+		(not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)) then	-- ours
 	--if (not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)) then	-- base
       return false
     end
