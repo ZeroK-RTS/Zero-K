@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.314 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.315 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-04-10
+    date      = "2009-06-02", --2013-05-12
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -12,6 +12,8 @@ function widget:GetInfo()
 	alwaysStart = true,
   }
 end
+
+include("utility_two.lua") --contain file backup function
 
 --CRUDE EXPLAINATION (third party comment) on how things work: (by Msafwan)
 --1) first... a container called "OPTION" is shipped into epicMenuFactory from various sources (from widgets or epicmenu_conf.lua)
@@ -37,16 +39,31 @@ local echo = Spring.Echo
 --------------------------------------------------------------------------------
 
 -- Config file data
-local VFSMODE      = VFS.RAW_FIRST
-local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
-local confdata = VFS.Include(file, nil, VFSMODE)
+local keybind_file, defaultkeybinds, defaultkeybind_date, confdata
+do
+	--load config file:
+	local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
+	confdata = VFS.Include(file, nil, VFS.RAW_FIRST)
+	--assign keybind file:
+	keybind_file = LUAUI_DIRNAME .. 'Configs/' .. Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
+	local isMission = Game.modDesc:find("Mission Mutator")
+	if isMission then
+		--FIXME: find modname instead of using hardcoded mission_keybinds_file name
+		keybind_file = (confdata.mission_keybinds_file and LUAUI_DIRNAME .. 'Configs/' .. confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
+	end
+	--check for validity, backup or delete
+	CheckLUAFileAndBackup(keybind_file,'') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
+	--load default keybinds:
+	--FIXME: make it automatically use same name for mission, multiplayer, and default keybinding file
+	local default_keybind_file = LUAUI_DIRNAME .. 'Configs/' .. confdata.default_source_file
+	local file_return = VFS.Include(default_keybind_file, nil, VFS.ZIP)
+	defaultkeybinds = file_return.keybinds
+	defaultkeybind_date = file_return.date
+end
 local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
-local keybind_file = confdata.keybind_file or title_text .. '_keys.lua'
-local file_return = VFS.Include(keybind_file, nil, VFS.ZIP)
-local defaultkeybinds, defaultkeybind_date = file_return.keybinds, file_return.date
 local useUiKeys = false
 --file_return = nil
 
@@ -868,7 +885,7 @@ local function RemoveOptionAction(path, option)
 end
 
 
--- Unsssign a keybinding from settings and other tables that keep track of related info
+-- Unassign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(actionName, verbose)
 	local actionHotkeys = GetActionHotkeys(actionName)
 	if actionHotkeys then

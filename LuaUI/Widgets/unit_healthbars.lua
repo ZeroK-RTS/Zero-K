@@ -15,7 +15,7 @@ function widget:GetInfo()
     name      = "HealthBars",
     desc      = "Gives various informations about units in form of bars.",
     author    = "jK",
-    date      = "2009", --2013 April 25
+    date      = "2009", --2013 May 12
     license   = "GNU GPL, v2 or later",
     layer     = -10,
     enabled   = true  --  loaded by default?
@@ -1076,21 +1076,13 @@ do
 
   local sec = 0
   local sec2 = 0
-  local sec3 = 0
-
-  local _1GameFrameSecond = 0.033
 
   function widget:Update(dt)
     sec=sec+dt
     blink = (sec%1)<0.5
 
     gameFrame = GetGameFrame()
-
-    sec3 = sec3 +dt
-    if sec3 > _1GameFrameSecond then
-        sec3 = 0
-        visibleUnits = GetVisibleUnits(-1,nil,false)
-    end
+    visibleUnits = GetVisibleUnits(-1,nil,false) --this don't need any delayed update or caching since its already done in "LUAUI/cache.lua"
 
     sec2=sec2+dt
     if (sec2>1/3) then

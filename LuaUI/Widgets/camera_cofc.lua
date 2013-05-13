@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.115 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.116 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-May-5
+    date      = "2011-03-16", --2013-May-12
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -1180,6 +1180,7 @@ function widget:Update(dt)
 	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
 	if (trackcycle == 0 and
 		trackmode and
+		not overview_mode and
 		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 		not thirdperson_trackunit and
 		(not rotate)) then --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
@@ -1204,6 +1205,7 @@ function widget:Update(dt)
 	--camcycle = camcycle%(12) + 1  --automatically reset "camcycle" value to Zero (0) every 12th iteration.
 	if (camcycle == 0 and
 		not isTrackingUnit and --if currently not tracking unit, and
+		not overview_mode and
 		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 		not thirdperson_trackunit and
 		options.follow.value) then --if follow selected player's cursor: do
@@ -1447,7 +1449,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		return false
 	end
 	
-	follow_timer = 3 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
+	follow_timer = 4 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
 	
 	local a,c,m,s = spGetModKeyState()
 	
@@ -1524,7 +1526,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (button == 2) then
-		follow_timer = 3 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
+		follow_timer = 4 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
 		rotate = nil
 		smoothscroll = false
 		springscroll = false
