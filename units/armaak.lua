@@ -166,6 +166,7 @@ unitDef = {
       blocking         = true,
       damage           = 1020,
       energy           = 0,
+      featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
       height           = [[15]],
