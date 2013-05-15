@@ -102,7 +102,6 @@ unitDef = {
       name                    = [[Red Killer]],
       accuracy                = 750,
       avoidFeature            = false,
-	  avoidGround             = false,
       areaOfEffect            = 192,
       craterBoost             = 4,
       craterMult              = 3,
@@ -135,7 +134,6 @@ unitDef = {
       accuracy                = 750,
       areaOfEffect            = 512,
       avoidFeature            = false,
-	  avoidGround             = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 	  
@@ -173,7 +171,6 @@ unitDef = {
       accuracy                = 750,
       areaOfEffect            = 384,
       avoidFeature            = false,
-	  avoidGround             = false,
       craterBoost             = 0.5,
       craterMult              = 1,
 
@@ -206,7 +203,6 @@ unitDef = {
       accuracy                = 750,
       areaOfEffect            = 300,
       avoidFeature            = false,
-	  avoidGround             = false,
       craterBoost             = 32,
       craterMult              = 1,
 
@@ -244,7 +240,6 @@ unitDef = {
       accuracy                = 750,
       areaOfEffect            = 320,
       avoidFeature            = false,
-	  avoidGround             = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
@@ -280,7 +275,6 @@ unitDef = {
       accuracy                = 750,
       areaOfEffect            = 720,
       avoidFeature            = false,
-	  avoidGround             = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 

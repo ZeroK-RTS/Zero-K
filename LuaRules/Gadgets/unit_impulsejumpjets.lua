@@ -7,9 +7,9 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by msafwan (impulsejump)",
-		date    = "May 14 2008, May 11 2013",
+		date    = "May 14 2008, March 11 2013",
 		license = "GNU GPL, v2 or later",
-		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
+		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage)
 		enabled = isImpulseJump,
 	}
 end
@@ -64,7 +64,6 @@ local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
 local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
-local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spCallCOBScript      = Spring.CallCOBScript
@@ -110,6 +109,7 @@ local jumpCmdDesc = {
 	action	= 'jump',
 	tooltip = 'Impulse Jump to selected position.',
 }
+
 	
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -292,14 +292,11 @@ local function Jump(unitID, goal, cmdTag)
 		if delay > 0 then
 			local countUp = 1
 			while (countUp <= delay ) do
-				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 				if GG.wasMorphedTo[unitID] then
 					local oldUnitID = unitID --previous unitID
 					unitID = GG.wasMorphedTo[unitID] --new unitID
 					local unitDefID = spGetUnitDefID(unitID)
 					if (not jumpDefs[unitDefID]) then --check if new unit can jump
-						jumping[unitID] = nil
-						lastJump[unitID] = nil
 						return --exit JumpLoop() if unit can't jump
 					end
 					cob = jumpDefs[unitDefID].cobscript --script type
@@ -339,29 +336,23 @@ local function Jump(unitID, goal, cmdTag)
 			end
 		end
 		
-		do
-			local x,y,z =spGetUnitPosition(unitID)
-			local grndh =spGetGroundHeight(x,z)
-			if y<=grndh+1 then
-				spSetUnitVelocity(unitID,0,0,0) --thus its speed don't interfere with jumping (prevent range increase while running). Note; flying unit wont be effected
-			end
-		end
 		SetLeaveTracks(unitID, false)
-		impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
-		impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
+		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {}) --we give wait so that unit stop, thus its speed don't interfere with jumping. Note; flying unit wont be effected
+			Sleep()
+			Sleep()
+			impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+			impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
+		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {}) --continue move
 		unitCmdQueue[unitID] = spGetCommandQueue(unitID)
 		
 		local halfJump
 		local i = 0
 		while i <= duration*1.5 do
-			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 			if GG.wasMorphedTo[unitID] then
 				local oldUnitID = unitID
 				unitID = GG.wasMorphedTo[unitID]
 				local unitDefID = spGetUnitDefID(unitID)
 				if (not jumpDefs[unitDefID]) then
-					jumping[unitID] = nil
-					lastJump[unitID] = nil
 					return
 				end
 				cob = jumpDefs[unitDefID].cobscript
@@ -376,25 +367,32 @@ local function Jump(unitID, goal, cmdTag)
 			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then
 				return --unit died
 			end
-			if (not jumping[unitID] ) or ( jumping[unitID]=="landed" ) then
+			if not jumping[unitID] then
 				break --jump aborted (skip to refreshing reload bar)
 			end
 
-			do
-				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
-				local _,vy,_= spGetUnitVelocity(unitID)
-				local collide = type(jumping[unitID])== 'number'
-				jumping[unitID] = true
-				local speedDiffer =desiredVerticalSpeed - vy --calculate correction
-				if collide and abs(speedDiffer) > 2 then
-					spSetUnitVelocity(unitID,0,0,0) --stop unit
-					break --jump aborted (skip to refreshing reload bar)
+			if type(jumping[unitID])== 'number'  then --if collision detected?	skip trajectory maintenance
+				if jumping[unitID] > 0 then
+					if jumping[unitID] == 1 then
+						local _,vy,_= spGetUnitVelocity(unitID)
+						impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
+						impulseQueue[#impulseQueue+1] = {unitID, 0, -vy-4, 0} --add correction impulse
+					end
+					jumping[unitID] = jumping[unitID]-1				
+				else
+					jumping[unitID] = true
 				end
+			else 
+				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
+				--Spring.Echo("----")
+				local _,vy,_= spGetUnitVelocity(unitID)
+				--speedProfile[#speedProfile+1]=vy
+				local speedDiffer =desiredVerticalSpeed - vy --calculate correction
 				local sign = math.abs(speedDiffer)/speedDiffer
 				speedDiffer = sign*math.min(math.abs(speedDiffer),10) --cap maximum correction to 10 impulse safety against 'physic glitch' (violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
 				impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
 				impulseQueue[#impulseQueue+1] = {unitID, 0, speedDiffer-4, 0} --add correction impulse
-				----Spring.Echo("----"); speedProfile[#speedProfile+1]=vy; Spring.Echo(speedDiffer)
+				--Spring.Echo(speedDiffer)
 			end
 		
 			if rotateMidAir then -- allow unit to maintain posture in the air
@@ -439,8 +437,6 @@ local function Jump(unitID, goal, cmdTag)
 				unitID = GG.wasMorphedTo[unitID]
 				local unitDefID = spGetUnitDefID(unitID)
 				if (not jumpDefs[unitDefID]) then --check if new unit can jump
-					jumping[unitID] = nil
-					lastJump[unitID] = nil				
 					break
 				end
 				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
@@ -482,13 +478,13 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision
 	if jumping[unitID] and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
-		jumping[unitID] = 1 --signal to jump loop that a collision is occurring (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
+		jumping[unitID] = 3 --skip jump impulse for several cycle to escape 'physic glitch'
 		return math.random()  -- no collision damage. use random return so that unit_fall_damage.lua do not use pairs of zero to calculate collision damage.
 	end
 	-- ground collision
 	if jumping[unitID] and weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
 		spSetUnitVelocity(unitID,0,Game.gravity*3/30/30,0) --add some bounce upward to escape 'physic glitch'
-		jumping[unitID] = "landed" --abort jump. Note: we do not assign NIL because jump is not yet completed and we do not want a 2nd mid-air jump just because CommandFallback() sees NIL.
+		jumping[unitID] = false --abort jump
 		return 0  -- no collision damage.
 	end
 	return damage
@@ -515,8 +511,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
-	--NOTE: its really important to map old table to new id ASAP to prevent CommandFallback() from executing jump twice for morphed unit. 
-	--UnitDestroyed() is called before CommandFallback() when unit is morphed (unit_morph.lua must destroy unit before issuing command) 
 	if jumping[oldUnitID] and GG.wasMorphedTo[oldUnitID] then
 		local newUnitID = GG.wasMorphedTo[oldUnitID]
 		jumping[newUnitID] = jumping[oldUnitID] --copy last jump state to new unit
@@ -528,18 +522,6 @@ function gadget:UnitDestroyed(oldUnitID, unitDefID)
 		jumping[oldUnitID] = nil --empty old unit's data
 		unitCmdQueue[oldUnitID] = nil
 	end
-end
-
-function gadget:AllowCommand_GetWantedCommand()	
-	return true
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()	
-	boolDef = {}
-	for udid,_ in pairs(jumpDefs) do
-		boolDef[udid] = true
-	end
-	return boolDef
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
@@ -567,7 +549,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
-	if (not jumpDefs[unitDefID]) then --ignore non-jumpable unit
+	if (not jumpDefs[unitDefID]) then
 		return false
 	end
 	
@@ -593,29 +575,16 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if (distSqr < (range*range)) then
 		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
 		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
-			local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
-			if not didJump then
-				return true, true -- command was used, don't remove it
-			end
-			return true, keepCommand -- command was used, remove it 
-			
-			--[[ with Jump randomizer:
 			local coords = table.concat(cmdParams)
-			local currFrame = spGetGameFrame()
-			for allCoords, oldStuff in pairs(jumps) do
-				if currFrame-oldStuff[2] > 150 then 
-					jumps[allCoords] = nil --empty jump table (used for randomization) after 5 second. Use case: If infinite wave of unit has same jump coordinate then jump coordinate won't get infinitely random
-				end
-			end
 			if (not jumps[coords]) then
 				local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
 				if not didJump then
 					return true, true -- command was used, don't remove it
 				end
-				jumps[coords] = {1,currFrame}
+				jumps[coords] = 1
 				return true, keepCommand -- command was used, remove it 
 			else
-				local r = landBoxSize*jumps[coords][1]^0.5/2
+				local r = landBoxSize*jumps[coords]^0.5/2
 				local randpos = {
 					cmdParams[1] + random(-r, r),
 					cmdParams[2],
@@ -624,10 +593,9 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				if not didJump then
 					return true, true -- command was used, don't remove it
 				end
-				jumps[coords][1] = jumps[coords][1] + 1
-				return true, keepCommand -- command was used, remove it
+				jumps[coords] = jumps[coords] + 1
+				return true, keepCommand -- command was used, remove it 
 			end
-			--]]
 		end
 	else
 		if not goalSet[unitID] then
@@ -640,7 +608,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 end
 
 
-function gadget:GameFrame(currFrame)
+function gadget:GameFrame(n)
 	UpdateCoroutines()
 	for i=#impulseQueue, 1, -1 do --we need to apply impulse outside a coroutine thread like this because we don't want impulses in a coroutine to cancel any newton's impulses that is occuring in main thread. We wanted all them to add up.
 		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4])

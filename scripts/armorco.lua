@@ -35,7 +35,6 @@ local lastTorsoHeading = 0
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
-
 local PACE = 1.1
 
 -- four leg positions - front to straight, then to back, then to bent (then front again)
@@ -135,9 +134,7 @@ local function Step(frontLeg, backLeg)
 end
 
 local function Walk()
-	Signal(SIG_Walk)
 	SetSignalMask( SIG_Walk )
-	
 	while ( true ) do
 		Step(leftLeg, rightLeg)
 		Step(rightLeg, leftLeg)
@@ -145,9 +142,6 @@ local function Walk()
 end
 
 local function StopWalk()
-	Signal(SIG_Walk)
-	SetSignalMask( SIG_Walk )
-	
 	Move(torso, y_axis, 0, 100)
 	for i,p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, LEG_STRAIGHT_SPEEDS[i])
@@ -168,6 +162,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	Signal( SIG_Walk )
 	StartThread( StopWalk )
 end
 

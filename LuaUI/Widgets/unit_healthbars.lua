@@ -15,7 +15,7 @@ function widget:GetInfo()
     name      = "HealthBars",
     desc      = "Gives various informations about units in form of bars.",
     author    = "jK",
-    date      = "2009", --2013 May 12
+    date      = "2009",
     license   = "GNU GPL, v2 or later",
     layer     = -10,
     enabled   = true  --  loaded by default?
@@ -217,7 +217,7 @@ function widget:Initialize()
   --// find real primary weapon and its reloadtime
   for _,ud in pairs(UnitDefs) do
     ud.reloadTime    = 0;
-    ud.primaryWeapon = 1;
+    ud.primaryWeapon = 0;
     ud.shieldPower   = 0;
 
     for i=1,#ud.weapons do
@@ -561,7 +561,6 @@ do
   function JustGetOverlayInfos(unitID,unitDefID, ud)
     
 	ux, uy, uz = GetUnitViewPosition(unitID)
-	if not ux then return end
     dx, dy, dz = ux-cx, uy-cy, uz-cz
     dist = dx*dx + dy*dy + dz*dz
 	
@@ -598,7 +597,7 @@ do
         canStockpile  = ud.canStockpile,
 		gadgetStock   = ud.customParams.stockpiletime,
         reloadTime    = ud.reloadTime,
-        primaryWeapon = ud.primaryWeapon,
+        primaryWeapon = ud.primaryWeapon-1,
 		maxWaterTank  = ud.customParams.maxwatertank,
 		freeStockpile = (ud.customParams.freestockpile and true) or nil,
       }
@@ -607,7 +606,6 @@ do
 
     fullText = true
     ux, uy, uz = GetUnitViewPosition(unitID)
-	if not ux then return end
     dx, dy, dz = ux-cx, uy-cy, uz-cz
     dist = dx*dx + dy*dy + dz*dz
     if (dist > infoDistance) then
@@ -997,7 +995,7 @@ do
         return
       end
       if WG.Cutscene and WG.Cutscene.IsInCutscene() then
-        return
+	return
       end
       --gl.Fog(false)
       --gl.DepthTest(true)
@@ -1012,31 +1010,25 @@ do
       for i=1,#visibleUnits do
         unitID    = visibleUnits[i]
         unitDefID = GetUnitDefID(unitID)
-		if (unitDefID) then
-          unitDef   = UnitDefs[unitDefID]
-          if (unitDef) then
-            DrawUnitInfos(unitID, unitDefID, unitDef)
-          end
+        unitDef   = UnitDefs[unitDefID or -1]
+        if (unitDef) then
+          DrawUnitInfos(unitID, unitDefID, unitDef)
         end
       end
       
       --// draw bars for features
-      local wx, wy, wz, dx, dy, dz, dist, featureID, valid
+      local wx, wy, wz, dx, dy, dz, dist
       local featureInfo
       for i=1,#visibleFeatures do
         featureInfo = visibleFeatures[i]
-		featureID = featureInfo[4]
-        valid = Spring.ValidFeatureID(featureID)
-        if (valid) then
-          wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
-          dx, dy, dz = wx-cx, wy-cy, wz-cz
-          dist = dx*dx + dy*dy + dz*dz
-          if (dist < 6000000) then
-            if (dist < infoDistance) then
-              DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx,wy,wz)
-            else
-              DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx,wy,wz)
-            end
+        wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
+        dx, dy, dz = wx-cx, wy-cy, wz-cz
+        dist = dx*dx + dy*dy + dz*dz
+        if (dist < 6000000) then
+          if (dist < infoDistance) then
+            DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx,wy,wz)
+          else
+            DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx,wy,wz)
           end
         end
       end
@@ -1045,11 +1037,9 @@ do
       for i=1,#visibleUnits do
         unitID    = visibleUnits[i]
         unitDefID = GetUnitDefID(unitID)
-		if (unitDefID) then
-          unitDef   = UnitDefs[unitDefID]
-          if (unitDef) then
-            JustGetOverlayInfos(unitID, unitDefID, unitDef)
-          end
+        unitDef   = UnitDefs[unitDefID or -1]
+        if (unitDef) then
+          JustGetOverlayInfos(unitID, unitDefID, unitDef)
         end
       end
 	end
@@ -1076,13 +1066,23 @@ do
 
   local sec = 0
   local sec2 = 0
+  local sec3 = 0
+
+  local videoFrame   = 0
+  local _1GameFrameSecond = 0.033
 
   function widget:Update(dt)
     sec=sec+dt
     blink = (sec%1)<0.5
 
     gameFrame = GetGameFrame()
-    visibleUnits = GetVisibleUnits(-1,nil,false) --this don't need any delayed update or caching since its already done in "LUAUI/cache.lua"
+
+    videoFrame = videoFrame+1
+    sec3 = sec3 +dt
+    if sec3 > _1GameFrameSecond then
+        sec3 = 0
+        visibleUnits = GetVisibleUnits(-1,nil,false)
+    end
 
     sec2=sec2+dt
     if (sec2>1/3) then

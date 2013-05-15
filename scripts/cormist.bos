@@ -16,8 +16,6 @@ static-var	moving, once, animCount, curGun, firepoint, deployed,
 
 // Signal definitions
 #define SIG_AIM1						1
-#define SIG_MOVE						2
-
 #define ANIM_SPEED						50
 #define RESTORE_DELAY					3000
 
@@ -216,9 +214,6 @@ Deploy()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
-
 	moving = FALSE;
 	call-script Deploy();
 	
@@ -241,9 +236,6 @@ StopMoving()
 
 StartMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
-
 	runsp = TRUE;
 	moving = TRUE;
 	animCount = 0;

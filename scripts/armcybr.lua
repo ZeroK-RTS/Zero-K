@@ -19,25 +19,9 @@ local emit4 = piece 'emit4'
 
 smokePiece = {base}
 
---Signal
-local SIG_move = 1
-
 local gun_1 = false
 
-local function Stopping()
-	Signal(SIG_move)
-	SetSignalMask(SIG_move)
-	Move( wing1 , x_axis, -0, 1.65)
-	Move( wing1 , z_axis, 0, 0.35 )
-	Move( wing2 , x_axis, 0, 1.65 )
-	Move( wing2 , z_axis, 0, 0.35)
-	Turn( wing1 , z_axis, 0, math.rad(0.62) )
-	Turn( wing2 , z_axis, 0, math.rad(1.85) )
-end
-
-local function Moving()
-	Signal(SIG_move)
-	SetSignalMask(SIG_move)
+function script.StartMoving()
 	Move( wing1 , x_axis, 2.4, 1.65 )
 	Move( wing1 , z_axis, -0.5, 0.35)
 	Move( wing2 , x_axis, -2.4, 1.65 )
@@ -46,12 +30,13 @@ local function Moving()
 	Turn( wing2 , z_axis, math.rad(-2.7), math.rad(1.85))
 end
 
-function script.StartMoving()
-	StartThread(Moving)
-end
-
 function script.StopMoving()
-	StartThread(Stopping)
+	Move( wing1 , x_axis, -0, 1.65)
+	Move( wing1 , z_axis, 0, 0.35 )
+	Move( wing2 , x_axis, 0, 1.65 )
+	Move( wing2 , z_axis, 0, 0.35)
+	Turn( wing1 , z_axis, 0, math.rad(0.62) )
+	Turn( wing2 , z_axis, 0, math.rad(1.85) )
 end
 
 function script.MoveRate(rate)

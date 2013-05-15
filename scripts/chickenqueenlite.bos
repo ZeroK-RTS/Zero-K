@@ -8,13 +8,13 @@ static-var bMoving, feet;
 // Signal definitions
 #define SIG_AIM				2
 #define SIG_AIM_2			4
-#define SIG_MOVE			8
+#define SIG_MOVE			16
 
 #include "constants.h"
 
 fly()
 {
-	while (bMoving)
+	if (bMoving)
 		{
 			turn lwing to z-axis <-40> speed<120>;
 			turn rwing to z-axis <40> speed<120>;
@@ -27,6 +27,7 @@ fly()
 			move body to y-axis [0] speed <40000>;
 //			emit-sfx 4096 + 5 from body; Queen Crush
 			wait-for-turn lwing around z-axis;
+			start-script fly();
 		}
 }
 
@@ -38,8 +39,6 @@ stopfly ()
 
 StartMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
 	bMoving = TRUE;
 	start-script fly();
 	turn lfoot to x-axis <-20> speed<420>;
@@ -50,8 +49,6 @@ StartMoving()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
 	bMoving = FALSE;
 	start-script stopfly();
 }

@@ -817,7 +817,7 @@ function WeaponReady(unitID, allyteam)
   local AAdefbuff = AAdef[allyteam].units[unitID]
   local reloadtime = getReloadTime(AAdefbuff.name)
   local lowestreloading
-  _, ready, _, _, _ = WeaponState(unitID, 1)
+  _, ready, _, _, _ = WeaponState(unitID, 0)
   local rframe = AAdefbuff.frame
   if IsDPSAA(AAdefbuff.name) then
     return true, 0
@@ -1468,14 +1468,6 @@ function gadget:GameFrame()
   checkAAdef()
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
-	return true
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()	
-	return true
-end
-
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   local ud = UnitDefs[unitDefID]
   if IsAA(ud.name) then
@@ -1515,100 +1507,109 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 end
 
 function globalassignmentstaticcompare(gassign1, gassign2)
-	if gassign1.def.cost > gassign2.def.cost then
-		return true
-	end
-	return false
+  if gassign1.def.cost > gassign2.def.cost then
+    return true
+  end
+  return false
 end
 
 function gadget:Initialize()
-	Echo("AA Micro Gadget Enabled")
+  Echo("AA Micro Gadget Enabled")
 
-	for id,unitDef in pairs(UnitDefs) do
-		local invalidAA = (unitDefName == "corsub" or unitDefName == "roost" or unitDefName == "mahlazer" or unitDefName == "funnelweb" or unitDefName == "armorco" or unitDefName:find("test") or unitDefName:find("chicken") or unitDefName:find("fake"))
-		local aaexception = (unitDefName == "corrl") --defender
-		local dpsaaexception = (unitDefName == "corrl" or unitDefName == "corcrash")
-		local unitDefName = unitDef.name
-		if unitDef.canFly then
-			airunitdefs[unitDefName] = {hp = unitDef.health, maxspeed = unitDef.speed, cost = unitDef.metalCost}
-			globalassignment[#globalassignment+1] = {name = unitDefName, def = unitDef, units = {}, unitscount = 1}
-			globalassignmentcount = #globalassignment
-		end
-		if not invalidAA then
-			if not unitDef.canFly then
-				if unitDefName == "amphaa" then 
-					AAstats[unitDefName].height = unitDef.height
-					AAstats[unitDefName].movespeed = unitDef.speed
-				end 
-				for i = 1,#WeaponDefs do
-					local wd = WeaponDefs[i]
-					if wd.name:find(unitDefName) then
-						if not wd.canAttackGround or aaexception then  --air-only weapons
-							local damage = 0
-							local sdamage = 0
-							for i = 1, #wd.damages do
-								if damage < wd.damages[i] then
-									damage = wd.damages[i]
-								end
-							end
-							sdamage = damage
-							damage = damage * wd.salvoSize
-							local dps = damage / wd.reload
-							if damage > 5 and wd.range > 100 and dps > 20 then  --filters
-								if unitDef.speed == 0 then
-									StaticAA[unitDefName] = true
-								else
-									MobileAA[unitDefName] = true
-								end
-								if wd.salvoDelay > 0.5 and wd.salvoSize > 1 then
-									AAdelayedsalvo[unitDefName] = wd.salvoDelay * 30
-								end
-								if wd.reload > 0.5 then
-									AABurst[unitDefName] = true
-								else
-									AADPS[unitDefName] = true
-								end
-								if wd.reload <= 1 or dpsaaexception then
-									EscortAA[unitDefName] = dps
-								end
-								if wd.cylinderTargetting == 1 then
-									CylinderAA[unitDefName] = true
-								else
-									CylinderAA[unitDefName] = false
-								end
-								if AAstats[unitDefName] == nil then
-									--Echo(unitDefName, wd.name, wd.range)
-									AAstats[unitDefName] = { damage = damage, shotdamage = sdamage, salvosize = wd.salvoSize, range = wd.range, reload = wd.reload * 30, dps = dps, velocity = wd.customParams.weaponvelocity, movespeed = unitDef.speed, height = unitDef.height}
-								else
-									AAstats[unitDefName].damage = AAstats[unitDefName].damage + damage
-									AAstats[unitDefName].dps = AAstats[unitDefName].dps + dps
-								end
-							end
-						end
-					end
-				end
-			end
-		end
+  for id,unitDef in pairs(UnitDefs) do
+    local exception = true
+    local unitDefName = unitDef.name
+    if unitDefName == "corsub" or unitDefName == "roost" or unitDefName == "mahlazer" or unitDefName == "funnelweb" or unitDefName == "armorco" or unitDefName:find("test") or unitDefName:find("chicken") or unitDefName:find("fake") then
+      exception = false
+    end
+    local aaexception = false
+    if unitDefName == "corrl" then
+      aaexception = true
+    end
+    local dpsaaexception = false
+    if unitDefName == "corrl" or unitDefName == "corcrash" then
+      dpsaaexception = true
+    end
+    if unitDef.canFly then
+      airunitdefs[unitDefName] = {hp = unitDef.health, maxspeed = unitDef.speed, cost = unitDef.metalCost}
+      globalassignment[globalassignmentcount] = {name = unitDefName, def = unitDef, units = {}, unitscount = 1}
+      globalassignmentcount = globalassignmentcount + 1
 	end
+    if exception then
+      if not unitDef.canFly then
+        if unitDefName == "amphaa" then 
+          AAstats[unitDefName].height = unitDef.height
+          AAstats[unitDefName].movespeed = unitDef.speed
+        end 
+        for i = 1,#WeaponDefs do
+          local wd = WeaponDefs[i]
+          if wd.name:find(unitDefName) then
+          if not wd.canAttackGround or aaexception then  --air-only weapons
+            local damage = 0
+            local sdamage = 0
+            for i = 1, #wd.damages do
+              if damage < wd.damages[i] then
+                damage = wd.damages[i]
+              end
+            end
+            sdamage = damage
+            damage = damage * wd.salvoSize
+            local dps = damage / wd.reload
+            if damage > 5 and wd.range > 100 and dps > 20 then  --filters
+              if unitDef.speed == 0 then
+                StaticAA[unitDefName] = true
+              else
+                MobileAA[unitDefName] = true
+              end
+              if wd.salvoDelay > 0.5 and wd.salvoSize > 1 then
+                AAdelayedsalvo[unitDefName] = wd.salvoDelay * 30
+              end
+              if wd.reload > 0.5 then
+                AABurst[unitDefName] = true
+              else
+                AADPS[unitDefName] = true
+              end
+              if wd.reload <= 1 or dpsaaexception then
+                EscortAA[unitDefName] = dps
+              end
+              if wd.cylinderTargetting == 1 then
+                CylinderAA[unitDefName] = true
+              else
+                CylinderAA[unitDefName] = false
+              end
+              if AAstats[unitDefName] == nil then
+                --Echo(unitDefName, wd.name, wd.range)
+                AAstats[unitDefName] = { damage = damage, shotdamage = sdamage, salvosize = wd.salvoSize, range = wd.range, reload = wd.reload * 30, dps = dps, velocity = wd.customParams.weaponvelocity, movespeed = unitDef.speed, height = unitDef.height}
+              else
+                AAstats[unitDefName].damage = AAstats[unitDefName].damage + damage
+                AAstats[unitDefName].dps = AAstats[unitDefName].dps + dps
+              end
+            end
+          end
+          end
+        end
+      end
+    end
+  end
 
-	AAstats["corrl"].reload = corrlreload
-	CylinderAA["hoveraa"] = true
+  AAstats["corrl"].reload = corrlreload
+  CylinderAA["hoveraa"] = true
 
-	table.sort(globalassignment, globalassignmentstaticcompare) --assign target based on cost
+  table.sort(globalassignment, globalassignmentstaticcompare)
 
-	for i = 1,#WeaponDefs do
-		local wd = WeaponDefs[i]
-		for name,_ in pairs(AABurst) do
-			if wd.name:find(name) then
-				Script.SetWatchWeapon(i,true)
-				weapondefID[name] = i
-			end
-		end
-	end
-	for _, unitID in pairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		gadget:UnitCreated(unitID, unitDefID)
-	end
+  for i = 1,#WeaponDefs do
+    local wd = WeaponDefs[i]
+    for name,_ in pairs(AABurst) do
+      if wd.name:find(name) then
+        Script.SetWatchWeapon(i,true)
+        weapondefID[name] = i
+      end
+    end
+  end
+  for _, unitID in pairs(Spring.GetAllUnits()) do
+    local unitDefID = Spring.GetUnitDefID(unitID)
+    gadget:UnitCreated(unitID, unitDefID)
+  end
 end
 
 function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)

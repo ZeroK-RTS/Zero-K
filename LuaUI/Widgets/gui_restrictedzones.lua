@@ -20,8 +20,6 @@ end
 ------------------------------------------------------------------
 ------------------------------------------------------------------
 
-local echo = Spring.Echo
-
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spTraceScreenRay		= Spring.TraceScreenRay
 local spGetSpectatingState  = Spring.GetSpectatingState
@@ -29,18 +27,6 @@ local spGetAllyTeamList     = Spring.GetAllyTeamList
 local spSendLuaRulesMsg     = Spring.SendLuaRulesMsg
 local spGetLocalAllyTeamID	= Spring.GetLocalAllyTeamID
 local spGetLocalTeamID		= Spring.GetLocalTeamID
-local spGetUnitsInRectangle		= Spring.GetUnitsInRectangle
-
-local glLineStipple 		= gl.LineStipple
-local glLineWidth   		= gl.LineWidth
-local glColor       		= gl.Color
-local glDepthTest			= gl.DepthTest
-local glDrawGroundCircle	= gl.DrawGroundCircle -- the areas are actually rectangles but ground quads look crap
-
-local abs = math.abs
-local floor = math.floor
-
-------------------------------------------------------------------
 
 if not WG.rzones then
 	WG.rzones = {
@@ -52,14 +38,14 @@ end
 -- CONFIG
 local size = 128 -- size of the zones
 
-local myAllyID = -1
-local myTeamID = -1
 ------------------------------------------------------------------
 -- NO LONGER CONFIG
 
 local zones = {}
 local zoneID = {count = 0, data = {}}
 
+local abs = math.abs
+local floor = math.floor
 
 local point = {}
 local points = 0
@@ -225,56 +211,6 @@ local function calculateAreaPoints()
 	
 end
 
--- THE BIT THAT DOES THE CHECK FOR "ALLIED" UNITS
-local function unitInRZones(cAlliance)
-	local teamList = Spring.GetTeamList(cAlliance)
-	for _,teamID in ipairs(teamList) do
-		for i = 1, zoneID.count do
-			local zone = zoneID.data[i]
-			local units = spGetUnitsInRectangle(zone.x, zone.z, zone.x+size, zone.z+size, teamID)
-			if units and units[1] then
-				return true
-			end
-		end
-	end
-	return false
-end
-
-local function nukeInRectangle(x1,z1,x2,z2, nx,nz)
-	if nx >= x1 and nx <= x2 and nz >= z1 and nz <= z2 then
-		return true
-	end
-	return false
-end
-
-local function nukeInRZones(x,y,z)
-	for i = 1, zoneID.count do
-		local zone = zoneID.data[i]
-		if nukeInRectangle(zone.x, zone.z, zone.x+size, zone.z+size, x,z) then
-			return true
-		end
-	end
-	
-	return false
-end
-
-local function explode(div,str)
-  if (div=='') then return false end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
-end
-
-
-----------------------------------------------------
--- callins
-
-
 function widget:MousePress(mx, my, button)
 	
 	if WG.rzones.rZonePlaceMode and (button == 1 or button == 3) and not drawingLasso then
@@ -353,24 +289,6 @@ function widget:MouseMove(mx, my, dx, dy, button)
 	end
 end
 
-function widget:RecvLuaMsg(msg, playerID)
-	local luamsg = explode('|',msg)
-	if luamsg[1] ~= 'nukelaunch' then
-		return
-	end
-	
-	local allianceId = tonumber( luamsg[2] )
-	if allianceId == myAllyID then
-		return
-	end
-	
-	local x,y,z = tonumber( luamsg[3] ), tonumber( luamsg[4] ), tonumber( luamsg[5] )
-	if nukeInRZones(x,y,z) then
-		spSendLuaRulesMsg('ceasefire:n:'..allianceId)
-	end
-	
-end
-
 function widget:MouseRelease(mx, my, button)
 	
 	if drawingLasso then
@@ -384,12 +302,22 @@ function widget:MouseRelease(mx, my, button)
 	
 end
 
+------------------------------------------------------------------
+-- THE BIT THAT DOES THE CHECK FOR "ALLIED" UNITS
 
-function widget:Initialize()
-	myAllyID = spGetLocalAllyTeamID()
-	myTeamID = spGetLocalTeamID()
-		
+function inRZones(cAlliance)
+	local teamList = Spring.GetTeamList(cAlliance)
+	for _,teamID in ipairs(teamList) do
+		for i = 1, zoneID.count do
+			local units = spGetUnitsInRectangle(zoneID.data[i].x, zoneID.data[i].z, zoneID.data[i].x+size, zoneID.data[i].z+size, teamID)
+			if units and units[1] then
+				return true
+			end
+		end
+	end
+	return false
 end
+
 function widget:Update()
 
 	if WG.rzones.rZonePlaceMode and not drawing then
@@ -402,13 +330,16 @@ function widget:Update()
 	spec = spGetSpectatingState()
 	
 	if cycle == 1 then
+		local myAllyID = spGetLocalAllyTeamID()
+		local myTeamID = spGetLocalTeamID()
+		
 		if not spec then
 			--for cAlliance, _ in pairs(myCeasefires) do
 			local alliances = spGetAllyTeamList()
 			for _, alliance in ipairs(alliances) do
 				if Spring.GetGameRulesParam('cf_' .. myAllyID .. '_' .. alliance) == 1 then
-					if unitInRZones(alliance) then
-						spSendLuaRulesMsg('ceasefire:n:'..alliance)
+					if inRZones(alliance) then
+						spSendLuaRulesMsg('ceasefire:n'..alliance)
 					end
 				end
 			end
@@ -416,6 +347,15 @@ function widget:Update()
 		
 	end
 end
+
+------------------------------------------------------------------
+-- THE DRAWING BIT OF THE WIDGET WHERE THINGS ARE DRAWN ON THE MAP
+
+local glLineStipple 		= gl.LineStipple
+local glLineWidth   		= gl.LineWidth
+local glColor       		= gl.Color
+local glDepthTest			= gl.DepthTest
+local glDrawGroundCircle	= gl.DrawGroundCircle -- the areas are actually rectangles but ground quads look crap
 
 function widget:DrawWorld()
 	
@@ -443,3 +383,8 @@ function widget:DrawWorld()
 	glDepthTest(false)
 	glColor(1,1,1,1)
 end
+
+--function widget:PlayerChanged(playerID)
+--  if myPlayerID == playerID then
+--  end
+--end

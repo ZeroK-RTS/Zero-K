@@ -237,9 +237,14 @@ local function Walk()
 	end
 end
 
-local function Stopping()
+function script.StartMoving()
+	deployed = false
+	GG.tele_undeployTeleport(unitID)
+	StartThread(Walk)
+end
+
+function script.StopMoving()
 	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
 	if not deployed then
 		Turn( rthigh , x_axis, 0, math.rad(80)  )
 		Turn( rshin , x_axis, 0, math.rad(120)  )
@@ -251,17 +256,6 @@ local function Stopping()
 		Move( pelvis , y_axis, 0, 12 )
 	end
 	DeployTeleport()
-end
-
-function script.StartMoving()
-	deployed = false
-	GG.tele_undeployTeleport(unitID)
-	StartThread(Walk)
-end
-
-function script.StopMoving()
-	Signal(SIG_WALK)
-	StartThread(Stopping)
 end
 
 function script.Create()

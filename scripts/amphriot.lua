@@ -95,9 +95,6 @@ local function Walk()
 end
 
 local function ResetLegs()
-	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
-
 	Turn(lfleg, x_axis, 0, math.rad(80))
 	Turn(lffoot, x_axis, 0, math.rad(80))
 	Turn(rfleg, x_axis, 0, math.rad(80))
@@ -117,11 +114,11 @@ local function WeaponRangeUpdate()
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		if height < -20 then
 			if not longRange then
-				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+				Spring.SetUnitWeaponState(unitID, 0, {range = torpRange})
 				longRange = true
 			end
 		elseif longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+			Spring.SetUnitWeaponState(unitID, 0, {range = shotRange})
 			longRange = false
 		end
 		Sleep(200)
@@ -135,11 +132,11 @@ function script.Create()
 	local height = select(2, Spring.GetUnitPosition(unitID))
 	if height < -20 then
 		if not longRange then
-			Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+			Spring.SetUnitWeaponState(unitID, 0, {range = torpRange})
 			longRange = true
 		end
 	elseif longRange then
-		Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+		Spring.SetUnitWeaponState(unitID, 0, {range = shotRange})
 		longRange = false
 	end
 end
@@ -151,7 +148,8 @@ end
 
 function script.StopMoving()
 	--Spring.Echo("Stopped moving")
-	StartThread(ResetLegs)
+	Signal(SIG_WALK)
+	ResetLegs()
 end
 
 local function RestoreAfterDelay()

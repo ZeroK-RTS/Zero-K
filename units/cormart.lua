@@ -77,8 +77,6 @@ unitDef = {
       name                    = [[Plasma Artillery]],
       accuracy                = 600,
       areaOfEffect            = 96,
-	  avoidFeature            = false,
-	  avoidGround             = false,
       craterBoost             = 1,
       craterMult              = 2,
 

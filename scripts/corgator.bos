@@ -16,7 +16,6 @@ static-var	moving, once, animcount,
 
 // Signal definitions
 #define SIG_AIM1				1
-#define SIG_MOVE				2		//Signal to prevent duplicate moving. Ref for sig number: http://pastebin.com/raw.php?i=qEPRtcD9
 #define ANIM_SPEED				50
 #define RESTORE_DELAY			2000
 
@@ -152,9 +151,6 @@ DamageControl()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-	
 	moving = FALSE;
 	
 	sleep 500;
@@ -174,9 +170,6 @@ StopMoving()
 
 StartMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-
 	moving = TRUE;
 	animCount = 0;
 	runsp = TRUE;

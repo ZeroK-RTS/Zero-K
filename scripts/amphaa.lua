@@ -271,9 +271,13 @@ local function Walk()
 	end
 end
 
-local function Stopping()
+function script.StartMoving()
+	StartThread(Walk)
+end
+
+function script.StopMoving()
 	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
+	Signal(SIG_START_FLOAT)
 	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
 	Turn( rcalf , x_axis, 0, math.rad(120)*PACE  )
 	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
@@ -282,15 +286,6 @@ local function Stopping()
 	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
 	Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
 	Move( pelvis , y_axis, 0, 12*PACE )
-end
-
-function script.StartMoving()
-	StartThread(Walk)
-end
-
-function script.StopMoving()
-	Signal(SIG_START_FLOAT)
-	StartThread(Stopping)
 	GG.Floating_StopMoving(unitID)
 end
 
@@ -314,7 +309,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	
-	local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
+	local reloadState = Spring.GetUnitWeaponState(unitID, 0 , 'reloadState')
 	if reloadState < 0 or reloadState - Spring.GetGameFrame() < 70 then
 		GG.Floating_AimWeapon(unitID)
 	end

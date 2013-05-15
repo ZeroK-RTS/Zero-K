@@ -104,11 +104,6 @@ wepTable = nil
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	
-	Turn( nanolath , x_axis, math.rad(-40), ARM_SPEED_PITCH )
-	Turn( biggun , x_axis, math.rad(-62.5), ARM_SPEED_PITCH )
-	isMoving = true
-	
 	Turn(ground, x_axis, math.rad(10), math.rad(30))
 	while true do
 		--left leg up, right leg back
@@ -142,8 +137,6 @@ local function Walk()
 end
 
 local function RestorePose()
-	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
 	Turn(ground, x_axis, 0, math.rad(60))
 	Move(pelvis , y_axis, 0 , 1 )
 	Turn(rthigh , x_axis, 0, math.rad(200) )
@@ -167,11 +160,15 @@ function script.Create()
 end
 
 function script.StartMoving() 
+	Turn( nanolath , x_axis, math.rad(-40), ARM_SPEED_PITCH )
+	Turn( biggun , x_axis, math.rad(-62.5), ARM_SPEED_PITCH )
+	isMoving = true
 	StartThread(Walk)
 end
 
 function script.StopMoving() 
 	isMoving = false
+	Signal(SIG_WALK)
 	StartThread(RestorePose)
 end
 

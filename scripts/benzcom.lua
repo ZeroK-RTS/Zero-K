@@ -127,9 +127,6 @@ local function Walk()
 end
 
 local function RestoreLegs()
-	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
-	
 	Move( pelvis , y_axis, 0 , 1 )
 	Turn( rupleg , x_axis, 0, math.rad(200) )
 	Turn( rleg , x_axis, 0, math.rad(200) )
@@ -138,7 +135,7 @@ local function RestoreLegs()
 	Turn( torso , y_axis, 0, math.rad(200) )
 	Turn(larm, x_axis, 0, math.rad(200) )
 	Turn(rarm, x_axis, 0, math.rad(200) )
-end
+	end
 
 
 function script.Create()
@@ -161,7 +158,8 @@ end
 
 function script.StopMoving() 
 	isMoving = false
-	StartThread(RestoreLegs)
+	Signal(SIG_WALK)
+	RestoreLegs()
 end
 
 local function RestoreLaser()

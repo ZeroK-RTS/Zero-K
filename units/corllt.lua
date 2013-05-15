@@ -89,7 +89,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 9.18,
+        default = 9.4,
         subs    = 0.5,
       },
 

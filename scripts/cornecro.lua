@@ -66,10 +66,13 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
-local function Stopping()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
+function script.StartMoving()
+	StartThread(Walk)
+end
 
+function script.StopMoving()
+	Signal( SIG_MOVE )
+	
 	Move( pelvis , y_axis, 0 , 12 )
 	Turn( pelvis , z_axis, math.rad(0), math.rad(15) * PACE )
 	
@@ -84,14 +87,6 @@ local function Stopping()
 	Move( rightLeg.lowercalf , z_axis, 0 , 2 )
 	Move( leftLeg.lowercalf , y_axis, 0 , 3 )
 	Move( rightLeg.lowercalf , y_axis, 0 , 2 )
-end
-
-function script.StartMoving()
-	StartThread(Walk)
-end
-
-function script.StopMoving()
-	StartThread(Stopping)
 end
 
 function script.StartBuilding(heading, pitch)

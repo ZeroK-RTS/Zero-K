@@ -51,17 +51,15 @@ local base = {
 		modules = {
 			"commweapon_heavymachinegun_lime",
 			"commweapon_disruptorbomb",
-			"weaponmod_disruptor_ammo",
 		}
 	},
 	{
 		name = "shotty",
 		modules = {
-			"commweapon_shotgun_green", 
+			"commweapon_shotgun", 
 			"weaponmod_autoflechette",
 			"commweapon_napalmgrenade",
 			"module_companion_drone",
-			"weaponmod_disruptor_ammo",
 		}
 	},
 	{

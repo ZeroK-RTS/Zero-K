@@ -1,4 +1,4 @@
-local version = 'v1.101'
+local version = 'v1.1'
 
 function widget:GetInfo()
 	return {
@@ -59,7 +59,7 @@ function widget:Initialize()
 			gameID_to_playerName[teamID+1] = aiName
 		elseif not isAI then
 			local playerName = Spring.GetPlayerInfo(playerID)
-			gameID_to_playerName[teamID+1] = playerName or "Gaia"
+			gameID_to_playerName[teamID+1] = playerName
 		end
 	end
 	----

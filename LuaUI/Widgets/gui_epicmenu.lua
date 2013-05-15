@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.315 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.313 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-05-12
+    date      = "2009-06-02", --2013-02-24
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -12,8 +12,6 @@ function widget:GetInfo()
 	alwaysStart = true,
   }
 end
-
-include("utility_two.lua") --contain file backup function
 
 --CRUDE EXPLAINATION (third party comment) on how things work: (by Msafwan)
 --1) first... a container called "OPTION" is shipped into epicMenuFactory from various sources (from widgets or epicmenu_conf.lua)
@@ -39,31 +37,16 @@ local echo = Spring.Echo
 --------------------------------------------------------------------------------
 
 -- Config file data
-local keybind_file, defaultkeybinds, defaultkeybind_date, confdata
-do
-	--load config file:
-	local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
-	confdata = VFS.Include(file, nil, VFS.RAW_FIRST)
-	--assign keybind file:
-	keybind_file = LUAUI_DIRNAME .. 'Configs/' .. Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
-	local isMission = Game.modDesc:find("Mission Mutator")
-	if isMission then
-		--FIXME: find modname instead of using hardcoded mission_keybinds_file name
-		keybind_file = (confdata.mission_keybinds_file and LUAUI_DIRNAME .. 'Configs/' .. confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
-	end
-	--check for validity, backup or delete
-	CheckLUAFileAndBackup(keybind_file,'') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
-	--load default keybinds:
-	--FIXME: make it automatically use same name for mission, multiplayer, and default keybinding file
-	local default_keybind_file = LUAUI_DIRNAME .. 'Configs/' .. confdata.default_source_file
-	local file_return = VFS.Include(default_keybind_file, nil, VFS.ZIP)
-	defaultkeybinds = file_return.keybinds
-	defaultkeybind_date = file_return.date
-end
+local VFSMODE      = VFS.RAW_FIRST
+local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
+local confdata = VFS.Include(file, nil, VFSMODE)
 local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
+local keybind_file = confdata.keybind_file or title_text .. '_keys.lua'
+local file_return = VFS.Include(keybind_file, nil, VFS.ZIP)
+local defaultkeybinds, defaultkeybind_date = file_return.keybinds, file_return.date
 local useUiKeys = false
 --file_return = nil
 
@@ -348,7 +331,7 @@ local function otget(t,key)
 		if not t[i] then
 			return
 		end
-		if t[i][1] == key then --key stored in index 1, while value at index 2
+		if t[i][1] == key then
 			return t[i][2]
 		end
 	end
@@ -356,7 +339,7 @@ local function otget(t,key)
 end
 local function otset(t, key, val)
 	for i=1,#t do
-		if t[i][1] == key then --key stored in index 1, while value at index 2
+		if t[i][1] == key then
 			if val == nil then
 				table.remove( t, i )
 			else
@@ -392,35 +375,6 @@ WG.crude.ResetSettings 	= function() end
 
 --Reset hotkeys, defined in Initialized
 WG.crude.ResetKeys 		= function() end
-
---Get hotkey by actionname, defined in Initialize()
-WG.crude.GetHotkey = function() end
-
---Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here (at least if running epicmenu.lua in local copy) will return empty pathoptions table.
-WG.crude.SetHotkey =  function() end 
-
---Callin often used for space+click shortcut, defined in Initialize(). Is defined in Initialize() because it help with testing epicmenu.lua in local copy
-WG.crude.OpenPath = function() end
-
---Allow other widget to toggle-up/show Epic-Menu remotely, defined in Initialize()
-WG.crude.ShowMenu = function() end --// allow other widget to toggle-up Epic-Menu which allow access to game settings' Menu via click on other GUI elements.
-
-
---[[
--- is this an improvement?
-WG.crude.GetHotkey = function(actionName)
-	local hotkey = keybounditems[actionName]
-	if not hotkey then
-		local fallback = Spring.GetActionHotKeys(actionName)
-		if fallback and fallback[1] then
-			return CapCase(fallback[1])
-		else
-			return ''
-		end
-	end
-	return GetReadableHotkey(hotkey) 
-end
---]]
 
 WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
 	--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
@@ -736,7 +690,7 @@ local function GetReadableHotkeyMod(mod)
 		''		
 end
 
-local function HotKeyBreakdown(hotkey) --convert hotkey string into a standardized hotkey string
+local function HotKeyBreakdown(hotkey)
 	hotkey = hotkey:gsub('numpad%+', 'numpadplus')
 	local hotkey_table = explode('+', hotkey)
 	local alt, ctrl, meta, shift
@@ -827,7 +781,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 	end
 end
 
---create spring action for this option. Note: this is used by AddOption()
+--create spring action for this option
 local function CreateOptionAction(path, option)
 
 	local kbfunc = option.OnChange
@@ -836,7 +790,7 @@ local function CreateOptionAction(path, option)
 		kbfunc = function()
 		
 			local wname = option.wname
-			-- [[ Note: following code between -- [[ and  --]] is just to catch an exception. Is not part of code's logic.
+			-- [[
 			if not pathoptions[path] or not otget( pathoptions[path], wname..option.key ) then
 				Spring.Echo("Warning, detected keybind mishap. Please report this info and help us fix it:")
 				Spring.Echo("Option path is "..path)
@@ -868,14 +822,6 @@ local function CreateOptionAction(path, option)
 	end
 	local actionName = GetActionName(path, option)
 	AddAction(actionName, kbfunc, nil, "t")
-	
-	if option.hotkey then
-		local existingRegister = otget( keybounditems, actionName) --check whether existing actionname is already bound with a custom hotkey in zkkey
-		if existingRegister == nil then
-			Spring.Echo("Epicmenu: " .. option.hotkey .. " (" .. option.key .. ", " .. option.wname..")") --tell user (in infolog.txt) that a widget is adding hotkey
-			otset(keybounditems, actionName, option.hotkey ) --save new hotkey if no existing key found (not yet applied. Will be applied in IntegrateWidget())
-		end
-	end
 end
 
 --remove spring action for this option
@@ -885,7 +831,7 @@ local function RemoveOptionAction(path, option)
 end
 
 
--- Unassign a keybinding from settings and other tables that keep track of related info
+-- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(actionName, verbose)
 	local actionHotkeys = GetActionHotkeys(actionName)
 	if actionHotkeys then
@@ -943,7 +889,7 @@ local function ReApplyKeybinds()
 	end
 end
 
-local function AddOption(path, option, wname ) --Note: this is used when loading widgets and in Initialize()
+local function AddOption(path, option, wname )
 	--echo(path, wname, option)
 	if not wname then
 		wname = path
@@ -1110,7 +1056,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		
 		--migrate from old logic, make sure this is done before setting orig_key
 		if option.hotkey and type(option.hotkey) == 'table' then
-			option.hotkey = option.hotkey.mod .. option.hotkey.key --change hotkey table into string
+			option.hotkey = option.hotkey.mod .. option.hotkey.key
 		end
 		
 		if option.hotkey then
@@ -1121,7 +1067,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		
 		CreateOptionAction(path, option)
 		
-	--Keybinds for radiobuttons
+	--needs more work
 	elseif option.type == 'radioButton' then --if its a list of checkboxes:
 		for i=1, #option.items do --prepare keybinds for each of radioButton's checkbox
 			local item = {} 
@@ -1330,7 +1276,7 @@ local function IntegrateWidget(w, addoptions, index)
 	MakeSubWindow(curPath)
 	
 	
-	ReApplyKeybinds() --reapply keybinds when widget load/removed (incase widget alter keybinds)
+	ReApplyKeybinds()
 	
 end
 
@@ -1390,7 +1336,38 @@ local function MakeKeybindWindow( path, option, hotkey )
 	}
 end
 
---Get hotkey action and readable hotkey string. Note: this is used in MakeHotkeyedControl() which make hotkey handled by Chili.
+WG.crude.GetHotkey = function(actionName)
+	local actionHotkey = GetActionHotkey(actionName)
+	--local hotkey = keybounditems[actionName] or actionHotkey
+	local hotkey = otget( keybounditems, actionName ) or actionHotkey
+	if not hotkey or hotkey == 'none' then
+		return ''
+	end
+	if type(hotkey) == 'table' then
+		hotkey = hotkey[1]
+	end
+	return GetReadableHotkey(hotkey) 
+end
+
+
+--[[
+-- is this an improvement?
+WG.crude.GetHotkey = function(actionName)
+	local hotkey = keybounditems[actionName]
+	if not hotkey then
+		local fallback = Spring.GetActionHotKeys(actionName)
+		if fallback and fallback[1] then
+			return CapCase(fallback[1])
+		else
+			return ''
+		end
+	end
+	return GetReadableHotkey(hotkey) 
+end
+--]]
+
+
+--Get hotkey action and readable hotkey string
 local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
 	--local hotkey = keybounditems[actionName]
@@ -1398,19 +1375,18 @@ local function GetHotkeyData(path, option)
 	if type(hotkey) == 'table' then
 		hotkey = hotkey[1]
 	end
-	if hotkey and hotkey ~= 'none' then --if ZKkey contain definitive hotkey: return zkkey's hotkey
+	if hotkey and hotkey ~= 'none' then
 		if hotkey:find('%+%+') then
 			hotkey = hotkey:gsub( '%+%+', '+plus' )
 		end
 		
 		return GetReadableHotkey(hotkey) 
 	end
-	if (not hotkey ) and option.hotkey then  --if widget supplied default hotkey: return widget's hotkey (this only effect hotkey on Chili menu)
-		return option.hotkey
-	end
 	
-	return 'None' --show "none" on epicmenu's menu
+	return 'None'
 end
+
+
 
 --Make a stack with control and its hotkey button
 local function MakeHotkeyedControl(control, path, option)
@@ -1796,43 +1772,27 @@ local function MakeMenuBar()
                 y = 2*exit_menu_height/64,
 				align="center",
 				textColor = color.main_fg },
-			
+				
 			Button:New{
-                caption = "Vote Resign",
-                OnMouseUp = { function()
-						spSendCommands("say !voteresign") --after this gui_chili_vote.lua will handle vote GUI
-						screen0:RemoveChild(window_exit)
-						exitWindowVisible = false
-					end, },
-				tooltip = "Ask teammate to resign",
-				height=exit_menu_btn_height, 
-				width=exit_menu_btn_width,
-                x = exit_menu_width/2 - exit_menu_btn_width/2, 
-                y = 20*exit_menu_height/64 - exit_menu_btn_height/2, 
-			},
-			
-			Button:New{
-                caption = "Resign and Spectate",
+                caption = "Resign and spectate",
                 OnMouseUp = { function()
 						spSendCommands{"spectator"}
 						screen0:RemoveChild(window_exit)
 						exitWindowVisible = false
-					end, },
-				tooltip = "Abandon team and be spectator",
+					end, }, 
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2, 
-                y = 30*exit_menu_height/64 - exit_menu_btn_height/2, 
+                y = 24*exit_menu_height/64 - exit_menu_btn_height/2, 
 			},
 			
 			
 			Button:New{
 				caption = "Exit game", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, },
-				tooltip = "Leave game completely.",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2,  
-                y = 40*exit_menu_height/64 - exit_menu_btn_height/2,
+                y = 36*exit_menu_height/64 - exit_menu_btn_height/2,
 			},
 			
 			Button:New{
@@ -2051,6 +2011,10 @@ RemakeEpicMenu = function()
 	end
 end
 
+function WG.crude.OpenPath(path)
+	MakeSubWindow(path)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -2158,70 +2122,10 @@ function widget:Initialize()
 	-- clear all keybindings
 	WG.crude.ResetKeys = function()
 		keybounditems = {}
-		keybounditems = CopyTable(defaultkeybinds, true) --restore with mods zkkey's default value
+		keybounditems = CopyTable(defaultkeybinds, true)
 		
-		--restore with widget's default value:
-		for path, subtable in pairs ( pathoptions) do
-			for _,element in ipairs(subtable) do
-				local option = element[2]
-				local defaultHotkey = option.orig_hotkey
-				if defaultHotkey then
-					option.hotkey = defaultHotkey --make chili menu display the default hotkey
-					local actionName = GetActionName(path, option)
-					otset( keybounditems, actionName, defaultHotkey) --save default hotkey to zkkey
-				end
-			end
-		end
-		
-		ReApplyKeybinds() --unbind all hotkey and re-attach with stuff in keybounditems table 
+		ReApplyKeybinds()
 		echo 'Reset all hotkeys to default.'
-	end
-	
-	-- get hotkey
-	WG.crude.GetHotkey = function(actionName) --Note: declared here because keybounditems must not be empty
-		local actionHotkey = GetActionHotkey(actionName)
-		--local hotkey = keybounditems[actionName] or actionHotkey
-		local hotkey = otget( keybounditems, actionName ) or actionHotkey
-		if not hotkey or hotkey == 'none' then
-			return ''
-		end
-		if type(hotkey) == 'table' then
-			hotkey = hotkey[1]
-		end
-		return GetReadableHotkey(hotkey) 
-	end
-	
-	-- set hotkey
-	WG.crude.SetHotkey =  function(actionName, hotkey, func) --Note: declared here because pathoptions must not be empty
-		if hotkey then
-			hotkey = GetReadableHotkey(hotkey) --standardize hotkey (just in case stuff happen)
-		end
-		if hotkey == '' then 
-			hotkey = nil --convert '' into NIL.
-		end
-		if func then
-			if hotkey then
-				AddAction(actionName, func, nil, "t") --attach function to action
-			else
-				RemoveAction(actionName) --detach function from action
-			end
-		end
-		if hotkey then
-			AssignKeyBindAction(hotkey, actionName, false) --attach action to keybinds
-		else
-			UnassignKeyBind(actionName,false) --detach action from keybinds
-		end
-		otset(keybounditems, actionName, hotkey) --update epicmenu's hotkey table
-		for path, subtable in pairs (pathoptions) do 
-			for _,element in ipairs(subtable) do
-				local option = element[2]
-				local indirectActionName = GetActionName(path, option)
-				local directActionName = option.action
-				if indirectActionName==actionName or directActionName == actionName then
-					option.hotkey = hotkey or "None" --update pathoption hotkey for Chili menu display & prevent conflict with hotkey registerd by Chili . Note: LUA is referencing table, so we don't need to change same table elsewhere.
-				end
-			end
-		end
 	end
 	
 	-- Add custom actions for the following keybinds
@@ -2238,7 +2142,6 @@ function widget:Initialize()
 		echo('You have opted to use the engine\'s uikeys.txt. The menu keybind system will not be used.')
 	end
 	
-	LoadKeybinds()
 	ReApplyKeybinds()
 	
 	-- Override widgethandler functions for the purposes of alerting crudemenu 
@@ -2288,19 +2191,6 @@ function widget:Initialize()
 		return ret
 	end
 	init = false
-	
-	--intialize remote menu trigger
-	WG.crude.OpenPath = function(path) --Note: declared here so that it work in local copy
-		MakeSubWindow(path)
-	end
-	
-	--intialize remote menu trigger 2
-	WG.crude.ShowMenu = function()  --Note: declared here so that it work in local copy
-		if not settings.show_crudemenu then 
-			settings.show_crudemenu = true
-			ShowHideCrudeMenu()
-		end
-	end
 end
 
 function widget:Shutdown()

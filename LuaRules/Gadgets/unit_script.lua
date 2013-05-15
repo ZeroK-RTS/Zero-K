@@ -446,7 +446,7 @@ end
 
 function Spring.UnitScript.GetLongestReloadTime(unitID)
 	local longest = 0
-	for i=1,32 do
+	for i=0,31 do
 		local reloadTime = sp_GetUnitWeaponState(unitID, i, "reloadTime")
 		if (not reloadTime) then break end
 		if (reloadTime > longest) then longest = reloadTime end
@@ -580,7 +580,8 @@ local function Wrap_AimWeapon(unitID, callins)
 		local bAimReady = AimWeapon(weaponNum, heading, pitch) or false
 		local fAimReady = (bAimReady and 1.0) or 0.0
 
-		return sp_SetUnitWeaponState(unitID, weaponNum, "aimReady", fAimReady)
+		-- SetUnitWeaponState counts weapons from 0
+		return sp_SetUnitWeaponState(unitID, weaponNum - 1, "aimReady", fAimReady)
 	end
 
 	callins["AimWeapon"] = function(weaponNum, heading, pitch)
@@ -597,7 +598,8 @@ local function Wrap_AimShield(unitID, callins)
 	-- SetUnitWeaponState wants 1 or 0, niiice =)
 	local function AimShieldThread(weaponNum)
 		local enabled = AimShield(weaponNum) and true or false
-		return sp_SetUnitShieldState(unitID, weaponNum, enabled)
+		-- SetUnitShieldState counts weapons from 0
+		return sp_SetUnitShieldState(unitID, weaponNum - 1, enabled)
 	end
 
 	callins["AimShield"] = function(weaponNum)

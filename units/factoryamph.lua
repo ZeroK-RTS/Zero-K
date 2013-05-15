@@ -26,7 +26,6 @@ unitDef = {
 
   buildPic         = [[factoryamph.png]],
   buildTime        = 600,
-  canAttack        = true,
   canMove          = true,
   canPatrol        = true,
   canstop          = [[1]],
@@ -66,7 +65,6 @@ unitDef = {
   showNanoSpray    = false,
   side             = [[ARM]],
   sightDistance    = 273,
-  TEDClass         = [[PLANT]],
   turnRate         = 0,
   workerTime       = 10,
   yardMap          = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],

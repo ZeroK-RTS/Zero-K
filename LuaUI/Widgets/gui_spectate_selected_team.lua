@@ -3,7 +3,7 @@ function widget:GetInfo()
     name     = "Spectate Selected Team",
     desc     = "Automatically spectate team based on selected units, and other spectate options.",
     author   = "SirMaverick",
-    version  = "0.205", --has added options
+    version  = "0.203", --has added options
     date     = "2010", --2013
     license  = "GNU GPL, v2 or later",
     layer     = 0,
@@ -33,10 +33,10 @@ options={
 		type='radioButton', 
 		name='Spectator View Selection',
 		items = {
-			{name = 'View Chosen Player',key='viewchosenplayer', desc="Point of view of current player, and you can only select the current player's units.", hotkey=nil},
-			{name = 'View All',key='viewall', desc="Unlimited line of sight, but you can only select current player's units.", hotkey=nil},
-			{name = 'Select Any Unit',key='selectanyunit', desc="Point of view of current player, and you can select any unit.", hotkey=nil},
-			{name = 'View All & Select Any',key='viewallselectany', desc="Unlimited line of sight, and you can select any unit.", hotkey=nil},
+			{name = 'View Chosen Player',key='viewchosenplayer', desc="Point-of-view of current player and you can only select the current player's units.", hotkey=nil},
+			{name = 'View All',key='viewall', desc="Unlimited line-of-sight, but you can only select current player's units.", hotkey=nil},
+			{name = 'Select Any Unit',key='selectanyunit', desc="Point-of-view of current player, and you can select any unit.", hotkey=nil},
+			{name = 'View All & Select Any',key='viewallselectany', desc="Unlimited line-of-sight, and you can select any unit.", hotkey=nil},
 		},
 		value = 'viewallselectany',
 		OnChange = function(self)
@@ -87,14 +87,11 @@ end
 SelectNextPlayer = function ()
 	local currentTeam = Spring.GetLocalTeamID()
 	local playerTableSortTeamID = Spring.GetPlayerRoster(2)
-	local isSpring91 = type(playerTableSortTeamID[1][5])=='number'
-	local currentTeamIndex, firstPlayerIndex, teamIndexGoto = -1,nil,nil
+	local currentTeamIndex, firstPlayerIndex, teamIDIndexGoto = -1,nil,nil
 	for i=1, #playerTableSortTeamID do
 		local teamID = playerTableSortTeamID[i][3]
 		local isSpec = playerTableSortTeamID[i][5]
-		if ( isSpring91 ) then isSpec = ( isSpec==1 ) 
-		end
-		if (not isSpec ) then
+		if not isSpec then
 			if not firstPlayerIndex then --if spectator portion has finished: mark this index
 				firstPlayerIndex = i
 			end
@@ -109,14 +106,12 @@ SelectNextPlayer = function ()
 			teamIndexGoto = math.random(firstPlayerIndex,#playerTableSortTeamID)
 		elseif currentTeamIndex <= #playerTableSortTeamID then
 			teamIndexGoto = currentTeamIndex + 1 --if player list is at beginning: go to next index
-			for i=1,#playerTableSortTeamID - firstPlayerIndex +1 do --find player that we can spectate . NOTE: "#playerTableSortTeamID - firstPlayerIndex +1" is the amount of non-spec player.
+			for i=1,#playerTableSortTeamID - firstPlayerIndex do --find player that we can spectate
 				if teamIndexGoto > #playerTableSortTeamID then  --if player list is at end: go to first index
 					teamIndexGoto = firstPlayerIndex
 				end
-				local isSpec = playerTableSortTeamID[teamIndexGoto][5] 
-				if ( isSpring91 ) then isSpec = ( isSpec==1 )
-				end
-				if (not isSpec ) then --not spectator
+				local isSpec = playerTableSortTeamID[teamIndexGoto][5]
+				if not isSpec then
 					break
 				end
 				teamIndexGoto = teamIndexGoto + 1

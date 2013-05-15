@@ -201,8 +201,8 @@ end
 -- I'm leaving all the code in place, but disabling the buttons.
 -- Someone can come back in and fix it later.
 --
-local cf = IsFFA()
---local cf = false
+-- local cf = IsFFA()
+local cf = false
 
 local localTeam = 0
 local localAlliance = 0
@@ -465,22 +465,9 @@ end
 local function CfTooltip(allyTeam)
 	local tooltip = ''
 	
-	if Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
-		tooltip = tooltip .. green .. 'Ceasefire in effect.' .. white
-	else
-		local theyOffer = Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1
-		local youOffer = Spring.GetGameRulesParam('cf_offer_' .. allyTeam.. '_' .. localAlliance) == 1
-		if theyOffer then
-			tooltip = tooltip .. yellow .. 'They have offered a ceasefire.' .. white
-		end
-		if youOffer then
-			tooltip = tooltip .. cyan .. 'Your team has offered a ceasefire.' .. white
-		end
-		
-		tooltip = tooltip .. red .. 'No ceasefire in effect.' .. white
-	end
-	
-	tooltip = tooltip .. '\n\n'
+	tooltip = tooltip .. 'Check this box to vote for a ceasefire with '.. yellow ..'<Team ' .. (allyTeam+1) .. '>'..white..'. '
+		..'If everyone votes Yes, an offer will be made. If there is a ceasefire, '
+		..'unchecking the box will break it.\n\n'
 	
 	tooltip = tooltip .. 'Your team\'s votes: \n'
 	local teamList = Spring.GetTeamList(localAlliance)
@@ -489,14 +476,23 @@ local function CfTooltip(allyTeam)
 		local name = Spring.GetPlayerInfo(playerID) or '-'
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
-		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote ..'\n'
+		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote .. '\n'
 	end
 	
-	tooltip = tooltip .. '\n'
-	
-	tooltip = tooltip .. 'Check this box to vote for a ceasefire with '.. yellow ..'<Team ' .. (allyTeam+1) .. '>'..white..'. \n\n'
-		..'If everyone votes Yes, an offer will be made. If there is a ceasefire, '
-		..'unchecking the box will break it.'
+	if Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
+		tooltip = tooltip .. '\n\n' .. green .. 'Ceasefire in effect.' .. white
+	else
+		local theyOffer = Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1
+		local youOffer = Spring.GetGameRulesParam('cf_offer_' .. allyTeam.. '_' .. localAlliance) == 1
+		if theyOffer then
+			tooltip = tooltip .. '\n\n' .. yellow .. 'They have offered a ceasefire.' .. white
+		end
+		if youOffer then
+			tooltip = tooltip .. '\n\n' .. cyan .. 'Your team has offered a ceasefire.' .. white
+		end
+		
+		tooltip = tooltip .. '\n\n' .. red .. 'No ceasefire in effect.' .. white
+	end
 	
 	return tooltip
 end
@@ -774,7 +770,6 @@ local function AddTableHeaders()
 end
 
 local function AddCfCheckbox(allyTeam)
-	local fontsize = options.text_height.value
 	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
 		local cfCheck = Checkbox:New{
 			x=x_cf,y=(fontsize+1) * row + 3,width=20,
@@ -782,14 +777,13 @@ local function AddCfCheckbox(allyTeam)
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
 			tooltip = CfTooltip(allyTeam),
 			OnChange = { function(self)
-				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. ':' .. allyTeam)
+				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
 				self.tooltip = CfTooltip(allyTeam)
 			end },
 		}
 		scroll_cpl:AddChild(cfCheck)
 		cfCheckBoxes[allyTeam] = cfCheck
 	end
-	
 end
 
 -- adds all the entity information
@@ -954,7 +948,6 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = ("Team " .. allyTeamID+1),textColor = allyTeamColor,})
 				DrawPlayerTeamStats(allyTeamEntities[allyTeamID],allyTeamColor,allyTeamResources[allyTeamID])
 				if elo then MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
-				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
 				row = row + 1
 			end
@@ -1217,7 +1210,7 @@ SetupPlayerNames = function()
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			if allyTeams[allyTeamID] and (list_size >= 3 or allyTeamID == localAlliance) then
-				--AddCfCheckbox(allyTeamID)
+				AddCfCheckbox(allyTeamID)
 				for j=1,#allyTeams[allyTeamID] do  -- for every player team on the ally team
 					local teamID = allyTeams[allyTeamID][j]
 					if teams[teamID] and teams[teamID].roster and (list_size >= 2 or teamID == localTeam) then

@@ -47,22 +47,22 @@ drawRadius[3] = {
 	
 drawRadius[4] = {
 	range = 1500,
-	color = {0.2,0.2,1,0.5},
+	color = {0.2,0.2,1,1},
 	text = "EMP vertical",
 	width = 1,
 	miniWidth = 1,
 	textSize = 60,
-	--stipple = {4,1000},
+	stipple = {4,1000},
 	}
 	
 drawRadius[5] = {
 	range = 600,
-	color = {0.4,1,0.2,0.5},
+	color = {0.4,1,0.2,1},
 	text = "Seismic and Tacnuke vertical",
 	width = 1,
 	miniWidth = 1,
 	textSize = 60,
-	--stipple = {4,4095},
+	stipple = {4,4095},
 	}
 	
 local circleDivs = 64

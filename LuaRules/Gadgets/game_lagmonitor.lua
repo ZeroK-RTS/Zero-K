@@ -7,7 +7,7 @@ function gadget:GetInfo()
     name      = "Lag Monitor",
     desc      = "Gives away units of people who are lagging",
     author    = "KingRaptor",
-    date      = "11/5/2012", --2/4/2013
+    date      = "11/5/2012",
     license   = "Public domain",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -145,7 +145,6 @@ end
 function gadget:GameFrame(n)
 	if n%UPDATE_PERIOD == 0 then --check every UPDATE_PERIOD-th frame
 		local laggers = {}
-		local specList = {}
 		local players = Spring.GetPlayerList()
 		local recepientByAllyTeam = {}
 		local gameSecond = Spring.GetGameSeconds()
@@ -154,7 +153,7 @@ function gadget:GameFrame(n)
 		for i=1,#players do
 			local playerID = players[i]
 			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(playerID)
-	
+			
 			local justResigned = false
 			if oldTeam[playerID] then
 				if spec then
@@ -173,7 +172,7 @@ function gadget:GameFrame(n)
 			
 			local afk = Spring.GetGameSeconds() - (pActivity[playerID] or 0)
 			local _,_,_,isAI,_,_ = Spring.GetTeamInfo(team)
-			if not (spec or isAI) then 
+			if not spec and not isAI then 
 				if (afkTeams[team] == true) then  -- team was AFK 
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
 						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
@@ -203,8 +202,6 @@ function gadget:GameFrame(n)
 				else --if not at all AFK or lagging: then...
 					tickTockCounter[playerID] = nil -- empty tick-tock clock. We want to reset the counter when the player return.
 				end
-			elseif (spec and not isAI) then
-				specList[playerID] = true --record spectator list in non-AI team
 			end
 		end
 		afkPlayer = afkPlayer .. "#".. players[#players] --cap the string with the largest playerID information. ie: (string)1010219899#98 can be read like this-> id:01 ally:02, id:98 ally:99, highestID:98  
@@ -214,12 +211,11 @@ function gadget:GameFrame(n)
 			-- FIRST! check if everyone else on the team is also lagging
 			local team = data.team
 			local allyTeam = data.allyTeam
-			local playersInTeam = Spring.GetPlayerList(team, true) --return only active player
+			local playersInTeam = Spring.GetPlayerList(team, true)
 			local discontinue = false
 			for j=1,#playersInTeam do
-				local playerID = playersInTeam[j]
-				if not (laggers[playerID] or specList[playerID]) then --Note: we need the extra specList check because Spectators is sharing same teamID as team 0
-					discontinue = true	-- someone on same team is not lagging & not spec, don't move units around!
+				if not laggers[playersInTeam[j]] then
+					discontinue = true	-- someone on same team is not lagging, don't move units around!
 					break
 				end
 			end

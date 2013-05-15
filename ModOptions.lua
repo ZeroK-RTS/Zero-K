@@ -1,4 +1,3 @@
-
 -- $Id: ModOptions.lua 4642 2009-05-22 05:32:36Z carrepairer $
 
 --  Custom Options Definition Table format
@@ -501,8 +500,6 @@ local options = {
     section= 'experimental',
     def    = false,
   },
-  --]]
- 
   {
     key    = 'specialdecloak',
     name   = 'Special Decloak Behavior (buggy)',
@@ -511,6 +508,7 @@ local options = {
     section= 'experimental',
     def    = false,
   },
+]]--
   {
     key    = 'fun',
     name   = 'Fun Stuff',
@@ -572,17 +570,9 @@ local options = {
     section	= "experimental",
   },
   {
-    key		= "impulsefloat",
-    name	= "Impulses Float",
-    desc	= "Allow amphibious floatation that is effected by Archer and can be pushed by other moving objects. Compatible for Spring 91, or Spring 95 and above",
-    type	= "bool",
-    def		= false,
-    section	= "experimental",
-  },    
-  {
     key		= "impulsejump",
     name	= "Impulses Jump",
-    desc	= "Allow jumps that is effected by Newton and can jump anywhere (no restriction). Compatible for Spring 93.2 and above",
+    desc	= "Allow jumps that can jump anywhere (no restriction) and is effected by Newton. Compatible for Spring 93.2 and above",
     type	= "bool",
     def		= false,
     section	= "experimental",
@@ -618,14 +608,6 @@ local options = {
     name   = 'Chicken',
     desc   = 'Settings for Chicken: Custom',
     type   = 'section',
-  },
-  {
-    key = "playerchickens",
-    name = "Players as chickens",
-    desc = "Shared chickens with players, take commanders away",
-    type = "bool",
-    def = false,
-    section = 'chicken',
   },
   {
     key	= "eggs",

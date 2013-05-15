@@ -234,9 +234,6 @@ StartMoving()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-
 	bMoving = FALSE;
 	start-script	stopwalk();
 }

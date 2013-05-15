@@ -16,8 +16,6 @@ static-var	moving, once;
 
 // Signal definitions
 #define SIG_BUILD						1
-#define SIG_MOVE						2		//Signal to prevent duplicate moving. Ref for sig number: http://pastebin.com/raw.php?i=qEPRtcD9
-
 #define RESTORE_DELAY					3000
 
 #define TURN_SPEED1						<160>
@@ -76,9 +74,6 @@ DamageControl()
 
 StartMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-
 	moving = TRUE;
 	
 	spin fwheel around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
@@ -94,9 +89,6 @@ StartMoving()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-
 	moving = FALSE;
 	
 	// I don't like insta braking. It's not perfect but works for most cases.

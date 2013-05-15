@@ -1,13 +1,13 @@
-local isMoveCtrlFloat = not (Spring.GetModOptions().impulsefloat  == "1") --not ImpulseFloat
+
 function gadget:GetInfo()
   return {
     name      = "Float Toggle",
     desc      = "Adds a float/sink toggle to units, currently static while floating",
     author    = "Google Frog",
-    date      = "9 March 2012, 12 April 2013",
+    date      = "9 March 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = isMoveCtrlFloat,  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -31,7 +31,7 @@ local unitFloatIdleBehaviour = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Float State',
 	action  = 'floatstate',
-	tooltip	= 'Float / Sink', --colorful tooltip is written in integral_menu_commands.lua
+	tooltip	= '\255\90\255\90Green\255\255\255\255:Always float \n\255\90\90\90Grey\255\255\255\255:Float to fire\n\255\255\90\90Red\255\255\255\255:Never float',
 	params 	= {DEFAULT_FLOAT, 'Sink','Attack','Float'}
 }
 
@@ -61,9 +61,6 @@ local floatByID = {data = {}, count = 0}
 local floatState = {}
 local aimWeapon = {}
 
-local gRAVITY = Game.gravity/30/30
-local rAD_PER_ROT = (math.pi/(2^15))
-local fLY_THRESHOLD = gRAVITY*8
 --------------------------------------------------------------------------------
 -- Communication to script
 
@@ -76,11 +73,11 @@ end
 --------------------------------------------------------------------------------
 -- Float Table Manipulation
 
-local function addFloat(unitID, unitDefID, isFlying)
+local function addFloat(unitID, unitDefID)
 	if not float[unitID] then
 		local def = floatDefs[unitDefID]
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		if y < def.depthRequirement or isFlying then
+		local x,y,z = Spring.GetUnitBasePosition(unitID)
+		if y < def.depthRequirement then
 			Spring.MoveCtrl.Enable(unitID)
 			Spring.MoveCtrl.SetNoBlocking(unitID, true)
 			local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
@@ -100,13 +97,9 @@ local function addFloat(unitID, unitDefID, isFlying)
 					speed = def.initialRiseSpeed,
 					x = x, y = y, z = z,
 					unitDefID = unitDefID,
-					isFlying = isFlying,
 					paraData = {want = false, para = false},
 				}
-				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*rAD_PER_ROT, 0)
-				if isFlying then
-					Spring.MoveCtrl.Disable(unitID) --disable MoveCtrl temporary so that Newton can work
-				end
+				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*2^-15*math.pi, 0)
 			else
 				Spring.MoveCtrl.Disable(unitID)
 			end
@@ -153,12 +146,6 @@ end
 --------------------------------------------------------------------------------
 -- Script calls
 
-GG.Floating_StopMoving = GG.Floating_StopMoving or function() end --empty function. Defined in gadget:Initialize()
-
-GG.Floating_AimWeapon = GG.Floating_AimWeapon or function() end
-
-GG.Floating_UnitTeleported = GG.Floating_UnitTeleported or function() end
-
 local function checkAlwaysFloat(unitID)
 	if not select(1, Spring.GetUnitIsStunned(unitID)) then
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -170,14 +157,44 @@ local function checkAlwaysFloat(unitID)
 	end
 end
 
---------------------------------------------------------------------------------
--- Realism/Physic
+function GG.Floating_StopMoving(unitID)
+	if floatState[unitID] == FLOAT_ALWAYS  then
+		checkAlwaysFloat(unitID)
+	end
+end
 
---Reference: http://en.wikipedia.org/wiki/Drag_equation
-local function CalculateDrag (velocity, dragCoefficient, unitsMass, waterDensity, unitsArea)
-	local acceleration = 0.5*(waterDensity*velocity*velocity*dragCoefficient*unitsArea)/unitsMass
-	local accWithDirection = acceleration*(math.abs(velocity)/velocity)
-	return -accWithDirection
+function GG.Floating_AimWeapon(unitID)
+	if floatState[unitID] == FLOAT_ATTACK and not select(1, Spring.GetUnitIsStunned(unitID)) then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local cQueue = Spring.GetCommandQueue(unitID, 1)
+		local moving = cQueue and #cQueue > 0 and cQueue[1].id == CMD.MOVE and not cQueue[1].options.internal
+		if not moving then
+			addFloat(unitID, unitDefID)
+		end
+	end
+	aimWeapon[unitID] = true
+end
+
+
+function GG.Floating_UnitTeleported(unitID, position)
+	if float[unitID] then
+		local data = float[unitID]
+		local def = floatDefs[data.unitDefID]
+		data.x, data.y, data.z = position[1], position[2], position[3]
+		--data.speed = 0.1
+		local height = Spring.GetGroundHeight(data.x, data.z)
+		if height <= def.depthRequirement then
+			data.onSurface = false
+			Spring.MoveCtrl.SetPosition(unitID, data.x, data.y, data.z)
+			return true
+		else
+			Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
+			callScript(unitID, "script.StopMoving")
+			removeFloat(unitID)
+			return false
+		end
+	end
+	return false
 end
 
 --------------------------------------------------------------------------------
@@ -191,37 +208,8 @@ function gadget:GameFrame(f)
 	local i = 1
 	while i <= floatByID.count do
 		local unitID = floatByID.data[i]
-		local isValidUnitID = Spring.ValidUnitID(unitID)
-		local isFlying = isValidUnitID and float[unitID]["isFlying"]
-		
-		if isFlying then --check if unit has landed or not
-			local data = float[unitID] --(get reference to data table)
-			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
-			local height = Spring.GetGroundHeight(data.x, data.z)
-			if data.y == height then --touch down on land
-				removeFloat(unitID)
-				i = i - 1
-			elseif data.y <= 0 then --touch down on water level
-				local dx,dy,dz = Spring.GetUnitVelocity(unitID)
-				data.speed = dy
-				data.isFlying = false
-				local cmdQueue = Spring.GetUnitCommands(unitID);
-				if (#cmdQueue>0) then 
-					local cmdOpt = cmdQueue[1].options
-					if cmdQueue[1].id == CMD.MOVE and cmdOpt.coded == 16 and cmdOpt.right then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position
-						--Spring.GiveOrderToUnit(unitID,CMD.REMOVE, {cmdQueue[1].tag}, {}) --clear Spring's command that desire unit to return to old position	
-						Spring.GiveOrderArrayToUnitArray( {unitID},{
-							{CMD.REMOVE, {cmdQueue[1].tag}, {}},--clear Spring's command that desire unit to return to old position	
-							{CMD.INSERT, {0, CMD.STOP, CMD.SHIFT,}, {"alt"}},
-						})
-					end
-				end
-				Spring.MoveCtrl.Enable(unitID)
-				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*rAD_PER_ROT, 0)
-			end
-			i = i + 1
-			
-		elseif isValidUnitID and not isFlying then --perform float/sink behaviour
+
+		if Spring.ValidUnitID(unitID) then
 			local data = float[unitID]
 			local def = floatDefs[data.unitDefID]
 			
@@ -280,9 +268,6 @@ function gadget:GameFrame(f)
 				data.prevSurfacing = data.surfacing
 			end
 			
-			-- Update unit current position
-			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
-			
 			-- Fill tank
 			if def.sinkTankRequirement then
 				if not data.surfacing then
@@ -296,38 +281,32 @@ function gadget:GameFrame(f)
 			
 			-- Accelerate the speed
 			if data.y <= def.floatPoint then
-				if not data.surfacing then --sinking
+				if not data.surfacing then
 					if (not def.sinkTankRequirement or data.sinkTank > def.sinkTankRequirement) then
-						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag*def.waterHitDrag
-						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
-						data.speed = (data.speed + def.sinkAccel +drag) --sink as fast as possible
+						data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag
 						data.onSurface = false
 					else
-						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag*def.waterHitDrag
-						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
-						data.speed = (data.speed + def.sinkAccel*(data.sinkTank/def.sinkTankRequirement) +drag) --sink as fast as sinktank fill
+						data.speed = data.speed*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag
 					end
-				else --rising
-					local dragFactors = (data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag*def.waterHitDrag
-					local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)				
-					data.speed = (data.speed + def.riseAccel+drag) --float as fast as possible
+				elseif not data.onSurface then
+					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag
 				end
 			else
-				local dragFactors = (def.airDrag)*data.nextSpecialDrag
-				local drag = CalculateDrag(data.speed,dragFactors, 1,0.02,1)	
-				data.speed = (data.speed + def.airAccel + drag) --fall down from sky
+				data.speed = (data.speed + def.airAccel)*def.airDrag*data.nextSpecialDrag
 			end
 			
-			-- Speed the position/Test for special case
+			-- Speed the position
 			local height = Spring.GetGroundHeight(data.x, data.z)
 			if data.speed ~= 0 or data.y <= height or not data.onSurface then
 				
-				-- Splash animation
+				data.nextSpecialDrag = 1
+				-- Splash animation and slowdown
 				if not data.onSurface then
 					local waterline = data.y - def.floatPoint
 					-- enter water
 					if data.speed < 0 and waterline > 0 and waterline < -data.speed then
 						callScript(unitID, "Float_crossWaterline", {data.speed})
+						data.nextSpecialDrag = data.nextSpecialDrag*def.waterHitDrag
 					end
 					
 					--leave water
@@ -340,6 +319,8 @@ function gadget:GameFrame(f)
 				
 				if data.y > height then
 					if data.surfacing and def.stopSpeedLeeway > math.abs(data.speed) and def.stopPositionLeeway > math.abs(data.y - def.floatPoint) then
+						data.speed = 0
+						data.y = def.floatPoint
 						if not data.onSurface then
 							callScript(unitID, "Float_stationaryOnSurface")
 							data.onSurface = true
@@ -381,21 +362,14 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 			state = (state + 1)%3
 		end
 		if (cmdDescID) then
-			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = {state, 'Sink','Attack','Float'}})
+			unitFloatIdleBehaviour.params[1] = state
+			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitFloatIdleBehaviour.params})
 		end
 		floatState[unitID] = state
 		if state == FLOAT_ALWAYS then
 			checkAlwaysFloat(unitID)
 		end
 	end
-end
-
-function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD_UNIT_FLOAT_STATE] = true}
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()	
-	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
@@ -421,58 +395,8 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
 	end
-	
-	GG.Floating_StopMoving =function(unitID) --real function. Note: we do this in gadget:Initialize() so that only gadget that actually run will initialize GG. with a correct function
-		if floatState[unitID] == FLOAT_ALWAYS  then
-			checkAlwaysFloat(unitID)
-		end
-	end
-
-	GG.Floating_AimWeapon = function(unitID)
-		if floatState[unitID] == FLOAT_ATTACK and not select(1, Spring.GetUnitIsStunned(unitID)) then
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			local cQueue = Spring.GetCommandQueue(unitID, 1)
-			local moving = cQueue and #cQueue > 0 and cQueue[1].id == CMD.MOVE and not cQueue[1].options.internal
-			if not moving then
-				addFloat(unitID, unitDefID)
-			end
-		end
-		aimWeapon[unitID] = true
-	end
-
-	GG.Floating_UnitTeleported = function(unitID, position)
-		if float[unitID] then
-			local data = float[unitID]
-			local def = floatDefs[data.unitDefID]
-			data.x, data.y, data.z = position[1], position[2], position[3]
-			--data.speed = 0.1
-			local height = Spring.GetGroundHeight(data.x, data.z)
-			if height <= def.depthRequirement then
-				data.onSurface = false
-				Spring.MoveCtrl.SetPosition(unitID, data.x, data.y, data.z)
-				return true
-			else
-				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
-				callScript(unitID, "script.StopMoving")
-				removeFloat(unitID)
-				return false
-			end
-		end
-		return false
-	end	
 end
----------------------------------------------------------------------
---Updates that check whether unit is flying
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-	if floatDefs[unitDefID] and not float[unitID] then
-		local _,dy = Spring.GetUnitVelocity(unitID)
-		if dy>= fLY_THRESHOLD then
-			addFloat(unitID, unitDefID, true)
-		end
-	end
-	return damage
-end
 
 
 

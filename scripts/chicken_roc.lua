@@ -68,20 +68,13 @@ local function StopFly()
 	Turn(rightWing1, z_axis, 0, wingSpeed)
 end
 
-local function Moving()
-	Signal(SIG_Fly)
-	SetSignalMask(SIG_Fly)
-	
+function script.StartMoving()
+	isMoving = true
 	StartThread(Fly)
 	Turn(leftFoot, x_axis, math.rad(-20), math.rad(420))
 	Turn(rightFoot, x_axis, math.rad(-20), math.rad(420))
 	Turn(leftShin, x_axis, math.rad(-40), math.rad(420))
 	Turn(rightShin, x_axis, math.rad(-40), math.rad(420))
-end
-
-function script.StartMoving()
-	isMoving = true
-	StartThread(Moving)
 end
 
 function script.StopMoving()

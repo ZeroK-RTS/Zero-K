@@ -107,15 +107,11 @@ end
 local function Curl()
 	if nocurl then return end
 	--Spring.Echo("Initiating curl")
-	
-	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
 	Sleep(100)
 	bCurling = true
-	--Spring.Echo("slowing down", Spring.GetGameFrame())
-	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.05)
-	--GG.UpdateUnitAttributes(unitID)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.05)
 
 	Move( canon , y_axis, 5 , 2.5 )
 	Move( base , y_axis, -5 , 2.5 )
@@ -143,18 +139,28 @@ local function Curl()
 	Turn(leg1 , x_axis, math.rad(180), math.rad(95))
 	Turn(leg4 , x_axis, math.rad(180), math.rad(95))
 
-	WaitForTurn(leg1, x_axis)
-	WaitForTurn(leg2, x_axis)
-	WaitForTurn(leg3, x_axis)
-	WaitForTurn(leg4, x_axis)
-	    
+    WaitForTurn(leg1, x_axis)
+    WaitForTurn(leg2, x_axis)
+    WaitForTurn(leg3, x_axis)
+    WaitForTurn(leg4, x_axis)
+        
+    WaitForTurn(leg1, y_axis)
+    WaitForTurn(leg2, y_axis)
+    WaitForTurn(leg3, y_axis)
+    WaitForTurn(leg4, y_axis)
+        
+    WaitForTurn(leg1, z_axis)
+    WaitForTurn(leg2, z_axis)
+    WaitForTurn(leg3, z_axis)
+    WaitForTurn(leg4, z_axis)    
+	
    	bCurled = true
    	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
 end
 
 local function ResetLegs()
-	--Spring.Echo("Resetting legs", Spring.GetGameFrame())
+	--Spring.Echo("Resetting legs")
 	Turn( leg1 , y_axis, 0, math.rad(35) )
 	Turn( leg2 , y_axis, 0, math.rad(35) )
 	Turn( leg3 , y_axis, 0, math.rad(35) )
@@ -178,28 +184,34 @@ local function ResetLegs()
 end
 
 local function Uncurl()
-	--Spring.Echo("Initiating uncurl", Spring.GetGameFrame())
+	--Spring.Echo("Initiating uncurl")
 	bCurled = false
 	bCurling = true
 	
 	ResetLegs()
+	Spring.SetUnitArmored(unitID,false)
+	
 	Move( canon , y_axis, 0 , 2.5 )
 	Move( base , y_axis, 0 , 2.5 )
 	Move( base , z_axis, 0 , 2.5 )
-
-	Sleep(400)
-	--Spring.Echo("disabling armor", Spring.GetGameFrame())
-	Spring.SetUnitArmored(unitID,false)
     
-	WaitForTurn(leg1, x_axis)
-	WaitForTurn(leg2, x_axis)
-	WaitForTurn(leg3, x_axis)
-	WaitForTurn(leg4, x_axis)
+    WaitForTurn(leg1, x_axis)
+    WaitForTurn(leg2, x_axis)
+    WaitForTurn(leg3, x_axis)
+    WaitForTurn(leg4, x_axis)
+        
+    WaitForTurn(leg1, y_axis)
+    WaitForTurn(leg2, y_axis)
+    WaitForTurn(leg3, y_axis)
+    WaitForTurn(leg4, y_axis)
+        
+    WaitForTurn(leg1, z_axis)
+    WaitForTurn(leg2, z_axis)
+    WaitForTurn(leg3, z_axis)
+    WaitForTurn(leg4, z_axis)    
 	
-	--Spring.Echo("speeding up", Spring.GetGameFrame())
-	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	--GG.UpdateUnitAttributes(unitID)
-	bCurling = false
+    Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+    bCurling = false
 end
 
 local function BlinkingLight()
@@ -253,6 +265,7 @@ end
 function script.StopMoving()
 	--Spring.Echo("Stopped moving")
 	bMoving = false
+	Signal(SIG_MOVE)
 	StartThread(Curl)
 end
 

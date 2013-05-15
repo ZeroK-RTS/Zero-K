@@ -84,8 +84,6 @@ unitDef = {
 
     WEAPON = {
       name                    = [[Claws]],
-      avoidFriendly           = false,
-      collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 

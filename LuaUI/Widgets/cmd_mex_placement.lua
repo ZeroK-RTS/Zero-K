@@ -5,7 +5,7 @@ function widget:GetInfo()
 		desc      = "Places mexes in the correct position DO NOT DISABLE",
 		author    = "Google Frog with some from Niobium and Evil4Zerggin.",
 		version   = "v1",
-		date      = "22 April, 2012", --2 April 2013
+		date      = "22 April, 2012",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
 		enabled   = true,
@@ -299,50 +299,44 @@ function widget:CommandNotify(cmdID, params, options)
 	
 		local shift = options.shift
 	
-		do --issue ordered order to unit(s)
-			local commandArrayToIssue={}
-			local unitArrayToReceive ={}
-			for i = 1, #units do --prepare unit list
-				local unitID = units[i]
-				if mexBuilder[unitID] then
-					unitArrayToReceive[#unitArrayToReceive+1] = unitID
+		for i = 1, #units do 
+			local unitID = units[i]
+			if mexBuilder[unitID] then
+				local commandArrayToIssue={}
+				if not shift then 
+					commandArrayToIssue[1] = {CMD.STOP, {} , {}}
+					--spGiveOrderToUnit(unitID, CMD.STOP, {} , 0 )
 				end
-			end
-			--prepare command list
-			if not shift then 
-				commandArrayToIssue[1] = {CMD.STOP, {} , {}}
-				--spGiveOrderToUnit(unitID, CMD.STOP, {} , 0 )
-			end
-			for i, command in ipairs(orderedCommands) do
-				local x = command.x
-				local z = command.z
-				local buildable, feature = spTestBuildOrder(mexDefID,x,0,z,1)
-				if buildable ~= 0 then
-					local handledExternally = false
-					if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-						handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options , true) --add additional flag "true" for additional logic for zk areamex
-					end
-					if ( not handledExternally ) then
-						commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,0,z,0} , {"shift"}}
-						--spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
-					end
-				else
-					local mexes = spGetUnitsInRectangle(x-1,z-1,x+1,z+1)
-					for i = 1, #mexes do --check unit in build location
-						local aid = mexes[i]
-						local udid = spGetUnitDefID(aid)
-						if spGetUnitAllyTeam(aid) == myAllyTeam and mexDefID == udid then
-							if select(5, spGetUnitHealth(aid)) ~= 1 then
-								commandArrayToIssue[#commandArrayToIssue+1] = {CMD.REPAIR, {aid} , {"shift"}}
-								--spGiveOrderToUnit(unitID, CMD.REPAIR, {aid} , {"shift"})
-								break
+				for i, command in ipairs(orderedCommands) do
+                    local x = command.x
+                    local z = command.z
+					local buildable, feature = spTestBuildOrder(mexDefID,x,0,z,1)
+					if buildable ~= 0 then
+						local handledExternally = false
+						if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
+							handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options , true) --add additional flag "true" for additional logic for "central_build_AI.lua"
+						end
+						if ( not handledExternally ) then
+							commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,0,z,0} , {"shift"}}
+							--spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
+						end
+					else
+						local mexes = spGetUnitsInRectangle(x-1,z-1,x+1,z+1)
+						for i = 1, #mexes do
+							local aid = mexes[i]
+							local udid = spGetUnitDefID(aid)
+							if spGetUnitAllyTeam(aid) == myAllyTeam and mexDefID == udid then
+								if select(5, spGetUnitHealth(aid)) ~= 1 then
+									commandArrayToIssue[#commandArrayToIssue+1] = {CMD.REPAIR, {aid} , {"shift"}}
+									--spGiveOrderToUnit(unitID, CMD.REPAIR, {aid} , {"shift"})
+									break
+								end
 							end
 						end
 					end
 				end
-			end		
-			--issue all order to all unit at once
-			Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
+				Spring.GiveOrderArrayToUnitArray({unitID},commandArrayToIssue)
+			end
 		end
   
 		return true

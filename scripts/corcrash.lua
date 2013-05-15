@@ -77,9 +77,7 @@ function script.Create()
 end
 
 local function Walk()
-	Signal( SIG_Walk )
 	SetSignalMask( SIG_Walk )
-	
 	while ( true ) do -- needs major fixing. 
 		Move(base, y_axis, 3.6, 12)
 		
@@ -121,9 +119,6 @@ local function Walk()
 end
 
 local function StopWalk()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
-	
 	Move(base, y_axis, 0, 12)
 	
 	Turn( l_thigh, x_axis, 0, 2 )
@@ -136,10 +131,13 @@ local function StopWalk()
 end
 
 function script.StartMoving()
+	--SetSignalMask( walk )
 	StartThread( Walk )
 end
 
 function script.StopMoving()
+	Signal( SIG_Walk )
+	--SetSignalMask( SIG_Walk )
 	StartThread( StopWalk )
 end
 

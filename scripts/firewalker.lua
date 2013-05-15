@@ -141,7 +141,6 @@ end
 
 local function Stop()
 	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
 	Turn( lupleg , x_axis, 0, math.rad(50) )
 	Turn( rupleg , x_axis, 0, math.rad(50) )
 	Turn( lloleg , x_axis, 0, math.rad(100) )

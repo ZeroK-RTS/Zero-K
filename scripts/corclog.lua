@@ -164,10 +164,12 @@ local function RestoreAfterDelay()
 	Turn( box , y_axis, 0, math.rad(90.021978) )
 end
 
-local function Stopping()
+function script.StartMoving()
+	StartThread(Walk)
+end
+
+function script.StopMoving()
 	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
-	
 	Move( pelvis , y_axis, 0.000000 , 1.000000 )
 	Turn( rightLeg.thigh, x_axis, 0, math.rad(200) )
 	Turn( rightLeg.calf, x_axis, 0, math.rad(200) )
@@ -175,14 +177,6 @@ local function Stopping()
 	Turn( leftLeg.thigh, x_axis, 0, math.rad(200) )
 	Turn( leftLeg.calf, x_axis, 0, math.rad(200) )
 	Turn( leftLeg.foot, x_axis, 0, math.rad(200) )
-end
-
-function script.StartMoving()
-	StartThread(Walk)
-end
-
-function script.StopMoving()
-	StartThread(Stopping)
 end
 
 function script.Killed(recentDamage, maxHealth)

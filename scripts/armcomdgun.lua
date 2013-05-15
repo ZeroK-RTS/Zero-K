@@ -168,9 +168,6 @@ local function Walk()
 end
 
 local function RestorePose()
-	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
-
 	Turn(ground, x_axis, 0, math.rad(60))
         Turn(turret, y_axis, 0, math.rad(60))
 	Move(pelvis , y_axis, 0 , 1 )
@@ -195,7 +192,8 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-    StartThread(RestorePose)
+    Signal(SIG_WALK)
+    RestorePose()
 end
 
 local function RestoreAfterDelay()

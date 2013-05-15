@@ -21,7 +21,6 @@ unitDef = {
 
   buildPic                      = [[missilesilo.png]],
   buildTime                     = 1200,
-  canAttack                     = true,
   canFight                      = false,
   canMove                       = false,
   canPatrol                     = false,
@@ -60,7 +59,6 @@ unitDef = {
   showNanoSpray                 = false,
   side                          = [[ARM]],
   sightDistance                 = 273,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,

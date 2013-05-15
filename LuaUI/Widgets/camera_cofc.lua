@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.116 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
-    author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-May-12
+    desc      = "v0.112 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    author    = "CarRepairer",
+    date      = "2011-03-16", --2013-March-9 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -21,7 +21,7 @@ include("keysym.h.lua")
 
 local init = true
 local trackmode = false --before options
-local thirdperson_trackunit = false
+local thirdperson_trackunit = false 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ options = {
 	},
 	
 	overviewmode = {
-		name = "COFC Overview",
+		name = "Overview",
 		desc = "Go to overview mode, then restore view to cursor position.",
 		type = 'button',
 		hotkey = {key='tab', mod=''},
@@ -291,7 +291,7 @@ options = {
 	-- follow cursor
 	follow = {
 		name = "Follow player's cursor",
-		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on). Mouse midclick to pause tracking for 4 second.",
+		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
 		type = 'bool',
 		value = false,
 		hotkey = {key='l', mod='alt+'},
@@ -309,7 +309,6 @@ options = {
 		desc = "Follow speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
 		type = 'number',
 		min = 1, max = 14, step = 1,
-		mid = ((14-1)/2) + 1,
 		value = 1,
 		path = cameraFollowPath,
 	},	
@@ -318,7 +317,6 @@ options = {
 		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest if auto-zoom is enabled (faster tracking will prevent auto-zoom from zooming out too far)",
 		type = 'number',
 		min = 2, max = 15, step = 1,
-		mid = ((15-2)/2) + 2,
 		value = 15,
 		path = cameraFollowPath,
 	},
@@ -342,17 +340,17 @@ options = {
 	
 	-- follow unit
 	trackmode = {
-		name = "Activate Trackmode",
+		name = "Enter Trackmode",
 		desc = "Track the selected unit (mouse midclick to exit mode)",
 		type = 'button',
         hotkey = {key='t', mod='alt+'},
 		path = cameraFollowPath,
-		OnChange = function(self) trackmode = true; Spring.Echo("COFC: Unit tracking ON") end,
+		OnChange = function(self) trackmode = true; end,
 	},
 	
 	persistenttrackmode = {
 		name = "Persistent trackmode state",
-		desc = "Trackmode will not cancel when deselecting unit. Trackmode will always attempt to track newly selected unit. Press mouse midclick to cancel this mode.",
+		desc = "Trackmode will not cancel when deselect unit. Trackmode will always track new unit selection unless user press mouse midclick.",
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
@@ -387,7 +385,7 @@ options = {
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
-		desc = "Tap the same group numbers to focus camera view toward each units within the same group. This option use \'Receive Indicator\' widget to intelligently cycle focus when appropriate.",
+		desc = "Tap a number to pan camera view toward a unit(s) within a group number. This option use \'Receive Indicator\' widget to intelligently cycle focus within group unit.",
 		OnChange = function(self) 
 			if self.value==true then
 				Spring.SendCommands("luaui enablewidget Receive Units Indicator")
@@ -457,7 +455,6 @@ local ls_dist, ls_have, ls_onmap --lockspot flag
 local tilting
 local overview_mode, last_rx, last_ls_dist --overview_mode's variable
 local follow_timer = 0
-local epicmenuHkeyComp = {} --for saving & reapply hotkey system handled by epicmenu.lua
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -884,7 +881,7 @@ end
 
 
 local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camera while in follow cursor mode)
-	if smoothscroll or springscroll or rotate then
+	if follow_timer > 0 or smoothscroll or springscroll or rotate then
 		return
 	end
 	local lclZoom = function(cs,zoomin, smoothness, no_2)
@@ -1132,58 +1129,50 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Update(dt)
-	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
-    
-	if hideCursor then
+
+    if hideCursor then
         spSetMouseCursor('%none%')
     end
 	
-	--//HANDLE TIMER FOR VARIOUS SECTION
-	--timer to block tracking when using mouse
 	if follow_timer > 0  then 
 		follow_timer = follow_timer - dt
 	end
-	--timer to block unit tracking
-	trackcycle = trackcycle + framePassed 
-	if trackcycle >=6 then 
-		trackcycle = 0 --reset value to Zero (0) every 6th frame. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
-	end
-	--timer to block cursor tracking
-	camcycle = camcycle + framePassed 
-	if camcycle >=12 then
-		camcycle = 0 --reset value to Zero (0) every 12th frame. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
-	end
-	--tweak to timer:
-	if trackcycle==0 and camcycle> 0 then
-		camcycle = 6 --prevent trackcyle & camcycle from out of sync with each other.
-		--Example:
-		--[[
-			estFrame   =   +4    +3     +3    +3    +3    +5   
-			camcycle   = 0 ... 4 ... 7 ... 0 ... 3 ... 6 ... 0
-			trackcycle = 0 ... 4 ... 7 ... 10... 13... 0 ... 5
-			             ^                             ^     ^
-			             sync                           unsync
-			camcycle   = 0 ... 4 ... 7 ... 0 ... 3 ... 6 ... 0
-			trackcycle = 0 ... 4 ... 7 ... 6 ... 9 ... 12... 0
-			             ^                                   ^
-			             sync                               sync						 
-		--]]
-	end
-	--timer to block periodic warning
-	cycle = cycle + framePassed
-	if cycle >=32*15 then
-		cycle = 0 --reset value to Zero (0) every 32*15th frame.
-	end	
 
-	--//HANDLE TRACK UNIT
-	local isTrackingUnit
-	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
-	if (trackcycle == 0 and
-		trackmode and
-		not overview_mode and
-		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
-		not thirdperson_trackunit and
-		(not rotate)) then --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
+	if options.follow.value then --if follow selected player's cursor: do
+		camcycle = camcycle %(8) + 1 --automatically reset value to Zero (0) every 8th iteration.
+		if camcycle == 1 then
+			if WG.alliedCursorsPos then 
+				if options.followautozoom.value then
+					AutoZoomInOutToCursor()
+				else
+					local teamID = Spring.GetLocalTeamID()
+					local _, playerID = Spring.GetTeamInfo(teamID)
+					local pp = WG.alliedCursorsPos[ playerID ]
+					if pp then
+						local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
+						local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
+						local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
+						if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
+							local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+							spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
+						else --if cursor within screen: do
+							local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+							spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
+						end
+					end
+				end
+			end 
+		end
+	end
+	
+	cycle = cycle %(32*15) + 1
+	-- Periodic warning
+	if cycle == 1 then
+		PeriodicWarning()
+	end
+	
+	trackcycle = trackcycle %(4) + 1 --automatically reset "trackcycle" value to Zero (0) every 4th iteration. Extra note: dt*trackcycle would be the estimated number of second elapsed since last reset.
+	if trackcycle == 1 and trackmode and (not rotate) then --update trackmode during normal/non-rotating state (doing both will cause a zoomed-out bug)
 		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
 			local vx,vy,vz = Spring.GetUnitVelocity(selUnits[1])
@@ -1194,50 +1183,11 @@ function widget:Update(dt)
 			--2) increase value A until camera motion is not jittery, then stop: (x+vx,y+vy,z+vz, 0.0333*A)
 			--3) increase value B until unit center on screen, then stop: (x+vx*B,y+vy*B,z+vz*B, 0.0333*A)
 			spSetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
-			isTrackingUnit = true
 		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
 			trackmode=false --exit trackmode
-			Spring.Echo("COFC: Unit tracking OFF")
 		end
 	end
 	
-	--//HANDLE TRACK CURSOR
-	--camcycle = camcycle%(12) + 1  --automatically reset "camcycle" value to Zero (0) every 12th iteration.
-	if (camcycle == 0 and
-		not isTrackingUnit and --if currently not tracking unit, and
-		not overview_mode and
-		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
-		not thirdperson_trackunit and
-		options.follow.value) then --if follow selected player's cursor: do
-		if WG.alliedCursorsPos then 
-			if options.followautozoom.value then
-				AutoZoomInOutToCursor()
-			else
-				local teamID = Spring.GetLocalTeamID()
-				local _, playerID = Spring.GetTeamInfo(teamID)
-				local pp = WG.alliedCursorsPos[ playerID ]
-				if pp then
-					local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
-					local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
-					local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
-					if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-						local fastSpeed = (options.followmaxscrollspeed.mid - options.followmaxscrollspeed.value)+options.followmaxscrollspeed.mid --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-						spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
-					else --if cursor within screen: do
-						local slowSpeed = (options.followminscrollspeed.mid - options.followminscrollspeed.value)+options.followminscrollspeed.mid --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-						spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
-					end
-				end
-			end
-		end
-	end
-	
-	
-	-- Periodic warning
-	--cycle = cycle%(32*15) + framePassed --automatically reset "cycle" value to Zero (0) every 32*15th iteration.
-	if cycle == 0 then
-		PeriodicWarning()
-	end
 
 	local cs = spGetCameraState()
 	
@@ -1245,7 +1195,6 @@ function widget:Update(dt)
 
 	local a,c,m,s = spGetModKeyState()
 	
-	--//HANDLE ROTATE CAMERA
 	if 	(not thirdperson_trackunit and  --block 3rd Person 
 		(rot.right or rot.left or rot.up or rot.down))
 		then
@@ -1265,7 +1214,6 @@ function widget:Update(dt)
 		
 	end
 	
-	--//HANDLE MOVE CAMERA
 	if (not thirdperson_trackunit and  --block 3rd Person 
 		(smoothscroll or
 		move.right or move.left or move.up or move.down or
@@ -1329,7 +1277,6 @@ function widget:Update(dt)
 	
 	mx, my = spGetMouseState()
 	
-	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
 	if options.edgemove.value then
 		if not movekey then --if not doing arrow key on keyboard: reset
 			move = {}
@@ -1360,7 +1307,6 @@ function widget:Update(dt)
 		end
 	end
 	
-	--//HANDLE MOUSE/KEYBOARD'S 3RD-PERSON (TRACK UNIT) RETARGET
 	if 	(thirdperson_trackunit and 
 		not overview_mode and --block 3rd person scroll when in overview mode
 		(move.right or move.left or move.up or move.down or
@@ -1369,9 +1315,9 @@ function widget:Update(dt)
 		
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
-		else --not using movekey for 3rdPerson-edge-Scroll (ie:is using mouse): re-issue 3rd person
+		else --not 3rdPerson-edge-Scroll: re-issue 3rd person
 			local selUnits = spGetSelectedUnits()
-			if selUnits and selUnits[1] then -- re-issue 3rd person for selected unit (we need to reissue this because in normal case mouse edge scroll will exit trackmode)
+			if selUnits and selUnits[1] then -- re-issue 3rd person for selected unit
 				spSendCommands('viewfps')
 				spSendCommands('track')
 				thirdperson_trackunit = selUnits[1]
@@ -1386,7 +1332,6 @@ function widget:Update(dt)
 		end
 	end
 	
-	--//MISC
 	fpsmode = cs.name == "fps"
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
 		init = false
@@ -1415,7 +1360,6 @@ function widget:MouseMove(x, y, dx, dy, button)
 		
 		spWarpMouse(msx, msy)
 		
-		follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	elseif springscroll then
 		
 		if abs(dx) > 0 or abs(dy) > 0 then
@@ -1429,8 +1373,6 @@ function widget:MouseMove(x, y, dx, dy, button)
 		local mxm = speed * dx * dir
 		local mym = speed * dy * dir
 		ScrollCam(cs, mxm, mym, 0)
-		
-		follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	end
 end
 
@@ -1449,16 +1391,13 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		return false
 	end
 	
-	follow_timer = 4 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
+	follow_timer = 4
 	
 	local a,c,m,s = spGetModKeyState()
 	
 	spSendCommands('trackoff')
     spSendCommands('viewfree')
 	if not (options.persistenttrackmode.value and (c or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
-		if trackmode then
-			Spring.Echo("COFC: Unit tracking OFF")
-		end
 		trackmode = false
 	end
 	thirdperson_trackunit = false
@@ -1526,7 +1465,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (button == 2) then
-		follow_timer = 4 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
+		follow_timer = 4
 		rotate = nil
 		smoothscroll = false
 		springscroll = false
@@ -1562,8 +1501,6 @@ function widget:MouseWheel(wheelUp, value)
 			overview_mode = false
 		else return; end --skip wheel if Overview_mode + ZOOM-out
 	end
-	
-	follow_timer = 0.6 --disable tracking for 1 second when middle mouse is pressed or when scroll is used for zoom
 	return Zoom(not wheelUp, shift)
 end
 
@@ -1712,6 +1649,7 @@ function widget:DrawScreen()
 	end
 end
 
+
 function widget:Initialize()
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
@@ -1722,23 +1660,9 @@ function widget:Initialize()
 	spSendCommands( 'unbindaction track' )
 	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
 	
-	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
-	if WG.crude.GetHotkey then
-		epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview") --get hotkey
-		epicmenuHkeyComp[2] = WG.crude.GetHotkey("trackmode")
-		epicmenuHkeyComp[3] = WG.crude.GetHotkey("track")
-		epicmenuHkeyComp[4] = WG.crude.GetHotkey("mousestate")
-	end
-	if 	WG.crude.SetHotkey then
-		WG.crude.SetHotkey("toggleoverview",nil) --unbind hotkey
-		WG.crude.SetHotkey("trackmode",nil)
-		WG.crude.SetHotkey("track",nil)
-		WG.crude.SetHotkey("mousestate",nil)
-	end
-	
 	spSendCommands("luaui disablewidget SmoothScroll")
-	if WG.SetWidgetOption then
-		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
+	if WG.SetWidgetOption then 
+		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC")
 	end
 end
 
@@ -1748,14 +1672,6 @@ function widget:Shutdown()
 	spSendCommands( 'bind any+t track' )
 	spSendCommands( 'bind ctrl+t trackmode' )
 	spSendCommands( 'bind backspace mousestate' ) --//re-enable screen-panning-mode toggled by 'backspace' key
-	
-	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
-	if WG.crude.SetHotkey then
-		WG.crude.SetHotkey("toggleoverview",epicmenuHkeyComp[1]) --rebind hotkey
-		WG.crude.SetHotkey("trackmode",epicmenuHkeyComp[2])
-		WG.crude.SetHotkey("track",epicmenuHkeyComp[3])
-		WG.crude.SetHotkey("mousestate",epicmenuHkeyComp[4])
-	end
 end
 
 function widget:TextCommand(command)
@@ -1794,7 +1710,7 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			end
 		end
 		selUnits = spGetSelectedUnits()--test select unit
-		if selUnits and selUnits[1] and (not Spring.GetUnitIsDead(selUnits[1]) ) then --if we can select unit, and those unit is not dead in this frame, then: track them
+		if selUnits and selUnits[1] then
 			spSendCommands('viewfps')
 			spSendCommands('track')
 			thirdperson_trackunit = selUnits[1]

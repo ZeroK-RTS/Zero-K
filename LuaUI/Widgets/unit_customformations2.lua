@@ -267,32 +267,9 @@ local function AddFNode(pos)
 	totaldxy = 0
 	return true
 end
-
-local function HasWaterWeapon(UnitDefID)
-	local haswaterweapon = false
-	local numweapons = #(UnitDefs[UnitDefID]["weapons"])
-	for j=1, numweapons do
-		local weapondefid = UnitDefs[UnitDefID]["weapons"][j]["weaponDef"]
-		local iswaterweapon = WeaponDefs[weapondefid]["waterWeapon"]
-		if iswaterweapon then haswaterweapon=true end
-	end	
-	return haswaterweapon
-end
-
-local function GetInterpNodes(mUnits)
-		
-	local number = #mUnits
-	local spacing = fDists[#fNodes] / (#mUnits - 1)
-
-	local haswaterweapon = {}
-	for i=1, number do
-		local UnitDefID = spGetUnitDefID(mUnits[i])
-		haswaterweapon[i] = HasWaterWeapon(UnitDefID)
-	end
-	--result of this and code below is that the height of the aimpoint for a unit [i] will be:
-	--(a) on GetGroundHeight(units aimed position), if the unit has a waterweapon
-	--(b) on whichever is highest out of water surface (=0) and GetGroundHeight(units aimed position), if the unit does not have water weapon. 
-	--in BA this must match the behaviour of prevent_range_hax or commands will get modified.
+local function GetInterpNodes(number)
+	
+	local spacing = fDists[#fNodes] / (number - 1)
 	
 	local interpNodes = {}
 	
@@ -307,9 +284,7 @@ local function GetInterpNodes(mUnits)
 	local eZ = ePos[3]
 	local eDist = fDists[2]
 	
-	local sY 
-	if haswaterweapon[1] then sY=spGetGroundHeight(sX, sZ) else sY=math.max(0,spGetGroundHeight(sX,sZ)) end
-	interpNodes[1] = {sX, sY, sZ}
+	interpNodes[1] = {sX, spGetGroundHeight(sX, sZ), sZ}
 	
 	for n = 1, number - 2 do
 		
@@ -330,19 +305,13 @@ local function GetInterpNodes(mUnits)
 		local nFrac = (reqDist - sDist) / (eDist - sDist)
 		local nX = sX * (1 - nFrac) + eX * nFrac
 		local nZ = sZ * (1 - nFrac) + eZ * nFrac
-		local nY 
-		if haswaterweapon[number+1] then nY=spGetGroundHeight(nX, nZ) else nY=math.max(0,spGetGroundHeight(nX, nZ)) end
-		interpNodes[n + 1] = {nX, nY, nZ}
+		interpNodes[n + 1] = {nX, spGetGroundHeight(nX, nZ), nZ}
 	end
 	
 	ePos = fNodes[#fNodes]
 	eX = ePos[1]
 	eZ = ePos[3]
-	local eY 
-	if haswaterweapon[number] then  eY=spGetGroundHeight(eX, eZ) else eY=math.max(0,spGetGroundHeight(eX, eZ)) end
-	interpNodes[number] = {eX, eY, eZ}
-	
-	--DEBUG for i=1,number do Spring.Echo(interpNodes[i]) end
+	interpNodes[number] = {eX, spGetGroundHeight(eX, eZ), eZ}
 	
 	return interpNodes
 end
@@ -585,7 +554,7 @@ function widget:MouseRelease(mx, my, mButton)
 			local mUnits = GetExecutingUnits(usingCmd)
 			if #mUnits > 0 then
 				
-				local interpNodes = GetInterpNodes(mUnits)
+				local interpNodes = GetInterpNodes(#mUnits)
 				
 				local orders
 				if (#mUnits <= maxHungarianUnits) then
@@ -675,13 +644,11 @@ local function DrawFormationLines(vertFunction, lineStipple)
 	if #fNodes > 1 then
 		SetColor(usingCmd, 1.0)
 		glBeginEnd(GL_LINE_STRIP, vertFunction, fNodes)
-		glColor(1,1,1,1)
 	end
 	
 	if #dimmNodes > 1 then
 		SetColor(dimmCmd, dimmAlpha)
 		glBeginEnd(GL_LINE_STRIP, vertFunction, dimmNodes)
-		glColor(1,1,1,1)
 	end
 	
 	glLineWidth(1.0)

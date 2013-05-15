@@ -11,7 +11,6 @@ smokePiece = {bay, gantry}
 --------------------------------------------------------------------------------
 -- Signal definitions
 local SIG_AIM = 2
-local SIG_MOVE = 1
 
 local RESTORE_DELAY = 5000
 local LOAD_DELAY = 500
@@ -82,32 +81,19 @@ local function Reload()
 	Show( missile)
 end
 
-local function Moving()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
-	
+function script.StartMoving() 
+	isMoving = true
 	StartThread(TrackControl)
 	for i=1,#wheels do
 		Spin( wheels[i] , x_axis, WHEEL_SPIN_SPEED, WHEEL_SPIN_ACCEL )
 	end
 end
 
-local function Stopping()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
+function script.StopMoving() 
+	isMoving = false
 	for i=1,#wheels do
 		StopSpin( wheels[i], x_axis, WHEEL_SPIN_DECEL )
 	end
-end
-
-function script.StartMoving() 
-	isMoving = true
-	StartThread(Moving)
-end
-
-function script.StopMoving() 
-	isMoving = false
-	StartThread(Stopping)
 end
 
 local function RestoreAfterDelay() 

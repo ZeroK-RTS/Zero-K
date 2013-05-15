@@ -40,20 +40,14 @@ local function StartMoving()
 	Turn( enginer , x_axis, math.rad(10), math.rad(200) )
 end
 
-local function Stopping()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
-	
-	Turn( enginel , x_axis, 0, math.rad(100) )
-	Turn( enginer , x_axis, 0, math.rad(100) )
-end
-
 function script.StartMoving()
 	StartThread(StartMoving)
 end
 
 function script.StopMoving()
-	StartThread(Stopping)
+	Signal( SIG_MOVE)
+	Turn( enginel , x_axis, 0, math.rad(100) )
+	Turn( enginer , x_axis, 0, math.rad(100) )
 end
 
 function script.StartBuilding()

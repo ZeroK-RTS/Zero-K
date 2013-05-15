@@ -180,38 +180,34 @@ local function UpdateFac(i, facInfo)
 	for j,unitDefIDb in ipairs(buildList) do
 		local unitDefIDb = unitDefIDb
 		
-		if not facs[i].boStack then
-		  echo('<Chili Facbar> Strange error #1' )
-		else
-		  local boButton = facs[i].boStack.childrenByName[unitDefIDb]
-		  local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
-		  
-		  local boBar = boButton.childrenByName['bp'].childrenByName['prog']
-		  local qBar = qButton.childrenByName['bp'].childrenByName['prog']
-		  
-		  local amount = buildQueue[unitDefIDb] or 0
-		  local boCount = boButton.childrenByName['count']
-		  local qCount = qButton.childrenByName['count']			
-		  
-		  facs[i].qStack:RemoveChild(qButton)
-		  
-		  boBar:SetValue(0)
-		  qBar:SetValue(0)
-		  if unitDefIDb == unitBuildDefID then
-			  boBar:SetValue(progress)
-			  qBar:SetValue(progress)
-		  end
-		  
-		  if amount > 0 then
-			  boButton.backgroundColor = queueColor
-		  else
-			  boButton.backgroundColor = buttonColor
-		  end
-		  boButton:Invalidate()
-		  
-		  boCount:SetCaption(amount > 0 and amount or '')
-		  qCount:SetCaption(amount > 0 and amount or '')
+		local boButton = facs[i].boStack.childrenByName[unitDefIDb]
+		local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
+		
+		local boBar = boButton.childrenByName['bp'].childrenByName['prog']
+		local qBar = qButton.childrenByName['bp'].childrenByName['prog']
+		
+		local amount = buildQueue[unitDefIDb] or 0
+		local boCount = boButton.childrenByName['count']
+		local qCount = qButton.childrenByName['count']			
+		
+		facs[i].qStack:RemoveChild(qButton)
+		
+		boBar:SetValue(0)
+		qBar:SetValue(0)
+		if unitDefIDb == unitBuildDefID then
+			boBar:SetValue(progress)
+			qBar:SetValue(progress)
 		end
+		
+		if amount > 0 then
+			boButton.backgroundColor = queueColor
+		else
+			boButton.backgroundColor = buttonColor
+		end
+		boButton:Invalidate()
+		
+		boCount:SetCaption(amount > 0 and amount or '')
+		qCount:SetCaption(amount > 0 and amount or '')
 	end
 end
 local function UpdateFacQ(i, facInfo)

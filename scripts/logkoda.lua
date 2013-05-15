@@ -11,10 +11,8 @@ piece('base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint', 'tracks1', 'tra
 local moving, once, animCount = false,true,0
 
 -- Signal definitions
-local SIG_Walk = 2
 local SIG_Restore = 1
 local SIG_AIM1 = 1
-
 local ANIM_SPEED = 50
 local RESTORE_DELAY = 3000
 
@@ -77,9 +75,10 @@ function AnimationControl()
 	end
 end
 
-local function Moving()
-	Signal(SIG_Walk)
-	SetSignalMask(SIG_Walk)
+function script.StartMoving()
+
+	moving = true
+	animCount = 0
 	
 	Spin( wheels1 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
 	Spin( wheels2 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
@@ -91,9 +90,9 @@ local function Moving()
 	Spin( wheels8 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
 end
 
-local function Stopping()
-	Signal(SIG_Walk)
-	SetSignalMask(SIG_Walk)
+function script.StopMoving()
+
+	moving = false
 	
 	-- I don\'t like insta braking. It\'s not perfect but works for most cases.
 	-- Probably looks goofy when the unit is turtling,, i.e. does not become faster as time increases..
@@ -107,19 +106,6 @@ local function Stopping()
 	StopSpin( wheels6, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
 	StopSpin( wheels7, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
 	StopSpin( wheels8, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
-end
-
-
-function script.StartMoving()
-	moving = true
-	animCount = 0
-	StartThread(Moving)
-end
-
-function script.StopMoving()
-
-	moving = false
-	StartThread(Stopping)
 end
 
 -- Weapons

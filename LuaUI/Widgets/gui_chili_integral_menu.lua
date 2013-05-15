@@ -723,9 +723,7 @@ local function ManageBuildRow()
 
 	for i=1, MAX_COLUMNS do
 		local buttonArray = buildRowButtons[i]
-		if buttonArray.button then
-			RemoveChildren(buttonArray.button)
-		end
+		if buttonArray.button then RemoveChildren(buttonArray.button) end
 		if buildQueue[i] then	--adds button for queued unit
 			local udid, count, caption
 			for id, num in pairs(buildQueue[i]) do
@@ -779,11 +777,10 @@ local function ManageBuildRow()
 					--y = "70%",
 					align="right";
 					valign="bottom";
-					--caption = caption;
+					caption = caption;
 					fontSize = 16;
 					fontShadow = true;
 				}
-				buttonArray.label:SetCaption(caption)	-- do it here as workaround for vanishing text
 			end
 			
 			if i == 1 then

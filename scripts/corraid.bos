@@ -15,8 +15,6 @@ static-var	moving, once, animcount,
 
 // Signal definitions
 #define SIG_AIM1						1
-#define SIG_MOVE						2
-
 #define ANIM_SPEED						50
 #define RESTORE_DELAY					3000
 
@@ -251,9 +249,6 @@ StartMoving()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
-
 	moving = FALSE;
 	
 	// I don't like insta braking. It's not perfect but works for most cases.

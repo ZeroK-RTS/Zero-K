@@ -1,10 +1,7 @@
 local confdata = {}
 confdata.title = 'Z.K.'
 confdata.title_image = LUAUI_DIRNAME .. 'Images/ZK_logo.png'
-confdata.default_source_file = 'zk_keys.lua' --the file in ZIP archive where default key is stored.
-confdata.mission_keybinds_file = 'zk_keys.lua' --the filename to be used for Mission mod. set this to NIL if want to use mission's name as filename.
--- confdata.regular_keybind_file = LUAUI_DIRNAME .. 'Configs/zk_keys.lua' --for Multiplayer this is automatically set according to modName in epicmenu.lua
---FIXME: find modname instead of using hardcoded mission_keybinds_file name
+confdata.keybind_file = LUAUI_DIRNAME .. 'Configs/zk_keys.lua'
 local color = {
 	white = {1,1,1,1},
 	yellow = {1,1,0,1},
@@ -125,12 +122,10 @@ path='Settings/Reset Settings'
 					spSendCommands{"water 0",
 						"Shadows 0",
 						"maxparticles 100",
-						"advmodelshading 0",
+						"advshading 0",
 						"grounddecals 0",
 						'luaui disablewidget LupsManager',
-						"luaui disablewidget Lups",
 						"luaui disablewidget Display DPS",
-						"luaui disablewidget Map Edge Extension",
 						"luaui disablewidget SelectionHalo",
 						"luaui disablewidget SelectionCircle",
 						"luaui disablewidget UnitShapes",
@@ -215,11 +210,7 @@ path='Settings/Camera/Old Camera Shortcuts'
 	ShButton( 'Move Forward', 'moveforward' )	
 	ShButton( 'Move Back', 'moveback' )	
 	ShButton( 'Move Left', 'moveleft' )	
-	ShButton( 'Move Right', 'moveright' )
-	ShLabel(' ')
-	ShButton( 'TA camera track unit', 'track' )
-	ShButton( 'Overview mode', 'toggleoverview' )
-	ShButton( 'Panning mode','mousestate', 'Note: must be bound to a key for use')
+	ShButton( 'Move Right', 'moveright' )	
 	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
@@ -262,8 +253,6 @@ path='Settings/Interface/Selection'
 		ShButton('Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected and hovered-over units")	
 	path='Settings/Interface/Selection/Team Platters'
 		ShButton('Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
-	path='Settings/Interface/Selection/Blurry Halo Selections'
-		ShButton('Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Puts team-coloured disk below units")
 path='Settings/Interface/Command Visibility'
   ShButton('Toggle Show all Commands', function() spSendCommands{"luaui togglewidget Show All Commands"} end, "Shows all unit commands")
 
@@ -330,7 +319,7 @@ path='Settings/Graphics'
 			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
 		end, 
 	} )
-	ShButton('Toggle Terrain Shadows',
+	ShButton('Enable Terrain Shadows',
 		function()
 			local curShadow=Spring.GetConfigInt("Shadows") or 0
 			if curShadow == 0 then
@@ -366,7 +355,7 @@ path='Settings/Graphics'
 		name = 'Shiny Units',
 		type = 'bool',
 		springsetting = 'AdvUnitShading',
-		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
+		OnChange=function(self) spSendCommands{"advshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
 	AddOption({ 	
 		name = 'Ground Decals',
@@ -382,7 +371,7 @@ path='Settings/Graphics'
 		springsetting = 'MaxParticles',
 		OnChange=function(self) Spring.SendCommands{"maxparticles " .. self.value } end, 
 	} )
-	ShButton('Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager','luaui togglewidget Lups'} end )
+	ShButton('Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager'} end )
 	ShButton('Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
 	
 path='Settings/Graphics/Effects'

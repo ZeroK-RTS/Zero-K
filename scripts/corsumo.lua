@@ -51,8 +51,6 @@ local rb_ankle = piece "rb_ankle"
 local rb_pump = piece "rb_pump"
 local rb_foot = piece "rb_foot"
 
-local emit = piece "emit"
-
 smokePiece = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
 
 local weaponPieces = {
@@ -88,7 +86,6 @@ local walk = 2
 local SIG_Aim = { [2] = 4, [3] = 8 }
 
 local function Walk()
-	Signal( walk )
 	SetSignalMask( walk )
 	
 	Turn( lf_pump, x_axis, -p_angle, 1.4 )
@@ -330,14 +327,14 @@ end
 
 
 function endJump()
-	--Move( b_dome, x_axis, 22)
-	--Move( b_dome, y_axis, -30)
-	--Move( b_dome, z_axis, 12)
+	Move( b_dome, x_axis, 22)
+	Move( b_dome, y_axis, -30)
+	Move( b_dome, z_axis, 12)
 	
-	EmitSfx( emit, crater )
-	--Move( b_dome, x_axis, 0)
-	--Move( b_dome, y_axis, 0)
-	--Move( b_dome, z_axis, 0)
+	EmitSfx( b_dome, crater )
+	Move( b_dome, x_axis, 0)
+	Move( b_dome, y_axis, 0)
+	Move( b_dome, z_axis, 0)
 	
 	EmitSfx( rf_foot, dirtfling )
 	EmitSfx( lf_foot, dirtfling )
@@ -357,10 +354,13 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
-local function Stopping()
+function script.StartMoving()
+	StartThread( Walk )
+end
+
+function script.StopMoving()
 	Signal( walk )
-	SetSignalMask( walk )
-	
+	--StartThread( RAD )
 	Move( t_dome, y_axis, 0, 10 )
 	Move( b_dome, y_axis, 0, 20 )
 
@@ -400,15 +400,6 @@ local function Stopping()
 	Turn( rf_foot, x_axis, 0, sp1 )
 	Turn( lb_foot, x_axis, 0, sp1 )
 	Turn( rb_foot, x_axis, 0, sp1 )
-end
-
-function script.StartMoving()
-	StartThread( Walk )
-end
-
-function script.StopMoving()
-	--StartThread( RAD )
-	StartThread(Stopping)
 end
 
 function script.QueryWeapon(num) 

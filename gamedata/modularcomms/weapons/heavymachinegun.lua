@@ -14,7 +14,6 @@ local weaponDef = {
 		miscEffectShot = [[custom:DEVA_SHELLS]],
 		altforms = {
 			lime = {
-				explosionGenerator = [[custom:BEAMWEAPON_HIT_GREEN]],
 				rgbColor = [[0.2 1 0]],
 			},
 		}

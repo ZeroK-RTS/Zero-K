@@ -1,5 +1,5 @@
 -- $Id: unit_comm_nametags.lua 3240 2008-11-17 10:48:13Z carrepairer $
-local versionNumber = "1.72"
+local versionNumber = "1.71"
 
 function widget:GetInfo()
   return {
@@ -9,7 +9,7 @@ function widget:GetInfo()
     date      = "18 April 2008",
     license   = "GNU GPL, v2 or later",
     layer     = -9,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
@@ -46,7 +46,6 @@ local GetVisibleUnits     = Spring.GetVisibleUnits
 local GetUnitDefID        = Spring.GetUnitDefID
 local GetAllUnits         = Spring.GetAllUnits
 local GetUnitHeading      = Spring.GetUnitHeading
-local IsUnitIcon 		  = Spring.IsUnitIcon 
 
 local iconsize   = 10
 local iconhsize  = iconsize * 0.5
@@ -162,9 +161,8 @@ function widget:DrawWorld()
 		glTexture('LuaUI/Images/hellomynameis.png')
 		glAlphaTest(GL_GREATER, 0)
 		if (showStickyTags) then
-			--draw HelloMyName icon is on chest
 			for unitID, attributes in pairs(comms) do
-				if (attributes[4]) and (not IsUnitIcon(unitID)) then 
+				if (attributes[4]) then
 					glPushMatrix()
 					glUnitMultMatrix(unitID)
 					glUnitPieceMultMatrix(unitID, attributes[4])
@@ -175,9 +173,8 @@ function widget:DrawWorld()
 					glPopMatrix()
 				end
 			end
-			 --draw player name on HelloMyName icon
 			for unitID, attributes in pairs(comms) do
-				if (attributes[4]) and (not IsUnitIcon(unitID)) then
+				if (attributes[4]) then
 					glPushMatrix()
 					glUnitMultMatrix(unitID)
 					glUnitPieceMultMatrix(unitID, attributes[4])
@@ -196,7 +193,7 @@ function widget:DrawWorld()
 				end
 			end
 		end
-	--draw hovering text that mention player's name.
+	
 	for unitID, attributes in pairs(comms) do
 		local heading = GetUnitHeading(unitID)
 		if (not heading) then

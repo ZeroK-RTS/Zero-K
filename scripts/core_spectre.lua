@@ -51,7 +51,6 @@ local aim  = 4
 local SIG_Flutter = 1
 
 local function Walk()
-	Signal( walk )
 	SetSignalMask( walk )
 	while ( true ) do
 		Turn( base, y_axis, -.2, .5 )
@@ -174,9 +173,14 @@ function script.Deactivate()
 	--spSetUnitShieldState(unitID, 1, false)
 end
 
-local function Stopping()
+function script.StartMoving()
+	--StopSpin( glow, y_axis )
+	--Turn( glow, y_axis, 0, 1 )
+	StartThread( Walk )
+end
+
+function script.StopMoving()
 	Signal( walk )
-	SetSignalMask( walk )
 	--Spin( glow, y_axis, 1 )
 	Move( base, y_axis, 0, 15 )
 	Turn( base, y_axis, 0, 1 )
@@ -194,16 +198,6 @@ local function Stopping()
 	Turn( lb_knee, z_axis, 0, 1 )
 	Turn( rb_knee, x_axis, 0, 1 )
 	Turn( rb_knee, z_axis, 0, 1 )
-end
-
-function script.StartMoving()
-	--StopSpin( glow, y_axis )
-	--Turn( glow, y_axis, 0, 1 )
-	StartThread( Walk )
-end
-
-function script.StopMoving()
-	StartThread(Stopping)
 end
 
 function script.Killed(recentDamage, maxHealth)

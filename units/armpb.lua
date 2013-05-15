@@ -91,10 +91,6 @@ unitDef = {
         subs    = 8,
       },
 
-      customParams = {
-        single_hit = true,
-      },
-      
       explosionGenerator      = [[custom:gauss_hit_m]],
       groundbounce            = 1,
       impactOnly              = true,

@@ -5,15 +5,15 @@ static-var bMoving;
 // Signal definitions
 #define SIG_AIM				2
 #define SIG_AIM_2			4
-#define SIG_MOVE			8
+#define SIG_MOVE			16
 
 #include "sfxtype.h"
 #include "exptype.h"
 
 walk()
 {		
-	while (bMoving)
-		{
+	if (bMoving)
+			{
 //			bMoving = FALSE;
 			turn lthighf to x-axis <70> speed<115>;
 			turn lkneef to x-axis <-40> speed<145>;
@@ -126,7 +126,8 @@ walk()
 			wait-for-turn rshinf around x-axis;
 			
 //			bMoving = FALSE;
-		}
+			start-script walk();
+			}
 }
 
 stopwalk ()
@@ -151,16 +152,12 @@ stopwalk ()
 
 StartMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
 	bMoving = TRUE;
 	start-script walk();
 }
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
 	bMoving = FALSE;
 	start-script stopwalk();
 }

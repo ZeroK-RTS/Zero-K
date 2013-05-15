@@ -12,7 +12,7 @@ local materials = {
        culling   = GL.BACK,
        texunits  = {
          [0] = '%ALTSKIN',
-         [1] = '%ALTSKIN2',
+         [1] = '%%UNITDEFID:1',
          [2] = '$shadow',
          [3] = '$specular',
          [4] = '$reflection',
@@ -29,9 +29,7 @@ for i=1,#UnitDefs do
   local udef = UnitDefs[i]
 
   if (udef.customParams.altskin and VFS.FileExists(udef.customParams.altskin)) then
-    local tex2 = "%%"..i..":1"
-    unitMaterials[udef.name] = {"altSkinS3o", ALTSKIN = udef.customParams.altskin, ALTSKIN2 = udef.customParams.altskin2 or tex2}
-    Spring.Echo(udef.name, unitMaterials[udef.name].ALTSKIN, unitMaterials[udef.name].ALTSKIN2)
+    unitMaterials[udef.name] = {"altSkinS3o", ALTSKIN = udef.customParams.altskin}
   end --if
 end --for
 

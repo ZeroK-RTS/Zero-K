@@ -42,18 +42,18 @@ TODO:
 
 ]]--
 
--- Seed unsynced random number generator.
--- Credits https://github.com/tvo/craig/blob/master/LuaRules/Gadgets/craig/main.lua
-if (math.randomseed ~= nil) then
-  local r = Spring.DiffTimers(Spring.GetTimer(), Script.CreateScream())
-  math.random()
-  math.randomseed(r)
+if(not Spring.GetModOptions()) then
+      return false
+end
+
+local modOptions = Spring.GetModOptions()
+if (modOptions.zkmode ~= "halloween") then
+      return
 end
 
 --SYNCED-------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
 
-local modOptions = Spring.GetModOptions()
 --local sin    = math.sin
 local random = math.random
 local floor  = math.floor
@@ -82,25 +82,22 @@ local spGetPlayerInfo	    = Spring.GetPlayerInfo
 -- actually im not sure what com names are exactly so
 local unpossassableUnitsDef = {
   -- commander excludement went to if statement in respective places
-  --[ UnitDefNames['corcom1'].id ] = true, -- battle commander
-  --[ UnitDefNames['commsupport1'].id ] = true, -- support commander
-  --[ UnitDefNames['commrecon1'].id ] = true, -- recon commander
-  --[ UnitDefNames['armcom1'].id ] = true, -- strike commander
-  --[ UnitDefNames['benzcom1'].id ] = true, -- bombard commander
-  [ UnitDefNames['terraunit'].id ] = true, -- terraform thing
-  -- other commanders, singleplayer and whatnot
-  --[ UnitDefNames['armcom3'].id ] = true,
-  --[ UnitDefNames['armcom2'].id ] = true,
-  --[ UnitDefNames['corcom2'].id ] = true,
-  --[ UnitDefNames['commrecon2'].id ] = true,
-  --[ UnitDefNames['armcom2'].id ] = true,
-  --[ UnitDefNames['commsupport2'].id ] = true,
-  --[ UnitDefNames['corcom2'].id ] = true,
-  --[ UnitDefNames['commrecon2'].id ] = true,
-  --[ UnitDefNames['commsupport2'].id ] = true,
-  [ UnitDefNames['pw_generic'].id ] = true,
-  [ UnitDefNames['pw_hq'].id ] = true,
-  [ UnitDefNames['tele_beacon'].id ] = true, -- TODO test how djin works, lol
+	--[ UnitDefNames['corcom1'].id ] = true, -- battle commander
+	--[ UnitDefNames['commsupport1'].id ] = true, -- support commander
+	--[ UnitDefNames['commrecon1'].id ] = true, -- recon commander
+	--[ UnitDefNames['armcom1'].id ] = true, -- strike commander
+	--[ UnitDefNames['benzcom1'].id ] = true, -- bombard commander
+	[ UnitDefNames['terraunit'].id ] = true, -- terraform thing
+	-- other commanders, singleplayer and whatnot
+	--[ UnitDefNames['armcom3'].id ] = true,
+	--[ UnitDefNames['armcom2'].id ] = true,
+	--[ UnitDefNames['corcom2'].id ] = true,
+	--[ UnitDefNames['commrecon2'].id ] = true,
+	--[ UnitDefNames['armcom2'].id ] = true,
+	--[ UnitDefNames['commsupport2'].id ] = true,
+	--[ UnitDefNames['corcom2'].id ] = true,
+	--[ UnitDefNames['commrecon2'].id ] = true,
+	--[ UnitDefNames['commsupport2'].id ] = true,
 }
 
 -- these are to remember original value
@@ -125,8 +122,6 @@ local possessGoal = 0
 local ownedThings = 0 -- owned in like "pwned"
 local graceTimer = tonumber(halloweenGhostInitialGrace) -- ...
 local bossWave = 10
-
-local zalgo = nil
 
 function gadget:Initialize()
     if(modOptions.zkmode ~= "halloween") then
@@ -186,7 +181,7 @@ function gadget:GameStart()
     else
       spEcho("Have... IT COMES! YOU CAN'T SURVIVE! NOOO!!!")
       -- for lulz
-      local x,z
+      local zalgo,x,z
       -- after some consideration i decided to make detri spawn at the center of any map
       -- TODO add some checkings to make sure no players are present at center, and if they are -- spawn it in some furthest corner (for silly maps)
       -- or smth like it
@@ -206,7 +201,7 @@ function gadget:GameStart()
       if (zalgo ~= nil) then
 	spGiveOrderToUnit(zalgo,CMD.REPEAT,{1},{})
 	spGiveOrderToUnit(zalgo,CMD.MOVE_STATE,{2},{})
-	for i=1,random(10,30) do -- make this more random and more.. fun?
+	for i=1,10 do
 	  if (spGetUnitIsDead(zalgo) == false) then
 	    x = random(0,Game.mapSizeX)
 	    z = random(0,Game.mapSizeZ)
@@ -215,22 +210,6 @@ function gadget:GameStart()
 	end
       end
     end
-end
-
-function gadget:UnitUnloaded(unitID, unitDefID, team, transport)
-  -- TODO probably copy/paste previous orders? also for other ghosted units too...
-  if ((zalgo ~= nil) and (unitID == zalgo) and (team == GaiaTeamID)) then
-    local x,z
-    spGiveOrderToUnit(zalgo,CMD.REPEAT,{1},{})
-    spGiveOrderToUnit(zalgo,CMD.MOVE_STATE,{2},{})
-    for i=1,random(10,30) do
-      if (spGetUnitIsDead(zalgo) == false) then
-	x = random(0,Game.mapSizeX)
-	z = random(0,Game.mapSizeZ)
-	spGiveOrderToUnit(zalgo,CMD.INSERT,{-1,CMD.FIGHT,CMD.OPT_SHIFT,x,0,z},{"alt"});
-      end
-    end
-  end
 end
 
 function gadget:GameFrame (f)
@@ -295,14 +274,11 @@ function gadget:GameFrame (f)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-  -- unit destroyed, but was possessed? forget about owner, doesn't matter anymore
-  if (PossessedUnitList[unitID] ~= nil) then
-      PossessedCount[unitID] = nil -- it's dead Sam
-      deletePossession(unitID)
-  end
-  if (unitID == zalgo) then
-    zalgo = nil
-  end
+    -- unit destroyed, but was possessed? forget about owner, doesn't matter anymore
+    if (PossessedUnitList[unitID] ~= nil) then
+	PossessedCount[unitID] = nil -- it's dead Sam
+	deletePossession(unitID)
+    end
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)

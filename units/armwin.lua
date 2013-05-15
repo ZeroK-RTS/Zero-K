@@ -16,6 +16,10 @@ unitDef = {
   buildPic                      = [[armwin.png]],
   buildTime                     = 35,
   category                      = [[FLOAT UNARMED]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[36 90 36]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

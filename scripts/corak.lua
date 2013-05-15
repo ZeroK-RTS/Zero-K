@@ -68,9 +68,12 @@ function script.Create()
 	Turn( leftLeg.foot , x_axis, math.rad(30))
 end
 
-local function Stopping()
+function script.StartMoving()
+	StartThread( Walk )
+end
+
+function script.StopMoving()
 	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
 	
 	Turn( rightLeg.thigh , x_axis, math.rad(60), math.rad(200) )
 	Turn( leftLeg.thigh , x_axis, math.rad(60), math.rad(200) )
@@ -84,14 +87,6 @@ local function Stopping()
 	Move( base , y_axis, 0 , 200 )
 	Move( base , z_axis, 0 , 200 )
 	Turn( base , z_axis, math.rad(-(0)), math.rad(200) )
-end
-
-function script.StartMoving()
-	StartThread( Walk )
-end
-
-function script.StopMoving()
-	StartThread( Stopping)
 end
 
 local function RestoreAfterDelay()

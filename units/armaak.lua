@@ -85,7 +85,7 @@ unitDef = {
 
       damage                  = {
         default = 0.9,
-        planes  = 8.8,
+        planes  = 9,
         subs    = 0.5,
       },
 
@@ -131,7 +131,7 @@ unitDef = {
 
       damage                  = {
         default = 1.88,
-        planes  = 18.45,
+        planes  = 18.8,
         subs    = 0.94,
       },
 
@@ -166,7 +166,6 @@ unitDef = {
       blocking         = true,
       damage           = 1020,
       energy           = 0,
-      featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
       height           = [[15]],

@@ -28,48 +28,47 @@ end
 local function Dig()
 	Signal(SIG_Move)
 	SetSignalMask(SIG_Move)
-	while true do
-		if (isMoving) then
-			Turn(head, y_axis, -digRotate, digSpeed/2)
-			Turn(fbody, y_axis, digRotate, digSpeed)
-			Turn(mbody, y_axis, digRotate, digSpeed)
-			Turn(bbody, y_axis, -digRotate, digSpeed)
-			Turn(tail, y_axis, -digRotate, digSpeed)
-			EmitSfx(head, 1026)
-			WaitForTurn(tail, y_axis)
-		else return end
-		Sleep(50)
-		if (isMoving) then
-			Turn(head, y_axis, 0, digSpeed/2)
-			Turn(fbody, y_axis, -digRotate, digSpeed)
-			Turn(mbody, y_axis, digRotate, digSpeed)
-			Turn(bbody, y_axis, digRotate, digSpeed)
-			Turn(tail, y_axis, -digRotate, digSpeed)
-			EmitSfx(fbody, 1026)
-			WaitForTurn(fbody, y_axis)
-		else return end
-		Sleep(50)
-		if (isMoving) then
-			Turn(head, y_axis, digRotate, digSpeed/2)
-			Turn(fbody, y_axis, -digRotate, digSpeed)
-			Turn(mbody, y_axis, -digRotate, digSpeed)
-			Turn(bbody, y_axis, digRotate, digSpeed)
-			Turn(tail, y_axis, digRotate, digSpeed)
-			EmitSfx(fbody, 1026)
-			WaitForTurn(mbody, y_axis)
-		else return end
-		Sleep(50)
-		if (isMoving) then	
-			Turn(head, y_axis, 0, digSpeed/2)
-			Turn(fbody, y_axis, digRotate, digSpeed)
-			Turn(mbody, y_axis, -digRotate, digSpeed)
-			Turn(bbody, y_axis, -digRotate, digSpeed)
-			Turn(tail, y_axis, digRotate, digSpeed)
-			WaitForTurn(bbody, y_axis)
-			EmitSfx(fbody, 1026)
-		else return end
-		Sleep(50)
-	end
+	if (isMoving) then
+		Turn(head, y_axis, -digRotate, digSpeed/2)
+		Turn(fbody, y_axis, digRotate, digSpeed)
+		Turn(mbody, y_axis, digRotate, digSpeed)
+		Turn(bbody, y_axis, -digRotate, digSpeed)
+		Turn(tail, y_axis, -digRotate, digSpeed)
+		EmitSfx(head, 1026)
+		WaitForTurn(tail, y_axis)
+	else return end
+	Sleep(50)
+	if (isMoving) then
+		Turn(head, y_axis, 0, digSpeed/2)
+		Turn(fbody, y_axis, -digRotate, digSpeed)
+		Turn(mbody, y_axis, digRotate, digSpeed)
+		Turn(bbody, y_axis, digRotate, digSpeed)
+		Turn(tail, y_axis, -digRotate, digSpeed)
+		EmitSfx(fbody, 1026)
+		WaitForTurn(fbody, y_axis)
+	else return end
+	Sleep(50)
+	if (isMoving) then
+		Turn(head, y_axis, digRotate, digSpeed/2)
+		Turn(fbody, y_axis, -digRotate, digSpeed)
+		Turn(mbody, y_axis, -digRotate, digSpeed)
+		Turn(bbody, y_axis, digRotate, digSpeed)
+		Turn(tail, y_axis, digRotate, digSpeed)
+		EmitSfx(fbody, 1026)
+		WaitForTurn(mbody, y_axis)
+	else return end
+	Sleep(50)
+	if (isMoving) then	
+		Turn(head, y_axis, 0, digSpeed/2)
+		Turn(fbody, y_axis, digRotate, digSpeed)
+		Turn(mbody, y_axis, -digRotate, digSpeed)
+		Turn(bbody, y_axis, -digRotate, digSpeed)
+		Turn(tail, y_axis, digRotate, digSpeed)
+		WaitForTurn(bbody, y_axis)
+		EmitSfx(fbody, 1026)
+	else return end
+	Sleep(50)
+	StartThread(Dig)
 end
 
 local function StopDig()

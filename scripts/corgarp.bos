@@ -7,10 +7,7 @@ piece		base, swivel, turret, arm, wrist, gun, barrel, muzzle, breech, eject, ste
 static-var	isMoving, gun_1_yaw;
 
 // Signal definitions
-#define SIG_MOVE					1		//Signal to prevent duplicate moving. Ref for sig number: http://pastebin.com/raw.php?i=qEPRtcD9
 #define SIG_AIM_1					2
-#define SIG_ROCK_X					4		//Signal to prevent multiple rocking. REPLACE!
-#define SIG_TILT_Z					8		//Signal to prevent multiple tilting. REPLACE!
 
 #define RESTORE_DELAY				3000
 #define RECOIL_BARREL				[-3.5]
@@ -24,6 +21,9 @@ static-var	isMoving, gun_1_yaw;
 #define WHEEL_SPIN_SPEED		<360>
 #define WHEEL_SPIN_ACCEL		<10>
 #define WHEEL_SPIN_DECEL		<30>
+
+#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_TILT_Z				8		//Signal to prevent multiple tilting. REPLACE!
 
 //rocking
 #define ROCK_PIECE				base	//piece to rock. REPLACE!
@@ -99,9 +99,6 @@ DamageControl()
 
 StartMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-	
 	isMoving = 1;
 	spin wheel1r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
 	spin wheel2r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
@@ -112,9 +109,6 @@ StartMoving()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-	
 	isMoving = 0;
 
 	stop-spin wheel1r around x-axis decelerate WHEEL_SPIN_DECEL;

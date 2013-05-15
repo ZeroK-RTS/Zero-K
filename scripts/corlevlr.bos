@@ -14,15 +14,14 @@ static-var	moving, once, animCount,
 
 // Signal definitions
 #define SIG_AIM1						1
-#define SIG_MOVE						2		//Signal to prevent duplicate moving. Ref for sig number: http://pastebin.com/raw.php?i=qEPRtcD9
-#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
-#define SIG_TILT_Z				8		//Signal to prevent multiple tilting. REPLACE!
-
 #define ANIM_SPEED						50
 #define RESTORE_DELAY					3000
 
 #define TURRET_TURN_SPEED				<160>
 #define GUN_TURN_SPEED					<50>
+
+#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_TILT_Z				8		//Signal to prevent multiple tilting. REPLACE!
 
 // definitions for weapons behaviour
 #define RELOAD      3400 // time in milliseconds between shots
@@ -214,9 +213,6 @@ DamageControl()
 
 StartMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-
 	runsp = TRUE;
 	moving = TRUE;
 	animCount = 0;
@@ -231,9 +227,6 @@ StartMoving()
 
 StopMoving()
 {
-	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;
-
 	moving = FALSE;
 	sleep 500;
 	if	(!moving)
