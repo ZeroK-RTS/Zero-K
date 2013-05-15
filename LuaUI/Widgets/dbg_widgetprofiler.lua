@@ -312,6 +312,8 @@ end
 
     local vsx, vsy = gl.GetViewSizes()
     local x,y = vsx-300, vsy-60
+	local fSize = 9
+	local fSpacing = 11
 
     gl.Color(1,1,1,1)
     gl.BeginText()
@@ -320,21 +322,21 @@ end
       local wname = v[1]
       local tLoad = v[2]
       if maximum > 0 then
-        gl.Rect(x+100-tLoad/maximum*100, y+1-(12)*i, x+100, y+9-(12)*i)
+        gl.Rect(x+100-tLoad/maximum*100, y+1-(fSpacing)*i, x+100, y+9-(fSpacing)*i)
       end
-      gl.Text(wname, x+150, y+1-(12)*i, 10)
-      gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(12)*i, 10)
+      gl.Text(wname, x+150, y+1-(fSpacing)*i, fSize)
+      gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(fSpacing)*i, fSize)
     end
     local i = #sortedList + 1    
-    gl.Text("\255\255\064\064total time", x+150, y-1-(12)*i, 10)
-    gl.Text("\255\255\064\064"..('%.3fs'):format(allOverTimeSec), x+105, y-1-(12)*i, 10)
+    gl.Text("\255\255\064\064total time", x+150, y-1-(fSpacing)*i, fSize)
+    gl.Text("\255\255\064\064"..('%.3fs'):format(allOverTimeSec), x+105, y-1-(fSpacing)*i, fSize)
     i = i+1
-    gl.Text("\255\255\064\064total FPS cost", x+150, y-1-(12)*i, 10)
-    gl.Text("\255\255\064\064"..('%.1f%%'):format(allOverTime), x+105, y-1-(12)*i, 10)
+    gl.Text("\255\255\064\064total FPS cost", x+150, y-1-(fSpacing)*i, fSize)
+    gl.Text("\255\255\064\064"..('%.1f%%'):format(allOverTime), x+105, y-1-(fSpacing)*i, fSize)
     i = i+1
     
-    gl.Text("\255\255\064\064memory usage", x+150, y-1-(12)*i, 10)
-    gl.Text("\255\255\064\064"..memString, x+105, y-1-(12)*i, 10)
+    gl.Text("\255\255\064\064memory usage", x+150, y-1-(fSpacing)*i, fSize)
+    gl.Text("\255\255\064\064"..memString, x+105, y-1-(fSpacing)*i, fSize)
     gl.EndText()
   end
 

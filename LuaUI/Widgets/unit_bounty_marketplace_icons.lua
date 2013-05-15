@@ -79,7 +79,7 @@ local function UpdateAllUnits()
 		teamColors[teamID] = {Spring.GetTeamColor(teamID)}
 	end
 	
-	for _,unitID in pairs( GetAllUnits() ) do
+	for _,unitID in ipairs( GetAllUnits() ) do
 		for _,iconType in ipairs( iconTypes ) do
 			SetIcons(unitID, iconType )
 		end
@@ -91,7 +91,9 @@ end
 
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	SetIcons(unitID)
+	for _,iconType in ipairs( iconTypes ) do
+		SetIcons(unitID, iconType )
+	end
 end
 
 

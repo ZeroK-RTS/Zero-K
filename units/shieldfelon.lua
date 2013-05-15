@@ -89,7 +89,6 @@ unitDef = {
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-      isShield                = true,
       shieldAlpha             = 0.4,
       shieldBadColor          = [[1 0.1 0.1]],
       shieldGoodColor         = [[0.1 0.1 1]],
@@ -116,7 +115,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 100,
+        default        = 98,
       },
 
       explosionGenerator      = [[custom:flash2purple]],

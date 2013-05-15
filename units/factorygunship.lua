@@ -67,6 +67,7 @@ unitDef = {
   side                          = [[CORE]],
   sightDistance                 = 273,
   smoothAnim                    = true,
+  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline						= 0,

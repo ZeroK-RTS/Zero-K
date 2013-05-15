@@ -42,6 +42,16 @@ local gunpoints = {
 	[6] = {aim = Base, pitch = Base, fire = Base},
 }
 
+gunpoints[2].radial = {0.67289841175079, -0.29416278004646, 0.67873126268387}
+gunpoints[2].right = {0.6971772313118, -0.030258473008871, -0.71625995635986}
+gunpoints[2].normal = {0.23123440146446, 0.95516616106033, 0.18472272157669}
+gunpoints[1].radial = {-0.67857336997986, -0.29443317651749, 0.67293930053711}
+gunpoints[1].right = {0.70172995328903, 0.036489851772785, 0.71150785684586}
+gunpoints[1].normal = {-0.23404698073864, 0.95503199100494, 0.18185153603554}
+gunpoints[4].radial = {0.0040571023710072, -0.25233194231987, -0.96763223409653}
+gunpoints[4].right = {-0.99998968839645, 0.0029705890920013, 0.0034227864816785}
+gunpoints[4].normal = {0.0020107594318688, 0.96760839223862, -0.25231730937958}
+
 --signals
 local signals = {
 	[1] = 2,
@@ -107,11 +117,13 @@ local function updateVectors(num)
 	Turn(gunpoints[num].pitch,x_axis,0)
 	
 	Turn(gunpoints[num].pitch,x_axis,math.rad(-90))
+	Sleep(400)
 	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
 	gunpoints[num].radial = hat({x, y, z})
 	
 	Turn(gunpoints[num].rot,y_axis,math.rad(90))
 	Turn(gunpoints[num].pitch,x_axis,math.rad(90))
+	Sleep(400)
 	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
 	gunpoints[num].right = hat({x, y, z})
 	
@@ -119,6 +131,23 @@ local function updateVectors(num)
 	
 	Turn(gunpoints[num].rot,y_axis,0)
 	Turn(gunpoints[num].pitch,x_axis,0)
+	
+	
+	Spring.Echo("gunpoints[" .. num .. "].radial = {" .. gunpoints[num].radial[1] .. ", " .. gunpoints[num].radial[2] .. ", " .. gunpoints[num].radial[3] .. "}")
+	Spring.Echo("gunpoints[" .. num .. "].right = {" .. gunpoints[num].right[1] .. ", " .. gunpoints[num].right[2] .. ", " .. gunpoints[num].right[3] .. "}")
+	Spring.Echo("gunpoints[" .. num .. "].normal = {" .. gunpoints[num].normal[1] .. ", " .. gunpoints[num].normal[2] .. ", " .. gunpoints[num].normal[3] .. "}")
+end
+
+local function updateAllVectors()
+
+	updateVectors(1)
+	updateVectors(2)
+	updateVectors(4)
+	
+	-- idk why they must be swapped
+	gunpoints[1].normal,gunpoints[2].normal = gunpoints[2].normal,gunpoints[1].normal
+	gunpoints[1].radial,gunpoints[2].radial = gunpoints[2].radial,gunpoints[1].radial
+	gunpoints[1].right,gunpoints[2].right = gunpoints[2].right,gunpoints[1].right
 end
 
 function script.Create()	
@@ -143,14 +172,7 @@ function script.Create()
 		Turn(subemit[i], x_axis, math.rad(90))
 	end
 	
-	updateVectors(1)
-	updateVectors(2)
-	updateVectors(4)
-	
-	-- idk why they must be swapped
-	gunpoints[1].normal,gunpoints[2].normal = gunpoints[2].normal,gunpoints[1].normal
-	gunpoints[1].radial,gunpoints[2].radial = gunpoints[2].radial,gunpoints[1].radial
-	gunpoints[1].right,gunpoints[2].right = gunpoints[2].right,gunpoints[1].right
+	--StartThread(updateAllVectors)
 	
 	Turn(jetleft, x_axis, math.rad(90))
 	Turn(jetright, x_axis, math.rad(90))

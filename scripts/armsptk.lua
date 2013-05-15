@@ -72,6 +72,7 @@ local function Walk()
 end
 
 local function RestoreLegs()
+	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
 		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)			
@@ -86,7 +87,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal(SIG_WALK)
 	StartThread(RestoreLegs)
 end
 

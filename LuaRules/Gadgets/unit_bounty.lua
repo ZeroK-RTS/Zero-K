@@ -1,330 +1,1 @@
-function gadget:GetInfo()
-  return {
-    name      = "Bounties",
-    desc      = "Place bounties on units.",
-    author    = "CarRepairer",
-    date      = "2010-07-25",
-    license   = "GNU GPL, v2 or later",
-    layer     = 2,
-    enabled   = false,
-  }
-end
-
-local TESTMODE = false
-local BOUNTYTIME = 60*5
-
-if not tobool(Spring.GetModOptions().marketandbounty) then
-	return
-end 
-
-local echo 				= Spring.Echo
-local spGetPlayerInfo	= Spring.GetPlayerInfo
-local spGetTeamInfo		= Spring.GetTeamInfo
-local spGetTeamList		= Spring.GetTeamList
-local spAreTeamsAllied	= Spring.AreTeamsAllied
-local spGetAllUnits     = Spring.GetAllUnits
-local spGetUnitDefID    = Spring.GetUnitDefID
-
-local bounty = {}
-
--------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then 
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
-local spGetUnitIsActive     = Spring.GetUnitIsActive
-local spGiveOrderToUnit     = Spring.GiveOrderToUnit
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spGetTeamUnitCount	= Spring.GetTeamUnitCount
-local spInsertUnitCmdDesc	= Spring.InsertUnitCmdDesc
-local spGetAllyTeamList		= Spring.GetAllyTeamList
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-local function explode(div,str)
-  if (div=='') then return false end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
-end
-
--------------------------------------------------------------------------------------
-
-local function AddBounty( unitID, teamID, price, timer )
-	if not bounty[unitID] then
-		bounty[unitID] = {}
-	end
-	if not bounty[unitID][teamID] then
-		bounty[unitID][teamID] = {price = 0}
-	end
-	
-	local newprice = math.max( price, bounty[unitID][teamID].price )
-	bounty[unitID][teamID] = {price = newprice, timer = timer,}
-	
-	Spring.SetUnitRulesParam( unitID, 'bounty'..teamID, newprice )
-	Spring.SetUnitRulesParam( unitID, 'bountyTimer'..teamID, timer )
-end
-
-
-local function RemoveBounty( unitID, teamID )
-	if not bounty[unitID] then
-		return
-	end
-	Spring.SetUnitRulesParam( unitID, 'bounty'..teamID, 0 )
-	Spring.SetUnitRulesParam( unitID, 'bountyTimer'..teamID, 0 )
-	bounty[unitID][teamID] = nil
-end
-
--------------------------------------------------------------------------------------
---Callins
-
-function gadget:RecvLuaMsg(msg, playerID)
-	local msgTable = explode( '|', msg )
-	local command = msgTable[1]
-	
-	local bounty_prefix = "$bounty"
-	
-	if command == '$bounty' then
-		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID)
-		if spec then
-			return
-		end
-		
-		if( #msgTable ~= 3 ) then
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<Bounty> (A) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
-			return false
-		end
-		
-		local unitID = msgTable[2]+0
-		local price = msgTable[3]+0
-		
-		if( type(unitID) ~= 'number' or type(price) ~= 'number' ) then
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<Bounty> (B) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
-			return false
-		end
-		
-		--local unitTeamID = Spring.GetUnitTeam(unitID)
-		local unitAlliance = Spring.GetUnitAllyTeam(unitID)
-		
-		if unitAlliance == allianceID then
-			echo ('<Bounty> You cannot place a bounty on an allied unit, Player ' .. playerID .. ' on team ' .. teamID)
-			return false
-		end
-		
-		AddBounty( unitID, teamID, price, BOUNTYTIME )
-		
-	end
-
-end
-
-
-function gadget:Initialize()
-	gaiaTeam = Spring.GetGaiaTeamID()
-	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)
-	
-	if TESTMODE then
-		local allUnits = Spring.GetAllUnits()
-		for _,unitID in ipairs(allUnits) do
-			AddBounty( unitID, 0, 50, 20 )
-			--AddBounty( unitID, 1, 100, 20 )
-			AddBounty( unitID, 2, 100, 40 )
-			--AddBounty( unitID, 3, 50, 500 )
-			
-		end
-	end
-end
-
-local timerPeriod = 5
-
-function gadget:GameFrame(f)
-	
-	if f % (32*timerPeriod) == 0 then
-		for unitID, teamData in pairs(bounty) do
-			local bountiesLeft = false
-			for teamID, bData in pairs(teamData) do
-				if bData.timer <= timerPeriod then
-					--bounty[unitID][teamID] = nil
-					RemoveBounty(unitID, teamID)
-				else
-					bountiesLeft = true
-					bounty[unitID][teamID].timer = bData.timer - timerPeriod
-				end
-			end
-			if not bountiesLeft then
-				bounty[unitID] = nil
-			end
-		end
-	end
-end
-
-
-function gadget:UnitDestroyed(unitID,unitDefID,unitTeam,attackerID, attackerDefID, attackerTeam)
-	local ubounty = bounty[unitID]
-	if ubounty then
-		for teamID, amount in pairs(ubounty) do
-			if attackerTeam then
-				GG.AddDebt(teamID, attackerTeam, amount)
-			end
-			RemoveBounty(unitID, teamID)
-		end
-		bounty[unitID] = nil
-	end
-end
-
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-else  -- UNSYNCED
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
---[[
-
-local spSendCommands		= Spring.SendCommands
-local spGetSpectatingState 	= Spring.GetSpectatingState
-local spGetLocalAllyTeamID	= Spring.GetLocalAllyTeamID
-local spGetLocalTeamID		= Spring.GetLocalTeamID
-
-local CallAsTeam = CallAsTeam
-
-local glTranslate			= gl.Translate
-local glColor				= gl.Color
-local glDepthTest			= gl.DepthTest
-local glDrawFuncAtUnit		= gl.DrawFuncAtUnit
-local glBillboard			= gl.Billboard
-
-LUAUI_DIRNAME = 'LuaUI/'
-local fontHandler   = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
---local bigFont			= LUAUI_DIRNAME.."Fonts/FreeSansBold_14"
---local smallFont			= LUAUI_DIRNAME.."Fonts/FreeSansBold_12"
-local fhDraw    		= fontHandler.Draw
-local fhDrawCentered	= fontHandler.DrawCentered
-local overheadFont		= "LuaUI/Fonts/FreeSansBold_16"
-
-local myAllyID 		= spGetLocalAllyTeamID()
-local myTeamID 		= spGetLocalTeamID()
-
-local heightOffset = 24
-local xOffset = 0
-local yOffset = 0
-local fontSize = 6
-
-local inColors, teamNames = {}, {}
-
-local BountyTextCache = {}
-
-local spec = false
-local cycle_40s = 1
-local cycle_1s = 1
-
-
---gadget:ViewResize(Spring.GetViewGeometry())
---------------------------------------------------------
-
-
-local function DrawPrice(unitID, text, height)
-  glTranslate(0, height, 0 )
-  glBillboard()
-  
-  fontHandler.UseFont(overheadFont)
-  fontHandler.DrawCentered(text, xOffset,yOffset)
-  
-end
-
-local function SetupTeamData()
-	local teamList = spGetTeamList()
-	for _,teamID in ipairs(teamList) do
-		local _, leaderPlayerID = spGetTeamInfo(teamID)
-		if leaderPlayerID and leaderPlayerID ~= -1 then
-			
-			teamNames[teamID] = spGetPlayerInfo(leaderPlayerID) or '?? Rob P. ??'
-			local r,g,b,a = Spring.GetTeamColor(teamID)
-			inColors[teamID] = '\\255\\255\\255\\255'
-			if r then
-				inColors[teamID] = string.char(a*255) .. string.char(r*255) ..  string.char(g*255) .. string.char(b*255)
-			end
-		end
-	end
-end
-
-local function GetBountyText(unitID, ubounty)
-
-	if BountyTextCache[unitID] then
-		return BountyTextCache[unitID]
-	end
-
-	local text = '\255\255\255\255Bounty: '
-	for team, data in spairs(ubounty) do
-		--text = text .. inColors[team] .. '($' .. data.price .. ' ' .. data.timer .. 's) '
-	end
-	BountyTextCache[unitID] = text
-	return text
-end
-
------------------------------------------------------------------------------
---Callins	
-
---function gadget:DrawScreen()	
---end
-
-function gadget:DrawWorld()
-	if not bounty then return end
-	
-	for unitID, ubounty in spairs(bounty) do
-	
-		local visible = false
-		if spec then
-			visible = true
-		else
-			CallAsTeam({ ['read'] = myTeamID }, function()
-				visible = Spring.IsUnitVisible(unitID)
-			end)
-		end
-		local height = 80
-		if visible then
-			local text = GetBountyText(unitID, ubounty)
-			glDrawFuncAtUnit(unitID, false, DrawPrice, unitID, text, height)
-		end
-		
-	end
-end
-
-
-function gadget:Initialize()
-	SetupTeamData()
-end
-
-function gadget:Update()
-	
-	spec = spGetSpectatingState()
-	
-	cycle_40s = cycle_40s % (32*40) + 1
-	cycle_1s = cycle_1s % (32*1) + 1
-	if cycle_40s == 1 then
-		SetupTeamData()
-	end
-	if cycle_1s == 1 then
-		BountyTextCache = {}
-	end
-	
-	if SYNCED.bounty then
-		bounty = SYNCED.bounty
-	end
-end
---]]
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-end
+function gadget:GetInfo()  return {    name      = "Bounties",    desc      = "Place bounties on units.",    author    = "CarRepairer",    date      = "2010-07-25",    license   = "GNU GPL, v2 or later",    layer     = 2,    enabled   = false,  }endlocal TESTMODE = falselocal BOUNTYTIME = 60*5if not tobool(Spring.GetModOptions().marketandbounty) then	returnend local echo 				= Spring.Echolocal spGetPlayerInfo	= Spring.GetPlayerInfolocal spGetTeamInfo		= Spring.GetTeamInfolocal spGetTeamList		= Spring.GetTeamListlocal spAreTeamsAllied	= Spring.AreTeamsAlliedlocal spGetAllUnits     = Spring.GetAllUnitslocal spGetUnitDefID    = Spring.GetUnitDefIDlocal bounty = {}---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------if (gadgetHandler:IsSyncedCode()) then --------------------------------------------------------------------------------------------------------------------------------------------------------------------------local spGetUnitAllyTeam		= Spring.GetUnitAllyTeamlocal spGetUnitPosition		= Spring.GetUnitPositionlocal spGetUnitNearestEnemy = Spring.GetUnitNearestEnemylocal spGetUnitIsActive     = Spring.GetUnitIsActivelocal spGiveOrderToUnit     = Spring.GiveOrderToUnitlocal spEditUnitCmdDesc     = Spring.EditUnitCmdDesclocal spFindUnitCmdDesc     = Spring.FindUnitCmdDesclocal spGetTeamUnitCount	= Spring.GetTeamUnitCountlocal spInsertUnitCmdDesc	= Spring.InsertUnitCmdDesclocal spGetAllyTeamList		= Spring.GetAllyTeamList--------------------------------------------------------------------------------------------------------------------------------------------------------------------------local function explode(div,str)  if (div=='') then return false end  local pos,arr = 0,{}  -- for each divider found  for st,sp in function() return string.find(str,div,pos,true) end do    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider    pos = sp + 1 -- Jump past current divider  end  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider  return arrend-------------------------------------------------------------------------------------local function AddBounty( unitID, teamID, price, timer )	if not bounty[unitID] then		bounty[unitID] = {}	end	if not bounty[unitID][teamID] then		bounty[unitID][teamID] = {price = 0}	end		local newprice = math.max( price, bounty[unitID][teamID].price )	bounty[unitID][teamID] = {price = newprice, timer = timer,}		Spring.SetUnitRulesParam( unitID, 'bounty'..teamID, newprice )	Spring.SetUnitRulesParam( unitID, 'bountyTimer'..teamID, timer )endlocal function RemoveBounty( unitID, teamID )	if not bounty[unitID] then		return	end	Spring.SetUnitRulesParam( unitID, 'bounty'..teamID, 0 )	Spring.SetUnitRulesParam( unitID, 'bountyTimer'..teamID, 0 )	bounty[unitID][teamID] = nilend---------------------------------------------------------------------------------------Callinsfunction gadget:RecvLuaMsg(msg, playerID)	local msgTable = explode( '|', msg )	local command = msgTable[1]		local bounty_prefix = "$bounty"		if command == '$bounty' then		local _,_, spec, teamID, allianceID = spGetPlayerInfo(playerID)		if spec then			return		end				if( #msgTable ~= 3 ) then			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<Bounty> (A) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')			return false		end				local unitID = msgTable[2]+0		local price = msgTable[3]+0				if( type(unitID) ~= 'number' or type(price) ~= 'number' ) then			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<Bounty> (B) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')			return false		end				--local unitTeamID = Spring.GetUnitTeam(unitID)		local unitAlliance = Spring.GetUnitAllyTeam(unitID)				if unitAlliance == allianceID then			echo ('<Bounty> You cannot place a bounty on an allied unit, Player ' .. playerID .. ' on team ' .. teamID)			return false		end				AddBounty( unitID, teamID, price, BOUNTYTIME )			endendfunction gadget:Initialize()	gaiaTeam = Spring.GetGaiaTeamID()	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)		if TESTMODE then		local allUnits = Spring.GetAllUnits()		for _,unitID in ipairs(allUnits) do			AddBounty( unitID, 0, 50, 20 )			--AddBounty( unitID, 1, 100, 20 )			AddBounty( unitID, 2, 100, 40 )			--AddBounty( unitID, 3, 50, 500 )					end	endendlocal timerPeriod = 5function gadget:GameFrame(f)		if f % (32*timerPeriod) == 0 then		for unitID, teamData in pairs(bounty) do			local bountiesLeft = false			for teamID, bData in pairs(teamData) do				if bData.timer <= timerPeriod then					--bounty[unitID][teamID] = nil					RemoveBounty(unitID, teamID)				else					bountiesLeft = true					bounty[unitID][teamID].timer = bData.timer - timerPeriod				end			end			if not bountiesLeft then				bounty[unitID] = nil			end		end	endendfunction gadget:UnitDestroyed(unitID,unitDefID,unitTeam,attackerID, attackerDefID, attackerTeam)	local ubounty = bounty[unitID]	if ubounty then		for teamID, amount in pairs(ubounty) do			if attackerTeam then				GG.AddDebt(teamID, attackerTeam, amount)			end			RemoveBounty(unitID, teamID)		end		bounty[unitID] = nil	endend--------------------------------------------------------------------------------------------------------------------------------------------------------------------------else  -- UNSYNCED----------------------------------------------------------------------------------------------------------------------------------------------------------------------------[[local spSendCommands		= Spring.SendCommandslocal spGetSpectatingState 	= Spring.GetSpectatingStatelocal spGetLocalAllyTeamID	= Spring.GetLocalAllyTeamIDlocal spGetLocalTeamID		= Spring.GetLocalTeamIDlocal CallAsTeam = CallAsTeamlocal glTranslate			= gl.Translatelocal glColor				= gl.Colorlocal glDepthTest			= gl.DepthTestlocal glDrawFuncAtUnit		= gl.DrawFuncAtUnitlocal glBillboard			= gl.BillboardLUAUI_DIRNAME = 'LuaUI/'local fontHandler   = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()--local bigFont			= LUAUI_DIRNAME.."Fonts/FreeSansBold_14"--local smallFont			= LUAUI_DIRNAME.."Fonts/FreeSansBold_12"local fhDraw    		= fontHandler.Drawlocal fhDrawCentered	= fontHandler.DrawCenteredlocal overheadFont		= "LuaUI/Fonts/FreeSansBold_16"local myAllyID 		= spGetLocalAllyTeamID()local myTeamID 		= spGetLocalTeamID()local heightOffset = 24local xOffset = 0local yOffset = 0local fontSize = 6local inColors, teamNames = {}, {}local BountyTextCache = {}local spec = falselocal cycle_40s = 1local cycle_1s = 1--gadget:ViewResize(Spring.GetViewGeometry())--------------------------------------------------------local function DrawPrice(unitID, text, height)  glTranslate(0, height, 0 )  glBillboard()    fontHandler.UseFont(overheadFont)  fontHandler.DrawCentered(text, xOffset,yOffset)  endlocal function SetupTeamData()	local teamList = spGetTeamList()	for _,teamID in ipairs(teamList) do		local _, leaderPlayerID = spGetTeamInfo(teamID)		if leaderPlayerID and leaderPlayerID ~= -1 then						teamNames[teamID] = spGetPlayerInfo(leaderPlayerID) or '?? Rob P. ??'			local r,g,b,a = Spring.GetTeamColor(teamID)			inColors[teamID] = '\\255\\255\\255\\255'			if r then				inColors[teamID] = string.char(a*255) .. string.char(r*255) ..  string.char(g*255) .. string.char(b*255)			end		end	endendlocal function GetBountyText(unitID, ubounty)	if BountyTextCache[unitID] then		return BountyTextCache[unitID]	end	local text = '\255\255\255\255Bounty: '	for team, data in spairs(ubounty) do		--text = text .. inColors[team] .. '($' .. data.price .. ' ' .. data.timer .. 's) '	end	BountyTextCache[unitID] = text	return textend-------------------------------------------------------------------------------Callins	--function gadget:DrawScreen()	--endfunction gadget:DrawWorld()	if not bounty then return end		for unitID, ubounty in spairs(bounty) do			local visible = false		if spec then			visible = true		else			CallAsTeam({ ['read'] = myTeamID }, function()				visible = Spring.IsUnitVisible(unitID)			end)		end		local height = 80		if visible then			local text = GetBountyText(unitID, ubounty)			glDrawFuncAtUnit(unitID, false, DrawPrice, unitID, text, height)		end			endendfunction gadget:Initialize()	SetupTeamData()endfunction gadget:Update()		spec = spGetSpectatingState()		cycle_40s = cycle_40s % (32*40) + 1	cycle_1s = cycle_1s % (32*1) + 1	if cycle_40s == 1 then		SetupTeamData()	end	if cycle_1s == 1 then		BountyTextCache = {}	end		if SYNCED.bounty then		bounty = SYNCED.bounty	endend--]]--------------------------------------------------------------------------------------------------------------------------------------------------------------------------end

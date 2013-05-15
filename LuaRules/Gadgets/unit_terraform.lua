@@ -1981,6 +1981,14 @@ end
 -- Recieve Terraform command from UI widget
 --------------------------------------------------------------------------------
 
+function gadget:AllowCommand_GetWantedCommand()	
+	return {[CMD_TERRAFORM_INTERNAL] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
 
   if (cmdID == CMD_TERRAFORM_INTERNAL) then
@@ -3047,7 +3055,7 @@ function gadget:GameFrame(n)
 end	
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponID, attackerID, attackerDefID, attackerTeam)
+                            weaponDefID, attackerID, attackerDefID, attackerTeam)
 							
 	if unitDefID == terraunitDefID then
 		return -0.0001 -- terraunit starts on 0 HP. If a unit is damaged and has 0 HP it dies
@@ -3529,10 +3537,10 @@ else -- UNSYNCED
 --------------------------------------------------------------------------------
 
 local lastMarkerFrame = 0
-
+--[[
 function gadget:DrawWorldPreUnit()
 	local drawPositions = SYNCED.drawPositions
-	--[[
+	
 	--gl.DepthTest(true)
 	for i = 1, drawPositions.count do
 		local point = drawPositions.data[i]
@@ -3541,9 +3549,9 @@ function gadget:DrawWorldPreUnit()
 		gl.Color(0.5,0,0,0.5)
 		--gl.DrawGroundQuad(point.x1,point.z1,point.x2,point.z2)
 		--gl.Utilities.DrawGroundRectangle(point.x1,point.z1,point.x2,point.z2)
-	end--]]
+	end
 end
-
+--]]
 
 
 function gadget:Update(n)

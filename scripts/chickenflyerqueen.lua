@@ -128,13 +128,20 @@ local function DropBasiliskLoop()
 	end
 end
 
-function script.StartMoving()
-	isMoving = true
+local function Moving()
+	Signal(SIG_Fly)
+	SetSignalMask(SIG_Fly)
+
 	StartThread(Fly)
 	Turn(leftFoot, x_axis, math.rad(-20), math.rad(420))
 	Turn(rightFoot, x_axis, math.rad(-20), math.rad(420))
 	Turn(leftShin, x_axis, math.rad(-40), math.rad(420))
 	Turn(rightShin, x_axis, math.rad(-40), math.rad(420))
+end
+
+function script.StartMoving()
+	isMoving = true
+	StartThread(Moving)
 end
 
 function script.StopMoving()

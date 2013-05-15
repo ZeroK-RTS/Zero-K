@@ -5,7 +5,7 @@ static-var bMoving, lasthit;
 // Signal definitions
 #define SIG_AIM				2
 #define SIG_AIM_2			4
-#define SIG_MOVE			16
+#define SIG_MOVE			8
 
 #include "sfxtype.h"
 #include "exptype.h"
@@ -49,8 +49,8 @@ EndJump()
 
 walk()
 {		
-	if (bMoving)
-			{
+	while (bMoving)
+		{
 			turn lthigh to x-axis <70> speed<420>;
 			turn lknee to x-axis <-40> speed<420>;
 			turn lshin to x-axis <20> speed<420>;
@@ -88,8 +88,7 @@ walk()
 			wait-for-move body along y-axis;
 			move body to y-axis [0] speed <140000>;
 			wait-for-move body along y-axis;
-			start-script walk();
-			}
+		}
 }
 
 stopwalk ()
@@ -106,12 +105,16 @@ stopwalk ()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = TRUE;
 	start-script walk();
 }
 
 StopMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = FALSE;
 	start-script stopwalk();
 }

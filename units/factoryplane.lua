@@ -26,6 +26,7 @@ unitDef = {
 
   buildPic                      = [[factoryplane.png]],
   buildTime                     = 600,
+  canAttack                     = true,
   canMove                       = true,
   canPatrol                     = true,
   canstop                       = [[1]],
@@ -70,6 +71,7 @@ unitDef = {
   showNanoSpray                 = false,
   side                          = [[CORE]],
   sightDistance                 = 273,
+  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline						= 0,

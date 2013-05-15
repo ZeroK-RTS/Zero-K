@@ -50,16 +50,22 @@ local function Walk()
 	end
 end
 
+local function Stopping()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+
+	Move(lleg, y_axis, 0, LEG_Y_SPEED)
+	Move(lfoot, z_axis, 0, LEG_Z_SPEED)
+	Move(rleg, y_axis, 0, LEG_Y_SPEED)
+	Move(rfoot, z_axis, 0, LEG_Z_SPEED)
+end
+
 function script.StartMoving()
 	StartThread(Walk)
 end
 
 function script.StopMoving()
-	Signal(SIG_WALK)
-	Move(lleg, y_axis, 0, LEG_Y_SPEED)
-	Move(lfoot, z_axis, 0, LEG_Z_SPEED)
-	Move(rleg, y_axis, 0, LEG_Y_SPEED)
-	Move(rfoot, z_axis, 0, LEG_Z_SPEED)
+	StartThread(Stopping)
 end
 
 function script.Create()

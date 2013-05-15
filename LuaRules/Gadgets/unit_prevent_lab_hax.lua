@@ -7,7 +7,7 @@ function gadget:GetInfo()
     name      = "Prevent Lab Hax",
     desc      = "Stops enemy units from entering labs. Blocks construction of structures in labs.",
     author    = "Google Frog",
-    date      = "Jul 24, 2007",
+    date      = "Jul 24, 2007", --May 11, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -31,6 +31,11 @@ local spGetUnitsInBox  = Spring.GetUnitsInBox
 local spSetUnitPosition  = Spring.SetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitDirection = Spring.GetUnitDirection
+local spGetUnitVelocity = Spring.GetUnitVelocity
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetUnitTeam = Spring.GetUnitTeam
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local abs = math.abs
 local min = math.min
@@ -58,50 +63,62 @@ function checkLabs()
     for i,id in ipairs(units) do 
 	  local ud = spGetUnitDefID(id)
 	  local fly = UnitDefs[ud].canFly
-	  local team = spGetUnitAllyTeam(id)
-	  if (team ~= Lv.team) and not fly then
-
-	    local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(id, true, true)
-		if aimY > -15 then
-		  local l = abs(ux-Lv.minx)
-		  local r = abs(ux-Lv.maxx)
-		  local t = abs(uz-Lv.minz)
-		  local b = abs(uz-Lv.maxz)
-		  
-		  local side = min(l,r,t,b)
-		  
-		  if (side == l) then
-		    spSetUnitPosition(id, Lv.minx, uz, true)
-		  elseif (side == r) then
-		    spSetUnitPosition(id, Lv.maxx, uz, true)
-		  elseif (side == t) then
-		    spSetUnitPosition(id, ux, Lv.minz, true)
-		  else
-		    spSetUnitPosition(id, ux, Lv.maxz, true)
-		  end
-		
-		--[[
-		if (Lv.face == 1) then
-		    local l = abs(ux-Lv.minx)
-		    local r = abs(ux-Lv.maxx)
-		    
-		    if (l < r) then
-		      spSetUnitPosition(id, Lv.minx, uz, true)
-		    else
-		      spSetUnitPosition(id, Lv.maxx, uz, true)
-		    end
-		  else
-		    local t = abs(uz-Lv.minz)
-		    local b = abs(uz-Lv.maxz)
-		    
-		    if (t < b) then
-		      spSetUnitPosition(id, ux, Lv.minz, true)
-		    else
-		      spSetUnitPosition(id, ux, Lv.maxz, true)
-		    end
-		  end
-		
-		--]]
+	  local ally = spGetUnitAllyTeam(id)
+	  local team = spGetUnitTeam(id)
+	  if not fly then
+		if (ally ~= Lv.ally) then --teleport unit away
+			local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(id, true, true)
+			if aimY > -15 then
+			  local l = abs(ux-Lv.minx)
+			  local r = abs(ux-Lv.maxx)
+			  local t = abs(uz-Lv.minz)
+			  local b = abs(uz-Lv.maxz)
+			  
+			  local side = min(l,r,t,b)
+			  
+			  if (side == l) then
+				spSetUnitPosition(id, Lv.minx, uz, true)
+			  elseif (side == r) then
+				spSetUnitPosition(id, Lv.maxx, uz, true)
+			  elseif (side == t) then
+				spSetUnitPosition(id, ux, Lv.minz, true)
+			  else
+				spSetUnitPosition(id, ux, Lv.maxz, true)
+			  end
+			
+			--[[
+			if (Lv.face == 1) then
+				local l = abs(ux-Lv.minx)
+				local r = abs(ux-Lv.maxx)
+				
+				if (l < r) then
+				  spSetUnitPosition(id, Lv.minx, uz, true)
+				else
+				  spSetUnitPosition(id, Lv.maxx, uz, true)
+				end
+			  else
+				local t = abs(uz-Lv.minz)
+				local b = abs(uz-Lv.maxz)
+				
+				if (t < b) then
+				  spSetUnitPosition(id, ux, Lv.minz, true)
+				else
+				  spSetUnitPosition(id, ux, Lv.maxz, true)
+				end
+			  end
+			
+			--]]
+			end		
+		elseif (team ~= Lv.team) then --order unit to move away
+			local xVel,_,zVel = spGetUnitVelocity(id)
+			local stunned_or_inbuild = spGetUnitIsStunned(id)
+			if math.abs(xVel)<0.1 and math.abs(zVel)<0.1 and (not stunned_or_inbuild) then
+				local ux, uy, uz  = spGetUnitPosition(id)
+				local dx,_,dz = spGetUnitDirection(id)
+				dx = dx*100
+				dz = dz*100
+				spGiveOrderToUnit(id, CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, ux+dx,uy,uz+dz},{"alt"})
+			end
 		end
 	  end
 	end
@@ -176,7 +193,7 @@ local function AllowUnitCreation(unitDefID, builderID, builderTeam, ux, uy, uz, 
     return true
 end
 
-function gadget:UnitCreated(unitID, unitDefID)
+function gadget:UnitCreated(unitID, unitDefID,teamID)
   
   -- http://springrts.com/mantis/view.php?id=2871
   local ux,_,uz,_, uy, _  = spGetUnitPosition(unitID, true)
@@ -196,7 +213,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 		local face = spGetUnitBuildFacing(unitID)
 		local xsize = (ud.xsize)*4
 		local zsize = (ud.ysize or ud.zsize)*4
-		local team = spGetUnitAllyTeam(unitID)
+		local ally = spGetUnitAllyTeam(unitID)
 
 		if ((face == 0) or (face == 2))  then
 			if xsize%16 == 0 then
@@ -211,7 +228,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				uz = math.floor(uz/16)*16+8
 			end
 		
-			lab[unitID] = { team = team, face = 0,
+			lab[unitID] = { ally = ally, team=teamID, face = 0,
 				minx = ux-xsize+0.1, minz = uz-zsize+0.1, maxx = ux+xsize-0.1, maxz = uz+zsize-0.1}
 		else
 			if xsize%16 == 0 then
@@ -226,7 +243,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				ux = math.floor(ux/16)*16+8
 			end
 			
-			lab[unitID] = { team = team, face = 1,
+			lab[unitID] = { ally = ally, team=teamID, face = 1,
 				minx = ux-zsize+0.1, minz = uz-xsize+0.1, maxx = ux+zsize-0.1, maxz = uz+xsize-0.1}
 		end
 	
@@ -252,9 +269,10 @@ function gadget:UnitDestroyed(unitID, unitDefID)
   end
 end
 
-function gadget:UnitGiven(unitID, unitDefID)
+function gadget:UnitGiven(unitID, unitDefID,unitTeam)
   if (lab[unitID]) then
-    lab[unitID].team = spGetUnitAllyTeam(unitID)
+    lab[unitID].ally = spGetUnitAllyTeam(unitID)
+	lab[unitID].team = unitTeam
   end
 end
 

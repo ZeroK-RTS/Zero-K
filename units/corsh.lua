@@ -89,9 +89,13 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 90,
-        planes  = 90,
-        subs    = 4.5,
+        default = 110,
+        planes  = 110,
+        subs    = 5.5,
+      },
+      
+      customParams = {
+        single_hit = true,
       },
 
       explosionGenerator      = [[custom:gauss_hit_l]],

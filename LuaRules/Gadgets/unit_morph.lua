@@ -1057,6 +1057,18 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 	return false
 end
 
+function gadget:AllowCommand_GetWantedCommand()	
+	return true -- morph command is dynamic so incoperating it is difficult
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	boolDef = {}
+	for udid,_ in pairs(morphDefs) do
+		boolDef[udid] = true
+	end
+	return boolDef
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	local morphData = morphUnits[unitID]
 	if (morphData) then

@@ -193,6 +193,7 @@ end
 
 
 local function Walk()
+	Signal( SIG_Walk )
 	SetSignalMask( SIG_Walk )
 
 	-- tilt arms out a bit so they don't scrape body
@@ -209,6 +210,9 @@ local function Walk()
 end
 
 local function StopWalk()
+	Signal( SIG_Walk )
+	SetSignalMask( SIG_Walk )
+
 	-- straighten legs
 	for i, p in pairs(leftLeg) do
 		Turn(leftLeg[i], x_axis, 0, 4)
@@ -240,7 +244,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( SIG_Walk )
 	StartThread( StopWalk )
 end
 

@@ -154,6 +154,9 @@ local function Walk()
 end
 
 local function RestorePose()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+
 	Move(pelvis , y_axis, 0 , 1 )
 	Turn(thighR , x_axis, 0, math.rad(200) )
 	Turn(shinR , x_axis, 0, math.rad(200) )
@@ -179,7 +182,6 @@ end
 
 function script.StopMoving() 
 	isMoving = false
-	Signal(SIG_WALK)
 	StartThread(RestorePose)
 end
 

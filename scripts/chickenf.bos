@@ -5,13 +5,13 @@ static-var bMoving;
 // Signal definitions
 #define SIG_AIM				2
 #define SIG_AIM_2			4
-#define SIG_MOVE			16
+#define SIG_MOVE			8
 
 #include "constants.h"
 
 fly()
 {
-	if (bMoving)
+	while (bMoving)
 		{
 			turn lwing to z-axis <-40> speed<60>;
 			turn rwing to z-axis <40> speed<60>;
@@ -19,7 +19,6 @@ fly()
 			turn lwing to z-axis <40> speed<120>;
 			turn rwing to z-axis <-40> speed<120>;
 			wait-for-turn lwing around z-axis;
-			start-script fly();
 		}
 }
 
@@ -31,12 +30,16 @@ stopfly ()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = TRUE;
 	start-script fly();
 }
 
 StopMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = FALSE;
 	start-script stopfly();
 }

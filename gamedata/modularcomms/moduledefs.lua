@@ -198,6 +198,10 @@ upgrades = {
 							--v.rgbcolor = [[0.1 0.65 0.9]]
 							--v.explosiongenerator = [[custom:BURNTEAL]]
 						end
+						if i == "commweapon_shotgun_green" or i == "commweapon_heavymachinegun_lime" then
+							v.rgbcolor = "0 1 0.7"
+							v.explosiongenerator = [[custom:BEAMWEAPON_HIT_TURQUOISE]]
+						end
 					end
 				end
 			end,	
@@ -646,11 +650,22 @@ decorations = {
 	skin_recon_dark = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commrecon1dark.dds]]
+				unitDef.customparams.altskin2 = [[unittextures/commrecon2alt.dds]]
+				unitDef.buildpic = "skin_recon_dark.png"
 			end,
 	},
 	skin_recon_red = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commrecon1red.dds]]
+				unitDef.customparams.altskin2 = [[unittextures/commrecon2alt.dds]]
+				unitDef.buildpic = "skin_recon_red.png"
+			end,
+	},
+	skin_recon_leopard = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commrecon1leopard.dds]]
+				unitDef.customparams.altskin2 = [[unittextures/commrecon2alt.dds]]
+				unitDef.buildpic = "skin_recon_leopard.png"
 			end,
 	},
 	skin_battle_blue = {
@@ -658,6 +673,12 @@ decorations = {
 				unitDef.customparams.altskin = [[unittextures/core_commander_1blue.dds]]
 			end,
 	},
+	skin_battle_camo = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/core_commander_1camo.dds]]
+				unitDef.buildpic = "skin_battle_camo.png"
+			end,
+	},	
 	skin_support_dark = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commsupport1dark.dds]]
@@ -667,6 +688,13 @@ decorations = {
 	skin_support_green = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commsupport1green.dds]]
+				unitDef.buildpic = "skin_support_green.png"
+			end,
+	},
+	skin_support_hotrod = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commsupport1hotrod.dds]]
+				unitDef.buildpic = "skin_support_hotrod.png"
 			end,
 	},
 	
@@ -780,10 +808,6 @@ for i=1,#weaponsList do
 			upgrades[newName] = CopyTable(upgrades[name], true)
 			
 			local weapon2 = weapons[newName]
-			for i,v in pairs(mods) do
-				Spring.Echo(i,v)
-			end
-			
 			local modded = CopyTable(mods)
 			MergeTable(modded, weapon2, true)
 			weapons[newName] = modded

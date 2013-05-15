@@ -35,4 +35,11 @@ for name, data in pairs(carrierDefNames) do
 	if UnitDefNames[name] then carrierDefs[UnitDefNames[name].id] = data	end
 end
 
-return carrierDefs
+local thingsWhichAreDrones = {
+	[UnitDefNames.carrydrone.id] = true,
+	[UnitDefNames.attackdrone.id] = true,
+	[UnitDefNames.battledrone.id] = true
+}
+	
+
+return carrierDefs, thingsWhichAreDrones

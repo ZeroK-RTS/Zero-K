@@ -32,22 +32,28 @@ end
 include("keysym.h.lua")
 include("utils.lua")
 includeZIPFirst("system.lua")
-includeZIPFirst("cache.lua")
+includeZIPFirst("cache.lua") --contain cached override for Spring.GetVisibleUnit (performance optimization). All overrides that are placed here have global reach
 include("callins.lua")
-include("savetable.lua") --for reference: file is in "Spring\LuaUI\"
+include("savetable.lua")
+include("utility_two.lua") --contain file backup function
+local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = include("chat_preprocess.lua") -- contain stuff that preprocess chat message for Chili Chat widgets
 
-local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName:upper() .. '_order.lua'
-local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName:upper() .. '_data.lua'
+local modShortUpper = Game.modShortName:upper()
+local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_order.lua'
+local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. modShortUpper .. '_data.lua'
 local WIDGET_DIRNAME     = LUAUI_DIRNAME .. 'Widgets/'
 
 local HANDLER_BASENAME = "cawidgets.lua"
 local SELECTOR_BASENAME = 'selector.lua'
 
-if not VFS.FileExists(ORDER_FILENAME) then
-  -- FIXME: hack fix for missions not using right config files
-  local modShortName = "ZK"	-- Game.modShortName
-  ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. modShortName .. '_order.lua'
-  CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. modShortName .. '_data.lua'
+do
+	local isMission = Game.modDesc:find("Mission Mutator")
+	if isMission then -- all missions will be forced to use a specific name
+		if not VFS.FileExists(ORDER_FILENAME) or not VFS.FileExists(CONFIG_FILENAME) then
+			ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/ZK_order.lua' --use "ZK" name when running any mission mod (provided that there's no existing config file)
+			CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/ZK_data.lua'
+		end
+	end
 end
 
 local SAFEWRAP = 1
@@ -61,31 +67,11 @@ local glPushAttrib = gl.PushAttrib
 local pairs = pairs
 local ipairs = ipairs
 
--- create backup for ZK_data.lua and ZK_order.lua to workaround against case of file corruption if it happen (ie: bluescreen cause file corruption)
-do
+do -- create backup for ZK_data.lua and ZK_order.lua to workaround against case of file corruption when OS crash
  	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
-	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'}
+	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'} --this is a header text that is appended to start of file
 	for i=1, #fileToCheck do
-		local chunk, err = loadfile(fileToCheck[i])
-		if (chunk) then --if original content is LUA OK:
-		    local tmp = {}
-			setfenv(chunk, tmp)
-			table.save(chunk(),fileToCheck[i]..".bak",extraText[i]) --write to backup
-		else --if original content is not LUA OK:
-			Spring.Log(HANDLER_BASENAME, LOG.ERROR, tostring(err) .. " (Now will attempt to use backup file)")
-			chunk, err = loadfile(fileToCheck[i]..".bak")
-			if (chunk) then --if backup content is LUA OK:
-				local tmp = {}
-				setfenv(chunk, tmp)
-				table.save(chunk(),fileToCheck[i],extraText[i]) --overwrite original
-				-- Spring.Echo(os.remove (fileToCheck[i]))
-				-- Spring.Echo(os.rename (fileToCheck[i]..".bak", fileToCheck[i]))
-			else --if backup content is also not LUA OK:
-				Spring.Log(HANDLER_BASENAME, LOG.ERROR, tostring(err) .. " (Now will delete file and hope ZIP archive has another copy)")
-				Spring.Echo(os.remove (fileToCheck[i])) --delete original
-				Spring.Echo(os.remove (fileToCheck[i]..".bak")) --delete backup
-			end
-		end
+		CheckLUAFileAndBackup(fileToCheck[i], extraText[i])
 	end
 end
 
@@ -93,7 +79,7 @@ end
 local localWidgetsFirst = false
 local localWidgets = false
 
-if VFS.FileExists(CONFIG_FILENAME) then
+if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to use localWidgetsFirst
   local cadata = VFS.Include(CONFIG_FILENAME)
   if cadata["Local Widgets Config"] then
     localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
@@ -296,142 +282,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- helper functions
-
-local myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-local transmitMagic = "> ["..myName.."]!transmit" -- Lobby is sending to LuaUI
-local voiceMagic = "> ["..myName.."]!transmit voice" -- Lobby is sending a voice command to LuaUI
-local transmitLobbyMagic = "!transmitlobby" -- LuaUI is sending to lobby
-
-function StringStarts(s, start)
-   return string.sub(s, 1, string.len(start)) == start
-end
-
-local function Deserialize(text)
-  local f, err = loadstring(text)
-  if not f then
-    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing  table (compiling): "..tostring(err))
-    return
-  end
-  setfenv(f, {}) -- sandbox
-  local success, arg = pcall(f)
-  if not success then
-    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing table (calling): "..tostring(arg))
-    return
-  end
-  return arg
-end
-
-
-local MessageProcessor = {}
-
-local PLAYERNAME_PATTERN = '([%w%[%]_]+)' -- to make message patterns easier to read/update
-
--- message definitions
---[[
-pattern syntax:
-	see http://www.lua.org/manual/5.1/manual.html#5.4.1
-	pattern must contain at least 1 capture group; its content will end up in msg.argument after parseMessage()
-	PLAYERNAME will match anything that looks like a playername (see code for definition of PLAYERNAME_PATTERN); it is a capture group
-	if message does not contain a PLAYERNAME, add 'noplayername = true' to definition
-	it should be possible to add definitions to help debug widgets or whatever... (no guarantee)
---]]
-MessageProcessor.MESSAGE_DEFINITIONS = {
-	{ msgtype = 'player_to_allies', pattern = '^<PLAYERNAME> Allies: (.*)' },
-	{ msgtype = 'player_to_player_received', pattern = '^<PLAYERNAME> Private: (.*)' }, -- TODO test!
-	{ msgtype = 'player_to_player_sent', pattern = '^You whispered PLAYERNAME: (.*)' }, -- TODO test!
-	{ msgtype = 'player_to_specs', pattern = '^<PLAYERNAME> Spectators: (.*)' },
-	{ msgtype = 'player_to_everyone', pattern = '^<PLAYERNAME> (.*)' },
-
-	{ msgtype = 'spec_to_specs', pattern = '^%[PLAYERNAME%] Spectators: (.*)' },
-	{ msgtype = 'spec_to_allies', pattern = '^%[PLAYERNAME%] Allies: (.*)' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
-	{ msgtype = 'spec_to_everyone', pattern = '^%[PLAYERNAME%] (.*)' },
-
-	-- shameful copy-paste -- TODO rewrite pattern matcher to remove this duplication
-	{ msgtype = 'replay_spec_to_specs', pattern = '^%[PLAYERNAME %(replay%)%] Spectators: (.*)' },
-	{ msgtype = 'replay_spec_to_allies', pattern = '^%[PLAYERNAME %(replay%)%] Allies: (.*)' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
-	{ msgtype = 'replay_spec_to_everyone', pattern = '^%[PLAYERNAME %(replay%)%] (.*)'},
-
-	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', discard = true }, -- NOTE : these messages are discarded -- points and labels are provided through MapDrawCmd() callin
-	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', discard = true },
-	{ msgtype = 'autohost', pattern = '^> (.+)', noplayername = true },
-	{ msgtype = 'other' } -- no pattern... will match anything else
-}
-
-local function escapePatternReplacementChars(s)
-  return string.gsub(s, "%%", "%%%%")
-end
-
-function MessageProcessor:Initialize()
-	local escapedPlayernamePattern = escapePatternReplacementChars(PLAYERNAME_PATTERN)
-	for _,def in ipairs(self.MESSAGE_DEFINITIONS) do
-		if def.pattern then
-			def.pattern = def.pattern:gsub('PLAYERNAME', escapedPlayernamePattern) -- patch definition pattern so it is an actual lua pattern string
-		end
-	end
-end
-
-local players = {}
-
-local function SetupPlayers()
-	local playerroster = Spring.GetPlayerList()
-	
-	for i, id in ipairs(playerroster) do
-		local name, _, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(id)
-		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
-	end
-end
-
-local function getSource(spec, allyTeamId)
-	return (spec and 'spec')
-		or ((Spring.GetMyTeamID() == allyTeamId) and 'ally')
-		or 'enemy'
-end
-
--- update msg members msgtype, argument, source and playername (when relevant)
-function MessageProcessor:ParseMessage(msg)
-  for _, candidate in ipairs(self.MESSAGE_DEFINITIONS) do
-    if candidate.pattern == nil then -- for fallback/other messages
-      msg.msgtype = candidate.msgtype
-      msg.argument = msg.text
-	  msg.source = 'other'
-      return
-    end
-    local capture1, capture2 = msg.text:match(candidate.pattern)
-    if capture1 then
-      msg.msgtype = candidate.msgtype
-      if candidate.noplayername then
-        msg.argument = capture1
-	msg.source = 'other'
-	return
-      else
-        local playername = capture1
-        if players[playername] then
-	local player = players[playername]
-	  msg.player = player
-	  msg.source = getSource(player.spec, player.allyTeamId)
-	  msg.playername = playername
-	  msg.argument = capture2
-	  return
-        end
-      end
-    end
-  end
-end
-
-function MessageProcessor:ProcessConsoleLine(msg)
-	self:ParseMessage(msg)
-end
-
-function MessageProcessor:ProcessConsoleBuffer(count)
-	local bufferMessages = Spring.GetConsoleBuffer(count)
-	for i = 1,#bufferMessages do
-		self:ProcessConsoleLine(bufferMessages[i])
-	end
-	return bufferMessages
-end
-
-SetupPlayers()
-MessageProcessor:Initialize()
+---include chat preprocess here
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1380,7 +1231,8 @@ function widgetHandler:CommandNotify(id, params, options)
   end
   return false
 end
-  
+
+--NOTE: StringStarts() and MessageProcessor is included in "chat_preprocess.lua"
 function widgetHandler:AddConsoleLine(msg, priority)
   if StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
     return -- ignore
@@ -1413,7 +1265,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			else --if I am NOT the muted, then: delete this message
 				return
 			end
-			--TODO: improve chili_chat2 spam-filter/dedupe-detection so that it could detect spamming across multiple chatline. So that we have better protection against spam.
+			--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 		end
 	end
   

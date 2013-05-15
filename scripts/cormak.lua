@@ -143,19 +143,36 @@ function AutoAttack_Thread()
 	SetSignalMask(SIG_ACTIVATE)
 	while true do
 		Sleep(100)
-		local reloaded = select(2, spGetUnitWeaponState(unitID,2))
+		local reloaded = select(2, spGetUnitWeaponState(unitID,3))
 		if reloaded then
 			local gameFrame   = spGetGameFrame()
 			local reloadMult  = GG.att_reload[unitID] or 1.0
 			local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
-			spSetUnitWeaponState(unitID, 2, {reloadFrame = reloadFrame} )
+			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame} )
 			GG.PokeDecloakUnit(unitID,30)
 			
 			lastWaveFrame = gameFrame
 			EmitSfx( emit,  UNIT_SFX1 )
 			EmitSfx( emit,  DETO_W2 )
+			Vibrate()
 		end
 	end
+end
+
+function Vibrate()
+	--Vibrate
+	Move(base, x_axis, 1, 20)
+	WaitForMove(base, x_axis)
+	Move(base, x_axis, 0, 20)
+	Move(base, z_axis, 1, 20)
+	WaitForMove(base, z_axis)
+	Move(base, z_axis, 0, 20)
+	Move(base, x_axis, -1, 20)
+	WaitForMove(base, x_axis)
+	Move(base, x_axis, 0, 20)
+	Move(base, z_axis, -1, 20)
+	WaitForMove(base, z_axis)
+	Move(base, z_axis, 0, 20)		
 end
 
 function script.Activate()
@@ -179,6 +196,7 @@ function script.FireWeapon(num)
 		lastWaveFrame = spGetGameFrame()
 		EmitSfx( emit,  UNIT_SFX1 )
 		EmitSfx( emit,  DETO_W2 )
+		Vibrate()
 	end
 end
 

@@ -65,7 +65,7 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:UnitPreDamaged(u, ud, team, damage, para, weapon)
+function gadget:UnitPreDamaged(u, ud, team, damage, para, weaponDefID)
 	if not sheathed[u] then return damage end
 	local dmg = 0
 	recharge[u] = spGetGameFrame() + sheathDefs[ud].regenDelay

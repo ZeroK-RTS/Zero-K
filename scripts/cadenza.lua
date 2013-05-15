@@ -84,6 +84,9 @@ local bSomersault = false
 -- funcs
 --------------------------------------------------------------------------------
 local function RestorePose()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
 	Turn(base, x_axis, 0, math.rad(60))
 	Move(pelvis , y_axis, 0 , 1 )
 	Turn(rthigh , x_axis, 0, math.rad(200) )
@@ -235,6 +238,7 @@ end
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	
 	Turn(base, x_axis, math.rad(10), math.rad(30))
 	while true do
 		--left leg up, right leg back
@@ -288,7 +292,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving() 
-	Signal(SIG_WALK)
 	StartThread(RestorePose)
 end
 

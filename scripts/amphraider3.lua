@@ -102,12 +102,9 @@ local function Walk()
 	end
 end
 
-function script.StartMoving()
-	StartThread(Walk)
-end
-
-function script.StopMoving()
+local function Stopping()
 	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
 	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
 	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
 	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
@@ -116,6 +113,14 @@ function script.StopMoving()
 	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
 	Turn( torso , z_axis, 0, math.rad(20)*PACE  )
 	Move( torso , y_axis, 0, 12*PACE )
+end
+
+function script.StartMoving()
+	StartThread(Walk)
+end
+
+function script.StopMoving()
+	StartThread(Stopping)
 end
 
 function script.Create()
@@ -155,7 +160,7 @@ end
 function script.FireWeapon(num)
     local toChange = 3 - num
 	local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-    Spring.SetUnitWeaponState(unitID, toChange-1, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
+    Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 	if num == 2 then
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		if py < -8 then

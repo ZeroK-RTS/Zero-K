@@ -15,6 +15,11 @@
 -- stopSpeedLeeway:     Below this speed the unit can snap to surface
 -- stopPositionLeeway:  Below this distance from the surface the unit can stnap to surface.
 
+-- PHYSIC UPDATE (4 April 2013): 
+-- as in ZK version >= r9871 (>1.1.3.6) all "Drag" related constant now mean "dragCoefficient" from Physic's drag equation ( this equation here: http://en.wikipedia.org/wiki/Drag_equation ),
+-- from this physic equation, the negative acceleration (the resistance) is defined by :  resistiveAccel = 0.5*(currentVelocity*currentVelocity*dragCoefficient)
+-- this mean faster unit has more drag, and bigger "Drag" cause more drag, while smaller "Drag" lead to less drag, while 0 "Drag" lead to 0 drag (and 0 drag will lead to infinite speed).
+
 local floatDefs = {
 	
 	-- This unit pushes off the floor and swims to the surface at fairly constant
@@ -73,7 +78,7 @@ local floatDefs = {
 		airAccel = -0.3, -- aka gravity, only effective out of water
 		airDrag = 0.995,
 		waterHitDrag = 0.5,
-		floatPoint = -40,
+		floatPoint = -60,
 		depthRequirement = -40,
 		sinkOnPara = false,
 		sinkTankRequirement = false,

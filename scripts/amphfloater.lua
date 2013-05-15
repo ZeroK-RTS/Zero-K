@@ -168,8 +168,10 @@ local function Unpack()
     bUnpacked = true
 end
 
-function script.StopMoving()
+local function Stopping()
 	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
 	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
 	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
 	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
@@ -185,6 +187,10 @@ function script.StopMoving()
 	StartThread(Unpack)
 end
 
+function script.StopMoving()
+	StartThread(Stopping)
+end
+
 function script.Create()
 	StartThread(SmokeUnit)	
 end
@@ -198,14 +204,14 @@ local function RestoreAfterDelay()
 end
 
 function script.AimFromWeapon()
-	--Spring.Echo(Spring.GetUnitWeaponState(unitID, 0, "projectileSpeed"))
+	--Spring.Echo(Spring.GetUnitWeaponState(unitID, 1, "projectileSpeed"))
 	--Spring.Echo(PROJECTILE_SPEED)
 	
 	local height = select(2, Spring.GetUnitBasePosition(unitID))
 	if height < -130 then
-		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 200})
+		Spring.SetUnitWeaponState(unitID,1,{projectileSpeed = 200})
 	else
-		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = PROJECTILE_SPEED})
+		Spring.SetUnitWeaponState(unitID,1,{projectileSpeed = PROJECTILE_SPEED})
 	end
 	
 	return barrel

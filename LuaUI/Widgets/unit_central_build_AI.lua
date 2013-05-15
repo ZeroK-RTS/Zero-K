@@ -14,13 +14,13 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.321"
+local version = "v1.342"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 16 March 2013",
+    date      = "July 20, 2009, 10 April 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -60,6 +60,7 @@ local myGroupId = 0	--//Constant: a group number (0 to 9) will be controlled by 
 local hotkey = string.byte( "g" )	--//Constant: a custom hotkey to add unit to custom group. NOTE: set myGroupId to "-1" to use this hotkey.
 local checkFeatures = false --//Constant: if true, Central Build will reject any build queue on top of allied features (eg: ally's wreck & dragon teeth).
 
+local Echo					= Spring.Echo
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetGroupList		= Spring.GetGroupList
 local spGetGroupUnits		= Spring.GetGroupUnits
@@ -113,6 +114,7 @@ local sqrt 	= math.sqrt
 local max	= math.max
 
 local nextFrame	= spGetGameFrame() +30
+local nextPathCheck = spGetGameFrame() + 400 --is used to check whether constructor can go to construction site
 local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
 
@@ -120,6 +122,7 @@ local textSize = 12.0
 local myUnits = {}	--  list of units in the Central Build group
 local myQueue = {}  --  list of commands for Central Build group
 local groupHasChanged	--	Flag if group members have changed.
+local myQueueUnreachable = {} -- list of queue and unitlist that cant go to it
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -215,6 +218,10 @@ end
 --  Was Update(), but Niobium says GameFrame() is more better.
 
 function widget:GameFrame(thisFrame)
+	if ( thisFrame > nextPathCheck ) then
+		UpdateUnitsPathability()
+		nextPathCheck = thisFrame + 300
+	end
 	if ( thisFrame < nextFrame ) then 
 		return
 	end
@@ -249,6 +256,8 @@ function UpdateOneGroupsDetails(myGroupId)
 			local ud = UnitDefs[udid]
 			if (ud.builder and ud.canMove) then
 				myUnits[unitID] = "idle"
+				myQueueUnreachable[unitID]= {}
+				UpdateOneUnitPathability(unitID)
 			end
 		end
 	end
@@ -262,22 +271,138 @@ function UpdateOneGroupsDetails(myGroupId)
 		end
 		if ( not isInThere ) then
 			myUnits[unitID] = nil
+			myQueueUnreachable[unitID]=nil
 		end
 	end
 	groupHasChanged = nil
+end
+
+-- NOTE: path check only work for Spring's Standard pathing (Spring.RequestPath() always return nil for qtpfs as in Spring 93.2.1+)
+-- This function check all build site whether it is accessible to all constructor. Reference: http://springrts.com/phpbb/viewtopic.php?t&t=22953&start=2
+function UpdateUnitsPathability()
+	for unitID, _ in pairs(myUnits) do
+		myQueueUnreachable[unitID] = {} --note: unitID entry is always cleared when unit die or exit CBA group
+		UpdateOneUnitPathability(unitID)
+	end
+end
+
+-- This function check all build site whether it is accessible to 1 constructor. Reference: http://springrts.com/phpbb/viewtopic.php?t&t=22953&start=2
+function UpdateOneUnitPathability(unitID)
+	local udid = spGetUnitDefID(unitID)
+	local moveID = UnitDefs[udid].moveData.id
+	local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
+	for queue, location in pairs(myQueue) do
+		local x, y, z = location.x, location.y, location.z
+		local reach = true --Note: first assume Spring.RequestPath() always broke and target always reachable
+		local path
+		if moveID then --Note: crane/air-constructor do not have moveID!
+			path = Spring.RequestPath( moveID,ux,uy,uz,x,y,z, 128)
+		end
+		if path then --unknown why sometimes NIL
+			reach = false --Note: assume non-reachable until waypoint tell otherwise
+			local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box but high chance to hit 128x128 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
+			local finalCoord = waypoint[#waypoint]
+			if finalCoord then --unknown why sometimes NIL
+				local dx, dz = finalCoord[1]-x, finalCoord[3]-z
+				if dx*dx + dz*dz < 128*128 then --is within 128 radius?
+					reach = true
+				end
+			end
+			--[[ --step-by-step detailed path check: WARNING!: lag prone if path too long and unreachable.
+			local dx,dy,dz = x-ux, y-uy, z-uz
+			local distance = math.sqrt(dx*dx + dy*dy + dz*dz)
+			local exageratedYetReasonableDistance = math.sqrt(distance*distance+distance*distance)
+			local walkedDistance = 0
+			local nx,ny,nz = ux, uy, uz
+			while (not ( walkedDistance>=exageratedYetReasonableDistance or reach )) do
+				local nx1,ny1,nz1 = path:Next(nx,ny,nz)
+				dx,dy,dz = abs(nx1-nx),abs(ny1-ny),abs(nz1-nz)
+				walkedDistance =walkedDistance + dx + dy + dz --Note: is rough estimate,not accurate because not calculate hypotenus
+				if nx1 and ny1 and nz1 then
+					if abs(nx1-x) <200 and abs(ny1-y)<200 and abs(nz1-z)<200 then
+						reach = true
+					end
+				end
+				nx,ny,nz = nx1,ny1,nz1
+			end
+			--]]
+		end
+		if not reach then
+			myQueueUnreachable[unitID][queue]=true
+		else
+			myQueueUnreachable[unitID][queue]=nil
+		end
+	end
+end
+
+-- This function check 1 build site whether it is accessible to all constructor. Reference: http://springrts.com/phpbb/viewtopic.php?t&t=22953&start=2
+function UpdateUnitsPathabilityForOneQueue(queueKey)
+	local location = myQueue[queueKey]
+	local x, y, z = location.x, location.y, location.z
+	for unitID, _ in pairs(myUnits) do
+		local udid = spGetUnitDefID(unitID)
+		local moveID = UnitDefs[udid].moveData.id
+		local reach = true --Note: first assume unit is flying and/or target always reachable
+		if moveID then --Note: crane/air-constructor do not have moveID!
+			local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
+			local result,finCoord = IsTargetReachable(moveID, ux,uy,uz,x,y,z,128)
+			if result == "outofreach" then --if result not reachable (and we'll have the closest coordinate), then:
+				result = IsTargetReachable(moveID, finCoord[1],finCoord[2],finCoord[3],x,y,z,8) --refine pathing
+				if result ~= "reach" then --if result still not reach, then:
+					reach = false --target is unreachable
+				end
+			else -- Spring.PathRequest() must be non-functional. (unsynced blocked?)
+			end
+			--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, may change in different version)
+		end
+		if not reach then
+			myQueueUnreachable[unitID][queueKey]=true
+		else
+			myQueueUnreachable[unitID][queueKey]=nil
+		end
+	end
+end
+
+--This function process result of Spring.PathRequest() to say whether target is reachable or not
+function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
+	local returnValue1,returnValue2
+	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
+	if path then
+		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
+		local finalCoord = waypoint[#waypoint]
+		if finalCoord then --unknown why sometimes NIL
+			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
+			local dist = math.sqrt(dx*dx + dz*dz)
+			if dist <= radius+10 then --is within radius?
+				returnValue1 = "reach"
+				returnValue2 = finalCoord
+			else
+				returnValue1 = "outofreach"
+				returnValue2 = finalCoord
+			end
+		end
+	else
+		returnValue1 = "noreturn"
+		returnValue2 = nil
+	end
+	return returnValue1,returnValue2
 end
 
 --	A compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue
 function CommandNotifyMex(id,params,options, isAreaMex)
 	local groundHeight = Spring.GetGroundHeight(params[1],params[3])
 	params[2] = math.max(0, groundHeight)
-	return widget:CommandNotify(id, params, options, true,isAreaMex)
+	local returnValue = widget:CommandNotify(id, params, options, true,isAreaMex)
+	return returnValue
 end
 
 --  If the command is issued to something in our group, flag it.
 --  Thanks to Niobium for pointing out CommandNotify().
 
 function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
+	if id < 0 and params[1]==nil and params[2]==nil and params[3]==nil then --CentralBuildAI can't handle unit-build command for factory for the moment (is buggy).
+		return
+	end
 	local selectedUnits = spGetSelectedUnits()
 	for _, unitID in pairs(selectedUnits) do	-- check selected units...
 		if ( myUnits[unitID] ) then	--  was issued to one of our units.
@@ -287,22 +412,17 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
 					local isOverlap = CleanOrders(myCmd) -- check if current queue overlap with existing queue, and clear up any invalid queue 
 					if not isOverlap then
-						if not params[3] then
-							-- Spring.Echo(CMD[id])
-							-- Spring.Echo(id)
-							-- Spring.Echo("A")
-							--Unknown build command that has nil parameter 
-						else
-							local hash = hash(myCmd)
-							--[[
-							if ( myQueue[hash] ) then	-- if dupe of existing order
-								myQueue[hash] = nil		-- must want to cancel
-							else						-- if not a dupe
-								myQueue[hash] = myCmd	-- add to CB queue
-							end
-							--]]
+						local hash = hash(myCmd)
+						--[[ crude delete-duplicate-command code. Now is handled by CleanOrder():
+						if ( myQueue[hash] ) then	-- if dupe of existing order
+							myQueue[hash] = nil		-- must want to cancel
+						else						-- if not a dupe
 							myQueue[hash] = myCmd	-- add to CB queue
+							UpdateUnitsPathabilityForOneQueue(hash)
 						end
+						--]]
+						myQueue[hash] = myCmd	-- add to CB queue
+						UpdateUnitsPathabilityForOneQueue(hash) --check if build site is reachable
 					end
 					nextFrame = spGetGameFrame() + 30 --wait 1 more second before distribute work, so user can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
@@ -313,17 +433,11 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					-- do NOT return here because there may be more units.  Let Spring handle.
 				end
 			else
-				if ( id < 0 ) and ( not isAreaMex ) then --direct command of building stuff
+				if ( id < 0 ) and (not isAreaMex ) then --is building stuff & is direct command/not an area mex command
 					local x, y, z, h = params[1], params[2], params[3], params[4]
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
-					if not params[3] then
-						-- Spring.Echo(CMD[id])
-						-- Spring.Echo(id)
-						-- Spring.Echo("B")
-					else
-						local hash = hash(myCmd)
-						myUnits[unitID] = hash --remember what command this unit is having
-					end
+					local hash = hash(myCmd)
+					myUnits[unitID] = hash --remember what command this unit is having
 				else
 					myUnits[unitID] = "busy"	-- direct command of something else.
 				end
@@ -383,37 +497,43 @@ end
 --  One at a time, assign idle builders new tasks.
 
 function FindIdleUnits(myUnits, thisFrame)
-	for unitID,myCmd in pairs(myUnits) do --check if unit really idle because UnitIdle() can be triggered by other widget and overriden with new command afterward (ie: cmd_mex_placement.lua, area mex widget)
+	local idle_myUnits = {}
+	local idle_assigned = {}
+	local numberOfIdle = 0
+	for unitID,myCmd in pairs(myUnits) do --check if unit really idle or is actually busy, because UnitIdle() can be triggered by other widget and is overriden with new command afterward, thus making unit look idle but is busy (ie: cmd_mex_placement.lua, area mex widget)
 		if myCmd == "idle" then --if unit is marked as idle, then double check it
 			local cmd1 = GetFirstCommand(unitID)
 			if ( cmd1 ) then
-				if ( cmd1.id < 0 ) then
-					local unitCmd = {id=cmd1.id,x=cmd1.params[1],y=cmd1.params[2],z=cmd1.params[3],h=cmd1.params[4]}
-					if not cmd1.params[3] then
-						-- Spring.Echo(CMD[cmd1.id])
-						-- Spring.Echo(cmd1.id)
-						-- Spring.Echo("C")
-						--Unknown build command that has nil parameter 
-					else
+				if ( cmd1.id < 0 ) then --is build (any) stuff
+					if ( cmd1.params[3] ) then --is not build unit command (build unit command has nil parameter (only for factory))
+						local unitCmd = {id=cmd1.id,x=cmd1.params[1],y=cmd1.params[2],z=cmd1.params[3],h=cmd1.params[4]}
 						local hash = hash(unitCmd)
 						myUnits[unitID] = hash
 					end
 				else
 					myUnits[unitID] = 'busy'
 				end
+			else
+				if numberOfIdle <= 10 then
+					numberOfIdle = numberOfIdle +1
+					--NOTE: only allow up to 10 idler to be processed to prevent super lag.
+					--The amount of external loop will be (numberOfmyunit^2+numberOfQueue)*numberOfIdle^2.
+					--ie: if all variable were 50, then the amount of loop in total is 6375000 loop (6 million).
+					idle_myUnits[numberOfIdle] = unitID
+				end
 			end
 		end
 	end
 
 	--HOW THIS WORK:
-	--*loopA for all CBA unit,
-	--	*loopB for all CBA unit,
-	--		*for each CBA unit: find nearest job (FOR_cba)
+	--*loopA for all idle CBA unit,
+	--	*loopB for all idle CBA unit,
+	--		*for each idle CBA unit: find nearest job (forA)
 	--			>check nearest job for assisting other working constructor
 	--			>check nearest job for building-stuff that not yet done by any working constructor
 	--			>check whether assisting or construction is nearest
-	--		*FOR_cba return nearest job for each CBA unit
-	--	*loopB return all nearest jobs for all CBA units
+	--		*forA return nearest job for each idle CBA unit
+	--	*loopB return all nearest jobs for all idle CBA units
 	--	>check how many constructor has job order
 	--	>check which constructor is most nearest to its job
 	--	>register that constructor as working constructor
@@ -422,15 +542,16 @@ function FindIdleUnits(myUnits, thisFrame)
 	CleanOrders()	-- check build site for blockage. In case something's changed since last we checked.
 	local orderArray={}
 	local unitArray={}
-	for _,_ in pairs(myUnits) do
+	for i=1,numberOfIdle do
 		local nearestOrders = {}
-		for unitID,myCmd in pairs(myUnits) do
+		for i=1,numberOfIdle do
 			--[[
 			local cmd1 = GetFirstCommand(unitID)
 			if ( cmd1 == nil ) then		-- no orders?  Must be idle.
 				myUnits[unitID] = "idle"
 			--]]
-			if myCmd == "idle" then --if unit is marked as idle, then use it.
+			local unitID = idle_myUnits[i] --if unit is marked as idle, then use it.
+			if (not idle_assigned[unitID] ) then --unit not yet assigned in previous iteration? find work
 				local tmp = GetWorkFor(unitID)
 				if ( tmp ~= nil ) then
 					table.insert( nearestOrders, tmp )	-- indexed okay here
@@ -449,15 +570,17 @@ function FindIdleUnits(myUnits, thisFrame)
 			end
 		end
 		--spGiveOrderToUnit( close[1], close[2], close[3], { "" } )
-		unitArray[#unitArray+1]=close[1]
+		local assignUnitID = close[1]
+		unitArray[#unitArray+1]= assignUnitID
 		orderArray[#orderArray+1]={close[2], close[3], { "" }}
-		if ( close[5] == 0 ) then
-			myUnits[close[1]] = "asst "..unpack(close[3])	--  unitID we're assisting
+		if ( close[5] == 0 ) then --if GUARD command: then,
+			myUnits[assignUnitID] = "asst "..unpack(close[3])	--  unitID we're assisting
 			--Echo(close[3])
-		else
-			myUnits[close[1]] = close[5]	--  hash of command we're executing
+		else --if regular assisting: then,
+			myUnits[assignUnitID] = close[5]	--  hash of command we're executing
 			--Echo(close[5])
 		end
+		idle_assigned[assignUnitID] = true
 	end
 	if #orderArray > 0 then --we should not give empty command else it will delete all unit's existing queue
 		Spring.GiveOrderArrayToUnitArray (unitArray,orderArray, true) --send command to bulk of constructor
@@ -510,13 +633,16 @@ function CleanOrders(newCmd)
 	for key,myCmd in pairs(myQueue) do
 		local cmdID = abs( myCmd.id )
 		local x, y, z, facing = myCmd.x, myCmd.y, myCmd.z, myCmd.h
-		
 		local canBuildThisThere,featureID = spTestBuildOrder(cmdID,x,y,z,facing) --check if build site is blocked by buildings & terrain
+		
+		--for prevent build on ally feature
 		if ( checkFeatures ) and ( featureID ) then --check if build site is blocked by feature
 			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't reclaim or build there. (ie: dragon-teeth's wall)
 				canBuildThisThere = 0
 			end
 		end
+		--end feature check
+		
 		if newCmd and xSize and (canBuildThisThere >= 1) then --check if build site overlap new queue
 			if facing == 0 or facing == 2 then --check the size of the queued building
 				xSize_queue = UnitDefs[cmdID].xsize*4
@@ -531,8 +657,17 @@ function CleanOrders(newCmd)
 				minTolerance = zSize_queue + zSize --check minimum tolerance in z direction
 				axisDist = abs (z - z_newCmd) -- check actual separation in z direction
 				if axisDist < minTolerance then --if too close in z direction
-					canBuildThisThere = 0 --remove queue
-					isOverlap = true
+					canBuildThisThere = 0 --flag this queue for removal
+					isOverlap = true --return true
+					
+					local unitArray = {}
+					for unitID, queueKey in pairs(myUnits) do
+						if queueKey == key then
+							unitArray[#unitArray+1] = unitID
+						end
+						myQueueUnreachable[unitID][key] = nil --clear the pathability table of this queue for all unit
+					end
+					Spring.GiveOrderToUnitArray (unitArray,CMD_STOP, {}, {}) --send STOP to units assigned to this queue. A scenario: user delete this queue thru overlap method and it stop any unit trying to build this queue
 				end
 			end
 		end
@@ -557,51 +692,60 @@ function GetWorkFor(unitID)
 		if ( busyUnitID ~= unitID ) then --if not observing ourself
 			local cmd1 = GetFirstCommand(busyUnitID)
 			local myCmd = myQueue[busyCmd1]
-			if ( myCmd ) then --when busy unit has CentralBuild command
+			if ( myCmd ) then --when busy unit has CentralBuild command (is using SHIFT)
 				local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
 				if ( cmd  and cmd < 0 ) then
 					local x2, y2, z2 = spGetUnitPosition( busyUnitID)	-- location of busy unit
 					local numOfAssistant = 0.0
 					for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
-						local prefix = assistantCmd1:sub(1,4)
-						if prefix ~= "asst" then
-							if (assistantCmd1 == busyCmd1) then
-								numOfAssistant = numOfAssistant + 0.1
-							end
-						else
-							-- assistantCmd1:sub(1,5) == "asst "
-							local assisting = tonumber(assistantCmd1:sub(6))
-							if (assisting == busyUnitID) then
-								numOfAssistant = numOfAssistant + 0.1
+						if ( busyUnitID ~= assistantUnitID ) then --if busyUnit not observing itself
+							local prefix = assistantCmd1:sub(1,4)
+							if prefix ~= "asst" then
+								if (assistantCmd1 == busyCmd1) then
+									numOfAssistant = numOfAssistant + 0.11
+								end
+							else
+								-- assistantCmd1:sub(1,5) == "asst "
+								local assisting = tonumber(assistantCmd1:sub(6))
+								if (assisting == busyUnitID) then
+									numOfAssistant = numOfAssistant + 0.11
+								end
 							end
 						end
 					end
-					local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2 --distance between busy unit & self,and btwn structure & self, and between structure & busy unit.
-					dist = dist + dist*numOfAssistant
+					local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2 --distance btwn busy unit & self,and btwn structure & self, and btwn structure & busy unit. A distance that is no less than btwn structure & busy unit but is 1.5 when opposite to the structure & the busy unit OR when is further away than btwn structure & busy unit
+					local notaccessible = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][busyCmd1] --check if unit can reach this location
+					dist = dist + ((notaccessible and 9000) or 0) --increase perceived distance arbitrarity if cannot reach
+					--local dist = Distance(ux,uz,x,z) --distance btwn structure & self
+					dist = dist + dist*numOfAssistant --make the distance look further away than it actually is if there's too many assistance
 					if ( dist < busyDist ) then
 						busyClosestID = busyUnitID	-- busy unit who needs help
 						busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
 					end
 				end
-			elseif ( cmd1 and cmd1.id < 0) then --when busy unit is currently building a structure
+			elseif ( cmd1 and cmd1.id < 0) then --when busy unit is currently building a structure, is "busy" and not using SHIFT
 				local x2, y2, z2 = spGetUnitPosition(busyUnitID)	-- location of busy unit
+				--local x, z = cmd1.params[1], cmd1.params[3]
 				local numOfAssistant = 0.0
 				for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
-					local prefix = assistantCmd1:sub(1,4)
-					if prefix ~= "asst" then
-						local cmd2 = GetFirstCommand(assistantUnitID)
-						if (cmd2 and (cmd2 == cmd1)) then
-							numOfAssistant = numOfAssistant + 0.1
-						end
-					else
-						-- assistantCmd1:sub(1,5) == "asst "
-						local assisting = tonumber(assistantCmd1:sub(6))
-						if (assisting == busyUnitID) then
-							numOfAssistant = numOfAssistant + 0.1
+					if ( busyUnitID ~= assistantUnitID ) then --if busyUnit not observing itself
+						local prefix = assistantCmd1:sub(1,4)
+						if prefix ~= "asst" then
+							local cmd2 = GetFirstCommand(assistantUnitID) --check using unit's command queue when we dont have its command stored
+							if (cmd2 and (cmd2 == cmd1)) then
+								numOfAssistant = numOfAssistant + 0.11
+							end
+						else
+							-- assistantCmd1:sub(1,5) == "asst "
+							local assisting = tonumber(assistantCmd1:sub(6))
+							if (assisting == busyUnitID) then
+								numOfAssistant = numOfAssistant + 0.11
+							end
 						end
 					end
 				end
 				local dist = Distance(ux,uz,x2,z2) * 1.5 --distance between busy unit & self
+				--local dist = Distance(ux,uz,x,z) --distance btwn structure & self
 				dist = dist + dist*numOfAssistant
 				if ( dist < busyDist ) then
 					busyClosestID = busyUnitID	-- busy unit who needs help
@@ -628,7 +772,9 @@ function GetWorkFor(unitID)
 			for _, options in ipairs(ud.buildOptions) do
 				if ( options == acmd ) then canBuild = true break end	-- only one to find.
 			end
-			local dist = Distance(ux,uz,x,z)
+			local dist = Distance(ux,uz,x,z) --distance btwn current unit & project to be started
+			local notaccessible = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][index] --check if unit can reach this location
+			dist = dist + ((notaccessible and 9000) or 0) --increase perceived distance arbitrarity if cannot reach
 			if ( dist < queueDist and canBuild ) then
 				queueClose = index	-- # of the project we'll be starting
 				queueDist = dist
@@ -712,6 +858,7 @@ function UnitGoByeBye(unitID)
 				myUnits[unit2] = "idle"
 			end
 		end
+		myQueueUnreachable[unitID] = nil --clear unit's accessibility list
 	end
 		
 end

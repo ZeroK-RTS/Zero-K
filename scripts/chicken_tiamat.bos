@@ -7,7 +7,7 @@ static-var bMoving, gun_1;
 // Signal definitions
 #define SIG_AIM				2
 #define SIG_AIM_2			4
-#define SIG_MOVE			16
+#define SIG_MOVE			8
 	
 #include "constants.h"
 
@@ -18,8 +18,8 @@ lua_FlameShot(weapon) //flame effect?
 
 walk()
 {		
-	if (bMoving)
-			{
+	while (bMoving)
+		{
 //			bMoving = FALSE;
 			turn lthighf to x-axis <70> speed<115>;
 			turn lkneef to x-axis <-40> speed<145>;
@@ -134,8 +134,7 @@ walk()
 			wait-for-turn rshinf around x-axis;
 			
 //			bMoving = FALSE;
-			start-script walk();
-			}
+		}
 }
 
 stopwalk ()
@@ -160,12 +159,16 @@ stopwalk ()
 
 StartMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = TRUE;
 	start-script walk();
 }
 
 StopMoving()
 {
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
 	bMoving = FALSE;
 	start-script stopwalk();
 }

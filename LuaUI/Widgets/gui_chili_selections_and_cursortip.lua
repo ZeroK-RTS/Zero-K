@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.074 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.078 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02",
+    date      = "2009-06-02", --15 April 2013 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -117,7 +117,6 @@ local tweakShow = false
 local window_height = 130
 local real_window_corner
 local window_corner
-local numSelectedUnits = 0
 local selectedUnitsByDefCounts = {}
 local selectedUnitsByDef = {}
 local selectedUnits = {}
@@ -156,6 +155,7 @@ local terraTips = {}
 
 local selectedUnits = {}
 local numSelectedUnits = 0
+local maxPicFit = 12
 
 local gi_count = 0
 local gi_cost = 0
@@ -240,6 +240,7 @@ options = {
 		name = "Show Drawing Tools When Drawing",
 		type = 'bool',
 		value = true,
+		path = 'Settings/Interface/Mouse Cursor',
 		desc = 'Show pencil or eraser when drawing or erasing.',
 		OnChange = function(self)
 			widget:UpdateCallIns(self.value)
@@ -269,7 +270,7 @@ options = {
 		path = selPath,
 	},
 	manualWeaponReloadBar = {
-		name="Show Unit's Reload Bar",
+		name="Show Unit's DGun Status",
 		type='bool',
 		value= true,
 		desc = "Show reload progress for weapon that use manual trigger. *Only applies for ungrouped unit selection*",
@@ -421,6 +422,24 @@ function widget:UpdateCallIns(enable)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--get reload status for selected weapon
+local function GetWeaponReloadStatus(unitID, weapNum)
+	local unitDefID = spGetUnitDefID(unitID)
+	local unitDef = UnitDefs[unitDefID]
+	local weaponNoX = (unitDef.weapons[weapNum]) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
+		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
+		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum) --select weapon no.X
+		local currentFrame, _ = spGetGameFrame() 
+		local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
+		local reloadFraction =1 - remainingTime/reloadTime
+		return reloadFraction, remainingTime
+	end
+	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- group selection
 
 --updates cost, HP, and resourcing info for group info
@@ -527,13 +546,26 @@ local function WriteGroupInfo()
 	if gi_label then
 		window_corner:RemoveChild(gi_label)
 	end
+	local dgunStatus = ''
+	if stt_unitID and numSelectedUnits == 1 and options.manualWeaponReloadBar.value then
+		local reloadFraction, remainingTime = GetWeaponReloadStatus(stt_unitID,3)  --select weapon no.3 (slot 3 is by ZK convention is usually used for user controlled weapon)
+		if reloadFraction then
+			if reloadFraction < 0.99 then
+				remainingTime = math.floor(remainingTime)
+				dgunStatus = "\nDGun\255\255\90\90 Reloading\255\255\255\255(" .. remainingTime .. "s)"  --red and white
+			else
+				dgunStatus = "\nDGun\255\90\255\90 Ready\255\255\255\255"
+			end
+		end
+	end
+	local metal = (tonumber(gi_metalincome)>0 or tonumber(gi_metaldrain)>0) and ("\nMetal \255\0\255\0+" .. gi_metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  gi_metaldrain  .. "\255\255\255\255") or '' --have metal or ''
+	local energy = (tonumber(gi_energyincome)>0 or tonumber(gi_energydrain)>0) and ("\nEnergy \255\0\255\0+" .. gi_energyincome .. "\255\255\255\255 / \255\255\0\0-" .. gi_energydrain .. "\255\255\255\255") or '' --have energy or ''
+	local buildpower = (tonumber(gi_totalbp)>0) and ("\nBuild Power " .. gi_usedbp .. " / " ..  gi_totalbp) or ''  --have buildpower or ''
 	gi_str = 
-		"Selected Units " .. gi_count .. "\n" ..
-		"Health " .. gi_hp .. " / " ..  gi_maxhp  .. "\n" ..
-		"Cost " .. gi_cost .. " / " ..  gi_finishedcost .. "\n" ..
-		"Metal \255\0\255\0+" .. gi_metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  gi_metaldrain  .. "\255\255\255\255\n" ..
-		"Energy \255\0\255\0+" .. gi_energyincome .. "\255\255\255\255 / \255\255\0\0-" .. gi_energydrain .. "\255\255\255\255\n" ..
-		"Build Power " .. gi_usedbp .. " / " ..  gi_totalbp 
+		"Selected Units " .. gi_count ..
+		"\nHealth " .. gi_hp .. " / " ..  gi_maxhp ..
+		"\nCost " .. gi_cost .. " / " ..  gi_finishedcost ..
+		metal .. energy ..	buildpower .. dgunStatus
 		
 	gi_label = Label:New{
 		parent = window_corner;
@@ -696,6 +728,7 @@ end
 local function MakeUnitGroupSelectionToolTip()
 	window_corner:ClearChildren();
 	
+	--IDEA: add scrollpanel as parent to barGrid (like playerlist)? but IMO selection bar is a reflex UI and thus only need only visible element and not hidden rows. 
 	local barGrid = LayoutPanel:New{
 		name     = 'Bars';
 		resizeItems = false;
@@ -704,18 +737,45 @@ local function MakeUnitGroupSelectionToolTip()
 		height  = "100%";
 		x=0,
 		--width   = "100%";
-		right=options.showgroupinfo.value and 120 or 0,
+		right=options.showgroupinfo.value and 120 or 0, --expand to right
 		--columns = 5;
 		itemPadding = {0,0,0,0};
 		itemMargin  = {0,0,2,2};
-		tooltip = "Left Click: Just select clicked unit(s)\nRight Click: Deselect unit(s)";
+		tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
 	}
+	do --check how many picture can fit into the selection grid (estimated!)
+		local maxRight, maxBottom = barGrid:GetMinimumExtents()
+		maxRight = maxRight - (options.showgroupinfo.value and 120 or 0)
+		local horizontalFit = maxRight/50
+		local verticalFit = maxBottom/50
+		maxPicFit = horizontalFit*verticalFit --Note: maxPicFit not need to round to nearest integer.
+	end
 	--if check is done in target function
 	--if options.showgroupinfo.value then
 		WriteGroupInfo()
 	--end
 
-	if ((numSelectedUnits<8) and (not options.groupalways.value)) then
+	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
+	do --add a button that allow you to change alwaysgroup value on the interface directly
+		local gi_groupingbutton = Button:New{
+			parent = window_corner;
+			bottom= 1,
+			right = 110,
+			minHeight = 30,
+			width = 30,
+			backgroundColor = {0,0,0,0.1},
+			fontSize = 12,
+			caption = pictureWithinCapacity and (options.groupalways.value and "[...]" or "...") or "[xxx]", 
+			OnMouseUp = {pictureWithinCapacity and function(self) 
+				options.groupalways.value = not options.groupalways.value
+				local selUnits = spGetSelectedUnits()
+				widget:SelectionChanged(selUnits) --this will recreate all buttons
+				end or function() end},
+			textColor = {1,1,1,0.75}, 
+			tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit group based on type" or "Unit not grouped") or "Bar is full, unit group based on type",
+		}
+	end
+	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
 			local unitid = selectedUnits[i]
 			local defid  = spGetUnitDefID(unitid)
@@ -743,7 +803,7 @@ local function UpdateSelectedUnitsTooltip()
 	if (numSelectedUnits>1) then
 			local barsContainer = window_corner.childrenByName['Bars']
 
-			if ((numSelectedUnits<8) and (not options.groupalways.value)) then
+			if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
 				for i=1,numSelectedUnits do
 					local unitid = selectedUnits[i]
 					--Spring.Echo(unitid)
@@ -758,16 +818,9 @@ local function UpdateSelectedUnitsTooltip()
 					
 					--RELOAD_BAR: start-- , by msafwan. Function: show tiny reload bar for clickable weapon in unit selection list
 					if options.manualWeaponReloadBar.value then
-						local unitDefID = spGetUnitDefID(unitid)
-						local unitDef = UnitDefs[unitDefID]
-						local weaponNo3 = (unitDef.weapons[3]) --select weapon no.3 (slot 3 usually used for user controlled weapon)
-						if (weaponNo3 ~= nil) and WeaponDefs[weaponNo3.weaponDef].manualFire then
-							local reloadTime = WeaponDefs[weaponNo3.weaponDef].reload
-							local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitid, 2) --select weapon no.3, but we use 2 because somehow table start at 0. eg: 0,1,2, Also in: cmd_dynamic_avoidance.lua
-							local currentFrame, _ = spGetGameFrame() 
-							local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
+						local reloadFraction,remainingTime = GetWeaponReloadStatus(unitid, 3)
+						if reloadFraction then
 							local reloadMiniBar = unitIcon.childrenByName['reloadMiniBar']
-							local reloadFraction =1 - remainingTime/reloadTime
 							if reloadMiniBar and reloadFraction < 0.99 then --update value IF already have the miniBar & is reloading weapon
 								reloadMiniBar:SetValue(reloadFraction)
 								miniReloadBarPresent = true
@@ -1090,8 +1143,15 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 				energy = energy + tonumber(s)
 			end 
 		end 
-		
 	end
+	
+	--Skip metal/energy rendering for unit selection bar when unit has no metal and energy
+	if tooltip_type == 'selunit' and metal==0 and energy==0 then
+		if globalitems['resources_selunit'] then
+			globalitems['resources_selunit'] = nil
+		end
+		return
+	end	
 	
 	if tooltip_type == 'feature' or tooltip_type == 'corpse' then
 		color_m = {1,1,1,1}
@@ -1263,7 +1323,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 		local empty = false
 		
 		if item.directcontrol then
-			local directitem = globalitems[item.directcontrol]
+			local directitem = globalitems[item.directcontrol] --copy new chili element from this global table (is updated everywhere around this widget)
 			stack_children[#stack_children+1] = directitem
 
 		elseif item.text or item.icon then
@@ -1613,7 +1673,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	local iconPath		= GetUnitIcon(stt_ud)
 	
-	UpdateResourceStack( 'selunit', unitID, stt_ud, tooltip )
+	UpdateResourceStack( 'selunit', unitID, stt_ud, tooltip)
 	
 	
 	
@@ -2038,7 +2098,7 @@ function widget:Update(dt)
 	
 	timer = timer + dt
 	if timer >= updateFrequency  then
-		UpdateSelectedUnitsTooltip()
+		UpdateSelectedUnitsTooltip() --this has numSelectedUnits check. Will only run with numSelectedUnits > 1
 		UpdateDynamicGroupInfo()
 		WriteGroupInfo()
 		
@@ -2046,7 +2106,7 @@ function widget:Update(dt)
 		if stt_unitID then
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
-			UpdateResourceStack( 'selunit', stt_unitID, stt_ud, tooltip )
+			UpdateResourceStack( 'selunit', stt_unitID, stt_ud, tooltip)
 			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
@@ -2069,7 +2129,7 @@ function widget:Update(dt)
 	--UNIT.STATUS start (by msafwan), function: add/show units task whenever individual pic is shown.
 	timer2 = timer2 + dt
 	if timer2 >= updateFrequency2  then
-		if options.unitCommand.value == true and ((numSelectedUnits<8) and (not options.groupalways.value)) then
+		if options.unitCommand.value == true and ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
 			for i=1,numSelectedUnits do --//iterate over all selected unit *this variable is updated by 'widget:SelectionChanged()'
 				local unitID = selectedUnits[i]
 				local barGridItem = nil
@@ -2110,14 +2170,14 @@ function widget:Update(dt)
 													{{35171},"Teleport",{0,0.6,0.6,1}},
 												}										
 							for i=1, #commandList, 1 do --iterate over the commandList so we could find a match with unit's current command.
-								if #commandList[i][1] == 1 then
+								if #commandList[i][1] == 1 then --if commandList don't have sub-table at first row
 									if commandList[i][1][1] == commandID then
 										commandName = commandList[i][2]
 										color = commandList[i][3]
 										break
 									end
 								else
-									if commandList[i][1][1] == commandID or commandList[i][1][2] == commandID then
+									if commandList[i][1][1] == commandID or commandList[i][1][2] == commandID then --if commandList has sub-table with 2 content at first row
 										commandName = commandList[i][2]
 										color = commandList[i][3]
 										break
@@ -2190,6 +2250,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	
+	widget:UpdateCallIns(options.showDrawTools.value)
 	
 	SetupTerraTips()
 	
@@ -2370,7 +2432,7 @@ function widget:SelectionChanged(newSelection)
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
 			
-			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1], tooltip)
+			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1], tooltip) --healthbar/resource consumption/ect chili element
 			if cur1 then
 				window_corner:ClearChildren()
 				window_corner:AddChild(cur1)
@@ -2384,7 +2446,7 @@ function widget:SelectionChanged(newSelection)
 	else
 		stt_unitID = nil
 		window_corner:ClearChildren()
-        screen0:RemoveChild(real_window_corner)
+		screen0:RemoveChild(real_window_corner)
 	end
 end
 --------------------------------------------------------------------------------

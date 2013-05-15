@@ -51,6 +51,7 @@ local airpadNames = {
 }
 
 local bomberDefs = {}
+local boolBomberDefs = {}
 local airpadDefs = {}
 
 for name, data in pairs(bomberNames) do
@@ -63,6 +64,7 @@ end
 for i=1,#UnitDefs do
   if UnitDefs[i].canFly then
     bomberDefs[i] = {}
+	boolBomberDefs[i] = true
   end
 end
 
@@ -425,6 +427,14 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		return true, true	-- command used, remove
 	end
 	return false -- command not used
+end
+
+function gadget:AllowCommand_GetWantedCommand()
+	return true
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+	return boolBomberDefs
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)

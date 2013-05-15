@@ -33,6 +33,7 @@ smokePiece = {lowerhull, radarbase, upperhull}
 
 local SIG_RESTORE = 1
 local SIG_MOVE = 2
+local SIG_Aim = 4
 
 local RESTORE_DELAY = 5000
 
@@ -84,7 +85,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal(SIG_Move)
+	Signal(SIG_MOVE)
 end
 
 function script.AimWeapon(num, heading, pitch)

@@ -88,19 +88,19 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if isWind then
 		if  severity <= 0.25  then
-			Explode(base, sfxFire)
-			Explode(fan, sfxSmoke)
-			Explode(cradle, sfxFire)
+			Explode(base, sfxShatter)
+			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
+			Explode(base, sfxShatter)
 			return 1
 		elseif severity <= 0.5  then
-			Explode(base, sfxSmoke)
+			Explode(base, sfxShatter)
 			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
-			Explode(cradle, sfxSmoke)
+			Explode(cradle, sfxShatter)
 			return 1
 		else
 			Explode(base, sfxShatter)
-			Explode(fan, sfxShatter)
-			Explode(cradle, sfxShatter)
+			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
+			Explode(cradle, sfxSmoke)
 			return 2
 		end
 	else

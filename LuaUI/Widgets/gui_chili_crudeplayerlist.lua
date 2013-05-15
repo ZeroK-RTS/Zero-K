@@ -66,6 +66,12 @@ end
 	
 local cf = IsFFA()
 
+if not WG.rzones then
+	WG.rzones = {
+		rZonePlaceMode = false
+	}
+end
+
 local x_icon_country	= 0
 local x_icon_rank		= x_icon_country + 20
 local x_icon_clan		= x_icon_rank + 16
@@ -216,9 +222,22 @@ end
 local function CfTooltip(allyTeam)
 	local tooltip = ''
 	
-	tooltip = tooltip .. 'Check this box to vote for a ceasefire with '.. yellow ..'<Team ' .. (allyTeam+1) .. '>'..white..'. '
-		..'If everyone votes Yes, an offer will be made. If there is a ceasefire, '
-		..'unchecking the box will break it.\n\n'
+	if Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
+		tooltip = tooltip .. green .. 'Ceasefire in effect.' .. white
+	else
+		local theyOffer = Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1
+		local youOffer = Spring.GetGameRulesParam('cf_offer_' .. allyTeam.. '_' .. localAlliance) == 1
+		if theyOffer then
+			tooltip = tooltip .. yellow .. 'They have offered a ceasefire.' .. white
+		end
+		if youOffer then
+			tooltip = tooltip .. cyan .. 'Your team has offered a ceasefire.' .. white
+		end
+		
+		tooltip = tooltip .. red .. 'No ceasefire in effect.' .. white
+	end
+	
+	tooltip = tooltip .. '\n\n'
 	
 	tooltip = tooltip .. 'Your team\'s votes: \n'
 	local teamList = Spring.GetTeamList(localAlliance)
@@ -227,23 +246,14 @@ local function CfTooltip(allyTeam)
 		local name = Spring.GetPlayerInfo(playerID) or '-'
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
-		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote .. '\n'
+		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote ..'\n'
 	end
 	
-	if Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
-		tooltip = tooltip .. '\n\n' .. green .. 'Ceasefire in effect.' .. white
-	else
-		local theyOffer = Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1
-		local youOffer = Spring.GetGameRulesParam('cf_offer_' .. allyTeam.. '_' .. localAlliance) == 1
-		if theyOffer then
-			tooltip = tooltip .. '\n\n' .. yellow .. 'They have offered a ceasefire.' .. white
-		end
-		if youOffer then
-			tooltip = tooltip .. '\n\n' .. cyan .. 'Your team has offered a ceasefire.' .. white
-		end
-		
-		tooltip = tooltip .. '\n\n' .. red .. 'No ceasefire in effect.' .. white
-	end
+	tooltip = tooltip .. '\n'
+	
+	tooltip = tooltip .. 'Check this box to vote for a ceasefire with '.. yellow ..'<Team ' .. (allyTeam+1) .. '>'..white..'. \n\n'
+		..'If everyone votes Yes, an offer will be made. If there is a ceasefire, '
+		..'unchecking the box will break it.'
 	
 	return tooltip
 end
@@ -351,7 +361,7 @@ local function AddCfCheckbox(allyTeam)
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
 			tooltip = CfTooltip(allyTeam),
 			OnChange = { function(self)
-				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
+				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. ':' .. allyTeam)
 				self.tooltip = CfTooltip(allyTeam)
 			end },
 		}

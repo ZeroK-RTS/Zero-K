@@ -1139,7 +1139,8 @@ end
 function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
                                     cmdID, cmdParams, cmdOptions, cmdTag, synced)
   for _,g in ipairs(self.AllowCommandList) do
-    if (not g:AllowCommand(unitID, unitDefID, unitTeam,
+
+	if (not g:AllowCommand(unitID, unitDefID, unitTeam,
                            cmdID, cmdParams, cmdOptions, cmdTag, synced)) then
       return false
     end
@@ -1357,15 +1358,29 @@ end
 
 
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID,
-                                   attackerID, attackerDefID, attackerTeam)
+                                   damage, paralyzer, weaponDefID,
+								   a, b, c, d)
+  local projectileID,attackerID
+  local attackerDefID,attackerTeam
+  if Game.version:find('91.0') then 
+	attackerID = a 
+    attackerDefID = b
+    attackerTeam = c
+  else
+    projectileID = a
+    attackerID = b
+    attackerDefID = c
+    attackerTeam = d
+  end
+  
   local rDam = damage
   local rImp = 1.0
 
   for _,g in ipairs(self.UnitPreDamagedList) do
     dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
-                  rDam, paralyzer, weaponID,
-                  attackerID, attackerDefID, attackerTeam)
+                  rDam, paralyzer, weaponDefID,
+                  attackerID, attackerDefID, attackerTeam,
+				  projectileID)
     if (dam ~= nil) then
       rDam = dam
     end
@@ -1895,33 +1910,27 @@ function gadgetHandler:RegisterCMDID(gadget, id)
   self.CMDIDs[id] = gadget
 end
 
-function gadgetHandler:AllowResourceTransfer(oldTeam, newTeam, type, amount)	-- ours
---function gadgetHandler:AllowResourceTransfer(teamID, res, level)	-- base
-  for _,g in ipairs(self.AllowResourceTransferList) do
-    if (not g:AllowResourceTransfer(oldTeam, newTeam, type, amount)) then	-- ours
-	--if (not g:AllowResourceTransfer(teamID, res, level)) then	-- base
-      return false
-    end
-  end
-  return true
-end
+local AllowCommand_WantedCommand = {}
+local AllowCommand_WantedUnitDefID = {}
 
---function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)	-- ours
-function gadgetHandler:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)	-- base
-  for _,g in ipairs(self.CommandFallbackList) do
-  	--local used, remove = g:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)	-- ours
-    local used, remove = g:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)	-- base
-    if (used) then
-      return remove
-    end
-  end
-  return true  -- remove the command
-end
-
-function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions,fromSynced) 	-- ours
+function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced) 	-- ours
 --function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)	-- base
   for _,g in ipairs(self.AllowCommandList) do
-	if (not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, fromSynced)) then	-- ours
+	if not AllowCommand_WantedCommand[g] then
+		AllowCommand_WantedCommand[g] = g:AllowCommand_GetWantedCommand()
+	end
+	if not AllowCommand_WantedUnitDefID[g] then
+		AllowCommand_WantedUnitDefID[g] = g:AllowCommand_GetWantedUnitDefID()
+	end
+	local wantedCommand = AllowCommand_WantedCommand[g]
+	local wantedUnitDefID = AllowCommand_WantedUnitDefID[g]
+
+	--if g:GetBadCommand() then
+	--	Spring.Echo(g:GetBadCommand())
+	--end
+	if ((wantedCommand == true) or wantedCommand[cmdID]) and
+		((wantedUnitDefID == true) or wantedUnitDefID[unitDefID]) and
+		(not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)) then	-- ours
 	--if (not g:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)) then	-- base
       return false
     end

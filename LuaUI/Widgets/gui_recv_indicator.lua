@@ -1,4 +1,4 @@
-local versionName = "v1.293"
+local versionName = "v1.294"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -50,7 +50,6 @@ local glPolygonMode = gl.PolygonMode
 local glText = gl.Text
 --end----------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-local gaiaTeamID = Spring.GetGaiaTeamID()
 local myTeamID_gbl = -1 --//variable: myTeamID
 local receivedUnitList_gbl = {} --//variable: store unitID and its corresponding unitPosition
 local givenByTeamID_gbl = -1 --//variable: store sender's ID
@@ -284,9 +283,6 @@ end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
 	if iNotLagging then
-		if oldTeamID == gaiaTeamID then
-			return
-		end
 		if spValidUnitID(unitID) and unitTeamID == myTeamID_gbl then --if my unit
 			if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then --if from my ally, or from a captured enemy unit
 				--myTeamID_gbl = unitTeamID --//uncomment this and comment 'unitTeamID == myTeamID_gbl' (above) when testing
@@ -330,7 +326,7 @@ function widget:Initialize()
 			gameID_to_playerName[teamID+1] = aiName
 		elseif not isAI then
 			local playerName = Spring.GetPlayerInfo(playerID)
-			gameID_to_playerName[teamID+1] = playerName
+			gameID_to_playerName[teamID+1] = playerName or "Gaia"
 		end
 	end
 	
