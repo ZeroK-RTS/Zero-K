@@ -471,10 +471,10 @@ local function CfTooltip(allyTeam)
 		local theyOffer = Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1
 		local youOffer = Spring.GetGameRulesParam('cf_offer_' .. allyTeam.. '_' .. localAlliance) == 1
 		if theyOffer then
-			tooltip = tooltip .. yellow .. 'They have offered a ceasefire.' .. white
+			tooltip = tooltip .. yellow .. 'They have offered a ceasefire.' .. white .. '\n'
 		end
 		if youOffer then
-			tooltip = tooltip .. cyan .. 'Your team has offered a ceasefire.' .. white
+			tooltip = tooltip .. cyan .. 'Your team has offered a ceasefire.' .. white .. '\n'
 		end
 		
 		tooltip = tooltip .. red .. 'No ceasefire in effect.' .. white
@@ -1198,14 +1198,17 @@ SetupPlayerNames = function()
 	row = row + 1
 
 	-- add the team summaries
-	if options.showSummaries.value then
+	if cf then
+		AddAllAllyTeamSummaries(allyTeamsSorted)
+		row = row + 0.5
+	elseif options.showSummaries.value then
 		if amSpec then
 			if existsVeryBigTeam or numBigTeams > 2 then
 				AddAllAllyTeamSummaries(allyTeamsSorted)
 				row = row + 0.5
 			end
 		else
-			if myTeamIsVeryBig then
+			if myTeamIsVeryBig or cf then
 				AddAllAllyTeamSummaries({localTeam})
 				row = row + 0.5
 			end

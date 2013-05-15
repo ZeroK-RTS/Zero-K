@@ -228,10 +228,10 @@ local function CfTooltip(allyTeam)
 		local theyOffer = Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1
 		local youOffer = Spring.GetGameRulesParam('cf_offer_' .. allyTeam.. '_' .. localAlliance) == 1
 		if theyOffer then
-			tooltip = tooltip .. yellow .. 'They have offered a ceasefire.' .. white
+			tooltip = tooltip .. yellow .. 'They have offered a ceasefire.' .. white .. '\n'
 		end
 		if youOffer then
-			tooltip = tooltip .. cyan .. 'Your team has offered a ceasefire.' .. white
+			tooltip = tooltip .. cyan .. 'Your team has offered a ceasefire.' .. white .. '\n'
 		end
 		
 		tooltip = tooltip .. red .. 'No ceasefire in effect.' .. white
