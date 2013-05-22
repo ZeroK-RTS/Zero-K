@@ -24,6 +24,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local isOldSpring = 0 --//for backward compatibility with old weapon indice. Set to 1 for Spring less than 94.1+
 
 local barHeight = 3
 local barWidth  = 14  --// (barWidth)x2 total width!!!
@@ -753,10 +754,10 @@ do
 	  
       --// RELOAD
       if (ci.reloadTime>=options.minReloadTime.value) then
-        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,ci.primaryWeapon)
+        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,ci.primaryWeapon - isOldSpring)
         if (reloaded==false) then
 		  local slowState = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
-		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon , 'reloadTime')
+		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon - isOldSpring , 'reloadTime')
 		  ci.reloadTime = reloadTime
           reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
 		  if (reload >= 0) then
@@ -1082,7 +1083,7 @@ do
     blink = (sec%1)<0.5
 
     gameFrame = GetGameFrame()
-    visibleUnits = GetVisibleUnits(-1,nil,false) --this don't need any delayed update or caching since its already done in "LUAUI/cache.lua"
+    visibleUnits = GetVisibleUnits(-1,nil,false) --this don't need any delayed update or caching or optimization since its already done in "cawidgets.lua/cache.lua"
 
     sec2=sec2+dt
     if (sec2>1/3) then

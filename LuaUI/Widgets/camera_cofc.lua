@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.116 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-May-12
+    date      = "2011-03-16", --2013-May-17
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -1823,30 +1823,33 @@ local previousGroup =99
 local currentIteration = 1
 local previousKey = 99
 local previousTime = spGetTimer()
+local groupNumber = {
+	[KEYSYMS.N_1] = 1,
+	[KEYSYMS.N_2] = 2,
+	[KEYSYMS.N_3] = 3,
+	[KEYSYMS.N_4] = 4,
+	[KEYSYMS.N_5] = 5,
+	[KEYSYMS.N_6] = 6,
+	[KEYSYMS.N_7] = 7,
+	[KEYSYMS.N_8] = 8,
+	[KEYSYMS.N_9] = 9,
+}
 
 function GroupRecallFix(key, modifier, isRepeat)
 	if ( not modifier.ctrl and not modifier.alt and not modifier.meta) then --check key for group. Reference: unit_auto_group.lua by Licho
-		local gr
-		if (key == KEYSYMS.N_0) then gr = 0 
-		elseif (key == KEYSYMS.N_1) then gr = 1
-		elseif (key == KEYSYMS.N_2) then gr = 2 
-		elseif (key == KEYSYMS.N_3) then gr = 3
-		elseif (key == KEYSYMS.N_4) then gr = 4
-		elseif (key == KEYSYMS.N_5) then gr = 5
-		elseif (key == KEYSYMS.N_6) then gr = 6
-		elseif (key == KEYSYMS.N_7) then gr = 7
-		elseif (key == KEYSYMS.N_8) then gr = 8
-		elseif (key == KEYSYMS.N_9) then gr = 9
+		local group
+		if (key ~= nil and groupNumber[key]) then 
+			group = groupNumber[key]	
 		end
-		if (gr ~= nil) then
+		if (group ~= nil) then
 			local selectedUnit = spGetSelectedUnits()
-			local groupCount = spGetGroupList()
-			if groupCount[gr] ~= #selectedUnit then
+			local groupCount = spGetGroupList() --get list of group with number of units in them
+			if groupCount[group] ~= #selectedUnit then
 				return false
 			end
 			for i=1,#selectedUnit do
 				local unitGroup = spGetUnitGroup(selectedUnit[i])
-				if unitGroup~=gr then
+				if unitGroup~=group then
 					return false
 				end
 			end
@@ -1865,7 +1868,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 				end
 				selectedUnit = nil
 				local cluster, lonely = WG.recvIndicator.OPTICS_cluster(slctUnitUnordered, 600,2, Spring.GetMyTeamID(),300) --//find clusters with atleast 2 unit per cluster and with at least within 300-elmo from each other with 600-elmo detection range
-				if previousGroup == gr then
+				if previousGroup == group then
 					currentIteration = currentIteration +1
 					if currentIteration > (#cluster + #lonely) then
 						currentIteration = 1
@@ -1909,7 +1912,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 				meanZ = sumZ/unitCount
 				Spring.SetCameraTarget(meanX, meanY, meanZ,0.5) --is overriden by Spring.SetCameraTarget() at cache.lua.
 			end
-			previousGroup= gr
+			previousGroup= group
 			return true
 		end
 	end

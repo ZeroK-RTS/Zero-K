@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "EPIC Menu",
     desc      = "v1.315 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-05-12
+    date      = "2009-06-02", --2013-05-22
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -634,7 +634,8 @@ local function MakeFlags()
 	local flagChildren = {}
 	
 	flagChildren[#flagChildren + 1] = Label:New{ caption='Flag', align='center' }
-	flagChildren[#flagChildren + 1] = Button:New{ 
+	flagChildren[#flagChildren + 1] = Button:New{
+		name = 'flagButton';
 		caption = 'Auto', 
 		country = myCountry, 
 		countryLang = country_langs[myCountry] or 'en',
@@ -651,7 +652,8 @@ local function MakeFlags()
 		local countryLang = country_langs[country] or 'en'
 		flagCount = flagCount + 1
 		flagChildren[#flagChildren + 1] = Image:New{ file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. country ..'.png', }
-		flagChildren[#flagChildren + 1] = Button:New{ caption = country:upper(), 
+		flagChildren[#flagChildren + 1] = Button:New{ caption = country:upper(),
+			name = 'countryButton' .. country;
 			width='50%',
 			textColor = color.sub_button_fg,
 			backgroundColor = color.sub_button_bg,
@@ -686,7 +688,8 @@ local function MakeFlags()
 				}
 			},
 			--close button
-			Button:New{ caption = 'Close',  x=10, y=0-B_HEIGHT, bottom=5, right=5, 
+			Button:New{ caption = 'Close',  x=10, y=0-B_HEIGHT, bottom=5, right=5,
+				name = 'makeFlagCloseButton';
 				OnMouseUp = { function(self) window_flags:Dispose(); window_flags = nil; end },  
 				width=window_width-20, backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
 				},
@@ -718,7 +721,9 @@ local function MakeHelp(caption, text)
 				}
 			},
 			--Close button
-			Button:New{ caption = 'Close', OnMouseUp = { function(self) self.parent:Dispose() end }, x=10, bottom=1, right=50, height=B_HEIGHT, backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg, },
+			Button:New{ caption = 'Close', OnMouseUp = { function(self) self.parent:Dispose() end }, x=10, bottom=1, right=50, height=B_HEIGHT,
+			name = 'makeHelpCloseButton';
+			backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg, },
 		}
 	}
 end
@@ -1430,6 +1435,7 @@ local function MakeHotkeyedControl(control, path, option)
 	control:DetectRelativeBounds()
 	
 	local hkbutton = Button:New{
+		name = option.wname .. ' hotKeyButton';
 		minHeight = 30,
 		--right=0, --Note: uncommenting this entry cause hotkey-button's position to overlap with control-button's position. It happen after Chili merge/update (???)
 		width = hklength,
@@ -1538,6 +1544,7 @@ MakeSubWindow = function(path)
 			
 			if not hide then
 				local button = Button:New{
+					name = option.wname .. " " .. option.name;
 					x=0,
 					--right = 30,
 					minHeight = 30,
@@ -1556,6 +1563,7 @@ MakeSubWindow = function(path)
 		elseif option.type == 'text' then	
 			tree_children[#tree_children+1] = 
 				Button:New{
+					name = option.wname .. " " .. option.name;
 					width = "100%",
 					minHeight = 30,
 					caption = option.name, 
@@ -1605,6 +1613,7 @@ MakeSubWindow = function(path)
 				local item = option.items[i]
 				settings_height = settings_height + B_HEIGHT
 				tree_children[#tree_children+1] = Button:New{
+						name = option.wname .. " " .. item.name;
 						width = "100%",
 						caption = item.name, 
 						OnMouseUp = { function(self) option.OnChange(item.key) end },
@@ -1690,18 +1699,18 @@ MakeSubWindow = function(path)
 	local backButton 
 	--back button
 	if parent_path then
-		window_children[#window_children+1] = Button:New{ caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
+		window_children[#window_children+1] = Button:New{ name= 'backButton', caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
 			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
 	end
 	
 	
 	--reset button
-	window_children[#window_children+1] = Button:New{ caption = 'Reset', OnMouseUp = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
+	window_children[#window_children+1] = Button:New{ name= 'resetButton', caption = 'Reset', OnMouseUp = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='33%', right='33%', bottom=1, height=B_HEIGHT, }
 	
 	
 	--close button
-	window_children[#window_children+1] = Button:New{ caption = 'Close', OnMouseUp = { KillSubWindow }, 
+	window_children[#window_children+1] = Button:New{ name= 'menuCloseButton', caption = 'Close', OnMouseUp = { KillSubWindow }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT, }
 	
 	
@@ -1798,6 +1807,7 @@ local function MakeMenuBar()
 				textColor = color.main_fg },
 			
 			Button:New{
+				name = 'voteResignButton';
                 caption = "Vote Resign",
                 OnMouseUp = { function()
 						spSendCommands("say !voteresign") --after this gui_chili_vote.lua will handle vote GUI
@@ -1812,6 +1822,7 @@ local function MakeMenuBar()
 			},
 			
 			Button:New{
+				name= 'resignButton',
                 caption = "Resign and Spectate",
                 OnMouseUp = { function()
 						spSendCommands{"spectator"}
@@ -1827,6 +1838,7 @@ local function MakeMenuBar()
 			
 			
 			Button:New{
+				name= 'exitGameButton',
 				caption = "Exit game", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, },
 				tooltip = "Leave game completely.",
 				height=exit_menu_btn_height, 
@@ -1836,6 +1848,7 @@ local function MakeMenuBar()
 			},
 			
 			Button:New{
+				name= 'cancelExitGameButton',
 				caption = "Cancel", 
 				OnMouseUp = { function() 
 						screen0:RemoveChild(window_exit) 
@@ -1887,6 +1900,7 @@ local function MakeMenuBar()
 					
 					-- odd-number button width keeps image centered
 					Button:New{
+						name= 'gameSettingButton',
 						caption = "", OnMouseUp = { function() MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions and Settings...',
 						children = {
@@ -1894,6 +1908,7 @@ local function MakeMenuBar()
 						},
 					},
 					Button:New{
+						name= 'settingButton',
 						caption = "", OnMouseUp = { function() MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'General Settings...', 
 						children = {
@@ -1901,6 +1916,7 @@ local function MakeMenuBar()
 						},
 					},
 					Button:New{
+						name= 'tweakGuiButton',
 						caption = "", OnMouseUp = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
 						padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
 						children = {
@@ -2016,6 +2032,7 @@ local function MakeMenuBar()
 					},
 					
 					Button:New{
+						name= 'helpButton',
 						caption = "", OnMouseUp = { function() MakeSubWindow('Help') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin, tooltip = 'Help...', 
 						children = {
@@ -2023,6 +2040,7 @@ local function MakeMenuBar()
 						},
 					},
 					Button:New{
+						name= 'quitButton',
 						caption = "", OnMouseUp = { function() 
 								if not exitWindowVisible then
 									screen0:AddChild(window_exit) 
