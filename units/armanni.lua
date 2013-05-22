@@ -36,7 +36,7 @@ unitDef = {
     keeptooltip    = [[any string I want]],
     neededlink     = 50,
     pylonrange     = 50,
-	aimposoffset   = [[0 20 0]],
+	aimposoffset   = [[0 32 0]],
 	midposoffset   = [[0 0 0]],
 	modelradius    = [[40]],
   },
