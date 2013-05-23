@@ -275,7 +275,7 @@ end
 function widget:Initialize()
 	
 	WG.icons.SetOrder( 'firestate', 5 )
-	WG.icons.SetOrder( 'firestate', 6 )
+	WG.icons.SetOrder( 'movestate', 6 )
 	WG.icons.SetDisplay('firestate', false)
 	WG.icons.SetDisplay('movestate', false)
 	

@@ -59,8 +59,6 @@ local IsGuiHidden		=	Spring.IsGUIHidden
 
 local abs, rand       = math.abs, math.random
 
-local iconsize   = 30
-local iconhsize  = iconsize * 0.5
 local dist = 160
 local maxDistSqr = dist * dist
 local myTeamID
@@ -198,13 +196,6 @@ function StopRetreating(unitID)
 end
 
 
-local function DrawUnitFunc(yshift)
-	glTranslate(10, yshift, 0)
-	glBillboard()
-	glTexRect(-iconhsize, 0, iconhsize, iconsize)
-end
-
-
 local function Retreat(unitID)
 	local hx, hy, hz, dSquared = FindClosestHavenToUnit(unitID)
 	hx = hx + dist - rand(10, dist*2)
@@ -219,6 +210,17 @@ local function Retreat(unitID)
 		retreatingUnits[unitID] = {hx, hy, hz}
 	end
 end
+
+function SetWantRetreat(unitID, want)
+	wantRetreat[unitID] = want
+	WG.icons.SetUnitIcon( unitID, {
+		name='retreatstate',
+		texture= want and 'Anims/cursorrepair_old.png' or nil
+	} )
+end
+
+--------------------
+-- callins
 
 function widget:Initialize()
 	--[[
@@ -239,21 +241,22 @@ function widget:Initialize()
 	WG['retreat'].addRetreatCommand = function(unitID, unitDefID, retreatOrder)		
 		setRetreatOrder(unitID, unitDefID, retreatOrder)
 	end
+	
+	WG.icons.SetOrder( 'retreatstate', 5 )
+	WG.icons.SetDisplay( 'retreatstate', true )
+	WG.icons.SetPulse( 'retreatstate', true )
 end
-
-----------------------------------------------------------------------------
-----------------------------------------------------------------------------
 
 function widget:UnitFromFactory(unitID, unitDefID, teamID, builderID, _, _)
 	local ud = UnitDefs[unitDefID]
 	if ud.canMove and builderID then      
 		setRetreatOrder(unitID, unitDefID, retreatOrdersArray[builderID])
-		wantRetreat[unitID] = nil
+		SetWantRetreat(unitID, nil)
 	end	
 end
 
 function widget:UnitDestroyed(unitID, _, teamID)
-	wantRetreat[unitID] = nil
+	SetWantRetreat(unitID, nil)
 	cancelRetreatCommands[unitID] = nil
 	retreatOrdersArray[unitID] = nil
 	retreatingUnits[unitID] = nil
@@ -261,7 +264,7 @@ function widget:UnitDestroyed(unitID, _, teamID)
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
-	wantRetreat[unitID] = nil
+	SetWantRetreat(unitID, nil)
 	cancelRetreatCommands[unitID] = nil
 	retreatOrdersArray[unitID] = nil
 	retreatingUnits[unitID] = nil
@@ -291,7 +294,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 
 			if ud.canMove then --Check canmove for mixed selections
 
-				wantRetreat[unitID] = nil 
+				SetWantRetreat(unitID, nil)
 				if not foundValidUnit then
 					foundValidUnit = true
 					
@@ -422,9 +425,9 @@ function widget:UnitDamaged(unitID)
 			local threshold = retreatOrder * 0.3
 
 			if healthRatio < threshold then        
-				wantRetreat[unitID] = true
+				SetWantRetreat(unitID, true)
 			elseif (healthRatio == 1) then
-				wantRetreat[unitID] = nil	
+				SetWantRetreat(unitID, nil)
 			end
 
 			if wantRetreat[unitID] then				        
@@ -458,9 +461,9 @@ function widget:DrawWorld()
 				local threshold = retreatOrders * 0.3
 
 				if healthRatio < threshold then        
-					wantRetreat[unitID] = true
+					SetWantRetreat(unitID, true)
 				elseif (healthRatio == 1) then
-					wantRetreat[unitID] = nil	
+					SetWantRetreat(unitID, nil)
 				end
 
 				if wantRetreat[unitID] then				        
@@ -527,26 +530,6 @@ function widget:DrawWorld()
 		glDepthTest(false)
 	end --if havens
 	
-	--Draw medic symbol on critical units.
-	if wantRetreat and not IsGuiHidden() then --also do alliedWantRetreat table
-		glDepthTest(true)
-		glAlphaTest(GL_GREATER, 0)
-		glColor(1,1,1,fade)
-		glTexture('Anims/cursorrepair_old.png')
-		
-		for unitID, _ in pairs(wantRetreat) do
-			local unitDefID = GetUnitDefID(unitID)
-			if (unitDefID) then
-				glDrawFuncAtUnit(unitID, false, DrawUnitFunc, UnitDefs[unitDefID].height + 4)
-			end
-		end
-
-		glColor(1,1,1,1)
-		glTexture(false)
-		glAlphaTest(false)
-		glDepthTest(false)
-	end
-  
 end --DrawWorld
 
 --Bind a hotkey to "luaui noretreat" for quick bravery

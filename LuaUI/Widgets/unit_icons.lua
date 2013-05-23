@@ -18,9 +18,10 @@ end
 
 local echo = Spring.Echo
 
-local spGetUnitDefID = Spring.GetUnitDefID
-local spIsUnitInView = Spring.IsUnitInView
+local spGetUnitDefID 	= Spring.GetUnitDefID
+local spIsUnitInView 	= Spring.IsUnitInView
 local spGetUnitPosition = Spring.GetUnitPosition
+local spGetGameFrame 	= Spring.GetGameFrame
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask
@@ -37,6 +38,7 @@ local GL_GREATER = GL.GREATER
 
 local min   = math.min
 local floor = math.floor
+local abs 	= math.abs
 
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
@@ -78,6 +80,7 @@ local textureColors = {}
 --local xshiftUnitTexture = {}
 
 local hideIcons = {}
+local pulseIcons = {}
 
 
 WG.icons = {}
@@ -149,6 +152,10 @@ end
 
 function WG.icons.SetOrder( iconName, order )
 	SetOrder(iconName, order)
+end
+
+function WG.icons.SetPulse( iconName, pulse )
+	pulseIcons[iconName] = pulse
 end
 
 
@@ -254,6 +261,11 @@ function widget:DrawWorld()
 		return -- avoid unnecessary GL calls
 	end
 	
+	
+	local gameFrame = spGetGameFrame()
+	
+	local fade = abs((gameFrame % 40) - 20) / 20
+	
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
 	glDepthTest(true)
@@ -271,6 +283,8 @@ function widget:DrawWorld()
 			local textureColor = textureColors[unitID] and textureColors[unitID][iconName]
 			if textureColor then
 				gl.Color( textureColor )
+			elseif pulseIcons[iconName] then
+				gl.Color( 1,1,1,fade )
 			end
 			
 			local unitInView = spIsUnitInView(unitID)
@@ -282,7 +296,7 @@ function widget:DrawWorld()
 				end
 			end
 			
-			if textureColor then
+			if textureColor or pulseIcons[iconName] then
 				gl.Color(1,1,1,1)
 			end
 		end
