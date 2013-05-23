@@ -1,4 +1,4 @@
-local versionName = "v2.851"
+local versionName = "v2.853"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "May 5, 2013",
+    date      = "May 25, 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -77,8 +77,8 @@ local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half th
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
 local safetyMarginCONSTANTunitG = 0.175 --obstacle graph windower (a "safety margin" constant). Shape the obstacle graph so that its fatter and more sloppier at extremities: ie: probably causing unit to prefer to turn more left or right (default = 0.175 radian)
 local smCONSTANTunitG		= 0.175  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right??? (default = 0.175 radian)
-local aCONSTANTg			= {math.pi/4 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2 (because both contribution from obstacle & target will sum to math.pi)).
-local obsCONSTANTg			= {math.pi/4, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD & ATTACK)). 
+local aCONSTANTg			= {math.pi/4 , math.pi/2} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2 (because both contribution from obstacle & target will sum to math.pi)).
+local obsCONSTANTg			= {math.pi/4, math.pi/2} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD & ATTACK)). 
 --aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction. Activated by 'graphCONSTANTtrigger[1]'
 --an antagonist to aCONSTANg (obsCONSTANTg or obstacle graph) also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy, but already normalized. Activated by 'graphCONSTANTtrigger[2]'
 local windowingFuncMultG = 1 --? (default = 1 multiplier)
@@ -158,7 +158,7 @@ local unitWasDead_gbl = {} --//variable: remember last case of unit death as pre
 --Methods:
 ---------------------------------Level 0
 options_path = 'Game/Unit AI/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
-options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
+options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'cloakyAlwaysFlee','dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
 options = {
 	enableCons = {
 		name = 'Enable for constructors',
@@ -211,6 +211,12 @@ options = {
 					consRetreatTimeoutG = self.value
 					Spring.Echo(string.format ("%.1f", 1.1*consRetreatTimeoutG) .. " second")
 				end,
+	},
+	cloakyAlwaysFlee = {
+		name = 'Cloakies always flee',
+		type = 'bool',
+		value = false,
+		desc = 'Force cloakies & constructor to always flee from enemy when idle except if they are under hold-position state. \n\nNote: Unit can wander around and could put themselves in danger. Default:Off',
 	},
 	dbg_RemoveAvoidanceSplitSecond = {
 		name = 'Debug: Constructor instant retreat',
@@ -472,6 +478,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 					--local boxSizeTrigger= unitInMotion[i][2]
 					local fixedPointCONSTANTtrigger = unitInMotion[i][4] --//using fixedPointType to trigger different fixed point constant for each unit type
 					local unitVisible = (unitInMotion[i].isVisible == "yes")
+					local fastestWeaponIndex = unitInMotion[i]["reloadableWeaponIndex"]
 					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case=IdentifyTargetOnCommandQueue(cQueue,cQueueTemp, unitID, commandIndexTable,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --check old or new command
 					local currentX,_,currentZ = spGetUnitPosition(unitID)
 					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
@@ -479,7 +486,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 						boxSizeTrigger = 1 -- override all reclaim/ressurect/repair's deactivation 'halfboxsize' with the one for MOVE command (give more tolerance when unit is selected)
 					end
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
-					local losRadius	= GetUnitLOSRadius(unitID,case,unitInMotion[i]["reloadableWeaponIndex"]) --get LOS. also custom LOS for case=="attack" & weapon range >0
+					local losRadius	= GetUnitLOSRadius(unitID,case,fastestWeaponIndex) --get LOS. also custom LOS for case=="attack" & weapon range >0
 					local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
 					
 					if ((newCommand and cQueueTemp[1].id==CMD_MOVE) or cQueueTemp[2].id==CMD_MOVE) and not unitVisible then --if unit is issued a move Command and is outside user's view. Note: is using cQueueTemp because cQueue can be NIL
@@ -735,7 +742,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
-		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading or unitInMotionSingleUnit[2] == 1) then --if unit is out of user's vision OR is reloading OR is cloaky, and: 
+		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading or (unitInMotionSingleUnit[2] == 1 and options.cloakyAlwaysFlee.value)) then --if unit is out of user's vision OR is reloading OR is cloaky, and: 
 			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
 				if (holdPosition== false) then --if unit is not "hold position", then:
 					local idleOrIsDodging = (cQueue[1] == nil) or (#cQueue == 1 and cQueue[1].id == CMD_MOVE) --is idle completely, or is given widget's CMD_MOVE (note: CMD_MOVE or any other command will not end with CMD_STOP when its widget issued)
@@ -854,19 +861,22 @@ end
 function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 	----Global Constant----
 	local isOldSpring = isOldSpring_g --for Spring < 95 compatibility
+	local extraLOSRadiusCONSTANT = extraLOSRadiusCONSTANTg
 	-----------------------
 	local unitDefID= spGetUnitDefID(unitID)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
 	if unitDef~=nil then --if unitDef is not empty then use the following LOS
 		losRadius= unitDef.losRadius*32 --in normal case use real LOS. Note: for some reason it was times 32
-		losRadius= losRadius + extraLOSRadiusCONSTANTg --add extra detection range for beyond LOS (radar)
+		losRadius= losRadius + extraLOSRadiusCONSTANT --add extra detection range for beyond LOS (radar)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
+			
 			local unitFastestReloadableWeapon = reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 			if unitFastestReloadableWeapon ~= -1 then
 				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon -isOldSpring, "range") --retrieve weapon range
 				losRadius = math.min(weaponRange*0.75, losRadius) --reduce avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the smallest (Note: we need this minimum detection range to avoid disturbing maximum range artillery unit)
-			end			
+			end	
+			
 			--[[
 			local unitShieldRange,fastWeaponRange =-1, -1 --assume unit has no shield and no weapon
 			local fastestReloadTime = 999 --temporary variables
@@ -888,7 +898,7 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 			--]]
 		end
 		if unitDef["builder"] then 
-			losRadius = losRadius + extraLOSRadiusCONSTANTg --add additional/more detection range for constructors for quicker reaction vs enemy radar dot
+			losRadius = losRadius + extraLOSRadiusCONSTANT --add additional/more detection range for constructors for quicker reaction vs enemy radar dot
 		end 
 	end
 	return losRadius
@@ -1159,12 +1169,21 @@ function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, command
 	local queueIndex=1
 	local avoidanceCommand = true
 	if not newCommand then  --if widget's command then delete it
-		orderArray[1] = {CMD_REMOVE, {cQueue[1].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
-		local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
-		commandTTL[unitID][lastIndx] = nil --//delete the last watchdog entry (the "not newCommand" means that previous widget's command haven't changed yet (nothing has interrupted this unit, same is with commandTTL), and so if command is to delete then it is good opportunity to also delete its timeout info at *commandTTL* too). Deleting this entry mean that this particular command will no longer be checked for timeout.
-		commandTTL[unitID][1] = lastIndx -1 --refresh table lenght
-		-- Technical note: emptying commandTTL[unitID][#commandTTL[unitID]] is not technically required (not emptying it only make commandTTL countdown longer, but a mistake in emptying a commandTTL could make unit more prone to stuck when fleeing to impassable coordinate.
-		queueIndex=2 --skip index 1 of stored command. Skip widget's command
+		if not cQueue or not cQueue[1] then
+			if turnOnEcho==2 then
+				Spring.Echo("UnitIsDead (InsertCommandQueue):")
+				Spring.Echo(Spring.GetUnitIsDead(unitID))
+				Spring.Echo("ValidUnitID (InsertCommandQueue):")
+				Spring.Echo(Spring.ValidUnitID(unitID))
+			end
+		else 
+			orderArray[1] = {CMD_REMOVE, {cQueue[1].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
+			local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
+			commandTTL[unitID][lastIndx] = nil --//delete the last watchdog entry (the "not newCommand" means that previous widget's command haven't changed yet (nothing has interrupted this unit, same is with commandTTL), and so if command is to delete then it is good opportunity to also delete its timeout info at *commandTTL* too). Deleting this entry mean that this particular command will no longer be checked for timeout.
+			commandTTL[unitID][1] = lastIndx -1 --refresh table lenght
+			-- Technical note: emptying commandTTL[unitID][#commandTTL[unitID]] is not technically required (not emptying it only make commandTTL countdown longer, but a mistake in emptying a commandTTL could make unit more prone to stuck when fleeing to impassable coordinate.
+			queueIndex=2 --skip index 1 of stored command. Skip widget's command
+		end
 	end
 	if (#cQueue>=queueIndex+1) then --if is queue={reclaim, area reclaim,stop}, or: queue={move,reclaim, area reclaim,stop}, or: queue={area reclaim, stop}, or:queue={move, area reclaim, stop}.
 		if (cQueue[queueIndex].id==40 or cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125) then --if first (1) queue is reclaim/ressurect/repair
@@ -1432,12 +1451,12 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
 		boxSizeTrigger = 4 --//deactivation 'halfboxsize' for GUARD command
 		graphCONSTANTtrigger[1] = 2 --//use more aggressive attraction because it GUARD units. It need big result.
-		graphCONSTANTtrigger[2] = 1	--//use less aggressive avoidance because need to stay close to units. It need not stray.
+		graphCONSTANTtrigger[2] = 1	--//(if 1) use less aggressive avoidance because need to stay close to units. It need not stray.
 		case = 'guard'
 	elseif cQueue[queueIndex].id == CMD_ATTACK then
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		boxSizeTrigger = nil --//value not needed when target is "-1" which always return "not reached" (a case where boxSizeTrigger is not used)
-		if unitVisible and not isReloadAvoidance then --*Note: this is needed if "GateKeeperOrCommandFilter" miss filtering out attack command* if unit is visible & not reloadAvoidance (ie: is cloaked and is issued direct attack), then set enemy as target and check for "target reached" properly.
+		if unitVisible and not isReloadAvoidance then --This make sycthe (melee cloaking unit) attack its target when is issued an attack command. *Note: this is needed if "GateKeeperOrCommandFilter" miss filtering out attack command* if unit is visible & not reloadAvoidance (ie: is cloaked and user is issuing a direct attack during avoidance), then set enemy as target and check for "target reached" properly.
 			local enemyID = cQueue[queueIndex].params[1]
 			local x,y,z = spGetUnitPosition(enemyID)
 			if x then
