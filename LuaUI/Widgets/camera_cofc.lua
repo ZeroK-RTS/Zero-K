@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.116 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.117 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-May-17
     license   = "GNU GPL, v2 or later",
@@ -296,6 +296,7 @@ options = {
 		value = false,
 		hotkey = {key='l', mod='alt+'},
 		path = cameraFollowPath,
+		OnChange = function(self) Spring.Echo("COFC: follow cursor " .. (self.value and "active" or "inactive")) end,		
 	},
 	followautozoom = {
 		name = "Auto zoom",
@@ -1153,22 +1154,6 @@ function widget:Update(dt)
 	if camcycle >=12 then
 		camcycle = 0 --reset value to Zero (0) every 12th frame. NOTE: a reset value a multiple of trackcycle's reset is needed to prevent conflict 
 	end
-	--tweak to timer:
-	if trackcycle==0 and camcycle> 0 then
-		camcycle = 6 --prevent trackcyle & camcycle from out of sync with each other.
-		--Example:
-		--[[
-			estFrame   =   +4    +3     +3    +3    +3    +5   
-			camcycle   = 0 ... 4 ... 7 ... 0 ... 3 ... 6 ... 0
-			trackcycle = 0 ... 4 ... 7 ... 10... 13... 0 ... 5
-			             ^                             ^     ^
-			             sync                           unsync
-			camcycle   = 0 ... 4 ... 7 ... 0 ... 3 ... 6 ... 0
-			trackcycle = 0 ... 4 ... 7 ... 6 ... 9 ... 12... 0
-			             ^                                   ^
-			             sync                               sync						 
-		--]]
-	end
 	--timer to block periodic warning
 	cycle = cycle + framePassed
 	if cycle >=32*15 then
@@ -1176,7 +1161,6 @@ function widget:Update(dt)
 	end	
 
 	--//HANDLE TRACK UNIT
-	local isTrackingUnit
 	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
 	if (trackcycle == 0 and
 		trackmode and
@@ -1194,7 +1178,6 @@ function widget:Update(dt)
 			--2) increase value A until camera motion is not jittery, then stop: (x+vx,y+vy,z+vz, 0.0333*A)
 			--3) increase value B until unit center on screen, then stop: (x+vx*B,y+vy*B,z+vz*B, 0.0333*A)
 			spSetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
-			isTrackingUnit = true
 		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
 			trackmode=false --exit trackmode
 			Spring.Echo("COFC: Unit tracking OFF")
@@ -1204,7 +1187,7 @@ function widget:Update(dt)
 	--//HANDLE TRACK CURSOR
 	--camcycle = camcycle%(12) + 1  --automatically reset "camcycle" value to Zero (0) every 12th iteration.
 	if (camcycle == 0 and
-		not isTrackingUnit and --if currently not tracking unit, and
+		not trackmode and
 		not overview_mode and
 		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 		not thirdperson_trackunit and
@@ -1449,7 +1432,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		return false
 	end
 	
-	follow_timer = 4 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
+	follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
 	
 	local a,c,m,s = spGetModKeyState()
 	
@@ -1526,7 +1509,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (button == 2) then
-		follow_timer = 4 --disable tracking for 3 second when middle mouse is pressed or when scroll is used for zoom
+		follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
 		rotate = nil
 		smoothscroll = false
 		springscroll = false
@@ -1723,17 +1706,19 @@ function widget:Initialize()
 	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
 	
 	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
-	if WG.crude.GetHotkey then
-		epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview") --get hotkey
-		epicmenuHkeyComp[2] = WG.crude.GetHotkey("trackmode")
-		epicmenuHkeyComp[3] = WG.crude.GetHotkey("track")
-		epicmenuHkeyComp[4] = WG.crude.GetHotkey("mousestate")
-	end
-	if 	WG.crude.SetHotkey then
-		WG.crude.SetHotkey("toggleoverview",nil) --unbind hotkey
-		WG.crude.SetHotkey("trackmode",nil)
-		WG.crude.SetHotkey("track",nil)
-		WG.crude.SetHotkey("mousestate",nil)
+	if WG.crude then
+		if WG.crude.GetHotkey then
+			epicmenuHkeyComp[1] = WG.crude.GetHotkey("toggleoverview") --get hotkey
+			epicmenuHkeyComp[2] = WG.crude.GetHotkey("trackmode")
+			epicmenuHkeyComp[3] = WG.crude.GetHotkey("track")
+			epicmenuHkeyComp[4] = WG.crude.GetHotkey("mousestate")
+		end
+		if 	WG.crude.SetHotkey then
+			WG.crude.SetHotkey("toggleoverview",nil) --unbind hotkey
+			WG.crude.SetHotkey("trackmode",nil)
+			WG.crude.SetHotkey("track",nil)
+			WG.crude.SetHotkey("mousestate",nil)
+		end
 	end
 	
 	spSendCommands("luaui disablewidget SmoothScroll")
@@ -1750,7 +1735,7 @@ function widget:Shutdown()
 	spSendCommands( 'bind backspace mousestate' ) --//re-enable screen-panning-mode toggled by 'backspace' key
 	
 	--Note: the following is for compatibility with epicmenu.lua's zkkey framework
-	if WG.crude.SetHotkey then
+	if WG.crude and WG.crude.SetHotkey then
 		WG.crude.SetHotkey("toggleoverview",epicmenuHkeyComp[1]) --rebind hotkey
 		WG.crude.SetHotkey("trackmode",epicmenuHkeyComp[2])
 		WG.crude.SetHotkey("track",epicmenuHkeyComp[3])
