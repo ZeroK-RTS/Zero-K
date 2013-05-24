@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.078 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.079 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --15 April 2013 (msafwan)
+    date      = "2009-06-02", --25 May 2013 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -543,7 +543,10 @@ end
 
 --this is a separate function to allow group info to be regenerated without reloading the whole tooltip
 local function WriteGroupInfo()
-	if not options.showgroupinfo.value then return end
+	if not options.showgroupinfo.value or numSelectedUnits==0 then
+		return 
+	end
+
 	if gi_label then
 		window_corner:RemoveChild(gi_label)
 	end
