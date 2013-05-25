@@ -43,6 +43,7 @@ local awardDescs =
 	kam		= 'Kamikaze Award',
 	comm	= 'Master and Commander',
 	mex		= 'Mineral Prospector',
+	mexkill	= 'Mineral Marauder',
 	rage	= 'Rage Inducer',
 	head	= 'Head Hunter',
 	dragon	= 'Dragon Slayer',
@@ -93,6 +94,7 @@ local awardAbsolutes = {
 	terra		= 1000,
 	rezz		= 3000,
 	mex			= 15,
+	mexkill		= 15,
 	head		= 3,
 	dragon		= 3,
 	sweeper		= 20,
@@ -466,7 +468,9 @@ local function ProcessAwardData()
 				elseif awardType == 'friend' then
 					message = 'Damage inflicted on allies: '.. floor(maxVal * 100) ..'%'
 				elseif awardType == 'mex' then
-					message = 'Mexes: '.. maxVal .. ' built'
+					message = 'Mexes built: '.. maxVal
+				elseif awardType == 'mexkill' then
+					message = 'Mexes destroyed: '.. maxVal
 				elseif awardType == 'head' then
 					message = maxVal .. ' Commanders eliminated'
 				elseif awardType == 'dragon' then
@@ -600,6 +604,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	end
 	if (killerTeam == unitTeam) or (killerTeam == gaiaTeamID) or (unitTeam == gaiaTeamID) or (killerTeam == nil) then
 		return
+	elseif (unitDefID == mexDefID) then
+		if ((not spIsGameOver()) and (select(5, spGetUnitHealth(unitID)) > 0.9) and (not spAreTeamsAllied(killerTeam, unitTeam))) then
+			AddAwardPoints( 'mexkill', killerTeam, 1 )
+		end
 	else
 		local ud = UnitDefs[unitDefID]
 		if (ud.customParams.commtype and (not spAreTeamsAllied(killerTeam, unitTeam))) then
