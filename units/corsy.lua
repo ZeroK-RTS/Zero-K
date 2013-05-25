@@ -35,7 +35,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Produziert Schiffe, Baut mit 6 M/s]],
+    description_de = [[Produziert Schiffe, Baut mit 10 M/s]],
 	helptext_de    = [[Im Shipyard kannst du Schiffe jeder Art und für jeden Zweck bauen.]],
     sortName = [[7]],
   },

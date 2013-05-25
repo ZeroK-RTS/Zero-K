@@ -32,7 +32,7 @@ unitDef = {
 
   customParams        = {
 	cloakstealth = [[1]],
-	description_de = [[Ökonomie/Untersützung Kommandant, Baut mit 12 M/s]],
+	description_de = [[Ökonomie/Untersützung Kommandant, Baut mit 10 M/s]],
 	helptext       = [[The esoteric Support Commander uses a more unorthodox weapon set. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
 	helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset, welches standardmäßig aus einem Gaußgewehr, das Erschütterungen abfeuert sobald es ausreichend aufgebessert wurde, besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Einkommensbonus beliebt.]],
 	level = [[1]],

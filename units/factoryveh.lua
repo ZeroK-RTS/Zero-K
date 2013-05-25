@@ -35,9 +35,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_es = [[F?brica de veh?culos ligeros]],
-    description_it = [[Fabbrica di veicoli leggeri]],
-	description_de = [[Produziert Radfahrzeug, Baut mit 6 M/s]],
+    description_es = [[F?brica de veh?culos ligeros, Construye a 10 m/s]],
+    description_it = [[Fabbrica di veicoli leggeri, Costruisce a 10 m/s]],
+	description_de = [[Produziert Radfahrzeug, Baut mit 10 M/s]],
     helptext       = [[A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Weasel, Scorcher, Ravager, Leveler, Slasher]],
     helptext_es    = [[Un favorito tradicional, la f?brica de veh?culos Logos es la f?brica "blitzkrieg" ideal con sus unidades r?pidas y agresivas. Las unidades que no son r?pidas lo compensan con poder de fuego copioso.]],
     helptext_it    = [[Un favorito tradizionale, la fabbrica de veicoli Logos ? la fabbrica "blitzkrieg" ideale con le sue unita veloci ed aggressive. Quelle unita a cui manca la velocita lo compensano con una potenza di fuoco copiosa.]],

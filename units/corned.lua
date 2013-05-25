@@ -27,11 +27,11 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Veículo construtor, constrói a 6 m/s]],
-    description_es = [[vehículo para Construcción, construye a 6 m/s]],
-    description_fr = [[V?hicule de Construction, Construit ? 6 m/s]],
-    description_it = [[Veicolo da Costruzzione, costruisce a 6 m/s]],
-	description_de = [[Konstruktionsfahrzeug, Baut mir 6 M/s]],
+    description_bp = [[Veículo construtor, constrói a 5 m/s]],
+    description_es = [[vehículo para Construcción, construye a 5 m/s]],
+    description_fr = [[V?hicule de Construction, Construit ? 5 m/s]],
+    description_it = [[Veicolo da Costruzzione, costruisce a 5 m/s]],
+	description_de = [[Konstruktionsfahrzeug, Baut mir 5 M/s]],
     helptext       = [[Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area.]],
     helptext_bp    = [[Altamente móvel e capaz de suportar uma boa surra, o veículo de construç?o permite ao jogar expandir rapidamente por uma grande área.]],
     helptext_es    = [[Altamente móbil y capaz de recibir una paliza, el Mason puede ampliar tu territorio sobre una vasta área rápidamente]],

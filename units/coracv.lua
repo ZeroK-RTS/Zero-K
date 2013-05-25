@@ -27,9 +27,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Tanque de construç?o armado, contrói a 9 m/s]],
-    description_fr = [[Tank de Construction Arm?e, Construit ? 9 m/s]],
-	description_de = [[Bewaffneter Konstruktionspanzer, Baut mit 9 M/s]],
+    description_bp = [[Tanque de construç?o armado, contrói a 7.5 m/s]],
+    description_fr = [[Tank de Construction Arm?e, Construit ? 7.5 m/s]],
+	description_de = [[Bewaffneter Konstruktionspanzer, Baut mit 7.5 M/s]],
     helptext       = [[Armed with a small defensive tower, the Welder can defend itself against light enemy attacks.]],
     helptext_bp    = [[Armado com uma torre de defesa, o construtor armado pode se defender de pequenos ataques inimigos.]],
     helptext_fr    = [[Arm? d'une tourelle laser l?g?re, le Welder saura parfaitement se d?fendre contre les attaques de tirailleurs ou d'?claireurs.]],

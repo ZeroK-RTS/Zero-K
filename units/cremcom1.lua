@@ -34,7 +34,7 @@ unitDef = {
 
   customParams           = {
 	cloakstealth = [[1]],
-	description_de = [[Mobiler Sturmkommandant, Baut mit 12 M/s]],
+	description_de = [[Mobiler Sturmkommandant, Baut mit 10 M/s]],
 	helptext       = [[The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed and armor.]],
 	helptext_de    = [[Der Knight Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
 	level = [[1]],

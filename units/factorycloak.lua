@@ -36,7 +36,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Produziert Tarnroboter, Baut mit 6 M/s]],
+    description_de = [[Produziert Tarnroboter, Baut mit 10 M/s]],
     helptext       = [[Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Warrior, Zeus, Hammer]],
 	helptext_de    = [[List statt pure Gewalt lautet hier das Motto. Die Cloaky Bot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Rocko, Warrior, Zeus, Hammer]],
     sortName = [[1]],

@@ -24,11 +24,11 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_bp = [[Robô de construç?o, constrói a 6 m/s]],
-    description_es = [[Robot de Construccion, Construye a 6 m/s]],
-    description_fr = [[Robot de Construction, Construit ? 6 m/s]],
-    description_it = [[Robot da Costruzzione, Costruisce a 6 m/s]],
-	description_de = [[Konstruktions, Baut mit 6 M/s]],
+    description_bp = [[Robô de construç?o, constrói a 5 m/s]],
+    description_es = [[Robot de Construccion, Construye a 5 m/s]],
+    description_fr = [[Robot de Construction, Construit ? 5 m/s]],
+    description_it = [[Robot da Costruzzione, Costruisce a 5 m/s]],
+	description_de = [[Konstruktions, Baut mit 5 M/s]],
     helptext       = [[The Convict is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots.]],
     helptext_bp    = [[]],
     --helptext_fr    = [[Le Convict tient son nom de sa facult?, comme tous les constructeurs de sa faction, ? r?ssuciter les carcasses du champ de bataille. La Resurrection ne consomme que de l'?nergie, et d?pends du co?t de l'unit? originelle.]],
