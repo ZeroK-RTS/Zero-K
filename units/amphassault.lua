@@ -21,14 +21,10 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    floattoggle = [[1]],
-    --description_bp = [[Robô dispersador]],
-    --description_fr = [[Robot Émeutier]],
-	--description_de = [[Sturm Roboter]],
+    floattoggle    = [[1]],
+    description_pl = [[Ciężki Amfibijny Bot Szturmowy]],
     helptext       = [[The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else.]],
-    --helptext_bp    = [[O raio de calor do Sumo é muito poderoso a curto alcançe, mas se dissipa com a distância e é bem mais fraca de longe. A velocidade alta de disparo o torna ideal para lutar contra grandes grupos de unidades baratas. ]],
-    --helptext_fr    = [[Le rayon r chaleur du Sumo est capable de délivrer une puissance de feu important sur un point précis. Plus la cible est proche, plus les dégâts seront importants. La précision du rayon est idéale pour lutter contre de larges vagues d'ennemis, mais l'imposant blindage du Sumo le restreint r une vitesse réduite.]],
-	--helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert er entsprechend an Feuerkraft. Er eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
+    helptext_pl    = [[Grizzly to klasyczna jednostka szturmowa - dość wolna, niezdarna, lecz prawie niepowstrzymana. Jego bronią jest laser o dużym zasięgu i obrażeniach, który ma problemy właściwie tylko przeciwko szybkim jednostkom atakującym w grupach i lotnictwu.]],
 	aimposoffset   = [[0 30 0]],
 	midposoffset   = [[0 6 0]],
 	modelradius    = [[35]],

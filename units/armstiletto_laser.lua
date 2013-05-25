@@ -25,13 +25,15 @@ unitDef = {
 
   customParams        = {
     description_bp = [[Bombardeiro de raios PEM invisível a radar]],
+    description_de = [[EMP-Tarnkappenbomber]],
     description_fr = [[Bombardier EMP Furtif]],
-	description_de = [[EMP-Tarnkappenbomber]],
+    description_pl = [[Bombowiec EMP]],
     helptext       = [[Fast bomber armed with a lightning generator that paralyzes units in a wide area under it.]],
     helptext_bp    = [[Bombardeiro rápido a radar equipado com um gerador de raios ao invés de bombas que dispara raios de PEM contra o inimigo ao atacar.]],
+    helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
     helptext_fr    = [[Rapide, armé de canons EMP pouvant paralyser les unités dans une large bande.]],
-	helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
-	modelradius    = [[10]],
+    helptext_pl    = [[Szybki bombowiec, który jest w stanie sparaliżować jednostki w wyznaczonym obszarze.]],
+    modelradius    = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],

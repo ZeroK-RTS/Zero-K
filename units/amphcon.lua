@@ -23,7 +23,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    description_pl = [[Amfibijny Konstruktor, moc 7.5 m/s]],
     helptext       = [[The Clam is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land.]],
+    helptext_pl    = [[Clam to opancerzony konstruktor, który mo¿e wykonywaæ swoje obowi¹zki zarówno na l¹dzie, jak i g³êboko pod wod¹.]],
   },
 
   energyMake          = 0.225,

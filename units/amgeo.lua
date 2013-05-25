@@ -26,9 +26,11 @@ unitDef = {
   customParams                  = {
     description_de = [[Erzeugt Energie (100) - RISKANT]],
     description_fr = [[Produit de l'énergie (100) - DANGEREUX]],
+    description_pl = [[Produkuje Energiê (100) - NIEBEZPIECZNE]],
     helptext       = [[The Moho Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion.]],
     helptext_de    = [[Das Moho Geothermisches Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar.]],
     helptext_fr    = [[La centrale géothermique Moho produit une quantité important d'énergie. Son explosion peut être catastrophique selon son emplacement.]],
+    helptext_pl    = [[Elektrownia Moho-geotermiczna wytwarza ogromne iloœci energii, jednak wymaga ochrony, jako ¿e jej zniszczenie wi¹¿e siê z katastroficznym wybuchem.]],
     pylonrange = 600,
   },
 

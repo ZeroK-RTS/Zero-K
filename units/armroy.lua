@@ -24,12 +24,12 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Destroyer Artillerie/Semi-Anti-Sous-Marins]],
-    description_pl = [[Niszczyciel (Artyleria/Przeciw ?odziom Podwodnym)]],
-	description_de = [[Zerstörer (Artillerie/Semi-U-Boot-Abwehr]],
+    description_pl = [[Niszczyciel (Artyleria/Przeciw £odziom Podwodnym)]],
+    description_de = [[Zerstörer (Artillerie/Semi-U-Boot-Abwehr]],
     helptext       = [[This Destroyer packs a powerful, long-range main cannon, useful for bombarding fixed emplacements and shore targets, as well as a depth charge launcher for use against submarines. Beware of aircraft and Corvettes--the Destroyer's weapons have trouble hitting fast-moving targets.]],
     helptext_fr    = [[Ce Destroyer embarque un puissant canon longue port?e et un lance grenade sous marines. Utile pour se d?barrasser de menaces sous marines ou de positions fixes, son canon est cependant trop peu pr?cis pour d?truire des menaces rapides.]],
-    helptext_pl    = [[Crusader posiada pot?n? armat? ?redniego zasi?gu idealn? do bombardowania nieruchomych wie?yczek broni?cych wybrze?y. Jego drug? broni? jest wyrzutnia ?adunk?w g??binowych przeciwko ?odziom podwodnym. ?atwo pada ofiar? jednostek lataj?cych i Korwet, gdy? nie posiada broni skutecznym przeciwko szybkim celom.]],
-	helptext_de    = [[Der Zerstörer kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Torpedowerfer gegen U-Boote. Hüte dich vor Flugzeugen und Korvetten - Zerstörer haben einige Probleme damit, schnelle Ziele zu treffen.]],
+    helptext_pl    = [[Crusader posiada potê¿n¹ armatê œredniego zasiêgu idealn¹ do bombardowania nieruchomych wie¿yczek broni¹cych wybrze¿y. Jego drug¹ broni¹ jest wyrzutnia ³adunków g³êbinowych. £atwo pada ofiar¹ jednostek lataj¹cych i korwet, gdy¿ nie posiada broni skutecznym przeciwko szybkim celom.]],
+    helptext_de    = [[Der Zerstörer kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Torpedowerfer gegen U-Boote. Hüte dich vor Flugzeugen und Korvetten - Zerstörer haben einige Probleme damit, schnelle Ziele zu treffen.]],
     extradrawrange = 300,
   },
 

@@ -21,11 +21,13 @@ unitDef = {
   customParams                  = {
     description_de = [[Produziert Energie (variabel)]],
     description_fr = [[Produit de l'énergie]],
+    description_pl = [[Produkuje Energiê]],
     helptext       = [[Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output.]],
-	helptext_de    = [[Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht.]],
-	helptext_fr    = [[Sur terre, l'éolienne produit de l'énergie en quantité variable, selon l'altitude et la vitesse du vent. Elles sont très fragiles et explosent à la chaine quand elles sont trop proches l'une de l'autre. Dans l'eau, la génératrice marémotrice est plus résistante et produit une énérgie constante.]],
-    pylonrange = 60,
-    windgen    = true,
+    helptext_de    = [[Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht.]],
+    helptext_fr    = [[Sur terre, l'éolienne produit de l'énergie en quantité variable, selon l'altitude et la vitesse du vent. Elles sont très fragiles et explosent à la chaine quand elles sont trop proches l'une de l'autre. Dans l'eau, la génératrice marémotrice est plus résistante et produit une énérgie constante.]],
+    helptext_pl    = [[Ta elektrownia funkcjonuje ró¿nie zale¿nie od lokalizacji. Na l¹dzie jest elektrowni¹ wiatrow¹, który produkuje zmienn¹ iloœæ energii. Wiatraki znajduj¹ce siê wy¿ej produkuj¹ wiêcej. W wodzie staje siê elektrowni¹ p³ywow¹ - jest wytrzymalsza i produkuje sta³¹ iloœæ energii niezale¿n¹ od g³êbokoœci.]],
+    pylonrange     = 60,
+    windgen        = true,
   },
 
   energyUse                     = 0,

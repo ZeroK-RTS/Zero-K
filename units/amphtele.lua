@@ -22,7 +22,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[Djinn excels at moving large land based armies across bodies of water. When deployed it teleports units from around it's pre-placed static beacon to it's present location. The teleportation is one-way, so ensure the destination is safe.]],
+    description_pl = [[Amfibijny Teleporter]],
+    helptext       = [[Djinn excels at moving large land based armies across bodies of water. When deployed it teleports units from around its pre-placed static beacon to its present location. The teleportation is one-way, so ensure the destination is safe.]],
+    helptext_pl    = [[Djinn s³u¿y do przenoszenia du¿ych armii l¹dowych przez wiêksze akweny. Mo¿e on ustawiæ wêze³ przesy³owy w dowolnym miejscu na mapie; jednostki mog¹ u¿ywaæ tego wêz³a do jednokierunkowej teleportacji do Djinna pod warunkiem, ¿e Djinn stoi nieruchomo.]],
   },
 
   explodeAs              = [[BIG_UNIT]],

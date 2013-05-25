@@ -25,11 +25,13 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    description_de = [[Antinukleares System (Anti-Nuke)]],
     description_fr = [[Syst?me de D?fense Anti Missile (AntiNuke)]],
-	description_de = [[Antinukleares System (Anti-Nuke)]],
+	description_pl = [[Tarcza Antyrakietowa]],
     helptext       = [[The Protector automatically intercepts enemy nuclear ICBMs aimed within its coverage radius.]],
+    helptext_de    = [[Der Protector fängt automatisch gegnerische, atomare Interkontinentalraketen, welche in den, vom System abgedeckten, Bereich zielen, ab.]],
     helptext_fr    = [[Le Protector est un b?timent indispensable dans tout conflit qui dure. Il est toujours malvenu de voir sa base r?duite en cendres ? cause d'un missile nucl?aire. Le Protector est un syst?me de contre mesure capable de faire exploser en vol les missiles nucl?aires ennemis.]],
-	helptext_de    = [[Der Protector fängt automatisch gegnerische, atomare Interkontinentalraketen, welche in den, vom System abgedeckten, Bereich zielen, ab.]],
+	helptext_pl    = [[Protector automatycznie wysy³a przeciwrakiety, aby zniszczyæ przelatuj¹ce nad jego obszarem ochrony g³owice nuklearne przeciwników.]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],

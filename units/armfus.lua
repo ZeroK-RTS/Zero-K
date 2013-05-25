@@ -26,8 +26,10 @@ unitDef = {
 
   customParams                  = {
 	description_de = [[Produziert Energie (35)]],
+    description_pl = [[Produkuje Energiê (35)]],
     helptext       = [[Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units.]],
 	helptext_de    = [[Der Fusionsreaktor liefert eine gute Menge an konstanter Energie zu einem fairen Preis. Sie sind aber attraktive Ziele und schlecht gepanzert, also beschütze sie gut. Sobald ein Reaktor zerstört wird, werden Einheiten in der Nähe beschädigt.]],
+    helptext_pl    = [[Reaktory fuzyjne pozwalaj¹ osi¹gn¹æ wysok¹ produkcjê energii za niewygórowan¹ cenê. S¹ jednak dobrym celem dla przeciwników i nie s¹ zbyt wytrzyma³e. Wybuch reaktora zadaje wysokie obra¿enia okolicznym jednostkom, tote¿ nie warto stawiaæ ich jeden obok drugiego.]],
     pylonrange = 450,
   },
 

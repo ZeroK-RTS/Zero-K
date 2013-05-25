@@ -25,9 +25,11 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-	description_de = [[Verhüllender Turm / Störsender]],
-    helptext	   = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
-	helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
+    description_de = [[Verhüllender Turm / Störsender]],
+    description_pl = [[Wie¿a Zak³ócaj¹co-Maskuj¹ca]],
+    helptext       = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
+    helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
+    helptext_pl    = [[Wie¿e zak³ócaj¹ce sprawiaj¹, ¿e radary nie s¹ w stanie wy³apaæ sygna³u okolicznych jednostek. Ponadto pole maskuj¹ce mo¿e zapewniæ im maskowanie.]],
   },
 
   energyUse                     = 1.5,

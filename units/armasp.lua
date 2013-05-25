@@ -21,9 +21,11 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
 	description_de = [[Repariert automatisch eigene/verbündete Lufteinheiten]],
+    description_pl = [[Stacja Naprawy i Dozbrajania Samolotów]],
+    helptext       = [[The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
 	helptext_de    = [[Das Air Repair/Rearm Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
+    helptext_pl    = [[Ta Stacja mo¿e naprawiaæ samoloty i odnawiaæ amunicjê bombowcom. Posiada 4 stanowiska.]],
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],

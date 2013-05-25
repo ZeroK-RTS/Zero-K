@@ -22,14 +22,16 @@ unitDef = {
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
- 
+
   customParams                  = {
     description_de = [[Langstreckenradar, halbiert Radarungenauigkeit]],
-    helptext		= [[The advanced Radar Tower has a considerably greater range than the basic version. In addition each advanced radar tower halves the radar wobble of units. This works globally and affects all allied radars. Building one or two can be of great help, at a price.]],
-    helptext_de = [[Der erweiterte Radarturm hat eine weitaus größere Radarreichweite als die Standardvariante. Zusätzlich wird das hin und her wackeln von Zielen halbiert. Dieser Effekt ist global und wirkt such auf alle verbündeten Radartürme aus. Ein, zwei solcher Türme können sehr nützlich sein, haben allerdings ihren Preis.]],
+    description_pl = [[Radar Dalekiego Zasięgu z ulepszeniem dokładności]],
+    helptext       = [[The advanced Radar Tower has a considerably greater range than the basic version. In addition each advanced radar tower halves the radar wobble of units. This works globally and affects all allied radars. Building one or two can be of great help, at a price.]],
+    helptext_de    = [[Der erweiterte Radarturm hat eine weitaus größere Radarreichweite als die Standardvariante. Zusätzlich wird das hin und her wackeln von Zielen halbiert. Dieser Effekt ist global und wirkt such auf alle verbündeten Radartürme aus. Ein, zwei solcher Türme können sehr nützlich sein, haben allerdings ihren Preis.]],
+    helptext_pl    = [[Ten radar ma zdecydowanie większy zasięg niż podstawowa wersja. Ponadto, każdy taki budynek zwiększa dokładność namiaru wszystkich własnych i sprzymierzonych radarów.]],
 	modelradius    = [[16]],
-  }, 
-  
+  },
+
   energyUse                     = 3,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,

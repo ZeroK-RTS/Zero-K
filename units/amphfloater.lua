@@ -19,8 +19,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext	 = [[The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating.]],
-    floattoggle  = [[1]],
+    description_pl = [[Amfibijny Bot-P³ywak]],
+    helptext       = [[The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating.]],
+    helptext_pl    = [[Buoy nie mo¿e strzelaæ pod wod¹, ale radzi sobie z tym poprzez wyp³ywanie na powierzchniê. Wtedy mo¿e atakowaæ przy u¿yciu dzia³ka o dobrym zasiêgu, zadaj¹c dodatkowe obra¿enia spowalniaj¹ce. Bêd¹c na powierzchni nie mo¿e siê poruszaæ.]],
+    floattoggle    = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

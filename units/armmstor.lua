@@ -45,8 +45,10 @@ unitDef = {
   yardMap                       = [[ooo ooo ooo]],
 
   customParams                  = {
-    description_de 	= [[Lagert Energie und Metall (500)]],
-	helptext_de 	= [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
+    description_de = [[Lagert Energie und Metall (500)]],
+    description_pl = [[Przechowuje Surowce (500)]],
+    helptext_de    = [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
+    helptext_pl    = [[Magazyn pozwala na przechowywanie surowców na wypadek, gdy nie masz wystarczaj¹co du¿o budowniczych, by je wykorzystaæ. Lepiej jest jednak zbudowaæ wiêcej budowniczych, a magazynu u¿ywaæ bardziej jako bufora na wypadek du¿ych zysków.]],
   }, 	
   
   featureDefs                   = {

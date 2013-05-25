@@ -47,8 +47,10 @@ unitDef = {
   
   customParams                  = {
     description_de = [[Ortet Einheiten unter Wasser]],
-	helptext		= [[The docile Sonar Station provides one of the few means of locating underwater targets.]],
-	helptext_de    = [[Das Sonar ortet nach dem Echoprinzip von Radaranlagen feindliche Einheiten unter Wasser. Dazu strahlen sie selbst ein Signal aus und empfangen das entsprechende Echo, aus dessen Laufzeit auf die Entfernung zu den Einheiten geschlossen wird.]],
+    description_pl = [[Wykrywa Jednostki Podwodne]],
+    helptext       = [[The docile Sonar Station provides one of the few means of locating underwater targets.]],
+    helptext_de    = [[Das Sonar ortet nach dem Echoprinzip von Radaranlagen feindliche Einheiten unter Wasser. Dazu strahlen sie selbst ein Signal aus und empfangen das entsprechende Echo, aus dessen Laufzeit auf die Entfernung zu den Einheiten geschlossen wird.]],
+    helptext_pl    = [[Sonar jest odpowiednikiem radaru dzia³aj¹cym pod wod¹. Jest niezbêdny do wykrywania (a zatem i niszczenia) okrêtów podwodnych i amfibii nieprzyjaciela.]],
   },
 
   featureDefs       = {

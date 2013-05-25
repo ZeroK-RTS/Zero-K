@@ -24,7 +24,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    description_pl = [[Amfibijny Bot Przeciwlotniczy]],
     helptext       = [[Angler is amphibious AA designed to counter the factory's nemesis - Shadow. Two of them together can float to the surface and kill a single Shadow.]],
+    helptext_pl    = [[Angler to amfibijna jednostka przeciwlotnicza zaprojektowana, by likwidowaæ g³ówne lotnicze zagro¿enie dla amfibii - bombowiec Shadow. Dwa Anglery mog¹ wyp³yn¹æ na powierzchniê i zestrzeliæ pojedynczego Shadowa.]],
     floattoggle = [[1]],
   },
 
