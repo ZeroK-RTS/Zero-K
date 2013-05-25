@@ -591,30 +591,21 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 		expUnitTeam = unitTeam
 		expUnitDefID = unitDefID
 	end
-	if (killerTeam == unitTeam) or (killerTeam == gaiaTeamID) or (unitTeam == gaiaTeamID) or (killerTeam == nil)
-	then return --echo("UnitDestroyed excluded")
+	if (killerTeam == unitTeam) or (killerTeam == gaiaTeamID) or (unitTeam == gaiaTeamID) or (killerTeam == nil) then
+		return
 	else
-		--Spring.Echo('Killer Team ' .. killerTeam)
 		local ud = UnitDefs[unitDefID]
-		if ud.customParams.commtype then
-			--commsKilledList[killerTeam] = commsKilledList[killerTeam] + 1
+		if (ud.customParams.commtype and (not spAreTeamsAllied(killerTeam, unitTeam))) then
 			AddAwardPoints( 'head', killerTeam, 1 )
-		--	echo('Team ' .. killerTeam .. ' killed a commander, total value = ' .. commsKilledList[killerTeam])
-		elseif ud.name == "chicken_dragon" then --check unit filename
-			--dragonsKilledList[killerTeam] = dragonsKilledList[killerTeam] + 1
+		elseif ud.name == "chicken_dragon" then
 			AddAwardPoints( 'dragon', killerTeam, 1 )
-			
-		--	echo("Team " .. killerTeam .. " killed a WD, value = ".. dragonsKilledList[killerTeam])
 		elseif ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
 			for killerFrienz, _ in pairs(awardData['heart']) do --give +1000000000 points for all frienz that kill queen and won
 				AddAwardPoints( 'heart', killerFrienz, awardAbsolutes['heart']) --the extra points is for id purpose. Will deduct later
 			end
 		elseif ud.name == "roost" then
-			--nestsKilledList[killerTeam] = nestsKilledList[killerTeam] + 1
 			AddAwardPoints( 'sweeper', killerTeam, 1 )
-		--	echo("Team " .. killerTeam .. " killed a nest, value = ".. nestsKilledList[killerTeam])
 		else
-		--echo("unimportant death: ".. ud.name)
 		end
 	end
 end --UnitDestroyed
