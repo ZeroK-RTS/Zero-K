@@ -441,12 +441,12 @@ local function ProcessAwardData()
 			else
 				compare = getMeanDamageExcept(winningTeam) * easyFactor
 			end
-			
+
 			--if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			if maxVal > compare then
 				maxVal = floor(maxVal)
 				maxValWrite = comma_value(maxVal)
-				message = 'Damage: '.. maxValWrite
+
 				if awardType == 'cap' then
 					message = 'Captured value: ' .. maxValWrite
 				elseif awardType == 'share' then
@@ -455,6 +455,12 @@ local function ProcessAwardData()
 					message = 'Terraform: ' .. maxValWrite
 				elseif awardType == 'rezz' then
 					message = 'Resurrected value: ' .. maxValWrite
+				elseif awardType == 'fire' then
+					message = 'Burnt value: ' .. maxValWrite
+				elseif awardType == 'emp' then
+					message = 'EMP Damage: ' .. maxValWrite
+				elseif awardType == 'ouch' then
+					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
 					message = maxValWrite .. " m from wreckage"
 				elseif awardType == 'friend' then
@@ -470,15 +476,16 @@ local function ProcessAwardData()
 					message = 'Damage: '.. comma_value(maxQueenKillDamage)
 				elseif awardType == 'sweeper' then
 					message = maxVal .. ' Nests wiped out'
-					
+
 					
 				elseif awardType == 'vet' then
 					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
 					local expUnitExpRounded = ''..floor(expUnitExp * 10)
 					expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1)
 					message = vetName ..', '.. expUnitExpRounded ..' XP'
+				else
+					message = 'Damaged value: '.. maxValWrite
 				end
-				
 			end
 		end --if winningTeam
 		if message then
@@ -608,36 +615,23 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 		else
 		end
 	end
-end --UnitDestroyed
-
---[[
-function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, step) 
-	if terraunitDefID == unitDefID then
-		terraformList[builderTeam] = terraformList[builderTeam] + step*terraformCost
-	end
-	return true
 end
-]]--
-
 
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
-  if builderTeam == gaiaTeamID then
-    return true
-  end
-  reclaimListByFeature[featureID] = reclaimListByFeature[featureID] or { metal = FeatureDefs[featureDefID].metal }
-  reclaimListByFeature[featureID][builderTeam] = (reclaimListByFeature[featureID][builderTeam] or 0) + part
-  return true
+	if builderTeam == gaiaTeamID then
+		return true
+	end
+	reclaimListByFeature[featureID] = reclaimListByFeature[featureID] or { metal = FeatureDefs[featureDefID].metal }
+	reclaimListByFeature[featureID][builderTeam] = (reclaimListByFeature[featureID][builderTeam] or 0) + part
+	return true
 end
-
 
 function gadget:FeatureDestroyed (featureID, allyTeam)
-  if (reclaimListByFeature[featureID]) then
-    AddFeatureReclaim(featureID)
-    reclaimListByFeature[featureID] = nil
-  end
+	if (reclaimListByFeature[featureID]) then
+		AddFeatureReclaim(featureID)
+		reclaimListByFeature[featureID] = nil
+	end
 end
-
-
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
 		attackerID, attackerDefID, attackerTeam)
@@ -649,66 +643,62 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 	
 	local hp = spGetUnitHealth(unitID)
 	local damage = (hp > 0) and fullDamage or fullDamage + hp
+	local costdamage = (damage / UnitDefs[unitDefID].health) * UnitDefs[unitDefID].metalCost
 	
 	if spAreTeamsAllied(attackerTeam, unitTeam) then
 		if not paralyzer then
-			--friendlyDamageList[attackerTeam] = friendlyDamageList[attackerTeam] + damage
-			AddAwardPoints( 'friend', attackerTeam, damage )
+			AddAwardPoints( 'friend', attackerTeam, costdamage )
 		end
 	else
 		if paralyzer then
-			--empDamageList[attackerTeam] = empDamageList[attackerTeam] + damage
 			AddAwardPoints( 'emp', attackerTeam, damage )
 		else
-			local attackedDef= UnitDefs[unitDefID]
+			local attackedDef = UnitDefs[unitDefID]
 			if attackedDef.name == "chickenflyerqueen" or attackedDef.name == "chickenlandqueen" then
-				if damage> 0 then --the damage to queen
-					AddAwardPoints( 'heart', attackerTeam, damage ) --store damage.
-				end
+				AddAwardPoints( 'heart', attackerTeam, damage )
 			end
-			AddAwardPoints( 'pwn', attackerTeam, damage )
+			AddAwardPoints( 'pwn', attackerTeam, costdamage )
 			AddAwardPoints( 'ouch', unitTeam, damage )
 			local ad = UnitDefs[attackerDefID]
-			
+
 			if (flamerWeaponDefs[weaponID]) then				
-				AddAwardPoints( 'fire', attackerTeam, damage )
+				AddAwardPoints( 'fire', attackerTeam, costdamage )
 			end
-			
+
 			-- Static Weapons
 			if (not ad.canMove) then
-			
+
 				-- bignukes, zenith, starlight
 				if staticO_big[ad.name] then
-					AddAwardPoints( 'nux', attackerTeam, damage )
-					
+					AddAwardPoints( 'nux', attackerTeam, costdamage )
+
 				-- not lrpc, tacnuke, emp missile
 				elseif not staticO_small[ad.name] then
-					AddAwardPoints( 'shell', attackerTeam, damage )
+					AddAwardPoints( 'shell', attackerTeam, costdamage )
 				end
-				
+
 			elseif kamikaze[ad.name] then
-				AddAwardPoints( 'kam', attackerTeam, damage )
-			
+				AddAwardPoints( 'kam', attackerTeam, costdamage )
+
 			elseif ad.canFly then
-				AddAwardPoints( 'air', attackerTeam, damage )
-				
+				AddAwardPoints( 'air', attackerTeam, costdamage )
+
 			elseif boats[attackerDefID] then
-				AddAwardPoints( 'navy', attackerTeam, damage )
-			
+				AddAwardPoints( 'navy', attackerTeam, costdamage )
+
 			elseif t3Units[attackerDefID] then
-				AddAwardPoints( 't3', attackerTeam, damage )
+				AddAwardPoints( 't3', attackerTeam, costdamage )
 
 			elseif comms[attackerDefID] then
-				AddAwardPoints( 'comm', attackerTeam, damage )
+				AddAwardPoints( 'comm', attackerTeam, costdamage )
 				
 			end	
 		end
 	end
-end --UnitDamaged
+end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if unitDefID == mexDefID then
-		--mexList[teamID] = mexList[teamID] + 1
 		AddAwardPoints( 'mex', teamID, 1 )
 	end
 end
