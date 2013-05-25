@@ -1,4 +1,3 @@
-
 function gadget:GetInfo()
   return {
     name      = "Awards",
@@ -22,7 +21,6 @@ local echo = Spring.Echo
 
 local totalTeams = 0
 local totalTeamList = {}
-
 
 local awardDescs = 
 {
@@ -129,24 +127,28 @@ local shareList_update = five_minute_frames
 
 local boats, t3Units, comms = {}, {}, {}
 
-local nukes = {	armsilo=1, 	corsilo=1,
-				armshock=1,	cortron=1,
-				armcybr=1,	
-			}
 local staticO_small = {
-				armemp=1, cortron=1,
-				armbrtha=1, corint=1,
-			}
-			
+	armbrtha=1,
+	seismic=1,
+	tacnuke=1,
+	empmissile=1,
+	napalmmissile=1,
+}
+
 local staticO_big = {
-				armsilo=1,	corsilo=1,
-				mahlazer=1, corbeac=1,
+	corsilo=1,
+	mahlazer=1,
+	zenith=1,
+	raveparty=1,
 }
 
 local kamikaze = {
-				corroach=1, corsktl=1, blastwing=1, puppy=1,
+	corroach=1,
+	corsktl=1,
+	blastwing=1,
+	puppy=1,
 }
-			
+
 local flamerWeaponDefs = {}
 
 -------------------
