@@ -24,6 +24,7 @@ unitDef = {
 
   customParams                  = {
     pylonrange = 500,
+    helptext       = [[Energy Transmission Pylons help one extend one's energy grid and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defenses that rely on the energy grid.]],
 	description_de = [[Erweitert den Bereich des Overdrive-Energienetzes]],
 	helptext_de    = [[Durch das Energy Pylon wird es dir ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
 	aimposoffset   = [[0 0 0]],
