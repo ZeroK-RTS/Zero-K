@@ -72,8 +72,8 @@ local remUnitDefID = {}
 local Echo = Spring.Echo
 
 local IsAA = {
-	[UnitDefnames.missiletower.id] = true,
-	[UnitDefnames.screamer.id] = true,
+	[UnitDefNames.missiletower.id] = true,
+	[UnitDefNames.screamer.id] = true,
 }
 
 -------------------FUNCTIONS------------------
