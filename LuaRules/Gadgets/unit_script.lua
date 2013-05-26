@@ -551,7 +551,8 @@ function gadget:Initialize()
 			local filename = scriptFiles[fn] or scriptFiles[bn] or
 			                 scriptFiles[cfn] or scriptFiles[cbn]
 			if filename then
-				Spring.Echo("  Loading unit script: " .. filename)
+				--Spring.Echo("  Loading unit script: " .. filename)
+				Spring.Log("unit_script.lua", LOG.DEBUG, "  Loading unit script: " .. filename)
 				LoadScript(unitDef.scriptName, filename)
 			end
 		end
