@@ -2,8 +2,6 @@ unitDef = {
   unitname                      = [[armpb]],
   name                          = [[Gauss]],
   description                   = [[Ambush Gauss Turret]],
-  acceleration                  = 0,
-  brakeRate                     = 0,
   buildCostEnergy               = 400,
   buildCostMetal                = 400,
   builder                       = false,
@@ -14,6 +12,7 @@ unitDef = {
   buildPic                      = [[ARMPB.png]],
   buildTime                     = 400,
   canAttack                     = true,
+  canMove                       = false,
   canstop                       = [[1]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
@@ -23,10 +22,10 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Versteckter Raketenturm]],
-    helptext 	   = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage, making it a good choice when the enemy is using artillery.]],
-	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
-	modelradius    = [[15]],
+    description_de = [[Versteckter Gaussturm]],
+    helptext       = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage, making it a good choice when the enemy is using artillery.]],
+    helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurÃ¼ckgezogen hat, ist es viermal schwerer ihn zu zerstÃ¶ren, was ihn effektive gegen gegnerische Artillerie macht.]],
+    modelradius    = [[15]],
   },
 
   damageModifier                = 0.25,
@@ -54,12 +53,11 @@ unitDef = {
       [[custom:flashmuzzle1]],
     },
   }, 
-  
-  side                          = [[ARM]],
+
   sightDistance                 = 660,
   smoothAnim                    = true,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
+  yardmap                       = [[oooo]],
 
   weapons                       = {
 
