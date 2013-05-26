@@ -23,7 +23,7 @@ function gadget:Initialize()
 			if wd.customParams.single_hit then
 				Script.SetWatchWeapon(wd.id, true)
 				singleHitWeapon[wd.id] = true;
-				Spring.Echo('Registered '..wd.name..' as single-hit weapon');
+				--Spring.Echo('Registered '..wd.name..' as single-hit weapon');
 			end
 		end
 	end
