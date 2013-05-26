@@ -2,6 +2,8 @@ unitDef = {
   unitname                      = [[armpb]],
   name                          = [[Gauss]],
   description                   = [[Ambush Gauss Turret]],
+  acceleration                  = 0,
+  brakeRate                     = 0,
   buildCostEnergy               = 400,
   buildCostMetal                = 400,
   builder                       = false,
@@ -10,9 +12,8 @@ unitDef = {
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[armpb_aoplane.dds]],
   buildPic                      = [[ARMPB.png]],
-  buildTime                     = 400, 
-  canAttack                     = true,  
-  canMove                       = false, 
+  buildTime                     = 400,
+  canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
@@ -24,7 +25,7 @@ unitDef = {
   customParams                  = {
     description_de = [[Versteckter Raketenturm]],
     helptext 	   = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage, making it a good choice when the enemy is using artillery.]],
-	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurÃ¼ckgezogen hat, ist es sehr schwer ihn zu zerstÃ¶ren, was ihn effektive gegen gegnerische Artillerie macht.]],
+	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
 	modelradius    = [[15]],
   },
 
@@ -53,11 +54,12 @@ unitDef = {
       [[custom:flashmuzzle1]],
     },
   }, 
-
+  
+  side                          = [[ARM]],
   sightDistance                 = 660,
   smoothAnim                    = true,
-  useBuildingGroundDecal        = true, 
-  yardmap                       = [[oooo]], 
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
 
   weapons                       = {
 
