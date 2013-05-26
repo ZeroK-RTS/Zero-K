@@ -127,7 +127,7 @@ commDefs = {}	--holds precedurally generated comm defs
 
 local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then
-		Spring.Echo("Processing comm: "..name)
+		Spring.Log("gamedata/modularcomms/unitdefgen.lua", LOG.DEBUG, "\tModularComms: Processing comm: " .. name)
 		local name = name
 		commDefs[name] = CopyTable(UnitDefs[config.chassis], true)
 		commDefs[name].customparams = commDefs[name].customparams or {}
