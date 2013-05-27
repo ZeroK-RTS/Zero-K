@@ -1,3 +1,9 @@
+--[[
+To-do:
+	- actual decloaking (or simply revealing somehow) instead of seismic. For easy solution with seismic enable ping2blip
+	- allow to specify whether scanning reveals the scanner unit
+--]]
+
 function gadget:GetInfo()
 	return {
 		name      = "Scan Sweep",

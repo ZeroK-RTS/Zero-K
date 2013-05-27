@@ -11,12 +11,15 @@ function gadget:GetInfo()
 end
 
 ------ SYNCED -------------------------------------------------------
-if (gadgetHandler:IsSyncedCode() and enabled) then 
+if (gadgetHandler:IsSyncedCode() and enabled) then
 
 local defaultCeg = ''
 local burnoutWeapon = {}
 local burnoutProjectile = {}
+
 local spSetProjectileCeg = Spring.SetProjectileCEG
+local scSetWatchWeapon   = Script.SetWatchWeapon
+
 local curFrame = 0
 
 function gadget:Initialize()
@@ -30,7 +33,7 @@ function gadget:Initialize()
 					burnout = wd.customParams.trail_burnout,
 					burnoutCeg = wd.customParams.trail_burnout_ceg or defaultCeg
 				}
-				Script.SetWatchWeapon(wd.id, true)
+				scSetWatchWeapon(wd.id, true)
 			end
 		end
 	end
@@ -44,11 +47,11 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 			burnoutCeg = burnoutWeapon[weaponID].burnoutCeg or defaultCeg
 		}
 	end
-end	
+end
 
 function gadget:ProjectileDestroyed(proID, proOwnerID, weaponID)
 	burnoutProjectile[proID] = nil
-end	
+end
 
 function gadget:GameFrame(f)
 	curFrame = f
@@ -57,8 +60,8 @@ function gadget:GameFrame(f)
 			spSetProjectileCeg(id, proj.burnoutCeg)
 			burnoutProjectile[id] = nil
 		end
-	end	
+	end
 end
-	
-end 
+
+end
 ----- END SYNCED ---------------------------------------------------
