@@ -112,20 +112,14 @@ local awardEasyFactors = {
 	
 	empFactor	= empFactor,
 }
--- end new
-
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
-
 
 local awardList = {}
 local sentAwards = false
 local teamCount = 0
 
-local five_minute_frames = 32*60*5
-local shareList_update = five_minute_frames
---shareList_update = 32*20
-
+local shareList_update = 32*60*5 -- five minute frames
 
 local boats, t3Units, comms = {}, {}, {}
 
@@ -200,7 +194,7 @@ local function getMeanDamageExcept(excludeTeam)
 	local count = 0
 	--for team,dmg in pairs(damageList) do
 	for team,dmg in pairs(awardData.pwn) do
-		if team ~= excludeTeam 
+		if team ~= excludeTeam
 			and dmg > 100
 		then
 			mean = mean + dmg
@@ -352,15 +346,13 @@ local function UpdateResourceStats(t)
 		aRes.energy_spend_construction = aRes.metal_spend_construction
 		aRes.energy_spend_other = aRes.energy_spend_total - (aRes.energy_spend_overdrive + aRes.energy_spend_construction + aRes.energy_spend_waste)		
 	end
-end --UpdateResourceStats
-
+end
 
 local function AddAwardPoints( awardType, teamID, amount )
 	awardData[awardType][teamID] = awardData[awardType][teamID] + amount
 end
 
 local function AddTerraformCost(teamID, value)
-	--terraformList[teamID] = terraformList[teamID] + value
 	AddAwardPoints( 'terra', teamID, value )
 end
 
@@ -373,14 +365,12 @@ local function AddFeatureReclaim(featureID)
 
   for team, part in pairs(featureData) do
     if (part < 0) then  --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
-      --reclaimList[team] = reclaimList[team] - metal * part
 	  if metal then
 		AddAwardPoints( 'reclaim', team, - metal * part )
 	  end
     end
   end
 end
-
 
 local function FinalizeReclaimList()
   for featureID, _ in pairs(reclaimListByFeature) do
@@ -389,16 +379,12 @@ local function FinalizeReclaimList()
   reclaimListByFeature = {}
 end
 
-
 local function UnitResurrected (unitDefID, teamID)
   local ud = UnitDefs[unitDefID]
-  --resurrectList[teamID] = resurrectList[teamID] + (ud and ud.metalCost or 0)
   AddAwardPoints( 'rezz', teamID, (ud and ud.metalCost or 0) )
 end
 
 GG.Awards.UnitResurrected = UnitResurrected
-
-
 
 local function ProcessAwardData()
 	
@@ -460,7 +446,7 @@ local function ProcessAwardData()
 				elseif awardType == 'fire' then
 					message = 'Burnt value: ' .. maxValWrite
 				elseif awardType == 'emp' then
-					message = 'EMP Damage: ' .. maxValWrite
+					message = 'Stunned value: ' .. maxValWrite
 				elseif awardType == 'ouch' then
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
@@ -533,17 +519,19 @@ function gadget:Initialize()
 		
 		
 	end
-	
 
-	local boatFacs = {'armsy', 'corsy', } --'armasy', 'corasy'}
+	local boatFacs = {'corsy', 'striderhub'}
 	for _, boatFac in pairs(boatFacs) do
 		local udBoatFac = UnitDefNames[boatFac]
 		if udBoatFac then
 			for _, boatDefID in pairs(udBoatFac.buildOptions) do
-				boats[boatDefID] = true
+				if (UnitDefs[boatDefID].minwaterdepth > 0) then -- because striderhub
+					boats[boatDefID] = true
+				end
 			end
 		end
 	end
+
 	--[[
 	local t3Facs = {'armshltx', 'corgant', }
 	for _, t3Fac in pairs(t3Facs) do
@@ -553,6 +541,7 @@ function gadget:Initialize()
 		end
 	end
 	--]]
+
 	for i=1,#WeaponDefs do
 		local wcp = WeaponDefs[i].customParams or {}
 		if (wcp.setunitsonfire) then
@@ -648,18 +637,18 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 		or (attackerTeam == gaiaTeamID) 
 		or (unitTeam == gaiaTeamID) 
 		then return end
-	
+
 	local hp = spGetUnitHealth(unitID)
 	local damage = (hp > 0) and fullDamage or fullDamage + hp
 	local costdamage = (damage / UnitDefs[unitDefID].health) * UnitDefs[unitDefID].metalCost
-	
+
 	if spAreTeamsAllied(attackerTeam, unitTeam) then
 		if not paralyzer then
 			AddAwardPoints( 'friend', attackerTeam, costdamage )
 		end
 	else
 		if paralyzer then
-			AddAwardPoints( 'emp', attackerTeam, damage )
+			AddAwardPoints( 'emp', attackerTeam, costdamage )
 		else
 			local attackedDef = UnitDefs[unitDefID]
 			if attackedDef.name == "chickenflyerqueen" or attackedDef.name == "chickenlandqueen" then
