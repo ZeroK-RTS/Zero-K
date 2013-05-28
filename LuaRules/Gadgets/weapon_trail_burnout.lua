@@ -17,15 +17,12 @@ local defaultCeg = ''
 local burnoutWeapon = {}
 local burnoutProjectile = {}
 
+local spGetGameFrame     = Spring.GetGameFrame
 local spSetProjectileCeg = Spring.SetProjectileCEG
 local scSetWatchWeapon   = Script.SetWatchWeapon
 
-local curFrame = 0
-
 function gadget:Initialize()
-	local j = 0;
 	for i=1,#WeaponDefs do
-		j=j+1;
 		local wd = WeaponDefs[i]
 		if wd.customParams then
 			if wd.customParams.trail_burnout then
@@ -42,7 +39,7 @@ end
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if burnoutWeapon[weaponID] then
 		burnoutProjectile[proID] = {
-			startFrame = curFrame,
+			startFrame = spGetGameFrame(),
 			burnout = burnoutWeapon[weaponID].burnout,
 			burnoutCeg = burnoutWeapon[weaponID].burnoutCeg or defaultCeg
 		}
@@ -54,7 +51,6 @@ function gadget:ProjectileDestroyed(proID, proOwnerID, weaponID)
 end
 
 function gadget:GameFrame(f)
-	curFrame = f
 	for id, proj in pairs(burnoutProjectile) do
 		if proj.startFrame+proj.burnout <= f then
 			spSetProjectileCeg(id, proj.burnoutCeg)
