@@ -20,6 +20,7 @@ local GetUnitPosition   = Spring.GetUnitPosition
 local GiveOrderToUnit   = Spring.GiveOrderToUnit
 local SetUnitPosition   = Spring.SetUnitPosition
 local SetUnitNoSelect   = Spring.SetUnitNoSelect
+local TransferUnit      = Spring.TransferUnit
 local random            = math.random
 local CMD_ATTACK		= CMD.ATTACK
 
@@ -31,6 +32,7 @@ local DEFAULT_MAX_DRONE_RANGE = 1500
 
 local carrierList = {}
 local droneList = {}
+local drones_to_move = {}
 
 local function InitCarrier(unitDefID, teamID)
 	local carrierData = carrierDefs[unitDefID]
@@ -96,6 +98,11 @@ end
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 	if carrierList[unitID] then
 		carrierList[unitID].teamID = newTeam
+		for i=1,#carrierList[carrierID].droneSets do
+			local set = carrierList[carrierID].droneSets[i]
+			for droneID, _ in pairs(set.drones) do
+				drones_to_move[droneID] = newTeam
+			end
 	end
 	return true
 end
@@ -191,6 +198,9 @@ function gadget:GameFrame(n)
 					end
 				end
 			end
+		end
+		for droneID, team in pairs(drones_to_move) do
+			TransferUnit(droneID, team)
 		end
 	end
 	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) < 0.1) then
