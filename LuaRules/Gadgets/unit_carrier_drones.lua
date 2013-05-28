@@ -202,6 +202,7 @@ function gadget:GameFrame(n)
 		for droneID, team in pairs(drones_to_move) do
 			TransferUnit(droneID, team)
 		end
+		drones_to_move = {}
 	end
 	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) < 0.1) then
 		for i,_ in pairs(carrierList) do
