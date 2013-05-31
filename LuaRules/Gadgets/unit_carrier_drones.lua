@@ -103,6 +103,7 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 			for droneID, _ in pairs(set.drones) do
 				drones_to_move[droneID] = newTeam
 			end
+		end
 	end
 	return true
 end
@@ -217,7 +218,6 @@ function gadget:Initialize()
 		if build == 1 then
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local team = Spring.GetUnitTeam(unitID)
-
 			gadget:UnitFinished(unitID, unitDefID, team)
 		end
 	end

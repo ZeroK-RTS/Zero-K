@@ -525,7 +525,7 @@ function gadget:Initialize()
 		local udBoatFac = UnitDefNames[boatFac]
 		if udBoatFac then
 			for _, boatDefID in pairs(udBoatFac.buildOptions) do
-				if (UnitDefs[boatDefID].minwaterdepth > 0) then -- because striderhub
+				if (UnitDefs[boatDefID].minWaterDepth > 0) then -- because striderhub
 					boats[boatDefID] = true
 				end
 			end
