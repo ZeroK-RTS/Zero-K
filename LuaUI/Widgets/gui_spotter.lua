@@ -45,7 +45,6 @@ local spGetGroundNormal      = Spring.GetGroundNormal
 local spGetSelectedUnits     = Spring.GetSelectedUnits
 local spGetTeamColor         = Spring.GetTeamColor
 local spGetTimer             = Spring.GetTimer
-local spGetUnitBasePosition  = Spring.GetUnitBasePosition
 local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spGetUnitRadius        = Spring.GetUnitRadius

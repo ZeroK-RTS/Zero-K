@@ -102,7 +102,7 @@ local function GetTipDimensions(unitID, str, height, invert)
 	textHeight = textHeight*fontSize*numLines
 	local textWidth = gl.GetTextWidth(str)*fontSize
 
-	local ux, uy, uz = Spring.GetUnitBasePosition(unitID)
+	local ux, uy, uz = Spring.GetUnitPosition(unitID)
 	uy = uy + height
 	local x,y,z = Spring.WorldToScreenCoords(ux, uy, uz)
 	if not invert then

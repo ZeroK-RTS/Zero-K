@@ -203,7 +203,7 @@ local function UnitFinished(_,unitID,unitDefID)
       end
 
       if (fx.class=="GroundFlash") then
-        fx.options.pos = { Spring.GetUnitBasePosition(unitID) }
+        fx.options.pos = { Spring.GetUnitPosition(unitID) }
       end
       if (fx.options.heightFactor) then
 		local pos = fx.options.pos or {0, 0, 0}
@@ -248,7 +248,7 @@ local function UnitEnteredLos(_,unitID)
     for i=1,#effects do
       local fx = effects[i]
       if (fx.class=="GroundFlash") then
-        fx.options.pos = { Spring.GetUnitBasePosition(unitID) }
+        fx.options.pos = { Spring.GetUnitPosition(unitID) }
       end
     fx.options.unit = unitID
     AddFxs( unitID,LupsAddFX(fx.class,fx.options) )

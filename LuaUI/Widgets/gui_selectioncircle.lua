@@ -74,7 +74,6 @@ local GetUnitTeam         = Spring.GetUnitTeam
 local GetUnitDefID        = Spring.GetUnitDefID
 local GetUnitRadius       = Spring.GetUnitRadius
 local GetUnitViewPosition = Spring.GetUnitViewPosition
-local GetUnitBasePosition = Spring.GetUnitBasePosition
 local GetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetSelectedUnits  = Spring.GetSelectedUnits
 local GetUnitNoDraw       = Spring.GetUnitNoDraw

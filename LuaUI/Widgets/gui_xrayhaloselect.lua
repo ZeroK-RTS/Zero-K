@@ -64,7 +64,6 @@ local GL_STENCIL_BITS = 0x0D57
 
 local GetUnitRadius       = Spring.GetUnitRadius
 local GetUnitViewPosition = Spring.GetUnitViewPosition
-local GetUnitBasePosition = Spring.GetUnitBasePosition
 local GetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local IsUnitVisible       = Spring.IsUnitVisible
 local GetGroundNormal     = Spring.GetGroundNormal

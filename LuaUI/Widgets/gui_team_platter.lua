@@ -51,7 +51,7 @@ local spGetGroundNormal      = Spring.GetGroundNormal
 local spGetSelectedUnits     = Spring.GetSelectedUnits
 local spGetTeamColor         = Spring.GetTeamColor
 local spGetTimer             = Spring.GetTimer
-local spGetUnitBasePosition  = Spring.GetUnitBasePosition
+local spGetUnitPosition      = Spring.GetUnitPosition
 local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 local spGetUnitDefID         = Spring.GetUnitDefID
 --local spGetUnitRadius        = Spring.GetUnitRadius --not used
@@ -283,7 +283,7 @@ if not spIsGUIHidden() then
             end
             local colorSet  = GetTeamColorSet(teamID)
             if (trackSlope and (not UnitDefs[udid].canFly)) then
-              local x, y, z = spGetUnitBasePosition(visUnits[i])
+              local x, y, z = spGetUnitPosition(visUnits[i])
               local gx, gy, gz = spGetGroundNormal(x, z)
               local degrot = acos(gy) * radInDeg
               colorSet[4] = fillOpacity
@@ -335,7 +335,7 @@ if not spIsGUIHidden() then
       if (radius) then
         radius = radius + extraRadius
         if (trackSlope and (not UnitDefs[udid].canFly)) then
-          local x, y, z = spGetUnitBasePosition(unitID)
+          local x, y, z = spGetUnitPosition(unitID)
           local gx, gy, gz = spGetGroundNormal(x, z)
           local degrot = acos(gy) * radInDeg
           glDrawListAtUnit(unitID, circleLines, false,
