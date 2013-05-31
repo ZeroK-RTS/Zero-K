@@ -26,6 +26,7 @@ local weapons = {
 	raveparty_violet_slugger = { slowDamage = 2500, noDeathBlast = true, scaleSlow = true },
 	chicken_spidermonkey_web = { slowDamage = 30, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	amphfloater_cannon = { slowDamage = 250, scaleSlow = true},
+	corsumo_disruptor = { slowDamage = 500, scaleSlow = true },
 }
 
 -- reads from customParams and copies to weapons as appropriate - needed for procedurally generated comms

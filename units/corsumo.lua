@@ -25,7 +25,7 @@ unitDef = {
     --description_bp = [[Robô dispersador]],
     description_fr = [[Robot Émeutier]],
     description_de = [[Springender Sturm Roboter]],
-    helptext       = [[The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and mows down the survivors with its particle beams.]],
+    helptext       = [[The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and mows down the survivors with its disruptor beams.]],
     --helptext_bp    = [[O raio de calor do Sumo é muito poderoso a curto alcançe, mas se dissipa com a distância e é bem mais fraca de longe. A velocidade alta de disparo o torna ideal para lutar contra grandes grupos de unidades baratas. ]],
     --helptext_fr    = [[Le rayon r chaleur du Sumo est capable de délivrer une puissance de feu important sur un point précis. Plus la cible est proche, plus les dégâts seront importants. La précision du rayon est idéale pour lutter contre de larges vagues d'ennemis, mais l'imposant blindage du Sumo le restreint r une vitesse réduite.]],
 	--helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert er entsprechend an Feuerkraft. Er eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
@@ -84,7 +84,7 @@ unitDef = {
     },  
   
     {
-      def                = [[PARTICLEBEAM]],
+      def                = [[DISRUPTOR]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[-1 0 0]],
       maxAngleDif        = 222,
@@ -92,7 +92,7 @@ unitDef = {
     },
 
     {
-      def                = [[PARTICLEBEAM]],
+      def                = [[DISRUPTOR]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[1 0 0]],
       maxAngleDif        = 222,
@@ -195,7 +195,7 @@ unitDef = {
       weaponVelocity          = 500,
     },
 	
-	PARTICLEBEAM = {
+    PARTICLEBEAM = {
       name                    = [[Auto Particle Beam]],
       beamDecay               = 0.85,
       beamTime                = 0.01,
@@ -226,6 +226,48 @@ unitDef = {
       tolerance               = 8192,
       turret                  = true,
       weaponType              = [[BeamLaser]],
+    },
+    
+    DISRUPTOR = {
+      name                    = [[Disruptor Pulse Beam]],
+      areaOfEffect            = 24,
+      beamdecay               = 0.9,
+      beamTime                = 0.03,
+      beamttl                 = 50,
+      coreThickness           = 0.25,
+      craterBoost             = 0,
+      craterMult              = 0,
+  
+      damage                  = {
+		default = 250,
+      },
+  
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4.33,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 320,
+      reloadtime              = 2,
+      rgbColor                = [[0.3 0 0.4]],
+      soundStart              = [[weapon/laser/heavy_laser5]],
+      soundStartVolume        = 3,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 12,
+      tolerance               = 18000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,    
     },
 
     LANDING = {
