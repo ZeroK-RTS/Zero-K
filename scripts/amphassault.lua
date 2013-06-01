@@ -297,12 +297,11 @@ function script.QueryWeapon(num)
 		if beamCount < 6 then
 			if beamCount == 1 then
 				Spring.SetUnitWeaponState(unitID, 1, "range", 0)
+			elseif beamCount == 2 then
+				Spring.SetUnitWeaponState(unitID, 1, "range", 550)
 			end
 			return mflare
 		else
-			if beamCount == 2 then
-				Spring.SetUnitWeaponState(unitID, 1, "range", 550)
-			end
 			if beamCount >= 24*5 then
 				beamCount = 0
 			end
@@ -343,7 +342,7 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(rbarrel1, x_axis, -pitch, math.rad(90))
 		WaitForTurn(turret, y_axis)
 		WaitForTurn(rbarrel1, x_axis)
-        WaitForTurn(lbarrel1, x_axis)
+		WaitForTurn(lbarrel1, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 2 then
