@@ -92,6 +92,7 @@ unitDef = {
 	  customParams            = {
 	    gatherradius = [[416]],
 		smoothradius = [[256]],
+		detachmentradius = [[256]],
 		smoothmult   = [[1]],
 	  },
 	  

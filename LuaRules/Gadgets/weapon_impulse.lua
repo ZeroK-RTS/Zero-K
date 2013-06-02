@@ -89,8 +89,8 @@ local inTransport = {}
 -------------------------------------------------------------------------------------
 -- General Functionss
 
-local function AddGadgetImpulse(unitID, unitDefID, x, y, z, moveType) -- could be GG if needed.
-	moveType = moveType or moveTypeByID[unitDefID]
+local function AddGadgetImpulse(unitID, x, y, z, unitDefID, moveType) -- could be GG if needed.
+	moveType = moveType or moveTypeByID[unitDefID or Spring.GetUnitDefID(unitID)]
 	if not unit[unitID] then
 		unit[unitID] = {
 			moveType = moveType,
@@ -105,6 +105,22 @@ local function AddGadgetImpulse(unitID, unitDefID, x, y, z, moveType) -- could b
 	end
 	thereIsStuffToDo = true
 end
+
+local function DetatchFromGround(unitID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	local h = Spring.GetGroundHeight(x,z)
+	--GG.UnitEcho(unitID,h-y)
+	if h >= y - 0.01 or y >= h - 0.01 then
+		Spring.AddUnitImpulse(unitID, 0,1000,0)
+		Spring.MoveCtrl.Enable(unitID)
+		Spring.MoveCtrl.SetPosition(unitID, x, y+0.1, z)
+		Spring.MoveCtrl.Disable(unitID)
+		Spring.AddUnitImpulse(unitID, 0,-1000,0)
+	end
+end
+
+GG.AddGadgetImpulse = AddGadgetImpulse
+GG.DetatchFromGround = DetatchFromGround
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -129,7 +145,7 @@ local function CheckSpaceGunships(f)
 					GG.UpdateUnitAttributes(unitID)
 					data.inSpace = true
 				end
-				AddGadgetImpulse(unitID, 0, 0, BALLISTIC_GUNSHIP_GRAVITY, 0, 1)
+				AddGadgetImpulse(unitID, 0, BALLISTIC_GUNSHIP_GRAVITY, 0, 0, 1)
 			else
 				if data.inSpace then
 					--Spring.SetUnitRulesParam(unitID, "inSpace", 0)
@@ -250,7 +266,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(8*myMass), (uz-az)*mag
 		end
 		
-		AddGadgetImpulse(unitID, unitDefID, x, y, z)
+		AddGadgetImpulse(unitID, x, y, z, unitDefID)
 		
 		--if moveTypeByID[unitDefID] == 1 and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam) then
 		--	unit[unitID].allied	= true

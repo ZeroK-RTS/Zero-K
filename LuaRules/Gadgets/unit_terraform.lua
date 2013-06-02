@@ -3081,6 +3081,7 @@ for i=1,#WeaponDefs do
 			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
 			smoothradius = wd.customParams.smoothradius or wd.craterAreaOfEffect*0.5,
 			gatherradius = wd.customParams.gatherradius or wd.craterAreaOfEffect*0.75,
+			detachmentradius = wd.customParams.detachmentradius
 		}
 	end
 end
@@ -3091,7 +3092,8 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		local height = spGetGroundHeight(x,z)
 		
 		local smoothradius = SeismicWeapon[weaponID].smoothradius
-		local gatherradius = SeismicWeapon[weaponID].gatherradius	
+		local gatherradius = SeismicWeapon[weaponID].gatherradius
+		local detachmentradius = SeismicWeapon[weaponID].detachmentradius	
 		local maxSmooth = SeismicWeapon[weaponID].smooth
 		if y > height + HEIGHT_FUDGE_FACTOR then
 			local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2
@@ -3150,6 +3152,14 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 				end 
 			end
 			spSetHeightMapFunc(func)
+		end
+		
+		if detachmentradius then
+			local units = Spring.GetUnitsInCylinder(sx,sz,detachmentradius)
+			for i = 1, #units do
+				local hitUnitID = units[i]
+				GG.DetatchFromGround(hitUnitID)
+			end
 		end
 	end
 
@@ -3239,8 +3249,8 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		local  _,_,_,_,build = spGetUnitHealth(unitID)
 		if build == 1 then
 			local ux, uy, uz  = spGetUnitPosition(unitID)
-			ux = floor((ux+4)/8)*8
-			uz = floor((uz+4)/8)*8
+			ux = floor((ux+8)/16)*16
+			uz = floor((uz+8)/16)*16
 			
 			local posCount = 57
 			
@@ -3277,15 +3287,15 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			--		 0 ,0 ,0 }
 			
 			local posY = 
-				 {3 ,5 ,3 ,
-			      6 ,12,15,12,6 ,
-			   6 ,14,21,24,21,14,6 ,
-			3 ,12,21,25,30,25,21,12,3 ,
-			4 ,15,24,30,32,30,24,15,4 ,
-			3 ,12,21,25,30,25,21,12,3 ,
-			   6 ,14,21,24,21,14,6 ,
-			       6 ,12,15,12,6 ,
-				 3 ,5 ,3 }
+				    {2 ,3 ,2 ,
+			      2 ,3 ,7 ,3 ,2 ,
+			   2 ,5 ,20,21,20,4 ,2 ,
+			2 ,3 ,20,25,26,25,20,3 ,2 ,
+			3 ,7 ,21,26,28,26,21,7 ,3 ,
+			2 ,3 ,20,25,26,25,20,3 ,2 ,
+			   2 ,4 ,20,21,20,5 ,2 ,
+			       2,3 ,7 ,3 ,2 ,
+				     2 ,3 ,2 }
 			
 			for i = 1, posCount do
 				if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
@@ -3303,6 +3313,14 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 				posZ,
 				posY
 			) 
+			
+			local units = Spring.GetUnitsInCylinder(ux,uz,40)
+			for i = 1, #units do
+				local hitUnitID = units[i]
+				if hitUnitID ~= unitID then
+					GG.DetatchFromGround(hitUnitID)
+				end
+			end
 		end
 		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
 	end

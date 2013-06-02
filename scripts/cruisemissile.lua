@@ -22,13 +22,18 @@ local function RemoveMissile()
 	Spring.DestroyUnit(unitID, false, true)	--"reclaim the missile"
 end
 
-function script.Shot1()
+function script.Shot()
 	StartThread(RemoveMissile)
 end
 
-function script.AimFromWeapon1() return base end
+function script.AimFromWeapon() 
+	return base 
+end
 
-function script.QueryWeapon1() return base end
+function script.QueryWeapon() 
+	Spring.Echo("QueryWeapon")
+	return base 
+end
 
 function script.Create()
 	Turn( base , x_axis, math.rad(-90) )
