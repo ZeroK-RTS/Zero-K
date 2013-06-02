@@ -390,6 +390,7 @@ local function Jump(unitID, goal, cmdTag)
 		lastJump[unitID] = jumpEndTime
 		jumping[unitID] = false
 		SetLeaveTracks(unitID, true)
+		spSetUnitVelocity(unitID, 0, 0, 0)
 		mcDisable(unitID)
 	
 		--mcSetPosition(unitID, start[1] + vector[1],start[2] + vector[2]-6,start[3] + vector[3])
