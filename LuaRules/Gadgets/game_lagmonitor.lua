@@ -188,8 +188,10 @@ function gadget:GameFrame(n)
 						local spTransferUnit = Spring.TransferUnit
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
-								spTransferUnit(unitID, team, true)
-								lineage[unitID] = nil
+								if allyTeam == Spring.GetUnitAllyTeam(unitID) then
+									spTransferUnit(unitID, team, true)
+									lineage[unitID] = nil
+								end
 							end
 						end
 						GG.allowTransfer = false
@@ -249,8 +251,10 @@ function gadget:GameFrame(n)
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
 						for j=1,#units do
-							lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
-							spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
+							if allyTeam == Spring.GetUnitAllyTeam(units[j]) then
+								lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
+								spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
+							end
 						end
 						GG.allowTransfer = false
 						
