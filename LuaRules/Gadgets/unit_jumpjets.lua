@@ -95,11 +95,14 @@ local goalSet = {}
 
 local jumpDefNames = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
+local JumpSpreadException = {}
 local jumpDefs = {}
 for name, data in pairs(jumpDefNames) do
 	jumpDefs[UnitDefNames[name].id] = data
+	if data.JumpSpreadException then
+		JumpSpreadException[UnitDefNames[name].id] = true
+	end
 end
-
 
 local jumpCmdDesc = {
 	id			= CMD_JUMP,
@@ -547,6 +550,12 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 					return true, true -- command was used, don't remove it
 				end
 				jumps[coords] = {1, currFrame}
+				return true, keepCommand -- command was used, remove it 
+			elseif JumpSpreadException[unitDefID] then
+				local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
+				if not didJump then
+					return true, true -- command was used, don't remove it
+				end
 				return true, keepCommand -- command was used, remove it 
 			else
 				local r = landBoxSize*jumps[coords][1]^0.5/2

@@ -94,7 +94,7 @@ overCategory = {
     range = 600, reload = 2, },
 	
 corclog = {
-	cobscript = false, cannotJumpMidair = true},
+	cobscript = false, cannotJumpMidair = true, JumpSpreadException = true},
 	
  armaak = {
     cobscript = false, cannotJumpMidair = true},	
@@ -235,6 +235,8 @@ for uName,uOvers in pairs(overCategory) do
 			if uOvers.cobscript ~= nil then
 				jumpers[uName].cobscript = uOvers.cobscript
 			end
+			
+			jumpers[uName].JumpSpreadException	= ( uOvers.JumpSpreadException or jumpers[uName].JumpSpreadException)
 			
 			if uOvers.rotateMidAir ~= nil then
 				jumpers[uName].rotateMidAir = uOvers.rotateMidAir
