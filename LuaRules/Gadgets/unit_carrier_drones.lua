@@ -201,7 +201,7 @@ function gadget:GameFrame(n)
 			end
 		end
 		for droneID, team in pairs(drones_to_move) do
-			TransferUnit(droneID, team)
+			TransferUnit(droneID, team, false)
 			drones_to_move[droneID] = nil
 		end
 	end
