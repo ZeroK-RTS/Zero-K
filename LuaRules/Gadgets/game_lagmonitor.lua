@@ -81,13 +81,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-local spAreTeamsAllied = Spring.AreTeamsAllied
-function gadget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-	if (not spAreTeamsAllied(unitTeam, newTeam) and lineage[unitID]) then
-		lineage[unitID] = nil
-	end
-end
-
 function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
 	if lineage[unitID] and (not unitAlreadyFinished[unitID]) and not (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory) then --(religuish ownership for all unit except factories so the returning player has something to do)
 		lineage[unitID] = nil --relinguish the original ownership of the unit
