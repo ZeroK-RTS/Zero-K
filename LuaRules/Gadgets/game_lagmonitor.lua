@@ -72,10 +72,11 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if builderID ~= nil then
 		local builderDefID = spGetUnitDefID(builderID)
 		local ud = (builderDefID and UnitDefs[builderDefID])
-		if ud and (not ud.isFactory) then --(set ownership to original owner for all units except units from factory so that receipient player didn't loose his investment creating that unit)
+		if ud and (not ud.isFactory) then --(set ownership to original owner for all units except units from factory so that receipient player didn't lose his investment creating that unit)
 			local originalTeamID = lineage[builderID]
-			if originalTeamID ~= nil then
-				lineage[unitID] = originalTeamID --to return newly created unit to the owner of the constructor.
+			if originalTeamID ~= nil and #originalTeamID > 0 then
+				-- lineage of the new unit should be the same as its builder
+				lineage[unitID] = originalTeamID
 			end
 		end
 	end
@@ -83,7 +84,7 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
 	if lineage[unitID] and (not unitAlreadyFinished[unitID]) and not (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory) then --(religuish ownership for all unit except factories so the returning player has something to do)
-		lineage[unitID] = nil --relinguish the original ownership of the unit
+		lineage[unitID] = {} --relinguish the original ownership of the unit
 	end
 	unitAlreadyFinished[unitID] = true --for reverse build
 end
@@ -179,11 +180,19 @@ function gadget:GameFrame(n)
 						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
-						for unitID, uteam in pairs(lineage) do
-							if (uteam == team) then
-								if allyTeam == Spring.GetUnitAllyTeam(unitID) then
-									spTransferUnit(unitID, team, true)
-									lineage[unitID] = nil
+						for unitID, teamList in pairs(lineage) do
+							local delete = false;
+							for i=1,#teamList do
+								local uteam = teamList[i];
+								if (uteam == team) then
+									if allyTeam == Spring.GetUnitAllyTeam(unitID) then
+										spTransferUnit(unitID, team, true)
+										delete = true
+									end
+								end
+								-- remove all teams after the previous owner (inclusive)
+								if (delete ~= nil) then
+									lineage[unitID][uteam] = nil;
 								end
 							end
 						end
@@ -244,9 +253,16 @@ function gadget:GameFrame(n)
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
 						for j=1,#units do
-							if allyTeam == Spring.GetUnitAllyTeam(units[j]) then
-								lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
-								spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
+							local unit = units[j]
+							if allyTeam == Spring.GetUnitAllyTeam(unit) then
+								-- add this team to the lineage list, then send the unit away
+								if lineage[unit] == nil then
+									lineage[unit] = { team }
+								else 
+									-- this unit belonged to someone else before me, add me to the end of the list
+									lineage[unit][#lineage[unit]+1] = team
+								end
+								spTransferUnit(unit, recepientByAllyTeam[allyTeam].team, true)
 							end
 						end
 						GG.allowTransfer = false
