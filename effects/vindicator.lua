@@ -12,7 +12,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.6,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 1 1 0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -43,7 +43,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.6,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 0 0.9      1 0.8  0.3 08    0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -71,7 +71,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.6,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 1 1 0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -93,7 +93,7 @@ return {
     },
     takeoff1 = {
       air                = false,
-      airlos             = 0,
+      useairlos       = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
@@ -131,7 +131,7 @@ return {
 	  underwater         = true,
       properties = {
         airdrag            = 0.6,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 0 0.9      1 0.8  0.3 08    0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -160,7 +160,7 @@ return {
 	  underwater         = true,
       properties = {
         airdrag            = 0.6,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 1 1 0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -182,7 +182,7 @@ return {
     },
     takeoff1 = {
       air                = false,
-      airlos             = 0,
+      useairlos       = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,

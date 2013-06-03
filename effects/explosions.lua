@@ -294,7 +294,7 @@ return {
   ["pilot"] = {
     heatcloud = {
       air                = true,
-      airlos             = 1,
+      useairlos       = false,
       count              = 1,
       ground             = true,
       water              = true,
@@ -1818,7 +1818,7 @@ return {
   ["pilot2"] = {
     heatcloud = {
       air                = true,
-      airlos             = 1,
+      useairlos       = false,
       count              = 1,
       ground             = true,
       water              = true,

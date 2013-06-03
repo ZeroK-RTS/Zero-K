@@ -15,7 +15,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 1 1   1 1 1 1]],
         directional        = true,
         emitrot            = 0,
@@ -46,7 +46,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.6,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 1 1   0 0 0 0.01]],
         directional        = false,
         emitrot            = 0,
@@ -77,7 +77,7 @@ return {
       underwater         = 1,
       water              = true,
       properties = {
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 0 0.01	1 0.5 0 0.01	0 0 0 0.01]],
         dir                = [[dir]],
         frontoffset        = 0.1,
@@ -97,7 +97,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 1,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[0.5 0.5 0.5 1   0 0 0 0.01]],
         directional        = false,
         emitrot            = 0,
@@ -128,7 +128,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[0.8 0.8 1 0.01   1 1 0 0.01   1 0.5 0 0.01   0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -159,7 +159,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.9,
-        airlos             = 0,
+        useairlos       = false,
         colormap           = [[1 1 1 1  1 1 1 1 0 0 0 0.01]],
         directional        = false,
         emitrot            = 0,

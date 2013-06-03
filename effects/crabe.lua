@@ -152,7 +152,7 @@ return {
   ["armcrabe_explosion"] = {
     dirt1 = {
       air                = false,
-      airlos             = 1,
+      useairlos       = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
@@ -234,7 +234,7 @@ return {
     },
     splash_water2 = {
       air                = false,
-      airlos             = 1,
+      useairlos       = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = false,
