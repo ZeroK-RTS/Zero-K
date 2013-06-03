@@ -45,9 +45,9 @@ TODO:
 -- Seed unsynced random number generator.
 -- Credits https://github.com/tvo/craig/blob/master/LuaRules/Gadgets/craig/main.lua
 if (math.randomseed ~= nil) then
-  local r = Spring.DiffTimers(Spring.GetTimer(), Script.CreateScream())
+  --local r = Spring.DiffTimers(Spring.GetTimer(), Script.CreateScream())	-- FIXME crashes with "invalid args" error
   math.random()
-  math.randomseed(r)
+  --math.randomseed(r)
 end
 
 --SYNCED-------------------------------------------------------------------
