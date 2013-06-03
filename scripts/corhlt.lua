@@ -17,6 +17,7 @@ local HOUSING_TURN_SPEED = rad(200)
 local SPINDLE_TURN_SPEED = rad(240)
 
 local firing = false
+local index = 1
 
 ----------------------------------------------------------------------------------------------
 -- Signal Definitions
@@ -44,7 +45,7 @@ end
 ----------------------------------------------------------------------------------------------
 -- Weapon Animations
 
-function script.QueryWeapon(num) return flares[num] end
+function script.QueryWeapon(num) return flares[index] end
 
 function script.AimFromWeapon(num) return holder end
 
@@ -64,11 +65,13 @@ end
 
 function script.FireWeapon(num)
 	firing = true
-	EmitSfx(flares[num], UNIT_SFX2)
+	EmitSfx(flares[index], UNIT_SFX2)
 	Sleep(1200)
 	rx,ry,rz = GetPieceRotation(spindle)
 	Turn(spindle, z_axis, rz + rad(120),SPINDLE_TURN_SPEED)
 	firing = false
+	index = index - 1
+	if index == 0 then index = 3 end
 end
 
 

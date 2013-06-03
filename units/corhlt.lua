@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Stinger]],
   description                   = [[High-Energy Laser Tower]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 420,
@@ -33,7 +32,6 @@ unitDef = {
     aimposoffset   = [[0 55 0]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,
@@ -66,8 +64,6 @@ unitDef = {
   side                          = [[CORE]],
   sightDistance                 = 660,
   smoothAnim                    = true,
-  sweepfire                     = [[1]],
-  TEDClass                      = [[FORT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -142,7 +138,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 2475,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
@@ -155,28 +151,7 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Stinger]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 2475,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 168,
-      object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 168,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
+    
 
     HEAP  = {
       description      = [[Debris - Stinger]],
