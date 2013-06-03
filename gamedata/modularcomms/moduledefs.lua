@@ -678,7 +678,13 @@ decorations = {
 				unitDef.customparams.altskin = [[unittextures/core_commander_1camo.dds]]
 				unitDef.buildpic = "skin_battle_camo.png"
 			end,
-	},	
+	},
+	skin_battle_tiger = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/core_commander_1tiger.dds]]
+				unitDef.buildpic = "skin_battle_tiger.png"
+			end,
+	},
 	skin_support_dark = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commsupport1dark.dds]]
