@@ -1691,7 +1691,8 @@ function gadget:DrawWorldPreUnit()
 			HighlightPylons(nil)
 		return 
 		end 
-	end 
+	end
+	glColor(1,1,1,1)
 end
 
 --[[ moved to widget

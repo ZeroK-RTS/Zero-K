@@ -1125,7 +1125,7 @@ function gadget:DrawScreen()
 			sentToPlanetWars = true
 		end
 		glPopMatrix()
-		glColor(0,0,0,0)
+		glColor(1,1,1,1)
 	end
 end
 
