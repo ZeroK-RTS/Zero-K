@@ -760,6 +760,7 @@ local function MakeUnitGroupSelectionToolTip()
 	--end
 
 	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
+	--[[
 	do --add a button that allow you to change alwaysgroup value on the interface directly
 		local gi_groupingbutton = Button:New{
 			parent = window_corner;
@@ -779,6 +780,7 @@ local function MakeUnitGroupSelectionToolTip()
 			tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit group based on type" or "Unit not grouped") or "Bar is full, unit group based on type",
 		}
 	end
+	--]]
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
 			local unitid = selectedUnits[i]
