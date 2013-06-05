@@ -1917,10 +1917,10 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParam
 --function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)	-- base
   for _,g in ipairs(self.AllowCommandList) do
 	if not AllowCommand_WantedCommand[g] then
-		AllowCommand_WantedCommand[g] = (g:AllowCommand_GetWantedCommand and g:AllowCommand_GetWantedCommand()) or true
+		AllowCommand_WantedCommand[g] = g:AllowCommand_GetWantedCommand()
 	end
 	if not AllowCommand_WantedUnitDefID[g] then
-		AllowCommand_WantedUnitDefID[g] = (g:AllowCommand_GetWantedUnitDefID and g:AllowCommand_GetWantedUnitDefID()) or true
+		AllowCommand_WantedUnitDefID[g] = g:AllowCommand_GetWantedUnitDefID()
 	end
 	local wantedCommand = AllowCommand_WantedCommand[g]
 	local wantedUnitDefID = AllowCommand_WantedUnitDefID[g]
