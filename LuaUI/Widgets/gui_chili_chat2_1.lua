@@ -714,6 +714,8 @@ end
 function widget:AddConsoleMessage(msg)
 	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
 	and #messages > 0 and messages[#messages].text == msg.text then
+		-- update MapPoint position with most recent, as it is probably more relevant
+		messages[#messages].point = msg.point
 		messages[#messages].dup = messages[#messages].dup + 1
 		displayMessage(messages[#messages])
 		return
