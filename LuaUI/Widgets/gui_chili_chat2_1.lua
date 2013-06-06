@@ -158,11 +158,16 @@ local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-c
 
 local wasSimpleColor = nil -- variable: indicate if simple color was toggled on or off. Used to trigger refresh.
 
+local time_opened = nil
+
+local GetTimer = Spring.GetTimer 
+local DiffTimers = Spring.DiffTimers
+
 ----
 
 options_path = "Settings/HUD Panels/Chat/Console"
 options_order = {
-	'mousewheel', 'clickable_points',
+	'autohide', 'autohide_time', 'mousewheel', 'clickable_points',
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
 	'text_height', 'highlighted_text_height', 'max_lines',
 	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
@@ -375,6 +380,21 @@ options = {
 		type = 'bool',
 		value = true,
 	},	
+	autohide = {
+		name = "Autohide chat",
+		desc = "Hides the chat when not in use",
+		type = 'bool',
+		value = false,
+		OnChange = onOptionsChanged,
+	},
+	autohide_time = {
+		name = "Autohide time",
+		desc = "Time to leave chat visible",
+		type = 'number',
+		value = 4,
+		min = 1, max = 10, step = 1, 
+		OnChange = onOptionsChanged,
+	},
 	
 }
 --------------------------------------------------------------------------------
@@ -599,6 +619,8 @@ local function displayMessage(msg, remake)
 		stack_console:AddChild(textbox, false)
 		stack_console:UpdateClientArea()
 	end 
+	-- open timer (for autohide)
+	time_opened = GetTimer()
 end 
 
 
@@ -650,6 +672,15 @@ function RemakeConsole()
 		local msg = messages[i]
 		displayMessage(msg, true)
 	end	
+	-- set initial state for the chat, hide the dock for autohide
+	if (options.autohide.value) then
+		window_console.dockable = false
+		hideConsole()
+	else
+		window_console.dockable = true
+		visible = false -- to trick showConsole into adding the window
+		showConsole()
+	end 
 end
 
 
@@ -657,6 +688,8 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) then
+		-- open timer (for autohide)
+		time_opened = GetTimer()
 		if not WG.enteringText then 
 			if noAlly then
 				firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
@@ -668,9 +701,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 				firstEnter = false
 			end
 			WG.enteringText = true
-			if window_console.hidden and not visible then 
-				screen0:AddChild(window_console)
-				visible = true
+			if not visible then 
+				showConsole()
 			end 
 		end
 	else
@@ -758,6 +790,16 @@ local timer = 0
 
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
+
+	if (options.autohide.value) then
+		local time_now = GetTimer()
+		if (time_opened) and (DiffTimers(time_now, time_opened) > options.autohide_time.value) then
+			hideConsole()
+		else
+			showConsole()
+		end
+	end
+
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
@@ -805,7 +847,7 @@ function widget:Initialize()
 	screen0 = WG.Chili.Screen0
 
 	hideConsole = function()
-		if window_console.hidden and visible then
+		if visible then
 			screen0:RemoveChild(window_console)
 			visible = false
 			return true
@@ -813,7 +855,7 @@ function widget:Initialize()
 		return false
 	end
 
-	-- only used by Crude
+	-- only used by Crude, and by autohide (to unhide)
 	showConsole = function()
 		if not visible then
 			screen0:AddChild(window_console)
@@ -919,10 +961,7 @@ function widget:Initialize()
 	end
 	
 	Spring.SendCommands({"console 0"})
-	
-	screen0:AddChild(window_console)
-        visible = true
-	
+ 	
 	self:LocalColorRegister()
 end
 
