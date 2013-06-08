@@ -8,7 +8,7 @@ function gadget:GetInfo() return {
 	enabled   = true
 } end
 
-if (not gadgetHandler:IsSyncedCode()) then
+if (gadgetHandler:IsSyncedCode()) then
 
 	local spGetUnitHealth   = Spring.GetUnitHealth
 	local spGetUnitPosition = Spring.GetUnitPosition
@@ -38,7 +38,7 @@ if (not gadgetHandler:IsSyncedCode()) then
 				end
 
 				-- add CEG and play sound
-				unitDef = unitDefID and UnitDefs[unitDefID]
+				local unitDef = unitDefID and UnitDefs[unitDefID]
 				if unitDef then
 					local size = unitDef.xsize
 					local ux, uy, uz = spGetUnitPosition(unitID)
