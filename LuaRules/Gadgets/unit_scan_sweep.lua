@@ -116,7 +116,9 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 
 		-- visuals (CEG + circle)
-		spSpawnCEG("scan_sweep", cmdParams[1], cmdParams[2], cmdParams[3])
+		if (config[unitDefID].ceg) then
+			spSpawnCEG(config[unitDefID].ceg, cmdParams[1], cmdParams[2], cmdParams[3])
+		end
 		SendToUnsync("scan_start", scanID, config[unitDefID].scanRadius)
 
 		return true, true -- Recognized and finished
