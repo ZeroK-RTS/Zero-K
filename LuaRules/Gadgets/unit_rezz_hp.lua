@@ -10,9 +10,13 @@ function gadget:GetInfo() return {
 
 if (not gadgetHandler:IsSyncedCode()) then
 
-	local spSetUnitHealth = Spring.SetUnitHealth
-	local spGetUnitHealth = Spring.GetUnitHealth
-	local CMD_RESURRECT   = CMD.RESURRECT
+	local spGetUnitHealth   = Spring.GetUnitHealth
+	local spGetUnitPosition = Spring.GetUnitPosition
+	local spSetUnitHealth   = Spring.SetUnitHealth
+	local spSpawnCEG        = Spring.SpawnCEG
+
+	local SendToUnsync      = SendToUnsynced
+	local CMD_RESURRECT     = CMD.RESURRECT
 
 	local units = {}
 	local unitsCount = 0
@@ -34,14 +38,13 @@ if (not gadgetHandler:IsSyncedCode()) then
 				end
 
 				-- add CEG and play sound
-				local ud = Spring.GetUnitDefID(unitID)
-				ud = ud and UnitDefs[ud]
-				if ud then
-					local size = ud.xsize
-					local ux, uy, uz = Spring.GetUnitPosition(unitID)
-					Spring.SpawnCEG("resurrect", ux, uy, uz, 0, 0, 0, size)
+				unitDef = unitDefID and UnitDefs[unitDefID]
+				if unitDef then
+					local size = unitDef.xsize
+					local ux, uy, uz = spGetUnitPosition(unitID)
+					spSpawnCEG("resurrect", ux, uy, uz, 0, 0, 0, size)
 					--Spring.PlaySoundFile("sounds/misc/resurrect.wav", 15, ux, uy, uz)
-					SendToUnsynced("rez_sound", ux, uy, uz)
+					SendToUnsync("rez_sound", ux, uy, uz)
 				end
 			end
 		end
@@ -51,7 +54,7 @@ if (not gadgetHandler:IsSyncedCode()) then
 		-- apply pending unit health changes
 		if (unitsCount ~= 0) then
 			for i = 1, unitsCount do
-			local health, maxHealth = spGetUnitHealth(units[i])
+			local maxHealth = select(2, spGetUnitHealth(units[i]))
 				if maxHealth then
 					spSetUnitHealth(units[i], maxHealth)
 				end
@@ -64,11 +67,16 @@ if (not gadgetHandler:IsSyncedCode()) then
 
 else -- UNSYNCED
 
+	local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
+	local spGetSpectatingState = Spring.GetSpectatingState
+	local spIsPosInLos         = Spring.IsPosInLos
+	local spPlaySoundFile      = Spring.PlaySoundFile
+
 	local function rez_sound(_, x, y, z)
-		local spec = select(2, Spring.GetSpectatingState())
-		local myAllyTeam = Spring.GetLocalAllyTeamID()
-		if (spec or Spring.IsPosInLos(x, y, z, myAllyTeam)) then
-			Spring.PlaySoundFile("sounds/misc/resurrect.wav", 15, x, y, z)
+		local spec = select(2, spGetSpectatingState())
+		local myAllyTeam = spGetLocalAllyTeamID()
+		if (spec or spIsPosInLos(x, y, z, myAllyTeam)) then
+			spPlaySoundFile("sounds/misc/resurrect.wav", 15, x, y, z)
 		end
 	end
 
