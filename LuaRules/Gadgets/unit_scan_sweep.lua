@@ -23,6 +23,7 @@ local config = include("LuaRules/Configs/scan_sweep_defs.lua")
 for _, data in pairs(config) do
 	data.scanTime = data.scanTime * 30
 	data.cooldownTime = data.cooldownTime * 30
+	data.revealTime = data.revealTime * 30
 end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -33,6 +34,7 @@ if (gadgetHandler:IsSyncedCode()) then
 	local spGetGameFrame               = Spring.GetGameFrame
 	local spFindUnitCmdDesc            = Spring.FindUnitCmdDesc
 	local spEditUnitCmdDesc            = Spring.EditUnitCmdDesc
+	local spSetUnitAlwaysVisible       = Spring.SetUnitAlwaysVisible
 	local spSetUnitNeutral             = Spring.SetUnitNeutral
 	local spSetUnitBlocking            = Spring.SetUnitBlocking
 	local spSetUnitCollisionVolumeData = Spring.SetUnitCollisionVolumeData
@@ -60,6 +62,7 @@ if (gadgetHandler:IsSyncedCode()) then
 	local editCmdDesc = {}
 	local scans = {} -- a table holding the fake scan units providing LoS.
 	local cooldowns = {} -- a table holding scanners that are undergoing cooldown.
+	local revealed = {} -- a table holding scanners that are revealed.
 
 	function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		if (config[unitDefID]) then
@@ -70,7 +73,11 @@ if (gadgetHandler:IsSyncedCode()) then
 	function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		if (cooldowns[unitID]) then
 			cooldowns[unitID] = nil
-		elseif (scans[unitID]) then
+		end
+		if (revealed[unitID]) then
+			revealed[unitID] = nil
+		end
+		if (scans[unitID]) then
 			scans[unitID] = nil
 			SendToUnsync("scan_end", unitID)
 		end
@@ -80,7 +87,13 @@ if (gadgetHandler:IsSyncedCode()) then
 		if (cmdID ~= CMD_SCAN_SWEEP) then return false end -- Not recognized
 		if (cooldowns[unitID]) then return true, false end -- Recognized, but not done (keep in queue)
 
-		cooldowns[unitID] = spGetGameFrame() + config[unitDefID].cooldownTime
+		local current_frame = spGetGameFrame()
+		
+		cooldowns[unitID] = current_frame + config[unitDefID].cooldownTime
+		if (config[unitDefID].revealTime) then
+			revealed[unitID] = current_frame + config[unitDefID].revealTime
+			spSetUnitAlwaysVisible(unitID, true)
+		end
 
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_SCAN_SWEEP)
 		editCmdDesc.disabled = true
@@ -88,7 +101,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		spEditUnitCmdDesc(unitID, cmdDescID, editCmdDesc)
 
 		local scanID = spCreateUnit("fakeunit_los", cmdParams[1], cmdParams[2], cmdParams[3], 0, teamID)
-		scans[scanID] = spGetGameFrame() + config[unitDefID].scanTime
+		scans[scanID] = current_frame + config[unitDefID].scanTime
 
 		-- change LoS to the wanted value and make the unit not interact with the environment
 		spSetUnitSensorRadius(scanID, "los", config[unitDefID].scanRadius)
@@ -128,6 +141,12 @@ if (gadgetHandler:IsSyncedCode()) then
 		for id, timer in pairs(scans) do
 			if (n > timer) then -- vision time ran out
 				spDestroyUnit(id, false, true)
+			end
+		end
+		for id, timer in pairs(revealed) do
+			if (n > timer) then
+				spSetUnitAlwaysVisible(id, false)
+				revealed[id] = nil
 			end
 		end
 		for id, timer in pairs(cooldowns) do
