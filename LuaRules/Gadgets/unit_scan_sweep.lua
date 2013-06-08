@@ -27,25 +27,26 @@ end
 
 if (gadgetHandler:IsSyncedCode()) then
 
-	-- performance
-	local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
-	local spCreateUnit = Spring.CreateUnit
-	local spDestroyUnit = Spring.DestroyUnit
-	local spGetGameFrame = Spring.GetGameFrame
-	local spFindUnitCmdDesc = Spring.FindUnitCmdDesc
-	local spEditUnitCmdDesc = Spring.EditUnitCmdDesc
-	local spSetUnitNeutral = Spring.SetUnitNeutral
-	local spSetUnitBlocking = Spring.SetUnitBlocking
+	local spInsertUnitCmdDesc          = Spring.InsertUnitCmdDesc
+	local spCreateUnit                 = Spring.CreateUnit
+	local spDestroyUnit                = Spring.DestroyUnit
+	local spGetGameFrame               = Spring.GetGameFrame
+	local spFindUnitCmdDesc            = Spring.FindUnitCmdDesc
+	local spEditUnitCmdDesc            = Spring.EditUnitCmdDesc
+	local spSetUnitNeutral             = Spring.SetUnitNeutral
+	local spSetUnitBlocking            = Spring.SetUnitBlocking
 	local spSetUnitCollisionVolumeData = Spring.SetUnitCollisionVolumeData
-	local spSetUnitSensorRadius = Spring.SetUnitSensorRadius
-	local spSetUnitLosState = Spring.SetUnitLosState
-	local spSetUnitLosMask = Spring.SetUnitLosMask
-	local SendToUnsync = SendToUnsynced
-	local spSetUnitNoSelect = Spring.SetUnitNoSelect
-	local spSetUnitNoDraw = Spring.SetUnitNoDraw
-	local spSetUnitNoMinimap = Spring.SetUnitNoMinimap
-	local spSpawnCEG = Spring.SpawnCEG
+	local spSetUnitSensorRadius        = Spring.SetUnitSensorRadius
+	local spSetUnitLosState            = Spring.SetUnitLosState
+	local spSetUnitLosMask             = Spring.SetUnitLosMask
+	local SendToUnsync                 = SendToUnsynced
+	local spSetUnitNoSelect            = Spring.SetUnitNoSelect
+	local spSetUnitNoDraw              = Spring.SetUnitNoDraw
+	local spSetUnitNoMinimap           = Spring.SetUnitNoMinimap
+	local spSpawnCEG                   = Spring.SpawnCEG
 	local ceil = math.ceil
+
+	local ally_count = #Spring.GetAllyTeamList() - 1
 
 	local scanSweepCmdDesc = {
 		id = CMD_SCAN_SWEEP,
@@ -71,13 +72,13 @@ if (gadgetHandler:IsSyncedCode()) then
 			cooldowns[unitID] = nil
 		elseif (scans[unitID]) then
 			scans[unitID] = nil
+			SendToUnsync("scan_end", unitID)
 		end
 	end
 
-	local ally_count = #Spring.GetAllyTeamList() - 1
 	function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 		if (cmdID ~= CMD_SCAN_SWEEP) then return false end -- Not recognized
-		if (cooldowns[unitID]) then return true, false end -- Recognized, but not done
+		if (cooldowns[unitID]) then return true, false end -- Recognized, but not done (keep in queue)
 
 		cooldowns[unitID] = spGetGameFrame() + config[unitDefID].cooldownTime
 
@@ -114,13 +115,9 @@ if (gadgetHandler:IsSyncedCode()) then
 			spSetUnitLosMask (scanID, i, 15)
 		end
 
-		spSpawnCEG ("scan_sweep", cmdParams[1], cmdParams[2], cmdParams[3])
-
-		_G.ScanSweep = scanID
-		_G.ScanRadius = config[unitDefID].scanRadius
-		SendToUnsync("ScanSweep")
-		_G.ScanSweep = nil
-		_G.ScanRadius = nil
+		-- visuals (CEG + circle)
+		spSpawnCEG("scan_sweep", cmdParams[1], cmdParams[2], cmdParams[3])
+		SendToUnsync("scan_start", scanID, config[unitDefID].scanRadius)
 
 		return true, true -- Recognized and finished
 	end
@@ -128,9 +125,6 @@ if (gadgetHandler:IsSyncedCode()) then
 	function gadget:GameFrame(n)
 		for id, timer in pairs(scans) do
 			if (n > timer) then -- vision time ran out
-				_G.ScanSweep = id
-				SendToUnsync("ScanEnd")
-				_G.ScanSweep = nil
 				spDestroyUnit(id, false, true)
 			end
 		end
@@ -150,27 +144,29 @@ if (gadgetHandler:IsSyncedCode()) then
 
 else -- un/sync
 
-	local spGetUnitPosition = Spring.GetUnitPosition
-	local spGetUnitDefID = Spring.GetUnitDefID
-	local glColor = gl.Color
+	local spGetUnitPosition  = Spring.GetUnitPosition
+	local spGetUnitDefID     = Spring.GetUnitDefID
+
+	local glColor            = gl.Color
 	local glDrawGroundCircle = gl.DrawGroundCircle
 
 	local scans = {}
+
+	local function scan_start (_, unitID, scanRadius)
+		local xx, yy, zz = spGetUnitPosition(unitID)
+		scans[unitID] = { x = xx, y = yy, z = zz, r = scanRadius }
+	end
+
+	local function scan_end (_, unitID)
+		scans[unitID] = nil
+	end
 
 	function gadget:Initialize()
 		gadgetHandler:RegisterCMDID(CMD_SCAN_SWEEP)
 		Spring.SetCustomCommandDrawData(CMD_SCAN_SWEEP, "Centroid", {0.0, 0.5, 1, 1})
 
-		gadgetHandler:AddSyncAction("ScanSweep", function()
-			local unitID = SYNCED.ScanSweep
-			local xx, yy, zz = spGetUnitPosition(unitID)
-			scans[unitID] = { x = xx, y = yy, z = zz, r = SYNCED.ScanRadius }
-		end)
-
-		gadgetHandler:AddSyncAction("ScanEnd", function()
-			local unitID = SYNCED.ScanSweep
-			scans[unitID] = nil
-		end)
+		gadgetHandler:AddSyncAction("scan_start", scan_start)
+		gadgetHandler:AddSyncAction("scan_end", scan_end)
 	end
 
 	function gadget:DrawWorldPreUnit()
