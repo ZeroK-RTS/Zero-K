@@ -68,7 +68,7 @@ if (gadgetHandler:IsSyncedCode()) then
   local function WarnDeprecated()
 	if (alreadyWarned<10) then
 		alreadyWarned = alreadyWarned + 1
-		Spring.Log(LOG.WARNING, "LUS/COB: QueryNanoPiece is deprecated! Use Spring.SetUnitNanoPieces() instead!")
+		Spring.Log("LUPS", LOG.WARNING, "LUS/COB: QueryNanoPiece is deprecated! Use Spring.SetUnitNanoPieces() instead!")
 	end
   end
 
