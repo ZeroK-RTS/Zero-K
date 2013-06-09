@@ -687,29 +687,25 @@ end
 -----------------------------------------------------------------------
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if (key == KEYSYMS.RETURN) then
-		-- open timer (for autohide)
+	if (key == KEYSYMS.RETURN) and not WG.enteringText then
+		-- time chat opened (for autohide)
 		time_opened = GetTimer()
-		if not WG.enteringText then 
-			if noAlly then
-				firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
-			end
-			if firstEnter then
-				if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
-					Spring.SendCommands("chatally")
-				end
-				firstEnter = false
-			end
-			WG.enteringText = true
-			if not visible then 
-				showConsole()
-			end 
+	
+		if noAlly then
+			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
+		if firstEnter then
+			if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
+				Spring.SendCommands("chatally")
+			end
+			firstEnter = false
+		end
+		WG.enteringText = true
+		if not visible then 
+			showConsole()
+		end 
 	else
-		if WG.enteringText then
-			WG.enteringText = false
-            return hideConsole()
-		end
+		WG.enteringText = false		
 	end 
 end
 
