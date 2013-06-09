@@ -22,8 +22,9 @@ local config = include("LuaRules/Configs/scan_sweep_defs.lua")
 for _, data in pairs(config) do
 	data.scanTime = (data.scanTime or 5) * 30
 	data.cooldownTime = (data.cooldownTime or 60) * 30
-	data.selfRevealTime = (data.selfRevealTime or 0) * 30 end
-	if (not data.scanRadius) then data.scanRadius = 300 end
+	data.selfRevealTime = (data.selfRevealTime or 0) * 30
+	data.scanRadius = data.scanRadius or 300
+	data.revealRadius = data.revealRadius or 300
 end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -137,8 +138,8 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 
 		-- reveal cloaked stuff without decloaking, Dust of Appearance style
-		if (config[unitDefID].revealCloaked) then
-			local nearby_units = spGetUnitsInCylinder(cmdParams[1], cmdParams[3], config[unitDefID].scanRadius)
+		if (config[unitDefID].revealRadius > 0) then
+			local nearby_units = spGetUnitsInCylinder(cmdParams[1], cmdParams[3], config[unitDefID].revealRadius)
 			local scannerAllyTeam = spGetUnitAllyTeam(unitID)
 			for i = 1, #nearby_units do
 				if ((not revealed[nearby_units[i]]) or (scanTime > revealed[nearby_units[i]])) then -- don't replace longer reveal time with a shorter one
