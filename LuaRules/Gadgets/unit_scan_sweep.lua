@@ -1,8 +1,7 @@
 --[[
 To-do:
-	- actual decloaking (or simply revealing somehow) instead of seismic. For easy solution with seismic enable ping2blip
-	- allow to specify whether scanning reveals the scanner unit
---]]
+	* per-allyteam reveal timers. Currently your scans' reveal time gets extended if someone else also scans the same units.
+]]--
 
 function gadget:GetInfo()
 	return {
@@ -21,9 +20,10 @@ local config = include("LuaRules/Configs/scan_sweep_defs.lua")
 
 -- process the config values
 for _, data in pairs(config) do
-	data.scanTime = data.scanTime * 30
-	data.cooldownTime = data.cooldownTime * 30
-	data.revealTime = data.revealTime * 30
+	data.scanTime = (data.scanTime or 5) * 30
+	data.cooldownTime = (data.cooldownTime or 60) * 30
+	data.selfRevealTime = (data.selfRevealTime or 0) * 30 end
+	if (not data.scanRadius) then data.scanRadius = 300 end
 end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -31,21 +31,24 @@ if (gadgetHandler:IsSyncedCode()) then
 	local spInsertUnitCmdDesc          = Spring.InsertUnitCmdDesc
 	local spCreateUnit                 = Spring.CreateUnit
 	local spDestroyUnit                = Spring.DestroyUnit
-	local spGetGameFrame               = Spring.GetGameFrame
-	local spFindUnitCmdDesc            = Spring.FindUnitCmdDesc
 	local spEditUnitCmdDesc            = Spring.EditUnitCmdDesc
+	local spFindUnitCmdDesc            = Spring.FindUnitCmdDesc
+	local spGetGameFrame               = Spring.GetGameFrame
+	local spGetUnitAllyTeam            = Spring.GetUnitAllyTeam
+	local spGetUnitsInCylinder         = Spring.GetUnitsInCylinder
 	local spSetUnitAlwaysVisible       = Spring.SetUnitAlwaysVisible
-	local spSetUnitNeutral             = Spring.SetUnitNeutral
 	local spSetUnitBlocking            = Spring.SetUnitBlocking
 	local spSetUnitCollisionVolumeData = Spring.SetUnitCollisionVolumeData
-	local spSetUnitSensorRadius        = Spring.SetUnitSensorRadius
-	local spSetUnitLosState            = Spring.SetUnitLosState
+	local spSetUnitNeutral             = Spring.SetUnitNeutral
 	local spSetUnitLosMask             = Spring.SetUnitLosMask
-	local SendToUnsync                 = SendToUnsynced
+	local spSetUnitLosState            = Spring.SetUnitLosState
+	local spSetUnitSensorRadius        = Spring.SetUnitSensorRadius
 	local spSetUnitNoSelect            = Spring.SetUnitNoSelect
 	local spSetUnitNoDraw              = Spring.SetUnitNoDraw
 	local spSetUnitNoMinimap           = Spring.SetUnitNoMinimap
 	local spSpawnCEG                   = Spring.SpawnCEG
+
+	local SendToUnsync = SendToUnsynced
 	local ceil = math.ceil
 
 	local ally_count = #Spring.GetAllyTeamList() - 1
@@ -88,27 +91,32 @@ if (gadgetHandler:IsSyncedCode()) then
 		if (cooldowns[unitID]) then return true, false end -- Recognized, but not done (keep in queue)
 
 		local current_frame = spGetGameFrame()
-		
-		cooldowns[unitID] = current_frame + config[unitDefID].cooldownTime
-		if (config[unitDefID].revealTime) then
-			revealed[unitID] = current_frame + config[unitDefID].revealTime
-			spSetUnitAlwaysVisible(unitID, true)
-		end
 
+		cooldowns[unitID] = current_frame + config[unitDefID].cooldownTime
+
+		-- self revelation
+		if (config[unitDefID].selfRevealTime > 0) then
+			revealed[unitID] = current_frame + config[unitDefID].selfRevealTime
+			for i = 0, ally_count do
+				spSetUnitLosState(unitID, i, 15)
+				spSetUnitLosMask (unitID, i, 15)
+			end
+		end
+ 
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_SCAN_SWEEP)
 		editCmdDesc.disabled = true
 		editCmdDesc.name = 'Scanning...'
 		spEditUnitCmdDesc(unitID, cmdDescID, editCmdDesc)
 
 		local scanID = spCreateUnit("fakeunit_los", cmdParams[1], cmdParams[2], cmdParams[3], 0, teamID)
-		scans[scanID] = current_frame + config[unitDefID].scanTime
+		local scanTime = current_frame + config[unitDefID].scanTime
+		scans[scanID] = scanTime
 
 		-- change LoS to the wanted value and make the unit not interact with the environment
 		spSetUnitSensorRadius(scanID, "los", config[unitDefID].scanRadius)
 		spSetUnitSensorRadius(scanID, "airLos", config[unitDefID].scanRadius)
 		spSetUnitSensorRadius(scanID, "radar", config[unitDefID].scanRadius)
 		spSetUnitSensorRadius(scanID, "sonar", config[unitDefID].scanRadius)
-		spSetUnitSensorRadius(scanID, "seismic", config[unitDefID].scanRadius)
 
 		spSetUnitSensorRadius(scanID, "radarJammer", 0)
 		spSetUnitSensorRadius(scanID, "sonarJammer", 0)
@@ -123,9 +131,22 @@ if (gadgetHandler:IsSyncedCode()) then
 			, 0, 1, 0
 		)
 
-		for i = 1, ally_count do
+		for i = 0, ally_count do
 			spSetUnitLosState(scanID, i, 0)
 			spSetUnitLosMask (scanID, i, 15)
+		end
+
+		-- reveal cloaked stuff without decloaking, Dust of Appearance style
+		if (config[unitDefID].revealCloaked) then
+			local nearby_units = spGetUnitsInCylinder(cmdParams[1], cmdParams[3], config[unitDefID].scanRadius)
+			local scannerAllyTeam = spGetUnitAllyTeam(unitID)
+			for i = 1, #nearby_units do
+				if ((not revealed[nearby_units[i]]) or (scanTime > revealed[nearby_units[i]])) then -- don't replace longer reveal time with a shorter one
+					revealed[nearby_units[i]] = scanTime
+				end
+				spSetUnitLosState(nearby_units[i], scannerAllyTeam, 15)
+				spSetUnitLosMask (nearby_units[i], scannerAllyTeam, 15)
+			end
 		end
 
 		-- visuals (CEG + circle)
@@ -134,7 +155,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 		SendToUnsync("scan_start", scanID, config[unitDefID].scanRadius)
 
-		return true, true -- Recognized and finished
+		return true, true -- Recognized and finished (remove from Q)
 	end
 
 	function gadget:GameFrame(n)
@@ -145,7 +166,9 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 		for id, timer in pairs(revealed) do
 			if (n > timer) then
-				spSetUnitAlwaysVisible(id, false)
+				for i = 0, ally_count do
+					spSetUnitLosMask (id, i, 0)
+				end
 				revealed[id] = nil
 			end
 		end

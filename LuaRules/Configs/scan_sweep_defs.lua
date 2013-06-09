@@ -4,10 +4,9 @@ return {
 		cooldownTime = 60,
 		scanRadius = 500,
 		scanTime = 5, -- how long the vision stays
-
-		-- optional
-		revealTime = 10, -- how long the scanner itself is globally revealed for after scan
+		selfRevealTime = 10,
 		ceg = "scan_sweep",
+		revealCloaked = true,
 	},
-	--]]
+	]]--
 }
