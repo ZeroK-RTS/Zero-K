@@ -23,15 +23,15 @@ local function RemoveMissile()
 end
 
 function script.Shot()
-	StartThread(RemoveMissile)
+	--StartThread(RemoveMissile)
+	Spring.DestroyUnit(unitID, false, true)
 end
 
 function script.AimFromWeapon() 
 	return base 
 end
 
-function script.QueryWeapon() 
-	Spring.Echo("QueryWeapon")
+function script.QueryWeapon()
 	return base 
 end
 
