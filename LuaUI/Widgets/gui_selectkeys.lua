@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Select Keys",
-    desc      = "v0.034 Common SelectKey Hotkeys for EPIC Menu.", -- this functionality is included in KB Menu
+    desc      = "v0.035 Common SelectKey Hotkeys for EPIC Menu.",
     author    = "CarRepairer",
     date      = "2010-09-23",
     license   = "GNU GPL, v2 or later",
@@ -43,8 +43,6 @@ options_order = {
 	'uikey4',
 	'uikey5',
 	'uikey6',
-	'uikey7',
-	'uikey8',
 }
 options = {
 
@@ -52,57 +50,70 @@ options = {
 	lbl_idle = { type = 'label', name = 'Idle' },
 	lbl_same = { type = 'label', name = 'Of Same Type' },
 	lbl_w = { type = 'label', name = 'Armed Units' },
+	
+	
+	
 	select_all = { type = 'button',
-		name = 'Select All Units',
+		name = 'All Units',
+		desc = 'Select all units.',
 		action = 'select AllMap++_ClearSelection_SelectAll+',
 	},
 	select_idleb = { type = 'button',
-		name = 'Select An Idle Builder',
-		action = 'select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+',
+		name = 'Idle Builder',
+		desc = 'Select the next idle builder.',
+		action = 'select AllMap+_Builder_Idle+_ClearSelection_SelectOne+',
 	},
 	select_idleallb = { type = 'button',
-		name = 'Select All Idle Builders',
+		name = 'All Idle Builders',
+		desc = 'Select all idle builders.',
 		action = 'select AllMap+_Builder_Not_Building_Not_Transport_Idle+_ClearSelection_SelectAll+',
 	},
 	
 	select_vissame = { type = 'button',
-		name = 'In-View Units of Same Type as Selected',
+		name = 'Visible Same',
+		desc = 'Select all visible units of the same type as current selection.',
 		action = 'select Visible+_InPrevSel+_ClearSelection_SelectAll+',
 	},
 	select_same = { type = 'button',
-		name = 'All Units of Same Type as Selected',
+		name = 'All Same',
+		desc = 'Select all units of the same type as current selection.',
 		action = 'select AllMap+_InPrevSel+_ClearSelection_SelectAll+',
 	},
 	select_half = { type = 'button',
 		name = 'Deselect Half',
+		desc = 'Deselect half of the selected units.',
 		action = 'select PrevSelection++_ClearSelection_SelectPart_50+',
 	},
 	select_one = { type = 'button',
-		name = 'Deselect All But One',
+		name = 'Deselect Except One',
+		desc = 'Deselect all but one of the selected units.',
 		action = 'select PrevSelection++_ClearSelection_SelectOne+',
 	},
 	select_nonidle = { type = 'button',
-		name = 'Deselect non-idle units',
+		name = 'Deselect non-idle',
+		desc = 'Deselect all but the idle selected units.',
 		action = 'select PrevSelection+_Idle+_ClearSelection_SelectAll+',
 	},
 	select_landw = { type = 'button',
-		name = 'Armed Land Units In View',
+		name = 'Visible Armed Land',
+		desc = 'Select all visible armed land units.',
 		action = 'select Visible+_Not_Builder_Not_Building_Not_Aircraft_Weapons+_ClearSelection_SelectAll+',
 	},
 	selectairw = { type = 'button',
-		name = 'Armed Flying Units In View',
+		name = 'Visible Armed Flying',
+		desc = 'Select all visible armed flying units.',
 		action = 'select Visible+_Not_Building_Not_Transport_Aircraft_Weapons+_ClearSelection_SelectAll+',
 	},
-
 	
-		
 	lowhealth = { type = 'button',
 		name = '30% Health',
 		desc = '',
 		action = 'select PrevSelection+_Not_RelativeHealth_30+_ClearSelection_SelectAll+',
 	},
+	
+	
+	
 	----
-	-- the below are from uikeys, I don't know what they do
 	lbl_misc = { type = 'label', name = 'Misc ZK uikeys' },
 	uikey1 = { type = 'button',
 		name = 'Non-trans non-Vamp armed air',
@@ -130,13 +141,8 @@ options = {
 		action = 'select AllMap+_Not_Builder_Not_Building_Transport_Aircraft+_ClearSelection_SelectAll+',
 	},
 	uikey6 = { type = 'button',
-		name = 'Prev sel, not in ctrl grp (append)',
+		name = 'Append non-ctrl grouped',
 		desc = '',
 		action = 'select AllMap+_InPrevSel_Not_InHotkeyGroup+_SelectAll+',
-	},
-	uikey7 = { type = 'button',
-		name = 'Idle builder (one)',
-		desc = '',
-		action = 'select AllMap+_Builder_Idle+_ClearSelection_SelectOne+',
 	},
 }
