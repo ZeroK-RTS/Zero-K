@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.117 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-May-17
+    date      = "2011-03-16", --2013-June-11
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -1163,11 +1163,12 @@ function widget:Update(dt)
 	--//HANDLE TRACK UNIT
 	--trackcycle = trackcycle%(6) + 1 --automatically reset "trackcycle" value to Zero (0) every 6th iteration.
 	if (trackcycle == 0 and
-		trackmode and
-		not overview_mode and
-		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
-		not thirdperson_trackunit and
-		(not rotate)) then --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
+	trackmode and
+	not overview_mode and
+	(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
+	not thirdperson_trackunit and
+	(not rotate)) --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
+	then 
 		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
 			local vx,vy,vz = Spring.GetUnitVelocity(selUnits[1])
@@ -1187,11 +1188,12 @@ function widget:Update(dt)
 	--//HANDLE TRACK CURSOR
 	--camcycle = camcycle%(12) + 1  --automatically reset "camcycle" value to Zero (0) every 12th iteration.
 	if (camcycle == 0 and
-		not trackmode and
-		not overview_mode and
-		(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
-		not thirdperson_trackunit and
-		options.follow.value) then --if follow selected player's cursor: do
+	not trackmode and
+	not overview_mode and
+	(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
+	not thirdperson_trackunit and
+	options.follow.value)  --if follow selected player's cursor:
+	then 
 		if WG.alliedCursorsPos then 
 			if options.followautozoom.value then
 				AutoZoomInOutToCursor()
@@ -1230,8 +1232,8 @@ function widget:Update(dt)
 	
 	--//HANDLE ROTATE CAMERA
 	if 	(not thirdperson_trackunit and  --block 3rd Person 
-		(rot.right or rot.left or rot.up or rot.down))
-		then
+	(rot.right or rot.left or rot.up or rot.down))
+	then
 		
 		local speed = options.rotfactor.value * (s and 400 or 150)
 		if rot.right then
@@ -1250,10 +1252,10 @@ function widget:Update(dt)
 	
 	--//HANDLE MOVE CAMERA
 	if (not thirdperson_trackunit and  --block 3rd Person 
-		(smoothscroll or
-		move.right or move.left or move.up or move.down or
-		use_lockspringscroll))
-		then
+	(smoothscroll or
+	move.right or move.left or move.up or move.down or
+	use_lockspringscroll))
+	then
 		
 		local x, y, lmb, mmb, rmb = spGetMouseState()
 		
@@ -1345,10 +1347,10 @@ function widget:Update(dt)
 	
 	--//HANDLE MOUSE/KEYBOARD'S 3RD-PERSON (TRACK UNIT) RETARGET
 	if 	(thirdperson_trackunit and 
-		not overview_mode and --block 3rd person scroll when in overview mode
-		(move.right or move.left or move.up or move.down or
-		rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
-		then
+	not overview_mode and --block 3rd person scroll when in overview mode
+	(move.right or move.left or move.up or move.down or
+	rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
+	then
 		
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit

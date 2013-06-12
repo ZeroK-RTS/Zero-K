@@ -1083,7 +1083,7 @@ do
     blink = (sec%1)<0.5
 
     gameFrame = GetGameFrame()
-    visibleUnits = GetVisibleUnits(-1,nil,false) --this don't need any delayed update or caching or optimization since its already done in "cawidgets.lua/cache.lua"
+    visibleUnits = GetVisibleUnits(-1,nil,false) --this don't need any delayed update or caching or optimization since its already done in "LUAUI/cache.lua"
 
     sec2=sec2+dt
     if (sec2>1/3) then

@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "Chili Widget Selector", --needs epic menu to dynamically update widget checkbox colors.
     desc      = "v1.01 Chili Widget Selector", 
     author    = "CarRepairer",
-    date      = "2012-01-11", --2013-04-25 (add crude filter/search capability)
+    date      = "2012-01-11", --2013-06-11 (add crude filter/search capability)
     license   = "GNU GPL, v2 or later",
     layer     = -100000,
     handler   = true,
@@ -213,12 +213,14 @@ MakeWidgetList = function()
 			local lowercase_display = name_display:lower()
 			local lowercase_desc = data.desc:lower()
 			local lowercase_author = data.author:lower()
+			
 			if filterUserInsertedTerm == "" or 
-				lowercase_name:find(filterUserInsertedTerm) or
-				lowercase_display:find(filterUserInsertedTerm) or
-				lowercase_desc:find(filterUserInsertedTerm) or
-				lowercase_author:find(filterUserInsertedTerm) or
-				lowercase_category:find(filterUserInsertedTerm) then
+			lowercase_name:find(filterUserInsertedTerm) or
+			lowercase_display:find(filterUserInsertedTerm) or
+			lowercase_desc:find(filterUserInsertedTerm) or
+			lowercase_author:find(filterUserInsertedTerm) or
+			lowercase_category:find(filterUserInsertedTerm) 
+			then
 			
 				if not groupDescs[category] then
 					category = 'ungrouped'
