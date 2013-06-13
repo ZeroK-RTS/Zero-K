@@ -7,14 +7,20 @@ function CheckLUAFileAndBackup(filePath, headerString)
 	if (chunk) then --if original content is LUA OK:
 		local tmp = {}
 		setfenv(chunk, tmp)
-		table.save(chunk(),filePath..".bak",headerString) --write to backup
+		local tab = chunk()
+		if tab and type(tab) == "table" then
+		    table.save(chunk(),filePath..".bak",headerString) --write to backup
+		end
 	else --if original content is not LUA OK:
 		Spring.Log("CheckLUAFileAndBackup","warning", tostring(err) .. " (Now will find backup file)")
 		chunk, err = loadfile(filePath..".bak")
 		if (chunk) then --if backup content is LUA OK:
 			local tmp = {}
 			setfenv(chunk, tmp)
-			table.save(chunk(),filePath,headerString) --overwrite original
+			local tab = chunk()
+			if tab and type(tab) == "table" then
+			    table.save(chunk(),filePath,headerString) --overwrite original
+			end
 		else --if backup content is also not LUA OK:
 			Spring.Log("CheckLUAFileAndBackup","warning", tostring(err) .. " (Backup file not available)")
 			Spring.Echo(os.remove (filePath)) --delete original
