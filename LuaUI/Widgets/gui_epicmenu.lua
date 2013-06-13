@@ -671,6 +671,7 @@ local function MakeFlags()
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
 		clientHeight = window_height,
+		maxWidth = 200,
 		parent = screen0,
 		backgroundColor = color.sub_bg,
 		children = {
@@ -2114,14 +2115,14 @@ local function MakeMenuBar()
     local exit_menu_cancel_width = exit_menu_btn_width/2
     local exit_menu_cancel_height = 2*exit_menu_btn_height/3
 
-	local crude_width = 445
+	local crude_width = 460
 	local crude_height = B_HEIGHT+10
 	
 
-	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header,  }
-	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 45, height=5, textColor = color.sub_header,  }
+	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={4,4,4,4}, }
+	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
-	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,4}  }
+	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,6}  }
 	
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	
@@ -2328,7 +2329,7 @@ local function MakeMenuBar()
 						orientation = 'horizontal',
 						columns = 2,
 						rows = 2,
-						width = 140,
+						width = 150,
 						height = '100%',
 						--height = 40,
 						resizeItems = true,
