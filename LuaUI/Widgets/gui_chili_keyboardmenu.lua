@@ -706,9 +706,9 @@ local function SetupTabs()
 	tab_buttons = {}
 	local tabs = {
 		none = 'Commands',
-		ctrl = 'Selections (Ctrl)',
-		alt = 'States (Alt)',
-		meta = '(Spacebar)',
+		ctrl = 'Selection '..green..'(Ctrl)',
+		alt = 'States ' ..green..'(Alt)',
+		meta = green..'(Spacebar)',
 		unbound = 'Other',
 	}
 	local tabs_i = { 'none', 'ctrl', 'alt', 'meta', 'unbound' }
