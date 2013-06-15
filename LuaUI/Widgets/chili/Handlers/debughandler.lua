@@ -163,7 +163,7 @@ function DebugHandler.Stacktrace()
     local i = 1 + math.ceil(DebugHandler.maxStackLength/2)+1
     local tail = (DebugHandler.maxStackLength - i)
     local j = #trace - tail
-    trace[i] = "..."
+    trace[i] = ("... (%i calls)"):format(#trace - (i + tail))
     for n=1,tail do
       trace[i+n] = trace[j+n]
     end
