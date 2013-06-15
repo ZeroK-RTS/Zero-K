@@ -53,7 +53,8 @@ local FLOAT_TEXTURES   = gl.HasExtension("GL_ARB_texture_float")
 
 --// SYSTEM CONFIG
 PostDistortion.texRectangle     = false
-PostDistortion.jitterformat     = GL_RGBA16F_ARB
+--PostDistortion.jitterformat     = GL_RGBA16F_ARB
+PostDistortion.jitterformat     = GL.RGBA
 PostDistortion.depthformat      = GL_DEPTH_COMPONENT
 PostDistortion.screenUpdateSkip = 0
 PostDistortion.copyDepthBuffer  = (NVseries>=7)or(NVseries==0)
@@ -114,7 +115,7 @@ function PostDistortion.ViewResize()
 
   jitterTex = gl.CreateTexture(vsx,vsy, {
     target = target,
-    format = PostDistortion.jitterformat,
+   -- format = PostDistortion.jitterformat,
     min_filter = GL.NEAREST,
     mag_filter = GL.NEAREST,
     wrap_s   = GL.CLAMP_TO_EDGE,
@@ -148,11 +149,11 @@ function PostDistortion:BeginDraw()
   end
 
   --// don't update the screen copies each frame (needed for gfxs with slow screen copies, geforce5 etc.)
-  screensUpdated = screensUpdated + 1
-  if (screensUpdated>pd.screenUpdateSkip) then
+  --screensUpdated = screensUpdated + 1
+  --if (screensUpdated>pd.screenUpdateSkip) then
     glCopyToTexture(screenCopyTex, 0, 0, vpx, vpy, vsx, vsy)
-    screensUpdated = 0
-  end
+   -- screensUpdated = 0
+ -- end
 end
 
 function PostDistortion:EndDraw()
