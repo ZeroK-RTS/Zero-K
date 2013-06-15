@@ -1316,6 +1316,7 @@ SetupPanels = function ()
 		tweakResizable = true,
 		minimizable = false,
 		minWidth = x_windowbound,
+		noSelfHitTest = true,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end

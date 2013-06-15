@@ -921,14 +921,14 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
-        selfImplementedMinimizable = 
-            function (show)
-                if show then
-                    showConsole()
-                else
-                    hideConsole()
-                end
-            end,
+		noSelfHitTest = true,
+		selfImplementedMinimizable = function (show)
+			if show then
+				showConsole()
+			else
+				hideConsole()
+			end
+		end,
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
 		color = { 0, 0, 0, 0 },

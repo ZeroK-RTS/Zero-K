@@ -824,6 +824,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimizable = true,
 		minWidth = x_bound,
+		noSelfHitTest = true,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
