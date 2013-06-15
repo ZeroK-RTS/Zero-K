@@ -4,14 +4,9 @@ unitDef = {
   description            = [[Amphibious Raider Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   brakeRate              = 0.4,
   buildCostEnergy        = 300,
   buildCostMetal         = 300,
-
-  buildoptions           = {
-  },
-
   buildPic               = [[amphraider.png]],
   buildTime              = 300,
   canAttack              = true,
@@ -20,7 +15,6 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND SINK]],
-  collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -29,12 +23,10 @@ unitDef = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  hideDamage             = false,
   iconType               = [[walkerraider]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 411,
   maxDamage              = 900,
   maxSlope               = 36,
   maxVelocity            = 2.4,
@@ -52,7 +44,6 @@ unitDef = {
     },
   },
 
-  side                   = [[ARM]],
   sightDistance          = 500,
   sonarDistance          = 300,
   trackOffset            = 0,
@@ -77,7 +68,6 @@ unitDef = {
     --},
   },
 
-
   weaponDefs             = {
 
 	GRENADE = {
@@ -86,13 +76,13 @@ unitDef = {
       areaOfEffect            = 96,
       craterBoost             = 1,
       craterMult              = 2,
-	  
+
       damage                  = {
         default = 240,
         planes  = 240,
         subs    = 12,
       },
-      
+
       explosionGenerator      = [[custom:PLASMA_HIT_96]],
       fireStarter             = 180,
       impulseBoost            = 0,
@@ -114,7 +104,7 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
 	},
-  
+
 	TORPEDO = {
       name                    = [[Torpedo]],
       areaOfEffect            = 16,
@@ -154,47 +144,34 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Grebe]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 900,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 120,
       object           = [[wreck2x2b.s3o]],
       reclaimable      = true,
       reclaimTime      = 120,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP      = {
       description      = [[Debris - Grebe]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 900,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
       metal            = 60,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 60,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
   },
 

@@ -6,7 +6,6 @@ unitDef = {
   brakeRate           = 0.1,
   buildCostEnergy     = 2000,
   buildCostMetal      = 2000,
-  builder             = false,
   buildPic            = [[amphassault.png]],
   buildTime           = 2000,
   canAttack           = true,
@@ -16,7 +15,6 @@ unitDef = {
   category            = [[LAND SINK]],
   collisionVolumeOffsets  = [[0 0 0]],
   --collisionVolumeScales   = [[70 70 70]],
-  --collisionVolumeTest	  = 1,
   --collisionVolumeType	  = [[ellipsoid]],
   corpse              = [[DEAD]],
 
@@ -37,14 +35,12 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 621,
   maxDamage           = 9000,
   maxSlope            = 36,
   maxVelocity         = 1.6,
   maxWaterDepth       = 5000,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT4]],
-  noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[amphassault.s3o]],
   script              = [[amphassault.lua]],
@@ -59,9 +55,7 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 605,
-  smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -69,7 +63,6 @@ unitDef = {
   trackWidth          = 66,
   turnRate            = 500,
   upright             = false,
-  workerTime          = 0,
 
   weapons                       = {
     {
@@ -86,7 +79,6 @@ unitDef = {
 --    },
 
   },
-
 
   weaponDefs                    = {
 
@@ -181,41 +173,28 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Grizzly]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 10000,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 800,
       object           = [[amphassault_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 800,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP = {
       description      = [[Debris - Grizzly]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 10000,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 400,
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
       reclaimTime      = 400,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

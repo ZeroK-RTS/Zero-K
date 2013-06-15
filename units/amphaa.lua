@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Amphibious AA Bot]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   brakeRate              = 0.375,
   buildCostEnergy        = 220,
   buildCostMetal         = 220,
@@ -20,7 +19,6 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND SINK]],
-  collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -33,12 +31,10 @@ unitDef = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  hideDamage             = false,
   iconType               = [[amphaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 390,
   maxDamage              = 1100,
   maxSlope               = 36,
   maxVelocity            = 1.6,
@@ -58,7 +54,6 @@ unitDef = {
     },
   },
 
-  side                   = [[ARM]],
   sightDistance          = 660,
   sonarDistance          = 400,
   trackOffset            = 0,
@@ -78,7 +73,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -119,26 +113,21 @@ unitDef = {
       turnRate                = 63000,
       turret                  = true,
       weaponAcceleration      = 141,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 850,
     },
 
   },
 
-
   featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Angler]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1100,
       energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 88,
       object           = [[amphaa_dead.s3o]],
       reclaimable      = true,
@@ -148,18 +137,15 @@ unitDef = {
     HEAP      = {
       description      = [[Debris - Angler]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1100,
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
       metal            = 44,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 44,
     },
-
 
   },
 

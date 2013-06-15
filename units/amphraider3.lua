@@ -4,14 +4,9 @@ unitDef = {
   description            = [[Amphibious Raider Bot (Sea)]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   brakeRate              = 0.375,
   buildCostEnergy        = 180,
   buildCostMetal         = 180,
-
-  buildoptions           = {
-  },
-
   buildPic               = [[amphraider3.png]],
   buildTime              = 180,
   canAttack              = true,
@@ -20,7 +15,6 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND SINK]],
-  collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -30,12 +24,10 @@ unitDef = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  hideDamage             = false,
   iconType               = [[amphtorpraider]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 390,
   maxDamage              = 400,
   maxSlope               = 36,
   maxVelocity            = 2.7,
@@ -53,7 +45,6 @@ unitDef = {
     },
   },
 
-  side                   = [[ARM]],
   sightDistance          = 500,
   sonarDistance          = 400,
   trackOffset            = 0,
@@ -69,14 +60,13 @@ unitDef = {
       def                = [[TORPCANNON]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM FIXEDWING HOVER LAND SINK TURRET FLOAT SHIP GUNSHIP]],
-    },  
+    },
     {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP]],
     },
   },
-
 
   weaponDefs             = {
 
@@ -110,7 +100,7 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 200,
     },
-  
+
     TORPEDO = {
       name                    = [[Torpedo]],
       areaOfEffect            = 32,
@@ -148,47 +138,34 @@ unitDef = {
     },
   },
 
-
   featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Duck]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 400,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 72,
       object           = [[amphraider3_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 72,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP      = {
       description      = [[Debris - Duck]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 400,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
       metal            = 36,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 36,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
   },
 

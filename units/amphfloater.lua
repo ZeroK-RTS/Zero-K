@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Inflatable Amphibious Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   brakeRate              = 0.4,
   buildCostEnergy        = 300,
   buildCostMetal         = 300,
@@ -15,7 +14,6 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND SINK]],
-  collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -32,7 +30,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 411,
   maxDamage              = 1200,
   maxSlope               = 36,
   maxVelocity            = 1.4,
@@ -50,7 +47,6 @@ unitDef = {
     },
   },
 
-  side                   = [[ARM]],
   sightDistance          = 500,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -74,7 +70,6 @@ unitDef = {
     --},
   },
 
-
   weaponDefs             = {
 
     CANNON = {
@@ -84,13 +79,13 @@ unitDef = {
       cegTag                  = [[beamweapon_muzzle_purple]],
       craterBoost             = 1,
       craterMult              = 2,
-       
+
       damage                  = {
         default = 150,
         planes  = 150,
         subs    = 7.5,
       },
-      
+
       explosionGenerator      = [[custom:flashslowwithsparks]],
       fireStarter             = 180,
       impactOnly              = true,
@@ -99,7 +94,6 @@ unitDef = {
       interceptedByShieldType = 2,
       myGravity               = 0.2,
 	  predictBoost            = 1,
-      projectiles             = 1,
 	  range 			      = 450,
       reloadtime              = 1.8,
       rgbcolor                = [[0.9 0.1 0.9]],
@@ -115,47 +109,34 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Buoy]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1250,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 120,
       object           = [[can_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 120,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP      = {
       description      = [[Debris - Buoy]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1250,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
       metal            = 60,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 60,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
   },
 

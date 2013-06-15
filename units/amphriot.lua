@@ -4,11 +4,9 @@ unitDef = {
   description            = [[Amphibious Riot Bot (Land), Skirmish Bot (Sea)]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   brakeRate              = 0.375,
   buildCostEnergy        = 350,
   buildCostMetal         = 350,
-
   buildPic               = [[amphriot.png]],
   buildTime              = 350,
   canAttack              = true,
@@ -17,7 +15,6 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND SINK]],
-  collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -28,12 +25,10 @@ unitDef = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  hideDamage             = false,
   iconType               = [[amphtorpriot]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 390,
   maxDamage              = 1210,
   maxSlope               = 36,
   maxVelocity            = 1.4,
@@ -53,7 +48,6 @@ unitDef = {
     },
   },
 
-  side                   = [[ARM]],
   sightDistance          = 500,
   sonarDistance          = 500,
   trackOffset            = 0,
@@ -65,24 +59,23 @@ unitDef = {
   upright                = false,
 
   weapons                = {
-  
+
     {
       def                = [[FLECHETTE]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
- 
+
     {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
-    },  
+    },
 
   },
 
-
   weaponDefs             = {
-  
+
     TORPEDO = {
       name                    = [[Torpedo Launcher]],
       areaOfEffect            = 16,
@@ -120,8 +113,7 @@ unitDef = {
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 160,
     },
-  
-  
+
     FLECHETTE = {
       name                    = [[Flechette]],
       areaOfEffect            = 32,
@@ -130,12 +122,12 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-      
+
       damage                  = {
 	    default = 22,
 	    subs    = 1.6,
       },
-      
+
       duration                = 0.02,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_YELLOW]],
       fireStarter             = 50,
@@ -158,50 +150,37 @@ unitDef = {
       turret                  = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 880,
-    }	
+    }
   },
-
 
   featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Scallop]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1600,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 140,
       object           = [[amphriot_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 140,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP      = {
       description      = [[Debris - Scallop]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1600,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
       metal            = 70,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 70,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
   },
 

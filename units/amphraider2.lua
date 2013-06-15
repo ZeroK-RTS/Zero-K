@@ -4,14 +4,9 @@ unitDef = {
   description            = [[Amphibious Raider/Skirmish Bot (Land)]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   brakeRate              = 0.4,
   buildCostEnergy        = 260,
   buildCostMetal         = 260,
-
-  buildoptions           = {
-  },
-
   buildPic               = [[amphraider2.png]],
   buildTime              = 260,
   canAttack              = true,
@@ -20,7 +15,6 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[SINK]],
-  collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -31,12 +25,10 @@ unitDef = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  hideDamage             = false,
   iconType               = [[amphraider]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 411,
   maxDamage              = 800,
   maxSlope               = 36,
   maxVelocity            = 2.3,
@@ -55,7 +47,6 @@ unitDef = {
     },
   },
 
-  side                   = [[ARM]],
   sightDistance          = 500,
   sonarDistance          = 300,
   trackOffset            = 0,
@@ -75,7 +66,6 @@ unitDef = {
 
   },
 
-
   weaponDefs             = {
 
     WATERCANNON = {
@@ -93,7 +83,7 @@ unitDef = {
 	    impulse = [[20]],
 		normaldamage = [[1]],
 	  },
-	  
+
       damage                  = {
         default = 0.7,
         planes  = 0.7,
@@ -131,47 +121,34 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Archer]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 800,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 104,
       object           = [[amphraider2_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 104,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP      = {
       description      = [[Debris - Archer]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 800,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
       metal            = 52,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 52,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
   },
 
