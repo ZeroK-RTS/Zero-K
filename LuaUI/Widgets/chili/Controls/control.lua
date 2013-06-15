@@ -839,6 +839,10 @@ end
 --//=============================================================================
 
 function Control:_CheckIfRTTisAppreciated()
+	if self._cantUseRTT then
+		return false
+	end
+
 	if self:InheritsFrom("window") then
 		if self._usingRTT then
 			return (((self._redrawSelfCounter or 1) / (self._redrawCounter or 1)) < 0.2)
@@ -972,9 +976,6 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 	self[fboName] = nil
 
 	if (width ~= self[texw])or(height ~= self[texh]) then
-		self[texw] = width
-		self[texh] = height
-
 		fbo.color0  = nil
 		fbo.stencil = nil
 		gl.DeleteTexture(texColor)
@@ -1000,6 +1001,7 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 		gl.DeleteFBO(fbo)
 		gl.DeleteTexture(texColor)
 		gl.DeleteRBO(texStencil)
+		self._cantUseRTT = true
 		return
 	end
 
@@ -1012,6 +1014,8 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 	self[texname] = texColor
 	self[texStencilName] = texStencil
 	self[fboName] = fbo
+	self[texw] = width
+	self[texh] = height
 end
 
 --//=============================================================================
