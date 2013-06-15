@@ -53,8 +53,8 @@ local FLOAT_TEXTURES   = gl.HasExtension("GL_ARB_texture_float")
 
 --// SYSTEM CONFIG
 PostDistortion.texRectangle     = false
---PostDistortion.jitterformat     = GL_RGBA16F_ARB
-PostDistortion.jitterformat     = GL.RGBA
+PostDistortion.jitterformat     = GL_RGBA16F_ARB
+--PostDistortion.jitterformat     = GL.RGBA
 PostDistortion.depthformat      = GL_DEPTH_COMPONENT
 PostDistortion.screenUpdateSkip = 0
 PostDistortion.copyDepthBuffer  = (NVseries>=7)or(NVseries==0)
@@ -115,7 +115,7 @@ function PostDistortion.ViewResize()
 
   jitterTex = gl.CreateTexture(vsx,vsy, {
     target = target,
-   -- format = PostDistortion.jitterformat,
+    format = PostDistortion.jitterformat,
     min_filter = GL.NEAREST,
     mag_filter = GL.NEAREST,
     wrap_s   = GL.CLAMP_TO_EDGE,
