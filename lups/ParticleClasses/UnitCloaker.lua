@@ -72,8 +72,10 @@ function UnitCloaker:BeginDraw()
   --gl.Texture(1,'bitmaps/clouddetail.bmp')
   --gl.Texture(1,'bitmaps/GPL/Lups/perlin_noise.jpg')
   gl.Texture(2,'bitmaps/GPL/Lups/mynoise2.png')
-  gl.Texture(3,'$specular')
-  gl.Texture(4,'$reflection')
+  if not isATI then
+    gl.Texture(3,'$specular')
+    gl.Texture(4,'$reflection')
+  end
 
   gl.MatrixMode(GL.PROJECTION)
   gl.PushMatrix()
@@ -95,11 +97,13 @@ function UnitCloaker:EndDraw()
 
   gl.UseShader(0)
 
-  gl.Texture(0,false)
-  gl.Texture(1,false)
+  --gl.Texture(0,false)
+  --gl.Texture(1,false)
   gl.Texture(2,false)
-  gl.Texture(3,false)
-  gl.Texture(4,false)
+  if not isATI then
+    gl.Texture(3,false)
+    gl.Texture(4,false)
+  end
 
   gl.Color(1,1,1,1)
 
@@ -114,7 +118,9 @@ function UnitCloaker:Draw()
 
   if (udid~=loadedS3oTexture) then
     gl.Texture(0, "%" .. udid .. ":0")
-    gl.Texture(1, "%" .. udid .. ":1")
+    if not isATI then
+      gl.Texture(1, "%" .. udid .. ":1")
+    end
     loadedS3oTexture = udid
   end
 
