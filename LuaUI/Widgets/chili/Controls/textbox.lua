@@ -5,7 +5,7 @@ TextBox = Control:Inherit{
 
   text      = "line1\nline2",
   autoHeight  = true, --// sets height to text size, useful for embedding in scrollboxes
-  autoObeyLineHeight = true, --// (needs autoHeight) if true, autoHeight will obey the lineHeight (-> texts with the same line count will have the same height) 
+  autoObeyLineHeight = true, --// (needs autoHeight) if true, autoHeight will obey the lineHeight (-> texts with the same line count will have the same height)
   fontsize = 12,
 
   _lines = {},
@@ -84,9 +84,18 @@ end
 
 function TextBox:DrawControl()
   local paddx, paddy = unpack4(self.clientArea)
-  local x = math.ceil(self.x + paddx)
-  local y = math.ceil(self.y + paddy)
+  local x = paddx
+  local y = paddy
 
   local font = self.font
   font:Draw(self._wrappedText, x, y)
+
+  if (self.debug) then
+    gl.Color(0,1,0,0.5)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
+    gl.LineWidth(2)
+    gl.Rect(0,0,self.width,self.height)
+    gl.LineWidth(1)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+  end
 end

@@ -43,7 +43,7 @@ end
 function Trackbar:New(obj)
   obj = inherited.New(self,obj)
 
-  if ((not obj.tooltip) or (obj.tooltip == '')) and (useValueTooltip ~= false) then
+  if ((not obj.tooltip) or (obj.tooltip == '')) and (obj.useValueTooltip ~= false) then
     obj.useValueTooltip = true
   end
 
@@ -103,6 +103,10 @@ end
 
 
 function Trackbar:SetValue(v)
+  if type(v) ~= "number" then
+    Spring.Echo("Chili: wrong param to Trackbar:SetValue(number v)")
+    return
+  end
   local r = v % self.step
   if (r > 0.5*self.step) then
     v = v + self.step - r
@@ -113,7 +117,7 @@ function Trackbar:SetValue(v)
   local oldvalue = self.value
   self.value = v
   if self.useValueTooltip then
-    self.tooltip = "Current: "..FormatNum(v)
+    self.tooltip = "Current: "..FormatNum(self.value)
   end
   self:CallListeners(self.OnChange,v,oldvalue)
   self:Invalidate()

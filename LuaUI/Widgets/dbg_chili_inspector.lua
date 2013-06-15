@@ -35,7 +35,7 @@ local function trace(children, node, level, max_level)
 	for i=1,#children do
 		local obj = children[i]
 		if obj and (obj.name ~= "wnd_inspector") then
-			local caption = ("%s: %s (redrawn: %i)"):format(obj.classname, obj.name, obj._redrawCounter or 0)
+			local caption = ("%s: %s (redrawn: %i/%i)"):format(obj.classname, obj.name, obj._redrawSelfCounter or 0, obj._redrawCounter or 0)
 			local nodec = node:Add(caption)
 			trace(obj.children, nodec, (level or 0) + 1, max_level)
 		end
@@ -44,7 +44,7 @@ end
 
 
 local function traceLost(node)
-	
+
 	for i,obj in pairs(Chili.DebugHandler.allObjects) do
 		if obj.name ~= "wnd_inspector" then
 			if (not obj.parent)and(not obj:InheritsFrom("screen")) then

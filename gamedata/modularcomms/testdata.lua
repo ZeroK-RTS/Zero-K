@@ -34,7 +34,7 @@ local base = {
 			"module_areashield",
 			"module_adv_targeting",
 			"weaponmod_disruptor_ammo",
-		}
+		},
 	},
 	{
 		name = "arty",
@@ -52,7 +52,7 @@ local base = {
 			"commweapon_heavymachinegun_lime",
 			"commweapon_disruptorbomb",
 			"weaponmod_disruptor_ammo",
-		}
+		},
 	},
 	{
 		name = "shotty",
@@ -62,7 +62,7 @@ local base = {
 			"commweapon_napalmgrenade",
 			"module_companion_drone",
 			"weaponmod_disruptor_ammo",
-		}
+		},
 	},
 	{
 		name = "beam",
@@ -163,6 +163,7 @@ for i = 1, #chassis do
 		ret.count = ret.count + 1
 		ret[ret.count] = {}
 		ret[ret.count].modules = base[j].modules
+		ret[ret.count].decorations = base[j].decorations
 		ret[ret.count].chassis = chassis[i].value
 		ret[ret.count].name = "test_" .. chassis[i].name .. base[j].name
 	end

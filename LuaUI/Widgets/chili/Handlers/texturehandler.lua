@@ -102,6 +102,8 @@ local usedTime = 0
 local lastCall = spGetTimer()
 
 function TextureHandler.Update()
+  if (not next(requested)) then return end
+
   if (usedTime>0) then
     thisCall = spGetTimer()
 
@@ -110,8 +112,6 @@ function TextureHandler.Update()
 
     if (usedTime<0) then usedTime = 0 end
   end
-
-  if (not next(requested)) then return end
 
   local timerStart = spGetTimer()
   while (usedTime < timeLimit) do
