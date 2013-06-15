@@ -306,6 +306,9 @@ unitConfigs = {
   [UnitDefNames.fakeunit_aatarget.id] = {
     empty  = true,
   },
+  [UnitDefNames.fakeunit_los.id] = {
+    empty  = true,
+  },
 }
 
 for i=1,#UnitDefs do
