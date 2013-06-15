@@ -1,3 +1,5 @@
+include "constants.lua"
+
 local base = piece 'base' 
 local body = piece 'body' 
 local engine1 = piece 'engine1' 
@@ -18,16 +20,14 @@ local rightClawBit 		= piece 'RightClawBit'
 local engShield1 		= piece 'EngShield1'
 local engShield2 		= piece 'EngShield2'
 
-
 smokePiece = {base, engine1, engine2}
-local nanoPieces = {nano}
-
-include "constants.lua"
+local nanoPieces = {nano, CentreNano, LeftNano}
 
 function script.Create()
 	Move( engShield1, y_axis, 0, 0.5 ) 
 	Move( engShield2, y_axis, 0, 0.5 ) 
 	StartThread(SmokeUnit)
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Activate()
