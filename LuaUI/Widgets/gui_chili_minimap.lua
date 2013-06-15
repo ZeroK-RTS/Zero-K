@@ -76,7 +76,7 @@ options = {
 		items={
 			{key='arwindow', 	name='Aspect Ratio Window'},
 			{key='armap', 		name='Aspect Ratio Map'},
-			{key='arnone', 		name='Custom Size'},
+			{key='arnone', 		name='Map Fills Window'},
 		},
 		advanced = true,
 		OnChange = function(self)
@@ -340,7 +340,7 @@ MakeMinimapWindow = function()
 			screenWidth = w*screenHeight/h
 		end
 	end
-	echo( options.use_map_ratio.value == 'arwindow' and 'YEs' or 'no!')
+	
 	map_panel = Chili.Panel:New {bottom = (iconsize*1.3), x = 0, y = 0, right = 0,
 		margin={0,0,0,0},
 		padding = {8,5,8,8},
