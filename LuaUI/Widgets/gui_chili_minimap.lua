@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.888 Chili Minimap",
+    desc      = "v0.889 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -42,6 +42,22 @@ local function AdjustToMapAspectRatio(w,h)
 	return h*Game.mapX/Game.mapY, h+iconsize
 end
 
+local function AdjustMapAspectRatioToWindow(x,y,w,h)
+	local ar = Game.mapX / Game.mapY
+	local newH, newW
+	local newX,newY = x,y
+	if w/h > ar then
+		newW = ar*h
+		newH = h
+		newX = (w-newW)/2
+	else
+		newW = w
+		newH = w/ar-0
+		newY = (h-newH)/2
+	end
+	return newX,newY,  newW, newH 
+end
+
 local function MakeMinimapWindow()
 end
 
@@ -55,15 +71,21 @@ options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysD
 options = {
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
-		type = 'bool',
-		value = true,
+		type = 'radioButton',
+		value = 'arwindow',
+		items={
+			{key='arwindow', 	name='Aspect Ratio Window'},
+			{key='armap', 		name='Aspect Ratio Map'},
+			{key='arnone', 		name='Custom Size'},
+		},
 		advanced = true,
 		OnChange = function(self)
-			if (self.value) then 
+			local arwindow = self.value == 'arwindow'
+			if (arwindow ) then 
 				local w,h = AdjustToMapAspectRatio(300, 200)
 				window_minimap:Resize(w,h,false,false)
 			end 
-			window_minimap.fixedRatio = self.value;			
+			window_minimap.fixedRatio = arwindow
 		end,
 		path = minimap_path,
 	},
@@ -307,7 +329,7 @@ MakeMinimapWindow = function()
 	
 	--local w,h = screenWidth*0.32,screenHeight*0.4+iconsize
 	local w,h = 328,308+iconsize
-	if (options.use_map_ratio.value) then
+	if (options.use_map_ratio.value == 'arwindow') then
 		w,h = AdjustToMapAspectRatio(w,h)
 	end
 	
@@ -318,7 +340,7 @@ MakeMinimapWindow = function()
 			screenWidth = w*screenHeight/h
 		end
 	end
-	
+	echo( options.use_map_ratio.value == 'arwindow' and 'YEs' or 'no!')
 	map_panel = Chili.Panel:New {bottom = (iconsize*1.3), x = 0, y = 0, right = 0,
 		margin={0,0,0,0},
 		padding = {8,5,8,8},
@@ -340,7 +362,7 @@ MakeMinimapWindow = function()
 		resizable = true,
 	    tweakResizable   = true,
 		minimizable = true,
-		fixedRatio = options.use_map_ratio.value,
+		fixedRatio = options.use_map_ratio.value == 'arwindow',
 		dragUseGrip = false,
 		minWidth = iconsize*10,
 		maxWidth = screenWidth*0.8,
@@ -471,6 +493,11 @@ function widget:DrawScreen()
 		return 
 	end
 	local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
+	
+	if (options.use_map_ratio.value == 'armap') then
+		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
+	end
+	
 	--if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) or init then
 	if (lw ~= cx or lh ~= ch or lx ~= cx or ly ~= cy) then
 		--[[
