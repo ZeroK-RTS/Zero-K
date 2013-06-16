@@ -54,7 +54,10 @@ function SetIcons(unitID)
 		end
 		
 		local facplop = Spring.GetUnitRulesParam(unitID, "facplop") 
-		if facplop then
+		if facplop or lastFacPlop[unitID] == 1 then
+			if not facplop then
+				facplop = 0
+			end
 			if (not lastFacPlop[unitID]) or lastFacPlop[unitID] ~= facplop then
 				lastFacPlop[unitID] = facplop
 				if facplop ~= 0 then
