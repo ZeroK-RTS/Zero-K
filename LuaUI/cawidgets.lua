@@ -524,8 +524,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   
   local enabled = ((order ~= nil) and (order > 0)) or
       ((order == nil) and  -- unknown widget
-       (info.enabled and ((not knownInfo.fromZip) or self.autoModWidgets))) or
-			 info.alwaysStart
+       (info.enabled and ((not knownInfo.fromZip) or self.autoModWidgets))) --or info.alwaysStart
 
   -- experimental widget, disabled by default in stable
   if info.experimental and isStable then
