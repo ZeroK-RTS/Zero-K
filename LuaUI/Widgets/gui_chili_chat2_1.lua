@@ -152,7 +152,7 @@ local incolors = {} -- incolors indexed by playername + special #a/#e/#o/#s/#h c
 local messages = {} -- message buffer
 local highlightPattern -- currently based on player name -- TODO add configurable list of highlight patterns
 
-local visible = true
+local visible = false
 local firstEnter = true --used to activate ally-chat at game start. To run once
 local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 
@@ -675,7 +675,6 @@ function RemakeConsole()
 		hideConsole()
 	else
 		window_console.dockable = true
-		visible = false -- to trick showConsole into adding the window
 		showConsole()
 	end 
 end
