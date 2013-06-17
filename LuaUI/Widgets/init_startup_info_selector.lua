@@ -150,22 +150,22 @@ local function CreateWindow()
 					OnClick = {option.button},
 					--OnMouseUp = {option.button},
 					y = 9 
-				}
-				local buttonWidth = posterx*2/3
-				if (option.button ~= nil) then 
-					local button = Button:New {
-						parent = mainWindow,
-						x = i*posterx + (posterx - buttonWidth)/2, --placement of comms names' buttons @ the middle of each poster
-						y = postery+12,
-						caption = option.selector,
-						tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
-						width = buttonWidth,
-						height = 30,
-						padding={1,1,1,1},
-					--OnMouseUp = {option.button},
-						OnClick = {option.button},-- used onclick in case people change their mind, mouseup register the option you were when pressed on, even if you moved somewhere else while still hold mouse button. onclick register it only if you're still on it (even if you moved to another part of the comm button).
 					}
-				end 
+				local buttonWidth = posterx*2/3
+					if (option.button ~= nil) then 
+						local button = Button:New {
+							parent = mainWindow,
+							x = i*posterx + (posterx - buttonWidth)/2, --placement of comms names' buttons @ the middle of each poster
+							y = postery+12,
+							caption = option.selector,
+							tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
+							width = buttonWidth,
+							height = 30,
+							padding={1,1,1,1},
+						--OnMouseUp = {option.button},
+							OnClick = {option.button},-- used onclick in case people change their mind, mouseup register the option you were when pressed on, even if you moved somewhere else while still hold mouse button. onclick register it only if you're still on it (even if you moved to another part of the comm button).
+							}
+					end 
 				i = i + 1
 			end
 		end

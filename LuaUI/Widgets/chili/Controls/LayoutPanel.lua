@@ -416,6 +416,17 @@ function LayoutPanel:_LayoutChildrenResizeItems()
   local cn = self.children
   local cn_count = #cn
 
+  local max_ix = math.floor(self.clientArea[3] / self.minItemWidth)
+  local max_iy = math.floor(self.clientArea[4] / self.minItemHeight)
+
+  if (max_ix * max_iy < cn_count)   or
+     (max_ix < (self.columns or 0)) or
+     (max_iy < (self.rows or 0))
+  then
+    --FIXME add autoEnlarge/autoAdjustSize?
+    --error"LayoutPanel: not enough space"
+  end
+
   --FIXME take minWidth/height maxWidth/Height into account! (and try to reach a 1:1 pixel ratio)
   if self.columns and self.rows then
     self._columns = self.columns
@@ -730,7 +741,7 @@ function LayoutPanel:DrawChildren()
   if (not cn[1]) then return end
 
   gl.PushMatrix()
-  gl.Translate(self.clientArea[1], self.clientArea[2], 0)
+  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end
@@ -755,13 +766,13 @@ function LayoutPanel:DrawChildrenForList()
     gl.Color(0,1,0,0.5)
     gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
     gl.LineWidth(2)
-    gl.Rect(0, 0, self.width, self.height)
+    gl.Rect(self.x,self.y,self.x+self.width,self.y+self.height)
     gl.LineWidth(1)
     gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
   end
 
   gl.PushMatrix()
-  gl.Translate(self.clientArea[1], self.clientArea[2], 0)
+  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end

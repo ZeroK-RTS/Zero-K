@@ -29,6 +29,9 @@ Control = Object:Inherit{
   fixedRatio      = false,
   tooltip         = nil, --// JUST TEXT
 
+  useDList        = true,
+  safeOpengl      = true, --// enables scissors
+
   font = {
     font          = "FreeSansBold.otf",
     size          = 14,
@@ -53,9 +56,6 @@ Control = Object:Inherit{
   skin            = nil,
   skinName        = nil,
 
-  drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
-  noSelfHitTest = nil,
-
   OnResize        = {},
 }
 
@@ -67,10 +67,11 @@ local inherited = this.inherited
 function Control:New(obj)
   --// backward compability
   BackwardCompa(obj)
-
-  if obj.DrawControl then
-    obj._hasCustomDrawControl = true
-  end
+  
+  --//minimum size from minimum size table when minWidth & minHeight is not set (backward compatibility)
+  local minimumSize = obj.minimumSize or {} 
+  obj.minWidth = obj.minWidth or minimumSize[1] 
+  obj.minHeight = obj.minHeight or minimumSize[2]
 
   --// load the skin for this control
   obj.classname = self.classname
@@ -82,18 +83,6 @@ function Control:New(obj)
   obj.children = nil
 
   obj = inherited.New(self,obj)
-
-  if obj._hasCustomDrawControl then
-    if not obj.drawcontrolv2 then
-	local w = obj._widget or {whInfo = { name = "unknown" } }
-	local fmtStr = [[You are using a custom %s::DrawControl in widget "%s".
-	Please note that with Chili 2.1 the (self.x, self.y) translation is moved a level up and does not need to be done in DrawControl anymore.
-	When you adjusted your code set `drawcontrolv2 = true` in the respective control to disable this message.]]
-	Spring.Log("Chili", "warning", fmtStr:format(obj.name, w.whInfo.name))
-    else
-	obj._hasCustomDrawControl = false
-    end
-  end
 
   local p = obj.padding
   if (obj.clientWidth) then
@@ -122,29 +111,17 @@ end
 
 
 function Control:Dispose(...)
-  gl.DeleteList(self._all_dlist)
-  self._all_dlist = nil
-
-  gl.DeleteList(self._children_dlist)
-  self._children_dlist = nil
-
-  gl.DeleteList(self._own_dlist)
-  self._own_dlist = nil
-
-  gl.DeleteTexture(self._tex_all)
-  self._tex_all = nil
-  gl.DeleteTexture(self._tex_children)
-  self._tex_children = nil
-
-  if gl.DeleteFBO then
-	gl.DeleteRBO(self._stencil_all)
-	self._stencil_all = nil
-	gl.DeleteRBO(self._stencil_children)
-	self._stencil_children = nil
-	gl.DeleteFBO(self._fbo_all)
-	self._fbo_all = nil
-	gl.DeleteFBO(self._fbo_children)
-	self._fbo_children = nil
+  if (self._all_dlist) then
+    gl.DeleteList(self._all_dlist)
+    self._all_dlist = nil
+  end
+  if (self._children_dlist) then
+    gl.DeleteList(self._children_dlist)
+    self._children_dlist = nil
+  end
+  if (self._own_dlist) then
+    gl.DeleteList(self._own_dlist)
+    self._own_dlist = nil
   end
 
   inherited.Dispose(self,...)
@@ -171,6 +148,13 @@ function Control:RemoveChild(obj)
     self:RequestRealign()
   end
   return found
+end
+
+--//=============================================================================
+
+function Control:Invalidate()
+  self._needRedraw = true
+  self:RequestUpdate()
 end
 
 --//=============================================================================
@@ -319,7 +303,7 @@ end
 
 --//=============================================================================
 
-function Control:UpdateClientArea(dontRedraw)
+function Control:UpdateClientArea()
   local padding = self.padding
 
   self.clientWidth  = self.width  - padding[1] - padding[3]
@@ -342,7 +326,11 @@ function Control:UpdateClientArea(dontRedraw)
     self._oldheight_uca = self.height
   end
 
-  if not dontRedraw then self:Invalidate() end --FIXME only when RTT!
+if (self.debug) then
+  Spring.Echo(self.name, self.width, self.height, self._realignRequested)
+end
+
+  self:Invalidate() --FIXME correct place?
   self:CallListeners(self.OnResize) --FIXME more arguments and filter unchanged resizes
 end
 
@@ -433,7 +421,6 @@ end
 
 function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
   local changed = false
-  local redraw  = false
 
   --//FIXME add an API for relative constraints changes
   if (x)and(type(x) == "number") then
@@ -476,14 +463,12 @@ function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
     if (self.width ~= w) then
       self.width = w
       changed = true
-      redraw  = true
     end
     if (not dontUpdateRelative) then
       if (self._relativeBounds.width ~= w) then
         self._relativeBounds.width = IsRelativeCoord(w) and w
         self._givenBounds.width = w
         changed = true
-	redraw  = true
       end
     end
   end
@@ -495,27 +480,24 @@ function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
     if (self.height ~= h) then
       self.height = h
       changed = true
-      redraw  = true
     end
     if (not dontUpdateRelative) then
       if (self._relativeBounds.height ~= h) then
         self._relativeBounds.height = IsRelativeCoord(h) and h
         self._givenBounds.height = h
         changed = true
-	redraw  = true
       end
     end
   end
 
   if (changed)or(not self.clientArea) then
-    self:UpdateClientArea(not redraw)
+    self:UpdateClientArea()
   end
 end
 
 
 function Control:SetPosRelative(x, y, w, h, clientArea, dontUpdateRelative)
   local changed = false
-  local redraw  = false
 
   --//FIXME add an API for relative constraints changes
   if x then
@@ -559,7 +541,6 @@ function Control:SetPosRelative(x, y, w, h, clientArea, dontUpdateRelative)
       if (self.width ~= w) then
         self.width = w
         changed = true
-	redraw  = true
       end
     end
     if (not dontUpdateRelative) then
@@ -567,7 +548,6 @@ function Control:SetPosRelative(x, y, w, h, clientArea, dontUpdateRelative)
         self._relativeBounds.width = IsRelativeCoord(w) and w
         self._givenBounds.width = w
         changed = true
-	redraw  = true
       end
     end
   end
@@ -580,7 +560,6 @@ function Control:SetPosRelative(x, y, w, h, clientArea, dontUpdateRelative)
       if (self.height ~= h) then
         self.height = h
         changed = true
-	redraw  = true
       end
     end
     if (not dontUpdateRelative) then
@@ -588,13 +567,12 @@ function Control:SetPosRelative(x, y, w, h, clientArea, dontUpdateRelative)
         self._relativeBounds.height = IsRelativeCoord(h) and h
         self._givenBounds.height = h
         changed = true
-	redraw  = true
       end
     end
   end
 
   if (changed)or(not self.clientArea) then
-    self:UpdateClientArea(not redraw)
+    self:UpdateClientArea()
   end
 end
 
@@ -710,7 +688,7 @@ function Control:GetChildrenCurrentExtents()
   local minTop    = 0
   local maxRight  = 0
   local maxBottom = 0
-
+ 
   local cn = self.children
   for i=1,#cn do
     local c = cn[i]
@@ -731,7 +709,7 @@ end
 function Control:StartResizing(x,y)
   --//FIXME the x,y aren't needed check how drag is handled!
   self.resizing = {
-    mouse = {x, y},
+    mouse = {x, y}, 
     size  = {self.width, self.height},
     pos   = {self.x, self.y},
   }
@@ -768,13 +746,13 @@ end
 
 function Control:ParentToClient(x,y)
   local ca = self.clientArea
-  return x - self.x - ca[1], y - self.y - ca[2]
+  return x - self.x - ca[1], y - self.y - ca[2] 
 end
 
 
 function Control:ClientToParent(x,y)
   local ca = self.clientArea
-  return x + self.x + ca[1], y + self.y + ca[2]
+  return x + self.x + ca[1], y + self.y + ca[2] 
 end
 
 
@@ -786,255 +764,100 @@ end
 
 --//=============================================================================
 
-function Control:Invalidate()
-	self._needRedraw = true
-	self._needRedrawSelf = nil
-	self:RequestUpdate()
+function Control:Update()
+	if (self._realignRequested) then
+		self:Realign(self.__savespace)
+		self._realignRequested = nil
+	end
+
+	if (self._needRedraw)and(self:IsInView()) then
+		if (self.useDList) then
+			--//FIXME don't recreate the own displaylist each time we _move_ a window
+			self:_UpdateOwnDList()
+			--self:_UpdateChildrenDList()
+			self:_UpdateAllDList()
+		end
+		self._needRedraw = nil
+	end
 end
 
-function Control:InvalidateSelf()
-	self._needRedraw = true
-	self._needRedrawSelf = true
-	self:RequestUpdate()
-end
-
---//=============================================================================
 
 function Control:InstantUpdate()
 	if self:IsInView() then
 		if self._needRedraw then
 			self:Update()
 		else
-			self._in_update = true
-			self:_UpdateChildrenDList()
 			self:_UpdateAllDList()
-			self._in_update = false
 		end
 	end
 end
-
-
-function Control:Update()
-	if self._realignRequested then
-		self:Realign(self.__savespace)
-		self._realignRequested = false
-	end
-
-	if self._needRedraw then
-		if self:IsInView() then
-			self._in_update = true
-			self:_UpdateOwnDList()
-			if not self._needRedrawSelf then self:_UpdateChildrenDList() end
-			self:_UpdateAllDList()
-			self._in_update = false
-
-			self._needRedraw = false
-			self._needRedrawSelf = false
-			self._redrawSelfCounter = (self._redrawSelfCounter or 0) + 1
-		end
-	end
-end
-
 
 --//=============================================================================
-
-function Control:_CheckIfRTTisAppreciated()
-	if self._cantUseRTT then
-		return false
-	end
-
-	if self:InheritsFrom("window") then
-		if self._usingRTT then
-			return (((self._redrawSelfCounter or 1) / (self._redrawCounter or 1)) < 0.2)
-		else
-			return (((self._redrawSelfCounter or 1) / (self._redrawCounter or 1)) < 0.1)
-		end
-	else
-		if (self._redrawCounter or 0) > 300 then
-			return (((self._redrawSelfCounter or 1) / (self._redrawCounter or 1)) < 0.03)
-		end
-	end
-end
-
 
 function Control:_UpdateOwnDList()
-	if not self.parent then return end
-	if not self:IsInView() then return end
+  if (not self.parent) then return end
+  if not self:IsInView() then return end
 
-	self:CallChildren('_UpdateOwnDList')
+  self:CallChildren('_UpdateOwnDList')
 
-	gl.DeleteList(self._own_dlist)
-	--self._own_dlist = nil
-	--self._own_dlist = gl.CreateList(self.DrawControl, self)
+  if (self._needRedraw) then
+    if (self._own_dlist) then
+      gl.DeleteList(self._own_dlist)
+      self._own_dlist = nil
+    end
+
+    self._own_dlist = gl.CreateList(self.DrawControl, self)
+
+    self._needRedraw = nil
+  end
 end
 
-
+--[[
 function Control:_UpdateChildrenDList()
-	if not self.parent then return end
-	if not self:IsInView() then return end
-
-	if self:InheritsFrom("scrollpanel") then
-		local contentX,contentY,contentWidth,contentHeight = unpack4(self.contentArea)
-		self:CreateViewTexture("children", contentWidth, contentHeight, self.DrawChildrenForList, self, true)
-	end
+  if (self._children_dlist) then
+    gl.DeleteList(self._children_dlist)
+    self._children_dlist = nil
+  end
+  self._children_dlist = gl.CreateList(self.CallChildrenInverse, self, 'DrawForList')
 end
-
+--]]
 
 function Control:_UpdateAllDList()
-	if not self.parent then return end
-	if not self:IsInView() then return end
+  if (not self.parent) then return end
+  if not self:IsInView() then return end
 
-	local RTT = self:_CheckIfRTTisAppreciated()
+  self._redrawCounter = (self._redrawCounter or 0) + 1
 
-	if RTT then
-		self._usingRTT = true
-		self:CreateViewTexture("all", self.width, self.height, self.DrawForList, self)
-	else
-		local suffix_name = "all"
-		local texname = "_tex_" .. suffix_name
-		local texStencilName = "_stencil_" .. suffix_name
-		local fboName = "_fbo_" .. suffix_name
-		local texw = "_texw_" .. suffix_name
-		local texh = "_texh_" .. suffix_name
-		gl.DeleteFBO(self[fboName])
-		gl.DeleteTexture(self[texname])
-		gl.DeleteRBO(self[texStencilName])
-		self[texStencilName] = nil
-		self[texname] = nil
-		self[fboName] = nil
-		self[texw] = nil
-		self[texh] = nil
-		self._usingRTT = false
-	end
+  if (self._all_dlist) then
+    gl.DeleteList(self._all_dlist)
+    self._all_dlist = nil
+  end
+  self._all_dlist = gl.CreateList(self.DrawForList,self)
 
-	--gl.DeleteList(self._all_dlist)
-	--self._all_dlist = gl.CreateList(self.DrawForList,self)
-
-	if (self.parent)and(not self.parent._needRedraw)and(self.parent._UpdateAllDList) then
-		TaskHandler.RequestInstantUpdate(self.parent)
-	end
-end
-
-
-
-function Control:_SetupRTT(fnc, self_, drawInContentRect, ...)
-	gl.Clear(GL.COLOR_BUFFER_BIT, 0,0,0,1)
-	gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
-
-	--// no need to push/pop cause gl.ActiveFBO already does so
-	gl.MatrixMode(GL.MODELVIEW)
-	gl.Translate(-1,1,0)
-	if not drawInContentRect then
-		gl.Scale(2/self.width, -2/self.height, 1)
-		gl.Translate(-self.x, -self.y, 0)
-	else
-		local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
-		local contentX,contentY,contentWidth,contentHeight = unpack4(self.contentArea)
-		gl.Scale(2/contentWidth, -2/contentHeight, 1)
-		gl.Translate(-(clientX - self.scrollPosX), -(clientY - self.scrollPosY), 0)
-	end
-
-	gl.Color(1,1,1,1)
-	gl.StencilTest(true)
-	gl.StencilFunc(GL.EQUAL, 0, 0xFF)
-	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
-
-	gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
-		fnc(self_, ...)
-
--- 		--//Render a red quad to indicate that RTT is used for the respective control
--- 		gl.Color(1,0,0,0.5)
--- 		if not drawInContentRect then
--- 			gl.Rect(self.x,self.y,self.x+50,self.y+50)
--- 		else
--- 			gl.Rect(0,0,50,50)
--- 		end
--- 		gl.Color(1,1,1,1)
-
-	gl.Blending("reset")
-
-	gl.StencilTest(false)
-end
-
-
-function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
-	if not gl.CreateFBO then
-		return
-	end
-
-	local texname = "_tex_" .. suffix_name
-	local texw = "_texw_" .. suffix_name
-	local texh = "_texh_" .. suffix_name
-	local texStencilName = "_stencil_" .. suffix_name
-	local fboName = "_fbo_" .. suffix_name
-
-	local fbo = self[fboName] or gl.CreateFBO()
-	local texColor = self[texname]
-	local texStencil = self[texStencilName]
-	self[texStencilName] = nil
-	self[texname] = nil
-	self[fboName] = nil
-
-	if (width ~= self[texw])or(height ~= self[texh]) then
-		fbo.color0  = nil
-		fbo.stencil = nil
-		gl.DeleteTexture(texColor)
-		gl.DeleteRBO(texStencil)
-
-		--FIXME check maxtexsize!
-		texColor = gl.CreateTexture(width, height, {
-			min_filter = GL.NEAREST,
-			mag_filter = GL.NEAREST,
-			wrap_s     = GL.CLAMP,
-			wrap_t     = GL.CLAMP,
-			border     = false,
-		})
-		texStencil = gl.CreateRBO(width, height, {
-			format = GL_DEPTH24_STENCIL8,
-		})
-
-		fbo.color0  = texColor
-		fbo.stencil = texStencil
-	end
-
-	if  (not (fbo and texColor and texStencil))or(not gl.IsValidFBO(fbo)) then
-		gl.DeleteFBO(fbo)
-		gl.DeleteTexture(texColor)
-		gl.DeleteRBO(texStencil)
-		self._cantUseRTT = true
-		return
-	end
-
-	EnterRTT()
-	self._inrtt = true
-	gl.ActiveFBO(fbo, true, Control._SetupRTT, self, fnc, ...)
-	self._inrtt = false
-	LeaveRTT()
-
-	self[texname] = texColor
-	self[texStencilName] = texStencil
-	self[fboName] = fbo
-	self[texw] = width
-	self[texh] = height
+  if (self.parent)and(not self.parent._needRedraw)and(self.parent._UpdateAllDList)and(self.parent.useDList) then
+    TaskHandler.RequestInstantUpdate(self.parent)
+  end
 end
 
 --//=============================================================================
 
-
 function Control:_DrawInClientArea(fnc,...)
-	local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
+  local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
+  if (self.safeOpengl) then
+    local sx,sy = self:LocalToScreen(clientX,clientY)
+    sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
 
-	gl.PushMatrix()
-	gl.Translate(clientX, clientY, 0)
+    PushScissor(sx,sy,math.ceil(clientWidth),math.ceil(clientHeight))
+  end
 
-	local sx,sy = self:LocalToScreen(clientX,clientY)
-	sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
-	PushLimitRenderRegion(self, sx, sy, clientWidth, clientHeight)
+  gl.PushMatrix()
+  gl.Translate(math.floor(self.x + clientX),math.floor(self.y + clientY),0)
+  fnc(...)
+  gl.PopMatrix()
 
-	fnc(...)
-
-	PopLimitRenderRegion(self, sx, sy, clientWidth, clientHeight)
-	gl.PopMatrix()
+  if (self.safeOpengl) then
+    PopScissor()
+  end
 end
 
 
@@ -1073,194 +896,119 @@ function Control:_DrawChildrenInClientArea(event)
 	self:_DrawInClientArea(self.CallChildrenInverseCheckFunc, self, self.IsChildInView, event or 'Draw')
 end
 
-
-function Control:_DrawChildrenInClientAreaWithoutViewCheck(event)
-	self:_DrawInClientArea(self.CallChildrenInverse, self, event or 'Draw')
-end
-
-
 --//=============================================================================
 
 --//FIXME move resize and drag to Window class!!!!
 function Control:DrawBackground()
-	--// gets overriden by the skin/theme
+  --// gets overriden by the skin/theme
 end
 
 function Control:DrawDragGrip()
-	--// gets overriden by the skin/theme
+  --// gets overriden by the skin/theme
 end
 
 function Control:DrawResizeGrip()
-	--// gets overriden by the skin/theme
+  --// gets overriden by the skin/theme
 end
 
 function Control:DrawBorder()
-	--// gets overriden by the skin/theme ??????
+  --// gets overriden by the skin/theme ??????
 end
 
 
 function Control:DrawGrips() -- FIXME this thing is a hack, fix it - todo ideally make grips appear only when mouse hovering over it
-	local drawResizeGrip = self.resizable
-	local drawDragGrip   = self.draggable and self.dragUseGrip
-	--[[if IsTweakMode() then
-	drawResizeGrip = drawResizeGrip or self.tweakResizable
-	drawDragGrip   = (self.tweakDraggable and self.tweakDragUseGrip)
-	end--]]
+  local drawResizeGrip = self.resizable
+  local drawDragGrip   = self.draggable and self.dragUseGrip
+  --[[if IsTweakMode() then
+    drawResizeGrip = drawResizeGrip or self.tweakResizable
+    drawDragGrip   = (self.tweakDraggable and self.tweakDragUseGrip)
+  end--]]
 
-	if drawResizeGrip then
-		self:DrawResizeGrip()
-	end
-	if drawDragGrip then
-		self:DrawDragGrip()
-	end
+  if drawResizeGrip then
+    self:DrawResizeGrip()
+  end
+  if drawDragGrip then
+    self:DrawDragGrip()
+  end
 end
 
 
 function Control:DrawControl()
-	self:DrawBackground()
-	self:DrawBorder()
+  --//an option to make panel position snap to an integer
+  if self.snapToGrid then 
+    self.x = math.floor(self.x) + 0.5 
+    self.y = math.floor(self.y) + 0.5 
+  end 
+  self:DrawBackground()
+  self:DrawBorder()
 end
 
 
 function Control:DrawForList()
-	self._redrawCounter = (self._redrawCounter or 0) + 1
-	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then self:InvalidateSelf() end
+  if (self._own_dlist) then
+    gl.CallList(self._own_dlist);
+  else
+    self:DrawControl();
+  end
 
-	if (self._tex_all) then
-		gl.PushMatrix()
-		gl.Translate(self.x, self.y, 0)
-			gl.BlendFuncSeparate(GL.ONE, GL.SRC_ALPHA, GL.ZERO, GL.SRC_ALPHA)
-			gl.Color(1,1,1,1)
-			gl.Texture(0, self._tex_all)
-			gl.TexRect(0, 0, self.width, self.height)
-			gl.Texture(0, false)
-			gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
-		gl.PopMatrix()
-		return
-	elseif (self._all_dlist) then
-		gl.PushMatrix()
-		gl.Translate(self.x, self.y, 0)
-			gl.CallList(self._all_dlist);
-		gl.PopMatrix()
-		return
-	end
+  if (self._children_dlist) then
+    self:_DrawInClientArea(gl.CallList,self._children_dlist);
+  else
+    self:DrawChildrenForList();
+  end
 
-	gl.PushMatrix()
-	gl.Translate(self.x, self.y, 0)
+  if (self.DrawControlPostChildren) then
+    self:DrawControlPostChildren();
+  end
 
-	if (self._own_dlist) then
-		gl.CallList(self._own_dlist)
-	else
-		if self._hasCustomDrawControl then
-			gl.Translate(-self.x, -self.y, 0)
-			self:DrawControl()
-			gl.Translate(self.x, self.y, 0)
-		else
-			self:DrawControl()
-		end
-	end
-
-	if (self._tex_children) then
-		gl.BlendFuncSeparate(GL.ONE, GL.SRC_ALPHA, GL.ZERO, GL.SRC_ALPHA)
-		gl.Color(1,1,1,1)
-		gl.Texture(0, self._tex_children)
-		local contX,contY,contWidth,contHeight = unpack4(self.contentArea)
-		local clientX,clientY,clientWidth,clientHeight = unpack4(self.clientArea)
-		local x = clientX
-		local y = clientY
-		local s = self.scrollPosX / contWidth
-		local t = 1 - self.scrollPosY / contHeight
-		local u = s + clientWidth / contWidth
-		local v = t - clientHeight / contHeight
-		gl.TexRect(x, y, x + clientWidth, y + clientHeight, s, t, u, v)
-		gl.Texture(0, false)
-		gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
-	elseif (self._children_dlist) then
-		self:_DrawInClientArea(gl.CallList, self._children_dlist)
-	else
-		self:DrawChildrenForList()
-	end
-
-	if (self.DrawControlPostChildren) then
-		self:DrawControlPostChildren()
-	end
-
-	self:DrawGrips()
-	gl.PopMatrix()
+  self:DrawGrips();
 end
 
 
 function Control:Draw()
-	self._redrawCounter = (self._redrawCounter or 0) + 1
-	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then self:InvalidateSelf() end
+  if (self._all_dlist) then
+    gl.CallList(self._all_dlist);
+    return;
+  end
 
-	if (self._tex_all) then
-		gl.PushMatrix()
-		gl.Translate(self.x, self.y, 0)
-			gl.BlendFunc(GL.ONE, GL.SRC_ALPHA)
-			gl.Color(1,1,1,1)
-			gl.Texture(0, self._tex_all)
-			gl.TexRect(0, 0, self.width, self.height)
-			gl.Texture(0, false)
-			gl.Blending("reset")
-		gl.PopMatrix()
-		return
-	elseif (self._all_dlist) then
-		gl.PushMatrix()
-		gl.Translate(self.x, self.y, 0)
-			gl.CallList(self._all_dlist);
-		gl.PopMatrix()
-		return
-	end
+  if (self._own_dlist) then
+    gl.CallList(self._own_dlist);
+  else
+    self:DrawControl();
+  end
 
-	gl.PushMatrix()
-	gl.Translate(self.x, self.y, 0)
+  if (self._children_dlist) then
+    self:_DrawInClientArea(gl.CallList,self._children_dlist);
+  else
+    self:DrawChildren();
+  end
 
-	if (self._own_dlist) then
-		gl.CallList(self._own_dlist)
-	else
-		if self._hasCustomDrawControl then
-			gl.Translate(-self.x, -self.y, 0)
-			self:DrawControl()
-			gl.Translate(self.x, self.y, 0)
-		else
-			self:DrawControl()
-		end
-	end
+  if (self.DrawControlPostChildren) then
+    self:DrawControlPostChildren();
+  end
 
-	if (self._children_dlist) then
-		self:_DrawInClientArea(gl.CallList, self._children_dlist)
-	else
-		self:DrawChildren();
-	end
-
-	if (self.DrawControlPostChildren) then
-		self:DrawControlPostChildren();
-	end
-
-	self:DrawGrips();
-	gl.PopMatrix()
+  self:DrawGrips();
 end
 
 
 function Control:TweakDraw()
-	if (next(self.children)) then
-		self:_DrawChildrenInClientArea('TweakDraw')
-	end
+  if (next(self.children)) then
+    self:_DrawChildrenInClientArea('TweakDraw')
+  end
 end
 
 
 function Control:DrawChildren()
-	if (next(self.children)) then
-		self:_DrawChildrenInClientArea('Draw')
-	end
+  if (next(self.children)) then
+    self:_DrawChildrenInClientArea('Draw')
+  end
 end
 
 
 function Control:DrawChildrenForList()
-	if (next(self.children)) then
-		self:_DrawChildrenInClientAreaWithoutViewCheck('DrawForList')
-	end
+  if (next(self.children)) then
+    self:_DrawChildrenInClientArea('DrawForList')
+  end
 end
 
 --//=============================================================================
@@ -1287,6 +1035,10 @@ function Control:HitTest(x,y)
           end
         end
       end
+      --//an option that allow you to mouse click on empty panel
+      if self.hitTestAllowEmpty then 
+      	return self 
+      end
     end
   end
 
@@ -1295,18 +1047,6 @@ function Control:HitTest(x,y)
     if (nchit) then
       return nchit
     end
-  end
-
-  if (not self.noSelfHitTest) and
-	(self.tooltip
-	or (#self.OnMouseDown > 0)
-	or (#self.OnMouseUp > 0)
-	or (#self.OnClick > 0)
-	or (#self.OnDblClick > 0)
-	or (#self.OnMouseMove > 0)
-	or (#self.OnMouseWheel > 0))
-  then
-    return self
   end
 
   return false
@@ -1351,7 +1091,7 @@ function Control:MouseMove(x, y, dx, dy, ...)
     local deltaMousePosY = y - oldState.mouse[2]
 
     local w = math.max(
-      self.minWidth,
+      self.minWidth, 
       oldState.size[1] + deltaMousePosX
     )
     local h = math.max(
@@ -1420,14 +1160,14 @@ end
 function Control:MouseOver(...)
 	inherited.MouseOver(self, ...)
 	self.state.hovered = true
-	self:InvalidateSelf()
+	self:Invalidate()
 end
 
 
 function Control:MouseOut(...)
 	inherited.MouseOut(self, ...)
 	self.state.hovered = false
-	self:InvalidateSelf()
+	self:Invalidate()
 end
 
 --//=============================================================================
