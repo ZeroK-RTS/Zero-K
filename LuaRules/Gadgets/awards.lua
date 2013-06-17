@@ -14,6 +14,7 @@ local TESTMODE = false
 
 local spGetAllyTeamList		= Spring.GetAllyTeamList
 local spIsGameOver			= Spring.IsGameOver
+local spGetTeamInfo         = Spring.GetTeamInfo
 
 local gaiaTeamID			= Spring.GetGaiaTeamID()
 
@@ -79,6 +80,8 @@ GG.Awards = GG.Awards or {}
 local reclaimListByFeature = {}
 local shareListTemp1	= {}
 local shareListTemp2	= {}
+
+local cappedComs = {}
 
 --new
 local awardData = {}
@@ -567,6 +570,13 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost or 0
 			AddAwardPoints( 'cap', newTeam, mCost )
+			if (ud.customParams.commtype) then
+				if (not cappedComs[unitID]) then
+					cappedComs[unitID] = select(6, spGetTeamInfo(oldTeam))
+				elseif (cappedComs[unitID] == select(6, spGetTeamInfo(newTeam))) then
+					cappedComs[unitID] = nil
+				end
+			end
 		end
 	else -- teams are allied
 		if shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
@@ -591,6 +601,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 		expUnitTeam = unitTeam
 		expUnitDefID = unitDefID
 	end
+
+	if (cappedComs[unitID]) then
+		cappedComs[unitID] = nil
+		if (unitTeam ~= gaiaTeamID) then
+			AddAwardPoints( 'head', unitTeam, 1 )
+		end
+		return
+	end
+
 	if (killerTeam == unitTeam) or (killerTeam == gaiaTeamID) or (unitTeam == gaiaTeamID) or (killerTeam == nil) then
 		return
 	elseif (unitDefID == mexDefID) then
@@ -610,6 +629,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 		elseif ud.name == "roost" then
 			AddAwardPoints( 'sweeper', killerTeam, 1 )
 		else
+			--
 		end
 	end
 end
@@ -818,7 +838,7 @@ function gadget:Initialize()
 	end
 	
 	for _,team in pairs(totalTeamList) do
-		local _, leaderPlayerID, _, isAI = Spring.GetTeamInfo(team)
+		local _, leaderPlayerID, _, isAI = spGetTeamInfo(team)
 		local name
 		if isAI then
 		  local _, aiName, _, shortName = Spring.GetAIInfo(team)
