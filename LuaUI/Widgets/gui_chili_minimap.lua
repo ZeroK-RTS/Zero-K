@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.889 Chili Minimap",
+    desc      = "v0.890 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -34,28 +34,26 @@ local function toggleTeamColors()
 	end
 end 
 
-
+local ar = Game.mapX/Game.mapY
+local mapIsWider = Game.mapX > Game.mapY
 local function AdjustToMapAspectRatio(w,h)
-	if (Game.mapX > Game.mapY) then
-		return w, w*Game.mapY/Game.mapX+iconsize
+	if mapIsWider then
+		return w, w/ar +iconsize
 	end
-	return h*Game.mapX/Game.mapY, h+iconsize
+	return h*ar, h+iconsize
 end
 
 local function AdjustMapAspectRatioToWindow(x,y,w,h)
-	local ar = Game.mapX / Game.mapY
-	local newH, newW
-	local newX,newY = x,y
+	local newW, newH = w,h
+	local newX, newY = x,y
 	if w/h > ar then
 		newW = ar*h
-		newH = h
 		newX = (w-newW)/2
 	else
-		newW = w
-		newH = w/ar-0
+		newH = w/ar
 		newY = (h-newH)/2
 	end
-	return newX,newY,  newW, newH 
+	return newX, newY, newW, newH
 end
 
 local function MakeMinimapWindow()
@@ -81,11 +79,12 @@ options = {
 		advanced = true,
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
-			if (arwindow ) then 
-				local w,h = AdjustToMapAspectRatio(300, 200)
+			window_minimap.fixedRatio = arwindow
+			if arwindow then 
+				local w,h = AdjustToMapAspectRatio(328,308+iconsize)
 				window_minimap:Resize(w,h,false,false)
 			end 
-			window_minimap.fixedRatio = arwindow
+			
 		end,
 		path = minimap_path,
 	},
