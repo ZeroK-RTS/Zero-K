@@ -880,8 +880,6 @@ local function AddEntity(entity, teamID, allyTeamID)
 			MakeNewIcon(entity,"pingImg",{x=x_ping,file=pingPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'Ping: ' .. pingText,})
 			entity.cpuImg.color = cpuCol
 			entity.pingImg.color = pingCol
-			function entity.cpuImg:HitTest(x,y) return self end
-			function entity.pingImg:HitTest(x,y) return self end
 		end
 
 	end -- if not isAI
@@ -1318,6 +1316,7 @@ SetupPanels = function ()
 		tweakResizable = true,
 		minimizable = false,
 		minWidth = x_windowbound,
+		noSelfHitTest = true,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end

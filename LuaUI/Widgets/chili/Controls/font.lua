@@ -32,7 +32,7 @@ end
 
 function Font:Dispose(...)
   if (not self.disposed) then
-    FontHandler.UnloadFont(self._font)  
+    FontHandler.UnloadFont(self._font)
   end
   inherited.Dispose(self,...)
 end
@@ -117,11 +117,11 @@ do
       if (recreateFont) then
         self:_LoadFont()
         if (p) then
-          p:RequestRealign() 
+          p:RequestRealign()
         end
       else
         if (p)and NotEqual(oldValue, self[param]) then
-          p:Invalidate() 
+          p:Invalidate()
         end
       end
     end
@@ -181,7 +181,7 @@ function Font:AdjustPosToAlignment(x, y, width, height, align, valign)
     extra = 'a'
   end
   --FIXME add baseline 'd'
-  
+
   --// horizontal alignment
   if align == "left" then
     --do nothing
@@ -225,12 +225,30 @@ end
 
 --//=============================================================================
 
+function Font:_DrawText(text, x, y, extra)
+	local font = self._font
+
+	gl.PushAttrib(GL.COLOR_BUFFER_BIT)
+	gl.PushMatrix()
+	gl.Scale(1,-1,1)
+		font:Begin()
+		if AreInRTT() then
+			gl.BlendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ZERO, GL.ONE_MINUS_SRC_ALPHA)
+		end
+		font:SetTextColor(self.color)
+		font:SetOutlineColor(self.outlineColor)
+		font:SetAutoOutlineColor(self.autoOutlineColor)
+			font:Print(text, x, -y, self.size, extra)
+		font:End()
+	gl.PopMatrix()
+	gl.PopAttrib()
+end
+
+
 function Font:Draw(text, x, y, align, valign)
   if (not text) then
     return
   end
-
-  local font = self._font
 
   local extra = _GetExtra(align, valign)
   if self.outline then
@@ -239,15 +257,7 @@ function Font:Draw(text, x, y, align, valign)
 	extra = extra .. 's'
   end
 
-  gl.PushMatrix()
-    gl.Scale(1,-1,1)
-    font:Begin()
-      font:SetTextColor(self.color)
-      font:SetOutlineColor(self.outlineColor)
-      font:SetAutoOutlineColor(self.autoOutlineColor)
-        font:Print(text, x, -y, self.size, extra)
-    font:End()
-  gl.PopMatrix()
+  self:_DrawText(text, x, y, extra)
 end
 
 
@@ -256,10 +266,8 @@ function Font:DrawInBox(text, x, y, w, h, align, valign)
     return
   end
 
-  local font = self._font
-
   local x,y,extra = self:AdjustPosToAlignment(x, y, w, h, align, valign)
-  
+
   if self.outline then
 	extra = extra .. 'o'
   elseif self.shadow then
@@ -268,15 +276,7 @@ function Font:DrawInBox(text, x, y, w, h, align, valign)
 
   y = y + 1 --// FIXME: if this isn't done some chars as 'R' get truncated at the top
 
-  gl.PushMatrix()
-    gl.Scale(1,-1,1)
-    font:Begin()
-      font:SetTextColor(self.color)
-      font:SetOutlineColor(self.outlineColor)
-      font:SetAutoOutlineColor(self.autoOutlineColor)
-        font:Print(text, x, -y, self.size, extra)
-    font:End()
-  gl.PopMatrix()
+  self:_DrawText(text, x, y, extra)
 end
 
 Font.Print = Font.Draw

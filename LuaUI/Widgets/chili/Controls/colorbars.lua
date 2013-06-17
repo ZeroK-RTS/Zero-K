@@ -34,9 +34,6 @@ local glColor    = gl.Color
 local glBeginEnd = gl.BeginEnd
 
 function Colorbars:DrawControl()
-  glPushMatrix()
-  glTranslate(self.x,self.y,0)
-
   local barswidth  = self.width - (self.height + 4)
 
   local color = self.color
@@ -64,8 +61,6 @@ function Colorbars:DrawControl()
   glRect(barswidth + 2,self.height,self.width - 2,0)
 
   gl.BeginEnd(GL.TRIANGLE_STRIP, theme.DrawBorder_, barswidth + 2,0,self.width - barswidth - 4,self.height, 1, self.borderColor, self.borderColor2)
-
-  glPopMatrix()
 end
 
 --//=============================================================================

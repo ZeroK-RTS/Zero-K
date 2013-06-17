@@ -330,9 +330,6 @@ function widget:AddChatMessage(msg)
 			end 
 		end},
 	}
-	function w:HitTest(x,y)
-		return self
-	end 
 
 	
 	Chili.Image:New{

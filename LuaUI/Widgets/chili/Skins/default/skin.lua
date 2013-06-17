@@ -78,8 +78,8 @@ end
 
 
 local function _DrawDragGrip(obj)
-  local x = obj.x + obj.borderThickness + 1
-  local y = obj.y + obj.borderThickness + 1
+  local x = obj.borderThickness + 1
+  local y = obj.borderThickness + 1
   local w = obj.dragGripSize[1]
   local h = obj.dragGripSize[2]
 
@@ -111,8 +111,8 @@ local function _DrawResizeGrip(obj)
   end
 
   if (resizable) then
-    local x = obj.x + obj.width - obj.padding[3] --obj.borderThickness - 1
-    local y = obj.y + obj.height - obj.padding[4] --obj.borderThickness - 1
+    local x = obj.width - obj.padding[3] --obj.borderThickness - 1
+    local y = obj.height - obj.padding[4] --obj.borderThickness - 1
     local w = obj.resizeGripSize[1]
     local h = obj.resizeGripSize[2]
 
@@ -147,8 +147,8 @@ end
 --//
 
 function DrawBorder(obj,state)
-  local x = obj.x
-  local y = obj.y
+  local x = 0
+  local y = 0
   local w = obj.width
   local h = obj.height
   local bt = obj.borderThickness
@@ -196,8 +196,8 @@ end
 
 
 function _DrawBackground(obj)
-  local x = obj.x
-  local y = obj.y
+  local x = 0
+  local y = 0
   local w = obj.width
   local h = obj.height
 
@@ -210,8 +210,8 @@ end
 
 
 function _DrawTabBackground(obj)
-  local x = obj.x
-  local y = obj.y
+  local x = 0
+  local y = 0
   local w = obj.width
   local h = obj.height
   local bt= 2
@@ -225,8 +225,8 @@ end
 
 
 local function _DrawTabBorder(obj, state)
-  local x = obj.x
-  local y = obj.y
+  local x = 0
+  local y = 0
   local w = obj.width
   local h = obj.height
   local bt= 2
@@ -263,19 +263,17 @@ function DrawButton(obj)
   gl.BeginEnd(GL.TRIANGLE_STRIP, DrawBorder, obj, obj.state)
 
   if (obj.caption) then
-    local x = obj.x
-    local y = obj.y
     local w = obj.width
     local h = obj.height
 
-    obj.font:Print(obj.caption, x+w*0.5, y+h*0.5, "center", "center")
+    obj.font:Print(obj.caption, w*0.5, h*0.5, "center", "center")
   end
 end
 
 function _DrawTriangle(obj)
   local w = obj.width
-  local x = obj.x
-  local y = obj.y
+  local x = 0
+  local y = 0
   local w = obj.width
   local h = obj.height
   local bt = obj.borderThickness
@@ -305,9 +303,9 @@ end
 function DrawEditBox(obj)
 	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBackground, obj, obj.state)
 	if obj.state.focused then
-		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, obj.x, obj.y, obj.width, obj.height, obj.borderThickness, obj.focusColor, obj.focusColor)
+		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, 0, 0, obj.width, obj.height, obj.borderThickness, obj.focusColor, obj.focusColor)
 	else
-		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, obj.x, obj.y, obj.width, obj.height, obj.borderThickness, obj.borderColor2, obj.borderColor)
+		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, 0, 0, obj.width, obj.height, obj.borderThickness, obj.borderColor2, obj.borderColor)
 	end
 
 	if (obj.text) then
@@ -344,7 +342,7 @@ function DrawEditBox(obj)
 		txt = txt:sub(1, lsize - 1)
 
 		gl.Color(1,1,1,1)
-		obj.font:DrawInBox(txt, obj.x + clientX, obj.y + clientY, clientWidth, clientHeight, obj.align, obj.valign)
+		obj.font:DrawInBox(txt, clientX, clientY, clientWidth, clientHeight, obj.align, obj.valign)
 
 		if obj.state.focused then
 			local cursorTxt = obj.text:sub(obj.offset, obj.cursor - 1)
@@ -361,7 +359,7 @@ function DrawEditBox(obj)
 
 			local cc = obj.cursorColor
 			gl.Color(cc[1], cc[2], cc[3], cc[4] * alpha)
-			gl.BeginEnd(GL.TRIANGLE_STRIP, DrawCursor, obj.x + cursorX + clientX - 1, obj.y + clientY, 3, clientHeight)
+			gl.BeginEnd(GL.TRIANGLE_STRIP, DrawCursor, cursorX + clientX - 1, clientY, 3, clientHeight)
 		end
 	end
 end
@@ -375,7 +373,7 @@ end
 
 function DrawItemBkGnd(obj,x,y,w,h,state)
   if (state=="selected") then
-    gl.Color(0.15,0.15,0.9,1)   
+    gl.Color(0.15,0.15,0.9,1)
   else
     gl.Color({0.8, 0.8, 1, 0.45})
   end
@@ -390,7 +388,7 @@ function DrawScrollPanel(obj)
   local contX,contY,contWidth,contHeight = unpack4(obj.contentArea)
 
   gl.PushMatrix()
-  gl.Translate(math.floor(obj.x + clientX),math.floor(obj.y + clientY),0)
+  gl.Translate(clientX, clientY,0)
 
   if obj._vscrollbar and (contHeight > 0) then
     local height = (not obj._hscrollbar and obj.height) or (obj.height - obj.scrollbarSize)
@@ -409,16 +407,14 @@ end
 
 function DrawTrackbar(obj)
   local percent = (obj.value-obj.min)/(obj.max-obj.min)
-  local x = obj.x
-  local y = obj.y
   local w = obj.width
   local h = obj.height
 
   gl.Color(0,0,0,1)
-  gl.Rect(x,y+h*0.5,x+w,y+h*0.5+1)
+  gl.Rect(0,h*0.5,w,h*0.5+1)
 
-  local vc = y+h*0.5 --//verticale center
-  local pos = x+percent*w
+  local vc = h*0.5 --//verticale center
+  local pos = percent*w
 
   gl.Rect(pos-2,vc-h*0.5,pos+2,vc+h*0.5)
 end
@@ -430,7 +426,7 @@ function DrawCheckbox(obj)
   local ty = vc
 
   gl.PushMatrix()
-  gl.Translate(obj.x,obj.y,0)
+  gl.Translate(0,0,0)
 
   obj.font:Print(obj.caption, tx, ty, "left", "center")
 
@@ -452,7 +448,7 @@ end
 
 function DrawColorbars(obj)
   gl.PushMatrix()
-  gl.Translate(obj.x,obj.y,0)
+  gl.Translate(0,0,0)
 
   local barswidth  = obj.width - (obj.height + 4)
 
@@ -487,9 +483,9 @@ end
 
 function DrawLine(self)
 	if (self.style:find("^v")) then
-		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawVLine, self.x + self.width * 0.5, self.y, self.height, 1, self.borderColor, self.borderColor2)
+		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawVLine, self.width * 0.5, 0, self.height, 1, self.borderColor, self.borderColor2)
 	else
-		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawHLine, self.x, self.y + self.height * 0.5, self.width, 1, self.borderColor, self.borderColor2)
+		gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawHLine, 0, self.height * 0.5, self.width, 1, self.borderColor, self.borderColor2)
 	end
 end
 
@@ -507,14 +503,14 @@ end
 local darkBlue = {0.0,0.0,0.6,0.9}
 function DrawTreeviewNode(self)
   if CompareLinks(self.treeview.selected,self) then
-    local x = self.x + self.clientArea[1]
-    local y = self.y
+    local x = self.clientArea[1]
+    local y = 0
     local w = self.children[1].width
     local h = self.clientArea[2] + self.children[1].height
 
     gl.Color(0.1,0.1,1,0.55)
-    gl.Rect(x,y,x+w,y+h)
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, x,y,w,h, 1, darkBlue, darkBlue)
+    gl.Rect(0,0,w,h)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, 0,0,w,h, 1, darkBlue, darkBlue)
   end
 end
 
@@ -550,11 +546,11 @@ end
 
 
 function DrawTreeviewNodeTree(self)
-  local x1 = self.x + math.ceil(self.padding[1]*0.5)
-  local x2 = self.x + self.padding[1]
-  local y1 = self.y
-  local y2 = self.y + self.height
-  local y3 = self.y + self.padding[2] + math.ceil(self.children[1].height*0.5)
+  local x1 = math.ceil(self.padding[1]*0.5)
+  local x2 = self.padding[1]
+  local y1 = 0
+  local y2 = self.height
+  local y3 = self.padding[2] + math.ceil(self.children[1].height*0.5)
 
   if (self.parent)and(CompareLinks(self,self.parent.nodes[#self.parent.nodes])) then
     y2 = y3
@@ -577,7 +573,7 @@ function DrawTreeviewNodeTree(self)
   local texInfo = gl.TextureInfo(image) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
 
-  _DrawTextureAspect(self.x,self.y,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
+  _DrawTextureAspect(0,0,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
   gl.Texture(0,false)
 end
 
@@ -589,8 +585,6 @@ function DrawTabBarItem(self)
 	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTabBorder, self, self.state)
 
 	if self.caption then
-		local x = self.x
-		local y = self.y
 		local w = self.width
 		local h = self.height
 		local bt= 2
@@ -599,7 +593,7 @@ function DrawTabBarItem(self)
 		if self.state.selected then
 			self.font:SetColor(self.focusColor)
 		end
-		self.font:Print(self.caption, x+w*0.5, y+bt+h*0.5, "center", "center")
+		self.font:Print(self.caption, w*0.5, bt+h*0.5, "center", "center")
 		if self.state.selected then
 			self.font:SetColor(oldColor)
 		end

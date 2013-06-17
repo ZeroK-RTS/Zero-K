@@ -6,6 +6,14 @@ end
 
 --//=============================================================================
 
+--// some needed gl constants
+GL_DEPTH24_STENCIL8 = 0x88F0
+GL_KEEP      = 0x1E00
+GL_INCR_WRAP = 0x8507
+GL_DECR_WRAP = 0x8508
+
+--//=============================================================================
+
 function unpack4(t)
   return t[1], t[2], t[3], t[4]
 end
@@ -113,7 +121,20 @@ local curScissor = {1,1,1e9,1e9}
 local stack = {curScissor}
 local stackN = 1
 
-function PushScissor(x,y,w,h)
+local pool = {}
+local function GetVector4()
+	if not pool[1] then
+		return {0,0,0,0}
+	end
+	local t = pool[#pool]
+	pool[#pool] = nil
+	return t
+end
+local function FreeVector4(t)
+	pool[#pool + 1] = t
+end
+
+local function PushScissor(_,x,y,w,h)
   local right = x+w
   local bottom = y+h
   if (right > curScissor[3]) then
@@ -129,6 +150,8 @@ function PushScissor(x,y,w,h)
     y = curScissor[2]
   end
   curScissor = {x,y,right,bottom}
+  --curScissor = GetVector4()
+  --curScissor[1] = x; curScissor[2] = y; curScissor[3] = right; curScissor[4] = bottom;
   stackN = stackN + 1
   stack[stackN] = curScissor
 
@@ -136,7 +159,8 @@ function PushScissor(x,y,w,h)
 end
 
 
-function PopScissor()
+local function PopScissor()
+  --FreeVector4(stack[stackN])
   stack[stackN] = nil
   stackN = stackN - 1
   curScissor = stack[stackN]
@@ -147,6 +171,85 @@ function PopScissor()
     gl.Scissor(x,y,right - x,bottom - y)
   end
 end
+
+
+
+local function PushStencilMask(obj, x,y,w,h)
+	obj._stencilMask = (obj.parent._stencilMask or 0) + 1
+	if (obj._stencilMask > 255) then
+		obj._stencilMask = 0
+	end
+
+	gl.ColorMask(false)
+
+	gl.StencilFunc(GL.ALWAYS, 0, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_INCR_WRAP, GL_INCR_WRAP)
+
+	if not obj.scrollPosY then
+		gl.Rect(0, 0, w, h)
+	else
+		local contentX,contentY,contentWidth,contentHeight = unpack4(obj.contentArea)
+		gl.Rect(0, 0, contentWidth,contentHeight)
+	end
+
+	gl.ColorMask(true)
+	gl.StencilFunc(GL.EQUAL, obj._stencilMask, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+end
+
+local function PopStencilMask(obj, x,y,w,h)
+	gl.ColorMask(false)
+
+	gl.StencilFunc(GL.ALWAYS, 0, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_DECR_WRAP, GL_DECR_WRAP)
+
+	if not obj.scrollPosY then
+		gl.Rect(0, 0, w, h)
+	else
+		local contentX,contentY,contentWidth,contentHeight = unpack4(obj.contentArea)
+		gl.Rect(0, 0, contentWidth,contentHeight)
+	end
+
+	gl.ColorMask(true)
+	gl.StencilFunc(GL.EQUAL, obj.parent._stencilMask or 0, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+	--gl.StencilTest(false)
+
+	obj._stencilMask = nil
+end
+
+
+local inRTT = false
+
+function EnterRTT()
+	inRTT = true
+end
+
+function LeaveRTT()
+	inRTT = false
+end
+
+function AreInRTT()
+	return inRTT
+end
+
+
+function PushLimitRenderRegion(...)
+	if inRTT then
+		PushStencilMask(...)
+	else
+		PushScissor(...)
+	end
+end
+
+function PopLimitRenderRegion(...)
+	if inRTT then
+		PopStencilMask(...)
+	else
+		PopScissor(...)
+	end
+end
+
 
 --//=============================================================================
 

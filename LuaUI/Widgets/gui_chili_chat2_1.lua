@@ -598,9 +598,6 @@ local function displayMessage(msg, remake)
 				--]]
 			
 			end}
-			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
-				return self
-			end
 			--[[ testing - CarRep
 		else
 			textbox.OnMouseDown = {function(self, x, y, mouse)
@@ -911,7 +908,7 @@ function widget:Initialize()
 		padding = { 0, 0, 0, 0 },
 		dockable = true,
 		name = "Chat",
-		y = 0,
+		y = 2,
 		right = 425, -- epic/resbar width
 		width  = screenWidth * 0.30,
 		height = screenHeight * 0.20,
@@ -923,14 +920,14 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
-        selfImplementedMinimizable = 
-            function (show)
-                if show then
-                    showConsole()
-                else
-                    hideConsole()
-                end
-            end,
+		noSelfHitTest = true,
+		selfImplementedMinimizable = function (show)
+			if show then
+				showConsole()
+			else
+				hideConsole()
+			end
+		end,
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
 		color = { 0, 0, 0, 0 },

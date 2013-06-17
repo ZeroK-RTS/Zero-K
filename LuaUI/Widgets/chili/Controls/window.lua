@@ -50,8 +50,6 @@ VFS.Include(CHILI_DIRNAME .. "headers/skinutils.lua", nil, VFS.RAW_FIRST)
 function Window:TweakDraw()
   gl.Color(0.6,1,0.6,0.65)
 
-  local x = self.x
-  local y = self.y
   local w = self.width
   local h = self.height
 
@@ -63,6 +61,6 @@ function Window:TweakDraw()
     local texInfo = gl.TextureInfo("LuaUI/Widgets/chili/skins/default/tweak_overlay.png") or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, 31,31,31,31, tw,th, 0)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, self.x,self.y,w,h, 31,31,31,31, tw,th, 0)
   gl.Texture(0,false)
 end

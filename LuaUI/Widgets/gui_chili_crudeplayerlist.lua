@@ -548,7 +548,6 @@ local function AddEntity(entity, teamID, allyTeamID)
 			file = cpuPic,
 			keepAspect = false,
 		}
-		function cpuImg:HitTest(x,y) return self end
 		entity.cpuImg = cpuImg
 		scroll_cpl:AddChild(cpuImg)
 		local pingImg = Image:New{
@@ -561,7 +560,6 @@ local function AddEntity(entity, teamID, allyTeamID)
 			keepAspect = false,
 		}
 		function pingImg:HitTest(x,y) return self end
-		entity.pingImg = pingImg
 		scroll_cpl:AddChild(pingImg)
 	end
 	row = row + 1
@@ -826,6 +824,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimizable = true,
 		minWidth = x_bound,
+		noSelfHitTest = true,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
@@ -844,7 +843,6 @@ function widget:Initialize()
 		--autosize = true,
 		scrollbarSize = 6,
 		horizontalScrollbar = false,
-		hitTestAllowEmpty = true
 	}
 
 	SetupPlayerNames()
