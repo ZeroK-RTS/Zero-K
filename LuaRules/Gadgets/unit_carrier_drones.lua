@@ -95,7 +95,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 end
 
-function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
+function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if carrierList[unitID] then
 		carrierList[unitID].teamID = newTeam
 		for i=1,#carrierList[carrierID].droneSets do
@@ -105,7 +105,6 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 			end
 		end
 	end
-	return true
 end
 
 local function GetDistance(x1, x2, y1, y2)
