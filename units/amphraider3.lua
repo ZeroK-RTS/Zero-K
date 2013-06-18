@@ -95,7 +95,6 @@ unitDef = {
 	  soundHitVolume          = 6,
       soundStart              = [[weapon/cannon/mini_cannon]],
 	  soundStartVolume        = 8,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 200,

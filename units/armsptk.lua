@@ -102,7 +102,6 @@ unitDef = {
       soundHit                = [[explosion/ex_small13]],
       soundStart              = [[weapon/missile/missile_fire4]],
       soundTrigger            = true,
-      startsmoke              = [[1]],
       startVelocity           = 150,
       texture2                = [[darksmoketrail]],
       trajectoryHeight        = 1.5,

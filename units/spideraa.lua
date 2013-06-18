@@ -96,7 +96,6 @@ unitDef = {
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
-      startsmoke              = [[1]],
       startVelocity           = 400,
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,

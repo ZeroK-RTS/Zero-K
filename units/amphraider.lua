@@ -99,7 +99,6 @@ unitDef = {
       soundStartVolume        = 2,
       soundTrigger			= true,
       sprayangle              = 512,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
