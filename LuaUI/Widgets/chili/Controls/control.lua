@@ -873,7 +873,7 @@ function Control:_UpdateChildrenDList()
 	if not self.parent then return end
 	if not self:IsInView() then return end
 
-	if self:InheritsFrom("scrollpanel") then
+	if self:InheritsFrom("scrollpanel") and not self._cantUseRTT then
 		local contentX,contentY,contentWidth,contentHeight = unpack4(self.contentArea)
 		self:CreateViewTexture("children", contentWidth, contentHeight, self.DrawChildrenForList, self, true)
 	end
@@ -935,6 +935,7 @@ function Control:_SetupRTT(fnc, self_, drawInContentRect, ...)
 	end
 
 	gl.Color(1,1,1,1)
+	gl.AlphaTest(false)
 	gl.StencilTest(true)
 	gl.StencilFunc(GL.EQUAL, 0, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
@@ -958,7 +959,9 @@ end
 
 
 function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
-	if not gl.CreateFBO then
+	if not gl.CreateFBO or not gl.BlendFuncSeparate then
+		self._cantUseRTT = true
+		self._usingRTT = false
 		return
 	end
 
@@ -971,17 +974,15 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 	local fbo = self[fboName] or gl.CreateFBO()
 	local texColor = self[texname]
 	local texStencil = self[texStencilName]
-	self[texStencilName] = nil
-	self[texname] = nil
-	self[fboName] = nil
 
 	if (width ~= self[texw])or(height ~= self[texh]) then
+		self[texw] = width
+		self[texh] = height
 		fbo.color0  = nil
 		fbo.stencil = nil
 		gl.DeleteTexture(texColor)
 		gl.DeleteRBO(texStencil)
 
-		--FIXME check maxtexsize!
 		texColor = gl.CreateTexture(width, height, {
 			min_filter = GL.NEAREST,
 			mag_filter = GL.NEAREST,
@@ -1001,7 +1002,13 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 		gl.DeleteFBO(fbo)
 		gl.DeleteTexture(texColor)
 		gl.DeleteRBO(texStencil)
+		self[texw] = nil
+		self[texh] = nil
+		self[texStencilName] = nil
+		self[texname] = nil
+		self[fboName] = nil
 		self._cantUseRTT = true
+		self._usingRTT = false
 		return
 	end
 
@@ -1014,8 +1021,6 @@ function Control:CreateViewTexture(suffix_name, width, height, fnc, ...)
 	self[texname] = texColor
 	self[texStencilName] = texStencil
 	self[fboName] = fbo
-	self[texw] = width
-	self[texh] = height
 end
 
 --//=============================================================================
@@ -1126,7 +1131,7 @@ function Control:DrawForList()
 	self._redrawCounter = (self._redrawCounter or 0) + 1
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then self:InvalidateSelf() end
 
-	if (self._tex_all) then
+	if (self._tex_all and not self._inrtt) then
 		gl.PushMatrix()
 		gl.Translate(self.x, self.y, 0)
 			gl.BlendFuncSeparate(GL.ONE, GL.SRC_ALPHA, GL.ZERO, GL.SRC_ALPHA)
@@ -1413,6 +1418,7 @@ end
 
 
 function Control:FocusUpdate(...)
+  self:InvalidateSelf()
   return inherited.FocusUpdate(self, ...)
 end
 
