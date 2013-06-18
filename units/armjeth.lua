@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.32,
   buildCostEnergy        = 150,
   buildCostMetal         = 150,
-  builder                = false,
   buildPic               = [[ARMJETH.png]],
   buildTime              = 150,
   canAttack              = true,
@@ -19,7 +18,6 @@ unitDef = {
   cloakCostMoving        = 0.5,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[35 40 35]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -50,7 +48,6 @@ unitDef = {
   idleTime               = 1800,
   initCloaked            = true,
   leaveTracks            = true,
-  mass                   = 117,
   maxDamage              = 550,
   maxSlope               = 36,
   maxVelocity            = 2.9,
@@ -58,7 +55,6 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0,
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[spherejeth.s3o]],
   seismicSignature       = 4,
@@ -73,9 +69,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 660,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -83,8 +77,7 @@ unitDef = {
   trackWidth             = 17,
   turnRate               = 2200,
   upright                = true,
-  workerTime             = 0,
-  
+
   weapons                = {
 
     {
@@ -122,7 +115,6 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 3.25,
       minIntensity            = 1,
-      pitchtolerance          = 8192,
       range                   = 700,
       reloadtime              = 0.3,
       rgbColor                = [[0 1 1]],
@@ -139,7 +131,7 @@ unitDef = {
 
   featureDefs            = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Jethro]],
       blocking         = true,
       damage           = 550,
@@ -147,23 +139,19 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 60,
       object           = [[spherejeth_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 60,
     },
 
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Jethro]],
       blocking         = false,
       damage           = 550,
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 30,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,

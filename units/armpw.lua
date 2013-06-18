@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.4,
   buildCostEnergy        = 65,
   buildCostMetal         = 65,
-  builder                = false,
   buildPic               = [[armpw.png]],
   buildTime              = 65,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[22 33 22]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -46,7 +44,6 @@ unitDef = {
   idleAutoHeal           = 20,
   idleTime               = 150,
   leaveTracks            = true,
-  mass                   = 79,
   maxDamage              = 190,
   maxSlope               = 36,
   maxVelocity            = 3.8,
@@ -54,7 +51,7 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherebot.s3o]],
   script                 = [[armpw.lua]],
   seismicSignature       = 4,
@@ -69,9 +66,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 500,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -79,7 +74,6 @@ unitDef = {
   trackWidth             = 14,
   turnRate               = 2500,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -90,7 +84,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -110,19 +103,16 @@ unitDef = {
         subs    = 0.567,
       },
 
-      endsmoke                = [[0]],
       explosionGenerator      = [[custom:FLASHPLOSION]],
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       intensity               = 0.7,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       noGap                   = false,
       noSelfDamage            = true,
       range                   = 185,
       reloadtime              = 0.31,
-      renderType              = 4,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       size                    = 1.75,
@@ -131,78 +121,41 @@ unitDef = {
       soundStartVolume        = 4,
       sprayAngle              = 1180,
       stages                  = 10,
-      startsmoke              = [[0]],
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Glaive]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 190,
       energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 26,
       object           = [[spherebot_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 26,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Glaive]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 190,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 26,
-      object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 26,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Glaive]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 190,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 13,
       object           = [[debris2x2b.s3o]],
       reclaimable      = true,
       reclaimTime      = 13,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.2,
   buildCostEnergy        = 350,
   buildCostMetal         = 350,
-  builder                = false,
   buildPic               = [[ARMZEUS.png]],
   buildTime              = 350,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[48 62 48]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -46,7 +44,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-   mass                   = 248,
   maxDamage              = 2400,
   maxSlope               = 36,
   maxVelocity            = 1.7,
@@ -54,7 +51,6 @@ unitDef = {
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 0 4]],
   movementClass          = [[KBOT2]],
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[spherezeus.s3o]],
   seismicSignature       = 4,
@@ -69,9 +65,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 325,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -79,7 +73,6 @@ unitDef = {
   trackWidth             = 26,
   turnRate               = 1400,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -90,7 +83,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -127,7 +119,6 @@ unitDef = {
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning]],
       soundTrigger            = true,
-      startsmoke              = [[1]],
       targetMoveError         = 0.3,
       texture1                = [[lightning]],
       thickness               = 10,
@@ -139,47 +130,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Zeus]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 2400,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 140,
       object           = [[spherezeus_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 140,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Zeus]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 2400,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 70,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 70,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

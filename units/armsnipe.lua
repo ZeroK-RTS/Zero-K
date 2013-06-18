@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.2,
   buildCostEnergy        = 750,
   buildCostMetal         = 750,
-  builder                = false,
   buildPic               = [[ARMSNIPE.png]],
   buildTime              = 750,
   canAttack              = true,
@@ -19,7 +18,6 @@ unitDef = {
   cloakCostMoving        = 5,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[35 64 35]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
   corpse                 = [[DEAD]],
 
@@ -50,7 +48,6 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   initCloaked            = true,
-  mass                   = 245,
   maxDamage              = 560,
   maxSlope               = 36,
   maxVelocity            = 1.7,
@@ -61,7 +58,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[sharpshooter.s3o]],
   radarDistanceJam       = 10,
-  script		 = [[armsnipe.lua]],
+  script                 = [[armsnipe.lua]],
   seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],
 
@@ -74,9 +71,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 400,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -84,7 +79,6 @@ unitDef = {
   trackWidth             = 22,
   turnRate               = 2600,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -95,7 +89,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -117,18 +110,15 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 700,
       reloadtime              = 15,
-      renderType              = 4,
       rgbColor                = [[1 0.2 0.2]],
       separation              = 1.5,
       size                    = 5,
       sizeDecay               = 0,
       soundHit                = [[weapon/laser/heavy_laser6]],
       soundStart              = [[weapon/gauss_fire]],
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 850,
@@ -136,47 +126,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD = {
       description      = [[Wreckage - Sharpshooter]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 560,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 300,
       object           = [[sharpshooter_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 300,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP = {
       description      = [[Debris - Sharpshooter]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 560,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 150,
       object           = [[debris2x2b.s3o]],
       reclaimable      = true,
       reclaimTime      = 150,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

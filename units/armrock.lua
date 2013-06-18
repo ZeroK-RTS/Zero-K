@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.2,
   buildCostEnergy        = 90,
   buildCostMetal         = 90,
-  builder                = false,
   buildPic               = [[ARMROCK.png]],
   buildTime              = 90,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[26 39 26]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
   corpse                 = [[DEAD]],
 
@@ -44,7 +42,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 109,
   maxDamage              = 480,
   maxSlope               = 36,
   maxVelocity            = 2.2,
@@ -53,7 +50,6 @@ unitDef = {
   modelCenterOffset      = [[0 6 0]],
   movementClass          = [[KBOT2]],
   moveState              = 0,
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[sphererock.s3o]],
   seismicSignature       = 4,
@@ -67,9 +63,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 523,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -77,7 +71,6 @@ unitDef = {
   trackWidth             = 18,
   turnRate               = 2200,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -88,7 +81,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -104,103 +96,61 @@ unitDef = {
         planes  = 180,
         subs    = 9,
       },
-	  
+
       fireStarter             = 70,
       flightTime              = 2.2,
-      guidance                = false,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      lineOfSight             = true,
       model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
       range                   = 450,
       reloadtime              = 3.8,
-      renderType              = 1,
-      selfprop                = true,
-      smokedelay              = [[.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/sabot_hit]],
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/sabot_fire]],
       soundStartVolume        = 7,
-      startsmoke              = [[1]],
       startVelocity           = 200,
       texture2                = [[darksmoketrail]],
       tracks                  = false,
       trajectoryHeight        = 0.05,
       turret                  = true,
       weaponAcceleration      = 190,
-      weaponTimer             = 2.6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 180,
     },
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Rocko]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 480,
       energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 36,
       object           = [[spherejeth_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 36,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Rocko]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 480,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 36,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Rocko]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 480,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 18,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 18,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

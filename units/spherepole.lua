@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.3,
   buildCostEnergy        = 250,
   buildCostMetal         = 250,
-  builder                = false,
   buildPic               = [[spherepole.png]],
   buildTime              = 250,
   canAttack              = true,
@@ -19,7 +18,6 @@ unitDef = {
   cloakCostMoving        = 1,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[36 46 36]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -43,7 +41,6 @@ unitDef = {
   idleTime               = 300,
   initCloaked            = true,
   leaveTracks            = true,
-  mass                   = 169,
   maxDamage              = 800,
   maxSlope               = 36,
   maxVelocity            = 3,
@@ -51,7 +48,6 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0,
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[spherepole.s3o]],
   seismicSignature       = 4,
@@ -66,9 +62,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 425,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -76,7 +70,6 @@ unitDef = {
   trackWidth             = 18,
   turnRate               = 2200,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -86,7 +79,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -113,7 +105,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
-      lineOfSight             = true,
       lodDistance             = 10000,
       minIntensity            = 1,
       noSelfDamage            = true,
@@ -134,68 +125,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Scythe]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 800,
       energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 100,
       object           = [[spherebot_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Scythe]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 800,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 100,
-      object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Scythe]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 800,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 50,
       object           = [[debris2x2b.s3o]],
       reclaimable      = true,
       reclaimTime      = 50,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

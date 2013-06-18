@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.2,
   buildCostEnergy        = 220,
   buildCostMetal         = 220,
-  builder                = false,
   buildPic               = [[ARMWAR.png]],
   buildTime              = 220,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 42 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -44,8 +42,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[1]],
-  mass                   = 165,
   maxDamage              = 880,
   maxSlope               = 36,
   maxVelocity            = 1.71,
@@ -53,7 +49,6 @@ unitDef = {
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 0 -6]],
   movementClass          = [[KBOT2]],
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[Spherewarrior.s3o]],
   seismicSignature       = 4,
@@ -68,9 +63,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 330,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -78,7 +71,6 @@ unitDef = {
   trackWidth             = 20,
   turnRate               = 1800,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -89,7 +81,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -117,11 +108,9 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 0.7,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 270,
       reloadtime              = 0.52,
-      renderType              = 4,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
       soundHit                = [[weapon/cannon/emg_hit]],
@@ -135,68 +124,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Warrior]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 880,
       energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 88,
       object           = [[spherewarrior_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Warrior]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 880,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 88,
-      object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Warrior]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 880,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 44,
       object           = [[debris3x3a.s3o]],
       reclaimable      = true,
       reclaimTime      = 44,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

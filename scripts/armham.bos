@@ -237,14 +237,14 @@ Killed( severity, corpsetype )
 
 	if (severity <= 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode waist type		SHATTER;
 		explode torso type		SHATTER;
 		explode barrel type		FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		return( 0 );
 	}
 
-	corpsetype = 3;
+	corpsetype = 2;
 	explode waist type		SHATTER;
 	explode torso type		SHATTER;
 	explode rankle type	SHATTER;

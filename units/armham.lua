@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.25,
   buildCostEnergy        = 130,
   buildCostMetal         = 130,
-  builder                = false,
   buildPic               = [[ARMHAM.png]],
   buildTime              = 130,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[29 43 29]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -46,7 +44,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 114,
   maxDamage              = 350,
   maxSlope               = 36,
   maxVelocity            = 1.62,
@@ -54,7 +51,6 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0,
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName             = [[Milo.s3o]],
   seismicSignature       = 4,
@@ -70,9 +66,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 660,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -80,7 +74,6 @@ unitDef = {
   trackWidth             = 22,
   turnRate               = 1500,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -91,7 +84,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -114,15 +106,12 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      minbarrelangle          = [[-35]],
 	  myGravity               = 0.09,
       noSelfDamage            = true,
       range                   = 840,
       reloadtime              = 6,
-      renderType              = 4,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],
-      startsmoke              = [[1]],
       targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
@@ -131,68 +120,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Hammer]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 350,
       energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 52,
       object           = [[milo_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 52,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Hammer]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 350,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 52,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 52,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Hammer]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 350,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 26,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 26,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

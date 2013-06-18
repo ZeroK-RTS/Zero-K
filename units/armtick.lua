@@ -15,7 +15,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets  = [[0 0 0]],
   collisionVolumeScales   = [[14 14 14]],
-  collisionVolumeTest	  = 1,
   collisionVolumeType	  = [[ellipsoid]],
   cloakCost              = 0,
 
@@ -46,7 +45,6 @@ unitDef = {
   kamikaze               = true,
   kamikazeDistance       = 80,
   kamikazeUseLOS         = true,
-  mass                   = 82,
   maxDamage              = 50,
   maxSlope               = 72,
   maxVelocity            = 4.2,
@@ -68,9 +66,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 160,
-  smoothAnim             = true,
   turnRate               = 3000,
 }
 
