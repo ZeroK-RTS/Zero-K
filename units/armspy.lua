@@ -4,16 +4,13 @@ unitDef = {
   description           = [[Spy, Anti-Heavy]],
   acceleration          = 0.3,
   activateWhenBuilt     = true,
-  amphibious            = [[1]],
-  bmcode                = [[1]],
   brakeRate             = 0.3,
   buildCostEnergy       = 280,
   buildCostMetal        = 280,
-  builder               = false,
   buildPic              = [[armspy.png]],
   buildTime             = 280,
-  canAttack             = false,
-  canGuard              = false,
+  canAttack             = true,
+  canGuard              = true,
   canMove               = true,
   canPatrol             = true,
   canstop               = [[1]],
@@ -36,7 +33,6 @@ unitDef = {
     helptext_pl    = [[Infiltrator jest użyteczny w dwojaki sposób. Przede wszystkim jest doskonałym zwiadowcą, który dzięki maskowaniu i możliwości wspinania się po dowolnym terenie jest bardzo trudny do wykrycia. Ponadto może wystrzelić wiązkę EMP, która sparaliżuje pojedynczą jednostkę lub budynek na długi okres czasu.]],
   },
 
-  defaultmissiontype    = [[Standby]],
   explodeAs             = [[BIG_UNITEX]],
   fireState             = 0,
   footprintX            = 2,
@@ -46,8 +42,6 @@ unitDef = {
   idleTime              = 1800,
   leaveTracks           = true,
   initCloaked           = true,
-  maneuverleashlength   = [[640]],
-  mass                  = 130,
   maxDamage             = 270,
   maxSlope              = 36,
   maxVelocity           = 2.55,
@@ -55,25 +49,18 @@ unitDef = {
   minCloakDistance      = 60,
   movementClass         = [[TKBOT3]],
   moveState             = 0,
-  noAutoFire            = false,
   noChaseCategory       = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName            = [[infiltrator.s3o]],
   script                = [[armspy.lua]],
   seismicSignature      = 16,
   selfDestructAs        = [[BIG_UNITEX]],
-  selfDestructCountdown = 1,
-  side                  = [[ARM]],
   sightDistance         = 550,
-  smoothAnim            = true,
-  steeringmode          = [[2]],
-  TEDClass              = [[KBOT]],
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,
   trackType             = [[ChickenTrackPointyShort]],
   trackWidth            = 45,
   turnRate              = 1800,
-  workerTime            = 0,
 
   weapons               = {
 
@@ -83,7 +70,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs            = {
 
@@ -96,8 +82,6 @@ unitDef = {
 
       damage                  = {
         default        = 8000,
-        empresistant75 = 2000,
-        empresistant99 = 80,
       },
 
       duration                = 8,
@@ -113,7 +97,6 @@ unitDef = {
       paralyzeTime            = 30,
       range                   = 100,
       reloadtime              = 35,
-      renderType              = 7,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/LightningBolt]],
       soundTrigger            = true,
@@ -129,45 +112,33 @@ unitDef = {
 
   },
 
-
   featureDefs           = {
 
     DEAD = {
       description      = [[Wreckage - Infiltrator]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 270,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 112,
       object           = [[Infiltrator_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 112,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP = {
       description      = [[Debris - Infiltrator]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 270,
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 56,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
       reclaimTime      = 56,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.26,
   buildCostEnergy        = 300,
   buildCostMetal         = 300,
-  builder                = false,
   buildPic               = [[ARMSPTK.png]],
   buildTime              = 300,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 30 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -44,20 +42,17 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 171,
   maxDamage              = 650,
   maxSlope               = 72,
   maxVelocity            = 1.6,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
   objectName             = [[recluse.s3o]],
   script				 = [[armsptk.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[ARM]],
   sightDistance          = 594,
   trackOffset            = 0,
   trackStrength          = 10,
@@ -65,7 +60,6 @@ unitDef = {
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 52,
   turnRate               = 1600,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -76,7 +70,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -98,18 +91,13 @@ unitDef = {
       edgeEffectiveness       = 0.5,
       fireStarter             = 70,
       flightTime              = 4,
-      guided                  = [[1]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      lineOfSight             = true,
       model                   = [[recluse_missile.s3o]],
       noSelfDamage            = true,
       range                   = 540,
       reloadtime              = 4,
-      renderType              = 1,
-      selfprop                = true,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[explosion/ex_small13]],
       soundStart              = [[weapon/missile/missile_fire4]],
@@ -121,7 +109,6 @@ unitDef = {
       turnRate                = 4000,
       turret                  = true,
       weaponAcceleration      = 150,
-      weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
       wobble                  = 9000,
@@ -129,46 +116,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Recluse]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 600,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 120,
       object           = [[recluse_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 120,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
       description      = [[Debris - Recluse]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 600,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 60,
       object           = [[debris3x3a.s3o]],
       reclaimable      = true,
       reclaimTime      = 60,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

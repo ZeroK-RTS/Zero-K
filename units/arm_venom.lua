@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.26,
   buildCostEnergy        = 200,
   buildCostMetal         = 200,
-  builder                = false,
   buildPic               = [[arm_venom.png]],
   buildTime              = 200,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 30 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -27,7 +25,7 @@ unitDef = {
     description_fi = [[EMP-mellakkarobotti]],
     description_fr = [[Araign?e ?meuti?re EMP]],
     description_it = [[Ragno PEM da rissa]],
-    description_de = [[Unterstützende EMP Spinne]],	
+    description_de = [[Unterstützende EMP Spinne]],
     helptext       = [[The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher.]],
     helptext_bp    = [[Venon é uma unidade escaladora projetada para paralizar inimigos para que outras unidades possam destruílos facilmente. Seus tiros podem atingir múltiplas unidades e portanto é útil como dispersadora. Funciona bem junto com o Recluse para impedir os inimigos de se aproximarem deste.]],
     helptext_es    = [[El Venom es una unidad all-terrain hecha para paralizar a los nemigos, permitiendo que otras unidades puedan destruirlos fácilmente. Tiene AdE y es útil como unidad de alboroto, para tener a la larga pelotones de enemigos. Funciona bien juntado con los recluse para no dejar que los enemigos se acerquen demasiado al frágil escaramuzador.]],
@@ -44,14 +42,12 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 155,
   maxDamage              = 750,
   maxSlope               = 72,
   maxVelocity            = 2.7,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[venom.s3o]],
   script                 = [[arm_venom.lua]],
@@ -67,7 +63,6 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 440,
   trackOffset            = 0,
   trackStrength          = 10,
@@ -75,7 +70,6 @@ unitDef = {
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 54,
   turnRate               = 1600,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -85,7 +79,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -99,8 +92,6 @@ unitDef = {
 
       damage                  = {
         default        = 600,
-        empresistant75 = 150,
-        empresistant99 = 6,
       },
 
       duration                = 8,
@@ -129,46 +120,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Venom]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 750,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 80,
       object           = [[venom_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 80,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-	  
+
     },
     HEAP  = {
       description      = [[Debris - Venom]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 750,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 40,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
       reclaimTime      = 40,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

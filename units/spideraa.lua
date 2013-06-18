@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.22,
   buildCostEnergy        = 400,
   buildCostMetal         = 400,
-  builder                = false,
   buildPic               = [[spideraa.png]],
   buildTime              = 400,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 30 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -38,20 +36,17 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 215,
   maxDamage              = 1200,
   maxSlope               = 72,
   maxVelocity            = 2.3,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[tarantula.s3o]],
   script				 = [[spideraa.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[ARM]],
   sightDistance          = 660,
   trackOffset            = 0,
   trackStrength          = 10,
@@ -59,7 +54,6 @@ unitDef = {
   trackType              = [[ChickenTrackPointyShort]],
   trackWidth             = 55,
   turnRate               = 1700,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -70,7 +64,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -111,53 +104,39 @@ unitDef = {
       turnRate                = 50000,
       turret                  = true,
       weaponAcceleration      = 100,
-      weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 450,
     },
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Tarantula]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1200,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 160,
       object           = [[tarantula_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 160,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
       description      = [[Debris - Tarantula]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1200,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 80,
       object           = [[debris3x3a.s3o]],
       reclaimable      = true,
       reclaimTime      = 80,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

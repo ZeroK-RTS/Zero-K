@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.18,
   buildCostEnergy        = 1600,
   buildCostMetal         = 1600,
-  builder                = false,
   buildPic               = [[armcrabe.png]],
   buildTime              = 1600,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[60 60 60]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -48,7 +46,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 445,
   maxDamage              = 4000,
   maxSlope               = 36,
   maxVelocity            = 1.35,
@@ -56,7 +53,6 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[TKBOT4]],
   moveState              = 0,
-  noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING GUNSHIP]],
   objectName             = [[ARMCRABE]],
   pushResistant          = 0,
@@ -75,16 +71,13 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 660,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[crossFoot]],
   trackWidth             = 50,
   turnRate               = 600,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -94,7 +87,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -119,7 +111,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 600,
       reloadtime              = 4,
-      renderType              = 4,
       shakeduration           = [[1]],
       shakemagnitude          = [[2]],
       soundHit                = [[weapon/cannon/cannon_hit3]],
@@ -131,7 +122,6 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
@@ -141,14 +131,11 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 4,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 640,
       object           = [[armcrabe_dead]],
       reclaimable      = true,
       reclaimTime      = 640,
     },
-
 
     HEAP  = {
       description      = [[Debris - Crabe]],
@@ -156,8 +143,6 @@ unitDef = {
       damage           = 4000,
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 320,
       object           = [[debris3x3c.s3o]],
       reclaimable      = true,

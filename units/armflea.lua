@@ -6,7 +6,6 @@ unitDef = {
   brakeRate           = 0.7,
   buildCostEnergy     = 20,
   buildCostMetal      = 20,
-  builder             = false,
   buildPic            = [[ARMFLEA.png]],
   buildTime           = 20,
   canAttack           = true,
@@ -41,7 +40,6 @@ unitDef = {
   iconType            = [[spiderscout]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 39,
   maxDamage           = 40,
   maxSlope            = 72,
   maxVelocity         = 4.8,
@@ -49,7 +47,6 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[TKBOT1]],
   moveState           = 0,
-  noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[arm_flea.s3o]],
   pushResistant       = 0,
@@ -64,11 +61,8 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
   sightDistance       = 560,
-  smoothAnim          = true,
   turnRate            = 2100,
-  workerTime          = 0,
 
   weapons             = {
 
@@ -79,7 +73,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs          = {
 
@@ -106,7 +99,6 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       laserFlareSize          = 3.22,
-      lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 140,
@@ -122,39 +114,32 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 600,
     },
-	
+
   },
-	
+
   featureDefs                   = {
 
     DEAD = {
       description      = [[Wreckage - Flea]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 40,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 1,
       footprintZ       = 1,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 8,
       object           = [[debris1x1a.s3o]],
       reclaimable      = true,
       reclaimTime      = 8,
     },
 
-
     HEAP = {
       description      = [[Debris - Flea]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 40,
       energy           = 0,
       footprintX       = 1,
       footprintZ       = 1,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 4,
       object           = [[debris1x1b.s3o]],
       reclaimable      = true,

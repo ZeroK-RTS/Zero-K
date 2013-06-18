@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.22,
   buildCostEnergy        = 160,
   buildCostMetal         = 160,
-  builder                = false,
   buildPic               = [[spiderassault.png]],
   buildTime              = 160,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[28 30 28]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -42,20 +40,18 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 175,
   maxDamage              = 1400,
   maxSlope               = 36,
   maxVelocity            = 1.7,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
-  noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[hermit.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   script                = [[spiderassault.lua]],
-  
+
   sfxtypes               = {
 
     explosiongenerators = {
@@ -66,16 +62,13 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
   sightDistance          = 420,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 30,
   turnRate               = 1600,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -86,7 +79,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -110,7 +102,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 350,
       reloadtime              = 3,
-      renderType              = 4,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire5]],
       startsmoke              = [[1]],
@@ -121,68 +112,47 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Hermit]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1500,
       energy           = 0,
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 64,
       object           = [[hermit_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 64,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     DEAD2 = {
       description      = [[Debris - Hermit]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1500,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 64,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 64,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Hermit]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1500,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 32,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 32,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
