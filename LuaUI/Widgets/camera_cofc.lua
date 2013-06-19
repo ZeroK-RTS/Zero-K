@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.117 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.119 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-June-11
+    date      = "2011-03-16", --2013-June-19
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -250,7 +250,7 @@ options = {
 	},
 	freemode = {
 		name = "FreeMode (risky)",
-		desc = "Be free. Camera movement not bound to map edge. USE AT YOUR OWN RISK!",
+		desc = "Be free. Camera movement not bound to map edge. USE AT YOUR OWN RISK!\nTips: press TAB if you get lost.",
 		type = 'bool',
 		advanced = true,
 		value = false,
@@ -477,6 +477,7 @@ local PI 			= 3.1415
 local HALFPI		= PI/2
 --local HALFPIPLUS	= HALFPI+0.01
 local HALFPIMINUS	= HALFPI-0.01
+local RADperDEGREE = PI/180
 
 
 local fpsmode = false
@@ -556,6 +557,106 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local previousFov =0
+local prevInclination =99
+local prevAzimuth = 299
+local prevX = 9999
+local prevY = 9999
+local cachedMagicOffset = 0
+local cachedResult = {0,0,0}
+local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
+	local halfViewSizeY = vsy/2
+	local halfViewSizeX = vsx/2
+	y = y- halfViewSizeY --convert screen coordinate to 0,0 at middle
+	x = x- halfViewSizeX
+	local currentFov = cs.fov --in Spring: 0 degree is directly ahead and +FOV degree to the left and -FOV degree to the right
+	local magicOffset = cachedMagicOffset
+	--//Speedup//--
+	if previousFov==currentFov and prevInclination == cs.rx and prevAzimuth == cs.ry and prevX ==x and prevY == y then --if camera Sphere coordinate & mouse position not change then use cached value
+		return cachedResult[1],cachedResult[2],cachedResult[3] 
+	end
+	if previousFov ~= currentFov then --if FOV changes then: update perspective projection plane distance
+		magicOffset = math.exp(-(1/13.8)*(currentFov-110.7))+300 --somehow the perspective projection plane (the clip plane) has this offset that get bigger with smaller FOV. This approximation is obtained thru trial-n-error
+		cachedMagicOffset = magicOffset
+		previousFov = currentFov
+	end
+	--ISSUES: Ignoring the magicOffset will cause mismatch in mouse-to-ground position and axis reversal in FOV > 90 (because the perspective projection plane distance is negative).
+	--Trial-n-error:
+	--10 FOV, 1750 offset
+	--30 FOV, 600 offset 
+	--45 FOV, 420 offset
+	--90 FOV, 300 offset
+	--Using a free graphic calculator from www.runiter.com for test of many variation of offset equation: y = e^(-(1/var_1)*(x-var_2))+300
+	--FIXME: find out the reason for the need of magicOffset.
+	
+	--//Opengl FOV scaling logic//--
+	local referenceScreenSize = halfViewSizeY --because Opengl Glut use vertical screen size for FOV setting
+	local referencePlaneDistance = referenceScreenSize -- because Opengl use 45 degree as default FOV, in which case tan(45)=1= referenceScreenSize/referencePlaneDistance
+	local currentScreenSize = math.tan(currentFov*RADperDEGREE)*referencePlaneDistance --calculate screen size for current FOV if the distance to perspective projection plane is the default for 45 degree
+	local resizeFactor = referenceScreenSize/currentScreenSize --the ratio of the default screen size to new FOV's screen size
+	local perspectivePlaneDistance = resizeFactor*referencePlaneDistance + magicOffset --move perspective projection plane (closer or further away) so that the size appears to be as the default size for 45 degree
+	--//mouse-to-Sphere projection & rotation//--
+	local distanceFromCenter = math.sqrt(x*x+y*y) --mouse cursor distance from center screen. We going to simulate a Sphere dome which we will position the mouse cursor.
+	local inclination = math.atan(distanceFromCenter/perspectivePlaneDistance) --translate distance in 2d plane to angle projected from the Sphere
+	inclination = inclination -PI/2 --offset 90 degree because we want to place the south hemisphere (bottom) of the dome on the screen
+	local azimuth = math.atan2(-x,y) --convert x,y to angle, so that left is +degree and right is -degree. Note: negative x flip left-right or right-left (flip the direction of angle)
+	local sphere_x = 100* math.sin(azimuth)* math.cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
+	local sphere_y = 100* math.sin(inclination)
+	local sphere_z = 100* math.cos(azimuth)* math.cos(inclination)
+	local rotateToInclination = PI/2+cs.rx --rotate to +90 degree facing the horizon then rotate to camera's current facing.
+	local new_x = sphere_x --rotation on x-axis
+	local new_y = sphere_y* math.cos (rotateToInclination) + sphere_z* math.sin (rotateToInclination) --move points of Sphere to new location 
+	local new_z = sphere_z* math.cos (rotateToInclination) - sphere_y* math.sin (rotateToInclination)
+	local cursorTilt = math.atan2(new_y,math.sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate
+	local cursorHeading = math.atan2(new_x,new_z) --Sphere's azimuth
+	--//Sphere-to-groundPosition translation//--
+	local tiltSign = math.abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
+	local cursorTiltComplement = (PI/2-math.abs(cursorTilt))*tiltSign --return complement angle for cursorTilt
+	cursorTiltComplement = math.min(1.5550425,math.abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
+	local cursorxzDist = math.tan(cursorTiltComplement)*(averageEdgeHeight-cs.py) --how far does the camera angle look pass the ground beneath
+	local cursorxDist = math.sin(cs.ry+cursorHeading)*cursorxzDist ----break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
+	local cursorzDist = math.cos(cs.ry+cursorHeading)*cursorxzDist
+	local gx, gy, gz = cs.px+cursorxDist,averageEdgeHeight,cs.pz+cursorzDist --estimated ground position infront of camera 
+	--Finish
+	if false then
+		Spring.Echo("MouseCoordinate")
+		Spring.Echo(y .. " y")
+		Spring.Echo(x .. " x")
+		Spring.Echo("Before_Angle")
+		Spring.Echo(inclination*(180/PI) .. " inclination")
+		Spring.Echo(azimuth*(180/PI).. " azimuth")
+		Spring.Echo(distanceFromCenter.. " distanceFromCenter")
+		Spring.Echo(perspectivePlaneDistance.. " perspectivePlaneDistance")
+		Spring.Echo( halfViewSizeY/math.tan(currentFov*RADperDEGREE)+magicOffset .. " perspectivePlaneDistance(2ndMethod)")
+		Spring.Echo("CameraAngle")
+		Spring.Echo(cs.rx*(180/PI))
+		Spring.Echo(cs.ry*(180/PI))
+		Spring.Echo("After_Angle")
+		Spring.Echo(cursorTilt*(180/PI))
+		Spring.Echo((cs.ry+cursorHeading)*(180/PI) .. " cursorComponent: " .. cursorHeading*(180/PI))
+		Spring.MarkerAddPoint(gx, gy, gz, "here")
+	end
+	--//caching for efficiency
+	cachedResult[1] = gx
+	cachedResult[2] = gy
+	cachedResult[3] = gz
+	prevInclination =cs.rx
+	prevAzimuth = cs.ry
+	prevX = x
+	prevY = y	
+
+	return gx,gy,gz
+	--Most important credit to!:
+	--0: Google search service
+	--1: "Perspective Projection: The Wrong Imaging Model" by Margaret M. Fleck (http://www.cs.illinois.edu/~mfleck/my-papers/stereographic-TR.pdf)
+	--2: http://www.scratchapixel.com/lessons/3d-advanced-lessons/perspective-and-orthographic-projection-matrix/perspective-projection-matrix/
+	--3: http://stackoverflow.com/questions/5278417/rotating-body-from-spherical-coordinates
+	--4: http://en.wikipedia.org/wiki/Spherical_coordinate_system
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 --[[ --NOTE: is not yet used for the moment
 local function MoveRotatedCam(cs, mxm, mym)
 	if not cs.dy then
@@ -606,7 +707,6 @@ end
 local function VirtTraceRay(x,y, cs)
 	local _, gpos = spTraceScreenRay(x, y, true)
 	
-	
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
 		
@@ -626,13 +726,8 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
-	---===Convert camera angle into estimated ground position (by Msafwan)===
-	local camTilt = math.min(1.5550425, PI/2 + cs.rx)
-	local xzDist = math.tan(camTilt)*(cs.py-averageEdgeHeight) --the ground distance (at xz-plane) between FreeStyle camera and the target.
-	local xDist = sin(cs.ry)*xzDist ----break down "xzDist" into x and z component.
-	local zDist = cos(cs.ry)*xzDist
-	gx, gy, gz = cs.px+xDist,averageEdgeHeight,cs.pz+zDist --estimated ground position infront of camera (if outside map)
-	---===
+
+	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs) --use override if spTraceScreenRay() do not have results
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
@@ -700,53 +795,56 @@ local function Zoom(zoomin, shift, forceCenter)
 	local cs = spGetCameraState()
 	-- [[
 	if
-		(not forceCenter) and
-		(
-			(zoomin and options.zoomintocursor.value)
-			or ((not zoomin) and options.zoomoutfromcursor.value)
-		)
-		then
+	(not forceCenter) and
+	((zoomin and options.zoomintocursor.value) or ((not zoomin) and options.zoomoutfromcursor.value)) --zoom to cursor or zoom-out from cursor
+	then
 		
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
 		
-		if onmap then
-			if gx then
-				dx = gx - cs.px
-				dy = gy - cs.py
-				dz = gz - cs.pz
-			else
-				return false
-			end
-            
-			local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
-			
-			local new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the target.
-			local new_py = cs.py + dy * sp
-			local new_pz = cs.pz + dz * sp
-			
-			if not options.freemode.value then
-                if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then --zooming underground?
-                    sp = (spGetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
-                    new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the ground.
-                    new_py = cs.py + dy * sp
-                    new_pz = cs.pz + dz * sp
-                elseif (not zoomin) and new_py > maxDistY then --zoom out to space?
-                    sp = (maxDistY - cs.py) / dy
-                    new_px = cs.px + dx * sp --a zoom-out that get slower the closer you are to the ceiling?
-                    new_py = cs.py + dy * sp
-                    new_pz = cs.pz + dz * sp
-                end
-                
-            end
-			
-            cs.px = new_px
-            cs.py = new_py
-            cs.pz = new_pz
-            
-			spSetCameraState(cs, options.smoothness.value)
-			ls_have = false
-			return
+		if gx and not options.freemode.value then
+			--out of map. Bound zooming to within map
+			if gx < 0 then gx = 0; end
+			if gx > mwidth then gx=mwidth; end
+			if gz < 0 then gz = 0; end 
+			if gz > mheight then gz = mheight; end  
 		end
+		
+		if gx then
+			dx = gx - cs.px
+			dy = gy - cs.py
+			dz = gz - cs.pz
+		else
+			return false
+		end
+		
+		local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
+		
+		local new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the target.
+		local new_py = cs.py + dy * sp
+		local new_pz = cs.pz + dz * sp
+		
+		if not options.freemode.value then
+			if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then --zooming underground?
+				sp = (spGetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
+				new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the ground.
+				new_py = cs.py + dy * sp
+				new_pz = cs.pz + dz * sp
+			elseif (not zoomin) and new_py > maxDistY then --zoom out to space?
+				sp = (maxDistY - cs.py) / dy
+				new_px = cs.px + dx * sp --a zoom-out that get slower the closer you are to the ceiling?
+				new_py = cs.py + dy * sp
+				new_pz = cs.pz + dz * sp
+			end
+			
+		end
+		
+		cs.px = new_px
+		cs.py = new_py
+		cs.pz = new_pz
+		
+		spSetCameraState(cs, options.smoothness.value)
+		ls_have = false
+		return
 		
 	end
 	--]]
@@ -812,7 +910,7 @@ SetFOV = function(fov)
 	
 	local currentFOVhalf_rad = (fov/2)*PI/180
 	local mapLenght = (max(mheight, mwidth)+4000)/2
-	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust TAB/Overview distance based on camera FOV
+	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
 end
 
 local function ResetCam()
@@ -965,7 +1063,7 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
             SetLockSpot2(cs)
         end
 		--]]
-		if lock and ls_onmap then
+		if lock and (ls_onmap or options.freemode.value) then --if have lock (ls_have ==true) and is either onmap or freemode (offmap) then update camera properties.
 			local cstemp = UpdateCam(cs)
 			if cstemp then
 				cs = cstemp;
@@ -1392,6 +1490,8 @@ function widget:MouseMove(x, y, dx, dy, button)
 		if rotate_transit then --if "rotateAtCursor" flag is True, then this will run 'once' to smoothen camera motion
 			if spDiffTimers(spGetTimer(),rotate_transit)<1 then --smooth camera for in-transit effect
 				smoothed = true
+			else
+				rotate_transit = nil --cancel in-transit flag
 			end
 		end
 		if abs(dx) > 0 or abs(dy) > 0 then
@@ -1478,18 +1578,21 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	-- Rotate World --
 	if c then
 		rotate_transit = nil
-		if options.targetmouse.value then --if "rotateAtCursor": trigger smoot in-transit effect
+		if options.targetmouse.value then --if rotate world at mouse cursor: 
 			
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
-			if gx and onmap then
-				SetLockSpot2(cs,x,y)
+			if gx then  --Note: we don't block offmap position since VirtTraceRay() now work for offmap position.
+				SetLockSpot2(cs,x,y) --lockspot at cursor position
+				spSetCameraTarget(gx,gy,gz, 1) 
 				
-				spSetCameraTarget(gx,gy,gz, 1)
-				rotate_transit = spGetTimer()
+				rotate_transit = spGetTimer() --trigger smooth in-transit effect in widget:MouseMove()
 			end
+			
+		else
+			SetLockSpot2(cs) --lockspot at center of screen
 		end
-		spWarpMouse(cx, cy)
-		SetLockSpot2(cs)
+		
+		spWarpMouse(cx, cy) --move cursor to center of screen
 		rotate = true
 		msx = cx
 		msy = cy
@@ -1511,7 +1614,6 @@ end
 
 function widget:MouseRelease(x, y, button)
 	if (button == 2) then
-		follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
 		rotate = nil
 		smoothscroll = false
 		springscroll = false
