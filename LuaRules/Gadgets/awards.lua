@@ -23,16 +23,17 @@ local echo = Spring.Echo
 local totalTeams = 0
 local totalTeamList = {}
 
-local awardDescs = 
+local awardDescs =
 {
-	pwn 	= 'Complete Annihilation Award', 
-	navy 	= 'Fleet Admiral', 
-	air 	= 'Airforce General', 
-	nux 	= 'Apocalyptic Achievement Award', 
-	friend 	= 'Friendly Fire Award', 
-	shell 	= 'Turtle Shell Award', 
+	pwn 	= 'Complete Annihilation Award',
+	navy 	= 'Fleet Admiral',
+	air 	= 'Airforce General',
+	nux 	= 'Apocalyptic Achievement Award',
+	friend 	= 'Friendly Fire Award',
+	shell 	= 'Turtle Shell Award',
 	fire 	= 'Master Grill-Chef',
 	emp 	= 'EMP Wizard',
+	slow 	= 'Slow King', -- if technobabble is used then dunno, Time Manipulator? 
 	t3 		= 'Experimental Engineer',
 	cap 	= 'Capture Award',
 	share 	= 'Share Bear',
@@ -54,7 +55,7 @@ local awardDescs =
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then 
+if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 local spAreTeamsAllied		= Spring.AreTeamsAllied
@@ -108,11 +109,12 @@ local awardAbsolutes = {
 local awardEasyFactors = {
 	shell	 	= basicEasyFactor,
 	fire	 	= basicEasyFactor,
-	
+
 	nux		 	= veryEasyFactor,
 	kam 		= veryEasyFactor,
 	comm 		= veryEasyFactor,
-	
+	slow 		= veryEasyFactor,
+
 	empFactor	= empFactor,
 }
 
@@ -155,7 +157,7 @@ local flamerWeaponDefs = {}
 
 include("LuaRules/Configs/constants.lua")
 
-local allyTeamInfo = {} 
+local allyTeamInfo = {}
 local resourceInfo = {count = 0, data = {}}
 
 do
@@ -166,7 +168,7 @@ do
 			team = {},
 			teams = 0,
 		}
-		
+
 		local teamList = Spring.GetTeamList(allyTeamID)
 		for j=1,#teamList do
 			local teamID = teamList[j]
@@ -183,7 +185,7 @@ end
 local function comma_value(amount)
 	local formatted = amount .. ''
 	local k
-	while true do  
+	while true do
 		formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
 		if (k==0) then
 			break
@@ -231,10 +233,10 @@ end
 
 local function awardAward(team, awardType, record)
 	awardList[team][awardType] = record
-	
+
 	if TESTMODE then
 		for _,curTeam in pairs(totalTeamList) do
-			if curTeam ~= team then	
+			if curTeam ~= team then
 				awardList[curTeam][awardType] = nil
 			end
 		end
@@ -266,38 +268,38 @@ local function UpdateResourceStats(t)
 	resourceInfo.count = resourceInfo.count + 1
 	resourceInfo.data[resourceInfo.count] = {allyRes = {}, teamRes = {}, t = t}
 
-	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
+	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
 		local teams = allyTeamData.teams
 		local team = allyTeamData.team
-		
+
 		local allyOverdriveResources = GG.Overdrive_allyTeamResources[allyTeamID] or {}
-		
+
 		resourceInfo.data[resourceInfo.count].allyRes[allyTeamID] = {
 			metal_income_total = 0,
 			metal_income_base = allyOverdriveResources.baseMetal or 0,
 			metal_income_overdrive = allyOverdriveResources.overdriveMetal or 0,
 			metal_income_other = 0,
-			
+
 			metal_spend_total = 0,
 			metal_spend_construction = 0,
 			metal_spend_waste = 0,
-			
+
 			metal_storage_current = 0,
 			metal_storage_free = 0,
-			
+
 			energy_income_total = allyOverdriveResources.baseEnergy or 0,
-			
+
 			energy_spend_total = 0,
 			energy_spend_overdrive = allyOverdriveResources.overdriveEnergy or 0,
 			energy_spend_construction = 0,
 			energy_spend_other = 0,
 			energy_spend_waste = allyOverdriveResources.wasteEnergy or 0,
-			
+
 			energy_storage_current = 0,
 		}
-		
+
 		local aRes = resourceInfo.data[resourceInfo.count].allyRes[allyTeamID]
-		
+
 		for i = 1, teams do
 			local teamID = team[i]
 			local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teamID, "metal")
@@ -306,48 +308,48 @@ local function UpdateResourceStats(t)
 			aRes.metal_spend_total = aRes.metal_spend_total + mExpe
 			aRes.metal_storage_free = aRes.metal_storage_free + mStor - mCurr
 			aRes.metal_storage_current = aRes.metal_storage_current + mCurr
-			
+
 			local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teamID, "energy")
 			aRes.energy_spend_total = aRes.energy_spend_total + eExpe
 			aRes.energy_storage_current = aRes.energy_storage_current + eCurr
-			
+
 			local teamOverdriveResources = GG.Overdrive_teamResources[teamID] or {}
-			
+
 			resourceInfo.data[resourceInfo.count].teamRes[teamID] = {
 				metal_income_total = mInco + mReci,
 				metal_income_base = teamOverdriveResources.baseMetal or 0,
 				metal_income_overdrive = teamOverdriveResources.overdriveMetal or 0,
 				metal_income_other = 0,
-				
+
 				metal_spend_total = mExpe + mSent,
 				metal_spend_construction = mExpe,
-				
+
 				metal_share_net = mReci - mSent,
-				
+
 				metal_storage_current = mCurr,
-				
+
 				energy_income_total = eInco,
-				
+
 				energy_spend_total = eExpe,
 				energy_spend_construction = mExpe,
 				energy_spend_other = 0,
-				
+
 				energy_share_net = teamOverdriveResources.overdriveEnergyChange or 0,
-				
+
 				energy_storage_current = eCurr,
 			}
-			
+
 			local tRes = resourceInfo.data[resourceInfo.count].teamRes[teamID]
-			
+
 			tRes.metal_income_other = tRes.metal_income_total - tRes.metal_income_base - tRes.metal_income_overdrive - mReci
-			tRes.energy_spend_other = tRes.energy_spend_total - tRes.energy_spend_construction + math.min(0, tRes.energy_share_net) 
+			tRes.energy_spend_other = tRes.energy_spend_total - tRes.energy_spend_construction + math.min(0, tRes.energy_share_net)
 		end
-		
+
 		aRes.metal_income_other = aRes.metal_income_total - aRes.metal_income_base - aRes.metal_income_overdrive
 		aRes.metal_spend_waste = math.min(aRes.metal_storage_free - aRes.metal_income_total - aRes.metal_spend_total,0)
-		
+
 		aRes.energy_spend_construction = aRes.metal_spend_construction
-		aRes.energy_spend_other = aRes.energy_spend_total - (aRes.energy_spend_overdrive + aRes.energy_spend_construction + aRes.energy_spend_waste)		
+		aRes.energy_spend_other = aRes.energy_spend_total - (aRes.energy_spend_overdrive + aRes.energy_spend_construction + aRes.energy_spend_waste)
 	end
 end
 
@@ -387,46 +389,51 @@ local function UnitResurrected (unitDefID, teamID)
   AddAwardPoints( 'rezz', teamID, (ud and ud.metalCost or 0) )
 end
 
+local function UnitSlowed (amount, teamID)
+  AddAwardPoints( 'slow', teamID, amount )
+end
+
 GG.Awards.UnitResurrected = UnitResurrected
+GG.Awards.UnitSlowed      = UnitSlowed
 
 local function ProcessAwardData()
-	
+
 	for awardType, data in pairs(awardData) do
 		local winningTeam
 		local maxVal
 		local easyFactor = awardEasyFactors[awardType] or 1
 		local absolute = awardAbsolutes[awardType]
 		local message
-		
+
 		if awardType == 'vet' then
 			maxVal = expUnitExp
 			winningTeam = expUnitTeam
 		elseif awardType == 'friend' then
-			
+
 			maxVal = 0
 			for team,dmg in pairs(data) do
-				
+
 				--local totalDamage = dmg+damageList[team]
 				local totalDamage = dmg + awardData.pwn[team]
 				local damageRatio = totalDamage>0 and dmg/totalDamage or 0
-				
+
 				if  damageRatio > maxVal then
 					winningTeam = team
 					maxVal = damageRatio
 				end
 			end
-			
+
 		else
 			winningTeam, maxVal = getMaxVal(data)
-			
+
 		end
-		
+
 		if winningTeam then
-			
+
 			local compare
 			if absolute then
 				compare = absolute
-				
+
 			elseif awardType == 'reclaim' then
 				compare = getMeanMetalIncome() * easyFactor
 			else
@@ -450,6 +457,8 @@ local function ProcessAwardData()
 					message = 'Burnt value: ' .. maxValWrite
 				elseif awardType == 'emp' then
 					message = 'Stunned value: ' .. maxValWrite
+				elseif awardType == 'slow' then
+					message = 'Slowed value: ' .. maxValWrite
 				elseif awardType == 'ouch' then
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
@@ -470,7 +479,7 @@ local function ProcessAwardData()
 				elseif awardType == 'sweeper' then
 					message = maxVal .. ' Nests wiped out'
 
-					
+
 				elseif awardType == 'vet' then
 					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
 					local expUnitExpRounded = ''..floor(expUnitExp * 10)
@@ -484,7 +493,7 @@ local function ProcessAwardData()
 		if message then
 			awardAward(winningTeam, awardType, message)
 		end
-		
+
 	end
 end
 
@@ -492,9 +501,9 @@ end
 -- Callins
 
 function gadget:Initialize()
-	
+
 	_G.resourceInfo = resourceInfo
-	
+
 	local tempTeamList = Spring.GetTeamList()
 	for i=1, #tempTeamList do
 		local team = tempTeamList[i]
@@ -504,7 +513,7 @@ function gadget:Initialize()
 			totalTeamList[team] = team
 		end
 	end
-	
+
 	--new
 	for awardType, _ in pairs(awardDescs) do
 		awardData[awardType] = {}
@@ -512,15 +521,15 @@ function gadget:Initialize()
 	for _,team in pairs(totalTeamList) do
 		awardList[team] = {}
 		teamCount = teamCount + 1
-		
+
 		shareListTemp1[team]	= 0
 		shareListTemp2[team]	= 0
-		
-		for awardType, _ in pairs(awardDescs) do	
+
+		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
-		
-		
+
+
 	end
 
 	local boatFacs = {'corsy', 'striderhub'}
@@ -557,7 +566,7 @@ function gadget:Initialize()
 	end
 
  end
- 
+
 end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
@@ -582,10 +591,10 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		if shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost or 0
-			
+
 			shareListTemp1[oldTeam] = shareListTemp1[oldTeam] + mCost
 			shareListTemp1[newTeam] = shareListTemp1[newTeam] - mCost
-			
+
 			--[[
 			AddAwardPoints( 'share', oldTeam, mCost )
 			AddAwardPoints( 'share', newTeam, 0-mCost )
@@ -652,10 +661,10 @@ end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
 		attackerID, attackerDefID, attackerTeam)
-	if (not attackerTeam) 
+	if (not attackerTeam)
 		or (attackerTeam == unitTeam)
-		or (attackerTeam == gaiaTeamID) 
-		or (unitTeam == gaiaTeamID) 
+		or (attackerTeam == gaiaTeamID)
+		or (unitTeam == gaiaTeamID)
 		then return end
 
 	local hp = spGetUnitHealth(unitID)
@@ -678,7 +687,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			AddAwardPoints( 'ouch', unitTeam, damage )
 			local ad = UnitDefs[attackerDefID]
 
-			if (flamerWeaponDefs[weaponID]) then				
+			if (flamerWeaponDefs[weaponID]) then
 				AddAwardPoints( 'fire', attackerTeam, costdamage )
 			end
 
@@ -708,8 +717,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 
 			elseif comms[attackerDefID] then
 				AddAwardPoints( 'comm', attackerTeam, costdamage )
-				
-			end	
+
+			end
 		end
 	end
 end
@@ -722,7 +731,7 @@ end
 
 function gadget:GameFrame(n)
 
-	if n%32 == 2 then 
+	if n%32 == 2 then
         UpdateResourceStats((n-2)/32)
     end
 
@@ -735,12 +744,12 @@ function gadget:GameFrame(n)
 		if (frame32 < 0.1) then
 			sentAwards = false
 		end
-	
+
 	else
 		if not spIsGameOver() then return end
 	end
-	
-	if not sentAwards then 
+
+	if not sentAwards then
 		local units = spGetAllUnits()
 		for i=1,#units do
 			local unitID = units[i]
@@ -748,20 +757,20 @@ function gadget:GameFrame(n)
 			local unitDefID = spGetUnitDefID(unitID)
 			gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		end
-	
+
 		FinalizeReclaimList()
-		
-		
+
+
 		--new
 		ProcessAwardData()
-	
+
 		--test values
 		if TESTMODE then
 			local testteam = 0
-			
-		--]]	
+
+		--]]
 		end
-		
+
 		_G.awardList = awardList
 		sentAwards = true
 	end
@@ -836,7 +845,7 @@ function gadget:Initialize()
 			totalTeamList[team] = team
 		end
 	end
-	
+
 	for _,team in pairs(totalTeamList) do
 		local _, leaderPlayerID, _, isAI = spGetTeamInfo(team)
 		local name
@@ -860,78 +869,78 @@ function gadget:Initialize()
 end
 
 local function SendEconomyDataToWidget()
-	
+
 	if (Script.LuaUI('WriteResourceStatsToFile')) then
-	
+
 		local resourceInfo = SYNCED.resourceInfo
 		local count = resourceInfo.count
 		local data = resourceInfo.data
 		local reallyBigString = ""
-		
+
 		for i = 1, count do
 			if data[i] then
 				local toSend = data[i].t .. " "
-				for allyTeamID, allyData in spairs(data[i].allyRes) do 
+				for allyTeamID, allyData in spairs(data[i].allyRes) do
 					toSend = toSend .. " " .. allyTeamID .. " " ..
 					allyData.metal_income_total .. " " ..
 					allyData.metal_income_base .. " " ..
 					allyData.metal_income_overdrive .. " " ..
 					allyData.metal_income_other .. " " ..
-			
+
 					allyData.metal_spend_total .. " " ..
 					allyData.metal_spend_construction .. " " ..
 					allyData.metal_spend_waste .. " " ..
-					
+
 					allyData.metal_storage_current .. " " ..
 					allyData.metal_storage_free .. " " ..
-					
+
 					allyData.energy_income_total .. " " ..
-					
+
 					allyData.energy_spend_total .. " " ..
 					allyData.energy_spend_overdrive .. " " ..
 					allyData.energy_spend_construction .. " " ..
 					allyData.energy_spend_other .. " " ..
 					allyData.energy_spend_waste .. " " ..
-					
+
 					allyData.energy_storage_current
 				end
 				--Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. toSend)
 				reallyBigString = reallyBigString .. toSend .. "\n"
-				
+
 				toSend = data[i].t .. " "
-				
-				for teamID, teamData in spairs(data[i].teamRes) do 
+
+				for teamID, teamData in spairs(data[i].teamRes) do
 					toSend = toSend .. " " .. teamID .. " " ..
 					teamData.metal_income_total .. " " ..
 					teamData.metal_income_base .. " " ..
 					teamData.metal_income_overdrive .. " " ..
 					teamData.metal_income_other .. " " ..
-			
+
 					teamData.metal_spend_total .. " " ..
 					teamData.metal_spend_construction .. " " ..
-					
+
 					teamData.metal_share_net  .. " " ..
-					
+
 					teamData.metal_storage_current .. " " ..
-					
+
 					teamData.energy_income_total .. " " ..
-					
+
 					teamData.energy_spend_total .. " " ..
 					teamData.energy_spend_construction .. " " ..
 					teamData.energy_spend_other .. " " ..
-					
+
 					teamData.energy_share_net  .. " " ..
-					
+
 					teamData.energy_storage_current
 				end
-				
+
 				reallyBigString = reallyBigString .. toSend .. "\n"
 			end
 		end
-	
+
 		Script.LuaUI.WriteResourceStatsToFile(reallyBigString, teamNames)
 	end
-	
+
 end
 
 function gadget:GameOver()
@@ -950,13 +959,13 @@ end
 
 
 function gadget:IsAboveCloseButton(x,y)
-	return (x > bx+exitX1) and (x < bx+exitX2) and (y > by+exitY1) and (y < by+exitY2) 
+	return (x > bx+exitX1) and (x < bx+exitX2) and (y > by+exitY1) and (y < by+exitY2)
 end
 
 
 function gadget:IsAbove(x,y)
 	if not gameOver then return false end
-	local above = (x > bx) and (x < bx+w) and (y > by) and (y < by+h) 
+	local above = (x > bx) and (x < bx+w) and (y > by) and (y < by+h)
 
 	if (above)and(self:IsAboveCloseButton(x,y)) then
 		buttonHover = true
@@ -1024,14 +1033,14 @@ function gadget:DrawScreen()
 			awardList = SYNCED.awardList
 		end
 		--Spring.Echo("Drawing awards")
-			
+
 		fontHandler.UseFont(smallFont)
 		glPushMatrix()
 		-- Main Box
 		glTranslate(bx,by, 0)
 		glColor(0.2, 0.2, 0.2, 0.4)
 		gl.Rect(0,0,w,h)
-		
+
 		-- Title
 		glColor(1, 1, 0, 0.8)
 		glPushMatrix()
@@ -1039,7 +1048,7 @@ function gadget:DrawScreen()
 		glScale(1.5, 1.5, 1.5)
 		fhDraw('Awards', 0,0)
 		glPopMatrix()
-		
+
 		-- Button
 		if buttonHover then
 			glColor(0.4, 0.4, 0.9, 0.85)
@@ -1048,15 +1057,15 @@ function gadget:DrawScreen()
 		end
 		gl.Rect(exitX1,exitY1,exitX2,exitY2)
 		fhDrawCentered('Show/Hide Stats Window', (exitX1 + exitX2)/2,(exitY1 + exitY2)/2 - fontHeight/2)
-		
+
 		glTranslate(margin, h - (tHeight + margin)*2, 0)
 		local row, col = 0,0
 		if awardList then
-			
+
 			local teamCount = 0
-			
+
 			for team,awards in spairs(awardList) do
-			
+
 				local awardCount = 0
 				for awardType, record in spairs(awards) do
 					awardCount = awardCount + 1
@@ -1066,22 +1075,22 @@ function gadget:DrawScreen()
 						Spring.Echo(planetWarsData)
 					end
 				end
-			
+
 				if awardCount > 0 then
 					teamCount = teamCount + 1
-					
+
 					if row == maxRow-1 then
 						row = 0
 						col = col + 1
 						glTranslate(margin+colSpacing, (tHeight+margin)*(maxRow-1) , 0)
 					end
-					
+
 					glColor( teamColorsDim[team] )
 					gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
-					
-					glColor(1,1,1,1)	
+
+					glColor(1,1,1,1)
 					fhDraw((teamNames[team] or "no_name") , 0, fontHeight )
-					
+
 					row = row + 1
 					glTranslate( 0, 0 - (tHeight+margin), 0)
 					if row == maxRow then
@@ -1089,22 +1098,22 @@ function gadget:DrawScreen()
 						col = col + 1
 						glTranslate(margin+colSpacing, (tHeight+margin)*maxRow , 0)
 					end
-					
+
 					for awardType, record in spairs(awards) do
-					
+
 						glColor(teamColorsDim[team] )
 						gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
-						glColor(1,1,1,1)	
-						
+						glColor(1,1,1,1)
+
 						glPushMatrix()
-							
+
 							local border = 2
 							glColor(0,0,0,0)
 							gl.Rect(0-border, 0-border, tWidth+border, tHeight+border)
-							glColor(1,1,1,1)	
+							glColor(1,1,1,1)
 							glTexture(':l:LuaRules/Images/awards/trophy_'.. awardType ..'.png')
 							glTexRect(0, 0, tWidth, tHeight )
-							
+
 							glTranslate(tWidth+margin,(fontHeight+margin),0)
 							glColor(1,1,0,1)
 							glPushMatrix()
@@ -1113,10 +1122,10 @@ function gadget:DrawScreen()
 								elseif awardDescs[awardType]:len() > 20 then
 									glScale(0.8,1,1)
 								end
-								--fhDraw(awardCount ..') '.. awardDescs[awardType], 0,0) 
-								fhDraw(awardDescs[awardType], 0,0) 
+								--fhDraw(awardCount ..') '.. awardDescs[awardType], 0,0)
+								fhDraw(awardDescs[awardType], 0,0)
 							glPopMatrix()
-							
+
 							glTranslate(0,0-(fontHeight/2+margin),0)
 							glColor(1,1,1,1)
 							glPushMatrix()
@@ -1125,12 +1134,12 @@ function gadget:DrawScreen()
 								elseif record:len() > 20 then
 									glScale(0.8,1,1)
 								end
-								
+
 								fhDraw('  '..record, 0,0)
 							glPopMatrix()
-							
+
 						glPopMatrix()
-						
+
 						row = row + 1
 						glTranslate( 0, 0 - (tHeight+margin), 0)
 						if row == maxRow then
@@ -1141,7 +1150,7 @@ function gadget:DrawScreen()
 					end
 				end --if at least 1 award
 			end
-			
+
 			sentToPlanetWars = true
 		end
 		glPopMatrix()
