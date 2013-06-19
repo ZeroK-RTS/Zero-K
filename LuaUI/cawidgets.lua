@@ -35,7 +35,7 @@ includeZIPFirst("system.lua")
 includeZIPFirst("cache.lua") --contain cached override for Spring.GetVisibleUnit (performance optimization). All overrides that are placed here have global reach
 include("callins.lua")
 include("savetable.lua")
-VFS.Include(LUAUI_DIRNAME.."utility_two.lua", envTable, VFS.RAW_FIRST) --contain file backup function and SetCameraTarget override
+include("utility_two.lua") --contain file backup function
 local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = include("chat_preprocess.lua") -- contain stuff that preprocess chat message for Chili Chat widgets
 
 local modShortUpper = Game.modShortName:upper()
