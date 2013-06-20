@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.119 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.120 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-June-19
+    date      = "2011-03-16", --2013-June-20
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -557,58 +557,48 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local previousFov =0
+local previousFov=-1
 local prevInclination =99
 local prevAzimuth = 299
 local prevX = 9999
 local prevY = 9999
-local cachedMagicOffset = 0
 local cachedResult = {0,0,0}
 local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
 	local halfViewSizeY = vsy/2
 	local halfViewSizeX = vsx/2
 	y = y- halfViewSizeY --convert screen coordinate to 0,0 at middle
 	x = x- halfViewSizeX
-	local currentFov = cs.fov --in Spring: 0 degree is directly ahead and +FOV degree to the left and -FOV degree to the right
-	local magicOffset = cachedMagicOffset
+	local currentFov = cs.fov/2 --in Spring: 0 degree is directly ahead and +FOV/2 degree to the left and -FOV/2 degree to the right
 	--//Speedup//--
 	if previousFov==currentFov and prevInclination == cs.rx and prevAzimuth == cs.ry and prevX ==x and prevY == y then --if camera Sphere coordinate & mouse position not change then use cached value
 		return cachedResult[1],cachedResult[2],cachedResult[3] 
 	end
-	if previousFov ~= currentFov then --if FOV changes then: update perspective projection plane distance
-		magicOffset = math.exp(-(1/13.8)*(currentFov-110.7))+300 --somehow the perspective projection plane (the clip plane) has this offset that get bigger with smaller FOV. This approximation is obtained thru trial-n-error
-		cachedMagicOffset = magicOffset
-		previousFov = currentFov
-	end
-	--ISSUES: Ignoring the magicOffset will cause mismatch in mouse-to-ground position and axis reversal in FOV > 90 (because the perspective projection plane distance is negative).
-	--Trial-n-error:
-	--10 FOV, 1750 offset
-	--30 FOV, 600 offset 
-	--45 FOV, 420 offset
-	--90 FOV, 300 offset
-	--Using a free graphic calculator from www.runiter.com for test of many variation of offset equation: y = e^(-(1/var_1)*(x-var_2))+300
-	--FIXME: find out the reason for the need of magicOffset.
 	
 	--//Opengl FOV scaling logic//--
 	local referenceScreenSize = halfViewSizeY --because Opengl Glut use vertical screen size for FOV setting
 	local referencePlaneDistance = referenceScreenSize -- because Opengl use 45 degree as default FOV, in which case tan(45)=1= referenceScreenSize/referencePlaneDistance
 	local currentScreenSize = math.tan(currentFov*RADperDEGREE)*referencePlaneDistance --calculate screen size for current FOV if the distance to perspective projection plane is the default for 45 degree
 	local resizeFactor = referenceScreenSize/currentScreenSize --the ratio of the default screen size to new FOV's screen size
-	local perspectivePlaneDistance = resizeFactor*referencePlaneDistance + magicOffset --move perspective projection plane (closer or further away) so that the size appears to be as the default size for 45 degree
-	--//mouse-to-Sphere projection & rotation//--
+	local perspectivePlaneDistance = resizeFactor*referencePlaneDistance --move perspective projection plane (closer or further away) so that the size appears to be as the default size for 45 degree
+	
+	--//mouse-to-Sphere projection//--
 	local distanceFromCenter = math.sqrt(x*x+y*y) --mouse cursor distance from center screen. We going to simulate a Sphere dome which we will position the mouse cursor.
 	local inclination = math.atan(distanceFromCenter/perspectivePlaneDistance) --translate distance in 2d plane to angle projected from the Sphere
 	inclination = inclination -PI/2 --offset 90 degree because we want to place the south hemisphere (bottom) of the dome on the screen
 	local azimuth = math.atan2(-x,y) --convert x,y to angle, so that left is +degree and right is -degree. Note: negative x flip left-right or right-left (flip the direction of angle)
+	--//Sphere-to-coordinate conversion//--
 	local sphere_x = 100* math.sin(azimuth)* math.cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
 	local sphere_y = 100* math.sin(inclination)
 	local sphere_z = 100* math.cos(azimuth)* math.cos(inclination)
+	--//coordinate rotation 90+x degree//--
 	local rotateToInclination = PI/2+cs.rx --rotate to +90 degree facing the horizon then rotate to camera's current facing.
 	local new_x = sphere_x --rotation on x-axis
 	local new_y = sphere_y* math.cos (rotateToInclination) + sphere_z* math.sin (rotateToInclination) --move points of Sphere to new location 
 	local new_z = sphere_z* math.cos (rotateToInclination) - sphere_y* math.sin (rotateToInclination)
+	--//coordinate-to-Sphere conversion//--
 	local cursorTilt = math.atan2(new_y,math.sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate
 	local cursorHeading = math.atan2(new_x,new_z) --Sphere's azimuth
+	
 	--//Sphere-to-groundPosition translation//--
 	local tiltSign = math.abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
 	local cursorTiltComplement = (PI/2-math.abs(cursorTilt))*tiltSign --return complement angle for cursorTilt
@@ -619,21 +609,21 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 	local gx, gy, gz = cs.px+cursorxDist,averageEdgeHeight,cs.pz+cursorzDist --estimated ground position infront of camera 
 	--Finish
 	if false then
-		Spring.Echo("MouseCoordinate")
-		Spring.Echo(y .. " y")
-		Spring.Echo(x .. " x")
-		Spring.Echo("Before_Angle")
-		Spring.Echo(inclination*(180/PI) .. " inclination")
-		Spring.Echo(azimuth*(180/PI).. " azimuth")
-		Spring.Echo(distanceFromCenter.. " distanceFromCenter")
-		Spring.Echo(perspectivePlaneDistance.. " perspectivePlaneDistance")
-		Spring.Echo( halfViewSizeY/math.tan(currentFov*RADperDEGREE)+magicOffset .. " perspectivePlaneDistance(2ndMethod)")
-		Spring.Echo("CameraAngle")
-		Spring.Echo(cs.rx*(180/PI))
-		Spring.Echo(cs.ry*(180/PI))
-		Spring.Echo("After_Angle")
-		Spring.Echo(cursorTilt*(180/PI))
-		Spring.Echo((cs.ry+cursorHeading)*(180/PI) .. " cursorComponent: " .. cursorHeading*(180/PI))
+		-- Spring.Echo("MouseCoordinate")
+		-- Spring.Echo(y .. " y")
+		-- Spring.Echo(x .. " x")
+		-- Spring.Echo("Before_Angle")
+		-- Spring.Echo(inclination*(180/PI) .. " inclination")
+		-- Spring.Echo(azimuth*(180/PI).. " azimuth")
+		-- Spring.Echo(distanceFromCenter.. " distanceFromCenter")
+		-- Spring.Echo(perspectivePlaneDistance.. " perspectivePlaneDistance")
+		-- Spring.Echo( halfViewSizeY/math.tan(currentFov*RADperDEGREE)+magicOffset .. " perspectivePlaneDistance(2ndMethod)")
+		-- Spring.Echo("CameraAngle")
+		-- Spring.Echo(cs.rx*(180/PI))
+		-- Spring.Echo(cs.ry*(180/PI))
+		-- Spring.Echo("After_Angle")
+		-- Spring.Echo(cursorTilt*(180/PI))
+		-- Spring.Echo((cs.ry+cursorHeading)*(180/PI) .. " cursorComponent: " .. cursorHeading*(180/PI))
 		Spring.MarkerAddPoint(gx, gy, gz, "here")
 	end
 	--//caching for efficiency
@@ -643,7 +633,8 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 	prevInclination =cs.rx
 	prevAzimuth = cs.ry
 	prevX = x
-	prevY = y	
+	prevY = y
+	previousFov = currentFov	
 
 	return gx,gy,gz
 	--Most important credit to!:
@@ -706,7 +697,7 @@ end
 --          offmap position using the camera direction and disregards the x,y parameters.
 local function VirtTraceRay(x,y, cs)
 	local _, gpos = spTraceScreenRay(x, y, true)
-	
+
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
 		
