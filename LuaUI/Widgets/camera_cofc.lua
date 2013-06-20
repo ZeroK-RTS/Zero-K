@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.120 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.121 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-June-20
     license   = "GNU GPL, v2 or later",
@@ -580,32 +580,33 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 	local currentScreenSize = math.tan(currentFov*RADperDEGREE)*referencePlaneDistance --calculate screen size for current FOV if the distance to perspective projection plane is the default for 45 degree
 	local resizeFactor = referenceScreenSize/currentScreenSize --the ratio of the default screen size to new FOV's screen size
 	local perspectivePlaneDistance = resizeFactor*referencePlaneDistance --move perspective projection plane (closer or further away) so that the size appears to be as the default size for 45 degree
+	--Note: second method is "perspectivePlaneDistance=halfViewSizeY/math.tan(currentFov*RADperDEGREE)" which yield the same result with 1 line.
 	
 	--//mouse-to-Sphere projection//--
-	local distanceFromCenter = math.sqrt(x*x+y*y) --mouse cursor distance from center screen. We going to simulate a Sphere dome which we will position the mouse cursor.
+	local distanceFromCenter = sqrt(x*x+y*y) --mouse cursor distance from center screen. We going to simulate a Sphere dome which we will position the mouse cursor.
 	local inclination = math.atan(distanceFromCenter/perspectivePlaneDistance) --translate distance in 2d plane to angle projected from the Sphere
 	inclination = inclination -PI/2 --offset 90 degree because we want to place the south hemisphere (bottom) of the dome on the screen
 	local azimuth = math.atan2(-x,y) --convert x,y to angle, so that left is +degree and right is -degree. Note: negative x flip left-right or right-left (flip the direction of angle)
 	--//Sphere-to-coordinate conversion//--
-	local sphere_x = 100* math.sin(azimuth)* math.cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
-	local sphere_y = 100* math.sin(inclination)
-	local sphere_z = 100* math.cos(azimuth)* math.cos(inclination)
+	local sphere_x = 100* sin(azimuth)* cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
+	local sphere_y = 100* sin(inclination)
+	local sphere_z = 100* cos(azimuth)* cos(inclination)
 	--//coordinate rotation 90+x degree//--
 	local rotateToInclination = PI/2+cs.rx --rotate to +90 degree facing the horizon then rotate to camera's current facing.
 	local new_x = sphere_x --rotation on x-axis
-	local new_y = sphere_y* math.cos (rotateToInclination) + sphere_z* math.sin (rotateToInclination) --move points of Sphere to new location 
-	local new_z = sphere_z* math.cos (rotateToInclination) - sphere_y* math.sin (rotateToInclination)
+	local new_y = sphere_y* cos (rotateToInclination) + sphere_z* sin (rotateToInclination) --move points of Sphere to new location 
+	local new_z = sphere_z* cos (rotateToInclination) - sphere_y* sin (rotateToInclination)
 	--//coordinate-to-Sphere conversion//--
-	local cursorTilt = math.atan2(new_y,math.sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate
+	local cursorTilt = math.atan2(new_y,sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate
 	local cursorHeading = math.atan2(new_x,new_z) --Sphere's azimuth
 	
 	--//Sphere-to-groundPosition translation//--
-	local tiltSign = math.abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
-	local cursorTiltComplement = (PI/2-math.abs(cursorTilt))*tiltSign --return complement angle for cursorTilt
-	cursorTiltComplement = math.min(1.5550425,math.abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
+	local tiltSign = abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
+	local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt
+	cursorTiltComplement = min(1.5550425,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
 	local cursorxzDist = math.tan(cursorTiltComplement)*(averageEdgeHeight-cs.py) --how far does the camera angle look pass the ground beneath
-	local cursorxDist = math.sin(cs.ry+cursorHeading)*cursorxzDist ----break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
-	local cursorzDist = math.cos(cs.ry+cursorHeading)*cursorxzDist
+	local cursorxDist = sin(cs.ry+cursorHeading)*cursorxzDist ----break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
+	local cursorzDist = cos(cs.ry+cursorHeading)*cursorxzDist
 	local gx, gy, gz = cs.px+cursorxDist,averageEdgeHeight,cs.pz+cursorzDist --estimated ground position infront of camera 
 	--Finish
 	if false then
@@ -617,7 +618,7 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 		-- Spring.Echo(azimuth*(180/PI).. " azimuth")
 		-- Spring.Echo(distanceFromCenter.. " distanceFromCenter")
 		-- Spring.Echo(perspectivePlaneDistance.. " perspectivePlaneDistance")
-		-- Spring.Echo( halfViewSizeY/math.tan(currentFov*RADperDEGREE)+magicOffset .. " perspectivePlaneDistance(2ndMethod)")
+		-- Spring.Echo( halfViewSizeY/math.tan(currentFov*RADperDEGREE) .. " perspectivePlaneDistance(2ndMethod)")
 		-- Spring.Echo("CameraAngle")
 		-- Spring.Echo(cs.rx*(180/PI))
 		-- Spring.Echo(cs.ry*(180/PI))
@@ -1575,6 +1576,11 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 			if gx then  --Note: we don't block offmap position since VirtTraceRay() now work for offmap position.
 				SetLockSpot2(cs,x,y) --lockspot at cursor position
 				spSetCameraTarget(gx,gy,gz, 1) 
+				
+				--//update "ls_dist" with value from mid-screen's LockSpot because rotation is centered on mid-screen and not at cursor//--
+				_,gx,gy,gz = VirtTraceRay(cx,cy,cs) --get ground position traced from mid of screen
+				local dx,dy,dz = gx-cs.px, gy-cs.py, gz-cs.pz
+				ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground 
 				
 				rotate_transit = spGetTimer() --trigger smooth in-transit effect in widget:MouseMove()
 			end
