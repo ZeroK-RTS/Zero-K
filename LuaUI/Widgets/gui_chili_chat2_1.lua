@@ -683,7 +683,7 @@ end
 -----------------------------------------------------------------------
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if (key == KEYSYMS.RETURN) and not WG.enteringText then
+	if (key == KEYSYMS.RETURN) then
 		-- time chat opened (for autohide)
 		time_opened = GetTimer()
 	
