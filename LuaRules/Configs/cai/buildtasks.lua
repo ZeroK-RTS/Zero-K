@@ -563,7 +563,35 @@ factionBuildConfig = {
 				energy = true,
 			},
 			
+			[UnitDefNames['geo'].id] = {
+				energyGreaterThan = 20, 
+				energySpacing = 400,
+				whileStall = false,
+				makeNearFactory = 1800,
+				chance = 0.8,
+				minEtoMratio = 1.5,
+				defenceQuota = {0.8,0.6,0.4},
+				defenceRange = 600,
+				airDefenceQuota = {1.5,0.8,0.1},
+				index = 2,
+				energy = true,
+			},
+			
 			[UnitDefNames['cafus'].id] = {
+				energyGreaterThan = 120, 
+				energySpacing = 900,
+				whileStall = false,
+				makeNearFactory = false,
+				chance = 0.3,
+				minEtoMratio = 1.5,
+				defenceQuota = {3,2,2},
+				defenceRange = 800,
+				airDefenceQuota = {3,2,1},
+				index = 4,
+				energy = true,
+			},
+			
+			[UnitDefNames['amgeo'].id] = {
 				energyGreaterThan = 120, 
 				energySpacing = 900,
 				whileStall = false,
