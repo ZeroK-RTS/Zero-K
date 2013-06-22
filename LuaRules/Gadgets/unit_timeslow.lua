@@ -103,7 +103,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
 
 	if GG.Awards then
-		GG.Awards.UnitSlowed (slowdown, teamID)
+		GG.Awards.UnitSlowed (slowdown, attackerTeam)
 	end
 
 	-- check if a target change is needed
