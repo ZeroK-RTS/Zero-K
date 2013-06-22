@@ -1,22 +1,22 @@
 function gadget:GetInfo()
-  return {
-    name      = "Awards",
-    desc      = "Awards players at end of battle with shiny trophies.",
-    author    = "CarRepairer",
-    date      = "2008-10-15", --2013-03-02
-    license   = "GNU GPL, v2 or later",
-    layer     = 1000000, -- Must be after all other build steps and before unit_spawner.lua for queen kill award.
-    enabled   = true -- loaded by default?
-  }
+	return {
+		name    = "Awards",
+		desc    = "Awards players at end of battle with shiny trophies.",
+		author  = "CarRepairer",
+		date    = "2008-10-15", --2013-03-02
+		license = "GNU GPL, v2 or later",
+		layer   = 1000000, -- Must be after all other build steps and before unit_spawner.lua for queen kill award.
+		enabled = true -- loaded by default?
+	}
 end
 
 local TESTMODE = false
 
-local spGetAllyTeamList		= Spring.GetAllyTeamList
-local spIsGameOver			= Spring.IsGameOver
-local spGetTeamInfo         = Spring.GetTeamInfo
+local spGetAllyTeamList = Spring.GetAllyTeamList
+local spIsGameOver      = Spring.IsGameOver
+local spGetTeamInfo     = Spring.GetTeamInfo
 
-local gaiaTeamID			= Spring.GetGaiaTeamID()
+local gaiaTeamID        = Spring.GetGaiaTeamID()
 
 local echo = Spring.Echo
 
@@ -25,32 +25,32 @@ local totalTeamList = {}
 
 local awardDescs =
 {
-	pwn 	= 'Complete Annihilation Award',
-	navy 	= 'Fleet Admiral',
-	air 	= 'Airforce General',
-	nux 	= 'Apocalyptic Achievement Award',
-	friend 	= 'Friendly Fire Award',
-	shell 	= 'Turtle Shell Award',
-	fire 	= 'Master Grill-Chef',
-	emp 	= 'EMP Wizard',
-	slow 	= 'Traffic Cop',
-	t3 		= 'Experimental Engineer',
-	cap 	= 'Capture Award',
-	share 	= 'Share Bear',
-	terra	= 'Legendary Landscaper',
+	pwn     = 'Complete Annihilation Award',
+	navy    = 'Fleet Admiral',
+	air     = 'Airforce General',
+	nux     = 'Apocalyptic Achievement Award',
+	friend  = 'Friendly Fire Award',
+	shell   = 'Turtle Shell Award',
+	fire    = 'Master Grill-Chef',
+	emp     = 'EMP Wizard',
+	slow    = 'Traffic Cop',
+	t3      = 'Experimental Engineer',
+	cap     = 'Capture Award',
+	share   = 'Share Bear',
+	terra   = 'Legendary Landscaper',
 	reclaim = 'Spoils of War',
-	rezz	= 'Necromancy Award',
-	vet 	= 'Decorated Veteran',
-	ouch 	= 'Big Purple Heart',
-	kam		= 'Kamikaze Award',
-	comm	= 'Master and Commander',
-	mex		= 'Mineral Prospector',
-	mexkill	= 'Loot & Pillage',
-	rage	= 'Rage Inducer',
-	head	= 'Head Hunter',
-	dragon	= 'Dragon Slayer',
-	heart	= 'Queen Heart Breaker',
-	sweeper	= 'Land Sweeper',
+	rezz    = 'Necromancy Award',
+	vet     = 'Decorated Veteran',
+	ouch    = 'Big Purple Heart',
+	kam     = 'Kamikaze Award',
+	comm    = 'Master and Commander',
+	mex     = 'Mineral Prospector',
+	mexkill = 'Loot & Pillage',
+	rage    = 'Rage Inducer',
+	head    = 'Head Hunter',
+	dragon  = 'Dragon Slayer',
+	heart   = 'Queen Heart Breaker',
+	sweeper = 'Land Sweeper',
 }
 
 -------------------------------------------------------------------------------------
@@ -58,29 +58,29 @@ local awardDescs =
 if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-local spAreTeamsAllied		= Spring.AreTeamsAllied
-local spGetGameSeconds 		= Spring.GetGameSeconds
-local spGetTeamStatsHistory	= Spring.GetTeamStatsHistory
-local spGetUnitHealth		= Spring.GetUnitHealth
-local spGetAllUnits			= Spring.GetAllUnits
-local spGetUnitTeam			= Spring.GetUnitTeam
-local spGetUnitDefID		= Spring.GetUnitDefID
-local spGetUnitExperience	= Spring.GetUnitExperience
+local spAreTeamsAllied      = Spring.AreTeamsAllied
+local spGetGameSeconds      = Spring.GetGameSeconds
+local spGetTeamStatsHistory = Spring.GetTeamStatsHistory
+local spGetUnitHealth       = Spring.GetUnitHealth
+local spGetAllUnits         = Spring.GetAllUnits
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitExperience   = Spring.GetUnitExperience
 local spGetTeamResources    = Spring.GetTeamResources
 
 local floor = math.floor
 
 local terraunitDefID = UnitDefNames["terraunit"].id
-local terraformCost = UnitDefNames["terraunit"].metalCost
+local terraformCost  = UnitDefNames["terraunit"].metalCost
 
 local mexDefID = UnitDefNames["cormex"].id
-local mexCost = UnitDefNames["cormex"].metalCost
+local mexCost  = UnitDefNames["cormex"].metalCost
 
 GG.Awards = GG.Awards or {}
 
 local reclaimListByFeature = {}
-local shareListTemp1	= {}
-local shareListTemp2	= {}
+local shareListTemp1 = {}
+local shareListTemp2 = {}
 
 local cappedComs = {}
 
@@ -93,29 +93,29 @@ local minFriendRatio = 0.25
 local minReclaimRatio = 0.15
 
 local awardAbsolutes = {
-	cap 		= 1000,
-	share		= 5000,
-	terra		= 1000,
-	rezz		= 3000,
-	mex			= 15,
-	mexkill		= 15,
-	head		= 3,
-	dragon		= 3,
-	sweeper		= 20,
-	heart		= 1*10^9, --we should not exceed 2*10^9 because math.floor-ing the value will return integer -2147483648. Reference: https://code.google.com/p/zero-k/source/detail?r=9681
-	vet			= 3,
+	cap         = 1000,
+	share       = 5000,
+	terra       = 1000,
+	rezz        = 3000,
+	mex         = 15,
+	mexkill     = 15,
+	head        = 3,
+	dragon      = 3,
+	sweeper     = 20,
+	heart       = 1*10^9, --we should not exceed 2*10^9 because math.floor-ing the value will return integer -2147483648. Reference: https://code.google.com/p/zero-k/source/detail?r=9681
+	vet         = 3,
 }
 
 local awardEasyFactors = {
-	shell	 	= basicEasyFactor,
-	fire	 	= basicEasyFactor,
+	shell     = basicEasyFactor,
+	fire      = basicEasyFactor,
 
-	nux		 	= veryEasyFactor,
-	kam 		= veryEasyFactor,
-	comm 		= veryEasyFactor,
-	slow 		= veryEasyFactor,
+	nux       = veryEasyFactor,
+	kam       = veryEasyFactor,
+	comm      = veryEasyFactor,
+	slow      = veryEasyFactor,
 
-	empFactor	= empFactor,
+	empFactor = empFactor,
 }
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
@@ -129,18 +129,18 @@ local shareList_update = 32*60*5 -- five minute frames
 local boats, t3Units, comms = {}, {}, {}
 
 local staticO_small = {
-	armbrtha=1,
-	seismic=1,
-	tacnuke=1,
-	empmissile=1,
-	napalmmissile=1,
+	armbrtha = 1,
+	seismic = 1,
+	tacnuke = 1,
+	empmissile = 1,
+	napalmmissile = 1,
 }
 
 local staticO_big = {
-	corsilo=1,
-	mahlazer=1,
-	zenith=1,
-	raveparty=1,
+	corsilo = 1,
+	mahlazer = 1,
+	zenith = 1,
+	raveparty = 1,
 }
 
 local kamikaze = {
@@ -178,7 +178,6 @@ do
 	end
 end
 
-
 ------------------------------------------------
 -- functions
 
@@ -191,7 +190,7 @@ local function comma_value(amount)
 			break
 		end
 	end
-  	return formatted
+	return formatted
 end
 
 local function getMeanDamageExcept(excludeTeam)
@@ -243,9 +242,8 @@ local function awardAward(team, awardType, record)
 	end
 end
 
-
-local function CopyTable(original)   -- Warning: circular table references lead to
-	local copy = {}               -- an infinite loop.
+local function CopyTable(original) -- Warning: circular table references lead to
+	local copy = {}                -- an infinite loop.
 	for k, v in pairs(original) do
 		if (type(v) == "table") then
 			copy[k] = CopyTable(v)
@@ -260,8 +258,6 @@ local function UpdateShareList()
 	awardData.share = CopyTable(shareListTemp2)
 	shareListTemp2 = CopyTable(shareListTemp1)
 end
-
-
 
 local function UpdateResourceStats(t)
 
@@ -364,33 +360,35 @@ end
 GG.Awards.AddTerraformCost = AddTerraformCost
 
 local function AddFeatureReclaim(featureID)
-  local featureData = reclaimListByFeature[featureID]
-  local metal = featureData.metal
-  featureData.metal = nil
+	local featureData = reclaimListByFeature[featureID]
+	local metal = featureData.metal
+	featureData.metal = nil
 
-  for team, part in pairs(featureData) do
-    if (part < 0) then  --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
-	  if metal then
-		AddAwardPoints( 'reclaim', team, - metal * part )
-	  end
-    end
-  end
+	for team, part in pairs(featureData) do
+		if (part < 0) then --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
+			if metal then
+				AddAwardPoints( 'reclaim', team, - metal * part )
+			end
+		end
+	end
 end
 
 local function FinalizeReclaimList()
-  for featureID, _ in pairs(reclaimListByFeature) do
-    AddFeatureReclaim(featureID)
-  end
-  reclaimListByFeature = {}
+	for featureID, _ in pairs(reclaimListByFeature) do
+		AddFeatureReclaim(featureID)
+	end
+	reclaimListByFeature = {}
 end
 
 local function UnitResurrected (unitDefID, teamID)
-  local ud = UnitDefs[unitDefID]
-  AddAwardPoints( 'rezz', teamID, (ud and ud.metalCost or 0) )
+	local ud = UnitDefs[unitDefID]
+	AddAwardPoints( 'rezz', teamID, (ud and ud.metalCost or 0) )
 end
 
 local function UnitSlowed (amount, teamID)
-  AddAwardPoints( 'slow', teamID, amount )
+	if (teamID and (teamID ~= gaiaTeamID)) then
+		AddAwardPoints( 'slow', teamID, amount or 0)
+	end
 end
 
 GG.Awards.UnitResurrected = UnitResurrected
@@ -417,7 +415,7 @@ local function ProcessAwardData()
 				local totalDamage = dmg + awardData.pwn[team]
 				local damageRatio = totalDamage>0 and dmg/totalDamage or 0
 
-				if  damageRatio > maxVal then
+				if damageRatio > maxVal then
 					winningTeam = team
 					maxVal = damageRatio
 				end
@@ -479,7 +477,6 @@ local function ProcessAwardData()
 				elseif awardType == 'sweeper' then
 					message = maxVal .. ' Nests wiped out'
 
-
 				elseif awardType == 'vet' then
 					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
 					local expUnitExpRounded = ''..floor(expUnitExp * 10)
@@ -522,13 +519,12 @@ function gadget:Initialize()
 		awardList[team] = {}
 		teamCount = teamCount + 1
 
-		shareListTemp1[team]	= 0
-		shareListTemp2[team]	= 0
+		shareListTemp1[team] = 0
+		shareListTemp2[team] = 0
 
 		for awardType, _ in pairs(awardDescs) do
 			awardData[awardType][team] = 0
 		end
-
 
 	end
 
@@ -571,7 +567,7 @@ end --Initialize
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	-- Units given to neutral?
-	if oldTeam == gaiaTeamID or newTeam == gaiaTeamID  then
+	if oldTeam == gaiaTeamID or newTeam == gaiaTeamID then
 		return
 	end
 	if not spAreTeamsAllied(oldTeam,newTeam) then
@@ -732,8 +728,8 @@ end
 function gadget:GameFrame(n)
 
 	if n%32 == 2 then
-        UpdateResourceStats((n-2)/32)
-    end
+		UpdateResourceStats((n-2)/32)
+	end
 
 	if n % shareList_update == 1 and not spIsGameOver() then
 		UpdateShareList()
@@ -760,7 +756,6 @@ function gadget:GameFrame(n)
 
 		FinalizeReclaimList()
 
-
 		--new
 		ProcessAwardData()
 
@@ -776,64 +771,61 @@ function gadget:GameFrame(n)
 	end
 end --GameFrame
 
-
 function gadget:GameOver()
 	SendToUnsynced("aw_GameOver")
 end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-else  -- UNSYNCED
+else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local spGetGameFrame  = Spring.GetGameFrame
+local spGetMouseState = Spring.GetMouseState
+local spSendCommands  = Spring.SendCommands
 
-local spGetGameFrame 	= Spring.GetGameFrame
-local spGetMouseState 	= Spring.GetMouseState
-local spSendCommands	= Spring.SendCommands
+local glPushMatrix = gl.PushMatrix
+local glPopMatrix  = gl.PopMatrix
+local glTexture    = gl.Texture
+local glTexRect    = gl.TexRect
+local glAlphaTest  = gl.AlphaTest
+local glTranslate  = gl.Translate
+local glColor      = gl.Color
+local glBeginEnd   = gl.BeginEnd
+local glVertex     = gl.Vertex
+local glScale      = gl.Scale
 
-
-local glPushMatrix		= gl.PushMatrix
-local glPopMatrix		= gl.PopMatrix
-local glTexture			= gl.Texture
-local glTexRect			= gl.TexRect
-local glAlphaTest		= gl.AlphaTest
-local glTranslate		= gl.Translate
-local glColor			= gl.Color
-local glBeginEnd		= gl.BeginEnd
-local glVertex			= gl.Vertex
-local glScale			= gl.Scale
-local GL_QUADS     		= GL.QUADS
---local GL_GREATER		= GL.GREATER
+local GL_QUADS     = GL.QUADS
+--local GL_GREATER   = GL.GREATER
 
 LUAUI_DIRNAME = 'LuaUI/'
-local fontHandler   = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
-local fancyFont		= LUAUI_DIRNAME.."Fonts/KOMTXT___16"
-local smallFont		= LUAUI_DIRNAME.."Fonts/FreeSansBold_16"
+local fontHandler = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
+local fancyFont   = LUAUI_DIRNAME.."Fonts/KOMTXT___16"
+local smallFont   = LUAUI_DIRNAME.."Fonts/FreeSansBold_16"
 
-local fhDraw    		= fontHandler.Draw
-local fhDrawCentered	= fontHandler.DrawCentered
+local fhDraw         = fontHandler.Draw
+local fhDrawCentered = fontHandler.DrawCentered
 
 local caught, windowCaught, buttonHover
 local gameOver = false
-local showGameOverWin 	= true
-local sentToPlanetWars	= false
+local showGameOverWin  = true
+local sentToPlanetWars = false
 
-local colSpacing		= 250
-local bx, by 			= 100,100
-local margin 			= 10
-local tWidth,tHeight	= 30,40
-local w, h 				= (colSpacing+margin)*3, 500
+local colSpacing     = 250
+local bx, by         = 100,100
+local margin         = 10
+local tWidth,tHeight = 30,40
+local w, h           = (colSpacing+margin)*3, 500
 local exitX1,exitY1,exitX2,exitY2 = w-260, h-40, w-10, h-10
 
-local teamNames		= {}
-local teamColors	= {}
-local teamColorsDim	= {}
+local teamNames     = {}
+local teamColors    = {}
+local teamColorsDim = {}
 local awardList
 
-local maxRow 		= 8
-local fontHeight 	= 16
-
+local maxRow     = 8
+local fontHeight = 16
 
 function gadget:Initialize()
 	local tempTeamList = Spring.GetTeamList()
@@ -850,17 +842,16 @@ function gadget:Initialize()
 		local _, leaderPlayerID, _, isAI = spGetTeamInfo(team)
 		local name
 		if isAI then
-		  local _, aiName, _, shortName = Spring.GetAIInfo(team)
-		  name = aiName ..' ('.. shortName .. ')'
+			local _, aiName, _, shortName = Spring.GetAIInfo(team)
+			name = aiName ..' ('.. shortName .. ')'
 		else
-		  name = Spring.GetPlayerInfo(leaderPlayerID)
+			name = Spring.GetPlayerInfo(leaderPlayerID)
 		end
 		teamNames[team] = name
-		teamColors[team]  = {Spring.GetTeamColor(team)}
-		teamColorsDim[team]  = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
+		teamColors[team] = {Spring.GetTeamColor(team)}
+		teamColorsDim[team] = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
 	end
 	spSendCommands({'endgraph 0'})
-
 
 	gadgetHandler:AddSyncAction("aw_GameOver", gadget.GameOver)
 	if TESTMODE then
@@ -919,7 +910,7 @@ local function SendEconomyDataToWidget()
 					teamData.metal_spend_total .. " " ..
 					teamData.metal_spend_construction .. " " ..
 
-					teamData.metal_share_net  .. " " ..
+					teamData.metal_share_net .. " " ..
 
 					teamData.metal_storage_current .. " " ..
 
@@ -929,7 +920,7 @@ local function SendEconomyDataToWidget()
 					teamData.energy_spend_construction .. " " ..
 					teamData.energy_spend_other .. " " ..
 
-					teamData.energy_share_net  .. " " ..
+					teamData.energy_share_net .. " " ..
 
 					teamData.energy_storage_current
 				end
@@ -948,8 +939,8 @@ function gadget:GameOver()
 	--Spring.Echo("Game over (unsynced)")
 	-- reassign colors in case they have been changed locally
 	for _,team in pairs(totalTeamList) do
-		teamColors[team]  = {Spring.GetTeamColor(team)}
-		teamColorsDim[team]  = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
+		teamColors[team] = {Spring.GetTeamColor(team)}
+		teamColorsDim[team] = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
 	end
 
 	--// Resources
@@ -957,11 +948,9 @@ function gadget:GameOver()
 
 end
 
-
 function gadget:IsAboveCloseButton(x,y)
 	return (x > bx+exitX1) and (x < bx+exitX2) and (y > by+exitY1) and (y < by+exitY2)
 end
-
 
 function gadget:IsAbove(x,y)
 	if not gameOver then return false end
@@ -976,32 +965,30 @@ function gadget:IsAbove(x,y)
 	return above
 end
 
-
 function gadget:MousePress(x,y,button)
-  if (button==1) then
-	--Spring.Echo(self:IsAbove(x,y))
-    if (self:IsAbove(x,y)) then
-	  --Spring.Echo(self:IsAboveCloseButton(x,y))
-      if (self:IsAboveCloseButton(x,y)) then
-        --// close button clicked
-        if showGameOverWin then
-          spSendCommands('endgraph 1')
-        else
-          spSendCommands('endgraph 0')
-        end
-        showGameOverWin = not showGameOverWin
-        return true
-      end
-      windowCaught = true
-      cx = x-bx
-      cy = y-by
-      caught = true
-      return true
-    end
-  end
-  return false
+	if (button==1) then
+		--Spring.Echo(self:IsAbove(x,y))
+		if (self:IsAbove(x,y)) then
+			--Spring.Echo(self:IsAboveCloseButton(x,y))
+			if (self:IsAboveCloseButton(x,y)) then
+				--// close button clicked
+				if showGameOverWin then
+					spSendCommands('endgraph 1')
+				else
+					spSendCommands('endgraph 0')
+				end
+				showGameOverWin = not showGameOverWin
+				return true
+			end
+			windowCaught = true
+			cx = x-bx
+			cy = y-by
+			caught = true
+			return true
+		end
+	end
+	return false
 end
-
 
 function gadget:MouseRelease(x,y,button)
 	if (button==1) then
@@ -1015,7 +1002,6 @@ function gadget:MouseRelease(x,y,button)
 	return false
 end
 
-
 function gadget:MouseMove(x,y,button)
 	if (windowCaught) then
 		bx = x-cx
@@ -1025,7 +1011,6 @@ function gadget:MouseMove(x,y,button)
 		return false
 	end
 end
-
 
 function gadget:DrawScreen()
 	if gameOver then
@@ -1135,7 +1120,7 @@ function gadget:DrawScreen()
 									glScale(0.8,1,1)
 								end
 
-								fhDraw('  '..record, 0,0)
+								fhDraw(' '..record, 0,0)
 							glPopMatrix()
 
 						glPopMatrix()
