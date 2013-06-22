@@ -294,7 +294,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:STARFIRE]],
+      explosionGenerator      = [[custom:TESS]],
       fireStarter             = 55,
       impulseBoost            = 0,
       impulseFactor           = 0.8,
