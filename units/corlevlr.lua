@@ -103,7 +103,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:FLASH64]],
+      explosionGenerator      = [[custom:tremor]],
       impulseBoost            = 30,
       impulseFactor           = 0.5,
       interceptedByShieldType = 1,
