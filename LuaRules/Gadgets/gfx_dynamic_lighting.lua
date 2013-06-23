@@ -24,7 +24,7 @@ return {
 				-- put this gadget in a lower layer than fx_watersplash and exp_no_air_nuke
 				-- (which both want noGFX) so the short-circuit evaluation in gh:Explosion()
 				-- does not cut us out
-				enabled = false,
+				enabled = true,
 				layer   = -1,
 		}
 end
