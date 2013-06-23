@@ -198,6 +198,25 @@ local function AddEvent(str, unitDefID, color, sound, pos)
 			parent = panel_ticker;
 			OnClick = posTable;
 		}
+	
+		
+		-- implements button mouse functionality for the panel
+		function newLabel:HitTest(x,y) return self end
+		function newLabel:MouseDown(...)
+			local inherited = newLabel.inherited
+			self._down = true
+			inherited.MouseDown(self, ...)
+			return self
+		end
+	
+		function newLabel:MouseUp(...)
+			local inherited = newLabel.inherited
+			if (self._down) then
+				self._down = false
+				inherited.MouseUp(self, ...)
+				return self
+			end
+		end
 		
 		labels[#labels+1] = newLabel
 	end

@@ -498,6 +498,13 @@ function widget:Initialize()
 	UpdateRules()
 	WriteTooltipsOnce()
 	UpdateAnger()
+
+	-- Activate tooltips for labels, they do not have them in default chili
+	function label_anger:HitTest(x,y) return self end
+	function label_chickens:HitTest(x,y) return self end
+	function label_burrows:HitTest(x,y) return self end
+	function label_aggro:HitTest(x,y) return self end
+	function label_tech:HitTest(x,y) return self end
 end
 
 function widget:Shutdown()

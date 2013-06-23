@@ -9,7 +9,7 @@ Label = Control:Inherit{
   padding = {0,0,0,0},
 
   autosize = true,
-  autoObeyLineHeight = true, --// (needs autosize) if true, autosize will obey the lineHeight (-> texts with the same line count will have the same height)
+  autoObeyLineHeight = true, --// (needs autosize) if true, autosize will obey the lineHeight (-> texts with the same line count will have the same height) 
 
   align    = "left",
   valign   = "linecenter", --// usefull too "ascender"
@@ -81,13 +81,13 @@ end
 
 function Label:DrawControl()
   local font = self.font
-  font:DrawInBox(self._caption,0,0,self.width,self.height,self.align,self.valign)
+  font:DrawInBox(self._caption,self.x,self.y,self.width,self.height,self.align,self.valign)
 
   if (self.debug) then
     gl.Color(0,1,0,0.5)
     gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
     gl.LineWidth(2)
-    gl.Rect(0,0,self.width,self.height)
+    gl.Rect(self.x,self.y,self.x+self.width,self.y+self.height)
     gl.LineWidth(1)
     gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
   end

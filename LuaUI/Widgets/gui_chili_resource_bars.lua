@@ -270,13 +270,13 @@ function widget:GameFrame(n)
 	local totalOtherE = Format(-totalExpense + (WG.energyForOverdrive or 0) + totalConstruction + (WG.energyWasted or 0))
 	local totalConstruction = Format(-totalConstruction)
 	
-	trkbar_metal.tooltip = "Local Metal Economy" ..
+	bar_metal.tooltip = "Local Metal Economy" ..
 	"\nBase Extraction: " .. mexInc ..
 	"\nOverdrive: " .. odInc ..
 	"\nReclaim and Cons: " .. otherM ..
 	"\nSharing: " .. shareM .. 
 	"\nConstruction: " .. constuction ..
-	"\nReserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
+    "\nReserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
 	"\n" .. 
 	"\nTeam Metal Economy" ..
 	"\nTotal Income: " .. totalMetalIncome ..
@@ -288,12 +288,12 @@ function widget:GameFrame(n)
 	"\n" .. 
 	"\nTotal Stored: " .. totalMetalStored
 	
-	trkbar_energy.tooltip = "Local Energy Economy" ..
+	bar_energy.tooltip = "Local Energy Economy" ..
 	"\nIncome: " .. energyInc ..
 	"\nSharing & Overdrive: " .. energyShare .. 
 	"\nConstruction: " .. constuction .. 
 	"\nOther: " .. otherE ..
-	"\nReserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
+    "\nReserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
 	"\n" .. 
 	"\nTeam Energy Economy" ..
 	"\nIncome: " .. teamIncome .. 
@@ -489,7 +489,6 @@ function CreateWindow()
 		noDrawStep = true,
 		noDrawBar = true,
 		noDrawThumb = true,
-		useValueTooltip = false,
 	}
 	
 	Chili.Image:New{
@@ -586,7 +585,6 @@ function CreateWindow()
 		noDrawStep = true,
 		noDrawBar = true,
 		noDrawThumb = true,
-		useValueTooltip = false,
 	}
 	
 	Chili.Image:New{
@@ -616,7 +614,7 @@ function CreateWindow()
 		color  = {0.5,0.5,0.5,0.5},
 		height = p(100/bars),
 		right  = 26,
-		value = 0,
+		 value = 0,
 		min = 0,
 		max = 1,
 		right  = 36,
@@ -676,6 +674,18 @@ function CreateWindow()
 		font   = {size = 12, outline = true, color = {1,0,0,1}},
 		tooltip = "This is the energy demand of your economy, cloakers, shields and overdrive",
 	}
+	
+	-- Activate tooltips for lables and bars, they do not have them in default chili
+	function bar_metal:HitTest(x,y) return self	end
+	function bar_energy:HitTest(x,y) return self end
+    function trkbar_metal:HitTest(x,y) return bar_metal end
+    function trkbar_energy:HitTest(x,y) return bar_energy end
+	function lbl_energy:HitTest(x,y) return self end
+	function lbl_metal:HitTest(x,y) return self end
+	function lbl_e_income:HitTest(x,y) return self end
+	function lbl_m_income:HitTest(x,y) return self end
+	function lbl_e_expense:HitTest(x,y) return self end
+	function lbl_m_expense:HitTest(x,y) return self end
 
 	if not options.workerUsage.value then return end
 	-- worker usage
@@ -746,7 +756,7 @@ function ReserveState(teamID, metalStorageReserve, energyStorageReserve)
             trkbar_energy:SetValue(energyStorageReserve/(eStor - HIDDEN_STORAGE))
             bar_energy_reserve_overlay:SetValue(trkbar_energy.value)
         end
-        WG.energyStorageReserve = energyStorageReserve
+         WG.energyStorageReserve = energyStorageReserve
     end
 end
 

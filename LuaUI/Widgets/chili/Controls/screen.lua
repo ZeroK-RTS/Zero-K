@@ -43,19 +43,19 @@ end
 
 
 function Screen:OnGlobalDispose(obj)
-  if CompareLinks(self.activeControl, obj) then
+  if (UnlinkSafe(self.activeControl) == obj) then
     self.activeControl = nil
   end
 
-  if CompareLinks(self.hoveredControl, obj) then
+  if (UnlinkSafe(self.hoveredControl) == obj) then
     self.hoveredControl = nil
   end
 
-  if CompareLinks(self._lastHoveredControl, obj) then
+  if (UnlinkSafe(self._lastHoveredControl) == obj) then
     self._lastHoveredControl = nil
   end
 
-  if CompareLinks(self.focusedControl, obj) then
+  if (UnlinkSafe(self.focusedControl) == obj) then
     self.focusedControl = nil
   end
 end
@@ -138,7 +138,7 @@ function Screen:IsAbove(x,y,...)
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
   --// tooltip
-  if not CompareLinks(hoveredControl, self._lastHoveredControl) then
+  if (UnlinkSafe(hoveredControl) ~= UnlinkSafe(self._lastHoveredControl)) then
     if self._lastHoveredControl then
       self._lastHoveredControl:MouseOut()
     end
