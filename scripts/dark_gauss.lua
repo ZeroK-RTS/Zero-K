@@ -5,6 +5,7 @@ local concrete, belt = piece('Concrete','Belt');
 local wheel, arm, hand, cannon = piece('Wheel', 'Arm','Hand', 'Cannon');
 local barrel1, barrel2, barrel3, muzzle = piece("Barrel1","Barrel2","Barrel3","Muzzle");
 local lidLeft, lidRight = piece("lidLeft","lidRight");
+local aimProxy = piece("AimProxy");
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
@@ -110,11 +111,11 @@ end
 
 
 function script.QueryWeapon(n)
-	return muzzle 
+	return muzzle
 end
 
 function script.AimFromWeapon(n) 
-	return barrel3 
+	return aimProxy 
 end
 
 function script.AimWeapon(num, heading, pitch )
@@ -133,10 +134,10 @@ function script.AimWeapon(num, heading, pitch )
 
 	--Turn( cannon, y_axis, heading, 1.2 )
 	Turn( belt,  z_axis, heading, math.rad(200));
-	Turn( wheel, y_axis, -pitch-math.rad(30), math.rad(200));
-	Turn( arm, y_axis, math.rad(20),10);
-	Turn( hand, y_axis, math.rad(20),10);
-	Turn( cannon, y_axis, -math.rad(10),10);
+	Turn( wheel, y_axis, -math.rad(30), math.rad(200));
+	Turn( arm, y_axis, math.rad(30),10);
+	Turn( hand, y_axis, math.rad(30),10);
+	Turn( cannon, y_axis, -pitch-math.rad(30),10);
 	 
 	WaitForTurn (belt, z_axis)
 	WaitForTurn (wheel, y_axis)
@@ -148,9 +149,9 @@ end
 
 function script.FireWeapon(n)
 	EmitSfx(muzzle, 1024)
-	Move(barrel1,x_axis,-1,4);
-	Move(barrel2,x_axis,-1,5);
-	Move(barrel3,x_axis,-1,6);
+	Move(barrel1,x_axis,-1,5);
+	Move(barrel2,x_axis,-1,7);
+	Move(barrel3,x_axis,-1,9);
 	
 	Sleep(200);
 	Move(barrel3,x_axis,0,2);
