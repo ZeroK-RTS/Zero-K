@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armmanni]],
   name                = [[Penetrator]],
-  description         = [[Mobile Tachyon Accelerator (Artillery/Anti-Heavy)]],
+  description         = [[Mobile Tachyon Projector (Artillery/Anti-Heavy)]],
   acceleration        = 0.016,
   brakeRate           = 0.148,
   buildCostEnergy     = 1000,
