@@ -111,11 +111,13 @@ function DeployTeleport()
 	if GG.tele_ableToDeploy(unitID) then
 		deployed = true
 		StartThread(DeployTeleport_Thread)
+		Spring.SetUnitRulesParam(unitID, "deploy", 1)
 	end
 end
 
 function UndeployTeleport()
 	deployed = false
+	Spring.SetUnitRulesParam(unitID, "deploy", 0)
 	Turn( body , x_axis, math.rad(0), math.rad(90))
 	Move( body , z_axis, 0, 5 )
 	Turn( rthigh , x_axis, 0, math.rad(80)  )
