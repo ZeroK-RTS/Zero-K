@@ -130,13 +130,14 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		msgBoxPersistent.width = width
 		msgBoxPersistent.height = height + PERSISTENT_SUBBAR_HEIGHT
 		msgBoxPersistent.x = vsx - width
+		
+		local x = ((imageDir and imagePersistent.width + imagePersistent.x) or 0) + 5
 		if imageDir then
 			imagePersistent.width = height * 0.8
 			imagePersistent.height = height * 0.8
 			imagePersistent.file = imageDir
 			imagePersistent.color = {1, 1, 1, 1}
 			
-			local x = imagePersistent.width + imagePersistent.x + 5
 			scrollPersistent.width = (width - x - 8)
 		else
 			imagePersistent.color = {1, 1, 1, 0}
@@ -146,9 +147,21 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		
 		scrollPersistent.height	= height - 8 - 8
 		--scrollPersistent:Invalidate()
-		textPersistent:SetText(text or '')
-		textPersistent.font.size = fontsize or 12
-		textPersistent:Invalidate()	-- for some reason the text can fail to update without this
+		
+		-- recreate textbox to make sure it never fails to update text
+		textPersistent:Dispose()
+		
+		textPersistent = Chili.TextBox:New{
+			text    = text or '',
+			align   = "left";
+			width = (width - x - 12),
+			padding = {5, 5, 5, 5},
+			font    = {
+				size   = fontsize or 12;
+				shadow = true;
+			},
+		}	
+		scrollPersistent:AddChild(textPersistent)
 		
 		scrollPersistent:SetScrollPos(nil, 0)
 		countLabelPersistent:SetCaption(persistentMsgIndex .. "/" .. #persistentMsgHistory)
@@ -549,9 +562,9 @@ function widget:Update(dt)
 	timer = timer + dt
 	if timer >= 5 then
 		if bool then
-			WG.ShowPersistentMessageBox("Now you see me...", 300, 100, 12, "LuaUI/Images/advisor2.jpg")  
+			WG.ShowPersistentMessageBox("Now you see me...", 320, 100, 12, "LuaUI/Images/advisor2.jpg")  
 		else
-			WG.ShowPersistentMessageBox("Now you don't!", 300, 100, 14, nil)  
+			WG.ShowPersistentMessageBox("Now you don't!", 320, 100, 14, nil)  
 		end
 		timer = 0
 		bool = not bool
