@@ -252,6 +252,26 @@ local options = {
     },
   },
   {
+    key = "air_ploppable",
+    name = "Unploppable Air",
+    desc = "Choose whether Air/Gunships are ploppable or not",
+    type = "list",
+    section= 'startconds',
+    def = "true",
+    items = {
+      {
+        key  = "true",
+        name = "Ploppable",
+        desc = "Ploppable",
+      },
+      {
+        key  = "false",
+        name = "Unploppable",
+        desc = "Unploppable",
+      },
+    },
+  },
+  {
     key = "overdrivesharingscheme",
     name = "Overdrive Resource Distribution Scheme",
     desc = "Different scheme designed for distributing overdrive share.",
