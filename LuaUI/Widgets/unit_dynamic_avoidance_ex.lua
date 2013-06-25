@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "May 25, 2013",
+    date      = "May 25, 2013", --clean up June 25, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -69,7 +69,7 @@ local mathRandom = math.random
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
-local isOldSpring_g = 1 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
+local isOldSpring_g = ((Game.version:find('91.0') and (Game.version:find('91.0.1') == nil)) and 1) or 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
 local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
 local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
@@ -194,12 +194,7 @@ options = {
 		name = "Find base",
 		type = 'bool',
 		value = true,
-		desc = "Allow constructor to return to base when having area-reclaim or area-ressurect command, else it will return to center of the circle when retreating. Enabling this function will also enable the \'Receive Indicator\' widget. \n\nTips: build 3 new buildings at new location to identify as base, unit will automatically select nearest base. Default:On",
-		OnChange = function(self) 
-			if self.value==true then
-				spSendCommands("luaui enablewidget Receive Units Indicator")
-			end
-		end,
+		desc = "Allow constructor to return to base when having area-reclaim or area-ressurect command, else it will return to center of the circle when retreating. \n\nTips: build 3 new buildings at new location to identify as base, unit will automatically select nearest base. Default:On",
 	},
 	consRetreatTimeoutOption = {
 		name = 'Constructor retreat auto-expire:',
@@ -1785,7 +1780,7 @@ local safeHavenCoordinates = {}
 function FindSafeHavenForCons(unitID, now)
 	local myTeamID = myTeamID_gbl
 	----
-	if options.enableReturnToBase.value==false or WG.recvIndicator == nil then --//if epicmenu option 'Return To Base' is false then return nil
+	if options.enableReturnToBase.value==false or WG.OPTICS_cluster == nil then --//if epicmenu option 'Return To Base' is false then return nil
 		return nil
 	end
 	--Spring.Echo((now - safeHavenLastUpdate))
@@ -1813,7 +1808,7 @@ function FindSafeHavenForCons(unitID, now)
 				unorderedUnitList[unitID_list] = {x,y,z} --//store
 			end
 		end
-		local cluster, _ = WG.recvIndicator.OPTICS_cluster(unorderedUnitList, 600,3, myTeamID,300) --//find clusters with atleast 3 unit per cluster and with at least within 300-meter from each other 
+		local cluster, _ = WG.OPTICS_cluster(unorderedUnitList, 600,3, myTeamID,300) --//find clusters with atleast 3 unit per cluster and with at least within 300-meter from each other 
 		for index=1 , #cluster do
 			local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 			for unitIndex=1, #cluster[index] do
