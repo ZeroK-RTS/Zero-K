@@ -404,6 +404,9 @@ function AddParticlesArray(array)
   end
 end
 
+function GetParticles(particlesID)
+  return particles[particlesID]
+end
 
 function RemoveParticles(particlesID)
   local fx = particles[particlesID]
@@ -1030,6 +1033,7 @@ local function Initialize()
   GG.Lups.GetStats          = GetStats
   GG.Lups.GetErrorLog       = GetErrorLog
   GG.Lups.AddParticles      = AddParticles
+  GG.Lups.GetParticles      = GetParticles
   GG.Lups.RemoveParticles   = RemoveParticles
   GG.Lups.AddParticlesArray = AddParticlesArray
   GG.Lups.HasParticleClass  = HasParticleClass
