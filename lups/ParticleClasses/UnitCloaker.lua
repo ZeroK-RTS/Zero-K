@@ -279,7 +279,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function UnitCloaker.Create(Options)
-  SetUnitLuaDraw(Options.unit,true)
+  --SetUnitLuaDraw(Options.unit,true)
   local newObject = MergeTable(Options, UnitCloaker.Default)
   setmetatable(newObject,UnitCloaker)  -- make handle lookup
   newObject:CreateParticle()
@@ -287,7 +287,7 @@ function UnitCloaker.Create(Options)
 end
 
 function UnitCloaker:Destroy()
-  SetUnitLuaDraw(self.unit,false)
+  --SetUnitLuaDraw(self.unit,false)
 end
 
 -----------------------------------------------------------------------------------------------------------------
