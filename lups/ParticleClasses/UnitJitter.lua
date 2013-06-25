@@ -282,7 +282,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function UnitJitter.Create(Options)
-  SetUnitLuaDraw(Options.unit,true)
+  --SetUnitLuaDraw(Options.unit,true)
 
   local newObject = MergeTable(Options, UnitJitter.Default)
   setmetatable(newObject,UnitJitter)  -- make handle lookup
@@ -291,7 +291,7 @@ function UnitJitter.Create(Options)
 end
 
 function UnitJitter:Destroy()
-  SetUnitLuaDraw(self.unit,false)
+  --SetUnitLuaDraw(self.unit,false)
 end
 
 -----------------------------------------------------------------------------------------------------------------
