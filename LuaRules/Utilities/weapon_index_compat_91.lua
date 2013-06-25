@@ -9,8 +9,8 @@ if (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil)) then
     SetUnitWeaponState(unitID, weaponNum - 1, ...)
   end
   
-  function Spring.GetUnitWeaponState(unitID, weaponNum)
-    return GetUnitWeaponState(unitID, weaponNum - 1)
+  function Spring.GetUnitWeaponState(unitID, weaponNum, tag)
+    return GetUnitWeaponState(unitID, weaponNum - 1, tag)
   end
   
   function Spring.GetUnitWeaponVectors(unitID, weaponNum)
