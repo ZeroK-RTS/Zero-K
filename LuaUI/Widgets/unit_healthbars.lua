@@ -24,7 +24,8 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local isOldSpring = 0 --//for backward compatibility with old weapon indice. Set to 1 for Spring less than 94.1+
+--//for backward compatibility with old weapon indice. Set to 1 for Spring less than 94.1+
+local reverseCompat = ((Game.version:find('91.0') and (Game.version:find('91.0.1') == nil)) and 1) or 0 
 
 local barHeight = 3
 local barWidth  = 14  --// (barWidth)x2 total width!!!
@@ -754,10 +755,10 @@ do
 	  
       --// RELOAD
       if (ci.reloadTime>=options.minReloadTime.value) then
-        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,ci.primaryWeapon - isOldSpring)
+        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,ci.primaryWeapon - reverseCompat)
         if (reloaded==false) then
 		  local slowState = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
-		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon - isOldSpring , 'reloadTime')
+		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon - reverseCompat , 'reloadTime')
 		  ci.reloadTime = reloadTime
           reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
 		  if (reload >= 0) then

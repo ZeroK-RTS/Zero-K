@@ -40,6 +40,7 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return false
 end
 
+local reverseCompat = (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil)) and 1 or 0
 
 -- This lists all callins which may be wrapped in a coroutine (thread).
 -- The ones which should not be thread-wrapped are commented out.
@@ -126,6 +127,8 @@ local sp_WaitForTurn = Spring.UnitScript.WaitForTurn
 local sp_SetPieceVisibility = Spring.UnitScript.SetPieceVisibility
 local sp_SetDeathScriptFinished = Spring.UnitScript.SetDeathScriptFinished
 
+local LUA_WEAPON_MIN_INDEX = 1 - reverseCompat
+local LUA_WEAPON_MAX_INDEX = LUA_WEAPON_MIN_INDEX + 31
 
 local UNITSCRIPT_DIR = (UNITSCRIPT_DIR or "scripts/"):lower()
 local VFSMODE = VFS.ZIP_ONLY
@@ -446,7 +449,7 @@ end
 
 function Spring.UnitScript.GetLongestReloadTime(unitID)
 	local longest = 0
-	for i=1,32 do
+	for i = LUA_WEAPON_MIN_INDEX, LUA_WEAPON_MAX_INDEX do
 		local reloadTime = sp_GetUnitWeaponState(unitID, i, "reloadTime")
 		if (not reloadTime) then break end
 		if (reloadTime > longest) then longest = reloadTime end
@@ -580,7 +583,6 @@ local function Wrap_AimWeapon(unitID, callins)
 	local function AimWeaponThread(weaponNum, heading, pitch)
 		local bAimReady = AimWeapon(weaponNum, heading, pitch) or false
 		local fAimReady = (bAimReady and 1.0) or 0.0
-
 		return sp_SetUnitWeaponState(unitID, weaponNum, "aimReady", fAimReady)
 	end
 
