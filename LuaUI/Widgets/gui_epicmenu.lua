@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.316 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.317 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-06-12
+    date      = "2009-06-02", --2013-06-26
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -1829,8 +1829,8 @@ MakeSubWindowSearch = function(path)
 					for i=1, #option.items do
 						local item = option.items[i]
 						item.wname = option.wname.."radioButton"
-						lowercase_name = item.name:lower()
-						lowercase_desc = item.desc:lower()
+						lowercase_name = item.name and item.name:lower() or ''
+						lowercase_desc = item.desc and item.desc:lower() or ''
 						local hotkeystring = GetHotkeyData(currentPath, item)
 						local lowercase_hotkey = hotkeystring:lower()
 						local found = lowercase_name:find(filterUserInsertedTerm) or lowercase_desc:find(filterUserInsertedTerm) or lowercase_hotkey:find(filterUserInsertedTerm)
