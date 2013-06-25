@@ -98,8 +98,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 9.558,
-        planes  = 9.558,
+        default = 12.213,
+        planes  = 12.213,
         subs    = 0.61,
       },
 

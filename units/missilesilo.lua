@@ -21,7 +21,6 @@ unitDef = {
 
   buildPic                      = [[missilesilo.png]],
   buildTime                     = 1200,
-  canAttack                     = true,
   canFight                      = false,
   canMove                       = false,
   canPatrol                     = false,
