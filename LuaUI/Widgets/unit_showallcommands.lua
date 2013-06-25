@@ -10,7 +10,7 @@ function widget:GetInfo()
     date      = "Mar 1, 2009",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -24,13 +24,19 @@ local spIsUnitSelected = Spring.IsUnitSelected
 local drawUnits = {}
 
 options_path = 'Settings/Interface/Command Visibility'
-options_order = { 'showonlyonshift'}
+options_order = { 'showonlyonshift', "showforselected"}
 options = {
 	
 	showonlyonshift = {
 		name = 'Show only on shift',
 		type = 'bool',
 		value = false,
+		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
+	},	
+	showforselected = {
+		name = 'Show for selected units',
+		type = 'bool',
+		value = true,
 		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
 	},
 }
@@ -39,7 +45,7 @@ function widget:DrawWorld()
 
 	if not spIsGUIHidden()  then
 		for i, v in pairs(drawUnits) do
-			if i and (not options.showonlyonshift.value or select(4,spGetModKeyState()) or (spIsUnitSelected(i) and true)) then
+			if i and (not options.showonlyonshift.value or select(4,spGetModKeyState()) or (spIsUnitSelected(i) and showforselected)) then
 				spDrawUnitCommands(i)
 			end
 		end
