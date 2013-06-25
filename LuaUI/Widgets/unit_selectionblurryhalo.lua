@@ -275,18 +275,13 @@ function widget:Initialize()
 
   blurShader_h = gl.CreateShader({
     fragment = [[
-      float kernel[7]; // = float[7]( 0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);
+      float kernel[2]; // = float[7]( 0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);
       uniform sampler2D tex0;
       uniform int screenX;
 
       void InitKernel(void) {
-        kernel[0] = 0.013;
-        kernel[1] = 0.054;
-        kernel[2] = 0.069;
-        kernel[3] = 0.129;
-        kernel[4] = 0.212;
-        kernel[5] = 0.301;
-        kernel[6] = 0.372;
+        kernel[0] = 0.6;
+        kernel[1] = 0.7;
       }
 
       void main(void) {
@@ -300,7 +295,7 @@ function widget:Initialize()
         vec2 tc1 = gl_TexCoord[0].st;
         vec2 tc2 = gl_TexCoord[0].st;
 
-        for(n=6; n>= 0; --n){
+        for(n=1; n>= 0; --n){
           tc1.s += pixelsize;
           tc2.s -= pixelsize;
           gl_FragColor += kernel[n] * ( texture2D(tex0, tc1 )+texture2D(tex0, tc2 ) );
@@ -322,18 +317,13 @@ function widget:Initialize()
 
   blurShader_v = gl.CreateShader({
     fragment = [[
-      float kernel[7]; // = float[7]( 0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);
+      float kernel[2]; // = float[7]( 0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);
       uniform sampler2D tex0;
       uniform int screenY;
 
       void InitKernel(void) {
-        kernel[0] = 0.013;
-        kernel[1] = 0.054;
-        kernel[2] = 0.069;
-        kernel[3] = 0.129;
-        kernel[4] = 0.212;
-        kernel[5] = 0.301;
-        kernel[6] = 0.372;
+        kernel[0] = 0.6;
+        kernel[1] = 0.7;
       }
 
       void main(void) {
@@ -347,7 +337,7 @@ function widget:Initialize()
         vec2 tc1 = gl_TexCoord[0].st;
         vec2 tc2 = gl_TexCoord[0].st;
 
-        for(n=6; n>= 0; --n){
+        for(n=1; n>= 0; --n){
           tc1.t += pixelsize;
           tc2.t -= pixelsize;
           gl_FragColor += kernel[n] * ( texture2D(tex0, tc1 )+texture2D(tex0, tc2 ) );
