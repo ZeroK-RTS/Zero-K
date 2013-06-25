@@ -812,11 +812,7 @@ for i=1,#weaponsList do
 			local newName = name.."_"..form
 			weapons[newName] = CopyTable(weapon, true)
 			upgrades[newName] = CopyTable(upgrades[name], true)
-			
-			local weapon2 = weapons[newName]
-			local modded = CopyTable(mods)
-			MergeTable(modded, weapon2, true)
-			weapons[newName] = modded
+			weapons[newName] = MergeTable(mods, weapons[newName], true)
 		end
 	end
 end
