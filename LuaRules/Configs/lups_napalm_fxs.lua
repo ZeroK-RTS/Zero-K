@@ -74,12 +74,12 @@ local heat = {
 
 for name,def in pairs(napalm) do
 	if name ~= "default" then
-		Spring.Utilities.MergeTable(napalm.default,def,true)
+		napalm[name] = Spring.Utilities.MergeTable(def,napalm.default,true)
 	end
 end
 for name,def in pairs(heat) do
 	if name ~= "default" then
-		Spring.Utilities.MergeTable(heat.default,def,true)
+		heat[name] = Spring.Utilities.MergeTable(def,heat.default,true)
 	end
 end
 
