@@ -44,7 +44,8 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[ARMPB]],
+  objectName                    = [[grim_gauss.dae]],
+  script                 		= [[armpb.lua]],
   seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
  
@@ -131,7 +132,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 2250,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -144,29 +145,8 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Gauss]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 2250,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 160,
-      object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 160,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
+    
+    
     HEAP  = {
       description      = [[Debris - Gauss]],
       blocking         = false,
