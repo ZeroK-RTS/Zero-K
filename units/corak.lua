@@ -6,18 +6,15 @@ unitDef = {
   brakeRate              = 0.4,
   buildCostEnergy        = 80,
   buildCostMetal         = 80,
-  builder                = false,
   buildPic               = [[CORAK.png]],
   buildTime              = 80,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[25 29 25]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -42,15 +39,13 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 88,
   maxDamage              = 250,
   maxSlope               = 36,
   maxVelocity            = 3,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[mbot.s3o]],
   script				 = [[corak.lua]],
   seismicSignature       = 4,
@@ -64,9 +59,7 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
   sightDistance          = 500,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -74,7 +67,6 @@ unitDef = {
   trackWidth             = 18,
   turnRate               = 2500,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -85,7 +77,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -111,17 +102,15 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 240,
       reloadtime              = 0.107,
-      renderType              = 0,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/small_laser_fire2]],
       soundTrigger            = true,
       targetMoveError         = 0.15,
-      thickness               = 2.54950975679639,
+      thickness               = 2.55,
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
@@ -130,68 +119,47 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Bandit]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 250,
       energy           = 0,
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 32,
       object           = [[mbot_d.s3o]],
       reclaimable      = true,
       reclaimTime      = 32,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     DEAD2 = {
       description      = [[Debris - Bandit]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 250,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 32,
       object           = [[debris2x2b.s3o]],
       reclaimable      = true,
       reclaimTime      = 32,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Bandit]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 250,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 16,
       object           = [[debris2x2b.s3o]],
       reclaimable      = true,
       reclaimTime      = 16,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

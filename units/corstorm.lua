@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.2,
   buildCostEnergy        = 120,
   buildCostMetal         = 120,
-  builder                = false,
   buildPic               = [[CORSTORM.png]],
   buildTime              = 120,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[28 42 28]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -41,15 +39,13 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 124,
   maxDamage              = 570,
   maxSlope               = 36,
   maxVelocity            = 1.95,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[storm.s3o]],
   script                 = [[corstorm.lua]],
   seismicSignature       = 4,
@@ -64,9 +60,7 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
   sightDistance          = 583,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -74,7 +68,6 @@ unitDef = {
   trackWidth             = 22,
   turnRate               = 2200,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -84,7 +77,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -122,75 +114,53 @@ unitDef = {
       trajectoryHeight        = 0.6,
       turnrate                = 1000,
       turret                  = true,
-      weaponTimer             = 3.5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 170,
     },
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Rogue]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 570,
       energy           = 0,
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 48,
       object           = [[storm_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 48,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     DEAD2 = {
       description      = [[Debris - Rogue]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 570,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 48,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 48,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Rogue]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 570,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 24,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 24,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

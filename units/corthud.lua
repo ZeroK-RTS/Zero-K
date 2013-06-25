@@ -7,7 +7,6 @@ unitDef = {
   brakeRate           = 0.22,
   buildCostEnergy     = 180,
   buildCostMetal      = 180,
-  builder             = false,
   buildPic            = [[CORTHUD.png]],
   buildTime           = 180,
   canAttack           = true,
@@ -34,15 +33,13 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 147,
   maxDamage           = 960,
   maxSlope            = 36,
   maxVelocity         = 1.925,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[thud.s3o]],
   onoffable           = false,
   script			  = [[corthud.lua]],
@@ -59,9 +56,7 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 420,
-  smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -69,7 +64,6 @@ unitDef = {
   trackWidth          = 22,
   turnRate            = 2000,
   upright             = true,
-  workerTime          = 0,
 
   weapons             = {
 
@@ -79,27 +73,22 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
     {
       def = [[SHIELD]],
     },
 
   },
 
-
   weaponDefs          = {
 
     SHIELD      = {
       name                    = [[Energy Shield]],
-      craterMult              = 0,
 
       damage                  = {
         default = 10,
       },
 
       exteriorShield          = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
       shieldAlpha             = 0.2,
       shieldBadColor          = [[1 0.1 0.1]],
       shieldGoodColor         = [[0.1 0.1 1]],
@@ -118,7 +107,6 @@ unitDef = {
       weaponType              = [[Shield]],
     },
 
-
     THUD_WEAPON = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 36,
@@ -135,12 +123,10 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      minbarrelangle          = [[-35]],
       range                   = 280,
       reloadtime              = 4,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire5]],
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 200,
@@ -148,47 +134,33 @@ unitDef = {
 
   },
 
-
   featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Thug]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 960,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 72,
       object           = [[thug_d.s3o]],
       reclaimable      = true,
       reclaimTime      = 72,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Thug]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 960,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 36,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 36,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

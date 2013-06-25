@@ -6,14 +6,12 @@ unitDef = {
   brakeRate              = 0.25,
   buildCostEnergy        = 350,
   buildCostMetal         = 350,
-  builder                = false,
   buildPic               = [[SHIELDARTY.png]],
   buildTime              = 350,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND]],
   corpse                 = [[DEAD]],
 
@@ -28,7 +26,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 248,
   maxDamage              = 950,
   maxSlope               = 36,
   maxVelocity            = 1.8,
@@ -37,8 +34,7 @@ unitDef = {
   modelCenterOffset      = [[0 0 0]],
   movementClass          = [[KBOT2]],
   moveState              = 0,
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[dominator.s3o]],
   script                 = [[shieldarty.lua]],
   seismicSignature       = 4,
@@ -53,9 +49,7 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 325,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -63,7 +57,6 @@ unitDef = {
   trackWidth             = 22,
   turnRate               = 1800,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -74,7 +67,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
     EMP_ROCKET = {
@@ -87,11 +79,8 @@ unitDef = {
 
       damage                  = {
         default        = 1500,
-        empresistant75 = 375,
-        empresistant99 = 15,
         planes         = 1500,
       },
-      
 
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
@@ -100,7 +89,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
-      metalpershot            = 0,
       model                   = [[wep_merl.s3o]],
       noSelfDamage            = true,
       paralyzer               = true,
@@ -110,7 +98,6 @@ unitDef = {
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_emp_hit]],
       soundStart              = [[weapon/missile/missile_launch_high]],
-      startsmoke              = [[1]],
       texture1                = [[null]], --flare
       tolerance               = 4000,
       weaponAcceleration      = 300,
@@ -120,46 +107,33 @@ unitDef = {
     },
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Racketeer]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 950,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 140,
       object           = [[dominator_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 140,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
       description      = [[Debris - Racketeer]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 950,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 70,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 70,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

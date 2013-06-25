@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.45,
   buildCostEnergy        = 90,
   buildCostMetal         = 90,
-  builder                = false,
   buildPic               = [[CORCRASH.png]],
   buildTime              = 90,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 41 30]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -42,7 +40,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 123,
   maxDamage              = 650,
   maxSlope               = 36,
   maxVelocity            = 2.7,
@@ -50,8 +47,7 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0,
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[crasher.s3o]],
   script                 = [[corcrash.lua]],
   seismicSignature       = 4,
@@ -65,7 +61,6 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
   sightDistance          = 660,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -84,7 +79,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -123,54 +117,38 @@ unitDef = {
       turnRate                = 63000,
       turret                  = true,
       weaponAcceleration      = 141,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 850,
     },
 
   },
 
-
   featureDefs            = {
 
     DEAD = {
       description      = [[Wreckage - Vandal]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 650,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 36,
       object           = [[crasher_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 36,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP = {
       description      = [[Debris - Vandal]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 650,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 18,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
-      reclaimTime      = 18,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

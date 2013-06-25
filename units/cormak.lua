@@ -6,18 +6,15 @@ unitDef = {
   brakeRate              = 0.22,
   buildCostEnergy        = 250,
   buildCostMetal         = 250,
-  builder                = false,
   buildPic               = [[cormak.png]],
   buildTime              = 250,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[46 48 37]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -38,15 +35,13 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 177,
   maxDamage              = 1050,
   maxSlope               = 36,
   maxVelocity            = 1.5,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[behethud.s3o]],
   onoffable              = true,
   seismicSignature       = 4,
@@ -65,9 +60,7 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
   sightDistance          = 347,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -75,7 +68,6 @@ unitDef = {
   trackWidth             = 22,
   turnRate               = 2000,
   upright                = true,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -85,13 +77,11 @@ unitDef = {
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
     },
 
-
     {
       def                = [[BLAST]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
     },
-
 
     {
       def                = [[FAKEGUN2]],
@@ -100,7 +90,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -115,7 +104,7 @@ unitDef = {
         planes  = 20,
         subs    = 0.1,
       },
-	  
+
       customParams           = {
 	    lups_explodespeed = 1,
 	    lups_explodelife = 0.6,
@@ -132,14 +121,11 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 300,
       reloadtime              = 0.95,
-      renderType              = 4,
       soundHitVolume          = 1,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 230,
     },
-
 
     FAKEGUN1 = {
       name                    = [[Fake Weapon]],
@@ -176,7 +162,6 @@ unitDef = {
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 200,
     },
-
 
     FAKEGUN2 = {
       name                    = [[Fake Weapon]],
@@ -217,44 +202,31 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Outlaw]],
       blocking         = true,
-      catagory         = [[corcorpses]],
       damage           = 1050,
       featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[10]],
-      hitdensity       = [[23]],
       metal            = 100,
       object           = [[behethud_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 100,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[all]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Outlaw]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1050,
-      featurereclamate = [[smudge01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[4]],
       metal            = 50,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 50,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[all]],
     },
 
   },

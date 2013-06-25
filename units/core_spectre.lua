@@ -7,18 +7,15 @@ unitDef = {
   brakeRate              = 0.25,
   buildCostEnergy        = 550,
   buildCostMetal         = 550,
-  builder                = false,
   buildPic               = [[core_spectre.png]],
   buildTime              = 550,
   canAttack              = false,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND UNARMED]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[34 39 29]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
@@ -40,7 +37,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 212,
   maxDamage              = 700,
   maxSlope               = 36,
   maxVelocity            = 2.05,
@@ -48,15 +44,12 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   moveState              = 0,
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[m-8.s3o]],
   onoffable              = false,
   pushResistant          = 0,
   script                 = [[core_spectre.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[Core]],
   sightDistance          = 300,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -65,7 +58,6 @@ unitDef = {
   trackWidth             = 30,
   turnRate               = 2100,
   upright                = false,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -75,20 +67,16 @@ unitDef = {
 
   },
 
-
   weaponDefs             = {
 
     COR_SHIELD_SMALL = {
       name                    = [[Energy Shield]],
-      craterMult              = 0,
 
       damage                  = {
         default = 10,
       },
 
       exteriorShield          = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
       shieldAlpha             = 0.2,
       shieldBadColor          = [[1 0.1 0.1]],
       shieldGoodColor         = [[0.1 0.1 1]],
@@ -108,47 +96,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD = {
       description      = [[Wreckage - Aspis]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 700,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 1,
       footprintZ       = 1,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 220,
       object           = [[shield_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 220,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP = {
       description      = [[Debris - Aspis]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 700,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 1,
       footprintZ       = 1,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 110,
       object           = [[debris1x1a.s3o]],
       reclaimable      = true,
       reclaimTime      = 110,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

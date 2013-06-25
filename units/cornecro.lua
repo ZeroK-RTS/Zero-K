@@ -43,7 +43,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 132,
   maxDamage           = 650,
   maxSlope            = 36,
   maxVelocity         = 2,
@@ -51,17 +50,13 @@ unitDef = {
   metalMake           = 0.15,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[conbot.s3o]],
   onoffable           = false,
   script			  = [[cornecro.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   showNanoSpray       = false,
-  side                = [[CORE]],
   sightDistance       = 375,
-  smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -71,7 +66,7 @@ unitDef = {
   turnRate            = 2200,
   upright             = true,
   workerTime          = 5,
-  
+
   weapons             = {
 
     {
@@ -79,20 +74,17 @@ unitDef = {
     },
 
   },
-  
+
   weaponDefs          = {
 
     SHIELD      = {
       name                    = [[Energy Shield]],
-      craterMult              = 0,
 
       damage                  = {
         default = 10,
       },
 
       exteriorShield          = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
       shieldAlpha             = 0.2,
       shieldBadColor          = [[1 0.1 0.1]],
       shieldGoodColor         = [[0.1 0.1 1]],
@@ -110,7 +102,7 @@ unitDef = {
       visibleShieldRepulse    = true,
       weaponType              = [[Shield]],
     },
-	
+
   },
 
   featureDefs         = {
@@ -118,41 +110,28 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Convict]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 650,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 56,
       object           = [[conbot_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 56,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Convict]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 650,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 28,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
       reclaimTime      = 28,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

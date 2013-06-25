@@ -7,7 +7,6 @@ unitDef = {
   brakeRate              = 0.4,
   buildCostEnergy        = 160,
   buildCostMetal         = 160,
-  builder                = false,
   buildPic               = [[CORROACH.png]],
   buildTime              = 160,
   canAttack              = true,
@@ -17,7 +16,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets  = [[0 0 0]],
   collisionVolumeScales   = [[14 14 14]],
-  collisionVolumeTest	  = 1,
   collisionVolumeType	  = [[ellipsoid]],
   cloakCost              = 0,
 
@@ -46,15 +44,13 @@ unitDef = {
   kamikaze               = true,
   kamikazeDistance       = 80,
   kamikazeUseLOS         = true,
-  mass                   = 105,
   maxDamage              = 60,
   maxSlope               = 36,
   maxVelocity            = 4,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
   movementClass          = [[KBOT1]],
-  noAutoFire             = false,
-  noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[logroach.s3o]],
   pushResistant          = 0,
   script                 = [[corroach.lua]],
@@ -72,11 +68,8 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
   sightDistance          = 240,
-  smoothAnim             = true,
   turnRate               = 3000,
-  workerTime             = 0,
 }
 
 return lowerkeys({ corroach = unitDef })

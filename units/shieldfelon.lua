@@ -7,7 +7,6 @@ unitDef = {
   brakeRate           = 0.22,
   buildCostEnergy     = 620,
   buildCostMetal      = 620,
-  builder             = false,
   buildPic            = [[shieldfelon.png]],
   buildTime           = 620,
   canAttack           = true,
@@ -28,15 +27,13 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 300,
   maxDamage           = 1400,
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[shieldfelon.s3o]],
   onoffable           = false,
   script              = [[shieldfelon.lua]],
@@ -51,7 +48,6 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 520,
   trackOffset         = 0,
   trackStrength       = 8,
@@ -60,7 +56,6 @@ unitDef = {
   trackWidth          = 30,
   turnRate            = 1000,
   upright             = true,
-  workerTime          = 0,
 
   weapons             = {
     {
@@ -75,20 +70,16 @@ unitDef = {
     },
   },
 
-
   weaponDefs          = {
-	
+
     SHIELD      = {
       name                    = [[Energy Shield]],
-      craterMult              = 0,
 
       damage                  = {
         default = 10,
       },
 
       exteriorShield          = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
       shieldAlpha             = 0.4,
       shieldBadColor          = [[1 0.1 0.1]],
       shieldGoodColor         = [[0.1 0.1 1]],
@@ -106,7 +97,7 @@ unitDef = {
       visibleShieldRepulse    = true,
       weaponType              = [[Shield]],
     },
-	
+
     SHIELDGUN = {
       name                    = [[Shield Gun]],
       areaOfEffect            = 8,
@@ -131,7 +122,6 @@ unitDef = {
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,
       soundTrigger            = true,
-      startsmoke              = [[1]],
       targetMoveError         = 0,
       texture1                = [[corelaser]],
       thickness               = 2,
@@ -141,47 +131,33 @@ unitDef = {
 
   },
 
-
   featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Felon]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1400,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 248,
       object           = [[shieldfelon_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 248,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Felon]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1400,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 124,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 124,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
