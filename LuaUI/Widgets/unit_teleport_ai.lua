@@ -7,8 +7,7 @@ function widget:GetInfo()
     date      = "24 June 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
-    enabled   = true,
-	experimental = true --will auto disable in stable (I think)
+    enabled   = false,
   }
 end
 
