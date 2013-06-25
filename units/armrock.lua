@@ -99,7 +99,7 @@ unitDef = {
       },
 
       fireStarter             = 70,
-      flightTime              = 2,
+      flightTime              = 2.1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -119,7 +119,7 @@ unitDef = {
       turret                  = true,
       weaponAcceleration      = 190,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 180,
+      weaponVelocity          = 200,
     },
 
   },
