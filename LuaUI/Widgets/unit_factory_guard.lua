@@ -56,7 +56,7 @@ local factoryDefs = {
 	[UnitDefNames["factorytank"].id] = 0,
 	[UnitDefNames["factoryplane"].id] = 0,
 	[UnitDefNames["factorygunship"].id] = 0,
-	[UnitDefNames["corsy"].id] = 0,
+	[UnitDefNames["factoryship"].id] = 0,
 }
 
 local factories = {}

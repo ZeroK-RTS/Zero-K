@@ -422,7 +422,7 @@ AddFactoryOfUnits("factoryamph")
 AddFactoryOfUnits("factoryspider")
 AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
-AddFactoryOfUnits("corsy")
+AddFactoryOfUnits("factoryship")
 
 addUnit("striderhub","Mech")
 addUnit("armcsa","Mech")

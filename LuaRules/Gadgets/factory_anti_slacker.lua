@@ -19,7 +19,7 @@ local spGetUnitIsDead = Spring.GetUnitIsDead
 
 local noEject = {
 	[UnitDefNames["missilesilo"].id] = true,
-	[UnitDefNames["corsy"].id] = true,
+	[UnitDefNames["factoryship"].id] = true,
 	[UnitDefNames["factoryplane"].id] = true,
 	[UnitDefNames["factorygunship"].id] = true,
 }

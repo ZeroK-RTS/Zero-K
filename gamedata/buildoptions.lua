@@ -20,7 +20,7 @@ local buildOpts = {
 	[[factoryjump]],
 	[[factorytank]],
     [[striderhub]],
-	[[corsy]],
+	[[factoryship]],
 	[[corrad]],
 	[[armarad]],
 	[[armsonar]],

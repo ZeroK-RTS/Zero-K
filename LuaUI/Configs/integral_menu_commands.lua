@@ -25,7 +25,7 @@ local factories = {
 	factoryjump = {order = 8},
 	factorytank = {order = 9},
 	factoryamph = {order = 10},
-	corsy = {order = 11},
+	factoryship = {order = 11},
     striderhub = {order = 12},
 }
 

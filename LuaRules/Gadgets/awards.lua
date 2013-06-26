@@ -528,7 +528,7 @@ function gadget:Initialize()
 
 	end
 
-	local boatFacs = {'corsy', 'striderhub'}
+	local boatFacs = {'factoryship', 'striderhub'}
 	for _, boatFac in pairs(boatFacs) do
 		local udBoatFac = UnitDefNames[boatFac]
 		if udBoatFac then

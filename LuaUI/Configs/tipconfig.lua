@@ -170,7 +170,7 @@ energyDefs = {
 }
 
 factoryDefs = {
-	"corsy",
+	"factoryship",
 	"striderhub",
 }
 

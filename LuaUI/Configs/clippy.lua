@@ -110,7 +110,7 @@ local defenseDefs = {
 }
 
 factoryDefs = {
-	"corsy",
+	"factoryship",
 	"striderhub",
 }
 for name in pairs(UnitDefNames) do

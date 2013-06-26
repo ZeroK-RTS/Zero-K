@@ -113,7 +113,7 @@ effectUnitDefs = {
   },
 
   --// FACTORIES //----------------------------
-  corsy= {
+  factoryship = {
   	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="flash01"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="flash03", delay = 20,}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightBlue, {piece="flash05", delay = 40,}) },	

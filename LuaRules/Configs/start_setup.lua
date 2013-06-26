@@ -30,7 +30,7 @@ ploppables = {
   "factoryamph",
   "factoryjump",
   "factoryspider",
-  "corsy",
+  "factoryship",
 }
 
 air_ploppables = {

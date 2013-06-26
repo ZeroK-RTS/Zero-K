@@ -23,7 +23,7 @@ local buildoptions = {
 		{ "factoryveh", notSea=true },
 		{ "factoryspider",  notSea=true },
 
-		{ "corsy",  sea=true },
+		{ "factoryship",  sea=true },
 
 		-- support both
 		{ "factoryamph" },

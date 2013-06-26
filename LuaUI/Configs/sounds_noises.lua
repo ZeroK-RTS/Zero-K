@@ -1144,7 +1144,7 @@ local sounds = {
 			[1] = "factory_select",
 		},
 	},
-	corsy = {
+	factoryship = {
 		build = "builder_start",
 		select = {
 			[1] = "factory_select",

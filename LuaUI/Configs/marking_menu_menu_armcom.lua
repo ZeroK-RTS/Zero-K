@@ -54,7 +54,7 @@ local menu_armcom = {
       },
       {
         angle = 180,
-        unit = "corsy"
+        unit = "factoryship"
       },
       {
         angle = 0,

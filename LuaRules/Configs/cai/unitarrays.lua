@@ -123,7 +123,7 @@ local prioritySos = {
     "factoryspider",
     "factoryjump",
     "factorytank",
-    "corsy",
+    "factoryship",
 	"armcom1",
 	"corcom1",
 	"commrecon1",

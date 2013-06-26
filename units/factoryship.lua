@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[corsy]],
+  unitname               = [[factoryship]],
   name                   = [[Shipyard]],
   description            = [[Produces Ships, Builds at 10 m/s]],
   acceleration           = 0,
@@ -57,7 +57,7 @@ unitDef = {
   minWaterDepth          = 15,
   modelCenterOffset      = [[0 20 4]],
   objectName             = [[seafac.s3o]],
-  script				 = [[corsy.lua]],
+  script				 = [[factoryship.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
   showNanoSpray          = false,
@@ -114,4 +114,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corsy = unitDef })
+return lowerkeys({ factoryship = unitDef })
