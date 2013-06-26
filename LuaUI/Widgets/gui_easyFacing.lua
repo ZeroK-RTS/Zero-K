@@ -204,19 +204,12 @@ function manipulateFacing()
 	--check if valid command
 	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
 	if (not cmd_id) then return end
+
 	
 	--check if build command
 	local cmdDesc = spGetActiveCmdDesc( idx )
 	if ( cmdDesc["type"] ~= 20 ) then
 		--quit here if not a build command
-		return
-	end
-	
-	local unitDefID = -cmd_id
-	local alt,ctrl,meta,shift = spGetModKeyState()
-	
-	local udef = udefTab[unitDefID]
-	if (drawForAll == false and udef["isFactory"] == false ) then
 		return
 	end
 	
