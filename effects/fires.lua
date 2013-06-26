@@ -1,3 +1,4 @@
+-- flamer
 -- fire1_burn1_flame1
 -- fire1_smoke1
 -- fire1_burnlight
@@ -8,6 +9,37 @@
 -- fire1
 
 return {
+
+  ["flamer"] = {
+    fire = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.95,
+        colormap           = [[0.7 0.7 0.7 0.01  1 0.3 0.3 0.5   0 0 0 0]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 360,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 12,
+        particlelifespread = 6,
+        particlesize       = 8,
+        particlesizespread = 4,
+        particlespeed      = 0.1,
+        particlespeedspread = 0.1,
+        pos                = [[6 r-12, 6 r-12, 6 r-12]],
+        sizegrowth         = 1,
+        sizemod            = 1.0,
+        texture            = [[flame]],
+      },
+    },
+  },
+  
   ["fire1_burn1_flame1"] = {
     fire = {
       air                = true,
