@@ -199,7 +199,7 @@ local unitOrderList 		= {count = 0, data = {}}
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 
-local corclogDefID = UnitDefNames["corclog"].id
+local corclogDefID = math.huge    -- UnitDefNames["corclog"].id
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
 
 local exceptionArray = {
