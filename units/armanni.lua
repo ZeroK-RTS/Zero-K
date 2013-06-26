@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Tachyon Projector - Requires 50 Power]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 2200,
