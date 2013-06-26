@@ -112,7 +112,7 @@ unitDef = {
       },
       
       customParams = {
-        single_hit = true,
+        --single_hit = true, -- broken in 91.0
       },
 
       explosionGenerator      = [[custom:gauss_hit_h]],

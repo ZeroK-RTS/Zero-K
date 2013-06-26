@@ -10,18 +10,21 @@ function gadget:GetInfo()
 	}
 end
 
+local spGetGameFrame = Spring.GetGameFrame
+
 ------ SYNCED -------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then 
 
 local singleHitWeapon = {}
 local singleHitProjectile = {}
 
+
 function gadget:Initialize()
 	for i=1,#WeaponDefs do
 		local wd = WeaponDefs[i]
 		if wd.customParams then
 			if wd.customParams.single_hit then
-				Script.SetWatchWeapon(wd.id, true)
+				--Script.SetWatchWeapon(wd.id, true)
 				singleHitWeapon[wd.id] = true;
 				--Spring.Echo('Registered '..wd.name..' as single-hit weapon');
 			end
@@ -29,6 +32,7 @@ function gadget:Initialize()
 	end
 end
 
+--[[
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if singleHitWeapon[weaponID] then
 		singleHitProjectile[proID] = {};
@@ -40,18 +44,21 @@ function gadget:ProjectileDestroyed(proID)
 		singleHitProjectile[proID] = nil;
 	end
 end
+--]]
 
-function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,_,_,_, projectileID)
+function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
 	if singleHitWeapon[weaponDefID] then
-		if projectileID then
-			if singleHitProjectile[projectileID] == nil then
-				singleHitProjectile[projectileID] = {};
-				singleHitProjectile[projectileID][unitID] = true;
+		if attackerID then
+			local frame = spGetGameFrame()
+			if singleHitProjectile[attackerID] == nil then
+				singleHitProjectile[attackerID] = {};
+				singleHitProjectile[attackerID][unitID] = frame;
 			else
-				if singleHitProjectile[projectileID][unitID] then
+				if singleHitProjectile[attackerID][unitID] and frame - singleHitProjectile[attackerID][unitID] < 10 then
+					singleHitProjectile[attackerID][unitID] = frame
 					return 0;
 				else
-					singleHitProjectile[projectileID][unitID] = true;
+					singleHitProjectile[attackerID][unitID] = frame;
 				end
 			end
 			
