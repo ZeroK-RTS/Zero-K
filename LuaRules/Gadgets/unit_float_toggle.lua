@@ -1,4 +1,4 @@
-local isMoveCtrlFloat = not (Spring.GetModOptions().impulsefloat  == "1") --not ImpulseFloat
+
 function gadget:GetInfo()
   return {
     name      = "Float Toggle",
@@ -7,7 +7,7 @@ function gadget:GetInfo()
     date      = "9 March 2012, 12 April 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = isMoveCtrlFloat,  --  loaded by default?
+    enabled   = false,  --  loaded by default?
   }
 end
 

@@ -578,15 +578,7 @@ local options = {
     type	= "bool",
     def		= true,
     section	= "experimental",
-  },
-  {
-    key		= "impulsefloat",
-    name	= "Impulses Float",
-    desc	= "Allow amphibious floatation that is effected by Archer and can be pushed by other moving objects. Compatible for Spring 91, or Spring 95 and above",
-    type	= "bool",
-    def		= false,
-    section	= "experimental",
-  },    
+  },  
   {
     key		= "impulsejump",
     name	= "Impulses Jump",

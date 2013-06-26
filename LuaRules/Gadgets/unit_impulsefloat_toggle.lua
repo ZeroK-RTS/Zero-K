@@ -1,4 +1,4 @@
-local isImpulseFloat = (Spring.GetModOptions().impulsefloat  == "1") --ImpulseFloat
+
 function gadget:GetInfo()
   return {
     name      = "Impulse Float Toggle",
@@ -7,7 +7,7 @@ function gadget:GetInfo()
     date      = "9 March 2012, 12 April 2013",
     license   = "GNU GPL, v2 or later",
     layer     = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
-    enabled   = isImpulseFloat,  --  loaded by default?
+    enabled   = true,  --  loaded by default?
   }
 end
 --[[
@@ -29,6 +29,7 @@ end
 -- Commands
 
 local DEFAULT_FLOAT = 1
+local CMD_STOP = CMD.STOP
 
 include("LuaRules/Configs/customcmds.h.lua")
 
@@ -66,9 +67,9 @@ local floatByID = {data = {}, count = 0}
 
 local floatState = {}
 local aimWeapon = {}
-local gRAVITY = Game.gravity/30/30
+local GRAVITY = Game.gravity/30/30
 local rAD_PER_ROT = (math.pi/(2^15))
-local fLY_THRESHOLD = gRAVITY*8
+local fLY_THRESHOLD = GRAVITY*8
 
 --------------------------------------------------------------------------------
 -- Communication to script
@@ -278,7 +279,7 @@ function gadget:GameFrame(f)
 			end
 			
 			-- Update unit current position
-			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
+			data.x, data.y, data.z = Spring.GetUnitPosition(unitID)
 			
 			-- Fill tank
 			if def.sinkTankRequirement then
@@ -303,6 +304,15 @@ function gadget:GameFrame(f)
 						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag*def.waterHitDrag
 						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
 						data.speed = (data.speed + def.sinkAccel*(data.sinkTank/def.sinkTankRequirement) +drag) --sink as fast as sinktank fill
+					end
+					-- Jitter if terrain below is invalid
+					if f%30 == 0 then
+						local validMove = Spring.TestMoveOrder(data.unitDefID, data.x*0.5, 0, data.z*0.5)
+						if not validMove then
+							local nx, ny, nz = Spring.GetGroundNormal(data.x, data.z)
+							Spring.AddUnitImpulse(unitID, nx, 0, ny)
+							--GG.UnitEcho(unitID, nx .. "  " ..  ny .. "  " .. nz)
+						end
 					end
 				else --rising
 					local dragFactors = (data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag*def.waterHitDrag
@@ -355,7 +365,7 @@ function gadget:GameFrame(f)
 			
 			--Apply desired speed
 			local dx,dy,dz = Spring.GetUnitVelocity(unitID)
-			local dyCorrection = data.speed+gRAVITY-dy
+			local dyCorrection = data.speed+GRAVITY-dy
 			local headingInRadian = Spring.GetUnitHeading(unitID)*rAD_PER_ROT --get current heading
 			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
 			Spring.AddUnitImpulse(unitID, 0,-4,0) --Note: -4/+4 hax is for impulse capacitor  (Spring 91 only need -1/+1, Spring 94 require at least -4/+4). TODO: remove -4/+4 hax if no longer needed
@@ -393,7 +403,7 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD_UNIT_FLOAT_STATE] = true}
+	return {[CMD_UNIT_FLOAT_STATE] = true, [CMD_STOP] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()	
@@ -401,11 +411,15 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_UNIT_FLOAT_STATE) then
-		return true  -- command was not used
+	if (cmdID == CMD_UNIT_FLOAT_STATE) then
+		FloatToggleCommand(unitID, cmdParams, cmdOptions)  
+		return false  -- command was used
+	elseif (cmdID == CMD_STOP) then
+		if floatState[unitID] == FLOAT_ALWAYS then
+			checkAlwaysFloat(unitID)
+		end
 	end
-	FloatToggleCommand(unitID, cmdParams, cmdOptions)  
-	return false  -- command was used
+	return true  -- command was not used
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
