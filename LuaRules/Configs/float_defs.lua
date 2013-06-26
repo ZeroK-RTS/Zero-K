@@ -11,7 +11,6 @@
 -- floatPoint:          Position of unit base that denotes the surface of the water
 -- depthRequirement:    Max depth of sea floor that float can be enabled
 -- sinkOnPara:          If true the unit will set to sink if paralysed. In either mode state cannot be changed while paraed
--- sinkTankRequirement: Frames of delay (that must be spent in water) before a unit can sink. False if no delay required.
 -- stopSpeedLeeway:     Below this speed the unit can snap to surface
 -- stopPositionLeeway:  Below this distance from the surface the unit can stnap to surface.
 
@@ -39,7 +38,6 @@ local floatDefs = {
 		floatPoint = -20,
 		depthRequirement = -30,
 		sinkOnPara = true,
-		sinkTankRequirement = false,
 		stopSpeedLeeway = 0.05, 
 		stopPositionLeeway = 0.1,
 	},
@@ -61,7 +59,6 @@ local floatDefs = {
 		floatPoint = -15,
 		depthRequirement = -15,
 		sinkOnPara = false,
-		sinkTankRequirement = false,
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
@@ -81,7 +78,6 @@ local floatDefs = {
 		floatPoint = -40,
 		depthRequirement = -40,
 		sinkOnPara = false,
-		sinkTankRequirement = false,
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},

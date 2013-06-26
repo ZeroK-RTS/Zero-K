@@ -99,8 +99,6 @@ local function addFloat(unitID, unitDefID, isFlying)
 					prevSurfacing = true,
 					onSurface = false,
 					justStarted = true,
-					sinkTank = 0,
-					nextSpecialDrag = 1,
 					speed = def.initialRiseSpeed, --desired speed
 					x = x, y = y, z = z,
 					unitDefID = unitDefID,
@@ -153,9 +151,7 @@ end
 -- Script calls
 
 GG.Floating_StopMoving = GG.Floating_StopMoving or function() end --empty function. Defined in gadget:Initialize()
-
 GG.Floating_AimWeapon = GG.Floating_AimWeapon or function() end
-
 GG.Floating_UnitTeleported = GG.Floating_UnitTeleported or function() end
 
 local function checkAlwaysFloat(unitID)
@@ -167,16 +163,6 @@ local function checkAlwaysFloat(unitID)
 			addFloat(unitID, unitDefID)
 		end
 	end
-end
-
---------------------------------------------------------------------------------
--- Realism/Physic
-
---Reference: http://en.wikipedia.org/wiki/Drag_equation
-local function CalculateDrag (velocity, dragCoefficient, unitsMass, waterDensity, unitsArea)
-	local acceleration = 0.5*(waterDensity*velocity*velocity*dragCoefficient*unitsArea)/unitsMass
-	local accWithDirection = acceleration*(math.abs(velocity)/velocity)
-	return -accWithDirection
 end
 
 --------------------------------------------------------------------------------
@@ -281,32 +267,12 @@ function gadget:GameFrame(f)
 			-- Update unit current position
 			data.x, data.y, data.z = Spring.GetUnitPosition(unitID)
 			
-			-- Fill tank
-			if def.sinkTankRequirement then
-				if not data.surfacing then
-					if data.y <= def.floatPoint and data.sinkTank <= def.sinkTankRequirement then
-						data.sinkTank = data.sinkTank + 1
-					end
-				else
-					data.sinkTank = 0
-				end
-			end
-			
 			-- Increase & decrease floating/sinking speed
 			if data.y <= def.floatPoint then
-				if not data.surfacing then --sinking
-					if (not def.sinkTankRequirement or data.sinkTank > def.sinkTankRequirement) then
-						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag*def.waterHitDrag
-						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
-						--data.speed = (data.speed + def.sinkAccel +drag) --sink as fast as possible
-						data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
-						data.onSurface = false
-					else
-						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag*def.waterHitDrag
-						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
-						--data.speed = (data.speed + def.sinkAccel*(data.sinkTank/def.sinkTankRequirement) +drag) --sink as fast as sinktank fill
-					end
-					-- Jitter if terrain below is invalid
+				if not data.surfacing then -- sinking
+					data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+					data.onSurface = false
+					-- Horizontal jitter if terrain below is invalid
 					if f%30 == 0 then
 						local validMove = Spring.TestMoveOrder(data.unitDefID, data.x*0.5, 0, data.z*0.5)
 						if not validMove then
@@ -316,15 +282,9 @@ function gadget:GameFrame(f)
 						end
 					end
 				else --rising
-					local dragFactors = (data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag*def.waterHitDrag
-					local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)				
-					--data.speed = (data.speed + def.riseAccel+drag) --float as fast as possible
 					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
 				end
 			else
-				local dragFactors = (def.airDrag)*data.nextSpecialDrag
-				local drag = CalculateDrag(data.speed,dragFactors, 1,0.02,1)	
-				--data.speed = (data.speed + def.airAccel + drag) --fall down from sky
 				data.speed = (data.speed + def.airAccel)*def.airDrag
 			end
 			
