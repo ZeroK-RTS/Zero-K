@@ -141,6 +141,7 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	GG.Floating_AimWeapon(unitID)
 	Signal(SIG_AIM[num])
 	SetSignalMask(SIG_AIM[num])
 	Turn( head, y_axis, heading, math.rad(240) )
@@ -172,6 +173,7 @@ function script.FireWeapon(num)
 end
 
 function script.Shot(num)
+	GG.Floating_AimWeapon(unitID)
 	gun_1 = 1 - gun_1
 end
 
