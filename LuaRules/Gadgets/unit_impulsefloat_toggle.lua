@@ -298,12 +298,13 @@ function gadget:GameFrame(f)
 					if (not def.sinkTankRequirement or data.sinkTank > def.sinkTankRequirement) then
 						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag*def.waterHitDrag
 						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
-						data.speed = (data.speed + def.sinkAccel +drag) --sink as fast as possible
+						--data.speed = (data.speed + def.sinkAccel +drag) --sink as fast as possible
+						data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
 						data.onSurface = false
 					else
 						local dragFactors = (data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag*def.waterHitDrag
 						local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)
-						data.speed = (data.speed + def.sinkAccel*(data.sinkTank/def.sinkTankRequirement) +drag) --sink as fast as sinktank fill
+						--data.speed = (data.speed + def.sinkAccel*(data.sinkTank/def.sinkTankRequirement) +drag) --sink as fast as sinktank fill
 					end
 					-- Jitter if terrain below is invalid
 					if f%30 == 0 then
@@ -317,12 +318,14 @@ function gadget:GameFrame(f)
 				else --rising
 					local dragFactors = (data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag*def.waterHitDrag
 					local drag = CalculateDrag(data.speed,dragFactors, 1,0.2,1)				
-					data.speed = (data.speed + def.riseAccel+drag) --float as fast as possible
+					--data.speed = (data.speed + def.riseAccel+drag) --float as fast as possible
+					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
 				end
 			else
 				local dragFactors = (def.airDrag)*data.nextSpecialDrag
 				local drag = CalculateDrag(data.speed,dragFactors, 1,0.02,1)	
-				data.speed = (data.speed + def.airAccel + drag) --fall down from sky
+				--data.speed = (data.speed + def.airAccel + drag) --fall down from sky
+				data.speed = (data.speed + def.airAccel)*def.airDrag
 			end
 			
 			-- Test for special case
@@ -335,6 +338,7 @@ function gadget:GameFrame(f)
 					-- enter water: do splash
 					if data.speed < 0 and waterline > 0 and waterline < -data.speed then
 						callScript(unitID, "Float_crossWaterline", {data.speed})
+						data.speed = data.speed*def.waterHitDrag
 					end
 					
 					--leave water: do splash
