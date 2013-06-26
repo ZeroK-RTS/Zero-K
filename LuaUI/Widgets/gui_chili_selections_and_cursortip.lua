@@ -4,7 +4,7 @@ function widget:GetInfo()
     name      = "Chili Selections & CursorTip",
     desc      = "v0.079 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --25 May 2013 (msafwan)
+    date      = "2009-06-02", --26 June 2013 (msafwan)
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -759,27 +759,27 @@ local function MakeUnitGroupSelectionToolTip()
 	--end
 
 	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
-	--[[
-	do --add a button that allow you to change alwaysgroup value on the interface directly
-		local gi_groupingbutton = Button:New{
-			parent = window_corner;
-			bottom= 1,
-			right = 110,
-			minHeight = 30,
-			width = 30,
-			backgroundColor = {0,0,0,0.1},
-			fontSize = 12,
-			caption = pictureWithinCapacity and (options.groupalways.value and "[...]" or "...") or "[xxx]", 
-			OnMouseUp = {pictureWithinCapacity and function(self) 
-				options.groupalways.value = not options.groupalways.value
-				local selUnits = spGetSelectedUnits()
-				widget:SelectionChanged(selUnits) --this will recreate all buttons
-				end or function() end},
-			textColor = {1,1,1,0.75}, 
-			tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit group based on type" or "Unit not grouped") or "Bar is full, unit group based on type",
-		}
-	end
-	--]]
+
+	local gi_groupingbutton = Button:New{ --add a button that allow you to change alwaysgroup value on the interface directly
+		name = 'AlwaysGroupButton';
+		parent = window_corner;
+		bottom= 1,
+		right = 110,
+		minHeight = 18,
+		width = 18,
+		backgroundColor = {0,0,0,0.1},
+		fontSize = 9,
+		caption = pictureWithinCapacity and (options.groupalways.value and "[---]" or "---") or "#", 
+		OnMouseUp = {pictureWithinCapacity and function(self) 
+			options.groupalways.value = not options.groupalways.value
+			local selUnits = spGetSelectedUnits()
+			widget:SelectionChanged(selUnits) --this will recreate all buttons
+			end or function() end},
+		textColor = {1,1,1,0.75}, 
+		tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit group based on type" or "Unit not grouped") or "Bar is full, unit group based on type",
+	}
+	
+
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
 			local unitid = selectedUnits[i]

@@ -1,4 +1,4 @@
-local versionName = "v2.853"
+local versionName = "v2.854"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -792,7 +792,7 @@ function IdentifyTargetOnCommandQueue(cQueueOri, cQueueGKPed,unitID,commandIndex
 		commandIndexTable[unitID]={widgetX=-2, widgetZ=-2 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
 	else
 		local a = -1
-		local b = -1
+		local c = -1
 		local b = math.modf(commandIndexTable[unitID]["widgetX"])
 		local d = math.modf(commandIndexTable[unitID]["widgetZ"])
 		if cQueueOri[1] then
@@ -1164,7 +1164,7 @@ function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, command
 	local queueIndex=1
 	local avoidanceCommand = true
 	if not newCommand then  --if widget's command then delete it
-		if not cQueue or not cQueue[1] then
+		if not cQueue or not cQueue[1] then --happen when unit has NIL command (this), and somehow is same as widget's command (see: IdentifyTargetOnCommandQueue), and somehow unit currently has mono-command (see: CheckUserOverride)
 			if turnOnEcho==2 then
 				Spring.Echo("UnitIsDead (InsertCommandQueue):")
 				Spring.Echo(Spring.GetUnitIsDead(unitID))

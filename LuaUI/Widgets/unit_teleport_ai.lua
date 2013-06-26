@@ -1,13 +1,13 @@
-local version = 0.8
+local version = 0.81
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental)",
     desc      = "Automatically teleport any unit near a teleport enterance.",
     author    = "Msafwan",
-    date      = "24 June 2013",
+    date      = "26 June 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
-    enabled   = false,
+    enabled   = false
   }
 end
 
@@ -98,23 +98,20 @@ function widget:GameFrame(n)
 			local djinnDeployed = djinnID and (Spring.GetUnitRulesParam(djinnID,"deploy")) or 1
 			listOfBeacon[beaconID]["deployed"] = djinnDeployed
 		end
-	end	
+	end
 	for i=1, #groupBeacon,1 do
 		if n%30==0 or groupSpreadJobs[i] then --every 30 frame period (1 second)
 			--Spring.Echo("-----GROUP:" .. i)
 			local numberOfUnitToProcess = 5 --NUMBER OF UNIT PER BEACON PER SECOND
 			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29)
 			local beaconCurrentQueue = {}
-			local destroyedBeacon = {} --store encounter with NILs (indicating beacon is destroyed
 			local unitToEffect = groupEffectedUnit[i] or {}
 			groupSpreadJobs[i] = false
 			local loopedUnits = groupLoopedUnit[i] or {}
 			for j=1, #groupBeacon[i],1 do
 				local beaconID = groupBeacon[i][j]
 				--Spring.Echo("BEACON:" .. beaconID)
-				if not listOfBeacon[beaconID] then
-					destroyedBeacon[beaconID] = true
-				else
+				if listOfBeacon[beaconID] then --beacon is alive
 					beaconCurrentQueue[beaconID] = listOfBeacon[beaconID]["prevQue"] or 0
 					local alreadyFinished = listOfBeacon[beaconID]["finish"]
 					local djinDeployed = listOfBeacon[beaconID]["deployed"]
@@ -248,10 +245,12 @@ function widget:GameFrame(n)
 				groupLoopedUnit[i]=nil
 				for j=1, #groupBeacon[i],1 do
 					local beaconID = groupBeacon[i][j]
-					listOfBeacon[beaconID]["finish"]=nil
-					listOfBeacon[beaconID]["prevQue"] = nil
+					if listOfBeacon[beaconID] then  --beacon is alive
+						listOfBeacon[beaconID]["finish"]=nil
+						listOfBeacon[beaconID]["prevQue"] = nil
+					end
 				end	
-				--!spawn mod=Zero-K test-10542
+				--!spawn mod=Zero-K test-10559
 				--!setengine 94.1.1-645-g34c768b
 				for unitID, tblContent in pairs(unitToEffect)do
 					if tblContent["norm"] then
@@ -259,7 +258,7 @@ function widget:GameFrame(n)
 						local lowestPathTime = tblContent["norm"]
 						--Spring.Echo("TEST:".. unitID)
 						for beaconID, timeToDest in pairs(tblContent["becn"]) do
-							if (not destroyedBeacon[beaconID]) then
+							if listOfBeacon[beaconID] then --beacon is alive
 								if (timeToDest+beaconCurrentQueue[beaconID]) < lowestPathTime then
 									pathToFollow = beaconID
 									lowestPathTime = timeToDest
@@ -306,6 +305,13 @@ function ConvertCMDToMOVE(command)
 	if (command == nil) then 
 		return nil
 	end
+	-- if not command.params then
+		-- Spring.Echo("ALERT")
+		-- Spring.Echo(CMD[command.id])
+		-- Spring.Echo(command.params[1])
+		-- Spring.Echo(command.params[2])
+		-- Spring.Echo(command.params[3])
+	-- end
 	if command.id == CMD.MOVE 
 	or command.id == CMD.PATROL 
 	or command.id == CMD.FIGHT
@@ -313,6 +319,9 @@ function ConvertCMDToMOVE(command)
 	or command.id == CMD.ATTACK then
 		if not command.params[2] then
 			local x,y,z = Spring.GetUnitPosition(command.params[1])
+			if not x then --outside LOS and radar
+				return nil
+			end
 			command.id = CMD.MOVE
 			command.params[1] = x
 			command.params[2] = y
