@@ -88,6 +88,7 @@ local combatCommands = {	-- commands that require ammo to execute
 
 local padRadius = 400 -- land if pad is within this range
 local MAX_FUEL = 1000000 * 0.9	-- not exact to allow some fudge
+local GIVE_UP_FRAMES = 300
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -116,6 +117,7 @@ local bomberUnitIDs = {}
 local bomberToPad = {}	-- [bomberID] = detination pad ID
 local refuelling = {} -- [bomberID] = true
 local airpads = {}	-- stores data
+local bomberMayBeJiggling = {}
 local airpadsPerAllyTeam = {}	-- [allyTeam] = {[pad1ID] = true, [pad2ID] = true, ..}
 local allyteams = Spring.GetAllyTeamList()
 for i=1,#allyteams do
@@ -343,13 +345,35 @@ end
 
 function gadget:GameFrame(n)
 	if n%10 == 2 then
-		for bomberID in pairs(refuelling) do
+		for bomberID, giveUpFrame in pairs(refuelling) do
+			
 			local fuel = spGetUnitFuel(bomberID) or 0
 			if fuel >= MAX_FUEL then
 				refuelling[bomberID] = nil
 				Spring.SetUnitRulesParam(bomberID, "noammo", 0)	-- ready to go
 				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+				bomberMayBeJiggling[bomberID] = nil
+			elseif fuel <= 10 and (bomberMayBeJiggling[bomberID] or giveUpFrame < n) then
+				local x,y,z = Spring.GetUnitPosition(bomberID)
+				local h = Spring.GetGroundHeight(x,z) or 0
+				local offGround = y - ((h > 0 and h) or 0) 
+				local vy = select(2,Spring.GetUnitVelocity(bomberID))
+				
+				if vy ~= 0 and offGround < 20 then
+					if bomberMayBeJiggling[bomberID] then
+						
+						local unitDefID = Spring.GetUnitDefID(bomberID)
+						local teamID = Spring.GetUnitTeam(bomberID)
+						Spring.DestroyUnit(bomberID, true, true)
+						Spring.CreateUnit(unitDefID, x, y, z, 0, teamID)
+						bomberMayBeJiggling[bomberID] = nil
+					else
+						bomberMayBeJiggling[bomberID] = true
+					end
+				else
+					refuelling[bomberID] = n + GIVE_UP_FRAMES
+				end
 			end
 		end	
 	end
@@ -374,7 +398,7 @@ function gadget:GameFrame(n)
 				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 				bomberToPad[bomberID] = nil
-				refuelling[bomberID] = true
+				refuelling[bomberID] = n + GIVE_UP_FRAMES
 				Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
 			end
 		end
