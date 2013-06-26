@@ -68,8 +68,8 @@ local floatByID = {data = {}, count = 0}
 local floatState = {}
 local aimWeapon = {}
 local GRAVITY = Game.gravity/30/30
-local rAD_PER_ROT = (math.pi/(2^15))
-local fLY_THRESHOLD = GRAVITY*8
+local RAD_PER_ROT = (math.pi/(2^15))
+local FLY_THRESHOLD = GRAVITY*8
 
 --------------------------------------------------------------------------------
 -- Communication to script
@@ -107,7 +107,7 @@ local function addFloat(unitID, unitDefID, isFlying)
 					isFlying = isFlying,
 					paraData = {want = false, para = false},
 				}
-				local headingInRadian = Spring.GetUnitHeading(unitID)*rAD_PER_ROT
+				local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT
 				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
 			end
 		end
@@ -366,7 +366,7 @@ function gadget:GameFrame(f)
 			--Apply desired speed
 			local dx,dy,dz = Spring.GetUnitVelocity(unitID)
 			local dyCorrection = data.speed+GRAVITY-dy
-			local headingInRadian = Spring.GetUnitHeading(unitID)*rAD_PER_ROT --get current heading
+			local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT --get current heading
 			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
 			Spring.AddUnitImpulse(unitID, 0,-4,0) --Note: -4/+4 hax is for impulse capacitor  (Spring 91 only need -1/+1, Spring 94 require at least -4/+4). TODO: remove -4/+4 hax if no longer needed
 			Spring.AddUnitImpulse(unitID, 0,4+dyCorrection,0)
@@ -495,7 +495,7 @@ end
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if floatDefs[unitDefID] and not float[unitID] then
 		local _,dy = Spring.GetUnitVelocity(unitID)
-		if dy>= fLY_THRESHOLD then
+		if dy>= FLY_THRESHOLD then
 			addFloat(unitID, unitDefID, true)
 		end
 	end

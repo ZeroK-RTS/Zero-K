@@ -68,8 +68,8 @@ local floatDefs = {
 	
 	-- Big epic unit moves up and down about as quickly as Atlantis
 	[UnitDefNames["amphassault"].id] = {
-		initialRiseSpeed = 2,
-		riseAccel = 0.06,
+		initialRiseSpeed = 1.5,
+		riseAccel = 0.03,
 		riseUpDrag = 0.9,
 		riseDownDrag = 0.7,
 		sinkAccel = -0.06,
@@ -78,7 +78,7 @@ local floatDefs = {
 		airAccel = -0.3, -- aka gravity, only effective out of water
 		airDrag = 0.995,
 		waterHitDrag = 0.5,
-		floatPoint = -60,
+		floatPoint = -40,
 		depthRequirement = -40,
 		sinkOnPara = false,
 		sinkTankRequirement = false,
