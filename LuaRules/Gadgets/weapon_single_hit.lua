@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date = "25.03.2013",
 		license = "Public domain",
 		layer = 21,
-		enabled = true
+		enabled = not (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil))
 	}
 end
 
