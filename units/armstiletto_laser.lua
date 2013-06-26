@@ -83,7 +83,7 @@ unitDef = {
 
     ARMBOMBLIGHTNING = {
       name                    = [[BombLightning]],
-      areaOfEffect            = 96,
+      areaOfEffect            = 192,
       avoidFeature            = false,
       avoidFriendly           = false,
       beamTime                = 0.01,
@@ -96,10 +96,10 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 1350,
-        empresistant75 = 337.5,
-        empresistant99 = 12.5,
-        planes         = 1350,
+        default        = 675,
+        empresistant75 = 168.75,
+        empresistant99 = 67.5,
+        planes         = 675,
       },
 
       edgeEffectiveness       = 0.4,
