@@ -362,6 +362,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
+		GG.Floating_AimWeapon(unitID)
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
 		Turn( torso, y_axis, heading, math.rad(480) )
@@ -395,6 +396,7 @@ function script.FireWeapon(num)
 end
 
 function script.Shot(num)
+	GG.Floating_AimWeapon(unitID)
     if math.random() < 0.2 then
 		EmitSfx(firepoints[gun_1], 1024)
 	end
