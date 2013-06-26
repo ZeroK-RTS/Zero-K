@@ -84,11 +84,14 @@ local shareListTemp2 = {}
 
 local cappedComs = {}
 
---new
 local awardData = {}
+
 local basicEasyFactor = 0.5
 local veryEasyFactor = 0.3
-local empFactor = veryEasyFactor*4
+
+local empFactor     = veryEasyFactor*4
+local reclaimFactor = veryEasyFactor*0.2 -- wrecks aren't guaranteed to leave more than 0.2 of value
+
 local minFriendRatio = 0.25
 local minReclaimRatio = 0.15
 
@@ -115,6 +118,7 @@ local awardEasyFactors = {
 	comm      = veryEasyFactor,
 	slow      = veryEasyFactor,
 
+	reclaim   = reclaimFactor,
 	empFactor = empFactor,
 }
 
@@ -432,8 +436,6 @@ local function ProcessAwardData()
 			if absolute then
 				compare = absolute
 
-			elseif awardType == 'reclaim' then
-				compare = getMeanMetalIncome() * easyFactor
 			else
 				compare = getMeanDamageExcept(winningTeam) * easyFactor
 			end
@@ -460,7 +462,7 @@ local function ProcessAwardData()
 				elseif awardType == 'ouch' then
 					message = 'Damage received: ' .. maxValWrite
 				elseif awardType == 'reclaim' then
-					message = maxValWrite .. " m from wreckage"
+					message = 'Reclaimed value: ' .. maxValWrite
 				elseif awardType == 'friend' then
 					message = 'Damage inflicted on allies: '.. floor(maxVal * 100) ..'%'
 				elseif awardType == 'mex' then
