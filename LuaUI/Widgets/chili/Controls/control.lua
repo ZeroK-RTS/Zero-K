@@ -875,7 +875,9 @@ end
 
 
 function Control:IsRectInView(x,y,w,h)
-	if (not self.parent) then
+	--NOTE: added "(not self)" check because "(self.parent):IsRectInView(px,py,w,h)" can crash with "attempt to index parent" error 
+	--This always happen to "Chili Selection & Cursortip" (unable to debug the cause)
+	if (not self) or (not self.parent) then 
 		return false
 	end
 

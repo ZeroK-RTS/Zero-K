@@ -1,4 +1,4 @@
-local version = 0.81
+local version = 0.811
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental)",
@@ -305,13 +305,7 @@ function ConvertCMDToMOVE(command)
 	if (command == nil) then 
 		return nil
 	end
-	-- if not command.params then
-		-- Spring.Echo("ALERT")
-		-- Spring.Echo(CMD[command.id])
-		-- Spring.Echo(command.params[1])
-		-- Spring.Echo(command.params[2])
-		-- Spring.Echo(command.params[3])
-	-- end
+
 	if command.id == CMD.MOVE 
 	or command.id == CMD.PATROL 
 	or command.id == CMD.FIGHT
@@ -369,6 +363,9 @@ function ConvertCMDToMOVE(command)
 		end
 	end
 	if command.id < 0 then
+		if command.params[3]==nil then --is building unit in factory
+			return nil
+		end
 		command.id = CMD.MOVE
 		return command
 	end
