@@ -1,9 +1,9 @@
 -- see http://springrts.com/wiki/Sounds.lua for help
 local Sounds = {
    SoundItems = {
-      default = {
-	 pitchMod = 0.04,
-      }
+      --default = {
+      --pitchMod = 0.04,
+      --}
       IncomingChat = {
          --file = "sounds/talk.wav",
 		 file = nil,
@@ -85,10 +85,8 @@ local function AutoAdd(subDir, opts)
 end
 
 -- add sounds
---[[
 AutoAdd("weapon", defaultOpts)
 AutoAdd("explosion", defaultOpts)
-]]--
 AutoAdd("reply", replyOpts)
 
 return Sounds
