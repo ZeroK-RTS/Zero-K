@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphraider2]],
   name                   = [[Archer]],
-  description            = [[Amphibious Raider/Skirmish Bot (Land)]],
+  description            = [[Amphibious Raider/Skirmish Bot (Land/Sea)]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
@@ -20,6 +20,7 @@ unitDef = {
   customParams           = {
     helptext	 = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water.]],
     maxwatertank = [[180]],
+    floattoggle = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
