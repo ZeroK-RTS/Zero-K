@@ -13,7 +13,7 @@ local Sounds = {
       --},
       MapPoint = {
          file = "sounds/marker_place.wav",
-	 pitchMod = 0.02,
+         pitchMod = 0.01,
       },
 --[[
       MyAwesomeSounds = {
