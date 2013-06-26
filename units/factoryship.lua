@@ -9,7 +9,7 @@ unitDef = {
   builder                = true,
 
   buildoptions           = {
-    [[corcs]],
+    [[shipcon]],
     [[armpt]],
     [[coresupp]],
     [[dclship]],

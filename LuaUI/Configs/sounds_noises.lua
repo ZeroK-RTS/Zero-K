@@ -897,7 +897,7 @@ local sounds = {
 	},
 	
 	-- Sea
-	corcs = {
+	shipcon = {
 		build = "builder_start",
 		ok = {
 			[1] = "rumble2",

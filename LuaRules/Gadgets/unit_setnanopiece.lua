@@ -30,7 +30,7 @@ local units = {
   [UnitDefNames.corned.id] = {"firepoint"},
   [UnitDefNames.coracv.id] = {"nano1", "nano2"},
   [UnitDefNames.corch.id] = {"beam"},
-  [UnitDefNames.corcs.id] = {"beam"},
+  [UnitDefNames.shipcon.id] = {"beam"},
   
   [UnitDefNames.factorycloak.id] = {"claw1"},
   [UnitDefNames.factoryshield.id] = {"nanoemit"},

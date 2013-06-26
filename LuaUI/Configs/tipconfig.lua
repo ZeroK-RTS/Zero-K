@@ -156,7 +156,7 @@ conDefs = {
 	"coracv",
 	"corch",
 	"armca",
-	"corcs",
+	"shipcon",
 }
 
 mexDefs = {"cormex"}

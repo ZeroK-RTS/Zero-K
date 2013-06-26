@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[corcs]],
+  unitname               = [[shipcon]],
   name                   = [[Mariner]],
   description            = [[Construction Ship, Builds at 10 m/s]],
   acceleration           = 0.051375,
@@ -12,7 +12,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[CORCS.png]],
+  buildPic               = [[SHIPCON.png]],
   buildTime              = 250,
   canGuard               = true,
   canMove                = true,
@@ -130,4 +130,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corcs = unitDef })
+return lowerkeys({ shipcon = unitDef })
