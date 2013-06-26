@@ -21,7 +21,7 @@ unitDef = {
     [[armtboat]],
   },
 
-  buildPic               = [[CORSY.png]],
+  buildPic               = [[FACTORYSHIP.png]],
   buildTime              = 600,
   canAttack              = true,
   canMove                = true,
