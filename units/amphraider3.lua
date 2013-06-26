@@ -57,7 +57,7 @@ unitDef = {
 
   weapons                = {
     {
-      def                = [[TORPCANNON]],
+      def                = [[TORPMISSILE]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM FIXEDWING HOVER LAND SINK TURRET FLOAT SHIP GUNSHIP]],
     },
@@ -70,11 +70,12 @@ unitDef = {
 
   weaponDefs             = {
 
-    TORPCANNON = {
-      name                    = [[Torpedo Projector]],
+    TORPMISSILE = {
+      name                    = [[Torpedo]],
       areaOfEffect            = 32,
-      craterBoost             = 0,
-      craterMult              = 0,
+      cegTag                  = [[missiletrailyellow]],
+      craterBoost             = 1,
+      craterMult              = 2,
 
       damage                  = {
         default = 150,
@@ -86,17 +87,21 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       model                   = [[wep_m_ajax.s3o]],
-      myGravity               = 0.1,
       noSelfDamage            = true,
       projectiles	          = 2,
       range                   = 240,
       reloadtime              = 3,
+      smokeTrail              = true,
       soundHit                = [[weapon/cannon/cannon_hit2]],
-	  soundHitVolume          = 6,
-      soundStart              = [[weapon/cannon/mini_cannon]],
-	  soundStartVolume        = 8,
+      soundStart              = [[weapon/missile/missile_fire9]],
+      startVelocity           = 140,
+      texture2                = [[lightsmoketrail]],
+      tolerance               = 1000,
+      tracks                  = true,
+      turnRate                = 16000,
       turret                  = true,
-      weaponType              = [[Cannon]],
+      weaponAcceleration      = 90,
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 200,
     },
 
