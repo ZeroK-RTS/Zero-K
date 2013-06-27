@@ -1,4 +1,4 @@
-local version = 0.811
+local version = 0.812
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental)",
@@ -7,11 +7,21 @@ function widget:GetInfo()
     date      = "26 June 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
-    enabled   = false
+    enabled   = true
   }
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spValidUnitID = Spring.ValidUnitID
+local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
+local spValidFeatureID = Spring.ValidFeatureID
+local spGetFeaturePosition = Spring.GetFeaturePosition
+local spRequestPath = Spring.RequestPath
 ------------------------------------------------------------
 ------------------------------------------------------------
 local myTeamID
@@ -38,7 +48,7 @@ function widget:Initialize()
 		if Spring.IsUnitAllied(unitID) then
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			if IsTeleport(unitDefID) then
-				local x,y,z = Spring.GetUnitPosition(unitID)
+				local x,y,z = spGetUnitPosition(unitID)
 				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevQue=nil,prevIndex=nil,prevList=nil,finish=nil,deployed=1}
 			end
 		end
@@ -52,7 +62,7 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if IsTeleport(unitDefID) then
-		local x,y,z = Spring.GetUnitPosition(unitID)
+		local x,y,z = spGetUnitPosition(unitID)
 		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevQue=nil,prevIndex=nil,prevList=nil,finish=nil,deployed=1}
 		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, 500,1, myTeamID,500) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
 		groupBeaconOfficial = cluster
@@ -84,8 +94,8 @@ end
 function widget:GameFrame(n)
 	if n%150==15 then --every 150 frame period (5 second) at the 15th frame
 		for beaconID,_ in pairs(listOfBeacon)do
-			local djinnID = (Spring.GetUnitRulesParam(beaconID,"connectto"))
-			local ex,ey,ez = Spring.GetUnitPosition(djinnID)
+			local djinnID = (spGetUnitRulesParam(beaconID,"connectto"))
+			local ex,ey,ez = spGetUnitPosition(djinnID)
 			listOfBeacon[beaconID][4] = ex
 			listOfBeacon[beaconID][5] = ey
 			listOfBeacon[beaconID][6] = ez
@@ -95,7 +105,7 @@ function widget:GameFrame(n)
 	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: update deploy state
 		for beaconID,tblContent in pairs(listOfBeacon) do
 			local djinnID = listOfBeacon[beaconID]["djin"]
-			local djinnDeployed = djinnID and (Spring.GetUnitRulesParam(djinnID,"deploy")) or 1
+			local djinnDeployed = djinnID and (spGetUnitRulesParam(djinnID,"deploy")) or 1
 			listOfBeacon[beaconID]["deployed"] = djinnDeployed
 		end
 	end
@@ -117,7 +127,7 @@ function widget:GameFrame(n)
 					local djinDeployed = listOfBeacon[beaconID]["deployed"]
 					if not alreadyFinished and djinDeployed == 1 then
 						local bX,bY,bZ = listOfBeacon[beaconID][1],listOfBeacon[beaconID][2],listOfBeacon[beaconID][3]
-						local vicinityUnit = listOfBeacon[beaconID]["prevList"] or Spring.GetUnitsInCylinder(bX,bZ,500,myTeamID)
+						local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,500,myTeamID)
 						local numberOfLoop = #vicinityUnit
 						--Spring.Echo("LOOP:" .. numberOfLoop)
 						local numberOfLoopToProcessPerFrame = math.ceil(numberOfLoop/29)
@@ -130,12 +140,12 @@ function widget:GameFrame(n)
 						end
 						for k=currentLoopIndex, numberOfLoop,1 do
 							local unitID = vicinityUnit[k]
-							local validUnitID = Spring.ValidUnitID(unitID)
+							local validUnitID = spValidUnitID(unitID)
 							if not validUnitID then
 								unitToEffect[unitID] = nil
 							end
 							if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] then
-								local unitDefID = Spring.GetUnitDefID(unitID)
+								local unitDefID = spGetUnitDefID(unitID)
 								if not listOfMobile[unitDefID] then
 									local moveID = UnitDefs[unitDefID].moveData.id
 									local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog)
@@ -151,8 +161,8 @@ function widget:GameFrame(n)
 									
 									unitToEffect[unitID] = unitToEffect[unitID] or {norm=nil,becn={nil},pos=nil,cmd=nil,defID=unitDefID}
 									if not unitToEffect[unitID]["cmd"] then
-										local px,py,pz= Spring.GetUnitPosition(unitID)
-										local cmd_queue = Spring.GetCommandQueue(unitID,1);
+										local px,py,pz= spGetUnitPosition(unitID)
+										local cmd_queue = spGetCommandQueue(unitID,1);
 										cmd_queue = ConvertCMDToMOVE(cmd_queue)
 										unitToEffect[unitID]["pos"] = {px,py,pz}
 										unitToEffect[unitID]["cmd"] = cmd_queue
@@ -202,8 +212,8 @@ function widget:GameFrame(n)
 									cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
 									cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
 									if not listOfBeacon[beaconID][4] then
-										local djinnID = (Spring.GetUnitRulesParam(beaconID,"connectto"))
-										local ex,ey,ez = Spring.GetUnitPosition(djinnID)
+										local djinnID = (spGetUnitRulesParam(beaconID,"connectto"))
+										local ex,ey,ez = spGetUnitPosition(djinnID)
 										listOfBeacon[beaconID][4] = ex
 										listOfBeacon[beaconID][5] = ey
 										listOfBeacon[beaconID][6] = ez
@@ -273,7 +283,7 @@ function widget:GameFrame(n)
 							local dix,diz=unitToEffect[unitID]["cmd"].params[1],unitToEffect[unitID]["cmd"].params[3] --target coordinate
 							local dx,dz = (dix-ex),(diz-ez)
 							dx,dz = math.abs(dx)/dx,math.abs(dz)/dz
-							Spring.GiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
+							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
 							--local bx,by,bz = listOfBeacon[pathToFollow][1],listOfBeacon[pathToFollow][2],listOfBeacon[pathToFollow][3]
 							-- local params = {bx, by, bz, pathToFollow, Spring.GetGameFrame()}
 							-- Spring.GiveOrderArrayToUnitArray({unitID},{{CMD.INSERT,{0,CMD_WAIT_AT_BEACON,CMD.OPT_SHIFT, unpack(params)}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
@@ -312,7 +322,7 @@ function ConvertCMDToMOVE(command)
 	or command.id == CMD.JUMP
 	or command.id == CMD.ATTACK then
 		if not command.params[2] then
-			local x,y,z = Spring.GetUnitPosition(command.params[1])
+			local x,y,z = spGetUnitPosition(command.params[1])
 			if not x then --outside LOS and radar
 				return nil
 			end
@@ -334,16 +344,16 @@ function ConvertCMDToMOVE(command)
 			if not command.params[2] then
 				local x,y,z
 				if command.id == CMD.REPAIR or command.id == CMD.GUARD then
-					if Spring.ValidUnitID(command.params[1]) then
-						x,y,z = Spring.GetUnitPosition(command.params[1])
-					elseif Spring.ValidFeatureID(command.params[1]) then
-						x,y,z = Spring.GetFeaturePosition(command.params[1])
+					if spValidUnitID(command.params[1]) then
+						x,y,z = spGetUnitPosition(command.params[1])
+					elseif spValidFeatureID(command.params[1]) then
+						x,y,z = spGetFeaturePosition(command.params[1])
 					end
 				elseif command.id == CMD.RECLAIM or command.id == CMD.RESSURECT then
-					if Spring.ValidFeatureID(command.params[1]) then
-						x,y,z = Spring.GetFeaturePosition(command.params[1])
-					elseif Spring.ValidUnitID(command.params[1]) then
-						x,y,z = Spring.GetUnitPosition(command.params[1])
+					if spValidFeatureID(command.params[1]) then
+						x,y,z = spGetFeaturePosition(command.params[1])
+					elseif spValidUnitID(command.params[1]) then
+						x,y,z = spGetUnitPosition(command.params[1])
 					end
 				end
 				if not x then
@@ -385,7 +395,7 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz) --Note: source is fro
 		local reachable = true --always assume target reachable
 		local waypoints
 		if moveID then --unit has compatible moveID?
-			local path = Spring.RequestPath( moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
+			local path = spRequestPath( moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
 			local result, lastwaypoint
 			result, lastwaypoint, waypoints = IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
 			if result == "outofreach" then --abit out of reach?
@@ -415,7 +425,7 @@ end
 --This function process result of Spring.PathRequest() to say whether target is reachable or not
 function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
 	local returnValue1,returnValue2, returnValue3
-	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
+	local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
 	if path then
 		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
 		local finalCoord = waypoint[#waypoint]

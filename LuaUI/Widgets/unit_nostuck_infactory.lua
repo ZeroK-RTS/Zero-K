@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "UnitNoStuckInFactory",
     desc      = "Always move unit away from factory's build yard & Remove an accidental build unit command from unit from factory. Prevent case of unit stuck in factory & to make sure unit can complete their move queue.",
     author    = "msafwan",
-    date      = "24 Feb 2013",
+    date      = "27 June 2013",
     license   = "none",
 	handler   = false,
     layer     = 1,
@@ -12,9 +12,14 @@ function widget:GetInfo()
 end
 
 local myTeamID = Spring.GetMyTeamID()
+local excludedFactory = {nil}
+do
+	excludedFactory[UnitDefnames["factorygunship"].id] = true
+	excludedFactory[UnitDefnames["factoryplane"].id] = true
+end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
-	if myTeamID == unitTeam then
+	if myTeamID == unitTeam and (not excludedFactory[factDefID]) then
 		---Order unit to move away from factory's build yard---
 		local queue = Spring.GetUnitCommands(unitID, 1)
 		local firstCommand = queue and queue[1]
