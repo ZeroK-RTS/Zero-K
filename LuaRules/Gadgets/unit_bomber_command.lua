@@ -362,7 +362,6 @@ function gadget:GameFrame(n)
 				
 				if vy ~= 0 and offGround < 20 then
 					if bomberMayBeJiggling[bomberID] then
-						
 						local unitDefID = Spring.GetUnitDefID(bomberID)
 						local teamID = Spring.GetUnitTeam(bomberID)
 						Spring.DestroyUnit(bomberID, true, true)

@@ -1,13 +1,13 @@
 local version = 0.812
 function widget:GetInfo()
   return {
-    name      = "Teleport AI (experimental)",
+    name      = "Teleport AI (experimental) v2",
     desc      = "Automatically teleport any unit near a teleport enterance.",
     author    = "Msafwan",
     date      = "26 June 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
-    enabled   = true
+    enabled   = false
   }
 end
 

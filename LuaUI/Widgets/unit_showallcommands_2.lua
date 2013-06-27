@@ -4,7 +4,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Show All Commands",
+    name      = "Show All Commands v2",
     desc      = "Acts like CTRL-A SHIFT all the time",
     author    = "Google Frog",
     date      = "Mar 1, 2009",
