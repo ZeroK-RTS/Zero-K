@@ -14,8 +14,8 @@ end
 local myTeamID = Spring.GetMyTeamID()
 local excludedFactory = {nil}
 do
-	excludedFactory[UnitDefnames["factorygunship"].id] = true
-	excludedFactory[UnitDefnames["factoryplane"].id] = true
+	excludedFactory[UnitDefNames["factorygunship"].id] = true
+	excludedFactory[UnitDefNames["factoryplane"].id] = true
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
