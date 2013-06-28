@@ -1,4 +1,4 @@
-if (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil)) then
+if Game.version:find('91.') or ((Game.version:find('94') and (Game.version:find('94.1.1'))== nil)) then
   local SetUnitWeaponState = Spring.SetUnitWeaponState
   local GetUnitWeaponState = Spring.GetUnitWeaponState
   local GetUnitWeaponVectors = Spring.GetUnitWeaponVectors
