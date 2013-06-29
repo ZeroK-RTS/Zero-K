@@ -3,7 +3,7 @@ return {
 	-- yyyymmdd
 	-- if newer than user's, overwrite ALL zir zk_keys
 	-- else just add any that are missing from local config
-	["date"] = 20130220,
+	["date"] = 20130630,
 
 
 	-- all default ZK keybinds. 
@@ -126,7 +126,7 @@ return {
 	{	"viewta",	"C+f2",},
 	{	"lastmsgpos",	"f3",},
 	{	"viewtw",	"C+f3",},
-	{	"showmetalmap",	"f4",},
+	{	"showeco",	"f4",},
 	{	"viewrot",	"C+f4",},
 	{	"viewfree",	"C+f5",},
 	{	"HideInterface",	"Any+f5",},

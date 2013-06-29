@@ -110,6 +110,7 @@ options = {
 		hotkey = {key='f4', mod=''},
 		type ='bool',
 		value = false,
+		actionname='showeco',
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
