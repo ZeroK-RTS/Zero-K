@@ -25,7 +25,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --//for backward compatibility with old weapon indexes
-local reverseCompat = (Game.version:find('91.') or ((Game.version:find('94') and (Game.version:find('94.1.1'))== nil))) and 1 or 0
+local reverseCompat = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and 1 or 0
 
 local barHeight = 3
 local barWidth  = 14  --// (barWidth)x2 total width!!!

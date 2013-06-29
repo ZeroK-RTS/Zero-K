@@ -38,6 +38,9 @@ local spGetSelectedUnitsCount           = Spring.GetSelectedUnitsCount
 local spGetSelectedUnitsByDef           = Spring.GetSelectedUnitsSorted
 local spGetUnitWeaponState 				= Spring.GetUnitWeaponState
 local spGetGameFrame 					= Spring.GetGameFrame
+local spGetUnitRulesParam 				= Spring.GetUnitRulesParam
+local spSelectUnitArray 				= Spring.SelectUnitArray
+local spGetUnitPosition 			= Spring.GetUnitPosition
 
 local echo = Spring.Echo
 
@@ -56,7 +59,7 @@ include("keysym.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local reverseCompat = (Game.version:find('91.') or ((Game.version:find('94') and (Game.version:find('94.1.1'))== nil))) and 1 or 0
+local reverseCompat = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and 1 or 0
 
 local Chili
 local Button
@@ -602,8 +605,8 @@ local function GetUnitDesc(unitID, ud)
 	if lang == 'en' then
 		if unitID then
 			local tooltip = spGetUnitTooltip(unitID)
-			if windTooltips[ud.name] and not Spring.GetUnitRulesParam(unitID,"NotWindmill") and Spring.GetUnitRulesParam(unitID,"minWind") then
-				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", Spring.GetGameRulesParam("WindMax") )
+			if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
+				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", spGetGameRulesParam("WindMax") )
 			end
 			return tooltip
 		end
@@ -615,8 +618,8 @@ local function GetUnitDesc(unitID, ud)
 		local endesc = ud.tooltip
 		
 		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc)
-		if windTooltips[ud.name] and not Spring.GetUnitRulesParam(unitID,"NotWindmill") then
-			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. Spring.GetGameRulesParam("WindMax")
+		if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") then
+			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. spGetGameRulesParam("WindMax")
 		end
 		return tooltip
 	end
@@ -669,7 +672,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 				else
 					--// deselect a whole unitdef block
 					for i=numSelectedUnits,1,-1 do
-						if (Spring.GetUnitDefID(selectedUnits[i])==defid) then
+						if (spGetUnitDefID(selectedUnits[i])==defid) then
 							table.remove(selectedUnits,i)
 							if (alt) then
 								break
@@ -677,27 +680,27 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 						end
 					end
 				end
-				Spring.SelectUnitArray(selectedUnits)
+				spSelectUnitArray(selectedUnits)
 				--update selected units right now
-				local sel = Spring.GetSelectedUnits()
+				local sel = spGetSelectedUnits()
 				widget:SelectionChanged(sel)
 			elseif button == 1 then
 				if not ctrl then 
 					if (alt) then
-						Spring.SelectUnitArray({ selectedUnitsByDef[defid][1] })  -- only 1	
+						spSelectUnitArray({ selectedUnitsByDef[defid][1] })  -- only 1	
 					else
-						Spring.SelectUnitArray(unitids) -- no modifier - select all
+						spSelectUnitArray(unitids) -- no modifier - select all
 					end
 				else
 					-- select all units of the icon type
-					Spring.SelectUnitArray(selectedUnitsByDef[defid])
+					spSelectUnitArray(selectedUnitsByDef[defid])
 					
 					--local sorted = Spring.GetTeamUnitsSorted(Spring.GetMyTeamID())						
 					--local units = sorted[defid]
 					--if units then Spring.SelectUnitArray(units) end
 				end
 			else --button2 (middle)
-				local x,y,z = Spring.GetUnitPosition( unitids[1] )
+				local x,y,z = spGetUnitPosition( unitids[1] )
 				Spring.SetCameraTarget(x,y,z, 1)
 			end
 		end}
@@ -2347,7 +2350,7 @@ function widget:Initialize()
 		resizable   = false;
 		draggable = false,
 		OnMouseDown={ function(self)
-			local _,_, meta,_ = Spring.GetModKeyState()
+			local _,_, meta,_ = spGetModKeyState()
 			if not meta then return false end
 			WG.crude.OpenPath('Settings/HUD Panels/Selected Units Window')
 			WG.crude.ShowMenu()
