@@ -18,10 +18,10 @@ do
 	local rankTexBase = 'LuaUI/Images/Ranks/' 
 	rankTextures = {
 	  [0] = nil,
-	  [1] = rankTexBase .. 'rank1.png',
-	  [2] = rankTexBase .. 'rank2.png',
-	  [3] = rankTexBase .. 'rank3.png',
-	  [4] = rankTexBase .. 'star.png',
+	  [1] = rankTexBase .. 'dude_smurf.png',
+	  [2] = rankTexBase .. 'dude_user.png',
+	  [3] = rankTexBase .. 'dude_soldier.png',
+	  [4] = rankTexBase .. 'dude_napoleon.png',
 	} --reference: unit_rank_icons.lua
 end
 --[[
