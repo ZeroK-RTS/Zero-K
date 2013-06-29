@@ -33,6 +33,7 @@ local DEFAULT_MAX_DRONE_RANGE = 1500
 local carrierList = {}
 local droneList = {}
 local drones_to_move = {}
+local killList = {}
 
 local function InitCarrier(unitDefID, teamID)
 	local carrierData = carrierDefs[unitDefID]
@@ -75,7 +76,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			local set = carrier.droneSets[i]
 			for droneID in pairs(set.drones) do
 				droneList[droneID] = nil
-				AddUnitDamage(droneID,1000)
+				killList[droneID] = true
 			end
 		end
 		carrierList[unitID] = nil
@@ -180,7 +181,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 end
 
 function gadget:GameFrame(n)
-	if (((n+1) % 30) < 0.1) then
+	if (((n+1) % 30) == 0) then
 		for carrierID, carrier in pairs(carrierList) do
 			if (not GetUnitIsStunned(carrierID)) then
 				for i=1,#carrier.droneSets do
@@ -203,8 +204,12 @@ function gadget:GameFrame(n)
 			TransferUnit(droneID, team, false)
 			drones_to_move[droneID] = nil
 		end
+		for unitID in pairs(killList) do
+			Spring.DestroyUnit(unitID, true)
+			killList[unitID] = nil
+		end
 	end
-	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) < 0.1) then
+	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) == 0) then
 		for i,_ in pairs(carrierList) do
 			UpdateCarrierTarget(i)
 		end
