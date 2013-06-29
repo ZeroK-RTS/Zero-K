@@ -1,10 +1,10 @@
-local version = 0.812
+local version = "v0.813"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
-    desc      = "Automatically teleport any unit near a teleport enterance.",
+    desc      = version .. " Automatically teleport any unit near a teleport enterance.",
     author    = "Msafwan",
-    date      = "26 June 2013",
+    date      = "29 June 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
@@ -33,6 +33,8 @@ local groupBeaconOfficial={}
 local groupSpreadJobs={}
 local groupEffectedUnit={}
 local groupLoopedUnit={}
+local fiveSecondExcludedUnit = {}
+local beaconDefID = UnitDefNames["tele_beacon"].id
 
 function widget:Initialize()
 	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
@@ -47,13 +49,13 @@ function widget:Initialize()
 		local unitID = units[i]
 		if Spring.IsUnitAllied(unitID) then
 			local unitDefID = Spring.GetUnitDefID(unitID)
-			if IsTeleport(unitDefID) then
+			if beaconDefID == unitDefID then
 				local x,y,z = spGetUnitPosition(unitID)
 				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevQue=nil,prevIndex=nil,prevList=nil,finish=nil,deployed=1}
 			end
 		end
 	end
-	local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, 500,1, myTeamID,500) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other 
+	local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, 700,1, myTeamID,700) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other 
 	groupBeaconOfficial = cluster
 	for i=1, #nonClustered do
 		groupBeaconOfficial[#groupBeaconOfficial+1] = {nonClustered[i]}
@@ -61,10 +63,10 @@ function widget:Initialize()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if IsTeleport(unitDefID) then
+	if beaconDefID == unitDefID then
 		local x,y,z = spGetUnitPosition(unitID)
 		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevQue=nil,prevIndex=nil,prevList=nil,finish=nil,deployed=1}
-		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, 500,1, myTeamID,500) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
+		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, 700,1, myTeamID,700) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
 		groupBeaconOfficial = cluster
 		for i=1, #nonClustered do
 			groupBeaconOfficial[#groupBeaconOfficial+1] = {nonClustered[i]}
@@ -84,10 +86,6 @@ function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitCreated(unitID, unitDefID, newTeamID)
 end
 
-function IsTeleport(unitDefID) 
-  ud = UnitDefs[unitDefID]
-  return (ud ~= nil and (ud.name=="tele_beacon"))
-end
 ------------------------------------------------------------
 ------------------------------------------------------------
 
@@ -101,6 +99,7 @@ function widget:GameFrame(n)
 			listOfBeacon[beaconID][6] = ez
 			listOfBeacon[beaconID]["djin"] = djinnID
 		end
+		fiveSecondExcludedUnit = {}
 	end
 	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: update deploy state
 		for beaconID,tblContent in pairs(listOfBeacon) do
@@ -127,7 +126,7 @@ function widget:GameFrame(n)
 					local djinDeployed = listOfBeacon[beaconID]["deployed"]
 					if not alreadyFinished and djinDeployed == 1 then
 						local bX,bY,bZ = listOfBeacon[beaconID][1],listOfBeacon[beaconID][2],listOfBeacon[beaconID][3]
-						local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,500,myTeamID)
+						local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,700,myTeamID)
 						local numberOfLoop = #vicinityUnit
 						--Spring.Echo("LOOP:" .. numberOfLoop)
 						local numberOfLoopToProcessPerFrame = math.ceil(numberOfLoop/29)
@@ -144,17 +143,22 @@ function widget:GameFrame(n)
 							if not validUnitID then
 								unitToEffect[unitID] = nil
 							end
-							if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] then
+							local excludedUnit = fiveSecondExcludedUnit[unitID] and fiveSecondExcludedUnit[unitID][beaconID]
+							if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] and not excludedUnit then
 								local unitDefID = spGetUnitDefID(unitID)
 								if not listOfMobile[unitDefID] then
 									local moveID = UnitDefs[unitDefID].moveData.id
 									local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog)
 									local unitSpeed = UnitDefs[unitDefID].speed
-									listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed}
+									local isBomber = UnitDefs[unitDefID].isBomber
+									local isFighter = UnitDefs[unitDefID].isFighter
+									listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter}
 								end
 								local moveID = listOfMobile[unitDefID][1]
+								local isBomber = listOfMobile[unitDefID][4]
+								local isFighter = listOfMobile[unitDefID][5]
 								repeat
-									if not moveID then
+									if not moveID or isBomber or isFighter then
 										loopedUnits[unitID]=true
 										break; --a.k.a: Continue
 									end
@@ -272,6 +276,10 @@ function widget:GameFrame(n)
 								if (timeToDest+beaconCurrentQueue[beaconID]) < lowestPathTime then
 									pathToFollow = beaconID
 									lowestPathTime = timeToDest
+								end
+								if (timeToDest > tblContent["norm"]) then --beacon travel simply not a viable option
+									fiveSecondExcludedUnit[unitID] = fiveSecondExcludedUnit[unitID] or {}
+									fiveSecondExcludedUnit[unitID][beaconID] = true --exclude processing this unit for at least 5 sec or less
 								end
 							end
 							-- if timeToDest<30000 then
@@ -455,4 +463,19 @@ function Dist(x,y,z, x2, y2, z2)
 	local yd = y2-y
 	local zd = z2-z
 	return math.sqrt(xd*xd + yd*yd + zd*zd)
+end
+
+------------------------------------------------------------
+------------------------------------------------------------
+
+function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
+	 fiveSecondExcludedUnit[unitID]=nil
+end
+
+function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) 
+	fiveSecondExcludedUnit[unitID]=nil
+end
+
+function UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+	fiveSecondExcludedUnit[unitID]=nil
 end
