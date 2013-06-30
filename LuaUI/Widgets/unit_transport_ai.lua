@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 10.4.2013",
+    date      = "1.11.2007, 30.6.2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -722,7 +722,8 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 	end
 	
 	local queue = GetCommandQueue(unitID)
-	if (queue == nil) then  --unit has no command at all?!
+	if (queue == nil) and (not shift) then  --unit has no command at all?! and not queueing embark/disembark command?!
+		Spring.Echo("Transport: Select destination")
 		Spring.SetActiveCommand("transportto") --Force user to add move command. See unit_transport_ai_buttons.lua for more info.
 		return false --wait until user select destination
 	else
@@ -734,8 +735,9 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 				break
 			end
 		end
-		if not hasMoveCommand then --unit has no move command?!
-			Spring.SetActiveCommand("transportto") --Force user to add move command. 
+		if (not hasMoveCommand) and (not shift) then --unit has no move command?! and not queueing embark/disembark command?!
+			Spring.Echo("Transport: Select destination")
+			Spring.SetActiveCommand("transportto") --Force user to add move command.
 			return false --wait until user select destination
 		end
 	end

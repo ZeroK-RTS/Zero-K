@@ -1,10 +1,10 @@
-local version = "v0.813"
+local version = "v0.814"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
     desc      = version .. " Automatically teleport any unit near a teleport enterance.",
     author    = "Msafwan",
-    date      = "29 June 2013",
+    date      = "30 June 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
@@ -76,10 +76,12 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID)
 	listOfBeacon[unitID] = nil
+	fiveSecondExcludedUnit[unitID] = nil
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitDestroyed(unitID, unitDefID)
+	fiveSecondExcludedUnit[unitID] = nil
 end
 
 function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
@@ -99,7 +101,6 @@ function widget:GameFrame(n)
 			listOfBeacon[beaconID][6] = ez
 			listOfBeacon[beaconID]["djin"] = djinnID
 		end
-		fiveSecondExcludedUnit = {}
 	end
 	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: update deploy state
 		for beaconID,tblContent in pairs(listOfBeacon) do
@@ -152,13 +153,14 @@ function widget:GameFrame(n)
 									local unitSpeed = UnitDefs[unitDefID].speed
 									local isBomber = UnitDefs[unitDefID].isBomber
 									local isFighter = UnitDefs[unitDefID].isFighter
-									listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter}
+									local isStatic = (unitSpeed == 0)
+									listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isMobile}
 								end
-								local moveID = listOfMobile[unitDefID][1]
 								local isBomber = listOfMobile[unitDefID][4]
 								local isFighter = listOfMobile[unitDefID][5]
+								local isStatic = listOfMobile[unitDefID][6]
 								repeat
-									if not moveID or isBomber or isFighter then
+									if isStatic or isBomber or isFighter then
 										loopedUnits[unitID]=true
 										break; --a.k.a: Continue
 									end
@@ -185,6 +187,13 @@ function widget:GameFrame(n)
 												loopedUnits[unitID]=true
 											end
 											break; --a.k.a: Continue
+										else
+											local cmd_queue = spGetCommandQueue(unitID,3);
+											if cmd_queue[2] and cmd_queue[3] then --in case previous teleport AI teleport order make unit stuck to non-existent beacon
+												spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
+												cmd_queue = ConvertCMDToMOVE({cmd_queue[3]})
+												unitToEffect[unitID]["cmd"] = cmd_queue
+											end	
 										end
 									end
 									if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
@@ -198,6 +207,7 @@ function widget:GameFrame(n)
 									local px,py,pz = unitToEffect[unitID]["pos"][1],unitToEffect[unitID]["pos"][2],unitToEffect[unitID]["pos"][3]
 									local cmd_queue = {id=0,params={0,0,0}}
 									local unitSpeed = listOfMobile[unitDefID][3]
+									local moveID = listOfMobile[unitDefID][1]
 									if not unitToEffect[unitID]["norm"] then
 										cmd_queue.id = unitToEffect[unitID]["cmd"].id
 										cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
@@ -476,6 +486,6 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	fiveSecondExcludedUnit[unitID]=nil
 end
 
-function UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
 	fiveSecondExcludedUnit[unitID]=nil
 end
