@@ -1,3 +1,5 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
     name      = "Shared Functions",
@@ -11,6 +13,8 @@ function widget:GetInfo()
 	alwaysStart = true,
   }
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local ecoTex     = ":n:bitmaps/icons/frame_eco.png"
 local consTex    = ":n:bitmaps/icons/frame_cons.png"
@@ -74,7 +78,7 @@ local function WriteTable(array, numIndents, endOfFile, concise)
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise, useDoubleQuote)
+			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
 		elseif type(v) == "string" then
@@ -93,13 +97,13 @@ end
 
 WG.WriteTable = WriteTable
 
-function WG.PrintTable(f, table)
-	file = io.open (f, "w")
-	if (file== nil) then
-		Spring.Log(widget:GetInfo().name, "error", "could not open file for writing!")
+function WG.SaveTable(f, table, concise)
+	local file,err = io.open(f, "w")
+	if (err) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, err)
 		return
 	end
-	file:write(WriteTable(table, 0, true))
+	file:write(WriteTable(table, 0, true, concise))
 	file:flush()
 	file:close()
 end
@@ -146,10 +150,10 @@ end
 
 WG.WritePythonDict = WritePythonDict
 
-function WG.PrintPythonDict(f, listName, list, raw)
-	file = io.open(f, "w")
-	if (file== nil) then
-		Spring.Log(widget:GetInfo().name, "error", "could not open file for writing!")
+function WG.SavePythonDict(f, listName, list, raw)
+	local file,err = io.open (f, "w")
+	if (err) then
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, err)
 		return
 	end
 	file:write(WritePythonDict(listName, list, 0, true, raw))

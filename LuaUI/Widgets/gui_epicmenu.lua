@@ -438,17 +438,7 @@ end
 local function SaveKeybinds()
 	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
 	--table.save( keybindfile_table, keybind_file )
-	
-	local file = io.open (keybind_file, "w")
-	if (file== nil) then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Could not open keybind file " .. keybind_file .. " for writing")
-		return
-	end
-	
-	file:write ("return " .. WG.WriteTable(keybindfile_table, 0, true, true, true))
-	file:flush()
-	file:close()
-	
+	WG.SaveTable(keybind_file, keybindfile_table, true)
 end
 
 local function LoadKeybinds()
@@ -465,15 +455,15 @@ local function LoadKeybinds()
 				
 				loaded = true
 				keybind_date = keybind_date or defaultkeybind_date	-- reverse compat
-				
-				--echo ('============OVERRIDE??', keybind_date, defaultkeybind_date)
-				
 				if not keybind_date or keybind_date == 0 or (keybind_date+0) < defaultkeybind_date then
+					-- forcibly assign default keybind to actions it finds
+					-- note that it won't do anything to keybinds if the action is not defined in default keybinds
+					-- to overwrite such keys, assign the action's keybind to "None"
 					keybind_date = defaultkeybind_date
 					for _,elem in ipairs(defaultkeybinds) do
 						local action = elem[1]
 						local keybind = elem[2]
-						otset( keybounditems, action, keybind)-- forcibly override any user changes to default binds
+						otset( keybounditems, action, keybind)
 					end
 				else
 					for _, elem in ipairs(defaultkeybinds) do
