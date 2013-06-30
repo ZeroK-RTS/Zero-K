@@ -1,4 +1,4 @@
-local version = "v0.814"
+local version = "v0.815"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -22,6 +22,7 @@ local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 local spValidFeatureID = Spring.ValidFeatureID
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spRequestPath = Spring.RequestPath
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 ------------------------------------------------------------
 ------------------------------------------------------------
 local myTeamID
@@ -106,6 +107,9 @@ function widget:GameFrame(n)
 		for beaconID,tblContent in pairs(listOfBeacon) do
 			local djinnID = listOfBeacon[beaconID]["djin"]
 			local djinnDeployed = djinnID and (spGetUnitRulesParam(djinnID,"deploy")) or 1
+			if djinnID and djinnDeployed == 1 then
+				djinnDeployed = (spGetUnitIsStunned(djinnID) or spGetUnitIsStunned(beaconID)) and 0 or 1
+			end
 			listOfBeacon[beaconID]["deployed"] = djinnDeployed
 		end
 	end
