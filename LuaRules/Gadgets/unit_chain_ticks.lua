@@ -29,7 +29,7 @@ end
 function gadget:GameFrame()
 	if (table_size > 0) then
 		for i = 1, table_size do
-			if (spValidUnitID(ticks_to_pwn[i])) -- one tick could get damaged twice 
+			if (spValidUnitID(ticks_to_pwn[i])) then -- one tick could get damaged twice 
 				spDestroyUnit(ticks_to_pwn[i], true)
 			end
 			ticks_to_pwn[i] = nil
