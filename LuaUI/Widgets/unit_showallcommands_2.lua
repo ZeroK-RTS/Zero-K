@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Show All Commands v2",
-    desc      = "Provide ZK Epicmenu with Command visibility options", --"Acts like CTRL-A SHIFT all the time",
+    desc      = "Provide ZK Epicmenu with Command visibility options. Go to \255\90\255\90Setting/ Interface/ Command Visibility\255\255\255\255 for options.", --"Acts like CTRL-A SHIFT all the time",
     author    = "Google Frog, msafwan",
     date      = "Mar 1, 2009, July 1 2013",
     license   = "GNU GPL, v2 or later",

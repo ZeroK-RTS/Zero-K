@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.318 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.319 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-06-30
     license   = "GNU GPL, v2 or later",
@@ -1088,7 +1088,9 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 				option.value = key
 				settings.config[fullkey] = option.value
 				
-				MakeSubWindow(curPath) --remake window to update the buttons' visuals when pressed
+				if (path == curPath) or key.isSearchWindow then --search window always show options in wrong path, but we will refresh the window it anyway using "isSearchWindow" flag
+					MakeSubWindow(curPath) --remake window to update the buttons' visuals when pressed
+				end
 			end			
 	end
 	option.OnChange = function(self) 
@@ -1740,6 +1742,7 @@ MakeSubWindowSearch = function(path)
 	
 	local settings_height = #(pathoptions[path]) * B_HEIGHT
 	local settings_width = 270
+	local maximumResult = 17 --maximum result to display. Any more it will just say "too many"
 	
 	local filtered_pathOptions = {}
 	
@@ -1844,7 +1847,7 @@ MakeSubWindowSearch = function(path)
 	local roughNumberOfHit = #filtered_pathOptions
 	if roughNumberOfHit == 0 then
 		tree_children[1] = Label:New{ caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.sub_header, textColor = color.tooltip_bg, }
-	elseif  roughNumberOfHit >= 17 then
+	elseif  roughNumberOfHit > maximumResult then
 		tree_children[1] = Label:New{ caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", textColor = color.tooltip_bg,}
 		tree_children[2] = Label:New{ caption = "- please navigate the menu to see all options -",  textColor = color.tooltip_bg, }
 		tree_children[3] = Label:New{ caption = "- (" .. roughNumberOfHit .. " match in total) -",  textColor = color.tooltip_bg, }
@@ -1979,6 +1982,7 @@ MakeSubWindowSearch = function(path)
 				item.wname = option.wname.."radioButton"	-- wname is needed by Hotkey to 'AddAction'
 				item.name = option.items[i].name --is needed by checkbox caption
 				item.key = option.items[i].key --is needed to set checkbox status
+				item.isSearchWindow = true --this force MakeSubWindowSearch() to update even when the button's path is not same as the current window path
 				item.desc = option.items[i].desc --is needed for checkbox tooltip
 				item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item.key). Is needed for Hotkey
 				settings_height = settings_height + B_HEIGHT
