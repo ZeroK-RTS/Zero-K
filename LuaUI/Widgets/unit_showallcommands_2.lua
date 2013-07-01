@@ -31,12 +31,12 @@ options_order = {
 options = {
 	showallcommandselection = {
 		type='radioButton', 
-		name='Command Clutter Level',
+		name='Commands are drawn for',
 		items = {
-			{name = 'Highest',key='showallcommand', desc="Command always drawn on all units.", hotkey=nil},
-			{name = 'Medium',key='onlyselection', desc="Command always drawn on selected unit, pressing SHIFT will draw it for all units.", hotkey=nil},
-			{name = 'Lower',key='showallonshift', desc="Commands always hidden, but pressing SHIFT will draw it for all units.", hotkey=nil},
-			{name = 'Lowest',key='showminimal', desc="Commands always hidden, pressing SHIFT will draw it on selected units.", hotkey=nil},
+			{name = 'All units',key='showallcommand', desc="Command always drawn on all units.", hotkey=nil},
+			{name = 'Selected units, All with SHIFT',key='onlyselection', desc="Command always drawn on selected unit, pressing SHIFT will draw it for all units.", hotkey=nil},
+			{name = 'All units with SHIFT',key='showallonshift', desc="Commands always hidden, but pressing SHIFT will draw it for all units.", hotkey=nil},
+			{name = 'Selected units on SHIFT',key='showminimal', desc="Commands always hidden, pressing SHIFT will draw it on selected units.", hotkey=nil},
 		},
 		value = 'showallcommand',  --default at start of widget is SHOW ALL COMMAND!
 		OnChange = function(self)
