@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.317 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.318 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-06-26
+    date      = "2009-06-02", --2013-06-30
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -100,6 +100,7 @@ local lbl_gtime, lbl_fps, lbl_clock, img_flag
 local cmsettings_index = -1
 local window_sub_cur
 local filterUserInsertedTerm = "" --the term used to search the button list
+local explodeSearchTerm = {text="", terms={}} -- store exploded "filterUserInsertedTerm" (brokendown into sub terms)
 
 --------------------------------------------------------------------------------
 -- Misc
@@ -1087,9 +1088,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 				option.value = key
 				settings.config[fullkey] = option.value
 				
-				if path == curPath then
-					MakeSubWindow(path) --remake window to update the buttons' visuals
-				end
+				MakeSubWindow(curPath) --remake window to update the buttons' visuals when pressed
 			end			
 	end
 	option.OnChange = function(self) 
@@ -1735,7 +1734,7 @@ MakeSubWindow = function(path)
 	AdjustWindow(window_sub_cur)
 end
 
--- Make submenu window based on index from flat window list
+-- Make submenu window based on index from flat window list (This is exclusive for search result)
 --local function MakeSubWindow(key)
 MakeSubWindowSearch = function(path)
 	
@@ -1746,20 +1745,21 @@ MakeSubWindowSearch = function(path)
 	
 	local DiggDeeper = function() end
 	DiggDeeper = function(currentPath)
-		local virtualCategoryHit = false
+		local virtualCategoryHit = false --category deduced from the text label preceding the option(s)
 		for _,elem in ipairs(pathoptions[currentPath]) do
 			local option = elem[2]
 			
 			local lowercase_name = option.name:lower()
+			local lowercase_text = option.text and option.text:lower() or ''
 			local lowercase_desc = option.desc and option.desc:lower() or ''
-			local found_name = lowercase_name:find(filterUserInsertedTerm) or lowercase_desc:find(filterUserInsertedTerm) or virtualCategoryHit
+			local found_name = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_text,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm) or virtualCategoryHit
 					
 			if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
 				--do nothing
 			elseif option.type == 'button' then
 				local hide = false
 				
-				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname)(STABLE)
+				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
 					local menupath = option.desc
 					if pathoptions[menupath] then
 						if #pathoptions[menupath] >= 1 then
@@ -1780,7 +1780,7 @@ MakeSubWindowSearch = function(path)
 			elseif option.type == 'label' then
 				local virtualCategory = option.value or option.name
 				virtualCategory = virtualCategory:lower()
-				virtualCategoryHit = virtualCategory:find(filterUserInsertedTerm)
+				virtualCategoryHit = SearchInText(virtualCategory,filterUserInsertedTerm)
 				if virtualCategoryHit then
 					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
 				end
@@ -1806,7 +1806,7 @@ MakeSubWindowSearch = function(path)
 						local item = option.items[i]
 						lowercase_name = item.name:lower()
 						lowercase_desc = item.desc and item.desc:lower() or ''
-						local found = lowercase_name:find(filterUserInsertedTerm) or lowercase_desc:find(filterUserInsertedTerm)
+						local found = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm)
 						if found then
 							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
 						end
@@ -1823,7 +1823,7 @@ MakeSubWindowSearch = function(path)
 						lowercase_desc = item.desc and item.desc:lower() or ''
 						local hotkeystring = GetHotkeyData(currentPath, item)
 						local lowercase_hotkey = hotkeystring:lower()
-						local found = lowercase_name:find(filterUserInsertedTerm) or lowercase_desc:find(filterUserInsertedTerm) or lowercase_hotkey:find(filterUserInsertedTerm)
+						local found = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm) or lowercase_hotkey:find(filterUserInsertedTerm)
 						if found then
 							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
 						end
@@ -1844,9 +1844,10 @@ MakeSubWindowSearch = function(path)
 	local roughNumberOfHit = #filtered_pathOptions
 	if roughNumberOfHit == 0 then
 		tree_children[1] = Label:New{ caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.sub_header, textColor = color.tooltip_bg, }
-	elseif  roughNumberOfHit >= 16 then
+	elseif  roughNumberOfHit >= 17 then
 		tree_children[1] = Label:New{ caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", textColor = color.tooltip_bg,}
 		tree_children[2] = Label:New{ caption = "- please navigate the menu to see all options -",  textColor = color.tooltip_bg, }
+		tree_children[3] = Label:New{ caption = "- (" .. roughNumberOfHit .. " match in total) -",  textColor = color.tooltip_bg, }
 		filtered_pathOptions = {}
 	end
 	
@@ -2811,7 +2812,8 @@ do --Set our prefered camera mode when first screen frame is drawn. The engine a
 	end
 end
 --]]
-
+-------------------------------------------------------
+-------------------------------------------------------
 -- detect when user press ENTER to insert search term for searching option in epicmenu
 function widget:TextCommand(command)
 	if window_sub_cur and command:sub(1,7) == "search:" and curPath~="" then --Note: skip searching from Root/"" (because MakeSubWindowSearch() can't handle "" path for the moment)
@@ -2829,4 +2831,45 @@ function widget:KeyRelease(key)
 	if window_sub_cur and key ==13 then --Note: "13" equal to "Enter". Could this be different in different keyboard?
 		Spring.SendCommands("PasteText /search:" )
 	end
+end
+
+function SearchInText(randomTexts,searchText) --this allow search term to be unordered (eg: "sel view" == "view sel")
+	if explodeSearchTerm.text ~= searchText then
+		local explodedTerms = {}
+		local termLenght = searchText:len()
+		local spaceLocation,textLocation = searchText:find("%s%l") -- spacing + letter. eg: " x"
+		if spaceLocation then
+			explodedTerms[1] = searchText:sub(1,spaceLocation-1)
+			local theRestOfTerm = searchText:sub(textLocation,termLenght)
+			termLenght = termLenght-spaceLocation --text get shorter, so lenght get shorter
+			while termLenght > 1 do
+				local index = #explodedTerms
+				spaceLocation,textLocation = theRestOfTerm:find("%s%l")
+				if not spaceLocation then
+					explodedTerms[index+1] = theRestOfTerm:gsub("%s",'') --remove any spacing
+					break
+				end
+				explodedTerms[index+1] = theRestOfTerm:sub(1,spaceLocation-1)
+				theRestOfTerm = theRestOfTerm:sub(textLocation,termLenght)
+				termLenght = termLenght-spaceLocation
+			end
+			explodeSearchTerm.terms = explodedTerms
+			explodeSearchTerm.text = searchText
+		else
+			explodedTerms[1] = searchText:gsub("%s",'') --remove any spacing
+			explodeSearchTerm.terms = explodedTerms
+			explodeSearchTerm.text = searchText
+		end
+	end
+	local found = true --this return true if all term match (eg: found("sel") && found("view"))
+	local explodedTerms = explodeSearchTerm.terms
+	for i=1, #explodedTerms do 
+		local subSearchTerm = explodedTerms[i]
+		local findings = randomTexts:find(subSearchTerm)
+		if not findings then 
+			found = false
+			break
+		end
+	end
+	return found
 end

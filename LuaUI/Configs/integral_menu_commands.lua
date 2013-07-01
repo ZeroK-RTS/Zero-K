@@ -1,6 +1,7 @@
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --FIXME: use this table until state tooltip detection is fixed
+--SIDENOTE: using this table is preferable than editing command description directly because this maintain tooltip's compatibility with other build menu too.(eg: color text is not supported by stock gui)
 local tooltips = {
 	priority = "Priority: Set construction priority (low, normal, high)",
 	miscpriority = "Misc Priority: Set priority for morph or stockpile (low, normal, high)",

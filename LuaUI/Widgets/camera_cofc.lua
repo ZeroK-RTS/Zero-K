@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Combo Overhead/Free Camera (experimental)",
     desc      = "v0.121 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-June-20
+    date      = "2011-03-16", --2013-June-30
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -300,7 +300,7 @@ options = {
 	},
 	followautozoom = {
 		name = "Auto zoom",
-		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus). \n\nDo not enable this if you want fixed zoom level. If enabled, try to use the recommended follow cursor speed.",
+		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus). \n\nDO NOT enable this if you want to control the zoom level yourself. If enabled, try to use the recommended follow cursor speed.",
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
@@ -316,7 +316,7 @@ options = {
 	},	
 	followmaxscrollspeed = {
 		name = "Off Screen Follow Speed",
-		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest if auto-zoom is enabled (faster tracking will prevent auto-zoom from zooming out too far)",
+		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest (prevent missed action), faster tracking during auto-zoom will also prevent auto-zoom from zooming out too far",
 		type = 'number',
 		min = 2, max = 15, step = 1,
 		mid = ((15-2)/2) + 2,

@@ -1,18 +1,18 @@
 -- $Id$
-  
-
-
 function widget:GetInfo()
   return {
     name      = "Show All Commands v2",
-    desc      = "Acts like CTRL-A SHIFT all the time",
-    author    = "Google Frog",
-    date      = "Mar 1, 2009",
+    desc      = "Provide ZK Epicmenu with Command visibility options", --"Acts like CTRL-A SHIFT all the time",
+    author    = "Google Frog, msafwan",
+    date      = "Mar 1, 2009, July 1 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
   }
 end
+--Changelog:
+--July 1 2013 (msafwan add chili radiobutton and new options!)
+--NOTE: this options will behave correctly if "alwaysDrawQueue == 0" in cmdcolors.txt
 
 local spDrawUnitCommands = Spring.DrawUnitCommands
 local spGetAllUnits = Spring.GetAllUnits
@@ -22,36 +22,69 @@ local spGetModKeyState = Spring.GetModKeyState
 local spIsUnitSelected = Spring.IsUnitSelected
 
 local drawUnits = {}
+local commandLevel = 4 --default at start of widget is SHOW ALL COMMAND!
 
 options_path = 'Settings/Interface/Command Visibility'
-options_order = { 'showonlyonshift', "showforselected"}
-options = {
-	
-	showonlyonshift = {
-		name = 'Show only on shift',
-		type = 'bool',
-		value = false,
-		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
-	},	
-	showforselected = {
-		name = 'Show for selected units',
-		type = 'bool',
-		value = true,
-		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
-	},
+options_order = { 
+'showallcommandselection', 
 }
+options = {
+	showallcommandselection = {
+		type='radioButton', 
+		name='Command Clutter Level',
+		items = {
+			{name = 'Highest',key='showallcommand', desc="Command always drawn on all units.", hotkey=nil},
+			{name = 'Medium',key='onlyselection', desc="Command always drawn on selected unit, pressing SHIFT will draw it for all units.", hotkey=nil},
+			{name = 'Lower',key='showallonshift', desc="Commands always hidden, but pressing SHIFT will draw it for all units.", hotkey=nil},
+			{name = 'Lowest',key='showminimal', desc="Commands always hidden, pressing SHIFT will draw it on selected units.", hotkey=nil},
+		},
+		value = 'showallcommand',  --default at start of widget is SHOW ALL COMMAND!
+		OnChange = function(self)
+			local key = self.value
+			if key == 'showallcommand' then
+				commandLevel = 4
+				spSendLuaRulesMsg("target_on_the_move_all")
+			elseif key == 'onlyselection' then
+				commandLevel = 3
+				spSendLuaRulesMsg("target_on_the_move_selection")
+			elseif key == 'showallonshift' then
+				commandLevel = 2
+				spSendLuaRulesMsg("target_on_the_move_shift")
+			elseif key == 'showminimal' then
+				commandLevel = 1
+				spSendLuaRulesMsg("target_on_the_move_minimal")
+			end
+		end,
+	},
 
+}
+-----
 function widget:DrawWorld()
-
 	if not spIsGUIHidden()  then
-		for i, v in pairs(drawUnits) do
-			if i and (not options.showonlyonshift.value or select(4,spGetModKeyState()) or (spIsUnitSelected(i) and showforselected)) then
-				spDrawUnitCommands(i)
+		if commandLevel > 1 then --minimal
+			for i, v in pairs(drawUnits) do
+				if i then
+					local shift = select(4,spGetModKeyState())
+					
+					if (commandLevel==4) or --all
+					(commandLevel==2 and shift) or --shift
+					(commandLevel==3 and (spIsUnitSelected(i) or shift)) --selection/shift
+					then 
+						spDrawUnitCommands(i)
+					end
+				end
 			end
 		end
 	end
 end
 
+function PoolUnit()
+	local units = spGetAllUnits()
+	for i, id in pairs(units) do
+		drawUnits[id] = true
+	end
+end
+------
 function widget:UnitCreated(unitID)
 	drawUnits[unitID] = true
 end
@@ -65,26 +98,18 @@ function widget:UnitDestroyed(unitID)
 		drawUnits[unitID] = nil
 	end
 end
-
+-----
 function widget:GameFrame(n)
-	if (n == 1) then
-		local units = spGetAllUnits()
-  
-		for i, id in pairs(units) do
-			widget:UnitCreated(id)
-		end
+	if (n > 0) then
+		PoolUnit()
+		widgetHandler:RemoveCallIn("GameFrame") 
 	end
 end
 
-function widget:Initialize()
-    spSendLuaRulesMsg("target_on_the_move_draw_always")
-	local units = spGetAllUnits()
-	for i, id in pairs(units) do
-		widget:UnitCreated(id)
-	end
-end
+-- function widget:Initialize()
+    -- spSendLuaRulesMsg("target_on_the_move_all")
+-- end
 
 function widget:Shutdown()
-    spSendLuaRulesMsg("target_on_the_move_draw_normal")
+    spSendLuaRulesMsg("target_on_the_move_shift")
 end
-
