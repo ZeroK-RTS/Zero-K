@@ -1,10 +1,10 @@
-local version= "v0.944"
+local version= "v0.945"
 function widget:GetInfo()
   return {
     name      = "Comm-n-Elo Startpos. Info",
     desc      = version .. " Show Commander information and Elo icons before game start.",
     author    = "msafwan",
-    date      = "2013 April 10",
+    date      = "2013 July 3",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -18,10 +18,14 @@ do
 	local rankTexBase = 'LuaUI/Images/Ranks/' 
 	rankTextures = {
 	  [0] = nil,
-	  [1] = rankTexBase .. 'dude_smurf.png',
+	  [1] = rankTexBase .. 'dude_smurf.png', --dude-icon added by Sprung/Gnurps for theme consistency
 	  [2] = rankTexBase .. 'dude_user.png',
 	  [3] = rankTexBase .. 'dude_soldier.png',
 	  [4] = rankTexBase .. 'dude_napoleon.png',
+	  -- [1] = rankTexBase .. 'rank1.png', --this use unit-rank as user's rank (by xponen/msafwan)
+	  -- [2] = rankTexBase .. 'rank2.png',
+	  -- [3] = rankTexBase .. 'rank3.png',
+	  -- [4] = rankTexBase .. 'star.png',	  
 	} --reference: unit_rank_icons.lua
 end
 --[[
@@ -179,12 +183,21 @@ function widget:DrawScreenEffects() --Show icons on the screen. Reference: unit_
 			local y = playerInfo[i].xyz[2]
 			local z = playerInfo[i].xyz[3]
 			local height = y + (119) --got this exact height of the startpoint thru trial-n-error
-			local size = 59
+			--//The following config is suitable for unit-rank icon only:
+			--local size = 59
+			--local scrnVertOffset = 19
+			--local scrnHorzOffset = 0
+			--//
+			--//The following config is suitable for dude-icon:
+			local size = 23
+			local scrnVertOffset = 35
+			local scrnHorzOffset = 0
+			--//
 			x,height,z = Spring.WorldToScreenCoords(x,height,z) --convert unit position into screen coordinate
 			gl.Texture( rankTextures[eloLevel] ) --the icon (4 to choose from)
 			gl.PushMatrix()
 			gl.Translate(x,height,z) --move icon into screen coordinate
-			gl.TexRect(-size*0.5, -size+19, size*0.5, 19) --place this icon just below the player's name
+			gl.TexRect(-size*0.5+scrnHorzOffset, -size+scrnVertOffset, size*0.5+scrnHorzOffset, scrnVertOffset) --place this icon just below the player's name
 			gl.PopMatrix()
 		end
 	end
