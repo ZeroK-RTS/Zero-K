@@ -1,4 +1,4 @@
-local versionName = "v2.854"
+local versionName = "v2.856"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "May 25, 2013", --clean up June 25, 2013
+    date      = "July 3, 2013", --clean up June 25, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -62,6 +62,9 @@ local CMD_REMOVE		= CMD.REMOVE
 local CMD_MOVE			= CMD.MOVE
 local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 local CMD_OPT_SHIFT		= CMD.OPT_SHIFT
+local CMD_RECLAIM		= CMD.RECLAIM
+local CMD_RESURRECT		= CMD.RESURRECT
+local CMD_REPAIR		= CMD.REPAIR
 --local spRequestPath = Spring.RequestPath
 local mathRandom = math.random
 --local spGetUnitSensorRadius  = Spring.GetUnitSensorRadius
@@ -75,6 +78,7 @@ local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half th
 
 -- Graph constant:
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
+local useLOS_distanceCONSTANTunit_G = true --this replace  "distanceCONSTANTunitG" obstacle awareness (push) strenght with unit's LOS, ie: unit with different range suit better. (default = true, for tuning: use false)
 local safetyMarginCONSTANTunitG = 0.175 --obstacle graph windower (a "safety margin" constant). Shape the obstacle graph so that its fatter and more sloppier at extremities: ie: probably causing unit to prefer to turn more left or right (default = 0.175 radian)
 local smCONSTANTunitG		= 0.175  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right??? (default = 0.175 radian)
 local aCONSTANTg			= {math.pi/4 , math.pi/2} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2 (because both contribution from obstacle & target will sum to math.pi)).
@@ -122,10 +126,10 @@ local velocityAddingCONSTANTg=50 --add or remove command lenght (default = 50 el
 --curModID = upper(Game.modShortName)
 
 --Weapon Reload and Shield constant:
-local reloadableWeaponCriteriaG = 0.5 --second at which reload time is considered high enough to be a "reload-able". ie: 0.5second
-local criticalShieldLevelG = 0.5 --percent at which shield is considered low and should activate avoidance. ie: 50%
-local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate. ie: 0.9 second before finish
-local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calculating remaining reload time). ie: 0.0333 second-per-frame or 0.5sec/15frame
+local reloadableWeaponCriteriaG = 0.5 --second at which reload time is considered high enough to be a "reload-able". eg: 0.5second
+local criticalShieldLevelG = 0.5 --percent at which shield is considered low and should activate avoidance. eg: 50%
+local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate. eg: 0.9 second before finish
+local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calculating remaining reload time). eg: 0.0333 second-per-frame or 0.5sec/15frame
 
 --Command Timeout constants:
 local commandTimeoutG = 2 --multiply by 1.1 second
@@ -869,7 +873,7 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 			local unitFastestReloadableWeapon = reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 			if unitFastestReloadableWeapon ~= -1 then
 				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon -isOldSpring, "range") --retrieve weapon range
-				losRadius = math.min(weaponRange*0.75, losRadius) --reduce avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the smallest (Note: we need this minimum detection range to avoid disturbing maximum range artillery unit)
+				losRadius = math.max(weaponRange*0.75, losRadius) --select avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the biggest (Note: big LOSradius mean big detection but also big "distanceCONSTANTunit_G" if "useLOS_distanceCONSTANTunit_G==true", thus bigger avoidance circle)
 			end	
 			
 			--[[
@@ -1181,10 +1185,10 @@ function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, command
 		end
 	end
 	if (#cQueue>=queueIndex+1) then --if is queue={reclaim, area reclaim,stop}, or: queue={move,reclaim, area reclaim,stop}, or: queue={area reclaim, stop}, or:queue={move, area reclaim, stop}.
-		if (cQueue[queueIndex].id==40 or cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125) then --if first (1) queue is reclaim/ressurect/repair
-			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --if second (2) queue is also reclaim/ressurect
+		if (cQueue[queueIndex].id==CMD_REPAIR or cQueue[queueIndex].id==CMD_RECLAIM or cQueue[queueIndex].id==CMD_RESURRECT) then --if first (1) queue is reclaim/ressurect/repair
+			if cQueue[queueIndex+1].id==CMD_RECLAIM or cQueue[queueIndex+1].id==CMD_RESURRECT then --if second (2) queue is also reclaim/ressurect
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
-				if (cQueue[queueIndex+1].params[3]~=nil) then  --second (2) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
+				if (cQueue[queueIndex+1].params[4]~=nil) then  --second (2) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
 					orderArray[#orderArray+1] = {CMD_REMOVE, {cQueue[queueIndex].tag}, {}} -- spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete latest reclaiming/ressurecting command (skip the target:wreck/units). Allow command reset
 					local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex+1])
 					orderArray[#orderArray+1] = {CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command OR to any heavy concentration of ally (haven)
@@ -1193,12 +1197,12 @@ function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, command
 					commandTTL[unitID][1] = lastIndx +1--refresh table lenght
 					avoidanceCommand = false
 				end
-			elseif cQueue[queueIndex+1].id==40 then --if second (2) queue is also repair
+			elseif cQueue[queueIndex+1].id==CMD_REPAIR then --if second (2) queue is also repair
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
-				if (cQueue[queueIndex+1].params[3]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
+				if (cQueue[queueIndex+1].params[4]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
 					orderArray[#orderArray+1] = {CMD_REMOVE, {cQueue[queueIndex].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete current repair command, (skip the target:units). Reset the repair command
 				end
-			elseif (cQueue[queueIndex].params[3]~=nil) then  --if first (1) queue is area reclaim (an area reclaim without any wreckage to reclaim). area command should has no "nil" on params 1,2,3, & 4
+			elseif (cQueue[queueIndex].params[4]~=nil) then  --if first (1) queue is area reclaim (an area reclaim without any wreckage to reclaim). area command should has no "nil" on params 1,2,3, & 4
 				local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex])
 				orderArray[#orderArray+1] = {CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
 				local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
@@ -1298,31 +1302,36 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 		graphCONSTANTtrigger[2] = 1
-		if #cQueue >= queueIndex+1 then
-			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --//reclaim command has 2 stage: 1 is move back to base, 2 is going reclaim. If detected reclaim or ressurect at 2nd queue then identify as area reclaim
-				if cQueue[queueIndex].params[1]==cQueue[queueIndex+1].params[1]
-					and cQueue[queueIndex].params[2]==cQueue[queueIndex+1].params[2]
-					and cQueue[queueIndex].params[3]==cQueue[queueIndex+1].params[3] then --area reclaim will have no "nil", and will equal to retreat coordinate when retreating to center of area reclaim.
+		
+		if #cQueue >= queueIndex+1 then --this make unit retreating (that don't have safe haven coordinate) after reclaiming/ressurecting to have no target (and thus will retreat toward random position).
+			if cQueue[queueIndex+1].id==CMD_RECLAIM or cQueue[queueIndex+1].id==CMD_RESURRECT then --//reclaim command has 2 stage: 1 is move back to base, 2 is going reclaim. If detected reclaim or ressurect at 2nd queue then identify as area reclaim
+				if (cQueue[queueIndex].params[1]==cQueue[queueIndex+1].params[1]
+				and cQueue[queueIndex].params[2]==cQueue[queueIndex+1].params[2] --if retreat position equal to area reclaim/resurrect center (only happen if no safe haven coordinate detected)
+				and cQueue[queueIndex].params[3]==cQueue[queueIndex+1].params[3]) or
+				(cQueue[queueIndex].params[1]==cQueue[queueIndex+1].params[2]
+				and cQueue[queueIndex].params[2]==cQueue[queueIndex+1].params[3] --this 2nd condition happen when there is wreck to reclaim and the first params is the featureID.
+				and cQueue[queueIndex].params[3]==cQueue[queueIndex+1].params[4])
+				then --area reclaim will have no "nil", and will equal to retreat coordinate when retreating to center of area reclaim.
 					targetPosX, targetPosY, targetPosZ = -1, -1, -1 --//if area reclaim under the above condition, then avoid forever in presence of enemy, ELSE if no enemy (no avoidance): it reach retreat point and resume reclaiming
 					boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 				end
 			end
 		end
+		
 		targetCoordinate={targetPosX, targetPosY, targetPosZ } --send away the target for move command
 		commandIndexTable[unitID]["backupTargetX"]=targetPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=targetPosY
 		commandIndexTable[unitID]["backupTargetZ"]=targetPosZ
 		case = 'movebuild'
-	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then --reclaim or ressurect
+	elseif cQueue[queueIndex].id==CMD_RECLAIM or cQueue[queueIndex].id==CMD_RESURRECT then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
 		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
-		local notAreaMode = true
+		local areaMode = false
 		local foundMatch = false
-		--Method 1: set target to individual wreckage, else (if failed) revert to center of current area-command or to no target. *This method was used initially when constructor do not yet have retreat to base*
-		--[[
+		--Method 1: set target to individual wreckage, else (if failed) revert to center of current area-command or to no target.
+		-- [[
 		local targetFeatureID=-1
-		local iterativeTest=1
 		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
@@ -1330,41 +1339,40 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
 		else --if not own unit or trees or rock then
-			targetFeatureID=cQueue[queueIndex].params[1]+wreckageID_offset_multiplier-wreckageID_offset --remove the inherent offset
-			while iterativeTest<=3 and not foundMatch do --do test of reclaim wreckage (wreckage ID depend on number of players)
-				if Spring.ValidFeatureID(targetFeatureID) then
-					foundMatch=true
-					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
-				elseif Spring.ValidUnitID(targetFeatureID) then
-					foundMatch=true
-					wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
-				end
-				iterativeTest=iterativeTest+1
-				targetFeatureID=targetFeatureID-wreckageID_offset_multiplier
+			targetFeatureID=cQueue[queueIndex].params[1]-wreckageID_offset --remove the inherent offset
+			if Spring.ValidFeatureID(targetFeatureID) then
+				foundMatch=true
+				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
+			elseif Spring.ValidUnitID(targetFeatureID) then
+				foundMatch=true
+				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
 			end
 		end
-		if foundMatch==false then --if no wreckage, no trees, no rock, and no unitID then use coordinate
-			if cQueue[queueIndex].params[3] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4
-				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+		if foundMatch then --if no wreckage, no trees, no rock, and no unitID then use coordinate
+			if cQueue[queueIndex].params[4] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4 and in this case params 1 contain featureID/unitID because its the 2nd part of the area-reclaim command that reclaim wreck/target
 				areaMode = true
-			else
-				Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
+				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[2], cQueue[queueIndex].params[3],cQueue[queueIndex].params[4]
 			end
+		elseif cQueue[queueIndex].params[4] ~= nil then --1st part of the area-reclaim command (an empty area-command)
+			areaMode = true
+			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+		else --have no unit match but have no area coordinate either, but is RECLAIM command, something must be wrong:
+			if (turnOnEcho == 2)then  Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target") end
 		end
 		--]]
-		
+
 		--Method 2: set target to center of area command (also check for area command in next queue), else set target to wreckage or to no target. *This method assume retreat to base is a norm*
-		-- [[
-		if (cQueue[queueIndex].params[3] ~= nil) then --area reclaim should has no "nil" on params 1,2,3, & 4
+		--[[
+		if (cQueue[queueIndex].params[4] ~= nil) then --area reclaim should has no "nil" on params 1,2,3, & 4  while single reclaim has unit/featureID in params 1 only
 			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
-			notAreaMode = false
+			areaMode = true
 			foundMatch = true
-		elseif (cQueue[queueIndex+1].params[3] ~= nil and (cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125)) then --if next queue is an area-reclaim
+		elseif (cQueue[queueIndex+1].params[4] ~= nil and (cQueue[queueIndex+1].id==CMD_RECLAIM or cQueue[queueIndex+1].id==CMD_RESURRECT)) then --if next queue is an area-reclaim
 			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex+1].params[1], cQueue[queueIndex+1].params[2],cQueue[queueIndex+1].params[3]
-			notAreaMode = false
+			areaMode = true
 			foundMatch = true
 		end
-		if notAreaMode then
+		if not areaMode then
 			if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --reclaim own unit?
 				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
 				foundMatch = true
@@ -1397,14 +1405,13 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[2] = 1
 		boxSizeTrigger=2 --use deactivation 'halfboxsize' for RECLAIM/RESSURECT command
 		
-		--if not areaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --*used by Method 1* signature for discrete RECLAIM/RESSURECT command.
-		if notAreaMode then --*used by Method 2*
+		if not areaMode then --signature for discrete RECLAIM/RESSURECT command.
 			boxSizeTrigger = 1 --change to deactivation 'halfboxsize' similar to MOVE command if user queued a discrete reclaim/ressurect command
 			--graphCONSTANTtrigger[1] = 1 --override: use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 			--graphCONSTANTtrigger[2] = 1
 		end
 		case = 'reclaimressurect'
-	elseif cQueue[queueIndex].id==40 then --repair command
+	elseif cQueue[queueIndex].id==CMD_REPAIR then --repair command
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID=cQueue[queueIndex].params[1]
 	
@@ -1547,6 +1554,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG -- make the slopes in the extremeties of obstacle graph more sloppy (refer to "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas)
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
+	local useLOS_distanceCONSTANT = useLOS_distanceCONSTANTunit_G
 	local normalizeObsGraph = normalizeObsGraphG
 	----
 	local normalizingFactor = 1
@@ -1573,14 +1581,18 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID) -- obstacle's angular position with respect to our coordinate
 					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius) -- obstacle & our unit's angular size 
 
+					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
+					if useLOS_distanceCONSTANT then
+						distanceCONSTANT= losRadius --use unit's LOS instead of constant so that longer range unit has bigger avoidance radius.
+					end
+					
 					--get obstacle/ enemy/repulsor wave function
 					if impatienceTrigger==0 then --impatienceTrigger reach zero means that unit is impatient
 						distanceCONSTANT=distanceCONSTANT/2
 					end
 					local ri, wi, di,diff1 = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT)
 					local fObstacle = ri*wi*di
-					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
-
+					
 					--get second obstacle/enemy/repulsor wave function to calculate slope
 					local ri2, wi2, di2, diff2= GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT, true)
 					local fObstacle2 = ri2*wi2*di2
