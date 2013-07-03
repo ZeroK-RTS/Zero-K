@@ -360,15 +360,26 @@ local keywords = {
 }
 
 -- recursive function that write a Lua table to file in the correct format
-local function WriteTable(array, numIndents, endOfFile, concise)
+local function WriteTable(tab, tabName, numIndents, endOfFile, concise, raw, prefixReturn)
+	local comma = raw and "" or ","
+	local eos = comma .. ((concise and not raw) and '' or "\n")	-- end of string
 	numIndents = numIndents or 0
 	local str = ""	--WriteIndents(numIndents)
-	str = str .. (concise and "{" or "{\n")
-	for i,v in pairs(array) do
-		str = str .. WriteIndents(numIndents + 1)
+	if not raw then
+		if prefixReturn then
+			str = "return "
+		elseif tabName then
+			str = tabName .. " = "
+		end
+		str = str .. (concise and "{" or "{\n")
+	end
+	for i,v in pairs(tab) do
+		if not concise then
+			str = str .. WriteIndents(numIndents + 1)
+		end
 		if type(i) == "number" then
 			if not concise then
-			  str = str .. "[" .. i .. "] = "
+				str = str .. "[" .. i .. "] = "
 			end
 		elseif keywords[i] or (type(i) == "string") then
 			str = str .. "[" .. string.format("%q", i) .. "]" .. "= "
@@ -377,18 +388,18 @@ local function WriteTable(array, numIndents, endOfFile, concise)
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise, useDoubleQuote)
+			str = str .. WriteTable(v, nil, (concise and 0 or numIndents + 1), false, concise)
 		elseif type(v) == "boolean" then
-			str = str .. tostring(v) .. ",\n"
+			str = str .. tostring(v) .. eos
 		elseif type(v) == "string" then
-			str = str .. string.format("%q", v) .. "," .. (concise and '' or "\n")
+			str = str .. string.format("%q", v) .. eos
 		else
-			str = str .. v .. ",\n"
+			str = str .. v .. eos
 		end
 	end
-	str = str ..WriteIndents(numIndents) .. "}"
+	str = str .. WriteIndents(numIndents) .. "}"
 	if not endOfFile then
-		str = str .. ",\n"
+		str = str .. comma .. "\n"
 	end
 	
 	return str
@@ -396,7 +407,7 @@ end
 
 local function WriteSaveData(zip, filename, data)
 	zip:open(filename)
-	zip:write(WriteTable(data, 0, true))
+	zip:write(WriteTable(data, nil, 0, true))
 end
 GG.SaveLoad.WriteSaveData = WriteSaveData
 

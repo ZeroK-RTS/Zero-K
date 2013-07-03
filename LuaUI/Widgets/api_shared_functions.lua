@@ -61,15 +61,28 @@ local keywords = {
 	["repeat"] = true,
 }
 
-local function WriteTable(array, numIndents, endOfFile, concise)
+-- raw = print table key-value pairs straight to file (i.e. not as a table)
+-- if you use it make sure your keys are valid variable names!
+local function WriteTable(tab, tabName, numIndents, endOfFile, concise, raw, prefixReturn)
+	local comma = raw and "" or ","
+	local eos = comma .. ((concise and not raw) and '' or "\n")	-- end of string
 	numIndents = numIndents or 0
 	local str = ""	--WriteIndents(numIndents)
-	str = str .. (concise and "{" or "{\n")
-	for i,v in pairs(array) do
-		str = str .. WriteIndents(numIndents + 1)
+	if not raw then
+		if prefixReturn then
+			str = "return "
+		elseif tabName then
+			str = tabName .. " = "
+		end
+		str = str .. (concise and "{" or "{\n")
+	end
+	for i,v in pairs(tab) do
+		if not concise then
+			str = str .. WriteIndents(numIndents + 1)
+		end
 		if type(i) == "number" then
 			if not concise then
-			  str = str .. "[" .. i .. "] = "
+				str = str .. "[" .. i .. "] = "
 			end
 		elseif keywords[i] or (type(i) == "string") then
 			str = str .. "[" .. string.format("%q", i) .. "]" .. "= "
@@ -78,18 +91,18 @@ local function WriteTable(array, numIndents, endOfFile, concise)
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, concise and 0 or numIndents + 1, false, concise)
+			str = str .. WriteTable(v, nil, (concise and 0 or numIndents + 1), false, concise)
 		elseif type(v) == "boolean" then
-			str = str .. tostring(v) .. ",\n"
+			str = str .. tostring(v) .. eos
 		elseif type(v) == "string" then
-			str = str .. string.format("%q", v) .. "," .. (concise and '' or "\n")
+			str = str .. string.format("%q", v) .. eos
 		else
-			str = str .. v .. ",\n"
+			str = str .. v .. eos
 		end
 	end
-	str = str ..WriteIndents(numIndents) .. "}"
+	str = str .. WriteIndents(numIndents) .. "}"
 	if not endOfFile then
-		str = str .. ",\n"
+		str = str .. comma .. "\n"
 	end
 	
 	return str
@@ -97,28 +110,30 @@ end
 
 WG.WriteTable = WriteTable
 
-function WG.SaveTable(f, table, concise)
-	local file,err = io.open(f, "w")
+function WG.SaveTable(tab, fileName, tabName, concise, raw, prefixReturn)
+	local file,err = io.open(fileName, "w")
 	if (err) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, err)
 		return
 	end
-	file:write(WriteTable(table, 0, true, concise))
+	file:write(WriteTable(tab, tabName, 0, true, concise, raw, prefixReturn))
 	file:flush()
 	file:close()
 end
 
 -- raw = print table key-value pairs straight to file (i.e. not as a table)
-local function WritePythonDict(listName, array, numIndents, endOfFile, raw, concise)
+-- if you use it make sure your keys are valid variable names!
+local function WritePythonDict(dictName, dict, numIndents, endOfFile, raw, concise)
 	numIndents = numIndents or 0
 	local comma = raw and "" or ","
+	local eos = comma .. ((concise and not raw) and '' or "\n")	-- end of string
 	local separator = raw and " = " or  " : "
 	local str = ""
 	if not raw then
-	      str = listName .. " = "	--WriteIndents(numIndents)
+	      str = dictName .. " = "	--WriteIndents(numIndents)
 	      str = str .. (concise and "{" or "{\n")
 	end
-	for i,v in pairs(array) do
+	for i,v in pairs(dict) do
 		if not raw then
 			str = str .. WriteIndents(numIndents + 1)
 		end
@@ -131,18 +146,18 @@ local function WritePythonDict(listName, array, numIndents, endOfFile, raw, conc
 		if type(v) == "table" then
 			str = str .. WritePythonDict(v, concise and 0 or numIndents + 1, false, false, concise)
 		elseif type(v) == "boolean" then
-			str = str .. v and "True" or "False" .. comma .. "\n"
+			str = str .. v and "True" or "False" .. eos
 		elseif type(v) == "string" then
-			str = str .. string.format("%q", v) .. "" .. comma .. (concise and '' or "\n")
+			str = str .. string.format("%q", v) .. eos
 		else
-			str = str .. v .. comma .. "\n"
+			str = str .. v .. eos
 		end
 	end
 	if not raw then
 		str = str ..WriteIndents(numIndents) .. "}"
 	end
 	if not endOfFile then
-		str = str .. ",\n"
+		str = str .. comma .. "\n"
 	end
 	
 	return str
@@ -150,13 +165,13 @@ end
 
 WG.WritePythonDict = WritePythonDict
 
-function WG.SavePythonDict(f, listName, list, raw)
-	local file,err = io.open (f, "w")
+function WG.SavePythonDict(fileName, dictName, dict, raw)
+	local file,err = io.open (fileName, "w")
 	if (err) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, err)
 		return
 	end
-	file:write(WritePythonDict(listName, list, 0, true, raw))
+	file:write(WritePythonDict(dictName, dict, 0, true, raw))
 	file:flush()
 	file:close()
 end

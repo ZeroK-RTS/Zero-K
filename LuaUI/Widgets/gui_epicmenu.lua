@@ -439,7 +439,7 @@ end
 local function SaveKeybinds()
 	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
 	--table.save( keybindfile_table, keybind_file )
-	WG.SaveTable(keybind_file, keybindfile_table, true)
+	WG.SaveTable(keybindfile_table, keybind_file, nil, true, false, true)
 end
 
 local function LoadKeybinds()
