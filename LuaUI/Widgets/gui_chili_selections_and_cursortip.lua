@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.079 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.080 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --26 June 2013 (msafwan)
     license   = "GNU GPL, v2 or later",
@@ -41,6 +41,7 @@ local spGetGameFrame 					= Spring.GetGameFrame
 local spGetUnitRulesParam 				= Spring.GetUnitRulesParam
 local spSelectUnitArray 				= Spring.SelectUnitArray
 local spGetUnitPosition 			= Spring.GetUnitPosition
+local spGetGameRulesParam 			= Spring.GetGameRulesParam
 
 local echo = Spring.Echo
 
@@ -181,7 +182,7 @@ local gi_label	--group info Chili label
 
 options_path = 'Settings/HUD Panels/Tooltip'
 options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip','showDrawTools',
-  'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar', 'color_background',
+  'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin', 'color_background', 
 }
 
 local function option_Deselect()
@@ -288,6 +289,13 @@ options = {
 			real_window_corner.color = self.value
 			real_window_corner:Invalidate()
 		end,
+	},
+	alwaysShowSelectionWin = {
+		name="Always Show Selection Window",
+		type='bool',
+		value= false,
+		desc = "Always show the selection window even if nothing is selected.",
+		path = selPath,
 	},
 }
 
@@ -2371,6 +2379,8 @@ function widget:Initialize()
 	end
 	
 	option_Deselect()
+	
+	Show(real_window_corner)
 
 end
 
@@ -2454,7 +2464,9 @@ function widget:SelectionChanged(newSelection)
 	else
 		stt_unitID = nil
 		window_corner:ClearChildren()
-		screen0:RemoveChild(real_window_corner)
+		if not options.alwaysShowSelectionWin.value then
+			screen0:RemoveChild(real_window_corner)
+		end
 	end
 end
 --------------------------------------------------------------------------------
