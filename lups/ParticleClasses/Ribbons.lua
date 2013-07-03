@@ -16,6 +16,7 @@ Ribbon.__index = Ribbon
 local RibbonShader
 local widthLoc, quadsLoc
 local oldPosUniform = {}
+local lastTexture
 
 local DLists = {}
 
@@ -103,6 +104,7 @@ function Ribbon:EndDraw()
   glUseShader(0)
   glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   glTexture(0,false)
+  lastTexture = nil
   glColor(1,1,1,1)
 end
 
@@ -110,7 +112,10 @@ end
 function Ribbon:Draw()
   
   local quads0 = self.quads0
-  glTexture(0,":c:"..self.texture)
+  if self.texture ~= lastTexture then
+	glTexture(0,":c:"..self.texture)
+	lastTexture = self.texture
+  end
   glUniform(widthLoc, self.width )
   glUniformInt(quadsLoc, quads0 )
 
