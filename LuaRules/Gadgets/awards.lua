@@ -116,7 +116,6 @@ local awardEasyFactors = {
 	nux       = veryEasyFactor,
 	kam       = veryEasyFactor,
 	comm      = veryEasyFactor,
-	slow      = veryEasyFactor,
 
 	reclaim   = reclaimFactor,
 	empFactor = empFactor,
