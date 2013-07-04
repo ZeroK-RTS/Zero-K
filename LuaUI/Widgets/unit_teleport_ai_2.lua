@@ -2,8 +2,10 @@ local version = "v0.817"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
-    desc      = version .. " Automatically teleport any unit near a teleport enterance.",
-    author    = "Msafwan",
+    desc      = version .. " Automatically scan any units around teleport beacon " ..
+				"(up to 500elmo, LLT range) and teleport them when it shorten travel time. "..
+				"This only apply to your unit & allied beacon.",
+	author    = "Msafwan",
     date      = "30 June 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
@@ -203,7 +205,11 @@ function widget:GameFrame(n)
 												spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
 												cmd_queue = ConvertCMDToMOVE({cmd_queue[3]})
 												unitToEffect[unitID]["cmd"] = cmd_queue
-											end	
+												if not cmd_queue then --invalid command
+													loopedUnits[unitID]=true
+													break; --a.k.a: Continue
+												end
+											end
 										end
 									end
 									if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
