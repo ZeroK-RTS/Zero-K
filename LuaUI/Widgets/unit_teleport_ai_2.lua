@@ -1,4 +1,4 @@
-local version = "v0.815"
+local version = "v0.817"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -10,6 +10,8 @@ function widget:GetInfo()
     enabled   = false
   }
 end
+
+local detectionRange = 500
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -29,11 +31,15 @@ local myTeamID
 local ud
 local listOfBeacon={}
 local listOfMobile={}
-local groupBeacon={}
-local groupBeaconOfficial={}
-local groupSpreadJobs={}
+local groupBeacon={} --beacon list in its group
+local groupBeaconOfficial={} --most recent update to beacon list
+--Spread job stuff: (spread looping across 1 second)
+local groupSpreadJobs={} 
 local groupEffectedUnit={}
 local groupLoopedUnit={}
+local groupBeaconQueue={}
+local groupBeaconFinish={}
+--end spread job stuff
 local fiveSecondExcludedUnit = {}
 local beaconDefID = UnitDefNames["tele_beacon"].id
 
@@ -52,11 +58,11 @@ function widget:Initialize()
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			if beaconDefID == unitDefID then
 				local x,y,z = spGetUnitPosition(unitID)
-				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevQue=nil,prevIndex=nil,prevList=nil,finish=nil,deployed=1}
+				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,deployed=1}
 			end
 		end
 	end
-	local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, 700,1, myTeamID,700) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other 
+	local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other 
 	groupBeaconOfficial = cluster
 	for i=1, #nonClustered do
 		groupBeaconOfficial[#groupBeaconOfficial+1] = {nonClustered[i]}
@@ -66,8 +72,8 @@ end
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if beaconDefID == unitDefID then
 		local x,y,z = spGetUnitPosition(unitID)
-		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevQue=nil,prevIndex=nil,prevList=nil,finish=nil,deployed=1}
-		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, 700,1, myTeamID,700) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
+		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,deployed=1}
+		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
 		groupBeaconOfficial = cluster
 		for i=1, #nonClustered do
 			groupBeaconOfficial[#groupBeaconOfficial+1] = {nonClustered[i]}
@@ -118,20 +124,21 @@ function widget:GameFrame(n)
 			--Spring.Echo("-----GROUP:" .. i)
 			local numberOfUnitToProcess = 5 --NUMBER OF UNIT PER BEACON PER SECOND
 			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29)
-			local beaconCurrentQueue = {}
+			local beaconCurrentQueue = groupBeaconQueue[i] or {}
 			local unitToEffect = groupEffectedUnit[i] or {}
-			groupSpreadJobs[i] = false
 			local loopedUnits = groupLoopedUnit[i] or {}
+			local beaconFinishLoop = groupBeaconFinish[i] or {}
+			groupSpreadJobs[i] = false
 			for j=1, #groupBeacon[i],1 do
 				local beaconID = groupBeacon[i][j]
+				beaconCurrentQueue[beaconID] =beaconCurrentQueue[beaconID] or 0
 				--Spring.Echo("BEACON:" .. beaconID)
 				if listOfBeacon[beaconID] then --beacon is alive
-					beaconCurrentQueue[beaconID] = listOfBeacon[beaconID]["prevQue"] or 0
-					local alreadyFinished = listOfBeacon[beaconID]["finish"]
+					local alreadyFinished = beaconFinishLoop[beaconID]
 					local djinDeployed = listOfBeacon[beaconID]["deployed"]
 					if not alreadyFinished and djinDeployed == 1 then
 						local bX,bY,bZ = listOfBeacon[beaconID][1],listOfBeacon[beaconID][2],listOfBeacon[beaconID][3]
-						local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,700,myTeamID)
+						local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,detectionRange,myTeamID)
 						local numberOfLoop = #vicinityUnit
 						--Spring.Echo("LOOP:" .. numberOfLoop)
 						local numberOfLoopToProcessPerFrame = math.ceil(numberOfLoop/29)
@@ -185,11 +192,10 @@ function widget:GameFrame(n)
 									if unitToEffect[unitID]["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
 										local guardedUnit = unitToEffect[unitID]["cmd"].params[4] --DEFINED in unit_teleporter.lua
 										if listOfBeacon[guardedUnit] then --if beacon exist
-											if guardedUnit == beaconID then
-												local chargeTime = listOfMobile[unitDefID][2]
-												beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] + chargeTime
-												loopedUnits[unitID]=true
-											end
+											local chargeTime = listOfMobile[unitDefID][2]
+											beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] or 0
+											beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] + chargeTime
+											loopedUnits[unitID]=true
 											break; --a.k.a: Continue
 										else
 											local cmd_queue = spGetCommandQueue(unitID,3);
@@ -221,36 +227,37 @@ function widget:GameFrame(n)
 										unitToEffect[unitID]["norm"] = (distance/unitSpeed)*30
 									end
 									cmd_queue.id =CMD.MOVE
-									cmd_queue.params[1]=listOfBeacon[beaconID][1] --beacon coordinate
-									cmd_queue.params[2]=listOfBeacon[beaconID][2]
-									cmd_queue.params[3]=listOfBeacon[beaconID][3]
-									local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
-									local timeToBeacon = (distance/unitSpeed)*30
-									cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
-									cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
-									cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
-									if not listOfBeacon[beaconID][4] then
-										local djinnID = (spGetUnitRulesParam(beaconID,"connectto"))
-										local ex,ey,ez = spGetUnitPosition(djinnID)
-										listOfBeacon[beaconID][4] = ex
-										listOfBeacon[beaconID][5] = ey
-										listOfBeacon[beaconID][6] = ez
+									for l=1, #groupBeacon[i],1 do
+										local beaconID2 = groupBeacon[i][l]
+										cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
+										cmd_queue.params[2]=listOfBeacon[beaconID2][2]
+										cmd_queue.params[3]=listOfBeacon[beaconID2][3]
+										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
+										local timeToBeacon = (distance/unitSpeed)*30
+										cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
+										cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
+										cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
+										if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
+											local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
+											local ex,ey,ez = spGetUnitPosition(djinnID)
+											listOfBeacon[beaconID2][4] = ex
+											listOfBeacon[beaconID2][5] = ey
+											listOfBeacon[beaconID2][6] = ez
+										end
+										distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconID2][4],listOfBeacon[beaconID2][5],listOfBeacon[beaconID2][6])
+										local timeFromExitToDestination = (distance/unitSpeed)*30
+										local chargeTime = listOfMobile[unitDefID][2]
+										unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + chargeTime
 									end
-									distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconID][4],listOfBeacon[beaconID][5],listOfBeacon[beaconID][6])
-									local timeFromExitToDestination = (distance/unitSpeed)*30
-									local chargeTime = listOfMobile[unitDefID][2]
-									unitToEffect[unitID]["becn"][beaconID] = timeToBeacon + timeFromExitToDestination + chargeTime
 								until true
 								currentLoopCount = currentLoopCount + 1
 							end
 							--Spring.Echo("K:"..k)
 							if k == numberOfLoop then
 								finishLoop =true
-								listOfBeacon[beaconID]["finish"] = true
 								--Spring.Echo("FINISH")
 							elseif currentLoopCount>= numberOfLoopToProcessPerFrame then
 								groupSpreadJobs[i] = true
-								listOfBeacon[beaconID]["prevQue"] = beaconCurrentQueue[beaconID] --continue at next frame
 								listOfBeacon[beaconID]["prevIndex"] = k+1  --continue at next frame
 								listOfBeacon[beaconID]["prevList"] = vicinityUnit  --continue at next frame
 								--Spring.Echo("PAUSE,LOOP SO FAR:"..currentLoopCount)
@@ -259,6 +266,7 @@ function widget:GameFrame(n)
 							end
 						end
 						if finishLoop then
+							beaconFinishLoop[beaconID] = true
 							listOfBeacon[beaconID]["prevIndex"] = nil
 							listOfBeacon[beaconID]["prevList"] = nil
 						end
@@ -268,28 +276,26 @@ function widget:GameFrame(n)
 			if groupSpreadJobs[i] then
 				groupEffectedUnit[i]=unitToEffect
 				groupLoopedUnit[i] = loopedUnits
+				groupBeaconQueue[i] = beaconCurrentQueue
+				groupBeaconFinish[i]= beaconFinishLoop
 			elseif not groupSpreadJobs[i] then
 				groupEffectedUnit[i]=nil
 				groupLoopedUnit[i]=nil
-				for j=1, #groupBeacon[i],1 do
-					local beaconID = groupBeacon[i][j]
-					if listOfBeacon[beaconID] then  --beacon is alive
-						listOfBeacon[beaconID]["finish"]=nil
-						listOfBeacon[beaconID]["prevQue"] = nil
-					end
-				end	
+				groupBeaconQueue[i]=nil
+				groupBeaconFinish[i]=nil
 				--!spawn mod=Zero-K test-10559
 				--!setengine 94.1.1-645-g34c768b
 				for unitID, tblContent in pairs(unitToEffect)do
 					if tblContent["norm"] then
 						local pathToFollow
 						local lowestPathTime = tblContent["norm"]
-						--Spring.Echo("TEST:".. unitID)
+						-- Spring.Echo("TEST:".. unitID)
 						for beaconID, timeToDest in pairs(tblContent["becn"]) do
 							if listOfBeacon[beaconID] then --beacon is alive
-								if (timeToDest+beaconCurrentQueue[beaconID]) < lowestPathTime then
+								local transitTime = timeToDest+beaconCurrentQueue[beaconID]
+								if transitTime < lowestPathTime then
 									pathToFollow = beaconID
-									lowestPathTime = timeToDest
+									lowestPathTime = transitTime
 								end
 								if (timeToDest > tblContent["norm"]) then --beacon travel simply not a viable option
 									fiveSecondExcludedUnit[unitID] = fiveSecondExcludedUnit[unitID] or {}
@@ -300,6 +306,7 @@ function widget:GameFrame(n)
 								-- Spring.Echo("A:".. timeToDest .. " B:" .. beaconCurrentQueue[beaconID])
 							-- end
 						end
+						-- Spring.Echo("Selected:"..lowestPathTime)
 						if pathToFollow then
 							local ex,ey,ez = listOfBeacon[pathToFollow][4],listOfBeacon[pathToFollow][5],listOfBeacon[pathToFollow][6]
 							local dix,diz=unitToEffect[unitID]["cmd"].params[1],unitToEffect[unitID]["cmd"].params[3] --target coordinate
