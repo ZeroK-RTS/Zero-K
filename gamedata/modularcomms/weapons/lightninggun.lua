@@ -4,23 +4,19 @@ local weaponDef = {
 	areaOfEffect            = 8,
 	craterBoost             = 0,
 	craterMult              = 0,
-	
+
 	customParams            = {
 		extra_damage_mult = [[0.4]],
 		slot = [[5]],
 		muzzleEffectFire = [[custom:zeus_fire_fx]],
 	},
-	
-	cylinderTargeting      = 0,
-	
+
+	cylinderTargeting       = 0,
+
 	damage                  = {
-		default        = 640,
-		commanders     = 640,
-		empresistant75 = 160,
-		empresistant99 = 6.4,
+		default = 640,
 	},
-	
-	duration                = 10,
+
 	explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
 	fireStarter             = 110,
 	impactOnly              = true,
@@ -28,7 +24,6 @@ local weaponDef = {
 	impulseFactor           = 0.4,
 	intensity               = 12,
 	interceptedByShieldType = 1,
-	lineOfSight             = true,
 	paralyzer               = true,
 	paralyzeTime            = 1,
 	range                   = 280,
@@ -36,7 +31,6 @@ local weaponDef = {
 	rgbColor                = [[0.5 0.5 1]],
 	soundStart              = [[weapon/more_lightning]],
 	soundTrigger            = true,
-	startsmoke              = [[1]],
 	targetMoveError         = 0.3,
 	texture1                = [[lightning]],
 	thickness               = 10,

@@ -6,18 +6,18 @@ local weaponDef = {
 	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
-	
+
 	customParams			= {
 		slot = [[5]],
 		muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],
-	},		  
-	  
+	},
+
 	damage                  = {
 		default = 11,
 		planes  = 11,
 		subs    = 0.55,
 	},
-	
+
 	duration                = 0.02,
 	explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
 	fireStarter             = 50,
@@ -30,7 +30,6 @@ local weaponDef = {
 	noSelfDamage            = true,
 	range                   = 300,
 	reloadtime              = 0.107,
-	renderType              = 0,
 	rgbColor                = [[1 0 0]],
 	soundHit                = [[weapon/laser/lasercannon_hit]],
 	soundStart              = [[weapon/laser/small_laser_fire2]],

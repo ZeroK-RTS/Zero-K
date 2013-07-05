@@ -4,18 +4,19 @@ local weaponDef = {
 	areaOfEffect            = 32,
 	craterBoost             = 1,
 	craterMult              = 3,
-	  
-	customParams			= {
+
+	customParams            = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
 		--miscEffectFire = [[custom:RIOT_SHELL_L]],
 	},
+
 	damage                  = {
 		default = 360,
 		planes  = 360,
 		subs    = 18,
 	},
-	
+
 	explosionGenerator      = [[custom:INGEBORG]],
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
@@ -25,7 +26,6 @@ local weaponDef = {
 	reloadtime              = 2,
 	soundHit                = [[weapon/cannon/cannon_hit2]],
 	soundStart              = [[weapon/cannon/medplasma_fire]],
-	startsmoke              = [[1]],
 	turret                  = true,
 	weaponType              = [[Cannon]],
 	weaponVelocity          = 300,

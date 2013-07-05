@@ -1,5 +1,5 @@
 local name = "commweapon_torpedo"
-local weaponDef = { 
+local weaponDef = {
 	name                    = [[Torpedo]],
 	areaOfEffect            = 16,
 	avoidFriendly           = false,
@@ -14,8 +14,8 @@ local weaponDef = {
 		badTargetCategory  = [[FIXEDWING]],
 		onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
 		slot = [[5]],
-	},	
-	
+	},
+
 	damage                  = {
 		default = 180,
 		subs    = 180,
@@ -23,7 +23,7 @@ local weaponDef = {
 
 	explosionGenerator      = [[custom:TORPEDO_HIT]],
 	flightTime              = 6,
-	groundbounce			= 1,
+	groundbounce            = 1,
 	impactOnly              = true,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,

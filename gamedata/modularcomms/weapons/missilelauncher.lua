@@ -1,23 +1,23 @@
 local name = "commweapon_missilelauncher"
-local weaponDef = { 
-    name                    = [[Missile Launcher]],
-    areaOfEffect            = 48,
+local weaponDef = {
+	name                    = [[Missile Launcher]],
+	areaOfEffect            = 48,
 	avoidFeature            = true,
-    cegTag                  = [[missiletrailyellow]],
-    craterBoost             = 1,
-    craterMult              = 2,
+	cegTag                  = [[missiletrailyellow]],
+	craterBoost             = 1,
+	craterMult              = 2,
 
-	customParams			= {
+	customParams            = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:SLASHMUZZLE]],
 	},
-	
+
 	damage                  = {
 		default = 80,
 		planes  = 80,
 		subs    = 4,
 	},
-	
+
 	explosionGenerator      = [[custom:FLASH2]],
 	fireStarter             = 70,
 	flightTime              = 3,
@@ -28,11 +28,9 @@ local weaponDef = {
 	noSelfDamage            = true,
 	range                   = 415,
 	reloadtime              = 1,
-	smokedelay              = [[0.1]],
 	smokeTrail              = true,
 	soundHit                = [[explosion/ex_med17]],
 	soundStart              = [[weapon/missile/missile_fire11]],
-	startsmoke              = [[1]],
 	startVelocity           = 450,
 	texture2                = [[lightsmoketrail]],
 	tolerance               = 8000,
@@ -40,7 +38,6 @@ local weaponDef = {
 	turnRate                = 33000,
 	turret                  = true,
 	weaponAcceleration      = 109,
-	weaponTimer             = 5,
 	weaponType              = [[MissileLauncher]],
 	weaponVelocity          = 545,
 }

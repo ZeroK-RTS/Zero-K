@@ -1,19 +1,16 @@
 local name = "commweapon_personal_shield"
 local weaponDef = {
 	name                    = [[Personal Shield]],
-	craterMult              = 0,
-	  
-	customParams			= {
+
+	customParams            = {
 		slot = [[4]],
 	},
-	
+
 	damage                  = {
 		default = 10,
 	},
-	
+
 	exteriorShield          = true,
-	impulseFactor           = 0,
-	interceptedByShieldType = 1,
 	shieldAlpha             = 0.2,
 	shieldBadColor          = [[1 0.1 0.1]],
 	shieldGoodColor         = [[0.1 0.1 1]],

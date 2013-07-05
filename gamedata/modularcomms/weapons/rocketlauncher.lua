@@ -1,22 +1,22 @@
 local name = "commweapon_rocketlauncher"
-local weaponDef = { 
+local weaponDef = {
 	name                    = [[Rocket Launcher]],
 	areaOfEffect            = 75,
 	cegTag                  = [[missiletrailred]],
 	craterBoost             = 0,
 	craterMult              = 0,
 
-	customParams			= {
+	customParams            = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:STORMMUZZLE]],
 	},
-	
+
 	damage                  = {
 		default = 360,
 		planes  = 360,
 		subs    = 18,
 	},
-	
+
 	fireStarter             = 180,
 	flightTime              = 3,
 	impulseBoost            = 0,
@@ -27,7 +27,7 @@ local weaponDef = {
 	range                   = 430,
 	reloadtime              = 3,
 	smokeTrail              = true,
-    soundHit              = [[explosion/ex_med4]],
+	soundHit                = [[explosion/ex_med4]],
 	soundHitVolume          = 7,
 	soundStart              = [[weapon/missile/sabot_fire]],
 	soundStartVolume        = 7,

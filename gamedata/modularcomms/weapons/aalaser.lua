@@ -9,18 +9,18 @@ local weaponDef = {
 	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
-	cylinderTargeting      = 1,
-	
-	customParams			= {
+	cylinderTargeting       = 1,
+
+	customParams            = {
 		slot = [[5]],
 	},
-	
+
 	damage                  = {
 		default = 1.88,
 		planes  = 18.8,
 		subs    = 1,
 	},
-	
+
 	explosionGenerator      = [[custom:flash_teal7]],
 	fireStarter             = 100,
 	impactOnly              = true,

@@ -8,10 +8,10 @@ local weaponDef = {
 	craterBoost             = 0,
 	craterMult              = 0,
 
-	customParams			= {
+	customParams            = {
 		slot = [[5]],
-	},	
-	
+	},
+
 	damage                  = {
 		default = 40,
 		subs    = 2,

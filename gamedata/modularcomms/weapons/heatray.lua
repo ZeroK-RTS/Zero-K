@@ -7,17 +7,17 @@ local weaponDef = {
 	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
-	
-	customParams			= {
+
+	customParams            = {
 		slot = [[5]],
 	},		  
-	
+
 	damage                  = {
 		default = 35,
 		planes  = 35,
 		subs    = 1.75,
 	},
-	
+
 	duration                = 0.3,
 	dynDamageExp            = 1,
 	dynDamageInverted       = false,

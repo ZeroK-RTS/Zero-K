@@ -6,15 +6,14 @@ local weaponDef = {
 	burnblow                = true,
 	canattackground         = false,
 	cegTag                  = [[flak_trail]],
-	color                   = 1,
 	craterBoost             = 0,
 	craterMult              = 0,
 	cylinderTargeting      = 1,
-	
-	customParams			= {
+
+	customParams            = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
-		miscEffectFire = [[custom:RIOT_SHELL_L]],
+		miscEffectFire   = [[custom:RIOT_SHELL_L]],
 		onlyTargetCategory = [[FIXEDWING GUNSHIP]],
 	},
 
@@ -37,7 +36,6 @@ local weaponDef = {
 	soundHit                = [[weapon/flak_hit]],
 	soundStart              = [[weapon/flak_fire]],
 	turret                  = true,
-	weaponTimer             = 1,
 	weaponType              = [[Cannon]],
 	weaponVelocity          = 2000,
 }

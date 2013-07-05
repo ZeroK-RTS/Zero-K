@@ -1,5 +1,5 @@
 local name = "commweapon_heavymachinegun"
-local weaponDef = { 
+local weaponDef = {
 	name                    = [[Heavy Machine Gun]],
 	accuracy                = 1024,
 	alphaDecay              = 0.7,
@@ -8,7 +8,7 @@ local weaponDef = {
 	craterBoost             = 0.15,
 	craterMult              = 0.3,
 
-	customParams			= {
+	customParams            = {
 		slot = [[5]],
 		muzzleEffectShot = [[custom:WARMUZZLE]],
 		miscEffectShot = [[custom:DEVA_SHELLS]],
@@ -19,13 +19,13 @@ local weaponDef = {
 			},
 		}
 	},
-	
+
 	damage                  = {
 		default = 33,
 		planes  = 33,
 		subs    = 1.75,
 	},
-	
+
 	edgeEffectiveness       = 0.5,
 	explosionGenerator      = [[custom:EMG_HIT_HE]],
 	firestarter             = 70,
