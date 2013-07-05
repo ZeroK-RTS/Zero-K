@@ -1,4 +1,4 @@
-local version = "v0.817"
+local version = "v0.82"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -44,6 +44,7 @@ local groupBeaconFinish={}
 --end spread job stuff
 local fiveSecondExcludedUnit = {}
 local beaconDefID = UnitDefNames["tele_beacon"].id
+local diggDeeperExclusion = {}
 
 function widget:Initialize()
 	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
@@ -60,7 +61,7 @@ function widget:Initialize()
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			if beaconDefID == unitDefID then
 				local x,y,z = spGetUnitPosition(unitID)
-				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,deployed=1}
+				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,vicntyBecn=nil,becnQeuu=0,deployed=1}
 			end
 		end
 	end
@@ -74,7 +75,7 @@ end
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if beaconDefID == unitDefID then
 		local x,y,z = spGetUnitPosition(unitID)
-		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,deployed=1}
+		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,vicntyBecn=nil,becnQeuu=0,deployed=1}
 		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
 		groupBeaconOfficial = cluster
 		for i=1, #nonClustered do
@@ -99,6 +100,67 @@ end
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+--SOME NOTE:
+--"DiggDeeper()" use a straightforward recursive horizontal/sideway-search. 
+--But if we can find out if there's better way to do it would be more fun. Some Googling found stuff like "Minimum Spanning Tree" & "Spanning Tree" (might be interesting!)
+function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, previousOverheadTime, level)
+	level = level + 1
+	if level > 5 then
+		return nil,nil,nil,nil
+	end
+	local parentUnitID_return, unitIDToProcess_return, totalOverhead_return
+	for i=1, #beaconIDList,1 do
+		local beaconID = beaconIDList[i]
+		if not diggDeeperExclusion[beaconID] and listOfBeacon[beaconID] then
+			if not listOfBeacon[beaconID][4] then --if haven't update the djinnID yet
+				local djinnID = (spGetUnitRulesParam(beaconID,"connectto"))
+				local ex,ey,ez = spGetUnitPosition(djinnID)
+				listOfBeacon[beaconID][4] = ex
+				listOfBeacon[beaconID][5] = ey
+				listOfBeacon[beaconID][6] = ez
+			end
+			local distance = Dist(listOfBeacon[beaconID][4],listOfBeacon[beaconID][5], listOfBeacon[beaconID][6], targetCoord_CNSTNT[1], targetCoord_CNSTNT[2], targetCoord_CNSTNT[3])
+			local estTimeFromExitToDest = (distance/unitSpeed_CNSTNT)*30
+			local totalTime = previousOverheadTime + estTimeFromExitToDest
+			if totalTime<lowestTime_VAR then
+				parentUnitID_return =beaconID
+				unitIDToProcess_return =beaconID
+				totalOverhead_return =previousOverheadTime
+				lowestTime_VAR=totalTime
+			end
+		end
+	end
+	for i=1, #beaconIDList,1 do
+		local beaconID = beaconIDList[i]
+		if not diggDeeperExclusion[beaconID] and listOfBeacon[beaconID] then
+			--diggDeeperExclusion[beaconID]= true 
+			--The line above ensure all path is traversed only once (increase efficiency!), 
+			--but the issue is: if there's many parallel path that lead to a same point then there's no guarantee this unique path is the best one.
+			if not listOfBeacon[beaconID]["vicntyBecn"] then
+				local listOfUnits = spGetUnitsInCylinder(ex,ez,detectionRange,myTeamID)
+				local listOfBeaconInVicinity = {}
+				for i=1, #listOfUnits,1 do
+					local unitID = listOfUnits[i]
+					if listOfBeacon[unitID] then
+						local index = #listOfBeaconInVicinity+1
+						listOfBeaconInVicinity[index] = unitID
+					end
+				end
+				listOfBeacon[beaconID]["vicntyBecn"]=listOfBeaconInVicinity
+			end
+			local vicinityList = listOfBeacon[beaconID]["vicntyBecn"]
+			local totalOverheadTime = previousOverheadTime + chargeTime_CNSTNT + listOfBeacon[beaconID]["becnQeuu"] --plus congestion information from enterance beacon
+			local parentUnitID, unitIDToProcess, totalOverhead,lowestTime = DiggDeeper(vicinityList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, totalOverheadTime, level)
+			if parentUnitID then
+				parentUnitID_return =beaconID
+				unitIDToProcess_return =unitIDToProcess
+				totalOverhead_return =totalOverhead
+				lowestTime_VAR=lowestTime
+			end
+		end
+	end
+	return parentUnitID_return, unitIDToProcess_return, totalOverhead_return, lowestTime_VAR
+end
 
 function widget:GameFrame(n)
 	if n%150==15 then --every 150 frame period (5 second) at the 15th frame
@@ -109,6 +171,16 @@ function widget:GameFrame(n)
 			listOfBeacon[beaconID][5] = ey
 			listOfBeacon[beaconID][6] = ez
 			listOfBeacon[beaconID]["djin"] = djinnID
+			local listOfUnits = spGetUnitsInCylinder(ex,ez,detectionRange,myTeamID)
+			local listOfBeaconInVicinity = {}
+			for i=1, #listOfUnits,1 do
+				local unitID = listOfUnits[i]
+				if listOfBeacon[unitID] then
+					local index = #listOfBeaconInVicinity+1
+					listOfBeaconInVicinity[index] = unitID
+				end
+			end
+			listOfBeacon[beaconID]["vicntyBecn"]=listOfBeaconInVicinity
 		end
 	end
 	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: update deploy state
@@ -243,17 +315,23 @@ function widget:GameFrame(n)
 										cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
 										cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
 										cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
-										if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
-											local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
-											local ex,ey,ez = spGetUnitPosition(djinnID)
-											listOfBeacon[beaconID2][4] = ex
-											listOfBeacon[beaconID2][5] = ey
-											listOfBeacon[beaconID2][6] = ez
-										end
-										distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconID2][4],listOfBeacon[beaconID2][5],listOfBeacon[beaconID2][6])
-										local timeFromExitToDestination = (distance/unitSpeed)*30
+										-- if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
+											-- local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
+											-- local ex,ey,ez = spGetUnitPosition(djinnID)
+											-- listOfBeacon[beaconID2][4] = ex
+											-- listOfBeacon[beaconID2][5] = ey
+											-- listOfBeacon[beaconID2][6] = ez
+										-- end
 										local chargeTime = listOfMobile[unitDefID][2]
-										unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + chargeTime
+										local _, beaconIDToProcess, totalOverheadTime = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, unitToEffect[unitID]["norm"], chargeTime,0)
+										diggDeeperExclusion={}
+										if beaconIDToProcess then
+											distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6])
+											local timeFromExitToDestination = (distance/unitSpeed)*30
+											unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + totalOverheadTime
+										else
+											unitToEffect[unitID]["becn"][beaconID2] = 99999
+										end
 									end
 								until true
 								currentLoopCount = currentLoopCount + 1
@@ -326,6 +404,12 @@ function widget:GameFrame(n)
 							local chargeTime = listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime
 						end
+					end
+				end
+				for j=1, #groupBeacon[i],1 do --update beacon congestion status
+					local beaconID = groupBeacon[i][j]
+					if listOfBeacon[beaconID] then 
+						listOfBeacon[beaconID]["becnQeuu"]= beaconCurrentQueue[beaconID]
 					end
 				end
 			end
