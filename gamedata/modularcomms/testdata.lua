@@ -3,7 +3,7 @@ local base = {
 		name = "rocket",
 		modules = {
 			"commweapon_missilelauncher",
-			"commweapon_clusterbomb",
+			"commweapon_slamrocket",
 			"weaponmod_standoff_rocket",
 			"module_adv_targeting",
 			"module_adv_targeting",
@@ -83,7 +83,7 @@ local base = {
 			"commweapon_lightninggun",
 			"module_high_power_servos",
 			"weaponmod_stun_booster",
-			"commweapon_sunburst",
+			"commweapon_multistunner",
 			"module_high_power_servos",
 			"module_high_power_servos",
 			"module_high_power_servos",

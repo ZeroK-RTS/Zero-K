@@ -105,10 +105,18 @@ upgrades = {
 		name = "Disruptor Bomb",
 		description = "Damages and slows units in a large area",
 	},
+	commweapon_multistunner = {
+		name = "Multi-Stunner",
+		description = "Briefly disables multiple targets in an area",
+	},
 	commweapon_napalmgrenade = {
 		name = "Hellfire Grenade",
 		description = "Sets a moderate area ablaze",
-	},		
+	},
+	commweapon_slamrocket = {
+		name = "SLAM Rocket",
+		description = "Long-range weapon with a lethal punch",
+	},
 	commweapon_sunburst = {
 		name = "Sunburst Cannon",
 		description = "Ruins a single target's day with a medium-range high-energy burst",
