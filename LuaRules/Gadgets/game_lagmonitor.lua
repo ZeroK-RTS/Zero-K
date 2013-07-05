@@ -202,8 +202,8 @@ function gadget:GameFrame(n)
 									end
 								end
 								-- remove all teams after the previous owner (inclusive)
-								if (delete ~= nil) then
-									lineage[unitID][uteam] = nil;
+								if (delete) then
+									lineage[unitID][i] = nil;
 								end
 							end
 						end

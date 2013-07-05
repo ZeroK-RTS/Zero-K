@@ -1,4 +1,4 @@
-local version = "v0.82"
+local version = "v0.821"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -137,6 +137,7 @@ function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime
 			--The line above ensure all path is traversed only once (increase efficiency!), 
 			--but the issue is: if there's many parallel path that lead to a same point then there's no guarantee this unique path is the best one.
 			if not listOfBeacon[beaconID]["vicntyBecn"] then
+				local ex,ez = listOfBeacon[beaconID][4],listOfBeacon[beaconID][6]
 				local listOfUnits = spGetUnitsInCylinder(ex,ez,detectionRange,myTeamID)
 				local listOfBeaconInVicinity = {}
 				for i=1, #listOfUnits,1 do
