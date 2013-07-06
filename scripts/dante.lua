@@ -364,7 +364,7 @@ function script.Shot(num)
 		EmitSfx(missileEmits[side][1], 1025)
 		EmitSfx(missileEmits[side][2], 1025)
 	elseif num == 4 then
-		GG.LUPS.FlameShot(unitID, unitDefID, _, num)
+		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
 	end
 	weapon.index = index + 1
 	if (index + 1) > #weapon.query then
