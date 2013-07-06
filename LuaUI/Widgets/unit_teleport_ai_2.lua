@@ -1,4 +1,4 @@
-local version = "v0.821"
+local version = "v0.822"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -240,7 +240,7 @@ function widget:GameFrame(n)
 									local isBomber = UnitDefs[unitDefID].isBomber
 									local isFighter = UnitDefs[unitDefID].isFighter
 									local isStatic = (unitSpeed == 0)
-									listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isMobile}
+									listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isStatic}
 								end
 								local isBomber = listOfMobile[unitDefID][4]
 								local isFighter = listOfMobile[unitDefID][5]
@@ -308,30 +308,32 @@ function widget:GameFrame(n)
 									cmd_queue.id =CMD.MOVE
 									for l=1, #groupBeacon[i],1 do
 										local beaconID2 = groupBeacon[i][l]
-										cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
-										cmd_queue.params[2]=listOfBeacon[beaconID2][2]
-										cmd_queue.params[3]=listOfBeacon[beaconID2][3]
-										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
-										local timeToBeacon = (distance/unitSpeed)*30
-										cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
-										cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
-										cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
-										-- if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
-											-- local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
-											-- local ex,ey,ez = spGetUnitPosition(djinnID)
-											-- listOfBeacon[beaconID2][4] = ex
-											-- listOfBeacon[beaconID2][5] = ey
-											-- listOfBeacon[beaconID2][6] = ez
-										-- end
-										local chargeTime = listOfMobile[unitDefID][2]
-										local _, beaconIDToProcess, totalOverheadTime = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, unitToEffect[unitID]["norm"], chargeTime,0)
-										diggDeeperExclusion={}
-										if beaconIDToProcess then
-											distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6])
-											local timeFromExitToDestination = (distance/unitSpeed)*30
-											unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + totalOverheadTime
-										else
-											unitToEffect[unitID]["becn"][beaconID2] = 99999
+										if listOfBeacon[beaconID] then --beacon is alive?
+											cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
+											cmd_queue.params[2]=listOfBeacon[beaconID2][2]
+											cmd_queue.params[3]=listOfBeacon[beaconID2][3]
+											local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
+											local timeToBeacon = (distance/unitSpeed)*30
+											cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
+											cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
+											cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
+											-- if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
+												-- local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
+												-- local ex,ey,ez = spGetUnitPosition(djinnID)
+												-- listOfBeacon[beaconID2][4] = ex
+												-- listOfBeacon[beaconID2][5] = ey
+												-- listOfBeacon[beaconID2][6] = ez
+											-- end
+											local chargeTime = listOfMobile[unitDefID][2]
+											local _, beaconIDToProcess, totalOverheadTime = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, unitToEffect[unitID]["norm"], chargeTime,0)
+											diggDeeperExclusion={}
+											if beaconIDToProcess then
+												distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6])
+												local timeFromExitToDestination = (distance/unitSpeed)*30
+												unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + totalOverheadTime
+											else
+												unitToEffect[unitID]["becn"][beaconID2] = 99999
+											end
 										end
 									end
 								until true
