@@ -82,10 +82,15 @@ local function OptionsChanged()
 	end
 end 
 
-
 options_path = 'Settings/HUD Panels/Gestures'
-options_order = { 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', 'onlyOpenWithKeyboard', "qwertz", 'alternateconfig', 'allowMultiple'}
+options_order = { 'markingmenu', 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', 'onlyOpenWithKeyboard', "qwertz", 'alternateconfig', 'allowMultiple'}
 options = {
+	
+	markingmenu = {
+		name = "Activate Gesture Menu",
+		type = 'button',
+		--OnChange defined later 
+	},
 	
 	
 	iconDistance = {
@@ -715,15 +720,6 @@ end
 
 function widget:Initialize()
 
-  -- check for custom key bind
-  local hotkeys = Spring.GetActionHotKeys("markingmenu")
-  if hotkeys == nil then
-  else
-    if #hotkeys > 0 then
-      customKeyBind = true
-    end
-  end
-
   -- adding functions because of "handler=true"
   widgetHandler.AddAction    = function (_, cmd, func, data, types)
     return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
@@ -732,23 +728,15 @@ function widget:Initialize()
     return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
   end
 
-  widgetHandler:AddAction("markingmenu", ActionMenu, nil, "t")
   widgetHandler:AddAction("keyboardmarkingmenu", MouselessActionMenu, nil, "t")
-  
-  -- Only minimal support for those without our default hotkeys.
-  if not customKeyBind then
-    Spring.SendCommands("bind any+b markingmenu")
-	--Spring.SendCommands("bind any+d keyaboardmarkingmenu")
-  end
 
 end 
 
 function widget:Shutdown()
-  widgetHandler:RemoveAction("markingmenu")
   widgetHandler:RemoveAction("keyboardmarkingmenu")
 end
 
-function ActionMenu()
+local function ActionMenu()
   if menu == nil then 
     local _ , activeid = Spring.GetActiveCommand()
     if (activeid == nil or activeid < 0) then 
@@ -758,6 +746,8 @@ function ActionMenu()
     EndMenu(false)
   end
 end
+
+options.markingmenu.OnChange = ActionMenu
 
 function MouselessActionMenu()
   if menu == nil then 

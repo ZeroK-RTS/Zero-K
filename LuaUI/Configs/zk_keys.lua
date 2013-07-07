@@ -162,7 +162,7 @@ return {
 		{	"epic_chili_integral_menu_tab_economy",	"x",},
 		{	"epic_chili_integral_menu_tab_defence",	"c",},
 		{	"epic_chili_integral_menu_tab_special",	"v",},
-		{	"markingmenu",	"b",},
+		{	"epic_chili_gesture_menu_markingmenu",	"b",},
 		{	"exitwindow",	"s+escape",},
 	},
 }
