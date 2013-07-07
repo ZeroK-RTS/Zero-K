@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.319 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.320 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-06-30
     license   = "GNU GPL, v2 or later",
@@ -117,6 +117,7 @@ local myCountry = 'wut'
 
 local pathoptions = {}	
 local alloptions = {}	
+local actionToOption = {}
 
 local exitWindowVisible = false
 
@@ -423,6 +424,10 @@ WG.crude.GetHotkey = function(actionName)
 	return GetReadableHotkey(hotkey) 
 end
 --]]
+
+WG.crude.GetActionOption = function(actionName)
+	return actionToOption[actionName]
+end
 
 WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
 	--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
@@ -869,6 +874,7 @@ local function CreateOptionAction(path, option)
 	end
 	local actionName = GetActionName(path, option)
 	AddAction(actionName, kbfunc, nil, "t")
+	actionToOption[actionName] = option
 	
 	if option.hotkey then
 		local existingRegister = otget( keybounditems, actionName) --check whether existing actionname is already bound with a custom hotkey in zkkey

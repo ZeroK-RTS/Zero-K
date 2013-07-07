@@ -273,7 +273,9 @@ path='Settings/Misc'
 	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
 	ShButton( 'Map Draw Key', "drawinmap", '', true )
 	ShButton( 'Game Info', "gameinfo", '', true )
-	ShButton( 'Share Dialog...', 'sharedialog', '', true ) 
+	ShButton( 'Share Dialog...', 'sharedialog', '', true )
+	ShButton( 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true )
+	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
 	AddOption({
 		name = 'Use uikeys.txt',
 		desc = 'NOT RECOMMENDED! Enable this to use the engine\'s keybind file. This can break existing functionality. Requires restart.',

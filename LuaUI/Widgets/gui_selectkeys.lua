@@ -43,6 +43,7 @@ options_order = {
 	'uikey4',
 	'uikey5',
 	'uikey6',
+	'lowhealth',
 }
 options = {
 

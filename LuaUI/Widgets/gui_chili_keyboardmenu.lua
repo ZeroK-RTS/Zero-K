@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.021 Chili Keyboard Menu",
+    desc      = "v0.022 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -996,13 +996,24 @@ local function SetupCommands( modifier )
 			else
 				actions = Spring.GetKeyBindings(modifier .. '+' .. hotkey_key)
 			end
+			
 			if not ignore[hotkey_key] and actions and #actions > 0 then
 				for i,v in ipairs(actions) do
 					for actionCmd, actionExtra in pairs(v) do
-						local label = actionCmd
-						local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd 
-						hotkey = actionCmd and WG.crude.GetHotkey(action ) or '-'
-						UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( actionCmd ); end, '> ' .. label .. ' ' .. actionExtra, nil, black_table )
+						
+						if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' then 
+						
+							local actionOption = WG.crude.GetActionOption(actionCmd)
+							local actionName = actionOption and actionOption.name
+							local actionDesc = actionOption and actionOption.desc
+							
+							local label = actionName or actionCmd
+							local tooltip = actionDesc or (label  .. ' ' .. actionExtra)
+							local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd 
+							hotkey = actionCmd and WG.crude.GetHotkey(action ) or '-'
+							UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( actionCmd ); end, tooltip, nil, black_table )
+						end
+						
 					end
 				end
 			end
