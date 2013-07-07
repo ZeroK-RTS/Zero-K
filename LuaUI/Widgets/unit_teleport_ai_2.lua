@@ -1,4 +1,4 @@
-local version = "v0.822"
+local version = "v0.823"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -308,7 +308,8 @@ function widget:GameFrame(n)
 									cmd_queue.id =CMD.MOVE
 									for l=1, #groupBeacon[i],1 do
 										local beaconID2 = groupBeacon[i][l]
-										if listOfBeacon[beaconID] then --beacon is alive?
+										local djinDeployed2 = listOfBeacon[beaconID2]["deployed"]
+										if listOfBeacon[beaconID] and djinDeployed2 == 1 then --beacon is alive?
 											cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
 											cmd_queue.params[2]=listOfBeacon[beaconID2][2]
 											cmd_queue.params[3]=listOfBeacon[beaconID2][3]
