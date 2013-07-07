@@ -78,6 +78,8 @@ local function IsDictOrContainsDict(tab)
 			return true
 		elseif i > #tab then
 			return true
+		elseif i <= 0 then
+			return true
 		elseif type(v) == "table" then
 			return true
 		end
@@ -92,7 +94,7 @@ local function WriteTable(tab, tabName, params)
 	params.numIndents = params.numIndents or 0
 	local isDict = IsDictOrContainsDict(tab)
 	local comma = params.raw and "" or ", "
-	local endLine = (comma .. "\n") or comma 
+	local endLine = comma .. "\n"
 	local str = ""
 	
 	local function ProcessKeyValuePair(i,v, isArray, lastItem)
@@ -132,10 +134,12 @@ local function WriteTable(tab, tabName, params)
 	end
 	
 	-- do array component first (ensures order is preserved)
-	for i=1,#tab do
+	for i=0,#tab do
 		local v = tab[i]
-		ProcessKeyValuePair(i,v, true, (not isDict) and i == #tab)
-		processed[i] = true
+		if v then
+			ProcessKeyValuePair(i,v, (tab[0] == nil), (not isDict) and i == #tab)
+			processed[i] = true
+		end
 	end
 	for i,v in pairs(tab) do
 		if not processed[i] then
@@ -172,14 +176,14 @@ end
 -- if you use it make sure your keys are valid variable names!
 local function WritePythonDict(dict, dictName, params)
 	params = params or {}
-	local numIndents = params.numIndents or 0
-	local comma = params.raw and "" or ","
-	local eos = comma .. ((params.concise and not params.raw) and '' or "\n")	-- end of string
+	params.numIndents = params.numIndents or 0
+	local comma = params.raw and "" or ", "
+	local endLine = comma .. "\n"
 	local separator = params.raw and " = " or  " : "
 	local str = ""
 	if not params.raw then
 	      str = dictName .. " = "	--WriteIndents(numIndents)
-	      str = str .. (params.concise and "{" or "{\n")
+	      str = str .. "{\n"
 	end
 	for i,v in pairs(dict) do
 		if not params.raw then
@@ -192,18 +196,18 @@ local function WritePythonDict(dict, dictName, params)
 		end
 		
 		if type(v) == "table" then
-			local arg = {numIndents = (params.concise and 0 or numIndents + 1), concise = params.concise, endOfFile = false}
+			local arg = {numIndents =  params.numIndents + 1, endOfFile = false}
 			str = str .. WritePythonDict(v, nil, arg)
 		elseif type(v) == "boolean" then
-			str = str .. v and "True" or "False" .. eos
+			str = str .. v and "True" or "False" .. endLine
 		elseif type(v) == "string" then
-			str = str .. string.format("%q", v) .. eos
+			str = str .. string.format("%q", v) .. endLine
 		else
-			str = str .. v .. eos
+			str = str .. v .. endLine
 		end
 	end
 	if not params.raw then
-		str = str ..WriteIndents(numIndents) .. "}"
+		str = str ..WriteIndents(params.numIndents) .. "}"
 	end
 	if params.endOfFile == false then
 		str = str .. comma .. "\n"
