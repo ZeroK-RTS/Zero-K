@@ -249,7 +249,7 @@ local pollActive = true
 local springieName = Spring.GetModOptions().springiename or ''
 
 local VOTE_DEFAULT_CHOICE1 = "detriment";
-local VOTE_DEFAULT_CHOICE2 = 450;
+local VOTE_DEFAULT_CHOICE2 = 900;
 local most_voted_option = {};
 most_voted_option[0] = VOTE_DEFAULT_CHOICE1;
 most_voted_option[1] = VOTE_DEFAULT_CHOICE2;

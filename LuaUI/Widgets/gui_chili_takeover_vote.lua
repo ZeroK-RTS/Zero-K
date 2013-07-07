@@ -124,7 +124,7 @@ local springieName = Spring.GetModOptions().springiename or ''
 
 local VOTE_SPAM_DELAY = 1	--seconds
 local VOTE_DEFAULT_CHOICE1 = "detriment";
-local VOTE_DEFAULT_CHOICE2 = 450;
+local VOTE_DEFAULT_CHOICE2 = 900;
 
 local my_old_choice = {};
 local my_choice = {};
@@ -347,7 +347,7 @@ local function UpdateVote()
 	  end
 	end
 	local bestv = {}
-	bestv.choice = "detriment"
+	bestv.choice = VOTE_DEFAULT_CHOICE1
 	bestv.votes = 0
 	for _,choice in pairs(choices) do
 	  if (choice.votes > bestv.votes) then
@@ -374,7 +374,7 @@ local function UpdateVote()
 	  end
 	end
 	local bestv = {}
-	bestv.choice = 90
+	bestv.choice = VOTE_DEFAULT_CHOICE2
 	bestv.votes = 0
 	for _,choice in pairs(choices) do
 	  if (choice.votes > bestv.votes) then
@@ -669,7 +669,7 @@ function widget:Initialize()
 		width = 50;
 	}
 	textd = Label:New{
-		height = 36; width = 36; fontsize=16; caption="90"; align="center"; valign="center"; textColor = green;
+		height = 36; width = 36; fontsize=16; caption=VOTE_DEFAULT_CHOICE2; align="center"; valign="center"; textColor = GetColorForDelay(VOTE_DEFAULT_CHOICE2);
 	}
 	text2 = Label:New{
 		x = 380;
