@@ -58,6 +58,11 @@ local options = {
 	key  = 'halloween',
 	name = 'Halloween Ghost Possession',
 	desc = 'Try to crush all your enemy, while not trusting anything, expect yourself (commander)!',
+      },
+      {
+	key  = 'takeover',
+	name = 'Takeover',
+	desc = 'KoTH remake, instead of instantly winning game for controlling center of the map, capture a unit that will help you crush all enemies...',
       }
     },
   },
