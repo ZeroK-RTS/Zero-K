@@ -84,9 +84,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 160,
-        planes  = 160,
-        subs    = 8,
+        default = 200,
+        planes  = 200,
+        subs    = 10,
       },
 
       customParams = {
@@ -98,7 +98,7 @@ unitDef = {
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
-      interceptedByShieldType = 0,
+      interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
       numbounce               = 40,
