@@ -103,13 +103,13 @@ local function RemoveWindow()
 end
 
 function widget:AddConsoleMessage(msg)
-	if not msg.msgtype.autohost then	-- no spoofing messages
-		return false
-	end
 	local line = msg.text
 	if votingForceStart and line:sub(1,7) == "GameID:" then
 		RemoveWindow()
 		votingForceStart = false
+	end
+	if msg.msgtype ~= "autohost" then	-- no spoofing messages
+		return false
 	end
 	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) or line:find(string_noVote) then	--terminate existing vote
 		RemoveWindow()
