@@ -61,28 +61,47 @@ local keywords = {
 	["repeat"] = true,
 }
 
--- raw = print table key-value pairs straight to file (i.e. not as a table)
--- if you use it make sure your keys are valid variable names!
+--[[
+	raw = print table key-value pairs straight to file (i.e. not as a table)
+	if you use it make sure your keys are valid variable names!
+	
+	valid params: {
+		numIndents = int,
+		raw = bool,
+		prefixReturn = bool,
+		forceLineBreakAtEnd = bool,
+	}
+]]
+local function IsDictOrContainsDict(tab)
+	for i,v in pairs(tab) do
+		if type(i) ~= "number" then
+			return true
+		elseif i > #tab then
+			return true
+		elseif type(v) == "table" then
+			return true
+		end
+	end
+	return false
+end
+
 local function WriteTable(tab, tabName, params)
 	params = params or {}
-	local numIndents = params.numIndents or 0
-	local comma = params.raw and "" or ","
-	local eos = comma .. ((params.concise and not params.raw) and '' or "\n")	-- end of string
-	local str = ""	--WriteIndents(numIndents)
-	if not params.raw then
-		if params.prefixReturn then
-			str = "return "
-		elseif tabName then
-			str = tabName .. " = "
-		end
-		str = str .. (params.concise and "{" or "{\n")
-	end
-	for i,v in pairs(tab) do
-		if not params.concise then
-			str = str .. WriteIndents(numIndents + 1)
+	local processed = {}
+	
+	params.numIndents = params.numIndents or 0
+	local isDict = IsDictOrContainsDict(tab)
+	local comma = params.raw and "" or ", "
+	local endLine = (comma .. "\n") or comma 
+	local str = ""
+	
+	local function ProcessKeyValuePair(i,v, isArray, lastItem)
+		local pairEndLine = (lastItem and "") or (isArray and comma) or endLine
+		if isDict then
+			str = str .. WriteIndents(params.numIndents + 1)
 		end
 		if type(i) == "number" then
-			if not params.concise then
+			if not isArray then
 				str = str .. "[" .. i .. "] = "
 			end
 		elseif keywords[i] or (type(i) == "string") then
@@ -92,19 +111,44 @@ local function WriteTable(tab, tabName, params)
 		end
 		
 		if type(v) == "table" then
-			local arg = {numIndents = (params.concise and 0 or numIndents + 1), concise = params.concise, endOfFile = false}
+			local arg = {numIndents = (params.numIndents + 1), endOfFile = false}
 			str = str .. WriteTable(v, nil, arg)
 		elseif type(v) == "boolean" then
-			str = str .. tostring(v) .. eos
+			str = str .. tostring(v) .. pairEndLine
 		elseif type(v) == "string" then
-			str = str .. string.format("%q", v) .. eos
+			str = str .. string.format("%q", v) .. pairEndLine
 		else
-			str = str .. v .. eos
+			str = str .. v .. pairEndLine
 		end
 	end
-	str = str .. WriteIndents(numIndents) .. "}"
+	
+	if not params.raw then
+		if params.prefixReturn then
+			str = "return "
+		elseif tabName then
+			str = tabName .. " = "
+		end
+		str = str .. (isDict and "{\n" or "{")
+	end
+	
+	-- do array component first (ensures order is preserved)
+	for i=1,#tab do
+		local v = tab[i]
+		ProcessKeyValuePair(i,v, true, (not isDict) and i == #tab)
+		processed[i] = true
+	end
+	for i,v in pairs(tab) do
+		if not processed[i] then
+			ProcessKeyValuePair(i,v)
+		end
+	end
+	
+	if isDict then
+		str = str .. WriteIndents(params.numIndents)
+	end
+	str = str ..  "}"
 	if params.endOfFile == false then
-		str = str .. comma .. "\n"
+		str = str .. endLine
 	end
 	
 	return str
