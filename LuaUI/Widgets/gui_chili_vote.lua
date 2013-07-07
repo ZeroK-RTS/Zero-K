@@ -102,13 +102,14 @@ local function RemoveWindow()
 	end
 end
 
-function widget:AddConsoleLine(line,priority)
+function widget:AddConsoleMessage(msg)
+	if not msg.msgtype.autohost then	-- no spoofing messages
+		return false
+	end
+	local line = msg.text
 	if votingForceStart and line:sub(1,7) == "GameID:" then
 		RemoveWindow()
 		votingForceStart = false
-	end
-	if line:sub(1,springieName:len()) ~= springieName then	-- no spoofing messages
-		return false
 	end
 	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) or line:find(string_noVote) then	--terminate existing vote
 		RemoveWindow()
@@ -124,6 +125,11 @@ function widget:AddConsoleLine(line,priority)
 		end
 		local indexStart = select(2, line:find(string_titleStart))
 		local indexEnd = line:find(string_titleEnd)
+		if not (indexStart and indexEnd) then
+			-- malformed poll line
+			Spring.Log(widget:GetInfo().name, LOG.ERROR, "malformed poll notification text")
+			return
+		end
 		local title = line:sub(indexStart, indexEnd - 1)
 		votingForceStart = ((title:find("force game"))~=nil)
 		label_title:SetCaption("Poll: "..title)
