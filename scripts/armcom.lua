@@ -263,7 +263,7 @@ function script.Shot(num)
 		EmitSfx(rbigflash, 1027)
 	end
 	if flamers[num] then
-		GG.LUPS.FlameShot(unitID, unitDefID, _, num)
+		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
 	end
 end
 
