@@ -674,10 +674,8 @@ function RemakeConsole()
 	end	
 	-- set initial state for the chat, hide the dock for autohide
 	if (options.autohide.value) then
-		window_console.dockable = false
 		hideConsole()
 	else
-		window_console.dockable = true
 		showConsole()
 	end 
 end
@@ -788,10 +786,10 @@ function widget:Update(s)
 
 	if (options.autohide.value) then
 		local time_now = GetTimer()
-		if (time_opened) and (DiffTimers(time_now, time_opened) > options.autohide_time.value) then
-			hideConsole()
-		else
+		if (time_opened) and (DiffTimers(time_now, time_opened) < options.autohide_time.value) then
 			showConsole()
+		else
+			hideConsole()
 		end
 	end
 
@@ -926,9 +924,12 @@ function widget:Initialize()
         selfImplementedMinimizable = 
             function (show)
                 if show then
-                    showConsole()
+					-- update this in case autohide is enabled
+					time_opened = GetTimer()
+					showConsole()
                 else
-                    hideConsole()
+					time_opened = nil
+					hideConsole()
                 end
             end,
 		minWidth = MIN_WIDTH,
