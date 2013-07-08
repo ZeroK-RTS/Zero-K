@@ -572,7 +572,16 @@ function widget:RecvLuaMsg(line, playerID)
 	UpdateUnitTeam(line)
       end
       if line:find(string_takeover_unit_died) then
-	stats_window:RemoveChild(unit_team)
+	--stats_window:RemoveChild(unit_team)
+	if (unit_team) then
+	    unit_team:SetCaption("Unit's dead.")
+	    unit_team.font:SetColor(red)
+	end
+	timerInSeconds = -1;
+	if (stats_timer) then
+	    stats_timer:SetCaption("Time's out.")
+	    stats_timer.font:SetColor(orange)
+	end
       end
     else
       if line:find(string_vote_for2) and PollActive then
