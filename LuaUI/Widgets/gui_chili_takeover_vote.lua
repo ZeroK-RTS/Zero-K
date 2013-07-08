@@ -262,7 +262,7 @@ local delay_options = {
 --------------------------------------------------------------------------------
 
 local function GetColorForDelay(delay, paint_green)
-	if (delay <= 30) then return red; elseif (delay <= 180) then return orange; elseif (delay <= 360) then return yellow; elseif (delay >= 1500) then return cyan; end;
+	if (delay <= 30) then return red; elseif (delay <= 120) then return orange; elseif (delay <= 360) then return yellow; elseif (delay >= 1500) then return cyan; end;
 	if (delay == VOTE_DEFAULT_CHOICE2) and (paint_green) then return green; end
 	return white;
 end
@@ -668,8 +668,11 @@ function widget:Initialize()
 		tooltip = "Unminimize voting menu";
 		OnMouseDown = {function()
 			if vote_minimized then
-				screen0:AddChild(vote_window) end
-			end}
+				vote_minimized = false;
+				screen0:AddChild(vote_window);
+				screen0:RemoveChild(show_vote_window_button);
+			end
+		end}
 	}
 	stats_window = Window:New{
 		minimizable = true,
