@@ -43,7 +43,7 @@ local oldAllyTeam = {} -- allyTeam which player was on last frame
 
 GG.Lagmonitor_activeTeams = {}
 
-local spAddTeamResources  = Spring.AddTeamResources
+local spAddTeamResource   = Spring.AddTeamResource
 local spEcho              = Spring.Echo
 local spGetGameSeconds    = Spring.GetGameSeconds
 local spGetPlayerInfo     = Spring.GetPlayerInfo
@@ -57,7 +57,7 @@ local spGetUnitDefID      = Spring.GetUnitDefID
 local spGetUnitTeam       = Spring.GetUnitTeam
 local spGetPlayerList     = Spring.GetPlayerList
 local spTransferUnit      = Spring.TransferUnit
-local spUseTeamResources  = Spring.UseTeamResources
+local spUseTeamResource   = Spring.UseTeamResource
 
 local allyTeamList = Spring.GetAllyTeamList()
 for i=1,#allyTeamList do
