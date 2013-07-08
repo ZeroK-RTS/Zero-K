@@ -409,7 +409,7 @@ local function GetVotes(playerID, name, line)
 end
 
 function gadget:Initialize()
-    if(modOptions.zkmode ~= "takeover") then
+    if (not modOptions.zkmode) or (tostring(modOptions.zkmode) ~= "takeover") then
 	gadgetHandler:RemoveGadget()
     end
 --    gadgetHandler:AddChatAction(string_vote_for, ParseVote, " : sends vote's preferences to players and gadget...")
@@ -564,6 +564,9 @@ local function ParseVoteB(cmd, line, words, playerID)
 end
   
 function gadget:Initialize()
+    if (not Spring.GetModOptions().zkmode) or (tostring(Spring.GetModOptions().zkmode) ~= "takeover") then
+	gadgetHandler:RemoveGadget()
+    end
     gadgetHandler:AddChatAction(string_vote_for, ParseVoteB, " : sends vote's preferences to players and gadget...")
 end
 

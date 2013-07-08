@@ -81,8 +81,6 @@ local most_voted_option = {};
 most_voted_option[0] = VOTE_DEFAULT_CHOICE1;
 most_voted_option[1] = VOTE_DEFAULT_CHOICE2;
 
-local spectator = false
--- local players = {}; -- unsorted
 local player_list = {}; -- sorted
 local myAllyTeam;
 local myTeam;
@@ -603,10 +601,6 @@ function widget:RecvLuaMsg(line, playerID)
     end
 end
 
--- function widget:GameStart()
-
--- end
-
 function widget:GameFrame(n)
 	if ((n%30)==0) then
 	    if (timerInSeconds > 0) then
@@ -633,20 +627,13 @@ end
 
 
 function widget:Initialize()
-	spectator = Spring.GetSpectatingState()
-  	players = Spring.GetPlayerList()
 	myAllyTeam = Spring.GetMyAllyTeamID()
 	myTeam = Spring.GetMyTeamID()
-	-- this code is no longer needed
--- 	for i=1,#players do
--- 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(players[i])
--- 		if not spectator and active then
--- 		      player_list[#player_list + 1] = {id = i, name = name, team = teamID, ally = myAllyTeam==allyTeamID, voted = false, choice = {}};
--- 		      player_list[#player_list].choice[0] = VOTE_DEFAULT_CHOICE1;
--- 		      player_list[#player_list].choice[1] = VOTE_DEFAULT_CHOICE2;
--- 		end
--- 	end
-    --widgetHandler:RemoveWidget()
+	
+	if (not Spring.GetModOptions().zkmode) or (Spring.GetModOptions().zkmode ~= "takeover") then -- or Spring.GetSpectatingState() then -- ok i will allow spectators
+	    widgetHandler:RemoveWidget()
+	end
+	
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
