@@ -445,7 +445,7 @@ function gadget:GameStart()
       z = random(zmin,zmax)
     end
     if (spGetGroundHeight(x,z) <= waterLevel) and not (unit_choice[most_voted_option[0]].water_friendly) then
-      most_voted_option[0] = "detriment"; -- TODO basically i don't want land type unit in water
+      most_voted_option[0] = "detriment"; -- TODO basically i don't want land type units in water
       --spEcho(takeover_error_fallback)
       spSendLuaUIMsg(string_vote_fallback)
     end
@@ -472,8 +472,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   if (unitID == TheUnit) then
     spSendLuaUIMsg(string_takeover_unit_died)
     TheUnit = nil
+    gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
   end
-  gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
 end
 
 function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
