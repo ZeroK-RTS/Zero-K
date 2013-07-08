@@ -1,10 +1,13 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local version = "0.0.2 beta" -- i'm so noob in this :p
+-- you may find changelog in takeover.lua gadget
+
 function widget:GetInfo()
   return {
     name      = "Chili Takeover Vote Display",
-    desc      = "GUI for takeover votes",
+    desc      = "GUI for takeover votes "..version,
     author    = "Tom Fyuri",
     date      = "Jul 2013",
     license   = "GPL v2 or later",
@@ -12,8 +15,6 @@ function widget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
-local version = "0.0.1 beta" -- i'm so noob in this :p
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -35,65 +36,6 @@ local vote_window, panel_main, panel_for_stack, vote_title, stack_panel, scroll_
 local most_voted_panel, icon1, text1, textd, text2
 local stats_window,  stats_timer, show_vote_window_button, winner_icon, unit_team
 local vote_minimized = false -- im really noob in this
-  
-local unit_choice = {
-      ['scorpion'] = {
-	id = 1;
-	name = "scorpion";
-	type = "scorpion";
-	full_name = "Scorpion";
-	pic = "unitpics/scorpion.png";
-	water_friendly = false;
-      },
-      ['dante'] = {
-	id = 2;
-	name = "dante";
-	type = "dante";
-	full_name = "Dante";
-	pic = "unitpics/dante.png";
-	water_friendly = false;
-      },
-      ['catapult'] = {
-	id = 3;
-	name = "catapult";
-	type = "armraven";
-	full_name = "Catapult";
-	pic = "unitpics/armraven.png";
-	water_friendly = false;
-      },
-      ['bantha'] = {
-	id = 4;
-	name = "bantha";
-	type = "armbanth";
-	full_name = "Bantha";
-	pic = "unitpics/armbanth.png";
-	water_friendly = false;
-      },
-      ['krow'] = {
-	id = 5;
-	name = "krow";
-	type = "corcrw";
-	full_name = "Krow";
-	pic = "unitpics/corcrw.png";
-	water_friendly = false;
-      },
-      ['detriment'] = {
-	id = 6;
-	name = "detriment";
-	type = "armorco";
-	full_name = "Detriment";
-	pic = "unitpics/armorco.png";
-	water_friendly = true;
-      },
-      ['jugglenaut'] = {
-	id = 7;
-	name = "jugglenaut";
-	type = "gorg";
-	full_name = "Jugglenaut";
-	pic = "unitpics/gorg.png";
-	water_friendly = false;
-      },
-}
 
 local blue	= {0,0,1,1}
 local green	= {0,1,0,1}
@@ -113,11 +55,14 @@ local vote_unit_button = {};
 
 local string_vote_for = "#takeover_vote";
 local string_vote_for2 = 'takeover_vote';
-local string_vote_start = "^takeover_vote_start";
-local string_vote_end = "^takeover_vote_end";
-local takeover_error_fallback = "Takeover: WARNING! TheUnit position is underwater, thefore unit type changed back to detriment!";
-local pollActive = true
-local gameActive = false
+local string_vote_start = "takeover_vote_start";
+local string_vote_end = "takeover_vote_end";
+local string_vote_most_popular = "takeover_vote_most_popular";
+local string_vote_fallback = "takeover_vote_fallback";
+local takeover_error_fallback = "Takeover: WARNING! TheUnit position is underwater, therefore unit type changed back to detriment!";
+local string_takeover_owner = "takeover_new_owner";
+local string_takeover_unit_died = "takeover_unit_dead"
+local PollActive = false
 local timerInSeconds = 90
 
 local springieName = Spring.GetModOptions().springiename or ''
@@ -137,92 +82,181 @@ most_voted_option[0] = VOTE_DEFAULT_CHOICE1;
 most_voted_option[1] = VOTE_DEFAULT_CHOICE2;
 
 local spectator = false
-local players = {}; -- unsorted
+-- local players = {}; -- unsorted
 local player_list = {}; -- sorted
 local myAllyTeam;
 local myTeam;
 local players_voted = 0;
 
+local GaiaTeamID	   	= Spring.GetGaiaTeamID()
+local UnitTeamID		= GaiaTeamID
+  
+local unit_choice = {
+      ['scorpion'] = {
+	id = 1;
+	name = "scorpion";
+	type = "scorpion";
+	full_name = "Scorpion";
+	pic = "unitpics/scorpion.png";
+	water_friendly = false;
+	votes = 0;
+      },
+      ['dante'] = {
+	id = 2;
+	name = "dante";
+	type = "dante";
+	full_name = "Dante";
+	pic = "unitpics/dante.png";
+	water_friendly = false;
+	votes = 0;
+      },
+      ['catapult'] = {
+	id = 3;
+	name = "catapult";
+	type = "armraven";
+	full_name = "Catapult";
+	pic = "unitpics/armraven.png";
+	water_friendly = false;
+	votes = 0;
+      },
+      ['bantha'] = {
+	id = 4;
+	name = "bantha";
+	type = "armbanth";
+	full_name = "Bantha";
+	pic = "unitpics/armbanth.png";
+	water_friendly = false;
+	votes = 0;
+      },
+      ['krow'] = {
+	id = 5;
+	name = "krow";
+	type = "corcrw";
+	full_name = "Krow";
+	pic = "unitpics/corcrw.png";
+	water_friendly = false;
+	votes = 0;
+      },
+      ['detriment'] = {
+	id = 6;
+	name = "detriment";
+	type = "armorco";
+	full_name = "Detriment";
+	pic = "unitpics/armorco.png";
+	water_friendly = true;
+	votes = 0;
+      },
+      ['jugglenaut'] = {
+	id = 7;
+	name = "jugglenaut";
+	type = "gorg";
+	full_name = "Jugglenaut";
+	pic = "unitpics/gorg.png";
+	water_friendly = false;
+	votes = 0;
+      },
+}
+
 local delay_options = {
       {
 	id = 1;
 	delay = 0;
+	votes = 0;
       },
       {
 	id = 2;
 	delay = 5;
+	votes = 0;
       },
       {
 	id = 3;
 	delay = 10;
+	votes = 0;
       },
       {
 	id = 4;
 	delay = 30;
+	votes = 0;
       },
       {
 	id = 5;
 	delay = 45;
+	votes = 0;
       },
       {
 	id = 6;
 	delay = 60;
+	votes = 0;
       },
       {
 	id = 7;
 	delay = 90;
+	votes = 0;
       },
       {
 	id = 8;
 	delay = 120;
+	votes = 0;
       },
       {
 	id = 9;
 	delay = 150;
+	votes = 0;
       },
       {
 	id = 10;
 	delay = 240;
+	votes = 0;
       },
       {
 	id = 11;
 	delay = 300;
+	votes = 0;
       },
       {
 	id = 12;
 	delay = 450;
+	votes = 0;
       },
       {
 	id = 13;
 	delay = 600;
+	votes = 0;
       },
       {
 	id = 14;
 	delay = 900;
+	votes = 0;
       },
       {
 	id = 15;
 	delay = 1200;
+	votes = 0;
       },
       {
 	id = 16;
 	delay = 1500;
+	votes = 0;
       },
       {
 	id = 17;
 	delay = 1800;
+	votes = 0;
       },
       {
 	id = 18;
 	delay = 3600;
+	votes = 0;
       },
       {
 	id = 19;
 	delay = 7200;
+	votes = 0;
       },
       {
 	id = 20;
 	delay = 9000;
+	votes = 0;
       },
 }
 
@@ -230,8 +264,8 @@ local delay_options = {
 --------------------------------------------------------------------------------
 
 local function GetColorForDelay(delay, paint_green)
-	if (delay <= 5) then return red; elseif (delay < 45) then return orange; elseif (delay < 90) then return yellow; elseif (delay >= 1500) then return cyan; end;
-	if (delay == 90) and (paint_green) then return green; end
+	if (delay <= 30) then return red; elseif (delay <= 180) then return orange; elseif (delay <= 360) then return yellow; elseif (delay >= 1500) then return cyan; end;
+	if (delay == VOTE_DEFAULT_CHOICE2) and (paint_green) then return green; end
 	return white;
 end
 
@@ -330,66 +364,58 @@ local function DelayIntoID(delay)
 	  end
 	end
 end
-local function UpdateVote()
-	-- recalculate most popular option, quite easy, build a table of most wanted option
-	-- TODO much better code is present in "takeover.lua", put it here...
-	local choices = {}
-	for _,unit in pairs(unit_choice) do
-	  choices[unit.id] = {}
-	  choices[unit.id].name = unit.name
-	  choices[unit.id].votes = 0
-	end
-	local id
-	for i=1,#player_list do
-	  if player_list[i].voted then
-	    id = unit_choice[player_list[i].choice[0]].id
-	    choices[id].votes = choices[id].votes+1
-	  end
-	end
-	local bestv = {}
-	bestv.choice = VOTE_DEFAULT_CHOICE1
-	bestv.votes = 0
-	for _,choice in pairs(choices) do
-	  if (choice.votes > bestv.votes) then
-	    bestv.votes = choice.votes
-	    bestv.choice = choice.name
-	  end
-	end
-	most_voted_option[0] = bestv.choice
-	-- update 
-	icon1.file = unit_choice[bestv.choice].pic;
+local function UpdateMostPopularGraphics()
+	icon1.file = unit_choice[most_voted_option[0]].pic;
 	icon1:Invalidate();
-	text1:SetCaption(bestv.votes.." votes");
-	-- part 2, delay ?
-	choices = {}
-	for _,a in ipairs(delay_options) do
-	  choices[a.id] = {}
-	  choices[a.id].name = a.delay;
-	  choices[a.id].votes = 0
-	end
-	for i=1,#player_list do
-	  if player_list[i].voted then
-	    id = DelayIntoID(player_list[i].choice[1])
-	    choices[id].votes = choices[id].votes+1
-	  end
-	end
-	local bestv = {}
-	bestv.choice = VOTE_DEFAULT_CHOICE2
-	bestv.votes = 0
-	for _,choice in pairs(choices) do
-	  if (choice.votes > bestv.votes) then
-	    bestv.votes = choice.votes
-	    bestv.choice = choice.name
-	  end
-	end
-	most_voted_option[1] = bestv.choice
-	-- update
+	text1:SetCaption(most_unit_votes.." votes");
 	icon2:RemoveChild(textd)
 	textd = Label:New{
-		height = 36; width = 36; fontsize=16; caption=bestv.choice; align="center"; valign="center"; textColor = green;
+		height = 36; width = 36; fontsize=16; caption=most_voted_option[1]; align="center"; valign="center"; textColor = GetColorForDelay(most_voted_option[1]);
 	}
 	icon2:AddChild(textd)
-	text2:SetCaption(bestv.votes.." votes");
+	text2:SetCaption(most_delay_votes.." votes");
+end
+local function UpdateVote(line)
+	words={}
+	for word in line:gmatch("[^%s]+") do words[#words+1]=word end
+	if (#words ~= 5) then return false end
+	-- TODO do in need safety checks here? i think not
+	most_voted_option[0] = words[2]
+	most_unit_votes = words[3]
+	most_voted_option[1] = tonumber(words[4])
+	most_delay_votes = words[5]
+	-- update
+	UpdateMostPopularGraphics()
+	--Spring.Echo(most_voted_option[0].." "..most_voted_option[1])
+end
+local function GetPlayerName(owner,team,isAI)
+      local name = "noname"
+      if isAI then
+	local _,aiName,_,shortName = spGetAIInfo(team)
+	-- FIXME i never tested it with AI, so i wonder what name will it get... lol
+	name = aiName; --.."["..team.."]"..'('.. shortName .. ')'
+      elseif owner then
+	name = Spring.GetPlayerInfo(owner);--.."["..team.."]"
+      end
+      return name
+end
+local function UpdateUnitTeam(line)
+      words={}
+      for word in line:gmatch("[^%s]+") do words[#words+1]=word end
+      if (#words ~= 2) then return false end
+      local team = tonumber(words[2])
+      local _,owner,_,isAI,allyTeam = Spring.GetTeamInfo(team)
+      local color = red;
+      if (GaiaTeamID == team) then
+	color = white;
+      elseif (team == myTeam) then
+	color = cyan;
+      elseif (myAllyTeam == allyteam) then
+	coor = green;
+      end
+      unit_team:SetCaption("Owner: "..GetPlayerName(owner,team,isAI)..".")
+      unit_team.font:SetColor(color)
+      UnitTeamID = team
 end
 
 -- TODO really? i don't understand why i can't update text's color if it's parent is button, i have to add/remove it all the time!
@@ -434,41 +460,67 @@ local function RecolorDelays(old, new)
 	end
 end
 
-local function GetVotes(line)
+local function GetVotes(playerID, name, line)
+	-- this code is almost identical to the takeover.lua's implementation, but it has also some callins to update gui
 	if line==string_vote_for then return false end
-	--Spring.Echo("YOU VOTED FOR SOMETHING LOL")
 	words={}
 	for word in line:gmatch("[^%s]+") do words[#words+1]=word end
-	if (#words ~= 4) then return false end
-	local name = words[1];
-	name = name.sub(name,2,#name-1);
-	-- find player by name... oh my
+	if (#words ~= 3) then return false end
+	local new = true
+	local id = -1
 	for i=1,#player_list do
-	  if (player_list[i].name == name) then
-	    if (unit_choice[words[3]] ~= nil) then
-		player_list[i].choice[0] = words[3]
-	    end
-	    if (tonumber(words[4]) ~= nil) then
-		player_list[i].choice[1] = tonumber(words[4])
-	    end
-	    -- TODO detection if invalid choice is done above, but instead of putting defautl values, need to tell abuser to vote again
-	    if not player_list[i].voted then
-	      player_list[i].voted = true
-	      AddEntry(i)
-	      players_voted = players_voted+1;
-	    else
-	      UpdateResults(i)
-	    end
-	  end -- if player name isn't on sorted list, it's spectator or someone else? ignore anyway
+	  if (player_list[i].playerID == playerID) then
+	    new = false;
+	    id = i;
+	    break;
+	  end
 	end
-	UpdateVote()
-	--Spring.Echo(name..words[3]..words[4])
+	if new then
+	  local _ ,_,_,teamID,allyTeamID,_,_ = Spring.GetPlayerInfo(playerID)
+	  player_list[#player_list+1] = {
+	    playerID = playerID;
+	    name = name;
+	    team = teamID;
+	    ally = myAllyTeam==allyTeamID;
+	    voted = false;
+	    choice = {};
+	  };
+	  player_list[#player_list].choice[0] = VOTE_DEFAULT_CHOICE1;
+	  player_list[#player_list].choice[1] = VOTE_DEFAULT_CHOICE2;
+	  id = #player_list;
+	end
+	if (id > -1) then -- safety check
+	  if (unit_choice[words[2]] ~= nil) then
+	      if (player_list[id].voted) then
+		  unit_choice[player_list[id].choice[0]].votes = unit_choice[player_list[id].choice[0]].votes-1
+	      end
+	      unit_choice[words[2]].votes = unit_choice[words[2]].votes+1
+	      player_list[id].choice[0] = words[2]
+-- 		spEcho(words[2].." "..unit_choice[words[2]].votes)
+	  end
+	  local delay = tonumber(words[3])
+	  if (delay ~= nil) then
+	      if (player_list[id].voted) then
+		  delay_options[DelayIntoID(player_list[id].choice[1])].votes = delay_options[DelayIntoID(player_list[id].choice[1])].votes-1
+	      end
+	      delay_options[DelayIntoID(delay)].votes = delay_options[DelayIntoID(delay)].votes+1
+	      player_list[id].choice[1] = delay
+	  end
+	  -- TODO detection if invalid choice is done above, but instead of putting default values, need to tell abuser to vote again
+	  if not player_list[id].voted then
+	    player_list[id].voted = true
+	    AddEntry(id)
+	    players_voted = players_voted+1;
+	  else
+	    UpdateResults(id)
+	  end
+	end
+-- 	UpdateVote() -- no longer needed, since i can get current choice from gadget, perfectly synced :)
 end
 
 local function PrepareGame(line)
 	words={}
 	for word in line:gmatch("[^%s]+") do words[#words+1]=word end
-	gameActive = true
 	timerInSeconds = tonumber(words[3])
 	most_voted_option[0] = words[2]
 	most_voted_option[1] = timerInSeconds-30
@@ -482,60 +534,78 @@ local function PrepareGame(line)
 	stats_timer = Label:New{
 		width = 120,
 		height = 40,
-		y = 20;
-		right = 7;
+		y = 30;
+		right = 5;
 		autosize=false;
 		--align="center";
 		valign="center";
-		caption = timerInSeconds.." seconds left";
+		caption = timerInSeconds.." seconds left.";
 	}
 	stats_window:AddChild(stats_timer)
+	unit_team = Label:New{
+		width = 120,
+		height = 40,
+		y = 10;
+		right = 5;
+		autosize=false;
+		--align="center";
+		valign="center";
+		caption = "Owner: noone.";
+		textColor = white;
+	}
+	stats_window:AddChild(unit_team)
+	if (timerInSeconds > 5) then
+	  Spring.Echo("Takerover: The Unit is "..unit_choice[most_voted_option[0]].full_name.." and it will keep changing owner for "..timerInSeconds.." seconds.")
+	else
+	  Spring.Echo("Takerover: The Unit is "..unit_choice[most_voted_option[0]].full_name.." and it will go bersek right about... now? :)")
+	end
 end
 
-function widget:AddConsoleLine(line,priority)
-	if gameActive then return false end -- no need to check anything if game started
-	if line:sub(1,7) == "GameID:" then
-		pollActive = false
-		vote_minimized = true
-		screen0:RemoveChild(vote_window)
+function widget:RecvLuaMsg(line, playerID)
+    -- FIXME figure out what can be elseif and what cannot, i'm having trouble...
+    if not PollActive then
+      if (line == string_vote_start) then -- i wonder if i should check whether playerid ain't equal to the one who sent the msg
+	PollActive = true
+	vote_minimized = false
+	screen0:AddChild(vote_window)
+	screen0:AddChild(stats_window)
+      end
+      if line:find(string_takeover_owner) then
+	UpdateUnitTeam(line)
+      end
+      if line:find(string_takeover_unit_died) then
+	stats_window:RemoveChild(unit_team)
+      end
+    else
+      if line:find(string_vote_for2) and PollActive then
+	local name, _, spectator = Spring.GetPlayerInfo(playerID)
+	if not spectator then
+	  GetVotes(playerID, name, line)
 	end
-	if line:sub(1,springieName:len()) ~= springieName then	-- no spoofing messages
-		return false
+      end
+      if line:find(string_vote_most_popular) then
+	UpdateVote(line)
+      end
+      if (line == string_vote_fallback) then
+	Spring.Echo(takeover_error_fallback)
+	most_voted_option[0]="detriment"
+	UpdateMostPopularGraphics()
+      end
+      if line:find(string_vote_end) then	--terminate existing vote
+	PollActive = false
+	if not vote_minimized then
+	  vote_minimized = true
+	  screen0:RemoveChild(vote_window)
 	end
-	if line:find(string_vote_end) then	--terminate existing vote
-		pollActive = false
-		if not vote_minimized then
-		  vote_minimized = true
-		  screen0:RemoveChild(vote_window)
-		end
-		stats_window:RemoveChild(show_vote_window_button)
-		PrepareGame(line)
-	elseif line:find(takeover_error_fallback) then
-		most_voted_option[0]="detriment"
-		pollActive = false
-		if not vote_minimized then
-		  vote_minimized = true
-		  screen0:RemoveChild(vote_window)
-		end
-		stats_window:RemoveChild(show_vote_window_button)
-		PrepareGame()		
-	elseif line:find(string_vote_start) then
-		if not pollActive then
-			pollActive = true
-			vote_minimized = false
-			screen0:AddChild(vote_window)
-		end
-	end
-	if pollActive and line:find(string_vote_for) then
-		GetVotes(line)
-		line = "" --idk, is this okay? otherwise it loops
-	end
-	return false
+	stats_window:RemoveChild(show_vote_window_button)
+	PrepareGame(line)
+      end
+    end
 end
 
-function widget:GameStart()
-  -- meh
-end
+-- function widget:GameStart()
+
+-- end
 
 function widget:GameFrame(n)
 	if ((n%30)==0) then
@@ -545,9 +615,14 @@ function widget:GameFrame(n)
 		  stats_timer:SetCaption(timerInSeconds.." seconds left.")
 	      end
 	    elseif (timerInSeconds == 0) then
-	      timerInSeconds = timerInSeconds - 1
+	      timerInSeconds = -1
 	      if (stats_timer) then
-		  stats_timer:SetCaption("unit is freed or dead.")
+		  stats_timer:SetCaption("Time's out.")
+		  stats_timer.font:SetColor(orange)
+	      end
+	      if (unit_team) and (UnitTeamID == GaiaTeamID) then
+		unit_team:SetCaption("BERSERK MODE")
+		unit_team.font:SetColor(red)
 	      end
 	    end
 	end
@@ -562,14 +637,15 @@ function widget:Initialize()
   	players = Spring.GetPlayerList()
 	myAllyTeam = Spring.GetMyAllyTeamID()
 	myTeam = Spring.GetMyTeamID()
-	for i=1,#players do
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(players[i])
-		if not spectator and active then
-		      player_list[#player_list + 1] = {id = i, name = name, team = teamID, ally = myAllyTeam==allyTeamID, voted = false, choice = {}};
-		      player_list[#player_list].choice[0] = VOTE_DEFAULT_CHOICE1;
-		      player_list[#player_list].choice[1] = VOTE_DEFAULT_CHOICE2;
-		end
-	end
+	-- this code is no longer needed
+-- 	for i=1,#players do
+-- 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(players[i])
+-- 		if not spectator and active then
+-- 		      player_list[#player_list + 1] = {id = i, name = name, team = teamID, ally = myAllyTeam==allyTeamID, voted = false, choice = {}};
+-- 		      player_list[#player_list].choice[0] = VOTE_DEFAULT_CHOICE1;
+-- 		      player_list[#player_list].choice[1] = VOTE_DEFAULT_CHOICE2;
+-- 		end
+-- 	end
     --widgetHandler:RemoveWidget()
 	-- setup Chili
 	Chili = WG.Chili
@@ -629,9 +705,9 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
 		color = {1, 1, 1, 0.5},
-		children = {
+		--[[children = {
 		    show_vote_window_button,
-		}
+		}]]--
 	}
 	
 	vote_window = Window:New{
@@ -814,11 +890,14 @@ function widget:Initialize()
 		caption="Vote!";
 		tooltip = "Relay your choice to others!";
 		OnMouseDown = {function() 
-				local notSpam = CheckForVoteSpam (os.clock())
-					if notSpam then
-					Spring.SendCommands("say "..string_vote_for.." "..my_choice[0].." "..my_choice[1])
-					Spring.SendLuaRulesMsg(string_vote_for2.." "..my_choice[0].." "..my_choice[1])
-				end
+-- 				local notSpam = CheckForVoteSpam (os.clock())
+-- 				    if notSpam then
+-- 					Spring.SendCommands("say "..string_vote_for.." "..my_choice[0].." "..my_choice[1]) -- ok
+-- 				    end -- i think it's allright to spam luarules but not spam chat :)
+		  -- whatever i don't see any reason to spam chat... maybe ally chat?
+					Spring.SendLuaRulesMsg(string_vote_for2.." "..my_choice[0].." "..my_choice[1]) -- lol...
+					Spring.SendLuaUIMsg(string_vote_for2.." "..my_choice[0].." "..my_choice[1]) -- lol?!
+-- 				end
 			end}
 	}
 	minimize_button = Button:New {
@@ -831,7 +910,10 @@ function widget:Initialize()
 		caption="minimize";
 		tooltip = "Close this window";
 		OnMouseDown = {function() 
+		  if not vote_minimized then
 				screen0:RemoveChild(vote_window); vote_minimized = true;
+				stats_window:AddChild(show_vote_window_button)
+		  end
 			end}
 	}
 	panel_for_vote = Panel:New{
@@ -936,8 +1018,8 @@ function widget:Initialize()
 	  }
 	  unit_stack_panel:AddChild(vote_unit_button[unit.id]);
 	end
-	--RemoveWindow()
-	--Spring.Echo("takeover vote start")
+	screen0:RemoveChild(vote_window) -- FIXME i just don't know if there is property to make window hidden from the begining
+	screen0:RemoveChild(stats_window)
 end
 
 --------------------------------------------------------------------------------

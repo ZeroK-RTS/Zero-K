@@ -1,7 +1,9 @@
+local version = "0.0.2 beta" -- i'm so noob in this :p
+
 function gadget:GetInfo()
   return {
     name      = "Takeover",
-    desc      = "KoTH remake, instead of instantly winning game for controlling center of the map, capture a unit that will help you crush all enemies...",
+    desc      = "KoTH remake, instead of instantly winning game for controlling center of the map, capture a unit that will help you crush all enemies... "..version,
     author    = "Tom Fyuri, xponen",
     date      = "Jul 2013",
     license   = "GPL v2 or later",
@@ -9,8 +11,6 @@ function gadget:GetInfo()
     enabled   = true
   }
 end
-
-local version = "0.0.1 beta" -- i'm so noob in this :p
 
 --[[ The Takeover draft >
 ...inspired by detriment hideout and wolas...
@@ -57,6 +57,10 @@ If center of map and unit type are correct, unit will be spawn there.
 Players may decide to destroy unit instead of capturing it, and it's allright.
 The point is: if unit/structure is valuable, control the hill(center) until graceperiod is over, and pwn the other teams.
 This is skill based (teamwork) gamemode for fast games.
+
+  Changelog:
+0.0.1 beta - First version, not working in multiplayer, working singleplayer.
+0.0.2 beta - Recoded voting implementation, getting closer to smooth beta playing...
 ]]--
 
 -- TODO this is copy paste from halloween, it's only used to simulate unit berserk state, but it needs to be replaced with more sane AI that will try to attack players, but not finish them off!
@@ -67,6 +71,10 @@ if (math.randomseed ~= nil) then
   math.random()
   --math.randomseed(r)
 end
+
+local string_vote_for = 'takeover_vote';
+local spSendLuaRulesMsg	    = Spring.SendLuaRulesMsg
+local spSendLuaUIMsg	    = Spring.SendLuaUIMsg
 
 --SYNCED-------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
@@ -240,11 +248,13 @@ local delay_options = {
       },
 }
 
-local string_vote_for = 'takeover_vote';
 local string_vote_start = "takeover_vote_start";
 local string_vote_end = "takeover_vote_end";
-local takeover_error_fallback = "Takeover: WARNING! TheUnit position is underwater, thefore unit type changed back to detriment!";
-local pollActive = true
+local string_vote_most_popular = "takeover_vote_most_popular";
+local string_vote_fallback = "takeover_vote_fallback";
+local string_takeover_owner = "takeover_new_owner";
+local string_takeover_unit_died = "takeover_unit_dead"
+local PollActive = false
 
 local springieName = Spring.GetModOptions().springiename or ''
 
@@ -254,8 +264,8 @@ local most_voted_option = {};
 most_voted_option[0] = VOTE_DEFAULT_CHOICE1;
 most_voted_option[1] = VOTE_DEFAULT_CHOICE2;
 
-local players = {}; -- unsorted
-local player_list = {}; -- sorted
+--local players = {}; -- unsorted
+local player_list = {}; -- players who voted
 
 local modOptions = Spring.GetModOptions()
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
@@ -289,6 +299,9 @@ local spGetTeamList	    = Spring.GetTeamList
 local spGetTeamInfo	    = Spring.GetTeamInfo
 local spGetPlayerInfo	    = Spring.GetPlayerInfo
 
+local CMD_RECLAIM	= CMD.RECLAIM
+local CMD_LOAD_UNITS	= CMD.LOAD_UNITS
+
 local TheUnit
 local TheUnitIsChained	= true
 local DelayInFrames
@@ -311,7 +324,7 @@ local function UpdateVote()
 	for _,unit in pairs(unit_choice) do
 	   if (unit.votes == most_unit_votes) then
 	      most_units[#most_units+1] = unit.name;
-	      --Spring.Echo(most_units[#most_units].name.." "..most_unit_votes)
+-- 	      spEcho(most_units[#most_units].." "..most_unit_votes)
 	   end
 	end
 	
@@ -336,42 +349,61 @@ local function UpdateVote()
 	else
 	  most_voted_option[1] = VOTE_DEFAULT_CHOICE2
 	end
-	--Spring.Echo(most_voted_option[0].." "..most_voted_option[1])
+	spSendLuaUIMsg(string_vote_most_popular.." "..most_voted_option[0].." "..most_unit_votes.." "..most_voted_option[1].." "..most_delay_votes) -- genius lol
+	--spEcho(most_voted_option[0].." "..most_voted_option[1])
 end
 
-local function GetVotes(line) -- this is copy paste from client side, i probably could utilize "words" from ParseVote
--- 	Spring.Echo("YOU VOTED: "..line)
+local function GetVotes(playerID, name, line)
+	--spEcho("YOU VOTED: "..line)
 	if line==string_vote_for then return false end
 	words={}
 	for word in line:gmatch("[^%s]+") do words[#words+1]=word end
-	if (#words ~= 4) then return false end
-	local name = words[1];
--- 	name = name.sub(name,2,#name-1);
---  	Spring.Echo("[debug] Takeover: "..name.." voted for "..words[3].." "..words[4])
+	if (#words ~= 3) then return false end
+ 	--spEcho("[debug] Takeover: "..name.." voted for "..words[2].." "..words[3])
 	-- find player by name... oh my
+	local new = true
+	local id = -1
 	for i=1,#player_list do
-	  if (player_list[i].name == name) then
-	    if (unit_choice[words[3]] ~= nil) then
-		if (player_list[i].voted) then
-		    unit_choice[player_list[i].choice[0]].votes = unit_choice[player_list[i].choice[0]].votes-1
-		end
-		unit_choice[words[3]].votes = unit_choice[words[3]].votes+1
-		player_list[i].choice[0] = words[3]
--- 		Spring.Echo(words[3].." "..unit_choice[words[3]].votes)
-	    end
-	    local delay = tonumber(words[4])
-	    if (delay ~= nil) then
-		if (player_list[i].voted) then
-		    delay_options[DelayIntoID(player_list[i].choice[1])].votes = delay_options[DelayIntoID(player_list[i].choice[1])].votes-1
-		end
-		delay_options[DelayIntoID(delay)].votes = delay_options[DelayIntoID(delay)].votes+1
-		player_list[i].choice[1] = delay
-	    end
-	    -- TODO detection if invalid choice is done above, but instead of putting default values, need to tell abuser to vote again
-	    if not player_list[i].voted then
-	      player_list[i].voted = true
-	    end
-	  end -- if player name isn't on sorted list, it's spectator or someone else? ignore anyway
+	  if (player_list[i].playerID == playerID) then
+	    new = false;
+	    id = i;
+	    break;
+	  end
+	end
+	if new then
+	  player_list[#player_list+1] = {
+	    name = name;
+	    playerID = playerID;
+	    voted = false; choice = {};
+	  };
+	  player_list[#player_list].choice[0] = VOTE_DEFAULT_CHOICE1;
+	  player_list[#player_list].choice[1] = VOTE_DEFAULT_CHOICE2;
+	  id = #player_list;
+	end
+	--for i=1,#player_list do
+-- 	if (player_list[id].name == name) then
+	if (id > -1) then -- safety check
+	  if (unit_choice[words[2]] ~= nil) then
+	      if (player_list[id].voted) then
+		  unit_choice[player_list[id].choice[0]].votes = unit_choice[player_list[id].choice[0]].votes-1
+	      end
+	      unit_choice[words[2]].votes = unit_choice[words[2]].votes+1
+	      player_list[id].choice[0] = words[2]
+-- 		spEcho(words[2].." "..unit_choice[words[2]].votes)
+	  end
+	  local delay = tonumber(words[3])
+	  if (delay ~= nil) then
+	      if (player_list[id].voted) then
+		  delay_options[DelayIntoID(player_list[id].choice[1])].votes = delay_options[DelayIntoID(player_list[id].choice[1])].votes-1
+	      end
+	      delay_options[DelayIntoID(delay)].votes = delay_options[DelayIntoID(delay)].votes+1
+	      player_list[id].choice[1] = delay
+	  end
+	  -- TODO detection if invalid choice is done above, but instead of putting default values, need to tell abuser to vote again
+	  if not player_list[id].voted then
+	    player_list[id].voted = true
+	  end
+	  --end -- if player name isn't on sorted list, it's spectator or someone else? ignore anyway
 	end
 	UpdateVote()
 end
@@ -380,39 +412,26 @@ function gadget:Initialize()
     if(modOptions.zkmode ~= "takeover") then
 	gadgetHandler:RemoveGadget()
     end
-    -- no unsycned? -- bad idea
---     if (not gadgetHandler:IsSyncedCode()) then
--- 	gadgetHandler:RemoveGadget()
--- 	return
---     end
-    players = spGetPlayerList()
-    for i=1,#players do
-	    local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = spGetPlayerInfo(players[i])
-	    if not spectator and name ~= nil and name ~= "" then
-		  player_list[#player_list + 1] = {id = i, name = name, team = teamID, ally = myAllyTeam==allyTeamID, voted = false, choice = {}};
-		  player_list[#player_list].choice[0] = VOTE_DEFAULT_CHOICE1;
-		  player_list[#player_list].choice[1] = VOTE_DEFAULT_CHOICE2;
-	    end
-    end
 --    gadgetHandler:AddChatAction(string_vote_for, ParseVote, " : sends vote's preferences to players and gadget...")
-    pollActive = true
-    Spring.Echo(string_vote_start)
+    PollActive = true
+--    spEcho(string_vote_start)
+    spSendLuaUIMsg(string_vote_start)
 end
 
 local function Paralyze(unitID, frameCount) -- credits and fame to xponen
-    local health, maxHealth, paralyzeDamage = Spring.GetUnitHealth(unitID)
+    local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
     local second = math.abs(frameCount*(1/30)) --because each frame took 1/30 second
     second = second-1-1/16 --because at 0% it took 1 second to recover, and paralyze is in slow update (1/16)
     --Note: ZK use
     --paralyzeAtMaxHealth=true, and
     --unitParalysisDeclineScale=40
     local paralyze = maxHealth+maxHealth*second/40 --a full health of paralyzepoints represent 1 second of paralyze, additional health/40 paralyzepoints represent +1 second of paralyze. Reference: modrules.lua, Unit.cpp(spring).
-    Spring.SetUnitHealth(unitID, { paralyze = paralyze })
+    spSetUnitHealth(unitID, { paralyze = paralyze })
 end
 
 function gadget:GameStart()
     DelayInFrames = 30*most_voted_option[1];
-    pollActive = false
+    PollActive = false
     -- TODO write awesome code to detect if it's land/water/etc, terraform place, be able to put structures and so on
     local x,z
     local xmin,xmax
@@ -427,26 +446,31 @@ function gadget:GameStart()
     end
     if (spGetGroundHeight(x,z) <= waterLevel) and not (unit_choice[most_voted_option[0]].water_friendly) then
       most_voted_option[0] = "detriment"; -- TODO basically i don't want land type unit in water
-      Spring.Echo(takeover_error_fallback)
+      --spEcho(takeover_error_fallback)
+      spSendLuaUIMsg(string_vote_fallback)
     end
-    TheUnit = spCreateUnit(unit_choice[most_voted_option[0]].type,x,10000,z,"n",GaiaTeamID)
+    TheUnit = spCreateUnit(unit_choice[most_voted_option[0]].type,x,spGetGroundHeight(x,z)+200,z,"n",GaiaTeamID)
     if (TheUnit ~= nil) then
       SetUnitNoSelect(TheUnit,true)
       TheUnitIsChained = true
       Paralyze(TheUnit, most_voted_option[1]*30) -- +16 seconds haha
     end
-    Spring.Echo(string_vote_end.." "..most_voted_option[0].." "..most_voted_option[1]) -- this will force all vote windows to close if they aren't yet
+    spSendLuaUIMsg(string_vote_end.." "..most_voted_option[0].." "..most_voted_option[1]) -- this will force all vote windows to close if they aren't yet
+    -- TODO also rewrite string above into luamsg
+    -- TODO make it so timer in widgets and in gadgets are showing same number (or +- 1-2 seconds) somehow...
     TimeLeftInSeconds = most_voted_option[1]
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
     if (TheUnit ~= nil) and (TheUnit == unitID) and (paralyzer) and (TheUnitIsChained) then
+	spSendLuaUIMsg(string_takeover_owner.." "..attackerTeam)
 	spTransferUnit(TheUnit, attackerTeam, false)
     end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   if (unitID == TheUnit) then
+    spSendLuaUIMsg(string_takeover_unit_died)
     TheUnit = nil
   end
   gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
@@ -458,10 +482,25 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
   end
 end
 
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, fromSynced)
+-- idk what are these used for and how, my guess it's a filter so only "true" listen commands are processed by allowcommand &/or commandfallback
+function gadget:AllowCommand_GetWantedCommand()
+        return {[CMD.RECLAIM] = true, [CMD.LOAD_UNITS] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
+        return true
+end
+
+-- TODO FIXME i need some help figuring out how to block area load units command (exclude TheUnit from picking up) help wanted!
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) --, fromSynced)
   -- you shall not use the dormant unit
-  if (TheUnit ~= nil) and (unitID == TheUnit) and (TheUnitIsChained) then --and (cmdID == CMD.SELFD) then
-    return false
+  if (TheUnit ~= nil) then
+    if (unitID == TheUnit) and (TheUnitIsChained) then --and (cmdID == CMD.SELFD) then
+      return false
+    end
+    if ((cmdID == CMD_RECLAIM) or (cmdID == CMD_LOAD_UNITS)) and (#cmdParams == 1) and (cmdParams[1] == TheUnit) then -- you shall not reclaim me or touch me      
+      return false
+    end
   end
   return true
 end
@@ -476,10 +515,10 @@ function gadget:GameFrame (f)
 		  spGiveOrderToUnit(TheUnit,CMD.MOVE_STATE,{2},{})
 		  local xmin,xmax
 		  local zmin,zmax
-		  xmin = floor(Game.mapSizeX/2 - Game.mapSizeX/8)
-		  zmin = floor(Game.mapSizeZ/2 - Game.mapSizeZ/8)
-		  xmax = floor(Game.mapSizeX/2 + Game.mapSizeX/8)
-		  zmax = floor(Game.mapSizeZ/2 + Game.mapSizeZ/8)
+		  xmin = floor(Game.mapSizeX/2 - Game.mapSizeX/6)
+		  zmin = floor(Game.mapSizeZ/2 - Game.mapSizeZ/6)
+		  xmax = floor(Game.mapSizeX/2 + Game.mapSizeX/6)
+		  zmax = floor(Game.mapSizeZ/2 + Game.mapSizeZ/6)
 		  for i=1,random(1,10) do
 		    x = random(xmin,xmax)
 		    z = random(zmin,zmax)
@@ -505,10 +544,13 @@ end
 -- end
 
 function gadget:RecvLuaMsg(line, playerID)
-    if line:find(string_vote_for) then
-	local myName = Spring.GetPlayerInfo(playerID)
-	local str = myName.." "..line
-	GetVotes(str)
+    --spEcho(playerID)
+    if line:find(string_vote_for) and PollActive then
+	local name, _, spectator = spGetPlayerInfo(playerID)
+	--spEcho(name.." "..tostring(spectator))
+	if not spectator then
+	  GetVotes(playerID, name, line)
+	end
     end
 end
 
@@ -516,13 +558,13 @@ else
   
 local function ParseVoteB(cmd, line, words, playerID)
     if (#words == 2) then
-	local str = "takeover_vote "..words[1].." "..words[2]
-	Spring.SendLuaRulesMsg(str)
+	local str = string_vote_for.." "..words[1].." "..words[2]
+	spSendLuaRulesMsg(str)
     end
 end
   
 function gadget:Initialize()
-    gadgetHandler:AddChatAction('takeover_vote', ParseVoteB, " : sends vote's preferences to players and gadget...")
+    gadgetHandler:AddChatAction(string_vote_for, ParseVoteB, " : sends vote's preferences to players and gadget...")
 end
 
 end
