@@ -579,7 +579,7 @@ function widget:RecvLuaMsg(line, playerID)
 	end
 	timerInSeconds = -1;
 	if (stats_timer) then
-	    stats_timer:SetCaption("Time's out.")
+	    stats_timer:SetCaption("Time's up.")
 	    stats_timer.font:SetColor(orange)
 	end
       end
@@ -620,7 +620,7 @@ function widget:GameFrame(n)
 	    elseif (timerInSeconds == 0) then
 	      timerInSeconds = -1
 	      if (stats_timer) then
-		  stats_timer:SetCaption("Time's out.")
+		  stats_timer:SetCaption("Time's up.")
 		  stats_timer.font:SetColor(orange)
 	      end
 	      if (unit_team) and (UnitTeamID == GaiaTeamID) then
