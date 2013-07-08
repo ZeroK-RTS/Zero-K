@@ -494,7 +494,7 @@ end
 -- TODO FIXME i need some help figuring out how to block area load units command (exclude TheUnit from picking up) help wanted!
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) --, fromSynced)
   -- you shall not use the dormant unit
-  if (TheUnit ~= nil) then
+  if (TheUnit ~= nil) and (TheUnitIsChained) then
     if (unitID == TheUnit) and (TheUnitIsChained) then --and (cmdID == CMD.SELFD) then
       return false
     end
@@ -526,7 +526,8 @@ function gadget:GameFrame (f)
 		  end
 	    end
 	end
-	gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
+	-- actually lets monitor further
+	--gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
     end
     if ((f%30)==0) and (TimeLeftInSeconds > 0) then
       TimeLeftInSeconds = TimeLeftInSeconds - 1 
