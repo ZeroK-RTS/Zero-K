@@ -63,6 +63,7 @@ local takeover_error_fallback = "Takeover: WARNING! TheUnit position is underwat
 local string_takeover_owner = "takeover_new_owner";
 local string_takeover_unit_died = "takeover_unit_dead"
 local PollActive = false
+local GameStarted = false
 local timerInSeconds = 90
 
 local springieName = Spring.GetModOptions().springiename or ''
@@ -562,7 +563,7 @@ end
 function widget:RecvLuaMsg(line, playerID)
     -- FIXME figure out what can be elseif and what cannot, i'm having trouble...
     if not PollActive then
-      if (line == string_vote_start) then -- i wonder if i should check whether playerid ain't equal to the one who sent the msg
+      if (line == string_vote_start) and (not GameStarted) then -- i wonder if i should check whether playerid ain't equal to the one who sent the msg
 	PollActive = true
 	vote_minimized = false
 	screen0:AddChild(vote_window)
@@ -583,8 +584,8 @@ function widget:RecvLuaMsg(line, playerID)
 	    stats_timer.font:SetColor(orange)
 	end
       end
-    else
-      if line:find(string_vote_for2) and PollActive then
+    elseif (not GameStarted) then
+      if line:find(string_vote_for2) then
 	local name, _, spectator = Spring.GetPlayerInfo(playerID)
 	if not spectator then
 	  GetVotes(playerID, name, line)
@@ -598,7 +599,7 @@ function widget:RecvLuaMsg(line, playerID)
 	most_voted_option[0]="detriment"
 	UpdateMostPopularGraphics()
       end
-      if line:find(string_vote_end) then	--terminate existing vote
+      if line:find(string_vote_end) then --terminate existing vote
 	PollActive = false
 	if not vote_minimized then
 	  vote_minimized = true
@@ -606,6 +607,7 @@ function widget:RecvLuaMsg(line, playerID)
 	end
 	stats_window:RemoveChild(show_vote_window_button)
 	PrepareGame(line)
+	GameStarted = true
       end
     end
 end
@@ -927,7 +929,7 @@ function widget:Initialize()
 		  minimize_button,
 		}
 	}
-	if not spectator then
+	if not Spring.GetSpectatingState() then -- spectator no vote button for you
 	  panel_for_vote:AddChild(vote_button);
 	end
 	stack_panel = StackPanel:New {
