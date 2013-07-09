@@ -434,7 +434,7 @@ end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
     if (TheUnit ~= nil) and (TheUnit == unitID) and (paralyzer) and (TheUnitIsChained) then
-	spSendLuaUIMsg(string_takeover_owner.." "..attackerTeam)
+	--spSendLuaUIMsg(string_takeover_owner.." "..attackerTeam) -- this is now handled in UnitTaken below
 	spTransferUnit(TheUnit, attackerTeam, false)
     end
 end
