@@ -401,7 +401,7 @@ local function Paralyze(unitID, seconds) -- original code belonged to xponen but
 end -- xponen: its like a famous scientist say: the world work with constant 37.5 with no apparent reason at all!
 
 function gadget:GameStart()
-    DelayInFrames = 30*most_voted_option[1];
+    DelayInFrames = 32*most_voted_option[1];
     PollActive = false
     -- TODO write awesome code to detect if it's land/water/etc, terraform place, be able to put structures and so on
     local x,z
