@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.2 beta" -- i'm so noob in this :p
+local version = "0.0.3 beta" -- i'm so noob in this :p
 -- you may find changelog in takeover.lua gadget
 
 function widget:GetInfo()
   return {
     name      = "Chili Takeover Vote Display",
     desc      = "GUI for takeover votes "..version,
-    author    = "Tom Fyuri",
+    author    = "Tom Fyuri, Sprung",
     date      = "Jul 2013",
     license   = "GPL v2 or later",
     layer     = -9, 
@@ -64,7 +64,7 @@ local string_takeover_owner = "takeover_new_owner";
 local string_takeover_unit_died = "takeover_unit_dead"
 local PollActive = false
 local GameStarted = false
-local timerInSeconds = 90
+local timerInSeconds = -1
 
 local springieName = Spring.GetModOptions().springiename or ''
 
@@ -85,7 +85,6 @@ most_voted_option[1] = VOTE_DEFAULT_CHOICE2;
 local player_list = {}; -- sorted
 local myAllyTeam;
 local myTeam;
-local players_voted = 0;
 
 local GaiaTeamID	   	= Spring.GetGaiaTeamID()
 local UnitTeamID		= GaiaTeamID
@@ -133,7 +132,7 @@ local unit_choice = {
 	type = "corcrw";
 	full_name = "Krow";
 	pic = "unitpics/corcrw.png";
-	water_friendly = false;
+	water_friendly = true;
 	votes = 0;
       },
       ['detriment'] = {
@@ -164,97 +163,72 @@ local delay_options = {
       },
       {
 	id = 2;
-	delay = 5;
+	delay = 15;
 	votes = 0;
       },
       {
 	id = 3;
-	delay = 10;
-	votes = 0;
-      },
-      {
-	id = 4;
-	delay = 30;
-	votes = 0;
-      },
-      {
-	id = 5;
 	delay = 45;
 	votes = 0;
       },
       {
-	id = 6;
+	id = 4;
 	delay = 60;
 	votes = 0;
       },
       {
-	id = 7;
+	id = 5;
 	delay = 90;
 	votes = 0;
       },
       {
-	id = 8;
+	id = 6;
 	delay = 120;
 	votes = 0;
       },
       {
-	id = 9;
-	delay = 150;
-	votes = 0;
-      },
-      {
-	id = 10;
+	id = 7;
 	delay = 240;
 	votes = 0;
       },
       {
-	id = 11;
+	id = 8;
 	delay = 300;
 	votes = 0;
       },
       {
-	id = 12;
+	id = 9;
 	delay = 450;
 	votes = 0;
       },
       {
-	id = 13;
+	id = 10;
 	delay = 600;
 	votes = 0;
       },
       {
-	id = 14;
+	id = 11;
 	delay = 900;
 	votes = 0;
       },
       {
-	id = 15;
+	id = 12;
 	delay = 1200;
 	votes = 0;
       },
       {
-	id = 16;
+	id = 13;
 	delay = 1500;
 	votes = 0;
       },
       {
-	id = 17;
+	id = 14;
 	delay = 1800;
 	votes = 0;
       },
       {
-	id = 18;
+	id = 15;
 	delay = 3600;
-	votes = 0;
-      },
-      {
-	id = 19;
-	delay = 7200;
-	votes = 0;
-      },
-      {
-	id = 20;
-	delay = 9000;
 	votes = 0;
       },
 }
@@ -288,20 +262,28 @@ local function AddEntry(i)
 	end
 	entries[i] = {}
 	entries[i].choice = {}
+	local name = player_list[i].name
+	local fsize = 23
+	if (name:len() > 5) then
+	  fsize = math.floor(28-(name:len())*0.9) -- TODO do you happen to know much better way?
+	  if (fsize < 10) then fsize = 10 end -- whatever can't fit anyway
+	end
 	entries[i].label = Label:New{
+	  width = (scroll_panel.width-110 < 110) and 110 or scroll_panel.width-110;
+	  height = "100%";
 	  autosize=false;
 	  --align="center";
 	  valign="center";
-	  caption = player_list[i].name;
-	  height = 40,
-	  fontsize = 20, -- TODO change this so every name fits
-	  --width = 120;
-	  textColor = color,
+	  caption = name;
+	  fontsize = fsize;
+	  textColor = color;
 	};
+	local unit = unit_choice[player_list[i].choice[0]]
 	entries[i].choice[0] = Image:New {
-	  file   = unit_choice[player_list[i].choice[0]].pic;
+	  file   = unit.pic;
 	  height = 40;
 	  width = 40;
+	  tooltip= unit.full_name;
 	};
 	-- TODO scrap code below and make it convert seconds into minutes if needed, so any number fits into small square
 	-- i believe such things would take some extra time
@@ -319,17 +301,17 @@ local function AddEntry(i)
 	  fontsize=18; -- so cost values are better? for now atleast...
 	  textColor = color;
 	};
-	entries[i].entry = StackPanel:New{
-		x = 8;
-		y = 16+players_voted*32;
+	entries[i].entry = StackPanel:New{ -- TODO actually i can pull it off without stackpanel at all, i can just directly add elements to scroll_panel...
+		--x = 8;
+		y = 16+(#player_list-1)*42; -- 42 or 45 so so
 		centerItems = false,
 		resizeItems = false;
 		columns = 1;
 		orientation   = "horizontal";
 		width = "100%";
-		height = 40,
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
+		height = 50,
+		padding = {5, 5, 5, 5},
+		itemMargin  = {5, 0, 0, 0},
 		backgroundColor = {0, 0, 0, 0},
 		children = {
 		  entries[i].label,
@@ -356,12 +338,12 @@ local function UpdateResults(i)
 	entries[i].choice[1]:SetCaption(delay);
 	entries[i].choice[1].font:SetColor(color);
 end
-local function DelayIntoID(delay)
-	for _,a in ipairs(delay_options) do
-	  if (a.delay == delay) then
-	    return a.id
-	  end
-	end
+local function DelayIntoID(delay) -- thanks Sprung
+  for i=1, #delay_options do
+    if (delay_options[i].delay == delay) then
+      return i
+    end
+  end
 end
 local function UpdateMostPopularGraphics()
 	icon1.file = unit_choice[most_voted_option[0]].pic;
@@ -409,10 +391,18 @@ local function UpdateUnitTeam(line)
 	color = white;
       elseif (team == myTeam) then
 	color = cyan;
-      elseif (myAllyTeam == allyteam) then
+      elseif (myAllyTeam == allyTeam) then
 	coor = green;
       end
-      unit_team:SetCaption("Owner: "..GetPlayerName(owner,team,isAI)..".")
+      -- the reason why i'm doing this is, because player_list may hold the player and name, but not everyone is added to it since some people may not even vote (late join?)
+      local name = GetPlayerName(owner,team,isAI)
+      unit_team:SetCaption("Owner: "..name..".")
+      local fsize = 15
+      if (name:len() > 5) then
+	fsize = math.floor(20-(name:len())*0.9) -- TODO do you happen to know much better way?
+	if (fsize < 9) then fsize = 9 end -- whatever can't fit anyway
+      end
+      unit_team.font:SetSize(fsize)
       unit_team.font:SetColor(color)
       UnitTeamID = team
 end
@@ -480,7 +470,7 @@ local function GetVotes(playerID, name, line)
 	    playerID = playerID;
 	    name = name;
 	    team = teamID;
-	    ally = myAllyTeam==allyTeamID;
+	    ally = allyTeamID;
 	    voted = false;
 	    choice = {};
 	  };
@@ -509,7 +499,6 @@ local function GetVotes(playerID, name, line)
 	  if not player_list[id].voted then
 	    player_list[id].voted = true
 	    AddEntry(id)
-	    players_voted = players_voted+1;
 	  else
 	    UpdateResults(id)
 	  end
@@ -551,6 +540,7 @@ local function PrepareGame(line)
 		valign="center";
 		caption = "Owner: noone.";
 		textColor = white;
+		fontsize = 14;
 	}
 	stats_window:AddChild(unit_team)
 	if (timerInSeconds > 5) then
@@ -613,7 +603,8 @@ function widget:RecvLuaMsg(line, playerID)
 end
 
 function widget:GameFrame(n)
-	if ((n%30)==0) then
+    if (GameStarted) then
+	if ((n%32)==0) then
 	    if (timerInSeconds > 0) then
 	      timerInSeconds = timerInSeconds - 1
 	      if (stats_timer) then
@@ -631,6 +622,7 @@ function widget:GameFrame(n)
 	      end
 	    end
 	end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -649,6 +641,7 @@ function widget:Initialize()
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label
+	TextBox = Chili.TextBox
 	Colorbars = Chili.Colorbars
 	Window = Chili.Window
 	Panel = Chili.Panel
@@ -661,7 +654,7 @@ function widget:Initialize()
 	
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local mwidth = 600;
-	local mheight = 620;
+	local mheight = 580;
 	
 	local swidth = 200;
 	local sheight = 80;
@@ -834,7 +827,7 @@ function widget:Initialize()
 		resizeItems = true;
 		orientation   = "vertical";
 		width = "100%";
-		height = 170,
+		height = 160,
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 		backgroundColor = {0, 0, 0, 1},
@@ -865,7 +858,7 @@ function widget:Initialize()
 		resizeItems = true;
 		orientation   = "vertical";
 		width = "100%";
-		height = 170,
+		height = 110,
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 		backgroundColor = {0, 0, 0, 1},
@@ -933,7 +926,7 @@ function widget:Initialize()
 	  panel_for_vote:AddChild(vote_button);
 	end
 	stack_panel = StackPanel:New {
-		parent = panel_for_stack,
+		x=0;y=0;
 		centerItems = false,
 		resizeItems = false;
 		--resizeItems = true;
@@ -941,20 +934,26 @@ function widget:Initialize()
 		width = "100%";
 		height = vote_window.height-32,
 		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
+		itemMargin  = {5, 0, 0, 0},
 		children = {
-		  Label:New{
-		  autosize=false;
-		  align="center";
-		  valign="top";
-		  caption = "The rules are simple, all active players vote for desired options, before game's start.\n1) You may select 1 unit you want to spawn in the center of map.\n2) As well as time needed for this unit to wake up.\n3) Last team to do EMP damage to the unit, before timer reaches 0 - gets it!\nMost popular options voted for - are on!\nChoose unit and desired grace time, and press \"vote\".\nNote: if no team grabs the unit - unit will go bersek.\nVersion: "..version..".";
-		  height = 150,
-		  width = "100%";},
+		  TextBox:New{
+-- 		      autosize=false;
+		      --align="center";
+		      --valign="top";
+		      valign = "ascender",
+		      lineSpacing = 0,
+		      padding = { 5, 10, 5, 0 },
+		      text = "The rules are simple, all active players vote for desired options, before game's start.\n1) You may select 1 unit you want to spawn in the center of map.\n2) As well as time needed for this unit to become active.\n3) Any EMP damage to the unit changes it's current owner.\n4) On timer reaching 0 - current owner gets to keep the unit.\nMost popular options voted for - are on!\nChoose the unit and desired unit's dormant period, and press \"vote\".\nNote: if no team grabs the unit - unit will go bersek.\nVersion: "..version..".";
+		      height = 100;
+		      width = "100%";
+		      fontsize=13;
+		  },
 		  choose_unit,
 		  choose_delay,
-		  panel_for_vote,		  
+		  panel_for_vote,  
 		}
 	}
+	panel_for_stack:AddChild(stack_panel);
 	scroll_panel = ScrollPanel:New{
 	        y = 16,
 		x = "60%",

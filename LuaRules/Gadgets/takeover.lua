@@ -1,10 +1,10 @@
-local version = "0.0.2 beta" -- i'm so noob in this :p
+local version = "0.0.3 beta" -- i'm so noob in this :p
 
 function gadget:GetInfo()
   return {
     name      = "Takeover",
     desc      = "KoTH remake, instead of instantly winning game for controlling center of the map, capture a unit that will help you crush all enemies... "..version,
-    author    = "Tom Fyuri, xponen",
+    author    = "Tom Fyuri, xponen, Sprung",
     date      = "Jul 2013",
     license   = "GPL v2 or later",
     layer     = 0,
@@ -42,7 +42,7 @@ List is subject to change.
 Naturally, if center of map is water, and unit is land only, unit will fallback to "detriment", same if players select water unit when center of map is land.
 If center of map and unit type are correct, unit will be spawn there.
 3. Unit will get EMPed for amount of time correspoding to graceperiod modoption.
-  Graceperiod, corresponds to amount of time unit is paralysed for. Default is 90 seconds.
+  Graceperiod, corresponds to amount of time unit is paralyzed for. Default is 90 seconds.
 4. Unit may get transfered instantly to team that EMPed unit last or not, if not, use dominatrix to get the unit (may be long if unit is expensive).
   Naturally, if all teams fail to capture unit, it will belong to "noone". So next options:
   a) Any last team to EMP gets unit on graceperiod over. <- default
@@ -52,15 +52,16 @@ If center of map and unit type are correct, unit will be spawn there.
   a) Center of map. <- default
   b) Player boxes.
   c) Center of map + player boxes.
-6) Any transport trying to pick up unit will get EMPed for the same amount of time unit is paralysed for. Until graceperiod is over.
+6) Any transport trying to pick up unit will get EMPed for the same amount of time unit is paralyzed for. Until graceperiod is over.
 
 Players may decide to destroy unit instead of capturing it, and it's allright.
 The point is: if unit/structure is valuable, control the hill(center) until graceperiod is over, and pwn the other teams.
 This is skill based (teamwork) gamemode for fast games.
 
   Changelog:
-0.0.1 beta - First version, not working in multiplayer, working singleplayer.
-0.0.2 beta - Recoded voting implementation, getting closer to smooth beta playing...
+7 July 2013 - 0.0.1 beta - First version, not working in multiplayer, working singleplayer.
+8 July 2013 - 0.0.2 beta - Recoded voting implementation, getting closer to smooth beta playing, working multiplayer.
+9 July 2013 - 0.0.3 beta - Voting menu looks better, fontsize now is dynamic - name's should fit, vote menu should no longer re-appear during game, krow is water friendly, emp timers are synced and much more.
 ]]--
 
 -- TODO this is copy paste from halloween, it's only used to simulate unit berserk state, but it needs to be replaced with more sane AI that will try to attack players, but not finish them off!
@@ -122,7 +123,7 @@ local unit_choice = {
 	type = "corcrw";
 	full_name = "Krow";
 	pic = "unitpics/corcrw.png";
-	water_friendly = false;
+	water_friendly = true;
 	votes = 0;
       },
       ['detriment'] = {
@@ -153,97 +154,72 @@ local delay_options = {
       },
       {
 	id = 2;
-	delay = 5;
+	delay = 15;
 	votes = 0;
       },
       {
 	id = 3;
-	delay = 10;
-	votes = 0;
-      },
-      {
-	id = 4;
-	delay = 30;
-	votes = 0;
-      },
-      {
-	id = 5;
 	delay = 45;
 	votes = 0;
       },
       {
-	id = 6;
+	id = 4;
 	delay = 60;
 	votes = 0;
       },
       {
-	id = 7;
+	id = 5;
 	delay = 90;
 	votes = 0;
       },
       {
-	id = 8;
+	id = 6;
 	delay = 120;
 	votes = 0;
       },
       {
-	id = 9;
-	delay = 150;
-	votes = 0;
-      },
-      {
-	id = 10;
+	id = 7;
 	delay = 240;
 	votes = 0;
       },
       {
-	id = 11;
+	id = 8;
 	delay = 300;
 	votes = 0;
       },
       {
-	id = 12;
+	id = 9;
 	delay = 450;
 	votes = 0;
       },
       {
-	id = 13;
+	id = 10;
 	delay = 600;
 	votes = 0;
       },
       {
-	id = 14;
+	id = 11;
 	delay = 900;
 	votes = 0;
       },
       {
-	id = 15;
+	id = 12;
 	delay = 1200;
 	votes = 0;
       },
       {
-	id = 16;
+	id = 13;
 	delay = 1500;
 	votes = 0;
       },
       {
-	id = 17;
+	id = 14;
 	delay = 1800;
 	votes = 0;
       },
       {
-	id = 18;
+	id = 15;
 	delay = 3600;
-	votes = 0;
-      },
-      {
-	id = 19;
-	delay = 7200;
-	votes = 0;
-      },
-      {
-	id = 20;
-	delay = 9000;
 	votes = 0;
       },
 }
@@ -307,12 +283,12 @@ local TheUnitIsChained	= true
 local DelayInFrames
 local TimeLeftInSeconds
 
-local function DelayIntoID(delay)
-	for _,a in ipairs(delay_options) do
-	  if (a.delay == delay) then
-	    return a.id
-	  end
-	end
+local function DelayIntoID(delay) -- thanks Sprung
+  for i=1, #delay_options do
+    if (delay_options[i].delay == delay) then
+      return i
+    end
+  end
 end
 local function UpdateVote()
 	-- recalculate most popular option, quite easy, build a table of most wanted option
@@ -349,6 +325,8 @@ local function UpdateVote()
 	else
 	  most_voted_option[1] = VOTE_DEFAULT_CHOICE2
 	end
+	-- TODO current code has small fault, if there are multiple popular choices - it should hide "final" decision so players don't know it via "most popular choice"
+	-- probably best way would be to add "random" picture into client widget
 	spSendLuaUIMsg(string_vote_most_popular.." "..most_voted_option[0].." "..most_unit_votes.." "..most_voted_option[1].." "..most_delay_votes) -- genius lol
 	--spEcho(most_voted_option[0].." "..most_voted_option[1])
 end
@@ -418,16 +396,9 @@ function gadget:Initialize()
     spSendLuaUIMsg(string_vote_start)
 end
 
-local function Paralyze(unitID, frameCount) -- credits and fame to xponen
-    local health, maxHealth, paralyzeDamage = spGetUnitHealth(unitID)
-    local second = math.abs(frameCount*(1/30)) --because each frame took 1/30 second
-    second = second-1-1/16 --because at 0% it took 1 second to recover, and paralyze is in slow update (1/16)
-    --Note: ZK use
-    --paralyzeAtMaxHealth=true, and
-    --unitParalysisDeclineScale=40
-    local paralyze = maxHealth+maxHealth*second/40 --a full health of paralyzepoints represent 1 second of paralyze, additional health/40 paralyzepoints represent +1 second of paralyze. Reference: modrules.lua, Unit.cpp(spring).
-    spSetUnitHealth(unitID, { paralyze = paralyze })
-end
+local function Paralyze(unitID, seconds) -- original code belonged to xponen but it was producing not correct result, sorry xponen, code was rewriten
+    local maxHealth = select(2,spGetUnitHealth(unitID)); local paralyze = maxHealth+maxHealth*(seconds+0.6)/37.5; spSetUnitHealth(unitID, { paralyze = paralyze })
+end -- xponen: its like a famous scientist say: the world work with constant 37.5 with no apparent reason at all!
 
 function gadget:GameStart()
     DelayInFrames = 30*most_voted_option[1];
@@ -453,7 +424,7 @@ function gadget:GameStart()
     if (TheUnit ~= nil) then
       SetUnitNoSelect(TheUnit,true)
       TheUnitIsChained = true
-      Paralyze(TheUnit, most_voted_option[1]*30) -- +16 seconds haha
+      Paralyze(TheUnit, most_voted_option[1])
     end
     spSendLuaUIMsg(string_vote_end.." "..most_voted_option[0].." "..most_voted_option[1]) -- this will force all vote windows to close if they aren't yet
     -- TODO also rewrite string above into luamsg
@@ -472,7 +443,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   if (unitID == TheUnit) then
     spSendLuaUIMsg(string_takeover_unit_died)
     TheUnit = nil
-    gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
+    -- FIXME for now i will keep gadget running
+    --gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
   end
 end
 
@@ -506,8 +478,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 function gadget:GameFrame (f)
-    if (f >= DelayInFrames) then
-	TheUnitIsChained = false;
+    if (TheUnitIsChained) and (f == DelayInFrames) then --FIXME probably better if equation can be done, or this section can be rewritten somehow
 	if (TheUnit ~= nil) then
 	    SetUnitNoSelect(TheUnit,false)
 	    if (spGetUnitTeam(TheUnit) == GaiaTeamID) then
@@ -526,10 +497,11 @@ function gadget:GameFrame (f)
 		  end
 	    end
 	end
+	TheUnitIsChained = false;
 	-- actually lets monitor further
 	--gadgetHandler:RemoveGadget() -- my job here is done, no need to keep it working
     end
-    if ((f%30)==0) and (TimeLeftInSeconds > 0) then
+    if ((f%32)==0) and (TimeLeftInSeconds > 0) then
       TimeLeftInSeconds = TimeLeftInSeconds - 1 
     end
 end
