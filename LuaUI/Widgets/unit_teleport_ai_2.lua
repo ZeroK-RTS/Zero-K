@@ -1,4 +1,4 @@
-local version = "v0.823"
+local version = "v0.824"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -6,7 +6,7 @@ function widget:GetInfo()
 				"(up to 500elmo, LLT range) and teleport them when it shorten travel time. "..
 				"This only apply to your unit & allied beacon.",
 	author    = "Msafwan",
-    date      = "30 June 2013",
+    date      = "9 July 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
@@ -189,7 +189,7 @@ function widget:GameFrame(n)
 			local djinnID = listOfBeacon[beaconID]["djin"]
 			local djinnDeployed = djinnID and (spGetUnitRulesParam(djinnID,"deploy")) or 1
 			if djinnID and djinnDeployed == 1 then
-				djinnDeployed = (spGetUnitIsStunned(djinnID) or spGetUnitIsStunned(beaconID)) and 0 or 1
+				djinnDeployed = (spGetUnitIsStunned(beaconID) and 0) or 1
 			end
 			listOfBeacon[beaconID]["deployed"] = djinnDeployed
 		end
@@ -208,156 +208,151 @@ function widget:GameFrame(n)
 				local beaconID = groupBeacon[i][j]
 				beaconCurrentQueue[beaconID] =beaconCurrentQueue[beaconID] or 0
 				--Spring.Echo("BEACON:" .. beaconID)
-				if listOfBeacon[beaconID] then --beacon is alive
-					local alreadyFinished = beaconFinishLoop[beaconID]
-					local djinDeployed = listOfBeacon[beaconID]["deployed"]
-					if not alreadyFinished and djinDeployed == 1 then
-						local bX,bY,bZ = listOfBeacon[beaconID][1],listOfBeacon[beaconID][2],listOfBeacon[beaconID][3]
-						local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,detectionRange,myTeamID)
-						local numberOfLoop = #vicinityUnit
-						--Spring.Echo("LOOP:" .. numberOfLoop)
-						local numberOfLoopToProcessPerFrame = math.ceil(numberOfLoop/29)
-						local currentLoopIndex = listOfBeacon[beaconID]["prevIndex"] or 1
-						local currentLoopCount = 0
-						local currentUnitProcessed = 0
-						local finishLoop = false
-						if currentLoopIndex >= numberOfLoop then
-							finishLoop =true
+				if listOfBeacon[beaconID] and (not beaconFinishLoop[beaconID]) and listOfBeacon[beaconID]["deployed"]==1 then --beacon is alive & not finish looping? & deployed?
+					local bX,bY,bZ = listOfBeacon[beaconID][1],listOfBeacon[beaconID][2],listOfBeacon[beaconID][3]
+					local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,detectionRange,myTeamID)
+					local numberOfLoop = #vicinityUnit
+					--Spring.Echo("LOOP:" .. numberOfLoop)
+					local numberOfLoopToProcessPerFrame = math.ceil(numberOfLoop/29)
+					local currentLoopIndex = listOfBeacon[beaconID]["prevIndex"] or 1
+					local currentLoopCount = 0
+					local currentUnitProcessed = 0
+					local finishLoop = false
+					if currentLoopIndex >= numberOfLoop then
+						finishLoop =true
+					end
+					for k=currentLoopIndex, numberOfLoop,1 do
+						local unitID = vicinityUnit[k]
+						local validUnitID = spValidUnitID(unitID)
+						if not validUnitID then
+							unitToEffect[unitID] = nil
 						end
-						for k=currentLoopIndex, numberOfLoop,1 do
-							local unitID = vicinityUnit[k]
-							local validUnitID = spValidUnitID(unitID)
-							if not validUnitID then
-								unitToEffect[unitID] = nil
+						local excludedUnit = fiveSecondExcludedUnit[unitID] and fiveSecondExcludedUnit[unitID][beaconID]
+						if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] and not excludedUnit then
+							local unitDefID = spGetUnitDefID(unitID)
+							if not listOfMobile[unitDefID] then
+								local moveID = UnitDefs[unitDefID].moveData.id
+								local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog)
+								local unitSpeed = UnitDefs[unitDefID].speed
+								local isBomber = UnitDefs[unitDefID].isBomber
+								local isFighter = UnitDefs[unitDefID].isFighter
+								local isStatic = (unitSpeed == 0)
+								listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isStatic}
 							end
-							local excludedUnit = fiveSecondExcludedUnit[unitID] and fiveSecondExcludedUnit[unitID][beaconID]
-							if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] and not excludedUnit then
-								local unitDefID = spGetUnitDefID(unitID)
-								if not listOfMobile[unitDefID] then
-									local moveID = UnitDefs[unitDefID].moveData.id
-									local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog)
-									local unitSpeed = UnitDefs[unitDefID].speed
-									local isBomber = UnitDefs[unitDefID].isBomber
-									local isFighter = UnitDefs[unitDefID].isFighter
-									local isStatic = (unitSpeed == 0)
-									listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isStatic}
+							local isBomber = listOfMobile[unitDefID][4]
+							local isFighter = listOfMobile[unitDefID][5]
+							local isStatic = listOfMobile[unitDefID][6]
+							repeat
+								if isStatic or isBomber or isFighter then
+									loopedUnits[unitID]=true
+									break; --a.k.a: Continue
 								end
-								local isBomber = listOfMobile[unitDefID][4]
-								local isFighter = listOfMobile[unitDefID][5]
-								local isStatic = listOfMobile[unitDefID][6]
-								repeat
-									if isStatic or isBomber or isFighter then
-										loopedUnits[unitID]=true
-										break; --a.k.a: Continue
-									end
-									
-									unitToEffect[unitID] = unitToEffect[unitID] or {norm=nil,becn={nil},pos=nil,cmd=nil,defID=unitDefID}
-									if not unitToEffect[unitID]["cmd"] then
-										local px,py,pz= spGetUnitPosition(unitID)
-										local cmd_queue = spGetCommandQueue(unitID,1);
-										cmd_queue = ConvertCMDToMOVE(cmd_queue)
-										unitToEffect[unitID]["pos"] = {px,py,pz}
-										unitToEffect[unitID]["cmd"] = cmd_queue
-									end
+								
+								unitToEffect[unitID] = unitToEffect[unitID] or {norm=nil,becn={nil},pos=nil,cmd=nil,defID=unitDefID}
+								if not unitToEffect[unitID]["cmd"] then
+									local px,py,pz= spGetUnitPosition(unitID)
+									local cmd_queue = spGetCommandQueue(unitID,1);
+									cmd_queue = ConvertCMDToMOVE(cmd_queue)
+									unitToEffect[unitID]["pos"] = {px,py,pz}
+									unitToEffect[unitID]["cmd"] = cmd_queue
+								end
 
-									if not unitToEffect[unitID]["cmd"] then
+								if not unitToEffect[unitID]["cmd"] then
+									loopedUnits[unitID]=true
+									break; --a.k.a: Continue
+								end
+								if unitToEffect[unitID]["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
+									local guardedUnit = unitToEffect[unitID]["cmd"].params[4] --DEFINED in unit_teleporter.lua
+									if listOfBeacon[guardedUnit] then --if beacon exist
+										local chargeTime = listOfMobile[unitDefID][2]
+										beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] or 0
+										beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] + chargeTime
 										loopedUnits[unitID]=true
 										break; --a.k.a: Continue
-									end
-									if unitToEffect[unitID]["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
-										local guardedUnit = unitToEffect[unitID]["cmd"].params[4] --DEFINED in unit_teleporter.lua
-										if listOfBeacon[guardedUnit] then --if beacon exist
-											local chargeTime = listOfMobile[unitDefID][2]
-											beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] or 0
-											beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] + chargeTime
-											loopedUnits[unitID]=true
-											break; --a.k.a: Continue
-										else
-											local cmd_queue = spGetCommandQueue(unitID,3);
-											if cmd_queue[2] and cmd_queue[3] then --in case previous teleport AI teleport order make unit stuck to non-existent beacon
-												spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
-												cmd_queue = ConvertCMDToMOVE({cmd_queue[3]})
-												unitToEffect[unitID]["cmd"] = cmd_queue
-												if not cmd_queue then --invalid command
-													loopedUnits[unitID]=true
-													break; --a.k.a: Continue
-												end
+									else
+										local cmd_queue = spGetCommandQueue(unitID,3);
+										if cmd_queue[2] and cmd_queue[3] then --in case previous teleport AI teleport order make unit stuck to non-existent beacon
+											spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
+											cmd_queue = ConvertCMDToMOVE({cmd_queue[3]})
+											unitToEffect[unitID]["cmd"] = cmd_queue
+											if not cmd_queue then --invalid command
+												loopedUnits[unitID]=true
+												break; --a.k.a: Continue
 											end
 										end
 									end
-									if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
-										break;
-									end
-									if #unitToEffect >= numberOfUnitToProcess then
-										break;
-									end
-									currentUnitProcessed = currentUnitProcessed + 1
-									
-									local px,py,pz = unitToEffect[unitID]["pos"][1],unitToEffect[unitID]["pos"][2],unitToEffect[unitID]["pos"][3]
-									local cmd_queue = {id=0,params={0,0,0}}
-									local unitSpeed = listOfMobile[unitDefID][3]
-									local moveID = listOfMobile[unitDefID][1]
-									if not unitToEffect[unitID]["norm"] then
-										cmd_queue.id = unitToEffect[unitID]["cmd"].id
+								end
+								if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
+									break;
+								end
+								if #unitToEffect >= numberOfUnitToProcess then
+									break;
+								end
+								currentUnitProcessed = currentUnitProcessed + 1
+								
+								local px,py,pz = unitToEffect[unitID]["pos"][1],unitToEffect[unitID]["pos"][2],unitToEffect[unitID]["pos"][3]
+								local cmd_queue = {id=0,params={0,0,0}}
+								local unitSpeed = listOfMobile[unitDefID][3]
+								local moveID = listOfMobile[unitDefID][1]
+								if not unitToEffect[unitID]["norm"] then
+									cmd_queue.id = unitToEffect[unitID]["cmd"].id
+									cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
+									cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
+									cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
+									local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
+									unitToEffect[unitID]["norm"] = (distance/unitSpeed)*30
+								end
+								cmd_queue.id =CMD.MOVE
+								for l=1, #groupBeacon[i],1 do
+									local beaconID2 = groupBeacon[i][l]
+									if listOfBeacon[beaconID2] and listOfBeacon[beaconID2]["deployed"] == 1 then --beacon is alive?
+										cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
+										cmd_queue.params[2]=listOfBeacon[beaconID2][2]
+										cmd_queue.params[3]=listOfBeacon[beaconID2][3]
+										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
+										local timeToBeacon = (distance/unitSpeed)*30
 										cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
 										cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
 										cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
-										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
-										unitToEffect[unitID]["norm"] = (distance/unitSpeed)*30
-									end
-									cmd_queue.id =CMD.MOVE
-									for l=1, #groupBeacon[i],1 do
-										local beaconID2 = groupBeacon[i][l]
-										local djinDeployed2 = listOfBeacon[beaconID2]["deployed"]
-										if listOfBeacon[beaconID] and djinDeployed2 == 1 then --beacon is alive?
-											cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
-											cmd_queue.params[2]=listOfBeacon[beaconID2][2]
-											cmd_queue.params[3]=listOfBeacon[beaconID2][3]
-											local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
-											local timeToBeacon = (distance/unitSpeed)*30
-											cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
-											cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
-											cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
-											-- if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
-												-- local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
-												-- local ex,ey,ez = spGetUnitPosition(djinnID)
-												-- listOfBeacon[beaconID2][4] = ex
-												-- listOfBeacon[beaconID2][5] = ey
-												-- listOfBeacon[beaconID2][6] = ez
-											-- end
-											local chargeTime = listOfMobile[unitDefID][2]
-											local _, beaconIDToProcess, totalOverheadTime = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, unitToEffect[unitID]["norm"], chargeTime,0)
-											diggDeeperExclusion={}
-											if beaconIDToProcess then
-												distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6])
-												local timeFromExitToDestination = (distance/unitSpeed)*30
-												unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + totalOverheadTime
-											else
-												unitToEffect[unitID]["becn"][beaconID2] = 99999
-											end
+										-- if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
+											-- local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
+											-- local ex,ey,ez = spGetUnitPosition(djinnID)
+											-- listOfBeacon[beaconID2][4] = ex
+											-- listOfBeacon[beaconID2][5] = ey
+											-- listOfBeacon[beaconID2][6] = ez
+										-- end
+										local chargeTime = listOfMobile[unitDefID][2]
+										local _, beaconIDToProcess, totalOverheadTime = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, unitToEffect[unitID]["norm"], chargeTime,0)
+										diggDeeperExclusion={}
+										if beaconIDToProcess then
+											distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6])
+											local timeFromExitToDestination = (distance/unitSpeed)*30
+											unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + totalOverheadTime
+										else
+											unitToEffect[unitID]["becn"][beaconID2] = 99999
 										end
 									end
-								until true
-								currentLoopCount = currentLoopCount + 1
-							end
-							--Spring.Echo("K:"..k)
-							if k == numberOfLoop then
-								finishLoop =true
-								--Spring.Echo("FINISH")
-							elseif currentLoopCount>= numberOfLoopToProcessPerFrame then
-								groupSpreadJobs[i] = true
-								listOfBeacon[beaconID]["prevIndex"] = k+1  --continue at next frame
-								listOfBeacon[beaconID]["prevList"] = vicinityUnit  --continue at next frame
-								--Spring.Echo("PAUSE,LOOP SO FAR:"..currentLoopCount)
-								--Spring.Echo("PAUSE")
-								break
-							end
+								end
+							until true
+							currentLoopCount = currentLoopCount + 1
 						end
-						if finishLoop then
-							beaconFinishLoop[beaconID] = true
-							listOfBeacon[beaconID]["prevIndex"] = nil
-							listOfBeacon[beaconID]["prevList"] = nil
+						--Spring.Echo("K:"..k)
+						if k == numberOfLoop then
+							finishLoop =true
+							--Spring.Echo("FINISH")
+						elseif currentLoopCount>= numberOfLoopToProcessPerFrame then
+							groupSpreadJobs[i] = true
+							listOfBeacon[beaconID]["prevIndex"] = k+1  --continue at next frame
+							listOfBeacon[beaconID]["prevList"] = vicinityUnit  --continue at next frame
+							--Spring.Echo("PAUSE,LOOP SO FAR:"..currentLoopCount)
+							--Spring.Echo("PAUSE")
+							break
 						end
+					end
+					if finishLoop then
+						beaconFinishLoop[beaconID] = true
+						listOfBeacon[beaconID]["prevIndex"] = nil
+						listOfBeacon[beaconID]["prevList"] = nil
 					end
 				end --// end check for case if listOfBeacon[beaconID]==nil
 			end
