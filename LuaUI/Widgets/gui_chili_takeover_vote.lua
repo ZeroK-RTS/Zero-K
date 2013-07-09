@@ -392,7 +392,7 @@ local function UpdateUnitTeam(line)
       elseif (team == myTeam) then
 	color = cyan;
       elseif (myAllyTeam == allyTeam) then
-	coor = green;
+	color = green;
       end
       -- the reason why i'm doing this is, because player_list may hold the player and name, but not everyone is added to it since some people may not even vote (late join?)
       local name = GetPlayerName(owner,team,isAI)
