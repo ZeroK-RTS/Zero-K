@@ -269,7 +269,7 @@ local function AddEntry(i)
 	  if (fsize < 10) then fsize = 10 end -- whatever can't fit anyway
 	end
 	entries[i].label = Label:New{
-	  width = (scroll_panel.width-110 < 110) and 110 or scroll_panel.width-110;
+	  width = (scroll_panel.width-120 < 120) and 120 or scroll_panel.width-120;
 	  height = "100%";
 	  autosize=false;
 	  --align="center";

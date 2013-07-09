@@ -433,7 +433,7 @@ function gadget:GameStart()
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-    if (TheUnit ~= nil) and (TheUnit == unitID) and (paralyzer) and (TheUnitIsChained) then
+    if (TheUnit ~= nil) and (TheUnit == unitID) and (paralyzer) and (TheUnitIsChained) and (attackerTeam ~= nil) then -- FIXME can't cap with ticks, sadly
 	--spSendLuaUIMsg(string_takeover_owner.." "..attackerTeam) -- this is now handled in UnitTaken below
 	spTransferUnit(TheUnit, attackerTeam, false)
     end
