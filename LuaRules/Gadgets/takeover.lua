@@ -439,6 +439,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
     end
 end
 
+function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
+    if (TheUnit ~= nil) and (TheUnit == unitID) then
+	spSendLuaUIMsg(string_takeover_owner.." "..newTeamID)
+    end
+end
+
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   if (unitID == TheUnit) then
     spSendLuaUIMsg(string_takeover_unit_died)
