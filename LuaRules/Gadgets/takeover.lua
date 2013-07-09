@@ -450,7 +450,7 @@ end
 
 function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
   if (TheUnit ~= nil) and (unitID == TheUnit) and (TheUnitIsChained) and (TimeLeftInSeconds>0) then
-      Paralyze(transportID,TimeLeftInSeconds*30)
+      Paralyze(transportID,TimeLeftInSeconds)
   end
 end
 
