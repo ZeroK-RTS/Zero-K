@@ -99,8 +99,8 @@ end
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if carrierList[unitID] then
 		carrierList[unitID].teamID = newTeam
-		for i=1,#carrierList[carrierID].droneSets do
-			local set = carrierList[carrierID].droneSets[i]
+		for i=1,#carrierList[unitID].droneSets do
+			local set = carrierList[unitID].droneSets[i]
 			for droneID, _ in pairs(set.drones) do
 				drones_to_move[droneID] = newTeam
 			end
