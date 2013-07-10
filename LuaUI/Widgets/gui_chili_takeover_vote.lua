@@ -385,7 +385,7 @@ local function UpdateUnitTeam(line)
       for word in line:gmatch("[^%s]+") do words[#words+1]=word end
       if (#words ~= 2) then return false end
       local team = tonumber(words[2])
-      local _,owner,_,isAI,allyTeam = Spring.GetTeamInfo(team)
+      local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
       local color = red;
       if (GaiaTeamID == team) then
 	color = white;

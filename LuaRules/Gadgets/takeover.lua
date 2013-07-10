@@ -264,15 +264,13 @@ local spCreateUnit	    = Spring.CreateUnit
 local spGetUnitDefID	    = Spring.GetUnitDefID
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spSetUnitHealth	    = Spring.SetUnitHealth
-local SetUnitNoSelect       = Spring.SetUnitNoSelect
+local spSetUnitNoSelect       = Spring.SetUnitNoSelect
 local spGetGameFrame	    = Spring.GetGameFrame
+local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 --local spGetUnitTransporter  = Spring.GetUnitTransporter
 --local spGetUnitBasePosition = Spring.GetUnitBasePosition
 local spEcho                = Spring.Echo
 
-local spGetPlayerList	    = Spring.GetPlayerList
-local spGetTeamList	    = Spring.GetTeamList
-local spGetTeamInfo	    = Spring.GetTeamInfo
 local spGetPlayerInfo	    = Spring.GetPlayerInfo
 
 local CMD_RECLAIM	= CMD.RECLAIM
@@ -422,7 +420,7 @@ function gadget:GameStart()
     end
     TheUnit = spCreateUnit(unit_choice[most_voted_option[0]].type,x,spGetGroundHeight(x,z)+200,z,"n",GaiaTeamID)
     if (TheUnit ~= nil) then
-      SetUnitNoSelect(TheUnit,true)
+      spSetUnitNoSelect(TheUnit,true)
       TheUnitIsChained = true
       Paralyze(TheUnit, most_voted_option[1])
     end
@@ -433,7 +431,8 @@ function gadget:GameStart()
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-    if (TheUnit ~= nil) and (TheUnit == unitID) and (paralyzer) and (TheUnitIsChained) and (attackerTeam ~= nil) then -- FIXME can't cap with ticks, sadly
+    -- TODO block dominatrix, unit should not change owner with dominatrix OR should change owner when cap meter is 99%, because dominatrix has it's own transfer relation and it's not wanted here
+    if (TheUnit ~= nil) and (TheUnit == unitID) and (paralyzer) and (TheUnitIsChained) and (attackerTeam ~= nil) and (spGetUnitAllyTeam(attackerID) ~= spGetUnitAllyTeam(TheUnit)) then -- FIXME can't cap with ticks, sadly
 	--spSendLuaUIMsg(string_takeover_owner.." "..attackerTeam) -- this is now handled in UnitTaken below
 	spTransferUnit(TheUnit, attackerTeam, false)
     end
@@ -486,7 +485,7 @@ end
 function gadget:GameFrame (f)
     if (TheUnitIsChained) and (f == DelayInFrames) then --FIXME probably better if equation can be done, or this section can be rewritten somehow
 	if (TheUnit ~= nil) then
-	    SetUnitNoSelect(TheUnit,false)
+	    spSetUnitNoSelect(TheUnit,false)
 	    if (spGetUnitTeam(TheUnit) == GaiaTeamID) then
 		  spGiveOrderToUnit(TheUnit,CMD.REPEAT,{1},{})
 		  spGiveOrderToUnit(TheUnit,CMD.MOVE_STATE,{2},{})
