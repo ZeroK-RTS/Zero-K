@@ -124,7 +124,9 @@ local function RestoreAfterDelayHead()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num > 2 then return false end
+	if num > 2 then
+		return true
+	end
 	Signal( SIG_AIM[num])
 	SetSignalMask( SIG_AIM[num])
 	if num == 1 then
@@ -173,7 +175,7 @@ end
 
 function script.FireWeapon(num)
 	if num == 2 then
-		GraserLoop()
+		--GraserLoop()
 	end
 end
 

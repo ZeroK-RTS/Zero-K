@@ -89,7 +89,7 @@ effectUnitDefs = {
 --	{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
   },
   core_spectre = {
-    {class='Bursts', options=MergeTable({piece="glow"},corjamtBursts)},
+    {class='Bursts', options=corjamtBursts},
     {class='ShieldSphere', options={piece="glow", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=350, strength = .001, precision=50, repeatEffect=true, quality = 4}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
@@ -102,6 +102,10 @@ effectUnitDefs = {
   
   funnelweb = {
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4}},
+	{class='Bursts', options=MergeTable(corjamtBursts, {piece="emitl"})},
+		{class='Bursts', options=MergeTable(corjamtBursts, {piece="emitr"})},
+    {class='ShieldSphere', options={piece="emitl", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
+    {class='ShieldSphere', options={piece="emitr", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
   },
 
   --// ENERGY STORAGE //--------------------

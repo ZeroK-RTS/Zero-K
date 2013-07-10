@@ -9,6 +9,10 @@ local menu = {
 		angle = -45,
 		unit = "scorpion",
 		label = "Spider",
+		{
+			angle = 45,
+			unit = "funnelweb"
+		},  
 	  },
       {
 		angle = -90,
@@ -24,11 +28,7 @@ local menu = {
 		angle = 45,
 		unit = "armbanth",
 		label = "Heavy",
-		items = {
-		  {
-			angle = -45,
-			unit = "gorg"
-		  },  	  
+		items = {	  
 		}
 	  },
       {

@@ -5,7 +5,10 @@ local carrierDefs = {}
 local carrierDefNames = {
 	armcarry = { {drone = UnitDefNames.carrydrone.id, reloadTime = 15, maxDrones = 8, spawnSize = 2, range = 1600} },
 	--corcrw = { {drone = UnitDefNames.attackdrone.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 900} },
-	funnelweb = {{drone = UnitDefNames.attackdrone.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 600}},
+	funnelweb = { 
+		{drone = UnitDefNames.attackdrone.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 600},
+		{drone = UnitDefNames.battledrone.id, reloadTime = 20, maxDrones = 2, spawnSize = 1, range = 600},
+	},
 }
 
 local presets = {
