@@ -396,7 +396,11 @@ local function UpdateUnitTeam(line)
 	color = green;
       end
       -- the reason why i'm doing this is, because player_list may hold the player and name, but not everyone is added to it since some people may not even vote (late join?)
-      local name = GetPlayerName(owner,team,isAI)
+      local name = GetPlayerName(owner,team,isAI) -- nil?
+      if (name == nil) or (name == "") then 
+	name = "unknown"; -- TODO fix this... why can it be nil??? could it be that gadget is sending wrong value or smth? probably unsycned are sending messages in? :S
+	color = white;
+      end
       unit_team:SetCaption("Owner: "..name..".")
       local fsize = 15
       if (name:len() > 5) then
