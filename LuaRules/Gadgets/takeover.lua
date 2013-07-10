@@ -135,12 +135,12 @@ local unit_choice = {
 	water_friendly = true;
 	votes = 0;
       },
-      ['jugglenaut'] = {
+      ['funnelweb'] = {
 	id = 7;
-	name = "jugglenaut";
-	type = "gorg";
-	full_name = "Jugglenaut";
-	pic = "unitpics/gorg.png";
+	name = "funnelweb";
+	type = "funnelweb";
+	full_name = "Funnelweb";
+	pic = "unitpics/funnelweb.png";
 	water_friendly = false;
 	votes = 0;
       },
