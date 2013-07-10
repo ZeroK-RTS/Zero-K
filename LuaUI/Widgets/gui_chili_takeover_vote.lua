@@ -372,7 +372,7 @@ end
 local function GetPlayerName(owner,team,isAI)
       local name = "noname"
       if isAI then
-	local _,aiName,_,shortName = spGetAIInfo(team)
+	local _,aiName,_,shortName = Spring.GetAIInfo(team)
 	-- FIXME i never tested it with AI, so i wonder what name will it get... lol
 	name = aiName; --.."["..team.."]"..'('.. shortName .. ')'
       elseif owner then
