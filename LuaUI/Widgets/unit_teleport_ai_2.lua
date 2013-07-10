@@ -1,4 +1,4 @@
-local version = "v0.824"
+local version = "v0.825"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -6,7 +6,7 @@ function widget:GetInfo()
 				"(up to 500elmo, LLT range) and teleport them when it shorten travel time. "..
 				"This only apply to your unit & allied beacon.",
 	author    = "Msafwan",
-    date      = "9 July 2013",
+    date      = "10 July 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
@@ -243,7 +243,8 @@ function widget:GameFrame(n)
 							local isFighter = listOfMobile[unitDefID][5]
 							local isStatic = listOfMobile[unitDefID][6]
 							repeat
-								if isStatic or isBomber or isFighter then
+								local _,_,inBuild = spGetUnitIsStunned(unitID)
+								if isStatic or isBomber or isFighter or inBuild then
 									loopedUnits[unitID]=true
 									break; --a.k.a: Continue
 								end
