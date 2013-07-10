@@ -64,6 +64,7 @@ local string_takeover_owner = "takeover_new_owner";
 local string_takeover_unit_died = "takeover_unit_dead"
 local PollActive = false
 local GameStarted = false
+local unit_is_dead = false
 local timerInSeconds = -1
 
 local springieName = Spring.GetModOptions().springiename or ''
@@ -559,14 +560,16 @@ function widget:RecvLuaMsg(line, playerID)
 	screen0:AddChild(vote_window)
 	screen0:AddChild(stats_window)
       end
-      if line:find(string_takeover_owner) then
+      if line:find(string_takeover_owner) and (not unit_is_dead) then
 	UpdateUnitTeam(line)
       end
       if line:find(string_takeover_unit_died) then
 	--stats_window:RemoveChild(unit_team)
 	if (unit_team) then
 	    unit_team:SetCaption("Unit's dead.")
+	    unit_team.font:SetSize(14)
 	    unit_team.font:SetColor(red)
+	    unit_is_dead = true
 	end
 	timerInSeconds = -1;
 	if (stats_timer) then
