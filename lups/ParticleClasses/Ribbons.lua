@@ -161,7 +161,7 @@ function Ribbon.Initialize()
     vertex = [[
       uniform float width;
       uniform int   quads;
-      uniform vec3  oldPos[256];
+      uniform vec3  oldPos[32];
 
       varying vec2 texCoord;
 
@@ -214,7 +214,7 @@ function Ribbon.Initialize()
   widthLoc = gl.GetUniformLocation(RibbonShader, 'width')
   quadsLoc = gl.GetUniformLocation(RibbonShader, 'quads')
 
-  for i=1,256 do
+  for i=1,32 do
     oldPosUniform[i] = gl.GetUniformLocation(RibbonShader,"oldPos["..(i-1).."]")
   end
 end
@@ -310,7 +310,7 @@ end
 
 
 function Ribbon:CreateParticle()
-  if (self.size>256) then self.size=256
+  if (self.size>32) then self.size=32
   elseif (self.size<5) then self.size=5 end
 
   self.posIdx = 1
