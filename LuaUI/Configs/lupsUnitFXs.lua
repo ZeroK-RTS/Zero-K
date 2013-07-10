@@ -243,6 +243,12 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, emitVector = {0, 0, 1}}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}}},
   },
+  aagunship = {
+    {class='Ribbon', options={width=1, size=5, piece="lwingtip"}},
+    {class='Ribbon', options={width=1, size=5, piece="rwingtip"}},  
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ljet", onActive=true, emitVector = {0, 0, 1}}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rjet", onActive=true, emitVector = {0, 0, 1}}},
+  },
   armpnix = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustl", onActive=true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustr", onActive=true}},
