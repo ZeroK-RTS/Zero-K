@@ -21,6 +21,7 @@ unitDef = {
     [[armbrawl]],
     [[blackdawn]],
     [[corcrw]],
+	[[aagunship]],
     [[corvalk]],
     [[corbtrans]],
   },
