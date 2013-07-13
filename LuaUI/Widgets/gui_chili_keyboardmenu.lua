@@ -93,6 +93,20 @@ local lastCmd, lastColor
 
 local curTab = 'none'
 local keyRows = {}
+local unboundKeyList = {}
+
+local selections = {
+	'select_all',
+	'select_half',
+	'select_one',
+	'select_idleb',
+	'select_idleallb',
+	'select_nonidle',
+	'select_same',
+	'select_vissame',
+	'select_landw',
+	'selectairw',
+}
 
 --predeclared functions
 local function UpdateButtons() end
@@ -655,7 +669,7 @@ StoreBuilders = function(units)
 	curbuilder = 1
 	for _, unitID in ipairs(units) do 
 		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if ud.builder and build_menu_use[ud.name] then 
+		if ud and ud.builder and build_menu_use[ud.name] then 
 			if not builder_types[ud.name] then
 				builder_types[ud.name] = true
 				builder_types_i[#builder_types_i + 1] = ud.name
@@ -729,7 +743,7 @@ local function SetupTabs()
 			
 			OnMouseDown = { function()
 				SetCurTab(tab)
-				
+				BuildMode(false)
 			end },
 			
 
@@ -804,6 +818,9 @@ SetupKeybuttons = function()
 		end
 		colnum = colnum + 1
 	end
+	
+	local unboundKeys = table.concat( keyRows )
+	unboundKeyList = explode( '', unboundKeys )
 end
 
 
@@ -882,18 +899,6 @@ local function SetupCommands( modifier )
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
 	
-	local selections = {
-		'select_all',
-		'select_half',
-		'select_one',
-		'select_idleb',
-		'select_idleallb',
-		'select_nonidle',
-		'select_same',
-		'select_vissame',
-		'select_landw',
-		'selectairw',
-	}
 	
 	curCommands = {}
 	commandButtons = {}
@@ -908,13 +913,16 @@ local function SetupCommands( modifier )
 		modifier = '';
 	end
 	
-	local unboundKeys = table.concat( keyRows )
-	local unboundKeyList = explode( '', unboundKeys )
+	--moved to SetupKeybuttons
+	--local unboundKeys = table.concat( keyRows )
+	--local unboundKeyList = explode( '', unboundKeys )
 	local unboundKeyIndex = 1
 	
 	local ignore = {}
 		
-	for i, cmd in ipairs( curCommands ) do
+	--for i, cmd in ipairs( curCommands ) do
+	for i = 1, #curCommands do
+		local cmd = curCommands[i]
 		local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 		
 		local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)
@@ -971,7 +979,9 @@ local function SetupCommands( modifier )
 	end
 	
 	
-	for i, selection in ipairs(selections) do
+	--for i, selection in ipairs(selections) do
+	for i = 1, #selections do
+		local selection = selections[i]
 		--local option = options[selection]
 		local option = WG.GetWidgetOption( 'Select Keys','Game/Selections', selection ) --returns empty table if problem
 		if option.action then
@@ -998,7 +1008,9 @@ local function SetupCommands( modifier )
 			end
 			
 			if not ignore[hotkey_key] and actions and #actions > 0 then
-				for i,v in ipairs(actions) do
+				--for i,v in ipairs(actions) do
+				for i=1,#actions do
+					local v = actions[i]
 					for actionCmd, actionExtra in pairs(v) do
 						
 						if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' then 
@@ -1197,9 +1209,11 @@ function widget:MousePress(x,y,button)
 	end
 end
 
+--local selectionHasChanged
 function widget:SelectionChanged(sel)
 	--echo('selchanged')
 	selectedUnits = sel
+	--selectionHasChanged = true
 	-- updating here causes error because commandchanged needs to find whether unit is builder or not
 end
 
@@ -1232,10 +1246,13 @@ end
 
 function widget:GameFrame(f)
 	--updating here seems to solve the issue if the widget layer is sufficiently large
-	if updateCommandsSoon then
+	if updateCommandsSoon and (f % 16 == 0) then
 		updateCommandsSoon = false
 		StoreBuilders(selectedUnits)
-		UpdateButtons()
+		if not( build_mode and #builder_ids_i > 0 ) then
+			UpdateButtons()
+		end
+		--selectionHasChanged = false
 	end
 end
 
