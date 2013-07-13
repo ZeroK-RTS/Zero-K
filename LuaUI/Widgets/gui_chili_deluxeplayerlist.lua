@@ -180,7 +180,14 @@ local orange	= ''
 local yellow	= ''
 local cyan		= ''
 local white		= ''
-	
+
+local IsMission
+if VFS.FileExists("mission.lua") then
+	IsMission = true
+else
+	IsMission = false
+end
+
 local function IsFFA()
 	local allyteams = Spring.GetAllyTeamList()
 	local gaiaT = Spring.GetGaiaTeamID()
@@ -1002,7 +1009,9 @@ SetupPlayerNames = function()
 			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
 			if isAI then
 				local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
-				name = '<'.. name ..'> '.. shortName
+				if (IsMission == false) then
+					name = '<'.. name ..'> '.. shortName
+				end
 				local entityID = #entities + 1
 				entities[entityID] = {name = name, teamID = teamID, isAI = true}
 				local index = #teams[teamID].roster + 1
