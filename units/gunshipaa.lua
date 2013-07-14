@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[aagunship]],
+  unitname               = [[gunshipaa]],
   name                   = [[Vesper]],
   description            = [[Air Defense Gunship]],
   acceleration           = 0.18,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostEnergy        = 400,
   buildCostMetal         = 400,
   builder                = false,
-  buildPic               = [[aagunship.png]],
+  buildPic               = [[gunshipaa.png]],
   buildTime              = 400,
   canAttack              = true,
   canFly                 = true,
@@ -47,7 +47,7 @@ unitDef = {
   minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
-  objectName             = [[aagunship.s3o]],
+  objectName             = [[gunshipaa.s3o]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -133,7 +133,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 160,
-      object           = [[aagunship_dead.s3o]],
+      object           = [[gunshipaa_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 160,
     },
@@ -159,4 +159,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ aagunship = unitDef })
+return lowerkeys({ gunshipaa = unitDef })
