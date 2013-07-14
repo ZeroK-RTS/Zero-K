@@ -71,7 +71,7 @@ unitDef = {
       def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-	  maxAngleDif		 = 40,
+	  maxAngleDif		 = 60,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
