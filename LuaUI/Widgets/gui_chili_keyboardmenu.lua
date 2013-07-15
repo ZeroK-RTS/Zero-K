@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.022 Chili Keyboard Menu",
+    desc      = "v0.023 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -122,7 +122,7 @@ options_path = 'Settings/HUD Panels/KB Menu'
 options_order = {
 	'qwertz',
 	'sevenperrow',
-	'showRemainingCommands',
+	'showGlobalCommands',
 	'goToCommands',
 	'goToSelections',
 	'opacity',
@@ -149,8 +149,8 @@ options = {
 		value = false,
 	},
 	
-	showRemainingCommands = {
-		name = 'Show Remaining Commands',
+	showGlobalCommands = {
+		name = 'Show Global Commands',
 		type = 'bool',
 		value = false,
 		advanced = true,
@@ -998,7 +998,7 @@ local function SetupCommands( modifier )
 	end
 	
 	--testing
-	if options.showRemainingCommands.value then
+	if options.showGlobalCommands.value then
 		for hotkey_key, _ in pairs(key_buttons) do
 			local actions
 			if( modifier == '' or modifier == 'unbound' ) then
