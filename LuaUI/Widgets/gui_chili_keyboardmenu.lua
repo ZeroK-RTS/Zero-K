@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.023 Chili Keyboard Menu",
+    desc      = "v0.024 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -543,7 +543,8 @@ local function AddBuildStructureButton(item, index)
 	end
 	--]]
     local func = function()
-		if menu_level ~= 0 then 
+		--if menu_level ~= 0 then 
+		if menu_level ~= 0 or not item.items then  --account for first level items without subitems
 			local cmdid = build_menu_selected.cmd
 			if (cmdid == nil) then 
 				local ud = UnitDefNames[item.unit]
@@ -564,7 +565,7 @@ local function AddBuildStructureButton(item, index)
 			end
 			--BuildMode(false)
 		end 
-		if (item.items ~= nil)  then -- item has subitems 
+		if (item.items ~= nil) then -- item has subitems 
 			menu_level = menu_level + 1  -- save menu_level
 			build_menu = item
 			build_menu_selected = item
@@ -612,12 +613,16 @@ UpdateBuildMenu = function()
 	local temptree = {}
 
 	if (build_menu.items) then
+	--if true then
+		--local items = build_menu.items or {}
+		local items = build_menu.items
+		
 		if build_menu.angle then
 			local index = AngleToKey(build_menu.angle)
 			temptree[index] = build_menu
 		end
 		
-		for _,i in ipairs(build_menu.items) do
+		for _,i in ipairs(items) do
 			
 			local index = AngleToKey(i.angle)
 			temptree[index] = i
@@ -1162,11 +1167,9 @@ function widget:KeyPress(key, modifier)
 		
 		local pressbutton = key_buttons[index]
 		if pressbutton then
-			if #(pressbutton.OnMouseUp) < 1 then
-				echo '<KB Menu> Conflicted error with build menu.'
-				return false
+			if #(pressbutton.OnMouseUp) > 0 then
+				pressbutton.OnMouseUp[1]()
 			end
-			pressbutton.OnMouseUp[1]()
 			return true
 		end
 	end
