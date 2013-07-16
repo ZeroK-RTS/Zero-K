@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.024 Chili Keyboard Menu",
+    desc      = "v0.025 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -106,6 +106,7 @@ local selections = {
 	'select_vissame',
 	'select_landw',
 	'selectairw',
+	'lowhealth',
 }
 
 --predeclared functions
@@ -924,6 +925,55 @@ local function SetupCommands( modifier )
 	local unboundKeyIndex = 1
 	
 	local ignore = {}
+	
+	
+	if options.showGlobalCommands.value then
+		for letterInd=1,26 do
+			local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+			local letter = letters:sub(letterInd, letterInd)
+			local hotkey_key = letter
+			local actions
+			local modifiers = {'', 'ctrl', 'alt', 'meta'}
+			for j=1,#modifiers do
+				local modifier2 = modifiers[j]
+				local modifierKb = (modifierKb ~= '') and (modifier2 .. '+') or ''
+				actions = Spring.GetKeyBindings(modifierKb .. hotkey_key)
+				
+				--if not ignore[hotkey_key] and actions and #actions > 0 then
+				if actions and #actions > 0 then
+						
+					for i=1,#actions do
+						local v = actions[i]
+						for actionCmd, actionExtra in pairs(v) do
+							
+							if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' then 
+							
+								local actionOption = WG.crude.GetActionOption(actionCmd)
+								local actionName = actionOption and actionOption.name
+								local actionDesc = actionOption and actionOption.desc
+								
+								local label = actionName or actionCmd
+								local tooltip = actionDesc or (label  .. ' ' .. actionExtra)
+								local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd 
+								
+								--create fake command and add it to list
+								curCommands[#curCommands+1] = {
+									type = '',
+									id = 99999,
+									name = label,
+									tooltip = tooltip,
+									action = action,
+								}
+							end
+							
+						end
+					end
+				end
+				
+			end
+			
+		end --for letterInd=1,26 
+	end --options.showGlobalCommands.value
 		
 	--for i, cmd in ipairs( curCommands ) do
 	for i = 1, #curCommands do
@@ -932,6 +982,8 @@ local function SetupCommands( modifier )
 		
 		local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)
 		--echo(CMD[cmd.id], cmd.name, hotkey_key, hotkey_mod)
+		
+		if not ignore[hotkey_key] then
 		
 		if ( (modifier == 'unbound' and hotkey_key == '') or not key_buttons[hotkey_key] )
 			and cmd.type ~= CMDTYPE.NEXT and cmd.type ~= CMDTYPE.PREV
@@ -973,16 +1025,22 @@ local function SetupCommands( modifier )
 			if cmd.id < 0 then
 				AddBuildStructureButtonBasic( cmd.name, hotkey_key, hotkey )
 			else
-				UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+				if cmd.id == 99999 then
+					UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( cmd.action ); end, cmd.tooltip, texture, color )
+				else
+					UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+				end
 			end
 			
 			
 			ignore[hotkey_key] = true
 		end
+		
 		commandButtons[cmd.id] = key_buttons[hotkey_key]
 		
+	end --if not ignore[hotkey_key] then
+		
 	end
-	
 	
 	--for i, selection in ipairs(selections) do
 	for i = 1, #selections do
@@ -998,41 +1056,6 @@ local function SetupCommands( modifier )
 				local texture = override and override.texture
 				UpdateButton( hotkey_key, hotkey, option.name, function() Spring.SendCommands(option.action) end, option.tooltip, texture )
 				ignore[hotkey_key] = true
-			end
-		end
-	end
-	
-	--testing
-	if options.showGlobalCommands.value then
-		for hotkey_key, _ in pairs(key_buttons) do
-			local actions
-			if( modifier == '' or modifier == 'unbound' ) then
-				actions = Spring.GetKeyBindings(hotkey_key)
-			else
-				actions = Spring.GetKeyBindings(modifier .. '+' .. hotkey_key)
-			end
-			
-			if not ignore[hotkey_key] and actions and #actions > 0 then
-				--for i,v in ipairs(actions) do
-				for i=1,#actions do
-					local v = actions[i]
-					for actionCmd, actionExtra in pairs(v) do
-						
-						if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' then 
-						
-							local actionOption = WG.crude.GetActionOption(actionCmd)
-							local actionName = actionOption and actionOption.name
-							local actionDesc = actionOption and actionOption.desc
-							
-							local label = actionName or actionCmd
-							local tooltip = actionDesc or (label  .. ' ' .. actionExtra)
-							local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd 
-							hotkey = actionCmd and WG.crude.GetHotkey(action ) or '-'
-							UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( actionCmd ); end, tooltip, nil, black_table )
-						end
-						
-					end
-				end
 			end
 		end
 	end
