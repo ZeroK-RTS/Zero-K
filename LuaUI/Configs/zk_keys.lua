@@ -84,7 +84,7 @@ return {
 		--{	"guard",	"g",},
 		{	"areaguard",	"g",},
 		{	"sharedialog",	"h",},
-		{	"gameinfo",	"Any+i",},
+		{	"gameinfo",	"i",},
 		{	"cloak",	"k",},
 		{	"togglelos",	"l",},
 		{	"loadunits",	"l",},

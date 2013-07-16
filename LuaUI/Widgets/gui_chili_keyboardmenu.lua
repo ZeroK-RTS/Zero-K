@@ -936,7 +936,7 @@ local function SetupCommands( modifier )
 			local modifiers = {'', 'ctrl', 'alt', 'meta'}
 			for j=1,#modifiers do
 				local modifier2 = modifiers[j]
-				local modifierKb = (modifierKb ~= '') and (modifier2 .. '+') or ''
+				local modifierKb = (modifier2 ~= '') and (modifier2 .. '+') or ''
 				actions = Spring.GetKeyBindings(modifierKb .. hotkey_key)
 				
 				--if not ignore[hotkey_key] and actions and #actions > 0 then
