@@ -44,7 +44,7 @@ local SIG_AIM = {
 local SIG_GRASER = 16
 local GRASER_FIRE_TIME = 75	--gameframes
 
-local PERIOD = 0.7
+local PERIOD = 0.4
 
 local sleepTime = PERIOD*1000
 
