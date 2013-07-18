@@ -7,7 +7,7 @@ function widget:GetInfo()
     date      = "Mar 1, 2009, July 1 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 --Changelog:
@@ -22,7 +22,7 @@ local spGetModKeyState = Spring.GetModKeyState
 local spIsUnitSelected = Spring.IsUnitSelected
 
 local drawUnits = {}
-local commandLevel = 4 --default at start of widget is SHOW ALL COMMAND!
+local commandLevel = 1 --default at start of widget is to be disabled!
 
 options_path = 'Settings/Interface/Command Visibility'
 options_order = { 
@@ -35,13 +35,17 @@ options = {
 		items = {
 			{name = 'All units',key='showallcommand', desc="Command always drawn on all units.", hotkey=nil},
 			{name = 'Selected units, All with SHIFT',key='onlyselection', desc="Command always drawn on selected unit, pressing SHIFT will draw it for all units.", hotkey=nil},
+			{name = 'Selected units',key='onlyselectionlow', desc="Command always drawn on selected unit.", hotkey=nil},
 			{name = 'All units with SHIFT',key='showallonshift', desc="Commands always hidden, but pressing SHIFT will draw it for all units.", hotkey=nil},
 			{name = 'Selected units on SHIFT',key='showminimal', desc="Commands always hidden, pressing SHIFT will draw it on selected units.", hotkey=nil},
 		},
-		value = 'showallcommand',  --default at start of widget is SHOW ALL COMMAND!
+		value = 'showminimal',  --default at start of widget is to be disabled!
 		OnChange = function(self)
 			local key = self.value
-			if key == 'showallcommand' then
+			if key == 'onlyselectionlow' then
+				commandLevel = 5
+				spSendLuaRulesMsg("target_on_the_move_selection")
+			elseif key == 'showallcommand' then
 				commandLevel = 4
 				spSendLuaRulesMsg("target_on_the_move_all")
 			elseif key == 'onlyselection' then
@@ -68,7 +72,8 @@ function widget:DrawWorld()
 					
 					if (commandLevel==4) or --all
 					(commandLevel==2 and shift) or --shift
-					(commandLevel==3 and (spIsUnitSelected(i) or shift)) --selection/shift
+					(commandLevel==3 and (spIsUnitSelected(i) or shift)) or --selection/shift
+					(commandLevel==5 and spIsUnitSelected(i)) --selection
 					then 
 						spDrawUnitCommands(i)
 					end

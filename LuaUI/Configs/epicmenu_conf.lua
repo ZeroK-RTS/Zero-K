@@ -264,8 +264,6 @@ path='Settings/Interface/Selection'
 		ShButton('Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	path='Settings/Interface/Selection/Blurry Halo Selections'
 		ShButton('Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Puts team-coloured disk below units")
-path='Settings/Interface/Command Visibility'
-  ShButton('Toggle Show all Commands', function() spSendCommands{"luaui togglewidget Show All Commands v2"} end, "Shows all unit commands")
 
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.

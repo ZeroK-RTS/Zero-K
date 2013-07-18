@@ -25,15 +25,17 @@ function widget:GetInfo()
 end
 
 
+local spGetMapDrawMode = Spring.GetMapDrawMode
+local spGetActiveCommand = Spring.GetActiveCommand
+local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 local hilite = false
 
 
 function widget:DrawWorld()
-  if (not hilite) then
+  if (not hilite) and (spGetMapDrawMode() ~= 'metal')  then
     return
   end
 
@@ -74,14 +76,12 @@ end
 
 
 
-local currCmd =  Spring.GetActiveCommand() --remember current command
+local currCmd =  spGetActiveCommand() --remember current command
 function widget:Update()
-	if currCmd == Spring.GetActiveCommand() then --if detect no change in command selection: --skip whole thing
+	if currCmd == spGetActiveCommand() then --if detect no change in command selection: --skip whole thing
 		return
 	end --else (command selection has change): perform check/automated-map-view-change
-	currCmd = Spring.GetActiveCommand() --update active command
-	local activeCmd = Spring.GetActiveCmdDesc(currCmd)
+	currCmd = spGetActiveCommand() --update active command
+	local activeCmd = spGetActiveCmdDesc(currCmd)
 	hilite = (activeCmd and (activeCmd.name == "Reclaim" or activeCmd.name == "Resurrect"))
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
