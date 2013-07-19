@@ -1,4 +1,4 @@
-local version = "v1.001"
+local version = "v1.002"
 function widget:GetInfo()
   return {
     name      = "Showeco and Grid Drawer",
@@ -6,8 +6,8 @@ function widget:GetInfo()
     author    = "xponen",
     date      = "July 19 2013",
     license   = "GNU GPL, v2 or later",
-    layer     = -100002, --start before gui_epicmenu.lua before zk_keys.lua is read
-    enabled   = true,  --  loaded by default?
+	layer		= 0, --only layer > -4 works because it seems to be blocked by something.
+	enabled   = true,  --  loaded by default?
 	alwaysStart    = true,
     handler   = true,
   }
@@ -29,7 +29,7 @@ local function ToggleShoweco()
 end
 
 function widget:Shutdown()
-	AddAction("showeco")
+	RemoveAction("showeco")
 end
 
 local function RegisterShoweco()
@@ -43,6 +43,10 @@ function PylonOut(pylonString)
 end
 --------------------------------------------------------------------------------------
 --Grid drawing. Copied and trimmed from unit_mex_overdrive.lua gadget (by licho & googlefrog)
+VFS.Include("LuaRules/Configs/constants.lua", nil, VFS.ZIP_FIRST)
+VFS.Include("LuaRules/Configs/mex_overdrive.lua", nil, VFS.ZIP_FIRST)
+VFS.Include("LuaRules/Utilities/glVolumes.lua") --have to import this incase it fail to load before this widget
+
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitDefID     = Spring.GetUnitDefID
 local spGetUnitPosition  = Spring.GetUnitPosition
@@ -58,12 +62,7 @@ local glCreateList    = gl.CreateList
 
 local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
 
-local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
-
 local pylonDefs = {}
-
-VFS.Include("LuaRules/Configs/constants.lua", nil, VFS.ZIP_FIRST)
-VFS.Include("LuaRules/Configs/mex_overdrive.lua", nil, VFS.ZIP_FIRST)
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
@@ -108,7 +107,7 @@ local function HighlightPylons(selectedUnitDefID)
 				glColor(data.color[1],data.color[2], data.color[3], data.color[4])
 
 				local x,y,z = spGetUnitPosition(id)
-				Util_DrawGroundCircle(x,z, radius)
+				gl.Utilities.DrawGroundCircle(x,z, radius)
 			end 
 		end
 	end 
@@ -123,7 +122,7 @@ local function HighlightPylons(selectedUnitDefID)
 				local x = floor((coords[1])/16)*16 +8
 				local z = floor((coords[3])/16)*16 +8
 				glColor(disabledColor)
-				Util_DrawGroundCircle(x,z, radius)
+				gl.Utilities.DrawGroundCircle(x,z, radius)
 			end
 		end 
 	end 
