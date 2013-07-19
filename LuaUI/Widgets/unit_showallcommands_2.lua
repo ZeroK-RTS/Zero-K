@@ -44,19 +44,19 @@ options = {
 			local key = self.value
 			if key == 'onlyselectionlow' then
 				commandLevel = 5
-				spSendLuaRulesMsg("target_on_the_move_selection")
+				spSendLuaRulesMsg("target_move_selectionlow")
 			elseif key == 'showallcommand' then
 				commandLevel = 4
-				spSendLuaRulesMsg("target_on_the_move_all")
+				spSendLuaRulesMsg("target_move_all")
 			elseif key == 'onlyselection' then
 				commandLevel = 3
-				spSendLuaRulesMsg("target_on_the_move_selection")
+				spSendLuaRulesMsg("target_move_selection")
 			elseif key == 'showallonshift' then
 				commandLevel = 2
-				spSendLuaRulesMsg("target_on_the_move_shift")
+				spSendLuaRulesMsg("target_move_shift")
 			elseif key == 'showminimal' then
 				commandLevel = 1
-				spSendLuaRulesMsg("target_on_the_move_minimal")
+				spSendLuaRulesMsg("target_move_minimal")
 			end
 		end,
 	},
@@ -116,5 +116,5 @@ end
 -- end
 
 function widget:Shutdown()
-    spSendLuaRulesMsg("target_on_the_move_shift")
+    spSendLuaRulesMsg("target_move_minimal")
 end
