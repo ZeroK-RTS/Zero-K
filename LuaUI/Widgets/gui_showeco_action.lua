@@ -1,3 +1,4 @@
+local version = "v1.001"
 function widget:GetInfo()
   return {
     name      = "Showeco and Grid Drawer",
@@ -99,29 +100,12 @@ end
 
 local disabledColor = { 0.6,0.7,0.5,0.2}
 
-local colors = {
-	{0.9,0.9,0.2,0.2},
-	{0.9,0.2,0.2,0.2},
-	{0.2,0.9,0.2,0.2},
-	{0.2,0.2,0.9,0.2},
-	{0.2,0.9,0.9,0.2},
-	{0.9,0.2,0.9,0.2},
-}
-
 local function HighlightPylons(selectedUnitDefID)
-	pylon = pylon or {}
-
 	for id, data in pairs(pylon) do
 		if pylonDefs[spGetUnitDefID(id)] then
 			local radius = pylonDefs[spGetUnitDefID(id)].range
 			if (radius) then 
-				local color
-				if (not data.gridID) or data.gridID == 0 or data.color == nil then
-					color = disabledColor
-				else 
-					color = data.color
-				end 
-				glColor(color[1],color[2], color[3], color[4])
+				glColor(data.color[1],data.color[2], data.color[3], data.color[4])
 
 				local x,y,z = spGetUnitPosition(id)
 				Util_DrawGroundCircle(x,z, radius)
@@ -156,7 +140,18 @@ function widget:DrawWorldPreUnit()
 			glColor(1,1,1,1)
 			return
 		end 
-		return 
+	end
+	
+	local selUnits = spGetSelectedUnits()  -- or show it if its selected 	
+	if selUnits then 
+		for i=1,#selUnits do 
+			local ud = spGetUnitDefID(selUnits[i])
+			if (pylonDefs[ud]) then 
+				HighlightPylons(nil)
+				glColor(1,1,1,1)
+				return 
+			end 
+		end
 	end
 	
 	local showecoMode = WG.showeco
@@ -164,18 +159,5 @@ function widget:DrawWorldPreUnit()
 		HighlightPylons(nil)
 		glColor(1,1,1,1)
 		return
-	end
-
-	local selUnits = spGetSelectedUnits()  -- or show it if its selected 	
-	if not selUnits then 
-		return
-	end 
-	for i=1,#selUnits do 
-		local ud = spGetUnitDefID(selUnits[i])
-		if (pylonDefs[ud]) then 
-			HighlightPylons(nil)
-			glColor(1,1,1,1)
-			return 
-		end 
 	end
 end

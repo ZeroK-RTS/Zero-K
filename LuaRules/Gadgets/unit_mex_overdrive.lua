@@ -1728,16 +1728,8 @@ end
 
 local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 local spGetUnitDefID     = Spring.GetUnitDefID
+local spGetSpectatingState = Spring.GetSpectatingState
 local disabledColor = { 0.6,0.7,0.5,0.2}
-
-local colors = {
-	{0.9,0.9,0.2,0.2},
-	{0.9,0.2,0.2,0.2},
-	{0.2,0.9,0.2,0.2},
-	{0.2,0.2,0.9,0.2},
-	{0.2,0.9,0.9,0.2},
-	{0.9,0.2,0.9,0.2},
-}
 
 function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
   if (allyTeamID ~= spGetLocalAllyTeamID()) then return end
@@ -1746,26 +1738,40 @@ function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIn
   end
 end
 
+function ToStringTable(pylonToString, myAlly)
+	local pylon = SYNCED.pylon
+	if pylon[myAlly] then
+		for id, data in spairs(pylon[myAlly]) do 
+			local radius = pylonDefs[spGetUnitDefID(id)].range
+			if (radius) then
+				pylonToString = pylonToString .. "["..id.."]" .."={"
+				pylonToString = pylonToString .. "gridID="..data.gridID..","
+				if (not data.gridID) or data.gridID == 0 or data.color == nil then
+					pylonToString = pylonToString .. "color={"..disabledColor[1]..","..disabledColor[2]..","..disabledColor[3]..","..disabledColor[4].."},"
+				else
+					pylonToString = pylonToString .. "color={"..data.color[1]..","..data.color[2]..","..data.color[3]..","..data.color[4].."},"
+				end
+				pylonToString = pylonToString .. "},"
+			end
+		end 
+	end
+	return pylonToString
+end
 
 function WrapToLuaUI2(_,zzZ)
   if (Script.LuaUI('PylonOut')) then
-	local myAlly = spGetLocalAllyTeamID()
-	local pylon = SYNCED.pylon
 	local pylonToString= "{"
-	
-	for id, data in spairs(pylon[myAlly]) do 
-		local radius = pylonDefs[spGetUnitDefID(id)].range
-		if (radius) then
-			pylonToString = pylonToString .. "["..id.."]" .."={"
-			pylonToString = pylonToString .. "gridID="..data.gridID..","
-			if (not data.gridID) or data.gridID == 0 or data.color == nil then
-				pylonToString = pylonToString .. "color={"..disabledColor[1]..","..disabledColor[2]..","..disabledColor[3]..","..disabledColor[4].."},"
-			else
-				pylonToString = pylonToString .. "color={"..data.color[1]..","..data.color[2]..","..data.color[3]..","..data.color[4].."},"
-			end
-			pylonToString = pylonToString .. "},"
-		end
-	end 
+	local pylon = SYNCED.pylon
+	local spec, fullview = spGetSpectatingState()
+	spec = spec or fullview
+	if (spec) then 
+		for allyID,_ in spairs(pylon) do 
+			pylonToString = ToStringTable(pylonToString, allyID)
+		end 
+	else 
+		local myAlly = spGetLocalAllyTeamID()
+		pylonToString = ToStringTable(pylonToString, myAlly)
+	end
 	pylonToString = pylonToString .. "}"		
     Script.LuaUI.PylonOut(pylonToString)
   end
