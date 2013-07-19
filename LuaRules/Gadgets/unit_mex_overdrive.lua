@@ -28,7 +28,6 @@ local communismOverdrive = odSharingModOptions == "communism"
 include("LuaRules/Configs/constants.lua")
 include("LuaRules/Configs/mex_overdrive.lua")
 
-
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
 	if (udef.customParams.ismex) then
@@ -693,12 +692,12 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					end
 					local mexE = 0
 					if (allyMetalSquared > 0) then -- divide energy in ratio given by squared metal from mex
-						mexE = allyE*(orgMetal * orgMetal)/ allyMetalSquared 
-						energyWasted = energyWasted-mexE
+						mexE = allyE*(orgMetal * orgMetal)/ allyMetalSquared --the fraction of E to be consumed with respect to all other Mex
+						energyWasted = energyWasted-mexE --leftover E minus Mex usage
 						gridEnergySpent[i] = gridEnergySpent[i] + mexE
 						-- if a grid is being too overdriven it has become maxed.
 						-- the grid's mexSqauredSum is used for best distribution
-						if gridEnergySpent[i] > maxGridCapacity[i] then
+						if gridEnergySpent[i] > maxGridCapacity[i] then --final Mex to be looped since we are out of E to OD the rest of the Mex
 							gridMetalGain[i] = 0
 							local gridE = maxGridCapacity[i]
 							local gridMetalSquared = allyTeamData.grid[i].mexSquaredSum
@@ -712,7 +711,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							reCalc = true
 							allyE = allyE - gridE
 							energyWasted = allyE
-							for unitID, orgMetal in pairs(allyTeamMexes[i]) do
+							for unitID, orgMetal in pairs(allyTeamMexes[i]) do --re-distribute the grid energy to Mex (again! except taking account the limited energy of the grid)
 								local stunned_or_inbuld = spGetUnitIsStunned(unitID)
 								if stunned_or_inbuld then
 									orgMetal = 0
@@ -747,7 +746,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									end
 								end
 							end
-							break
+							break --finish distributing energy to 1 grid, go to next grid
 						end
 					end 
 					
@@ -835,12 +834,12 @@ local function keepTeamEnergyBelowMax(team)
 end
 
 local lastTeamNe = {}
-
 function gadget:GameFrame(n)
-
+	if (n%32 == 2) then
+		SendToUnsynced("PylonOut",1) --send pylon info to widget
+	end
 	if (n%32 == 1) then
 		lowPowerUnits.inner = {count = 0, units = {}}
-		
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
 			
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
@@ -1426,7 +1425,7 @@ end
 -------------------------------------------------------------------------------------
 else  -- UNSYNCED
 -------------------------------------------------------------------------------------
-
+--[[ draw OVERDRIVE CIRCLE, moved to gui_showeco_action.lua
 local spValidUnitID      = Spring.ValidUnitID
 local isUnitInView       = Spring.IsUnitInView
 local getUnitTeam        = Spring.GetUnitTeam
@@ -1477,10 +1476,9 @@ function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIn
   end
 end
 
-
 function gadget:Initialize()
 	gadgetHandler:AddSyncAction('MexEnergyEvent',WrapToLuaUI)
-	
+
 	local circleDivs = 32
 
 	circlePolys = glCreateList(function()
@@ -1513,28 +1511,27 @@ local function DrawArray(ar, unitID)  -- renders lines from unitID to array meme
 	end
 end 
 
---[[
-local function DrawPylonEnergyLines()
-	myAllyID = spGetMyAllyTeamID()
-	local spec, fullview = spGetSpectatingState()
-	spec = spec or fullview
+-- local function DrawPylonEnergyLines()
+	-- myAllyID = spGetMyAllyTeamID()
+	-- local spec, fullview = spGetSpectatingState()
+	-- spec = spec or fullview
 
-  	local pylon = SYNCED.pylon
+  	-- local pylon = SYNCED.pylon
 
 	
-	if (spec) then 
-		for _,pylonGroup in spairs(pylon) do 
-			for unitID, pylonData in spairs(pylonGroup) do 
-				DrawArray(pylonData.nearEnergy, unitID)
-			end
-		end 
-	else 
-		for unitID, pylonData in spairs(pylon[myAllyID]) do 
-			DrawArray(pylonData.nearEnergy, unitID)
-		end
-	end 
-end 
---]]
+	-- if (spec) then 
+		-- for _,pylonGroup in spairs(pylon) do 
+			-- for unitID, pylonData in spairs(pylonGroup) do 
+				-- DrawArray(pylonData.nearEnergy, unitID)
+			-- end
+		-- end 
+	-- else 
+		-- for unitID, pylonData in spairs(pylon[myAllyID]) do 
+			-- DrawArray(pylonData.nearEnergy, unitID)
+		-- end
+	-- end 
+-- end 
+
 local function DrawPylonMexLines()
 	myAllyID = spGetMyAllyTeamID()
 	local spec, fullview = spGetSpectatingState()
@@ -1623,11 +1620,11 @@ local function HighlightPylons(selectedUnitDefID)
 				--coords[3] = floor((coords[3]+8)/16)*16
 				Util_DrawGroundCircle(x,z, radius)
 
-				--[[glPushMatrix()
-				glTranslate(unpack(coords))
-				glScale(radius,1,radius)
-				glCallList(circlePolys)
-				glPopMatrix()]]--
+				-- glPushMatrix()
+				-- glTranslate(unpack(coords))
+				-- glScale(radius,1,radius)
+				-- glCallList(circlePolys)
+				-- glPopMatrix()
 			end
 		end 
 	end 
@@ -1635,45 +1632,46 @@ local function HighlightPylons(selectedUnitDefID)
 	--glPolygonOffset(false)
 
 	--glDepthTest(true)
---[[
-	if SYNCED.pylon and snext(SYNCED.pylon) then
-		gl.PushAttrib(GL.LINE_BITS)
+
+	-- if SYNCED.pylon and snext(SYNCED.pylon) then
+		-- gl.PushAttrib(GL.LINE_BITS)
 		
-		glDepthTest(true)
-		glColor(0.8,0.8,0.2,math.random()*0.1+0.3)
-		gl.LineWidth(1)
-		glBeginEnd(GL.LINES, DrawPylonEnergyLines)
+		-- glDepthTest(true)
+		-- glColor(0.8,0.8,0.2,math.random()*0.1+0.3)
+		-- gl.LineWidth(1)
+		-- glBeginEnd(GL.LINES, DrawPylonEnergyLines)
 		
-		gl.PopAttrib() 
-	end
---]]
+		-- gl.PopAttrib() 
+	-- end
+
 	--gl.PopAttrib()
 end 
 
 
 function gadget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() then return end
-	--[[if SYNCED.pylon and snext(SYNCED.pylon) then
-		gl.PushAttrib(GL.LINE_BITS)
+	-- if SYNCED.pylon and snext(SYNCED.pylon) then
+		-- gl.PushAttrib(GL.LINE_BITS)
 		
-		glColor(0.5,0.4,1,math.random()*0.1+0.5)
-		gl.LineWidth(3)
-		glBeginEnd(GL.LINES, DrawPylonMexLines)
+		-- glColor(0.5,0.4,1,math.random()*0.1+0.5)
+		-- gl.LineWidth(3)
+		-- glBeginEnd(GL.LINES, DrawPylonMexLines)
 		
-		glColor(0.9,0.8,0.2,math.random()*0.1+0.5)
-		gl.LineWidth(3)
-		glBeginEnd(GL.LINES, DrawPylonLinkLines)
+		-- glColor(0.9,0.8,0.2,math.random()*0.1+0.5)
+		-- gl.LineWidth(3)
+		-- glBeginEnd(GL.LINES, DrawPylonLinkLines)
 			
-		glDepthTest(false)
-		glColor(1,1,1,1)
+		-- glDepthTest(false)
+		-- glColor(1,1,1,1)
 			
-		gl.PopAttrib() 
-	end]]--
+		-- gl.PopAttrib() 
+	-- end
 
 	local _, cmd_id = spGetActiveCommand()  -- show pylons if pylon is about to be placed
 	if (cmd_id) then 
 		if pylonDefs[-cmd_id] then 
 			HighlightPylons(-cmd_id)
+			glColor(1,1,1,1)
 			return
 		--elseif energyDefs[-cmd_id] or mexDefs[-cmd_id] then
 		--	HighlightPylons(nil)
@@ -1689,13 +1687,14 @@ function gadget:DrawWorldPreUnit()
 		local ud = spGetUnitDefID(selUnits[i])
 		if (pylonDefs[ud]) then 
 			HighlightPylons(nil)
+			glColor(1,1,1,1)
 		return 
 		end 
 	end
-	glColor(1,1,1,1)
 end
+--]]
 
---[[ moved to widget
+--[[ draw POWER ICON, moved to widget
 local powerTexture = 'Luaui/Images/visible_energy.png'
 
 local function DrawUnitFunc(yshift)
@@ -1727,6 +1726,55 @@ function gadget:DrawWorld()
 end
 --]]
 
+local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
+local spGetUnitDefID     = Spring.GetUnitDefID
+local disabledColor = { 0.6,0.7,0.5,0.2}
+
+local colors = {
+	{0.9,0.9,0.2,0.2},
+	{0.9,0.2,0.2,0.2},
+	{0.2,0.9,0.2,0.2},
+	{0.2,0.2,0.9,0.2},
+	{0.2,0.9,0.9,0.2},
+	{0.9,0.2,0.9,0.2},
+}
+
+function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
+  if (allyTeamID ~= spGetLocalAllyTeamID()) then return end
+  if (Script.LuaUI('MexEnergyEvent')) then
+    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
+  end
+end
+
+
+function WrapToLuaUI2(_,zzZ)
+  if (Script.LuaUI('PylonOut')) then
+	local myAlly = spGetLocalAllyTeamID()
+	local pylon = SYNCED.pylon
+	local pylonToString= "{"
+	
+	for id, data in spairs(pylon[myAlly]) do 
+		local radius = pylonDefs[spGetUnitDefID(id)].range
+		if (radius) then
+			pylonToString = pylonToString .. "["..id.."]" .."={"
+			pylonToString = pylonToString .. "gridID="..data.gridID..","
+			if (not data.gridID) or data.gridID == 0 or data.color == nil then
+				pylonToString = pylonToString .. "color={"..disabledColor[1]..","..disabledColor[2]..","..disabledColor[3]..","..disabledColor[4].."},"
+			else
+				pylonToString = pylonToString .. "color={"..data.color[1]..","..data.color[2]..","..data.color[3]..","..data.color[4].."},"
+			end
+			pylonToString = pylonToString .. "},"
+		end
+	end 
+	pylonToString = pylonToString .. "}"		
+    Script.LuaUI.PylonOut(pylonToString)
+  end
+end
+
+function gadget:Initialize()
+	gadgetHandler:AddSyncAction('MexEnergyEvent',WrapToLuaUI)
+	gadgetHandler:AddSyncAction('PylonOut',WrapToLuaUI2)
+end
 
 -------------------------------------------------------------------------------------
 

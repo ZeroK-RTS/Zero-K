@@ -348,7 +348,7 @@ if not spIsGUIHidden() then
       end
     end
   end
-
+  glColor(1, 1, 1,1)
   glLineWidth(1.0)
 end
 end

@@ -182,7 +182,7 @@ function widget:DrawScreenEffects() --Show icons on the screen. Reference: unit_
 			local x = playerInfo[i].xyz[1]
 			local y = playerInfo[i].xyz[2]
 			local z = playerInfo[i].xyz[3]
-			local height = y + (119) --got this exact height of the startpoint thru trial-n-error
+			local height = y + (120) --got this exact height of the startpoint from minimap_startbox.lua
 			--//The following config is suitable for unit-rank icon only:
 			--local size = 59
 			--local scrnVertOffset = 19
