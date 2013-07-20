@@ -76,7 +76,6 @@ local status_timeleft
 local status_ally
 local status_enemy
 local status_units = {}
-local dead_label
 local status_stage = 1
 
 -- everything regarding help menu
@@ -682,16 +681,6 @@ local function SetupIngameStatusBar()
   help_button:SetPos(0,0)
   status_window:RemoveChild(help_button)
   -- lets draw!
-  dead_label = Label:New {
-    autosize = false;
-    width = 40;
-    align = "center";
-    valign = "center";
-    height = 20;
-    caption = "Lost";
-    fontsize = 12;
-    textColor = orange,
-  }
   local timer_label = Label:New {
     autosize = false;
     width = 65;
@@ -832,6 +821,16 @@ local function SetupIngameStatusBar()
 	padding = {0, 0, 0, 0},
 	itemMargin  = {0, 0, 0, 2},
       },
+      dead = Label:New {
+	autosize = false;
+	width = 40;
+	align = "center";
+	valign = "center";
+	height = 20;
+	caption = "Lost";
+	fontsize = 12;
+	textColor = orange,
+      },
     }
     status_units[i].button:AddChild(status_units[i].image)
     status_units[i].stack:AddChild(status_units[i].button)
@@ -845,7 +844,7 @@ local function SetupIngameStatusBar()
   -- what if widget was reload in game?
   for i=1,TheUnitCount do
     local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-    if (Spring.GetUnitPosition(unit)) then
+    if ((unit > 0) and Spring.ValidUnitID(unit) and Spring.GetUnitPosition(unit)) then
       visible[unit] = true
     end
   end
@@ -948,7 +947,7 @@ function widget:Update(s)
 	  status_units[i].button.tooltip = "DEAD.";
 	  status_units[i].stack:RemoveChild(status_units[i].health)
 	  status_units[i].stack:RemoveChild(status_units[i].emp)
-	  status_units[i].stack:AddChild(dead_label)
+	  status_units[i].stack:AddChild(status_units[i].dead)
 	  status_units[i].alive = false
 	  visible[i] = false;
 	  under_siege[i] = 0;
