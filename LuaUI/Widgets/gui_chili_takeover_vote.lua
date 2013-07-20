@@ -10,7 +10,7 @@ function widget:GetInfo()
     author    = "Tom Fyuri", -- also kudos to Sprung, KingRaptor and jK
     date      = "Jul 2013",
     license   = "GPL v2 or later",
-    layer     = 1, 
+    layer     = -1, 
     enabled   = true  --  loaded by default?
   }
 end
@@ -1101,10 +1101,6 @@ end
 function widget:Initialize()
   local takeovermode = (Spring.GetModOptions().zkmode) == "takeover"
   
-  if (not takeovermode) then
-    widgetHandler:RemoveWidget()
-  end
-  
   myAllyTeam = Spring.GetMyAllyTeamID()
   myTeam = Spring.GetMyTeamID()
   myPlayerID = Spring.GetMyPlayerID()
@@ -1656,7 +1652,12 @@ function widget:Initialize()
       help_button,
     }
   }
-  screen0:AddChild(status_window)
+  
+  if (takeovermode == false) then
+    widgetHandler:RemoveWidget()
+  else
+    screen0:AddChild(status_window)
+  end
 end
 
 function widget:Shutdown()
