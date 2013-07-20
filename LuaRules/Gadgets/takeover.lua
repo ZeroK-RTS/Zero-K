@@ -270,6 +270,8 @@ local function NominateNewRule(playerID, name, line)
 	opts = { location, unit, grace, godmode },
 	votes = 1,
       };
+    else
+      NominationList[nom].votes = NominationList[nom].votes + 1
     end
     PlayerList[#PlayerList+1] = {
       name = name;
@@ -278,15 +280,39 @@ local function NominateNewRule(playerID, name, line)
     };
   else -- if player is making a new nomination, destroy his previous nomination - make players abandon his new rules.
     local ThisPlayer = PlayerList[PID].nomination
-    for i=1,#PlayerList do
-      if (i ~= PID) then
-	if (PlayerList[i].nomination == ThisPlayer) then
-	  PlayerList[i].nomination = nil
+    if (NominationList[ThisPlayer].playerID == PID) then
+      for i=1,#PlayerList do
+	if (i ~= PID) then
+	  if (PlayerList[i].nomination == ThisPlayer) then
+	    PlayerList[i].nomination = nil
+	  end
 	end
       end
+      NominationList[ThisPlayer].opts = { location, unit, grace, godmode };
+      NominationList[ThisPlayer].votes = 1;
+    else -- owner's nomination ain't player
+      -- decrease vote amount on old nomination
+      NominationList[ThisPlayer].votes = NominationList[ThisPlayer].votes - 1;
+      -- create new nomination
+      local nom = #NominationList+1
+      for i=1,#NominationList do
+	if (NominationList[i].opts[1] == location) and (NominationList[i].opts[2] == unit) and (NominationList[3].opts[1] == grace) and (NominationList[i].opts[4] == godmode) then
+	  -- oh there is
+	  nom = i
+	  break
+	end
+      end
+      if (nom == #NominationList+1) then
+	NominationList[nom] = {
+	  playerID = playerID,
+	  opts = { location, unit, grace, godmode },
+	  votes = 1,
+	};
+      else
+	NominationList[nom].votes = NominationList[nom].votes + 1
+      end
+      PlayerList[i].nomination = NominationList[nom]
     end
-    NominationList[ThisPlayer].opts = { location, unit, grace, godmode };
-    NominationList[ThisPlayer].votes = 1;
   end
   UpdatePollData()
 end
