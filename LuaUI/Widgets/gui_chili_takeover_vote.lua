@@ -195,6 +195,7 @@ local function AnnounceMyChoice(choice)
     loc_text = "across map";
   end
   local time_text = select(3,GetTimeFormatted(choice[3], false))
+  if (choice[3] == 0) then time_text = "no delay" end
   local god_text = "mortal";
   if (choice[4] == 1) then
     god_text = " semi-mortal";
@@ -241,7 +242,9 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
 	  tooltip = "Press, if you agree with listed rules by "..name.."!";
 	  textColor = name_color;
 	  OnMouseDown = {function()
-	    Spring.SendLuaRulesMsg("takeover_agree_with "..owner)
+	      if (not Spring.GetSpectatingState()) then
+		Spring.SendLuaRulesMsg("takeover_agree_with "..owner)
+	      end
 	    end
 	  },
 	  fontsize = 16;
