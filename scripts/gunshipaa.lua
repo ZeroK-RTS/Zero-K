@@ -123,9 +123,9 @@ local function activate()
 	Move(rhull, z_axis, -2, 1)
 	Move(lhull, z_axis, -2, 1)
 	
-	Move(mrack, y_axis, -2.5, 2)
-	Move(rrack, y_axis, -2.5, 2)
-	Move(lrack, y_axis, -2.5, 2)
+	Move(mrack, y_axis, -2.5, 5)
+	Move(rrack, y_axis, -2.5, 5)
+	Move(lrack, y_axis, -2.5, 5)
 end
 
 local function deactivate()
