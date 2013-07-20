@@ -19,20 +19,18 @@ local SIG_RESTORE = 2
 
 smokePiece = { base}
 
-local function Activate()
-	Spin( rffan , y_axis, rad(360), rad(360) )
-	Spin( lffan , y_axis, rad(360), rad(360) )
-	Spin( rrfan , y_axis, rad(360), rad(360) )
-	Spin( lrfan , y_axis, rad(360), rad(360) )
-	Sleep(60)
+function script.Activate()
+	Spin( rffan , y_axis, rad(360), rad(100) )
+	Spin( lffan , y_axis, rad(360), rad(100) )
+	Spin( rrfan , y_axis, rad(360), rad(100) )
+	Spin( lrfan , y_axis, rad(360), rad(100) )
 end
 
-local function Deactivate()
-	Spin( rffan , y_axis, rad(0), rad(360) )
-	Spin( lffan , y_axis, rad(0), rad(360) )
-	Spin( rrfan , y_axis, rad(0), rad(360) )
-	Spin( lrfan , y_axis, rad(0), rad(360) )
-	Sleep(60)
+function script.StopMoving()
+	Spin( rffan , y_axis, rad(0), rad(100) )
+	Spin( lffan , y_axis, rad(0), rad(100) )
+	Spin( rrfan , y_axis, rad(0), rad(100) )
+	Spin( lrfan , y_axis, rad(0), rad(100) )
 end
 
 local function TiltBody()

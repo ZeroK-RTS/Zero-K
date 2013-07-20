@@ -4,6 +4,7 @@ unitDef = {
   description            = [[Air Defense Gunship]],
   acceleration           = 0.18,
   amphibious             = true,
+  bankingAllowed         = false,
   brakeRate              = 4.2,
   buildCostEnergy        = 400,
   buildCostMetal         = 400,
@@ -17,9 +18,13 @@ unitDef = {
   canPatrol              = true,
   canSubmerge            = false,
   category               = [[GUNSHIP]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[36 36 36]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
-  cruiseAlt              = 180,
+  cruiseAlt              = 130,
 
   customParams           = {
     airstrafecontrol = [[1]],
@@ -30,7 +35,8 @@ unitDef = {
     --helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
     --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
 	--helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
-	modelradius    = [[16]],
+	modelradius    = [[18]],
+	midposoffset   = [[0 15 0]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -43,11 +49,12 @@ unitDef = {
   idleTime               = 1800,
   mass                   = 208,
   maxDamage              = 1250,
-  maxVelocity            = 5,
+  maxVelocity            = 3,
   minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
-  objectName             = [[gunshipaa.s3o]],
+  objectName             = [[trifighter.s3o]],
+  script                 = [[gunshipaa.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -62,9 +69,64 @@ unitDef = {
   side                   = [[CORE]],
   sightDistance          = 600,
   smoothAnim             = true,
-  turnRate               = 594,
+  turnRate               = 0,
   workerTime             = 0,
 
+  weapons                = {
+
+    {
+      def                = [[AA_MISSILE]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
+    },
+
+  },
+
+  weaponDefs             = {
+
+    AA_MISSILE = {
+      name                    = [[Homing Missiles]],
+      areaOfEffect            = 48,
+	  avoidFeature            = false,
+      canattackground         = false,
+      cegTag                  = [[missiletrailblue]],
+	  collideFriendly         = false,
+      craterBoost             = 1,
+      craterMult              = 2,
+      cylinderTargeting       = 1,
+
+      damage                  = {
+        default = 7,
+        planes  = 70,
+        subs    = 3.5,
+      },
+
+      explosionGenerator      = [[custom:FLASH2]],
+      fireStarter             = 70,
+      flightTime              = 3,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_fury.s3o]],
+      noSelfDamage            = true,
+      range                   = 880,
+      reloadtime              = 2,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/rocket_hit]],
+      soundStart              = [[weapon/missile/missile_fire7]],
+      startVelocity           = 650,
+      texture2                = [[AAsmoketrail]],
+      tolerance               = 9000,
+      tracks                  = true,
+      turnRate                = 63000,
+      turret                  = false,
+      weaponAcceleration      = 141,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 850,
+    },
+
+  },
+  
   weapons                = {
   
     {
