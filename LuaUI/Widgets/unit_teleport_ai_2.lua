@@ -3,17 +3,17 @@ function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
     desc      = version .. " Automatically scan any units around teleport beacon " ..
-				"(up to 500elmo, LLT range) and teleport them when it shorten travel time. "..
+				"(up to 600elmo, HLT range) and teleport them when it shorten travel time. "..
 				"This only apply to your unit & allied beacon.",
 	author    = "Msafwan",
-    date      = "10 July 2013",
+    date      = "19 July 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
   }
 end
 
-local detectionRange = 500
+local detectionRange = 600
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -42,9 +42,13 @@ local groupLoopedUnit={}
 local groupBeaconQueue={}
 local groupBeaconFinish={}
 --end spread job stuff
-local fiveSecondExcludedUnit = {}
+local fiveSecondExcludedUnit = {} --list of uninteresting/irrelevant unit to be excluded until their command changes
 local beaconDefID = UnitDefNames["tele_beacon"].id
 local diggDeeperExclusion = {}
+--Network lag hax stuff: (wait until unit receive command before processing 2nd time)
+local waitForNetworkDelay = {}
+local issuedOrderTo = {}
+--end network lag stuff
 
 function widget:Initialize()
 	local _, _, spec, teamID = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
@@ -87,6 +91,14 @@ end
 function widget:UnitDestroyed(unitID, unitDefID)
 	listOfBeacon[unitID] = nil
 	fiveSecondExcludedUnit[unitID] = nil
+	if issuedOrderTo[unitID] then 
+		local group = issuedOrderTo[unitID]
+		waitForNetworkDelay[group] = waitForNetworkDelay[group] - 1 
+		issuedOrderTo[unitID] = nil 
+		if waitForNetworkDelay[group]==0 then 
+			waitForNetworkDelay[group] = nil 
+		end 
+	end 
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
@@ -195,10 +207,12 @@ function widget:GameFrame(n)
 		end
 	end
 	for i=1, #groupBeacon,1 do
-		if n%30==0 or groupSpreadJobs[i] then --every 30 frame period (1 second)
+		--if ( n%30==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 30 frame period (1 second). 30 frame if full. Not considering network delay (may go up to 2 second period)
+		--if ( n%18==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 18 frame period (0.6 second) if empty. 36 frame (1.2 second) if full. Not considering network delay
+		if ( n%15==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then 
 			--Spring.Echo("-----GROUP:" .. i)
 			local numberOfUnitToProcess = 5 --NUMBER OF UNIT PER BEACON PER SECOND
-			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29)
+			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29) --spread looping to entire 1 second
 			local beaconCurrentQueue = groupBeaconQueue[i] or {}
 			local unitToEffect = groupEffectedUnit[i] or {}
 			local loopedUnits = groupLoopedUnit[i] or {}
@@ -396,10 +410,19 @@ function widget:GameFrame(n)
 							local dix,diz=unitToEffect[unitID]["cmd"].params[1],unitToEffect[unitID]["cmd"].params[3] --target coordinate
 							local dx,dz = (dix-ex),(diz-ez)
 							dx,dz = math.abs(dx)/dx,math.abs(dz)/dz
+							--wait for network delay:--
+							waitForNetworkDelay[i] = waitForNetworkDelay[i] or 0 
+							waitForNetworkDelay[i] = waitForNetworkDelay[i] + 1
+							issuedOrderTo[unitID] = i
+							--end wait for network delay
+							--method A: give GUARD order--
 							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
-							--local bx,by,bz = listOfBeacon[pathToFollow][1],listOfBeacon[pathToFollow][2],listOfBeacon[pathToFollow][3]
+							--
+							--method B: give original CMD_WAIT_AT_BEACON-- (Problem: it skip beaconWaiter[unitID] assignment in gadget:AllowCommand() and so it make the command fail)
+							-- local bx,by,bz = listOfBeacon[pathToFollow][1],listOfBeacon[pathToFollow][2],listOfBeacon[pathToFollow][3]
 							-- local params = {bx, by, bz, pathToFollow, Spring.GetGameFrame()}
 							-- Spring.GiveOrderArrayToUnitArray({unitID},{{CMD.INSERT,{0,CMD_WAIT_AT_BEACON,CMD.OPT_SHIFT, unpack(params)}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
+							--
 							local defID = tblContent["defID"]
 							local chargeTime = listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime
@@ -589,4 +612,12 @@ end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
 	fiveSecondExcludedUnit[unitID]=nil
+	if (CMD.INSERT == cmdID) and (cmdParams[2] == CMD_WAIT_AT_BEACON) then 
+		local group = issuedOrderTo[unitID]
+		waitForNetworkDelay[group] = waitForNetworkDelay[group] - 1 
+		issuedOrderTo[unitID] = nil 
+		if waitForNetworkDelay[group]==0 then 
+			waitForNetworkDelay[group] = nil 
+		end 
+	end 
 end
