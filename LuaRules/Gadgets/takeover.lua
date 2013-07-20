@@ -342,13 +342,15 @@ local function GetTimeFormatted(time, addzeros)
 end
 
 function gadget:GameStart() -- i didn't want to clutter this code with many params, also it's possible to do everything inside this callback
-  if type(MostPopularChoice) == "table" then
-    if (MostPopularChoice[1] == "random") then
-      MostPopularChoice = MostPopularChoice[2][random(1,# MostPopularChoice[2])]
-      spSetGameRulesParam("takeover_winner_owner", NominationList[MostPopularChoice].playerID)
-    end
-  else
-    spSetGameRulesParam("takeover_winner_owner", 0)
+  if (type(MostPopularChoice) == "table") and (MostPopularChoice[1] == "random") then
+    local most_voted = MostPopularChoice[2][random(1,# MostPopularChoice[2])]
+    MostPopularChoice = {
+      NominationList[most_voted].opts[1],
+      NominationList[most_voted].opts[2],
+      NominationList[most_voted].opts[3],
+      NominationList[most_voted].opts[4],
+    };
+    spSetGameRulesParam("takeover_winner_owner", NominationList[most_voted].playerID)
   end
   spSetGameRulesParam("takeover_winner_opts1", MostPopularChoice[1])
   spSetGameRulesParam("takeover_winner_opts2", MostPopularChoice[2])

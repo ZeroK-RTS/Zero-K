@@ -10,7 +10,7 @@ function widget:GetInfo()
     author    = "Tom Fyuri", -- also kudos to Sprung, KingRaptor and jK
     date      = "Jul 2013",
     license   = "GPL v2 or later",
-    layer     = -9, 
+    layer     = 1, 
     enabled   = true  --  loaded by default?
   }
 end
@@ -300,63 +300,99 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
       },
     }
   }
-  nomi.pics[1] = Image:New {
-    file = "unitpics/fakeunit.png";
+  nomi.pics[1] = Button:New {
     height = 40;
     width = 40;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    caption = "";
     tooltip = loc_tooltip_array[nomi.location+1];
     children = {
-      Label:New {
-	autosize = false;
-	align = "center";
-	valign = "center";
-	caption = loc_text;
-	height = 40,
+      Image:New {
+	file = "unitpics/fakeunit.png";
+	height = 40;
 	width = 40;
-	fontsize = 11; -- so cost values are better? for now atleast...
-      };
+	children = {
+	  Label:New {
+	    autosize = false;
+	    align = "center";
+	    valign = "center";
+	    caption = loc_text;
+	    height = 40,
+	    width = 40;
+	    fontsize = 11; -- so cost values are better? for now atleast...
+	  };
+	}
+      }
     }
   };
-  nomi.pics[2] = Image:New {
-    file = "unitpics/"..UnitDefs[nomi.unit].name..".png";
+  nomi.pics[2] = Button:New {
     height = 40;
     width = 40;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    caption = "";
     tooltip = UnitDefs[nomi.unit].humanName;
+    children = {
+      Image:New {
+	file = "unitpics/"..UnitDefs[nomi.unit].name..".png";
+	height = 40;
+	width = 40;
+      }
+    }
   };
-  nomi.pics[3] = Image:New {
-    file = "unitpics/fakeunit.png";
+  nomi.pics[3] = Button:New {
     height = 40;
     width = 40;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    caption = "";
     tooltip = nomi.grace.." seconds.";
     children = {
-      Label:New {
-	autosize = false;
-	align = "center";
-	valign = "center";
-	caption = time_text;
-	height = 40,
+      Image:New {
+	file = "unitpics/fakeunit.png";
+	height = 40;
 	width = 40;
-	fontsize = 14;
-	textColor = GetColorForDelay(nomi.grace);
-      },
+	children = {
+	  Label:New {
+	    autosize = false;
+	    align = "center";
+	    valign = "center";
+	    caption = time_text;
+	    height = 40,
+	    width = 40;
+	    fontsize = 14;
+	    textColor = GetColorForDelay(nomi.grace);
+	  }
+	}
+      }
     }
   };
-  nomi.pics[4] = Image:New {
-    file = "unitpics/fakeunit.png";
+  nomi.pics[4] = Button:New {
     height = 40;
     width = 40;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    caption = "";
+    tooltip = god_tooltip_array[nomi.godmode+1];
     children = {
-      Label:New {
-	autosize = false;
-	align = "center";
-	valign = "center";
-	caption = god_text;
-	height = 40,
+      Image:New {
+	file = "unitpics/fakeunit.png";
+	height = 40;
 	width = 40;
-	fontsize = 11; -- so cost values are better? for now atleast...
-	textColor = god_color;
-	tooltip = god_tooltip_array[nomi.godmode+1];
-      };
+	children = {
+	  Label:New {
+	    autosize = false;
+	    align = "center";
+	    valign = "center";
+	    caption = god_text;
+	    height = 40,
+	    width = 40;
+	    fontsize = 11; -- so cost values are better? for now atleast...
+	    textColor = god_color;
+	  }
+	}
+      }
     }
   };
   nomi.stack = StackPanel:New {
@@ -382,7 +418,7 @@ end
 
 local function UpdateMostPopularStack()
   local location, unit, grace, godmode, vote_count
-  if (Spring.GetGameRulesParam("takeover_winner_votes") == nil) then
+  if (Spring.GetGameRulesParam("takeover_winner_votes") == nil) or (Spring.GetGameRulesParam("takeover_winner_owner") == -1) then
     location = DEFAULT_CHOICE[1]
     unit = DEFAULT_CHOICE[2]
     grace = DEFAULT_CHOICE[3]
@@ -396,84 +432,151 @@ local function UpdateMostPopularStack()
     vote_count = Spring.GetGameRulesParam("takeover_winner_votes")
   end
   results_label:SetCaption(vote_count.." votes:")
-  local loc_text = "center";
-  if (location == 1) then
-    loc_text = "spawn\n box";
-  elseif (location == 2) then
-    loc_text = "across\n  map";
-  end
-  local delay_minutes, delay_seconds, time_text = GetTimeFormatted(grace, false)
-  local god_text = "mortal";
-  local god_color = white;
-  if (godmode == 1) then
-    god_text = " semi-\nmortal";
-    god_color = yellow;
-  elseif (godmode == 2) then
-    god_text = "god-\nlike";
-    god_color = red
-  end
-  for i=1,4 do
-    results_stack:RemoveChild(results_elements[i])
-  end
-  results_elements[1] = Image:New {
-    file = "unitpics/fakeunit.png";
-    height = 40;
-    width = 40;
-    tooltip = loc_tooltip_array[location+1];
-    children = {
-      Label:New {
-	autosize = false;
-	align = "center";
-	valign = "center";
-	caption = loc_text;
-	height = 40,
+  if (Spring.GetGameRulesParam("takeover_winner_owner") ~= -2) then
+    local loc_text = "center";
+    if (location == 1) then
+      loc_text = "spawn\n box";
+    elseif (location == 2) then
+      loc_text = "across\n  map";
+    end
+    local delay_minutes, delay_seconds, time_text = GetTimeFormatted(grace, false)
+    local god_text = "mortal";
+    local god_color = white;
+    if (godmode == 1) then
+      god_text = " semi-\nmortal";
+      god_color = yellow;
+    elseif (godmode == 2) then
+      god_text = "god-\nlike";
+      god_color = red
+    end
+    for i=1,4 do
+      results_stack:RemoveChild(results_elements[i])
+    end
+    results_elements[1] = Button:New {
+      height = 40;
+      width = 40;
+      padding = {0, 0, 0, 0},
+      margin = {0, 0, 0, 0},
+      caption = "";
+      tooltip = loc_tooltip_array[location+1];
+      children = {
+	Image:New {
+	  file = "unitpics/fakeunit.png";
+	  height = 40;
+	  width = 40;
+	  children = {
+	    Label:New {
+	      autosize = false;
+	      align = "center";
+	      valign = "center";
+	      caption = loc_text;
+	      height = 40,
+	      width = 40;
+	      fontsize = 11; -- so cost values are better? for now atleast...
+	    };
+	  }
+	}
+      }
+    };
+    results_elements[2] = Button:New {
+      height = 40;
+      width = 40;
+      padding = {0, 0, 0, 0},
+      margin = {0, 0, 0, 0},
+      caption = "";
+      tooltip = UnitDefs[unit].humanName;
+      children = {
+	Image:New {
+	  file = "unitpics/"..UnitDefs[unit].name..".png";
+	  height = 40;
+	  width = 40;
+	}
+      }
+    };
+    results_elements[3] = Button:New {
+      height = 40;
+      width = 40;
+      padding = {0, 0, 0, 0},
+      margin = {0, 0, 0, 0},
+      caption = "";
+      tooltip = grace.." seconds.";
+      children = {
+	Image:New {
+	  file = "unitpics/fakeunit.png";
+	  height = 40;
+	  width = 40;	
+	  children = {
+	    Label:New {
+	      autosize = false;
+	      align = "center";
+	      valign = "center";
+	      caption = time_text;
+	      height = 40,
+	      width = 40;
+	      fontsize = 14;
+	      textColor = GetColorForDelay(grace);
+	    }
+	  }
+	}
+      }
+    };
+    results_elements[4] = Button:New {
+      height = 40;
+      width = 40;
+      padding = {0, 0, 0, 0},
+      margin = {0, 0, 0, 0},
+      caption = "";
+      tooltip = god_tooltip_array[godmode+1];
+      children = {
+	Image:New {
+	  file = "unitpics/fakeunit.png";
+	  height = 40;
+	  width = 40;
+	  children = {
+	    Label:New {
+	      autosize = false;
+	      align = "center";
+	      valign = "center";
+	      caption = god_text;
+	      height = 40,
+	      width = 40;
+	      fontsize = 11; -- so cost values are better? for now atleast...
+	      textColor = god_color;
+	    };
+	  }
+	}
+      }
+    };
+  else
+    for i=1,4 do
+      results_elements[i] = Button:New {
+	height = 40;
 	width = 40;
-	fontsize = 11; -- so cost values are better? for now atleast...
+	padding = {0, 0, 0, 0},
+	margin = {0, 0, 0, 0},
+	caption = "";
+	tooltip = "Multiple nominations have same number of votes. Final decision is random among most voted ones.";
+	children = {
+	  Image:New {
+	    file = "unitpics/fakeunit.png";
+	    height = 40;
+	    width = 40;
+	    children = {
+	      Label:New {
+		autosize = false;
+		align = "center";
+		valign = "center";
+		caption = "???";
+		height = 40,
+		width = 40;
+		fontsize = 14;
+	      }
+	    }
+	  }
+	}
       };
-    }
-  };
-  results_elements[2] = Image:New {
-    file = "unitpics/"..UnitDefs[unit].name..".png";
-    height = 40;
-    width = 40;
-    tooltip = UnitDefs[unit].humanName;
-  };
-  results_elements[3] = Image:New {
-    file = "unitpics/fakeunit.png";
-    height = 40;
-    width = 40;
-    tooltip = grace.." seconds.";
-    children = {
-      Label:New {
-	autosize = false;
-	align = "center";
-	valign = "center";
-	caption = time_text;
-	height = 40,
-	width = 40;
-	fontsize = 14;
-	textColor = GetColorForDelay(grace);
-      },
-    }
-  };
-  results_elements[4] = Image:New {
-    file = "unitpics/fakeunit.png";
-    height = 40;
-    width = 40;
-    children = {
-      Label:New {
-	autosize = false;
-	align = "center";
-	valign = "center";
-	caption = god_text;
-	height = 40,
-	width = 40;
-	fontsize = 11; -- so cost values are better? for now atleast...
-	textColor = god_color;
-	tooltip = god_tooltip_array[godmode+1];
-      };
-    }
-  };
+    end
+  end
   for i=1,4 do
     results_stack:AddChild(results_elements[i])
   end
@@ -996,7 +1099,9 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-  if (not Spring.GetModOptions().zkmode) or (Spring.GetModOptions().zkmode ~= "takeover") then
+  local takeovermode = (Spring.GetModOptions().zkmode) == "takeover"
+  
+  if (not takeovermode) then
     widgetHandler:RemoveWidget()
   end
   
