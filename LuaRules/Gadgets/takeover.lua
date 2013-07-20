@@ -234,9 +234,9 @@ local function PlayerAgreeWith(playerID, name, line)
     };
     NominationList[PlayerList[TPID].nomination].votes = NominationList[PlayerList[TPID].nomination].votes+1;
   else
---     if (PlayerList[PID].nomination) then
-    NominationList[PlayerList[PID].nomination].votes = NominationList[PlayerList[PID].nomination].votes-1;
---     end
+    if (PlayerList[PID].nomination) then
+      NominationList[PlayerList[PID].nomination].votes = NominationList[PlayerList[PID].nomination].votes-1;
+    end
     PlayerList[PID].nomination = PlayerList[TPID].nomination;
     NominationList[PlayerList[TPID].nomination].votes = NominationList[PlayerList[TPID].nomination].votes+1;
   end
@@ -286,6 +286,7 @@ local function NominateNewRule(playerID, name, line)
       end
     end
     NominationList[ThisPlayer].opts = { location, unit, grace, godmode };
+    NominationList[ThisPlayer].votes = 1;
   end
   UpdatePollData()
 end
