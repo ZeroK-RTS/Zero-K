@@ -432,6 +432,9 @@ local function UpdateMostPopularStack()
     vote_count = Spring.GetGameRulesParam("takeover_winner_votes")
   end
   results_label:SetCaption(vote_count.." votes:")
+  for i=1,4 do
+    results_stack:RemoveChild(results_elements[i])
+  end
   if (Spring.GetGameRulesParam("takeover_winner_owner") ~= -2) then
     local loc_text = "center";
     if (location == 1) then
@@ -448,9 +451,6 @@ local function UpdateMostPopularStack()
     elseif (godmode == 2) then
       god_text = "god-\nlike";
       god_color = red
-    end
-    for i=1,4 do
-      results_stack:RemoveChild(results_elements[i])
     end
     results_elements[1] = Button:New {
       height = 40;
