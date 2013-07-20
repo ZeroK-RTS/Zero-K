@@ -58,8 +58,6 @@ local function deactivate()
 	Move(lwing, x_axis, -WING_DISTANCE, 10)
 	Turn(rwing, y_axis, 0, math.rad(30))
 	Turn(lwing, y_axis, 0, math.rad(30))
-	Turn(ljet, y_axis, math.pi)
-	Turn(rjet, y_axis, math.pi)
 end
 
 function script.Create()
