@@ -197,7 +197,7 @@ local function AnnounceMyChoice(choice)
   if (choice[3] == 0) then time_text = "no delay" end
   local god_text = "mortal";
   if (choice[4] == 1) then
-    god_text = " semi-mortal";
+    god_text = "semi-mortal";
   elseif (choice[4] == 2) then
     god_text = "immortal";
   end

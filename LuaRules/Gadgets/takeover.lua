@@ -614,6 +614,7 @@ function gadget:GameFrame (f)
       TheUnit = TheUnits[i]
       if (TheUnit ~= nil) then
 	spSetUnitNoSelect(TheUnit,false)
+	spGiveOrderToUnit(TheUnit, CMD_FIRE_STATE, {2},{})
 	if (spGetUnitTeam(TheUnit) == GaiaTeamID) then
 	  spGiveOrderToUnit(TheUnit, CMD_REPEAT,{1},{})
 	  spGiveOrderToUnit(TheUnit, CMD_FIRE_STATE, {2},{})
@@ -733,15 +734,16 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	local hp  = (health or 0)/maxHealth
 	if (MostPopularChoice[4] == 2) then
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
-	    spSetUnitHealth(unitID, {health = health+floor(damage+1)}); -- you may ask yourself why, the answer is: i do not want to block emp/slow damage, if you know way to make this better, contact me
+	    -- you may ask yourself why, the answer is: i do not want to block emp/slow damage, if you know way to make this better, contact me
+	    spSetUnitHealth(unitID, {health = health+floor(damage+1)});
 	  end
 	  if (health-damage < buttomhp) then
-	    spSetUnitHealth(unitID, {health = buttomhp});
-	    if (paralyzer) then
-	      spSetUnitHealth(unitID, {paralyze = paralyzeDamage+damage})
-	    end
-	    -- critical border line, all damage blocked, expect emp
-	    return 0
+ 	    spSetUnitHealth(unitID, {health = health+floor(damage+1-health+buttomhp)});
+-- 	    if (paralyzer) then
+-- 	      spSetUnitHealth(unitID, {paralyze = paralyzeDamage+damage})
+-- 	    end
+-- 	    -- critical border line, all damage blocked, expect emp
+-- 	    return 0
 	  end
 	elseif (MostPopularChoice[4] == 1) then
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
