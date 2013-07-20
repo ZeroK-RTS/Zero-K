@@ -1,14 +1,13 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.3 beta" -- i'm so noob in this :p
--- you may find changelog in takeover.lua gadget
+local version = "0.1.0" -- you may find changelog in takeover.lua gadget
 
 function widget:GetInfo()
   return {
     name      = "Chili Takeover Vote Display",
-    desc      = "GUI for takeover votes "..version,
-    author    = "Tom Fyuri, Sprung",
+    desc      = "GUI for takeover game mode "..version,
+    author    = "Tom Fyuri", -- also kudos to Sprung, KingRaptor and jK
     date      = "Jul 2013",
     license   = "GPL v2 or later",
     layer     = -9, 
@@ -32,11 +31,6 @@ local Progressbar
 local Control
 local Font
 
-local vote_window, panel_main, panel_for_stack, vote_title, stack_panel, scroll_panel, choose_unit, choose_delay, vote_button, minimize_button, panel_for_vote, delay_stack_panel, unit_stack_panel
-local most_voted_panel, icon1, text1, textd, text2
-local stats_window,  stats_timer, show_vote_window_button, winner_icon, unit_team
-local vote_minimized = false -- im really noob in this
-
 local blue	= {0,0,1,1}
 local green	= {0,1,0,1}
 local red	= {1,0,0,1}
@@ -45,988 +39,1534 @@ local yellow 	= {1,1,0,1}
 local cyan 	= {0,1,1,1}
 local white 	= {1,1,1,1}
 
-local entries = {};
-local vote_delay_button = {};
-local vote_delay_text = {};
-local vote_unit_button = {};
+local GL_LINE_STRIP         = GL.LINE_STRIP
+
+local glVertex		= gl.Vertex
+local glDepthTest	= gl.DepthTest
+local glColor		= gl.Color
+local glBeginEnd	= gl.BeginEnd
+local glLineWidth	= gl.LineWidth
+local glDrawFuncAtUnit  = gl.DrawFuncAtUnit
+local glRotate		= gl.Rotate
+local glTranslate	= gl.Translate
+local glBillboard	= gl.Billboard
+
+local overheadFont	= "LuaUI/Fonts/FreeSansBold_16"
+
+local random	= math.random
+local floor	= math.floor
+local abs	= math.abs
+local sqrt	= math.sqrt
+local PI	= math.pi
+local cos	= math.cos
+local sin	= math.sin
+local max	= math.max
+
+-- everything regarding status panel
+local help_button
+-- before vote is settled
+local vote_menu_button
+local status_window
+local welcome_text
+local results_label
+local results_stack
+local results_elements = {}
+-- after vote relation
+local status_timeleft
+local status_ally
+local status_enemy
+local status_units = {}
+local dead_label
+local status_stage = 1
+
+-- everything regarding help menu
+local help_window
+local help_text
+local help_title
+
+-- everything regarding vote menu
+local vote_scroll
+local nominate_stack
+local default_nomination = true
+
+-- everything regarding nominating a new vote
+local nominate_window
+local nominate_advice
+local nominate_location
+local nominate_unit
+local nominate_unit_button = {}
+local nominate_gracetime
+local nominate_grace_button = {}
+local nominate_godmode
+
+-- other stuff
+local nominations = {}
+local nomination_count = 0
+local loc_tooltip_array = {
+  "Only one unit, in the center of the map.",
+  "Multiple units, same type, each for each spawn box.",
+  "Multiple units, same type, across map between spawn boxes.",
+}
+local god_tooltip_array = {
+  "TheUnit(s) can die at any time. Reclaim the bastard(s)!",
+  "TheUnit(s) will stay immune to any physical damage, if it's fully emped or grace timer > 0.",
+  "TheUnit(s) will never die, yet they can still recieve emp/slow/cap damage.",
+}
+
+local fu = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local string_vote_for = "#takeover_vote";
-local string_vote_for2 = 'takeover_vote';
-local string_vote_start = "takeover_vote_start";
-local string_vote_end = "takeover_vote_end";
-local string_vote_most_popular = "takeover_vote_most_popular";
-local string_vote_fallback = "takeover_vote_fallback";
-local takeover_error_fallback = "Takeover: WARNING! TheUnit position is underwater, therefore unit type changed back to detriment!";
-local string_takeover_owner = "takeover_new_owner";
-local string_takeover_unit_died = "takeover_unit_dead"
-local PollActive = false
-local GameStarted = false
-local unit_is_dead = false
-local timerInSeconds = -1
+local UnitList = { "scorpion", "dante", "armraven", "armbanth", "corcrw", "armorco", "funnelweb",
+    "corgol", "corsumo", "armmanni", "armzeus", "armcrabe", "armcarry", "corbats", "armcomdgun", "armcybr", "corroy", "amphassault",
+    "corhlt", "armanni", "cordoom", "cafus", "armbrtha", "corbhmth",
+    "zenith", "mahlazer", "raveparty", "armcsa" }
+local GraceList = { 0, 15, 45, 90, 120, 240, 300, 450, 600, 750, 817, 900}
 
-local springieName = Spring.GetModOptions().springiename or ''
+local my_choice = {}
 
-local VOTE_SPAM_DELAY = 1	--seconds
-local VOTE_DEFAULT_CHOICE1 = "detriment";
-local VOTE_DEFAULT_CHOICE2 = 900;
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-local my_old_choice = {};
-local my_choice = {};
-my_choice[0] = VOTE_DEFAULT_CHOICE1;
-my_choice[1] = VOTE_DEFAULT_CHOICE2;
-my_old_choice[0] = VOTE_DEFAULT_CHOICE1;
-my_old_choice[1] = VOTE_DEFAULT_CHOICE2;
-local most_voted_option = {};
-most_voted_option[0] = VOTE_DEFAULT_CHOICE1;
-most_voted_option[1] = VOTE_DEFAULT_CHOICE2;
+local UpdateTimer = 0
+local UPDATE_FREQUENCY = 0.8	-- seconds
+local UPDATE_FREQUENCY_2 = 0.5	-- seconds
+local timer = 0
+local timer_2 = 0
 
-local player_list = {}; -- sorted
 local myAllyTeam;
 local myTeam;
+local myPlayerID;
 
-local GaiaTeamID	   	= Spring.GetGaiaTeamID()
-local UnitTeamID		= GaiaTeamID
-  
-local unit_choice = {
-      ['scorpion'] = {
-	id = 1;
-	name = "scorpion";
-	type = "scorpion";
-	full_name = "Scorpion";
-	pic = "unitpics/scorpion.png";
-	water_friendly = false;
-	votes = 0;
-      },
-      ['dante'] = {
-	id = 2;
-	name = "dante";
-	type = "dante";
-	full_name = "Dante";
-	pic = "unitpics/dante.png";
-	water_friendly = false;
-	votes = 0;
-      },
-      ['catapult'] = {
-	id = 3;
-	name = "catapult";
-	type = "armraven";
-	full_name = "Catapult";
-	pic = "unitpics/armraven.png";
-	water_friendly = false;
-	votes = 0;
-      },
-      ['bantha'] = {
-	id = 4;
-	name = "bantha";
-	type = "armbanth";
-	full_name = "Bantha";
-	pic = "unitpics/armbanth.png";
-	water_friendly = false;
-	votes = 0;
-      },
-      ['krow'] = {
-	id = 5;
-	name = "krow";
-	type = "corcrw";
-	full_name = "Krow";
-	pic = "unitpics/corcrw.png";
-	water_friendly = true;
-	votes = 0;
-      },
-      ['detriment'] = {
-	id = 6;
-	name = "detriment";
-	type = "armorco";
-	full_name = "Detriment";
-	pic = "unitpics/armorco.png";
-	water_friendly = true;
-	votes = 0;
-      },
-      ['funnelweb'] = {
-	id = 7;
-	name = "funnelweb";
-	type = "funnelweb";
-	full_name = "Funnelweb";
-	pic = "unitpics/funnelweb.png";
-	water_friendly = false;
-	votes = 0;
-      },
-}
+local GaiaTeamID	= Spring.GetGaiaTeamID() -- TODO probably I should local all Spring. stuff here
+local GaiaAllyTeamID	= select(6,Spring.GetTeamInfo(GaiaTeamID))
 
-local delay_options = {
-      {
-	id = 1;
-	delay = 0;
-	votes = 0;
-      },
-      {
-	id = 2;
-	delay = 15;
-	votes = 0;
-      },
-      {
-	id = 3;
-	delay = 45;
-	votes = 0;
-      },
-      {
-	id = 4;
-	delay = 60;
-	votes = 0;
-      },
-      {
-	id = 5;
-	delay = 90;
-	votes = 0;
-      },
-      {
-	id = 6;
-	delay = 120;
-	votes = 0;
-      },
-      {
-	id = 7;
-	delay = 240;
-	votes = 0;
-      },
-      {
-	id = 8;
-	delay = 300;
-	votes = 0;
-      },
-      {
-	id = 9;
-	delay = 450;
-	votes = 0;
-      },
-      {
-	id = 10;
-	delay = 600;
-	votes = 0;
-      },
-      {
-	id = 11;
-	delay = 900;
-	votes = 0;
-      },
-      {
-	id = 12;
-	delay = 1200;
-	votes = 0;
-      },
-      {
-	id = 13;
-	delay = 1500;
-	votes = 0;
-      },
-      {
-	id = 14;
-	delay = 1800;
-	votes = 0;
-      },
-      {
-	id = 15;
-	delay = 3600;
-	votes = 0;
-      },
-}
+local PollActive = -1
+local GameStarted = false
+
+local DEFAULT_CHOICE = {0, UnitDefNames["armzeus"].id, 240, 2} -- mortal dante (armorco) should probably fit better, but this zeus is immortal :)
+local CAPTURE_RANGE = 256 -- capture range, you need to stand this close to begin unit capture process
+
+local TheUnitCount = 0
+
+local visible = {}
+local under_siege = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetColorForDelay(delay, paint_green)
-	if (delay <= 30) then return red; elseif (delay <= 120) then return orange; elseif (delay <= 360) then return yellow; elseif (delay >= 1500) then return cyan; end;
-	if (delay == VOTE_DEFAULT_CHOICE2) and (paint_green) then return green; end
-	return white;
+local function GetColorForDelay(delay)
+  if (delay <= 30) then return red; elseif (delay <= 120) then return orange; elseif (delay <= 360) then return yellow; elseif (delay >= 1500) then return cyan; end;
+  return white;
 end
 
-local lastClickTimestamp = 0
-local function CheckForVoteSpam (currentTime) --// function return "true" if not a voteSpam
-	local elapsedTimeFromLastClick = currentTime - lastClickTimestamp
-	if elapsedTimeFromLastClick < VOTE_SPAM_DELAY then
-		return false
-	else
-		lastClickTimestamp = currentTime;
-		return true
-	end
+local function GetTimeFormatted(time, addzeros)
+  local delay_minutes = floor(time/60) -- TODO optimise this, this can be done lot better and faster
+  local delay_seconds = time-delay_minutes*60
+  local time_text = "   no\ndelay"
+  if (time > 0) then
+    if (0 == delay_seconds) and (delay_minutes > 0) then
+      time_text = delay_minutes.."m"
+    elseif (delay_minutes == 0) then
+      time_text = delay_seconds.."s"
+    else
+      time_text = delay_minutes.."m\n"..delay_seconds.."s"
+    end -- should be possible to do this much faster
+  end
+  if addzeros then
+    if (delay_minutes < 10) then 
+      delay_minutes = "0"..delay_minutes
+    end
+    if (delay_seconds < 10) then
+      delay_seconds = "0"..delay_seconds
+    end
+  end
+  return delay_minutes, delay_seconds, time_text
 end
 
-local function AddEntry(i)
-	local color = red;
-	if (player_list[i].team == myTeam) then
-	  color = cyan;
-	elseif (player_list[i].ally == myAllyTeam) then
-	  color = green;
-	end
-	entries[i] = {}
-	entries[i].choice = {}
-	local name = player_list[i].name
-	local fsize = 23
-	if (name:len() > 5) then
-	  fsize = math.floor(28-(name:len())*0.9) -- TODO do you happen to know much better way?
-	  if (fsize < 10) then fsize = 10 end -- whatever can't fit anyway
-	end
-	entries[i].label = Label:New{
-	  width = (scroll_panel.width-120 < 120) and 120 or scroll_panel.width-120;
-	  height = "100%";
-	  autosize=false;
-	  --align="center";
-	  valign="center";
-	  caption = name;
-	  fontsize = fsize;
-	  textColor = color;
-	};
-	local unit = unit_choice[player_list[i].choice[0]]
-	entries[i].choice[0] = Image:New {
-	  file   = unit.pic;
-	  height = 40;
-	  width = 40;
-	  tooltip= unit.full_name;
-	};
-	-- TODO scrap code below and make it convert seconds into minutes if needed, so any number fits into small square
-	-- i believe such things would take some extra time
-	--local fontsize = 24;
-	--if (tonumber(player_list[i].choice[1])>99) then fontsize = 18; end
-	local delay = player_list[i].choice[1];
-	local color = GetColorForDelay(delay, true)
-	entries[i].choice[1] = Label:New {
-	  autosize=false;
-	  align="center";
-	  valign="center";
-	  caption = delay;
+local function AnnounceMyChoice(choice)
+  if (default_nomination ~= nil) then
+    vote_scroll:RemoveChild(default_nomination)
+    default_nomination = nil
+  end
+  Spring.SendLuaRulesMsg("takeover_nominate "..choice[1].." "..choice[2].." "..choice[3].." "..choice[4])
+  -- announce choice in chat
+  local loc_text = "at center";
+  if (choice[1] == 1) then
+    loc_text = "in spawn boxes";
+  elseif (choice[1] == 2) then
+    loc_text = "across map";
+  end
+  local time_text = select(3,GetTimeFormatted(choice[3], false))
+  local god_text = "mortal";
+  if (choice[4] == 1) then
+    god_text = " semi-mortal";
+  elseif (choice[4] == 2) then
+    god_text = "immortal";
+  end
+  Spring.SendCommands("say I nominate: "..god_text.." "..UnitDefs[choice[2]].humanName.." being spawned "..loc_text.." and dormant for "..time_text.."!");
+end
+
+local function SetupNominationStack(nomi, name, name_color, owner, nom)
+  local loc_text = "center";
+  if (nomi.location == 1) then
+    loc_text = "spawn\n box";
+  elseif (location == 2) then
+    loc_text = "across\n  map";
+  end
+  local delay_minutes, delay_seconds, time_text = GetTimeFormatted(nomi.grace, false)
+  local god_text = "mortal";
+  local god_color = white;
+  if (godmode == 1) then
+    god_text = " semi-\nmortal";
+    god_color = yellow;
+  elseif (godmode == 2) then
+    god_text = "god-\nlike";
+    god_color = red
+  end
+  if (owner > -1) then -- TODO make less clutter, i know this can be merged somehow
+    nomi.playername = StackPanel:New {
+      centerItems = false,
+      resizeItems = false;
+      orientation = "horizontal";
+      width = 200;
+      height = 40;
+      padding = {0, 0, 0, 0},
+      itemMargin  = {5, 0, 0, 0},
+      children = {
+	Button:New {
+	  width = "100%",
 	  height = 40,
-	  width = 40;
-	  fontsize=18; -- so cost values are better? for now atleast...
-	  textColor = color;
-	};
-	entries[i].entry = StackPanel:New{ -- TODO actually i can pull it off without stackpanel at all, i can just directly add elements to scroll_panel...
-		--x = 8;
-		y = 16+(#player_list-1)*42; -- 42 or 45 so so
-		centerItems = false,
-		resizeItems = false;
-		columns = 1;
-		orientation   = "horizontal";
-		width = "100%";
-		height = 50,
-		padding = {5, 5, 5, 5},
-		itemMargin  = {5, 0, 0, 0},
-		backgroundColor = {0, 0, 0, 0},
-		children = {
-		  entries[i].label,
-		  entries[i].choice[0],
-		  Image:New {
-		    file   = "unitpics/fakeunit.png";
-		    height = 40;
-		    width = 40;
-		      children = { 
-		      entries[i].choice[1],
-		    },
-		  },
-		},
-	}
-	scroll_panel:AddChild( entries[i].entry );
+	  padding = {0, 0, 0, 0},
+	  margin = {0, 0, 0, 0},
+	  backgroundColor = {1, 1, 1, 0.4},
+	  caption = name;
+	  tooltip = "Press, if you agree with listed rules by "..name.."!";
+	  textColor = name_color;
+	  OnMouseDown = {function()
+	    Spring.SendLuaRulesMsg("takeover_agree_with "..owner)
+	    end
+	  },
+	  fontsize = 16;
+	},
+      }
+    }
+  else
+    nomi.playername = StackPanel:New {
+      centerItems = false,
+      resizeItems = false;
+      orientation = "horizontal";
+      width = 200;
+      height = 40;
+      padding = {0, 0, 0, 0},
+      itemMargin  = {5, 0, 0, 0},
+      children = {
+	Button:New {
+	  width = "100%",
+	  height = 40,
+	  padding = {0, 0, 0, 0},
+	  margin = {0, 0, 0, 0},
+	  backgroundColor = {1, 1, 1, 0.4},
+	  caption = name;
+	  tooltip = "Press, if you agree with listed rules by "..name.."!";
+	  textColor = name_color;
+	  OnMouseDown = {function()
+	    AnnounceMyChoice(DEFAULT_CHOICE)
+	    end
+	  },
+	  fontsize = 16;
+	},
+      }
+    }
+  end
+  nomi.votes = StackPanel:New {
+    centerItems = false,
+    resizeItems = false;
+    orientation = "horizontal";
+    width = 70;
+    height = 40;
+    padding = {0, 0, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+    children = {
+      Label:New {
+	autosize = false;
+	align = "center";
+	valign = "center";
+	caption = nomi.vote_count.." vote"..((nomi.vote_count==1) and "" or "s");
+	height = "100%",
+	width = "100%";
+	fontsize = 15;
+      },
+    }
+  }
+  nomi.pics[1] = Image:New {
+    file = "unitpics/fakeunit.png";
+    height = 40;
+    width = 40;
+    tooltip = loc_tooltip_array[nomi.location+1];
+    children = {
+      Label:New {
+	autosize = false;
+	align = "center";
+	valign = "center";
+	caption = loc_text;
+	height = 40,
+	width = 40;
+	fontsize = 11; -- so cost values are better? for now atleast...
+      };
+    }
+  };
+  nomi.pics[2] = Image:New {
+    file = "unitpics/"..UnitDefs[nomi.unit].name..".png";
+    height = 40;
+    width = 40;
+    tooltip = UnitDefs[nomi.unit].humanName;
+  };
+  nomi.pics[3] = Image:New {
+    file = "unitpics/fakeunit.png";
+    height = 40;
+    width = 40;
+    tooltip = nomi.grace.." seconds.";
+    children = {
+      Label:New {
+	autosize = false;
+	align = "center";
+	valign = "center";
+	caption = time_text;
+	height = 40,
+	width = 40;
+	fontsize = 14;
+	textColor = GetColorForDelay(nomi.grace);
+      },
+    }
+  };
+  nomi.pics[4] = Image:New {
+    file = "unitpics/fakeunit.png";
+    height = 40;
+    width = 40;
+    children = {
+      Label:New {
+	autosize = false;
+	align = "center";
+	valign = "center";
+	caption = god_text;
+	height = 40,
+	width = 40;
+	fontsize = 11; -- so cost values are better? for now atleast...
+	textColor = god_color;
+	tooltip = god_tooltip_array[nomi.godmode+1];
+      };
+    }
+  };
+  nomi.stack = StackPanel:New {
+    y = 43*(nom-1);
+    centerItems = false,
+    resizeItems = false;
+    orientation = "horizontal";
+    width = "100%";
+    height = 40;
+    padding = {0, 0, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+    children = {
+      nomi.playername, nomi.pics[1], nomi.pics[2], nomi.pics[3], nomi.pics[4], nomi.votes,
+    }
+  }
+  if (owner == -1) then
+    default_nomination = nomi.stack
+    vote_scroll:AddChild(default_nomination);
+  else
+    vote_scroll:AddChild(nomi.stack);
+  end
 end
 
-local function UpdateResults(i)
-	-- someone updated his choice, redraw it
-	entries[i].choice[0].file = unit_choice[player_list[i].choice[0]].pic;
-	entries[i].choice[0]:Invalidate();
-	local delay = player_list[i].choice[1];
-	local color = GetColorForDelay(delay, true);
-	entries[i].choice[1]:SetCaption(delay);
-	entries[i].choice[1].font:SetColor(color);
+local function UpdateMostPopularStack()
+  local location, unit, grace, godmode, vote_count
+  if (Spring.GetGameRulesParam("takeover_winner_votes") == nil) then
+    location = DEFAULT_CHOICE[1]
+    unit = DEFAULT_CHOICE[2]
+    grace = DEFAULT_CHOICE[3]
+    godmode = DEFAULT_CHOICE[4]
+    vote_count = 0
+  else
+    location = Spring.GetGameRulesParam("takeover_winner_opts1")
+    unit = Spring.GetGameRulesParam("takeover_winner_opts2")
+    grace = Spring.GetGameRulesParam("takeover_winner_opts3")
+    godmode = Spring.GetGameRulesParam("takeover_winner_opts4")
+    vote_count = Spring.GetGameRulesParam("takeover_winner_votes")
+  end
+  results_label:SetCaption(vote_count.." votes:")
+  local loc_text = "center";
+  if (location == 1) then
+    loc_text = "spawn\n box";
+  elseif (location == 2) then
+    loc_text = "across\n  map";
+  end
+  local delay_minutes, delay_seconds, time_text = GetTimeFormatted(grace, false)
+  local god_text = "mortal";
+  local god_color = white;
+  if (godmode == 1) then
+    god_text = " semi-\nmortal";
+    god_color = yellow;
+  elseif (godmode == 2) then
+    god_text = "god-\nlike";
+    god_color = red
+  end
+  for i=1,4 do
+    results_stack:RemoveChild(results_elements[i])
+  end
+  results_elements[1] = Image:New {
+    file = "unitpics/fakeunit.png";
+    height = 40;
+    width = 40;
+    tooltip = loc_tooltip_array[location+1];
+    children = {
+      Label:New {
+	autosize = false;
+	align = "center";
+	valign = "center";
+	caption = loc_text;
+	height = 40,
+	width = 40;
+	fontsize = 11; -- so cost values are better? for now atleast...
+      };
+    }
+  };
+  results_elements[2] = Image:New {
+    file = "unitpics/"..UnitDefs[unit].name..".png";
+    height = 40;
+    width = 40;
+    tooltip = UnitDefs[unit].humanName;
+  };
+  results_elements[3] = Image:New {
+    file = "unitpics/fakeunit.png";
+    height = 40;
+    width = 40;
+    tooltip = grace.." seconds.";
+    children = {
+      Label:New {
+	autosize = false;
+	align = "center";
+	valign = "center";
+	caption = time_text;
+	height = 40,
+	width = 40;
+	fontsize = 14;
+	textColor = GetColorForDelay(grace);
+      },
+    }
+  };
+  results_elements[4] = Image:New {
+    file = "unitpics/fakeunit.png";
+    height = 40;
+    width = 40;
+    children = {
+      Label:New {
+	autosize = false;
+	align = "center";
+	valign = "center";
+	caption = god_text;
+	height = 40,
+	width = 40;
+	fontsize = 11; -- so cost values are better? for now atleast...
+	textColor = god_color;
+	tooltip = god_tooltip_array[godmode+1];
+      };
+    }
+  };
+  for i=1,4 do
+    results_stack:AddChild(results_elements[i])
+  end
 end
-local function DelayIntoID(delay) -- thanks Sprung
-  for i=1, #delay_options do
-    if (delay_options[i].delay == delay) then
-      return i
+
+local function ShowDefaultNomination()
+  local location = DEFAULT_CHOICE[1]
+  local unit = DEFAULT_CHOICE[2]
+  local grace = DEFAULT_CHOICE[3]
+  local godmode = DEFAULT_CHOICE[4]
+  local vote_count = 0
+  local nomi = { location = location, unit = unit, grace = grace, godmode = godmode, vote_count = vote_count, stack, playername, pics = {}, votes }
+  local name = "DEFAULT_CHOICE"
+  local name_color = white
+  SetupNominationStack(nomi, name, name_color, -1, 1)
+end
+
+local function ParseNomination(nom) -- TODO need rewrite to make this perfect, not redraw all the entries all the time
+  local owner = Spring.GetGameRulesParam("takeover_owner_nomination"..nom)
+  if (nominations[owner] ~= nil) then
+    vote_scroll:RemoveChild(nominations[owner].stack)
+  end
+  local location = Spring.GetGameRulesParam("takeover_location_nomination"..nom)
+  local unit = Spring.GetGameRulesParam("takeover_unit_nomination"..nom)
+  local grace = Spring.GetGameRulesParam("takeover_grace_nomination"..nom)
+  local godmode = Spring.GetGameRulesParam("takeover_godmode_nomination"..nom)
+  local vote_count = Spring.GetGameRulesParam("takeover_votes_nomination"..nom)
+  nominations[owner] = { location = location, unit = unit, grace = grace, godmode = godmode, vote_count = vote_count, stack, playername, pics = {}, votes }
+  local name, _, _, teamID, allyTeam = Spring.GetPlayerInfo(owner)
+  local name_color = cyan
+  if (allyTeam ~= myAllyTeam) then
+    name_color = red
+  elseif (teamID ~= myTeam) then
+    name_color = green
+  end
+  SetupNominationStack(nominations[owner], name, name_color, owner, nom)
+end
+
+local function UpdateNomListNOW()
+  local noms = Spring.GetGameRulesParam("takeover_nominations")
+  noms = noms and noms or 0
+  if (noms == 0) and (default_nomination == true) then
+    ShowDefaultNomination()
+  end
+  for i=1, noms do
+    ParseNomination(i)
+  end
+end
+
+local function SetupUnitStack(choice)
+  my_choice[1] = choice;
+  nominate_advice:SetCaption("2) Select TheUnit(s) type:");
+  nominate_stack:RemoveChild(nominate_location);
+  nominate_stack:AddChild(nominate_unit);
+end
+
+local function SetupGraceTime(choice)
+  my_choice[2] = UnitDefNames[choice].id
+  nominate_advice:SetCaption("3) Select TheUnit(s) grace timer:");
+  nominate_stack:RemoveChild(nominate_unit);
+  nominate_stack:AddChild(nominate_gracetime);  
+end
+
+local function SetupGodmode(choice)
+  my_choice[3] = choice
+  nominate_advice:SetCaption("4) Select TheUnit(s) immortality:");
+  nominate_stack:RemoveChild(nominate_gracetime);
+  nominate_stack:AddChild(nominate_godmode);  
+end
+
+local function NominateMyChoice(choice)
+  my_choice[4] = choice
+  nominate_stack:RemoveChild(nominate_godmode);
+  nominate_stack:AddChild(nominate_location);
+  screen0:RemoveChild(nominate_window);
+  nominate_window = nil;
+  -- NOTE if you abuse this widget and try to nominate something being a spectator, it will not work, also you can't nominate something again, while your option is being voted on
+  AnnounceMyChoice(my_choice)
+  screen0:AddChild(vote_window);
+  UpdateNomListNOW()
+end
+
+local function SetupIngameStatusBar()
+  status_window:RemoveChild(vote_menu_button)
+  status_window:RemoveChild(welcome_text)
+  status_window:RemoveChild(results_stack)
+  status_window:RemoveChild(results_label)
+  if (vote_window) then
+    screen0:RemoveChild(vote_window)
+    vote_window = nil
+  end
+  if (nominate_window) then
+    screen0:RemoveChild(nominate_window)
+    nominate_window = nil
+    vote_window = nil
+  end
+  -- now lets make awesome stuff!
+  help_button.right = nil;
+  help_button.width = 60;
+  help_button:SetPos(0,0)
+  status_window:RemoveChild(help_button)
+  -- lets draw!
+  dead_label = Label:New {
+    autosize = false;
+    width = 40;
+    align = "center";
+    valign = "center";
+    height = 20;
+    caption = "Lost";
+    fontsize = 12;
+    textColor = orange,
+  }
+  local timer_label = Label:New {
+    autosize = false;
+    width = 65;
+    align = "center";
+    height = 20;
+    caption = "Timeleft:";
+  }
+  status_timeleft = Label:New {
+    autosize = false;
+    align = "center",
+    width = 60;
+    align = "center";
+    height = 20;
+    caption = "00:00";
+    fontsize = 16;
+  }
+  status_ally = StackPanel:New {
+    width = floor(status_window.width-90)/2;
+    height = "100%";
+    centerItems = false,
+    resizeItems = false;
+    orientation = "horizontal";
+    padding = {0, 15, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+  }
+  local timer_panel = StackPanel:New {
+    width = 60;
+    height = "100%";
+    centerItems = false,
+    resizeItems = false;
+    orientation = "vertical";
+    padding = {0, 5, 0, 0},
+    itemMargin  = {0, 0, 0, 2},
+    children = {
+      timer_label,
+      status_timeleft,
+      help_button,
+    }
+  }
+  status_enemy = StackPanel:New {
+    width = floor(status_window.width-90)/2;
+    height = "100%";
+    centerItems = false,
+    resizeItems = false;
+    orientation = "horizontal";
+    padding = {0, 15, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+  }
+  local stack = StackPanel:New {
+    width = "100%";
+    height = "100%";
+    centerItems = false,
+    resizeItems = false;
+    orientation = "horizontal";
+    padding = {2, 5, 2, 5},
+    itemMargin  = {5, 0, 0, 0},
+    children = {
+      status_ally,
+      timer_panel,
+      status_enemy,
+    }
+  }
+  local label1 = Label:New {
+    y = 4;
+    autosize = false;
+    width = 60;
+    align = "center";
+    height = 15;
+    caption = "Allies:";
+    right = "70%";
+    textColor = green;
+    fontsize = 10;
+    --x = floor(status_ally.width/2);
+  }
+  local label2 = Label:New {
+    y = 4;
+    autosize = false;
+    width = 60;
+    align = "center";
+    height = 15;
+    caption = "Enemies:";
+    right = "15%";
+    textColor = red;
+    fontsize = 10;
+    --x = floor(status_ally.width/2+status_window.width/2);
+  }
+  status_window:AddChild(stack)
+  status_window:AddChild(label1)
+  status_window:AddChild(label2)
+  TheUnitCount = Spring.GetGameRulesParam("takeover_units")
+  TheUnitCount = TheUnitCount and TheUnitCount or 0
+  local unit_type = Spring.GetGameRulesParam("takeover_winner_opts2")
+  for i=1,TheUnitCount do
+    status_units[i] = {
+      alive = true,
+      enemy = true,
+      image = Image:New {
+	file = "unitpics/"..UnitDefs[unit_type].name..".png";
+	height = 40;
+	width = 40;
+      },
+      button = Button:New {
+	height = 40;
+	width = 40;
+	padding = {0, 0, 0, 0},
+	margin = {0, 0, 0, 0},
+	caption = "";
+	tooltip = "Owner: noone.";
+      },
+      health = Progressbar:New {
+	name    = "health"..i;
+	width   = 40;
+	height  = 7;
+	max     = 25;
+	value	= 25;
+	itemMargin    = {0,0,0,0},
+	itemPadding   = {0,0,0,0},	
+	padding = {0,0,0,0},
+	color   = {0.0,0.99,0.0,1};
+      },
+      emp = Progressbar:New {
+	name    = "emp"..i;
+	width   = 40;
+	height  = 7;
+	max     = 25;
+	value   = 0;
+	itemMargin    = {0,0,0,0},
+	itemPadding   = {0,0,0,0},	
+	padding = {0,0,0,0},
+	color   = {0.60,0.60,0.90,1};
+      },
+      stack = StackPanel:New {
+	width = 40;
+	height = "100%";
+	centerItems = false,
+	resizeItems = false;
+	orientation = "vertical";
+	padding = {0, 0, 0, 0},
+	itemMargin  = {0, 0, 0, 2},
+      },
+    }
+    status_units[i].button:AddChild(status_units[i].image)
+    status_units[i].stack:AddChild(status_units[i].button)
+    status_units[i].stack:AddChild(status_units[i].health)
+    status_units[i].stack:AddChild(status_units[i].emp)
+    status_enemy:AddChild(status_units[i].stack)
+    under_siege[i] = 0
+  end
+  status_stage = 2
+  
+  -- what if widget was reload in game?
+  for i=1,TheUnitCount do
+    local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
+    if (Spring.GetUnitPosition(unit)) then
+      visible[unit] = true
     end
   end
 end
-local function UpdateMostPopularGraphics()
-	icon1.file = unit_choice[most_voted_option[0]].pic;
-	icon1:Invalidate();
-	text1:SetCaption(most_unit_votes.." votes");
-	icon2:RemoveChild(textd)
-	textd = Label:New{
-		height = 36; width = 36; fontsize=16; caption=most_voted_option[1]; align="center"; valign="center"; textColor = GetColorForDelay(most_voted_option[1]);
-	}
-	icon2:AddChild(textd)
-	text2:SetCaption(most_delay_votes.." votes");
-end
-local function UpdateVote(line)
-	words={}
-	for word in line:gmatch("[^%s]+") do words[#words+1]=word end
-	if (#words ~= 5) then return false end
-	-- TODO do in need safety checks here? i think not
-	most_voted_option[0] = words[2]
-	most_unit_votes = words[3]
-	most_voted_option[1] = tonumber(words[4])
-	most_delay_votes = words[5]
-	-- update
-	UpdateMostPopularGraphics()
-	--Spring.Echo(most_voted_option[0].." "..most_voted_option[1])
-end
+
 local function GetPlayerName(owner,team,isAI)
-      local name = "noname"
-      if isAI then
-	local _,aiName,_,shortName = Spring.GetAIInfo(team)
-	-- FIXME i never tested it with AI, so i wonder what name will it get... lol
-	name = aiName; --.."["..team.."]"..'('.. shortName .. ')'
-      elseif owner then
-	name = Spring.GetPlayerInfo(owner);--.."["..team.."]"
-      end
-      return name
-end
-local function UpdateUnitTeam(line)
-      words={}
-      for word in line:gmatch("[^%s]+") do words[#words+1]=word end
-      if (#words ~= 2) then return false end
-      local team = tonumber(words[2])
-      local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
-      local color = red;
-      if (GaiaTeamID == team) then
-	color = white;
-      elseif (team == myTeam) then
-	color = cyan;
-      elseif (myAllyTeam == allyTeam) then
-	color = green;
-      end
-      -- the reason why i'm doing this is, because player_list may hold the player and name, but not everyone is added to it since some people may not even vote (late join?)
-      local name = GetPlayerName(owner,team,isAI) -- nil?
-      if (name == nil) or (name == "") then 
-	name = "unknown"; -- TODO fix this... why can it be nil??? could it be that gadget is sending wrong value or smth? probably unsycned are sending messages in? :S
-	color = white;
-      end
-      unit_team:SetCaption("Owner: "..name..".")
-      local fsize = 15
-      if (name:len() > 5) then
-	fsize = math.floor(20-(name:len())*0.9) -- TODO do you happen to know much better way?
-	if (fsize < 9) then fsize = 9 end -- whatever can't fit anyway
-      end
-      unit_team.font:SetSize(fsize)
-      unit_team.font:SetColor(color)
-      UnitTeamID = team
+  if team == GaiaTeamID then
+    return "noone"
+  elseif isAI then
+    local _,aiName,_,shortName = Spring.GetAIInfo(team)
+    -- FIXME i never tested it with AI, so i wonder what name will it get... lol
+    return aiName; --.."["..team.."]"..'('.. shortName .. ')'
+  else
+    return select(1,Spring.GetPlayerInfo(owner));--.."["..team.."]"
+  end
 end
 
--- TODO really? i don't understand why i can't update text's color if it's parent is button, i have to add/remove it all the time!
-local function AddTextToButton(button, i, delay, color)
-	vote_delay_text[i]=Image:New {
-		      file   = "unitpics/fakeunit.png";
-		      height = 40;
-		      width = 40;
-		      children = {
-			Label:New {
-			  autosize=false;
-			  align="center";
-			  valign="center";
-			  caption = delay;
-			  height = 40,
-			  width = 40;
-			  fontsize=18;
-			  textColor=color;
-			  },
-		      },
-		    };
-	button:AddChild(vote_delay_text[i]);
-end
-
-local function RecolorDelays(old, new)
-	local a1 = false
-	local a2 = false
-	for _,a in ipairs(delay_options) do
-	    delay = a.delay;
-	    i = a.id;
-	--for i,delay in ipairs(global_delays_options) do
-	    if (a1) and (a2) then return
-	    elseif (delay == old) then
-		vote_delay_button[i]:RemoveChild(vote_delay_text[i])
-		AddTextToButton(vote_delay_button[i], i, delay, GetColorForDelay(delay,false))
-		a1 = true
-	    elseif (delay == new) then
-		vote_delay_button[i]:RemoveChild(vote_delay_text[i])
-		AddTextToButton(vote_delay_button[i], i, delay, green)
-		a2 = true
-	    end
-	end
-end
-
-local function GetVotes(playerID, name, line)
-	-- this code is almost identical to the takeover.lua's implementation, but it has also some callins to update gui
-	if line==string_vote_for then return false end
-	words={}
-	for word in line:gmatch("[^%s]+") do words[#words+1]=word end
-	if (#words ~= 3) then return false end
-	local new = true
-	local id = -1
-	for i=1,#player_list do
-	  if (player_list[i].playerID == playerID) then
-	    new = false;
-	    id = i;
-	    break;
-	  end
-	end
-	if new then
-	  local _ ,_,_,teamID,allyTeamID,_,_ = Spring.GetPlayerInfo(playerID)
-	  player_list[#player_list+1] = {
-	    playerID = playerID;
-	    name = name;
-	    team = teamID;
-	    ally = allyTeamID;
-	    voted = false;
-	    choice = {};
-	  };
-	  player_list[#player_list].choice[0] = VOTE_DEFAULT_CHOICE1;
-	  player_list[#player_list].choice[1] = VOTE_DEFAULT_CHOICE2;
-	  id = #player_list;
-	end
-	if (id > -1) then -- safety check
-	  if (unit_choice[words[2]] ~= nil) then
-	      if (player_list[id].voted) then
-		  unit_choice[player_list[id].choice[0]].votes = unit_choice[player_list[id].choice[0]].votes-1
-	      end
-	      unit_choice[words[2]].votes = unit_choice[words[2]].votes+1
-	      player_list[id].choice[0] = words[2]
--- 		spEcho(words[2].." "..unit_choice[words[2]].votes)
-	  end
-	  local delay = tonumber(words[3])
-	  if (delay ~= nil) then
-	      if (player_list[id].voted) then
-		  delay_options[DelayIntoID(player_list[id].choice[1])].votes = delay_options[DelayIntoID(player_list[id].choice[1])].votes-1
-	      end
-	      delay_options[DelayIntoID(delay)].votes = delay_options[DelayIntoID(delay)].votes+1
-	      player_list[id].choice[1] = delay
-	  end
-	  -- TODO detection if invalid choice is done above, but instead of putting default values, need to tell abuser to vote again
-	  if not player_list[id].voted then
-	    player_list[id].voted = true
-	    AddEntry(id)
-	  else
-	    UpdateResults(id)
-	  end
-	end
--- 	UpdateVote() -- no longer needed, since i can get current choice from gadget, perfectly synced :)
-end
-
-local function PrepareGame(line)
-	words={}
-	for word in line:gmatch("[^%s]+") do words[#words+1]=word end
-	timerInSeconds = tonumber(words[3])
-	most_voted_option[0] = words[2]
-	most_voted_option[1] = timerInSeconds-30
-	winner_icon = Image:New {
-	    x=10;
-	    y=10;
-	    file   = unit_choice[most_voted_option[0]].pic;
-	    height = 60;
-	    width = 60; }
-	stats_window:AddChild(winner_icon)
-	stats_timer = Label:New{
-		width = 120,
-		height = 40,
-		y = 30;
-		right = 5;
-		autosize=false;
-		--align="center";
-		valign="center";
-		caption = timerInSeconds.." seconds left.";
-	}
-	stats_window:AddChild(stats_timer)
-	unit_team = Label:New{
-		width = 120,
-		height = 40,
-		y = 10;
-		right = 5;
-		autosize=false;
-		--align="center";
-		valign="center";
-		caption = "Owner: noone.";
-		textColor = white;
-		fontsize = 14;
-	}
-	stats_window:AddChild(unit_team)
-	if (timerInSeconds > 5) then
-	  Spring.Echo("Takerover: The Unit is "..unit_choice[most_voted_option[0]].full_name.." and it will keep changing owner for "..timerInSeconds.." seconds.")
-	else
-	  Spring.Echo("Takerover: The Unit is "..unit_choice[most_voted_option[0]].full_name.." and it will go bersek right about... now? :)")
-	end
-end
-
-function widget:RecvLuaMsg(line, playerID)
-    -- FIXME figure out what can be elseif and what cannot, i'm having trouble...
-    if not PollActive then
-      if (line == string_vote_start) and (not GameStarted) then -- i wonder if i should check whether playerid ain't equal to the one who sent the msg
-	PollActive = true
-	vote_minimized = false
-	screen0:AddChild(vote_window)
-	screen0:AddChild(stats_window)
-      end
-      if line:find(string_takeover_owner) and (not unit_is_dead) then
-	UpdateUnitTeam(line)
-      end
-      if line:find(string_takeover_unit_died) then
-	--stats_window:RemoveChild(unit_team)
-	if (unit_team) then
-	    unit_team:SetCaption("Unit's dead.")
-	    unit_team.font:SetSize(14)
-	    unit_team.font:SetColor(red)
-	    unit_is_dead = true
-	end
-	timerInSeconds = -1;
-	if (stats_timer) then
-	    stats_timer:SetCaption("Time's up.")
-	    stats_timer.font:SetColor(orange)
-	end
-      end
-    elseif (not GameStarted) then
-      if line:find(string_vote_for2) then
-	local name, _, spectator = Spring.GetPlayerInfo(playerID)
-	if not spectator then
-	  GetVotes(playerID, name, line)
-	end
-      end
-      if line:find(string_vote_most_popular) then
-	UpdateVote(line)
-      end
-      if (line == string_vote_fallback) then
-	Spring.Echo(takeover_error_fallback)
-	most_voted_option[0]="detriment"
-	UpdateMostPopularGraphics()
-      end
-      if line:find(string_vote_end) then --terminate existing vote
-	PollActive = false
-	if not vote_minimized then
-	  vote_minimized = true
-	  screen0:RemoveChild(vote_window)
-	end
-	stats_window:RemoveChild(show_vote_window_button)
-	PrepareGame(line)
+function widget:Update(s)
+  timer = timer + s
+  if timer > UPDATE_FREQUENCY then
+    timer = 0
+    local poll = Spring.GetGameRulesParam("takeover_vote")
+    poll = poll and poll==1 or false
+    if (poll ~= PollActive) then
+      if (poll) then
+	status_window:AddChild(vote_menu_button)
+      elseif not GameStarted then
+	SetupIngameStatusBar()
 	GameStarted = true
       end
+      PollActive = poll -- UNCOMMENT ME
+--       PollActive = true -- DO NOT UNCOMMENT ME
     end
-end
-
-function widget:GameFrame(n)
-    if (GameStarted) then
-	if ((n%32)==0) then
-	    if (timerInSeconds > 0) then
-	      timerInSeconds = timerInSeconds - 1
-	      if (stats_timer) then
-		  stats_timer:SetCaption(timerInSeconds.." seconds left.")
-	      end
-	    elseif (timerInSeconds == 0) then
-	      timerInSeconds = -1
-	      if (stats_timer) then
-		  stats_timer:SetCaption("Time's up.")
-		  stats_timer.font:SetColor(orange)
-	      end
-	      if (unit_team) and (UnitTeamID == GaiaTeamID) then
-		unit_team:SetCaption("BERSERK MODE")
-		unit_team.font:SetColor(red)
-	      end
+    if (poll) then
+      if (vote_window) then
+	--- TODO this needs small rewrite...
+	local height = vote_window.height - 40;
+	height = height>0 and height or 100
+	vote_scroll.height = height
+	vote_scroll:Invalidate();
+	---
+	UpdateMostPopularStack()
+	UpdateNomListNOW()
+      elseif (#nominations > 0) then
+	nominations = {} -- empty the list because player closed window
+      end
+    end
+  end
+  timer_2 = timer_2 + s
+  if timer_2 > UPDATE_FREQUENCY_2 then
+    timer_2 = 0
+    if (status_stage == 2) then -- TODO make it so if gadget is not active, the window quits ?
+      status_ally.width = floor(status_window.width-90)/2
+      status_ally:Invalidate();
+      status_enemy.width = floor(status_window.width-90)/2
+      status_enemy:Invalidate();
+      local grace = Spring.GetGameRulesParam("takeover_timeleft")
+      grace = grace and grace or 0
+      local delay_minutes, delay_seconds, time_text = GetTimeFormatted(grace, true)
+      status_timeleft:SetCaption(delay_minutes..":"..delay_seconds)
+      if (grace > 0) then
+	status_timeleft.font:SetColor(GetColorForDelay(grace))
+      else
+	status_timeleft.font:SetColor(green)
+      end
+      for i=1,TheUnitCount do
+	local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
+	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i, 0)
+	if (unit > 0) and (hp > 0) then
+	  local team = Spring.GetGameRulesParam("takeover_team_unit"..i, -1) -- could also rely on allyteam instead
+	  local maxhp = Spring.GetGameRulesParam("takeover_maxhp_unit"..i, 1)
+	  local emphp = Spring.GetGameRulesParam("takeover_emphp_unit"..i, 1)
+	  local emp = Spring.GetGameRulesParam("takeover_emp_unit"..i, 0)
+	  hp = math.round(hp/maxhp*25)
+	  emp = math.round(emp/emphp*25) -- probably can be done better
+	  local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
+	  local name = GetPlayerName(owner,team,isAI)
+	  status_units[i].button.tooltip = "Owner "..name..".";
+	  if (allyTeam == myAllyTeam) and (status_units[i].enemy) then
+	    status_enemy:RemoveChild(status_units[i].stack);
+	    status_ally:AddChild(status_units[i].stack);
+	    status_units[i].enemy = false
+	  elseif (allyTeam ~= myAllyTeam) and (not status_units[i].enemy) then
+	    status_ally:RemoveChild(status_units[i].stack);
+	    status_enemy:AddChild(status_units[i].stack);
+	    status_units[i].enemy = true
+	  end
+	  status_units[i].health:SetValue(hp)
+	  status_units[i].emp:SetValue(emp)
+	  local siege = Spring.GetGameRulesParam("takeover_siege_unit"..i)
+	  --Spring.Echo(tostring(siege))
+	  if (siege == 1) then
+	    under_siege[i] = under_siege[i]+1;
+	    if (under_siege[i] > 2) then
+	      under_siege[i] = 1
 	    end
+	  end
+	elseif (status_units[i].alive) then
+	  --status_units[i].button:SetCaption("DEAD");
+	  status_units[i].button.tooltip = "DEAD.";
+	  status_units[i].stack:RemoveChild(status_units[i].health)
+	  status_units[i].stack:RemoveChild(status_units[i].emp)
+	  status_units[i].stack:AddChild(dead_label)
+	  status_units[i].alive = false
+	  visible[i] = false;
+	  under_siege[i] = 0;
 	end
+      end
     end
+  end
+end
+
+function widget:UnitEnteredLos(uID, tID)
+  for i=1,TheUnitCount do
+    local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
+    if (unit == uID) then
+      visible[uID] = true;
+    end
+  end
+end
+
+function widget:UnitLeftLos(uID)
+  visible[uID] = false;
+end
+
+local function BuildVertexList(verts) -- this code was stolen from defence range widget
+  local count =  #verts
+  for i = 1, count do
+    glVertex(verts[i])
+  end
+  if count > 0 then
+    glVertex(verts[1])
+  end
+end
+
+function GetRange2D( range, yDiff) -- this code was stolen from defence range widget
+  local root1 = range * range - yDiff * yDiff
+  if ( root1 < 0 ) then
+    return 0
+  else
+    return sqrt( root1 )
+  end
+end
+
+function FigureOutHowToDrawACyrcleYeahNiceIdea( x, y, z, range) -- this code was stolen from defence range widget
+  local rangeLineStrip = {}
+  local yGround = Spring.GetGroundHeight( x,z)
+  for i = 1,40 do
+    local radians = 2.0 * PI * i / 40
+    local rad = range
+
+    local sinR = sin( radians )
+    local cosR = cos( radians )
+
+    local posx = x + sinR * rad
+    local posz = z + cosR * rad
+    local posy = Spring.GetGroundHeight( posx, posz )
+
+    local heightDiff = ( posy - yGround) / 2.0	-- maybe y has to be getGroundHeight(x,z) cause y is unit center and not aligned to ground
+
+--     rad = rad - heightDiff * slope
+    local adjRadius = GetRange2D( range, 0) --heightDiff * 0.0)
+    local adjustment = rad / 2.0
+    local yDiff = 0.0
+
+    for j = 0, 49 do
+      if ( abs( adjRadius - rad ) + yDiff <= 0.01 * rad ) then
+	break
+      end
+
+      if ( adjRadius > rad ) then
+	rad = rad + adjustment
+      else
+	rad = rad - adjustment
+	adjustment = adjustment / 2.0
+      end
+      posx = x + ( sinR * rad )
+      posz = z + ( cosR * rad )
+      local newY = Spring.GetGroundHeight( posx, posz )
+      yDiff = abs( posy - newY )
+      posy = newY
+      posy = max( posy, 0.0 )  --hack
+      heightDiff = ( posy - yGround )	--maybe y has to be Ground(x,z)
+      adjRadius = GetRange2D( range, heightDiff * 0.0)
+    end
+
+    posx = x + ( sinR * adjRadius )
+    posz = z + ( cosR * adjRadius )
+    posy = Spring.GetGroundHeight( posx, posz ) + 5.0
+    posy = max( posy, 0.0 )   --hack
+    
+    table.insert( rangeLineStrip, { posx, posy, posz } )
+  end
+  return rangeLineStrip
+end
+
+local function DrawUnitOwner(unitID, color, name, rotation)
+  glTranslate(0,UnitDefs[Spring.GetUnitDefID(unitID)].height + 26,0)
+  glBillboard()
+  glColor(color[1], color[2], color[3], 0.7)
+  fontHandler.UseFont(overheadFont)
+  fontHandler.DrawCentered(name, 0, 0)
+  glColor(1,1,1,1)
+end
+
+function widget:DrawWorld()
+  if not Spring.IsGUIHidden() then
+    for i=1,TheUnitCount do
+      local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
+      if (visible[unit]) then
+	local team = Spring.GetGameRulesParam("takeover_team_unit"..i)
+	local allyteam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
+	local x,y,z = Spring.GetUnitPosition(unit)
+	local color = red
+	if (allyteam == myAllyTeam) then
+	  if (team ~= myTeam) then
+	    color = green
+	  else
+	    color = cyan
+	  end
+	elseif (allyteam == GaiaAllyTeamID) then
+	  color = white
+	end
+	if (under_siege[i] == 1) then
+	  if (allyteam == myAllyTeam) then
+	    color = yellow;
+	  elseif (allyteam == GaiaAllyTeamID) then
+	    color = green;
+	  else
+	    color = orange;
+	  end
+	end
+	glDepthTest(true)
+	
+	glColor(color[1], color[2], color[3], 0.7)
+	glLineWidth(2.5)
+	glBeginEnd(GL_LINE_STRIP, BuildVertexList, FigureOutHowToDrawACyrcleYeahNiceIdea(x,y,z, CAPTURE_RANGE))
+	
+	local heading = Spring.GetUnitHeading(unit)
+	if heading then
+	  local rot = (heading / 32768) * 180
+	  local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
+	  local name = GetPlayerName(owner,team,isAI)
+	  glDrawFuncAtUnit(unit, false, DrawUnitOwner, unit, color, name, rot)
+	end
+	
+	glDepthTest(false)
+      end
+    end
+  end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 
 function widget:Initialize()
-	myAllyTeam = Spring.GetMyAllyTeamID()
-	myTeam = Spring.GetMyTeamID()
+  if (not Spring.GetModOptions().zkmode) or (Spring.GetModOptions().zkmode ~= "takeover") then
+    widgetHandler:RemoveWidget()
+  end
+  
+  myAllyTeam = Spring.GetMyAllyTeamID()
+  myTeam = Spring.GetMyTeamID()
+  myPlayerID = Spring.GetMyPlayerID()
+  
+  -- setup Chili
+  Chili = WG.Chili
+  Button = Chili.Button
+  Label = Chili.Label
+  TextBox = Chili.TextBox
+  Colorbars = Chili.Colorbars
+  Window = Chili.Window
+  Panel = Chili.Panel
+  StackPanel = Chili.StackPanel
+  ScrollPanel = Chili.ScrollPanel
+  Image = Chili.Image
+  Progressbar = Chili.Progressbar
+  Control = Chili.Control
+  screen0 = Chili.Screen0
 	
-	if (not Spring.GetModOptions().zkmode) or (Spring.GetModOptions().zkmode ~= "takeover") then -- or Spring.GetSpectatingState() then -- ok i will allow spectators
-	    widgetHandler:RemoveWidget()
+  local screenWidth,screenHeight = Spring.GetWindowGeometry()
+  local minWidth = 420;
+  local minHeight = 90;
+  local help_minWidth = 310;
+  local help_minHeight = 360;
+  local vote_minWidth = 500;
+  local vote_minHeight = 380;
+  local nominate_minWidth = 370;
+  local nominate_minHeight = 360;
+  
+  help_title = Label:New {
+    y = 10;
+    autosize = false;
+    width = "80%";
+    align = "center";
+    height = 30;
+  }
+  help_button = Button:New {
+    width = 70,
+    height = 30,
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    y = "60%";
+    right = "3%";
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Help";
+    tooltip = "General help.";
+    OnMouseDown = {function()
+      if not help_window then
+	help_window = Window:New {
+	  name = 'takeover_help_window';
+	  color = {nil, nil, nil, 0.5},
+	  width = help_minWidth;
+	  height = help_minHeight;
+	  x = screenWidth*0.6+help_minWidth/2;
+	  y = screenHeight/4-help_minHeight/2;
+	  dockable = true;
+	  minimizable = false,
+	  draggable = true,
+	  resizable = false,
+	  tweakDraggable = true,
+	  tweakResizable = true,
+	  padding = {0, 0, 0, 0},
+	  minWidth = help_minWidth, 
+	  minHeight = help_minHeight,
+	  minimizable = false,
+	  children = {
+	    Button:New {
+	      width = 70,
+	      height = 30,
+	      padding = {0, 0, 0, 0},
+	      margin = {0, 0, 0, 0},
+	      y = 10;
+	      right = "5%";
+	      backgroundColor = {1, 1, 1, 0.4},
+	      caption = "Close";
+	      OnMouseDown = {function()
+		if help_window then
+		  screen0:RemoveChild(help_window);
+		  help_window = nil;
+		end
+	      end
+	      }
+	    },
+	    help_title,
+	    TextBox:New {
+	      y = 40,
+	      valign = "ascender",
+	      lineSpacing = 0,
+	      padding = { 15, 15, 15, 0 },
+	      text = "How-to, step by step.\n1) Decide on game rules using new nomination system. Each player may nominate his own set of rules, or vote for someone else's.\n2) Once the game begins, vote will end and most popular rules apply instantly.\n3) Before grace period timer hits 0, unit will not listen to owner's commands and will not attack anything either.\n4) You may capture unit by fully emping it and securing it with your forces (stay close to unit), you may lose ownership of unit, if enemy does the same thing you did to capture it.\nNote: you may not be able to lift unit using your transport, while timer is non 0.\nIf you have any suggestions or advices, please join Zero-K forum (development section) or find \"Ivica\" in #zk/#zkdev room in spring chat.\nHave fun!\nVersion: "..version..".";
+	      height = 100;
+	      width = "100%";
+	      --fontsize = 13;
+	    },
+	  }
+	}
+	local r = random(0,3)
+	if (r == 0) then
+	  help_title:SetCaption("Knowledge is power!")
+	  help_title.font:SetColor(red);
+	elseif (r == 1) then
+	  help_title:SetCaption("Guides are powerful!")
+	  help_title.font:SetColor(green);
+	elseif (r == 2) then
+	  help_title:SetCaption("I appreciate reading!")
+	  help_title.font:SetColor(yellow);
+	else
+	  help_title:SetCaption("Thanks for reading!")
+	  help_title.font:SetColor(cyan);
 	end
-	
-	-- setup Chili
-	Chili = WG.Chili
-	Button = Chili.Button
-	Label = Chili.Label
-	TextBox = Chili.TextBox
-	Colorbars = Chili.Colorbars
-	Window = Chili.Window
-	Panel = Chili.Panel
-	StackPanel = Chili.StackPanel
-	ScrollPanel = Chili.ScrollPanel
-	Image = Chili.Image
-	Progressbar = Chili.Progressbar
-	Control = Chili.Control
-	screen0 = Chili.Screen0
-	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local mwidth = 600;
-	local mheight = 580;
-	
-	local swidth = 200;
-	local sheight = 80;
-	
-	--stats_window, stats_panel, stats_timer
-	show_vote_window_button = Button:New {
-		width = 120,
+	screen0:AddChild(help_window);
+      elseif help_window then
+	screen0:RemoveChild(help_window);
+	help_window = nil;
+      end
+    end
+    }
+  }
+  results_label = Label:New {
+    y = "40%";
+    autosize = false;
+    width = "55%";
+    align = "center";
+    height = 20;
+    caption = "0 votes:";
+    fontsize = 10;
+    textColor = green;
+  }
+  results_stack = StackPanel:New {
+    y = "52%";
+    centerItems = true,
+    resizeItems = false;
+    orientation = "horizontal";
+    width = "55%";
+    height = 40;
+    padding = {0, 0, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+  }
+  for i=1,4 do
+    results_elements[i] = Image:New {
+      file   = "unitpics/fakeunit.png"; -- lol?
+      height = 40;
+      width = 40;
+    }
+  end
+  UpdateMostPopularStack()
+  vote_scroll = ScrollPanel:New{
+    y = 40,
+    width = "100%",
+    height = 100,
+    --height = "100%",
+    borderColor = {1, 1, 1, 0},
+    backgroundColor  = {0, 0, 0, 0},
+    padding = {8, 15, 8, 10},
+    --autosize = true,
+    scrollbarSize = 6,
+    horizontalScrollbar = false,
+    hitTestAllowEmpty = true,
+  }
+  nominate_advice = Label:New {
+    autosize = false;
+    width = "100%";
+    --align = "center";
+    height = 20;
+    caption = "Kudos to everyone!";
+  }
+  nominate_location = StackPanel:New {
+    centerItems = false,
+    resizeItems = false;
+    orientation = "vertical";
+    width = "100%";
+    height = 100;
+    padding = {0, 0, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+  }
+  Button:New {
+    parent = nominate_location;
+    width = 250;
+    height = 30;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Center of the map";
+    tooltip = loc_tooltip_array[1];
+    OnMouseDown = {function()
+      SetupUnitStack(0);
+    end
+    }
+  }
+  Button:New {
+    parent = nominate_location;
+    width = 250;
+    height = 30;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Player boxes";
+    tooltip = loc_tooltip_array[2];
+    OnMouseDown = {function()
+      SetupUnitStack(1);
+    end
+    }
+  }
+  Button:New {
+    parent = nominate_location;
+    width = 250;
+    height = 30;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "3 points across the map";
+    tooltip = loc_tooltip_array[3];
+    OnMouseDown = {function()
+      SetupUnitStack(2);
+    end
+    }
+  }
+  nominate_unit = StackPanel:New {
+    centerItems = false,
+    resizeItems = false;
+    orientation = "horizontal";
+    width = "100%";
+    height = "100%";
+    padding = {0, 0, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+  }
+  for id,unit in pairs(UnitList) do
+    nominate_unit_button[id] = Button:New {
+      height = 56;
+      width = 56;
+      padding = {0, 0, 0, 0},
+      margin = {0, 0, 0, 0},
+      caption = "";
+      tooltip = "Select "..UnitDefNames[unit].humanName.." as the unit(s) of choice.";
+      OnMouseDown = {function()
+	SetupGraceTime(unit)
+      end},
+      children={
+	Image:New {
+	file   = "unitpics/"..unit..".png"; -- lol?
+	height = 56;
+	width = 56;
+	},
+      },
+    }
+    nominate_unit:AddChild(nominate_unit_button[id]);
+  end
+  nominate_gracetime = StackPanel:New {
+    centerItems = false,
+    resizeItems = false;
+    orientation = "horizontal";
+    width = "100%";
+    height = "100%";
+    padding = {0, 0, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+  }
+  for id,time in pairs(GraceList) do
+    local delay_minutes = floor(time/60) -- TODO optimise this, this can be done lot better and faster
+    local delay_seconds = time-delay_minutes*60
+    local time_text = "   no\ndelay"
+    if (time > 0) then
+      if (0 == delay_seconds) and (delay_minutes > 0) then
+	time_text = delay_minutes.."m"
+      elseif (delay_minutes == 0) then
+	time_text = delay_seconds.."s"
+      else
+	time_text = delay_minutes.."m\n"..delay_seconds.."s"
+      end -- should be possible to do this much faster
+    end
+    nominate_grace_button[id] = Button:New {
+      height = 56;
+      width = 56;
+      padding = {0, 0, 0, 0},
+      margin = {0, 0, 0, 0},
+      caption = "";
+      tooltip = time.." seconds.";
+      OnMouseDown = {function()
+	SetupGodmode(time)
+      end},
+      children = {
+	Image:New {
+	  file   = "unitpics/fakeunit.png"; -- lol?
+	  height = 56;
+	  width = 56;
+	  children = {
+	    Label:New {
+	      autosize = false;
+	      align = "center";
+	      valign = "center";
+	      caption = time_text;
+	      height = 56,
+	      width = 56;
+	      fontsize=18;
+	      textColor = GetColorForDelay(time);
+	    };
+	  },
+	}
+      },
+    }
+    nominate_gracetime:AddChild(nominate_grace_button[id]);
+  end
+  nominate_godmode = StackPanel:New {
+    centerItems = false,
+    resizeItems = false;
+    orientation = "vertical";
+    width = "100%";
+    height = "100%";
+    padding = {0, 0, 0, 0},
+    itemMargin  = {5, 0, 0, 0},
+  }
+  Button:New {
+    parent = nominate_godmode;
+    width = 250;
+    height = 30;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Mortal";
+    tooltip = god_tooltip_array[1];
+    OnMouseDown = {function()
+      NominateMyChoice(0);
+    end
+    }
+  }
+  Button:New {
+    parent = nominate_godmode;
+    width = 250;
+    height = 30;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Immortal while emped or grace period";
+    tooltip = god_tooltip_array[2];
+    OnMouseDown = {function()
+      NominateMyChoice(1);
+    end
+    }
+  }
+  Button:New {
+    parent = nominate_godmode;
+    width = 250;
+    height = 30;
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Full immortality, when hp <= 10%";
+    tooltip = god_tooltip_array[3];
+    OnMouseDown = {function()
+      NominateMyChoice(2);
+    end
+    }
+  }
+  nominate_stack = StackPanel:New {
+    x=0; y=40;
+    centerItems = false,
+    resizeItems = false;
+    orientation = "vertical";
+    width = "100%";
+    height = "100%";
+--     backgroundColor = {1, 0, 0, 0.5},
+    padding = {5, 5, 5, 5},
+    itemMargin  = {5, 0, 0, 0},
+    children = {
+      nominate_advice,
+      nominate_location,
+    }
+  }
+  vote_menu_button = Button:New {
+    width = 90,
+    height = 30,
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    y = "60%";
+    right = "22%";
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Vote menu";
+    tooltip = "Click to bring up the vote menu, you may change the game mode's rules, before the match began.";
+    OnMouseDown = {function()
+      if not nominate_window then -- NOTE if nominate window is open, i can't reopen vote window, will probably change this is future.
+	if not vote_window then
+	  vote_window = Window:New {
+	    name = 'takeover_vote_window';
+	    color = {nil, nil, nil, 0.5},
+	    width = vote_minWidth;
+	    height = vote_minHeight;
+	    x = screenWidth/2-vote_minWidth/2;
+	    y = screenHeight/2-vote_minHeight/2;
+	    dockable = true;
+	    minimizable = false,
+	    draggable = true,
+	    resizable = false,
+	    tweakDraggable = true,
+	    tweakResizable = true,
+	    padding = {0, 0, 0, 0},
+	    minWidth = vote_minWidth, 
+	    minHeight = vote_minHeight,
+	    minimizable = false,
+	    children = {
+	      Button:New {
+		width = 70,
 		height = 30,
-		padding = {0, 0, 0,0},
+		padding = {0, 0, 0, 0},
 		margin = {0, 0, 0, 0},
-		y = 25;
-		right = 40;
+		y = 10;
+		right = "5%";
 		backgroundColor = {1, 1, 1, 0.4},
-		caption="Show vote menu";
-		tooltip = "Unminimize voting menu";
+		caption = "Close";
 		OnMouseDown = {function()
-			if vote_minimized then
-				vote_minimized = false;
-				screen0:AddChild(vote_window);
-				screen0:RemoveChild(show_vote_window_button);
-			end
-		end}
-	}
-	stats_window = Window:New{
-		minimizable = true,
-		parent = screen0,
-		name   = 'takeover_stats';
-		--color = {0, 0, 0, 0},
-		width = swidth;
-		height = sheight;
-		right = 30;
-		y = 100;
-		--x = screenWidth/2-swidth/2;
-		--y = screenHeight/2-sheight/2-10;
-		dockable = false;
-		draggable = true,
-		resizable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		minWidth = MIN_WIDTH, 
-		minHeight = MIN_HEIGHT,
-		padding = {0, 0, 0, 0},
-		--itemMargin  = {0, 0, 0, 0},
-		color = {1, 1, 1, 0.5},
-		--[[children = {
-		    show_vote_window_button,
-		}]]--
-	}
-	
-	vote_window = Window:New{
-		minimizable = true,
-		parent = screen0,
-		name   = 'takeover_votes';
-		--color = {0, 0, 0, 0},
-		width = mwidth;
-		height = mheight;
-		x = screenWidth/2-mwidth/2;
-		y = screenHeight/2-mheight/2-10;
-		dockable = false;
-		draggable = true,
-		resizable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		minWidth = MIN_WIDTH, 
-		minHeight = MIN_HEIGHT,
-		padding = {0, 0, 0, 0},
-		--itemMargin  = {0, 0, 0, 0},
-		color = {0.1, 0, 0.9, 0.7},
-	}
-	icon1 = Image:New {
-			x=240;
-			file   = unit_choice["detriment"].pic;
-			height = 36;
-			width = 36; }
-	text1 = Label:New{
-		x = 280;
-		autosize=false;
-		align="center";
-		--valign="top";
-		caption = "0 votes";
-		height = 36,
-		width = 50;
-	}
-	textd = Label:New{
-		height = 36; width = 36; fontsize=16; caption=VOTE_DEFAULT_CHOICE2; align="center"; valign="center"; textColor = GetColorForDelay(VOTE_DEFAULT_CHOICE2);
-	}
-	text2 = Label:New{
-		x = 380;
-		autosize=false;
-		align="center";
-		--valign="top";
-		caption = "0 votes";
-		height = 36,
-		width = 50;
-	}
-	icon2 = Image:New {
-			x=340;
-			file   = "unitpics/fakeunit.png";
-			height = 36;
-			width = 36;
-			children = {textd}, }
-	most_voted_panel = Panel:New{
-		y = vote_window.height-36;
-		parent = vote_window,
-		resizeItems = true;
-		orientation   = "vertical";
-		height = 36;
-		width =  "100%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, 0.5},
-		children = {	Label:New{
-			    autosize=false;
-			    x=100;
-			    --align="center";
-			    valign="center";
-			    caption = 'Most popular choice:';
-			    height = "100%",
-			    width = 150;
-		    },
-		    icon1,
-		    text1,
-		    icon2,
-		    text2,
-		}
-	}
-	panel_main = Panel:New{
-		parent = vote_window,
-		resizeItems = true;
-		orientation   = "vertical";
-		height = 16;
-		width =  "100%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-		backgroundColor = {0.1, 0, 0.9, 1},
-	}
-	vote_title = Label:New{
-		parent = panel_main,
-		autosize=false;
-		align="center";
-		--valign="top";
-		caption = 'Takeover Vote Display | Vote for gameplay options!';
-		height = 16,
-		width = "100%";
-	}
-	panel_for_stack = Panel:New{
-		y = 16,
-		parent = vote_window,
-		resizeItems = true;
-		orientation   = "vertical";
-		width = "60%";
-		height = vote_window.height-50,
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-		backgroundColor = {0, 0, 0, 0.5},
-		borderColor = {1,1,1,1},
-	}
-	choose_unit_text = "Choose unit:";
-	unit_stack_panel = StackPanel:New{
-		    y = 16;
-		    centerItems = false,
-		    resizeItems = false;
-		    orientation   = "horizontal";
-		    width = "100%";
-		    height = "100%",
-		    padding = {5, 5, 5, 5},
-		    itemMargin  = {5,0,0,0},
-		  };
-	choose_unit = Panel:New{
-		resizeItems = true;
-		orientation   = "vertical";
-		width = "100%";
-		height = 160,
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-		backgroundColor = {0, 0, 0, 1},
-		children = {
-		  Label:New{
-		    autosize=false;
-		    align="center";
-		    --valign="top";
-		    caption = choose_unit_text;
-		    height = 16,
-		    width = "100%";
-		  },
-		  unit_stack_panel,
-		}
-	}
-	choose_delay_text = "Choose delay (in seconds):";
-	delay_stack_panel = StackPanel:New{
-		    y = 16;
-		    centerItems = false,
-		    resizeItems = false;
-		    orientation   = "horizontal";
-		    width = "100%";
-		    height = "100%",
-		    padding = {5, 5, 5, 5},
-		    itemMargin  = {5,0,0,0},
-		  };
-	choose_delay = Panel:New{
-		resizeItems = true;
-		orientation   = "vertical";
-		width = "100%";
-		height = 110,
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-		backgroundColor = {0, 0, 0, 1},
-		children = {
-		  Label:New{
-		    autosize=false;
-		    align="center";
-		    --valign="top";
-		    caption = choose_delay_text;
-		    height = 16,
-		    width = "100%";
-		    },
-		  delay_stack_panel,
-		}
-	}
-	vote_button = Button:New {
-		width = 80,
-		height = 30,
-		padding = {0, 0, 0,0},
-		margin = {0, 0, 0, 0},
-		right = panel_for_stack.width/2;
-		backgroundColor = {1, 1, 1, 0.4},
-		caption="Vote!";
-		tooltip = "Relay your choice to others!";
-		OnMouseDown = {function() 
--- 				local notSpam = CheckForVoteSpam (os.clock())
--- 				    if notSpam then
--- 					Spring.SendCommands("say "..string_vote_for.." "..my_choice[0].." "..my_choice[1]) -- ok
--- 				    end -- i think it's allright to spam luarules but not spam chat :)
-		  -- whatever i don't see any reason to spam chat... maybe ally chat?
-					Spring.SendLuaRulesMsg(string_vote_for2.." "..my_choice[0].." "..my_choice[1]) -- lol...
-					Spring.SendLuaUIMsg(string_vote_for2.." "..my_choice[0].." "..my_choice[1]) -- lol?!
--- 				end
-			end}
-	}
-	minimize_button = Button:New {
-		width = 80,
-		height = 30,
-		padding = {0, 0, 0,0},
-		margin = {0, 0, 0, 0},
-		right = panel_for_stack.width/2-80;
-		backgroundColor = {1, 1, 1, 0.4},
-		caption="minimize";
-		tooltip = "Close this window";
-		OnMouseDown = {function() 
-		  if not vote_minimized then
-				screen0:RemoveChild(vote_window); vote_minimized = true;
-				stats_window:AddChild(show_vote_window_button)
+		  if vote_window then
+		    screen0:RemoveChild(vote_window);
+		    vote_window = nil;
 		  end
-			end}
-	}
-	panel_for_vote = Panel:New{
-		resizeItems = true;
-		orientation   = "vertical";
-		width = "100%";
-		height = 32,
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-		backgroundColor = {0, 0, 0, 0},
-		children = {
-		  minimize_button,
+		end
 		}
-	}
-	if not Spring.GetSpectatingState() then -- spectator no vote button for you
-	  panel_for_vote:AddChild(vote_button);
-	end
-	stack_panel = StackPanel:New {
-		x=0;y=0;
-		centerItems = false,
-		resizeItems = false;
-		--resizeItems = true;
-		orientation   = "vertical";
-		width = "100%";
-		height = vote_window.height-32,
+	      },
+	      Button:New {
+		width = 75,
+		height = 30,
 		padding = {0, 0, 0, 0},
-		itemMargin  = {5, 0, 0, 0},
-		children = {
-		  TextBox:New{
--- 		      autosize=false;
-		      --align="center";
-		      --valign="top";
-		      valign = "ascender",
-		      lineSpacing = 0,
-		      padding = { 5, 10, 5, 0 },
-		      text = "The rules are simple, all active players vote for desired options, before game's start.\n1) You may select 1 unit you want to spawn in the center of map.\n2) As well as time needed for this unit to become active.\n3) Any EMP damage to the unit changes it's current owner.\n4) On timer reaching 0 - current owner gets to keep the unit.\nMost popular options voted for - are on!\nChoose the unit and desired unit's dormant period, and press \"vote\".\nNote: if no team grabs the unit - unit will go bersek.\nVersion: "..version..".";
-		      height = 100;
-		      width = "100%";
-		      fontsize=13;
-		  },
-		  choose_unit,
-		  choose_delay,
-		  panel_for_vote,  
-		}
-	}
-	panel_for_stack:AddChild(stack_panel);
-	scroll_panel = ScrollPanel:New{
-	        y = 16,
-		x = "60%",
-		parent = vote_window,
-		width = "40%",
-		height = vote_window.height-50,
-		borderColor = {1,1,1,0},
-		--backgroundColor  = {1,1,1,0.5},
-		--borderColor = {1,1,1,options.backgroundOpacity.value},
-		padding = {0, 0, 0, 0},
-		--autosize = true,
-		scrollbarSize = 6,
-		horizontalScrollbar = false,
-		hitTestAllowEmpty = true,
-		children = {
-		  Label:New{
-		  autosize=false;
-		  align="center";
-		  --valign="top";
-		  caption = 'Player voted for:';
-		  height = 16,
-		  width = "100%";}
-		}
-	}
-	local color
-	for _,de in ipairs(delay_options) do
-	  if (de.delay == my_choice[1]) then color = green; else color = GetColorForDelay(de.delay, false); end
-	  vote_delay_button[de.id] = Button:New {
-		height = 40;
-		width = 40;
-		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		caption="";
+		y = 10;
+		x = "5%";
+		backgroundColor = {1, 1, 1, 0.4},
+		caption = "Nominate";
+		tooltip = "Nominate a new set of rules, if you don't agree with any of listed ones. Spectators can't nominate rules!";
+		-- NOTE the basic idea is that this menu minimises the nomination menu, yet it doesn't dispose of it!
 		OnMouseDown = {function()
-		  if (de.delay == my_choice[1]) then return end
-		  my_old_choice[1] = my_choice[1];
-		  my_choice[1] = de.delay;
-		  RecolorDelays(my_old_choice[1],my_choice[1]);
-		end},
-	  }
-	  AddTextToButton(vote_delay_button[de.id], de.id, de.delay, color)
-	  delay_stack_panel:AddChild(vote_delay_button[de.id]);
+		  if (not nominate_window) and (not Spring.GetSpectatingState()) then
+		    nominate_window = Window:New {
+		      name = 'takeover_nominate_window';
+		      color = {nil, nil, nil, 0.5},
+		      width = nominate_minWidth;
+		      height = nominate_minHeight;
+		      x = screenWidth*0.25-nominate_minWidth/2;
+		      y = screenHeight/2-nominate_minHeight/2;
+		      dockable = true;
+		      minimizable = false,
+		      draggable = true,
+		      resizable = false,
+		      tweakDraggable = true,
+		      tweakResizable = true,
+		      padding = {0, 0, 0, 0},
+		      minWidth = nominate_minWidth, 
+		      minHeight = nominate_minHeight,
+		      minimizable = false,
+		      children = {
+			Button:New {
+			  width = 70,
+			  height = 30,
+			  padding = {0, 0, 0, 0},
+			  margin = {0, 0, 0, 0},
+			  y = 10;
+			  right = "5%";
+			  backgroundColor = {1, 1, 1, 0.4},
+			  caption = "Close";
+			  tooltip = "Close and go back to nominate window,";
+			  OnMouseDown = {function()
+			    if nominate_window then
+			      screen0:AddChild(vote_window);
+			      UpdateNomListNOW();
+			      screen0:RemoveChild(nominate_window);
+			      nominate_window = nil;
+			    end
+			  end
+			  }
+			},
+			Label:New {
+			  y = 5;
+			  autosize = false;
+			  width = "70%";
+			  align = "center";
+			  height = 30;
+			  caption = "Click on the buttons, only 4 steps.\nPay attention what you choose.";
+			},
+			nominate_stack,
+		      }
+		    }
+		    nominate_advice:SetCaption("1) Choose TheUnit(s) starting location:")
+		    screen0:AddChild(nominate_window);
+		    if vote_window then
+		      screen0:RemoveChild(vote_window);
+		    end
+		  elseif nominate_window then
+		    screen0:RemoveChild(nominate_window);
+		    nominate_window = nil;
+		  end
+		end
+		}
+	      },
+	      Label:New {
+		y = 15;
+		autosize = false;
+		width = "100%";
+		align = "center";
+		height = 20;
+		caption = "Vote for options or nominate a new rules set!";
+	      },
+	      Label:New {
+		y = 35;
+		autosize = false;
+		width = "100%";
+		align = "center";
+		height = 20;
+		caption = "Hover over icons to get their description, click on the player name with the most satisfying rules.";
+		fontsize = 10;
+	      },
+	      vote_scroll,
+	    },
+	  }	  
+	  screen0:AddChild(vote_window);
+	  UpdateNomListNOW();
+	elseif vote_window then
+	  screen0:RemoveChild(vote_window);
+	  vote_window = nil;
 	end
-	for _,unit in pairs(unit_choice) do
-	  vote_unit_button[unit.id] = Button:New {
-		height = 64;
-		width = 64;
-		padding = {0, 0, 0,0},
-		margin = {0, 0, 0, 0},
-		caption="";
-		tooltip=unit.full_name;
-		OnMouseDown = {function()
-		  if (unit.name == my_choice[0]) then return end
-		  my_old_choice[0] = my_choice[0];
-		  my_choice[0] = unit.name;
-		end},
-		children={Image:New {
-			file   = unit.pic;
-			height = 64;
-			width = 64;
-		},},
-	  }
-	  unit_stack_panel:AddChild(vote_unit_button[unit.id]);
-	end
-	screen0:RemoveChild(vote_window) -- FIXME i just don't know if there is property to make window hidden from the begining
-	screen0:RemoveChild(stats_window)
+      end
+    end
+    }
+  }
+  if not Spring.GetSpectatingState() then
+  end
+  welcome_text = Label:New {
+    autosize = false;
+    width = "100%";
+    align = "center";
+    height = 40;
+    caption = "We welcome you to our new game mode! The Takeover "..version.."!\nPress \"Vote menu\" to vote for game mode rules.";
+  }
+  status_window = Window:New {
+    name = 'takeover_status_window';
+    color = {nil, nil, nil, 0.5},
+    width = minWidth;
+    height = minHeight;
+    x = screenWidth/2-minWidth/2;
+    y = screenHeight/5-minHeight/2;
+    dockable = true;
+    minimizable = true,
+    draggable = false,
+    resizable = false,
+    tweakDraggable = true,
+    tweakResizable = true,
+    padding = {0, 0, 0, 0},
+    minWidth = minWidth, 
+    minHeight = minHeight,
+    children = {
+      welcome_text,
+      results_label,
+      results_stack,
+      help_button,
+    }
+  }
+  screen0:AddChild(status_window)
+end
+
+function widget:Shutdown()
+  if (status_window) then
+    status_window:Dispose()
+  end
+  if (vote_window) then
+    vote_window:Dispose()
+  end
+  if (nominate_window) then
+    nominate_window:Dispose()
+  end
+  if (help_window) then
+    help_window:Dispose()
+  end
 end
 
 --------------------------------------------------------------------------------
