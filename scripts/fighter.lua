@@ -18,8 +18,11 @@ local SPEEDUP_FACTOR = 5
 ----------------------------------------------------------
 
 function SprintThread()
-
-	Sleep(1000)
+	for i=1,15 do
+		EmitSfx(ljet, 1027)
+		EmitSfx(rjet, 1027)
+		Sleep(66)
+	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
 	GG.UpdateUnitAttributes(unitID)
@@ -55,6 +58,8 @@ local function deactivate()
 	Move(lwing, x_axis, -WING_DISTANCE, 10)
 	Turn(rwing, y_axis, 0, math.rad(30))
 	Turn(lwing, y_axis, 0, math.rad(30))
+	Turn(ljet, y_axis, math.pi)
+	Turn(rjet, y_axis, math.pi)
 end
 
 function script.Create()

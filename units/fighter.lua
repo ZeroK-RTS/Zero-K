@@ -65,6 +65,7 @@ unitDef = {
       [[custom:MUZZLE_ORANGE]],
       [[custom:FF_PUFF]],
       [[custom:BEAMWEAPON_MUZZLE_RED]],
+      [[custom:FLAMER]],
     },
 
   },
