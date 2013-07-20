@@ -122,7 +122,7 @@ local UnitList = { "scorpion", "dante", "armraven", "armbanth", "corcrw", "armor
     "corgol", "corsumo", "armmanni", "armzeus", "armcrabe", "armcarry", "corbats", "armcomdgun", "armcybr", "corroy", "amphassault",
     "corhlt", "armanni", "cordoom", "cafus", "armbrtha", "corbhmth",
     "zenith", "mahlazer", "raveparty", "armcsa" }
-local GraceList = { 0, 15, 45, 90, 120, 240, 300, 450, 600, 750, 817, 900}
+local GraceList = { 0, 15, 45, 90, 120, 180, 240, 300, 450, 600, 750, 817, 900 }
 
 local my_choice = {}
 
@@ -332,7 +332,7 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
     padding = {0, 0, 0, 0},
     margin = {0, 0, 0, 0},
     caption = "";
-    tooltip = UnitDefs[nomi.unit].humanName;
+    tooltip = UnitDefs[nomi.unit].humanName..".";
     children = {
       Image:New {
 	file = "unitpics/"..UnitDefs[nomi.unit].name..".png";
@@ -484,7 +484,7 @@ local function UpdateMostPopularStack()
       padding = {0, 0, 0, 0},
       margin = {0, 0, 0, 0},
       caption = "";
-      tooltip = UnitDefs[unit].humanName;
+      tooltip = UnitDefs[unit].humanName..".";
       children = {
 	Image:New {
 	  file = "unitpics/"..UnitDefs[unit].name..".png";
@@ -1101,6 +1101,11 @@ end
 function widget:Initialize()
   local takeovermode = (Spring.GetModOptions().zkmode) == "takeover"
   
+  if (takeovermode == false) then
+    widgetHandler:RemoveWidget()
+    return
+  end
+  
   myAllyTeam = Spring.GetMyAllyTeamID()
   myTeam = Spring.GetMyTeamID()
   myPlayerID = Spring.GetMyPlayerID()
@@ -1652,12 +1657,7 @@ function widget:Initialize()
       help_button,
     }
   }
-  
-  if (takeovermode == false) then
-    widgetHandler:RemoveWidget()
-  else
-    screen0:AddChild(status_window)
-  end
+  screen0:AddChild(status_window)
 end
 
 function widget:Shutdown()

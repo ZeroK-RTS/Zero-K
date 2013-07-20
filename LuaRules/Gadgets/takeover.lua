@@ -45,7 +45,7 @@ local UnitList = { "scorpion", "dante", "armraven", "armbanth", "corcrw", "armor
     "corgol", "corsumo", "armmanni", "armzeus", "armcrabe", "armcarry", "corbats", "armcomdgun", "armcybr", "corroy", "amphassault",
     "corhlt", "armanni", "cordoom", "cafus", "armbrtha", "corbhmth",
     "zenith", "mahlazer", "raveparty", "armcsa" }
-local GraceList = { 0, 15, 45, 90, 120, 240, 300, 450, 600, 750, 817, 900}
+local GraceList = { 0, 15, 45, 90, 120, 180, 240, 300, 450, 600, 750, 817, 900 }
 
 local modOptions = Spring.GetModOptions()
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
