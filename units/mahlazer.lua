@@ -186,8 +186,8 @@ unitDef = {
       beamTime                = 0.001,
       canattackground         = false,
       coreThickness           = 0.5,
-      --craterBoost             = 2,
-      --craterMult              = 4,
+      craterBoost             = 0.01,
+      craterMult              = 0.01,
       cylinderTargeting      = 8192,
 
       damage                  = {
