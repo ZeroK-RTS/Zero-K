@@ -54,6 +54,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
   objectName             = [[fighter.s3o]],
+  script                 = [[fighter.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
