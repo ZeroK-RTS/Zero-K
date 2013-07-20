@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[gunshipaa]],
-  name                   = [[Vesper]],
-  description            = [[Air Defense Gunship]],
+  name                   = [[Trident]],
+  description            = [[AA Gunship]],
   acceleration           = 0.18,
   airStrafe              = 0,
   amphibious             = true,
@@ -31,7 +31,7 @@ unitDef = {
     --description_bp = [[Aeronave flutuadora agressora]],
     --description_fr = [[ADAV Pilleur]],
 	description_de = [[Flugabwehr Hubschrauber]],
-    helptext       = [[The Vesper is a moderately fast gunship that cuts down enemy aircraft with its pulse lasers.]],
+    helptext       = [[The Trident is a slow  gunship that cuts down enemy aircraft with missiles.]],
     --helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
     --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
 	--helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
@@ -135,7 +135,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Vesper]],
+      description      = [[Wreckage - Trident]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1250,
@@ -153,7 +153,7 @@ unitDef = {
 
     
     HEAP  = {
-      description      = [[Debris - Vesper]],
+      description      = [[Debris - Trident]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1250,

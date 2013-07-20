@@ -212,9 +212,38 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = (recentDamage/maxHealth) * 100
-	if severity < 100 then
+	if severity <= 25 then
+		Explode(middle, sfxExplode)
+		Explode(mhull, sfxNone)
+		Explode(rhull, sfxNone)
+		Explode(lhull, sfxNone)
+		return 1
+	elseif severity <= 50 then
+		Explode(middle, sfxExplode)
+		Explode(mhull, sfxExplode)
+		Explode(rhull, sfxExplode)
+		Explode(lhull, sfxExplode)
+		Explode(mwing, sfxExplode + sfxFall)
+		Explode(rwing, sfxExplode + sfxFall)
+		Explode(lwing, sfxExplode + sfxFall)
+		return 1
+	elseif severity <= 100 then
+		Explode(middle, sfxExplode)
+		Explode(mhull, sfxExplode + sfxFall)
+		Explode(rhull, sfxExplode + sfxFall)
+		Explode(lhull, sfxExplode + sfxFall)
+		Explode(mwing, sfxExplode + sfxFall + sfxSmoke)
+		Explode(rwing, sfxExplode + sfxFall + sfxSmoke)
+		Explode(lwing, sfxExplode + sfxFall + sfxSmoke)
 		return 1
 	else
+		Explode(middle, sfxExplode + sfxFall)
+		Explode(mhull, sfxExplode + sfxFall + sfxShatter)
+		Explode(rhull, sfxExplode + sfxFall + sfxShatter)
+		Explode(lhull, sfxExplode + sfxFall + sfxShatter)
+		Explode(mwing, sfxExplode + sfxFall + sfxSmoke + sfxFire)
+		Explode(rwing, sfxExplode + sfxFall + sfxSmoke + sfxFire)
+		Explode(lwing, sfxExplode + sfxFall + sfxSmoke + sfxFire)
 		return 2
 	end
 end
