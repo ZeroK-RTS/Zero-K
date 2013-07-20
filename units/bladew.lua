@@ -46,7 +46,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   mass                = 73,
-  maxDamage           = 300,
+  maxDamage           = 350,
   maxVelocity         = 7.5,
   minCloakDistance    = 75,
   noAutoFire          = false,
@@ -91,9 +91,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 400,
-        empresistant75 = 100,
-        empresistant99 = 4,
+        default        = 600,
       },
 
       duration                = 0.01,
@@ -131,7 +129,7 @@ unitDef = {
       description      = [[Wreckage - Gnat]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 300,
+      damage           = 350,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 1,
@@ -149,7 +147,7 @@ unitDef = {
       description      = [[Debris - Gnat]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 300,
+      damage           = 350,
       energy           = 0,
       footprintX       = 1,
       footprintZ       = 1,
