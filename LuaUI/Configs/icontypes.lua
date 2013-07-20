@@ -741,6 +741,10 @@ local icontypes = {
     bitmap='icons/gunship.png',
     size=2,
   },
+  gunshipaa = {
+    bitmap='icons/gunshipaa.png',
+    size=2,
+  },
   gunshipears = {
     bitmap='icons/gunshipears.png',
     size=2,

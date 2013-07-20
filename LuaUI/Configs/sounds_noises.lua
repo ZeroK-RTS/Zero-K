@@ -847,6 +847,14 @@ local sounds = {
 			[1] = "gunship_select",
 		},
 	},
+	gunshipaa = {
+		ok = {
+			[1] = "gunship_move",
+		},
+		select = {
+			[1] = "gunship_select",
+		},
+	},
 	corape = {
 		ok = {
 			[1] = "gunship_move",

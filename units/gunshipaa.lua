@@ -44,7 +44,7 @@ unitDef = {
   footprintX             = 3,
   footprintZ             = 3,
   hoverAttack            = true,
-  iconType               = [[gunship]],
+  iconType               = [[gunshipaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 208,
@@ -67,7 +67,7 @@ unitDef = {
   },
 
   side                   = [[CORE]],
-  sightDistance          = 600,
+  sightDistance          = 660,
   smoothAnim             = true,
   turnRate               = 0,
   workerTime             = 0,
