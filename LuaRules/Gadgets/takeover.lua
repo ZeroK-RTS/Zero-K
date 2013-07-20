@@ -546,7 +546,7 @@ local function GiveUnitToMostMetalPlayerNear(unit,allyTeam)
       winners[#winners+1] = team
     end
   end
-  spTransferUnit(unit, winners[random(1,#winners), false);
+  spTransferUnit(unit, winners[random(1,#winners)], false);
 end
 
 local function GiveUnitToMVP(unit,allyTeam) -- TODO rewrite this function to make it perfect, ideal, marvelous as it can ever be
