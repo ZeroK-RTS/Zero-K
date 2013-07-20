@@ -152,8 +152,6 @@ end
 
 function script.Create()	
 	--Turn(Base,y_axis, math.pi)	
-
-	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
 	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
 	
 	--set starting positions for turrets
