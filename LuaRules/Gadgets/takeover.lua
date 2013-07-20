@@ -122,7 +122,7 @@ local PollActive = false
 
 local PlayerList = {};
 local NominationList = {};
-local DEFAULT_CHOICE = {0, UnitDefNames["armzeus"].id, 240, 2} -- mortal dante (armorco) should probably fit better, but this zeus is immortal :)
+local DEFAULT_CHOICE = {0, UnitDefNames["armzeus"].id, 60, 2} -- mortal dante (armorco) should probably fit better, but this zeus is immortal :)
 local CAPTURE_RANGE = 256 -- capture range, you need to stand this close to begin unit capture process
 local MostPopularChoice = DEFAULT_CHOICE -- center map detriment that wakes up after 5 minutes and is immortal while emped or timer > 0
 
@@ -687,7 +687,6 @@ function gadget:GameFrame (f)
   end
 end
 
---function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
   if (MostPopularChoice[4] > 0) then
     local TheUnit
@@ -705,8 +704,14 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if (MostPopularChoice[4] == 2) then
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
 	    spSetUnitHealth(unitID, {health = health+floor(damage+1)}); -- you may ask yourself why, the answer is: i do not want to block emp/slow damage, if you know way to make this better, contact me
-	  elseif (health-damage < buttomhp) then
-	    spSetUnitHealth(unitID, {health = buttomhp+floor(health-buttomhp+1)});
+	  end
+	  if (health-damage < buttomhp) then
+	    spSetUnitHealth(unitID, {health = buttomhp});
+	    if (paralyzer) then
+	      spSetUnitHealth(unitID, {paralyze = paralyzeDamage+damage})
+	    end
+	    -- critical border line, all damage blocked, expect emp
+	    return 0
 	  end
 	elseif (MostPopularChoice[4] == 1) then
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
