@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Vesper]],
   description            = [[Air Defense Gunship]],
   acceleration           = 0.18,
+  airStrafe              = 0,
   amphibious             = true,
   bankingAllowed         = false,
   brakeRate              = 4.2,
@@ -27,7 +28,6 @@ unitDef = {
   cruiseAlt              = 130,
 
   customParams           = {
-    airstrafecontrol = [[1]],
     --description_bp = [[Aeronave flutuadora agressora]],
     --description_fr = [[ADAV Pilleur]],
 	description_de = [[Flugabwehr Hubschrauber]],
@@ -103,6 +103,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
+      fixedlauncher           = true,
       flightTime              = 3,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -116,70 +117,16 @@ unitDef = {
       soundStart              = [[weapon/missile/missile_fire7]],
       startVelocity           = 650,
       texture2                = [[AAsmoketrail]],
-      tolerance               = 9000,
+      tolerance               = 22000,
       tracks                  = true,
-      turnRate                = 63000,
+      turnRate                = 40000,
       turret                  = false,
-      weaponAcceleration      = 141,
+      weaponAcceleration      = 550,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 850,
+      weaponVelocity          = 750,
     },
 
   },
-  
-  weapons                = {
-  
-    {
-      def                = [[AA_LASER]],
-	  mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
-      --badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
-    },
-	
-  },
-
-  weaponDefs             = {
-  
-    AA_LASER      = {
-      name                    = [[Anti-Air Laser]],
-      areaOfEffect            = 16,
-      beamDecay               = 0.736,
-      beamTime                = 0.01,
-      beamttl                 = 15,
-      canattackground         = false,
-      coreThickness           = 0.5,
-      craterBoost             = 0,
-      craterMult              = 0,
-      cylinderTargeting      = 1,
-
-      damage                  = {
-        default = 3.5,
-        planes  = 35,
-        subs    = 1.75,
-      },
-
-      explosionGenerator      = [[custom:flash_teal7]],
-      fireStarter             = 100,
-      impactOnly              = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      laserFlareSize          = 3.25,
-      minIntensity            = 1,
-	  projectiles             = 2,
-      range                   = 700,
-      reloadtime              = 0.5,
-      rgbColor                = [[0 1 1]],
-      soundStart              = [[weapon/laser/rapid_laser]],
-      soundStartVolume        = 4,
-      thickness               = 3,
-      tolerance               = 8192,
-      turret                  = false,
-      weaponType              = [[BeamLaser]],
-    },
-	
-  },
-
 
   featureDefs            = {
 

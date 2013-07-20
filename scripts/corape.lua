@@ -47,8 +47,6 @@ end
 function script.FireWeapon(num)
 end
 
-
-
 function script.Shot(num) 
 	gun_1 = not gun_1
 end
