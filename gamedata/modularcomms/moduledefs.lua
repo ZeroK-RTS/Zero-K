@@ -558,6 +558,25 @@ upgrades = {
 		end,
 	},
 	
+	module_ultralight_hull = {
+		name = "Ultralight Hull",
+		description = "-1200 HP, +25% speed",
+		func = function(unitDef, attributeMods)
+				unitDef.maxdamage = unitDef.maxdamage - 1200
+				attributeMods.speed = attributeMods.speed + 0.25
+			end,
+	},
+	module_weapon_hicharge = {
+		name = "Weapon Hi-Charger",
+		description = "-1000 HP, +40% damage",
+		func = function(unitDef, attributeMods)
+				unitDef.maxdamage = unitDef.maxdamage - 1000
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					v.customparams.damagemod = v.customparams.damagemod + 0.4
+				end
+			end,
+	},	
 	-- modules that use a weapon slot
 	module_guardian_armor = {
 		name = "Guardian Defense System",
@@ -618,7 +637,7 @@ upgrades = {
 	
 	-- secret stuff!
 	module_econ = {
-		name = "Economy Module",
+		name = "Economy Package",
 		description = "Produces +2 energy and metal",
 		func = function(unitDef)
 				unitDef.energymake = (unitDef.energymake or 0) + 2
