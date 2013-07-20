@@ -280,7 +280,7 @@ local function NominateNewRule(playerID, name, line)
     };
   else -- if player is making a new nomination, destroy his previous nomination - make players abandon his new rules.
     local ThisPlayer = PlayerList[PID].nomination
-    if (NominationList[ThisPlayer].playerID == PID) then
+    if (NominationList[ThisPlayer].playerID == playerID) then
       for i=1,#PlayerList do
 	if (i ~= PID) then
 	  if (PlayerList[i].nomination == ThisPlayer) then
