@@ -122,7 +122,7 @@ local PollActive = false
 
 local PlayerList = {};
 local NominationList = {};
-local DEFAULT_CHOICE = {0, UnitDefNames["armzeus"].id, 60, 2} -- mortal dante (armorco) should probably fit better, but this zeus is immortal :)
+local DEFAULT_CHOICE = {0, UnitDefNames["armzeus"].id, 240, 2} -- mortal dante (armorco) should probably fit better, but this zeus is immortal :)
 local CAPTURE_RANGE = 256 -- capture range, you need to stand this close to begin unit capture process
 local MostPopularChoice = DEFAULT_CHOICE -- center map detriment that wakes up after 5 minutes and is immortal while emped or timer > 0
 
