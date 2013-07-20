@@ -76,6 +76,7 @@ function script.FireWeapon(num)
 	if num == 2 then
 		--FakeUprightTurn(unitID, xp, zp, base, predrop)
 		GG.Bomber_Dive_fired(unitID)
+		Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
 		Reload()
 	elseif num == 3 then
 		GG.Bomber_Dive_fake_fired(unitID)
