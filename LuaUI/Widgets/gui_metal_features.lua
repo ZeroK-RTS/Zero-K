@@ -35,7 +35,7 @@ local hilite = false
 local showecoMode = WG.showeco
 
 function widget:DrawWorld()
-  if (not hilite) and (spGetMapDrawMode() ~= 'metal') and (not showecoMode) then
+  if (not hilite) and (spGetMapDrawMode() ~= 'metal') and (not WG.showeco) then
     return
   end
 
