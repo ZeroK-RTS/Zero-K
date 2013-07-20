@@ -20,9 +20,9 @@ local isActive = false
 
 local shot = 0
 local gun = {
-	[0] = {query = mmissleflare},
-	[1] = {query = rmissleflare},
-	[2] = {query = lmissleflare},
+	[0] = {query = mmissleflare, missile = rmissile, rack = rrack},
+	[1] = {query = rmissleflare, missile = lmissile, rack = lrack},
+	[2] = {query = lmissleflare, missile = mmissile, rack = mrack},
 }
 
 local function restoreWings()
@@ -122,6 +122,10 @@ local function activate()
 	Move(mhull, z_axis, -2, 1)
 	Move(rhull, z_axis, -2, 1)
 	Move(lhull, z_axis, -2, 1)
+	
+	Move(mrack, y_axis, -2.5, 2)
+	Move(rrack, y_axis, -2.5, 2)
+	Move(lrack, y_axis, -2.5, 2)
 end
 
 local function deactivate()
@@ -133,6 +137,10 @@ local function deactivate()
 	Move(mhull, z_axis, 0, 1)
 	Move(rhull, z_axis, 0, 1)
 	Move(lhull, z_axis, 0, 1)
+	
+	Move(mrack, y_axis, 5, 5)
+	Move(rrack, y_axis, 5, 5)
+	Move(lrack, y_axis, 5, 5)
 end
 
 function script.Activate()
@@ -171,14 +179,12 @@ end
 	Move(rrack, z_axis, -4)
 	Move(lrack, z_axis, -4)
 	
-	Turn(lmissile, x_axis, math.rad(90))
-	
 	StartThread(SmokeUnit)
 	StartThread(TiltBody)
 end
 
 function script.QueryWeapon(num) 
-	return mmissleflare -- gun[shot].query
+	return gun[shot].query
 end
 
 function script.AimFromWeapon(num) 
@@ -189,8 +195,19 @@ function script.AimWeapon( num, heading, pitch )
 	return true
 end
 
-function script.FireWeapon(num)
--- FX goes here
+local function reload(num)
+	Sleep(2000)
+	if isActive then
+		Show(gun[num].missile)
+		Move(gun[num].rack, y_axis, -2.5, 4)
+	end
+end
+
+function script.Shot(num)
+	Hide(gun[shot].missile)
+	Move(gun[shot].rack, y_axis, 5, 4)
+	StartThread(reload,shot)
+	shot = (shot + 1)%3
 end
 
 function script.Killed(recentDamage, maxHealth)
