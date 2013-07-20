@@ -288,13 +288,16 @@ local function NominateNewRule(playerID, name, line)
 	  end
 	end
       end
-      NominationList[ThisPlayer].opts = { location, unit, grace, godmode };
-      NominationList[ThisPlayer].votes = 1;
+      NominationList[ThisPlayer] = {
+	playerID = playerID,
+	opts = { location, unit, grace, godmode },
+	votes = 1,
+      };
     else -- owner's nomination ain't player
       -- decrease vote amount on old nomination
       NominationList[ThisPlayer].votes = NominationList[ThisPlayer].votes - 1;
       -- create new nomination
-      local nom = #NominationList+1
+      local nom = ThisPlayer
       for i=1,#NominationList do
 	if (NominationList[i].opts[1] == location) and (NominationList[i].opts[2] == unit) and (NominationList[3].opts[1] == grace) and (NominationList[i].opts[4] == godmode) then
 	  -- oh there is
@@ -302,7 +305,7 @@ local function NominateNewRule(playerID, name, line)
 	  break
 	end
       end
-      if (nom == #NominationList+1) then
+      if (nom == ThisPlayer) then
 	NominationList[nom] = {
 	  playerID = playerID,
 	  opts = { location, unit, grace, godmode },
@@ -311,7 +314,7 @@ local function NominateNewRule(playerID, name, line)
       else
 	NominationList[nom].votes = NominationList[nom].votes + 1
       end
-      PlayerList[i].nomination = NominationList[nom]
+      PlayerList[PID].nomination = nom
     end
   end
   UpdatePollData()
