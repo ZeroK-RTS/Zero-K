@@ -6,6 +6,9 @@ local oneClickWepDefNames = {
 	corcrw = {
 		{ functionToCall = "ClusterBomb", reloadTime = 854, name = "Carpet Bomb", tooltip = "Drop a huge number of bombs in a circle under the Krow", weaponToReload = 3,},
 	},
+	fighter = {
+		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed Boost", useSpecialReloadFrame = true, weaponToReload = 3,},
+	},
 }
 
 

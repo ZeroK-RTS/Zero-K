@@ -150,7 +150,7 @@ local barColors = {
   build   = { 0.75,0.75,0.75,barAlpha },
   stock   = { 0.50,0.50,0.50,barAlpha },
   reload  = { 0.00,0.60,0.60,barAlpha },
-  reload2 = { 1.00,0.60,0.00,barAlpha },
+  reload2 = { 0.70,0.30,0.00,barAlpha },
   jump    = { 0.00,0.60,0.60,barAlpha },
   sheath  = { 0.00,0.20,1.00,barAlpha },
   fuel    = { 0.70,0.30,0.00,barAlpha },
@@ -745,13 +745,13 @@ do
       end
 
 	  --// SPECIAL WEAPON
-	  --[[
+	  
 	  local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
       if (specialReloadState and specialReloadState > gameFrame) then
 		local special = 1-(specialReloadState-gameFrame)/(ud.customParams.specialreloadtime or 1*30)
-        AddBar("special reload",special,"reload2",(fullText and floor(special*100)..'%') or '')
+        AddBar("ability",special,"reload2",(fullText and floor(special*100)..'%') or '')
       end	  
-	  ]]--
+	  
 	  
       --// RELOAD
       if (ci.reloadTime>=options.minReloadTime.value) then

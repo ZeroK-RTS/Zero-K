@@ -13,6 +13,34 @@ local flare = {
 	[1] = flare2,
 }
 
+local SPEEDUP_FACTOR = 5
+
+----------------------------------------------------------
+
+function SprintThread()
+
+	Sleep(1000)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
+	GG.UpdateUnitAttributes(unitID)
+	GG.UpdateUnitAttributes(unitID)
+	
+	Turn(rwing, y_axis, 0, math.rad(100))
+	Turn(lwing, y_axis, 0, math.rad(100))
+end
+
+function Sprint()
+	Turn(rwing, y_axis, math.rad(65), math.rad(300))
+	Turn(lwing, y_axis, math.rad(-65), math.rad(300))
+
+	StartThread(SprintThread)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)	
+	Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 3)
+	GG.attUnits[unitID] = true
+	GG.UpdateUnitAttributes(unitID)
+	GG.UpdateUnitAttributes(unitID)
+end
+
 ----------------------------------------------------------
 
 local WING_DISTANCE = 8
@@ -25,6 +53,8 @@ end
 local function deactivate()
 	Move(rwing, x_axis, WING_DISTANCE, 10)
 	Move(lwing, x_axis, -WING_DISTANCE, 10)
+	Turn(rwing, y_axis, 0, math.rad(30))
+	Turn(lwing, y_axis, 0, math.rad(30))
 end
 
 function script.Create()

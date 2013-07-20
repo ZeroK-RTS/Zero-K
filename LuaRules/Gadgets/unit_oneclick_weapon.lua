@@ -102,7 +102,8 @@ end
 local function doTheCommand(unitID, unitDefID, num)
 	local data = defs[unitDefID] and defs[unitDefID][num]
 	if (data) then
-		local currentReload = data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")
+		local currentReload = (data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")) or
+			(data.useSpecialReloadFrame and Spring.GetUnitRulesParam(unitID, "specialReloadFrame"))
 		local frame = Spring.GetGameFrame()
 		--if (reloadFrame[unitID][num] <= frame and not spGetUnitIsDead(unitID)) then
 		if ((not currentReload or currentReload <= frame) and select(5, spGetUnitHealth(unitID)) == 1 and not spGetUnitIsDead(unitID)) then
@@ -119,6 +120,10 @@ local function doTheCommand(unitID, unitDefID, num)
 				--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
 				--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
 				Spring.SetUnitWeaponState(unitID, data.weaponToReload, "reloadState", reloadFrameVal)
+			end
+			if (data.reloadTime and data.useSpecialReloadFrame) then
+				local reloadFrameVal = frame + data.reloadTime
+				Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, {inlos = true})
 			end
 			return true
 		end
