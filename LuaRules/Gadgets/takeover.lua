@@ -47,11 +47,6 @@ local UnitList = { "scorpion", "dante", "armraven", "armbanth", "corcrw", "armor
     "zenith", "mahlazer", "raveparty", "armcsa" }
 local GraceList = { 0, 15, 45, 90, 120, 240, 300, 450, 600, 750, 817, 900}
 
-local string_vote_start = "takeover_vote_start";
-local string_vote_end = "takeover_vote_end";
-local string_takeover_owner = "takeover_new_owner";
-local string_takeover_unit_died = "takeover_unit_dead"
-
 local modOptions = Spring.GetModOptions()
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local squareSize      = Game.squareSize
@@ -94,7 +89,7 @@ local spGetTeamList	    = Spring.GetTeamList
 local spEcho                = Spring.Echo
 
 local spGetPlayerInfo	    = Spring.GetPlayerInfo
-local GetAllyTeamList	    = Spring.GetAllyTeamList
+local spGetAllyTeamList	    = Spring.GetAllyTeamList
 
 local CMD_MOVE_STATE	= CMD.MOVE_STATE
 local CMD_FIRE_STATE	= CMD.FIRE_STATE
@@ -317,9 +312,7 @@ local function hqHeightMapFunc(centerX, centerZ, terraHeight) -- function stolen
   for z = -size, size, squareSize do
     for x = -size, size, squareSize do
       wantedHeight = centerHeight + min((size - max(abs(x), abs(z))) * (terraHeight / 64), terraHeight)
---       if (wantedHeight > spGetGroundHeight(centerX + x, centerZ + z)) then
       spSetHeightMap(centerX + x, centerZ + z, wantedHeight)
---       end
     end
   end
 end
@@ -357,14 +350,6 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   else
     spSetGameRulesParam("takeover_winner_owner", 0)
   end
---   if (#NominationList > 0) then
---     MostPopularChoice = {
---       NominationList[MostPopularChoice][1],
---       NominationList[MostPopularChoice][2],
---       NominationList[MostPopularChoice][3],
---       NominationList[MostPopularChoice][4],
---     };
---   end
   spSetGameRulesParam("takeover_winner_opts1", MostPopularChoice[1])
   spSetGameRulesParam("takeover_winner_opts2", MostPopularChoice[2])
   spSetGameRulesParam("takeover_winner_opts3", MostPopularChoice[3])
@@ -399,7 +384,7 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   local SpawnPos = { { mapWidth/2, mapHeight/2 } } -- center, if map has no spawn boxes, then it's this
   
   local SpawnBoxes = {} -- TODO this code needs rewrite
-  for _,allyTeam in ipairs(GetAllyTeamList()) do
+  for _,allyTeam in ipairs(spGetAllyTeamList()) do
     local x1, z1, x2, z2 = spGetAllyTeamStartBox(allyTeam)
     if x1 then
       local width = abs(x2-x1)
