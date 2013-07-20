@@ -262,9 +262,11 @@ function Ribbon:Update(n)
       end
     end
   else
+    -- when uncommented this allows trails to decay along their length by age after unit dies
+    -- but may cause glitches
     local lastIndex = self.posIdx 
-    self.posIdx = (self.posIdx % self.size)+1
-    self.oldPos[self.posIdx] = self.oldPos[lastIndex]
+    --self.posIdx = (self.posIdx % self.size)+1
+    --self.oldPos[self.posIdx] = self.oldPos[lastIndex]
     self.blendfactor = self.blendfactor - n * self.decayRate
   end
 end
