@@ -153,9 +153,9 @@ unitDef = {
       cylinderTargeting       = 6,
 
       damage                  = {
-        default = 11,
-        planes  = 200,
-        subs    = 11,
+        default = 15,
+        planes  = 150,
+        subs    = 15,
       },
 
       explosionGenerator      = [[custom:WEAPEXP_PUFF]],

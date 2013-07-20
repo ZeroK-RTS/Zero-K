@@ -25,7 +25,7 @@ unitDef = {
   collisionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
-  cruiseAlt              = 130,
+  cruiseAlt              = 110,
 
   customParams           = {
     --description_bp = [[Aeronave flutuadora agressora]],
@@ -48,7 +48,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 208,
-  maxDamage              = 1250,
+  maxDamage              = 1500,
   maxVelocity            = 3,
   minCloakDistance       = 75,
   noAutoFire             = false,
@@ -96,8 +96,8 @@ unitDef = {
       cylinderTargeting       = 1,
 
       damage                  = {
-        default = 7,
-        planes  = 70,
+        default = 12,
+        planes  = 120,
         subs    = 3.5,
       },
 
@@ -110,8 +110,8 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_fury.s3o]],
       noSelfDamage            = true,
-      range                   = 880,
-      reloadtime              = 2,
+      range                   = 750,
+      reloadtime              = 1.15,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],

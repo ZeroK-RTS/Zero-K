@@ -199,13 +199,13 @@ local function reload(num)
 	Sleep(2000)
 	if isActive then
 		Show(gun[num].missile)
-		Move(gun[num].rack, y_axis, -2.5, 4)
+		Move(gun[num].rack, y_axis, -2.5, 5)
 	end
 end
 
 function script.Shot(num)
 	Hide(gun[shot].missile)
-	Move(gun[shot].rack, y_axis, 5, 4)
+	Move(gun[shot].rack, y_axis, 5, 5)
 	StartThread(reload,shot)
 	shot = (shot + 1)%3
 end
