@@ -636,7 +636,7 @@ function gadget:GameFrame (f)
 	  end
 	    -- I can check for most score in same gameframe :)
 	  for allyteam,sc in pairs(MostMetalOwnerData[i]) do
-	    if (sc == 3) then
+	    if (sc == 9) then
 	      GiveUnitToMVP(TheUnit,allyteam) -- that is if winner is only one... it should be one, right?
 	      break
 	    end
@@ -685,8 +685,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
       end
     end
-  else
-    gadgetHandler:RemoveCallIn("UnitPreDamaged")
   end
 end
 
