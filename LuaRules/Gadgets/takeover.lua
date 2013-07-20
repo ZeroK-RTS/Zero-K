@@ -223,8 +223,8 @@ local function PlayerAgreeWith(playerID, name, line)
   for word in line:gmatch("[^%s]+") do words[#words+1]=word end
   if (#words ~= 2) then return end
   local Nominator = tonumber(words[2])
-  local notfound, TPID = GetPlayerPID(Nominator)
-  if notfound then return end
+  local TPID = GetPlayerPID(Nominator)
+  if TPID == -1 then return end
   local PID = GetPlayerPID(playerID)
   if PID == -1 then
     PlayerList[#PlayerList+1] = {

@@ -186,10 +186,6 @@ local function GetTimeFormatted(time, addzeros)
 end
 
 local function AnnounceMyChoice(choice)
-  if (default_nomination ~= nil) then
-    vote_scroll:RemoveChild(default_nomination)
-    default_nomination = nil
-  end
   Spring.SendLuaRulesMsg("takeover_nominate "..choice[1].." "..choice[2].." "..choice[3].." "..choice[4])
   -- announce choice in chat
   local loc_text = "at center";
@@ -412,6 +408,10 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
     default_nomination = nomi.stack
     vote_scroll:AddChild(default_nomination);
   else
+    if (default_nomination ~= nil) then
+      vote_scroll:RemoveChild(default_nomination)
+      default_nomination = nil
+    end
     vote_scroll:AddChild(nomi.stack);
   end
 end
