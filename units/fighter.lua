@@ -47,7 +47,7 @@ unitDef = {
   maneuverleashlength    = [[1280]],
   mass                   = 114,
   maxAcc                 = 0.5,
-  maxDamage              = 350,
+  maxDamage              = 400,
   maxVelocity            = 13,
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 3 0]],
@@ -151,7 +151,7 @@ unitDef = {
 
       damage                  = {
         default = 11,
-        planes  = 220,
+        planes  = 200,
         subs    = 11,
       },
 
@@ -179,7 +179,7 @@ unitDef = {
       texture2                = [[AAsmoketrail]],
       tolerance               = 22000,
       tracks                  = true,
-      turnRate                = 30000,
+      turnRate                = 40000,
       weaponAcceleration      = 550,
       weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],

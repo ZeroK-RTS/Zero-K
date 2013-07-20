@@ -11,8 +11,8 @@ local weapons = {
 -- bombers to track
 local units = {
 	corshad = {
-		diveDamage = 1200,
-		diveHeight = 120,
+		diveDamage = 600,
+		diveHeight = 80,
 		orgHeight = UnitDefNames["corshad"].wantedHeight*FUDGE_FACTOR,
 	},
 }

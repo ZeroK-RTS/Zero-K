@@ -47,7 +47,7 @@ unitDef = {
   mass                   = 187,
   maxAcc                 = 0.5,
   maxDamage              = 1100,
-  maxVelocity            = 9.5,
+  maxVelocity            = 7.8,
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 8 2]],
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
@@ -92,8 +92,8 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 1.35,
-        planes  = 13.5,
+        default = 1.1,
+        planes  = 11,
         subs    = 0.675,
       },
 
