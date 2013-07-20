@@ -404,46 +404,47 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
     end
   end
   
-  if (#SpawnBoxes > 0) and (MostPopularChoice[1] > 0) then
-    if (MostPopularChoice[1] == 1) then
-      SpawnPos = {}
-      for i=1,#SpawnBoxes do
-	SpawnPos[i] = { SpawnBoxes[i].centerx, SpawnBoxes[i].centerz }
-      end
-    else -- this is kinda harder, need to detrimine 2 farthest centers x,y, and make units pos across
-      local best_pair = nil
-      for i=1,#SpawnBoxes do
-	for j=1,#SpawnBoxes do
-	  if (i~=j) then
-	    if (best_pair == nil) then
-	      best_pair = { i, j, disSQ(SpawnBoxes[i].x,SpawnBoxes[i].z,SpawnBoxes[j].x,SpawnBoxes[j].z) }
-	    else
-	      local my_dist = disSQ(SpawnBoxes[i].x,SpawnBoxes[i].z,SpawnBoxes[j].x,SpawnBoxes[j].z)
-	      if (my_dist > best_pair[3]) then
-		best_pair = { i, j, my_dist }
-	      end
-	    end
-	  end
-	end
-      end
-      -- now i need to determine farthest points
-      -- verticaly?
-      local ver_dist = disSQ(mapWidth/2, SpawnBoxes[best_pair[1]].centerx, mapHeight*0.75, SpawnBoxes[best_pair[2]].centerz) + disSQ(mapWidth/2, SpawnBoxes[best_pair[1]].centerx, mapHeight*0.75, SpawnBoxes[best_pair[2]].centerz)
-      local hor_dist = disSQ(mapWidth*0.75, SpawnBoxes[best_pair[1]].centerx, mapHeight/2, SpawnBoxes[best_pair[2]].centerz) + disSQ(mapWidth*0.75, SpawnBoxes[best_pair[1]].centerx, mapHeight/2, SpawnBoxes[best_pair[2]].centerz)
-      if (ver_dist > hor_dist) then
-	SpawnPos = {
-	  {mapWidth/2, mapHeight*0.25},
-	  {mapWidth/2, mapHeight/2},
-	  {mapWidth/2, mapHeight*0.75},
-	}
-      else -- apparently horizontally is better
-	SpawnPos = {
-	  {mapWidth*0.25, mapHeight/2},
-	  {mapWidth/2, mapHeight/2},
-	  {mapWidth*0.75, mapHeight/2},
-	}
-      end
+  if (#SpawnBoxes > 0) and (MostPopularChoice[1] == 1) then
+--     if (MostPopularChoice[1] == 1) then
+    SpawnPos = {}
+    for i=1,#SpawnBoxes do
+      SpawnPos[i] = { SpawnBoxes[i].centerx, SpawnBoxes[i].centerz }
     end
+      -- TODO commented code below doesn't work, but i would like it to work, maybe someday i will fix it
+--     else -- this is kinda harder, need to detrimine 2 farthest centers x,y, and make units pos across
+--       local best_pair = nil
+--       for i=1,#SpawnBoxes do
+-- 	for j=1,#SpawnBoxes do
+-- 	  if (i~=j) then
+-- 	    if (best_pair == nil) then
+-- 	      best_pair = { i, j, disSQ(SpawnBoxes[i].x,SpawnBoxes[i].z,SpawnBoxes[j].x,SpawnBoxes[j].z) }
+-- 	    else
+-- 	      local my_dist = disSQ(SpawnBoxes[i].x,SpawnBoxes[i].z,SpawnBoxes[j].x,SpawnBoxes[j].z)
+-- 	      if (my_dist > best_pair[3]) then
+-- 		best_pair = { i, j, my_dist }
+-- 	      end
+-- 	    end
+-- 	  end
+-- 	end
+--       end
+--       -- now i need to determine farthest points
+--       -- verticaly?
+--       local ver_dist = disSQ(mapWidth/2, SpawnBoxes[best_pair[1]].centerx, mapHeight*0.75, SpawnBoxes[best_pair[2]].centerz) + disSQ(mapWidth/2, SpawnBoxes[best_pair[1]].centerx, mapHeight*0.75, SpawnBoxes[best_pair[2]].centerz)
+--       local hor_dist = disSQ(mapWidth*0.75, SpawnBoxes[best_pair[1]].centerx, mapHeight/2, SpawnBoxes[best_pair[2]].centerz) + disSQ(mapWidth*0.75, SpawnBoxes[best_pair[1]].centerx, mapHeight/2, SpawnBoxes[best_pair[2]].centerz)
+--       if (ver_dist > hor_dist) then
+-- 	SpawnPos = {
+-- 	  {mapWidth/2, mapHeight*0.25},
+-- 	  {mapWidth/2, mapHeight/2},
+-- 	  {mapWidth/2, mapHeight*0.75},
+-- 	}
+--       else -- apparently horizontally is better
+-- 	SpawnPos = {
+-- 	  {mapWidth*0.25, mapHeight/2},
+-- 	  {mapWidth/2, mapHeight/2},
+-- 	  {mapWidth*0.75, mapHeight/2},
+-- 	}
+--       end
+--     end
   elseif (MostPopularChoice[1] == 2) then
     local horizon = 0
     if (mapWidth == mapHeight) then

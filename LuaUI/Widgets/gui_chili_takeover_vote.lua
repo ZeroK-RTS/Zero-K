@@ -212,16 +212,16 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
   local loc_text = "center";
   if (nomi.location == 1) then
     loc_text = "spawn\n box";
-  elseif (location == 2) then
+  elseif (nomi.location == 2) then
     loc_text = "across\n  map";
   end
   local delay_minutes, delay_seconds, time_text = GetTimeFormatted(nomi.grace, false)
   local god_text = "mortal";
   local god_color = white;
-  if (godmode == 1) then
+  if (nomi.godmode == 1) then
     god_text = " semi-\nmortal";
     god_color = yellow;
-  elseif (godmode == 2) then
+  elseif (nomi.godmode == 2) then
     god_text = "god-\nlike";
     god_color = red
   end
