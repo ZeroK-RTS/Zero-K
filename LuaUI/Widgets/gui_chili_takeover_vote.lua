@@ -989,7 +989,7 @@ end
 
 function FigureOutHowToDrawACyrcleYeahNiceIdea( x, y, z, range) -- this code was stolen from defence range widget
   local rangeLineStrip = {}
-  local yGround = Spring.GetGroundHeight( x,z)
+  local yGround = Spring.GetGroundHeight(x,z)
   for i = 1,40 do
     local radians = 2.0 * PI * i / 40
     local rad = range
@@ -1052,44 +1052,46 @@ function widget:DrawWorld()
   if not Spring.IsGUIHidden() then
     for i=1,TheUnitCount do
       local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-      if (visible[unit]) then
+      if (unit > 0) and (visible[unit]) then
 	local team = Spring.GetGameRulesParam("takeover_team_unit"..i)
 	local allyteam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
-	local x,y,z = Spring.GetUnitPosition(unit)
-	local color = red
-	if (allyteam == myAllyTeam) then
-	  if (team ~= myTeam) then
-	    color = green
-	  else
-	    color = cyan
-	  end
-	elseif (allyteam == GaiaAllyTeamID) then
-	  color = white
-	end
-	if (under_siege[i] == 1) then
+	if (Spring.ValidUnitID(unit)) then
+	  local x,y,z = Spring.GetUnitPosition(unit)
+	  local color = red
 	  if (allyteam == myAllyTeam) then
-	    color = yellow;
+	    if (team ~= myTeam) then
+	      color = green
+	    else
+	      color = cyan
+	    end
 	  elseif (allyteam == GaiaAllyTeamID) then
-	    color = green;
-	  else
-	    color = orange;
+	    color = white
 	  end
+	  if (under_siege[i] == 1) then
+	    if (allyteam == myAllyTeam) then
+	      color = yellow;
+	    elseif (allyteam == GaiaAllyTeamID) then
+	      color = green;
+	    else
+	      color = orange;
+	    end
+	  end
+	  glDepthTest(true)
+	  
+	  glColor(color[1], color[2], color[3], 0.7)
+	  glLineWidth(2.5)
+	  glBeginEnd(GL_LINE_STRIP, BuildVertexList, FigureOutHowToDrawACyrcleYeahNiceIdea(x,y,z, CAPTURE_RANGE))
+	  
+	  local heading = Spring.GetUnitHeading(unit)
+	  if heading then
+	    local rot = (heading / 32768) * 180
+	    local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
+	    local name = GetPlayerName(owner,team,isAI)
+	    glDrawFuncAtUnit(unit, false, DrawUnitOwner, unit, color, name, rot)
+	  end
+	  
+	  glDepthTest(false)
 	end
-	glDepthTest(true)
-	
-	glColor(color[1], color[2], color[3], 0.7)
-	glLineWidth(2.5)
-	glBeginEnd(GL_LINE_STRIP, BuildVertexList, FigureOutHowToDrawACyrcleYeahNiceIdea(x,y,z, CAPTURE_RANGE))
-	
-	local heading = Spring.GetUnitHeading(unit)
-	if heading then
-	  local rot = (heading / 32768) * 180
-	  local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
-	  local name = GetPlayerName(owner,team,isAI)
-	  glDrawFuncAtUnit(unit, false, DrawUnitOwner, unit, color, name, rot)
-	end
-	
-	glDepthTest(false)
       end
     end
   end

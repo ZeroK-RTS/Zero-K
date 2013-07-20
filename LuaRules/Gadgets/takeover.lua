@@ -515,6 +515,40 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   spSetGameRulesParam("takeover_vote", 0) -- UNCOMMENT ME
 end
 
+local function GiveUnitToMostMetalPlayerNear(unit,allyTeam)
+  local x,_,z = spGetUnitPosition(TheUnit)
+  local units = spGetUnitsInCylinder(x, z, CAPTURE_RANGE)
+  local score = {}
+  local TheUnitTeam = spGetUnitTeam(unit)
+  if (#units > 0) then
+    for j=1,#units do
+      local unitID = units[j]
+      if (unitID ~= TheUnit) then
+	local unitTeam = spGetUnitTeam(unitID)
+	if (unitTeam ~= TheUnitTeam) then
+	  if (score[unitTeam] == nil) then
+	    score[unitTeam] = 0
+	  end
+	  score[unitTeam] = score[unitTeam] + UnitDefs[spGetUnitDefID(unitID)].metalCost;
+	end
+      end
+    end
+  end
+  local best_score
+  for _,sc in pairs(score) do -- TODO get rid of the pairs and replace with smth like for i=1,n do
+    if (best_score == nil) or (sc > best_score) then
+      best_score = sc
+    end
+  end
+  local winners = {}
+  for team,sc in pairs(score) do -- TODO get rid of the pairs and replace with smth like for i=1,n do
+    if (best_score == sc) then
+      winners[#winners+1] = team
+    end
+  end
+  spTransferUnit(unit, winners[random(1,#winners), false);
+end
+
 local function GiveUnitToMVP(unit,allyTeam) -- TODO rewrite this function to make it perfect, ideal, marvelous as it can ever be
   local teams = {}
   for _,t in pairs(spGetTeamList()) do
@@ -596,7 +630,7 @@ function gadget:GameFrame (f)
 	if (emp >= 1) then
 	  if (MostMetalOwnerData[i] == nil) then MostMetalOwnerData[i] = {} end
 	  spSetGameRulesParam("takeover_siege_unit"..i, 1)
-    	  local x,y,z = spGetUnitPosition(TheUnit)
+    	  local x,_,z = spGetUnitPosition(TheUnit)
 	  local units = spGetUnitsInCylinder(x, z, CAPTURE_RANGE)
 	  local score = {}
 	  if (#units > 0) then
@@ -637,7 +671,8 @@ function gadget:GameFrame (f)
 	    -- I can check for most score in same gameframe :)
 	  for allyteam,sc in pairs(MostMetalOwnerData[i]) do
 	    if (sc == 9) then
-	      GiveUnitToMVP(TheUnit,allyteam) -- that is if winner is only one... it should be one, right?
+-- 	      GiveUnitToMVP(TheUnit,allyteam) -- that is if winner is only one... it should be one, right?
+	      GiveUnitToMostMetalPlayerNear(TheUnit,allyteam)
 	      break
 	    end
 	  end
@@ -663,16 +698,15 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	  return 0; -- negates dommi damage awwwright
         end
 	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
+	local buttomhp = maxHealth/10
 	local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
 	local emp = (paralyzeDamage or 0)/empHP
 	local hp  = (health or 0)/maxHealth
 	if (MostPopularChoice[4] == 2) then
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
 	    spSetUnitHealth(unitID, {health = health+floor(damage+1)}); -- you may ask yourself why, the answer is: i do not want to block emp/slow damage, if you know way to make this better, contact me
-	  elseif (maxHealth/10 > health) then 
-	    spSetUnitHealth(unitID, {health = maxHealth/10+floor(damage+1)});
-	  elseif (health-damage < maxHealth/10) then
-	    spSetUnitHealth(unitID, {health = maxHealth/10+floor(health-maxHealth/10+1)});
+	  elseif (health-damage < buttomhp) then
+	    spSetUnitHealth(unitID, {health = buttomhp+floor(health-buttomhp+1)});
 	  end
 	elseif (MostPopularChoice[4] == 1) then
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
