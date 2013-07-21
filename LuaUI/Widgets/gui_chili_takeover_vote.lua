@@ -161,6 +161,22 @@ local function GetColorForDelay(delay)
   return white;
 end
 
+local function GetTimeFormatted2(time)
+  local delay_minutes = floor(time/60) -- TODO optimise this, this can be done lot better and faster
+  local delay_seconds = time-delay_minutes*60
+  local time_text = "no delay"
+  if (time > 0) then
+    if (0 == delay_seconds) and (delay_minutes > 0) then
+      time_text = delay_minutes.."m"
+    elseif (delay_minutes == 0) then
+      time_text = delay_seconds.."s"
+    else
+      time_text = delay_minutes.."m "..delay_seconds.."s"
+    end -- should be possible to do this much faster
+  end
+  return time_text
+end
+
 local function GetTimeFormatted(time, addzeros)
   local delay_minutes = floor(time/60) -- TODO optimise this, this can be done lot better and faster
   local delay_seconds = time-delay_minutes*60
@@ -194,8 +210,7 @@ local function AnnounceMyChoice(choice)
   elseif (choice[1] == 2) then
     loc_text = "across map";
   end
-  local time_text = select(3,GetTimeFormatted(choice[3], false))
-  if (choice[3] == 0) then time_text = "no delay" end
+  local time_text = GetTimeFormatted2(choice[3])
   local god_text = "mortal";
   if (choice[4] == 1) then
     god_text = "semi-mortal";

@@ -355,28 +355,20 @@ local function hqHeightMapFunc(centerX, centerZ, terraHeight) -- function stolen
   end
 end
 
-local function GetTimeFormatted(time, addzeros)
-  local delay_minutes = math.floor(time/60) -- TODO optimise this, this can be done lot better and faster
+local function GetTimeFormatted2(time)
+  local delay_minutes = floor(time/60) -- TODO optimise this, this can be done lot better and faster
   local delay_seconds = time-delay_minutes*60
-  local time_text = "   no\ndelay"
+  local time_text = "no delay"
   if (time > 0) then
     if (0 == delay_seconds) and (delay_minutes > 0) then
       time_text = delay_minutes.."m"
     elseif (delay_minutes == 0) then
       time_text = delay_seconds.."s"
     else
-      time_text = delay_minutes.."m\n"..delay_seconds.."s"
+      time_text = delay_minutes.."m "..delay_seconds.."s"
     end -- should be possible to do this much faster
   end
-  if addzeros then
-    if (delay_minutes < 10) then 
-      delay_minutes = "0"..delay_minutes
-    end
-    if (delay_seconds < 10) then
-      delay_seconds = "0"..delay_seconds
-    end
-  end
-  return delay_minutes, delay_seconds, time_text
+  return time_text
 end
 
 function gadget:GameStart() -- i didn't want to clutter this code with many params, also it's possible to do everything inside this callback
@@ -503,10 +495,10 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
     elseif (MostPopularChoice[1] == 2) then
       loc_text = "across map";
     end
-    local time_text = select(3,GetTimeFormatted(MostPopularChoice[3], false))
+    local time_text = GetTimeFormatted2(MostPopularChoice[3])
     local god_text = "mortal";
     if (MostPopularChoice[4] == 1) then
-      god_text = " semi-mortal";
+      god_text = "semi-mortal";
     elseif (MostPopularChoice[4] == 2) then
       god_text = "immortal";
     end
