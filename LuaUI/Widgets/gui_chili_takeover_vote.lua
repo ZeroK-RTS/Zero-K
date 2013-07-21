@@ -80,7 +80,7 @@ local status_stage = 1
 
 -- everything regarding help menu
 local help_window
-local help_text
+local help_text = "Read carefully:\n- Before game starts, you can decide, which unit type will be objective.\n- It is always possible to capture objective, fully emp it and surround with allied units.\n- \"Timeleft\" timer shows how much time left for unit to be asleep.\n- While timer is non zero, it is good idea to try capturing it.\n- If objective is valuable, and invincible, keep friendly army near by at all times!\n- The circle around objective shows capture range, your units should be inside.\n- Blinking circle indicates capture progress, you only need 3 seconds to capture any objective.\n- There can be multiple objectives, refer to status panel.\nIf you have any suggestions or advices, please join Zero-K forum (development section) or find \"Ivica\" in #zk/#zkdev room.\nHave fun!\nVersion: "..version.."."
 local help_title
 
 -- everything regarding vote menu
@@ -119,6 +119,7 @@ local fu = {}
 
 local UnitList = { "scorpion", "dante", "armraven", "armbanth", "corcrw", "armorco", "funnelweb",
     "corgol", "corsumo", "armmanni", "armzeus", "armcrabe", "armcarry", "corbats", "armcomdgun", "armcybr", "corroy", "amphassault",
+    "armamd", "corsilo", "armcir", "screamer", "missilesilo",
     "corhlt", "armanni", "cordoom", "cafus", "armbrtha", "corbhmth",
     "zenith", "mahlazer", "raveparty", "armcsa" }
 local GraceList = { 0, 15, 45, 90, 120, 180, 240, 300, 450, 600, 750, 817, 900 }
@@ -222,6 +223,22 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
     god_color = red
   end
   if (owner > -1) then -- TODO make less clutter, i know this can be merged somehow
+    local also_agree = "";
+    if (nomi.vote_count > 1) then
+      -- find anyone who agrees
+      local players = Spring.GetTeamList()
+      for i=0,#players do
+	local agree = Spring.GetGameRulesParam("takeover_player_agree"..i)
+	if (agree == nom) and (i ~= myPlayerID) then
+	  if (also_agree == "") then
+	    also_agree = also_agree.."\nPlayers who also agree: "..select(1,Spring.GetPlayerInfo(i))
+	  else
+	    also_agree = also_agree..", "..select(1,Spring.GetPlayerInfo(i))
+	  end
+	end
+      end
+      also_agree = also_agree.."."
+    end
     nomi.playername = StackPanel:New {
       centerItems = false,
       resizeItems = false;
@@ -238,7 +255,7 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
 	  margin = {0, 0, 0, 0},
 	  backgroundColor = {1, 1, 1, 0.4},
 	  caption = name;
-	  tooltip = "Press, if you agree with listed rules by "..name.."!";
+	  tooltip = "Press, if you agree with listed rules by "..name.."!"..also_agree;
 	  textColor = name_color;
 	  OnMouseDown = {function()
 	      if (not Spring.GetSpectatingState()) then
@@ -1136,8 +1153,8 @@ function widget:Initialize()
   local help_minHeight = 360;
   local vote_minWidth = 500;
   local vote_minHeight = 380;
-  local nominate_minWidth = 370;
-  local nominate_minHeight = 360;
+  local nominate_minWidth = 355;
+  local nominate_minHeight = 410;
   
   help_title = Label:New {
     y = 10;
@@ -1195,11 +1212,11 @@ function widget:Initialize()
 	    },
 	    help_title,
 	    TextBox:New {
-	      y = 40,
+	      y = 35,
 	      valign = "ascender",
 	      lineSpacing = 0,
 	      padding = { 15, 15, 15, 0 },
-	      text = "How-to, step by step.\n1) Decide on game rules using new nomination system. Each player may nominate his own set of rules, or vote for someone else's.\n2) Once the game begins, vote will end and most popular rules apply instantly.\n3) Before grace period timer hits 0, unit will not listen to owner's commands and will not attack anything either.\n4) You may capture unit by fully emping it and securing it with your forces (stay close to unit), you may lose ownership of unit, if enemy does the same thing you did to capture it.\nNote: you may not be able to lift unit using your transport, while timer is non 0.\nIf you have any suggestions or advices, please join Zero-K forum (development section) or find \"Ivica\" in #zk/#zkdev room in spring chat.\nHave fun!\nVersion: "..version..".";
+	      text = help_text;
 	      height = 100;
 	      width = "100%";
 	      --fontsize = 13;
@@ -1647,7 +1664,7 @@ function widget:Initialize()
     y = screenHeight/5-minHeight/2;
     dockable = true;
     minimizable = true,
-    draggable = false,
+    draggable = true,
     resizable = false,
     tweakDraggable = true,
     tweakResizable = true,

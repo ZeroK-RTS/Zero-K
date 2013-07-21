@@ -43,6 +43,7 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local UnitList = { "scorpion", "dante", "armraven", "armbanth", "corcrw", "armorco", "funnelweb",
     "corgol", "corsumo", "armmanni", "armzeus", "armcrabe", "armcarry", "corbats", "armcomdgun", "armcybr", "corroy", "amphassault",
+    "armamd", "corsilo", "armcir", "screamer", "missilesilo",
     "corhlt", "armanni", "cordoom", "cafus", "armbrtha", "corbhmth",
     "zenith", "mahlazer", "raveparty", "armcsa" }
 local GraceList = { 0, 15, 45, 90, 120, 180, 240, 300, 450, 600, 750, 817, 900 }
@@ -159,6 +160,10 @@ local function GetPlayerPID(playerID)
 end
 
 local function UpdatePollData()
+  -- update info regarding who votes for what
+  for i=1,#PlayerList do
+    spSetGameRulesParam("takeover_player_agree"..PlayerList[i].playerID,PlayerList[i].nomination)
+  end
   -- update internal poll data
   spSetGameRulesParam("takeover_nominations", #NominationList)
   for i=1,#NominationList do
