@@ -618,9 +618,6 @@ local function ParseNomination(nom) -- TODO need rewrite to make this perfect, n
   if (nominations[owner] ~= nil) then
     vote_scroll:RemoveChild(nominations[owner].stack)
   end
-  if (owner == -3) then
-    return
-  end
   local location = Spring.GetGameRulesParam("takeover_location_nomination"..nom)
   local unit = Spring.GetGameRulesParam("takeover_unit_nomination"..nom)
   local grace = Spring.GetGameRulesParam("takeover_grace_nomination"..nom)

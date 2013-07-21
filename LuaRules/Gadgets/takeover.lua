@@ -178,7 +178,7 @@ local function UpdatePollData()
   -- recalculate most popular option, quite easy, build a table of most wanted option
   local most_votes = 0
   for i=1,#NominationList do
-    if NominationList[i].votes > most_votes) then
+    if (NominationList[i].votes > most_votes) then
       most_votes = NominationList[i].votes
     end
   end
@@ -248,12 +248,19 @@ local function DevoteNomination(PID, nom)
     NominationList[nom] = nil
     local j = nom
     while (NominationList[j+1] ~= nil) do
-      NominationList[j] = NominationList[j+1]
+      -- why? i need to copy instead of pointing to
+      NominationList[j] = {
+	playerID = NominationList[j+1].playerID,
+	opts = { NominationList[j+1].opts.location, NominationList[j+1].opts.unit, NominationList[j+1].opts.grace, NominationList[j+1].opts.godmode },
+	votes = 0,
+      };
       for i=1,#PlayerList do
 	if (PlayerList[i].nomination == j+1) then
 	  PlayerList[i].nomination = j
 	end
       end
+      -- remove
+      NominationList[j+1] = nil
     end
   end
 end
@@ -390,21 +397,6 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   DelayInFrames = 32*MostPopularChoice[3];
   TimeLeftInSeconds = MostPopularChoice[3];
   spSetGameRulesParam("takeover_timeleft", TimeLeftInSeconds)
-  --- tell everyone what happened
-  local loc_text = "at center";
-  if (MostPopularChoice[1] == 1) then
-    loc_text = "in spawn boxes";
-  elseif (MostPopularChoice[1] == 2) then
-    loc_text = "across map";
-  end
-  local time_text = select(3,GetTimeFormatted(MostPopularChoice[3], false))
-  local god_text = "mortal";
-  if (MostPopularChoice[4] == 1) then
-    god_text = " semi-mortal";
-  elseif (MostPopularChoice[4] == 2) then
-    god_text = "immortal";
-  end
-  spEcho("Takeover Vote Result: "..god_text.." "..UnitDefs[MostPopularChoice[2]].humanName.." being spawned "..loc_text.." and dormant for "..time_text..".");
   -- set up land for units, not if player's selected water unit, make it water then :)
   local ground = true -- flying or ground type, require little terraforming
   local ud = UnitDefs[MostPopularChoice[2]]
@@ -459,6 +451,8 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
 	{mapWidth/2, mapHeight*0.75},
       }
     end
+  else
+    MostPopularChoice[1] = 0 -- failed to spawn somewhere
   end
   
   -- TODO rewrite so groundheight is actually averaged...
@@ -502,6 +496,21 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   end
   if (#TheUnits > 0) then
     TheUnitsAreChained = true
+    --- tell everyone what happened
+    local loc_text = "at center";
+    if (MostPopularChoice[1] == 1) then
+      loc_text = "in spawn boxes";
+    elseif (MostPopularChoice[1] == 2) then
+      loc_text = "across map";
+    end
+    local time_text = select(3,GetTimeFormatted(MostPopularChoice[3], false))
+    local god_text = "mortal";
+    if (MostPopularChoice[4] == 1) then
+      god_text = " semi-mortal";
+    elseif (MostPopularChoice[4] == 2) then
+      god_text = "immortal";
+    end
+    spEcho("Takeover Vote Result: "..god_text.." "..UnitDefs[MostPopularChoice[2]].humanName.." being spawned "..loc_text.." and dormant for "..time_text..".");
   end
   
   PollActive = false -- UNCOMMENT ME
