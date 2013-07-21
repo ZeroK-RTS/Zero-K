@@ -426,7 +426,7 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
     }
   };
   nomi.stack = StackPanel:New {
-    y = 43*(#nominations);
+    y = 43*(nom-1);
     centerItems = false,
     resizeItems = false;
     orientation = "horizontal";

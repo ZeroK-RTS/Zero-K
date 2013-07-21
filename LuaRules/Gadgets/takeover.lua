@@ -261,6 +261,7 @@ local function DevoteNomination(PID, nom)
       end
       -- remove
       NominationList[j+1] = nil
+      j=j+1
     end
   end
 end
