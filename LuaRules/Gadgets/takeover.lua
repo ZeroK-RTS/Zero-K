@@ -689,9 +689,12 @@ function gadget:GameFrame (f)
 	  end
 	    -- I can check for most score in same gameframe :)
 	  for allyteam,sc in pairs(MostMetalOwnerData[i]) do
-	    if (sc == 9) then
+	    if (sc >= 9) then
 -- 	      GiveUnitToMVP(TheUnit,allyteam) -- that is if winner is only one... it should be one, right?
 	      GiveUnitToMostMetalPlayerNear(TheUnit,allyteam)
+	      -- reset everyone's score, basically it just empties the capture data, but since if any other enemy unit is present and unit is still empied, it will commence again
+	      spSetGameRulesParam("takeover_siege_unit"..i, 0)
+	      MostMetalOwnerData[i] = nil 
 	      break
 	    end
 	  end
