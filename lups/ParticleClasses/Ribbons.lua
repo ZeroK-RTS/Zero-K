@@ -140,8 +140,9 @@ function Ribbon:Draw()
       glUniform( oldPosUniform[quads0+1] , x,y,z )
     end
   else
-    local dir = self.oldPos[j]
-    glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
+  	-- this bit can cause glitches with a new unit's ribbons being "glued" to a dead unit's leftover ribbons
+    --local dir = self.oldPos[j]
+    --glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
   end
   --// define color and add speed blending (don't show ribbon for slow/landing units!)
   if (self.blendfactor<1) then
@@ -262,11 +263,11 @@ function Ribbon:Update(n)
       end
     end
   else
-    -- when uncommented this allows trails to decay along their length by age after unit dies
-    -- but may cause glitches
+    -- this allows trails to decay along their length by age after unit dies
     local lastIndex = self.posIdx 
-    --self.posIdx = (self.posIdx % self.size)+1
-    --self.oldPos[self.posIdx] = self.oldPos[lastIndex]
+    self.posIdx = (self.posIdx % self.size)+1
+    self.oldPos[self.posIdx] = self.oldPos[lastIndex]
+    
     self.blendfactor = self.blendfactor - n * self.decayRate
   end
 end
