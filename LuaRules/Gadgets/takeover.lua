@@ -167,29 +167,25 @@ local function UpdatePollData()
   -- update internal poll data
   spSetGameRulesParam("takeover_nominations", #NominationList)
   for i=1,#NominationList do
-    if (NominationList[i]) then
-      spSetGameRulesParam("takeover_owner_nomination"..i, NominationList[i].playerID)
-      spSetGameRulesParam("takeover_location_nomination"..i, NominationList[i].opts[1])
-      spSetGameRulesParam("takeover_unit_nomination"..i, NominationList[i].opts[2])
-      spSetGameRulesParam("takeover_grace_nomination"..i, NominationList[i].opts[3])
-      spSetGameRulesParam("takeover_godmode_nomination"..i, NominationList[i].opts[4])
-      spSetGameRulesParam("takeover_votes_nomination"..i, NominationList[i].votes)
-    else
-      spSetGameRulesParam("takeover_owner_nomination"..i, -3) -- deleted nomination
-    end
+    spSetGameRulesParam("takeover_owner_nomination"..i, NominationList[i].playerID)
+    spSetGameRulesParam("takeover_location_nomination"..i, NominationList[i].opts[1])
+    spSetGameRulesParam("takeover_unit_nomination"..i, NominationList[i].opts[2])
+    spSetGameRulesParam("takeover_grace_nomination"..i, NominationList[i].opts[3])
+    spSetGameRulesParam("takeover_godmode_nomination"..i, NominationList[i].opts[4])
+    spSetGameRulesParam("takeover_votes_nomination"..i, NominationList[i].votes)
   end -- this data is parsed by widget
   
   -- recalculate most popular option, quite easy, build a table of most wanted option
   local most_votes = 0
   for i=1,#NominationList do
-    if NominationList[i] and (NominationList[i].votes > most_votes) then
+    if NominationList[i].votes > most_votes) then
       most_votes = NominationList[i].votes
     end
   end
   
   local most_voted = {}
   for i=1,#NominationList do
-    if NominationList[i] and (NominationList[i].votes == most_votes) then
+    if (NominationList[i].votes == most_votes) then
       most_voted[#most_voted+1] = i
     end
   end
@@ -250,7 +246,15 @@ local function DevoteNomination(PID, nom)
       end
     end
     NominationList[nom] = nil
-    -- TODO make it so new nomination will not take place of deleted, but instead go to the end, while this function should shift data so that the end of the list becomes free rather than space in the middle
+    local j = nom
+    while (NominationList[j+1] ~= nil) do
+      NominationList[j] = NominationList[j+1]
+      for i=1,#PlayerList do
+	if (PlayerList[i].nomination == j+1) then
+	  PlayerList[i].nomination = j
+	end
+      end
+    end
   end
 end
 
@@ -404,7 +408,6 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   -- set up land for units, not if player's selected water unit, make it water then :)
   local ground = true -- flying or ground type, require little terraforming
   local ud = UnitDefs[MostPopularChoice[2]]
-  --if (ud ~= nil) then
   if (ud.minWaterDepth > 0) then
     ground = false
   end
@@ -432,46 +435,10 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   end
   
   if (#SpawnBoxes > 0) and (MostPopularChoice[1] == 1) then
---     if (MostPopularChoice[1] == 1) then
     SpawnPos = {}
     for i=1,#SpawnBoxes do
       SpawnPos[i] = { SpawnBoxes[i].centerx, SpawnBoxes[i].centerz }
     end
-      -- TODO commented code below doesn't work, but i would like it to work, maybe someday i will fix it
---     else -- this is kinda harder, need to detrimine 2 farthest centers x,y, and make units pos across
---       local best_pair = nil
---       for i=1,#SpawnBoxes do
--- 	for j=1,#SpawnBoxes do
--- 	  if (i~=j) then
--- 	    if (best_pair == nil) then
--- 	      best_pair = { i, j, disSQ(SpawnBoxes[i].x,SpawnBoxes[i].z,SpawnBoxes[j].x,SpawnBoxes[j].z) }
--- 	    else
--- 	      local my_dist = disSQ(SpawnBoxes[i].x,SpawnBoxes[i].z,SpawnBoxes[j].x,SpawnBoxes[j].z)
--- 	      if (my_dist > best_pair[3]) then
--- 		best_pair = { i, j, my_dist }
--- 	      end
--- 	    end
--- 	  end
--- 	end
---       end
---       -- now i need to determine farthest points
---       -- verticaly?
---       local ver_dist = disSQ(mapWidth/2, SpawnBoxes[best_pair[1]].centerx, mapHeight*0.75, SpawnBoxes[best_pair[2]].centerz) + disSQ(mapWidth/2, SpawnBoxes[best_pair[1]].centerx, mapHeight*0.75, SpawnBoxes[best_pair[2]].centerz)
---       local hor_dist = disSQ(mapWidth*0.75, SpawnBoxes[best_pair[1]].centerx, mapHeight/2, SpawnBoxes[best_pair[2]].centerz) + disSQ(mapWidth*0.75, SpawnBoxes[best_pair[1]].centerx, mapHeight/2, SpawnBoxes[best_pair[2]].centerz)
---       if (ver_dist > hor_dist) then
--- 	SpawnPos = {
--- 	  {mapWidth/2, mapHeight*0.25},
--- 	  {mapWidth/2, mapHeight/2},
--- 	  {mapWidth/2, mapHeight*0.75},
--- 	}
---       else -- apparently horizontally is better
--- 	SpawnPos = {
--- 	  {mapWidth*0.25, mapHeight/2},
--- 	  {mapWidth/2, mapHeight/2},
--- 	  {mapWidth*0.75, mapHeight/2},
--- 	}
---       end
---     end
   elseif (MostPopularChoice[1] == 2) then
     local horizon = 0
     if (mapWidth == mapHeight) then
@@ -538,7 +505,7 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   end
   
   PollActive = false -- UNCOMMENT ME
-  spSetGameRulesParam("takeover_units",#TheUnits)
+  spSetGameRulesParam("takeover_units", #TheUnits)
   spSetGameRulesParam("takeover_vote", 0) -- UNCOMMENT ME
 end
 
@@ -609,7 +576,7 @@ function gadget:GameFrame (f)
     local TheUnit
     for i=1,#TheUnits do
       TheUnit = TheUnits[i]
-      if (TheUnit ~= nil) then
+      if (TheUnit ~= -1) then
 	spSetUnitNoSelect(TheUnit,false)
 	spGiveOrderToUnit(TheUnit, CMD_FIRE_STATE, {2},{})
 	if (spGetUnitTeam(TheUnit) == GaiaTeamID) then
@@ -641,7 +608,7 @@ function gadget:GameFrame (f)
     local health,maxHealth,paralyzeDamage,empHP,emp,hp
     for i=1,#TheUnits do
       TheUnit = TheUnits[i]
-      if (TheUnit ~= nil) then
+      if (TheUnit ~= -1) then
 	health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(TheUnit)
 	empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
 	emp = (paralyzeDamage or 0)
@@ -720,7 +687,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
     local TheUnit
     for i=1,#TheUnits do
       TheUnit = TheUnits[i]
-      if (TheUnit ~= nil) and (TheUnit == unitID) then
+      if (TheUnit ~= -1) and (TheUnit == unitID) then
         if (TheUnitsAreChained) and (weaponID) and (captureWeaponDefs[weaponID]) then
 	  return 0; -- negates dommi damage awwwright
         end
@@ -760,7 +727,7 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
   local TheUnit
   for i=1,#TheUnits do
     TheUnit = TheUnits[i]
-    if (TheUnit ~= nil) and (TheUnit == unitID) then
+    if (TheUnit ~= -1) and (TheUnit == unitID) then
       spSetGameRulesParam("takeover_team_unit"..i, newTeamID)
       spSetGameRulesParam("takeover_allyteam_unit"..i, select(6,spGetTeamInfo(newTeamID)))
       if (TheUnitsAreChained) then
@@ -783,7 +750,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam) -- TODO detect if The
       spSetGameRulesParam("takeover_hp_unit"..i, 0)
       spSetGameRulesParam("takeover_emphp_unit"..i, 1)
       spSetGameRulesParam("takeover_emp_unit"..i, 0)
-      TheUnits[i] = nil
+      TheUnits[i] = -1 -- because apparently if i have for example { 1245, 532, 345 } and i set 532 to nil, for i=1,#TheUnits will never reach 345 O_O
     end
   end
 end
@@ -792,7 +759,7 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
   local TheUnit
   for i=1,#TheUnits do
     TheUnit = TheUnits[i]
-    if (TheUnit ~= nil) and (unitID == TheUnit) and (TheUnitsAreChained) and (TimeLeftInSeconds>0) then
+    if (TheUnit ~= -1) and (unitID == TheUnit) and (TheUnitsAreChained) and (TimeLeftInSeconds>0) then
       Paralyze(transportID,TimeLeftInSeconds)
     end
   end
@@ -814,7 +781,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
   local TheUnit
   for i=1,#TheUnits do
     TheUnit = TheUnits[i]
-    if (TheUnit ~= nil) then
+    if (TheUnit ~= -1) then
       if (TheUnitsAreChained) then
 	if (unitID == TheUnit) then
 	  return false

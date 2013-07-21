@@ -869,7 +869,7 @@ local function SetupIngameStatusBar()
   -- what if widget was reload in game?
   for i=1,TheUnitCount do
     local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-    if ((unit > 0) and Spring.ValidUnitID(unit) and Spring.GetUnitPosition(unit)) then
+    if ((unit > -1) and Spring.ValidUnitID(unit) and Spring.GetUnitPosition(unit)) then
       visible[unit] = true
     end
   end
@@ -938,7 +938,7 @@ function widget:Update(s)
       for i=1,TheUnitCount do
 	local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
 	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i, 0)
-	if (unit > 0) and (hp > 0) then
+	if (unit > -1) and (hp > 0) then
 	  local team = Spring.GetGameRulesParam("takeover_team_unit"..i, -1) -- could also rely on allyteam instead
 	  local maxhp = Spring.GetGameRulesParam("takeover_maxhp_unit"..i, 1)
 	  local emphp = Spring.GetGameRulesParam("takeover_emphp_unit"..i, 1)
@@ -987,7 +987,7 @@ end
 function widget:UnitEnteredLos(uID, tID)
   for i=1,TheUnitCount do
     local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-    if (unit == uID) then
+    if (unit > -1) and (unit == uID) then
       visible[uID] = true;
     end
   end
@@ -1081,7 +1081,7 @@ function widget:DrawWorld()
   if not Spring.IsGUIHidden() then
     for i=1,TheUnitCount do
       local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-      if (unit > 0) and (visible[unit]) then
+      if (unit > -1) and (visible[unit]) then
 	local team = Spring.GetGameRulesParam("takeover_team_unit"..i)
 	local allyteam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
 	if (Spring.ValidUnitID(unit)) then
