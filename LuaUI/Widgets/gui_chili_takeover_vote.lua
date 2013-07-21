@@ -239,16 +239,21 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
   end
   if (owner > -1) then -- TODO make less clutter, i know this can be merged somehow
     local also_agree = "";
+    --if (nomi.vote_count > 2) or ((nomi.vote_count > 1) and (owner ~= myPlayerID)) then -- at first i shouldn't add your own choice
     if (nomi.vote_count > 1) then
       -- find anyone who agrees
       local players = Spring.GetTeamList()
       for i=0,#players do
 	local agree = Spring.GetGameRulesParam("takeover_player_agree"..i)
-	if (agree == nom) and (i ~= myPlayerID) then
+	if (agree == nom) and (owner ~= i) then
+	  local player_name = select(1,Spring.GetPlayerInfo(i))
+	  if (myPlayerID == i) then
+	    player_name = "YOU" 
+	  end
 	  if (also_agree == "") then
-	    also_agree = also_agree.."\nPlayers who also agree: "..select(1,Spring.GetPlayerInfo(i))
+	    also_agree = also_agree.."\nPlayers who also agree: "..player_name
 	  else
-	    also_agree = also_agree..", "..select(1,Spring.GetPlayerInfo(i))
+	    also_agree = also_agree..", "..player_name
 	  end
 	end
       end
@@ -258,7 +263,7 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
       centerItems = false,
       resizeItems = false;
       orientation = "horizontal";
-      width = 200;
+      width = 220;
       height = 40;
       padding = {0, 0, 0, 0},
       itemMargin  = {5, 0, 0, 0},
@@ -287,7 +292,7 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
       centerItems = false,
       resizeItems = false;
       orientation = "horizontal";
-      width = 200;
+      width = 220;
       height = 40;
       padding = {0, 0, 0, 0},
       itemMargin  = {5, 0, 0, 0},
@@ -314,7 +319,7 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
     centerItems = false,
     resizeItems = false;
     orientation = "horizontal";
-    width = 70;
+    width = 80;
     height = 40;
     padding = {0, 0, 0, 0},
     itemMargin  = {5, 0, 0, 0},
@@ -640,11 +645,13 @@ local function ParseNomination(nom) -- TODO need rewrite to make this perfect, n
   local vote_count = Spring.GetGameRulesParam("takeover_votes_nomination"..nom)
   nominations[owner] = { location = location, unit = unit, grace = grace, godmode = godmode, vote_count = vote_count, stack, playername, pics = {}, votes }
   local name, _, _, teamID, allyTeam = Spring.GetPlayerInfo(owner)
-  local name_color = cyan
-  if (allyTeam ~= myAllyTeam) then
-    name_color = red
-  elseif (teamID ~= myTeam) then
+  local name_color = red
+  if (allyTeam == myAllyTeam) then
     name_color = green
+  end
+  local what_i_voted_for = Spring.GetGameRulesParam("takeover_player_agree"..myPlayerID)
+  if what_i_voted_for == nom then
+    name_color = cyan -- this way you know what you voted for
   end
   SetupNominationStack(nominations[owner], name, name_color, owner, nom)
 end
@@ -918,19 +925,15 @@ function widget:Update(s)
       PollActive = poll -- UNCOMMENT ME
 --       PollActive = true -- DO NOT UNCOMMENT ME
     end
-    if (poll) then
-      if (vote_window) then
-	--- TODO this needs small rewrite...
-	local height = vote_window.height - 40;
-	height = height>0 and height or 100
-	vote_scroll.height = height
-	vote_scroll:Invalidate();
-	---
-	UpdateMostPopularStack()
-	UpdateNomListNOW()
-      elseif (#nominations > 0) then
-	nominations = {} -- empty the list because player closed window
-      end
+    if (poll) and (vote_window) then
+      --- TODO this needs small rewrite...
+      local height = vote_window.height - 40;
+      height = height>0 and height or 100
+      vote_scroll.height = height
+      vote_scroll:Invalidate();
+      ---
+      UpdateMostPopularStack()
+      UpdateNomListNOW()
     end
   end
   timer_2 = timer_2 + s
@@ -1096,24 +1099,24 @@ function widget:DrawWorld()
     for i=1,TheUnitCount do
       local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
       if (unit > -1) and (visible[unit]) then
-	local team = Spring.GetGameRulesParam("takeover_team_unit"..i)
-	local allyteam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
+	local teamID = Spring.GetGameRulesParam("takeover_team_unit"..i)
+	local allyTeam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
 	if (Spring.ValidUnitID(unit)) then
 	  local x,y,z = Spring.GetUnitPosition(unit)
 	  local color = red
-	  if (allyteam == myAllyTeam) then
-	    if (team ~= myTeam) then
-	      color = green
-	    else
+	  if (allyTeam == myAllyTeam) then
+	    if (teamID == myTeam) then
 	      color = cyan
+	    else
+	      color = green
 	    end
-	  elseif (allyteam == GaiaAllyTeamID) then
+	  elseif (allyTeam == GaiaAllyTeamID) then
 	    color = white
 	  end
 	  if (under_siege[i] == 1) then
-	    if (allyteam == myAllyTeam) then
+	    if (allyTeam == myAllyTeam) then
 	      color = yellow;
-	    elseif (allyteam == GaiaAllyTeamID) then
+	    elseif (allyTeam == GaiaAllyTeamID) then
 	      color = green;
 	    else
 	      color = orange;
@@ -1128,8 +1131,8 @@ function widget:DrawWorld()
 	  local heading = Spring.GetUnitHeading(unit)
 	  if heading then
 	    local rot = (heading / 32768) * 180
-	    local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
-	    local name = GetPlayerName(owner,team,isAI)
+	    local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(teamID)
+	    local name = GetPlayerName(owner,teamID,isAI)
 	    glDrawFuncAtUnit(unit, false, DrawUnitOwner, unit, color, name, rot)
 	  end
 	  

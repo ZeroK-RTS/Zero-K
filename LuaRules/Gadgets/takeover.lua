@@ -197,10 +197,10 @@ local function UpdatePollData()
   if (#most_voted == 0) then -- hello default choices
     MostPopularChoice = DEFAULT_CHOICE -- center map detriment that wakes up after 5 minutes and is immortal while emped or timer > 0
     spSetGameRulesParam("takeover_winner_owner", -1) -- -1 means springiee or default
-    spSetGameRulesParam("takeover_winner_opts1", 0)
-    spSetGameRulesParam("takeover_winner_opts2", UnitDefNames["armorco"].id)
-    spSetGameRulesParam("takeover_winner_opts3", 300)
-    spSetGameRulesParam("takeover_winner_opts4", id)
+    spSetGameRulesParam("takeover_winner_opts1", DEFAULT_CHOICE[1])
+    spSetGameRulesParam("takeover_winner_opts2", DEFAULT_CHOICE[2])
+    spSetGameRulesParam("takeover_winner_opts3", DEFAULT_CHOICE[3])
+    spSetGameRulesParam("takeover_winner_opts4", DEFAULT_CHOICE[4])
     spSetGameRulesParam("takeover_winner_votes", 0)
   elseif (#most_voted == 1) then -- hello sole winner
     most_voted = most_voted[1]
@@ -294,7 +294,7 @@ local function PlayerAgreeWith(playerID, name, line)
     PID = CreatePlayer(playerID, name)
   end
   --if (NominationList[target_nomination].playerID ~= playerID) and (target_nomination ~= PlayerList[PID].nomination)  then -- oi, you can't upvote yourself
-  if (PID == TPID) then return end
+  if (PlayerList[PID].nomination == target_nomination) then return end
   local purge = false
   if (PlayerList[PID].nomination ~= nil) then
     purge = DevoteNomination(PID, PlayerList[PID].nomination)
@@ -331,17 +331,17 @@ local function NominateNewRule(playerID, name, line)
     end
   end
   local purge = false
-  if (PlayerList[PID].nomination ~= nil) then
-    local target_nomination = PlayerList[PID].nomination
-    if (playerID == NominationList[target_nomination].playerID) then -- oh owner
+  local target_nomination = PlayerList[PID].nomination
+  if (target_nomination ~= nil) and (nom ~= target_nomination) then
+    if (playerID == NominationList[target_nomination].playerID) then -- oh owner, ignore the attemption to create same nomination though
       NominationList[target_nomination].votes = 0
       purge = true
-    else
+    elseif (nom ~= target_nomination) then
       purge = DevoteNomination(PID, target_nomination)
     end
   end
   if (nom ~= nil) then
-    if (NominationList[nom].playerID ~= playerID) and (PlayerList[PID].nomination ~= nom) then -- oi, you can't upvote yourself, was tricky to find this bug :)
+    if (target_nomination ~= nom) then -- oi, you can't upvote yourself, was tricky to find this bug :)
       VoteNomination(PID, nom)
     end
   else
