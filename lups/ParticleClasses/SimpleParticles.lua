@@ -87,7 +87,6 @@ local spGetPositionLosState = Spring.GetPositionLosState
 local spGetUnitLosState     = Spring.GetUnitLosState
 local spIsSphereInView      = Spring.IsSphereInView
 local spGetUnitRadius       = Spring.GetUnitRadius
-local spGetProjectilePosition = Spring.GetProjectilePosition
 
 local IsPosInLos    = Spring.IsPosInLos
 local IsPosInAirLos = Spring.IsPosInAirLos
@@ -391,9 +390,6 @@ function SimpleParticles:Visible()
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
     posX,posY,posZ = posX+ux,posY+uy,posZ+uz
     radius = radius + spGetUnitRadius(self.unit)
-  elseif (self.projectile and not self.worldspace) then
-    local px,py,pz = spGetProjectilePosition(self.projectile)
-    posX,posY,posZ = posX+px,posY+py,posZ+pz
   end
   if (losState==nil) then
     if (self.radar) then

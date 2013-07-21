@@ -84,7 +84,6 @@ local spGetLocalAllyTeamID   = Spring.GetLocalAllyTeamID
 local scGetReadAllyTeam      = Script.GetReadAllyTeam
 local spGetUnitPieceMap      = Spring.GetUnitPieceMap
 local spValidUnitID          = Spring.ValidUnitID
-local spGetProjectilePosition = Spring.GetProjectilePosition
 
 local glUnitPieceMatrix = gl.UnitPieceMatrix
 local glPushMatrix      = gl.PushMatrix
@@ -588,16 +587,11 @@ local function Draw(extension,layer)
               for i=1,#UnitEffects do
                 local fx = UnitEffects[i]
                 if (fx.alwaysVisible or fx.visible) then
-                  glPushMatrix()
-                  if fx.projectile and not fx.worldspace then
-                    local x,y,z = spGetProjectilePosition(fx.projectile)
-                    glTranslate(x,y,z)
-                  end
                   drawfunc(fx)
-                  glPopMatrix()
                 end
-              end -- for
-            end -- if
+              end
+
+            end
           end  --if
         end  --for
       end
@@ -700,16 +694,10 @@ local DrawWorldShadowVisibleFx
 local DrawScreenEffectsVisibleFx
 local DrawInMiniMapVisibleFx
 
-function IsPosInLos(x,y,z)
-  return Spring.IsPosInLos(x,y,z, LocalAllyTeamID)
-end
-
-function IsPosInRadar(x,y,z)
-  return Spring.IsPosInRadar(x,y,z, LocalAllyTeamID)
-end
-
-function IsPosInAirLos(x,y,z)
-  return Spring.IsPosInAirLos(x,y,z, LocalAllyTeamID)
+local function IsPosInLos(x,y,z)
+  local inLos  = Spring.IsPosInLos(x,y,z, LocalAllyTeamID)
+  --local _,inLos  = Spring.GetPositionLosState(x,y,z, LocalAllyTeamID)
+  return (inLos)
 end
 
 local function IsUnitFXVisible(fx)
@@ -737,19 +725,6 @@ local function IsUnitFXVisible(fx)
 	end
 end
 
-local function IsProjectileFXVisible(fx)
-        local proID = fx.projectile
-        if fx.alwaysVisible then
-                return true
-	elseif (fx.Visible) then
-		return fx:Visible()
-	else
-                local x,y,z = Spring.GetProjectilePosition(proID)
-                if (IsPosInLos(x,y,z)and (spIsSphereInView(x,y,z,(fx.radius or 200)+100)) ) then
-                        return true
-                end
-        end
-end
 
 local function IsWorldFXVisible(fx)
 	if fx.alwaysVisible then
@@ -768,24 +743,18 @@ end
 
 
 local function CreateVisibleFxList()
-    local removeFX = {}
-    local removeCnt = 1
+  local removeFX = {}
+  local removeCnt = 1
 
-    local foo = 0
-    for _,fx in pairs(particles) do
-        foo = foo + 1
-        if ((fx.unit or -1) > -1) then
-            fx.visible = IsUnitFXVisible(fx)
-            if (fx.visible) then
-                if (not anyFXVisible) then anyFXVisible = true end
-                if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
-            end
-    elseif ((fx.projectile or -1) > -1) then
-        fx.visible = IsProjectileFXVisible(fx)
-        if (fx.visible) then
-            if (not anyFXVisible) then anyFXVisible = true end
-            if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
-        end
+  local foo = 0
+  for _,fx in pairs(particles) do
+	foo = foo + 1
+	if ((fx.unit or -1) > -1) then
+		fx.visible = IsUnitFXVisible(fx)
+		if (fx.visible) then
+			if (not anyFXVisible) then anyFXVisible = true end
+			if (not anyDistortionsVisible) then anyDistortionsVisible = fx.pi.distortion end
+		end
 	else
 		fx.visible = IsWorldFXVisible(fx)
 		if (fx.visible) then

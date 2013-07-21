@@ -32,11 +32,6 @@ StaticParticles.Default = {
   particles = {},
   dlist     = 0,
 
-  --// visibility check
-  los            = true,
-  airLos         = true,
-  radar          = false,
-
   emitVector  = {0,1,0},
   pos         = {0,0,0}, --// start pos
   partpos     = "0,0,0", --// particle relative start pos (can contain lua code!)
@@ -75,7 +70,6 @@ local spGetPositionLosState = Spring.GetPositionLosState
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spIsSphereInView      = Spring.IsSphereInView
 local spGetUnitRadius       = Spring.GetUnitRadius
-local spGetProjectilePosition = Spring.GetProjectilePosition
 
 local glTexture     = gl.Texture 
 local glBlending    = gl.Blending
@@ -300,29 +294,21 @@ end
 function StaticParticles:Visible()
   local radius = self.radius +
                  self.frame*(self.sphereGrowth) --FIXME: frame is only updated on Update()
-  local posX,posY,posZ = self.pos[1],self.pos[2],self.pos[3]
+  local pos = {self.pos[1],self.pos[2],self.pos[3]}
   local losState
   if (self.unit and not self.worldspace) then
-    losState = (spGetUnitLosState(self.unit, LocalAllyTeamID) or {}).los or false
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
-    posX,posY,posZ = posX+ux,posY+uy,posZ+uz
-    radius = radius + spGetUnitRadius(self.unit)
-  elseif (self.projectile and not self.worldspace) then
-    local px,py,pz = spGetProjectilePosition(self.projectile)
-    posX,posY,posZ = posX+px,posY+py,posZ+pz
+	if ux and uy and uz then
+		pos[1],pos[2],pos[3] = pos[1]+ux,pos[2]+uy,pos[3]+uz
+		radius = radius + (spGetUnitRadius(self.unit) or 0)
+		losState = spGetUnitLosState(self.unit, LocalAllyTeamID)
+	end
   end
   if (losState==nil) then
-    if (self.radar) then
-      losState = IsPosInRadar(posX,posY,posZ, LocalAllyTeamID)
-    end
-    if ((not losState) and self.airLos) then
-      losState = IsPosInAirLos(posX,posY,posZ, LocalAllyTeamID)
-    end
-    if ((not losState) and self.los) then
-      losState = IsPosInLos(posX,posY,posZ, LocalAllyTeamID)
-    end
+    local visible,los,radar = Spring.GetPositionLosState(pos[1],pos[2],pos[3], LocalAllyTeamID)
+    losState = {los=los }
   end
-  return (losState)and(spIsSphereInView(posX,posY,posZ,radius))
+  return (losState.los)and(spIsSphereInView(pos[1],pos[2],pos[3],radius))
 end
 
 -----------------------------------------------------------------------------------------------------------------
