@@ -162,7 +162,11 @@ end
 local function UpdatePollData()
   -- update info regarding who votes for what
   for i=1,#PlayerList do
-    spSetGameRulesParam("takeover_player_agree"..PlayerList[i].playerID,PlayerList[i].nomination)
+    if (PlayerList[i].nomination) then
+      spSetGameRulesParam("takeover_player_agree"..PlayerList[i].playerID, PlayerList[i].nomination)
+    else
+      spSetGameRulesParam("takeover_player_agree"..PlayerList[i].playerID, -1) -- purged, player don't agree with anyone anymore
+    end
   end
   -- update internal poll data
   spSetGameRulesParam("takeover_nominations", #NominationList)
@@ -237,33 +241,34 @@ local function VoteNomination(PID, nom)
   NominationList[nom].votes = NominationList[nom].votes + 1
 end
 
+local function AbandonNomination() -- nom)
+  -- NOTE apparently it's totally impossible to do it properly without pairs and other hacks, simple and fast
+  local NewNominationList = {}
+  for nom,data in pairs(NominationList) do
+    if (NominationList[nom].votes > 0) then
+      NewNominationList[#NewNominationList+1] = NominationList[nom]
+      for i=1,#PlayerList do
+	if (PlayerList[i].nomination == nom) then
+	  PlayerList[i].nomination = #NewNominationList
+	end
+      end
+    else
+      for i=1,#PlayerList do
+	if (PlayerList[i].nomination == nom) then
+	  PlayerList[i].nomination = nil
+	end
+      end
+    end
+  end
+  NominationList = NewNominationList
+end
+
 local function DevoteNomination(PID, nom)
   NominationList[nom].votes = NominationList[nom].votes - 1
   if (NominationList[nom].votes == 0) then
-    for i=1,#PlayerList do
-      if (PlayerList[i].nomination == nom) then
-	PlayerList[i].nomination = nil
-      end
-    end
-    NominationList[nom] = nil
-    local j = nom
-    while (NominationList[j+1] ~= nil) do
-      -- why? i need to copy instead of pointing to
-      NominationList[j] = {
-	playerID = NominationList[j+1].playerID,
-	opts = { NominationList[j+1].opts.location, NominationList[j+1].opts.unit, NominationList[j+1].opts.grace, NominationList[j+1].opts.godmode },
-	votes = 0,
-      };
-      for i=1,#PlayerList do
-	if (PlayerList[i].nomination == j+1) then
-	  PlayerList[i].nomination = j
-	end
-      end
-      -- remove
-      NominationList[j+1] = nil
-      j=j+1
-    end
+    return true
   end
+  return false
 end
 
 local function CreateNomination(playerID, location, unit, grace, godmode)
@@ -282,17 +287,24 @@ local function PlayerAgreeWith(playerID, name, line)
   local Nominator = tonumber(words[2])
   local TPID = GetPlayerPID(Nominator)
   if TPID == -1 then return end
-  if (PlayerList[TPID].nomination == nil) then return end
   local target_nomination = PlayerList[TPID].nomination
+  if (target_nomination == nil) then return end
   local PID = GetPlayerPID(playerID)
   if PID == -1 then
     PID = CreatePlayer(playerID, name)
   end
+  --if (NominationList[target_nomination].playerID ~= playerID) and (target_nomination ~= PlayerList[PID].nomination)  then -- oi, you can't upvote yourself
+  if (PID == TPID) then return end
+  local purge = false
   if (PlayerList[PID].nomination ~= nil) then
-    DevoteNomination(PID, PlayerList[PID].nomination)
+    purge = DevoteNomination(PID, PlayerList[PID].nomination)
   end
   VoteNomination(PID, target_nomination)
+  if (purge) then
+    AbandonNomination()
+  end
   UpdatePollData()
+  --end
 end
 
 local function NominateNewRule(playerID, name, line)
@@ -312,19 +324,31 @@ local function NominateNewRule(playerID, name, line)
   -- is there any nomination like the one player nominated?
   local nom = nil
   for i=1,#NominationList do
-    if (NominationList[i].opts[1] == location) and (NominationList[i].opts[2] == unit) and (NominationList[3].opts[1] == grace) and (NominationList[i].opts[4] == godmode) then
+    if (NominationList[i].opts[1] == location) and (NominationList[i].opts[2] == unit) and (NominationList[i].opts[3] == grace) and (NominationList[i].opts[4] == godmode) then
       -- oh there is
       nom = i
       break
     end
   end
+  local purge = false
   if (PlayerList[PID].nomination ~= nil) then
-    DevoteNomination(PID, PlayerList[PID].nomination)
+    local target_nomination = PlayerList[PID].nomination
+    if (playerID == NominationList[target_nomination].playerID) then -- oh owner
+      NominationList[target_nomination].votes = 0
+      purge = true
+    else
+      purge = DevoteNomination(PID, target_nomination)
+    end
   end
   if (nom ~= nil) then
-    VoteNomination(PID, nom)
+    if (NominationList[nom].playerID ~= playerID) and (PlayerList[PID].nomination ~= nom) then -- oi, you can't upvote yourself, was tricky to find this bug :)
+      VoteNomination(PID, nom)
+    end
   else
     VoteNomination(PID, CreateNomination(playerID, location, unit, grace, godmode))
+  end
+  if (purge) then
+    AbandonNomination()
   end
   UpdatePollData()
 end
@@ -639,13 +663,11 @@ function gadget:GameFrame (f)
 		  score[unitAllyTeam] = 0
 		end
 		score[unitAllyTeam] = score[unitAllyTeam] + UnitDefs[spGetUnitDefID(unitID)].metalCost;
--- 		Spring.Echo(UnitDefs[spGetUnitDefID(unitID)].humanName.." is in capture range.")
 	      end
 	    end
 	  end
 	  local best_score, winner_allyteam
 	  for allyteam,sc in pairs(score) do -- TODO get rid of the pairs and replace with smth like for i=1,n do
--- 	    Spring.Echo("Ally team: "..allyteam.." with "..sc.." metalcost value around unit.")
 	    if (best_score == nil) or (sc > best_score) then
 	      best_score = sc
 	      winner_allyteam = allyteam

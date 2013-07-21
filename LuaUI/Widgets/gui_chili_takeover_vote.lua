@@ -630,9 +630,9 @@ end
 
 local function ParseNomination(nom) -- TODO need rewrite to make this perfect, not redraw all the entries all the time
   local owner = Spring.GetGameRulesParam("takeover_owner_nomination"..nom)
-  if (nominations[owner] ~= nil) then
-    vote_scroll:RemoveChild(nominations[owner].stack)
-  end
+--   if (nominations[owner] ~= nil) then
+--     vote_scroll:RemoveChild(nominations[owner].stack)
+--   end
   local location = Spring.GetGameRulesParam("takeover_location_nomination"..nom)
   local unit = Spring.GetGameRulesParam("takeover_unit_nomination"..nom)
   local grace = Spring.GetGameRulesParam("takeover_grace_nomination"..nom)
@@ -655,10 +655,13 @@ local function UpdateNomListNOW()
   if (noms == 0) and (default_nomination == true) then
     ShowDefaultNomination()
   end
-  for i=1, #nominations do
-    if (nominations[i]) then
-      vote_scroll:RemoveChild(nominations[i].stack)
-    end
+--   for i=1, #nominations do
+--     if (nominations[i]) then
+--       vote_scroll:RemoveChild(nominations[i].stack)
+--     end
+--   end
+  for i,d in pairs (nominations) do
+    vote_scroll:RemoveChild(d.stack) -- TODO rewrite so it works without pairs
   end
   for i=1, noms do
     ParseNomination(i)
@@ -972,7 +975,6 @@ function widget:Update(s)
 	  status_units[i].health:SetValue(hp)
 	  status_units[i].emp:SetValue(emp)
 	  local siege = Spring.GetGameRulesParam("takeover_siege_unit"..i)
-	  --Spring.Echo(tostring(siege))
 	  if (siege == 1) then
 	    under_siege[i] = under_siege[i]+1;
 	    if (under_siege[i] > 2) then
