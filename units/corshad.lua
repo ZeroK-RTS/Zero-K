@@ -45,7 +45,9 @@ unitDef = {
   mass                = 234,
   maxAcc              = 0.5,
   maxDamage           = 800,
+  maxElevator         = 0.004,
   maxFuel             = 1000000,
+  maxPitch            = 0.30,
   maxVelocity         = 7.6,
   minCloakDistance    = 75,
   noAutoFire          = false,
@@ -66,7 +68,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
-  turnRadius          = 320,
+  turnRadius          = 250,
   workerTime          = 0,
 
   weapons             = {
@@ -80,7 +82,7 @@ unitDef = {
     {
       def                = [[BOMBSABOT]],
       mainDir            = [[0 -1 0]],
-      maxAngleDif        = 120,
+      maxAngleDif        = 180,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 	
@@ -146,7 +148,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_b_paveway.s3o]],
-      range                   = 140,
+      range                   = 150,
       reloadtime              = 5,
       selfprop                = true,
       smokedelay              = [[0.1]],

@@ -67,8 +67,8 @@ local function TiltBody()
 					Turn(mhull, y_axis, math.rad(speed),math.rad(30))
 					newHeading = velHeading + 2*pi/3
 					
-					Turn(middle, x_axis, -math.rad(1.2*speed*0.5), math.rad(30*0.5))
-					Turn(middle, y_axis, -math.rad(1.2*speed*root3/2), math.rad(30*root3/2))
+					Turn(middle, x_axis, -math.rad(2*speed*0.5), math.rad(30*0.5))
+					Turn(middle, y_axis, -math.rad(2*speed*root3/2), math.rad(30*root3/2))
 					
 					Turn(lhull, y_axis, math.rad(0),math.rad(30))
 					Turn(mhull, x_axis, math.rad(0),math.rad(24))
@@ -79,7 +79,7 @@ local function TiltBody()
 					Turn(rhull, y_axis, math.rad(speed),math.rad(30))
 					newHeading = velHeading
 					
-					Turn(middle, x_axis, math.rad(1.2*speed), math.rad(30))
+					Turn(middle, x_axis, math.rad(2*speed), math.rad(30))
 					Turn(middle, y_axis, math.rad(0), math.rad(30))
 					
 					Turn(mhull, y_axis, math.rad(0),math.rad(30))
@@ -91,8 +91,8 @@ local function TiltBody()
 					Turn(lhull, y_axis, math.rad(speed),math.rad(30))
 					newHeading = velHeading - 2*pi/3
 					
-					Turn(middle, x_axis, -math.rad(1.2*speed*0.5), math.rad(30*0.5))
-					Turn(middle, y_axis, math.rad(1.2*speed*root3/2), math.rad(30*root3/2))
+					Turn(middle, x_axis, -math.rad(2*speed*0.5), math.rad(30*0.5))
+					Turn(middle, y_axis, math.rad(2*speed*root3/2), math.rad(30*root3/2))
 					
 					Turn(rhull, y_axis, math.rad(0),math.rad(30))
 					Turn(mhull, x_axis, math.rad(0),math.rad(24))
