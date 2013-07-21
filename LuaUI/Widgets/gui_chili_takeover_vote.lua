@@ -411,7 +411,7 @@ local function SetupNominationStack(nomi, name, name_color, owner, nom)
     }
   };
   nomi.stack = StackPanel:New {
-    y = 43*(nom-1);
+    y = 43*(#nominations);
     centerItems = false,
     resizeItems = false;
     orientation = "horizontal";
@@ -618,6 +618,9 @@ local function ParseNomination(nom) -- TODO need rewrite to make this perfect, n
   if (nominations[owner] ~= nil) then
     vote_scroll:RemoveChild(nominations[owner].stack)
   end
+  if (owner == -3) then
+    return
+  end
   local location = Spring.GetGameRulesParam("takeover_location_nomination"..nom)
   local unit = Spring.GetGameRulesParam("takeover_unit_nomination"..nom)
   local grace = Spring.GetGameRulesParam("takeover_grace_nomination"..nom)
@@ -639,6 +642,11 @@ local function UpdateNomListNOW()
   noms = noms and noms or 0
   if (noms == 0) and (default_nomination == true) then
     ShowDefaultNomination()
+  end
+  for i=1, #nominations do
+    if (nominations[i]) then
+      vote_scroll:RemoveChild(nominations[i].stack)
+    end
   end
   for i=1, noms do
     ParseNomination(i)
@@ -958,6 +966,8 @@ function widget:Update(s)
 	    if (under_siege[i] > 2) then
 	      under_siege[i] = 1
 	    end
+	  else
+	    under_siege[i] = 0;
 	  end
 	elseif (status_units[i].alive) then
 	  --status_units[i].button:SetCaption("DEAD");

@@ -167,25 +167,29 @@ local function UpdatePollData()
   -- update internal poll data
   spSetGameRulesParam("takeover_nominations", #NominationList)
   for i=1,#NominationList do
-    spSetGameRulesParam("takeover_owner_nomination"..i, NominationList[i].playerID)
-    spSetGameRulesParam("takeover_location_nomination"..i, NominationList[i].opts[1])
-    spSetGameRulesParam("takeover_unit_nomination"..i, NominationList[i].opts[2])
-    spSetGameRulesParam("takeover_grace_nomination"..i, NominationList[i].opts[3])
-    spSetGameRulesParam("takeover_godmode_nomination"..i, NominationList[i].opts[4])
-    spSetGameRulesParam("takeover_votes_nomination"..i, NominationList[i].votes)
+    if (NominationList[i]) then
+      spSetGameRulesParam("takeover_owner_nomination"..i, NominationList[i].playerID)
+      spSetGameRulesParam("takeover_location_nomination"..i, NominationList[i].opts[1])
+      spSetGameRulesParam("takeover_unit_nomination"..i, NominationList[i].opts[2])
+      spSetGameRulesParam("takeover_grace_nomination"..i, NominationList[i].opts[3])
+      spSetGameRulesParam("takeover_godmode_nomination"..i, NominationList[i].opts[4])
+      spSetGameRulesParam("takeover_votes_nomination"..i, NominationList[i].votes)
+    else
+      spSetGameRulesParam("takeover_owner_nomination"..i, -3) -- deleted nomination
+    end
   end -- this data is parsed by widget
   
   -- recalculate most popular option, quite easy, build a table of most wanted option
   local most_votes = 0
   for i=1,#NominationList do
-    if (NominationList[i].votes > most_votes) then
+    if NominationList[i] and (NominationList[i].votes > most_votes) then
       most_votes = NominationList[i].votes
     end
   end
   
   local most_voted = {}
   for i=1,#NominationList do
-    if (NominationList[i].votes == most_votes) then
+    if NominationList[i] and (NominationList[i].votes == most_votes) then
       most_voted[#most_voted+1] = i
     end
   end
@@ -223,6 +227,42 @@ local function UpdatePollData()
   end
 end
 
+local function CreatePlayer(playerID, name)
+  PlayerList[#PlayerList+1] = {
+    name = name;
+    playerID = playerID;
+    nomination = nil;
+  };
+  return #PlayerList
+end
+
+local function VoteNomination(PID, nom)
+  PlayerList[PID].nomination = nom
+  NominationList[nom].votes = NominationList[nom].votes + 1
+end
+
+local function DevoteNomination(PID, nom)
+  NominationList[nom].votes = NominationList[nom].votes - 1
+  if (NominationList[nom].votes == 0) then
+    for i=1,#PlayerList do
+      if (PlayerList[i].nomination == nom) then
+	PlayerList[i].nomination = nil
+      end
+    end
+    NominationList[nom] = nil
+    -- TODO make it so new nomination will not take place of deleted, but instead go to the end, while this function should shift data so that the end of the list becomes free rather than space in the middle
+  end
+end
+
+local function CreateNomination(playerID, location, unit, grace, godmode)
+  NominationList[#NominationList+1] = {
+    playerID = playerID,
+    opts = { location, unit, grace, godmode },
+    votes = 0,
+  };
+  return #NominationList
+end
+
 local function PlayerAgreeWith(playerID, name, line)
   words={}
   for word in line:gmatch("[^%s]+") do words[#words+1]=word end
@@ -230,21 +270,16 @@ local function PlayerAgreeWith(playerID, name, line)
   local Nominator = tonumber(words[2])
   local TPID = GetPlayerPID(Nominator)
   if TPID == -1 then return end
+  if (PlayerList[TPID].nomination == nil) then return end
+  local target_nomination = PlayerList[TPID].nomination
   local PID = GetPlayerPID(playerID)
   if PID == -1 then
-    PlayerList[#PlayerList+1] = {
-      name = name;
-      playerID = playerID;
-      nomination = PlayerList[TPID].nomination;
-    };
-    NominationList[PlayerList[TPID].nomination].votes = NominationList[PlayerList[TPID].nomination].votes+1;
-  else
-    if (PlayerList[PID].nomination) then
-      NominationList[PlayerList[PID].nomination].votes = NominationList[PlayerList[PID].nomination].votes-1;
-    end
-    PlayerList[PID].nomination = PlayerList[TPID].nomination;
-    NominationList[PlayerList[TPID].nomination].votes = NominationList[PlayerList[TPID].nomination].votes+1;
+    PID = CreatePlayer(playerID, name)
   end
+  if (PlayerList[PID].nomination ~= nil) then
+    DevoteNomination(PID, PlayerList[PID].nomination)
+  end
+  VoteNomination(PID, target_nomination)
   UpdatePollData()
 end
 
@@ -260,67 +295,24 @@ local function NominateNewRule(playerID, name, line)
   if (location == nil) or (grace == nil) or (godmode == nil) or (UnitDefs[unit] == nil) then return end -- safe check complete
   local PID = GetPlayerPID(playerID)
   if PID == -1 then
-    -- is there any nomination like the one player nominated?
-    local nom = #NominationList+1
-    for i=1,#NominationList do
-      if (NominationList[i].opts[1] == location) and (NominationList[i].opts[2] == unit) and (NominationList[3].opts[1] == grace) and (NominationList[i].opts[4] == godmode) then
-	-- oh there is
-	nom = i
-	break
-      end
+    PID = CreatePlayer(playerID, name)
+  end
+  -- is there any nomination like the one player nominated?
+  local nom = nil
+  for i=1,#NominationList do
+    if (NominationList[i].opts[1] == location) and (NominationList[i].opts[2] == unit) and (NominationList[3].opts[1] == grace) and (NominationList[i].opts[4] == godmode) then
+      -- oh there is
+      nom = i
+      break
     end
-    if (nom == #NominationList+1) then
-      NominationList[nom] = {
-	playerID = playerID,
-	opts = { location, unit, grace, godmode },
-	votes = 1,
-      };
-    else
-      NominationList[nom].votes = NominationList[nom].votes + 1
-    end
-    PlayerList[#PlayerList+1] = {
-      name = name;
-      playerID = playerID;
-      nomination = nom
-    };
-  else -- if player is making a new nomination, destroy his previous nomination - make players abandon his new rules.
-    local ThisPlayer = PlayerList[PID].nomination
-    if (NominationList[ThisPlayer].playerID == playerID) then
-      for i=1,#PlayerList do
-	if (i ~= PID) then
-	  if (PlayerList[i].nomination == ThisPlayer) then
-	    PlayerList[i].nomination = nil
-	  end
-	end
-      end
-      NominationList[ThisPlayer] = {
-	playerID = playerID,
-	opts = { location, unit, grace, godmode },
-	votes = 1,
-      };
-    else -- owner's nomination ain't player
-      -- decrease vote amount on old nomination
-      NominationList[ThisPlayer].votes = NominationList[ThisPlayer].votes - 1;
-      -- create new nomination
-      local nom = ThisPlayer
-      for i=1,#NominationList do
-	if (NominationList[i].opts[1] == location) and (NominationList[i].opts[2] == unit) and (NominationList[3].opts[1] == grace) and (NominationList[i].opts[4] == godmode) then
-	  -- oh there is
-	  nom = i
-	  break
-	end
-      end
-      if (nom == ThisPlayer) then
-	NominationList[nom] = {
-	  playerID = playerID,
-	  opts = { location, unit, grace, godmode },
-	  votes = 1,
-	};
-      else
-	NominationList[nom].votes = NominationList[nom].votes + 1
-      end
-      PlayerList[PID].nomination = nom
-    end
+  end
+  if (PlayerList[PID].nomination ~= nil) then
+    DevoteNomination(PID, PlayerList[PID].nomination)
+  end
+  if (nom ~= nil) then
+    VoteNomination(PID, nom)
+  else
+    VoteNomination(PID, CreateNomination(playerID, location, unit, grace, godmode))
   end
   UpdatePollData()
 end
