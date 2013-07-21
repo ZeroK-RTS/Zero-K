@@ -46,19 +46,16 @@ local function TiltBody()
 			local speed = vx*vx + vz*vz
 			
 			if speed > 5 then
-				local velHeading = Spring.GetHeadingFromVector(vx, vz)*headingToRad
+				local myHeading = Spring.GetUnitHeading(unitID)*headingToRad
+				local velHeading = Spring.GetHeadingFromVector(vx, vz)*headingToRad - myHeading
 				-- south is 0, increases anticlockwise
 				
 				local px,_,pz = Spring.GetUnitPiecePosition(unitID, heading)
 				
-				local curHeading = -Spring.GetHeadingFromVector(-px, -pz)*headingToRad
+				local curHeading = -Spring.GetHeadingFromVector(-px, -pz)*headingToRad 
 				
-				local diffHeading = velHeading - curHeading
-				if diffHeading > pi then
-					diffHeading = diffHeading - tau
-				elseif diffHeading < -pi then
-					diffHeading = diffHeading + tau
-				end
+				local diffHeading = (velHeading - curHeading + pi)%tau - pi -- keep in range [-pi,pi)
+				
 				local newHeading 
 				
 				if diffHeading < -pi/3 then
