@@ -38,6 +38,8 @@ toDegrees = 180/pi
 frameToMs = 1000/30
 msToFrame = 30/1000
 
+headingToRad = 1/32768*math.pi
+
 -- Explosion generators
 UNIT_SFX1 = 1024
 UNIT_SFX2 = 1025

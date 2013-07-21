@@ -14,7 +14,7 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 	
 smokePiece = { base}
 
-local root3 = math.sqrt(3)
+local root3on2 = math.sqrt(3)/2
 
 local isActive = false
 
@@ -46,12 +46,12 @@ local function TiltBody()
 			local speed = vx*vx + vz*vz
 			
 			if speed > 5 then
-				local velHeading = Spring.GetHeadingFromVector(vx, vz)/32768*math.pi
+				local velHeading = Spring.GetHeadingFromVector(vx, vz)*headingToRad
 				-- south is 0, increases anticlockwise
 				
 				local px,_,pz = Spring.GetUnitPiecePosition(unitID, heading)
 				
-				local curHeading = -Spring.GetHeadingFromVector(-px, -pz)/32768*math.pi
+				local curHeading = -Spring.GetHeadingFromVector(-px, -pz)*headingToRad
 				
 				local diffHeading = velHeading - curHeading
 				if diffHeading > pi then
@@ -68,7 +68,7 @@ local function TiltBody()
 					newHeading = velHeading + 2*pi/3
 					
 					Turn(middle, x_axis, -math.rad(2*speed*0.5), math.rad(30*0.5))
-					Turn(middle, y_axis, -math.rad(2*speed*root3/2), math.rad(30*root3/2))
+					Turn(middle, y_axis, -math.rad(2*speed*root3on2), math.rad(30*root3on2))
 					
 					Turn(lhull, y_axis, math.rad(0),math.rad(30))
 					Turn(mhull, x_axis, math.rad(0),math.rad(24))
@@ -92,7 +92,7 @@ local function TiltBody()
 					newHeading = velHeading - 2*pi/3
 					
 					Turn(middle, x_axis, -math.rad(2*speed*0.5), math.rad(30*0.5))
-					Turn(middle, y_axis, math.rad(2*speed*root3/2), math.rad(30*root3/2))
+					Turn(middle, y_axis, math.rad(2*speed*root3on2), math.rad(30*root3on2))
 					
 					Turn(rhull, y_axis, math.rad(0),math.rad(30))
 					Turn(mhull, x_axis, math.rad(0),math.rad(24))
