@@ -489,12 +489,20 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	armbanth = {
+	funnelweb = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
 		select = {
 			[1] = "heavy_bot_move",
+		},
+	},
+	armbanth = {
+		ok = {
+			[1] = "turret_select",
+		},
+		select = {
+			[1] = "turret_select",
 		},
 	},
 	armraven = {
