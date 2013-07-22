@@ -955,16 +955,17 @@ function widget:Update(s)
       end
       for i=1,TheUnitCount do
 	local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i, 0)
+	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i)
 	if (unit > -1) and (hp > 0) then
-	  local team = Spring.GetGameRulesParam("takeover_team_unit"..i, -1) -- could also rely on allyteam instead
-	  local maxhp = Spring.GetGameRulesParam("takeover_maxhp_unit"..i, 1)
-	  local emphp = Spring.GetGameRulesParam("takeover_emphp_unit"..i, 1)
-	  local emp = Spring.GetGameRulesParam("takeover_emp_unit"..i, 0)
+	  local team = Spring.GetGameRulesParam("takeover_team_unit"..i) -- could also rely on allyteam instead
+	  local maxhp = Spring.GetGameRulesParam("takeover_maxhp_unit"..i)
+	  local emphp = Spring.GetGameRulesParam("takeover_emphp_unit"..i)
+	  local emp = Spring.GetGameRulesParam("takeover_emp_unit"..i)
 	  hp = math.round(hp/maxhp*25)
 	  emp = math.round(emp/emphp*25) -- probably can be done better
 	  local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
 	  local name = GetPlayerName(owner,team,isAI)
+	  name = name and name or "unknown" -- since owner resigned it will update on next update
 	  status_units[i].button.tooltip = "Owner "..name..".";
 	  if (allyTeam == myAllyTeam) and (status_units[i].enemy) then
 	    status_enemy:RemoveChild(status_units[i].stack);
