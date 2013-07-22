@@ -1099,7 +1099,7 @@ function widget:DrawWorld()
   if not Spring.IsGUIHidden() then
     for i=1,TheUnitCount do
       local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-      if (unit > -1) and (visible[unit]) then
+      if (unit > -1) and ((visible[unit]) or Spring.GetSpectatingState()) then
 	local teamID = Spring.GetGameRulesParam("takeover_team_unit"..i)
 	local allyTeam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
 	if (Spring.ValidUnitID(unit)) then
