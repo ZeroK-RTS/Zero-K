@@ -23,9 +23,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Versteckter Raketenturm]],
+    description_de = [[Versteckter Gaussturm]],
     helptext 	   = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage, making it a good choice when the enemy is using artillery.]],
-	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
+	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
 	modelradius    = [[15]],
   },
 
@@ -45,7 +45,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[grim_gauss.dae]],
+  objectName                    = [[gauss_91.dae]],
   script                 		= [[dark_gauss.lua]],
   seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],

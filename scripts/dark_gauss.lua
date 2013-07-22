@@ -31,27 +31,34 @@ local function Open()
 	SetSignalMask(open) --set the signal to kill the opening animation
 
 	
-	Turn(lidLeft, x_axis, math.rad(0), unpackSpeed);
-	Turn(lidRight, x_axis, math.rad(0), unpackSpeed);
+	Turn(lidLeft, z_axis, math.rad(0), unpackSpeed);
+	Turn(lidRight, z_axis, math.rad(0), unpackSpeed);
 	
-	WaitForTurn(lidLeft, x_axis);
+	WaitForTurn(lidLeft, z_axis);
 	
-	Turn(wheel, y_axis, math.rad(-15),unpackSpeed);
+	Turn(wheel, x_axis, math.rad(-15),unpackSpeed);
 	
-	WaitForTurn(wheel, y_axis);
+	WaitForTurn(wheel, x_axis);
 	
-	Turn(hand, y_axis, math.rad(20), unpackSpeed);
-	Turn(arm,y_axis,math.rad(20), unpackSpeed);
-	Turn(wheel, y_axis, math.rad(-30), unpackSpeed);
-	Turn(cannon, y_axis, math.rad(-10), unpackSpeed);
+	Turn(hand, x_axis, math.rad(20), unpackSpeed);
+	Turn(arm,x_axis,math.rad(20), unpackSpeed);
+	Turn(wheel, x_axis, math.rad(-30), unpackSpeed);
+	Turn(cannon, x_axis, math.rad(-10), unpackSpeed);
 	
 	WaitForTurn(cannon, y_axis);
 	
-	Move(barrel1,x_axis,0,6);
-	Move(barrel2,x_axis,0,6);
-	Move(barrel3,x_axis,0,6);
+	Move(barrel1,z_axis,0,6);
+	Move(barrel2,z_axis,0,6);
+	Move(barrel3,z_axis,0,6);
 	
 	is_open = true
+end
+
+local function AimBlink()
+	while true do 
+		EmitSfx(aimProxy, 1024)
+		Sleep(200)
+	end
 end
 
 --closing animation of the factory
@@ -61,26 +68,28 @@ local function Close()
 	SetSignalMask(close) --set the signal to kill the closing animation
 	is_open = false;
 	
-	Move(barrel1,x_axis,-1,2);
-	Move(barrel2,x_axis,-1,2);
-	Move(barrel3,x_axis,-1,2);
+	Move(barrel1,z_axis,-1,2);
+	Move(barrel2,z_axis,-1,2);
+	Move(barrel3,z_axis,-1,2); 
 		
-	Turn(wheel, y_axis, math.rad(-15),math.rad(90));
-	Turn(cannon, y_axis, math.rad(65),math.rad(90));
+	Turn(wheel, x_axis, math.rad(-15),math.rad(90));
+	Turn(cannon, x_axis, math.rad(65),math.rad(90));
 	
-	Turn(hand, y_axis, math.rad(60),math.rad(90));
-	Turn(arm,y_axis,math.rad(107),math.rad(90));
 	
-	WaitForTurn(arm,y_axis);
 	
-	Turn(wheel, y_axis, math.rad(55),math.rad(160));
+	Turn(hand, x_axis, math.rad(60),math.rad(90));
+	Turn(arm,x_axis,math.rad(107),math.rad(90));
 	
-	WaitForTurn(wheel, y_axis);
+	WaitForTurn(arm,x_axis);
 	
-	Turn(wheel, y_axis, math.rad(65),math.rad(20));
+	Turn(wheel, x_axis, math.rad(55),math.rad(160));
 	
-	Turn(lidLeft, x_axis, math.rad(90), math.rad(180));
-	Turn(lidRight, x_axis, math.rad(-90), math.rad(180));
+	WaitForTurn(wheel, x_axis);
+	
+	Turn(wheel, x_axis, math.rad(65),math.rad(20));
+	
+	Turn(lidLeft, z_axis, math.rad(90), math.rad(180));
+	Turn(lidRight, z_axis, math.rad(-90), math.rad(180));
 
 	Spring.SetUnitArmored(unitID,true);
 
@@ -105,8 +114,11 @@ end
 
 function script.Create()
 	is_open = true;
+		
+	--StartThread(AimBlink);
 	StartThread(SmokeUnit)
 	StartThread(RestoreAfterDelay);
+
 end
 
 
@@ -122,7 +134,7 @@ function script.AimWeapon(num, heading, pitch )
 	Signal( aim )
 	SetSignalMask( aim )
 	
-	Turn( belt,  z_axis, heading, math.rad(200));
+	Turn( belt,  y_axis, heading, math.rad(200));
 	
 	if (not is_open) then
 		StartThread(Open);
@@ -133,14 +145,14 @@ function script.AimWeapon(num, heading, pitch )
 	end
 
 	--Turn( cannon, y_axis, heading, 1.2 )
-	Turn( belt,  z_axis, heading, math.rad(200));
-	Turn( wheel, y_axis, -math.rad(30), math.rad(200));
-	Turn( arm, y_axis, math.rad(30),10);
-	Turn( hand, y_axis, math.rad(30),10);
-	Turn( cannon, y_axis, -pitch-math.rad(30),10);
+	Turn( belt,  y_axis, heading, math.rad(200));
+	Turn( wheel, x_axis, -math.rad(30), math.rad(200));
+	Turn( arm, x_axis, math.rad(30),10);
+	Turn( hand, x_axis, math.rad(30),10);
+	Turn( cannon, x_axis, -pitch-math.rad(30),10);
 	 
-	WaitForTurn (belt, z_axis)
-	WaitForTurn (wheel, y_axis)
+	WaitForTurn (belt, y_axis)
+	WaitForTurn (wheel, x_axis)
 	
 	StartThread(RestoreAfterDelay);
 
@@ -149,17 +161,16 @@ end
 
 function script.FireWeapon(n)
 	EmitSfx(muzzle, 1024)
-	Move(barrel1,x_axis,-1,5);
-	Move(barrel2,x_axis,-1,7);
-	Move(barrel3,x_axis,-1,9);
+	Move(barrel1,z_axis,-1,5);
+	Move(barrel2,z_axis,-1,7);
+	Move(barrel3,z_axis,-1,9);
 	
 	Sleep(200);
-	Move(barrel3,x_axis,0,2);
+	Move(barrel3,z_axis,0,2);
 	Sleep(100);
-	Move(barrel2,x_axis,0,2);
+	Move(barrel2,z_axis,0,2);
 	Sleep(100);
-	Move(barrel1,x_axis,0,2);
-	
+	Move(barrel1,z_axis,0,2);
 end
 
 function script.Killed(recentDamage, maxHealth)
