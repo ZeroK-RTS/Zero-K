@@ -545,12 +545,12 @@ local function GiveUnitToMostMetalPlayerNear(unit,allyTeam)
       local unitID = units[j]
       if (unitID ~= TheUnit) then
 	local unitTeam = spGetUnitTeam(unitID)
-	if (unitTeam ~= TheUnitTeam) then
-	  if (score[unitTeam] == nil) then
-	    score[unitTeam] = 0
-	  end
-	  score[unitTeam] = score[unitTeam] + UnitDefs[spGetUnitDefID(unitID)].metalCost;
+-- 	if (unitTeam ~= TheUnitTeam) then -- apparently this can cause situation when #winners is empty when it shouldn't
+	if (score[unitTeam] == nil) then
+	  score[unitTeam] = 0
 	end
+	score[unitTeam] = score[unitTeam] + UnitDefs[spGetUnitDefID(unitID)].metalCost;
+-- 	end
       end
     end
   end
@@ -566,34 +566,39 @@ local function GiveUnitToMostMetalPlayerNear(unit,allyTeam)
       winners[#winners+1] = team
     end
   end
+  if (winners == nil) or (#winners < 1) then -- just to be sure it never happens again
+    return false
+  end
   spTransferUnit(unit, winners[random(1,#winners)], false);
+  return true
 end
 
-local function GiveUnitToMVP(unit,allyTeam) -- TODO rewrite this function to make it perfect, ideal, marvelous as it can ever be
-  local teams = {}
-  for _,t in pairs(spGetTeamList()) do
-    local allyteam = select(6,spGetTeamInfo(t))
-    if allyTeam == allyteam then
-      teams[#teams+1] = t
-    end
-  end
-  local mvp
-  for i=1,#teams do
-    local id,elo
-    local _,id,_,isAI = spGetTeamInfo(teams[i])
-    elo = select(10,spGetPlayerInfo(id))
-    elo = (elo.elo ~= nil) and elo.elo or 1000 -- this should make it look like AI has elo of 1000, right?
-    if (not isAI) then
-      elo = elo + 250 -- this is for singleplayer support
-    end
-    if (mvp == nil) then
-      mvp = { id = id, team = teams[i], elo = elo }
-    elseif (mvp.elo < elo) then
-      mvp = { id = id, team = teams[i], elo = elo }
-    end
-  end
-  spTransferUnit(unit, mvp.team, false);
-end
+-- abandoning this one
+-- local function GiveUnitToMVP(unit,allyTeam) -- TODO rewrite this function to make it perfect, ideal, marvelous as it can ever be
+--   local teams = {}
+--   for _,t in pairs(spGetTeamList()) do
+--     local allyteam = select(6,spGetTeamInfo(t))
+--     if allyTeam == allyteam then
+--       teams[#teams+1] = t
+--     end
+--   end
+--   local mvp
+--   for i=1,#teams do
+--     local id,elo
+--     local _,id,_,isAI = spGetTeamInfo(teams[i])
+--     elo = select(10,spGetPlayerInfo(id))
+--     elo = (elo.elo ~= nil) and elo.elo or 1000 -- this should make it look like AI has elo of 1000, right?
+--     if (not isAI) then
+--       elo = elo + 250 -- this is for singleplayer support
+--     end
+--     if (mvp == nil) then
+--       mvp = { id = id, team = teams[i], elo = elo }
+--     elseif (mvp.elo < elo) then
+--       mvp = { id = id, team = teams[i], elo = elo }
+--     end
+--   end
+--   spTransferUnit(unit, mvp.team, false);
+-- end
 
 function gadget:GameFrame (f)
   if (TheUnitsAreChained) and (f == DelayInFrames) then --FIXME probably better if equation can be done, or this section can be rewritten somehow
@@ -691,10 +696,11 @@ function gadget:GameFrame (f)
 	  for allyteam,sc in pairs(MostMetalOwnerData[i]) do
 	    if (sc >= 9) then
 -- 	      GiveUnitToMVP(TheUnit,allyteam) -- that is if winner is only one... it should be one, right?
-	      GiveUnitToMostMetalPlayerNear(TheUnit,allyteam)
-	      -- reset everyone's score, basically it just empties the capture data, but since if any other enemy unit is present and unit is still empied, it will commence again
-	      spSetGameRulesParam("takeover_siege_unit"..i, 0)
-	      MostMetalOwnerData[i] = nil 
+	      if (GiveUnitToMostMetalPlayerNear(TheUnit,allyteam)) then
+		-- reset everyone's score, basically it just empties the capture data, but since if any other enemy unit is present and unit is still empied, it will commence again
+		spSetGameRulesParam("takeover_siege_unit"..i, 0)
+		MostMetalOwnerData[i] = nil 
+	      end
 	      break
 	    end
 	  end
