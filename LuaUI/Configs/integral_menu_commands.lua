@@ -265,7 +265,9 @@ local overrides = {
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
 	}
 
--- noone really knows what this table does but it's needed for epic menu to get the hotkey
+-- This is the list of name ("action name") related to unit command. This name won't work using command line (eg: /fight, won't activate FIGHT command) but it can be binded to a key (eg: /bind f fight, will activate FIGHT when f is pressed)
+-- In reverse, one can use Spring.GetActionHotkey(name) to get the key binded to this name.
+-- This table is used in Keyboardmenu, Integral menu, and Epicmenu for hotkey management.
 local custom_cmd_actions = {
 	-- states are 2, targeted commands (e.g. attack) are 1, instant commands (e.g. selfd) are 3
 	-- can (probably) set to 1 instead of 3 if order doesn't need to be queueable

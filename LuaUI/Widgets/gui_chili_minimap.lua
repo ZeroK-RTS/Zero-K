@@ -63,7 +63,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes','showecoOverlay', 'lastmsgpos', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
@@ -104,13 +104,19 @@ options = {
 		type = 'bool',
 		value = true,
 	},
-	
 	alwaysDisplayMexes = {
-		name = 'Show metal spots',
-		hotkey = {key='f4', mod=''},
+		name = 'Always show metal spots',
+		desc = 'Do not hide metal spots',
 		type ='bool',
 		value = false,
-		actionname='showeco',
+	},
+	
+	showecoOverlay = {
+		name = 'Showeco Overlay',
+		desc = 'Show Metal & Geothermal Spot and Energy Grid',
+		hotkey = {key='f4', mod=''},
+		type ='button',
+		action='showeco',
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
@@ -377,7 +383,7 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', 2.5, 'clearmapmarks' ),
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'alwaysDisplayMexes'),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'showecoOverlay'),
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
 			
 			Chili.Button:New{ 

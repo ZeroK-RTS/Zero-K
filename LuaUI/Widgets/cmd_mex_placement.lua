@@ -145,6 +145,7 @@ local spotData = {}
 
 local wasSpectating = spGetSpectatingState()
 local metalSpotsNil = true
+local alwaysShowMexes = false
 
 ------------------------------------------------------------
 -- Functions
@@ -499,6 +500,10 @@ function widget:Update()
 	end
 end
 
+function widget:GameFrame()
+	alwaysShowMexes = (WG.GetWidgetOption and WG.GetWidgetOption('Chili Minimap','Settings/Interface/Map','alwaysDisplayMexes').value)
+end
+
 ------------------------------------------------------------
 -- Drawing
 ------------------------------------------------------------
@@ -631,7 +636,7 @@ function widget:DrawWorld()
 	-- Check command is to build a mex
 	local _, cmdID = spGetActiveCommand()
 	local showecoMode = WG.showeco
-	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal' or (WG.GetWidgetOption and WG.GetWidgetOption('Chili Minimap','Settings/Interface/Map','alwaysDisplayMexes').value)
+	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal' or alwaysShowMexes
 	
 	local mx, my = spGetMouseState()
 	local _, pos = spTraceScreenRay(mx, my, true)

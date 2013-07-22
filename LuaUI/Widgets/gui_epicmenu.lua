@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.320 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.321 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-06-30
     license   = "GNU GPL, v2 or later",
@@ -118,6 +118,8 @@ local myCountry = 'wut'
 local pathoptions = {}	
 local alloptions = {}	
 local actionToOption = {}
+local actionToAction2 = {}
+local _,_,_,_,_,_,_,_,custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
 local exitWindowVisible = false
 
@@ -179,7 +181,7 @@ local transkey = {
 	kp9				= 'numpad9',
 }
 
-
+local wantToReapplyBinding = false
 
 --------------------------------------------------------------------------------
 -- Widget globals
@@ -408,6 +410,11 @@ WG.crude.OpenPath = function() end
 --Allow other widget to toggle-up/show Epic-Menu remotely, defined in Initialize()
 WG.crude.ShowMenu = function() end --// allow other widget to toggle-up Epic-Menu which allow access to game settings' Menu via click on other GUI elements.
 
+--Allow other widget to get option status remotely, defined in Initialize()
+WG.GetWidgetOption = function() end
+
+--Allow other widget to set option status remotely, defined in Initialize()
+WG.SetWidgetOption = function() end
 
 --[[
 -- is this an improvement?
@@ -428,18 +435,6 @@ end
 WG.crude.GetActionOption = function(actionName)
 	return actionToOption[actionName]
 end
-
-WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
-	--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
-	return (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) or {}
-end 
-WG.SetWidgetOption = function(wname, path, key, value)  
-	if (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) then
-		local option = alloptions[path..wname .. key]
-		option.OnChange(value)
-	end
-end 
-
 
 local function SaveKeybinds()
 	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
@@ -547,7 +542,13 @@ end
 
 local function GetActionName(path, option)
 	local fullkey = GetFullKey(path, option):lower()
-	return option.action or fullkey
+	if option.action then --option refer to existing action
+		return option.action, option.action.."_2" --return refered actionName & create secondary actionName
+	elseif fullkey then --option have a unique action
+		return fullkey
+	else
+		return nil
+	end
 end
 
 WG.crude.GetActionName = GetActionName
@@ -785,6 +786,9 @@ local function GetActionHotkey(action)
 end
 
 local function AssignKeyBindAction(hotkey, actionName, verbose)
+	if actionToAction2[actionName] then --this actionName is linked to another actionName
+		actionName = actionToAction2[actionName] --use secondary actionName for binding key
+	end
 	if verbose then
 		--local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
 		local actions = Spring.GetKeyBindings(hotkey)
@@ -872,15 +876,20 @@ local function CreateOptionAction(path, option)
 			end
 		end
 	end
-	local actionName = GetActionName(path, option)
-	AddAction(actionName, kbfunc, nil, "t")
+	local actionName,override = GetActionName(path, option) --get an actionName to be created
+	if override and not custom_cmd_actions[actionName] then --attempt to use secondary actionName if it refer to existing actionName except when its command name. (command name don't have recursion issue because it cannot work when called from commandline)
+		AddAction(override, kbfunc, nil, "t") --create action
+		actionToAction2[actionName] = override --link the current actionName with the original actionName
+	else
+		AddAction(actionName, kbfunc, nil, "t") --create a unique action
+	end
 	actionToOption[actionName] = option
 	
 	if option.hotkey then
 		local existingRegister = otget( keybounditems, actionName) --check whether existing actionname is already bound with a custom hotkey in zkkey
-		if existingRegister == nil then
+		if existingRegister == nil then --not even registered, not even "None"
 			Spring.Echo("Epicmenu: " .. option.hotkey .. " (" .. option.key .. ", " .. option.wname..")") --tell user (in infolog.txt) that a widget is adding hotkey
-			otset(keybounditems, actionName, option.hotkey ) --save new hotkey if no existing key found (not yet applied. Will be applied in IntegrateWidget())
+			otset(keybounditems, actionName, option.hotkey ) --save new hotkey if no existing key found. not yet applied. Will be applied in IntegrateWidget() (AddOption() is called within IntegrateWidget())
 		end
 	end
 end
@@ -888,6 +897,9 @@ end
 --remove spring action for this option
 local function RemoveOptionAction(path, option)
 	local actionName = GetActionName(path, option)
+	if actionToAction2[actionName] then --this actionName was linked to another actionName?
+		actionName = actionToAction2[actionName] --do stuff to the linked actionName instead (leave original untouch)
+	end
 	RemoveAction(actionName)
 end
 
@@ -913,6 +925,10 @@ local function UnassignKeyBind(actionName, verbose)
 				echo( 'Unbound hotkeys from action: ' .. actionName )
 			end
 		end
+	end
+	if actionToAction2[actionName] then --is this actionName linked to a secondary actionName?
+		actionName = actionToAction2[actionName]
+		UnassignKeyBind(actionName, verbose) --unassign keybind for the linked name too
 	end
 	--otset( keybounditems, actionName, nil )
 end
@@ -1126,7 +1142,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		  option.orig_hotkey = orig_hotkey
 		end
 		
-		CreateOptionAction(path, option)
+		CreateOptionAction(path, option) --register an action for this option
 		
 	--Keybinds for radiobuttons
 	elseif option.type == 'radioButton' then --if its a list of checkboxes:
@@ -1136,14 +1152,13 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			item.key = option.items[i].key
 			item.hotkey = option.items[i].hotkey
 			item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item's key). Is needed for Hotkey
-			local actionName = GetActionName(path, item)
 			if item.hotkey then
 			  local orig_hotkey = ''
 			  orig_hotkey = item.hotkey
 			  item.orig_hotkey = orig_hotkey
 			end
 			
-			CreateOptionAction(path,item)
+			CreateOptionAction(path,item) --register an action for this option
 			
 			alloptions[path..wname..item.key] = item --is used to store options but will not be used to make button. Is for random stuff now.
 		end			
@@ -1161,13 +1176,13 @@ local function RemOption(path, option, wname )
 		--echo ('<epic menu> ...error #333 ', (option and option.key) )
 		return
 	end
-	RemoveOptionAction(path, option)	
-	otset( pathoptions[path], wname..option.key, nil )
-	alloptions[path..wname..option.key] = nil
+	RemoveOptionAction(path, option) --remove action registered on behalf of this widget.
+	otset( pathoptions[path], wname..option.key, nil ) --remove from menu (primary list)
+	alloptions[path..wname..option.key] = nil --remove from secondary list
 	if option.type == 'radioButton' then
 		for i=1, #option.items do
 			local itemsKey = option.items[i].key
-			alloptions[path..wname..itemsKey] = nil
+			alloptions[path..wname..itemsKey] = nil --remove option from radiobutton
 		end
 	end
 end
@@ -1337,8 +1352,8 @@ local function IntegrateWidget(w, addoptions, index)
 	MakeSubWindow(curPath)
 	
 	
-	ReApplyKeybinds() --reapply keybinds when widget load/removed (incase widget alter keybinds)
-	
+	--ReApplyKeybinds() --reapply keybinds when widget load/removed (incase widget alter keybinds)
+	wantToReapplyBinding = true --request ReApplyKeybind() in widget:Update(). IntegrateWidget() will be called many time during LUA loading but ReApplyKeybind() will be done only once in widget:Update()
 end
 
 --Store custom widget settings for all active widgets
@@ -1405,7 +1420,7 @@ local function GetHotkeyData(path, option)
 	if type(hotkey) == 'table' then
 		hotkey = hotkey[1]
 	end
-	if hotkey and hotkey ~= 'none' then --if ZKkey contain definitive hotkey: return zkkey's hotkey
+	if hotkey and hotkey ~= 'None' then --if ZKkey contain definitive hotkey: return zkkey's hotkey
 		if hotkey:find('%+%+') then
 			hotkey = hotkey:gsub( '%+%+', '+plus' )
 		end
@@ -2424,7 +2439,6 @@ function widget:ViewResize(vsx, vsy)
 	scrH = vsy
 end
 
-
 function widget:Initialize()
 	
 	if (not WG.Chili) then
@@ -2547,7 +2561,7 @@ function widget:Initialize()
 		local actionHotkey = GetActionHotkey(actionName)
 		--local hotkey = keybounditems[actionName] or actionHotkey
 		local hotkey = otget( keybounditems, actionName ) or actionHotkey
-		if not hotkey or hotkey == 'none' then
+		if not hotkey or hotkey == 'None' then
 			return ''
 		end
 		if type(hotkey) == 'table' then
@@ -2565,10 +2579,14 @@ function widget:Initialize()
 			hotkey = nil --convert '' into NIL.
 		end
 		if func then
+			local actionName2 = actionName
+			if actionToAction2[actionName] then --is this actionName linked to another actionName?
+				actionName2 = actionToAction2[actionName] --use linked actionName
+			end
 			if hotkey then
-				AddAction(actionName, func, nil, "t") --attach function to action
+				AddAction(actionName2, func, nil, "t") --attach function to action
 			else
-				RemoveAction(actionName) --detach function from action
+				RemoveAction(actionName2) --detach function from action
 			end
 		end
 		if hotkey then
@@ -2666,6 +2684,20 @@ function widget:Initialize()
 			ShowHideCrudeMenu()
 		end
 	end
+	
+	--intialize remote option fetcher
+	WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
+		--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
+		return (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) or {}
+	end 
+	
+	--intialize remote option setter
+	WG.SetWidgetOption = function(wname, path, key, value)  
+		if (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) then
+			local option = alloptions[path..wname .. key]
+			option.OnChange(value)
+		end
+	end 
 end
 
 function widget:Shutdown()
@@ -2734,6 +2766,11 @@ function widget:Update()
 			--lbl_clock:SetCaption( 'Clock\n ' .. os.date(format) )
 			lbl_clock:SetCaption( os.date(format) )
 		end
+	end
+	
+	if wantToReapplyBinding then --widget integration request ReApplyKeybinds()?
+		ReApplyKeybinds() --unbind all action/key, rebind action/key
+		wantToReapplyBinding = false
 	end
 end
 

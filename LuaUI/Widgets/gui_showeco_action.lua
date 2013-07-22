@@ -1,4 +1,4 @@
-local version = "v1.002"
+local version = "v1.003"
 function widget:GetInfo()
   return {
     name      = "Showeco and Grid Drawer",
@@ -53,6 +53,7 @@ local spGetUnitPosition  = Spring.GetUnitPosition
 local spGetActiveCommand = Spring.GetActiveCommand
 local spTraceScreenRay   = Spring.TraceScreenRay
 local spGetMouseState    = Spring.GetMouseState
+local spIsAABBInView  = Spring.IsAABBInView 
 
 local glVertex        = gl.Vertex
 local glCallList      = gl.CallList
@@ -63,6 +64,7 @@ local glCreateList    = gl.CreateList
 local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
 
 local pylonDefs = {}
+local positionCache = {}
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
@@ -105,9 +107,14 @@ local function HighlightPylons(selectedUnitDefID)
 			local radius = pylonDefs[spGetUnitDefID(id)].range
 			if (radius) then 
 				glColor(data.color[1],data.color[2], data.color[3], data.color[4])
-
-				local x,y,z = spGetUnitPosition(id)
-				gl.Utilities.DrawGroundCircle(x,z, radius)
+				if not positionCache[id] then
+					local x,y,z = spGetUnitPosition(id)
+					positionCache[id] = {minX = x-radius, minY = y, minZ=z-radius, maxX=x+radius,maxY=y, maxZ=z+radius ,x = x , z= z}
+				end
+				local inView = spIsAABBInView( positionCache[id].minX, positionCache[id].minY, positionCache[id].minZ,positionCache[id].maxX, positionCache[id].maxY, positionCache[id].maxZ )
+				if inView then
+					gl.Utilities.DrawGroundCircle(positionCache[id].x,positionCache[id].z, radius)
+				end
 			end 
 		end
 	end 
@@ -158,5 +165,11 @@ function widget:DrawWorldPreUnit()
 		HighlightPylons(nil)
 		glColor(1,1,1,1)
 		return
+	end
+end
+
+function widget:UnitDestroyed(unitID)
+	if positionCache[unitID] then
+		positionCache[unitID] = nil
 	end
 end
