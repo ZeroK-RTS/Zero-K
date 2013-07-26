@@ -873,18 +873,18 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     if (best_ally_score > 0) then
       -- now let's scale score
       for i,sc in pairs(allyTeamScore) do
-	if (sc < best_ally_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
-	  sc = 0
-	end
 	if (sc > 0) then
+	  if (sc < best_ally_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
+	    sc = 0
+	  end
 	  allyTeamScore[i] = points*(sc/best_ally_score)
 	end
       end
       for i,sc in pairs(teamScore) do
-	if (sc < best_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
-	  sc = 0
-	end
 	if (sc > 0) then
+	  if (sc < best_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
+	    sc = 0
+	  end
 	  teamScore[i] = points*(sc/best_score)
 	end
       end
@@ -933,7 +933,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 	    end
 	  end
 	end
-	if (megateam > -1) and ((spGetUnitTeam(unitID) == GaiaTeamID) or (megateam ~= spGetUnitTeam(unitID))) then
+	if (megateam > -1) and ((spGetUnitTeam(unitID) == GaiaTeamID) or (megateam ~= spGetUnitTeam(unitID))) then -- could probably not move unit between same ally team?
 	  spTransferUnit(unitID, megateam, false)
 	  data.AllyTeamsProgress[solewinner] = 0 -- owner allyteam will have 0 progress
 	  for allyteam,sc in pairs(data.AllyTeamsProgress) do
