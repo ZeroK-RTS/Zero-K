@@ -1148,7 +1148,7 @@ function widget:Update(s)
 	  local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(team)
 	  local name = GetPlayerName(owner,team,isAI)
 	  name = name and name or "unknown" -- since owner resigned it will update on next update
-	  status_units[i].button.tooltip = "Owner "..name..".";
+	  status_units[i].button.tooltip = "Owner: "..name..".";
 	  if (allyTeam == Spring.GetMyAllyTeamID()) and (status_units[i].enemy) then
 	    status_enemy:RemoveChild(status_units[i].stack);
 	    ReallignUnitsOnStatusPanel()

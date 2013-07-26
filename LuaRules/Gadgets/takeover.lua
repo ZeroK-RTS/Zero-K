@@ -1052,39 +1052,33 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
       if (TheUnit ~= -1) and (TheUnit == unitID) then
 	local x,_,z = spGetUnitPosition(unitID)
 	if (x < 0) or (z < 0) or (x > mapWidth) or (z > mapHeight) then return damage; end -- so you left map? become mortal glitcher :)
+	local scaled_damage = nil
 	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
-	local buttomhp = maxHealth/10
+	local bottomhp = maxHealth/10
 	local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
 	local emp = (paralyzeDamage or 0)/empHP
+	if (bottomhp < 500) and (damage > maxHealth) then scaled_damage = maxHealth*0.9; damage = scaled_damage; end -- TODO FIXME dirty hack to make glaives and fleas not to die from instant-kill weapons
 	if (MostPopularChoice[4] == 2) or ((MostPopularChoice[4] == 1) and (unitTeam == GaiaTeamID)) then
--- 	  Spring.Echo(weaponID.." "..health.." "..damage)
 	  if (weaponID < 0) then return 0; end
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
 	    -- you may ask yourself why, the answer is: i do not want to block emp/slow damage, if you know way to make this better, contact me
-	    UnitNoOverhealData[unitID] = health
+	    UnitNoOverhealData[unitID] = health+floor(damage+1)
 	    spSetUnitHealth(unitID, {health = health+floor(damage+1)});
-	  end	  
-	  if (health-damage < buttomhp) then
--- 	  if (health-damage >= buttomhp) then --- tried to rewrite it, but failed ;(
-	    UnitNoOverhealData[unitID] = health
- 	    spSetUnitHealth(unitID, {health = health+floor(damage+1-health+buttomhp)});
--- 	  elseif (health-damage < buttomhp) then
--- 	    UnitNoOverhealData[unitID] = buttomhp+floor(damage+1)
---  	    spSetUnitHealth(unitID, {health = buttomhp+floor(damage+1)});
+	  end
+	  if (health-damage < bottomhp) then
+-- 	    Spring.Echo("Too much damage: "..damage.." unit health before damage: "..health.." after fix: "..(health+floor(damage+1-health+bottomhp))..".")
+	    UnitNoOverhealData[unitID] = health+floor(damage+1)
+ 	    spSetUnitHealth(unitID, {health = health+floor(damage+1-health+bottomhp)});
 	  end
 	elseif (MostPopularChoice[4] == 1) then
 	  if (weaponID < 0) then return 0; end
 	  if ((emp >= 1) or (TheUnitsAreChained) or (unitTeam == GaiaTeamID)) then
 	    if (weaponID < 0) then return 0; end
-	    UnitNoOverhealData[unitID] = health
+	    UnitNoOverhealData[unitID] = health+floor(damage+1)
 	    spSetUnitHealth(unitID, {health = health+floor(damage+1)});
 	  end
 	end
--- 	local health = select(1,spGetUnitHealth(unitID))
--- 	if (health > maxHealth) then
--- 	  UnitNoOverhealData[unitID] = health
--- 	  spSetUnitHealth(unitID, {health = maxHealth})
--- 	end
+	if (scaled_damage ~= nil) then return scaled_damage end
       end
     end
   end
@@ -1099,11 +1093,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
       if (TheUnit ~= -1) and (TheUnit == unitID) and (UnitNoOverhealData[unitID]) then
 	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
 	if (health > UnitNoOverhealData[unitID]) then
+	  Spring.Echo("Unit has too much health. "..health.." > "..UnitNoOverhealData[unitID])
 	  spSetUnitHealth(unitID, {health = UnitNoOverhealData[unitID]})
 	  UnitNoOverhealData[unitID] = nil
 	end
 	if (health > maxHealth) then
-	  UnitNoOverhealData[unitID] = health
+	  Spring.Echo("Unit health is over maximum!")
 	  spSetUnitHealth(unitID, {health = maxHealth})
 	end
       end
