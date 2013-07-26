@@ -467,13 +467,16 @@ end
 -- basically for every 1% of objective's emped state, most metalcost allyteam in circle gets 3.33% additional score points, which makes capping faster
 
 local function InitializeObjective(unitID, index, ud, lockdown)
-  ObjectiveData[unitID] = { index = index, capradius, capscore, siege = false, lastsiege = -1000, AllyTeamsProgress = {}, TeamsProgress = {}}
+--   Spring.Echo("InitObj "..unitID.." "..index.." "..tostring(lockdown).." "..tostring(ObjectiveData[unitID] == nil)..".")
+  if (ObjectiveData[unitID] == nil) then
+    ObjectiveData[unitID] = { index = index, capradius, capscore, siege = false, lastsiege = -1000, AllyTeamsProgress = {}, TeamsProgress = {}}
+  end
   local rad, score = GetCapDataForCost(ud.metalCost)
   ObjectiveData[unitID].capradius = rad
   spSetUnitRulesParam(unitID, "takeover_cap_range", round(rad), {public = true}) -- lol didn't know about public
   ObjectiveData[unitID].capscore = score
-  spSetGameRulesParam("takeover_team_unit"..index, GaiaTeamID)
-  spSetGameRulesParam("takeover_allyteam_unit"..index, GaiaAllyTeamID)
+  spSetGameRulesParam("takeover_team_unit"..index, Spring.GetUnitTeam(unitID))
+  spSetGameRulesParam("takeover_allyteam_unit"..index, Spring.GetUnitAllyTeam(unitID))
   local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
   local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
   local emp = (paralyzeDamage or 0)
@@ -719,13 +722,7 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   -- spawn units
   for i=1,#SpawnPos do
 --     local uniqname = UnitDefs[MostPopularChoice[2]].name.."_tq"
-    local unit = spCreateUnit(UnitDefs[MostPopularChoice[2]].id, SpawnPos[i][1], spGetGroundHeight(SpawnPos[i][1], SpawnPos[i][2])+40, SpawnPos[i][2],"n",GaiaTeamID)
-    -- since i can see who is objective in unitcreated callback...
---     if (unit ~= nil) then
---       local id = #TheUnits+1
---       TheUnits[id] = unit
---       InitializeObjective(unit, id, UnitDefNames[uniqname])
---     end
+    spCreateUnit(UnitDefs[MostPopularChoice[2]].id, SpawnPos[i][1], spGetGroundHeight(SpawnPos[i][1], SpawnPos[i][2])+40, SpawnPos[i][2],"n",GaiaTeamID)
   end
   if (#TheUnits > 0) then
     TheUnitsAreChained = true
@@ -753,44 +750,6 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   spSetGameRulesParam("takeover_vote", 0) -- UNCOMMENT ME
 end
 
--- local function GiveUnitToMostMetalPlayerNear(unit,allyTeam)
---   local x,_,z = spGetUnitPosition(TheUnit)
---   local units = spGetUnitsInCylinder(x, z, CAPTURE_RANGE)
---   local score = {}
---   local TheUnitTeam = spGetUnitTeam(unit)
---   if (#units > 0) then
---     for j=1,#units do
---       local unitID = units[j]
---       if (unitID ~= TheUnit) then
--- 	local unitTeam = spGetUnitTeam(unitID)
--- -- 	if (unitTeam ~= TheUnitTeam) then -- apparently this can cause situation when #winners is empty when it shouldn't
--- 	if (score[unitTeam] == nil) then
--- 	  score[unitTeam] = 0
--- 	end
--- 	score[unitTeam] = score[unitTeam] + UnitDefs[spGetUnitDefID(unitID)].metalCost;
--- -- 	end
---       end
---     end
---   end
---   local best_score
---   for _,sc in pairs(score) do -- TODO get rid of the pairs and replace with smth like for i=1,n do
---     if (best_score == nil) or (sc > best_score) then
---       best_score = sc
---     end
---   end
---   local winners = {}
---   for team,sc in pairs(score) do -- TODO get rid of the pairs and replace with smth like for i=1,n do
---     if (best_score == sc) then
---       winners[#winners+1] = team
---     end
---   end
---   if (winners == nil) or (#winners < 1) then -- just to be sure it never happens again
---     return false
---   end
---   spTransferUnit(unit, winners[random(1,#winners)], false);
---   return true
--- end
-
 -- TODO
 -- add cap car damage here too, cap car should do any damage it wants, but not transfer unit on 100%, instead, all capcar damage, allied team wise should contribute to capture speed
 -- i wonder how should i do that... probably GG. stuff capcar has and finally change the layer to 1, but then i need to edit some of capcar code to ignore objective... fine... someday :p
@@ -804,7 +763,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
   local points = CAP_POINTS_PER_SEC * emp_bonus * dmg_bonus * cap_bonus
   if (data.siege) and (frame-120 > data.lastsiege) then
     local ok = true
-    for allyteam,score in pairs(data.AllyTeamsProgress) do
+    for _,score in pairs(data.AllyTeamsProgress) do
       if (score > 0) then
 	ok = false
 	break
@@ -870,113 +829,96 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 	winner_allyteam = team
       end
     end
-    if (best_ally_score > 0) then
-      -- now let's scale score
-      for i,sc in pairs(allyTeamScore) do
-	if (sc > 0) then
-	  if (sc < best_ally_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
-	    sc = 0
-	  end
-	  allyTeamScore[i] = points*(sc/best_ally_score)
+--     if (best_ally_score > 0) then
+    -- now let's scale score
+    for i,sc in pairs(allyTeamScore) do
+      if (sc > 0) then
+	if (sc < best_ally_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
+	  sc = 0
 	end
-      end
-      for i,sc in pairs(teamScore) do
-	if (sc > 0) then
-	  if (sc < best_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
-	    sc = 0
-	  end
-	  teamScore[i] = points*(sc/best_score)
-	end
-      end
-      -- now let's add points, note if you had no unit, your personal team points will be removed, if entire allyteam has lost all units in circle, entire allyteam score will be decremented
-      for allyteam,sc in pairs(data.AllyTeamsProgress) do
-	if (allyTeamScore[allyteam] ~= nil) and (enemies) then
-	  data.AllyTeamsProgress[allyteam] = sc + allyTeamScore[allyteam]
-	else
-	  data.AllyTeamsProgress[allyteam] = sc - CAP_POINTS_PER_SEC
-	end
-	allyTeamScore[allyteam] = nil
-      end
-      for team,sc in pairs(data.TeamsProgress) do
-	if (teamScore[team] ~= nil) and (enemies) then
-	  data.TeamsProgress[team] = sc + teamScore[team]
-	else
-	  data.TeamsProgress[team] = sc - CAP_POINTS_PER_SEC
-	end
-	teamScore[team] = nil
-      end
-      -- all the data that wasn't looped
-      for allyteam,sc in pairs(allyTeamScore) do
-	data.AllyTeamsProgress[allyteam] = sc
-      end
-      for team,sc in pairs(teamScore) do
-	data.TeamsProgress[team] = sc
-      end
-      -- now, who ever accumulated most points needed wins!
-      local winners_ally_team = {}
-      for allyteam,sc in pairs(data.AllyTeamsProgress) do
-	if (sc >= data.capscore) then
-	  winners_ally_team[#winners_ally_team+1] = allyteam
-	end
-      end
-      if (#winners_ally_team > 0) then
-	local solewinner = winners_ally_team[random(1,#winners_ally_team)]
-	local megascore = -1
-	local megateam = -1
-	-- determine most useful player
-	for team,sc in pairs(data.TeamsProgress) do
-	  local teams_ally = select(6,spGetTeamInfo(team))
-	  if (teams_ally == solewinner) then
-	    if (sc > megascore) then
-	      megascore = sc
-	      megateam = team
-	    end
-	  end
-	end
-	if (megateam > -1) and ((spGetUnitTeam(unitID) == GaiaTeamID) or (megateam ~= spGetUnitTeam(unitID))) then -- could probably not move unit between same ally team?
-	  spTransferUnit(unitID, megateam, false)
-	  data.AllyTeamsProgress[solewinner] = 0 -- owner allyteam will have 0 progress
-	  for allyteam,sc in pairs(data.AllyTeamsProgress) do
-	    data.AllyTeamsProgress[allyteam] = sc/2 -- halves all enemy progress, because unit was captured
-	  end
-	  data.TeamsProgress = {} -- entire team data is emptied, since it is no more up to date
-	  data.siege = false -- siege will reset if enemy units are still present
-	  spSetGameRulesParam("takeover_siege_unit"..i, 0)
-  --       else
-  -- 	Spring.Echo("sum thin wong") -- >_>
-	end
+	allyTeamScore[i] = points*(sc/best_ally_score)
       end
     end
---     -- why this? this will make it sure that if both players have same metalcost value near unit if it will change sides unfairly, but rather enemy forces hinder capture process
---     for allyteam,sc in pairs(score) do -- TODO get rid of the pairs and replace with smth like for i=1,n do
---       if (best_score == sc) and (allyteam ~= winner_allyteam) then
--- 	winner_allyteam = nil
--- 	break
---       end
---     end
---     if (winner_allyteam ~= nil) then
---       if (MostMetalOwnerData[i][winner_allyteam] == nil) then
--- 	MostMetalOwnerData[i][winner_allyteam] = 1; -- score
+    for i,sc in pairs(teamScore) do
+      if (sc > 0) then
+	if (sc < best_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
+	  sc = 0
+	end
+	teamScore[i] = points*(sc/best_score)
+      end
+    end
+    -- now let's add points, note if you had no unit, your personal team points will be removed, if entire allyteam has lost all units in circle, entire allyteam score will be decremented
+    for allyteam,sc in pairs(data.AllyTeamsProgress) do
+      if (allyTeamScore[allyteam] ~= nil) and (enemies) then
+	data.AllyTeamsProgress[allyteam] = sc + allyTeamScore[allyteam]
+      else
+	data.AllyTeamsProgress[allyteam] = sc - CAP_POINTS_PER_SEC
+      end
+      allyTeamScore[allyteam] = nil
+    end
+    for team,sc in pairs(data.TeamsProgress) do
+      if (teamScore[team] ~= nil) and (enemies) then
+	data.TeamsProgress[team] = sc + teamScore[team]
+      else
+	data.TeamsProgress[team] = sc - CAP_POINTS_PER_SEC
+      end
+      teamScore[team] = nil
+    end
+    -- all the data that wasn't looped
+    for allyteam,sc in pairs(allyTeamScore) do
+      data.AllyTeamsProgress[allyteam] = sc
+    end
+    for team,sc in pairs(teamScore) do
+      data.TeamsProgress[team] = sc
+    end
+    -- now, who ever accumulated most points needed wins!
+    local winners_ally_team = {}
+    for allyteam,sc in pairs(data.AllyTeamsProgress) do
+      if (sc >= data.capscore) then
+	data.AllyTeamsProgress[allyteam] = data.capscore -- you may not be able to go over 100%
+	winners_ally_team[#winners_ally_team+1] = allyteam
+      end
+    end
+    for team,sc in pairs(data.TeamsProgress) do
+      if (sc >= data.capscore) then
+	data.TeamsProgress[team] = data.capscore -- you may not be able to go over 100%
+      end
+    end
+    if (#winners_ally_team > 0) then
+      local solewinner = winners_ally_team[random(1,#winners_ally_team)]
+      local megascore = -1
+      local megateam = -1
+      -- determine most useful player
+      for team,sc in pairs(data.TeamsProgress) do
+	local teams_ally = select(6,spGetTeamInfo(team))
+	if (teams_ally == solewinner) then
+	  if (sc > megascore) then
+	    megascore = sc
+	    megateam = team
+	  end
+	end
+      end
+      if (megateam > -1) and ((spGetUnitTeam(unitID) == GaiaTeamID) or (megateam ~= spGetUnitTeam(unitID))) then -- could probably not move unit between same ally team?
+	spTransferUnit(unitID, megateam, false)
+	data.AllyTeamsProgress[solewinner] = 0 -- owner allyteam will have 0 progress
+	for allyteam,sc in pairs(data.AllyTeamsProgress) do
+	  data.AllyTeamsProgress[allyteam] = sc/2 -- halves all enemy progress, because unit was captured
+	end
+	data.TeamsProgress = {} -- entire team data is emptied, since it is no more up to date
+	data.siege = false -- siege will reset if enemy units are still present
+	spSetGameRulesParam("takeover_siege_unit"..i, 0)
 --       else
--- 	MostMetalOwnerData[i][winner_allyteam] = MostMetalOwnerData[i][winner_allyteam] + 1;
---       end
---     end
---       -- I can check for most score in same gameframe :)
---     for allyteam,sc in pairs(MostMetalOwnerData[i]) do
---       if (sc >= 9) then
--- 	if (GiveUnitToMostMetalPlayerNear(TheUnit,allyteam)) then
--- 	  -- reset everyone's score, basically it just empties the capture data, but since if any other enemy unit is present and unit is still empied, it will commence again
--- 	  spSetGameRulesParam("takeover_siege_unit"..i, 0)
--- 	  MostMetalOwnerData[i] = nil 
+-- 	Spring.Echo("sum thin wong") -- >_>
 -- 	end
--- 	break
---       end
---     end
+      end
+    end
   end
   for _,allyteam in ipairs(spGetAllyTeamList()) do -- transmit all allyteam's progress on capping
-    local sc = data.AllyTeamsProgress[allyteam]
-    sc = sc and round(data.AllyTeamsProgress[allyteam]/data.capscore*100) or 0
-    spSetUnitRulesParam(unitID, "takeover_cap_allyteam"..allyteam, sc, {public = true}) -- lol didn't know about public
+    if (data.AllyTeamsProgress[allyteam]) then
+      spSetUnitRulesParam(unitID, "takeover_cap_allyteam"..allyteam, round(data.AllyTeamsProgress[allyteam]/data.capscore*100), {public = true}) -- lol didn't know about public
+    else
+      spSetUnitRulesParam(unitID, "takeover_cap_allyteam"..allyteam, 0, {public = true})
+    end
     --Spring.Echo("takeover_cap_allyteam"..allyteam.." "..sc)
   end
 end
@@ -1093,12 +1035,10 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
       if (TheUnit ~= -1) and (TheUnit == unitID) and (UnitNoOverhealData[unitID]) then
 	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
 	if (health > UnitNoOverhealData[unitID]) then
-	  Spring.Echo("Unit has too much health. "..health.." > "..UnitNoOverhealData[unitID])
 	  spSetUnitHealth(unitID, {health = UnitNoOverhealData[unitID]})
 	  UnitNoOverhealData[unitID] = nil
 	end
 	if (health > maxHealth) then
-	  Spring.Echo("Unit health is over maximum!")
 	  spSetUnitHealth(unitID, {health = maxHealth})
 	end
       end
@@ -1113,30 +1053,22 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam)
   return true
 end
   
-function gadget:UnitCreated(unitID, unitDefID, teamID)
+function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
   if (UnitDefs[unitDefID].customParams.tqobj) then
     local TheUnit
     local id = -1
     for i,unit in pairs(TheUnits) do
-      if (unit > -1) and (spGetUnitRulesParam(unit, "wasMorphedTo") ~= nil) and (spGetUnitRulesParam(unit, "wasMorphedTo") == unit) then
+      if (unit == -1) then
 	id = i
 	break
       end
     end
-    local oldobj
-    if (ObjectiveData[unit] ~= nil) then
-      oldobj = CopyTable(ObjectiveData[unit], true)
-    end
-    if (id ~= -1) then
-      gadget:UnitDestroyed(unitID, unitDefID, teamID)
-    end
-    if (id ~= -1) then
-      InitializeObjective(unitID, id, UnitDefs[unitDefID], spGetGameFrame()<=300) -- objective ain't dead anymore, hehehehe
-      if (oldobj ~= nil) then
-	ObjectiveData[unitID] = oldobj
-      end
-    else
-      InitializeObjective(unitID, #TheUnits+1, UnitDefs[unitDefID], spGetGameFrame()<=300) -- objective ain't dead anymore, hehehehe
+    if (id == -1) and (spGetGameFrame() <= 300) then
+--       Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just created. true "..#TheUnits+1)
+      InitializeObjective(unitID, #TheUnits+1, UnitDefs[unitDefID], true)
+    elseif (builderID) then -- might be ressedv
+--       Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just created. "..builderID.." "..id)
+      InitializeObjective(unitID, id, UnitDefs[unitDefID], false)
     end
   elseif (thingsWhichAreDrones[unitDefID]) and ((TheUnitsAreChained) or (teamID == GaiaTeamID)) then
     local carrierID = GG.droneList[unitID].carrier
@@ -1168,17 +1100,27 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam) -- TODO detect if The
   for i=1,#TheUnits do
     TheUnit = TheUnits[i]
     if (unitID == TheUnit) then
-      spSetGameRulesParam("takeover_id_unit"..i, -1)
-      spSetGameRulesParam("takeover_udid_unit"..i, -1)
-      spSetGameRulesParam("takeover_team_unit"..i, -1)
-      spSetGameRulesParam("takeover_allyteam_unit"..i, -1)
-      spSetGameRulesParam("takeover_maxhp_unit"..i, 1)
-      spSetGameRulesParam("takeover_hp_unit"..i, 0)
-      spSetGameRulesParam("takeover_emphp_unit"..i, 1)
-      spSetGameRulesParam("takeover_emp_unit"..i, 0)
-      TheUnits[i] = -1 -- because apparently if i have for example { 1245, 532, 345 } and i set 532 to nil, for i=1,#TheUnits will never reach 345 O_O
-      ObjectiveData[unitID] = nil
-      break
+      if (spGetUnitRulesParam(TheUnit, "wasMorphedTo") ~= nil) then
+-- 	Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just morphed")
+	local newunit = spGetUnitRulesParam(TheUnit, "wasMorphedTo")
+	ObjectiveData[newunit] = CopyTable(ObjectiveData[unitID], true)
+	InitializeObjective(newunit, i, UnitDefs[spGetUnitDefID(newunit)], false)
+	ObjectiveData[unitID] = nil
+	break
+      else
+-- 	Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just died")
+	spSetGameRulesParam("takeover_id_unit"..i, -1)
+	spSetGameRulesParam("takeover_udid_unit"..i, -1)
+	spSetGameRulesParam("takeover_team_unit"..i, -1)
+	spSetGameRulesParam("takeover_allyteam_unit"..i, -1)
+	spSetGameRulesParam("takeover_maxhp_unit"..i, 1)
+	spSetGameRulesParam("takeover_hp_unit"..i, 0)
+	spSetGameRulesParam("takeover_emphp_unit"..i, 1)
+	spSetGameRulesParam("takeover_emp_unit"..i, 0)
+	TheUnits[i] = -1 -- because apparently if i have for example { 1245, 532, 345 } and i set 532 to nil, for i=1,#TheUnits will never reach 345 O_O
+	ObjectiveData[unitID] = nil
+	break
+      end
     end
   end
 end

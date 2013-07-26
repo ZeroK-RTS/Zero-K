@@ -456,8 +456,8 @@ if (modOptions and (modOptions.zkmode == "takeover")) then
 	local newname = name.."_tq"
 	local new_morphie
 	if (type(data) ~= "number") and (data.into ~= nil) then
--- 	  Spring.Echo("ERROR "..name.." has 1 entry")
--- 	  Spring.Echo("ERROR ^> "..data.into)
+-- 	  Spring.Echo("ERROR "..newname.." has 1 entry")
+-- 	  Spring.Echo("ERROR ^> "..data.into.."_tq")
 	  new_morphie = {
 	    [newname] = {
 	      into = data.into.."_tq",
@@ -467,14 +467,13 @@ if (modOptions and (modOptions.zkmode == "takeover")) then
 	  }
 	  AddUnit(data.into)
 	else
--- 	  Spring.Echo("ERROR "..name.." has multiple")
+-- 	  Spring.Echo("ERROR "..newname.." has multiple")
 	  new_morphie = {
-	    [newname] = {
-	    },
+	    [newname] = {}
 	  }
 	  local num=1
 	  for inner_name, inner_data in pairs(data) do
--- 	    Spring.Echo("ERROR -> "..inner_data.into)
+-- 	    Spring.Echo("ERROR -> "..inner_data.into.."_tq")
 	    new_morphie[newname][num] = {
 	      into = inner_data.into.."_tq",
 	      time = inner_data.time,
@@ -484,17 +483,26 @@ if (modOptions and (modOptions.zkmode == "takeover")) then
 	    num=num+1
 	  end
 	end
-	if (new_morphie) then
+	if (new_morphie ~= nil) then
 	  morphDefs = MergeTable(morphDefs, new_morphie, true)
 	end
       end
     end
   end
-  for name, data in pairs(morphDefs) do
-    if (type(name) == "string") and (name:find("_tk")) then
-      Spring.Echo("ERROR OK "..name)
-    end
-  end
+--   for name, data in pairs(morphDefs) do
+--     Spring.Echo("ERROR OK "..name)
+--     if (type(data) ~= "number") and (data.into ~= nil) then
+--       Spring.Echo("ERROR "..name.." has 1 entry")
+--       Spring.Echo("ERROR ^> "..data.into)
+--     else
+--       Spring.Echo("ERROR "..name.." has multiple")
+--       local num=1
+--       for inner_name, inner_data in pairs(data) do
+-- 	Spring.Echo("ERROR -> "..inner_data.into)
+-- 	num=num+1
+--       end
+--     end
+--   end
 end
 
 --------------------------------------------------------------------------------

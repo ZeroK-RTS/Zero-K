@@ -10,7 +10,7 @@ function widget:GetInfo()
     author    = "Tom Fyuri", -- also kudos to Sprung, KingRaptor and jK
     date      = "Jul 2013",
     license   = "GPL v2 or later",
-    layer     = -1, 
+    layer     = 2, 
     enabled   = true  --  loaded by default?
   }
 end
@@ -149,10 +149,10 @@ if DEFAULT_CHOICE then
   DEFAULT_CHOICE[2] = UnitDefNames[DEFAULT_CHOICE[2].."_tq"].id
 end
 
+local TheUnitsDefId = {}
 local TheUnitCount = 0
 local ShowedNoms = 0
 
-local visible = {}
 local under_siege = {}
 
 local iconFormat = ''
@@ -958,18 +958,16 @@ local function SetupIngameStatusBar()
   local unit_type = Spring.GetGameRulesParam("takeover_winner_opts2")
   for i=1,TheUnitCount do
     local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-    local filepic = (UnitDefs[unit_type].id)
     if (unit > -1) then
-      if (Spring.ValidUnitID(unit) and Spring.GetUnitPosition(unit)) then
-	visible[unit] = true
-      end
-      filepic = UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id
+      TheUnitsDefId[i] = UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id
+    else
+      TheUnitsDefId[i] = UnitDefs[unit_type].id
     end
     status_units[i] = {
       alive = true,
       enemy = true,
       image = Image:New {
-	file = "#"..(filepic); -- "unitpics/"..UnitDefs[unit_type].name..".png";
+	file = "#"..(TheUnitsDefId[i]); -- "unitpics/"..UnitDefs[unit_type].name..".png";
 	height = 40;
 	width = 40;
       },
@@ -1082,6 +1080,50 @@ local function ReallignUnitsOnStatusPanel()
   end
 end
 
+local function ReInitUnit(i)
+  status_units[i].stack:RemoveChild(status_units[i].button)
+  status_units[i].button:RemoveChild(status_units[i].image)
+  TheUnitsDefId[i] = UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id
+  status_units[i].image.file = "#"..(TheUnitsDefId[i])
+  status_units[i].button:AddChild(status_units[i].image)
+  status_units[i].stack:AddChild(status_units[i].button)
+  status_units[i].stack:RemoveChild(status_units[i].health)
+  status_units[i].stack:RemoveChild(status_units[i].emp)
+  status_units[i].stack:RemoveChild(status_units[i].undead)
+  status_units[i].stack:RemoveChild(status_units[i].dead)
+  if (Spring.GetGameRulesParam("takeover_winner_opts4") == 2) then
+    status_units[i].stack:AddChild(status_units[i].undead)
+  else
+    status_units[i].stack:AddChild(status_units[i].health)
+  end   
+  status_units[i].stack:AddChild(status_units[i].emp)
+  status_units[i].alive = true
+end
+
+function widget:UnitEnteredLos(uID, tID) -- probably useless code
+  for i=1,TheUnitCount do
+    local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
+    if (unit > -1) and (unit == uID) then
+      ReInitUnit(i)
+      break
+    end
+  end
+end
+
+function widget:UnitCreated(unitID, unitDefID, teamID, builderID)
+  if (not builderID) and (UnitDefs[unitDefID].customParams.tqobj) then
+    --Spring.Echo("WIDGET DETECT "..unitID)
+    for i=1,TheUnitCount do
+      local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
+      if (unit > -1) and (unit == uID) then
+	--Spring.Echo("testing against "..unit)
+	ReInitUnit(i)
+	break
+      end
+    end    
+  end
+end
+
 function widget:Update(s)
   timer = timer + s
   if timer > UPDATE_FREQUENCY then
@@ -1130,19 +1172,12 @@ function widget:Update(s)
       end
       for i=1,TheUnitCount do
 	local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
+	local udid = UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id
 	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i)
 	if (unit > -1) and (hp > 0) then
-	  if (status_units[i].alive == false) then
-	    status_units[i].stack:RemoveChild(status_units[i].dead)
-	    if (Spring.GetGameRulesParam("takeover_winner_opts4") == 2) then
-	      status_units[i].stack:AddChild(status_units[i].undead)
-	    else
-	      status_units[i].stack:AddChild(status_units[i].health)
-	    end   
-	    status_units[i].stack:AddChild(status_units[i].emp)
-	    status_units[i].alive = true
+	  if (status_units[i].alive == false) or (TheUnitsDefId[i] ~= udid) then
 	    -- check unit pics
-	    status_units[i].image.file = "#"..(UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id)
+	    ReInitUnit(i)
 	  end
 	  local team = Spring.GetGameRulesParam("takeover_team_unit"..i) -- could also rely on allyteam instead
 	  local maxhp = Spring.GetGameRulesParam("takeover_maxhp_unit"..i)
@@ -1184,37 +1219,9 @@ function widget:Update(s)
 	  status_units[i].stack:RemoveChild(status_units[i].emp)
 	  status_units[i].stack:AddChild(status_units[i].dead)
 	  status_units[i].alive = false
-	  visible[i] = false;
 	  under_siege[i] = 0;
 	end
       end
-    end
-  end
-end
-
-function widget:UnitTaken(unitID, unitDefID, oldTeam, team)
-  for i=1,TheUnitCount do
-    local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-    if (unit > -1) and (unit == uID) then
-      visible[uID] = true;
-    end
-  end
-end
-
-function widget:UnitEnteredLos(uID, tID)
-  for i=1,TheUnitCount do
-    local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-    if (unit > -1) and (unit == uID) then
-      visible[uID] = true;
-    end
-  end
-end
-
-function widget:UnitLeftLos(uID)
-  for i=1,TheUnitCount do
-    local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-    if (unit == uID) then
-      visible[uID] = false;
     end
   end
 end
@@ -1350,7 +1357,7 @@ function widget:DrawWorld()
   if not Spring.IsGUIHidden() then
     for i=1,TheUnitCount do
       local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-      if (unit > -1) and ((visible[unit]) or Spring.GetSpectatingState()) then
+      if (unit > -1) then --or Spring.GetSpectatingState() then
 	local teamID = Spring.GetGameRulesParam("takeover_team_unit"..i)
 	local allyTeam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
 	if (Spring.ValidUnitID(unit) and (teamID >= 0)) then
