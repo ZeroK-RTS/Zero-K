@@ -606,11 +606,11 @@ local function UpdateMostPopularStack()
     upvotes = Spring.GetGameRulesParam("takeover_winner_upvotes")
     downvotes = Spring.GetGameRulesParam("takeover_winner_downvotes")
   end
-  results_label:SetCaption("Most popular "..upvotes.."/"..downvotes.." choice:")
   for i=1,4 do
     results_stack:RemoveChild(results_elements[i])
   end
   if (Spring.GetGameRulesParam("takeover_winner_owner") ~= -2) then
+    results_label:SetCaption("Most popular "..upvotes.."/"..downvotes.." choice:")
     local loc_text = "center";
     if (location == 1) then
       loc_text = "spawn\n box";
@@ -725,6 +725,7 @@ local function UpdateMostPopularStack()
       }
     };
   else
+    results_label:SetCaption("No choice has more than 60% of players agreed!")
     for i=1,4 do
       results_elements[i] = Button:New {
 	height = 40;
@@ -732,7 +733,7 @@ local function UpdateMostPopularStack()
 	padding = {0, 0, 0, 0},
 	margin = {0, 0, 0, 0},
 	caption = "";
-	tooltip = "Multiple nominations have same number of votes. Final decision is random among most voted ones.";
+	tooltip = "Multiple nominations have almost same amount of upvotes. Final decision is random among most upvoted ones.";
 	children = {
 	  Image:New {
 	    file = "unitpics/fakeunit.png";
@@ -1902,6 +1903,11 @@ function widget:Initialize()
 		      }
 		    }
 		    nominate_advice:SetCaption("1) Choose TheUnit(s) starting location:")
+		    nominate_stack:RemoveChild(nominate_godmode); -- TODO back button huh :)
+		    nominate_stack:RemoveChild(nominate_unit);
+		    nominate_stack:RemoveChild(nominate_gracetime);
+		    nominate_stack:RemoveChild(nominate_location);
+		    nominate_stack:AddChild(nominate_location);
 		    screen0:AddChild(nominate_window);
 		    if vote_window then
 		      screen0:RemoveChild(vote_window);
