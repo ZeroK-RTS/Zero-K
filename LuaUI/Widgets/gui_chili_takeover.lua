@@ -161,7 +161,7 @@ local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local VOTE_SPAM_DELAY = 15 -- you can nominate new choices, but only one per 15 seconds gonna be announced in chat, consider this self advertising limitation.
-local lastClickTimestamp = 0
+local lastClickTimestamp = -100
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -884,7 +884,7 @@ local function SetupIngameStatusBar()
     borderColor = {0, 0, 0, 0},
     backgroundColor  = {0, 0, 0, 0},
     padding = {0, 15, 0, 0},
-    scrollbarSize = 3,
+    scrollbarSize = 2,
     horizontalScrollbar = true,
     hitTestAllowEmpty = true,
   }
@@ -908,7 +908,7 @@ local function SetupIngameStatusBar()
     borderColor = {0, 0, 0, 0},
     backgroundColor  = {0, 0, 0, 0},
     padding = {0, 15, 0, 0},
-    scrollbarSize = 3,
+    scrollbarSize = 2,
     horizontalScrollbar = true,
     hitTestAllowEmpty = true,
   }
@@ -984,7 +984,7 @@ local function SetupIngameStatusBar()
       health = Progressbar:New {
 	name    = "health"..i;
 	width   = 40;
-	height  = 7;
+	height  = 3;
 	max     = 25;
 	value	= 25;
 	itemMargin    = {0,0,0,0},
@@ -995,7 +995,7 @@ local function SetupIngameStatusBar()
       emp = Progressbar:New {
 	name    = "emp"..i;
 	width   = 40;
-	height  = 7;
+	height  = 3;
 	max     = 25;
 	value   = 0;
 	itemMargin    = {0,0,0,0},
