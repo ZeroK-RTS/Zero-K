@@ -1126,19 +1126,19 @@ function widget:Update(s)
       for i=1,TheUnitCount do
 	local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
 	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i)
-	if (status_units[i].alive == false) and (unit > -1) then
-	  status_units[i].stack:RemoveChild(status_units[i].dead)
-	  if (Spring.GetGameRulesParam("takeover_winner_opts4") == 2) then
-	    status_units[i].stack:AddChild(status_units[i].undead)
-	  else
-	    status_units[i].stack:AddChild(status_units[i].health)
-	  end   
-	  status_units[i].stack:AddChild(status_units[i].emp)
-	  status_units[i].alive = true
-	  -- check unit pics
-	  status_units[i].image.file = "#"..(UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id)
-	end
 	if (unit > -1) and (hp > 0) then
+	   if (status_units[i].alive == false) then
+	    status_units[i].stack:RemoveChild(status_units[i].dead)
+	    if (Spring.GetGameRulesParam("takeover_winner_opts4") == 2) then
+	      status_units[i].stack:AddChild(status_units[i].undead)
+	    else
+	      status_units[i].stack:AddChild(status_units[i].health)
+	    end   
+	    status_units[i].stack:AddChild(status_units[i].emp)
+	    status_units[i].alive = true
+	    -- check unit pics
+	    status_units[i].image.file = "#"..(UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id)
+	  end
 	  local team = Spring.GetGameRulesParam("takeover_team_unit"..i) -- could also rely on allyteam instead
 	  local maxhp = Spring.GetGameRulesParam("takeover_maxhp_unit"..i)
 	  local emphp = Spring.GetGameRulesParam("takeover_emphp_unit"..i)
@@ -1224,7 +1224,7 @@ local function BuildVertexList(verts) -- this code was stolen from defence range
   end
 end
 
-function GetRange2D( range, yDiff) -- this code was stolen from defence range widget
+local function GetRange2D(range, yDiff) -- this code was stolen from defence range widget
   local root1 = range * range - yDiff * yDiff
   if ( root1 < 0 ) then
     return 0
