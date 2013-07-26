@@ -1353,40 +1353,41 @@ function widget:DrawWorld()
       if (unit > -1) and ((visible[unit]) or Spring.GetSpectatingState()) then
 	local teamID = Spring.GetGameRulesParam("takeover_team_unit"..i)
 	local allyTeam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
-	if (Spring.ValidUnitID(unit) and (teamID >= 0) and Spring.GetUnitPosition(unit)) then
-	  --local x,y,z = Spring.GetUnitPosition(unit)
-	  local color = {Spring.GetTeamColor(teamID)} --(teamID == GaiaTeamID) and {1,1,1,1} or {(Spring.GetTeamColor(teamID))}
-	  if (under_siege[i] == 1) then
-	    if (allyTeam == Spring.GetMyAllyTeamID()) then
-	      color = yellow;
-	    elseif (allyTeam == GaiaAllyTeamID) then
-	      color = green;
-	    else
-	      color = orange;
+	if (Spring.ValidUnitID(unit) and (teamID >= 0)) then
+	  local x,y,z = Spring.GetUnitPosition(unit)
+	  if (x ~= nil) then
+	    local color = {Spring.GetTeamColor(teamID)} --(teamID == GaiaTeamID) and {1,1,1,1} or {(Spring.GetTeamColor(teamID))}
+	    if (under_siege[i] == 1) then
+	      if (allyTeam == Spring.GetMyAllyTeamID()) then
+		color = yellow;
+	      elseif (allyTeam == GaiaAllyTeamID) then
+		color = green;
+	      else
+		color = orange;
+	      end
 	    end
+	    glDepthTest(true)
+	    
+	    glColor(color[1], color[2], color[3], 0.7)
+	    local range = Spring.GetUnitRulesParam(unit, "takeover_cap_range")
+	    range = range and range or 0
+	    if (range > 0) then
+	      glLineWidth(2.5)
+	      glBeginEnd(GL_LINE_STRIP, BuildVertexList, FigureOutHowToDrawACyrcleYeahNiceIdea(x,y,z, range))
+	    end
+	    
+  -- 	  local heading = Spring.GetUnitHeading(unit)
+  -- 	  if heading then
+  -- 	    local rot = (heading / 32768) * 180
+	    local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(teamID)
+	    local name = GetPlayerName(owner,teamID,isAI)
+	    glDrawFuncAtUnit(unit, false, DrawUnitOwner, unit, color, name)
+	    -- the most interesting
+	    ManageCapProgressLabel(unit, Spring.GetMyAllyTeamID()) -- NOTE TODO, probably would be better to move this into unit_healthbars.lua so it overrides capture car progressbar
+  -- 	  end
+	    
+	    glDepthTest(false)
 	  end
-	  glDepthTest(true)
-	  
-	  glColor(color[1], color[2], color[3], 0.7)
-	  local range = Spring.GetUnitRulesParam(unit, "takeover_cap_range")
-	  range = range and range or 0
-	  if (range > 0) then
-	    glLineWidth(2.5)
-	    glBeginEnd(GL_LINE_STRIP, BuildVertexList, FigureOutHowToDrawACyrcleYeahNiceIdea(x,y,z, range))
-	  end
-	  
--- 	  local heading = Spring.GetUnitHeading(unit)
--- 	  if heading then
--- 	    local rot = (heading / 32768) * 180
-	  local _,owner,_,isAI,_,allyTeam = Spring.GetTeamInfo(teamID)
-	  local name = GetPlayerName(owner,teamID,isAI)
-	  glDrawFuncAtUnit(unit, false, DrawUnitOwner, unit, color, name)
-	  -- the most interesting
-	  ManageCapProgressLabel(unit, Spring.GetMyAllyTeamID()) -- NOTE TODO, probably would be better to move this into unit_healthbars.lua so it overrides capture car progressbar
--- 	  end
-	  
-	  
-	  glDepthTest(false)
 	end
       end
     end
