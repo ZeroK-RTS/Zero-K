@@ -49,6 +49,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[logsiren.s3o]],
   scale                  = [[0.6]],
+  script		 = [[corroy.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNIT]],
 

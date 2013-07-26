@@ -103,11 +103,18 @@ function widget:SelectionChanged(selection)
 		unitInSelection[selection[i]] = true
 	end
 	local unitDefID = GetUnitDefID(selection[1])
-	local unitName = unitDefID and UnitDefs[unitDefID].name --only make sound when selecting own units
-	if (unitName and soundTable[unitName]) then
-		local sound = soundTable[unitName].select[1]
-		if (sound) then
-			CoolNoisePlay((sound), 0.5, soundTable[unitName].select.volume)
+	if (unitDefID) then --only make sound when selecting own units
+		local unitName
+		if (UnitDefs[unitDefID].customParams.origname) then -- compatibility with takeover
+		  unitName = UnitDefs[unitDefID].customParams.origname
+		else
+		  unitName = UnitDefs[unitDefID].name
+		end
+		if (unitName and soundTable[unitName]) then
+			local sound = soundTable[unitName].select[1]
+			if (sound) then
+				CoolNoisePlay((sound), 0.5, soundTable[unitName].select.volume)
+			end
 		end
 	end
 end
@@ -115,7 +122,12 @@ end
 function WG.sounds_gaveOrderToUnit(unitID, isBuild)
 	if unitID then
 		local unitDefID = GetUnitDefID(unitID)
-		local unitName = UnitDefs[unitDefID].name
+		local unitName
+		if (UnitDefs[unitDefID].customParams.origname) then -- compatibility with takeover
+		  unitName = UnitDefs[unitDefID].customParams.origname
+		else
+		  unitName = UnitDefs[unitDefID].name
+		end
 		local sounds = soundTable[unitName] or soundTable[default]
 		if not isBuild then
 			if (sounds and sounds.ok) then
@@ -133,7 +145,12 @@ function widget:CommandNotify(cmdID)
 		return
 	end
 	local unitDefID = GetUnitDefID(unitID)
-	local unitName = UnitDefs[unitDefID].name
+	local unitName
+	if (UnitDefs[unitDefID].customParams.origname) then -- compatibility with takeover
+	  unitName = UnitDefs[unitDefID].customParams.origname
+	else
+	  unitName = UnitDefs[unitDefID].name
+	end
 	local sounds = soundTable[unitName] or soundTable[default]
 	if (CMD[cmdID]) then
 		if (sounds and sounds.ok) then

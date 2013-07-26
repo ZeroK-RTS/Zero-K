@@ -32,6 +32,7 @@ local DEFAULT_MAX_DRONE_RANGE = 1500
 
 local carrierList = {}
 local droneList = {}
+GG.droneList = droneList -- compatibility with takeover
 local drones_to_move = {}
 local killList = {}
 

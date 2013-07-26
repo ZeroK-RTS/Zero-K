@@ -50,6 +50,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherepole.s3o]],
+  script		 = [[spherepole.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 

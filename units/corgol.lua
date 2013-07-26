@@ -45,6 +45,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[corgol_512.s3o]],
+  script	      = [[corgol.cob]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNIT]],
 

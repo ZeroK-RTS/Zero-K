@@ -51,6 +51,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[Spherewarrior.s3o]],
+  script		 = [[armwar.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 

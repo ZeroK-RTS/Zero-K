@@ -228,7 +228,13 @@ local function CheckSelected()
   for _, unitID in ipairs(unitTable) do
     local unitDefID = GetUnitDefID(unitID)
    
-   local name = UnitDefs[unitDefID].name
+    local name
+    if (UnitDefs[unitDefID].customParams.origname) then -- compatibility with takeover
+      name = UnitDefs[unitDefID].customParams.origname
+    else
+      name = UnitDefs[unitDefID].name
+    end
+   --local name = UnitDefs[unitDefID].name
    
    if ((not UnitDefs[unitDefID].canMove) and
         (UnitDefs[unitDefID].canAttack == 1)) then

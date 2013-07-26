@@ -48,6 +48,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[corgator_512.s3o]],
+  script		 = [[corgator.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 

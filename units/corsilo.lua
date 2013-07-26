@@ -44,6 +44,7 @@ unitDef = {
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   noAutoFire                    = false,
+  script			= [[corsilo.cob]],
   objectName                    = [[Silencer.s3o]],
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],

@@ -48,6 +48,7 @@ unitDef = {
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName            = [[m-5.s3o]],
+  script		= [[corpyro.cob]],
   seismicSignature      = 4,
   selfDestructAs        = [[CORPYRO_NAPALM]],
   selfDestructCountdown = 1,

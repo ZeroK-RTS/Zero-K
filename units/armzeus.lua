@@ -53,6 +53,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherezeus.s3o]],
+  script		 = [[armzeus.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
