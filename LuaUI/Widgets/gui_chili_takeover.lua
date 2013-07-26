@@ -160,8 +160,21 @@ local iconFormat = ''
 local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
+local VOTE_SPAM_DELAY = 15 -- you can nominate new choices, but only one per 15 seconds gonna be announced in chat, consider this self advertising limitation.
+local lastClickTimestamp = 0
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function CheckForVoteSpam(currentTime)
+  local elapsedTimeFromLastClick = currentTime - lastClickTimestamp
+  if elapsedTimeFromLastClick < VOTE_SPAM_DELAY then
+    return false
+  else
+    lastClickTimestamp = currentTime
+    return true
+  end
+end
 
 -- makes a color char from a color table
 -- explanation for string.char: http://springrts.com/phpbb/viewtopic.php?f=23&t=24952
@@ -244,7 +257,10 @@ local function AnnounceMyChoice(choice)
   elseif (choice[4] == 2) then
     god_text = "immortal";
   end
-  Spring.SendCommands("say I nominate: "..god_text.." "..UnitDefs[choice[2]].humanName.." being spawned "..loc_text.." and dormant for "..time_text.."!");
+  local notSpam = CheckForVoteSpam(os.clock())
+  if notSpam then
+    Spring.SendCommands("say I nominate: "..god_text.." "..UnitDefs[choice[2]].humanName.." being spawned "..loc_text.." and dormant for "..time_text.."!");
+  end
 end
 
 local function SetupNominationStack(nomi, name, owner, nom)
