@@ -1057,7 +1057,12 @@ local function GetPlayerName(owner,team,isAI)
     -- FIXME i never tested it with AI, so i wonder what name will it get... lol
     return aiName; --.."["..team.."]"..'('.. shortName .. ')'
   else
-    return select(1,Spring.GetPlayerInfo(owner));--.."["..team.."]"
+    local name = select(1,Spring.GetPlayerInfo(owner));--.."["..team.."]"
+    if (name ~= nil) then
+      return name
+    else
+      return "unknown" -- this has to be fixed :O
+    end
   end
 end
 
@@ -1068,10 +1073,10 @@ local function ReallignUnitsOnStatusPanel()
     local team = Spring.GetGameRulesParam("takeover_team_unit"..i) -- could also rely on allyteam instead
     local allyTeam = select(6,Spring.GetTeamInfo(team))
     if (allyTeam ~= Spring.GetMyAllyTeamID()) then
-      status_units[i].stack:SetPos(enemy_units*45,_)
+      status_units[i].stack:SetPos(enemy_units*45,0)
       enemy_units = enemy_units + 1
     else
-      status_units[i].stack:SetPos(ally_units*45,_)
+      status_units[i].stack:SetPos(ally_units*45,0)
       ally_units = ally_units + 1
     end
   end
@@ -1127,7 +1132,7 @@ function widget:Update(s)
 	local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
 	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i)
 	if (unit > -1) and (hp > 0) then
-	   if (status_units[i].alive == false) then
+	  if (status_units[i].alive == false) then
 	    status_units[i].stack:RemoveChild(status_units[i].dead)
 	    if (Spring.GetGameRulesParam("takeover_winner_opts4") == 2) then
 	      status_units[i].stack:AddChild(status_units[i].undead)
@@ -1297,22 +1302,20 @@ end
 local function DrawCapLabel(unitID, txt, txt2)
   glTranslate(0,UnitDefs[Spring.GetUnitDefID(unitID)].height + 64,0)
   glBillboard()
-  --glColor(white[1], white[2], white[3], 1)
+  glColor(white[1], white[2], white[3], 1)
   fontHandler.UseFont(overheadFont)
   fontHandler.DrawCentered(GetColorChar(green)..(txt).."%\008 "..GetColorChar(white).."vs\008 "..GetColorChar(red)..(txt2).."%\008", 0, 0)
   glColor(1,1,1,1)
 end
    
 local function DrawCapLabel2(unitID, what, txt)
+  glTranslate(0,UnitDefs[Spring.GetUnitDefID(unitID)].height + 64,0)
+  glBillboard()
   if (what == 1) then
-    glTranslate(0,UnitDefs[Spring.GetUnitDefID(unitID)].height + 64,0)
-    glBillboard()
     glColor(green[1], green[2], green[3], 1)
     fontHandler.UseFont(overheadFont)
     fontHandler.DrawCentered(txt.."%", 0, 0)
   else
-    glTranslate(0,UnitDefs[Spring.GetUnitDefID(unitID)].height + 64,0)
-    glBillboard()
     glColor(red[1], red[2], red[3], 1)
     fontHandler.UseFont(overheadFont)
     fontHandler.DrawCentered(txt.."%", 0, 0)
@@ -1350,8 +1353,8 @@ function widget:DrawWorld()
       if (unit > -1) and ((visible[unit]) or Spring.GetSpectatingState()) then
 	local teamID = Spring.GetGameRulesParam("takeover_team_unit"..i)
 	local allyTeam = Spring.GetGameRulesParam("takeover_allyteam_unit"..i)
-	if (Spring.ValidUnitID(unit) and (teamID >= 0)) then
-	  local x,y,z = Spring.GetUnitPosition(unit)
+	if (Spring.ValidUnitID(unit) and (teamID >= 0) and Spring.GetUnitPosition(unit)) then
+	  --local x,y,z = Spring.GetUnitPosition(unit)
 	  local color = {Spring.GetTeamColor(teamID)} --(teamID == GaiaTeamID) and {1,1,1,1} or {(Spring.GetTeamColor(teamID))}
 	  if (under_siege[i] == 1) then
 	    if (allyTeam == Spring.GetMyAllyTeamID()) then
@@ -1365,10 +1368,10 @@ function widget:DrawWorld()
 	  glDepthTest(true)
 	  
 	  glColor(color[1], color[2], color[3], 0.7)
-	  glLineWidth(2.5)
 	  local range = Spring.GetUnitRulesParam(unit, "takeover_cap_range")
 	  range = range and range or 0
 	  if (range > 0) then
+	    glLineWidth(2.5)
 	    glBeginEnd(GL_LINE_STRIP, BuildVertexList, FigureOutHowToDrawACyrcleYeahNiceIdea(x,y,z, range))
 	  end
 	  
