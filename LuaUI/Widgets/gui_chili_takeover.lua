@@ -1852,7 +1852,7 @@ function widget:Initialize()
 		tooltip = "Nominate a new set of rules, if you don't agree with any of listed ones. Spectators can nominate, but can't vote.";
 		-- NOTE the basic idea is that this menu minimises the nomination menu, yet it doesn't dispose of it!
 		OnMouseDown = {function()
-		  if (not nominate_window) and (not Spring.GetSpectatingState()) then
+		  if (not nominate_window) then --and (not Spring.GetSpectatingState()) then
 		    nominate_window = Window:New {
 		      name = 'takeover_nominate_window';
 		      color = {nil, nil, nil, 0.5},
@@ -1949,8 +1949,6 @@ function widget:Initialize()
     end
     }
   }
-  if not Spring.GetSpectatingState() then
-  end
   welcome_text = Label:New {
     autosize = false;
     width = "100%";
