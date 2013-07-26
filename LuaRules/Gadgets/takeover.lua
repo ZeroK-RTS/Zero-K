@@ -499,12 +499,14 @@ local function InitializeObjective(unitID, index, ud, lockdown)
   TheUnits[index] = unitID -- this has to be last, or errorz
 end
 
-function FindHighestPoint(x1,z1,x2,z2)
-  local step = 20
-  local bx, bz, h
+local function FindHighestPoint(x1,z1,x2,z2,curheight)
+  local step = 5
+  local bx = (x1+x2)/2
+  local bz = (z1+z2)/2
+  local h = 0
   local x = x1
   local z = z1
-  local bh = 0
+  local bh = curheight
   while (x <= x2) do
     while (z <= z2) do
       h = spGetGroundHeight(x,z)
@@ -697,7 +699,10 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
     local mz = 160
     if (mx > mapWidth*0.02) then mx = round(mapWidth*0.02) end
     if (mz > mapHeight*0.02) then mz = round(mapHeight*0.02) end
-    SpawnPos[1] = { FindHighestPoint(SpawnPos[1][1]-mx,SpawnPos[1][2]-mz,SpawnPos[1][1]+mx,SpawnPos[1][2]+mz) }
+--     Spring.Echo(SpawnPos[1][1].." "..SpawnPos[1][2])
+--     Spring.Echo(mx.." "..mz)
+    SpawnPos[1] = { FindHighestPoint(SpawnPos[1][1]-mx,SpawnPos[1][2]-mz,SpawnPos[1][1]+mx,SpawnPos[1][2]+mz, spGetGroundHeight(SpawnPos[1][1],SpawnPos[1][2])) }
+--     Spring.Echo(SpawnPos[1][1].." "..SpawnPos[1][2])
   end
   
   -- TODO instead of terra, if unit can fit in the boat, give him "special" boat (should copy immortality ability, if there is one), put unit on boat and let it "sail"
@@ -722,7 +727,7 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   -- spawn units
   for i=1,#SpawnPos do
 --     local uniqname = UnitDefs[MostPopularChoice[2]].name.."_tq"
-    spCreateUnit(UnitDefs[MostPopularChoice[2]].id, SpawnPos[i][1], spGetGroundHeight(SpawnPos[i][1], SpawnPos[i][2])+40, SpawnPos[i][2],"n",GaiaTeamID)
+    spCreateUnit(UnitDefs[MostPopularChoice[2]].id, SpawnPos[i][1], spGetGroundHeight(SpawnPos[i][1], SpawnPos[i][2])+20, SpawnPos[i][2],"n",GaiaTeamID)
   end
   if (#TheUnits > 0) then
     TheUnitsAreChained = true
