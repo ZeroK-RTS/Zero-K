@@ -63,7 +63,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes','showecoOverlay', 'lastmsgpos', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState','showecoOverlay', 'lastmsgpos', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
@@ -103,12 +103,6 @@ options = {
 		desc = "Game starts with LOS enabled",
 		type = 'bool',
 		value = true,
-	},
-	alwaysDisplayMexes = {
-		name = 'Always show metal spots',
-		desc = 'Do not hide metal spots',
-		type ='bool',
-		value = false,
 	},
 	
 	showecoOverlay = {

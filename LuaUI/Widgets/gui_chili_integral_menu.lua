@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.36 Integral Command Menu",
+    desc      = "v0.361 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -1460,7 +1460,8 @@ function widget:SelectionChanged(newSelection)
 	--get new selected fac, if any
 	for i=1,#newSelection do
 		local id = newSelection[i]
-		if UnitDefs[spGetUnitDefID(id)].isFactory then
+		local defID = spGetUnitDefID(id) --is in LOS?
+		if defID and UnitDefs[defID].isFactory then
 			if selectedFac ~= id then
 				alreadyRemovedTag = {}
 			end

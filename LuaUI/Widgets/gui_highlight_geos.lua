@@ -16,7 +16,6 @@ end
 -- Globals
 ----------------------------------------------------------------
 local geoDisplayList
-local alwaysShowGeo = false
 
 ----------------------------------------------------------------
 -- Speedups
@@ -73,15 +72,11 @@ function widget:Shutdown()
 	end
 end
 
-function widget:GameFrame(n)
-	alwaysShowGeo = (WG.GetWidgetOption and WG.GetWidgetOption('Chili Minimap','Settings/Interface/Map','alwaysDisplayMexes').value)
-end
-
 function widget:DrawWorld()
 	
 	local _, cmdID = spGetActiveCommand()
 	local showecoMode = WG.showeco
-	drawGeos = spGetMapDrawMode() == 'metal' or showecoMode or -geoDefID == cmdID or spGetGameFrame() < 1 or alwaysShowGeo
+	drawGeos = spGetMapDrawMode() == 'metal' or showecoMode or -geoDefID == cmdID or spGetGameFrame() < 1
 	
 	if drawGeos then
 		

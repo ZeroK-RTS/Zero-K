@@ -10,7 +10,7 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local versionNum = '1.1'
+local versionNum = '1.11'
 
 function widget:GetInfo()
   return {
@@ -102,7 +102,8 @@ function widget:SelectionChanged(selection)
 	for i = 1, #selection do
 		unitInSelection[selection[i]] = true
 	end
-	local unitName = UnitDefs[GetUnitDefID(selection[1])].name
+	local unitDefID = GetUnitDefID(selection[1])
+	local unitName = unitDefID and UnitDefs[unitDefID].name --only make sound when selecting own units
 	if (unitName and soundTable[unitName]) then
 		local sound = soundTable[unitName].select[1]
 		if (sound) then
