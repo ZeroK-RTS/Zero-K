@@ -286,7 +286,7 @@ FireWeapon3()
 
 Shot3()
 {
-	call-script lua_FlameShot(1);
+	//call-script lua_FlameShot(1);
 	return 0;
 }
 
