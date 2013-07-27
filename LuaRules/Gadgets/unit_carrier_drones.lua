@@ -35,7 +35,7 @@ local droneList = {}
 local drones_to_move = {}
 local killList = {}
 
-local notakeover = true -- becomes function if this is takeover gamemode
+local notakeover = function(_,_) return true; end
 local GaiaTeamID 	    = Spring.GetGaiaTeamID()
 
 local function InitCarrier(unitDefID, teamID)
