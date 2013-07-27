@@ -283,8 +283,15 @@ local function SetupNominationStack(nomi, name, owner, nom)
     god_color = red
   end
 --   local teamcolorstring = {1,1,1,1}
-  local teamID = select(4,Spring.GetPlayerInfo(owner))
-  teamID = teamID or GaiaTeamID
+  local _,_,spec,teamID = Spring.GetPlayerInfo(owner)
+  if (teamID == nil) then
+    teamID = GaiaTeamID
+    spec = true
+  end
+  local player_color = GetColorChar(white)
+  if (not spec) then
+    player_color = color2incolor(Spring.GetTeamColor(teamID))
+  end
   --local teamcolorstring = GetColorChar(teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1})
   if (owner > -1) then -- TODO make less clutter, i know this can be merged somehow
 --     local also_agree = "";
@@ -324,8 +331,8 @@ local function SetupNominationStack(nomi, name, owner, nom)
 	  padding = {0, 0, 0, 0},
 	  margin = {0, 0, 0, 0},
 	  backgroundColor = {1, 1, 1, 0.4},
-	  caption = color2incolor(Spring.GetTeamColor(teamID))..(name);
-	  tooltip = "If you agree with "..color2incolor(Spring.GetTeamColor(teamID))..(name).."\008 upvote his nomination with the \"+\" button!";--..also_agree;
+	  caption = (player_color)..(name);
+	  tooltip = "If you agree with "..(player_color)..(name).."\008 upvote his nomination with the \"+\" button!";--..also_agree;
 -- 	  textColor = name_color
 -- 	  OnMouseDown = {function()
 -- 	      if (not Spring.GetSpectatingState()) then
@@ -481,7 +488,7 @@ local function SetupNominationStack(nomi, name, owner, nom)
       padding = {0, 0, 0, 0},
       margin = {0, 0, 0, 0},
       caption = "";
-      tooltip = "Upvote "..color2incolor(Spring.GetTeamColor(teamID))..(name).."\008!";
+      tooltip = "Upvote "..(player_color)..(name).."\008!";
 --       textColor = name_color;
       OnMouseDown = {function()
 	  if (not Spring.GetSpectatingState()) then
@@ -515,7 +522,7 @@ local function SetupNominationStack(nomi, name, owner, nom)
       padding = {0, 0, 0, 0},
       margin = {0, 0, 0, 0},
       caption = "";
-      tooltip = "Downvote "..color2incolor(Spring.GetTeamColor(teamID))..(name).."\008!";
+      tooltip = "Downvote "..(player_color)..(name).."\008!";
 --       textColor = name_color;
       OnMouseDown = {function()
 	  if (not Spring.GetSpectatingState()) then
