@@ -164,8 +164,6 @@ local function lowerkeys(t)
 end
 
 local paralyzeOnMaxHealth = ((lowerkeys(VFS.Include"gamedata/modrules.lua") or {}).paralyze or {}).paralyzeonmaxhealth
--- local captureWeaponDefs, _ = include("LuaRules/Configs/capture_defs.lua")
-local _, thingsWhichAreDrones = include "LuaRules/Configs/drone_defs.lua"
 
 local CopyTable = Spring.Utilities.CopyTable
 
@@ -306,7 +304,7 @@ local function CreateNomination(playerID, location, unit, grace, godmode)
     downvotes = {},
     upvotes_count = 0,
     downvotes_count = 0,
-    score = nil, -- always recalculated, on updates, highest value = most promising nomination
+    score = 0, -- always recalculated, on updates, highest value = most promising nomination
   };
   return #NominationList
 end
@@ -1074,11 +1072,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
     elseif (builderID) then -- might be ressedv
 --       Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just created. "..builderID.." "..id)
       InitializeObjective(unitID, id, UnitDefs[unitDefID], false)
-    end
-  elseif (thingsWhichAreDrones[unitDefID]) and ((TheUnitsAreChained) or (teamID == GaiaTeamID)) then
-    local carrierID = GG.droneList[unitID].carrier
-    if (carrierID.customParams.tqobj) then
-	spDestroyUnit(unitID, false, true) -- impossible to drop drones orders because drone gadget updates them every 2 seconds :)
     end
   end
 end
