@@ -67,7 +67,7 @@ local title_image = confdata.title_image
 local useUiKeys = false
 --file_return = nil
 
-local _, _, _, _, _, _, _, _, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+local custom_cmd_actions = select(9, include("Configs/integral_menu_commands.lua"))
 
 --------------------------------------------------------------------------------
 
@@ -118,11 +118,8 @@ local myCountry = 'wut'
 local pathoptions = {}	
 local alloptions = {}	
 local actionToOption = {}
-local actionToAction2 = {}
-local _,_,_,_,_,_,_,_,custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
 local exitWindowVisible = false
-
 --------------------------------------------------------------------------------
 -- Key bindings
 -- KEY BINDINGS AND YOU:
@@ -410,11 +407,6 @@ WG.crude.OpenPath = function() end
 --Allow other widget to toggle-up/show Epic-Menu remotely, defined in Initialize()
 WG.crude.ShowMenu = function() end --// allow other widget to toggle-up Epic-Menu which allow access to game settings' Menu via click on other GUI elements.
 
---Allow other widget to get option status remotely, defined in Initialize()
-WG.GetWidgetOption = function() end
-
---Allow other widget to set option status remotely, defined in Initialize()
-WG.SetWidgetOption = function() end
 
 --[[
 -- is this an improvement?
@@ -542,13 +534,7 @@ end
 
 local function GetActionName(path, option)
 	local fullkey = GetFullKey(path, option):lower()
-	if option.action then --option refer to existing action
-		return option.action, option.action.."_2" --return refered actionName & create secondary actionName
-	elseif fullkey then --option have a unique action
-		return fullkey
-	else
-		return nil
-	end
+	return option.action or fullkey
 end
 
 WG.crude.GetActionName = GetActionName
@@ -786,9 +772,6 @@ local function GetActionHotkey(action)
 end
 
 local function AssignKeyBindAction(hotkey, actionName, verbose)
-	if actionToAction2[actionName] then --this actionName is linked to another actionName
-		actionName = actionToAction2[actionName] --use secondary actionName for binding key
-	end
 	if verbose then
 		--local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
 		local actions = Spring.GetKeyBindings(hotkey)
@@ -876,20 +859,15 @@ local function CreateOptionAction(path, option)
 			end
 		end
 	end
-	local actionName,override = GetActionName(path, option) --get an actionName to be created
-	if override and not custom_cmd_actions[actionName] then --attempt to use secondary actionName if it refer to existing actionName except when its command name. (command name don't have recursion issue because it cannot work when called from commandline)
-		AddAction(override, kbfunc, nil, "t") --create action
-		actionToAction2[actionName] = override --link the current actionName with the original actionName
-	else
-		AddAction(actionName, kbfunc, nil, "t") --create a unique action
-	end
+	local actionName = GetActionName(path, option)
+	AddAction(actionName, kbfunc, nil, "t")
 	actionToOption[actionName] = option
 	
 	if option.hotkey then
 		local existingRegister = otget( keybounditems, actionName) --check whether existing actionname is already bound with a custom hotkey in zkkey
-		if existingRegister == nil then --not even registered, not even "None"
+		if existingRegister == nil then
 			Spring.Echo("Epicmenu: " .. option.hotkey .. " (" .. option.key .. ", " .. option.wname..")") --tell user (in infolog.txt) that a widget is adding hotkey
-			otset(keybounditems, actionName, option.hotkey ) --save new hotkey if no existing key found. not yet applied. Will be applied in IntegrateWidget() (AddOption() is called within IntegrateWidget())
+			otset(keybounditems, actionName, option.hotkey ) --save new hotkey if no existing key found (not yet applied. Will be applied in IntegrateWidget())
 		end
 	end
 end
@@ -897,9 +875,6 @@ end
 --remove spring action for this option
 local function RemoveOptionAction(path, option)
 	local actionName = GetActionName(path, option)
-	if actionToAction2[actionName] then --this actionName was linked to another actionName?
-		actionName = actionToAction2[actionName] --do stuff to the linked actionName instead (leave original untouch)
-	end
 	RemoveAction(actionName)
 end
 
@@ -925,10 +900,6 @@ local function UnassignKeyBind(actionName, verbose)
 				echo( 'Unbound hotkeys from action: ' .. actionName )
 			end
 		end
-	end
-	if actionToAction2[actionName] then --is this actionName linked to a secondary actionName?
-		actionName = actionToAction2[actionName]
-		UnassignKeyBind(actionName, verbose) --unassign keybind for the linked name too
 	end
 	--otset( keybounditems, actionName, nil )
 end
@@ -1036,17 +1007,13 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		option.value = newval
 	end
 	
+	local origOnChange = option.OnChange
 	
-	
-	local origOnChange = option.OnChange or function() end
-	
-	local controlfunc
-	if option.type == 'button' then
-		controlfunc = 
+	local controlfunc = function() end
+	if option.type == 'button' and (option.action) and (not option.noAutoControlFunc) then	
+		controlfunc =
 			function(self)
-				if option.action then --if keybindings supplied by widgets
-					spSendCommands{option.action} 
-				end
+				spSendCommands{option.action}
 			end
 	elseif option.type == 'bool' then
 		
@@ -1115,6 +1082,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 				end
 			end			
 	end
+	origOnChange = origOnChange or function() end
 	option.OnChange = function(self) 
 		controlfunc(self) --note: 'self' in this context will be refer to the button/checkbox/slider state provided by Chili UI
 		origOnChange(option)
@@ -1142,7 +1110,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		  option.orig_hotkey = orig_hotkey
 		end
 		
-		CreateOptionAction(path, option) --register an action for this option
+		CreateOptionAction(path, option)
 		
 	--Keybinds for radiobuttons
 	elseif option.type == 'radioButton' then --if its a list of checkboxes:
@@ -1152,13 +1120,14 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			item.key = option.items[i].key
 			item.hotkey = option.items[i].hotkey
 			item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item's key). Is needed for Hotkey
+			local actionName = GetActionName(path, item)
 			if item.hotkey then
 			  local orig_hotkey = ''
 			  orig_hotkey = item.hotkey
 			  item.orig_hotkey = orig_hotkey
 			end
 			
-			CreateOptionAction(path,item) --register an action for this option
+			CreateOptionAction(path,item)
 			
 			alloptions[path..wname..item.key] = item --is used to store options but will not be used to make button. Is for random stuff now.
 		end			
@@ -1176,13 +1145,13 @@ local function RemOption(path, option, wname )
 		--echo ('<epic menu> ...error #333 ', (option and option.key) )
 		return
 	end
-	RemoveOptionAction(path, option) --remove action registered on behalf of this widget.
-	otset( pathoptions[path], wname..option.key, nil ) --remove from menu (primary list)
-	alloptions[path..wname..option.key] = nil --remove from secondary list
+	RemoveOptionAction(path, option)	
+	otset( pathoptions[path], wname..option.key, nil )
+	alloptions[path..wname..option.key] = nil
 	if option.type == 'radioButton' then
 		for i=1, #option.items do
 			local itemsKey = option.items[i].key
-			alloptions[path..wname..itemsKey] = nil --remove option from radiobutton
+			alloptions[path..wname..itemsKey] = nil
 		end
 	end
 end
@@ -1291,10 +1260,7 @@ local function IntegrateWidget(w, addoptions, index)
 					origOnChange(self)
 				end
 		else
-			option.OnChange = 
-				function(self)
-					origOnChange(self)
-				end
+			option.OnChange = origOnChange
 		end
 		
 		local path = option.path or defaultpath
@@ -1573,7 +1539,7 @@ MakeSubWindow = function(path)
 					--right = 30,
 					minHeight = 30,
 					caption = option.name, 
-					OnMouseUp = {option.OnChange},
+					OnClick = {option.OnChange},
 					backgroundColor = color.sub_button_bg,
 					textColor = color.sub_button_fg, 
 					tooltip = option.desc
@@ -2579,14 +2545,10 @@ function widget:Initialize()
 			hotkey = nil --convert '' into NIL.
 		end
 		if func then
-			local actionName2 = actionName
-			if actionToAction2[actionName] then --is this actionName linked to another actionName?
-				actionName2 = actionToAction2[actionName] --use linked actionName
-			end
 			if hotkey then
-				AddAction(actionName2, func, nil, "t") --attach function to action
+				AddAction(actionName, func, nil, "t") --attach function to action
 			else
-				RemoveAction(actionName2) --detach function from action
+				RemoveAction(actionName) --detach function from action
 			end
 		end
 		if hotkey then

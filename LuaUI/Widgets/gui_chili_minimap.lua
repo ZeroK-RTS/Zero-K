@@ -63,7 +63,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState','showecoOverlay', 'lastmsgpos', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'lastmsgpos', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
@@ -103,14 +103,6 @@ options = {
 		desc = "Game starts with LOS enabled",
 		type = 'bool',
 		value = true,
-	},
-	
-	showecoOverlay = {
-		name = 'Showeco Overlay',
-		desc = 'Show Metal & Geothermal Spot and Energy Grid',
-		hotkey = {key='f4', mod=''},
-		type ='button',
-		action='showeco',
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
@@ -276,10 +268,18 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
-local function MakeMinimapButton(file, pos, option)
-	local desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
-	local action = WG.crude.GetActionName(options_path, options[option])
-	local hotkey = WG.crude.GetHotkey(action)
+local function MakeMinimapButton(file, pos, params)
+	local option = params.option
+	local name, desc, action, hotkey
+	if option then
+		name = options[option].name
+		desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
+		action = WG.crude.GetActionName(options_path, options[option])
+	end
+	name = name or params.name or ""
+	desc = desc or params.desc or ""
+	action = action or params.action
+	hotkey = WG.crude.GetHotkey(action)
 	
 	if hotkey ~= '' then
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
@@ -294,7 +294,7 @@ local function MakeMinimapButton(file, pos, option)
 		bottom=iconsize*0.3, 
 		right=iconsize*pos+5, 
 		
-		tooltip = ( options[option].name .. desc .. hotkey ),
+		tooltip = (name .. desc .. hotkey ),
 		
 		--OnClick={ function(self) options[option].OnChange() end }, 
 		OnClick={ function(self)
@@ -372,13 +372,13 @@ MakeMinimapWindow = function()
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
 			map_panel,
 			
-			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, 'lastmsgpos' ),
-			--MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, 'viewstandard' ),
-			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', 2.5, 'clearmapmarks' ),
-			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'showecoOverlay'),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
+			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, {option = 'lastmsgpos'} ),
+			--MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, option = {'viewstandard'} ),
+			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', 2.5, {option = 'clearmapmarks'} ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, {option = 'viewheightmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, {option = 'viewblockmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, {option = 'viewfow'} ),
 			
 			Chili.Button:New{ 
 				height=iconsize, width=iconsize, 
