@@ -531,7 +531,7 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
       NominationList[most_voted].opts[3],
       NominationList[most_voted].opts[4],
     };
-    spSetGameRulesParam("takeover_winner_owner", NominationList[most_voted].playerID)
+    spSetGameRulesParam("takeover_winner_owner", NominationList[most_voted].ownerID)
   end
   spSetGameRulesParam("takeover_winner_opts1", MostPopularChoice[1])
   spSetGameRulesParam("takeover_winner_opts2", MostPopularChoice[2])
