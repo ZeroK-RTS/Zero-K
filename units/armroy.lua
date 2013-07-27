@@ -50,6 +50,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE]],
   objectName             = [[armroy.s3o]],
+  script	    	 = [[armroy.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   side                   = [[ARM]],

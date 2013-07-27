@@ -5,7 +5,7 @@ return {
     "armzeus", -- default choice
     "corraid", "shieldfelon", "armmanni", "corgol", "armcrabe", "corsumo", "amphassault", -- good assault
     "gunshipaa", "armbrawl", "armcybr", "corcrw", -- air
-    "corroy", "corbats", "armcarry", -- naval
+    "armroy", "corroy", "corbats", "armcarry", -- naval
     "armcomdgun", "armraven", "scorpion", "dante", "funnelweb", "armbanth", "armorco", -- striders
     "cafus", -- eco
     "corhlt", "cordoom", "armanni", "armbrtha", "corbhmth", -- land defence, from cheap to expensive
