@@ -412,9 +412,14 @@ local function printWeapons(unitDef)
 							bestDamage = wsTemp.damw
 							bestDamageIndex = i
 						end
-						
 					end
 				end
+			end
+			if weaponDef.customParams.stats_damage then
+				wsTemp.dam = weaponDef.customParams.stats_damage
+			end
+			if weaponDef.customParams.stats_empdamage then
+				wsTemp.damw = weaponDef.customParams.stats_empdamage
 			end
 			if not wsTemp.wname 
 				or wsTemp.wname:find('fake')

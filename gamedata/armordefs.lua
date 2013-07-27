@@ -86,6 +86,8 @@ local armorDefs = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local EMP_DAMAGE_MOD = 1/3
+local FLAMER_DAMAGE_MOD = 3
+local GAUSS_DAMAGE_MOD = 1.5
 
 local function tobool(val)
   local t = type(val)
@@ -124,6 +126,7 @@ end
 
 -- use categories to set default weapon damages
 for name, wd in pairs(DEFS.weaponDefs) do
+	local weaponNameLower = wd.name:lower()
 	local max = -0.000001
 	for _, dAmount in pairs(wd.damage) do
 		max = math.max(max, dAmount)
@@ -136,10 +139,18 @@ for name, wd in pairs(DEFS.weaponDefs) do
 	if wd.customparams and wd.customparams.damage_vs_shield then
 		wd.damage.default = tonumber(wd.customparams.damage_vs_shield)
 	else
-		wd.damage.default = wd.paralyzer and max*EMP_DAMAGE_MOD or max
-		-- add extra damage vs shields for mixed damage units
-		if wd.customparams and wd.customparams.extra_damage then
-			wd.damage.default = wd.damage.default + tonumber(wd.customparams.extra_damage)
+		if wd.paralyzer then
+			wd.damage.default =  max*EMP_DAMAGE_MOD
+			-- add extra damage vs shields for mixed damage units
+			if wd.customparams and wd.customparams.extra_damage then
+				wd.damage.default = wd.damage.default + tonumber(wd.customparams.extra_damage)
+			end
+		elseif weaponNameLower:find("flamethrower") or weaponNameLower:find("flame thrower") then
+			wd.damage.default =  max*FLAMER_DAMAGE_MOD
+			wd.customparams.stats_damage = max
+		elseif weaponNameLower:find("gauss") then
+			wd.damage.default =  max*GAUSS_DAMAGE_MOD
+			wd.customparams.stats_damage = max
 		end
 	end
 	
