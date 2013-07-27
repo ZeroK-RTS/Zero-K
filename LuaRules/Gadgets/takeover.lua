@@ -785,6 +785,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
   local x,_,z = spGetUnitPosition(unitID)
   local units = spGetUnitsInCylinder(x, z, data.capradius)
   local winner_allyteam = spGetUnitAllyTeam(unitID)
+  local original_allyteam = spGetUnitAllyTeam(unitID)
   local allyTeamScore = {}
   local teamScore = {} -- only used to determine which player in the allyteam gets the unit
   local enemies = false
@@ -805,7 +806,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 	if (select(5,spGetUnitHealth(unit)) < 1) then mc = 0 end -- nanoframed bastard, no unit for you!
 	allyTeamScore[unitAllyTeam] = allyTeamScore[unitAllyTeam] + mc
 	teamScore[team] = teamScore[team] + mc
-	if (winner_allyteam ~= unitAllyTeam) then
+	if (original_allyteam ~= unitAllyTeam) then
 	  if (data.siege == false) then -- contestants have arrived
 -- 	    Spring.Echo("Siege started")
 	    spSetGameRulesParam("takeover_siege_unit"..i, 1)
@@ -831,7 +832,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     for team,sc in pairs(teamScore) do
       if (sc > best_score) then
 	best_score = sc
-	winner_allyteam = team
+	winner_team = team
       end
     end
 --     if (best_ally_score > 0) then
@@ -881,7 +882,9 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     for allyteam,sc in pairs(data.AllyTeamsProgress) do
       if (sc >= data.capscore) then
 	data.AllyTeamsProgress[allyteam] = data.capscore -- you may not be able to go over 100%
-	winners_ally_team[#winners_ally_team+1] = allyteam
+	if (allyteam ~= original_allyteam) then -- doesn't make sense to show capture time on unit that is already yours.
+	  winners_ally_team[#winners_ally_team+1] = allyteam
+	end
       end
     end
     for team,sc in pairs(data.TeamsProgress) do

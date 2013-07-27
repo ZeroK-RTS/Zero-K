@@ -1338,7 +1338,7 @@ local function DrawCapLabel2(unitID, what, txt)
   glColor(1,1,1,1)
 end
 
-local function ManageCapProgressLabel(unitID, allyTeam) -- TODO make XX% blink too, depending which team is going to get unit! :D
+local function ManageCapProgressLabel(unitID, allyTeam, unitAllyTeam) -- TODO make XX% blink too, depending which team is going to get unit! :D
   local mycapprog = 0
   local bestenemy = 0
   for _,allyteam in ipairs(Spring.GetAllyTeamList()) do
@@ -1351,6 +1351,9 @@ local function ManageCapProgressLabel(unitID, allyTeam) -- TODO make XX% blink t
 	bestenemy = capprog
       end
     end
+  end
+  if (allyTeam == unitAllyTeam) then
+    mycapprog = 0 -- it's actually more than 0, but it doesn't make sense to show it if you already own unit
   end
   if (mycapprog > 0) and (bestenemy > 0) then
     glDrawFuncAtUnit(unitID, false, DrawCapLabel, unitID, mycapprog, bestenemy)
@@ -1398,7 +1401,7 @@ function widget:DrawWorld()
 	    local name = GetPlayerName(owner,teamID,isAI)
 	    glDrawFuncAtUnit(unit, false, DrawUnitOwner, unit, color, name)
 	    -- the most interesting
-	    ManageCapProgressLabel(unit, Spring.GetMyAllyTeamID()) -- NOTE TODO, probably would be better to move this into unit_healthbars.lua so it overrides capture car progressbar
+	    ManageCapProgressLabel(unit, Spring.GetMyAllyTeamID(), allyTeam) -- NOTE TODO, probably would be better to move this into unit_healthbars.lua so it overrides capture car progressbar
   -- 	  end
 	    
 	    glDepthTest(false)
