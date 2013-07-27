@@ -44,6 +44,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[corcan.s3o]],
+  script	      = [[corcan.cob]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 

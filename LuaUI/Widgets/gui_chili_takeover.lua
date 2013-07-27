@@ -114,7 +114,7 @@ local loc_tooltip_array = {
 }
 local god_tooltip_array = {
   "TheUnit(s) can die at any time. Reclaim the bastard(s)!",
-  "TheUnit(s) is invincible, if either of these is true:\na) It belongs to Gaia.\nb) Fully emped.\bc) Grace timer > 0.",
+  "TheUnit(s) is invincible, if either of these is true:\na) It belongs to Gaia.\nb) Fully emped.\nc) Grace timer > 0.",
   "TheUnit(s) will never die, yet they can still recieve emp/slow/cap damage.",
 }
 
@@ -617,7 +617,7 @@ local function UpdateMostPopularStack()
     results_stack:RemoveChild(results_elements[i])
   end
   if (Spring.GetGameRulesParam("takeover_winner_owner") ~= -2) then
-    results_label:SetCaption("Most popular "..upvotes.."/"..downvotes.." choice:")
+    results_label:SetCaption("Most popular "..upvotes.."/-"..downvotes.." choice:")
     local loc_text = "center";
     if (location == 1) then
       loc_text = "spawn\n box";
