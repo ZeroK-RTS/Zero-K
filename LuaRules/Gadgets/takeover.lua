@@ -172,6 +172,8 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 local function UpdatePollData()
+  if (not PollActive) then return end
+  
   local most_score = 0
   local worst_score = 0
   for i=1,#NominationList do
