@@ -1,4 +1,4 @@
-local version = "v1.002"
+local version = "v1.003"
 function widget:GetInfo()
   return {
     name      = "Showeco and Grid Drawer",
@@ -15,6 +15,17 @@ end
 
 local pylon ={}
 
+local spGetMapDrawMode = Spring.GetMapDrawMode
+local spSendCommands   = Spring.SendCommands
+
+local function ToggleShoweco()
+  WG.showeco = not WG.showeco
+
+  if (not WG.metalSpots and (spGetMapDrawMode() == "metal") ~= WG.showeco) then
+    spSendCommands("showmetalmap")
+  end
+end
+
 options_path = 'Settings/Interface/Map'
 options = {
 	showeco = {
@@ -24,7 +35,7 @@ options = {
 		type ='button',
 		action='showeco',
 		noAutoControlFunc = true,
-		OnChange = function() WG.showeco = not WG.showeco end
+		OnChange = ToggleShoweco
 	},
 }
 
