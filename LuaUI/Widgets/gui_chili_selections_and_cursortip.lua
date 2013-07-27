@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.080 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.081 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --26 June 2013 (msafwan)
+    date      = "2009-06-02", --27 July 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -157,7 +157,6 @@ local terraTips = {}
 --------------------------------------------------------------------------------
 -- group info
 
-local selectedUnits = {}
 local numSelectedUnits = 0
 local maxPicFit = 12
 
@@ -270,14 +269,14 @@ options = {
 		name="Show Unit's Command",
 		type='bool',
 		value= false,
-		desc = "Display current command on unit's icon if selection isn't grouped (unit selection is grouped when unit count exceed 8)",
+		desc = "Display current command on unit's icon (only for ungrouped unit selection)",
 		path = selPath,
 	},
 	manualWeaponReloadBar = {
 		name="Show Unit's DGun Status",
 		type='bool',
 		value= true,
-		desc = "Show reload progress for weapon that use manual trigger. *Only applies for ungrouped unit selection*",
+		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
 		path = selPath,
 	},
 	color_background = {
@@ -464,17 +463,19 @@ local function UpdateDynamicGroupInfo()
 	gi_usedbp = 0
 	
 	for i = 1, numSelectedUnits do
-		local id = selectedUnits[i]
-	
-		local ud = UnitDefs[spGetUnitDefID(id) or 0]
+		local id = selectedUnits[i][1]
+		local defID = selectedUnits[i][2]
+		local ud = UnitDefs[defID]
 		if ud then
 			local name = ud.name 
 			local hp, _, paradam, cap, build = spGetUnitHealth(id)
 			local mm,mu,em,eu = spGetUnitResources(id)
 		
 			if name ~= "terraunit" then
-				gi_cost = gi_cost + ud.metalCost*build
-				gi_hp = gi_hp + hp
+				if mm then--failsafe when switching spectator view.
+					gi_cost = gi_cost + ud.metalCost*build
+					gi_hp = gi_hp + hp
+				end
 				
 				local stunned_or_inbuld = spGetUnitIsStunned(id)
 				if not stunned_or_inbuld then 
@@ -508,7 +509,7 @@ local function UpdateDynamicGroupInfo()
 						end
 					end
 					
-					if ud.buildSpeed ~= 0 then
+					if ud.buildSpeed ~= 0 and mm then
 						gi_usedbp = gi_usedbp + mu
 					end
 				end
@@ -534,7 +535,8 @@ local function UpdateStaticGroupInfo()
 	gi_maxhp = 0
 	
 	for i = 1, numSelectedUnits do
-		local ud = UnitDefs[spGetUnitDefID(selectedUnits[i]) or 0]
+		local defID = selectedUnits[i][2]
+		local ud = UnitDefs[defID]
 		if ud then
 			local name = ud.name 
 			if name ~= "terraunit" then
@@ -672,7 +674,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 				if (unitid and not ctrl) then
 					--// deselect a single unit
 					for i=1,numSelectedUnits do
-						if (selectedUnits[i]==unitid) then
+						if (selectedUnits[i][1]==unitid) then
 							table.remove(selectedUnits,i)
 							break
 						end
@@ -680,7 +682,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 				else
 					--// deselect a whole unitdef block
 					for i=numSelectedUnits,1,-1 do
-						if (spGetUnitDefID(selectedUnits[i])==defid) then
+						if (selectedUnits[i][2]==defid) then
 							table.remove(selectedUnits,i)
 							if (alt) then
 								break
@@ -688,7 +690,11 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 						end
 					end
 				end
-				spSelectUnitArray(selectedUnits)
+				local selectedIds = {}
+				for i = 1, #selectedUnits do
+					selectedIds[#selectedIds] = selectedUnits[i][1]
+				end
+				spSelectUnitArray(selectedIds)
 				--update selected units right now
 				local sel = spGetSelectedUnits()
 				widget:SelectionChanged(sel)
@@ -793,8 +799,8 @@ local function MakeUnitGroupSelectionToolTip()
 
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
-			local unitid = selectedUnits[i]
-			local defid  = spGetUnitDefID(unitid)
+			local unitid = selectedUnits[i][1]
+			local defid  = selectedUnits[i][2]
 			local unitids = {unitid}
 
 			AddSelectionIcon(barGrid,unitid,defid,unitids)
@@ -815,72 +821,71 @@ end
 
 
 local function UpdateSelectedUnitsTooltip()
-	local selectedUnits = selectedUnits
 	if (numSelectedUnits>1) then
 			local barsContainer = window_corner.childrenByName['Bars']
 
 			if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
 				for i=1,numSelectedUnits do
-					local unitid = selectedUnits[i]
+					local unitid = selectedUnits[i][1]
 					--Spring.Echo(unitid)
 					local unitIcon = barsContainer.childrenByName[unitid]
 					local healthbar = unitIcon.childrenByName['health']
 					local health, maxhealth = spGetUnitHealth(unitid)
-					if (health) then
+					if (health) then --safety against spectating in limited LOS
 						healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
 						healthbar.color = GetHealthColor(health/maxhealth)
 						healthbar:SetValue(health/maxhealth) --update the healthbar value
-					end
 					
-					--RELOAD_BAR: start-- , by msafwan. Function: show tiny reload bar for clickable weapon in unit selection list
-					if options.manualWeaponReloadBar.value then
-						local reloadFraction,remainingTime = GetWeaponReloadStatus(unitid, 3)
-						if reloadFraction then
-							local reloadMiniBar = unitIcon.childrenByName['reloadMiniBar']
-							if reloadMiniBar and reloadFraction < 0.99 then --update value IF already have the miniBar & is reloading weapon
-								reloadMiniBar:SetValue(reloadFraction)
-								miniReloadBarPresent = true
-							elseif reloadMiniBar then --remove the minibar IF not reloading weapon
-								unitIcon:RemoveChild(reloadMiniBar) --ref: chili/Controls/object.lua by jK & quantum.
-								unitIcon:RemoveChild(healthbar) --delete modified healthbar 
-								Progressbar:New{ --recreate original healthbar 
-									parent  = unitIcon;
-									name    = 'health';
-									width   = 50;
-									height  = 10;
-									max     = 1;
-									value 	= (health/maxhealth);
-									color   = {0.0,0.99,0.0,1};
-								};
-							elseif reloadFraction < 0.99 then --create the minibar IF doesn't have the minibar & is reloading weapon
-									unitIcon:RemoveChild(healthbar) --delete original healthbar 
-									Progressbar:New{ --recreate new healthbar (this is to solve issue of bar not resizing when we just changed the "height" & do 'healthbar:Invalidate()').
+						--RELOAD_BAR: start-- , by msafwan. Function: show tiny reload bar for clickable weapon in unit selection list
+						if options.manualWeaponReloadBar.value then
+							local reloadFraction,remainingTime = GetWeaponReloadStatus(unitid, 3)
+							if reloadFraction then
+								local reloadMiniBar = unitIcon.childrenByName['reloadMiniBar']
+								if reloadMiniBar and reloadFraction < 0.99 then --update value IF already have the miniBar & is reloading weapon
+									reloadMiniBar:SetValue(reloadFraction)
+									miniReloadBarPresent = true
+								elseif reloadMiniBar then --remove the minibar IF not reloading weapon
+									unitIcon:RemoveChild(reloadMiniBar) --ref: chili/Controls/object.lua by jK & quantum.
+									unitIcon:RemoveChild(healthbar) --delete modified healthbar 
+									Progressbar:New{ --recreate original healthbar 
 										parent  = unitIcon;
 										name    = 'health';
 										width   = 50;
-										height  = 8;
-										minHeight = 8;
+										height  = 10;
 										max     = 1;
 										value 	= (health/maxhealth);
 										color   = {0.0,0.99,0.0,1};
 									};
-									Progressbar:New{ --create mini reload bar
-										parent  = unitIcon;
-										name    = 'reloadMiniBar';
-										width   = 49;
-										height  = 2;
-										minHeight = 2;
-										max     = 1;
-										value = reloadFraction;
-										color   = {013, 245, 243,1}; --? color. 
-									};
+								elseif reloadFraction < 0.99 then --create the minibar IF doesn't have the minibar & is reloading weapon
+										unitIcon:RemoveChild(healthbar) --delete original healthbar 
+										Progressbar:New{ --recreate new healthbar (this is to solve issue of bar not resizing when we just changed the "height" & do 'healthbar:Invalidate()').
+											parent  = unitIcon;
+											name    = 'health';
+											width   = 50;
+											height  = 8;
+											minHeight = 8;
+											max     = 1;
+											value 	= (health/maxhealth);
+											color   = {0.0,0.99,0.0,1};
+										};
+										Progressbar:New{ --create mini reload bar
+											parent  = unitIcon;
+											name    = 'reloadMiniBar';
+											width   = 49;
+											height  = 2;
+											minHeight = 2;
+											max     = 1;
+											value = reloadFraction;
+											color   = {013, 245, 243,1}; --? color. 
+										};
+								end
 							end
 						end
+						--RELOAD_BAR: end--	
 					end
-					--RELOAD_BAR: end--	
 				end
 			else
-				for defid,unitids in pairs(selectedUnitsByDef) do
+				for defid,unitids in pairs(selectedUnitsByDef) do --when grouped by unitDef
 					local health = 0
 					local maxhealth = 0
 					for i=1,#unitids do
@@ -890,10 +895,12 @@ local function UpdateSelectedUnitsTooltip()
 					end
 
 					local unitGroup = barsContainer.childrenByName[defid]
-					local healthbar = unitGroup.childrenByName['health']
-					healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
-					healthbar.color = GetHealthColor(health/maxhealth)
-					healthbar:SetValue(health/maxhealth)
+					if unitGroup then --failsafe when spectating and selecting enemy units without LOS
+						local healthbar = unitGroup.childrenByName['health']
+						healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
+						healthbar.color = GetHealthColor(health/maxhealth)
+						healthbar:SetValue(health/maxhealth)
+					end
 				end
 			end
 
@@ -1675,16 +1682,22 @@ end
 
 local function MakeToolTip_SelUnit(data, tooltip)
 	local unitID = data
-	local fullname
-	stt_unitID = unitID
-	stt_ud = UnitDefs[ spGetUnitDefID(stt_unitID) or -1]
+	local uDefID = spGetUnitDefID(unitID)
 	
-	fullname = ((stt_ud and stt_ud.humanName) or "")	
-		
+	if not uDefID then --unit out of LOS
+		stt_unitID = nil
+		return false
+	end
+	
+	stt_unitID = unitID
+	stt_ud = UnitDefs[uDefID]
+	
 	if not (stt_ud) then
 		--fixme
 		return false
 	end
+
+	local fullname = (stt_ud.humanName or "")	
 	
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	local iconPath		= GetUnitIcon(stt_ud)
@@ -2147,7 +2160,7 @@ function widget:Update(dt)
 	if timer2 >= updateFrequency2  then
 		if options.unitCommand.value == true and ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
 			for i=1,numSelectedUnits do --//iterate over all selected unit *this variable is updated by 'widget:SelectionChanged()'
-				local unitID = selectedUnits[i]
+				local unitID = selectedUnits[i][1]
 				local barGridItem = nil
 				local itemImg =nil
 				local picLabel = 1
@@ -2160,7 +2173,7 @@ function widget:Update(dt)
 					local cQueue = spGetCommandQueue(unitID, 1)
 					local commandName = ""
 					local color = nil
-					if cQueue[1] ~= nil then
+					if cQueue and cQueue[1] ~= nil then
 						local commandID = cQueue[1].id				
 						commandName = ":" .. commandID --"unrecognized" 
 						if commandID < 0 then
@@ -2421,9 +2434,20 @@ end
 
 
 function widget:SelectionChanged(newSelection)
-	numSelectedUnits = spGetSelectedUnitsCount()
-	selectedUnits = newSelection
-
+	selectedUnits = {}
+	numSelectedUnits = 0
+	if (spGetSelectedUnitsCount() > 0) then 
+		local count = 0
+		for i=1, #newSelection do
+			local unitID = newSelection[i]
+			local defID = spGetUnitDefID(unitID)
+			if defID then --in LOS/not enemy
+				count = count+1
+				selectedUnits[count] = {unitID,defID}
+			end
+		end
+		numSelectedUnits = count 
+	end
 	if (numSelectedUnits>0) then
 		UpdateStaticGroupInfo()
 		UpdateDynamicGroupInfo()
@@ -2439,7 +2463,7 @@ function widget:SelectionChanged(newSelection)
 		selectionSortOrder = {}
 		local alreadyInList = {}
 		for i=1,#selectedUnits do
-			local defid = spGetUnitDefID(selectedUnits[i])
+			local defid = selectedUnits[i][2]
 			if (not alreadyInList[defid]) then
 				alreadyInList[defid] = true
 				selectionSortOrder[#selectionSortOrder+1] = defid
@@ -2450,7 +2474,7 @@ function widget:SelectionChanged(newSelection)
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
 			
-			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1], tooltip) --healthbar/resource consumption/ect chili element
+			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1][1], tooltip) --healthbar/resource consumption/ect chili element
 			if cur1 then
 				window_corner:ClearChildren()
 				window_corner:AddChild(cur1)
