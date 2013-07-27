@@ -1005,7 +1005,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	local bottomhp = maxHealth/10
 	local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
 	local emp = (paralyzeDamage or 0)/empHP
-	if ((damage > 2500) or (bottomhp < 500)) and (damage > maxHealth) then scaled_damage = maxHealth*0.9; damage = scaled_damage; end -- TODO FIXME dirty hack to make glaives and fleas not to die from instant-kill weapons
+	if (damage > maxHealth) then scaled_damage = maxHealth*0.9; damage = scaled_damage; end -- TODO FIXME dirty hack to make glaives and fleas not to die from instant-kill weapons
 	if (MostPopularChoice[4] == 2) or ((MostPopularChoice[4] == 1) and (unitTeam == GaiaTeamID)) then
 	  if (weaponID < 0) then return 0; end
 	  if ((emp >= 1) or (TheUnitsAreChained)) then
