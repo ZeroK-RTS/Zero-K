@@ -694,16 +694,14 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
   end
   
   -- fix center positions, whenever generating spawn positions, whatever that may be, center pos should be first in array
-  if (MostPopularChoice[1] ~= 1) then
-    local mx = 160
-    local mz = 160
-    if (mx > mapWidth*0.02) then mx = round(mapWidth*0.02) end
-    if (mz > mapHeight*0.02) then mz = round(mapHeight*0.02) end
---     Spring.Echo(SpawnPos[1][1].." "..SpawnPos[1][2])
---     Spring.Echo(mx.." "..mz)
-    SpawnPos[1] = { FindHighestPoint(SpawnPos[1][1]-mx,SpawnPos[1][2]-mz,SpawnPos[1][1]+mx,SpawnPos[1][2]+mz, spGetGroundHeight(SpawnPos[1][1],SpawnPos[1][2])) }
---     Spring.Echo(SpawnPos[1][1].." "..SpawnPos[1][2])
-  end
+  -- TODO FIXME need to detect of map is actually ok not to relocate >_>
+--   if (MostPopularChoice[1] ~= 1) then
+--     local mx = 160
+--     local mz = 160
+--     if (mx > mapWidth*0.02) then mx = round(mapWidth*0.02) end
+--     if (mz > mapHeight*0.02) then mz = round(mapHeight*0.02) end
+--     SpawnPos[1] = { FindHighestPoint(SpawnPos[1][1]-mx,SpawnPos[1][2]-mz,SpawnPos[1][1]+mx,SpawnPos[1][2]+mz, spGetGroundHeight(SpawnPos[1][1],SpawnPos[1][2])) }
+--   end
   
   -- TODO instead of terra, if unit can fit in the boat, give him "special" boat (should copy immortality ability, if there is one), put unit on boat and let it "sail"
   --if (not ud.canMove) then -- water? nevermind water, spawn reef in the middle of the hill, it's okay! spawn bandit in the ocean? why not!
