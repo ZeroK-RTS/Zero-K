@@ -1180,9 +1180,9 @@ function widget:Update(s)
       end
       for i=1,TheUnitCount do
 	local unit = Spring.GetGameRulesParam("takeover_id_unit"..i)
-	local udid = UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id
 	local hp = Spring.GetGameRulesParam("takeover_hp_unit"..i)
 	if (unit > -1) and (hp > 0) then
+	  local udid = UnitDefs[Spring.GetGameRulesParam("takeover_udid_unit"..i)].id
 	  if (status_units[i].alive == false) or (TheUnitsDefId[i] ~= udid) then
 	    -- check unit pics
 	    ReInitUnit(i)
