@@ -26,6 +26,14 @@ local moveDefs = {
 		crushstrength = 50,
 	},
 
+	KBOT3 = {
+		footprintx = 3,
+		footprintz = 3,
+		maxwaterdepth = 22,
+		maxslope = 36,
+		crushstrength = 500,
+	},
+	
 	KBOT4 = {
 		footprintx = 4,
 		footprintz = 4,

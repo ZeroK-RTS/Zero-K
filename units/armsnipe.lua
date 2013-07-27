@@ -17,8 +17,8 @@ unitDef = {
   cloakCost              = 1,
   cloakCostMoving        = 5,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[35 64 35]],
-  collisionVolumeType    = [[CylY]],
+  collisionVolumeScales  = [[36 60 36]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -37,6 +37,7 @@ unitDef = {
     helptext_fr    = [[Le Sharpshooter est une unit? d'artillerie furtive, camouflable et coutant tres cher. Il peut faire feu tout en restant camoufl?. Son tir tres visible peut cependant r?veler sa position. La quantit?e d'?nergie qu'il n?cessite pour tirer et rester camoufler en m?me temps est ?lev?e. Sa destruction ?met une onde de choque EMP qui immobilise les unit?s qui se trouve a proximit?. Il est le plus utile en tant que tireur isol?.]],
     helptext_it    = [[Il Sharpshooter é un unita costosa occultata d'artiglieria. Puo sparare mentre é occultata; pero il proiettile visibile tradisce la sua posizione. Richiede molta energia per tenerlo occultato mentre spara. la migliore maniera di trovare un Sharpshooter é di ispezionare l'area con unita di ricognizione]],
     helptext_pl    = [[Sharpshooter może zadawać ciężkie obrażenia pojedynczemu celowi. Może się maskować i nie traci tego efektu przy strzelaniu. To maskowanie jest jednak drogie i tak jak każde inne można je wykryć poprzez podejście. Niska szybkość strzelania Sharpshootera pozwala wykryć go przez pokrycie okolic jego domniemanego miejsca pobytu tanimi jednostkami.]],
+	modelradius    = [[18]],
   },
 
   decloakOnFire          = false,
