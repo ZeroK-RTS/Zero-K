@@ -134,6 +134,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 	for categoryName, _ in pairs(armorDefs) do
 		wd.damage[categoryName] = wd.damage[categoryName] or wd.damage.default
 	end
+	wd.damage.default = max
   
 	-- damage vs shields
 	if wd.customparams and wd.customparams.damage_vs_shield then
