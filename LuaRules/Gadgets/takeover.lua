@@ -881,7 +881,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     -- now let's scale score
     for i,sc in pairs(allyTeamScore) do
       if (sc > 0) then
-	if (sc < best_ally_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
+	if (sc < (best_ally_score/10)) and (original_allyteam ~= i) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
 	  sc = 0
 	end
 	allyTeamScore[i] = points*(sc/best_ally_score)
@@ -889,7 +889,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     end
     for i,sc in pairs(teamScore) do
       if (sc > 0) then
-	if (sc < best_score/10) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
+	if (sc < (best_score/10)) and (original_allyteam ~= select(6,spGetTeamInfo(i))) then -- untested change, you need to have at least 10% of most powerful army in metalcost to participate in capture
 	  sc = 0
 	end
 	teamScore[i] = points*(sc/best_score)
