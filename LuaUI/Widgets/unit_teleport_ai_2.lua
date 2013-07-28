@@ -1,4 +1,4 @@
-local version = "v0.825"
+local version = "v0.826"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -246,7 +246,7 @@ function widget:GameFrame(n)
 							local unitDefID = spGetUnitDefID(unitID)
 							if not listOfMobile[unitDefID] then
 								local moveID = UnitDefs[unitDefID].moveData.id
-								local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog)
+								local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
 								local unitSpeed = UnitDefs[unitDefID].speed
 								local isBomber = UnitDefs[unitDefID].isBomber
 								local isFighter = UnitDefs[unitDefID].isFighter
@@ -386,8 +386,10 @@ function widget:GameFrame(n)
 				for unitID, tblContent in pairs(unitToEffect)do
 					if tblContent["norm"] then
 						local pathToFollow
-						local lowestPathTime = tblContent["norm"]
+						--NOTE: time to destination is in frame (number of frame).
+						local lowestPathTime = tblContent["norm"] - 30 --add 1 second benefit to regular walking (make walking more attractive choice unless teleport can save more than 1 second travel time)
 						-- Spring.Echo("TEST:".. unitID)
+						-- Spring.Echo("Normal:".. lowestPathTime)
 						for beaconID, timeToDest in pairs(tblContent["becn"]) do
 							if listOfBeacon[beaconID] then --beacon is alive
 								local transitTime = timeToDest+beaconCurrentQueue[beaconID]
@@ -397,7 +399,7 @@ function widget:GameFrame(n)
 								end
 								if (timeToDest > tblContent["norm"]) then --beacon travel simply not a viable option
 									fiveSecondExcludedUnit[unitID] = fiveSecondExcludedUnit[unitID] or {}
-									fiveSecondExcludedUnit[unitID][beaconID] = true --exclude processing this unit for at least 5 sec or less
+									fiveSecondExcludedUnit[unitID][beaconID] = true --exclude processing this unit forever until its command changed
 								end
 							end
 							-- if timeToDest<30000 then
@@ -554,6 +556,7 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz) --Note: source is fro
 					d = d + Dist(way1,way2,way3, waypoints[i][1],waypoints[i][2],waypoints[i][3])
 					way1,way2,way3 = waypoints[i][1],waypoints[i][2],waypoints[i][3]
 				end
+				d = d + Dist(way1,way2,way3, v.params[1], v.params[2], v.params[3]) --connect endpoint of waypoint to destination
 			else --so we don't have waypoint?
 				d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3]) --we don't have waypoint then measure straight line
 			end
