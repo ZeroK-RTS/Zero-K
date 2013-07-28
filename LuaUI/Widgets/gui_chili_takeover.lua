@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.2.0" -- you may find changelog in takeover.lua gadget
+local version = "0.2.1" -- you may find changelog in takeover.lua gadget
 
 function widget:GetInfo()
   return {
@@ -102,6 +102,8 @@ local nominate_unit_button = {}
 local nominate_gracetime
 local nominate_grace_button = {}
 local nominate_godmode
+local nominate_back_buttons = {}
+
 
 -- other stuff
 local nominations = {}
@@ -617,7 +619,7 @@ local function UpdateMostPopularStack()
     results_stack:RemoveChild(results_elements[i])
   end
   if (Spring.GetGameRulesParam("takeover_winner_owner") ~= -2) then
-    results_label:SetCaption("Most popular "..upvotes.."/-"..downvotes.." choice:")
+    results_label:SetCaption("Most popular +"..upvotes.."/-"..downvotes.." choice:")
     local loc_text = "center";
     if (location == 1) then
       loc_text = "spawn\n box";
@@ -817,31 +819,53 @@ local function UpdateNomListNOW()
   end
 end
 
-local function SetupUnitStack(choice)
-  my_choice[1] = choice;
+local function SetupLocationStack()
+  nominate_advice:SetCaption("1) Select TheUnit(s) starting location:")
+  nominate_window:RemoveChild(nominate_back_buttons[1])
+  nominate_window:RemoveChild(nominate_back_buttons[2])
+  nominate_window:RemoveChild(nominate_back_buttons[3])
+  nominate_stack:RemoveChild(nominate_godmode);
+  nominate_stack:RemoveChild(nominate_unit);
+  nominate_stack:RemoveChild(nominate_gracetime);
+  nominate_stack:RemoveChild(nominate_location);
+  nominate_stack:AddChild(nominate_location);
+end
+
+local function SetupUnitStack()
   nominate_advice:SetCaption("2) Select TheUnit(s) type:");
   nominate_stack:RemoveChild(nominate_location);
+  nominate_stack:RemoveChild(nominate_godmode);
+  nominate_stack:RemoveChild(nominate_gracetime);
+  nominate_window:RemoveChild(nominate_back_buttons[2])
+  nominate_window:RemoveChild(nominate_back_buttons[3])
   nominate_stack:AddChild(nominate_unit);
+  nominate_window:AddChild(nominate_back_buttons[1])
 end
 
-local function SetupGraceTime(choice)
-  my_choice[2] = UnitDefNames[choice.."_tq"].id
+local function SetupGraceTime()
   nominate_advice:SetCaption("3) Select TheUnit(s) grace timer:");
   nominate_stack:RemoveChild(nominate_unit);
-  nominate_stack:AddChild(nominate_gracetime);  
+  nominate_stack:RemoveChild(nominate_location);
+  nominate_stack:RemoveChild(nominate_godmode);
+  nominate_window:RemoveChild(nominate_back_buttons[1])
+  nominate_window:RemoveChild(nominate_back_buttons[3])
+  nominate_stack:AddChild(nominate_gracetime);
+  nominate_window:AddChild(nominate_back_buttons[2])
 end
 
-local function SetupGodmode(choice)
-  my_choice[3] = choice
+local function SetupGodmode()
   nominate_advice:SetCaption("4) Select TheUnit(s) immortality:");
   nominate_stack:RemoveChild(nominate_gracetime);
+  nominate_stack:RemoveChild(nominate_unit);
+  nominate_stack:RemoveChild(nominate_location);
+  nominate_window:RemoveChild(nominate_back_buttons[1])
+  nominate_window:RemoveChild(nominate_back_buttons[2])
   nominate_stack:AddChild(nominate_godmode);  
+  nominate_window:AddChild(nominate_back_buttons[3])
 end
 
 local function NominateMyChoice(choice)
-  my_choice[4] = choice
-  nominate_stack:RemoveChild(nominate_godmode);
-  nominate_stack:AddChild(nominate_location);
+  SetupLocationStack()
   screen0:RemoveChild(nominate_window);
   nominate_window = nil;
   -- NOTE if you abuse this widget and try to nominate something being a spectator, it will not work, also you can't nominate something again, while your option is being voted on
@@ -1606,7 +1630,8 @@ function widget:Initialize()
     caption = "Center of the map";
     tooltip = loc_tooltip_array[1];
     OnMouseDown = {function()
-      SetupUnitStack(0);
+      my_choice[1] = 0;
+      SetupUnitStack();
     end
     }
   }
@@ -1620,7 +1645,8 @@ function widget:Initialize()
     caption = "Player boxes";
     tooltip = loc_tooltip_array[2];
     OnMouseDown = {function()
-      SetupUnitStack(1);
+      my_choice[1] = 1;
+      SetupUnitStack();
     end
     }
   }
@@ -1634,7 +1660,8 @@ function widget:Initialize()
     caption = "3 positions across the map";
     tooltip = loc_tooltip_array[3];
     OnMouseDown = {function()
-      SetupUnitStack(2);
+      my_choice[1] = 2;
+      SetupUnitStack();
     end
     }
   }
@@ -1648,7 +1675,8 @@ function widget:Initialize()
     caption = "5 positions around the map";
     tooltip = loc_tooltip_array[4];
     OnMouseDown = {function()
-      SetupUnitStack(3);
+      my_choice[1] = 3;
+      SetupUnitStack();
     end
     }
   }
@@ -1670,7 +1698,8 @@ function widget:Initialize()
       caption = "";
       tooltip = "Select "..UnitDefNames[unit].humanName.." as the unit(s) of choice.";
       OnMouseDown = {function()
-	SetupGraceTime(unit)
+	my_choice[2] = UnitDefNames[unit.."_tq"].id
+	SetupGraceTime()
       end},
       children={
 	Image:New {
@@ -1712,7 +1741,8 @@ function widget:Initialize()
       caption = "";
       tooltip = time.." seconds.";
       OnMouseDown = {function()
-	SetupGodmode(time)
+	my_choice[3] = time
+	SetupGodmode()
       end},
       children = {
 	Image:New {
@@ -1755,7 +1785,8 @@ function widget:Initialize()
     caption = "Mortal";
     tooltip = god_tooltip_array[1];
     OnMouseDown = {function()
-      NominateMyChoice(0);
+      my_choice[4] = 0
+      NominateMyChoice();
     end
     }
   }
@@ -1769,7 +1800,8 @@ function widget:Initialize()
     caption = "Immortal while emped or grace period";
     tooltip = god_tooltip_array[2];
     OnMouseDown = {function()
-      NominateMyChoice(1);
+      my_choice[4] = 1
+      NominateMyChoice();
     end
     }
   }
@@ -1783,7 +1815,8 @@ function widget:Initialize()
     caption = "Full immortality, when hp <= 10%";
     tooltip = god_tooltip_array[3];
     OnMouseDown = {function()
-      NominateMyChoice(2);
+      my_choice[4] = 2
+      NominateMyChoice();
     end
     }
   }
@@ -1800,6 +1833,51 @@ function widget:Initialize()
     children = {
       nominate_advice,
       nominate_location,
+    }
+  }
+  nominate_back_buttons[1] = Button:New {
+    width = 70,
+    height = 30,
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    y = 35;
+    right = "5%";
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Back";
+    tooltip = "Redo previous option.";
+    OnMouseDown = {function()
+      SetupLocationStack()
+    end
+    }
+  }
+  nominate_back_buttons[2] = Button:New {
+    width = 70,
+    height = 30,
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    y = 35;
+    right = "5%";
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Back";
+    tooltip = "Redo previous option.";
+    OnMouseDown = {function()
+      SetupUnitStack()
+    end
+    }
+  }
+  nominate_back_buttons[3] = Button:New {
+    width = 70,
+    height = 30,
+    padding = {0, 0, 0, 0},
+    margin = {0, 0, 0, 0},
+    y = 35;
+    right = "5%";
+    backgroundColor = {1, 1, 1, 0.4},
+    caption = "Back";
+    tooltip = "Redo previous option.";
+    OnMouseDown = {function()
+      SetupGraceTime()
+    end
     }
   }
   vote_menu_button = Button:New {
@@ -1912,12 +1990,7 @@ function widget:Initialize()
 			nominate_stack,
 		      }
 		    }
-		    nominate_advice:SetCaption("1) Choose TheUnit(s) starting location:")
-		    nominate_stack:RemoveChild(nominate_godmode); -- TODO back button huh :)
-		    nominate_stack:RemoveChild(nominate_unit);
-		    nominate_stack:RemoveChild(nominate_gracetime);
-		    nominate_stack:RemoveChild(nominate_location);
-		    nominate_stack:AddChild(nominate_location);
+		    SetupLocationStack()
 		    screen0:AddChild(nominate_window);
 		    if vote_window then
 		      screen0:RemoveChild(vote_window);

@@ -1,4 +1,4 @@
-local version = "0.2.0"
+local version = "0.2.1"
 
 function gadget:GetInfo()
   return {
@@ -22,6 +22,7 @@ end
 20 July 2013 - 0.1.0 - Entire code was rewritten from scrach in both widget and mostly gadget files. Too many changes to fit them in few words.
 		     Because of this, I was not able to complete half the features I promised you guys, sorry.
 25 July 2013 - 0.2.0 - The promised feature list is slowly getting completed and as well as most bugs are getting fixed. Suggestions are also getting implemented.
+28 July 2013 - 0.2.1 - Immortality re-implemented, back button in nomination window added.
 ]]--
 
 -- TODO FIXME this is copy paste from halloween, it's only used to simulate unit berserk state, but it needs to be replaced with more sane AI that will try to attack players, but not finish them off!
@@ -90,7 +91,8 @@ local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetUnitsInCylinder  = Spring.GetUnitsInCylinder
 local spGetUnitPosition     = Spring.GetUnitPosition
-local spGetTeamList	    = Spring.GetTeamList 
+local spGetTeamList	    = Spring.GetTeamList
+local spValidUnitID	    = Spring.ValidUnitID
 local spEcho                = Spring.Echo
 
 local spGetPlayerInfo	    = Spring.GetPlayerInfo
@@ -123,11 +125,12 @@ local OnBlockList = { -- you shall not be able to use these while unit is dorman
 }
 
 local TheUnits = {}
+GG.ImagineBreaker = function(_,_,_) return 0; end -- returns how much damage to negate
 local MostMetalOwnerData = {} -- for every TheUnits i
 local UnitNoOverhealData = {}
 local ObjectiveData = {} -- for cap data
 
-local TheUnitsAreChained  = false
+GG.TheUnitsAreChained  = false
 local DelayInFrames
 local TimeLeftInSeconds
 local PollActive = false
@@ -467,7 +470,8 @@ end
 -- basically for every 1% of objective's emped state, most metalcost allyteam in circle gets 3.33% additional score points, which makes capping faster
 
 local function InitializeObjective(unitID, index, ud, lockdown)
---   Spring.Echo("InitObj "..unitID.." "..index.." "..tostring(lockdown).." "..tostring(ObjectiveData[unitID] == nil)..".")
+  if (unitID < 0) then return end -- my bad, i failed D:
+  
   if (ObjectiveData[unitID] == nil) then
     ObjectiveData[unitID] = { index = index, capradius, capscore, siege = false, lastsiege = -1000, AllyTeamsProgress = {}, TeamsProgress = {}}
   end
@@ -722,13 +726,55 @@ function gadget:GameStart() -- i didn't want to clutter this code with many para
 --     end
 --   end
   
+  if (MostPopularChoice[4] == 1) then
+    GG.ImagineBreaker = function(unitID,unitDefID,damage)
+      if (UnitDefs[unitDefID].customParams.tqobj) and (damage) then
+	local x,_,z = spGetUnitPosition(unitID)
+-- 	Spring.Echo("objective is getting hurt "..damage)
+	if (x < 0) or (z < 0) or (x > mapWidth) or (z > mapHeight) then return 0; end -- so you left map? become mortal glitcher :)
+	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
+	local unitTeam = spGetUnitTeam(unitID)
+	local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
+	local emp = (paralyzeDamage or 0)/empHP
+	if ((emp >= 1) or (GG.TheUnitsAreChained)) then
+-- 	  Spring.Echo("negating! "..damage)
+	  return damage -- negate everything
+	elseif (health-damage < bottomhp) and (unitTeam == GaiaTeamID) and (damage-(health-bottomhp) > 0) then
+-- 	  Spring.Echo("negating! "..damage-(health-bottomhp))
+	  return damage-(health-bottomhp) -- negate the amount of damage, so unit won't die instantly
+	end
+      end
+      return 0
+    end
+  elseif (MostPopularChoice[4] == 2) then
+    GG.ImagineBreaker = function(unitID,unitDefID,damage)
+      if (UnitDefs[unitDefID].customParams.tqobj) and (damage) then
+-- 	Spring.Echo("objective is getting hurt "..damage)
+	local x,_,z = spGetUnitPosition(unitID)
+	if (x < 0) or (z < 0) or (x > mapWidth) or (z > mapHeight) then return 0; end -- so you left map? become mortal glitcher :)
+	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
+	local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
+	local emp = (paralyzeDamage or 0)/empHP
+	local bottomhp = maxHealth/10
+	if ((emp >= 1) or (GG.TheUnitsAreChained)) then
+-- 	  Spring.Echo("negating! "..damage)
+	  return damage -- negate everything
+	elseif (health-damage < bottomhp) and (damage-(health-bottomhp) > 0) then
+-- 	  Spring.Echo("negating! "..damage-(health-bottomhp))
+	  return damage-(health-bottomhp) -- negate the amount of damage, so unit won't die instantly
+	end
+      end
+      return 0
+    end
+  end
+  
   -- spawn units
   for i=1,#SpawnPos do
 --     local uniqname = UnitDefs[MostPopularChoice[2]].name.."_tq"
     spCreateUnit(UnitDefs[MostPopularChoice[2]].id, SpawnPos[i][1], spGetGroundHeight(SpawnPos[i][1], SpawnPos[i][2])+20, SpawnPos[i][2],"n",GaiaTeamID)
   end
   if (#TheUnits > 0) then
-    TheUnitsAreChained = true
+    GG.TheUnitsAreChained = true
     --- tell everyone what happened
     local loc_text = "at center";
     if (MostPopularChoice[1] == 1) then
@@ -930,9 +976,9 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 end
 
 function gadget:GameFrame (f)
-  if (TheUnitsAreChained) and (f == DelayInFrames) then --FIXME probably better if equation can be done, or this section can be rewritten somehow
+  if (GG.TheUnitsAreChained) and (f == DelayInFrames) then --FIXME probably better if equation can be done, or this section can be rewritten somehow
     spSetGameRulesParam("takeover_timeleft", TimeLeftInSeconds)
-    TheUnitsAreChained = false;
+    GG.TheUnitsAreChained = false;
     local TheUnit
     for i=1,#TheUnits do
       TheUnit = TheUnits[i]
@@ -992,71 +1038,19 @@ function gadget:GameFrame (f)
   end
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-  if (MostPopularChoice[4] > 0) then
-    local TheUnit
-    for i=1,#TheUnits do
-      TheUnit = TheUnits[i]
-      if (TheUnit ~= -1) and (TheUnit == unitID) then
-	local x,_,z = spGetUnitPosition(unitID)
-	if (x < 0) or (z < 0) or (x > mapWidth) or (z > mapHeight) then return damage; end -- so you left map? become mortal glitcher :)
-	local scaled_damage = nil
-	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
-	local bottomhp = maxHealth/10
-	local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
-	local emp = (paralyzeDamage or 0)/empHP
-	if (damage > maxHealth) then scaled_damage = maxHealth*0.9; damage = scaled_damage; end -- TODO FIXME dirty hack to make glaives and fleas not to die from instant-kill weapons
-	if (MostPopularChoice[4] == 2) or ((MostPopularChoice[4] == 1) and (unitTeam == GaiaTeamID)) then
-	  if (weaponID < 0) then return 0; end
-	  if ((emp >= 1) or (TheUnitsAreChained)) then
-	    -- you may ask yourself why, the answer is: i do not want to block emp/slow damage, if you know way to make this better, contact me
-	    UnitNoOverhealData[unitID] = health+floor(damage+1)
-	    spSetUnitHealth(unitID, {health = health+floor(damage+1)});
-	  end
-	  if (health-damage < bottomhp) then
--- 	    Spring.Echo("Too much damage: "..damage.." unit health before damage: "..health.." after fix: "..(health+floor(damage+1-health+bottomhp))..".")
-	    UnitNoOverhealData[unitID] = health+floor(damage+1)
- 	    spSetUnitHealth(unitID, {health = health+floor(damage+1-health+bottomhp)});
-	  end
-	elseif (MostPopularChoice[4] == 1) then
-	  if (weaponID < 0) then return 0; end
-	  if ((emp >= 1) or (TheUnitsAreChained) or (unitTeam == GaiaTeamID)) then
-	    if (weaponID < 0) then return 0; end
-	    UnitNoOverhealData[unitID] = health+floor(damage+1)
-	    spSetUnitHealth(unitID, {health = health+floor(damage+1)});
-	  end
-	end
-	if (scaled_damage ~= nil) then return scaled_damage end
-      end
-    end
-  end
-end
-
--- fix to issue when emp drones and so it won't heal unit
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-  if (MostPopularChoice[4] > 0) then
-    local TheUnit
-    for i=1,#TheUnits do
-      TheUnit = TheUnits[i]
-      if (TheUnit ~= -1) and (TheUnit == unitID) and (UnitNoOverhealData[unitID]) then
-	local health,maxHealth,paralyzeDamage,_ = spGetUnitHealth(unitID)
-	if (health > UnitNoOverhealData[unitID]) then
-	  spSetUnitHealth(unitID, {health = UnitNoOverhealData[unitID]})
-	  UnitNoOverhealData[unitID] = nil
-	end
-	if (health > maxHealth) then
-	  spSetUnitHealth(unitID, {health = maxHealth})
-	end
-      end
-    end
-  end
-end
-
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam)
   if (newTeam == GaiaTeamID) then
     return false
   end
   return true
+end
+
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+  if (not spValidUnitID(unitID)) or (MostPopularChoice[4] == 0) or (paralyzer) then -- basically paralyzer damage is handled by unit_paralysis_damage, while slow damage is handled by unit_timeslow and i handle it here anyway.
+    return damage
+  end
+
+  return damage-GG.ImagineBreaker(unitID, unitDefID, damage)
 end
   
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -1069,11 +1063,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	break
       end
     end
-    if (id == -1) and (spGetGameFrame() <= 300) then
---       Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just created. true "..#TheUnits+1)
+    if (id == -1) and (spGetGameFrame() <= 33) then
       InitializeObjective(unitID, #TheUnits+1, UnitDefs[unitDefID], true)
     elseif (builderID) then -- might be ressedv
---       Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just created. "..builderID.." "..id)
       InitializeObjective(unitID, id, UnitDefs[unitDefID], false)
     end
   end
@@ -1086,7 +1078,7 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
     if (TheUnit ~= -1) and (TheUnit == unitID) then
       spSetGameRulesParam("takeover_team_unit"..i, newTeamID)
       spSetGameRulesParam("takeover_allyteam_unit"..i, select(6,spGetTeamInfo(newTeamID)))
-      if (TheUnitsAreChained) or (newTeamID == GaiaTeamID) then
+      if (GG.TheUnitsAreChained) or (newTeamID == GaiaTeamID) then
 	spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, {}) -- don't attack
 	spGiveOrderToUnit(unitID, CMD_MOVE_STATE, {0}, {}) -- don't move
 	spGiveOrderToUnit(unitID, CMD_ONOFF, {0}, {}) -- don't work
@@ -1102,26 +1094,23 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam) -- TODO detect if The
     TheUnit = TheUnits[i]
     if (unitID == TheUnit) then
       if (spGetUnitRulesParam(TheUnit, "wasMorphedTo") ~= nil) then
--- 	Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just morphed")
 	local newunit = spGetUnitRulesParam(TheUnit, "wasMorphedTo")
 	ObjectiveData[newunit] = CopyTable(ObjectiveData[unitID], true)
 	InitializeObjective(newunit, i, UnitDefs[spGetUnitDefID(newunit)], false)
 	ObjectiveData[unitID] = nil
-	break
-      else
--- 	Spring.Echo(unitID.." "..UnitDefs[unitDefID].name.." objective just died")
-	spSetGameRulesParam("takeover_id_unit"..i, -1)
-	spSetGameRulesParam("takeover_udid_unit"..i, -1)
-	spSetGameRulesParam("takeover_team_unit"..i, -1)
-	spSetGameRulesParam("takeover_allyteam_unit"..i, -1)
-	spSetGameRulesParam("takeover_maxhp_unit"..i, 1)
-	spSetGameRulesParam("takeover_hp_unit"..i, 0)
-	spSetGameRulesParam("takeover_emphp_unit"..i, 1)
-	spSetGameRulesParam("takeover_emp_unit"..i, 0)
-	TheUnits[i] = -1 -- because apparently if i have for example { 1245, 532, 345 } and i set 532 to nil, for i=1,#TheUnits will never reach 345 O_O
-	ObjectiveData[unitID] = nil
-	break
+	return
       end
+      spSetGameRulesParam("takeover_id_unit"..i, -1)
+      spSetGameRulesParam("takeover_udid_unit"..i, -1)
+      spSetGameRulesParam("takeover_team_unit"..i, -1)
+      spSetGameRulesParam("takeover_allyteam_unit"..i, -1)
+      spSetGameRulesParam("takeover_maxhp_unit"..i, 1)
+      spSetGameRulesParam("takeover_hp_unit"..i, 0)
+      spSetGameRulesParam("takeover_emphp_unit"..i, 1)
+      spSetGameRulesParam("takeover_emp_unit"..i, 0)
+      TheUnits[i] = -1 -- because apparently if i have for example { 1245, 532, 345 } and i set 532 to nil, for i=1,#TheUnits will never reach 345 O_O
+      ObjectiveData[unitID] = nil
+      return
     end
   end
 end
@@ -1130,7 +1119,7 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
   local TheUnit
   for i=1,#TheUnits do
     TheUnit = TheUnits[i]
-    if (TheUnit ~= -1) and (unitID == TheUnit) and (TheUnitsAreChained) and (TimeLeftInSeconds>0) then
+    if (TheUnit ~= -1) and (unitID == TheUnit) and (GG.TheUnitsAreChained) and (TimeLeftInSeconds>0) then
       Paralyze(transportID,TimeLeftInSeconds)
     end
   end
@@ -1152,7 +1141,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
   for i=1,#TheUnits do
     TheUnit = TheUnits[i]
     if (TheUnit ~= -1) then
-      if (TheUnitsAreChained) then
+      if (GG.TheUnitsAreChained) then
 	if (unitID == TheUnit) then
 	  return false
 	elseif (OnBlockList[cmdID]) and (#cmdParams == 1) and (cmdParams[1] == TheUnit) then -- you shall not reclaim me or touch me      
@@ -1184,7 +1173,7 @@ function gadget:RecvLuaMsg(line, playerID)
 	PlayerDownVote(playerID, name, ParseParams(line))
       end
     elseif line:find(string_nominate) then
-	NominateNewRule(playerID, name, ParseParams(line), true)
+      NominateNewRule(playerID, name, ParseParams(line), true)
     end
   end
 end
