@@ -830,6 +830,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
   local units = spGetUnitsInCylinder(x, z, data.capradius)
   local winner_allyteam = spGetUnitAllyTeam(unitID)
   local original_allyteam = spGetUnitAllyTeam(unitID)
+--   local original_team = spGetUnitTeam(unitID)
   local allyTeamScore = {}
   local teamScore = {} -- only used to determine which player in the allyteam gets the unit
   if (#units > 0) then
@@ -896,7 +897,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     end
     -- now let's add points, note if you had no unit, your personal team points will be removed, if entire allyteam has lost all units in circle, entire allyteam score will be decremented
     for allyteam,sc in pairs(data.AllyTeamsProgress) do
-      if (allyTeamScore[allyteam] ~= nil) and (original_allyteam ~= unitAllyTeam) then
+      if (allyTeamScore[allyteam] ~= nil) and (original_allyteam ~= allyteam) then
 	data.AllyTeamsProgress[allyteam] = sc + allyTeamScore[allyteam]
       else
 	data.AllyTeamsProgress[allyteam] = sc - CAP_POINTS_PER_SEC
@@ -904,7 +905,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
       allyTeamScore[allyteam] = nil
     end
     for team,sc in pairs(data.TeamsProgress) do
-      if (teamScore[team] ~= nil) and (original_allyteam ~= unitAllyTeam) then
+      if (teamScore[team] ~= nil) and (original_allyteam ~= select(6,spGetTeamInfo(team))) then
 	data.TeamsProgress[team] = sc + teamScore[team]
       else
 	data.TeamsProgress[team] = sc - CAP_POINTS_PER_SEC
