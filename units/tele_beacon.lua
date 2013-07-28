@@ -28,7 +28,6 @@ unitDef = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
-  modelCenterOffsets			= [[0 0 0]],
   noAutoFire                    = false,
   objectName                    = [[amphteleportbeacon.s3o]],
   power							= 100,

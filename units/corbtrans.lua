@@ -53,7 +53,6 @@ unitDef = {
   maxDamage              = 1100,
   maxVelocity            = 8,
   minCloakDistance       = 75,
-  --modelCenterOffset      = [[0 -6 0]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[largeTransport.s3o]],
   script				 = [[corbtrans.lua]],

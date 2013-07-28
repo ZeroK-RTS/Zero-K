@@ -625,7 +625,6 @@ for name, ud in pairs(UnitDefs) do
   end
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Set chicken cost
@@ -650,11 +649,12 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Copy some unitdef values to customparams
+-- Implement modelcenteroffset
 --
 for name, ud in pairs(UnitDefs) do
     if ud.modelcenteroffset then
-	ud.customparams.midposoffset = ud.modelcenteroffset
+		ud.customparams.aimposoffset = ud.modelcenteroffset
+		ud.customparams.midposoffset = ud.modelcenteroffset
     end   
 end
 

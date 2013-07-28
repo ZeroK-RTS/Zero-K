@@ -25,6 +25,8 @@ if not Spring.SetUnitMidAndAimPos then
 	return
 end
 
+local armwarDefID = UnitDefNames["armwar"].id
+
 local offsets = {}
 local modelRadii = {}
 
@@ -60,7 +62,11 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if offsets[unitDefID] then
 		mid = offsets[unitDefID].mid
 		aim = offsets[unitDefID].aim
-		local _,_,_, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
+		local bx, _, bz, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
+		if armwarDefID == unitDefID then
+			ux = bx
+			uz = bz
+		end
 		local mx, my, mz = mid[1] + ux, mid[2] + uy, mid[3] + uz
 		local ax, ay, az = aim[1] + ux, aim[2] + uy, aim[3] + uz
 		Spring.SetUnitMidAndAimPos(unitID, mx, my, mz, ax, ay, az)
@@ -71,7 +77,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	--]]
 	--[[
 	local _,_,_, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
-	Spring.SetUnitMidAndAimPos(unitID, ux, uy-3, uz, ux, uy+5, uz)
+	Spring.SetUnitMidAndAimPos(unitID, ux, uy, uz , ux, uy, uz)
 	Spring.SetUnitRadiusAndHeight(unitID,22)
 	--]]
 end

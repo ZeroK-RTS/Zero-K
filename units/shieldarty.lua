@@ -31,7 +31,6 @@ unitDef = {
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  modelCenterOffset      = [[0 0 0]],
   movementClass          = [[KBOT2]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],

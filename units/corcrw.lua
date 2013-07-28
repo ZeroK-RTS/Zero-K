@@ -53,7 +53,6 @@ unitDef = {
   maxDamage              = 17500,
   maxVelocity            = 3.3,
   minCloakDistance       = 150,
-  modelCenterOffset      = [[0 0 0]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          	 = [[krow.s3o]],

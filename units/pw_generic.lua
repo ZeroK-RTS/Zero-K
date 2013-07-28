@@ -37,7 +37,6 @@ unitDef = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
-  modelCenterOffsets			= [[0 0 0]],
   noAutoFire                    = false,
   objectName                    = [[pw_techlab.obj]],
   power							= 100,
