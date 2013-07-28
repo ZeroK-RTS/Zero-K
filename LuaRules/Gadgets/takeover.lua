@@ -957,7 +957,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 	  data.AllyTeamsProgress[allyteam] = sc/2 -- halves all enemy progress, because unit was captured
 	end
 	data.TeamsProgress = {} -- entire team data is emptied, since it is no more up to date
-	data.siege = false -- siege will reset if enemy units are still present
+-- 	data.siege = false -- siege will reset if enemy units are still present
 	spSetGameRulesParam("takeover_siege_unit"..i, 0)
 --       else
 -- 	Spring.Echo("sum thin wong") -- >_>
