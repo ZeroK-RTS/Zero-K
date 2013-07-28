@@ -832,7 +832,6 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
   local original_allyteam = spGetUnitAllyTeam(unitID)
   local allyTeamScore = {}
   local teamScore = {} -- only used to determine which player in the allyteam gets the unit
-  local enemies = false
   if (#units > 0) then
     for j=1,#units do
       local unit = units[j]
@@ -857,7 +856,6 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 	    data.siege = true
 	  end
 	  data.lastsiege = frame -- basically siege stops when noone attackin'
-	  enemies = true
 	end
       end
     end
@@ -879,7 +877,6 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 	winner_team = team
       end
     end
---     if (best_ally_score > 0) then
     -- now let's scale score
     for i,sc in pairs(allyTeamScore) do
       if (sc > 0) then
@@ -899,7 +896,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     end
     -- now let's add points, note if you had no unit, your personal team points will be removed, if entire allyteam has lost all units in circle, entire allyteam score will be decremented
     for allyteam,sc in pairs(data.AllyTeamsProgress) do
-      if (allyTeamScore[allyteam] ~= nil) and (enemies) then
+      if (allyTeamScore[allyteam] ~= nil) and (original_allyteam ~= unitAllyTeam) then
 	data.AllyTeamsProgress[allyteam] = sc + allyTeamScore[allyteam]
       else
 	data.AllyTeamsProgress[allyteam] = sc - CAP_POINTS_PER_SEC
@@ -907,7 +904,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
       allyTeamScore[allyteam] = nil
     end
     for team,sc in pairs(data.TeamsProgress) do
-      if (teamScore[team] ~= nil) and (enemies) then
+      if (teamScore[team] ~= nil) and (original_allyteam ~= unitAllyTeam) then
 	data.TeamsProgress[team] = sc + teamScore[team]
       else
 	data.TeamsProgress[team] = sc - CAP_POINTS_PER_SEC
@@ -938,7 +935,7 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
     end
     if (#winners_ally_team > 0) then
       local solewinner = winners_ally_team[random(1,#winners_ally_team)]
-      local megascore = -1
+      local megascore = 0
       local megateam = -1
       -- determine most useful player
       for team,sc in pairs(data.TeamsProgress) do
@@ -954,7 +951,9 @@ local function PerformCaptureLoop(unitID, i, data, hp, maxHealth, emp, empHP, ca
 	spTransferUnit(unitID, megateam, false)
 	data.AllyTeamsProgress[solewinner] = 0 -- owner allyteam will have 0 progress
 	for allyteam,sc in pairs(data.AllyTeamsProgress) do
-	  data.AllyTeamsProgress[allyteam] = sc/2 -- halves all enemy progress, because unit was captured
+	  if (sc > 0) then
+	    data.AllyTeamsProgress[allyteam] = sc/2 -- halves all enemy progress, because unit was captured
+	  end
 	end
 	data.TeamsProgress = {} -- entire team data is emptied, since it is no more up to date
 -- 	data.siege = false -- siege will reset if enemy units are still present
