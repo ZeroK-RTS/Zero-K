@@ -909,6 +909,9 @@ end
 
 
 function gadgetHandler:RegisterCMDID(gadget, id)
+  if not LOG_SECTION then
+	LOG_SECTION = "ERROR"
+  end
   if (id < 1000) then
     Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
                 'tried to register a reserved CMD_ID')
