@@ -4,7 +4,7 @@ function widget:GetInfo()
     name      = "Chili Selections & CursorTip",
     desc      = "v0.081 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --27 July 2013
+    date      = "2009-06-02", --31 July 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -692,7 +692,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 				end
 				local selectedIds = {}
 				for i = 1, #selectedUnits do
-					selectedIds[#selectedIds] = selectedUnits[i][1]
+					selectedIds[#selectedIds+1] = selectedUnits[i][1]
 				end
 				spSelectUnitArray(selectedIds)
 				--update selected units right now
