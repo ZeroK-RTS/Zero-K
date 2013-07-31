@@ -8,6 +8,7 @@ local lidLeft, lidRight = piece("lidLeft","lidRight");
 local aimProxy = piece("AimProxy");
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local unpackSpeed = 5;
 
@@ -45,7 +46,8 @@ local function Open()
 	Turn(wheel, x_axis, math.rad(-30), unpackSpeed);
 	Turn(cannon, x_axis, math.rad(-10), unpackSpeed);
 	
-	WaitForTurn(cannon, y_axis);
+	WaitForTurn(cannon, x_axis);
+	WaitForTurn(wheel, x_axis);
 	
 	Move(barrel1,z_axis,0,6);
 	Move(barrel2,z_axis,0,6);
@@ -97,6 +99,14 @@ end
 
 function RestoreAfterDelay()
 	Sleep(restore_delay);
+	
+	repeat
+			local _, _, inBuild = spGetUnitIsStunned(unitID)
+			if inBuild then
+					Sleep(restore_delay)
+			end
+	until not inBuild
+	
 	StartThread(Close);
 end
 
@@ -118,7 +128,6 @@ function script.Create()
 	--StartThread(AimBlink);
 	StartThread(SmokeUnit)
 	StartThread(RestoreAfterDelay);
-
 end
 
 
