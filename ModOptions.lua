@@ -540,6 +540,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'iwinbutton',
+    name   = 'Enable giant expensive "I Win" button',
+    desc   = "For speed games. Race to build it!",
+    type   = 'bool',
+    section= 'fun',
+    def    = false,
+  },
+  {
     key    = "disablefeatures",
     name   = "Disable Features",
     desc   = "Disable features (no wreackages).",

@@ -184,6 +184,10 @@ local function ProcessCommBuildOpts()
 	
 	local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 	
+    if modOptions and tobool(modOptions.iwinbutton) then
+        buildOpts[#buildOpts+1] = 'iwin'
+    end
+    
 	for _, name in pairs(chassisList) do
 		for i=1, numLevels do
 			commanders[#commanders + 1] = name..i
@@ -206,7 +210,6 @@ ProcessCommBuildOpts()
 
 for name, ud in pairs(UnitDefs) do
 	--Spring.Echo(name, ud.faction)
-    --if ud.faction ~= "THUNDERBIRDS" then ud.faction = "arm" end
 	if not name:find("chicken") then
 		ud.faction = "arm"
 	else

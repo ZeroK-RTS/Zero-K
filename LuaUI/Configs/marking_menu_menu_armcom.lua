@@ -235,6 +235,10 @@ local menu_armcom = {
         unit = "raveparty"
        },
 	   {
+        angle = 135,
+        unit = "iwin"
+       },
+	   {
         angle = 0,
         unit = "zenith"
        }, 	   
