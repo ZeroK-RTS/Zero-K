@@ -1413,24 +1413,6 @@ end
 local keyCtrl = 306 
 
 function widget:KeyRelease(key)
-	if key == keyCtrl and drawingLasso then
-		local mx,my = Spring.GetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
-		if legalPos(pos) then
-				
-			local diffX = abs(point[points].x - pos[1])
-			local diffZ = abs(point[points].z - pos[3])
-				
-			if diffX >= 10 or diffZ >= 10 then
-				points = points + 1
-				point[points] = {x = pos[1], y = spGetGroundHeight(pos[1],pos[3]), z = pos[3]}
-			end
-		end
-		return true
-	end
-end
-
-function widget:KeyRelease(key)
 	if (key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT) and originalCommandGiven then
 		completelyStopCommand()
 	end
