@@ -73,7 +73,6 @@ unitDef = {
   turnRate               = 2000,
   upright                = true,
   workerTime             = 0,
-  wpri_badtargetcategory = [[VTOL]],
 }
 
 return lowerkeys({ corsktl = unitDef })

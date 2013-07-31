@@ -8,6 +8,8 @@ local button  = piece 'button'
 
 local on = false
 
+local built = false
+
 smokePiece = {base}
 
 -- Signal definitions
@@ -24,7 +26,10 @@ local function MakeVisible()
 end
 
 function script.HitByWeapon( x, z, weaponDefID, damage )
-	return 0
+    if built then
+        return 0
+    end
+    return damage
 end
 
 function script.Activate()
@@ -47,6 +52,7 @@ function script.Create()
 	    Sleep(250)
 	    buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	end
+    built = true
     StartThread(MakeVisible)
     
 end
