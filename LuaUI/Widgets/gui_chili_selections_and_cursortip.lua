@@ -692,7 +692,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 				end
 				local selectedIds = {}
 				for i = 1, #selectedUnits do
-					selectedIds[#selectedIds+1] = selectedUnits[i][1]
+					selectedIds[i] = selectedUnits[i][1]
 				end
 				spSelectUnitArray(selectedIds)
 				--update selected units right now
