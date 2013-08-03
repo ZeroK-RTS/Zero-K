@@ -1,4 +1,4 @@
-local version = "v0.826"
+local version = "v0.827"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -615,7 +615,7 @@ end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
 	fiveSecondExcludedUnit[unitID]=nil
-	if (CMD.INSERT == cmdID) and (cmdParams[2] == CMD_WAIT_AT_BEACON) then 
+	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID) and (cmdParams[2] == CMD_WAIT_AT_BEACON) then 
 		local group = issuedOrderTo[unitID]
 		waitForNetworkDelay[group] = waitForNetworkDelay[group] - 1 
 		issuedOrderTo[unitID] = nil 

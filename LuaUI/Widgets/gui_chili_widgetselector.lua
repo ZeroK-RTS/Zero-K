@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Widget Selector", --needs epic menu to dynamically update widget checkbox colors.
-    desc      = "v1.01 Chili Widget Selector", 
+    desc      = "v1.011 Chili Widget Selector", 
     author    = "CarRepairer",
     date      = "2012-01-11", --2013-06-11 (add crude filter/search capability)
     license   = "GNU GPL, v2 or later",
@@ -205,9 +205,11 @@ MakeWidgetList = function()
 		if not data.alwaysStart then 
 			local name = name
 			local name_display = name .. (data.fromZip and ' (mod)' or '')
-			local data = data
+			data.basename = data.basename or ''
+			data.desc = data.desc or '' --become NIL if zipfile/archive corrupted
+			data.author = data.author or ''
 			local _, _, category = string.find(data.basename, "([^_]*)")
-			
+
 			local lowercase_name = name:lower()
 			local lowercase_category = category:lower()
 			local lowercase_display = name_display:lower()
