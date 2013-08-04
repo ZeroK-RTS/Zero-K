@@ -1,4 +1,4 @@
-local version = "v0.827"
+local version = "v0.828"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -27,6 +27,7 @@ local spValidFeatureID = Spring.ValidFeatureID
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spRequestPath = Spring.RequestPath
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 ------------------------------------------------------------
 ------------------------------------------------------------
 local myTeamID
@@ -114,7 +115,7 @@ end
 ------------------------------------------------------------
 --SOME NOTE:
 --"DiggDeeper()" use a straightforward recursive horizontal/sideway-search. 
---But if we can find out if there's better way to do it would be more fun. Some Googling found stuff like "Minimum Spanning Tree" & "Spanning Tree" (might be interesting!)
+--TODO: But if we can find out if there's better way to do it would be more fun. Some Googling found stuff like "Minimum Spanning Tree" & "Spanning Tree" (might be interesting!)
 function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, previousOverheadTime, level)
 	level = level + 1
 	if level > 5 then
@@ -251,12 +252,13 @@ function widget:GameFrame(n)
 								local isBomber = UnitDefs[unitDefID].isBomber
 								local isFighter = UnitDefs[unitDefID].isFighter
 								local isStatic = (unitSpeed == 0)
-								listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isStatic}
+								local isTransport = UnitDefs[unitDefID].isTransport
+								listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isStatic,isTransport}
 							end
 							local isBomber = listOfMobile[unitDefID][4]
 							local isFighter = listOfMobile[unitDefID][5]
 							local isStatic = listOfMobile[unitDefID][6]
-							repeat
+							repeat --note: not looping, only for using "break" as method of escaping code
 								local _,_,inBuild = spGetUnitIsStunned(unitID)
 								if isStatic or isBomber or isFighter or inBuild then
 									loopedUnits[unitID]=true
@@ -337,6 +339,15 @@ function widget:GameFrame(n)
 											-- listOfBeacon[beaconID2][6] = ez
 										-- end
 										local chargeTime = listOfMobile[unitDefID][2]
+										local isTransport = listOfMobile[unitDefID][7]
+										if isTransport then
+											local cargo = spGetUnitIsTransporting(unitID)  -- for transports, also count their cargo 
+											if cargo then
+												for i = 1, #cargo do 
+													chargeTime = chargeTime + math.floor(UnitDefs[spGetUnitDefID(cargo[i])].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
+												end 
+											end
+										end
 										local _, beaconIDToProcess, totalOverheadTime = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, unitToEffect[unitID]["norm"], chargeTime,0)
 										diggDeeperExclusion={}
 										if beaconIDToProcess then
