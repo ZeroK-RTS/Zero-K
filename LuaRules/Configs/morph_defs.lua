@@ -2,14 +2,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local modOptions = {}
-if (Spring.GetModOptions) then
-  modOptions = Spring.GetModOptions()
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local devolution = false
 
 local morphDefs = {
@@ -430,80 +422,6 @@ local baseComMorph = {
 	[3] = {	time = 40, cost = 400},
 	[4] = {	time = 50, cost = 500},
 }
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-if (modOptions and (modOptions.zkmode == "takeover")) then
-  CopyTable = Spring.Utilities.CopyTable
-  MergeTable = Spring.Utilities.MergeTable
-  
-  local tk_unitlist = VFS.Include("LuaRules/Configs/takeover_config.lua") or {}
-  tk_unitlist = (tk_unitlist ~= nil) and tk_unitlist.Units
-  local function AddUnit(name)
-    for i=1,#tk_unitlist do
-      if (tk_unitlist[i] == name) then
-	return true
-      end
-    end
-    tk_unitlist[#tk_unitlist+1] = name
-    return true
-  end
-  for _, target_name in pairs (tk_unitlist) do
-    for tar, data in pairs(morphDefs) do
-      if tar == target_name then
-	local name = target_name
-	local newname = name.."_tq"
-	local new_morphie
-	if (type(data) ~= "number") and (data.into ~= nil) then
--- 	  Spring.Echo("ERROR "..newname.." has 1 entry")
--- 	  Spring.Echo("ERROR ^> "..data.into.."_tq")
-	  new_morphie = {
-	    [newname] = {
-	      into = data.into.."_tq",
-	      time = data.time,
-	      rank = data.rank,
-	    },
-	  }
-	  AddUnit(data.into)
-	else
--- 	  Spring.Echo("ERROR "..newname.." has multiple")
-	  new_morphie = {
-	    [newname] = {}
-	  }
-	  local num=1
-	  for inner_name, inner_data in pairs(data) do
--- 	    Spring.Echo("ERROR -> "..inner_data.into.."_tq")
-	    new_morphie[newname][num] = {
-	      into = inner_data.into.."_tq",
-	      time = inner_data.time,
-	      rank = inner_data.rank,
-	    }
-	    AddUnit(inner_data.into)
-	    num=num+1
-	  end
-	end
-	if (new_morphie ~= nil) then
-	  morphDefs = MergeTable(morphDefs, new_morphie, true)
-	end
-      end
-    end
-  end
---   for name, data in pairs(morphDefs) do
---     Spring.Echo("ERROR OK "..name)
---     if (type(data) ~= "number") and (data.into ~= nil) then
---       Spring.Echo("ERROR "..name.." has 1 entry")
---       Spring.Echo("ERROR ^> "..data.into)
---     else
---       Spring.Echo("ERROR "..name.." has multiple")
---       local num=1
---       for inner_name, inner_data in pairs(data) do
--- 	Spring.Echo("ERROR -> "..inner_data.into)
--- 	num=num+1
---       end
---     end
---   end
-end
 
 --------------------------------------------------------------------------------
 -- basic (non-modular) commander handling

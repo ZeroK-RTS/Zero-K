@@ -11,55 +11,6 @@ local carrierDefNames = {
 	},
 }
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
--- what does this part do? it ensures compatibility with takeover, no need to edit any other part of the file or define new units
-
-local modOptions = {}
-if (Spring.GetModOptions) then
-  modOptions = Spring.GetModOptions()
-end
-
-if (modOptions and (modOptions.zkmode == "takeover")) then
-  CopyTable = Spring.Utilities.CopyTable
-  MergeTable = Spring.Utilities.MergeTable
-  
-  local tk_unitlist = VFS.Include("LuaRules/Configs/takeover_config.lua") or {}
-  tk_unitlist = (tk_unitlist ~= nil) and tk_unitlist.Units
-  for tar, data in pairs(carrierDefNames) do
-    for _, target_name in pairs (tk_unitlist) do
-      if tostring(tar) == target_name then
-	local name = target_name
-	local newname = name.."_tq"
-	local new_carrier
-	if (type(data) == "table") then
-	  new_carrier = {
-	    [newname] = {}
-	  }
-	  local num=1
-	  for inner_name, inner_data in pairs(data) do
-	    new_carrier[newname][num] = {
-	      drone	= inner_data.drone,
-	      reloadTime= inner_data.reloadTime,
-	      maxDrones	= inner_data.maxDrones,
-	      spawnSize	= inner_data.spawnSize,
-	      range	= inner_data.range,
-	    }
-	    num=num+1
-	  end
-	end
-	if (new_carrier ~= nil) then
-	  carrierDefNames = MergeTable(carrierDefNames, new_carrier, true)
-	end
-      end
-    end
-  end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local presets = {
 	module_companion_drone = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 2, spawnSize = 1, range = 450},
 	module_battle_drone = {drone = UnitDefNames.battledrone.id, reloadTime = 20, maxDrones = 1, spawnSize = 1, range = 600},

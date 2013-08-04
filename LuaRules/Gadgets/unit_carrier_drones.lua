@@ -35,9 +35,6 @@ local droneList = {}
 local drones_to_move = {}
 local killList = {}
 
-local notakeover = function(_,_) return true; end
-local GaiaTeamID 	    = Spring.GetGaiaTeamID()
-
 local function InitCarrier(unitDefID, teamID)
 	local carrierData = carrierDefs[unitDefID]
 	local toReturn  = {unitDefID = unitDefID, teamID = teamID, droneSets = {}}
@@ -192,7 +189,7 @@ function gadget:GameFrame(n)
 					local set = carrier.droneSets[i]
 					if (set.reload > 0) then
 						set.reload = (set.reload - 1)
-					elseif (set.droneCount < carrierDef.maxDrones) and (notakeover(carrierID, carrier.unitDefID)) then
+					elseif (set.droneCount < carrierDef.maxDrones) then
 						for n=1,carrierDef.spawnSize do
 							if (set.droneCount >= set.maxDrones) then
 								break
@@ -219,16 +216,7 @@ function gadget:GameFrame(n)
 	end
 end
 
-function gadget:Initialize()
-	if (Spring.GetModOptions().zkmode) or (tostring(Spring.GetModOptions().zkmode) == "takeover") then
-		notakeover = function(unitID, unitDefID)
-			if (UnitDefs[unitDefID].customParams.tqobj) and (Spring.GetUnitTeam(unitID) == GaiaTeamID) then
-				return false
-			end
-			return true
-		end
-	end
-  
+function gadget:Initialize()  
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local build  = select(5,Spring.GetUnitHealth(unitID))
 		if build == 1 then
