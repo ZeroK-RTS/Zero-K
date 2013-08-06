@@ -77,6 +77,7 @@ end
 --------------------------------------------------------------------------------
 
 local UnitEffects = {}
+local registeredUnits = {}	-- all finished units - prevents partial unbuild then rebuild from being treated as two UnitFinished events
 
 local function AddFX(unitname,fx)
   local ud = UnitDefNames[unitname]
@@ -185,6 +186,10 @@ end
 --------------------------------------------------------------------------------
 
 local function UnitFinished(_,unitID,unitDefID)
+  if registeredUnits[unitID] then
+    return
+  end
+  registeredUnits[unitID] = true
 
   if (unitDefID == cormexDefID) then
     cormexes[unitID] = 0
@@ -221,6 +226,7 @@ end
 
 
 local function UnitDestroyed(_,unitID,unitDefID)
+  registeredUnits[unitID] = nil
   if (unitDefID == cormexDefID) then
     cormexes[unitID] = nil
   end
@@ -234,6 +240,13 @@ local function UnitEnteredLos(_,unitID)
   if (spec and fullSpec) then 
     return 
   end
+  
+  --[[
+  if registeredUnits[unitID] then
+    return
+  end
+  registeredUnits[unitID] = true
+  ]]
 
   if (unitDefID == cormexDefID) then
     cormexes[unitID] = 1
@@ -262,6 +275,7 @@ local function UnitLeftLos(_,unitID)
   local spec, fullSpec = spGetSpectatingState()
   if (spec and fullSpec) then return end
 
+  --registeredUnits[unitID] = nil
   if (unitDefID == cormexDefID) then
     cormexes[unitID] = nil
   end
