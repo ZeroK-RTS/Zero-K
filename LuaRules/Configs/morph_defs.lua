@@ -105,7 +105,7 @@ local morphDefs = {
   },
   armcrabe = {
     {
-      into = 'dante',
+      into = 'scorpion',
       time = 45,
       rank = 3,
     },
@@ -115,9 +115,9 @@ local morphDefs = {
       rank = 3,
     },
   },
-  dante = {
-    into = 'armbanth',
-    time = 90,
+  scorpion = {
+    into = 'funnelweb',
+    time = 60,
     rank = 3,
   },
   armbanth = {
@@ -162,6 +162,11 @@ local morphDefs = {
       rank = 3,
     },
   },
+  dante = {
+    into = 'armbanth',
+    time = 90,
+    rank = 3,
+  },  
   gorg = {
     into = 'armorco',
     time = 180,
