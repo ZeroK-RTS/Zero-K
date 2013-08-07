@@ -1,6 +1,7 @@
 local name = "commweapon_slamrocket"
 local weaponDef = {
 	name                    = [[SLAM Rocket]],
+	avoidFeature            = false,
 	areaOfEffect            = 256,
 	burnblow                = true,
 	cegTag                  = [[BANISHERTRAIL]],
@@ -14,8 +15,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 1280,
-		subs    = 64,
+		default = 1440,
+		subs    = 72,
 	},
 
 	edgeEffectiveness       = 0.5,
