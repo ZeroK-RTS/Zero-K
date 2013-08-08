@@ -15,19 +15,19 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 1120,
-		subs    = 56,
+		default = 800,
+		subs    = 40,
 	},
 
 	edgeEffectiveness       = 0.5,
 	explosionGenerator      = [[custom:xamelimpact_slam]],
 	fireStarter             = 180,
-	flightTime              = 5,
+	flightTime              = 7.5,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 2,
 	model                   = [[wep_m_phoenix.s3o]],
-	predictBoost            = 1,
+	predictBoost            = 0.0,
 	range                   = 850,
 	reloadtime              = 16,
 	smokeTrail              = true,
@@ -37,11 +37,11 @@ local weaponDef = {
 	texture2                = [[darksmoketrail]],
 	tolerance               = 450,
 	tracks                  = false,
-	trajectoryHeight        = 0.57735, 
+	trajectoryHeight        = 2.14451, 
 	turret                  = true,
-	weaponAcceleration      = 50,
+	weaponAcceleration      = 0,
 	weaponType              = [[MissileLauncher]],
-	weaponVelocity          = 425,
+	weaponVelocity          = 300,
 }
 
 return name, weaponDef
