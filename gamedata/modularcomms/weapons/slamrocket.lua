@@ -2,7 +2,7 @@ local name = "commweapon_slamrocket"
 local weaponDef = {
 	name                    = [[SLAM Rocket]],
 	avoidFeature            = false,
-	areaOfEffect            = 384,
+	areaOfEffect            = 320,
 	burnblow                = true,
 	cegTag                  = [[BANISHERTRAIL]],
 	commandFire             = true,
@@ -13,13 +13,14 @@ local weaponDef = {
 		slot = [[3]],
 		muzzleEffectFire = [[custom:STORMMUZZLE]],
 	},
+	cylinderTargeting       = 1.0,
 
 	damage                  = {
 		default = 800,
 		subs    = 40,
 	},
 
-	edgeEffectiveness       = 0.5,
+	edgeEffectiveness       = 0.6,
 	explosionGenerator      = [[custom:xamelimpact_slam]],
 	fireStarter             = 180,
 	flightTime              = 7.5,
@@ -33,7 +34,7 @@ local weaponDef = {
 	smokeTrail              = true,
 	soundHit                = [[weapon/bomb_hit]],
 	soundStart              = [[weapon/missile/missile_fire2]],
-	startVelocity           = 300,
+	startVelocity           = 250,
 	texture2                = [[darksmoketrail]],
 	tolerance               = 450,
 	tracks                  = false,
@@ -41,7 +42,7 @@ local weaponDef = {
 	turret                  = true,
 	weaponAcceleration      = 0,
 	weaponType              = [[MissileLauncher]],
-	weaponVelocity          = 300,
+	weaponVelocity          = 250,
 }
 
 return name, weaponDef
