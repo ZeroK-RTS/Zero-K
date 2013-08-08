@@ -101,11 +101,11 @@ function RestoreAfterDelay()
 	Sleep(restore_delay);
 	
 	repeat
-			local _, _, inBuild = spGetUnitIsStunned(unitID)
-			if inBuild then
+			local inactive = spGetUnitIsStunned(unitID)
+			if inactive then
 					Sleep(restore_delay)
 			end
-	until not inBuild
+	until not inactive
 	
 	StartThread(Close);
 end
