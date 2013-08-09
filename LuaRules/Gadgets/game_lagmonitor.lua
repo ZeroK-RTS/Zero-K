@@ -83,7 +83,7 @@ local AFK_THRESHOLD = 30
 --------------------------------------------------------------------------------
 
 local function ProductionCancelled(data, factoryTeam)  -- return invested metal if produced unit wasn't recreated
-  local ud = UnitDef[data.producedDefID]
+  local ud = UnitDefs[data.producedDefID]
   local returnedMetal = data.build * (ud and ud.metalCost or 0)
   spAddTeamResource(factoryTeam, "metal", returnedMetal)
 end
