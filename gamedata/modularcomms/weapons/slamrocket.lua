@@ -1,7 +1,6 @@
 local name = "commweapon_slamrocket"
 local weaponDef = {
 	name                    = [[SLAM Rocket]],
-	accuracy                = 0,
 	avoidFeature            = false,
 	areaOfEffect            = 320,
 	burnblow                = true,
