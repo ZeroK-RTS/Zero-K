@@ -9,10 +9,8 @@ local chest = piece "chest"
 -- left arm
 local lshoulder = piece "lshoulder"
 local lforearm = piece "lforearm"
-local gun = piece "gun"
-local magazine = piece "magazine"
-local flare = piece "flare"
-local ejector = piece "ejector"
+local halberd = piece "halberd"
+local blade = piece "blade"
 
 -- right arm
 local rshoulder = piece "rshoulder"
@@ -32,7 +30,7 @@ smokePiece = {head, hips, chest}
 
 
 --constants
-local runspeed = 8
+local runspeed = 6
 local steptime = 40
 
 -- variables
@@ -45,9 +43,11 @@ local SIG_Aim  = 4
 
 function script.Create()
 	StartThread(SmokeUnit)
-	Turn( flare, x_axis, 1.6, 5 )
-	Turn( lshoulder, x_axis, -0.9, 5 )
-	Turn( lforearm, z_axis, -0.2, 5 )
+	Turn( lforearm, x_axis, 0, 2 )
+	Turn( lshoulder, z_axis, - 0.9, 6 )
+	Turn( lshoulder, x_axis, - 0.8, 6 )
+	Turn( lforearm, y_axis, - 1, 5 )
+	Turn( halberd, z_axis, 0, 5 )
 end
 
 local function Walk()
@@ -91,7 +91,8 @@ local function StopWalk()
 	Signal( SIG_Walk )
 	SetSignalMask( SIG_Walk )
 	Turn( hips, z_axis, 0, 0.5 )
-	
+	Turn( rshoulder, x_axis, 0, 0.5 )
+		
 	Turn( lthigh, x_axis, 0, 2 )
 	Turn( lshin, x_axis, 0, 2 )
 	Turn( lfoot, x_axis, 0, 2 )
@@ -115,21 +116,13 @@ local function RestoreAfterDelay()
 	Sleep(2000)
 	firing = 0
 	Turn( chest, y_axis, 0, 3 )
-	Turn( lshoulder, x_axis, -0.9, 5 )
-	Turn( rshoulder, x_axis, 0, 3 )
-
-	Turn( lforearm, z_axis, -0.2, 5 )
-	Turn( lshoulder, z_axis, 0, 3 )
-	Turn( rshoulder, z_axis, 0, 3 )
-	Turn( head, y_axis, 0, 2  )
-	Turn( head, x_axis, 0, 2 )
-	Spin( magazine, y_axis, 0  )
+	Move( halberd, z_axis, 0, 2 )
 end
 
 ----[[
-function script.QueryWeapon1() return flare end
+function script.QueryWeapon1() return head end
 
-function script.AimFromWeapon1() return chest end
+function script.AimFromWeapon1() return head end
 
 function script.AimWeapon1( heading, pitch )
 	
@@ -149,20 +142,25 @@ function script.AimWeapon1( heading, pitch )
 	-- Outstreched Arm
 	firing = 1
 	Turn( chest, y_axis, heading, 12 )
-	Turn( lforearm, z_axis, 0, 5 )
-	Turn( lshoulder, x_axis, -pitch - 1.5, 12 )
-	
 	
 	WaitForTurn( chest, y_axis )
-	WaitForTurn( lshoulder, x_axis )
 	StartThread(RestoreAfterDelay)
 	return true
 end
 
 function script.FireWeapon1()
-	Spin( magazine, y_axis, 2  )
-	EmitSfx( ejector, 1024 )
-	EmitSfx( flare, 1025 )
+	Turn( lforearm, x_axis, 0.4, 5 )
+	Turn( lshoulder, z_axis, - 0, 12 )
+	Turn( lshoulder, x_axis, - 0.7, 12 )
+	Turn( lforearm, y_axis, - 0.2, 10 )
+	Turn( halberd, z_axis, 1, 8 )
+	Move( halberd, z_axis, 15, 40 )
+	Sleep ( 800 )
+	Turn( lforearm, x_axis, 0, 2 )
+	Turn( lshoulder, z_axis, - 0.9, 6 )
+	Turn( lshoulder, x_axis, - 0.8, 6 )
+	Turn( lforearm, y_axis, - 1, 5 )
+	Turn( halberd, z_axis, 0, 5 )
 end
 
 function script.Killed(recentDamage, maxHealth)
