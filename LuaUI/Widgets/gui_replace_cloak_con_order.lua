@@ -21,7 +21,7 @@ options = {
 
 function widget:CommandNotify(id, params, cmdOptions)
 	if cmdOptions.right and #params < 4 and ((id == CMD.REPAIR and options.repair.value) or 
-	(id == CMD.RECLAIM and options.reclaim.value) or id == (CMD.RESURRECT and options.resurrect.value)) then
+	(id == CMD.RECLAIM and options.reclaim.value) or (id == CMD.RESURRECT and options.resurrect.value)) then
 		local selUnits = Spring.GetSelectedUnits()
 		local replace = false
 		for i = 1, #selUnits do
