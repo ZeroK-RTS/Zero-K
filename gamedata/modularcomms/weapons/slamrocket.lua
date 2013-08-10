@@ -1,4 +1,5 @@
 local name = "commweapon_slamrocket"
+
 local weaponDef = {
 	name                    = [[SLAM Rocket]],
 	avoidFeature            = false,
