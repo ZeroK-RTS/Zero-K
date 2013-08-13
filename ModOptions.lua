@@ -530,7 +530,7 @@ local options = {
   {
     key	= "eggs",
     name = "Chicken Eggs",
-    desc = "Enables eggs mode (applies to all chicken difficulties)",
+    desc = "Enables eggs mode (applies to all chicken difficulties); metal extractors are disabled but chickens drop twice as many eggs",
     type = "bool",
     def	= false,
     section = 'chicken',
