@@ -59,6 +59,7 @@ local ARM_FRONT_ANGLE = -math.rad(15)
 local ARM_FRONT_SPEED = math.rad(14.5) * PACE
 local ARM_BACK_ANGLE = math.rad(5)
 local ARM_BACK_SPEED = math.rad(14.5) * PACE
+local ARM_PERPENDICULAR = math.rad(90)
 --[[
 local FOREARM_FRONT_ANGLE = -math.rad(15)
 local FOREARM_FRONT_SPEED = math.rad(40) * PACE
@@ -79,12 +80,16 @@ local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, fal
 local restoreHeading, restorePitch = 0, 0
 
 local flamers = {}
+local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons
 wepTable.n = nil
 for index, weapon in pairs(wepTable) do
 	local weaponDef = WeaponDefs[weapon.weaponDef]
 	if weaponDef.type == "Flame" then
 		flamers[index] = true
+	elseif weaponDef.type == "StarburstLauncher" then
+		starBLaunchers[index] = true
+		--Spring.Echo("sbl found")
 	end
 end
 wepTable = nil
@@ -195,6 +200,8 @@ local function RestoreDGun()
 end
 
 function script.AimWeapon(num, heading, pitch)
+
+
 	if num >= 5 then
 		Signal( SIG_LASER)
 		SetSignalMask( SIG_LASER)
@@ -207,6 +214,9 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreLaser)
 		return true
 	elseif num == 3 then
+		if starBLaunchers[num] then
+			pitch = ARM_PERPENDICULAR
+		end
 		Signal( SIG_DGUN)
 		SetSignalMask( SIG_DGUN)
 		isDgunning = true
@@ -225,11 +235,13 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
+
 	if num == 5 then
 		EmitSfx(rcannon_flare, 1024)
 	elseif num == 3 then
 		EmitSfx(lcannon_flare, 1026)
 	end
+
 end
 
 function script.Shot(num)
