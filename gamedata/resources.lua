@@ -168,6 +168,7 @@ local resources = {
       uglynovaexplo= "cc/uglynovaexplo.tga",
       whitelightb= "pd/whitelightningball.tga",
 	  whitelightgpl = 'GPL/lightw.png',
+	  sonic_glow = "sonic_glow.png",
 	  },
 	},
 }
