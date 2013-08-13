@@ -20,8 +20,8 @@ local weaponDef = {
 	cylinderTargeting       = 1.0,
 
 	damage                  = {
-		default = 670,
-		subs    = 33.5,
+		default = 768,
+		subs    = 38.4,
 	},
 
 	edgeEffectiveness       = 0.98,
