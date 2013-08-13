@@ -3,14 +3,15 @@ local name = "commweapon_slamrocket"
 local weaponDef = {
 	name                    = [[S.L.A.M.]],
 	avoidFeature            = false,
+	avoidGround             = false 
 	collideFriendly         = false,
-	areaOfEffect            = 160,
+	areaOfEffect            = 180,
 	burnblow                = false,
 	cegTag                  = [[BANISHERTRAIL]],
 	collisionSize           = 1,
 	commandFire             = true,
 	craterBoost             = 0,
-	craterMult              = 0.33333,
+	craterMult              = 0.45,
 
 	customParams            = {
 		slot = [[3]],
@@ -19,8 +20,8 @@ local weaponDef = {
 	cylinderTargeting       = 1.0,
 
 	damage                  = {
-		default = 570,
-		subs    = 28.5,
+		default = 670,
+		subs    = 33.5,
 	},
 
 	edgeEffectiveness       = 0.98,
@@ -28,7 +29,7 @@ local weaponDef = {
 	fireStarter             = 180,
 	flightTime              = 14,
 	impulseBoost            = 0,
-	impulseFactor           = 0.15,
+	impulseFactor           = 0.2,
 	interceptedByShieldType = 2,
 	leadLimit               = 0.0,
 	model                   = [[wep_m_phoenix.s3o]],
