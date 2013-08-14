@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = " v0.271 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = " v0.272 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2013-8-14
     license   = "GNU GPL, v2 or later",
@@ -52,6 +52,7 @@ local GetUnitPosition  = Spring.GetUnitPosition
 local GetUnitDefID     = Spring.GetUnitDefID
 local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitStates    = Spring.GetUnitStates
+local GetUnitIsStunned	   = Spring.GetUnitIsStunned
 
 local AreTeamsAllied   = Spring.AreTeamsAllied
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
@@ -469,8 +470,9 @@ function widget:UnitDamaged(unitID)
 
 			local healthRatio = health / maxHealth
 			local threshold = retreatOrder * 0.3
+			local _,_,inBuild = GetUnitIsStunned(unitID)
 
-			if healthRatio < threshold then        
+			if healthRatio < threshold and (not inBuild) then        
 				SetWantRetreat(unitID, true)
 			elseif (healthRatio == 1) then
 				SetWantRetreat(unitID, nil)
@@ -516,8 +518,9 @@ function widget:GameFrame(gameFrame)
 				if (health) then
 					local healthRatio = health / maxHealth
 					local threshold = retreatOrders * 0.3
+					local _,_,inBuild = GetUnitIsStunned(unitID)
 
-					if healthRatio < threshold then        
+					if healthRatio < threshold and (not inBuild) then       
 						SetWantRetreat(unitID, true)
 					elseif (healthRatio == 1) then
 						SetWantRetreat(unitID, nil)
