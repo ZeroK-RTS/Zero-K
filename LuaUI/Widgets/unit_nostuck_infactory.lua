@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "UnitNoStuckInFactory",
     desc      = "Always move unit away from factory's build yard & Remove an accidental build unit command from unit from factory. Prevent case of unit stuck in factory & to make sure unit can complete their move queue.",
     author    = "msafwan",
-    date      = "27 June 2013",
+    date      = "14 August 2013",
     license   = "none",
 	handler   = false,
     layer     = 1,
@@ -12,19 +12,18 @@ function widget:GetInfo()
 end
 
 local myTeamID = Spring.GetMyTeamID()
-local excludedFactory = {nil}
-do
-	excludedFactory[UnitDefNames["factorygunship"].id] = true
-	excludedFactory[UnitDefNames["factoryplane"].id] = true
-end
+local excludedFactory = {
+	[UnitDefNames["factorygunship"].id] = true
+	[UnitDefNames["factoryplane"].id] = true
+}
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
+	---Order unit to move away from factory's build yard---
 	if myTeamID == unitTeam and (not excludedFactory[factDefID]) then
-		---Order unit to move away from factory's build yard---
 		local queue = Spring.GetUnitCommands(unitID, 1)
 		local firstCommand = queue and queue[1]
 		if firstCommand then
-			if firstCommand.id ~= CMD.MOVE then --we leave unit with CMD.MOVE alone because we don't want to disturb factory's move command (factory's rallying behaviour)
+			if firstCommand.id ~= CMD.MOVE then --no rally behaviour?? (we leave unit with CMD.MOVE alone because we don't want to disturb factory's move command)
 				local dx,_,dz = Spring.GetUnitDirection(unitID)
 				local x,y,z = Spring.GetUnitPosition(unitID)
 				dx = dx*100 --Note: don't need trigonometry here because factory direction is either {0+-,1+-} or {1+-,0+-} (1 or 0), so multiply both with 100 elmo is enough
@@ -32,18 +31,24 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 				--note to self: CMD.OPT_META is spacebar, CMD.OPT_INTERNAL is widget. If we use CMD.OPT_INTERNAL Spring might return unit to where it originally started but the benefit is it don't effected by Repeat state (reference: cmd_retreat.lua widget by CarRepairer).
 				if ( firstCommand.id < 0 ) and (not firstCommand.params[1] ) then --if build-unit-command (which can be accidentally given when you use Chili Integral Menu)
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
-							{CMD.REMOVE, {firstCommand.tag}, {}}, --remove build-unit-command since its not functional on the unit & prevent idle state to be achieved.
+							{CMD.REMOVE, {firstCommand.tag}, {}}, --remove build-unit command since its only valid for factory & it prevent idle status from being called for regular unit (it disturb other widget's logic)
 							{CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
 							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}}, --stop unit at end of move command (else it will return to original position).
 							})--insert move-stop command behind existing command
 				else	
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
 							{CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
-							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}},  --stop unit at end of move command (else it will return to original position).
-							})--insert move-stop command behind existing command
+							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}}, 
+							})
 					--Spring.Echo(CMD[firstCommand.id])
 				end
 			end
+		else --no command at all? (happen when factory is at edge of map and engine ask unit to rally outside of map)
+			local dx,_,dz = Spring.GetUnitDirection(unitID)
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			dx = dx*100
+			dz = dz*100
+			Spring.GiveOrderToUnit( unitID, CMD.MOVE, {x+dx, y, z+dz}, {})
 		end
 		------
 	end

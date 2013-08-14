@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = " v0.27 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = " v0.271 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2013-8-14
     license   = "GNU GPL, v2 or later",
@@ -75,8 +75,8 @@ local havenCount = 0
 --------------------------------------------------------------------------------
 
 local function CanReallyMove(unitDefID)
-  -- let factories have the retreat button, but don't check them
-  -- (they do have canMove for new units, but their speed should be 0)
+  -- we let factories have the retreat button, but we don't check them
+  -- (factory have canMove for rallying new units, but factory speed is 0)
   local ud = UnitDefs[unitDefID]
   if (ud == nil) then
     return false
@@ -162,7 +162,7 @@ end
 
 local function setRetreatOrder(unitID, unitDefID, retreatOrder)
 	retreatOrdersArray[unitID] = retreatOrder
-	mobileUnits[unitID] = CanReallyMove(unitDefID) or nil
+	mobileUnits[unitID] = mobileUnits[unitID] or CanReallyMove(unitDefID) --note: mobileUnits[unitID] is used to filter only moving object for periodic health checks
 end
 
 function GetFirstCommand(unitID)
@@ -311,7 +311,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				SetWantRetreat(unitID, nil)
 				if not foundValidUnit then
 					foundValidUnit = true
-					
+					--[[ --scheme1: left-click to cycle between 3 retreat state, right-click to de-activate retreat
 					if not cmdOptions.right then
 						if retreatOrdersArray[unitID] then
 							newRetreatOrder = retreatOrdersArray[unitID] % 3 + 1
@@ -319,17 +319,31 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 							newRetreatOrder = 1
 						end
 					end
+					--]]
+					--scheme2: left-click to cycle 4 retreat state upward, right-click to cycle 4 retreat state downward.
+					newRetreatOrder = retreatOrdersArray[unitID] or 0
+					if cmdOptions.right then
+						newRetreatOrder = newRetreatOrder - 1
+						if newRetreatOrder < 0 then
+							newRetreatOrder = 3
+						end
+					else 
+						newRetreatOrder = newRetreatOrder + 1
+						if newRetreatOrder == 4 then
+							newRetreatOrder = 0
+						end
+					end
 				end
 
 				setRetreatOrder(unitID, unitDefID, newRetreatOrder)
-				if not newRetreatOrder then
-					pauseRetreatChecks[unitID] = GetGameFrame() + 32
-					retreatingUnits[unitID]= nil
+				if newRetreatOrder==0 then --if no-retreat
+					pauseRetreatChecks[unitID] = GetGameFrame() + 64 --pause checking for ~2 second. We dont want retreat order to end abruptly if user is just cycling thru options.
 				end
 			end --if canmove
 		end --for
 		return true
 	else
+		--exclude currently retreating unit for ~5 second
 		if (havenCount > 0) then
 			local selectedUnits = GetSelectedUnits()
 			for i=1, #selectedUnits do
@@ -417,7 +431,7 @@ function widget:CommandsChanged()
 		local unitDefID = GetUnitDefID(unitID)
 		local ud = UnitDefs[unitDefID]
 
-		if not foundRetreatable and ud and ud.canMove then
+		if not foundRetreatable and ud and ud.canMove then --Note: canMove include factory
 			foundRetreatable = true
 			local retreatOrder = retreatOrdersArray[unitID] or 0			
 			--widgetHandler:AddLayoutCommand({
@@ -575,5 +589,4 @@ function widget:TextCommand(command)
 		return true
 	end
 	return false
-end   
-
+end
