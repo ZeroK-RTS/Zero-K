@@ -76,7 +76,6 @@ options = {
 			{key='armap', 		name='Aspect Ratio Map'},
 			{key='arnone', 		name='Map Fills Window'},
 		},
-		advanced = true,
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
 			window_minimap.fixedRatio = arwindow
