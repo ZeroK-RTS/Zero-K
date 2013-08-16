@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "UnitNoStuckInFactory",
     desc      = "Always move unit away from factory's build yard & Remove an accidental build unit command from unit from factory. Prevent case of unit stuck in factory & to make sure unit can complete their move queue.",
     author    = "msafwan",
-    date      = "14 August 2013",
+    date      = "16 August 2013",
     license   = "none",
 	handler   = false,
     layer     = 1,
@@ -13,7 +13,7 @@ end
 
 local myTeamID = Spring.GetMyTeamID()
 local excludedFactory = {
-	[UnitDefNames["factorygunship"].id] = true
+	[UnitDefNames["factorygunship"].id] = true,
 	[UnitDefNames["factoryplane"].id] = true
 }
 
