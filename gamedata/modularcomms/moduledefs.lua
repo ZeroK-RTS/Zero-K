@@ -114,7 +114,7 @@ upgrades = {
 		description = "Sets a moderate area ablaze",
 	},
 	commweapon_slamrocket = {
-		name = "SLAM Rocket",
+		name = "S.L.A.M.",
 		description = "Long-range weapon with a lethal punch",
 	},
 	commweapon_sunburst = {
