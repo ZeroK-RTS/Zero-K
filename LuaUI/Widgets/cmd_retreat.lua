@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = " v0.272 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = " v0.273 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
-    date      = "2008-03-17", --2013-8-14
+    date      = "2008-03-17", --2013-8-16
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
@@ -53,6 +53,7 @@ local GetUnitDefID     = Spring.GetUnitDefID
 local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitStates    = Spring.GetUnitStates
 local GetUnitIsStunned	   = Spring.GetUnitIsStunned
+local SelectUnitArray = Spring.SelectUnitArray
 
 local AreTeamsAllied   = Spring.AreTeamsAllied
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
@@ -71,13 +72,31 @@ local retreatingUnits, wantRetreat, alliedWantRetreat, retreatOrdersArray = {}, 
 local mobileUnits, pauseRetreatChecks, havens = {}, {}, {}
 local havenCount = 0
 
+local retreatedUnits = {} --for "removeFromSelection" options
 
+-------------------------------------
+options_path = 'Game/Unit AI/Retreat Zone' --//for use 'with gui_epicmenu.lua'
+options_order = {'removeFromSelection','returnLastPosition'}
+options = {
+	removeFromSelection = {
+		name = 'Auto Unselect units',
+		type = 'bool',
+		value = false,
+		desc = 'Automatically remove retreating unit from current selection (Retreating unit might need exclusion from the order given to healthy units).',
+	},
+	returnLastPosition = {
+		name = 'Return to last position',
+		type = 'bool',
+		value = false,
+		desc = 'Always attempt to return unit to their last known position (Unit might need to return to their last idle position or their last location where their previous order expired).',
+	},
+}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local function CanReallyMove(unitDefID)
   -- we let factories have the retreat button, but we don't check them
-  -- (factory have canMove for rallying new units, but factory speed is 0)
+  -- (factory have canMove for rallying new units, but factory speed should be 0)
   local ud = UnitDefs[unitDefID]
   if (ud == nil) then
     return false
@@ -171,8 +190,8 @@ function GetFirstCommand(unitID)
 	return queue and queue[1]
 end
 
-function GetFirst2Command(unitID)
-	local queue = GetUnitCommands(unitID, 2)
+function GetFirst3Command(unitID)
+	local queue = GetUnitCommands(unitID, 3)
 	return queue
 end
 
@@ -180,7 +199,7 @@ end
 --(until retreatingUnits[unitID] is NIL. In which case the retreat checks in GameFrame() no longer call StopRetreating() due to NIL)
 function StopRetreating(unitID)
 	if retreatingUnits[unitID] then
-		local cmds = GetFirst2Command(unitID)
+		local cmds = GetFirst3Command(unitID)
 
 		if not cmds or not cmds[1] then
 			retreatingUnits[unitID] = nil
@@ -189,6 +208,12 @@ function StopRetreating(unitID)
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
 			if cmds[2] and cmds[2].id==CMD_WAIT then --is the move+wait retreat combo(?)
 				GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[2].tag}, {})
+				
+				if not cmds[3] and retreatingUnits[unitID][4] then --no work to return to?? returnLastPosition enabled??
+					local x,y,z = retreatingUnits[unitID][4],retreatingUnits[unitID][5],retreatingUnits[unitID][6]
+					GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
+				end
+				
 				retreatingUnits[unitID] = nil --unit no longer considered retreating
 			end
 			
@@ -198,6 +223,7 @@ function StopRetreating(unitID)
 		else --is currently some other command
 			--retreatingUnits[unitID] = nil
 			--Note: didn't NIL-ify retreatingUnits[unitID] here so that StopRetreating() can run 2nd time later
+		
 		end
 	else
 		local cmd1 = GetFirstCommand(unitID)
@@ -221,6 +247,14 @@ local function Retreat(unitID)
 		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex+1, CMD_WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 
 		retreatingUnits[unitID] = {hx, hy, hz}
+		
+		--add last position
+		if options.returnLastPosition.value then
+			local ux, uy, uz = GetUnitPosition(unitID)
+			retreatingUnits[unitID][4] = ux
+			retreatingUnits[unitID][5] = uy
+			retreatingUnits[unitID][6] = uz
+		end
 	end
 end
 
@@ -479,7 +513,8 @@ function widget:UnitDamaged(unitID)
 			end
 
 			if wantRetreat[unitID] then				        
-				Retreat(unitID)        
+				Retreat(unitID)
+				retreatedUnits[#retreatedUnits+1] = unitID
 			end 
 		end 
 	end 
@@ -528,7 +563,8 @@ function widget:GameFrame(gameFrame)
 
 					if wantRetreat[unitID] then				        
 						if (havenCount > 0) and not retreatingUnits[unitID] then
-							Retreat(unitID)        
+							Retreat(unitID) 
+							retreatedUnits[#retreatedUnits+1] = unitID
 						end
 					else --not wantRetreat[unitID]
 						if retreatingUnits[unitID] then
@@ -540,6 +576,21 @@ function widget:GameFrame(gameFrame)
 			end
 		end -- for
 	end --if frame 1/30
+	--remove retreating unit from selection (only for this one time)
+	if #retreatedUnits > 0 and options.removeFromSelection.value then
+		local selectedUnits = GetSelectedUnits()
+		for i=1, #retreatedUnits do
+			local retreatingUnitID = retreatedUnits[i]
+			for j=1, #selectedUnits do
+				if selectedUnits[j] == retreatingUnitID then
+					table.remove(selectedUnits, j)
+					break;
+				end
+			end
+		end
+		SelectUnitArray(selectedUnits)
+		retreatedUnits = {}
+	end
 end
 
 function widget:DrawWorld()
