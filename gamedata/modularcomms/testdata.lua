@@ -2,10 +2,10 @@ local base = {
 	{
 		name = "rocket",
 		modules = {
-			"commweapon_missilelauncher",
+			"commweapon_rocketlauncher",
 			"commweapon_slamrocket",
 			"weaponmod_standoff_rocket",
-			"module_adv_targeting",
+			"weaponmod_napalm_warhead",
 			"module_adv_targeting",
 			"module_adv_targeting",
 			"module_adv_targeting",
@@ -95,8 +95,11 @@ local base = {
 	{
 		name = "flame",
 		modules = {
+			"commweapon_partillery",
 			"commweapon_flamethrower",
-			"commweapon_flamethrower",
+			"weaponmod_high_caliber_barrel",
+			"weaponmod_napalm_warhead",
+			"weaponmod_flame_enhancer",
 			"module_dmg_booster",
 			"module_dmg_booster",
 		}

@@ -1,12 +1,8 @@
--- napalm_expl
--- napalmfireball_piece3
--- napalmmissile
--- napalmmissilehalfduration
--- napalmfireball_missile
--- firewalker_impact
--- napalmfireball_firewalker
+Spring = Spring or {}
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
-return {
+local cegs = {
   ["napalm_koda"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -57,7 +53,7 @@ return {
         -- circle
       },
     },
-	redploom_long = {
+    redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 200,
@@ -117,7 +113,7 @@ return {
         pos                = [[r14.1421 y10 -1 x10x10 y10 200 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
       },
     },
-	redploom_long = {
+    redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 200,
@@ -155,7 +151,7 @@ return {
         pos                = [[r10 y10 -1 x10x10 y10 100 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
       },
     },
-	redploom_long = {
+    redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 45,
@@ -193,7 +189,7 @@ return {
         pos                = [[r10 y10 -1 x10x10 y10 100 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
       },
     },
-	redploom_long = {
+    redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 45,
@@ -208,93 +204,6 @@ return {
   },  
     
   -- Fireball particles of various lifetimes
-  ["napalmfireball_1400"] = {
-    rocks = {
-      air                = true,
-      class              = [[CSimpleParticleSystem]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        airdrag            = 0.98,
-        colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
-        directional        = false,
-        emitrot            = 60,
-        emitrotspread      = 30,
-        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
-        gravity            = [[0.001 r-0.002, -0.001 r0.002, 0.001 r-0.002]],
-        numparticles       = 2,
-        particlelife       = 500,	--minimum particle lifetime in frames
-        particlelifespread = 900,	--max value of random lifetime added to each particle's lifetime
-        particlesize       = 30,
-        particlesizespread = 10,
-        particlespeed      = 0.6,
-        particlespeedspread = 1.2,
-        pos                = [[-10 r20, 0, -10 r20]],
-        sizegrowth         = 0,
-        sizemod            = 1.0,
-        texture            = [[fireball]],
-      },
-    },
-  },
-  ["napalmfireball_600"] = {
-    rocks = {
-      air                = true,
-      class              = [[CSimpleParticleSystem]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        airdrag            = 0.97,
-        colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
-        directional        = false,
-        emitrot            = 60,
-        emitrotspread      = 30,
-        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
-        gravity            = [[0.001 r-0.002, -0.001 r0.002, 0.001 r-0.002]],
-        numparticles       = 2,
-        particlelife       = 200,	--minimum particle lifetime in frames
-        particlelifespread = 400,	--max value of random lifetime added to each particle's lifetime
-        particlesize       = 30,
-        particlesizespread = 10,
-        particlespeed      = 0.5,
-        particlespeedspread = 1.2,
-        pos                = [[-10 r20, 0, -10 r20]],
-        sizegrowth         = 0,
-        sizemod            = 1.0,
-        texture            = [[fireball]],
-      },
-    },
-  },
-  ["napalmfireball_450"] = {
-    rocks = {
-      air                = true,
-      class              = [[CSimpleParticleSystem]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        airdrag            = 0.97,
-        colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
-        directional        = false,
-        emitrot            = 60,
-        emitrotspread      = 30,
-        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
-        gravity            = [[0.001 r-0.002, -0.001 r0.002, 0.001 r-0.002]],
-        numparticles       = 2,
-        particlelife       = 100,	--minimum particle lifetime in frames
-        particlelifespread = 250,	--max value of random lifetime added to each particle's lifetime
-        particlesize       = 30,
-        particlesizespread = 10,
-        particlespeed      = 0.5,
-        particlespeedspread = 1.0,
-        pos                = [[-10 r20, 0, -10 r20]],
-        sizegrowth         = 0,
-        sizemod            = 1.0,
-        texture            = [[fireball]],
-      },
-    },
-  },
   ["napalmfireball_200"] = {
     rocks = {
       air                = true,
@@ -339,7 +248,7 @@ return {
         pos                = [[20 r-40, -100, 20 r-40]],
       },
     },
-	redploom_long = {
+    redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
       count              = 50,
@@ -394,3 +303,61 @@ return {
     },
   },
 }
+
+local altforms = {
+  napalmfireball_450 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {particlelife = 100, particlelifespread = 250},
+      },
+    },
+  },
+  napalmfireball_600 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {particlelife = 200, particlelifespread = 400},
+      },
+    },
+  },
+  napalmfireball_750 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {particlelife = 250, particlelifespread = 500},
+      },
+    },
+  },
+  napalmfireball_1400 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {
+	  airdrag            = 0.98,
+	  colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
+	  particlelife       = 500,	--minimum particle lifetime in frames
+	  particlelifespread = 900,	--max value of random lifetime added to each particle's lifetime
+	  particlespeed      = 0.6,
+	  particlespeedspread = 1.2,
+	},
+      }
+    }
+  },
+  napalm_firewalker_long = {
+    source = "napalm_firewalker",
+    modifications = {
+      redploom_long = {
+	properties = {
+	  explosiongenerator = [[custom:NAPALMFIREBALL_750]],
+	},
+      },
+    },
+  },
+}
+
+for cegName, info in pairs(altforms) do
+  cegs[cegName] = Spring.Utilities.MergeTable(info.modifications, cegs[info.source], true)
+end
+
+return cegs

@@ -376,6 +376,21 @@ upgrades = {
 				end
 			end,		
 	},
+	weaponmod_flame_enhancer = {
+		name = "Long-Burn Napalm",
+		description = "Flamethrower/Napalm Warhead: +25% on-fire time",
+		func = function(unitDef)
+				for i,v in pairs(weapons) do
+					if v.customparams.burntime then
+						v.customparams.burntime = v.customparams.burntime * 1.25
+					end
+					if v.customparams.idstring == "commweapon_hpartillery_napalm" then
+						v.customparams.areadamage_preset = "module_napalmarty_long"
+						v.explosiongenerator = "custom:napalm_firewalker_long"
+					end
+				end
+			end
+	},
 	weaponmod_plasma_containment = {
 		name = "Plasma Containment Field",
 		description = "Heat Ray/Riot Cannon: +30% range",
