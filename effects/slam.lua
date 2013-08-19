@@ -2,17 +2,20 @@
 -- slam_sparks_smokejets
 -- slam_flash
 -- slam_ray
+-- slam_heat_pillar
 -- slam_landcloud
 -- slam_landcloud_ring
 -- slam_landcloud_topcap
 -- slam_landcloud_cap
 -- slam_landcloud_pillar
+-- slam_landcloud_topsuction
 -- slam_seacloud
 -- slam_seacloud_topcap
 -- slam_seacloud_ring
 -- slam_seacloud_cap
 -- slam_seacloud_pillar
 -- slam_water_droplets
+-- slam_water_pillar
 -- slam_trail
 
 
@@ -21,6 +24,8 @@
 -- slam_seacloud & slam_landcloud stuff from nuke_150 (heavily modified)
 -- slam_water_droplets from nuke_150 (modified) 
 -- slam_trail from cruisetrail (modified)
+-- slam_water_pillar from torpedo_hit_main_large (more growth)
+-- slam_ray and slam_heat_pillar from galiblow.lua
 
 return {
 
@@ -71,7 +76,7 @@ return {
       count              = 1,
       ground             = true,
       properties = {
-        delay              = 15,
+        delay              = 7,
         dir                = [[dir]],
         explosiongenerator = [[custom:SLAM_LANDCLOUD]],
         pos                = [[0, 0, 0]],
@@ -85,7 +90,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
-        delay              = 7,
+        delay              = 3.5,
         dir                = [[dir]],
         explosiongenerator = [[custom:SLAM_SEACLOUD]],
         pos                = [[0, 0, 0]],
@@ -104,6 +109,35 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
+    swaterpillar = {
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      water              = true,
+      underwater		 = true,
+      properties = {
+        delay              = 0,
+        dir                = [[dir]],
+        explosiongenerator = [[custom:SLAM_WATER_PILLAR]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+
+    sheatpillar = {
+      class              = [[CExpGenSpawner]],
+      count              = 32,
+      water              = true,
+      underwater		 = true,
+      ground             = true,
+      air                = true,
+      properties = {
+        delay              = [[i0.25]],
+        dir                = [[-0.1 r0.2, 1 -0.1 r0.2, -0.1 r0.2]],
+        explosiongenerator = [[custom:SLAM_HEAT_PILLAR]],
+        pos                = [[-4 r8, 0, r32]],
+      },
+    },
+
+    
   },
 
    ["slam_seacloud"] = {
@@ -154,18 +188,19 @@ return {
     topcap = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 4,
+      count              = 24,
       ground             = true,
       water              = true,
       
       underwater		 = true,
       properties = {
-        delay              = [[12 i0.5]],
+        delay              = [[12 i0.083333]],
         dir                = [[dir]],
         explosiongenerator = [[custom:SLAM_SEACLOUD_TOPCAP]],
-        pos                = [[0, 112 i1, 0]],
+        pos                = [[0, 96 i0.083333, 0]],
       },
     },
+
   },
 
 
@@ -205,10 +240,10 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        delay              = 16,
+        delay              = 12,
         dir                = [[dir]],
         explosiongenerator = [[custom:SLAM_LANDCLOUD_RING]],
-        pos                = [[0, 64, 0]],
+        pos                = [[0, 80, 0]],
       },
     },
     topcap = {
@@ -224,6 +259,20 @@ return {
         pos                = [[0, 96 i2, 0]],
       },
     },
+
+    topsuction = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 9,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[a0 r5 y0 a0 24 i1.5]],
+        dir                = [[dir]],
+        explosiongenerator = [[custom:SLAM_TOPSUCTION]],
+        pos                = [[0, 104, 0]],
+      },
+    },
   },
 
     ["slam_landcloud_ring"] = {
@@ -234,24 +283,24 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        airdrag            = 0.9,
+        airdrag            = 0.93,
         alwaysvisible      = true,
-        colormap           = [[0 0 0 0  1 1 0.75 1  1 0.75 0.5 1  0.75 0.75 0.75 1  0 0 0 0]],
+        colormap           = [[0 0 0 0  1 1 0.75 1  0.8 0.75 0.7 0.8  0.6 0.565 0.55 0.6  0 0 0 0]],
         directional        = false,
         emitrot            = 90,
         emitrotspread      = 5,
         emitvector         = [[0, 1, 0]],
-        gravity            = [[0, 0.2, 0]],
-        numparticles       = 32,
-        particlelife       = 60,
-        particlelifespread = 10,
+        gravity            = [[0, 0.05, 0]],
+        numparticles       = 40,
+        particlelife       = 75,
+        particlelifespread = 5,
         particlesize       = 6,
-        particlesizespread = 8,
-        particlespeed      = 8,
-        particlespeedspread = 1,
+        particlesizespread = 12,
+        particlespeed      = 6,
+        particlespeedspread = 0,
         pos                = [[0, 0, 0]],
-        sizegrowth         = 8,
-        sizemod            = 0.75,
+        sizegrowth         = 9,
+        sizemod            = 0.7,
         texture            = [[smokesmall]],
       },
     },
@@ -265,21 +314,21 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        airdrag            = 0.9,
+        airdrag            = 0.93,
         alwaysvisible      = true,
-        colormap           = [[0 0 0 0  1 0.75 0.5 0.75  1 0.75 0.0 0.5  0.1 0.0 0.0 0.5  0 0 0 0.01]],
+        colormap           = [[0 0 0 0  1 0.75 0.5 0.5  1 0.75 0.0 0.4  0.1 0.0 0.0 0.25  0 0 0 0.01]],
         directional        = false,
         emitrot            = 90,
         emitrotspread      = 5,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 0.2, 0]],
-        numparticles       = 4,
-        particlelife       = 50,
-        particlelifespread = 20,
-        particlesize       = 10,
-        particlesizespread = 30,
-        particlespeed      = 4,
-        particlespeedspread = 4,
+        numparticles       = 5,
+        particlelife       = 60,
+        particlelifespread = 5,
+        particlesize       = 12,
+        particlesizespread = 40,
+        particlespeed      = 1,
+        particlespeedspread = 5,
         pos                = [[0, 0, 0]],
         sizegrowth         = 0,
         sizemod            = 1,
@@ -312,8 +361,8 @@ return {
         particlespeed      = 4,
         particlespeedspread = 4,
         pos                = [[0, 0, 0]],
-        sizegrowth         = 8,
-        sizemod            = 0.75,
+        sizegrowth         = 12,
+        sizemod            = 0.6,
         texture            = [[fireball]],
       },
     },
@@ -330,22 +379,22 @@ return {
       properties = {
         airdrag            = 0.9,
         alwaysvisible      = true,
-        colormap           = [[0 0 0 0  1.0 0.8 0.6 0.5  1.0 1.0 0.8 0.4  0.8 0.8 1 0.25  0 0 0 0]],
+        colormap           = [[0 0 0 0  1.0 0.8 0.6 0.8  1.0 1.0 0.8 0.7  0.8 0.8 1 0.6  0 0 0 0]],
         directional        = false,
         emitrot            = 90,
         emitrotspread      = 5,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 0.2, 0]],
-        numparticles       = 4,
+        numparticles       = 1,
         particlelife       = 50,
         particlelifespread = 10,
-        particlesize       = 4,
-        particlesizespread = 4,
-        particlespeed      = 4,
+        particlesize       = 8,
+        particlesizespread = 48,
+        particlespeed      = 1,
         particlespeedspread = 4,
         pos                = [[r16 r-16, r16 r-16, r16 r-16]],
-        sizegrowth         = 8,
-        sizemod            = 0.8,
+        sizegrowth         = -0.5,
+        sizemod            = 1,
         texture            = [[smokesmall]],
       },
     },
@@ -464,15 +513,47 @@ return {
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 0.2, 0]],
         numparticles       = 1,
-        particlelife       = 30,
+        particlelife       = 45,
         particlelifespread = 10,
-        particlesize       = 4,
-        particlesizespread = 2,
+        particlesize       = 256,
+        particlesizespread = 64,
         particlespeed      = 1,
         particlespeedspread = 1,
         pos                = [[0, 0, 0]],
-        sizegrowth         = 16,
-        sizemod            = 0.75,
+        sizegrowth         = 24,
+        sizemod            = 0.5,
+        texture            = [[smokesmall]],
+      },
+    },
+  },
+
+
+  ["slam_topsuction"] = {
+    land = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.5,
+        alwaysvisible      = true,
+        colormap           = [[0 0 0 0   1 1 1 0.04   0.75 0.6 0.45 0.02  0.1 0.1 0 0.01  0.1 0 0 0.001]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = 0,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0.2, 0]],
+        numparticles       = 1,
+        particlelife       = 15,
+        particlelifespread = 0,
+        particlesize       = 96,
+        particlesizespread = 256,
+        particlespeed      = 27,
+        particlespeedspread = 4,
+        pos                = [[r32 r-32, r16 r-16, r32 r-32]],
+        sizegrowth         = 32,
+        sizemod            = 0.25,
         texture            = [[smokesmall]],
       },
     },
@@ -488,6 +569,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
+        alwaysVisible      = true,
         airdrag            = 1,
         colormap           = [[1 0.6 0 0.1    1.0 0.7 0.4 1    0.05 0.05 0.05 0.1]],
         directional        = false,
@@ -516,6 +598,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
+        alwaysVisible      = true,
         airdrag            = 1,
         colormap           = [[1 0.6 0 0.1    1.0 0.7 0.4 1    0.05 0.05 0.05 0.1]],
         directional        = true,
@@ -544,6 +627,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
+        alwaysVisible      = true,
         airdrag            = 1,
         colormap           = [[1 0.6 0 0.1    1.0 0.7 0.4 1    0.05 0.05 0.05 0.1]],
         directional        = true,
@@ -572,6 +656,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
+        alwaysVisible      = true,
         airdrag            = 1,
         colormap           = [[1 0.7 0.3 0.01    1 0.7 0.3 0.01    0.5 0.35 0.15 0.01    0.05 0.05 0.05 0.01]],
         directional        = true,
@@ -600,6 +685,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
+        alwaysVisible      = true,
         airdrag            = 1,
         colormap           = [[1 0.7 0.3 0.01    1 0.7 0.3 0.01    0.5 0.35 0.15 0.01    0.05 0.05 0.05 0.01]],
         directional        = true,
@@ -628,6 +714,7 @@ return {
       water              = true,
       underwater         = true,
       properties = {
+        alwaysVisible      = true,
         airdrag            = 1,
         colormap           = [[1 0.7 0.3 0.01    1 0.7 0.3 0.01    0.5 0.35 0.15 0.01    0.05 0.05 0.05 0.01]],
         directional        = true,
@@ -732,7 +819,6 @@ return {
       },
     },
     shock1 = {
-      alwaysvisible      = true,
       air                = true,
       class              = [[CSpherePartSpawner]],
       count              = 1,
@@ -740,6 +826,7 @@ return {
       water              = true,
 	  underwater		 = true,
       properties = {
+        alwaysVisible      = true,
         alpha = 0.02,
         ttl = 64,
         expansionSpeed = 5,
@@ -747,7 +834,6 @@ return {
       },
     },
     shock2 = {
-      alwaysvisible      = true,
       air                = true,
       class              = [[CSpherePartSpawner]],
       count              = 1,
@@ -755,6 +841,7 @@ return {
       water              = true,
 	  underwater		 = true,
       properties = {
+        alwaysVisible      = true,
         alpha = 0.02,
         ttl = 32,
         expansionSpeed = 10,
@@ -762,7 +849,6 @@ return {
       },
     },
         shock3 = {
-      alwaysvisible      = true,
       air                = true,
       class              = [[CSpherePartSpawner]],
       count              = 1,
@@ -770,6 +856,7 @@ return {
       water              = true,
 	  underwater		 = true,
       properties = {
+        alwaysVisible      = true,
         alpha = 0.02,
         ttl = 16,
         expansionSpeed = 20,
@@ -788,7 +875,7 @@ return {
         heat               = 375,
         heatfalloff        = 10,
         maxheat            = 5000,
-        pos                = [[r35 r-35, 35 r-20, r35 r-35]],
+        pos                = [[r35 r-35, 35 r-20, r60 r-60]],
         size               = 300,
         sizegrowth         = -1,
         speed              = [[0, 0, 0]],
@@ -796,18 +883,18 @@ return {
       },
     },
     heatglow = {
-      alwaysvisible      = true,
       class              = [[CSimpleGroundFlash]],
       count              = 1,
       ground             = true,
       water              = true,
       underwater         = true,
       properties = {
-        colorMap           = [[1 0.9 0.8 1.0	1 0 0 0.5		0.0 0.0 0.0 0.01]],
-        size               = 85,
-        sizegrowth         = -0.1, 
+        alwaysVisible      = true,
+        colorMap           = [[1 0.9 0.8 1.0	1 0.4 0 0.9		0.0 0.0 0.0 0.01]],
+        size               = 110,
+        sizegrowth         = -0.025, 
         texture            = [[groundflash]],
-        ttl                = 55,
+        ttl                = 125,
       },
 
     },
@@ -818,21 +905,43 @@ return {
       gravspike1 = {
       air                = true,
       class              = [[CExploSpikeProjectile]],
-      count              = 12,
+      count              = 3,
       ground             = true,
       water              = true,
       underwater         = true,
       properties = {
+        alwaysVisible      = true,
         length 				= 250,
         width					= 50,
-        alpha					= 0.25,
-        alphaDecay 			= 0.008,
+        alpha					= 0.375,
+        alphaDecay 			= 0.012,
         dir 					= [[dir]],
         color 				= [[1, 0.4, 0]],
-        pos                = [[r40 r-40, 0, r40 r-40]],
+        pos                = [[10 r-20, 0, 10 r-20]],
       },
     },
   },
+
+    ["slam_water_pillar"] = {
+    mainhit = {
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 4,
+      water              = true,
+	  underwater		 = true,
+      properties = {
+        alwaysVisible      = true,
+        colormap           = [[0.45 0.45 0.5 0.5  0.045 0.045 0.05 0.05]],
+        dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
+        frontoffset        = 0,
+        fronttexture       = [[splashbase]],
+        length             = [[48 r32]],
+        sidetexture        = [[splashside]],
+        size               = [[12 r8]],
+        sizegrowth         = 1.8,
+        ttl                = 24,
+      },
+    },
+  },  
 
   ["slam_water_droplets"] = {
       watermist = {
@@ -841,6 +950,7 @@ return {
       water              = true,
 	  underwater		 = true,
       properties = {
+        alwaysVisible      = true,
         airdrag            = 0.99,
         alwaysvisible      = true,
         colormap           = [[0 0 0 0  1 1 0.8 0.1  0.8 1 1 0.075  0.8 1 1 0.025  0 0 0 0]],
@@ -912,6 +1022,28 @@ return {
         sizegrowth         = 1.5,
         sizemod            = 1.0,
         texture            = [[smoke]],
+      },
+    },
+  },
+
+  ["slam_heat_pillar"] = {
+
+      gravspike1 = {
+      air                = true,
+      class              = [[CExploSpikeProjectile]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      underwater         = true,
+      properties = {
+        alwaysVisible      = true,
+        length 				= 70,
+        width					= 105,
+        alpha					= 0.1,
+        alphaDecay 			= 0.001,
+        dir 					= [[dir]],
+        color 				= [[1, 0.4, 0]],
+        pos                = [[0, 0, 0]],
       },
     },
   },
