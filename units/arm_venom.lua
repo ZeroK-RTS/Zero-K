@@ -89,13 +89,17 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+	  
+      customParams            = {
+        extra_damage = [[18]],
+      },
 
       damage                  = {
         default        = 600,
       },
 
       duration                = 8,
-      explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
+      explosionGenerator      = [[custom:LIGHTNINGPLOSION160AoE]],
       fireStarter             = 0,
       heightMod               = 1,
       impulseBoost            = 0,
@@ -107,7 +111,7 @@ unitDef = {
       paralyzeTime            = 3,
       range                   = 240,
       reloadtime              = 1.75,
-      rgbColor                = [[1 1 0.25]],
+      rgbColor                = [[1 1 0.7]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,
       targetMoveError         = 0,
