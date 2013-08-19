@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = " v0.273 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = " v0.274 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
-    date      = "2008-03-17", --2013-8-16
+    date      = "2008-03-17", --2013-8-19
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
@@ -27,6 +27,7 @@ local CMD_WAIT          = CMD.WAIT
 local CMD_MOVE          = CMD.MOVE
 local CMD_PATROL        = CMD.PATROL
 local CMD_REPAIR        = CMD.REPAIR
+local CMD_STOP			= CMD.STOP
 
 local CMD_CLOAK         = CMD.CLOAK
 local CMD_ONOFF         = CMD.ONOFF
@@ -72,7 +73,8 @@ local retreatingUnits, wantRetreat, alliedWantRetreat, retreatOrdersArray = {}, 
 local mobileUnits, pauseRetreatChecks, havens = {}, {}, {}
 local havenCount = 0
 
-local retreatedUnits = {} --for "removeFromSelection" options
+local retreatedUnits = {} --recently retreating unit that is about to be deselected from user selection
+local currentSelection = nil --current unit selection (for deselecting any retreating units. See code for more detail)
 
 -------------------------------------
 options_path = 'Game/Unit AI/Retreat Zone' --//for use 'with gui_epicmenu.lua'
@@ -82,13 +84,13 @@ options = {
 		name = 'Auto Unselect units',
 		type = 'bool',
 		value = false,
-		desc = 'Automatically remove retreating unit from current selection (Retreating unit might need exclusion from the order given to healthy units).',
+		desc = 'Automatically remove retreating unit from current selection if majority is healthy units. (Retreating unit might need exclusion from orders given to healthy units)',
 	},
 	returnLastPosition = {
 		name = 'Return to last position',
 		type = 'bool',
 		value = false,
-		desc = 'Always attempt to return unit to their last known position (Unit might need to return to their last idle position or their last location where their previous order expired).',
+		desc = 'Always attempt to return unit to their last known position. (Unit might need to return to their last idle position or their last location where their previous order expired)',
 	},
 }
 --------------------------------------------------------------------------------
@@ -208,8 +210,7 @@ function StopRetreating(unitID)
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
 			if cmds[2] and cmds[2].id==CMD_WAIT then --is the move+wait retreat combo(?)
 				GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[2].tag}, {})
-				
-				if not cmds[3] and retreatingUnits[unitID][4] then --no work to return to?? returnLastPosition enabled??
+				if (not cmds[3] or cmds[3].id==CMD_STOP) and retreatingUnits[unitID][4] then --no work to return to?? returnLastPosition enabled??
 					local x,y,z = retreatingUnits[unitID][4],retreatingUnits[unitID][5],retreatingUnits[unitID][6]
 					GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 				end
@@ -219,6 +220,10 @@ function StopRetreating(unitID)
 			
 		elseif (cmds[1].id == CMD_WAIT) then --is waiting for repair(?)		
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
+			if (not cmds[2] or cmds[2].id==CMD_STOP) and retreatingUnits[unitID][4] then --no work to return to?? returnLastPosition enabled??
+				local x,y,z = retreatingUnits[unitID][4],retreatingUnits[unitID][5],retreatingUnits[unitID][6]
+				GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
+			end
 			retreatingUnits[unitID] = nil
 		else --is currently some other command
 			--retreatingUnits[unitID] = nil
@@ -383,7 +388,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			local selectedUnits = GetSelectedUnits()
 			for i=1, #selectedUnits do
 				local unitID = selectedUnits[i]
-				if retreatingUnits[unitID] then
+				if retreatingUnits[unitID] or pauseRetreatChecks[unitID] then  --currently paused or retreating
 					pauseRetreatChecks[unitID] = GetGameFrame() + 160 --cancel retreat command until 5 second later
 					retreatingUnits[unitID] = nil
 				end
@@ -492,6 +497,12 @@ function widget:CommandsChanged()
 	end--for 
 end
 
+function widget:SelectionChanged(newSelection)
+	if (havenCount > 0) and options.removeFromSelection.value then
+		currentSelection = newSelection
+	end
+end
+
 function widget:UnitDamaged(unitID) 
 	local retreatOrder = retreatOrdersArray[unitID]
 	
@@ -514,7 +525,9 @@ function widget:UnitDamaged(unitID)
 
 			if wantRetreat[unitID] then				        
 				Retreat(unitID)
-				retreatedUnits[#retreatedUnits+1] = unitID
+				if options.removeFromSelection.value then 
+					retreatedUnits[#retreatedUnits+1] = unitID
+				end
 			end 
 		end 
 	end 
@@ -563,8 +576,10 @@ function widget:GameFrame(gameFrame)
 
 					if wantRetreat[unitID] then				        
 						if (havenCount > 0) and not retreatingUnits[unitID] then
-							Retreat(unitID) 
-							retreatedUnits[#retreatedUnits+1] = unitID
+							Retreat(unitID)
+							if options.removeFromSelection.value then
+								retreatedUnits[#retreatedUnits+1] = unitID
+							end
 						end
 					else --not wantRetreat[unitID]
 						if retreatingUnits[unitID] then
@@ -576,20 +591,45 @@ function widget:GameFrame(gameFrame)
 			end
 		end -- for
 	end --if frame 1/30
-	--remove retreating unit from selection (only for this one time)
-	if #retreatedUnits > 0 and options.removeFromSelection.value then
-		local selectedUnits = GetSelectedUnits()
-		for i=1, #retreatedUnits do
-			local retreatingUnitID = retreatedUnits[i]
-			for j=1, #selectedUnits do
-				if selectedUnits[j] == retreatingUnitID then
-					table.remove(selectedUnits, j)
-					break;
+	--remove retreating unit from selection (only perform at selection change or when retreat is ordered)
+	if options.removeFromSelection.value then
+		if currentSelection then --new selection
+			local unitsToDeselect= {}
+			local selectionCount = #currentSelection
+			local retreatedCount = 0
+			for i=1, selectionCount do
+				local unitID = currentSelection[i]
+				if retreatingUnits[unitID] then --selection contain retreating units
+					unitsToDeselect[#unitsToDeselect+1] = i
+					retreatedCount = retreatedCount + 1
 				end
 			end
+			if retreatedCount > 0 and (retreatedCount/selectionCount) < 0.4 then --retreating unit is minority?
+				for i=1, #unitsToDeselect do
+					table.remove(currentSelection, unitsToDeselect[i]) --remove from list
+				end
+				SelectUnitArray(currentSelection) --update unit selection
+			end
+			currentSelection = nil --finish deselecting units
+			
+		elseif #retreatedUnits > 0 then -- there is recently retreating units?
+			local selectedUnits = GetSelectedUnits() --get existing selection
+			local changes = false
+			for i=1, #retreatedUnits do
+				local retreatingUnitID = retreatedUnits[i]
+				for j=1, #selectedUnits do
+					if selectedUnits[j] == retreatingUnitID then --selection contain recently retreating units
+						table.remove(selectedUnits, j) --unit remove from existing selection
+						changes = true
+						break;
+					end
+				end
+			end
+			if changes then --have unit to deselect?
+				SelectUnitArray(selectedUnits) --update unit selection
+			end
+			retreatedUnits = {} --empty recent-retreat list
 		end
-		SelectUnitArray(selectedUnits)
-		retreatedUnits = {}
 	end
 end
 
