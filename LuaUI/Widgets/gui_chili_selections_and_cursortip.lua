@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.081 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.082 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --31 July 2013
     license   = "GNU GPL, v2 or later",
@@ -618,6 +618,7 @@ local function GetUnitDesc(unitID, ud)
 			if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
 				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", spGetGameRulesParam("WindMax") )
 			end
+			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' )
 			return tooltip
 		end
 		return ud.tooltip
