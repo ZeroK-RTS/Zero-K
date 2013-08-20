@@ -37,8 +37,10 @@ local B_HEIGHT = 20
 	
 
 local window_anim
+local selectedUnit
 local rotX, rotY, rotZ
 local posX, posY, posZ
+local showButton, hideButton, printPieceButton
 local writeOutButton, resetButton,  pieceTreeControl, scroll1, stack1 
 
 --------------------------
@@ -152,7 +154,7 @@ local function MakePieceTreeNodesRec(unitID, pieceTree, nodes)
 		nodes2[#nodes2+1] = Button:New{
 			caption = pieceName,
 			OnClick = {function(self)
-				Spring.SendLuaRulesMsg("tpkey|getpieceinfo|" .. unitID .. '|' .. pieceNum)
+				Spring.SendLuaRulesMsg("animator|getpieceinfo|" .. unitID .. '|' .. pieceNum)
 				
 				rotX.unitID = unitID
 				rotY.unitID = unitID
@@ -170,6 +172,11 @@ local function MakePieceTreeNodesRec(unitID, pieceTree, nodes)
 				posY.pieceNum = pieceNum
 				posZ.pieceNum = pieceNum
 				
+				showButton.unitID = unitID
+				hideButton.unitID = unitID
+				
+				showButton.pieceNum = pieceNum
+				hideButton.pieceNum = pieceNum
 			end},
 		}
 		if type( pChildren ) == 'table' then
@@ -201,6 +208,7 @@ local function UpdateAnimWindow(unitID)
 	local children = {}
 	
 	children[#children+1] = writeOutButton
+	children[#children+1] = printPieceButton
 	children[#children+1] = resetButton
 	
 	children[#children+1] = Label:New{ caption = 'Rot X', width=40, height=B_HEIGHT, }; children[#children+1] = rotX
@@ -210,8 +218,13 @@ local function UpdateAnimWindow(unitID)
 	children[#children+1] = Label:New{ caption = 'Pos X', width=40, height=B_HEIGHT, }; children[#children+1] = posX
 	children[#children+1] = Label:New{ caption = 'Pos Y', width=40, height=B_HEIGHT, }; children[#children+1] = posY
 	children[#children+1] = Label:New{ caption = 'Pos Z', width=40, height=B_HEIGHT, }; children[#children+1] = posZ
+	
+	children[#children+1] = showButton
+	children[#children+1] = hideButton
+	
+	
 
-	children[#children+1] = Label:New{ caption = 'Pieces', width='100%', height=B_HEIGHT }
+	children[#children+1] = Label:New{ caption = 'Pieces', width='100%', autosize=false, align='center', height=B_HEIGHT }
 	
 	children[#children+1] = pieceTreeControl
 	
@@ -266,14 +279,16 @@ local function AnimWindow(unitID)
 	
 	local window = Window:New{
 		caption = "Animation Control",
-		x = '33%',  
-		y = '33%',
+		x = scrW/3,  
+		y = scrH/3,
 		width='20%',
+		minHeight=300,
+		minWidth=200,
 		--height = '30%',
-		--resizable = true,
+		resizable = true,
 		parent = screen0,
-		dockable = false,
-		autosize = true,
+		dockable = true,
+		--autosize = true,
 		children = {
 			scroll1
 		},
@@ -282,23 +297,60 @@ local function AnimWindow(unitID)
 end
 
 
+
+
+
+
+function write_unit_piece_tree (unitID, unitDefID)
+	local unitDef = UnitDefs[unitDefID]
+	Spring.Echo ("*** pieces tree of " .. unitDef.name .. " ***")
+	write_children (unitID,1,0)
+end
+
+function write_children (unitID, pID, recdeep)	
+	PieceInfo = Spring.GetUnitPieceInfo (unitID, pID)
+	local pname = PieceInfo.name
+	if (recdeep == 0) then Spring.Echo (pname) end
+	local pchildren = PieceInfo.children
+	for i,cname  in ipairs(pchildren) do
+		local cpID = Spring.GetUnitPieceMap(unitID)[cname]		
+		local spacing = string.rep("-",recdeep+1)
+		Spring.Echo (spacing .. cname)
+		write_children (unitID, cpID,recdeep+1)
+    end
+	return
+end
+
+function write_piece_list (unitID)
+	local allpieces = Spring.GetUnitPieceList (unitID)
+	local piece_n = table.getn (allpieces)
+	Spring.Echo ("unit has " .. piece_n  .. " pieces")
+	for pID=1, piece_n,1  do		
+		Spring.Echo ("pID:" .. pID)
+		PieceInfo = Spring.GetUnitPieceInfo (unitID,pID)
+		local pname = PieceInfo.name
+		local pchildren = PieceInfo.children		
+		Spring.Echo (" name:"..pname)
+	end
+end
+
+
 --------------------------
 
 
 function widget:SelectionChanged(selectedUnits)
 	if not selectedUnits or not selectedUnits[1] then return end
-	local unitID = selectedUnits[1]
-	Spring.SendLuaRulesMsg ("tpkey|sel|" .. unitID )
+	selectedUnit = selectedUnits[1]
+	Spring.SendLuaRulesMsg ("animator|sel|" .. selectedUnit )
 	
 	--echo( table_to_string( PieceTree(unitID) ) )
 	
-	UpdateAnimWindow(unitID)
+	UpdateAnimWindow(selectedUnit)
 end
 
 function widget:Initialize()
-	local animationMode = Spring.GetGameRulesParam('animation') == 1
-	--echo ( animationMode )
-	if not WG.Chili or not animationMode then
+	local devMode = Spring.GetGameRulesParam('devmode') == 1
+	if not WG.Chili or not devMode then
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
@@ -317,25 +369,30 @@ function widget:Initialize()
 	Trackbar = Chili.Trackbar
 	screen0 = Chili.Screen0
 	
-	rotX = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("tpkey|turn|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	rotY = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("tpkey|turn|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	rotZ = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("tpkey|turn|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotX = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|turn|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotY = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|turn|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotZ = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|turn|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
 	
-	posX = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("tpkey|move|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	posY = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("tpkey|move|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	posZ = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("tpkey|move|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posX = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posY = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posZ = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	
+	showButton = Button:New{ caption = 'Show', width='40%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|show|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
+	hideButton = Button:New{ caption = 'Hide', width='40%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|hide|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
 
+
+	printPieceButton = Button:New{ caption = 'Print Pieces', width='30%', height=B_HEIGHT*2, OnClick = { function(self) write_piece_list(selectedUnit) end }, }
 	writeOutButton = Button:New{
 		unitID = 0,
-		caption = 'Write Out', width="45%", height=B_HEIGHT*2,
-		OnClick = { function(self) Spring.SendLuaRulesMsg( 'tpkey|write|' .. self.unitID ) end },
+		caption = 'Write Out', width="30%", height=B_HEIGHT*2,
+		OnClick = { function(self) Spring.SendLuaRulesMsg( 'animator|write|' .. self.unitID ) end },
 	}
 	
 	resetButton = Button:New{
 		unitID = 0,
-		caption = 'Reset', x = '55%', width="45%", height=B_HEIGHT*2,
+		caption = 'Reset', width="30%", height=B_HEIGHT*2,
 		OnClick = { function(self)
-			Spring.SendLuaRulesMsg( 'tpkey|reset|' .. self.unitID )
+			Spring.SendLuaRulesMsg( 'animator|reset|' .. self.unitID )
 			rotX:SetValue( 0 )
 			rotY:SetValue( 0 )
 			rotZ:SetValue( 0 )
