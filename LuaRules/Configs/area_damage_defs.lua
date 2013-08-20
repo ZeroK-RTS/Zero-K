@@ -9,6 +9,7 @@ local weapons = {
 	chickenwurm_napalm = { radius = 128, damage = 30, duration = 600, rangeFall = 0.6, timeFall = 0.5 },
 	raveparty_orange_roaster = { radius = 256, damage = 40, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
 	logkoda_napalm_bomblet = { radius = 64, damage = 60, duration = 300, rangeFall = 0.6, timeFall = 0.5 },
+	infernal_napalm = { radius = 192, damage = 60, duration = 300, rangeFall = 0.6, timeFall = 0.5 },
 }
 
 -- radius		- defines size of sphereical area in which damage is dealt

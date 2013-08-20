@@ -7,7 +7,7 @@ local cegs = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
-      flashsize          = 80,
+      flashsize          = 64,
       ttl                = 330,
       color = {
         [1]  = 0.7,
@@ -25,6 +25,31 @@ local cegs = {
         delay              = [[0 i40]],
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
         pos                = [[-10 r20, 30, -10 r20]],
+      },
+    },
+  },
+  ["napalm_infernal"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 110,
+      ttl                = 330,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 6,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i40]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_200]],
+        pos                = [[-30 r60, 30, -30 r60]],
       },
     },
   },
