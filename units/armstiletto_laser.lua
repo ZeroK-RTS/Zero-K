@@ -103,7 +103,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
-      explosionGenerator      = [[custom:YELLOW_LIGHTNING_BOMB]],
+      explosionGenerator      = [[custom:WHITE_LIGHTNING_BOMB]],
       fireStarter             = 90,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -116,7 +116,7 @@ unitDef = {
       paralyzeTime            = 13,
       range                   = 730,
       reloadtime              = 10,
-      rgbColor                = [[1 1 0]],
+      rgbColor                = [[1 1 1]],
       sprayAngle              = 6000,
       texture1                = [[lightning]],
       texture2                = [[flare]],
