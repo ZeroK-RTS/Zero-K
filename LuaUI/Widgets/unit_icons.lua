@@ -20,7 +20,7 @@ local echo = Spring.Echo
 
 local spGetUnitDefID 	= Spring.GetUnitDefID
 local spIsUnitInView 	= Spring.IsUnitInView
-local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitPosition = Spring.GetUnitViewPosition
 local spGetGameFrame 	= Spring.GetGameFrame
 
 local glDepthTest      = gl.DepthTest
