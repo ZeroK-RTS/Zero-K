@@ -20,7 +20,7 @@ local echo = Spring.Echo
 
 local spGetUnitDefID 	= Spring.GetUnitDefID
 local spIsUnitInView 	= Spring.IsUnitInView
-local spGetUnitPosition = Spring.GetUnitViewPosition
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spGetGameFrame 	= Spring.GetGameFrame
 
 local glDepthTest      = gl.DepthTest
@@ -238,7 +238,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function DrawFuncAtUnitIcon2(unitID, xshift, yshift)
-	local x,y,z = spGetUnitPosition(unitID)
+	local x,y,z = spGetUnitViewPosition(unitID)
 	glPushMatrix()
 		glTranslate(x,y,z)
 		glTranslate(0,yshift,0)
