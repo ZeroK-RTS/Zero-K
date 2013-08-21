@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 30.6.2013",
+    date      = "1.11.2007, 21.8.2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -609,7 +609,7 @@ function GetPathLength(unitID)
   local d = 0
   local queue = GetCommandQueue(unitID);
   local udid = Spring.GetUnitDefID(unitID)
-  local moveID = UnitDefs[udid].moveData.id
+  local moveID = UnitDefs[udid].moveDef.id
   if (queue == nil) then return 0 end
   for k=1, #queue do
     local v = queue[k]

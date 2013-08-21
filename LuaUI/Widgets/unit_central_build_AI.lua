@@ -20,7 +20,7 @@ function widget:GetInfo()
     name      = "Central Build AI",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 10 April 2013",
+    date      = "July 20, 2009, 21 August 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -289,7 +289,7 @@ end
 -- This function check all build site whether it is accessible to 1 constructor. Reference: http://springrts.com/phpbb/viewtopic.php?t&t=22953&start=2
 function UpdateOneUnitPathability(unitID)
 	local udid = spGetUnitDefID(unitID)
-	local moveID = UnitDefs[udid].moveData.id
+	local moveID = UnitDefs[udid].moveDef.id
 	local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
 	for queue, location in pairs(myQueue) do
 		local x, y, z = location.x, location.y, location.z
@@ -341,7 +341,7 @@ function UpdateUnitsPathabilityForOneQueue(queueKey)
 	local x, y, z = location.x, location.y, location.z
 	for unitID, _ in pairs(myUnits) do
 		local udid = spGetUnitDefID(unitID)
-		local moveID = UnitDefs[udid].moveData.id
+		local moveID = UnitDefs[udid].moveDef.id
 		local reach = true --Note: first assume unit is flying and/or target always reachable
 		if moveID then --Note: crane/air-constructor do not have moveID!
 			local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location

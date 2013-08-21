@@ -6,7 +6,7 @@ function widget:GetInfo()
 				"(up to 600elmo, HLT range) and teleport them when it shorten travel time. "..
 				"This only apply to your unit & allied beacon.",
 	author    = "Msafwan",
-    date      = "19 July 2013",
+    date      = "21 August 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
@@ -246,7 +246,7 @@ function widget:GameFrame(n)
 						if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] and not excludedUnit then
 							local unitDefID = spGetUnitDefID(unitID)
 							if not listOfMobile[unitDefID] then
-								local moveID = UnitDefs[unitDefID].moveData.id
+								local moveID = UnitDefs[unitDefID].moveDef.id
 								local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
 								local unitSpeed = UnitDefs[unitDefID].speed
 								local isBomber = UnitDefs[unitDefID].isBomber
