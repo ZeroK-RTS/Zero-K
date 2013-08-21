@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.025 Chili Keyboard Menu",
+    desc      = "v0.026 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -375,6 +375,9 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	end
 
 	Update()
+	if (cmdCount <= 0) then
+		return "", xIcons, yIcons, {}, {}, {}, {}, {}, {}, {}, {} --prevent CommandChanged() from being called twice when deselecting all units (copied from ca_layout.lua)
+	end	
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
 
@@ -1157,7 +1160,7 @@ function widget:Initialize()
 end 
 
 function widget:Shutdown()
-	widgetHandler:ConfigLayoutHandler(nil)
+	widgetHandler:ConfigLayoutHandler(false) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins . See Layout.lua
 	Spring.ForceLayoutUpdate()
 	if not customKeyBind then
 		Spring.SendCommands("unbind d radialbuildmenu")

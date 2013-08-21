@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.121 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.122 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-June-30
+    date      = "2011-03-16", --2013-August-21
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -361,7 +361,7 @@ options = {
     
     thirdpersontrack = {
 		name = "Enter 3rd Person Trackmode",
-		desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, and move mouse to edge of screen to jump to current unit selection.",
+		desc = "3rd Person track the selected unit (mouse midclick to exit mode). Press arrow key to jump to nearby units, or move mouse to edge of screen to jump to current unit selection (will exit mode if no selection).",
 		type = 'button',
 		hotkey = {key='k', mod='alt+'},
 		path = cameraFollowPath,
@@ -388,7 +388,7 @@ options = {
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
-		desc = "Tap the same group numbers to focus camera view toward each units within the same group. This option use \'Receive Indicator\' widget to intelligently cycle focus when appropriate.",
+		desc = "If you tap the group numbers (1,2,3..ect) it will focus camera view toward the cluster of unit rather than toward the average position.",
 		OnChange = function(self) 
 			if self.value==true then
 				Spring.SendCommands("luaui enablewidget Receive Units Indicator")
@@ -1945,7 +1945,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 			previousKey = key
 			previousTime = spGetTimer()
 			
-			if options.enableCycleView.value and WG.recvIndicator then 
+			if options.enableCycleView.value then 
 				local slctUnitUnordered = {}
 				for i=1 , #selectedUnit do
 					local unitID = selectedUnit[i]
@@ -1953,7 +1953,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 					slctUnitUnordered[unitID] = {x,y,z}
 				end
 				selectedUnit = nil
-				local cluster, lonely = WG.recvIndicator.OPTICS_cluster(slctUnitUnordered, 600,2, Spring.GetMyTeamID(),300) --//find clusters with atleast 2 unit per cluster and with at least within 300-elmo from each other with 600-elmo detection range
+				local cluster, lonely = WG.OPTICS_cluster(slctUnitUnordered, 600,2, Spring.GetMyTeamID(),300) --//find clusters with atleast 2 unit per cluster and with at least within 300-elmo from each other with 600-elmo detection range
 				if previousGroup == group then
 					currentIteration = currentIteration +1
 					if currentIteration > (#cluster + #lonely) then

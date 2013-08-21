@@ -1,12 +1,11 @@
--- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: proper tooltips for queue buttons
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.361 Integral Command Menu",
+    desc      = "v0.362 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
-    date      = "12.10.2010",
+    date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
     layer     = math.huge-1,
     enabled   = true,
@@ -1034,6 +1033,9 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	end
 
 	Update()
+	if (cmdCount <= 0) then
+		return "", xIcons, yIcons, {}, {}, {}, {}, {}, {}, {}, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
+	end
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
 
@@ -1167,6 +1169,7 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
+--this function add hotkey text to each tab name
 local function updateTabName(num, choice)
 	local hotkey = WG.crude.GetHotkey(choice.actionName)
 	if hotkey ~= '' then
@@ -1475,8 +1478,8 @@ function widget:SelectionChanged(newSelection)
 end
 
 function widget:Shutdown()
-  widgetHandler:ConfigLayoutHandler(nil)
-  Spring.ForceLayoutUpdate()
+	widgetHandler:ConfigLayoutHandler(false) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins. See Layout.lua
+	Spring.ForceLayoutUpdate()
 end
 
 options.hidetabs.OnChange = function(self) 

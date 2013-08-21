@@ -421,9 +421,9 @@ end
 
 
 function widget:Shutdown()
-  widgetHandler:ConfigLayoutHandler(nil)
-  Spring.ForceLayoutUpdate()
-  widgetHandler.actionHandler:RemoveAction(widget,"layout")
+	widgetHandler:ConfigLayoutHandler(true) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins
+	Spring.ForceLayoutUpdate()
+	widgetHandler.actionHandler:RemoveAction(widget,"layout")
 end
 
 --------------------------------------------------------------------------------
