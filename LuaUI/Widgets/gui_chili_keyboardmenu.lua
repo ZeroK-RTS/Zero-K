@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.026 Chili Keyboard Menu",
+    desc      = "v0.027 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -127,6 +127,7 @@ options_order = {
 	'goToCommands',
 	'goToSelections',
 	'opacity',
+	'old_menu_at_shutdown'
 }
 options = {
 
@@ -176,9 +177,13 @@ options = {
 		value = 0.4, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) window_main.color = {1,1,1,self.value}; window_main:Invalidate() end,
 	},
-	
-
-	
+	old_menu_at_shutdown = {
+		name = 'Reenable Spring Menu at Shutdown',
+		desc = "Upon widget shutdown (manual or upon crash) reenable Spring's original command menu.",
+		type = 'bool',
+		advanced = true,
+		value = true,
+	},		
 }
 
 
@@ -376,7 +381,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 
 	Update()
 	if (cmdCount <= 0) then
-		return "", xIcons, yIcons, {}, {}, {}, {}, {}, {}, {}, {} --prevent CommandChanged() from being called twice when deselecting all units (copied from ca_layout.lua)
+		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units (copied from ca_layout.lua)
 	end	
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
@@ -1160,7 +1165,7 @@ function widget:Initialize()
 end 
 
 function widget:Shutdown()
-	widgetHandler:ConfigLayoutHandler(false) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins . See Layout.lua
+	widgetHandler:ConfigLayoutHandler(options.old_menu_at_shutdown.value) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins . See Layout.lua
 	Spring.ForceLayoutUpdate()
 	if not customKeyBind then
 		Spring.SendCommands("unbind d radialbuildmenu")

@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.362 Integral Command Menu",
+    desc      = "v0.363 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
@@ -47,7 +47,7 @@ NOTE FOR OTHER GAME DEVS:
 ------------------------
 ------------------------
 options_path = 'Settings/HUD Panels/Integral Menu'
-options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
+options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown'}
 options = {
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
@@ -94,6 +94,13 @@ options = {
 		name = "Special Tab",
 		desc = "Switches to special tab, enables grid hotkeys",
 		type = 'button',
+	},
+	old_menu_at_shutdown = {
+		name = 'Reenable Spring Menu at Shutdown',
+		desc = "Upon widget shutdown (manual or upon crash) reenable Spring's original command menu.",
+		type = 'bool',
+		advanced = true,
+		value = true,
 	},
 }
 
@@ -1034,7 +1041,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 
 	Update()
 	if (cmdCount <= 0) then
-		return "", xIcons, yIcons, {}, {}, {}, {}, {}, {}, {}, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
+		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
 	end
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
@@ -1478,7 +1485,7 @@ function widget:SelectionChanged(newSelection)
 end
 
 function widget:Shutdown()
-	widgetHandler:ConfigLayoutHandler(false) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins. See Layout.lua
+	widgetHandler:ConfigLayoutHandler(options.old_menu_at_shutdown.value) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins. See Layout.lua
 	Spring.ForceLayoutUpdate()
 end
 
