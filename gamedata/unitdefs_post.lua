@@ -452,6 +452,13 @@ for name, ud in pairs(UnitDefs) do
 	end
 end 
 
+-- Set to accelerate towards their destination regardless of heading
+for name, ud in pairs(UnitDefs) do
+	if ud.hoverattack then
+		ud.turninplaceanglelimit = 180
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- 2x repair speed than BP
