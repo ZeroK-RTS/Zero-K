@@ -91,7 +91,7 @@ local function IdleAnim()
 	while true do
 		EmitSfx(zelena, 1025)	
 		
-		heading = math.rad(math.random(0, 360))
+		heading = math.rad(math.random(-90, 90))
 		if(lastHeading > heading) then
 			rotateWise = 1
 		else
@@ -109,7 +109,7 @@ local function IdleAnim()
 		Spin(gear002, y_axis, TURN_SPEED * 5 * rotateWise)
 	
 		Turn(rotating_bas, y_axis, heading, math.rad(60))
-		Turn(mc_rocket_ho, x_axis, math.rad(math.random(260, 360)), math.rad(60))
+		Turn(mc_rocket_ho, x_axis, math.rad(math.random(-25, 0)), math.rad(60))
 		
 		WaitForTurn(rotating_bas, y_axis)
 		EmitSfx(modra, 1026)
@@ -143,7 +143,7 @@ function script.Create()
 	--Spin(rotating_bas, y_axis, 0.5)
 	
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end	
-	--StartThread(IdleAnim)
+	StartThread(IdleAnim)
 	
 	--while true do
 	--	if not(inMove) then
