@@ -146,7 +146,7 @@ function script.Create()
 	Spin(rotating_bas, y_axis, 0.5)
 	
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end	
-	StartThread(IdleAnim)
+	--StartThread(IdleAnim)
 	
 	--while true do
 	--	if not(inMove) then
