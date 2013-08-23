@@ -294,7 +294,7 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		-- multiply paralyze damage by 3 due to armor.txt
 		ws.damw = ws.damw * 3
 		ws.dpsw = ws.dpsw * 3
-		
+
 		local dps_str, dam_str = '', ''
 		if ws.dps > 0 then
 			dam_str = dam_str .. numformat(ws.dam,2)
@@ -302,8 +302,8 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		end
 		if ws.dpsw > 0 then
 			if dps_str ~= '' then
-				dps_str = dps_str .. ' || '
-				dam_str = dam_str .. ' || '
+				dps_str = dps_str .. ' + '
+				dam_str = dam_str .. ' + '
 			end
 			dam_str = dam_str .. numformat(ws.damw,2) .. ' (P)'
 			dps_str = dps_str .. numformat(ws.dpsw,2) .. ' (P)'
@@ -415,9 +415,14 @@ local function printWeapons(unitDef)
 					end
 				end
 			end
-			if weaponDef.customParams.stats_damage then
+			
+			if weaponDef.customParams.extra_damage then
+				wsTemp.dam = weaponDef.customParams.extra_damage * wsTemp.burst * wsTemp.projectiles -- is it right?
+				wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
+			elseif weaponDef.customParams.stats_damage then
 				wsTemp.dam = weaponDef.customParams.stats_damage
 			end
+			
 			if weaponDef.customParams.stats_empdamage then
 				wsTemp.damw = weaponDef.customParams.stats_empdamage
 			end
