@@ -92,7 +92,7 @@ local function ReadFile(zip, name, file)
 	if not (dataRaw and type(dataRaw) == 'string') then
 		err = name.." save data is empty or in invalid format"
 	else
-		dataFunc, err = loadstring("return "..dataRaw)
+		dataFunc, err = loadstring(dataRaw)
 		if dataFunc then
 			success, data = pcall(dataFunc)
 			if not success then	-- execute Borat
@@ -113,6 +113,7 @@ local function boolToNum(bool)
 	else return 0 end
 end
 
+-- FIXME: obsolete in >92.0
 local function GetNewUnitID(oldUnitID)
 	return savedata.unit[oldUnitID] and savedata.unit[oldUnitID].newID
 end
@@ -151,7 +152,7 @@ local function LoadUnits()
 			py = Spring.GetGroundHeight(px, pz)
 		end
 		local isNanoFrame = data.buildProgress < 1
-		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, oldID)
+		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, true, oldID)
 		data.newID = newID
 		-- position and velocity
 		spSetUnitVelocity(newID, unpack(data.vel))
@@ -346,7 +347,9 @@ local savedata = {
 local autosave = true
 local autosaveFreq = 30*60*10	-- every 10 minutes
 
+--------------------------------------------------------------------------------
 -- I/O utility functions
+--------------------------------------------------------------------------------
 local function WriteIndents(num)
 	local str = ""
 	for i=1, num do
@@ -359,26 +362,49 @@ local keywords = {
 	["repeat"] = true,
 }
 
--- recursive function that write a Lua table to file in the correct format
-local function WriteTable(tab, tabName, numIndents, endOfFile, concise, raw, prefixReturn)
-	local comma = raw and "" or ","
-	local eos = comma .. ((concise and not raw) and '' or "\n")	-- end of string
-	numIndents = numIndents or 0
-	local str = ""	--WriteIndents(numIndents)
-	if not raw then
-		if prefixReturn then
-			str = "return "
-		elseif tabName then
-			str = tabName .. " = "
-		end
-		str = str .. (concise and "{" or "{\n")
-	end
+--[[
+	raw = print table key-value pairs straight to file (i.e. not as a table)
+	if you use it make sure your keys are valid variable names!
+	
+	valid params: {
+		numIndents = int,
+		raw = bool,
+		prefixReturn = bool,
+		forceLineBreakAtEnd = bool,
+	}
+]]
+local function IsDictOrContainsDict(tab)
 	for i,v in pairs(tab) do
-		if not concise then
-			str = str .. WriteIndents(numIndents + 1)
+		if type(i) ~= "number" then
+			return true
+		elseif i > #tab then
+			return true
+		elseif i <= 0 then
+			return true
+		elseif type(v) == "table" then
+			return true
+		end
+	end
+	return false
+end
+
+local function WriteTable(tab, tabName, params)
+	params = params or {}
+	local processed = {}
+	
+	params.numIndents = params.numIndents or 0
+	local isDict = IsDictOrContainsDict(tab)
+	local comma = params.raw and "" or ", "
+	local endLine = comma .. "\n"
+	local str = ""
+	
+	local function ProcessKeyValuePair(i,v, isArray, lastItem)
+		local pairEndLine = (lastItem and "") or (isArray and comma) or endLine
+		if isDict then
+			str = str .. WriteIndents(params.numIndents + 1)
 		end
 		if type(i) == "number" then
-			if not concise then
+			if not isArray then
 				str = str .. "[" .. i .. "] = "
 			end
 		elseif keywords[i] or (type(i) == "string") then
@@ -388,18 +414,46 @@ local function WriteTable(tab, tabName, numIndents, endOfFile, concise, raw, pre
 		end
 		
 		if type(v) == "table" then
-			str = str .. WriteTable(v, nil, (concise and 0 or numIndents + 1), false, concise)
+			local arg = {numIndents = (params.numIndents + 1), endOfFile = false}
+			str = str .. WriteTable(v, nil, arg)
 		elseif type(v) == "boolean" then
-			str = str .. tostring(v) .. eos
+			str = str .. tostring(v) .. pairEndLine
 		elseif type(v) == "string" then
-			str = str .. string.format("%q", v) .. eos
+			str = str .. string.format("%q", v) .. pairEndLine
 		else
-			str = str .. v .. eos
+			str = str .. v .. pairEndLine
 		end
 	end
-	str = str .. WriteIndents(numIndents) .. "}"
-	if not endOfFile then
-		str = str .. comma .. "\n"
+	
+	if not params.raw then
+		if params.prefixReturn then
+			str = "return "
+		elseif tabName then
+			str = tabName .. " = "
+		end
+		str = str .. (isDict and "{\n" or "{")
+	end
+	
+	-- do array component first (ensures order is preserved)
+	for i=0,#tab do
+		local v = tab[i]
+		if v then
+			ProcessKeyValuePair(i,v, (tab[0] == nil), (not isDict) and i == #tab)
+			processed[i] = true
+		end
+	end
+	for i,v in pairs(tab) do
+		if not processed[i] then
+			ProcessKeyValuePair(i,v)
+		end
+	end
+	
+	if isDict then
+		str = str .. WriteIndents(params.numIndents)
+	end
+	str = str ..  "}"
+	if params.endOfFile == false then
+		str = str .. endLine
 	end
 	
 	return str
@@ -407,7 +461,7 @@ end
 
 local function WriteSaveData(zip, filename, data)
 	zip:open(filename)
-	zip:write(WriteTable(data, nil, 0, true))
+	zip:write(WriteTable(data, nil, {prefixReturn = true}))
 end
 GG.SaveLoad.WriteSaveData = WriteSaveData
 
