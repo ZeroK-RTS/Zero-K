@@ -1392,8 +1392,15 @@ end
 
 
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID,
+                                   damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
+		
+  if Game.version:find('91.0') then
+    attackerTeam = attackerDefID
+    attackerDefID = attackerID
+    attackerID = projectileID
+  end
+  
   for _,g in ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,
                   damage, paralyzer, weaponID,
