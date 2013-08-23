@@ -85,13 +85,6 @@ local SIG_Idle = 2
 --------------------------------------------------------------------------------
 -- Methods and functions
 --------------------------------------------------------------------------------
-
-
-local function RestoreAfterDelay()
-	Sleep(2000)
-	StartThread(IdleAnim)
-end
-
 local function IdleAnim()
 	Signal(SIG_Idle)
 	SetSignalMask(SIG_Idle)
@@ -129,6 +122,10 @@ local function IdleAnim()
 	end
 end
 
+local function RestoreAfterDelay()
+	--Sleep(2000)
+	--StartThread(IdleAnim)
+end
 
 function script.Create()	
 	--Spring.Echo("Vytvořeno")
@@ -143,7 +140,7 @@ function script.Create()
 	
 	StartThread(SmokeUnit)
 	
-	Spin(rotating_bas, y_axis, 0.5)
+	--Spin(rotating_bas, y_axis, 0.5)
 	
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end	
 	--StartThread(IdleAnim)
@@ -404,7 +401,7 @@ function script.QueryWeapon()
 end
 
 function script.AimFromWeapon() 
-	return flare
+	return mc_rocket_ho
 end
 
 
