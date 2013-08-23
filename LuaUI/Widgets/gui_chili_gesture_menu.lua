@@ -335,7 +335,7 @@ function SetupMenu(keyboard, mouseless)
     local found = false
     for _, unitID in ipairs(units) do 
       local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-      if ud.builder and menu_use[ud.name] then 
+      if ud.isBuilder and menu_use[ud.name] then 
 		found = ud
 	  elseif ud.canMove and not keyboard then
 		menu = nil
@@ -767,7 +767,7 @@ function widget:CommandsChanged()
   for _, unitID in ipairs(selectedUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 			
-    if UnitDefs[unitDefID].builder then 
+    if UnitDefs[unitDefID].isBuilder then 
       foundBuilder = true 
       break
     end 

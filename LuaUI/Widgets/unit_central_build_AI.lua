@@ -254,7 +254,7 @@ function UpdateOneGroupsDetails(myGroupId)
 		if ( not myUnits[unitID] ) then
 			local udid = spGetUnitDefID(unitID)
 			local ud = UnitDefs[udid]
-			if (ud.builder and ud.canMove) then
+			if (ud.isBuilder and ud.canMove) then
 				myUnits[unitID] = "idle"
 				myQueueUnreachable[unitID]= {}
 				UpdateOneUnitPathability(unitID)
@@ -892,7 +892,7 @@ function widget:KeyPress(key, mods, isRepeat)
 			if ( not myUnits[unitID] ) then
 				local udid = spGetUnitDefID(unitID)
 				local ud = UnitDefs[udid]
-				if (ud.builder and ud.canMove) then
+				if (ud.isBuilder and ud.canMove) then
 					myUnits[unitID] = "idle"
 				end
 			end

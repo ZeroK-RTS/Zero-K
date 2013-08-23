@@ -74,7 +74,7 @@ options =
 --------------------------------------------------------------------------------
 
 local function IsImmobileBuilder(ud)
-  return(ud and ud.builder and not ud.canMove
+  return(ud and ud.isBuilder and not ud.canMove
          and not ud.isFactory)
 end
 

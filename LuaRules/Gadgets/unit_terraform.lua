@@ -3417,7 +3417,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if ud.builder and not ud.isFactory and not exceptionArray[unitDefID] then
+	if ud.isBuilder and not ud.isFactory and not exceptionArray[unitDefID] then
 		for _, cmdDesc in ipairs(cmdDescsArray) do
 			spInsertUnitCmdDesc(unitID, cmdDesc)
 		end

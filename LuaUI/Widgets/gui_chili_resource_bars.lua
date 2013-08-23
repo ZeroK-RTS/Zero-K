@@ -79,7 +79,7 @@ local excessE = false
 
 local builderDefs = {}
 for id,ud in pairs(UnitDefs) do
-	if (ud.builder) then
+	if (ud.isBuilder) then
 		builderDefs[#builderDefs+1] = id
 	elseif (ud.buildSpeed > 0) then
 		builderDefs[#builderDefs+1] = id

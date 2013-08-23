@@ -161,10 +161,10 @@ end
 
 
 local function GetBuildIconFrame(udef) 
-  if (udef.builder and udef.speed>0) then
+  if (udef.isBuilder and udef.speed>0) then
     return consTex
 
-  elseif (udef.builder or udef.isFactory) then
+  elseif (udef.isBuilder or udef.isFactory) then
     return consTex
 
   elseif (udef.weapons[1] and udef.isBuilding) then

@@ -314,7 +314,7 @@ local function StoreBuilders(units)
 	curbuilder = 1
 	for _, unitID in ipairs(units) do 
 		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if ud.builder and menu_use[ud.name] then 
+		if ud.isBuilder and menu_use[ud.name] then 
 			if not builder_types[ud.name] then
 				builder_types[ud.name] = true
 				builder_types_i[#builder_types_i + 1] = ud.name

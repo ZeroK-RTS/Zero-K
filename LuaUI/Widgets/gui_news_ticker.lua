@@ -330,7 +330,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	elseif (ud.customParams.commtype) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed, "commanderLost", pos)
 	elseif (ud.isBuilding) then AddEvent(ud.humanName .. ": building destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
 	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(ud.humanName .. " sunk", unitDefID, colorRed, "unitLost", pos)
-	elseif (ud.builder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed, "unitLost", pos)
+	elseif (ud.isBuilder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed, "unitLost", pos)
 	else AddEvent(ud.humanName .. ": unit lost", unitDefID, colorRed, "unitLost", pos)
 	end
 end
@@ -343,7 +343,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	--	Spring.Echo(name,param)
 	--end
 	-- cheap units aren't newsworthy unless they're builders
-	if ((not ud.builder) and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
+	if ((not ud.isBuilder) and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
 	local pos = {Spring.GetUnitPosition(unitID)}
 	if (not ud.canMove) or (ud.isFactory) then
 		AddEvent(ud.humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete", pos)

@@ -1716,7 +1716,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 			{ name='uname', icon = iconPath, text = fullname, fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
 			{ name='hp', directcontrol = 'hp_selunit', },
-			stt_ud.builder and { name='bp', directcontrol = 'bp_selunit', } or {},
+			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
 			{ name='res', directcontrol = 'resources_selunit' },
 		},
 	}
