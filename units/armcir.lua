@@ -142,7 +142,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 320,
-      object           = [[wreck4x4a.s3o]],
+      object           = [[chainsaw_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 320,
     },
