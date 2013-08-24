@@ -104,7 +104,22 @@ local base = {
 			"module_dmg_booster",
 		}
 	},
-	
+	{
+		name = "drone",
+		modules = {
+			"commweapon_beamlaser_green",
+			"commweapon_beamlaser_red",
+			"conversion_lazor",
+			"module_guardian_armor",
+			"module_superspeed",
+			"module_super_nano",
+			"module_dmg_booster",
+			"module_companion_drone",
+			"module_companion_drone",
+			"module_companion_drone",
+			"module_companion_drone",
+		}
+	},
 }
 
 local ret = {count = 0}
