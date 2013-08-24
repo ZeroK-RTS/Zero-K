@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.085 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.086 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -87,7 +87,8 @@ local UnitDefsList = {}
 for i=1,#UnitDefs do
 	local ud = UnitDefs[i]
 	local unitName = ud.humanName
-	if not (unitName:find('test') or unitName:find('fake')) and not ignoreList[unitName] then
+	local unitNameL = unitName:lower()
+	if not (unitNameL:find('test') or unitNameL:find('fake')) and not ignoreList[unitName] then
 		UnitDefsList[#UnitDefsList+1] = {unitName=unitName, ud=ud}
 	end
 end
@@ -106,7 +107,8 @@ for i=1,#UnitDefsList do
 		OnChange = function(self)
 			MakeStatsWindow(ud)
 		end,
-		path = unitHelpPath,
+		path = options_path ..'/' .. unitName:sub(1,1):upper(),
+		
 	}
 	options_order[#options_order + 1] = optionName
 end
