@@ -528,7 +528,7 @@ end
 -- Set mass
 -- 
 for name, ud in pairs(UnitDefs) do
-	--ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
+	ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
 end
 
 --------------------------------------------------------------------------------
