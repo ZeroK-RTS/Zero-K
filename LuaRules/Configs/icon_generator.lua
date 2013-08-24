@@ -90,7 +90,7 @@ backgrounds = {
   {check={canFly=true},                                      texture="LuaRules/Images/IconGenBkgs/bg_air.png"},
 --//hovers
   {check={factions=IsCoreOrChicken,canHover=true},                                    texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
-  {check={factions=IsCoreOrChicken,floater=true,minWaterDepth=LessEqZero},            texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
+  {check={factions=IsCoreOrChicken,floatOnWater=true,minWaterDepth=LessEqZero},            texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
   {check={factions=IsCoreOrChicken,waterline=GreaterZero,minWaterDepth=LessEqZero},   texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
   --{check={canHover=true},                                    texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
   {check={floatOnWater=true,minWaterDepth=LessEqZero},            texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},

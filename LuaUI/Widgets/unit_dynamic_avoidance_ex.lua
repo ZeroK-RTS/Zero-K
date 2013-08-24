@@ -1,4 +1,4 @@
-local versionName = "v2.86"
+local versionName = "v2.861"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -403,17 +403,17 @@ function RefreshUnitList(attacker, commandTTL)
 			if (unitSpeed>0) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
+				if (unitDef.isBuilder or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
 					unitType =1 --//this unit-type will do avoidance even in camera view
 					
 					local isBuilder_ignoreTrue = false
-					if unitDef["builder"] then
+					if unitDef.isBuilder then
 						isBuilder_ignoreTrue = (options.dbg_IgnoreSelectedCons.value == true and selectedUnits_Meta[unitID] == true) --is (epicMenu force-selection-ignore is true? AND unit is a constructor?)
 						if selectedUnits_Meta[unitID] then
 							selectedCons_Meta[unitID] = true --remember selected Constructor
 						end
 					end
-					if (unitDef["builder"] and options.enableCons.value==false) or (isBuilder_ignoreTrue) then --//if ((Cons epicmenu option is false) OR (epicMenu force-selection-ignore is true)) AND it is a constructor, then... exclude (this) Cons
+					if (unitDef.isBuilder and options.enableCons.value==false) or (isBuilder_ignoreTrue) then --//if ((Cons epicmenu option is false) OR (epicMenu force-selection-ignore is true)) AND it is a constructor, then... exclude (this) Cons
 						unitType = 0 --//this unit-type excluded from avoidance
 					end
 					if unitDef["canCloak"] then --only cloakies + constructor that is cloakies
@@ -450,7 +450,7 @@ function RefreshUnitList(attacker, commandTTL)
 				Spring.Echo("unitID(RefreshUnitList)" .. unitID)
 				Spring.Echo("unitDef[humanName](RefreshUnitList)" .. unitDef["humanName"])
 				Spring.Echo("((unitDef[builder] or unitDef[canCloak]) and unitDef[speed]>0)(RefreshUnitList):")
-				Spring.Echo((unitDef["builder"] or unitDef["canCloak"]) and unitDef["speed"]>0)
+				Spring.Echo((unitDef.isBuilder or unitDef["canCloak"]) and unitDef["speed"]>0)
 			end
 		end
 	end
@@ -915,7 +915,7 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 			end
 			--]]
 		end
-		if unitDef["builder"] then 
+		if unitDef.isBuilder then 
 			losRadius = losRadius + extraLOSRadiusCONSTANT --add additional/more detection range for constructors for quicker reaction vs enemy radar dot
 		end 
 	end
@@ -927,7 +927,7 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 	local x,y,z = spGetUnitPosition(unitID)
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
-	local iAmConstructor = unitDef["builder"]
+	local iAmConstructor = unitDef.isBuilder
 	local unitState = spGetUnitStates(unitID) --unitID is "this" unit (our unit)
 	local iAmNotCloaked = not unitState["cloak"]
 	
@@ -1826,7 +1826,7 @@ function FindSafeHavenForCons(unitID, now)
 			local unitDef = UnitDefs[unitDefID_list]
 			local unitSpeed =unitDef["speed"]
 			if (unitSpeed>0) then --//if moving units
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --if cloakies and constructor, and not com (ZK)
+				if (unitDef.isBuilder or unitDef["canCloak"]) and not unitDef.customParams.commtype then --if cloakies and constructor, and not com (ZK)
 					--intentionally empty. Not include cloakies and builder.
 				elseif unitDef.customParams.commtype then --if COMMANDER,
 					unorderedUnitList[unitID_list] = {x,y,z} --//store
