@@ -967,7 +967,7 @@ do
         end
 	  end
 	  if (#disarmUnits>0) then
-	    glColor(0.8,0.8,0.5,alpha/4)
+	    glColor(0.8,0.8,0.5,alpha/6)
         for i=1,#disarmUnits do
           glUnit(disarmUnits[i],true)
         end
@@ -992,7 +992,7 @@ do
 	  end
 	  if (#disarmUnits>0) then
 	    glTexture("LuaUI/Images/disarmed.png")
-	    glColor(0.7,0.7,0.4,alpha*1.1)
+	    glColor(0.6,0.6,0.2,alpha*0.9)
         for i=1,#disarmUnits do
           glUnit(disarmUnits[i],true)
         end
