@@ -726,7 +726,7 @@ do
 	  if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
         local disarmProp = (disarmFrame - gameFrame)/1200
         if disarmProp < 1 then
-			if disarmProp > emp + 0.014 then -- 16 gameframes of emp time
+			if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
 				AddBar("disarm",disarmProp,"disarm",(fullText and floor(disarmProp*100)..'%') or '')
 			end
 		else
