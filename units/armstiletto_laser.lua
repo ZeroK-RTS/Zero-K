@@ -95,6 +95,13 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        = {
+	    disarmDamageMult = 1,
+		disarmDamageOnly = 1,
+		disarmTimer      = 13, -- seconds
+	  
+	  },
+	  
       damage                  = {
         default        = 675,
         empresistant75 = 168.75,
@@ -112,8 +119,7 @@ unitDef = {
       largeBeamLaser          = true,
       laserFlareSize          = 5,
       minIntensity            = 1,
-      paralyzer               = true,
-      paralyzeTime            = 13,
+      paralyzer               = true, -- for smart targeting, damage vs shields and lups shockwave
       range                   = 730,
       reloadtime              = 10,
       rgbColor                = [[1 1 1]],

@@ -58,6 +58,7 @@ local stockpileH = 24
 local stockpileW = 12
 
 local captureReloadTime = 240
+local DISARM_DECAY_FRAMES = 1200
 
 --------------------------------------------------------------------------------
 -- OPTIONS
@@ -146,6 +147,9 @@ local barColors = {
   emp     = { 0.50,0.50,1.00,barAlpha },
   emp_p   = { 0.40,0.40,0.80,barAlpha },
   emp_b   = { 0.60,0.60,0.90,barAlpha },
+  disarm  = { 0.50,0.50,0.50,barAlpha },
+  disarm_p= { 0.40,0.40,0.40,barAlpha },
+  disarm_b= { 0.60,0.60,0.60,barAlpha },
   capture = { 1.00,0.50,0.00,barAlpha },
   build   = { 0.75,0.75,0.75,barAlpha },
   stock   = { 0.50,0.50,0.50,barAlpha },
@@ -175,6 +179,7 @@ local empDecline = 32/30/40;
 local cx, cy, cz = 0,0,0;  --// camera pos
 
 local paraUnits   = {};
+local disarmUnits = {};
 local onFireUnits = {};
 local UnitMorphs  = {};
 
@@ -583,10 +588,18 @@ do
     end
   
     --// PARALYZE
+	local stunned = GetUnitIsStunned(unitID)
 	if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
-      local stunned = GetUnitIsStunned(unitID)
       if (stunned) then
         paraUnits[#paraUnits+1]=unitID
+      end
+	end
+	
+	--// DISARM
+	if not stunned then
+      local disarmed = GetUnitRulesParam(unitID,"disarmed")
+      if disarmed and disarmed == 1 then
+        disarmUnits[#disarmUnits+1]=unitID
       end
 	end
   end
@@ -687,13 +700,15 @@ do
       end
 
       --// PARALYZE
+	  local paraTime = false
+	  local stunned = GetUnitIsStunned(unitID)
 	  if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
-        local stunned = GetUnitIsStunned(unitID)
         local infotext = ""
         if (stunned) then
           paraUnits[#paraUnits+1]=unitID
+		  paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
           if (fullText) then
-            infotext = floor((paralyzeDamage-empHP)/(maxHealth*empDecline)) .. 's'
+            infotext = floor(paraTime) .. 's'
           end
           emp = 1
         else
@@ -704,6 +719,25 @@ do
         end
         local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
         AddBar("paralyze",emp,empcolor_index,infotext)
+      end
+	  
+	   --// DISARM
+	  local disarmFrame = GetUnitRulesParam(unitID,"disarmframe")
+	  if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
+        local disarmProp = (disarmFrame - gameFrame)/1200
+        if disarmProp < 1 then
+			if disarmProp > emp + 0.014 then -- 16 gameframes of emp time
+				AddBar("disarm",disarmProp,"disarm",(fullText and floor(disarmProp*100)..'%') or '')
+			end
+		else
+			local disarmTime = (disarmFrame - gameFrame - 1200)/30
+			if (not paraTime) or disarmTime > paraTime + 0.5 then
+			  AddBar("disarm",1,((blink and "disarm_b") or "disarm_p") or ("disarm"),floor(disarmTime) .. 's')
+			  if not stunned then
+			    disarmUnits[#disarmUnits+1]=unitID
+			  end
+			end
+		end
       end
 
       --// CAPTURE (set by capture gadget)
@@ -919,17 +953,25 @@ do
   local abs                    = math.abs
 
   function DrawOverlays()
-    --// draw an overlay for stunned units
-    if (drawStunnedOverlay)and(#paraUnits>0) then
+    --// draw an overlay for stunned or disarmed units
+    if (drawStunnedOverlay) and ((#paraUnits>0) or (#disarmUnits>0)) then
       glDepthTest(true)
       glPolygonOffset(-2, -2)
       glBlending(GL_SRC_ALPHA, GL_ONE)
 
       local alpha = ((5.5 * widgetHandler:GetHourTimer()) % 2) - 0.7
-      glColor(0,0.7,1,alpha/4)
-      for i=1,#paraUnits do
-        glUnit(paraUnits[i],true)
-      end
+	  if (#paraUnits>0) then
+        glColor(0,0.7,1,alpha/4)
+        for i=1,#paraUnits do
+          glUnit(paraUnits[i],true)
+        end
+	  end
+	  if (#disarmUnits>0) then
+	    glColor(0.8,0.8,0.5,alpha/4)
+        for i=1,#disarmUnits do
+          glUnit(disarmUnits[i],true)
+        end
+	  end
       local shift = widgetHandler:GetHourTimer() / 20
 
       glTexCoord(0,0)
@@ -940,13 +982,22 @@ do
       glTexGen(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
       v = cvs.forward
       glTexGen(GL_S, GL_EYE_PLANE, v[1]*0.008,v[2]*0.008,v[3]*0.008, shift)
-      glTexture("LuaUI/Images/paralyzed.png")
-
-      glColor(0,1,1,alpha*1.1)
-      for i=1,#paraUnits do
-        glUnit(paraUnits[i],true)
-      end
-
+	  
+	  if (#paraUnits>0) then
+        glTexture("LuaUI/Images/paralyzed.png")
+        glColor(0,1,1,alpha*1.1)
+        for i=1,#paraUnits do
+          glUnit(paraUnits[i],true)
+        end
+	  end
+	  if (#disarmUnits>0) then
+	    glTexture("LuaUI/Images/disarmed.png")
+	    glColor(0.7,0.7,0.4,alpha*1.1)
+        for i=1,#disarmUnits do
+          glUnit(disarmUnits[i],true)
+        end
+	  end
+	  
       glTexture(false)
       glTexGen(GL_T, false)
       glTexGen(GL_S, false)
@@ -955,6 +1006,7 @@ do
       glDepthTest(false)
 
       paraUnits = {}
+	  disarmUnits = {}
     end
 
     --// overlay for units on fire
