@@ -65,7 +65,8 @@ local minimap_path = 'Settings/HUD Panels/Minimap'
 local radar_path = 'Settings/Interface/Map'
 options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'lastmsgpos', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
-'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
+'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
+'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
@@ -182,6 +183,19 @@ options = {
 		OnChange = function()
 			options.radar_fog_color.value = { 0.4, 0.4, 0.4, 1}
 			options.radar_los_color.value = { 0.15, 0.15, 0.15, 1}
+			options.radar_radar_color.value = { 0, 0, 1, 1}
+			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
+			updateRadarColors()
+		end,
+		path = radar_path,
+	},
+	
+	radar_preset_blue_line_dark_fog = {
+		name = 'Blue Outline Radar with dark fog',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_color.value = { 0.05, 0.05, 0.05, 1}
+			options.radar_los_color.value = { 0.5, 0.5, 0.5, 1}
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			updateRadarColors()
