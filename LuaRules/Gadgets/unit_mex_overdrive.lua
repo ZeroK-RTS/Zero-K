@@ -686,9 +686,13 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 				gridEnergySpent[i] = 0
 				gridMetalGain[i] = 0
 				for unitID, orgMetal in pairs(allyTeamMexes[i]) do -- loop mexes
-					local stunned_or_inbuld = spGetUnitIsStunned(unitID)
+					local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
 					if stunned_or_inbuld then
 						orgMetal = 0
+					end
+					local incomeFactor = spGetUnitRulesParam(unitID,"mexincomefactor")
+					if incomeFactor then
+						orgMetal = orgMetal*incomeFactor
 					end
 					local mexE = 0
 					if (allyMetalSquared > 0) then -- divide energy in ratio given by squared metal from mex
@@ -712,9 +716,13 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							allyE = allyE - gridE
 							energyWasted = allyE
 							for unitID, orgMetal in pairs(allyTeamMexes[i]) do --re-distribute the grid energy to Mex (again! except taking account the limited energy of the grid)
-								local stunned_or_inbuld = spGetUnitIsStunned(unitID)
+								local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
 								if stunned_or_inbuld then
 									orgMetal = 0
+								end
+								local incomeFactor = spGetUnitRulesParam(unitID,"mexincomefactor")
+								if incomeFactor then
+									orgMetal = orgMetal*incomeFactor
 								end
 								local mexE = gridE*(orgMetal * orgMetal)/ gridMetalSquared 
 								local metalMult = energyToExtraM(mexE)
@@ -845,7 +853,7 @@ function gadget:GameFrame(n)
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
 				if spValidUnitID(unitID) then
-					local stunned_or_inbuld = spGetUnitIsStunned(unitID)
+					local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
 					local states = spGetUnitStates(unitID)
 					local currentlyActive = (not stunned_or_inbuld) and states and states.active
 					if (currentlyActive) and (not pylonData.active) then
@@ -932,7 +940,7 @@ function gadget:GameFrame(n)
 				maxGridCapacity[i] = 0
 				if not allyTeamData.nilGrid[i] then
 					for unitID,_ in pairs(allyTeamData.grid[i].pylon) do
-						local stunned_or_inbuild = spGetUnitIsStunned(unitID)
+						local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
 						if (not stunned_or_inbuild) then
 							local _,_,em,eu = spGetUnitResources(unitID)
 							maxGridCapacity[i] = maxGridCapacity[i] + (em or 0) - (eu or 0)
@@ -1007,7 +1015,7 @@ function gadget:GameFrame(n)
 			
 			--// Income For non-Gridded mexes
 			for unitID, orgMetal in pairs(mexes[allyTeamID][0]) do
-				local stunned_or_inbuld = spGetUnitIsStunned(unitID)
+				local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
 				if stunned_or_inbuld then
 					orgMetal = 0
 				end
