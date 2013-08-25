@@ -62,7 +62,7 @@ unitDef = {
     {
       def                = [[EMP_ROCKET]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },
@@ -71,36 +71,46 @@ unitDef = {
     EMP_ROCKET = {
       name                    = [[EMP Cruise Missile]],
       areaOfEffect            = 96,
-      cegTag                  = [[emptrail]],
+      cegTag                  = [[disarmtrail]],
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        = {
+	    disarmDamageMult = 1,
+		disarmDamageOnly = 1,
+		disarmTimer      = 8, -- seconds
+	  
+	  },
+	  
       damage                  = {
         default        = 1500,
         planes         = 1500,
       },
 
       edgeEffectiveness       = 0.4,
-      explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
+      explosionGenerator      = [[custom:WHITE_LIGHTNING_BOMB]],
       fireStarter             = 0,
-      flighttime              = 10,
+      flighttime              = 12,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
       model                   = [[wep_merl.s3o]],
       noSelfDamage            = true,
       paralyzer               = true,
-      paralyzeTime            = 8,
       range                   = 940,
       reloadtime              = 5,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_emp_hit]],
       soundStart              = [[weapon/missile/missile_launch_high]],
-      texture1                = [[null]], --flare
+      startvelocity           = 250,
+--      texture1                = [[spark]], --flare
+      texture3                = [[spark]], --flame
       tolerance               = 4000,
+      tracks                  = true,
+      turnRate                = 64000,
       weaponAcceleration      = 300,
-      weaponTimer             = 1.6,
+      weaponTimer             = 1,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 7000,
     },
