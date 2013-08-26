@@ -160,20 +160,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- convert to named maps  (does anyone know what 99 is for?  :)
-
-for categoryName, categoryTable in pairs(armorDefs) do
-  local t = {}
-  for _, unitName in pairs(categoryTable) do
-    t[unitName] = 99
-  end
-  armorDefs[categoryName] = t
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local system = VFS.Include('gamedata/system.lua')
 
 return system.lowerkeys(armorDefs)
