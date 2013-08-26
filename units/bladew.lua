@@ -137,7 +137,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 36,
-      object           = [[debris1x1a.s3o]],
+      object           = [[gnat_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 36,
     },
