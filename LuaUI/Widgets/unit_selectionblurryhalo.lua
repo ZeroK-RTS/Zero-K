@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Shows a halo for selected and hovered units. (Doesn't work on ati cards!)",
     author    = "CarRepairer, from jK's gfx_halo",
     date      = "Jan, 2008",
-    version   = "0.0001",
+    version   = "0.0002",
     license   = "GNU GPL, v2 or later",
     layer     = -11,
     enabled   = false  --  loaded by default?
@@ -131,6 +131,7 @@ local glMatrixMode    = gl.MatrixMode
 local glPushMatrix    = gl.PushMatrix
 local glLoadIdentity  = gl.LoadIdentity
 local glPopMatrix     = gl.PopMatrix
+local glBlending      = gl.Blending
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -221,6 +222,8 @@ end
 function widget:DrawWorldPreUnit()
   glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
 
+  glBlending(true)
+  
   if (resChanged) then
     resChanged = false
     if (vsx==1) or (vsy==1) then return end
@@ -242,8 +245,10 @@ function widget:DrawWorldPreUnit()
 
   glCallList(enter2d)
   glTexture(offscreentex)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy) --this line breaks mearth labels
   glCallList(leave2d)
+  
+  glBlending(false)
 end
 
 
