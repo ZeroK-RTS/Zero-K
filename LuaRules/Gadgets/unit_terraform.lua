@@ -2044,7 +2044,7 @@ end
 -- Sudden Death Mode
 --------------------------------------------------------------------------------
 
-local function RaiseWater( raiseAmount)
+function GG.Terraform_RaiseWater( raiseAmount)
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i]]
@@ -2881,7 +2881,7 @@ end
 function gadget:GameFrame(n)
 	
 	--if n % 300 == 0 then
-	--	RaiseWater(-20)
+	--	GG.Terraform_RaiseWater(-20)
 	--end
 	
 	if n == 60 and costMult ~= 1 then
@@ -3538,7 +3538,7 @@ function gadget:Initialize()
 	_G.drawPositions = drawPositions
 	
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
-		RaiseWater(modOptions.waterlevel)
+		GG.Terraform_RaiseWater(modOptions.waterlevel)
 	end
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
