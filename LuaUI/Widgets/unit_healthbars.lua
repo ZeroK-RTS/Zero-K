@@ -66,10 +66,11 @@ local DISARM_DECAY_FRAMES = 1200
 local function OptionsChanged() 
 	drawFeatureHealth = options.drawFeatureHealth.value
 	drawBarPercentages = options.drawBarPercentages.value
+	debugMode = options.debugMode.value
 end 
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'minReloadTime'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'debugMode', 'minReloadTime'}
 options = {
 	
 	showhealthbars = {
@@ -102,6 +103,15 @@ options = {
 		max = 10,
 		step = 1,
 		desc = 'Min reload time (sec)',
+		OnChange = OptionsChanged,
+	},	
+	
+	debugMode = {
+		name = 'Debug Mode',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		desc = 'Pings units with debug information',
 		OnChange = OptionsChanged,
 	},	
 	
@@ -627,7 +637,11 @@ do
     dist = dx*dx + dy*dy + dz*dz
     if (dist > infoDistance) then
       if (dist > 9000000) then
-        return
+        if debugMode then
+		  local x,y,z = Spring.GetUnitPosition(unitID)
+          Spring.MarkerAddPoint(x,y,z,"High Distance")
+		end
+		return
       end
       fullText = false
     end
@@ -826,7 +840,12 @@ do
           AddBar("jump",jumpReload,"jump",(fullText and floor(jumpReload*100)..'%') or '')
         end
       end
-
+	  
+    if debugMode then
+	  local x,y,z = Spring.GetUnitPosition(unitID)
+      Spring.MarkerAddPoint(x,y,z,"N" .. barsN)
+    end
+	
     if (barsN>0)or(numStockpiled) then
       glPushMatrix()
       glTranslate(ux, uy+ci.height, uz )
@@ -1070,7 +1089,13 @@ do
           unitDef   = UnitDefs[unitDefID]
           if (unitDef) then
             DrawUnitInfos(unitID, unitDefID, unitDef)
-          end
+		  elseif debugMode then
+		    local x,y,z = Spring.GetUnitPosition(unitID)
+		    Spring.MarkerAddPoint(x,y,z,"Missing unitDef")
+		  end
+		elseif debugMode then
+		  local x,y,z = Spring.GetUnitPosition(unitID)
+		  Spring.MarkerAddPoint(x,y,z,"Missing unitDefID")
         end
       end
       
