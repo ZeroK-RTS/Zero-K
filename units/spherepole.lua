@@ -137,7 +137,7 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       metal            = 100,
-      object           = [[spherebot_dead.s3o]],
+      object           = [[scythe_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 100,
     },
