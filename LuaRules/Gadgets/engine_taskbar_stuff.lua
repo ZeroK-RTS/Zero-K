@@ -19,14 +19,9 @@ if (gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
 
-local function noFunc() end
-
-local SetWMIcon = Spring.SetWMIcon or noFunc
-local SetWMCaption = Spring.SetWMCaption or noFunc
-
 function gadget:Initialize()
 	local name = Game.modName
-	SetWMIcon("bitmaps/ZK_logo_square.bmp")
-	SetWMCaption(name .. " (Spring " .. Game.version .. ")", name)
+	Spring.SetWMIcon("LuaUI/Images/ZK_logo.png")
+	Spring.SetWMCaption(name .. " (Spring " .. Game.version .. ")", name)
 	gadgetHandler:RemoveGadget()
 end
