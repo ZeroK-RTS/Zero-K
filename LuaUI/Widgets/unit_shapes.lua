@@ -136,6 +136,13 @@ options = {
 			visibleAllySelUnits = {}
 		end,
 	},
+	debugMode = {
+		name = 'Debug Mode',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		desc = 'Pings visible or selected units',
+	},
 }
 
 ------------------------------------------------------------------------------------
@@ -410,6 +417,7 @@ end
 --------------------------------------------------------------------------------
 local visibleUnits, visibleSelected = {}, {}
 local degrot = {}
+local lastFrame = 0
 function widget:Update()
 	-- [[
 	local mx, my = spGetMouseState()
@@ -423,6 +431,25 @@ function widget:Update()
 	--visibleUnits, visibleSelected = GetVisibleUnits()
 	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
 	heading = {}
+	
+	if options.debugMode.value then
+		local frame = Spring.GetGameFrame()
+		if frame ~= lastFrame and frame%10 == 0 then
+			local vis = spGetVisibleUnits(-1, 30, true)
+			for i = 1, #vis do
+				local unitID = vis[i]
+				local x,y,z = Spring.GetUnitPosition(unitID)
+				Spring.MarkerAddPoint(x,y,z,"")
+			end
+			for i = 1, #visibleSelected do
+				local unitID = visibleSelected[i]
+				local x,y,z = Spring.GetUnitPosition(unitID)
+				Spring.MarkerAddPoint(x,y,z,"v")
+			end
+			lastFrame = frame
+		end
+	end
+	
 	for i=1, #visibleUnits do
 		local unitID = visibleUnits[i]
 		dirx, _, dirz = spGetUnitDirection(unitID)
