@@ -129,7 +129,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 						--attackerDefID = attackerDefID,
 						weaponID    = weaponID,
 					}
-					SetUnitRulesParam(unitID, "on_fire", 1)
+					SetUnitRulesParam(unitID, "on_fire", 1, {inlos = true})
 					GG.attUnits[unitID] = true
 					GG.UpdateUnitAttributes(unitID)
 				end
