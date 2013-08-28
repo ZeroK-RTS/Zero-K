@@ -34,6 +34,7 @@ unitDef = {
     helptext_fr    = [[Summum de la technologie d'information, ses multiples capteurs vous renseigneront sur toutes les activit?s ennemies: terrestre aerienne ou sousmarine.]],
 	helptext_de    = [[Der Vulture bietet dir die beispiellose Möglichkeit zur unerkannten, weitläufigen Aufklärung und kann mit seinem Sonar auch Unterwasserziele lokalisieren.]],
 	modelradius    = [[20]],
+	specialreloadtime = [[600]],
   },
 
   energyUse           = 1.5,
@@ -53,6 +54,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[armpnix.s3o]],
   radarDistance       = 2400,
+  script              = [[corawac.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[CORE]],
