@@ -453,6 +453,10 @@ local function printWeapons(unitDef)
 	return cells
 end
 
+local function GetWeapon(weaponName)
+	return WeaponDefNames[weaponName] 
+end
+
 local function printunitinfo(ud, lang, buttonWidth)	
 	local icons = {
 		Image:New{
@@ -522,6 +526,26 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.buildSpeed,2), textColor = color.stats_fg, }
 	end
 	
+	if ud.canKamikaze then
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		
+		statschildren[#statschildren+1] = Label:New{ caption = 'Death Explosion', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+		
+		local weaponStats = GetWeapon( ud.deathExplosion )
+		
+		statschildren[#statschildren+1] = Label:New{ caption = 'Range: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.range,2), textColor = color.stats_fg, }
+		
+		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1],2), textColor = color.stats_fg, }
+		
+		statschildren[#statschildren+1] = Label:New{ caption = 'Edge Damage: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1] * weaponStats.edgeEffectiveness,2), textColor = color.stats_fg, }
+		
+	end
+	
 
 	if commModules then
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
@@ -548,6 +572,13 @@ local function printunitinfo(ud, lang, buttonWidth)
 			statschildren[#statschildren+1] = Label:New{ caption = cells[i], textColor = color.stats_fg, }
 		end
 	end
+	
+	--adding this because of annoying  cutoff
+	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+	
 	
 	local stack_icons = StackPanel:New{
 		autoArrangeV  = false,
