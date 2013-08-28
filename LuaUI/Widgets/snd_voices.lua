@@ -639,7 +639,7 @@ end
 --end
 
 
---function widget:UnitEnteredLos(unitID, unitDefID, unitTeam)
+--function widget:UnitEnteredLos(unitID, unitTeam)
 --  if ((UnitDefs[unitDefID]) and 
 --      (UnitDefs[unitDefID].isTransport)) then
 --    Play("detectedt")

@@ -235,6 +235,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
   widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 end
 
-function widget:UnitEnteredLos(unitID, unitDefID, unitTeam)
+function widget:UnitEnteredLos(unitID, unitTeam)
+  local unitDefID = Spring.GetUnitDefID(unitID)
   widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 end
