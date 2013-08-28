@@ -1085,17 +1085,25 @@ do
       for i=1,#visibleUnits do
         unitID    = visibleUnits[i]
         unitDefID = GetUnitDefID(unitID)
-		if (unitDefID) then
+        if (unitDefID) then
           unitDef   = UnitDefs[unitDefID]
           if (unitDef) then
             DrawUnitInfos(unitID, unitDefID, unitDef)
-		  elseif debugMode then
-		    local x,y,z = Spring.GetUnitPosition(unitID)
-		    Spring.MarkerAddPoint(x,y,z,"Missing unitDef")
-		  end
-		elseif debugMode then
-		  local x,y,z = Spring.GetUnitPosition(unitID)
-		  Spring.MarkerAddPoint(x,y,z,"Missing unitDefID")
+          elseif debugMode then
+            local x,y,z = Spring.GetUnitPosition(unitID)
+            if not (x and y and z) then
+              Spring.Log("HealthBars", "error", "missing position and unitDef of unit " .. unitID)
+            else
+              Spring.MarkerAddPoint(x,y,z,"Missing unitDef")
+            end
+          end
+        elseif debugMode then
+          local x,y,z = Spring.GetUnitPosition(unitID)
+          if not (x and y and z) then
+            Spring.Log("HealthBars", "error", "missing position and unitDefID of unit " .. unitID)
+          else
+            Spring.MarkerAddPoint(x,y,z,"Missing unitDef")
+          end
         end
       end
       
