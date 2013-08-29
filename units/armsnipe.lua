@@ -38,6 +38,7 @@ unitDef = {
     helptext_it    = [[Il Sharpshooter é un unita costosa occultata d'artiglieria. Puo sparare mentre é occultata; pero il proiettile visibile tradisce la sua posizione. Richiede molta energia per tenerlo occultato mentre spara. la migliore maniera di trovare un Sharpshooter é di ispezionare l'area con unita di ricognizione]],
     helptext_pl    = [[Sharpshooter może zadawać ciężkie obrażenia pojedynczemu celowi. Może się maskować i nie traci tego efektu przy strzelaniu. To maskowanie jest jednak drogie i tak jak każde inne można je wykryć poprzez podejście. Niska szybkość strzelania Sharpshootera pozwala wykryć go przez pokrycie okolic jego domniemanego miejsca pobytu tanimi jednostkami.]],
 	modelradius    = [[18]],
+	dontfireatradarcommand = '1',
   },
 
   decloakOnFire          = false,

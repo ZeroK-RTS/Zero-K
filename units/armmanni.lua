@@ -27,6 +27,7 @@ unitDef = {
     helptext_de    = [[Penetrators Waffe, genannt "der Blaue Laser des Todes", hat die Macht und Präzision die meisten Einheiten mit einem einzigen Schuss zu vernichten. Nutze ihn gegen gut gepanzerte Einheiten, aber halte ihn hinter den Frontlinien - er besitzt nur wenig Durchhaltevermögen und kann nicht ruckartig weglaufen.]],
     helptext_fr    = [[Le surnon du Penetrator est 'le rayon bleu de la mort'. Le Penetrator est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindages ? grande distance. Il est cependant peu protégé et peu maniable.]],
     helptext_pl    = [[Broń Penetratora ma wystarczającą siłę i celność, by jednym strzałem zniszczyć lub poważnie uszkodzić większość jednostek. Jest jednak wolny i ma niską wytrzymałość, a zatem warto trzymać go za linią frontu - ma wystarczająco duży zasięg, by nadal prowadzić ostrzał.]],
+	dontfireatradarcommand = '1',
   },
 
   explodeAs           = [[MEDIUM_BUILDINGEX]],

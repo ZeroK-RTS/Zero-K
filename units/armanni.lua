@@ -38,6 +38,7 @@ unitDef = {
 	aimposoffset   = [[0 32 0]],
 	midposoffset   = [[0 0 0]],
 	modelradius    = [[40]],
+	dontfireatradarcommand = '1',
   },
 
   damageModifier                = 0.25,

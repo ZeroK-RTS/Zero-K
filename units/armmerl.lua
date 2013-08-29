@@ -26,6 +26,7 @@ unitDef = {
     helptext_de    = [[Der Impaler feuert seine Ballistgeschoss senkrecht ab. Ihn zeichnen seine hohe Präzision und die lange Reichweite seiner Flugkörper, sowie die Möglichkeit über Hindernisse zu schießen, aus. Die große Flugzeit macht ihn aber nutzlos gegenüber sich bewegenden Einheiten. Nutze den Impaler, um spezielle Einheiten/Gebäude zu zerstören.]],
     helptext_fr    = [[Le Impaler tire verticallement des missiles de croisi?res qui retombent exactement sur leur cible, causant de puissant dommages sur une tr?s petite zone. Cependant le temps de voyage des missiles le rends inefficace contre les unit?s mobiles. ]],
     helptext_pl    = [[Impaler jest wyrzutnią ciężkich pocisków kinetycznych dużego zasięgu. Po wystrzeleniu pocisk wznosi się wysoko w powietrze, a następnie opada na wcześniej wyznaczony punkt. Pozwala to ominąć większość przeszkód i uderzyć z dużą mocą w konkretny budynek. Niestety, Impaler jest absolutnie bezużyteczny przeciwko mobilnym jednostkom.]],
+	dontfireatradarcommand = '1',
   },
 
   explodeAs           = [[BIG_UNITEX_MERL]],
