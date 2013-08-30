@@ -172,9 +172,6 @@ local function MakePieceTreeNodesRec(unitID, pieceTree, nodes)
 				posY.pieceNum = pieceNum
 				posZ.pieceNum = pieceNum
 				
-				showButton.unitID = unitID
-				hideButton.unitID = unitID
-				
 				showButton.pieceNum = pieceNum
 				hideButton.pieceNum = pieceNum
 			end},
@@ -221,6 +218,11 @@ local function UpdateAnimWindow(unitID)
 	
 	children[#children+1] = showButton
 	children[#children+1] = hideButton
+	children[#children+1] = testAnimButton
+	
+	showButton.unitID = unitID
+	hideButton.unitID = unitID
+	testAnimButton.unitID = unitID
 	
 	
 
@@ -377,8 +379,10 @@ function widget:Initialize()
 	posY = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
 	posZ = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
 	
-	showButton = Button:New{ caption = 'Show', width='40%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|show|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
-	hideButton = Button:New{ caption = 'Hide', width='40%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|hide|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
+	showButton = Button:New{ caption = 'Show', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|show|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
+	hideButton = Button:New{ caption = 'Hide', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|hide|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
+	
+	testAnimButton = Button:New{ caption = 'Test Thread', width='30%', height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|testthread|" .. self.unitID ) end }, }
 
 
 	printPieceButton = Button:New{ caption = 'Print Pieces', width='30%', height=B_HEIGHT*2, OnClick = { function(self) write_piece_list(selectedUnit) end }, }

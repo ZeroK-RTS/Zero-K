@@ -113,6 +113,12 @@ local function Reset(unitID)
 		end
 	end
 end
+
+local function CallUnitScript(unitID, funcName, ...)
+	if Spring.UnitScript.GetScriptEnv(unitID) and Spring.UnitScript.GetScriptEnv(unitID).script[funcName] then
+		Spring.UnitScript.CallAsUnit(unitID, Spring.UnitScript.GetScriptEnv(unitID).script[funcName], ...)
+	end
+end  
   
 function gadget:RecvLuaMsg(msg, playerID)
 	--echo (msg)
@@ -186,6 +192,12 @@ function gadget:RecvLuaMsg(msg, playerID)
 		local unitID = param1+0 --convert to num!
 		local pieceNum = param2+0 --convert to num!
 		Spring.UnitScript.CallAsUnit(unitID, Spring.UnitScript.Show, 	pieceNum )
+	
+	elseif cmd == 'testthread' then
+		local unitID = param1+0 --convert to num!
+		CallUnitScript(unitID, "TestThread" )
+	
+	
 	
 	end
 	
