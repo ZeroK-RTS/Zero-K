@@ -45,7 +45,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[gauss_91.dae]],
-  script                 		= [[dark_gauss.lua]],
+  script                 		= [[armpb.lua]],
   seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
  
