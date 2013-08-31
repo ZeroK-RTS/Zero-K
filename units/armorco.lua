@@ -42,7 +42,7 @@ unitDef = {
   mass                   = 2233,
   maxDamage              = 85800,
   maxSlope               = 37,
-  maxVelocity            = 1.626,
+  maxVelocity            = 1.2,
   maxWaterDepth          = 5000,
   minCloakDistance       = 150,
   movementClass          = [[AKBOT6]],
@@ -106,9 +106,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 200,
-        planes  = 200,
-        subs    = 10,
+        default = 160,
+        planes  = 160,
+        subs    = 8,
       },
       
       customParams = {
@@ -197,7 +197,7 @@ unitDef = {
       },
 	  
       damage                  = {
-	default = 600,
+	    default = 600,
       },
   
       explosionGenerator      = [[custom:flash2purple]],
