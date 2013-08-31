@@ -1,8 +1,8 @@
 
 function gadget:GetInfo()
   return {
-    name      = "Circular LOS",
-    desc      = "Approximates circular (actually a double cone) LOS by reducing LOS for very high ground units.",
+    name      = "Sphereical LOS",
+    desc      = "Approximates sphereical (actually a double cone) LOS by reducing LOS for very high ground units.",
     author    = "Google Frog",
     date      = "31 August 2012",
     license   = "GNU GPL, v2 or later",
