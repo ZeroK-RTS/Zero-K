@@ -48,7 +48,8 @@ for i=1,#WeaponDefs do
 	if wd.customParams and wd.customParams.impulse then
 		impulseWeaponID[wd.id] = {
 			impulse = tonumber(wd.customParams.impulse), 
-			normalDamage = (wd.customParams.normaldamage and true or false)
+			normalDamage = (wd.customParams.normaldamage and true or false),
+			checkLOS = true
 		}
 	end
 end
@@ -264,6 +265,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			x,y,z = (ux-ax)*mag, (uy-ay)*mag * GUNSHIP_VERTICAL_MULT, (uz-az)*mag
 		elseif moveTypeByID[unitDefID] == 2 then
 			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(8*myMass), (uz-az)*mag
+			GG.AddSphereicalLOSCheck(unitID, unitDefID)
 		end
 		
 		AddGadgetImpulse(unitID, x, y, z, unitDefID)
