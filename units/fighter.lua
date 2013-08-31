@@ -71,7 +71,7 @@ unitDef = {
   },
 
   side                   = [[CORE]],
-  sightDistance          = 690,
+  sightDistance          = 520,
   smoothAnim             = true,
   speedToFront           = 0,
   stealth                = true,

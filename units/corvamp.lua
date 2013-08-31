@@ -56,7 +56,7 @@ unitDef = {
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
   side                   = [[CORE]],
-  sightDistance          = 790,
+  sightDistance          = 750,
   smoothAnim             = true,
   speedToFront           = 0.5,
 
