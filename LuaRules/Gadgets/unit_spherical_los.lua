@@ -1,7 +1,7 @@
 
 function gadget:GetInfo()
   return {
-    name      = "Sphereical LOS",
+    name      = "Spherical LOS",
     desc      = "Approximates sphereical (actually a double cone) LOS by reducing LOS for very high ground units.",
     author    = "Google Frog",
     date      = "31 August 2012",
