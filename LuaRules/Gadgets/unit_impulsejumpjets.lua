@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by msafwan (impulsejump)",
-		date    = "May 14 2008, May 11 2013",
+		date    = "May 14 2008, September 1 2013",
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
 		enabled = isImpulseJump,
@@ -199,6 +199,7 @@ end
 local function Jump(unitID, goal, cmdTag)
 	goal[2]						 = spGetGroundHeight(goal[1],goal[3])
 	local start				 = {spGetUnitPosition(unitID)}
+	start[2] = math.max(0,start[2]) --always use the case for surface launch (no underwater launch)
 
 	local fakeUnitID
 	local unitDefID		 = spGetUnitDefID(unitID)
@@ -339,19 +340,10 @@ local function Jump(unitID, goal, cmdTag)
 			end
 		end
 		
-		do
-			local x,y,z =spGetUnitPosition(unitID)
-			local grndh =spGetGroundHeight(x,z)
-			if y<=grndh+1 then
-				spSetUnitVelocity(unitID,0,0,0) --thus its speed don't interfere with jumping (prevent range increase while running). Note; flying unit wont be effected
-			end
-		end
 		SetLeaveTracks(unitID, false)
-		impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
-		impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
-		unitCmdQueue[unitID] = spGetCommandQueue(unitID)
 		
 		local halfJump
+		local jumped
 		local i = 0
 		while i <= duration*1.5 do
 			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
@@ -379,15 +371,29 @@ local function Jump(unitID, goal, cmdTag)
 			if (not jumping[unitID] ) or ( jumping[unitID]=="landed" ) then
 				break --jump aborted (skip to refreshing reload bar)
 			end
-
+			
+			local x,y,z =spGetUnitPosition(unitID)
 			do
+				if not jumped and y>=0 then
+					local grndh =spGetGroundHeight(x,z)
+					if y<=grndh+1 or y<=1 then
+						spSetUnitVelocity(unitID,0,0,0) --thus its speed don't interfere with jumping (prevent range increase while running). Note; ground unit in flying mode wont be effected
+					end
+					
+					impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+					impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
+					unitCmdQueue[unitID] = spGetCommandQueue(unitID)
+					jumped = true
+				end
 				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
-				local _,vy,_= spGetUnitVelocity(unitID)
+				local vx,vy,vz= spGetUnitVelocity(unitID)
 				local collide = type(jumping[unitID])== 'number'
 				jumping[unitID] = true
 				local speedDiffer =desiredVerticalSpeed - vy --calculate correction
 				if collide and abs(speedDiffer) > 2 then
-					spSetUnitVelocity(unitID,0,0,0) --stop unit
+					--spSetUnitVelocity(unitID,0,0,0) --stop unit
+					impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0}
+					impulseQueue[#impulseQueue+1] = {unitID, -vx*0.9, -vy*0.9-4, -vz*0.9} --slowdown to stop
 					break --jump aborted (skip to refreshing reload bar)
 				end
 				local sign = math.abs(speedDiffer)/speedDiffer
@@ -417,7 +423,9 @@ local function Jump(unitID, goal, cmdTag)
 				halfJump = true
 			end
 			Sleep()
-			i = i + 1 --next frame
+			if jumped then
+				i = i + 1 --next frame
+			end
 		end
 		
 		if cob then
@@ -592,7 +600,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 
 	if (distSqr < (range*range)) then
 		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
-		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
+		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) and Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1 then
 			local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
 			if not didJump then
 				return true, true -- command was used, don't remove it

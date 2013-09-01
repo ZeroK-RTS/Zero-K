@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "EPIC Menu",
     desc      = "v1.321 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-06-30
+    date      = "2009-06-02", --2013-08-31
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -2151,13 +2151,13 @@ local function MakeMenuBar()
 			
 			Button:New{
 				name= 'resignButton',
-                caption = "Resign and Spectate",
+                caption = "Resign",
                 OnMouseUp = { function()
 						spSendCommands{"spectator"}
 						screen0:RemoveChild(window_exit)
 						exitWindowVisible = false
 					end, },
-				tooltip = "Abandon team and be spectator",
+				tooltip = "Abandon team and become spectator",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2, 
