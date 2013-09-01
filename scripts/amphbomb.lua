@@ -5,8 +5,12 @@
 
 --pieces
 local body = piece "body"
+local firepoint = piece "firepoint"
 local digger = piece "digger"
-local missile = piece "missile"
+local wheell1 = piece "wheell1"
+local wheell2 = piece "wheell2"
+local wheelr1 = piece "wheelr1"
+local wheelr2 = piece "wheelr2"
 
 --constants
 local PI = math.pi
@@ -68,7 +72,6 @@ end
 
 local function Walk()
 	while (walking == true) do
-		
 		Turn( body, 2, .1, .5 )         	-- body roll left
 		Turn( body, 3, sa/2, 1.5 )         	-- body turn right
 		
@@ -92,7 +95,10 @@ end
 local function Moving()
 	Signal(Sig_move)
 	SetSignalMask(Sig_move)
-	
+	Spin(wheell1, x_axis, (12))
+	Spin(wheell2, x_axis, (12))
+	Spin(wheelr1, x_axis, (12))
+	Spin(wheelr2, x_axis, (12))
 	StartThread( UnBurrow )
 	walking = true
 	StartThread( Walk )
@@ -105,15 +111,19 @@ end
 
 function script.StopMoving()
 	walking = false
+	StopSpin(wheell1, x_axis, (10))
+	StopSpin(wheell2, x_axis, (10))
+	StopSpin(wheelr1, x_axis, (10))
+	StopSpin(wheelr2, x_axis, (10))
 	StartThread( Burrow )
 end
 
 function script.QueryWeapon1()
-	return missile
+	return firepoint
 end
 
 function script.AimFromWeapon1()
-	return missile
+	return firepoint
 end
 
 function script.AimWeapon1()

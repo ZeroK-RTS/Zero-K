@@ -5,10 +5,10 @@ unitDef = {
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
-  buildCostEnergy        = 180,
-  buildCostMetal         = 180,
+  buildCostEnergy        = 150,
+  buildCostMetal         = 150,
   buildPic               = [[amphraider3.png]],
-  buildTime              = 180,
+  buildTime              = 150,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -18,7 +18,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-      helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses it's (relatively) high speed to harass sea targets that cannot shoot back though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon.]],
+      helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses it's relatively high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy and assault weapon.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -57,7 +57,7 @@ unitDef = {
 
   weapons                = {
     {
-      def                = [[TORPMISSILE]],
+      def                = [[TORPCANNON]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM FIXEDWING HOVER LAND SINK TURRET FLOAT SHIP GUNSHIP]],
     },
@@ -70,12 +70,11 @@ unitDef = {
 
   weaponDefs             = {
 
-    TORPMISSILE = {
-      name                    = [[Torpedo]],
+    TORPCANNON = {
+      name                    = [[Torpedo Projector]],
       areaOfEffect            = 32,
-      cegTag                  = [[missiletrailyellow]],
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       damage                  = {
         default = 150,
@@ -87,21 +86,17 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       model                   = [[wep_m_ajax.s3o]],
+      myGravity               = 0.1,
       noSelfDamage            = true,
       projectiles	          = 2,
       range                   = 240,
       reloadtime              = 3,
-      smokeTrail              = true,
       soundHit                = [[weapon/cannon/cannon_hit2]],
-      soundStart              = [[weapon/missile/missile_fire9]],
-      startVelocity           = 140,
-      texture2                = [[lightsmoketrail]],
-      tolerance               = 1000,
-      tracks                  = true,
-      turnRate                = 16000,
+	  soundHitVolume          = 6,
+      soundStart              = [[weapon/cannon/mini_cannon]],
+	  soundStartVolume        = 8,
       turret                  = true,
-      weaponAcceleration      = 90,
-      weaponType              = [[MissileLauncher]],
+      weaponType              = [[Cannon]],
       weaponVelocity          = 200,
     },
 
