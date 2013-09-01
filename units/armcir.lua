@@ -32,8 +32,8 @@ unitDef = {
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
-  footprintX                    = 3,
-  footprintZ                    = 3,
+  footprintX                    = 4,
+  footprintZ                    = 4,
   iconType                      = [[staticskirmaa]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
