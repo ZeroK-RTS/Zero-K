@@ -1,4 +1,4 @@
-local version = "v0.828"
+local version = "v0.829"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -6,7 +6,7 @@ function widget:GetInfo()
 				"(up to 600elmo, HLT range) and teleport them when it shorten travel time. "..
 				"This only apply to your unit & allied beacon.",
 	author    = "Msafwan",
-    date      = "21 August 2013",
+    date      = "1 September 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
@@ -28,6 +28,7 @@ local spGetFeaturePosition = Spring.GetFeaturePosition
 local spRequestPath = Spring.RequestPath
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
+local spGetGameSeconds = Spring.GetGameSeconds
 ------------------------------------------------------------
 ------------------------------------------------------------
 local myTeamID
@@ -94,11 +95,13 @@ function widget:UnitDestroyed(unitID, unitDefID)
 	fiveSecondExcludedUnit[unitID] = nil
 	if issuedOrderTo[unitID] then 
 		local group = issuedOrderTo[unitID]
-		waitForNetworkDelay[group] = waitForNetworkDelay[group] - 1 
 		issuedOrderTo[unitID] = nil 
-		if waitForNetworkDelay[group]==0 then 
-			waitForNetworkDelay[group] = nil 
-		end 
+		if waitForNetworkDelay[group] then
+			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1 
+			if waitForNetworkDelay[group][2]==0 then 
+				waitForNetworkDelay[group] = nil 
+			end
+		end
 	end 
 end
 
@@ -197,7 +200,8 @@ function widget:GameFrame(n)
 			listOfBeacon[beaconID]["vicntyBecn"]=listOfBeaconInVicinity
 		end
 	end
-	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: update deploy state
+	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: 
+		--update deploy state
 		for beaconID,tblContent in pairs(listOfBeacon) do
 			local djinnID = listOfBeacon[beaconID]["djin"]
 			local djinnDeployed = djinnID and (spGetUnitRulesParam(djinnID,"deploy")) or 1
@@ -205,6 +209,13 @@ function widget:GameFrame(n)
 				djinnDeployed = (spGetUnitIsStunned(beaconID) and 0) or 1
 			end
 			listOfBeacon[beaconID]["deployed"] = djinnDeployed
+		end
+		--check if any beacon-groups under lockdown for overextended time
+		local currentSecond = spGetGameSeconds()
+		for groupNum, content in pairs(waitForNetworkDelay) do
+			if currentSecond - content[1] > 4 then
+				waitForNetworkDelay[groupNum] = nil
+			end
 		end
 	end
 	for i=1, #groupBeacon,1 do
@@ -424,9 +435,9 @@ function widget:GameFrame(n)
 							local dx,dz = (dix-ex),(diz-ez)
 							dx,dz = math.abs(dx)/dx,math.abs(dz)/dz
 							--wait for network delay:--
-							waitForNetworkDelay[i] = waitForNetworkDelay[i] or 0 
-							waitForNetworkDelay[i] = waitForNetworkDelay[i] + 1
 							issuedOrderTo[unitID] = i
+							waitForNetworkDelay[i] = waitForNetworkDelay[i] or {spGetGameSeconds(),0}
+							waitForNetworkDelay[i][2] = waitForNetworkDelay[i][2] + 1
 							--end wait for network delay
 							--method A: give GUARD order--
 							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
@@ -626,12 +637,14 @@ end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
 	fiveSecondExcludedUnit[unitID]=nil
-	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID) and (cmdParams[2] == CMD_WAIT_AT_BEACON) then 
+	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID and cmdParams[2] == CMD_WAIT_AT_BEACON) then 
 		local group = issuedOrderTo[unitID]
-		waitForNetworkDelay[group] = waitForNetworkDelay[group] - 1 
 		issuedOrderTo[unitID] = nil 
-		if waitForNetworkDelay[group]==0 then 
-			waitForNetworkDelay[group] = nil 
-		end 
-	end 
+		if waitForNetworkDelay[group] then
+			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1 
+			if waitForNetworkDelay[group][2]==0 then 
+				waitForNetworkDelay[group] = nil 
+			end
+		end
+	end
 end
