@@ -745,6 +745,18 @@ decorations = {
 				unitDef.buildpic = "skin_support_hotrod.png"
 			end,
 	},
+	skin_support_zebra = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commsupport1zebra.dds]]
+				unitDef.buildpic = "skin_support_zebra.png"
+			end,
+	},
+	skin_bombard_steel = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/benzcom_1_steel.dds]]
+				unitDef.buildpic = "skin_bombard_steel.png"
+			end,
+	},
 	
 	shield_red = {
 		func = function(unitDef)
