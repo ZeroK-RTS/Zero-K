@@ -277,13 +277,26 @@ end
 
 for name, ud in pairs(UnitDefs) do
     if (ud.canfly) then
-	ud.usesmoothmesh = false
-	if not ud.maxfuel then
-	    ud.maxfuel = 1000000
-	    ud.refueltime = ud.refueltime or 1
-	end
+		ud.usesmoothmesh = false
+		if not ud.maxfuel then
+			ud.maxfuel = 1000000
+			ud.refueltime = ud.refueltime or 1
+		end
     end
 end 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
+-- 
+
+--[[
+for name, ud in pairs(UnitDefs) do
+	if (ud.canfly) then
+		ud.brakerate = ud.brakerate * 0.1
+	end
+end
+--]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
