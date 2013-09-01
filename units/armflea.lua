@@ -23,7 +23,7 @@ unitDef = {
     description_fi = [[Maastokelpoinen tiedustelurobotti]],
     description_fr = [[Éclaireur tout terrain.]],
     description_it = [[Robot All-Terrain da ricognizione]],
-    description_pl = [[Terenowy Pająk Zwiadowczy]],
+    description_pl = [[Terenowy Paj�? Zwiadowczy]],
     helptext       = [[The Flea can hide in inaccessible locations where its sophisticated sensor suite allows it to see further than it can be seen. It can be used in small groups to effectively raid mexes early on, and in maps with tall cliffs can attack from unexpected angles. It does very little damage and dies to any form of opposition.]],
     helptext_bp    = [[Flea é o robô batedor escalador de Nova. Ele pode se esconder em locais inacessíveis onde seus sensores sofisticados permitem que ele veja mais longe do que pode ser visto. Pode ser usado em pequenos groups are atacar extratores de metais no começo do jogo, quando estao pouco defendidos, e em mapas com colinas elevadas pode atacar de ângulos inesperados. Porém ele tem muito pouco poder de fogo e resistencia, portanto morrendo frente a qualquer forma de resistencia.]],
     helptext_de    = [[Flea kann sich in unerreichbaren Gegenden verstecken, wo ein durchdachter Sensor es ermöglicht weiter zu sehen als Flea gesehen werden kann. In kleinen Gruppen kann es effektiv die gegnerischen Extraktoren überlaufen. Es macht aber nur wenig Schaden und stirbt sofort bei irgendeiner Gegenwehr.]],
@@ -31,7 +31,7 @@ unitDef = {
     helptext_fi    = [[Flea pystyy piileksim??n saavuttamattomissa paikoissa, joista se n?kee kehittyneen anturij?rjestelm?ns? avulla kauemmas, kuin mist? sit? pystyt??n havaitsemaan. Flea:ta voidaan k?ytt?? varhaisiin hy?kk?yksiin esimerkiksi metallikaivoksia p?in, mutta se tuhoutuu hetkess? mit? tahansa vastustusta kohdatessaan.]],
     helptext_fr    = [[Le Flea peut se cacher r des endroits inaccessibles d'ou il peut observer de loin grâce r ses capteurs sophistiqué sans etre vu. Il peut etre utilisé en petit groupe pour éffectuer des raid sur les éxtracteur de métal enemi en début de jeu, et peut attaquer par des endroit innatendus tel que les pentes raide. Il ne cause que tres peut de dégat et meurt contre toute opposition.]],
     helptext_it    = [[Il Flea pu? nascondersi in posti inaccessibili dove i suoi sensori sofisticati gli permettono vedere pi? lontano che possa essere visto. Pu? essere usato in piccoli gruppi per efficacemente distruggere mexes all'inizio del gioco, e in mappe con monti alti pu? attacare da angoli inaspettati. Fa poco danno e muore contro qualunque tipo di resistenza.]],
-    helptext_pl    = [[Flea może ukrywać się w niedostępnych lokacjach, gdzie jego sensory pozwalają mu obserwować z ukrycia - gdy nie porusza się, ma automatycznie włączane maskowanie. Może być używany w małych grupach aby skutecznie nękać ekonomiczne budynki wroga, a na mapach z wysokimi klifami może zaskoczyć przeciwnika atakując z zaskoczenia. Zadaje bardzo małe obrażenia i ginie przy jakimkolwiek oporze ze strony wroga.]],
+    helptext_pl    = [[Flea może ukrywa�?si�?w niedostępnych lokacjach, gdzie jego sensory pozwalaj�?mu obserwowa�?z ukrycia - gdy nie porusza si�? ma automatycznie wł�?zane maskowanie. Może by�?używany w małych grupach aby skutecznie nęka�?ekonomiczne budynki wroga, a na mapach z wysokimi klifami może zaskoczy�?przeciwnika atakuj�? z zaskoczenia. Zadaje bardzo małe obrażenia i ginie przy jakimkolwiek oporze ze strony wroga.]],
   },
 
   explodeAs           = [[TINY_BUILDINGEX]],
@@ -43,9 +43,9 @@ unitDef = {
   maxDamage           = 40,
   maxSlope            = 72,
   maxVelocity         = 4.8,
-  maxWaterDepth       = 15,
+  maxWaterDepth       = 22,
   minCloakDistance    = 75,
-  movementClass       = [[TKBOT1]],
+  movementClass       = [[TFAKEHOVER1]],
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[arm_flea.s3o]],
@@ -64,6 +64,7 @@ unitDef = {
 
   sightDistance       = 560,
   turnRate            = 2100,
+  waterline           = 5,
 
   weapons             = {
 
