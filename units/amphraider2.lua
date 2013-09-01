@@ -73,20 +73,20 @@ unitDef = {
       name                    = [[Laserbeam]],
       areaOfEffect            = 128,
       beamTime                = 0.01,
-	  beamTtl                 = 30,
-	  beamDecay               = 0.95,
+	  beamTtl                 = 10,
+	  beamDecay               = 0.80,
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
 	  
 	  customParams            = {
-	    impulse = [[60]],
+	    impulse = [[40]],
 		normaldamage = [[1]],
 	  },
 	  
       damage                  = {
-        default = 4,
-        planes  = 4,
+        default = 1.3,
+        planes  = 1.3,
         subs    = 1,
       },
 
@@ -98,7 +98,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 400,
-      reloadtime              = 0.3,
+      reloadtime              = 0.1,
       rgbColor                = [[0.2 0.2 0.3]],
       scrollSpeed             = 10,
 --      soundStart              = [[weapon/laser/laser_burn8]],
