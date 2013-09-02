@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shieldarty]],
   name                   = [[Racketeer]],
-  description            = [[EMP Artillery]],
+  description            = [[Disarming Artillery]],
   acceleration           = 0.25,
   brakeRate              = 0.25,
   buildCostEnergy        = 350,
@@ -16,7 +16,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Racketeer launches long range EMP missiles that can stun key enemy defenses before assaulting them. Since its missiles do not track or even lead, it is only useful against enemy units that are standing still. Only one Racketeer is needed to keep a target stunned, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields.]],
+    helptext       = [[The Racketeer launches long range missiles that can disarm key enemy defenses or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

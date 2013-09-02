@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armstiletto_laser]],
   name                = [[Stiletto]],
-  description         = [[EMP Lightning Bomber]],
+  description         = [[Disarming Lightning Bomber]],
   amphibious          = true,
   buildCostEnergy     = 600,
   buildCostMetal      = 600,
@@ -28,7 +28,7 @@ unitDef = {
     description_de = [[EMP-Tarnkappenbomber]],
     description_fr = [[Bombardier EMP Furtif]],
     description_pl = [[Bombowiec EMP]],
-    helptext       = [[Fast bomber armed with a lightning generator that paralyzes units in a wide area under it.]],
+    helptext       = [[Fast bomber armed with a lightning generator that disarms units in a wide area under it.]],
     helptext_bp    = [[Bombardeiro rápido a radar equipado com um gerador de raios ao invés de bombas que dispara raios de PEM contra o inimigo ao atacar.]],
     helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
     helptext_fr    = [[Rapide, armé de canons EMP pouvant paralyser les unités dans une large bande.]],
