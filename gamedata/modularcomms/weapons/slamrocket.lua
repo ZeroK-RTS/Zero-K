@@ -16,7 +16,7 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[3]],
-		muzzleEffectFire = [[custom:STORMMUZZLE]],
+		muzzleEffectFire = [[custom:SLAM_MUZZLE]],
 	},
 	cylinderTargeting       = 1.0,
 
@@ -41,7 +41,7 @@ local weaponDef = {
 	soundHit                = [[weapon/bomb_hit]],
 	soundStart              = [[weapon/missile/missile_fire2]],
 	startVelocity           = 0,
---	texture2                = [[darksmoketrail]],
+ 	texture1                = [[flare]],
 	targetBorder            = 1,
 	targetMoveError         = 0.9,
 	tolerance               = 4000,
