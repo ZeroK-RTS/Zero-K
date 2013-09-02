@@ -30,7 +30,6 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
-		DeathAnim()
 		Explode(base, sfxNone)
 		return 1	
 	else
