@@ -313,6 +313,7 @@ local custom_cmd_actions = {
 	settargetcircle=1,
 	canceltarget=3,
 	setferry=1, 
+	setfirezone=1, 
 	radialmenu=3,
 	placebeacon=1,
 	buildprev=1,
