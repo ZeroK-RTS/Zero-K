@@ -598,8 +598,8 @@ do
     end
   
     --// PARALYZE
-	local stunned = GetUnitIsStunned(unitID)
-	if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
+	local stunned, _, inbuild = GetUnitIsStunned(unitID)
+	if (emp>0)and(hp>0)and((not morph) or morph.combatMorph) and (emp<1e8) and (paralyzeDamage >= empHP) then
       if (stunned) then
         paraUnits[#paraUnits+1]=unitID
       end
@@ -718,14 +718,15 @@ do
 	  local stunned = GetUnitIsStunned(unitID)
 	  if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
         local infotext = ""
-        if (stunned) then
-          paraUnits[#paraUnits+1]=unitID
+        stunned = stunned and paralyzeDamage >= empHP
+		if (stunned) then
 		  paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
-          if (fullText) then
+          paraUnits[#paraUnits+1]=unitID
+		 if (fullText) then
             infotext = floor(paraTime) .. 's'
           end
           emp = 1
-        else
+		else
           if (emp>1) then emp=1 end
           if (fullText) then
             infotext = floor(emp*100)..'%'
