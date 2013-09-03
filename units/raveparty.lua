@@ -33,6 +33,7 @@ unitDef = {
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 7,
   footprintZ                    = 7,
+  highTrajectory		= 2,
   iconType                      = [[mahlazer]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
