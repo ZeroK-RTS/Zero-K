@@ -1355,13 +1355,16 @@ function gadgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 end
 
 
+local UnitPreDamaged_reverseCompat = Game.version:find('91.0')
+
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   a, b, c, d)
+  
   local projectileID,attackerID
   local attackerDefID,attackerTeam
-  if Game.version:find('91.0') then 
-	attackerID = a 
+  if UnitPreDamaged_reverseCompat then 
+    attackerID = a 
     attackerDefID = b
     attackerTeam = c
   else
@@ -1391,22 +1394,32 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 end
 
 
-function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
-                                   attackerID, attackerDefID, attackerTeam)
-		
-  if Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1')) then
-    attackerTeam = attackerDefID
-    attackerDefID = attackerID
-    attackerID = projectileID
+local UnitDamaged_reverseCompat = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
+
+if UnitDamaged_reverseCompat then
+  function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
+                                     damage, paralyzer, weaponID,
+                                     attackerID, attackerDefID, attackerTeam, _)
+    
+    for _,g in ipairs(self.UnitDamagedList) do
+      g:UnitDamaged(unitID, unitDefID, unitTeam,
+                    damage, paralyzer, weaponID,
+                    attackerID, attackerDefID, attackerTeam)
+    end
+    return
   end
-  
-  for _,g in ipairs(self.UnitDamagedList) do
-    g:UnitDamaged(unitID, unitDefID, unitTeam,
-                  damage, paralyzer, weaponID,
-                  attackerID, attackerDefID, attackerTeam)
+else
+  function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
+                                     damage, paralyzer, weaponID, projectileID, 
+                                     attackerID, attackerDefID, attackerTeam)
+    
+    for _,g in ipairs(self.UnitDamagedList) do
+      g:UnitDamaged(unitID, unitDefID, unitTeam,
+                    damage, paralyzer, weaponID,
+                    attackerID, attackerDefID, attackerTeam)
+    end
+    return
   end
-  return
 end
 
 
