@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[arm_venom]],
   name                   = [[Venom]],
-  description            = [[Riot EMP Spider]],
+  description            = [[Riot Lightning Spider]],
   acceleration           = 0.26,
   brakeRate              = 0.26,
   buildCostEnergy        = 200,
@@ -26,7 +26,7 @@ unitDef = {
     description_fr = [[Araign?e ?meuti?re EMP]],
     description_it = [[Ragno PEM da rissa]],
     description_de = [[Unterstützende EMP Spinne]],
-    helptext       = [[The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher.]],
+    helptext       = [[The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit as in addition to paralysis it does a small amount of damage. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher.]],
     helptext_bp    = [[Venon é uma unidade escaladora projetada para paralizar inimigos para que outras unidades possam destruílos facilmente. Seus tiros podem atingir múltiplas unidades e portanto é útil como dispersadora. Funciona bem junto com o Recluse para impedir os inimigos de se aproximarem deste.]],
     helptext_es    = [[El Venom es una unidad all-terrain hecha para paralizar a los nemigos, permitiendo que otras unidades puedan destruirlos fácilmente. Tiene AdE y es útil como unidad de alboroto, para tener a la larga pelotones de enemigos. Funciona bien juntado con los recluse para no dejar que los enemigos se acerquen demasiado al frágil escaramuzador.]],
     helptext_fi    = [[Maastokelpoinen Venom kykenee EMP-aseellaan halvaannuttamaan vihollisen yksik?t niin, ett? ne voidaan tuhota vaaratta. Tehokas toimiessaan yhdess? Recluse:n kanssa. Tuhoutuu nopeasti vihollisen tuliksen alla.]],

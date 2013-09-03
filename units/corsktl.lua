@@ -38,7 +38,6 @@ unitDef = {
 
   explodeAs              = [[CORSKTL_DEATH]],
   fireState              = 0,
-  floater                = true,
   footprintX             = 1,
   footprintZ             = 1,
   iconType               = [[jumpjetbomb]],
@@ -49,13 +48,14 @@ unitDef = {
   kamikaze               = true,
   kamikazeDistance       = 25,
   kamikazeUseLOS         = true,
+  maneuverleashlength    = [[140]],
   mass                   = 210,
   maxDamage              = 250,
   maxSlope               = 36,
   maxVelocity            = 1.5225,
-  maxWaterDepth          = 22,
+  maxWaterDepth          = 15,
   minCloakDistance       = 180,
-  movementClass          = [[BFAKEHOVER1]],
+  movementClass          = [[KBOT1]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[skuttle.s3o]],
@@ -72,7 +72,7 @@ unitDef = {
   trackWidth             = 26,
   turnRate               = 2000,
   upright                = true,
-  waterline		 = 4,
+  workerTime             = 0,
 }
 
 return lowerkeys({ corsktl = unitDef })

@@ -47,9 +47,9 @@ unitDef = {
   maxDamage              = 60,
   maxSlope               = 36,
   maxVelocity            = 4,
-  maxWaterDepth          = 22,
+  maxWaterDepth          = 15,
   minCloakDistance       = 75,
-  movementClass          = [[BFAKEHOVER1]],
+  movementClass          = [[KBOT1]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[logroach.s3o]],
   pushResistant          = 0,
@@ -70,7 +70,6 @@ unitDef = {
 
   sightDistance          = 240,
   turnRate               = 3000,
-  waterline		 = 5,
 }
 
 return lowerkeys({ corroach = unitDef })

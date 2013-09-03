@@ -10,13 +10,13 @@
 
 local moveDefs = {
 
-	--KBOT1 = {
-	--	footprintx = 1,
-	--	footprintz = 1,
-	--	maxwaterdepth = 15,
-	--	maxslope = 36,
-	--	crushstrength = 5,
-	--},
+	KBOT1 = {
+		footprintx = 1,
+		footprintz = 1,
+		maxwaterdepth = 15,
+		maxslope = 36,
+		crushstrength = 5,
+	},
 
 	KBOT2 = {
 		footprintx = 2,
@@ -137,22 +137,6 @@ local moveDefs = {
 		crushstrength = 500,
 	},
 	
-	BFAKEHOVER1 = {
-		footprintx = 1,
-		footprintz = 1,
-		maxslope = 36,
-		maxwaterdepth = 22,
-		crushstrength = 15,	
-	},
-
-	TFAKEHOVER1 = {
-		footprintx = 1,
-		footprintz = 1,
-		maxslope = 70,
-		maxwaterdepth = 22,
-		crushstrength = 15,	
-	},	
-		
 	HOVER3 = {
 		footprintx = 3,
 		footprintz = 3,
