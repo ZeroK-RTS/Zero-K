@@ -1395,7 +1395,7 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
 		
-  if Game.version:find('91.0') then
+  if Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1')) then
     attackerTeam = attackerDefID
     attackerDefID = attackerID
     attackerID = projectileID
