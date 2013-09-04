@@ -810,8 +810,7 @@ local fhDrawCentered = fontHandler.DrawCentered
 
 local caught, windowCaught, buttonHover
 local gameOver = false
---local showGameOverWin  = true
-local showingEndGraph  = false
+local showGameOverWin  = true
 local sentToPlanetWars = false
 
 local colSpacing     = 250
@@ -972,12 +971,14 @@ function gadget:MousePress(x,y,button)
 		--Spring.Echo(self:IsAbove(x,y))
 		if (self:IsAbove(x,y)) then
 			--Spring.Echo(self:IsAboveCloseButton(x,y))
-			
 			if (self:IsAboveCloseButton(x,y)) then
-				if not showingEndGraph then
-					Script.LuaUI.LoadEndGamePanel()
-					showingEndGraph = true
+				--// close button clicked
+				if showGameOverWin then
+					spSendCommands('endgraph 1')
+				else
+					spSendCommands('endgraph 0')
 				end
+				showGameOverWin = not showGameOverWin
 				return true
 			end
 			windowCaught = true
@@ -1041,7 +1042,7 @@ function gadget:DrawScreen()
 			glColor(0.9, 0.9, 0.9, 0.85)
 		end
 		gl.Rect(exitX1,exitY1,exitX2,exitY2)
-		fhDrawCentered('Show Stats Window', (exitX1 + exitX2)/2,(exitY1 + exitY2)/2 - fontHeight/2)
+		fhDrawCentered('Show/Hide Stats Window', (exitX1 + exitX2)/2,(exitY1 + exitY2)/2 - fontHeight/2)
 
 		glTranslate(margin, h - (tHeight + margin)*2, 0)
 		local row, col = 0,0
