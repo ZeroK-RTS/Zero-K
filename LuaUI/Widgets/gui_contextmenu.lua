@@ -365,24 +365,12 @@ local function printWeapons(unitDef)
 				wsTemp.bestTypeDamage = 0
 				wsTemp.bestTypeDamagew = 0
 				wsTemp.paralyzer = weaponDef.paralyzer	
-				for key, val in ipairs(weaponDef.damages) do
-					--[[
-					if (wsTemp.bestTypeDamage <= (damage+0) and not wsTemp.paralyzer)
-						or (wsTemp.bestTypeDamagew <= (damage+0) and wsTemp.paralyzer)
-						then
-
-						if wsTemp.paralyzer then
-							wsTemp.bestTypeDamagew = (damage+0)
-						else
-							wsTemp.bestTypeDamage = (damage+0)
-						end
-					--]]
-					if key == 0 then
-						if wsTemp.paralyzer then
-							wsTemp.bestTypeDamagew = val 
-						else
-							wsTemp.bestTypeDamage = val
-						end
+				local val = weaponDef.damages[0]
+				if val then
+				  	if wsTemp.paralyzer then
+						wsTemp.bestTypeDamagew = val 
+					else
+						wsTemp.bestTypeDamage = val
 					end
 				end
 				wsTemp.burst = weaponDef.salvoSize or 1
