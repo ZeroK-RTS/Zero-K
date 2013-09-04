@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "AnimatorGUI",
-    desc      = "Send animation commands",
+    desc      = "v0.002 Send animation commands",
     author    = "CarRepairer & knorke",
     date      = "2010-03-05",
     license   = "push button magic",
@@ -101,6 +101,13 @@ local function explode(div,str)
   return arr
 end
 
+local function SendMessageCheck(msg)
+	if not Spring.IsCheatingEnabled() then 
+		echo "Cannot do this unless Cheating is enabled."
+		return
+	end
+	Spring.SendLuaRulesMsg(msg)
+end
 
 local function PieceInfo(pieceInfo)
 	local pieceInfo_t = explode('|', pieceInfo)
@@ -154,7 +161,7 @@ local function MakePieceTreeNodesRec(unitID, pieceTree, nodes)
 		nodes2[#nodes2+1] = Button:New{
 			caption = pieceName,
 			OnClick = {function(self)
-				Spring.SendLuaRulesMsg("animator|getpieceinfo|" .. unitID .. '|' .. pieceNum)
+				SendMessageCheck("animator|getpieceinfo|" .. unitID .. '|' .. pieceNum)
 				
 				rotX.unitID = unitID
 				rotY.unitID = unitID
@@ -343,7 +350,7 @@ end
 function widget:SelectionChanged(selectedUnits)
 	if not selectedUnits or not selectedUnits[1] then return end
 	selectedUnit = selectedUnits[1]
-	Spring.SendLuaRulesMsg ("animator|sel|" .. selectedUnit )
+	SendMessageCheck ("animator|sel|" .. selectedUnit )
 	
 	--echo( table_to_string( PieceTree(unitID) ) )
 	
@@ -371,32 +378,32 @@ function widget:Initialize()
 	Trackbar = Chili.Trackbar
 	screen0 = Chili.Screen0
 	
-	rotX = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|turn|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	rotY = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|turn|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	rotZ = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|turn|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotX = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|turn|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotY = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|turn|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotZ = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|turn|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
 	
-	posX = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	posY = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	posZ = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) Spring.SendLuaRulesMsg("animator|move|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posX = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|move|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posY = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|move|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posZ = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|move|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
 	
-	showButton = Button:New{ caption = 'Show', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|show|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
-	hideButton = Button:New{ caption = 'Hide', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|hide|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
+	showButton = Button:New{ caption = 'Show', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) SendMessageCheck("animator|show|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
+	hideButton = Button:New{ caption = 'Hide', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) SendMessageCheck("animator|hide|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
 	
-	testAnimButton = Button:New{ caption = 'Test Thread', width='30%', height=B_HEIGHT, OnClick = { function(self) Spring.SendLuaRulesMsg("animator|testthread|" .. self.unitID ) end }, }
+	testAnimButton = Button:New{ caption = 'Test Thread', width='30%', height=B_HEIGHT, OnClick = { function(self) SendMessageCheck("animator|testthread|" .. self.unitID ) end }, }
 
 
 	printPieceButton = Button:New{ caption = 'Print Pieces', width='30%', height=B_HEIGHT*2, OnClick = { function(self) write_piece_list(selectedUnit) end }, }
 	writeOutButton = Button:New{
 		unitID = 0,
 		caption = 'Write Out', width="30%", height=B_HEIGHT*2,
-		OnClick = { function(self) Spring.SendLuaRulesMsg( 'animator|write|' .. self.unitID ) end },
+		OnClick = { function(self) SendMessageCheck( 'animator|write|' .. self.unitID ) end },
 	}
 	
 	resetButton = Button:New{
 		unitID = 0,
 		caption = 'Reset', width="30%", height=B_HEIGHT*2,
 		OnClick = { function(self)
-			Spring.SendLuaRulesMsg( 'animator|reset|' .. self.unitID )
+			SendMessageCheck( 'animator|reset|' .. self.unitID )
 			rotX:SetValue( 0 )
 			rotY:SetValue( 0 )
 			rotZ:SetValue( 0 )

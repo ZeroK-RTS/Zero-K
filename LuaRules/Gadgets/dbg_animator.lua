@@ -4,7 +4,7 @@
 function gadget:GetInfo()
   return {
     name      = "Animator",
-    desc      = "Moves and turns pieces.",
+    desc      = "v0.002 Moves and turns pieces.",
     author    = "CarRepairer & knorke",
     date      = "2010-03-05",
     license   = "raubkopierer sind verbrecher",
@@ -121,6 +121,9 @@ local function CallUnitScript(unitID, funcName, ...)
 end  
   
 function gadget:RecvLuaMsg(msg, playerID)
+  
+	if not Spring.IsCheatingEnabled() then return end
+  
 	--echo (msg)
 	pre = "animator"
 	--if (msg:find(pre,1,true)) then Spring.Echo ("its a loveNtrolls message") end
