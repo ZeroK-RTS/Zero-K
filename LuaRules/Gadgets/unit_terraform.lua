@@ -2916,8 +2916,8 @@ function gadget:GameFrame(n)
 					spSetUnitTooltip(id, TOOLTIP_SPENT .. floor(terraformUnit[id].totalSpent) ..
 							  ", " .. TOOLTIP_COST .. floor(terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost) )
 					
-					if GG.Awards and GG.Awards.AddTerraformCost then
-						GG.Awards.AddTerraformCost(terraformUnit[id].team, costDiff)
+					if GG.Awards and GG.Awards.AddAwardPoints then
+						GG.Awards.AddAwardPoints('terra', terraformUnit[id].team, costDiff)
 					end
 					
 					local updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
