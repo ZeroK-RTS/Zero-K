@@ -2,6 +2,12 @@ local base = piece 'base'
 local body = piece 'body' 
 local firep1 = piece 'firep1' 
 local firep2 = piece 'firep2' 
+local wings = piece 'wings' 
+local fan = piece 'fan' 
+local Rwingengine = piece 'Rwingengine' 
+local Lwingengine = piece 'Lwingengine' 
+local Rengine = piece 'Rengine' 
+local Lengine = piece 'Lengine' 
 
 smokePiece = {base}
 
@@ -9,9 +15,35 @@ include "constants.lua"
 
 local gun_1 = false
 local firestate = Spring.GetUnitStates(unitID).firestate
+local spGetUnitVelocity = Spring.GetUnitVelocity
+
+local function TiltWings()
+	while  true  do
+		if attacking then
+			Turn( wings , x_axis, 0, math.rad(45) )
+			Sleep(250)
+		else
+			local vx,_,vz = spGetUnitVelocity(unitID)
+			local speed = vx*vx + vz*vz
+			Turn( wings, x_axis, math.rad(speed*3), math.rad(45) )
+			Sleep(250)
+		end
+	end
+end
 
 function script.Create()
 	StartThread(SmokeUnit)
+	StartThread(TiltWings)
+	Turn( Lwingengine, x_axis, math.rad(-90), math.rad(500) )
+	Turn( Rwingengine, x_axis, math.rad(-90), math.rad(500) )
+end
+
+function script.Activate()
+	Spin( fan , y_axis, math.rad(700) )
+end
+
+function script.Deactivate()
+	StopSpin( fan , y_axis, math.rad(3) )
 end
 
 function script.QueryWeapon(num)
