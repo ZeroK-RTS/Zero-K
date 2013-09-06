@@ -466,6 +466,30 @@ upgrades = {
 				end
 			end,	
 	},
+	module_burst_loader = {
+		name = "Burst Loader",
+		description = "+1 burst, +70% reload time",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if id == "commweapon_beamlaser" or id == "commweapon_disruptor" or id == "commweapon_slowbeam" then
+						v.beamtime = v.beamtime + 10
+						v.coreThickness = v.coreThickness *3
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 2
+						end
+					elseif id == "commweapon_shotgun" then
+						v.burst = (v.burst or 0) + 3
+						v.sprayangle = (v.sprayangle or 0) + 256
+					else
+						v.burstrate = (v.burstrate or 0.1 )
+						v.reloadtime = v.reloadtime * 1.7
+						v.burst = (v.burst or 0) + 1
+						v.sprayangle = (v.sprayangle or 0) + 256
+					end
+				end
+			end,	
+	},
 	module_energy_cell = {
 		name = "Energy Cell",
 		description = "Compact fuel cells that produce +6 energy",
@@ -519,6 +543,7 @@ upgrades = {
 				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
 			end,
 	},
+	
 	module_resurrect = {
 		name = "Lazarus Device",
 		description = "Enables resurrection of wrecks",
