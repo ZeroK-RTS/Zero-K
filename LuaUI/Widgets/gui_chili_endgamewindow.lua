@@ -115,14 +115,22 @@ local function ShowEndGameWindow()
 	awardSubPanel:ClearChildren()
 	
 	for teamID,awards in pairs(awardList) do
-		echo(k, v)
-		Label:New{ caption = teamNames[teamID], width=100; autosize=true, height=L_HEIGHT; textColor=teamColors[teamID]; 	parent=awardSubPanel }
-		for awardType, record in pairs(awards) do
-			
-			awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
-		end
+		--echo(k, v)
 		
-		Label:New{ caption = string.rep('-', 100), autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
+		local playerHasAward
+		for awardType, record in pairs(awards) do
+			playerHasAward = true
+		end
+		if playerHasAward then
+			Label:New{ caption = teamNames[teamID], width=100; autosize=true, height=L_HEIGHT; textColor=teamColors[teamID]; 	parent=awardSubPanel }
+		
+			for awardType, record in pairs(awards) do
+				
+				awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
+			end
+			
+			Label:New{ caption = string.rep('-', 100), autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
+		end
 	end
 	
 	screen0:AddChild(window_endgame)
