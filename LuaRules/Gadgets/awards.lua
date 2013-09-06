@@ -1,7 +1,7 @@
 function gadget:GetInfo()
 	return {
 		name    = "Awards",
-		desc    = "v1.001 Awards players at end of battle with shiny trophies.",
+		desc    = "v1.002 Awards players at end of battle with shiny trophies.",
 		author  = "CarRepairer",
 		date    = "2008-10-15", --2013-09-05
 		license = "GNU GPL, v2 or later",
@@ -116,7 +116,7 @@ local awardEasyFactors = {
 	comm      = veryEasyFactor,
 
 	reclaim   = reclaimFactor,
-	empFactor = empFactor,
+	emp		= empFactor,
 }
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
