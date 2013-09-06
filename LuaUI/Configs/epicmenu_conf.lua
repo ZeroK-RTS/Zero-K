@@ -401,21 +401,23 @@ path='Settings/Graphics/Map'
 		ShButton('Toggle Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')
 	
 path='Settings/Graphics/Unit Visibility'
-  ShLabel( 'Unit Visibility Options')
-  AddOption({
-    name = 'Icon Distance',
-    type = 'number',
-    min = 1, 
-    max = 1000,
-    springsetting = 'UnitIconDist',
-    OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
-	} ) 
-  ShLabel( 'Unit Visibility Widgets')
-  ShButton('Outline',function() spSendCommands{"luaui togglewidget Outline"} end, "Shows cartoon-like outline around units")
-  ShButton('Halo', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
-  ShButton('Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
+	ShLabel( 'Unit Visibility Options')
+	AddOption({
+	  name = 'Icon Distance',
+	  type = 'number',
+	  min = 1, 
+	  max = 1000,
+	  springsetting = 'UnitIconDist',
+	  OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
+	  } ) 
+	ShLabel( 'Unit Visibility Widgets')
+	ShButton('Toggle Unit Outlines',function() spSendCommands{"luaui togglewidget Outline"} end, "Shows cartoon-like outline around units")
+	ShButton('Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
+	
+	path='Settings/Graphics/Unit Visibility/Spotter'
+		ShButton('Toggle Unit Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
 	path='Settings/Graphics/Unit Visibility/XRay Shader'
-  	ShButton('Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+		ShButton('Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
 
 --- HELP ---
 path='Help'
