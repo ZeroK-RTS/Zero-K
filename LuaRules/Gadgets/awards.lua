@@ -350,12 +350,14 @@ local function UpdateResourceStats(t)
 end
 
 local function AddAwardPoints( awardType, teamID, amount )
-	if (teamID and (teamID ~= gaiaTeamID)) then
-		awardData[awardType][teamID] = awardData[awardType][teamID] + (amount or 0)
-	end
+	awardData[awardType][teamID] = awardData[awardType][teamID] + amount
 end
 
-GG.Awards.AddAwardPoints = AddAwardPoints
+local function AddTerraformCost(teamID, value)
+	AddAwardPoints( 'terra', teamID, value )
+end
+
+GG.Awards.AddTerraformCost = AddTerraformCost
 
 local function AddFeatureReclaim(featureID)
 	local featureData = reclaimListByFeature[featureID]
@@ -377,6 +379,20 @@ local function FinalizeReclaimList()
 	end
 	reclaimListByFeature = {}
 end
+
+local function UnitResurrected (unitDefID, teamID)
+	local ud = UnitDefs[unitDefID]
+	AddAwardPoints( 'rezz', teamID, (ud and ud.metalCost or 0) )
+end
+
+local function UnitSlowed (amount, teamID)
+	if (teamID and (teamID ~= gaiaTeamID)) then
+		AddAwardPoints( 'slow', teamID, amount or 0)
+	end
+end
+
+GG.Awards.UnitResurrected = UnitResurrected
+GG.Awards.UnitSlowed      = UnitSlowed
 
 local function ProcessAwardData()
 
