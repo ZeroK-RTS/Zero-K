@@ -1,26 +1,24 @@
 function gadget:GetInfo()
 	return {
 		name    = "Awards",
-		desc    = "Awards players at end of battle with shiny trophies.",
+		desc    = "v1.001 Awards players at end of battle with shiny trophies.",
 		author  = "CarRepairer",
-		date    = "2008-10-15", --2013-03-02
+		date    = "2008-10-15", --2013-09-05
 		license = "GNU GPL, v2 or later",
 		layer   = 1000000, -- Must be after all other build steps and before unit_spawner.lua for queen kill award.
-		enabled = true -- loaded by default?
+		enabled = true,
 	}
 end
 
-local TESTMODE = false
+--local TESTMODE = true
 
 local spGetAllyTeamList = Spring.GetAllyTeamList
 local spIsGameOver      = Spring.IsGameOver
 local spGetTeamInfo     = Spring.GetTeamInfo
-
 local gaiaTeamID        = Spring.GetGaiaTeamID()
 
 local echo = Spring.Echo
 
-local totalTeams = 0
 local totalTeamList = {}
 
 local awardDescs =
@@ -125,7 +123,6 @@ local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
 local awardList = {}
 local sentAwards = false
-local teamCount = 0
 
 local shareList_update = 32*60*5 -- five minute frames
 
@@ -491,7 +488,6 @@ function gadget:Initialize()
 		local team = tempTeamList[i]
 		--Spring.Echo('team', team)
 		if team ~= gaiaTeamID then
-			totalTeams = totalTeams + 1
 			totalTeamList[team] = team
 		end
 	end
@@ -502,7 +498,6 @@ function gadget:Initialize()
 	end
 	for _,team in pairs(totalTeamList) do
 		awardList[team] = {}
-		teamCount = teamCount + 1
 
 		shareListTemp1[team] = 0
 		shareListTemp2[team] = 0
@@ -725,6 +720,15 @@ function gadget:GameFrame(n)
 		if (frame32 < 0.1) then
 			sentAwards = false
 		end
+		awardAward(0, 'rezz', '12 super rezz go')
+		awardAward(0, 'pwn', '100000 damage!')
+		awardAward(0, 'ouch', '3400000 damage ouch!')
+		awardAward(0, 'navy', '3400000 damage ouch!')
+		awardAward(0, 'air', '3400000 damage ouch!')
+		awardAward(0, 'nux', '3400000 damage ouch!')
+		awardAward(0, 'kam', '3400000 damage ouch!')
+		
+		awardAward(1, 'mex', '20 mexes built super')
 
 	else
 		if not spIsGameOver() then return end
@@ -766,52 +770,13 @@ else -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local spGetGameFrame  = Spring.GetGameFrame
-local spGetMouseState = Spring.GetMouseState
 local spSendCommands  = Spring.SendCommands
 
-local glPushMatrix = gl.PushMatrix
-local glPopMatrix  = gl.PopMatrix
-local glTexture    = gl.Texture
-local glTexRect    = gl.TexRect
-local glAlphaTest  = gl.AlphaTest
-local glTranslate  = gl.Translate
-local glColor      = gl.Color
-local glBeginEnd   = gl.BeginEnd
-local glVertex     = gl.Vertex
-local glScale      = gl.Scale
-
-local GL_QUADS     = GL.QUADS
---local GL_GREATER   = GL.GREATER
-
-LUAUI_DIRNAME = 'LuaUI/'
-local fontHandler = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
-local fancyFont   = LUAUI_DIRNAME.."Fonts/KOMTXT___16"
-local smallFont   = LUAUI_DIRNAME.."Fonts/FreeSansBold_16"
-
-local fhDraw         = fontHandler.Draw
-local fhDrawCentered = fontHandler.DrawCentered
-
-local caught, windowCaught, buttonHover
 local gameOver = false
---local showGameOverWin  = true
-local showingEndGraph  = false
 local sentToPlanetWars = false
 
-local colSpacing     = 250
-local bx, by         = 100,100
-local margin         = 10
-local tWidth,tHeight = 30,40
-local w, h           = (colSpacing+margin)*3, 500
-local exitX1,exitY1,exitX2,exitY2 = w-260, h-40, w-10, h-10
-
 local teamNames     = {}
-local teamColors    = {}
-local teamColorsDim = {}
 local awardList
-
-local maxRow     = 8
-local fontHeight = 16
 
 function gadget:Initialize()
 	local tempTeamList = Spring.GetTeamList()
@@ -819,7 +784,6 @@ function gadget:Initialize()
 		local team = tempTeamList[i]
 		--Spring.Echo('team', team)
 		if team ~= gaiaTeamID then
-			totalTeams = totalTeams + 1
 			totalTeamList[team] = team
 		end
 	end
@@ -834,11 +798,8 @@ function gadget:Initialize()
 			name = Spring.GetPlayerInfo(leaderPlayerID)
 		end
 		teamNames[team] = name
-		teamColors[team] = {Spring.GetTeamColor(team)}
-		teamColorsDim[team] = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
 	end
-	spSendCommands({'endgraph 0'})
-
+	--spSendCommands({'endgraph 0'})
 	gadgetHandler:AddSyncAction("aw_GameOver", gadget.GameOver)
 	if TESTMODE then
 		gadget:GameOver()
@@ -922,218 +883,45 @@ end
 
 function gadget:GameOver()
 	gameOver = true
-	--Spring.Echo("Game over (unsynced)")
-	-- reassign colors in case they have been changed locally
-	for _,team in pairs(totalTeamList) do
-		teamColors[team] = {Spring.GetTeamColor(team)}
-		teamColorsDim[team] = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
-	end
-
+	--Spring.Echo("Game over (awards unsynced)")
+		
 	--// Resources
 	SendEconomyDataToWidget()
-
 end
 
-function gadget:IsAboveCloseButton(x,y)
-	return (x > bx+exitX1) and (x < bx+exitX2) and (y > by+exitY1) and (y < by+exitY2)
-end
-
-function gadget:IsAbove(x,y)
-	if not gameOver then return false end
-	local above = (x > bx) and (x < bx+w) and (y > by) and (y < by+h)
-
-	if (above)and(self:IsAboveCloseButton(x,y)) then
-		buttonHover = true
-	else
-		buttonHover = false
+-- function to convert SYNCED table to regular table. assumes no self referential loops
+local function ConvertToRegularTable(stable)
+	local ret = {}
+	for k,v in spairs(stable) do
+		if type(v) == 'table' then
+			v = ConvertToRegularTable(v)
+		end
+		ret[k] = v
 	end
-
-	return above
+	return ret
 end
 
-function gadget:MousePress(x,y,button)
-	if (button==1) then
-		--Spring.Echo(self:IsAbove(x,y))
-		if (self:IsAbove(x,y)) then
-			--Spring.Echo(self:IsAboveCloseButton(x,y))
-			
-			if (self:IsAboveCloseButton(x,y)) then
-				if not showingEndGraph then
-					Script.LuaUI.LoadEndGamePanel()
-					showingEndGraph = true
-				end
-				return true
+function gadget:Update()
+	if not gameOver then
+		return
+	end
+	if (not awardList) and SYNCED.awardList then
+		awardList = ConvertToRegularTable( SYNCED.awardList )
+		Script.LuaUI.SetAwardList( awardList )
+	end
+	if awardList and not sentToPlanetWars then
+		for team,awards in pairs(awardList) do
+			for awardType, record in pairs(awards) do
+				local planetWarsData = (teamNames[team] or "no_name") ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
+				Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
+				--Spring.Echo(planetWarsData)
 			end
-			windowCaught = true
-			cx = x-bx
-			cy = y-by
-			caught = true
-			return true
 		end
-	end
-	return false
-end
-
-function gadget:MouseRelease(x,y,button)
-	if (button==1) then
-		if (windowCaught) then
-			windowCaught = false
-			return true
-		else
-			return false
-		end
-	end
-	return false
-end
-
-function gadget:MouseMove(x,y,button)
-	if (windowCaught) then
-		bx = x-cx
-		by = y-cy
-		return true
-	else
-		return false
+		sentToPlanetWars = true
 	end
 end
 
-function gadget:DrawScreen()
-	if gameOver then
-		if (not awardList) and SYNCED.awardList then
-			awardList = SYNCED.awardList
-		end
-		--Spring.Echo("Drawing awards")
-
-		fontHandler.UseFont(smallFont)
-		glPushMatrix()
-		-- Main Box
-		glTranslate(bx,by, 0)
-		glColor(0.2, 0.2, 0.2, 0.4)
-		gl.Rect(0,0,w,h)
-
-		-- Title
-		glColor(1, 1, 0, 0.8)
-		glPushMatrix()
-		glTranslate(colSpacing,h-fontHeight*2,0)
-		glScale(1.5, 1.5, 1.5)
-		fhDraw('Awards', 0,0)
-		glPopMatrix()
-
-		-- Button
-		if buttonHover then
-			glColor(0.4, 0.4, 0.9, 0.85)
-		else
-			glColor(0.9, 0.9, 0.9, 0.85)
-		end
-		gl.Rect(exitX1,exitY1,exitX2,exitY2)
-		fhDrawCentered('Show Stats Window', (exitX1 + exitX2)/2,(exitY1 + exitY2)/2 - fontHeight/2)
-
-		glTranslate(margin, h - (tHeight + margin)*2, 0)
-		local row, col = 0,0
-		if awardList then
-
-			local teamCount = 0
-
-			for team,awards in spairs(awardList) do
-
-				local awardCount = 0
-				for awardType, record in spairs(awards) do
-					awardCount = awardCount + 1
-					if not sentToPlanetWars then
-						local planetWarsData = (teamNames[team] or "no_name") ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
-						Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
-						Spring.Echo(planetWarsData)
-					end
-				end
-
-				if awardCount > 0 then
-					teamCount = teamCount + 1
-
-					if row == maxRow-1 then
-						row = 0
-						col = col + 1
-						glTranslate(margin+colSpacing, (tHeight+margin)*(maxRow-1) , 0)
-					end
-
-					glColor( teamColorsDim[team] )
-					gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
-
-					glColor(1,1,1,1)
-					fhDraw((teamNames[team] or "no_name") , 0, fontHeight )
-
-					row = row + 1
-					glTranslate( 0, 0 - (tHeight+margin), 0)
-					if row == maxRow then
-						row = 0
-						col = col + 1
-						glTranslate(margin+colSpacing, (tHeight+margin)*maxRow , 0)
-					end
-
-					for awardType, record in spairs(awards) do
-
-						glColor(teamColorsDim[team] )
-						gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
-						glColor(1,1,1,1)
-
-						glPushMatrix()
-
-							local border = 2
-							glColor(0,0,0,0)
-							gl.Rect(0-border, 0-border, tWidth+border, tHeight+border)
-							glColor(1,1,1,1)
-							glTexture(':l:LuaRules/Images/awards/trophy_'.. awardType ..'.png')
-							glTexRect(0, 0, tWidth, tHeight )
-
-							glTranslate(tWidth+margin,(fontHeight+margin),0)
-							glColor(1,1,0,1)
-							glPushMatrix()
-								if awardDescs[awardType]:len() > 35 then
-									glScale(0.6,1,1)
-								elseif awardDescs[awardType]:len() > 20 then
-									glScale(0.8,1,1)
-								end
-								--fhDraw(awardCount ..') '.. awardDescs[awardType], 0,0)
-								fhDraw(awardDescs[awardType], 0,0)
-							glPopMatrix()
-
-							glTranslate(0,0-(fontHeight/2+margin),0)
-							glColor(1,1,1,1)
-							glPushMatrix()
-								if record:len() > 35 then
-									glScale(0.6,1,1)
-								elseif record:len() > 20 then
-									glScale(0.8,1,1)
-								end
-
-								fhDraw(' '..record, 0,0)
-							glPopMatrix()
-
-						glPopMatrix()
-
-						row = row + 1
-						glTranslate( 0, 0 - (tHeight+margin), 0)
-						if row == maxRow then
-							row = 0
-							col = col + 1
-							glTranslate(margin+colSpacing, (tHeight+margin)*maxRow , 0)
-						end
-					end
-				end --if at least 1 award
-			end
-
-			sentToPlanetWars = true
-		end
-		glPopMatrix()
-		glColor(1,1,1,1)
-	end
-end
-
-function gadget:ViewResize(vsx, vsy)
-	bx = vsx/2 - w/2
-	by = vsy/2 - h/2
-end
-
-gadget:ViewResize(Spring.GetViewGeometry())
-
+--unsynced
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 end

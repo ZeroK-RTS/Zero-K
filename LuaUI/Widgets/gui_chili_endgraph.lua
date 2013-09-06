@@ -13,8 +13,8 @@
 ]]
 function widget:GetInfo()
 	return {
-		name		    = "EndGame Stats v0.9",
-		desc		    = "v0.91 Chili replacement for default end game statistics",
+		name		    = "EndGame Stats",
+		desc		    = "v0.911 Chili replacement for default end game statistics",
 		author		  = "Funkencool",
 		date		    = "2013",
 		license     = "public domain",
@@ -28,6 +28,9 @@ end
 		0.91 - CarRepairer
 			- Added fixes to prevent widget crash when running spring.exe.
 			- Integrated with awards gadget.
+		0.911 - CarRepairer
+			- Integrated with new widget gui_chili_endgamewindow
+	
 --]]
 
 local testing = false
@@ -59,7 +62,7 @@ local engineStats = {
 }
 
 local graphLength = 0
-local gameOver = false
+--local gameOver = false
 local isDelta = false
 local curGraph = {}
 
@@ -218,11 +221,11 @@ end
 -----------------------------------------------------------------------
 -- Starting point: Draws all the main elements which are later tailored
 function loadpanel()
-echo 'LOAD PANEL'
 	Chili = WG.Chili
 	local screen0 = Chili.Screen0
 	local selW  = 150
-	window0 		= Chili.Window:New{parent = screen0, x = "20%", y = "20%", width = "60%", height = "60%", padding = {5,5,5,5}}
+	--window0 		= Chili.Window:New{parent = screen0, x = "20%", y = "20%", width = "60%", height = "60%", padding = {5,5,5,5}}
+	window0 		= Chili.Panel:New{x = "0", y = "0", width = "100%", height = "100%", padding = {5,5,5,5}}
 
 	lineLabels 	= Chili.Control:New{parent = window0, right = 0, y = 0, width = 37, height = "100%", padding = {0,0,0,0},}
 	graphSelect	= Chili.StackPanel:New{minHeight = 70, parent = window0, x =  0, y = 0, width = selW, height = "100%",}
@@ -235,11 +238,13 @@ echo 'LOAD PANEL'
 			function(obj) graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(obj.name,obj.caption);end}}
 	end
 
+	--[[
 	local exitButton = Chili.Button:New{name = "exit", caption = "Exit", bottom = 0, right = 0, height = 30, width = 40 , parent = window0, OnClick = {
 		function() Spring.SendCommands("quit");end}}
 	local exitButton = Chili.Button:New{caption = "Delta", bottom = 0, right = 45, height = 30, width = 50 , parent = window0, OnClick = {
 		function()  isDelta = not isDelta; if curGraph.name then graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(curGraph.name,curGraph.caption)end;end}}
-
+--]]
+	WG.statsPanel = window0
 end
 
 --to do: possible to run from start when playing as spec
@@ -253,15 +258,8 @@ function widget:GameStart()
 end
 
 function widget:GameOver()
-	gameOver = true
+	--gameOver = true
 	Spring.SendCommands("endgraph 0")
-	--loadpanel()
+	loadpanel()
 end
 
-function widget:Initialize()
-	widgetHandler:RegisterGlobal("LoadEndGamePanel", loadpanel)
-end
-
-function widget:Shutdown()
-	widgetHandler:DeregisterGlobal("LoadEndGamePanel")
-end
