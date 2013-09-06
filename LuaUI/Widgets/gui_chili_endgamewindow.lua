@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili EndGame Window",
-    desc      = "v0.001 Chili EndGame Window. Creates award control and receives stats control from another widget.",
+    desc      = "v0.002 Chili EndGame Window. Creates award control and receives stats control from another widget.",
     author    = "CarRepairer",
     date      = "2013-09-05",
     license   = "GNU GPL, v2 or later",
@@ -138,7 +138,6 @@ local function ShowEndGameWindow()
 end
 
 function SetAwardList(awardList)
-	echo 'got award list'
 	WG.awardList = awardList
 	
 	ShowEndGameWindow()
