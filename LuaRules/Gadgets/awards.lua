@@ -645,7 +645,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 
 	local hp = spGetUnitHealth(unitID)
 	local damage = (hp > 0) and fullDamage or fullDamage + hp
-	local costdamage = (damage / UnitDefs[unitDefID].health) * UnitDefs[unitDefID].metalCost
+	local ud = UnitDefs[unitDefID]
+	local costdamage = (damage / ud.health) * ud.metalCost
 
 	if spAreTeamsAllied(attackerTeam, unitTeam) then
 		if not paralyzer then
@@ -655,8 +656,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 		if paralyzer then
 			AddAwardPoints( 'emp', attackerTeam, costdamage )
 		else
-			local attackedDef = UnitDefs[unitDefID]
-			if attackedDef.name == "chickenflyerqueen" or attackedDef.name == "chickenlandqueen" then
+			if ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
 				AddAwardPoints( 'heart', attackerTeam, damage )
 			end
 			AddAwardPoints( 'pwn', attackerTeam, costdamage )
