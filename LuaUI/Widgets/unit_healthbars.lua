@@ -165,7 +165,7 @@ local barColors = {
   stock   = { 0.50,0.50,0.50,barAlpha },
   reload  = { 0.00,0.60,0.60,barAlpha },
   reload2 = { 0.70,0.30,0.00,barAlpha },
-  jump    = { 0.70,0.20,0.20,barAlpha },
+  jump    = { 0.70,0.30,0.00,barAlpha },
   sheath  = { 0.00,0.20,1.00,barAlpha },
   fuel    = { 0.70,0.30,0.00,barAlpha },
   slow    = { 0.50,0.10,0.70,barAlpha },
@@ -809,9 +809,13 @@ do
 		  local slowState = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
 		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon - reverseCompat , 'reloadTime')
 		  ci.reloadTime = reloadTime
-          reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
-		  if (reload >= 0) then
-            AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
+		  -- When weapon is disabled the reload time is constantly set to be almost complete. 
+		  -- It results in a bunch of units walking around with 99% reload bars.
+		  if reloadFrame > gameFrame + 4 then -- UPDATE_PERIOD in unit_attributes.lua.
+            reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
+		    if (reload >= 0) then
+              AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
+		    end
 		  end
         end
       end
