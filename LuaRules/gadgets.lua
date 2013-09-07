@@ -848,7 +848,7 @@ function gadgetHandler:RegisterGlobal(owner, name, value)
   if ((name == nil)        or
       (_G[name])           or
       (self.globals[name]) or
-      (CallInsMap[name])) then
+      ((CallInsMap and CallInsMap[name]) or (CALLIN_MAP and CALLIN_MAP[name]))) then
     return false
   end
   _G[name] = value
