@@ -472,9 +472,10 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
+					local id = v.customparams.idstring
 					if id == "commweapon_beamlaser" or id == "commweapon_disruptor" or id == "commweapon_slowbeam" then
-						v.beamtime = v.beamtime + 10
-						v.coreThickness = v.coreThickness *3
+						-- v.beamtime = v.beamtime + 10 -- beamlaser has 0.1, it's in seconds
+						v.coreThickness = v.coreThickness * 3
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 2
 						end
