@@ -84,6 +84,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
+
       damage                  = {
         default = 41.25,
         planes  = 412.5,

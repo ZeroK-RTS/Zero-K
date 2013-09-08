@@ -55,6 +55,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
   objectName             = [[fighter.s3o]],
+  power                  = 50,
   script                 = [[fighter.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
@@ -151,6 +152,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
       cylinderTargeting       = 6,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 15,

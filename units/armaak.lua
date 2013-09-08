@@ -83,7 +83,11 @@ unitDef = {
       canattackground         = false,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 0.9,
@@ -129,7 +133,11 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 1.88,

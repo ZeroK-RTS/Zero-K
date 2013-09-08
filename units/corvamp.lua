@@ -52,6 +52,7 @@ unitDef = {
   modelCenterOffset      = [[0 8 2]],
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[fighter2.s3o]],
+  power                  = 100,
   script                 = [[corvamp.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
@@ -89,7 +90,11 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 1.1,
