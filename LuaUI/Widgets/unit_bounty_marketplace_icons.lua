@@ -10,7 +10,7 @@ function widget:GetInfo()
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -37,11 +37,19 @@ local myAllyTeamID = 666
 
 local imageDir = 'LuaUI/Images/bountymarketplaceicons/'
 
+local marketandbounty 	= false
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function ToBool(x)
-  return x and x ~= 0 and x ~= "false"
+local function tobool(val)
+  local t = type(val)
+  if (t == 'nil') then return false
+  elseif (t == 'boolean') then	return val
+  elseif (t == 'number') then	return (val ~= 0)
+  elseif (t == 'string') then	return ((val ~= '0') and (val ~= 'false'))
+  end
+  return false
 end
 
 function SetIcons(unitID, iconType)
@@ -118,7 +126,7 @@ end
 
 
 function widget:Initialize()
-	if not ToBool(Spring.GetModOptions().marketandbounty) then
+	if not tobool(Spring.GetModOptions().marketandbounty) then
 		echo('Marketplace and Bounty Icons: Widget removed.')
 		widgetHandler:RemoveWidget()
 	end 
