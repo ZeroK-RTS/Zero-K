@@ -10,7 +10,7 @@
 
 local moveDefs = {
 
-	KBOT1 = {
+	KBOT1_ = {
 		footprintx = 1,
 		footprintz = 1,
 		maxwaterdepth = 15,
@@ -78,7 +78,7 @@ local moveDefs = {
 		crushstrength = 5000,
 	},
 	
-	TKBOT1 = {		--allterrain
+	TKBOT1_ = {		--allterrain
 		footprintx = 1,
 		footprintz = 1,
 		maxwaterdepth = 15,
