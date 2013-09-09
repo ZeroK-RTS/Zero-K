@@ -18,7 +18,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-      helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses it's relatively high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy and assault weapon.]],
+      helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses it's (relatively) high speed to harass sea targets that cannot shoot back though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -57,7 +57,7 @@ unitDef = {
 
   weapons                = {
     {
-      def                = [[TORPCANNON]],
+      def                = [[TORPMISSILE]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM FIXEDWING HOVER LAND SINK TURRET FLOAT SHIP GUNSHIP]],
     },
@@ -70,33 +70,39 @@ unitDef = {
 
   weaponDefs             = {
 
-    TORPCANNON = {
-      name                    = [[Torpedo Projector]],
+    TORPMISSILE = {
+      name                    = [[Torpedo]],
       areaOfEffect            = 32,
-      craterBoost             = 0,
-      craterMult              = 0,
+      cegTag                  = [[missiletrailyellow]],
+      craterBoost             = 1,
+      craterMult              = 2,
 
       damage                  = {
-        default = 150,
-        subs    = 7.5,
+        default = 200,
+        subs    = 10,
       },
 
       explosionGenerator      = [[custom:INGEBORG]],
+      flightTime              = 3.5,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       model                   = [[wep_m_ajax.s3o]],
-      myGravity               = 0.1,
       noSelfDamage            = true,
       projectiles	          = 2,
       range                   = 240,
-      reloadtime              = 3,
+      reloadtime              = 4,
+      smokeTrail              = true,
       soundHit                = [[weapon/cannon/cannon_hit2]],
-	  soundHitVolume          = 6,
-      soundStart              = [[weapon/cannon/mini_cannon]],
-	  soundStartVolume        = 8,
+      soundStart              = [[weapon/missile/missile_fire9]],
+      startVelocity           = 140,
+      texture2                = [[lightsmoketrail]],
+      tolerance               = 1000,
+      tracks                  = true,
+      turnRate                = 16000,
       turret                  = true,
-      weaponType              = [[Cannon]],
+      weaponAcceleration      = 90,
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 200,
     },
 
@@ -109,7 +115,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 150,
+        default = 200,
       },
 
       edgeEffectiveness       = 0.99,
@@ -122,7 +128,7 @@ unitDef = {
       predictBoost            = 1,
       projectiles	      	  = 2,
       range                   = 240,
-      reloadtime              = 3,
+      reloadtime              = 4,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
       startVelocity           = 100,
@@ -147,10 +153,10 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 72,
+      metal            = 60,
       object           = [[amphraider3_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 72,
+      reclaimTime      = 60,
     },
 
     HEAP      = {
@@ -160,10 +166,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
+      metal            = 30,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 36,
+      reclaimTime      = 30,
     },
 
   },

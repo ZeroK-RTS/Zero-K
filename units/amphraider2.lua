@@ -80,7 +80,7 @@ unitDef = {
       craterMult              = 0,
 	  
 	  customParams            = {
-	    impulse = [[40]],
+	    impulse = [[30]],
 		normaldamage = [[1]],
 	  },
 	  
@@ -97,7 +97,7 @@ unitDef = {
       laserFlareSize          = 0,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 400,
+      range                   = 300,
       reloadtime              = 0.1,
       rgbColor                = [[0.2 0.2 0.3]],
       scrollSpeed             = 10,
