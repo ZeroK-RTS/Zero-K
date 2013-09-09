@@ -59,8 +59,8 @@ local flare2 = piece 'flare_l'
 --------------------------------------------------------------------------------
 smokePiece = {rotating_bas, mc_rocket_ho}
 
-local TURN_SPEED = 1.5
-local TILT_SPEED = 1.2
+local TURN_SPEED = 145
+local TILT_SPEED = 200
 local RELOAD_SPEED = 20
 local MOV_DEL = 50
 
@@ -104,9 +104,9 @@ local function IdleAnim()
 			loaded = true
 		end
 		
-		Spin(gear, y_axis, TURN_SPEED * 5 * rotateWise)
-		Spin(gear001, y_axis, TURN_SPEED * 5 * rotateWise)
-		Spin(gear002, y_axis, TURN_SPEED * 5 * rotateWise)
+		Spin(gear, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
+		Spin(gear001, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
+		Spin(gear002, y_axis, math.rad(TURN_SPEED) * 5 * rotateWise)
 	
 		Turn(rotating_bas, y_axis, heading, math.rad(60))
 		Turn(mc_rocket_ho, x_axis, math.rad(math.random(-25, 0)), math.rad(60))
@@ -353,13 +353,13 @@ function script.AimWeapon(num, heading, pitch)
 		loaded = true
 	end
 	
-	Turn( rotating_bas , y_axis, heading,  TURN_SPEED )
+	Turn( rotating_bas , y_axis, heading,  math.rad(TURN_SPEED) )
 	
-	Spin(gear, y_axis, TURN_SPEED * rotateWise * 5)
-	Spin(gear001, y_axis, TURN_SPEED * rotateWise * 5)
-	Spin(gear002, y_axis, TURN_SPEED * rotateWise * 5)	
+	Spin(gear, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
+	Spin(gear001, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
+	Spin(gear002, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)	
 	
-	Turn( mc_rocket_ho , x_axis, -pitch,  TILT_SPEED )
+	Turn( mc_rocket_ho , x_axis, -pitch,  math.rad(TILT_SPEED) )
 	WaitForTurn(rotating_bas, y_axis)
 	WaitForTurn(mc_rocket_ho, x_axis)	
 	
