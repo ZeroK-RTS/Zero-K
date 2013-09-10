@@ -1,4 +1,4 @@
-local versionNum = '0.300'
+local versionNum = '0.301'
 
 function widget:GetInfo()
 	return {
@@ -284,8 +284,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer
 , weaponDefID, attackerID, attackerDefID, attackerTeam )
 	if victim == unitID then
 		victimStillBeingAttacked = true
-		EstimateCrashLocation(unitID)
-		local frame = Spring.GetGameFrame() + 10
+		local frame = Spring.GetGameFrame() + 1
 		estimateInFuture[frame] = estimateInFuture[frame] or {}
 		estimateInFuture[frame][unitID] = true
 		--ech("still being attacked")
@@ -438,33 +437,26 @@ function EstimateCrashLocation(victimID)
 		return
 	end
 	local xVel,yVel,zVel = Spring.GetUnitVelocity(victimID)
-	local x,y,z = spGetUnitPosition(victimID)
 	local gravity = Game.gravity/30/30
 	if math.abs(yVel) < gravity*10 then --speed insignificant compared to gravity?
 		victimLandingLocation[victimID]=nil
 		return
 	end
-	local future_locationX, future_locationZ, future_height= 0,0,0
-	local hitGround=false
-	local reachApex = false
-	local iterationSoFar=1
-	local step =5 --how much gameframe to skip (set how much gameframe does 1 iteration will represent)
-	local maximumIteration = 360 --1 iteration crudely simulate 5 frame (skip 4 frame), therefore 360 iteration is roughly 2 minute simulation into future
-	while (not hitGround and iterationSoFar < maximumIteration) do --not hit ground yet?
-		local future_time = iterationSoFar*step
-		future_locationX =xVel*future_time
-		future_locationZ =zVel*future_time
-		future_height =(yVel)*future_time - (gravity/2)*future_time*future_time 
-		local groundHeight =spGetGroundHeight(future_locationX+x,future_locationZ+z)
-		if gravity*future_time >= yVel then --is falling down phase?
-			reachApex = true
-		end
-		if future_height+y <= groundHeight and reachApex then --reach ground & is falling down?
-			hitGround = true
-		end
-		iterationSoFar = iterationSoFar +1
+	local x,y,z = spGetUnitPosition(victimID)
+	local future_locationX, future_locationZ, future_height
+	if Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil) then
+		--Simple simulation:
+		future_locationX, future_height,future_locationZ = SimulateWithoutDrag(xVel,yVel,zVel, x,y,z, gravity)
+	else
+		--HARDCORE simulation!:
+		local radius = Spring.GetUnitRadius(victimID)
+		local mass = UnitDefs[defID].mass
+		local airDensity = 1.2/4 --see Spring/rts/Map/Mapinfo.cpp
+		future_locationX, future_height,future_locationZ = SimulateWithDrag(xVel,yVel,zVel, x,y,z, gravity ,mass,radius, airDensity)
 	end
-	victimLandingLocation[victimID]={future_locationX+x,future_height+y, future_locationZ+z}
+	if future_locationX then
+		victimLandingLocation[victimID]={future_locationX,future_height, future_locationZ}
+	end
 end
 
 function widget:Initialize()
@@ -482,4 +474,170 @@ end
 
 function widget:Shutdown()
 	gl.DeleteList(circleList)
+end
+---------------------------------
+---------------------------------
+-- SIMULATION / Prediction
+--a) simple balistic
+function SimulateWithoutDrag(xVel,yVel,zVel, x,y,z,gravity)
+	local hitGround=false
+	local reachApex = false
+	local iterationSoFar=1
+	local step =5 --how much gameframe to skip (set how much gameframe does 1 iteration will represent)
+	local maximumIteration = 360 --1 iteration crudely simulate 5 frame (skip 4 frame), therefore 360 iteration is roughly 2 minute simulation into future
+	local future_locationX, future_locationZ, future_height= 0,0,0
+	while (not hitGround and iterationSoFar < maximumIteration) do --not hit ground yet?
+		local future_time = iterationSoFar*step
+		future_locationX =xVel*future_time
+		future_locationZ =zVel*future_time
+		future_height =(yVel)*future_time - (gravity/2)*future_time*future_time 
+		local groundHeight =spGetGroundHeight(future_locationX+x,future_locationZ+z)
+		if gravity*future_time >= yVel then --is falling down phase?
+			reachApex = true
+		end
+		if future_height+y <= groundHeight and reachApex then --reach ground & is falling down?
+			hitGround = true
+		end
+		iterationSoFar = iterationSoFar +1
+	end
+	return future_locationX+x,future_height+y,future_locationZ+z
+end
+--b) complex balistic with airdrag
+--SOURCE CODE copied from: 
+--1) http://www2.hawaii.edu/~kjbeamer/
+--2) http://www.codeproject.com/Articles/19107/Flight-of-a-projectile
+--Some Theory from: 
+--1) Kamalu J. Beamer ,"Projectile Motion Using Runge-Kutta Methods" PDF, 13 April 2013
+--2) Vit Buchta, "Flight of Projectile" CodeProject article, 8 Jun 2007
+--(No copyright licence was stated)
+
+local function Vec2dot(X,Y) --a function that takes dot products of two specific vectors X and Y
+  local tmp={hrzn=0,vert=0};
+  tmp.hrzn = X.hrzn * Y.hrzn;
+  tmp.vert = X.vert * Y.vert;
+  return(tmp.hrzn+ tmp.vert);
+end
+
+local function Vec2sum(X,Y) --a function that adds two specific vectors X and Y
+  local tmp={hrzn=0,vert=0};
+  tmp.hrzn = X.hrzn + Y.hrzn;
+  tmp.vert = X.vert + Y.vert;
+  return(tmp);
+end
+
+local function Vec2sum4(W,X,Y,Z) --a function that sums four 3-vectors W,X,Y,Z
+  local tmp={hrzn=0,vert=0};
+  tmp.hrzn = W.hrzn + X.hrzn + Y.hrzn + Z.hrzn;
+  tmp.vert = W.vert + X.vert + Y.vert + Z.vert;
+  return(tmp);
+end
+
+local function Scalar_vec2mult(X,Y) --a function that multiplies vector Y by double X
+  local tmp = {hrzn=0,vert=0};
+  tmp.hrzn = X * Y.hrzn;
+  tmp.vert = X * Y.vert;
+  return(tmp);
+end
+
+local function f_x(t,x,v) --gives the formal definition of v = dx/dt
+	return(v)
+end
+
+local function f_v(t,xold,vold,mass,area,gravity,airDensity) -- a function that returns acceleration as a function of x, v and all other variables; all based on force law
+  local tmp = {hrzn=0,vert=0};
+  local rho=1
+  local b=(1.0/2.0)*airDensity*area*rho;
+  local horizontalSign = -1*math.abs(vold.hrzn)/vold.hrzn
+  local verticalSign = -1*math.abs(vold.vert)/vold.vert
+  --MethodA: current spring implementation--
+  tmp.hrzn = (b/mass)*(vold.hrzn*vold.hrzn)*horizontalSign;--horizontal is back-and-forth movement
+  tmp.vert = -gravity+(b/mass)*(vold.vert*vold.vert)*verticalSign; --is vertical movement
+  --MethodB: ideal implementation (more accurate to real airdrag, not implemented in spring)--
+  -- local totalVelocity = math.sqrt(vold.hrzn*vold.hrzn+vold.vert*vold.vert)
+  -- tmp.hrzn = (b/mass)*(totalVelocity*totalVelocity)*(vold.hrzn/totalVelocity)*horizontalSign;
+  -- tmp.vert = -g+(b/mass)*(totalVelocity*totalVelocity)*(vold.vert/totalVelocity)*verticalSign; 
+  return(tmp);
+end
+
+--4th order Runge-Kutta algorithm--
+--Numerical method for differential equation--
+--Algorithm:
+--[[
+for n=0,1,2....,N-1 do
+	k1=stepSize * derivativeOfEquation(currentX,currentV)
+	k2=stepSize * derivativeOfEquation(currentX+stepSize/2, currentV+k1/2)
+	k3=stepSize * derivativeOfEquation(currentX+stepSize/2, currentV+k2/2)
+	k4=stepSize * derivativeOfEquation(currentX+stepSize, currentV+k3)
+	nextX = currentX + stepSize
+	nextV = currentV + (k1+2*k2+2*k3+k4)/6
+end
+--]]
+--For projectile simulation:
+--The derivative of X is V (velocity), and the derivative of V is A (acceleration)
+--the equation for A is given as the Drag equation while X and V is not available due to complexity
+local function VecFRK4xv(ytype,t,xold, vold,dt,mass,area,gravity,airDensity)
+	local k1x = Scalar_vec2mult(dt,f_x(t,xold,vold));
+	local k1v = Scalar_vec2mult(dt,f_v(t,xold,vold,mass,area,gravity,airDensity));
+	local k2x = Scalar_vec2mult(dt,f_x(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k1x)),Vec2sum(vold,Scalar_vec2mult(0.5,k1v))));
+	local k2v = Scalar_vec2mult(dt,f_v(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k1x)),Vec2sum(vold,Scalar_vec2mult(0.5,k1v)),mass,area,gravity,airDensity));  
+	local k3x = Scalar_vec2mult(dt,f_x(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k2x)),Vec2sum(vold,Scalar_vec2mult(0.5,k2v))));
+	local k3v = Scalar_vec2mult(dt,f_v(t+dt/2.0,Vec2sum(xold,Scalar_vec2mult(0.5,k2x)),Vec2sum(vold,Scalar_vec2mult(0.5,k2v)),mass,area,gravity,airDensity));
+	local k4x = Scalar_vec2mult(dt,f_x(t+dt,Vec2sum(xold,k3x),Vec2sum(vold,k3v)));
+	local k4v = Scalar_vec2mult(dt,f_v(t+dt,Vec2sum(xold,k3x),Vec2sum(vold,k3v),mass,area,gravity,airDensity));
+	local k2x2 = Scalar_vec2mult(2.0,k2x);
+	local k2v2 = Scalar_vec2mult(2.0,k2v);
+	local k3x2 = Scalar_vec2mult(2.0,k3x);
+	local k3v2 = Scalar_vec2mult(2.0,k3v);
+
+	if (ytype==0) then
+		return(Scalar_vec2mult((1.0/6.0),Vec2sum4(k1x,k2x2,k3x2,k4x)));
+	else
+		return(Scalar_vec2mult((1.0/6.0),Vec2sum4(k1v,k2v2,k3v2,k4v)));
+	end
+end
+
+function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity)
+	radius = radius *0.01 --in centi-elmo (centimeter, or 10^-2) instead of elmo. See Spring/rts/Sim/Objects/SolidObject.cpp  
+	local horizontalVelocity = math.sqrt(velX*velX+velZ*velZ)
+	local horizontalAngle = math.atan2 (velX/horizontalVelocity, velZ/horizontalVelocity)
+	local hrznAngleCos = math.cos(horizontalAngle)
+	local hrznAngleSin = math.sin(horizontalAngle)
+
+	local area=(radius*radius)*math.pi;
+
+	local xold={hrzn=0,vert=0}; --position
+	local vold={hrzn=0,vert=0}; --velocity
+	local currPosition = {x=0,y=0,z=0}
+
+	vold.hrzn = horizontalVelocity --initial horizontal component of velocity
+	vold.vert = velY --initial vertical component of velocity
+
+	xold.hrzn = 0.0; --initial at the origin
+	xold.vert = 0.0;
+
+	--PRINT OUT A TABLE OF TRAJECTORY:
+	-- Spring.Echo("Time    dist-Pos    dist-Vel    vert-Pos    vert-Vel");
+	-- Spring.Echo(t0.. " " .. xold.hrzn .. " " .. vold.hrzn .. " " .. xold.vert .. " " .. vold.vert);
+	
+	local t0 = 0; --initial frame
+	local dt = 15; --frame increment
+	local Tmax = 1800 --max 2 minute
+	for t=t0,Tmax,dt do
+		local xt = Vec2sum(xold,VecFRK4xv(0,t,xold,vold,dt,mass,area,gravity,airDensity));
+		local vt = Vec2sum(vold,VecFRK4xv(1,t,xold,vold,dt,mass,area,gravity,airDensity));
+		xold = xt;
+		vold = vt;
+		currPosition.x = xt.hrzn*hrznAngleSin + x --break down xt.hrzn (distance) into components. Note: math.sin for X and math.cos for Z due to orientation of x & z axis in Spring.
+		currPosition.z = xt.hrzn*hrznAngleCos + z
+		currPosition.y = xt.vert + y
+		local groundHeight =spGetGroundHeight(currPosition.x,currPosition.z)
+		if currPosition.y < groundHeight then --if the unit hits the ground, stop calculating...
+			break;
+		end
+		-- Spring.Echo(t.. " " .. xold.hrzn .. " " .. vold.hrzn .. " " .. xold.vert .. " " .. vold.vert);
+	end
+	if xold.hrzn then
+		return currPosition.x,currPosition.y ,currPosition.z
+	end
+	return
 end
