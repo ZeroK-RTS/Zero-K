@@ -98,7 +98,7 @@ unitDef = {
 	  customParams        = {
 	    disarmDamageMult = 1,
 		disarmDamageOnly = 1,
-		disarmTimer      = 13, -- seconds
+		disarmTimer      = 16, -- seconds
 	  
 	  },
 	  
