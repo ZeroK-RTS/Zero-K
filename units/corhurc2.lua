@@ -45,7 +45,7 @@ unitDef = {
   mass                = 180,
   maxAcc              = 0.5,
   maxDamage           = 700,
-  maxAileron          = 0.02,
+  maxAileron          = 0.018,
   maxElevator         = 0.02,
   maxRudder           = 0.008,
   maxFuel             = 1000000,
@@ -70,7 +70,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
-  turnRadius          = 350,
+  turnRadius          = 50,
   workerTime          = 0,
 
   weapons             = {

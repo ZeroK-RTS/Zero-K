@@ -44,15 +44,10 @@ unitDef = {
   maneuverleashlength = [[1380]],
   mass                = 234,
   maxAcc              = 0.5,
-  maxAileron          = 0.015,
-  maxBank             = 0.8,
-  maxDamage           = 1100,
-  maxAileron          = 0.02,
+  maxDamage           = 700,
   maxElevator         = 0.02,
-  maxRudder           = 0.008,
+  maxRudder           = 0.006,
   maxFuel             = 1000000,
-  maxRudder           = 0.004,
-  maxVelocity         = 7.8,
   maxVelocity         = 7.8,
   minCloakDistance    = 75,
   noAutoFire          = false,
@@ -73,7 +68,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
-  turnRadius          = 350,
+  turnRadius          = 80,
   workerTime          = 0,
 
   weapons             = {
