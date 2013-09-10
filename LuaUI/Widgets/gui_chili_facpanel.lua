@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.001"
+local version = "v0.002"
 
 function widget:GetInfo()
   return {
@@ -135,6 +135,11 @@ local push        = table.insert
 
 
 -------------------------------------------------------------------------------
+
+--temporary function until "#" is restored.
+local function GetUnitPic(unitDefID)
+	return 'unitpics/' .. UnitDefs[unitDefID].name .. '.png'
+end
 
 local function GetBuildQueue(unitID)
   local result = {}
@@ -287,7 +292,8 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		children = {
 			unitID ~= 0 and
 				Image:New {
-					file = "#"..unitDefID,
+					--file = "#"..unitDefID, -- do not remove this line
+					file = GetUnitPic(unitDefID),
 					file2 = WG.GetBuildIconFrame(UnitDefs[unitDefID]),
 					keepAspect = false;
 					x = '5%',
@@ -416,7 +422,8 @@ local function MakeButton(unitDefID, facID, facIndex)
 				Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, x=2, bottom=2, fontShadow = true, },
 				Image:New {
 					name = 'bp',
-					file = "#"..unitDefID,
+					--file = "#"..unitDefID, -- do not remove this line
+					file = GetUnitPic(unitDefID),
 					file2 = WG.GetBuildIconFrame(ud),
 					keepAspect = false;
 					width = '100%',height = '80%',
@@ -474,6 +481,38 @@ local function WaypointHandler(x,y,button)
   --if not shift then waypointMode = 0; return true end
 end
 
+local function MakeClearButton(unitID)
+	return Button:New{
+		name = 'clearfac-' .. unitID,
+		tooltip='Clear Factory Queue',
+		x=0,
+		caption='',
+		width = options.buttonsize.value,
+		height = options.buttonsize.value,
+		padding = {4, 4, 4, 4},
+		backgroundColor = queueColor,
+		OnClick = {
+			function(_,_,_,button)
+				local buildQueue = Spring.GetFactoryCommands (unitID)               
+				for _, buildCommand in ipairs( buildQueue) do
+					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
+				end
+			end
+		},
+		children = {
+			Image:New{
+				file='LuaUI/images/drawingcursors/eraser.png',
+				width="100%";
+				height="100%";
+				x="0%";
+				y="0%";
+			}
+		},
+		
+	}
+	
+end
+
 RecreateFacbar = function()
 	enteredTweak = false
 	if inTweak then return end
@@ -516,6 +555,8 @@ RecreateFacbar = function()
 			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, i) )
 			qStore[i .. '|' .. unitDefIDb] = MakeButton(unitDefIDb, facInfo.unitID, i)
 		end
+		
+		boStack:AddChild( MakeClearButton( facInfo.unitID ) )
 		
 	end
 
@@ -741,7 +782,7 @@ function widget:Initialize()
 	
 	stack_build = Panel:New{
 		y=20,
-		x=options.buttonsize.value*1.2 + 8, 
+		x=options.buttonsize.value*1.2 + 0, 
 		right=0,
 		bottom=0,
 		
