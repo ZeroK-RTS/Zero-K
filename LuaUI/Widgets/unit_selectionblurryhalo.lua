@@ -4,10 +4,10 @@
 function widget:GetInfo()
   return {
     name      = "Selection BlurryHalo",
-    desc      = "Shows a halo for selected and hovered units. (Doesn't work on ati cards!)",
+    desc      = "Shows a halo for selected, hovered ally-selected units. (Doesn't work on ati cards!)",
     author    = "CarRepairer, from jK's gfx_halo",
     date      = "Jan, 2008",
-    version   = "0.0002",
+    version   = "0.003",
     license   = "GNU GPL, v2 or later",
     layer     = -11,
     enabled   = false  --  loaded by default?
@@ -220,6 +220,9 @@ local blur_v = function()
 end
 
 function widget:DrawWorldPreUnit()
+  if Spring.IsGUIHidden() then
+	return
+  end
   glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
 
   glBlending(true)
