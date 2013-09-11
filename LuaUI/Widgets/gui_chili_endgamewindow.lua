@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili EndGame Window",
-    desc      = "v0.003 Chili EndGame Window. Creates award control and receives stats control from another widget.",
+    desc      = "v0.004 Chili EndGame Window. Creates award control and receives stats control from another widget.",
     author    = "CarRepairer",
     date      = "2013-09-05",
     license   = "GNU GPL, v2 or later",
@@ -102,13 +102,15 @@ local function SetTeamNamesAndColors()
 end
 
 local function MakeAwardPanel(awardType, record)
+	local desc = awardDescs[awardType]
+	local fontsize = desc:len() > 25 and 12 or 16
 	return Panel:New{
 		width=230;
 		height=awardPanelHeight;
 		children = {
 			Image:New{ file='LuaRules/Images/awards/trophy_'.. awardType ..'.png'; 		parent=awardPanel; x=0;y=0; width=30; height=40; };
-			Label:New{ caption = awardDescs[awardType], autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0 };
-			Label:New{ caption = record, 				autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=20 };
+			Label:New{ caption = desc; 		autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=0;	textColor={1,1,0,1}; fontsize=fontsize; };
+			Label:New{ caption = record, 	autosize=true, height=L_HEIGHT, parent=awardPanel; x=35; y=20 };
 		}
 	}
 end
@@ -130,7 +132,7 @@ local function ShowEndGameWindow()
 			playerHasAward = true
 		end
 		if playerHasAward then
-			Label:New{ caption = teamNames[teamID], width=120; valign='center'; autosize=false, height=awardPanelHeight; textColor=teamColors[teamID]; 	parent=awardSubPanel }
+			Label:New{ caption = teamNames[teamID], width=120; fontShadow = true; valign='center'; autosize=false, height=awardPanelHeight; textColor=teamColors[teamID]; 	parent=awardSubPanel }
 		
 			for awardType, record in pairs(awards) do
 				
