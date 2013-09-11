@@ -60,12 +60,12 @@ local spSetUnitShieldState	= Spring.SetUnitShieldState
 local spSetUnitWeaponState	= Spring.SetUnitWeaponState
 local spSetUnitStockpile	= Spring.SetUnitStockpile
 local spSetUnitNeutral		= Spring.SetUnitNeutral
+local spGetUnitIsBuilding	= Spring.GetUnitIsBuilding
 local spGiveOrderToUnit		= Spring.GiveOrderToUnit
 local spCreateFeature		= Spring.CreateFeature
 local spSetFeatureDirection	= Spring.SetFeatureDirection
 local spSetFeatureHealth	= Spring.SetFeatureHealth
 local spSetFeatureReclaim	= Spring.SetFeatureReclaim
-
 
 local cmdTypeIconModeOrNumber = {
 	[CMD.AUTOREPAIRLEVEL] = true,
@@ -80,6 +80,9 @@ local savedata = {
 	gadgets = {}
 }
 
+local toCleanupFactory = {}
+local cleanupFrame
+local autosave = false
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 local function ReadFile(zip, name, file)
@@ -144,6 +147,7 @@ end
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 local function LoadUnits()
+	local factoryBuildeesToDelete = {}
 	-- prep units
 	for oldID, data in pairs(savedata.unit) do
 		local px, py, pz = unpack(data.pos)
@@ -229,7 +233,33 @@ local function LoadUnits()
 			opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")} 
 			Spring.GiveOrderToUnit(data.newID, command.id, params, opts)
 		end
-	end	
+		
+		if data.factoryData then
+			for i=1,#data.factoryData.commands do
+				local facCmd = data.factoryData.commands[i]
+				local opts = facCmd.options
+				local alt, ctrl, shift, right = opts.alt, opts.ctrl, opts.shift, opts.right
+				opts = {(alt and "alt"), (shift and "shift"), (ctrl and "ctrl"), (right and "right")} 
+				Spring.GiveOrderToUnit(data.newID, facCmd.id, facCmd.params, opts)
+			end
+			if data.factoryData.buildee then
+				local buildeeData = data.factoryData.buildee
+				local index = #factoryBuildeesToDelete+1
+				buildeeData.unitID = GetNewUnitID(buildeeData.unitID)
+				buildeeData.factoryID =  GetNewUnitID(buildeeData.factoryID)
+				factoryBuildeesToDelete[index] = buildeeData
+			end
+		end
+	end
+	
+	for i=1,#factoryBuildeesToDelete do
+		local buildeeData = factoryBuildeesToDelete[i]
+		--Spring.DestroyUnit(buildeeData.unitID, false, true)	-- clear the unit so factory can build it again
+		Spring.SetUnitBlocking(buildeeData.unitID, false, false, false)
+		toCleanupFactory[#toCleanupFactory + 1] = buildeeData
+		--Spring.GiveOrderToUnit(buildeeData.factoryID, CMD.INSERT, {0, -buildeeData.unitDefID, CMD.OPT_ALT}, {"alt", "ctrl"})
+	end
+	cleanupFrame = Spring.GetGameFrame() + 75	-- needs to be some time to allow for factory opening animations
 end
 
 local function LoadFeatures()
@@ -300,6 +330,30 @@ function gadget:Load(zip)
 	LoadFeatures()	-- do features before units so we can change unit orders involving features to point to new ID
 	LoadUnits()
 	SetStorage()
+	
+	Spring.SetGameRulesParam("loadedGame", 1)
+end
+
+function gadget:GameFrame(n)
+	if autosave and n % AUTOSAVE_FREQUENCY == 0 then
+		Spring.SendCommands("save -y autosave")
+	end
+	
+	if n == cleanupFrame then
+		for i=1,#toCleanupFactory do
+			local data = toCleanupFactory[i]
+			local factoryID = data.factoryID
+			if factoryID and (not Spring.GetUnitIsDead(factoryID)) then
+				Spring.DestroyUnit(data.unitID, false, true)	-- clear the existing unit so factory can build it again
+				local producedUnitID = spGetUnitIsBuilding(factoryID)
+				if (producedUnitID) then
+					spSetUnitHealth(producedUnitID, {health = data.health, capture = data.capture, paralyze = data.paralyze, build = data.build})
+				end
+			end
+		end
+		cleanupFrame = nil
+		toCleanupFactory = nil
+	end
 end
 
 -----------------------------------------------------------------------------------
@@ -325,6 +379,7 @@ local spGetUnitBasePosition	= Spring.GetUnitBasePosition
 local spGetUnitVelocity		= Spring.GetUnitVelocity
 local spGetUnitExperience	= Spring.GetUnitExperience
 local spGetUnitWeaponState	= Spring.GetUnitWeaponState
+local spGetUnitIsBuilding	= Spring.GetUnitIsBuilding
 local spGetFeatureDefID		= Spring.GetFeatureDefID
 local spGetFeatureAllyTeam	= Spring.GetFeatureAllyTeam
 local spGetFeatureHealth	= Spring.GetFeatureHealth
@@ -343,9 +398,6 @@ local savedata = {
 	feature = {},
 	gadgets = {},
 }
-
-local autosave = true
-local autosaveFreq = 30*60*10	-- every 10 minutes
 
 --------------------------------------------------------------------------------
 -- I/O utility functions
@@ -478,7 +530,8 @@ local function SaveUnits()
 		
 		-- basic unit information
 		local unitDefID = spGetUnitDefID(unitID)
-		unitInfo.unitDefName = UnitDefs[unitDefID].name
+		local unitDef = UnitDefs[unitDefID]
+		unitInfo.unitDefName = unitDef.name
 		local unitTeam = spGetUnitTeam(unitID)
 		unitInfo.unitTeam = unitTeam
 		local neutral = spGetUnitNeutral(unitID)
@@ -490,7 +543,7 @@ local function SaveUnits()
 		-- save health
 		unitInfo.health, unitInfo.maxHealth, unitInfo.paralyzeDamage, unitInfo.captureProgress, unitInfo.buildProgress = spGetUnitHealth(unitID)
 		-- save weapons
-		local weapons = UnitDefs[unitDefID].weapons
+		local weapons = unitDef.weapons
 		unitInfo.weapons = {}
 		unitInfo.shield = {}
 		for i=1,#weapons do
@@ -503,6 +556,28 @@ local function SaveUnits()
 		end
 		unitInfo.stockpile = {}
 		unitInfo.stockpile.num, _, unitInfo.stockpile.progress = spGetUnitStockpile(unitID)
+		
+		-- factory properties
+		if unitDef.isFactory then
+			local factoryCommands = Spring.GetFactoryCommands(unitID) or {}
+			unitInfo.factoryData = { commands = factoryCommands }
+			local producedUnitID = spGetUnitIsBuilding(unitID)
+			if (producedUnitID) then
+				local producedDefID = spGetUnitDefID(producedUnitID)
+				if (producedDefID) then
+					local health, _, paralyze, capture, build = spGetUnitHealth(producedUnitID)
+					unitInfo.factoryData.buildee = {
+						factoryID = unitID,
+						unitID = producedUnitID,
+						unitDefID = producedDefID,
+						health = health,
+						paralyze = paralyze,
+						capture = capture,
+						build = build,
+					}
+				end
+			end
+		end
 		
 		-- save commands and states
 		local commands = spGetUnitCommands(unitID)
@@ -606,12 +681,6 @@ end
 
 function gadget:Initialize()
 
-end
-
-function gadget:GameFrame(n)
-	if n % AUTOSAVE_FREQUENCY == 0 then
-		--Spring.SendCommands("save -y autosave")
-	end
 end
 -----------------------------------------------------------------------------------
 --  END UNSYNCED
