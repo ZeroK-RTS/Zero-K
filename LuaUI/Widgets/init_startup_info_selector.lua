@@ -1,4 +1,4 @@
-local versionNumber = "1.2"
+local versionNumber = "1.21"
 
 function widget:GetInfo()
 	return {
@@ -29,6 +29,7 @@ _ Make each player broadcast their choice to their team in a way it can be used 
 ----------------------------------------------
 local debug	= false --generates debug message
 local Echo	= Spring.Echo
+local spGetGameRulesParam = Spring.GetGameRulesParam
 
 local coop = (Spring.GetModOptions().coop == 1) or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"

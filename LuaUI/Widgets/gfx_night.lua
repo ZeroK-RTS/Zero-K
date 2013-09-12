@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.5"
+local versionNumber = "v1.5.6"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -8,7 +8,7 @@ function widget:GetInfo()
     name      = "Night",
     desc      = versionNumber .. " Makes map appear as nighttime and gives units searchlights.\n",
     author    = "Evil4Zerggin; based on jK's darkening widget",
-    date      = "28 September 2008,2012",
+    date      = "28 September 2008,2012,12 September 2013",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -19,11 +19,11 @@ end
 --config
 --------------------------------------------------------------------------------
 
-local nightColorMap        = {{0.2, 0.25, 0.3}, --midnight
-                              {0.2, 0.25, 0.3},
-                              {0.2, 0.25, 0.3},
+local nightColorMap        = {{0.2, 0.2, 0.2}, --midnight
+                              {0.2, 0.2, 0.2},
+                              {0.2, 0.2, 0.2},
                               
-							  {0.4, 0.5, 0.6},
+							  {0.2, 0.4, 0.6}, --dawn
                               {1, 0.8, 0.6},
                               {1, 1, 1},
                               {1, 1, 1},
@@ -32,10 +32,10 @@ local nightColorMap        = {{0.2, 0.25, 0.3}, --midnight
                               {1, 1, 1},
                               {1, 1, 1},
                               
-                              {1, 0.8, 0.6},
-                              {0.4, 0.5, 0.6},
-							  {0.2, 0.25, 0.3},
-                              {0.2, 0.25, 0.3},}
+                              {1, 0.8, 0.6}, --sunset
+                              {0.2, 0.4, 0.6},
+							  {0.2, 0.2, 0.2},
+                              {0.2, 0.2, 0.2},}
                               
 local searchlightBeamColor = {1, 1, 0.75, 0.05}  --searchlight beam color
 local searchlightStrength  = 0.6                 --searchlight strength; <= 0 to turn off
@@ -59,7 +59,7 @@ local secondsPerDay        = 600                 --seconds per day
 
 local currColor, currColorInverse
 
-local hoursPerDay = #nightColorMap
+local hoursPerDay = #nightColorMap --14hours per day
 
 local currDayTime
 
@@ -76,7 +76,7 @@ local vsx, vsy
 local function UpdateColors() end	-- redefined below
 
 options_path = 'Settings/Graphics/Effects/Night View'
-options_order = {"coloredUnits", "cycle", "time", "beam", "bases"}
+options_order = {"coloredUnits", "cycle", "time","secperday", "beam", "bases"}
 options = {
 	--[[
 	night = {
@@ -102,15 +102,27 @@ options = {
 		name = "Time of day",
 		type = 'number',
 		min = 0, 
-		max = 0.9, 
-		step = 0.1,
-		value = 0.2,
-		desc = 'Starting time of day',
+		max = 0.5, 
+		step = 0.05,
+		value = 0.4,
+		desc = 'Starting Time of day.\n <--Midnight, Noon-->',
 		OnChange = function(self)
 			currDayTime = self.value
 			UpdateColors()
 		end, 
-	},			
+	},
+	secperday = {
+		name = "Game Minute Per Day",
+		type = 'number',
+		min = 1, 
+		max = 101, 
+		step = 1,		
+		value = 10,
+		OnChange = function(self)
+			secondsPerDay = self.value*60
+			Spring.Echo(self.value .. " Minute") 
+		end,
+	},	
 	beam = {
 		name = "Searchlight Beams",
 		type = 'bool',
@@ -181,7 +193,7 @@ local RADIANS_PER_COBANGLE = math.pi / 32768
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 UpdateColors = function()
-  local currHour = math.floor(currDayTime * hoursPerDay) + 1
+  local currHour = math.floor(currDayTime * hoursPerDay) + 1 -- ((0 to 1) * 14) + 1
   local currHourPart = currDayTime * hoursPerDay - currHour + 1
   local startColor = nightColorMap[currHour]
   local endColor
@@ -451,12 +463,12 @@ function widget:Update(dt)
     update = update + dt
     searchlightBuildingAngle = searchlightBuildingAngle + dt * speedFactor
     if update > updatePeriod then
-      if (options.cycle.value) then
-	currDayTime = currDayTime + update * speedFactor / secondsPerDay
-	currDayTime = currDayTime - math.floor(currDayTime)
-	UpdateColors()
-      end
-      update = 0
+		if (options.cycle.value) then
+			currDayTime = currDayTime + update * speedFactor / secondsPerDay
+			currDayTime = currDayTime - math.floor(currDayTime) --currDayTime range from 0 -> 1
+			UpdateColors()
+		end
+		update = 0
     end
   end
 end
