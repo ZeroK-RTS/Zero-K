@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.6"
+local versionNumber = "v1.5.7"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -39,14 +39,14 @@ local nightColorMap        = {{0.2, 0.2, 0.2}, --midnight
                               
 local searchlightBeamColor = {1, 1, 0.75, 0.05}  --searchlight beam color
 local searchlightStrength  = 0.6                 --searchlight strength; <= 0 to turn off
-local searchlightHeightOffset = 0.5              --raises searchlight above unit's middle by this multiple of the unit's radius
+local searchlightHeightOffset = 1              --raises searchlight above unit's feet by this multiple of the unit's radius
 local preUnit              = true                --if true, night is applied pre-unit
 local drawBeam             = true                --if true, will draw the searchlight beam
 local baseType             = 2               --0: off, 1: simple, 2: full
 
 local searchlightVertexCount       = 16          --roughly many vertices to use
 
-local searchlightAirLeadTime       = 2           --roughly how many seconds ahead the searchlight aims
+local searchlightAirLeadTime       = 0.5           --roughly how many seconds ahead the searchlight aims
 local searchlightGroundLeadTime    = 1           --roughly how many seconds ahead the searchlight aims
 
 local dayNightCycle        = true                --enables day/night cycle
@@ -115,9 +115,9 @@ options = {
 		name = "Game Minute Per Day",
 		type = 'number',
 		min = 1, 
-		max = 101, 
+		max = 100, 
 		step = 1,		
-		value = 10,
+		value = 2,
 		OnChange = function(self)
 			secondsPerDay = self.value*60
 			Spring.Echo(self.value .. " Minute") 
@@ -213,20 +213,23 @@ UpdateColors = function()
                        1}
 end
 
-local function BaseVertices(baseX, baseZ, radius, ecc, heading)
+local function BaseVertices(baseX, baseZ, radius, ecc, heading,yOffset)
+  if yOffset then
+	yOffset = GetGroundHeight(baseX, baseZ) + yOffset
+  end
   local theta = heading
   while theta < heading + 2 * math.pi do
     local denom = (1 - ecc * math.cos(theta - heading))
     local vx = baseX + radius * math.cos(theta) / denom
     local vz = baseZ + radius * math.sin(theta) / denom
-    local vy = math.max(GetGroundHeight(vx, vz), 0)
+    local vy = yOffset or math.max(GetGroundHeight(vx, vz), 0) --follow ground contour
     glVertex(vx, vy, vz)
     theta = theta + searchlightVertexIncrement * denom 
   end
   local denom = 1 - ecc
   local vx = baseX + radius * math.cos(heading) / denom
   local vz = baseZ + radius * math.sin(heading) / denom
-  local vy = math.max(GetGroundHeight(vx, vz), 0)
+  local vy = yOffset or  math.max(GetGroundHeight(vx, vz), 0)
   glVertex(vx, vy, vz)
 end
 
@@ -243,9 +246,9 @@ local function ConeVertices(baseX, baseZ, radius, ecc, heading, cx, cy, cz)
   BaseVertices(baseX, baseZ, radius, ecc, heading)
 end
 
-local function BeamVertices(baseX, baseZ, radius, ecc, heading, px, py, pz)
+local function BeamVertices(baseX, baseZ, radius, ecc, heading, px, py, pz, yOffset)
   glVertex(px, py, pz)
-  BaseVertices(baseX, baseZ, radius, ecc, heading)
+  BaseVertices(baseX, baseZ, radius, ecc, heading,yOffset)
 end
 
 local function DrawNight()
@@ -285,7 +288,7 @@ local function DrawSearchlights()
 	if GetUnitPosition(unitID) and not GetUnitIsDead(unitID) then
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 		local unitRadius = GetUnitRadius(unitID) or 10
-		local _,_,_,px, py, pz = GetUnitPosition(unitID,true) --get mid position. Since Spring 89: it return baseposition instead of midposition unless you add "true" to second argument.
+		local px, py, pz = GetUnitPosition(unitID,true) --get mid position. Since Spring 89: it return baseposition instead of midposition unless you add "true" to second argument.
 		local relativeHeight = searchlightHeightOffset * unitRadius
 		py = py + relativeHeight
 		local groundy = math.max(GetGroundHeight(px, pz), 0)
@@ -307,46 +310,62 @@ local function DrawSearchlights()
 		  local heading
 		  local baseX, baseZ
 		  local speed = unitDef.speed
+		  local leadDist_to_height_ratio = 1
+		  local isAboveNominalHeight = false
 		  
 		  if (not speed or speed == 0) then
 			heading = searchlightBuildingAngle * (0.5 + ((unitID * 137) % 256) / 512)
 			leadDistance = unitRadius * 2
+			leadDist_to_height_ratio = leadDistance/relativeHeight
 			radius = unitRadius
 		  elseif (unitDef.type == "Bomber" or unitDef.type == "Fighter") then
 			local vx, _, vz = GetUnitVelocity(unitID)
 			heading = math.atan2(vz, vx)
 			leadDistance = searchlightAirLeadTime * math.sqrt(vx * vx + vz * vz) * 30
+			relativeHeight = relativeHeight+unitDef.wantedHeight--nominal search light height is unit height + flying height distance
+			leadDist_to_height_ratio = leadDistance/relativeHeight
 			radius = unitRadius * 2
 		  elseif (unitDef.canFly) then
 			heading = -1*(GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
 			local range = math.max(unitDef.buildDistance, unitDef.maxWeaponRange)
-			leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight, 0)) * 0.8
+			leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight,0)) * 0.8
+			relativeHeight = relativeHeight+unitDef.wantedHeight
+			leadDist_to_height_ratio = leadDistance/relativeHeight
 			radius = unitRadius * 2
 		  else
 			heading = -1*(not (GetUnitIsDead(unitID)) and GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
 			leadDistance = searchlightGroundLeadTime * speed
+			leadDist_to_height_ratio = leadDistance/relativeHeight
 			radius = unitRadius
 		  end
 		  
-		  baseX = px + leadDistance * math.cos(heading)
-		  baseZ = pz + leadDistance * math.sin(heading)
-		  ecc = math.min(1 - 2 / (leadDistance / absHeight + 2), 0.75)
+		  local newLeadDist = math.min(leadDist_to_height_ratio*absHeight,leadDistance*2) --limit searchlight distance to 2x the expected distance (beam distance usually become longer if unit jump and become shorter if a gunship/airplane land)
+		  baseX = px + newLeadDist * math.cos(heading)
+		  baseZ = pz + newLeadDist * math.sin(heading)
+		  ecc = math.min(1 - 2 / (newLeadDist / absHeight + 2), 0.75)
 		  
 		  --base
 		  glBlending(GL_DST_COLOR, GL_ONE)
 		  glColor(currColorInverse)
 		  
 		  --scale radius based on height--
-		  local originalRatio= radius/math.sqrt(leadDistance*leadDistance+ relativeHeight*relativeHeight) --ratio of radius-over-distance for original beam
-		  local newSize = originalRatio*math.sqrt(leadDistance*leadDistance+ absHeight*absHeight) --explaination: The same radius-over-distance ratio must apply for all height
-		  radius = newSize
+		  local radius_to_leadDist_ratio= radius/math.sqrt(leadDistance*leadDistance+ relativeHeight*relativeHeight) --ratio of radius-over-distance for original beam
+		  local newRadius = radius_to_leadDist_ratio*math.sqrt(newLeadDist*newLeadDist+ absHeight*absHeight) --explaination: newRadius/newHeight = oldRadius/oldHeight (The same radius-over-distance ratio must apply for all height)
+		  if newRadius/radius >= 2 then
+			isAboveNominalHeight = true
+			radius = radius*2
+		  else
+			radius = newRadius
+		  end
 		  
-		  if (options.bases.value == "full") then
-			glDepthTest(true)
-			glBeginEnd(GL_TRIANGLE_FAN, ConeVertices, baseX, baseZ, radius, ecc, heading, cx, cy, cz, groundy)
-		  elseif (options.bases.value == "simple") then
-			glDepthTest(false)
-			glBeginEnd(GL_POLYGON, BaseVertices, baseX, baseZ, radius, ecc, heading)
+		  if not isAboveNominalHeight then
+			  if (options.bases.value == "full") then --highlight ground
+				glDepthTest(true)
+				glBeginEnd(GL_TRIANGLE_FAN, ConeVertices, baseX, baseZ, radius, ecc, heading, cx, cy, cz, groundy)
+			  elseif (options.bases.value == "simple") then
+				glDepthTest(false)
+				glBeginEnd(GL_POLYGON, BaseVertices, baseX, baseZ, radius, ecc, heading)
+			  end
 		  end
 		  
 		  --beam
@@ -355,7 +374,7 @@ local function DrawSearchlights()
 		  if (options.beam.value) then
 			glColor(searchlightBeamColor)
 			glDepthTest(true)
-			glBeginEnd(GL_TRIANGLE_FAN, BeamVertices, baseX, baseZ, radius, ecc, heading, px, py, pz)
+			glBeginEnd(GL_TRIANGLE_FAN, BeamVertices, baseX, baseZ, radius, ecc, heading, px, py, pz,isAboveNominalHeight and absHeight/2)
 		  end
 		  
 		  glColor(1, 1, 1, 1)
@@ -458,13 +477,13 @@ end
 local update = 0
 local updatePeriod = 0.25
 function widget:Update(dt)
-  local _, speedFactor, paused = GetGameSpeed()
+  local userSpeed, speedFactor, paused = GetGameSpeed()
   if (not paused) then
     update = update + dt
-    searchlightBuildingAngle = searchlightBuildingAngle + dt * speedFactor
+    searchlightBuildingAngle = searchlightBuildingAngle + dt * userSpeed
     if update > updatePeriod then
 		if (options.cycle.value) then
-			currDayTime = currDayTime + update * speedFactor / secondsPerDay
+			currDayTime = currDayTime + update * userSpeed / secondsPerDay
 			currDayTime = currDayTime - math.floor(currDayTime) --currDayTime range from 0 -> 1
 			UpdateColors()
 		end
