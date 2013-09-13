@@ -70,7 +70,7 @@ unitDef = {
   weaponDefs             = {
 
     WATERCANNON = {
-      name                    = [[Laserbeam]],
+      name                    = [[Water Cutter]],
       areaOfEffect            = 128,
       beamTime                = 0.01,
 	  beamTtl                 = 10,
