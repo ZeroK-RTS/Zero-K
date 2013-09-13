@@ -137,9 +137,11 @@ local push        = table.insert
 -------------------------------------------------------------------------------
 
 --temporary function until "#" is restored.
+--[[
 local function GetUnitPic(unitDefID)
 	return 'unitpics/' .. UnitDefs[unitDefID].name .. '.png'
 end
+--]]
 
 local function GetBuildQueue(unitID)
   local result = {}
@@ -292,8 +294,8 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		children = {
 			unitID ~= 0 and
 				Image:New {
-					--file = "#"..unitDefID, -- do not remove this line
-					file = GetUnitPic(unitDefID),
+					file = "#"..unitDefID, -- do not remove this line
+					--file = GetUnitPic(unitDefID),
 					file2 = WG.GetBuildIconFrame(UnitDefs[unitDefID]),
 					keepAspect = false;
 					x = '5%',
@@ -422,8 +424,8 @@ local function MakeButton(unitDefID, facID, facIndex)
 				Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, x=2, bottom=2, fontShadow = true, },
 				Image:New {
 					name = 'bp',
-					--file = "#"..unitDefID, -- do not remove this line
-					file = GetUnitPic(unitDefID),
+					file = "#"..unitDefID, -- do not remove this line
+					--file = GetUnitPic(unitDefID),
 					file2 = WG.GetBuildIconFrame(ud),
 					keepAspect = false;
 					width = '100%',height = '80%',
