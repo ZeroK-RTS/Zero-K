@@ -29,7 +29,7 @@ local floor = math.floor
 local myAllyTeamID = 666
 
 local powerTexture = 'Luaui/Images/visible_energy.png'
-local facplopTexture = 'Luaui/Images/gift.png'
+local facplopTexture = 'Luaui/Images/factory.png'
 local rearmTexture = 'LuaUI/Images/noammo.png'
 
 local lastLowPower = {}
