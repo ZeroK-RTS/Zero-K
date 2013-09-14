@@ -78,6 +78,11 @@ unitDef = {
       def                = [[LAZER]],
       onlyTargetCategory = [[NONE]],
     },
+	
+	{
+      def                = [[RELAYLAZER]],
+      onlyTargetCategory = [[NONE]],
+    },
 
     {
       def                = [[CUTTER]],
@@ -94,7 +99,47 @@ unitDef = {
 
   weaponDefs                    = {
 
-    LAZER    = {
+	LAZER    = {
+      name                    = [[Craterpuncher]],
+      alwaysVisible           = 0,
+      areaOfEffect            = 140,
+      avoidFeature            = false,
+      avoidNeutral            = false,
+      beamTime                = 0.001,
+      coreThickness           = 0.5,
+      craterBoost             = 4,
+      craterMult              = 8,
+
+      damage                  = {
+        default = 100,
+      },
+
+      explosionGenerator      = [[custom:FLASHLAZER]],
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 12,
+      minIntensity            = 1,
+      range                   = 9000,
+      reloadtime              = 20,
+      rgbColor                = [[0.25 0 1]],
+      soundStartVolume        = 1,
+      soundTrigger            = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 48,
+      tolerance               = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 1400,
+    },
+	
+	
+    OLDLAZER    = {
       name                    = [[Craterpuncher]],
       accuracy                = 0,
       alwaysVisible           = 0,
@@ -102,10 +147,10 @@ unitDef = {
       avoidFeature            = false,
       avoidNeutral            = false,
       beamTime                = 1,
+      canattackground         = false,
       coreThickness           = 0.5,
       craterBoost             = 4,
       craterMult              = 8,
-      cylinderTargeting      = 1,
 
       damage                  = {
         default = 3000,
@@ -119,7 +164,7 @@ unitDef = {
       laserFlareSize          = 10,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 10000,	-- extra 1000 to prevent cutoff at max range
+      range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser4]],
@@ -129,6 +174,46 @@ unitDef = {
       texture4                = [[smallflare]],
       thickness               = 48,
       tolerance               = 1000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 1400,
+    },
+	
+	RELAYLAZER    = {
+      name                    = [[Relay Craterpuncher (fake)]],
+      alwaysVisible           = 18,
+      areaOfEffect            = 56,
+      avoidFeature            = false,
+      avoidNeutral            = false,
+      beamTime                = 0.001,
+      canattackground         = false,
+      coreThickness           = 0.5,
+      craterBoost             = 2,
+      craterMult              = 4,
+
+      damage                  = {
+        default = 100,
+      },
+
+      explosionGenerator      = [[custom:FLASHLAZER]],
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 12,
+      minIntensity            = 1,
+      range                   = 9000,
+      reloadtime              = 20,
+      rgbColor                = [[0.25 0 1]],
+      soundStartVolume        = 1,
+      soundTrigger            = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 48,
+      tolerance               = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
@@ -146,7 +231,6 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 2,
       craterMult              = 4,
-      cylinderTargeting      = 8192,
 
       damage                  = {
         default = 100,
@@ -159,7 +243,7 @@ unitDef = {
       largeBeamLaser          = true,
       laserFlareSize          = 12,
       minIntensity            = 1,
-      range                   = 9000,	-- extra 1000 to prevent cutoff at max range
+      range                   = 9000,
       reloadtime              = 0.03,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/laser_burn6]],
@@ -188,7 +272,6 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0.01,
       craterMult              = 0.01,
-      cylinderTargeting      = 8192,
 
       damage                  = {
         default = 100,
@@ -212,7 +295,7 @@ unitDef = {
       texture3                = [[flare]],
       texture4                = [[smallflare]],
       thickness               = 16,
-      tolerance               = 10000,
+      tolerance               = 9000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
@@ -227,9 +310,7 @@ unitDef = {
       avoidFeature            = false,
       avoidNeutral            = false,
       beamTime                = 0.001,
-      canattackground         = false,
       coreThickness           = 0.5,
-      cylinderTargeting      = 8192,
 
       damage                  = {
         default = -0.00001,
@@ -245,15 +326,14 @@ unitDef = {
       range                   = 9000,
       reloadtime              = 20,
       rgbColor                = [[0.25 0 1]],
-      soundVolume             = 0,
-      soundStartVolume        = 0,
+      soundStart              = [[weapon/laser/heavy_laser4]],
       soundTrigger            = true,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
       texture4                = [[smallflare]],
       thickness               = 0,
-      tolerance               = 10000,
+      tolerance               = 9000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
