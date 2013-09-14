@@ -3086,6 +3086,39 @@ for i=1,#WeaponDefs do
 	end
 end
 
+local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
+	--local found = {count = 0, data = {}}
+	for i = 1, posCount do
+		if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
+			posY[i] = 0
+			--found.count = found.count + 1
+			--found.data[found.count] = {x = posX[i], z = posZ[i]}
+		end	
+	end
+	
+	
+	--[[
+	if found.count == 0 then	
+		return posY
+	end
+	
+	for i = 1, posCount do
+		local x = posX[i]
+		local z = posZ[i]
+		for j = 1, found.count do
+			local fx = found.data[j].x
+			local fz = found.data[j].z
+			local maxChange = sqrt((fx-x)^2 + (fz-z)^2)*maxHeightDifference/64
+			if abs(posY[i]) > maxChange then
+				posY[i] = abs(posY[i])/posY[i]*maxChange
+			end
+		end
+	end
+	--]]
+
+	return posY
+end
+
 function gadget:Explosion(weaponID, x, y, z, owner)
 	
 	if SeismicWeapon[weaponID] then
@@ -3135,23 +3168,39 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		if groundPoints > 0 then
 			groundHeight = groundHeight/groundPoints
 			
-			local func = function()
-				for i = sx-smoothradius, sx+smoothradius,8 do
-					for j = sz-smoothradius, sz+smoothradius,8 do
-						local disSQ = (i - x)^2 + (j - z)^2
-						if disSQ <= smoothradiusSQ then
-							if not origHeight[i] then
-								origHeight[i] = {}
-							end
-							if not origHeight[i][j] then
-								origHeight[i][j] = spGetGroundHeight(i,j)
-							end
-							spSetHeightMap(i, j, origHeight[i][j] + (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ))
+			local posX, posY, posZ = {}, {}, {}
+			local posCount = 0
+			
+			for i = sx-smoothradius, sx+smoothradius,8 do
+				for j = sz-smoothradius, sz+smoothradius,8 do
+					local disSQ = (i - x)^2 + (j - z)^2
+					if disSQ <= smoothradiusSQ then
+						if not origHeight[i] then
+							origHeight[i] = {}
 						end
+						if not origHeight[i][j] then
+							origHeight[i][j] = spGetGroundHeight(i,j)
+						end
+						posCount = posCount + 1
+						posX[posCount] = i
+						posY[posCount] = (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ)
+						posZ[posCount] = j
 					end
-				end 
-			end
-			spSetHeightMapFunc(func)
+				end
+			end 
+			
+			local posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
+			
+			spSetHeightMapFunc(
+				function(x,z,h)
+					for i = 1, #x, 1 do
+						spAddHeightMap(x[i],z[i],h[i])
+					end
+				end,
+				posX,
+				posZ,
+				posY
+			) 
 		end
 		
 		if detachmentradius then
@@ -3297,11 +3346,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			       2,3 ,7 ,3 ,2 ,
 				     2 ,3 ,2 }
 			
-			for i = 1, posCount do
-				if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
-					posY[i] = 0
-				end	
-			end
+			posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
 			
 			spSetHeightMapFunc(
 				function(x,z,h)

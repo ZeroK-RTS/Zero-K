@@ -110,8 +110,12 @@ unitDef = {
       craterBoost             = 4,
       craterMult              = 8,
 
+	  customParams        	  = {
+		stats_damage = 3000,
+	  },
+
       damage                  = {
-        default = 100,
+        default = 200,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],

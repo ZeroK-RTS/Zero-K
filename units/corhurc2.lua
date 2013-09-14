@@ -131,6 +131,7 @@ unitDef = {
       avoidFriendly           = false,
       burst                   = 15,
       burstrate               = 0.09,
+      collideFeature          = false,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
