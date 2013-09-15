@@ -1378,7 +1378,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 			end
 			
 			if item.wrap then
-				local font = WG.langFont and { font= 'LuaUI/Fonts/ru/BKKOI8N.TTF' } or { size=curFontSize } --setting size breaks with cyrillic font
+				local font = WG.langFont and { font= WG.langFont } or { size=curFontSize } --setting size breaks with cyrillic font
 				controls[ttname][item.name] = TextBox:New{
 					name=item.name, 				
 					autosize=false,
