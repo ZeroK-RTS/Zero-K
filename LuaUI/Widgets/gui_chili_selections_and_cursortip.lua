@@ -612,6 +612,9 @@ local function GetUnitDesc(unitID, ud)
 	if not (unitID or ud) then return '' end
 	
 	local lang = WG.lang or 'en'
+	local font = WG.langFont
+	
+	
 	if lang == 'en' then
 		if unitID then
 			local tooltip = spGetUnitTooltip(unitID)
@@ -623,8 +626,18 @@ local function GetUnitDesc(unitID, ud)
 		end
 		return ud.tooltip
 	end
-	local suffix = ('_' .. lang)
-	local desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
+	
+	local desc
+	if font then
+		local unitConf = WG.langFontConf.units[ud.name] 
+		desc = unitConf and unitConf.description
+	end
+	if not desc then
+		local suffix = ('_' .. lang)
+		desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
+		--font = nil
+	end
+	
 	if unitID then
 		local endesc = ud.tooltip
 		
@@ -1365,13 +1378,14 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 			end
 			
 			if item.wrap then
+				local font = WG.langFont and { font= 'LuaUI/Fonts/ru/BKKOI8N.TTF' } or { size=curFontSize } --setting size breaks with cyrillic font
 				controls[ttname][item.name] = TextBox:New{
 					name=item.name, 				
 					autosize=false,
 					text = itemtext , 
 					width='100%',
 					valign="ascender", 
-					font={ size=curFontSize }, 
+					font= font,
 					--fontShadow=true,
 				}
 				stack_children[#stack_children+1] = controls[ttname][item.name]

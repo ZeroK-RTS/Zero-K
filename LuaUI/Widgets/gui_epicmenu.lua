@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.321 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.322 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-08-31
     license   = "GNU GPL, v2 or later",
@@ -573,6 +573,16 @@ local function checkWidget(widget)
 end
 
 
+local function SetLangFontConf()
+	if VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang..".lua", VFS.ZIP) then
+		WG.langFontConf = include("Configs/nonlatin/"..WG.lang..".lua")
+		WG.langFont = WG.langFontConf.font
+	else
+		WG.langFont = nil
+		WG.langFontConf = nil
+	end
+end
+
 local function SetCountry(self) 
 	echo('Setting country: "' .. self.country .. '" ') 
 	
@@ -580,6 +590,8 @@ local function SetCountry(self)
 	settings.country = self.country
 	
 	WG.lang = self.countryLang 
+	SetLangFontConf()
+	
 	settings.lang = self.countryLang
 	
 	if img_flag then
@@ -613,6 +625,7 @@ local function MakeFlags()
 		pl='pl',
 		pt='pt',
 		pr='es',
+		ru='ru',
 	}
 
 	local flagChildren = {}
@@ -2469,6 +2482,7 @@ function widget:Initialize()
 	
 	WG.country = settings.country	
 	WG.lang = settings.lang
+	SetLangFontConf()
 	
 		-- add custom widget settings to crudemenu
 	AddAllCustSettings()

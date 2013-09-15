@@ -250,20 +250,44 @@ local function GetUnitDefByHumanName(humanName)
 end
 
 
-local function getHelpText(unitDef, lang)
-	local suffix = (lang == 'en') and '' or ('_' .. lang)	
-	return unitDef.customParams and unitDef.customParams['helptext' .. suffix] 
-		or unitDef.customParams.helptext
-		or "No help text available for this unit."
+local function getHelpText(unitDef)
+	local lang = WG.lang
+	local font = WG.langFont
+	
+	local helpText
+	if font then
+		local unitConf = WG.langFontConf.units[unitDef.name] 
+		helpText = unitConf and unitConf.helptext
+	end
+	if not helpText then
+		local suffix = (lang == 'en') and '' or ('_' .. lang)
+		helpText = unitDef.customParams and unitDef.customParams['helptext' .. suffix] 
+			or unitDef.customParams.helptext
+			or "No help text available for this unit."
+		font = nil
+	end
+		
+	return helpText, font
 end	
 
 
-local function getDescription(unitDef, lang)
-	if not lang or lang == 'en' then 
-		return unitDef.tooltip
+local function getDescription(unitDef)
+	local lang = WG.lang
+	local font = WG.langFont
+	
+	local desc
+	if font then
+		local unitConf = WG.langFontConf.units[unitDef.name] 
+		desc = unitConf and unitConf.description
 	end
-	local suffix  = ('_' .. lang)
-	return unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
+	if not desc then
+		local suffix = (lang == 'en') and '' or ('_' .. lang)
+		desc = unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
+		font = nil
+	end
+		
+	return desc, font
+	
 end	
 
 local function weapons2Table(cells, weaponStats, ws, merw, index)
@@ -463,8 +487,11 @@ local function printunitinfo(ud, lang, buttonWidth)
 			}
 	end
 	
-	local helptextbox = TextBox:New{ 
-		text = getHelpText(ud, lang), 
+	local text,font = getHelpText(ud)
+	
+	local helptextbox = TextBox:New{
+		font = {font=font},
+		text = text, 
 		textColor = color.stats_fg, 
 		width = '100%',
 		height = '100%',
@@ -727,9 +754,12 @@ MakeStatsWindow = function(ud, x,y)
 		window_unitstats:Dispose()
 	end
 
+	local desc, font = getDescription(ud)
+	
 	statswindows[num] = Window:New{  
-		x = x,  
-		y = y,  
+		x = x,
+		y = y,
+		font = {font=font},
 		width  = window_width,
 		height = window_height,
 		resizable = true,
@@ -739,7 +769,7 @@ MakeStatsWindow = function(ud, x,y)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = ud.humanName ..' - '.. getDescription(ud, WG.lang or 'en'), 
+		caption = ud.humanName ..' - '.. desc,
 		
 		children = children,
 	}
@@ -852,9 +882,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 	local window_width = 200
 	--local buttonWidth = window_width - 0
 	
-	
+	local desc, font = getDescription(ud)
 	local children = {
-		Label:New{ caption =  ud.humanName ..' - '.. getDescription(ud, WG.lang or 'en'), width=window_width, textColor = color.context_header,},
+		Label:New{ caption =  ud.humanName ..' - '.. desc, font={font=font}, width=window_width, textColor = color.context_header,},
 		Label:New{ caption = 'Player: ' .. playerName, width=window_width, textColor=teamColor },
 		Label:New{ caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width=window_width ,textColor = color.context_fg,},
 		
