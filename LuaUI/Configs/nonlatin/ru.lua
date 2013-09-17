@@ -50,65 +50,60 @@ return{
 			description="Лёгкая артиллерия/Стрелок-робот ",
 			helptext="Молот оборудован плазменной пушкой, превосходящей по дальности большинство стационарной обороны и позволяющей стрелять по параболической траектории. Не смотря на то, что Молот эффективен против мобильных юнитов, его надо защищать от рейдеров и других быстрых юнитов.",
 		},
-		--[[
-		-- Sharpshooter
+		-- Sharpshooter (Kmar)
 		armsnipe={
-			description="Sniper Walker (Skirmish/Anti-Heavy)",
-			helptext="The Sharpshooter's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Sharpshooter is by sweeping the area with many cheap units.",
+			description="Шагоход Снайпер (Стрелок/Бронебой)",
+			helptext="Энергетическое ружьё Снайпера наносит огромный урон, но только одной цели. Он может стрелять, будучи невидимым, но его снаряд выдаёт его позицию. Ему нужно немного энергии для невидимости, больше, если он в движении. Лучший способ обнаружить снайпера - пробежаться по окрестности многими дешёвыми единицами.",
 		},
-		-- Jethro
+		-- Jethro (Kmar)
 		armjeth={
-			description="Anti-air Bot",
-			helptext="Fast and fairly sturdy for its price, the Jethro is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against.",
+			description="Бот Противовоздушной обороны",
+			helptext="Быстрый и довольной выносливый за свою цену, Джетро - хорошая дешёвая мобильная установка ПВО. Он может маскироваться, что позволяет ему обеспечивать неожиданную противовоздушную защиту или убежать от наземных воиск противника, против которых он беззащитен.",
 		},
-		-- Tick 
+		-- Tick (Kmar)
 		armtick={
-			description="All-Terrain EMP Crawling Bomb ",
-			helptext="The Tick relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Warriors or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle.",
+			description="Вездеходная ползучая бомба-ЭМИ",
+			helptext="Вошка опирается на свою скорость и малый размер, чтобы уворачиваться от не метких снарядов, особенно таких, как у штурмовиков и многих стрелков. Она может парализовать тяжелые цели или группы малых, которые не успевают её убить до того, как она окажется в радиусе. Войны и Мечи могут потом уничтожить беспомощного противника без всякого риска. Боритесь с ними с помощью защитных сооружений или одиночными дешёвыми единицами, чтобы она взорвалась преждевременно. Эта единица маскируется, если бездействует.",
 		},
-		]]--
 		-- Eraser (banana_Ai)
 		spherecloaker={
 			description="Шагающий робот с генераторами невидимости и помех",
 			helptext="Стиратель оснащён устройством помех, что-бы скрывать своих от вражеских радаров. Также у него есть генератор поля невидимости.",
 		},
-		
-		--[[
-		-- Shield Bot Factory
+		-- Shield Bot Factory (Kmar)
 		factoryshield={
-			description="Produces Tough Robots, Builds at 10 m/s ",
-			helptext="The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer",
+			description="Создаёт прочных роботов, строит со скоростью 10 м/с",
+			helptext="Фабрика роботов с щитами прочная, но в то же время гибкая. Его единицы созданы для того, чтобы вытерпеть наказание, а потом его раздать обратно, не жертвуя при этом скорость. Использование хитрых комбинаций единиц щедро вознаграждается. Ключевые единицы: Бандит, Головорез, Изгой, Жулик, Рэкетир.",
 		},
-		-- Convict
+		-- Convict (Kmar)
 		cornecro={
-			description="Construction/Shield Support bot, Builds at 5 m/s",
-			helptext="The Convict is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots. ",
+			description="Бот-строитель/поддержки щитов. Строит со скоростью 5 м/с",
+			helptext="Осуждённый - довольно стандартный робот-строитель с прибабахом: лёгкий щит для самообороны и поддержки дружественных Щитботов.",
 		},
-		-- Bandit
+		-- Bandit (Kmar)
 		corak={
-			description="Medium-Light Raider Bot",
-			helptext="The Bandit outranges and is somewhat tougher than the Glaive, but still not something that you hurl against entrenched forces. Counter with riot units and LLTs.",
+			description="Средне-Лёгкий бот рейдер.",
+			helptext="Бандит превосходит в дальности и в некотором смысле крепче Меча, но все равно не то, чём стоит брать окопавшегося противника. Боритесь с ними с помощью бунтажных единиц и лёгкими лазерами.",
 		},
-		-- Rogue
+		-- Rogue (Kmar)
 		corstorm={
-			description="Skirmisher Bot (Indirect Fire)",
-			helptext="The Rogue's arcing missiles have a low rate of fire, but do a lot of damage, making it very good at dodging in and out of range of enemy units or defense, or in a powerful initial salvo. Counter them by attacking them with fast units, or crawling bombs when massed.",
+			description="Робот стрелок (Непрямой огонь)",
+			helptext="Ракеты Жулика медленно перезаряжаются, но наносят много урона, что позволяет ему легко входить в радиус единиц и защиты противника и выходить от туда, или выстреливать мощным залпом. Быстрые единицы и ползучие бомбы их легко одолевают.",
 		},
-		-- Thug
+		-- Thug (Kmar)
 		corthud={
-			description="Shielded Assault Bot ",
-			helptext="Weak on its own, the Thug makes an excellent screen for Outlaws and Rogues. The linking shield gives Thugs strength in numbers, but can be defeated by AoE weapons or focus fire. ",
+			description="Бот штурмовик с щитом",
+			helptext="Сам по себе он слаб, но Головорез предоставляет отличное прикрытие для Изгоев и Жуликов. Соединяющийся щит придаёт Головорезу силу в числах, но он всё равно может быть повержен оружием с большой областью поражения или фокусированным огнём.",
 		},
-		-- Outlaw
+		-- Outlaw (Kmar)
 		cormak={
-			description="Riot Bot",
-			helptext="The Outlaw emits an electromagnetic disruption pulse in a wide circle around it that damages and slows enemy units. Friendly units are unaffected. ",
+			description="Бунтажный Бот",
+			helptext="Изгой излучает разрушающий электромагнитный импульс в широком радиусе вокруг себя, который замедляем и повреждает системы противника. Дружественные единицы не подвергаются этому воздействию.",
 		},
-		-- Felon
+		-- Felon (Kmar)
 		shieldfelon={
-			description="Shielded Skirmisher",
-			helptext="The Felon draws energy from its shield, discharging it in accurate bursts. Link it to other shields to increase its rate of fire.",
+			description="Стрелок с щитом",
+			helptext="Преступник черпает силу из своего щита, разряжая его при невероятно точной стрельбе. Соединяйте его с другими щитами, чтобы увеличить скорость стрельбы.",
 		},
-		]]--
     }
 }
