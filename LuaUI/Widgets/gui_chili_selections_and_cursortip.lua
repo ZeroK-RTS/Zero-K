@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.082 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.083 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --31 July 2013
     license   = "GNU GPL, v2 or later",
@@ -480,7 +480,7 @@ local function UpdateDynamicGroupInfo()
 				local stunned_or_inbuld = spGetUnitIsStunned(id)
 				if not stunned_or_inbuld then 
 					if name == 'armmex' or name =='cormex' then -- mex case
-						local tooltip = spGetUnitTooltip(id)
+						local tooltip = spGetUnitTooltip(id) or '' --Note:spGetUnitTooltip(id) become NIL if spectator select enemy team's unit while Spectating allied team with limited LOS.
 						
 						local baseMetal = 0
 						local s = tooltip:match("Makes: ([^ ]+)")
@@ -2255,7 +2255,9 @@ function widget:Update(dt)
 	
 	local show_cursortip = true
 	if meta then
-		if not showExtendedTip then changeNow = true end
+		if not showExtendedTip then 
+			changeNow = true 
+		end
 		showExtendedTip = true
 	
 	else
@@ -2268,7 +2270,9 @@ function widget:Update(dt)
 			show_cursortip = stillCursorTime > options.tooltip_delay.value
 		end
 		
-		if showExtendedTip then changeNow = true end
+		if showExtendedTip then 
+			changeNow = true 
+		end
 		showExtendedTip = false
 	
 	end
@@ -2451,6 +2455,7 @@ end
 function widget:SelectionChanged(newSelection)
 	selectedUnits = {}
 	numSelectedUnits = 0
+	--store selected unitID list in a table with unitDefID
 	if (spGetSelectedUnitsCount() > 0) then 
 		local count = 0
 		for i=1, #newSelection do

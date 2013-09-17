@@ -14,7 +14,7 @@
 function widget:GetInfo()
 	return {
 		name		    = "EndGame Stats",
-		desc		    = "v0.911 Chili replacement for default end game statistics",
+		desc		    = "v0.912 Chili replacement for default end game statistics",
 		author		  = "Funkencool",
 		date		    = "2013",
 		license     = "public domain",
@@ -130,7 +130,9 @@ local function drawGraph(graphArray, graph_m, teamID)
 	local teamColor = {r,g,b,a}
 	local lineLabel = numFormat(graphArray[#graphArray])
 	local shortName
-	--playerName = playerNames[teamID]
+	if not playerName then --become NIL if player resigned (when player resigned their teamID change to 0 into spectator team)
+		playerName = playerNames[teamID]
+	end
 	--Sets AI name to reflect AI used and player hosting it
 	if isAI then
 		local _,botID,_,shortName = Spring.GetAIInfo(teamID)
@@ -248,12 +250,17 @@ function loadpanel()
 end
 
 --to do: possible to run from start when playing as spec
-function widget:GameStart()
-	local teams	= Spring.GetTeamList()
-	local teams = (#teams - 1)
-	for teamID=0, teams do
-		playerNames[teamID],_ = Spring.GetPlayerInfo(teamID)
-		--Spring.Echo(playerNames[teamID])
+function widget:GameFrame(n)
+	if n>0 then
+		--remember playerName (specifically: leader's name) for each teamID as soon as possible. At end-game some player might become spectator and loose their original teamID
+		local teams	= Spring.GetTeamList()
+		local teams = (#teams - 1)
+		for teamID=0, teams do
+			local _,teamLeader,_ = Spring.GetTeamInfo(teamID)
+			playerNames[teamID],_ = Spring.GetPlayerInfo(teamLeader)
+			--Spring.Echo(playerNames[teamID])
+		end
+		widgetHandler:RemoveCallIn("GameFrame") -- remove GameFrame call-in since it only need to run once.
 	end
 end
 

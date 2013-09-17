@@ -1,4 +1,4 @@
-local versionNum = '0.301'
+local versionNum = '0.302'
 
 function widget:GetInfo()
 	return {
@@ -433,7 +433,7 @@ function EstimateCrashLocation(victimID)
 		return
 	end
 	local defID = spGetUnitDefID(victimID)
-	if UnitDefs[defID].canFly then
+	if not UnitDefs[defID] or UnitDefs[defID].canFly then --if speccing with limited LOS or the unit can fly, then skip predicting trajectory.
 		return
 	end
 	local xVel,yVel,zVel = Spring.GetUnitVelocity(victimID)

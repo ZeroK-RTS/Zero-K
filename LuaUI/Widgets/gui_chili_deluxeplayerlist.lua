@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Deluxe Player List - Alpha 2.02",
-    desc      = "v0.202 Chili Deluxe Player List, Alpha Release",
+    desc      = "v0.203 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
@@ -1184,7 +1184,7 @@ SetupPlayerNames = function()
 			if allyTeamsDead[b] and allyTeamsDead[a] and allyTeams[a] and allyTeams[b] then
 				local teamIDa = allyTeams[a][1]
 				local teamIDb = allyTeams[b][1]
-				if teamIDa and teamIDb and teams[teamIDa].roster and teams[teamIDb].roster then
+				if teamIDa and teamIDb and teams[teamIDa].roster and teams[teamIDb].roster and teams[teamIDa].roster[1] and teams[teamIDb].roster[1]  then
 					if teams[teamIDa].roster[1].isActive and not teams[teamIDb].roster[1].isActive then return true end
 					if teams[teamIDb].roster[1].isActive and not teams[teamIDa].roster[1].isActive then return false end
 				end
