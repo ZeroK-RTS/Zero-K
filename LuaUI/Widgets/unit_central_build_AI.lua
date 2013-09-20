@@ -27,8 +27,6 @@ function widget:GetInfo()
   }
 end
 
-include("utility_two.lua")
-
 --  Central Build AI creates a common build order queue for all units in the
 --	group.  Select this group (or any member of it) and issue build orders
 --  while holding down the shift key to add orders to the common queue.
