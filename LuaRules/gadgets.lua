@@ -20,6 +20,20 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+--test if any gadget is using pairs in a bad way.
+origPairs = pairs
+local blackList = { ['function']=true }
+local function mynext(...)
+	local i,v = next(...); local t = type(i);
+	if blackList[t] then		
+		Spring.Echo('*** A gadget is misusing pairs! ***')
+		assert(false)
+	end
+	return i,v;
+end
+function pairs(...) local n,s,i = origPairs(...); return mynext,s,i end
+
+
 local SAFEWRAP = 0
 -- 0: disabled
 -- 1: enabled, but can be overriden by gadget.GetInfo().unsafe
@@ -45,6 +59,7 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
 local HANDLER_BASENAME = "gadgets.lua"
+
 
 --------------------------------------------------------------------------------
 
