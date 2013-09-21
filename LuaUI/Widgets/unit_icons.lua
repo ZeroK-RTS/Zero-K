@@ -37,6 +37,7 @@ local glPopMatrix      = gl.PopMatrix
 local GL_GREATER = GL.GREATER
 
 local min   = math.min
+local max   = math.max
 local floor = math.floor
 local abs 	= math.abs
 
@@ -275,7 +276,7 @@ function widget:DrawWorld()
 	
 	local gameFrame = spGetGameFrame()
 	
-	local fade = abs((gameFrame % 40) - 20) / 20
+	local fade = min( abs((gameFrame % 60) - 20) / 20, 1 )
 	
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
