@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = " v0.274 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = " v0.275 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2013-8-19
     license   = "GNU GPL, v2 or later",
@@ -64,7 +64,7 @@ local abs, rand       = math.abs, math.random
 
 local currentGameFrame = 0
 
-local dist = 160
+local dist = 160 --retreat zone radius
 local maxDistSqr = dist * dist
 local myTeamID
 local tooltips = {}
@@ -75,6 +75,7 @@ local havenCount = 0
 
 local retreatedUnits = {} --recently retreating unit that is about to be deselected from user selection
 local currentSelection = nil --current unit selection (for deselecting any retreating units. See code for more detail)
+local maximumDeselect = 0.4 --maximum fraction of retreating-unit w.r.t. healthy-unit in current selection before auto-deselect ignore selection.
 
 -------------------------------------
 options_path = 'Game/Unit AI/Retreat Zone' --//for use 'with gui_epicmenu.lua'
@@ -593,7 +594,8 @@ function widget:GameFrame(gameFrame)
 	end --if frame 1/30
 	--remove retreating unit from selection (only perform at selection change or when retreat is ordered)
 	if options.removeFromSelection.value then
-		if currentSelection then --new selection
+		local commitChange = false
+		if currentSelection then --new selection?
 			local unitsToDeselect= {}
 			local selectionCount = #currentSelection
 			local retreatedCount = 0
@@ -604,32 +606,37 @@ function widget:GameFrame(gameFrame)
 					retreatedCount = retreatedCount + 1
 				end
 			end
-			if retreatedCount > 0 and (retreatedCount/selectionCount) < 0.4 then --retreating unit is minority?
-				for i=1, #unitsToDeselect do
+			if retreatedCount > 0 and (retreatedCount/selectionCount) < maximumDeselect then --retreating unit is minority?
+				table.sort(unitsToDeselect, function(a,b) return a>b end) --sort from biggest index to lowest index
+				for i=1, retreatedCount do
 					table.remove(currentSelection, unitsToDeselect[i]) --remove from list
 				end
-				SelectUnitArray(currentSelection) --update unit selection
+				commitChange = true--update unit selection
 			end
-			currentSelection = nil --finish deselecting units
-			
-		elseif #retreatedUnits > 0 then -- there is recently retreating units?
-			local selectedUnits = GetSelectedUnits() --get existing selection
+		end
+		if #retreatedUnits > 0 then -- there is recently retreating units?
+			currentSelection = currentSelection or GetSelectedUnits() --get existing selection
 			local changes = false
 			for i=1, #retreatedUnits do
 				local retreatingUnitID = retreatedUnits[i]
-				for j=1, #selectedUnits do
-					if selectedUnits[j] == retreatingUnitID then --selection contain recently retreating units
-						table.remove(selectedUnits, j) --unit remove from existing selection
+				for j=1, #currentSelection do
+					local selectedUnitID = currentSelection[j]
+					if selectedUnitID == retreatingUnitID then --selection contain recently retreating units
+						table.remove(currentSelection, j) --unit remove from existing selection
 						changes = true
 						break;
 					end
 				end
 			end
 			if changes then --have unit to deselect?
-				SelectUnitArray(selectedUnits) --update unit selection
+				commitChange = true --update unit selection
 			end
 			retreatedUnits = {} --empty recent-retreat list
 		end
+		if commitChange then
+			SelectUnitArray(currentSelection) --apply selection changes
+		end
+		currentSelection = nil --flag: finish deselecting units
 	end
 end
 

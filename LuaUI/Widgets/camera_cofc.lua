@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.122 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.123 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-August-21
+    date      = "2011-03-16", --2013-September-21
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -67,16 +67,20 @@ options_order = {
 	
 	'lblFollowCursor',
 	'follow',
-	'followautozoom',
-	'followminscrollspeed',
-	'followmaxscrollspeed',
-	--'followzoominspeed',
-	--'followzoomoutspeed',
 	
 	'lblFollowUnit',
 	'trackmode',
 	'persistenttrackmode',
 	'thirdpersontrack',
+
+	'lblFollowCursorZoom',
+	'followautozoom',
+	'followinscrollspeed',
+	'followoutscrollspeed',
+	'followzoominspeed',
+	'followzoomoutspeed',
+	'followzoommindist',
+	'followzoommaxdist',
 	
 	'lblMisc2',
 	'enableCycleView',
@@ -96,6 +100,7 @@ options = {
 	lblMisc = {name='Misc.', type='label'},
 	
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
+	lblFollowCursorZoom = {name='Auto-Zooming', type='label', path=cameraFollowPath},
 	lblFollowUnit = {name='Unit Following', type='label', path=cameraFollowPath},
 	lblMisc2 = {name='Misc.', type='label', path = cameraFollowPath},
 	
@@ -136,7 +141,7 @@ options = {
 		name = 'Rotate world origin at cursor',
 		desc = 'Rotate world using origin at the cursor rather than the center of screen.',
 		type = 'bool',
-		value = false,
+		value = true,
 	},
 	edgemove = {
 		name = 'Scroll camera at edge',
@@ -300,43 +305,65 @@ options = {
 	},
 	followautozoom = {
 		name = "Auto zoom",
-		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus). \n\nDO NOT enable this if you want to control the zoom level yourself. If enabled, try to use the recommended follow cursor speed.",
+		desc = "Auto zoom in and out if following player's cursor (zoom level will represent player's focus). \n\nDO NOT enable this if you want to control the zoom level yourself.",
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
 	},
-	followminscrollspeed = {
-		name = "On Screen Follow Speed",
-		desc = "Follow speed for on-screen cursor. \n\nRecommend: Lowest (prevent jerky movement)",
+	followinscrollspeed = {
+		name = "On Screen Tracking Speed",
+		desc = "Tracking speed while cursor is on-screen. \n\nRecommend: Lowest (prevent jerky movement)",
 		type = 'number',
 		min = 1, max = 14, step = 1,
-		mid = ((14-1)/2) + 1,
+		mid = (14+1)/2,
 		value = 1,
+		OnChange = function(self) Spring.Echo("COFC: " ..self.mid*2 - self.value .. " second") end,
 		path = cameraFollowPath,
 	},	
-	followmaxscrollspeed = {
-		name = "Off Screen Follow Speed",
-		desc = "Follow speed for off-screen cursor. \n\nRecommend: Highest (prevent missed action), faster tracking during auto-zoom will also prevent auto-zoom from zooming out too far",
+	followoutscrollspeed = {
+		name = "Off Screen Tracking Speed",
+		desc = "Tracking speed while cursor is off-screen. \n\nRecommend: Highest (prevent missed action)",
 		type = 'number',
 		min = 2, max = 15, step = 1,
-		mid = ((15-2)/2) + 2,
+		mid = (15+2)/2,
 		value = 15,
+		OnChange = function(self) Spring.Echo("COFC: " ..self.mid*2 - self.value  .. " second") end,
 		path = cameraFollowPath,
 	},
-	followzoominspeed = {
-		name = "Follow Zoom-in Speed",
-		desc = "Zoom-in speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Tweak follow speed instead!)",
+	followzoommindist = {
+		name = "Closest Zoom",
+		desc = "The closest zoom. Default: 500",
 		type = 'number',
-		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.2,
+		min = 200, max = 10000, step = 100,
+		value = 500,
+		OnChange = function(self) Spring.Echo("COFC: " ..self.value .. " elmo") end,
+		path = cameraFollowPath,
+	},
+	followzoommaxdist = {
+		name = "Farthest Zoom",
+		desc = "The furthest zoom. Default: 2000",
+		type = 'number',
+		min = 200, max = 10000, step = 100,
+		value = 2000,
+		OnChange = function(self) Spring.Echo("COFC: " .. self.value .. " elmo") end,
+		path = cameraFollowPath,
+	},	
+	followzoominspeed = {
+		name = "Zoom-in Speed",
+		desc = "Zoom-in speed when cursor is on-screen. Default: 50%",
+		type = 'number',
+		min = 0.1, max = 1, step = 0.05,
+		value = 0.5,
+		OnChange = function(self) Spring.Echo("COFC: " .. self.value*100 .. " percent") end,
 		path = cameraFollowPath,
 	},
 	followzoomoutspeed = {
-		name = "Follow Zoom-out Speed",
-		desc = "Zoom-out speed (only when auto-zoom is enabled). \n\nRecommend: Low (better leave this option to low for smoother zoom. Use faster follow speed to prevent zoom-out)",
+		name = "Zoom-out Speed",
+		desc = "Zoom-out speed when cursor is at screen edge and off-screen. Default: 50%",
 		type = 'number',
-		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.2,
+		min = 0.1, max = 1, step = 0.05,
+		value = 0.5,
+		OnChange = function(self)Spring.Echo("COFC: " .. self.value*100 .. " percent") end,
 		path = cameraFollowPath,
 	},
 	-- end follow cursor
@@ -529,7 +556,6 @@ end
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
 local last_move = spGetTimer() --switch for reseting lockspot for Edgescroll
-local last_zoom = {spGetTimer(),spGetTimer()} --switch for delaying zooming updates for FollowCursorAutoZoom
 local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trackmode edge screen scroll"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -978,55 +1004,50 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	if smoothscroll or springscroll or rotate then
 		return
 	end
-	local lclZoom = function(cs,zoomin, smoothness, no_2)
-		if not (spDiffTimers(spGetTimer(),last_zoom[1])>=1) and not (spDiffTimers(spGetTimer(),last_zoom[2])>=1 and no_2)  then
-			return
-		end
-		if no_2 then
-			last_zoom[2] = spGetTimer() --saperate update rate for special off-screen zoom-out
-		else
-			last_zoom[1] = spGetTimer()  --saperate update rate for on-screen zoom-out/zoom-in
-		end
+	local lclZoom = function(zoomin, smoothness,x,y,z)
+		local cs = spGetCameraState()
 		ls_have = false --unlock lockspot 
-		SetLockSpot2(cs) --set lockspot
-		if not ls_have then
-			return
-		end
-		local sp = (zoomin and -1*options.followzoomoutspeed.value or options.followzoominspeed.value)
-		local ls_dist_new = ls_dist + ls_dist*sp
-		ls_dist_new = max(ls_dist_new, 20)
-		ls_dist_new = min(ls_dist_new, maxDistY)
+        SetLockSpot2(cs) --set lockspot
+        if not ls_have then
+            return
+        end 
+		local sp = (zoomin and -1*options.followzoominspeed.value or options.followzoomoutspeed.value)
+		local deltaDist = max(abs(ls_dist - abs(options.followzoommaxdist.value+options.followzoommindist.value)/2),10) --distance to midpoint
+		local ls_dist_new = ls_dist + deltaDist*sp --zoom step: distance-to-midpoint multiplied by a zooming-multiplier
+		ls_dist_new = max(ls_dist_new, options.followzoommindist.value)
+		ls_dist_new = min(ls_dist_new, maxDistY,options.followzoommaxdist.value)
 		ls_dist = ls_dist_new
+		ls_x = x --update lockpot to target destination
+		ls_y = y
+		ls_z = z
+		ls_have = true --lock lockspot
 		local cstemp = UpdateCam(cs)
 		if cstemp then cs = cstemp; end
-		if zoomin or ls_dist < maxDistY then
-			spSetCameraState(cs, smoothness)
-		end
+		spSetCameraState(cs, smoothness)
 	end
 	local teamID = Spring.GetLocalTeamID()
 	local _, playerID = Spring.GetTeamInfo(teamID)
 	local pp = WG.alliedCursorsPos[ playerID ]
 	if pp then
 		local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
-		local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 		local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
-		local cs = spGetCameraState()
+		local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 		if (scrn_x<scrnsize_X*4/6 and scrn_x>scrnsize_X*2/6) and (scrn_y<scrnsize_Y*4/6 and scrn_y>scrnsize_Y*2/6) then --if cursor near center:
-			local camHeight = cs.py - groundY --get camera height with respect to ground
-			if camHeight >1000 then --if cam height from ground greater than 1000elmo: do
-				lclZoom(cs,true, 1) --zoom in
-			end
+			-- Spring.Echo("CENTER")
+			local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			lclZoom(true, slowSpeed,pp[1], groundY, pp[2]) --zoom in
 		elseif (scrn_x<scrnsize_X*5/6 and scrn_x>scrnsize_X*1/6) and (scrn_y<scrnsize_Y*5/6 and scrn_y>scrnsize_Y*1/6) then --if cursor between center & edge: do nothing 
-		elseif (scrn_x<scrnsize_X*6/6 and scrn_x>scrnsize_X*0/6) and (scrn_y<scrnsize_Y*6/6 and scrn_y>scrnsize_Y*0/6) then --if cursor near edge: do
-			lclZoom(cs,false, 1) --zoom out
-		end				
-		if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-			local fastSpeed = (8 - options.followmaxscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-			lclZoom(cs,false, 1,true) --zoom out using special update rate
-			spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
-		else --if cursor within screen: do
-			local slowSpeed = (8 - options.followminscrollspeed.value)+8 --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			-- Spring.Echo("MID")
+			local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 			spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
+		elseif (scrn_x<scrnsize_X*6/6 and scrn_x>scrnsize_X*0/6) and (scrn_y<scrnsize_Y*6/6 and scrn_y>scrnsize_Y*0/6) then --if cursor near edge: do
+			-- Spring.Echo("EDGE")
+			local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			lclZoom(false, slowSpeed,pp[1], groundY, pp[2]) --zoom out
+		else --outside screen
+			-- Spring.Echo("OUT")
+			local fastSpeed = options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			lclZoom(false, fastSpeed,pp[1], groundY, pp[2]) --zoom out
 		end
 	end
 end
@@ -1296,10 +1317,10 @@ function widget:Update(dt)
 					local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 					local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
 					if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-						local fastSpeed = (options.followmaxscrollspeed.mid - options.followmaxscrollspeed.value)+options.followmaxscrollspeed.mid --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+						local fastSpeed = options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 						spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
 					else --if cursor within screen: do
-						local slowSpeed = (options.followminscrollspeed.mid - options.followminscrollspeed.value)+options.followminscrollspeed.mid --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+						local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
 						spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
 					end
 				end

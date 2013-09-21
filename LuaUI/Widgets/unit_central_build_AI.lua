@@ -14,7 +14,7 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.344"
+local version = "v1.345"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -120,7 +120,7 @@ local nextPathCheck = currentFrame + 400 --is used to check whether constructor 
 local myAllyID = Spring.GetMyAllyTeamID()
 local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
-local enemyRange = 450 --range (in elmo) around build site to check for enemy
+local enemyRange = 600 --range (in elmo) around build site to check for enemy
 local enemyThreshold = 0.49--fraction of enemy around build site w.r.t. ally unit for it to be marked as unsafe
 
 --	"global" for this widget.  This is probably not a recommended practice.
