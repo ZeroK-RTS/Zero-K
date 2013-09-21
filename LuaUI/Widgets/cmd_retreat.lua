@@ -4,7 +4,7 @@ function widget:GetInfo()
     name      = "Retreat",
     desc      = " v0.275 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
-    date      = "2008-03-17", --2013-8-19
+    date      = "2008-03-17", --2013-9-21
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
@@ -84,7 +84,7 @@ options = {
 	removeFromSelection = {
 		name = 'Auto Unselect units',
 		type = 'bool',
-		value = false,
+		value = true,
 		desc = 'Automatically remove retreating unit from current selection if majority is healthy units. (Retreating unit might need exclusion from orders given to healthy units)',
 	},
 	returnLastPosition = {

@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.083 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.084 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --31 July 2013
+    date      = "2009-06-02", --21 September 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -436,7 +436,7 @@ end
 local function GetWeaponReloadStatus(unitID, weapNum)
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
-	local weaponNoX = (unitDef.weapons[weapNum]) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+	local weaponNoX = (unitDef and unitDef.weapons and unitDef.weapons[weapNum]) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
 	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
 		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
 		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum-reverseCompat) --select weapon no.X

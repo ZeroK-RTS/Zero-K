@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Unit Start State",
     desc      = "Configurable starting unit states for units",
     author    = "GoogleFrog",
-    date      = "13 April 2011", --last update: 14 August 2013
+    date      = "13 April 2011", --last update: 21 September 2013
     license   = "GNU GPL, v2 or later",
 	handler   = false,
     layer     = 1,
@@ -423,15 +423,15 @@ AddFactoryOfUnits("factoryspider")
 AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
 AddFactoryOfUnits("factoryship")
-
-addUnit("striderhub","Mech")
-addUnit("armcsa","Mech")
-addUnit("armcomdgun","Mech")
-addUnit("dante","Mech")
-addUnit("armraven","Mech")
-addUnit("armbanth","Mech")
-addUnit("gorg","Mech")
-addUnit("armorco","Mech")
+AddFactoryOfUnits("striderhub")
+-- addUnit("striderhub","Mech")
+-- addUnit("armcsa","Mech")
+-- addUnit("armcomdgun","Mech")
+-- addUnit("dante","Mech")
+-- addUnit("armraven","Mech")
+-- addUnit("armbanth","Mech")
+-- addUnit("gorg","Mech")
+-- addUnit("armorco","Mech")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 local _, _, factory_commands, econ_commands, defense_commands, special_commands, _, _, _ = include("Configs/integral_menu_commands.lua")
