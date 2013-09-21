@@ -92,6 +92,7 @@ unitDef = {
 	  
       customParams            = {
         extra_damage = [[18]],
+        extra_damage_falloff_max = [[600]], -- make the extra damage proportional to (actual damage dealt)/extra_damage_falloff_max
       },
 
       damage                  = {
