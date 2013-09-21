@@ -389,7 +389,7 @@ function EndMenu(ok)
       if os.clock() - menu_start > level * 0.25 then  -- if speed was slower than 250ms per level, flash the gesture
         menu_flash = {origin[1], origin[2], os.clock()}  
       end 
-      Spring.SetActiveCommand(cmdid, _, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
+      Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
     end
   end 
   origin = nil

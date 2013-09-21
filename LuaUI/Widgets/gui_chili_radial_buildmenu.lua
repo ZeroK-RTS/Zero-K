@@ -185,7 +185,7 @@ local function AddButton(item, index)
 				if (menu ~= menu_selected) then -- store last item and level to render its back path
 					level = level + 1  -- save level
 				end 
-				Spring.SetActiveCommand(cmdid, _, left, right, alt, ctrl, meta, shift)
+				Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)
 				last_cmdid = cmdid
 			end
 			HotKeyMode(false)

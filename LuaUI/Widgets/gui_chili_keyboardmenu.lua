@@ -569,7 +569,7 @@ local function AddBuildStructureButton(item, index)
 				if (build_menu ~= build_menu_selected) then -- store last item and menu_level to render its back path
 					menu_level = menu_level + 1  -- save menu_level
 				end 
-				Spring.SetActiveCommand(cmdid, _, left, right, alt, ctrl, meta, shift)
+				Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)
 				last_cmdid = cmdid
 			end
 			--BuildMode(false)
