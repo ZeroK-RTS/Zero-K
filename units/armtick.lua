@@ -35,6 +35,7 @@ unitDef = {
     helptext_it    = [[Usato bene, il Tick puo valere dozzine di volte il suo costo. Usalo per paralizzare difese, unitá pesanti, e masse di unitá con armi lente. Altre tue unitá posson eliminare i nemici indifesi senza rischi. Contrastali con torri lancia-razzo o singole unitá economiche per provocare una detonazione prematura.]],
     helptext_pl    = [[Tick jest szybki i mały, co pozwala mu unikać wolniejszych pocisków i dotrzeć do celu, aby się zdetonować, zadając wysokie obrażenia EMP i paraliżując grupy przeciwników. Gdy stoi nieruchomo w miejscu, włącza maskowanie.]],
     modelradius    = [[7]],
+	instantselfd   = [[1]],
   },
 
   explodeAs              = [[ARMTICK_DEATH]],
