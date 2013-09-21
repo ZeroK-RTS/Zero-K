@@ -62,6 +62,7 @@ function SetIcons(unitID)
 				lastFacPlop[unitID] = facplop
 				if facplop ~= 0 then
 					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=facplopTexture} )
+					WG.icons.SetPulse( 'facplop', true )
 				else
 					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
 				end
