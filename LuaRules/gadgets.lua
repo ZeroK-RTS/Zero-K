@@ -20,18 +20,36 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
---test if any gadget is using pairs in a bad way.
+
+local DepthMod = 10
+local DepthValue = -1
+
 origPairs = pairs
-local blackList = { ['function']=true }
+local whiteList = {['string'] = true, ['number'] = true, ['boolean'] = true, ['nil'] = true, ['thread'] = true}
 local function mynext(...)
-	local i,v = next(...); local t = type(i);
-	if blackList[t] then		
+	local i,v = next(...)
+	local t = type(i)
+	if not whiteList[t] then
 		Spring.Echo('*** A gadget is misusing pairs! ***')
-		assert(false)
+		Spring.Echo(t)
+		Spring.Echo(i)
+		Spring.Echo(v)
+		DepthValue = DepthValue + 1
+		error("Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)
 	end
-	return i,v;
+	return i,v
 end
-function pairs(...) local n,s,i = origPairs(...); return mynext,s,i end
+
+function pairs(...) 
+	if SendToUnsynced then
+		local n,s,i = origPairs(...)
+		return mynext,s,i
+	else
+		local n,s,i = origPairs(...)
+		return next,s,i
+	end
+end
+
 
 
 local SAFEWRAP = 0
@@ -59,7 +77,6 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
 local HANDLER_BASENAME = "gadgets.lua"
-
 
 --------------------------------------------------------------------------------
 
@@ -247,7 +264,6 @@ local isSyncedCode = (SendToUnsynced ~= nil)
 local function IsSyncedCode()
   return isSyncedCode
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
