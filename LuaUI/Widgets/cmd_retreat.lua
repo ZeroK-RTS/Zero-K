@@ -2,9 +2,9 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = " v0.274 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = " v0.277 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
-    date      = "2008-03-17", --2013-8-19
+    date      = "2008-03-17", --2013-9-21
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
@@ -19,7 +19,6 @@ local glTexture        = gl.Texture
 local glTexRect        = gl.TexRect
 local glTranslate      = gl.Translate
 local glBillboard      = gl.Billboard
-local glDrawFuncAtUnit = gl.DrawFuncAtUnit
 local glColor          = gl.Color
 local GL_GREATER       = GL.GREATER
 
@@ -30,20 +29,12 @@ local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP			= CMD.STOP
 
 local CMD_CLOAK         = CMD.CLOAK
-local CMD_ONOFF         = CMD.ONOFF
-local CMD_REPEAT        = CMD.REPEAT
-local CMD_MOVE_STATE    = CMD.MOVE_STATE
-local CMD_FIRE_STATE    = CMD.FIRE_STATE
 
 local CMD_INSERT        = CMD.INSERT
 local CMD_REMOVE        = CMD.REMOVE
-local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
 local CMD_RETREAT       = 10000
 local CMD_SETHAVEN      = 10001
-local CMD_CLOAK_SHIELD  = 32101
-local CMD_STEALTH       = 32100
-
 
 local GetGameFrame     = Spring.GetGameFrame
 local GetLocalTeamID   = Spring.GetLocalTeamID
@@ -52,29 +43,35 @@ local GetUnitCommands  = Spring.GetUnitCommands
 local GetUnitPosition  = Spring.GetUnitPosition
 local GetUnitDefID     = Spring.GetUnitDefID
 local GetSelectedUnits = Spring.GetSelectedUnits
-local GetUnitStates    = Spring.GetUnitStates
 local GetUnitIsStunned	   = Spring.GetUnitIsStunned
 local SelectUnitArray = Spring.SelectUnitArray
 
-local AreTeamsAllied   = Spring.AreTeamsAllied
+--local AreTeamsAllied   = Spring.AreTeamsAllied
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
-local IsGuiHidden		=	Spring.IsGUIHidden
+--local IsGuiHidden		=	Spring.IsGUIHidden
+
+local echo = Spring.Echo
 
 local abs, rand       = math.abs, math.random
 
 local currentGameFrame = 0
 
-local dist = 160
+local dist = 160 --retreat zone radius
 local maxDistSqr = dist * dist
 local myTeamID
 local tooltips = {}
 
-local retreatingUnits, wantRetreat, alliedWantRetreat, retreatOrdersArray = {}, {}, {}, {}
-local mobileUnits, pauseRetreatChecks, havens = {}, {}, {}
+local retreatMoveOrders, wantRetreat, retreatOrdersArray = {}, {}, {}, {}
+local wantStopRetreat 			= {}
+local mobileUnits, havens = {}, {}
+local processUnitsNow = {}
+local retreatCmds, retreatWaitCmds, checkNextCmd = {}, {}, {}
+local waitingForCommands = {}
 local havenCount = 0
 
 local retreatedUnits = {} --recently retreating unit that is about to be deselected from user selection
 local currentSelection = nil --current unit selection (for deselecting any retreating units. See code for more detail)
+local maximumDeselect = 0.4 --maximum fraction of retreating-unit w.r.t. healthy-unit in current selection before auto-deselect ignore selection.
 
 -------------------------------------
 options_path = 'Game/Unit AI/Retreat Zone' --//for use 'with gui_epicmenu.lua'
@@ -111,7 +108,7 @@ local function HeadingToHaven(unitID)
 		return false
 	end
 
-	local dx, dy, dz = retreatingUnits[unitID][1], retreatingUnits[unitID][2], retreatingUnits[unitID][3]
+	local dx, dy, dz = retreatMoveOrders[unitID][1], retreatMoveOrders[unitID][2], retreatMoveOrders[unitID][3]
 
 	for havenUnitID, havenPosition in pairs(havens) do
 		local hx, hy, hz = havenPosition[1], havenPosition[2], havenPosition[3]
@@ -125,6 +122,11 @@ local function HeadingToHaven(unitID)
 	return false
 end
 
+
+function GetFirstCommand(unitID)
+	local queue = GetUnitCommands(unitID, 1)
+	return queue and queue[1]
+end
 
 
 local function FindClosestHaven(sx, _, sz)
@@ -150,13 +152,14 @@ local function FindClosestHavenToUnit(unitID)
   return FindClosestHaven(ux, _, uz)
 end
 
-
 local function IsRetreatMove(unitID, cmd)
-	local dest = retreatingUnits[unitID]
+	local dest = retreatMoveOrders[unitID]
 
 	if not dest or not cmd then
 		return false
 	end
+	
+	echo(CMD[cmd.id], cmd.params[1] , cmd.params[2] , cmd.params[3], dest[1], dest[2], dest[3]  )
 
 	if cmd.params[1] == dest[1] 
 		and  cmd.params[2] == dest[2]
@@ -166,7 +169,6 @@ local function IsRetreatMove(unitID, cmd)
 	end
 	return false
 end
-
 
 local function addHaven(x, y, z)
 	havenCount = havenCount + 1
@@ -187,83 +189,73 @@ local function setRetreatOrder(unitID, unitDefID, retreatOrder)
 	mobileUnits[unitID] = mobileUnits[unitID] or CanReallyMove(unitDefID) --note: mobileUnits[unitID] is used to filter only moving object for periodic health checks
 end
 
-function GetFirstCommand(unitID)
-	local queue = GetUnitCommands(unitID, 1)
-	return queue and queue[1]
-end
-
-function GetFirst3Command(unitID)
+function GetFirst3Commands(unitID)
 	local queue = GetUnitCommands(unitID, 3)
 	return queue
 end
 
---Runs multiple times to finish process 
---(until retreatingUnits[unitID] is NIL. In which case the retreat checks in GameFrame() no longer call StopRetreating() due to NIL)
-function StopRetreating(unitID)
-	if retreatingUnits[unitID] then
-		local cmds = GetFirst3Command(unitID)
 
-		if not cmds or not cmds[1] then
-			retreatingUnits[unitID] = nil
-
-		elseif IsRetreatMove(unitID, cmds[1]) then --is retreating to repair zone(?)	
-			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
-			if cmds[2] and cmds[2].id==CMD_WAIT then --is the move+wait retreat combo(?)
-				GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[2].tag}, {})
-				if (not cmds[3] or cmds[3].id==CMD_STOP) and retreatingUnits[unitID][4] then --no work to return to?? returnLastPosition enabled??
-					local x,y,z = retreatingUnits[unitID][4],retreatingUnits[unitID][5],retreatingUnits[unitID][6]
-					GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
-				end
-				
-				retreatingUnits[unitID] = nil --unit no longer considered retreating
-			end
-			
-		elseif (cmds[1].id == CMD_WAIT) then --is waiting for repair(?)		
-			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
-			if (not cmds[2] or cmds[2].id==CMD_STOP) and retreatingUnits[unitID][4] then --no work to return to?? returnLastPosition enabled??
-				local x,y,z = retreatingUnits[unitID][4],retreatingUnits[unitID][5],retreatingUnits[unitID][6]
-				GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
-			end
-			retreatingUnits[unitID] = nil
-		else --is currently some other command
-			--retreatingUnits[unitID] = nil
-			--Note: didn't NIL-ify retreatingUnits[unitID] here so that StopRetreating() can run 2nd time later
-		
-		end
-	else
-		local cmd1 = GetFirstCommand(unitID)
-		if not (cmd1 and cmd1.id == CMD_WAIT) then
-			pauseRetreatChecks[unitID] = nil
-		end
-	end
+local function IsFirstCommandRetreatMove(unitID)
+	local cmd = GetFirstCommand(unitID)
+	return IsRetreatMove(unitID, cmd)
 end
 
 
-local function Retreat(unitID)
+function StopRetreating(unitID)
+	if waitingForCommands[unitID] then
+		return
+	end
+	local cmds = GetFirst3Commands(unitID)
+
+	for _,cmd in ipairs(cmds) do
+		if cmd.tag == retreatCmds[unitID] or cmd.tag == retreatWaitCmds[unitID] then
+			--echo('remove cmd', cmd.id )
+			GiveOrderToUnit(unitID, CMD_REMOVE, { cmd.tag }, {})
+		end
+	end
+	retreatCmds[unitID] = nil
+	retreatWaitCmds[unitID] = nil
+	
+	wantStopRetreat[unitID] = nil
+	retreatMoveOrders[unitID] = nil
+end
+
+
+local function StartRetreat(unitID, force)
 	local hx, hy, hz, dSquared = FindClosestHavenToUnit(unitID)
 	hx = hx + dist - rand(10, dist*2)
 	--hy = hy
 	hz = hz + dist - rand(10, dist*2)
 
-	if (dSquared > maxDistSqr) then
+	if force or dSquared > maxDistSqr then
 		local insertIndex = 0
+		
+		retreatMoveOrders[unitID] = {hx, hy, hz}
+		waitingForCommands[unitID] = true
+		
 		-- using OPT_INTERNAL so that the CMD.MOVE order is not cycled when the unit has repeat enabled
 		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex+1, CMD_WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 
-		retreatingUnits[unitID] = {hx, hy, hz}
 		
 		--add last position
 		if options.returnLastPosition.value then
 			local ux, uy, uz = GetUnitPosition(unitID)
-			retreatingUnits[unitID][4] = ux
-			retreatingUnits[unitID][5] = uy
-			retreatingUnits[unitID][6] = uz
+			retreatMoveOrders[unitID][4] = ux
+			retreatMoveOrders[unitID][5] = uy
+			retreatMoveOrders[unitID][6] = uz
 		end
 	end
 end
 
-function SetWantRetreat(unitID, want)
+local function SetWantRetreat(unitID, want)
+	if wantRetreat[unitID] ~= want then
+		processUnitsNow[unitID] = true
+	end
+	if wantRetreat[unitID] and not want then
+		wantStopRetreat[unitID] = true
+	end
+	
 	wantRetreat[unitID] = want
 	WG.icons.SetUnitIcon( unitID, {
 		name='retreatstate',
@@ -271,23 +263,76 @@ function SetWantRetreat(unitID, want)
 	} )
 end
 
+local function CheckSetWantRetreat(unitID, health, maxHealth, retreatOrder)
+	local healthRatio = health / maxHealth
+	local threshold = retreatOrder * 0.3
+	local _,_,inBuild = GetUnitIsStunned(unitID)
+
+	if healthRatio < threshold and (not inBuild) then        
+		SetWantRetreat(unitID, true)
+	elseif (healthRatio == 1) then
+		SetWantRetreat(unitID, nil)
+	end
+end
+
+local function CheckCommands(unitID)
+	local cmds = GetFirst3Commands(unitID)
+	if #cmds < 2 then return end
+	
+	if IsRetreatMove(unitID, cmds[1]) and cmds[2].id == CMD.WAIT then
+		retreatCmds[unitID] = cmds[1].tag
+		retreatWaitCmds[unitID] = cmds[2].tag
+		waitingForCommands[unitID] = nil
+		processUnitsNow[unitID] = true
+	end
+end
+
+local function ProcessUnit(unitID)
+	if wantRetreat[unitID] then
+		if not retreatWaitCmds[unitID] then
+			StartRetreat(unitID, true)
+		end
+		if options.removeFromSelection.value then
+			retreatedUnits[#retreatedUnits+1] = unitID
+		end
+		
+	elseif wantStopRetreat[unitID] then
+		StopRetreating(unitID)
+	end
+end
+
+local function RemoveUnitData(unitID)
+	SetWantRetreat(unitID, nil)
+	retreatOrdersArray[unitID] = nil
+	retreatMoveOrders[unitID] = nil
+	retreatCmds[unitID] = nil
+	retreatWaitCmds[unitID] = nil
+	waitingForCommands[unitID] = nil
+	processUnitsNow[unitID] = nil
+	wantRetreat[unitID] = nil
+	wantStopRetreat[unitID] = nil
+	mobileUnits[unitID] = nil
+end
+
+local function RemoveAllButRetreatCmds(unitID)
+	local cmds = GetUnitCommands(unitID)
+	for _,cmd in ipairs(cmds) do
+		if cmd.tag ~= retreatCmds[unitID] and cmd.tag ~= retreatWaitCmds[unitID] then
+			echo(' -- removing ', CMD[cmd.id], cmd.tag)
+			GiveOrderToUnit(unitID, CMD_REMOVE, { cmd.tag }, {})
+		end
+	end
+end
+
 --------------------
 -- callins
 
 function widget:Initialize()
-	--[[
-	if (not (widgetHandler.knownWidgets["CALayout"] or {}).active) then
-		Spring.Echo("RetreatWidget: You have deactivated the CALayout widget, which is needed by the retreat widget!")
-		widgetHandler:RemoveWidget(widget)
-		return
-	end
-	--]]
-
 	myTeamID = GetLocalTeamID()
-	tooltips[1] = 'Orders: never retreat.'
-	tooltips[2] = 'Orders: retreat at less than 30% of health (right-click to turn off).'
-	tooltips[3] = 'Orders: retreat at less than 60% of health (right-click to turn off).'
-	tooltips[4] = 'Orders: retreat at less than 90% of health (right-click to turn off).'
+	tooltips[1] = 'Orders: Never retreat.'
+	tooltips[2] = 'Orders: Retreat at less than 30% health (right-click to cancel).'
+	tooltips[3] = 'Orders: Retreat at less than 60% health (right-click to cancel).'
+	tooltips[4] = 'Orders: Retreat at less than 90% health (right-click to cancel).'
 
 	WG['retreat'] = {}
 	WG['retreat'].addRetreatCommand = function(unitID, unitDefID, retreatOrder)		
@@ -298,7 +343,7 @@ function widget:Initialize()
 	WG.icons.SetDisplay( 'retreatstate', true )
 	WG.icons.SetPulse( 'retreatstate', true )
 	
-	WG.retreatingUnits = retreatingUnits --make this table global, available to all widget
+	WG.retreatingUnits = retreatMoveOrders --make this table global, available to all widget
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, teamID, builderID, _, _)
@@ -310,19 +355,11 @@ function widget:UnitFromFactory(unitID, unitDefID, teamID, builderID, _, _)
 end
 
 function widget:UnitDestroyed(unitID, _, teamID)
-	SetWantRetreat(unitID, nil)
-	pauseRetreatChecks[unitID] = nil
-	retreatOrdersArray[unitID] = nil
-	retreatingUnits[unitID] = nil
-	mobileUnits[unitID] = nil
+	RemoveUnitData(unitID)
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
-	SetWantRetreat(unitID, nil)
-	pauseRetreatChecks[unitID] = nil
-	retreatOrdersArray[unitID] = nil
-	retreatingUnits[unitID] = nil
-	mobileUnits[unitID] = nil
+	RemoveUnitData(unitID)
 end
 
 
@@ -351,7 +388,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				SetWantRetreat(unitID, nil)
 				if not foundValidUnit then
 					foundValidUnit = true
-					--[[ --scheme1: left-click to cycle between 3 retreat state, right-click to de-activate retreat
+					-- [[ --scheme1: left-click to cycle between 3 retreat state, right-click to de-activate retreat
 					if not cmdOptions.right then
 						if retreatOrdersArray[unitID] then
 							newRetreatOrder = retreatOrdersArray[unitID] % 3 + 1
@@ -360,6 +397,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 						end
 					end
 					--]]
+					--[[
 					--scheme2: left-click to cycle 4 retreat state upward, right-click to cycle 4 retreat state downward.
 					newRetreatOrder = retreatOrdersArray[unitID] or 0
 					if cmdOptions.right then
@@ -373,76 +411,57 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 							newRetreatOrder = 0
 						end
 					end
+					--]]
 				end
 
 				setRetreatOrder(unitID, unitDefID, newRetreatOrder)
 				if newRetreatOrder==0 then --if no-retreat
-					pauseRetreatChecks[unitID] = GetGameFrame() + 64 --pause checking for ~2 second. We dont want retreat order to end abruptly if user is just cycling thru options.
+					wantStopRetreat[unitID] = true
 				end
 			end --if canmove
 		end --for
 		return true
 	else
-		--exclude currently retreating unit for ~5 second
-		if (havenCount > 0) then
-			local selectedUnits = GetSelectedUnits()
-			for i=1, #selectedUnits do
-				local unitID = selectedUnits[i]
-				if retreatingUnits[unitID] or pauseRetreatChecks[unitID] then  --currently paused or retreating
-					pauseRetreatChecks[unitID] = GetGameFrame() + 160 --cancel retreat command until 5 second later
-					retreatingUnits[unitID] = nil
-				end
-			end
-		end
-	end
-end
-
---[[
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdParams) 
-	local commandOverriden = false
-	
-	if cmdID == CMD_MOVE then
-		--if not cmdOptions.shift then
-		if not (math.bit_and(cmdOptions,CMD.OPT_SHIFT) > 0) then
-			commandOverriden = true
-		end
-	
-	elseif (math.bit_and(cmdOptions,CMD.OPT_ALT) > 0) then
-		--ignore these priority commands hopefully issued only by this widget
-	
-	--elseif (not cmdOptions.shift) then
-	elseif not (math.bit_and(cmdOptions,CMD.OPT_SHIFT) > 0)
-		and cmdID ~= CMD_SET_WANTED_MAX_SPEED	
-		and cmdID ~= CMD_FIRE_STATE	and cmdID ~= CMD_MOVE_STATE
-		and cmdID ~= CMD_ONOFF		and cmdID ~= CMD_REPEAT
-		and cmdID ~= CMD_CLOAK		and cmdID ~= CMD_CLOAK_SHIELD	
-		and cmdID ~= CMD_STEALTH	and cmdID ~= CMD_WAIT
-		and cmdID ~= CMD_IDLEMODE
-		then
-		commandOverriden = true
-	end
-
-	if commandOverriden and retreatingUnits[unitID] then
-		local cmd1 = GetFirstCommand(unitID)
-
-		if not cmd1 then
-			--retreatingUnits[unitID] = nil
-		elseif IsRetreatMove(unitID, cmd1) then
-			Retreat(unitID)	
-		elseif (cmd1.id == CMD_WAIT) then			
-			GiveOrderToUnit(unitID, CMD_WAIT, {}, {})
+		if cmdOptions.shift then
+			return false
 		end
 		
-		--local selectedUnits = GetSelectedUnits()
-		--for i=1, #selectedUnits do
-			--local unitID = selectedUnits[i]
-			--retreatingUnits[unitID] = nil
-		--end
-
+		--don't override commandinsert
+		local _,_,meta,_ = Spring.GetModKeyState()
+		if meta then
+			return false
+		end
+		
+		local selectedUnits = GetSelectedUnits()
+		for i=1, #selectedUnits do
+			local unitID = selectedUnits[i]
+			
+			local cmdOptions2 = {}
+			--if (cmdOptions.shift) then table.insert(cmdOptions2, "shift")   end
+			if (cmdOptions.alt)   then table.insert(cmdOptions2, "alt")   end
+			if (cmdOptions.ctrl)  then table.insert(cmdOptions2, "ctrl")  end
+			if (cmdOptions.right) then table.insert(cmdOptions2, "right") end
+			
+			
+			if wantRetreat[unitID] and
+				(
+					cmdID == CMD.MOVE
+					or cmdID == CMD.FIGHT
+					or cmdID == CMD.STOP
+				)
+				then
+				CheckCommands(unitID)
+				RemoveAllButRetreatCmds(unitID)
+				table.insert(cmdOptions2, "shift")
+			end
+			GiveOrderToUnit(unitID, cmdID, cmdParams, cmdOptions2 )
+			
+		end
+		
+		return true
 	end
-	
 end
---]]
+
 
 function widget:CommandsChanged()
 	local selectedUnits = GetSelectedUnits()
@@ -459,7 +478,7 @@ function widget:CommandsChanged()
 		params  = { }, 
 		texture = 'LuaUI/Images/commands/Bold/retreat.png',
 
-		pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT}, 
+		pos = {CMD_CLOAK}, 
 	})
 
 	-- Find out if menu should display retreat-state button 
@@ -484,7 +503,7 @@ function widget:CommandsChanged()
 				action  = 'retreat',
 				params  = { retreatOrder , 'Retreat Off', 'Retreat 30%', 'Retreat 60%', 'Retreat 90%' }, 
 
-				pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE}, 
+				pos = {CMD_CLOAK}, 
 			})
    
 		end--if canmove
@@ -492,8 +511,6 @@ function widget:CommandsChanged()
 		if foundRetreatable then
 			return
 		end
-
-
 	end--for 
 end
 
@@ -506,29 +523,17 @@ end
 function widget:UnitDamaged(unitID) 
 	local retreatOrder = retreatOrdersArray[unitID]
 	
-	if (havenCount > 0) and
-	(retreatOrder ~= nil and retreatOrder > 0 and mobileUnits[unitID]) and
-	not (retreatingUnits[unitID] or pauseRetreatChecks[unitID])
+	if (havenCount > 0)
+		and retreatOrder ~= nil
+		and retreatOrder > 0
+		and mobileUnits[unitID]
+		and not retreatMoveOrders[unitID] 
 	then 
 		local health, maxHealth = GetUnitHealth(unitID)
 		if (health) then
 
-			local healthRatio = health / maxHealth
-			local threshold = retreatOrder * 0.3
-			local _,_,inBuild = GetUnitIsStunned(unitID)
-
-			if healthRatio < threshold and (not inBuild) then        
-				SetWantRetreat(unitID, true)
-			elseif (healthRatio == 1) then
-				SetWantRetreat(unitID, nil)
-			end
-
-			if wantRetreat[unitID] then				        
-				Retreat(unitID)
-				if options.removeFromSelection.value then 
-					retreatedUnits[#retreatedUnits+1] = unitID
-				end
-			end 
+			CheckSetWantRetreat(unitID, health, maxHealth, retreatOrder)
+			
 		end 
 	end 
 
@@ -539,97 +544,84 @@ function widget:GameFrame(gameFrame)
 	local frame160 = gameFrame % 160 == 0 -- ~5 second
 	currentGameFrame = gameFrame
 
-	--clear any Ignore list if it expired (this will un-block retreat check in gadget:UnitDamaged() as well as retreat check in gadget:GameFrame() *here*) 
-	for unitID, timeToClear in pairs(pauseRetreatChecks) do
-		if timeToClear <= gameFrame then
-			pauseRetreatChecks[unitID] = nil --clear ignore list when expired
-		end
-	end
-	
-	--Every 5 seconds, check all unit in case they are heading to a deleted retreat area
-	if (frame160) then
-		for unitID, _ in pairs(retreatOrdersArray) do
-			if retreatingUnits[unitID] and not HeadingToHaven(unitID) then --if heaven is no longer exist			
-				pauseRetreatChecks[unitID] = nil --cancel any pause applied to checks
-				StopRetreating(unitID) --remove retreat queue and nullify "retreatingUnits[unitID]"
-				Retreat(unitID) --redirect unit
-			end
-		end
-	end	
-	
-	if (frame32) then
+	if frame32 then
 		--check all unit if retreat is needed, apply retreat if needed, remove retreat queue if no longer needed.
 		for unitID, retreatOrders in pairs(retreatOrdersArray) do
-			if mobileUnits[unitID] and not pauseRetreatChecks[unitID] then
+			if mobileUnits[unitID] then
         		local health, maxHealth = GetUnitHealth(unitID)
 				
 				if (health) then
-					local healthRatio = health / maxHealth
-					local threshold = retreatOrders * 0.3
-					local _,_,inBuild = GetUnitIsStunned(unitID)
-
-					if healthRatio < threshold and (not inBuild) then       
-						SetWantRetreat(unitID, true)
-					elseif (healthRatio == 1) then
-						SetWantRetreat(unitID, nil)
-					end
-
-					if wantRetreat[unitID] then				        
-						if (havenCount > 0) and not retreatingUnits[unitID] then
-							Retreat(unitID)
-							if options.removeFromSelection.value then
-								retreatedUnits[#retreatedUnits+1] = unitID
-							end
-						end
-					else --not wantRetreat[unitID]
-						if retreatingUnits[unitID] then
-							pauseRetreatChecks[unitID] = nil
-							StopRetreating(unitID)
-						end
-					end
+					CheckSetWantRetreat(unitID, health, maxHealth, retreatOrders)
 				end
+				
+				if waitingForCommands[unitID] then
+					CheckCommands(unitID)
+				end
+				
 			end
 		end -- for
 	end --if frame 1/30
+	
+	if frame160 then
+		for unitID, retreatOrders in pairs(retreatOrdersArray) do
+			if retreatMoveOrders[unitID] and not HeadingToHaven(unitID) then
+				StopRetreating(unitID)
+				processUnitsNow[unitID] = true
+			end
+		end
+	end
+	
+	for unitID, _ in pairs(processUnitsNow) do
+		ProcessUnit(unitID)
+	end
+	
+	processUnitsNow = {}
+	
 	--remove retreating unit from selection (only perform at selection change or when retreat is ordered)
 	if options.removeFromSelection.value then
-		if currentSelection then --new selection
+		local commitChange = false
+		if currentSelection then --new selection?
 			local unitsToDeselect= {}
 			local selectionCount = #currentSelection
 			local retreatedCount = 0
 			for i=1, selectionCount do
 				local unitID = currentSelection[i]
-				if retreatingUnits[unitID] then --selection contain retreating units
+				if retreatMoveOrders[unitID] then --selection contain retreating units
 					unitsToDeselect[#unitsToDeselect+1] = i
 					retreatedCount = retreatedCount + 1
 				end
 			end
-			if retreatedCount > 0 and (retreatedCount/selectionCount) < 0.4 then --retreating unit is minority?
-				for i=1, #unitsToDeselect do
+			if retreatedCount > 0 and (retreatedCount/selectionCount) < maximumDeselect then --retreating unit is minority?
+				table.sort(unitsToDeselect, function(a,b) return a>b end) --sort from biggest index to lowest index
+				for i=1, retreatedCount do
 					table.remove(currentSelection, unitsToDeselect[i]) --remove from list
 				end
-				SelectUnitArray(currentSelection) --update unit selection
+				commitChange = true--update unit selection
 			end
-			currentSelection = nil --finish deselecting units
-			
-		elseif #retreatedUnits > 0 then -- there is recently retreating units?
-			local selectedUnits = GetSelectedUnits() --get existing selection
+		end
+		if #retreatedUnits > 0 then -- there is recently retreating units?
+			currentSelection = currentSelection or GetSelectedUnits() --get existing selection
 			local changes = false
 			for i=1, #retreatedUnits do
 				local retreatingUnitID = retreatedUnits[i]
-				for j=1, #selectedUnits do
-					if selectedUnits[j] == retreatingUnitID then --selection contain recently retreating units
-						table.remove(selectedUnits, j) --unit remove from existing selection
+				for j=1, #currentSelection do
+					local selectedUnitID = currentSelection[j]
+					if selectedUnitID == retreatingUnitID then --selection contain recently retreating units
+						table.remove(currentSelection, j) --unit remove from existing selection
 						changes = true
 						break;
 					end
 				end
 			end
 			if changes then --have unit to deselect?
-				SelectUnitArray(selectedUnits) --update unit selection
+				commitChange = true --update unit selection
 			end
 			retreatedUnits = {} --empty recent-retreat list
 		end
+		if commitChange then
+			SelectUnitArray(currentSelection) --apply selection changes
+		end
+		currentSelection = nil --flag: finish deselecting units
 	end
 end
 
