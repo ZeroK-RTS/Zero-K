@@ -38,6 +38,8 @@ function widget:CommandNotify(id, params, options)
         local units = Spring.GetSelectedUnits()
         for i = 1, #units do
             local unitID = units[i]
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local ud = UnitDefs[unitDefID]
             if isValidType(ud) and Spring.ValidUnitID(unitID) then
                 Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,{})
             end
