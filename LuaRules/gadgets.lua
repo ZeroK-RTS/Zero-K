@@ -20,7 +20,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
 local DepthMod = 10
 local DepthValue = -1
 
@@ -40,7 +39,7 @@ local function mynext(...)
 	return i,v
 end
 
-function pairs(...) 
+pairs = function(...) 
 	if SendToUnsynced then
 		local n,s,i = origPairs(...)
 		return mynext,s,i
@@ -49,8 +48,6 @@ function pairs(...)
 		return next,s,i
 	end
 end
-
-
 
 local SAFEWRAP = 0
 -- 0: disabled
@@ -67,7 +64,6 @@ local VFSMODE = VFS.ZIP_ONLY
 if (Spring.IsDevLuaEnabled()) then
   VFSMODE = VFS.RAW_ONLY
 end
-
 
 VFS.Include(HANDLER_DIR .. 'setupdefs.lua', nil, VFSMODE)
 VFS.Include(HANDLER_DIR .. 'system.lua',    nil, VFSMODE)
