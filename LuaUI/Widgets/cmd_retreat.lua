@@ -159,7 +159,7 @@ local function IsRetreatMove(unitID, cmd)
 		return false
 	end
 	
-	echo(CMD[cmd.id], cmd.params[1] , cmd.params[2] , cmd.params[3], dest[1], dest[2], dest[3]  )
+	--echo(CMD[cmd.id], cmd.params[1] , cmd.params[2] , cmd.params[3], dest[1], dest[2], dest[3]  )
 
 	if cmd.params[1] == dest[1] 
 		and  cmd.params[2] == dest[2]
@@ -318,7 +318,7 @@ local function RemoveAllButRetreatCmds(unitID)
 	local cmds = GetUnitCommands(unitID)
 	for _,cmd in ipairs(cmds) do
 		if cmd.tag ~= retreatCmds[unitID] and cmd.tag ~= retreatWaitCmds[unitID] then
-			echo(' -- removing ', CMD[cmd.id], cmd.tag)
+			--echo(' -- removing ', CMD[cmd.id], cmd.tag)
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmd.tag }, {})
 		end
 	end
