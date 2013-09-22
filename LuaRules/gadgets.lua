@@ -29,7 +29,7 @@ local function mynext(...)
 	local i,v = next(...)
 	local t = type(i)
 	if not whiteList[t] then
-		Spring.Echo('*** A gadget is misusing pairs! ***')
+		Spring.Echo('*** A gadget is misusing pairs! Report this with full infolog.txt! ***')
 		Spring.Echo(t)
 		Spring.Echo(i)
 		Spring.Echo(v)
