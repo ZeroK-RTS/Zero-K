@@ -132,7 +132,7 @@ unitDef = {
       footprintX       = 5,
       footprintZ       = 4,
       metal            = 640,
-      object           = [[armcrabe_dead]],
+      object           = [[crabe_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 640,
     },
