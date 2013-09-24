@@ -161,11 +161,12 @@ local barColors = {
   disarm_p= { 0.40,0.40,0.40,barAlpha },
   disarm_b= { 0.60,0.60,0.60,barAlpha },
   capture = { 1.00,0.50,0.00,barAlpha },
+  capture_reload = { 0.00,0.60,0.60,barAlpha },
   build   = { 0.75,0.75,0.75,barAlpha },
   stock   = { 0.50,0.50,0.50,barAlpha },
   reload  = { 0.00,0.60,0.60,barAlpha },
   reload2 = { 0.70,0.30,0.00,barAlpha },
-  jump    = { 0.70,0.30,0.00,barAlpha },
+  jump    = { 0.00,0.60,0.60,barAlpha },
   sheath  = { 0.00,0.20,1.00,barAlpha },
   fuel    = { 0.70,0.30,0.00,barAlpha },
   slow    = { 0.50,0.10,0.70,barAlpha },
@@ -764,7 +765,7 @@ do
 	  local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
       if (captureReloadState and captureReloadState > 0) then
 		local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
-        AddBar("capture reload",capture,"reload2",(fullText and floor(capture*100)..'%') or '')
+        AddBar("capture reload",capture,"reload",(fullText and floor(capture*100)..'%') or '')
       end
 	  
 	  --// WATER TANK
