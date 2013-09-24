@@ -7,6 +7,8 @@ if (Spring.GetModOptions) then
   modOptions = Spring.GetModOptions()
 end
 
+local reverseCompat = (Game and true) or false -- Game is nil in 91.0
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility
@@ -288,15 +290,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
--- 
+-- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
 
---[[
-for name, ud in pairs(UnitDefs) do
-	if (ud.canfly) then
-		ud.brakerate = ud.brakerate * 0.1
+if reverseCompat then
+	for name, ud in pairs(UnitDefs) do
+		if (ud.canfly) then
+			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 0.1
+		end
 	end
 end
---]]
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -308,9 +311,14 @@ local ACCEL_MULT = 3
 local ACCEL_MULT_HIGH = 5
 
 for name, ud in pairs(UnitDefs) do
-	--if  then
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
+		
+		-- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
+		if ud.acceleration == ud.brakerate and reverseCompat then
+			ud.brakerate = ud.brakerate * 3
+		end
+		
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
 			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
