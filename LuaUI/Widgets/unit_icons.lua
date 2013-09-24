@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Unit Icons",
-    desc      = "v0.032 Shows icons above units",
+    desc      = "v0.033 Shows icons above units",
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
@@ -76,7 +76,7 @@ local unitHeights  = {}
 local iconOrders = {}
 local iconOrders_order = {}
 
-local iconoffset = 14
+local iconoffset = 22
 
 
 local iconUnitTexture = {}
