@@ -64,12 +64,20 @@ local options = {
     def    = false,
     section= 'modifiers',
   },
-    {
+  {
+    key = "noelo",
+    name = "No Elo",
+    desc = "Prevent battle from affecting Elo rankings",
+    type = "bool",
+    section= 'modifiers',
+    def = true,
+  },
+  {
     key    = 'koth',
     name   = 'King of the Hill Settings',
     desc   = 'Settings for King of the Hill mode.',
     type   = 'section',
-    },
+  },
     {
         key='hilltime',
         name='Hill control time',
