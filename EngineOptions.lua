@@ -140,18 +140,11 @@ local options =
   },
 
   {
-    key    = 'LimitSpeed',
-    name   = 'Speed Restriction',
-    desc   = 'Limits maximum and minimum speed that the players will be allowed to change to',
-    type   = 'section',
-  },
-  
-  {
     key    = 'MinSpeed',
     name   = 'Minimum game speed',
     desc   = 'Sets the minimum speed that the players will be allowed to change to',
     type   = 'number',
-    section= 'LimitSpeed',
+    section= 'modifiers',
     def    = 0.5,
     min    = 0.1,
     max    = 10,
@@ -164,7 +157,7 @@ local options =
     name   = 'Maximum game speed',
     desc   = 'Sets the maximum speed that the players will be allowed to change to',
     type   = 'number',
-    section= 'LimitSpeed',
+    section= 'modifiers',
     def    = 2,
     min    = 0.1,
     max    = 10,
