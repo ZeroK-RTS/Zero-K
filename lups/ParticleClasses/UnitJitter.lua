@@ -149,8 +149,7 @@ function UnitJitter:Draw()
     end
   end
 
-  --glColor(self.teamColor)
-  glColor(0,0,0,0)
+  glColor(self.teamColor)
   glUnit(self.unit,true,-1)
 end
 
