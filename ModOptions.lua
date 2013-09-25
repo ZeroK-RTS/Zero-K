@@ -70,7 +70,7 @@ local options = {
     desc = "Prevent battle from affecting Elo rankings",
     type = "bool",
     section= 'modifiers',
-    def = true,
+    def = false,
   },
   {
     key    = 'koth',
