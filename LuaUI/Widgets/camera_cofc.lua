@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.123 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.124 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-September-21
+    date      = "2011-03-16", --2013-September-25
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -305,7 +305,7 @@ options = {
 	},
 	followautozoom = {
 		name = "Auto zoom",
-		desc = "Auto zoom in and out if following player's cursor (zoom level will represent player's focus). \n\nDO NOT enable this if you want to control the zoom level yourself.",
+		desc = "Auto zoom in and out while following player's cursor (zoom level will represent player's focus). \n\nDO NOT enable this if you want to control the zoom level yourself.",
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
@@ -466,6 +466,7 @@ local spGetCameraDirection	= Spring.GetCameraDirection
 local spSetCameraTarget		= Spring.SetCameraTarget
 local spGetTimer 			= Spring.GetTimer
 local spDiffTimers 			= Spring.DiffTimers
+local spGetUnitDefID 		= Spring.GetUnitDefID
 
 local abs	= math.abs
 local min 	= math.min
@@ -1091,48 +1092,64 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
 end
 
 local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump between unit by edge scrolling (by msafwan)
-	local initRadius = 50
+	local detectionSphereRadiusAndPosition = {
+		--This big spheres will fill a 90-degree cone and is used to represent a detection cone facing forward/left/right/backward. It's size will never exceed the 90-degree cone, but bigger sphere will always overlap halfway into smaller sphere and some empty space still exist on the side.
+		--the first 25-elmo from unit is an empty space (which is really close to unit and thus needed no detection sphere)
+		[1]={60,85}, --smaller sphere
+		[2]={206,291}, --bigger sphere
+		[3]={704,995},
+		[4]={2402,3397},
+		[5]={8201,11598},
+		[6]={28001,39599},
+		--90-degree cone
+	}
 	--local camVecs = spGetCameraVectors()
 	local isSpec = Spring.GetSpectatingState()
-	local teamID = (not isSpec and Spring.GetMyTeamID()) --get teamID if not spec
-	local foundUnit
+	local teamID = (not isSpec and Spring.GetMyTeamID()) --get teamID ONLY IF not spec
+	local foundUnit, foundUnitStructure
 	local forwardOffset,backwardOffset,leftOffset,rightOffset
 	if move.right or rot.right then --content of move & rot table is set in Update() and in KeyPress(). Is global. Is used to start scrolling & rotation (initiated in Update()) 
-		rightOffset =initRadius
+		rightOffset =true
 	elseif move.up or rot.up then
-		forwardOffset = initRadius
+		forwardOffset = true
 	elseif move.left or rot.left then
-		leftOffset =initRadius
+		leftOffset =true
 	elseif move.down or rot.down then
-		backwardOffset = initRadius
+		backwardOffset = true
 	end
-	for i=1, 5 do --create a (detection) sphere of increasing size (x5) in scroll direction
-		local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
-		local x,y,z = spGetUnitPosition(thirdperson_trackunit) 
-		y = y+25
-		local offX_temp = (forwardOffset and forwardOffset+25) or (backwardOffset and -backwardOffset-25) or 0 --set direction where sphere must grow in x,y,z (global) direction.
+	local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
+	local x,y,z = spGetUnitPosition(thirdperson_trackunit) 
+	y = y+25
+	for i=1, 3 do --create a (detection) sphere of increasing size to ~1600-elmo range in scroll direction
+		local sphereCenterOffset = detectionSphereRadiusAndPosition[i][2]
+		local sphereRadius = detectionSphereRadiusAndPosition[i][1]
+		local offX_temp = (forwardOffset and sphereCenterOffset) or (backwardOffset and -sphereCenterOffset) or 0 --set direction where sphere must grow in x,y,z (global) direction.
 		local offY_temp = 0
-		local offZ_temp = (rightOffset and rightOffset+25) or (leftOffset and -leftOffset-25) or 0
+		local offZ_temp = (rightOffset and sphereCenterOffset) or (leftOffset and -sphereCenterOffset) or 0
 		local offX = front[1]*offX_temp + top[1]*offY_temp + right[1]*offZ_temp --rotate (translate) the global right/left/forward/backward into a direction relative to current unit
 		local offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
 		local offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
-		local selUnits = Spring.GetUnitsInSphere(x+offX,y+offY,z+offZ, initRadius,teamID) --create sphere that detect unit in area of this direction
-		Spring.SelectUnitArray({selUnits[1]}) --test select unit (in case its not selectable)
-		selUnits = spGetSelectedUnits()
-		if selUnits and selUnits[1] then --find unit in that area
-			foundUnit = selUnits[1]
-			break
+		local sphUnits = Spring.GetUnitsInSphere(x+offX,y+offY,z+offZ, sphereRadius,teamID) --create sphere that detect unit in area of this direction
+		for i=1, #sphUnits do
+			local unitID = sphUnits[i]
+			Spring.SelectUnitArray({unitID}) --test select unit (in case its not selectable)
+			local selUnits = spGetSelectedUnits()
+			if selUnits and selUnits[1] then --find unit in that area
+				local defID = spGetUnitDefID(unitID)
+				--Note: additional randomness is good, so no nearest distance checking is needed.
+				if UnitDefs[defID] and UnitDefs[defID].speed >0 then
+					foundUnit = selUnits[1]
+					break
+				elseif not foundUnitStructure then
+					foundUnitStructure = selUnits[1]
+				end
+			end
 		end
-		if forwardOffset then --increase distance of detection sphere away into selected direction
-			forwardOffset =forwardOffset*2
-		elseif backwardOffset then
-			backwardOffset =backwardOffset*2
-		elseif leftOffset then
-			leftOffset =leftOffset*2
-		elseif rightOffset then
-			rightOffset =rightOffset*2
-		end
-		initRadius =initRadius*2 --increase size of detection sphere
+		if foundUnit then break end
+		-- i++ (increase size of detection sphere) & (increase distance of detection sphere away into selected direction)
+	end
+	if not foundUnit then --if no mobile unit in the area: use closest structure (as target)
+		foundUnit = foundUnitStructure
 	end
 	if not foundUnit then --if no unit in the area: use current unit (as target)
 		foundUnit = thirdperson_trackunit

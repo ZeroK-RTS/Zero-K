@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.7"
+local versionNumber = "v1.5.8"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -53,6 +53,8 @@ local dayNightCycle        = true                --enables day/night cycle
 local startDayTime         = 0                   --start time, between 0 and 1; 0 = midnight, 0.5 = noon
 local secondsPerDay        = 600                 --seconds per day
 
+local maxBeamDivergent = 2 					--how big the light beam can expand if unit get further away from ground
+
 --------------------------------------------------------------------------------
 --other vars
 --------------------------------------------------------------------------------
@@ -70,6 +72,8 @@ local searchlightBuildingAngle = 0
 local noLightList = {}
 
 local vsx, vsy
+
+local cache = {} --cache some calculation result for efficiency
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -287,19 +291,19 @@ local function DrawSearchlights()
   for _, unitID in pairs(visibleUnits) do
 	if GetUnitPosition(unitID) and not GetUnitIsDead(unitID) then
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
+		local defID = GetUnitDefID(unitID)
 		local unitRadius = GetUnitRadius(unitID) or 10
-		local px, py, pz = GetUnitPosition(unitID,true) --get mid position. Since Spring 89: it return baseposition instead of midposition unless you add "true" to second argument.
+		local px, py, pz = GetUnitPosition(unitID) --get position.
 		local relativeHeight = searchlightHeightOffset * unitRadius
 		py = py + relativeHeight
 		local groundy = math.max(GetGroundHeight(px, pz), 0)
 		local absHeight = py - groundy
-		local unitDefID = GetUnitDefID(unitID)
-		local unitDef = UnitDefs[unitDefID]
+		local unitDef = UnitDefs[defID]
 		
 		if (unitDef
 			and absHeight > 0
 			and (not buildProgress or buildProgress >= 1)
-			and not noLightList[unitDefID]
+			and not noLightList[defID]
 			and timeFromNoon > (0.25 + ((unitID * 97) % 256) / 8192)
 			and not GetUnitIsCloaked(unitID)
 			and not GetUnitTransporter(unitID)
@@ -314,9 +318,17 @@ local function DrawSearchlights()
 		  local isAboveNominalHeight = false
 		  
 		  if (not speed or speed == 0) then
+			cache[defID]= cache[defID] or {}
+			if not cache[defID].leadDist then
+				leadDistance = unitRadius * 2
+				leadDist_to_height_ratio = leadDistance/relativeHeight
+				--cache
+				cache[defID].leadDist = leadDistance
+				cache[defID].lhRatio = leadDist_to_height_ratio
+			end
 			heading = searchlightBuildingAngle * (0.5 + ((unitID * 137) % 256) / 512)
-			leadDistance = unitRadius * 2
-			leadDist_to_height_ratio = leadDistance/relativeHeight
+			leadDistance = cache[defID].leadDist
+			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius
 		  elseif (unitDef.type == "Bomber" or unitDef.type == "Fighter") then
 			local vx, _, vz = GetUnitVelocity(unitID)
@@ -326,20 +338,38 @@ local function DrawSearchlights()
 			leadDist_to_height_ratio = leadDistance/relativeHeight
 			radius = unitRadius * 2
 		  elseif (unitDef.canFly) then
-			heading = -1*(GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
-			local range = math.max(unitDef.buildDistance, unitDef.maxWeaponRange)
-			leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight,0)) * 0.8
-			relativeHeight = relativeHeight+unitDef.wantedHeight
-			leadDist_to_height_ratio = leadDistance/relativeHeight
+			cache[defID]= cache[defID] or {}
+			if not cache[defID].leadDist then
+				local range = math.max(unitDef.buildDistance, unitDef.maxWeaponRange)
+				leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight,0)) * 0.8
+				relativeHeight = relativeHeight+unitDef.wantedHeight
+				leadDist_to_height_ratio = leadDistance/relativeHeight
+				--cache
+				cache[defID].leadDist = leadDistance
+				cache[defID].relativeY = relativeHeight
+				cache[defID].lhRatio = leadDist_to_height_ratio
+			end
+		    heading = -1*(GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
+			leadDistance = cache[defID].leadDist
+			relativeHeight = cache[defID].relativeY 
+			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius * 2
 		  else
+		    cache[defID]= cache[defID] or {}
+			if not cache[defID].leadDist then
+				leadDistance = searchlightGroundLeadTime * speed
+				leadDist_to_height_ratio = leadDistance/relativeHeight
+				--cache
+				cache[defID].leadDist = leadDistance
+				cache[defID].lhRatio = leadDist_to_height_ratio
+			end
 			heading = -1*(not (GetUnitIsDead(unitID)) and GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
-			leadDistance = searchlightGroundLeadTime * speed
-			leadDist_to_height_ratio = leadDistance/relativeHeight
+			leadDistance = cache[defID].leadDist
+			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius
 		  end
-		  
-		  local newLeadDist = math.min(leadDist_to_height_ratio*absHeight,leadDistance*2) --limit searchlight distance to 2x the expected distance (beam distance usually become longer if unit jump and become shorter if a gunship/airplane land)
+		  --scale lenght based on height--
+		  local newLeadDist = math.min(leadDist_to_height_ratio*absHeight,leadDistance*maxBeamDivergent) --limit searchlight distance to 1.25x the expected distance (beam distance usually become longer if unit jump and become shorter if a gunship/airplane land)
 		  baseX = px + newLeadDist * math.cos(heading)
 		  baseZ = pz + newLeadDist * math.sin(heading)
 		  ecc = math.min(1 - 2 / (newLeadDist / absHeight + 2), 0.75)
@@ -349,11 +379,16 @@ local function DrawSearchlights()
 		  glColor(currColorInverse)
 		  
 		  --scale radius based on height--
-		  local radius_to_leadDist_ratio= radius/math.sqrt(leadDistance*leadDistance+ relativeHeight*relativeHeight) --ratio of radius-over-distance for original beam
+		  if cache[defID] and not cache[defID].rlRatio then
+			cache[defID].rlRatio = radius/math.sqrt(leadDistance*leadDistance+ relativeHeight*relativeHeight)
+		  end
+		  local cached_rlRatio = cache[defID] and cache[defID].rlRatio
+		  local radius_to_leadDist_ratio= cached_rlRatio or radius/math.sqrt(leadDistance*leadDistance+ relativeHeight*relativeHeight) --ratio of radius-over-distance for original beam
 		  local newRadius = radius_to_leadDist_ratio*math.sqrt(newLeadDist*newLeadDist+ absHeight*absHeight) --explaination: newRadius/newHeight = oldRadius/oldHeight (The same radius-over-distance ratio must apply for all height)
-		  if newRadius/radius >= 2 then
+		  --limit size
+		  if newRadius/radius >= maxBeamDivergent then
 			isAboveNominalHeight = true
-			radius = radius*2
+			radius = radius*maxBeamDivergent
 		  else
 			radius = newRadius
 		  end
@@ -374,7 +409,7 @@ local function DrawSearchlights()
 		  if (options.beam.value) then
 			glColor(searchlightBeamColor)
 			glDepthTest(true)
-			glBeginEnd(GL_TRIANGLE_FAN, BeamVertices, baseX, baseZ, radius, ecc, heading, px, py, pz,isAboveNominalHeight and absHeight/2)
+			glBeginEnd(GL_TRIANGLE_FAN, BeamVertices, baseX, baseZ, radius, ecc, heading, px, py, pz,isAboveNominalHeight and absHeight-relativeHeight*maxBeamDivergent)
 		  end
 		  
 		  glColor(1, 1, 1, 1)
