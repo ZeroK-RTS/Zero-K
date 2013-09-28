@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.002"
+local version = "v0.003"
 
 function widget:GetInfo()
   return {
@@ -36,7 +36,6 @@ local Label
 local Window
 local StackPanel
 local Grid
-local TextBox
 local Image
 local Progressbar
 local Panel
@@ -96,6 +95,7 @@ local sound_waypoint  = LUAUI_DIRNAME .. 'Sounds/buildbar_waypoint.wav'
 local sound_click     = LUAUI_DIRNAME .. 'Sounds/buildbar_click.WAV'
 local sound_queue_add = LUAUI_DIRNAME .. 'Sounds/buildbar_add.wav'
 local sound_queue_rem = LUAUI_DIRNAME .. 'Sounds/buildbar_rem.wav'
+local sound_queue_clear = LUAUI_DIRNAME .. 'Sounds/buildbar_hover.wav'
 
 -------------------------------------------------------------------------------
 
@@ -499,6 +499,7 @@ local function MakeClearButton(unitID)
 				for _, buildCommand in ipairs( buildQueue) do
 					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
 				end
+				Spring.PlaySoundFile(sound_queue_clear, 0.97, 'ui')
 			end
 		},
 		children = {
@@ -561,6 +562,9 @@ RecreateFacbar = function()
 		boStack:AddChild( MakeClearButton( facInfo.unitID ) )
 		
 	end
+	
+	--stack_build:SetPos(options.buttonsize.value*1.2 )
+	stack_build:SetPos(options.buttonsize.value*1.2, nil, 400  ) -- why need width param #3?
 
 	stack_main:Invalidate()
 	stack_main:UpdateLayout()
@@ -651,6 +655,7 @@ function widget:Update()
 	if myTeamID~=Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
 		UpdateFactoryList()
+		widget:SelectionChanged(Spring.GetSelectedUnits())
 	end
 	inTweak = widgetHandler:InTweakMode()
   
@@ -698,7 +703,6 @@ function widget:SelectionChanged(selectedUnits)
 	if facs[pressedFac] then
 		local qStack = facs[pressedFac].qStack
 		local boStack = facs[pressedFac].boStack
-		--facs[pressedFac].facStack:RemoveChild(boStack)
 		stack_build:ClearChildren()
 		stack_build.backgroundColor = {0,0,0,0}
 		facs[pressedFac].facStack:AddChild(qStack)
@@ -763,7 +767,6 @@ function widget:Initialize()
 	Window = Chili.Window
 	StackPanel = Chili.StackPanel
 	Grid = Chili.Grid
-	TextBox = Chili.TextBox
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
 	Panel = Chili.Panel
