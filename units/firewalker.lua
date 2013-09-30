@@ -87,13 +87,12 @@ unitDef = {
       accuracy                = 400,
       areaOfEffect            = 512,
 	  avoidFeature            = false,
+      avoidFriendly           = false,
       craterBoost             = 1,
       craterMult              = 2,
 	  
       damage                  = {
-        default = 80,
-        planes  = 80,
-        subs    = 4,
+        default = 0,
       },
 
       explosionGenerator      = [[custom:black_hole]],

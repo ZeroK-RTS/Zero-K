@@ -90,6 +90,22 @@ local inTransport = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local function IsUnitOnGround(unitID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	local ground =  Spring.GetGroundHeight(x,z)
+
+	if ground and y then
+		local diff = y - ground
+		if diff < 1 then
+			return true
+		end
+	end
+	return false
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 -- General Functionss
 
 local function AddGadgetImpulseRaw(unitID, x, y, z, unitDefID, moveType) -- could be GG if needed.
@@ -109,7 +125,8 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, unitDefID, moveType) -- coul
 	thereIsStuffToDo = true
 end
 
-local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, unitDefID, moveType) 
+
+local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, pushOffGround, unitDefID, moveType) 
 	if inTransport[unitID] then
 		if not affectTransporter then
 			return
@@ -140,7 +157,10 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, u
 		x,y,z = x*mag, y*mag * GUNSHIP_VERTICAL_MULT, z*mag
 	elseif moveTypeByID[unitDefID] == 2 then
 		x,y,z = x*mag, y*mag, z*mag
-		y = y + abs(magnitude)/(20*myMass) 
+		y = y + abs(magnitude)/(20*myMass)
+		if pushOffGround and IsUnitOnGround(unitID) then
+			y = y + 1.1*Game.gravity/30/30
+		end
 		GG.AddSphereicalLOSCheck(unitID, unitDefID)
 	end
 	
@@ -293,7 +313,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local x,y,z = (ux-ax), (uy-ay), (uz-az)
 		local magnitude = impulseWeaponID[weaponDefID].impulse
 		
-		AddGadgetImpulse(unitID, x, y, z, magnitude, true, unitDefID) 
+		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, unitDefID) 
 		
 		if impulseWeaponID[weaponDefID].normalDamage then
 			return damage

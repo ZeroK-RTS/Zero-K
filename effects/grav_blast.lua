@@ -239,7 +239,7 @@ return {
         particlesizespread = 60,
         particlespeed      = 0.15,
         particlespeedspread = 0.05,
-        pos                = [[0, 40, 0]],
+        pos                = [[0, 3, 0]],
         sizegrowth         = -0.4,
         sizemod            = 1,
         texture            = [[chargeparticles]],
