@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.890 Chili Minimap",
+    desc      = "v0.891 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -63,7 +63,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'lastmsgpos', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los'}
@@ -107,9 +107,9 @@ options = {
 	
 	lblViews = { type = 'label', name = 'Views', },
 	
-	--[[ this option was secretly removed
+	-- [[ this option was secretly removed
 	viewstandard = {
-		name = 'Clear map drawings',
+		name = 'View standard map',
 		type = 'button',
 		action = 'showstandard',
 	},
@@ -320,13 +320,14 @@ local function MakeMinimapButton(file, pos, params)
 			Spring.SendCommands( action )
 		end },
 		children={
+		  file and
 			Chili.Image:New{
 				file=file,
 				width="100%";
 				height="100%";
 				x="0%";
 				y="0%";
-			}
+			} or nil
 		},
 	}
 end
@@ -386,12 +387,12 @@ MakeMinimapWindow = function()
 			map_panel,
 			
 			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, {option = 'lastmsgpos'} ),
-			--MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, option = {'viewstandard'} ),
-			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', 2.5, {option = 'clearmapmarks'} ),
-			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, {option = 'viewheightmap'} ),
-			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, {option = 'viewblockmap'} ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, {option = 'viewfow'} ),
+			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', 2, {option = 'clearmapmarks'} ),
+			MakeMinimapButton( nil, 3.5, {option = 'viewstandard'} ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 4.5, {option = 'viewheightmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 5.5, {option = 'viewblockmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 6.5, {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 8, {option = 'viewfow'} ),
 			
 			Chili.Button:New{ 
 				height=iconsize, width=iconsize, 
@@ -399,7 +400,7 @@ MakeMinimapWindow = function()
 				margin={0,0,0,0},
 				padding={4,3,2,2},
 				bottom=iconsize*0.3, 
-				right=iconsize*8.5, 
+				right=iconsize*9 +5, 
 				
 				tooltip = "Toggle simplified teamcolours",
 				
