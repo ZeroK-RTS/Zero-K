@@ -18,10 +18,11 @@ local weapons = {
 		timeFall = 0
 	},
 	firewalker_napalm_mortar = { 
-		radius = 128, 
-		damage = 20, 
-		duration = 600, 
-		rangeFall = 0.6,
+		radius = 256, 
+		damage = 1000,
+		impulse = true,
+		duration = 450, 
+		rangeFall = 0.2,
 		timeFall = 0.5 
 	},
 	chickenwurm_napalm = { 
