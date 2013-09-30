@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.003"
+local version = "v0.004"
 
 function widget:GetInfo()
   return {
@@ -416,7 +416,7 @@ local function MakeButton(unitDefID, facID, facIndex)
 					align="right";
 					valign="top";
 					caption = '';
-					fontSize = 14;
+					fontSize = 16;
 					fontShadow = true;
 				},
 
@@ -773,7 +773,7 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 
 	stack_main = Grid:New{
-		y=20,
+		y=0,
 		padding = {0,0,0,0},
 		itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
@@ -786,7 +786,7 @@ function widget:Initialize()
 	}
 	
 	stack_build = Panel:New{
-		y=20,
+		y=0,
 		x=options.buttonsize.value*1.2 + 0, 
 		right=0,
 		bottom=0,
@@ -815,9 +815,10 @@ function widget:Initialize()
 		minWidth = 56,
 		minHeight = 56,
 		color = {0,0,0,1},
+		caption='Factories',
 		children = {
 			stack_build, --must be first so it's always above of the others (like frontmost layer)
-			Label:New{ caption='Factories', fontShadow = true, },
+			--Label:New{ caption='Factories', fontShadow = true, },
 			stack_main,
 		},
 		OnMouseDown={ function(self)
