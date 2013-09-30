@@ -255,15 +255,14 @@ path='Settings/Interface/Mouse Cursor'
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	} )	
 path='Settings/Interface/Selection'
-	ShButton('Toggle Selection Circles', function() spSendCommands{"luaui togglewidget SelectionCircle"} end, "Draws team-coloured circles under selected and hovered-over units")
 	path='Settings/Interface/Selection/Selection Shapes'
 		ShButton('Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
 	path='Settings/Interface/Selection/Selection XRay&Halo'
-		ShButton('Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected and hovered-over units")	
+		ShButton('Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")	
 	path='Settings/Interface/Selection/Team Platters'
 		ShButton('Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
 	path='Settings/Interface/Selection/Blurry Halo Selections'
-		ShButton('Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Puts team-coloured disk below units")
+		ShButton('Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
