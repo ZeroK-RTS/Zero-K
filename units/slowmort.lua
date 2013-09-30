@@ -82,16 +82,11 @@ unitDef = {
       areaOfEffect            = 8,
       beamDecay               = 0.9,
       beamlaser               = 1,
-      beamTime                = 0.03,
+      beamTime                = 0.1,
       beamttl                 = 40,
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
-	  
-	  customParams            = {
-	    impulse = [[-500]],
-		normaldamage = [[1]],
-	  },
 
       damage                  = {
         default = 220,
