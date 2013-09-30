@@ -28,6 +28,7 @@ local spGetUnitStates = Spring.GetUnitStates
 local CMD_IDLEMODE = CMD.IDLEMODE
 local CMD_REPEAT = CMD.REPEAT
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local abs = math.abs
 
 --local BALLISTIC_GUNSHIP_GRAVITY = -0.2
 --local BALLISTIC_GUNSHIP_HEIGHT = 600000
@@ -46,6 +47,7 @@ local impulseWeaponID = {}
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.impulse then
+		Spring.Echo(wd.name)
 		impulseWeaponID[wd.id] = {
 			impulse = tonumber(wd.customParams.impulse), 
 			normalDamage = (wd.customParams.normaldamage and true or false),
@@ -90,7 +92,7 @@ local inTransport = {}
 -------------------------------------------------------------------------------------
 -- General Functionss
 
-local function AddGadgetImpulse(unitID, x, y, z, unitDefID, moveType) -- could be GG if needed.
+local function AddGadgetImpulseRaw(unitID, x, y, z, unitDefID, moveType) -- could be GG if needed.
 	moveType = moveType or moveTypeByID[unitDefID or Spring.GetUnitDefID(unitID)]
 	if not unit[unitID] then
 		unit[unitID] = {
@@ -107,6 +109,49 @@ local function AddGadgetImpulse(unitID, x, y, z, unitDefID, moveType) -- could b
 	thereIsStuffToDo = true
 end
 
+local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, unitDefID, moveType) 
+	if inTransport[unitID] then
+		if not affectTransporter then
+			return
+		end
+		unitDefID = inTransport[unitID].def
+		unitID = inTransport[unitID].id
+	else
+		unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	end
+	
+	if not moveTypeByID[unitDefID] then
+		return
+	end
+	
+	local _, _, inbuild = Spring.GetUnitIsStunned(unitID)
+	if inbuild then
+		return
+	end
+	
+	local dis = math.sqrt(x^2 + y^2 + z^2)
+	
+	local myMass = transportMass[unitID] or mass[unitDefID]
+	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/myMass
+	
+	if moveTypeByID[unitDefID] == 0 then
+		x,y,z = x*mag, y*mag, z*mag
+	elseif moveTypeByID[unitDefID] == 1 then
+		x,y,z = x*mag, y*mag * GUNSHIP_VERTICAL_MULT, z*mag
+	elseif moveTypeByID[unitDefID] == 2 then
+		x,y,z = x*mag, y*mag, z*mag
+		y = y + abs(magnitude)/(20*myMass) 
+		GG.AddSphereicalLOSCheck(unitID, unitDefID)
+	end
+	
+	AddGadgetImpulseRaw(unitID, x, y, z, unitDefID, moveType)
+	
+	--if moveTypeByID[unitDefID] == 1 and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam) then
+	--	unit[unitID].allied	= true
+	--end
+
+end
+
 local function DetatchFromGround(unitID)
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local h = Spring.GetGroundHeight(x,z)
@@ -120,6 +165,7 @@ local function DetatchFromGround(unitID)
 	end
 end
 
+GG.AddGadgetImpulseRaw = AddGadgetImpulseRaw
 GG.AddGadgetImpulse = AddGadgetImpulse
 GG.DetatchFromGround = DetatchFromGround
 
@@ -239,40 +285,15 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--Spring.AddUnitImpulse(unitID,0,3,0)
-	if impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) and moveTypeByID[unitDefID] then
+	if impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) then
 
-		local _, _, inbuild = Spring.GetUnitIsStunned(unitID)
-		if inbuild then
-			return 0
-		end
-		
 		local ux, uy, uz = Spring.GetUnitPosition(unitID)
 		local ax, ay, az = Spring.GetUnitPosition(attackerID)
 		
-		if inTransport[unitID] then
-			unitDefID = inTransport[unitID].def
-			unitID = inTransport[unitID].id
-		end
+		local x,y,z = (ux-ax), (uy-ay), (uz-az)
+		local magnitude = impulseWeaponID[weaponDefID].impulse
 		
-		local dis = distance(ux,uy,uz,ax,ay,az)
-		local myMass = transportMass[unitID] or mass[unitDefID]
-		local mag = impulseWeaponID[weaponDefID].impulse*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/myMass
-		
-		local x,y,z 
-		if moveTypeByID[unitDefID] == 0 then
-			x,y,z = (ux-ax)*mag, (uy-ay)*mag, (uz-az)*mag
-		elseif moveTypeByID[unitDefID] == 1 then
-			x,y,z = (ux-ax)*mag, (uy-ay)*mag * GUNSHIP_VERTICAL_MULT, (uz-az)*mag
-		elseif moveTypeByID[unitDefID] == 2 then
-			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(8*myMass), (uz-az)*mag
-			GG.AddSphereicalLOSCheck(unitID, unitDefID)
-		end
-		
-		AddGadgetImpulse(unitID, x, y, z, unitDefID)
-		
-		--if moveTypeByID[unitDefID] == 1 and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam) then
-		--	unit[unitID].allied	= true
-		--end
+		AddGadgetImpulse(unitID, x, y, z, magnitude, true, unitDefID) 
 		
 		if impulseWeaponID[weaponDefID].normalDamage then
 			return damage
@@ -290,25 +311,27 @@ local function AddImpulses()
 			local data = unit[unitID]
 			if data.moveType == 1 then
 				local vx, vy, vz = Spring.GetUnitVelocity(unitID)
-				Spring.SetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
-				
-				--if data.allied then
-					local states = spGetUnitStates(unitID)
-					if states["repeat"] then
-						spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
+				if vx then
+					Spring.SetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
+					
+					--if data.allied then
+						local states = spGetUnitStates(unitID)
+						if states["repeat"] then
+							spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
+						end
+					--end
+					--[[
+					if vy + data.y > 0 and not rising[unitID] then
+						rising[unitID] = {inSpace = false}
+						risingByID.count = risingByID.count + 1
+						risingByID.data[risingByID.count] = unitID
 					end
-				--end
-				--[[
-				if vy + data.y > 0 and not rising[unitID] then
-					rising[unitID] = {inSpace = false}
-					risingByID.count = risingByID.count + 1
-					risingByID.data[risingByID.count] = unitID
+					--]]
 				end
-				--]]
 			else
-				Spring.AddUnitImpulse(unitID, 1,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
-				Spring.AddUnitImpulse(unitID, -1,0,0) --remove dummy impulse
+				Spring.AddUnitImpulse(unitID, 10,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
 				Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
+				Spring.AddUnitImpulse(unitID, -10,0,0) --remove dummy impulse
 				--GG.UnitEcho(unitID,data.y)
 			end
 		end

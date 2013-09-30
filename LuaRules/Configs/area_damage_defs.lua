@@ -3,13 +3,55 @@ local array = {}
 local DAMAGE_PERIOD = 2 -- how often damage is applied
 
 local weapons = {
-	napalmmissile_weapon = { radius = 256, damage = 20, duration = 1400, rangeFall = 0.6, timeFall = 0.5},
-	slowmissile_weapon = { radius = 512, damage = 3000, duration = 1800, rangeFall = 0, timeFall = 0},
-	firewalker_napalm_mortar = { radius = 128, damage = 20, duration = 600, rangeFall = 0.6, timeFall = 0.5 },
-	chickenwurm_napalm = { radius = 128, damage = 30, duration = 600, rangeFall = 0.6, timeFall = 0.5 },
-	raveparty_orange_roaster = { radius = 256, damage = 40, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
-	logkoda_napalm_bomblet = { radius = 64, damage = 60, duration = 300, rangeFall = 0.6, timeFall = 0.5 },
-	infernal_napalm = { radius = 192, damage = 60, duration = 300, rangeFall = 0.6, timeFall = 0.5 },
+	napalmmissile_weapon = { 
+		radius = 256, 
+		damage = 20, 
+		duration = 1400, 
+		rangeFall = 0.6, 
+		timeFall = 0.5
+	},
+	slowmissile_weapon = { 
+		radius = 512, 
+		damage = 3000, 
+		duration = 1800, 
+		rangeFall = 0, 
+		timeFall = 0
+	},
+	firewalker_napalm_mortar = { 
+		radius = 128, 
+		damage = 20, 
+		duration = 600, 
+		rangeFall = 0.6,
+		timeFall = 0.5 
+	},
+	chickenwurm_napalm = { 
+		radius = 128, 
+		damage = 30, 
+		duration = 600, 
+		rangeFall = 0.6, 
+		timeFall = 0.5 
+	},
+	raveparty_orange_roaster = { 
+		radius = 256, 
+		damage = 40, 
+		duration = 450, 
+		rangeFall = 0.6, 
+		timeFall = 0.5 
+	},
+	logkoda_napalm_bomblet = { 
+		radius = 64, 
+		damage = 60, 
+		duration = 300, 
+		rangeFall = 0.6, 
+		timeFall = 0.5 
+	},
+	infernal_napalm = { 
+		radius = 192, 
+		damage = 60, 
+		duration = 300, 
+		rangeFall = 0.6, 
+		timeFall = 0.5 
+},
 }
 
 -- radius		- defines size of sphereical area in which damage is dealt
