@@ -18,8 +18,9 @@ local weapons = {
 		timeFall = 0
 	},
 	firewalker_napalm_mortar = { 
-		radius = 128, 
-		damage = 20, 
+		radius = 256, 
+		damage = 2000,
+		impulse = true,
 		duration = 600, 
 		rangeFall = 0.6,
 		timeFall = 0.5 
