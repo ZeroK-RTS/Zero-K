@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.004"
+local version = "v0.005"
 
 function widget:GetInfo()
   return {
@@ -51,7 +51,7 @@ local echo = Spring.Echo
 
 local function RecreateFacbar() end
 
-options_path = 'Settings/HUD Panels/FactoryBar'
+options_path = 'Settings/HUD Panels/FactoryPanel'
 options = {
 	maxVisibleBuilds = {
 		type = 'number',
@@ -190,7 +190,7 @@ local function UpdateFac(i, facInfo)
 		local unitDefIDb = unitDefIDb
 		
 		if not facs[i].boStack then
-		  echo('<Chili Facbar> Strange error #1' )
+		  echo('<Chili Facpanel> Strange error #1' )
 		else
 		  local boButton = facs[i].boStack.childrenByName[unitDefIDb]
 		  local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
@@ -277,7 +277,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 						local x,y,z = Spring.GetUnitPosition(unitID)
 						Spring.SetCameraTarget(x,y,z)
 					elseif button == 3 then
-						Spring.Echo("FactoryBar: Entered easy waypoint mode")
+						Spring.Echo("FactoryPanel: Entered Quick Rallypoint mode")
 						Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
 						waypointMode = 2 -- greedy mode
 						waypointFac  = stackname
@@ -456,7 +456,7 @@ end
 
 local function WaypointHandler(x,y,button)
   if (button==1)or(button>3) then
-    Spring.Echo("FactoryBar: Exited easy waypoint mode")
+    Spring.Echo("FactoryPanel: Exited Quick Rallypoint mode")
     Spring.PlaySoundFile(sound_waypoint, 1)
     waypointFac  = -1
     waypointMode = 0
@@ -746,7 +746,7 @@ function widget:MousePress(x, y, button)
 		return (button~=2) -- we allow middle click scrolling in greedy waypoint mode
 	end
 	if waypointMode>1 then
-		Spring.Echo("FactoryBar: Exited easy waypoint mode")
+		Spring.Echo("FactoryPanel: Exited Quick Rallypoint mode")
 		Spring.PlaySoundFile(sound_waypoint, 1)
 	end
 	waypointFac  = -1
