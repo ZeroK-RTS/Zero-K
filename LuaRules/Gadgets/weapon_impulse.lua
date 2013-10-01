@@ -23,6 +23,7 @@ end
 
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
+local GROUND_PUSH_CONSTANT = 1.1*GRAVITY/30/30
 
 local spGetUnitStates = Spring.GetUnitStates
 local spGetCommandQueue = Spring.GetCommandQueue
@@ -107,15 +108,30 @@ local function IsUnitOnGround(unitID)
 	return false
 end
 
+local function DetatchFromGround(unitID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	local h = Spring.GetGroundHeight(x,z)
+	--GG.UnitEcho(unitID,h-y)
+	if h >= y - 0.01 or y >= h - 0.01 then
+		Spring.AddUnitImpulse(unitID, 0,1000,0)
+		Spring.MoveCtrl.Enable(unitID)
+		Spring.MoveCtrl.SetPosition(unitID, x, y+0.1, z)
+		Spring.MoveCtrl.Disable(unitID)
+		Spring.AddUnitImpulse(unitID, 0,-1000,0)
+	end
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- General Functionss
 
-local function AddGadgetImpulseRaw(unitID, x, y, z, unitDefID, moveType) -- could be GG if needed.
+local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType) -- could be GG if needed.
 	moveType = moveType or moveTypeByID[unitDefID or Spring.GetUnitDefID(unitID)]
 	if not unit[unitID] then
 		unit[unitID] = {
 			moveType = moveType,
+			useDummy = useDummy,
+			pushOffGround = pushOffGround,
 			x = x, y = y, z = z
 		}
 		unitByID.count = unitByID.count + 1
@@ -124,12 +140,18 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, unitDefID, moveType) -- coul
 		unit[unitID].x = unit[unitID].x + x
 		unit[unitID].y = unit[unitID].y + y
 		unit[unitID].z = unit[unitID].z + z
+		if useDummy then
+			unit[unitID].useDummy = true
+		end
+		if pushOffGround then
+			unit[unitID].pushOffGround = true
+		end
 	end
 	thereIsStuffToDo = true
 end
 
 
-local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, pushOffGround, unitDefID, moveType) 
+local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, pushOffGround, useDummy, unitDefID, moveType) 
 	if inTransport[unitID] then
 		if not affectTransporter then
 			return
@@ -161,13 +183,11 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 	elseif moveTypeByID[unitDefID] == 2 then
 		x,y,z = x*mag, y*mag, z*mag
 		y = y + abs(magnitude)/(20*myMass)
-		if pushOffGround and IsUnitOnGround(unitID) then
-			y = y + 1.1*Game.gravity/30/30
-		end
+		pushOffGround = pushOffGround and IsUnitOnGround(unitID)
 		GG.AddSphereicalLOSCheck(unitID, unitDefID)
 	end
 	
-	AddGadgetImpulseRaw(unitID, x, y, z, unitDefID, moveType)
+	AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType)
 	
 	--if moveTypeByID[unitDefID] == 1 and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam) then
 	--	unit[unitID].allied	= true
@@ -175,22 +195,8 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 
 end
 
-local function DetatchFromGround(unitID)
-	local x,y,z = Spring.GetUnitPosition(unitID)
-	local h = Spring.GetGroundHeight(x,z)
-	--GG.UnitEcho(unitID,h-y)
-	if h >= y - 0.01 or y >= h - 0.01 then
-		Spring.AddUnitImpulse(unitID, 0,1000,0)
-		Spring.MoveCtrl.Enable(unitID)
-		Spring.MoveCtrl.SetPosition(unitID, x, y+0.1, z)
-		Spring.MoveCtrl.Disable(unitID)
-		Spring.AddUnitImpulse(unitID, 0,-1000,0)
-	end
-end
-
 GG.AddGadgetImpulseRaw = AddGadgetImpulseRaw
 GG.AddGadgetImpulse = AddGadgetImpulse
-GG.DetatchFromGround = DetatchFromGround
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -316,7 +322,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local x,y,z = (ux-ax), (uy-ay), (uz-az)
 		local magnitude = impulseWeaponID[weaponDefID].impulse
 		
-		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, unitDefID) 
+		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, unitDefID) 
 		
 		if impulseWeaponID[weaponDefID].normalDamage then
 			return damage
@@ -356,10 +362,19 @@ local function AddImpulses()
 					end
 					--]]
 				end
-			else
-				Spring.AddUnitImpulse(unitID, 10,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
+			elseif data.moveType == 0 then
 				Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
-				Spring.AddUnitImpulse(unitID, -10,0,0) --remove dummy impulse
+			else
+				if data.pushOffGround then
+					data.y = data.y + GROUND_PUSH_CONSTANT
+				end
+				if data.useDummy then
+					Spring.AddUnitImpulse(unitID, 10,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
+					Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
+					Spring.AddUnitImpulse(unitID, -10,0,0) --remove dummy impulse
+				else
+					Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
+				end
 				--GG.UnitEcho(unitID,data.y)
 			end
 		end
