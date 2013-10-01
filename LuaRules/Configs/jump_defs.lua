@@ -56,6 +56,7 @@ jumpClassGroups = {
 	"corclog",
 	"corsumo",
 	"jumpriot",
+	"jumpblackhole",
 	--"cadenza",
 	"factoryjump",
 	-- "pizzathehut",--bad unit left for testing purposes
@@ -110,6 +111,9 @@ corsktl = {
 	range = 400, height = 120, speed = 5.2,  reload = 10,  aaShootMe = false, delay = 0, cannotJumpMidair = true},
 	
 jumpriot = {
+	cobscript = false},
+	
+jumpblackhole = {
 	cobscript = false},
 	
 -- corpyro = {

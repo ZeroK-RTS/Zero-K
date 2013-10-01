@@ -85,17 +85,24 @@ unitDef = {
     NAPALM_MORTAR = {
       name                    = [[Napalm Mortar]],
       accuracy                = 400,
-      areaOfEffect            = 512,
+      areaOfEffect            = 256,
 	  avoidFeature            = false,
-      avoidFriendly           = false,
       craterBoost             = 1,
       craterMult              = 2,
+
+	  customParams        	  = {
+	    setunitsonfire = "1",
+		burntime = 60,
+		--lups_heat_fx = [[firewalker]],
+	  },
 	  
       damage                  = {
-        default = 0,
+        default = 80,
+        planes  = 80,
+        subs    = 4,
       },
 
-      explosionGenerator      = [[custom:black_hole]],
+      explosionGenerator      = [[custom:napalm_firewalker]],
       firestarter             = 180,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

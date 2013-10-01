@@ -157,8 +157,8 @@ end
 
 local function JumpExhaust()
 	while bJumping do 
-		EmitSfx( lfoot,  1028 )
-		EmitSfx( rfoot,  1028 )
+		EmitSfx( lfoot,  UNIT_SFX3 )
+		EmitSfx( rfoot,  UNIT_SFX3 )
 		Sleep(33)
 	end
 end
@@ -167,25 +167,25 @@ function preJump(turn, distance)
 end
 
 function beginJump() 
-	--[[
+	StartThread( StopWalk )
 	bJumping = true
 	StartThread(JumpExhaust)
-	--]]
 end
 
 function jumping()
-	EmitSfx( lfoot,  1028 )
-	EmitSfx( rfoot,  1028 )
-	EmitSfx( lfoot,  1024 )
-	EmitSfx( rfoot,  1025 )
+	EmitSfx( lfoot,  UNIT_SFX4 )
+	EmitSfx( rfoot,  UNIT_SFX4 )
+	EmitSfx( lfoot,  UNIT_SFX1 )
+	EmitSfx( rfoot,  UNIT_SFX2 )
 end
 
 function halfJump()
 end
 
 function endJump() 
-	--bJumping = false
-	EmitSfx( base,  1029 )
+	bJumping = false
+	EmitSfx( lfoot,  UNIT_SFX4 )
+	EmitSfx( rfoot,  UNIT_SFX4 )
 end
 
 

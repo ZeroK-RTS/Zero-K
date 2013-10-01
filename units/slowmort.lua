@@ -87,11 +87,6 @@ unitDef = {
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
-	  
-	  customParams            = {
-	    impulse = [[-500]],
-		normaldamage = [[1]],
-	  },
 
       damage                  = {
         default = 220,

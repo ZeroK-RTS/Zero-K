@@ -263,7 +263,7 @@ local function Jump(unitID, goal, cmdTag)
 	spSetUnitRulesParam(unitID,"jumpReload",0)
 
 	local function JumpLoop()
-	
+
 		if delay > 0 then
 			for i=delay, 1, -1 do
 				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.

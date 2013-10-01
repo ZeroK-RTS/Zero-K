@@ -18,12 +18,19 @@ local weapons = {
 		timeFall = 0
 	},
 	firewalker_napalm_mortar = { 
-		radius = 256, 
-		damage = 1000,
-		impulse = true,
-		duration = 450, 
-		rangeFall = 0.2,
+		radius = 128, 
+		damage = 20, 
+		duration = 600, 
+		rangeFall = 0.6,
 		timeFall = 0.5 
+	},
+	jumpblackhole_black_hole = { 
+		radius = 150, 
+		damage = 4000,
+		impulse = true,
+		duration = 400, 
+		rangeFall = 0.2,
+		timeFall = 0.9 
 	},
 	chickenwurm_napalm = { 
 		radius = 128, 

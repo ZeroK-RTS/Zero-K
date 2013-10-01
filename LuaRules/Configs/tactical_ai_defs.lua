@@ -560,6 +560,14 @@ local behaviourConfig = {
 	},	
 	
 	-- long range skirms
+	["jumpblackhole"] = {
+		skirms = longRangeSkirmieeArray, 
+		swarms = longRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 30, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 10, 
+	},
 	["corstorm"] = {
 		skirms = longRangeSkirmieeArray, 
 		swarms = longRangeSwarmieeArray, 
