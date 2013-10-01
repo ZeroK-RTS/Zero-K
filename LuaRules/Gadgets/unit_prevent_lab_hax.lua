@@ -36,6 +36,9 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetFeaturesInRectangle = Spring.GetFeaturesInRectangle
+local spGetFeaturePosition = Spring.GetFeaturePosition
+local spSetFeaturePosition = Spring.SetFeaturePosition
 
 local abs = math.abs
 local min = math.min
@@ -59,8 +62,10 @@ _G.lab = lab
 function checkLabs()
   for Lid,Lv in pairs(lab) do  
     local units = spGetUnitsInBox(Lv.minx, Lv.miny, Lv.minz, Lv.maxx, Lv.maxy, Lv.maxz)
+    local features = spGetFeaturesInRectangle(Lv.minx, Lv.minz, Lv.maxx, Lv.maxz)
 	
-    for i,id in ipairs(units) do 
+    for i=1,#units do
+	  local id = units[i]
 	  local ud = spGetUnitDefID(id)
 	  local fly = UnitDefs[ud].canFly
 	  local ally = spGetUnitAllyTeam(id)
@@ -121,8 +126,29 @@ function checkLabs()
 			end
 		end
 	  end
-	end
+    end
+    for i=1,#features do
+      local id = features[i]
+      local fx, fy, fz = spGetFeaturePosition(id)
+      if fy > Lv.miny and fy < Lv.maxy then
+	local l = abs(fx-Lv.minx)
+	local r = abs(fx-Lv.maxx)
+	local t = abs(fz-Lv.minz)
+	local b = abs(fz-Lv.maxz)
 	
+	local side = min(l,r,t,b)
+	
+	if (side == l) then
+	      spSetFeaturePosition(id, Lv.minx, fy, fz, true)
+	elseif (side == r) then
+	      spSetFeaturePosition(id, Lv.maxx, fy, fz, true)
+	elseif (side == t) then
+	      spSetFeaturePosition(id, fx, fy, Lv.minz, true)
+	else
+	      spSetFeaturePosition(id, fx, fy, Lv.maxz, true)
+	end
+      end
+    end
   end
 end
 
