@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.124 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.125 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-September-25
+    date      = "2011-03-16", --2013-October-1
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -375,7 +375,15 @@ options = {
 		type = 'button',
         hotkey = {key='t', mod='alt+'},
 		path = cameraFollowPath,
-		OnChange = function(self) trackmode = true; Spring.Echo("COFC: Unit tracking ON") end,
+		OnChange = function(self) 
+			if thirdperson_trackunit then --turn off 3rd person tracking if it is.
+				Spring.SendCommands('trackoff')
+				Spring.SendCommands('viewfree')
+				thirdperson_trackunit = false
+			end
+			trackmode = true;
+			Spring.Echo("COFC: Unit tracking ON")
+		end,
 	},
 	
 	persistenttrackmode = {
@@ -467,6 +475,7 @@ local spSetCameraTarget		= Spring.SetCameraTarget
 local spGetTimer 			= Spring.GetTimer
 local spDiffTimers 			= Spring.DiffTimers
 local spGetUnitDefID 		= Spring.GetUnitDefID
+local spGetUnitSeparation	= Spring.GetUnitSeparation
 
 local abs	= math.abs
 local min 	= math.min
@@ -1000,12 +1009,16 @@ OverviewAction = function()
 end
 --==End option menu function (function that is attached to epic menu button)^^
 
-
+local offscreenTracking = false --state variable
 local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camera while in follow cursor mode)
 	if smoothscroll or springscroll or rotate then
 		return
 	end
 	local lclZoom = function(zoomin, smoothness,x,y,z)
+		if not options.followautozoom.value then
+			spSetCameraTarget(x,y,z, smoothness) --track only
+			return
+		end
 		local cs = spGetCameraState()
 		ls_have = false --unlock lockspot 
         SetLockSpot2(cs) --set lockspot
@@ -1024,7 +1037,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		ls_have = true --lock lockspot
 		local cstemp = UpdateCam(cs)
 		if cstemp then cs = cstemp; end
-		spSetCameraState(cs, smoothness)
+		spSetCameraState(cs, smoothness) --track & zoom
 	end
 	local teamID = Spring.GetLocalTeamID()
 	local _, playerID = Spring.GetTeamInfo(teamID)
@@ -1035,20 +1048,32 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 		if (scrn_x<scrnsize_X*4/6 and scrn_x>scrnsize_X*2/6) and (scrn_y<scrnsize_Y*4/6 and scrn_y>scrnsize_Y*2/6) then --if cursor near center:
 			-- Spring.Echo("CENTER")
-			local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-			lclZoom(true, slowSpeed,pp[1], groundY, pp[2]) --zoom in
+			local onscreenspeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			lclZoom(true, onscreenspeed,pp[1], groundY, pp[2]) --zoom in & track
+			offscreenTracking = nil
 		elseif (scrn_x<scrnsize_X*5/6 and scrn_x>scrnsize_X*1/6) and (scrn_y<scrnsize_Y*5/6 and scrn_y>scrnsize_Y*1/6) then --if cursor between center & edge: do nothing 
 			-- Spring.Echo("MID")
-			local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-			spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
+			if not offscreenTracking then
+				local onscreenspeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+				spSetCameraTarget(pp[1], groundY, pp[2], onscreenspeed) --track
+			else --continue off-screen tracking, but at fastest speed (bring cursor to center ASAP)
+				local maxspeed = math.min(options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value,options.followinscrollspeed.mid*2 - options.followinscrollspeed.value) --the fastest speed available 
+				spSetCameraTarget(pp[1], groundY, pp[2], maxspeed) --track
+			end
 		elseif (scrn_x<scrnsize_X*6/6 and scrn_x>scrnsize_X*0/6) and (scrn_y<scrnsize_Y*6/6 and scrn_y>scrnsize_Y*0/6) then --if cursor near edge: do
 			-- Spring.Echo("EDGE")
-			local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-			lclZoom(false, slowSpeed,pp[1], groundY, pp[2]) --zoom out
+			if not offscreenTracking then
+				local onscreenspeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+				lclZoom(false, onscreenspeed,pp[1], groundY, pp[2]) --zoom out & track
+			else --continue off-screen tracking, but at fastest speed (bring cursor to center ASAP)
+				local maxspeed = math.min(options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value,options.followinscrollspeed.mid*2 - options.followinscrollspeed.value) --the fastest speed available 
+				lclZoom(false, maxspeed,pp[1], groundY, pp[2]) --zoom out & track
+			end
 		else --outside screen
 			-- Spring.Echo("OUT")
-			local fastSpeed = options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-			lclZoom(false, fastSpeed,pp[1], groundY, pp[2]) --zoom out
+			local offscreenspeed = options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
+			lclZoom(false, offscreenspeed,pp[1], groundY, pp[2]) --zoom out & track
+			offscreenTracking = true
 		end
 	end
 end
@@ -1130,18 +1155,25 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 		local offY = front[2]*offX_temp + top[2]*offY_temp + right[2]*offZ_temp
 		local offZ = front[3]*offX_temp + top[3]*offY_temp + right[3]*offZ_temp
 		local sphUnits = Spring.GetUnitsInSphere(x+offX,y+offY,z+offZ, sphereRadius,teamID) --create sphere that detect unit in area of this direction
+		local lowestUnitSeparation = 9999
+		local lowestStructureSeparation = 9999
 		for i=1, #sphUnits do
 			local unitID = sphUnits[i]
 			Spring.SelectUnitArray({unitID}) --test select unit (in case its not selectable)
 			local selUnits = spGetSelectedUnits()
 			if selUnits and selUnits[1] then --find unit in that area
 				local defID = spGetUnitDefID(unitID)
-				--Note: additional randomness is good, so no nearest distance checking is needed.
+				local unitSeparation = spGetUnitSeparation (unitID, thirdperson_trackunit, true)
 				if UnitDefs[defID] and UnitDefs[defID].speed >0 then
-					foundUnit = selUnits[1]
-					break
+					if lowestUnitSeparation > unitSeparation then
+						foundUnit = selUnits[1]
+						lowestUnitSeparation = unitSeparation
+					end
 				elseif not foundUnitStructure then
-					foundUnitStructure = selUnits[1]
+					if lowestStructureSeparation > unitSeparation then
+						foundUnitStructure = selUnits[1]
+						lowestStructureSeparation = unitSeparation
+					end
 				end
 			end
 		end
@@ -1323,25 +1355,7 @@ function widget:Update(dt)
 	options.follow.value)  --if follow selected player's cursor:
 	then 
 		if WG.alliedCursorsPos then 
-			if options.followautozoom.value then
-				AutoZoomInOutToCursor()
-			else
-				local teamID = Spring.GetLocalTeamID()
-				local _, playerID = Spring.GetTeamInfo(teamID)
-				local pp = WG.alliedCursorsPos[ playerID ]
-				if pp then
-					local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
-					local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
-					local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
-					if (scrn_x>scrnsize_X or scrn_x<0) or (scrn_y>scrnsize_Y or scrn_y<0) then --if cursor outside screen: do
-						local fastSpeed = options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-						spSetCameraTarget(pp[1], groundY, pp[2], fastSpeed) --fast go-to speed
-					else --if cursor within screen: do
-						local slowSpeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-						spSetCameraTarget(pp[1], groundY, pp[2], slowSpeed) --slow go-to speed
-					end
-				end
-			end
+			AutoZoomInOutToCursor()
 		end
 	end
 	
