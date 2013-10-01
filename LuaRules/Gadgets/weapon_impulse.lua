@@ -25,8 +25,11 @@ local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
 
 local spGetUnitStates = Spring.GetUnitStates
+local spGetCommandQueue = Spring.GetCommandQueue
 local CMD_IDLEMODE = CMD.IDLEMODE
 local CMD_REPEAT = CMD.REPEAT
+local CMD_GUARD = CMD.GUARD
+local CMD_STOP = CMD.STOP
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local abs = math.abs
 
@@ -335,6 +338,11 @@ local function AddImpulses()
 					Spring.SetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
 					
 					--if data.allied then
+						local cQueue = spGetCommandQueue(unitID,1)
+						if #cQueue >= 1 and cQueue[1].id == CMD_GUARD then
+							spGiveOrderToUnit(unitID, CMD_STOP, {0},{})
+						end
+						
 						local states = spGetUnitStates(unitID)
 						if states["repeat"] then
 							spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
