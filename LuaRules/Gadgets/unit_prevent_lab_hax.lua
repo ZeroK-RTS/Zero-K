@@ -46,7 +46,7 @@ local min = math.min
 local terraunitDefID = UnitDefNames["terraunit"].id
 
 local EXCEPTION_LIST = {
-  factorygunship = true,
+  --factorygunship = true,
   missilesilo = true,
   armasp = true,
 }
