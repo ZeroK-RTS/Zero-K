@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.084 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.085 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --21 September 2013
     license   = "GNU GPL, v2 or later",
@@ -1219,8 +1219,8 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 		return
 	end
 	
-	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, displayPlusMinus), autosize=true, fontSize=ttFontSize, valign='center' }
-	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, displayPlusMinus), autosize=true, fontSize=ttFontSize, valign='center'  }
+	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, displayPlusMinus), autosize=true, fontSize=ttFontSize+2, valign='center' }
+	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, displayPlusMinus), autosize=true, fontSize=ttFontSize+2, valign='center'  }
 	
 	local lbl_empty = Label:New{ name='blank', caption = '  ', autosize=true, fontSize=ttFontSize, valign='center'  }
 	
@@ -1235,10 +1235,10 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 		itemPadding = {0,0,0,0},
 		itemMargin = {5,0,0,0},
 		children = {
-			Image:New{file='LuaUI/images/ibeam.png',height= icon_size,width= icon_size, fontSize=ttFontSize,},
+			Image:New{file='LuaUI/images/ibeam.png',height= icon_size,width= icon_size,},
 			lbl_metal2,
 			lbl_empty,
-			Image:New{file='LuaUI/images/energy.png',height= icon_size,width= icon_size, fontSize=ttFontSize,},
+			Image:New{file='LuaUI/images/energy.png',height= icon_size,width= icon_size,},
 			lbl_energy2,
 		},
 	}
@@ -1401,6 +1401,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 					name=item.name,
 					caption = itemtext,
 					fontSize=curFontSize,
+					align= item.center and 'center' or nil,
 					valign='center',
 					height=icon_size+5,
 					x=icon_size+5,
@@ -1426,9 +1427,11 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 				resizeItems=false,
 				width = '100%',
 				autosize=true,
-				padding = {1,1,1,1},
-				itemPadding = {1,1,0,0},
-				itemMargin = {4,0,0,0},
+				--padding = {1,1,1,1},
+				padding = {0,0,0,0},
+				--itemPadding = {1,1,0,0},
+				itemPadding = {0,0,0,0},
+				itemMargin = {0,0,0,0},
 				children = stack_children,
 			}
 		end
@@ -1521,10 +1524,11 @@ local function BuildTooltip2(ttname, ttdata, sel)
 			y = 0,
 			orientation='vertical',
 			centerItems = false,
-			width = 220,
+			width = 250,
 			padding = {0,0,0,0},
-			itemPadding = {1,0,0,0},
+			itemPadding = {0,0,0,0},
 			itemMargin = {0,0,0,0},
+			--itemMargin = {1,1,1,1},
 			resizeItems=false,
 			children = children_main,
 		}
@@ -1682,10 +1686,14 @@ local function MakeToolTip_Unit(data, tooltip)
 			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0') },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname .. '\n(' .. teamColor .. playerName .. white ..')', fontSize=2, },
-			{ name='utt', text = unittooltip, wrap=true },
+			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
+			{ name='utt', text = unittooltip .. '\n', wrap=true },
+			
+			
 			{ name='hp', directcontrol = 'hp_unit', },
 			{ name='res', directcontrol = 'resources_unit' },
+			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
+			
 			{ name='help', text = green .. 'Space+click: Show unit stats', },
 		},
 	}
@@ -1727,7 +1735,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((stt_ud and stt_ud.metalCost) or '0') },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname, fontSize=2, },
+			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
 			{ name='utt', text = unittooltip, wrap=true },
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
@@ -1795,12 +1803,13 @@ local function MakeToolTip_Feature(data, tooltip)
 			}
 			or nil,
 		main = {
-			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
-			{ name='utt', text = unittooltip, wrap=true },
+			{ name='uname', icon = iconPath, text = fullname, fontSize=6, },
+			{ name='utt', text = unittooltip .. '\n', wrap=true },
 			(	options.featurehp.value
 					and { name='hp', directcontrol = (tt_ud and 'hp_corpse' or 'hp_feature'), } 
 					or {}),
 			{ name='res', directcontrol = tt_ud and 'resources_corpse' or 'resources_feature' },
+			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false, },
 			{ name='help', text = tt_ud and (green .. 'Space+click: Show unit stats') or '', },
 		},
 	}
