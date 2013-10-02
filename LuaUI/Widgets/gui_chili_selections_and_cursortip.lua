@@ -19,7 +19,7 @@ local spGetCurrentTooltip		= Spring.GetCurrentTooltip
 local spGetUnitDefID			= Spring.GetUnitDefID
 local spGetFeatureDefID			= Spring.GetFeatureDefID
 local spGetFeatureTeam			= Spring.GetFeatureTeam
-local spGetUnitAllyTeam			= Spring.GetUnitAllyTeam
+--local spGetUnitAllyTeam			= Spring.GetUnitAllyTeam
 local spGetUnitTeam				= Spring.GetUnitTeam
 local spGetUnitHealth			= Spring.GetUnitHealth
 local spGetUnitResources		= Spring.GetUnitResources
@@ -54,9 +54,7 @@ local glTexRect 	= gl.TexRect
 local abs						= math.abs
 local strFormat 				= string.format
 
-
 include("keysym.h.lua")
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -71,7 +69,6 @@ local Panel
 local Grid
 local TextBox
 local Image
-local Multiprogressbar
 local Progressbar
 local LayoutPanel
 local Grid
@@ -104,6 +101,7 @@ local globalitems = {}
 local ttFontSize = 10
 
 local green = '\255\1\255\1'
+local red = '\255\255\1\1'
 local cyan = '\255\1\255\255'
 local white = '\255\255\255\255'
 local yellow = '\255\255\255\1'
@@ -127,8 +125,6 @@ local selectedUnits = {}
 local selectionSortOrder = {}
 
 local secondPerGameFrame = 1/30 --this constant is used for calculating weapon reload time.
-
-local color = {}
 
 local cursor_size = 24	-- pencil and eraser
 local iconFormat = ''
@@ -175,13 +171,19 @@ local gi_totalbp = 0
 local gi_str	--group info string
 local gi_label	--group info Chili label
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/HUD Panels/Tooltip'
-options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip','showDrawTools',
-  'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin', 'color_background', 
+options_order = {
+	--tooltip
+	'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip',
+	
+	--mouse
+	'showDrawTools',
+	
+	--selected units
+	'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin', 'color_background', 
 }
 
 local function option_Deselect()
@@ -239,6 +241,14 @@ options = {
 		value = true,
 		desc = 'Show map-drawing tooltip when holding down the tilde (~).',
 	},
+
+	showterratooltip = {
+		name = "Show Terraform Tooltip",
+		type = 'bool',
+		value = true,
+		desc = 'Show terraform tooltip when performing terraform commands.',
+	},
+	
 	showDrawTools = {
 		name = "Show Drawing Tools When Drawing",
 		type = 'bool',
@@ -248,12 +258,6 @@ options = {
 		OnChange = function(self)
 			widget:UpdateCallIns(self.value)
 		end
-	},
-	showterratooltip = {
-		name = "Show Terraform Tooltip",
-		type = 'bool',
-		value = true,
-		desc = 'Show terraform tooltip when performing terraform commands.',
 	},
 
 	groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
@@ -326,6 +330,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--helper functions
 
 function round(num, idp)
   if (not idp) then
@@ -383,14 +388,44 @@ local function ToSIPrec(num) -- more presise
   end
 end
 
-
 local function numformat(num, displayPlusMinus)
 	return comma_value(ToSIPrec(num), displayPlusMinus)
 end
 
 
+function comma_value(amount, displayPlusMinus)
+	local formatted
+
+	-- amount is a string when ToSI is used before calling this function
+	if type(amount) == "number" then
+		if (amount ==0) then formatted = "0" else 
+			if (amount < 20 and (amount * 10)%10 ~=0) then 
+				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
+				else formatted = strFormat("%.1f", amount) end 
+			else 
+				if displayPlusMinus then formatted = strFormat("%+d", amount)
+				else formatted = strFormat("%d", amount) end 
+			end 
+		end
+	else
+		formatted = amount .. ""
+	end
+
+	if options.hpshort.value then 
+		local k
+		while true do  
+			formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
+			if (k==0) then
+				break
+			end
+		end
+	end 
+  	return formatted
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--functions
 
 local function DrawScreenDrawTools()
 	if not tildepressed then return end
@@ -419,19 +454,6 @@ local function DrawScreenDrawTools()
 	end
 end
 
---ToggleDrawTools = function(enable)
-function widget:UpdateCallIns(enable)
-	if enable then
-		self.DrawScreen = DrawScreenDrawTools
-	else
-		self.DrawScreen = function() end
-	end
-	
-	widgetHandler:UpdateCallIn("DrawScreen")
-	widgetHandler:UpdateCallIn("DrawScreen")
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 --get reload status for selected weapon
 local function GetWeaponReloadStatus(unitID, weapNum)
 	local unitDefID = spGetUnitDefID(unitID)
@@ -450,7 +472,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- group selection
+-- group selection functions
 
 --updates cost, HP, and resourcing info for group info
 local function UpdateDynamicGroupInfo()
@@ -551,8 +573,6 @@ local function UpdateStaticGroupInfo()
 	gi_maxhp = numformat(gi_maxhp)
 end
 
-
-
 --this is a separate function to allow group info to be regenerated without reloading the whole tooltip
 local function WriteGroupInfo()
 	if not options.showgroupinfo.value or numSelectedUnits==0 then
@@ -597,7 +617,7 @@ local function WriteGroupInfo()
 	}
 end
 
-
+-- group selection functions
 ----------------------------------------------------------------
 ----------------------------------------------------------------
 
@@ -649,10 +669,6 @@ local function GetUnitDesc(unitID, ud)
 	end
 	return desc
 end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 	local ud = UnitDefs[defid]
@@ -830,9 +846,6 @@ local function MakeUnitGroupSelectionToolTip()
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 
 local function UpdateSelectedUnitsTooltip()
 	if (numSelectedUnits>1) then
@@ -890,7 +903,7 @@ local function UpdateSelectedUnitsTooltip()
 											minHeight = 2;
 											max     = 1;
 											value = reloadFraction;
-											color   = {013, 245, 243,1}; --? color. 
+											color   = {013, 245, 243,1}; --? 
 										};
 								end
 							end
@@ -920,38 +933,6 @@ local function UpdateSelectedUnitsTooltip()
 
 		
 	end
-end
-
-
-
-function comma_value(amount, displayPlusMinus)
-	local formatted
-
-	-- amount is a string when ToSI is used before calling this function
-	if type(amount) == "number" then
-		if (amount ==0) then formatted = "0" else 
-			if (amount < 20 and (amount * 10)%10 ~=0) then 
-				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
-				else formatted = strFormat("%.1f", amount) end 
-			else 
-				if displayPlusMinus then formatted = strFormat("%+d", amount)
-				else formatted = strFormat("%d", amount) end 
-			end 
-		end
-	else
-		formatted = amount .. ""
-	end
-
-	if options.hpshort.value then 
-		local k
-		while true do  
-			formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
-			if (k==0) then
-				break
-			end
-		end
-	end 
-  	return formatted
 end
 
 local function AdjustWindow(window)
@@ -984,10 +965,9 @@ local function AdjustWindow(window)
 	
 end
 
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--tooltip functions
 
 local UnitDefByHumanName_cache = {}
 local function GetUnitDefByHumanName(humanName)
@@ -1069,6 +1049,7 @@ local function tooltipBreakdown(tooltip)
 	}
 end
 
+--tooltip functions
 ----------------------------------------------------------------
 
 local function SetHealthbar(tt_healthbar,health, maxhealth)
@@ -1123,7 +1104,6 @@ local function SetHealthbars()
 	end
 end
 
-
 local function KillTooltip(force)
 	old_ttstr = ''
 	tt_unitID = nil
@@ -1133,15 +1113,11 @@ local function KillTooltip(force)
 	end
 end
 
-local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 
-	local stack_children = {}
-
+local function GetResources(tooltip_type, unitID, ud, tooltip)
 	local metal, energy = 0,0
-	local color_m = {1,1,1,1}
-	local color_e = {1,1,1,1}
-	
-	local resource_tt_name = 'resources_' .. tooltip_type
+	local color_m = white
+	local color_e = white
 	
 	if tooltip_type == 'feature' or tooltip_type == 'corpse' then
 		metal = ud.metal
@@ -1183,66 +1159,26 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 	end
 	
 	--Skip metal/energy rendering for unit selection bar when unit has no metal and energy
-	if tooltip_type == 'selunit' and metal==0 and energy==0 then
-		if globalitems['resources_selunit'] then
-			globalitems['resources_selunit'] = nil
-		end
-		return
+	--if tooltip_type == 'selunit' and metal==0 and energy==0 then
+	if metal==0 and energy==0 then
+		return '',''
 	end	
 	
-	if tooltip_type == 'feature' or tooltip_type == 'corpse' then
-		color_m = {1,1,1,1}
-		color_e = {1,1,1,1}
-	else
+	if tooltip_type ~= 'feature' and tooltip_type ~= 'corpse' then
 		if metal > 0 then
-			color_m = {0,1,0,1}
+			color_m = green
 		elseif metal < 0 then
-			color_m = {1,0,0,1}
+			color_m = red
 		end
 		if energy > 0 then
-			color_e = {0,1,0,1}
+			color_e = green
 		elseif energy < 0 then
-			color_e = {1,0,0,1}
+			color_e = red
 		end
 	end
 	local displayPlusMinus = tooltip_type ~= 'feature' and tooltip_type ~= 'corpse' 
 	
-	if globalitems[resource_tt_name] then
-		local metalcontrol 	= globalitems[resource_tt_name]:GetChildByName('metal')
-		local energycontrol = globalitems[resource_tt_name]:GetChildByName('energy')
-		
-		metalcontrol.font:SetColor(color_m)
-		energycontrol.font:SetColor(color_e)
-		
-		metalcontrol:SetCaption( numformat(metal, displayPlusMinus) )
-		energycontrol:SetCaption( numformat(energy, displayPlusMinus) )
-		return
-	end
-	
-	local lbl_metal2 = Label:New{ name='metal', width=30, height=icon_size, caption = numformat(metal, displayPlusMinus), autosize=false, fontSize=ttFontSize, valign='center' }
-	local lbl_energy2 = Label:New{ name='energy', width=30, height=icon_size, caption = numformat(energy, displayPlusMinus), autosize=false, fontSize=ttFontSize, valign='center'  }
-	
-	--local lbl_empty = Label:New{ name='blank', caption = '  ', autosize=true, fontSize=ttFontSize, valign='center'  }
-	
-	globalitems[resource_tt_name] = StackPanel:New{
-		centerItems = false,
-		autoArrangeV = true,
-		orientation='horizontal',
-		resizeItems=false,
-		--width = '100%',
-		width = 50,
-		height = icon_size*2,
-		padding = {0,0,0,0},
-		itemPadding = {0,0,0,0},
-		itemMargin = {0,0,0,0},
-		children = {
-			Image:New{file='LuaUI/images/metalplus.png',height= icon_size,width= icon_size,},
-			lbl_metal2,
-			--lbl_empty,
-			Image:New{file='LuaUI/images/energy.png',height= icon_size,width= icon_size,},
-			lbl_energy2,
-		},
-	}
+	return color_m .. numformat(metal, displayPlusMinus), color_e .. numformat(energy, displayPlusMinus)	
 end
 
 local function PlaceToolTipWindow2(x,y)
@@ -1283,25 +1219,21 @@ local function UpdateMorphControl(morph_data)
 		globalitems.morphs:GetChildByName('cost'):SetCaption(morph_cost)
 		globalitems.morphs:GetChildByName('prereq'):SetCaption(morph_prereq and ('Need Unit: '..morph_prereq) or '')
 		
-		--[[
-		globalitems.morphs:GetChildByName('time').height=height
-		globalitems.morphs:GetChildByName('time'):Invalidate()
-		globalitems.morphs:Invalidate()
-		globalitems.morphs:UpdateLayout()
-		--]]
 		return
 	end
 	height = icon_size+1
 	
-	morph_controls[#morph_controls + 1] = Label:New{ caption = 'Morph: ', height= icon_size, valign='center', textColor=color.tooltip_info, autosize=false, width=45, fontSize=ttFontSize,}
+	local cyan = {0,1,1,1}
+	
+	morph_controls[#morph_controls + 1] = Label:New{ caption = 'Morph: ', height= icon_size, valign='center', textColor=cyan , autosize=false, width=45, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/clock.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
-	morph_controls[#morph_controls + 1] = Label:New{ name='time', caption = morph_time, valign='center', textColor=color.tooltip_info, autosize=false, width=25, fontSize=ttFontSize,}
+	morph_controls[#morph_controls + 1] = Label:New{ name='time', caption = morph_time, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/ibeam.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
-	morph_controls[#morph_controls + 1] = Label:New{ name='cost', caption = morph_cost, valign='center', textColor=color.tooltip_info, autosize=false, width=25, fontSize=ttFontSize,}
+	morph_controls[#morph_controls + 1] = Label:New{ name='cost', caption = morph_cost, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
 	
 	--if morph_prereq then
-		--morph_controls[#morph_controls + 1] = Label:New{ 'prereq' caption = 'Need Unit: '..morph_prereq, valign='center', textColor=color.tooltip_info, autosize=false, width=180, fontSize=ttFontSize,}
-		morph_controls[#morph_controls + 1] = Label:New{ name='prereq', caption = morph_prereq and ('Need Unit: '..morph_prereq) or '', valign='center', textColor=color.tooltip_info, autosize=false, width=80, fontSize=ttFontSize,}
+		--morph_controls[#morph_controls + 1] = Label:New{ 'prereq' caption = 'Need Unit: '..morph_prereq, valign='center', textColor=cyan , autosize=false, width=180, fontSize=ttFontSize,}
+		morph_controls[#morph_controls + 1] = Label:New{ name='prereq', caption = morph_prereq and ('Need Unit: '..morph_prereq) or '', valign='center', textColor=cyan , autosize=false, width=80, fontSize=ttFontSize,}
 	--end
 	
 	
@@ -1347,7 +1279,7 @@ local function GetHelpText(tooltip_type)
 	else
 		sc_caption = 'Space+click: Show unit stats'
 	end
-	--return TextBox:New{ text = sc_caption, textColor=color.tooltip_help, width=250, fontSize=ttFontSize,  }
+	
 	return sc_caption
 	
 end
@@ -1542,7 +1474,6 @@ local function BuildTooltip2(ttname, ttdata, sel)
 				draggable = false,
 				autosize  = true,
 				--tweakDraggable = true,
-				backgroundColor = color.tooltip_bg, 
 				children = { stack_leftbar_temp, stack_main_temp, },
 				savespace = true
 			}
@@ -1675,18 +1606,18 @@ local function MakeToolTip_Unit(data, tooltip)
 	end
 
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
-	---local unittooltip	= tt_unitID and spGetUnitTooltip(tt_unitID) or (tt_ud and tt_ud.tooltip) or ""
 	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateResourceStack( 'unit', unitID, tt_ud, tooltip )
+	local m, e = GetResources( 'unit', unitID, tt_ud, tooltip )
 	
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_unit' },
 			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0') },
 			
-			{ name='res', directcontrol = 'resources_unit' },
+			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
+			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 		},
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
@@ -1728,15 +1659,15 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	local iconPath		= GetUnitIcon(stt_ud)
 	
-	UpdateResourceStack( 'selunit', unitID, stt_ud, tooltip)
-	
-	
+	local m, e = GetResources( 'selunit', unitID, stt_ud, tooltip)
 	
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_selunit' },
 			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((stt_ud and stt_ud.metalCost) or '0') },
-			{ name='res', directcontrol = 'resources_selunit' },
+			
+			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
+			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 		},
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
@@ -1792,19 +1723,22 @@ local function MakeToolTip_Feature(data, tooltip)
 	local _, player		= spGetTeamInfo(team)
 	local playerName	= player and spGetPlayerInfo(player) or 'noname'
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
-	---local unittooltip	= tt_unitID and spGetUnitTooltip(tt_unitID) or (tt_ud and tt_ud.tooltip) or ""
 	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateResourceStack( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd, tooltip )
+	local m,e = GetResources( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd, tooltip )
 	
 	local leftbar = tt_ud and {
 		{ name= 'bp', directcontrol = 'buildpic_feature' },
 		{ name='cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0'), },
-		{ name='res', directcontrol = 'resources_corpse' },
+		
+		{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
+		{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 	}
 	or {
-		{ name='res', directcontrol = 'resources_feature' },
+		
+		{ name='res', icon = 'LuaUI/images/metalplus.png', text = m },
+		{ name='res', icon = 'LuaUI/images/energy.png', text = e },
 	}
 	
 	local tt_structure = {
@@ -1822,7 +1756,6 @@ local function MakeToolTip_Feature(data, tooltip)
 		},
 	}
 	
-	
 	if tt_ud then
 		UpdateBuildpic( tt_ud, 'buildpic_feature' )
 		BuildTooltip2('corpse2', tt_structure)
@@ -1832,26 +1765,7 @@ local function MakeToolTip_Feature(data, tooltip)
 	return true
 end
 
-
-
 local function CreateHpBar(name)
-	--[[
-	globalitems[name] = Progressbar:New {
-		name = name,
-		width = '100%',
-		height = icon_size+2,
-		itemMargin    = {0,0,0,0},
-		itemPadding   = {0,0,0,0},	
-		padding = {0,0,0,0},
-		color = {0,1,0,1},
-		max=1,
-		caption = 'a',
-
-		children = {
-			Image:New{file='LuaUI/images/commands/bold/health.png',height= icon_size,width= icon_size,  x=0,y=0},
-		},
-	}
-	--]]
 	globalitems[name] = Panel:New {
 		orientation='horizontal',
 		name = name,
@@ -1877,31 +1791,12 @@ local function CreateHpBar(name)
 				max=1,
 				caption = 'a',
 			},
-
-			
 		},
 	}
 	
 end
 
 local function CreateBpBar(name)
-	--[[
-	globalitems[name] = Progressbar:New {
-		name = name,
-		width = '100%',
-		height = icon_size+2,
-		itemMargin    = {0,0,0,0},
-		itemPadding   = {0,0,0,0},	
-		padding = {0,0,0,0},
-		color = {0.8,0.8,0.2,1};
-		max=1,
-		caption = 'a',
-
-		children = {
-			Image:New{file='LuaUI/Images/commands/Bold/buildsmall.png',height= icon_size,width= icon_size,  x=0,y=0},
-		},
-	}
-	--]]
 	globalitems[name] = Panel:New {
 		orientation='horizontal',
 		name = name,
@@ -1927,8 +1822,6 @@ local function CreateBpBar(name)
 				max=1,
 				caption = 'a',
 			},
-
-			
 		},
 	}
 end
@@ -2081,9 +1974,7 @@ local function MakeTooltip()
 end --function MakeTooltip
 
 local function SetupTerraTips()
-	terraTips = {
-	
-	}
+	terraTips = {}
 	
 	for cmdName, _ in pairs( terraCmds ) do
 		terraTips[cmdName] =
@@ -2114,7 +2005,6 @@ local function SetupTerraTips()
 		green.. 'Red'..white..': Only all-terrain / spiders can traverse. \n'..
 		''
 		
-	
 	terraTips.Level = terraTips.Level ..
 		yellow..'[During Terraform Draw]\n'..
 		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
@@ -2141,12 +2031,11 @@ local function SetupTerraTips()
 		yellow..'[Any Time]\n'..
 		green.. 'Space'..white..': Limit to only raise/lower \n'..
 		''
-		
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+--callins
 
 function widget:Update(dt)
 	if widgetHandler:InTweakMode() then
@@ -2167,7 +2056,14 @@ function widget:Update(dt)
 		if stt_unitID then
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
-			UpdateResourceStack( 'selunit', stt_unitID, stt_ud, tooltip)
+			
+			local ctrlm = controls['selunit2']['res_m']
+			if ctrlm then
+				local ctrle = controls['selunit2']['res_e']
+				local m, e = GetResources( 'selunit', stt_unitID, stt_ud, tooltip)
+				ctrlm:SetCaption(m)
+				ctrle:SetCaption(e)
+			end
 			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
@@ -2324,9 +2220,7 @@ function widget:Initialize()
 	
 	local VFSMODE      = VFS.RAW_FIRST
 	_, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
-	local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
-	color = confdata.color
-
+	
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
@@ -2337,7 +2231,6 @@ function widget:Initialize()
 	Grid = Chili.Grid
 	TextBox = Chili.TextBox
 	Image = Chili.Image
-	Multiprogressbar = Chili.Multiprogressbar
 	Progressbar = Chili.Progressbar
 	LayoutPanel = Chili.LayoutPanel
 	screen0 = Chili.Screen0
@@ -2359,12 +2252,10 @@ function widget:Initialize()
 	}
 	
 	window_tooltip2 = Window:New{
-		--skinName = 'default',
 		useDList = false,
 		resizable = false,
 		draggable = false,
 		autosize  = true,
-		backgroundColor = color.tooltip_bg, 
 		children = { stack_leftbar, stack_main, },
 		minHeight = 32,
 		minWidth = 32,
@@ -2373,10 +2264,6 @@ function widget:Initialize()
 	--FontChanged()
 	spSendCommands({"tooltip 0"})
 	
-	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local y = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100 - window_height)) .. "%"
-
     real_window_corner = Window:New{
 		name   = 'real_window_corner';
 		color = options.color_background.value,
@@ -2430,7 +2317,6 @@ function widget:Initialize()
 	option_Deselect()
 	
 	Show(real_window_corner)
-
 end
 
 function widget:Shutdown()
@@ -2440,8 +2326,6 @@ function widget:Shutdown()
 	end
 	Spring.SetDrawSelectionInfo(true)
 end
-
-
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if key == KEYSYMS.BACKQUOTE then
@@ -2460,15 +2344,10 @@ function widget:KeyRelease(key)
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 --lags like a brick due to being spammed constantly for unknown reason, moved all its behavior to SelectionChanged
 --function widget:CommandsChanged()
 --end
 --
-
-
 function widget:SelectionChanged(newSelection)
 	selectedUnits = {}
 	numSelectedUnits = 0
@@ -2530,10 +2409,18 @@ function widget:SelectionChanged(newSelection)
 		end
 	end
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 
-function widget:Shutdown()
-	Spring.SetDrawSelectionInfo(true) 
+--ToggleDrawTools = function(enable)
+function widget:UpdateCallIns(enable)
+	if enable then
+		self.DrawScreen = DrawScreenDrawTools
+	else
+		self.DrawScreen = function() end
+	end
+	
+	widgetHandler:UpdateCallIn("DrawScreen")
+	widgetHandler:UpdateCallIn("DrawScreen")
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
