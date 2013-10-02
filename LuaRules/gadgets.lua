@@ -19,6 +19,8 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local HANDLER_BASENAME = "gadgets.lua"
+local isMission = VFS.FileExists("mission.lua")
 
 local DepthMod = 10
 local DepthValue = -1
@@ -29,12 +31,16 @@ local function mynext(...)
 	local i,v = next(...)
 	local t = type(i)
 	if not whiteList[t] then
-		Spring.Echo('*** A gadget is misusing pairs! Report this with full infolog.txt! ***')
-		Spring.Echo(t)
-		Spring.Echo(i)
-		Spring.Echo(v)
+		Spring.Log(HANDLER_BASENAME, "error", '*** A gadget is misusing pairs! Report this with full infolog.txt! ***')
+		Spring.Log(HANDLER_BASENAME, "error", t)
+		Spring.Log(HANDLER_BASENAME, "error", i)
+		Spring.Log(HANDLER_BASENAME, "error", v)
 		DepthValue = DepthValue + 1
-		error("Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)
+		if isMission then
+			Spring.Log(HANDLER_BASENAME, "error", "Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)
+		else
+			error("Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)	-- breaks mission_runner
+		end
 	end
 	return i,v
 end
@@ -71,8 +77,6 @@ VFS.Include(HANDLER_DIR .. 'callins.lua',   nil, VFSMODE)
 VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
-
-local HANDLER_BASENAME = "gadgets.lua"
 
 --------------------------------------------------------------------------------
 
