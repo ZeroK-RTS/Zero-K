@@ -101,15 +101,17 @@ unitDef = {
       name                    = [[Gauss Cannon]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
+      avoidFeature            = false,
       bouncerebound           = 0.15,
       bounceslip              = 1,
       burst                   = 2,
       burstrate               = 0.4,
       cegTag                  = [[gauss_tag_h]],
-	  
-	  customParams            = {
-	    single_hit = [[1]],
-	  },
+      
+      customParams            = {
+	single_hit = [[1]],
+      },
+      
       craterBoost             = 0,
       craterMult              = 0,
 
