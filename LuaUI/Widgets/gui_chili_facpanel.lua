@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.005"
+local version = "v0.006"
 
 function widget:GetInfo()
   return {
@@ -564,7 +564,7 @@ RecreateFacbar = function()
 	end
 	
 	--stack_build:SetPos(options.buttonsize.value*1.2 )
-	stack_build:SetPos(options.buttonsize.value*1.2, nil, 400  ) -- why need width param #3?
+	stack_build.x = options.buttonsize.value*1.2
 
 	stack_main:Invalidate()
 	stack_main:UpdateLayout()
