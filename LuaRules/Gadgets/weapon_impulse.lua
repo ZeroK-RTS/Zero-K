@@ -34,6 +34,14 @@ local CMD_STOP = CMD.STOP
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local abs = math.abs
 
+
+local UNSTICK_CONSTANT = 0
+if Game.version:find('91.') then
+	UNSTICK_CONSTANT = 2.74 --for Spring 91.0
+elseif (Game.version:find('94') and Game.version:find('94.1.1')== nil) then
+	UNSTICK_CONSTANT = 3.00 --for Spring 94.1
+end
+
 --local BALLISTIC_GUNSHIP_GRAVITY = -0.2
 --local BALLISTIC_GUNSHIP_HEIGHT = 600000
 
@@ -108,6 +116,10 @@ local function IsUnitOnGround(unitID)
 	return false
 end
 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- General Functionss
+
 local function DetatchFromGround(unitID)
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local h = Spring.GetGroundHeight(x,z)
@@ -120,10 +132,6 @@ local function DetatchFromGround(unitID)
 		Spring.AddUnitImpulse(unitID, 0,-1000,0)
 	end
 end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
--- General Functionss
 
 local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType) -- could be GG if needed.
 	moveType = moveType or moveTypeByID[unitDefID or Spring.GetUnitDefID(unitID)]
@@ -195,6 +203,7 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 
 end
 
+GG.DetatchFromGround = DetatchFromGround
 GG.AddGadgetImpulseRaw = AddGadgetImpulseRaw
 GG.AddGadgetImpulse = AddGadgetImpulse
 
@@ -288,31 +297,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 end
 
-local unstickImpulse = nil
-local pushImpulse = 0.01 --default test value
-local function adjustImpulse(cmd,line,words,player)
-	--NOTE: how to use:
-	--Shoot 1 unit (any unit) with 1 Newton
-	--write "/luarules unstickimpulse <value>", to set "jiggle impulse" value that unstuck unit from ground (sane value range from 0-5)
-	--write "/luarules pushimpulse <value>", to set "raw push impulse" that would push unit in +x direction (sane value range from 0-2)
-	--a value of 1 represent 1 impulse which mean +1 elmo per frame. Regular unit will usually move at speed 1.2 elmo per frame
-	--Caution: +1 elmo per frame for 30 frame under no ground friction will cause insane speed 
-	if Spring.IsCheatingEnabled() then
-		if cmd=='unstickimpulse' then
-			unstickImpulse = tonumber(line)
-			Spring.Echo("unstickImpulse " .. unstickImpulse)
-		elseif cmd=='pushimpulse' then
-			pushImpulse = tonumber(line)
-			Spring.Echo("pushimpulse " .. pushImpulse)
-		end
-	end
-end
-
 function gadget:Initialize()
-	--/luarules unstickimpulse <value> (reference: dbg_dev_commands.lua)
-	--/luarules pushimpulse <value> 
-	gadgetHandler:AddChatAction("unstickimpulse",adjustImpulse,"Adjust unstickimpulse.")
-	gadgetHandler:AddChatAction("pushimpulse",adjustImpulse,"Adjust pushimpulse.")
 	-- load active units
 	for _, transportID in ipairs(Spring.GetAllUnits()) do
 		local transporting = Spring.GetUnitIsTransporting(transportID)
@@ -393,24 +378,9 @@ local function AddImpulses()
 					data.y = data.y + GROUND_PUSH_CONSTANT
 				end
 				if data.useDummy then
-					if unstickImpulse then --for debugging!
-						--Spring 91		Spring 94.1		Spring 95
-						--0.01 push		0.01 push		0.01 push
-						--2.75 unstick	3.01 unstick	0.27 unstick
-						Spring.AddUnitImpulse(unitID, unstickImpulse,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
-						Spring.AddUnitImpulse(unitID, pushImpulse, 0, 0)
-						Spring.AddUnitImpulse(unitID, -unstickImpulse,0,0) --remove dummy impulse
-					else
-						local unstickConstant = 0 --for Spring 95 (unadjusted!) --NOTE: Spring 95 no longer able to utilize stick/unstick hax to create consistent "slowdown" behaviour. Unit always stuck when turning in Spring 94.1.1+ git
-						if Game.version:find('91.') then
-							unstickConstant = 2.74 --for Spring 91.0
-						elseif (Game.version:find('94') and Game.version:find('94.1.1')== nil) then
-							unstickConstant = 3.00 --for Spring 94.1
-						end
-						Spring.AddUnitImpulse(unitID, unstickConstant,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
-						Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
-						Spring.AddUnitImpulse(unitID, -unstickConstant,0,0) --remove dummy impulse
-					end
+					Spring.AddUnitImpulse(unitID, UNSTICK_CONSTANT,0,0) --dummy impulse (applying impulse>1 make unit less sticky to map surface)
+					Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
+					Spring.AddUnitImpulse(unitID, -UNSTICK_CONSTANT,0,0) --remove dummy impulse
 				else
 					Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
 				end
