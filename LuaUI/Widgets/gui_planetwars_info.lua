@@ -27,10 +27,11 @@ local IMAGE_WIDTH = 32
 
 local factions = {
 	Cybernetic = {name = "Cybernetic Front", color = {136,170,255} },
-	Dynasty = {name = "Dynasty of Earth", color = {255, 170, 32} },
+	Dynasty = {name = "Dynasty of Earth", color = {255, 191, 0} },	--255, 170, 32
 	Machines = {name = "Free Machines", color = {170, 0, 0} },
 	Empire = {name = "Empire Reborn", color = {96, 16, 255} },
 	Liberty = {name = "Liberated Humanity", color = {85, 187, 85} },
+	SynPact = {name = "Synthetic Pact", color = {83, 136, 235} },
 }
 
 for faction, data in pairs(factions) do
