@@ -57,6 +57,7 @@ jumpClassGroups = {
 	"corsumo",
 	"jumpriot",
 	"jumpblackhole",
+	"jumpimpulse",
 	--"cadenza",
 	"factoryjump",
 	-- "pizzathehut",--bad unit left for testing purposes
@@ -114,6 +115,9 @@ jumpriot = {
 	cobscript = false},
 	
 jumpblackhole = {
+	cobscript = false},
+	
+jumpimpulse = {
 	cobscript = false},
 	
 -- corpyro = {

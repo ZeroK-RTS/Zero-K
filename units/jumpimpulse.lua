@@ -1,14 +1,14 @@
 unitDef = {
-  unitname              = [[jumpblackhole]],
-  name                  = [[Placeholder]],
-  description           = [[Jumpy Black Hole Launcher]],
+  unitname              = [[jumpimpulse]],
+  name                  = [[Elevator]],
+  description           = [[Impulse Shenanigans Jumpbot]],
   acceleration          = 0.4,
   brakeRate             = 0.4,
-  buildCostEnergy       = 500,
-  buildCostMetal        = 500,
+  buildCostEnergy       = 300,
+  buildCostMetal        = 300,
   builder               = false,
   buildPic              = [[JUMPRIOT.png]],
-  buildTime             = 500,
+  buildTime             = 300,
   canAttack             = true,
   canGuard              = true,
   canMove               = true,
@@ -19,7 +19,7 @@ unitDef = {
 
   customParams          = {
     canjump        = [[1]],
-    helptext       = [[Black hole launching jumpbot.]],
+    helptext       = [[Shenanigans jumpbot.]],
   },
 
   explodeAs             = [[BIG_UNITEX]],
@@ -56,7 +56,7 @@ unitDef = {
   },
 
   side                  = [[CORE]],
-  sightDistance         = 605,
+  sightDistance         = 550,
   smoothAnim            = true,
   trackOffset           = 0,
   trackStrength         = 8,
@@ -70,7 +70,7 @@ unitDef = {
  weapons             = {
 
     {
-      def                = [[BLACK_HOLE]],
+      def                = [[IMPULSE_BEAM]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
@@ -80,46 +80,50 @@ unitDef = {
 
   weaponDefs          = {
 
-    BLACK_HOLE = {
-      name                    = [[Black Hole Launcher]],
-      accuracy                = 350,
-      areaOfEffect            = 300,
-	  avoidFeature            = false,
-      avoidFriendly           = false,
-      burnblow                = true,
-      collideFeature          = false,
-      collideFriendly         = false,
-      craterBoost             = 100,
-      craterMult              = 2,
+    IMPULSE_BEAM = {
+      name                    = [[Impulse Beam]],
+      areaOfEffect            = 8,
+      beamDecay               = 0.9,
+      beamlaser               = 1,
+      beamTime                = 0.03,
+      beamttl                 = 40,
+      coreThickness           = 0,
+      craterBoost             = 0,
+      craterMult              = 0,
 
 	  customParams            = {
-	    falldamageimmunity = [[120]],
+	    impulse = [[-300]],
+		impulseup = [[1200]],
 	  },
-	  
+
       damage                  = {
         default = 0,
       },
 
-      explosionGenerator      = [[custom:black_hole]],
-      explosionSpeed          = 50,
-      impulseBoost            = 250,
-      impulseFactor           = -3,
-	  intensity               = 0.9,
+      explosionGenerator      = [[custom:NONE]],
+      fireStarter             = 30,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      myGravity               = 0.1,
-      projectiles             = 1,
-      range                   = 550,
-      reloadtime              = 18,
-      rgbColor                = [[0.05 0.05 0.05]],
-      size                    = 16,
-      soundHit                = [[weapon/cannon/wolverine_hit]],
-      soundStart              = [[weapon/cannon/wolverine_fire]],
-      soundStartVolume        = 6000,
-      soundHitVolume          = 6000,
-      startsmoke              = [[1]],
-      targetMoveError         = 0,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 500,
+      reloadtime              = 10,
+      rgbColor                = [[0 0 1]],
+      soundStart              = [[weapon/gravity_fire]],
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 8,
+      tolerance               = 18000,
       turret                  = true,
-      weaponType              = [[Cannon]],
+      weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
 
@@ -171,4 +175,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ jumpblackhole = unitDef })
+return lowerkeys({ jumpimpulse = unitDef })

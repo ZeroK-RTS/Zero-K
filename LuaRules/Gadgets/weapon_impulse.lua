@@ -59,12 +59,14 @@ local impulseWeaponID = {}
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.impulse then
-		Spring.Echo(wd.name)
 		impulseWeaponID[wd.id] = {
 			impulse = tonumber(wd.customParams.impulse), 
 			normalDamage = (wd.customParams.normaldamage and true or false),
 			checkLOS = true
 		}
+		if wd.customParams.impulseup then
+			impulseWeaponID[wd.id].impulseUp = tonumber(wd.customParams.impulseup)
+		end
 	end
 end
 
@@ -324,16 +326,19 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--Spring.AddUnitImpulse(unitID,0,3,0)
 	if impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) then
-
+		local defData = impulseWeaponID[weaponDefID]
 		local ux, uy, uz = Spring.GetUnitPosition(unitID)
 		local ax, ay, az = Spring.GetUnitPosition(attackerID)
 		
 		local x,y,z = (ux-ax), (uy-ay), (uz-az)
-		local magnitude = impulseWeaponID[weaponDefID].impulse
+		local magnitude = defData.impulse
 		
 		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, unitDefID) 
+		if defData.impulseUp then
+			AddGadgetImpulse(unitID, 0, 1, 0, defData.impulseUp, true, false, true, unitDefID) 
+		end
 		
-		if impulseWeaponID[weaponDefID].normalDamage then
+		if defData.normalDamage then
 			return damage
 		else
 			return 0
