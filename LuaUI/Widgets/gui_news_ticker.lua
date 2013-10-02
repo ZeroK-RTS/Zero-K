@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name	= "News Ticker",
-		desc	= "v1.01 Keeps you up to date on important battlefield events",
+		desc	= "v1.011 Keeps you up to date on important battlefield events",
 		author	= "KingRaptor",
 		date	= "July 26, 2009",
 		license	= "GNU GPL, v2 or later",
@@ -86,7 +86,7 @@ local scrollSpeed = math.ceil(60*UPDATE_PERIOD)
 local function SetTickerVisiblity()
 end
 
-options_path = 'Settings/Interface/News Ticker'
+options_path = 'Settings/HUD Panels/News Ticker'
 options = {
 	backgroundOpacity = {
 		name = "Background opacity",
@@ -103,8 +103,8 @@ options = {
 		value = 10, min = 1, max = 20, step = 1,
 		desc = "Multiplies metal income for minimum cost of newsworthy units",
 	},
-	soundOnly = {
-		name = "Sound Only",
+	hideBar = {
+		name = "Hide Bar",
 		type = "bool",
 		value = false,
 		desc = "Hides the visible bar",
@@ -112,6 +112,13 @@ options = {
 			SetTickerVisiblity(not self.value)
 		end
 	},
+	useSounds = {
+		name = "Use Sounds",
+		type = "bool",
+		value = true,
+		desc = "Hides the visible bar",
+	},
+	
 }
 
 local timeoutConstant = 60
@@ -141,7 +148,6 @@ local noMonitor = {
 	[UnitDefNames.terraunit.id] = true,
 }
 
-local useSounds = true
 --local mFactor = 10 --multiply by current M income to get the minimum cost for newsworthiness
 local useDeathMinCost = true
 local useCompleteMinCost = true
@@ -170,7 +176,7 @@ local function AddEvent(str, unitDefID, color, sound, pos)
 		lastEventFrame[unitDefID] = frame
 	end
 	
-	if not options.soundOnly.value then
+	if not options.hideBar.value then
 		local x = window_ticker.width
 		local lastLabel = labels[#labels]
 		if lastLabel then
@@ -221,7 +227,7 @@ local function AddEvent(str, unitDefID, color, sound, pos)
 		labels[#labels+1] = newLabel
 	end
 	
-	if useSounds and soundTimeout < frame then
+	if options.useSounds.value and soundTimeout < frame then
 		if WG.Cutscene and WG.Cutscene.IsInCutscene() then
 			return
 		end
