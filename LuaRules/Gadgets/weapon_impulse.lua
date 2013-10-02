@@ -216,7 +216,8 @@ local function DoAirDrag(unitID, factor, unitDefID)
 	local vx,vy,vz = spGetUnitVelocity(unitID)
 	if unitDefID and vx then
 		local myMass = transportMass[unitID] or mass[unitDefID]
-		factor = factor/myMass
+		factor = factor/(factor+myMass^1.5)
+		--Spring.Echo(factor)
 		spSetUnitVelocity(unitID, vx*(1-factor), vy*(1-factor), vz*(1-factor))
 	end
 end
