@@ -26,11 +26,11 @@ local weapons = {
 	},
 	jumpblackhole_black_hole = { 
 		radius = 150, 
-		damage = 5000,
+		damage = 8000,
 		impulse = true,
 		duration = 120, 
 		rangeFall = 0.2,
-		timeFall = 0.9 
+		timeFall = 0.5 
 	},
 	chickenwurm_napalm = { 
 		radius = 128, 
