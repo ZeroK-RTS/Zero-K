@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.891 Chili Minimap",
+    desc      = "v0.892 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -63,7 +63,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los'}
@@ -106,6 +106,15 @@ options = {
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
+	
+	buttonsOnRight = {
+		name = 'Map buttons on the right',
+		type = 'bool',
+		value = false,
+		OnChange= function(self) MakeMinimapWindow() end,
+		
+		path = minimap_path,
+	},
 	
 	-- [[ this option was secretly removed
 	viewstandard = {
@@ -281,7 +290,7 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
-local function MakeMinimapButton(file, pos, params)
+local function MakeMinimapButton(file, params)
 	local option = params.option
 	local name, desc, action, hotkey
 	if option then
@@ -300,16 +309,10 @@ local function MakeMinimapButton(file, pos, params)
 		
 	return Chili.Button:New{ 
 		height=iconsize, width=iconsize, 
---		file=file,
 		caption="",
 		margin={0,0,0,0},
 		padding={4,3,2,2},
-		bottom=iconsize*0.3, 
-		right=iconsize*pos+5, 
-		
 		tooltip = (name .. desc .. hotkey ),
-		
-		--OnClick={ function(self) options[option].OnChange() end }, 
 		OnClick={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if meta then
@@ -355,11 +358,81 @@ MakeMinimapWindow = function()
 		end
 	end
 	
-	map_panel = Chili.Panel:New {bottom = (iconsize*1.3), x = 0, y = 0, right = 0,
+	local map_panel_bottom = iconsize*1.3
+	local map_panel_right = 0
+	
+	local buttons_height = iconsize+3
+	local buttons_width = iconsize*10
+	if options.buttonsOnRight.value then
+		map_panel_bottom = 0
+		map_panel_right = iconsize*1.3
+		buttons_height = iconsize*10
+		buttons_width = iconsize+3
+	end
+	
+	map_panel = Chili.Panel:New {
+		bottom = map_panel_bottom,
+		x = 0,
+		y = 0,
+		right = map_panel_right,
+		
 		margin={0,0,0,0},
 		padding = {8,5,8,8},
 		backgroundColor = bgColor_panel
 		}
+	
+	local buttons_panel = Chili.StackPanel:New{
+		orientation = 'horizontal',
+		height=buttons_height,
+		width=buttons_width,
+		bottom = 5,
+		right=5,
+		
+		padding={1,1,1,1},
+		--margin={0,0,0,0},
+		itemMargin={0,0,0,0},
+		
+		autosize = false,
+		resizeItems = false,
+		autoArrangeH = false,
+		autoArrangeV = false,
+		centerItems = false,
+		
+		children = {
+			Chili.Button:New{ 
+				height=iconsize, width=iconsize, 
+				caption="",
+				margin={0,0,0,0},
+				padding={4,3,2,2},
+				tooltip = "Toggle simplified teamcolours",
+				OnClick = {toggleTeamColors},
+				children={
+					Chili.Image:New{
+						file='LuaUI/images/map/minimap_colors_simple.png',
+						width="100%";
+						height="100%";
+						x="0%";
+						y="0%";
+					}
+				},
+			},
+			
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', {option = 'viewfow'} ),
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
+			MakeMinimapButton( nil, {option = 'viewstandard'} ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', {option = 'viewheightmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', {option = 'viewblockmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
+			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
+			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
+		},
+	}
+	
 	window_minimap = Chili.Window:New{  
 		dockable = true,
 		name = "Minimap",
@@ -382,40 +455,8 @@ MakeMinimapWindow = function()
 		maxWidth = screenWidth*0.8,
 		maxHeight = screenHeight*0.8,
 		children = {
-			
---			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
 			map_panel,
-			
-			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, {option = 'lastmsgpos'} ),
-			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', 2, {option = 'clearmapmarks'} ),
-			MakeMinimapButton( nil, 3.5, {option = 'viewstandard'} ),
-			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 4.5, {option = 'viewheightmap'} ),
-			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 5.5, {option = 'viewblockmap'} ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 6.5, {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 8, {option = 'viewfow'} ),
-			
-			Chili.Button:New{ 
-				height=iconsize, width=iconsize, 
-				caption="",
-				margin={0,0,0,0},
-				padding={4,3,2,2},
-				bottom=iconsize*0.3, 
-				right=iconsize*9 +5, 
-				
-				tooltip = "Toggle simplified teamcolours",
-				
-				--OnClick={ function(self) options[option].OnChange() end }, 
-				OnClick = {toggleTeamColors},
-				children={
-					Chili.Image:New{
-						file='LuaUI/images/map/minimap_colors_simple.png',
-						width="100%";
-						height="100%";
-						x="0%";
-						y="0%";
-					}
-				},
-			},
+			buttons_panel,
 		},
 	}
 end
