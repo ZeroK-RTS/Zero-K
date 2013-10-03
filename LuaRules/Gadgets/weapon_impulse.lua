@@ -56,7 +56,7 @@ end
 local GUNSHIP_VERTICAL_MULT = 0.25 -- prevents rediculus gunship climb
 
 local impulseMult = {
-	[0] = 0.022, -- fixedwing
+	[0] = 0.02, -- fixedwing
 	[1] = 0.004, -- gunships
 	[2] = 0.0032, -- other
 }
@@ -167,7 +167,7 @@ local function AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, uni
 end
 
 
-local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, pushOffGround, useDummy, unitDefID, moveType) 
+local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, pushOffGround, useDummy, myImpulseMult, unitDefID, moveType) 
 	if inTransport[unitID] then
 		if not affectTransporter then
 			return
@@ -189,8 +189,10 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 	
 	local dis = math.sqrt(x^2 + y^2 + z^2)
 	
+	myImpulseMult = myImpulseMult or {1,1,1}
+	
 	local myMass = transportMass[unitID] or mass[unitDefID]
-	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/myMass
+	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]*myImpulseMult[moveTypeByID[unitDefID]+1]/myMass
 	
 	if moveTypeByID[unitDefID] == 0 then
 		x,y,z = x*mag, y*mag, z*mag
@@ -351,9 +353,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local x,y,z = (ux-ax), (uy-ay), (uz-az)
 		local magnitude = defData.impulse
 		
-		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, unitDefID) 
+		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, false, unitDefID) 
 		if defData.impulseUp then
-			AddGadgetImpulse(unitID, 0, 1, 0, defData.impulseUp, true, false, true, unitDefID) 
+			AddGadgetImpulse(unitID, 0, 1, 0, defData.impulseUp, true, false, true, false, unitDefID) 
 		end
 		
 		if defData.normalDamage then
