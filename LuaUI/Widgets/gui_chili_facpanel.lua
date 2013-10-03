@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.006"
+local version = "v0.007"
 
 function widget:GetInfo()
   return {
@@ -563,11 +563,17 @@ RecreateFacbar = function()
 		
 	end
 	
+	--stack_build:ClearChildren()
+	--stack_build.backgroundColor = {0,0,0,0}
+	
+	
 	--stack_build:SetPos(options.buttonsize.value*1.2 )
 	stack_build.x = options.buttonsize.value*1.2
 
 	stack_main:Invalidate()
 	stack_main:UpdateLayout()
+	
+	widget:SelectionChanged(Spring.GetSelectedUnits())
 end
 
 local function UpdateFactoryList()
@@ -596,7 +602,21 @@ local function UpdateFactoryList()
 	RecreateFacbar()
 end
 
+local function CheckRemoveFacStack()
+	if facs[pressedFac] then
+		local qStack = facs[pressedFac].qStack
+		stack_build:ClearChildren()
+		stack_build.backgroundColor = {0,0,0,0}
+		facs[pressedFac].facStack:AddChild(qStack)
+		
+		facs[pressedFac].facButton.backgroundColor = {1,1,1,1}
+		facs[pressedFac].facButton:Invalidate()
+	end
+end
+
 ------------------------------------------------------
+------------------------------------------------------
+--callins
 
 function widget:DrawWorld()
 	-- Draw factories command lines
@@ -637,10 +657,14 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
     for i,facInfo in ipairs(facs) do
       if unitID==facInfo.unitID then
         
-        table.remove(facs,i)
+		CheckRemoveFacStack()
+		
+		table.remove(facs,i)
         unfinished_facs[unitID] = nil
 		--UpdateFactoryList()
 		RecreateFacbar()
+		
+		
         return
       end
     end
@@ -700,17 +724,8 @@ end
 
 
 function widget:SelectionChanged(selectedUnits)
-	if facs[pressedFac] then
-		local qStack = facs[pressedFac].qStack
-		local boStack = facs[pressedFac].boStack
-		stack_build:ClearChildren()
-		stack_build.backgroundColor = {0,0,0,0}
-		facs[pressedFac].facStack:AddChild(qStack)
-		
-		facs[pressedFac].facButton.backgroundColor = {1,1,1,1}
-		facs[pressedFac].facButton:Invalidate()
-	end
-
+	CheckRemoveFacStack()
+	
 	pressedFac = -1
 	
 	if (#selectedUnits == 1) then 
