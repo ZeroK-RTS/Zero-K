@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.131 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.132 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "Oct 10, 2012",
     license   = "GNU GPL, v2 or later",
