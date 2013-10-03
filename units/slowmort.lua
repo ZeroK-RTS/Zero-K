@@ -67,7 +67,7 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[SLOWBEAM]],
+      def                = [[SLOWBALL]],
       badTargetCategory  = [[FIXEDWING UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -123,7 +123,38 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
+    SLOWBALL = { --this slowball have the maximum transit time of 0.5 second at 600-elmo range (Very fast)
+      name                    = [[Slowing Ball]],
+      areaOfEffect            = 64,
+	  avoidFeature            = false,
+      avoidFriendly           = false,
+      craterBoost             = 0,
+      craterMult              = 0,
 
+      damage                  = {
+        default = 350,
+		planes = 350,
+		subs = 17.5,
+      },
+
+      explosionGenerator      = [[custom:flashslow]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      myGravity               = 2.368,
+      range                   = 600,
+      reloadtime              = 1,
+      rgbColor                = [[0.3 0 0.4]],
+	  size                    = 15,
+	  soundHit                = [[weapon/aoe_aura]],
+	  soundHitVolume          = 2.2,
+      soundStart              = [[weapon/laser/small_laser_fire3]],
+      soundStartVolume        = 3.5,
+      soundTrigger            = true,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 1220,
+    },
   },
 
 
