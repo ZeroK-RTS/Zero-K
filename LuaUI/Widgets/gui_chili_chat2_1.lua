@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.909 Alternate Chili Chat Console.",
+    desc      = "v0.910 Alternate Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -136,6 +136,8 @@ local inputspace
 WG.enteringText = false
 WG.chat = WG.chat or {}
 
+local echo = Spring.Echo
+
 -- redefined in Initialize()
 local function showConsole() end
 local function hideConsole() end
@@ -167,7 +169,7 @@ local DiffTimers = Spring.DiffTimers
 
 options_path = "Settings/HUD Panels/Chat/Console"
 options_order = {
-	'autohide', 'autohide_time', 'mousewheel', 'clickable_points',
+	'autohide', 'autohide_time', 'mousewheel', 'clickable_points','pointButtonOpacity',
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
 	'text_height', 'highlighted_text_height', 'max_lines',
 	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
@@ -206,6 +208,13 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = onOptionsChanged,
+		advanced = true,
+	},
+	pointButtonOpacity = {
+		name = "Point button opacity",
+		type = 'number',
+		value = 0.25,
+		min = 0, max = 1, step = 0.05,
 		advanced = true,
 	},
 	
@@ -558,9 +567,11 @@ local function displayMessage(msg, remake)
 	if (msg.dup > 1 and not remake) then
 		local last = stack_console.children[#(stack_console.children)]
 		if last then
-			last:SetText(text)
-			-- UpdateClientArea() is not enough - last message keeps disappearing until new message is added
-			last:Invalidate()
+			if last.SetText then
+				last:SetText(text)
+				-- UpdateClientArea() is not enough - last message keeps disappearing until new message is added
+				last:Invalidate()
+			end
 		end
 	else
 		local textbox = WG.Chili.TextBox:New{
@@ -584,40 +595,31 @@ local function displayMessage(msg, remake)
 			}
 		}
 		
+		local button
 		if msg.point and options.clickable_points.value then
-			textbox.OnMouseDown = {function(self, x, y, mouse)
-				local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
-				if (mouse == 1 and click_on_text) then
+			textbox:SetPos( nil, 2, stack_console.width - 5 )
+			textbox:Update()
+			local tbheight = textbox.height
+			
+			button = WG.Chili.Button:New{
+				width = '100%',
+				height = tbheight * 1.4,
+				padding = { 3,3,3,3 },
+				backgroundColor = {1,1,1,options.pointButtonOpacity.value},
+				caption = '',
+				children = { textbox, },
+				OnMouseDown = {function(self, x, y, mouse)
 					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
-				end
-				--[[ testing - CarRep
-				local _,_, meta,_ = Spring.GetModKeyState()
-				if not meta then return false end
-				WG.crude.OpenPath(options_path)
-				WG.crude.ShowMenu() --make epic Chili menu appear.
-				--]]
+				end}
+			}
 			
-			end}
-			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
-				return self
-			end
-			--[[ testing - CarRep
+			stack_console:AddChild(button, false)
 		else
-			textbox.OnMouseDown = {function(self, x, y, mouse)
-				local _,_, meta,_ = Spring.GetModKeyState()
-				if not meta then return false end
-				WG.crude.OpenPath(options_path)
-				WG.crude.ShowMenu() --make epic Chili menu appear.
-			
-			end}
-			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
-				return self
-			end
-			--]]
+			stack_console:AddChild(textbox, false)	
 		end
 
-		stack_console:AddChild(textbox, false)
 		stack_console:UpdateClientArea()
+		
 	end 
 	-- open timer (for autohide)
 	time_opened = GetTimer()
