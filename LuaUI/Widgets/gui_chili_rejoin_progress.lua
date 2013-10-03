@@ -144,7 +144,7 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			
 			local minute, second = math.modf(timeToComplete/60) --second divide by 60sec-per-minute, then saperate result from its remainder
 			second = 60*second --multiply remainder with 60sec-per-minute to get second back.
-			timeToComplete_string = string.format ("Time Remaining: %.0f:%.0f" , minute, second)
+			timeToComplete_string = string.format ("Time Remaining: %d:%02d" , minute, second)
 		
 			progress_vote:SetCaption(timeToComplete_string)
 			progress_vote:SetValue(myGameFrame/serverFrameNum)
