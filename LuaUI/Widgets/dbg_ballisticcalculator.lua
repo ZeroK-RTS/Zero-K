@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "Ballistic Calculator",
     desc      = "Simulate & plot weapon's ballistic range & trajectory based on gravity setting (ie: myGravity) and velocity (ie:weaponVelocity). For weapon setting testing. \n\nInstruction: select any unit, press attack, hover mouse over ground (trajectory will be drawn), press I & O to decrease & increase myGravity respectively, press K & L to decrease & increase weaponVelocity respectively , M to activate high-trajectory.",
     author    = "msafwan", --using component from "gui_jumpjets.lua" by quantum,
-    date      = "Sept 14 2012",
+    date      = "October 3 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 10000,
     enabled   = false,
@@ -15,6 +15,8 @@ local customWeaponVelocity = 232
 local flightTime =0
 local highTrajectory = false
 local maximumRange = 0
+local apexHeight = 0
+local currRange = 0
 
 local spGetActiveCommand = Spring.GetActiveCommand
 local spGetMouseState = Spring.GetMouseState
@@ -63,9 +65,9 @@ function CalculateBallisticConstant(deltaV,myGravity)
 	local t = nil
 	local yDist = 0 -- set vertical height of 0 (a round trip from 0 height to 0 height)
 	local a = myGravity
-	-- 0 = yVel*t - a*t*t/2
-	-- 0 = (yVel)*t - (a/2)*t*t 
-	local t1 = (-yVel + (yVel^2 - 4*(-a/2)*(-0))^0.5)/(2*(-a/2)) ---formula for finding root for quadratic equation. Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
+	-- 0 = yVel*t - a*t*t/2 --this is the basic equation of motion for vertical motion, we set distance to 0 (this have 2 meaning: either is launching from ground or hit ground) then we find solution for time (t) using a quadratic solver
+	-- 0 = (yVel)*t - (a/2)*t*t --^same equation as above rearranged to highlight time (t)
+	local t1 = (-yVel + (yVel^2 - 4*(-a/2)*(-0))^0.5)/(2*(-a/2)) ---formula for finding root for quadratic equation (quadratic solver). Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
 	local t2 = (-yVel - (yVel^2 - 4*(-a/2)*(-0))^0.5)/(2*(-a/2))
 	xDist1 = xVel*t1 --distance travelled horizontally in "t" amount of time
 	xDist2 = xVel*t2
@@ -137,12 +139,22 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 				goodValue[4] = yVel
 				goodValue[5]= t1
 				goodValue.deviation = math.abs(xDist1 - dist)
+				currRange = xDist1
+				--Note:
+				--Formula to find root is: t = (-b +- (b*b - 4*(a)*(c))^0.5)/(2*a) ..... a & b & c is: 0= c + b*t - a*t*t
+				--but when it have only 1 solution (which only happen at the top-most of the arch/trajectory, the discriminant become 0, simplifying the equation to: t = -b /(2*a)
+				local flightTimeApex = -yVel/(2*(-a/2)) --time to apex^
+				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2 
 			elseif math.abs(xDist2 - dist) <= goodValue.deviation and t2>=0 then 
 				goodValue[2] = angle
 				goodValue[3] = xVel
 				goodValue[4] = yVel
 				goodValue[5]= t2
 				goodValue.deviation = math.abs(xDist2 - dist)
+				currRange = xDist2
+				
+				local flightTimeApex = -yVel/(2*(-a/2)) --time to apex^
+				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2 
 			end
 		end
 		correctAngle = goodValue[2]
@@ -197,7 +209,7 @@ function widget:GameFrame(n)
 	lineProgress = lineProgress + (1/30)
 	calculateNow =true
 	if n- lastUpdate >= 30 then
-		Spring.Echo("myGravity: ".. customMyGravity.. ", weaponVelocity: ".. customWeaponVelocity .. ", flightTime: " .. flightTime .. " ,maximumRange: ".. maximumRange)
+		Spring.Echo("myGravity: ".. string.format("%.3f", customMyGravity).. " ("..string.format("%.3f", customMyGravity/888.888888) .. " Spring91), weaponVelocity: ".. string.format("%.3f", customWeaponVelocity) .. ", flightTime: " .. string.format("%.3f", flightTime) .." ,apexHeight: " .. string.format("%.3f", apexHeight) .. " , currentRange: " .. string.format("%.3f", currRange) .. " ,maximumRange: ".. string.format("%.3f", maximumRange))
 		lastUpdate = n
 	end
 end
@@ -210,10 +222,10 @@ local decVelocity = string.byte( "k" )
 local trajectory =  string.byte( "m" )
 function widget:KeyPress(key, mods, isRepeat)
 	if ( key == incGravity ) then 
-		customMyGravity = customMyGravity + ((isRepeat and 1) or 0.01)
+		customMyGravity = customMyGravity + ((isRepeat and 1) or 0.1)
 		return true
 	elseif ( key == decGravity ) then
-		customMyGravity = customMyGravity - ((isRepeat and 1) or 0.01)
+		customMyGravity = customMyGravity - ((isRepeat and 1) or 0.1)
 		return true
 	elseif ( key == incVelocity ) then
 		customWeaponVelocity = customWeaponVelocity + ((isRepeat and 10) or 1)
