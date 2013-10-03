@@ -141,13 +141,11 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			
 			local timeToComplete = frameDistanceToFinish/myGameFrameRate -- estimate the time to completion.
 			local timeToComplete_string = "?/?"
-			if timeToComplete > 75 then
-				local minute, second = math.modf(timeToComplete/60) --second divide by 60sec-per-minute, then saperate result from its remainder
-				second = 60*second --multiply remainder with 60sec-per-minute to get second back.
-				timeToComplete_string = string.format ("%.0f minute, %.0f second(s) left.",minute, second)
-			else
-				timeToComplete_string = string.format ("%.1f second(s) left.",timeToComplete)
-			end
+			
+			local minute, second = math.modf(timeToComplete/60) --second divide by 60sec-per-minute, then saperate result from its remainder
+			second = 60*second --multiply remainder with 60sec-per-minute to get second back.
+			timeToComplete_string = string.format ("Time Remaining: %.0f:%.0f" , minute, second)
+		
 			progress_vote:SetCaption(timeToComplete_string)
 			progress_vote:SetValue(myGameFrame/serverFrameNum)
 			
