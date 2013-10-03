@@ -80,16 +80,20 @@ unitDef = {
     SLOWBEAM = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
+	  avoidFeature            = false,
+      avoidFriendly           = false,
       beamDecay               = 0.9,
       beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 40,
+      collideFeature          = false,
+      collideFriendly         = false,
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 220,
+        default = 350,
       },
 
       explosionGenerator      = [[custom:flashslow]],
