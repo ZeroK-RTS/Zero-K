@@ -610,6 +610,7 @@ local function displayMessage(msg, remake)
 				children = { textbox, },
 				OnMouseDown = {function(self, x, y, mouse)
 					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+					time_opened = GetTimer()
 				end}
 			}
 			
