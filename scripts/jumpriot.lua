@@ -32,8 +32,8 @@ local runspeed = 4
 local steptime = 40
 
 -- variables
-local firing = 0
-local bjumping = false
+local firing = false
+local walkCycle = 0
 
 --signals
 local SIG_Restore = 1
@@ -51,36 +51,46 @@ local function Walk()
 	Signal( SIG_Walk )
 	SetSignalMask( SIG_Walk )
 	while ( true ) do
-		Turn( lshoulder, x_axis, -1.2, runspeed*0.2 )
-		Turn( hips, z_axis, 0.1, runspeed*0.05 )
-		Turn( rshoulder, x_axis, 0.5, runspeed*0.3 )
-		
-		Turn( rthigh, x_axis, -1.2, runspeed*1 )
-		Turn( rshin, x_axis, 1, runspeed*1 )
---		Turn( rfoot, x_axis, 0.5, runspeed*1 )
-		
-		Turn( lshin, x_axis, 0.2, runspeed*1 )
-		Turn( lthigh, x_axis, 1.2, runspeed*1 )
+		if walkCycle == 0 then
+			if not firing then
+				Turn( lshoulder, x_axis, -1.2, runspeed*0.2 )
+				Turn( rshoulder, x_axis, 0.5, runspeed*0.3 )
+			end
+			
+			Turn( hips, z_axis, 0.1, runspeed*0.05 )
+			
+			Turn( rthigh, x_axis, -1.2, runspeed*1 )
+			Turn( rshin, x_axis, 1, runspeed*1 )
+	--		Turn( rfoot, x_axis, 0.5, runspeed*1 )
+			
+			Turn( lshin, x_axis, 0.2, runspeed*1 )
+			Turn( lthigh, x_axis, 1.2, runspeed*1 )
 
-		WaitForTurn( rthigh, x_axis )
-
-		Sleep( steptime )
+			walkCycle = 1
+			WaitForTurn( rthigh, x_axis )
+			
+			Sleep( steptime )
+		end
 		
-		Turn( lshoulder, x_axis, -0.6, runspeed*0.2 )
-		Turn( hips, z_axis, -0.1, runspeed*0.05 )
-		Turn( rshoulder, x_axis, -0.5, runspeed*0.3 )
-		
-		Turn( lthigh, x_axis, -1.2, runspeed*1 )
-		Turn( lshin, x_axis, 1, runspeed*1 )
---		Turn( lfoot, x_axis, 0.5, runspeed*1 )
-		
-		Turn( rshin, x_axis, 0.2, runspeed*1 )
-		Turn( rthigh, x_axis, 1.2, runspeed*1 )
-		
-		WaitForTurn( lthigh, x_axis )
-		
-		Sleep( steptime )
-
+		if walkCycle == 1 then
+			if not firing then
+				Turn( lshoulder, x_axis, -0.6, runspeed*0.2 )
+				Turn( rshoulder, x_axis, -0.5, runspeed*0.3 )
+			end
+			
+			Turn( hips, z_axis, -0.1, runspeed*0.05 )
+			
+			Turn( lthigh, x_axis, -1.2, runspeed*1 )
+			Turn( lshin, x_axis, 1, runspeed*1 )
+	--		Turn( lfoot, x_axis, 0.5, runspeed*1 )
+			
+			Turn( rshin, x_axis, 0.2, runspeed*1 )
+			Turn( rthigh, x_axis, 1.2, runspeed*1 )
+			
+			walkCycle = 0
+			WaitForTurn( lthigh, x_axis )
+			Sleep( steptime )
+		end
 	end
 end
 
@@ -110,11 +120,11 @@ local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
 	Sleep(2000)
-	firing = 0
+	firing = false
 	Turn( chest, y_axis, 0, 3 )
 	Turn( lshoulder, x_axis, -0.9, 5 )
 	Turn( rshoulder, x_axis, 0, 3 )
-
+    
 	Turn( lforearm, z_axis, -0.2, 5 )
 	Turn( lshoulder, z_axis, 0, 3 )
 	Turn( rshoulder, z_axis, 0, 3 )
@@ -138,7 +148,7 @@ function script.AimWeapon1( heading, pitch )
 	--]]
 	
 	-- Outstreched Arm
-	firing = 1
+	firing = true
 	Turn( chest, y_axis, heading, 12 )
 	Turn( lforearm, z_axis, 0, 5 )
 	Turn( lshoulder, x_axis, -pitch - 1.5, 12 )
@@ -154,22 +164,11 @@ function script.FireWeapon1()
 	EmitSfx( flare, 1025 )
 end
 
-
-local function JumpExhaust()
-	while bJumping do 
-		EmitSfx( lfoot,  UNIT_SFX3 )
-		EmitSfx( rfoot,  UNIT_SFX3 )
-		Sleep(33)
-	end
-end
-
 function preJump(turn, distance)
 end
 
 function beginJump() 
 	StartThread( StopWalk )
-	bJumping = true
-	StartThread(JumpExhaust)
 end
 
 function jumping()
@@ -177,13 +176,14 @@ function jumping()
 	EmitSfx( rfoot,  UNIT_SFX4 )
 	EmitSfx( lfoot,  UNIT_SFX1 )
 	EmitSfx( rfoot,  UNIT_SFX2 )
+	EmitSfx( lshoulder,  UNIT_SFX3 )
+	EmitSfx( rshoulder,  UNIT_SFX3 )
 end
 
 function halfJump()
 end
 
 function endJump() 
-	bJumping = false
 	EmitSfx( lfoot,  UNIT_SFX4 )
 	EmitSfx( rfoot,  UNIT_SFX4 )
 end
