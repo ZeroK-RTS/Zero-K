@@ -287,7 +287,7 @@ local function addUnit(defName, path)
 	
 	if ud.isFactory then
 		options[defName .. "_repeat"] = {
-			name = "  Rpeat",
+			name = "  Repeat",
 			desc = "Repeat: check box to turn it on",
 			type = 'bool',
 			value = false,
