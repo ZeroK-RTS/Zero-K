@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.086 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.087 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --21 September 2013
     license   = "GNU GPL, v2 or later",
@@ -1553,8 +1553,8 @@ local function MakeToolTip_UD(tt_table)
 			{ name = 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
 		},
 		main = {
-			{ name = 'udname', icon = iconPath, text = tt_table.unitDef.humanName .. extraText, fontSize=6 },
-			{ name = 'tt', text = tt_table.unitDef.tooltip, wrap=true },
+			{ name = 'udname', icon = iconPath, text = tt_table.unitDef.humanName, fontSize=6 },
+			{ name = 'tt', text = tt_table.unitDef.tooltip .. extraText, wrap=true },
 			{ name='health', icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(tt_table.unitDef.health),  fontSize=4, },
 			--[[
 			{ name = 'requires', text = tt_table.requires and ('REQUIRES' .. tt_table.requires) or '', },
