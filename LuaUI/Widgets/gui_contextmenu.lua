@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.086 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.087 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -108,7 +108,15 @@ for i=1,#UnitDefsList do
 			MakeStatsWindow(ud)
 		end,
 		path = options_path ..'/' .. unitName:sub(1,1):upper(),
-		
+	}
+	options_order[#options_order + 1] = optionName
+	
+	options[optionName] = {
+		name=unitName,
+		type='button',
+		desc = "Build " .. unitName,
+		action = 'buildunit_' .. ud.name,
+		path = 'Game/Units/' .. unitName:sub(1,1):upper(),
 	}
 	options_order[#options_order + 1] = optionName
 end
