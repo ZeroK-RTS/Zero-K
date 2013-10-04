@@ -111,6 +111,7 @@ for i=1,#UnitDefsList do
 	}
 	options_order[#options_order + 1] = optionName
 	
+	optionName = unitName .. 'build'
 	options[optionName] = {
 		name=unitName,
 		type='button',
