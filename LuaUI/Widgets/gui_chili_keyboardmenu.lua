@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.027 Chili Keyboard Menu",
+    desc      = "v0.028 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -954,7 +954,9 @@ local function SetupCommands( modifier )
 						local v = actions[i]
 						for actionCmd, actionExtra in pairs(v) do
 							
-							if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' then 
+							local buildCommand = actionCmd:find('buildunit_')
+							
+							if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' and not buildCommand then 
 							
 								local actionOption = WG.crude.GetActionOption(actionCmd)
 								local actionName = actionOption and actionOption.name
