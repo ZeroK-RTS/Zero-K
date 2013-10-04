@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "Ballistic Calculator",
     desc      = "Simulate & plot weapon's ballistic range & trajectory based on gravity setting (ie: myGravity) and velocity (ie:weaponVelocity). For weapon setting testing. \n\nInstruction: select any unit, press attack, hover mouse over ground (trajectory will be drawn), press I & O to decrease & increase myGravity respectively, press K & L to decrease & increase weaponVelocity respectively , M to activate high-trajectory.",
     author    = "msafwan", --using component from "gui_jumpjets.lua" by quantum,
-    date      = "October 3 2013",
+    date      = "October 4 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 10000,
     enabled   = false,
@@ -47,7 +47,7 @@ function DrawMouseArc(unitID, shift, groundPos)
 	if (not queue or #queue == 0 or not shift) then
 		local unitPos = {spGetUnitPosition(unitID)}
 		local dist = GetDist2D(unitPos, groundPos)
-		local maxRange,_ = CalculateBallisticConstant(deltaV,customMyGravity)
+		local maxRange,_ = CalculateBallisticConstant(deltaV,customMyGravity,unitPos, groundPos)
 		DrawArc(unitID, unitPos, groundPos, maxRange,dist, deltaV, customMyGravity)
 		maximumRange = maxRange
 	end
@@ -57,18 +57,19 @@ function GetDist2D(a, b)
   return ((a[1] - b[1])^2 + (a[3] - b[3])^2)^0.5
 end
 
-function CalculateBallisticConstant(deltaV,myGravity)
+local spGetGroundHeight = Spring.GetGroundHeight
+function CalculateBallisticConstant(deltaV,myGravity,start, finish)
 	local angle  = 0.707 --use test range of 45 degree for optimal launch
 	--determine maximum range & time
 	local xVel = math.cos(0.707)*deltaV --horizontal portion
 	local yVel = math.sin(0.707)*deltaV --vertical portion
 	local t = nil
-	local yDist = 0 -- set vertical height of 0 (a round trip from 0 height to 0 height)
+	local yDist = spGetGroundHeight(finish[1],finish[3]) - start[2] -- set vertical height of 0 (a round trip from 0 height to 0 height)
 	local a = myGravity
-	-- 0 = yVel*t - a*t*t/2 --this is the basic equation of motion for vertical motion, we set distance to 0 (this have 2 meaning: either is launching from ground or hit ground) then we find solution for time (t) using a quadratic solver
+	-- 0 = yVel*t - a*t*t/2 --this is the basic equation of motion for vertical motion, we set distance to 0 or yDist (this have 2 meaning: either is launching from ground or is hitting ground) then we find solution for time (t) using a quadratic solver
 	-- 0 = (yVel)*t - (a/2)*t*t --^same equation as above rearranged to highlight time (t)
-	local t1 = (-yVel + (yVel^2 - 4*(-a/2)*(-0))^0.5)/(2*(-a/2)) ---formula for finding root for quadratic equation (quadratic solver). Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
-	local t2 = (-yVel - (yVel^2 - 4*(-a/2)*(-0))^0.5)/(2*(-a/2))
+	local t1 = (-yVel + (yVel^2 - 4*(-a/2)*(-yDist))^0.5)/(2*(-a/2)) ---formula for finding root for quadratic equation (quadratic solver). Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
+	local t2 = (-yVel - (yVel^2 - 4*(-a/2)*(-yDist))^0.5)/(2*(-a/2))
 	xDist1 = xVel*t1 --distance travelled horizontally in "t" amount of time
 	xDist2 = xVel*t2
 	local maxRange = nil
@@ -88,7 +89,6 @@ end
 local glVertex = gl.Vertex
 local glColor = gl.Color
 local glDrawGroundCircle = gl.DrawGroundCircle
-local spGetGroundHeight = Spring.GetGroundHeight
 local glBeginEnd = gl.BeginEnd
 local glLineStipple = gl.LineStipple
 local GL_LINE_STRIP = GL.LINE_STRIP
@@ -115,7 +115,7 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 	local horizontalSpeed = cachedResult[3] or 0	
 	if calculateNow then --let GameFrame() control when to calculate this rather than letting it to DrawWorld()
 		local goodValue = {deviation= 999}
-		local searchPattern = {startAngle = 0.0, endAngle = 0.707, stepAngle = 0.005}
+		local searchPattern = {startAngle = -1.571, endAngle = 0.707, stepAngle = 0.005}
 		if highTrajectory then 
 			searchPattern= {startAngle = 0.707, endAngle = 1.57, stepAngle = 0.005}
 		end
@@ -123,7 +123,7 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 			local angle  = i
 			local xVel = math.cos(angle)*deltaV
 			local yVel = math.sin(angle)*deltaV
-			local yDist = spGetGroundHeight(finish[1],finish[3]) - spGetGroundHeight(start[1],start[3])
+			local yDist = spGetGroundHeight(finish[1],finish[3]) - start[2]
 			local a = myGravity
 			local t1 = nil
 			local t2 = nil
