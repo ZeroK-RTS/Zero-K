@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.007"
+local version = "v0.008"
 
 function widget:GetInfo()
   return {
@@ -67,6 +67,17 @@ options = {
 		min = 40, max = 100, step=5,
 		value = 50,
 		OnChange = function() RecreateFacbar() end,
+	},
+	
+	backgroundOpacity = {
+		name = "Background opacity",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			window_facbar.color = {0,0,0,self.value}
+			window_facbar.caption = self.value == 0 and '' or 'Factories'
+			window_facbar:Invalidate()
+		end,
 	},
 }
 
