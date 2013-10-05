@@ -1,4 +1,4 @@
-local versionNum = '0.302'
+local versionNum = '0.303'
 
 function widget:GetInfo()
 	return {
@@ -59,15 +59,17 @@ local selectedNewtons = nil		--temprorary {newtons}
 local intensivity = 255
 local colorIndex = 0
 
-local victim = nil
-local victimStillBeingAttacked = false
+local victim = {}
+local groupTarget = {}
+local victimStillBeingAttacked = {}
 local victimLandingLocation = {}
 
 local estimateInFuture = {}
 
 --local cmdRate = 0
 --local cmdRateS = 0
-local softEnabled = false	--if zero newtons has orders, uses less 
+local softEnabled = false	--if zero newtons has orders, uses less
+local currentFrame = Spring.GetGameFrame()
 
 local cmdFirezone = {
 	id      = CMD_NEWTON_FIREZONE,
@@ -170,6 +172,12 @@ local function RemoveDeadGroups(units)
 					newtonIDs[egNewtons.data[j]].groupID = groupID
 				end
 				
+				--displace/re-occupy dead group with another group
+				victimStillBeingAttacked[groupID] = victimStillBeingAttacked[groups.count]
+				victimStillBeingAttacked[groups.count] = nil
+				groupTarget[groupID] = groupTarget[groups.count]
+				groupTarget[groups.count] = nil
+				
 				groups.data[groupID] = groups.data[groups.count]
 				groups.data[groups.count] = nil
 				groups.count = groups.count - 1
@@ -271,6 +279,15 @@ end
 -------------------------------------------------------------------
 --- UNIT HANDLING
 
+local function SquareDistance (points, target)
+	local xCenter = (points.x2 + points.x)/2
+	local zCenter = (points.z2 + points.z)/2
+	local x,_,z = spGetUnitPosition(target)
+	local diffX = xCenter - x
+	local diffZ = zCenter - z
+	return (diffX*diffX + diffZ*diffZ)
+end
+
 function widget:UnitDestroyed(unitID)
 	if newtonIDs[unitID] ~= nil then
 		RemoveDeadGroups({unitID})
@@ -282,16 +299,23 @@ end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer
 , weaponDefID, attackerID, attackerDefID, attackerTeam )
-	if victim == unitID then
-		victimStillBeingAttacked = true
-		local frame = Spring.GetGameFrame() + 1
-		estimateInFuture[frame] = estimateInFuture[frame] or {}
-		estimateInFuture[frame][unitID] = true
+	if victim[unitID] then
+		for g=1, groups.count do
+			if groupTarget[g] == unitID then
+				victimStillBeingAttacked[g] = unitID
+			end
+		end
+		local frame = currentFrame
+		victim[unitID] = frame + 90 --delete 3 second later
+		local estFrame = (frame-(frame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into 15 step. eg [1 .. 15 .. 30] into [1,15,30]
+		estimateInFuture[estFrame] = estimateInFuture[estFrame] or {}
+		estimateInFuture[estFrame][unitID] = true
 		--ech("still being attacked")
 	end
 end
 
 function widget:GameFrame(n)
+	currentFrame = n
 	--if n % 30 == 0 then
 	--	ech("cmdRate A=".. cmdRate .. " cmdRate S="  .. cmdRateS .. "   SUM=" .. cmdRate + cmdRateS)
 	--	cmdRate = 0
@@ -306,22 +330,33 @@ function widget:GameFrame(n)
 		estimateInFuture[n] = nil
 	end
 	
-	if softEnabled then
+	--empty whitelist to widget:UnitDamaged() monitoring
+	for unitID, frame in pairs(victim) do
+		if frame<=n then
+			victim[unitID] = nil
+		end
+	end
+	
+	if softEnabled then --is disabled if group is empty
 		-- update attack orders
 		if n % checkRate == 0 then
 			for g = 1, groups.count do
 				local points = groups.data[g].points
 				local newtons = groups.data[g].newtons.data
 				if points ~= nil then
-					units = spGetUnitsInRectangle(points.x, points.z, points.x2, points.z2)
-					stop = true
+					local units = spGetUnitsInRectangle(points.x, points.z, points.x2, points.z2)
+					local stop = true
+					local unitToAttack = nil
+					local shortestDistance = 9999999
 					for i = 1, #units do
 						local unitID = units[i]
 						if UnitDefs[spGetUnitDefID(unitID)].speed > 0 then
 							stop = false
-							if victimStillBeingAttacked then
-								victimStillBeingAttacked = false
-								break
+							if victimStillBeingAttacked[g] == unitID then --signal from UnitDamaged() that a unit is still being pushed
+								victimStillBeingAttacked[g] = nil--clear signal
+								unitToAttack = nil
+								break --wait for next frame until UnitDamaged() stop signalling. 
+								--NOTE: there is periodic pause around ~16 frame in UnitDamaged(), this allowed the signal to be empty and prompted Newton-groups to retarget.
 							end
 							--if (#cmdQueue>0) then
 							--ech("attack " .. CMD.ATTACK)
@@ -333,25 +368,40 @@ function widget:GameFrame(n)
 							--	break
 							--end
 							--end
-							spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitID}, {} )
-							victim = unitID
+							-- spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitID}, {} )
+							-- groupTarget[g] = unitID
+							-- victim[unitID] = n + 90 --empty whitelist 3 second later
 							--cmdRate = cmdRate +1
-
-							break
+							--break
+							local distToBoxCenter = SquareDistance (points, unitID)
+							if distToBoxCenter < shortestDistance then --get smallest distance to box's center
+								shortestDistance = distToBoxCenter --shortest square distance
+								unitToAttack = unitID --shoot this unit at end of this loop
+							end
 						end
 					end
-					if stop and spGetUnitCommands(newtons[1],1)[1] ~= nil then
-						spGiveOrderToUnitArray(newtons,CMD.STOP, {}, {})
-						victim = nil
-						--cmdRateS = cmdRateS +1
-						--ech("stop")
+					if unitToAttack and (groupTarget[g]~=unitToAttack) then --there are target, and target is different than previous target (prevent command spam)? 
+						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, {} ) --shoot unit
+						groupTarget[g] = unitToAttack --have target!
+						victimStillBeingAttacked[g] = nil --clear signal
+						victim[unitToAttack] = n + 90 --add UnitDamaged() whitelist, and expire after 3 second later
+					end
+					if stop and groupTarget[g] then --no unit in the box, and have target?
+						local orders = spGetUnitCommands(newtons[1],1)[1]
+						if orders and orders.id ==CMD.ATTACK and orders.params[1]==groupTarget[g] then --is currently attacking old target??
+							spGiveOrderToUnitArray(newtons,CMD.STOP, {}, {}) --cancel attacking any out-of-box unit
+							--cmdRateS = cmdRateS +1
+							--ech("stop")
+						end
+						groupTarget[g] = nil --no target
+						victimStillBeingAttacked[g] = nil --clear signal
 					end
 				end
 			end
 		end
 	end
 	
-	if n % 150 == 0 then --recheck crash estimated location after 5 second
+	if n % 150 == 0 then --recheck crash estimated location every 5 second
 		for victimID, _ in pairs (victimLandingLocation) do
 			local x,y,z = spGetUnitPosition(victimID)
 			if x then
