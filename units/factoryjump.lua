@@ -18,7 +18,6 @@ unitDef = {
     [[puppy]],
     [[corpyro]],
 	[[slowmort]],
-	[[jumpblackhole]],
     [[corcan]],
     [[corsumo]],
 	[[firewalker]],
