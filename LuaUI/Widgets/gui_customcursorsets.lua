@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Custom Cursor Sets",
-    desc      = "v1.001 Choose different cursor sets.",
+    desc      = "v1.002 Choose different cursor sets.",
     author    = "CarRepairer",
     date      = "2012-01-11",
     license   = "GNU GPL, v2 or later",
@@ -108,14 +108,21 @@ end
 
 ----------------------
 
-
-
-function widget:KeyPress(key, modifier, isRepeat)
+ 
+ 
+ function widget:KeyPress(key, modifier, isRepeat)
 	if ( key == KEYSYMS.F5) then
 		if Spring.IsGUIHidden() then
-			SetCursor( options.cursorsets.value )
+			
+			if options.cursorsets.value == 'zk' then
+				RestoreCursor()
+			else
+				SetCursor( options.cursorsets.value )
+			end
+			
 		else
-		  Spring.Echo 'test1'
+			
+			
 			for i=1, #cursorNames do
 				local cursor = cursorNames[i]
 				local topLeft = (cursor == 'cursornormal' and cursorSet ~= 'k_haos_girl')
@@ -124,6 +131,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end 
 	end 
  end
+
+ 
 
  
 ----------------------
