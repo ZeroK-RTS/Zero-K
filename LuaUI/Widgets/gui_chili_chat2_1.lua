@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.910 Alternate Chili Chat Console.",
+    desc      = "v0.911 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -113,7 +113,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local HIGHLIGHT_SURROUND_SEQUENCE = ' #### '
+local HIGHLIGHT_SURROUND_SEQUENCE_1 = ' >>> '
+local HIGHLIGHT_SURROUND_SEQUENCE_2 = ' <<<'
 local DEDUPE_SUFFIX = 'x '
 
 --------------------------------------------------------------------------------
@@ -169,13 +170,36 @@ local DiffTimers = Spring.DiffTimers
 
 options_path = "Settings/HUD Panels/Chat/Console"
 options_order = {
-	'autohide', 'autohide_time', 'mousewheel', 'clickable_points','pointButtonOpacity',
-	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
-	'text_height', 'highlighted_text_height', 'max_lines',
+	
+	'lblGeneral',
+	'mousewheel', 
+	'defaultAllyChat',
+	'text_height', 'max_lines',
 	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
-	'dedupe_messages', 'dedupe_points','color_dup',
+	
+	
+	'lblFilter',
+	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel',
+	
+	'lblPointButtons',
+	'clickable_points','pointButtonOpacity',
+	
+	'lblAutohide',
+	'autohide', 'autohide_time',
+	
+	
+	'lblHilite',
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight'
+	'highlight_surround', 'highlight_sound', 'color_highlight','highlighted_text_height', 
+	
+	'lblDedupe',
+	'dedupe_messages', 'dedupe_points','color_dup',
+	
+	
+	
+	
+	
+	
 }
 
 --------------------------------------------------------------------------------
@@ -189,6 +213,14 @@ end
 --------------------------------------------------------------------------------
 
 options = {
+	
+	lblFilter = {name='Filtering', type='label'},
+	lblPointButtons = {name='Point Buttons', type='label'},
+	lblAutohide = {name='Auto Hiding', type='label'},
+	lblHilite = {name='Highlighting', type='label'},
+	lblDedupe = {name='De-Duplication', type='label'},
+	lblGeneral = {name='General Settings', type='label'},
+	
 	text_height = {
 		name = 'Text Size',
 		type = 'number',
@@ -561,8 +593,9 @@ local function displayMessage(msg, remake)
 	end
 	
 	-- TODO betterify this / make configurable
-	local highlight_sequence = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE) or '')
-	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence .. msg.formatted .. highlight_sequence
+	local highlight_sequence1 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_1) or '')
+	local highlight_sequence2 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_2) or '')
+	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.formatted .. highlight_sequence2
 
 	if (msg.dup > 1 and not remake) then
 		local last = stack_console.children[#(stack_console.children)]
@@ -597,13 +630,14 @@ local function displayMessage(msg, remake)
 		
 		local button
 		if msg.point and options.clickable_points.value then
-			textbox:SetPos( nil, 2, stack_console.width - 5 )
+			textbox:SetPos( nil, 3, stack_console.width - 6 )
 			textbox:Update()
-			local tbheight = textbox.height
-			
+			local tbheight = textbox.height -- not perfect
+			tbheight = math.max( tbheight, 15 ) --hack
+			--echo('tbheight', tbheight)
 			button = WG.Chili.Button:New{
 				width = '100%',
-				height = tbheight * 1.4,
+				height = tbheight + 8,
 				padding = { 3,3,3,3 },
 				backgroundColor = {1,1,1,options.pointButtonOpacity.value},
 				caption = '',
