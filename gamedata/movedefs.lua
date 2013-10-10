@@ -185,6 +185,13 @@ local moveDefs = {
 	},
 }
 
+-- desync fix attempt
+for name, moveData in pairs(moveDefs) do
+	if moveData.maxslope then
+		moveData.maxslope = moveData.maxslope + 0.01
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
