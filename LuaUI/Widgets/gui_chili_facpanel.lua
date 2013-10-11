@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.008"
+local version = "v0.009"
 
 function widget:GetInfo()
   return {
@@ -514,11 +514,12 @@ local function MakeClearButton(unitID)
 			end
 		},
 		children = {
+			Label:New{ caption = 'Clear Q', fontSize = 11, x=2, bottom=2, fontShadow = true, },
 			Image:New{
 				file='LuaUI/images/drawingcursors/eraser.png',
-				width="100%";
-				height="100%";
-				x="0%";
+				width="80%";
+				height="80%";
+				x="10%";
 				y="0%";
 			}
 		},
