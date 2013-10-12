@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.125 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.126 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-October-1
+    date      = "2011-03-16", --2013-October-12
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -51,11 +51,14 @@ options_order = {
 	'invertalt', 
 	'zoomintocursor', 
 	'zoomoutfromcursor', 
+	'zoomouttocenter', 
 	'zoominfactor', 
 	'zoomoutfactor',
 	
 	'lblMisc',
 	'overviewmode', 
+	'overviewset',
+	'rotatebackfromov',
 	'smoothness',
 	'fov',
 	--'restrictangle',
@@ -88,6 +91,7 @@ options_order = {
 }
 
 local OverviewAction = function() end
+local OverviewSetAction = function() end
 local SetFOV = function(fov) end
 local SelectNextPlayer = function() end
 
@@ -208,7 +212,12 @@ options = {
 		type = 'bool',
 		value = true,
 	},
-	
+	zoomouttocenter = {
+		name = 'Zoom out to center',
+		desc = 'Center the map as you zoom out.',
+		type = 'bool',
+		value = false,
+	},
 	
 	rotfactor = {
 		name = 'Rotation speed',
@@ -277,6 +286,18 @@ options = {
 		type = 'button',
 		hotkey = {key='tab', mod=''},
 		OnChange = function(self) OverviewAction() end,
+	},
+	overviewset = {
+		name = "Set Overview Viewpoint",
+		desc = "Save the current view as the new overview mode viewpoint.",
+		type = 'button',
+		OnChange = function(self) OverviewSetAction() end,
+	},
+	rotatebackfromov = {
+		name = "Rotate Back From Overview",
+		desc = "When returning from overview mode, rotate the camera to its original position.",
+		type = 'bool',
+		value = false,
 	},
 	resetcam = {
 		name = "Reset Camera",
@@ -493,7 +514,7 @@ local helpText = {}
 local ls_x, ls_y, ls_z --lockspot position
 local ls_dist, ls_have, ls_onmap --lockspot flag
 local tilting
-local overview_mode, last_rx, last_ls_dist --overview_mode's variable
+local overview_mode, last_rx, last_ry, last_ls_dist, ov_cs --overview_mode's variable
 local follow_timer = 0
 local epicmenuHkeyComp = {} --for saving & reapply hotkey system handled by epicmenu.lua
 
@@ -896,6 +917,15 @@ local function Zoom(zoomin, shift, forceCenter)
 
 	local cstemp = UpdateCam(cs)
 	if cstemp then cs = cstemp; end
+	if (not zoomin and options.zoomouttocenter.value) then
+		local dcx = mcx - ls_x -- distance in x-z plane from center of map to center of view (x-axis)
+		local dcz = mcz - ls_z -- distance in x-z plane from center of map to center of view (z-axis)
+--		Spring.Echo ("maxDistY: " .. maxDistY .. " cs.py: " .. cs.py .. " dcx: " .. dcx .. " dcz: " .. dcz)
+		local csp = math.min((cs.py/(maxDistY*2/3)),1) ^ 2
+--		Spring.Echo ("csp: " .. csp)
+		cs.px = cs.px + dcx * csp
+		cs.pz = cs.pz + dcz * csp
+	end
 	if zoomin or ls_dist < maxDistY then
 		spSetCameraState(cs, options.smoothness.value)
 	end
@@ -949,8 +979,19 @@ local function ResetCam()
 	cs.rx = -HALFPI
 	cs.ry = PI
 	spSetCameraState(cs, 1)
+	ov_cs = nil
 end
 options.resetcam.OnChange = ResetCam
+
+OverviewSetAction = function()
+	local cs = spGetCameraState()
+	ov_cs = {}
+	ov_cs.px = cs.px
+	ov_cs.py = cs.py
+	ov_cs.pz = cs.pz
+	ov_cs.rx = cs.rx
+	ov_cs.ry = cs.ry
+end
 
 OverviewAction = function()
 	if not overview_mode then
@@ -963,11 +1004,19 @@ OverviewAction = function()
 		SetLockSpot2(cs)
 		last_ls_dist = ls_dist
 		last_rx = cs.rx
-		
-		cs.px = Game.mapSizeX/2
-		cs.py = maxDistY
-		cs.pz = Game.mapSizeZ/2
-		cs.rx = -HALFPI
+		last_ry = cs.ry
+		if ov_cs then
+			cs.px = ov_cs.px
+			cs.py = ov_cs.py
+			cs.pz = ov_cs.pz
+			cs.rx = ov_cs.rx
+			cs.ry = ov_cs.ry
+		else
+			cs.px = Game.mapSizeX/2
+			cs.py = maxDistY
+			cs.pz = Game.mapSizeZ/2
+			cs.rx = -HALFPI
+		end
 		spSetCameraState(cs, 1)
 	else --if in overview mode
 		local cs = spGetCameraState()
@@ -976,6 +1025,7 @@ OverviewAction = function()
 		if gx then --Note:  Now VirtTraceRay can extrapolate coordinate in null space (no need to check for onmap)
 			local cs = spGetCameraState()			
 			cs.rx = last_rx
+			if ov_cs and last_ry and options.rotatebackfromov.value then cs.ry = last_ry end
 			ls_dist = last_ls_dist 
 			ls_x = gx
 			ls_z = gz
