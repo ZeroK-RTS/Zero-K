@@ -295,7 +295,7 @@ options = {
 	},
 	rotatebackfromov = {
 		name = "Rotate Back From Overview",
-		desc = "When returning from overview mode, rotate the camera to its original position.",
+		desc = "When returning from overview mode, rotate the camera to its original position (only applies when you have set an overview viewpoint).",
 		type = 'bool',
 		value = false,
 	},
