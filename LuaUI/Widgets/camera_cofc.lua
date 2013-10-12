@@ -289,7 +289,7 @@ options = {
 	},
 	overviewset = {
 		name = "Set Overview Viewpoint",
-		desc = "Save the current view as the new overview mode viewpoint.",
+		desc = "Save the current view as the new overview mode viewpoint. Use 'Reset Camera' to remove it.",
 		type = 'button',
 		OnChange = function(self) OverviewSetAction() end,
 	},
