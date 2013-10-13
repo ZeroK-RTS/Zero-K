@@ -236,7 +236,7 @@ function loadpanel()
 	graphTime		= Chili.Label:New{parent = window0, bottom = 25,caption = "", width = 50, right = 50, height = 10}
 
 	for a=1, #engineStats do
-		local engineButton =	Chili.Button:New{name = engineStats[a][1], caption = engineStats[a][2], maxHeight = 30, parent = graphSelect, OnClick = {
+		local engineButton =	Chili.Button:New{name = engineStats[a][1], caption = engineStats[a][2], minHeight = 20, maxHeight = 30, parent = graphSelect, OnClick = {
 			function(obj) graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(obj.name,obj.caption);end}}
 	end
 
