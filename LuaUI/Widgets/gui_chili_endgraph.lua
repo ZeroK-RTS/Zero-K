@@ -232,8 +232,8 @@ function loadpanel()
 	lineLabels 	= Chili.Control:New{parent = window0, right = 0, y = 0, width = 37, height = "100%", padding = {0,0,0,0},}
 	graphSelect	= Chili.StackPanel:New{minHeight = 70, parent = window0, x =  0, y = 0, width = selW, height = "100%",}
 	graphPanel 	= Chili.Panel:New{parent = window0, x = selW, right = 30, y = 0, bottom = 40, padding = {10,10,10,10}}
-	graphLabel  = Chili.Label:New{autosize = true, parent = window0, bottom = 0,caption = "", align = "center", width = "70%", x = "20%", height = "10%", font = {size = 30,},}
-	graphTime		= Chili.Label:New{parent = window0, bottom = 30,caption = "", width = 50, right = 50, height = 10}
+	graphLabel  = Chili.Label:New{autosize = true, parent = window0, bottom = 5,caption = "", align = "center", width = "70%", x = "20%", height = 30, font = {size = 30,},}
+	graphTime		= Chili.Label:New{parent = window0, bottom = 25,caption = "", width = 50, right = 50, height = 10}
 
 	for a=1, #engineStats do
 		local engineButton =	Chili.Button:New{name = engineStats[a][1], caption = engineStats[a][2], maxHeight = 30, parent = graphSelect, OnClick = {
