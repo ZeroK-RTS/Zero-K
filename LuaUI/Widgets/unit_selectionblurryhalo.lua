@@ -26,12 +26,18 @@ options = {
 	showally = {
 		name = 'Show Ally Selections',
 		type = 'bool',
-		desc = 'Highlight in yellow the units your allies currently have selected.',
+		desc = 'Highlight the units your allies currently have selected.',
 		value = true,
 		OnChange = function(self) 
 			visibleAllySelUnits = {}
 			showAlly = self.value
 		end,
+	},
+	useteamcolors = {
+		name = 'Use Team Colors',
+		type = 'bool',
+		desc = 'Highlight your allies\' selections with their team colors instead of the default yellow.',
+		value = false,
 	},
 }
 
@@ -167,9 +173,17 @@ local function DrawHaloFunc()
 		glUnit(unitID,true)
 	end
     
-	glColor(allySelectColor)
+	if not options.useteamcolors.value then glColor(allySelectColor) end
 	for i=1,#visibleAllySelUnits do
 		local unitID = visibleAllySelUnits[i]
+		local teamID = spGetUnitTeam(unitID)
+		if options.useteamcolors.value then
+			if teamID then
+				glColor(Spring.GetTeamColor(teamID))
+			else
+				glColor(allySelectColor)
+			end
+		end
 		glUnit(unitID,true)
 	end
     
