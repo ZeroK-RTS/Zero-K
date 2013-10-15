@@ -176,8 +176,8 @@ local function DrawHaloFunc()
 	if not options.useteamcolors.value then glColor(allySelectColor) end
 	for i=1,#visibleAllySelUnits do
 		local unitID = visibleAllySelUnits[i]
-		local teamID = spGetUnitTeam(unitID)
 		if options.useteamcolors.value then
+			local teamID = spGetUnitTeam(unitID)
 			if teamID then
 				glColor(Spring.GetTeamColor(teamID))
 			else
