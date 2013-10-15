@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Shows a halo for selected, hovered ally-selected units. (Doesn't work on ati cards!)",
     author    = "CarRepairer, from jK's gfx_halo",
     date      = "Jan, 2008",
-    version   = "0.003",
+    version   = "0.004",
     license   = "GNU GPL, v2 or later",
     layer     = -11,
     enabled   = false  --  loaded by default?
@@ -21,7 +21,26 @@ local showAlly = false
 local visibleAllySelUnits = {}
 local visibleSelected = {}
 
+local function UpdateHaloColors(self) end
+
 options_path = 'Settings/Interface/Selection/Blurry Halo Selections'
+
+options_order = {
+	'showally',
+	'useteamcolors',
+	
+	
+	'lblPresetColors',
+	'selectColor',
+	'allySelectColor',
+	'myHoverColor',
+	'allyHoverColor',
+	'enemyHoverColor',
+	'featureHoverColor',
+	
+	
+}
+
 options = {
 	showally = {
 		name = 'Show Ally Selections',
@@ -36,9 +55,58 @@ options = {
 	useteamcolors = {
 		name = 'Use Team Colors',
 		type = 'bool',
-		desc = 'Highlight your allies\' selections with their team colors instead of the default yellow.',
+		desc = 'Highlight your allies\' selections with their team colors instead of the preset colors.',
 		value = false,
 	},
+	
+	-----
+	
+	lblPresetColors = {type='label', name = 'Preset Colors' },
+	selectColor = {
+		name = 'Selected Units Color',
+		type = 'colors',
+		value = { 0, 1, 0, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	},
+	
+	allySelectColor = {
+		name = 'Ally Selected Units Color',
+		type = 'colors',
+		value = { 1, 1, 0, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	myHoverColor = {
+		name = 'My Unit Hover Color',
+		type = 'colors',
+		value = { 0, 1, 1, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	},
+	
+	allyHoverColor = {
+		name = 'Ally Unit Hover Color',
+		type = 'colors',
+		value = { 0.2, 0.2, 1, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	enemyHoverColor = {
+		name = 'Enemy Unit Hover Color',
+		type = 'colors',
+		value = { 1, 0, 0, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	
+	featureHoverColor = {
+		name = 'Feature Hover Color',
+		type = 'colors',
+		value = { 1, 0, 1, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	
+	
 }
 
 --------------------------------------------------------------------------------
@@ -139,10 +207,21 @@ local glLoadIdentity  = gl.LoadIdentity
 local glPopMatrix     = gl.PopMatrix
 local glBlending      = gl.Blending
 
+local echo = Spring.Echo
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --functions
 
+UpdateHaloColors = function(self)
+	selectColor = options.selectColor.value
+	allySelectColor = options.allySelectColor.value
+	myHoverColor = options.myHoverColor.value
+	
+	allyHoverColor = options.allyHoverColor.value
+	enemyHoverColor = options.enemyHoverColor.value
+	featureHoverColor = options.featureHoverColor.value
+end
 
 local function GetVisibleUnits()
     local units = spGetVisibleUnits(-1, 30, true)
