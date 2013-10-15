@@ -73,7 +73,7 @@ unitDef = {
       footprintX       = 1,
       footprintZ       = 1,
       metal            = 240,
-      object           = [[eraser_d.3ds]],
+      object           = [[spherebot_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 240,
     },

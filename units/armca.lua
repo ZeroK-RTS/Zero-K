@@ -92,7 +92,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 88,
-      object           = [[crane_d.3ds]],
+      object           = [[wreck2x2b.s3o]],
       reclaimable      = true,
       reclaimTime      = 88,
     },

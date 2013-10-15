@@ -129,7 +129,7 @@ unitDef = {
       footprintX       = 1,
       footprintZ       = 1,
       metal            = 8,
-      object           = [[flea_d.3ds]],
+      object           = [[debris1x1a.s3o]],
       reclaimable      = true,
       reclaimTime      = 8,
     },

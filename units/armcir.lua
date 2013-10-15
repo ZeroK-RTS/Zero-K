@@ -9,29 +9,32 @@ unitDef = {
   buildCostMetal                = 900,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 3.6,
-  buildingGroundDecalSizeY      = 3.6,
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
   buildingGroundDecalType       = [[armcir_aoplane.dds]],
   buildPic                      = [[ARMCIR.png]],
   buildTime                     = 900,
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT]],
-  collisionVolumeOffsets        = [[0 12 0]],
-  collisionVolumeScales         = [[58 76 58]],
-  collisionVolumeTest	        = 1,
-  collisionVolumeType	        = [[CylY]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[70 70 70]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     usetacai       = [[1]],
+    description_de = [[Weitreichende Anti-Air Raketenbatterie]],
     description_fr = [[Batterie de Missiles Anti-Air ? Moyenne Port?e]],
-	description_de = [[Weitreichende Anti-Air Raketenbatterie]],
-	helptext_de    = [[Der Chainsaw ist eine weitreichendes Anit-Air Geschütz, welches massiv Schaden austeilt und sogar Bomber vom Himmel holen kann. Dennoch kann es nicht viel Schaden einstecken und versagt kläglich, wenn es direkt angegriffen wird.]],
+    description_pl = [[Wyrzutnia Rakiet Przeciwlotniczych Dalekiego Zasiêgu]],
     helptext       = [[The Chainsaw is a long range anti-air turret, dealing out massive damage, able to knock bombers out of the sky very quickly. It can't take very much damage in return, though, and does poorly when attacked directly.]],
+    helptext_de    = [[Der Chainsaw ist eine weitreichendes Anit-Air Geschütz, welches massiv Schaden austeilt und sogar Bomber vom Himmel holen kann. Dennoch kann es nicht viel Schaden einstecken und versagt kläglich, wenn es direkt angegriffen wird.]],
     helptext_fr    = [[Cette batterie de missile ultra v?loce permet d'abattre des cibles aeriennes lourdes - comme les bombardiers - avant qu'elles ne puissent passer ? l'attaque. Il n?cessite d'?tre plac? en terrain d?gag? pour utiliser pleinement son potentiel. Reste assez fragile et ? prot?ger.]],
-	aimposoffset   = [[0 10 0]],
-	modelradius    = [[19]],
+    helptext_pl    = [[Chainsaw ma du¿e obra¿enia i zasiêg, co pozwala mu szybko zestrzeliwaæ samoloty. Nie jest jednak zbyt wytrzyma³y i mo¿na go doœæ ³atwo zniszczyæ.]],
+    aimposoffset   = [[0 10 0]],
+    midposoffset   = [[0 -10 0]],
+    modelradius    = [[35]],
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -49,7 +52,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[armcir.s3o]],
+  objectName                    = [[ARMCIR]],
   script                        = [[armcir.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
@@ -60,17 +63,7 @@ unitDef = {
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooooooooooooooo]],
-	
-  sfxtypes            = {
 
-    explosiongenerators = {
-      [[custom:light_red_short]],
-      [[custom:light_green_short]],
-      [[custom:light_blue_short]],
-    },
-
-  },
-	
   weapons                       = {
 
     {
@@ -91,11 +84,7 @@ unitDef = {
       cegTag                  = [[chainsawtrail]],
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting       = 1,
-
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      cylinderTargeting       = 2,
 
       damage                  = {
         default = 25,
@@ -128,7 +117,7 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 550,
-      weaponTimer             = 3,
+      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 800,
     },
@@ -150,7 +139,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 320,
-      object           = [[chainsaw_d.3ds]],
+      object           = [[wreck4x4a.s3o]],
       reclaimable      = true,
       reclaimTime      = 320,
     },

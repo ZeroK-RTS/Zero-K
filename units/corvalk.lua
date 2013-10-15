@@ -89,7 +89,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 32,
-      object           = [[smalltransport_d.3ds]],
+      object           = [[corvalk_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 32,
     },

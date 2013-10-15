@@ -135,7 +135,7 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       metal            = 36,
-      object           = [[rocko_d.3ds]],
+      object           = [[spherejeth_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 36,
     },
