@@ -26,7 +26,7 @@ local commandLevel = 1 --default at start of widget is to be disabled!
 
 options_path = 'Settings/Interface/Command Visibility'
 options_order = { 
-'showallcommandselection', 
+'showallcommandselection','lblincludeallies','includeallies', 
 }
 options = {
 	showallcommandselection = {
@@ -60,24 +60,31 @@ options = {
 			end
 		end,
 	},
-
+	lblincludeallies = {name='Allies', type='label'},
+	includeallies = {
+		name = 'Include ally selections',
+		desc = 'When showing commands for selected units, show them for both your own and your allies\' selections.',
+		type = 'bool',
+		value = false,
+	},
 }
 -----
 function widget:DrawWorld()
 	if not spIsGUIHidden()  then
-		if commandLevel > 1 then --minimal
-			for i, v in pairs(drawUnits) do
-				if i then
-					local shift = select(4,spGetModKeyState())
-					
-					if (commandLevel==4) or --all
-					(commandLevel==2 and shift) or --shift
-					(commandLevel==3 and (spIsUnitSelected(i) or shift)) or --selection/shift
-					(commandLevel==5 and spIsUnitSelected(i)) --selection
-					then 
-						spDrawUnitCommands(i)
-					end
+		for i, v in pairs(drawUnits) do
+			if i then
+				local shift = select(4,spGetModKeyState())
+				
+				if
+				(commandLevel==4) or --all
+				(commandLevel==2 and shift) or --shift
+				(commandLevel==3 and (spIsUnitSelected(i) or (options.includeallies.value and WG.allySelUnits[i]) or shift )  ) or --selection/shift
+				(commandLevel==5 and (spIsUnitSelected(i) or (options.includeallies.value and WG.allySelUnits[i]) )           ) or --selection
+				(commandLevel==1 and (spIsUnitSelected(i) or (options.includeallies.value and WG.allySelUnits[i]) ) and shift )    --minimal, but with allies
+				then 
+					spDrawUnitCommands(i)
 				end
+				
 			end
 		end
 	end
