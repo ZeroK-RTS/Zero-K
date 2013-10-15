@@ -2316,7 +2316,9 @@ function widget:Initialize()
 	
 	option_Deselect()
 	
-	Show(real_window_corner)
+	if options.alwaysShowSelectionWin.value then
+		Show(real_window_corner)
+	end
 end
 
 function widget:Shutdown()
