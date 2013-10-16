@@ -1,10 +1,10 @@
 include("keysym.h.lua")
-local versionNumber = "1.4"
+local versionNumber = "1.41"
 
 function widget:GetInfo()
 	return {
 		name      = "Easy Facing",
-		desc      = "[v" .. string.format("%s", versionNumber ) .. "] Enables changing building facing by holding left mouse button. Press (META) to change facing when using shift.",
+		desc      = "[v" .. string.format("%s", versionNumber ) .. "] change build facing by holding Left Mouse Button. Press Spacebar (META) to change build facing when building in grid using Shift.",
 		author    = "very_bad_soldier",
 		date      = "2009.08.10",
 		license   = "GNU GPL v2",
@@ -18,8 +18,9 @@ end
 -- CONFIGURATION
 local debug = false
 local updateInt = 1 --seconds for the ::update loop
-local sens = 150	--rotate mouse sensitivity - length of mouse movement vector
+local sens = 100	--rotate mouse sensitivity - length of mouse movement vector
 local drawForAll = false --draw facing direction also for other buildings than labs
+local drawForTurret = false --draw facing direction for all unit that can attack
 --------------------------------------------------------------------------------
 local inDrag = false
 local metaStart = false
@@ -219,24 +220,28 @@ function manipulateFacing()
 			mouseYStartRotate = my
 		end
 		
-		local curDeltaX = mx - mouseXStartRotate
+		local curDeltaX = mx - mouseXStartRotate or mx
 		mouseDeltaX = mouseDeltaX + curDeltaX
-		local curDeltaY = my - mouseYStartRotate
+		local curDeltaY = my - mouseYStartRotate or my
 		mouseDeltaY = mouseDeltaY + curDeltaY
 		
 		local newFacing = getFacingByMouseDelta( mouseDeltaX, mouseDeltaY )
-		if ( newFacing ~= nil ) then
+		if ( newFacing ~= nil) then
 			mouseDeltaX = 0
-			mouseDeltaY = 0 --added. was it missing?
+			mouseDeltaY = 0 --reset cumulative delta
+			mouseXStartRotate = mx
+			mouseYStartRotate = my -- reset rotate center
 			
 			if ( newFacing ~= spGetBuildFacing() ) then
 				spSetBuildFacing( newFacing )
 			end
 		end
-			
+		
+		--[[ note: disable cursor lock so that it won't conflict with other widget (such as CommandInsert() widget when meta is pressed).
 		if mouseXStartRotate~=mx or mouseYStartRotate~=my then
 			spWarpMouse( mouseXStartRotate, mouseYStartRotate ) --set old mouse coords to prevent mouse movement
 		end
+		--]]
 	end
 end
 
@@ -253,14 +258,14 @@ function drawOrientation()
 	local alt,ctrl,meta,shift = spGetModKeyState()
 	
 	local udef = udefTab[unitDefID]
-	if (drawForAll == false and udef["isFactory"] == false ) then
+	if not (drawForAll or udef["isFactory"] or (drawForTurret and udef.canAttack)) then
 		return
 	end
 	
-	local mx, my = spGetMouseState()
+	local mx, my,lmb = spGetMouseState()
 	
-	if ( shift and inDrag ) then
-		mx = mouseXStartDrag
+	if ( shift and inDrag and lmb) then --shift+drag+click (queue a line)
+		mx = mouseXStartDrag --center arrow on first queue
 		my = mouseYStartDrag
 		printDebug("UDEFID: " .. mx )
 	end

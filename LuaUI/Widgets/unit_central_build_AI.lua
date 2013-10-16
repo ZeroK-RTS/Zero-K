@@ -14,7 +14,7 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.345"
+local version = "v1.346"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -298,6 +298,9 @@ end
 
 function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 	if id < 0 and params[1]==nil and params[2]==nil and params[3]==nil then --CentralBuildAI can't handle unit-build command for factory for the moment (is buggy).
+		return
+	end
+	if options.meta then --skip special insert command (spacebar). Handled by CommandInsert() widget
 		return
 	end
 	local selectedUnits = spGetSelectedUnits()
