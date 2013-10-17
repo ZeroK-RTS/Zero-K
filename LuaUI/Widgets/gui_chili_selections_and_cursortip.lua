@@ -2407,12 +2407,17 @@ function widget:SelectionChanged(newSelection)
 			stt_unitID = nil
 			MakeUnitGroupSelectionToolTip()
 		end
+		real_window_corner.caption = nil
+		real_window_corner:Invalidate()
 		Show(real_window_corner)
 	else
 		stt_unitID = nil
 		window_corner:ClearChildren()
 		if not options.alwaysShowSelectionWin.value then
 			screen0:RemoveChild(real_window_corner)
+		else
+			real_window_corner.caption = 'No Units Selected'
+			real_window_corner:Invalidate()
 		end
 	end
 end
