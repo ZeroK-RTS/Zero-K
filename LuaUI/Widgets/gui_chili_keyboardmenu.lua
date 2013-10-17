@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.028 Chili Keyboard Menu",
+    desc      = "v0.029 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -81,6 +81,7 @@ local customKeyBind = false
 local build_mode = false
 local green = '\255\1\255\1'
 local white = '\255\255\255\255'
+local red 	= '\255\255\001\001'
 
 local magenta_table = {0.8, 0, 0, 1}
 local white_table = {1,1,1, 1}
@@ -964,7 +965,11 @@ local function SetupCommands( modifier )
 								
 								local label = actionName or actionCmd
 								local tooltip = actionDesc or (label  .. ' ' .. actionExtra)
-								local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd 
+								local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd
+								
+								if label == 'luaui' then
+									label = actionExtra
+								end
 								
 								--create fake command and add it to list
 								curCommands[#curCommands+1] = {
@@ -1028,8 +1033,9 @@ local function SetupCommands( modifier )
 			if texture and texture ~= '' then
 				label = ''
 			end
-			if cmd.name == 'Morph' then
-				hotkey = 'Morph'
+			
+			if cmd.name == 'Morph' or cmd.name == red  .. 'Stop' then
+				hotkey = cmd.name
 			end
 			
 			if cmd.id < 0 then
