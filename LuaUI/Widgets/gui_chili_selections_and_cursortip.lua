@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.087 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.088 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --21 September 2013
     license   = "GNU GPL, v2 or later",
@@ -191,6 +191,9 @@ local function option_Deselect()
   Spring.SelectUnitMap({}, false)
   window_height = options.squarepics.value and 140 or 115
 end
+
+local function Show(param) end
+
 local selPath = 'Settings/HUD Panels/Selected Units Window'
 options = {
 	tooltip_delay = {
@@ -299,6 +302,12 @@ options = {
 		value= false,
 		desc = "Always show the selection window even if nothing is selected.",
 		path = selPath,
+		OnChange = function(self)
+			if self.value and real_window_corner then
+				Show(real_window_corner)
+			end
+			widget:SelectionChanged(Spring.GetSelectedUnits())
+		end,
 	},
 }
 
@@ -621,7 +630,7 @@ end
 ----------------------------------------------------------------
 ----------------------------------------------------------------
 
-local function Show(obj)
+Show = function(obj)
 	if (not obj:IsDescendantOf(screen0)) then
 		screen0:AddChild(obj)
 	end
@@ -2315,10 +2324,6 @@ function widget:Initialize()
 	end
 	
 	option_Deselect()
-	
-	if options.alwaysShowSelectionWin.value then
-		Show(real_window_corner)
-	end
 end
 
 function widget:Shutdown()
