@@ -1,10 +1,11 @@
+--TODO investigate Chili-Error in `Chili Selections & CursorTip`:2435 : [string "LuaUI/Widgets/chili/controls/control.lua"]:897: attempt to index field 'parent' (a nil value). (This bug is many months old. This TODO is written on 18 October 2013). See end of file for longer stacktrace.
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.088 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.089 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --21 September 2013
+    date      = "2009-06-02", --18 October 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -680,9 +681,10 @@ local function GetUnitDesc(unitID, ud)
 end
 
 local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
+	counts = counts or 1
 	local ud = UnitDefs[defid]
 	local item = LayoutPanel:New{
-		name    = unitid or defid;
+		name    = (counts==1 and unitids[1]) or defid; --identify button by UnitID if not grouped, else identify by UnitDefID
 		parent  = barGrid;
 		width   = 50;
 		height  = 62;
@@ -758,7 +760,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 			end
 		end}
 	};
-	if ((counts or 1)>1) then --//add unit count when units are grouped.
+	if (counts >1) then --//add unit count when units are grouped.
 		Label:New{
 			name = "selLabel";
 			parent = img;
@@ -1063,16 +1065,14 @@ end
 
 local function SetHealthbar(tt_healthbar,health, maxhealth)
 	if health then
-		
 		tt_health_fraction = health/maxhealth
+		tt_healthbar.color = GetHealthColor(tt_health_fraction)
 		tt_healthbar:SetValue(tt_health_fraction)
 		if options.hpshort.value then
 			tt_healthbar:SetCaption(numformat(health) .. ' / ' .. numformat(maxhealth))
 		else
 			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth))
 		end
-		
-		tt_healthbar.color = GetHealthColor(tt_health_fraction)
 		
 	else
 		tt_healthbar.color = {0,0,0.5, 1}
@@ -1117,7 +1117,7 @@ local function KillTooltip(force)
 	old_ttstr = ''
 	tt_unitID = nil
 	
-	if window_tooltip2 and window_tooltip2:IsDescendantOf(screen0) then
+	if window_tooltip2 then --and window_tooltip2:IsDescendantOf(screen0) then --does IsDescendantOf() check needed? doesn't appear to have visual difference.
 		screen0:RemoveChild(window_tooltip2)
 	end
 end
@@ -1131,7 +1131,6 @@ local function GetResources(tooltip_type, unitID, ud, tooltip)
 	if tooltip_type == 'feature' or tooltip_type == 'corpse' then
 		metal = ud.metal
 		energy = ud.energy
-		
 		if unitID then
 			local m, _, e, _, _ = Spring.GetFeatureResources(unitID)
 			metal = m or metal
@@ -1746,8 +1745,8 @@ local function MakeToolTip_Feature(data, tooltip)
 	}
 	or {
 		
-		{ name='res', icon = 'LuaUI/images/metalplus.png', text = m },
-		{ name='res', icon = 'LuaUI/images/energy.png', text = e },
+		{ name='res_1', icon = 'LuaUI/images/metalplus.png', text = m },
+		{ name='res_2', icon = 'LuaUI/images/energy.png', text = e },
 	}
 	
 	local tt_structure = {
@@ -2095,21 +2094,18 @@ function widget:Update(dt)
 	--UNIT.STATUS start (by msafwan), function: add/show units task whenever individual pic is shown.
 	timer2 = timer2 + dt
 	if timer2 >= updateFrequency2  then
-		if options.unitCommand.value == true and ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
+		if options.unitCommand.value and numSelectedUnits >= 2 then
+			local barGrid = window_corner.childrenByName['Bars'] --//find chili element that we want to modify. REFERENCE: gui_chili_facbar.lua, by CarRepairer
 			for i=1,numSelectedUnits do --//iterate over all selected unit *this variable is updated by 'widget:SelectionChanged()'
 				local unitID = selectedUnits[i][1]
 				local barGridItem = nil
 				local itemImg =nil
-				local picLabel = 1
-				local barGrid = window_corner.childrenByName['Bars'] --//find chili element that we want to modify. REFERENCE: gui_chili_facbar.lua, by CarRepairer
-				if barGrid then	barGridItem = barGrid.childrenByName[unitID] end
-				if barGridItem then	itemImg = barGridItem.childrenByName['selImage'] end
-				if itemImg then picLabel = itemImg.childrenByName['selLabel'] end  
-				if picLabel == nil then --//if picture has no label then insert our own label *if picture is non-grouped it doesn't have label, but when grouped it have numbers as label. 
-					window_corner.childrenByName['Bars'].childrenByName[unitID].childrenByName['selImage']:ClearChildren(); --delete old label (if any exist) so we can create new label with new value
+				if barGrid then	barGridItem = barGrid.childrenByName[unitID] end --only ungrouped icon will be named by unitID & thus return barGridItem
+				if barGridItem then itemImg = barGridItem.childrenByName['selImage'] end
+				if itemImg then
 					local cQueue = spGetCommandQueue(unitID, 1)
-					local commandName = ""
-					local color = nil
+					local commandName
+					local color = {1,1,1,1}
 					if cQueue and cQueue[1] ~= nil then
 						local commandID = cQueue[1].id				
 						commandName = ":" .. commandID --"unrecognized" 
@@ -2152,17 +2148,20 @@ function widget:Update(dt)
 							end
 						end
 					end
-					Label:New{ --create new chili element
-						parent = itemImg;
-						name = "commandLabel";
-						align  = "left";
-						valign = "top";
-						fontsize   = 14;
-						fontshadow = true;
-						fontOutline = true;
-						textColor = color or {1,1,1,1}; --//Reference: gui_chili_crudeplayerlist.lua by KingRaptor
-						caption    = commandName;
-					};
+					itemImg:ClearChildren(); --remove existing label and readd (to eliminate color bug)
+					if commandName then
+						Label:New{ --create new chili element
+							parent = itemImg;
+							name = "commandLabel";
+							align  = "left";
+							valign = "top";
+							fontsize   = 14;
+							fontshadow = true;
+							fontOutline = true;
+							textColor = color; --//Reference: gui_chili_crudeplayerlist.lua by KingRaptor
+							caption    = commandName;
+						};
+					end
 				end
 			end
 		end
@@ -2436,3 +2435,22 @@ function widget:UpdateCallIns(enable)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--[[Stacktrace for TODO bug
+Chili-Error in `Chili Selections & CursorTip`:2435 : [string "LuaUI/Widgets/chili/controls/control.lua"]:897: attempt to index field 'parent' (a nil value)
+stacktrace:
+	[string "LuaUI/Widgets/chili/controls/control.lua"]:897
+	(tail call): in [?]
+	[string "LuaUI/Widgets/chili/controls/control.lua"]:773
+	(tail call): in [?]
+	[string "LuaUI/Widgets/chili/handlers/taskhandler.lu..."]:96: in Update
+	[string "LuaUI/Widgets/api_chili.lua"]:100
+	[C]: in pcall
+	[string "LuaUI/cawidgets.lua"]:724: in realFunc
+	[string "LuaUI/Widgets/dbg_widgetprofiler.lua"]:86: in Update
+	[string "LuaUI/cawidgets.lua"]:1177: in Update
+	[string "-- $Id: camain.lua 3171 2008-11-06 09:06:29..."]:103
+Removed widget: Chili Selections & CursorTip
+--Note: line number may be different due to local widget tweak (adding echo and stuff).
+--Note2: "2435" is identified to be the button name. Most likely unitID
+--Note3: from chat, [LCC]jk says same error can happen when an element is disposed first before it have chance to redrawn/resize at next Update() cycle. So,does object is recommended to be unlink dependencies first (ClearChildren) before(RemoveChild)???
+--]]
