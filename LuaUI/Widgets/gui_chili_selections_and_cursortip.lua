@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.089 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.090 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --18 October 2013
     license   = "GNU GPL, v2 or later",
@@ -1706,7 +1706,7 @@ local function MakeToolTip_Feature(data, tooltip)
 	if tt_fd and tt_fd.customParams and tt_fd.customParams.unit then
 		live_name = tt_fd.customParams.unit
 	else
-		live_name = feature_name:gsub('([^_]*).*', '%1')
+		live_name = feature_name:gsub('(.*)_.*', '%1') --filter out _dead or _dead2 or _anything
 	end
 	
 	local desc = ''
