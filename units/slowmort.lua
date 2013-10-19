@@ -19,7 +19,7 @@ unitDef = {
 
   customParams        = {
     description_de = [[Kurzstrahl Roboter]],
-    helptext       = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to 50%. Though doing no damage themselves, Moderators are effective against almost all targets.]],
+    helptext       = [[The Moderator's slowing missile reduces enemy speed and rate of fire by up to 50%. Though doing no damage themselves, Moderators are effective against almost all targets.]],
 	helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 50%. Obwohl Moderatoren kein Schaden machen, sind sie effektiv gegen fast alle Ziele.]],
   },
 
@@ -67,8 +67,8 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[SLOWBEAM]],
-      badTargetCategory  = [[FIXEDWING UNARMED]],
+      def                = [[SLOWMISSILE]],
+      badTargetCategory  = [[UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -77,14 +77,13 @@ unitDef = {
 
   weaponDefs          = {
 
-    SLOWBEAM = {
-      name                    = [[Slowing Beam]],
+    SLOWMISSILE = {
+      name                    = [[Slowing Missile Launcher]],
       areaOfEffect            = 8,
-      beamDecay               = 0.9,
-      beamlaser               = 1,
-      beamTime                = 0.1,
-      beamttl                 = 40,
-      coreThickness           = 0,
+      avoidFeature            = false,
+      avoidGround             = false,
+      cegTag                  = [[moderatortrail]],
+      collisionSize           = 0.05,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -94,30 +93,32 @@ unitDef = {
 
       explosionGenerator      = [[custom:flashslow]],
       fireStarter             = 30,
+      flightTime              = 6,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      largeBeamLaser          = true,
-      laserFlareSize          = 4,
-      minIntensity            = 1,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
+      predictBoost            = 1.0,
       range                   = 600,
-      reloadtime              = 1,
-      rgbColor                = [[0.3 0 0.4]],
-      soundStart              = [[weapon/laser/pulse_laser2]],
+      reloadtime              = 1.0,
+      rgbColor                = [[1 0 1]],
+      smokeTrail              = false,
+      soundHit                = [[explosion/ex_med17]],
+      soundStart              = [[weapon/missile/missile_fire11]],
       soundStartVolume        = 11,
       soundTrigger            = true,
-      sweepfire               = false,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 8,
+      startVelocity           = 817.5,
+      texture1                = [[flare]],
       tolerance               = 18000,
+      tracks                  = true,
+      trajectoryHeight        = 0.767326988,
+      turnRate                = 200000,
       turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 500,
+      weaponAcceleration      = 0,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 817.5,
     },
   },
 
