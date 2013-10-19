@@ -13,7 +13,8 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 1, 
 --[[before enabling, read commit message 5482]]
-    enabled   = (rank and rank == 1) or true,
+    --enabled   = (rank and rank == 1) or true,
+    enabled   = false
   }
 end
 
