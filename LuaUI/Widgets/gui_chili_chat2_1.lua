@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.911 Chili Chat Console.",
+    desc      = "v0.912 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -195,8 +195,8 @@ options_order = {
 	'lblDedupe',
 	'dedupe_messages', 'dedupe_points','color_dup',
 	
-	
-	
+	'lblError',
+	'error_opengl_source',	
 	
 	
 	
@@ -214,12 +214,20 @@ end
 
 options = {
 	
-	lblFilter = {name='Filtering', type='label'},
-	lblPointButtons = {name='Point Buttons', type='label'},
+	lblFilter = {name='Filtering', type='label', advanced = true},
+	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
 	lblHilite = {name='Highlighting', type='label'},
 	lblDedupe = {name='De-Duplication', type='label'},
 	lblGeneral = {name='General Settings', type='label'},
+	lblError = {name='Error Filter', type='label'},
+	
+	error_opengl_source = {
+		name = "Filter out \'Error: OpenGL: source\' error",
+		type = 'bool',
+		value = false,
+		desc = "Block \'Error: OpenGL: source\' error spam in Spring 91 for Intel Mesa driver.",
+	},
 	
 	text_height = {
 		name = 'Text Size',
@@ -774,6 +782,7 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
+	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
 	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
 	and #messages > 0 and messages[#messages].text == msg.text then
 		-- update MapPoint position with most recent, as it is probably more relevant
