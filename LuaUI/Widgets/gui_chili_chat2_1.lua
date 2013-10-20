@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.912 Chili Chat Console.",
+    desc      = "v0.913 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -438,7 +438,6 @@ options = {
 	},
 	autohide_time = {
 		name = "Autohide time",
-		desc = "Time to leave chat visible",
 		type = 'number',
 		value = 4,
 		min = 1, max = 10, step = 1, 
@@ -652,7 +651,6 @@ local function displayMessage(msg, remake)
 				children = { textbox, },
 				OnMouseDown = {function(self, x, y, mouse)
 					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
-					time_opened = GetTimer()
 				end}
 			}
 			
@@ -664,8 +662,8 @@ local function displayMessage(msg, remake)
 		stack_console:UpdateClientArea()
 		
 	end 
-	-- open timer (for autohide)
-	time_opened = GetTimer()
+
+	showConsole()
 end 
 
 
@@ -730,9 +728,7 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) then
-		-- time chat opened (for autohide)
-		time_opened = GetTimer()
-	
+
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
@@ -743,9 +739,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			firstEnter = false
 		end
 		WG.enteringText = true
-		if not visible then 
-			showConsole()
-		end 
+		showConsole()
 	else
 		WG.enteringText = false		
 	end 
@@ -830,13 +824,8 @@ local timer = 0
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
 
-	if (options.autohide.value) then
-		local time_now = GetTimer()
-		if (time_opened) and (DiffTimers(time_now, time_opened) < options.autohide_time.value) then
-			showConsole()
-		else
-			hideConsole()
-		end
+	if options.autohide.value and time_opened and (DiffTimers(GetTimer(), time_opened) > options.autohide_time.value) then
+		hideConsole()	
 	end
 
 	timer = timer + s
@@ -889,16 +878,15 @@ function widget:Initialize()
 		if visible then
 			screen0:RemoveChild(window_console)
 			visible = false
-			return true
+			time_opened = nil
 		end
-		return false
 	end
 
-	-- only used by Crude, and by autohide (to unhide)
 	showConsole = function()
 		if not visible then
 			screen0:AddChild(window_console)
 			visible = true
+			time_opened = GetTimer()
 		end
 	end
 	WG.chat.hideConsole = hideConsole
@@ -970,11 +958,10 @@ function widget:Initialize()
         selfImplementedMinimizable = 
             function (show)
                 if show then
-					-- update this in case autohide is enabled
-					time_opened = GetTimer()
+					options.autohide.value = false
 					showConsole()
                 else
-					time_opened = nil
+					options.autohide.value = true
 					hideConsole()
                 end
             end,
