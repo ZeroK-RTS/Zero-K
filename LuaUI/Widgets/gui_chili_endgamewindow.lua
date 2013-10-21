@@ -115,36 +115,13 @@ local function MakeAwardPanel(awardType, record)
 	}
 end
 
-local function ShowEndGameWindow()
-
-	local awardList = WG.awardList
-	if not awardList then return end
-	
-	local L_HEIGHT = 30
-	
-	awardSubPanel:ClearChildren()
-	
-	for teamID,awards in pairs(awardList) do
-		--echo(k, v)
-		
-		local playerHasAward
-		for awardType, record in pairs(awards) do
-			playerHasAward = true
-		end
-		if playerHasAward then
-			Label:New{ caption = teamNames[teamID], width=120; fontShadow = true; valign='center'; autosize=false, height=awardPanelHeight; textColor=teamColors[teamID]; 	parent=awardSubPanel }
-		
-			for awardType, record in pairs(awards) do
-				
-				awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
-			end
-			
-			Label:New{ caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4}; autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
-		end
+-- returns true if tab is already showing, shows tab
+local function ShowTab(tabName)
+	if showingTab == tabName then
+		return true
 	end
-	
-	screen0:AddChild(window_endgame)
-	
+	showingTab = tabName
+	return false
 end
 
 function SetAwardList(awardList)
@@ -164,15 +141,6 @@ end
 local function SetButtonColor(button, color)
 	button.backgroundColor = color
 	button:Invalidate()
-end
-
--- returns true if tab is already showing, shows tab
-local function ShowTab(tabName)
-	if showingTab == tabName then
-		return true
-	end
-	showingTab = tabName
-	return false
 end
 
 local function ShowAwards()
@@ -200,6 +168,40 @@ local function ShowStats()
 	
 	SetButtonColor( statsButton, magenta_table )
 	SetButtonColor( awardButton, white_table )
+end
+
+local function ShowEndGameWindow()
+	local awardList = WG.awardList
+	
+	local L_HEIGHT = 30
+	
+	awardSubPanel:ClearChildren()
+	
+	if awardList then
+		for teamID,awards in pairs(awardList) do
+			--echo(k, v)
+			
+			local playerHasAward
+			for awardType, record in pairs(awards) do
+				playerHasAward = true
+			end
+			if playerHasAward then
+				Label:New{ caption = teamNames[teamID], width=120; fontShadow = true; valign='center'; autosize=false, height=awardPanelHeight; textColor=teamColors[teamID]; 	parent=awardSubPanel }
+			
+				for awardType, record in pairs(awards) do
+					
+					awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
+				end
+				
+				Label:New{ caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4}; autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
+			end
+		end
+	else
+		ShowStats()
+	end
+	
+	screen0:AddChild(window_endgame)
+	
 end
 
 local function SetupControls()
@@ -319,7 +321,9 @@ function widget:Initialize()
 	Spring.SendCommands("endgraph 0")
 	
 	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
+end
 
+function widget:GameOver()
 	SetTeamNamesAndColors()
 	ShowEndGameWindow()
 end
