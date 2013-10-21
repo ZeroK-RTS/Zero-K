@@ -85,7 +85,6 @@ local awardDescs =
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --functions
-local function ShowEndGameWindow() end
 
 local function SetTeamNamesAndColors()
   for _,teamID in ipairs(Spring.GetTeamList()) do
@@ -169,7 +168,7 @@ local function ShowStats()
 	SetButtonColor( awardButton, white_table )
 end
 
-ShowEndGameWindow = function()
+local function ShowEndGameWindow()
 	local awardList = WG.awardList
 	
 	local L_HEIGHT = 30
