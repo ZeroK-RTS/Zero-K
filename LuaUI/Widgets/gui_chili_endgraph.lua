@@ -240,6 +240,9 @@ function loadpanel()
 			function(obj) graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(obj.name,obj.caption);end}}
 	end
 
+	-- display first enginestat on load
+	getEngineArrays(engineStats[1][1],engineStats[1][2]);
+	
 	--[[
 	local exitButton = Chili.Button:New{name = "exit", caption = "Exit", bottom = 0, right = 0, height = 30, width = 40 , parent = window0, OnClick = {
 		function() Spring.SendCommands("quit");end}}
