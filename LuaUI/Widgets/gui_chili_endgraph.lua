@@ -239,9 +239,6 @@ function loadpanel()
 		local engineButton =	Chili.Button:New{name = engineStats[a][1], caption = engineStats[a][2], minHeight = 20, maxHeight = 30, parent = graphSelect, OnClick = {
 			function(obj) graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(obj.name,obj.caption);end}}
 	end
-
-	-- display first enginestat on load
-	getEngineArrays(engineStats[1][1],engineStats[1][2]);
 	
 	--[[
 	local exitButton = Chili.Button:New{name = "exit", caption = "Exit", bottom = 0, right = 0, height = 30, width = 40 , parent = window0, OnClick = {
