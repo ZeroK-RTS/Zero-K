@@ -352,21 +352,7 @@ path='Settings/Graphics'
 		OnChange = function(self) Spring.SendCommands{"luaui enablewidget Darkening", "luaui darkening " .. 1-self.value} end, 
 	} )
 	
-	AddOption({
-		name = 'Draw Distance',
-		type = 'number',
-		min = 1, 
-		max = 1000,
-		springsetting = 'UnitLodDist',
-		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
-	} )
 	
-	AddOption({
-		name = 'Shiny Units',
-		type = 'bool',
-		springsetting = 'AdvUnitShading',
-		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
-	} )
 	AddOption({ 	
 		name = 'Ground Decals',
 		type = 'bool',
@@ -402,13 +388,27 @@ path='Settings/Graphics/Map'
 path='Settings/Graphics/Unit Visibility'
 	ShLabel( 'Unit Visibility Options')
 	AddOption({
+		name = 'Draw Distance',
+		type = 'number',
+		min = 1, 
+		max = 1000,
+		springsetting = 'UnitLodDist',
+		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
+	} )
+	AddOption({
 	  name = 'Icon Distance',
 	  type = 'number',
 	  min = 1, 
 	  max = 1000,
 	  springsetting = 'UnitIconDist',
 	  OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
-	  } ) 
+	  } )
+	AddOption({
+		name = 'Shiny Units',
+		type = 'bool',
+		springsetting = 'AdvUnitShading',
+		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
+	} )
 	ShLabel( 'Unit Visibility Widgets')
 	ShButton('Toggle Unit Outlines',function() spSendCommands{"luaui togglewidget Outline"} end, "Shows cartoon-like outline around units")
 	ShButton('Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
