@@ -9,6 +9,7 @@ local flashpoint = piece 'flashpoint'
 local beam1 = piece 'beam1' 
 
 local on = false
+local awake = false;
 local oldHeight = 0
 local shooting = 0
 
@@ -20,6 +21,9 @@ smokePiece = {base}
 local SIG_AIM = 2
 local TARGET_ALT = 143565270/2^16
 
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+
+
 function TargetingLaser()
 	while on do
 		local _, flashY = Spring.GetUnitPiecePosition(unitID, flashpoint)
@@ -30,14 +34,22 @@ function TargetingLaser()
 			Spring.SetUnitWeaponState(unitID, 3, "range", newHeight)
 			oldHeight = newHeight
 		end
-		if shooting ~= 0 then
-			EmitSfx( mah_lazer,  FIRE_W2 )
-			EmitSfx( flashpoint,  FIRE_W3 )
-			shooting = shooting - 1
+		
+		awake = not spGetUnitIsStunned(unitID);
+		
+		if awake then		
+			if shooting ~= 0 then
+				EmitSfx( mah_lazer,  FIRE_W2 )
+				EmitSfx( flashpoint,  FIRE_W3 )
+				shooting = shooting - 1
+			else
+				EmitSfx( mah_lazer,  FIRE_W4 )
+				EmitSfx( flashpoint,  FIRE_W5 )
+			end
 		else
-			EmitSfx( mah_lazer,  FIRE_W4 )
-			EmitSfx( flashpoint,  FIRE_W5 )
+				EmitSfx( flashpoint,  FIRE_W6 )
 		end
+		
 		Sleep(30)
 	end
 end
@@ -69,7 +81,7 @@ function script.Create()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if on and num == 1 then
+	if on and awake and num == 1 then
 		Signal( SIG_AIM)
 		SetSignalMask( SIG_AIM)
 		--local echoHeading = heading*180/math.pi - 90

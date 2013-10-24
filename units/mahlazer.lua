@@ -94,6 +94,11 @@ unitDef = {
       onlyTargetCategory = [[NONE]],
     },   
     
+    {
+      def                = [[LOWPOWER]],
+      onlyTargetCategory = [[NONE]],
+    },   
+    
   },
 
 
@@ -305,8 +310,7 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 1400,
     },
-
-
+    
     TARGETER = {
       name                    = [[Aimer (fake)]],
       alwaysVisible           = 18,
@@ -337,6 +341,42 @@ unitDef = {
       texture3                = [[flare]],
       texture4                = [[smallflare]],
       thickness               = 0,
+      tolerance               = 9000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 1400,
+    },
+    
+    LOWPOWER    = {
+      name                    = [[Mah Weak Lazor (fake)]],
+      alwaysVisible           = 18,
+      areaOfEffect            = 0,
+      avoidFeature            = false,
+      avoidNeutral            = false,
+      beamTime                = 0.001,
+      canattackground         = false,
+      coreThickness           = 0.2,
+      craterBoost             = 0.0,
+      craterMult              = 0.0,
+
+      damage                  = {
+        default = 0,
+      },
+
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = false,
+      laserFlareSize          = 12,
+      minIntensity            = 0,
+      range                   = 900,
+      reloadtime              = 0.03,
+      rgbColor                = [[0.25 0 1]],
+      soundStart              = [[weapon/laser/laser_burn6]],
+      soundStartVolume        = 1,
+      soundTrigger            = true,
+      thickness               = 16,
       tolerance               = 9000,
       turret                  = true,
       waterWeapon             = true,
