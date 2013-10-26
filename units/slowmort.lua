@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[slowmort]],
   name                = [[Moderator]],
-  description         = [[Slowbeam Walker]],
+  description         = [[Slowing Missile Walker]],
   acceleration        = 0.2,
   activateWhenBuilt   = true,
   brakeRate           = 0.2,
@@ -110,7 +110,6 @@ unitDef = {
       soundStartVolume        = 11,
       soundTrigger            = true,
       startVelocity           = 1090,
-      texture1                = [[flare]],
       tolerance               = 18000,
       tracks                  = true,
       trajectoryHeight        = 0.767326988,
