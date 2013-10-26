@@ -209,6 +209,13 @@ if not WG.Layout then
 end
 
 --------------------------------------------------------------------------------
+--extra icons for submenu paths
+subMenuIcons = {
+	['Game/Game Speed'] = 'epicmenu/speed-test-icon.png',
+	['Game/Unit AI'] = 'epicmenu/robot2.png',
+}
+
+--------------------------------------------------------------------------------
 -- Luaui config settings
 local keybounditems = {}
 local keybind_date = 0
@@ -976,18 +983,22 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	if not wname then
 		wname = path
 	end
-
+	
 	local path2 = path
 	if not option or type(option) == 'string' then
 		if not pathoptions[path] then
 			pathoptions[path] = {}
 		end
+		
+		local icon = option
+		if subMenuIcons[path] then -- must be before path var is changed
+			icon = subMenuIcons[path] 
+		end
+		
 		local pathexploded = explode('/',path)
 		local pathend = pathexploded[#pathexploded]
 		pathexploded[#pathexploded] = nil
 		path = table.concat(pathexploded, '/')
-		
-		local icon = option
 		
 		option = {
 			type='button',
@@ -1001,6 +1012,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	end
 	
 	if not pathoptions[path] then
+		echo('1 adding....', path)
 		AddOption( path )
 	end
 	

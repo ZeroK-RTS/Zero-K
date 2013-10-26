@@ -81,7 +81,7 @@ local function AddOption(option)
 	table.insert(confdata.eopt, option)
 end
 
-local function ShButton( caption, action2, tooltip, advanced )
+local function ShButton( caption, action2, tooltip, advanced, icon )
 	AddOption({
 		type='button',
 		name=caption,
@@ -90,6 +90,7 @@ local function ShButton( caption, action2, tooltip, advanced )
 		OnChange = (type(action2) ~= 'string' and action2 or nil),
 		key=caption,
 		advanced = advanced,
+		icon = icon,
 	})
 end
 
@@ -154,7 +155,7 @@ path='Settings'
 --- GAME --- Stuff for gameplay only. Spectator would never need to open this
 path='Game' 
 
-	ShButton( 'Pause/Unpause', 'pause' )
+	ShButton( 'Pause/Unpause', 'pause', nil, nil, 'epicmenu/media_playback_pause.png' )
 	path='Game/Game Speed' 
 		ShButton( 'Increase Speed', 'speedup' )
 		ShButton( 'Decrease Speed', 'slowdown' )
