@@ -978,7 +978,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	end
 
 	local path2 = path
-	if not option then
+	if not option or type(option) == 'string' then
 		if not pathoptions[path] then
 			pathoptions[path] = {}
 		end
@@ -987,9 +987,12 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		pathexploded[#pathexploded] = nil
 		path = table.concat(pathexploded, '/')
 		
+		local icon = option
+		
 		option = {
 			type='button',
 			name=pathend .. '...',
+			icon = icon,
 			OnChange = function(self)
 				MakeSubWindow(path2)  --this made this button open another menu
 			end,
@@ -1567,17 +1570,24 @@ MakeSubWindow = function(path)
 			end
 			
 			if not hide then
+				
+				local icon = option.icon
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
 					x=0,
-					--right = 30,
 					minHeight = 30,
 					caption = option.name, 
 					OnClick = {option.OnChange},
 					backgroundColor = color.sub_button_bg,
 					textColor = color.sub_button_fg, 
-					tooltip = option.desc
+					tooltip = option.desc,
+					
+					padding={2,2,2,2},
 				}
+				
+				if icon then
+					Image:New{ file= LUAUI_DIRNAME  .. 'images/'.. icon, width = 16,height = 16, parent = button, x=4,y=4,  }
+				end
 				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option)
 			end
 			
@@ -2510,13 +2520,15 @@ function widget:Initialize()
 	
 
 	--this is done to establish order the correct button order
-	AddOption('Settings/Reset Settings')
-	AddOption('Settings/Audio')
-	AddOption('Settings/Camera')
-	AddOption('Settings/Graphics')	
-	AddOption('Settings/HUD Panels')
-	AddOption('Settings/Interface')
-	AddOption('Settings/Misc')
+	AddOption('Settings/Reset Settings', 'epicmenu/undo.png')
+	AddOption('Settings/Audio', 'epicmenu/vol.png')
+	AddOption('Settings/Camera', 'epicmenu/video_camera.png')
+	AddOption('Settings/Graphics', 'epicmenu/graphics.png')
+	AddOption('Settings/HUD Panels', 'epicmenu/control_panel.png')
+	AddOption('Settings/Interface', 'epicmenu/interface_builder.png')
+	AddOption('Settings/Misc', 'epicmenu/misc.png')
+	
+	AddOption('Settings/Interface/Mouse Cursor', 'epicmenu/input_mouse.png')
 	
 
 	-- Add pre-configured button/options found in epicmenu config file
