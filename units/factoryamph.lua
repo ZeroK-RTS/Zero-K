@@ -31,7 +31,10 @@ unitDef = {
   canPatrol        = true,
   canstop          = [[1]],
   category         = [[UNARMED SINK]],
-  collisionVolumeTest           = 1,
+  collisionVolumeOffsets = [[0 0 20]],
+  collisionVolumeScales  = [[90 60 70]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[box]],
   corpse           = [[DEAD]],
 
   customParams     = {
