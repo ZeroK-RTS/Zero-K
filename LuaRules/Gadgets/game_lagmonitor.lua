@@ -35,6 +35,7 @@ if (gadgetHandler:IsSyncedCode()) then -- SYNCED ---
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local lineage = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner.
+local teamsControlled = {} -- how many afk teams you are controlling, for load balancing
 local afkTeams = {}
 local tickTockCounter = {} --remember how many second a player is in AFK mode. To add a delay before unit transfer commence.
 local unitAlreadyFinished = {}
@@ -169,14 +170,17 @@ local function GetRecepient(allyTeam, laggers)
 		local name, active, spectator, _, _, _, _, _, _, customKeys = spGetPlayerInfo(leader)
 		if active and not spectator and not laggers[leader] and not spGetTeamRulesParam(teams[i], "WasKilled") then -- only consider giving to someone in position to take!
 			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0))}
+			teamsControlled[name] = teamsControlled[name] or 1
 		end
 	end
 
-	-- pick highest rank
+	-- pick highest rank, except those controlling the most teams already
+	local maxTeamsControlled = 0
 	for i=1,#candidatesForTake do
 		local player = candidatesForTake[i]
-		if player.rank > highestRank then
+		if player.rank > highestRank and teamsControlled <= maxTeamsControlled then
 			highestRank = player.rank
+			maxTeamsControlled = teamsControlled[player.name]
 			target = player
 		end
 	end
@@ -186,6 +190,10 @@ local function GetRecepient(allyTeam, laggers)
 		target = candidatesForTake[math.random(1,#candidatesForTake)]
 	end
 
+	if target then
+		teamsControlled[target.name] = teamsControlled[target.name] + 1
+	end
+	
 	return target
 end
 
