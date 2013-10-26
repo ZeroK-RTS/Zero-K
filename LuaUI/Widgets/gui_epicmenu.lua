@@ -2525,7 +2525,7 @@ function widget:Initialize()
 	AddOption('Settings/Camera', 'epicmenu/video_camera.png')
 	AddOption('Settings/Graphics', 'epicmenu/graphics.png')
 	AddOption('Settings/HUD Panels', 'epicmenu/control_panel.png')
-	AddOption('Settings/Interface', 'epicmenu/interface_builder.png')
+	AddOption('Settings/Interface', 'epicmenu/robotarm.png')
 	AddOption('Settings/Misc', 'epicmenu/misc.png')
 	
 	AddOption('Settings/Interface/Mouse Cursor', 'epicmenu/input_mouse.png')
