@@ -91,7 +91,7 @@ unitDef = {
         default = 350,
       },
 
-      explosionGenerator      = [[custom:flashslow]],
+      explosionGenerator      = [[custom:slowmissileflash]],
       fireStarter             = 30,
       flightTime              = 6,
       impactOnly              = true,
@@ -109,7 +109,7 @@ unitDef = {
       soundStart              = [[weapon/missile/missile_fire11]],
       soundStartVolume        = 11,
       soundTrigger            = true,
-      startVelocity           = 817.5,
+      startVelocity           = 1090,
       texture1                = [[flare]],
       tolerance               = 18000,
       tracks                  = true,
@@ -118,7 +118,7 @@ unitDef = {
       turret                  = true,
       weaponAcceleration      = 0,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 817.5,
+      weaponVelocity          = 1090,
     },
   },
 

@@ -3,6 +3,7 @@
 -- missiletrailyellow
 -- missiletrailblue
 -- missiletrailbluebig
+-- moderatortrail
 -- chainsawtrail
 -- cruisetrail
 -- tactrail
@@ -284,22 +285,22 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.9,
-        colormap           = [[1 0 1 0.2   1 0 1 0.2     0.5 0 0.5 0.15     0.25 0 0.25 0.05  0 0 0 0]],
+        colormap           = [[1 0.67 0.9 0.2   0.45 0.3 0.405 0.2     0.4 0.3 0.36 0.125     0.3 0.3 0.3 0.05  0 0 0 0]],
         directional        = true,
         emitrot            = 15,
-        emitrotspread      = 0,
+        emitrotspread      = 30,
         emitvector         = [[dir]],
         gravity            = [[0, 0, 0]],
         numparticles       = 1,
-        particlelife       = 30,
-        particlelifespread = 0,
-        particlesize       = 18,
-        particlesizespread = 12,
+        particlelife       = 28,
+        particlelifespread = 4,
+        particlesize       = 25,
+        particlesizespread = 11,
         particlespeed      = 1,
         particlespeedspread = 0,
         pos                = [[0, 0, 0]],
         sizegrowth         = -1,
-        sizemod            = 1.05,
+        sizemod            = 1.04,
         texture            = [[smoke]],
       },
     },

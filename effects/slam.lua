@@ -17,6 +17,10 @@
 -- slam_water_droplets
 -- slam_water_pillar
 -- slam_trail
+-- slam_muzzle
+-- slam_air_scrap
+-- slam_air_scrap_fragments
+-- slam_air_scrap_particles
 
 
 -- slam_flash from gundam_xamelimpact (heavily modified)
