@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.322 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.323 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-08-31
     license   = "GNU GPL, v2 or later",
@@ -176,6 +176,27 @@ local transkey = {
 	kp7				= 'numpad7',
 	kp8				= 'numpad8',
 	kp9				= 'numpad9',
+	
+
+    -- for french keyboard
+    --groupping
+            ampersand               = '&',
+            world_73                = '0x0e9',
+            quotedbl                = '"',
+            leftparen               = '(',
+            minus                   = '-',
+            world_72                = '0x0e8',
+            underscore              = '_',
+            world_71                = '0x07e',
+            world_64                = '0x0e0',
+     
+    --other
+            leftparen               = ')',
+            world_89                = '0x0f9',
+            dollar                  = '$',
+            asterisk                = '*',
+
+
 }
 
 local wantToReapplyBinding = false
