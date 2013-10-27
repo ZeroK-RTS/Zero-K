@@ -2932,12 +2932,6 @@ function widget:TextCommand(command)
 	return false
 end
 
-function widget:KeyRelease(key)
-	if window_sub_cur and key ==13 then --Note: "13" equal to "Enter". Could this be different in different keyboard?
-		--Spring.SendCommands("PasteText /search:" )
-	end
-end
-
 function SearchInText(randomTexts,searchText) --this allow search term to be unordered (eg: "sel view" == "view sel")
 	if explodeSearchTerm.text ~= searchText then
 		local explodedTerms = {}
