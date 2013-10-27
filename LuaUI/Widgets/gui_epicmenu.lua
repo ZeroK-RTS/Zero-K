@@ -1746,18 +1746,33 @@ MakeSubWindow = function(path)
 	--back button
 	if parent_path then
 		window_children[#window_children+1] = Button:New{ name= 'backButton', caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
-			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
+			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT,
+			padding= {2,2,2,2},
+			children = {
+				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+			}
+		}
 	end
 	
 	
 	--reset button
 	window_children[#window_children+1] = Button:New{ name= 'resetButton', caption = 'Reset', OnMouseUp = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='33%', right='33%', bottom=1, height=B_HEIGHT, }
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='33%', right='33%', bottom=1, height=B_HEIGHT,
+		padding= {2,2,2,2},
+		children = {
+			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+		}
+	}
 	
 	
 	--close button
 	window_children[#window_children+1] = Button:New{ name= 'menuCloseButton', caption = 'Close', OnMouseUp = { KillSubWindow }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT, }
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT,
+		padding= {2,2,2,2},
+		children = {
+			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+		}
+	}
 	
 	
 	
