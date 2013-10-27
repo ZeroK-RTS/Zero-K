@@ -64,6 +64,7 @@ local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
+local subMenuIcons = confdata.subMenuIcons  
 local useUiKeys = false
 --file_return = nil
 
@@ -209,13 +210,6 @@ if not WG.Layout then
 end
 
 --------------------------------------------------------------------------------
---extra icons for submenu paths
-subMenuIcons = {
-	['Game/Game Speed'] = 'epicmenu/speed-test-icon.png',
-	['Game/Unit AI'] = 'epicmenu/robot2.png',
-}
-
---------------------------------------------------------------------------------
 -- Luaui config settings
 local keybounditems = {}
 local keybind_date = 0
@@ -226,6 +220,7 @@ local settings = {
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
+	showAdvanced = false,
 }
 
 
@@ -1568,7 +1563,8 @@ MakeSubWindow = function(path)
 		end
 		
 		
-		if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
+		--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
+		if option.advanced and not settings.showAdvanced then
 			--do nothing
 		elseif option.type == 'button' then
 			local hide = false
@@ -1752,6 +1748,22 @@ MakeSubWindow = function(path)
 		autosize = true,
 		resizeItems = true,
 		centerItems = false,
+	}
+	
+	window_children[#window_children+1] = Checkbox:New{ 
+		--x=0,
+		width=180;
+		right = 5,
+		bottom=B_HEIGHT;
+		
+		caption = 'Show Advanced Settings', 
+		checked = settings.showAdvanced, 
+		OnChange = { function(self)
+			settings.showAdvanced = not self.checked
+			RemakeEpicMenu()
+		end }, 
+		textColor = color.sub_fg, 
+		tooltip   = 'For experienced users only.',
 	}
 	
 	window_children[#window_children+1] = buttonBar

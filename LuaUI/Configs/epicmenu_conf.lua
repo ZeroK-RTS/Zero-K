@@ -81,6 +81,7 @@ local function AddOption(option)
 	table.insert(confdata.eopt, option)
 end
 
+--ShortHand for adding a button
 local function ShButton( caption, action2, tooltip, advanced, icon )
 	AddOption({
 		type='button',
@@ -94,8 +95,9 @@ local function ShButton( caption, action2, tooltip, advanced, icon )
 	})
 end
 
---a form of checkbox that act like multiple choice question
-local function ShTick2( caption, items,defValue, action2, advanced) 
+
+--ShortHand for adding radiobuttons
+local function ShRadio( caption, items,defValue, action2, advanced) 
 	AddOption({
 		type='radioButton', 
 		name=caption,
@@ -108,6 +110,7 @@ local function ShTick2( caption, items,defValue, action2, advanced)
 	})
 end
 
+--ShortHand for adding a label
 local function ShLabel( caption )
 	AddOption({
 		type='label',
@@ -116,6 +119,12 @@ local function ShLabel( caption )
 		key=caption,
 	})
 end
+
+
+confdata.subMenuIcons = {
+	['Game/Game Speed'] = 'epicmenu/speed-test-icon.png',
+	['Game/Unit AI'] = 'epicmenu/robot2.png',
+}
 
 -- SETUP MENU HERE
 
@@ -146,11 +155,13 @@ path='Settings/Reset Settings'
 
 
 path='Settings'
+	--[[
 	AddOption({
 		name = 'Show Advanced Settings',
 		type = 'bool',
 		value = false,
 	})
+	--]]
 
 --- GAME --- Stuff for gameplay only. Spectator would never need to open this
 path='Game' 
@@ -175,7 +186,7 @@ path='Settings/Camera'
 	--]]
 
 	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
-	ShTick2( 'Camera Type', {
+	ShRadio( 'Camera Type', {
 			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
 			{name = 'FPS',key='FPS', desc='FPS camera', hotkey=nil},
 			{name = 'Free',key='Free', desc='Freestyle camera', hotkey=nil},
@@ -247,6 +258,8 @@ path='Settings/HUD Panels/HUD Skin'
 --- Interface --- anything that's an interface but not a HUD Panel
 path='Settings/Interface'
 	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
+path='Settings/Interface/Map'
+	ShButton( 'Map Draw Key', "drawinmap", nil, true )
 path='Settings/Interface/Mouse Cursor'
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
 	AddOption({ 	
@@ -269,7 +282,6 @@ path='Settings/Interface/Selection'
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
 path='Settings/Misc'
 	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
-	ShButton( 'Map Draw Key', "drawinmap", '', true )
 	ShButton( 'Game Info', "gameinfo", '', true )
 	ShButton( 'Share Dialog...', 'sharedialog', '', true )
 	ShButton( 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true )
