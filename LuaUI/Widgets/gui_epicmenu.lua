@@ -79,6 +79,7 @@ local Label
 local Colorbars
 local Checkbox
 local Window
+local Panel
 local ScrollPanel
 local StackPanel
 local LayoutPanel
@@ -980,15 +981,18 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	end
 	
 	local path2 = path
-	if not option or type(option) == 'string' then
+	if not option then
 		if not pathoptions[path] then
 			pathoptions[path] = {}
 		end
 		
-		local icon = option
-		if subMenuIcons[path] then -- must be before path var is changed
+		-- must be before path var is changed
+		local icon = subMenuIcons[path]
+		--[[
+		if subMenuIcons[path] then 
 			icon = subMenuIcons[path] 
 		end
+		--]]
 		
 		local pathexploded = explode('/',path)
 		local pathend = pathexploded[#pathexploded]
@@ -1007,7 +1011,6 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	end
 	
 	if not pathoptions[path] then
-		echo('1 adding....', path)
 		AddOption( path )
 	end
 	
@@ -1445,7 +1448,7 @@ local function GetHotkeyData(path, option)
 end
 
 --Make a stack with control and its hotkey button
-local function MakeHotkeyedControl(control, path, option)
+local function MakeHotkeyedControl(control, path, option, icon)
 
 	local hotkeystring = GetHotkeyData(path, option)
 	local kbfunc = function() 
@@ -1458,15 +1461,17 @@ local function MakeHotkeyedControl(control, path, option)
 	local hklength = math.max( hotkeystring:len() * 10, 20)
 	local control2 = control
 	control.x = 0
+	if icon then
+		control.x = 20
+	end
 	control.right = hklength+2 --room for hotkey button on right side?
 	control:DetectRelativeBounds()
 	
 	local hkbutton = Button:New{
 		name = option.wname .. ' hotKeyButton';
 		minHeight = 30,
-		--right=0, --Note: uncommenting this entry cause hotkey-button's position to overlap with control-button's position. It happen after Chili merge/update (???)
+		right=0,
 		width = hklength,
-		--x=-30,
 		caption = hotkeystring, 
 		OnMouseUp = { kbfunc },
 		backgroundColor = color.sub_button_bg,
@@ -1474,20 +1479,26 @@ local function MakeHotkeyedControl(control, path, option)
 		tooltip = 'Hotkey: ' .. hotkeystring,
 	}
 	
-	return StackPanel:New{
+	local children = {}
+	if icon then
+		local iconImage = Image:New{ file= icon, width = 16,height = 16, }
+		children = { iconImage, }
+	end
+	children[#children+1] = control
+	children[#children+1] = hkbutton
+	
+	return Panel:New{
 		width = "100%",
 		orientation='horizontal',
 		resizeItems = false,
 		centerItems = false,
 		autosize = true,
+		backgroundColor = {0, 0, 0, 0},
 		itemMargin = {0,0,0,0},
 		margin = {0,0,0,0},
-		itemPadding = {2,0,-hklength-2,0}, --{left,top,right,bottom}. Note: removing -hklength-2 padding causes wide empty space to appear between control-buttons and hotkey-buttons. This happen after Chili update/merge (???)
+		itemPadding = {0,0,0,0}, 
 		padding = {0,0,0,0},
-		children={
-			control2,
-			hkbutton
-		},
+		children=children,
 	}
 end
 
@@ -1594,7 +1605,7 @@ MakeSubWindow = function(path)
 				}
 				
 				if icon then
-					Image:New{ file= LUAUI_DIRNAME  .. 'images/'.. icon, width = 16,height = 16, parent = button, x=4,y=4,  }
+					Image:New{ file= icon, width = 16,height = 16, parent = button, x=4,y=4,  }
 				end
 				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option)
 			end
@@ -1630,7 +1641,22 @@ MakeSubWindow = function(path)
 			
 		elseif option.type == 'number' then	
 			settings_height = settings_height + B_HEIGHT
-			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
+			local icon = option.icon
+			if icon then
+				tree_children[#tree_children+1] = Panel:New{
+					backgroundColor = {0,0,0,0},
+					padding = {0,0,0,0},
+					margin = {0,0,0,0},
+					--itemMargin = {2,2,2,2},
+					autosize = true,
+					children = {
+						Image:New{ file= icon, width = 16,height = 16, x=4,y=0,  },
+						Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=0,  },
+					}
+				}
+			else
+				tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
+			end
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
@@ -1679,16 +1705,19 @@ MakeSubWindow = function(path)
 				item.desc = option.items[i].desc --is needed for checkbox tooltip
 				item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item.key). Is needed for Hotkey
 				settings_height = settings_height + B_HEIGHT
-				tree_children[#tree_children+1] = MakeHotkeyedControl(
-					Checkbox:New{
-						x=0,
-						right = 35,
-						caption = item.name, 
-						checked = (option.value == item.key), 
-						OnMouseUp = {function(self) option.OnChange(item.key) end},
-						textColor = color.sub_fg,
-						tooltip=item.desc,
-					}, path, item)
+				
+				local cb = Checkbox:New{
+					--x=0,
+					right = 35,
+					caption = item.name, 
+					checked = (option.value == item.key), 
+					OnMouseUp = {function(self) option.OnChange(item.key) end},
+					textColor = color.sub_fg,
+					tooltip=item.desc,
+				}
+				local icon = option.items[i].icon
+				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon)
+					
 			end			
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
@@ -1849,7 +1878,8 @@ MakeSubWindowSearch = function(path)
 			local lowercase_desc = option.desc and option.desc:lower() or ''
 			local found_name = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_text,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm) or virtualCategoryHit
 					
-			if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
+			--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
+			if option.advanced and not settings.showAdvanced then
 				--do nothing
 			elseif option.type == 'button' then
 				local hide = false
@@ -2530,6 +2560,7 @@ function widget:Initialize()
 	Colorbars = Chili.Colorbars
 	Checkbox = Chili.Checkbox
 	Window = Chili.Window
+	Panel = Chili.Panel
 	ScrollPanel = Chili.ScrollPanel
 	StackPanel = Chili.StackPanel
 	LayoutPanel = Chili.LayoutPanel
@@ -2581,15 +2612,14 @@ function widget:Initialize()
 	
 
 	--this is done to establish order the correct button order
-	AddOption('Settings/Reset Settings', 'epicmenu/undo.png')
-	AddOption('Settings/Audio', 'epicmenu/vol.png')
-	AddOption('Settings/Camera', 'epicmenu/video_camera.png')
-	AddOption('Settings/Graphics', 'epicmenu/graphics.png')
-	AddOption('Settings/HUD Panels', 'epicmenu/control_panel.png')
-	AddOption('Settings/Interface', 'epicmenu/robotarm.png')
-	AddOption('Settings/Misc', 'epicmenu/misc.png')
-	
-	AddOption('Settings/Interface/Mouse Cursor', 'epicmenu/input_mouse.png')
+	local imgPath = LUAUI_DIRNAME  .. 'images/'
+	AddOption('Settings/Reset Settings')
+	AddOption('Settings/Audio')
+	AddOption('Settings/Camera')
+	AddOption('Settings/Graphics')
+	AddOption('Settings/HUD Panels')
+	AddOption('Settings/Interface')
+	AddOption('Settings/Misc')
 	
 
 	-- Add pre-configured button/options found in epicmenu config file

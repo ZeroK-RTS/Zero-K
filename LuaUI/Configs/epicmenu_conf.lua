@@ -121,9 +121,22 @@ local function ShLabel( caption )
 end
 
 
-confdata.subMenuIcons = {
-	['Game/Game Speed'] = 'epicmenu/speed-test-icon.png',
-	['Game/Unit AI'] = 'epicmenu/robot2.png',
+local imgPath = LUAUI_DIRNAME  .. 'images/'
+confdata.subMenuIcons = {	
+	['Game/Game Speed'] = imgPath..'epicmenu/speed-test-icon.png',
+	['Game/Unit AI'] = imgPath..'epicmenu/robot2.png',
+	['Settings/Reset Settings'] = imgPath..'epicmenu/undo.png',
+	['Settings/Audio'] = imgPath..'epicmenu/vol.png',
+	['Settings/Camera'] = imgPath..'epicmenu/video_camera.png',
+	['Settings/Graphics'] = imgPath..'epicmenu/graphics.png',
+	['Settings/HUD Panels'] = imgPath..'epicmenu/control_panel.png',
+	['Settings/Interface'] = imgPath..'epicmenu/robotarm.png',
+	['Settings/Misc'] = imgPath..'epicmenu/misc.png',
+	
+	['Settings/Interface/Mouse Cursor'] = imgPath..'epicmenu/input_mouse.png',
+	['Settings/Interface/Map'] = imgPath..'epicmenu/map.png',
+	['Settings/Interface/Healthbars'] = imgPath..'commands/Bold/health.png',
+	['Settings/Interface/Spectating'] = imgPath..'epicmenu/find.png',
 }
 
 -- SETUP MENU HERE
@@ -166,7 +179,7 @@ path='Settings'
 --- GAME --- Stuff for gameplay only. Spectator would never need to open this
 path='Game' 
 
-	ShButton( 'Pause/Unpause', 'pause', nil, nil, 'epicmenu/media_playback_pause.png' )
+	ShButton( 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png' )
 	path='Game/Game Speed' 
 		ShButton( 'Increase Speed', 'speedup' )
 		ShButton( 'Decrease Speed', 'slowdown' )
@@ -313,17 +326,17 @@ path='Settings/Graphics'
 
 
 	ShLabel('Trees')
-	ShButton('Toggle View', 'drawtrees' )
-	ShButton('See More Trees', 'moretrees' )
-	ShButton('See Less Trees', 'lesstrees' )
+	ShButton('Toggle View', 'drawtrees', nil, nil, imgPath..'epicmenu/tree_1.png' )
+	ShButton('See More Trees', 'moretrees', nil, nil, imgPath..'epicmenu/tree_1.png' )
+	ShButton('See Less Trees', 'lesstrees', nil, nil, imgPath..'epicmenu/tree_1.png' )
 	--{'Toggle Dynamic Sky', function(self) spSendCommands{'dynamicsky'} end },
 	
 	ShLabel('Water Settings')
-	ShButton('Basic', function() spSendCommands{"water 0"} end )
-	ShButton('Reflective', function() spSendCommands{"water 1"} end )
-	ShButton('Reflective and Refractive', function() spSendCommands{"water 3"} end )
-	ShButton('Dynamic', function() spSendCommands{"water 2"} end )
-	ShButton('Bumpmapped', function() spSendCommands{"water 4"} end )
+	ShButton('Basic', function() spSendCommands{"water 0"} end, nil, nil, imgPath..'epicmenu/water.png' )
+	ShButton('Reflective', function() spSendCommands{"water 1"} end, nil, nil, imgPath..'epicmenu/water.png' )
+	ShButton('Reflective and Refractive', function() spSendCommands{"water 3"} end, nil, nil, imgPath..'epicmenu/water.png' )
+	ShButton('Dynamic', function() spSendCommands{"water 2"} end, nil, nil, imgPath..'epicmenu/water.png' )
+	ShButton('Bumpmapped', function() spSendCommands{"water 4"} end, nil, nil, imgPath..'epicmenu/water.png' )
 
 	ShLabel('Shadow Settings')
 	
@@ -362,6 +375,7 @@ path='Settings/Graphics'
 		max = 1, 
 		step = 0.01,
 		value = 1,
+		icon = imgPath..'epicmenu/stock_brightness.png',
 		OnChange = function(self) Spring.SendCommands{"luaui enablewidget Darkening", "luaui darkening " .. 1-self.value} end, 
 	} )
 	
