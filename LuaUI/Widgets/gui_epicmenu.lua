@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.323 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.324 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-08-31
     license   = "GNU GPL, v2 or later",
@@ -1743,43 +1743,65 @@ MakeSubWindow = function(path)
 	
 	window_height = window_height + B_HEIGHT
 	
+	local buttonBar = Grid:New{
+		x=0;bottom=0;
+		right=10,height=B_HEIGHT,
+		columns = 4,
+		padding = {0, 0, 0, 0},
+		itemMargin = {0, 0, 0, 0}, --{1, 1, 1, 1},
+		autosize = true,
+		resizeItems = true,
+		centerItems = false,
+	}
+	
+	window_children[#window_children+1] = buttonBar
+	
 	--back button
 	if parent_path then
-		window_children[#window_children+1] = Button:New{ name= 'backButton', caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
-			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT,
+		Button:New{ name= 'backButton', caption = 'Back', OnClick = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
+			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, height=B_HEIGHT,
 			padding= {2,2,2,2},
+			parent = buttonBar;
 			children = {
 				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16,height = 16, parent = button, x=4,y=4,  }
 			}
 		}
 	end
 	
+	--search button
+	Button:New{ name= 'searchButton', caption = 'Search',
+		OnClick = { function() Spring.SendCommands("chatall","PasteText /search:" ) end }, 
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+		padding= {2,2,2,2},parent = buttonBar;
+		children = {
+			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+		}
+	}
 	
 	--reset button
-	window_children[#window_children+1] = Button:New{ name= 'resetButton', caption = 'Reset', OnMouseUp = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='33%', right='33%', bottom=1, height=B_HEIGHT,
-		padding= {2,2,2,2},
+	Button:New{ name= 'resetButton', caption = 'Reset',
+		OnClick = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+		padding= {2,2,2,2}, parent = buttonBar;
 		children = {
 			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=4,  }
 		}
 	}
 	
-	
 	--close button
-	window_children[#window_children+1] = Button:New{ name= 'menuCloseButton', caption = 'Close', OnMouseUp = { KillSubWindow }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT,
-		padding= {2,2,2,2},
+	Button:New{ name= 'menuCloseButton', caption = 'Close',
+		OnClick = { KillSubWindow }, 
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+		padding= {2,2,2,2}, parent = buttonBar;
 		children = {
 			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16,height = 16, parent = button, x=4,y=4,  }
 		}
 	}
 	
-	
-	
 	KillSubWindow()
 	curPath = path -- must be done after KillSubWindow
 	window_sub_cur = Window:New{  
-		caption= (path~='') and (path .. "\n(Press Enter to do Search)"), --display this text if path is not ""
+		caption= (path~='') and (path), --display this text if path is not ""
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y, 
 		clientWidth = window_width,
@@ -2912,7 +2934,7 @@ end
 
 function widget:KeyRelease(key)
 	if window_sub_cur and key ==13 then --Note: "13" equal to "Enter". Could this be different in different keyboard?
-		Spring.SendCommands("PasteText /search:" )
+		--Spring.SendCommands("PasteText /search:" )
 	end
 end
 
