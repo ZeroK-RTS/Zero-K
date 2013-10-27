@@ -14,7 +14,7 @@
 function widget:GetInfo()
 	return {
 		name		    = "EndGame Stats",
-		desc		    = "v0.912 Chili replacement for default end game statistics",
+		desc		    = "v0.913 Chili replacement for default end game statistics",
 		author		  = "Funkencool",
 		date		    = "2013",
 		license     = "public domain",
@@ -230,13 +230,16 @@ function loadpanel()
 	window0 		= Chili.Panel:New{x = "0", y = "0", width = "100%", height = "100%", padding = {5,5,5,5}}
 
 	lineLabels 	= Chili.Control:New{parent = window0, right = 0, y = 0, width = 37, height = "100%", padding = {0,0,0,0},}
-	graphSelect	= Chili.StackPanel:New{minHeight = 70, parent = window0, x =  0, y = 0, width = selW, height = "100%",}
+	graphSelect	= Chili.StackPanel:New{
+		minHeight = 70, parent = window0, x =  0, y = 0, width = selW, height = "100%", padding = {0,0,0,0},
+		itemMargin = {0, 0, 0, 0},
+		resizeItems=true,}
 	graphPanel 	= Chili.Panel:New{parent = window0, x = selW, right = 30, y = 0, bottom = 40, padding = {10,10,10,10}}
 	graphLabel  = Chili.Label:New{autosize = true, parent = window0, bottom = 5,caption = "", align = "center", width = "70%", x = "20%", height = 30, font = {size = 30,},}
 	graphTime		= Chili.Label:New{parent = window0, bottom = 25,caption = "", width = 50, right = 50, height = 10}
 
 	for a=1, #engineStats do
-		local engineButton =	Chili.Button:New{name = engineStats[a][1], caption = engineStats[a][2], minHeight = 20, maxHeight = 30, parent = graphSelect, OnClick = {
+		local engineButton =	Chili.Button:New{name = engineStats[a][1], caption = engineStats[a][2], parent = graphSelect, OnClick = {
 			function(obj) graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(obj.name,obj.caption);end}}
 	end
 	
