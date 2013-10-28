@@ -809,7 +809,7 @@ end
 local function SendEconomyDataToWidget()
 
 	if (Script.LuaUI('WriteResourceStatsToFile')) then
-
+		Spring.Echo("Awards: Writing resource data to widget")
 		local resourceInfo = SYNCED.resourceInfo
 		local count = resourceInfo.count
 		local data = resourceInfo.data
