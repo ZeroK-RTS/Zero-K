@@ -5,5 +5,4 @@ return {
   ["CathraldaV10"] = "alloff",
   ["Vein"] = "alloff",
   ["Violence_V3"] = "mapdefault",
-  mapdefault
 }
