@@ -181,22 +181,22 @@ local transkey = {
 	
 
     -- for french keyboard
-    --groupping
-            ampersand               = '&',
-            world_73                = '0x0e9',
-            quotedbl                = '"',
-            leftparen               = '(',
-            minus                   = '-',
-            world_72                = '0x0e8',
-            underscore              = '_',
-            world_71                = '0x07e',
-            world_64                = '0x0e0',
-     
-    --other
-            leftparen               = ')',
-            world_89                = '0x0f9',
-            dollar                  = '$',
-            asterisk                = '*',
+	--groupping
+		ampersand               = '&',
+		world_73                = '0x0e9',
+		quotedbl                = '"',
+		leftparen               = '(',
+		minus                   = '-',
+		world_72                = '0x0e8',
+		underscore              = '_',
+		world_71                = '0x0e7',
+		world_64                = '0x0e0',
+	
+	--other
+		leftparen               = ')', 
+		world_89				= '0x0f9',
+		dollar					= '$',
+		asterisk                = '*',
 
 
 }
