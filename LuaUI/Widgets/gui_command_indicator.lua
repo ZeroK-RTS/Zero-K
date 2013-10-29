@@ -26,7 +26,7 @@ local image = "LuaUI/Images/arrowhead.png"
 local diamondDList
 
 local INIT_Y_OFFSET = 24
-local UPDATE_FREQUENCY = 0.05
+local UPDATE_FREQUENCY = 0.02
 
 local colorWhite = {1,1,1}
 
@@ -86,7 +86,18 @@ end
 
 local function GetUnitTopPos(unitID)
 	local x,y,z = spGetUnitPosition(unitID)
+	if not x and y and z then
+		return
+	end
 	return x, y + spGetUnitHeight(unitID), z
+end
+
+local function GetFeatureTopPos(featureID)
+	local x,y,z = spGetFeaturePosition(featureID)
+	if not x and y and z then
+		return
+	end
+	return x, y + spGetFeatureHeight(featureID), z
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -121,11 +132,11 @@ function widget:Update(dt)
 				
 				if command.targetID then
 					if command.isFeature then
-						local x, y, z = spGetFeaturePosition(command.targetID) 
-						command.pos = x and y and z and {x, y, z} or command.pos
+						local x, y, z = GetFeatureTopPos(command.targetID) 
+						command.pos = x and {x, y, z} or command.pos
 					else
 						local x, y, z = GetUnitTopPos(command.targetID) 
-						command.pos = x and y and z and {x, y, z} or command.pos
+						command.pos = x and {x, y, z} or command.pos
 					end
 				end
 			end
@@ -157,16 +168,13 @@ function widget:CommandNotify(id, params, options)
 			local x, y, z
 			if isFeature then
 				targetID = targetID - 32000
-				x, y, z = spGetFeaturePosition(targetID)
-				if y then
-					y = y + spGetFeatureHeight(targetID)
-				end
+				x, y, z = GetFeatureTopPos(targetID)
 			else
 				x, y, z = GetUnitTopPos(targetID)
 			end
 			if x and y and z then
 				commands[#commands+1] = {
-					targetID = params[1],
+					targetID = targetID,
 					isFeature = isFeature,
 					cmdID = id,
 					pos = {x, y + INIT_Y_OFFSET, z },
