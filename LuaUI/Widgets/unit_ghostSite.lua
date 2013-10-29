@@ -22,6 +22,8 @@ local lastTime
 local ghostSites = {}
 local ghostFeatures = {}
 
+local gaiaAllyID = Spring.GetGaiaAllyTeam()
+
 local floor                 = math.floor
 local udefTab				= UnitDefs
 local glColor               = gl.Color
@@ -183,7 +185,7 @@ function ScanFeatures()
 
 		--printDebug( "FID: " .. fDefId .. " Name: " .. fName .. " Team: " .. fTeamID .. " Res: " .. resName )
 
-		if ( resName == "" and fAllyID >= 0 and myAllyID ~= fAllyID and ghostFeatures[fID] == nil ) then
+		if ( resName == "" and fAllyID ~= gaiaAllyID and myAllyID ~= fAllyID and ghostFeatures[fID] == nil ) then
 			--printDebug( FeatureDefs[fDefId] )
 			local x, y, z = spGetFeaturePosition(fID)
 			--printDebug("Feature added: " .. fName .. " ID: " .. fID .. " Pos: " .. x .. ":" .. y .. ":" .. z .. " Ally: " .. fAllyID .. " Team: " .. fTeamID  )
