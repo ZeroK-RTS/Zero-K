@@ -1,5 +1,5 @@
 include("keysym.h.lua")
-local versionNumber = "1.41"
+local versionNumber = "1.42"
 
 function widget:GetInfo()
 	return {
@@ -18,9 +18,10 @@ end
 -- CONFIGURATION
 local debug = false
 local updateInt = 1 --seconds for the ::update loop
-local sens = 100	--rotate mouse sensitivity - length of mouse movement vector
+local sens = 85	--rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
 local drawForAll = false --draw facing direction also for other buildings than labs
 local drawForTurret = false --draw facing direction for all unit that can attack
+local timesens = 0.175 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
 --------------------------------------------------------------------------------
 local inDrag = false
 local metaStart = false
@@ -28,6 +29,7 @@ local mouseDeltaX = 0
 local mouseDeltaY = 0
 local mouseXStartRotate = 0
 local mouseYStartRotate = 0
+local mouseTimeStartRotate = Spring.GetTimer()
 local mouseXStartDrag = 0
 local mouseYStartDrag = 0
 local mouseLbLast = false
@@ -54,6 +56,8 @@ local spGetBuildFacing		= Spring.GetBuildFacing
 local spSetBuildFacing 		= Spring.SetBuildFacing
 local spPos2BuildPos 		= Spring.Pos2BuildPos
 local spGetGroundHeight 	= Spring.GetGroundHeight
+local spDiffTimers			= Spring.DiffTimers
+local spGetTimer			= Spring.GetTimer
 
 local floor                 = math.floor
 local abs					= math.abs
@@ -232,7 +236,9 @@ function manipulateFacing()
 			mouseXStartRotate = mx
 			mouseYStartRotate = my -- reset rotate center
 			
-			if ( newFacing ~= spGetBuildFacing() ) then
+			local transTime = spDiffTimers(spGetTimer(), mouseTimeStartRotate)
+			mouseTimeStartRotate = spGetTimer()
+			if (transTime < timesens) and ( newFacing ~= spGetBuildFacing()) then
 				spSetBuildFacing( newFacing )
 			end
 		end

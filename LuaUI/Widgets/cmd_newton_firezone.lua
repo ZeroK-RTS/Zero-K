@@ -299,15 +299,15 @@ end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer
 , weaponDefID, attackerID, attackerDefID, attackerTeam )
-	if victim[unitID] then
+	if victim[unitID] then --is current victim of any Newton group?
 		for g=1, groups.count do
 			if groupTarget[g] == unitID then
-				victimStillBeingAttacked[g] = unitID
+				victimStillBeingAttacked[g] = unitID --signal as being attacked
 			end
 		end
 		local frame = currentFrame
 		victim[unitID] = frame + 90 --delete 3 second later
-		local estFrame = (frame-(frame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into 15 step. eg [1 .. 15 .. 30] into [1,15,30]
+		local estFrame = (frame-(frame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
 		estimateInFuture[estFrame] = estimateInFuture[estFrame] or {}
 		estimateInFuture[estFrame][unitID] = true
 		--ech("still being attacked")

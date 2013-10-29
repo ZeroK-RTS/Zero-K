@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.8"
+local versionNumber = "v1.5.9"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ function widget:GetInfo()
     author    = "Evil4Zerggin; based on jK's darkening widget",
     date      = "28 September 2008,2012,12 September 2013",
     license   = "GNU LGPL, v2.1 or later",
-    layer     = 0,
+    layer     = 6, --draw stuff after gui_showeco_action.lua(0) & gui_ally_cursor.lua(5) have drawn theirs to avoid disturbing their color
     enabled   = false  --  loaded by default?
   }
 end
@@ -91,9 +91,9 @@ options = {
 	},
 	]]--
 	coloredUnits = {
-		name = "Night Colored Units",
+		name = "Bright Units",
 		type = 'bool',
-		value = false,
+		value = true,
 		desc = 'Bright units even at night',
 	},
 	cycle = {
@@ -135,13 +135,13 @@ options = {
 	},
 	bases = {
 		name = "Searchlight Bases",
-		type = 'list',
+		type = 'radioButton',
 		items = {
 			{ key = 'none', name = 'None', },
 			{ key = 'simple', name = 'Simple', },
 			{ key = 'full', name = 'Full', },
 		},
-		value = 'simple',
+		value = 'full',
 	},
 }
 
