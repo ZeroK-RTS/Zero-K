@@ -17,7 +17,14 @@ end
 --------------------------------------------------------------------------------
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetFeaturePosition = Spring.GetFeaturePosition
+local spGetUnitHeight = Spring.GetUnitHeight
+local spGetFeatureHeight = Spring.GetFeatureHeight
+
 local image = "LuaUI/Images/arrowhead.png"
+local diamondDList
+
 local INIT_Y_OFFSET = 24
 local UPDATE_FREQUENCY = 0.05
 
@@ -31,6 +38,8 @@ local cmdColors = {
 	[CMD.FIGHT] = {0.1, 0.1, 0.9},
 	[CMD.GUARD] = {0.1, 0.8, 0.8},
 	[CMD.REPAIR] = {0.1, 0.8, 0.8},
+	[CMD.RECLAIM] = {0.8, 0.1, 0.8},
+	[CMD.RESURRECT] = {0.1, 0.8, 0.8},
 	[CMD_JUMP] = {0.1, 0.9, 0.1},
 	[CMD_REARM] = {0.1, 0.8, 0.8},
 	[CMD_PLACE_BEACON] = {0.1, 0.8, 0.8},
@@ -46,11 +55,39 @@ local phases = {
 }
 local highestTime = phases[#phases].time
 
-local commands = {} -- [1] = {pos = {x, y, z}, cmdID = cmdID, time = time, phase = 1, alpha = alpha, offset = offset}
+local commands = {} -- [1] = {targetID = unitID/featureID, isFeature = bool, pos = {x, y, z}, cmdID = cmdID, time = time, phase = number, alpha = number, offset = number}
 local toRemove = {} -- {1, 2, 7, ...}
 
 local updateTimer = 0
 
+local function Diamond()	-- FIXME: not a diamond (it's actually an inverted pyramid)
+	gl.Vertex(0, -16, 0)
+	gl.Vertex(12, 0, 0)
+	gl.Vertex(0, 0, 12)
+	gl.Vertex(-12, 0, 0)
+	gl.Vertex(0, 0, -12)
+	gl.Vertex(12, 0, 0)
+	
+	--[[
+	gl.Vertex(0, -16, 0)
+	gl.Vertex(12, 0, 0)
+	gl.Vertex(0, 16, 0)
+	
+	gl.Vertex(0, 0, 12)
+	gl.Vertex(0, -16, 0)
+	
+	gl.Vertex(-12, 0, 0)
+	gl.Vertex(0, 16, 0)
+	
+	gl.Vertex(0, 0, -12)
+	gl.Vertex(0, -16, 0)
+	]]
+end
+
+local function GetUnitTopPos(unitID)
+	local x,y,z = spGetUnitPosition(unitID)
+	return x, y + spGetUnitHeight(unitID), z
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:Update(dt)
@@ -81,6 +118,16 @@ function widget:Update(dt)
 				command.alpha = previousPhaseDef.alpha + alphaDiff*phaseProgress
 				local offsetDiff = nextPhaseDef.offset - previousPhaseDef.offset
 				command.offset = previousPhaseDef.offset + offsetDiff*phaseProgress
+				
+				if command.targetID then
+					if command.isFeature then
+						local x, y, z = spGetFeaturePosition(command.targetID) 
+						command.pos = x and y and z and {x, y, z} or command.pos
+					else
+						local x, y, z = GetUnitTopPos(command.targetID) 
+						command.pos = x and y and z and {x, y, z} or command.pos
+					end
+				end
 			end
 		end
 		if #toRemove > 0 then	-- so we don't recreate the table unless we have to
@@ -103,6 +150,33 @@ function widget:CommandNotify(id, params, options)
 			alpha = 1,
 			offset = 0,
 		}
+	elseif #params == 1 then
+		local targetID = params[1]
+		local isFeature = (targetID > 32000)
+		if (isFeature) or Spring.ValidUnitID(targetID) then
+			local x, y, z
+			if isFeature then
+				targetID = targetID - 32000
+				x, y, z = spGetFeaturePosition(targetID)
+				if y then
+					y = y + spGetFeatureHeight(targetID)
+				end
+			else
+				x, y, z = GetUnitTopPos(targetID)
+			end
+			if x and y and z then
+				commands[#commands+1] = {
+					targetID = params[1],
+					isFeature = isFeature,
+					cmdID = id,
+					pos = {x, y + INIT_Y_OFFSET, z },
+					time = 0,
+					phase = 1,
+					alpha = 1,
+					offset = 0,
+				}
+			end
+		end
 	end
 	return false	-- don't do anything to the command
 end
@@ -111,7 +185,6 @@ function widget:DrawWorld()
 	if Spring.IsGUIHidden() then return end
 	gl.DepthTest(true)
 	gl.Texture(image)
-	
 	for i=1,#commands do
 		local command = commands[i]
 		local x, y, z = unpack(command.pos)
@@ -123,6 +196,7 @@ function widget:DrawWorld()
 		gl.Billboard()
 		gl.Rotate(180, 0, 0, 1)
 		gl.TexRect(-24, -24, 24, 24)
+		--gl.CallList(diamondDList)
 		gl.PopMatrix()
 	end
 
@@ -131,6 +205,12 @@ function widget:DrawWorld()
 	gl.Color(1, 1, 1, 1)
 end
   
+function widget:Initialize()
+	--diamondDList = gl.CreateList(gl.BeginEnd, GL.POLYGON, Diamond)
+end
 
+function widget:Shutdown()
+	--gl.DeleteList(diamondDList)
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
