@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.090 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.091 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --18 October 2013
     license   = "GNU GPL, v2 or later",
@@ -2148,7 +2148,11 @@ function widget:Update(dt)
 							end
 						end
 					end
-					itemImg:ClearChildren(); --remove existing label and readd (to eliminate color bug)
+					local cmdLabel = itemImg.childrenByName['commandLabel']
+					if cmdLabel then
+						itemImg:RemoveChild(cmdLabel)
+					end
+					--itemImg:ClearChildren(); --remove existing label and readd (to eliminate color bug)
 					if commandName then
 						Label:New{ --create new chili element
 							parent = itemImg;

@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.892 Chili Minimap",
+    desc      = "v0.893 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -63,11 +63,22 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
+	start_with_showeco = {
+		name = "Initial Showeco state",
+		desc = "Game starts with Showeco enabled",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			if (self.value) then
+				WG.showeco = self.value
+			end
+		end,
+	},
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
