@@ -10,7 +10,7 @@ return {
 			ground             = true,
 			water              = false,
 			properties = {
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				length 				= 5,
 				width					= 5,
 				alpha					= 0.67,
@@ -28,7 +28,7 @@ return {
 			ground             = true,
 			water              = false,
 			properties = {
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				length 				= 5,
 				width					= 10,
 				alpha					= 0.67,
@@ -47,7 +47,7 @@ return {
 			ground             = true,
 			water              = false,
 			properties = {
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				size = 40,
 				sizeGrowth = -9,
 				ttl = 7,
@@ -63,7 +63,7 @@ return {
 			ground             = true,
 			water              = false,
 			properties = {
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				size = 12,
 				sizeGrowth = 0.25,
 				ttl = 60,
@@ -80,7 +80,7 @@ return {
 			water              = true,
 			properties = {
 				airdrag            = 0.8,
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				colormap           = [[0.8 0 1 0.75	0.2 0.2 0.8 0.01	0.0 0.0 0.0 0.01]],
 				directional        = false,
 				emitrot            = 45,
@@ -108,7 +108,7 @@ return {
 			ground             = true,
 			water              = true,
 			properties = {
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				heat               = 150,
 				heatfalloff        = 10,
 				maxheat            = 200,
@@ -127,7 +127,7 @@ return {
 			underwater         = 1,
 			water              = false,
 			properties = {
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				airdrag            = 0.8,
 				colormap           = [[0.75 0.25 1 0.75  0.75 0.25 0.75 0.5  0 0 0 0.01]],
 				directional        = false,
@@ -157,7 +157,7 @@ return {
 			underwater         = 1,
 			water              = true,
 			properties = {
-				alwaysVisible      = true,
+				alwaysVisible      = false,
 				airdrag            = 0.8,
 				colormap           = [[0.75 0.25 1 0.75  0.75 0.25 0.75 0.5  0 0 0 0.01]],
 				directional        = false,
