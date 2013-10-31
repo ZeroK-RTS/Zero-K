@@ -1,4 +1,4 @@
-local versionName = "v2.864"
+local versionName = "v2.865"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "August 14, 2013", --clean up June 25, 2013
+    date      = "November 1, 2013", --clean up June 25, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -74,7 +74,7 @@ local mathRandom = math.random
 -- Switches:
 local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
 local isOldSpring_g = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and 1 or 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
-local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
+local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 1)
 local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
 -- Graph constant:
@@ -1811,8 +1811,10 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 	end
 	local maximumVelocity = (nearestFrontObstacleRange- safetyDistanceCONSTANT)/timeToContactCONSTANT --calculate the velocity that will cause a collision within the next "timeToContactCONSTANT" second.
 	activateAutoReverse=activateAutoReverse*impatienceTrigger --activate/deactivate 'autoReverse' if impatience system is used
-	if (velocity >= maximumVelocity) and (activateAutoReverse==1) and (not newCommand) then 
-		velocity = -unitSpeed	--set to reverse if impact is imminent & when autoReverse is active & when isn't a newCommand. NewCommand is TRUE if its on initial avoidance. We don't want auto-reverse on initial avoidance (we rely on normal avoidance first, then auto-reverse if it about to collide with enemy).
+	local doReverseNow = false
+	if (maximumVelocity <= velocity) and (activateAutoReverse==1) and (not newCommand) then 
+		--velocity = -unitSpeed	--set to reverse if impact is imminent & when autoReverse is active & when isn't a newCommand. NewCommand is TRUE if its on initial avoidance. We don't want auto-reverse on initial avoidance (we rely on normal avoidance first, then auto-reverse if it about to collide with enemy).
+		doReverseNow = true
 	end 
 	
 	if (turnOnEcho == 1) then 
@@ -1821,7 +1823,7 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 		Spring.Echo("unitDirection(SendCommand)" .. unitDirection)
 	end
 	
-	local newX, newZ= ConvertToXZ(thisUnitID, newUnitAngleDerived,velocity, unitDirection, networkDelayDrift) --convert angle into coordinate form
+	local newX, newZ= ConvertToXZ(thisUnitID, newUnitAngleDerived,velocity, unitDirection, networkDelayDrift,doReverseNow) --convert angle into coordinate form
 	return newX, newZ
 end
 
@@ -1927,15 +1929,24 @@ function GetUnitDirection(unitID, lastPosition) --give unit direction in radian,
 	return unitDirection, currentY, usingLastPosition
 end
 
-function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, networkDelayDrift)
+function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, networkDelayDrift,doReverseNow)
 	--localize global constant
 	local velocityAddingCONSTANT=velocityAddingCONSTANTg
 	local velocityScalingCONSTANT=velocityScalingCONSTANTg
 	--
+	
 	local x,_,z = spGetUnitPosition(thisUnitID)
-	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT*Sgn(velocity) --add multiplier & adder. note: we multiply "velocityAddingCONSTANT" with velocity Sign ("Sgn") because we might have reverse speed (due to auto-reverse)
-	local newX = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
-	local newZ = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + z
+	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT*Sgn(velocity) --add multiplier & adder. note: we multiply "velocityAddingCONSTANT" with velocity Sign ("Sgn") because we might have reverse speed (due to auto-reverse)	
+	local newX = 0
+	local newZ = 0		
+	if doReverseNow then
+		local reverseDirection = unitDirection+math.pi --0 degree + 180 degree = reverse direction
+		newX = distanceToTravelInSecond*math.sin(reverseDirection) + x
+		newZ = distanceToTravelInSecond*math.cos(reverseDirection) + z
+	else
+		newX = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
+		newZ = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + z
+	end
 	
 	if (unitDirection ~= nil) and (networkDelayDrift~=0) then --need this check because argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
 		local distanceTraveledDueToNetworkDelay = networkDelayDrift 
