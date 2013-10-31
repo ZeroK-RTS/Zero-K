@@ -47,9 +47,11 @@ unitDef = {
   
   customParams        = {
 	description_de = [[Trägerdrohne]],
-	description_fr = [[Drone d'attaque]],
+	description_fr = [[Drone de combat avancé]],
+	helptext		= [[The Viper is an advanced battle drone similar to the Firefly but equipped with a Disruptor Pulse Beam, slowing its targets more with each hit]],
 	helptext_de    = [[]],
-	helptext_fr    = [[]],
+	helptext_fr    = [[Le Viper est un drone de combat agile similair au Firefly mais équipé d'un canon à électrons endommageant non seulement ses cibles mais les ralentissant progressivement, les rendant à chaque tir plus vulnérables.]],
+	
   },
   
   
