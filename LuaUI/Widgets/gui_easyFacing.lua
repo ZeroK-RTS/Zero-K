@@ -1,5 +1,5 @@
 include("keysym.h.lua")
-local versionNumber = "1.42"
+local versionNumber = "1.421"
 
 function widget:GetInfo()
 	return {
@@ -18,10 +18,10 @@ end
 -- CONFIGURATION
 local debug = false
 local updateInt = 1 --seconds for the ::update loop
-local sens = 85	--rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
+local sens = 20	--rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
 local drawForAll = false --draw facing direction also for other buildings than labs
 local drawForTurret = false --draw facing direction for all unit that can attack
-local timesens = 0.175 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
+local timesens = 0.100 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
 --------------------------------------------------------------------------------
 local inDrag = false
 local metaStart = false
@@ -29,7 +29,7 @@ local mouseDeltaX = 0
 local mouseDeltaY = 0
 local mouseXStartRotate = 0
 local mouseYStartRotate = 0
-local mouseTimeStartRotate = Spring.GetTimer()
+local mouseTimeStartRotate = 0
 local mouseXStartDrag = 0
 local mouseYStartDrag = 0
 local mouseLbLast = false
@@ -190,6 +190,7 @@ function manipulateFacing()
 		mouseDeltaY = 0
 		mouseXStartRotate = mx
 		mouseYStartRotate = my
+		mouseTimeStartRotate = spGetTimer()
 		mouseXStartDrag = mx
 		mouseYStartDrag = my
 		printDebug("IN")
