@@ -61,7 +61,7 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 	SetUnitPosition(droneID, xS, zS, true)
 	GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 	GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
-	GiveOrderToUnit(droneID, CMD.FIGHT,	{x + random(-300,300), 60, z + random(-300,300)}, {""})
+	GiveOrderToUnit(droneID, CMD.FIGHT,	{(x + (random(0,600) - 300)), 60, (z + (random(0,600) - 300))}, {""})
 	GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 
 	SetUnitNoSelect(droneID,true)
@@ -134,7 +134,7 @@ local function UpdateCarrierTarget(carrierID)
 			if dist < set.range then
 				for droneID in pairs(set.drones) do
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-					GiveOrderToUnit(droneID, CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
+					GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 					droneList[droneID] = {carrier = carrierID, set = i}
 				end
@@ -155,7 +155,7 @@ local function UpdateCarrierTarget(carrierID)
 				if not engaged then
 					local px,py,pz = GetUnitPosition(carrierID)
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-					GiveOrderToUnit(droneID, CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
+					GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 					droneList[droneID] = {carrier = carrierID, set = i}
 				end
