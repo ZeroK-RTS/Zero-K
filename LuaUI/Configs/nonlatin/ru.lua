@@ -10,10 +10,10 @@ return{
 	-- All Ъ (not ъ) must be replaced by ` 
 	-- The code of the Symbol Ъ is 255 which is color control code for Spring Engine
 	-- This font dispaly Ъ instead of `
-	
+	 
 	-- We must know who we should blame if a translation is sucks.  
     units={
-		-- Cloaks
+		-- Cloaks 
 		-- Cloaky Bot Factory (banana_Ai)
 		factorycloak={
 			description="Производит невидимых ботов, Сторит 10m/s",
