@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Command Indicator",
+		name      = "Command Indicator v2",
 		desc      = "Simple visual feedback of received commands",
 		author    = "KingRaptor (L.J. Lim)",
 		date      = "2013.10.29",
 		license   = "Public domain/CC0",
 		layer     = 0,
-		enabled   = true  --  loaded by default?
+		enabled   = false  --  loaded by default?
 	}
 end
 
