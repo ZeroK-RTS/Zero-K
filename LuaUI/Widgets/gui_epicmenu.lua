@@ -2277,7 +2277,7 @@ local function MakeMenuBar()
 						screen0:RemoveChild(window_exit)
 						exitWindowVisible = false
 					end, },
-				tooltip = "Ask teammate to resign",
+				tooltip = "Ask teammates to resign",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2, 
