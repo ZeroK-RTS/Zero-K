@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili EndGame Window",
-    desc      = "v0.004 Chili EndGame Window. Creates award control and receives stats control from another widget.",
+    desc      = "v0.005 Chili EndGame Window. Creates award control and receives stats control from another widget.",
     author    = "CarRepairer",
     date      = "2013-09-05",
     license   = "GNU GPL, v2 or later",
@@ -124,9 +124,6 @@ local function ShowTab(tabName)
 	return false
 end
 
-function SetAwardList(awardList)
-	WG.awardList = awardList
-end
 
 local function AddStatsSubPanel()
 	if addedStatsSubPanel then
@@ -168,32 +165,42 @@ local function ShowStats()
 	SetButtonColor( awardButton, white_table )
 end
 
+
+
+local function SetupAwardsPanel()
+	awardSubPanel:ClearChildren()
+	for teamID,awards in pairs(WG.awardList) do
+		--echo(k, v)
+		
+		local playerHasAward
+		for awardType, record in pairs(awards) do
+			playerHasAward = true
+		end
+		if playerHasAward then
+			Label:New{ caption = teamNames[teamID], width=120; fontShadow = true; valign='center'; autosize=false, height=awardPanelHeight; textColor=teamColors[teamID]; 	parent=awardSubPanel }
+		
+			for awardType, record in pairs(awards) do
+				
+				awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
+			end
+			
+			Label:New{ caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4}; autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
+		end
+	end
+end
+
+
+function SetAwardList(awardList)
+	WG.awardList = awardList
+	SetupAwardsPanel()
+	ShowAwards()
+end
+
 local function ShowEndGameWindow()
 	local awardList = WG.awardList
 	
-	local L_HEIGHT = 30
-	
-	awardSubPanel:ClearChildren()
-	
-	if awardList then
-		for teamID,awards in pairs(awardList) do
-			--echo(k, v)
-			
-			local playerHasAward
-			for awardType, record in pairs(awards) do
-				playerHasAward = true
-			end
-			if playerHasAward then
-				Label:New{ caption = teamNames[teamID], width=120; fontShadow = true; valign='center'; autosize=false, height=awardPanelHeight; textColor=teamColors[teamID]; 	parent=awardSubPanel }
-			
-				for awardType, record in pairs(awards) do
-					
-					awardSubPanel:AddChild( MakeAwardPanel(awardType, record) )
-				end
-				
-				Label:New{ caption = string.rep('-', 300), textColor = {0.4,0.4,0.4,0.4}; autosize=false; width='100%'; height=5; parent=awardSubPanel } --spacer label to force a "line break"
-			end
-		end
+	if WG.awardList then
+		ShowAwards()
 	else
 		ShowStats()
 	end
