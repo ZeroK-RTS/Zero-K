@@ -202,7 +202,7 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 		x,y,z = x*mag, y*mag, z*mag
 		y = y + abs(magnitude)/(20*myMass)
 		pushOffGround = pushOffGround and IsUnitOnGround(unitID)
-		GG.AddSphereicalLOSCheck(unitID, unitDefID)
+		--GG.AddSphereicalLOSCheck(unitID, unitDefID)
 	end
 	
 	AddGadgetImpulseRaw(unitID, x, y, z, pushOffGround, useDummy, unitDefID, moveType)
