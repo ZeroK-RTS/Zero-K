@@ -197,8 +197,6 @@ function SetAwardList(awardList)
 end
 
 local function ShowEndGameWindow()
-	local awardList = WG.awardList
-	
 	if WG.awardList then
 		ShowAwards()
 	else
@@ -206,7 +204,6 @@ local function ShowEndGameWindow()
 	end
 	
 	screen0:AddChild(window_endgame)
-	
 end
 
 local function SetupControls()
