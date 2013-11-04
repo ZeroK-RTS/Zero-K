@@ -1,4 +1,4 @@
-local versionNumber = "v0.9 "
+local versionNumber = "v0.91 "
 function widget:GetInfo()
   return {
     name     = "Resurrect Congregate",
@@ -17,8 +17,8 @@ local blobUnits_gbl_cnst = 5
 local congregateRange_gbl_cnst = 3000
 
 local spGetGameFrame = Spring.GetGameFrame
+local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitsInBox = Spring.GetUnitsInBox
 local spGetAllUnits = Spring.GetAllUnits
 local spIsUnitAllied = Spring.IsUnitAllied
 local spGetUnitDefID = Spring.GetUnitDefID
@@ -41,18 +41,23 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeamID, builderID)
 	if iNotLagging_gbl and
-	(builderID) and --have builder
+	(builderID) and --have builder (not created using /give, not morph)
 	unitTeamID == myTeamID_gbl and UnitDefs[unitDefID].speed > 0 then --is mobile and our own unit
 		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
-		local unitChecked = spGetUnitsInBox (x-1, y-1,z-1, x+1,y+1, z+1)
-		if unitChecked and #unitChecked==1 then --filter out morph
+		local health, maxhealth = spGetUnitHealth(unitID)
+		if health/maxhealth > 0.9 then --is full health (typical of unit from resurrect)
 			unitToMove_gbl[#unitToMove_gbl+1]={x,y,z,unitID, unitDefID}
 		end
 	end
 end
 
 function widget:Initialize()
+	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() return false end --remove widget when spectating
 	myTeamID_gbl = Spring.GetMyTeamID()
+end
+
+function widget:PlayerChanged(playerID)
+	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end
 end
 
 local elapsedTime = 0 
