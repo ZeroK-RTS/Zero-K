@@ -1,4 +1,4 @@
-local versionName = "v2.865"
+local versionName = "v2.866"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -401,7 +401,8 @@ function RefreshUnitList(attacker, commandTTL)
 			local unitSpeed =unitDef["speed"]
 			local decloakScaling = math.max((unitDef["decloakDistance"] or 0),stdDecloakDist)/stdDecloakDist
 			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
-			if (unitSpeed>0) then
+			local _,_,inbuild = spGetUnitIsStunned(unitID)
+			if (unitSpeed>0) and (not inbuild) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
 				if (unitDef.isBuilder or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
@@ -749,7 +750,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
 		local unitType = unitInMotionSingleUnit[2]
-		local unitInView = unitInMotionSingleUnit.isVisible
+		local unitInView = unitInMotionSingleUnit["isVisible"]
 		local retreating = false
 		if options.retreatAvoidance.value and WG.retreatingUnits then
 			retreating = (WG.retreatingUnits[unitID]~=nil)

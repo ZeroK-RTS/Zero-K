@@ -114,7 +114,7 @@ function checkLabs()
 			
 			--]]
 			end		
-		elseif (team ~= Lv.team) then --order unit to move away
+		elseif (team ~= Lv.team) then --order unit blocking ally factory to move away
 			local xVel,_,zVel = spGetUnitVelocity(id)
 			local stunned_or_inbuild = spGetUnitIsStunned(id)
 			if math.abs(xVel)<0.1 and math.abs(zVel)<0.1 and (not stunned_or_inbuild) then

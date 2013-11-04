@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "UnitNoStuckInFactory",
-    desc      = "Always move unit away from factory's build yard & Remove an accidental build unit command from unit from factory. Prevent case of unit stuck in factory & to make sure unit can complete their move queue.",
+    desc      = "Always move unit away from factory's build yard & Remove an accidental build-unit command given to unit in factory. This prevent case of unit stuck in factory & to make sure unit can complete their move queue.",
     author    = "msafwan",
     date      = "16 August 2013",
     license   = "none",
@@ -23,7 +23,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		local queue = Spring.GetUnitCommands(unitID, 1)
 		local firstCommand = queue and queue[1]
 		if firstCommand then
-			if firstCommand.id ~= CMD.MOVE then --no rally behaviour?? (we leave unit with CMD.MOVE alone because we don't want to disturb factory's move command)
+			if firstCommand.id ~= CMD.MOVE then --no rally behaviour? no move command? is attack command? (we exclude unit with CMD.MOVE because we don't want to disturb factory's move command)
 				local dx,_,dz = Spring.GetUnitDirection(unitID)
 				local x,y,z = Spring.GetUnitPosition(unitID)
 				dx = dx*100 --Note: don't need trigonometry here because factory direction is either {0+-,1+-} or {1+-,0+-} (1 or 0), so multiply both with 100 elmo is enough

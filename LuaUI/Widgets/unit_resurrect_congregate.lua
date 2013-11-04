@@ -1,4 +1,4 @@
-local versionNumber = "v0.91 "
+local versionNumber = "v0.92 "
 function widget:GetInfo()
   return {
     name     = "Resurrect Congregate",
@@ -7,7 +7,7 @@ function widget:GetInfo()
     date     = "3 November 2013",
     license  = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -17,7 +17,7 @@ local blobUnits_gbl_cnst = 5
 local congregateRange_gbl_cnst = 3000
 
 local spGetGameFrame = Spring.GetGameFrame
-local spGetUnitHealth = Spring.GetUnitHealth
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetAllUnits = Spring.GetAllUnits
 local spIsUnitAllied = Spring.IsUnitAllied
@@ -44,8 +44,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeamID, builderID)
 	(builderID) and --have builder (not created using /give, not morph)
 	unitTeamID == myTeamID_gbl and UnitDefs[unitDefID].speed > 0 then --is mobile and our own unit
 		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
-		local health, maxhealth = spGetUnitHealth(unitID)
-		if health/maxhealth > 0.9 then --is full health (typical of unit from resurrect)
+		local _,_,inbuild = spGetUnitIsStunned(unitID)
+		if not inbuild then --resurrected unit is instantly full health
 			unitToMove_gbl[#unitToMove_gbl+1]={x,y,z,unitID, unitDefID}
 		end
 	end
