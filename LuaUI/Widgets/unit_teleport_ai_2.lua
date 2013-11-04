@@ -275,7 +275,7 @@ function widget:GameFrame(n)
 									loopedUnits[unitID]=true
 									break; --a.k.a: Continue
 								end
-								
+								--IS NEW UNIT? initialize them--
 								unitToEffect[unitID] = unitToEffect[unitID] or {norm=nil,becn={nil},pos=nil,cmd=nil,defID=unitDefID}
 								if not unitToEffect[unitID]["cmd"] then
 									local px,py,pz= spGetUnitPosition(unitID)
@@ -284,11 +284,12 @@ function widget:GameFrame(n)
 									unitToEffect[unitID]["pos"] = {px,py,pz}
 									unitToEffect[unitID]["cmd"] = cmd_queue
 								end
-
+								--IS UNIT IDLE? skip--
 								if not unitToEffect[unitID]["cmd"] then
 									loopedUnits[unitID]=true
 									break; --a.k.a: Continue
 								end
+								--IS UNIT WAITING AT BEACON? count them--
 								if unitToEffect[unitID]["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
 									local guardedUnit = unitToEffect[unitID]["cmd"].params[4] --DEFINED in unit_teleporter.lua
 									if listOfBeacon[guardedUnit] then --if beacon exist
@@ -310,14 +311,16 @@ function widget:GameFrame(n)
 										end
 									end
 								end
+								--IS REACH PROCESSING LIMIT? skip--
 								if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
 									break;
 								end
+								--IS REACH DESIRED LIMIT? skip--
 								if #unitToEffect >= numberOfUnitToProcess then
 									break;
 								end
 								currentUnitProcessed = currentUnitProcessed + 1
-								
+								--MEASURE REGULAR DISTANCE--
 								local px,py,pz = unitToEffect[unitID]["pos"][1],unitToEffect[unitID]["pos"][2],unitToEffect[unitID]["pos"][3]
 								local cmd_queue = {id=0,params={0,0,0}}
 								local unitSpeed = listOfMobile[unitDefID][3]
@@ -330,6 +333,7 @@ function widget:GameFrame(n)
 									local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
 									unitToEffect[unitID]["norm"] = (distance/unitSpeed)*30
 								end
+								--MEASURE DISTANCE WITH TELEPORTER--
 								cmd_queue.id =CMD.MOVE
 								for l=1, #groupBeacon[i],1 do
 									local beaconID2 = groupBeacon[i][l]
