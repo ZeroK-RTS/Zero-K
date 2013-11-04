@@ -1,0 +1,2 @@
+hotspot center
+frame  cursorjump_0.png  5

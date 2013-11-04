@@ -1,0 +1,2 @@
+hotspot center
+frame  cursordgun_0.png  5

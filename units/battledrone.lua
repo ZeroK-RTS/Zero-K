@@ -12,7 +12,6 @@ unitDef = {
   buildPic            = [[battledrone.png]],
   buildTime           = 120,
   canAttack           = true,
-  canCloak            = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -33,7 +32,6 @@ unitDef = {
   footprintZ          = 2,
   hoverAttack         = true,
   iconType            = [[gunship]],
-  initCloaked         = true,
   mass                = 84,
   maxDamage           = 480,
   maxVelocity         = 5,
@@ -64,6 +62,7 @@ unitDef = {
 
   side                = [[ARM]],
   sightDistance       = 500,
+  stealth             = true,
   turnRate            = 792,
   upright             = true,
 

@@ -27,7 +27,7 @@ local CMD_ATTACK		= CMD.ATTACK
 -- thingsWhichAreDrones is an optimisation for AllowCommand
 local carrierDefs, thingsWhichAreDrones = include "LuaRules/Configs/drone_defs.lua"
 
-local DEFAULT_UPDATE_ORDER_FREQUENCY = 60 -- gameframes
+local DEFAULT_UPDATE_ORDER_FREQUENCY = 40 -- gameframes
 local DEFAULT_MAX_DRONE_RANGE = 1500
 
 local carrierList = {}
@@ -114,35 +114,33 @@ end
 
 local function UpdateCarrierTarget(carrierID)
 	local cQueueC = GetCommandQueue(carrierID, 1)
+	local droneSendDistance = false
+	local px,py,pz
 	if cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
 		local ox,oy,oz = GetUnitPosition(carrierID)
 		local params = cQueueC[1].params
-		local px,py,pz
 		if #params == 1 then
 			px,py,pz = GetUnitPosition(params[1])
 		else
-			px,py,pz = unpack(params)
+			px,py,pz = cQueueC[1].params[1], cQueueC[1].params[2], cQueueC[1].params[3]
 		end
 		if not px then
 			return
 		end
-		-- check range
-		local dist = GetDistance(ox,px,oz,pz)
-
-		for i=1,#carrierList[carrierID].droneSets do
-			local set = carrierList[carrierID].droneSets[i]
-			if dist < set.range then
-				for droneID in pairs(set.drones) do
-					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-					GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
-					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-					droneList[droneID] = {carrier = carrierID, set = i}
-				end
+		
+		droneSendDistance = GetDistance(ox,px,oz,pz)
+	end
+	
+	for i=1,#carrierList[carrierID].droneSets do
+		local set = carrierList[carrierID].droneSets[i]
+		if droneSendDistance and droneSendDistance < set.range then
+			for droneID in pairs(set.drones) do
+				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
+				GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,300) - 150)), (py+120), (pz + (random(0,300) - 150))} , {""})
+				--GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
+				droneList[droneID] = {carrier = carrierID, set = i}
 			end
-		end
-	else
-		for i=1,#carrierList[carrierID].droneSets do
-			local set = carrierList[carrierID].droneSets[i]
+		else
 			for droneID in pairs(set.drones) do
 				local cQueue = GetCommandQueue(droneID)
 				local engaged = false
@@ -153,14 +151,14 @@ local function UpdateCarrierTarget(carrierID)
 					end
 				end
 				if not engaged then
-					local px,py,pz = GetUnitPosition(carrierID)
+					px,py,pz = GetUnitPosition(carrierID)
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
 					GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,200) - 100)), (py+120), (pz + (random(0,200) - 100))} , {""})
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 					droneList[droneID] = {carrier = carrierID, set = i}
 				end
 			end
-		end
+		end	
 	end
 end
 
