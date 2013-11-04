@@ -18,7 +18,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The slow all-terrain Funnelweb is only (relatively) modestly armed and can only fire forwards, but features a powerful area shield and drone complement in addition to its unique gravity toss ability.]],
+    helptext       = [[The slow all-terrain Funnelweb is only (relatively) modestly armed and can only fire forwards, but features an area shield and powerful drone complement.]],
   },
 
   energyUse                     = 1.5,
