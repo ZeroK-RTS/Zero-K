@@ -30,6 +30,7 @@ local turnCmdDesc = {
 	action = "turn",
 	tooltip = "Turn to face a given point",
 	cursor = "Patrol",
+	hidden = true
 }
 
 -- Variables
