@@ -1,5 +1,5 @@
 -- $Id$
-local versionNumber = "1.0"
+local versionNumber = "1.01"
 
 function widget:GetInfo()
 	return {
@@ -185,7 +185,7 @@ function ScanFeatures()
 
 		--printDebug( "FID: " .. fDefId .. " Name: " .. fName .. " Team: " .. fTeamID .. " Res: " .. resName )
 
-		if ( resName == "" and fTeamID ~= gaiaTeamID and myAllyID ~= fAllyID and ghostFeatures[fID] == nil ) then
+		if ( resName ~= "" and fTeamID ~= gaiaTeamID and myAllyID ~= fAllyID and ghostFeatures[fID] == nil ) then
 			--printDebug( FeatureDefs[fDefId] )
 			local x, y, z = spGetFeaturePosition(fID)
 			--printDebug("Feature added: " .. fName .. " ID: " .. fID .. " Pos: " .. x .. ":" .. y .. ":" .. z .. " Ally: " .. fAllyID .. " Team: " .. fTeamID  )
