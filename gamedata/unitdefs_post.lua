@@ -686,5 +686,6 @@ for name, ud in pairs(UnitDefs) do
     if ud.modelcenteroffset then
 		ud.customparams.aimposoffset = ud.modelcenteroffset
 		ud.customparams.midposoffset = ud.modelcenteroffset
+		ud.modelcenteroffset = "0 0 0"
     end   
 end

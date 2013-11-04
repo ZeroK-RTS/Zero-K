@@ -15,10 +15,9 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 -1 0]],
-  collisionVolumeScales  = [[32 50 52]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 5 0]],
+  collisionVolumeScales  = [[26 30 36]],
+  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -29,6 +28,7 @@ unitDef = {
     helptext_bp    = [[Slasher é um escaramuçador. Mantenha-o a distância máxima do inimigo para perturbar suas unidades ou comandante. Pode atirar tanto contra inimigos aéreos como terrestres, sendo úteis quando o inimigo está usando ambos, e seus mísseis s?o tele-guiados possibilitando acertar alvos pequenos e rápidos como bombas rastejantes. N?o pode atirar sobre muros de terra e luta mal de perto.]],
     helptext_fr    = [[Le Slasher est un camion Tirailleur. Sa trcs grande portée compense un peu son manque de puissance de feu. Capable de tirer en l'air ou au sol, il saura quand meme trouver sa place dans votre armée.]],
 	helptext_de    = [[Halte deinen Slasher immer auf maximaler Distanz zum Feind, um diesen am besten zu belagern. Seine Raketen sind gelenkt und somit ideal, um sich schnell bewegende Einheiten oder Crawling Bomben zu vernichten. Er kann sowohl Land-, als auch Lufteinheiten treffen, aber nicht über Wände und Hügel schießen. Außerdem versagt er kläglich, sobald sich Feinde dicht am ihm befinden. Im Gegensatz zu dem meisten normalen Skirmishern, kann der Slasher nicht Feuern, wenn er sich bewegt.]],
+	modelradius    = [[13]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

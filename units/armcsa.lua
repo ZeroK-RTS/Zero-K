@@ -51,6 +51,10 @@ unitDef = {
   cloakCostMoving     = 5,
   collide             = true,
   corpse              = [[DEAD]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[20 20 20]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]], 
   cruiseAlt           = 80,
 
   customParams        = {

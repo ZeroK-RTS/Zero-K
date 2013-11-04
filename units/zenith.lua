@@ -16,6 +16,10 @@ unitDef = {
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[SINK]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[90 194 90]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
   
   customParams                  = {
@@ -23,6 +27,7 @@ unitDef = {
     keeptooltip = [[any string I want]],
     --neededlink  = 150,
     --pylonrange  = 150,
+	modelradius    = [[45]],
   },  
   
   energyUse                     = 0,

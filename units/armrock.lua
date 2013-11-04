@@ -14,7 +14,7 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[26 39 26]],
   collisionVolumeType    = [[CylY]],
   corpse                 = [[DEAD]],
@@ -33,6 +33,7 @@ unitDef = {
     helptext_fr    = [[La faible puissance de feux et la lenteur des roquettes non guid?s du Rocko son conpens?es par sa port?e de tire. Ils sont le plus ?fficace en formation de ligne, en tirant ? port?e maximale. Contrez le en attaquant avec des unit?s rapide ou bien placer vos d?fenses derriere un mure t?rraform?.]],
     helptext_it    = [[Il basso danno e la bassa velocita dei razzi non guidati del Rocko riscattati dal suo raggio. Sono al meglio in una linea, attaccando dal suo raggio massimo. Si contrastano attaccandoli con unita veloci, o mettendo le tue difese dietro di un muro di terraform.]],
 	helptext_de    = [[Rockos geringer Schaden und die geringe Geschwindigkeit der Raketen wird durch seine Reichweite aufgehoben. Sie sind an Fronten sehr effektiv, da sie dort mit maximaler Reichweite agieren können. Kontere sie, indem du schnelle Einheiten schickst oder Verteidigung hinter einer Terraformmauer baust.]],
+	modelradius    = [[13]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

@@ -14,11 +14,11 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
+  collisionVolumeOffsets = [[0 -2 0]],
+  collisionVolumeScales  = [[28 36 28]],
+  collisionVolumeType    = [[cylY]],
   cloakCost              = 0.2,
   cloakCostMoving        = 1,
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[36 46 36]],
-  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -31,6 +31,7 @@ unitDef = {
     description_pl = [[Bot Naje?d?ca]],
     helptext       = [[The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy.]],
 	helptext_de    = [[Der Scythe ist nicht sehr zäh im Standkampf, aber seine Tarnfähigkeit ermöglicht es ihm hinter die feindliche Verteidigung zu gelangen und so die gegnerische Ökonomie zu beeinträchtigen.]],
+	modelradius    = [[14]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],

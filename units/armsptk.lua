@@ -14,9 +14,6 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[40 30 40]],
-  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -33,6 +30,7 @@ unitDef = {
     helptext_fr    = [[Une unité lance-missiles tout-terrain. Grimpe le long des parois et les reliefs impraticables pour surprendre vos ennemis. Les salves de roquettes non-guidées ne peuvent atteindre une cible très mobile que par chance mais elles ont une portée importante. Peut être aisément éliminée si utilisée sans soutien.]],
     helptext_it    = [[Un unita all-terrain lancia-razzi. Arrampicati sui muri con questo camminatore ragno e sorprendi al nemico. I razzi non-guidati no riescono a colpire unita che si muovon rapidamente, pero hanno un raggio piuttosto lungo]],
 	helptext_de    = [[Eine raketenschieÃŸende Einheit, die jedes Terrain betreten kann. Klettere mit der Spinne an WÃ¤nden hoch und Ã¼berrasche deine Gegner mit Angriffen aus unmÃ¶glichen Lagen. Die Raketen ohne ZielfÃ¼hrung treffen aber selten schnelle Ziele, trotzdem darf man ihre groÃŸe Reichweite nicht vernachlÃ¤ssigen.]],
+	midposoffset   = [[0 -5 0]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

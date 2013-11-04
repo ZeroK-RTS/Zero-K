@@ -16,7 +16,7 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[35 15 35]],
+  collisionVolumeScales  = [[28 12 28]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
@@ -29,6 +29,7 @@ unitDef = {
     helptext_bp    = [[Panther é um agressor de alta tecnologia. sua arma de raios cause principalmente dano PEM, permitindo ao Panther paralizar as defesas inimigas e ent?o passar direto por elas para destruir a infra-estrutura inimiga.]],
     helptext_fr    = [[Le Panther est un pilleur high-tech. Son canon principal sert ? paralyser l'ennemi, lui permettant de traverser les d?fenses afin de s'attaquer au coeur ?conomique d'une base]],
 	helptext_de    = [[Der Panther ist ein hoch entwickelter Raider, dessen Hauptwaffe, eine Blitzkanone, hauptsächlich paralysierenden Schaden austeilt. Auf diesem Wege kann der Panther Türme ausschalten und sich so durch die feindlichen Verteidigungslinien walzen, bis zur Egalisierung der feindlichen, ökonimischen Grundversorgung.]],
+	modelradius    = [[10]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

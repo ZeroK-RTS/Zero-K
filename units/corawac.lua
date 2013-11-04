@@ -19,9 +19,9 @@ unitDef = {
   category            = [[UNARMED FIXEDWING]],
   collide             = false,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[60 20 70]],
+  collisionVolumeScales  = [[35 12 60]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
   cruiseAlt           = 250,
 

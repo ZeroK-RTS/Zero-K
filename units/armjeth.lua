@@ -16,9 +16,9 @@ unitDef = {
   category               = [[LAND]],
   cloakCost              = 0.1,
   cloakCostMoving        = 0.5,
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[35 40 35]],
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 1 0]],
+  collisionVolumeScales  = [[22 28 22]],
+  collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -38,6 +38,7 @@ unitDef = {
     helptext_fr    = [[Se situant entre le Defender et le Packo pour la d?fense a?rienne, en ayant la faiblaisse d'aucun des deux et pouvant offrire un d?fense d?cissive pour les forces mobile, le Jethro done un avantage d?finis pour les robots. Il est sans d?fense contre les unit?s terriennes.]],
     helptext_it    = [[Un passo tra un defender ed un pack0, senza le sue debolezze, e con l'abilitá di proteggere bene una forza mobile, il Jethro offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
     helptext_pl    = [[Szybki i dość wytrzymały jak na swoją cenę, Jethro jest w stanie zapewnić obronę przeciwlotniczą. Jest bezbronny przeciw wojskom lądowym, ale posiada opcję maskowania.]],
+	modelradius    = [[11]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

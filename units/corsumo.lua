@@ -15,7 +15,7 @@ unitDef = {
   canPatrol           = true,
   category            = [[LAND]],
   collisionVolumeOffsets  = [[0 0 0]],
-  collisionVolumeScales   = [[70 70 70]],
+  collisionVolumeScales   = [[64 64 64]],
   collisionVolumeTest	  = 1,
   collisionVolumeType	  = [[ellipsoid]],
   corpse              = [[DEAD]],
@@ -31,7 +31,7 @@ unitDef = {
 	--helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert er entsprechend an Feuerkraft. Er eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
 	aimposoffset   = [[0 6 0]],
 	midposoffset   = [[0 6 0]],
-	modelradius    = [[35]],
+	modelradius    = [[32]],
   },
 
   explodeAs           = [[BIG_UNIT]],

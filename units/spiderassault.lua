@@ -14,8 +14,8 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[28 30 28]],
+  collisionVolumeOffsets = [[0 -3 0]],
+  collisionVolumeScales  = [[24 30 24]],
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -31,6 +31,7 @@ unitDef = {
     helptext_fr    = [[Le Thug est extraordinairement résistant pour sa taille. Si son canon à plasma n'a pas la précision requise pour abattre les cibles rapides il reste néanmoins un bouclier parfait pour des unités moins solides telles que les Recluses.]],
     helptext_it    = [[Il Thud é incredibilmente resistente, ed e utile come scudo per i Recluse che fanno piú danno]],
 	helptext_de    = [[Der Hermit kann unglaublich viel Prügel einstecken und ist als Schutzschild für schwächere, oder zu schonende Einheiten, hervorragend geeignet.]],
+	modelradius    = [[12]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

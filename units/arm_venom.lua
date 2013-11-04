@@ -15,8 +15,9 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[40 30 40]],
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeScales  = [[38 38 38]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -33,6 +34,9 @@ unitDef = {
     helptext_fr    = [[Le Venom est une araignée tout terrain rapide spécialement conçue pour paralyser l'ennemi afin que d'autres unités puissent les détruire rapidement et sans risques. Sa faible portée est compensée par son effet de zone pouvant affecter plusieurs unités à proximité de sa cible. Est particulièrement efficace en tandem avec le Recluse ou l'Hermit.]],
     helptext_it    = [[Il Venom é un'unita all-terrain fatta per paralizzare i nemici cosi che altre unita le possano distruggere facilmente. Ha un AdE ed é utile come unita da rissa, per tenere lontano sciame di nemici. Funziona bene con i recluse per non peremttere ai nemici di avvicinarsi troppo al fragili scaramuzzatore.]],
 	helptext_de    = [[Venom ist eine geländeunabhängige Einheit, welche Gegner paralysieren kann, damit andere Einheiten diese einfach zerstören können. Venom besitzt eine AoE und ist nützlich, um gengerische Schwärme in Schach zu halten.]],
+	aimposoffset   = [[0 0 0]],
+	midposoffset   = [[0 -6 0]],
+	modelradius    = [[19]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

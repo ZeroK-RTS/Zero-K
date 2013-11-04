@@ -133,11 +133,11 @@ local function DetatchFromGround(unitID)
 	local h = spGetGroundHeight(x,z)
 	--GG.UnitEcho(unitID,h-y)
 	if h >= y - 0.01 or y >= h - 0.01 then
-		spAddUnitImpulse(unitID, 0,1000,0)
+		--spAddUnitImpulse(unitID, 0,1000,0)
 		Spring.MoveCtrl.Enable(unitID)
 		Spring.MoveCtrl.SetPosition(unitID, x, y+0.1, z)
 		Spring.MoveCtrl.Disable(unitID)
-		spAddUnitImpulse(unitID, 0,-1000,0)
+		--spAddUnitImpulse(unitID, 0,-1000,0)
 	end
 end
 

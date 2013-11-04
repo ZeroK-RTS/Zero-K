@@ -15,14 +15,15 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[32 40 52]],
+  collisionVolumeOffsets = [[0 3 0]],
+  collisionVolumeScales  = [[18 30 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     helptext       = [[The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships.]],
+	modelradius    = [[9]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

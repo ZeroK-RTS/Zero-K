@@ -24,9 +24,9 @@ unitDef = {
   category               = [[LAND UNARMED]],
   cloakCost              = 0.1,
   cloakCostMoving        = 0.5,
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[34 51 34]],
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 4 0]],
+  collisionVolumeScales  = [[28 40 28]],
+  collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -43,6 +43,7 @@ unitDef = {
     helptext_fr    = [[]],
     helptext_de    = [[Der Rector besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können.]],
     helptext_pl    = [[Rector może się maskować i ma zakłócacz radaru bardzo krótkiego zasięgu, co pozwala mu pracować w ukryciu.]],
+	modelradius    = [[14]],
   },
 
   energyMake             = 0.15,

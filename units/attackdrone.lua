@@ -19,12 +19,6 @@ unitDef = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
-  
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[28 12 26]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],    
-  
   cruiseAlt           = 100,
   explodeAs           = [[TINY_BUILDINGEX]],
   floater             = true,

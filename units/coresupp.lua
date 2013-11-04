@@ -18,9 +18,9 @@ unitDef = {
   canstop                = [[1]],
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 4 -2]],
-  collisionVolumeScales  = [[35 45 110]],
+  collisionVolumeScales  = [[30 30 90]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -29,6 +29,7 @@ unitDef = {
     helptext       = [[The Typhoon is a brawler, combining high speed, decent armor, and strong firepower at a low cost--for a ship. Use corvette packs against anything on the surface, but watch out for submarines.]],
     helptext_fr    = [[La corvette est ? la fois bon-march? et rapide. Son blindage moyen et sa forte puissance de feu laser en font un bon compromis, mais est vuln?rable aux attaques sousmarines. ]],
 	helptext_de    = [[Der Typhoon ist ein Schiff, welches Geschwindigkeite, Panzerung und Feuerkraft verhältnismäßig günstig verbindet - zumindest für ein Schiff. Nutze Korvetten gegen alles auf der Oberfläche, achte aber auf feindliche U-Boote.]],
+    modelradius    = [[15]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

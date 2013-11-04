@@ -22,8 +22,9 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND UNARMED]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[40 30 40]],
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeScales  = [[30 30 30]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -42,6 +43,7 @@ unitDef = {
     helptext_fr    = [[Le weaver est un robot de construction arachnide tout terrain pouvant atteindre des zones élevées.]],
     helptext_it    = [[Il Weaver é un costruttore che puo arrampicarsi su qualunque ostacolo e costruire difese nel terreno alto]],
     helptext_pl    = [[Weaver jest konstruktorem mogacym wspinac sie po kazdej powierzchni.]],
+	modelradius    = [[15]],
   },
 
   energyMake             = 0.15,
