@@ -31,7 +31,6 @@ for i=1,#UnitDefs do
   if (udef.customParams.altskin and VFS.FileExists(udef.customParams.altskin)) then
     local tex2 = "%%"..i..":1"
     unitMaterials[udef.name] = {"altSkinS3o", ALTSKIN = udef.customParams.altskin, ALTSKIN2 = udef.customParams.altskin2 or tex2}
-    Spring.Echo(udef.name, unitMaterials[udef.name].ALTSKIN, unitMaterials[udef.name].ALTSKIN2)
   end --if
 end --for
 
