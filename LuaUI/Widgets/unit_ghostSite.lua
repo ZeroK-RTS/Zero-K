@@ -1,5 +1,5 @@
 -- $Id$
-local versionNumber = "1.0"
+local versionNumber = "1.02"
 
 function widget:GetInfo()
 	return {
