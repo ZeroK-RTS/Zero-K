@@ -384,6 +384,7 @@ upgrades = {
 		name = "Long-Burn Napalm",
 		description = "Flamethrower/Napalm Warhead: +25% on-fire time",
 		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if v.customparams.burntime then
 						v.customparams.burntime = v.customparams.burntime * 1.25
@@ -393,7 +394,8 @@ upgrades = {
 						v.explosiongenerator = "custom:napalm_firewalker_long"
 					end
 				end
-			end
+			end,
+		order = 3.1,
 	},
 	weaponmod_plasma_containment = {
 		name = "Plasma Containment Field",
