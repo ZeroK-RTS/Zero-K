@@ -1,4 +1,4 @@
-local versionNum = '0.303'
+local versionNum = '0.304'
 
 function widget:GetInfo()
 	return {
@@ -302,7 +302,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer
 	if victim[unitID] then --is current victim of any Newton group?
 		for g=1, groups.count do
 			if groupTarget[g] == unitID then
-				victimStillBeingAttacked[g] = unitID --signal as being attacked
+				victimStillBeingAttacked[g] = unitID --signal a "wait, this group is attacking this unit!"
 			end
 		end
 		local frame = currentFrame
@@ -350,13 +350,14 @@ function widget:GameFrame(n)
 					local shortestDistance = 9999999
 					for i = 1, #units do
 						local unitID = units[i]
-						if UnitDefs[spGetUnitDefID(unitID)].speed > 0 then
+						local targetDefID = spGetUnitDefID(unitID)
+						if (not targetDefID) or UnitDefs[targetDefID].speed > 0 then
 							stop = false
-							if victimStillBeingAttacked[g] == unitID then --signal from UnitDamaged() that a unit is still being pushed
-								victimStillBeingAttacked[g] = nil--clear signal
+							if victimStillBeingAttacked[g] == unitID then --wait signal from UnitDamaged() that a unit is still being pushed
+								victimStillBeingAttacked[g] = nil--clear wait signal
 								unitToAttack = nil
-								break --wait for next frame until UnitDamaged() stop signalling. 
-								--NOTE: there is periodic pause around ~16 frame in UnitDamaged(), this allowed the signal to be empty and prompted Newton-groups to retarget.
+								break --wait for next frame until UnitDamaged() stop signalling wait. 
+								--NOTE: there is periodic pause around ~16 frame in UnitDamaged(), this also allowed the wait signal to be empty and prompted Newton-groups to retarget.
 							end
 							--if (#cmdQueue>0) then
 							--ech("attack " .. CMD.ATTACK)
@@ -382,8 +383,8 @@ function widget:GameFrame(n)
 					end
 					if unitToAttack and (groupTarget[g]~=unitToAttack) then --there are target, and target is different than previous target (prevent command spam)? 
 						spGiveOrderToUnitArray(newtons, CMD.ATTACK, {unitToAttack}, {} ) --shoot unit
-						groupTarget[g] = unitToAttack --have target!
-						victimStillBeingAttacked[g] = nil --clear signal
+						groupTarget[g] = unitToAttack --flag this group as having a target!
+						victimStillBeingAttacked[g] = nil --clear wait signal
 						victim[unitToAttack] = n + 90 --add UnitDamaged() whitelist, and expire after 3 second later
 					end
 					if stop and groupTarget[g] then --no unit in the box, and have target?
@@ -394,7 +395,7 @@ function widget:GameFrame(n)
 							--ech("stop")
 						end
 						groupTarget[g] = nil --no target
-						victimStillBeingAttacked[g] = nil --clear signal
+						victimStillBeingAttacked[g] = nil --clear wait signal
 					end
 				end
 			end
