@@ -1,5 +1,5 @@
 -- $Id$
-local versionNumber = "1.01"
+local versionNumber = "1.0"
 
 function widget:GetInfo()
 	return {
@@ -22,7 +22,7 @@ local lastTime
 local ghostSites = {}
 local ghostFeatures = {}
 
-local gaiaTeamID = Spring.GetGaiaTeamID()
+local gaiaTeamID = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and -1 or Spring.GetGaiaTeamID()
 
 local floor                 = math.floor
 local udefTab				= UnitDefs
@@ -185,7 +185,7 @@ function ScanFeatures()
 
 		--printDebug( "FID: " .. fDefId .. " Name: " .. fName .. " Team: " .. fTeamID .. " Res: " .. resName )
 
-		if ( resName ~= "" and fTeamID ~= gaiaTeamID and myAllyID ~= fAllyID and ghostFeatures[fID] == nil ) then
+		if ( fTeamID ~= gaiaTeamID and resName == "" and fAllyID ~= nil and fAllyID >= 0 and myAllyID ~= fAllyID and ghostFeatures[fID] == nil ) then
 			--printDebug( FeatureDefs[fDefId] )
 			local x, y, z = spGetFeaturePosition(fID)
 			--printDebug("Feature added: " .. fName .. " ID: " .. fID .. " Pos: " .. x .. ":" .. y .. ":" .. z .. " Ally: " .. fAllyID .. " Team: " .. fTeamID  )
