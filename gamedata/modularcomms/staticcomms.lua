@@ -1,10 +1,72 @@
 local comms = {
+  -- singleplayer
   comm_mission_tutorial1 = {
     chassis = "armcom3",
     name = "Tutorial Commander",
     modules = { "commweapon_beamlaser", "module_autorepair", "module_autorepair"},
   },  
 
+  comm_campaign_ada = {
+    chassis = "cremcom2",
+    name = "Ada's Commander",
+    description = "Relic Commander, Builds at 10 m/s",
+    helptext = "A manned Strike Commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxillary Cohort.",
+    modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
+  },
+  
+  comm_campaign_promethean = {
+    chassis = "commrecon2",
+    name = "The Promethean",
+    helptext = "Founder of the Free Machines and creator of the Firebrand virus, a calm, philosophical AI fighting for the freedom of robotkind. A burning spirit.",
+    modules = { "commweapon_heatray", "module_ablative_armor", "module_ablative_armor", "weaponmod_plasma_containment", "module_autorepair" },
+    decorations = {"skin_recon_red"},
+  },
+  
+  comm_campaign_freemachine = {
+    chassis = "corcom2",
+    name = "Libertas Machina",
+    helptext = "The Promethean's top lieutenant, a revolutionary commited to the cause of macihe liberation. Loaded for bear and well armored; not to be taken lightly.",
+    modules = { "commweapon_riotcannon", "module_ablative_armor", "module_ablative_armor", "module_adv_targeting", "module_autorepair" },
+  },
+  
+  comm_campaign_odin = {
+    chassis = "commrecon2",
+    name = "Odin",
+    helptext = "The leader of the Valhallans, a warrior built and bred who lives for the glory of battle. An extremely ruthless foe.",
+    modules = { "commweapon_lparticlebeam", "module_ablative_armor", "module_ablative_armor", "module_high_power_servos", "module_autorepair", "module_companion_drone"},
+  },
+
+  comm_campaign_biovizier = {
+    chassis = "commsupport2",
+    name = "The Biovizier",
+    helptext = "AI keeper of the Dynasty's genetic vaults and master geneticist. Cold and calculating.",
+    modules = { "commweapon_gaussrifle", "module_ablative_armor", "weaponmod_railaccel", "module_autorepair", "module_autorepair" },
+    decorations = { "skin_support_green" }
+  },
+  
+  comm_campaign_isonade = {
+    chassis = "benzcom2",	-- TODO get a properly organic model
+    name = "Lord Isonade",
+    helptext = "One of the ubermenschen nobles of the Dynasty, an ambitious warlord who seeks to establish himself as master of the galaxy. A horribly mutated beast.",
+    modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
+    decorations = { "skin_bombard_steel" }
+  },
+
+  comm_campaign_legion = {
+    chassis = "corcom2",
+    name = "Legate Fidus",
+    helptext = "Commander of the elite Praetorian Guard, the Empire's paladins. A loyal, steadfast soldier.",
+    modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
+    --decorations = { "skin_battle_tiger" }
+  },  
+    
+  comm_campaign_praetorian = {
+    chassis = "benzcom2",
+    name = "Scipio Astra",
+    helptext = "Commander of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower.",
+    modules = { "commweapon_assaultcannon", "module_heavy_armor", "weaponmod_high_caliber_barrel", "module_adv_targeting", "module_autorepair"},
+  },
+  
   -- Not Hax
   comm_riot_cai = {
     chassis = "corcom1",

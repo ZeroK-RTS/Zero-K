@@ -83,6 +83,10 @@ upgrades = {
 		name = "Slowing Beam",
 		description = "Slows an enemy's movement and firing rate; non-lethal",
 	},
+	commweapon_sonicgun = {
+		name = "Sonic Blaster",
+		description = "Short-range weapon that works when dry or wet",
+	},	
 	commweapon_torpedo = {
 		name = "Torpedo",
 		description = "Fires a torpedo effective against waterborne targets",
