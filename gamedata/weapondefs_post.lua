@@ -161,6 +161,23 @@ end
     weaponDef.noselfdamage = (weaponDef.noselfdamage ~= false)
  end
  
+ --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Workaround for http://springrts.com/mantis/view.php?id=4104
+--
+
+ for _, weaponDef in pairs(WeaponDefs) do
+    if weaponDef.texture1 == "largelaserdark" then
+		weaponDef.texture1 = "largelaserdark_long" 
+		weaponDef.tilelength = (weaponDef.tilelength and weaponDef.tilelength*4) or 800
+	end
+	if weaponDef.texture1 == "largelaser" then
+		weaponDef.texture1 = "largelaser_long" 
+		weaponDef.tilelength = (weaponDef.tilelength and weaponDef.tilelength*4) or 800
+	end
+ end
+ 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
