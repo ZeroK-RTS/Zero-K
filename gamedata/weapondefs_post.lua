@@ -11,6 +11,11 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --
 --  Per-unitDef weaponDefs
 --
@@ -92,9 +97,11 @@ end
 --
 -- 91.0 compatibility
 
- for _, weaponDef in pairs(WeaponDefs) do
-	if (weaponDef.weapontype == "Shield") then
-		weaponDef.isshield = true
+if reverseCompat then
+	for _, weaponDef in pairs(WeaponDefs) do
+		if (weaponDef.weapontype == "Shield") then
+			weaponDef.isshield = true
+		end
 	end
 end
 

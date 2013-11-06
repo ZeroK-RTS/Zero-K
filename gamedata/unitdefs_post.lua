@@ -7,7 +7,7 @@ if (Spring.GetModOptions) then
   modOptions = Spring.GetModOptions()
 end
 
-local reverseCompat = (Game and true) or false -- Game is nil in 91.0
+local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -292,7 +292,7 @@ end
 -- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
 -- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
 
-if reverseCompat then
+if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if (ud.canfly) then
 			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 0.1
@@ -315,7 +315,7 @@ for name, ud in pairs(UnitDefs) do
 		local class = ud.movementclass
 		
 		-- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
-		if ud.acceleration == ud.brakerate and reverseCompat then
+		if ud.acceleration == ud.brakerate and not reverseCompat then
 			ud.brakerate = ud.brakerate * 3
 		end
 		

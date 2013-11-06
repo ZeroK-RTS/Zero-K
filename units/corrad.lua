@@ -31,6 +31,7 @@ unitDef = {
     helptext_bp    = [[]],
     helptext_fr    = [[]],
     helptext_de    = [[Dieser Radarturm ermöglicht die frühzeitige Lokalisierung von feindlichen Einheiten in der entsprechenden Reichweite. Für den Betrieb wird eine sehr kleine Menge Energie benötigt. Die Radarbedeckung wird durch Gelände - beispielsweise Berge - blockiert.]],
+    modelradius    = [[16]],
   },    
   
   energyUse                     = 0.8,

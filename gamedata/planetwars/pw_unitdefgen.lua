@@ -69,7 +69,6 @@ for _, info in pairs(unitData) do
 	if type(info) == "table" and info.isDestroyed ~= 1 then 
 		structureDefs[info.unitname] = CopyTable(genericStructure, true)
 		structureDefs[info.unitname].customparams = structureDefs[info.unitname].customparams or {}
-		Spring.Echo(info.unitname)
 		if structureConfig[info.unitname] then
 			structureConfig[info.unitname](structureDefs[info.unitname])
 			structureDefs[info.unitname].unitname = info.unitname
