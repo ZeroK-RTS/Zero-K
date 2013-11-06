@@ -548,7 +548,7 @@ local function FinishMorph(unitID, morphData)
     end
     Spring.SetUnitPosition(newUnit, x, y, z)
   else
-    newUnit = Spring.CreateUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, true)
+    newUnit = Spring.CreateUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, isBeingBuilt)
     if not newUnit then
        StopMorph(unitID, morphData)
        return
@@ -599,15 +599,18 @@ local function FinishMorph(unitID, morphData)
   Spring.SetUnitBlocking(newUnit, true)  
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
   
-  --//copy lineage
+  --//transfer lineage
   --Spring.SetUnitLineage(newUnit,lineage,true)
-  --//copy unit speed
-  Spring.AddUnitImpulse(newUnit,0,1,0) --dummy impulse (applying impulse>1 stop engine from forcing any unit to stick on map surface)
-  Spring.AddUnitImpulse(newUnit,0,-1,0) --negate dummy impulse
+  --//transfer unit speed
+  local gy = Spring.GetGroundHeight(px, pz)
+  if py>gy+1 then --unit is off-ground
+    Spring.AddUnitImpulse(newUnit,0,1,0) --dummy impulse (applying impulse>1 stop engine from forcing new unit to stick on map surface, unstick!)
+    Spring.AddUnitImpulse(newUnit,0,-1,0) --negate dummy impulse
+  end
   Spring.AddUnitImpulse(newUnit,velX,velY,velZ) --restore speed
-  --// copy facplop
+  --// transfer facplop
   if facplop then GG.GiveFacplop(newUnit) end  
-  --// copy health
+  --// transfer health
   -- old health is declared far above
   local _,newMaxHealth         = Spring.GetUnitHealth(newUnit)
   local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
@@ -624,7 +627,7 @@ local function FinishMorph(unitID, morphData)
 	end
   end
   Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})  
-  --//copy experience
+  --//transfer experience
   local nextMorph = morphDefs[morphData.def.into]
   if nextMorph~= nil and nextMorph.into ~= nil then nextMorph = {morphDefs[morphData.def.into]} end
   if (nextMorph) then --//determine the lowest xp req. of all next possible morphs
@@ -642,11 +645,11 @@ local function FinishMorph(unitID, morphData)
     newXp = math.min( newXp, maxXp*0.9)
   end
   Spring.SetUnitExperience(newUnit, newXp)
-  --// copy shield power
+  --// transfer shield power
   if oldShieldState and Spring.GetUnitShieldState(newUnit) then
     Spring.SetUnitShieldState(newUnit, enabled,oldShieldState)
   end
-  --//copy some state
+  --//transfer some state
   Spring.GiveOrderArrayToUnitArray({ newUnit }, {
     { CMD.FIRE_STATE, { states.firestate },             { } },
     { CMD.MOVE_STATE, { states.movestate },             { } },
@@ -657,7 +660,7 @@ local function FinishMorph(unitID, morphData)
   })
   --//reassign assist commands to new unit
   ReAssignAssists(newUnit,unitID)
-  --//copy command queue
+  --//transfer command queue
   for i = 1, #cmds do
     local cmd = cmds[i]
 	if i == 1 and cmd.id < 0 then -- repair case for construction
