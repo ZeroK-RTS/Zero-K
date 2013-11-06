@@ -160,6 +160,10 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 
 include("LuaRules/colors.h.lua")
+local spGetUnitPosition = Spring.GetUnitPosition
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local stopPenalty  = 0.667
 local morphPenalty = 1.0
@@ -504,7 +508,7 @@ local function FinishMorph(unitID, morphData)
   local ud = UnitDefs[unitID]
   local defName = udDst.name
   local unitTeam = morphData.teamID
-  local px, py, pz = Spring.GetUnitBasePosition(unitID)
+  local px, py, pz = spGetUnitPosition(unitID)
   local h = Spring.GetUnitHeading(unitID)
   Spring.SetUnitBlocking(unitID, false)
   morphUnits[unitID] = nil
@@ -544,7 +548,7 @@ local function FinishMorph(unitID, morphData)
     end
     Spring.SetUnitPosition(newUnit, x, y, z)
   else
-    newUnit = Spring.CreateUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, isBeingBuilt)
+    newUnit = Spring.CreateUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, true)
     if not newUnit then
        StopMorph(unitID, morphData)
        return
@@ -1171,9 +1175,10 @@ local CallAsTeam = CallAsTeam
 local spairs = spairs
 local snext = snext
 
+local spGetUnitPosition = Spring.GetUnitPosition
+
 local GetUnitTeam         = Spring.GetUnitTeam
 local GetUnitHeading      = Spring.GetUnitHeading
-local GetUnitBasePosition = Spring.GetUnitBasePosition
 local GetGameFrame        = Spring.GetGameFrame
 local GetSpectatingState  = Spring.GetSpectatingState
 local AddWorldIcon        = Spring.AddWorldIcon
@@ -1372,7 +1377,7 @@ local function DrawMorphUnit(unitID, morphData, localTeamID)
   if (h==nil) then
     return  --// bonus, heading is only available when the unit is in LOS
   end
-  local px,py,pz = GetUnitBasePosition(unitID)
+  local px,py,pz = spGetUnitPosition(unitID)
   if (px==nil) then
     return
   end
