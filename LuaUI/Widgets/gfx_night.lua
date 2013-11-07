@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.9"
+local versionNumber = "v1.5.10"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -55,6 +55,7 @@ local secondsPerDay        = 600                 --seconds per day
 
 local maxBeamDivergent = 2 					--how big the light beam can expand if unit get further away from ground
 
+local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1')) -- for UnitDef Tag
 --------------------------------------------------------------------------------
 --other vars
 --------------------------------------------------------------------------------
@@ -197,8 +198,8 @@ local RADIANS_PER_COBANGLE = math.pi / 32768
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 UpdateColors = function()
-  local currHour = math.floor(currDayTime * hoursPerDay) + 1 -- ((0 to 1) * 14) + 1
-  local currHourPart = currDayTime * hoursPerDay - currHour + 1
+  local currHour = math.floor(currDayTime * hoursPerDay) + 1 -- (realnumber(0..1) * 14)roundedToNearest_0 + 1 = integer[1..14]
+  local currHourPart = currDayTime * hoursPerDay - currHour + 1 -- (realnumber(0..1) * 14) - integer[1..14] + 1 = realnumber(0..1)
   local startColor = nightColorMap[currHour]
   local endColor
   if (currHour == hoursPerDay) then 
@@ -330,7 +331,8 @@ local function DrawSearchlights()
 			leadDistance = cache[defID].leadDist
 			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius
-		  elseif (unitDef.type == "Bomber" or unitDef.type == "Fighter") then
+		  elseif (reverseCompatibility and (unitDef.type == "Bomber" or unitDef.type == "Fighter") or 
+		  (unitDef.isBomberAirUnit or unitDef.isFighterAirUnit)) then --https://github.com/spring/spring/blob/develop/doc/changelog.txt
 			local vx, _, vz = GetUnitVelocity(unitID)
 			heading = math.atan2(vz, vx)
 			leadDistance = searchlightAirLeadTime * math.sqrt(vx * vx + vz * vz) * 30
@@ -396,7 +398,7 @@ local function DrawSearchlights()
 		  if not isAboveNominalHeight then
 			  if (options.bases.value == "full") then --highlight ground
 				glDepthTest(true)
-				glBeginEnd(GL_TRIANGLE_FAN, ConeVertices, baseX, baseZ, radius, ecc, heading, cx, cy, cz, groundy)
+				glBeginEnd(GL_TRIANGLE_FAN, ConeVertices, baseX, baseZ, radius, ecc, heading, cx, cy, cz)
 			  elseif (options.bases.value == "simple") then
 				glDepthTest(false)
 				glBeginEnd(GL_POLYGON, BaseVertices, baseX, baseZ, radius, ecc, heading)

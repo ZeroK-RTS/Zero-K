@@ -12,7 +12,7 @@ function widget:GetInfo()
 		name = "Auto Reclaim/Heal/Assist",
 		desc = "Makes idle unselected builders/rez/com/nanos to reclaim metal if metal bar is not full, repair nearby units and assist in building",
 		author = "Pithikos",
-		date = "Nov 21, 2010",
+		date = "Nov 21, 2010", --Nov 7, 2013
 		license = "GPLv3",
 		layer = 0,
 		enabled = false
@@ -30,7 +30,7 @@ local lastOrderGivenInSecs= 0
 local idleReclaimers={} --reclaimers because they all can reclaim
 
 myTeamID=-1;
-
+local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1')) -- for UnitDef Tag
 --------------------------------------------------------------------------------------
 
 
@@ -65,8 +65,8 @@ end
 --Add reclaimer to the register
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (myTeamID==getUnitTeam(unitID)) then					--check if unit is mine
-		local unittype = UnitDefs[unitDefID].type			--***
-		if (unittype == "Factory") then return end			--no factories ***
+		local factoryType = (reverseCompatibility and UnitDefs[unitDefID].type == "Factory") or UnitDefs[unitDefID].isFactory	--***
+		if factoryType then return end						--no factories ***
 			if (UnitDefs[unitDefID]["canReclaim"]) then		--check if unit can reclaim
 				idleReclaimers[unitID]=true					--add unit to register
 				--echo("<auto_reclaim_heal_assist>: registering unit "..unitID.." as idle")
