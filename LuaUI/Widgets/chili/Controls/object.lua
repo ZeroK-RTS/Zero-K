@@ -216,7 +216,7 @@ function Object:SetParent(obj)
 end
 
 
-function Object:AddChild(obj, dontUpdate)
+function Object:AddChild(obj, dontUpdate, index)
   local objDirect = UnlinkSafe(obj)
 
   if (self.children[objDirect]) then
@@ -240,11 +240,20 @@ function Object:AddChild(obj, dontUpdate)
   obj:SetParent(self)
 
   local children = self.children
-  local i = #children+1
-  children[i] = objDirect
-  children[hobj] = i
-  children[objDirect] = i
-  self:Invalidate()
+  if index and (index <= #children) then
+    for i,v in pairs(children) do -- remap hardlinks and objects
+      if type(v) == "number" and v >= index then
+        children[i] = v + 1
+      end
+    end
+    table.insert(children, index, objDirect)
+  else
+    local i = #children+1
+    children[i] = objDirect
+    children[hobj] = i
+    children[objDirect] = i
+  end
+    self:Invalidate()
 end
 
 

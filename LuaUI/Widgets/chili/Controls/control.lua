@@ -135,8 +135,8 @@ function Control:SetParent(obj)
   self:RequestRealign()
 end
 
-function Control:AddChild(obj, dontUpdate)
-  inherited.AddChild(self,obj)
+function Control:AddChild(obj, dontUpdate, index)
+  inherited.AddChild(self,obj, dontUpdate, index)
   if (not dontUpdate) then
     self:RequestRealign()
   end
