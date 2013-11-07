@@ -322,7 +322,7 @@ local function MakeMinimapButton(file, params)
 		height=iconsize, width=iconsize, 
 		caption="",
 		margin={0,0,0,0},
-		padding={4,3,2,2},
+		padding={2,2,2,2},
 		tooltip = (name .. desc .. hotkey ),
 		OnClick={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -414,7 +414,7 @@ MakeMinimapWindow = function()
 				height=iconsize, width=iconsize, 
 				caption="",
 				margin={0,0,0,0},
-				padding={4,3,2,2},
+				padding={2,2,2,2},
 				tooltip = "Toggle simplified teamcolours",
 				OnClick = {toggleTeamColors},
 				children={

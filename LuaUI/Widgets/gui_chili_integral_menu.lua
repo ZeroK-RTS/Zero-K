@@ -1325,11 +1325,11 @@ function widget:Initialize()
 	commands_main = Panel:New{
 		parent = fakewindow,
 		backgroundColor = {0, 0, 0, 0},
-		height = "98%";
+		height = "100%";
 		width = COMMAND_SECTION_WIDTH.."%";
-		x = "1.5%";
-		y = "1.5%";
-		padding = {0, 0, 0, 0},
+		x = "0%";
+		y = "0%";
+		padding = {4, 4, 0, 4},
 		itemMargin  = {0, 0, 0, 0},
 	}
 	for i=1,numRows do
@@ -1352,12 +1352,12 @@ function widget:Initialize()
 	states_main = Panel:New{
 		parent = fakewindow,
 		backgroundColor = {0, 0, 0, 0},
-		height = "96%";
+		height = "100%";
 		width = (STATE_SECTION_WIDTH).."%";
 		--x = tostring(100-STATE_SECTION_WIDTH).."%";
-		right = 4;
-		y = "3%";
-		padding = {0, 0, 0, 0},
+		right = 0;
+		y = "0%";
+		padding = {0, 4, 4, 4},
 		itemMargin  = {0, 0, 0, 0},
 	}
 	for i=1, numStateColumns do

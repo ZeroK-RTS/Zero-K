@@ -1465,7 +1465,7 @@ local function BuildTooltip2(ttname, ttdata, sel)
 			y = 0,
 			orientation='vertical',
 			centerItems = false,
-			width = 250,
+			width = 230,
 			padding = {0,0,0,0},
 			itemPadding = {0,0,0,0},
 			itemMargin = {0,0,0,0},
