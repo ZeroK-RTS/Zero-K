@@ -55,15 +55,10 @@ options = {
 		min = 0, max = 100, step = 1,
 		value = 20,
 	},
-	
-	
-	
 }
-
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 local cx,cy = vsx * 0.5,vsy * 0.5
-
 
 function OnChangeFunc(self)
 	if not Spring.IsCheatingEnabled() then 
@@ -120,13 +115,13 @@ local function SetupOptions()
 	end
 end
 
-
-SetupOptions()
-
-
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
 	cx = vsx * 0.5
 	cy = vsy * 0.5
+end
+
+function widget:Initialize()
+  SetupOptions()
 end
