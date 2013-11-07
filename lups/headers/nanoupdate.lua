@@ -13,6 +13,16 @@
 ---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------
 
+local function GetUnitMidPos(unitID)
+    local _,_,_, x, y, z = Spring.GetUnitPosition(unitID, true)
+    return x, y, z
+end
+
+local function GetFeatureMidPos(featureID)
+    local _,_,_, x, y, z = Spring.GetFeaturePosition(featureID, true)
+    return x, y, z
+end
+
 local function GetCmdTag(unitID) 
     local cmdTag = 0
     local cmds = Spring.GetFactoryCommands(unitID,1)
@@ -58,7 +68,7 @@ function UpdateNanoParticles(self)
     if (tid >= 0) then
       if (not self.isFeature) then
         if Spring.ValidUnitID(tid) then
-          self.targetpos = {Spring.GetUnitPosition(tid)}
+          self.targetpos = {GetUnitMidPos(tid)}
         else
           if (not self._dead) then
             --// assigned target unit died
@@ -68,7 +78,7 @@ function UpdateNanoParticles(self)
         end
       else
         if Spring.ValidFeatureID(tid) then
-          self.targetpos = {Spring.GetFeaturePosition(tid)}
+          self.targetpos = {GetFeatureMidPos(tid)}
           self.targetpos[2] = self.targetpos[2] + 25
         else
           if (not self._dead) then

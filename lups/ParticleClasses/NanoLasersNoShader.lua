@@ -108,7 +108,7 @@ end
 
 local function DrawNanoLasersNoShader(dir,dir_upright,visibility,streamThickness,core_alpha,core_thickness)
   local startF,endF = 0,1
-  if (visibility<0)
+  if (visibility==0)
     then startF=-visibility
     else endF  = visibility end
 
@@ -206,7 +206,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function NanoLasersNoShader:CreateParticle()
-  --self.life           = self.life + 1 --// so we can reuse existing fx's
+  self.life           = self.life + 1 --// so we can reuse existing fx's
   self.firstGameFrame = thisGameFrame
   self.dieGameFrame   = self.firstGameFrame + self.life
 
