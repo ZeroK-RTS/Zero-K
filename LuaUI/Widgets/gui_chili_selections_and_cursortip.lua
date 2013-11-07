@@ -59,7 +59,7 @@ include("keysym.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local reverseCompat = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and 1 or 0
+local reverseCompat = Game.version:find('91.') and 1 or 0
 
 local Chili
 local Button

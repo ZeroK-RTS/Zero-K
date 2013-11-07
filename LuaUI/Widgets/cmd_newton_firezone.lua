@@ -495,7 +495,7 @@ function EstimateCrashLocation(victimID)
 	end
 	local x,y,z = spGetUnitPosition(victimID)
 	local future_locationX, future_locationZ, future_height
-	if Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil) then
+	if Game.version:find('91.') then
 		--Simple simulation:
 		future_locationX, future_height,future_locationZ = SimulateWithoutDrag(xVel,yVel,zVel, x,y,z, gravity)
 	else

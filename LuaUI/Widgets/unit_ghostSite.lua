@@ -22,7 +22,7 @@ local lastTime
 local ghostSites = {}
 local ghostFeatures = {}
 
-local gaiaTeamID = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and -1 or Spring.GetGaiaTeamID()
+local gaiaTeamID = (Game.version:find('91.')) and -1 or Spring.GetGaiaTeamID()
 
 local floor                 = math.floor
 local udefTab				= UnitDefs

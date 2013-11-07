@@ -407,8 +407,6 @@ function widget:GameFrame(n)
 				groupLoopedUnit[i]=nil
 				groupBeaconQueue[i]=nil
 				groupBeaconFinish[i]=nil
-				--!spawn mod=Zero-K test-10559
-				--!setengine 94.1.1-645-g34c768b
 				for unitID, tblContent in pairs(unitToEffect)do
 					if tblContent["norm"] then
 						local pathToFollow
