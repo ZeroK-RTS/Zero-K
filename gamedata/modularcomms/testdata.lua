@@ -1,4 +1,5 @@
 local base = {
+	--[[
 	{
 		name = "rocket",
 		modules = {
@@ -120,6 +121,7 @@ local base = {
 			"module_companion_drone",
 		}
 	},
+	]]
 }
 
 local ret = {count = 0}
