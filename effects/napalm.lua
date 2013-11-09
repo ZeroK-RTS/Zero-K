@@ -354,6 +354,14 @@ local altforms = {
       },
     },
   },
+  napalmfireball_840 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {particlelife = 280, particlelifespread = 560},
+      },
+    },
+  },
   napalmfireball_1400 = {
     source = "napalmfireball_200",
     modifications = {
@@ -374,7 +382,7 @@ local altforms = {
     modifications = {
       redploom_long = {
 	properties = {
-	  explosiongenerator = [[custom:NAPALMFIREBALL_750]],
+	  explosiongenerator = [[custom:NAPALMFIREBALL_840]],
 	},
       },
     },

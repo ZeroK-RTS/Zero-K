@@ -382,12 +382,12 @@ upgrades = {
 	},
 	weaponmod_flame_enhancer = {
 		name = "Long-Burn Napalm",
-		description = "Flamethrower/Napalm Warhead: +25% on-fire time",
+		description = "Flamethrower/Napalm Warhead: +40% on-fire time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if v.customparams.burntime then
-						v.customparams.burntime = v.customparams.burntime * 1.25
+						v.customparams.burntime = v.customparams.burntime * 1.4
 					end
 					if v.customparams.idstring == "commweapon_hpartillery_napalm" then
 						v.customparams.areadamage_preset = "module_napalmarty_long"
