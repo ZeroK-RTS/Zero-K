@@ -10,7 +10,7 @@ local comms = {
     chassis = "cremcom2",
     name = "Ada's Commander",
     description = "Relic Commander, Builds at 10 m/s",
-    helptext = "A manned Strike Commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxillary Cohort.",
+    helptext = "A manned Strike Commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxiliary Cohort.",
     modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
   },
   
@@ -25,7 +25,7 @@ local comms = {
   comm_campaign_freemachine = {
     chassis = "corcom2",
     name = "Libertas Machina",
-    helptext = "The Promethean's top lieutenant, a revolutionary commited to the cause of macihe liberation. Loaded for bear and well armored; not to be taken lightly.",
+    helptext = "The Promethean's top lieutenant, a revolutionary commited to the cause of machine liberation. Loaded for bear and well armored; not to be taken lightly.",
     modules = { "commweapon_riotcannon", "module_ablative_armor", "module_ablative_armor", "module_adv_targeting", "module_autorepair" },
   },
   
