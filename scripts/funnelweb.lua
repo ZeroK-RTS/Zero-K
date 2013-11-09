@@ -21,9 +21,9 @@ smokePiece = {gaster}
 
 local weaponPieces = {
 	[1] = {aimFrom = aimpoint, flare = aimpoint},
-	[2] = {aimFrom = eye, flare = eye},
-	[3] = {aimFrom = eye, flare = eyeflare},
-	[4] = {aimFrom = gaster, flare = gaster},
+	[2] = {aimFrom = gaster, flare = gaster},
+	[3] = {aimFrom = eye, flare = eye},
+	[4] = {aimFrom = eye, flare = eyeflare},
 }
 
 local cannons = {
@@ -124,7 +124,7 @@ local function RestoreAfterDelayHead()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num > 2 then
+	if num == 2 then
 		return true
 	end
 	Signal( SIG_AIM[num])
