@@ -340,6 +340,7 @@ path='Settings/Graphics'
 
 	ShLabel('Shadow Settings')
 	
+	--[[ FIXME: crashes 13.9 catalyst drivers; can be re-enabled with 95.1
 	AddOption({
 		name = 'Shadow Detail (Slide left for off)',
 		type = 'number',
@@ -355,6 +356,7 @@ path='Settings/Graphics'
 			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
 		end, 
 	} )
+	]]--
 	ShButton('Toggle Terrain Shadows',
 		function()
 			local curShadow=Spring.GetConfigInt("Shadows") or 0
