@@ -76,9 +76,6 @@ VFS.Include(HANDLER_DIR .. 'system.lua',    nil, VFSMODE)
 VFS.Include(HANDLER_DIR .. 'callins.lua',   nil, VFSMODE)
 VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
-local CallInsList = CALLIN_LIST
-local CallInsMap = CALLIN_MAP
-
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
 --------------------------------------------------------------------------------
@@ -124,9 +121,139 @@ gadgetHandler = {
   actionHandler = actionHandler,	-- FIXME: not in base
 }
 
+
+-- these call-ins are set to 'nil' if not used
+-- they are setup in UpdateCallIns()
+local callInLists = {
+	"Shutdown",
+
+	"GamePreload",
+	"GameStart",
+	"GameOver",
+	"GameID",
+	"TeamDied",
+
+	"GameFrame",
+
+	"ViewResize",  -- FIXME ?
+
+	"TextCommand",  -- FIXME ?
+	"GotChatMsg",
+	"RecvLuaMsg",
+
+	-- Unit CallIns
+	"UnitCreated",
+	"UnitFinished",
+	"UnitFromFactory",
+	"UnitDestroyed",
+	"UnitExperience",
+	"UnitIdle",
+	"UnitCmdDone",
+	"UnitPreDamaged",
+	"UnitDamaged",
+	"UnitTaken",
+	"UnitGiven",
+	"UnitEnteredRadar",
+	"UnitEnteredLos",
+	"UnitLeftRadar",
+	"UnitLeftLos",
+	"UnitSeismicPing",
+	"UnitLoaded",
+	"UnitUnloaded",
+	"UnitCloaked",
+	"UnitDecloaked",
+	-- optional
+	-- "UnitUnitCollision",
+	-- "UnitFeatureCollision",
+	-- "UnitMoveFailed",
+	"StockpileChanged",
+
+	-- Feature CallIns
+	"FeatureCreated",
+	"FeatureDestroyed",
+
+	-- Projectile CallIns
+	"ProjectileCreated",
+	"ProjectileDestroyed",
+
+	-- Shield CallIns
+	"ShieldPreDamaged",
+
+	-- Misc Synced CallIns
+	"Explosion",
+
+	-- LuaRules CallIns (note: the *PreDamaged calls belong here too)
+	"CommandFallback",
+	"AllowCommand",
+	"AllowUnitCreation",
+	"AllowUnitTransfer",
+	"AllowUnitBuildStep",
+	"AllowFeatureBuildStep",
+	"AllowFeatureCreation",
+	"AllowResourceLevel",
+	"AllowResourceTransfer",
+	"AllowDirectUnitControl",
+	"MoveCtrlNotify",
+	"TerraformComplete",
+	"AllowWeaponTargetCheck",
+	"AllowWeaponTarget",
+	-- unsynced
+	"DrawUnit",
+	"DrawFeature",
+	"DrawShield",
+	"RecvSkirmishAIMessage",
+
+	-- COB CallIn  (FIXME?)
+	"CobCallback",
+
+	-- Unsynced CallIns
+	"Update",
+	"DefaultCommand",
+	"DrawGenesis",
+	"DrawWorld",
+	"DrawWorldPreUnit",
+	"DrawWorldShadow",
+	"DrawWorldReflection",
+	"DrawWorldRefraction",
+	"DrawScreenEffects",
+	"DrawScreen",
+	"DrawInMiniMap",
+	"RecvFromSynced",
+
+	-- moved from LuaUI
+	"KeyPress",
+	"KeyRelease",
+	"MousePress",
+	"MouseRelease",
+	"MouseMove",
+	"MouseWheel",
+	"IsAbove",
+	"GetTooltip",
+
+	-- FIXME -- not implemented  (more of these?)
+	"WorldTooltip",
+	"MapDrawCmd",
+	"GameSetup",
+	"DefaultCommand",
+
+	-- Save/Load
+	"Save",
+	"Load",
+
+	-- FIXME: NOT IN BASE
+	"UnitCommand",
+	"UnitEnteredWater",
+	"UnitEnteredAir",
+	"UnitLeftWater",
+	"UnitLeftAir",
+
+	"UnsyncedHeightMapUpdate"
+}
+
+
 -- initialize the call-in lists
 do
-  for _,listname in ipairs(CallInsList) do
+  for _,listname in ipairs(callInLists) do
     gadgetHandler[listname .. 'List'] = {}
   end
 end
@@ -453,7 +580,7 @@ local function SafeWrapGadget(gadget)
     end
   end
 
-  for _,ciName in ipairs(CallInsList) do
+  for _,ciName in ipairs(callInLists) do
     if (gadget[ciName]) then
       gadget[ciName] = SafeWrap(gadget[ciName], ciName)
     end
@@ -499,7 +626,7 @@ function gadgetHandler:InsertGadget(gadget)
   end
 
   ArrayInsert(self.gadgets, true, gadget)
-  for _,listname in ipairs(CallInsList) do
+  for _,listname in ipairs(callInLists) do
     local func = gadget[listname]
     if (type(func) == 'function') then
       ArrayInsert(self[listname..'List'], func, gadget)
@@ -528,7 +655,7 @@ function gadgetHandler:RemoveGadget(gadget)
   ArrayRemove(self.gadgets, gadget)
   self:RemoveGadgetGlobals(gadget)
   actionHandler.RemoveGadgetActions(gadget)
-  for _,listname in ipairs(CallInsList) do
+  for _,listname in ipairs(callInLists) do
     ArrayRemove(self[listname..'List'], gadget)
   end
 
@@ -590,7 +717,7 @@ end
 
 
 function gadgetHandler:UpdateCallIns()
-  for _,name in ipairs(CallInsList) do
+  for _,name in ipairs(callInLists) do
     self:UpdateCallIn(name)
   end
 end
@@ -691,7 +818,7 @@ function gadgetHandler:RaiseGadget(gadget)
     end
   end
   Raise(self.gadgets, true, gadget)
-  for _,listname in ipairs(CallInsList) do
+  for _,listname in ipairs(callInLists) do
     Raise(self[listname..'List'], gadget[listname], gadget)
   end
 end
@@ -723,7 +850,7 @@ function gadgetHandler:LowerGadget(gadget)
     end
   end
   Lower(self.gadgets, true, gadget)
-  for _,listname in ipairs(CallInsList) do
+  for _,listname in ipairs(callInLists) do
     Lower(self[listname..'List'], gadget[listname], gadget)
   end
 end
