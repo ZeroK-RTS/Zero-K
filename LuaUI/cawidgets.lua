@@ -81,7 +81,7 @@ local localWidgets = false
 
 if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to use localWidgetsFirst
   local cadata = VFS.Include(CONFIG_FILENAME)
-  if cadata["Local Widgets Config"] then
+  if cadata and cadata["Local Widgets Config"] then
     localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
     localWidgets = cadata["Local Widgets Config"].localWidgets
   end
