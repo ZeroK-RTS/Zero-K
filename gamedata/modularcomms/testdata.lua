@@ -122,6 +122,18 @@ local base = {
 		}
 	},
 	]]
+	{
+		name = "doubleshield",
+		modules = {
+			"commweapon_riotcannon",
+			"commweapon_riotcannon",
+			"module_energy_cell",
+			"module_energy_cell",
+			"module_energy_cell",
+ 			"module_personal_shield",
+			"module_areashield",
+		},
+	},
 }
 
 local ret = {count = 0}
