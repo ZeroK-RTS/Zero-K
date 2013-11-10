@@ -12,6 +12,8 @@ local weaponDef = {
 		slot = [[5]],
 		lups_explodelife = 100,
 		lups_explodespeed = 1,
+		badtargetcategory = [[FIXEDWING]],
+		onlyTargetCategory = [[FIXEDWING LAND SINK SWIM FLOAT SHIP SUB GUNSHIP HOVER]],
 	},
 
 	damage                  = {
