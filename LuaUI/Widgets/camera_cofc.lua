@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.126 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.127 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-October-12
+    date      = "2011-03-16", --2013-November-12
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -492,7 +492,7 @@ local spSetMouseCursor		= Spring.SetMouseCursor
 local spTraceScreenRay		= Spring.TraceScreenRay
 local spWarpMouse			= Spring.WarpMouse
 local spGetCameraDirection	= Spring.GetCameraDirection
-local spSetCameraTarget		= Spring.SetCameraTarget
+--local spSetCameraTarget		= Spring.SetCameraTarget
 local spGetTimer 			= Spring.GetTimer
 local spDiffTimers 			= Spring.DiffTimers
 local spGetUnitDefID 		= Spring.GetUnitDefID
@@ -545,7 +545,7 @@ local smoothscroll = false
 local springscroll = false
 local lockspringscroll = false
 local rotate, movekey
-local move, rot = {}, {}
+local move, rot, move2 = {}, {}, {}
 local key_code = {
 	left 		= 276,
 	right 		= 275,
@@ -614,12 +614,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local previousFov=-1
-local prevInclination =99
-local prevAzimuth = 299
-local prevX = 9999
-local prevY = 9999
-local cachedResult = {0,0,0}
+local scrnRay_previousFov=-1
+local scrnRay_prevInclination =99
+local scrnRay_prevAzimuth = 299
+local scrnRay_prevX = 9999
+local scrnRay_prevY = 9999
+local scrnRay_cachedResult = {0,0,0}
 local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
 	local halfViewSizeY = vsy/2
 	local halfViewSizeX = vsx/2
@@ -627,10 +627,28 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 	x = x- halfViewSizeX
 	local currentFov = cs.fov/2 --in Spring: 0 degree is directly ahead and +FOV/2 degree to the left and -FOV/2 degree to the right
 	--//Speedup//--
-	if previousFov==currentFov and prevInclination == cs.rx and prevAzimuth == cs.ry and prevX ==x and prevY == y then --if camera Sphere coordinate & mouse position not change then use cached value
-		return cachedResult[1],cachedResult[2],cachedResult[3] 
+	if scrnRay_previousFov==currentFov and scrnRay_prevInclination == cs.rx and scrnRay_prevAzimuth == cs.ry and scrnRay_prevX ==x and scrnRay_prevY == y then --if camera Sphere coordinate & mouse position not change then use cached value
+		return scrnRay_cachedResult[1],scrnRay_cachedResult[2],scrnRay_cachedResult[3] 
 	end
-	
+	--[[
+	--Opengl screen FOV scaling logic:
+	                                  >     
+	                              >    | 
+	                          >        |  
+	                      >            | 
+	                  >  |             |  Notice! : 90 FOV screen size == 2 times 45 FOV screen size
+	              >      | <-45 FOV    |
+	          >          |   reference | 
+	      >              |   screen    | 
+	      > --- FOV=45   |             | 
+	          >          |             |  <-- 90 FOV
+	              >      |             |      new screen size
+	                  >  |             |      
+	                      >            |
+	                          >        |
+	                              >    |
+	                                  > <--ray cone
+	--]]
 	--//Opengl FOV scaling logic//--
 	local referenceScreenSize = halfViewSizeY --because Opengl Glut use vertical screen size for FOV setting
 	local referencePlaneDistance = referenceScreenSize -- because Opengl use 45 degree as default FOV, in which case tan(45)=1= referenceScreenSize/referencePlaneDistance
@@ -638,31 +656,53 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 	local resizeFactor = referenceScreenSize/currentScreenSize --the ratio of the default screen size to new FOV's screen size
 	local perspectivePlaneDistance = resizeFactor*referencePlaneDistance --move perspective projection plane (closer or further away) so that the size appears to be as the default size for 45 degree
 	--Note: second method is "perspectivePlaneDistance=halfViewSizeY/math.tan(currentFov*RADperDEGREE)" which yield the same result with 1 line.
-	
+	--[[
+	--mouse-to-Sphere illustration:
+	          ______                            ______
+	          \     -----------_______----------      /
+	            \    .      .     |     .     .     /
+	             \   .     .    ..|.. $<cursor.    /
+	              \   .   .   /   |   \   .  .    /
+	              | --.---.--.----|----.--.--.----|    <--(bottom of) sphere surface flatten on 2d screen
+	              /   .   .   \   |   /   .  .    \       so, cursor distance from center assume role of Inclination
+	             /   .     .    ..|..    .    .    \      and, cursor position (left, right, or bottom) assume role of Azimuth
+	            /    .      .     |     .     .     \
+	          /    ____________-------__________      \
+	          -----                             ------
+	--]]
 	--//mouse-to-Sphere projection//--
 	local distanceFromCenter = sqrt(x*x+y*y) --mouse cursor distance from center screen. We going to simulate a Sphere dome which we will position the mouse cursor.
 	local inclination = math.atan(distanceFromCenter/perspectivePlaneDistance) --translate distance in 2d plane to angle projected from the Sphere
 	inclination = inclination -PI/2 --offset 90 degree because we want to place the south hemisphere (bottom) of the dome on the screen
 	local azimuth = math.atan2(-x,y) --convert x,y to angle, so that left is +degree and right is -degree. Note: negative x flip left-right or right-left (flip the direction of angle)
-	--//Sphere-to-coordinate conversion//--
+	--//Sphere-to-coordinate conversion//-- 
+	--(x,y,z floating in space)
 	local sphere_x = 100* sin(azimuth)* cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
 	local sphere_y = 100* sin(inclination)
 	local sphere_z = 100* cos(azimuth)* cos(inclination)
 	--//coordinate rotation 90+x degree//--
+	--(x,y,z rotated in space)
 	local rotateToInclination = PI/2+cs.rx --rotate to +90 degree facing the horizon then rotate to camera's current facing.
 	local new_x = sphere_x --rotation on x-axis
 	local new_y = sphere_y* cos (rotateToInclination) + sphere_z* sin (rotateToInclination) --move points of Sphere to new location 
 	local new_z = sphere_z* cos (rotateToInclination) - sphere_y* sin (rotateToInclination)
 	--//coordinate-to-Sphere conversion//--
-	local cursorTilt = math.atan2(new_y,sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate
+	--(Inclination and Azimuth for x,y,z)
+	local cursorTilt = math.atan2(new_y,sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate. See: http://en.wikipedia.org/wiki/Spherical_coordinate_system for conversion formula.
 	local cursorHeading = math.atan2(new_x,new_z) --Sphere's azimuth
 	
 	--//Sphere-to-groundPosition translation//--
+	--(calculate intercept of ray from mouse to a flat ground)
 	local tiltSign = abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
-	local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt
+	local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt. Note: we use 0 degree when look down, and 90 degree when facing the horizon. This simplify the problem conceptually. 
 	cursorTiltComplement = min(1.5550425,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
-	local cursorxzDist = math.tan(cursorTiltComplement)*(averageEdgeHeight-cs.py) --how far does the camera angle look pass the ground beneath
-	local cursorxDist = sin(cs.ry+cursorHeading)*cursorxzDist ----break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
+	local vertGroundDist = averageEdgeHeight-cs.py --distance to ground
+	local groundDistSign = abs(vertGroundDist)/vertGroundDist --negative when ground is below, positive when ground is above
+	local cursorxzDist = math.tan(cursorTiltComplement)*(vertGroundDist) --calculate how far does the camera angle look pass the ground beneath
+	if groundDistSign + tiltSign == 0 then ---handle a special case when camera is facing away from ground.
+		cursorxzDist = cursorxzDist*-1 --Note: Not sure how it manage to work, except it work.
+	end
+	local cursorxDist = sin(cs.ry+cursorHeading)*cursorxzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed (?)
 	local cursorzDist = cos(cs.ry+cursorHeading)*cursorxzDist
 	local gx, gy, gz = cs.px+cursorxDist,averageEdgeHeight,cs.pz+cursorzDist --estimated ground position infront of camera 
 	--Finish
@@ -685,14 +725,14 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 		Spring.MarkerAddPoint(gx, gy, gz, "here")
 	end
 	--//caching for efficiency
-	cachedResult[1] = gx
-	cachedResult[2] = gy
-	cachedResult[3] = gz
-	prevInclination =cs.rx
-	prevAzimuth = cs.ry
-	prevX = x
-	prevY = y
-	previousFov = currentFov	
+	scrnRay_cachedResult[1] = gx
+	scrnRay_cachedResult[2] = gy
+	scrnRay_cachedResult[3] = gz
+	scrnRay_prevInclination =cs.rx
+	scrnRay_prevAzimuth = cs.ry
+	scrnRay_prevX = x
+	scrnRay_prevY = y
+	scrnRay_previousFov = currentFov	
 
 	return gx,gy,gz
 	--Most important credit to!:
@@ -775,7 +815,6 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
-
 	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs) --use override if spTraceScreenRay() do not have results
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
@@ -833,6 +872,22 @@ local function UpdateCam(cs)
 	end
 	
 	return cs
+end
+
+local function SetCameraTarget(gx,gy,gz,smoothness)
+	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
+	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
+	local cs = spGetCameraState()
+	SetLockSpot2(cs) --get lockspot at mid screen if there's none present
+	if not ls_have then
+		return
+	end
+	ls_x = gx --update lockpot to target destination
+	ls_y = gy
+	ls_z = gz
+	local cstemp = UpdateCam(cs)
+	if cstemp then cs = cstemp; end
+	spSetCameraState(cs, 1) --move
 end
 
 local function Zoom(zoomin, shift, forceCenter)
@@ -1183,13 +1238,13 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	local teamID = (not isSpec and Spring.GetMyTeamID()) --get teamID ONLY IF not spec
 	local foundUnit, foundUnitStructure
 	local forwardOffset,backwardOffset,leftOffset,rightOffset
-	if move.right or rot.right then --content of move & rot table is set in Update() and in KeyPress(). Is global. Is used to start scrolling & rotation (initiated in Update()) 
+	if move.right then --content of move table is set in KeyPress(). Is global. Is used to start scrolling & rotation (initiated in Update()) 
 		rightOffset =true
-	elseif move.up or rot.up then
+	elseif move.up then
 		forwardOffset = true
-	elseif move.left or rot.left then
+	elseif move.left then
 		leftOffset =true
-	elseif move.down or rot.down then
+	elseif move.down then
 		backwardOffset = true
 	end
 	local front, top, right = Spring.GetUnitVectors(thirdperson_trackunit) --get vector of current tracked unit
@@ -1267,6 +1322,7 @@ local function Tilt(s, dir)
 end
 
 local function ScrollCam(cs, mxm, mym, smoothlevel)
+	scrnRay_prevX=9999 --force reset of offmap traceScreenRay cache. Reason: because offmap traceScreenRay use cursor position for calculation & scrollcam always have cursor at midscreen
 	SetLockSpot2(cs)
 	if not cs.dy or not ls_have then
 		--echo "<COFC> scrollcam fcn fail"
@@ -1446,6 +1502,7 @@ function widget:Update(dt)
 	if (not thirdperson_trackunit and  --block 3rd Person 
 	(smoothscroll or
 	move.right or move.left or move.up or move.down or
+	move2.right or move2.left or move2.up or move2.down or
 	use_lockspringscroll))
 	then
 		
@@ -1481,15 +1538,15 @@ function widget:Update(dt)
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
 			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor, 1 )
 			
-			if move.right then
+			if move.right or move2.right then
 				mxm = speed
-			elseif move.left then
+			elseif move.left or move2.left then
 				mxm = -speed
 			end
 			
-			if move.up then
+			if move.up or move2.up then
 				mym = speed
-			elseif move.down then
+			elseif move.down or move2.down then
 				mym = -speed
 			end
 			smoothlevel = options.smoothness.value
@@ -1508,19 +1565,23 @@ function widget:Update(dt)
 	
 	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
 	if options.edgemove.value then
-		if not movekey then --if not doing arrow key on keyboard: reset
-			move = {}
-		end
+		-- if not movekey then --if not doing arrow key on keyboard: reset
+		--move ={}
+		move2.right = false
+		move2.left = false
+		move2.up = false
+		move2.down = false
+		-- end
 		
 		if mx > vsx-2 then 
-			move.right = true
+			move2.right = true
 		elseif mx < 2 then
-			move.left = true
+			move2.left = true
 		end
 		if my > vsy-2 then
-			move.up = true
+			move2.up = true
 		elseif my < 2 then
-			move.down = true
+			move2.down = true
 		end
 		
 	elseif options.rotateonedge.value then
@@ -1541,12 +1602,13 @@ function widget:Update(dt)
 	if 	(thirdperson_trackunit and 
 	not overview_mode and --block 3rd person scroll when in overview mode
 	(move.right or move.left or move.up or move.down or
+	move2.right or move2.left or move2.up or move2.down or
 	rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
 	then
 		
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
-		else --not using movekey for 3rdPerson-edge-Scroll (ie:is using mouse): re-issue 3rd person
+		else --not using movekey for 3rdPerson-edge-Scroll (ie:is using mouse, "move2" and "rot"): re-issue 3rd person
 			local selUnits = spGetSelectedUnits()
 			if selUnits and selUnits[1] then -- re-issue 3rd person for selected unit (we need to reissue this because in normal case mouse edge scroll will exit trackmode)
 				spSendCommands('viewfps')
@@ -1630,11 +1692,11 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	
 	follow_timer = 4 --disable tracking for 4 second when middle mouse is pressed or when scroll is used for zoom
 	
-	local a,c,m,s = spGetModKeyState()
+	local a,ctrl,m,s = spGetModKeyState()
 	
 	spSendCommands('trackoff')
     spSendCommands('viewfree')
-	if not (options.persistenttrackmode.value and (c or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
+	if not (options.persistenttrackmode.value and (ctrl or a)) then --Note: wont escape trackmode if pressing Ctrl or Alt in persistent trackmode, else: always escape.
 		if trackmode then
 			Spring.Echo("COFC: Unit tracking OFF")
 		end
@@ -1644,7 +1706,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	
 	
 	-- Reset --
-	if a and c then
+	if a and ctrl then
 		ResetCam()
 		return true
 	end
@@ -1670,14 +1732,14 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		return true
 	end
 	-- Rotate World --
-	if c then
+	if ctrl then
 		rotate_transit = nil
 		if options.targetmouse.value then --if rotate world at mouse cursor: 
 			
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
 			if gx then  --Note: we don't block offmap position since VirtTraceRay() now work for offmap position.
-				SetLockSpot2(cs,x,y) --lockspot at cursor position
-				spSetCameraTarget(gx,gy,gz, 1) 
+				SetLockSpot2(cs,x,y) --set lockspot at cursor position
+				SetCameraTarget(gx,gy,gz,1)
 				
 				--//update "ls_dist" with value from mid-screen's LockSpot because rotation is centered on mid-screen and not at cursor//--
 				_,gx,gy,gz = VirtTraceRay(cx,cy,cs) --get ground position traced from mid of screen
@@ -2077,11 +2139,11 @@ function GroupRecallFix(key, modifier, isRepeat)
 					meanX = sumX/unitCount --//calculate center of cluster
 					meanY = sumY/unitCount
 					meanZ = sumZ/unitCount
-					Spring.SetCameraTarget(meanX, meanY, meanZ,0.5)
+					SetCameraTarget(meanX, meanY, meanZ,0.5)
 				else
 					local unitID = lonely[currentIteration-#cluster]
 					local x,y,z= slctUnitUnordered[unitID][1],slctUnitUnordered[unitID][2],slctUnitUnordered[unitID][3] --// get stored unit position
-					Spring.SetCameraTarget(x,y,z,0.5)
+					SetCameraTarget(x,y,z,0.5)
 				end
 				cluster=nil
 				slctUnitUnordered = nil
@@ -2098,7 +2160,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 				meanX = sumX/unitCount --//calculate center
 				meanY = sumY/unitCount
 				meanZ = sumZ/unitCount
-				Spring.SetCameraTarget(meanX, meanY, meanZ,0.5) --is overriden by Spring.SetCameraTarget() at cache.lua.
+				SetCameraTarget(meanX, meanY, meanZ,0.5) --is overriden by Spring.SetCameraTarget() at cache.lua.
 			end
 			previousGroup= group
 			return true
