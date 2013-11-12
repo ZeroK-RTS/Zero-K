@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.127 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.128 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-November-12
     license   = "GNU GPL, v2 or later",
@@ -218,7 +218,7 @@ options = {
 		type = 'bool',
 		value = false,
 	},
-	
+
 	rotfactor = {
 		name = 'Rotation speed',
 		type = 'number',
@@ -492,7 +492,6 @@ local spSetMouseCursor		= Spring.SetMouseCursor
 local spTraceScreenRay		= Spring.TraceScreenRay
 local spWarpMouse			= Spring.WarpMouse
 local spGetCameraDirection	= Spring.GetCameraDirection
---local spSetCameraTarget		= Spring.SetCameraTarget
 local spGetTimer 			= Spring.GetTimer
 local spDiffTimers 			= Spring.DiffTimers
 local spGetUnitDefID 		= Spring.GetUnitDefID
@@ -877,17 +876,19 @@ end
 local function SetCameraTarget(gx,gy,gz,smoothness)
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
-	local cs = spGetCameraState()
-	SetLockSpot2(cs) --get lockspot at mid screen if there's none present
-	if not ls_have then
-		return
+	if gx and gy and gz and smoothness then --just in case
+		local cs = spGetCameraState()
+		SetLockSpot2(cs) --get lockspot at mid screen if there's none present
+		if not ls_have then
+			return
+		end
+		ls_x = gx --update lockpot to target destination
+		ls_y = gy
+		ls_z = gz
+		local cstemp = UpdateCam(cs)
+		if cstemp then cs = cstemp; end
+		spSetCameraState(cs, smoothness) --move
 	end
-	ls_x = gx --update lockpot to target destination
-	ls_y = gy
-	ls_z = gz
-	local cstemp = UpdateCam(cs)
-	if cstemp then cs = cstemp; end
-	spSetCameraState(cs, 1) --move
 end
 
 local function Zoom(zoomin, shift, forceCenter)
@@ -1121,7 +1122,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	end
 	local lclZoom = function(zoomin, smoothness,x,y,z)
 		if not options.followautozoom.value then
-			spSetCameraTarget(x,y,z, smoothness) --track only
+			SetCameraTarget(x,y,z, smoothness) --track only
 			return
 		end
 		local cs = spGetCameraState()
@@ -1160,10 +1161,10 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 			-- Spring.Echo("MID")
 			if not offscreenTracking then
 				local onscreenspeed = options.followinscrollspeed.mid*2 - options.followinscrollspeed.value --reverse value (ie: if 15 return 1, if 1 return 15, ect)
-				spSetCameraTarget(pp[1], groundY, pp[2], onscreenspeed) --track
+				SetCameraTarget(pp[1], groundY, pp[2], onscreenspeed) --track
 			else --continue off-screen tracking, but at fastest speed (bring cursor to center ASAP)
 				local maxspeed = math.min(options.followoutscrollspeed.mid*2 - options.followoutscrollspeed.value,options.followinscrollspeed.mid*2 - options.followinscrollspeed.value) --the fastest speed available 
-				spSetCameraTarget(pp[1], groundY, pp[2], maxspeed) --track
+				SetCameraTarget(pp[1], groundY, pp[2], maxspeed) --track
 			end
 		elseif (scrn_x<scrnsize_X*6/6 and scrn_x>scrnsize_X*0/6) and (scrn_y<scrnsize_Y*6/6 and scrn_y>scrnsize_Y*0/6) then --if cursor near edge: do
 			-- Spring.Echo("EDGE")
@@ -1444,7 +1445,7 @@ function widget:Update(dt)
 			--1) reset Spring.SetCameraTarget to: (x+vx,y+vy,z+vz, 0.0333)
 			--2) increase value A until camera motion is not jittery, then stop: (x+vx,y+vy,z+vz, 0.0333*A)
 			--3) increase value B until unit center on screen, then stop: (x+vx*B,y+vy*B,z+vz*B, 0.0333*A)
-			spSetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
+			SetCameraTarget(x+vx*40,y+vy*40,z+vz*40, 0.0333*137)
 		elseif (not options.persistenttrackmode.value) then --cancel trackmode when no more units is present in non-persistent trackmode.
 			trackmode=false --exit trackmode
 			Spring.Echo("COFC: Unit tracking OFF")
@@ -1565,13 +1566,10 @@ function widget:Update(dt)
 	
 	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
 	if options.edgemove.value then
-		-- if not movekey then --if not doing arrow key on keyboard: reset
-		--move ={}
-		move2.right = false
+		move2.right = false --reset mouse move state
 		move2.left = false
 		move2.up = false
 		move2.down = false
-		-- end
 		
 		if mx > vsx-2 then 
 			move2.right = true
@@ -1614,9 +1612,12 @@ function widget:Update(dt)
 				spSendCommands('viewfps')
 				spSendCommands('track')
 				thirdperson_trackunit = selUnits[1]
-				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
-				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
-				spSetCameraState(cs,0)
+				local x,y,z = spGetUnitPosition(selUnits[1])
+				if x and y and z then --unit position can be NIL if spectating with limited LOS
+					cs.px,cs.py,cs.pz=x,y,z
+					cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
+					spSetCameraState(cs,0)
+				end
 			else --no unit selected: return to freeStyle camera
 				spSendCommands('trackoff')
 				spSendCommands('viewfree')
