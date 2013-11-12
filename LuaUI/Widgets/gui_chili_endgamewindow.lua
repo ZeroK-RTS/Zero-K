@@ -323,10 +323,11 @@ function widget:Initialize()
 	Spring.SendCommands("endgraph 0")
 	
 	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
+	
+	SetTeamNamesAndColors()
 end
 
 function widget:GameOver()
-	SetTeamNamesAndColors()
 	ShowEndGameWindow()
 end
 
