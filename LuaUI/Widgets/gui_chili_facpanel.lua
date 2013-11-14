@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.009"
+local version = "v0.010"
 
 function widget:GetInfo()
   return {
@@ -72,7 +72,7 @@ options = {
 	backgroundOpacity = {
 		name = "Background opacity",
 		type = "number",
-		value = 0, min = 0, max = 1, step = 0.01,
+		value = 1, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			window_facbar.color = {0,0,0,self.value}
 			window_facbar.caption = self.value == 0 and '' or 'Factories'
@@ -841,7 +841,7 @@ function widget:Initialize()
 		dragUseGrip = false,
 		minWidth = 56,
 		minHeight = 56,
-		color = {0,0,0,1},
+--		color = {0,0,0,1},
 		caption='Factories',
 		children = {
 			stack_build, --must be first so it's always above of the others (like frontmost layer)
