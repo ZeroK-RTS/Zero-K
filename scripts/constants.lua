@@ -38,9 +38,6 @@ toDegrees = 180/pi
 frameToMs = 1000/30
 msToFrame = 30/1000
 
-cos = math.cos
-sin = math.sin
-
 headingToRad = 1/32768*math.pi
 
 -- Explosion generators

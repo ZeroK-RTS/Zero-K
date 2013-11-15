@@ -10,10 +10,6 @@ unitDef = {
   buildTime           = 550,
   canMove             = true,
   category            = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[30 48 30]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[cylY]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -28,7 +24,6 @@ unitDef = {
     helptext_fi    = [[Archangel:in kaksoislaserit sek? automaattitykki tuhoavat vihollisen ilma-alukset tehokkaasti ja nopeasti.]],
     helptext_fr    = [[L'Archangel est munis d'un laser double anti air et d'un autocannon similaire au packo pour pouvoir an?antire les avions enemis.]],
     helptext_pl    = [[Archangel posiada silne działko i lasery przeciwlotnicze, które zadają lotnictwu ogromne straty. Posiada także możliwość skoku.]],
-	modelradius    = [[15]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -88,11 +83,7 @@ unitDef = {
       canattackground         = false,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting       = 1,
-
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      cylinderTargeting      = 1,
 
       damage                  = {
         default = 0.9,
@@ -138,11 +129,7 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting       = 1,
-
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      cylinderTargeting      = 1,
 
       damage                  = {
         default = 1.88,

@@ -16,7 +16,7 @@ unitDef = {
   canstop          	      = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[34 34 50]],
+  collisionVolumeScales  = [[44 34 60]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
@@ -29,7 +29,6 @@ unitDef = {
     helptext_bp    = [[O princípio por trás do Tremor é simples: encha uma área com tiros suficientes, e voç? acertará algo pelo menos uma vez. Lento, atrapalhado, vulnerável e extremamente assustador, Tremor funciona melhor contra áreas-alvo de alta densidade, onde seus tiros de saturaç?o tem maior probabilidade de causar dano.]],
     helptext_fr    = [[Le principe du Tremor est simple: inonder une zone de tirs plasma gr?ce ? son triple canon, avec une chance de toucher quelquechose. Par d?finition impr?cis, le Tremor est l'outil indispensable de destruction de toutes les zones ? h'aute densit? d'ennemis.]],
 	helptext_de    = [[Das Prinzip hinter dem Tremor ist einfach: flute ein Areal mit genug Schüssen und du wirst irgendwas, wenigstens einmal, treffen. Langsam, schwerfällig, anfällig und extrem beängstigend ist der Tremor, weshalb er gegen dichbesiedelte Gebiete sinnvoll einzusetzen ist.]],
-	modelradius    = [[17]],
   },
 
   explodeAs              = [[BIG_UNIT]],

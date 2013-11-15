@@ -26,8 +26,6 @@ function widget:GetInfo()
 	}
 end
 
--- CarRepairer's modification: Properly displaying time.
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -244,10 +242,8 @@ end
 local function DrawEtaText(timeLeft,yoffset)
 	local etaStr
 	if (timeLeft == nil) then
-		etaStr = '\255\255\255\1ETA\255\255\255\255: \255\1\1\255???'
+		etaStr = '\255\255\255\1ETA\255\255\255\255:\255\1\1\255???'
 	else
-		
-		--[[ old code
 		if (timeLeft > 60) then
 			etaStr = "\255\255\255\1ETA\255\255\255\255:" .. string.format('\255\1\255\1%d', timeLeft / 60) .. "m, " .. string.format('\255\1\255\1%.1f', timeLeft % 60) .. "s"
 		elseif (timeLeft > 0) then
@@ -255,10 +251,6 @@ local function DrawEtaText(timeLeft,yoffset)
 		else
 			etaStr = "\255\255\255\1ETA\255\255\255\255:" .. string.format('\255\255\1\1%.1f', -timeLeft) .. "s"
 		end
-		--]]
-		
-		local color = timeLeft > 0 and '\255\1\255\1' or '\255\255\1\1'
-		etaStr = "\255\255\255\1ETA: " .. string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
 	end
 
 	gl.Translate(0, yoffset,0)

@@ -7,12 +7,13 @@ function gadget:GetInfo()
     name      = "Lag Monitor",
     desc      = "Gives away units of people who are lagging",
     author    = "KingRaptor",
-    date      = "11/5/2012", --6/11/2013
+    date      = "11/5/2012", --2/4/2013
     license   = "Public domain",
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
+--Revision 29-th?
 --------------------------------------------------------------------------------
 --List of stuff in this gadget (to help us remember stuff for future debugging/improvement):
 
@@ -24,6 +25,8 @@ end
 --1) If Owner's builder (constructor) created a unit --> Owner inherit the ownership to that unit
 --2) If Taker finished an Owner's unit --> the unit belong to Taker
 --3) wait 3 strike (3 time AFK & Ping) before --> mark player as AFK/Lagging
+--4) being AFK/Lag --> deduct the perceived ELO by 250 each
+--5) request "TAKE" --> temporary increase the perceived ELO by 250
 
 --Everything else: anti-bug, syntax, methods, ect
 --------------------------------------------------------------------------------
@@ -80,30 +83,20 @@ local AFK_THRESHOLD = 30
 --------------------------------------------------------------------------------
 
 local function ProductionCancelled(data, factoryTeam)  -- return invested metal if produced unit wasn't recreated
-	local ud = UnitDefs[data.producedDefID]
-	local returnedMetal = data.build * (ud and ud.metalCost or 0)
-	spAddTeamResource(factoryTeam, "metal", returnedMetal)
+  local ud = UnitDefs[data.producedDefID]
+  local returnedMetal = data.build * (ud and ud.metalCost or 0)
+  spAddTeamResource(factoryTeam, "metal", returnedMetal)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if GG.wasMorphedTo and GG.wasMorphedTo[unitID] then --copy lineage for unit Morph
-		local newUnitID = GG.wasMorphedTo[unitID]
-		local originalTeamIDs = lineage[unitID]
-		if originalTeamIDs ~= nil and #originalTeamIDs > 0 then
-			-- lineage of the morphed unit will be the same as its pre-morph
-			lineage[newUnitID] = {unpack(originalTeamIDs)} --NOTE!: this copy value to new table instead of copying table-reference (to avoid bug)
-		end
-		unitAlreadyFinished[newUnitID] = true --for reverse build -- what is reverse build?
-	end
-
 	lineage[unitID] = nil --to delete any units that do not need returning.
 	unitAlreadyFinished[unitID] = nil
 
-	if transferredFactories[unitID] then --the dying unit is the factory we transfered to other team but it haven't continued previous build queue yet. 
-		ProductionCancelled(transferredFactories[unitID], unitTeam)  -- refund metal for partial build
-		transferredFactories[unitID] = nil
-	end
-	factories[unitID] = nil
+  if transferredFactories[unitID] then 
+    ProductionCancelled(transferredFactories[unitID], unitTeam)  -- unit was not recreated after factory transfer
+    transferredFactories[unitID] = nil
+  end
+  factories[unitID] = nil
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
@@ -112,34 +105,34 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		local builderDefID = spGetUnitDefID(builderID)
 		local ud = (builderDefID and UnitDefs[builderDefID])
 		if ud and (not ud.isFactory) then --(set ownership to original owner for all units except units from factory so that receipient player didn't lose his investment creating that unit)
-			local originalTeamIDs = lineage[builderID]
-			if originalTeamIDs ~= nil and #originalTeamIDs > 0 then
-				-- lineage of the new unit will be the same as its builder
-				lineage[unitID] = {unpack(originalTeamIDs)} --NOTE!: this copy value to new table instead of copying table-reference (to avoid bug)
+			local originalTeamID = lineage[builderID]
+			if originalTeamID ~= nil and #originalTeamID > 0 then
+				-- lineage of the new unit should be the same as its builder
+				lineage[unitID] = originalTeamID
 			end
-		elseif transferredFactories[builderID] then --this unit was created inside a recently transfered factory
-			local data = transferredFactories[builderID]
+    elseif transferredFactories[builderID] then
+      local data = transferredFactories[builderID]
 
-			if (data.producedDefID == unitDefID) then --this factory has continued its previous build queue
-				data.producedDefID   = nil
-				data.expirationFrame = nil
-				spSetUnitHealth(unitID, data) --set health of current build to pre-transfer level
-			else
-				ProductionCancelled(data, unitTeam)  -- different unitDef was created after factory transfer, refund
-			end
+      if (data.producedDefID == unitDefID) then
+        data.producedDefID   = nil
+        data.expirationFrame = nil
+        spSetUnitHealth(unitID, data)
+      else
+        ProductionCancelled(data, unitTeam)  -- different unitDef was created after factory transfer
+      end
 
-			transferredFactories[builderID] = nil
+      transferredFactories[builderID] = nil
 		end
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
-	if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory then
-		factories[unitID] = {}
-	else
-		if lineage[unitID] and (not unitAlreadyFinished[unitID]) then --(relinguish ownership for all unit except factories so the returning player has something to do)
-			lineage[unitID] = {} --relinguish the original ownership of the unit
-		end
+  if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory then
+    factories[unitID] = {}
+  else
+    if lineage[unitID] and (not unitAlreadyFinished[unitID]) then --(religuish ownership for all unit except factories so the returning player has something to do)
+      lineage[unitID] = {} --relinguish the original ownership of the unit
+    end
 	end
 	unitAlreadyFinished[unitID] = true --for reverse build
 end
@@ -196,43 +189,46 @@ local function GetRecepient(allyTeam, laggers)
 	return target
 end
 
+local paramTable_SetUnitHealth = { build = 0 }
+
 local function TransferUnitAndKeepProduction(unitID, newTeamID, given)
-	if (factories[unitID]) then --is a factory
-		local producedUnitID = spGetUnitIsBuilding(unitID)
-		if (producedUnitID) then
-			local producedDefID = spGetUnitDefID(producedUnitID)
-			if (producedDefID) then
-				local data = factories[unitID]
-				data.producedDefID   = producedDefID
-				data.expirationFrame = gameFrame + 31
+  if (factories[unitID]) then
+    local producedUnitID = spGetUnitIsBuilding(unitID)
+    if (producedUnitID) then
+      local producedDefID = spGetUnitDefID(producedUnitID)
+      if (producedDefID) then
+        local data = factories[unitID]
+        data.producedDefID   = producedDefID
+        data.expirationFrame = gameFrame + 31
 
-				local health, _, paralyzeDamage, captureProgress, buildProgress = spGetUnitHealth(producedUnitID)
-				-- following 4 members are compatible with params required by Spring.SetUnitHealth
-				data.health   = health
-				data.paralyze = paralyzeDamage
-				data.capture  = captureProgress
-				data.build    = buildProgress
+        local health, _, paralyzeDamage, captureProgress, buildProgress = spGetUnitHealth(producedUnitID)
+        -- following 4 members are compatible with params required by Spring.SetUnitHealth
+        data.health   = health
+        data.paralyze = paralyzeDamage
+        data.capture  = captureProgress
+        data.build    = buildProgress
 
-				transferredFactories[unitID] = data
+        transferredFactories[unitID] = data
 
-				spSetUnitHealth(producedUnitID, { build = 0 })  -- reset buildProgress to 0 before transfer factory, so no resources are given to AFK team when cancelling current build queue
-			end
-		end
-	end
-	spTransferUnit(unitID, newTeamID, given)
+        spSetUnitHealth(producedUnitID, paramTable_SetUnitHealth)  -- reset buildProgress to 0 so no resources are returned for cancelling the unit
+      end
+    end
+  end
+
+  spTransferUnit(unitID, newTeamID, given)
 end
 
 function gadget:GameFrame(n)
-	gameFrame = n;
-
-	if n % 15 == 0 then  -- check factories that haven't recreated the produced unit after transfer
-		for factoryID, data in pairs(transferredFactories) do
-			if (data.expirationFrame <= gameFrame) then
-				ProductionCancelled(data, spGetUnitTeam(factoryID)) --refund metal to current team
-				transferredFactories[factoryID] = nil
-			end
-		end
-	end
+  gameFrame = n;
+  
+  if n % 15 == 0 then  -- check factories that haven't recreated the produced unit after transfer
+    for factoryID, data in pairs(transferredFactories) do
+      if (data.expirationFrame <= gameFrame) then
+        ProductionCancelled(data, spGetUnitTeam(factoryID))
+        transferredFactories[factoryID] = nil
+      end
+    end
+  end
 
 	if n%UPDATE_PERIOD == 0 then --check every UPDATE_PERIOD-th frame
 		local laggers = {}
@@ -240,7 +236,7 @@ function gadget:GameFrame(n)
 		local players = spGetPlayerList()
 		local recepientByAllyTeam = {}
 		local gameSecond = spGetGameSeconds()
-		local afkPlayers = "" -- remember which player is AFK/Lagg. Information will be sent to 'gui_take_remind.lua' as string
+		local afkPlayer = "" -- remember which player is AFK/Lagg. Information will be sent to 'gui_take_remind.lua' as string
 
 		for i=1,#players do
 			local playerID = players[i]
@@ -262,15 +258,15 @@ function gadget:GameFrame(n)
 				oldAllyTeam[playerID] = allyTeam
 			end
 
-			local afk = gameSecond - (pActivity[playerID] or 0) --mouse activity
+			local afk = gameSecond - (pActivity[playerID] or 0)
 			local _,_,_,isAI,_,_ = spGetTeamInfo(team)
 			if not (spec or isAI) then
 				if (afkTeams[team] == true) then  -- team was AFK
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
 						spEcho("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
-						
-						for unitID, teamList in pairs(lineage) do --Return unit to the oldest inheritor (or to original owner if possible)
+
+						for unitID, teamList in pairs(lineage) do
 							local delete = false;
 							for i=1,#teamList do
 								local uteam = teamList[i];
@@ -293,11 +289,11 @@ function gadget:GameFrame(n)
 					end
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
-					afkPlayers = afkPlayers .. (10000 + playerID*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
+					afkPlayer = afkPlayer .. (10000 + playerID*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
 					tickTockCounter[playerID] = (tickTockCounter[playerID] or 0) + 1 --tick tock counter ++. count-up 1
 					if tickTockCounter[playerID] >= 2 or justResigned then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
 						local units = spGetTeamUnits(team)
-						if units~=nil and #units > 0 then
+						if units ~= nil and #units > 0 then
 							laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, units = units, resigned = justResigned}
 						end
 					end
@@ -308,13 +304,13 @@ function gadget:GameFrame(n)
 				specList[playerID] = true --record spectator list in non-AI team
 			end
 		end
-		afkPlayers = afkPlayers .. "#".. players[#players] --cap the string with the largest playerID information. ie: (string)1010219899#98 can be read like this-> (1=dummy) id:01 ally:02, (1=dummy) id:98 ally:99, (#=dummy) highestID:98
-		SendToUnsynced("LagmonitorAFK",afkPlayers) --tell widget about AFK list (widget need to deserialize this string)
+		afkPlayer = afkPlayer .. "#".. players[#players] --cap the string with the largest playerID information. ie: (string)1010219899#98 can be read like this-> id:01 ally:02, id:98 ally:99, highestID:98
+		SendToUnsynced("LagmonitorAFK",afkPlayer) --tell widget about AFK list
 
-		for playerID, lagger in pairs(laggers) do
+		for playerID, data in pairs(laggers) do
 			-- FIRST! check if everyone else on the team is also lagging
-			local team = lagger.team
-			local allyTeam = lagger.allyTeam
+			local team = data.team
+			local allyTeam = data.allyTeam
 			local playersInTeam = spGetPlayerList(team, true) --return only active player
 			local discontinue = false
 			for j=1,#playersInTeam do
@@ -337,7 +333,7 @@ function gadget:GameFrame(n)
 						GG.Lagmonitor_activeTeams[allyTeam][team] = false
 					end
 					afkTeams[team] = true --mark team as AFK
-					local units = lagger.units or {}
+					local units = data.units or {}
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0
 						-- Transfer Units
 						GG.allowTransfer = true
@@ -362,10 +358,10 @@ function gadget:GameFrame(n)
 						spAddTeamResource(recepientByAllyTeam[allyTeam].team,"metal",spareMetal)
 
 						-- Send message
-						if lagger.resigned then
-							spEcho(lagger.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name .. " (ally #".. allyTeam ..")")
+						if data.resigned then
+							spEcho(data.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name .. " (ally #".. allyTeam ..")")
 						else
-							spEcho("Giving all units of "..lagger.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
+							spEcho("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
 						end
 					end
 				end	-- if

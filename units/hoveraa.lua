@@ -16,7 +16,7 @@ unitDef = {
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[40 40 40]],
+  collisionVolumeScales  = [[55 35 65]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]], 
   corpse              = [[DEAD]],
@@ -25,8 +25,7 @@ unitDef = {
     description_de = [[Fulgabwehrgleiter]],
     helptext       = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
 	helptext_de    = [[Der Flail verschieﬂt ein einzige, groﬂe SAM auf mittlerer Distanz, die wirklich groﬂen Schaden anrichtet.]],
-	modelradius    = [[20]],
-	midposoffset   = [[0 8 -5]],
+	modelradius    = [[15]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -84,10 +83,6 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
 
       damage                  = {
         default = 41.25,

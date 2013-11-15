@@ -17,9 +17,9 @@ unitDef = {
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[30 18 36]],
+  collisionVolumeScales  = [[50 25 55]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[box]],  
+  collisionVolumeType    = [[ellipsoid]],  
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -27,7 +27,6 @@ unitDef = {
 	description_de = [[Blockadebrecher Gleiter]],
     helptext       = [[The Halberd buttons down into its armored hull when not firing, offering 4x damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets.]],
 	helptext_de    = [[Der Halberd zieht sich in seine gepanzerte Hülle zurück, sobald er nicht mehr feuert, was ihm einen exzellenten Schadenswiderstand bietet. Seine langsame, kurzreichweitige Waffe ist ungeeignet für den Einsatz gegen hochmobile Ziele.]],
-	modelradius    = [[10]],
   },
 
   damageModifier      = 0.25,

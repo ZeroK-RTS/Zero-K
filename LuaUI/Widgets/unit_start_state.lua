@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Unit Start State",
     desc      = "Configurable starting unit states for units",
     author    = "GoogleFrog",
-    date      = "13 April 2011", --last update: 21 September 2013
+    date      = "13 April 2011",
     license   = "GNU GPL, v2 or later",
 	handler   = false,
     layer     = 1,
@@ -287,7 +287,7 @@ local function addUnit(defName, path)
 	
 	if ud.isFactory then
 		options[defName .. "_repeat"] = {
-			name = "  Repeat",
+			name = "  Rpeat",
 			desc = "Repeat: check box to turn it on",
 			type = 'bool',
 			value = false,
@@ -423,15 +423,15 @@ AddFactoryOfUnits("factoryspider")
 AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
 AddFactoryOfUnits("factoryship")
-AddFactoryOfUnits("striderhub")
--- addUnit("striderhub","Mech")
--- addUnit("armcsa","Mech")
--- addUnit("armcomdgun","Mech")
--- addUnit("dante","Mech")
--- addUnit("armraven","Mech")
--- addUnit("armbanth","Mech")
--- addUnit("gorg","Mech")
--- addUnit("armorco","Mech")
+
+addUnit("striderhub","Mech")
+addUnit("armcsa","Mech")
+addUnit("armcomdgun","Mech")
+addUnit("dante","Mech")
+addUnit("armraven","Mech")
+addUnit("armbanth","Mech")
+addUnit("gorg","Mech")
+addUnit("armorco","Mech")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 local _, _, factory_commands, econ_commands, defense_commands, special_commands, _, _, _ = include("Configs/integral_menu_commands.lua")
@@ -458,7 +458,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
 			orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"}}
 			orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
-			if WG['retreat'] then WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value) end
+			orderArray[3] = {CMD_RETREAT, {options.commander_retreat.value}, {"shift"}}
         end
         
         local name = UnitDefs[unitDefID].name
@@ -501,8 +501,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
             end
 
 			if options[name .. "_flylandstate"] and options[name .. "_flylandstate"].value then
-				--NOTE: The unit_air_plants gadget deals with inherit
-				if options[name .. "_flylandstate"].value ~= -1 then  --if not inherit 
+				if options[name .. "_flylandstate"].value ~= -1 then -- The unit_air_plants gadget deals with inherit
 					--Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"})
 					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"}}
                 end
@@ -519,11 +518,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 			
 			if options[name .. "_autorepairlevel1"] and options[name .. "_autorepairlevel1"].value then
-				--NOTE: The unit_air_plants gadget deals with inherit
-				if options[name .. "_autorepairlevel1"].value ~= -1 then --if not inherit 
+				if options[name .. "_autorepairlevel1"].value ~= -1 then  -- The unit_air_plants gadget deals with inherit
 					--Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"})
 					orderArray[#orderArray + 1] = {CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"}}
-				elseif not builderID then --if set to inherit but don't have parent (builder):
+				elseif not builderID then
 					-- Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {0}, {"shift"})
 					orderArray[#orderArray + 1] = {CMD.AUTOREPAIRLEVEL, {0}, {"shift"}}
 				end
@@ -545,11 +543,21 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 
 			if options[name .. "_retreatpercent"] and options[name .. "_retreatpercent"].value then
-				--NOTE: cmd_retreat.lua widget will handle the inherit
-				if options[name .. "_retreatpercent"].value == -1 then --if inherit
-					--do nothing! (cmd_retreat.lua widget will automatically inherit retreat OR will apply no-retreat if no builder is present)
-				else --if not inherit
-					WG['retreat'].addRetreatCommand(unitID, unitDefID, options[name .. "_retreatpercent"].value) --apply retreat value
+				if options[name .. "_retreatpercent"].value == -1 then
+					if builderID then
+						local bdid = Spring.GetUnitDefID(builderID)
+						if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
+							local retreat = Spring.GetUnitStates(builderID).retreat
+							if retreat then
+								-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {_retreatpercent}, {"shift"})
+								orderArray[#orderArray + 1] = {CMD_RETREAT, {_retreatpercent}, {"shift"}}
+							end
+						end
+					end
+				else
+					-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"}}
+					--WG['retreat'].addRetreatCommand(unitID, unitDefID, 2) -> overriden by factory setting @factory exit.
 				end
 			end
 

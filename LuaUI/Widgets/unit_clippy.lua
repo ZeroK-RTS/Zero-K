@@ -337,7 +337,7 @@ function widget:SelectionChanged(newSelection)
 	--get new selected con, if any
 	for i=1,#newSelection do
 		local id = newSelection[i]
-		if UnitDefs[spGetUnitDefID(id)].isBuilder then
+		if UnitDefs[spGetUnitDefID(id)].builder then
 			currentBuilder = id
 			return
 		end

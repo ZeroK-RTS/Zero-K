@@ -1,5 +1,5 @@
 -- $Id$
-local versionNumber = "1.03"
+local versionNumber = "1.0"
 
 function widget:GetInfo()
 	return {
@@ -21,8 +21,6 @@ local updateInt = 1 	--seconds for the ::update loop
 local lastTime
 local ghostSites = {}
 local ghostFeatures = {}
-
-local gaiaTeamID = (Game.version:find('91.')) and -1 or Spring.GetGaiaTeamID()
 
 local floor                 = math.floor
 local udefTab				= UnitDefs
@@ -112,13 +110,13 @@ end
 function DrawGhostFeatures()
 	glColor(1.0, 1.0, 1.0, 0.35 )
   
-	--glTexture(0,"$units1") --.3do texture atlas for .3do model
+	glTexture(0,"$units1")
 	--glTexture(1,"$units1")
 
-	glTexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 34160 ) --34160 = GL_COMBINE_RGB_ARB
-	--use the alpha given by glColor for the outgoing alpha, else it would interpret the teamcolor channel as alpha one and make model transparent.
-	glTexEnv( GL.TEXTURE_ENV, 34162, GL.REPLACE ) --34162 = GL_COMBINE_ALPHA
-	glTexEnv( GL.TEXTURE_ENV, 34184, 34167 ) --34184 = GL_SOURCE0_ALPHA_ARB, 34167 = GL_PRIMARY_COLOR_ARB
+	glTexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 34160 )				--GL_COMBINE_RGB_ARB
+	--use the alpha given by glColor for the outgoing alpha.
+	glTexEnv( GL.TEXTURE_ENV, 34162, GL.REPLACE )			--GL_COMBINE_ALPHA
+	glTexEnv( GL.TEXTURE_ENV, 34184, 34167 )			--GL_SOURCE0_ALPHA_ARB			GL_PRIMARY_COLOR_ARB
 	
 	--------------------------Draw-------------------------------------------------------------
 	for unitID, ghost in pairs( ghostFeatures ) do
@@ -130,8 +128,7 @@ function DrawGhostFeatures()
 		if ( losState == false ) then
 			--glow effect?
 			--gl.Blending(GL.SRC_ALPHA, GL.ONE)
-			glTexture(0,"%-"..ghost["featDefId"]..":0") -- .s3o texture for .s3o model
-			
+			    
 			glPushMatrix()
 			glTranslate( x, y, z)
 
@@ -142,10 +139,10 @@ function DrawGhostFeatures()
 	end
 
 	--------------------------Clean up-------------------------------------------------------------
-	glTexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 8448 ) --8448 = GL_MODULATE
+	glTexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 8448 )				--GL_MODULATE
 	--use the alpha given by glColor for the outgoing alpha.
-	glTexEnv( GL.TEXTURE_ENV, 34162, 8448 ) --34162 = GL_COMBINE_ALPHA, 8448 = GL_MODULATE
-	--gl.TexEnv( GL.TEXTURE_ENV, 34184, 5890 ) --34184 = GL_SOURCE0_ALPHA_ARB, 5890 = GL_TEXTURE
+	glTexEnv( GL.TEXTURE_ENV, 34162, 8448 )											--GL_MODULATE
+	----gl.TexEnv( GL.TEXTURE_ENV, 34184, 5890 )			--GL_SOURCE0_ALPHA_ARB			GL_TEXTURE
 end
 
 function DrawGhostSites()
@@ -186,7 +183,7 @@ function ScanFeatures()
 
 		--printDebug( "FID: " .. fDefId .. " Name: " .. fName .. " Team: " .. fTeamID .. " Res: " .. resName )
 
-		if ( fTeamID ~= gaiaTeamID and fAllyID ~= nil and fAllyID >= 0 and ghostFeatures[fID] == nil ) then
+		if ( resName == "" and fAllyID >= 0 and myAllyID ~= fAllyID and ghostFeatures[fID] == nil ) then
 			--printDebug( FeatureDefs[fDefId] )
 			local x, y, z = spGetFeaturePosition(fID)
 			--printDebug("Feature added: " .. fName .. " ID: " .. fID .. " Pos: " .. x .. ":" .. y .. ":" .. z .. " Ally: " .. fAllyID .. " Team: " .. fTeamID  )

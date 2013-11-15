@@ -32,10 +32,10 @@ unitDef = {
   canPatrol                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT UNARMED]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[86 86 86]],
+  collisionVolumeOffsets        = [[0 -5 0]],
+  collisionVolumeScales         = [[95 50 95]],
   collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
+  collisionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -44,7 +44,6 @@ unitDef = {
     description_de = [[Produziert Kampfhubschrauber, Baut mit 10 M/s]],
 	helptext_de    = [[Kampfhubschrauber bieten aufgrund ihrer Beweglichkeit eine enorme Bandbreite an Einsetzbarkeit.]],
     sortName = [[3]],
-	modelradius    = [[43]],
   },
 
   energyMake                    = 0.225,

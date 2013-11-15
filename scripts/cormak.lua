@@ -10,10 +10,7 @@ local Rleg = piece 'rleg'
 local lowerLleg = piece 'lowerlleg' 
 local lowerRleg = piece 'lowerrleg' 
 local Lfoot = piece 'lfoot' 
-local Rfoot = piece 'rfoot'
-
-local l_gun = piece 'l_gun' 
-local r_gun = piece 'r_gun' 
+local Rfoot = piece 'rfoot' 
 
 smokePiece = {torso}
 
@@ -157,22 +154,25 @@ function AutoAttack_Thread()
 			lastWaveFrame = gameFrame
 			EmitSfx( emit,  UNIT_SFX1 )
 			EmitSfx( emit,  DETO_W2 )
-			FireAnim()
+			Vibrate()
 		end
 	end
 end
 
-function FireAnim()
-	
-	local mspeed = 4
-	Move (l_gun, x_axis, 2, mspeed*3)	
-	Move (r_gun, x_axis, -2, mspeed*3)
-    WaitForMove(l_gun, x_axis)
-    WaitForMove(r_gun, x_axis)
-    Sleep(1)
-	Move (l_gun, x_axis, 0, mspeed)	
-	Move (r_gun, x_axis, 0, mspeed)
-    Sleep(1)
+function Vibrate()
+	--Vibrate
+	Move(base, x_axis, 1, 20)
+	WaitForMove(base, x_axis)
+	Move(base, x_axis, 0, 20)
+	Move(base, z_axis, 1, 20)
+	WaitForMove(base, z_axis)
+	Move(base, z_axis, 0, 20)
+	Move(base, x_axis, -1, 20)
+	WaitForMove(base, x_axis)
+	Move(base, x_axis, 0, 20)
+	Move(base, z_axis, -1, 20)
+	WaitForMove(base, z_axis)
+	Move(base, z_axis, 0, 20)		
 end
 
 function script.Activate()
@@ -196,7 +196,7 @@ function script.FireWeapon(num)
 		lastWaveFrame = spGetGameFrame()
 		EmitSfx( emit,  UNIT_SFX1 )
 		EmitSfx( emit,  DETO_W2 )
-		FireAnim()
+		Vibrate()
 	end
 end
 

@@ -146,7 +146,6 @@ unitDef = {
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
       soundTrigger            = true,
-      sweepfire               = false,
       targetMoveError         = 0.05,
       texture1                = [[largelaser]],
       texture2                = [[flare]],

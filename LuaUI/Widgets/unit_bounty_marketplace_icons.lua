@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Bounty & Marketplace Icons (experimental)",
     desc      = "Shows bounty and marketplace icons",
     author    = "CarRepairer",
-	version   = "0.023",
+	version   = "0.022",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
@@ -19,8 +19,7 @@ end
 
 local echo = Spring.Echo
 
-local spGetAllUnits			= Spring.GetAllUnits
-local spGetVisibleUnits		= Spring.GetVisibleUnits
+local GetAllUnits          = Spring.GetAllUnits
 
 local min   = math.min
 local floor = math.floor
@@ -37,19 +36,11 @@ local myAllyTeamID = 666
 
 local imageDir = 'LuaUI/Images/bountymarketplaceicons/'
 
-local marketandbounty 	= false
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function tobool(val)
-  local t = type(val)
-  if (t == 'nil') then return false
-  elseif (t == 'boolean') then	return val
-  elseif (t == 'number') then	return (val ~= 0)
-  elseif (t == 'string') then	return ((val ~= '0') and (val ~= 'false'))
-  end
-  return false
+local function ToBool(x)
+  return x and x ~= 0 and x ~= "false"
 end
 
 function SetIcons(unitID, iconType)
@@ -80,15 +71,7 @@ local function UpdateAllUnits()
 		teamColors[teamID] = {Spring.GetTeamColor(teamID)}
 	end
 	
-	for _,unitID in ipairs( spGetAllUnits() ) do
-		for _,iconType in ipairs( iconTypes ) do
-			SetIcons(unitID, iconType )
-		end
-	end
-end
-
-local function UpdateVisibleUnits()
-	for _,unitID in ipairs( spGetVisibleUnits() ) do
+	for _,unitID in ipairs( GetAllUnits() ) do
 		for _,iconType in ipairs( iconTypes ) do
 			SetIcons(unitID, iconType )
 		end
@@ -117,16 +100,14 @@ end
 
 --needed if icon widget gets disabled/enabled after this one. find a better way?
 function widget:GameFrame(f)
-	if f%(32*6) == 0 then
+	if f%(64) == 0 then --1 second
 		UpdateAllUnits()
-	elseif f%(32*2) == 0 then
-		UpdateVisibleUnits()
 	end
 end
 
 
 function widget:Initialize()
-	if not tobool(Spring.GetModOptions().marketandbounty) then
+	if not ToBool(Spring.GetModOptions().marketandbounty) then
 		echo('Marketplace and Bounty Icons: Widget removed.')
 		widgetHandler:RemoveWidget()
 	end 

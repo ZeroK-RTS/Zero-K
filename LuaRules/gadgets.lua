@@ -19,41 +19,6 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local HANDLER_BASENAME = "gadgets.lua"
-local isMission = VFS.FileExists("mission.lua")
-
-local DepthMod = 10
-local DepthValue = -1
-
-origPairs = pairs
-local whiteList = {['string'] = true, ['number'] = true, ['boolean'] = true, ['nil'] = true, ['thread'] = true}
-local function mynext(...)
-	local i,v = next(...)
-	local t = type(i)
-	if not whiteList[t] then
-		Spring.Log(HANDLER_BASENAME, "error", '*** A gadget is misusing pairs! Report this with full infolog.txt! ***')
-		Spring.Log(HANDLER_BASENAME, "error", t)
-		Spring.Log(HANDLER_BASENAME, "error", i)
-		Spring.Log(HANDLER_BASENAME, "error", v)
-		DepthValue = DepthValue + 1
-		if isMission then
-			Spring.Log(HANDLER_BASENAME, "error", "Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)
-		else
-			error("Error depth: " .. DepthValue%DepthMod + 1, DepthValue%DepthMod + 1)	-- breaks mission_runner
-		end
-	end
-	return i,v
-end
-
-pairs = function(...) 
-	if SendToUnsynced then
-		local n,s,i = origPairs(...)
-		return mynext,s,i
-	else
-		local n,s,i = origPairs(...)
-		return next,s,i
-	end
-end
 
 local SAFEWRAP = 0
 -- 0: disabled
@@ -71,12 +36,15 @@ if (Spring.IsDevLuaEnabled()) then
   VFSMODE = VFS.RAW_ONLY
 end
 
+
 VFS.Include(HANDLER_DIR .. 'setupdefs.lua', nil, VFSMODE)
 VFS.Include(HANDLER_DIR .. 'system.lua',    nil, VFSMODE)
 VFS.Include(HANDLER_DIR .. 'callins.lua',   nil, VFSMODE)
 VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
+
+local HANDLER_BASENAME = "gadgets.lua"
 
 --------------------------------------------------------------------------------
 
@@ -264,6 +232,7 @@ local isSyncedCode = (SendToUnsynced ~= nil)
 local function IsSyncedCode()
   return isSyncedCode
 end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -879,7 +848,7 @@ function gadgetHandler:RegisterGlobal(owner, name, value)
   if ((name == nil)        or
       (_G[name])           or
       (self.globals[name]) or
-      ((CallInsMap and CallInsMap[name]) or (CALLIN_MAP and CALLIN_MAP[name]))) then
+      (CallInsMap[name])) then
     return false
   end
   _G[name] = value
@@ -1423,15 +1392,8 @@ end
 
 
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
+                                   damage, paralyzer, weaponID,
                                    attackerID, attackerDefID, attackerTeam)
-		
-  if Game.version:find('91.0') then
-    attackerTeam = attackerDefID
-    attackerDefID = attackerID
-    attackerID = projectileID
-  end
-  
   for _,g in ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,
                   damage, paralyzer, weaponID,

@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.324 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.321 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-08-31
+    date      = "2009-06-02", --2013-06-30
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -64,7 +64,6 @@ local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
-local subMenuIcons = confdata.subMenuIcons  
 local useUiKeys = false
 --file_return = nil
 
@@ -79,7 +78,6 @@ local Label
 local Colorbars
 local Checkbox
 local Window
-local Panel
 local ScrollPanel
 local StackPanel
 local LayoutPanel
@@ -178,27 +176,6 @@ local transkey = {
 	kp7				= 'numpad7',
 	kp8				= 'numpad8',
 	kp9				= 'numpad9',
-	
-
-    -- for french keyboard
-	--groupping
-		ampersand               = '&',
-		world_73                = '0x0e9',
-		quotedbl                = '"',
-		leftparen               = '(',
-		minus                   = '-',
-		world_72                = '0x0e8',
-		underscore              = '_',
-		world_71                = '0x0e7',
-		world_64                = '0x0e0',
-	
-	--other
-		leftparen               = ')', 
-		world_89				= '0x0f9',
-		dollar					= '$',
-		asterisk                = '*',
-
-
 }
 
 local wantToReapplyBinding = false
@@ -221,7 +198,6 @@ local settings = {
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
-	showAdvanced = false,
 }
 
 
@@ -597,16 +573,6 @@ local function checkWidget(widget)
 end
 
 
-local function SetLangFontConf()
-	if VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang..".lua", VFS.ZIP) then
-		WG.langFontConf = include("Configs/nonlatin/"..WG.lang..".lua")
-		WG.langFont = WG.langFontConf.font
-	else
-		WG.langFont = nil
-		WG.langFontConf = nil
-	end
-end
-
 local function SetCountry(self) 
 	echo('Setting country: "' .. self.country .. '" ') 
 	
@@ -614,8 +580,6 @@ local function SetCountry(self)
 	settings.country = self.country
 	
 	WG.lang = self.countryLang 
-	SetLangFontConf()
-	
 	settings.lang = self.countryLang
 	
 	if img_flag then
@@ -649,7 +613,6 @@ local function MakeFlags()
 		pl='pl',
 		pt='pt',
 		pr='es',
-		ru='ru',
 	}
 
 	local flagChildren = {}
@@ -979,21 +942,12 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	if not wname then
 		wname = path
 	end
-	
+
 	local path2 = path
 	if not option then
 		if not pathoptions[path] then
 			pathoptions[path] = {}
 		end
-		
-		-- must be before path var is changed
-		local icon = subMenuIcons[path]
-		--[[
-		if subMenuIcons[path] then 
-			icon = subMenuIcons[path] 
-		end
-		--]]
-		
 		local pathexploded = explode('/',path)
 		local pathend = pathexploded[#pathexploded]
 		pathexploded[#pathexploded] = nil
@@ -1002,7 +956,6 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		option = {
 			type='button',
 			name=pathend .. '...',
-			icon = icon,
 			OnChange = function(self)
 				MakeSubWindow(path2)  --this made this button open another menu
 			end,
@@ -1448,7 +1401,7 @@ local function GetHotkeyData(path, option)
 end
 
 --Make a stack with control and its hotkey button
-local function MakeHotkeyedControl(control, path, option, icon)
+local function MakeHotkeyedControl(control, path, option)
 
 	local hotkeystring = GetHotkeyData(path, option)
 	local kbfunc = function() 
@@ -1461,17 +1414,15 @@ local function MakeHotkeyedControl(control, path, option, icon)
 	local hklength = math.max( hotkeystring:len() * 10, 20)
 	local control2 = control
 	control.x = 0
-	if icon then
-		control.x = 20
-	end
 	control.right = hklength+2 --room for hotkey button on right side?
 	control:DetectRelativeBounds()
 	
 	local hkbutton = Button:New{
 		name = option.wname .. ' hotKeyButton';
 		minHeight = 30,
-		right=0,
+		--right=0, --Note: uncommenting this entry cause hotkey-button's position to overlap with control-button's position. It happen after Chili merge/update (???)
 		width = hklength,
+		--x=-30,
 		caption = hotkeystring, 
 		OnMouseUp = { kbfunc },
 		backgroundColor = color.sub_button_bg,
@@ -1479,26 +1430,20 @@ local function MakeHotkeyedControl(control, path, option, icon)
 		tooltip = 'Hotkey: ' .. hotkeystring,
 	}
 	
-	local children = {}
-	if icon then
-		local iconImage = Image:New{ file= icon, width = 16,height = 16, }
-		children = { iconImage, }
-	end
-	children[#children+1] = control
-	children[#children+1] = hkbutton
-	
-	return Panel:New{
+	return StackPanel:New{
 		width = "100%",
 		orientation='horizontal',
 		resizeItems = false,
 		centerItems = false,
 		autosize = true,
-		backgroundColor = {0, 0, 0, 0},
 		itemMargin = {0,0,0,0},
 		margin = {0,0,0,0},
-		itemPadding = {0,0,0,0}, 
+		itemPadding = {2,0,-hklength-2,0}, --{left,top,right,bottom}. Note: removing -hklength-2 padding causes wide empty space to appear between control-buttons and hotkey-buttons. This happen after Chili update/merge (???)
 		padding = {0,0,0,0},
-		children=children,
+		children={
+			control2,
+			hkbutton
+		},
 	}
 end
 
@@ -1574,8 +1519,7 @@ MakeSubWindow = function(path)
 		end
 		
 		
-		--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
-		if option.advanced and not settings.showAdvanced then
+		if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
 			--do nothing
 		elseif option.type == 'button' then
 			local hide = false
@@ -1589,24 +1533,17 @@ MakeSubWindow = function(path)
 			end
 			
 			if not hide then
-				
-				local icon = option.icon
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
 					x=0,
+					--right = 30,
 					minHeight = 30,
 					caption = option.name, 
 					OnClick = {option.OnChange},
 					backgroundColor = color.sub_button_bg,
 					textColor = color.sub_button_fg, 
-					tooltip = option.desc,
-					
-					padding={2,2,2,2},
+					tooltip = option.desc
 				}
-				
-				if icon then
-					Image:New{ file= icon, width = 16,height = 16, parent = button, x=4,y=4,  }
-				end
 				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option)
 			end
 			
@@ -1641,22 +1578,7 @@ MakeSubWindow = function(path)
 			
 		elseif option.type == 'number' then	
 			settings_height = settings_height + B_HEIGHT
-			local icon = option.icon
-			if icon then
-				tree_children[#tree_children+1] = Panel:New{
-					backgroundColor = {0,0,0,0},
-					padding = {0,0,0,0},
-					margin = {0,0,0,0},
-					--itemMargin = {2,2,2,2},
-					autosize = true,
-					children = {
-						Image:New{ file= icon, width = 16,height = 16, x=4,y=0,  },
-						Label:New{ caption = option.name, textColor = color.sub_fg, x=20,y=0,  },
-					}
-				}
-			else
-				tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
-			end
+			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
 			if option.valuelist then
 				option.value = GetIndex(option.valuelist, option.value)
 			end
@@ -1705,19 +1627,16 @@ MakeSubWindow = function(path)
 				item.desc = option.items[i].desc --is needed for checkbox tooltip
 				item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item.key). Is needed for Hotkey
 				settings_height = settings_height + B_HEIGHT
-				
-				local cb = Checkbox:New{
-					--x=0,
-					right = 35,
-					caption = item.name, 
-					checked = (option.value == item.key), 
-					OnMouseUp = {function(self) option.OnChange(item.key) end},
-					textColor = color.sub_fg,
-					tooltip=item.desc,
-				}
-				local icon = option.items[i].icon
-				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon)
-					
+				tree_children[#tree_children+1] = MakeHotkeyedControl(
+					Checkbox:New{
+						x=0,
+						right = 35,
+						caption = item.name, 
+						checked = (option.value == item.key), 
+						OnMouseUp = {function(self) option.OnChange(item.key) end},
+						textColor = color.sub_fg,
+						tooltip=item.desc,
+					}, path, item)
 			end			
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
@@ -1768,81 +1687,28 @@ MakeSubWindow = function(path)
 	
 	window_height = window_height + B_HEIGHT
 	
-	local buttonBar = Grid:New{
-		x=0;bottom=0;
-		right=10,height=B_HEIGHT,
-		columns = 4,
-		padding = {0, 0, 0, 0},
-		itemMargin = {0, 0, 0, 0}, --{1, 1, 1, 1},
-		autosize = true,
-		resizeItems = true,
-		centerItems = false,
-	}
-	
-	window_children[#window_children+1] = Checkbox:New{ 
-		--x=0,
-		width=180;
-		right = 5,
-		bottom=B_HEIGHT;
-		
-		caption = 'Show Advanced Settings', 
-		checked = settings.showAdvanced, 
-		OnChange = { function(self)
-			settings.showAdvanced = not self.checked
-			RemakeEpicMenu()
-		end }, 
-		textColor = color.sub_fg, 
-		tooltip   = 'For experienced users only.',
-	}
-	
-	window_children[#window_children+1] = buttonBar
-	
 	--back button
 	if parent_path then
-		Button:New{ name= 'backButton', caption = 'Back', OnClick = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
-			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, height=B_HEIGHT,
-			padding= {2,2,2,2},
-			parent = buttonBar;
-			children = {
-				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16,height = 16, parent = button, x=4,y=4,  }
-			}
-		}
+		window_children[#window_children+1] = Button:New{ name= 'backButton', caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
+			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
 	end
 	
-	--search button
-	Button:New{ name= 'searchButton', caption = 'Search',
-		OnClick = { function() Spring.SendCommands("chatall","PasteText /search:" ) end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
-		padding= {2,2,2,2},parent = buttonBar;
-		children = {
-			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16,height = 16, parent = button, x=4,y=4,  }
-		}
-	}
 	
 	--reset button
-	Button:New{ name= 'resetButton', caption = 'Reset',
-		OnClick = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
-		padding= {2,2,2,2}, parent = buttonBar;
-		children = {
-			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=4,  }
-		}
-	}
+	window_children[#window_children+1] = Button:New{ name= 'resetButton', caption = 'Reset', OnMouseUp = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='33%', right='33%', bottom=1, height=B_HEIGHT, }
+	
 	
 	--close button
-	Button:New{ name= 'menuCloseButton', caption = 'Close',
-		OnClick = { KillSubWindow }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
-		padding= {2,2,2,2}, parent = buttonBar;
-		children = {
-			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16,height = 16, parent = button, x=4,y=4,  }
-		}
-	}
+	window_children[#window_children+1] = Button:New{ name= 'menuCloseButton', caption = 'Close', OnMouseUp = { KillSubWindow }, 
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT, }
+	
+	
 	
 	KillSubWindow()
 	curPath = path -- must be done after KillSubWindow
 	window_sub_cur = Window:New{  
-		caption= (path~='') and (path), --display this text if path is not ""
+		caption= (path~='') and (path .. "\n(Press Enter to do Search)"), --display this text if path is not ""
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y, 
 		clientWidth = window_width,
@@ -1878,8 +1744,7 @@ MakeSubWindowSearch = function(path)
 			local lowercase_desc = option.desc and option.desc:lower() or ''
 			local found_name = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_text,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm) or virtualCategoryHit
 					
-			--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
-			if option.advanced and not settings.showAdvanced then
+			if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
 				--do nothing
 			elseif option.type == 'button' then
 				local hide = false
@@ -2277,7 +2142,7 @@ local function MakeMenuBar()
 						screen0:RemoveChild(window_exit)
 						exitWindowVisible = false
 					end, },
-				tooltip = "Ask teammates to resign",
+				tooltip = "Ask teammate to resign",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2, 
@@ -2286,13 +2151,13 @@ local function MakeMenuBar()
 			
 			Button:New{
 				name= 'resignButton',
-                caption = "Resign",
+                caption = "Resign and Spectate",
                 OnMouseUp = { function()
 						spSendCommands{"spectator"}
 						screen0:RemoveChild(window_exit)
 						exitWindowVisible = false
 					end, },
-				tooltip = "Abandon team and become spectator",
+				tooltip = "Abandon team and be spectator",
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2, 
@@ -2560,7 +2425,6 @@ function widget:Initialize()
 	Colorbars = Chili.Colorbars
 	Checkbox = Chili.Checkbox
 	Window = Chili.Window
-	Panel = Chili.Panel
 	ScrollPanel = Chili.ScrollPanel
 	StackPanel = Chili.StackPanel
 	LayoutPanel = Chili.LayoutPanel
@@ -2605,18 +2469,16 @@ function widget:Initialize()
 	
 	WG.country = settings.country	
 	WG.lang = settings.lang
-	SetLangFontConf()
 	
 		-- add custom widget settings to crudemenu
 	AddAllCustSettings()
 	
 
 	--this is done to establish order the correct button order
-	local imgPath = LUAUI_DIRNAME  .. 'images/'
 	AddOption('Settings/Reset Settings')
 	AddOption('Settings/Audio')
 	AddOption('Settings/Camera')
-	AddOption('Settings/Graphics')
+	AddOption('Settings/Graphics')	
 	AddOption('Settings/HUD Panels')
 	AddOption('Settings/Interface')
 	AddOption('Settings/Misc')
@@ -2972,6 +2834,12 @@ function widget:TextCommand(command)
 		return true
 	end
 	return false
+end
+
+function widget:KeyRelease(key)
+	if window_sub_cur and key ==13 then --Note: "13" equal to "Enter". Could this be different in different keyboard?
+		Spring.SendCommands("PasteText /search:" )
+	end
 end
 
 function SearchInText(randomTexts,searchText) --this allow search term to be unordered (eg: "sel view" == "view sel")

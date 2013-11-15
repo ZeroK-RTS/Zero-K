@@ -106,7 +106,7 @@ function widget:Initialize()
     local myAllyID = Spring.GetMyAllyTeamID()
     local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(myAllyID)
     if (x1 and not (x1 == 0 and z1 == 0 and x2 == msx and z2 == msz)) then
-	  allyStartBox = { x1+1, z1+1, x2-1, z2-1 }
+      allyStartBox = { x1, z1, x2, z2 }
     end
 
     for _,at in ipairs(Spring.GetAllyTeamList()) do
@@ -114,7 +114,7 @@ function widget:Initialize()
       if (at ~= myAllyID) then
         local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(at)
         if (x1 and not (x1 == 0 and z1 == 0 and x2 == msx and z2 == msz)) then
-          table.insert(enemyStartBoxes, { x1+1, z1+1, x2-1, z2-1 })
+          table.insert(enemyStartBoxes, { x1, z1, x2, z2 })
         end
       end
     end

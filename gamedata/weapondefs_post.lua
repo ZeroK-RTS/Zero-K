@@ -11,11 +11,6 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 --
 --  Per-unitDef weaponDefs
 --
@@ -97,21 +92,10 @@ end
 --
 -- 91.0 compatibility
 
-if reverseCompat then
-	for _, weaponDef in pairs(WeaponDefs) do
-		if (weaponDef.weapontype == "Shield") then
-			weaponDef.isshield = true
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Disable sweepfire until we know how to use it
-
  for _, weaponDef in pairs(WeaponDefs) do
-	weaponDef.sweepfire = false
+	if (weaponDef.weapontype == "Shield") then
+		weaponDef.isshield = true
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -166,23 +150,6 @@ end
 --
  for _, weaponDef in pairs(WeaponDefs) do
     weaponDef.noselfdamage = (weaponDef.noselfdamage ~= false)
- end
- 
- --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Workaround for http://springrts.com/mantis/view.php?id=4104
---
-
- for _, weaponDef in pairs(WeaponDefs) do
-    if weaponDef.texture1 == "largelaserdark" then
-		weaponDef.texture1 = "largelaserdark_long" 
-		weaponDef.tilelength = (weaponDef.tilelength and weaponDef.tilelength*4) or 800
-	end
-	if weaponDef.texture1 == "largelaser" then
-		weaponDef.texture1 = "largelaser_long" 
-		weaponDef.tilelength = (weaponDef.tilelength and weaponDef.tilelength*4) or 800
-	end
  end
  
 --------------------------------------------------------------------------------

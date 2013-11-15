@@ -29,7 +29,7 @@ unitDef = {
 	helptext_de    = [[Der Rogue nutzt Raketen mit einer geringen Feuerrate, dafür aber mit großem Schaden. Von daher eignet er sich gut gegen Verteidigung. Gegen schnelle Einheiten sieht er alledings recht alt aus.]],
 	aimposoffset   = [[0 5 0]],
 	midposoffset   = [[0 -3 0]],
-	modelradius    = [[14]],
+	modelradius    = [[22]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

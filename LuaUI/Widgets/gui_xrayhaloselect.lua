@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "XrayHaloSelections",
-    desc      = "v0.022 XraySelections & HaloSelections (Halo on cloaked)",
+    desc      = "v0.021 XraySelections & HaloSelections (Halo on cloaked)",
     author    = "CarRepairer - Xray by trepan & Halo by jK",
     date      = "2011-06-11",
     license   = "GNU GPL, v2 or later",
@@ -103,18 +103,12 @@ options = {
 	showally = {
 		name = 'Show Ally Selections',
 		type = 'bool',
-		desc = 'Highlight the units your allies currently have selected.',
+		desc = 'Highlight in yellow the units your allies currently have selected.',
 		value = false,
 		OnChange = function(self) 
 			visibleAllySelUnits = {}
 			showAlly = self.value
 		end,
-	},
-	useteamcolors = {
-		name = 'Use Team Colors',
-		type = 'bool',
-		desc = 'Highlight your allies\' selections with their team colors instead of the default yellow.',
-		value = false,
 	},
 }
 
@@ -211,7 +205,6 @@ local function SetTeamColor(teamID)
 		glColor(enemyColor)
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -404,10 +397,9 @@ function widget:DrawWorld()
     end
     
     if (na>0) then
-		if not options.useteamcolors.value then glColor(allySelectColor) end
+        glColor(allySelectColor)
         for i=1,na do
             --if unitID and unitID ~= data then
-			if options.useteamcolors.value then glColor(Spring.GetTeamColor(GetUnitTeam(visAllyUnit[i]))) end
             glUnit(visAllyUnit[i], true)
         end
     end
@@ -477,12 +469,7 @@ function widget:DrawWorld()
         end
         
         gl.ColorMask(true)
-		if (type == 'unit') and ValidUnitID(data) then 
-			glColor(Spring.GetTeamColor(GetUnitTeam(data)))
-		else
-			glColor(allySelectColor)
-		end
-		if not options.useteamcolors.value then glColor(allySelectColor) end
+        glColor(allySelectColor)
         gl.StencilFunc(GL.NOTEQUAL, 1, 1)
         gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
         gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
@@ -491,7 +478,6 @@ function widget:DrawWorld()
         end
         gl.PolygonMode(GL.FRONT_AND_BACK,GL.POINT)
         for i=1,nac do
-			if options.useteamcolors.value then glColor(Spring.GetTeamColor(GetUnitTeam(visAllyCloakUnit[i]))) end
 			glUnit(visAllyCloakUnit[i],true,-1)
         end
         

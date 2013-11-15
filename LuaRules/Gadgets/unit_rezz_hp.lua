@@ -32,14 +32,13 @@ if (gadgetHandler:IsSyncedCode()) then
 				unitsCount = unitsCount + 1
 				units[unitsCount] = unitID
 
-				local unitDef = unitDefID and UnitDefs[unitDefID]
-
 				-- award calculation
-				if GG.Awards and GG.Awards.AddAwardPoints then
-					GG.Awards.AddAwardPoints( 'rezz', teamID, (unitDef and unitDef.metalCost or 0) )
+				if GG.Awards then
+					GG.Awards.UnitResurrected(unitDefID, teamID)
 				end
 
 				-- add CEG and play sound
+				local unitDef = unitDefID and UnitDefs[unitDefID]
 				if unitDef then
 					local size = unitDef.xsize
 					local ux, uy, uz = spGetUnitPosition(unitID)

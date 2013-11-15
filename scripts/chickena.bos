@@ -1,4 +1,3 @@
-//linear constant 163840
 piece body,head,tail,lthigh,lknee,lshin,lfoot,rthigh,rknee,rshin,rfoot,lforearml,lbladel,rforearml,rbladel,lforearmu,lbladeu,rforearmu,rbladeu;
 
 static-var gun_1, bMoving;
@@ -8,7 +7,8 @@ static-var gun_1, bMoving;
 #define SIG_AIM_2			4
 #define SIG_MOVE			8
 
-#include "constants.h"
+#include "sfxtype.h"
+#include "exptype.h"
 
 walk()
 {		
@@ -211,8 +211,5 @@ Killed( severity, corpsetype )
 	{
 	corpsetype = 1;
 	emit-sfx 1025 from body;
-	explode head type FALL;
-	explode tail type FALL;
-	
 	return( 0 );
 	}

@@ -64,20 +64,12 @@ local options = {
     def    = false,
     section= 'modifiers',
   },
-  {
-    key = "noelo",
-    name = "No Elo",
-    desc = "Prevent battle from affecting Elo rankings",
-    type = "bool",
-    section= 'modifiers',
-    def = false,
-  },
-  {
+    {
     key    = 'koth',
     name   = 'King of the Hill Settings',
     desc   = 'Settings for King of the Hill mode.',
     type   = 'section',
-  },
+    },
     {
         key='hilltime',
         name='Hill control time',
@@ -538,7 +530,7 @@ local options = {
   {
     key	= "eggs",
     name = "Chicken Eggs",
-    desc = "Enables eggs mode (applies to all chicken difficulties); metal extractors are disabled but chickens drop twice as many eggs",
+    desc = "Enables eggs mode (applies to all chicken difficulties)",
     type = "bool",
     def	= false,
     section = 'chicken',

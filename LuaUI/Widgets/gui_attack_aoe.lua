@@ -206,7 +206,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 		if (weaponDef.tracks) then
 			retData = {type = "tracking"}
 		else
-			retData = {type = "cruise", range = weaponDef.range}
+			retData = {type = "cruise"}
 		end
 	elseif (weaponType == "TorpedoLauncher") then
 		if (weaponDef.tracks) then

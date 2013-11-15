@@ -4,7 +4,7 @@
 local skin = {
   info = {
     name    = "Carbon",
-    version = "1.0",
+    version = "0.1",
     author  = "luckywaldo7",
   }
 }
@@ -13,17 +13,13 @@ local skin = {
 --//
 
 skin.general = {
-  focusColor  = {0.0, 0.6, 1.0, 1.0},
-  borderColor = {1.0, 1.0, 1.0, 1.0},
+  --font        = "FreeSansBold.ttf",
+  fontOutline = false,
+  fontsize    = 13,
+  textColor   = {1,1,1,1},
 
-  font = {
-    --font    = "FreeSansBold.ttf",
-    color        = {1,1,1,1},
-    outlineColor = {0.05,0.05,0.05,0.9},
-    outline = false,
-    shadow  = true,
-    size    = 13,
-  },
+  --padding         = {5, 5, 5, 5}, --// padding: left, top, right, bottom
+  backgroundColor = {0.1, 0.1, 0.1, 0.7},
 }
 
 
@@ -34,10 +30,10 @@ skin.icons = {
 skin.button = {
   TileImageBK = ":cl:tech_button.png",
   TileImageFG = ":cl:empty.png",
-  tiles = {32, 32, 32, 32}, --// tile widths: left,top,right,bottom
+  tiles = {22, 22, 22, 22}, --// tile widths: left,top,right,bottom
   padding = {10, 10, 10, 10},
 
-  backgroundColor = {1, 1, 1, 1.0},
+  backgroundColor = {1, 1, 1, 0.7},
 
   DrawControl = DrawButton,
 }
@@ -45,8 +41,8 @@ skin.button = {
 skin.checkbox = {
   TileImageFG = ":cl:tech_checkbox_checked.png",
   TileImageBK = ":cl:tech_checkbox_unchecked.png",
-  tiles       = {8,8,8,8},
-  boxsize     = 12,
+  tiles       = {3,3,3,3},
+  boxsize     = 13,
 
   DrawControl = DrawCheckbox,
 }
@@ -89,9 +85,9 @@ skin.panel = {
   --tiles = {17,15,17,20},
   TileImageBK = ":cl:tech_button.png",
   TileImageFG = ":cl:empty.png",
-  tiles = {32, 32, 32, 32},
+  tiles = {22, 22, 22, 22},
 
-  backgroundColor = {1, 1, 1, 0.8},
+  backgroundColor = {1, 1, 1, 0.6},
 
   DrawControl = DrawPanel,
 }
@@ -99,7 +95,7 @@ skin.panel = {
 skin.progressbar = {
   TileImageFG = ":cl:tech_progressbar_full.png",
   TileImageBK = ":cl:tech_progressbar_empty.png",
-  tiles       = {16, 16, 16, 16},
+  tiles       = {10, 10, 10, 10},
 
   font = {
     shadow = true,
@@ -110,31 +106,31 @@ skin.progressbar = {
 
 skin.scrollpanel = {
   BorderTileImage = ":cl:panel2_border.png",
-  bordertiles = {16,16,16,16},
+  bordertiles = {14,14,14,14},
 
   BackgroundTileImage = ":cl:panel2_bg.png",
-  bkgndtiles = {16,16,16,16},
+  bkgndtiles = {14,14,14,14},
 
   TileImage = ":cl:tech_scrollbar.png",
-  tiles     = {8,8,8,8},
+  tiles     = {7,7,7,7},
   KnobTileImage = ":cl:tech_scrollbar_knob.png",
-  KnobTiles     = {8,8,8,8},
+  KnobTiles     = {6,8,6,8},
 
   HTileImage = ":cl:tech_scrollbar.png",
-  htiles     = {8,8,8,8},
+  htiles     = {7,7,7,7},
   HKnobTileImage = ":cl:tech_scrollbar_knob.png",
-  HKnobTiles     = {8,8,8,8},
+  HKnobTiles     = {6,8,6,8},
 
-  KnobColorSelected = {0.0, 0.6, 1.0, 1.0},
+  KnobColorSelected = {1,0.7,0.1,0.8},
 
-  scrollbarSize = 12,
+  scrollbarSize = 11,
   DrawControl = DrawScrollPanel,
   DrawControlPostChildren = DrawScrollPanelBorder,
 }
 
 skin.trackbar = {
   TileImage = ":cl:trackbar.png",
-  tiles     = {16, 16, 16, 16}, --// tile widths: left,top,right,bottom
+  tiles     = {10, 14, 10, 14}, --// tile widths: left,top,right,bottom
 
   ThumbImage = ":cl:trackbar_thumb.png",
   StepImage  = ":cl:trackbar_step.png",
@@ -147,7 +143,7 @@ skin.trackbar = {
 skin.treeview = {
   --ImageNode         = ":cl:node.png",
   ImageNodeSelected = ":cl:node_selected.png",
-  tiles = {16, 16, 16, 16},
+  tiles = {9, 9, 9, 9},
 
   ImageExpanded  = ":cl:treeview_node_expanded.png",
   ImageCollapsed = ":cl:treeview_node_collapsed.png",
@@ -162,11 +158,10 @@ skin.window = {
   --TileImage = ":cl:tech_window.png",
   --TileImage = ":cl:window_tooltip.png",
   --tiles = {25, 25, 25, 25}, --// tile widths: left,top,right,bottom
-  tiles = {64, 64, 64, 64}, --// tile widths: left,top,right,bottom
+  tiles = {62, 62, 62, 62}, --// tile widths: left,top,right,bottom
   padding = {13, 13, 13, 13},
   hitpadding = {4, 4, 4, 4},
 
-  color = {1, 1, 1, 1.0},
   captionColor = {1, 1, 1, 0.45},
 
   boxes = {

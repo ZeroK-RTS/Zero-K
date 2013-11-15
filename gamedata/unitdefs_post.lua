@@ -7,8 +7,6 @@ if (Spring.GetModOptions) then
   modOptions = Spring.GetModOptions()
 end
 
-local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility
@@ -279,27 +277,13 @@ end
 
 for name, ud in pairs(UnitDefs) do
     if (ud.canfly) then
-		ud.usesmoothmesh = false
-		if not ud.maxfuel then
-			ud.maxfuel = 1000000
-			ud.refueltime = ud.refueltime or 1
-		end
+	ud.usesmoothmesh = false
+	if not ud.maxfuel then
+	    ud.maxfuel = 1000000
+	    ud.refueltime = ud.refueltime or 1
+	end
     end
 end 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
--- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
-
-if not reverseCompat then
-	for name, ud in pairs(UnitDefs) do
-		if (ud.canfly) then
-			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 0.1
-		end
-	end
-end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -311,14 +295,9 @@ local ACCEL_MULT = 3
 local ACCEL_MULT_HIGH = 5
 
 for name, ud in pairs(UnitDefs) do
+	--if  then
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
-		
-		-- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
-		if ud.acceleration == ud.brakerate and not reverseCompat then
-			ud.brakerate = ud.brakerate * 3
-		end
-		
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
 			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
@@ -473,13 +452,6 @@ for name, ud in pairs(UnitDefs) do
 	end
 end 
 
--- Set to accelerate towards their destination regardless of heading
-for name, ud in pairs(UnitDefs) do
-	if ud.hoverattack then
-		ud.turninplaceanglelimit = 180
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- 2x repair speed than BP
@@ -506,7 +478,6 @@ end
 --------------------------------------------------------------------------------
 -- Burrowed
 -- 
---[[
 for name, ud in pairs(UnitDefs) do
   if (ud.weapondefs) then
     for wName,wDef in pairs(ud.weapondefs) do      
@@ -514,7 +485,6 @@ for name, ud in pairs(UnitDefs) do
     end
   end
 end --for
-]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -688,6 +658,5 @@ for name, ud in pairs(UnitDefs) do
     if ud.modelcenteroffset then
 		ud.customparams.aimposoffset = ud.modelcenteroffset
 		ud.customparams.midposoffset = ud.modelcenteroffset
-		ud.modelcenteroffset = "0 0 0"
     end   
 end

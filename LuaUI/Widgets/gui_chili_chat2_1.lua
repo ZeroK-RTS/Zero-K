@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.913 Chili Chat Console.",
+    desc      = "v0.909 Alternate Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -113,8 +113,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local HIGHLIGHT_SURROUND_SEQUENCE_1 = ' >>> '
-local HIGHLIGHT_SURROUND_SEQUENCE_2 = ' <<<'
+local HIGHLIGHT_SURROUND_SEQUENCE = ' #### '
 local DEDUPE_SUFFIX = 'x '
 
 --------------------------------------------------------------------------------
@@ -136,8 +135,6 @@ local scrollpanel1
 local inputspace
 WG.enteringText = false
 WG.chat = WG.chat or {}
-
-local echo = Spring.Echo
 
 -- redefined in Initialize()
 local function showConsole() end
@@ -170,36 +167,13 @@ local DiffTimers = Spring.DiffTimers
 
 options_path = "Settings/HUD Panels/Chat/Console"
 options_order = {
-	
-	'lblGeneral',
-	'mousewheel', 
-	'defaultAllyChat',
-	'text_height', 'max_lines',
+	'autohide', 'autohide_time', 'mousewheel', 'clickable_points',
+	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
+	'text_height', 'highlighted_text_height', 'max_lines',
 	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
-	
-	
-	'lblFilter',
-	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel',
-	
-	'lblPointButtons',
-	'clickable_points','pointButtonOpacity',
-	
-	'lblAutohide',
-	'autohide', 'autohide_time',
-	
-	
-	'lblHilite',
-	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight','highlighted_text_height', 
-	
-	'lblDedupe',
 	'dedupe_messages', 'dedupe_points','color_dup',
-	
-	'lblError',
-	'error_opengl_source',	
-	
-	
-	
+	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
+	'highlight_surround', 'highlight_sound', 'color_highlight'
 }
 
 --------------------------------------------------------------------------------
@@ -213,22 +187,6 @@ end
 --------------------------------------------------------------------------------
 
 options = {
-	
-	lblFilter = {name='Filtering', type='label', advanced = true},
-	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
-	lblAutohide = {name='Auto Hiding', type='label'},
-	lblHilite = {name='Highlighting', type='label'},
-	lblDedupe = {name='De-Duplication', type='label'},
-	lblGeneral = {name='General Settings', type='label'},
-	lblError = {name='Error Filter', type='label'},
-	
-	error_opengl_source = {
-		name = "Filter out \'Error: OpenGL: source\' error",
-		type = 'bool',
-		value = false,
-		desc = "Block \'Error: OpenGL: source\' error spam in Spring 91 for Intel Mesa driver.",
-	},
-	
 	text_height = {
 		name = 'Text Size',
 		type = 'number',
@@ -248,13 +206,6 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = onOptionsChanged,
-		advanced = true,
-	},
-	pointButtonOpacity = {
-		name = "Point button opacity",
-		type = 'number',
-		value = 0.25,
-		min = 0, max = 1, step = 0.05,
 		advanced = true,
 	},
 	
@@ -438,6 +389,7 @@ options = {
 	},
 	autohide_time = {
 		name = "Autohide time",
+		desc = "Time to leave chat visible",
 		type = 'number',
 		value = 4,
 		min = 1, max = 10, step = 1, 
@@ -600,18 +552,15 @@ local function displayMessage(msg, remake)
 	end
 	
 	-- TODO betterify this / make configurable
-	local highlight_sequence1 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_1) or '')
-	local highlight_sequence2 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_2) or '')
-	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.formatted .. highlight_sequence2
+	local highlight_sequence = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE) or '')
+	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence .. msg.formatted .. highlight_sequence
 
 	if (msg.dup > 1 and not remake) then
 		local last = stack_console.children[#(stack_console.children)]
 		if last then
-			if last.SetText then
-				last:SetText(text)
-				-- UpdateClientArea() is not enough - last message keeps disappearing until new message is added
-				last:Invalidate()
-			end
+			last:SetText(text)
+			-- UpdateClientArea() is not enough - last message keeps disappearing until new message is added
+			last:Invalidate()
 		end
 	else
 		local textbox = WG.Chili.TextBox:New{
@@ -635,35 +584,43 @@ local function displayMessage(msg, remake)
 			}
 		}
 		
-		local button
 		if msg.point and options.clickable_points.value then
-			textbox:SetPos( nil, 3, stack_console.width - 6 )
-			textbox:Update()
-			local tbheight = textbox.height -- not perfect
-			tbheight = math.max( tbheight, 15 ) --hack
-			--echo('tbheight', tbheight)
-			button = WG.Chili.Button:New{
-				width = '100%',
-				height = tbheight + 8,
-				padding = { 3,3,3,3 },
-				backgroundColor = {1,1,1,options.pointButtonOpacity.value},
-				caption = '',
-				children = { textbox, },
-				OnMouseDown = {function(self, x, y, mouse)
+			textbox.OnMouseDown = {function(self, x, y, mouse)
+				local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
+				if (mouse == 1 and click_on_text) then
 					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
-				end}
-			}
+				end
+				--[[ testing - CarRep
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then return false end
+				WG.crude.OpenPath(options_path)
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				--]]
 			
-			stack_console:AddChild(button, false)
+			end}
+			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+				return self
+			end
+			--[[ testing - CarRep
 		else
-			stack_console:AddChild(textbox, false)	
+			textbox.OnMouseDown = {function(self, x, y, mouse)
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then return false end
+				WG.crude.OpenPath(options_path)
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+			
+			end}
+			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+				return self
+			end
+			--]]
 		end
 
+		stack_console:AddChild(textbox, false)
 		stack_console:UpdateClientArea()
-		
 	end 
-
-	showConsole()
+	-- open timer (for autohide)
+	time_opened = GetTimer()
 end 
 
 
@@ -728,7 +685,9 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) then
-
+		-- time chat opened (for autohide)
+		time_opened = GetTimer()
+	
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
@@ -739,7 +698,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 			firstEnter = false
 		end
 		WG.enteringText = true
-		showConsole()
+		if not visible then 
+			showConsole()
+		end 
 	else
 		WG.enteringText = false		
 	end 
@@ -776,7 +737,6 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
-	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
 	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
 	and #messages > 0 and messages[#messages].text == msg.text then
 		-- update MapPoint position with most recent, as it is probably more relevant
@@ -824,8 +784,13 @@ local timer = 0
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
 
-	if options.autohide.value and time_opened and (DiffTimers(GetTimer(), time_opened) > options.autohide_time.value) then
-		hideConsole()	
+	if (options.autohide.value) then
+		local time_now = GetTimer()
+		if (time_opened) and (DiffTimers(time_now, time_opened) < options.autohide_time.value) then
+			showConsole()
+		else
+			hideConsole()
+		end
 	end
 
 	timer = timer + s
@@ -878,15 +843,16 @@ function widget:Initialize()
 		if visible then
 			screen0:RemoveChild(window_console)
 			visible = false
-			time_opened = nil
+			return true
 		end
+		return false
 	end
 
+	-- only used by Crude, and by autohide (to unhide)
 	showConsole = function()
 		if not visible then
 			screen0:AddChild(window_console)
 			visible = true
-			time_opened = GetTimer()
 		end
 	end
 	WG.chat.hideConsole = hideConsole
@@ -958,10 +924,11 @@ function widget:Initialize()
         selfImplementedMinimizable = 
             function (show)
                 if show then
-					options.autohide.value = false
+					-- update this in case autohide is enabled
+					time_opened = GetTimer()
 					showConsole()
                 else
-					options.autohide.value = true
+					time_opened = nil
 					hideConsole()
                 end
             end,

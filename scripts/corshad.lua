@@ -16,9 +16,6 @@ local wingtipl = piece 'wingtipl'
 local wingtipr = piece 'wingtipr' 
 local xp,zp = piece("x","z")
 
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitHeading = Spring.GetUnitHeading
-local spGetUnitVelocity = Spring.GetUnitVelocity
 
 smokePiece = {fuselage, thrustr, thrustl}
 
@@ -57,12 +54,13 @@ local function Lights()
 end
 
 function script.Create()
+	FakeUprightInit(xp, zp, drop)
 	StartThread(SmokeUnit)
-	FakeUprightInit(xp, zp, drop) 
 	--StartThread(Lights)
 end
 
 function script.QueryWeapon(num)
+	FakeUprightTurn(unitID, xp, zp, base, predrop)
 	return drop
 end
 
@@ -74,48 +72,11 @@ function script.AimWeapon(num, heading, pitch)
 	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
-local predictMult = 3
-
-function script.BlockShot(num, targetID)
-	if num ~= 2 then
-		return false
-	end
-	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
-	if not (targetID and ableToFire) then
-		return not ableToFire
-	end
-	local x,y,z = spGetUnitPosition(unitID)
-	local _,_,_,_,_,_,tx,ty,tz = spGetUnitPosition(targetID, true, true)
-	local vx,vy,vz = spGetUnitVelocity(targetID)
-	local heading = spGetUnitHeading(unitID)*headingToRad
-	vx, vy, vz = vx*predictMult, vy*predictMult, vz*predictMult
-	local dx, dy, dz = tx + vx - x, ty + vy - y, tz + vz - z
-	local cosHeading = cos(heading)
-	local sinHeading = sin(heading)
-	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
-	
-	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
-	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
-	--Spring.Echo(heading)
-	
-	if dz < 30 and dz > -30 and dx < 100 and dx > -100 and dy < 0 then
-		FakeUprightTurn(unitID, xp, zp, base, predrop) 
-		Move(drop, x_axis, dx)
-		Move(drop, z_axis, dz)
-		dy = math.max(dy, -30)
-		Move(drop, y_axis, dy)
-		return false
-	end
-	return true
-end
-
 function script.FireWeapon(num)
 	if num == 2 then
+		FakeUprightTurn(unitID, xp, zp, base, predrop)
 		GG.Bomber_Dive_fired(unitID)
 		Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
-		Move(drop, x_axis, 0)
-		Move(drop, z_axis, 0)
-		Move(drop, y_axis, 0)
 		Reload()
 	elseif num == 3 then
 		GG.Bomber_Dive_fake_fired(unitID)

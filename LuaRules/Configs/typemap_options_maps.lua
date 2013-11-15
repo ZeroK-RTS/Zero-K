@@ -4,5 +4,4 @@ return {
 	["DeltaSiegeDry"] = "alloff",
   ["CathraldaV10"] = "alloff",
   ["Vein"] = "alloff",
-  ["Violence_V3"] = "mapdefault",
 }

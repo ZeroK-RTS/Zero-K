@@ -36,7 +36,7 @@ local lastTorsoHeading = 0
 local SIG_Restore = 1
 local SIG_Walk = 2
 
-local PACE = 0.8
+local PACE = 1.1
 
 -- four leg positions - front to straight, then to back, then to bent (then front again)
 local LEG_FRONT_ANGLES    = { thigh=math.rad(-40), knee=math.rad(-10), shin=math.rad( 50), foot=math.rad(  0), toef=math.rad(  0), toeb=math.rad( 15) }

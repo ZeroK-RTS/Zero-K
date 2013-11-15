@@ -15,10 +15,10 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 2]],
-  collisionVolumeScales  = [[14 14 40]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[19 21 50]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -29,7 +29,6 @@ unitDef = {
     helptext_bp    = [[Dart é um rápido e barato agressor ou batedor. ? letal nos primeiros minutos do jogo se o inimigo for pego de surpresa. Defenda-se deles com torres de laser leves ou torres de misseis ou suas própias unidades.]],
     helptext_fr    = [[Le Dart est rapide, aussi bien r construire qu'r rejoindre la base ennemie. Faiblement armée la moindre résistance le réduira en miettes, mais capable de surprendre assez tôt un ennemi non préparé.]],
 	helptext_de    = [[Billig und schnell, damit wird der Dart zur tödlichen Waffe in den ersten fünf Minuten eines Spiels, wenn du deinen Gegner überrumpeln willst. Raketentürme, LLT oder schnelle Einheiten stoppen die Darts.]],
-	modelradius    = [[7]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -45,6 +44,7 @@ unitDef = {
   maxVelocity            = 5.09,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
+  modelCenterOffset      = [[0 0 2]],
   movementClass          = [[TANK2]],
   moveState              = 0,
   noAutoFire             = false,

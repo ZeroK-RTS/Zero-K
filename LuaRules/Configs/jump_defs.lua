@@ -55,8 +55,6 @@ jumpClassGroups = {
 	"armaak",
 	"corclog",
 	"corsumo",
-	"jumpriot",
-	"jumpimpulse",
 	--"cadenza",
 	"factoryjump",
 	-- "pizzathehut",--bad unit left for testing purposes
@@ -109,13 +107,7 @@ corclog = {
 	
 corsktl = {
 	range = 400, height = 120, speed = 5.2,  reload = 10,  aaShootMe = false, delay = 0, cannotJumpMidair = true},
-	
-jumpriot = {
-	cobscript = false},
-	
-jumpimpulse = {
-	cobscript = false},
-	
+
 -- corpyro = {
 	-- range = 400, height = 200, speed = 6,  reload = 10, },	
 }

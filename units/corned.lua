@@ -20,10 +20,10 @@ unitDef = {
   canreclamate           = [[1]],
   canstop                = [[1]],
   category               = [[LAND UNARMED]],
-  collisionVolumeOffsets = [[0 5 0]],
-  collisionVolumeScales  = [[28 28 40]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[36 54 56]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[cylZ]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -38,7 +38,6 @@ unitDef = {
     helptext_fr    = [[Alliant rapidit? et blindage important, le Mason permet de s'?tendre rapidement en s?curit?.]],
     helptext_it    = [[Altamente mobile e capace di prendere parecchi colpi, il Mason pu? rapidamente espandere il tuo territorio in una grande area]],
 	helptext_de    = [[Hochmobiles, bewaffnetes Konstruktionsfahrzeug, das sich ideal für schnelle Expansionen über große Flächen eignet.]],
-	modelradius    = [[14]],
   },
 
   energyMake             = 0.15,

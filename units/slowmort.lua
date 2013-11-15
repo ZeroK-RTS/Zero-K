@@ -5,11 +5,11 @@ unitDef = {
   acceleration        = 0.2,
   activateWhenBuilt   = true,
   brakeRate           = 0.2,
-  buildCostEnergy     = 220,
-  buildCostMetal      = 220,
+  buildCostEnergy     = 280,
+  buildCostMetal      = 280,
   builder             = false,
   buildPic            = [[slowmort.png]],
-  buildTime           = 220,
+  buildTime           = 280,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -89,7 +89,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 350,
+        default = 220,
       },
 
       explosionGenerator      = [[custom:flashslow]],
@@ -119,6 +119,7 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
+
   },
 
 
@@ -136,10 +137,10 @@ unitDef = {
       footprintZ       = 2,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 84,
+      metal            = 112,
       object           = [[CORMORT_DEAD.s3o]],
       reclaimable      = true,
-      reclaimTime      = 84,
+      reclaimTime      = 112,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -155,10 +156,10 @@ unitDef = {
       footprintZ  = 2,
       height      = [[4]],
       hitdensity  = [[100]],
-      metal       = 42,
+      metal       = 56,
       object      = [[debris2x2a.s3o]],
       reclaimable = true,
-      reclaimTime = 42,
+      reclaimTime = 56,
       world       = [[All Worlds]],
     },
 

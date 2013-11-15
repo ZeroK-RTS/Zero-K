@@ -32,7 +32,7 @@ end
 
 function IsTargetReallyReachable(unitID, x,y,z,ux, uy, uz)
 	local udid = spGetUnitDefID(unitID)
-	local moveID = UnitDefs[udid].moveDef.id
+	local moveID = UnitDefs[udid].moveData.id
 	local reach = true --Note: first assume unit is flying and/or target always reachable
 	if moveID then --Note: crane/air-constructor do not have moveID!
 		if not ux then

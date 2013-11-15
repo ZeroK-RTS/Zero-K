@@ -263,7 +263,7 @@ local function Jump(unitID, goal, cmdTag)
 	spSetUnitRulesParam(unitID,"jumpReload",0)
 
 	local function JumpLoop()
-
+	
 		if delay > 0 then
 			for i=delay, 1, -1 do
 				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
@@ -537,7 +537,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 
 	if (distSqr < (range*range)) then
 		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
-		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) and Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1 then
+		if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
 			local coords = table.concat(cmdParams)
 			local currFrame = spGetGameFrame()
 			for allCoords, oldStuff in pairs(jumps) do

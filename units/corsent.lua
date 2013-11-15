@@ -29,7 +29,6 @@ unitDef = {
     helptext_bp    = [[]],
     helptext_fr    = [[Le Copperhead est doté d'un double canon Flak envoyant des balles explosives en l'air. Il compense son imprécision par les dégâts de zones qu'elles provoquent. Peut efficace contre les cibles rapides, il s'occupera parfaitement des cibles aeriennes groupées en essaim.]],
 	helptext_de    = [[Copperheads Flakkanone macht kurzen Prozess mit feindlichen Hubschraubern, aber auch gegen Flugzeuge erweist sie sich als nützlich.]],
-	modelradius    = [[19]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -97,11 +96,7 @@ unitDef = {
       color                   = 1,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting       = 1,
-
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      cylinderTargeting      = 1,
 
       damage                  = {
         default = 9,

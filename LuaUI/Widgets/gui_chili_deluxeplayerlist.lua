@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Deluxe Player List - Alpha 2.02",
-    desc      = "v0.203 Chili Deluxe Player List, Alpha Release",
+    desc      = "v0.202 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
@@ -1116,25 +1116,20 @@ SetupPlayerNames = function()
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
 			table.sort (allyTeams[allyTeamID], function(a,b)
-					if not teams[a] or not teams[b] then
-					  Spring.Echo('<ChiliDeluxePlayerlist> Critical Error #1!')
-					  return a > b
-					else
-					  if (teams[a].isDead or not teams[a].isPlaying) and not (teams[b].isDead or not teams[b].isPlaying) then return false end
-					  if (teams[b].isDead or not teams[b].isPlaying) and not (teams[a].isDead or not teams[a].isPlaying) then return true end
-					  if (teams[a].isDead or not teams[a].isPlaying) and (teams[b].isDead or not teams[b].isPlaying) then
-						  if teams[a].roster[1].isActive and not teams[b].roster[1].isActive then return true end
-						  if teams[b].roster[1].isActive and not teams[a].roster[1].isActive then return false end
-					  end
-					  if localTeam ~= 0 or teamZeroPlayers[myID] then
-						  if a == localTeam then return true end
-						  if b == localTeam then return false end
-					  end
-					  if teams[a].roster[1].elo and teams[b].roster[1].elo then
-						  return teams[a].roster[1].elo > teams[b].roster[1].elo
-					  end
-					  return a > b
+					if (teams[a].isDead or not teams[a].isPlaying) and not (teams[b].isDead or not teams[b].isPlaying) then return false end
+					if (teams[b].isDead or not teams[b].isPlaying) and not (teams[a].isDead or not teams[a].isPlaying) then return true end
+					if (teams[a].isDead or not teams[a].isPlaying) and (teams[b].isDead or not teams[b].isPlaying) then
+						if teams[a].roster[1].isActive and not teams[b].roster[1].isActive then return true end
+						if teams[b].roster[1].isActive and not teams[a].roster[1].isActive then return false end
 					end
+					if localTeam ~= 0 or teamZeroPlayers[myID] then
+						if a == localTeam then return true end
+						if b == localTeam then return false end
+					end
+					if teams[a].roster[1].elo and teams[b].roster[1].elo then
+						return teams[a].roster[1].elo > teams[b].roster[1].elo
+					end
+					return a > b
 				end
 			)
 		end
@@ -1189,7 +1184,7 @@ SetupPlayerNames = function()
 			if allyTeamsDead[b] and allyTeamsDead[a] and allyTeams[a] and allyTeams[b] then
 				local teamIDa = allyTeams[a][1]
 				local teamIDb = allyTeams[b][1]
-				if teamIDa and teamIDb and teams[teamIDa].roster and teams[teamIDb].roster and teams[teamIDa].roster[1] and teams[teamIDb].roster[1]  then
+				if teamIDa and teamIDb and teams[teamIDa].roster and teams[teamIDb].roster then
 					if teams[teamIDa].roster[1].isActive and not teams[teamIDb].roster[1].isActive then return true end
 					if teams[teamIDb].roster[1].isActive and not teams[teamIDa].roster[1].isActive then return false end
 				end

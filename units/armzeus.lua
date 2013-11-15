@@ -14,9 +14,9 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 7]],
-  collisionVolumeScales  = [[35 50 35]],
-  collisionVolumeType    = [[cylY]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[40 60 40]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -35,7 +35,7 @@ unitDef = {
     helptext_fr    = [[Lentement mais surement, un groupe de Zeus peut encaisser les tirs enemis lourd jusqu'a ce qu'ils atteignent les fortifications et puissent utiliser leur canon éclair courte portée qui peut paralyser et endommager les enemis retranchés.]],
     helptext_it    = [[Lentamente, gruppi di Zeus possono sopportare fuoco pesante mentre camminano verso le fortificazioni nemiche, fino a che possono usare il loro cannone spara-fulmini a corto raggio, che danneggia e paralizza i nemici trincerati. Contrastali con qualunque cosa che puo tenersi fuori dal loro raggio, stando sicuro di non essere paralizzato (in quel caso sei morto.)]],
     helptext_pl    = [[Zeus jest na tyle wytrzymały, że niska szybkość nie przeszkadza mu podczas podchodzenia pod wrogie wieżyczki i niszczenia ich mocnym działkiem EMP. W walce z ruchomymi jednostkami jednak nie jest w stanie dogonić jednostek mających większe szybkość i zasięg, chociaż jednostki o mniejszym zasięgu niszczy skutecznie.]],
-	modelradius    = [[12]],
+	modelradius    = [[20]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -50,6 +50,7 @@ unitDef = {
   maxVelocity            = 1.7,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
+  modelCenterOffset      = [[0 0 4]],
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherezeus.s3o]],

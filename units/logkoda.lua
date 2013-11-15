@@ -110,8 +110,9 @@ unitDef = {
       soundStart              = [[weapon/cannon/cannon_fire3]],
       --soundStartVolume        = 2,
 	  soundTrigger			  = false,
+      sprayangle              = 300,
       startsmoke              = [[1]],
-      startVelocity           = 320,
+      startVelocity           = 350,
       texture2                = [[darksmoketrail]],
 	  tracks                  = false,
       trajectoryHeight        = 0.12,
@@ -120,7 +121,7 @@ unitDef = {
       weaponAcceleration      = 190,
       weaponTimer             = 0.6,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 320,
+      weaponVelocity          = 260,
     },
 	
 	BOGUS_FAKE_NAPALM_BOMBLET = {
@@ -161,7 +162,7 @@ unitDef = {
 	  soundTrigger			  = false,
       sprayangle              = 300,
       startsmoke              = [[1]],
-      startVelocity           = 320,
+      startVelocity           = 350,
       texture2                = [[darksmoketrail]],
 	  tracks                  = false,
       trajectoryHeight        = 0.2,
@@ -170,7 +171,7 @@ unitDef = {
       weaponAcceleration      = 190,
       weaponTimer             = 0.6,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 320,
+      weaponVelocity          = 260,
     },
 
   },

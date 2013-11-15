@@ -1,7 +1,7 @@
 -- $Id: snd_voices.lua 3727 2009-01-08 22:36:55Z licho $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local versionNumber = "1.1.3"
+local versionNumber = "1.1.2"
 
 function widget:GetInfo()
 	return {
@@ -541,10 +541,10 @@ end
 function widget:CommandNotify(commandID, params ,options)
   --PlaySound(LUAUI_DIRNAME.."Voices/", "left.wav")
   local unitID = GetSelectedUnits()[1]
+  local unitDefID = GetUnitDefID(unitID)
   if (not unitID) then
     return false
   end
-  local unitDefID = GetUnitDefID(unitID)
 
   if (commandID == CMD_RETREAT) then
 	local newRetreatOrder = 0
@@ -639,7 +639,7 @@ end
 --end
 
 
---function widget:UnitEnteredLos(unitID, unitTeam)
+--function widget:UnitEnteredLos(unitID, unitDefID, unitTeam)
 --  if ((UnitDefs[unitDefID]) and 
 --      (UnitDefs[unitDefID].isTransport)) then
 --    Play("detectedt")

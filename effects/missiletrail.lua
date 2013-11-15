@@ -3,7 +3,6 @@
 -- missiletrailyellow
 -- missiletrailblue
 -- missiletrailbluebig
--- moderatortrail
 -- chainsawtrail
 -- cruisetrail
 -- tactrail
@@ -11,7 +10,6 @@
 -- seismictrail
 -- bigemptrail
 -- emptrail
--- disarmtrail
 -- raventrail
 -- banishertrail
 -- bdtrail
@@ -81,7 +79,7 @@ return {
         width              = 6,
       },
     },
-
+	
   },
 
   ["missiletrailyellow"] = {
@@ -164,7 +162,7 @@ return {
     },
 
  },
-
+ 
   ["missiletrailbluebig"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -204,7 +202,7 @@ return {
       },
     },
  },
-
+ 
   ["chainsawtrail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -243,7 +241,7 @@ return {
         width              = 4,
       },
     },
-
+	
     smoketrail = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -272,41 +270,7 @@ return {
       },
     },
   },
-
-    ["moderatortrail"] = {
-    alwaysvisible      = false,
-    usedefaultexplosions = false,
-
-    smoketrail = {
-      air                = true,
-      class              = [[CSimpleParticleSystem]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        airdrag            = 0.9,
-        colormap           = [[1 0.67 0.9 0.2   0.45 0.3 0.405 0.2     0.4 0.3 0.36 0.125     0.3 0.3 0.3 0.05  0 0 0 0]],
-        directional        = true,
-        emitrot            = 15,
-        emitrotspread      = 30,
-        emitvector         = [[dir]],
-        gravity            = [[0, 0, 0]],
-        numparticles       = 1,
-        particlelife       = 28,
-        particlelifespread = 4,
-        particlesize       = 25,
-        particlesizespread = 11,
-        particlespeed      = 1,
-        particlespeedspread = 0,
-        pos                = [[0, 0, 0]],
-        sizegrowth         = -1,
-        sizemod            = 1.04,
-        texture            = [[smoke]],
-      },
-    },
-  },
-
-
+ 
 ["screamertrail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -345,7 +309,7 @@ return {
         width              = 8,
       },
     },
-
+	
     smoketrail = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -425,7 +389,7 @@ return {
         texture            = [[smoke]],
       },
     },
-
+	
     spikes = {
       air                = true,
       class              = [[explspike]],
@@ -442,7 +406,7 @@ return {
       },
     },
   },
-
+  
   ["tactrail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -493,7 +457,7 @@ return {
         texture            = [[smoke]],
       },
     },
-
+	
     spikes = {
       air                = true,
       class              = [[explspike]],
@@ -706,7 +670,7 @@ return {
   ["bigemptrail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
-
+    
     largeflash = {
       air                   = true,
       class                 = [[CBitmapMuzzleFlame]],
@@ -754,7 +718,7 @@ return {
         texture             = [[smoke]],
       },
     },
-
+    
     sparks = {
       air                   = true,
       class                 = [[CSimpleParticleSystem]],
@@ -799,11 +763,11 @@ return {
       },
     },
   },
-
+  
   ["emptrail"] = {
     alwaysvisible           = false,
     usedefaultexplosions    = false,
-
+    
     smoke_front = {
       air                   = true,
       class                 = [[CSimpleParticleSystem]],
@@ -831,7 +795,7 @@ return {
         texture             = [[smoke]],
       },
     },
-
+    
     sparks = {
       air                   = true,
       class                 = [[CSimpleParticleSystem]],
@@ -859,7 +823,7 @@ return {
         texture             = [[spark]],
       },
     },
-
+   
     spikes = {
       air                   = true,
       class                 = [[explspike]],
@@ -876,84 +840,6 @@ return {
       },
     },
   },
-
-  ["disarmtrail"] = {
-    alwaysvisible           = false,
-    usedefaultexplosions    = false,
-
-    smoke_front = {
-      air                   = true,
-      class                 = [[CSimpleParticleSystem]],
-      count                 = 1,
-      ground                = true,
-      water                 = true,
-      properties = {
-        airdrag             = 0.8,
-        colormap            = [[0.9 0.9 0.9 0.4  0.5 0.5 0.5 0.7  0.0 0.0 0.0 0.01]],
-        directional         = false,
-        emitrot             = 0,
-        emitrotspread       = 50,
-        emitvector          = [[dir]],
-        gravity             = [[0.05 r-0.1, 0.05 r-0.1, 0.05 r-0.1]],
-        numparticles        = 2,
-        particlelife        = 10,
-        particlelifespread  = 0,
-        particlesize        = 6,
-        particlesizespread  = 2,
-        particlespeed       = 4,
-        particlespeedspread = -4,
-        pos                 = [[0, 1, 3]],
-        sizegrowth          = 1.3,
-        sizemod             = 1.0,
-        texture             = [[smoke]],
-      },
-    },
-
-    sparks = {
-      air                   = true,
-      class                 = [[CSimpleParticleSystem]],
-      count                 = 1,
-      ground                = true,
-      water                 = true,
-      properties = {
-        airdrag             = 0.97,
-        colormap            = [[1 1 1 0.01   1 1 1 0.01   0.0 0.0 0 0.01]],
-        directional         = true,
-        emitrot             = 0,
-        emitrotspread       = 60,
-        emitvector          = [[0, 1, 0]],
-        gravity             = [[0, 0, 0]],
-        numparticles        = 1,
-        particlelife        = 12,
-        particlelifespread  = 4,
-        particlesize        = 5,
-        particlesizespread  = 0,
-        particlespeed       = 3,
-        particlespeedspread = 0,
-        pos                 = [[0, 0, 0]],
-        sizegrowth          = 0,
-        sizemod             = 1.0,
-        texture             = [[spark]],
-      },
-    },
-
-    spikes = {
-      air                   = true,
-      class                 = [[explspike]],
-      count                 = 4,
-      ground                = true,
-      water                 = true,
-      properties = {
-        alpha               = 0.75,
-        alphadecay          = 0.25,
-        color               = [[0.8, 0.8, 0.8]],
-        dir                 = [[-6 r12,-6 r12,-6 r12]],
-        length              = 12,
-        width               = 5,
-      },
-    },
-  },
-
 
   ["raventrail"] = {
     alwaysvisible      = false,

@@ -287,7 +287,7 @@ function widget:UnitDestroyed(unitID)
 	defences[unitID] = nil
 end
 
-function widget:UnitEnteredLos(unitID, unitTeam)
+function widget:UnitEnteredLos(unitID, unitDefID, unitTeam)
 	if defences[unitID] and not defences[unitID].complete then
 		defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
 	else

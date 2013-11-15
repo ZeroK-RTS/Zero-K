@@ -3,63 +3,12 @@ local array = {}
 local DAMAGE_PERIOD = 2 -- how often damage is applied
 
 local weapons = {
-	napalmmissile_weapon = { 
-		radius = 256, 
-		damage = 20, 
-		duration = 1400, 
-		rangeFall = 0.6, 
-		timeFall = 0.5
-	},
-	slowmissile_weapon = { 
-		radius = 512, 
-		damage = 3000, 
-		duration = 1800, 
-		rangeFall = 0, 
-		timeFall = 0
-	},
-	firewalker_napalm_mortar = { 
-		radius = 128, 
-		damage = 20, 
-		duration = 600, 
-		rangeFall = 0.6,
-		timeFall = 0.5 
-	},
-	jumpblackhole_black_hole = { 
-		radius = 150, 
-		damage = 5000,
-		impulse = true,
-		duration = 120, 
-		rangeFall = 0.4,
-		timeFall = 0.6
-	},
-	chickenwurm_napalm = { 
-		radius = 128, 
-		damage = 30, 
-		duration = 600, 
-		rangeFall = 0.6, 
-		timeFall = 0.5 
-	},
-	raveparty_orange_roaster = { 
-		radius = 256, 
-		damage = 40, 
-		duration = 450, 
-		rangeFall = 0.6, 
-		timeFall = 0.5 
-	},
-	logkoda_napalm_bomblet = { 
-		radius = 64, 
-		damage = 60, 
-		duration = 300, 
-		rangeFall = 0.6, 
-		timeFall = 0.5 
-	},
-	infernal_napalm = { 
-		radius = 192, 
-		damage = 60, 
-		duration = 300, 
-		rangeFall = 0.6, 
-		timeFall = 0.5 
-},
+	napalmmissile_weapon = { radius = 256, damage = 20, duration = 1400, rangeFall = 0.6, timeFall = 0.5},
+	slowmissile_weapon = { radius = 512, damage = 3000, duration = 1800, rangeFall = 0, timeFall = 0},
+	firewalker_napalm_mortar = { radius = 128, damage = 20, duration = 600, rangeFall = 0.6, timeFall = 0.5 },
+	chickenwurm_napalm = { radius = 128, damage = 30, duration = 600, rangeFall = 0.6, timeFall = 0.5 },
+	raveparty_orange_roaster = { radius = 256, damage = 40, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
+	logkoda_napalm_bomblet = { radius = 64, damage = 60, duration = 300, rangeFall = 0.6, timeFall = 0.5 },
 }
 
 -- radius		- defines size of sphereical area in which damage is dealt
@@ -70,8 +19,6 @@ local weapons = {
 
 local presets = {
 	module_napalmgrenade = { radius = 128, damage = 20, duration = 1400, rangeFall = 0.6, timeFall = 0.5 },
-	module_napalmarty = { radius = 128, damage = 20, duration = 600, rangeFall = 0.6, timeFall = 0.5 },
-	module_napalmarty_long = { radius = 128, damage = 20, duration = 750, rangeFall = 0.6, timeFall = 0.5 },
 }
 
 ------------------------

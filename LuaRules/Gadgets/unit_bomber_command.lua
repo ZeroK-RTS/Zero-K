@@ -86,7 +86,7 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.MANUALFIRE] = true,
 }
 
-local padRadius = 700 -- land if pad is within this range
+local padRadius = 400 -- land if pad is within this range
 local MAX_FUEL = 1000000 * 0.9	-- not exact to allow some fudge
 local GIVE_UP_FRAMES = 300
 

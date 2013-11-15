@@ -33,6 +33,7 @@ return {
         glowfalloff        = 8,
         pos                = [[0, 0, 0]],
         size               = 8,
+        sizegrowth         = 1,
         speed              = [[r-0.5 r0.5, ri-0.05 ri0.05, r-0.5 r0.5]],
         wantedpos          = [[-8 r16, r8, -8 r16]],
       },

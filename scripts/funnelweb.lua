@@ -8,7 +8,6 @@ local notum = piece 'notum'
 local gaster = piece 'gaster' 
 local gunL, gunR, flareL, flareR, aimpoint = piece('gunl', 'gunr', 'flarel', 'flarer', 'aimpoint')
 local shieldArm, shield, eye, eyeflare = piece('shield_arm', 'shield', 'eye', 'eyeflare')
-local emitl, emitr = piece('emitl', 'emitr')
 
 -- note reversed sides from piece names!
 local br = piece 'thigh_bacl'	-- back right
@@ -22,10 +21,9 @@ smokePiece = {gaster}
 
 local weaponPieces = {
 	[1] = {aimFrom = aimpoint, flare = aimpoint},
-	[2] = {aimFrom = emitl, flare = emitl},
-	[3] = {aimFrom = emitr, flare = emitr},
-	[4] = {aimFrom = eye, flare = eye},
-	[5] = {aimFrom = eye, flare = eyeflare},
+	[2] = {aimFrom = eye, flare = eye},
+	[3] = {aimFrom = eye, flare = eyeflare},
+	[4] = {aimFrom = gaster, flare = gaster},
 }
 
 local cannons = {
@@ -126,7 +124,7 @@ local function RestoreAfterDelayHead()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 2 or num == 3 then
+	if num > 2 then
 		return true
 	end
 	Signal( SIG_AIM[num])

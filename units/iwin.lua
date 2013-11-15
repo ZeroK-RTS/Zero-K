@@ -41,8 +41,9 @@ unitDef = {
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[iwin.blend]],
+  objectName                    = [[iwin.s3o]],
   script                        = [[iwin.lua]],
+  onoffable                     = true,
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
 

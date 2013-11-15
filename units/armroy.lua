@@ -31,7 +31,6 @@ unitDef = {
     helptext_pl    = [[Crusader posiada potê¿n¹ armatê œredniego zasiêgu idealn¹ do bombardowania nieruchomych wie¿yczek broni¹cych wybrze¿y. Jego drug¹ broni¹ jest wyrzutnia ³adunków g³êbinowych. £atwo pada ofiar¹ jednostek lataj¹cych i korwet, gdy¿ nie posiada broni skutecznym przeciwko szybkim celom.]],
     helptext_de    = [[Der Zerstörer kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Torpedowerfer gegen U-Boote. Hüte dich vor Flugzeugen und Korvetten - Zerstörer haben einige Probleme damit, schnelle Ziele zu treffen.]],
     extradrawrange = 300,
-	modelradius    = [[17]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

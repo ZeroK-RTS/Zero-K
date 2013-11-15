@@ -216,37 +216,6 @@ return {
       },
     },
   },
-  
-  ["black_hole"] = {
-    usedefaultexplosions = false,
-    sparks = {
-      air                = true,
-	  ground             = true,
-      water              = true,
-	  underwater         = true,
-      class              = [[CSimpleParticleSystem]],
-      properties = {
-        airdrag            = 1,
-        colormap           = [[0 .8 1 .1   0 0 0 0]],
-        directional        = true,
-        emitrot            = 0,
-        emitrotspread      = 120,
-        emitvector         = [[0,1,0]],
-        gravity            = [[0, 0, 0]],
-        numparticles       = 20,
-        particlelife       = 80,
-        particlelifespread = 40,
-        particlesize       = 110,
-        particlesizespread = 110,
-        particlespeed      = 0.15,
-        particlespeedspread = 0.05,
-        pos                = [[0, 10, 0]],
-        sizegrowth         = -0.4,
-        sizemod            = 1,
-        texture            = [[chargeparticles]],
-      },
-    },
-  },
 
   ["grav_blast_effect"] = {
     usedefaultexplosions = false,

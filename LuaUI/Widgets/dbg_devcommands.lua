@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Dev Commands",
-    desc      = "v0.011 Dev Commands",
+    desc      = "v0.01 Dev Commands",
     author    = "CarRepairer",
     date      = "2011-11-17",
     license   = "GPLv2",
@@ -77,11 +77,6 @@ options = {
 		name = "Debug Path",
 		type = 'button',
 		action = 'debugpath',
-	},
-	singlestep = {
-		name = "Single Step",
-		type = 'button',
-		action = 'singlestep',
 	},
 	
 	

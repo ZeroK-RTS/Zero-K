@@ -3,7 +3,7 @@ function widget:GetInfo()
     name      = "Ballistic Calculator",
     desc      = "Simulate & plot weapon's ballistic range & trajectory based on gravity setting (ie: myGravity) and velocity (ie:weaponVelocity). For weapon setting testing. \n\nInstruction: select any unit, press attack, hover mouse over ground (trajectory will be drawn), press I & O to decrease & increase myGravity respectively, press K & L to decrease & increase weaponVelocity respectively , M to activate high-trajectory.",
     author    = "msafwan", --using component from "gui_jumpjets.lua" by quantum,
-    date      = "October 4 2013",
+    date      = "Sept 14 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 10000,
     enabled   = false,
@@ -15,8 +15,6 @@ local customWeaponVelocity = 232
 local flightTime =0
 local highTrajectory = false
 local maximumRange = 0
-local apexHeight = 0
-local currRange = 0
 
 local spGetActiveCommand = Spring.GetActiveCommand
 local spGetMouseState = Spring.GetMouseState
@@ -47,7 +45,7 @@ function DrawMouseArc(unitID, shift, groundPos)
 	if (not queue or #queue == 0 or not shift) then
 		local unitPos = {spGetUnitPosition(unitID)}
 		local dist = GetDist2D(unitPos, groundPos)
-		local maxRange,_ = CalculateBallisticConstant(deltaV,customMyGravity,unitPos, groundPos)
+		local maxRange,_ = CalculateBallisticConstant(deltaV,customMyGravity)
 		DrawArc(unitID, unitPos, groundPos, maxRange,dist, deltaV, customMyGravity)
 		maximumRange = maxRange
 	end
@@ -57,19 +55,18 @@ function GetDist2D(a, b)
   return ((a[1] - b[1])^2 + (a[3] - b[3])^2)^0.5
 end
 
-local spGetGroundHeight = Spring.GetGroundHeight
-function CalculateBallisticConstant(deltaV,myGravity,start, finish)
+function CalculateBallisticConstant(deltaV,myGravity)
 	local angle  = 0.707 --use test range of 45 degree for optimal launch
 	--determine maximum range & time
 	local xVel = math.cos(0.707)*deltaV --horizontal portion
 	local yVel = math.sin(0.707)*deltaV --vertical portion
 	local t = nil
-	local yDist = spGetGroundHeight(finish[1],finish[3]) - start[2] -- set vertical height of 0 (a round trip from 0 height to 0 height)
+	local yDist = 0 -- set vertical height of 0 (a round trip from 0 height to 0 height)
 	local a = myGravity
-	-- 0 = yVel*t - a*t*t/2 --this is the basic equation of motion for vertical motion, we set distance to 0 or yDist (this have 2 meaning: either is launching from ground or is hitting ground) then we find solution for time (t) using a quadratic solver
-	-- 0 = (yVel)*t - (a/2)*t*t --^same equation as above rearranged to highlight time (t)
-	local t1 = (-yVel + (yVel^2 - 4*(-a/2)*(-yDist))^0.5)/(2*(-a/2)) ---formula for finding root for quadratic equation (quadratic solver). Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
-	local t2 = (-yVel - (yVel^2 - 4*(-a/2)*(-yDist))^0.5)/(2*(-a/2))
+	-- 0 = yVel*t - a*t*t/2
+	-- 0 = (yVel)*t - (a/2)*t*t 
+	local t1 = (-yVel + (yVel^2 - 4*(-a/2)*(-0))^0.5)/(2*(-a/2)) ---formula for finding root for quadratic equation. Ref: http://www.sosmath.com/algebra/quadraticeq/quadraformula/summary/summary.html
+	local t2 = (-yVel - (yVel^2 - 4*(-a/2)*(-0))^0.5)/(2*(-a/2))
 	xDist1 = xVel*t1 --distance travelled horizontally in "t" amount of time
 	xDist2 = xVel*t2
 	local maxRange = nil
@@ -89,6 +86,7 @@ end
 local glVertex = gl.Vertex
 local glColor = gl.Color
 local glDrawGroundCircle = gl.DrawGroundCircle
+local spGetGroundHeight = Spring.GetGroundHeight
 local glBeginEnd = gl.BeginEnd
 local glLineStipple = gl.LineStipple
 local GL_LINE_STRIP = GL.LINE_STRIP
@@ -115,7 +113,7 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 	local horizontalSpeed = cachedResult[3] or 0	
 	if calculateNow then --let GameFrame() control when to calculate this rather than letting it to DrawWorld()
 		local goodValue = {deviation= 999}
-		local searchPattern = {startAngle = -1.571, endAngle = 0.707, stepAngle = 0.005}
+		local searchPattern = {startAngle = 0.0, endAngle = 0.707, stepAngle = 0.005}
 		if highTrajectory then 
 			searchPattern= {startAngle = 0.707, endAngle = 1.57, stepAngle = 0.005}
 		end
@@ -123,7 +121,7 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 			local angle  = i
 			local xVel = math.cos(angle)*deltaV
 			local yVel = math.sin(angle)*deltaV
-			local yDist = spGetGroundHeight(finish[1],finish[3]) - start[2]
+			local yDist = spGetGroundHeight(finish[1],finish[3]) - spGetGroundHeight(start[1],start[3])
 			local a = myGravity
 			local t1 = nil
 			local t2 = nil
@@ -139,22 +137,12 @@ function DrawArc(unitID, start, finish, range, dist, deltaV, myGravity)
 				goodValue[4] = yVel
 				goodValue[5]= t1
 				goodValue.deviation = math.abs(xDist1 - dist)
-				currRange = xDist1
-				--Note:
-				--Formula to find root is: t = (-b +- (b*b - 4*(a)*(c))^0.5)/(2*a) ..... a & b & c is: 0= c + b*t - a*t*t
-				--but when it have only 1 solution (which only happen at the top-most of the arch/trajectory, the discriminant become 0, simplifying the equation to: t = -b /(2*a)
-				local flightTimeApex = -yVel/(2*(-a/2)) --time to apex^
-				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2 
 			elseif math.abs(xDist2 - dist) <= goodValue.deviation and t2>=0 then 
 				goodValue[2] = angle
 				goodValue[3] = xVel
 				goodValue[4] = yVel
 				goodValue[5]= t2
 				goodValue.deviation = math.abs(xDist2 - dist)
-				currRange = xDist2
-				
-				local flightTimeApex = -yVel/(2*(-a/2)) --time to apex^
-				apexHeight = yVel*flightTimeApex - a*flightTimeApex*flightTimeApex/2 --from: yDist = yVel*t - a*t*t/2 
 			end
 		end
 		correctAngle = goodValue[2]
@@ -209,7 +197,7 @@ function widget:GameFrame(n)
 	lineProgress = lineProgress + (1/30)
 	calculateNow =true
 	if n- lastUpdate >= 30 then
-		Spring.Echo("myGravity: ".. string.format("%.3f", customMyGravity).. " ("..string.format("%.3f", customMyGravity/888.888888) .. " Spring91), weaponVelocity: ".. string.format("%.3f", customWeaponVelocity) .. ", flightTime: " .. string.format("%.3f", flightTime) .." ,apexHeight: " .. string.format("%.3f", apexHeight) .. " , currentRange: " .. string.format("%.3f", currRange) .. " ,maximumRange: ".. string.format("%.3f", maximumRange))
+		Spring.Echo("myGravity: ".. customMyGravity.. ", weaponVelocity: ".. customWeaponVelocity .. ", flightTime: " .. flightTime .. " ,maximumRange: ".. maximumRange)
 		lastUpdate = n
 	end
 end
@@ -222,10 +210,10 @@ local decVelocity = string.byte( "k" )
 local trajectory =  string.byte( "m" )
 function widget:KeyPress(key, mods, isRepeat)
 	if ( key == incGravity ) then 
-		customMyGravity = customMyGravity + ((isRepeat and 1) or 0.1)
+		customMyGravity = customMyGravity + ((isRepeat and 1) or 0.01)
 		return true
 	elseif ( key == decGravity ) then
-		customMyGravity = customMyGravity - ((isRepeat and 1) or 0.1)
+		customMyGravity = customMyGravity - ((isRepeat and 1) or 0.01)
 		return true
 	elseif ( key == incVelocity ) then
 		customWeaponVelocity = customWeaponVelocity + ((isRepeat and 10) or 1)

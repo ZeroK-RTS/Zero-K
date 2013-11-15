@@ -2044,7 +2044,7 @@ end
 -- Sudden Death Mode
 --------------------------------------------------------------------------------
 
-function GG.Terraform_RaiseWater( raiseAmount)
+local function RaiseWater( raiseAmount)
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i]]
@@ -2881,7 +2881,7 @@ end
 function gadget:GameFrame(n)
 	
 	--if n % 300 == 0 then
-	--	GG.Terraform_RaiseWater(-20)
+	--	RaiseWater(-20)
 	--end
 	
 	if n == 60 and costMult ~= 1 then
@@ -2916,8 +2916,8 @@ function gadget:GameFrame(n)
 					spSetUnitTooltip(id, TOOLTIP_SPENT .. floor(terraformUnit[id].totalSpent) ..
 							  ", " .. TOOLTIP_COST .. floor(terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost) )
 					
-					if GG.Awards and GG.Awards.AddAwardPoints then
-						GG.Awards.AddAwardPoints('terra', terraformUnit[id].team, costDiff)
+					if GG.Awards and GG.Awards.AddTerraformCost then
+						GG.Awards.AddTerraformCost(terraformUnit[id].team, costDiff)
 					end
 					
 					local updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
@@ -3086,39 +3086,6 @@ for i=1,#WeaponDefs do
 	end
 end
 
-local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
-	--local found = {count = 0, data = {}}
-	for i = 1, posCount do
-		if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
-			posY[i] = 0
-			--found.count = found.count + 1
-			--found.data[found.count] = {x = posX[i], z = posZ[i]}
-		end	
-	end
-	
-	
-	--[[
-	if found.count == 0 then	
-		return posY
-	end
-	
-	for i = 1, posCount do
-		local x = posX[i]
-		local z = posZ[i]
-		for j = 1, found.count do
-			local fx = found.data[j].x
-			local fz = found.data[j].z
-			local maxChange = sqrt((fx-x)^2 + (fz-z)^2)*maxHeightDifference/64
-			if abs(posY[i]) > maxChange then
-				posY[i] = abs(posY[i])/posY[i]*maxChange
-			end
-		end
-	end
-	--]]
-
-	return posY
-end
-
 function gadget:Explosion(weaponID, x, y, z, owner)
 	
 	if SeismicWeapon[weaponID] then
@@ -3168,39 +3135,23 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		if groundPoints > 0 then
 			groundHeight = groundHeight/groundPoints
 			
-			local posX, posY, posZ = {}, {}, {}
-			local posCount = 0
-			
-			for i = sx-smoothradius, sx+smoothradius,8 do
-				for j = sz-smoothradius, sz+smoothradius,8 do
-					local disSQ = (i - x)^2 + (j - z)^2
-					if disSQ <= smoothradiusSQ then
-						if not origHeight[i] then
-							origHeight[i] = {}
+			local func = function()
+				for i = sx-smoothradius, sx+smoothradius,8 do
+					for j = sz-smoothradius, sz+smoothradius,8 do
+						local disSQ = (i - x)^2 + (j - z)^2
+						if disSQ <= smoothradiusSQ then
+							if not origHeight[i] then
+								origHeight[i] = {}
+							end
+							if not origHeight[i][j] then
+								origHeight[i][j] = spGetGroundHeight(i,j)
+							end
+							spSetHeightMap(i, j, origHeight[i][j] + (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ))
 						end
-						if not origHeight[i][j] then
-							origHeight[i][j] = spGetGroundHeight(i,j)
-						end
-						posCount = posCount + 1
-						posX[posCount] = i
-						posY[posCount] = (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ)
-						posZ[posCount] = j
 					end
-				end
-			end 
-			
-			local posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
-			
-			spSetHeightMapFunc(
-				function(x,z,h)
-					for i = 1, #x, 1 do
-						spAddHeightMap(x[i],z[i],h[i])
-					end
-				end,
-				posX,
-				posZ,
-				posY
-			) 
+				end 
+			end
+			spSetHeightMapFunc(func)
 		end
 		
 		if detachmentradius then
@@ -3346,7 +3297,11 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			       2,3 ,7 ,3 ,2 ,
 				     2 ,3 ,2 }
 			
-			posY = makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posCount)
+			for i = 1, posCount do
+				if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
+					posY[i] = 0
+				end	
+			end
 			
 			spSetHeightMapFunc(
 				function(x,z,h)
@@ -3462,7 +3417,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if ud.isBuilder and not ud.isFactory and not exceptionArray[unitDefID] then
+	if ud.builder and not ud.isFactory and not exceptionArray[unitDefID] then
 		for _, cmdDesc in ipairs(cmdDescsArray) do
 			spInsertUnitCmdDesc(unitID, cmdDesc)
 		end
@@ -3583,7 +3538,7 @@ function gadget:Initialize()
 	_G.drawPositions = drawPositions
 	
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
-		GG.Terraform_RaiseWater(modOptions.waterlevel)
+		RaiseWater(modOptions.waterlevel)
 	end
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

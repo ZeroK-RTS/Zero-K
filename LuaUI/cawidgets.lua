@@ -35,7 +35,7 @@ includeZIPFirst("system.lua")
 includeZIPFirst("cache.lua") --contain cached override for Spring.GetVisibleUnit (performance optimization). All overrides that are placed here have global reach
 include("callins.lua")
 include("savetable.lua")
-include("utility_two.lua") --contain file backup function: CheckLUAFileAndBackup()
+include("utility_two.lua") --contain file backup function
 local myName, transmitMagic, voiceMagic, transmitLobbyMagic, MessageProcessor = include("chat_preprocess.lua") -- contain stuff that preprocess chat message for Chili Chat widgets
 
 local modShortUpper = Game.modShortName:upper()
@@ -71,7 +71,7 @@ do -- create backup for ZK_data.lua and ZK_order.lua to workaround against case 
  	local fileToCheck = {ORDER_FILENAME,CONFIG_FILENAME}
 	local extraText = {'-- Widget Order List  (0 disables a widget)', '-- Widget Custom Data'} --this is a header text that is appended to start of file
 	for i=1, #fileToCheck do
-		CheckLUAFileAndBackup(fileToCheck[i], extraText[i]) --utility_two.lua
+		CheckLUAFileAndBackup(fileToCheck[i], extraText[i])
 	end
 end
 
@@ -81,7 +81,7 @@ local localWidgets = false
 
 if VFS.FileExists(CONFIG_FILENAME) then --check config file whether user want to use localWidgetsFirst
   local cadata = VFS.Include(CONFIG_FILENAME)
-  if cadata and cadata["Local Widgets Config"] then
+  if cadata["Local Widgets Config"] then
     localWidgetsFirst = cadata["Local Widgets Config"].localWidgetsFirst
     localWidgets = cadata["Local Widgets Config"].localWidgets
   end
@@ -639,7 +639,7 @@ function widgetHandler:NewWidget()
 
   ----
   widget.ProcessConsoleBuffer = function(_,_, num)	-- FIXME: probably not the least hacky way to make ProcessConsoleBuffer accessible to widgets
-    return MessageProcessor:ProcessConsoleBuffer(num) --chat_preprocess.lua
+    return MessageProcessor:ProcessConsoleBuffer(num)
   end
   ----
   
@@ -1252,7 +1252,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
   else
 	--censor message for muted player. This is mandatory, everyone is forced to close ears to muted players (ie: if it is optional, then everyone will opt to hear muted player for spec-cheat info. Thus it will defeat the purpose of mute)
 	local newMsg = { text = msg, priority = priority }
-	MessageProcessor:ProcessConsoleLine(newMsg) --chat_preprocess.lua
+	MessageProcessor:ProcessConsoleLine(newMsg)
 	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' then 
 		local playerID_msg = newMsg.player and newMsg.player.id --retrieve playerID from message.
 		local customkeys = select(10, Spring.GetPlayerInfo(playerID_msg))

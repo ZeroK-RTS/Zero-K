@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.087 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.085 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -87,8 +87,7 @@ local UnitDefsList = {}
 for i=1,#UnitDefs do
 	local ud = UnitDefs[i]
 	local unitName = ud.humanName
-	local unitNameL = unitName:lower()
-	if not (unitNameL:find('test') or unitNameL:find('fake')) and not ignoreList[unitName] then
+	if not (unitName:find('test') or unitName:find('fake')) and not ignoreList[unitName] then
 		UnitDefsList[#UnitDefsList+1] = {unitName=unitName, ud=ud}
 	end
 end
@@ -107,17 +106,7 @@ for i=1,#UnitDefsList do
 		OnChange = function(self)
 			MakeStatsWindow(ud)
 		end,
-		path = options_path ..'/' .. unitName:sub(1,1):upper(),
-	}
-	options_order[#options_order + 1] = optionName
-	
-	optionName = unitName .. 'build'
-	options[optionName] = {
-		name=unitName,
-		type='button',
-		desc = "Build " .. unitName,
-		action = 'buildunit_' .. ud.name,
-		path = 'Game/Units/' .. unitName:sub(1,1):upper(),
+		path = unitHelpPath,
 	}
 	options_order[#options_order + 1] = optionName
 end
@@ -259,44 +248,20 @@ local function GetUnitDefByHumanName(humanName)
 end
 
 
-local function getHelpText(unitDef)
-	local lang = WG.lang
-	local font = WG.langFont
-	
-	local helpText
-	if font then
-		local unitConf = WG.langFontConf.units[unitDef.name] 
-		helpText = unitConf and unitConf.helptext
-	end
-	if not helpText then
-		local suffix = (lang == 'en') and '' or ('_' .. lang)
-		helpText = unitDef.customParams and unitDef.customParams['helptext' .. suffix] 
-			or unitDef.customParams.helptext
-			or "No help text available for this unit."
-		font = nil
-	end
-		
-	return helpText, font
+local function getHelpText(unitDef, lang)
+	local suffix = (lang == 'en') and '' or ('_' .. lang)	
+	return unitDef.customParams and unitDef.customParams['helptext' .. suffix] 
+		or unitDef.customParams.helptext
+		or "No help text available for this unit."
 end	
 
 
-local function getDescription(unitDef)
-	local lang = WG.lang
-	local font = WG.langFont
-	
-	local desc
-	if font then
-		local unitConf = WG.langFontConf.units[unitDef.name] 
-		desc = unitConf and unitConf.description
+local function getDescription(unitDef, lang)
+	if not lang or lang == 'en' then 
+		return unitDef.tooltip
 	end
-	if not desc then
-		local suffix = (lang == 'en') and '' or ('_' .. lang)
-		desc = unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
-		font = nil
-	end
-		
-	return desc, font
-	
+	local suffix  = ('_' .. lang)
+	return unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
 end	
 
 local function weapons2Table(cells, weaponStats, ws, merw, index)
@@ -329,7 +294,7 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		-- multiply paralyze damage by 3 due to armor.txt
 		ws.damw = ws.damw * 3
 		ws.dpsw = ws.dpsw * 3
-
+		
 		local dps_str, dam_str = '', ''
 		if ws.dps > 0 then
 			dam_str = dam_str .. numformat(ws.dam,2)
@@ -337,8 +302,8 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		end
 		if ws.dpsw > 0 then
 			if dps_str ~= '' then
-				dps_str = dps_str .. ' + '
-				dam_str = dam_str .. ' + '
+				dps_str = dps_str .. ' || '
+				dam_str = dam_str .. ' || '
 			end
 			dam_str = dam_str .. numformat(ws.damw,2) .. ' (P)'
 			dps_str = dps_str .. numformat(ws.dpsw,2) .. ' (P)'
@@ -388,8 +353,7 @@ local function printWeapons(unitDef)
 				wsTemp.regen = weaponDef.shieldPowerRegen
 				wsTemp.regenE = weaponDef.shieldPowerRegenEnergy
 			else
-				-- in 95.0 weapons are slaved to themselves for some reason
-				wsTemp.slaveTo = (weapon.slavedTo ~= 0 and weapon.slavedTo ~= i) and weapon.slavedTo or nil
+				wsTemp.slaveTo = (weapon.slavedTo ~= 0) and weapon.slavedTo or nil
 
 				if wsTemp.slaveTo then
 					merw[wsTemp.slaveTo] = merw[wsTemp.slaveTo] or {}
@@ -398,54 +362,62 @@ local function printWeapons(unitDef)
 				wsTemp.bestTypeDamage = 0
 				wsTemp.bestTypeDamagew = 0
 				wsTemp.paralyzer = weaponDef.paralyzer	
-				local val = weaponDef.damages[0]
-				if val then
-				  	if wsTemp.paralyzer then
-						wsTemp.bestTypeDamagew = val 
-					else
-						wsTemp.bestTypeDamage = val
+				for key, val in pairs(weaponDef.damages) do
+					--[[
+					if (wsTemp.bestTypeDamage <= (damage+0) and not wsTemp.paralyzer)
+						or (wsTemp.bestTypeDamagew <= (damage+0) and wsTemp.paralyzer)
+						then
+
+						if wsTemp.paralyzer then
+							wsTemp.bestTypeDamagew = (damage+0)
+						else
+							wsTemp.bestTypeDamage = (damage+0)
+						end
+					--]]
+					if key == 0 then
+						if wsTemp.paralyzer then
+							wsTemp.bestTypeDamagew = val 
+						else
+							wsTemp.bestTypeDamage = val
+						end
+						
+						wsTemp.burst = weaponDef.salvoSize or 1
+						wsTemp.projectiles = weaponDef.projectiles or 1
+						wsTemp.dam = 0
+						wsTemp.damw = 0
+						if wsTemp.paralyzer then
+							wsTemp.damw = wsTemp.bestTypeDamagew * wsTemp.burst * wsTemp.projectiles
+						else
+							wsTemp.dam = wsTemp.bestTypeDamage * wsTemp.burst * wsTemp.projectiles
+						end
+						wsTemp.reloadtime = weaponDef.reload or ''
+						wsTemp.airWeapon = weaponDef.toAirWeapon or false
+						wsTemp.range = weaponDef.range or ''
+						wsTemp.wname = weaponDef.description or 'NoName Weapon'
+						wsTemp.dps = 0
+						wsTemp.dpsw = 0
+						if  wsTemp.reloadtime ~= '' and wsTemp.reloadtime > 0 then
+							if wsTemp.paralyzer then
+								wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
+							else
+								wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
+							end
+						end
+						--echo('test', unitDef.unitname, wsTemp.wname, wsTemp.bestTypeDamage, i)
+						if wsTemp.dam > bestDamage then
+							bestDamage = wsTemp.dam	
+							bestDamageIndex = i
+						end
+						if wsTemp.damw > bestDamage then
+							bestDamage = wsTemp.damw
+							bestDamageIndex = i
+						end
 					end
-				end
-				wsTemp.burst = weaponDef.salvoSize or 1
-				wsTemp.projectiles = weaponDef.projectiles or 1
-				wsTemp.dam = 0
-				wsTemp.damw = 0
-				if wsTemp.paralyzer then
-					wsTemp.damw = wsTemp.bestTypeDamagew * wsTemp.burst * wsTemp.projectiles
-				else
-					wsTemp.dam = wsTemp.bestTypeDamage * wsTemp.burst * wsTemp.projectiles
-				end
-				wsTemp.reloadtime = weaponDef.reload or ''
-				wsTemp.airWeapon = weaponDef.toAirWeapon or false
-				wsTemp.range = weaponDef.range or ''
-				wsTemp.wname = weaponDef.description or 'NoName Weapon'
-				wsTemp.dps = 0
-				wsTemp.dpsw = 0
-				if  wsTemp.reloadtime ~= '' and wsTemp.reloadtime > 0 then
-					if wsTemp.paralyzer then
-						wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
-					else
-						wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
-					end
-				end
-				--echo('test', unitDef.unitname, wsTemp.wname, wsTemp.bestTypeDamage, i)
-				if wsTemp.dam > bestDamage then
-					bestDamage = wsTemp.dam	
-					bestDamageIndex = i
-				end
-				if wsTemp.damw > bestDamage then
-					bestDamage = wsTemp.damw
-					bestDamageIndex = i
 				end
 			end
-			
-			if weaponDef.customParams.extra_damage then
-				wsTemp.dam = weaponDef.customParams.extra_damage * wsTemp.burst * wsTemp.projectiles -- is it right?
-				wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
-			elseif weaponDef.customParams.stats_damage then
+			if weaponDef.customParams.stats_damage then
 				wsTemp.dam = weaponDef.customParams.stats_damage
 			end
-			
 			if weaponDef.customParams.stats_empdamage then
 				wsTemp.damw = weaponDef.customParams.stats_empdamage
 			end
@@ -454,7 +426,7 @@ local function printWeapons(unitDef)
 				or wsTemp.wname:find('Fake')
 				or wsTemp.wname:find('NoWeapon')
 				then 
-				weaponStats[i] = nil
+				weaponStats[i] = false
 			else
 				weaponStats[i] = wsTemp
 			end 
@@ -465,15 +437,13 @@ local function printWeapons(unitDef)
 		
 	for index,ws in pairs(weaponStats) do
 		--if not ignoreweapon[unitDef.name] or not ignoreweapon[unitDef.name][index] then
-		cells = weapons2Table(cells, weaponStats, ws, merw, index)
+		if ws then
+			cells = weapons2Table(cells, weaponStats, ws, merw, index)
+		end
 		--end
 	end
 	
 	return cells
-end
-
-local function GetWeapon(weaponName)
-	return WeaponDefNames[weaponName] 
 end
 
 local function printunitinfo(ud, lang, buttonWidth)	
@@ -496,11 +466,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 			}
 	end
 	
-	local text,font = getHelpText(ud)
-	
-	local helptextbox = TextBox:New{
-		font = {font=font},
-		text = text, 
+	local helptextbox = TextBox:New{ 
+		text = getHelpText(ud, lang), 
 		textColor = color.stats_fg, 
 		width = '100%',
 		height = '100%',
@@ -548,26 +515,6 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.buildSpeed,2), textColor = color.stats_fg, }
 	end
 	
-	if ud.canKamikaze then
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		
-		statschildren[#statschildren+1] = Label:New{ caption = 'Death Explosion', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-		
-		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
-		
-		statschildren[#statschildren+1] = Label:New{ caption = 'Range: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.range,2), textColor = color.stats_fg, }
-		
-		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1],2), textColor = color.stats_fg, }
-		
-		statschildren[#statschildren+1] = Label:New{ caption = 'Edge Damage: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1] * weaponStats.edgeEffectiveness,2), textColor = color.stats_fg, }
-		
-	end
-	
 
 	if commModules then
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
@@ -594,13 +541,6 @@ local function printunitinfo(ud, lang, buttonWidth)
 			statschildren[#statschildren+1] = Label:New{ caption = cells[i], textColor = color.stats_fg, }
 		end
 	end
-	
-	--adding this because of annoying  cutoff
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
-	
 	
 	local stack_icons = StackPanel:New{
 		autoArrangeV  = false,
@@ -763,12 +703,9 @@ MakeStatsWindow = function(ud, x,y)
 		window_unitstats:Dispose()
 	end
 
-	local desc, font = getDescription(ud)
-	
 	statswindows[num] = Window:New{  
-		x = x,
-		y = y,
-		font = {font=font},
+		x = x,  
+		y = y,  
 		width  = window_width,
 		height = window_height,
 		resizable = true,
@@ -778,7 +715,7 @@ MakeStatsWindow = function(ud, x,y)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = ud.humanName ..' - '.. desc,
+		caption = ud.humanName ..' - '.. getDescription(ud, WG.lang or 'en'), 
 		
 		children = children,
 	}
@@ -891,9 +828,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 	local window_width = 200
 	--local buttonWidth = window_width - 0
 	
-	local desc, font = getDescription(ud)
+	
 	local children = {
-		Label:New{ caption =  ud.humanName ..' - '.. desc, font={font=font}, width=window_width, textColor = color.context_header,},
+		Label:New{ caption =  ud.humanName ..' - '.. getDescription(ud, WG.lang or 'en'), width=window_width, textColor = color.context_header,},
 		Label:New{ caption = 'Player: ' .. playerName, width=window_width, textColor=teamColor },
 		Label:New{ caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width=window_width ,textColor = color.context_fg,},
 		

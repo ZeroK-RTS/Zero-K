@@ -14,16 +14,19 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[40 30 40]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Aranha anti-aérea]],
-    description_fr = [[Araignée AA]],
+    description_bp = [[Aranha anti-aÃ©rea]],
+    description_fr = [[Araign?e AA]],
 	description_de = [[Flugabwehr Spinne]],
     helptext       = [[An all-terrain AA unit that supports other spiders against air with its medium-range missiles.]],
-    helptext_bp    = [[Uma unidade escaladora anti-aérea. Use para proteger outras aranhas contra ataques aéreos.]],
-    helptext_fr    = [[Une unité araignée lourde anti-air, son missile a décollage vertical est lent à tirer mais très efficace contre des cibles aériennes blindées.]],
-	helptext_de    = [[Eine geländegängige Flugabwehreinheit, die andere Spinnen mit ihren mittellangen Raketen gegen Luftangriffe verteidigt.]],
+    helptext_bp    = [[Uma unidade escaladora anti-aÃ©rea. Use para proteger outras aranhas contra ataques aÃ©reos.]],
+    helptext_fr    = [[Un unit? anti air et torpille tout terrain. Peut prot?ger ses alli?s des attaques marines et a?riennes. ]],
+	helptext_de    = [[Eine gelÃ¤ndegÃ¤ngige Flugabwehreinheit, die andere Spinnen mit ihren mittellangen Raketen gegen Luftangriffe verteidigt.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -71,11 +74,7 @@ unitDef = {
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
       craterMult              = 2,
-      cylinderTargeting       = 1,
-
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      cylinderTargeting      = 1,
 
       damage                  = {
         default = 22,

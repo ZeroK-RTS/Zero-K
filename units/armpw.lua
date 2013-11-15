@@ -15,8 +15,8 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 -2 0]],
-  collisionVolumeScales  = [[18 28 18]],
-  collisionVolumeType    = [[cylY]],
+  collisionVolumeScales  = [[22 33 22]],
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -35,7 +35,6 @@ unitDef = {
     helptext_it    = [[Leggero ed economico, il Glave pu? essere costruito a dozzina, ma muore velocemente ed e raramente utile contro nemici seri. Si contrastano con unita da rissa ed llt.]],
     helptext_pl    = [[Glaive jest lekki, tani i szybki. Mo?e by? budowany dziesi?tkami, ale ginie bardzo szybko w kontakcie z podstawowymi nawet jednostkami obronnymi.]],
 	helptext_de    = [[Leicht und billig, der Glaive kann in Massen gebaut werden, stirbt aber genauso schnell und ist kaum von Nützlichkeit gegen ernsthafte Gegenwehr. Mit Riot Einheiten oder leichten Lasertürmen kontern.]],
-	modelradius    = [[9]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],

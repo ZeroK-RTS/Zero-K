@@ -83,10 +83,7 @@ local function GenerateBasicComm()
 	def.buildcostmetal = 1250
 	def.buildcostenergy = 1250
 	def.buildtime = 1250
-
-	--RemoveWeapons(def)
-	--ApplyWeapon(def, "commweapon_sonicgun")
-
+	
 	def.customparams.helptext = "The Commander Junior is a basic version of the popular Strike Commander platform, issued to new commanders. "
 			            .."While lacking the glory of its customizable brethren, the Commander Jr. remains an effective tool with full base-building and combat capabilites."
 	
@@ -264,7 +261,7 @@ local stressTemplate = {
 for name in pairs(upgrades) do
 	stressTemplate.modules[#stressTemplate.modules+1] = name
 end
-for index,name in ipairs(stressChassis) do
+for index,name in pairs(stressChassis) do
 	local def = stressTemplate
 	def.chassis = name
 	def.name = def.name..name
@@ -380,7 +377,7 @@ for name, data in pairs(commDefs) do
 	
 	-- make sure weapons can hit their max range
 	if data.weapondefs then
-		for weaponName, weaponData in pairs(data.weapondefs) do
+		for name, weaponData in pairs(data.weapondefs) do
 			if weaponData.weapontype == "MissileLauncher" then
 				weaponData.flighttime = math.max(weaponData.flighttime or 3, 1.2 * weaponData.range/weaponData.weaponvelocity)
 			elseif weaponData.weapontype == "Cannon" then

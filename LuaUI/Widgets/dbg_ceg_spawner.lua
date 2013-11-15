@@ -4,12 +4,12 @@
 function widget:GetInfo()
   return {
     name      = "CEG Spawner",
-    desc      = "v0.031 Spawn CEGs",
+    desc      = "v0.03 Spawn CEGs",
     author    = "CarRepairer",
     date      = "2010-11-07",
     license   = "GPLv2",
     layer     = 5,
-    enabled   = true,  --  loaded by default?
+    enabled   = false,
   }
 end
 
@@ -55,44 +55,46 @@ options = {
 		min = 0, max = 100, step = 1,
 		value = 20,
 	},
+	
+	
+	
 }
+
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 local cx,cy = vsx * 0.5,vsy * 0.5
 
-function OnChangeFunc(self)
-	if not Spring.IsCheatingEnabled() then 
-		echo "Cannot do this unless Cheating is enabled."
-		return 
-	end		
-	cx,cy = vsx * 0.5,vsy * 0.5
-	local ttype,pos = Spring.TraceScreenRay(cx, cy, true)
-	if ttype == 'ground' then
-		Spring.SendLuaRulesMsg( '*' .. self.cegname
-			.. '|' .. pos[1]
-			.. '|' .. pos[2]
-			.. '|' .. pos[3]
-			
-			.. '|' .. options.xdir.value
-			.. '|' .. options.ydir.value
-			.. '|' .. options.zdir.value
-			.. '|' .. options.radius.value
-			
-			
-		) 
-	else
-		echo "Cannot do this with a unit in the center of the screen."
-	end
-end
-		
+
 local function AddCEGButton(cegname)
 	options_order[#options_order+1] = cegname
 	
 	options[cegname] = {
 		type = 'button',
 		name = cegname,
-		cegname = cegname,
-		OnChange = OnChangeFunc,
+		OnChange = function()
+			if not Spring.IsCheatingEnabled() then 
+				echo "Cannot do this unless Cheating is enabled."
+				return 
+			end		
+			cx,cy = vsx * 0.5,vsy * 0.5
+			local ttype,pos = Spring.TraceScreenRay(cx, cy, true)
+			if ttype == 'ground' then
+				Spring.SendLuaRulesMsg( '*' .. cegname
+					.. '|' .. pos[1]
+					.. '|' .. pos[2]
+					.. '|' .. pos[3]
+					
+					.. '|' .. options.xdir.value
+					.. '|' .. options.ydir.value
+					.. '|' .. options.zdir.value
+					.. '|' .. options.radius.value
+					
+					
+				) 
+			else
+				echo "Cannot do this with a unit in the center of the screen."
+			end
+		end,
 	}
 	
 	if ALPHA then
@@ -115,13 +117,13 @@ local function SetupOptions()
 	end
 end
 
+
+SetupOptions()
+
+
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
 	cx = vsx * 0.5
 	cy = vsy * 0.5
-end
-
-function widget:Initialize()
-  SetupOptions()
 end

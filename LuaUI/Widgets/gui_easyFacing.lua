@@ -1,10 +1,10 @@
 include("keysym.h.lua")
-local versionNumber = "1.421"
+local versionNumber = "1.4"
 
 function widget:GetInfo()
 	return {
 		name      = "Easy Facing",
-		desc      = "[v" .. string.format("%s", versionNumber ) .. "] change build facing by holding Left Mouse Button. Press Spacebar (META) to change build facing when building in grid using Shift.",
+		desc      = "[v" .. string.format("%s", versionNumber ) .. "] Enables changing building facing by holding left mouse button. Press (META) to change facing when using shift.",
 		author    = "very_bad_soldier",
 		date      = "2009.08.10",
 		license   = "GNU GPL v2",
@@ -18,10 +18,8 @@ end
 -- CONFIGURATION
 local debug = false
 local updateInt = 1 --seconds for the ::update loop
-local sens = 20	--rotate mouse sensitivity (length of 1 mouse movement vector). Smaller value = higher sensitivity
+local sens = 150	--rotate mouse sensitivity - length of mouse movement vector
 local drawForAll = false --draw facing direction also for other buildings than labs
-local drawForTurret = false --draw facing direction for all unit that can attack
-local timesens = 0.100 --rotate mouse time sensitivity (second for 1 mouse movement vector). Bigger value = higher sensitivity
 --------------------------------------------------------------------------------
 local inDrag = false
 local metaStart = false
@@ -29,7 +27,6 @@ local mouseDeltaX = 0
 local mouseDeltaY = 0
 local mouseXStartRotate = 0
 local mouseYStartRotate = 0
-local mouseTimeStartRotate = 0
 local mouseXStartDrag = 0
 local mouseYStartDrag = 0
 local mouseLbLast = false
@@ -56,8 +53,6 @@ local spGetBuildFacing		= Spring.GetBuildFacing
 local spSetBuildFacing 		= Spring.SetBuildFacing
 local spPos2BuildPos 		= Spring.Pos2BuildPos
 local spGetGroundHeight 	= Spring.GetGroundHeight
-local spDiffTimers			= Spring.DiffTimers
-local spGetTimer			= Spring.GetTimer
 
 local floor                 = math.floor
 local abs					= math.abs
@@ -190,7 +185,6 @@ function manipulateFacing()
 		mouseDeltaY = 0
 		mouseXStartRotate = mx
 		mouseYStartRotate = my
-		mouseTimeStartRotate = spGetTimer()
 		mouseXStartDrag = mx
 		mouseYStartDrag = my
 		printDebug("IN")
@@ -225,30 +219,24 @@ function manipulateFacing()
 			mouseYStartRotate = my
 		end
 		
-		local curDeltaX = mx - mouseXStartRotate or mx
+		local curDeltaX = mx - mouseXStartRotate
 		mouseDeltaX = mouseDeltaX + curDeltaX
-		local curDeltaY = my - mouseYStartRotate or my
+		local curDeltaY = my - mouseYStartRotate
 		mouseDeltaY = mouseDeltaY + curDeltaY
 		
 		local newFacing = getFacingByMouseDelta( mouseDeltaX, mouseDeltaY )
-		if ( newFacing ~= nil) then
+		if ( newFacing ~= nil ) then
 			mouseDeltaX = 0
-			mouseDeltaY = 0 --reset cumulative delta
-			mouseXStartRotate = mx
-			mouseYStartRotate = my -- reset rotate center
+			mouseDeltaY = 0 --added. was it missing?
 			
-			local transTime = spDiffTimers(spGetTimer(), mouseTimeStartRotate)
-			mouseTimeStartRotate = spGetTimer()
-			if (transTime < timesens) and ( newFacing ~= spGetBuildFacing()) then
+			if ( newFacing ~= spGetBuildFacing() ) then
 				spSetBuildFacing( newFacing )
 			end
 		end
-		
-		--[[ note: disable cursor lock so that it won't conflict with other widget (such as CommandInsert() widget when meta is pressed).
+			
 		if mouseXStartRotate~=mx or mouseYStartRotate~=my then
 			spWarpMouse( mouseXStartRotate, mouseYStartRotate ) --set old mouse coords to prevent mouse movement
 		end
-		--]]
 	end
 end
 
@@ -265,14 +253,14 @@ function drawOrientation()
 	local alt,ctrl,meta,shift = spGetModKeyState()
 	
 	local udef = udefTab[unitDefID]
-	if not (drawForAll or udef["isFactory"] or (drawForTurret and udef.canAttack)) then
+	if (drawForAll == false and udef["isFactory"] == false ) then
 		return
 	end
 	
-	local mx, my,lmb = spGetMouseState()
+	local mx, my = spGetMouseState()
 	
-	if ( shift and inDrag and lmb) then --shift+drag+click (queue a line)
-		mx = mouseXStartDrag --center arrow on first queue
+	if ( shift and inDrag ) then
+		mx = mouseXStartDrag
 		my = mouseYStartDrag
 		printDebug("UDEFID: " .. mx )
 	end

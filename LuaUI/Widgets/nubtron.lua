@@ -7,14 +7,13 @@ local rank = playerID and select(9, Spring.GetPlayerInfo(playerID))
 function widget:GetInfo()
   return {
     name      = "Nubtron",
-    desc      = "v0.411 Friendly Tutorial Robot",
+    desc      = "v0.41 Friendly Tutorial Robot",
     author    = "CarRepairer",
     date      = "2008-08-18",
     license   = "GNU GPL, v2 or later",
     layer     = 1, 
 --[[before enabling, read commit message 5482]]
-    --enabled   = (rank and rank == 1) or true,
-    enabled   = false
+    enabled   = (rank and rank == 1) or true,
   }
 end
 
@@ -840,12 +839,13 @@ function widget:Update()
 		end
 		
 		
-		--- metal map or showeco---
-		if GetMapDrawMode() == 'metal' or WG.showeco == true then
+		--- metal map ---
+		if GetMapDrawMode() == 'metal' then
 			setCondition('metalMapView')
 		else
 			remCondition('metalMapView')
 		end
+
 
 		--- build facing direction ---
 		--[[

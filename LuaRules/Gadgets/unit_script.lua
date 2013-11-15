@@ -40,7 +40,7 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return false
 end
 
-local reverseCompat = (Game.version:find('91.')) and 1 or 0
+local reverseCompat = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and 1 or 0
 
 -- This lists all callins which may be wrapped in a coroutine (thread).
 -- The ones which should not be thread-wrapped are commented out.

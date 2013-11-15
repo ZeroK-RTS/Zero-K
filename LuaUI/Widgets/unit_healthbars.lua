@@ -25,7 +25,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --//for backward compatibility with old weapon indexes
-local reverseCompat = (Game.version:find('91.')) and 1 or 0
+local reverseCompat = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and 1 or 0
 
 local barHeight = 3
 local barWidth  = 14  --// (barWidth)x2 total width!!!
@@ -58,7 +58,6 @@ local stockpileH = 24
 local stockpileW = 12
 
 local captureReloadTime = 240
-local DISARM_DECAY_FRAMES = 1200
 
 --------------------------------------------------------------------------------
 -- OPTIONS
@@ -66,11 +65,10 @@ local DISARM_DECAY_FRAMES = 1200
 local function OptionsChanged() 
 	drawFeatureHealth = options.drawFeatureHealth.value
 	drawBarPercentages = options.drawBarPercentages.value
-	debugMode = options.debugMode.value
 end 
 
 options_path = 'Settings/Interface/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'debugMode', 'minReloadTime'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'minReloadTime'}
 options = {
 	
 	showhealthbars = {
@@ -103,15 +101,6 @@ options = {
 		max = 10,
 		step = 1,
 		desc = 'Min reload time (sec)',
-		OnChange = OptionsChanged,
-	},	
-	
-	debugMode = {
-		name = 'Debug Mode',
-		type = 'bool',
-		value = false,
-		advanced = true,
-		desc = 'Pings units with debug information',
 		OnChange = OptionsChanged,
 	},	
 	
@@ -157,21 +146,17 @@ local barColors = {
   emp     = { 0.50,0.50,1.00,barAlpha },
   emp_p   = { 0.40,0.40,0.80,barAlpha },
   emp_b   = { 0.60,0.60,0.90,barAlpha },
-  disarm  = { 0.50,0.50,0.50,barAlpha },
-  disarm_p= { 0.40,0.40,0.40,barAlpha },
-  disarm_b= { 0.60,0.60,0.60,barAlpha },
   capture = { 1.00,0.50,0.00,barAlpha },
-  capture_reload = { 0.00,0.60,0.60,barAlpha },
   build   = { 0.75,0.75,0.75,barAlpha },
   stock   = { 0.50,0.50,0.50,barAlpha },
   reload  = { 0.00,0.60,0.60,barAlpha },
-  reload2 = { 0.80,0.60,0.00,barAlpha },
-  jump    = { 0.00,0.90,0.00,barAlpha },
+  reload2 = { 0.70,0.30,0.00,barAlpha },
+  jump    = { 0.00,0.60,0.60,barAlpha },
   sheath  = { 0.00,0.20,1.00,barAlpha },
   fuel    = { 0.70,0.30,0.00,barAlpha },
   slow    = { 0.50,0.10,0.70,barAlpha },
-  goo     = { 0.40,0.40,0.40,barAlpha },
-  shield  = { 0.30,0.0,0.90,barAlpha },
+  goo     = { 0.50,0.50,0.50,barAlpha },
+  shield  = { 0.20,0.60,0.60,barAlpha },
   tank    = { 0.10,0.20,0.90,barAlpha },
   tele    = { 0.00,0.60,0.60,barAlpha },
 
@@ -190,7 +175,6 @@ local empDecline = 32/30/40;
 local cx, cy, cz = 0,0,0;  --// camera pos
 
 local paraUnits   = {};
-local disarmUnits = {};
 local onFireUnits = {};
 local UnitMorphs  = {};
 
@@ -599,18 +583,10 @@ do
     end
   
     --// PARALYZE
-	local stunned, _, inbuild = GetUnitIsStunned(unitID)
-	if (emp>0)and(hp>0)and((not morph) or morph.combatMorph) and (emp<1e8) and (paralyzeDamage >= empHP) then
+	if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
+      local stunned = GetUnitIsStunned(unitID)
       if (stunned) then
         paraUnits[#paraUnits+1]=unitID
-      end
-	end
-	
-	--// DISARM
-	if not stunned then
-      local disarmed = GetUnitRulesParam(unitID,"disarmed")
-      if disarmed and disarmed == 1 then
-        disarmUnits[#disarmUnits+1]=unitID
       end
 	end
   end
@@ -638,11 +614,7 @@ do
     dist = dx*dx + dy*dy + dz*dz
     if (dist > infoDistance) then
       if (dist > 9000000) then
-        if debugMode then
-		  local x,y,z = Spring.GetUnitPosition(unitID)
-          Spring.MarkerAddPoint(x,y,z,"High Distance")
-		end
-		return
+        return
       end
       fullText = false
     end
@@ -715,19 +687,16 @@ do
       end
 
       --// PARALYZE
-	  local paraTime = false
-	  local stunned = GetUnitIsStunned(unitID)
 	  if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
+        local stunned = GetUnitIsStunned(unitID)
         local infotext = ""
-        stunned = stunned and paralyzeDamage >= empHP
-		if (stunned) then
-		  paraTime = (paralyzeDamage-empHP)/(maxHealth*empDecline)
+        if (stunned) then
           paraUnits[#paraUnits+1]=unitID
-		 if (fullText) then
-            infotext = floor(paraTime) .. 's'
+          if (fullText) then
+            infotext = floor((paralyzeDamage-empHP)/(maxHealth*empDecline)) .. 's'
           end
           emp = 1
-		else
+        else
           if (emp>1) then emp=1 end
           if (fullText) then
             infotext = floor(emp*100)..'%'
@@ -735,25 +704,6 @@ do
         end
         local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
         AddBar("paralyze",emp,empcolor_index,infotext)
-      end
-	  
-	   --// DISARM
-	  local disarmFrame = GetUnitRulesParam(unitID,"disarmframe")
-	  if disarmFrame and disarmFrame ~= -1 and disarmFrame > gameFrame then
-        local disarmProp = (disarmFrame - gameFrame)/1200
-        if disarmProp < 1 then
-			if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
-				AddBar("disarm",disarmProp,"disarm",(fullText and floor(disarmProp*100)..'%') or '')
-			end
-		else
-			local disarmTime = (disarmFrame - gameFrame - 1200)/30
-			if (not paraTime) or disarmTime > paraTime + 0.5 then
-			  AddBar("disarm",1,((blink and "disarm_b") or "disarm_p") or ("disarm"),floor(disarmTime) .. 's')
-			  if not stunned then
-			    disarmUnits[#disarmUnits+1]=unitID
-			  end
-			end
-		end
       end
 
       --// CAPTURE (set by capture gadget)
@@ -765,7 +715,7 @@ do
 	  local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
       if (captureReloadState and captureReloadState > 0) then
 		local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
-        AddBar("capture reload",capture,"reload",(fullText and floor(capture*100)..'%') or '')
+        AddBar("capture reload",capture,"reload2",(fullText and floor(capture*100)..'%') or '')
       end
 	  
 	  --// WATER TANK
@@ -810,13 +760,9 @@ do
 		  local slowState = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
 		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon - reverseCompat , 'reloadTime')
 		  ci.reloadTime = reloadTime
-		  -- When weapon is disabled the reload time is constantly set to be almost complete. 
-		  -- It results in a bunch of units walking around with 99% reload bars.
-		  if reloadFrame > gameFrame + 4 then -- UPDATE_PERIOD in unit_attributes.lua.
-            reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
-		    if (reload >= 0) then
-              AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
-		    end
+          reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
+		  if (reload >= 0) then
+            AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
 		  end
         end
       end
@@ -846,12 +792,7 @@ do
           AddBar("jump",jumpReload,"jump",(fullText and floor(jumpReload*100)..'%') or '')
         end
       end
-	  
-    if debugMode then
-	  local x,y,z = Spring.GetUnitPosition(unitID)
-      Spring.MarkerAddPoint(x,y,z,"N" .. barsN)
-    end
-	
+
     if (barsN>0)or(numStockpiled) then
       glPushMatrix()
       glTranslate(ux, uy+ci.height, uz )
@@ -978,25 +919,17 @@ do
   local abs                    = math.abs
 
   function DrawOverlays()
-    --// draw an overlay for stunned or disarmed units
-    if (drawStunnedOverlay) and ((#paraUnits>0) or (#disarmUnits>0)) then
+    --// draw an overlay for stunned units
+    if (drawStunnedOverlay)and(#paraUnits>0) then
       glDepthTest(true)
       glPolygonOffset(-2, -2)
       glBlending(GL_SRC_ALPHA, GL_ONE)
 
       local alpha = ((5.5 * widgetHandler:GetHourTimer()) % 2) - 0.7
-	  if (#paraUnits>0) then
-        glColor(0,0.7,1,alpha/4)
-        for i=1,#paraUnits do
-          glUnit(paraUnits[i],true)
-        end
-	  end
-	  if (#disarmUnits>0) then
-	    glColor(0.8,0.8,0.5,alpha/6)
-        for i=1,#disarmUnits do
-          glUnit(disarmUnits[i],true)
-        end
-	  end
+      glColor(0,0.7,1,alpha/4)
+      for i=1,#paraUnits do
+        glUnit(paraUnits[i],true)
+      end
       local shift = widgetHandler:GetHourTimer() / 20
 
       glTexCoord(0,0)
@@ -1007,22 +940,13 @@ do
       glTexGen(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
       v = cvs.forward
       glTexGen(GL_S, GL_EYE_PLANE, v[1]*0.008,v[2]*0.008,v[3]*0.008, shift)
-	  
-	  if (#paraUnits>0) then
-        glTexture("LuaUI/Images/paralyzed.png")
-        glColor(0,1,1,alpha*1.1)
-        for i=1,#paraUnits do
-          glUnit(paraUnits[i],true)
-        end
-	  end
-	  if (#disarmUnits>0) then
-	    glTexture("LuaUI/Images/disarmed.png")
-	    glColor(0.6,0.6,0.2,alpha*0.9)
-        for i=1,#disarmUnits do
-          glUnit(disarmUnits[i],true)
-        end
-	  end
-	  
+      glTexture("LuaUI/Images/paralyzed.png")
+
+      glColor(0,1,1,alpha*1.1)
+      for i=1,#paraUnits do
+        glUnit(paraUnits[i],true)
+      end
+
       glTexture(false)
       glTexGen(GL_T, false)
       glTexGen(GL_S, false)
@@ -1031,7 +955,6 @@ do
       glDepthTest(false)
 
       paraUnits = {}
-	  disarmUnits = {}
     end
 
     --// overlay for units on fire
@@ -1091,24 +1014,10 @@ do
       for i=1,#visibleUnits do
         unitID    = visibleUnits[i]
         unitDefID = GetUnitDefID(unitID)
-        if (unitDefID) then
+		if (unitDefID) then
           unitDef   = UnitDefs[unitDefID]
           if (unitDef) then
             DrawUnitInfos(unitID, unitDefID, unitDef)
-          elseif debugMode then
-            local x,y,z = Spring.GetUnitPosition(unitID)
-            if not (x and y and z) then
-              Spring.Log("HealthBars", "error", "missing position and unitDef of unit " .. unitID)
-            else
-              Spring.MarkerAddPoint(x,y,z,"Missing unitDef")
-            end
-          end
-        elseif debugMode then
-          local x,y,z = Spring.GetUnitPosition(unitID)
-          if not (x and y and z) then
-            Spring.Log("HealthBars", "error", "missing position and unitDefID of unit " .. unitID)
-          else
-            Spring.MarkerAddPoint(x,y,z,"Missing unitDef")
           end
         end
       end

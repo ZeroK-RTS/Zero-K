@@ -17,6 +17,10 @@ unitDef = {
   canGuard                      = true,
   canstop                       = [[1]],
   category                      = [[FLOAT TURRET]],
+  collisionVolumeOffsets        = [[0 -8 0]],
+  collisionVolumeScales         = [[49 60 49]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

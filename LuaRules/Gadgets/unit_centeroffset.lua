@@ -18,9 +18,6 @@ end
 --SYNCED
 if gadgetHandler:IsSyncedCode() then
 
-
-local spGetUnitBuildFacing = Spring.GetUnitBuildFacing
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -63,14 +60,15 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	---[[
 	if offsets[unitDefID] then
-
 		mid = offsets[unitDefID].mid
 		aim = offsets[unitDefID].aim
-		
 		local bx, _, bz, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
-		local facing = spGetUnitBuildFacing(unitID)
-		local mx, my, mz = ux + mid[1], uy + mid[2], uz + mid[3]
-		local ax, ay, az = ux + aim[1], uy + aim[2], uz + aim[3]
+		if armwarDefID == unitDefID then
+			ux = bx
+			uz = bz
+		end
+		local mx, my, mz = mid[1] + ux, mid[2] + uy, mid[3] + uz
+		local ax, ay, az = aim[1] + ux, aim[2] + uy, aim[3] + uz
 		Spring.SetUnitMidAndAimPos(unitID, mx, my, mz, ax, ay, az)
 	end
 	if modelRadii[unitDefID] then
