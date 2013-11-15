@@ -1,7 +1,7 @@
 function widget:GetInfo()
    return {
       name      = "UnitShapes",
-      desc      = "0.5.8.zk.02 Draws blended shapes around units and buildings",
+      desc      = "0.5.8.zk.03 Draws blended shapes around units and buildings",
       author    = "Lelousius and aegis, modded Licho, CarRepairer",
       date      = "30.07.2010",
       license   = "GNU GPL, v2 or later",
@@ -127,14 +127,29 @@ local visibleAllySelUnits = {}
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
+options_order = {'showally','useteamcolors','debugMode',}
 options = {
 	showally = {
 		name = 'Show Ally Selections',
+		desc = 'Highlight the units your allies currently have selected.',
 		type = 'bool',
 		value = false,
 		OnChange = function(self) 
 			visibleAllySelUnits = {}
 		end,
+	},
+	useteamcolors = {
+		name = 'Use Team Colors',
+		type = 'bool',
+		desc = 'Highlight your allies\' selections with their team colors instead of the default yellow.',
+		value = false,
+	},
+	debugMode = {
+		name = 'Debug Mode',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		desc = 'Pings visible or selected units',
 	},
 }
 
@@ -410,6 +425,7 @@ end
 --------------------------------------------------------------------------------
 local visibleUnits, visibleSelected = {}, {}
 local degrot = {}
+local lastFrame = 0
 function widget:Update()
 	-- [[
 	local mx, my = spGetMouseState()
@@ -423,6 +439,25 @@ function widget:Update()
 	--visibleUnits, visibleSelected = GetVisibleUnits()
 	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
 	heading = {}
+	
+	if options.debugMode.value then
+		local frame = Spring.GetGameFrame()
+		if frame ~= lastFrame and frame%10 == 0 then
+			local vis = spGetVisibleUnits(-1, 30, true)
+			for i = 1, #vis do
+				local unitID = vis[i]
+				local x,y,z = Spring.GetUnitPosition(unitID)
+				Spring.MarkerAddPoint(x,y,z,"")
+			end
+			for i = 1, #visibleSelected do
+				local unitID = visibleSelected[i]
+				local x,y,z = Spring.GetUnitPosition(unitID)
+				Spring.MarkerAddPoint(x,y,z,"v")
+			end
+			lastFrame = frame
+		end
+	end
+	
 	for i=1, #visibleUnits do
 		local unitID = visibleUnits[i]
 		dirx, _, dirz = spGetUnitDirection(unitID)
@@ -453,6 +488,126 @@ end
 	local unit
 -- Drawing:
 
+local function DrawUnitShapes(allies)
+
+	local unitcount
+	local shapecolor
+	local shapecolor_noalpha
+	local teams = {}
+
+	if allies then
+		unitcount = #visibleAllySelUnits
+		shapecolor = {1,1,0,1}
+		shapecolor_noalpha = {1,1,0,0}
+	else
+		unitcount = #visibleSelected
+		shapecolor = {0,1,0,1}
+		shapecolor_noalpha = {0,1,0,0}
+	end
+	for i=1, unitcount do
+		if allies then
+			unitID = visibleAllySelUnits[i]
+		else
+			unitID = visibleSelected[i]
+		end
+		local teamID = spGetUnitTeam(unitID)
+		if teamID then
+			if not teams[teamID] then teams[teamID] = {} end
+			local team = teams[teamID]
+			team[#team+1] = unitID
+		end
+	end
+
+	for teamID, team in pairs(teams) do
+
+		if allies and options.useteamcolors.value then
+			local tcolors = GetTeamColorSet(teamID)
+			shapecolor = {tcolors[1], tcolors[2], tcolors[3], 1}
+			shapecolor_noalpha = {tcolors[1], tcolors[2], tcolors[3], 0}
+		end
+
+		-- To fix Water
+		gl_ColorMask(false,false,false,true)
+		gl_BlendFunc(GL_ONE, GL_ONE)
+		glColor(shapecolor)
+		-- Does not need to be drawn per Unit .. it covers the whole map
+		gl_DrawList(clearquad)
+
+		--  Draw selection circles
+		gl_BlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA)
+		for i=1, #team do
+			unitID = team[i]
+			udid = spGetUnitDefID(unitID)
+			unit = unitConf[udid]
+			
+			if (unit) then
+				if ally then
+					glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
+				else
+					glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+				end
+			end
+		end
+
+		--  Here The inner of the selected circles are removed
+		gl_BlendFunc(GL_ONE, GL_ZERO)
+		glColor(0,0,0,1)
+		
+		for i=1, #team do
+			unitID = team[i]
+			udid = spGetUnitDefID(unitID)
+			unit = unitConf[udid]
+			
+			if (unit) then
+				if ally then
+					glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale,  0, 0, 0, 0)
+				else
+					glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+				end
+			end
+		end	
+		
+		--  Really draw the Circles now  (This could be optimised if we could say Draw as much as DST_ALPHA * SRC_ALPHA is)
+		-- (without protecting form drawing them twice)
+		gl_ColorMask(true,true,true,true)
+		gl_BlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA)
+		glColor(shapecolor)
+
+		-- Does not need to be drawn per Unit anymore
+		gl_DrawList(clearquad)
+
+		--  Draw Circles to AlphaBuffer
+		gl_ColorMask(false, false, false, true)
+		gl_BlendFunc(GL_DST_ALPHA, GL_ZERO)
+
+		for i=1, #team do
+			unitID = team[i]
+			udid = spGetUnitDefID(unitID)
+			unit = unitConf[udid]
+			
+			if (unit) then
+				if ally then
+					glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
+				else
+					glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+				end
+				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+			end
+		end
+		
+		glColor(shapecolor_noalpha)
+		for i=1, #team do
+			unitID = team[i]
+			udid = spGetUnitDefID(unitID)
+			unit = unitConf[udid]
+			
+			if (unit) then
+				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+			end
+		end
+
+	end
+end
 
 function widget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() or (#visibleAllySelUnits + #visibleSelected == 0) then return end
@@ -462,153 +617,15 @@ function widget:DrawWorldPreUnit()
 	glDepthTest(false)
 
 	if #visibleSelected > 0 then
-		-- To fix Water
-		gl_ColorMask(false,false,false,true)
-		gl_BlendFunc(GL_ONE, GL_ONE)
-		glColor(0,1,0,1)
-		-- Does not need to be drawn per Unit .. it covers the whole map
-		gl_DrawList(clearquad)
-		
-		--  Draw selection circles
-		gl_BlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA)
-		for i=1, #visibleSelected do
-			unitID = visibleSelected[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end
-
-		--  Here The inner of the selected circles are removed
-		gl_BlendFunc(GL_ONE, GL_ZERO)
-		glColor(0,0,0,1)
-		
-		for i=1, #visibleSelected do
-			unitID = visibleSelected[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end	
-
-		--  Really draw the Circles now  (This could be optimised if we could say Draw as much as DST_ALPHA * SRC_ALPHA is)
-		-- (without protecting form drawing them twice)
-		gl_ColorMask(true,true,true,true)
-		gl_BlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA)
-		glColor(0,1,0,1)
-
-		-- Does not need to be drawn per Unit anymore
-		gl_DrawList(clearquad)
-
-		--  Draw Circles to AlphaBuffer
-		gl_ColorMask(false, false, false, true)
-		gl_BlendFunc(GL_DST_ALPHA, GL_ZERO)
-
-		for i=1, #visibleSelected do
-			unitID = visibleSelected[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end
-		
-		for i=1, #visibleSelected do
-			unitID = visibleSelected[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glColor(0,1,0,0)
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end
-	end --if #visibleSelected > 0
-	
-	--Can this massive if block be somehow merged into the above? I tried and tried.
+		DrawUnitShapes(false)
+	end
 	if #visibleAllySelUnits > 0 then
-		-- To fix Water
-		gl_ColorMask(false,false,false,true)
-		gl_BlendFunc(GL_ONE, GL_ONE)
-		glColor(1,1,0,1)
-		-- Does not need to be drawn per Unit .. it covers the whole map
-		gl_DrawList(clearquad)
-		
-		--  Draw selection circles
-		gl_BlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA)
-		for i=1, #visibleAllySelUnits do
-			unitID = visibleAllySelUnits[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
-			end
-		end
-
-		--  Here The inner of the selected circles are removed
-		gl_BlendFunc(GL_ONE, GL_ZERO)
-		glColor(0,0,0,1)
-		
-		for i=1, #visibleAllySelUnits do
-			unitID = visibleAllySelUnits[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale,  0, 0, 0, 0)	
-			end
-		end	
-
-		--  Really draw the Circles now  (This could be optimised if we could say Draw as much as DST_ALPHA * SRC_ALPHA is)
-		-- (without protecting form drawing them twice)
-		gl_ColorMask(true,true,true,true)
-		gl_BlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA)
-		glColor(1,1,0,1)
-
-		-- Does not need to be drawn per Unit anymore
-		gl_DrawList(clearquad)
-
-		--  Draw Circles to AlphaBuffer
-		gl_ColorMask(false, false, false, true)
-		gl_BlendFunc(GL_DST_ALPHA, GL_ZERO)
-
-		for i=1, #visibleAllySelUnits do
-			unitID = visibleAllySelUnits[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
-				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end
-		
-		for i=1, #visibleAllySelUnits do
-			unitID = visibleAllySelUnits[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glColor(1,1,0,0)
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end
-	end --if #visibleAllySelUnits > 0
+		DrawUnitShapes(true)
+	end
 	
 	glColor(1,1,1,1)
 	glPopAttrib()
 end
---allySelUnits
-
-	
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

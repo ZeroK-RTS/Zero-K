@@ -16,16 +16,16 @@ unitDef = {
   canPatrol           = true,
   category            = [[SHIP]],
   collisionVolumeOffsets = [[0 -5 0]],
-  collisionVolumeScales  = [[55 60 100]],
+  collisionVolumeScales  = [[28 28 80]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
     description_de = [[Torpedofregatte]],
     helptext       = [[The Torpedo Frigate is a (relatively) cheap countermeasure to subs, though it can also attack surface targets.]],
 	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
-	modelradius    = [[30]],
+	modelradius    = [[14]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -130,7 +130,7 @@ unitDef = {
       height           = [[4]],
       hitdensity       = [[100]],
       metal            = 184,
-      object           = [[wreck3x3a.s3o]],
+      object           = [[hunter_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 184,
       seqnamereclamate = [[TREE1RECLAMATE]],

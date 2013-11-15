@@ -12,7 +12,6 @@ return {
         lifetime           = 220,
         pos                = [[-3 r6, r6, -3 r6]],
         size               = 10,
-        sizeexpansion      = .3,
         slowdown           = 1,
         speed              = [[0.3 r-0.6, 1 r1.0, 0.3 r-0.6]],
       },

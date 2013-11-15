@@ -1,4 +1,4 @@
-local version = "v0.828"
+local version = "v0.831"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -6,7 +6,7 @@ function widget:GetInfo()
 				"(up to 600elmo, HLT range) and teleport them when it shorten travel time. "..
 				"This only apply to your unit & allied beacon.",
 	author    = "Msafwan",
-    date      = "19 July 2013",
+    date      = "1 September 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 21,
     enabled   = false
@@ -28,6 +28,7 @@ local spGetFeaturePosition = Spring.GetFeaturePosition
 local spRequestPath = Spring.RequestPath
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
+local spGetGameSeconds = Spring.GetGameSeconds
 ------------------------------------------------------------
 ------------------------------------------------------------
 local myTeamID
@@ -43,9 +44,8 @@ local groupLoopedUnit={}
 local groupBeaconQueue={}
 local groupBeaconFinish={}
 --end spread job stuff
-local fiveSecondExcludedUnit = {} --list of uninteresting/irrelevant unit to be excluded until their command changes
+local IgnoreUnit = {} --list of uninteresting/irrelevant unit to be excluded until their command changes
 local beaconDefID = UnitDefNames["tele_beacon"].id
-local diggDeeperExclusion = {}
 --Network lag hax stuff: (wait until unit receive command before processing 2nd time)
 local waitForNetworkDelay = {}
 local issuedOrderTo = {}
@@ -66,7 +66,7 @@ function widget:Initialize()
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			if beaconDefID == unitDefID then
 				local x,y,z = spGetUnitPosition(unitID)
-				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,vicntyBecn=nil,becnQeuu=0,deployed=1}
+				listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djinID=nil,prevIndex=nil,prevList=nil,nearbyBeacon=nil,becnQeuu=0,deployed=1}
 			end
 		end
 	end
@@ -80,7 +80,7 @@ end
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if beaconDefID == unitDefID then
 		local x,y,z = spGetUnitPosition(unitID)
-		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djin=nil,prevIndex=nil,prevList=nil,vicntyBecn=nil,becnQeuu=0,deployed=1}
+		listOfBeacon[unitID] = {x,y,z,nil,nil,nil,djinID=nil,prevIndex=nil,prevList=nil,nearbyBeacon=nil,becnQeuu=0,deployed=1}
 		local cluster, nonClustered = WG.OPTICS_cluster(listOfBeacon, detectionRange,1, myTeamID,detectionRange) --//find clusters with atleast 1 unit per cluster and with at least within 500-elmo from each other (this function is located in api_shared_function.lua)
 		groupBeaconOfficial = cluster
 		for i=1, #nonClustered do
@@ -91,20 +91,22 @@ end
 
 function widget:UnitDestroyed(unitID, unitDefID)
 	listOfBeacon[unitID] = nil
-	fiveSecondExcludedUnit[unitID] = nil
+	IgnoreUnit[unitID] = nil
 	if issuedOrderTo[unitID] then 
 		local group = issuedOrderTo[unitID]
-		waitForNetworkDelay[group] = waitForNetworkDelay[group] - 1 
 		issuedOrderTo[unitID] = nil 
-		if waitForNetworkDelay[group]==0 then 
-			waitForNetworkDelay[group] = nil 
-		end 
+		if waitForNetworkDelay[group] then
+			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1 
+			if waitForNetworkDelay[group][2]==0 then 
+				waitForNetworkDelay[group] = nil 
+			end
+		end
 	end 
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitDestroyed(unitID, unitDefID)
-	fiveSecondExcludedUnit[unitID] = nil
+	IgnoreUnit[unitID] = nil
 end
 
 function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
@@ -113,26 +115,41 @@ end
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+local function GetNearbyBeacon(ex,ez,beaconData)
+	local nearbyUnits = spGetUnitsInCylinder(ex,ez,detectionRange,myTeamID)
+	local nearbyBeacon = {}
+	for i=1, #nearbyUnits do
+		local unitID = nearbyUnits[i]
+		if listOfBeacon[unitID] then --is unit a beacon? (note: center unit is a Djinn, not a beacon)
+			nearbyBeacon[#nearbyBeacon+1] = unitID
+		end
+	end
+	beaconData["nearbyBeacon"]=nearbyBeacon
+end
+
 --SOME NOTE:
 --"DiggDeeper()" use a straightforward recursive horizontal/sideway-search. 
 --TODO: But if we can find out if there's better way to do it would be more fun. Some Googling found stuff like "Minimum Spanning Tree" & "Spanning Tree" (might be interesting!)
-function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, previousOverheadTime, level)
+function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, previousOverheadTime, level, history_VAR, djinExitPos_CNSTNT)
 	level = level + 1
 	if level > 5 then
 		return nil,nil,nil,nil
 	end
 	local parentUnitID_return, unitIDToProcess_return, totalOverhead_return
-	for i=1, #beaconIDList,1 do
+	local history_return = history_VAR
+	--//CHECK DJIN EXIT TO DESTINATION
+	for i=1, #beaconIDList do
 		local beaconID = beaconIDList[i]
-		if not diggDeeperExclusion[beaconID] and listOfBeacon[beaconID] then
-			if not listOfBeacon[beaconID][4] then --if haven't update the djinnID yet
+		local beaconData = listOfBeacon[beaconID]
+		if beaconData and not history_VAR[beaconID] then --beacon exist, and not traversed by this branch yet
+			if not beaconData[4] then --if haven't update the djinnID yet
 				local djinnID = (spGetUnitRulesParam(beaconID,"connectto"))
 				local ex,ey,ez = spGetUnitPosition(djinnID)
-				listOfBeacon[beaconID][4] = ex
-				listOfBeacon[beaconID][5] = ey
-				listOfBeacon[beaconID][6] = ez
+				beaconData[4] = ex --Djinn coordinate
+				beaconData[5] = ey
+				beaconData[6] = ez
 			end
-			local distance = Dist(listOfBeacon[beaconID][4],listOfBeacon[beaconID][5], listOfBeacon[beaconID][6], targetCoord_CNSTNT[1], targetCoord_CNSTNT[2], targetCoord_CNSTNT[3])
+			local distance = Dist(beaconData[4],beaconData[5], beaconData[6], targetCoord_CNSTNT[1], targetCoord_CNSTNT[2], targetCoord_CNSTNT[3]) --Djin exit to destination
 			local estTimeFromExitToDest = (distance/unitSpeed_CNSTNT)*30
 			local totalTime = previousOverheadTime + estTimeFromExitToDest
 			if totalTime<lowestTime_VAR then
@@ -143,68 +160,80 @@ function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime
 			end
 		end
 	end
-	for i=1, #beaconIDList,1 do
+	--//DIGG DEEPER
+	for i=1, #beaconIDList do
 		local beaconID = beaconIDList[i]
-		if not diggDeeperExclusion[beaconID] and listOfBeacon[beaconID] then
-			--diggDeeperExclusion[beaconID]= true 
-			--The line above ensure all path is traversed only once (increase efficiency!), 
-			--but the issue is: if there's many parallel path that lead to a same point then there's no guarantee this unique path is the best one.
-			if not listOfBeacon[beaconID]["vicntyBecn"] then
-				local ex,ez = listOfBeacon[beaconID][4],listOfBeacon[beaconID][6]
-				local listOfUnits = spGetUnitsInCylinder(ex,ez,detectionRange,myTeamID)
-				local listOfBeaconInVicinity = {}
-				for i=1, #listOfUnits,1 do
-					local unitID = listOfUnits[i]
-					if listOfBeacon[unitID] then
-						local index = #listOfBeaconInVicinity+1
-						listOfBeaconInVicinity[index] = unitID
+		local beaconData = listOfBeacon[beaconID]
+		if beaconData then --beacon exist
+			repeat --for emulating "continue" function
+				if not beaconData["nearbyBeacon"] then
+					local ex,ez = beaconData[4],beaconData[6]
+					GetNearbyBeacon(ex,ez,beaconData)
+				end
+				
+				local loopDetected = false
+				local newHistoryBranch = {}
+				for pastBID,_ in pairs(history_VAR) do
+					newHistoryBranch[pastBID] = true --copy value to new branch
+					if pastBID == beaconID then --we returned to previous beacon!
+						loopDetected = true
+						break
 					end
 				end
-				listOfBeacon[beaconID]["vicntyBecn"]=listOfBeaconInVicinity
-			end
-			local vicinityList = listOfBeacon[beaconID]["vicntyBecn"]
-			local totalOverheadTime = previousOverheadTime + chargeTime_CNSTNT + listOfBeacon[beaconID]["becnQeuu"] --plus congestion information from enterance beacon
-			local parentUnitID, unitIDToProcess, totalOverhead,lowestTime = DiggDeeper(vicinityList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, totalOverheadTime, level)
-			if parentUnitID then
-				parentUnitID_return =beaconID
-				unitIDToProcess_return =unitIDToProcess
-				totalOverhead_return =totalOverhead
-				lowestTime_VAR=lowestTime
-			end
+				if loopDetected then break; end --"continue"
+				newHistoryBranch[beaconID] = true
+
+				local estTimeFromExitToBeacon = 0
+				if djinExitPos_CNSTNT then --if exit position was defined (at djin)
+					local distance = Dist(djinExitPos_CNSTNT[1],djinExitPos_CNSTNT[2], djinExitPos_CNSTNT[3], beaconData[1], beaconData[2], beaconData[3]) --Djin exit to beacon position
+					estTimeFromExitToBeacon = (distance/unitSpeed_CNSTNT)*30
+				end
+
+				local djinExitPos = {beaconData[4],beaconData[5],beaconData[6]}
+				local nearbyBeacon = beaconData["nearbyBeacon"]
+				local totalOverheadTime = previousOverheadTime + chargeTime_CNSTNT + estTimeFromExitToBeacon + beaconData["becnQeuu"] --plus congestion information from enterance beacon
+				local parentUnitID, unitIDToProcess, totalOverhead,lowestTime,history = DiggDeeper(nearbyBeacon, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, totalOverheadTime, level, newHistoryBranch,djinExitPos)
+				if parentUnitID then
+					parentUnitID_return =beaconID
+					unitIDToProcess_return =unitIDToProcess
+					totalOverhead_return =totalOverhead
+					lowestTime_VAR=lowestTime
+					history_return=history
+				end
+			until true
 		end
 	end
-	return parentUnitID_return, unitIDToProcess_return, totalOverhead_return, lowestTime_VAR
+	return parentUnitID_return, unitIDToProcess_return, totalOverhead_return, lowestTime_VAR,history_return
 end
 
 function widget:GameFrame(n)
-	if n%150==15 then --every 150 frame period (5 second) at the 15th frame
-		for beaconID,_ in pairs(listOfBeacon)do
+	if n%150==15 then --every 150 frame period (5 second) at the 15th frame update Djinn coordinate
+		for beaconID,beaconData in pairs(listOfBeacon)do
 			local djinnID = (spGetUnitRulesParam(beaconID,"connectto"))
 			local ex,ey,ez = spGetUnitPosition(djinnID)
-			listOfBeacon[beaconID][4] = ex
-			listOfBeacon[beaconID][5] = ey
-			listOfBeacon[beaconID][6] = ez
-			listOfBeacon[beaconID]["djin"] = djinnID
-			local listOfUnits = spGetUnitsInCylinder(ex,ez,detectionRange,myTeamID)
-			local listOfBeaconInVicinity = {}
-			for i=1, #listOfUnits,1 do
-				local unitID = listOfUnits[i]
-				if listOfBeacon[unitID] then
-					local index = #listOfBeaconInVicinity+1
-					listOfBeaconInVicinity[index] = unitID
-				end
-			end
-			listOfBeacon[beaconID]["vicntyBecn"]=listOfBeaconInVicinity
+			beaconData[4] = ex --4,5,6 is Djinn coordinate, 1,2,3 is beacon coordinate
+			beaconData[5] = ey
+			beaconData[6] = ez
+			beaconData["djinID"] = djinnID
+			GetNearbyBeacon(ex,ez,beaconData)
 		end
 	end
-	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: update deploy state
-		for beaconID,tblContent in pairs(listOfBeacon) do
-			local djinnID = listOfBeacon[beaconID]["djin"]
+	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: 
+		--update deploy state
+		for beaconID,beaconData in pairs(listOfBeacon) do
+			local djinnID = beaconData["djinID"]
 			local djinnDeployed = djinnID and (spGetUnitRulesParam(djinnID,"deploy")) or 1
 			if djinnID and djinnDeployed == 1 then
 				djinnDeployed = (spGetUnitIsStunned(beaconID) and 0) or 1
 			end
-			listOfBeacon[beaconID]["deployed"] = djinnDeployed
+			beaconData["deployed"] = djinnDeployed
+		end
+		--check if any beacon-groups under lockdown for overextended time
+		local currentSecond = spGetGameSeconds()
+		for groupNum, content in pairs(waitForNetworkDelay) do
+			if currentSecond - content[1] > 4 then
+				waitForNetworkDelay[groupNum] = nil
+			end
 		end
 	end
 	for i=1, #groupBeacon,1 do
@@ -242,13 +271,13 @@ function widget:GameFrame(n)
 						if not validUnitID then
 							unitToEffect[unitID] = nil
 						end
-						local excludedUnit = fiveSecondExcludedUnit[unitID] and fiveSecondExcludedUnit[unitID][beaconID]
+						local excludedUnit = IgnoreUnit[unitID] and IgnoreUnit[unitID][beaconID]
 						if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] and not excludedUnit then
 							local unitDefID = spGetUnitDefID(unitID)
 							if not listOfMobile[unitDefID] then
-								local moveID = UnitDefs[unitDefID].moveData.id
+								local moveID = UnitDefs[unitDefID].moveDef.id
 								local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
-								local unitSpeed = UnitDefs[unitDefID].speed
+								local unitSpeed = UnitDefs[unitDefID].speed --speed is in elmo-per-second
 								local isBomber = UnitDefs[unitDefID].isBomber
 								local isFighter = UnitDefs[unitDefID].isFighter
 								local isStatic = (unitSpeed == 0)
@@ -264,22 +293,24 @@ function widget:GameFrame(n)
 									loopedUnits[unitID]=true
 									break; --a.k.a: Continue
 								end
-								
+								--IS NEW UNIT? initialize them--
 								unitToEffect[unitID] = unitToEffect[unitID] or {norm=nil,becn={nil},pos=nil,cmd=nil,defID=unitDefID}
-								if not unitToEffect[unitID]["cmd"] then
+								local unitInfo = unitToEffect[unitID] --note: copy table reference
+								if not unitInfo["cmd"] then
 									local px,py,pz= spGetUnitPosition(unitID)
 									local cmd_queue = spGetCommandQueue(unitID,1);
 									cmd_queue = ConvertCMDToMOVE(cmd_queue)
-									unitToEffect[unitID]["pos"] = {px,py,pz}
-									unitToEffect[unitID]["cmd"] = cmd_queue
+									unitInfo["pos"] = {px,py,pz}
+									unitInfo["cmd"] = cmd_queue
 								end
-
-								if not unitToEffect[unitID]["cmd"] then
+								--IS UNIT IDLE? skip--
+								if not unitInfo["cmd"] then
 									loopedUnits[unitID]=true
 									break; --a.k.a: Continue
 								end
-								if unitToEffect[unitID]["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
-									local guardedUnit = unitToEffect[unitID]["cmd"].params[4] --DEFINED in unit_teleporter.lua
+								--IS UNIT WAITING AT BEACON? count them--
+								if unitInfo["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
+									local guardedUnit = unitInfo["cmd"].params[4] --DEFINED in unit_teleporter.lua
 									if listOfBeacon[guardedUnit] then --if beacon exist
 										local chargeTime = listOfMobile[unitDefID][2]
 										beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] or 0
@@ -291,7 +322,7 @@ function widget:GameFrame(n)
 										if cmd_queue[2] and cmd_queue[3] then --in case previous teleport AI teleport order make unit stuck to non-existent beacon
 											spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
 											cmd_queue = ConvertCMDToMOVE({cmd_queue[3]})
-											unitToEffect[unitID]["cmd"] = cmd_queue
+											unitInfo["cmd"] = cmd_queue
 											if not cmd_queue then --invalid command
 												loopedUnits[unitID]=true
 												break; --a.k.a: Continue
@@ -299,26 +330,29 @@ function widget:GameFrame(n)
 										end
 									end
 								end
+								--IS REACH PROCESSING LIMIT? skip--
 								if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
 									break;
 								end
+								--IS REACH DESIRED LIMIT? skip--
 								if #unitToEffect >= numberOfUnitToProcess then
 									break;
 								end
 								currentUnitProcessed = currentUnitProcessed + 1
-								
-								local px,py,pz = unitToEffect[unitID]["pos"][1],unitToEffect[unitID]["pos"][2],unitToEffect[unitID]["pos"][3]
+								--MEASURE REGULAR DISTANCE--
+								local px,py,pz = unitInfo["pos"][1],unitInfo["pos"][2],unitInfo["pos"][3]
 								local cmd_queue = {id=0,params={0,0,0}}
 								local unitSpeed = listOfMobile[unitDefID][3]
 								local moveID = listOfMobile[unitDefID][1]
-								if not unitToEffect[unitID]["norm"] then
-									cmd_queue.id = unitToEffect[unitID]["cmd"].id
-									cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
-									cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
-									cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
+								if not unitInfo["norm"] then
+									cmd_queue.id = unitInfo["cmd"].id
+									cmd_queue.params[1]=unitInfo["cmd"].params[1] --target coordinate
+									cmd_queue.params[2]=unitInfo["cmd"].params[2]
+									cmd_queue.params[3]=unitInfo["cmd"].params[3]
 									local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
-									unitToEffect[unitID]["norm"] = (distance/unitSpeed)*30
+									unitInfo["norm"] = (distance/unitSpeed)*30
 								end
+								--MEASURE DISTANCE WITH TELEPORTER--
 								cmd_queue.id =CMD.MOVE
 								for l=1, #groupBeacon[i],1 do
 									local beaconID2 = groupBeacon[i][l]
@@ -327,10 +361,10 @@ function widget:GameFrame(n)
 										cmd_queue.params[2]=listOfBeacon[beaconID2][2]
 										cmd_queue.params[3]=listOfBeacon[beaconID2][3]
 										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
-										local timeToBeacon = (distance/unitSpeed)*30
-										cmd_queue.params[1]=unitToEffect[unitID]["cmd"].params[1] --target coordinate
-										cmd_queue.params[2]=unitToEffect[unitID]["cmd"].params[2]
-										cmd_queue.params[3]=unitToEffect[unitID]["cmd"].params[3]
+										local timeToBeacon = (distance/unitSpeed)*30 --timeToBeacon is in frame
+										cmd_queue.params[1]=unitInfo["cmd"].params[1] --target coordinate
+										cmd_queue.params[2]=unitInfo["cmd"].params[2]
+										cmd_queue.params[3]=unitInfo["cmd"].params[3]
 										-- if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
 											-- local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
 											-- local ex,ey,ez = spGetUnitPosition(djinnID)
@@ -348,14 +382,18 @@ function widget:GameFrame(n)
 												end 
 											end
 										end
-										local _, beaconIDToProcess, totalOverheadTime = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, unitToEffect[unitID]["norm"], chargeTime,0)
-										diggDeeperExclusion={}
+										local _, beaconIDToProcess, totalOverheadTime,_,history = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, 99999, chargeTime,0, {})
 										if beaconIDToProcess then
+											history[beaconIDToProcess] = true --add the LAST BEACON in the history list
 											distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6])
 											local timeFromExitToDestination = (distance/unitSpeed)*30
-											unitToEffect[unitID]["becn"][beaconID2] = timeToBeacon + timeFromExitToDestination + totalOverheadTime
-										else
-											unitToEffect[unitID]["becn"][beaconID2] = 99999
+											local totalTime = timeToBeacon + timeFromExitToDestination + totalOverheadTime
+											unitInfo["becn"][beaconID2] = {totalTime, history}
+											--Note: all unitInfo table have reference to unitToEffect[unitID], so all value already saved there.
+											
+										else --if beacon yeild no result? (all result have travel time > 99999 frame or ~1hour)
+											--unitInfo["becn"][beaconID2][1] = 99999
+											--intentionally empty
 										end
 									end
 								end
@@ -392,25 +430,28 @@ function widget:GameFrame(n)
 				groupLoopedUnit[i]=nil
 				groupBeaconQueue[i]=nil
 				groupBeaconFinish[i]=nil
-				--!spawn mod=Zero-K test-10559
-				--!setengine 94.1.1-645-g34c768b
-				for unitID, tblContent in pairs(unitToEffect)do
-					if tblContent["norm"] then
+				for unitID, unitInfo in pairs(unitToEffect)do
+					if unitInfo["norm"] then
 						local pathToFollow
 						--NOTE: time to destination is in frame (number of frame).
-						local lowestPathTime = tblContent["norm"] - 30 --add 1 second benefit to regular walking (make walking more attractive choice unless teleport can save more than 1 second travel time)
+						local lowestPathTime = unitInfo["norm"] - 30 --add 1 second benefit to regular walking (make walking more attractive choice unless teleport can save more than 1 second travel time)
 						-- Spring.Echo("TEST:".. unitID)
 						-- Spring.Echo("Normal:".. lowestPathTime)
-						for beaconID, timeToDest in pairs(tblContent["becn"]) do
+						for beaconID, beaconResult in pairs(unitInfo["becn"]) do
 							if listOfBeacon[beaconID] then --beacon is alive
-								local transitTime = timeToDest+beaconCurrentQueue[beaconID]
+								local pathCurrentQueue = 0
+								for pastBID,_ in pairs(beaconResult[2]) do --check beacon path and sum queue delay for each beacon traversed
+									pathCurrentQueue = pathCurrentQueue + (beaconCurrentQueue[pastBID] or 0) --Note: beaconCurrentQueue[pastBID] can be NIL if other group haven't been updated yet
+								end
+								local timeToDest = beaconResult[1]
+								local transitTime = timeToDest + pathCurrentQueue
 								if transitTime < lowestPathTime then
 									pathToFollow = beaconID
 									lowestPathTime = transitTime
 								end
-								if (timeToDest > tblContent["norm"]) then --beacon travel simply not a viable option
-									fiveSecondExcludedUnit[unitID] = fiveSecondExcludedUnit[unitID] or {}
-									fiveSecondExcludedUnit[unitID][beaconID] = true --exclude processing this unit forever until its command changed
+								if (timeToDest > unitInfo["norm"]) then --beacon travel simply not a viable option
+									IgnoreUnit[unitID] = IgnoreUnit[unitID] or {}
+									IgnoreUnit[unitID][beaconID] = true --exclude processing this unit forever until its command changed
 								end
 							end
 							-- if timeToDest<30000 then
@@ -424,9 +465,9 @@ function widget:GameFrame(n)
 							local dx,dz = (dix-ex),(diz-ez)
 							dx,dz = math.abs(dx)/dx,math.abs(dz)/dz
 							--wait for network delay:--
-							waitForNetworkDelay[i] = waitForNetworkDelay[i] or 0 
-							waitForNetworkDelay[i] = waitForNetworkDelay[i] + 1
 							issuedOrderTo[unitID] = i
+							waitForNetworkDelay[i] = waitForNetworkDelay[i] or {spGetGameSeconds(),0}
+							waitForNetworkDelay[i][2] = waitForNetworkDelay[i][2] + 1
 							--end wait for network delay
 							--method A: give GUARD order--
 							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
@@ -436,7 +477,7 @@ function widget:GameFrame(n)
 							-- local params = {bx, by, bz, pathToFollow, Spring.GetGameFrame()}
 							-- Spring.GiveOrderArrayToUnitArray({unitID},{{CMD.INSERT,{0,CMD_WAIT_AT_BEACON,CMD.OPT_SHIFT, unpack(params)}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
 							--
-							local defID = tblContent["defID"]
+							local defID = unitInfo["defID"]
 							local chargeTime = listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime
 						end
@@ -617,21 +658,23 @@ end
 ------------------------------------------------------------
 
 function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
-	 fiveSecondExcludedUnit[unitID]=nil
+	 IgnoreUnit[unitID]=nil
 end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) 
-	fiveSecondExcludedUnit[unitID]=nil
+	IgnoreUnit[unitID]=nil
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
-	fiveSecondExcludedUnit[unitID]=nil
-	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID) and (cmdParams[2] == CMD_WAIT_AT_BEACON) then 
+	IgnoreUnit[unitID]=nil
+	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID and cmdParams[2] == CMD_WAIT_AT_BEACON) then 
 		local group = issuedOrderTo[unitID]
-		waitForNetworkDelay[group] = waitForNetworkDelay[group] - 1 
 		issuedOrderTo[unitID] = nil 
-		if waitForNetworkDelay[group]==0 then 
-			waitForNetworkDelay[group] = nil 
-		end 
-	end 
+		if waitForNetworkDelay[group] then
+			waitForNetworkDelay[group][2] = waitForNetworkDelay[group][2] - 1 
+			if waitForNetworkDelay[group][2]==0 then 
+				waitForNetworkDelay[group] = nil 
+			end
+		end
+	end
 end

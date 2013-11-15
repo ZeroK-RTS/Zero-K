@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[fighter]],
   name                   = [[Avenger]],
-  description            = [[Multirole Stealth Fighter]],
+  description            = [[Multi-role Stealth Fighter]],
   amphibious             = true,
   buildCostEnergy        = 150,
   buildCostMetal         = 150,
@@ -17,22 +17,24 @@ unitDef = {
   category               = [[FIXEDWING]],
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
-  collisionVolumeScales  = [[31 8 45]],
+  collisionVolumeScales  = [[25 8 40]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
+  crashDrag              = 0.02,
   cruiseAlt              = 200,
 
   customParams           = {
     description_bp = [[Caça básico]],
     description_fr = [[Chasseur Multirôle]],
 	description_de = [[Mehrzweck-Tarnkappenjäger]],
-    helptext       = [[The Avenger can hit both land and air. It protects well against air units, but enemy AA and air superiority fighters will kill it quickly. In numbers it can harass land units.]],
+    helptext       = [[The Avenger can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they have a passive stealth system that renders them invisible to enemy radar, and are equipped with afterburner jets that can be used to give the Avenger a massive speed boost, allowing them to execute incredible combat and evasive maneuvers.]],
     helptext_bp    = [[Este caça pode atacar unidades aéreas e terrestres e protege bem outras unidades contra unidades aéreas, mas é morto rapidamente por fogo anti-aéreo e caças de superioridade aérea. Funciona melhor contra unidades terrestres quando em grandes números.]],
     helptext_fr    = [[Capable de tirer en l'air ou au sol le Avenger n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
 	helptext_de    = [[Der Avenger kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
 	modelradius    = [[20]],
 	specialreloadtime = [[850]],
+	modelradius    = [[5]],
   },
 
   defaultmissiontype     = [[VTOL_standby]],
@@ -52,9 +54,11 @@ unitDef = {
   maxVelocity            = 13,
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 3 0]],
+  mygravity              = 1,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
   objectName             = [[fighter.s3o]],
+  power                  = 50,
   script                 = [[fighter.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
@@ -71,7 +75,7 @@ unitDef = {
   },
 
   side                   = [[CORE]],
-  sightDistance          = 690,
+  sightDistance          = 520,
   smoothAnim             = true,
   speedToFront           = 0,
   stealth                = true,
@@ -151,6 +155,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
       cylinderTargeting       = 6,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 15,

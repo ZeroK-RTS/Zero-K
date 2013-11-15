@@ -18,10 +18,11 @@ unitDef = {
   category               = [[FIXEDWING]],
   collide                = false,
   collisionVolumeOffsets = [[0 -3 5]],
-  collisionVolumeScales  = [[40 14 55]],
+  collisionVolumeScales  = [[30 12 50]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
+  crashDrag              = 0.01,
   cruiseAlt              = 220,
 
   customParams           = {
@@ -32,7 +33,7 @@ unitDef = {
     helptext_bp    = [[Vamp é um caça poderoso contra unidades aéreas mas incapaz de atacar unidades terrestres.]],
     helptext_fr    = [[le Vamp combine, vitesse, invisibilit? au radar, et puissante force offensive Air/Air, afin d'abatre les aeronefs ennemis. Sans d?fense contre les attaques Sol/Air.]],
 	helptext_de    = [[Der Vamp ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
-	modelradius    = [[20]],
+	modelradius    = [[10]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -47,16 +48,17 @@ unitDef = {
   mass                   = 187,
   maxAcc                 = 0.5,
   maxDamage              = 1100,
-  maxVelocity            = 7.8,
+  maxVelocity            = 7.6,
   minCloakDistance       = 75,
-  modelCenterOffset      = [[0 8 2]],
+  mygravity              = 1,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[fighter2.s3o]],
+  power                  = 100,
   script                 = [[corvamp.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
   side                   = [[CORE]],
-  sightDistance          = 790,
+  sightDistance          = 750,
   smoothAnim             = true,
   speedToFront           = 0.5,
 
@@ -89,7 +91,11 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 1.1,

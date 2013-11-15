@@ -117,7 +117,7 @@ unitDef = {
       vlaunch                 = true,
       waterWeapon             = true,
       weaponAcceleration      = 400,
-      weaponTimer             = 0.2,
+      weaponTimer             = 1,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 1300,
     },

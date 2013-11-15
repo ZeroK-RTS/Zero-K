@@ -15,10 +15,10 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 1 0]],
-  collisionVolumeScales  = [[47 36 45]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[42 42 42]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -29,6 +29,9 @@ unitDef = {
     helptext_bp    = [[Ravager é um tanque de assalto. Caro mais poderoso, pode lutar eficientemente contra a maioria dos inimigos. ? pouco ágil mas sua velocidade é alta, portanto é recomendável cargar diretamente contra o inimigo, especialmente se forem escaramuçadores or agressores. O ângulo de seus disparos possibilita atirar sobre obstáculos. ? vulnerável a bombas rastejantes.]],
     helptext_fr    = [[Le Ravager est un tank d'assaut. Sont blindage lui permet de faire face r nombre de menaces, et son canon plasma lui permet de tirer au dessus de ses alliés et des carcasses. Son moteur met du temps r atteindre sa vitesse maximale, mais celle ci est assez élevée pour qu'il ne puisse pas se faire harrasser par des tirailleurs qui seront trop occupés r le suivre.  Attention donc, r ne pas lui faire prendre de virages trop secs afin de conserver sa vitesse.]],
 	helptext_de    = [[Zwar teuer, aber auch kraftvoll ist der Ravager, der in der Lage ist, sich selbst gegen die meisten Gegner am Leben zu halten. Obwohl seine Manövrierfähigkeit unglaublich schlecht ist, seine Stärke ist sich mit der Maximalgeschwindigkeit geradeaus zu bewegen. Währenddessen ist es fast unmöglich gegen ihn zu kämpfen. Deshalb solltest du auch darauf achten, dass du ihn im Kampf immer geradeaus bewegst. Das Projektil ermöglicht auch den bogenförmigen Beschuß, um z.B. über Wracks oder Einheiten zu schießen. Anfällig gegen Massen von Crawling Bomben.]],
+	aimposoffset   = [[0 5 0]],
+	midposoffset   = [[0 -2 0]],
+	modelradius    = [[21]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

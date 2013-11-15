@@ -124,7 +124,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
     teamUnits[unitID].unitDefID = unitDefID
     teamUnits[unitID].damaged = false
       
-    if (UnitDefs[unitDefID].builder and not UnitDefs[unitDefID].canMove) then
+    if (UnitDefs[unitDefID].isBuilder and not UnitDefs[unitDefID].canMove) then
       nanoTurrets[unitID] = {}
       nanoTurrets[unitID].unitDefID = unitDefID
       nanoTurrets[unitID].buildDistance = UnitDefs[nanoTurrets[unitID].unitDefID].buildDistance

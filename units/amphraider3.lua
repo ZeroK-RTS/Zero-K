@@ -5,10 +5,10 @@ unitDef = {
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
-  buildCostEnergy        = 180,
-  buildCostMetal         = 180,
+  buildCostEnergy        = 150,
+  buildCostMetal         = 150,
   buildPic               = [[amphraider3.png]],
-  buildTime              = 180,
+  buildTime              = 150,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -78,11 +78,12 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 150,
-        subs    = 7.5,
+        default = 200,
+        subs    = 10,
       },
 
       explosionGenerator      = [[custom:INGEBORG]],
+      flightTime              = 3.5,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -90,7 +91,7 @@ unitDef = {
       noSelfDamage            = true,
       projectiles	          = 2,
       range                   = 240,
-      reloadtime              = 3,
+      reloadtime              = 4,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/missile/missile_fire9]],
@@ -114,7 +115,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 150,
+        default = 200,
       },
 
       edgeEffectiveness       = 0.99,
@@ -127,7 +128,7 @@ unitDef = {
       predictBoost            = 1,
       projectiles	      	  = 2,
       range                   = 240,
-      reloadtime              = 3,
+      reloadtime              = 4,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
       startVelocity           = 100,
@@ -152,10 +153,10 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 72,
+      metal            = 60,
       object           = [[amphraider3_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 72,
+      reclaimTime      = 60,
     },
 
     HEAP      = {
@@ -165,10 +166,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
+      metal            = 30,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 36,
+      reclaimTime      = 30,
     },
 
   },

@@ -122,7 +122,9 @@ local resources = {
       kfoam= "other/foam.tga",
       kfoom= "other/foom.tga",
       largelaser= "gpl/largelaserfalloff.png",
+	  largelaser_long= "gpl/largelaserfalloff_long.png",
 	  largelaserdark= "gpl/largelaserfalloffdark.png",
+	  largelaserdark_long= "gpl/largelaserfalloffdark_long.png",
       lightb= "pd/lightningball.tga",
       lightb3= "pd/lightningball3.tga",
       lightb4= "pd/lightningball4.tga",
@@ -168,6 +170,7 @@ local resources = {
       uglynovaexplo= "cc/uglynovaexplo.tga",
       whitelightb= "pd/whitelightningball.tga",
 	  whitelightgpl = 'GPL/lightw.png',
+	  sonic_glow = "sonic_glow.png",
 	  },
 	},
 }

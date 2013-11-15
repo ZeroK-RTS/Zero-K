@@ -16,6 +16,10 @@ unitDef = {
   buildPic                      = [[armwin.png]],
   buildTime                     = 35,
   category                      = [[FLOAT UNARMED]],
+  collisionVolumeOffsets        = [[0 15 0]],
+  collisionVolumeScales         = [[30 60 30]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -28,6 +32,7 @@ unitDef = {
     helptext_pl    = [[Ta elektrownia funkcjonuje ró¿nie zale¿nie od lokalizacji. Na l¹dzie jest elektrowni¹ wiatrow¹, który produkuje zmienn¹ iloœæ energii. Wiatraki znajduj¹ce siê wy¿ej produkuj¹ wiêcej. W wodzie staje siê elektrowni¹ p³ywow¹ - jest wytrzymalsza i produkuje sta³¹ iloœæ energii niezale¿n¹ od g³êbokoœci.]],
     pylonrange     = 60,
     windgen        = true,
+	modelradius    = [[15]],
   },
 
   energyUse                     = 0,

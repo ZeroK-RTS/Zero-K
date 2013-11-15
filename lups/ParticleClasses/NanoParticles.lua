@@ -15,7 +15,7 @@ local lastTexture = ""
 function NanoParticles.GetInfo()
   return {
     name      = "NanoParticles",
-    backup    = "", --// backup class, if this class doesn't work (old cards,ati's,etc.)
+    backup    = "NanoLasers", --// backup class, if this class doesn't work (old cards,ati's,etc.)
     desc      = "",
 
     layer     = 0, --// extreme simply z-ordering :x

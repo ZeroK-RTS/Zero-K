@@ -25,22 +25,22 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitCOBValue 	= Spring.GetUnitCOBValue
-local spAreTeamsAllied		= Spring.AreTeamsAllied
-local spValidUnitID 		= Spring.ValidUnitID
-local spGiveOrderToUnit		= Spring.GiveOrderToUnit
-local spGetUnitHealth		= Spring.GetUnitHealth
-local spSetUnitRulesParam	= Spring.SetUnitRulesParam
-local spGetCommandQueue		= Spring.GetCommandQueue
-local spGetUnitStates		= Spring.GetUnitStates
-local spGetUnitTeam		= Spring.GetUnitTeam
-local spSetUnitTarget		= Spring.SetUnitTarget
+local spGetUnitCOBValue     = Spring.GetUnitCOBValue
+local spAreTeamsAllied      = Spring.AreTeamsAllied
+local spValidUnitID         = Spring.ValidUnitID
+local spGiveOrderToUnit     = Spring.GiveOrderToUnit
+local spGetUnitHealth       = Spring.GetUnitHealth
+local spSetUnitRulesParam   = Spring.SetUnitRulesParam
+local spGetCommandQueue     = Spring.GetCommandQueue
+local spGetUnitStates       = Spring.GetUnitStates
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitNearestEnemy	= Spring.GetUnitNearestEnemy
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
-local CMD_MOVE	 = CMD.MOVE
-local CMD_FIGHT	 = CMD.FIGHT
+local CMD_MOVE   = CMD.MOVE
+local CMD_FIGHT  = CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
 local gaiaTeamID			= Spring.GetGaiaTeamID()
@@ -102,8 +102,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + slowdown
 	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
 
-	if GG.Awards then
-		GG.Awards.UnitSlowed (slowdown, attackerTeam)
+	if GG.Awards and GG.Awards.AddAwardPoints then
+		local ud = UnitDefs[unitDefID]
+		local cost_slowdown = (slowdown / ud.health) * ud.metalCost
+		GG.Awards.AddAwardPoints ('slow', attackerTeam, cost_slowdown)
 	end
 
 	-- check if a target change is needed

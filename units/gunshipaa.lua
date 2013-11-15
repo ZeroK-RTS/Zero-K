@@ -31,7 +31,7 @@ unitDef = {
     --description_bp = [[Aeronave flutuadora agressora]],
     --description_fr = [[ADAV Pilleur]],
 	description_de = [[Flugabwehr Hubschrauber]],
-    helptext       = [[The Trident is a slow  gunship that cuts down enemy aircraft with missiles.]],
+    helptext       = [[ The Trident is a slow  gunship that cuts down enemy aircraft with missiles. It is much slower than other gunships, so it is much easier to kill the Trident with ground units than with planes.]],
     --helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
     --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
 	--helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
@@ -94,6 +94,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
       cylinderTargeting       = 1,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 12,

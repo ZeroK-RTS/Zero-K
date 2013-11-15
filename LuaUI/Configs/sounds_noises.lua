@@ -288,6 +288,22 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
+	jumpblackhole = {
+		ok = {
+			[1] = "bot_move",
+		},
+		select = {
+			[1] = "bot_select",
+		},
+	},
+	jumpimpulse = {
+		ok = {
+			[1] = "bot_move",
+		},
+		select = {
+			[1] = "bot_select",
+		},
+	},
 	corcan = {
 		ok = {
 			[1] = "bot_move",

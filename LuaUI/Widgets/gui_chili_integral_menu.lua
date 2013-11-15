@@ -1,12 +1,11 @@
--- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: proper tooltips for queue buttons
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.361 Integral Command Menu",
+    desc      = "v0.363 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
-    date      = "12.10.2010",
+    date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
     layer     = math.huge-1,
     enabled   = true,
@@ -48,7 +47,7 @@ NOTE FOR OTHER GAME DEVS:
 ------------------------
 ------------------------
 options_path = 'Settings/HUD Panels/Integral Menu'
-options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
+options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown'}
 options = {
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
@@ -95,6 +94,13 @@ options = {
 		name = "Special Tab",
 		desc = "Switches to special tab, enables grid hotkeys",
 		type = 'button',
+	},
+	old_menu_at_shutdown = {
+		name = 'Reenable Spring Menu at Shutdown',
+		desc = "Upon widget shutdown (manual or upon crash) reenable Spring's original command menu.",
+		type = 'bool',
+		advanced = true,
+		value = true,
 	},
 }
 
@@ -1034,6 +1040,9 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	end
 
 	Update()
+	if (cmdCount <= 0) then
+		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
+	end
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
 
@@ -1167,6 +1176,7 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
+--this function add hotkey text to each tab name
 local function updateTabName(num, choice)
 	local hotkey = WG.crude.GetHotkey(choice.actionName)
 	if hotkey ~= '' then
@@ -1315,11 +1325,11 @@ function widget:Initialize()
 	commands_main = Panel:New{
 		parent = fakewindow,
 		backgroundColor = {0, 0, 0, 0},
-		height = "98%";
+		height = "100%";
 		width = COMMAND_SECTION_WIDTH.."%";
-		x = "1.5%";
-		y = "1.5%";
-		padding = {0, 0, 0, 0},
+		x = "0%";
+		y = "0%";
+		padding = {4, 4, 0, 4},
 		itemMargin  = {0, 0, 0, 0},
 	}
 	for i=1,numRows do
@@ -1342,12 +1352,12 @@ function widget:Initialize()
 	states_main = Panel:New{
 		parent = fakewindow,
 		backgroundColor = {0, 0, 0, 0},
-		height = "96%";
+		height = "100%";
 		width = (STATE_SECTION_WIDTH).."%";
 		--x = tostring(100-STATE_SECTION_WIDTH).."%";
-		right = 4;
-		y = "3%";
-		padding = {0, 0, 0, 0},
+		right = 0;
+		y = "0%";
+		padding = {0, 4, 4, 4},
 		itemMargin  = {0, 0, 0, 0},
 	}
 	for i=1, numStateColumns do
@@ -1475,8 +1485,8 @@ function widget:SelectionChanged(newSelection)
 end
 
 function widget:Shutdown()
-  widgetHandler:ConfigLayoutHandler(nil)
-  Spring.ForceLayoutUpdate()
+	widgetHandler:ConfigLayoutHandler(options.old_menu_at_shutdown.value) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins. See Layout.lua
+	Spring.ForceLayoutUpdate()
 end
 
 options.hidetabs.OnChange = function(self) 

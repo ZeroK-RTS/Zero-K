@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Widget Selector", --needs epic menu to dynamically update widget checkbox colors.
-    desc      = "v1.011 Chili Widget Selector", 
+    desc      = "v1.012 Chili Widget Selector", 
     author    = "CarRepairer",
     date      = "2012-01-11", --2013-06-11 (add crude filter/search capability)
     license   = "GNU GPL, v2 or later",
@@ -300,7 +300,7 @@ MakeWidgetList = function()
 		clientHeight = window_h,
 		parent = screen0,
 		backgroundColor = color.sub_bg,
-		caption = 'Widget List (F11)\nPress Enter to do Search',
+		caption = 'Widget List (F11)',
 		minWidth = 300,
 		minHeight = 400,
 		
@@ -325,19 +325,7 @@ MakeWidgetList = function()
 				},
 			},
 			
-			--Close button
-			Button:New{ 
-				caption = 'Close', 
-				OnMouseUp = { KillWidgetList }, 
-				backgroundColor=color.sub_close_bg, 
-				textColor=color.sub_close_fg, 
-				
-				x=1,
-				bottom=1,
-				width='40%',
-				height=C_HEIGHT,
-				
-			},
+			
 			--Categorization checkbox
 			Checkbox:New{ 
 				caption = 'Categorize', 
@@ -345,10 +333,36 @@ MakeWidgetList = function()
 				OnMouseUp = { function() widget_categorize = not widget_categorize end, KillWidgetList, MakeWidgetList }, 
 				textColor=color.sub_fg, 
 				checked = widget_categorize,
-				x = '50%',
+				
 				width = '30%',
 				height= C_HEIGHT,
 				bottom=1,
+			},
+			
+			--Search button
+			Button:New{ 
+				caption = 'Search', 
+				OnClick = { function() Spring.SendCommands("chatall","PasteText /search:" ) end }, 
+				backgroundColor=color.sub_close_bg, 
+				textColor=color.sub_close_fg, 
+				
+				x = '33%',
+				bottom=1,
+				width='30%',
+				height=B_HEIGHT,
+			},
+			
+			--Close button
+			Button:New{ 
+				caption = 'Close', 
+				OnClick = { KillWidgetList }, 
+				backgroundColor=color.sub_close_bg, 
+				textColor=color.sub_close_fg, 
+				
+				x = '66%',
+				bottom=1,
+				width='30%',
+				height=B_HEIGHT,
 			},
 
 		},
@@ -417,10 +431,4 @@ function widget:TextCommand(command)
 		return true
 	end
 	return false
-end
-
-function widget:KeyRelease(key)
-	if window_widgetlist and key ==13 then --Note: "13" equal to "Enter". Could this be different in different keyboard?
-		Spring.SendCommands("PasteText /search:" )
-	end
 end

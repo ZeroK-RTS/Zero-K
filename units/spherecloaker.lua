@@ -15,9 +15,6 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND UNARMED]],
-  collisionVolumeOffsets = [[0 1 0]],
-  collisionVolumeScales  = [[36 49 35]],
-  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -73,7 +70,7 @@ unitDef = {
       footprintX       = 1,
       footprintZ       = 1,
       metal            = 240,
-      object           = [[spherebot_dead.s3o]],
+      object           = [[eraser_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 240,
     },

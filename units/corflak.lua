@@ -91,7 +91,11 @@ unitDef = {
       color                   = 1,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
+
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
 
       damage                  = {
         default = 14.5,

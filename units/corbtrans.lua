@@ -207,7 +207,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 200,
-      object           = [[wreck4x4c.s3o]],
+      object           = [[heavytrans_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 200,
     },

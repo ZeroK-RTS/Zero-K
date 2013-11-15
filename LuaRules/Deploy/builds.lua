@@ -63,7 +63,7 @@ local function CompareBuilds(udid1, udid2)
   test = Compare(a, b, function(x) return (x.speed <= 0)    end)
   if (test ~= 0) then return (test > 0) end
 
-  test = Compare(a, b, function(x) return  x.builder        end)
+  test = Compare(a, b, function(x) return  x.isBuilder        end)
   if (test ~= 0) then return (test > 0) end
 
   test = Compare(a, b, function(x) return  x.extractsMetal  end)
@@ -106,7 +106,7 @@ local function InsertBuilder(udid, level, baseMetal)
     return
   end
   local ud = UnitDefs[udid]
-  if ((ud == nil) or (not ud.builder)) then
+  if ((ud == nil) or (not ud.isBuilder)) then
     return
   end
   if (builderSet[udid]) then

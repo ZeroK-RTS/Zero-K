@@ -10,6 +10,8 @@ local on = false
 
 local built = false
 
+local push = false
+
 smokePiece = {base}
 
 -- Signal definitions
@@ -32,16 +34,6 @@ function script.HitByWeapon( x, z, weaponDefID, damage )
     return damage
 end
 
-function script.Activate()
-	Move( firepoint , y_axis, TARGET_ALT , 30*4)
-	on = true
-end
-
-function script.Deactivate()
-	Move( firepoint , y_axis, 0 , 250*4)
-	on = false
-	Signal( SIG_AIM)
-end
 
 function script.Create()
 	Turn( firepoint , z_axis, math.rad(0.04) )
@@ -53,35 +45,40 @@ function script.Create()
 	    buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	end
     built = true
+    
+    Move( firepoint , y_axis, TARGET_ALT , 30*4)
     StartThread(MakeVisible)
     
 end
 
-function script.AimWeapon(num, heading, pitch)
-	if on then
-		Signal( SIG_AIM)
-		SetSignalMask( SIG_AIM)
-		return true
-	end
-	return false
+function script.AimWeapon1( heading, pitch)
+    Signal( SIG_AIM)
+	SetSignalMask( SIG_AIM)
+    
+    return true
 end
 
-function script.QueryWeapon(num)
+function script.QueryWeapon1()
 	return firepoint_test
 end
 
-function script.FireWeapon(num)
-    Move( button , y_axis, -10 , 16)
-    WaitForMove(button, y_axis)
-    Sleep(1)
-    Move( button , y_axis, 0 , 16)
-    WaitForMove(button, y_axis)
-    Sleep(1)
+function script.FireWeapon1()
+    if not push then
+        push = true
+        Move( button , y_axis, -10 , 16)
+        WaitForMove(button, y_axis)
+        Sleep(10)
+        
+        Move( button , y_axis, 0 , 16)
+        WaitForMove(button, y_axis)
+        Sleep(10)
+        push = false
+    end
     
-	EmitSfx( firepoint_test,  FIRE_W2 )
+	--EmitSfx( firepoint_test,  FIRE_W2 )
 end
 
-function script.AimFromWeapon(num)
+function script.AimFromWeapon1()
 	return firepoint_test
 end
 

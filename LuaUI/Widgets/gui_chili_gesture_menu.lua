@@ -335,7 +335,7 @@ function SetupMenu(keyboard, mouseless)
     local found = false
     for _, unitID in ipairs(units) do 
       local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-      if ud.builder and menu_use[ud.name] then 
+      if ud.isBuilder and menu_use[ud.name] then 
 		found = ud
 	  elseif ud.canMove and not keyboard then
 		menu = nil
@@ -389,7 +389,7 @@ function EndMenu(ok)
       if os.clock() - menu_start > level * 0.25 then  -- if speed was slower than 250ms per level, flash the gesture
         menu_flash = {origin[1], origin[2], os.clock()}  
       end 
-      Spring.SetActiveCommand(cmdid, _, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
+      Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
     end
   end 
   origin = nil
@@ -767,7 +767,7 @@ function widget:CommandsChanged()
   for _, unitID in ipairs(selectedUnits) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 			
-    if UnitDefs[unitDefID].builder then 
+    if UnitDefs[unitDefID].isBuilder then 
       foundBuilder = true 
       break
     end 

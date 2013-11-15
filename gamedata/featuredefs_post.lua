@@ -76,6 +76,7 @@ local function ProcessUnitDef(udName, ud)
     local fullName = udName .. '_' .. ud.corpse:lower()
     local fd = FeatureDefs[fullName]
     if (fd) then
+      fd.resurrectable = 1
       ud.corpse = fullName
     end
   end
@@ -95,5 +96,15 @@ for udName, ud in pairs(UnitDefs) do
   end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- resurrectable = -1 seems to be broken, set it to 0 for all values which are not 1
+
+for name, def in pairs(FeatureDefs) do
+	if def.resurrectable ~= 1 then
+		def.resurrectable = 0
+	end
+end
+ 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

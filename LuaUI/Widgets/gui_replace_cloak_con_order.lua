@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Replace Cloak Con Orders",
-    desc      = "Prevents con accidental decloak in enemy territory by replacing Repair, Reclaim and Rez with Move",
+    desc      = "Prevents constructor accidental decloak in enemy territory by replacing Repair, Reclaim and Rez with Move. .\n\nNOTE:Use command menu or command hotkeys to override.",
     author    = "GoogleFrog",
     date      = "13 August 2011",
     license   = "GNU GPL, v2 or later",

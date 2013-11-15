@@ -29,7 +29,7 @@ local floor = math.floor
 local myAllyTeamID = 666
 
 local powerTexture = 'Luaui/Images/visible_energy.png'
-local facplopTexture = 'Luaui/Images/gift.png'
+local facplopTexture = 'Luaui/Images/factory.png'
 local rearmTexture = 'LuaUI/Images/noammo.png'
 
 local lastLowPower = {}
@@ -62,6 +62,7 @@ function SetIcons(unitID)
 				lastFacPlop[unitID] = facplop
 				if facplop ~= 0 then
 					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=facplopTexture} )
+					WG.icons.SetPulse( 'facplop', true )
 				else
 					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
 				end

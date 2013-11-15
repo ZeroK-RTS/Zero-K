@@ -15,13 +15,32 @@ function widget:GetInfo()
 	return {
 		name      = "Spotter",
 		desc      = "Draws smoothed polys using fast glDrawListAtUnit",
-		author    = "Orig. by 'TradeMark' - mod. by 'metuslucidium'",
+		author    = "Orig. by 'TradeMark' - mod. by 'metuslucidium'", --updated with options for zk (CarRepairer)
 		date      = "01.12.2012",
 		license   = "GNU GPL, v2 or later",
 		layer     = 5,
 		enabled   = false  --  loaded by default?
 	}
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function UpdateDrawList() end
+
+options_path = 'Settings/Graphics/Unit Visibility/Spotter'
+options = {
+	showEnemyCircle	= {
+		name = 'Show Circle Around Enemies',
+		desc = 'Show a hard circle rround enemy units',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			UpdateDrawList()
+		end
+	}
+}
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -70,9 +89,8 @@ local circlePoly = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
 -- Creating polygons, this is run once widget starts, create quads for each team colour:
-function widget:Initialize()
+UpdateDrawList = function()
 	for _,team in ipairs(Spring.GetTeamList()) do
 		local r, g, b = spGetTeamColor(team)
 		local alpha = 0.5
@@ -81,6 +99,7 @@ function widget:Initialize()
 			alpha = 0.7
 			fadealpha = 0.4
 		end
+		
 		--Spring.Echo("Team", team, "R G B", r, g, b, "Alphas", alpha, fadealpha)
 		circlePoly[team] = glCreateList(function()
 			-- inner:
@@ -111,7 +130,7 @@ function widget:Initialize()
 				end
 			end)
 			-- 'enemy spotter' red-yellow 'rainbow' part
-			if not ( Spring.AreTeamsAllied(myTeamID, team) ) then
+			if options.showEnemyCircle.value and not ( Spring.AreTeamsAllied(myTeamID, team) ) then
 				-- inner:
 				glBeginEnd(GL.QUADS, function()
 					local radstep = (2.0 * math.pi) / circleDivs
@@ -186,6 +205,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function widget:Initialize()
+	UpdateDrawList()
+end
 
 				--[[if (spIsUnitSelected (unitID)) then -- for debuggin' sizes/colours
 				Spring.Echo (radius)

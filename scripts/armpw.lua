@@ -35,6 +35,9 @@ smokePiece = {head, hips, chest}
 local runspeed = 8
 local steptime = 40
 
+-- variables
+local firing = 0
+
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
@@ -44,16 +47,16 @@ function script.Create()
 	StartThread(SmokeUnit)
 	Turn( flare, x_axis, 1.6, 5 )
 	Turn( lshoulder, x_axis, -0.9, 5 )
-	Turn( lforearm, z_axis, -0.9, 5 )
+	Turn( lforearm, z_axis, -0.2, 5 )
 end
 
 local function Walk()
 	Signal( SIG_Walk )
 	SetSignalMask( SIG_Walk )
 	while ( true ) do
-		Move(hips, y_axis, 1.6, runspeed*2)
 		Turn( lshoulder, x_axis, -1.2, runspeed*0.2 )
-		Turn( rshoulder, x_axis, 0.3, runspeed*0.5 )
+		Turn( hips, z_axis, 0.1, runspeed*0.05 )
+		Turn( rshoulder, x_axis, 0.5, runspeed*0.3 )
 		
 		Turn( rthigh, x_axis, -1.5, runspeed*1 )
 		Turn( rshin, x_axis, 1.3, runspeed*1 )
@@ -61,16 +64,14 @@ local function Walk()
 		
 		Turn( lshin, x_axis, 0.2, runspeed*1 )
 		Turn( lthigh, x_axis, 1.2, runspeed*1 )
-		
-		Sleep( steptime )
-		Move(hips, y_axis, -1.6, runspeed*3)
+
 		WaitForTurn( rthigh, x_axis )
-		
+
 		Sleep( steptime )
 		
-		Move(hips, y_axis, 1.6, runspeed*2)
 		Turn( lshoulder, x_axis, -0.6, runspeed*0.2 )
-		Turn( rshoulder, x_axis, -0.3, runspeed*0.5 )
+		Turn( hips, z_axis, -0.1, runspeed*0.05 )
+		Turn( rshoulder, x_axis, -0.5, runspeed*0.3 )
 		
 		Turn( lthigh, x_axis, -1.5, runspeed*1 )
 		Turn( lshin, x_axis, 1.3, runspeed*1 )
@@ -79,9 +80,6 @@ local function Walk()
 		Turn( rshin, x_axis, 0.2, runspeed*1 )
 		Turn( rthigh, x_axis, 1.2, runspeed*1 )
 		
-		Sleep( steptime )
-		
-		Move(hips, y_axis, -1.6, runspeed*3)
 		WaitForTurn( lthigh, x_axis )
 		
 		Sleep( steptime )
@@ -92,7 +90,7 @@ end
 local function StopWalk()
 	Signal( SIG_Walk )
 	SetSignalMask( SIG_Walk )
-	Move(hips, y_axis, 0, 12)
+	Turn( hips, z_axis, 0, 0.5 )
 	
 	Turn( lthigh, x_axis, 0, 2 )
 	Turn( lshin, x_axis, 0, 2 )
@@ -115,11 +113,12 @@ local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
 	Sleep(2000)
+	firing = 0
 	Turn( chest, y_axis, 0, 3 )
 	Turn( lshoulder, x_axis, -0.9, 5 )
 	Turn( rshoulder, x_axis, 0, 3 )
 
-	Turn( lforearm, z_axis, -0.9, 5 )
+	Turn( lforearm, z_axis, -0.2, 5 )
 	Turn( lshoulder, z_axis, 0, 3 )
 	Turn( rshoulder, z_axis, 0, 3 )
 	Turn( head, y_axis, 0, 2  )
@@ -148,6 +147,7 @@ function script.AimWeapon1( heading, pitch )
 	Turn( head, x_axis, -pitch, 9 )--]]
 	
 	-- Outstreched Arm
+	firing = 1
 	Turn( chest, y_axis, heading, 12 )
 	Turn( lforearm, z_axis, 0, 5 )
 	Turn( lshoulder, x_axis, -pitch - 1.5, 12 )

@@ -84,6 +84,10 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 3,
 
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
+
       damage                  = {
         default = 65,
         planes  = 650,

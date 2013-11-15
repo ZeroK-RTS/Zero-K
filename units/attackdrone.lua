@@ -19,12 +19,6 @@ unitDef = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
-  
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[28 12 26]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],    
-  
   cruiseAlt           = 100,
   explodeAs           = [[TINY_BUILDINGEX]],
   floater             = true,
@@ -45,10 +39,11 @@ unitDef = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-	description_de = [[Trägerdrohne]],
-	description_fr = [[Drone d'attaque]],
-	helptext_de    = [[]],
-	helptext_fr    = [[]],
+	description_de	= [[Trägerdrohne]],
+	description_fr	= [[Drone d'attaque]],
+	helptext		= [[The Firefly is a miniature autonomous attack drone with a weak high precision pulse laser. A commander can spawn two, they buzz around to protect it from the small enemy units. But they don't have stealth so they can also betray the presence of a cloaked commander.]],
+	helptext_de		= [[]],
+	helptext_fr		= [[La Luciole est un drone miniature d'attaque autonome équipé d'un faible laser pulsé. Un commandant en possède deux qui patrouillent autour de lui et le protêge efficacement des petites unités adverses. Néanmoins leur présence peut trahir un commandant invisible.]],
   },
   
   
@@ -61,6 +56,7 @@ unitDef = {
 
   side                = [[ARM]],
   sightDistance       = 500,
+  stealth             = true,
   turnRate            = 792,
   upright             = true,
 

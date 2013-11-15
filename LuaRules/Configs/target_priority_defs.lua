@@ -2,6 +2,7 @@
 -- Max useful HP/Cost is 11, Only Dirtbag and Claw are higher at 32.5 and 40 respectively.
 
 local weaponBadCats = {}
+local weaponIsAA = {}
 
 for wid = 1, #WeaponDefs do
 	weaponBadCats[wid] = {}
@@ -17,6 +18,9 @@ for i=1, #UnitDefs do
 		if wd.badTargets and realWD ~= 0 then
 			weaponBadCats[realWD].fixedwing = wd.badTargets["fixedwing"]
 			weaponBadCats[realWD].gunship = wd.badTargets["gunship"]
+		end
+		if wd.customParams and realWD ~= 0 and wd.customParams.isaa then
+			weaponIsAA[realWD] = true
 		end
 	end
 end
@@ -65,6 +69,23 @@ local unitIsTooFastToHit = {
 	[UnitDefNames["corroach"].id] = true,
 }
 
+-- Don't shoot at fighters or drones, they are unimportant.
+local unitIsFighterOrDrone = {
+	[UnitDefNames["fighter"].id] = true,
+	[UnitDefNames["corvamp"].id] = true,
+	[UnitDefNames["attackdrone"].id] = true,
+	[UnitDefNames["battledrone"].id] = true,
+	[UnitDefNames["carrydrone"].id] = true,
+}
+
+-- Prioritize bombers
+local unitIsBomber = {
+	[UnitDefNames["corshad"].id] = true,
+	[UnitDefNames["corhurc2"].id] = true,
+	[UnitDefNames["armcybr"].id] = true,
+	[UnitDefNames["armstiletto_laser"].id] = true,
+}
+
 -- Hardcode things which should not fire at things too fast to hit
 local unitIsBadAgainstFastStuff = {
 	[UnitDefNames["correap"].id] = true,
@@ -93,19 +114,22 @@ for i=1, #baseUnitPriority do
 end
 --]]
 
-
 -- Generate full target table
 local targetTable = {}
 
 for uid = 1, #UnitDefs do
 	targetTable[uid] = {}
 	for wid = 1, #WeaponDefs do
-		if (weaponBadCats[wid].fastStuff and unitIsTooFastToHit[uid]) or
+		if unitIsUnarmed[uid] then
+			targetTable[uid][wid] = unitHealthRatio[uid] + 35
+		elseif (unitIsFighterOrDrone[uid]) or
+			(weaponBadCats[wid].fastStuff and unitIsTooFastToHit[uid]) or
 			(weaponBadCats[wid].fixedwing and unitIsFixedwing[uid]) or
-			(weaponBadCats[wid].gunship and unitIsGunship[uid]) or
-			unitIsUnarmed[uid] then
+			(weaponBadCats[wid].gunship and unitIsGunship[uid]) then
 			
 			targetTable[uid][wid] = unitHealthRatio[uid] + 15
+		elseif unitIsBomber[uid] and weaponIsAA[wid] then
+			targetTable[uid][wid] = unitHealthRatio[uid]*0.3
 		else
 			targetTable[uid][wid] = unitHealthRatio[uid]
 		end

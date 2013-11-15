@@ -15,6 +15,10 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[38 38 38]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]], 
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -25,6 +29,7 @@ unitDef = {
     helptext_bp    = [[Scalpel é um escaramuçador: Use-o para ataques de bater e correr. Demora para recarregar e n?o é muito resistente, devendo sempre ser mantido a distância do inimigo. Seus projéteis de trajetória curva superam obstáculos.]],
     helptext_fr    = [[Le Scalpel est un tirailleur, il est utile pour harrasser l'ennemi ? l'aide de son lance roquette. Il tire des roquettes ? t?te chercheuse au dessus des obstacles, mais son temps de rechargement, sa maniabilit? et son faible blindage le rendent vuln?rable aux contre attaques.]],
 	helptext_de    = [[Nutze den Scalpel für Schlag-und-Renn Attacken. Er hat eine lange Nachladezeit und nicht allzu viele Lebenspunkte. Er sollte immer auf Distanz zum Feind gehalten werden. Die bogenförmige Schussbahn ermöglicht es über Hindernisse und freundliche Einheiten zu schießen.]],
+	modelradius    = [[19]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

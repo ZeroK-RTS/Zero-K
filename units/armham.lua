@@ -15,7 +15,7 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[29 43 29]],
+  collisionVolumeScales  = [[28 43 28]],
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -35,6 +35,7 @@ unitDef = {
     helptext_fr    = [[Le Hammer a un canon plasma longue port?e qui lui permet de tirer indirectement au dessus des obstacles, et a une port?e plus grande que les tour de d?fense basic jusqu'au HLT. Bien qu'il soit ?fficace contre les unit?es mobiles, il est n?c?ssaire de le d?fendre avec des Warriors pour le prot?ger des unit?s rapide et de raid.]],
     helptext_it    = [[Il Hammer ha un cannone al plasma da lungo raggio che gli permette di fare fuoco indiretto sopra ostacoli, ed ha un raggio maggiore di molte difese basiche fino alla HLT. Anche se é efficace contro unitá mobili, é consigliabile difenderli con warriors per prevenire che le unitá da invasione si avvicinino troppo]],
     helptext_pl    = [[Hammer ma działo dalekiego zasięgu, które pozwala mu strzelać nad niskimi przeszkodami i ma większy zasięg niż podstawowe wieżyczki. Choć jest dosyć efektywny przeciwko ruchomym jednostkom, powinno się zapewnić mu ochronę przed lżejszymi jednostkami, które mogą unikać jego powolnych pocisków.]],
+	modelradius    = [[14]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

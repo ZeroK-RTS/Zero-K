@@ -1,4 +1,4 @@
-local versionName = "v2.856"
+local versionName = "v2.866"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "July 3, 2013", --clean up June 25, 2013
+    date      = "November 1, 2013", --clean up June 25, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -30,6 +30,7 @@ local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 local spGetMyTeamID 	= Spring.GetMyTeamID
 local spIsUnitAllied 	= Spring.IsUnitAllied
 local spGetUnitPosition =Spring.GetUnitPosition
+local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitDefID 	= Spring.GetUnitDefID
 local spGetUnitSeparation	= Spring.GetUnitSeparation
 local spGetUnitDirection	=Spring.GetUnitDirection
@@ -72,8 +73,8 @@ local mathRandom = math.random
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
-local isOldSpring_g = (Game.version:find('91.') or (Game.version:find('94') and Game.version:find('94.1.1')== nil)) and 1 or 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
-local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
+local isOldSpring_g = (Game.version:find('91.')) and 1 or 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
+local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 1)
 local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
 -- Graph constant:
@@ -162,7 +163,7 @@ local unitWasDead_gbl = {} --//variable: remember last case of unit death as pre
 --Methods:
 ---------------------------------Level 0
 options_path = 'Game/Unit AI/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
-options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'cloakyAlwaysFlee','dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
+options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'cloakyAlwaysFlee','retreatAvoidance','dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
 options = {
 	enableCons = {
 		name = 'Enable for constructors',
@@ -217,6 +218,12 @@ options = {
 		value = false,
 		desc = 'Force cloakies & constructor to always flee from enemy when idle except if they are under hold-position state. \n\nNote: Unit can wander around and could put themselves in danger. Default:Off',
 	},
+	retreatAvoidance = {
+		name = 'Retreating unit always flee',
+		type = 'bool',
+		value = true,
+		desc = 'Force retreating unit to always avoid the enemy (Note: this require the use of RETREAT functionality provided by cmd_retreat.lua widget a.k.a unit retreat widget). Default:On',
+	},	
 	dbg_RemoveAvoidanceSplitSecond = {
 		name = 'Debug: Constructor instant retreat',
 		type = 'bool',
@@ -394,20 +401,21 @@ function RefreshUnitList(attacker, commandTTL)
 			local unitSpeed =unitDef["speed"]
 			local decloakScaling = math.max((unitDef["decloakDistance"] or 0),stdDecloakDist)/stdDecloakDist
 			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
-			if (unitSpeed>0) then
+			local _,_,inbuild = spGetUnitIsStunned(unitID)
+			if (unitSpeed>0) and (not inbuild) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
+				if (unitDef.isBuilder or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
 					unitType =1 --//this unit-type will do avoidance even in camera view
 					
 					local isBuilder_ignoreTrue = false
-					if unitDef["builder"] then
+					if unitDef.isBuilder then
 						isBuilder_ignoreTrue = (options.dbg_IgnoreSelectedCons.value == true and selectedUnits_Meta[unitID] == true) --is (epicMenu force-selection-ignore is true? AND unit is a constructor?)
 						if selectedUnits_Meta[unitID] then
 							selectedCons_Meta[unitID] = true --remember selected Constructor
 						end
 					end
-					if (unitDef["builder"] and options.enableCons.value==false) or (isBuilder_ignoreTrue) then --//if ((Cons epicmenu option is false) OR (epicMenu force-selection-ignore is true)) AND it is a constructor, then... exclude (this) Cons
+					if (unitDef.isBuilder and options.enableCons.value==false) or (isBuilder_ignoreTrue) then --//if ((Cons epicmenu option is false) OR (epicMenu force-selection-ignore is true)) AND it is a constructor, then... exclude (this) Cons
 						unitType = 0 --//this unit-type excluded from avoidance
 					end
 					if unitDef["canCloak"] then --only cloakies + constructor that is cloakies
@@ -444,7 +452,7 @@ function RefreshUnitList(attacker, commandTTL)
 				Spring.Echo("unitID(RefreshUnitList)" .. unitID)
 				Spring.Echo("unitDef[humanName](RefreshUnitList)" .. unitDef["humanName"])
 				Spring.Echo("((unitDef[builder] or unitDef[canCloak]) and unitDef[speed]>0)(RefreshUnitList):")
-				Spring.Echo((unitDef["builder"] or unitDef["canCloak"]) and unitDef["speed"]>0)
+				Spring.Echo((unitDef.isBuilder or unitDef["canCloak"]) and unitDef["speed"]>0)
 			end
 		end
 	end
@@ -741,9 +749,15 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
-		if ((unitInMotionSingleUnit.isVisible ~= "yes") or isReloading or (unitInMotionSingleUnit[2] == 1 and options.cloakyAlwaysFlee.value)) then --if unit is out of user's vision OR is reloading OR is cloaky, and: 
+		local unitType = unitInMotionSingleUnit[2]
+		local unitInView = unitInMotionSingleUnit["isVisible"]
+		local retreating = false
+		if options.retreatAvoidance.value and WG.retreatingUnits then
+			retreating = (WG.retreatingUnits[unitID]~=nil)
+		end
+		--if ((unitInView ~= "yes") or isReloading or (unitType == 1 and options.cloakyAlwaysFlee.value)) then --if unit is out of user's vision OR is reloading OR is cloaky, and: 
 			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
-				if (holdPosition== false) then --if unit is not "hold position", then:
+				--if (not holdPosition) then --if unit is not "hold position", then:
 					local idleOrIsDodging = (cQueue[1] == nil) or (#cQueue == 1 and cQueue[1].id == CMD_MOVE) --is idle completely, or is given widget's CMD_MOVE (note: CMD_MOVE or any other command will not end with CMD_STOP when its widget issued)
 					local dummyCmd
 					if idleOrIsDodging then
@@ -753,14 +767,17 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 					end
 					cQueue={{id = dummyCmd, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --flag unit with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit. Note: this is not real command, its here just to trigger avoidance.
 					--Note2: negative target only deactivate attraction function, but avoidance function is still active & output new coordinate if enemy is around
-				end
+				--end
 			end
-		end
+		--end
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
-			local isConstructorCmd = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == 125)
-			local isValidCommand = ((isConstructorCmd and not holdPosition) or cQueue[1].id == CMD_MOVE or  cQueue[1].id == cMD_DummyG) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
-			--local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes" and unitInMotionSingleUnit[2]~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
-			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes")--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
+			local isStealthUnit = (unitType == 1)
+			local isNotViewed = (unitInView ~= "yes")
+			local isConstructorCmd = (cQueue[1].id == CMD_REPAIR or cQueue[1].id < 0 or cQueue[1].id == CMD_RECLAIM or cQueue[1].id == CMD_RESURRECT)
+			local isMoveCommand = (cQueue[1].id == CMD_MOVE)
+			local isNormCommand = (isConstructorCmd or isMoveCommand) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10),
+			--local isStealthUnitTypeOrIsNotViewed = isStealthUnit or (unitInView ~= "yes" and unitType~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
+			local isStealthUnitTypeOrIsNotViewed = isStealthUnit or isNotViewed--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
 			local _2ndAttackSignature = false --attack command signature
 			local _2ndGuardSignature = false --guard command signature
 			if #cQueue >=2 then --check if the command-queue is masked by widget's previous command, but the actual originality check will be performed by TargetBoxReached() later.
@@ -769,8 +786,18 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 			end
 			local isReloadingAttack = (isReloading and (cQueue[1].id == CMD_ATTACK or (cQueue[1].id == cMD_DummyG or cQueue[1].id == cMD_Dummy_atkG) or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (cQueue[1].id == CMD_GUARD or _2ndGuardSignature)
-			local isForceCloaked = spGetUnitIsCloaked(unitID) and (unitInMotionSingleUnit[2]==2 or unitInMotionSingleUnit[2]==3) --any unit with type 3 (gunship) or type 2 (ground units except cloaky) that is cloaked.
-			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingAttack and not holdPosition) or (isGuardState) or (isForceCloaked and cQueue[1].id==CMD_MOVE) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or any unit outside visibility... OR on any unit which is reloading & not holding position... OR is guarding another unit... OR any normal unit being cloaked and is moving.
+			local isForceCloaked = spGetUnitIsCloaked(unitID) and (unitType==2 or unitType==3) --any unit with type 3 (gunship) or type 2 (ground units except cloaky) that is cloaked.
+			local isRealIdle = cQueue[1].id == cMD_DummyG --FAKE (IDLE) COMMAND
+			local isStealthUnitAlwaysFlee = isStealthUnit and options.cloakyAlwaysFlee.value
+			
+			if (isNormCommand and isStealthUnitTypeOrIsNotViewed and not holdPosition) or --execute on: unit with generic mobility command: for UnitType==1 unit (cloaky, constructor) OR for any unit outside player view... & which is not holding position
+			(isRealIdle and (isNotViewed or isStealthUnitAlwaysFlee) and not holdPosition) or --execute on: any unit that is really idle and out of view... & is not hold position
+			(isReloadingAttack and not holdPosition) or --execute on: any unit which is reloading... & is not holding position
+			(isGuardState and not holdPosition) or --execute on: any unit which is guarding another unit...  & is not hold position
+			(isForceCloaked and isMoveCommand and not holdPosition) or --execute on: any normal unit being cloaked and is moving... & is not hold position.
+			(retreating and not holdPosition) --execute on: any retreating unit
+			then 
+				--Spring.Echo("AVOID!")
 				local isReloadAvoidance = (isReloadingAttack and not holdPosition)
 				if isReloadAvoidance or #cQueue>=2 then --check cQueue for lenght to prevent STOP command from short circuiting the system 
 					if isReloadAvoidance or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
@@ -896,7 +923,7 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 			end
 			--]]
 		end
-		if unitDef["builder"] then 
+		if unitDef.isBuilder then 
 			losRadius = losRadius + extraLOSRadiusCONSTANT --add additional/more detection range for constructors for quicker reaction vs enemy radar dot
 		end 
 	end
@@ -908,7 +935,7 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 	local x,y,z = spGetUnitPosition(unitID)
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
-	local iAmConstructor = unitDef["builder"]
+	local iAmConstructor = unitDef.isBuilder
 	local unitState = spGetUnitStates(unitID) --unitID is "this" unit (our unit)
 	local iAmNotCloaked = not unitState["cloak"]
 	
@@ -973,21 +1000,27 @@ function CatalogueMovingObject(surroundingUnits, unitID, lastPosition, losRadius
 		--if unitType == 4 then --//if unit is amphibious, then:
 			_,unitDepth,_ = spGetUnitPosition(unitID) --//get unit's y-axis. Less than 0 mean submerged.
 		--end
+		local unitXvel,_,unitZvel = spGetUnitVelocity(unitID)
+		local unitSpeed = math.sqrt(unitXvel*unitXvel+unitZvel*unitZvel)
 		for i=2,surroundingUnits[1],1 do --//iterate over all enemy list.
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil) then
+				local recXvel,_,recZvel = spGetUnitVelocity(unitRectangleID)
+				recXvel = recXvel or 0
+				recZvel = recZvel or 0
+				local recSpeed = math.sqrt(recXvel*recXvel+recZvel*recZvel)
 				local relativeAngle 	= GetUnitRelativeAngle (unitID, unitRectangleID)
 				local unitDirection,_,_	= GetUnitDirection(unitID, lastPosition)
 				local unitSeparation	= spGetUnitSeparation (unitID, unitRectangleID, true)
-				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) then --unit inside the collision angle is catalogued with a value that is useful for comparision later
+				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) or (recSpeed>3*unitSpeed) then --unit inside the collision angle? or is super fast? remember unit currrent saperation for comparison again later
 					unitsSeparation[unitRectangleID]=unitSeparation
-				else --unit outside the collision angle is set to an arbitrary 999 which is not useful for comparision later
-					unitsSeparation[unitRectangleID]=999 --set saperation distance to 999 such that later comparison (which is always smaller than this) imply an approaching units
+				else --unit outside the collision angle? set to an arbitrary 9999 which mean "do not need comparision, always avoid"
+					unitsSeparation[unitRectangleID]=9999
 				end
 				if unitDepth <0 then --//if unit is submerged, then:
 					--local enemySonarRadius = (spGetUnitSensorRadius(unitRectangleID,"sonar") or 0)
 					local enemyDefID = spGetUnitDefID(unitRectangleID)
-					local unitDefsSonarContent = 999 --//set to very large so that any un-identified contact is assumed as having sonar (as threat). 
+					local unitDefsSonarContent = 9999 --//set to very large so that any un-identified contact is assumed as having sonar (as threat). 
 					if UnitDefs[enemyDefID]~=nil then
 						unitDefsSonarContent = UnitDefs[enemyDefID].sonarRadius
 					end
@@ -1082,7 +1115,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local normalizingFactor=0
 
 		--count every enemy unit and sum its contribution to the obstacle/repulsor variable
-		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius,obsCONSTANT)
+		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius,obsCONSTANT,skippingTimer)
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 		--convert an angular command into a coordinate command
@@ -1503,9 +1536,15 @@ function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, 
 	return relevantUnit, arrayIndex
 end
 
-function GetUnitRelativeAngle (unitIDmain, unitID2)
-	local x,_,z = spGetUnitPosition(unitIDmain)
-	local rX, _, rZ= spGetUnitPosition(unitID2)
+function GetUnitRelativeAngle (unitIDmain,unitID2,unitIDmainX,unitIDmainZ,unitID2X,unitID2Z)
+	local x,z = unitIDmainX,unitIDmainZ
+	local rX, rZ=unitID2X,unitID2Z --use inputted position
+	if not x then --empty?
+		x,_,z = spGetUnitPosition(unitIDmain) --use standard position
+	end
+	if not rX then 
+		rX, _, rZ= spGetUnitPosition(unitID2) 
+	end
 	local cX, _, cZ = rX-x, _, rZ-z 
 	local cXcZ = math.sqrt(cX*cX + cZ*cZ) --hypothenus for xz direction
 	local relativeAngle = math.atan2 (cX/cXcZ, cZ/cXcZ) --math.atan2 accept trigonometric ratio (ie: ratio that has same value as: cos(angle) & sin(angle). Cos is ratio between x and hypothenus, and Sin is ratio between z and hypothenus)
@@ -1550,7 +1589,7 @@ function GetTargetSubtendedAngle(unitID, targetCoordinate)
 end
 
 --sum the contribution from all enemy unit
-function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius, obsCONSTANT)
+function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius, obsCONSTANT,skippingTimer)
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG -- make the slopes in the extremeties of obstacle graph more sloppy (refer to "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas)
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
@@ -1567,19 +1606,31 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 				graphSample[i]=0 --initialize content 360 points
 			end
 		end
+		local thisXvel,_,thisZvel = spGetUnitVelocity(thisUnitID)
+		local thisX,_,thisZ = spGetUnitPosition(thisUnitID)
+		thisXvel = thisXvel*30*skippingTimer.averageDelay --convert per-frame velocity into per-second velocity, then into elmo-per-averageNetworkDelay
+		thisZvel = thisZvel*30*skippingTimer.averageDelay
 		for i=2,surroundingUnits[1], 1 do
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil)then --excluded any nil entry
-				local unitSeparation	= spGetUnitSeparation (thisUnitID, unitRectangleID, true) --get 2D distance
-				--if enemy spontaneously appear then set the memorized separation distance to 999; maybe previous polling missed it and to prevent nil
-				if unitsSeparation[unitRectangleID]==nil then unitsSeparation[unitRectangleID]=999 end
+				local recXvel,_,recZvel = spGetUnitVelocity(unitRectangleID)
+				local recX,_,recZ = spGetUnitPosition(unitRectangleID)
+				recXvel = recXvel or 0
+				recZvel = recZvel or 0
+				recXvel = recXvel*30*skippingTimer.averageDelay - thisXvel --calculate relative elmo-per-averageNetworkDelay
+				recZvel = recZvel*30*skippingTimer.averageDelay - thisZvel
+				recX = recX + recXvel --predict obstacle's offsetted position after network delay has passed
+				recZ = recZ + recZvel
+				local diffX, diffZ = (recX - thisX) , (recZ - thisZ)
+				local unitSeparation = math.sqrt(diffX*diffX+diffZ*diffZ) --spGetUnitSeparation (thisUnitID, unitRectangleID, true) --get 2D distance
+				if unitsSeparation[unitRectangleID]==nil then unitsSeparation[unitRectangleID]=9999 end --if enemy spontaneously appear then set the memorized separation distance to 9999; maybe previous polling missed it and to prevent nil
 				if (turnOnEcho == 1) then
 					Spring.Echo("unitSeparation <unitsSeparation[unitRectangleID](SumAllUnitAroundUnitID)")
 					Spring.Echo(unitSeparation <unitsSeparation[unitRectangleID])
 				end
-				if unitSeparation <(unitsSeparation[unitRectangleID] or 999) then --see if the enemy is maintaining distance
-					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID) -- obstacle's angular position with respect to our coordinate
-					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius) -- obstacle & our unit's angular size 
+				if unitSeparation <unitsSeparation[unitRectangleID] then --see if the enemy in collision front is maintaining distance/fleeing or is closing in
+					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID,thisX,thisZ,recX,recZ) -- obstacle's angular position with respect to our coordinate
+					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius,unitSeparation) -- obstacle & our unit's angular size 
 
 					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
 					if useLOS_distanceCONSTANT then
@@ -1761,8 +1812,10 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 	end
 	local maximumVelocity = (nearestFrontObstacleRange- safetyDistanceCONSTANT)/timeToContactCONSTANT --calculate the velocity that will cause a collision within the next "timeToContactCONSTANT" second.
 	activateAutoReverse=activateAutoReverse*impatienceTrigger --activate/deactivate 'autoReverse' if impatience system is used
-	if (velocity >= maximumVelocity) and (activateAutoReverse==1) and (not newCommand) then 
-		velocity = -unitSpeed	--set to reverse if impact is imminent & when autoReverse is active & when isn't a newCommand. NewCommand is TRUE if its on initial avoidance. We don't want auto-reverse on initial avoidance (we rely on normal avoidance first, then auto-reverse if it about to collide with enemy).
+	local doReverseNow = false
+	if (maximumVelocity <= velocity) and (activateAutoReverse==1) and (not newCommand) then 
+		--velocity = -unitSpeed	--set to reverse if impact is imminent & when autoReverse is active & when isn't a newCommand. NewCommand is TRUE if its on initial avoidance. We don't want auto-reverse on initial avoidance (we rely on normal avoidance first, then auto-reverse if it about to collide with enemy).
+		doReverseNow = true
 	end 
 	
 	if (turnOnEcho == 1) then 
@@ -1771,7 +1824,7 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 		Spring.Echo("unitDirection(SendCommand)" .. unitDirection)
 	end
 	
-	local newX, newZ= ConvertToXZ(thisUnitID, newUnitAngleDerived,velocity, unitDirection, networkDelayDrift) --convert angle into coordinate form
+	local newX, newZ= ConvertToXZ(thisUnitID, newUnitAngleDerived,velocity, unitDirection, networkDelayDrift,doReverseNow) --convert angle into coordinate form
 	return newX, newZ
 end
 
@@ -1807,7 +1860,7 @@ function FindSafeHavenForCons(unitID, now)
 			local unitDef = UnitDefs[unitDefID_list]
 			local unitSpeed =unitDef["speed"]
 			if (unitSpeed>0) then --//if moving units
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --if cloakies and constructor, and not com (ZK)
+				if (unitDef.isBuilder or unitDef["canCloak"]) and not unitDef.customParams.commtype then --if cloakies and constructor, and not com (ZK)
 					--intentionally empty. Not include cloakies and builder.
 				elseif unitDef.customParams.commtype then --if COMMANDER,
 					unorderedUnitList[unitID_list] = {x,y,z} --//store
@@ -1877,15 +1930,24 @@ function GetUnitDirection(unitID, lastPosition) --give unit direction in radian,
 	return unitDirection, currentY, usingLastPosition
 end
 
-function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, networkDelayDrift)
+function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, networkDelayDrift,doReverseNow)
 	--localize global constant
 	local velocityAddingCONSTANT=velocityAddingCONSTANTg
 	local velocityScalingCONSTANT=velocityScalingCONSTANTg
 	--
+	
 	local x,_,z = spGetUnitPosition(thisUnitID)
-	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT*Sgn(velocity) --add multiplier & adder. note: we multiply "velocityAddingCONSTANT" with velocity Sign ("Sgn") because we might have reverse speed (due to auto-reverse)
-	local newX = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
-	local newZ = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + z
+	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT*Sgn(velocity) --add multiplier & adder. note: we multiply "velocityAddingCONSTANT" with velocity Sign ("Sgn") because we might have reverse speed (due to auto-reverse)	
+	local newX = 0
+	local newZ = 0		
+	if doReverseNow then
+		local reverseDirection = unitDirection+math.pi --0 degree + 180 degree = reverse direction
+		newX = distanceToTravelInSecond*math.sin(reverseDirection) + x
+		newZ = distanceToTravelInSecond*math.cos(reverseDirection) + z
+	else
+		newX = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
+		newZ = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + z
+	end
 	
 	if (unitDirection ~= nil) and (networkDelayDrift~=0) then --need this check because argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
 		local distanceTraveledDueToNetworkDelay = networkDelayDrift 
@@ -1901,7 +1963,7 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 end
 
 --get enemy angular size with respect to unit's perspective
-function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius)
+function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius,unitSeparation)
 	local unitSize2 =32 --a commander size for an unidentified enemy unit
 	local unitDefID2= spGetUnitDefID(unitID2)
 	local unitDef2= UnitDefs[unitDefID2]
@@ -1911,10 +1973,10 @@ function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius)
 	local unitDefID= spGetUnitDefID(unitIDmain)
 	local unitDef= UnitDefs[unitDefID]
 	local unitSize = unitDef.xsize*8 --8 is the actual Distance per square
-	local separationDistance = 0
-	if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2, true) --actual separation distance
-	else separationDistance = losRadius -- GetUnitLOSRadius(unitIDmain) --as far as unit's reported LOSradius
-	end
+	local separationDistance = unitSeparation
+	--if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2, true) --actual separation distance
+	--else separationDistance = losRadius -- GetUnitLOSRadius(unitIDmain) --as far as unit's reported LOSradius
+	--end
 
 	local unit2SubtendedAngle = math.atan((unitSize + unitSize2)/separationDistance) --convert size and distance into radian (angle)
 	return unit2SubtendedAngle --return angular size

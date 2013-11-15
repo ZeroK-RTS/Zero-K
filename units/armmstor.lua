@@ -17,6 +17,10 @@ unitDef = {
   buildPic                      = [[ARMMSTOR.png]],
   buildTime                     = 100,
   category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[60 60 60]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[ellipsoid]], 
   corpse                        = [[DEAD]],
   energyStorage                 = 500,
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -49,6 +53,7 @@ unitDef = {
     description_pl = [[Przechowuje Surowce (500)]],
     helptext_de    = [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
     helptext_pl    = [[Magazyn pozwala na przechowywanie surowców na wypadek, gdy nie masz wystarczaj¹co du¿o budowniczych, by je wykorzystaæ. Lepiej jest jednak zbudowaæ wiêcej budowniczych, a magazynu u¿ywaæ bardziej jako bufora na wypadek du¿ych zysków.]],
+	modelradius    = [[30]],
   }, 	
   
   featureDefs                   = {
@@ -66,7 +71,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 40,
-      object           = [[armmstor_dead.s3o]],
+      object           = [[storage_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 40,
       seqnamereclamate = [[TREE1RECLAMATE]],

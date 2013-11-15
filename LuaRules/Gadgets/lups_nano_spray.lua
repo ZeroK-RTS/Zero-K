@@ -51,14 +51,14 @@ if (gadgetHandler:IsSyncedCode()) then
   end
 
   function gadget:UnitFinished(uid, udid)
-	if (UnitDefs[udid].builder) and not registeredBuilders[uid] then
+	if (UnitDefs[udid].isBuilder) and not registeredBuilders[uid] then
 		SendToUnsynced("nano_BuilderFinished", uid)
 		registeredBuilders[uid] = nil
 	end
   end
 
   function gadget:UnitDestroyed(uid, udid)
-	if (UnitDefs[udid].builder) and registeredBuilders[uid] then
+	if (UnitDefs[udid].isBuilder) and registeredBuilders[uid] then
 		SendToUnsynced("nano_BuilderDestroyed", uid)
 		registeredBuilders[uid] = nil
 	end

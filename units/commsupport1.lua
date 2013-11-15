@@ -140,6 +140,7 @@ unitDef = {
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
+      sweepfire               = false,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

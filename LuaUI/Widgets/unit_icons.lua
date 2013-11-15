@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Unit Icons",
-    desc      = "v0.031 Shows icons above units",
+    desc      = "v0.033 Shows icons above units",
     author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
@@ -20,7 +20,7 @@ local echo = Spring.Echo
 
 local spGetUnitDefID 	= Spring.GetUnitDefID
 local spIsUnitInView 	= Spring.IsUnitInView
-local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spGetGameFrame 	= Spring.GetGameFrame
 
 local glDepthTest      = gl.DepthTest
@@ -37,8 +37,12 @@ local glPopMatrix      = gl.PopMatrix
 local GL_GREATER = GL.GREATER
 
 local min   = math.min
+local max   = math.max
 local floor = math.floor
 local abs 	= math.abs
+
+local iconsize = 5
+local forRadarIcons = true
 
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
@@ -49,14 +53,21 @@ options = {
 		name = 'Hovering Icon Size',
 		type = 'number',
 		value = 30, min=10, max = 40,
+		OnChange = function(self)
+			iconsize = self.value
+		end
 	},
 	forRadarIcons = {
 		name = 'Draw on Icons',
 		desc = 'Draws state icons when zoomed out.',
 		type = 'bool',
 		value = true,
+		OnChange = function(self)
+			forRadarIcons = self.value
+		end
 	},		
 }
+options.iconsize.OnChange(options.iconsize)
 
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
@@ -65,7 +76,7 @@ local unitHeights  = {}
 local iconOrders = {}
 local iconOrders_order = {}
 
-local iconoffset = 14
+local iconoffset = 22
 
 
 local iconUnitTexture = {}
@@ -107,7 +118,7 @@ local function OrderIconsOnUnit(unitID )
 			iconCount = iconCount + 1
 		end
 	end
-	local xshift = (0.5 - iconCount*0.5)*options.iconsize.value
+	local xshift = (0.5 - iconCount*0.5)*iconsize
 	
 	for i=1, #iconOrders_order do
 		local iconName = iconOrders_order[i]
@@ -120,7 +131,7 @@ local function OrderIconsOnUnit(unitID )
 			else
 				--textureUnitsXshift[texture][unitID] = xshift
 				textureData[texture][iconName][unitID] = xshift
-				xshift = xshift + options.iconsize.value
+				xshift = xshift + iconsize
 			end
 		end
 		
@@ -218,7 +229,8 @@ function WG.icons.SetUnitIcon( unitID, data )
 		if (ud == nil) then
 			unitHeights[unitID] = nil
 		else
-			unitHeights[unitID] = ud.height + iconoffset
+			--unitHeights[unitID] = ud.height + iconoffset
+			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset
 		end
 	end
 
@@ -238,19 +250,19 @@ end
 -------------------------------------------------------------------------------------
 
 local function DrawFuncAtUnitIcon2(unitID, xshift, yshift)
-	local x,y,z = spGetUnitPosition(unitID)
+	local x,y,z = spGetUnitViewPosition(unitID)
 	glPushMatrix()
 		glTranslate(x,y,z)
 		glTranslate(0,yshift,0)
 		glBillboard()
-		glTexRect(xshift -options.iconsize.value*0.5, -5, xshift + options.iconsize.value*0.5, options.iconsize.value-5)
+		glTexRect(xshift -iconsize*0.5, -5, xshift + iconsize*0.5, iconsize-5)
 	glPopMatrix()
 end
 
 local function DrawUnitFunc(xshift, yshift)
 	glTranslate(0,yshift,0)
 	glBillboard()
-	glTexRect(xshift - options.iconsize.value*0.5, -9, xshift + options.iconsize.value*0.5, options.iconsize.value-9)
+	glTexRect(xshift - iconsize*0.5, -9, xshift + iconsize*0.5, iconsize-9)
 end
 
 
@@ -264,7 +276,7 @@ function widget:DrawWorld()
 	
 	local gameFrame = spGetGameFrame()
 	
-	local fade = abs((gameFrame % 40) - 20) / 20
+	local fade = min( abs((gameFrame % 60) - 20) / 20, 1 )
 	
 	gl.Color(1,1,1,1)
 	glDepthMask(true)
@@ -289,7 +301,7 @@ function widget:DrawWorld()
 			
 			local unitInView = spIsUnitInView(unitID)
 			if unitInView and xshift and unitHeights and unitHeights[unitID] then
-				if  options.forRadarIcons.value then
+				if forRadarIcons then
 					DrawFuncAtUnitIcon2(unitID, xshift, unitHeights[unitID])
 				else
 					glDrawFuncAtUnit(unitID, false, DrawUnitFunc,xshift,unitHeights[unitID])
@@ -339,7 +351,7 @@ function widget:DrawScreenEffects()
 			if xshift and unitHeights then
 				glTranslate(xshift,0,0)
 				--glBillboard()
-				glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
+				glTexRect(-iconsize*0.5, -9, iconsize*0.5, iconsize-9)
 			end
 			gl.PopMatrix()
 		end

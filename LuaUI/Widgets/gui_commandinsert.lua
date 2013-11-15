@@ -1,13 +1,13 @@
 -- $Id: gui_commandinsert.lua 3171 2008-11-06 09:06:29Z det $
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
+local version= "1.001"
 function widget:GetInfo()
   return {
     name = "CommandInsert",
-    desc = "When pressing spacebar and shift, you can insert commands to arbitrary places in queue. When pressing spacebar alone, commands are inserted on front of queue. Based on FrontInsert by jK",
+    desc = "[v" .. version .. "] When pressing Spacebar and Shift, you can insert commands to arbitrary places in queue. When pressing Spacebar alone, commands are inserted on front of queue. Based on FrontInsert by jK",
     author = "dizekat",
-    date = "Jan,2008",
+    date = "Jan,2008", --16 October 2013
     license = "GNU GPL, v2 or later",
     layer = 5,
     enabled = true,
@@ -77,12 +77,27 @@ local function GetCommandPos(command)	--- get the command position
 end
 
 local function ProcessCommand(id, params, options)
-  local _,_,meta,_ = Spring.GetModKeyState()
+  local _,ctrl,meta,_ = Spring.GetModKeyState()
+  if (ctrl) and not (meta) and id==CMD.RECLAIM then --Reclaim + CTRL
+	local opt = 0
+	if options.alt then opt = opt + CMD.OPT_ALT end
+	opt = opt + CMD.OPT_META; --add META. Force-reclaim-own-unit
+	if options.right then opt = opt + CMD.OPT_RIGHT end
+	if options.shift then opt = opt + CMD.OPT_SHIFT end
+	Spring.GiveOrder(id,params,opt)
+	return true
+  end
   if (meta) then
     local opt = 0
     local insertfront=false
     if options.alt then opt = opt + CMD.OPT_ALT end
-    if options.ctrl then opt = opt + CMD.OPT_CTRL end    
+	if options.ctrl then
+		if id~=CMD.RECLAIM then  
+			opt = opt + CMD.OPT_CTRL --add CTRL like normal
+		else --add CTRL+Reclaim as force-reclaim
+			opt = opt + CMD.OPT_META; --add META. Force-reclaim-own-unit(originally META+Reclaim). Can't change CommandInsert() to other modifier because META is already established (culturally) for CommandInsert()
+		end
+	end     
     if options.right then opt = opt + CMD.OPT_RIGHT end
     if options.shift then 
       opt = opt + CMD.OPT_SHIFT       

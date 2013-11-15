@@ -129,8 +129,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 						--attackerDefID = attackerDefID,
 						weaponID    = weaponID,
 					}
-					SetUnitCloak(unitID, false, 10000)
-					SetUnitRulesParam(unitID, "on_fire", 1)
+					SetUnitRulesParam(unitID, "on_fire", 1, {inlos = true})
+					GG.attUnits[unitID] = true
+					GG.UpdateUnitAttributes(unitID)
 				end
 			end
 		end
@@ -153,7 +154,7 @@ function gadget:GameFrame(n)
 		for unitID, t in pairs(unitsOnFire) do
 			if (n > t.endFrame) or (inWater[unitID] and CheckImmersion(unitID)) then
 				SetUnitRulesParam(unitID, "on_fire", 0)
-				SetUnitCloak(unitID, false, false)
+				GG.UpdateUnitAttributes(unitID)
 				unitsOnFire[unitID] = nil
 			else
 				t.damageLeft = t.damageLeft - t.fireDmg*CHECK_INTERVAL

@@ -8,6 +8,11 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local armorDefs = {
   
   SUBS = {
@@ -162,12 +167,14 @@ end
 
 -- convert to named maps  (does anyone know what 99 is for?  :)
 
-for categoryName, categoryTable in pairs(armorDefs) do
-  local t = {}
-  for _, unitName in pairs(categoryTable) do
-    t[unitName] = 99
-  end
-  armorDefs[categoryName] = t
+if reverseCompat then
+	for categoryName, categoryTable in pairs(armorDefs) do
+		local t = categoryTable
+		for _, unitName in pairs(categoryTable) do
+			t[unitName] = 99
+		end
+		armorDefs[categoryName] = t
+	end
 end
 
 

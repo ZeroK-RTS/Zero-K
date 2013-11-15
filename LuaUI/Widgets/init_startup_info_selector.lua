@@ -1,4 +1,4 @@
-local versionNumber = "1.2"
+local versionNumber = "1.21"
 
 function widget:GetInfo()
 	return {
@@ -29,6 +29,7 @@ _ Make each player broadcast their choice to their team in a way it can be used 
 ----------------------------------------------
 local debug	= false --generates debug message
 local Echo	= Spring.Echo
+local spGetGameRulesParam = Spring.GetGameRulesParam
 
 local coop = (Spring.GetModOptions().coop == 1) or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
@@ -47,6 +48,7 @@ local actionShow = "showstartupinfoselector"
 local optionData = include("Configs/startup_info_selector.lua")
 
 local noComm = false
+local gameframe = Spring.GetGameFrame()
 ---------------------------------------------
 local function PlaySound(filename, ...)
 	local path = filename..".WAV"
@@ -261,12 +263,28 @@ function widget:Initialize()
 	end
 end
 
- 
+-- hide window if game was loaded
+local timer = 0
+function widget:Update(dt)
+	if gameframe < 1 then
+		timer = timer + dt
+		if timer >= 0.1 then
+			if (spGetGameRulesParam("loadedGame") == 1) and mainWindow then
+				mainWindow:Dispose()
+			end
+		end
+	end
+end
+
 function widget:Shutdown()
   --if mainWindow then
 	--mainWindow:Dispose()
   --end
   widgetHandler:RemoveAction(actionShow)
+end
+
+function widget:Gameframe(n)
+	gameframe = n
 end
 
 function widget:GameStart()

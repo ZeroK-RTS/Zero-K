@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.025 Chili Keyboard Menu",
+    desc      = "v0.029 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -81,6 +81,7 @@ local customKeyBind = false
 local build_mode = false
 local green = '\255\1\255\1'
 local white = '\255\255\255\255'
+local red 	= '\255\255\001\001'
 
 local magenta_table = {0.8, 0, 0, 1}
 local white_table = {1,1,1, 1}
@@ -127,6 +128,7 @@ options_order = {
 	'goToCommands',
 	'goToSelections',
 	'opacity',
+	'old_menu_at_shutdown'
 }
 options = {
 
@@ -176,9 +178,13 @@ options = {
 		value = 0.4, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) window_main.color = {1,1,1,self.value}; window_main:Invalidate() end,
 	},
-	
-
-	
+	old_menu_at_shutdown = {
+		name = 'Reenable Spring Menu at Shutdown',
+		desc = "Upon widget shutdown (manual or upon crash) reenable Spring's original command menu.",
+		type = 'bool',
+		advanced = true,
+		value = true,
+	},		
 }
 
 
@@ -375,6 +381,9 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	end
 
 	Update()
+	if (cmdCount <= 0) then
+		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units (copied from ca_layout.lua)
+	end	
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
 
@@ -561,7 +570,7 @@ local function AddBuildStructureButton(item, index)
 				if (build_menu ~= build_menu_selected) then -- store last item and menu_level to render its back path
 					menu_level = menu_level + 1  -- save menu_level
 				end 
-				Spring.SetActiveCommand(cmdid, _, left, right, alt, ctrl, meta, shift)
+				Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)
 				last_cmdid = cmdid
 			end
 			--BuildMode(false)
@@ -675,7 +684,7 @@ StoreBuilders = function(units)
 	curbuilder = 1
 	for _, unitID in ipairs(units) do 
 		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if ud and ud.builder and build_menu_use[ud.name] then 
+		if ud and ud.isBuilder and build_menu_use[ud.name] then 
 			if not builder_types[ud.name] then
 				builder_types[ud.name] = true
 				builder_types_i[#builder_types_i + 1] = ud.name
@@ -693,7 +702,7 @@ end
 local function AddCustomCommands(selectedUnits)
 	for _, unitID in ipairs(selectedUnits) do
 		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if ud and ud.builder and build_menu_use[ud.name] then
+		if ud and ud.isBuilder and build_menu_use[ud.name] then
 			table.insert(widgetHandler.customCommands, {
 				id      = CMD_RADIALBUILDMENU,
 				name	= 'Build',
@@ -946,7 +955,9 @@ local function SetupCommands( modifier )
 						local v = actions[i]
 						for actionCmd, actionExtra in pairs(v) do
 							
-							if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' then 
+							local buildCommand = actionCmd:find('buildunit_')
+							
+							if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' and not buildCommand then 
 							
 								local actionOption = WG.crude.GetActionOption(actionCmd)
 								local actionName = actionOption and actionOption.name
@@ -954,7 +965,11 @@ local function SetupCommands( modifier )
 								
 								local label = actionName or actionCmd
 								local tooltip = actionDesc or (label  .. ' ' .. actionExtra)
-								local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd 
+								local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd
+								
+								if label == 'luaui' then
+									label = actionExtra
+								end
 								
 								--create fake command and add it to list
 								curCommands[#curCommands+1] = {
@@ -1018,8 +1033,9 @@ local function SetupCommands( modifier )
 			if texture and texture ~= '' then
 				label = ''
 			end
-			if cmd.name == 'Morph' then
-				hotkey = 'Morph'
+			
+			if cmd.name == 'Morph' or cmd.name == red  .. 'Stop' then
+				hotkey = cmd.name
 			end
 			
 			if cmd.id < 0 then
@@ -1157,7 +1173,7 @@ function widget:Initialize()
 end 
 
 function widget:Shutdown()
-	widgetHandler:ConfigLayoutHandler(nil)
+	widgetHandler:ConfigLayoutHandler(options.old_menu_at_shutdown.value) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins . See Layout.lua
 	Spring.ForceLayoutUpdate()
 	if not customKeyBind then
 		Spring.SendCommands("unbind d radialbuildmenu")

@@ -125,7 +125,7 @@ unitDef = {
 
     DEAD  = {
       description      = [[Wreckage - Leveler]],
-      blocking         = true,
+      blocking         = false,
       category         = [[corpses]],
       damage           = 1100,
       energy           = 0,
@@ -136,7 +136,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 96,
-      object           = [[levelercorpse.s3o]],
+      object           = [[leveler_d.3ds]],
       reclaimable      = true,
       reclaimTime      = 96,
       seqnamereclamate = [[TREE1RECLAMATE]],

@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.001"
+local version = "v0.010"
 
 function widget:GetInfo()
   return {
@@ -36,7 +36,6 @@ local Label
 local Window
 local StackPanel
 local Grid
-local TextBox
 local Image
 local Progressbar
 local Panel
@@ -52,7 +51,7 @@ local echo = Spring.Echo
 
 local function RecreateFacbar() end
 
-options_path = 'Settings/HUD Panels/FactoryBar'
+options_path = 'Settings/HUD Panels/FactoryPanel'
 options = {
 	maxVisibleBuilds = {
 		type = 'number',
@@ -68,6 +67,17 @@ options = {
 		min = 40, max = 100, step=5,
 		value = 50,
 		OnChange = function() RecreateFacbar() end,
+	},
+	
+	backgroundOpacity = {
+		name = "Background opacity",
+		type = "number",
+		value = 1, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			window_facbar.color = {0,0,0,self.value}
+			window_facbar.caption = self.value == 0 and '' or 'Factories'
+			window_facbar:Invalidate()
+		end,
 	},
 }
 
@@ -96,6 +106,7 @@ local sound_waypoint  = LUAUI_DIRNAME .. 'Sounds/buildbar_waypoint.wav'
 local sound_click     = LUAUI_DIRNAME .. 'Sounds/buildbar_click.WAV'
 local sound_queue_add = LUAUI_DIRNAME .. 'Sounds/buildbar_add.wav'
 local sound_queue_rem = LUAUI_DIRNAME .. 'Sounds/buildbar_rem.wav'
+local sound_queue_clear = LUAUI_DIRNAME .. 'Sounds/buildbar_hover.wav'
 
 -------------------------------------------------------------------------------
 
@@ -135,6 +146,13 @@ local push        = table.insert
 
 
 -------------------------------------------------------------------------------
+
+--temporary function until "#" is restored.
+--[[
+local function GetUnitPic(unitDefID)
+	return 'unitpics/' .. UnitDefs[unitDefID].name .. '.png'
+end
+--]]
 
 local function GetBuildQueue(unitID)
   local result = {}
@@ -183,7 +201,7 @@ local function UpdateFac(i, facInfo)
 		local unitDefIDb = unitDefIDb
 		
 		if not facs[i].boStack then
-		  echo('<Chili Facbar> Strange error #1' )
+		  echo('<Chili Facpanel> Strange error #1' )
 		else
 		  local boButton = facs[i].boStack.childrenByName[unitDefIDb]
 		  local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
@@ -270,7 +288,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 						local x,y,z = Spring.GetUnitPosition(unitID)
 						Spring.SetCameraTarget(x,y,z)
 					elseif button == 3 then
-						Spring.Echo("FactoryBar: Entered easy waypoint mode")
+						Spring.Echo("FactoryPanel: Entered Quick Rallypoint mode")
 						Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
 						waypointMode = 2 -- greedy mode
 						waypointFac  = stackname
@@ -287,7 +305,8 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		children = {
 			unitID ~= 0 and
 				Image:New {
-					file = "#"..unitDefID,
+					file = "#"..unitDefID, -- do not remove this line
+					--file = GetUnitPic(unitDefID),
 					file2 = WG.GetBuildIconFrame(UnitDefs[unitDefID]),
 					keepAspect = false;
 					x = '5%',
@@ -408,7 +427,7 @@ local function MakeButton(unitDefID, facID, facIndex)
 					align="right";
 					valign="top";
 					caption = '';
-					fontSize = 14;
+					fontSize = 16;
 					fontShadow = true;
 				},
 
@@ -416,7 +435,8 @@ local function MakeButton(unitDefID, facID, facIndex)
 				Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, x=2, bottom=2, fontShadow = true, },
 				Image:New {
 					name = 'bp',
-					file = "#"..unitDefID,
+					file = "#"..unitDefID, -- do not remove this line
+					--file = GetUnitPic(unitDefID),
 					file2 = WG.GetBuildIconFrame(ud),
 					keepAspect = false;
 					width = '100%',height = '80%',
@@ -447,7 +467,7 @@ end
 
 local function WaypointHandler(x,y,button)
   if (button==1)or(button>3) then
-    Spring.Echo("FactoryBar: Exited easy waypoint mode")
+    Spring.Echo("FactoryPanel: Exited Quick Rallypoint mode")
     Spring.PlaySoundFile(sound_waypoint, 1)
     waypointFac  = -1
     waypointMode = 0
@@ -472,6 +492,40 @@ local function WaypointHandler(x,y,button)
   end
 
   --if not shift then waypointMode = 0; return true end
+end
+
+local function MakeClearButton(unitID)
+	return Button:New{
+		name = 'clearfac-' .. unitID,
+		tooltip='Clear Factory Queue',
+		x=0,
+		caption='',
+		width = options.buttonsize.value,
+		height = options.buttonsize.value,
+		padding = {4, 4, 4, 4},
+		backgroundColor = queueColor,
+		OnClick = {
+			function(_,_,_,button)
+				local buildQueue = Spring.GetFactoryCommands (unitID)               
+				for _, buildCommand in ipairs( buildQueue) do
+					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
+				end
+				Spring.PlaySoundFile(sound_queue_clear, 0.97, 'ui')
+			end
+		},
+		children = {
+			Label:New{ caption = 'Clear Q', fontSize = 11, x=2, bottom=2, fontShadow = true, },
+			Image:New{
+				file='LuaUI/images/drawingcursors/eraser.png',
+				width="80%";
+				height="80%";
+				x="10%";
+				y="0%";
+			}
+		},
+		
+	}
+	
 end
 
 RecreateFacbar = function()
@@ -517,10 +571,21 @@ RecreateFacbar = function()
 			qStore[i .. '|' .. unitDefIDb] = MakeButton(unitDefIDb, facInfo.unitID, i)
 		end
 		
+		boStack:AddChild( MakeClearButton( facInfo.unitID ) )
+		
 	end
+	
+	--stack_build:ClearChildren()
+	--stack_build.backgroundColor = {0,0,0,0}
+	
+	
+	--stack_build:SetPos(options.buttonsize.value*1.2 )
+	stack_build.x = options.buttonsize.value*1.2
 
 	stack_main:Invalidate()
 	stack_main:UpdateLayout()
+	
+	widget:SelectionChanged(Spring.GetSelectedUnits())
 end
 
 local function UpdateFactoryList()
@@ -549,7 +614,21 @@ local function UpdateFactoryList()
 	RecreateFacbar()
 end
 
+local function CheckRemoveFacStack()
+	if facs[pressedFac] then
+		local qStack = facs[pressedFac].qStack
+		stack_build:ClearChildren()
+		stack_build.backgroundColor = {0,0,0,0}
+		facs[pressedFac].facStack:AddChild(qStack)
+		
+		facs[pressedFac].facButton.backgroundColor = {1,1,1,1}
+		facs[pressedFac].facButton:Invalidate()
+	end
+end
+
 ------------------------------------------------------
+------------------------------------------------------
+--callins
 
 function widget:DrawWorld()
 	-- Draw factories command lines
@@ -590,10 +669,14 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
     for i,facInfo in ipairs(facs) do
       if unitID==facInfo.unitID then
         
-        table.remove(facs,i)
+		CheckRemoveFacStack()
+		
+		table.remove(facs,i)
         unfinished_facs[unitID] = nil
 		--UpdateFactoryList()
 		RecreateFacbar()
+		
+		
         return
       end
     end
@@ -608,6 +691,7 @@ function widget:Update()
 	if myTeamID~=Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
 		UpdateFactoryList()
+		widget:SelectionChanged(Spring.GetSelectedUnits())
 	end
 	inTweak = widgetHandler:InTweakMode()
   
@@ -652,18 +736,8 @@ end
 
 
 function widget:SelectionChanged(selectedUnits)
-	if facs[pressedFac] then
-		local qStack = facs[pressedFac].qStack
-		local boStack = facs[pressedFac].boStack
-		--facs[pressedFac].facStack:RemoveChild(boStack)
-		stack_build:ClearChildren()
-		stack_build.backgroundColor = {0,0,0,0}
-		facs[pressedFac].facStack:AddChild(qStack)
-		
-		facs[pressedFac].facButton.backgroundColor = {1,1,1,1}
-		facs[pressedFac].facButton:Invalidate()
-	end
-
+	CheckRemoveFacStack()
+	
 	pressedFac = -1
 	
 	if (#selectedUnits == 1) then 
@@ -699,7 +773,7 @@ function widget:MousePress(x, y, button)
 		return (button~=2) -- we allow middle click scrolling in greedy waypoint mode
 	end
 	if waypointMode>1 then
-		Spring.Echo("FactoryBar: Exited easy waypoint mode")
+		Spring.Echo("FactoryPanel: Exited Quick Rallypoint mode")
 		Spring.PlaySoundFile(sound_waypoint, 1)
 	end
 	waypointFac  = -1
@@ -720,14 +794,13 @@ function widget:Initialize()
 	Window = Chili.Window
 	StackPanel = Chili.StackPanel
 	Grid = Chili.Grid
-	TextBox = Chili.TextBox
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
 	Panel = Chili.Panel
 	screen0 = Chili.Screen0
 
 	stack_main = Grid:New{
-		y=20,
+		y=0,
 		padding = {0,0,0,0},
 		itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
@@ -740,8 +813,8 @@ function widget:Initialize()
 	}
 	
 	stack_build = Panel:New{
-		y=20,
-		x=options.buttonsize.value*1.2 + 8, 
+		y=0,
+		x=options.buttonsize.value*1.2 + 0, 
 		right=0,
 		bottom=0,
 		
@@ -768,10 +841,11 @@ function widget:Initialize()
 		dragUseGrip = false,
 		minWidth = 56,
 		minHeight = 56,
-		color = {0,0,0,1},
+--		color = {0,0,0,1},
+		caption='Factories',
 		children = {
 			stack_build, --must be first so it's always above of the others (like frontmost layer)
-			Label:New{ caption='Factories', fontShadow = true, },
+			--Label:New{ caption='Factories', fontShadow = true, },
 			stack_main,
 		},
 		OnMouseDown={ function(self)

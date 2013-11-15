@@ -31,6 +31,7 @@ unitDef = {
 	helptext_de    = [[Die Bertha ist eine massive Kanone, welche hochenergetische Plasmoide über die Karte verschiesst. Angemessener Gebrauch der Waffe kann gengerische Operationen von der eigenen, sicheren Basis aus schnell unterdrücken. Trotzdem erwarte nicht, dass du nur dich diese Waffe die Schlachten gewinnen wirst.]],
     helptext_fr    = [[Le Big Bertha est un canon ? plasma lourd, tr?s lourd. Un seul impact de son tir peut r?duire ? n?ant plusieurs unit?s ou structures. Sa port?e de tir op?rationnelle est immense et n'?gale que son co?t de construction et d'usage. En effet chaque tir consomme 300 unit?s d'?nergie. Notez que le Big Bertha effectue des tirs tendus. Autrement dit, pensez ? le placer en hauteur, ou le moindre relief servira de refuge ? l'ennemi.]],
     helptext_pl    = [[Gruba Berta to masywne działo o ogromnym zasięgu. W dobrych rękach jest w stanie niweczyć ważne przedsięwzięcia przeciwnika z bezpiecznego miejsca we własnej bazie. Nie jest jednak w stanie zastąpić ruchomych jednostek i nie zapewni ci sama zwycięstwa.]],
+	modelradius    = [[35]],
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],

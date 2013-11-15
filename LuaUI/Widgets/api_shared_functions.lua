@@ -26,10 +26,10 @@ Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 local function GetBuildIconFrame(udef) 
-  if (udef.builder and udef.speed>0) then
+  if (udef.isBuilder and udef.speed>0) then
     return consTex
 
-  elseif (udef.builder or udef.isFactory) then
+  elseif (udef.isBuilder or udef.isFactory) then
     return consTex
 
   elseif (udef.weapons[1] and udef.isBuilding) then
@@ -181,13 +181,15 @@ local function WritePythonDict(dict, dictName, params)
 	local endLine = comma .. "\n"
 	local separator = params.raw and " = " or  " : "
 	local str = ""
-	if not params.raw then
-	      str = dictName .. " = "	--WriteIndents(numIndents)
-	      str = str .. "{\n"
+	if (not params.raw) then
+		if params.endOfFile then
+			str = dictName .. " = "	--WriteIndents(numIndents)
+		end
+		str = str .. "{\n"
 	end
 	for i,v in pairs(dict) do
 		if not params.raw then
-			str = str .. WriteIndents(numIndents + 1)
+			str = str .. WriteIndents(params.numIndents + 1)
 		end
 		if (type(i) == "string") and not params.raw then
 			str = str .. string.format("%q", i) .. separator
@@ -199,7 +201,7 @@ local function WritePythonDict(dict, dictName, params)
 			local arg = {numIndents =  params.numIndents + 1, endOfFile = false}
 			str = str .. WritePythonDict(v, nil, arg)
 		elseif type(v) == "boolean" then
-			str = str .. v and "True" or "False" .. endLine
+			str = str .. ((v and "True") or "False") .. endLine
 		elseif type(v) == "string" then
 			str = str .. string.format("%q", v) .. endLine
 		else

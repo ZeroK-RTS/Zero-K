@@ -16,7 +16,7 @@ unitDef = {
   canstop                       = [[1]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[24 50 24]],
+  collisionVolumeScales         = [[28 80 28]],
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
@@ -26,6 +26,7 @@ unitDef = {
     helptext       = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage, making it a good choice when the enemy is using artillery.]],
     helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es viermal schwerer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
     modelradius    = [[15]],
+	aimposoffset   = [[0 25 0]],
   },
 
   damageModifier                = 0.25,
@@ -45,7 +46,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[gauss_91.dae]],
-  script                 		= [[dark_gauss.lua]],
+  script                 		= [[armpb.lua]],
   seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
  

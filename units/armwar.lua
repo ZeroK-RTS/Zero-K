@@ -14,9 +14,9 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[32 42 32]],
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeOffsets = [[0 2 -5]],
+  collisionVolumeScales  = [[26 36 26]],
+  collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -33,7 +33,7 @@ unitDef = {
     helptext_fr    = [[La dévastatrice mitrailleuse à plasma lourde du Warrior est efficace contre la majorité de ses enemis, en particulier les unités de raid. Il est très peu efficace contre les défenses statiques, ne l'utilisez donc pas comme unité d'assaut. Contrez le en restant hors de sa portée, étant donné sa faible vitesse de mouvement.]],
     helptext_it    = [[La devastante mitraglia ad alta energia del Warrior é efficace contro la maggioranza delle unitá namiche, in particolare quelli da invasione. Non é molto efficace contro la difesa statica, sicché non usarlo come unitá d'assalto. Contrastali stando fuero dal loro raggio, siccome sono lenti.]],
 	helptext_de    = [[Sein schweres Maschingewehr ist gegen die meisten Einheiten effektiv, vor allem gegen Raider. Dennoch versagt es kläglich gegen stationäre Verteidigung. Also nutze ihn nicht als Sturmeinheit. Kontere den Warrior, indem du aus seiner Reichweite bleibst, sie sind langsam.]],
-	modelradius    = [[16]],
+	modelradius    = [[7]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -48,7 +48,6 @@ unitDef = {
   maxVelocity            = 1.71,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
-  modelCenterOffset      = [[0 0 -4]],
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[Spherewarrior.s3o]],

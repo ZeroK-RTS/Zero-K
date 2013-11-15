@@ -13,7 +13,7 @@ unitDef = {
   buildPic               = [[cormex.png]],
   buildTime              = 75,
   category               = [[UNARMED FLOAT]],
-  collisionVolumeOffsets = [[0 -2 0]],
+  collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 40 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
@@ -30,6 +30,8 @@ unitDef = {
     occupationStrength = 1,
     pylonrange         = 50,
 	ismex              = 1,
+	midposoffset       = [[0 -10 0]],
+	modelradius        = [[20]],
   },
 
   energyUse              = 0,

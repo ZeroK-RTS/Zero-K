@@ -15,10 +15,10 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 1 0]],
-  collisionVolumeScales  = [[33 23 42]],
+  collisionVolumeOffsets = [[0 -5 0]],
+  collisionVolumeScales  = [[26 26 36]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -29,6 +29,7 @@ unitDef = {
     helptext_bp    = [[Scorcher é um tanque agressor. ? capaz de aguentar dano considerável e muito versátil, mas n?o t?o ágil quanto outras unidades agressoras. Sua regeneraç?o rápida lhe dá vantagem em pequenos combates onde estiver em maior número. Embora capaz em combate, n?o é pareo para unidades e defesas dispersadoras.]],
     helptext_fr    = [[Le Scorcher est rapide et solide. ?quip? d'une mitrailleuse laser il saura faire face de lui m?me ? un combat et ses nano-robots auto r?g?nerants se chargeront de le remettre sur pied pour la suite. Particuli?rement allergique aux anti-nu?es et au ?meutiers.]],
     helptext_de    = [[Der Scorcher ist fähig Schaden einzustecken und auszuteilen, was ihn zu einer vielseitigen Einheit macht, welche für mehr als nur Überfälle nützlich ist. All das aber zum Preis der Manövrierfähigkeit und der Kosten. Obwohl er sich im Kampf meist gut schlägt, taugt er nichts gegen Antischwarm- und Rioteinheiten oder Verteidigung.]],
+	modelradius    = [[10]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

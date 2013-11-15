@@ -4,10 +4,10 @@
 function widget:GetInfo()
   return {
     name      = "Selection BlurryHalo",
-    desc      = "Shows a halo for selected and hovered units. (Doesn't work on ati cards!)",
+    desc      = "Shows a halo for selected, hovered ally-selected units. (Doesn't work on ati cards!)",
     author    = "CarRepairer, from jK's gfx_halo",
     date      = "Jan, 2008",
-    version   = "0.0001",
+    version   = "0.004",
     license   = "GNU GPL, v2 or later",
     layer     = -11,
     enabled   = false  --  loaded by default?
@@ -21,18 +21,92 @@ local showAlly = false
 local visibleAllySelUnits = {}
 local visibleSelected = {}
 
+local function UpdateHaloColors(self) end
+
 options_path = 'Settings/Interface/Selection/Blurry Halo Selections'
+
+options_order = {
+	'showally',
+	'useteamcolors',
+	
+	
+	'lblPresetColors',
+	'selectColor',
+	'allySelectColor',
+	'myHoverColor',
+	'allyHoverColor',
+	'enemyHoverColor',
+	'featureHoverColor',
+	
+	
+}
+
 options = {
 	showally = {
 		name = 'Show Ally Selections',
 		type = 'bool',
-		desc = 'Highlight in yellow the units your allies currently have selected.',
+		desc = 'Highlight the units your allies currently have selected.',
 		value = true,
 		OnChange = function(self) 
 			visibleAllySelUnits = {}
 			showAlly = self.value
 		end,
 	},
+	useteamcolors = {
+		name = 'Use Team Colors',
+		type = 'bool',
+		desc = 'Highlight your allies\' selections with their team colors instead of the preset colors.',
+		value = false,
+	},
+	
+	-----
+	
+	lblPresetColors = {type='label', name = 'Preset Colors' },
+	selectColor = {
+		name = 'Selected Units Color',
+		type = 'colors',
+		value = { 0, 1, 0, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	},
+	
+	allySelectColor = {
+		name = 'Ally Selected Units Color',
+		type = 'colors',
+		value = { 1, 1, 0, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	myHoverColor = {
+		name = 'My Unit Hover Color',
+		type = 'colors',
+		value = { 0, 1, 1, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	},
+	
+	allyHoverColor = {
+		name = 'Ally Unit Hover Color',
+		type = 'colors',
+		value = { 0.2, 0.2, 1, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	enemyHoverColor = {
+		name = 'Enemy Unit Hover Color',
+		type = 'colors',
+		value = { 1, 0, 0, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	
+	featureHoverColor = {
+		name = 'Feature Hover Color',
+		type = 'colors',
+		value = { 1, 0, 1, 1 },
+		OnChange = function(self) UpdateHaloColors(); end
+	}, 
+	
+	
+	
 }
 
 --------------------------------------------------------------------------------
@@ -131,11 +205,23 @@ local glMatrixMode    = gl.MatrixMode
 local glPushMatrix    = gl.PushMatrix
 local glLoadIdentity  = gl.LoadIdentity
 local glPopMatrix     = gl.PopMatrix
+local glBlending      = gl.Blending
+
+local echo = Spring.Echo
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --functions
 
+UpdateHaloColors = function(self)
+	selectColor = options.selectColor.value
+	allySelectColor = options.allySelectColor.value
+	myHoverColor = options.myHoverColor.value
+	
+	allyHoverColor = options.allyHoverColor.value
+	enemyHoverColor = options.enemyHoverColor.value
+	featureHoverColor = options.featureHoverColor.value
+end
 
 local function GetVisibleUnits()
     local units = spGetVisibleUnits(-1, 30, true)
@@ -166,9 +252,17 @@ local function DrawHaloFunc()
 		glUnit(unitID,true)
 	end
     
-	glColor(allySelectColor)
+	if not options.useteamcolors.value then glColor(allySelectColor) end
 	for i=1,#visibleAllySelUnits do
 		local unitID = visibleAllySelUnits[i]
+		if options.useteamcolors.value then
+			local teamID = spGetUnitTeam(unitID)
+			if teamID then
+				glColor(Spring.GetTeamColor(teamID))
+			else
+				glColor(allySelectColor)
+			end
+		end
 		glUnit(unitID,true)
 	end
     
@@ -219,8 +313,13 @@ local blur_v = function()
 end
 
 function widget:DrawWorldPreUnit()
+  if Spring.IsGUIHidden() then
+	return
+  end
   glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
 
+  glBlending(true)
+  
   if (resChanged) then
     resChanged = false
     if (vsx==1) or (vsy==1) then return end
@@ -242,8 +341,10 @@ function widget:DrawWorldPreUnit()
 
   glCallList(enter2d)
   glTexture(offscreentex)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy) --this line breaks mearth labels
   glCallList(leave2d)
+  
+  glBlending(false)
 end
 
 
