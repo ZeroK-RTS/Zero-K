@@ -1,11 +1,12 @@
 local base = {
+	--[[
 	{
 		name = "rocket",
 		modules = {
-			"commweapon_missilelauncher",
+			"commweapon_rocketlauncher",
 			"commweapon_slamrocket",
 			"weaponmod_standoff_rocket",
-			"module_adv_targeting",
+			"weaponmod_napalm_warhead",
 			"module_adv_targeting",
 			"module_adv_targeting",
 			"module_adv_targeting",
@@ -95,13 +96,44 @@ local base = {
 	{
 		name = "flame",
 		modules = {
+			"commweapon_partillery",
 			"commweapon_flamethrower",
-			"commweapon_flamethrower",
+			"weaponmod_high_caliber_barrel",
+			"weaponmod_napalm_warhead",
+			"weaponmod_flame_enhancer",
 			"module_dmg_booster",
 			"module_dmg_booster",
 		}
 	},
-	
+	{
+		name = "drone",
+		modules = {
+			"commweapon_beamlaser_green",
+			"commweapon_beamlaser_red",
+			"conversion_lazor",
+			"module_guardian_armor",
+			"module_superspeed",
+			"module_super_nano",
+			"module_dmg_booster",
+			"module_companion_drone",
+			"module_companion_drone",
+			"module_companion_drone",
+			"module_companion_drone",
+		}
+	},
+	]]
+	{
+		name = "doubleshield",
+		modules = {
+			"commweapon_riotcannon",
+			"commweapon_riotcannon",
+			"module_energy_cell",
+			"module_energy_cell",
+			"module_energy_cell",
+ 			"module_personal_shield",
+			"module_areashield",
+		},
+	},
 }
 
 local ret = {count = 0}

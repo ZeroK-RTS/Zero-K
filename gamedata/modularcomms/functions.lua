@@ -65,10 +65,10 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.muzzleeffectshot or [[custom:NONE]]
 	end
 	
-	local wcp2 = unitDef.weapondefs[weapon].customparams
-	wcp2.rangemod = 0
-	wcp2.reloadmod = 0
-	wcp2.damagemod = 0
+	local wcp_unique = unitDef.weapondefs[weapon].customparams
+	wcp_unique.rangemod = 0
+	wcp_unique.reloadmod = 0
+	wcp_unique.damagemod = 0
 	
 	if (not isDgun) and not (dualwield or replace) then
 		unitDef.customparams.alreadyhasweapon = true

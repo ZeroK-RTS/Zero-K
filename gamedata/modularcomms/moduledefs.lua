@@ -83,6 +83,10 @@ upgrades = {
 		name = "Slowing Beam",
 		description = "Slows an enemy's movement and firing rate; non-lethal",
 	},
+	commweapon_sonicgun = {
+		name = "Sonic Blaster",
+		description = "Short-range weapon that works when dry or wet",
+	},	
 	commweapon_torpedo = {
 		name = "Torpedo",
 		description = "Fires a torpedo effective against waterborne targets",
@@ -114,7 +118,7 @@ upgrades = {
 		description = "Sets a moderate area ablaze",
 	},
 	commweapon_slamrocket = {
-		name = "SLAM Rocket",
+		name = "S.L.A.M.",
 		description = "Long-range weapon with a lethal punch",
 	},
 	commweapon_sunburst = {
@@ -376,6 +380,23 @@ upgrades = {
 				end
 			end,		
 	},
+	weaponmod_flame_enhancer = {
+		name = "Long-Burn Napalm",
+		description = "Flamethrower/Napalm Warhead: +40% on-fire time",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if v.customparams.burntime then
+						v.customparams.burntime = v.customparams.burntime * 1.4
+					end
+					if v.customparams.idstring == "commweapon_hpartillery_napalm" then
+						v.customparams.areadamage_preset = "module_napalmarty_long"
+						v.explosiongenerator = "custom:napalm_firewalker_long"
+					end
+				end
+			end,
+		order = 3.1,
+	},
 	weaponmod_plasma_containment = {
 		name = "Plasma Containment Field",
 		description = "Heat Ray/Riot Cannon: +30% range",
@@ -451,6 +472,31 @@ upgrades = {
 				end
 			end,	
 	},
+	module_burst_loader = {
+		name = "Burst Loader",
+		description = "+1 burst, +70% reload time",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					--local id = v.customparams.idstring
+					if id == "commweapon_beamlaser" or id == "commweapon_disruptor" or id == "commweapon_slowbeam" then
+						-- v.beamtime = v.beamtime + 10 -- beamlaser has 0.1, it's in seconds
+						v.coreThickness = v.coreThickness * 3
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 2
+						end
+					elseif id == "commweapon_shotgun" then
+						v.burst = (v.burst or 0) + 3
+						v.sprayangle = (v.sprayangle or 0) + 256
+					else
+						v.burstrate = (v.burstrate or 0.1 )
+						v.reloadtime = v.reloadtime * 1.7
+						v.burst = (v.burst or 0) + 1
+						v.sprayangle = (v.sprayangle or 0) + 256
+					end
+				end
+			end,	
+	},
 	module_energy_cell = {
 		name = "Energy Cell",
 		description = "Compact fuel cells that produce +6 energy",
@@ -504,6 +550,7 @@ upgrades = {
 				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
 			end,
 	},
+	
 	module_resurrect = {
 		name = "Lazarus Device",
 		description = "Enables resurrection of wrecks",
@@ -728,6 +775,18 @@ decorations = {
 		func = function(unitDef)
 				unitDef.customparams.altskin = [[unittextures/commsupport1hotrod.dds]]
 				unitDef.buildpic = "skin_support_hotrod.png"
+			end,
+	},
+	skin_support_zebra = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commsupport1zebra.dds]]
+				unitDef.buildpic = "skin_support_zebra.png"
+			end,
+	},
+	skin_bombard_steel = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/benzcom_1_steel.dds]]
+				unitDef.buildpic = "skin_bombard_steel.png"
 			end,
 	},
 	
