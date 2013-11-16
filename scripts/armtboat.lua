@@ -41,17 +41,23 @@ function script.TransportPickup(passengerID)
 	local px2, py2, pz2 = Spring.GetUnitBasePosition(passengerID)
 	local dx, dy , dz = px2 - px1, py2 - py1, pz2 - pz1
 	local heading = (Spring.GetHeadingFromVector(dx, dz) - Spring.GetUnitHeading(unitID))/32768*math.pi
-	local dist = (dx^2 + dz^2)^0.5
+	local sqDist2D = dx*dx + dz*dz
+	local dist2D = math.sqrt(sqDist2D)
+	local dist3D = math.sqrt(sqDist2D + dy*dy)
 	
 	Turn(load_shoulder, y_axis, heading)
 	Move(load_shoulder, y_axis, dy)
-	Move(load_arm, z_axis, dist)
+	Move(load_arm, z_axis, dist2D)
 	AttachUnit(load_arm, passengerID)
 	
-	Move(load_arm, z_axis, 0, LOAD_SPEED_XZ)
-	Move(load_shoulder, y_axis, 0, LOAD_SPEED_Y )
-	WaitForMove(load_arm, z_axis)
-	WaitForMove(load_shoulder, y_axis)	
+	if (dist3D > 0) then
+		local xzSpeed = LOAD_SPEED_XZ * dist2D / dist3D
+		local  ySpeed = LOAD_SPEED_XZ * dy     / dist3D
+		Move(load_arm, z_axis, 0, xzSpeed)
+		Move(load_shoulder, y_axis, 0, ySpeed)
+		WaitForMove(load_arm, z_axis)
+		WaitForMove(load_shoulder, y_axis)
+	end
 	AttachUnit(slot1, passengerID)
 	loaded = true
 	SetUnitValue(COB.BUSY, 0)
@@ -65,16 +71,20 @@ function script.TransportDrop(passengerID, x, y, z)
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local dx, dy , dz = x - px1, y - py1, z - pz1
 	local heading = (Spring.GetHeadingFromVector(dx, dz) - Spring.GetUnitHeading(unitID))/32768*math.pi
-	local dist = (dx^2 + dz^2)^0.5
-	--local angleV = math.atan(dy/dist)
-	--dist = dist/math.cos(angleV)	-- convert 2d distance (adjacent) to 3d dist (hypotenuse)  --but we need 2d distance so doing this makes no sense
+	local sqDist2D = dx*dx + dz*dz
+	local dist2D = math.sqrt(sqDist2D)
+	local dist3D = math.sqrt(sqDist2D + dy*dy)
 	
 	AttachUnit(load_arm, passengerID)
 	Turn(load_shoulder, y_axis, heading)
-	Move(load_shoulder, y_axis, dy, LOAD_SPEED_Y )
-	Move(load_arm, z_axis, dist, LOAD_SPEED_XZ)
-	WaitForMove(load_arm, z_axis)
-	WaitForMove(load_shoulder, y_axis)
+	if (dist3D > 0) then
+		local xzSpeed = LOAD_SPEED_XZ * dist2D / dist3D
+		local  ySpeed = LOAD_SPEED_XZ * dy     / dist3D
+		Move(load_shoulder, y_axis, dy, ySpeed)
+		Move(load_arm, z_axis, dist2D, xzSpeed)
+		WaitForMove(load_arm, z_axis)
+		WaitForMove(load_shoulder, y_axis)
+	end
 	
 	DropUnit(passengerID)
 	loaded = false
