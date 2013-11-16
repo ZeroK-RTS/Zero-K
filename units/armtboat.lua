@@ -51,6 +51,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[ARMTBOAT]],
+  releaseHeld         = true,
   script			  = [[armtboat.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
