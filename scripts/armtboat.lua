@@ -41,7 +41,7 @@ function script.TransportPickup(passengerID)
 	local px2, py2, pz2 = Spring.GetUnitBasePosition(passengerID)
 	local dx, dy , dz = px2 - px1, py2 - py1, pz2 - pz1
 	local heading = (Spring.GetHeadingFromVector(dx, dz) - Spring.GetUnitHeading(unitID))/32768*math.pi
-	local dist = (dx^2 + dy^2)^0.5
+	local dist = (dx^2 + dz^2)^0.5
 	
 	Turn(load_shoulder, y_axis, heading)
 	Move(load_shoulder, y_axis, dy)
@@ -65,9 +65,9 @@ function script.TransportDrop(passengerID, x, y, z)
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local dx, dy , dz = x - px1, y - py1, z - pz1
 	local heading = (Spring.GetHeadingFromVector(dx, dz) - Spring.GetUnitHeading(unitID))/32768*math.pi
-	local dist = (dx^2 + dy^2)^0.5
-	local angleV = math.atan(dy/dist)
-	dist = dist/math.cos(angleV)	-- convert 2d distance (adjacent) to 3d dist (hypotenuse)
+	local dist = (dx^2 + dz^2)^0.5
+	--local angleV = math.atan(dy/dist)
+	--dist = dist/math.cos(angleV)	-- convert 2d distance (adjacent) to 3d dist (hypotenuse)  --but we need 2d distance so doing this makes no sense
 	
 	AttachUnit(load_arm, passengerID)
 	Turn(load_shoulder, y_axis, heading)
