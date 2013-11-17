@@ -10,10 +10,10 @@
 
 local moveDefs = {
 
-	KBOT1_ = {
+	KBOT1 = {
 		footprintx = 1,
 		footprintz = 1,
-		maxwaterdepth = 15,
+		maxwaterdepth = 16,
 		maxslope = 36,
 		crushstrength = 5,
 	},
@@ -31,7 +31,7 @@ local moveDefs = {
 		footprintz = 3,
 		maxwaterdepth = 22,
 		maxslope = 36,
-		crushstrength = 500,
+		crushstrength = 150,
 	},
 	
 	KBOT4 = {
@@ -66,7 +66,7 @@ local moveDefs = {
 		maxwaterdepth = 5000,
 		depthmod = 0,
 		maxslope = 36,
-		crushstrength = 5000,
+		crushstrength = 500,
 	},
 	
 	AKBOT6 = {		--amphib
@@ -78,10 +78,10 @@ local moveDefs = {
 		crushstrength = 5000,
 	},
 	
-	TKBOT1_ = {		--allterrain
+	TKBOT1 = {		--allterrain
 		footprintx = 1,
 		footprintz = 1,
-		maxwaterdepth = 15,
+		maxwaterdepth = 16,
 		maxslope = 70,
 		crushstrength = 5,
 	},
