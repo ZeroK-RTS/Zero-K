@@ -70,11 +70,15 @@ end
 -- note x, y z is in worldspace
 function script.TransportDrop(passengerID, x, y, z)
 	if not loaded then return end
+	
+	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
+	local surfaceY = math.max(0, Spring.GetGroundHeight(px1, pz1) )
+	if (py1 - surfaceY > 10) then return end -- don't allow unloading when flying
+	
 	SetUnitValue(COB.BUSY, 1)
 	Spring.MoveCtrl.Enable(unitID) -- freeze in place during unloading to make sure the passenger gets unloaded at the right place
 	
 	y = y - Spring.GetUnitHeight(passengerID) - 10
-	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local dx, dy , dz = x - px1, y - py1, z - pz1
 	local heading = (Spring.GetHeadingFromVector(dx, dz) - Spring.GetUnitHeading(unitID))/32768*math.pi
 	local sqDist2D = dx*dx + dz*dz
