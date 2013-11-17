@@ -59,13 +59,13 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-    description_pl = [[Lataj�?y Konstruktor do Zada�?Specjalnych, moc 7.5 m/s]],
+    description_pl = [[LatajÄ?y Konstruktor do ZadaÅ?Specjalnych, moc 7.5 m/s]],
     description_fr = [[ADAV de Construcion Furtif Camouflable, Construit r 7.5 m/s]],
     description_de = [[Fliegender SpecOps Bauleiter, Baut mit 7.5 m/s]],
     helptext       = [[The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield while cloaked, adding them to your army.]],
-    helptext_de    = [[Athene ist die Spitze der Tarnungsschlagkraft. Ausgerüstet mit einem Verhüllungsgeräte und einem Radarstörer kann es durch gegnerische Verteidigungslinien fliegen und Truppen aus Angreifern zusammenstellen, die dann Verwüstung nachsichziehen werden und die gegnerische Logistik vernichten können.]],
-    helptext_fr    = [[Le Athena est un ingénieur de combat non armé. Équipé d'un brouilleur radar et d'un camouflage optique il peut construire certaines infrastructures et des unités nimporte ou, et ainsi surprendre l'enneme.]],
-    helptext_pl    = [[Athena to technologiczne cacko pod względem kamuflażu i precyzyjnych operacji. Maskowanie i zakłócacz radaru pozwalaj�?Athenie prześlizgn�??si�?niezauważenie przez lini�?obrony przeciwnika, gdzie może śledzi�?jego ruchy i budowa�?jednostki bezpośrednio na polu walki.]],
+    helptext_de    = [[Athene ist die Spitze der Tarnungsschlagkraft. AusgerÃ¼stet mit einem VerhÃ¼llungsgerÃ¤te und einem RadarstÃ¶rer kann es durch gegnerische Verteidigungslinien fliegen und Truppen aus Angreifern zusammenstellen, die dann VerwÃ¼stung nachsichziehen werden und die gegnerische Logistik vernichten kÃ¶nnen.]],
+    helptext_fr    = [[Le Athena est un ingÃ©nieur de combat non armÃ©. ÃquipÃ© d'un brouilleur radar et d'un camouflage optique il peut construire certaines infrastructures et des unitÃ©s nimporte ou, et ainsi surprendre l'enneme.]],
+    helptext_pl    = [[Athena to technologiczne cacko pod względem kamuflażu i precyzyjnych operacji. Maskowanie i zakłócacz radaru pozwalają Athenie prześlizgnąć się niezauważenie przez linię obrony przeciwnika, gdzie może śledzić jego ruchy i budować jednostki bezpośrednio na polu walki.]],
     modelradius    = [[15]],
   },
 
