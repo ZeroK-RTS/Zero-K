@@ -9,6 +9,8 @@ local load_arm, load_shoulder = piece("load_arm", "load_shoulder")
 local slot1 = piece "slot1"
 
 -- constants
+local SIG_Move = 1
+
 local LOAD_SPEED_XZ = 200
 local LOAD_SPEED_Y = 80
 
@@ -48,16 +50,17 @@ function script.TransportPickup(passengerID)
 	Turn(load_shoulder, y_axis, heading)
 	Move(load_shoulder, y_axis, dy)
 	Move(load_arm, z_axis, dist2D)
-	AttachUnit(load_arm, passengerID)
 	
 	if (dist3D > 0) then
 		local xzSpeed = LOAD_SPEED_XZ * dist2D / dist3D
 		local  ySpeed = LOAD_SPEED_XZ * dy     / dist3D
-		Move(load_arm, z_axis, 0, xzSpeed)
+		Move(load_arm, z_axis, 0, xzSpeed) -- has to be called before AttachUnit, because in some cases calling Move doesn't work while the piece has an unit attached to it
 		Move(load_shoulder, y_axis, 0, ySpeed)
-		WaitForMove(load_arm, z_axis)
-		WaitForMove(load_shoulder, y_axis)
 	end
+	AttachUnit(load_arm, passengerID)
+	
+	WaitForMove(load_arm, z_axis)
+	WaitForMove(load_shoulder, y_axis)
 	AttachUnit(slot1, passengerID)
 	loaded = true
 	SetUnitValue(COB.BUSY, 0)
@@ -90,7 +93,7 @@ function script.TransportDrop(passengerID, x, y, z)
 	loaded = false
 	Move(load_arm, z_axis, 0)
 	Move(load_shoulder, y_axis, 0)
-	SetUnitValue(COB.BUSY, 0)	
+	SetUnitValue(COB.BUSY, 0)
 end
 
 function script.StartMoving()
