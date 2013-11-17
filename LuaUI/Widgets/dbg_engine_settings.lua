@@ -16,8 +16,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local isTest = Game.modVersion:find("test") or Game.modVersion:find("$VERSION")
+
 local tags = {
-  LogFlush = 0,
+  LogFlush = isTest and 1 or 0,
   AllowDeferredMapRendering = 0,
   AllowDeferredModelRendering = 0,
   --WorkerThreadCount = 0,
