@@ -31,7 +31,7 @@ unitDef = {
 	helptext_de    = [[Der Inferno ist eine große AoE Feuerwaffe. Sein direkter Schaden ist gering, aber die Flammenhölle erzeugt Verluste für längere Zeit.]],
   },
 
-  explodeAs                     = [[SMALL_UNITEX]],
+  explodeAs                     = [[WEAPON]],
   footprintX                    = 1,
   footprintZ                    = 1,
   iconType                      = [[cruisemissilesmall]],
@@ -47,7 +47,7 @@ unitDef = {
   objectName                    = [[wep_napalm.s3o]],
   script                        = [[cruisemissile.lua]],
   seismicSignature              = 4,
-  selfDestructAs                = [[SMALL_UNITEX]],
+  selfDestructAs                = [[WEAPON]],
 
   sfxtypes                      = {
 

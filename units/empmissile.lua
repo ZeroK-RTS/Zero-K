@@ -26,7 +26,7 @@ unitDef = {
     mobilebuilding = [[1]],
   },
 
-  explodeAs              = [[SMALL_UNITEX]],
+  explodeAs              = [[EMP_WEAPON]],
   footprintX             = 1,
   footprintZ             = 1,
   iconType               = [[cruisemissilesmall]],
@@ -42,7 +42,7 @@ unitDef = {
   objectName             = [[wep_empmissile.s3o]],
   script                 = [[cruisemissile.lua]],
   seismicSignature       = 4,
-  selfDestructAs         = [[SMALL_UNITEX]],
+  selfDestructAs         = [[EMP_WEAPON]],
 
   sfxtypes               = {
 

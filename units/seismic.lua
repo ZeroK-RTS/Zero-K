@@ -32,7 +32,7 @@ unitDef = {
     mobilebuilding = [[1]],
   },
 
-  explodeAs                     = [[SMALL_UNITEX]],
+  explodeAs                     = [[SEISMIC_WEAPON]],
   footprintX                    = 1,
   footprintZ                    = 1,
   iconType                      = [[cruisemissilesmall]],
@@ -48,7 +48,7 @@ unitDef = {
   objectName                    = [[wep_seismic.s3o]],
   script                        = [[cruisemissile.lua]],
   seismicSignature              = 4,
-  selfDestructAs                = [[SMALL_UNITEX]],
+  selfDestructAs                = [[SEISMIC_WEAPON]],
 
   sfxtypes                      = {
 
