@@ -649,7 +649,7 @@ function gadgetHandler:RemoveGadget(gadget)
   local name = gadget.ghInfo.name
   self.knownGadgets[name].active = false
   if (gadget.Shutdown) then
-    gadget:Shutdown()
+	gadget:Shutdown()
   end
 
   ArrayRemove(self.gadgets, gadget)
@@ -979,9 +979,13 @@ function gadgetHandler:GameStart()
 end
 
 function gadgetHandler:Shutdown()
+  Spring.Echo("Start gadgetHandler:Shutdown")
   for _,g in ipairs(self.ShutdownList) do
-    g:Shutdown()
+    local name = g.ghInfo.name or "UNKNOWN NAME"
+	Spring.Echo("Shutdown - " .. name)
+	g:Shutdown()
   end
+  Spring.Echo("End gadgetHandler:Shutdown")
   return
 end
 
