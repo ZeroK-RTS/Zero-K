@@ -439,13 +439,14 @@ path='Settings/Graphics/Unit Visibility'
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
 	ShLabel( 'Unit Visibility Widgets')
-	ShButton('Toggle Unit Outlines',function() spSendCommands{"luaui togglewidget Outline"} end, "Shows cartoon-like outline around units")
 	ShButton('Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
 	
 	path='Settings/Graphics/Unit Visibility/Spotter'
 		ShButton('Toggle Unit Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
 	path='Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton('Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+	path='Settings/Graphics/Unit Visibility/Outline'
+		ShButton('Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
 
 --- HELP ---
 path='Help'

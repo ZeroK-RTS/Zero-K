@@ -24,6 +24,27 @@ function widget:GetInfo()
   }
 end
 
+options_path = 'Settings/Graphics/Unit Visibility/Outline'
+options = {
+	thickness = {
+			name = 'Outline Thickness',
+			desc = 'How thick the outline appears around objects',
+			type = 'number',
+			min = 0.4, max = 1, step = 0.01,
+			value = 1,
+	},
+}
+
+local thickness = 1
+
+local function OnchangeFunc()
+	thickness = options.thickness.value
+end
+for key,option in pairs(options) do
+	option.OnChange = OnchangeFunc
+end
+OnchangeFunc()
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -286,7 +307,7 @@ local MyDrawVisibleUnits = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glPushMatrix()
   glResetMatrices()
-  glColor(0,0,0,1)
+  glColor(0,0,0,thickness)
   DrawVisibleUnits()
   glColor(1,1,1,1)
   glPopMatrix()
