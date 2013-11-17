@@ -18,6 +18,7 @@ local LOAD_SPEED_Y = 80
 -- local vars
 smokePiece = { base }
 local loaded = false
+local emptyTable = {}
 
 local function Wake()
 	Signal(SIG_Move)
@@ -70,6 +71,8 @@ end
 function script.TransportDrop(passengerID, x, y, z)
 	if not loaded then return end
 	SetUnitValue(COB.BUSY, 1)
+	Spring.MoveCtrl.Enable(unitID) -- freeze in place during unloading to make sure the passenger gets unloaded at the right place
+	
 	y = y - Spring.GetUnitHeight(passengerID) - 10
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local dx, dy , dz = x - px1, y - py1, z - pz1
@@ -93,7 +96,11 @@ function script.TransportDrop(passengerID, x, y, z)
 	loaded = false
 	Move(load_arm, z_axis, 0)
 	Move(load_shoulder, y_axis, 0)
+	
+	Spring.MoveCtrl.Disable(unitID)
 	SetUnitValue(COB.BUSY, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)	-- WAITWAIT magic to make unit continue with any orders it has
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)
 end
 
 function script.StartMoving()
