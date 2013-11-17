@@ -160,6 +160,7 @@ function widget:CommandNotify(id, params, options)
 			phase = 1,
 			alpha = 1,
 			offset = 0,
+			radius = params[4],
 		}
 	elseif #params == 1 then
 		local targetID = params[1]
@@ -198,9 +199,12 @@ function widget:DrawWorld()
 		local x, y, z = unpack(command.pos)
 		y = y + command.offset
 		gl.PushMatrix()
-		gl.Translate(x, y, z)
 		local r, g, b = unpack(cmdColors[command.cmdID] or colorWhite)
 		gl.Color(r, g, b, command.alpha)
+		if command.radius then
+			gl.DrawGroundCircle(x, y, z, command.radius, 32)
+		end
+		gl.Translate(x, y, z)
 		gl.CallList(diamondDList)
 		--gl.Billboard()
 		gl.Rotate(180, 0, 0, 1)
