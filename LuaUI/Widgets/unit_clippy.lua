@@ -146,7 +146,8 @@ local function MakeTip(unitID, tip)
 		font    = {
 			font   = font;
 			size   = fontSize;
-			color  = {0,0,0,1}
+			color  = {0,0,0,1};
+			outlineColor  = {0,0,0,0},
 		},
 	}
 	
