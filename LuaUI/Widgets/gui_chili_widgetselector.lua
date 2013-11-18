@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Widget Selector", --needs epic menu to dynamically update widget checkbox colors.
-    desc      = "v1.012 Chili Widget Selector", 
+    desc      = "v1.013 Chili Widget Selector", 
     author    = "CarRepairer",
     date      = "2012-01-11", --2013-06-11 (add crude filter/search capability)
     license   = "GNU GPL, v2 or later",
@@ -342,7 +342,7 @@ MakeWidgetList = function()
 			--Search button
 			Button:New{ 
 				caption = 'Search', 
-				OnClick = { function() Spring.SendCommands("chatall","PasteText /search:" ) end }, 
+				OnClick = { function() Spring.SendCommands("chat","PasteText /search:") end }, 
 				backgroundColor=color.sub_close_bg, 
 				textColor=color.sub_close_fg, 
 				

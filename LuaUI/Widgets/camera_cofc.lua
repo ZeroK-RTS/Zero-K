@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.128 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.129 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-November-12
     license   = "GNU GPL, v2 or later",
@@ -618,16 +618,21 @@ local scrnRay_prevInclination =99
 local scrnRay_prevAzimuth = 299
 local scrnRay_prevX = 9999
 local scrnRay_prevY = 9999
-local scrnRay_cachedResult = {0,0,0}
-local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
-	local halfViewSizeY = vsy/2
-	local halfViewSizeX = vsx/2
+local scrnRay_cachedResult = {0,0,0,0,0,0}
+local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeIntercept) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
+	local viewSizeY = vsy
+	local viewSizeX = vsx
+	if not vsy or not vsx then
+		viewSizeX, viewSizeY = widgetHandler:GetViewSizes()
+	end
+	local halfViewSizeY = viewSizeY/2
+	local halfViewSizeX = viewSizeX/2
 	y = y- halfViewSizeY --convert screen coordinate to 0,0 at middle
 	x = x- halfViewSizeX
 	local currentFov = cs.fov/2 --in Spring: 0 degree is directly ahead and +FOV/2 degree to the left and -FOV/2 degree to the right
 	--//Speedup//--
 	if scrnRay_previousFov==currentFov and scrnRay_prevInclination == cs.rx and scrnRay_prevAzimuth == cs.ry and scrnRay_prevX ==x and scrnRay_prevY == y then --if camera Sphere coordinate & mouse position not change then use cached value
-		return scrnRay_cachedResult[1],scrnRay_cachedResult[2],scrnRay_cachedResult[3] 
+		return scrnRay_cachedResult[1],scrnRay_cachedResult[2],scrnRay_cachedResult[3],scrnRay_cachedResult[4],scrnRay_cachedResult[5],scrnRay_cachedResult[6]  
 	end
 	--[[
 	--Opengl screen FOV scaling logic:
@@ -676,9 +681,10 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 	local azimuth = math.atan2(-x,y) --convert x,y to angle, so that left is +degree and right is -degree. Note: negative x flip left-right or right-left (flip the direction of angle)
 	--//Sphere-to-coordinate conversion//-- 
 	--(x,y,z floating in space)
-	local sphere_x = 100* sin(azimuth)* cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
-	local sphere_y = 100* sin(inclination)
-	local sphere_z = 100* cos(azimuth)* cos(inclination)
+	sphereRadius = sphereRadius or 100
+	local sphere_x = sphereRadius* sin(azimuth)* cos(inclination) --convert Sphere coordinate back to Cartesian coordinate to prepare for rotation procedure
+	local sphere_y = sphereRadius* sin(inclination)
+	local sphere_z = sphereRadius* cos(azimuth)* cos(inclination)
 	--//coordinate rotation 90+x degree//--
 	--(x,y,z rotated in space)
 	local rotateToInclination = PI/2+cs.rx --rotate to +90 degree facing the horizon then rotate to camera's current facing.
@@ -690,20 +696,59 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 	local cursorTilt = math.atan2(new_y,sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate. See: http://en.wikipedia.org/wiki/Spherical_coordinate_system for conversion formula.
 	local cursorHeading = math.atan2(new_x,new_z) --Sphere's azimuth
 	
-	--//Sphere-to-groundPosition translation//--
-	--(calculate intercept of ray from mouse to a flat ground)
-	local tiltSign = abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
-	local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt. Note: we use 0 degree when look down, and 90 degree when facing the horizon. This simplify the problem conceptually. 
-	cursorTiltComplement = min(1.5550425,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
-	local vertGroundDist = averageEdgeHeight-cs.py --distance to ground
-	local groundDistSign = abs(vertGroundDist)/vertGroundDist --negative when ground is below, positive when ground is above
-	local cursorxzDist = math.tan(cursorTiltComplement)*(vertGroundDist) --calculate how far does the camera angle look pass the ground beneath
-	if groundDistSign + tiltSign == 0 then ---handle a special case when camera is facing away from ground.
-		cursorxzDist = cursorxzDist*-1 --Note: Not sure how it manage to work, except it work.
+	local gx, gy, gz,rx,ry,rz = -1,-1,-1,-1,-1,-1
+	local cancelCache = false
+	if planeIntercept then
+		planeHeight = planeHeight or 0
+		--//Sphere-to-groundPosition translation (part1)//--
+		--(calculate intercept of ray from mouse to a flat ground)
+		local tiltSign = abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
+		local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt. Note: we use 0 degree when look down, and 90 degree when facing the horizon. This simplify the problem conceptually. (actual case is 0 degree horizon and +-90 degree up/down)
+		cursorTiltComplement = min(1.5550425,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
+		local vertGroundDist = planeHeight-cs.py --distance to ground
+		local groundDistSign = abs(vertGroundDist)/vertGroundDist --negative when ground is below, positive when ground is above
+		local cursorxzDist = math.tan(cursorTiltComplement)*(vertGroundDist) --calculate how far does the camera angle look pass the ground beneath
+		if groundDistSign + tiltSign == 0 then ---handle a special case when camera/cursor is facing away from ground.
+			--//Sphere-to-3d-coordinate translation//--
+			--(calculate intercept of ray from mouse to sphere edge)
+			local xzDist = sqrt(new_x*new_x + new_z*new_z)
+			local xDist = sin(cs.ry+cursorHeading)*xzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
+			local zDist = cos(cs.ry+cursorHeading)*xzDist
+			rx,ry,rz = xDist,new_y,zDist --relative 3d coordinate with respect to screen
+			gx, gy, gz = cs.px+xDist,cs.py+new_y,cs.pz+zDist --estimated ground position infront of camera 
+			cancelCache = true --force cache update next run (because zooming the sky will end when cam reach the edge of the sphere, so we must always calculate next sphere)
+		else --when normal case (camera facing the ground)
+			--//Sphere-to-groundPosition translation (part2)//--
+			--[[
+			--illustration of conventional coordinate and Spring's coordinate:
+			--Convention coordinate:
+			         * +Z-axis
+			         |
+			         |
+			         |
+			         O - - - - -> +X-axis
+			--Spring coordinate: (conventional trigonometry must be tweaked to be consistent with this coordinate system. High chance of bug!)
+			         O - - - - -> +X-axis
+			         |
+			         |
+			         |
+			         v +Z-axis
+			--]]
+			local cursorxDist = sin(cs.ry+cursorHeading)*cursorxzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
+			local cursorzDist = cos(cs.ry+cursorHeading)*cursorxzDist
+			rx,ry,rz = cursorxDist,new_y,cursorzDist --relative 3d coordinate with respect to screen
+			gx, gy, gz = cs.px+cursorxDist,planeHeight,cs.pz+cursorzDist --estimated ground position infront of camera
+		end
+	else
+		--//Sphere-to-worldSphere translation//--
+		--(calculate intercept of ray from mouse to a bigger sphere)
+		local xzDist = sqrt(new_x*new_x + new_z*new_z)
+		local xDist = sin(cs.ry+cursorHeading)*xzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed (?)
+		local zDist = cos(cs.ry+cursorHeading)*xzDist
+		rx,ry,rz = xDist,new_y,zDist
+		gx, gy, gz = cs.px+xDist,cs.py+new_y,cs.pz+zDist --estimated ground position infront of camera 
 	end
-	local cursorxDist = sin(cs.ry+cursorHeading)*cursorxzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed (?)
-	local cursorzDist = cos(cs.ry+cursorHeading)*cursorxzDist
-	local gx, gy, gz = cs.px+cursorxDist,averageEdgeHeight,cs.pz+cursorzDist --estimated ground position infront of camera 
+		
 	--Finish
 	if false then
 		-- Spring.Echo("MouseCoordinate")
@@ -722,18 +767,24 @@ local function OverrideTraceScreenRay(x,y,cs) --this function provide an adjuste
 		-- Spring.Echo(cursorTilt*(180/PI))
 		-- Spring.Echo((cs.ry+cursorHeading)*(180/PI) .. " cursorComponent: " .. cursorHeading*(180/PI))
 		Spring.MarkerAddPoint(gx, gy, gz, "here")
+		Spring.Echo(gx..",".. gy..",".. gz)
 	end
 	--//caching for efficiency
-	scrnRay_cachedResult[1] = gx
-	scrnRay_cachedResult[2] = gy
-	scrnRay_cachedResult[3] = gz
-	scrnRay_prevInclination =cs.rx
-	scrnRay_prevAzimuth = cs.ry
-	scrnRay_prevX = x
-	scrnRay_prevY = y
-	scrnRay_previousFov = currentFov	
+	if not cancelCache then
+		scrnRay_cachedResult[1] = gx
+		scrnRay_cachedResult[2] = gy
+		scrnRay_cachedResult[3] = gz
+		scrnRay_cachedResult[4] = rx
+		scrnRay_cachedResult[5] = ry
+		scrnRay_cachedResult[6] = rz
+		scrnRay_prevInclination =cs.rx
+		scrnRay_prevAzimuth = cs.ry
+		scrnRay_prevX = x
+		scrnRay_prevY = y
+		scrnRay_previousFov = currentFov
+	end
 
-	return gx,gy,gz
+	return gx,gy,gz,rx,ry,rz
 	--Most important credit to!:
 	--0: Google search service
 	--1: "Perspective Projection: The Wrong Imaging Model" by Margaret M. Fleck (http://www.cs.illinois.edu/~mfleck/my-papers/stereographic-TR.pdf)
@@ -814,7 +865,7 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
-	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs) --use override if spTraceScreenRay() do not have results
+	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,averageEdgeHeight,1000,true) --use override if spTraceScreenRay() do not have results
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
@@ -861,7 +912,7 @@ local function UpdateCam(cs)
 	if not options.freemode.value then
 		local gndheight = spGetGroundHeight(cs.px, cs.pz)+5
 		--gndheight = spGetSmoothMeshHeight(cs.px, cs.pz)+5
-		if cs.py < gndheight then
+		if cs.py < gndheight then --prevent camera from going underground
 			if options.groundrot.value then
 				cs.py = gndheight
 			else
@@ -898,14 +949,14 @@ local function Zoom(zoomin, shift, forceCenter)
 	end
 
 	local cs = spGetCameraState()
-	-- [[
+	
+	--//ZOOMOUT FROM CURSOR, ZOOMIN TO CURSOR//--
 	if
 	(not forceCenter) and
-	((zoomin and options.zoomintocursor.value) or ((not zoomin) and options.zoomoutfromcursor.value)) --zoom to cursor or zoom-out from cursor
+	((zoomin and options.zoomintocursor.value) or ((not zoomin) and options.zoomoutfromcursor.value))
 	then
-		
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
-		
+	
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
 			if gx < 0 then gx = 0; end
@@ -952,9 +1003,29 @@ local function Zoom(zoomin, shift, forceCenter)
 		return
 		
 	end
-	--]]
+
+	--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
+	local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs)
+	
+	if gx and not options.freemode.value then
+		--out of map. Bound zooming to within map
+		if gx < 0 then gx = 0; end
+		if gx > mwidth then gx=mwidth; end
+		if gz < 0 then gz = 0; end 
+		if gz > mheight then gz = mheight; end  
+	end
+	
 	ls_have = false --unlock lockspot 
-	SetLockSpot2(cs) --set lockspot
+	-- SetLockSpot2(cs) --set lockspot
+	if gx then --set lockspot
+		ls_x,ls_y,ls_z = gx,gy,gz
+		local px,py,pz = cs.px,cs.py,cs.pz
+		local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+		ls_onmap = onmap
+		ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
+		ls_have = true
+	end
+	
 	if not ls_have then
 		return
 	end
@@ -967,13 +1038,15 @@ local function Zoom(zoomin, shift, forceCenter)
 	
 	local ls_dist_new = ls_dist + ls_dist*sp -- a zoom in that get faster the further away from target
 	ls_dist_new = max(ls_dist_new, 20)
-	ls_dist_new = min(ls_dist_new, maxDistY)
+	if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
+		return
+	end
 	
 	ls_dist = ls_dist_new
 
 	local cstemp = UpdateCam(cs)
 	if cstemp then cs = cstemp; end
-	if (not zoomin and options.zoomouttocenter.value) then
+	if (not zoomin and options.zoomouttocenter.value) then --move camera toward center
 		local dcx = mcx - ls_x -- distance in x-z plane from center of map to center of view (x-axis)
 		local dcz = mcz - ls_z -- distance in x-z plane from center of map to center of view (z-axis)
 --		Spring.Echo ("maxDistY: " .. maxDistY .. " cs.py: " .. cs.py .. " dcx: " .. dcx .. " dcz: " .. dcz)
@@ -982,9 +1055,8 @@ local function Zoom(zoomin, shift, forceCenter)
 		cs.px = cs.px + dcx * csp
 		cs.pz = cs.pz + dcz * csp
 	end
-	if zoomin or ls_dist < maxDistY then
-		spSetCameraState(cs, options.smoothness.value)
-	end
+
+	spSetCameraState(cs, options.smoothness.value)
 
 	return true
 end
@@ -1202,10 +1274,22 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
 		end
 		
         -- [[
-        if trackmode then --always rotate world instead of camera in trackmode
-            lock = true
+        if trackmode then --rotate world instead of camera during trackmode (during tracking unit)
+            lock = true --lock camera to lockspot while rotating
             ls_have = false
-            SetLockSpot2(cs)
+			-- SetLockSpot2(cs) --set lockspot to middle of screen
+			local selUnits = spGetSelectedUnits()
+			if selUnits and selUnits[1] then
+				local x,y,z = spGetUnitPosition( selUnits[1] )
+				if x then --set lockspot to the unit
+					ls_x,ls_y,ls_z = x,y,z
+					local px,py,pz = cs.px,cs.py,cs.pz
+					local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+					ls_onmap = true
+					ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to unit
+					ls_have = true
+				end
+			end
         end
 		--]]
 		if lock and (ls_onmap or options.freemode.value) then --if have lock (ls_have ==true) and is either onmap or freemode (offmap) then update camera properties.
@@ -1363,7 +1447,9 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	if options.smoothmeshscroll.value then
 		ls_y = spGetSmoothMeshHeight(ls_x, ls_z) or 0
 	else
-		ls_y = spGetGroundHeight(ls_x, ls_z) or 0
+		if not options.freemode.value then
+			ls_y = spGetGroundHeight(ls_x, ls_z) or 0 --limit lockspot to groundheight if not free
+		end
 	end
 	
 	
@@ -1434,6 +1520,7 @@ function widget:Update(dt)
 	not overview_mode and
 	(follow_timer <= 0) and --disable tracking temporarily when middle mouse is pressed or when scroll is used for zoom
 	not thirdperson_trackunit and
+	not (rot.right or rot.left or rot.up or rot.down) and --cam rotation conflict with tracking, causing zoom-out bug. Rotation while tracking is handled in RotateCamera() but with less smoothing.
 	(not rotate)) --update trackmode during non-rotating state (doing both will cause a zoomed-out bug)
 	then 
 		local selUnits = spGetSelectedUnits()
@@ -1738,15 +1825,15 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		if options.targetmouse.value then --if rotate world at mouse cursor: 
 			
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
-			if gx then  --Note: we don't block offmap position since VirtTraceRay() now work for offmap position.
+			if gx and (options.freemode.value or onmap) then  --Note: we don't block offmap position since VirtTraceRay() now work for offmap position.
 				SetLockSpot2(cs,x,y) --set lockspot at cursor position
-				SetCameraTarget(gx,gy,gz,1)
 				
-				--//update "ls_dist" with value from mid-screen's LockSpot because rotation is centered on mid-screen and not at cursor//--
-				_,gx,gy,gz = VirtTraceRay(cx,cy,cs) --get ground position traced from mid of screen
-				local dx,dy,dz = gx-cs.px, gy-cs.py, gz-cs.pz
+				--//update "ls_dist" with value from mid-screen's LockSpot because rotation is centered on mid-screen and not at cursor (cursor's "ls_dist" has bigger value than midscreen "ls_dist")//--
+				local _,cgx,cgy,cgz = VirtTraceRay(cx,cy,cs) --get ground position traced from mid of screen
+				local dx,dy,dz = cgx-cs.px, cgy-cs.py, cgz-cs.pz
 				ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground 
 				
+				SetCameraTarget(gx,gy,gz,1) --transit to cursor position
 				rotate_transit = spGetTimer() --trigger smooth in-transit effect in widget:MouseMove()
 			end
 			

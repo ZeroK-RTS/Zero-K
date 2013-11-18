@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.324 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.325 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-08-31
     license   = "GNU GPL, v2 or later",
@@ -1811,7 +1811,7 @@ MakeSubWindow = function(path)
 	
 	--search button
 	Button:New{ name= 'searchButton', caption = 'Search',
-		OnClick = { function() Spring.SendCommands("chatall","PasteText /search:" ) end }, 
+		OnClick = { function() Spring.SendCommands("chat","PasteText /search:" ) end }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
 		padding= {2,2,2,2},parent = buttonBar;
 		children = {
@@ -1998,7 +1998,8 @@ MakeSubWindowSearch = function(path)
 		end
 		
 		
-		if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
+		--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
+		if option.advanced and not settings.showAdvanced then
 			--do nothing
 		elseif option.type == 'button' then
 			local hide = false
@@ -2181,7 +2182,7 @@ MakeSubWindowSearch = function(path)
 	KillSubWindow()
 	curPath = path -- must be done after KillSubWindow
 	window_sub_cur = Window:New{  
-		caption= "Searching in: \"" .. path .. "...\"\n(Press Enter to do Search)",
+		caption= "Searching in: \"" .. path .. "...\"",
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y, 
 		clientWidth = window_width,
