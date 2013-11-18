@@ -27,6 +27,30 @@ local function MakeVisible()
     end
 end
 
+local SIZE_GROWTH = 25
+local MAP_SIZE = Game.mapSizeX + Game.mapSizeZ
+
+local function ShockwavesOfKillEverything()
+	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
+	local size = 0
+	while size < MAP_SIZE do
+		local units = Spring.GetUnitsInSphere(x,y,z,size)
+		for i = 1, #units do
+			if units[i] ~= unitID then
+				Spring.DestroyUnit(units[i])
+			end
+		end
+		Sleep(250)
+		size = size + SIZE_GROWTH
+	end
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		if units[i] ~= unitID then
+			Spring.DestroyUnit(units[i])
+		end
+	end
+end
+
 function script.HitByWeapon( x, z, weaponDefID, damage )
     if built then
         return 0
@@ -48,7 +72,7 @@ function script.Create()
     
     Move( firepoint , y_axis, TARGET_ALT , 30*4)
     StartThread(MakeVisible)
-    
+    StartThread(ShockwavesOfKillEverything)
 end
 
 function script.AimWeapon1( heading, pitch)
