@@ -18,10 +18,10 @@ local SPEEDUP_FACTOR = 5
 ----------------------------------------------------------
 
 function SprintThread()
-	for i=1,15 do
+	for i=1,30 do
 		EmitSfx(ljet, 1027)
 		EmitSfx(rjet, 1027)
-		Sleep(66)
+		Sleep(33)
 	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
