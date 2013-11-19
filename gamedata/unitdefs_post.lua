@@ -530,6 +530,7 @@ for name, ud in pairs(UnitDefs) do
 			end
 		end
 	end
+	ud.nochasecategory = (ud.nochasecategory or "") .. " STUPIDTARGET"
 end
 
 --------------------------------------------------------------------------------
