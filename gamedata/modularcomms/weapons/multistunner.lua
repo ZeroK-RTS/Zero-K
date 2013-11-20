@@ -1,10 +1,10 @@
 local name = "commweapon_multistunner"
 local weaponDef = {
 	name                    = [[Multi-Stunner]],
-	areaOfEffect            = 128,
+	areaOfEffect            = 144,
 	avoidFeature            = false,
-	burst                   = 10,
-	burstRate               = 0.16,
+	burst                   = 16,
+	burstRate               = 0.1875,
 	commandFire             = true,
 
 	customParams            = {
@@ -17,11 +17,11 @@ local weaponDef = {
 	cylinderTargeting       = 0,
 
 	damage                  = {
-		default = 800,
+		default = 542.534722222222,
 	},
 
 	duration                = 8,
-	edgeEffectiveness       = 0.8,
+	edgeEffectiveness       = 0,
 	explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
 	fireStarter             = 0,
 	impulseBoost            = 0,
@@ -30,13 +30,13 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
 	paralyzer               = true,
-	paralyzeTime            = 3,
+	paralyzeTime            = 6,
 	range                   = 360,
 	reloadtime              = 12,
 	rgbColor                = [[1 1 0.25]],
 	soundStart              = [[weapon/lightning_fire]],
 	soundTrigger            = false,
-	sprayAngle              = 1536,
+	sprayAngle              = 1920,
 	texture1                = [[lightning]],
 	thickness               = 10,
 	turret                  = true,
