@@ -21,8 +21,8 @@ local weaponDef = {
 	cylinderTargeting       = 1.0,
 
 	damage                  = {
-		default = 1120,
-		subs    = 56,
+		default = 1512,
+		subs    = 75.6,
 	},
 
 	edgeEffectiveness       = 1,
@@ -36,7 +36,7 @@ local weaponDef = {
 	model                   = [[wep_m_phoenix.s3o]],
 	predictBoost            = 0.0,
 	range                   = 700,
-	reloadtime              = 21,
+	reloadtime              = 30,
 	smokeTrail              = false,
 	soundHit                = [[weapon/bomb_hit]],
 	soundStart              = [[weapon/missile/missile_fire2]],
