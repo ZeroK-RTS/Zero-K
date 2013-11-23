@@ -116,12 +116,16 @@ local function MakeTip(unitID, tip)
 	if (options.rankLimit.value and (rank > RANK_LIMIT)) then
 		return
 	end
+	if Spring.GetUnitIsDead(unitID) then
+		return
+	end
 	DisposeTip(unitID)
 
 	local strings = tips[tip].str
 	local str = strings[math.random(#strings)]
 	
 	local height = Spring.GetUnitHeight(unitID)
+	if not height then return end
 	
 	local textWidth, textHeight, x, y = GetTipDimensions(unitID, str, height)
 
