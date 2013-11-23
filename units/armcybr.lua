@@ -81,7 +81,7 @@ unitDef = {
 
     ARM_PIDR = {
       name                    = [[Implosion Bomb]],
-      areaOfEffect            = 256,
+      areaOfEffect            = 192,
       avoidFeature            = false,
       avoidFriendly           = false,
 	  burnblow                = true,
@@ -101,7 +101,6 @@ unitDef = {
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 100,
       flightTime              = 4,
-	  guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = -0.8,
       interceptedByShieldType = 2,
