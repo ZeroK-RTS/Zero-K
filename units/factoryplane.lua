@@ -42,7 +42,7 @@ unitDef = {
 	modelradius    = [[25]],
   },
 
-  energyMake                    = 0.225,
+  energyMake                    = 0.25,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
@@ -56,7 +56,7 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  metalMake                     = 0.225,
+  metalMake                     = 0.25,
   minCloakDistance              = 150,
   modelCenterOffset				= [[0 20 0]],
   noAutoFire                    = false,

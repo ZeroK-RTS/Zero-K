@@ -49,7 +49,7 @@ unitDef = {
     sortName       = [[1]],
   },
 
-  energyMake                    = 0.15,
+  energyMake                    = 0.25,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 6,
@@ -62,7 +62,7 @@ unitDef = {
   maxSlope                      = 15,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
-  metalMake                     = 0.15,
+  metalMake                     = 0.25,
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[factory.s3o]],

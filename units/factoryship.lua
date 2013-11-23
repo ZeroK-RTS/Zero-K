@@ -43,7 +43,7 @@ unitDef = {
 	--modelradius    = [[18]],
   },
 
-  energyMake             = 0.3,
+  energyMake             = 0.25,
   energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
   footprintX             = 9,
@@ -55,7 +55,7 @@ unitDef = {
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
-  metalMake              = 0.3,
+  metalMake              = 0.25,
   minCloakDistance       = 150,
   minWaterDepth          = 15,
   objectName             = [[seafac.s3o]],
