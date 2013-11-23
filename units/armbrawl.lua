@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armbrawl]],
   name                = [[Brawler]],
-  description         = [[Assault/Skirmish Gunship]],
+  description         = [[Riot Gunship]],
   acceleration        = 0.24,
   amphibious          = true,
   bankscale           = [[1]],
@@ -90,7 +90,7 @@ unitDef = {
 
     EMG = {
       name                    = [[Heavy Pulse MG]],
-      areaOfEffect            = 40,
+      areaOfEffect            = 72,
       avoidFeature            = false,
       burst                   = 4,
       burstrate               = 0.1,
@@ -99,8 +99,8 @@ unitDef = {
       craterMult              = 0.3,
 
       damage                  = {
-        default = 21.6,
-        subs    = 1.08,
+        default = 22,
+        subs    = 11,
       },
 
       edgeEffectiveness       = 0.5,
@@ -110,7 +110,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       noSelfDamage            = true,
       pitchtolerance          = 12000,
       range                   = 600,
@@ -121,7 +120,6 @@ unitDef = {
       soundStart              = [[weapon/cannon/brawler_emg]],
       sprayAngle              = 1600,
       startsmoke              = [[0]],
-      sweepfire               = false,
       tolerance               = 2000,
       turret                  = true,
       weaponTimer             = 1,
