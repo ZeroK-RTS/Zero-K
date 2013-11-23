@@ -46,7 +46,7 @@ unitDef = {
 	modelradius    = [[15]],
   },
 
-  energyMake             = 0.15,
+  energyMake             = 0.225,
   energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
@@ -59,7 +59,7 @@ unitDef = {
   maxSlope               = 72,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
-  metalMake              = 0.15,
+  metalMake              = 0.225,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   objectName             = [[weaver.s3o]],
