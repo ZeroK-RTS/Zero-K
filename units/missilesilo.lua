@@ -31,8 +31,10 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Produziert Raketen, Baut mit 10 M/s]],
+    description_pl = [[Buduje rakiety taktyczne, moc 10 m/s]],
     helptext       = [[The Missile Silo constructs and holds up to four different cruise missiles, each with a unique warhead. It offers excellent standoff strike capability for offensive and defensive purposes.]],
-	helptext_de    = [[Das Raketensilo erzeugt und lagert bis zu vier verschiedene Marschflugk�rper, jede mit einem einzigartigen Sprengkopf. Das Silo bietet hervorragende Schlagkraft in Pattsituationen, sowohl f�r offensive, als auch defensive Zwecke.]],
+	helptext_de    = [[Das Raketensilo erzeugt und lagert bis zu vier verschiedene Marschflugkörper, jede mit einem einzigartigen Sprengkopf. Das Silo bietet hervorragende Schlagkraft in Pattsituationen, sowohl für offensive, als auch defensive Zwecke.]],
+	helptext_pl    = [[Silos Rakietowy buduje i przechowuje do czterech jednorazowych rakiet taktycznych dalekiego zasięgu. Silos oferuje kilka różnych głowic, co daje świetne możliwości zarówno defensywne, jak i ofensywne.]],
   },
 
   energyMake                    = 0.3,

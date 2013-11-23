@@ -27,8 +27,10 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Seismische Rakete]],
+    description_pl = [[Rakieta Sejsmiczna]],
     helptext       = [[The Quake creates a powerful seismic shockwave that smooths a wide area of terrain, while causing minimal harm to units.]],
-	helptext_de    = [[Die Rakete Quake erzeugt eine akustische Schockwelle, welche massive Krater im Boden hinerl�sst, aber nur minimale Sch�den an Einheiten aus Metall und Kohlenstoff-Nanor�hrchen verursacht.]],
+	helptext_de    = [[Die Rakete Quake erzeugt eine akustische Schockwelle, welche die anliegend Boden glatt macht, aber nur minimale Schäden an Einheiten aus Metall und Kohlenstoff-Nanoröhrchen verursacht.]],
+	helptext_pl    = [[Jednorazowa rakieta sejsmiczna dalekiego zasięgu. Nie zadaje obrażeń, ale wyrównuje okoliczny teren.]],
     mobilebuilding = [[1]],
   },
 

@@ -27,8 +27,10 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Napalm-Rakete]],
+    description_pl = [[Rakieta zapalająca]],
     helptext       = [[The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time.]],
-	helptext_de    = [[Der Inferno ist eine gro�e AoE Feuerwaffe. Sein direkter Schaden ist gering, aber die Flammenh�lle erzeugt Verluste f�r l�ngere Zeit.]],
+	helptext_de    = [[Der Inferno ist eine große AoE Feuerwaffe. Sein direkter Schaden ist gering, aber die Flammenhölle erzeugt Verluste für längere Zeit.]],
+	helptext_pl    = [[Jednorazowa rakieta dalekiego zasięgu, która podpala na długi czas trafiony obszar, zadając znajdującym się w nim jednostkom obrażenia.]],
   },
 
   explodeAs                     = [[WEAPON]],
