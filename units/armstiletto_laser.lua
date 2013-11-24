@@ -32,7 +32,7 @@ unitDef = {
     helptext_bp    = [[Bombardeiro rápido a radar equipado com um gerador de raios ao invés de bombas que dispara raios de PEM contra o inimigo ao atacar.]],
     helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
     helptext_fr    = [[Rapide, armé de canons EMP pouvant paralyser les unités dans une large bande.]],
-    helptext_pl    = [[Szybki bombowiec, który jest w stanie sparaliżować jednostki w wyznaczonym obszarze.]],
+    helptext_pl    = [[Szybki bombowiec, który jest w stanie rozbroic jednostki w wyznaczonym obszarze.]],
     modelradius    = [[10]],
   },
 
