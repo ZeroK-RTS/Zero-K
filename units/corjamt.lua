@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corjamt]],
   name                          = [[Aegis]],
-  description                   = [[Light Shield Device]],
+  description                   = [[Area Shield Device]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
@@ -53,10 +53,12 @@ unitDef = {
     description_bp = [[]],
     description_fr = [[]],
 	description_de = [[Leichte Abschirmeinrichtung]],
+	description_pl = [[Tarcza obszarowa]],
     helptext       = [[The Aegis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block very powerful weapons.]],
     helptext_bp    = [[]],
     helptext_fr    = [[]],
 	helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
+	helptext_pl    = [[Aegis tworzy obszarowa tarcze, ktora detonuje pociski na jej obwodzie. Utrzymanie i regeneracja tarczy kosztuja znaczne ilosci energii, a niektore pociski sa zbyt mocne, by je zatrzymac.]],
   },  
   
   weapons                       = {

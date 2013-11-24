@@ -25,9 +25,11 @@ unitDef = {
   customParams                  = {
     description_fr = [[Tourrelle r Gravité Répulsive/Attractive]],
 	description_de = [[Gravitationsturm - An zum Abstoßen, Aus zum Anziehen]],
+	description_pl = [[Wiezyczka Grawitacyjna]],
     helptext       = [[The Newton is armed with an experimental graviton projector. This weapon does virtually no damage directly, but can push units toward or away from the Newton. You can use it on your own units as well, but beware of friendly fire.]],
     helptext_fr    = [[Le Newton est un équipement toute dernicre génération utilisant des flux de gravitron densifiés pour repousser ou attirer ses cibles. Régler par défaut sur repousser, il empechera les ennemis de grimper sur une collinne fortifiée par exemple. Il peut également attirer dans l'eau des unités non-amphibies.]],
 	helptext_de    = [[Der Newton ist mit einem experimentellen Gravitonprojektor bewaffnet. Diese Waffe so gut wie keinen direkten Schaden, denn sie kann Einheiten anziehen und abstoßen. Das kann entweder mit deinen eigenen Einheiten passieren oder mit feindlichen.]],
+	helptext_pl    = [[Mimo ze wiezyczka grawitacyjna nie zadaje bezposrednio obrazen, moze przyciagac lub odpychac jednostki - takze sojusznicze.]],
 	modelradius    = [[25]],
   },
 
