@@ -36,8 +36,10 @@ unitDef = {
   customParams                  = {
     landflystate   = [[0]],
     description_de = [[Produziert Flugzeuge, Baut mit 10 M/s]],
-    helptext       = [[The Airplane Plant offers a variety of fixed-wing aircraft to suit your needs. Choose between multirole fighters that can double as light attackers or specialized interceptors, and between precision bombers for taking down specific targets or their saturation counterparts for destroying swarms.]],
-	helptext_de    = [[Das Airplane Plant ermöglicht den Bau vielfältiger Starrflügelflugzeuge, um deine Bedürfnisse zu stillen. Wähle zwischen Allzweckjägern, die sowohl leichte Attacken fliegen können, als auch als Abfangjäger fungieren, und präzisen Bombern, um spezielle Ziele zu vernichten.]],
+    description_pl = [[Buduje samoloty, moc 10 m/s]],
+    helptext       = [[The Airplane Plant offers a variety of fixed-wing aircraft to suit your needs. Choose between multirole fighters that can double as light attackers or specialized interceptors, and between precision bombers for taking down specific targets or their saturation counterparts for destroying swarms. The plant also comes bundled with one rearm pad.]],
+	helptext_de    = [[Das Airplane Plant ermöglicht den Bau vielfältiger Starrflügelflugzeuge, um deine Bedürfnisse zu stillen. Wähle zwischen Allzweckjägern, die sowohl leichte Attacken fliegen können, als auch als Abfangjäger fungieren, und präzisen Bombern, um spezielle Ziele zu vernichten. Es befüllt außerdem die Bomber.]],
+	helptext_pl    = [[Lotnisko pozwala na budowe samolotow i oprocz samolotu konstrukcyjnego i zwiadowczego oferuje takze dwa rodzaje mysliwcow i cztery bombowcow, kazdy wyspecjalizowany do unikalnej roli. Posiada takze jedno stanowisko uzupelniania dla bombowcow.]],
     sortName = [[4]],
 	modelradius    = [[25]],
   },
