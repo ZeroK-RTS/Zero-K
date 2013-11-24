@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armpb]],
   name                          = [[Gauss]],
-  description                   = [[Ambush Gauss Turret]],
+  description                   = [[Gauss Turret]],
   buildCostEnergy               = 400,
   buildCostMetal                = 400,
   builder                       = false,
@@ -23,8 +23,10 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Versteckter Gaussturm]],
+    description_pl = [[Dzialo Gaussa]],
     helptext       = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage, making it a good choice when the enemy is using artillery.]],
     helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es viermal schwerer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
+    helptext_pl	   = [[Dzialo Gaussa to wszechstronna wiezyczka, ktora otrzymuje tylko cwierc obrazen, gdy sama nie prowadzi ostrzalu.]],
     modelradius    = [[15]],
 	aimposoffset   = [[0 25 0]],
   },
