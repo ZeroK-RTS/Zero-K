@@ -64,7 +64,7 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	window:Dispose()
+	if window then window:Dispose() end
 end
 
 function updateCounters()

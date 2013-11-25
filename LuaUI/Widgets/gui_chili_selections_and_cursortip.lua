@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.090 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.091 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --18 October 2013
     license   = "GNU GPL, v2 or later",
@@ -97,7 +97,7 @@ local controls = {}
 local controls_icons = {}
 
 local stack_main, stack_leftbar
-local globalitems = {}
+local globalitems = {} --remember reference to various chili element that need to be accessed/updated globally.
 
 local ttFontSize = 10
 
@@ -227,9 +227,18 @@ options = {
 		value = false,
 		desc = 'Shows healthbar for features.',
 		OnChange = function() 
-			--fixme: dispose?
-			controls['feature']=nil; 
-			controls['corpse']=nil; 
+			if controls['feature2'] then
+				for _,controls in pairs(controls['feature2']) do
+					controls:Dispose();
+				end
+			end
+			if controls['corpse2'] then
+				for _,controls in pairs(controls['corpse2']) do
+					controls:Dispose();
+				end
+			end
+			controls['feature2']=nil; 
+			controls['corpse2']=nil; 
 		end,
 	},
 	hide_for_unreclaimable = {
@@ -585,13 +594,15 @@ end
 
 --this is a separate function to allow group info to be regenerated without reloading the whole tooltip
 local function WriteGroupInfo()
+	if gi_label then
+		gi_label:Dispose(); --delete chili element
+		gi_label=nil;
+	end
+	
 	if not options.showgroupinfo.value or numSelectedUnits==0 then
 		return 
 	end
-
-	if gi_label then
-		window_corner:RemoveChild(gi_label)
-	end
+	
 	local dgunStatus = ''
 	if stt_unitID and numSelectedUnits == 1 and options.manualWeaponReloadBar.value then
 		local reloadFraction, remainingTime = GetWeaponReloadStatus(stt_unitID,3)  --select weapon no.3 (slot 3 is by ZK convention is usually used for user controlled weapon)
@@ -612,8 +623,8 @@ local function WriteGroupInfo()
 		"\nHealth " .. gi_hp .. " / " ..  gi_maxhp ..
 		"\nCost " .. gi_cost .. " / " ..  gi_finishedcost ..
 		metal .. energy ..	buildpower .. dgunStatus
-		
-	gi_label = Label:New{
+	
+	gi_label = Label:New{ --recreate chili element (rather than just updating caption) to avoid color bug
 		parent = window_corner;
 		y=5,
 		right=5,
@@ -625,6 +636,7 @@ local function WriteGroupInfo()
 		fontSize = 12;
 		fontShadow = true;
 	}
+	
 end
 
 -- group selection functions
@@ -637,6 +649,13 @@ Show = function(obj)
 	end
 end
 
+local function DisposeSelectionDisplay()
+	if globalitems["window_corner_direct_child"] then
+		globalitems["window_corner_direct_child"][1]:Dispose()
+		globalitems["window_corner_direct_child"][2]:Dispose()
+		globalitems["window_corner_direct_child"]=nil
+	end
+end
 
 local function GetUnitDesc(unitID, ud)
 	if not (unitID or ud) then return '' end
@@ -787,9 +806,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 end
 
 local function MakeUnitGroupSelectionToolTip()
-	window_corner:ClearChildren();
-	
-	--IDEA: add scrollpanel as parent to barGrid (like playerlist)? but IMO selection bar is a reflex UI and thus only need only visible element and not hidden rows. 
+
 	local barGrid = LayoutPanel:New{
 		name     = 'Bars';
 		resizeItems = false;
@@ -804,19 +821,16 @@ local function MakeUnitGroupSelectionToolTip()
 		itemMargin  = {0,0,2,2};
 		tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
 	}
-	do --check how many picture can fit into the selection grid (estimated!)
-		local maxRight, maxBottom = barGrid:GetMinimumExtents()
-		maxRight = maxRight - (options.showgroupinfo.value and 120 or 0)
-		local horizontalFit = maxRight/50
-		local verticalFit = maxBottom/50
-		maxPicFit = horizontalFit*verticalFit --Note: maxPicFit not need to round to nearest integer.
-	end
-	--if check is done in target function
-	--if options.showgroupinfo.value then
-		WriteGroupInfo()
-	--end
-
+	
+	--estimate how many picture can fit into the selection grid
+	local maxRight, maxBottom = barGrid:GetMinimumExtents() --Note: for a non-zero return, barGrid must be attached to the window_corner first 
+	maxRight = maxRight - (options.showgroupinfo.value and 120 or 0)
+	local horizontalFit = maxRight/50
+	local verticalFit = maxBottom/50
+	maxPicFit = horizontalFit*verticalFit --Note: maxPicFit not need to round to nearest integer.
 	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
+
+	WriteGroupInfo() --write selection summary text on right side of the panel
 
 	local gi_groupingbutton = Button:New{ --add a button that allow you to change alwaysgroup value on the interface directly
 		name = 'AlwaysGroupButton';
@@ -836,7 +850,6 @@ local function MakeUnitGroupSelectionToolTip()
 		textColor = {1,1,1,0.75}, 
 		tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit group based on type" or "Unit not grouped") or "Bar is full, unit group based on type",
 	}
-	
 
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
@@ -855,6 +868,8 @@ local function MakeUnitGroupSelectionToolTip()
 			AddSelectionIcon(barGrid,nil,defid,unitids,counts)
 		end
 	end
+	
+	return barGrid, gi_groupingbutton
 end
 
 
@@ -883,9 +898,9 @@ local function UpdateSelectedUnitsTooltip()
 									reloadMiniBar:SetValue(reloadFraction)
 									miniReloadBarPresent = true
 								elseif reloadMiniBar then --remove the minibar IF not reloading weapon
-									unitIcon:RemoveChild(reloadMiniBar) --ref: chili/Controls/object.lua by jK & quantum.
-									unitIcon:RemoveChild(healthbar) --delete modified healthbar 
-									Progressbar:New{ --recreate original healthbar 
+									reloadMiniBar:Dispose();
+									healthbar:Dispose(); --delete modified healthbar 
+									Progressbar:New{ --recreate original healthbar to avoid layout bug
 										parent  = unitIcon;
 										name    = 'health';
 										width   = 50;
@@ -895,7 +910,7 @@ local function UpdateSelectedUnitsTooltip()
 										color   = {0.0,0.99,0.0,1};
 									};
 								elseif reloadFraction < 0.99 then --create the minibar IF doesn't have the minibar & is reloading weapon
-										unitIcon:RemoveChild(healthbar) --delete original healthbar 
+										healthbar:Dispose(); --delete original healthbar 
 										Progressbar:New{ --recreate new healthbar (this is to solve issue of bar not resizing when we just changed the "height" & do 'healthbar:Invalidate()').
 											parent  = unitIcon;
 											name    = 'health';
@@ -904,7 +919,7 @@ local function UpdateSelectedUnitsTooltip()
 											minHeight = 8;
 											max     = 1;
 											value 	= (health/maxhealth);
-											color   = {0.0,0.99,0.0,1};
+											color   = {0.0,0.99,0.0,1}; --arbitrary color, will correct itself in next update
 										};
 										Progressbar:New{ --create mini reload bar
 											parent  = unitIcon;
@@ -2148,8 +2163,12 @@ function widget:Update(dt)
 							end
 						end
 					end
-					itemImg:ClearChildren(); --remove existing label and readd (to eliminate color bug)
-					if commandName then
+					local cmdLabel = itemImg.childrenByName['commandLabel']
+					if cmdLabel and cmdLabel.caption ~= commandName then --differing label?
+						cmdLabel:Dispose(); --remove existing label and recreate chili element (to eliminate color bug)
+						cmdLabel = nil;
+					end
+					if not cmdLabel and commandName then
 						Label:New{ --create new chili element
 							parent = itemImg;
 							name = "commandLabel";
@@ -2357,7 +2376,7 @@ end
 function widget:SelectionChanged(newSelection)
 	selectedUnits = {}
 	numSelectedUnits = 0
-	--store selected unitID list in a table with unitDefID
+	--store selected unitID list in a table with unitDefID. This prevent NIL error if selecting using limited LOS spectator
 	if (spGetSelectedUnitsCount() > 0) then 
 		local count = 0
 		for i=1, #newSelection do
@@ -2398,20 +2417,23 @@ function widget:SelectionChanged(newSelection)
 			
 			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1][1], tooltip) --healthbar/resource consumption/ect chili element
 			if cur1 then
-				window_corner:ClearChildren()
+				DisposeSelectionDisplay()
 				window_corner:AddChild(cur1)
 				window_corner:AddChild(cur2)
+				globalitems["window_corner_direct_child"]= {cur1,cur2}
 			end
 		else
 			stt_unitID = nil
-			MakeUnitGroupSelectionToolTip()
+			DisposeSelectionDisplay()
+			local cur1, cur2 = MakeUnitGroupSelectionToolTip()
+			globalitems["window_corner_direct_child"]= {cur1,cur2}
 		end
 		real_window_corner.caption = nil
 		real_window_corner:Invalidate()
 		Show(real_window_corner)
 	else
 		stt_unitID = nil
-		window_corner:ClearChildren()
+		DisposeSelectionDisplay()
 		if not options.alwaysShowSelectionWin.value then
 			screen0:RemoveChild(real_window_corner)
 		else
@@ -2451,6 +2473,6 @@ stacktrace:
 	[string "-- $Id: camain.lua 3171 2008-11-06 09:06:29..."]:103
 Removed widget: Chili Selections & CursorTip
 --Note: line number may be different due to local widget tweak (adding echo and stuff).
---Note2: "2435" is identified to be the button name. Most likely unitID
+--Note2: "2435" is identified to be the button name. Is unitID, is not dead unit, is most likely not selected.
 --Note3: from chat, [LCC]jk says same error can happen when an element is disposed first before it have chance to redrawn/resize at next Update() cycle. So,does object is recommended to be unlink dependencies first (ClearChildren) before(RemoveChild)???
 --]]
