@@ -3,9 +3,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.364 Integral Command Menu",
+    desc      = "v0.363 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
-    date      = "12.10.2010", --26.November.2013
+    date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
     layer     = math.huge-1,
     enabled   = true,
@@ -111,10 +111,6 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth     = Spring.GetUnitHealth
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
 local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
-local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetGameSeconds    = Spring.GetGameSeconds
-local spGetUnitWeaponState 	= Spring.GetUnitWeaponState
-local spGetGameFrame 		= Spring.GetGameFrame
 
 local push        = table.insert
 
@@ -186,6 +182,7 @@ end
 
 AddHotkeyOptions()
 
+
 local MAX_COLUMNS = 6
 local MAX_STATE_ROWS = 5
 local MIN_HEIGHT = 80
@@ -252,12 +249,6 @@ local gridMap = {
 	},
 }
 
--- DGun button progressbar, for listening to special-weapon reload progress
-local reverseCompat = Game.version:find('91.') and 1 or 0
-local secondPerGameFrame = 1/30 --constant for calculating weapon reload time.
-local spellReloadList = {}
-local cachedSpellProgressBar = {}
-
 -- Chili classes
 local Chili
 local Button
@@ -322,6 +313,7 @@ local cmdColors = {}
 -- default config
 local config = {
 }
+
 
 ------------------------
 --  FUNCTIONS
@@ -1193,65 +1185,8 @@ local function updateTabName(num, choice)
 	end
 end
 
---this function listen to gadget broadcasting spell reload information
-local function SpellListener(unitID,spellID,gameSecond,reloadTime)
-	--NOTE: 
-	--SpellListener listen from unit_oneclick_weapon.lua about any spellID being casted. spellID is cmdID.(origin ZK-Dota)
-	--and store information in spellReloadList[]
-	--cachedSpellProgressBar[] store progressbar made for each spellID
-	
-	spellReloadList[unitID] = spellReloadList[unitID] or {}
-	spellReloadList[unitID][spellID] = {gameSecond, reloadTime}
-
-	--create new progress bar
-	if not cachedSpellProgressBar[spellID] then
-		local spellProgress = Progressbar:New{
-				value = 0.0,
-				name    = 'spellprog';
-				max     = 1;
-				color   		= {0.7, 0.7, 0.4, 0.6},
-				backgroundColor = {1, 1, 1, 0.01},
-				width = "92%",
-				height = "92%",
-				x = "4%",
-				y = "4%",
-				skin=nil,
-				skinName='default',
-			}
-		cachedSpellProgressBar[spellID] = {spellProgress,attached=false,reseted=true}
-	end
-end
-
---get reload status for selected weapon
-local function GetWeaponReloadStatus(unitID, weapNum)
-	local unitDefID = spGetUnitDefID(unitID)
-	local unitDef = UnitDefs[unitDefID]
-	local weaponNoX = (unitDef and unitDef.weapons and unitDef.weapons[weapNum]) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
-	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
-		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
-		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum-reverseCompat) --select weapon no.X
-		local currentFrame, _ = spGetGameFrame() 
-		-- local secondPerGameFrame = 1/30
-		local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
-		local reloadFraction =1 - remainingTime/reloadTime
-		return reloadFraction, remainingTime
-	end
-	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
-end
-
---catch DGUN fire event
-function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
-	if cmdID == CMD.MANUALFIRE then
-		local reloadFraction, remainingTime = GetWeaponReloadStatus(unitID,3)  --select weapon no.3 (slot 3 is by ZK convention is usually used for user controlled weapon)
-		if reloadFraction and reloadFraction < 0.90 then
-			SpellListener(unitID,CMD.MANUALFIRE,spGetGameSeconds(),remainingTime)
-		end
-	end
-end
-
 -- INITS 
 function widget:Initialize()
-	widgetHandler:RegisterGlobal(widget,'SpellListener', SpellListener) --Catch ONECLICKWEAPON fire event. Note: we have 3 argument (1:widget,2:name,3:function name) because this widget is a handler
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
 	Spring.ForceLayoutUpdate()
 	
@@ -1517,7 +1452,6 @@ function widget:Update()
 	end
 end
 
---This function update construction progress bar and weapon reload progress bar
 function widget:GameFrame(n)
 	--set progress bar
 	if n%6 == 0 then
@@ -1528,70 +1462,6 @@ function widget:GameFrame(n)
 				progress = select(5, spGetUnitHealth(unitBuildID))
 			end
 			buildProgress:SetValue(progress or 0)
-		end
-	end
-	--update/set dgun progress bar
-	if n%7==0 then
-		--NOTE: 
-		--spell reloadtime is in second, so we use second instead of frame
-		--commandButtons[] contain buttons for ALL commandID, we will access this to tweak image color and attach spell progressbar 
-		--basically, 
-		--1) spellReloadList[] store (temporary) reload information, 
-		--2) cachedSpellProgressBar[] store (permanent) progressbar for each spellID,
-		--3) commandButtons[] store permanent button for all commandID
-		--we tweak commandButtons[], attach progressbar, and tweak values based on spellReloadList[]
-		
-		--add & update progressbar to buttons for spells
-		local currentTime = spGetGameSeconds()
-		local processedSpell = {} --in case 2 unit have same spells, only do 1
-		local selectedUnitList = spGetSelectedUnits()
-		for i=1, #selectedUnitList do
-			local unitID = selectedUnitList[i]
-			if spellReloadList[unitID] then
-				local howMuchSpell = 0
-				for spellID, reloadInfo in pairs(spellReloadList[unitID])do
-					howMuchSpell=howMuchSpell+1 --count spells with reload
-					if not processedSpell[spellID] then
-						if not cachedSpellProgressBar[spellID].attached and commandButtons[spellID] then
-							local spellProgress = cachedSpellProgressBar[spellID][1]
-							commandButtons[spellID].image:AddChild(spellProgress) --attach spellProgressbar to button
-							cachedSpellProgressBar[spellID].attached = true
-						end
-						if cachedSpellProgressBar[spellID].attached then
-							local spellProgress = cachedSpellProgressBar[spellID][1]
-							local initialSecond = reloadInfo[1]
-							local reloadPeriod = reloadInfo[2]
-							local fraction = (currentTime-initialSecond) / reloadPeriod
-							if fraction >= 0.99 then
-								fraction = 0 --reset spell progressbar
-								spellReloadList[unitID][spellID] = nil --expired
-								commandButtons[spellID].image.color = {1, 1, 1, 1} --reset button color
-								commandButtons[spellID].image:Invalidate()
-								cachedSpellProgressBar[spellID].reseted = true
-							elseif cachedSpellProgressBar[spellID].reseted then
-								commandButtons[spellID].image.color = {0.5, 0.5, 0.5, 1}
-								commandButtons[spellID].image:Invalidate()
-								cachedSpellProgressBar[spellID].reseted = false
-							end
-							spellProgress:SetValue(fraction)
-						end
-						processedSpell[spellID] = true
-					end
-				end
-				if howMuchSpell==0 then
-					spellReloadList[unitID] = nil --expired
-				end
-			end
-		end
-		--reset unused progress bar
-		for spellID, progressBarStuff in pairs(cachedSpellProgressBar) do
-			if not processedSpell[spellID] and not cachedSpellProgressBar[spellID].reseted then
-				local spellProgress = progressBarStuff[1]
-				spellProgress:SetValue(0)  --reset spell progressbar
-				commandButtons[spellID].image.color = {1, 1, 1, 1}  --reset button color
-				commandButtons[spellID].image:Invalidate()
-				cachedSpellProgressBar[spellID].reseted = true
-			end
 		end
 	end
 end

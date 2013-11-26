@@ -1,11 +1,11 @@
 function gadget:GetInfo() return {
-	name    = "Dont load Smurfboards",
-	desc    = "Prevents awesomeness",
+	name    = "Conditional Transportability",
+	desc    = "Allows units to only be transportable in some situations.",
 	author  = "sprung",
 	date    = "17/11/13",
 	license = "PD",
 	layer   = 0,
-	enabled = true
+	enabled = false
 } end
 
 if (not gadgetHandler:IsSyncedCode()) then return end

@@ -8,7 +8,7 @@ function gadget:GetInfo()
     name      = "One Click Weapon",
     desc      = "Handles one-click weapon attacks like hoof stomp",
     author    = "KingRaptor",
-    date      = "20 Aug 2011", --Recent changes: 26 Nov 2013
+    date      = "20 Aug 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true --  loaded by default?
@@ -125,7 +125,6 @@ local function doTheCommand(unitID, unitDefID, num)
 				local reloadFrameVal = frame + data.reloadTime
 				Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, {inlos = true})
 			end
-			SendToUnsynced("SpellReloadEvent",unitID,CMD_ONECLICK_WEAPON,nil,data.reloadTime) --tell widget about Spell reloading
 			return true
 		end
 	end
@@ -165,22 +164,10 @@ else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
-	local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
-	local myAllyTeamID = Spring.GetMyAllyTeamID()
-	
-	function WrapToLuaUI(_,unitID,spellID,gameSecond,reloadTime)
-		if (Script.LuaUI('SpellListener')) then
-			if spGetUnitAllyTeam(unitID) == myAllyTeamID then --security check
-				Script.LuaUI.SpellListener(unitID,spellID,Spring.GetGameSeconds(),reloadTime/30)
-			end
-		end
-	end
-	
-	function gadget:Initialize()
-		gadgetHandler:AddSyncAction('SpellReloadEvent',WrapToLuaUI)
-		gadgetHandler:RegisterCMDID(CMD_ONECLICK_WEAPON)
-		Spring.SetCustomCommandDrawData(CMD_ONECLICK_WEAPON, "dgun", {1, 1, 1, 0.7})
-		Spring.AssignMouseCursor("oneclickwep", "cursordgun", true, true)
-	end
+function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_ONECLICK_WEAPON)
+	Spring.SetCustomCommandDrawData(CMD_ONECLICK_WEAPON, "dgun", {1, 1, 1, 0.7})
+	Spring.AssignMouseCursor("oneclickwep", "cursordgun", true, true)
+end
 
 end
