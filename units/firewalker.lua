@@ -85,6 +85,7 @@ unitDef = {
 	  avoidFeature            = false,
       craterBoost             = 1,
       craterMult              = 2,
+      cegTag                  = [[flamer]],
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
