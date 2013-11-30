@@ -129,10 +129,10 @@ unitDef = {
       soundHit                = [[weapon/missile/vlaunch_hit]],
       soundStart              = [[weapon/missile/missile_launch]],
       startsmoke              = [[1]],
-      startVelocity 		  = 0,
+      startVelocity           = 0,
       tolerance               = 4000,
-      turnRate				  = 65536, --in cau. --Note, how to set turn radius: needed_turnRate = desired_turn_radius/(speed_during_turning*radian_per_cau)   --radian_per_cau = 2*pi/65536 --Reference: http://en.wikipedia.org/wiki/Circular_motion#Velocity
-      tracks 				  = false,
+      turnRate                = 65536, --in cau. --Note, how to set turn radius: needed_turnRate = desired_turn_radius/(speed_during_turning*radian_per_cau)   --radian_per_cau = 2*pi/65536 --Reference: http://en.wikipedia.org/wiki/Circular_motion#Velocity
+      tracks                  = false,
       weaponAcceleration      = 315, --elmo/s per second
       weaponTimer             = 2, --elapsed second before turning.
       weaponType              = [[StarburstLauncher]],
