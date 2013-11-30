@@ -53,6 +53,7 @@ unitDef = {
   sonarDistance       = 600,
   turninplace         = 0,
   turnRate            = 480,
+  waterline           = 4,
   workerTime          = 0,
 
   weapons             = {
