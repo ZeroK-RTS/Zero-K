@@ -1,4 +1,4 @@
-local version = "v0.832"
+local version = "v0.833"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -536,8 +536,9 @@ function ConvertCMDToMOVE(command)
 	or command.id == CMD.REPAIR
 	or command.id == CMD.GUARD
 	or command.id == CMD.RESSURECT then
-		if not command.params[4] or command.params[5] then --if not area-command or the 2nd part of area-command (1st part have radius at 4th-param, 2nd part have unitID/featureID at 1st-param and radius at 5th-param)
-			if not command.params[2] then
+		local isPossible2PartAreaCmd = command.params[5]
+		if not command.params[4] or isPossible2PartAreaCmd then --if not area-command or is the 2nd part of area-command (1st part have radius at 4th-param, 2nd part have unitID/featureID at 1st-param and radius at 5th-param)
+			if not command.params[2] or isPossible2PartAreaCmd then
 				local x,y,z
 				if command.id == CMD.REPAIR or command.id == CMD.GUARD then
 					if spValidUnitID(command.params[1]) then
@@ -548,6 +549,8 @@ function ConvertCMDToMOVE(command)
 				elseif command.id == CMD.RECLAIM or command.id == CMD.RESSURECT then
 					if spValidFeatureID(command.params[1]) then
 						x,y,z = spGetFeaturePosition(command.params[1])
+					elseif spValidFeatureID(command.params[1]-Game.maxUnits) then --featureID is always offset by maxunit count
+						x,y,z = spGetFeaturePosition(command.params[1]-Game.maxUnits)
 					elseif spValidUnitID(command.params[1]) then
 						x,y,z = spGetUnitPosition(command.params[1])
 					end

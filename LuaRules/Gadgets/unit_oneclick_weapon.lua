@@ -124,6 +124,7 @@ local function doTheCommand(unitID, unitDefID, num)
 			if (data.reloadTime and data.useSpecialReloadFrame) then
 				local reloadFrameVal = frame + data.reloadTime
 				Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, {inlos = true})
+				Spring.SetUnitRulesParam(unitID, "specialReloadStart", frame, {inlos = true})
 			end
 			return true
 		end

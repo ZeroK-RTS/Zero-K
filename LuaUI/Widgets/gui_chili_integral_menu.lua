@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.363 Integral Command Menu",
+    desc      = "v0.364 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
@@ -111,6 +111,10 @@ local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth     = Spring.GetUnitHealth
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
 local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
+local spGetSelectedUnits = Spring.GetSelectedUnits
+local spGetUnitWeaponState 	= Spring.GetUnitWeaponState
+local spGetGameFrame 		= Spring.GetGameFrame
+local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 
 local push        = table.insert
 
@@ -248,6 +252,11 @@ local gridMap = {
 		[6] = "N",
 	},
 }
+
+-- DGun button progressbar, for listening to special-weapon reload progress
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+local reverseCompat = Game.version:find('91.') and 1 or 0
+local turnOffReloadableWeaponChecks = false
 
 -- Chili classes
 local Chili
@@ -1185,6 +1194,18 @@ local function updateTabName(num, choice)
 	end
 end
 
+--get reload status for selected weapon
+local function IsWeaponManualFire(unitID, weapNum)
+	local unitDefID = spGetUnitDefID(unitID)
+	local unitDef = UnitDefs[unitDefID]
+	local weaponNoX = (unitDef and unitDef.weapons and unitDef.weapons[weapNum])
+	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
+		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
+		return true,reloadTime
+	end
+	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
+end
+
 -- INITS 
 function widget:Initialize()
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
@@ -1452,6 +1473,7 @@ function widget:Update()
 	end
 end
 
+--This function update construction progress bar and weapon reload progress bar
 function widget:GameFrame(n)
 	--set progress bar
 	if n%6 == 0 then
@@ -1464,9 +1486,125 @@ function widget:GameFrame(n)
 			buildProgress:SetValue(progress or 0)
 		end
 	end
+	--update/set dgun progress bar
+	if n%7==0 and not turnOffReloadableWeaponChecks then --every 1/4 second & was not sleeping
+		local oneclickweapon = nil
+		local oneclickweaponProgress = 0
+		local manualfireweapon = nil
+		local manualfireweaponProgress = 0
+		local jump = nil
+		local jumpProgress = 0
+		local selectedUnitList = spGetSelectedUnits()
+		local currentFrame = spGetGameFrame()
+		for i=1, #selectedUnitList do
+			local unitID = selectedUnitList[i]
+			if not manualfireweapon then
+				local _,_, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, 3-reverseCompat) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+				local isManualFire, reloadTime = IsWeaponManualFire(unitID, 3)
+				if isManualFire then
+					if weaponReloadFrame > currentFrame then
+						manualfireweapon = false
+						local remainingTime = (weaponReloadFrame - currentFrame)*1/30
+						local reloadFraction =1 - remainingTime/reloadTime
+						if manualfireweaponProgress < reloadFraction then
+							manualfireweaponProgress = reloadFraction
+						end
+					else
+						manualfireweapon = true
+					end
+				end
+			end
+			if not oneclickweapon then
+				local specialReloadFrame = spGetUnitRulesParam(unitID,"specialReloadFrame")
+				local specialReloadStart = spGetUnitRulesParam(unitID,"specialReloadStart")
+				if specialReloadFrame then
+					if specialReloadFrame > currentFrame then
+						oneclickweapon = false
+						if specialReloadStart then
+							local reloadTime = specialReloadFrame - specialReloadStart
+							local remainingTime = (specialReloadFrame - currentFrame)
+							local reloadFraction =1 - remainingTime/reloadTime
+							if oneclickweaponProgress < reloadFraction then
+								oneclickweaponProgress = reloadFraction 
+							end
+						end
+					else
+						oneclickweapon = true
+					end
+				end
+			end
+			if not jump then
+				local jumpReload = spGetUnitRulesParam(unitID,"jumpReload")
+				if jumpReload then
+					if jumpReload < 0.95 then
+						jump = false
+						if jumpProgress < jumpReload then
+							jumpProgress = jumpReload 
+						end
+					else
+						jump = true
+					end
+				end
+			end	
+		end
+		if manualfireweapon == true then
+			commandButtons[CMD.MANUALFIRE].image.color = {1, 1, 1, 1}
+			commandButtons[CMD.MANUALFIRE].image:Invalidate()
+		elseif manualfireweapon == false then
+			manualfireweaponProgress = manualfireweaponProgress*0.7
+			local grey = 0.3+ manualfireweaponProgress
+			commandButtons[CMD.MANUALFIRE].image.color = {grey, grey, grey, 1}
+			commandButtons[CMD.MANUALFIRE].image:Invalidate()
+		end		
+		
+		if oneclickweapon == true then
+			commandButtons[CMD_ONECLICK_WEAPON].image.color = {1, 1, 1, 1}
+			commandButtons[CMD_ONECLICK_WEAPON].image:Invalidate()
+		elseif oneclickweapon == false then
+			oneclickweaponProgress = oneclickweaponProgress*0.7
+			local grey = 0.3+oneclickweaponProgress
+			commandButtons[CMD_ONECLICK_WEAPON].image.color = {grey, grey, grey, 1}
+			commandButtons[CMD_ONECLICK_WEAPON].image:Invalidate()
+		end
+		
+		if jump == true then
+			commandButtons[CMD_JUMP].image.color = {1, 1, 1, 1}
+			commandButtons[CMD_JUMP].image:Invalidate()
+		elseif jump == false then
+			jumpProgress = jumpProgress*0.7
+			local grey = 0.3+jumpProgress
+			commandButtons[CMD_JUMP].image.color = {grey, grey, grey, 1}
+			commandButtons[CMD_JUMP].image:Invalidate()
+		end
+		
+		if jump == nil and oneclickweapon==nil and manualfireweapon==nil then 
+			turnOffReloadableWeaponChecks = true --be efficient, turn off check if no reload state detected
+		end
+	end
+end
+
+function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
+	if cmdID == CMD.MANUALFIRE or cmdID == CMD_JUMP or cmdID == CMD_ONECLICK_WEAPON then
+		turnOffReloadableWeaponChecks = false --wake up reload state checking, in case some new unit activated a reload state
+	end
 end
 
 function widget:SelectionChanged(newSelection)
+	--reset reloadable weapon button (newly created unit doesn't have reload state, if user select this unit it need to reset to default value first)
+	if commandButtons[CMD.MANUALFIRE] then
+		commandButtons[CMD.MANUALFIRE].image.color = {1, 1, 1, 1}
+		commandButtons[CMD.MANUALFIRE].image:Invalidate()
+	end		
+	if commandButtons[CMD_ONECLICK_WEAPON] then
+		commandButtons[CMD_ONECLICK_WEAPON].image.color = {1, 1, 1, 1}
+		commandButtons[CMD_ONECLICK_WEAPON].image:Invalidate()
+	end
+	if commandButtons[CMD_JUMP] then
+		commandButtons[CMD_JUMP].image.color = {1, 1, 1, 1}
+		commandButtons[CMD_JUMP].image:Invalidate()
+	end
+	turnOffReloadableWeaponChecks = false;
+	
 	--get new selected fac, if any
 	for i=1,#newSelection do
 		local id = newSelection[i]
