@@ -312,6 +312,7 @@ unitDef = {
       soundHit                = [[weapon/missile/vlaunch_hit]],
       soundStart              = [[weapon/missile/missile_launch]],
       startsmoke              = [[1]],
+      turnrate                = 18000,
       weaponAcceleration      = 245,
       weaponTimer             = 2,
       weaponType              = [[StarburstLauncher]],

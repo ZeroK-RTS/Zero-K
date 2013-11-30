@@ -153,6 +153,7 @@ unitDef = {
       stockpile               = true,
       stockpileTime           = 10^5,
       tolerance               = 4000,
+      turnrate                = 18000,
       twoPhase                = true,
       vlaunch                 = true,
       waterWeapon             = true,

@@ -117,6 +117,7 @@ unitDef = {
       startsmoke              = [[1]],
       tolerance               = 4000,
       twoPhase                = true,
+      turnrate                = 18000,
       vlaunch                 = true,
       weaponAcceleration      = 180,
       weaponTimer             = 3,

@@ -134,6 +134,7 @@ unitDef = {
       soundStart              = [[weapon/missile/missile_launch]],
       startsmoke              = [[1]],
       tolerance               = 4000,
+      turnrate                = 18000,
       twoPhase                = true,
       vlaunch                 = true,
       weaponAcceleration      = 355,
