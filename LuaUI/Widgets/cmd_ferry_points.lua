@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Ferry Points",
-    desc      = "Allows the creation of ferry routes that can have transports and units assigned to them",
+    desc      = "Allow the creation of ferry routes for transports. Move transports and units to route entrance to assign them to the ferry route.",
     author    = "Google Frog",
     date      = "24 Nov 2010",
     license   = "GNU GPL, v2 or later",

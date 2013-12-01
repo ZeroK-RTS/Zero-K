@@ -1,4 +1,4 @@
-local versionNum = '0.304'
+local versionNum = '0.305'
 
 function widget:GetInfo()
 	return {
@@ -42,6 +42,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 --local ech = Spring.Echo
 
 local CMD_NEWTON_FIREZONE = 10283
+local CMD_STOP_NEWTON_FIREZONE = 10284
 
 local floor = math.floor
 
@@ -74,11 +75,22 @@ local currentFrame = Spring.GetGameFrame()
 local cmdFirezone = {
 	id      = CMD_NEWTON_FIREZONE,
 	type    = CMDTYPE.ICON_UNIT_OR_RECTANGLE,
-	tooltip = 'Set a Newton firezone. Newtons will fire at all units in the area (including allied).',
+	tooltip = 'Set a Newton firezone. Newtons will fire at all units in the area (including allies).',
 	cursor  = 'Attack',
 	action  = 'setfirezone',
 	params  = { }, 
 	texture = 'LuaUI/Images/commands/Bold/capture.png',
+	params  = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
+}
+
+local cmdStopFirezone = {
+	id      = CMD_STOP_NEWTON_FIREZONE,
+	type    = CMDTYPE.ICON ,
+	tooltip = 'Disasociate Newton from current firezone.',
+	cursor  = 'Stop',
+	action  = 'closefirezone',
+	params  = { }, 
+	texture = 'LuaUI/Images/commands/Bold/stop.png',
 	params  = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
 }
 
@@ -241,7 +253,7 @@ function widget:CommandNotify(cmdID, params, options)
 			NewGroup(points)
 			
 			softEnabled = true
-		elseif cmdID == CMD.STOP or cmdID == CMD.ATTACK then
+		elseif (cmdID == CMD_STOP_NEWTON_FIREZONE) then
 			RemoveDeadGroups(selectedNewtons)
 		end
 	end
@@ -272,6 +284,7 @@ function widget:CommandsChanged()
 	if selectedNewtons then
 		local customCommands = widgetHandler.customCommands
 		customCommands[#customCommands+1] = cmdFirezone
+		customCommands[#customCommands+1] = cmdStopFirezone
 	end
 end
 
