@@ -57,7 +57,12 @@ end
 local font = gl.LoadFont("FreeSansBold.otf", 50, 20, 1.95)
 
 function addon.DrawLoadScreen()
-	local loadProgress = lastProgress or SG.GetLoadProgress()
+	local loadProgress = SG.GetLoadProgress()
+	if loadProgress == 0 then
+		loadProgress = lastProgress
+	else
+		loadProgress = math.min(lastProgress, loadProgress)
+	end
 
 	local vsx, vsy = gl.GetViewSizes()
 
@@ -194,11 +199,12 @@ function addon.DrawLoadScreen()
 
 	--font:Print(lastLoadMessage, vsx * 0.5, vsy * 0.3, 50, "sc")
 	--font:Print(Game.gameName, vsx * 0.5, vsy * 0.95, vsy * 0.07, "sca")
-	font:Print(lastLoadMessage, vsx * 0.2, vsy * 0.14, barTextSize*0.5, "sa")
+	--font:Print(lastLoadMessage, vsx * 0.2, vsy * 0.14, barTextSize*0.5, "sa")
+	font:Print(lastLoadMessage, vsx * 0.5, vsy * 0.12, barTextSize*0.8, "oc")
 	if loadProgress>0 then
-		--font:Print(("%.0f%%"):format(loadProgress * 100), vsx * 0.5, vsy * 0.165, barTextSize, "oc")
+		font:Print(("%.0f%%"):format(loadProgress * 100), vsx * 0.5, vsy * 0.165, barTextSize, "oc")
 	else
-		--font:Print("Loading...", vsx * 0.5, vsy * 0.165, barTextSize, "oc")
+		font:Print("Loading...", vsx * 0.5, vsy * 0.165, barTextSize, "oc")
 	end
 	gl.PopMatrix()
 end
