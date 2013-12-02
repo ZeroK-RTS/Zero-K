@@ -76,11 +76,11 @@ local function BuildPose(heading, pitch)
 	Turn( luparm , z_axis, math.rad(-10), math.rad(250) )
 	
 	Turn( larm , x_axis, math.rad(5), math.rad(250) )
-	Turn( larm , y_axis, math.rad(-30), math.rad(250) )
-	Turn( larm , z_axis, math.rad(-26), math.rad(250) )
+	Turn( larm , y_axis, math.rad(30), math.rad(250) )
+	Turn( larm , z_axis, math.rad(-5), math.rad(250) )
 	
 	Turn( lloarm , y_axis, math.rad(-37), math.rad(250) )
-	Turn( lloarm , z_axis, math.rad(-152), math.rad(450) )
+	Turn( lloarm , z_axis, math.rad(-75), math.rad(450) )
 	Turn( gunpod , y_axis, math.rad(90), math.rad(350) )
 	
 	Turn( turret , y_axis, heading, math.rad(350) )
