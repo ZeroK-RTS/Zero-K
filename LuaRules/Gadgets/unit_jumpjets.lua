@@ -173,6 +173,34 @@ local function ReloadQueue(unitID, queue, cmdTag)
 	
 end
 
+local function CopyJumpData(unitID,lineDist,flightDist )
+	local oldUnitID = unitID --previous unitID
+	unitID = GG.wasMorphedTo[unitID] --new unitID. NOTE: UnitDestroyed() already updated jumping & lastJump table with new value
+	local unitDefID = spGetUnitDefID(unitID)
+	if (not jumpDefs[unitDefID]) then --check if new unit can jump
+		jumping[unitID] = nil
+		lastJump[unitID] = nil
+		return --exit JumpLoop() if unit can't jump
+	end
+	local cob = jumpDefs[unitDefID].cobscript --script type 
+	local speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
+	local reloadTime = (jumpDefs[unitDefID].reload or 0)*30 --jump reload time
+	local env
+	if not cob then
+		env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
+	end
+	local step = speed/lineDist --resolution of JumpLoop() update
+	mcEnable(unitID) --enable MoveCtrl for new unit
+	SetLeaveTracks(unitID, false) --set no track
+	spSetUnitRulesParam(unitID,"jumpReload",0)
+	
+	local rotateMidAir = jumpDefs[unitDefID].rotateMidAir --unit rotate to face new direction?
+	local delay = jumpDefs[unitDefID].delay --prejump delay
+	local height = jumpDefs[unitDefID].height --max height
+	
+	return unitID,reloadTime,env,cob,speed,step,rotateMidAir,delay,height
+end
+
 local function Jump(unitID, goal, cmdTag)
 	goal[2]						 = spGetGroundHeight(goal[1],goal[3])
 	local start				 = {spGetUnitBasePosition(unitID)}
@@ -268,27 +296,10 @@ local function Jump(unitID, goal, cmdTag)
 			for i=delay, 1, -1 do
 				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 				if GG.wasMorphedTo[unitID] then
-					local oldUnitID = unitID --previous unitID
-					unitID = GG.wasMorphedTo[unitID] --new unitID. NOTE: UnitDestroyed() already updated jumping & lastJump table with new value
-					local unitDefID = spGetUnitDefID(unitID)
-					if (not jumpDefs[unitDefID]) then --check if new unit can jump
-						jumping[unitID] = nil
-						lastJump[unitID] = nil
-						return --exit JumpLoop() if unit can't jump
+					unitID,reloadTime,env,cob,speed,step,rotateMidAir,delay,height = CopyJumpData(unitID,lineDist,flightDist )
+					if unitID == nil then 
+						return
 					end
-					cob = jumpDefs[unitDefID].cobscript --script type
-					rotateMidAir = jumpDefs[unitDefID].rotateMidAir --unit rotate to face new direction?
-					delay = jumpDefs[unitDefID].delay --prejump delay
-					speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
-					height = jumpDefs[unitDefID].height --max height
-					reloadTime = (jumpDefs[unitDefID].reload or 0)*30 --jump reload time
-					if not cob then
-						env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
-					end
-					step = speed/lineDist --resolution of JumpLoop() update
-					mcEnable(unitID) --enable MoveCtrl for new unit
-					SetLeaveTracks(unitID, false) --set no track
-					spSetUnitRulesParam(unitID,"jumpReload",0)
 				end			
 				Sleep()
 			end
@@ -318,30 +329,16 @@ local function Jump(unitID, goal, cmdTag)
 		while i <= 1 do
 			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 			if GG.wasMorphedTo[unitID] then
-				local oldUnitID = unitID
-				unitID = GG.wasMorphedTo[unitID]
-				local unitDefID = spGetUnitDefID(unitID)
-				if (not jumpDefs[unitDefID]) then
-					jumping[unitID] = nil
-					lastJump[unitID] = nil
+				unitID,reloadTime,env,cob,speed,step = CopyJumpData(unitID,lineDist,flightDist )
+				if unitID == nil then 
 					return
 				end
-				cob = jumpDefs[unitDefID].cobscript
-				speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
-				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
-				if not cob then
-					env = Spring.UnitScript.GetScriptEnv(unitID)
-				end
-				step = speed/lineDist --resolution of JumpLoop() update
-				mcEnable(unitID)
-				SetLeaveTracks(unitID, false)
 				halfJump = nil --reset halfjump flag. Redo halfjump script for new unit
 				if rotateMidAir then
 					local h = spGetUnitHeading(unitID)
 					mcSetRotation(unitID, 0, h/rotUnit, 0) -- keep current heading
 					mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0) --resume unit rotation mid air
 				end
-				spSetUnitRulesParam(unitID,"jumpReload",0)
 			end
 			if ((not spGetUnitTeam(unitID)) and fakeUnitID) then
 				spDestroyUnit(fakeUnitID, false, true)
@@ -394,20 +391,20 @@ local function Jump(unitID, goal, cmdTag)
 		mcDisable(unitID)
 	
 		--mcSetPosition(unitID, start[1] + vector[1],start[2] + vector[2]-6,start[3] + vector[3])
-		local oldQueue = spGetCommandQueue(unitID)
+		-- local oldQueue = spGetCommandQueue(unitID)
+		-- ReloadQueue(unitID, oldQueue, cmdTag)
 	
-		ReloadQueue(unitID, oldQueue, cmdTag)
-	
+		spSetUnitRulesParam(unitID,"jumpReloadStart",jumpEndTime)
 		for j=1, reloadTime do
 			if GG.wasMorphedTo[unitID] then
-				local oldUnitID = unitID
-				unitID = GG.wasMorphedTo[unitID]
-				if (not jumpDefs[unitDefID]) then --check if new unit can jump
-					jumping[unitID] = nil
-					lastJump[unitID] = nil
-					break
+				unitID,reloadTime = CopyJumpData(unitID,lineDist,flightDist )
+				lastJump[unitID] = jumpEndTime
+				jumping[unitID] = false
+				SetLeaveTracks(unitID, true)
+				mcDisable(unitID)
+				if unitID == nil then 
+					return
 				end
-				reloadTime = (jumpDefs[unitDefID].reload or 0)*30
 			end
 			spSetUnitRulesParam(unitID,"jumpReload",j/reloadTime)
 			Sleep()
@@ -525,15 +522,20 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 
 	if (jumping[unitID]) then
-		return true, false -- command was used but don't remove it
+		return true, false -- command was used but don't remove it (unit is still jumping)
 	end
 
+	local t = spGetGameSeconds()
+
+	if lastJump[unitID] and lastJump[unitID]+1 >= t then
+		return true, true -- command was used, remove it (unit finished jump)
+	end
+	
 	local x, y, z = spGetUnitBasePosition(unitID)
 	local distSqr = GetDist2Sqr({x, y, z}, cmdParams)
 	local jumpDef = jumpDefs[unitDefID]
 	local range   = jumpDef.range
 	local reload  = jumpDef.reload or 0
-	local t       = spGetGameSeconds()
 
 	if (distSqr < (range*range)) then
 		local cmdTag = spGetCommandQueue(unitID,1)[1].tag
@@ -546,30 +548,30 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				end
 			end
 			if (not jumps[coords]) then
-				local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
+				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag)
 				if not didJump then
-					return true, true -- command was used, don't remove it
+					return true, removeCommand -- command was used
 				end
 				jumps[coords] = {1, currFrame}
-				return true, keepCommand -- command was used, remove it 
+				return true, false -- command was used but don't remove it (unit have not finish jump yet)
 			elseif JumpSpreadException[unitDefID] then
-				local didJump, keepCommand = Jump(unitID, cmdParams, cmdTag)
+				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag)
 				if not didJump then
-					return true, true -- command was used, don't remove it
+					return true, removeCommand -- command was used
 				end
-				return true, keepCommand -- command was used, remove it 
+				return true, false -- command was used but don't remove it (unit have not finish jump yet)
 			else
 				local r = landBoxSize*jumps[coords][1]^0.5/2
 				local randpos = {
 					cmdParams[1] + random(-r, r),
 					cmdParams[2],
 					cmdParams[3] + random(-r, r)}
-				local didJump, keepCommand = Jump(unitID, randpos, cmdTag)
+				local didJump, removeCommand = Jump(unitID, randpos, cmdTag)
 				if not didJump then
-					return true, true -- command was used, don't remove it
+					return true, removeCommand -- command was used
 				end
 				jumps[coords][1] = jumps[coords][1] + 1
-				return true, keepCommand -- command was used, remove it 
+				return true, false -- command was used but don't remove it(unit have not finish jump yet)
 			end
 		end
 	else
