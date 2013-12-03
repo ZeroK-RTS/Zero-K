@@ -17,7 +17,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Felon draws energy from its shield, discharging it in accurate bursts. Link it to other shields to increase its rate of fire.]],
+    helptext       = [[The Felon draws energy from its shield, discharging it in rapid, accurate bursts. Link it to other shields to increase its rate of fire.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -117,7 +117,7 @@ unitDef = {
       intensity               = 6,
       interceptedByShieldType = 1,
       range                   = 430,
-      reloadtime              = 0.15,
+      reloadtime              = 0.2,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,
