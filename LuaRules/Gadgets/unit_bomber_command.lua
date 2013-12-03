@@ -337,10 +337,13 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 	end
 end
 
-function gadget:AllowUnitTransfer(unitID, unitDefID, oldteam, newteam)
+-- bear in mind that UnitGiven is called before UnitTaken
+function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
 	gadget:UnitDestroyed(unitID, unitDefID, oldteam)
-	gadget:UnitFinished(unitID, unitDefID, newteam)
-	return true
+end
+
+function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+	gadget:UnitFinished(unitID, unitDefID, newTeam)
 end
 
 function gadget:GameFrame(n)
