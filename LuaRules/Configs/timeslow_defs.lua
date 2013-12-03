@@ -27,6 +27,7 @@ local weapons = {
 	chicken_spidermonkey_web = { slowDamage = 30, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	amphfloater_cannon = { slowDamage = 250, scaleSlow = true},
 	corsumo_disruptor = { slowDamage = 500, scaleSlow = true },
+	vehdisable_disableray = { slowDamage = 30, scaleSlow = false },
 }
 
 -- reads from customParams and copies to weapons as appropriate - needed for procedurally generated comms
