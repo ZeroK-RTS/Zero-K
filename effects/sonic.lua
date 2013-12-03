@@ -1,4 +1,8 @@
-return {
+Spring = Spring or {}
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
+
+local fx = {
  ['sonic'] = {
     groundflash = {
       air                = false,
@@ -68,7 +72,7 @@ return {
         heat               = 18,
         heatfalloff        = 0.6,
         maxheat            = 15,
-        pos                = [[r10,r10,r10]],
+        pos                = [[-5 r10, -5 r10, -5 r10]],
         size               = 3,
         sizegrowth         = -0.01,
         speed              = [[0, 0, 0]],
@@ -87,7 +91,7 @@ return {
         heat               = 18,
         heatfalloff        = 0.4,
         maxheat            = 15,
-        pos                = [[r10,r10,r10]],
+        pos                = [[-5 r10, -5 r10, -5 r10]],
         size               = 3,
         sizegrowth         = 0.01,
         speed              = [[0, 0, 0]],
@@ -96,3 +100,26 @@ return {
     },
   },
 }
+
+local altforms = {
+  sonic_80 = {
+    source = "sonic",
+    modifications = {
+      groundflash = {
+	properties = {flashsize = 80},
+      },
+      expand = {
+	 properties = {size = 80, sizegrowth = 24},
+      },
+      contract = {
+	 properties = {size = 80, sizegrowth = -24},
+      }, 
+    },
+  },
+}
+
+for cegName, info in pairs(altforms) do
+  fx[cegName] = Spring.Utilities.MergeTable(info.modifications, fx[info.source], true)
+end
+
+return fx

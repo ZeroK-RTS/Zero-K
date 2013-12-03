@@ -62,7 +62,7 @@ return {
         size               = 0.2,
         sizegrowth         = 8,
         speed              = [[0, 0, 0]],
-        texture            = [[bluegreennovaexplo]],
+        texture            = [[greennovaexplo]],
       },
     },
     pop2 = {
