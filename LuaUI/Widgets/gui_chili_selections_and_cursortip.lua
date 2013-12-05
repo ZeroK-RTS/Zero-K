@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.091 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.092 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --18 October 2013
     license   = "GNU GPL, v2 or later",
@@ -56,6 +56,7 @@ local abs						= math.abs
 local strFormat 				= string.format
 
 include("keysym.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -691,7 +692,7 @@ local function GetUnitDesc(unitID, ud)
 		local endesc = ud.tooltip
 		
 		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc)
-		if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") then
+		if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
 			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. spGetGameRulesParam("WindMax")
 		end
 		return tooltip
@@ -2141,10 +2142,12 @@ function widget:Update(dt)
 													{{CMD.UNLOAD_UNITS, CMD.UNLOAD_UNIT}, "Unload", {0.6,0.6,0,1}},
 													{{CMD.RECLAIM}, "Reclaim",{0.6,0,0.4,1}},
 													{{CMD.RESURRECT},"Resurrect",{0.2,0,0.8,1}},
-													{{38521},"Jump",{0,0.8,0,1}},
-													{{32768},"Re-Arm",{0.2,0.8,1,1}},
-													{{35170},"Bridge",{0.6,0.6,0,1}},
-													{{35171},"Teleport",{0,0.6,0.6,1}},
+													{{CMD.MANUALFIRE},"DGun",{1,1,1,1}},
+													{{CMD_ONECLICK_WEAPON},"Special",{0.8,0.6,0.0,1}},
+													{{CMD_JUMP},"Jump",{0,0.8,0,1}},
+													{{CMD_REARM},"Re-Arm",{0.2,0.8,1,1}},
+													{{CMD_PLACE_BEACON},"Bridge",{0.6,0.6,0,1}},
+													{{CMD_WAIT_AT_BEACON},"Teleport",{0,0.6,0.6,1}},
 												}										
 							for i=1, #commandList, 1 do --iterate over the commandList so we could find a match with unit's current command.
 								if #commandList[i][1] == 1 then --if commandList don't have sub-table at first row
@@ -2164,7 +2167,7 @@ function widget:Update(dt)
 						end
 					end
 					local cmdLabel = itemImg.childrenByName['commandLabel']
-					if cmdLabel and cmdLabel.caption ~= commandName then --differing label?
+					if cmdLabel and cmdLabel.caption ~= commandName then --is differing label?
 						cmdLabel:Dispose(); --remove existing label and recreate chili element (to eliminate color bug)
 						cmdLabel = nil;
 					end
