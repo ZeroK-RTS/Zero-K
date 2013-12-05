@@ -57,7 +57,7 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[ARM]],
   sightDistance       = 660,
-  stealth             = true,
+  stealth             = false,
   turnRadius          = 100,
 
   weapons             = {

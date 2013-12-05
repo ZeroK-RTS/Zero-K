@@ -111,14 +111,14 @@ end
 
 function script.FireWeapon(num)
 	if num == 2 then
-		--GG.Bomber_Dive_fired(unitID)
+		GG.Bomber_Dive_fired(unitID)
 		Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
 		Move(drop, x_axis, 0)
 		Move(drop, z_axis, 0)
 		Move(drop, y_axis, 0)
 		Reload()
 	elseif num == 3 then
-		--GG.Bomber_Dive_fake_fired(unitID)
+		GG.Bomber_Dive_fake_fired(unitID)
 	end
 end
 

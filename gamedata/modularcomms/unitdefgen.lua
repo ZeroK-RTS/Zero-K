@@ -84,8 +84,8 @@ local function GenerateBasicComm()
 	def.buildcostenergy = 1250
 	def.buildtime = 1250
 
-	RemoveWeapons(def)
-	ApplyWeapon(def, "commweapon_sonicgun")
+	--RemoveWeapons(def)
+	--ApplyWeapon(def, "commweapon_sonicgun")
 
 	def.customparams.helptext = "The Commander Junior is a basic version of the popular Strike Commander platform, issued to new commanders. "
 			            .."While lacking the glory of its customizable brethren, the Commander Jr. remains an effective tool with full base-building and combat capabilites."

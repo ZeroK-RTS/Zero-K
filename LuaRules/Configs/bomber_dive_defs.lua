@@ -5,16 +5,16 @@ local unitArray = {}
 
 -- weapons to track
 local weapons = {
-	--corshad_shield_check = true,
+	corshad_shield_check = true,
 }
 
 -- bombers to track
 local units = {
-	--[[corshad = {
+	corshad = {
 		diveDamage = 600,
 		diveHeight = 80,
 		orgHeight = UnitDefNames["corshad"].wantedHeight*FUDGE_FACTOR,
-	},]]
+	},
 }
 
 for i=1,#WeaponDefs do
