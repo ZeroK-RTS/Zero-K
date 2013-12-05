@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by msafwan (impulsejump)",
-		date    = "May 14 2008, December 2 2013",
+		date    = "May 14 2008, December 5 2013",
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
 		enabled = isImpulseJump,
@@ -90,6 +90,7 @@ local jumping = {}
 local goalSet = {}
 local impulseQueue = {} --used by impulse jump to queue unit impulses outside coroutine. Note: Doing impulses inside coroutine cause Newton to be nonfunctional toward jumping unit.
 local unitCmdQueue = {} --only used in impulse jump. It remember command queue issued while unit is jumping. A workaround for an issue where unit automatically try to return to the place where they started jumping.
+local defFallGravity =Game.gravity/30/30
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -373,7 +374,7 @@ local function Jump(unitID, goal, cmdTag)
 			
 			local x,y,z =spGetUnitPosition(unitID)
 			do
-				if not jumped and y>=0 then
+				if not jumped and y>=0 then --not underwater
 					local grndh =spGetGroundHeight(x,z)
 					if y<=grndh+1 or y<=1 then
 						spSetUnitVelocity(unitID,0,0,0)  --thus its speed don't interfere with jumping (prevent range increase while running). Note; ground unit in flying mode wont be effected
@@ -385,21 +386,23 @@ local function Jump(unitID, goal, cmdTag)
 					jumped = true
 				end
 				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
+				local currFallSpeed = verticalLaunchVel - defFallGravity*(i) 
 				local vx,vy,vz= spGetUnitVelocity(unitID)
 				local collide = type(jumping[unitID])== 'number'
 				jumping[unitID] = true
-				local speedDiffer =desiredVerticalSpeed - vy --calculate correction
-				if collide and speedDiffer < 0 then --collide while going down
+				local jumpDiffer =desiredVerticalSpeed - vy --calculate correction
+				local nominalDiffer = currFallSpeed - vy
+				if collide and halfJump and nominalDiffer < 0 then --collide while going down
 					--spSetUnitVelocity(unitID,0,0,0) --stop unit
 					impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0}
 					impulseQueue[#impulseQueue+1] = {unitID, -vx*0.9, -vy*0.9-4, -vz*0.9} --slowdown to stop
 					break --jump aborted (skip to refreshing reload bar)
 				end
-				local sign = math.abs(speedDiffer)/speedDiffer
-				speedDiffer = sign*math.min(math.abs(speedDiffer),verticalLaunchVel) --cap maximum correction to launch impulse (safety against 'physic glitch': violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
+				local sign = math.abs(jumpDiffer)/jumpDiffer
+				jumpDiffer = sign*math.min(math.abs(jumpDiffer),verticalLaunchVel) --cap maximum correction to launch impulse (safety against 'physic glitch': violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
 				impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
-				impulseQueue[#impulseQueue+1] = {unitID, 0, speedDiffer-4, 0} --add correction impulse
-				----Spring.Echo("----"); speedProfile[#speedProfile+1]=vy; Spring.Echo(speedDiffer)
+				impulseQueue[#impulseQueue+1] = {unitID, 0, jumpDiffer-4, 0} --add correction impulse
+				----Spring.Echo("----"); speedProfile[#speedProfile+1]=vy; Spring.Echo(jumpDiffer)
 			end
 		
 			if rotateMidAir then -- allow unit to maintain posture in the air
@@ -490,7 +493,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if jumping[unitID] and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
 		jumping[unitID] = 1 --signal to jump loop that a collision is occurring (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
 		if GG.SetUnitFallDamgeImmunity then
-			GG.SetUnitFallDamgeImmunity(unitID, spGetGameFrame()+10) --this unit immune to unit-to-unit collision damage
+			GG.SetUnitFallDamgeImmunity(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
+		end
+		if GG.SetUnitFallDamgeImmunityFeature then
+			GG.SetUnitFallDamgeImmunityFeature(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
 		end
 		--return math.random() -- no collision damage to collided victim. Using random return to tell "unit_fall_damage.lua" to not use pairs of damage to infer unit-to-unit collision.
 	end
