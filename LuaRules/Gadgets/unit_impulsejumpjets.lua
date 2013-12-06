@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by msafwan (impulsejump)",
-		date    = "May 14 2008, December 5 2013",
+		date    = "May 14 2008, December 6 2013",
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
 		enabled = isImpulseJump,
@@ -492,11 +492,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- unit or wreck collision
 	if jumping[unitID] and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
 		jumping[unitID] = 1 --signal to jump loop that a collision is occurring (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
-		if GG.SetUnitFallDamgeImmunity then
-			GG.SetUnitFallDamgeImmunity(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
+		if GG.SetUnitFallDamageImmunity then
+			GG.SetUnitFallDamageImmunity(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
 		end
-		if GG.SetUnitFallDamgeImmunityFeature then
-			GG.SetUnitFallDamgeImmunityFeature(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
+		if GG.SetUnitFallDamageImmunityFeature then
+			GG.SetUnitFallDamageImmunityFeature(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
 		end
 		--return math.random() -- no collision damage to collided victim. Using random return to tell "unit_fall_damage.lua" to not use pairs of damage to infer unit-to-unit collision.
 	end
