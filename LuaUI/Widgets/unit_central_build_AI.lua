@@ -14,7 +14,7 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.346"
+local version = "v1.347"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -83,6 +83,7 @@ local spGetModKeyState		= Spring.GetModKeyState
 local spTestBuildOrder		= Spring.TestBuildOrder
 local spSelectUnitMap		= Spring.SelectUnitMap
 local spGetUnitsInCylinder 	= Spring.GetUnitsInCylinder
+local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetUnitAllyTeam 	= Spring.GetUnitAllyTeam
 
 local glPushMatrix	= gl.PushMatrix
@@ -364,12 +365,16 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) --this i
 			end
 		end
 		for unit2,myCmd in pairs(myUnits) do
-			if ( myCmd == myCmd1 ) then --check if others is using same command as this unit, if true:
-				local cmd = GetFirstCommand(unit2)
-				if ( cmd == nil ) then	-- no orders?  Must be idle.
+			if ( myCmd == myCmd1 ) then --check if others is using same command as this unit (note: myCmd == "cmdID@x@z", if true:
+				local cmd2 = GetFirstCommand(unit2)
+				if ( cmd2 == nil ) then	-- no orders?  Must be idle.
 					myUnits[unit2]="idle"
 				else 
-					myUnits[unit2]="busy" -- command done but still busy.
+					if ( cmd2.id == cmdID ) then --having same order as finished order
+						spGiveOrderToUnit(unit2, CMD_REMOVE, {cmd2.tag}, {} ) --remove
+						spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
+					end
+					myUnits[unit2]="busy" -- command done but still busy. Example scenario: unit attempt to assist a construction while user SHIFT queued a reclaim command, however the construction finishes first before this unit arrives, so this unit continue finishing the RECLAIM command with "busy" tag.
 				end
 			elseif ( myCmd == "asst "..unitID ) then  --check if this unit is being GUARDed
 				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
@@ -507,9 +512,7 @@ function GetFirstCommand(unitID)
 	return queue and queue[1]
 end
 
---  Formerly remove duplicate orders, process cancel requests, delete bad builds.
---  Now, just test for and remove bad builds.
---  EDIT: added check for duplicate.
+--  Remove duplicate orders, process cancel requests, delete bad builds.
 
 function CleanOrders(newCmd)
 	local xSize = nil --variables for checking queue overlaping
@@ -538,22 +541,17 @@ function CleanOrders(newCmd)
 		local x, y, z, facing = myCmd.x, myCmd.y, myCmd.z, myCmd.h
 		local canBuildThisThere,featureID = spTestBuildOrder(cmdID,x,y,z,facing) --check if build site is blocked by buildings & terrain
 		
-		--for prevent build on ally feature
-		if ( checkFeatures ) and ( featureID ) then --check if build site is blocked by feature
-			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't reclaim or build there. (ie: dragon-teeth's wall)
-				canBuildThisThere = 0
-			end
-		end
-		--end feature check
-		
-		if newCmd and xSize and (canBuildThisThere >= 1) then --check if build site overlap new queue
+		if (canBuildThisThere == 1) or (newCmd and xSize and canBuildThisThere > 0) then --if unit blocking OR new build site was added
 			if facing == 0 or facing == 2 then --check the size of the queued building
 				xSize_queue = UnitDefs[cmdID].xsize*4
 				zSize_queue = UnitDefs[cmdID].zsize*4
 			else
 				xSize_queue = UnitDefs[cmdID].zsize*4
 				zSize_queue = UnitDefs[cmdID].xsize*4
-			end
+			end	
+		end
+		
+		if newCmd and xSize and (canBuildThisThere > 0) then --check if build site overlap new queue
 			local minTolerance = xSize_queue + xSize --check minimum tolerance in x direction
 			local axisDist = abs (x - x_newCmd) --check actual separation in x direction
 			if axisDist < minTolerance then --if too close in x direction
@@ -563,17 +561,38 @@ function CleanOrders(newCmd)
 					canBuildThisThere = 0 --flag this queue for removal
 					isOverlap = true --return true
 					
+					-- stop any constructor constructing this queue
 					local unitArray = {}
 					for unitID, queueKey in pairs(myUnits) do
 						if queueKey == key then
 							unitArray[#unitArray+1] = unitID
 						end
 					end
-					Spring.GiveOrderToUnitArray (unitArray,CMD_STOP, {}, {}) --send STOP to units assigned to this queue. A scenario: user delete this queue by overlapping method and it stop any unit trying to build this queue
+					Spring.GiveOrderToUnitArray (unitArray,CMD_STOP, {}, {}) --send STOP to units assigned to this queue. A scenario: user deleted this queue by overlapping old queue with new queue and it automatically stop any unit trying to build this queue
 				end
 			end
 		end
-		if (canBuildThisThere < 1) then --if queue is flagged for removal
+		
+		if ( canBuildThisThere==1 ) then --check if blocking unit can move away from our build site
+			local blockingUnits = spGetUnitsInRectangle(x-xSize_queue, z-zSize_queue, x+xSize_queue, z+zSize_queue)
+			for i=1, #blockingUnits do
+				local blockerDefID = spGetUnitDefID(blockingUnits[i])
+				if math.modf(UnitDefs[blockerDefID].speed*10) == 0 then -- ie: modf(0.01*10) == 00 (fractional speed is ignored)
+					canBuildThisThere = 0 --blocking unit can't move away, cancel this queue
+					break;
+				end
+			end
+		end	
+		
+		--prevent build queue on ally feature
+		if ( checkFeatures ) and ( featureID ) then --check if build site is blocked by feature
+			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't reclaim or build there. (ie: dragon-teeth's wall)
+				canBuildThisThere = 0
+			end
+		end
+		--end feature check
+		
+		if (canBuildThisThere == 0) then --if queue is flagged for removal
 			myQueue[key] = nil  --remove queue
 		end
 	end
