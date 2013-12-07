@@ -23,8 +23,10 @@ unitDef = {
 
   customParams        = {
     description_de = [[Torpedofregatte]],
+    description_pl = [[Fregata torpedowa]],
     helptext       = [[The Torpedo Frigate is a (relatively) cheap countermeasure to subs, though it can also attack surface targets.]],
 	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
+	helptext_pl    = [[Fregata torpedowa to odpowiedz na jednostki podwodne; moze tez strzelac w statki.]],
 	modelradius    = [[14]],
   },
 

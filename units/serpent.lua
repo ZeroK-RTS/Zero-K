@@ -24,10 +24,12 @@ unitDef = {
   customParams           = {
     description_fr = [[Sous-Marin Artilleur]],
 	description_de = [[Scharfschützen U-Boot]],
+	description_pl = [[Lodz podwodna]],
     fireproof      = [[1]],
     helptext       = [[The Serpent is truly a nightmare, for its long-range, deadly accurate, high lethality heavy torpedoes can sink almost any ship in a few shots. It is however extremely expensive and not particularly agile.]],
     helptext_fr    = [[Le Serpent est un véritable cauchemard, grâce r ses torpilles haute vélocité r charge creuse, il peut couler depuis de les profondeurs nimporte quel navire ennemi. Relativement lent et peu blindé, sa portée lui permet de rester loin des combats.]],
 	helptext_de    = [[Der Serpent ist wahrlich ein Albtraum. Seine weitreichenden, tödlich genauen und hochtödlichen, schweren Torpedos können fast jedes Schiff mit ein paar Schüssen zum Sinken bringen. Es ist allerdings extrem teuer und nicht sehr wendig.]],
+	helptext_pl    = [[Serpent jest bardzo drogi i ma niska wytrzymalosc, ale jego potezne torpedy dalekiego zasiegu zatapiaja wszystko, co plywa.]],
 	modelradius    = [[15]],
   },
 

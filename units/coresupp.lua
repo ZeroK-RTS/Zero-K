@@ -26,9 +26,11 @@ unitDef = {
   customParams           = {
     description_fr = [[Corvette d'Assaut/Pillage]],
 	description_de = [[Korvette (Sturmangriff/Raider)]],
+	description_pl = [[Korweta]],
     helptext       = [[The Typhoon is a brawler, combining high speed, decent armor, and strong firepower at a low cost--for a ship. Use corvette packs against anything on the surface, but watch out for submarines.]],
     helptext_fr    = [[La corvette est ? la fois bon-march? et rapide. Son blindage moyen et sa forte puissance de feu laser en font un bon compromis, mais est vuln?rable aux attaques sousmarines. ]],
 	helptext_de    = [[Der Typhoon ist ein Schiff, welches Geschwindigkeite, Panzerung und Feuerkraft verhältnismäßig günstig verbindet - zumindest für ein Schiff. Nutze Korvetten gegen alles auf der Oberfläche, achte aber auf feindliche U-Boote.]],
+	helptext_pl    = [[Korweta oferuje wysoka predkosc, duza wytrzymalosc i silne dzialka za niska (jak na statek) cene. Grupy korwet dobrze niszcza cele na powierzchni, ale nie maja obrony glebinowej.]],
     modelradius    = [[15]],
   },
 
