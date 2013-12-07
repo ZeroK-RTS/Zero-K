@@ -18,7 +18,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext	   = [[A flexible unit, the Scallop is armed with torpedoes for underwater use and a quadruple shotgun when on land. It is the closest thing there is to a mainline torpedo unit that can stand up to armed ships. That is not to say it is good against them.]],
+    description_pl = [[Amfibijny bot wsparcia]],
+    helptext       = [[A flexible unit, the Scallop is armed with torpedoes for underwater use and a quadruple shotgun when on land. It is the closest thing there is to a mainline torpedo unit that can stand up to armed ships. That is not to say it is good against them.]],
+    helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz torped ma takze shotgun do walk na ladzie.]],
     extradrawrange = 460,
   },
 
