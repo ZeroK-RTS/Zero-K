@@ -32,7 +32,13 @@ unitDef = {
   upright                       = false,
   workerTime                    = 0,
   yardMap                       = [[ff ff]],
-  
+
+  customParams        = {
+	description_pl = [[Meteoryt]],
+	helptext       = [[Asteroids can be manipulated to fall onto the planet by the Meteor Controller; they serve primarily as a weapon to crush the units they fall on, but they can also be reclaimed for resources.]],
+	helptext_pl    = [[Asteroidy sciagniete z orbity miazdza jednostki, na ktore spadna; mozna z nich takze odzyskac surowce.]],
+  },
+
   featureDefs                   = {
 
     DEAD = {

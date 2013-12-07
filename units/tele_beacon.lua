@@ -12,6 +12,11 @@ unitDef = {
   category                      = [[SINK UNARMED]],
 
   customParams                  = {
+	helptext       = [[This is Djinn's entry beacon. Right-click it to teleport units to the parent Djinn.]],
+	description_de = [[Teleport-Knoten - rechten Maustaste darauf]],
+	description_pl = [[Wezel teleportera - uzyj prawego przycisku myszy]],
+	helptext_de    = [[Dieser Teleport-Knoten teleportiert Einheiten zu der verknuepften Djinn.]],
+	helptext_pl    = [[To jest wejscie do teleportera - uzyj prawego przycisku myszy, aby przeteleportowac jednostki do powiazanego Djinna.]],
   	dontcount = [[1]],
   },
 
