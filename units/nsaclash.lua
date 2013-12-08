@@ -22,8 +22,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_bp = [[Veículo escaramuçador]],
-    description_fr = [[V?hicule Tirailleur]],
+    --description_bp = [[Veículo escaramuçador]], -- janus legacy, claims its a vehicle
+    description_fr = [[Hovercraft Tirailleur]],
 	description_de = [[Skirmisher Gleiter (Anti-Heavy)]],
     helptext       = [[Use the Scalpel for hit-and-run attacks. Has a long reload time and not too many hit points, and should always be kept at range with the enemy. An arcing projectile allows it to shoot over obstacles and friendly units.]],
     helptext_bp    = [[Scalpel é um escaramuçador: Use-o para ataques de bater e correr. Demora para recarregar e n?o é muito resistente, devendo sempre ser mantido a distância do inimigo. Seus projéteis de trajetória curva superam obstáculos.]],

@@ -23,8 +23,10 @@ unitDef = {
 
   customParams        = {
     description_de = [[Fulgabwehrgleiter]],
+    description_pl = [[Poduszkowiec przeciwlotniczy]],
     helptext       = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
 	helptext_de    = [[Der Flail verschieﬂt ein einzige, groﬂe SAM auf mittlerer Distanz, die wirklich groﬂen Schaden anrichtet.]],
+	helptext_pl    = [[Flail wystrzeliwuje rakiety przeciwlotnicze sredniego zasiegu, ktore zadaja wysokie obrazenia.]],
 	modelradius    = [[20]],
 	midposoffset   = [[0 8 -5]],
   },
