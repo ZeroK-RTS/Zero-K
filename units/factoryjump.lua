@@ -39,9 +39,11 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Produziert Spezial- und Sprungdüsenroboter, Baut mit 10 M/s]],
+    description_pl = [[Buduje specjalistyczne roboty, moc 10 m/s]],
+    helptext       = [[The esoteric Jumpjet/Specialist Plant offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo]],
     helptext_de    = [[Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Sumo]],
+    helptext_pl    = [[W tej fabryce produkowane sa specjalistyczne jednostki, z ktorych wiekszosc posiada mozliwosc skoku, co pozwala im na szybkie zblizenie sie do przeciwnika, ucieczke lub ominiecie trudnego terenu.]],
     canjump  = [[1]],
-    helptext = [[The esoteric Jumpjet/Specialist Plant offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo]],
     sortName = [[5]],
 	modelradius    = [[56]],
   },

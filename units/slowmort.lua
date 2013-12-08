@@ -19,8 +19,10 @@ unitDef = {
 
   customParams        = {
     description_de = [[Kurzstrahl Roboter]],
+    description_pl = [[Robot spowalniajacy]],
     helptext       = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to 50%. Though doing no damage themselves, Moderators are effective against almost all targets.]],
 	helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 50%. Obwohl Moderatoren kein Schaden machen, sind sie effektiv gegen fast alle Ziele.]],
+	helptext_pl    = [[Promien spowalniajacy Moderatora zmniejsza predkosc ruchu i ataku trafionych jednostek maksymalnie dwukrotnie. Mimo ze nie zadaja bezposrednio obrazen, jest pomocny w walce z kazdym przeciwnikiem.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

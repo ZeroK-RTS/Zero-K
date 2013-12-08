@@ -19,8 +19,10 @@ unitDef = {
 
   customParams           = {
     description_de = [[Roboter mit Feuerunterstützung (Artillerie/Skrimish)]],
+    description_pl = [[Robot wsparcia artyleryjskiego]],
     helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
-	helptext_de    = [[Der Firewalk verschießt seine Mörser auf mittlerer Distanz und erzeugt in den betroffenen Arealen eine Unbrauchbarkeit des Geländes für kurze Zeiträume. Die Einheit selber ist etwas schwerfällig und langsam im Manövrieren.]],
+	helptext_de    = [[Der Firewalker verschießt seine Mörser auf mittlerer Distanz und erzeugt in den betroffenen Arealen eine Unbrauchbarkeit des Geländes für kurze Zeiträume. Die Einheit selber ist etwas schwerfällig und langsam im Manövrieren.]],
+	helptext_pl    = [[Firewalker uzywa swoich dzial sredniego zasiegu do podpalania wyznaczonych obszarow, co zadaje obrazenia jednostkom, ktore tam pozostana.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
