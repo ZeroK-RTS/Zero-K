@@ -21,10 +21,10 @@ unitDef = {
 
   customParams           = {
     description_de = [[EMP Rakete]],
-    description_de = [[Rakieta EMP]],
+    description_pl = [[Rakieta EMP]],
     helptext       = [[The Shockley disables units in a small area for up to 45 seconds.]],
 	helptext_de    = [[Der Shockley paralysiert Einheiten in seiner kleinen Reichweite für bis zu 45 Sekunden.]],
-	helptext_de    = [[Jednorazowa rakieta dalekiego zasięgu, która paraliżuje trafione jednostki do 45 sekund.]],
+	helptext_pl    = [[Jednorazowa rakieta dalekiego zasięgu, która paraliżuje trafione jednostki do 45 sekund.]],
     mobilebuilding = [[1]],
   },
 

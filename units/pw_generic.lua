@@ -20,7 +20,8 @@ unitDef = {
   --corpse                        = [[DEAD]],
 
   customParams                  = {
-	helptext = [[This structure offers benefits to the faction holding the planet. Only members of the attacking or defending factions can harm it.]],
+	helptext       = [[This structure offers benefits to the faction holding the planet. Only members of the attacking or defending factions can harm it.]],
+	helptext_pl    = [[Ten budynek daje korzysci wlascicielom planety, na ktorej sie znajduje.]],
   	dontcount = [[1]],
   },
 
