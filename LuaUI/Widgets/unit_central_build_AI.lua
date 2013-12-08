@@ -14,7 +14,7 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
-local version = "v1.347"
+local version = "v1.348"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -85,6 +85,7 @@ local spSelectUnitMap		= Spring.SelectUnitMap
 local spGetUnitsInCylinder 	= Spring.GetUnitsInCylinder
 local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetUnitAllyTeam 	= Spring.GetUnitAllyTeam
+local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
 
 local glPushMatrix	= gl.PushMatrix
 local glPopMatrix	= gl.PopMatrix
@@ -352,25 +353,39 @@ end
 --	If one of our units completed an order, cancel units guarding it.
 --  Thanks again to Niobium for pointing out UnitCmdDone().
 
-function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) --this is called for each time a command is finished
+function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag,cmdParams) --this is called for each time a command is finished
 	if ( myUnits[unitID] and cmdID < 0 ) then	-- one of us finish building something
 		local myCmd1 = myUnits[unitID]
 		local myCmd_header = myCmd1:sub(1,4)
-		if myCmd_header ~= "asst" then --check if this unit was GUARDing another unit. If NOT then:
+		if myCmd_header ~= "asst" then --check if this unit was GUARDing another unit. If NOT then update unit status
 			local cmd = GetFirstCommand(unitID)
 			if ( cmd == nil ) then		-- no orders?  Must be idle. NOTE: this will fail if unit still have CMD.STOP and/or CMD.SET_WANTED_SPEED, therefore we depend on UnitIdle().
 				myUnits[unitID]="idle"
-			else -- have orders?  Must be busy.
-				myUnits[unitID]="busy" -- command done but still busy.
+			else -- have orders?  Must be busy. 
+				myUnits[unitID]="busy" -- command done but still busy. eg: have user queue pending
+			end
+		end
+		local buildFinished
+		if cmdParams then
+			--find out if widget:UnitCmdDone() call is due to building completion or due to interruption (this require Spring 95):
+			local blockingUnits = spGetUnitsInRectangle(cmdParams[1]-4, cmdParams[3]-4, cmdParams[1]+4, cmdParams[3]+4)
+			for i=1, #blockingUnits do
+				if spGetUnitDefID(blockingUnits[i]) == -cmdID then
+					local _,_,inBuild = spGetUnitIsStunned(blockingUnits[i])
+					if not inBuild then
+						buildFinished = true; --build order is finished, FORCE STOP other assisting constructors. This fix constructors won't stop when building transportable turret in NOTA.
+					end
+					break;
+				end
 			end
 		end
 		for unit2,myCmd in pairs(myUnits) do
-			if ( myCmd == myCmd1 ) then --check if others is using same command as this unit (note: myCmd == "cmdID@x@z", if true:
+			if ( unit2~=unitID ) and( myCmd == myCmd1 ) then --check if others is using same command as this unit (note: myCmd == "cmdID@x@z", if true:
 				local cmd2 = GetFirstCommand(unit2)
 				if ( cmd2 == nil ) then	-- no orders?  Must be idle.
 					myUnits[unit2]="idle"
 				else 
-					if ( cmd2.id == cmdID ) then --having same order as finished order
+					if ( buildFinished and cmd2.id == cmdID ) then --having same order as finished order
 						spGiveOrderToUnit(unit2, CMD_REMOVE, {cmd2.tag}, {} ) --remove
 						spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
 					end

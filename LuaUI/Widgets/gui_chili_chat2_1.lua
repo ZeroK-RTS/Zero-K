@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.914 Chili Chat Console.",
+    desc      = "v0.915 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -637,7 +637,7 @@ local function displayMessage(msg, remake)
 		
 		if options.clickable_points.value then
 			local button = textbox
-			if msg.point then --message is a marker
+			if msg.point then --message is a marker, make obvious looking button
 				textbox:SetPos( nil, 3, stack_console.width - 6 )
 				textbox:Update()
 				local tbheight = textbox.height -- not perfect
@@ -652,12 +652,12 @@ local function displayMessage(msg, remake)
 					children = { textbox, },
 					OnMouseDown = {function(self, x, y, mouse)
 						local alt,ctrl, meta,shift = Spring.GetModKeyState()
-						if (shift or ctrl or meta or alt) or ( not mouse == 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
+						if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
 						Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 					end}
 				}
 				
-			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat
+			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
 				local cur = WG.alliedCursorsPos[msg.player.id]
 				if cur then
 					textbox.OnMouseDown = {function(self, x, y, mouse)

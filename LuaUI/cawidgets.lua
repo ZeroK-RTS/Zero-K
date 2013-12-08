@@ -1896,18 +1896,18 @@ end
 
 
 function widgetHandler:UnitCommand(unitID, unitDefID, unitTeam,
-                                   cmdId, cmdOpts, cmdParams)
+                                   cmdId, cmdOpts, cmdParams,cmdTag) --cmdTag available in Spring 95
   for _,w in ipairs(self.UnitCommandList) do
     w:UnitCommand(unitID, unitDefID, unitTeam,
-                  cmdId, cmdOpts, cmdParams)
+                  cmdId, cmdOpts, cmdParams,cmdTag)
   end
   return
 end
 
 
-function widgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
+function widgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag, cmdParams, cmdOptions) --cmdParams & cmdOptions available in Spring 95
   for _,w in ipairs(self.UnitCmdDoneList) do
-    w:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
+    w:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag, cmdParams, cmdOptions)
   end
   return
 end
