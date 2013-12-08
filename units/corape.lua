@@ -30,10 +30,12 @@ unitDef = {
     description_bp = [[Aeronave flutuadora agressora]],
     description_fr = [[ADAV Pilleur]],
 	description_de = [[Skirmisher/Flugabwehr Hubschrauber]],
+	description_pl = [[Wielozadaniowy statek powietrzny]],
     helptext       = [[The Rapier is a light combat gunship. Its missiles are accurate and hit air, and it is good against small targets and defending against other raiders.]],
     helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
     helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
 	helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
+	helptext_pl    = [[Rapier to lekki statek bojowy, ktorego rakiety sa na tyle celne, ze dobrze radzi sobie z lekkimi, szybkimi jednostkami, a nawet z lotnictwem.]],
 	modelradius    = [[16]],
   },
 

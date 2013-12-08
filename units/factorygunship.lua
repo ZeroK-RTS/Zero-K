@@ -40,9 +40,11 @@ unitDef = {
 
   customParams                  = {
     landflystate   = [[1]],
-	helptext = [[The Gunship Plant is designed for close air support. It includes a selection of transports for hauling land units around, and combat gunships which can perform a variety of offensive or defensive roles.]],
-    description_de = [[Produziert Kampfhubschrauber, Baut mit 10 M/s]],
-	helptext_de    = [[Kampfhubschrauber bieten aufgrund ihrer Beweglichkeit eine enorme Bandbreite an Einsetzbarkeit.]],
+	description_de = [[Produziert Kampfhubschrauber, Baut mit 10 M/s]],
+	description_pl = [[Buduje statki powietrzne, moc 10 m/s]],
+	helptext       = [[The Gunship Plant is designed for close air support. It includes a selection of transports for hauling land units around, and combat gunships which can perform a variety of offensive or defensive roles.]],
+    helptext_de    = [[Kampfhubschrauber bieten aufgrund ihrer Beweglichkeit eine enorme Bandbreite an Einsetzbarkeit.]],
+    helptext_pl    = [[Statki powietrzne zapewniaja miejscowe wsparcie lotnicze; wsrod jednostek oprocz statkow bojowych mozna takze znalezc transporty dla jednostek ladowych.]],
     sortName = [[3]],
 	modelradius    = [[43]],
   },
