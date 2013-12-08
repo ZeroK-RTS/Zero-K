@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.913 Chili Chat Console.",
+    desc      = "v0.914 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -635,25 +635,44 @@ local function displayMessage(msg, remake)
 			}
 		}
 		
-		local button
-		if msg.point and options.clickable_points.value then
-			textbox:SetPos( nil, 3, stack_console.width - 6 )
-			textbox:Update()
-			local tbheight = textbox.height -- not perfect
-			tbheight = math.max( tbheight, 15 ) --hack
-			--echo('tbheight', tbheight)
-			button = WG.Chili.Button:New{
-				width = '100%',
-				height = tbheight + 8,
-				padding = { 3,3,3,3 },
-				backgroundColor = {1,1,1,options.pointButtonOpacity.value},
-				caption = '',
-				children = { textbox, },
-				OnMouseDown = {function(self, x, y, mouse)
-					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
-				end}
-			}
-			
+		if options.clickable_points.value then
+			local button = textbox
+			if msg.point then --message is a marker
+				textbox:SetPos( nil, 3, stack_console.width - 6 )
+				textbox:Update()
+				local tbheight = textbox.height -- not perfect
+				tbheight = math.max( tbheight, 15 ) --hack
+				--echo('tbheight', tbheight)
+				button = WG.Chili.Button:New{
+					width = '100%',
+					height = tbheight + 8,
+					padding = { 3,3,3,3 },
+					backgroundColor = {1,1,1,options.pointButtonOpacity.value},
+					caption = '',
+					children = { textbox, },
+					OnMouseDown = {function(self, x, y, mouse)
+						local alt,ctrl, meta,shift = Spring.GetModKeyState()
+						if (shift or ctrl or meta or alt) or ( not mouse == 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
+						Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+					end}
+				}
+				
+			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat
+				local cur = WG.alliedCursorsPos[msg.player.id]
+				if cur then
+					textbox.OnMouseDown = {function(self, x, y, mouse)
+							local alt,ctrl, meta,shift = Spring.GetModKeyState()
+							if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
+							local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
+							if (mouse == 1 and click_on_text) then
+								Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+							end
+					end}
+					function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+						return self
+					end
+				end
+			end
 			stack_console:AddChild(button, false)
 		else
 			stack_console:AddChild(textbox, false)	
@@ -710,7 +729,10 @@ end
 
 function RemakeConsole()
 	setup()
-	stack_console:ClearChildren()
+	-- stack_console:ClearChildren() --disconnect from all children
+	for i=1, #stack_console.children do
+		stack_console.children[1]:Dispose() --dispose/disconnect all children (safer)
+	end
 	for i = 1, #messages do -- FIXME : messages collection changing while iterating (if max_lines option has been shrinked)
 		local msg = messages[i]
 		displayMessage(msg, true)
@@ -804,7 +826,8 @@ function widget:AddConsoleMessage(msg)
 	
 	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
 	while #messages > options.max_lines.value do
-		stack_console:RemoveChild(stack_console.children[1])
+		-- stack_console:RemoveChild(stack_console.children[1]) --disconnect children
+		stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
 		table.remove(messages, 1)
 		--stack_console:UpdateLayout()
 	end
