@@ -20,9 +20,9 @@ unitDef = {
 
   customParams        = {
     floattoggle    = [[1]],
-    description_pl = [[Ciężki Amfibijny Bot Szturmowy]],
-    helptext       = [[The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else.]],
-    helptext_pl    = [[Grizzly to klasyczna jednostka szturmowa - dość wolna, niezdarna, lecz prawie niepowstrzymana. Jego bronią jest laser o dużym zasięgu i obrażeniach, który ma problemy właściwie tylko przeciwko szybkim jednostkom atakującym w grupach i lotnictwu.]],
+    description_pl = [[Ciezki amfibijny bot szturmowy]],
+    helptext       = [[The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to surface in order to shoot.]],
+    helptext_pl    = [[Grizzly to klasyczna jednostka szturmowa - dosc wolna i niezdarna, lecz prawie niepowstrzymana. Jego bronia jest laser o duzym zasiegu i obrazeniach, ktory ma problemy wlasciwie tylko przeciwko szybkim jednostkom atakujacym w grupach i lotnictwu. Grizzly moze sie wynurzyc do strzalu, ale nie moze strzelac pod woda.]],
 	aimposoffset   = [[0 30 0]],
 	midposoffset   = [[0 6 0]],
 	modelradius    = [[35]],
