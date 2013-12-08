@@ -26,7 +26,7 @@ unitDef = {
     description_fi = [[Tykist?/kahakkarobotti]],
     description_fr = [[Robot d'Artillerie]],
     description_it = [[Robot d'artiglieria]],
-    description_pl = [[Bot Artyleryjski]],
+    description_pl = [[Bot artyleryjski]],
     helptext       = [[The Hammer has a long range plasma cannon that allows indirect fire over obstacles, and outranges static defenses up to heavy laser towers. Although effective versus mobile units, it should be guarded in order to prevent raiders and other fast units from closing range.]],
     helptext_bp    = [[O hammer ? o rob? b?sico de artilharia de Nova, que tamb?m serve como escaramu?ador. Ele tem um canhao de plasma de longo alcan?e que permite fogo indireto sobre obst?culos, e possui alcan?e superior a defesas fixas b?sicas at? no m?ximo a Torre de laser pesada. Embora efetivo contra unidades m?veis, ? recomend?vel defende-los com warriors para evitar que agressores ou outras unidades r?pidas se aproximem.]],
     helptext_de    = [[Der Hammer besitzt eine weitreichende Plasmakanone, die es ihm erlaubt über Hindernisse zu schießen und sich dabei außer Reichweite von gegnerischen Verteidigungsanlagen zu finden. Obwohl er auch effektiv gegen mobile Einheiten ist, sollte er beschützt werden, um Raider und andere schnelle Einheiten von ihm Fern zu halten.]],
@@ -34,7 +34,7 @@ unitDef = {
     helptext_fi    = [[Hammer omaa pitk?n kantaman plasmatykin, joka mahdollistaa ep?suoran tulituksen yksik?iden ylitse. Sen kantama on pidempi, kuin peruspuolustusten aina HLT:hen saakka. Vaikka Hammer on tehokas my?s yksik?it? vastaan, sit? tulee suojata eteenkin nopeasti liikkuvia yksik?it? vastaan, sill? ne pystyv?t v?ist?m??n Hammerin ammukset.]],
     helptext_fr    = [[Le Hammer a un canon plasma longue port?e qui lui permet de tirer indirectement au dessus des obstacles, et a une port?e plus grande que les tour de d?fense basic jusqu'au HLT. Bien qu'il soit ?fficace contre les unit?es mobiles, il est n?c?ssaire de le d?fendre avec des Warriors pour le prot?ger des unit?s rapide et de raid.]],
     helptext_it    = [[Il Hammer ha un cannone al plasma da lungo raggio che gli permette di fare fuoco indiretto sopra ostacoli, ed ha un raggio maggiore di molte difese basiche fino alla HLT. Anche se é efficace contro unitá mobili, é consigliabile difenderli con warriors per prevenire che le unitá da invasione si avvicinino troppo]],
-    helptext_pl    = [[Hammer ma działo dalekiego zasięgu, które pozwala mu strzelać nad niskimi przeszkodami i ma większy zasięg niż podstawowe wieżyczki. Choć jest dosyć efektywny przeciwko ruchomym jednostkom, powinno się zapewnić mu ochronę przed lżejszymi jednostkami, które mogą unikać jego powolnych pocisków.]],
+    helptext_pl    = [[Hammer ma dzialo dalekiego zasiegu, ktore pozwala mu strzelac nad niskimi przeszkodami i ma wiekszy zasieg niz podstawowe wiezyczki. Choc jest dosyc efektywny przeciwko ruchomym jednostkom, powinno sie zapewnic mu ochrone przed lzejszymi jednostkami, ktore moga unikac jego powolnych pociskow.]],
 	modelradius    = [[14]],
   },
 

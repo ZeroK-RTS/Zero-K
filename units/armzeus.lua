@@ -26,7 +26,7 @@ unitDef = {
     description_fi = [[Rynn?kk?robotti]],
     description_fr = [[Marcheur d'Assaut]],
     description_it = [[Camminatore d'Assalto]],
-    description_pl = [[Bot Szturmowo-Bojowy]],
+    description_pl = [[Bot szturmowo-bojowy]],
     helptext       = [[Slowly and steadily, groups of Zeuses can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)]],
     helptext_bp    = [[Zeus ? o principal rob? de assalto de Nova. Devagar e sempre, grupos de Zeus podem resistir fogo pesado a medida que avan?am contra fortifica?oes inimigas, at? poderem atirar seu canhao de raios de curto-alcan?e, que danifica e paraliza inimigos.]],
     helptext_de    = [[Langsam und zuverlässig, Gruppen von Zeus' können sogar starken Beschuss ignorieren und so schnell an die feindliche Festung herankommen, bis sie dort ihre Blitzschlagkanonen mit kurzer Reichweite zum Einsatz bringen können, welche feindliche Einheiten schädigt und betäubt. Kontere den Zeus mit Einheiten, die umherflitzen, damit sie nicht paralysiert werden (denn dann sind sie so gut wie tot).]],
@@ -34,7 +34,7 @@ unitDef = {
     helptext_fi    = [[Hitaasti mutta varmasti etenev? Zeus kest?? vihollisen tulitusta kohtuullisesti. Sen lyhyen kantaman tesla-ase halvaannuttaa ja vaurioittaa kohteensa tehokkaasti.]],
     helptext_fr    = [[Lentement mais surement, un groupe de Zeus peut encaisser les tirs enemis lourd jusqu'a ce qu'ils atteignent les fortifications et puissent utiliser leur canon éclair courte portée qui peut paralyser et endommager les enemis retranchés.]],
     helptext_it    = [[Lentamente, gruppi di Zeus possono sopportare fuoco pesante mentre camminano verso le fortificazioni nemiche, fino a che possono usare il loro cannone spara-fulmini a corto raggio, che danneggia e paralizza i nemici trincerati. Contrastali con qualunque cosa che puo tenersi fuori dal loro raggio, stando sicuro di non essere paralizzato (in quel caso sei morto.)]],
-    helptext_pl    = [[Zeus jest na tyle wytrzymały, że niska szybkość nie przeszkadza mu podczas podchodzenia pod wrogie wieżyczki i niszczenia ich mocnym działkiem EMP. W walce z ruchomymi jednostkami jednak nie jest w stanie dogonić jednostek mających większe szybkość i zasięg, chociaż jednostki o mniejszym zasięgu niszczy skutecznie.]],
+    helptext_pl    = [[Zeus jest na tyle wytrzymaly, ze niska szybkosc nie przeszkadza mu podczas podchodzenia pod wrogie wiezyczki i niszczenia ich mocnym dzialkiem EMP. Nie jest jednak w stanie dogonic jednostek majacych wieksze szybkosc i zasieg, chociaz jednostki o mniejszym od niego zasiegu niszczy skutecznie.]],
 	modelradius    = [[12]],
   },
 

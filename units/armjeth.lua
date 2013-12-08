@@ -29,7 +29,7 @@ unitDef = {
     description_fi = [[Ilmatorjuntarobotti]],
     description_fr = [[Robot Anti-air]],
     description_it = [[Robot da contraerea]],
-    description_pl = [[Bot Przeciwlotniczy z Maskowaniem]],
+    description_pl = [[Bot przeciwlotniczy z maskowaniem]],
     helptext       = [[Fast and fairly sturdy for its price, the Jethro is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against.]],
     helptext_bp    = [[Jethro ? um rob? barato dedicado a defesa anti-a?rea. est? entre defenders e packos, sem as fraquezas de nenhum deles, e pode com certeza proteger uma for?a m?vel, dando aos rob?s uma vantagem definitiva contra aeronaves. Nao pode se defender de unidades terrestres.]],
     helptext_de    = [[Durch seine Fähigkeit mobile Kräft vor Luftangriffen zu beschützen, gibt der Jethro den entsprechenden Einheiten einen wichtigen Vorteil gegenüber Lufteinheiten. Verteidigungslos gegenüber Landeinheiten.]],
@@ -37,7 +37,7 @@ unitDef = {
     helptext_fi    = [[Kevyell? hakeutuvalla ohjuksella varustettu Jethro on tehokas nopeita, mutta kevyesti panssaroituja ilma-aluksia vastaan. Soveltuu hyvin yksik?iden puolustamiseen ketter?n liikkuvuutensa takia. Ei pysty ampumaan maayksik?it? kohti.]],
     helptext_fr    = [[Se situant entre le Defender et le Packo pour la d?fense a?rienne, en ayant la faiblaisse d'aucun des deux et pouvant offrire un d?fense d?cissive pour les forces mobile, le Jethro done un avantage d?finis pour les robots. Il est sans d?fense contre les unit?s terriennes.]],
     helptext_it    = [[Un passo tra un defender ed un pack0, senza le sue debolezze, e con l'abilitá di proteggere bene una forza mobile, il Jethro offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
-    helptext_pl    = [[Szybki i dość wytrzymały jak na swoją cenę, Jethro jest w stanie zapewnić obronę przeciwlotniczą. Jest bezbronny przeciw wojskom lądowym, ale posiada opcję maskowania.]],
+    helptext_pl    = [[Szybki i dosc wytrzymaly jak na swoja cene, Jethro zapewnia obrone przeciwlotnicza. Jest bezbronny przeciw wojskom ladowym, ale posiada mozliwosc maskowania.]],
 	modelradius    = [[11]],
   },
 

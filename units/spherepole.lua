@@ -28,9 +28,10 @@ unitDef = {
     description_fi = [[Hy?kk??j?robotti]],
     description_fr = [[Robot Pilleur]],
     description_it = [[Robot d'invasione]],
-    description_pl = [[Bot Naje?d?ca]],
-    helptext       = [[The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy.]],
+    description_pl = [[Kosynier]],
+    helptext       = [[The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy. Damaged Scythes can quickly regenerate when out of combat.]],
 	helptext_de    = [[Der Scythe ist nicht sehr zäh im Standkampf, aber seine Tarnfähigkeit ermöglicht es ihm hinter die feindliche Verteidigung zu gelangen und so die gegnerische Ökonomie zu beeinträchtigen.]],
+	helptext_pl    = [[Scythe to jednostka do walki w zwarciu. Posiada maskowanie, ktore pozwala mu zblizyc sie do wrogich jednostek lub je ominac i zajac sie niszczeniem wrogiej bazy. Uszkodzony Scythe po wyjsciu z walki samoczynnie naprawia sie.]],
 	modelradius    = [[14]],
   },
 
