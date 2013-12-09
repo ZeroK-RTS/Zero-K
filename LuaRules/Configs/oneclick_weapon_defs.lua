@@ -12,7 +12,12 @@ local oneClickWepDefNames = {
 	--corawac = {
 	--	{ functionToCall = "Cloak", reloadTime = 600, name = "Temp Cloak", tooltip = "Cloaks for 5 seconds", useSpecialReloadFrame = true},
 	--},
-	
+	corbtrans = {
+		{ functionToCall = "ForceDropUnit", reloadTime = 30, name = "Drop Cargo", tooltip = "Eject cargo!", useSpecialReloadFrame = true,},
+	},
+	corvalk = {
+		{ functionToCall = "ForceDropUnit", reloadTime = 30, name = "Drop Cargo", tooltip = "Eject cargo!", useSpecialReloadFrame = true,},
+	},		
 }
 
 

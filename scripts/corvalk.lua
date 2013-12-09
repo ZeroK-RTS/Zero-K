@@ -78,6 +78,20 @@ function script.QueryTransport( passengerID )
 	return link
 end
 
+--Special ability: drop unit midair
+function ForceDropUnit()
+	if (unitLoaded ~= nil) then
+		local x,y,z = Spring.GetUnitPosition(unitLoaded) --cargo position
+		local vx,vy,vz = Spring.GetUnitVelocity(unitID) --transport speed
+		DropUnit(unitLoaded)
+		Spring.SetUnitPosition(unitLoaded, x,y,z)
+		Spring.AddUnitImpulse(unitLoaded,0,-1,0) --hax to prevent teleport to ground
+		Spring.AddUnitImpulse(unitLoaded,vx,vy,vz)
+		Spring.AddUnitDamage(unitLoaded,0) --trigger float/flight detection for floating amphibious (unit_impulsefloat_toggle.lua)
+	end
+	StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
+end
+
 --fetch unit id of passenger (from the load command)
 function getPassengerId() 
 	local cmd=Spring.GetUnitCommands(unitID)
