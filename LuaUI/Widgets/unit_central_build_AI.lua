@@ -11,10 +11,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
---to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
--- because it never test the end of the build but test the validity to build another one at the same place.
-
-local version = "v1.348"
+local version = "v1.349"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -350,54 +347,35 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 	end
 end
 
---	If one of our units completed an order, cancel units guarding it.
---  Thanks again to Niobium for pointing out UnitCmdDone().
+--If one of our units completed an order, cancel units guarding/assisting it.
+--This replace UnitCmdDone() because UnitCmdDone() is called even if command is not finished, such as when new command is inserted into existing queue
+--Credit was given to Niobium for pointing out UnitCmdDone() originally.
 
-function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag,cmdParams) --this is called for each time a command is finished
-	if ( myUnits[unitID] and cmdID < 0 ) then	-- one of us finish building something
-		local myCmd1 = myUnits[unitID]
-		local myCmd_header = myCmd1:sub(1,4)
-		if myCmd_header ~= "asst" then --check if this unit was GUARDing another unit. If NOT then update unit status
-			local cmd = GetFirstCommand(unitID)
-			if ( cmd == nil ) then		-- no orders?  Must be idle. NOTE: this will fail if unit still have CMD.STOP and/or CMD.SET_WANTED_SPEED, therefore we depend on UnitIdle().
-				myUnits[unitID]="idle"
-			else -- have orders?  Must be busy. 
-				myUnits[unitID]="busy" -- command done but still busy. eg: have user queue pending
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	local ux, _, uz = spGetUnitPosition(unitID)
+	local myCmd = { id=-unitDefID, x=ux, z=uz, }
+	local hash = hash(myCmd)
+	for unit2,myCmd in pairs(myUnits) do
+		if ( myCmd == hash ) then --check if others is using same command as this unit (note: myCmd == "cmdID@x@z", if true:
+			local cmd2 = GetFirstCommand(unit2)
+			if ( cmd2 == nil ) then	-- no orders?  Must be idle.
+				myUnits[unit2]="idle"
+			else 
+				spGiveOrderToUnit(unit2, CMD_REMOVE, {-unitDefID}, {"alt"} ) --remove
+				spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
+				myUnits[unit2]="busy" -- command done but still busy. Example scenario: unit attempt to assist a construction while user SHIFT queued a reclaim command, however the construction finishes first before this unit arrives, so this unit continue finishing the RECLAIM command with "busy" tag.
 			end
-		end
-		local buildFinished
-		if cmdParams then
-			--find out if widget:UnitCmdDone() call is due to building completion or due to interruption (this require Spring 95):
-			local blockingUnits = spGetUnitsInRectangle(cmdParams[1]-4, cmdParams[3]-4, cmdParams[1]+4, cmdParams[3]+4)
-			for i=1, #blockingUnits do
-				if spGetUnitDefID(blockingUnits[i]) == -cmdID then
-					local _,_,inBuild = spGetUnitIsStunned(blockingUnits[i])
-					if not inBuild then
-						buildFinished = true; --build order is finished, FORCE STOP other assisting constructors. This fix constructors won't stop when building transportable turret in NOTA.
-					end
-					break;
+			for unit3,myCmd2 in pairs(myUnits) do
+				if ( myCmd2 == "asst "..unit2 ) then  --check if this unit is being GUARDed
+					spGiveOrderToUnit(unit3, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
+					spGiveOrderToUnit(unit3, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
+					--myUnits[unit2] = "idle" --set as "idle"
+					myUnits[unit2]="busy" --busy until really idle
 				end
 			end
 		end
-		for unit2,myCmd in pairs(myUnits) do
-			if ( unit2~=unitID ) and( myCmd == myCmd1 ) then --check if others is using same command as this unit (note: myCmd == "cmdID@x@z", if true:
-				local cmd2 = GetFirstCommand(unit2)
-				if ( cmd2 == nil ) then	-- no orders?  Must be idle.
-					myUnits[unit2]="idle"
-				else 
-					if ( buildFinished and cmd2.id == cmdID ) then --having same order as finished order
-						spGiveOrderToUnit(unit2, CMD_REMOVE, {cmd2.tag}, {} ) --remove
-						spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
-					end
-					myUnits[unit2]="busy" -- command done but still busy. Example scenario: unit attempt to assist a construction while user SHIFT queued a reclaim command, however the construction finishes first before this unit arrives, so this unit continue finishing the RECLAIM command with "busy" tag.
-				end
-			elseif ( myCmd == "asst "..unitID ) then  --check if this unit is being GUARDed
-				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
-				myUnits[unit2] = "idle" --set as "idle"
-			end
-		end		
-		nextFrame = currentFrame + ping() --find new work
 	end
+	nextFrame = currentFrame + ping() --find new work
 end
 
 --	If unit detected as idle and it's one of ours, time to find it some work.
@@ -407,7 +385,9 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 		for unit2,myCmd in pairs(myUnits) do
 			if ( myCmd == "asst "..unitID ) then  --check if this unit is being GUARDed
 				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
-				myUnits[unit2] = "idle" --set as "idle"
+				spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
+				--myUnits[unit2] = "idle" --set as "idle"
+				myUnits[unit2]="busy" --busy until really idle
 			end
 		end
 		myUnits[unitID] = "idle"
@@ -595,6 +575,13 @@ function CleanOrders(newCmd)
 				if math.modf(UnitDefs[blockerDefID].speed*10) == 0 then -- ie: modf(0.01*10) == 00 (fractional speed is ignored)
 					canBuildThisThere = 0 --blocking unit can't move away, cancel this queue
 					break;
+				end
+				if blockerDefID == cmdID then
+					local _,_,inBuild = spGetUnitIsStunned(blockingUnits[i])
+					if inBuild then
+						canBuildThisThere = 0 --unit that we wanted to build is already being build, cancel this queue
+						break;
+					end
 				end
 			end
 		end	
