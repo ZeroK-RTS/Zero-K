@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date = "25.03.2013",
 		license = "Public domain",
 		layer = 21,
-		enabled = not (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil))
+		enabled = true
 	}
 end
 
@@ -15,62 +15,73 @@ local spGetGameFrame = Spring.GetGameFrame
 ------ SYNCED -------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then 
 
-local singleHitWeapon = {}
-local singleHitProjectile = {}
+local isNewEngine = not (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil))
 
+local singleHitWeapon = {}
+local singleHitUnitId = {}
+
+local singleHitMultiWeapon = {}
+local singleHitProjectile = {}
 
 function gadget:Initialize()
 	for i=1,#WeaponDefs do
 		local wd = WeaponDefs[i]
 		if wd.customParams then
 			if wd.customParams.single_hit then
-				--Script.SetWatchWeapon(wd.id, true)
 				singleHitWeapon[wd.id] = true;
-				--Spring.Echo('Registered '..wd.name..' as single-hit weapon');
+			end
+			if isNewEngine and wd.customParams.single_hit_multi then
+				Script.SetWatchWeapon(wd.id, true)
+				singleHitMultiWeapon[wd.id] = true;
 			end
 		end
 	end
 end
 
---[[
+
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
-	if singleHitWeapon[weaponID] then
+	if singleHitMultiWeapon[weaponID] then
 		singleHitProjectile[proID] = {};
 	end
 end	
 
 function gadget:ProjectileDestroyed(proID)
-	if singleHitProjectile[proID] then -- apparently setwatchweapon is not per-gadget. sad but true.
+	if singleHitMultiWeapon[proID] then -- apparently setwatchweapon is not per-gadget. sad but true.
 		singleHitProjectile[proID] = nil;
 	end
 end
---]]
+
 
 function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
 	if singleHitWeapon[weaponDefID] then
 		if attackerID then
 			local frame = spGetGameFrame()
-			if singleHitProjectile[attackerID] == nil then
-				singleHitProjectile[attackerID] = {};
-				singleHitProjectile[attackerID][unitID] = frame;
+			if singleHitUnitId[attackerID] == nil then
+				singleHitUnitId[attackerID] = {}
+				singleHitUnitId[attackerID][unitID] = frame
 			else
-				if singleHitProjectile[attackerID][unitID] and frame - singleHitProjectile[attackerID][unitID] < 10 then
-					singleHitProjectile[attackerID][unitID] = frame
-					return 0;
+				if singleHitUnitId[attackerID][unitID] and frame - singleHitUnitId[attackerID][unitID] < 10 then
+					singleHitUnitId[attackerID][unitID] = frame
+					return 0
 				else
-					singleHitProjectile[attackerID][unitID] = frame;
+					singleHitUnitId[attackerID][unitID] = frame
 				end
 			end
-			
-			local unitFPX = UnitDefs[unitDefID].xsize / 2 -- somewhy these sizes are footprint doubled; 
-			local unitFPZ = UnitDefs[unitDefID].zsize / 2
-			local sizeFactor = math.sqrt(unitFPX*unitFPZ);
-
-			-- original 0.5 + diag*0.5 causes glaives to be instagibbed because they're 2x2 -> multiplier is 2
-			-- presumably this could be fixed by tweaking the actual damages instead... on everything
-			return (damage/2 + sizeFactor*damage/4) 
+			return damage 
 	
 		end
+	end
+	
+	if singleHitMultiWeapon[weaponDefID] then
+		if not singleHitProjectile[projectileID] then
+			singleHitProjectile[projectileID] = {}
+		end
+		if singleHitProjectile[projectileID][unitID] then
+			return 0
+		else
+			singleHitProjectile[projectileID][unitID] = true
+		end
+		return damage 
 	end
 	
 	return damage;
