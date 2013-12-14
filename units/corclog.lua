@@ -20,15 +20,15 @@ unitDef = {
 
   customParams           = {
     canjump        = [[1]],
-    description_bp = [[]],
     description_es = [[Caja de tierra]],
     description_fr = [[]],
     description_it = [[Scatola di terra]],
 	description_de = [[Behälter voller Dreck]],
-    helptext       = [[The Dirtbag is an unarmed unit whose sole purpose is to die - leaving a mound that obstructs enemy movement, effective against vehicles. It also doubles as an expendable scout.]],
-    helptext_bp    = [[]],
-    helptext_fr    = [[Le Clogger est une unit? sacrifiable sans armement. Il s'agit en fait d'une fortification anti-tank l?g?re ?quip?e d'un syst?me de propulsion bip?de. Il sert donc autant a rep?rer l'ennemi avec des unit?s de co?t d?risoire qu'a bloquer la progression d'une arm?e.]],
-	helptext_de    = [[Der Dirtbag ist eine unbewaffnete Einheit mit der einzigen Absicht zu sterben - dabei hinterlässt er einen Hügel, der feindlichen Bewegung behindert, vor allem gegen Fahrzeuge effektiv. Er fungiert gegebenenfalls auch als entbehrlicher Auklärer.]],
+    description_pl = [[Pudlo z piachem]],
+    helptext       = [[The Dirtbag is an unarmed unit whose sole purpose is to die - leaving a mound that obstructs enemy movement. It also doubles as an expendable scout.]],
+    helptext_fr    = [[Le Dirtbag est une unit? sacrifiable sans armement. Il s'agit en fait d'une fortification anti-tank l?g?re ?quip?e d'un syst?me de propulsion bip?de. Il sert donc autant a rep?rer l'ennemi avec des unit?s de co?t d?risoire qu'a bloquer la progression d'une arm?e.]],
+	helptext_de    = [[Der Dirtbag ist eine unbewaffnete Einheit mit der einzigen Absicht zu sterben - dabei hinterlässt er einen Hügel, der feindlichen Bewegung behindert. Er fungiert gegebenenfalls auch als entbehrlicher Auklärer.]],
+	helptext_pl    = [[Dirtbag to nieuzbrojona jednostka, ktora po zniszczeniu wysypuje piach, utrudniajac poruszanie sie jednostek. Ponadto sluzy jako tani zwiadowca.]],
   },
 
   explodeAs              = [[CLOGGER_EXPLODE]],

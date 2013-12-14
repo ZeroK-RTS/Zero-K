@@ -21,8 +21,10 @@ unitDef = {
     description_fr = [[Robot ?meurier]],
     description_it = [[Robot da rissa]],
     description_de = [[Riot Roboter]],
+    description_pl = [[Bot wsparcia]],
     helptext       = [[The Outlaw emits an electromagnetic disruption pulse in a wide circle around it that damages and slows enemy units. Friendly units are unaffected.]],
     helptext_de    = [[Der Outlaw stößt einen elektromagnetischen Störungspuls, in einem weiten Kreis um sich herum, aus, welcher feindliche Einheiten schädigt und verlangsamt. Freundliche Einheiten sind davon aber nicht betroffen.]],
+    helptext_pl    = [[Outlaw wyzwala fale, ktore uszkadzaja i spowalniaja wszystkie wrogie jednostki wokol niego, zostawiajac sojusznikow bez szwanku.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
