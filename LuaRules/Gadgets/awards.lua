@@ -886,7 +886,7 @@ function gadget:GameOver()
 	--Spring.Echo("Game over (awards unsynced)")
 		
 	--// Resources
-	SendEconomyDataToWidget()
+	--SendEconomyDataToWidget()
 end
 
 -- function to convert SYNCED table to regular table. assumes no self referential loops
