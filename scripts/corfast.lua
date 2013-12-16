@@ -571,7 +571,7 @@ end
 function halfJump()
 end
 
-function EndJump()
+function endJump()
 	EmitSfx( jump,  UNIT_SFX2 )
 end
 
