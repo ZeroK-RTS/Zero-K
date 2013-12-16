@@ -561,6 +561,7 @@ function preJump(turn,distance)
 end
 
 function beginJump()
+	script.StopMoving()
 	EmitSfx( jump,  UNIT_SFX2 )
 end
 

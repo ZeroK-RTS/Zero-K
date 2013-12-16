@@ -48,6 +48,7 @@ local random = math.random
 local abs    = math.abs
 
 local CMD_STOP = CMD.STOP
+local CMD_WAIT = CMD.WAIT
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitBasePosition  = Spring.GetUnitBasePosition
@@ -389,6 +390,9 @@ local function Jump(unitID, goal, cmdTag)
 		SetLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
 		mcDisable(unitID)
+
+		spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+		spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
 	
 		--mcSetPosition(unitID, start[1] + vector[1],start[2] + vector[2]-6,start[3] + vector[3])
 		-- local oldQueue = spGetCommandQueue(unitID)
