@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date    = "May 14 2008, December 16 2013",
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
-		enabled = true,
+    enabled = isImpulseJump,
 	}
 end
 
