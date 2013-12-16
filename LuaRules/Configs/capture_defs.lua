@@ -12,7 +12,7 @@ local weapons = {
 -- all units with capture weapons must have a unit entry
 local units = {
 	capturecar = { 
-		postCaptureReload = 240, 
+		postCaptureReload = 360, 
 	},
 }
 -- postCaptureReload 	- reload time after capturing

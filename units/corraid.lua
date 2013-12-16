@@ -44,7 +44,7 @@ unitDef = {
   mass                   = 212,
   maxDamage              = 1850,
   maxSlope               = 18,
-  maxVelocity            = 2.95,
+  maxVelocity            = 2.9,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
@@ -113,7 +113,7 @@ unitDef = {
       startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 230,
+      weaponVelocity          = 215,
     },
 
   },
