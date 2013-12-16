@@ -4,6 +4,9 @@ local CMD_PRIORITY		= 34220
 -- Takes inputs such as economy status, own units by cost, enemy scouted units by cost.
 -- Outputs factory and constructor job weights
 function constructionAndEconomyHandler(a, at, frame)
+	--Note: all "chance" variable have continous value from 0 to 1
+	--all "importance" variable have continuous value from 0 to infinity
+	--all "count" variable have integer value from 0 to infinity
 	
 	-- useful localisations
 	local averagedEcon = a.averagedEcon
@@ -12,7 +15,8 @@ function constructionAndEconomyHandler(a, at, frame)
 	local facJobAir = a.facJobAir
 	local controlledUnit = a.controlledUnit
 	
-	a.unitHording = 0.3
+	a.unitHordingChance = 0.3 --value [0..1]
+	a.nanoChance = 0.05 --chance of making a nano
 	if averagedEcon.aveMInc < 50 then
 		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/24)
 	elseif averagedEcon.aveMInc < 100 then

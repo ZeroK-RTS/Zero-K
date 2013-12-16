@@ -1332,7 +1332,7 @@ local function conJobHandler(team)
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.factory.index
 			assignFactory(team,unitID,cQueue)
-		elseif a.wantedNanoCount > controlledUnit.nano.count and math.random() < 0.05 then
+		elseif a.wantedNanoCount > controlledUnit.nano.count and math.random() < a.nanoChance then
 			makeNano(team, unitID)
 		end
 	end
@@ -1431,7 +1431,7 @@ local function factoryJobHandler(team)
 					end
 				end
 			else
-				if math.random() < a.unitHording then
+				if math.random() < a.unitHordingChance then
 					setUnitPosting(team, unitID)
 				else
 					spGiveOrderToUnit(unitID, CMD_FIGHT, { data.wayX+math.random(-200,200), data.wayY, data.wayZ+math.random(-200,200)}, {})
@@ -2668,12 +2668,15 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 
 end
 
+--update scout heatmap and add spotted enemy to enemy-stat counter
 function gadget:UnitEnteredLos(unitID, unitTeam, allyTeam, unitDefID)
 
 	if not allyTeamData[allyTeam].ai then
 		return
 	end
 	local at = allyTeamData[allyTeam]
+	
+	at.inLOS[unitID] = true --remember temporarily until UnitLeftLos
 	
 	local scoutingHeatmap = at.scoutingHeatmap
 	
@@ -2689,6 +2692,15 @@ function gadget:UnitEnteredLos(unitID, unitTeam, allyTeam, unitDefID)
 	if (scoutingHeatmap[aX] and scoutingHeatmap[aX][aZ]) then
 		spotEnemyUnit(allyTeam,unitID,unitDefID,true)
 	end
+end
+
+function gadget:UnitLeftLos(unitID, unitTeam, allyTeam, unitDefID)
+	if not allyTeamData[allyTeam].ai then
+		return
+	end
+	local at = allyTeamData[allyTeam]
+	
+	at.inLOS[unitID] = nil
 end
 
 local function drawHeatmap(heatmap)
@@ -2905,6 +2917,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 	end
 end
 
+--reduce owned-unit stat counter by 1 unit or enemy-stat counter by 1 unit
 local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	local ud = UnitDefs[unitDefID]
@@ -3108,6 +3121,49 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 			end--]]
 		end
 	end
+	--reassess enemy force reduction (enemy counted by individual AI). Note: enemy force increase reassessment from weapon damage is done in UnitDamaged()
+	if (ud ~= nil) then
+		for i,at in pairs(allyTeamData) do
+			if at.ai and at.inLOS[unitID] and at.unitInHeatmap[unitID] then --this AI spotted this unit (as enemy) and it got destroyed
+			
+				if assaultArray[unitDefID] then
+					at.enemyForceComposition.unit.assault = at.enemyForceComposition.unit.assault - ud.metalCost
+				elseif skirmArray[unitDefID] then
+					at.enemyForceComposition.unit.skirm = at.enemyForceComposition.unit.skirm - ud.metalCost
+				elseif riotArray[unitDefID] then
+					at.enemyForceComposition.unit.riot = at.enemyForceComposition.unit.riot - ud.metalCost
+				elseif raiderArray[unitDefID] then
+					at.enemyForceComposition.unit.raider = at.enemyForceComposition.unit.raider - ud.metalCost
+				elseif artyArray[unitDefID] then
+					at.enemyForceComposition.unit.arty = at.enemyForceComposition.unit.arty - ud.metalCost
+				end
+				
+				if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and ud.speed > 0 then
+					at.enemyMobileAA[unitID] = nil
+					at.enemyForceComposition.unit.antiAir = at.enemyForceComposition.unit.antiAir - ud.metalCost
+				end
+				
+				if ud.maxWeaponRange > 0 and ud.canFly then
+					at.enemyForceComposition.unit.air = at.enemyForceComposition.unit.air - ud.metalCost
+				end
+				
+				if ud.maxWeaponRange > 0 and ud.speed == 0 then
+					if ud.weapons[1].onlyTargets.land then
+						at.enemyForceComposition.unit.groundDefence = at.enemyForceComposition.unit.groundDefence - ud.metalCost
+					else
+						at.enemyStaticAA[unitID] = nil
+						at.enemyForceComposition.unit.airDefence = at.enemyForceComposition.unit.airDefence - ud.metalCost
+					end
+				end
+				
+				-- if ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.customParams.ismex then -- econ
+					-- at.enemyForceComposition.unit.econ = at.enemyForceComposition.unit.econ - ud.metalCost
+				-- end --handled by "at.enemyEconomy.totalCost"
+				
+				at.unitInHeatmap[unitID] = nil
+			end
+		end
+	end
 end
 
 local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, changeAlly)
@@ -3307,14 +3363,6 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 	
 end
 
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	ProcessUnitDestroyed(unitID, unitDefID, unitTeam, false)
-end
-
-function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, true)
-end
-
 -- adds some things that can only be done on unit completion
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 
@@ -3430,6 +3478,12 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID) -- remove unit
 	end
 end
 
+function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
+	if (aiTeamData[unitTeam]) then
+		MoveUnitOutOfFactory(unitID, factDefID)
+	end
+end
+
 local function initialiseAiTeam(team, allyteam, aiConfig)
 
 	Spring.Echo("AI taken control of team " .. team .. " on allyTeam " .. allyteam)
@@ -3471,8 +3525,9 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		
 		wantedDefence = {count = 0},
 		
-		unitHording = 0, -- factor from 0 to 1 of percentage of units horded at main base
+		unitHordingChance = 0.3, -- factor from 0 to 1 of percentage of units horded at main base
 		wantedNanoCount = 0,
+		nanoChance = 0.05, -- factor from 0 to 1 chance of making nano if current nano lower than wantedNanoCount 
 		
 		totalBP = 0, -- total controlled build power
 		totalFactoryBPQuota = 0, -- build more factories when over this
@@ -3606,6 +3661,7 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 		aTeamOnThisTeam = 0,
 		ai = aiOnTeam,
 		listOfAis = {count = 0, data = {}},
+		inLOS = {}, --temporarily remember spotted unit for counting destroyed unit in a non-cheating way
 		
 		units = { -- most of these are unused - would be used in cheating AI
 			cost = 0,

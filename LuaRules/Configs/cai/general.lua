@@ -4,7 +4,8 @@ include("LuaRules/Configs/CAI/brains.lua")
 include("LuaRules/Configs/CAI/battlegroupcondition.lua")
 include("LuaRules/Configs/CAI/configCoordinator.lua")
 include("LuaRules/Configs/CAI/strategies.lua")
-include("LuaRules/Configs/CAI/targetReachableTester.lua")
+include("LuaRules/Configs/CAI/accessory/targetReachableTester.lua")
+include("LuaRules/Configs/CAI/accessory/no_stuck_in_factory.lua")
 
 --general constants/vars
 SOS_RADIUS = 1200		-- max distance for calls for aid when attacked
