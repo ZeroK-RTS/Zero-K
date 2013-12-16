@@ -481,7 +481,11 @@ local icontypes = {
   },
   jumpjetriot = {
     bitmap='icons/jumpjetriot.dds',
-    size=2.4,  
+    size=1.8,  
+  },
+  kbotwideriot = {
+    bitmap='icons/kbotwideriot.png',
+    size=2,  
   },
   
   

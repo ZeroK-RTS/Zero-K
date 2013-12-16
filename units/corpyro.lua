@@ -53,7 +53,7 @@ unitDef = {
   script		= [[corpyro.cob]],
   seismicSignature      = 4,
   selfDestructAs        = [[CORPYRO_NAPALM]],
-  selfDestructCountdown = 1,
+  selfDestructCountdown = 5,
 
   sfxtypes              = {
 

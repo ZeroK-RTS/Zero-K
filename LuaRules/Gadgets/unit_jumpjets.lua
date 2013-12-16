@@ -391,9 +391,11 @@ local function Jump(unitID, goal, cmdTag)
 		spSetUnitVelocity(unitID, 0, 0, 0)
 		mcDisable(unitID)
 
-		spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-		spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
-	
+		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
+		end
+		
 		--mcSetPosition(unitID, start[1] + vector[1],start[2] + vector[2]-6,start[3] + vector[3])
 		-- local oldQueue = spGetCommandQueue(unitID)
 		-- ReloadQueue(unitID, oldQueue, cmdTag)
