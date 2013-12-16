@@ -30,6 +30,7 @@ unitDef = {
     helptext_fr    = [[Le Shredder est ?quip? d'un puissant canon flak, capable de d?cimer les attaques aeriennes gr?ce ? une explosion ? fragmentation. Tr?s utile et moins cher qu'un Enforcer, il prot?ge efficacement toute les flottes.]],
 	helptext_de    = [[Mit seinem schlagkräftigen, doppelläufigen Flugabwehrlaser schützt diese Fregatte deine Flotte vor Luftangriffen. Wie immer ist aber auch diese Flugabwehr gegen Ziele, die sich nicht in der Luft befinden, machtlos.]],
 	helptext_pl    = [[Fregata przeciwlotnicza skutecznie broni floty przed atakami z powietrza, ale nie jest w stanie atakowac innych celow.]],
+	modelradius    = [[17]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

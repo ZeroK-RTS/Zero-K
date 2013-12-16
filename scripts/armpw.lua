@@ -126,12 +126,15 @@ local function RestoreAfterDelay()
 	Spin( magazine, y_axis, 0  )
 end
 
-----[[
-function script.QueryWeapon1() return flare end
+function script.QueryWeapon(num) 
+	return flare 
+end
 
-function script.AimFromWeapon1() return chest end
+function script.AimFromWeapon(num) 
+	return chest 
+end
 
-function script.AimWeapon1( heading, pitch )
+function script.AimWeapon(num, heading, pitch )
 	
 	Signal( SIG_Aim )
 	SetSignalMask( SIG_Aim )
@@ -159,7 +162,7 @@ function script.AimWeapon1( heading, pitch )
 	return true
 end
 
-function script.FireWeapon1()
+function script.FireWeapon(num)
 	Spin( magazine, y_axis, 2  )
 	EmitSfx( ejector, 1024 )
 	EmitSfx( flare, 1025 )

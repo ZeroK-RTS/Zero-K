@@ -24,7 +24,7 @@ sfxShatter		= SFX.SHATTER
 sfxFall	  		= SFX.FALL
 sfxSmoke   		= SFX.SMOKE
 sfxFire    		= SFX.FIRE
-sfxExplodeOnHit 	= SFX.EXPLODE_ON_HIT
+sfxExplodeOnHit = SFX.EXPLODE_ON_HIT
 
 -- Maths
 tau = math.pi*2

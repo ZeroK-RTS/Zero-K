@@ -95,6 +95,9 @@ overCategory = {
  chicken_leaper = {
     range = 600, reload = 2, },
 	
+corfast = {
+	cobscript = false},
+	
 corclog = {
 	cobscript = false, cannotJumpMidair = true, JumpSpreadException = true},
 	
