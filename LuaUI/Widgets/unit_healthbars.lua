@@ -57,7 +57,7 @@ local walls = {dragonsteeth=true,dragonsteeth_core=true,fortification=true,forti
 local stockpileH = 24
 local stockpileW = 12
 
-local captureReloadTime = 240
+local captureReloadTime = 360
 local DISARM_DECAY_FRAMES = 1200
 
 --------------------------------------------------------------------------------

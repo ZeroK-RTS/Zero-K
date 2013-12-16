@@ -95,8 +95,8 @@ unitDef = {
       burstrate               = 0.4,
       cegTag                  = [[gauss_tag_h]],
       
-      customParams            = {
-	single_hit = [[1]],
+      customParams = {
+        single_hit_multi = true,
       },
       
       craterBoost             = 0,

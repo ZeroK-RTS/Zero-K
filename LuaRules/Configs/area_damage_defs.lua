@@ -26,7 +26,7 @@ local weapons = {
 	},
 	jumpblackhole_black_hole = { 
 		radius = 150, 
-		damage = 5000,
+		damage = 5600,
 		impulse = true,
 		duration = 120, 
 		rangeFall = 0.4,

@@ -28,8 +28,8 @@ smokePiece = {hips, chest}
 
 
 --constants
-local runspeed = 4
-local steptime = 40
+local runspeed = 3
+local steptime = 20
 
 -- variables
 local firing = false
@@ -59,12 +59,12 @@ local function Walk()
 			
 			Turn( hips, z_axis, 0.1, runspeed*0.05 )
 			
-			Turn( rthigh, x_axis, -1.2, runspeed*1 )
+			Turn( rthigh, x_axis, -1, runspeed*1 )
 			Turn( rshin, x_axis, 1, runspeed*1 )
 	--		Turn( rfoot, x_axis, 0.5, runspeed*1 )
 			
 			Turn( lshin, x_axis, 0.2, runspeed*1 )
-			Turn( lthigh, x_axis, 1.2, runspeed*1 )
+			Turn( lthigh, x_axis, 0.5, runspeed*1 )
 
 			walkCycle = 1
 			WaitForTurn( rthigh, x_axis )
@@ -80,12 +80,12 @@ local function Walk()
 			
 			Turn( hips, z_axis, -0.1, runspeed*0.05 )
 			
-			Turn( lthigh, x_axis, -1.2, runspeed*1 )
+			Turn( lthigh, x_axis, -1, runspeed*1 )
 			Turn( lshin, x_axis, 1, runspeed*1 )
 	--		Turn( lfoot, x_axis, 0.5, runspeed*1 )
 			
 			Turn( rshin, x_axis, 0.2, runspeed*1 )
-			Turn( rthigh, x_axis, 1.2, runspeed*1 )
+			Turn( rthigh, x_axis, 0.5, runspeed*1 )
 			
 			walkCycle = 0
 			WaitForTurn( lthigh, x_axis )
@@ -149,9 +149,9 @@ function script.AimWeapon1( heading, pitch )
 	
 	-- Outstreched Arm
 	firing = true
-	Turn( chest, y_axis, heading, 12 )
+	Turn( chest, y_axis, heading, 4 )
 	Turn( lforearm, z_axis, 0, 5 )
-	Turn( lshoulder, x_axis, -pitch - 1.5, 12 )
+	Turn( lshoulder, x_axis, -pitch - 1.5, 4 )
 	
 	
 	WaitForTurn( chest, y_axis )
