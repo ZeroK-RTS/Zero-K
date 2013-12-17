@@ -4,7 +4,7 @@ function gadget:GetInfo()
     name      = "Impulse Float Toggle",
     desc      = "Adds a float/sink toggle to units, can be pushed by other unit while floating",
     author    = "Google Frog", --Msafwan (impulse based float)
-    date      = "9 March 2012, 12 April 2013",
+    date      = "9 March 2012, 17 Dec 2013",
     license   = "GNU GPL, v2 or later",
     layer     = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
     enabled   = true,  --  loaded by default?
@@ -83,7 +83,7 @@ end
 --------------------------------------------------------------------------------
 -- Float Table Manipulation
 
-local function addFloat(unitID, unitDefID, isFlying)
+local function addFloat(unitID, unitDefID, isFlying,transportCall)
 	if not float[unitID] then
 		local def = floatDefs[unitDefID]
 		local x,y,z = Spring.GetUnitPosition(unitID)
@@ -104,6 +104,7 @@ local function addFloat(unitID, unitDefID, isFlying)
 					unitDefID = unitDefID,
 					isFlying = isFlying,
 					paraData = {want = false, para = false},
+					transportCall = transportCall,
 				}
 				local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT
 				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
@@ -147,6 +148,15 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 	end
 end
 
+function gadget:UnitUnloaded(unitID, unitDefID, unitTeam,transportID, transportTeam)
+	if floatDefs[unitDefID] and not float[unitID] then
+		local px,py,pz = Spring.GetUnitPosition(unitID)
+		if py > Spring.GetGroundHeight(px,pz) + 20 then
+			addFloat(unitID, unitDefID, true)
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Script calls
 
@@ -183,13 +193,12 @@ function gadget:GameFrame(f)
 			local data = float[unitID] --(get reference to data table)
 			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
 			local height = Spring.GetGroundHeight(data.x, data.z)
-			if data.y == height then --touch down on land
+			if data.y == height then --touch down on ground
 				removeFloat(unitID)
 				i = i - 1
 			elseif data.y <= 0 then --touch down on water level
-				local dx,dy,dz = Spring.GetUnitVelocity(unitID)
-				dx,dz =dx/2,dz/2 --arbitrary tweak (reduce speed to make less bounce)
-				data.speed = math.sqrt(dy*dy + dx*dx + dz*dz) --Note: data.speed is designed for speed on y axis only but we include x,y,z just for fun! (higher speed mean better bounce when hitting water).
+				local _,dy = Spring.GetUnitVelocity(unitID)
+				data.speed = dy --Note: data.speed is designed for speed on y axis
 				data.isFlying = false
 				local cmdQueue = Spring.GetUnitCommands(unitID);
 				if (#cmdQueue>0) then 
@@ -241,7 +250,12 @@ function gadget:GameFrame(f)
 			
 			-- Check if the unit should sink
 			if checkOrder then
-				if floatState[unitID] == FLOAT_ALWAYS then
+				if data.transportCall then
+					local cQueue = Spring.GetCommandQueue(unitID, 1)
+					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
+					setSurfaceState(unitID, data.unitDefID, not moving)
+					data.transportCall = false
+				elseif floatState[unitID] == FLOAT_ALWAYS then
 					local cQueue = Spring.GetCommandQueue(unitID, 1)
 					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 					setSurfaceState(unitID, data.unitDefID, not moving)
@@ -326,9 +340,9 @@ function gadget:GameFrame(f)
 					i = i - 1 
 				end
 			end
-			
+
 			--Apply desired speed
-			local dx,dy,dz = Spring.GetUnitVelocity(unitID)
+			local _,dy = Spring.GetUnitVelocity(unitID)
 			local dyCorrection = data.speed+GRAVITY-dy
 			local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT --get current heading
 			Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --restore current heading. This force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
@@ -440,6 +454,18 @@ function gadget:Initialize()
 		end
 		return false
 	end
+	
+	GG.WantToTransport_FloatNow = function(unitID)
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if floatDefs[unitDefID] then
+			addFloat(unitID, unitDefID, false, true) --is called once by "unit_transport_ai_button.lua" when CMD.LOAD_UNITS is given
+		end
+	end
+	GG.HoldStillForTransport_HoldFloat = function(unitID)
+		if float[unitID] then
+			float[unitID].transportCall = true --is called every frame until transport no longer want to transport
+		end
+	end
 end
 
 ---------------------------------------------------------------------
@@ -447,7 +473,7 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note: argument list is based on Spring91 (compatibility with Spring 94 is maintained by gadget.lua). Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision. Prevent collision damage when surfacing (usefull when unit rise too fast and bump on another unit's bottom)
-	if float[unitID] and (not float[unitID].onSurface) and (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
+	if float[unitID] and (not float[unitID].onSurface) and (weaponDefID == -3) and attackerID == nil then
 		return math.random()  -- no collision damage. use random return so that unit_fall_damage.lua do not use pairs of zero to calculate collision damage.
 	end
 	return damage

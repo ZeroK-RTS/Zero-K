@@ -28,9 +28,11 @@ CMD_BUILD = 10010
 
 CMD_AREA_MEX = 30100
 CMD_MORPH = 31210
-CMD_EMBARK = 31200
-CMD_DISEMBARK = 31201
-CMD_TRANSPORTTO = 31202
+CMD_EMBARK = 31200 --unit_transport_ai_button.lua
+CMD_DISEMBARK = 31201 --unit_transport_ai_button.lua
+CMD_TRANSPORTTO = 31202 --unit_transport_ai_button.lua
+CMD_SMART_LOAD = 31203 --unit_transport_ai_button.lua
+CMD_SMART_UNLOAD = 31204 --unit_transport_ai_button.lua
 CMD_STEALTH = 32100
 CMD_CLOAK_SHIELD = 32101
 CMD_MINE = 32105	-- easymetal2

@@ -941,21 +941,26 @@ end
 
 function gadgetHandler:RegisterCMDID(gadget, id)
   if not LOG_SECTION then
-	LOG_SECTION = "ERROR"
+    LOG_SECTION = "ERROR"
   end
-  if (id < 1000) then
+  if not id then
     Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
-                'tried to register a reserved CMD_ID')
-    Script.Kill('Reserved CMD_ID code: ' .. id)
-  end
+               'tried to register a NIL CMD_ID')
+  else
+    if (id < 1000) then
+      Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+                 'tried to register a reserved CMD_ID')
+      Script.Kill('Reserved CMD_ID code: ' .. id)
+    end
 
-  if (self.CMDIDs[id] ~= nil) then
-    Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
-                'tried to register a duplicated CMD_ID')
-    Script.Kill('Duplicate CMD_ID code: ' .. id)
-  end
+    if (self.CMDIDs[id] ~= nil) then
+      Spring.Log(LOG_SECTION, LOG.ERROR, 'Gadget (' .. gadget.ghInfo.name .. ') ' ..
+                 'tried to register a duplicated CMD_ID')
+      Script.Kill('Duplicate CMD_ID code: ' .. id)
+    end
 
-  self.CMDIDs[id] = gadget
+    self.CMDIDs[id] = gadget
+  end
 end
 
 --------------------------------------------------------------------------------

@@ -275,12 +275,16 @@ end
 function ForceDropUnit()
 	if (unitLoaded ~= nil) then
 		local x,y,z = Spring.GetUnitPosition(unitLoaded) --cargo position
+		local _,ty = Spring.GetUnitPosition(unitID) --transport position
 		local vx,vy,vz = Spring.GetUnitVelocity(unitID) --transport speed
-		DropUnit(unitLoaded)
-		Spring.SetUnitPosition(unitLoaded, x,y,z)
-		Spring.AddUnitImpulse(unitLoaded,0,-1,0) --hax to prevent teleport to ground
-		Spring.AddUnitImpulse(unitLoaded,vx,vy,vz)
-		Spring.AddUnitDamage(unitLoaded,0) --trigger float/flight detection for floating amphibious (unit_impulsefloat_toggle.lua)
+		DropUnit(unitLoaded) --detach cargo
+		local transRadius = Spring.GetUnitRadius(unitID)
+		Spring.SetUnitPosition(unitLoaded, x,math.min(y, ty-transRadius),z) --set cargo position below transport
+		Spring.AddUnitImpulse(unitLoaded,0,4,0) --hax to prevent teleport to ground
+		Spring.AddUnitImpulse(unitLoaded,0,-4,0) --hax to prevent teleport to ground
+		Spring.SetUnitVelocity(unitLoaded,0,0,0) --remove any random velocity caused by collision with transport (especially Spring 91)
+		Spring.AddUnitImpulse(unitLoaded,vx,vy,vz) --readd transport momentum
+		unitLoaded = nil
 	end
 	StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
 end
@@ -365,7 +369,7 @@ end
 function script.MoveRate(curRate)	
 	local passengerId = getPassengerId()
 
-	if getCommandId() == 75 and isNearPickupPoint(passengerId) then	
+	if getCommandId() == 75 and isNearPickupPoint(passengerId) then
 		StartThread(openDoors)
 	elseif getCommandId() == 81 and isNearDropPoint(unitLoaded) then	
 		StartThread(openDoors)
@@ -396,6 +400,7 @@ function script.EndTransport()
 	--StartThread(openDoors)
 	if (unitLoaded ~= nil) then
 		DropUnit(unitLoaded)
+		unitLoaded = nil
 	end
 	loaded = false	
 	SetUnitValue(COB.BUSY, 0)
