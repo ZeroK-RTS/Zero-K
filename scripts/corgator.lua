@@ -16,11 +16,13 @@ local 		base, body, turret, sleeve, barrel, firepoint,
 			'gs1l', 'gs2l'
 			);
 
-local	moving, once, animcount, 
+local	moving,
 			s1r, s2r,
 			s1l, s2l,
 			xtilt, xtiltv, xtilta, ztilt, ztilta, ztiltv, 
 			ya, yv, yp, runsp, reloading, mainHead, WHEEL_TURN_SPEED
+			
+smokePiece = {turret, body}
 
 xtilt=0
 xtiltv=0
@@ -39,56 +41,49 @@ local RESTORE_DELAY = 2000
 local TURRET_TURN_SPEED = 220
 local SLEEVE_TURN_SPEED = 70
 
-local SpGroundHeight = Spring.GetGroundHeight
-local SpPiecePosition = Spring.GetUnitPiecePosition;
-local SpUnitVelocity = Spring.GetUnitVelocity;
+local spGetGroundHeight = Spring.GetGroundHeight
+local spGetPiecePosition = Spring.GetUnitPiecePosition;
+local spGetUnitVelocity = Spring.GetUnitVelocity;
 
 function Suspension()
-   while 1 do   
+   while true do   
 	   while runsp do
 			local x, y, z;
 			
-			x,y,z = SpPiecePosition(unitID,gs1r);
-			s1r = SpGroundHeight(x,z)-y;
+			x,y,z = spGetPiecePosition(unitID,gs1r);
+			s1r = spGetGroundHeight(x,z)-y;
 			if s1r < -2 then
-			 s1r = -2
+				s1r = -2
 			end
 
 			if s1r > 2 then
-
-			 s1r = 2
+				s1r = 2
 			end
-			x,y,z = SpPiecePosition(unitID,gs2r);
-			s2r = SpGroundHeight(x,z)-y;
+			x,y,z = spGetPiecePosition(unitID,gs2r);
+			s2r = spGetGroundHeight(x,z)-y;
 			if s2r < -2 then
-
-			 s2r = -2
+				s2r = -2
 			end
 			if s2r > 2 then
-
-			 s2r = 2
+				s2r = 2
 			end
 
-			x,y,z = SpPiecePosition(unitID,gs2r);
-			s1l = SpGroundHeight(x,z)-y;
+			x,y,z = spGetPiecePosition(unitID,gs2r);
+			s1l = spGetGroundHeight(x,z)-y;
 			if s1l < -2 then
-
-			 s1l = -2
+				s1l = -2
 			end
 			if s1l > 2 then
-
-			 s1l = 2
+				s1l = 2
 			end
 
-			x,y,z = SpPiecePosition(unitID,gs2l);
-			s2l = SpGroundHeight(x,z)-y;
+			x,y,z = spGetPiecePosition(unitID,gs2l);
+			s2l = spGetGroundHeight(x,z)-y;
 			if s2l < -2 then
-
-			 s2l = -2
+				s2l = -2
 			end
 			if s2l > 2 then
-
-			 s2l = 2
+				s2l = 2
 			end
 
 			xtilta = 0 - (s1r - s2r + s1l - s2l)/58000 + xtiltv/7      
@@ -119,7 +114,7 @@ function Suspension()
 			Move( lfender1 , y_axis, s1l , 9000 )
 			Move( lfender2 , y_axis, s2l , 9000 )
 
-			x,y,z = SpUnitVelocity(unitID)
+			x,y,z = spGetUnitVelocity(unitID)
 			WHEEL_TURN_SPEED = (math.sqrt(x*x+y*y+z*z)*10)
 
 			Spin( rwheel1 , x_axis, WHEEL_TURN_SPEED)
@@ -138,35 +133,6 @@ function RestoreAfterDelay()
 	Turn( turret , y_axis, 0, math.rad(90) )
 end
 
-function  DamageControl()
-
-	while select(5, Spring.GetUnitHealth(unitID)) < 1 do 
-		Sleep(1000)
-	end
-	local health
-	while true do
-	
-		health =  select(1, Spring.GetUnitHealth(unitID) ) / select(2, Spring.GetUnitHealth(unitID) )
-		
-		--[[ Restore damaged parts
-		if health > 25 then		
-			if health > 50 then
-			end
-		end ]]
-		
-		-- Damage parts, mnoke emits etc.
-		if health < 50 then
-		
---			EmitSfx( body,  SFX.WHITESMOKE )
-			if health < 25 then
-				
-				--EmitSfx( turret,  SFX.BLACKSMOKE )
-			end
-		end
-		Sleep(1000)
-	end
-end
-
 function script.StopMoving()
 	moving = false
 	StartThread(Roll)
@@ -175,10 +141,6 @@ end
 function Roll()
 	Sleep(500)
 	if not moving then
-	
-		once = animCount*ANIM_SPEED/1000
-		if once > 3 then once = 3 end
-	
 		StopSpin(rwheel1, x_axis)
 		StopSpin(rwheel2, x_axis)
 		StopSpin(lwheel1, x_axis)
@@ -190,10 +152,9 @@ end
 
 function script.StartMoving()
 	moving = true
-	animCount = 0
 	runsp = true
 	
-	local x,y,z = SpUnitVelocity(unitID)
+	local x,y,z = spGetUnitVelocity(unitID)
 	WHEEL_TURN_SPEED =  math.sqrt(x*x+y*y+z*z)*10
 	
 	Spin( rwheel1 , x_axis, WHEEL_TURN_SPEED)
@@ -224,57 +185,42 @@ function script.AimWeapon(num, heading, pitch)
 	return (true)
 end
 
-function FireWeapon1()
-	EmitSfx( firepoint,  1024 )
+function FireWeapon(num)
+	EmitSfx( firepoint,  UNIT_SFX1 )
 end
 
 
-
-function SweetSpot(piecenum)
-	piecenum = body
-end
-
-function script.Killed(severity, corpsetype)
-
-	if severity >= 0 and severity < 25 then
-	
-		corpsetype = 1
-		Explode(barrel, SFX.BITMAPONLY)
-		Explode(sleeve, SFX.BITMAPONLY)
-		Explode(body, SFX.BITMAPONLY)
-		Explode(turret, SFX.BITMAPONLY)
-	elseif severity >= 25 and severity < 50 then
-	
-		corpsetype = 2
-		Explode(barrel, SFX.FALL)
-		Explode(sleeve, SFX.FALL)
-		Explode(body, SFX.BITMAPONLY)
-		Explode(turret, SFX.SHATTER)
-	elseif severity >= 50 and severity < 100 then
-	
-		corpsetype = 3
-		Explode(barrel, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(sleeve, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(body, SFX.BITMAPONLY)
-		Explode(turret, SFX.SHATTER)
-	-- D-Gunned/Self-D
-	elseif severity >= 100 then
-		corpsetype = 3
-		Explode(barrel, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(sleeve, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(body, SFX.SHATTER)
-		Explode(turret, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage / maxHealth
+	if severity >= 0 and severity < 0.25 then
+		Explode(barrel, sfxNone)
+		Explode(sleeve, sfxNone)
+		Explode(body, sfxNone)
+		Explode(turret, sfxNone)
+		return 1
+	elseif severity < 0.50 then
+		Explode(barrel, sfxFall)
+		Explode(sleeve, sfxFall)
+		Explode(body, sfxNone)
+		Explode(turret, sfxShatter)
+		return 1
+	elseif severity < 1 then
+		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(body, sfxNone)
+		Explode(turret, sfxShatter)
+		return 2
+	else
+		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(body, sfxShatter)
+		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		return 2
 	end
 end
 
 function script.Create()
-
 	moving = false
-	
-	StartThread(DamageControl)
 	StartThread(Suspension)
-
-	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
-		Sleep(250)
-	end
+	StartThread(SmokeUnit)
 end

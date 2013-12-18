@@ -28,7 +28,7 @@ smokePiece = {hips, chest}
 
 
 --constants
-local runspeed = 3
+local runspeed = 3.5
 local steptime = 20
 
 -- variables
@@ -52,19 +52,22 @@ local function Walk()
 	SetSignalMask( SIG_Walk )
 	while ( true ) do
 		if walkCycle == 0 then
+			local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+			local speed = runspeed*speedmult
+			
 			if not firing then
-				Turn( lshoulder, x_axis, -1.2, runspeed*0.2 )
-				Turn( rshoulder, x_axis, 0.5, runspeed*0.3 )
+				Turn( lshoulder, x_axis, -1.2, speed*0.2 )
+				Turn( rshoulder, x_axis, 0.5, speed*0.3 )
 			end
 			
-			Turn( hips, z_axis, 0.1, runspeed*0.05 )
+			Turn( hips, z_axis, 0.1, speed*0.05 )
 			
-			Turn( rthigh, x_axis, -1, runspeed*1 )
-			Turn( rshin, x_axis, 1, runspeed*1 )
-	--		Turn( rfoot, x_axis, 0.5, runspeed*1 )
+			Turn( rthigh, x_axis, -1, speed*1 )
+			Turn( rshin, x_axis, 1, speed*1 )
+	--		Turn( rfoot, x_axis, 0.5, speed*1 )
 			
-			Turn( lshin, x_axis, 0.2, runspeed*1 )
-			Turn( lthigh, x_axis, 0.5, runspeed*1 )
+			Turn( lshin, x_axis, 0.2, speed*1 )
+			Turn( lthigh, x_axis, 0.5, speed*1 )
 
 			walkCycle = 1
 			WaitForTurn( rthigh, x_axis )
@@ -73,19 +76,22 @@ local function Walk()
 		end
 		
 		if walkCycle == 1 then
+			local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+			local speed = runspeed*speedmult
+			
 			if not firing then
-				Turn( lshoulder, x_axis, -0.6, runspeed*0.2 )
-				Turn( rshoulder, x_axis, -0.5, runspeed*0.3 )
+				Turn( lshoulder, x_axis, -0.6, speed*0.2 )
+				Turn( rshoulder, x_axis, -0.5, speed*0.3 )
 			end
 			
-			Turn( hips, z_axis, -0.1, runspeed*0.05 )
+			Turn( hips, z_axis, -0.1, speed*0.05 )
 			
-			Turn( lthigh, x_axis, -1, runspeed*1 )
-			Turn( lshin, x_axis, 1, runspeed*1 )
-	--		Turn( lfoot, x_axis, 0.5, runspeed*1 )
+			Turn( lthigh, x_axis, -1, speed*1 )
+			Turn( lshin, x_axis, 1, speed*1 )
+	--		Turn( lfoot, x_axis, 0.5, speed*1 )
 			
-			Turn( rshin, x_axis, 0.2, runspeed*1 )
-			Turn( rthigh, x_axis, 0.5, runspeed*1 )
+			Turn( rshin, x_axis, 0.2, speed*1 )
+			Turn( rthigh, x_axis, 0.5, speed*1 )
 			
 			walkCycle = 0
 			WaitForTurn( lthigh, x_axis )
