@@ -96,7 +96,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 				float[unitID] = {
 					index = floatByID.count,
 					surfacing = true,
-					prevSurfacing = true,
+					prevSurfacing = false,
 					onSurface = false,
 					justStarted = true,
 					speed = def.initialRiseSpeed, --desired speed
@@ -104,7 +104,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 					unitDefID = unitDefID,
 					isFlying = isFlying,
 					paraData = {want = false, para = false},
-					transportCall = transportCall,
+					transportCall = transportCall or 0,
 				}
 				local headingInRadian = Spring.GetUnitHeading(unitID)*RAD_PER_ROT
 				Spring.SetUnitRotation(unitID, 0, -headingInRadian, 0) --this force unit to stay upright/prevent tumbling.TODO: remove negative sign if Spring no longer mirror input anymore 
@@ -141,8 +141,8 @@ end
 function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	if float[unitID] then
 		Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
-		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+		-- Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {}) -->Error message: "UnitLoaded, [string "LuaRules/Gadgets/unit_impulsefloat_toggle.l..."]:144: GiveOrderToUnit() recursion is not permitted"
+		-- Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
 		callScript(unitID, "script.StopMoving")
 		removeFloat(unitID)
 	end
@@ -220,7 +220,7 @@ function gadget:GameFrame(f)
 			
 			-- This cannot be done when the float is added because that will often be
 			-- the result of a unit script. Strange trigger inheritence bleh!
-			if data.justStarted then
+			if data.justStarted and data.surfacing then
 				callScript(unitID, "Float_startFromFloor")
 				data.justStarted = nil
 			end
@@ -250,11 +250,11 @@ function gadget:GameFrame(f)
 			
 			-- Check if the unit should sink
 			if checkOrder then
-				if data.transportCall then
+				if data.transportCall>0 then
 					local cQueue = Spring.GetCommandQueue(unitID, 1)
 					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 					setSurfaceState(unitID, data.unitDefID, not moving)
-					data.transportCall = false
+					data.transportCall = data.transportCall - 1
 				elseif floatState[unitID] == FLOAT_ALWAYS then
 					local cQueue = Spring.GetCommandQueue(unitID, 1)
 					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
@@ -458,12 +458,18 @@ function gadget:Initialize()
 	GG.WantToTransport_FloatNow = function(unitID)
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if floatDefs[unitDefID] then
-			addFloat(unitID, unitDefID, false, true) --is called once by "unit_transport_ai_button.lua" when CMD.LOAD_UNITS is given
+			addFloat(unitID, unitDefID, false, 2) --is called once by "unit_transport_ai_button.lua" when CMD.LOAD_UNITS is given
+			return true
+		else
+			return false
 		end
 	end
 	GG.HoldStillForTransport_HoldFloat = function(unitID)
 		if float[unitID] then
-			float[unitID].transportCall = true --is called every frame until transport no longer want to transport
+			float[unitID].transportCall =2--is called every frame until transport no longer want to transport
+			return true
+		else
+			return false
 		end
 	end
 end

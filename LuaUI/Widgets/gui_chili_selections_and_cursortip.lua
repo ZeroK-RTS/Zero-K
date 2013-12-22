@@ -3,9 +3,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.092 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.093 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
-    date      = "2009-06-02", --18 October 2013
+    date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -2137,7 +2137,7 @@ function widget:Update(dt)
 													{{CMD.GUARD}, "Guard", {0.2,0,0.8,1}},
 													{{CMD.REPAIR}, "Repair",{0.2,0.8,1,1}},
 													--{{CMD.SELFD},  "Suicide"},
-													{{CMD.LOAD_UNITS},  "Load",{0,0.6,0.6,1}},
+													{{CMD.LOAD_UNITS, CMD_EXTENDED_LOAD},  "Load",{0,0.6,0.6,1}},
 													{{CMD.LOAD_ONTO}, "Load",{0,0.6,0.6,1}},
 													{{CMD.UNLOAD_UNITS, CMD.UNLOAD_UNIT}, "Unload", {0.6,0.6,0,1}},
 													{{CMD.RECLAIM}, "Reclaim",{0.6,0,0.4,1}},

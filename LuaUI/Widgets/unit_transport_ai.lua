@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 21.8.2013",
+    date      = "1.11.2007, 18.12.2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -30,6 +30,7 @@ local toPick = {} -- list of units waiting to be picked - key = transportID, val
 local toPickRev = {} -- list of units waiting to be picked - key = unitID, value=transportID
 local storedQueue = {} -- unit keyed stored queues
 local hackIdle ={} -- temp field to overcome unitIdle problem
+local floatDefs = VFS.Include("LuaRules/Configs/float_defs.lua") --list of unit able to float for pickup at sea
 
 
 local ST_ROUTE = 1 -- unit is enroute from factory
@@ -72,7 +73,7 @@ local function TableInsert(tab, toInsert)
   tab[#tab+1] = toInsert
 end
 
-local function ExtractModifiedOptions(options) --FIXME: pls check again if I'm really needed. This is a respond to https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than local)
+local function ExtractModifiedOptions(options) --FIXME: pls check again if I'm really needed. This is a respond to https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than in local game)
 	local alt,ctrl,shift,internal,right
 	for i,value in pairs(options) do 
 		if value == "alt" then
@@ -95,11 +96,12 @@ function IsTransport(unitDefID)
   return (ud ~= nil and (ud.transportCapacity >= 1) and ud.canFly)
 end
 
-function IsTransportable(unitDefID)  
+function IsTransportable(unitDefID, unitID)  
   ud = UnitDefs[unitDefID]
   if (ud == nil) then return false end
   udc = ud.springCategories
-  return (udc~= nil and ud.speed > 0 and not ud.canFly)
+  local _,y =Spring.GetUnitPosition(unitID)
+  return (udc~= nil and ud.speed > 0 and not ud.canFly and (y>-20 or floatDefs[unitDefID]))
 end
 
 
@@ -288,7 +290,7 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
   if (AddTransport(unitID, unitDefID)) then
     AssignTransports(unitID, 0)
   else
-    if (IsTransportable(unitDefID)) then
+    if (IsTransportable(unitDefID, unitID)) then
       priorityUnits[unitID] = nil
 
       local marked = GetToPickTransport(unitID)
@@ -313,7 +315,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
   if unitTeam == myTeamID then 
     local ud = UnitDefs[unitDefID]
     if (CONST_IGNORE_BUILDERS and ud.isBuilder and ud.canAssist) then return end
-    if (IsTransportable(unitDefID) and not userOrders) then 
+    if (IsTransportable(unitDefID, unitID) and not userOrders) then 
 --      Echo ("new unit from factory "..unitID)
 
       local commands = GetCommandQueue(unitID)
