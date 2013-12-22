@@ -1,9 +1,9 @@
 -- $Id: BloomShader.lua 3171 2008-11-06 09:06:29Z det $
 function widget:GetInfo()
 	return {
-		name      = "BloomShader (v0.31) (unstable)",
+		name      = "BloomShader (v0.31a)",
 		desc      = "Sets Spring In Bloom (do not use with < 7xxx geforce series or non-latest ATI cards!)",
-		author    = "Kloot",
+		author    = "Kloot", --Updated by Shadowfury333
 		date      = "28-5-2008",
 		license   = "",
 		layer     = 9,
@@ -18,31 +18,24 @@ options_path = 'Settings/Graphics/Effects/Bloom'
 options = {
 
 	dbgDraw 		= { type='bool', 	name='Draw Only Bloom Mask', 	value=false,		},
-	dilatePass 		= { type='bool', 	name='Dilate Pass', 			value=true, 		},
 	
-	glowAmplifier 	= { type='number', 		name='Glow Amplifier', 			value=1,		min=1, max=3,step=0.001, 	},
-	blurAmplifier 	= { type='number', 		name='Blur Amplifier', 			value=1.0625, 	min=1, max=1.5,step=0.001, 	},
-	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.5, 		min=0, max=1,step=0.001, 	},
-	blurPasses 		= { type='number', 		name='Blur Passes', 			value=1, 		min=0, max=10,step=1,  		},
+	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.35,		min=0.001, max=3,step=0.001, 	},
+	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.65, 		min=0, max=1,step=0.001, 	},
+	blurPasses 		= { type='number', 		name='Blur Passes', 			value=6, 		min=0, max=10,step=1,  		},
 }
 
 -- config params
 local dbgDraw = 0					-- draw only the bloom-mask? [0 | 1]
-local glowAmplifier = 1.0			-- intensity multiplier when filtering a glow source fragment [1, n]
-local blurAmplifier = 1.0625		-- intensity multiplier when applying a blur pass [1, n] (should be set close to 1)
-local illumThreshold = 0.5			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
-local blurPasses = 2				-- how many iterations of (7x7) Gaussian blur should be applied to the glow sources?
-local dilatePass = 1				-- dilate the glow sources after blurring? [0 | 1]
+local maxBrightness = 0.35			-- intensity multiplier when filtering a glow source fragment [1, n]
+local illumThreshold = 0.65			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
+local blurPasses = 6				-- how many iterations of (7x7) Gaussian blur should be applied to the glow sources?
 
 local function OnchangeFunc()
 	dbgDraw 		= options.dbgDraw.value and 1 or 0
-	dilatePass 		= options.dilatePass.value and 1 or 0
 	
-	glowAmplifier 	= options.glowAmplifier.value
-	blurAmplifier 	= options.blurAmplifier.value
+	maxBrightness 	= options.maxBrightness.value
 	illumThreshold 	= options.illumThreshold.value
 	blurPasses 		= options.blurPasses.value
-	dilatePass 		= options.dilatePass.value
 end
 for key,option in pairs(options) do
 	option.OnChange = OnchangeFunc
@@ -54,12 +47,11 @@ local vsx = 1						-- current viewport width
 local vsy = 1						-- current viewport height
 local ivsx = 1.0 / vsx
 local ivsy = 1.0 / vsy
+local kernelRadius = vsx / 108.0 --10 at 1080 px high
 
 -- shader and texture handles
 local blurShaderH71 = nil
 local blurShaderV71 = nil
-local dilateShaderH51 = nil
-local dilateShaderV51 = nil
 
 local brightShader = nil
 local brightTexture1 = nil
@@ -67,6 +59,8 @@ local brightTexture2 = nil
 
 local combineShader = nil
 local screenTexture = nil
+local screenTextureQuarter = nil
+local screenTextureSixteenth = nil
 
 -- speedups
 local glGetSun = gl.GetSun
@@ -134,11 +128,6 @@ local blurShaderV71Text0Loc = nil
 local blurShaderV71InvRYLoc = nil
 local blurShaderV71FragLoc = nil
 
-local dilateShaderH51Text0Loc = nil
-local dilateShaderH51InvRXLoc = nil
-local dilateShaderV51Text0Loc = nil
-local dilateShaderV51InvRYLoc = nil
-
 local combineShaderDebgDrawLoc = nil
 local combineShaderTexture0Loc = nil
 local combineShaderTexture1Loc = nil
@@ -171,25 +160,34 @@ end
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX; ivsx = 1.0 / vsx
 	vsy = viewSizeY; ivsy = 1.0 / vsy
+ 	kernelRadius = vsy / 108.0
+
+ 	Spring.Echo("Kernel Radius:", kernelRadius)
 
 	glDeleteTexture(brightTexture1 or "")
 	glDeleteTexture(brightTexture2 or "")
 	glDeleteTexture(screenTexture or "")
 
-	brightTexture1 = glCreateTexture(vsx, vsy, {
+	brightTexture1 = glCreateTexture(vsx/4, vsy/4, {
 		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
-	brightTexture2 = glCreateTexture(vsx, vsy, {
+	brightTexture2 = glCreateTexture(vsx/4, vsy/4, {
 		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 		format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 	})
 
 	screenTexture = glCreateTexture(vsx, vsy, {
-		min_filter = GL.NEAREST, mag_filter = GL.NEAREST,
+		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+	})
+	screenTextureQuarter = glCreateTexture(vsx/2, vsy/2, {
+		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+	})
+	screenTextureSixteenth = glCreateTexture(vsx/4, vsy/4, {
+		min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 	})
 
-	if (brightTexture1 == nil or brightTexture2 == nil or screenTexture == nil) then
+	if (brightTexture1 == nil or brightTexture2 == nil or screenTexture == nil or screenTextureQuarter == nil or screenTextureSixteenth == nil) then
 		RemoveMe("[BloomShader::ViewResize] removing widget, bad texture target")
 		return
 	end
@@ -240,28 +238,31 @@ function widget:Initialize()
 		fragment = [[
 			uniform sampler2D texture0;
 			uniform float inverseRX;
-			uniform float fragBlurAmplifier;
-			const float invKernelSum = 0.015625;
+			uniform float fragKernelRadius;
+			const float bloomSigma = 2.5;
 
 			void main(void) {
 				vec2 C0 = vec2(gl_TexCoord[0]);
 
-				vec4 S0 = texture2D(texture0, C0 + vec2(-3.0 * inverseRX, 0.0));
-				vec4 S1 = texture2D(texture0, C0 + vec2(-2.0 * inverseRX, 0.0));
-				vec4 S2 = texture2D(texture0, C0 + vec2(-1.0 * inverseRX, 0.0));
-				vec4 S3 = texture2D(texture0, C0 + vec2( 0.0            , 0.0));
-				vec4 S4 = texture2D(texture0, C0 + vec2( 1.0 * inverseRX, 0.0));
-				vec4 S5 = texture2D(texture0, C0 + vec2( 2.0 * inverseRX, 0.0));
-				vec4 S6 = texture2D(texture0, C0 + vec2( 3.0 * inverseRX, 0.0));
+				vec4 S = texture2D(texture0, C0);
+				float weight = 1.0 / (2.50663 * bloomSigma);
+				float total_weight = weight;
+				S *= weight;
+				for (float r = 1.5; r < fragKernelRadius; r += 2.0)
+				{
+					weight = exp(-((r*r)/(2.0 * bloomSigma * bloomSigma)))/(2.50663 * bloomSigma);
+					S += texture2D(texture0, C0 - vec2(r * inverseRX, 0.0)) * weight;
+					S += texture2D(texture0, C0 + vec2(r * inverseRX, 0.0)) * weight;
 
+					total_weight += 2*weight;
+				}
 
-				S3 = (S0 + 6.0*S1 + 15.0*S2 + 20.0*S3 + 15.0*S4 + 6.0*S5 + S6);
-				gl_FragColor = (S3 * invKernelSum) * fragBlurAmplifier;
+				gl_FragColor = vec4(S.rgb/total_weight, 1.0);
 			}
 		]],
 
 		uniformInt = {texture0 = 0},
-		uniformFloat = {inverseRX, fragBlurAmplifier}
+		uniformFloat = {inverseRX, fragKernelRadius}
 	})
 
 	if (blurShaderH71 == nil) then
@@ -272,103 +273,42 @@ function widget:Initialize()
 		fragment = [[
 			uniform sampler2D texture0;
 			uniform float inverseRY;
-			uniform float fragBlurAmplifier;
-			const float invKernelSum = 0.015625;
+			uniform float fragKernelRadius;
+			const float bloomSigma = 2.5;
 
 			void main(void) {
 				vec2 C0 = vec2(gl_TexCoord[0]);
 
-				vec4 S0 = texture2D(texture0, C0 + vec2(0.0, -3.0 * inverseRY));
-				vec4 S1 = texture2D(texture0, C0 + vec2(0.0, -2.0 * inverseRY));
-				vec4 S2 = texture2D(texture0, C0 + vec2(0.0, -1.0 * inverseRY));
-				vec4 S3 = texture2D(texture0, C0 + vec2(0.0,  0.0            ));
-				vec4 S4 = texture2D(texture0, C0 + vec2(0.0,  1.0 * inverseRY));
-				vec4 S5 = texture2D(texture0, C0 + vec2(0.0,  2.0 * inverseRY));
-				vec4 S6 = texture2D(texture0, C0 + vec2(0.0,  3.0 * inverseRY));
+				vec4 S = texture2D(texture0, C0);
+				float weight = 1.0 / (2.50663 * bloomSigma);
+				float total_weight = weight;
+				S *= weight;
+				for (float r = 1.5; r < fragKernelRadius; r += 2.0)
+				{
+					weight = exp(-((r*r)/(2.0 * bloomSigma * bloomSigma)))/(2.50663 * bloomSigma);
+					S += texture2D(texture0, C0 - vec2(0.0, r * inverseRY)) * weight;
+					S += texture2D(texture0, C0 + vec2(0.0, r * inverseRY)) * weight;
 
-				S3 = (S0 + 6.0*S1 + 15.0*S2 + 20.0*S3 + 15.0*S4 + 6.0*S5 + S6);
-				gl_FragColor = (S3 * invKernelSum) * fragBlurAmplifier;
+					total_weight += 2*weight;
+				}
+
+				gl_FragColor = vec4(S.rgb/total_weight, 1.0);
 			}
 		]],
 
 		uniformInt = {texture0 = 0},
-		uniformFloat = {inverseRY, fragBlurAmplifier}
+		uniformFloat = {inverseRY, fragKernelRadius}
 	})
 
 	if (blurShaderV71 == nil) then
 		RemoveMe("[BloomShader::Initialize] blurShaderV71 compilation failed"); print(glGetShaderLog()); return
 	end
 
-
-
-	dilateShaderH51 = glCreateShader({
-		fragment = [[
-			uniform sampler2D texture0;
-			uniform float inverseRX;
-
-			void main(void) {
-				vec2 C0 = vec2(gl_TexCoord[0]);
-				vec4 maxSample;
-
-				vec4 S0 = texture2D(texture0, C0 + vec2(-2.0 * inverseRX, 0.0));
-				vec4 S1 = texture2D(texture0, C0 + vec2(-1.0 * inverseRX, 0.0));
-				vec4 S2 = texture2D(texture0, C0 + vec2( 0.0            , 0.0));
-				vec4 S3 = texture2D(texture0, C0 + vec2( 1.0 * inverseRX, 0.0));
-				vec4 S4 = texture2D(texture0, C0 + vec2( 2.0 * inverseRX, 0.0));
-
-				maxSample    = max(S0,        S1);
-				maxSample    = max(maxSample, S2);
-				maxSample    = max(maxSample, S3);
-				gl_FragColor = max(maxSample, S4);
-			}
-		]],
-
-		uniformInt = { texture0 = 0 },
-		uniformFloat = { inverseRX }
-	})
-
-	if (dilateShaderH51 == nil) then
-		RemoveMe("[BloomShader::Initialize] dilateShaderH51 compilation failed"); print(glGetShaderLog()); return
-	end
-
-	dilateShaderV51 = glCreateShader({
-		fragment = [[
-			uniform sampler2D texture0;
-			uniform float inverseRY;
-
-			void main(void) {
-				vec2 C0 = vec2(gl_TexCoord[0]);
-				vec4 maxSample;
-
- 				vec4 S0 = texture2D(texture0, C0 + vec2(0.0, -2.0 * inverseRY));
-				vec4 S1 = texture2D(texture0, C0 + vec2(0.0, -1.0 * inverseRY));
-				vec4 S2 = texture2D(texture0, C0 + vec2(0.0,  0.0            ));
-				vec4 S3 = texture2D(texture0, C0 + vec2(0.0,  1.0 * inverseRY));
-				vec4 S4 = texture2D(texture0, C0 + vec2(0.0,  2.0 * inverseRY));
-
-
-				maxSample    = max(S0,        S1);
-				maxSample    = max(maxSample, S2);
-				maxSample    = max(maxSample, S3);
-				gl_FragColor = max(maxSample, S4);
-			}
-		]],
-
-		uniformInt = { texture0 = 0 },
-		uniformFloat = { inverseRY }
-	})
-
-	if (dilateShaderV51 == nil) then
-		RemoveMe("[BloomShader::Initialize] dilateShaderV51 compilation failed"); print(glGetShaderLog()); return
-	end
-
-
-
 	brightShader = glCreateShader({
 		fragment = [[
 			uniform sampler2D texture0;
 			uniform float illuminationThreshold;
-			uniform float fragGlowAmplifier;
+			uniform float fragMaxBrightness;
 			uniform float inverseRX;
 			uniform float inverseRY;
 
@@ -377,10 +317,8 @@ function widget:Initialize()
 				vec3 color = vec3(texture2D(texture0, C0));
 				float illum = dot(color, vec3(0.2990, 0.5870, 0.1140));
 
-//				vec4 samples[25];
-
 				if (illum > illuminationThreshold) {
-					gl_FragColor = vec4(color, 1.0) * fragGlowAmplifier;
+					gl_FragColor = vec4((color - color*(illuminationThreshold/max(illum, 0.00001))) * fragMaxBrightness/max(1.0 - illuminationThreshold, 0.0001), 1.0);
 				} else {
 					gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 				}
@@ -388,7 +326,7 @@ function widget:Initialize()
 		]],
 
 		uniformInt = {texture0 = 0},
-		uniformFloat = {illuminationThreshold, fragGlowAmplifier, inverseRX, inverseRY}
+		uniformFloat = {illuminationThreshold, fragMaxBrightness, inverseRX, inverseRY}
 	})
 
 	if (brightShader == nil) then
@@ -401,19 +339,14 @@ function widget:Initialize()
 	brightShaderInvRXLoc = glGetUniformLocation(brightShader, "inverseRX")
 	brightShaderInvRYLoc = glGetUniformLocation(brightShader, "inverseRY")
 	brightShaderIllumLoc = glGetUniformLocation(brightShader, "illuminationThreshold")
-	brightShaderFragLoc = glGetUniformLocation(brightShader, "fragGlowAmplifier")
+	brightShaderFragLoc = glGetUniformLocation(brightShader, "fragMaxBrightness")
 
 	blurShaderH71Text0Loc = glGetUniformLocation(blurShaderH71, "texture0")
 	blurShaderH71InvRXLoc = glGetUniformLocation(blurShaderH71, "inverseRX")
-	blurShaderH71FragLoc = glGetUniformLocation(blurShaderH71, "fragBlurAmplifier")
+	blurShaderH71FragLoc = glGetUniformLocation(blurShaderH71, "fragKernelRadius")
 	blurShaderV71Text0Loc = glGetUniformLocation(blurShaderV71, "texture0")
 	blurShaderV71InvRYLoc = glGetUniformLocation(blurShaderV71, "inverseRY")
-	blurShaderV71FragLoc = glGetUniformLocation(blurShaderV71, "fragBlurAmplifier")
-
-	dilateShaderH51Text0Loc = glGetUniformLocation(dilateShaderH51, "texture0")
-	dilateShaderH51InvRXLoc = glGetUniformLocation(dilateShaderH51, "inverseRX")
-	dilateShaderV51Text0Loc = glGetUniformLocation(dilateShaderV51, "texture0")
-	dilateShaderV51InvRYLoc = glGetUniformLocation(dilateShaderV51, "inverseRY")
+	blurShaderV71FragLoc = glGetUniformLocation(blurShaderV71, "fragKernelRadius")
 
 	combineShaderDebgDrawLoc = glGetUniformLocation(combineShader, "debugDraw")
 	combineShaderTexture0Loc = glGetUniformLocation(combineShader, "texture0")
@@ -429,8 +362,6 @@ function widget:Shutdown()
 		glDeleteShader(brightShader or 0)
 		glDeleteShader(blurShaderH71 or 0)
 		glDeleteShader(blurShaderV71 or 0)
-		glDeleteShader(dilateShaderH51 or 0)
-		glDeleteShader(dilateShaderV51 or 0)
 		glDeleteShader(combineShader or 0)
 	end
 end
@@ -483,47 +414,32 @@ local function Bloom()
 	gl.Color(1, 1, 1, 1)
 
 	glCopyToTexture(screenTexture, 0, 0, 0, 0, vsx, vsy)
- 
+
+
+
 	glUseShader(brightShader)
 		glUniformInt(brightShaderText0Loc, 0)
 		glUniform(   brightShaderInvRXLoc, ivsx)
 		glUniform(   brightShaderInvRYLoc, ivsy)
 		glUniform(   brightShaderIllumLoc, illumThreshold)
-		glUniform(   brightShaderFragLoc, glowAmplifier)
+		glUniform(   brightShaderFragLoc, maxBrightness)
 		mglRenderToTexture(brightTexture1, screenTexture, 1, -1)
 	glUseShader(0)
-
-
 
 	for i = 1, blurPasses do
 		glUseShader(blurShaderH71)
 			glUniformInt(blurShaderH71Text0Loc, 0)
 			glUniform(   blurShaderH71InvRXLoc, ivsx)
-			glUniform(   blurShaderH71FragLoc, blurAmplifier)
+			glUniform(	 blurShaderH71FragLoc, kernelRadius)
 			mglRenderToTexture(brightTexture2, brightTexture1, 1, -1)
 		glUseShader(0)
 		glUseShader(blurShaderV71)
 			glUniformInt(blurShaderV71Text0Loc, 0)
 			glUniform(   blurShaderV71InvRYLoc, ivsy)
-			glUniform(   blurShaderV71FragLoc, blurAmplifier)
+			glUniform(	 blurShaderV71FragLoc, kernelRadius)
 			mglRenderToTexture(brightTexture1, brightTexture2, 1, -1)
 		glUseShader(0)
 	end
-
-
-	if (dilatePass == 1) then
-		glUseShader(dilateShaderH51)
-			glUniformInt(dilateShaderH51Text0Loc, 0)
-			glUniform(   dilateShaderH51InvRXLoc, ivsx)
-			mglRenderToTexture(brightTexture2, brightTexture1, 1, -1)
-		glUseShader(0)
-		glUseShader(dilateShaderV51)
-			glUniformInt(dilateShaderV51Text0Loc, 0)
-			glUniform(   dilateShaderV51InvRYLoc, ivsy)
-			mglRenderToTexture(brightTexture1, brightTexture2, 1, -1)
-		glUseShader(0)
-	end
-
 
 	glUseShader(combineShader)
 		glUniformInt(combineShaderDebgDrawLoc, dbgDraw)
@@ -542,17 +458,11 @@ function widget:TextCommand(command)
 	if (string.find(command, "+illumthres") == 1) then illumThreshold = illumThreshold + 0.02 end
 	if (string.find(command, "-illumthres") == 1) then illumThreshold = illumThreshold - 0.02 end
 
-	if (string.find(command, "+glowamplif") == 1) then glowAmplifier = glowAmplifier + 0.05 end
-	if (string.find(command, "-glowamplif") == 1) then glowAmplifier = glowAmplifier - 0.05 end
-
-	if (string.find(command, "+bluramplif") == 1) then blurAmplifier = blurAmplifier + 0.05 end
-	if (string.find(command, "-bluramplif") == 1) then blurAmplifier = blurAmplifier - 0.05 end
+	if (string.find(command, "+glowamplif") == 1) then maxBrightness = maxBrightness + 0.05 end
+	if (string.find(command, "-glowamplif") == 1) then maxBrightness = maxBrightness - 0.05 end
 
 	if (string.find(command, "+blurpasses") == 1) then blurPasses = blurPasses + 1 end
 	if (string.find(command, "-blurpasses") == 1) then blurPasses = blurPasses - 1 end
-
-	if (string.find(command, "+dilatepass") == 1) then dilatePass = 1 end
-	if (string.find(command, "-dilatepass") == 1) then dilatePass = 0 end
 
 	if (string.find(command, "+bloomdebug") == 1) then dbgDraw = 1 end
 	if (string.find(command, "-bloomdebug") == 1) then dbgDraw = 0 end
@@ -562,7 +472,7 @@ function widget:TextCommand(command)
 
 	Spring.Echo("[BloomShader::TextCommand]")
 	Spring.Echo("   illumThreshold: " .. illumThreshold)
-	Spring.Echo("   glowAmplifier:  " .. glowAmplifier)
+	Spring.Echo("   maxBrightness:  " .. maxBrightness)
 	Spring.Echo("   blurAmplifier:  " .. blurAmplifier)
 	Spring.Echo("   blurPasses:     " .. blurPasses)
 	Spring.Echo("   dilatePass:     " .. dilatePass)
