@@ -1163,10 +1163,12 @@ end
 function widgetHandler:Shutdown()
   Spring.Echo("Start widgetHandler:Shutdown")
   self:SaveOrderList()
+  Spring.Echo("Shutdown - SaveOrderList Complete")
   self:SaveConfigData()
+  Spring.Echo("Shutdown - SaveConfigData Complete")
   for _,w in ipairs(self.ShutdownList) do
     local name = w.whInfo.name or "UNKNOWN NAME"
-	Spring.Echo("Shutdown - " .. name)
+	Spring.Echo("Shutdown Widget - " .. name)
 	w:Shutdown()
   end
   Spring.Echo("End widgetHandler:Shutdown")
