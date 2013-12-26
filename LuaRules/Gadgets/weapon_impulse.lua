@@ -83,7 +83,7 @@ local mass = {}
 for i=1,#UnitDefs do
 	local ud = UnitDefs[i]
 	mass[i] = ud.mass
-	local movetype = getMovetype(ud)
+	moveTypeByID[i] = getMovetype(ud)
 end
 
 -------------------------------------------------------------------------------------
