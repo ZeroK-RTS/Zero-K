@@ -24,10 +24,12 @@ unitDef = {
     description_bp = [[Veículo lançador de mísseis]],
     description_fr = [[Camion Lance-Missile]],
 	description_de = [[Unterstütung/Flugabwehr Laster (muss zum Feuern anhalten)]],
+	description_pl = [[Rozstawiany pojazd rakietowy]],
     helptext       = [[Keep the Slasher at maximum range to harass the opponent's units. The Slasher's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Slasher cannot fire while moving.]],
     helptext_bp    = [[Slasher é um escaramuçador. Mantenha-o a distância máxima do inimigo para perturbar suas unidades ou comandante. Pode atirar tanto contra inimigos aéreos como terrestres, sendo úteis quando o inimigo está usando ambos, e seus mísseis s?o tele-guiados possibilitando acertar alvos pequenos e rápidos como bombas rastejantes. N?o pode atirar sobre muros de terra e luta mal de perto.]],
     helptext_fr    = [[Le Slasher est un camion Tirailleur. Sa trcs grande portée compense un peu son manque de puissance de feu. Capable de tirer en l'air ou au sol, il saura quand meme trouver sa place dans votre armée.]],
 	helptext_de    = [[Halte deinen Slasher immer auf maximaler Distanz zum Feind, um diesen am besten zu belagern. Seine Raketen sind gelenkt und somit ideal, um sich schnell bewegende Einheiten oder Crawling Bomben zu vernichten. Er kann sowohl Land-, als auch Lufteinheiten treffen, aber nicht über Wände und Hügel schießen. Außerdem versagt er kläglich, sobald sich Feinde dicht am ihm befinden. Im Gegensatz zu dem meisten normalen Skirmishern, kann der Slasher nicht Feuern, wenn er sich bewegt.]],
+	helptext_pl    = [[Slasher nie moze strzelac w ruchu. Stojace w miejscu Slashery automatycznie rozstawiaja swoja dalekosiezna wyrzutnie lekkich rakiet samonaprowadzajacych, ktore swietnie nadaja sie do niszczenia lzejszych jednostek i bomb; moga takze sluzyc jako improwizowana obrona przeciwlotnicza. Slasher nie moze jednak strzelac nad przeszkodami i ma niska wytrzymalosc.]],
 	modelradius    = [[13]],
   },
 

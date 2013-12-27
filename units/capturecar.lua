@@ -22,8 +22,10 @@ unitDef = {
 
   customParams        = {
     description_de = [[Kaperungsfahrzeug]],
-    helptext       = [[The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 8 seconds. If a Dominatrix is destroyed all units it controls are freed.]],
+    description_pl = [[Pojazd do przejmowania jednostek]],
+    helptext       = [[The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed.]],
 	helptext_de    = [[Der Dominatrix erobert Einheiten, hetzt sie gegen die ehemaligen Verbündeten auf. Mehrere Dominatrixe können ein Ziel schneller erobern, obwohl nur einer von ihnen der Kontrolleur dieser Einheit wird. Nachdem eine gegnerische Einheit unter Kontrolle gebracht wurde, kann der Dominatrix für fünf Sekunden nicht schießen. Sobald ein Dominatrix zerstört wurde, sind alle Einheiten unter seiner Kontrolle wieder frei.]],
+	helptext_pl    = [[Domiantrix przejmuje jednostki wroga pod swoja kontrole. Wiele Dominatrix moze wspolpracowac przy przejmowaniu danej jednostki, ale tylko jednej z nich zostanie przypisana. Po przejeciu jednostki, Dominatrix nie moze przejmowac przez kolejne 12 sekund. Zniszczenie powoduje zwrot wszystkich przypisanych jednostek do pierwotnego wlasciciela.]],
 	modelradius    = [[13]],
   },
 
