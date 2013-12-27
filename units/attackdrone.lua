@@ -33,6 +33,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[attackdrone.s3o]],
+  reclaimable         = false,
   refuelTime          = 10,
   script              = [[attackdrone.lua]],
   seismicSignature    = 0,

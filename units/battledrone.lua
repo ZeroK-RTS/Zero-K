@@ -33,6 +33,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[battledrone.s3o]],
+  reclaimable         = false,
   script              = [[battledrone.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[SMALL_BUILDINGEX]],

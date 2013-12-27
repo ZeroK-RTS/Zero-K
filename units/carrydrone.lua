@@ -37,6 +37,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[carrydrone.s3o]],
+  reclaimable         = false,
   RefuelTime          = 10,
   script              = [[carrydrone.lua]],
   seismicSignature    = 0,
