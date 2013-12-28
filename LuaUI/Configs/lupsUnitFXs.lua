@@ -252,7 +252,7 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=32, piece="rjet", onActive=true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=32, piece="mjet", onActive=true}},
   },
-  armpnix = {
+  bomberstrike = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustl", onActive=true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="exhaustr", onActive=true}},
     {class='Ribbon', options={width=1, size=10, piece="wingtipl"}},
