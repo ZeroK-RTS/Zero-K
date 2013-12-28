@@ -302,6 +302,7 @@ unitDef = {
       edgeEffectiveness       = 0.75,
       explosionGenerator      = [[custom:TESS]],
       fireStarter             = 55,
+	  flighttime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.8,
       interceptedByShieldType = 2,
