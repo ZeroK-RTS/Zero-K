@@ -1,7 +1,7 @@
 unitDef = {
   unitname              = [[jumpblackhole]],
   name                  = [[Placeholder]],
-  description           = [[Jumpy Black Hole Launcher]],
+  description           = [[Black Hole Launcher]],
   acceleration          = 0.4,
   brakeRate             = 0.4,
   buildCostEnergy       = 250,
@@ -18,7 +18,9 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
-    helptext       = [[Black hole launching jumpbot.]],
+    description_pl = [[Wyrzutnia czarnych dziur]],
+    helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
+    helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
   },
 
   explodeAs             = [[BIG_UNITEX]],
