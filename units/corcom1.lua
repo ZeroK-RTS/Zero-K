@@ -33,8 +33,10 @@ unitDef = {
 
   customParams        = {
 	description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
+	description_pl = [[Ciezki Dowodca bojowy, moc 10 m/s]],
 	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment.]],
-	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterst?zungsausr?tung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
+	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstutzungsausrustung.]],
+	helptext_pl    = [[Battle to Dowodca, ktory reprezentuje brutalna sile i duza wytrzymalosc; jest jednak wolny i nie moze montowac zbyt wielu modulow wsparcia.]],
 	level = [[1]],
 	statsname = [[corcom1]],
 	soundok = [[heavy_bot_move]],

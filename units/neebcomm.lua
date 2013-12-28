@@ -24,7 +24,9 @@ unitDef = {
   commander           = true,
 
   customParams        = {
+    description_pl = [[Karny kurczak]],
     helptext       = [[This fat chicken is presented to you as a reward for your misdeeds. Behave next time!]],
+    helptext_pl    = [[Karny kurczak za zle zachowanie. Popraw sie!]],
 	level		   = [[1]],
   },
 
