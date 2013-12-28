@@ -18,7 +18,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The slow all-terrain Funnelweb is only (relatively) modestly armed and can only fire forwards, but features an area shield and powerful drone complement.]],
+    description_pl = [[Ciezki pajak wsparcia]],
+    helptext       = [[The slow all-terrain Funnelweb is only (relatively) modestly armed and can only fire forwards, but features twin area shields and powerful drone complement.]],
+    helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Mimo ze jego bron jest skromna i moze strzelac jedynie do przodu, posiada dwie tarcze obszarowe oraz produkuje zestaw dronow.]],
   },
 
   energyUse                     = 1.5,

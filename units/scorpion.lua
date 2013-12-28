@@ -20,8 +20,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    description_pl = [[Ciezki pajak bojowy]],
     helptext       = [[The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent.]],
-	cloakstealth   = [[1]],
+    helptext_pl    = [[Scorpion to bojowy pajak, ktory paralizuje i szybko niszczy przeciwnikow; jego pancerz jest bardzo wytrzymaly i zapewnia mu maskowanie.]],
+    cloakstealth   = [[1]],
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],
