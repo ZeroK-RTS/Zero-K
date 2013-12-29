@@ -112,7 +112,6 @@ local brightShaderText0Loc = nil
 local brightShaderInvRXLoc = nil
 local brightShaderInvRYLoc = nil
 local brightShaderIllumLoc = nil
-local brightShaderFragLoc = nil
 
 local blurShaderH51Text0Loc = nil
 local blurShaderH51InvRXLoc = nil
@@ -131,6 +130,8 @@ local blurShaderV71FragLoc = nil
 local combineShaderDebgDrawLoc = nil
 local combineShaderTexture0Loc = nil
 local combineShaderTexture1Loc = nil
+local combineShaderIllumLoc = nil
+local combineShaderFragLoc = nil
 
 
 
@@ -210,6 +211,8 @@ function widget:Initialize()
 		fragment = [[
 			uniform sampler2D texture0;
 			uniform sampler2D texture1;
+			uniform float illuminationThreshold;
+			uniform float fragMaxBrightness;
 			uniform int debugDraw;
 
 			void main(void) {
@@ -217,13 +220,15 @@ function widget:Initialize()
 				vec2 C0 = vec2(gl_TexCoord[0]);
 				vec4 S0 = texture2D(texture0, C0);
 				vec4 S1 = texture2D(texture1, C0);
+				S1 = vec4(S1.rgb * fragMaxBrightness/max(1.0 - illuminationThreshold, 0.0001), 1.0);
 
 
 				gl_FragColor = bool(debugDraw) ? S1 : S0 + S1;
 			}
 		]],
 
-		uniformInt = { texture0 = 0, texture1 = 1, debugDraw = 0}
+		uniformInt = { texture0 = 0, texture1 = 1, debugDraw = 0},
+		uniformFloat = {illuminationThreshold, fragMaxBrightness}
 	})
 
 	if (combineShader == nil) then
@@ -306,7 +311,6 @@ function widget:Initialize()
 		fragment = [[
 			uniform sampler2D texture0;
 			uniform float illuminationThreshold;
-			uniform float fragMaxBrightness;
 			uniform float inverseRX;
 			uniform float inverseRY;
 
@@ -316,7 +320,7 @@ function widget:Initialize()
 				float illum = dot(color, vec3(0.2990, 0.5870, 0.1140));
 
 				if (illum > illuminationThreshold) {
-					gl_FragColor = vec4((color - color*(illuminationThreshold/max(illum, 0.00001))) * fragMaxBrightness/max(1.0 - illuminationThreshold, 0.0001), 1.0);
+					gl_FragColor = vec4((color - color*(illuminationThreshold/max(illum, 0.00001))), 1.0);
 				} else {
 					gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 				}
@@ -324,7 +328,7 @@ function widget:Initialize()
 		]],
 
 		uniformInt = {texture0 = 0},
-		uniformFloat = {illuminationThreshold, fragMaxBrightness, inverseRX, inverseRY}
+		uniformFloat = {illuminationThreshold, inverseRX, inverseRY}
 	})
 
 	if (brightShader == nil) then
@@ -337,7 +341,6 @@ function widget:Initialize()
 	brightShaderInvRXLoc = glGetUniformLocation(brightShader, "inverseRX")
 	brightShaderInvRYLoc = glGetUniformLocation(brightShader, "inverseRY")
 	brightShaderIllumLoc = glGetUniformLocation(brightShader, "illuminationThreshold")
-	brightShaderFragLoc = glGetUniformLocation(brightShader, "fragMaxBrightness")
 
 	blurShaderH71Text0Loc = glGetUniformLocation(blurShaderH71, "texture0")
 	blurShaderH71InvRXLoc = glGetUniformLocation(blurShaderH71, "inverseRX")
@@ -349,6 +352,8 @@ function widget:Initialize()
 	combineShaderDebgDrawLoc = glGetUniformLocation(combineShader, "debugDraw")
 	combineShaderTexture0Loc = glGetUniformLocation(combineShader, "texture0")
 	combineShaderTexture1Loc = glGetUniformLocation(combineShader, "texture1")
+	combineShaderIllumLoc = glGetUniformLocation(combineShader, "illuminationThreshold")
+	combineShaderFragLoc = glGetUniformLocation(combineShader, "fragMaxBrightness")
 end
 
 function widget:Shutdown()
@@ -420,7 +425,6 @@ local function Bloom()
 		glUniform(   brightShaderInvRXLoc, ivsx)
 		glUniform(   brightShaderInvRYLoc, ivsy)
 		glUniform(   brightShaderIllumLoc, illumThreshold)
-		glUniform(   brightShaderFragLoc, maxBrightness)
 		mglRenderToTexture(brightTexture1, screenTexture, 1, -1)
 	glUseShader(0)
 
@@ -443,6 +447,8 @@ local function Bloom()
 		glUniformInt(combineShaderDebgDrawLoc, dbgDraw)
 		glUniformInt(combineShaderTexture0Loc, 0)
 		glUniformInt(combineShaderTexture1Loc, 1)
+		glUniform(   combineShaderIllumLoc, illumThreshold)
+		glUniform(   combineShaderFragLoc, maxBrightness)
 		mglActiveTexture(0, screenTexture, vsx, vsy, false, true)
 		mglActiveTexture(1, brightTexture1, vsx, vsy, false, true)
 	glUseShader(0)
