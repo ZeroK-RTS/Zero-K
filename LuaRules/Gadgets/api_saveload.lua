@@ -157,46 +157,48 @@ local function LoadUnits()
 		end
 		local isNanoFrame = data.buildProgress < 1
 		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, true, oldID)
-		data.newID = newID
-		-- position and velocity
-		spSetUnitVelocity(newID, unpack(data.vel))
-		--spSetUnitDirection(newID, unpack(data.dir))	-- FIXME: callin does not exist
-		Spring.MoveCtrl.Enable(newID)
-		Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
-		Spring.MoveCtrl.Disable(newID)
-		-- health
-		spSetUnitMaxHealth(newID, data.maxHealth)
-		spSetUnitHealth(newID, {health = data.health, capture = data.captureProgress, paralyze = data.paralyzeDamage, build = data.buildProgress})
-		-- experience
-		spSetUnitExperience(newID, data.experience)
-		-- weapons
-		for i,v in pairs(data.weapons) do
-			if v.reloadState then
-				spSetUnitWeaponState(newID, i, "reloadState", v.reloadState)
+		if newID then
+			data.newID = newID
+			-- position and velocity
+			spSetUnitVelocity(newID, unpack(data.vel))
+			--spSetUnitDirection(newID, unpack(data.dir))	-- FIXME: callin does not exist
+			Spring.MoveCtrl.Enable(newID)
+			Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
+			Spring.MoveCtrl.Disable(newID)
+			-- health
+			spSetUnitMaxHealth(newID, data.maxHealth)
+			spSetUnitHealth(newID, {health = data.health, capture = data.captureProgress, paralyze = data.paralyzeDamage, build = data.buildProgress})
+			-- experience
+			spSetUnitExperience(newID, data.experience)
+			-- weapons
+			for i,v in pairs(data.weapons) do
+				if v.reloadState then
+					spSetUnitWeaponState(newID, i, "reloadState", v.reloadState)
+				end
+				if data.shield[i] then
+					spSetUnitShieldState(newID, i, data.shield[i].enabled, data.shield[i].power)
+				end
 			end
-			if data.shield[i] then
-				spSetUnitShieldState(newID, i, data.shield[i].enabled, data.shield[i].power)
+			spSetUnitStockpile(newID, data.stockpile.num, data.stockpile.progress)
+			
+			-- states
+			spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate}, {})
+			spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate}, {})
+			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"])}, {})
+			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, {})
+			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, {})
+			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
+			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
+			
+			-- rulesparams
+			for name,value in pairs(data.rulesParams) do
+				Spring.SetUnitRulesParam(newID, name, value)
 			end
+			-- is neutral
+			spSetUnitNeutral(newID, data.neutral)
+			
+			Spring.Echo("unitID check", oldID, newID)
 		end
-		spSetUnitStockpile(newID, data.stockpile.num, data.stockpile.progress)
-		
-		-- states
-		spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate}, {})
-		spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate}, {})
-		spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"])}, {})
-		spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, {})
-		spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, {})
-		spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
-		spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
-		
-		-- rulesparams
-		for name,value in pairs(data.rulesParams) do
-			Spring.SetUnitRulesParam(newID, name, value)
-		end
-		-- is neutral
-		spSetUnitNeutral(newID, data.neutral)
-		
-		Spring.Echo("unitID check", oldID, newID)
 	end
 	
 	-- second pass for orders

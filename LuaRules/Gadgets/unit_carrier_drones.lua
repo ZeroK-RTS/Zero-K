@@ -53,20 +53,22 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 	local xS = (x + (math.sin(angle) * 20))
 	local zS = (z + (math.cos(angle) * 20))
 	local droneID = CreateUnit(droneName,x,y,z,1,carrierList[unitID].teamID)
-	local droneSet = carrierList[unitID].droneSets[setNum]
-	droneSet.reload = carrierDefs[unitDefID][setNum].reloadTime
-	droneSet.droneCount = droneSet.droneCount + 1
-	droneSet.drones[droneID] = true
+	if droneID then
+		local droneSet = carrierList[unitID].droneSets[setNum]
+		droneSet.reload = carrierDefs[unitDefID][setNum].reloadTime
+		droneSet.droneCount = droneSet.droneCount + 1
+		droneSet.drones[droneID] = true
 
-	SetUnitPosition(droneID, xS, zS, true)
-	GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
-	GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
-	GiveOrderToUnit(droneID, CMD.FIGHT,	{x + random(-300,300), 60, z + random(-300,300)}, {""})
-	GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
+		SetUnitPosition(droneID, xS, zS, true)
+		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
+		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
+		GiveOrderToUnit(droneID, CMD.FIGHT,	{x + random(-300,300), 60, z + random(-300,300)}, {""})
+		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 
-	SetUnitNoSelect(droneID,true)
+		SetUnitNoSelect(droneID,true)
 
-	droneList[droneID] = {carrier = unitID, set = setNum}
+		droneList[droneID] = {carrier = unitID, set = setNum}
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)

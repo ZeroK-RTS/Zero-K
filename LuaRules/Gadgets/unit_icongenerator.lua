@@ -73,39 +73,41 @@ if (gadgetHandler:IsSyncedCode()) then
         Spring.LevelHeightMap(x-50,z-50,x+50,z+50,y);
 
         local uid = Spring.CreateUnit(cunit.defname,x,y,z,"south", 0);	-- FIXME needs to be a non-gaia team if gaia doesn't have its unitlimit assigned
-        units[#units+1] = {id=uid,defname=cunit.defname,frame=n+cunit.time};
-        curTeam = cunit.team;
+        if uid then
+			units[#units+1] = {id=uid,defname=cunit.defname,frame=n+cunit.time};
+			curTeam = cunit.team;
 
-        Spring.SetUnitNeutral(uid,true);
-        Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},{});
-        Spring.GiveOrderToUnit(uid,CMD.STOP,{},{});
+			Spring.SetUnitNeutral(uid,true);
+			Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},{});
+			Spring.GiveOrderToUnit(uid,CMD.STOP,{},{});
 
-		local env = Spring.UnitScript.GetScriptEnv(uid)
-		if env then lus = true end
-		
-		if lus then
-			if env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate) end
-        else Spring.CallCOBScript(uid,"Activate",0) end
+			local env = Spring.UnitScript.GetScriptEnv(uid)
+			if env then lus = true end
+			
+			if lus then
+				if env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate) end
+			else Spring.CallCOBScript(uid,"Activate",0) end
 
-        if (cunit.move) then
-		  if lus then
-			if env.StartMoving then Spring.UnitScript.CallAsUnit(uid, env.StartMoving) end
-          else Spring.CallCOBScript(uid,"StartMoving",0) end
-        end;
+			if (cunit.move) then
+			  if lus then
+				if env.StartMoving then Spring.UnitScript.CallAsUnit(uid, env.StartMoving) end
+			  else Spring.CallCOBScript(uid,"StartMoving",0) end
+			end;
 
-        if (cunit.attack and not lus) then
-          local angle = (cunit.shotAngle / 180) * 32768
+			if (cunit.attack and not lus) then
+			  local angle = (cunit.shotAngle / 180) * 32768
 
-          Spring.CallCOBScript(uid,"AimPrimary",0,Spring.GetHeadingFromVector(0,1),angle);
-          Spring.CallCOBScript(uid,"AimWeapon1",0,Spring.GetHeadingFromVector(0,1),angle);
+			  Spring.CallCOBScript(uid,"AimPrimary",0,Spring.GetHeadingFromVector(0,1),angle);
+			  Spring.CallCOBScript(uid,"AimWeapon1",0,Spring.GetHeadingFromVector(0,1),angle);
 
-          Spring.CallCOBScript(uid,"AimSecondary",0,Spring.GetHeadingFromVector(0,1),angle);
-          Spring.CallCOBScript(uid,"AimWeapon2",0,Spring.GetHeadingFromVector(0,1),angle);
+			  Spring.CallCOBScript(uid,"AimSecondary",0,Spring.GetHeadingFromVector(0,1),angle);
+			  Spring.CallCOBScript(uid,"AimWeapon2",0,Spring.GetHeadingFromVector(0,1),angle);
 
-          Spring.CallCOBScript(uid,"AimTertiary",0,Spring.GetHeadingFromVector(0,1),angle);
-          Spring.CallCOBScript(uid,"AimWeapon3",0,Spring.GetHeadingFromVector(0,1),angle);
+			  Spring.CallCOBScript(uid,"AimTertiary",0,Spring.GetHeadingFromVector(0,1),angle);
+			  Spring.CallCOBScript(uid,"AimWeapon3",0,Spring.GetHeadingFromVector(0,1),angle);
 
-        end;
+			end;
+		end
       end;
     end;
     createunits = leftunits;

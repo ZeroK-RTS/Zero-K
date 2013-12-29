@@ -110,51 +110,53 @@ if (gadgetHandler:IsSyncedCode()) then
 		spEditUnitCmdDesc(unitID, cmdDescID, editCmdDesc)
 
 		local scanID = spCreateUnit("fakeunit_los", cmdParams[1], cmdParams[2], cmdParams[3], 0, teamID)
-		local scanTime = current_frame + config[unitDefID].scanTime
-		scans[scanID] = scanTime
+		if scanID then
+			local scanTime = current_frame + config[unitDefID].scanTime
+			scans[scanID] = scanTime
 
-		-- change LoS to the wanted value and make the unit not interact with the environment
-		spSetUnitSensorRadius(scanID, "los", config[unitDefID].scanRadius)
-		spSetUnitSensorRadius(scanID, "airLos", config[unitDefID].scanRadius)
-		spSetUnitSensorRadius(scanID, "radar", config[unitDefID].scanRadius)
-		spSetUnitSensorRadius(scanID, "sonar", config[unitDefID].scanRadius)
+			-- change LoS to the wanted value and make the unit not interact with the environment
+			spSetUnitSensorRadius(scanID, "los", config[unitDefID].scanRadius)
+			spSetUnitSensorRadius(scanID, "airLos", config[unitDefID].scanRadius)
+			spSetUnitSensorRadius(scanID, "radar", config[unitDefID].scanRadius)
+			spSetUnitSensorRadius(scanID, "sonar", config[unitDefID].scanRadius)
 
-		spSetUnitSensorRadius(scanID, "radarJammer", 0)
-		spSetUnitSensorRadius(scanID, "sonarJammer", 0)
-		spSetUnitNeutral(scanID, true)
-		spSetUnitBlocking(scanID, false, false, false)
-		spSetUnitNoSelect (scanID, true)
-		spSetUnitNoDraw (scanID, true)
-		spSetUnitNoMinimap (scanID, true)
-		spSetUnitCollisionVolumeData(scanID
-			, 0, 0, 0
-			, 0, 0, 0
-			, 0, 1, 0
-		)
+			spSetUnitSensorRadius(scanID, "radarJammer", 0)
+			spSetUnitSensorRadius(scanID, "sonarJammer", 0)
+			spSetUnitNeutral(scanID, true)
+			spSetUnitBlocking(scanID, false, false, false)
+			spSetUnitNoSelect (scanID, true)
+			spSetUnitNoDraw (scanID, true)
+			spSetUnitNoMinimap (scanID, true)
+			spSetUnitCollisionVolumeData(scanID
+				, 0, 0, 0
+				, 0, 0, 0
+				, 0, 1, 0
+			)
 
-		for i = 0, ally_count do
-			spSetUnitLosState(scanID, i, 0)
-			spSetUnitLosMask (scanID, i, 15)
-		end
-
-		-- reveal cloaked stuff without decloaking, Dust of Appearance style
-		if (config[unitDefID].revealRadius > 0) then
-			local nearby_units = spGetUnitsInCylinder(cmdParams[1], cmdParams[3], config[unitDefID].revealRadius)
-			local scannerAllyTeam = spGetUnitAllyTeam(unitID)
-			for i = 1, #nearby_units do
-				if ((not revealed[nearby_units[i]]) or (scanTime > revealed[nearby_units[i]])) then -- don't replace longer reveal time with a shorter one
-					revealed[nearby_units[i]] = scanTime
-				end
-				spSetUnitLosState(nearby_units[i], scannerAllyTeam, 15)
-				spSetUnitLosMask (nearby_units[i], scannerAllyTeam, 15)
+			for i = 0, ally_count do
+				spSetUnitLosState(scanID, i, 0)
+				spSetUnitLosMask (scanID, i, 15)
 			end
-		end
 
-		-- visuals (CEG + circle)
-		if (config[unitDefID].ceg) then
-			spSpawnCEG(config[unitDefID].ceg, cmdParams[1], cmdParams[2], cmdParams[3])
+			-- reveal cloaked stuff without decloaking, Dust of Appearance style
+			if (config[unitDefID].revealRadius > 0) then
+				local nearby_units = spGetUnitsInCylinder(cmdParams[1], cmdParams[3], config[unitDefID].revealRadius)
+				local scannerAllyTeam = spGetUnitAllyTeam(unitID)
+				for i = 1, #nearby_units do
+					if ((not revealed[nearby_units[i]]) or (scanTime > revealed[nearby_units[i]])) then -- don't replace longer reveal time with a shorter one
+						revealed[nearby_units[i]] = scanTime
+					end
+					spSetUnitLosState(nearby_units[i], scannerAllyTeam, 15)
+					spSetUnitLosMask (nearby_units[i], scannerAllyTeam, 15)
+				end
+			end
+
+			-- visuals (CEG + circle)
+			if (config[unitDefID].ceg) then
+				spSpawnCEG(config[unitDefID].ceg, cmdParams[1], cmdParams[2], cmdParams[3])
+			end
+			SendToUnsync("scan_start", scanID, config[unitDefID].scanRadius)
 		end
-		SendToUnsync("scan_start", scanID, config[unitDefID].scanRadius)
 
 		return true, true -- Recognized and finished (remove from Q)
 	end
