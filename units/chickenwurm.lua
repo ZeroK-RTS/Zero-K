@@ -18,10 +18,12 @@ unitDef = {
   customParams        = {
     description_fr = [[Ver d'assaut souterrain]],
 	description_de = [[Grabender Flammenwerfer (Sturm/Riot)]],
+	description_pl = [[Zakopany miotacz ognia]],
 	fireproof	   = 1,
     helptext       = [[The Wurm "burrows" under the surface of the ground, revealing itself to hurl a ball of fire that immolates a large swathe of terrain. It can climb cliffs and surprise defense turrets, but is weak to assaults.]],
     helptext_fr    = [[Ces poulets tenant partiellement de la taupe ont une particularité : ils savent mettre le feu où qu'ils aillent.]],
 	helptext_de    = [[Der Wurm "gräbt" sich unter die Bodenoberfläche und zeigt sich nur, wenn er Feuerbälle, die große Schneisen in das Gelände brennen, schleudert.]],
+	helptext_pl    = [[Wurm zagrzebuje sie pod ziemia i moze w ten sposob poruszac sie. Wychodzac z niej, ciska kule ognia, ktore podpalaja okolice. Moze tez wspinac sie na strome wzniesienia. Jego slabym punktem jest niska wytrzymalosc.]],
   },
 
   explodeAs           = [[CORPYRO_NAPALM]],

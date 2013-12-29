@@ -18,9 +18,11 @@ unitDef = {
   customParams        = {
     description_fr = [[Bouclier mobile/AA l?ger]],
 	description_de = [[Schild/Luftabwehr]],
+	description_pl = [[Tarcza / obrona przeciwlotnicza]],
     helptext       = [[Protects adjacent chickens.]],
     helptext_fr    = [[Le Toad est une sorte de crapaud g?ant avec comme particularit? de poss?der un puissant bouclier ?nerg?tique prot?geant les unit?s amies proches des tirs adverses lors de leur progression vers l'adversaire. Il utilise aussi des spores basiques pour se d?fendre des unit?s a?riennes.]],
 	helptext_de    = [[Beschützt nebenstehende Chicken.]],
+	helptext_pl    = [[Chroni okoliczne kurczaki.]],
   },
 
   explodeAs           = [[NOWEAPON]],

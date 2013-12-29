@@ -12,6 +12,15 @@ unitDef = {
   buildPic          = [[roost.png]],
   buildTime         = 340,
   category          = [[SINK]],
+
+  customParams      = {
+    description_de = [[Erzeugt Chicken]],
+    description_pl = [[Rozmnaza kurczaki]],
+	helptext       = [[Roosts such as this one are the hatching grounds of the Thunderbirds.]],
+	helptext_de    = [[In den Nestern der Chicken wird die Brut herangezogen und nach einer gewissen Zeit auf die restliche Welt losgelassen.]],
+	helptext_pl    = [[W tym gniezdzie rodza sie kurczaki.]],
+  },
+  
   energyMake        = 0,
   explodeAs         = [[NOWEAPON]],
   footprintX        = 3,

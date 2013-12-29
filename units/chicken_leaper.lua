@@ -17,9 +17,11 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Sauteur de combat]],
-    helptext       = [[The Leaper is the chicken's fast attack unit, running down enemies and leaping over obstacles.]],
+    description_pl = [[Lekki skoczek]],
+    helptext       = [[The Leaper is the chickens' fast attack unit, running down enemies and leaping over obstacles.]],
     helptext_fr    = [[Le Leaper est l'unit? d'attaque rapide des poulets, plongeant sur l'enemi et sautant les obstacles sur sa route.]],
 	helptext_de    = [[Der Leaper ist die am schnellsten angreifende Chickeneinheit. Er überrennt die Gegner und kann Hindernisse überspringen.]],
+	helptext_pl    = [[Leaper to lekki i szybki kurczak, ktory skacze nad przeszkodami i kopie przeciwnikow.]],
   },
 
   explodeAs           = [[NOWEAPON]],

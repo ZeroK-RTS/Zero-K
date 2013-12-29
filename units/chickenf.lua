@@ -25,9 +25,11 @@ unitDef = {
   customParams        = {
     description_fr = [[Lanceur de pikes volant]],
 	description_de = [[Fliegender Dornenspucker]],
+	description_pl = [[Latajacy wypluwacz kolcow]],
     helptext       = [[It's a flying chicken! The Talon is a lethal predator that takes down enemy aircraft with its spikes, but will also happily employ them on ground targets. It can be defeated like any other air unit, however.]],
     helptext_fr    = [[Un poulet volant ! Le talon est un pr?dateur mortel qui peut d?truire un avion adverse avec ses dards ainsi que les employer sur des cibles terrestres. Il reste dependant vuln?rable ? toute d?fense ? capacit? anti a?rienne.]],
 	helptext_de    = [[Talon ist ein fliegenes Chicken! Er ist ein tödliches Rauptier, das feindliche Lufteinheiten mit seinen dicken Bolzen vom Himmel holt, diese aber auch außerordentlich gerne gegen Bodenziele richtet.]],
+	helptext_pl    = [[Talon to latajacy drapieznik; wypluwa kolce we wszystko, co sie rusza. Mozna go potraktowac jak mysliwiec.]],
   },
 
   explodeAs           = [[NOWEAPON]],

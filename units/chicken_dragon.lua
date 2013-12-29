@@ -27,9 +27,11 @@ unitDef = {
   customParams           = {
     description_fr = [[Unit? d'assaut poulet ultra lourde]],
 	description_de = [[Über Sturmchicken]],
+	description_pl = [[Kogut szturmowy]],
     helptext       = [[The White Dragons, senior guardians of the chicken hive, are monstrous beings second only to the queen herself. With a powerful stomp, lethal jaws, corrosive goo and a multitude of spores, they are a threat to be feared indeed.]],
     helptext_fr    = [[Les White Dragons, gardiens s?culaires des nids poulet sont d'immenses cr?atures monstrueuses extr?mement f?roces. Capables d'?craser sous leur poids leurs adversaires, de broyer les alliages les plus robustes avec leur m?choire, de projeter leur bave corrosive et de cribler les unit?s a?riennes d'un amas de spores corrosifs, leur simple apparition sur le champ de bataille glace le sang.]],
 	helptext_de    = [[Der White Dragon ist ein außerordentlich monströses Wesen. Mit kraftvollen Stampfern, todbringendem Maul, ätzendem Schleim und einer Vielzahl von Sporen stellt er eine bedrohliche und furchteinflößende Gefahr dar.]],
+	helptext_pl    = [[White Dragon to straznik roju. Mocne kopniecia, smiertelne szczeki, zracy szlam i mnostwo zarodnikow to powody, dla ktorych nalezy sie go bac.]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
