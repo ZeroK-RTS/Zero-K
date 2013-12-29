@@ -19,16 +19,16 @@ options = {
 
 	dbgDraw 		= { type='bool', 	name='Draw Only Bloom Mask', 	value=false,		},
 	
-	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.35,		min=0.001, max=3,step=0.001, 	},
-	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.65, 		min=0, max=1,step=0.001, 	},
-	blurPasses 		= { type='number', 		name='Blur Passes', 			value=6, 		min=0, max=10,step=1,  		},
+	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.47,		min=0.001, max=3,step=0.001, 	},
+	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.7, 		min=0, max=1,step=0.001, 	},
+	blurPasses 		= { type='number', 		name='Blur Passes', 			value=2, 		min=0, max=10,step=1,  		},
 }
 
 -- config params
 local dbgDraw = 0					-- draw only the bloom-mask? [0 | 1]
-local maxBrightness = 0.35			-- intensity multiplier when filtering a glow source fragment [1, n]
-local illumThreshold = 0.65			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
-local blurPasses = 6				-- how many iterations of (7x7) Gaussian blur should be applied to the glow sources?
+local maxBrightness = 0.47			-- maximum brightness of bloom additions [1, n]
+local illumThreshold = 0.7			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
+local blurPasses = 2				-- how many iterations of Gaussian blur should be applied to the glow sources?
 
 local function OnchangeFunc()
 	dbgDraw 		= options.dbgDraw.value and 1 or 0
@@ -47,7 +47,7 @@ local vsx = 1						-- current viewport width
 local vsy = 1						-- current viewport height
 local ivsx = 1.0 / vsx
 local ivsy = 1.0 / vsy
-local kernelRadius = vsx / 108.0 --10 at 1080 px high
+local kernelRadius = vsx / 36.0 --30 at 1080 px high
 
 -- shader and texture handles
 local blurShaderH71 = nil
@@ -160,9 +160,7 @@ end
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX; ivsx = 1.0 / vsx
 	vsy = viewSizeY; ivsy = 1.0 / vsy
- 	kernelRadius = vsy / 108.0
-
- 	Spring.Echo("Kernel Radius:", kernelRadius)
+ 	kernelRadius = vsy / 36.0
 
 	glDeleteTexture(brightTexture1 or "")
 	glDeleteTexture(brightTexture2 or "")
@@ -221,7 +219,7 @@ function widget:Initialize()
 				vec4 S1 = texture2D(texture1, C0);
 
 
-				gl_FragColor = bool(debugDraw) ? S1 : (S0 + S1);
+				gl_FragColor = bool(debugDraw) ? S1 : S0 + S1;
 			}
 		]],
 
@@ -239,7 +237,7 @@ function widget:Initialize()
 			uniform sampler2D texture0;
 			uniform float inverseRX;
 			uniform float fragKernelRadius;
-			const float bloomSigma = 2.5;
+			float bloomSigma = fragKernelRadius / 2.0;
 
 			void main(void) {
 				vec2 C0 = vec2(gl_TexCoord[0]);
@@ -274,7 +272,7 @@ function widget:Initialize()
 			uniform sampler2D texture0;
 			uniform float inverseRY;
 			uniform float fragKernelRadius;
-			const float bloomSigma = 2.5;
+			float bloomSigma = fragKernelRadius / 2.0;
 
 			void main(void) {
 				vec2 C0 = vec2(gl_TexCoord[0]);
