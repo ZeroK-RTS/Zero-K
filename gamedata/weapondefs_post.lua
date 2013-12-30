@@ -185,22 +185,6 @@ end
 	end
  end
  
- --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Workaround for http://springrts.com/mantis/view.php?id=4177
---
-if not reverseCompat then
-	for _, weaponDef in pairs(WeaponDefs) do
-		if weaponDef.weapontype == "StarburstLauncher" then
-			if weaponDef.weaponvelocity > 1500 then
-				weaponDef.weaponvelocity = 800
-			end
-			weaponDef.startvelocity = weaponDef.weaponvelocity
-		end
-	end
-end
- 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
