@@ -21,9 +21,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    --description_de = [[Kaperungsfahrzeug]],
+    description_pl = [[Pojazd wojny cybernetycznej]],
     helptext       = [[The Dominatrix progressively disables enemies with its electronic warfare attack, starting by slowing their movement and attack, then disarming them and finally paralyzing them outright.]],
-	--helptext_de    = [[Der Dominatrix erobert Einheiten, hetzt sie gegen die ehemaligen Verbündeten auf. Mehrere Dominatrixe können ein Ziel schneller erobern, obwohl nur einer von ihnen der Kontrolleur dieser Einheit wird. Nachdem eine gegnerische Einheit unter Kontrolle gebracht wurde, kann der Dominatrix für fünf Sekunden nicht schießen. Sobald ein Dominatrix zerstört wurde, sind alle Einheiten unter seiner Kontrolle wieder frei.]],
+	helptext_pl    = [[Dominatrix stopniowo unieszkodliwia wrogie jednostki, zaczynajac od spowolnienia ruchu i ataku, poprzez rozbrojenie, a konczac na calkowitym paralizu.]],
 	modelradius    = [[13]],
   },
 

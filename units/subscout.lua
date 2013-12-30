@@ -23,7 +23,9 @@ unitDef = {
 
   customParams          = {
     fireproof = [[1]],
-    helptext  = [[The Lancelet is basically a large smart torpedo with scouting functionality. It can remain hidden in the depths to observe enemy movements, then detonate its explosive charge to sink unwary ships.]],
+    description_pl = [[Lodz podwodna - samobojczy zwiadowca]],
+    helptext       = [[The Lancelet is basically a large smart torpedo with scouting functionality. It can remain hidden in the depths to observe enemy movements, then detonate its explosive charge to sink unwary ships.]],
+    helptext_pl    = [[Lancelet to w gruncie rzeczy duza samowystarczalna torpeda wyposazona w sensory. Moze pozostawac niewykryta pod woda, aby sledzic ruchy przeciwnika, bedac w kazdej chwili gotowa do detonacji.]],
   },
 
   explodeAs             = [[SUBSCOUT_DEATH]],

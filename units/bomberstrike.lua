@@ -24,15 +24,9 @@ unitDef = {
   cruiseAlt           = 160,
 
   customParams        = {
-    --description_bp = [[Bombardeiro de precis?o]],
-    --description_fr = [[Bombardier de Précision]],
-    --description_de = [[Präzisionsbomber]],
-    --description_pl = [[Bombowiec precyzyjny]],
+    description_pl = [[Bombowiec taktyczny]],
     helptext       = [[The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets.]],
-    --helptext_bp    = [[Shadow lança uma única bomba a cada ataque, com pouca área de efeito mas grande poder. Em matéria de custo-benefício, é eficiente contra alvos caros e imóveis, mas funciona mal contra unidades móveis principalmente devido a dificuldade de acertar um alvo móvel com uma única bomba.]],
-    --helptext_fr    = [[Le Shadow largue des bombes de haute précision, parfait pour les frappes chirurgicales comme une défense antimissile ou une tourelle genante, mais peu efficace contre une armée massive.]],
-    --helptext_de    = [[Der Shadow wirft eine einzige Bombe mit hohem Schaden ab. Ideal fungiert er dazu, einzelne, strategisch wichtige Gebäude wie z.B. Anti-Atom zu zerstören, um dann mit seinen Haupteinheiten einzufallen. Kleinere Einheiten werden aber nur schwelich getroffen und sollten von daher auf anderem Wege bekämpft werden.]],
-    --helptext_pl    = [[Shadow zrzuca pojedyncza bombe o wysokich obrazeniach i malym obszarze wybuchu. Swietnie nadaje sie do niszczenia ciezszych celow, jednak po kazdym zrzucie musi zaladowac nowa bombe na lotnisku lub stacji dozbrajania.]],
+    helptext_pl    = [[Kestrel wystrzeliwuje rakiety krotkiego zasiegu, ktore moga trafic cele naziemne, nawodne lub podwodne. Sposrod bombowcow najlepiej nadaje sie do niszczenia pojedynczych jednostek.]],
     --modelradius    = [[10]],
   },
 

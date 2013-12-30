@@ -27,10 +27,8 @@ unitDef = {
     description_pl = [[Niszczyciel]],
 	description_de = [[Zerstörer]],
     helptext       = [[The Daimyo class destroyer packs a wallop with its main gun, a powerful riot cannon. It also features missiles that can hit submarines and surface targets alike. The Daimyo is best attacked from afar, using surface ships or hovercraft with long-range weapons.]],
-    --helptext_fr    = [[Ce Destroyer embarque un puissant canon longue port?e et un lance grenade sous marines. Utile pour se d?barrasser de menaces sous marines ou de positions fixes, son canon est cependant trop peu pr?cis pour d?truire des menaces rapides.]],
-    --helptext_pl    = [[Crusader posiada pot?n? armat? ?redniego zasi?gu idealn? do bombardowania nieruchomych wie?yczek broni?cych wybrze?y. Jego drug? broni? jest wyrzutnia ?adunk?w g??binowych przeciwko ?odziom podwodnym. ?atwo pada ofiar? jednostek lataj?cych i Korwet, gdy? nie posiada broni skutecznym przeciwko szybkim celom.]],
-	--helptext_de    = [[Der Zerstörer kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Torpedowerfer gegen U-Boote. Hüte dich vor Flugzeugen und Korvetten - Zerstörer haben einige Probleme damit, schnelle Ziele zu treffen.]],
-    extradrawrange = 420,
+    helptext_pl    = [[Glowna bronia Daimyo jest mocne dzialo; jest takze wyposazony w rakiety, ktore moga zanurzyc sie i uderzac w cele podwodne. Walczac przeciwko Daimyo, najlepiej atakowac z bezpiecznej odleglosci.]],
+	extradrawrange = 420,
   },
 
   explodeAs              = [[BIG_UNITEX]],

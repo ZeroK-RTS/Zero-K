@@ -19,7 +19,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The punisher has a shotgun which shoots a spray of projectiles which are good against large targets or tight clusters of enemies.]],
+    description_pl = [[Poduszkowiec z shotgunem]],
+    helptext       = [[The Punisher has a shotgun which shoots a spray of projectiles which are good against large targets or tight clusters of enemies.]],
+    helptext_pl    = [[Punisher posiada shotgun, ktory jest skuteczny przeciwko grupom lekkich jednostek lub pojedynczym ciezkim.]],
  },
 
   explodeAs           = [[BIG_UNITEX]],

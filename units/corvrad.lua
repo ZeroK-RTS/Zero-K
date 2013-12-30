@@ -21,10 +21,12 @@ unitDef = {
     description_bp = [[Veículo radar]],
     description_fr = [[Véhicule Radar]],
 	description_de = [[Radarfahrzeug]],
+	description_pl = [[Pojazd radarowy]],
     helptext       = [[The Informant provides radar coverage on the battlefield.]],
     helptext_bp    = [[]],
     helptext_fr    = [[Le Informant est un peu comme tous les radars mobiles, aussi indispensable que faible.]],
 	helptext_de    = [[Der Informant bietet Radarerfassung eines bestimmten Bereiches auf dem Schlachtfeld.]],
+	helptext_pl    = [[Informant to szybki pojazd, ktory zapewnia armii mobilny radar.]],
   },
 
   energyUse           = 1.5,

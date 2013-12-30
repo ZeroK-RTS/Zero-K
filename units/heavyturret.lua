@@ -19,9 +19,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    --description_de = [[Schienenkanoneturm (Panzerbrechend)]],
+    description_pl = [[Wiezyczka przeciwpancerna]],
     helptext       = [[The Sunlance's heavy disruptor beam cripples even the heaviest assault unit and will stop any armored assault dead in its tracks.]],
-    --helptext_de    = [[Seine Hochgeschwindigkeits-Gauﬂkanone schneidet sich durch die feindliche Panzerung wie eine Kettens‰ge durch Butter.]],
+    helptext_pl    = [[Sunlance posiada ciezki promien spowalniajacy, ktory spacyfikuje i zniszczy nawet najciezsze jednostki szturmowe, ale ktory do strzalu wymaga, by wiezyczka byla podlaczona do sieci energetycznej o mocy co najmniej 25 energii. ]],
     keeptooltip    = [[any string I want]],
     neededlink     = 25,
     pylonrange     = 50,	
