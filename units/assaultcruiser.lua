@@ -25,7 +25,7 @@ unitDef = {
   customParams           = {
     description_pl = [[Ciezki krazownik szturmowy]],
     helptext       = [[The Vanquisher cruiser boasts excellent armor and lethal close-in firepower. Its gauss cannons slice through surface targets like butter, while its missiles support it against enemies above and below the water surface. Its short range and lack of anti-air firepower leaves it vulnerable to standoff units and aircraft.]],
-    helptext_pl    = [[Vanquisher to krazownij bojowy z duza sila ognia i wysoka wytrzymaloscia. Jego dziala bez problemu przebijaja sie przez cele na powierzchni, a jego rakiety niszcza cele pod i nad nia. Jego glownym problemem jest niski zasieg; ponadto, rakiety nie radza sobie z jednostkami latajacymi w duzych ilosciach.]],
+    helptext_pl    = [[Vanquisher to krazownik bojowy z duza sila ognia i wysoka wytrzymaloscia. Jego dziala bez problemu przebijaja sie przez cele na powierzchni, a jego rakiety niszcza cele pod i nad nia. Jego glownym problemem jest niski zasieg; ponadto, rakiety nie radza sobie z jednostkami latajacymi w duzych ilosciach.]],
   },
 
   explodeAs              = [[BIG_UNIT]],
