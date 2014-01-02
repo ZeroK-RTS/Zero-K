@@ -7,10 +7,10 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by msafwan (impulsejump)",
-		date    = "May 14 2008, December 16 2013",
+		date    = "May 14 2008, January 2 2014",
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
-    enabled = isImpulseJump,
+		enabled = isImpulseJump,
 	}
 end
 
@@ -439,6 +439,8 @@ local function Jump(unitID, goal, cmdTag)
 		lastJump[unitID] = jumpEndTime
 		jumping[unitID] = false
 		SetLeaveTracks(unitID, true)
+		spGiveOrderToUnit(unitID,CMD.WAIT, {}, {}) --make unit continue last order (unit have tendency to return to jumping point after it land)
+		spGiveOrderToUnit(unitID,CMD.WAIT, {}, {})
 	
 		-- ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --reload the order given during jump. This override the unit's tendency to return to their jumping position
 		-- unitCmdQueue[unitID] = nil
@@ -493,10 +495,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if jumping[unitID] and (weaponDefID == -3) and attackerID == nil then
 		jumping[unitID] = 1 --signal to jump loop that a collision is occurring (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
 		if GG.SetUnitFallDamageImmunity then
-			GG.SetUnitFallDamageImmunity(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
-		end
-		if GG.SetUnitFallDamageImmunityFeature then
-			GG.SetUnitFallDamageImmunityFeature(unitID, spGetGameFrame()+30) --this unit immune to unit-to-unit collision damage
+			local immunityPeriod = spGetGameFrame()+30
+			GG.SetUnitFallDamageImmunity(unitID, immunityPeriod) --this unit immune to unit-to-unit collision damage
+			GG.SetNoDamageToAllyCollidee(unitID, immunityPeriod)
+			GG.SetUnitFallDamageImmunityFeature(unitID, immunityPeriod) --this unit immune to unit-to-feature collision damage
 		end
 		--return math.random() -- no collision damage to collided victim. Using random return to tell "unit_fall_damage.lua" to not use pairs of damage to infer unit-to-unit collision.
 	end
