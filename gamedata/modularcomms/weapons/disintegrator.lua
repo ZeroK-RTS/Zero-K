@@ -1,7 +1,7 @@
 local name = "commweapon_disintegrator"
 local weaponDef = {
 	name                    = [[Disintegrator]],
-	areaOfEffect            = 64,
+	areaOfEffect            = 48,
 	avoidFeature            = false,
 	avoidFriendly           = false,
 	avoidNeutral            = false,
