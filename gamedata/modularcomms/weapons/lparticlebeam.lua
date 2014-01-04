@@ -1,6 +1,6 @@
 local name = "commweapon_lparticlebeam"
 local weaponDef = {
-	name                    = [[Auto Particle Beam]],
+	name                    = [[Light Particle Beam]],
 	beamDecay               = 0.85,
 	beamTime                = 0.01,
 	beamttl                 = 45,
