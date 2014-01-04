@@ -671,7 +671,7 @@ local function GetUnitDesc(unitID, ud)
 			if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
 				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", spGetGameRulesParam("WindMax") )
 			end
-			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' )
+			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' ) -- remove name from desc
 			return tooltip
 		end
 		return ud.tooltip
@@ -690,8 +690,7 @@ local function GetUnitDesc(unitID, ud)
 	
 	if unitID then
 		local endesc = ud.tooltip
-		
-		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc)
+		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc):gsub( '^' .. ud.humanName .. ' %- ', '' ) -- permutation description-> description_FR for example
 		if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
 			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. spGetGameRulesParam("WindMax")
 		end
@@ -1681,6 +1680,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	local fullname = (stt_ud.humanName or "")	
 	
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
+	
 	local iconPath		= GetUnitIcon(stt_ud)
 	
 	local m, e = GetResources( 'selunit', unitID, stt_ud, tooltip)
@@ -1694,7 +1694,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
+			{ name='uname', icon = iconPath, text = fullname, fontSize=4, }, --name in window
 			{ name='utt', text = unittooltip .. '\n', wrap=true },
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
