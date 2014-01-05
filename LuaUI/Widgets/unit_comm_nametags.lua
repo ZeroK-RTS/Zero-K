@@ -27,11 +27,27 @@ Changelog:
 -- config
 --------------------------------------------------------------------------------
 
-local showStickyTags = true --comms literally wear name tags
+local showStickyTags --comms literally wear name tags
 local heightOffset = 24
 local xOffset = 0
 local yOffset = 0
 local fontSize = 6
+
+options_path = 'Settings/Interface/Commander Nametags'
+options_order = {"stickyTags"}
+options = {
+	stickyTags = {
+		name = "Show Sticky Tags",
+		type = 'bool',
+		value = true,
+		desc = 'Commanders literally wear name tags',
+		OnChange = function(self)
+			showStickyTags = self.value
+		end,
+	},
+}
+
+showStickyTags = options.stickyTags.value
 
 --------------------------------------------------------------------------------
 -- speed-ups
