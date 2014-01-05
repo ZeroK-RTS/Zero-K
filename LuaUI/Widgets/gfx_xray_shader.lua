@@ -30,19 +30,19 @@ options = {
                 desc = 'Minimum distance for XRay effect to show up',
                 type = 'number',
                 min = 0, max = 10000, step = 100,
-                value = 1500,
+                value = 1200,
         },
         zMax = {
                 name = 'Maximum distance',
                 desc = 'Distance at which XRay effect is at full strength',
                 type = 'number',
                 min = 0, max = 10000, step = 100,
-                value = 6000,
+                value = 4200,
         },
 }
 
-local zMin = 1500
-local zMax = 6000
+local zMin = 1200
+local zMax = 4200
 
 local function OnchangeFunc()
         zMin              = options.zMin.value

@@ -34,6 +34,7 @@ local umirrorX
 local umirrorZ
 local uup
 local uleft
+local ubrightness
 
 local island = false
 
@@ -80,6 +81,17 @@ options = {
 		desc = 'Use a realistic texture instead of a VR grid',
 		OnChange = ResetWidget,
 	},	
+	textureBrightness = {
+		name = "Texture Brightness",
+		advanced = true,
+		type = 'number',
+		min = 0, 
+		max = 1, 
+		step = 0.01,
+		value = 0.42,
+		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
+		OnChange = ResetWidget,
+	},
 	northSouthText = {
 		name = "North, East, South, & West text",
 		type = 'bool',
@@ -115,6 +127,7 @@ local function SetupShaderTable()
 		mirrorZ = 0,
 		up = 0,
 		left = 0,
+		brightness = 1.0,
 	  },
 	  vertex = (options.curvature.value and "#define curvature \n" or '')
 		.. (options.fogEffect.value and "#define edgeFog \n" or '')
@@ -124,6 +137,7 @@ local function SetupShaderTable()
 		uniform float mirrorZ;
 		uniform float left;
 		uniform float up;
+		uniform float brightness;
   
 		void main()
 		{
@@ -151,7 +165,7 @@ local function SetupShaderTable()
 		  length((gl_ModelViewMatrix * gl_Vertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
 		#endif
 		
-		gl_FrontColor = gl_Color;
+		gl_FrontColor = vec4(brightness * gl_Color.rgb, 1.0);
 		}
 	  ]],
   }
@@ -322,6 +336,7 @@ function widget:Initialize()
 		umirrorZ = gl.GetUniformLocation(mirrorShader,"mirrorZ")
 		uup = gl.GetUniformLocation(mirrorShader,"up")
 		uleft = gl.GetUniformLocation(mirrorShader,"left")
+		ubrightness = gl.GetUniformLocation(mirrorShader,"brightness")
 	end
 	dList = gl.CreateList(DrawOMap, mirrorShader)
 	--Spring.SetDrawGround(false)
@@ -346,8 +361,13 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
         gl.UseShader(mirrorShader)
         gl.PushMatrix()
         gl.DepthMask(true)
-        if options.useRealTex.value then gl.Texture(realTex)
-	else gl.Texture(gridTex) end
+        if options.useRealTex.value then 
+        		gl.Texture(realTex)
+        		glUniform(ubrightness, options.textureBrightness.value)
+				else 
+						gl.Texture(gridTex) 
+        		glUniform(ubrightness, 1.0)
+				end
         if wiremap then
             gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
         end
