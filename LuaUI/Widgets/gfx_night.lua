@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.10"
+local versionNumber = "v1.5.11"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -334,6 +334,10 @@ local function DrawSearchlights()
 		  elseif (reverseCompatibility and (unitDef.type == "Bomber" or unitDef.type == "Fighter") or 
 		  (unitDef.isBomberAirUnit or unitDef.isFighterAirUnit)) then --https://github.com/spring/spring/blob/develop/doc/changelog.txt
 			local vx, _, vz = GetUnitVelocity(unitID)
+			if not vx or not vz then --sometimes happen when seeing enemy airplane
+				vx=0
+				vz=0
+			end
 			heading = math.atan2(vz, vx)
 			leadDistance = searchlightAirLeadTime * math.sqrt(vx * vx + vz * vz) * 30
 			relativeHeight = relativeHeight+unitDef.wantedHeight--nominal search light height is unit height + flying height distance

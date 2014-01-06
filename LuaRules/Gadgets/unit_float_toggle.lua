@@ -4,7 +4,7 @@ function gadget:GetInfo()
     name      = "Float Toggle",
     desc      = "Adds a float/sink toggle to units, currently static while floating",
     author    = "Google Frog",
-    date      = "9 March 2012, 12 April 2013",
+    date      = "9 March 2012, 7 Jan 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false,  --  loaded by default?
@@ -23,6 +23,7 @@ end
 -- Commands
 
 local DEFAULT_FLOAT = 1
+local CMD_STOP = CMD.STOP
 
 include("LuaRules/Configs/customcmds.h.lua")
 
@@ -60,10 +61,10 @@ local floatByID = {data = {}, count = 0}
 
 local floatState = {}
 local aimWeapon = {}
-
-local gRAVITY = Game.gravity/30/30
-local rAD_PER_ROT = (math.pi/(2^15))
-local fLY_THRESHOLD = gRAVITY*8
+local GRAVITY = Game.gravity/30/30
+local RAD_PER_ROT = (math.pi/(2^15))
+local FLY_THRESHOLD = GRAVITY*8
+local buildTestUnitDefID = UnitDefNames["armdeva"].id --we use Stardust to check blockage on water surface because on Spring 96 onward amphibious are always buildable under factory.
 --------------------------------------------------------------------------------
 -- Communication to script
 
@@ -76,14 +77,14 @@ end
 --------------------------------------------------------------------------------
 -- Float Table Manipulation
 
-local function addFloat(unitID, unitDefID, isFlying)
+local function addFloat(unitID, unitDefID, isFlying,transportCall)
 	if not float[unitID] then
 		local def = floatDefs[unitDefID]
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		if y < def.depthRequirement or isFlying then
 			Spring.MoveCtrl.Enable(unitID)
 			Spring.MoveCtrl.SetNoBlocking(unitID, true)
-			local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
+			local place, feature = Spring.TestBuildOrder(buildTestUnitDefID, x, y ,z, 1)
 			Spring.MoveCtrl.SetNoBlocking(unitID, false)
 			if place == 2 then
 				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
@@ -92,7 +93,7 @@ local function addFloat(unitID, unitDefID, isFlying)
 				float[unitID] = {
 					index = floatByID.count,
 					surfacing = true,
-					prevSurfacing = true,
+					prevSurfacing = false,
 					onSurface = false,
 					justStarted = true,
 					sinkTank = 0,
@@ -102,8 +103,9 @@ local function addFloat(unitID, unitDefID, isFlying)
 					unitDefID = unitDefID,
 					isFlying = isFlying,
 					paraData = {want = false, para = false},
+					transportCall = transportCall or 0,
 				}
-				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*rAD_PER_ROT, 0)
+				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*RAD_PER_ROT, 0)
 				if isFlying then
 					Spring.MoveCtrl.Disable(unitID) --disable MoveCtrl temporary so that Newton can work
 				end
@@ -150,13 +152,20 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 	end
 end
 
+function gadget:UnitUnloaded(unitID, unitDefID, unitTeam,transportID, transportTeam)
+	if floatDefs[unitDefID] and not float[unitID] then
+		local px,py,pz = Spring.GetUnitPosition(unitID)
+		if py > Spring.GetGroundHeight(px,pz) + 20 then
+			addFloat(unitID, unitDefID, true)
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Script calls
 
 GG.Floating_StopMoving = GG.Floating_StopMoving or function() end --empty function. Defined in gadget:Initialize()
-
 GG.Floating_AimWeapon = GG.Floating_AimWeapon or function() end
-
 GG.Floating_UnitTeleported = GG.Floating_UnitTeleported or function() end
 
 local function checkAlwaysFloat(unitID)
@@ -198,11 +207,11 @@ function gadget:GameFrame(f)
 			local data = float[unitID] --(get reference to data table)
 			data.x,data.y,data.z = Spring.GetUnitPosition(unitID)
 			local height = Spring.GetGroundHeight(data.x, data.z)
-			if data.y == height then --touch down on land
+			if data.y == height then --touch down on ground
 				removeFloat(unitID)
 				i = i - 1
 			elseif data.y <= 0 then --touch down on water level
-				local dx,dy,dz = Spring.GetUnitVelocity(unitID)
+				local _,dy = Spring.GetUnitVelocity(unitID)
 				data.speed = dy
 				data.isFlying = false
 				local cmdQueue = Spring.GetUnitCommands(unitID);
@@ -217,7 +226,7 @@ function gadget:GameFrame(f)
 					end
 				end
 				Spring.MoveCtrl.Enable(unitID)
-				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*rAD_PER_ROT, 0)
+				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*RAD_PER_ROT, 0)
 			end
 			i = i + 1
 			
@@ -227,7 +236,7 @@ function gadget:GameFrame(f)
 			
 			-- This cannot be done when the float is added because that will often be
 			-- the result of a unit script. Strange trigger inheritence bleh!
-			if data.justStarted then
+			if data.justStarted and data.surfacing then
 				callScript(unitID, "Float_startFromFloor")
 				data.justStarted = nil
 			end
@@ -257,7 +266,12 @@ function gadget:GameFrame(f)
 			
 			-- Check if the unit should sink
 			if checkOrder then
-				if floatState[unitID] == FLOAT_ALWAYS then
+				if data.transportCall>0 then
+					local cQueue = Spring.GetCommandQueue(unitID, 1)
+					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
+					setSurfaceState(unitID, data.unitDefID, not moving)
+					data.transportCall = data.transportCall - 1
+				elseif floatState[unitID] == FLOAT_ALWAYS then
 					local cQueue = Spring.GetCommandQueue(unitID, 1)
 					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 					setSurfaceState(unitID, data.unitDefID, not moving)
@@ -270,7 +284,7 @@ function gadget:GameFrame(f)
 				end
 			end
 			
-			-- Animation
+			-- Rising/Sinking Animation
 			if data.prevSurfacing ~= data.surfacing then
 				if data.surfacing then
 					callScript(unitID, "Float_rising")
@@ -391,7 +405,7 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD_UNIT_FLOAT_STATE] = true}
+	return {[CMD_UNIT_FLOAT_STATE] = true, [CMD_STOP] = true}
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()	
@@ -399,11 +413,16 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_UNIT_FLOAT_STATE) then
-		return true  -- command was not used
+	if (cmdID == CMD_UNIT_FLOAT_STATE) then
+		FloatToggleCommand(unitID, cmdParams, cmdOptions)  
+		return false  -- command was used
+	elseif (cmdID == CMD_STOP) then
+		if floatState[unitID] == FLOAT_ALWAYS then
+			checkAlwaysFloat(unitID)
+		end
 	end
-	FloatToggleCommand(unitID, cmdParams, cmdOptions)  
-	return false  -- command was used
+
+	return true  -- command was not used
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
@@ -460,6 +479,24 @@ function gadget:Initialize()
 		end
 		return false
 	end	
+	
+	GG.WantToTransport_FloatNow = function(unitID)
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if floatDefs[unitDefID] then
+			addFloat(unitID, unitDefID, false, 2) --is called once by "unit_transport_ai_button.lua" when CMD.LOAD_UNITS is given
+			return true
+		else
+			return false
+		end
+	end
+	GG.HoldStillForTransport_HoldFloat = function(unitID)
+		if float[unitID] then
+			float[unitID].transportCall =2--is called every frame until transport no longer want to transport
+			return true
+		else
+			return false
+		end
+	end
 end
 ---------------------------------------------------------------------
 --Updates that check whether unit is flying
@@ -467,15 +504,9 @@ end
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if floatDefs[unitDefID] and not float[unitID] then
 		local _,dy = Spring.GetUnitVelocity(unitID)
-		if dy>= fLY_THRESHOLD then
+		if dy>= FLY_THRESHOLD then
 			addFloat(unitID, unitDefID, true)
 		end
 	end
 	return damage
 end
-
-
-
-
-
-

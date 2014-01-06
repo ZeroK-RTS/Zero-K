@@ -23,6 +23,7 @@ if (gadgetHandler:IsSyncedCode()) then
 local spGetUnitDefID    = Spring.GetUnitDefID;
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetUnitMoveGoal = Spring.SetUnitMoveGoal
+local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitCommands = Spring.GetUnitCommands
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -67,6 +68,17 @@ local sinkCommand = {
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
 	[CMD_WAIT_AT_BEACON] = true,
+}
+
+local dropableUnits = { 
+	--all floatable unit will be dropped when regular unload fail (such as when unloading at sea), but some can't float but is amphibious,
+	--this list additional units that should be dropped.
+	[UnitDefNames["amphcon"].id] = true, --clam
+	[UnitDefNames["amphraider3"].id] = true, --duck
+	[UnitDefNames["armcomdgun"].id] = true, --ultimatum
+	[UnitDefNames["core_spectre"].id] = true, --aspis
+	[UnitDefNames["spherecloaker"].id] = true, --eraser
+	[UnitDefNames["armorco"].id] = true, --detriment
 }
 
 local transportPhase = {}
@@ -232,12 +244,13 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			end
 			local x,_,z = spGetUnitPosition(unitID)
 			local distance = math.sqrt((x-cmdParams[1])^2 + (z-cmdParams[3])^2)
-			if distance > 64 then --wait until reach destination
+			local vx,_,vz = spGetUnitVelocity(unitID)
+			if distance > 64 or vx > 1 or vz > 1 then --wait until reach destination and until slow enough
 				return true, false  --hold this command
 			end
 			local gy = spGetGroundHeight(x,z)
 			local cargoDefID = spGetUnitDefID(cargo[1])
-			if gy < 0 and (UnitDefs[cargoDefID].customParams.commtype or floatDefs[cargoDefID]) then
+			if gy < 0 and (UnitDefs[cargoDefID].customParams.commtype or floatDefs[cargoDefID] or dropableUnits[cargoDefID]) then
 				giveDROP_order[#giveDROP_order+1] = {unitID,CMD.INSERT,{0,CMD_ONECLICK_WEAPON,CMD.OPT_INTERNAL}, {"alt"}}
 				-- Spring.Echo("E")
 				--"PHASE E"--

@@ -4,7 +4,7 @@ function gadget:GetInfo()
     name      = "Impulse Float Toggle",
     desc      = "Adds a float/sink toggle to units, can be pushed by other unit while floating",
     author    = "Google Frog", --Msafwan (impulse based float)
-    date      = "9 March 2012, 17 Dec 2013",
+    date      = "9 March 2012, 7 Jan 2014",
     license   = "GNU GPL, v2 or later",
     layer     = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
     enabled   = true,  --  loaded by default?
@@ -70,7 +70,7 @@ local aimWeapon = {}
 local GRAVITY = Game.gravity/30/30
 local RAD_PER_ROT = (math.pi/(2^15))
 local FLY_THRESHOLD = GRAVITY*8
-
+local buildTestUnitDefID = UnitDefNames["armdeva"].id --we use Stardust to check blockage on water surface because on Spring 96 onward amphibious are always buildable under factory.
 --------------------------------------------------------------------------------
 -- Communication to script
 
@@ -88,7 +88,7 @@ local function addFloat(unitID, unitDefID, isFlying,transportCall)
 		local def = floatDefs[unitDefID]
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		if y < def.depthRequirement or isFlying then
-			local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
+			local place, feature = Spring.TestBuildOrder(buildTestUnitDefID, x, y ,z, 1)
 			if place == 2 or place == 1 then
 				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
 				floatByID.count = floatByID.count + 1
