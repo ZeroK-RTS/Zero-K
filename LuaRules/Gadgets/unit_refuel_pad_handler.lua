@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date    = "5 Jan 2014",
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
-		enabled = true, -- loaded by default?
+		enabled = false, -- loaded by default?
 	}
 end
 
@@ -25,6 +25,7 @@ local spSetUnitLeaveTracks 	= Spring.SetUnitLeaveTracks
 local spGetUnitVelocity		= Spring.GetUnitVelocity
 local spGetUnitRotation		= Spring.GetUnitRotation 
 
+local mcSetVelocity         = Spring.MoveCtrl.SetVelocity
 local mcSetRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
 local mcSetPosition	        = Spring.MoveCtrl.SetPosition
 local mcSetRotation         = Spring.MoveCtrl.SetRotation
@@ -49,6 +50,9 @@ local exp = math.exp
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local unitNewScript = {}
+local unitMovectrled = {}
+
 local coroutines = {}
 
 local function StartScript(fn)
@@ -56,7 +60,9 @@ local function StartScript(fn)
 	coroutines[#coroutines + 1] = co
 end
 
-local function Circle(unitID, goal)
+local function CircleToLand(unitID, goal)
+	unitNewScript[unitID] = true
+	
 	local start = {spGetUnitBasePosition(unitID)}
 	
 	local unitDefID	= spGetUnitDefID(unitID)
@@ -181,7 +187,7 @@ local function Circle(unitID, goal)
 	
 	-- Calculate speeds and acceleration
 	local currentSpeed = maxSpeed
-	local currentTime = 0
+	local currentTime = 1
 	
 	local estimatedTime = (2*totalDist)/(maxSpeed+targetSpeed)
 	local acceleration = (targetSpeed^2 - maxSpeed^2)/(2*totalDist)
@@ -214,12 +220,14 @@ local function Circle(unitID, goal)
 	local maxRoll = 0.8
 	
 	-- Move control stuff
-	mcEnable(unitID)
-	spSetUnitVelocity(unitID,0,0,0)
-	mcSetRotation(unitID,0,heading,roll+currentTime/50)
-	spSetUnitLeaveTracks(unitID, false)
-		
-	local currentDistance = 0
+	if not unitMovectrled[unitID] then
+		mcEnable(unitID)
+		mcSetRotation(unitID,0,heading,roll+currentTime/50)
+		spSetUnitLeaveTracks(unitID, false)
+		unitMovectrled[unitID] = true
+	end
+	
+	local currentDistance = currentSpeed
 
 	local function LandLoop()
 		
@@ -228,13 +236,11 @@ local function Circle(unitID, goal)
 		while currentDistance < totalDist do
 			local px, pz = DistanceToPosition(currentDistance)
 			local py = TimeToVerticalPositon(currentTime)
-			
 			local direction = DistanceToDirection(currentDistance)
 			
 			mcSetRotation(unitID,0,direction,roll)
 			mcSetPosition(unitID, px, py, pz)
-			
-			spSetUnitVelocity(unitID, px - prevX, py - prevY, pz - prevZ)
+			mcSetVelocity(unitID, px - prevX, py - prevY, pz - prevZ)
 			
 			currentDistance = currentDistance + currentSpeed
 			currentSpeed = currentSpeed + acceleration
@@ -249,13 +255,18 @@ local function Circle(unitID, goal)
 			else
 				if -roll*turnDir > 0 then
 					roll = roll + turnDir*rollSpeed
-				elseif -roll*turnDir < - rollSpeed then
+				elseif -roll*turnDir < -rollSpeed then
 					roll = roll - turnDir*rollSpeed
 				end
 			end
 			
 			prevX, prevY, prevZ = px, py, pz
 			Sleep()
+			if unitNewScript[unitID] and currentTime ~= 2 then
+				return
+			else
+				unitNewScript[unitID] = nil
+			end
 		end
 		
 		local px, pz = DistanceToPosition(totalDist)
@@ -264,6 +275,7 @@ local function Circle(unitID, goal)
 		spSetUnitLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
 		mcDisable(unitID)
+		unitMovectrled[unitID] = nil
 	end
 	
 	StartScript(LandLoop)
@@ -280,7 +292,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD.ATTACK then
-		Circle(unitID, {1000,113,1128})
+		CircleToLand(unitID, {cmdParams[1],cmdParams[2],cmdParams[3]})
 		return false
 	end
 	return true
