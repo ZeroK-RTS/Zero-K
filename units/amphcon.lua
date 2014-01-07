@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[amphcon]],
-  name                = [[Clam]],
+  name                = [[Conch]],
   description         = [[Amphibious Construction Bot, Builds at 7.5 m/s]],
   acceleration        = 0.4,
   activateWhenBuilt	  = true,
@@ -24,8 +24,8 @@ unitDef = {
 
   customParams        = {
     description_pl = [[Amfibijny Konstruktor, moc 7.5 m/s]],
-    helptext       = [[The Clam is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land.]],
-    helptext_pl    = [[Clam to opancerzony konstruktor, który mo¿e wykonywaæ swoje obowi¹zki zarówno na l¹dzie, jak i g³êboko pod wod¹.]],
+    helptext       = [[The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land.]],
+    helptext_pl    = [[Conch to opancerzony konstruktor, który mo¿e wykonywaæ swoje obowi¹zki zarówno na l¹dzie, jak i g³êboko pod wod¹.]],
   },
 
   energyMake          = 0.225,
@@ -64,7 +64,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Clam]],
+      description      = [[Wreckage - Conch]],
       blocking         = true,
       damage           = 1300,
       energy           = 0,
@@ -78,7 +78,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Clam]],
+      description      = [[Debris - Conch]],
       blocking         = false,
       damage           = 1300,
       energy           = 0,
