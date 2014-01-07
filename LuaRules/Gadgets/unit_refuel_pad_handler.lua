@@ -186,8 +186,13 @@ local function Circle(unitID, goal)
 	local estimatedTime = (2*totalDist)/(maxSpeed+targetSpeed)
 	local acceleration = (targetSpeed^2 - maxSpeed^2)/(2*totalDist)
 	
+	-- Sigmoid Version
+	--local function TimeToVerticalPositon(t)
+	--	return start[2] + (goal[2] - start[2])*(1/(1 + exp(6*(-2*t/estimatedTime +1))))
+	--end
+	
 	local function TimeToVerticalPositon(t)
-		return start[2] + (goal[2] - start[2])*(1/(1 + exp(6*(-2*t/estimatedTime +1))))
+		return start[2] + (goal[2] - start[2])*t/estimatedTime
 	end
 	
 	--[[
@@ -205,8 +210,8 @@ local function Circle(unitID, goal)
 	roll = -roll
 	
 	local rollStopFudgeDistance = maxSpeed*25
-	local rollSpeed = 0.02
-	local maxRoll = 1
+	local rollSpeed = 0.03
+	local maxRoll = 0.8
 	
 	-- Move control stuff
 	mcEnable(unitID)
@@ -238,11 +243,13 @@ local function Circle(unitID, goal)
 			if currentDistance < circleDist - rollStopFudgeDistance then
 				if -roll*turnDir < maxRoll then
 					roll = roll - turnDir*rollSpeed
+				elseif -roll*turnDir > maxRoll + rollSpeed then
+					roll = roll + turnDir*rollSpeed
 				end
 			else
 				if -roll*turnDir > 0 then
 					roll = roll + turnDir*rollSpeed
-				elseif -roll*turnDir < -0.03 then
+				elseif -roll*turnDir < - rollSpeed then
 					roll = roll - turnDir*rollSpeed
 				end
 			end
