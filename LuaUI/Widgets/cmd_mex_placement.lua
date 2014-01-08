@@ -578,7 +578,7 @@ function calcMainMexDrawList()
 		glPopMatrix()
 	end
 
-	glLineWidth(0)
+	glLineWidth(1.0)
 	glColor(1,1,1,1)
 end
 --[[
@@ -607,7 +607,7 @@ function calcMiniMexDrawList()
 		glPopMatrix()
 	end
 
-	glLineWidth(0)
+	glLineWidth(1.0)
 	glColor(1,1,1,1)
 end
 --]]
@@ -715,7 +715,7 @@ function widget:DrawInMiniMap()
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
 		end
 
-		glLineWidth(0)
+		glLineWidth(1.0)
 		glColor(1,1,1,1)
 		
 	end

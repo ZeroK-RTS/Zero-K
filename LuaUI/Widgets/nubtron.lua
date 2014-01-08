@@ -605,7 +605,7 @@ function widget:DrawWorld()
 		
 	end
 	glDepthTest(false)
-	glLineWidth(0)
+	glLineWidth(1.0)
 	glColor(1,1,1,1)
 end
 

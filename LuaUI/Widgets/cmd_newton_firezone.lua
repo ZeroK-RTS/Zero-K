@@ -1,4 +1,4 @@
-local versionNum = '0.305'
+local versionNum = '0.306'
 
 function widget:GetInfo()
 	return {
@@ -14,14 +14,17 @@ function widget:GetInfo()
 end
 
 -- Based on Improved Newtons by wolas. ZK official version has less usage of pairs and a well integrated command instead of the hotkeys.
-
+--------------
+--CONSTANTS---
+--------------
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local checkRate = 2 -- spring has 30 frames per second, basically you
--- control responsives and accuracy.
--- On big setups checkRate = 1 is not recomended
--- + count your ping in
+local checkRate = 2 -- how fast Newton retarget. Default every 2 frame. Basically you control responsives and accuracy. On big setups checkRate = 1 is not recomended + count your ping in
 local newtonUnitDefID = UnitDefNames["corgrav"].id
+local newtonUnitDefRange = UnitDefNames["corgrav"].maxWeaponRange
+local calculateSimpleBallistic = Game.version:find('91.')
+local mapGravity = Game.gravity/30/30
+local flyThreshold = mapGravity*10
 
 local GL_LINE_STRIP = GL.LINE_STRIP
 local glLineWidth = gl.LineWidth
@@ -39,38 +42,13 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 local spGetUnitCommands = Spring.GetUnitCommands
 local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitVelocity = Spring.GetUnitVelocity
 --local ech = Spring.Echo
-
-local CMD_NEWTON_FIREZONE = 10283
-local CMD_STOP_NEWTON_FIREZONE = 10284
 
 local floor = math.floor
 
-local springPoints = {}			--[newtonGroupID] -> {points}
-springPoints[100] = {y = 100}
-springPoints[100] = nil
-local tempPoints = {}
-
-local groups = {count = 0, data = {}}
-
-local newtonIDs = {} 		--[unitID] -> newtonGroupid
-local newtonTrianglePoints = {}	--[unitID] -> { newtonTriangle Points}
-local selectedNewtons = nil		--temprorary {newtons}
-
-local intensivity = 255
-local colorIndex = 0
-
-local victim = {}
-local groupTarget = {}
-local victimStillBeingAttacked = {}
-local victimLandingLocation = {}
-
-local estimateInFuture = {}
-
---local cmdRate = 0
---local cmdRateS = 0
-local softEnabled = false	--if zero newtons has orders, uses less
-local currentFrame = Spring.GetGameFrame()
+local CMD_NEWTON_FIREZONE = 10283
+local CMD_STOP_NEWTON_FIREZONE = 10284
 
 local cmdFirezone = {
 	id      = CMD_NEWTON_FIREZONE,
@@ -93,6 +71,70 @@ local cmdStopFirezone = {
 	texture = 'LuaUI/Images/commands/Bold/stop.png',
 	params  = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
 }
+--------------
+--VARIABLE----
+--------------
+local springPoints = {}			--[newtonGroupID] -> {points}
+springPoints[100] = {y = 100}
+springPoints[100] = nil
+local tempPoints = {}
+
+local groups = {count = 0, data = {}}
+
+local newtonIDs = {} 		--[unitID] -> newtonGroupid
+local newtonTrianglePoints = {}	--[unitID] -> { newtonTriangle Points}
+local selectedNewtons = nil		--temprorary {newtons}
+
+local intensivity = 255
+local colorIndex = 0
+
+local victim = {}
+local groupTarget = {}
+local victimStillBeingAttacked = {}
+local victimLandingLocation = {}
+
+local queueTrajectoryEstimate = {targetFrame=-1,unitList={}} --for use in scheduling the time to calculate unit trajectory
+
+--local cmdRate = 0
+--local cmdRateS = 0
+local softEnabled = false	--if zero newtons has orders, uses less
+local currentFrame = Spring.GetGameFrame()
+--------------
+--METHODS-----
+--------------
+local function LimitRectangleSize(rect,units)  --limit rectangle size to Newton's range
+	local maxX = 0
+	local minX = math.huge
+	local maxZ = 0
+	local minZ = math.huge
+	for i = 1, #units do 
+		local unitID = units[i]
+		if spGetUnitDefID(unitID) == newtonUnitDefID then
+			local x,_,z = spGetUnitPosition(unitID)
+			if x + newtonUnitDefRange > maxX then
+				maxX = x + newtonUnitDefRange
+			end
+			if z + newtonUnitDefRange > maxZ then
+				maxZ = z + newtonUnitDefRange
+			end
+			if x - newtonUnitDefRange < minX then
+				minX = x - newtonUnitDefRange
+			end
+			if z - newtonUnitDefRange < minZ then
+				minZ = z - newtonUnitDefRange
+			end
+		end
+	end
+	rect.x = math.min(maxX,rect.x)
+	rect.z = math.min(maxZ,rect.z)
+	rect.x2 = math.min(maxX + 252,rect.x2)
+	rect.z2 = math.min(maxZ + 252,rect.z2)
+	rect.x = math.max(minX - 252,rect.x)
+	rect.z = math.max(minZ - 252,rect.z)
+	rect.x2 = math.max(minX,rect.x2)
+	rect.z2 = math.max(minZ,rect.z2)
+	return rect
+end
 
 local function FixRectangle(rect)
 	rect.x = floor((rect.x+8)/16)*16
@@ -246,7 +288,7 @@ function widget:CommandNotify(cmdID, params, options)
 				points.x2 = pos[1]
 				points.z2 = pos[3]
 			end
-
+			points = LimitRectangleSize(points,selectedNewtons)
 			points = FixRectangle(points)
 
 			RemoveDeadGroups(selectedNewtons)
@@ -310,19 +352,20 @@ function widget:UnitDestroyed(unitID)
 	end
 end
 
-function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer
-, weaponDefID, attackerID, attackerDefID, attackerTeam )
+function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer)
+	--estimate trajectory of any unit hit by weapon
+	if currentFrame >= queueTrajectoryEstimate["targetFrame"] then
+		queueTrajectoryEstimate["targetFrame"] = (currentFrame-(currentFrame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
+	end
+	queueTrajectoryEstimate["unitList"][unitID] = true
+
 	if victim[unitID] then --is current victim of any Newton group?
 		for g=1, groups.count do
 			if groupTarget[g] == unitID then
 				victimStillBeingAttacked[g] = unitID --signal a "wait, this group is attacking this unit!"
 			end
 		end
-		local frame = currentFrame
-		victim[unitID] = frame + 90 --delete 3 second later
-		local estFrame = (frame-(frame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
-		estimateInFuture[estFrame] = estimateInFuture[estFrame] or {}
-		estimateInFuture[estFrame][unitID] = true
+		victim[unitID] = currentFrame + 90 --delete 3 second later
 		--ech("still being attacked")
 	end
 end
@@ -336,11 +379,11 @@ function widget:GameFrame(n)
 	--end
 
 	-- estimate for recently launched units
-	if estimateInFuture[n] then
-		for unitID,_ in pairs(estimateInFuture[n]) do
+	if queueTrajectoryEstimate["targetFrame"] == n then
+		for unitID,_ in pairs(queueTrajectoryEstimate["unitList"]) do
 			EstimateCrashLocation(unitID)
+			queueTrajectoryEstimate["unitList"][unitID]=nil
 		end
-		estimateInFuture[n] = nil
 	end
 	
 	--empty whitelist to widget:UnitDamaged() monitoring
@@ -360,7 +403,7 @@ function widget:GameFrame(n)
 					local units = spGetUnitsInRectangle(points.x, points.z, points.x2, points.z2)
 					local stop = true
 					local unitToAttack = nil
-					local shortestDistance = 9999999
+					local shortestDistance = 999999
 					for i = 1, #units do
 						local unitID = units[i]
 						local targetDefID = spGetUnitDefID(unitID)
@@ -370,7 +413,7 @@ function widget:GameFrame(n)
 								victimStillBeingAttacked[g] = nil--clear wait signal
 								unitToAttack = nil
 								break --wait for next frame until UnitDamaged() stop signalling wait. 
-								--NOTE: there is periodic pause around ~16 frame in UnitDamaged(), this also allowed the wait signal to be empty and prompted Newton-groups to retarget.
+								--NOTE: there is periodic pause when Newton reload in UnitDamaged() (every 0.2 second), this allowed the wait signal to be empty and prompted Newton-groups to retarget.
 							end
 							--if (#cmdQueue>0) then
 							--ech("attack " .. CMD.ATTACK)
@@ -387,6 +430,7 @@ function widget:GameFrame(n)
 							-- victim[unitID] = n + 90 --empty whitelist 3 second later
 							--cmdRate = cmdRate +1
 							--break
+							
 							local distToBoxCenter = SquareDistance (points, unitID)
 							if distToBoxCenter < shortestDistance then --get smallest distance to box's center
 								shortestDistance = distToBoxCenter --shortest square distance
@@ -400,7 +444,7 @@ function widget:GameFrame(n)
 						victimStillBeingAttacked[g] = nil --clear wait signal
 						victim[unitToAttack] = n + 90 --add UnitDamaged() whitelist, and expire after 3 second later
 					end
-					if stop and groupTarget[g] then --no unit in the box, and have target?
+					if stop and groupTarget[g] then --no unit in the box, and still have target?
 						local orders = spGetUnitCommands(newtons[1],1)[1]
 						if orders and orders.id ==CMD.ATTACK and orders.params[1]==groupTarget[g] then --is currently attacking old target??
 							spGiveOrderToUnitArray(newtons,CMD.STOP, {}, {}) --cancel attacking any out-of-box unit
@@ -500,15 +544,15 @@ function EstimateCrashLocation(victimID)
 	if not UnitDefs[defID] or UnitDefs[defID].canFly then --if speccing with limited LOS or the unit can fly, then skip predicting trajectory.
 		return
 	end
-	local xVel,yVel,zVel = Spring.GetUnitVelocity(victimID)
-	local gravity = Game.gravity/30/30
-	if math.abs(yVel) < gravity*10 then --speed insignificant compared to gravity?
+	local xVel,yVel,zVel = spGetUnitVelocity(victimID)
+	local gravity = mapGravity
+	if math.abs(yVel) < flyThreshold then --speed insignificant compared to gravity?
 		victimLandingLocation[victimID]=nil
 		return
 	end
 	local x,y,z = spGetUnitPosition(victimID)
 	local future_locationX, future_locationZ, future_height
-	if Game.version:find('91.') then
+	if calculateSimpleBallistic then
 		--Simple simulation:
 		future_locationX, future_height,future_locationZ = SimulateWithoutDrag(xVel,yVel,zVel, x,y,z, gravity)
 	else
