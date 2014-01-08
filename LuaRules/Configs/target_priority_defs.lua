@@ -28,15 +28,14 @@ end
 -- Find the things which are fixedwing or gunship
 local unitIsGunship = {}
 local unitIsFixedwing = {}
-
+local getMovetype = Spring.Utilities.getMovetype
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.canFly then
-		if (ud.isFighter or ud.isBomber) then
-			unitIsFixedwing[i] = true
-		else
-			unitIsGunship[i] = true
-		end
+	local unitType = getMovetype(ud) --1 gunship, 0 fixedplane, 2 ground/sea, false everything-else
+	if unitType == 1 then
+		unitIsGunship[i] = true
+	elseif unitType == 0 then
+		unitIsFixedwing[i] = true
 	end
 end
 

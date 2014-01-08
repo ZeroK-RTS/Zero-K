@@ -30,7 +30,7 @@ function widget:Initialize()
     for tag, value in pairs(tags) do
       Spring.SetConfigInt(tag, value)
     end
-    Spring.Log(widget:GetInfo().name, LOG.WARNING, "Spring >91.0 detected. Setting config tags...")
+    Spring.Log(widget:GetInfo().name, LOG.WARNING, "not Spring 91.0. Setting a safe LogFlush & DeferredRendering config tags...")
     --Spring.SendCommands("luaui disablewidget " .. widget:GetInfo().name)
     widgetHandler:RemoveWidget()
   end
