@@ -17,8 +17,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 180,
-		subs    = 180,
+		default = 405,
+		subs    = 405,
 	},
 
 	explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -32,7 +32,7 @@ local weaponDef = {
 	numbounce               = 4,
 	noSelfDamage            = true,
 	range                   = 400,
-	reloadtime              = 1.2,
+	reloadtime              = 2.7,
 	soundHit                = [[explosion/wet/ex_underwater]],
 	soundStart              = [[weapon/torpedo]],
 	startVelocity           = 90,
