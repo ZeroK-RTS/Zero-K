@@ -258,6 +258,11 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=10, piece="wingtipl"}},
     {class='Ribbon', options={width=1, size=10, piece="wingtipr"}},  
   },
+  bomberassault = {
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustLeft", onActive=true}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=5, length=40, piece="exhaustRight", onActive=true}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=6, length=60, piece="exhaustTop", onActive=true}},
+  },
   corshad = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
