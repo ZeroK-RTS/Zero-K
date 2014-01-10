@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "KingRaptor",
-    date      = "22 Jan 2011",
+    date      = "22 Jan 2011", --update: 10 January 2014
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -33,6 +33,11 @@ local spGetUnitDefID	= Spring.GetUnitDefID
 local spGetUnitIsDead	= Spring.GetUnitIsDead
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local spGetUnitFuel		= Spring.GetUnitFuel
+local spGetUnitsInBox	= Spring.GetUnitsInBox
+local spGetUnitPieceMap = Spring.GetUnitPieceMap
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitPiecePosition = Spring.GetUnitPiecePosition 
+local spGetUnitVectors = Spring.GetUnitVectors
 
 
 include "LuaRules/Configs/customcmds.h.lua"
@@ -45,9 +50,9 @@ local bomberNames = {
 }
 
 local airpadNames = {
-	factoryplane = {mobile = false, cap = 1},
-	armasp = {mobile = false, cap = 4},
-	armcarry = {mobile = true, cap = 9},
+	factoryplane = {mobile = false, cap = 1, padName={"land"}},
+	armasp = {mobile = false, cap = 4, padName={"land1","land2","land3","land4"}},
+	armcarry = {mobile = true, cap = 9, padName={"landpad1","landpad2","landpad3","landpad4","landpad5","landpad6","landpad7","landpad8","landpad9"}},
 }
 
 local bomberDefs = {}
@@ -118,7 +123,7 @@ local bomberToPad = {}	-- [bomberID] = detination pad ID
 local refuelling = {} -- [bomberID] = true
 local airpads = {}	-- stores data
 local bomberMayBeJiggling = {}
-local airpadsPerAllyTeam = {}	-- [allyTeam] = {[pad1ID] = true, [pad2ID] = true, ..}
+local airpadsPerAllyTeam = {}	-- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
 local allyteams = Spring.GetAllyTeamList()
 for i=1,#allyteams do
 	airpadsPerAllyTeam[allyteams[i]] = {}
@@ -212,6 +217,35 @@ local function InsertCommand(unitID, index, cmdID, params, opts)
 end
 GG.InsertCommand = InsertCommand
 
+local function CountEmptyPad(unitID,unitDefID)
+	local emptySpot = 0
+	if airpadDefs[unitDefID] then
+		emptySpot = airpadDefs[unitDefID].cap
+		local occupiedSpot = 0
+		local piecesList = spGetUnitPieceMap(unitID)
+		local padPieceName = airpadDefs[unitDefID].padName
+		local ux,uy,uz = spGetUnitPosition(unitID)
+		local front, top, right = spGetUnitVectors(unitID)
+		for i=1, airpadDefs[unitDefID].cap do
+			local padName = padPieceName[i]
+			local pieceNum = piecesList[padName]
+			local x,y,z = spGetUnitPiecePosition(unitID, pieceNum)
+			local offX = front[1]*z + top[1]*y + right[1]*x
+			local offY = front[2]*z + top[2]*y + right[2]*x
+			local offZ = front[3]*z + top[3]*y + right[3]*x
+			local uxx,uyy,uzz = ux+offX, uy+offY, uz+offZ
+			local somethingOnThePad = spGetUnitsInBox(uxx-20,uyy-20,uzz-20, uxx+20,uyy+20,uzz+20)
+			if (#somethingOnThePad == 1 and somethingOnThePad[1]~= unitID) or 
+			(#somethingOnThePad == 2 and (somethingOnThePad[1]~= unitID or somethingOnThePad[2]~= unitID)) then
+				occupiedSpot = occupiedSpot + 1
+				-- Spring.MarkerAddPoint(uxx,uyy,uzz, "O")
+			end
+		end
+		emptySpot = emptySpot - occupiedSpot
+	end
+	return emptySpot
+end
+
 local function FindNearestAirpad(unitID, team)
 	--Spring.Echo(unitID.." checking for closest pad")
 	local allyTeam = spGetUnitAllyTeam(unitID)
@@ -302,7 +336,7 @@ function gadget:UnitFinished(unitID, unitDefID, team)
 		local allyTeam = spGetUnitAllyTeam(unitID)
 		airpads[unitID] = Spring.Utilities.CopyTable(airpadDefs[unitDefID], true)
 		airpads[unitID].reservations = {count = 0, units = {}}
-		airpadsPerAllyTeam[allyTeam][unitID] = true
+		airpadsPerAllyTeam[allyTeam][unitID] = unitDefID
 	end
 end
 
