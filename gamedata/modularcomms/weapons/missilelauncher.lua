@@ -13,9 +13,9 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 80,
-		planes  = 80,
-		subs    = 4,
+		default = 77,
+		planes  = 77,
+		subs    = 3.85,
 	},
 
 	explosionGenerator      = [[custom:FLASH2]],
@@ -26,7 +26,7 @@ local weaponDef = {
 	interceptedByShieldType = 2,
 	model                   = [[wep_m_frostshard.s3o]],
 	noSelfDamage            = true,
-	range                   = 415,
+	range                   = 430,
 	reloadtime              = 1,
 	smokeTrail              = true,
 	soundHit                = [[explosion/ex_med17]],
