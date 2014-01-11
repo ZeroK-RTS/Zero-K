@@ -13,8 +13,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 40,
-		subs    = 2,
+		default = 41,
+		subs    = 2.05,
 	},
 
 	explosionGenerator      = [[custom:flash1red]],
@@ -25,8 +25,8 @@ local weaponDef = {
 	laserFlareSize          = 4.5,
 	minIntensity            = 1,
 	pitchtolerance          = 8192,
-	range                   = 385,
-	reloadtime              = 0.33,
+	range                   = 400,
+	reloadtime              = (0.42708 + (1/300000)),
 	rgbColor                = [[1 0 0]],
 	soundStart              = [[weapon/laser/mini_laser]],
 	soundStartVolume        = 5,
