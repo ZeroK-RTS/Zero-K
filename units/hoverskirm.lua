@@ -89,7 +89,7 @@ unitDef = {
         subs    = 2,
       },
 
-      explosionGenerator      = [[custom:beamweapon_hit_red_large]],
+      explosionGenerator      = [[custom:flash1red]],
       fireStarter             = 100,
       --impactOnly              = true,
       impulseFactor           = 0,

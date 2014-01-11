@@ -1144,7 +1144,7 @@ local cegs = {
 -- CEG cloning
 local colors = {
   beamweapon_muzzle_green = {
-    source = "beamweapon_muzzle_blue",
+    source = "beamweapon_muzzle_yellow",
     data = {
       glow = {
 	properties = {color = "0, 1, 0",},
@@ -1152,7 +1152,7 @@ local colors = {
     },
   },
   beamweapon_muzzle_turquoise = {
-    source = "beamweapon_muzzle_blue",
+    source = "beamweapon_muzzle_yellow",
     data = {
       glow = {
 	properties = {color = "0, 0.8, 0.6",},
@@ -1161,7 +1161,7 @@ local colors = {
   },
   
   beamweapon_muzzle_red_large = {
-    source = "beamweapon_muzzle_blue",
+    source = "beamweapon_muzzle_yellow",
     data = {
       glow = {
 	properties = {color = "1, 0, 0",},
