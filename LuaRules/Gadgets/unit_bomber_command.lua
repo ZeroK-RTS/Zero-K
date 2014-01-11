@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "KingRaptor",
-    date      = "22 Jan 2011", --update: 10 January 2014
+    date      = "22 Jan 2011", --update: 11 January 2014
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -246,6 +246,25 @@ local function CountEmptyPad(unitID,unitDefID)
 	return emptySpot
 end
 
+local function CountAllEmptyPad_minusAirplaneSoonToLand()
+	local emptyPadPerAllyTeam = {}
+	for allyTeam in pairs(airpadsPerAllyTeam) do --all airpads
+		local emptyPadCount = 0
+		for airpadID,airpadUnitDefID in pairs (airpadsPerAllyTeam[allyTeam]) do
+			emptyPadCount = emptyPadCount + CountEmptyPad(airpadID,airpadUnitDefID)
+		end
+		emptyPadPerAllyTeam[allyTeam] = emptyPadCount
+	end
+	for bomberID in pairs(refuelling) do --airplane about to land
+		local fuel = spGetUnitFuel(bomberID) or 0
+		local bomberAllyTeam = bomberUnitIDs[bomberID]
+		if fuel == 0 then
+			emptyPadPerAllyTeam[bomberAllyTeam] = emptyPadPerAllyTeam[bomberAllyTeam] - 1
+		end
+	end
+	return emptyPadPerAllyTeam
+end
+
 local function FindNearestAirpad(unitID, team)
 	--Spring.Echo(unitID.." checking for closest pad")
 	local allyTeam = spGetUnitAllyTeam(unitID)
@@ -255,8 +274,10 @@ local function FindNearestAirpad(unitID, team)
 		return
 	end
 	-- first go through all the pads to see which ones are unbooked
-	for airpadID in pairs(airpadsPerAllyTeam[allyTeam]) do
-		if not spGetUnitIsDead(airpadID) and airpads[airpadID].reservations.count < airpads[airpadID].cap then
+	for airpadID,airpadDefID in pairs(airpadsPerAllyTeam[allyTeam]) do
+		if not spGetUnitIsDead(airpadID) and 
+		(airpads[airpadID].reservations.count < airpads[airpadID].cap or airpads[airpadID].reservations.units[unitID]) and 
+		CountEmptyPad(airpadID,airpadDefID)>0 then
 			freePads[airpadID] = true
 			freePadCount = freePadCount + 1
 		end
@@ -315,7 +336,7 @@ function gadget:UnitCreated(unitID, unitDefID, team)
 	if bomberDefs[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, 400, rearmCMD)
 		Spring.InsertUnitCmdDesc(unitID, 401, findPadCMD)
-		bomberUnitIDs[unitID] = true
+		bomberUnitIDs[unitID] = spGetUnitAllyTeam(unitID)
 	end
 	--[[
 	local id = Spring.FindUnitCmdDesc(unitID, CMD.WAIT)
@@ -419,9 +440,12 @@ function gadget:GameFrame(n)
 			RequestRearm(bomberID, nil, true)
 		end
 		scheduleRearmRequest = {}
+		local emptyPadPerAllyTeam = CountAllEmptyPad_minusAirplaneSoonToLand()
 		for bomberID, padID in pairs(bomberToPad) do
 			local queue = Spring.GetUnitCommands(bomberID, 1)
-			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) then
+			local bomberAllyTeam = bomberUnitIDs[bomberID]
+			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) and emptyPadPerAllyTeam[bomberAllyTeam]>0 then
+				emptyPadPerAllyTeam[bomberAllyTeam] = emptyPadPerAllyTeam[bomberAllyTeam] - 1 --assume this airplane already took a pad
 				local tag = queue[1].tag
 				--Spring.Echo("Bomber "..bomberID.." cleared for landing")
 				CancelAirpadReservation(bomberID)
@@ -480,7 +504,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			reservations.count = reservations.count + 1
 		end
 		local x, y, z = Spring.GetUnitPosition(targetPad)
-		Spring.SetUnitMoveGoal(unitID, x, y, z)
+		Spring.SetUnitMoveGoal(unitID, x, y, z) --persistently keep airplane toward/at the pad?
 		return true, false	-- command used, don't remove
 	elseif cmdID == CMD_FIND_PAD then
 		scheduleRearmRequest[unitID] = true
