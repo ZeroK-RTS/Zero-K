@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[bomberassault]],
   name                = [[Eclipse]],
-  description         = [[Assault Bomber (Anti-static)]],
+  description         = [[Assault Bomber (Anti-Static)]],
   amphibious          = true,
   --autoheal			  = 25,
   buildCostEnergy     = 1000,
@@ -65,7 +65,7 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[ARM]],
   sightDistance       = 660,
-  turnRadius          = 0,
+  turnRadius          = 90,
   smoothAnim          = true,
   workerTime          = 0,
 
@@ -109,7 +109,7 @@ unitDef = {
       range                   = 500,
       reloadtime              = 10,
       soundHit                = [[weapon/missile/liche_hit]],
-      soundStart              = [[weapon/bomb_drop]],
+      soundStart              = [[weapon/missile/liche_fire]],
       weaponType              = [[AircraftBomb]],
     },
 

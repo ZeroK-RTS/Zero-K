@@ -65,11 +65,7 @@ end
 local predictMult = 3
 
 function script.BlockShot(num, targetID)
-	if num ~= 2 then
-		return false
-	end
-	
-	return not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
+	return ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
 end
 
 function script.Killed(recentDamage, maxHealth)
