@@ -210,7 +210,6 @@ local function SetupControls()
 	window_endgame = Window:New{  
 		name = "GameOver",
 		caption = "Game Over",
-		color = {1,1,1,1},
 		x = '20%',
 		y = '20%',
 		width  = '60%',
@@ -224,14 +223,10 @@ local function SetupControls()
 		minHeight=400;
 	}
 	
-	
-	
 	awardPanel = ScrollPanel:New{
 		parent = window_endgame,
 		x=10;y=40;
 		bottom=10;right=10;
-		backgroundColor  = {1,1,1,1},
-		borderColor = {1,1,1,1},
 		autosize = true,
 		scrollbarSize = 6,
 		horizontalScrollbar = false,
