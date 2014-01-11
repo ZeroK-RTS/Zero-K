@@ -326,7 +326,7 @@ function UnitPieceLight.Initialize()
   uniformScreenX  = gl.GetUniformLocation(blurShader_h, 'screenX')
   uniformScreenY  = gl.GetUniformLocation(blurShader_v, 'screenY')
 
-  UnitPieceLight.ViewResize()
+  UnitPieceLight.ViewResize(vsx, vsy)
 end
 
 function UnitPieceLight.Finalize()
@@ -343,7 +343,7 @@ function UnitPieceLight.Finalize()
   end
 end
 
-function UnitPieceLight.ViewResize()
+function UnitPieceLight.ViewResize(vsx, vsy)
   gl.DeleteTexture(depthtex or 0)
   gl.DeleteTextureFBO(offscreentex or 0)
   gl.DeleteTextureFBO(blurtex or 0)
