@@ -20,7 +20,7 @@ generalTips = {
 	"You can draw on the map with tilde (~) and left mouse. ~ + double click adds a labelled point, while ~ + middle click adds a point without label. ~ + right click erases.",
 	"Many commands can be issued over a whole area by keeping button the down and dragging a box or disc.",
 	
-	"Heavy striders are built by the Athena specops aircraft, buildable by any mobile constructor.",
+	"Heavy striders are built by the Strider Hub, buildable by any standard constructor.",
 	"Riot units double as improvised anti-air against most gunships.",
 	"Nuclear missiles are devastating, but can be intercepted by antinuke systems which provide coverage over a wide area.",
 	"Cloaked units can be revealed by close contact, or when damaged.",
