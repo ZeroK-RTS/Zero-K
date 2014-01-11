@@ -212,8 +212,7 @@ end
 --------------------------------------------------------------------------------
 
 --// some global vars (so the effects can use them)
-vsx, vsy        = 1,1 -- can't be zero in 96.0.1+
-vpx, vpy        = 0,0  --// view pos (only unequal zero, if dualscreen+minimapOnTheLeft)
+vsx, vsy, vpx, vpy = Spring.GetViewGeometry() --// screen pos & view pos (view pos only unequal zero if dualscreen+minimapOnTheLeft) 
 LocalAllyTeamID = 0
 thisGameFrame   = 0
 frameOffset     = 0
