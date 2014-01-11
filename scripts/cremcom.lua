@@ -65,6 +65,7 @@ local ARM_FRONT_ANGLE = -math.rad(20)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
 local ARM_BACK_ANGLE = math.rad(10)
 local ARM_BACK_SPEED = math.rad(22.5) * PACE
+local ARM_PERPENDICULAR = math.rad(90)
 local FOREARM_FRONT_ANGLE = -math.rad(40)
 local FOREARM_FRONT_SPEED = math.rad(45) * PACE
 local FOREARM_BACK_ANGLE = math.rad(10)
@@ -100,12 +101,16 @@ local restoreHeading = 0
 local gun_num = 0
 
 local flamers = {}
+local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons
 wepTable.n = nil
 for index, weapon in pairs(wepTable) do
 	local weaponDef = WeaponDefs[weapon.weaponDef]
 	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
 		flamers[index] = true
+	elseif weaponDef.type == "StarburstLauncher" then
+		starBLaunchers[index] = true
+		--Spring.Echo("sbl found")
 	end
 end
 wepTable = nil
@@ -212,6 +217,9 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if starBLaunchers[num] then
+		pitch = ARM_PERPENDICULAR
+	end
 	if num >= 5 then
 		Signal( SIG_AIM)
 		SetSignalMask( SIG_AIM)
