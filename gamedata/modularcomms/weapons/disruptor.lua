@@ -11,11 +11,11 @@ local weaponDef = {
 
 	customParams            = {
 		--timeslow_preset       = [[module_disruptorbeam]],
-		timeslow_damagefactor = [[1.8]],
+		timeslow_damagefactor = [[2]],
 	},
 
 	damage                  = {
-		default = 250,
+		default = 225,
 	},
 
 	explosionGenerator      = [[custom:flash2purple]],
