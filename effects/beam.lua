@@ -344,7 +344,7 @@ local cegs = {
         emitrotspread      = 80,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, -0.4, 0]],
-        numparticles       = 64,
+        numparticles       = 32,
         particlelife       = 15,
         particlelifespread = 0,
         particlesize       = 3,
@@ -412,7 +412,7 @@ local cegs = {
         emitrotspread      = 80,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, -0.4, 0]],
-        numparticles       = 64,
+        numparticles       = 32,
         particlelife       = 15,
         particlelifespread = 0,
         particlesize       = 3,
@@ -703,7 +703,7 @@ local cegs = {
         emitrotspread      = 80,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, -0.4, 0]],
-        numparticles       = 64,
+        numparticles       = 32,
         particlelife       = 15,
         particlelifespread = 0,
         particlesize       = 3,
@@ -771,7 +771,7 @@ local cegs = {
         emitrotspread      = 80,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, -0.4, 0]],
-        numparticles       = 64,
+        numparticles       = 32,
         particlelife       = 15,
         particlelifespread = 0,
         particlesize       = 3,
@@ -1158,7 +1158,17 @@ local colors = {
 	properties = {color = "0, 0.8, 0.6",},
       },
     },
-  },  
+  },
+  
+  beamweapon_muzzle_red_large = {
+    source = "beamweapon_muzzle_blue",
+    data = {
+      glow = {
+	properties = {color = "1, 0, 0",},
+      },
+    },
+  },
+  
   beamweapon_hit_green = {
     source = "beamweapon_hit_yellow",
     data = {
@@ -1183,6 +1193,19 @@ local colors = {
       },
     },
   },
+  
+  beamweapon_hit_red_large = {
+    source = "beamweapon_hit_yellow",
+    data = {
+      groundflash = {color = {1, 0.5, 0.2} },
+      pikes = {
+	properties = {explosiongenerator = "custom:BEAMWEAPON_MUZZLE_RED_LARGE"},
+      },
+      sparks = {
+	properties = {colormap = "1 0.7 0.3 0.01   0.01 0.01 0.005 0.01"},
+      },
+    },
+  },  
 }
 
 for color, info in pairs(colors) do
