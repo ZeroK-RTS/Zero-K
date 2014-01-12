@@ -132,12 +132,12 @@ local resChanged = false
 
 
 --more
-local featureHoverColor = { 1, 0, 1 }
-local myHoverColor 	    = { 0, 1, 1 }
-local allyHoverColor 	= { 0.2, 0.2, 1 }
-local enemyHoverColor   = { 1, 0, 0 }
-local selectColor 	    = { 0, 1, 0 }
-local allySelectColor 	= { 1, 1, 0 }
+local featureHoverColor = { 1, 0, 1, 1}
+local myHoverColor 	    = { 0, 1, 1, 1 }
+local allyHoverColor 	= { 0.2, 0.2, 1, 1 }
+local enemyHoverColor   = { 1, 0, 0, 1 }
+local selectColor 	    = { 0, 1, 0, 1 }
+local allySelectColor 	= { 1, 1, 0, 1 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -258,7 +258,8 @@ local function DrawHaloFunc()
 		if options.useteamcolors.value then
 			local teamID = spGetUnitTeam(unitID)
 			if teamID then
-				glColor(Spring.GetTeamColor(teamID))
+        local r, g, b = Spring.GetTeamColor(teamID);
+				glColor(r, g, b, allySelectColor[4])
 			else
 				glColor(allySelectColor)
 			end
