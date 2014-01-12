@@ -1,4 +1,4 @@
-local versionName = "v2.866"
+local versionName = "v2.867"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -73,7 +73,7 @@ local mathRandom = math.random
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
-local isOldSpring_g = (Game.version:find('91.')) and 1 or 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
+local isOldSpringG = (Game.version:find('91.')) and 1 or 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
 local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 1)
 local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
@@ -129,7 +129,7 @@ local velocityAddingCONSTANTg=50 --add or remove command lenght (default = 50 el
 --Weapon Reload and Shield constant:
 local reloadableWeaponCriteriaG = 0.5 --second at which reload time is considered high enough to be a "reload-able". eg: 0.5second
 local criticalShieldLevelG = 0.5 --percent at which shield is considered low and should activate avoidance. eg: 50%
-local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate. eg: 0.9 second before finish
+local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate (note: overriden by 1/4 of weapon's reload time if its bigger). eg: 0.9 second before finish (or 7 second for armspy)
 local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calculating remaining reload time). eg: 0.0333 second-per-frame or 0.5sec/15frame
 
 --Command Timeout constants:
@@ -442,10 +442,10 @@ function RefreshUnitList(attacker, commandTTL)
 					-- end
 				end
 				if (unitType>0) then
-					local unitShieldPower, reloadableWeaponIndex= -1, -1
-					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
+					local unitShieldPower, reloadableWeaponIndex,reloadTime,range = -1, -1,-1,-1
+					unitShieldPower, reloadableWeaponIndex,reloadTime,range = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
-					relevantUnit[arrayIndex]={unitID, unitType, unitSpeed, fixedPointType, decloakScaling, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
+					relevantUnit[arrayIndex]={unitID, unitType, unitSpeed, fixedPointType, decloakScaling,{unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex,reloadTime = reloadTime,range=range}, isVisible = unitInView}
 				end
 			end
 			if (turnOnEcho == 1) then --for debugging
@@ -485,7 +485,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 					--local boxSizeTrigger= unitInMotion[i][2]
 					local fixedPointCONSTANTtrigger = unitInMotion[i][4] --//using fixedPointType to trigger different fixed point constant for each unit type
 					local unitVisible = (unitInMotion[i].isVisible == "yes")
-					local fastestWeaponIndex = unitInMotion[i]["reloadableWeaponIndex"]
+					local fastestWeapon = unitInMotion[i][6]
 					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case=IdentifyTargetOnCommandQueue(cQueue,cQueueTemp, unitID, commandIndexTable,fixedPointCONSTANTtrigger,unitVisible,isReloadAvoidance) --check old or new command
 					local currentX,_,currentZ = spGetUnitPosition(unitID)
 					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
@@ -493,7 +493,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 						boxSizeTrigger = 1 -- override all reclaim/ressurect/repair's deactivation 'halfboxsize' with the one for MOVE command (give more tolerance when unit is selected)
 					end
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
-					local losRadius	= GetUnitLOSRadius(unitID,case,fastestWeaponIndex) --get LOS. also custom LOS for case=="attack" & weapon range >0
+					local losRadius	= GetUnitLOSRadius(unitID,case,fastestWeapon) --get LOS. also custom LOS for case=="attack" & weapon range >0
 					local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
 					
 					if ((newCommand and cQueueTemp[1].id==CMD_MOVE) or cQueueTemp[2].id==CMD_MOVE) and not unitVisible then --if unit is issued a move Command and is outside user's view. Note: is using cQueueTemp because cQueue can be NIL
@@ -714,7 +714,8 @@ function CheckWeaponsAndShield (unitDef)
 	local reloadableWeaponCriteria = reloadableWeaponCriteriaG --minimum reload time for reloadable weapon
 	----
 	local unitShieldPower, reloadableWeaponIndex =-1, -1 --assume unit has no shield and no reloadable/slow-loading weapons
-	local fastestReloadTime, fastWeaponIndex = 999, -1 --temporary variables
+	local fastWeaponIndex =  -1 --temporary variables
+	local fastestReloadTime, fastReloadRange = 999,-1
 	for currentWeaponIndex, weapons in ipairs(unitDef.weapons) do --reference: gui_contextmenu.lua by CarRepairer
 		local weaponsID = weapons.weaponDef
 		local weaponsDef = WeaponDefs[weaponsID]
@@ -725,6 +726,7 @@ function CheckWeaponsAndShield (unitDef)
 				local reloadTime = weaponsDef.reload
 				if reloadTime < fastestReloadTime then --find the weapon with the smallest reload time
 					fastestReloadTime = reloadTime
+					fastReloadRange = weaponsDef.range
 					fastWeaponIndex = currentWeaponIndex --remember the index of the fastest weapon.
 				end
 			end
@@ -739,7 +741,7 @@ function CheckWeaponsAndShield (unitDef)
 			Spring.Echo(fastestReloadTime)
 		end
 	end
-	return unitShieldPower, reloadableWeaponIndex
+	return unitShieldPower, reloadableWeaponIndex,fastestReloadTime,fastReloadRange
 end
 
 function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
@@ -884,9 +886,8 @@ function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger, lastPositio
 end
 
 -- get LOS
-function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
+function GetUnitLOSRadius(unitID,case,fastestWeapon)
 	----Global Constant----
-	local isOldSpring = isOldSpring_g --for Spring < 95 compatibility
 	local extraLOSRadiusCONSTANT = extraLOSRadiusCONSTANTg
 	-----------------------
 	local unitDefID= spGetUnitDefID(unitID)
@@ -897,9 +898,9 @@ function GetUnitLOSRadius(unitID,case,reloadableWeaponIndex)
 		losRadius= losRadius + extraLOSRadiusCONSTANT --add extra detection range for beyond LOS (radar)
 		if case=="attack" then --if avoidance is for attack enemy: use special LOS
 			
-			local unitFastestReloadableWeapon = reloadableWeaponIndex --retrieve the quickest reloadable weapon index
+			local unitFastestReloadableWeapon = fastestWeapon["reloadableWeaponIndex"] --retrieve the quickest reloadable weapon index
 			if unitFastestReloadableWeapon ~= -1 then
-				local weaponRange = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon -isOldSpring, "range") --retrieve weapon range
+				local weaponRange = fastestWeapon["range"] --retrieve weapon range
 				losRadius = math.max(weaponRange*0.75, losRadius) --select avoidance's detection-range to 75% of weapon range or maintain to losRadius, select which is the biggest (Note: big LOSradius mean big detection but also big "distanceCONSTANTunit_G" if "useLOS_distanceCONSTANTunit_G==true", thus bigger avoidance circle)
 			end	
 			
@@ -1270,14 +1271,15 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 	local criticalShieldLevel =criticalShieldLevelG 
 	local minimumRemainingReloadTime =minimumRemainingReloadTimeG
 	local secondPerGameFrame =secondPerGameFrameG
-	local isOldSpring = isOldSpring_g --for Spring < 95 compatibility
+	local isOldSpring = isOldSpringG --for Spring < 95 compatibility
 	------
 	--local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
 	local shieldIsCritical =false
 	local weaponIsEmpty = false
+	local fastestWeapon = unitInMotionSingleUnitTable[6]
 	--if unitType ==2 or unitType == 1 then
 		local unitID = unitInMotionSingleUnitTable[1] --retrieve stored unitID
-		local unitShieldPower = unitInMotionSingleUnitTable.unitShieldPower --retrieve registered full shield power
+		local unitShieldPower = fastestWeapon["unitShieldPower"] --retrieve registered full shield power
 		if unitShieldPower ~= -1 then
 			local _, currentPower = spGetUnitShieldState(unitID)
 			if currentPower~=nil then
@@ -1286,15 +1288,25 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 				end
 			end
 		end
-		local unitFastestReloadableWeapon = unitInMotionSingleUnitTable.reloadableWeaponIndex --retrieve the quickest reloadable weapon index
+		local unitFastestReloadableWeapon = fastestWeapon["reloadableWeaponIndex"] --retrieve the quickest reloadable weapon index
+		local fastestReloadTime = fastestWeapon["reloadTime"]
 		if unitFastestReloadableWeapon ~= -1 then
-			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-isOldSpring) --Somehow the weapon table actually start at "0", so minus 1 from actual value
-			local currentFrame, _ = spGetGameFrame() 
-			local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
-			weaponIsEmpty = (remainingTime> minimumRemainingReloadTime)
-			if (turnOnEcho == 1) then --debugging
-				Spring.Echo(unitFastestReloadableWeapon)
-				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-isOldSpring, "range"))
+			local unitSpeed = unitInMotionSingleUnitTable[3]
+			local distancePerSecond = unitSpeed/secondPerGameFrame
+			local fastUnit_shortRange = distancePerSecond > fastestWeapon["range"] --check if unit can exit range easily if *this widget* evasion is activated
+			local unitValidForReloadEvasion = true
+			if fastUnit_shortRange then
+				unitValidForReloadEvasion = fastestReloadTime > 2.5 --check if unit will have enough time to return from *this widget* evasion
+			end
+			if unitValidForReloadEvasion then
+				local weaponReloadFrame = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-isOldSpring, "reloadFrame") --Somehow the weapon table actually start at "0", so minus 1 from actual value
+				local currentFrame, _ = spGetGameFrame() 
+				local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame --convert to second
+				weaponIsEmpty = (remainingTime> math.max(minimumRemainingReloadTime,fastestReloadTime*0.25))
+				if (turnOnEcho == 1) then --debugging
+					Spring.Echo(unitFastestReloadableWeapon)
+					Spring.Echo(fastestWeapon["range"])
+				end
 			end
 		end			
 	--end
