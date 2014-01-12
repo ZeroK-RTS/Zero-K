@@ -44,7 +44,7 @@ unitDef = {
   mass                   = 198,
   maxDamage              = 1050,
   maxSlope               = 18,
-  maxVelocity            = 3.6,
+  maxVelocity            = 3.9,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
@@ -95,15 +95,15 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = [[180]],
+        extra_damage = [[160]],
       },
 
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 1600,
-        empresistant75 = 400,
-        empresistant99 = 16,
+        default        = 800,
+        empresistant75 = 200,
+        empresistant99 = 8,
       },
 
       duration                = 10,
@@ -115,9 +115,9 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzer               = true,
-      paralyzeTime            = 2,
+      paralyzeTime            = 1,
       range                   = 250,
-      reloadtime              = 3,
+      reloadtime              = 2.5,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning]],
       soundTrigger            = true,
