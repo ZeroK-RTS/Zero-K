@@ -15,36 +15,36 @@ end
 ------------------------------------------
 
 local lastLoadMessage = ""
-local lastProgress = 0
+local lastProgress = {0, 0}
 
 local progressByLastLine = {
-	["Parsing Map Information"] = 0,
-	["Loading SMF"] = 5,
-	["Loading Radar Icons"] = 10,
-	["Loading GameData Definitions"] = 15,
-	["Loading Sound Definitions"] = 20,
-	["Creating Smooth Height Mesh"] = 22,
-	["Creating QuadField & CEGs"] = 25,
-	["Creating Unit Textures"] = 30,
-	["Creating Sky"] = 35,
-	["Loading Weapon Definitions"] = 40,
-	["Loading Unit Definitions"] = 45,
-	["Loading Feature Definitions"] = 50,
-	--["PathCosts: writing"] = 55,	-- this is done at the end in 96.0.1+
-	["Initializing Map Features"] = 60,
-	["Creating ShadowHandler & DecalHandler"] = 65,
-	["Loading Map Tiles"] = 68,
-	["Loading Square Textures"] = 70,
-	["Creating TreeDrawer"] = 72,
-	["Creating ProjectileDrawer & UnitDrawer"] = 75,
-	["Creating Projectile Textures"] = 78,
-	["Loading LuaRules"] = 80,
-	["Loading LuaUI"] = 90,
-	["Initializing PathCache"] = 95,
-	["Finalizing"] = 100
+	["Parsing Map Information"] = {0, 5},
+	["Loading SMF"] = {5, 10},
+	["Loading Radar Icons"] = {10, 15},
+	["Loading GameData Definitions"] = {15, 20},
+	["Loading Sound Definitions"] = {20, 22},
+	["Creating Smooth Height Mesh"] = {22, 25},
+	["Creating QuadField & CEGs"] = {25, 30},
+	["Creating Unit Textures"] = {30, 35},
+	["Creating Sky"] = {35, 40},
+	["Loading Weapon Definitions"] = {40, 45},
+	["Loading Unit Definitions"] = {45, 50},
+	["Loading Feature Definitions"] = {50, 58},
+	--["PathCosts: writing"] = {55, 60},
+	["Initializing Map Features"] = {58, 65},
+	["Creating ShadowHandler & DecalHandler"] = {65, 68},
+	["Loading Map Tiles"] = {68, 70},
+	["Loading Square Textures"] = {70, 72},
+	["Creating TreeDrawer"] = {72, 75},
+	["Creating ProjectileDrawer & UnitDrawer"] = {75, 78},
+	["Creating Projectile Textures"] = {78, 80},
+	["Loading LuaRules"] = {80, 90},
+	["Loading LuaUI"] = {90, 95},
+	["Initializing PathCache"] = {95, 100},
+	["Finalizing"] = {100, 100}
 }
 for name,val in pairs(progressByLastLine) do
-	progressByLastLine[name] = val*0.01
+	progressByLastLine[name] = {val[1]*0.01, val[2]*0.01}
 end
 
 function addon.LoadProgress(message, replaceLastLine)
@@ -59,9 +59,9 @@ local font = gl.LoadFont("FreeSansBold.otf", 50, 20, 1.95)
 function addon.DrawLoadScreen()
 	local loadProgress = SG.GetLoadProgress()
 	if loadProgress == 0 then
-		loadProgress = lastProgress
+		loadProgress = lastProgress[1]
 	else
-		loadProgress = math.min(lastProgress, loadProgress)
+		loadProgress = math.min(math.max(loadProgress, lastProgress[1]), lastProgress[2])
 	end
 
 	local vsx, vsy = gl.GetViewSizes()
