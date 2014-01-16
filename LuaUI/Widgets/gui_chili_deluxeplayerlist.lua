@@ -53,7 +53,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/PlayerList'
-options_order = { 'visible', 'backgroundOpacity', 'text_height', 'name_width', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'text_height', 'name_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -85,6 +85,14 @@ options = {
 		type = 'number',
 		value = 120,
 		min=50,max=200,step=10,
+		OnChange = function() SetupPanels() end,
+		advanced = true
+	},
+	round_elo = {
+		name = "Round Elo display",
+		type = 'bool',
+		value = true,
+		desc = "Round Elo display to the nearest 50 points",
 		OnChange = function() SetupPanels() end,
 		advanced = true
 	},
@@ -832,7 +840,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			if icon then MakeNewIcon(entity,"clanIcon",{x=x_icon_clan,file=icon,y=((fontsize+1)*row)+5,width=fontsize-1,height=fontsize-1}) end 
 		end
 		if entity.elo and entity.elo ~= "" then
-			elo, eloCol = FormatElo(entity.elo)
+			elo, eloCol = FormatElo(entity.elo, not options.round_elo.value)
 		end
 		if elo then MakeNewLabel(entity,"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
 
