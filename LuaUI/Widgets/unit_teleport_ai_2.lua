@@ -1,4 +1,4 @@
-local version = "v0.833"
+local version = "v0.834"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -31,6 +31,7 @@ local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetGameSeconds = Spring.GetGameSeconds
 ------------------------------------------------------------
 ------------------------------------------------------------
+local isNewEngine = not Game.version:find('91.0') 
 local myTeamID
 local ud
 local listOfBeacon={}
@@ -244,7 +245,7 @@ function widget:GameFrame(n)
 			local numberOfUnitToProcess = 5 --NUMBER OF UNIT PER BEACON PER SECOND
 			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29) --spread looping to entire 1 second
 			local beaconCurrentQueue = groupBeaconQueue[i] or {}
-			local unitToEffect = groupEffectedUnit[i] or {}
+			local unitToEffect = groupEffectedUnit[i] or {} --Note: is refreshed (empty) every second
 			local loopedUnits = groupLoopedUnit[i] or {}
 			local beaconFinishLoop = groupBeaconFinish[i] or {}
 			groupSpreadJobs[i] = false
@@ -276,29 +277,33 @@ function widget:GameFrame(n)
 							local unitDefID = spGetUnitDefID(unitID)
 							if not listOfMobile[unitDefID] then
 								local moveID = UnitDefs[unitDefID].moveDef.id
-								local chargeTime = math.floor(UnitDefs[unitDefID].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
-								local unitSpeed = UnitDefs[unitDefID].speed --speed is in elmo-per-second
-								local isBomber = UnitDefs[unitDefID].isBomber
-								local isFighter = UnitDefs[unitDefID].isFighter
+								local ud = UnitDefs[unitDefID]
+								local chargeTime = math.floor(ud.mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
+								local unitSpeed = ud.speed --speed is in elmo-per-second
+								local isFixedWing = (ud.canFly or ud.isAirUnit) and (ud.isBomber or ud.isFighter)
+								if isNewEngine then
+									isFixedWing = (ud.canFly or ud.isAirUnit) and not ud.isHoveringAirUnit
+								end
+								local weaponRange = GetUnitFastestWeaponRange(ud)
 								local isStatic = (unitSpeed == 0)
-								local isTransport = UnitDefs[unitDefID].isTransport
-								listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isBomber,isFighter,isStatic,isTransport}
+								local isTransport = ud.isTransport
+								listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isFixedWing,weaponRange,isStatic,isTransport}
 							end
-							local isBomber = listOfMobile[unitDefID][4]
-							local isFighter = listOfMobile[unitDefID][5]
+							local isFixedWing = listOfMobile[unitDefID][4]
 							local isStatic = listOfMobile[unitDefID][6]
 							repeat --note: not looping, only for using "break" as method of escaping code
 								local _,_,inBuild = spGetUnitIsStunned(unitID)
-								if isStatic or isBomber or isFighter or inBuild then
+								if isStatic or isFixedWing or inBuild then
 									loopedUnits[unitID]=true
 									break; --a.k.a: Continue
 								end
 								--IS NEW UNIT? initialize them--
-								unitToEffect[unitID] = unitToEffect[unitID] or {norm=nil,becn={nil},pos=nil,cmd=nil,defID=unitDefID}
-								local unitInfo = unitToEffect[unitID] --note: copy table reference
+								unitToEffect[unitID] = unitToEffect[unitID] or {norm=nil,attckng=nil,becn={nil},pos=nil,cmd=nil,defID=unitDefID}
+								local unitInfo = unitToEffect[unitID] --note: copy table reference (this mean changes to unitInfo saves into unitToEffect)
 								if not unitInfo["cmd"] then
 									local px,py,pz= spGetUnitPosition(unitID)
 									local cmd_queue = spGetCommandQueue(unitID,1);
+									unitInfo["attckng"] = (cmd_queue and cmd_queue[1] and cmd_queue[1].id == CMD.ATTACK)
 									cmd_queue = ConvertCMDToMOVE(cmd_queue)
 									unitInfo["pos"] = {px,py,pz}
 									unitInfo["cmd"] = cmd_queue
@@ -317,10 +322,11 @@ function widget:GameFrame(n)
 										beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] + chargeTime
 										loopedUnits[unitID]=true
 										break; --a.k.a: Continue
-									else
+									else -- beacon removed
 										local cmd_queue = spGetCommandQueue(unitID,3);
 										if cmd_queue[2] and cmd_queue[3] then --in case previous teleport AI teleport order make unit stuck to non-existent beacon
 											spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
+											unitInfo["attckng"] = (cmd_queue[3].id == CMD.ATTACK)
 											cmd_queue = ConvertCMDToMOVE({cmd_queue[3]})
 											unitInfo["cmd"] = cmd_queue
 											if not cmd_queue then --invalid command
@@ -339,6 +345,7 @@ function widget:GameFrame(n)
 									break;
 								end
 								currentUnitProcessed = currentUnitProcessed + 1
+								local weaponRange = listOfMobile[unitDefID][5]
 								--MEASURE REGULAR DISTANCE--
 								local px,py,pz = unitInfo["pos"][1],unitInfo["pos"][2],unitInfo["pos"][3]
 								local cmd_queue = {id=0,params={0,0,0}}
@@ -349,18 +356,18 @@ function widget:GameFrame(n)
 									cmd_queue.params[1]=unitInfo["cmd"].params[1] --target coordinate
 									cmd_queue.params[2]=unitInfo["cmd"].params[2]
 									cmd_queue.params[3]=unitInfo["cmd"].params[3]
-									local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
+									local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz,unitInfo["attckng"],weaponRange)
 									unitInfo["norm"] = (distance/unitSpeed)*30
 								end
 								--MEASURE DISTANCE WITH TELEPORTER--
 								cmd_queue.id =CMD.MOVE
-								for l=1, #groupBeacon[i],1 do
+								for l=1, #groupBeacon[i],1 do --iterate over all beacon in vicinity
 									local beaconID2 = groupBeacon[i][l]
 									if listOfBeacon[beaconID2] and listOfBeacon[beaconID2]["deployed"] == 1 then --beacon is alive?
 										cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
 										cmd_queue.params[2]=listOfBeacon[beaconID2][2]
 										cmd_queue.params[3]=listOfBeacon[beaconID2][3]
-										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz)
+										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz,false,0) --dist to beacon
 										local timeToBeacon = (distance/unitSpeed)*30 --timeToBeacon is in frame
 										cmd_queue.params[1]=unitInfo["cmd"].params[1] --target coordinate
 										cmd_queue.params[2]=unitInfo["cmd"].params[2]
@@ -385,7 +392,7 @@ function widget:GameFrame(n)
 										local _, beaconIDToProcess, totalOverheadTime,_,history = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, 99999, chargeTime,0, {})
 										if beaconIDToProcess then
 											history[beaconIDToProcess] = true --add the LAST BEACON in the history list
-											distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6])
+											distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6],unitInfo["attckng"],weaponRange) --dist out of beacon
 											local timeFromExitToDestination = (distance/unitSpeed)*30
 											local totalTime = timeToBeacon + timeFromExitToDestination + totalOverheadTime
 											unitInfo["becn"][beaconID2] = {totalTime, history}
@@ -440,8 +447,8 @@ function widget:GameFrame(n)
 						for beaconID, beaconResult in pairs(unitInfo["becn"]) do
 							if listOfBeacon[beaconID] then --beacon is alive
 								local pathCurrentQueue = 0
-								for pastBID,_ in pairs(beaconResult[2]) do --check beacon path and sum queue delay for each beacon traversed
-									pathCurrentQueue = pathCurrentQueue + (beaconCurrentQueue[pastBID] or 0) --Note: beaconCurrentQueue[pastBID] can be NIL if other group haven't been updated yet
+								for traversedBID,_ in pairs(beaconResult[2]) do --check beacon(s) traversed in beacon network and sum queue delay for each beacon traversed
+									pathCurrentQueue = pathCurrentQueue + (beaconCurrentQueue[traversedBID] or 0) --Note: beaconCurrentQueue[pastBID] can be NIL if other group haven't been updated yet
 								end
 								local timeToDest = beaconResult[1]
 								local transitTime = timeToDest + pathCurrentQueue
@@ -503,6 +510,24 @@ function widget:GameFrame(n)
 	end
 end
 
+function GetUnitFastestWeaponRange(unitDef)
+	local fastestReloadTime, fastReloadRange = 999,-1
+	for _, weapons in ipairs(unitDef.weapons) do --reference: gui_contextmenu.lua by CarRepairer
+		local weaponsID = weapons.weaponDef
+		local weaponsDef = WeaponDefs[weaponsID]
+		if weaponsDef.name and not (weaponsDef.name:find('fake') or weaponsDef.name:find('noweapon')) then --reference: gui_contextmenu.lua by CarRepairer
+			if not weaponsDef.isShield then --if not shield then this is conventional weapon
+				local reloadTime = weaponsDef.reload
+				if reloadTime < fastestReloadTime then --find the weapon with the smallest reload time
+					fastestReloadTime = reloadTime
+					fastReloadRange = weaponsDef.range
+				end
+			end
+		end
+	end
+	return fastReloadRange
+end
+
 function ConvertCMDToMOVE(command)
 	if (command == nil) then 
 		return nil
@@ -537,7 +562,7 @@ function ConvertCMDToMOVE(command)
 	or command.id == CMD.GUARD
 	or command.id == CMD.RESSURECT then
 		local isPossible2PartAreaCmd = command.params[5]
-		if not command.params[4] or isPossible2PartAreaCmd then --if not area-command or is the 2nd part of area-command (1st part have radius at 4th-param, 2nd part have unitID/featureID at 1st-param and radius at 5th-param)
+		if not command.params[4] or isPossible2PartAreaCmd then --if not area-command or the is the 2nd part of area-command (1st part have radius at 4th-param, 2nd part have unitID/featureID at 1st-param and radius at 5th-param)
 			if not command.params[2] or isPossible2PartAreaCmd then
 				local x,y,z
 				if command.id == CMD.REPAIR or command.id == CMD.GUARD then
@@ -584,7 +609,7 @@ function ConvertCMDToMOVE(command)
 	return nil
 end
 
-function GetWaypointDistance(unitID,moveID,queue,px,py,pz) --Note: source is from unit_transport_ai.lua (by Licho)
+function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRange) --Note: source is from unit_transport_ai.lua (by Licho)
 	local d = 0
 	if (queue == nil) then 
 		return 99999
@@ -594,26 +619,28 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz) --Note: source is fro
 		local reachable = true --always assume target reachable
 		local waypoints
 		if moveID then --unit has compatible moveID?
-			local path = spRequestPath( moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
+			local minimumGoalDist = (isAttackCmd and weaponRange-20) or 128
+			local path = spRequestPath( moveID,px,py,pz,v.params[1],v.params[2],v.params[3],minimumGoalDist)
 			local result, lastwaypoint
-			result, lastwaypoint, waypoints = IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
+			result, lastwaypoint, waypoints = IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],minimumGoalDist)
 			if result == "outofreach" then --abit out of reach?
-				result = IsTargetReachable(moveID,lastwaypoint[1],lastwaypoint[2],lastwaypoint[3],v.params[1],v.params[2],v.params[3],8) --refine pathing
+				result = IsTargetReachable(moveID,lastwaypoint[1],lastwaypoint[2],lastwaypoint[3],v.params[1],v.params[2],v.params[3],minimumGoalDist-100) --refine pathing
 				if result ~= "reach" then --still not reachable?
 					reachable=false --target is unreachable!
 				end
 			end
 		end
-		if reachable then 
+		if reachable then
+			local distOffset = (isAttackCmd and weaponRange-20) or 0
 			if waypoints then --we have waypoint to destination?
 				local way1,way2,way3 = px,py,pz
 				for i=1, #waypoints do --sum all distance in waypoints
 					d = d + Dist(way1,way2,way3, waypoints[i][1],waypoints[i][2],waypoints[i][3])
 					way1,way2,way3 = waypoints[i][1],waypoints[i][2],waypoints[i][3]
 				end
-				d = d + Dist(way1,way2,way3, v.params[1], v.params[2], v.params[3]) --connect endpoint of waypoint to destination
+				d = d + math.max(0,Dist(way1,way2,way3, v.params[1], v.params[2], v.params[3])-distOffset) --connect endpoint of waypoint to destination
 			else --so we don't have waypoint?
-				d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3]) --we don't have waypoint then measure straight line
+				d = d + math.max(0,Dist(px,py, pz, v.params[1], v.params[2], v.params[3])-distOffset) --we don't have waypoint then measure straight line
 			end
 		else --pathing says target unreachable?!
 			d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3]) + 99999 --target unreachable!
