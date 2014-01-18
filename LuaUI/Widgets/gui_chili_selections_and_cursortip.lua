@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.093 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.094 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
@@ -179,7 +179,7 @@ local gi_label	--group info Chili label
 options_path = 'Settings/HUD Panels/Tooltip'
 options_order = {
 	--tooltip
-	'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip',
+	'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'hide_position', 'hide_unit_text', 'showdrawtooltip','showterratooltip',
 	
 	--mouse
 	'showDrawTools',
@@ -248,6 +248,20 @@ options = {
 		advanced = true,
 		value = true,
 		desc = 'Don\'t show the tooltip for unreclaimable features.',
+	},
+	hide_position = {
+		name = "Hide Position Tooltip",
+		type = 'bool',
+		advanced = true,
+		value = false,
+		desc = 'Don\'t show the position tooltip, even when showing extended tooltips.',
+	},
+	hide_unit_text = {
+		name = "Hide Unit Text Tooltips",
+		type = 'bool',
+		advanced = true,
+		value = false,
+		desc = 'Don\'t show the text-only tooltips for units selected but not pointed at, even when showing extended tooltips.',
 	},
 	showdrawtooltip = {
 		name = "Show Map-drawing Tooltip",
@@ -1964,7 +1978,7 @@ local function MakeTooltip()
 		end
 	
 		--holding meta or static tip
-		if (showExtendedTip) then
+		if (showExtendedTip and not options.hide_unit_text.value) then
 			MakeToolTip_Text(tooltip)
 		else
 			KillTooltip()
@@ -1982,7 +1996,7 @@ local function MakeTooltip()
 	local pos_tooltip = tooltip:sub(1,4) == 'Pos '
 	
 	-- default tooltip
-	if not pos_tooltip or showExtendedTip then
+	if not pos_tooltip or (showExtendedTip and not options.hide_position.value) then
 		MakeToolTip_Text(tooltip)
 		return
 	end
