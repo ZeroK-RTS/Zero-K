@@ -351,9 +351,6 @@ end
 
 local function AimRifle(heading, pitch, isDgun)
 	if isDgun then dgunning = true end
-	while not armsFree do
-		Sleep(33)
-	end
 	--[[
 	if dgunning and not isDgun then
 		return false
