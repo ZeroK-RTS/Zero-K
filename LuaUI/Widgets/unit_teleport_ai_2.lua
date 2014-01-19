@@ -1,4 +1,4 @@
-local version = "v0.834"
+local version = "v0.835"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -367,7 +367,7 @@ function widget:GameFrame(n)
 										cmd_queue.params[1]=listOfBeacon[beaconID2][1] --beacon coordinate
 										cmd_queue.params[2]=listOfBeacon[beaconID2][2]
 										cmd_queue.params[3]=listOfBeacon[beaconID2][3]
-										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz,false,0) --dist to beacon
+										local distance = GetWaypointDistance(unitID,moveID,cmd_queue,px,py,pz,false,0) --distance to beacon
 										local timeToBeacon = (distance/unitSpeed)*30 --timeToBeacon is in frame
 										cmd_queue.params[1]=unitInfo["cmd"].params[1] --target coordinate
 										cmd_queue.params[2]=unitInfo["cmd"].params[2]
@@ -384,8 +384,8 @@ function widget:GameFrame(n)
 										if isTransport then
 											local cargo = spGetUnitIsTransporting(unitID)  -- for transports, also count their cargo 
 											if cargo then
-												for i = 1, #cargo do 
-													chargeTime = chargeTime + math.floor(UnitDefs[spGetUnitDefID(cargo[i])].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
+												for l = 1, #cargo do --i=group index, j=beacon index, k=unit index, l= cargo index
+													chargeTime = chargeTime + math.floor(UnitDefs[spGetUnitDefID(cargo[l])].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
 												end 
 											end
 										end

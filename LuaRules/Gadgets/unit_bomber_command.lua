@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "KingRaptor",
-    date      = "22 Jan 2011", --update: 11 January 2014
+    date      = "22 Jan 2011", --update: 19 January 2014
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -440,26 +440,31 @@ function gadget:GameFrame(n)
 			RequestRearm(bomberID, nil, true)
 		end
 		scheduleRearmRequest = {}
-		local emptyPadPerAllyTeam = CountAllEmptyPad_minusAirplaneSoonToLand()
+		local emptyPadPerAllyTeam = nil;
 		for bomberID, padID in pairs(bomberToPad) do
 			local queue = Spring.GetUnitCommands(bomberID, 1)
-			local bomberAllyTeam = bomberUnitIDs[bomberID]
-			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) and emptyPadPerAllyTeam[bomberAllyTeam]>0 then
-				emptyPadPerAllyTeam[bomberAllyTeam] = emptyPadPerAllyTeam[bomberAllyTeam] - 1 --assume this airplane already took a pad
-				local tag = queue[1].tag
-				--Spring.Echo("Bomber "..bomberID.." cleared for landing")
-				CancelAirpadReservation(bomberID)
-				spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
-				if Spring.GetUnitStates(bomberID)["repeat"] then 
-					--spGiveOrderToUnit(bomberID, CMD_REARM, {padID}, {"shift"})
-					InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) then
+				local bomberAllyTeam = bomberUnitIDs[bomberID]
+				if not emptyPadPerAllyTeam then
+					emptyPadPerAllyTeam = CountAllEmptyPad_minusAirplaneSoonToLand() --initialize empty pad count once
 				end
-				Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
-				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
-				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
-				bomberToPad[bomberID] = nil
-				refuelling[bomberID] = n + GIVE_UP_FRAMES
-				Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
+				if emptyPadPerAllyTeam[bomberAllyTeam]>0 then
+					emptyPadPerAllyTeam[bomberAllyTeam] = emptyPadPerAllyTeam[bomberAllyTeam] - 1 --assume this airplane already took a pad
+					local tag = queue[1].tag
+					--Spring.Echo("Bomber "..bomberID.." cleared for landing")
+					CancelAirpadReservation(bomberID)
+					spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
+					if Spring.GetUnitStates(bomberID)["repeat"] then 
+						--spGiveOrderToUnit(bomberID, CMD_REARM, {padID}, {"shift"})
+						InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+					end
+					Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
+					Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+					Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+					bomberToPad[bomberID] = nil
+					refuelling[bomberID] = n + GIVE_UP_FRAMES
+					Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
+				end
 			end
 		end
 		
