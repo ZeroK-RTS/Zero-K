@@ -249,8 +249,9 @@ return {
         alphadecay         = 0.05,
         color              = [[1,0.25,0]],
         dir                = [[-1 r2,-1 r2,-1 r2]],
-        length             = 5,
-        width              = 10,
+        length             = 3,
+        width              = 5,
+		lengthGrowth       = 0.1,
       },
     },
     sparks = {

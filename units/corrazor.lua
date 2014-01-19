@@ -96,7 +96,7 @@ unitDef = {
 
       duration                = 0.02,
       edgeEffectiveness       = 1,
-      explosionGenerator      = [[custom:FLASH1RED]],
+      explosionGenerator      = [[custom:flash1orange]],
       fireStarter             = 10,
       impactOnly              = true,
       impulseFactor           = 0,
@@ -107,7 +107,7 @@ unitDef = {
       proximityPriority       = 4,
       range                   = 1040,
       reloadtime              = 0.1,
-      rgbColor                = [[1 0 0]],
+      rgbColor                = [[1 0.6 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/lasercannon_fire]],
       soundTrigger            = true,
