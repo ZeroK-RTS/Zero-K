@@ -43,6 +43,7 @@ local spGetUnitRulesParam 				= Spring.GetUnitRulesParam
 local spSelectUnitArray 				= Spring.SelectUnitArray
 local spGetUnitPosition 			= Spring.GetUnitPosition
 local spGetGameRulesParam 			= Spring.GetGameRulesParam
+local spGetGroundHeight			= Spring.GetGroundHeight
 
 local echo = Spring.Echo
 
@@ -110,6 +111,10 @@ local yellow = '\255\255\255\1'
 
 local windMin = 0
 local windMax = 2.5
+local windGroundMin = 0
+local windGroundExtreme = 1
+local windGroundSlope = 1
+local windTidalThreashold = -10
 
 local updateFrequency = 0.25
 local updateFrequency2 = 1.0 --//update frequency for checking unit's command, for showing unit status in its picture.
@@ -141,6 +146,7 @@ local windTooltips = {
 }
 
 local mexDefID = UnitDefNames["cormex"] and UnitDefNames["cormex"].id or ''
+local windgenDefID = UnitDefNames["armwin"] and UnitDefNames["armwin"].id or ''
 
 local terraCmds = {
 	Ramp=1,
@@ -683,7 +689,7 @@ local function GetUnitDesc(unitID, ud)
 		if unitID then
 			local tooltip = spGetUnitTooltip(unitID)
 			if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
-				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", spGetGameRulesParam("WindMax") )
+				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", windMax )
 			end
 			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' ) -- remove name from desc
 			return tooltip
@@ -1582,6 +1588,20 @@ local function MakeToolTip_UD(tt_table)
 		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 	end
 	
+	if windgenDefID == tt_table.unitDef.id then
+		local _, pos = spTraceScreenRay(mx,my, true)
+		
+		local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
+		local y = spGetGroundHeight(x,z)
+
+		if y <= windTidalThreashold then
+			extraText = ", Tidal Income +1.2"
+		else
+			local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
+			extraText = ", Wind Range " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+		end
+	end
+	
 	local tt_structure = {
 		leftbar = {
 			tt_table.morph_data 
@@ -2346,8 +2366,11 @@ function widget:Initialize()
 		end },
 	}
 
-	windMin = Spring.GetGameRulesParam("WindMin")
-	windMax = Spring.GetGameRulesParam("WindMax")
+	windMin = spGetGameRulesParam("WindMin")
+	windMax = spGetGameRulesParam("WindMax")
+	windGroundMin = spGetGameRulesParam("WindGroundMin")
+	windGroundExtreme = spGetGameRulesParam("WindGroundExtreme")
+	windGroundSlope = spGetGameRulesParam("WindSlope")
 
 	for i=1,#UnitDefs do
 		local ud = UnitDefs[i]
