@@ -597,7 +597,7 @@ function calcMainMexDrawList()
 			glTexture(false)
 		else
 			glRotate(-90,1,0,0)		
-			glTranslate(x,-z+50, y+2)
+			glTranslate(x,-z-20-options.size.value, y+2)
 			glColor(1,1,1)
 			glText( ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 		end	
