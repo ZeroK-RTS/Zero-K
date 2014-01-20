@@ -69,7 +69,7 @@ options = {
 	},
 }
 -----
-function widget:DrawWorld()
+function widget:Update()
 	if not spIsGUIHidden()  then
 		for i, v in pairs(drawUnits) do
 			if i then
