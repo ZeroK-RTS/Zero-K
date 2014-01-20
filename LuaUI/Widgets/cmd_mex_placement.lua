@@ -109,6 +109,26 @@ local TEXT_CORRECT_Y = 1.25
 
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
+options_path = 'Settings/Interface/Metal Spots'
+options_order = { 'drawicons', 'size'}
+options = {
+	
+	drawicons = {
+		name = 'Show Income as Icon',
+		type = 'bool',
+		value = true,
+		tooltip = "When enabled income is shown pictorially. When disabled income is shown as a number.",
+		OnChange = function() updateMexDrawList() end
+	},
+	size = {name = "Income Display Size", 
+		type = "number", 
+		value = 30, 
+		min = 10,
+		max = 150,
+		step = 5,
+		OnChange = function() updateMexDrawList() end
+	},
+}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -546,16 +566,6 @@ function calcMainMexDrawList()
 
 		local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
 		local metal = spot.metal
-		local size = 1
-		if metal > 10 then
-			if metal > 100 then
-				metal = metal*0.01
-				size = 5
-			else
-				metal = metal*0.1
-				size = 2.5
-			end
-		end
 		
 		glPushMatrix()
 		
@@ -564,14 +574,34 @@ function calcMainMexDrawList()
 		glDepthTest(true)
 		glDrawGroundCircle(x, 1, z, 40, 32)
 		
-		glRotate(90,1,0,0)
-		glColor(0,1,1)		
-		glTranslate(0,0,-y-10)
-		glColor(1,1,1)
-		glTexture("LuaUI/Images/ibeam.png")
-		local width = 30*metal*size
-		glTexRect(x-width/2, z+20, x+width/2, z+20+30*size,0,0,metal,1)
-		glTexture(false)
+		if options.drawicons.value then
+			local size = 1
+			if metal > 10 then
+				if metal > 100 then
+					metal = metal*0.01
+					size = 5
+				else
+					metal = metal*0.1
+					size = 2.5
+				end
+			end
+			
+			size = options.size.value
+			
+			glRotate(90,1,0,0)	
+			glTranslate(0,0,-y-10)
+			glColor(1,1,1)
+			glTexture("LuaUI/Images/ibeam.png")
+			local width = metal*size
+			glTexRect(x-width/2, z+20, x+width/2, z+20+size,0,0,metal,1)
+			glTexture(false)
+		else
+			glRotate(-90,1,0,0)		
+			glTranslate(x,-z+50, y+2)
+			glColor(1,1,1)
+			glText( ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+		end	
+		
 		--glColor(0,1,1)
 		--glRect(x-width/2, z+18, x+width/2, z+20)
 		glDepthTest(false)
@@ -612,7 +642,10 @@ function calcMiniMexDrawList()
 end
 --]]
 function updateMexDrawList()
-	if (mainMexDrawList) then gl.DeleteList(mainMexDrawList); mainMexDrawList=nil end --delete previous list if exist (ref:gui_chicken.lua by quantum)
+	if (mainMexDrawList) then 
+		gl.DeleteList(mainMexDrawList); 
+		mainMexDrawList = nil 
+	end --delete previous list if exist (ref:gui_chicken.lua by quantum)
 	mainMexDrawList = glCreateList(calcMainMexDrawList)
 	--miniMexDrawList = glCreateList(calcMiniMexDrawList)
 end
