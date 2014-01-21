@@ -94,6 +94,26 @@ local comms = {
   },
   
   -- Hax
+  comm_strike_pea = {
+    chassis = "armcom1",
+    name = "Peashooter Commander",
+    modules = { "commweapon_peashooter"},
+  }, 
+  comm_battle_pea = {
+    chassis = "corcom1",
+    name = "Peashooter Commander",
+    modules = { "commweapon_peashooter"},
+  }, 
+  comm_support_pea = {
+    chassis = "commsupport1",
+    name = "Peashooter Commander",
+    modules = { "commweapon_peashooter"},
+  }, 
+  comm_recon_pea = {
+    chassis = "commrecon1",
+    name = "Peashooter Commander",
+    modules = { "commweapon_peashooter"},
+  }, 
   comm_guardian = { 
     chassis = "armcom2", 
     name = "Star Guardian",
