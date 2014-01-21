@@ -21,8 +21,8 @@
   turret=1;
   [DAMAGE]
   {
-    default=500;
-    empresistant99=5;
-    empresistant75=125;
+    default=600;
+    empresistant99=6;
+    empresistant75=150;
   }
 }
