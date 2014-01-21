@@ -38,13 +38,13 @@ unitDef = {
 
   customParams                  = {
     description_fi = [[Taktinen robottitehdas. Rakentaa erikoistuneita robotteja 10m/s nopeudella]],
-	description_fr = [[Produit des unitÈes arachnides, construit ‡ 10 M/s]],
+	description_fr = [[Produit des unit√©es arachnides, construit √† 10 M/s]],
 	description_de = [[Produziert Spinnen, Baut mit 10 M/s]],
 	description_pl = [[Buduje pajaki, moc 10 m/s]],
-    helptext       = [[Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Cudgel, Crabe]],
-	helptext_fr    = [[OptimisÈe pour les terrains accidentÈs, la fabrique ‡ araignÈes produit des unitÈs exotiques centrÈes principalement sur la portÈe et la manúuvrabilitÈ au dÈtriment de la force brute, ‡ quelques exceptions prËs.]],
+    helptext       = [[Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Hermit, Crabe]],
+	helptext_fr    = [[Optimis√©e pour les terrains accident√©s, la fabrique √† araign√©es produit des unit√©s exotiques centr√©es principalement sur la port√©e et la man¬úuvrabilit√© au d√©triment de la force brute, √† quelques exceptions pr√®s.]],
     helptext_fi    = [[Tuottaa pitk?lti erikoistuneita tai jalkav?kirobotteja raskaampia yksik?it?. Esimerkiksi EMP, n?kym?tt?myys ja maastokelpoisuus ovat joidenkin t?m?n tehtaan tuotoksien erikoisuuksia.]],
-	helptext_de    = [[Ideal f¸r unwegsames Gel‰nde, liegt der Fokus der Spider Factory eher auf Einheiten mit groﬂer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Cudgel, Crabe]],
+	helptext_de    = [[Ideal f√ºr unwegsames Gel√§nde, liegt der Fokus der Spider Factory eher auf Einheiten mit gro√üer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Hermit, Crabe]],
 	helptext_pl    = [[Pajaki to jednostki przystosowane do przemierzania nierownego terenu, skarp i klifow. W walce polegaja bardziej na mobilnosci i zasiegu, niz bezposredniej sile.]],
     sortName       = [[5]],
 	modelradius    = [[50]],
