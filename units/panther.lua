@@ -34,7 +34,7 @@ unitDef = {
 	modelradius    = [[10]],
   },
 
-  explodeAs              = [[BIG_UNITEX]],
+  explodeAs              = [[PANTHER_DEATH]],
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[tankraider]],
@@ -44,7 +44,7 @@ unitDef = {
   mass                   = 198,
   maxDamage              = 1050,
   maxSlope               = 18,
-  maxVelocity            = 3.9,
+  maxVelocity            = 3.7,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
@@ -53,7 +53,7 @@ unitDef = {
   objectName             = [[corseal.s3o]],
   script                 = [[panther.lua]],
   seismicSignature       = 4,
-  selfDestructAs         = [[BIG_UNITEX]],
+  selfDestructAs         = [[PANTHER_DEATH]],
 
   sfxtypes               = {
 
@@ -95,15 +95,15 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = [[160]],
+        extra_damage = [[220]],
       },
 
       cylinderTargeting      = 0,
 
       damage                  = {
-        default        = 800,
-        empresistant75 = 200,
-        empresistant99 = 8,
+        default        = 500,
+        empresistant75 = 125,
+        empresistant99 = 5,
       },
 
       duration                = 10,
