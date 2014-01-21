@@ -31,6 +31,7 @@ ex_small3.wav
 
 Golgotha:
 ex_ultra1.wav
+small_emp_exlode.wav
 
 Nanoblobs:
 ex_large8.wav
@@ -52,6 +53,7 @@ ex_small11.wav
 ex_small12.wav
 ex_small13.wav
 ex_with_debri.wav
+small_emp_exlode.wav
 
 Merc Squad:
 ex_large10.wav

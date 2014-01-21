@@ -16,7 +16,7 @@
   range=600;
   reloadtime=0.3;
   rendertype=4;
-  soundhit=weapon/more_lightning;
+  soundhit=explosion/small_emp_explode;
   tolerance=7000;
   turret=1;
   [DAMAGE]
