@@ -28,7 +28,7 @@ unitDef = {
 	helptext_pl    = [[Dzialo Levelera skutecznie niszczy grupy lzejszych jednostek, jednak musi miec czysta linie strzalu, zatem w miare mozliwosci Levelery nalezy zawsze ustawiac w linii. Slabosciami Levelera sa niska szybkosc i zasieg. Pociski Levelera wyrownuja teren, co moze ulatwic pojazdom przejazd po nierownym terenie.]],
   },
 
-  explodeAs           = [[BIG_UNITEX_LEVELER]],
+  explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehicleriot]],
