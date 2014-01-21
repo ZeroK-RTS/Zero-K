@@ -1173,8 +1173,8 @@ function gadget:GameFrame(n)
 						--if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
 						--	odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * ratio
 						--end		
-						local odShare = summedOverdriveMetalAfterPayback / activeCount + (teamPacybackOD[teamID] or 0)
-						local baseShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)
+						local odShare = (summedOverdriveMetalAfterPayback / activeCount + (teamPacybackOD[teamID] or 0)) or 0
+						local baseShare = (summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)) or 0
 						
 						sendTeamInformationToAwards(teamID, baseShare, odShare, te.totalChange)
 						
