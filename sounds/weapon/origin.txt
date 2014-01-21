@@ -8,6 +8,7 @@ flamethrower.wav
 LightningBolt.wav
 soft_crunch.wav
 more_lightning.wav
+more_lightning_fast.wav
 
 Astro Menance:
 emg.wav
