@@ -1501,7 +1501,7 @@ for udid, ud in pairs(UnitDefs) do
 	end
 end
 
-local commanderUnderAttack = "comdying_core_1"
+local commanderUnderAttack = "alarm"
 
 for udid, ud in pairs(UnitDefs) do
 	if ud.customParams.commtype then
