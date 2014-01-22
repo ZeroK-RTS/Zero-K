@@ -1,7 +1,7 @@
 -- $Id: snd_voices.lua 3727 2009-01-08 22:36:55Z licho $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local versionNumber = "1.1.3"
+local versionNumber = "1.1.4"
 
 function widget:GetInfo()
 	return {
@@ -408,7 +408,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 		if (GetUnitHealth(unitID) > 0 ) then
 			if (IsStructure(unitID)) then
 				CoolPlay("sdamaged", 20)
-			elseif (UnitDefs[unitDefID].isTransport) then
+			elseif (UnitDefs[unitDefID].transportCapacity >= 1) then
 				CoolPlay("tdamaged", 10)
 			else
 				CoolPlay("udamaged", 20)
@@ -641,7 +641,7 @@ end
 
 --function widget:UnitEnteredLos(unitID, unitTeam)
 --  if ((UnitDefs[unitDefID]) and 
---      (UnitDefs[unitDefID].isTransport)) then
+--      (UnitDefs[unitDefID].transportCapacity >= 1)) then
 --    Play("detectedt")
 --  elseif (not radarList[unitID]) then
 --    Play("detected")

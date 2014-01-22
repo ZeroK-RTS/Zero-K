@@ -1,4 +1,4 @@
-local version = "v0.835"
+local version = "v0.836"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -242,7 +242,7 @@ function widget:GameFrame(n)
 		--if ( n%18==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 18 frame period (0.6 second) if empty. 36 frame (1.2 second) if full. Not considering network delay
 		if ( n%15==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then 
 			--Spring.Echo("-----GROUP:" .. i)
-			local numberOfUnitToProcess = 5 --NUMBER OF UNIT PER BEACON PER SECOND
+			local numberOfUnitToProcess = 29 --NUMBER OF UNIT PER BEACON PER SECOND. minimum: 29 per second
 			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29) --spread looping to entire 1 second
 			local beaconCurrentQueue = groupBeaconQueue[i] or {}
 			local unitToEffect = groupEffectedUnit[i] or {} --Note: is refreshed (empty) every second
@@ -286,7 +286,7 @@ function widget:GameFrame(n)
 								end
 								local weaponRange = GetUnitFastestWeaponRange(ud)
 								local isStatic = (unitSpeed == 0)
-								local isTransport = ud.isTransport
+								local isTransport = ud.transportCapacity >= 1
 								listOfMobile[unitDefID] = {moveID,chargeTime,unitSpeed,isFixedWing,weaponRange,isStatic,isTransport}
 							end
 							local isFixedWing = listOfMobile[unitDefID][4]
@@ -312,6 +312,21 @@ function widget:GameFrame(n)
 								if not unitInfo["cmd"] then
 									loopedUnits[unitID]=true
 									break; --a.k.a: Continue
+								end
+								--MODIFY CHARGETIME & SPEED FOR TRANSPORT--
+								local transportSpeedMod = 1
+								local isTransport = listOfMobile[unitDefID][7]
+								if isTransport then
+									local newMass = spGetUnitRulesParam(unitID,"effectiveMass")
+									local originalChargeTime = listOfMobile[unitDefID][2]
+									listOfMobile[unitDefID][2] = (newMass and math.floor(newMass*0.25)) or originalChargeTime --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
+									transportSpeedMod = spGetUnitRulesParam(unitID,"selfMoveSpeedChange") or 1 --see unit_transport_speed.lua
+									-- local cargo = spGetUnitIsTransporting(unitID)  -- for transports, also count their cargo 
+									-- if cargo then
+										-- for m = 1, #cargo do --i=group index, j=beacon index, k=unit index, m=cargo index
+											-- transportChargeAdd = transportChargeAdd + math.floor(UnitDefs[spGetUnitDefID(cargo[m])].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
+										-- end 
+									-- end
 								end
 								--IS UNIT WAITING AT BEACON? count them--
 								if unitInfo["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
@@ -349,7 +364,7 @@ function widget:GameFrame(n)
 								--MEASURE REGULAR DISTANCE--
 								local px,py,pz = unitInfo["pos"][1],unitInfo["pos"][2],unitInfo["pos"][3]
 								local cmd_queue = {id=0,params={0,0,0}}
-								local unitSpeed = listOfMobile[unitDefID][3]
+								local unitSpeed = listOfMobile[unitDefID][3] * transportSpeedMod
 								local moveID = listOfMobile[unitDefID][1]
 								if not unitInfo["norm"] then
 									cmd_queue.id = unitInfo["cmd"].id
@@ -380,15 +395,6 @@ function widget:GameFrame(n)
 											-- listOfBeacon[beaconID2][6] = ez
 										-- end
 										local chargeTime = listOfMobile[unitDefID][2]
-										local isTransport = listOfMobile[unitDefID][7]
-										if isTransport then
-											local cargo = spGetUnitIsTransporting(unitID)  -- for transports, also count their cargo 
-											if cargo then
-												for l = 1, #cargo do --i=group index, j=beacon index, k=unit index, l= cargo index
-													chargeTime = chargeTime + math.floor(UnitDefs[spGetUnitDefID(cargo[l])].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
-												end 
-											end
-										end
 										local _, beaconIDToProcess, totalOverheadTime,_,history = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, 99999, chargeTime,0, {})
 										if beaconIDToProcess then
 											history[beaconIDToProcess] = true --add the LAST BEACON in the history list
@@ -404,6 +410,7 @@ function widget:GameFrame(n)
 										end
 									end
 								end
+								loopedUnits[unitID] = true
 							until true
 							currentLoopCount = currentLoopCount + 1
 						end
