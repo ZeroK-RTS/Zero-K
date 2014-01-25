@@ -6,7 +6,7 @@ function widget:GetInfo()
 		author		= "Licho",
 		date			= "10.6.2011",
 		license	= "GNU GPL, v2 or later",
-		layer		= 0,
+		layer		= math.huge,
 		enabled	= true,	--	loaded by default?
 		alwaysStart = true
 	}
