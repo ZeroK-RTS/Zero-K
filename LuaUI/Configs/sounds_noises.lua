@@ -1506,11 +1506,16 @@ local commanderUnderAttack = "alarm"
 for udid, ud in pairs(UnitDefs) do
 	if ud.customParams.commtype then
 		if sounds[ud.name] then
-			sounds[ud.name].underattack = commanderUnderAttack
+			sounds[ud.name].underattack = {commanderUnderAttack, volume = 0.4}
 			sounds[ud.name].attackdelay = function(hp) return 20*hp+2 end
 			sounds[ud.name].attackonscreen = true 
+			sounds[ud.name].volume = 0.6
 		else
-			sounds[ud.name] = {underattack = commanderUnderAttack, attackDelay = function(hp) return 20*hp+2 end, attackonscreen = true }
+			sounds[ud.name] = {
+				underattack = {commanderUnderAttack, volume = 0.4},
+				attackDelay = function(hp) return 20*hp+2 end, 
+				attackonscreen = true,
+			}
 		end
 	end
 end

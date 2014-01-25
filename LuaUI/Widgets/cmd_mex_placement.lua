@@ -120,7 +120,8 @@ options = {
 		tooltip = "When enabled income is shown pictorially. When disabled income is shown as a number.",
 		OnChange = function() updateMexDrawList() end
 	},
-	size = {name = "Income Display Size", 
+	size = {
+		name = "Income Display Size", 
 		type = "number", 
 		value = 30, 
 		min = 10,

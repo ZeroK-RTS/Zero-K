@@ -45,6 +45,40 @@ local spGetUnitHealth	= Spring.GetUnitHealth
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+options_path = 'Settings/Audio/Unit Replies'
+options_order = { 
+'selectnoisevolume','ordernoisevolume','attacknoisevolume', 
+}
+options = {
+	selectnoisevolume = {
+		name = 'Selection Volume',
+		type = "number", 
+		value = 1, 
+		min = 0,
+		max = 1,
+		step = 0.02,
+	},
+	ordernoisevolume = {
+		name = 'Command Volume',
+		type = "number", 
+		value = 1, 
+		min = 0,
+		max = 1,
+		step = 0.02,
+	},
+	attacknoisevolume = {
+		name = 'Commander Under Attack Volume',
+		type = "number", 
+		value = 1, 
+		min = 0,
+		max = 1,
+		step = 0.02,
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local SOUND_DIRNAME = 'Sounds/reply/'
 local SOUND_DIRNAME_SHORT = 'reply/'
 local LUAUI_DIRNAME = 'LuaUI/'
@@ -108,7 +142,7 @@ function widget:SelectionChanged(selection)
 		if (unitName and soundTable[unitName]) then
 			local sound = soundTable[unitName].select[1]
 			if (sound) then
-				CoolNoisePlay((sound), 0.5, soundTable[unitName].select.volume)
+				CoolNoisePlay((sound), 0.5, (soundTable[unitName].select.volume or 1)*options.selectnoisevolume.value)
 			end
 		end
 	end
@@ -139,10 +173,10 @@ function widget:CommandNotify(cmdID)
 	local sounds = soundTable[unitName] or soundTable[default]
 	if (CMD[cmdID]) then
 		if (sounds and sounds.ok) then
-			CoolNoisePlay(sounds.ok[1], 0.5, sounds.ok.volume)
+			CoolNoisePlay(sounds.ok[1], 0.5, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
 		end
 	elseif (sounds and sounds.build) then
-		CoolNoisePlay(sounds.build, 0.5)
+		CoolNoisePlay(sounds.build, 0.5, options.ordernoisevolume.value)
 	end
 end
 
@@ -154,9 +188,9 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 		if sounds and sounds.underattack and (sounds.attackonscreen or not spInView(unitID)) then
 			if sounds.attackdelay then
 				local health, maxhealth = spGetUnitHealth(unitID)
-				CoolNoisePlay(sounds.underattack, sounds.attackdelay(health/maxhealth))
+				CoolNoisePlay(sounds.underattack[1], sounds.attackdelay(health/maxhealth), (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
 			else
-				CoolNoisePlay(sounds.underattack, 40)
+				CoolNoisePlay(sounds.underattack[1], 40, (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
 			end
 		end
 	end
