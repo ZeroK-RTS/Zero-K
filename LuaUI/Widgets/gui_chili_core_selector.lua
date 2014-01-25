@@ -298,7 +298,7 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
 		caption = '',
-		OnMouseDown = {	function (self, x, y, mouse) 
+		OnClick = {	function (self, x, y, mouse) 
 				local shift = select(4, GetModKeyState())
 				SelectUnitArray({unitID}, shift)
 				if mouse == 1 then
@@ -889,7 +889,7 @@ function widget:Initialize()
 		children = {
 			stack_main,
 		},
-		OnMouseDown={ function(self)
+		OnClick={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
 			WG.crude.OpenPath(options_path)
@@ -904,7 +904,7 @@ function widget:Initialize()
 		parent = stack_main;
 		width = (100/options.maxbuttons.value).."%",
 		caption = '',
-		OnMouseDown = {	function () 
+		OnClick = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
 				if left and currentComm then
 					Spring.SelectUnitArray({currentComm}, false)
@@ -941,7 +941,7 @@ function widget:Initialize()
 		y = 0,
 		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
-		OnMouseDown = {	function (self, x, y, mouse) 
+		OnClick = {	function (self, x, y, mouse) 
 				if mouse == 1 then
 					-- FIXME: commanders will still be selected even if not monitored! (category detection donut work)
 					if options.monitoridlecomms.value and options.monitoridlenano.value then
