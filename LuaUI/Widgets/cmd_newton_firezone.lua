@@ -1,4 +1,4 @@
-local versionNum = '0.306'
+local versionNum = '0.307'
 
 function widget:GetInfo()
 	return {
@@ -353,12 +353,6 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer)
-	--estimate trajectory of any unit hit by weapon
-	if currentFrame >= queueTrajectoryEstimate["targetFrame"] then
-		queueTrajectoryEstimate["targetFrame"] = (currentFrame-(currentFrame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
-	end
-	queueTrajectoryEstimate["unitList"][unitID] = true
-
 	if victim[unitID] then --is current victim of any Newton group?
 		for g=1, groups.count do
 			if groupTarget[g] == unitID then
@@ -367,6 +361,12 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer)
 		end
 		victim[unitID] = currentFrame + 90 --delete 3 second later
 		--ech("still being attacked")
+		
+		--estimate trajectory of any unit hit by weapon
+		if currentFrame >= queueTrajectoryEstimate["targetFrame"] then
+			queueTrajectoryEstimate["targetFrame"] = (currentFrame-(currentFrame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
+		end
+		queueTrajectoryEstimate["unitList"][unitID] = true
 	end
 end
 
