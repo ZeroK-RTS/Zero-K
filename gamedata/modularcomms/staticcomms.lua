@@ -113,47 +113,58 @@ local comms = {
     chassis = "commrecon1",
     name = "Peashooter Commander",
     modules = { "commweapon_peashooter"},
-  }, 
+  },
+  
   comm_guardian = { 
     chassis = "armcom2", 
     name = "Star Guardian",
-    modules = { "commweapon_beamlaser", "module_ablative_armor", "module_high_power_servos", "module_high_power_servos", "weaponmod_high_frequency_beam", "module_energy_cell"},
+    modules = { "commweapon_beamlaser", "module_ablative_armor", "module_high_power_servos", "weaponmod_high_frequency_beam"},
   },
+  comm_thunder = { 
+    chassis = "armcom2", 
+    name = "Thunder Wizard",
+    modules = { "commweapon_lightninggun", "module_ablative_armor", "module_high_power_servos", "weaponmod_stun_booster", "module_energy_cell"},
+  },  
   comm_riot = {
     chassis = "corcom2",
     name = "Crowd Controller",
     modules = { "commweapon_riotcannon", "commweapon_heatray"},
   },
-  comm_recon = {
-    chassis = "commrecon2",
-    name = "Ghost Recon",
-    modules = { "commweapon_heatray", "module_ablative_armor", "module_high_power_servos", "module_high_power_servos", "module_jammer" , "module_autorepair"},
-  },
-  comm_rocketeer = {
-    chassis = "armcom2",
-    name = "Rocket Surgeon",
-    modules = { "commweapon_rocketlauncher", "module_dmg_booster", "module_adv_targeting", "module_ablative_armor" },
-  },
-  comm_marksman = {
-    chassis = "commsupport2",
-    name = "The Marksman",
-    modules = { "commweapon_gaussrifle", "module_dmg_booster", "module_adv_targeting", "module_ablative_armor" , "module_high_power_servos"},
-  },  
   comm_flamer = {
     chassis = "corcom2",
     name = "The Fury",
     modules = { "commweapon_flamethrower", "module_dmg_booster", "module_ablative_armor", "module_ablative_armor", "module_high_power_servos"},
+  },  
+  comm_recon = {
+    chassis = "commrecon2",
+    name = "Ghost Recon",
+    modules = { "commweapon_lparticlebeam", "module_ablative_armor", "module_high_power_servos", "module_high_power_servos", "module_jammer" , "module_autorepair"},
   },
   comm_marine = {
     chassis = "commrecon2",
     name = "Space Marine",
     modules = { "commweapon_heavymachinegun", "module_heavy_armor", "module_high_power_servos", "module_dmg_booster", "module_adv_targeting"},
+  },  
+  comm_marksman = {
+    chassis = "commsupport2",
+    name = "The Marksman",
+    modules = { "commweapon_gaussrifle", "module_dmg_booster", "module_adv_targeting", "module_ablative_armor" , "module_high_power_servos"},
   },
   comm_hunter = {
     chassis = "commsupport2",
     name = "Bear Hunter",
     modules = { "commweapon_shotgun", "module_dmg_booster", "module_adv_targeting", "module_high_power_servos", "module_fieldradar"},
   },
+  comm_rocketeer = {
+    chassis = "benzcom2",
+    name = "Rocket Surgeon",
+    modules = { "commweapon_rocketlauncher", "module_dmg_booster", "module_adv_targeting", "module_ablative_armor"},
+  },
+  comm_hammer = {
+    chassis = "benzcom2",
+    name = "Hammer Slammer",
+    modules = { "commweapon_assaultcannon", "module_dmg_booster", "conversion_partillery"},
+  },  
 }
 --[[
 for name,stats in pairs(comms) do
