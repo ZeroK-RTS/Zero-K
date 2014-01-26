@@ -185,7 +185,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 		local unitDefID = GetUnitDefID(unitID)
 		local unitName = UnitDefs[unitDefID].name
 		local sounds = soundTable[unitName] or soundTable[default]
-		if sounds and sounds.underattack and (sounds.attackonscreen or not spInView(unitID)) then
+		if sounds and sounds.underattack and sounds.underattack[1] and (sounds.attackonscreen or not spInView(unitID)) then
 			if sounds.attackdelay then
 				local health, maxhealth = spGetUnitHealth(unitID)
 				CoolNoisePlay(sounds.underattack[1], sounds.attackdelay(health/maxhealth), (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
