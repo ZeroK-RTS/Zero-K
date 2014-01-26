@@ -89,7 +89,8 @@ local function GetUnitTopPos(unitID)
 	if not (x and y and z) then
 		return
 	end
-	return x, y + spGetUnitHeight(unitID), z
+	local height = spGetUnitHeight(unitID) or 0
+	return x, y + height, z
 end
 
 local function GetFeatureTopPos(featureID)
