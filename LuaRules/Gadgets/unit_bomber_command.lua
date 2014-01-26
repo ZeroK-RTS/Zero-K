@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "KingRaptor",
-    date      = "22 Jan 2011",
+    date      = "22 Jan 2011", --update: 26 January 2014
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -33,6 +33,11 @@ local spGetUnitDefID	= Spring.GetUnitDefID
 local spGetUnitIsDead	= Spring.GetUnitIsDead
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local spGetUnitFuel		= Spring.GetUnitFuel
+local spGetUnitsInBox	= Spring.GetUnitsInBox
+local spGetUnitPieceMap = Spring.GetUnitPieceMap
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitPiecePosition = Spring.GetUnitPiecePosition 
+local spGetUnitVectors = Spring.GetUnitVectors
 
 
 include "LuaRules/Configs/customcmds.h.lua"
@@ -45,9 +50,9 @@ local bomberNames = {
 }
 
 local airpadNames = {
-	factoryplane = {mobile = false, cap = 1},
-	armasp = {mobile = false, cap = 4},
-	armcarry = {mobile = true, cap = 9},
+	factoryplane = {mobile = false, cap = 1, padName={"land"}},
+	armasp = {mobile = false, cap = 4, padName={"land1","land2","land3","land4"}},
+	armcarry = {mobile = true, cap = 9, padName={"landpad1","landpad2","landpad3","landpad4","landpad5","landpad6","landpad7","landpad8","landpad9"}},
 }
 
 local bomberDefs = {}
@@ -118,7 +123,7 @@ local bomberToPad = {}	-- [bomberID] = detination pad ID
 local refuelling = {} -- [bomberID] = true
 local airpads = {}	-- stores data
 local bomberMayBeJiggling = {}
-local airpadsPerAllyTeam = {}	-- [allyTeam] = {[pad1ID] = true, [pad2ID] = true, ..}
+local airpadsPerAllyTeam = {}	-- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
 local allyteams = Spring.GetAllyTeamList()
 for i=1,#allyteams do
 	airpadsPerAllyTeam[allyteams[i]] = {}
@@ -212,6 +217,54 @@ local function InsertCommand(unitID, index, cmdID, params, opts)
 end
 GG.InsertCommand = InsertCommand
 
+local function CountEmptyPad(unitID,unitDefID)
+	local emptySpot = 0
+	if airpadDefs[unitDefID] then
+		emptySpot = airpadDefs[unitDefID].cap
+		local occupiedSpot = 0
+		local piecesList = spGetUnitPieceMap(unitID)
+		local padPieceName = airpadDefs[unitDefID].padName
+		local ux,uy,uz = spGetUnitPosition(unitID)
+		local front, top, right = spGetUnitVectors(unitID)
+		for i=1, airpadDefs[unitDefID].cap do
+			local padName = padPieceName[i]
+			local pieceNum = piecesList[padName]
+			local x,y,z = spGetUnitPiecePosition(unitID, pieceNum)
+			local offX = front[1]*z + top[1]*y + right[1]*x
+			local offY = front[2]*z + top[2]*y + right[2]*x
+			local offZ = front[3]*z + top[3]*y + right[3]*x
+			local uxx,uyy,uzz = ux+offX, uy+offY, uz+offZ
+			local somethingOnThePad = spGetUnitsInBox(uxx-20,uyy-20,uzz-20, uxx+20,uyy+20,uzz+20)
+			if (#somethingOnThePad == 1 and somethingOnThePad[1]~= unitID) or 
+			(#somethingOnThePad == 2 and (somethingOnThePad[1]~= unitID or somethingOnThePad[2]~= unitID)) then
+				occupiedSpot = occupiedSpot + 1
+				-- Spring.MarkerAddPoint(uxx,uyy,uzz, "O")
+			end
+		end
+		emptySpot = emptySpot - occupiedSpot
+	end
+	return emptySpot
+end
+
+local function CountAllEmptyPad_minusAirplaneSoonToLand()
+	local emptyPadPerAllyTeam = {}
+	for allyTeam in pairs(airpadsPerAllyTeam) do --all airpads
+		local emptyPadCount = 0
+		for airpadID,airpadUnitDefID in pairs (airpadsPerAllyTeam[allyTeam]) do
+			emptyPadCount = emptyPadCount + CountEmptyPad(airpadID,airpadUnitDefID)
+		end
+		emptyPadPerAllyTeam[allyTeam] = emptyPadCount
+	end
+	for bomberID in pairs(refuelling) do --airplane about to land
+		local fuel = spGetUnitFuel(bomberID) or 0
+		local bomberAllyTeam = bomberUnitIDs[bomberID]
+		if fuel == 0 then
+			emptyPadPerAllyTeam[bomberAllyTeam] = emptyPadPerAllyTeam[bomberAllyTeam] - 1
+		end
+	end
+	return emptyPadPerAllyTeam
+end
+
 local function FindNearestAirpad(unitID, team)
 	--Spring.Echo(unitID.." checking for closest pad")
 	local allyTeam = spGetUnitAllyTeam(unitID)
@@ -221,8 +274,10 @@ local function FindNearestAirpad(unitID, team)
 		return
 	end
 	-- first go through all the pads to see which ones are unbooked
-	for airpadID in pairs(airpadsPerAllyTeam[allyTeam]) do
-		if not spGetUnitIsDead(airpadID) and airpads[airpadID].reservations.count < airpads[airpadID].cap then
+	for airpadID,airpadDefID in pairs(airpadsPerAllyTeam[allyTeam]) do
+		if not spGetUnitIsDead(airpadID) and 
+		(airpads[airpadID].reservations.count < airpads[airpadID].cap or airpads[airpadID].reservations.units[unitID]) and 
+		CountEmptyPad(airpadID,airpadDefID)>0 then
 			freePads[airpadID] = true
 			freePadCount = freePadCount + 1
 		end
@@ -281,7 +336,9 @@ function gadget:UnitCreated(unitID, unitDefID, team)
 	if bomberDefs[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, 400, rearmCMD)
 		Spring.InsertUnitCmdDesc(unitID, 401, findPadCMD)
-		bomberUnitIDs[unitID] = true
+		local allyID_a = select(6,Spring.GetTeamInfo(team))
+		-- local allyID_b = spGetUnitAllyTeam(unitID) --note: value is not updated fast enough during gadget:UnitTaken.Use GetTeamInfo(team) instead. 
+		bomberUnitIDs[unitID] = allyID_a
 	end
 	--[[
 	local id = Spring.FindUnitCmdDesc(unitID, CMD.WAIT)
@@ -302,7 +359,7 @@ function gadget:UnitFinished(unitID, unitDefID, team)
 		local allyTeam = spGetUnitAllyTeam(unitID)
 		airpads[unitID] = Spring.Utilities.CopyTable(airpadDefs[unitDefID], true)
 		airpads[unitID].reservations = {count = 0, units = {}}
-		airpadsPerAllyTeam[allyTeam][unitID] = true
+		airpadsPerAllyTeam[allyTeam][unitID] = unitDefID
 	end
 end
 
@@ -337,13 +394,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 	end
 end
 
--- bear in mind that UnitGiven is called before UnitTaken
-function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
-	gadget:UnitDestroyed(unitID, unitDefID, oldteam)
-end
-
+-- note: bear in mind that gadget:UnitTaken is called before gadget:UnitGiven (keep it in mind if used anywhere)
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+	gadget:UnitDestroyed(unitID, unitDefID, oldteam)
 	gadget:UnitFinished(unitID, unitDefID, newTeam)
+	gadget:UnitCreated(unitID, unitDefID, newTeam)
 end
 
 function gadget:GameFrame(n)
@@ -385,23 +440,31 @@ function gadget:GameFrame(n)
 			RequestRearm(bomberID, nil, true)
 		end
 		scheduleRearmRequest = {}
+		local emptyPadPerAllyTeam = nil;
 		for bomberID, padID in pairs(bomberToPad) do
 			local queue = Spring.GetUnitCommands(bomberID, 1)
 			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) then
-				local tag = queue[1].tag
-				--Spring.Echo("Bomber "..bomberID.." cleared for landing")
-				CancelAirpadReservation(bomberID)
-				spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
-				if Spring.GetUnitStates(bomberID)["repeat"] then 
-					--spGiveOrderToUnit(bomberID, CMD_REARM, {padID}, {"shift"})
-					InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+				local bomberAllyTeam = bomberUnitIDs[bomberID]
+				if not emptyPadPerAllyTeam then
+					emptyPadPerAllyTeam = CountAllEmptyPad_minusAirplaneSoonToLand() --initialize empty pad count once
 				end
-				Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
-				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
-				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
-				bomberToPad[bomberID] = nil
-				refuelling[bomberID] = n + GIVE_UP_FRAMES
-				Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
+				if emptyPadPerAllyTeam[bomberAllyTeam]>0 then
+					emptyPadPerAllyTeam[bomberAllyTeam] = emptyPadPerAllyTeam[bomberAllyTeam] - 1 --assume this airplane already took a pad
+					local tag = queue[1].tag
+					--Spring.Echo("Bomber "..bomberID.." cleared for landing")
+					CancelAirpadReservation(bomberID)
+					spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
+					if Spring.GetUnitStates(bomberID)["repeat"] then 
+						--spGiveOrderToUnit(bomberID, CMD_REARM, {padID}, {"shift"})
+						InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+					end
+					Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
+					Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+					Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+					bomberToPad[bomberID] = nil
+					refuelling[bomberID] = n + GIVE_UP_FRAMES
+					Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
+				end
 			end
 		end
 		
@@ -446,7 +509,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			reservations.count = reservations.count + 1
 		end
 		local x, y, z = Spring.GetUnitPosition(targetPad)
-		Spring.SetUnitMoveGoal(unitID, x, y, z)
+		Spring.SetUnitMoveGoal(unitID, x, y, z) --persistently keep airplane toward/at the pad?
 		return true, false	-- command used, don't remove
 	elseif cmdID == CMD_FIND_PAD then
 		scheduleRearmRequest[unitID] = true
