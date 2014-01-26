@@ -1588,17 +1588,20 @@ local function MakeToolTip_UD(tt_table)
 		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 	end
 	
-	if windgenDefID == tt_table.unitDef.id then
+	if windgenDefID == tt_table.unitDef.id and mx and my then
 		local _, pos = spTraceScreenRay(mx,my, true)
-		
-		local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
-		local y = spGetGroundHeight(x,z)
+		if pos and pos[1] and pos[3] then
+			local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
+			local y = spGetGroundHeight(x,z)
 
-		if y <= windTidalThreashold then
-			extraText = ", Tidal Income +1.2"
-		else
-			local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
-			extraText = ", Wind Range " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+			if y then
+				if y <= windTidalThreashold then
+					extraText = ", Tidal Income +1.2"
+				else
+					local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
+					extraText = ", Wind Range " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+				end
+			end
 		end
 	end
 	
