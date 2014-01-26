@@ -119,7 +119,6 @@ unitDef = {
       largeBeamLaser          = true,
       laserFlareSize          = 5,
       minIntensity            = 1,
-      paralyzer               = true, -- for smart targeting, damage vs shields and lups shockwave
       range                   = 730,
       reloadtime              = 10,
       rgbColor                = [[1 1 1]],
