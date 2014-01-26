@@ -27,7 +27,19 @@ local Sounds = {
  MapEntryValExtract(items, "dopplerscale", dopplerScale);
   MapEntryValExtract(items, "rolloff", rolloff);
       },
---]]
+--]]	  
+	  BladeSwing = {
+			 file = "sounds/weapon/blade/blade_swing.wav",
+			 in3d = true,
+			 pitchMod = 0.2,
+			 gainMod = 0.2,
+	  },
+	  BladeHit = {
+		 file = "sounds/weapon/blade/blade_hit.wav",
+		 in3d = true,
+		 pitchMod = 0.5,
+		 gainMod = 0.2,
+	  },
       DefaultsForSounds = { -- this are default settings
          file = "ThisEntryMustBePresent.wav",
          gain = 1.0,
