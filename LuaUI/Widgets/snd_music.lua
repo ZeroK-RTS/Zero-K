@@ -50,6 +50,7 @@ local warThreshold = 5000
 local peaceThreshold = 1000
 local PLAYLIST_FILE = 'sounds/music/playlist.lua'
 local LOOP_BUFFER = 0.015	-- if looping track is this close to the end, go ahead and loop
+local UPDATE_PERIOD = 1
 
 local musicType = 'peace'
 local dethklok = {} -- keeps track of the number of doods killed in each time frame
@@ -94,7 +95,7 @@ local function StartLoopingTrack(trackInit, trackLoop)
 	end
 	haltMusic = true
 	Spring.StopSoundStream()
-	musicType = 'unknown'
+	musicType = 'custom'
 	
 	curTrack = trackInit
 	loopTrack = trackLoop
@@ -108,9 +109,13 @@ local function StartTrack(track)
 	Spring.StopSoundStream()
 	
 	local newTrack = previousTrack
+	if musicType == 'custom' then
+		previousTrackType = "peace"
+		musicType = "peace"
+	end
 	if track then
 		newTrack = track	-- play specified track
-		musicType = 'unknown'
+		musicType = 'custom'
 	else
 		local tries = 0
 		repeat
@@ -213,7 +218,7 @@ function widget:Update(dt)
 	end
 	
 	timeframetimer = timeframetimer + dt
-	if (timeframetimer > 1) then	-- every second
+	if (timeframetimer > UPDATE_PERIOD) then	-- every second
 		timeframetimer = 0
 		newTrackWait = newTrackWait + 1
 		local PlayerTeam = Spring.GetMyTeamID()
@@ -225,7 +230,7 @@ function widget:Update(dt)
 			end
 		end
 			
-		totalKilled = 0
+		local totalKilled = 0
 		for i = 1, 10, 1 do --calculate the first half of the table (1-15)
 			totalKilled = totalKilled + (dethklok[i] * 2)
 		end
@@ -239,10 +244,12 @@ function widget:Update(dt)
 		end
 		dethklok[1] = 0 -- empty the first row
 		
-		if (totalKilled >= warThreshold) then
-			musicType = 'war'
-		elseif (totalKilled <= peaceThreshold) then
-			musicType = 'peace'
+		if (musicType ~= "custom") then
+			if (totalKilled >= warThreshold) then
+				musicType = 'war'
+			elseif (totalKilled <= peaceThreshold) then
+				musicType = 'peace'
+			end
 		end
 		
 		if (not firstTime) then
@@ -270,7 +277,7 @@ function widget:Update(dt)
 			--Spring.Echo("volume:", playedTime/5)
 			--Spring.SetSoundStreamVolume( playedTime/5)
 		--end
-
+		--Spring.Echo(previousTrackType, musicType)
 		if ( previousTrackType == "peace" and musicType == 'war' )
 		 or (playedTime >= totalTime)	-- both zero means track stopped
 		 and not(haltMusic or looping) then
