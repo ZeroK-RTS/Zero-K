@@ -1,4 +1,4 @@
-local version = "v0.836"
+local version = "v0.837"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -38,6 +38,7 @@ local listOfBeacon={}
 local listOfMobile={}
 local groupBeacon={} --beacon list in its group
 local groupBeaconOfficial={} --most recent update to beacon list
+local transportChargetime = {} --store dynamic (changing) charge time for transport
 --Spread job stuff: (spread looping across 1 second)
 local groupSpreadJobs={} 
 local groupEffectedUnit={}
@@ -152,11 +153,12 @@ function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime
 			end
 			local distance = Dist(beaconData[4],beaconData[5], beaconData[6], targetCoord_CNSTNT[1], targetCoord_CNSTNT[2], targetCoord_CNSTNT[3]) --Djin exit to destination
 			local estTimeFromExitToDest = (distance/unitSpeed_CNSTNT)*30
-			local totalTime = previousOverheadTime + estTimeFromExitToDest
+			local totalTime = previousOverheadTime + chargeTime_CNSTNT + estTimeFromExitToDest + beaconData["becnQeuu"] --plus congestion information to exit beacon
+				-- Spring.MarkerAddPoint(beaconData[1],beaconData[2], beaconData[3], totalTime - estTimeFromExitToDest)
 			if totalTime<lowestTime_VAR then
 				parentUnitID_return =beaconID
 				unitIDToProcess_return =beaconID
-				totalOverhead_return =previousOverheadTime
+				totalOverhead_return = totalTime - estTimeFromExitToDest --note: overhead time is: chargeTime + congestion time + time distance between an exit-to-another-enterance
 				lowestTime_VAR=totalTime
 			end
 		end
@@ -184,22 +186,24 @@ function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime
 				if loopDetected then break; end --"continue"
 				newHistoryBranch[beaconID] = true
 
-				local estTimeFromExitToBeacon = 0
+				local estTimeFromExitToAnotherBeacon = 0
 				if djinExitPos_CNSTNT then --if exit position was defined (at djin)
 					local distance = Dist(djinExitPos_CNSTNT[1],djinExitPos_CNSTNT[2], djinExitPos_CNSTNT[3], beaconData[1], beaconData[2], beaconData[3]) --Djin exit to beacon position
-					estTimeFromExitToBeacon = (distance/unitSpeed_CNSTNT)*30
+					estTimeFromExitToAnotherBeacon = (distance/unitSpeed_CNSTNT)*30
 				end
 
 				local djinExitPos = {beaconData[4],beaconData[5],beaconData[6]}
 				local nearbyBeacon = beaconData["nearbyBeacon"]
-				local totalOverheadTime = previousOverheadTime + chargeTime_CNSTNT + estTimeFromExitToBeacon + beaconData["becnQeuu"] --plus congestion information from enterance beacon
-				local parentUnitID, unitIDToProcess, totalOverhead,lowestTime,history = DiggDeeper(nearbyBeacon, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, totalOverheadTime, level, newHistoryBranch,djinExitPos)
-				if parentUnitID then
-					parentUnitID_return =beaconID
-					unitIDToProcess_return =unitIDToProcess
-					totalOverhead_return =totalOverhead
-					lowestTime_VAR=lowestTime
-					history_return=history
+				if #nearbyBeacon>0 then
+					local totalOverheadTime = previousOverheadTime + chargeTime_CNSTNT + estTimeFromExitToAnotherBeacon + beaconData["becnQeuu"] --plus congestion information from enterance beacon
+					local parentUnitID, unitIDToProcess, totalOverhead,lowestTime,history = DiggDeeper(nearbyBeacon, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, totalOverheadTime, level, newHistoryBranch,djinExitPos)
+					if parentUnitID then --Note: only got a value if any of the children have lower totalTime than lowestTime_VAR
+						parentUnitID_return =beaconID
+						unitIDToProcess_return =unitIDToProcess
+						totalOverhead_return =totalOverhead
+						lowestTime_VAR=lowestTime
+						history_return=history
+					end
 				end
 			until true
 		end
@@ -318,8 +322,7 @@ function widget:GameFrame(n)
 								local isTransport = listOfMobile[unitDefID][7]
 								if isTransport then
 									local newMass = spGetUnitRulesParam(unitID,"effectiveMass")
-									local originalChargeTime = listOfMobile[unitDefID][2]
-									listOfMobile[unitDefID][2] = (newMass and math.floor(newMass*0.25)) or originalChargeTime --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
+									transportChargetime[unitID] = (newMass and math.floor(newMass*0.25)) or nil --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
 									transportSpeedMod = spGetUnitRulesParam(unitID,"selfMoveSpeedChange") or 1 --see unit_transport_speed.lua
 									-- local cargo = spGetUnitIsTransporting(unitID)  -- for transports, also count their cargo 
 									-- if cargo then
@@ -332,7 +335,7 @@ function widget:GameFrame(n)
 								if unitInfo["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
 									local guardedUnit = unitInfo["cmd"].params[4] --DEFINED in unit_teleporter.lua
 									if listOfBeacon[guardedUnit] then --if beacon exist
-										local chargeTime = listOfMobile[unitDefID][2]
+										local chargeTime = transportChargetime[unitID] or listOfMobile[unitDefID][2]
 										beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] or 0
 										beaconCurrentQueue[guardedUnit] = beaconCurrentQueue[guardedUnit] + chargeTime
 										loopedUnits[unitID]=true
@@ -394,8 +397,8 @@ function widget:GameFrame(n)
 											-- listOfBeacon[beaconID2][5] = ey
 											-- listOfBeacon[beaconID2][6] = ez
 										-- end
-										local chargeTime = listOfMobile[unitDefID][2]
-										local _, beaconIDToProcess, totalOverheadTime,_,history = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, 99999, chargeTime,0, {})
+										local chargeTime = transportChargetime[unitID] or listOfMobile[unitDefID][2]
+										local _, beaconIDToProcess, totalOverheadTime,_,history = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, 99999, 0,0, {})
 										if beaconIDToProcess then
 											history[beaconIDToProcess] = true --add the LAST BEACON in the history list
 											distance = GetWaypointDistance(unitID,moveID,cmd_queue,listOfBeacon[beaconIDToProcess][4],listOfBeacon[beaconIDToProcess][5],listOfBeacon[beaconIDToProcess][6],unitInfo["attckng"],weaponRange) --dist out of beacon
@@ -454,7 +457,7 @@ function widget:GameFrame(n)
 						for beaconID, beaconResult in pairs(unitInfo["becn"]) do
 							if listOfBeacon[beaconID] then --beacon is alive
 								local pathCurrentQueue = 0
-								for traversedBID,_ in pairs(beaconResult[2]) do --check beacon(s) traversed in beacon network and sum queue delay for each beacon traversed
+								for traversedBID,_ in pairs(beaconResult[2]) do --check beacon(s) traversed in beacon network and sum newest congestion delay info for each beacon traversed. Note: beaconCurrentQueue[beaconID] is latest congestion delay and listOfBeacon[beaconID]["becnQeuu"] is the "last-time/ previous check's" congestion delay (included in beaconResult[1])
 									pathCurrentQueue = pathCurrentQueue + (beaconCurrentQueue[traversedBID] or 0) --Note: beaconCurrentQueue[pastBID] can be NIL if other group haven't been updated yet
 								end
 								local timeToDest = beaconResult[1]
@@ -492,7 +495,7 @@ function widget:GameFrame(n)
 							-- Spring.GiveOrderArrayToUnitArray({unitID},{{CMD.INSERT,{0,CMD_WAIT_AT_BEACON,CMD.OPT_SHIFT, unpack(params)}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
 							--
 							local defID = unitInfo["defID"]
-							local chargeTime = listOfMobile[defID][2]
+							local chargeTime = transportChargetime[unitID] or listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime
 						end
 					end
