@@ -331,6 +331,14 @@ local options = {
     max    = 100,
     step   = 0.01,
   },
+  {
+    key    = 'terrarestoreonly',
+    name   = 'Terraform Restore Only',
+    desc   = 'Restore is the only terraform option available.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
+  },  
 --[[  
   {
     key    = 'damagemult',

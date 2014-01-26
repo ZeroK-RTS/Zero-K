@@ -275,7 +275,6 @@ local cmdDescsArray = {
   --bumpyCmdDesc,
 }
 
-
 if (not Game.mapDamage) then  -- map has "notDeformable = true", or "disablemapdamage = 1" modoption was set in the startscript
   include("LuaRules/colors.h.lua")
   local disabledText = '\n' .. RedStr .. "DISABLED" .. PinkStr .. "  (map not deformable)"
@@ -283,6 +282,16 @@ if (not Game.mapDamage) then  -- map has "notDeformable = true", or "disablemapd
   for _, cmdDesc in ipairs(cmdDescsArray) do
     cmdDesc.disabled = true
     cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
+  end
+elseif modOptions.terrarestoreonly == "1" then
+  include("LuaRules/colors.h.lua")
+  local disabledText = '\n' .. RedStr .. "DISABLED" .. PinkStr .. "  (only restore allowed)"
+
+  for _, cmdDesc in ipairs(cmdDescsArray) do
+    if cmdDesc ~= restoreCmdDesc then
+      cmdDesc.disabled = true
+      cmdDesc.tooltip  = cmdDesc.tooltip .. disabledText
+    end
   end
 end
 
