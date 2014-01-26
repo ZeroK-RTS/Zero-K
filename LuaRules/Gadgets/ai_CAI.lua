@@ -3808,7 +3808,9 @@ local function SetFactoryDefImportance(team, factoryDefID, importance)
 end
 
 local function RemoveUnit(unitID, unitDefID, unitTeam)
-	if not aiTeamData[team] then
+	local unitDefID = unitDefID or spGetUnitDefID(unitID)
+	local unitTeam = unitTeam or spGetUnitTeam(unitID)
+	if not aiTeamData[unitTeam] then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "attempt to remove unit from a non-existent CAI team")
 	end
 	ProcessUnitDestroyed(unitID, unitDefID, unitTeam)
