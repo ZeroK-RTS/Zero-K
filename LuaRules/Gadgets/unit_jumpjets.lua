@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		name    = "Jumpjets",
 		desc    = "Gives units the jump ability",
 		author  = "quantum",
-		date    = "May 14, 2008",
+		date    = "May 14, 2008", --last update 27 January 2014
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
 		enabled = moveCtrlJump, -- loaded by default?
@@ -86,6 +86,7 @@ local emptyTable = {}
 
 local coroutines = {}
 local lastJump = {}
+local justFinishedJump = {}
 local landBoxSize = 60
 local jumps = {}
 local jumping = {}
@@ -386,6 +387,7 @@ local function Jump(unitID, goal, cmdTag)
 		end
 		local jumpEndTime = spGetGameSeconds()
 		lastJump[unitID] = jumpEndTime
+		justFinishedJump[unitID] = true
 		jumping[unitID] = false
 		SetLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
@@ -531,12 +533,12 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return true, false -- command was used but don't remove it (unit is still jumping)
 	end
 
-	local t = spGetGameSeconds()
-
-	if lastJump[unitID] and lastJump[unitID]+1 >= t then
+	if justFinishedJump[unitID] then
+		justFinishedJump[unitID] = nil
 		return true, true -- command was used, remove it (unit finished jump)
 	end
 	
+	local t = spGetGameSeconds()
 	local x, y, z = spGetUnitBasePosition(unitID)
 	local distSqr = GetDist2Sqr({x, y, z}, cmdParams)
 	local jumpDef = jumpDefs[unitDefID]
