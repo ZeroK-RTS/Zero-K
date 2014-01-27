@@ -1,4 +1,4 @@
-local version = "v0.837"
+local version = "v0.839"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -16,6 +16,7 @@ end
 local detectionRange = 600
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spValidUnitID = Spring.ValidUnitID
@@ -276,6 +277,7 @@ function widget:GameFrame(n)
 						if not validUnitID then
 							unitToEffect[unitID] = nil
 						end
+						local skipToNextFrameNow = false
 						local excludedUnit = IgnoreUnit[unitID] and IgnoreUnit[unitID][beaconID]
 						if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] and not excludedUnit then
 							local unitDefID = spGetUnitDefID(unitID)
@@ -354,14 +356,12 @@ function widget:GameFrame(n)
 										end
 									end
 								end
-								--IS REACH PROCESSING LIMIT? skip--
-								if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
-									break;
-								end
 								--IS REACH DESIRED LIMIT? skip--
-								if #unitToEffect >= numberOfUnitToProcess then
+								if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
+									skipToNextFrameNow = true
 									break;
 								end
+
 								currentUnitProcessed = currentUnitProcessed + 1
 								local weaponRange = listOfMobile[unitDefID][5]
 								--MEASURE REGULAR DISTANCE--
@@ -421,7 +421,7 @@ function widget:GameFrame(n)
 						if k == numberOfLoop then
 							finishLoop =true
 							--Spring.Echo("FINISH")
-						elseif currentLoopCount>= numberOfLoopToProcessPerFrame then
+						elseif skipToNextFrameNow or currentLoopCount>= numberOfLoopToProcessPerFrame then
 							groupSpreadJobs[i] = true
 							listOfBeacon[beaconID]["prevIndex"] = k+1  --continue at next frame
 							listOfBeacon[beaconID]["prevList"] = vicinityUnit  --continue at next frame
@@ -630,14 +630,14 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRang
 		local waypoints
 		if moveID then --unit has compatible moveID?
 			local minimumGoalDist = (isAttackCmd and weaponRange-20) or 128
-			local path = spRequestPath( moveID,px,py,pz,v.params[1],v.params[2],v.params[3],minimumGoalDist)
 			local result, lastwaypoint
-			result, lastwaypoint, waypoints = IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],minimumGoalDist)
+			result, lastwaypoint, waypoints = Spring.Utilities.IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],minimumGoalDist)
 			if result == "outofreach" then --abit out of reach?
-				result = IsTargetReachable(moveID,lastwaypoint[1],lastwaypoint[2],lastwaypoint[3],v.params[1],v.params[2],v.params[3],minimumGoalDist-100) --refine pathing
-				if result ~= "reach" then --still not reachable?
-					reachable=false --target is unreachable!
-				end
+				reachable=false --target is unreachable!
+				-- result = IsTargetReachable(moveID,lastwaypoint[1],lastwaypoint[2],lastwaypoint[3],v.params[1],v.params[2],v.params[3],minimumGoalDist-100) --refine pathing
+				-- if result ~= "reach" then --still not reachable?
+					-- reachable=false --target is unreachable!
+				-- end
 			end
 		end
 		if reachable then
@@ -657,34 +657,6 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRang
 		end
 	end
 	return d
-end
-
---This function process result of Spring.PathRequest() to say whether target is reachable or not
-function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
-	local returnValue1,returnValue2, returnValue3
-	local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
-	if path then
-		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
-		local finalCoord = waypoint[#waypoint]
-		if finalCoord then --unknown why sometimes NIL
-			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
-			local dist = math.sqrt(dx*dx + dz*dz)
-			if dist <= radius+10 then --is within radius?
-				returnValue1 = "reach"
-				returnValue2 = finalCoord
-				returnValue3 = waypoint
-			else
-				returnValue1 = "outofreach"
-				returnValue2 = finalCoord
-				returnValue3 = waypoint
-			end
-		end
-	else
-		returnValue1 = "noreturn"
-		returnValue2 = nil
-		returnValue3 = nil
-	end
-	return returnValue1,returnValue2, returnValue3
 end
 
 function Dist(x,y,z, x2, y2, z2) 

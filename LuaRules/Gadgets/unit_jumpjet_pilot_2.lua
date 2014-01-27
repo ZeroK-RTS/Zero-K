@@ -20,16 +20,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- function print(...)
-  -- Spring.SendMessage(...)
--- end
-
--- local aStar = VFS.Include "LuaRules/Gadgets/astar.lua"
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
 local spRequestPath = Spring.RequestPath
 
 local leaperDefID = UnitDefNames.chicken_leaper.id
@@ -40,34 +32,6 @@ function Dist(x,y,z, x2, y2, z2)
 	local yd = y2-y
 	local zd = z2-z
 	return math.sqrt(xd*xd + yd*yd + zd*zd)
-end
-
---This function process result of Spring.PathRequest() to say whether target is reachable or not
-function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
-	local returnValue1,returnValue2, returnValue3
-	local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
-	if path then
-		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
-		local finalCoord = waypoint[#waypoint]
-		if finalCoord then --unknown why sometimes NIL
-			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
-			local dist = math.sqrt(dx*dx + dz*dz)
-			if dist <= radius+10 then --is within radius?
-				returnValue1 = "reach"
-				returnValue2 = finalCoord
-				returnValue3 = waypoint
-			else
-				returnValue1 = "outofreach"
-				returnValue2 = finalCoord
-				returnValue3 = waypoint
-			end
-		end
-	else
-		returnValue1 = "noreturn"
-		returnValue2 = nil
-		returnValue3 = nil
-	end
-	return returnValue1,returnValue2, returnValue3
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
@@ -105,7 +69,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	if moveID then --unit has compatible moveID?
 		local minimumGoalDist = 8
 		local result, lastwaypoint
-		result, lastwaypoint, waypoints = IsTargetReachable( moveID,startX,startY,startZ,cmdParams[1],cmdParams[2],cmdParams[3],minimumGoalDist)
+		result, lastwaypoint, waypoints = Spring.Utilities.IsTargetReachable( moveID,startX,startY,startZ,cmdParams[1],cmdParams[2],cmdParams[3],minimumGoalDist)
 	end
 	if waypoints then --we have waypoint to destination?
 		if not Spring.GetUnitIsDead(unitID) and not cmdOptions.shift then

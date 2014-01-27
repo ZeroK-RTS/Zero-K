@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 18.12.2013",
+    date      = "1.11.2007, 27.1.2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -620,14 +620,10 @@ function GetPathLength(unitID)
 		local reachable = true --always assume target reachable
 		local waypoints
 		if moveID then --unit has compatible moveID?
-			local path = Spring.RequestPath( moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
 			local result, lastwaypoint
 			result, lastwaypoint, waypoints = IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
 			if result == "outofreach" then --abit out of reach?
-				result = IsTargetReachable(moveID,lastwaypoint[1],lastwaypoint[2],lastwaypoint[3],v.params[1],v.params[2],v.params[3],8) --refine pathing
-				if result ~= "reach" then --still not reachable?
-					reachable=false --target is unreachable!
-				end
+				reachable=false --target is unreachable!
 			end
 		end
 		if reachable then 
@@ -661,7 +657,7 @@ end
 
 --This function process result of Spring.PathRequest() to say whether target is reachable or not
 function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
-	local returnValue1,returnValue2, returnValue3
+	local result,lastcoordinate, waypoints
 	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
 	if path then
 		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
@@ -669,22 +665,22 @@ function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
 		if finalCoord then --unknown why sometimes NIL
 			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
 			local dist = math.sqrt(dx*dx + dz*dz)
-			if dist <= radius+10 then --is within radius?
-				returnValue1 = "reach"
-				returnValue2 = finalCoord
-				returnValue3 = waypoint
+			if dist <= radius+20 then --is within radius?
+				result = "reach"
+				lastcoordinate = finalCoord
+				waypoints = waypoint
 			else
-				returnValue1 = "outofreach"
-				returnValue2 = finalCoord
-				returnValue3 = waypoint
+				result = "outofreach"
+				lastcoordinate = finalCoord
+				waypoints = waypoint
 			end
 		end
 	else
-		returnValue1 = "noreturn"
-		returnValue2 = nil
-		returnValue3 = nil
+		result = "noreturn"
+		lastcoordinate = nil
+		waypoints = nil
 	end
-	return returnValue1,returnValue2, returnValue3
+	return result, lastcoordinate, waypoints
 end
 
 

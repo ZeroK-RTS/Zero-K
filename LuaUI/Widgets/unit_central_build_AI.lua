@@ -11,7 +11,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "v1.349"
+local version = "v1.350"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -349,7 +349,7 @@ end
 
 --If one of our units completed an order, cancel units guarding/assisting it.
 --This replace UnitCmdDone() because UnitCmdDone() is called even if command is not finished, such as when new command is inserted into existing queue
---Credit was given to Niobium for pointing out UnitCmdDone() originally.
+--Credit to Niobium for pointing out UnitCmdDone() originally.
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	local ux, _, uz = spGetUnitPosition(unitID)
@@ -945,10 +945,11 @@ function SetQueueUnreachableValue(unitID,moveID,ux,uy,uz,x,y,z,queueKey)
 	if moveID then --Note: crane/air-constructor do not have moveID!
 		local result,finCoord = IsTargetReachable(moveID, ux,uy,uz,x,y,z,128)
 		if result == "outofreach" then --if result not reachable but we have the closest coordinate, then:
-			result = IsTargetReachable(moveID, finCoord[1],finCoord[2],finCoord[3],x,y,z,8) --refine pathing
-			if result ~= "reach" then --if result still not reach, then:
-				reach = false --target is unreachable
-			end
+			reach = false --target is unreachable
+			-- result = IsTargetReachable(moveID, finCoord[1],finCoord[2],finCoord[3],x,y,z,8) --refine pathing
+			-- if result ~= "reach" then --if result still not reach, then:
+				-- reach = false --target is unreachable
+			-- end
 		else -- Spring.PathRequest() must be non-functional. (unsynced blocked?)
 		end
 		--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, may change in different version)
@@ -964,7 +965,7 @@ end
 
 --This function process result of Spring.PathRequest() to say whether target is reachable or not
 function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
-	local returnValue1,returnValue2
+	local result,lastcoordinate, waypoints
 	local path = Spring.RequestPath( moveID,ox,oy,oz,tx,ty,tz, radius)
 	if path then
 		local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
@@ -972,19 +973,22 @@ function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
 		if finalCoord then --unknown why sometimes NIL
 			local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
 			local dist = math.sqrt(dx*dx + dz*dz)
-			if dist <= radius+10 then --is within radius?
-				returnValue1 = "reach"
-				returnValue2 = finalCoord
+			if dist <= radius+20 then --is within radius?
+				result = "reach"
+				lastcoordinate = finalCoord
+				waypoints = waypoint
 			else
-				returnValue1 = "outofreach"
-				returnValue2 = finalCoord
+				result = "outofreach"
+				lastcoordinate = finalCoord
+				waypoints = waypoint
 			end
 		end
 	else
-		returnValue1 = "noreturn"
-		returnValue2 = nil
+		result = "noreturn"
+		lastcoordinate = nil
+		waypoints = nil
 	end
-	return returnValue1,returnValue2
+	return result, lastcoordinate, waypoints
 	
 	--[[ --step-by-step detailed path check: WARNING!: lag prone if path too long and unreachable.
 	local dx,dy,dz = x-ux, y-uy, z-uz
