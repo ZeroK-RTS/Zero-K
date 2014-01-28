@@ -37,8 +37,13 @@ end
 
 local source = debug and debug.getinfo(1).source
 local DIR = GetDirectory(source) or (LUAUI_DIRNAME.."Widgets/")
-CHILI_DIRNAME = DIR .. "chili/"
 
+local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
+if reverseCompatibility then
+	CHILI_DIRNAME = DIR .. "chili/"
+else
+	CHILI_DIRNAME = DIR .. "chili_new/"
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

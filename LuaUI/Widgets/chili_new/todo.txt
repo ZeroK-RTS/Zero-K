@@ -1,0 +1,13 @@
+- fix fixedRatio 1 pixel jumping
+
+- check all listeners if they use chili objects (doing so might break the garbage collection), if so replace them with weaklinks (debug.getupvalue & debug.setupvalue)
+
+- self:Resize(), OnResize
+- RenderToTexture
+- masks for HitTest (depending on linked textures-> alpha channel)
+- more different window controls -> background textures
+- use matrices for clientspace transformations
+- theme & layout handler
+
+controls:
+- combobox
