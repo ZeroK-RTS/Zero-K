@@ -372,13 +372,13 @@ function script.AimWeapon(num, heading, pitch)
 
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
+	StartThread(RestoreAfterDelay)
 	aiming = true
 	
 	Turn( chest , y_axis, heading , math.rad(150) )
-	Turn( chest , x_axis, 0, math.rad(60) )
+	Turn( chest , x_axis, -pitch, math.rad(60) )
 	WaitForTurn(chest, y_axis)
 	WaitForTurn(chest, x_axis)
-	StartThread(RestoreAfterDelay)
 	return true
 end
 
