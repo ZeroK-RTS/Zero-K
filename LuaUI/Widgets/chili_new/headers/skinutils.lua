@@ -274,7 +274,7 @@ function DrawWindow(obj)
 
   local c = obj.color
   if (c) then
-    gl.Color(c)
+	gl.Color(c)
   else
     gl.Color(1,1,1,1)
   end
@@ -683,14 +683,16 @@ function DrawProgressbar(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  gl.Color(obj.backgroundColor)
-  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+  if not obj.noSkin then
+    gl.Color(obj.backgroundColor)
+    TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  --gl.Texture(0,false)
-
+    --gl.Texture(0,false)
+  end
+  
   gl.Color(obj.color)
   TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
@@ -767,22 +769,24 @@ function DrawTrackbar(self)
   else
     gl.Color(1,1,1,1)
   end
-
-  TextureHandler.LoadTexture(0,self.ThumbImage,self)
-    local texInfo = gl.TextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
-    local tw,th = texInfo.xsize, texInfo.ysize
-
-    --// scale the thumb down if we don't have enough space
-    tw = math.ceil(tw * (h / th))
-    th = h
-
-    local barWidth = w - (pdLeft + pdRight)
-    local mx = pdLeft + barWidth * percent
-    local my = h * 0.5
-    mx = math.floor(mx - tw * 0.5)
-    my = math.floor(my - th * 0.5)
-    gl.TexRect(mx, my, mx + tw, my + th, false, true)
-
+  
+  if not self.noDrawThumb then
+    TextureHandler.LoadTexture(0,self.ThumbImage,self)
+      local texInfo = gl.TextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
+      local tw,th = texInfo.xsize, texInfo.ysize
+      
+      --// scale the thumb down if we don't have enough space
+      tw = math.ceil(tw * (h / th))
+      th = h
+      
+      local barWidth = w - (pdLeft + pdRight)
+      local mx = pdLeft + barWidth * percent
+      local my = h * 0.5
+      mx = math.floor(mx - tw * 0.5)
+      my = math.floor(my - th * 0.5)
+      gl.TexRect(mx, my, mx + tw, my + th, false, true)
+   end
+   
   gl.Texture(0,false)
 end
 

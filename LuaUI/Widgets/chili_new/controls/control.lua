@@ -74,7 +74,8 @@ Control = Object:Inherit{
   skinName        = nil,
 
   drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
-
+  noSelfHitTest = nil,
+  
   OnResize        = {},
 }
 
@@ -182,8 +183,8 @@ end
 --- Adds a child object to the control
 -- @tparam object.Object obj child object
 -- @param dontUpdate if true won't trigger a RequestRealign()
-function Control:AddChild(obj, dontUpdate)
-  inherited.AddChild(self,obj)
+function Control:AddChild(obj, dontUpdate, index)
+  inherited.AddChild(self,obj, dontUpdate, index)
   if (not dontUpdate) then
     self:RequestRealign()
   end
@@ -1345,6 +1346,9 @@ function Control:HitTest(x,y)
           end
         end
       end
+	  if self.hitTestAllowEmpty then
+		return self
+	  end
     end
   end
 

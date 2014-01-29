@@ -46,7 +46,7 @@ local includes = {
 
 local Chili = widget
 
-Chili.CHILI_DIRNAME = CHILI_DIRNAME or (LUAUI_DIRNAME .. "Widgets/chili/")
+Chili.CHILI_DIRNAME = CHILI_DIRNAME or (LUAUI_DIRNAME .. "Widgets/chili_new/")
 Chili.SKIN_DIRNAME  =  SKIN_DIRNAME or (CHILI_DIRNAME .. "skins/")
 
 if (-1>0) then

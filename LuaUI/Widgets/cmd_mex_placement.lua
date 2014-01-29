@@ -742,7 +742,7 @@ function widget:DrawInMiniMap()
 
 			local mexColor = getSpotColor(x,y,z,i,specatate,2)
 			
-			glLineWidth(spot.metal)
+			glLineWidth((spot.metal > 0 and spot.metal) or 0.1)
 			glLighting(false)
 			glColor(mexColor)
 			

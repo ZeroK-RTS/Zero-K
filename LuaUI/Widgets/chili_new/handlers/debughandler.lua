@@ -52,8 +52,8 @@ setmetatable(DebugHandler.allObjects, {
 --// Now this errorhandler removes the widget itself (and its owned chili objects)
 --// w/o crashing the whole framework.
 
-DebugHandler.maxStackLength = 7
-DebugHandler.maxChiliErrors = 5
+DebugHandler.maxStackLength = 20
+DebugHandler.maxChiliErrors = 20
 local numChiliErrors = 0
 local lastError = 0
 

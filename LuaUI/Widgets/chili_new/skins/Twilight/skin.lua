@@ -29,10 +29,6 @@ skin.button = {
   TileImageBK = ":cl:empty.png",
   tiles = {22, 22, 22, 22}, --// tile widths: left,top,right,bottom
   padding = {10, 10, 10, 10},
-  
-  backgroundColor = {1, 1, 1, 1.0},
-  
-  DrawControl = DrawButton,
 }
 
 skin.progressbar = {
