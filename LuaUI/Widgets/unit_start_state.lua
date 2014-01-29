@@ -6,7 +6,7 @@ function widget:GetInfo()
     name      = "Unit Start State",
     desc      = "Configurable starting unit states for units",
     author    = "GoogleFrog",
-    date      = "13 April 2011", --last update: 21 September 2013
+    date      = "13 April 2011", --last update: 29 January 2014
     license   = "GNU GPL, v2 or later",
 	handler   = false,
     layer     = 1,
@@ -247,7 +247,7 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_flylandstate"
-		
+		--[[
 		options[defName .. "_autorepairlevel1"] = {
             name = "  Auto Repair to airpad",
             desc = "Values: inherit from factory, no autorepair, 30%, 50%, 80% health remaining",
@@ -259,6 +259,7 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_autorepairlevel1"
+		--]]
 	elseif ud.customParams and ud.customParams.landflystate then
 		options[defName .. "_flylandstate_factory"] = {
             name = "  Fly/Land State for factory",
@@ -271,7 +272,7 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_flylandstate_factory"
-		
+		--[[
 		options[defName .. "_autorepairlevel_factory"] = {
             name = "  Auto Repair to airpad",
             desc = "Values: no autorepair, 30%, 50%, 80% health remaining",
@@ -283,6 +284,7 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_autorepairlevel_factory"
+		--]]
 	end
 	
 	if ud.isFactory then
@@ -509,25 +511,23 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 			
 			if options[name .. "_flylandstate_factory"] and options[name .. "_flylandstate_factory"].value then
-				--Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_flylandstate_factory"].value}, {"shift"})
 				orderArray[#orderArray + 1] = {CMD_AP_FLY_STATE, {options[name .. "_flylandstate_factory"].value}, {"shift"}}
 			end
 			
+			--[[
 			if options[name .. "_autorepairlevel_factory"] and options[name .. "_autorepairlevel_factory"].value then
-				--Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_autorepairlevel_factory"].value}, {"shift"})
-				orderArray[#orderArray + 1] = {CMD_AP_FLY_STATE, {options[name .. "_autorepairlevel_factory"].value}, {"shift"}}
+				orderArray[#orderArray + 1] = {CMD_AP_AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel_factory"].value}, {"shift"}}
 			end
 			
 			if options[name .. "_autorepairlevel1"] and options[name .. "_autorepairlevel1"].value then
 				--NOTE: The unit_air_plants gadget deals with inherit
 				if options[name .. "_autorepairlevel1"].value ~= -1 then --if not inherit 
-					--Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"})
 					orderArray[#orderArray + 1] = {CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"}}
 				elseif not builderID then --if set to inherit but don't have parent (builder):
-					-- Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {0}, {"shift"})
 					orderArray[#orderArray + 1] = {CMD.AUTOREPAIRLEVEL, {0}, {"shift"}}
 				end
 			end
+			--]]
 			
 			if options[name .. "_repeat"] and options[name .. "_repeat"].value ~= nil then
 				-- Spring.GiveOrderToUnit(unitID, CMD.REPEAT, {options[name .. "_repeat"].value and 1 or 0}, {"shift"})
@@ -582,7 +582,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
             end
         end
 		
-		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
+		if #orderArray>0 then
+			Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
+		end
 		orderArray = nil
     end
 end
@@ -630,7 +632,10 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			-- Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
 			orderArray[#orderArray + 1] = {CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"}}
 		end
-		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
+		
+		if #orderArray>0 then
+			Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
+		end
 		orderArray = nil
 	end
 end

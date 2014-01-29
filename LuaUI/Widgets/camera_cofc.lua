@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.129 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.130 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-November-12
     license   = "GNU GPL, v2 or later",
@@ -445,11 +445,6 @@ options = {
 		value = false,
 		path = cameraFollowPath,
 		desc = "If you tap the group numbers (1,2,3..ect) it will focus camera view toward the cluster of unit rather than toward the average position.",
-		OnChange = function(self) 
-			if self.value==true then
-				Spring.SendCommands("luaui enablewidget Receive Units Indicator")
-			end
-		end,
 	},
 	-- end follow unit
 	

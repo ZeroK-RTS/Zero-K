@@ -5,7 +5,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local tooltips = {
 	priority = "Priority: Set construction priority (low, normal, high)",
 	miscpriority = "Misc Priority: Set priority for morph or stockpile (low, normal, high)",
-	retreat = "Retreat: Retreat to closest retreat point at 30/60/90% of health (right-click to disable)",
+	retreat = "Retreat: Retreat to closest retreat point or airpad at 30/60/90% of health (right-click to disable). Airpad for aircraft only.",
 	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
 	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
 	diveBomb = "\255\90\255\90Green\255\255\255\255:Dive For Shielded or Mobile Target\n\255\255\255\90Yellow\255\255\255\255:Dive For Mobile Target\n\255\255\90\90Red\255\255\255\255:Always Fly Low\n\255\90\90\90Grey\255\255\255\255:Always Fly High", --override tooltip supplied by unit_bomber_dive.lua gadget.

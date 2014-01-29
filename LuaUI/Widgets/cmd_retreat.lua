@@ -1,11 +1,9 @@
-
-
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.279 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.280 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
-    date      = "2008-03-17", --2013-9-23
+    date      = "2008-03-17", --2014-1-29
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
@@ -23,6 +21,7 @@ local glBillboard      = gl.Billboard
 local glColor          = gl.Color
 local GL_GREATER       = GL.GREATER
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CMD_WAIT          = CMD.WAIT
 local CMD_MOVE          = CMD.MOVE
 local CMD_PATROL        = CMD.PATROL
@@ -62,9 +61,10 @@ local maxDistSqr = dist * dist
 local myTeamID
 local tooltips = {}
 
-local retreatMoveOrders, wantRetreat, retreatOrdersArray = {}, {}, {}, {}
+local retreatMoveOrders,retreatRearmOrders, wantRetreat, retreatOrdersArray = {}, {}, {}, {}
 local mobileUnits,pauseRetreatChecks, havens = {}, {}, {}
 local havenCount = 0
+local airpadCount = 0
 
 local retreatedUnits = {} --recently retreating unit that is about to be deselected from user selection
 local currentSelection = nil --current unit selection (for deselecting any retreating units. See code for more detail)
@@ -92,6 +92,12 @@ options = {
 		value = false,
 		desc = 'Always try to return unit to their last known position.',
 	},
+}
+
+local airpadDefs = {
+	[UnitDefNames["factoryplane"].id] = true,
+	[UnitDefNames["armasp"].id] = true,
+	[UnitDefNames["armcarry"].id] = true,
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -193,6 +199,20 @@ function GetFirst3Command(unitID)
 	return queue
 end
 
+function StopRearm(unitID) --is called until rearm is cancelled
+	local queue = GetFirst3Command(unitID)
+	if (queue and queue[1] and queue[1].id == CMD_REARM) then
+		local tag = queue[1].tag
+		GiveOrderToUnit(unitID, CMD_REMOVE, {tag}, {})
+		retreatRearmOrders[unitID]= nil
+	elseif (not queue or not queue[1] or queue[1].id==CMD_STOP) and --no work to do??
+	retreatRearmOrders[unitID][1] then --returnLastPosition enabled??
+		local x,y,z = retreatRearmOrders[unitID][1],retreatRearmOrders[unitID][2],retreatRearmOrders[unitID][3]
+		GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
+		retreatRearmOrders[unitID]= nil
+	end
+end
+
 function StopRetreating(unitID)
 	if retreatMoveOrders[unitID] then
 		local cmds = GetFirst3Command(unitID)
@@ -227,11 +247,23 @@ function StopRetreating(unitID)
 		local cmd1 = GetFirstCommand(unitID)
 		if not (cmd1 and cmd1.id == CMD_WAIT) then
 			pauseRetreatChecks[unitID] = nil
-			retreatMoveOrders[unitID] = nil
 		end
 	end
 end
 
+
+local function StartRearm(unitID)
+	local insertIndex = 0
+	GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_FIND_PAD, CMD.OPT_INTERNAL}, CMD.OPT_ALT)
+	retreatRearmOrders[unitID] = {nil,nil,nil}
+	--add last position
+	if options.returnLastPosition.value then
+		local ux, uy, uz = GetUnitPosition(unitID)
+		retreatRearmOrders[unitID][1] = ux
+		retreatRearmOrders[unitID][2] = uy
+		retreatRearmOrders[unitID][3] = uz
+	end
+end
 
 local function StartRetreat(unitID, force)
 	local hx, hy, hz, dSquared = FindClosestHavenToUnit(unitID)
@@ -259,14 +291,24 @@ end
 
 local function SetWantRetreat(unitID, want)
 	if want then
-		if (havenCount > 0) and (not pauseRetreatChecks[unitID]) and (not retreatMoveOrders[unitID]) then
-			StartRetreat(unitID)
-			if options.removeFromSelection.value then
-				retreatedUnits[#retreatedUnits+1] = unitID
+		if (not pauseRetreatChecks[unitID])then
+			local unitDefID = GetUnitDefID(unitID)
+			if (airpadCount> 0) and UnitDefs[unitDefID].canFly and (not retreatRearmOrders[unitID]) then
+				StartRearm(unitID)
+				if options.removeFromSelection.value then
+					retreatedUnits[#retreatedUnits+1] = unitID
+				end
+			elseif (havenCount > 0) and (not retreatMoveOrders[unitID]) then
+				StartRetreat(unitID)
+				if options.removeFromSelection.value then
+					retreatedUnits[#retreatedUnits+1] = unitID
+				end
 			end
 		end
 	elseif retreatMoveOrders[unitID] then 
 		StopRetreating(unitID)
+	elseif retreatRearmOrders[unitID] then
+		StopRearm(unitID)
 	end
 	
 	WG.icons.SetUnitIcon( unitID, {
@@ -296,6 +338,7 @@ local function RemoveUnitData(unitID)
 	pauseRetreatChecks[unitID] = nil
 	retreatOrdersArray[unitID] = nil
 	retreatMoveOrders[unitID] = nil
+	retreatRearmOrders[unitID] = nil
 	mobileUnits[unitID] = nil
 end
 
@@ -307,7 +350,7 @@ local function PerformDeselection()
 		local retreatedCount = 0
 		for i=1, selectionCount do
 			local unitID = currentSelection[i]
-			if retreatMoveOrders[unitID] then --selection contain retreating units
+			if retreatMoveOrders[unitID] or retreatRearmOrders[unitID] then --selection contain retreating units
 				unitsToDeselect[#unitsToDeselect+1] = i
 				retreatedCount = retreatedCount + 1
 			end
@@ -390,6 +433,11 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 				--retreatMoveOrders[unitID] = nil
 			--end
 
+		elseif  commandOverriden and retreatRearmOrders[unitID] then
+			local cmd1 = GetFirstCommand(unitID)
+			if (cmd1 and cmd1.id == CMD_REARM) then
+				StartRearm(unitID) --add rearm each time user issued new command
+			end
 		end
 	end
 end
@@ -411,6 +459,15 @@ function widget:Initialize()
 	WG.icons.SetPulse( 'retreatstate', true )
 	
 	WG.retreatingUnits = retreatMoveOrders --make this table global, available to all widget
+	WG.retreatingUnitsRearm = retreatRearmOrders
+	
+	local allUnits = Spring.GetAllUnits()
+	for i=1, #allUnits do
+		local unitID = allUnits[i]
+		if airpadDefs[GetUnitDefID(unitID)] then
+			airpadCount = airpadCount + 1
+		end
+	end
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, teamID, builderID, _, _)
@@ -421,12 +478,28 @@ function widget:UnitFromFactory(unitID, unitDefID, teamID, builderID, _, _)
 	end	
 end
 
-function widget:UnitDestroyed(unitID, _, teamID)
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	if airpadDefs[unitDefID] then
+		airpadCount = airpadCount + 1
+	end
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	RemoveUnitData(unitID)
+	if airpadDefs[unitDefID] then
+		airpadCount = airpadCount - 1
+	end
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	RemoveUnitData(unitID)
+	if airpadDefs[unitDefID] then
+		if newTeam == myTeamID then
+			airpadCount = airpadCount + 1
+		elseif oldTeam== myTeamID then
+			airpadCount = airpadCount - 1
+		end
+	end
 end
 
 function widget:UnitIdle(unitID, unitDefID, teamID)
@@ -495,13 +568,16 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		return true
 	else
 		--exclude currently retreating unit until idle
-		if (havenCount > 0) and options.overrideableCommand.value then
+		if ((havenCount > 0) or (airpadCount>0)) and options.overrideableCommand.value then
 			local selectedUnits = GetSelectedUnits()
 			for i=1, #selectedUnits do
 				local unitID = selectedUnits[i]
 				if retreatMoveOrders[unitID] then  --currently retreating
 					pauseRetreatChecks[unitID] = true --suspend retreat command until unit become idle, "widget:UnitIdle()"
 					retreatMoveOrders[unitID] = nil
+				elseif retreatRearmOrders[unitID] then
+					pauseRetreatChecks[unitID] = true
+					retreatRearmOrders[unitID] = nil
 				end
 			end
 		end
@@ -551,7 +627,6 @@ function widget:CommandsChanged()
 
 				pos = {CMD_CLOAK}, 
 			})
-   
 		end--if canmove
 		
 		if foundRetreatable then
@@ -561,7 +636,7 @@ function widget:CommandsChanged()
 end
 
 function widget:SelectionChanged(newSelection)
-	if (havenCount > 0) and options.removeFromSelection.value then
+	if ((havenCount > 0) or (airpadCount>0)) and options.removeFromSelection.value then
 		currentSelection = newSelection
 	end
 end
@@ -569,11 +644,11 @@ end
 function widget:UnitDamaged(unitID) 
 	local retreatOrder = retreatOrdersArray[unitID]
 	
-	if (havenCount > 0)
+	if ((havenCount > 0) or (airpadCount>0))
 		and retreatOrder ~= nil
 		and retreatOrder > 0
 		and mobileUnits[unitID]
-		and not (retreatMoveOrders[unitID] or pauseRetreatChecks[unitID])
+		and not (retreatMoveOrders[unitID] or retreatRearmOrders[unitID] or pauseRetreatChecks[unitID])
 	then 
 		CheckSetWantRetreat(unitID, retreatOrder)
 		
