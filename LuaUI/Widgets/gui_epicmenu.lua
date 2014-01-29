@@ -2256,7 +2256,7 @@ local function MakeMenuBar()
 		resizable = false,
 		minimizable = false,
 		backgroundColor = color.main_bg,
-		color = {nil,nil,nil,0.5},
+		color = {0,0,0,0.5},
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		
@@ -2341,7 +2341,7 @@ local function MakeMenuBar()
 		resizable = false,
 		minimizable = false,
 		backgroundColor = color.main_bg,
-		color = {nil,nil,nil,0.5},
+		color = {1,1,1,0.5},
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		
