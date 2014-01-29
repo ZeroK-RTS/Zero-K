@@ -16,7 +16,7 @@ function gadget:GetInfo()
   return {
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
-    author    = "xponen, (based on Aircraft Command by KingRaptor)",
+    author    = "xponen, KingRaptor",
     date      = "29 January 2014, 22 Jan 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
