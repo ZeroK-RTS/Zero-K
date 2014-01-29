@@ -1,5 +1,6 @@
 local base = piece 'base' 
 local chest = piece 'chest' 
+local aim = piece 'aim' 
 local flare = piece 'flare' 
 local hips = piece 'hips' 
 local lthigh = piece 'lthigh' 
@@ -356,7 +357,7 @@ local function RestoreAfterDelay()
 end
 
 function script.AimFromWeapon()
-	return hips
+	return aim
 end
 
 function script.QueryWeapon()
@@ -376,7 +377,7 @@ function script.AimWeapon(num, heading, pitch)
 	aiming = true
 	
 	Turn( chest , y_axis, heading , math.rad(150) )
-	Turn( chest , x_axis, -pitch, math.rad(60) )
+	Turn( chest , x_axis, -pitch-0.08, math.rad(60) )
 	WaitForTurn(chest, y_axis)
 	WaitForTurn(chest, x_axis)
 	return true
