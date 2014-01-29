@@ -364,8 +364,8 @@ function script.QueryWeapon()
 end
 
 function script.FireWeapon()
-	EmitSfx( flare,  UNIT_SFX2 )
-	EmitSfx( flare,  UNIT_SFX2 )
+	EmitSfx( flare,  UNIT_SFX1 )
+	EmitSfx( flare,  UNIT_SFX1 )
 end
 
 function script.AimWeapon(num, heading, pitch)
