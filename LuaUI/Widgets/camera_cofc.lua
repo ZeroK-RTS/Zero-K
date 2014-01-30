@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.131 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.132 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-November-12
     license   = "GNU GPL, v2 or later",
@@ -2163,6 +2163,7 @@ local spGetGroupList  = Spring.GetGroupList
 --include("keysym.h.lua")
 local previousGroup =99
 local currentIteration = 1
+local currentIterations = {}
 local previousKey = 99
 local previousTime = spGetTimer()
 local groupNumber = {
@@ -2200,15 +2201,19 @@ function GroupRecallFix(key, modifier, isRepeat)
 				end
 			end
 			if previousKey == key and (spDiffTimers(spGetTimer(),previousTime) > options.groupSelectionTapTimeout.value) then
-				currentIteration = 0 --reset cycle if delay between 2 similar tap took too long.
 				previousKey = key
 				previousTime = spGetTimer()
-				return true --and also don't do anything. Only move camera after a double-tap (or more).
+				return true --but don't do anything. Only move camera after a double-tap (or more).
 			end
 			previousKey = key
 			previousTime = spGetTimer()
 			
 			if options.enableCycleView.value then 
+				if (currentIterations[group]) then
+					currentIteration = currentIterations[group]
+				else
+					currentIteration = 1
+				end
 				local slctUnitUnordered = {}
 				for i=1 , #selectedUnit do
 					local unitID = selectedUnit[i]
@@ -2222,9 +2227,10 @@ function GroupRecallFix(key, modifier, isRepeat)
 					if currentIteration > (#cluster + #lonely) then
 						currentIteration = 1
 					end
-				else
-					currentIteration = 1
+				-- else
+				--	currentIteration = 1
 				end
+				currentIterations[group] = currentIteration
 				if currentIteration <= #cluster then
 					local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 					for unitIndex=1, #cluster[currentIteration] do
