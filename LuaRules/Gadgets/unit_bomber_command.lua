@@ -254,6 +254,7 @@ local function RefreshEmptyspot_minusBomberLanding()
 		end
 	end
 end
+
 local function FindNearestAirpad(unitID, team)
 	--Spring.Echo(unitID.." checking for closest pad")
 	local allyTeam = spGetUnitAllyTeam(unitID)
@@ -355,18 +356,21 @@ end
 -- we don't need the airpad for now, free up a slot
 local function CancelAirpadReservation(unitID)
 	local targetPad = bomberToPad[unitID]
-	if not targetPad then return end
-	
-	if GG.LandAborted then
-		Spring.Echo("GG.LandAborted()")
-		GG.LandAborted(unitID)
-		spGiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-		spGiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+	if not targetPad then 
+		if GG.LandAborted and Spring.GetUnitRulesParam(unitID, "noammo") == 2 then
+			Spring.Echo("GG.LandAborted()")
+			Spring.SetUnitRulesParam(unitID, "noammo", 1)
+			bomberLanding[unitID] = nil
+			GG.LandAborted(unitID)
+		end
+		return 
 	end
 	
 	--Spring.Echo("Clearing reservation by "..unitID.." at pad "..targetPad)
 	bomberToPad[unitID] = nil
-	if not airpadsData[targetPad] then return end
+	if not airpadsData[targetPad] then 
+		return 
+	end
 	local reservations = airpadsData[targetPad].reservations
 	if reservations.units[unitID] then
 		reservations.units[unitID] = nil
@@ -421,8 +425,6 @@ function gadget:GameFrame(n)
 					if GG.SendBomberToPad then
 						GG.SendBomberToPad(bomberID, padID, padPiece)
 					end
-					spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
-					spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 					bomberToPad[bomberID] = nil
 					bomberLanding[bomberID] = {padPiece,padID}
 					Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
@@ -443,12 +445,16 @@ end
 
 function GG.LandComplete(bomberID)
 	Spring.Echo("GG.LandComplete()")
+	local queue = Spring.GetUnitCommands(bomberID, 1)
+	if (queue and queue[1] and queue[1].id == CMD_REARM) then
+		local tag = queue[1].tag
+		spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
+	end
 	bomberLanding[bomberID] = nil
 	CancelAirpadReservation(bomberID)
 	Spring.SetUnitRulesParam(bomberID, "noammo", 0)	-- ready to go
 	spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 	spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
-	bomberMaybeJiggling[bomberID] = nil
 	rearmRemove[bomberID] = true --remove current RE-ARM command
 end
 
@@ -466,7 +472,8 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_REARM then	-- return to pad
-		if spGetUnitRulesParam(unitID, "noammo") == 2 then
+		local ammo = spGetUnitRulesParam(unitID, "noammo")
+		if ammo == 2 then
 			return true, true -- attempting to rearm while already rearming, abort
 		end
 		if rearmRemove[unitID] then
@@ -489,6 +496,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			reservations.count = reservations.count + 1
 		end
 		local x, y, z = Spring.GetUnitPosition(targetPad)
+		Spring.Echo("goal")
 		Spring.SetUnitMoveGoal(unitID, x, y, z)
 		return true, false	-- command used, don't remove
 	elseif cmdID == CMD_FIND_PAD then
@@ -519,6 +527,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	end
 	if bomberToPad[unitID] or bomberLanding[unitID] then
 		if cmdID ~= CMD_REARM and not cmdOptions.shift then
+			Spring.Echo(cmdID)
 			CancelAirpadReservation(unitID)
 		end
 	end

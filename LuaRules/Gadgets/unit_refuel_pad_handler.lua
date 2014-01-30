@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date    = "5 Jan 2014",
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
-		enabled = false, -- loaded by default?
+		enabled = true, -- loaded by default?
 	}
 end
 
@@ -24,6 +24,9 @@ local spSetUnitVelocity		= Spring.SetUnitVelocity
 local spSetUnitLeaveTracks 	= Spring.SetUnitLeaveTracks 
 local spGetUnitVelocity		= Spring.GetUnitVelocity
 local spGetUnitRotation		= Spring.GetUnitRotation 
+local spGetUnitHealth 		= Spring.GetUnitHealth
+local spSetUnitHealth 		= Spring.SetUnitHealth
+local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
 
 local mcSetVelocity         = Spring.MoveCtrl.SetVelocity
 local mcSetRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
@@ -46,9 +49,23 @@ local acos = math.acos
 local floor = math.floor
 local sqrt = math.sqrt
 local exp = math.exp
+local min = math.min
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local mobilePadDefs = {
+	[UnitDefNames["armcarry"].id] = true,
+}
+
+local padSnapRangeSqr = 80^2
+local REFUEL_TIME = 5*30
+local HEAL_PER_HALF_SECOND = 15
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local landingUnit = {}
 
 local unitNewScript = {}
 local unitMovectrled = {}
@@ -58,6 +75,90 @@ local coroutines = {}
 local function StartScript(fn)
 	local co = coroutine.create(fn)
 	coroutines[#coroutines + 1] = co
+end
+
+local function SitOnPad(unitID)
+	local landData = landingUnit[unitID]
+	
+	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(landData.padID, landData.padPieceID)
+	
+	local heading = spGetUnitHeading(unitID)*HEADING_TO_RAD
+	
+	if not unitMovectrled[unitID] then
+		mcEnable(unitID)
+		mcSetRotation(unitID,0,heading,0)
+		spSetUnitLeaveTracks(unitID, false)
+		unitMovectrled[unitID] = true
+	end
+	
+	local padHeading = acos(dz)
+	if dx < 0 then
+		padHeading = 2*PI-padHeading
+	end
+	
+	Spring.Echo(dx)
+	Spring.Echo(dy)
+	Spring.Echo(dz)
+	Spring.Echo(padHeading*180/PI)
+	
+	local headingDiff = heading - padHeading
+	
+	spSetUnitVelocity(unitID, 0, 0, 0)
+	mcSetVelocity(unitID, 0, 0, 0)
+	mcSetPosition(unitID, px, py, pz)
+	
+	local function SitLoop()
+		local landDuration = 0
+		
+		while true do
+			if landingUnit[unitID].abort or not landingUnit[unitID].landed then
+				spSetUnitLeaveTracks(unitID, true)
+				spSetUnitVelocity(unitID, 0, 0, 0)
+				mcDisable(unitID)
+				unitMovectrled[unitID] = nil
+				landingUnit[unitID] = nil
+				return
+			end
+			
+			if landData.mobilePad then
+				local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(landData.padID, landData.padPieceID)
+				local newPadHeading = acos(dz)
+				if dx < 0 then
+					newPadHeading = 2*PI-newPadHeading
+				end
+				mcSetPosition(unitID, px, py, pz)
+				mcSetRotation(unitID,0,headingDiff+newPadHeading,0)
+			end
+			
+			landDuration = landDuration + 1
+			
+			if landDuration%15 == 0 then
+				local stunned_or_inbuild = spGetUnitIsStunned(landData.padID)
+				if stunned_or_inbuild then
+					landDuration = landDuration - 15
+				else
+					local hp, maxHP = spGetUnitHealth(unitID)
+					if hp < maxHP then
+						spSetUnitHealth(unitID, min(maxHP, hp + HEAL_PER_HALF_SECOND))
+					elseif REFUEL_TIME <= landDuration then
+						break
+					end
+				end
+			end
+			
+			Sleep()
+		end
+		
+		spSetUnitLeaveTracks(unitID, true)
+		spSetUnitVelocity(unitID, 0, 0, 0)
+		mcDisable(unitID)
+		unitMovectrled[unitID] = nil
+		landingUnit[unitID] = nil
+		
+		GG.LandComplete(unitID)
+	end
+	
+	StartScript(SitLoop)
 end
 
 local function CircleToLand(unitID, goal)
@@ -71,7 +172,16 @@ local function CircleToLand(unitID, goal)
 	local turnCircleRadius = 180
 	local turnCircleRadiusSq = turnCircleRadius^2
 	
-	local _,_,_,maxSpeed = spGetUnitVelocity(unitID)
+	local disSq = (goal[1] - start[1])^2 + (goal[2] - start[2])^2 + (goal[3] - start[3])^2
+	if disSq < padSnapRangeSqr then
+		turnCircleRadius = 1
+	end
+	
+	local vx,vy,vz,maxSpeed = spGetUnitVelocity(unitID) -- 4th argument not present in 91.0
+	if not maxSpeed then
+		maxSpeed = sqrt(vx*vx + vy*vy + vz*vz)
+	end
+	
 	local targetSpeed = ud.speed/30
 	
 	local heading = spGetUnitHeading(unitID)*HEADING_TO_RAD
@@ -212,7 +322,8 @@ local function CircleToLand(unitID, goal)
 	--]]
 	
 	-- Roll Animation
-	local _,_,roll = spGetUnitRotation(unitID)
+	local roll = 0
+	--local _,_,roll = spGetUnitRotation(unitID) -- function not present in 91.0
 	roll = -roll
 	
 	local rollStopFudgeDistance = maxSpeed*25
@@ -233,7 +344,16 @@ local function CircleToLand(unitID, goal)
 		
 		local prevX, prevY, prevZ = start[1], start[2], start[3]
 		
-		while currentDistance < totalDist do
+		while currentDistance + currentSpeed*2 < totalDist do
+			
+			if landingUnit[unitID].abort then
+				spSetUnitLeaveTracks(unitID, true)
+				mcDisable(unitID)
+				unitMovectrled[unitID] = nil
+				landingUnit[unitID] = nil
+				return
+			end
+			
 			local px, pz = DistanceToPosition(currentDistance)
 			local py = TimeToVerticalPositon(currentTime)
 			local direction = DistanceToDirection(currentDistance)
@@ -241,6 +361,7 @@ local function CircleToLand(unitID, goal)
 			mcSetRotation(unitID,0,direction,roll)
 			mcSetPosition(unitID, px, py, pz)
 			mcSetVelocity(unitID, px - prevX, py - prevY, pz - prevZ)
+			spSetUnitVelocity(unitID, px - prevX, 0, pz - prevZ)
 			
 			currentDistance = currentDistance + currentSpeed
 			currentSpeed = currentSpeed + acceleration
@@ -270,36 +391,32 @@ local function CircleToLand(unitID, goal)
 		end
 		
 		local px, pz = DistanceToPosition(totalDist)
-		mcSetPosition(unitID, px, goal[2], pz)
 		
-		spSetUnitLeaveTracks(unitID, true)
-		spSetUnitVelocity(unitID, 0, 0, 0)
-		mcDisable(unitID)
-		unitMovectrled[unitID] = nil
+		landingUnit[unitID].landed = true
+		SitOnPad(unitID)
 	end
 	
 	StartScript(LandLoop)
+end
+
+function GG.SendBomberToPad(unitID, padID, padPieceID)
+	local padDefID = Spring.GetUnitDefID(padID)
+	landingUnit[unitID] = {
+		mobilePad = padDefID and mobilePadDefs[padDefID],
+		padID = padID,
+		padPieceID = padPieceID,
+	}
 	
+	local px, py, pz = Spring.GetUnitPiecePosDir(padID, padPieceID)
+	CircleToLand(unitID, {px,py,pz})
 end
 
-function gadget:AllowCommand_GetWantedCommand()
-	return true
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()
-	return true
-end
-
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD.ATTACK then
-		CircleToLand(unitID, {cmdParams[1],cmdParams[2],cmdParams[3]})
-		return false
+function GG.LandAborted(unitID)
+	if landingUnit[unitID] then
+		landingUnit[unitID].abort = true
 	end
-	return true
 end
 
--- a bit convoluted for this but might be					 
--- useful for lua unit scripts
 local function UpdateCoroutines() 
 	local newCoroutines = {} 
 	for i=1, #coroutines do 
@@ -314,6 +431,18 @@ local function UpdateCoroutines()
 	end
 end
 
+local function UpdatePadLocations(f)
+	for unitID, data in pairs(landingUnit) do
+		if data.mobilePad and not data.landed then
+			local px, py, pz = Spring.GetUnitPiecePosDir(data.padID, data.padPieceID)
+			CircleToLand(unitID, {px,py,pz})
+		end
+	end
+end
+
 function gadget:GameFrame(f)
 	UpdateCoroutines()
+	if f%3 == 1 then
+		UpdatePadLocations()
+	end
 end
