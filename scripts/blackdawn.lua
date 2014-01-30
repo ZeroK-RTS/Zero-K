@@ -9,7 +9,7 @@ local Lwingengine = piece 'Lwingengine'
 local Rengine = piece 'Rengine' 
 local Lengine = piece 'Lengine' 
 
-smokePiece = {base}
+local smokePiece = {base}
 
 include "constants.lua"
 
@@ -32,7 +32,7 @@ local function TiltWings()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(TiltWings)
 	Turn( Lwingengine, x_axis, math.rad(-90), math.rad(500) )
 	Turn( Rwingengine, x_axis, math.rad(-90), math.rad(500) )

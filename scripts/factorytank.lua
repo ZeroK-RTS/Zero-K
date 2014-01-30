@@ -39,7 +39,7 @@ local pad = piece "pad"
 --local vars
 local nanoPieces = {emit_1,emit_2,emit_3}
 local nanoIdx = 1
-smokePiece = { piece "wing_1", piece "wing_2", piece "wing_3" }
+local smokePiece = { piece "wing_1", piece "wing_2", piece "wing_3" }
 
 --opening animation of the factory
 local function Open()
@@ -117,7 +117,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

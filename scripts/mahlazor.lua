@@ -15,7 +15,7 @@ local shooting = 0
 
 local max = math.max
 
-smokePiece = {base}
+local smokePiece = {base}
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -77,7 +77,7 @@ function script.Create()
 	--Turn( flashpoint , x_axis, math.rad(0) )
 	Hide( mah_lazer)
 	Hide( downbeam)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)

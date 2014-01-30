@@ -18,7 +18,7 @@ local bl = piece 'thigh_bacr' 	-- back left
 local ml = piece 'thigh_midr' 	-- middle left
 local fl = piece 'thigh_fror' 	-- front left
 
-smokePiece = {gaster}
+local smokePiece = {gaster}
 
 local weaponPieces = {
 	[1] = {aimFrom = aimpoint, flare = aimpoint},
@@ -99,7 +99,7 @@ local function RestoreLegs()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()

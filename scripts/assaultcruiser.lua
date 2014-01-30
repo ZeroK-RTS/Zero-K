@@ -29,7 +29,7 @@ end
 --------------------------------------------------------------------
 --constants
 --------------------------------------------------------------------
-smokePiece = {lowerhull, radarbase, upperhull}
+local smokePiece = {lowerhull, radarbase, upperhull}
 
 local SIG_RESTORE = 1
 local SIG_MOVE = 2
@@ -55,7 +55,7 @@ function script.Create()
 	Turn(turretPieces[4].turret, y_axis, math.rad(180))
 	Turn(turretPieces[5].turret, y_axis, math.rad(180))
 	Spin(radardish, y_axis, math.rad(100))
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()

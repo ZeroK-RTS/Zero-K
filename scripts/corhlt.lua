@@ -6,7 +6,7 @@ include "constants.lua"
 local basebottom, basemid, basetop, holder, housing, spindle, aim = piece('basebottom', 'basemid', 'basetop', 'holder', 'housing', 'spindle', 'aim')
 local flares = {piece('flare1', 'flare2', 'flare3')}
 
-smokePiece = {basebottom, basemid, basetop}
+local smokePiece = {basebottom, basemid, basetop}
 
 ----------------------------------------------------------------------------------------------
 -- Local Constants
@@ -39,7 +39,7 @@ end
 -- Script Functions
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 ----------------------------------------------------------------------------------------------

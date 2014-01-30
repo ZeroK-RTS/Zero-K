@@ -31,7 +31,7 @@ local muzzle5 = piece 'muzzle5'
 
 include "constants.lua"
 
-smokePiece = {body,landpad1,landpad2,landpad3,landpad4,landpad5,landpad6,landpad7,landpad8,landpad9}
+local smokePiece = {body,landpad1,landpad2,landpad3,landpad4,landpad5,landpad6,landpad7,landpad8,landpad9}
 --local nanoPieces = {}
 
 local missileSpots = {
@@ -53,7 +53,7 @@ function script.Create()
 	Hide( muzzle5)
 	Hide( wake1)
 	Hide( wake2)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	
 	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
 		Sleep(1000)

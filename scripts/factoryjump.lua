@@ -11,7 +11,7 @@ local head1, head2, nano1, nano2, nano3, nano4 = piece('head1', 'head2', 'nano1'
 --local vars
 local nanoPieces = {nano1, nano2, nano3, nano4}
 local nanoIdx = 1
-smokePiece = {base, head1, head2}
+local smokePiece = {base, head1, head2}
 
 local SIG_Open = 1
 local SIG_Close = 2
@@ -56,7 +56,7 @@ function script.Create()
 	Move(side1, z_axis, 20)
 	Move(side2, z_axis, 10)
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.QueryNanoPiece()

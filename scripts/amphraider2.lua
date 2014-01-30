@@ -6,7 +6,7 @@ local rshoulder, rgun, rflare, lshoulder, lgun, lflare = piece('rshoulder', 'rgu
 
 local firepoints = {[0] = lflare, [1] = rflare}
 
-smokePiece = {torso}
+local smokePiece = {torso}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local PACE = 3
@@ -346,7 +346,7 @@ function script.Create()
 	TANK_MAX = UnitDefs[Spring.GetUnitDefID(unitID)].customParams.maxwatertank
 	--StartThread(Walk)
 
-	StartThread(SmokeUnit)	
+	StartThread(SmokeUnit, smokePiece)	
 end
 
 local function RestoreAfterDelay()

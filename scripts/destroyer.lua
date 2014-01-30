@@ -10,7 +10,7 @@ local gunPieces = {
 }
 local missiles = { piece("missile1", "missile2", "missile3", "missile4") }
 
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 ----------------------------------------------------------
 ----------------------------------------------------------
 
@@ -42,7 +42,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	for i=1,#missiles do
 		Turn(missiles[i], x_axis, -math.rad(90))
 	end

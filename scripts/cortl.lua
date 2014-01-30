@@ -8,7 +8,7 @@ local firepoint = piece 'firepoint'
 
 local waterFire = false
 
-smokePiece = {base}
+local smokePiece = {base}
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -47,7 +47,7 @@ function script.Create()
 		Turn( arm2 , x_axis, math.rad(180))
 		--Turn( turret , x_axis, math.rad(0))
 	end	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.AimWeapon1(heading, pitch)

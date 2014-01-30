@@ -34,7 +34,7 @@ local SIG_AIM = 2
 local SIG_OPEN = 4
 local SIG_CLOSE = 8
 
-smokePiece = { base, aim}
+local smokePiece = { base, aim}
 
 local function popUp()
 	Spring.SetUnitArmored(unitID,false)
@@ -114,7 +114,7 @@ function script.Create()
 		Sleep(1000)
 	end
 	StartThread(RestoreAfterDelay)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)

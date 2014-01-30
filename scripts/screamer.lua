@@ -5,7 +5,7 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 local base, turret, barrel, flare = piece('base', 'turret', 'barrel', 'flare')
 
-smokePiece = {turret, barrel}
+local smokePiece = {turret, barrel}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ end
 
 function script.Create()
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(IdleAnim)
 end
 

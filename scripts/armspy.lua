@@ -33,7 +33,7 @@ local forward = 2.5
 local backward = 2.3
 local up = 2
 
-smokePiece = {base, barrel}
+local smokePiece = {base, barrel}
 
 function script.Create()
 

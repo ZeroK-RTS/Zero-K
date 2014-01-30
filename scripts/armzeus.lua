@@ -17,7 +17,7 @@ local lfoot = piece 'lfoot'
 
 include "constants.lua"
 
-sfxSmokePiece = {chest}
+sfxlocal smokePiece = {chest}
 
 local aiming = false
 local walking = false
@@ -303,7 +303,7 @@ local function walk()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()

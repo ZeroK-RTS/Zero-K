@@ -15,7 +15,7 @@ local Rfoot = piece 'rfoot'
 local l_gun = piece 'l_gun' 
 local r_gun = piece 'r_gun' 
 
-smokePiece = {torso}
+local smokePiece = {torso}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ end
 
 function script.Create()
 	--Move( emit, y_axis, 20)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local spGetUnitWeaponState = Spring.GetUnitWeaponState

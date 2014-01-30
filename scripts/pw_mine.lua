@@ -3,7 +3,7 @@ include "constants.lua"
 local base = piece "base"
 local turret = piece "turret"
 
-smokePiece = {turret}
+local smokePiece = {turret}
 
 local function TurnTurret ()
 	while ( true ) do

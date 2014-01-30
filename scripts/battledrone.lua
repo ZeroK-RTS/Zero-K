@@ -3,7 +3,7 @@ include "constants.lua"
 --pieces
 local base, flare = piece('base', 'flare')
 
-smokePiece = {base}
+local smokePiece = {base}
 
 ----------------------------------------------------------
 

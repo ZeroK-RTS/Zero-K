@@ -11,7 +11,7 @@ local flaremain, flarel1, flarel2, flarer1, flarer2 = piece('flaremain', 'flarel
 
 local flares = {flarel1, flarer1, flarel2, flarer2}
 
-smokePiece = {pelvis, torso}
+local smokePiece = {pelvis, torso}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -130,7 +130,7 @@ end
 
 function script.Create()
 	--StartThread(Walk)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(WeaponRangeUpdate)
 	local height = select(2, Spring.GetUnitPosition(unitID))
 	if height < -20 then

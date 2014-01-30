@@ -24,7 +24,7 @@ local leg3 = piece 'leg3' 	-- back left
 local leg4 = piece 'leg4' 	-- front left
 local gflash = piece 'gflash' 
 
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -231,7 +231,7 @@ function script.Create()
 	Hide( flare7)
 	
 	--StartThread(MotionControl)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--StartThread(BlinkingLight)
 	StartThread(CurlDelay)
 end

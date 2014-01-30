@@ -24,7 +24,7 @@ local rfoot = piece "rfoot"
 local missl, exhaustl = piece("missl", "exhaustl")
 local missr, exhaustr = piece("missr", "exhaustr")
 
-smokePiece = {body, pelvis}
+local smokePiece = {body, pelvis}
 
 local points = {
 	{missile = missl, exhaust = exhaustl},
@@ -46,7 +46,7 @@ local SIG_Walk = 2
 local SIG_Aim  = 4
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Walk()

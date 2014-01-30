@@ -27,7 +27,7 @@ local r_foot = piece "r_foot"
 local lbarrel, rbarrel = piece("lbarrel", "rbarrel")
 local lpilot, rpilot = piece("lpilot", "rpilot")
 
-smokePiece = {pelvis, torso}
+local smokePiece = {pelvis, torso}
 
 local shotPieces = {
 	{lpilot, rpilot},
@@ -151,7 +151,7 @@ local function FireDelayLoop()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(FireDelayLoop)
 end
 

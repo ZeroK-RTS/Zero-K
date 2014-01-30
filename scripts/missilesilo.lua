@@ -69,7 +69,7 @@ function RemoveMissile(deadID)
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartBuilding()

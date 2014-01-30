@@ -9,7 +9,7 @@ local lgun, lbarrel1, lbarrel2, rgun, rbarrel1, rbarrel2 = piece('lgun', 'lbarre
 
 local firepoints = {lbarrel1, rbarrel1, lbarrel2, rbarrel2}
 
-smokePiece = {torso}
+local smokePiece = {torso}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local PACE = 2
@@ -295,7 +295,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)	
+	StartThread(SmokeUnit, smokePiece)	
 end
 
 local function RestoreAfterDelay()

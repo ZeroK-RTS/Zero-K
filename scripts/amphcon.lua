@@ -8,7 +8,7 @@ local rdoor, rnozzle, rnano, ldoor, lnozzle, lnano = piece('rdoor', 'rnozzle', '
 
 local nanoPieces = {[0] = lnano, [1] = rnano}
 
-smokePiece = {torso}
+local smokePiece = {torso}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local PERIOD = 500
@@ -69,7 +69,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

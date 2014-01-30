@@ -20,7 +20,7 @@ local forearmR = piece 'forearmr'
 local shinR = piece 'shinr' 
 local shinL = piece 'shinl' 
 
-smokePiece = {torso}
+local smokePiece = {torso}
 local nanoPieces = {snout}
 
 local flares = {[0] = flareL, [1] = flareR}
@@ -176,7 +176,7 @@ function script.Create()
 	Move(flareR, y_axis, -2)
 	Turn(flareL, x_axis, rightAngle)
 	Turn(flareR, x_axis, rightAngle)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

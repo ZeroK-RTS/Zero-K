@@ -13,7 +13,7 @@ local leg5 = piece 'leg5' 	-- middle left
 local leg6 = piece 'leg6' 	-- front left
 local platform, gun, elevator, elevator2, panel_r, panel_l, cover_r, cover_l, flare = piece('platform', 'gun', 'elevator', 'elevator2', 'panel_r', 'panel_l', 'cover_r', 'cover_l', 'flare')
 
-smokePiece = {base, gun}
+local smokePiece = {base, gun}
 local nanoPieces = {flare}
 
 --------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ local function RestoreLegs()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

@@ -38,7 +38,7 @@ local MIN_PIVOT = math.rad(-15)
 local PIVOT_SPEED = math.rad(60)
 local MIN_DIFF = 3
 
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 
 local function ImpactTilt(x,z)
 	Turn( base , z_axis, math.rad(-z), math.rad(105) )
@@ -135,7 +135,7 @@ function script.AimFromWeapon(num) return flare end
 function script.QueryWeapon(num) return flare end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	script.Activate()
 	Turn( rear , y_axis, 0.01, PIVOT_SPEED )
 end

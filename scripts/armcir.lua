@@ -57,7 +57,7 @@ local flare2 = piece 'flare_l'
 --------------------------------------------------------------------------------
 -- constants and variables
 --------------------------------------------------------------------------------
-smokePiece = {rotating_bas, mc_rocket_ho}
+local smokePiece = {rotating_bas, mc_rocket_ho}
 
 local TURN_SPEED = 145
 local TILT_SPEED = 200
@@ -138,7 +138,7 @@ function script.Create()
 		Hide(plovak)
 	end
 	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	
 	--Spin(rotating_bas, y_axis, 0.5)
 	

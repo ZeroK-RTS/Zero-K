@@ -19,7 +19,7 @@ local flare3 = piece "flare3"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-smokePiece = { shell_1, shell_2, cannonbase, heatray }
+local smokePiece = { shell_1, shell_2, cannonbase, heatray }
 
 --variables
 local heat = false
@@ -96,7 +96,7 @@ function script.Deactivate ( )
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 

@@ -32,7 +32,7 @@ local flare1 = piece 'flare1'
 
 local tailPieces = {tail1, tail2, tail3, tail4, tail5, tailgun}
 
-smokePiece = {base, tailgun}
+local smokePiece = {base, tailgun}
 
 local weaponPieces = {
 	[1] = {aimFrom = body, flare = {body}},
@@ -103,7 +103,7 @@ end
 
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 --	Turn( armr1 , z_axis, math.rad(30), 100 )
 --	Turn( arml1 , z_axis, math.rad(-30), 100 )
 end

@@ -4,7 +4,7 @@ local base = piece "base"
 local gen1 = piece "gen1"
 local gen2 = piece "gen2"
 
-smokePiece = {gen1, gen2}
+local smokePiece = {gen1, gen2}
 
 function script.Activate ( )
 	Spin(gen1, y_axis, 1, 0.01)

@@ -74,7 +74,7 @@ end
 --]]
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--StartThread(SpinScienceThread)
 end
 

@@ -21,7 +21,7 @@ local pivot = piece "pivot"
 local barrel = piece "barrel"
 local flare = piece "flare"
 
-smokePiece = {fuselage, engineL, engineR}
+local smokePiece = {fuselage, engineL, engineR}
 
 --constants
 local tiltAngle = math.rad(10)

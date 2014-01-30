@@ -40,7 +40,7 @@ local jet1 = piece 'jet1'
 local jet2 = piece 'jet2' 
 local fix = piece 'fix'
 
-smokePiece = {torso, pelvis, flagellum}
+local smokePiece = {torso, pelvis, flagellum}
 
 local weaponPieces = {
 	{aimFrom = torso, query = {rf1, lf1, rf2, lf2, rf3, lf3}, index = 1},
@@ -266,7 +266,7 @@ function script.Create()
 	Hide( jet1)
 	Hide( jet2)
 	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Stopping()

@@ -25,6 +25,8 @@ local rb_knee = piece "legrrmid"
 local rb_foot = piece "legrrshin"
 
 --constants
+include "constants.lua"
+
 local PI = math.pi
 local sa = math.rad(20)
 local ma = math.rad(60)
@@ -32,8 +34,9 @@ local la = math.rad(100)
 local pause = 300
 local dirtfling = 1024+2
 
+local smokePiece = {body}
+
 --variables
-local walking = false
 local burrowed = false
 local forward = 8
 local backward = 5
@@ -47,12 +50,15 @@ local cloaked = COB.CLOAKED
 local stealth = COB.STEALTH
 
 --signals
+local SIG_BURROW = 1
 local SIG_Walk = 2
 
 local function Burrow()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
+	Signal( SIG_BURROW )
+	SetSignalMask( SIG_BURROW )
+	Sleep(400)
 	
+	Signal( SIG_Walk )
 	burrowed = true
 	EmitSfx( digger, dirtfling )
 	
@@ -86,19 +92,13 @@ local function Burrow()
 	end
 end
 
-local function UnBurrow()
-	burrowed = false
-	Spring.UnitScript.SetUnitValue( cloaked, 0 )
-	Spring.UnitScript.SetUnitValue( stealth, 0 )
-	--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 0
-	EmitSfx( digger, dirtfling )
-	Move( body, 2, 0, 3 )
-	Turn( body, 1, 0, 3 )
-end
 --]]
 
 local function Walk()
-	while (walking == true) do
+	Signal( SIG_Walk )
+	SetSignalMask( SIG_Walk )
+	
+	while true do
 		
 		Turn( body, 2, .1, .5 )         	-- body roll left
 		Turn( body, 3, sa/2, 1.5 )         	-- body turn right
@@ -144,36 +144,52 @@ local function Walk()
 	end
 end
 
+local function UnBurrow()
+	Signal( SIG_BURROW )
+	burrowed = false
+	Spring.UnitScript.SetUnitValue( cloaked, 0 )
+	Spring.UnitScript.SetUnitValue( stealth, 0 )
+	Move( body, 2, 0, 3 )
+	Turn( body, 1, 0, 3 )
+	--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 0
+	Sleep(33)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0)
+	GG.attUnits[unitID] = true
+	GG.UpdateUnitAttributes(unitID)
+	
+	Sleep(600)
+	
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
+	EmitSfx( digger, dirtfling )
+	
+	StartThread( Walk )
+end
+
 local function Talk()
 	Spring.Echo("Hello World! ... Directive: Kill all humans")
 end
 
 function script.Create()
-	
-end
-
-local function Moving()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
-	
-	StartThread( UnBurrow )
-	walking = true
-	StartThread( Walk )
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()
-	StartThread( Moving )
+	Signal( SIG_BURROW )
+	if burrowed then
+		StartThread( UnBurrow )
+	else
+		StartThread( Walk )
+	end
 	--StartThread( Talk )
 end
 
 function script.StopMoving()
-	walking = false
 	StartThread( Burrow )
 end
 
 function script.Killed()
 	--Spring.Echo("I am ded")
-	--[[ desync testing
 	Explode( lf_leg, SFX.EXPLODE )
 	Explode( lb_leg, SFX.EXPLODE )
 	Explode( rf_leg, SFX.EXPLODE )
@@ -182,5 +198,4 @@ function script.Killed()
 	Explode( lb_foot, SFX.EXPLODE )
 	Explode( rf_foot, SFX.EXPLODE )
 	Explode( rb_foot, SFX.EXPLODE )
-	--]]
 end

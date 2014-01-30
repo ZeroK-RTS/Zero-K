@@ -10,7 +10,7 @@ local firepoint = piece 'firepoint'
 local doorl = piece 'doorl'
 local doorr = piece 'doorr'
 
-smokePiece = {base}
+local smokePiece = {base}
 
 -- Signal definitions
 local SIG_MOVE = 1
@@ -19,7 +19,7 @@ local gun_1 = 0
 
 function script.Create()
 	restore_delay = 3000
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Turn(turret, x_axis, math.rad(-90), math.rad(10000) )
 	Turn(doorl, z_axis, math.rad(-100), math.rad(240) )
 	Turn(doorr, z_axis, math.rad(100), math.rad(240) )

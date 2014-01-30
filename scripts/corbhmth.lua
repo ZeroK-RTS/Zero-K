@@ -26,10 +26,10 @@ local SIG_AIM = 2
 local RECOIL_DISTANCE = -3
 local RECOIL_RESTORE_SPEED = 1
 
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.AimWeapon(num, heading, pitch)

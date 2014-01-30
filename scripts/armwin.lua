@@ -46,7 +46,7 @@ function SpinWind()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
         baseDirection = math.random(0,tau)
 	Turn( base , y_axis, baseDirection )
 	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)

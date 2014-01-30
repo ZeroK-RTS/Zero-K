@@ -12,7 +12,7 @@ local base, middle, heading,
 
 local spGetUnitVelocity = Spring.GetUnitVelocity
 	
-smokePiece = { base}
+local smokePiece = { base}
 
 local root3on2 = math.sqrt(3)/2
 
@@ -176,7 +176,7 @@ end
 	Move(rrack, z_axis, -4)
 	Move(lrack, z_axis, -4)
 	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(TiltBody)
 end
 

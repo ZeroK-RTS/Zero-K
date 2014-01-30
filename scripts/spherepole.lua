@@ -26,7 +26,7 @@ local rthigh = piece "rthigh"
 local rshin = piece "rshin"
 local rfoot = piece "rfoot"
 
-smokePiece = {head, hips, chest}
+local smokePiece = {head, hips, chest}
 
 
 --constants
@@ -42,7 +42,7 @@ local SIG_Walk = 2
 local SIG_Aim  = 4
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Turn( lforearm, x_axis, 0, 2 )
 	Turn( lshoulder, z_axis, - 0.9, 6 )
 	Turn( lshoulder, x_axis, - 0.8, 6 )

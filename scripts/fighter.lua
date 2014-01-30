@@ -4,7 +4,7 @@ include "constants.lua"
 local  base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body 
 	= piece( "base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
 
-smokePiece = {base, rwing, lwing}
+local smokePiece = {base, rwing, lwing}
 
 --variables
 local shotCycle = 0

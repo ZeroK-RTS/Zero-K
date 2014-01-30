@@ -31,7 +31,7 @@ local land = piece "land"
 --local vars
 local nanoPieces = {emit1,emit2}
 local nanoIdx = 1
-smokePiece = { piece "bay", piece "pad1", piece "fuelpad" }
+local smokePiece = { piece "bay", piece "pad1", piece "fuelpad" }
 
 --opening animation
 local function Open()
@@ -132,7 +132,7 @@ function padchange()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	while buildprogress < 1 do

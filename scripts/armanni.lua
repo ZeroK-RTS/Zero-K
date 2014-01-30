@@ -10,7 +10,7 @@ local antenna = piece 'antenna'
 local door1 = piece 'door1' 
 local door2 = piece 'door2' 
 
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 
 include "constants.lua"
 
@@ -63,7 +63,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 function script.Activate()
 	Spin( radar , y_axis, math.rad(100) )

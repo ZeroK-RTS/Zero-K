@@ -22,7 +22,7 @@ local rleg = piece 'rleg'
 local r_foot = piece 'r_foot' 
 local head = piece 'head' 
 
-smokePiece = {torso}
+local smokePiece = {torso}
 local nanoPieces = {nanospray}
 --------------------------------------------------------------------------------
 -- constants
@@ -148,7 +148,7 @@ function script.Create()
 	Turn( biggun , x_axis, math.rad(41) )
 	Turn( nanolathe , x_axis, math.rad(36) )
 	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

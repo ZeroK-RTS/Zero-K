@@ -9,7 +9,7 @@ local wheels3 = piece 'wheels3'
 local wheels4 = piece 'wheels4' 
 local flare = piece 'flare' 
 
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 
 local RESTORE_DELAY = 4000
 
@@ -74,7 +74,7 @@ function script.Create()
 	Hide( wheels2)
 	Hide( wheels3)
 	Hide( wheels4)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(HoverFX)
 end
 

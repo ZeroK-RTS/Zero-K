@@ -9,7 +9,7 @@ local land4 = piece 'land4'
 local radar = piece 'radar' 
 
 local nanoPieces = {radar}
-smokePiece = {base,land1,land2,land3,land4}
+local smokePiece = {base,land1,land2,land3,land4}
 
 local function SpinRadar()
 	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
@@ -19,7 +19,7 @@ local function SpinRadar()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(SpinRadar)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end

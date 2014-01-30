@@ -17,7 +17,7 @@ local flares = {
     {base}
 }
 
-smokePiece = {torso}
+local smokePiece = {torso}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -283,7 +283,7 @@ function script.Create()
         Turn(rbflare1, y_axis, math.rad(45))
         Turn(rbflare2, y_axis, math.rad(45))       
         
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
         StartThread(SomersaultLoop)
 end
 

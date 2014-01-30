@@ -12,7 +12,7 @@ local bomberWeaponDefs = {
 
 include "constants.lua"
 
-smokePiece = {base}
+local smokePiece = {base}
 
 local SIG_Activate = 2
 local SIG_Defensive = 4
@@ -57,7 +57,7 @@ function script.Deactivate()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Turn( base , y_axis, math.rad(45) )	
 end
 

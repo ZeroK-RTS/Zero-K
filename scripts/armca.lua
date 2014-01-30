@@ -20,13 +20,13 @@ local rightClawBit 		= piece 'RightClawBit'
 local engShield1 		= piece 'EngShield1'
 local engShield2 		= piece 'EngShield2'
 
-smokePiece = {base, engine1, engine2}
+local smokePiece = {base, engine1, engine2}
 local nanoPieces = {nano, CentreNano, LeftNano}
 
 function script.Create()
 	Move( engShield1, y_axis, 0, 0.5 ) 
 	Move( engShield2, y_axis, 0, 0.5 ) 
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

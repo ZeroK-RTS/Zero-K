@@ -22,7 +22,7 @@ local unitLoaded = nil
 local SIG_OPENDOORS = 1
 local SIG_CLOSEDOORS = 2
 
-smokePiece = {base, engineEmit}
+local smokePiece = {base, engineEmit}
 
 include "constants.lua"
 
@@ -63,7 +63,7 @@ function closeDoors()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Activate()

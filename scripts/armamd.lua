@@ -5,7 +5,7 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 local base, door1, door2, brace, missile, aimpoint = piece('base', 'door1', 'door2', 'brace', 'missile', 'aimpoint') 
 
-smokePiece = {base}
+local smokePiece = {base}
 
 --------------------------------------------------------------------------------
 -- signals
@@ -43,7 +43,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function RestoreAfterDelay()

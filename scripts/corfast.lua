@@ -22,7 +22,7 @@ local SIG_BUILD = 2
 local SIG_WALK = 1
 local RESTORE_DELAY = 1000
 
-smokePiece = {torso}
+local smokePiece = {torso}
 local nanoPiece = lhand
 
 local usingNano = false
@@ -584,7 +584,7 @@ function script.Create()
 	Hide( jump)
 	Hide( flare)
 	Turn( thrust , x_axis, math.rad(70), math.rad(2000) )
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, {nanoPiece})
 end
 

@@ -17,7 +17,7 @@ local emits = {
 local SIG_AIM = 1
 local SIG_RESTORE = 2
 
-smokePiece = { base}
+local smokePiece = { base}
 
 function script.Activate()
 	Spin( rffan , y_axis, rad(360), rad(100) )
@@ -69,7 +69,7 @@ function script.Create()
 	Turn( rrfanbase , z_axis, math.rad(-22.5) )
 	Turn( lrfanbase , z_axis, math.rad(22.5) )
 
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(TiltBody)
 end
 

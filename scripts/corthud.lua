@@ -63,7 +63,7 @@ end
 
 function script.Create()
 	gun_1 = true
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Stopping()

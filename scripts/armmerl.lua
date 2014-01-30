@@ -5,7 +5,7 @@ local tracks1, tracks2, tracks3, tracks4 = piece("tracks1", "tracks2", "tracks3"
 
 local wheels = { piece("wheels1", "wheels2", "wheels3", "wheels4", "wheels5", "wheels6") }
 
-smokePiece = {bay, gantry}
+local smokePiece = {bay, gantry}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ function script.Create()
 	Hide( tracks3)
 	Hide( tracks4)
 	Move( bay , x_axis, -BAY_DISTANCE  )
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

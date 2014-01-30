@@ -20,7 +20,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitHeading = Spring.GetUnitHeading
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
-smokePiece = {exhaustTop, exhaustRight, exhaustLeft}
+local smokePiece = {exhaustTop, exhaustRight, exhaustLeft}
 
 local bombs = 1
 
@@ -40,7 +40,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.QueryWeapon(num)

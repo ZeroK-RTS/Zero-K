@@ -30,7 +30,7 @@ local footl = piece 'footl'
 local footr = piece 'footr' 
 local backpack = piece 'backpack' 
 
-smokePiece = {torso, backpack}
+local smokePiece = {torso, backpack}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ end
 
 function script.Create()
 	--Turn( forearmr , x_axis, math.rad(-45), math.rad(280) )
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(UnpackGunInstant)
 	StartThread(IdleAnim)
 	end

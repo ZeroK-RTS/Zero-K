@@ -1,10 +1,10 @@
 include "constants.lua"
 
 local base, cylinder, turret, jammersturret, jam1, jam2, deploy = piece ('base', 'cylinder', 'turret', 'jammersturret', 'jam1', 'jam2', 'deploy')
-smokePiece = {base}
+local smokePiece = {base}
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Activate()

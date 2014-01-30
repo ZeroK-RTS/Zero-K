@@ -11,7 +11,7 @@ local disks = {
 }
 local firepoints = {piece('fp1l', 'fp1r', 'fp2l', 'fp2r', 'fp3l', 'fp3r')}
 
-smokePiece = {body}
+local smokePiece = {body}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local PACE = 2
@@ -89,7 +89,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)	
+	StartThread(SmokeUnit, smokePiece)	
 end
 
 local function RestoreAfterDelay()

@@ -179,7 +179,7 @@ end
 function script.Create()
 	bMoving = false
 	bAiming = false
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()

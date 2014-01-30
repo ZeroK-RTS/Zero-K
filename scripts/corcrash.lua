@@ -45,7 +45,7 @@ local r_toe = piece "r_toe"
 local rf_toe = piece "rf_toe"
 local rb_toe = piece "rb_toe"
 
-smokePiece = {head, pod}
+local smokePiece = {head, pod}
 
 local points = {
 	{missile = m_1, exhaust = ex_1},
@@ -73,7 +73,7 @@ function script.Create()
 	Turn( ex_2, x_axis, math.rad(170) )
 	Turn( ex_3, x_axis, math.rad(170) )
 	Turn( axle, x_axis, math.rad(-30) )
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Walk()

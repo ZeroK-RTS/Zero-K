@@ -53,7 +53,7 @@ local rb_foot = piece "rb_foot"
 
 local emit = piece "emit"
 
-smokePiece = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
+local smokePiece = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
 
 local weaponPieces = {
 	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye},
@@ -354,7 +354,7 @@ function script.Create()
 	Turn( rf_ball, y_axis, math.rad(-45) )
 	Turn( lb_ball, y_axis, math.rad(-45) )
 	Turn( rb_ball, y_axis, math.rad(45) )
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Stopping()

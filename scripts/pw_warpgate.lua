@@ -4,10 +4,10 @@ local base = piece "base"
 local gen1 = piece "gen1"
 local gen2 = piece "gen2"
 
-smokePiece = {gen1}
+local smokePiece = {gen1}
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Activate ( )

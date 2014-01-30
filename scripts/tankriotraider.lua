@@ -32,7 +32,7 @@ local WHEEL_TURN_SPEED1 = 480
 local WHEEL_TURN_SPEED1_ACCELERATION = 75
 local WHEEL_TURN_SPEED1_DECELERATION = 200
 
-smokePiece = {main, turret}
+local smokePiece = {main, turret}
 
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
@@ -242,5 +242,5 @@ function script.Create()
 	end
 	
 	StartThread(AnimationControl)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end

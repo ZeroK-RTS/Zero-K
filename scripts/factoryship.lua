@@ -12,7 +12,7 @@ local pontoon = piece 'pontoon'
 local emitPieces = {piece('emit04', 'emit08', 'emit012')}
 local nanoNum = 1
 
-smokePiece = {base}
+local smokePiece = {base}
 
 -- Signal definitions
 local SIG_BUILD = 2
@@ -65,7 +65,7 @@ end
 
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, emitPieces)
 end
 

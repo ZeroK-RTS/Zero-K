@@ -7,14 +7,14 @@ local aim = piece "aim"
 local emitnano = piece "emitnano"
 
 --local vars
-smokePiece = { piece "aim", piece "body" }
+local smokePiece = { piece "aim", piece "body" }
 local nanoPieces = { piece "aim" }
 
 local nanoTurnSpeedHori = 0.5 * math.pi
 local nanoTurnSpeedVert = 0.1 * math.pi
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(UpdateNanoDirectionThread, nanoPieces, 500, nanoTurnSpeedHori, nanoTurnSpeedVert)
 	Spring.SetUnitNanoPieces(unitID, {emitnano})
 end

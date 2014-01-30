@@ -9,7 +9,7 @@ local muzz2 = piece 'muzzle2'
 local thrust1 = piece 'thrust1' 
 local thrust2 = piece 'thrust2' 
 
-smokePiece = {base}
+local smokePiece = {base}
 
 include "constants.lua"
 
@@ -17,7 +17,7 @@ local gun_1 = false
 local firestate = Spring.GetUnitStates(unitID).firestate
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 

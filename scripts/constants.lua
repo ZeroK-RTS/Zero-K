@@ -75,7 +75,7 @@ DETO_W8 = 4103
 local SMOKEPUFF = 258
 
 -- useful functions
-function SmokeUnit()
+function SmokeUnit(smokePiece)
 	local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 	
 	if not (smokePiece and smokePiece[1]) then 

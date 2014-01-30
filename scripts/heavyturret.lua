@@ -3,7 +3,7 @@ include "constants.lua"
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
 local base, turret, breech, barrel1, barrel2, flare = piece("base", "turret", "breech", "barrel1", "barrel2", "flare")
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 
 -- Signal definitions
 local SIG_AIM = 1
@@ -36,7 +36,7 @@ function script.Shot(num)
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

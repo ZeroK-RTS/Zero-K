@@ -27,7 +27,7 @@ local lfoot = piece 'lfoot'
 local rleg = piece 'rleg' 
 local rfoot = piece 'rfoot' 
 
-smokePiece = {torso}
+local smokePiece = {torso}
 local nanoPieces = {lnanoflare}
 --------------------------------------------------------------------------------
 -- constants
@@ -155,7 +155,7 @@ function script.Create()
 --	Turn( rhand , x_axis, math.rad(41) )
 --	Turn( lnanohand , x_axis, math.rad(36) )
 	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

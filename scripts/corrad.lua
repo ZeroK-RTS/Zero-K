@@ -4,7 +4,7 @@ local base = piece 'base'
 local ground = piece 'ground' 
 local head = piece 'head' 
 
-smokePiece = {head}
+local smokePiece = {head}
 
 local SCANNER_PERIOD = 1000
 
@@ -68,7 +68,7 @@ local function ScannerLoop()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--StartThread(ScannerLoop)
 	local cmd = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK)
 	if cmd then 

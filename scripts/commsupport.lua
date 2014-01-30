@@ -30,7 +30,7 @@ local ac1 = piece 'ac1'
 local ac2 = piece 'ac2' 
 local nanospray = piece 'nanospray' 
 
-smokePiece = {torso}
+local smokePiece = {torso}
 local nanoPieces = {nanospray}
 
 --------------------------------------------------------------------------------
@@ -325,7 +325,7 @@ function script.Create()
 
 	StartThread(MotionControl)
 	StartThread(RestoreAfterDelay)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 

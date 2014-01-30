@@ -15,7 +15,7 @@ local rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe = piece('rupleg', 'rmidleg', 'r
 local leftLeg = { thigh=piece'lupleg', knee=piece'lmidleg', shin=piece'lleg', foot=piece'lfoot', toef=piece'lftoe', toeb=piece'lbtoe' }
 local rightLeg = { thigh=piece'rupleg', knee=piece'rmidleg', shin=piece'rleg', foot=piece'rfoot', toef=piece'rftoe', toeb=piece'rbtoe' }
 
-smokePiece = { torso, head, shouldercannon }
+local smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
     {larmflare1, larmflare2, larmflare3, rarmflare1, rarmflare2, rarmflare3},
@@ -84,7 +84,7 @@ function script.Create()
 	Turn( larm, z_axis, -0.1)
 	Turn( rarm, z_axis, 0.1)	
 	Turn( shoulderflare, x_axis, math.rad(-90))	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Step(frontLeg, backLeg)

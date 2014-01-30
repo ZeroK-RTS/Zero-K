@@ -8,7 +8,7 @@ local wheel2 = piece "wheel2"
 local wheel3 = piece "wheel3"
 local wheel4 = piece "wheel4"
 
-smokePiece = {base, wheel1, wheel2, wheel3, wheel4}
+local smokePiece = {base, wheel1, wheel2, wheel3, wheel4}
 
 function script.Activate ( )
 	Spin(cylinder1, y_axis, 0.4, 0.001)

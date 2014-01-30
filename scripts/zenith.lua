@@ -8,13 +8,13 @@ local firept = piece "firept"
 
 local SOURCE_RANGE = 2000	-- size of the box which the emit point can be randomly placed in
 
-smokePiece = {base}
+local smokePiece = {base}
 
 function script.Create()
 	Move( firept, y_axis, 9001)
 	Move( flare, y_axis, -110)
 	Turn( flare, x_axis, math.rad(-90))
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.QueryWeapon(num) 

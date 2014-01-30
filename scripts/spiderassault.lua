@@ -41,7 +41,7 @@ local up = 1
 
 local gun = false
 
-smokePiece = {base, barrel}
+local smokePiece = {base, barrel}
 
 function script.Create()
 

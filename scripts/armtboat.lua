@@ -16,7 +16,7 @@ local LOAD_SPEED_Y = 80
 
 
 -- local vars
-smokePiece = { base }
+local smokePiece = { base }
 local loaded = false
 local emptyTable = {}
 
@@ -123,7 +123,7 @@ local function PingHeading()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--StartThread(PingHeading)
 end
 

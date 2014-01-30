@@ -30,7 +30,7 @@ include "constants.lua"
 
 local gun_1 = math.random() > 0.5
 
-smokePiece = {base, head}
+local smokePiece = {base, head}
 
 -- Signal( definitions
 local SIG_MOVE = 2
@@ -158,7 +158,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--gun_1 = torso
 	Turn( r_thigh , x_axis, math.rad(30) )
 	Turn( l_thigh , x_axis, math.rad(30) )

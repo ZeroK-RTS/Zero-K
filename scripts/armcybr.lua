@@ -17,7 +17,7 @@ local emit2 = piece 'emit2'
 local emit3 = piece 'emit3' 
 local emit4 = piece 'emit4' 
 
-smokePiece = {base}
+local smokePiece = {base}
 
 --Signal
 local SIG_move = 1
@@ -67,7 +67,7 @@ function script.MoveRate(rate)
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Hide( rearthrust)
 	Hide( wingthrust1)
 	Hide( wingthrust2)

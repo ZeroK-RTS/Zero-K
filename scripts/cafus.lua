@@ -11,7 +11,7 @@ local arm1 = piece "arm1"
 local arm2 = piece "arm2"
 local arm3 = piece "arm3"
 
-smokePiece = { piece "base", piece "arm1", piece "arm2", piece "arm3" }
+local smokePiece = { piece "base", piece "arm1", piece "arm2", piece "arm3" }
 
 local function StartAnim()
 	Show(energyball)
@@ -60,7 +60,7 @@ end
 function script.Create()
 	Hide(energyball)
 
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(Anim)
 end
 

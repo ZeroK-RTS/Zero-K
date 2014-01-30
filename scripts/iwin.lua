@@ -12,7 +12,7 @@ local built = false
 
 local push = false
 
-smokePiece = {base}
+local smokePiece = {base}
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -62,7 +62,7 @@ end
 function script.Create()
 	Turn( firepoint , z_axis, math.rad(0.04) )
 	Hide( firepoint)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
     local buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	while buildprogress < 1 do
 	    Sleep(250)

@@ -15,7 +15,7 @@ local leg4 = piece 'leg4' 	-- back left
 local leg5 = piece 'leg5' 	-- middle left
 local leg6 = piece 'leg6' 	-- front left
 
-smokePiece = {base, turret}
+local smokePiece = {base, turret}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -73,7 +73,7 @@ local function RestoreLegs()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()

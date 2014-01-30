@@ -12,7 +12,7 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local unpackSpeed = 5;
 
-smokePiece = { lidLeft, lidRight, wheel}
+local smokePiece = { lidLeft, lidRight, wheel}
 
 --variables
 local is_open = false

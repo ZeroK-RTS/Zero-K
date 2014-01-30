@@ -14,7 +14,7 @@ local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local RUN_SPEED_FAST = 5
 
-smokePiece = {torso}
+local smokePiece = {torso}
 
 local gun_1 = 0
 --------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ function script.Create()
 	Turn( lshoulder , x_axis, math.rad(22.5) )
 	Turn( llarm , x_axis, math.rad(-45) )
 
-	StartThread(SmokeUnit)	
+	StartThread(SmokeUnit, smokePiece)	
 end
 
 local function RestoreAfterDelay()

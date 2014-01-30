@@ -2,10 +2,10 @@ include "constants.lua"
 
 local base = piece "base"
 
-smokePiece = {base}
+local smokePiece = {base}
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

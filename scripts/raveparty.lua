@@ -68,7 +68,7 @@ local reloading = false
 
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	Turn(spindle, x_axis, spindleOffset + spindlePitch)
 	for i=1,6 do
 		Turn(guns[i].flare, x_axis, (math.rad(-60)* i+1))

@@ -15,7 +15,7 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 -- Signal definitions
 local SIG_AIM = 2
 
-smokePiece = {base, turret, ground}
+local smokePiece = {base, turret, ground}
 
 local function DisableCheck()
 	while true do
@@ -35,7 +35,7 @@ function script.Create()
 	Hide( flare)
 	Hide( muzzle)
 	Hide( barrel_back)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	StartThread(DisableCheck)
 end
 

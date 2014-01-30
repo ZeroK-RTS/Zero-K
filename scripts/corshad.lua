@@ -20,7 +20,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitHeading = Spring.GetUnitHeading
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
-smokePiece = {fuselage, thrustr, thrustl}
+local smokePiece = {fuselage, thrustr, thrustl}
 
 local bombs = 1
 
@@ -57,7 +57,7 @@ local function Lights()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	FakeUprightInit(xp, zp, drop) 
 	--StartThread(Lights)
 end

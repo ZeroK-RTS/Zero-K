@@ -14,7 +14,7 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets  = [[0 0 0]],
-  collisionVolumeScales   = [[14 14 14]],
+  collisionVolumeScales   = [[16 16 16]],
   collisionVolumeType	  = [[ellipsoid]],
   cloakCost              = 0,
 
@@ -55,6 +55,7 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[ARMTICK]],
   pushResistant          = 0,
+  script                 = [[armtick.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[ARMTICK_DEATH]],
   selfDestructCountdown  = 0,

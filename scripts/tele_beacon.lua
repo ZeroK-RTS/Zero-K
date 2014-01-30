@@ -5,7 +5,7 @@ local beacon, holder, sphere = piece('beacon', 'holder', 'sphere')
 
 local SIG_CEG_EFFECTS = 1
 
-smokePiece = {sphere}
+local smokePiece = {sphere}
 
 local spinmodes = {
 	[1] = {holder = 30, sphere = 25},
@@ -72,7 +72,7 @@ function endTeleOutLoop()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--StartThread(Walk)
 	activity_mode(1)
 end

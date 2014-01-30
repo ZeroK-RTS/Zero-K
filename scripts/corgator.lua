@@ -22,7 +22,7 @@ local	moving,
 			xtilt, xtiltv, xtilta, ztilt, ztilta, ztiltv, 
 			ya, yv, yp, runsp, reloading, mainHead, WHEEL_TURN_SPEED
 			
-smokePiece = {turret, body}
+local smokePiece = {turret, body}
 
 xtilt=0
 xtiltv=0
@@ -222,5 +222,5 @@ end
 function script.Create()
 	moving = false
 	StartThread(Suspension)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end

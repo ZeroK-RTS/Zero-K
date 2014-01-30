@@ -4,7 +4,7 @@ include "constants.lua"
 local base, fan, barrel, flare, thrust1, thrust2 = piece('base', 'fan', 'barrel', 'flare', 'thrust1', 'thrust2')
 local blades = {piece('b1', 'b2', 'b3', 'b4', 'b5', 'b6')}
 
-smokePiece = {base}
+local smokePiece = {base}
 
 --constants
 local rotorSpeed = math.rad(1080)

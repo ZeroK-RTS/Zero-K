@@ -43,7 +43,7 @@ local rtoer = piece "rtoer"
 local leftLeg = {thigh=piece("lupleg"), shin=piece("lleg"), foot=piece("lfoot"), toef=piece("ltoef"), toeb=piece("ltoer")}
 local rightLeg = {thigh=piece("rupleg"), shin=piece("rleg"), foot=piece("rfoot"), toef=piece("rtoef"), toeb=piece("rtoer")}
 
-smokePiece = { torso, rarmgun, larm_rgunclaw }
+local smokePiece = { torso, rarmgun, larm_rgunclaw }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ function script.Create()
 	Turn( rarm, z_axis, 0.1)	
 	Turn( lmissileflare, z_axis, math.rad(-90))
 	Turn( rmissileflare, z_axis, math.rad(-90))	
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function IdleAnim()

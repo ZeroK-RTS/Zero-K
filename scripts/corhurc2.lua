@@ -4,7 +4,7 @@ local jet = piece 'jet'
 local wingtipl = piece 'wingtipl' 
 local wingtipr = piece 'wingtipr' 
 
-smokePiece = {body, jet}
+local smokePiece = {body, jet}
 
 include "constants.lua"
 include "bombers.lua"
@@ -21,7 +21,7 @@ local function Lights()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--StartThread(Lights)
 end
 

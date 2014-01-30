@@ -6,7 +6,7 @@ local base, head, body, barrel, firepoint = piece('base', 'head', 'body', 'barre
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
 local vent1, vent2, vent3 = piece('vent1', 'vent2', 'vent3')
 
-smokePiece = {body}
+local smokePiece = {body}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local PACE = 2
@@ -192,7 +192,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)	
+	StartThread(SmokeUnit, smokePiece)	
 end
 
 local function RestoreAfterDelay()

@@ -16,7 +16,7 @@ local up = 2
 
 local RIGHT_ANGLE = math.rad(90)
 
-smokePiece = { base, l_wing, r_wing }
+local smokePiece = { base, l_wing, r_wing }
 local burrowed = false
 
 local SIG_BURROW = 1
@@ -60,7 +60,7 @@ local function UnBurrow()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Activate()

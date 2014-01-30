@@ -86,7 +86,7 @@ local weaponPieces = {
 	{aimFrom = FrontTurret, query = {fflare1,fflare2,fflare3,fflare4}, index = 1},
 }
 
-smokePiece = {body, engineEmit}
+local smokePiece = {body, engineEmit}
 
 include "constants.lua"
 
@@ -237,7 +237,7 @@ end
 function script.Create()
 	Turn(dust1, x_axis, math.rad(90))
 	Turn(dust2, x_axis, math.rad(90))
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--StartThread(DustLoop)	-- looks stupid
 	
 	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)

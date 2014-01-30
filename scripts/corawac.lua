@@ -4,7 +4,7 @@ include 'constants.lua'
 -- constants/vars
 --------------------------------------------------------------------
 local base, nozzle, thrust = piece("base", "nozzle", "thrust")
-smokePiece = {base}
+local smokePiece = {base}
 
 local SIG_CLOAK = 1
 local CLOAK_TIME = 5000
@@ -24,7 +24,7 @@ function Cloak()
 end
 
 function script.Create()
-    StartThread(SmokeUnit)
+    StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

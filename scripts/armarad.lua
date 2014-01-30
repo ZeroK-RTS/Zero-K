@@ -8,7 +8,7 @@ local float2 = piece 'float2'
 
 include "constants.lua"
 
-smokePiece = { ant, base}
+local smokePiece = { ant, base}
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
@@ -20,7 +20,7 @@ function script.Create()
 		--Hide(float1)
 		--Hide(float2)
 	end
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Activate()
