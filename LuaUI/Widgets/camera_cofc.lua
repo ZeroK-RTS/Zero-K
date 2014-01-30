@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.130 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.131 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-November-12
     license   = "GNU GPL, v2 or later",
@@ -87,6 +87,7 @@ options_order = {
 	
 	'lblMisc2',
 	'enableCycleView',
+	'groupSelectionTapTimeout',
 
 }
 
@@ -445,6 +446,14 @@ options = {
 		value = false,
 		path = cameraFollowPath,
 		desc = "If you tap the group numbers (1,2,3..ect) it will focus camera view toward the cluster of unit rather than toward the average position.",
+	},
+	groupSelectionTapTimeout = {
+		name = 'Group selection tap timeout',
+		desc = "How quickly do you have to tap group numbers to move the camera? Smaller timeout means faster tapping.",
+		type = 'number',
+		min = 0.0, max = 5.0, step = 0.1,
+		value = 2.0,
+		path = cameraFollowPath,
 	},
 	-- end follow unit
 	
@@ -2178,16 +2187,23 @@ function GroupRecallFix(key, modifier, isRepeat)
 			local selectedUnit = spGetSelectedUnits()
 			local groupCount = spGetGroupList() --get list of group with number of units in them
 			if groupCount[group] ~= #selectedUnit then
+				previousKey = key
+				previousTime = spGetTimer()
 				return false
 			end
 			for i=1,#selectedUnit do
 				local unitGroup = spGetUnitGroup(selectedUnit[i])
 				if unitGroup~=group then
+					previousKey = key
+					previousTime = spGetTimer()
 					return false
 				end
 			end
-			if previousKey == key and (spDiffTimers(spGetTimer(),previousTime) > 2) then
+			if previousKey == key and (spDiffTimers(spGetTimer(),previousTime) > options.groupSelectionTapTimeout.value) then
 				currentIteration = 0 --reset cycle if delay between 2 similar tap took too long.
+				previousKey = key
+				previousTime = spGetTimer()
+				return true --and also don't do anything. Only move camera after a double-tap (or more).
 			end
 			previousKey = key
 			previousTime = spGetTimer()
