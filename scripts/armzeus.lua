@@ -17,7 +17,7 @@ local lfoot = piece 'lfoot'
 
 include "constants.lua"
 
-sfxlocal smokePiece = {chest}
+local smokePiece = {chest}
 
 local aiming = false
 local walking = false
