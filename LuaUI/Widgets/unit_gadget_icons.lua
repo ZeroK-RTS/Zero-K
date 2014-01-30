@@ -73,8 +73,10 @@ function SetIcons(unitID)
 		if rearm then
 			if (not lastRearm[unitID]) or lastRearm[unitID] ~= rearm then
 				lastRearm[unitID] = rearm
-				if rearm ~= 0 then
+				if rearm == 1 or rearm == 2 then
 					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=rearmTexture} )
+				elseif rearm == 3 then
+					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=repairTexture} )
 				else
 					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
 				end

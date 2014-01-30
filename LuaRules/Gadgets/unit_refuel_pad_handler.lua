@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date    = "5 Jan 2014",
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
-		enabled = false, -- loaded by default?
+		enabled = true, -- loaded by default?
 	}
 end
 
@@ -96,10 +96,10 @@ local function SitOnPad(unitID)
 		padHeading = 2*PI-padHeading
 	end
 	
-	Spring.Echo(dx)
-	Spring.Echo(dy)
-	Spring.Echo(dz)
-	Spring.Echo(padHeading*180/PI)
+	-- Spring.Echo(dx)
+	-- Spring.Echo(dy)
+	-- Spring.Echo(dz)
+	-- Spring.Echo(padHeading*180/PI)
 	
 	local headingDiff = heading - padHeading
 	
@@ -109,6 +109,7 @@ local function SitOnPad(unitID)
 	
 	local function SitLoop()
 		local landDuration = 0
+		local refuelComplete = false
 		
 		while true do
 			if landingUnit[unitID].abort or not landingUnit[unitID].landed then
@@ -137,10 +138,14 @@ local function SitOnPad(unitID)
 				if stunned_or_inbuild then
 					landDuration = landDuration - 15
 				else
+					if not refuelComplete and REFUEL_TIME <= landDuration then
+						refuelComplete = true
+						GG.RefuelComplete(unitID)
+					end
 					local hp, maxHP = spGetUnitHealth(unitID)
 					if hp < maxHP then
 						spSetUnitHealth(unitID, min(maxHP, hp + HEAL_PER_HALF_SECOND))
-					elseif REFUEL_TIME <= landDuration then
+					elseif refuelComplete then
 						break
 					end
 				end
@@ -411,9 +416,10 @@ function GG.SendBomberToPad(unitID, padID, padPieceID)
 	CircleToLand(unitID, {px,py,pz})
 end
 
-function GG.LandAborted(unitID)
+function GG.LandAborted(unitID, force)
 	if landingUnit[unitID] then
 		landingUnit[unitID].abort = true
+		landingUnit[unitID].abortForce = force
 	end
 end
 
