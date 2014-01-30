@@ -445,7 +445,7 @@ options = {
 		type = 'bool',
 		value = false,
 		path = cameraFollowPath,
-		desc = "If you tap the group numbers (1,2,3..ect) it will focus camera view toward the cluster of unit rather than toward the average position.",
+		desc = "If you tap the group numbers (1,2,3 etc.) it will move the camera position to different clusters of units within the group rather than to the average position of the entire group.",
 	},
 	groupSelectionTapTimeout = {
 		name = 'Group selection tap timeout',
