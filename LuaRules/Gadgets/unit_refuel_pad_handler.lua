@@ -416,10 +416,10 @@ function GG.SendBomberToPad(unitID, padID, padPieceID)
 	CircleToLand(unitID, {px,py,pz})
 end
 
-function GG.LandAborted(unitID, force)
+function GG.LandAborted(unitID)
 	if landingUnit[unitID] then
 		landingUnit[unitID].abort = true
-		landingUnit[unitID].abortForce = force
+ 
 	end
 end
 
