@@ -3,17 +3,17 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Framework New",
+		name      = "Chili Framework",
 		desc      = "Hot GUI Framework",
 		author    = "jK",
 		date      = "WIP",
 		license   = "GPLv2",
 		version   = "2.1",
-		layer     = -1000,
+		layer     = 1000,
 		enabled   = true,  --  loaded by default?
 		handler   = true,
 		api       = true,
-		alwaysStart    = true,
+		alwaysStart = true,
 		hidden    = true,
 	}
 end
