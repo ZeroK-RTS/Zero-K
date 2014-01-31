@@ -540,7 +540,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		end
 	end
 	if bomberToPad[unitID] or bomberLanding[unitID] then
-		if cmdID ~= CMD_REARM and not cmdOptions.shift then
+		if not cmdOptions.shift then
 			CancelAirpadReservation(unitID)
 		end
 	end
