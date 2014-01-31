@@ -139,7 +139,7 @@ local mexDefID = UnitDefNames["cormex"].id
 local mexUnitDef = UnitDefNames["cormex"]
 local mexDefInfo = {
 	extraction = 0.001,
-	square = mexUnitDef.extractSquare,
+	square = false,
 	oddX = mexUnitDef.xsize % 4 == 2,
 	oddZ = mexUnitDef.zsize % 4 == 2,
 }
