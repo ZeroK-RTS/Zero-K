@@ -66,8 +66,10 @@ function checkLabs()
 	
     for i=1,#units do
 	  local id = units[i]
-	  local ud = spGetUnitDefID(id)
-	  local fly = UnitDefs[ud].canFly
+	  local unitDefID = spGetUnitDefID(id)
+	  local ud = UnitDefs[unitDefID]
+	  local movetype = Spring.Utilities.getMovetype(ud)
+	  local fly = ud.canFly
 	  local ally = spGetUnitAllyTeam(id)
 	  local team = spGetUnitTeam(id)
 	  if not fly then
@@ -114,7 +116,7 @@ function checkLabs()
 			
 			--]]
 			end		
-		elseif (team ~= Lv.team) then --order unit blocking ally factory to move away
+		elseif (team ~= Lv.team) and movetype then --order unit blocking ally factory to move away (only if it is not a structure)
 			local xVel,_,zVel = spGetUnitVelocity(id)
 			local stunned_or_inbuild = spGetUnitIsStunned(id)
 			if math.abs(xVel)<0.1 and math.abs(zVel)<0.1 and (not stunned_or_inbuild) then
