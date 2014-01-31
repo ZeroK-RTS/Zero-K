@@ -151,8 +151,7 @@ local function UnBurrow()
 	Spring.UnitScript.SetUnitValue( stealth, 0 )
 	Move( body, 2, 0, 3 )
 	Turn( body, 1, 0, 3 )
-	--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 0
-	Sleep(33)
+
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0)
 	GG.attUnits[unitID] = true
 	GG.UpdateUnitAttributes(unitID)
