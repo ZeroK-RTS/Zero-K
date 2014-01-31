@@ -27,6 +27,8 @@ local spGetUnitRotation		= Spring.GetUnitRotation
 local spGetUnitHealth 		= Spring.GetUnitHealth
 local spSetUnitHealth 		= Spring.SetUnitHealth
 local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
+local spGetUnitRulesParam   = Spring.GetUnitRulesParam
+local spGetUnitIsDead       = Spring.GetUnitIsDead
 
 local mcSetVelocity         = Spring.MoveCtrl.SetVelocity
 local mcSetRotationVelocity = Spring.MoveCtrl.SetRotationVelocity
@@ -34,6 +36,7 @@ local mcSetPosition	        = Spring.MoveCtrl.SetPosition
 local mcSetRotation         = Spring.MoveCtrl.SetRotation
 local mcDisable	            = Spring.MoveCtrl.Disable
 local mcEnable	            = Spring.MoveCtrl.Enable
+local mcSetTag				= Spring.MoveCtrl.SetTag
 
 local coroutine = coroutine
 local Sleep	    = coroutine.yield
@@ -57,6 +60,19 @@ local min = math.min
 local mobilePadDefs = {
 	[UnitDefNames["armcarry"].id] = true,
 }
+
+local turnRadius = {}
+local rotateUnit = {}
+for i=1,#UnitDefs do
+	local movetype = Spring.Utilities.getMovetype(UnitDefs[i])
+	if movetype == 0 then -- fixedwing
+		turnRadius[i] = UnitDefs[i].turnRadius
+		rotateUnit[i] = true
+	elseif movetype == 1 then -- gunship
+		turnRadius[i] = 20
+		rotateUnit[i] = false
+	end
+end
 
 local padSnapRangeSqr = 80^2
 local REFUEL_TIME = 5*30
@@ -86,6 +102,7 @@ local function SitOnPad(unitID)
 	
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
+		mcSetTag(unitID, 1)
 		mcSetRotation(unitID,0,heading,0)
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
@@ -112,10 +129,13 @@ local function SitOnPad(unitID)
 		local refuelComplete = false
 		
 		while true do
-			if landingUnit[unitID].abort or not landingUnit[unitID].landed then
-				spSetUnitLeaveTracks(unitID, true)
-				spSetUnitVelocity(unitID, 0, 0, 0)
-				mcDisable(unitID)
+			if (not landingUnit[unitID]) or landingUnit[unitID].abort or (not landingUnit[unitID].landed) then
+				if not spGetUnitIsDead(unitID) then
+					spSetUnitLeaveTracks(unitID, true)
+					spSetUnitVelocity(unitID, 0, 0, 0)
+					mcSetTag(unitID, 0)
+					mcDisable(unitID)
+				end
 				unitMovectrled[unitID] = nil
 				landingUnit[unitID] = nil
 				return
@@ -134,7 +154,7 @@ local function SitOnPad(unitID)
 			landDuration = landDuration + 1
 			
 			if landDuration%15 == 0 then
-				local stunned_or_inbuild = spGetUnitIsStunned(landData.padID)
+				local stunned_or_inbuild = spGetUnitIsStunned(landData.padID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
 				if stunned_or_inbuild then
 					landDuration = landDuration - 15
 				else
@@ -156,6 +176,7 @@ local function SitOnPad(unitID)
 		
 		spSetUnitLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
+		mcSetTag(unitID, 0)
 		mcDisable(unitID)
 		unitMovectrled[unitID] = nil
 		landingUnit[unitID] = nil
@@ -174,7 +195,7 @@ local function CircleToLand(unitID, goal)
 	local unitDefID	= spGetUnitDefID(unitID)
 	local ud = UnitDefs[unitDefID]
 	
-	local turnCircleRadius = 180
+	local turnCircleRadius = turnRadius[unitDefID]
 	local turnCircleRadiusSq = turnCircleRadius^2
 	
 	local disSq = (goal[1] - start[1])^2 + (goal[2] - start[2])^2 + (goal[3] - start[3])^2
@@ -182,10 +203,8 @@ local function CircleToLand(unitID, goal)
 		turnCircleRadius = 1
 	end
 	
-	local vx,vy,vz,maxSpeed = spGetUnitVelocity(unitID) -- 4th argument not present in 91.0
-	if not maxSpeed then
-		maxSpeed = sqrt(vx*vx + vy*vy + vz*vz)
-	end
+	local vx,vy,vz = spGetUnitVelocity(unitID)
+	local maxSpeed = sqrt(vx*vx + vy*vy + vz*vz)
 	
 	local targetSpeed = ud.speed/30
 	
@@ -338,7 +357,10 @@ local function CircleToLand(unitID, goal)
 	-- Move control stuff
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
-		mcSetRotation(unitID,0,heading,roll+currentTime/50)
+		mcSetTag(unitID, 1)
+		if rotateUnit[unitDefID] then
+			mcSetRotation(unitID,0,heading,roll+currentTime/50)
+		end
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
 	end
@@ -349,11 +371,14 @@ local function CircleToLand(unitID, goal)
 		
 		local prevX, prevY, prevZ = start[1], start[2], start[3]
 		
-		while currentDistance + currentSpeed*2 < totalDist do
+		while currentDistance + currentSpeed < totalDist do
 			
-			if landingUnit[unitID].abort then
-				spSetUnitLeaveTracks(unitID, true)
-				mcDisable(unitID)
+			if (not landingUnit[unitID]) or landingUnit[unitID].abort then
+				if not spGetUnitIsDead(unitID) then
+					spSetUnitLeaveTracks(unitID, true)
+					mcSetTag(unitID, 0)
+					mcDisable(unitID)
+				end
 				unitMovectrled[unitID] = nil
 				landingUnit[unitID] = nil
 				return
@@ -363,7 +388,9 @@ local function CircleToLand(unitID, goal)
 			local py = TimeToVerticalPositon(currentTime)
 			local direction = DistanceToDirection(currentDistance)
 			
-			mcSetRotation(unitID,0,direction,roll)
+			if rotateUnit[unitDefID] then
+				mcSetRotation(unitID,0,direction,roll)
+			end
 			mcSetPosition(unitID, px, py, pz)
 			mcSetVelocity(unitID, px - prevX, py - prevY, pz - prevZ)
 			spSetUnitVelocity(unitID, px - prevX, 0, pz - prevZ)

@@ -53,7 +53,6 @@ unitDef = {
   iconType                      = [[facair]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  isAirBase                     = true,
   mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,

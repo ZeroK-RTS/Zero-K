@@ -64,6 +64,7 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 660,
   smoothAnim          = true,
+  turnRadius          = 180,
   workerTime          = 0,
 
   weapons             = {

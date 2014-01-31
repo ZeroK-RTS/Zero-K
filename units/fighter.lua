@@ -81,6 +81,7 @@ unitDef = {
   smoothAnim             = true,
   speedToFront           = 0,
   stealth                = true,
+  turnRadius             = 80,
   turnRate               = 839,
 
   weapons                = {

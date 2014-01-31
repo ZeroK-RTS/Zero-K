@@ -17,7 +17,10 @@ unitDef = {
   buildPic            = [[ARMASP.png]],
   buildTime           = 350,
   category            = [[UNARMED FLOAT]],
-  collisionVolumeTest = 1,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[144 40 144]],
+  collisionVolumeTest	 = 1,
+  collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -34,7 +37,6 @@ unitDef = {
   iconType            = [[building]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  isAirBase           = true,
   mass                = 100000,
   maxDamage           = 1860,
   maxSlope            = 18,
@@ -49,7 +51,6 @@ unitDef = {
   sightDistance       = 273,
   turnRate            = 0,
   waterline           = 8,
-  workerTime          = 10,
   yardMap             = [[ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
   featureDefs         = {

@@ -58,7 +58,7 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 660,
   stealth             = false,
-  turnRadius          = 100,
+  turnRadius          = 130,
 
   weapons             = {
 

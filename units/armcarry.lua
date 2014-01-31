@@ -48,7 +48,6 @@ unitDef = {
   iconType               = [[carrier]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  isAirBase              = true,
   mass                   = 695,
   maxDamage              = 7500,
   maxVelocity            = 2.75,
@@ -71,7 +70,6 @@ unitDef = {
   turninplace            = 0,
   turnRate               = 233,
   waterline              = 10,
-  workerTime             = 10,
 
   weapons                = {
 

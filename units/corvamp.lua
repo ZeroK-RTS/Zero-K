@@ -63,6 +63,7 @@ unitDef = {
   sightDistance          = 750,
   smoothAnim             = true,
   speedToFront           = 0.5,
+  turnRadius             = 120,
 
   weapons                = {
 

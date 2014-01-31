@@ -67,7 +67,7 @@ unitDef = {
   smoothAnim          = true,
   sonarDistance       = 1400,
   stealth             = true,
-  turnRadius          = 1,
+  turnRadius          = 80,
   workerTime          = 0,
 
   featureDefs         = {

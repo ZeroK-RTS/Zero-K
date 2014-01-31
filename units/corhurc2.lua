@@ -72,7 +72,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
-  turnRadius          = 50,
+  turnRadius          = 120,
   workerTime          = 0,
 
   weapons             = {

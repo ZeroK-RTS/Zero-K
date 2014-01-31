@@ -53,11 +53,19 @@ local airpadDefs = {
 	},
 }
 
+ -- land if pad is within this range
+local fixedwingPadRadius = 500
+local gunshipPadRadius = 160 
+
 local bomberDefs = {}
 local boolBomberDefs = {}
 for i=1,#UnitDefs do
-	if UnitDefs[i].canFly then
-		bomberDefs[i] = {}
+	local movetype = Spring.Utilities.getMovetype(UnitDefs[i])
+	if movetype == 1 or movetype == 0 then
+		bomberDefs[i] = {
+			fixedwing = (movetype == 0),
+			padRadius = ((movetype == 0) and fixedwingPadRadius) or gunshipPadRadius
+		}
 		boolBomberDefs[i] = true
 	end
 end
@@ -97,7 +105,6 @@ local defaultCommands = { -- commands that is processed by gadget
 	[CMD.MOVE] = true,
 }
 
-local padRadius = 700 -- land if pad is within this range
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -419,9 +426,11 @@ function gadget:GameFrame(n)
 		end
 		rearmRequest = {}
 		local airpadRefreshEmptyspot = nil;
-		for bomberID, padID in pairs(bomberToPad) do
+		for bomberID, data in pairs(bomberToPad) do
+			local padID = data.padID
+			local unitDefID = data.unitDefID
 			local queue = Spring.GetUnitCommands(bomberID, 1)
-			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) then
+			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < bomberDefs[unitDefID].padRadius) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
 					airpadRefreshEmptyspot = true
@@ -498,7 +507,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		if not airpadsData[targetAirpad] then
 			return true, true	-- trying to land on an unregistered (probably under construction) pad, abort
 		end
-		bomberToPad[unitID] = targetAirpad
+		bomberToPad[unitID] = {padID = targetAirpad, unitDefID = unitDefID}
 		if not airpadsData[targetAirpad] then return false end
 		local reservations = airpadsData[targetAirpad].reservations
 		if not reservations.units[unitID] then
@@ -534,8 +543,11 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if (cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift then
 			return false --don't find new pad if already on the pad currently refueling or repairing.
 		end
+		if combatCommands[cmdID] then
+			return true
+		end
 	elseif noAmmo == 1 then
-		if combatCommands[cmdID] and not bomberDefs[unitDefID].noAutoRearm then	-- don't fight without ammo, go get ammo first!
+		if combatCommands[cmdID] then	-- don't fight without ammo, go get ammo first!
 			rearmRequest[unitID] = true
 		end
 	end
