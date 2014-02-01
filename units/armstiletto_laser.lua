@@ -96,17 +96,14 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        = {
-	    disarmDamageMult = 1,
+	    disarmDamageMult = 3,
 		disarmDamageOnly = 1,
 		disarmTimer      = 16, -- seconds
 	  
 	  },
 	  
       damage                  = {
-        default        = 675,
-        empresistant75 = 168.75,
-        empresistant99 = 67.5,
-        planes         = 675,
+        default        = 225,
       },
 
       edgeEffectiveness       = 0.4,
