@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "31 January 2014, 22 Jan 2011",
+    date      = "2 February 2014, 22 Jan 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -135,6 +135,8 @@ local bomberToPad = {}	-- [bomberID] = detination pad ID
 local bomberLanding = {} -- [bomberID] = true
 local rearmRequest = {} -- [bomberID] = true	(used to avoid recursion in UnitIdle)
 local rearmRemove = {}
+local cmdIgnoreSelf = false
+-- local totalReservedPad = 0
 
 _G.airpadsData = airpadsData
 
@@ -259,10 +261,10 @@ local function RefreshEmptyspot_minusBomberLanding()
 			RefreshEmptyPad(airpadID,airpadUnitDefID)
 		end
 	end
-	for bomberID,padpiece_padID in pairs(bomberLanding) do --airplane about to land
-		local bomberAirpadID = padpiece_padID[2]
+	for bomberID,data in pairs(bomberLanding) do --airplane about to land
+		local bomberAirpadID = data.padID
 		for i=1, #airpadsData[bomberAirpadID].emptySpot do
-			local padPiece = padpiece_padID[1]
+			local padPiece = data.padPiece
 			if airpadsData[bomberAirpadID].emptySpot[i]== padPiece then
 				table.remove(airpadsData[bomberAirpadID].emptySpot,i)
 				break
@@ -329,15 +331,23 @@ local function RequestRearm(unitID, team, forceNow)
 	if forceNow then
 		index = 0
 	end
-	local targetPad = FindNearestAirpad(unitID, team)
+	local targetPad = FindNearestAirpad(unitID, team) --UnitID find non-reserved airpad as target
 	if targetPad then
+		local reservations = airpadsData[targetPad].reservations
+		if not reservations.units[unitID] then
+			-- totalReservedPad = totalReservedPad + 1
+			reservations.units[unitID] = true --UnitID pre-reserve airpads so that next UnitID (if available) don't try to reserve the same spot
+			reservations.count = reservations.count + 1
+		end
 		--Spring.Echo(unitID.." directed to airpad "..targetPad)
-		InsertCommand(unitID, index, CMD_REARM, {targetPad})
+		InsertCommand(unitID, index, CMD_REARM, {targetPad}) --UnitID get RE-ARM command with reserved airpad as its Params
 		--spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, 0, targetPad}, {"alt"})
 		return targetPad
 	end
 end
-GG.RequestRearm = RequestRearm
+GG.RequestRearm = function(bomberID)
+	rearmRequest[bomberID] = true
+end
 
 function gadget:UnitCreated(unitID, unitDefID, team)
 	if bomberDefs[unitDefID] then
@@ -382,7 +392,15 @@ local function CancelAirpadReservation(unitID)
 		Spring.SetUnitRulesParam(unitID, "noammo", 1)
 	end
 	
-	local targetPad = bomberToPad[unitID] or (bomberLanding[unitID] and bomberLanding[unitID][2])
+	local targetPad
+	if bomberToPad[unitID] then
+		targetPad = bomberToPad[unitID].padID
+	elseif bomberLanding[unitID] then
+		targetPad = bomberLanding[unitID].padID
+	end
+	if not targetPad then
+		return
+	end
 
 	--Spring.Echo("Clearing reservation by "..unitID.." at pad "..targetPad)
 	bomberToPad[unitID] = nil
@@ -392,6 +410,7 @@ local function CancelAirpadReservation(unitID)
 	end
 	local reservations = airpadsData[targetPad].reservations
 	if reservations.units[unitID] then
+		-- totalReservedPad = totalReservedPad -1
 		reservations.units[unitID] = nil
 		reservations.count = math.max(reservations.count - 1, 0)
 	end
@@ -419,8 +438,12 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 end
 
 function gadget:GameFrame(n)
+	-- if n%30 == 0 then
+		-- Spring.Echo(totalReservedPad)
+	-- end
 	-- track proximity to bombers
 	if n%10 == 0 then
+		cmdIgnoreSelf = true
 		for bomberID in pairs(rearmRequest) do
 			RequestRearm(bomberID, nil, true)
 		end
@@ -446,7 +469,7 @@ function gadget:GameFrame(n)
 						GG.SendBomberToPad(bomberID, padID, padPiece)
 					end
 					bomberToPad[bomberID] = nil
-					bomberLanding[bomberID] = {padPiece,padID}
+					bomberLanding[bomberID] = {padID=padID,padPiece=padPiece}
 					
 					--value greater than 1 is for icon state, and it block bomber from firing while on airpad:
 					local noAmmo = spGetUnitRulesParam(bomberID, "noammo")
@@ -467,6 +490,7 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
+		cmdIgnoreSelf = false
 	end
 end
 
@@ -508,10 +532,10 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			return true, true	-- trying to land on an unregistered (probably under construction) pad, abort
 		end
 		bomberToPad[unitID] = {padID = targetAirpad, unitDefID = unitDefID}
-		if not airpadsData[targetAirpad] then return false end
 		local reservations = airpadsData[targetAirpad].reservations
-		if not reservations.units[unitID] then
-			reservations.units[unitID] = true
+		if not reservations.units[unitID] then --Reserve the airpad specified in RE-ARM params (if not yet reserved)
+			-- totalReservedPad = totalReservedPad + 1
+			reservations.units[unitID] = true 
 			reservations.count = reservations.count + 1
 		end
 		local x, y, z = Spring.GetUnitPosition(targetAirpad)
@@ -533,6 +557,10 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if cmdIgnoreSelf then  --don't re-read rewritten bomber's command
+		return true
+	end
+	---------------------
 	local noAmmo = spGetUnitRulesParam(unitID, "noammo")
 	if not noAmmo or noAmmo == 0 then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
@@ -544,7 +572,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			return false --don't find new pad if already on the pad currently refueling or repairing.
 		end
 		if combatCommands[cmdID] then
-			return true
+			return true --don't leave pad when given attack/fight command when refueling, allow command and skip CancelAirpadReservation
 		end
 	elseif noAmmo == 1 then
 		if combatCommands[cmdID] then	-- don't fight without ammo, go get ammo first!
@@ -553,7 +581,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	end
 	if bomberToPad[unitID] or bomberLanding[unitID] then
 		if not cmdOptions.shift then
-			CancelAirpadReservation(unitID)
+			CancelAirpadReservation(unitID) --don't leave airpad reservation hanging, empty them when bomber is given other task
 		end
 	end
 	return true
