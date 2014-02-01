@@ -123,7 +123,7 @@ function Progressbar:DrawControl()
 
   gl.Color(self.backgroundColor)
   gl.Rect(w*percent,y,w,h)
-
+  
   gl.Color(self.color)
   gl.Rect(0,y,w*percent,h)
 

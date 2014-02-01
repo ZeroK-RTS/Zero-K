@@ -698,11 +698,9 @@ function DrawProgressbar(obj)
     local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
-	-- workaround for catalyst >12.6 drivers: do the "clipping" by multiplying width by percentage in glBeginEnd instead of using glClipPlane
-    -- fuck AMD
-    --gl.ClipPlane(1, -1,0,0, x+w*percent)
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-    --gl.ClipPlane(1, false)
+    gl.ClipPlane(1, -1,0,0, w*percent)
+    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    gl.ClipPlane(1, false)
   gl.Texture(0,false)
 
   if (obj.caption) then
@@ -722,49 +720,52 @@ function DrawTrackbar(self)
   local pdLeft,pdTop,pdRight,pdBottom = unpack4(self.hitpadding)
 
   gl.Color(1,1,1,1)
-
-  TextureHandler.LoadTexture(0,self.TileImage,self)
-    local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
-    local tw,th = texInfo.xsize, texInfo.ysize
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-
-  TextureHandler.LoadTexture(0,self.StepImage,self)
-    local texInfo = gl.TextureInfo(self.StepImage) or {xsize=1, ysize=1}
-    local tw,th = texInfo.xsize, texInfo.ysize
-
-    --// scale the thumb down if we don't have enough space
-    if (th>h) then
-      tw = math.ceil(tw*(h/th))
-      th = h
-    end
-    if (tw>w) then
-      th = math.ceil(th*(w/tw))
-      tw = w
-    end
-
-    local barWidth = w - (pdLeft + pdRight)
-    local stepWidth = barWidth / ((self.max - self.min)/self.step)
-
-    if ((self.max - self.min)/self.step)<20 then
-      local newStepWidth = stepWidth
-      if (newStepWidth<20) then
-        newStepWidth = stepWidth*2
+  if not self.noDrawBar then
+    TextureHandler.LoadTexture(0,self.TileImage,self)
+      local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
+      local tw,th = texInfo.xsize, texInfo.ysize
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+  end
+	
+  if not self.noDrawStep then
+    TextureHandler.LoadTexture(0,self.StepImage,self)
+      local texInfo = gl.TextureInfo(self.StepImage) or {xsize=1, ysize=1}
+      local tw,th = texInfo.xsize, texInfo.ysize
+    
+      --// scale the thumb down if we don't have enough space
+      if (th>h) then
+        tw = math.ceil(tw*(h/th))
+        th = h
       end
-      if (newStepWidth<20) then
-        newStepWidth = stepWidth*5
+      if (tw>w) then
+        th = math.ceil(th*(w/tw))
+        tw = w
       end
-      if (newStepWidth<20) then
-        newStepWidth = stepWidth*10
+    
+      local barWidth = w - (pdLeft + pdRight)
+      local stepWidth = barWidth / ((self.max - self.min)/self.step)
+    
+      if ((self.max - self.min)/self.step)<20 then
+        local newStepWidth = stepWidth
+        if (newStepWidth<20) then
+          newStepWidth = stepWidth*2
+        end
+        if (newStepWidth<20) then
+          newStepWidth = stepWidth*5
+        end
+        if (newStepWidth<20) then
+          newStepWidth = stepWidth*10
+        end
+        stepWidth = newStepWidth
+    
+        local my = h*0.5
+        local mx = pdLeft+stepWidth
+        while (mx<(pdLeft+barWidth)) do
+          gl.TexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
+          mx = mx+stepWidth
+        end
       end
-      stepWidth = newStepWidth
-
-      local my = h*0.5
-      local mx = pdLeft+stepWidth
-      while (mx<(pdLeft+barWidth)) do
-        gl.TexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
-        mx = mx+stepWidth
-      end
-    end
+  end
 
   if (self.state.hovered) then
     gl.Color(self.focusColor)
