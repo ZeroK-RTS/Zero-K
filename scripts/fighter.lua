@@ -14,6 +14,7 @@ local flare = {
 }
 
 local SPEEDUP_FACTOR = 5
+local BOOSTUP_FACTOR = 6
 
 ----------------------------------------------------------
 
@@ -23,8 +24,12 @@ function SprintThread()
 		EmitSfx(rjet, 1027)
 		Sleep(33)
 	end
+	while (Spring.MoveCtrl.GetTag(unitID) == 1) do
+		Sleep(33) --sprinting fighter under unit_refuel_pad_handler.lua control?? (tag ==1),if so, wait until MoveCtrl disabled before restore speed.
+	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
+	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", 1)	
+	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
 	GG.UpdateUnitAttributes(unitID)
 	GG.UpdateUnitAttributes(unitID)
 	
@@ -38,7 +43,8 @@ function Sprint()
 
 	StartThread(SprintThread)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)	
-	Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 3)
+	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", BOOSTUP_FACTOR)	
+	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 3)
 	GG.attUnits[unitID] = true
 	GG.UpdateUnitAttributes(unitID)
 	GG.UpdateUnitAttributes(unitID)
