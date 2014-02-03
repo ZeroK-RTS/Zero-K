@@ -24,8 +24,8 @@ function SprintThread()
 		EmitSfx(rjet, 1027)
 		Sleep(33)
 	end
-	while (Spring.MoveCtrl.GetTag(unitID) == 1) do
-		Sleep(33) --sprinting fighter under unit_refuel_pad_handler.lua control?? (tag ==1),if so, wait until MoveCtrl disabled before restore speed.
+	while (Spring.MoveCtrl.GetTag(unitID) ~= nil) do --is true when unit_refuel_pad_handler.lua is MoveCtrl-ing unit, wait until MoveCtrl disabled before restore speed.
+		Sleep(33)
 	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", 1)	
