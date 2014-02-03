@@ -36,7 +36,6 @@ local mcSetPosition	        = Spring.MoveCtrl.SetPosition
 local mcSetRotation         = Spring.MoveCtrl.SetRotation
 local mcDisable	            = Spring.MoveCtrl.Disable
 local mcEnable	            = Spring.MoveCtrl.Enable
-local mcSetTag				= Spring.MoveCtrl.SetTag
 
 local coroutine = coroutine
 local Sleep	    = coroutine.yield
@@ -102,7 +101,6 @@ local function SitOnPad(unitID)
 	
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
-		mcSetTag(unitID, 1)
 		mcSetRotation(unitID,0,heading,0)
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
@@ -133,7 +131,6 @@ local function SitOnPad(unitID)
 				if not spGetUnitIsDead(unitID) then
 					spSetUnitLeaveTracks(unitID, true)
 					spSetUnitVelocity(unitID, 0, 0, 0)
-					mcSetTag(unitID, 0)
 					mcDisable(unitID)
 				end
 				unitMovectrled[unitID] = nil
@@ -176,7 +173,6 @@ local function SitOnPad(unitID)
 		
 		spSetUnitLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
-		mcSetTag(unitID, 0)
 		mcDisable(unitID)
 		unitMovectrled[unitID] = nil
 		landingUnit[unitID] = nil
@@ -357,7 +353,6 @@ local function CircleToLand(unitID, goal)
 	-- Move control stuff
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
-		mcSetTag(unitID, 1)
 		if rotateUnit[unitDefID] then
 			mcSetRotation(unitID,0,heading,roll+currentTime/50)
 		end
@@ -376,7 +371,6 @@ local function CircleToLand(unitID, goal)
 			if (not landingUnit[unitID]) or landingUnit[unitID].abort then
 				if not spGetUnitIsDead(unitID) then
 					spSetUnitLeaveTracks(unitID, true)
-					mcSetTag(unitID, 0)
 					mcDisable(unitID)
 				end
 				unitMovectrled[unitID] = nil
