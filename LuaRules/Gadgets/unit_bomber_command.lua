@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "3 February 2014, 22 Jan 2011",
+    date      = "2 February 2014, 22 Jan 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -518,10 +518,7 @@ end
 ]]--
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD_REARM then	-- return to pad'
-		if not bomberDefs[unitDefID] then
-			return true, true	-- trying to REARM using unauthorized unit
-		end
+	if cmdID == CMD_REARM then	-- return to pad
 		if rearmRemove[unitID] then
 			rearmRemove[unitID] = nil
 			return true, true
@@ -545,9 +542,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		Spring.SetUnitMoveGoal(unitID, x, y, z) -- try circle the airpad until free airpad allow bomberLanding.
 		return true, false	-- command used, don't remove
 	elseif cmdID == CMD_FIND_PAD then
-		if bomberDefs[unitDefID] then
-			rearmRequest[unitID] = true
-		end
+		rearmRequest[unitID] = true
 		return true, true	-- command used, remove
 	end
 	return false -- command not used

@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.281 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.280 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
-    date      = "2008-03-17", --2014-2-3
+    date      = "2008-03-17", --2014-1-29
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
@@ -22,7 +22,6 @@ local glColor          = gl.Color
 local GL_GREATER       = GL.GREATER
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
-VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 local CMD_WAIT          = CMD.WAIT
 local CMD_MOVE          = CMD.MOVE
 local CMD_PATROL        = CMD.PATROL
@@ -294,8 +293,7 @@ local function SetWantRetreat(unitID, want)
 	if want then
 		if (not pauseRetreatChecks[unitID])then
 			local unitDefID = GetUnitDefID(unitID)
-			local movetype = Spring.Utilities.getMovetype(UnitDefs[unitDefID])
-			if (movetype==0 or movetype==1) and (airpadCount> 0) and (not retreatRearmOrders[unitID]) then
+			if (airpadCount> 0) and UnitDefs[unitDefID].canFly and (not retreatRearmOrders[unitID]) then
 				StartRearm(unitID)
 				if options.removeFromSelection.value then
 					retreatedUnits[#retreatedUnits+1] = unitID
