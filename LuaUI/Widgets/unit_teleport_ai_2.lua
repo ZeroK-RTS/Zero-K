@@ -1,4 +1,4 @@
-local version = "v0.840"
+local version = "v0.841"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -33,7 +33,6 @@ local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetGameSeconds = Spring.GetGameSeconds
 ------------------------------------------------------------
 ------------------------------------------------------------
-local isNewEngine = not Game.version:find('91.0') 
 local myTeamID
 local ud
 local listOfBeacon={}
@@ -133,7 +132,6 @@ end
 
 --SOME NOTE:
 --"DiggDeeper()" use a straightforward recursive horizontal/sideway-search. 
---TODO: But if we can find out if there's better way to do it would be more fun. Some Googling found stuff like "Minimum Spanning Tree" & "Spanning Tree" (might be interesting!)
 function DiggDeeper(beaconIDList, unitSpeed_CNSTNT,targetCoord_CNSTNT,chargeTime_CNSTNT, lowestTime_VAR, previousOverheadTime, level, history_VAR, djinExitPos_CNSTNT)
 	level = level + 1
 	if level > 5 then
@@ -247,7 +245,7 @@ function widget:GameFrame(n)
 		--if ( n%30==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 30 frame period (1 second). 30 frame if full. Not considering network delay (may go up to 2 second period)
 		--if ( n%18==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 18 frame period (0.6 second) if empty. 36 frame (1.2 second) if full. Not considering network delay
 		if ( n%15==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then 
-			--Spring.Echo("-----GROUP:" .. i)
+			--GROUP: i
 			local numberOfUnitToProcess = 29 --NUMBER OF UNIT PER BEACON PER SECOND. minimum: 29 per second
 			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29) --spread looping to entire 1 second
 			local beaconCurrentQueue = groupBeaconQueue[i] or {}
@@ -256,14 +254,13 @@ function widget:GameFrame(n)
 			local beaconFinishLoop = groupBeaconFinish[i] or {}
 			groupSpreadJobs[i] = false
 			for j=1, #groupBeacon[i],1 do
+				--BEACON: j
 				local beaconID = groupBeacon[i][j]
 				beaconCurrentQueue[beaconID] =beaconCurrentQueue[beaconID] or 0
-				--Spring.Echo("BEACON:" .. beaconID)
 				if listOfBeacon[beaconID] and (not beaconFinishLoop[beaconID]) and listOfBeacon[beaconID]["deployed"]==1 then --beacon is alive & not finish looping? & deployed?
 					local bX,bY,bZ = listOfBeacon[beaconID][1],listOfBeacon[beaconID][2],listOfBeacon[beaconID][3]
 					local vicinityUnit = listOfBeacon[beaconID]["prevList"] or spGetUnitsInCylinder(bX,bZ,detectionRange,myTeamID)
 					local numberOfLoop = #vicinityUnit
-					--Spring.Echo("LOOP:" .. numberOfLoop)
 					local numberOfLoopToProcessPerFrame = math.ceil(numberOfLoop/29)
 					local currentLoopIndex = listOfBeacon[beaconID]["prevIndex"] or 1
 					local currentLoopCount = 0
@@ -273,6 +270,7 @@ function widget:GameFrame(n)
 						finishLoop =true
 					end
 					for k=currentLoopIndex, numberOfLoop,1 do
+						--UNIT: k
 						local unitID = vicinityUnit[k]
 						local validUnitID = spValidUnitID(unitID)
 						if not validUnitID then
@@ -324,12 +322,6 @@ function widget:GameFrame(n)
 									local newMass = spGetUnitRulesParam(unitID,"effectiveMass")
 									transportChargetime[unitID] = (newMass and math.floor(newMass*0.25)) or nil --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
 									transportSpeedMod = spGetUnitRulesParam(unitID,"selfMoveSpeedChange") or 1 --see unit_transport_speed.lua
-									-- local cargo = spGetUnitIsTransporting(unitID)  -- for transports, also count their cargo 
-									-- if cargo then
-										-- for m = 1, #cargo do --i=group index, j=beacon index, k=unit index, m=cargo index
-											-- transportChargeAdd = transportChargeAdd + math.floor(UnitDefs[spGetUnitDefID(cargo[m])].mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
-										-- end 
-									-- end
 								end
 								--IS UNIT WAITING AT BEACON? count them--
 								if unitInfo["cmd"].id==CMD_WAIT_AT_BEACON then --DEFINED in include("LuaRules/Configs/customcmds.h.lua")
@@ -382,13 +374,6 @@ function widget:GameFrame(n)
 										cmd_queue.params[1]=unitInfo["cmd"].params[1] --target coordinate
 										cmd_queue.params[2]=unitInfo["cmd"].params[2]
 										cmd_queue.params[3]=unitInfo["cmd"].params[3]
-										-- if not listOfBeacon[beaconID2][4] then --if haven't update the djinnID yet
-											-- local djinnID = (spGetUnitRulesParam(beaconID2,"connectto"))
-											-- local ex,ey,ez = spGetUnitPosition(djinnID)
-											-- listOfBeacon[beaconID2][4] = ex
-											-- listOfBeacon[beaconID2][5] = ey
-											-- listOfBeacon[beaconID2][6] = ez
-										-- end
 										local chargeTime = transportChargetime[unitID] or listOfMobile[unitDefID][2]
 										local _, beaconIDToProcess, totalOverheadTime,_,history = DiggDeeper({beaconID2}, unitSpeed,cmd_queue.params,chargeTime, 99999, 0,0, {})
 										if beaconIDToProcess then
@@ -398,10 +383,6 @@ function widget:GameFrame(n)
 											local totalTime = timeToBeacon + timeFromExitToDestination + totalOverheadTime
 											unitInfo["becn"][beaconID2] = {totalTime, history}
 											--Note: all unitInfo table have reference to unitToEffect[unitID], so all value already saved there.
-											
-										else --if beacon yeild no result? (all result have travel time > 99999 frame or ~1hour)
-											--unitInfo["becn"][beaconID2][1] = 99999
-											--intentionally empty
 										end
 									end
 								end
@@ -409,16 +390,12 @@ function widget:GameFrame(n)
 							until true
 							currentLoopCount = currentLoopCount + 1
 						end
-						--Spring.Echo("K:"..k)
 						if k >= numberOfLoop then
 							finishLoop =true
-							--Spring.Echo("FINISH")
 						elseif currentUnitProcessed >= numberOfUnitToProcessPerFrame or currentLoopCount>= numberOfLoopToProcessPerFrame then
 							groupSpreadJobs[i] = true
 							listOfBeacon[beaconID]["prevIndex"] = k+1  --continue at next frame
 							listOfBeacon[beaconID]["prevList"] = vicinityUnit  --continue at next frame
-							--Spring.Echo("PAUSE,LOOP SO FAR:"..currentLoopCount)
-							--Spring.Echo("PAUSE")
 							break
 						end
 					end
@@ -444,8 +421,6 @@ function widget:GameFrame(n)
 						local pathToFollow
 						--NOTE: time to destination is in frame (number of frame).
 						local lowestPathTime = unitInfo["norm"] - 30 --add 1 second benefit to regular walking (make walking more attractive choice unless teleport can save more than 1 second travel time)
-						-- Spring.Echo("TEST:".. unitID)
-						-- Spring.Echo("Normal:".. lowestPathTime)
 						for beaconID, beaconResult in pairs(unitInfo["becn"]) do
 							if listOfBeacon[beaconID] then --beacon is alive
 								local pathCurrentQueue = 0
@@ -463,11 +438,7 @@ function widget:GameFrame(n)
 									IgnoreUnit[unitID][beaconID] = true --exclude processing this unit forever until its command changed
 								end
 							end
-							-- if timeToDest<30000 then
-								-- Spring.Echo("A:".. timeToDest .. " B:" .. beaconCurrentQueue[beaconID])
-							-- end
 						end
-						-- Spring.Echo("Selected:"..lowestPathTime)
 						if pathToFollow then
 							local ex,ey,ez = listOfBeacon[pathToFollow][4],listOfBeacon[pathToFollow][5],listOfBeacon[pathToFollow][6]
 							local dix,diz=unitToEffect[unitID]["cmd"].params[1],unitToEffect[unitID]["cmd"].params[3] --target coordinate
@@ -480,12 +451,6 @@ function widget:GameFrame(n)
 							--end wait for network delay
 							--method A: give GUARD order--
 							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
-							--
-							--method B: give original CMD_WAIT_AT_BEACON-- (Problem: it skip beaconWaiter[unitID] assignment in gadget:AllowCommand() and so it make the command fail)
-							-- local bx,by,bz = listOfBeacon[pathToFollow][1],listOfBeacon[pathToFollow][2],listOfBeacon[pathToFollow][3]
-							-- local params = {bx, by, bz, pathToFollow, Spring.GetGameFrame()}
-							-- Spring.GiveOrderArrayToUnitArray({unitID},{{CMD.INSERT,{0,CMD_WAIT_AT_BEACON,CMD.OPT_SHIFT, unpack(params)}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
-							--
 							local defID = unitInfo["defID"]
 							local chargeTime = transportChargetime[unitID] or listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime

@@ -1,4 +1,4 @@
-local version = "v0.5"
+local version = "v0.502"
 function widget:GetInfo()
   return {
     name      = "Auto Jump Over Terrain",
@@ -24,7 +24,6 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameSeconds = Spring.GetGameSeconds
 ------------------------------------------------------------
 ------------------------------------------------------------
--- local isNewEngine = not Game.version:find('91.0') 
 local myTeamID
 local jumperAddInfo={}
 --Spread job stuff: (spread looping across 1 second)
@@ -94,7 +93,7 @@ function widget:GameFrame(n)
 					local halfJumprangeSq = (jumperDefs[unitDefID].range/2)^2
 					local heightSq = jumperDefs[unitDefID].height^2
 					local totalFlightDist = math.sqrt(halfJumprangeSq+heightSq)*2
-					local jumpTime = totalFlightDist/jumperDefs[unitDefID].speed + jumperDefs[unitDefID].delay --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
+					local jumpTime = (totalFlightDist/jumperDefs[unitDefID].speed + jumperDefs[unitDefID].delay)/30 -- is in second
 					local unitSpeed = ud.speed --speed is in elmo-per-second
 					local weaponRange = GetUnitFastestWeaponRange(ud)
 					local unitSize = math.max(ud.xsize*4, ud.zsize*4)
@@ -142,87 +141,94 @@ function widget:GameFrame(n)
 					end
 
 					currentUnitProcessed = currentUnitProcessed + 1
-					local weaponRange = jumperAddInfo[unitDefID][4]
-					--MEASURE REGULAR DISTANCE--
+					--CHECK POSITION OF PREVIOUS JUMP--
+					local extraCmd1 = nil
+					local extraCmd2 = nil
+					local jumpCmdPos = 0
+					if effectedUnit[unitID].cmdCount >0 then
+						for i=1, #cmd_queue do
+							local cmd = cmd_queue[i]
+							if cmd.id == effectedUnit[unitID].cmdOne.id and
+							cmd.params[1] == effectedUnit[unitID].cmdOne.x and
+							cmd.params[2] == effectedUnit[unitID].cmdOne.y and
+							cmd.params[3] == effectedUnit[unitID].cmdOne.z then
+								extraCmd1 = {CMD.REMOVE, {cmd.tag},{"shift"}}
+								jumpCmdPos = i
+							end
+							if cmd.id == effectedUnit[unitID].cmdTwo.id and
+							cmd.params[1] == effectedUnit[unitID].cmdTwo.x and
+							cmd.params[2] == effectedUnit[unitID].cmdTwo.y and
+							cmd.params[3] == effectedUnit[unitID].cmdTwo.z then
+								extraCmd2 = {CMD.REMOVE, {cmd.tag},{"shift"}}
+								jumpCmdPos = jumpCmdPos or i
+								break
+							end
+						end
+					end
+					--CHECK FOR OBSTACLE IN LINE--
 					local tx,ty,tz = cmd_queue2.params[1],cmd_queue2.params[2],cmd_queue2.params[3]
 					local px,py,pz = spGetUnitPosition(unitID)
-					local unitSpeed = jumperAddInfo[unitDefID][3]
-					local moveID = jumperAddInfo[unitDefID][1]
-					local distance = GetWaypointDistance(unitID,moveID,cmd_queue2,px,py,pz,unitIsAttacking,weaponRange)
-					local normalTimeToDest = (distance/unitSpeed)*30
-					--MEASURE DISTANCE WITH JUMP--
 					local  enterPoint_X,enterPoint_Y,enterPoint_Z,exitPoint_X,exitPoint_Y,exitPoint_Z = GetNearestObstacleEnterAndExitPoint(px,py,pz, tx,tz, unitDefID)
-					if exitPoint_X and exitPoint_Z then --beacon is alive?
+					if exitPoint_X and exitPoint_Z then
+						local unitSpeed = jumperAddInfo[unitDefID][3]
+						local moveID = jumperAddInfo[unitDefID][1]
+						local weaponRange = jumperAddInfo[unitDefID][4]
+						--MEASURE REGULAR DISTANCE--
+						local distance = GetWaypointDistance(unitID,moveID,cmd_queue2,px,py,pz,unitIsAttacking,weaponRange)
+						local normalTimeToDest = (distance/unitSpeed) --is in second
+						
+						--MEASURE DISTANCE WITH JUMP--
 						cmd_queue2.params[1]=enterPoint_X
 						cmd_queue2.params[2]=enterPoint_Y
 						cmd_queue2.params[3]=enterPoint_Z
-						local distance = GetWaypointDistance(unitID,moveID,cmd_queue2,px,py,pz,false,0) --distance to beacon
-						local timeToBeacon = (distance/unitSpeed)*30 --timeToBeacon is in frame
+						distance = GetWaypointDistance(unitID,moveID,cmd_queue2,px,py,pz,false,0) --distance to jump-start point
+						local timeToJump = (distance/unitSpeed) --is in second
 						cmd_queue2.params[1]=tx --target coordinate
 						cmd_queue2.params[2]=ty
 						cmd_queue2.params[3]=tz
-						if exitPoint_X then
-							local jumpTime = jumperAddInfo[unitDefID][2]
-							distance = GetWaypointDistance(unitID,moveID,cmd_queue2,exitPoint_X,exitPoint_Y,exitPoint_Z,unitIsAttacking,weaponRange) --dist out of beacon
-							local timeFromExitToDestination = (distance/unitSpeed)*30
-							local totalTimeWithJump = timeToBeacon + timeFromExitToDestination + jumpTime
-							
-							if normalTimeToDest then
-								--NOTE: time to destination is in frame (number of frame).
-								local normalPathTime = normalTimeToDest - 30 --add 1 second benefit to regular walking (make walking more attractive choice unless teleport can save more than 1 second travel time)
-								if totalTimeWithJump < normalPathTime then	
-									local extraCmd = {[1]=nil,[2]=nil}
-									if effectedUnit[unitID].cmdCount >0 then
-										for i=1, #cmd_queue do
-											local cmd = cmd_queue[i]
-											if cmd.id == effectedUnit[unitID].cmdOne.id and
-											cmd.params[1] == effectedUnit[unitID].cmdOne.x and
-											cmd.params[2] == effectedUnit[unitID].cmdOne.y and
-											cmd.params[3] == effectedUnit[unitID].cmdOne.z then
-												extraCmd[1] = {CMD.REMOVE, {cmd.tag},{"shift"}}
-											end
-											if cmd.id == effectedUnit[unitID].cmdTwo.id and
-											cmd.params[1] == effectedUnit[unitID].cmdTwo.x and
-											cmd.params[2] == effectedUnit[unitID].cmdTwo.y and
-											cmd.params[3] == effectedUnit[unitID].cmdTwo.z then
-												extraCmd[2] = {CMD.REMOVE, {cmd.tag},{"shift"}}
-												break
-											end
-										end
-									end
-									local commandArray = {[1]=nil,[2]=nil,[3]=nil,[4]=nil}
-									if (math.abs(enterPoint_X-px)>50 or math.abs(enterPoint_Z-pz)>50) then
-										commandArray[1]= {CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, enterPoint_X,enterPoint_Y,enterPoint_Z}, {"alt"}}
-										commandArray[2]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, {"alt"}}
-										commandArray[3]= extraCmd[2]
-										commandArray[4]= extraCmd[1]
-										effectedUnit[unitID].cmdCount = 2
-										effectedUnit[unitID].cmdOne.id = CMD.MOVE
-										effectedUnit[unitID].cmdOne.x = enterPoint_X
-										effectedUnit[unitID].cmdOne.y = enterPoint_Y
-										effectedUnit[unitID].cmdOne.z = enterPoint_Z
-										effectedUnit[unitID].cmdTwo.id = CMD_JUMP
-										effectedUnit[unitID].cmdTwo.x = exitPoint_X
-										effectedUnit[unitID].cmdTwo.y = exitPoint_Y
-										effectedUnit[unitID].cmdTwo.z = exitPoint_Z
-										issuedOrderTo[unitID] = {CMD.MOVE,enterPoint_X,enterPoint_Y,enterPoint_Z}
-									else
-										commandArray[1]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, {"alt"}}
-										commandArray[2]= extraCmd[2]
-										commandArray[3]= extraCmd[1]
-										effectedUnit[unitID].cmdCount = 1
-										effectedUnit[unitID].cmdTwo.id = CMD_JUMP
-										effectedUnit[unitID].cmdTwo.x = exitPoint_X
-										effectedUnit[unitID].cmdTwo.y = exitPoint_Y
-										effectedUnit[unitID].cmdTwo.z = exitPoint_Z
-										issuedOrderTo[unitID] = {CMD_JUMP,exitPoint_X,exitPoint_Y,exitPoint_Z}
-									end
-									spGiveOrderArrayToUnitArray({unitID},commandArray)
-									waitForNetworkDelay = waitForNetworkDelay or {spGetGameSeconds(),0}
-									waitForNetworkDelay[2] = waitForNetworkDelay[2] + 1
-								end
+
+						local jumpTime = jumperAddInfo[unitDefID][2]
+						distance = GetWaypointDistance(unitID,moveID,cmd_queue2,exitPoint_X,exitPoint_Y,exitPoint_Z,unitIsAttacking,weaponRange) --dist out of jump-landing point
+						local timeFromExitToDestination = (distance/unitSpeed) --in second
+						local totalTimeWithJump = timeToJump + timeFromExitToDestination + jumpTime
+
+						--NOTE: time to destination is in second.
+						local normalPathTime = normalTimeToDest - 1 --add 1 second benefit to regular walking (make walking more attractive choice unless jump can save more than 1 second travel time)
+						if totalTimeWithJump < normalPathTime then	
+							local commandArray = {[1]=nil,[2]=nil,[3]=nil,[4]=nil}
+							if (math.abs(enterPoint_X-px)>50 or math.abs(enterPoint_Z-pz)>50) then
+								commandArray[1]= {CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, enterPoint_X,enterPoint_Y,enterPoint_Z}, {"alt"}}
+								commandArray[2]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, {"alt"}}
+								commandArray[3]= extraCmd2
+								commandArray[4]= extraCmd1
+								effectedUnit[unitID].cmdCount = 2
+								effectedUnit[unitID].cmdOne.id = CMD.MOVE
+								effectedUnit[unitID].cmdOne.x = enterPoint_X
+								effectedUnit[unitID].cmdOne.y = enterPoint_Y
+								effectedUnit[unitID].cmdOne.z = enterPoint_Z
+								effectedUnit[unitID].cmdTwo.id = CMD_JUMP
+								effectedUnit[unitID].cmdTwo.x = exitPoint_X
+								effectedUnit[unitID].cmdTwo.y = exitPoint_Y
+								effectedUnit[unitID].cmdTwo.z = exitPoint_Z
+								issuedOrderTo[unitID] = {CMD.MOVE,enterPoint_X,enterPoint_Y,enterPoint_Z}
+							else
+								commandArray[1]= {CMD.INSERT, {0, CMD_JUMP, CMD.OPT_INTERNAL, exitPoint_X,exitPoint_Y,exitPoint_Z}, {"alt"}}
+								commandArray[2]= extraCmd2
+								commandArray[3]= extraCmd1
+								effectedUnit[unitID].cmdCount = 1
+								effectedUnit[unitID].cmdTwo.id = CMD_JUMP
+								effectedUnit[unitID].cmdTwo.x = exitPoint_X
+								effectedUnit[unitID].cmdTwo.y = exitPoint_Y
+								effectedUnit[unitID].cmdTwo.z = exitPoint_Z
+								issuedOrderTo[unitID] = {CMD_JUMP,exitPoint_X,exitPoint_Y,exitPoint_Z}
 							end
+							spGiveOrderArrayToUnitArray({unitID},commandArray)
+							waitForNetworkDelay = waitForNetworkDelay or {spGetGameSeconds(),0}
+							waitForNetworkDelay[2] = waitForNetworkDelay[2] + 1
 						end
+					elseif jumpCmdPos >= 2 then
+						spGiveOrderArrayToUnitArray({unitID},{extraCmd2,extraCmd1}) --another command was sandwiched before the Jump command, making Jump possibly outdated/no-longer-optimal. Remove Jump
+						effectedUnit[unitID].cmdCount = 0
 					end
 				until true
 				currentLoopCount = currentLoopCount + 1
