@@ -1,4 +1,4 @@
-local version = "v0.839"
+local version = "v0.840"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -17,6 +17,7 @@ local detectionRange = 600
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 VFS.Include("LuaRules/Utilities/isTargetReachable.lua")
+VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spValidUnitID = Spring.ValidUnitID
@@ -277,7 +278,6 @@ function widget:GameFrame(n)
 						if not validUnitID then
 							unitToEffect[unitID] = nil
 						end
-						local skipToNextFrameNow = false
 						local excludedUnit = IgnoreUnit[unitID] and IgnoreUnit[unitID][beaconID]
 						if not loopedUnits[unitID] and validUnitID and not listOfBeacon[unitID] and not excludedUnit then
 							local unitDefID = spGetUnitDefID(unitID)
@@ -286,10 +286,8 @@ function widget:GameFrame(n)
 								local ud = UnitDefs[unitDefID]
 								local chargeTime = math.floor(ud.mass*0.25) --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
 								local unitSpeed = ud.speed --speed is in elmo-per-second
-								local isFixedWing = (ud.canFly or ud.isAirUnit) and (ud.isBomber or ud.isFighter)
-								if isNewEngine then
-									isFixedWing = (ud.canFly or ud.isAirUnit) and not ud.isHoveringAirUnit
-								end
+								local movetype = Spring.Utilities.getMovetype(ud)
+								local isFixedWing = (movetype == 0)
 								local weaponRange = GetUnitFastestWeaponRange(ud)
 								local isStatic = (unitSpeed == 0)
 								local isTransport = ud.transportCapacity >= 1
@@ -356,12 +354,6 @@ function widget:GameFrame(n)
 										end
 									end
 								end
-								--IS REACH DESIRED LIMIT? skip--
-								if currentUnitProcessed >= numberOfUnitToProcessPerFrame then
-									skipToNextFrameNow = true
-									break;
-								end
-
 								currentUnitProcessed = currentUnitProcessed + 1
 								local weaponRange = listOfMobile[unitDefID][5]
 								--MEASURE REGULAR DISTANCE--
@@ -418,10 +410,10 @@ function widget:GameFrame(n)
 							currentLoopCount = currentLoopCount + 1
 						end
 						--Spring.Echo("K:"..k)
-						if k == numberOfLoop then
+						if k >= numberOfLoop then
 							finishLoop =true
 							--Spring.Echo("FINISH")
-						elseif skipToNextFrameNow or currentLoopCount>= numberOfLoopToProcessPerFrame then
+						elseif currentUnitProcessed >= numberOfUnitToProcessPerFrame or currentLoopCount>= numberOfLoopToProcessPerFrame then
 							groupSpreadJobs[i] = true
 							listOfBeacon[beaconID]["prevIndex"] = k+1  --continue at next frame
 							listOfBeacon[beaconID]["prevList"] = vicinityUnit  --continue at next frame
@@ -634,10 +626,6 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRang
 			result, lastwaypoint, waypoints = Spring.Utilities.IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],minimumGoalDist)
 			if result == "outofreach" then --abit out of reach?
 				reachable=false --target is unreachable!
-				-- result = IsTargetReachable(moveID,lastwaypoint[1],lastwaypoint[2],lastwaypoint[3],v.params[1],v.params[2],v.params[3],minimumGoalDist-100) --refine pathing
-				-- if result ~= "reach" then --still not reachable?
-					-- reachable=false --target is unreachable!
-				-- end
 			end
 		end
 		if reachable then
