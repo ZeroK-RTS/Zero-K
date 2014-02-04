@@ -132,7 +132,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 600,
+        default = 200,
       },
 
       explosionGenerator      = [[custom:flashslow]],
@@ -146,7 +146,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 350,
-      reloadtime              = 3,
+      reloadtime              = 1,
       rgbColor                = [[0.27 0 0.36]],
       soundStart              = [[weapon/laser/pulse_laser2]],
       soundStartVolume        = 15,
