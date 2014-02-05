@@ -55,7 +55,8 @@ local airpadDefs = {
 
  -- land if pad is within this range
 local fixedwingPadRadius = 500
-local gunshipPadRadius = 160 
+local gunshipPadRadius = 160
+local DEFAULT_PAD_RADIUS = 300
 
 local bomberDefs = {}
 local boolBomberDefs = {}
@@ -453,7 +454,7 @@ function gadget:GameFrame(n)
 			local padID = data.padID
 			local unitDefID = data.unitDefID
 			local queue = Spring.GetUnitCommands(bomberID, 1)
-			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < bomberDefs[unitDefID].padRadius) then
+			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < (unitDefID and bomberDefs[unitDefID] and bomberDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
 					airpadRefreshEmptyspot = true
