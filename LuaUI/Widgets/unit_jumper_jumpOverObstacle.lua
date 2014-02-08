@@ -1,4 +1,4 @@
-local version = "v0.502"
+local version = "v0.503"
 function widget:GetInfo()
   return {
     name      = "Auto Jump Over Terrain",
@@ -24,6 +24,7 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameSeconds = Spring.GetGameSeconds
 ------------------------------------------------------------
 ------------------------------------------------------------
+local gaussUnitDefID = UnitDefNames["armpb"].id
 local myTeamID
 local jumperAddInfo={}
 --Spread job stuff: (spread looping across 1 second)
@@ -281,7 +282,7 @@ function GetNearestObstacleEnterAndExitPoint(currPosX,currPosY, currPosZ, target
 			return x,z,true
 		end
 		local y = Spring.GetGroundHeight(x, z)
-		local clear,_ = Spring.TestBuildOrder(unitDefID, x,y ,z, 1)
+		local clear,_ = Spring.TestBuildOrder(gaussUnitDefID or unitDefID, x,y ,z, 1)
 		-- Spring.MarkerAddPoint(x,y ,z, clear)
 		if clear == 0 then
 			overobstacle = true
