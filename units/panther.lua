@@ -44,7 +44,7 @@ unitDef = {
   mass                   = 198,
   maxDamage              = 1050,
   maxSlope               = 18,
-  maxVelocity            = 3.7,
+  maxVelocity            = 3.3,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
@@ -95,7 +95,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = [[220]],
+        extra_damage = [[160]],
       },
 
       cylinderTargeting      = 0,
@@ -122,7 +122,7 @@ unitDef = {
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
       startsmoke              = [[1]],
-      targetMoveError         = 0.15,
+      targetMoveError         = 0,
       texture1                = [[lightning]],
       thickness               = 10,
       turret                  = true,

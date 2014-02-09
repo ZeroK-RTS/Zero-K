@@ -47,9 +47,9 @@ local weapons = {
 		timeFall = 0.5 
 	},
 	logkoda_napalm_bomblet = { 
-		radius = 64, 
-		damage = 60, 
-		duration = 300, 
+		radius = 96, 
+		damage = 20, 
+		duration = 400, 
 		rangeFall = 0.6, 
 		timeFall = 0.5 
 	},

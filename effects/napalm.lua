@@ -7,8 +7,8 @@ local cegs = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,
-      flashsize          = 64,
-      ttl                = 330,
+      flashsize          = 96,
+      ttl                = 440,
       color = {
         [1]  = 0.7,
         [2]  = 0.3,
@@ -18,13 +18,13 @@ local cegs = {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 6,
+      count              = 8,
       ground             = true,
       water              = true,
       properties = {
         delay              = [[0 i40]],
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[-10 r20, 30, -10 r20]],
+        pos                = [[-20 r40, 30, -20 r40]],
       },
     },
   },

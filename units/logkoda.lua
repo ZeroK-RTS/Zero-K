@@ -79,7 +79,7 @@ unitDef = {
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
       accuracy				  = 1000,
-      areaOfEffect            = 128,
+      areaOfEffect            = 192,
       avoidFeature            = true,
       avoidFriendly           = true,
       burnblow                = true,
@@ -114,7 +114,7 @@ unitDef = {
       soundStartVolume        = 3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 400,
+      weaponVelocity          = 600,
     },
 	
 	BOGUS_FAKE_NAPALM_BOMBLET = {
