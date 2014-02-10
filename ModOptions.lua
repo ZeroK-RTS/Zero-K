@@ -54,6 +54,11 @@ local options = {
 	name = 'Lava Rising',
 	desc = 'Endlessly rising lava!  Fiery fun for the whole family!',
       },
+      {
+	key  = 'ctf',
+	name = 'Capture The Flag',
+	desc = 'Rob enemy base from all flags and watch them selfd!',
+      },
     },
   },
   {
