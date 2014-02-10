@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.2" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.0.2b" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -81,9 +81,10 @@ local max	= math.max
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local myTeam = Spring.GetMyTeamID()
-local myAllyTeam = Spring.GetMyAllyTeamID()
-local RedAllyTeam = nil
+local myTeam --= Spring.GetMyTeamID()
+local myAllyTeam --= Spring.GetMyAllyTeamID()
+local myOldAllyTeam
+local RedAllyTeam --= nil
 local timer = 0
 local UPDATE_FREQUENCY = 0.6	-- seconds
 
@@ -153,20 +154,58 @@ function GetTimeFormatted(time)
   return time_text
 end
 
+function UpdateTeamData()
+  myTeam = Spring.GetMyTeamID()
+  myAllyTeam = Spring.GetMyAllyTeamID()
+  if (myAllyTeam ~= myOldAllyTeam) then
+    memo_bs = nil
+    memo_rs = nil
+    -- remove all status effects if there are any
+    -- such roundabout way huh
+    if (respawn_button) then
+      mid_stack:RemoveChild(respawn_button)
+      respawn_button = nil
+    end
+    if (red_stolen) then
+      red_team:RemoveChild(red_stolen)
+      red_stolen = nil
+    end
+    if (blue_stolen) then
+      blue_team:RemoveChild(blue_stolen)
+      blue_stolen = nil
+    end
+    if (contest_timer) then
+      status_window:RemoveChild(contest_text)
+      status_window:RemoveChild(contest_timer)
+    end
+    if (blue_defeat) then
+      blue_team:RemoveChild(blue_defeat)
+      blue_defeat = nil	
+    end
+    if (red_defeat) then
+      red_team:RemoveChild(red_defeat)
+      red_defeat = nil	
+    end
+    myOldAllyTeam = myAllyTeam
+  end
+  if (Spring.GetGameRulesParam("ctf_flags_team"..myAllyTeam) == nil) then
+    return false
+  end
+  -- FIXME hardcoded to 2 teams naturally TODO remake all widget to support more than 2 allyteams
+  RedAllyTeam = FigureOutRed(myAllyTeam)
+  if (RedAllyTeam == nil) then
+    return false
+  end
+  return true
+end
+
 function widget:Update(s)
   timer = timer + s
   if timer > UPDATE_FREQUENCY then
     timer = 0
+    UpdateTeamData()
+    if (myTeam == nil) or (myAllyTeam == nil) or (RedAllyTeam == nil) then return end
     local bs = Spring.GetGameRulesParam("ctf_flags_team"..myAllyTeam)
-    -- FIXME hardcoded to 2 teams naturally
-    if (RedAllyTeam == nil) then
-      RedAllyTeam = FigureOutRed(myAllyTeam)
-      if (RedAllyTeam ~= nil) then
-	memo_bs = bs
-	memo_rs = Spring.GetGameRulesParam("ctf_flags_team"..RedAllyTeam)
-      end
-      return
-    end
     local rs = Spring.GetGameRulesParam("ctf_flags_team"..RedAllyTeam)
     -- update labels
     blue_score:SetCaption(bs)
@@ -226,13 +265,13 @@ function widget:Update(s)
 	  textColor = red;
 	}
 	blue_team:AddChild(blue_stolen)
-	if (bs < memo_bs) then
+	if (memo_bs) and (bs < memo_bs) then
 	  Spring.PlaySoundFile(sfx_stolen)
 	end
       elseif (bf_stolen == 0) and (blue_stolen ~= nil) then
-	if (bs == (memo_bs+1)) then
+	if (memo_bs) and (bs == (memo_bs+1)) then
 	  Spring.PlaySoundFile(sfx_return)
-	elseif (rs == (memo_rs+1)) then
+	elseif (memo_rs) and (rs == (memo_rs+1)) then
 	  Spring.PlaySoundFile(sfx_red_score)
 	end
 	blue_team:RemoveChild(blue_stolen)
@@ -250,14 +289,14 @@ function widget:Update(s)
 	  fontsize = 13;
 	  textColor = green;
 	}
-	if (rs < memo_rs) then
+	if (memo_rs) and (rs < memo_rs) then
 	  Spring.PlaySoundFile(sfx_stolen)
 	end
 	red_team:AddChild(red_stolen)
       elseif (rf_stolen == 0) and (red_stolen ~= nil) then
-	if (rs == (memo_rs+1)) then
+	if (memo_rs) and (rs == (memo_rs+1)) then
 	  Spring.PlaySoundFile(sfx_return)
-	elseif (bs == (memo_bs+1)) then
+	elseif (memo_bs) and (bs == (memo_bs+1)) then
 	  Spring.PlaySoundFile(sfx_blue_score)
 	end
 	red_team:RemoveChild(red_stolen)
