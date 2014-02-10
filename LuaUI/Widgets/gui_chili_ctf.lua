@@ -265,13 +265,13 @@ function widget:Update(s)
 	  textColor = red;
 	}
 	blue_team:AddChild(blue_stolen)
-	if (memo_bs) and (bs < memo_bs) then
+	if (memo_bs ~= nil) and (bs < memo_bs) then
 	  Spring.PlaySoundFile(sfx_stolen)
 	end
       elseif (bf_stolen == 0) and (blue_stolen ~= nil) then
-	if (memo_bs) and (bs == (memo_bs+1)) then
+	if (memo_bs ~= nil) and (bs == (memo_bs+1)) then
 	  Spring.PlaySoundFile(sfx_return)
-	elseif (memo_rs) and (rs == (memo_rs+1)) then
+	elseif (memo_rs ~= nil) and (rs == (memo_rs+1)) then
 	  Spring.PlaySoundFile(sfx_red_score)
 	end
 	blue_team:RemoveChild(blue_stolen)
@@ -289,14 +289,14 @@ function widget:Update(s)
 	  fontsize = 13;
 	  textColor = green;
 	}
-	if (memo_rs) and (rs < memo_rs) then
+	if (memo_rs ~= nil) and (rs < memo_rs) then
 	  Spring.PlaySoundFile(sfx_stolen)
 	end
 	red_team:AddChild(red_stolen)
       elseif (rf_stolen == 0) and (red_stolen ~= nil) then
-	if (memo_rs) and (rs == (memo_rs+1)) then
+	if (memo_rs ~= nil) and (rs == (memo_rs+1)) then
 	  Spring.PlaySoundFile(sfx_return)
-	elseif (memo_bs) and (bs == (memo_bs+1)) then
+	elseif (memo_bs ~= nil) and (bs == (memo_bs+1)) then
 	  Spring.PlaySoundFile(sfx_blue_score)
 	end
 	red_team:RemoveChild(red_stolen)
