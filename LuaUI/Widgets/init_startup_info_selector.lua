@@ -33,6 +33,7 @@ local spGetGameRulesParam = Spring.GetGameRulesParam
 
 local coop = (Spring.GetModOptions().coop == 1) or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
+local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 
 local Chili
 local Window
@@ -288,7 +289,7 @@ function widget:Gameframe(n)
 end
 
 function widget:GameStart()
-	if not dotaMode then
+	if (not dotaMode) and (not ctfMode) then
 		screen0:RemoveChild(buttonWindow)
 	end
 end
