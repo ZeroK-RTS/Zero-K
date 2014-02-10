@@ -39,6 +39,7 @@ unitDef = {
   maxDamage                     = 175000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
+  maxWaterDepth     		= 0,
   minCloakDistance              = 0,
   noAutoFire                    = false,
   objectName                    = [[pw_techlab.obj]],
@@ -55,6 +56,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
+  waterline                     = 1,
   --yardMap                       = [[oooooooooooooooooooo]],
 
   featureDefs                   = {

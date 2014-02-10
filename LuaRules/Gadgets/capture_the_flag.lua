@@ -1,10 +1,10 @@
-local version = "0.0.1"
+local version = "0.0.2"
 
 function gadget:GetInfo()
   return {
     name      = "Capture The Flag",
     desc      = "CTF original game mode. Capture the flags! Version "..version,
-    author    = "Tom Fyuri", -- also kudos to Sprung, KingRaptor, xponen and jK
+    author    = "Tom Fyuri",
     date      = "Feb 2014",
     license   = "GPL v2 or later",
     layer     = 1,
@@ -59,7 +59,6 @@ if (math.randomseed ~= nil) then
   math.random()
   --math.randomseed(r)
 end
-
 
 --SYNCED-------------------------------------------------------------------
 
@@ -178,6 +177,9 @@ local ME_CENTER_LVL = ME_CENTER_INIT_LVL
 local ME_CENTER_CURRENT_BONUS = 1 -- this get's changed to 1.5 1.75 and 1.875...
 local COM_DROP_DELAY = 3 -- in seconds
 -- NOTE maybe it's better to simply make centers behave like mexes so you may connect them to OD grid...
+
+local energy_mult = 1.0 -- why not obey them too
+local metal_mult = 1.0
 
 local function disSQ(x1,y1,x2,y2)
   return (x1 - x2)^2 + (y1 - y2)^2
@@ -453,30 +455,29 @@ function SpawnCommandCenters()
   end
   spSetGameRulesParam("ctf_cc_lvl", ME_CENTER_INIT_LVL)
   
-  for _,data in pairs(CentreSpawns[1]) do
-    local y = spGetGroundHeight(data[1], data[2])
-    if (y < 0) then
-      local up = y-waterLevel
-      if (up > 0) then up = 20; else up = -up+20; end
-      spSetHeightMapFunc(hqHeightMapFunc, data[1], data[2], up)
-    end
+  -- mults
+  local em = spGetGameRulesParam("energymult")
+  local mm = spGetGameRulesParam("metalmult")
+  if (em ~= nil) then
+    energy_mult = em
   end
-  for _,data in pairs(CentreSpawns[2]) do
-    local y = spGetGroundHeight(data[1], data[2])
-    if (y < 0) then
-      local up = y-waterLevel
-      if (up > 0) then up = 20; else up = -up+20; end
-      spSetHeightMapFunc(hqHeightMapFunc, data[1], data[2], up)
-    end
+  if (mm ~= nil) then
+    metal_mult = mm
   end
   
   -- TODO disperse CCs amongst players, rather than giving all to single player
   for i=1,#CentreSpawns[1] do
-    CommandCenters[#CommandCenters+1] = { id = spCreateUnit("ctf_center", CentreSpawns[1][i][1], spGetGroundHeight(CentreSpawns[1][i][1], CentreSpawns[1][i][2])+20, CentreSpawns[1][i][2],"n",GetTeamFromAlly(SpawnBoxes[1].allyTeam).team), allyTeam = SpawnBoxes[1].allyTeam, x = CentreSpawns[1][i][1], y = spGetGroundHeight(CentreSpawns[1][i][1], CentreSpawns[1][i][2]), z = CentreSpawns[1][i][2] }
+    local y = spGetGroundHeight(CentreSpawns[1][i][1], CentreSpawns[1][i][2])
+    if (y < waterLevel) then
+      y = waterLevel end
+    CommandCenters[#CommandCenters+1] = { id = spCreateUnit("ctf_center", CentreSpawns[1][i][1], y, CentreSpawns[1][i][2],"n",GetTeamFromAlly(SpawnBoxes[1].allyTeam).team), allyTeam = SpawnBoxes[1].allyTeam, x = CentreSpawns[1][i][1], y = y, z = CentreSpawns[1][i][2] }
     UnStuckGuys(CentreSpawns[1][i][1], CentreSpawns[1][i][2], 130)
   end
   for i=1,#CentreSpawns[2] do
-    CommandCenters[#CommandCenters+1] = { id = spCreateUnit("ctf_center", CentreSpawns[2][i][1], spGetGroundHeight(CentreSpawns[2][i][1], CentreSpawns[2][i][2])+20, CentreSpawns[2][i][2],"n",GetTeamFromAlly(SpawnBoxes[2].allyTeam).team), allyTeam = SpawnBoxes[2].allyTeam, x = CentreSpawns[2][i][1], y = spGetGroundHeight(CentreSpawns[2][i][1], CentreSpawns[2][i][2]), z = CentreSpawns[2][i][2] }
+    local y = spGetGroundHeight(CentreSpawns[2][i][1], CentreSpawns[2][i][2])
+    if (y < waterLevel) then
+      y = waterLevel end
+    CommandCenters[#CommandCenters+1] = { id = spCreateUnit("ctf_center", CentreSpawns[2][i][1], y, CentreSpawns[2][i][2],"n",GetTeamFromAlly(SpawnBoxes[2].allyTeam).team), allyTeam = SpawnBoxes[2].allyTeam, x = CentreSpawns[2][i][1], y = y, z = CentreSpawns[2][i][2] }
     UnStuckGuys(CentreSpawns[2][i][1], CentreSpawns[2][i][2], 130)
   end
   PlayersPerTeam = players_per_team
@@ -556,7 +557,7 @@ function Payday()
     if (flags > 0) then
       teams = spGetTeamList(allyTeam)
       income = ME_BONUS_C[FlagAmount[allyTeam]] * ME_CENTER_CURRENT_BONUS
-      spSetGameRulesParam("ctf_income_team"..allyTeam, floor(income*100))
+      spSetGameRulesParam("ctf_income_team"..allyTeam, floor(income*metal_mult*100))
       candidatesForTake = {}
       for i=1,#teams do
 	local _, active, spectator = spGetPlayerInfo(select(2, spGetTeamInfo(teams[i])))
@@ -567,8 +568,8 @@ function Payday()
       local inc = income/#candidatesForTake
       for i=1,#candidatesForTake do
 	local player = candidatesForTake[i]
-	spAddTeamResource(player, "m", inc)
-	spAddTeamResource(player, "e", inc)
+	spAddTeamResource(player, "m", inc*metal_mult)
+	spAddTeamResource(player, "e", inc*energy_mult)
       end
     end
   end
@@ -710,6 +711,26 @@ end
 --//------------------ Misc code -- BEGIN
 --//------------------ CTF logic code -- BEGIN
 
+function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
+  if (FlagCarrier[unitID]) then
+    local oldAllyTeam = select(6,spGetTeamInfo(teamID))
+    local allyTeam = select(6,spGetTeamInfo(newTeamID))
+    if (oldAllyTeam ~= allyTeam) then -- transfer things
+      if (FlagCarrier[unitID] == allyTeam) then -- contested flag is the same as unit owner
+	ReturnFlag(nil, unitID, allyTeam)
+      else
+	TransferFlag(unitID, oldAllyTeam, unitID, allyTeam)
+      end
+    end
+  end
+end
+
+function TransferFlag(unitID, oldAllyTeam, newUnitID, allyTeam)
+  -- TODO this is half baked function
+  -- this it assumes oldunitid is same as new... for now
+  ContestedTeam[oldAllyTeam] = allyTeam
+end
+
 function TeleportFlag(TargetAllyTeam)
   -- find who's holding this flag
   for unitID, allyTeam in pairs(FlagCarrier) do
@@ -751,7 +772,10 @@ function ReturnFlag(flagID, unitID, allyTeam)
 end
 
 function DropFlag(allyTeam, x, y, z)
-  local flagID = spCreateUnit("ctf_flag", x, y+10, z, "n", GetTeamFromAlly(allyTeam).team) -- FIXME i think better would be to make it to rely on some var instead of func
+  local y = spGetGroundHeight(x,z)
+  if (y < waterLevel) then
+    y = waterLevel end
+  local flagID = spCreateUnit("ctf_flag", x, y, z, "n", GetTeamFromAlly(allyTeam).team) -- FIXME i think better would be to make it to rely on some var instead of func
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, flagID)
   DroppedFlags[flagID] = { allyTeam = allyTeam, x = x, y = y, z = z, id = flagID }
   spSetUnitAlwaysVisible(flagID, true)
@@ -815,7 +839,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
       ReturnFlag(nil, nil, DroppedFlags[unitID].allyTeam) -- flag destroyed
       DroppedFlags[flagID] = nil
     end
-    if (spValidUnitID(attackerID) and UnitDefs[unitDefID].customParams.commtype and not(spAreTeamsAllied(teamID,attackerTeamID))) then -- this commander was in battle, allow him to respawn!
+    if (spValidUnitID(attackerID) and UnitDefs[unitDefID].customParams.commtype and not(spAreTeamsAllied(teamID,attackerTeamID)) and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil)) then -- this commander was in battle, allow him to respawn!
       if (UsedOrbitDrop[teamID] ~= true) and (FlagAmount[select(6,spGetTeamInfo(teamID))] < FLAG_AMOUNT_INIT) then
 	spSetGameRulesParam("ctf_allow_respawn_team"..spGetUnitTeam(unitID),1)
       end
