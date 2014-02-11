@@ -99,12 +99,13 @@ local function SitOnPad(unitID)
 	
 	local heading = spGetUnitHeading(unitID)*HEADING_TO_RAD
 	
+	
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
-		mcSetRotation(unitID,0,heading,0)
 		spSetUnitLeaveTracks(unitID, false)
 		unitMovectrled[unitID] = true
 	end
+	mcSetRotation(unitID,0,heading,0)
 	
 	local padHeading = acos(dz)
 	if dx < 0 then
