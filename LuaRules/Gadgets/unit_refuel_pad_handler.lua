@@ -65,7 +65,12 @@ local rotateUnit = {}
 for i=1,#UnitDefs do
 	local movetype = Spring.Utilities.getMovetype(UnitDefs[i])
 	if movetype == 0 then -- fixedwing
-		turnRadius[i] = UnitDefs[i].turnRadius
+		local ud = UnitDefs[i]
+		if ud.customParams and ud.customParams.refuelturnradius then
+			turnRadius[i] = tonumber(ud.customParams.refuelturnradius)
+		else
+			turnRadius[i] = ud.turnRadius
+		end
 		rotateUnit[i] = true
 	elseif movetype == 1 then -- gunship
 		turnRadius[i] = 20
@@ -324,13 +329,13 @@ local function CircleToLand(unitID, goal)
 	local acceleration = (targetSpeed^2 - maxSpeed^2)/(2*totalDist)
 	
 	-- Sigmoid Version
-	--local function TimeToVerticalPositon(t)
-	--	return start[2] + (goal[2] - start[2])*(1/(1 + exp(6*(-2*t/estimatedTime +1))))
-	--end
-	
 	local function TimeToVerticalPositon(t)
-		return start[2] + (goal[2] - start[2])*t/estimatedTime
+		return start[2] + (goal[2] - start[2])*(1/(1 + exp(6*(-2*t/estimatedTime +1))))
 	end
+	
+	--local function TimeToVerticalPositon(t)
+	--	return start[2] + (goal[2] - start[2])*t/estimatedTime
+	--end
 	
 	--[[
 	for i = 0, totalDist, maxSpeed do

@@ -36,6 +36,7 @@ unitDef = {
 	helptext_de    = [[Der Vamp ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
 	helptext_pl    = [[Vamp to ciezki mysliwiec, ktory jest przeznaczony do niszczenia wszystkiego, co lata. Jest dosc wytrzymaly, jednak nie jest w stanie atakowac celow naziemnych.]],
 	modelradius    = [[10]],
+	refuelturnradius = [[120]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -63,7 +64,7 @@ unitDef = {
   sightDistance          = 750,
   smoothAnim             = true,
   speedToFront           = 0.5,
-  turnRadius             = 120,
+  turnRadius             = 400,
 
   weapons                = {
 

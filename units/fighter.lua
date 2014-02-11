@@ -37,6 +37,7 @@ unitDef = {
 	modelradius    = [[20]],
 	specialreloadtime = [[850]],
 	modelradius    = [[5]],
+	refuelturnradius = [[80]],
   },
 
   defaultmissiontype     = [[VTOL_standby]],
@@ -81,7 +82,6 @@ unitDef = {
   smoothAnim             = true,
   speedToFront           = 0,
   stealth                = true,
-  turnRadius             = 80,
   turnRate               = 839,
 
   weapons                = {

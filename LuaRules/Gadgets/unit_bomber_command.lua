@@ -54,7 +54,7 @@ local airpadDefs = {
 }
 
  -- land if pad is within this range
-local fixedwingPadRadius = 500
+local fixedwingPadRadius = 600
 local gunshipPadRadius = 160
 local DEFAULT_PAD_RADIUS = 300
 
@@ -546,11 +546,6 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		local x, y, z = Spring.GetUnitPosition(targetAirpad)
 		Spring.SetUnitMoveGoal(unitID, x, y, z) -- try circle the airpad until free airpad allow bomberLanding.
 		return true, false	-- command used, don't remove
-	elseif cmdID == CMD_FIND_PAD then
-		if bomberDefs[unitDefID] then
-			rearmRequest[unitID] = true
-		end
-		return true, true	-- command used, remove
 	end
 	return false -- command not used
 end
@@ -590,6 +585,12 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if not cmdOptions.shift then
 			CancelAirpadReservation(unitID) --don't leave airpad reservation hanging, empty them when bomber is given other task
 		end
+	end
+	if cmdID == CMD_FIND_PAD then
+		if bomberDefs[unitDefID] then
+			rearmRequest[unitID] = true
+		end
+		return false
 	end
 	return true
 end
