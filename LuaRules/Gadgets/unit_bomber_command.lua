@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "3 February 2014, 22 Jan 2011",
+    date      = "11 February 2014, 22 Jan 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -442,13 +442,13 @@ function gadget:GameFrame(n)
 	-- if n%30 == 0 then
 		-- Spring.Echo(totalReservedPad)
 	-- end
+	cmdIgnoreSelf = true
+	for bomberID in pairs(rearmRequest) do
+		RequestRearm(bomberID, nil, true)
+		rearmRequest[bomberID] = nil
+	end
 	-- track proximity to bombers
 	if n%10 == 0 then
-		cmdIgnoreSelf = true
-		for bomberID in pairs(rearmRequest) do
-			RequestRearm(bomberID, nil, true)
-		end
-		rearmRequest = {}
 		local airpadRefreshEmptyspot = nil;
 		for bomberID, data in pairs(bomberToPad) do
 			local padID = data.padID
@@ -492,8 +492,8 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
-		cmdIgnoreSelf = false
 	end
+	cmdIgnoreSelf = false
 end
 
 function GG.RefuelComplete(bomberID)
