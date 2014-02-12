@@ -171,7 +171,7 @@ local options = {
 	section	= 'startconds'
 	type	= string
 	def		= nil
-  }
+  },
    {
 	key		= "noair"
 	name	= "Disable air"
@@ -179,7 +179,7 @@ local options = {
 	section	= 'startconds'
 	type	= "bool"
 	def		= false
-  }
+  },
      {
 	key		= "nodef"
 	name	= "Disable defences"
@@ -187,7 +187,7 @@ local options = {
 	section	= 'startconds'
 	type	= "bool"
 	def		= false
-  }
+  },
   {
     key = "overdrivesharingscheme",
     name = "Overdrive Resource Distribution Scheme",
