@@ -165,28 +165,28 @@ local options = {
     def = true,
   },
   {
-	key		= "disabledunits"
-	name	= "Disable units"
-	desc	= "Prevents specified units from being built ingame"
-	section	= 'startconds'
-	type	= string
-	def		= nil
+	key		= "disabledunits",
+	name	= "Disable units",
+	desc	= "Prevents specified units from being built ingame",
+	section	= 'startconds',
+	type	= string,
+	def		= nil,
   },
    {
-	key		= "noair"
-	name	= "Disable air"
-	desc	= "Disables plane and gunship factories"
-	section	= 'startconds'
-	type	= "bool"
-	def		= false
+	key		= "noair",
+	name	= "Disable air",
+	desc	= "Disables plane and gunship factories",
+	section	= 'startconds',
+	type	= "bool",
+	def		= false,
   },
      {
-	key		= "nodef"
-	name	= "Disable defences"
-	desc	= "Disables all defences from Defence tab"
-	section	= 'startconds'
-	type	= "bool"
-	def		= false
+	key		= "nodef",
+	name	= "Disable defences",
+	desc	= "Disables all defences from Defence tab",
+	section	= 'startconds',
+	type	= "bool",
+	def		= false,
   },
   {
     key = "overdrivesharingscheme",
