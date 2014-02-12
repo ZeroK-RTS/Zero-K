@@ -53,13 +53,20 @@ local weapons = {
 		rangeFall = 0.6, 
 		timeFall = 0.5 
 	},
+	logkoda_bogus_fake_napalm_bomblet = { 
+		radius = 32, 
+		damage = 20, 
+		duration = 400, 
+		rangeFall = 0.6, 
+		timeFall = 0.5 
+	},
 	infernal_napalm = { 
 		radius = 192, 
 		damage = 60, 
 		duration = 300, 
 		rangeFall = 0.6, 
 		timeFall = 0.5 
-},
+	},
 }
 
 -- radius		- defines size of sphereical area in which damage is dealt

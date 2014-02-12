@@ -27,6 +27,8 @@ local WHEEL_TURN_SPEED1_DECELERATION = 200
 
 local smokePiece = {body, turret}
 
+local flaming = false
+
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
@@ -37,7 +39,34 @@ local function RestoreAfterDelay()
 	Turn( sleeve , x_axis, math.rad(0 ), math.rad(TURRET_TURN_SPEED/2) )
 end
 
+----------------------------------------------------------
+----------------------------------------------------------
 
+function FlameTrailThread()
+	flaming = true
+	Signal(SIG_Restore)
+	Signal(SIG_AIM1)
+	
+	Turn( turret , y_axis, math.pi, math.rad(TURRET_TURN_SPEED))
+	Turn( sleeve , x_axis, 0.6, math.rad(GUN_TURN_SPEED))
+	
+	WaitForTurn(turret , y_axis)
+	WaitForTurn(sleeve , x_axis)
+	
+	for i = 1, 20 do
+		EmitSfx( firepoint,  FIRE_W2 )
+		Sleep(400)
+	end
+	flaming = false
+end
+
+
+function FlameTrail()
+	StartThread(FlameTrailThread)
+end
+
+----------------------------------------------------------
+----------------------------------------------------------
 
 function AnimationControl()
 
@@ -132,6 +161,9 @@ function script.QueryWeapon1()
 end
 
 function script.AimWeapon1(heading, pitch)
+	if flaming then
+		return false
+	end
 	
 	Signal( SIG_AIM1)
 	SetSignalMask( SIG_AIM1)
@@ -171,6 +203,10 @@ local function Recoil()
 	Move( barrel , z_axis, -3.5  )
 	Sleep(150)
 	Move( barrel , z_axis, 0 , 10 )
+end
+
+function script.BlockShot(num)
+	return flaming
 end
 
 function script.Shot(num)		

@@ -28,6 +28,31 @@ local cegs = {
       },
     },
   },
+  ["napalm_koda_small"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 32,
+      ttl                = 440,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 8,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i40]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_200]],
+        pos                = [[-8 r16, 20, -8 16]],
+      },
+    },
+  },
   ["napalm_infernal"] = {
     usedefaultexplosions = false,
     groundflash = {
