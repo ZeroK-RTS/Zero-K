@@ -1,4 +1,4 @@
-local version = "0.0.2"
+local version = "0.0.3"
 
 function gadget:GetInfo()
   return {
@@ -13,14 +13,13 @@ function gadget:GetInfo()
 end
 
 --[[ Capture The Flag.
-NOTE: Currently this gadget only works for matches with only 2 teams!
-
-1. 2 teams spawn with 3 flags. Flag icon appears of top of all command centers. Centers spawn slightly closer to front lines.
+1. Teams spawn with 3 flags. Flag icon appears of top of all command centers. Centers spawn slightly closer to front lines.
 2. It's invincible, you can't attack it, to capture enemy flag walk close by it's command center. To score stolen flag, walk close by your team's center.
 3. The more flags you own, the more resources every player on your team gets (both M&E). Bonus is everytime bigger the more you have. Losing flags, on the other hand will give a lot less resources.
 4. Losing team get's ability to call in dead commanders again. They get brand new ones delivered from orbit to any place they want in LoS.
   Commanders also the level of [amount_of_flags_initialy - amount_of_flags_left], so if number is bigger than 0 and you lost commander in battle. You may call in another one.
   NOTE: If you reclaimed commander or you made it suicide, you are not given this ability.
+  In some cases you may have multiple commanders, if that's the case, you might get ability to stack extra backup coms.
 5. If you lose all flags (enemy scores your last flag), you have 3 minutes to redeem your team by scoring 1 flag. If you fail to do so, you will lose the game.
 6. There can be multiple command centers (the more players the more centers), and they upgrade themselves overtime (for every level of command center they give additional 50% resources).
 
@@ -39,17 +38,25 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 - Losing flags gives free commanders (but overtime having more flags benefits you more).
 - Having 0 flags will result in defeat within 3 minutes (it's okay if last flag is stolen though).
 - Having many players in single team will result in multiple flag bases.
-- You can capture only 1 flag at a time. If 2 teams control each other flags for 120 secs, flags are teleported back.
+- You can capture only 1 flag at a time. If 2 teams control each other flags for 120 secs, flags are teleported back. -- TODO make it more complex if multiple teams control each other flags
 - Walking over your own team's flag will teleport it back to the base.
 - Walking over your enemy's flag will pick it up, bring it to your own base!
 - Contested flags do not count towards bonus income!
 - There can only be one single stolen&contested flag at a time!
 
-  TODO:
-Mobile version, scrap buildings! Make commanders - carriers! XD
+  immediate TODO:
+- Fix, improve and finalize CC spawn position system (almost done, it should support ffa and very small maps when it's done, and any amount of teams).
+- Transfer and drop flag buttons.
+- Detect if players resign.
+- Rewrite widget (it only shows 2 teams, yet gadget supports more, almost).
+- Multi-contest resolution (when multiple teams are stuck because they stealed each other flags).
+- Some more endgame content (either superunit or turn CCs into superweapons for last team standing, so they finish other teams in spectacular way).
+- Search and destroy last bugs and release this is 0.1 or smth.
 
   Changelog:
-9 February 2014 - 0.0.1 beta - First version. ]]--
+9 February 2014 - 0.0.1 beta	- First version. 
+10 February 2014 - 0.0.2	- Second version with water support and few bug fixes.
+11 February 2014 - 0.0.3	- Income lowered by 2. Bug fixes. CC spawn logic changed. Backup commanders are stackable. And lots of bug fixes. ]]--
   
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -78,6 +85,8 @@ local ceil	= math.ceil
 local min	= math.min
 local max	= math.max
 local abs	= math.abs
+local cos	= math.cos
+local sin	= math.sin
 local spGetTeamInfo 	    = Spring.GetTeamInfo
 local GaiaTeamID 	    = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID	    = select(6,spGetTeamInfo(GaiaTeamID))
@@ -133,11 +142,17 @@ local DefeatTimer = {} -- every second you have 0 flags you are doomed :D
 local CallBackup = {} -- per team, holds lvl of commander player may call in (respawn)
 local CommChoice = {} -- players can change commchoice ingame...
 local OrbitDrop = {} -- delayed delivering...
-local UsedOrbitDrop = {} -- true if you already called backup, yet turns false if you lose another flag and com as well
 local BlackList = {} -- per unitid.. i put here transported units and unblacklist on unloading/death
+local CommanderPool = {} -- maximum amount of commanders per player
+local CommanderTickets = {} -- amount of tickets per player
+local CommanderTimer = {} -- timer starts to go down if player has less commanders than his pool allows, timer resets (and comm ticket is given) if enemy scores your team's flag
+local CommanderSpeedUpTimer = {} -- by teamID, if enemy team scores, it will allow to call in backup comm much sooner
+local Godmode = {} -- unitid... only CCs are dropped here, flags are not though
+local ActivePlayers = {} -- players that are not killed
+local PlayersInTeam = {} -- allyteam...
 local PlayersPerTeam
 
-local CMD_ATTACK	= CMD.ATTACK
+-- local CMD_ATTACK	= CMD.ATTACK
 
 local CopyTable = Spring.Utilities.CopyTable
 
@@ -152,19 +167,19 @@ local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
 local MAX_Z_DIFFERENCE = 75 -- no capturing from space lol
 local FLAG_AMOUNT_INIT = 3
-local ME_BONUS = function(i) return (1.4^(1+i)+(1.5+(i*1.5)))-2.9 end --[[
+local ME_BONUS = function(i) return ((1.4^(1+i)+(1.5+(i*1.5)))-2.9)/2 end --[[
 for every flag your team owns from 0 to 6 - your own income, examples:
 flags 	1 second	1 minute
 0	0.0		0.0
-1	2.06		123.6
-2	4.344		260.64
-3	6.9416		416.496
-4	9.97824		598.6944
-5	13.629536	817.77216
-6	18.1413504	1088.481024
-4 vs 2 - ~338 per minute advantage, your enemy respawns with 1lvl coms. -- +5.63m&e income per player seems fair to counter this with respawning few commanders.
-5 vs 1 - ~694 per minute advantage, your enemy respawns with 2lvl coms. -- +11.57m&e income per player seems fair to counter this with respawning few commanders being lvl2.
-6 vs 0 - ~1088 per minute advantage, your enemy respawns with 3lvl coms and have 3 minutes to grab 1 flag before auto-resign.
+1	1.03		61.8
+2	2.172		130.32
+3	3.4708		208.248
+4	4.98912		299.3472
+5	6.814768	408.88608
+6	9.0706752	544.240512
+4 vs 2 - ~169 per minute advantage, your enemy respawns with 1lvl coms. -- +2.815m&e income per player seems fair to counter this with respawning few commanders.
+5 vs 1 - ~347 per minute advantage, your enemy respawns with 2lvl coms. -- +5.785m&e income per player seems fair to counter this with respawning few commanders being lvl2.
+6 vs 0 - ~544 per minute advantage, your enemy respawns with 3lvl coms and have 3 minutes to grab 1 flag before auto-resign.
 this makes this entirely worthwhile to capture flags. because even by losing single flag you make your own position less favorable in the long run.
 no matter what you do command center is indestructible, yet gives constant bonus income. ]]-- 
 local ME_BONUS_C = {} -- this one fills in automatically from function above on gamestart, it's income per TEAM, NOT PER PLAYER!
@@ -176,238 +191,244 @@ local ME_CENTER_INIT_LVL = 0
 local ME_CENTER_LVL = ME_CENTER_INIT_LVL
 local ME_CENTER_CURRENT_BONUS = 1 -- this get's changed to 1.5 1.75 and 1.875...
 local COM_DROP_DELAY = 3 -- in seconds
+local COM_DROP_TIMER = 300 -- 1 free ticket per 5 minutes
+local CTF_ONE_SECOND_FRAME = 30 -- frames per second
 -- NOTE maybe it's better to simply make centers behave like mexes so you may connect them to OD grid...
 
 local energy_mult = 1.0 -- why not obey them too
 local metal_mult = 1.0
 
-local function disSQ(x1,y1,x2,y2)
-  return (x1 - x2)^2 + (y1 - y2)^2
-end
+local GameStarted = false
 
---//------------------ Code to determine command center spawn positions and teleport stucked commanders away -- BEGIN
---[[ What needs to be done in this section... well, a change in spawn position logic is required, right now it's pretty lame. Yet it's more smarter than takeover for example.
-]]--
+--//------------------ Code to determine command center spawn positions and teleport stucked commanders away and so on -- BEGIN
 
-function AddCoor(i)
-  local NORTH_WEST = { mapWidth*0.32, mapHeight*0.32 }
-  local NORTH = { mapWidth*0.5, mapHeight*0.32 }
-  local NORTH_EAST = { mapWidth*0.68, mapHeight*0.32 }
-  local WEST = { mapWidth*0.32, mapHeight*0.5 }
-  local CENTER = { mapWidth*0.5, mapHeight*0.5 }
-  local EAST = { mapWidth*0.68, mapHeight*0.5 }
-  local SOUTH_WEST = { mapWidth*0.32, mapHeight*0.68 }
-  local SOUTH = { mapWidth*0.5, mapHeight*0.68 }
-  local SOUTH_EAST = { mapWidth*0.68, mapHeight*0.68 }
-  if (i == 1) then
-    return NORTH_WEST
-  elseif (i == 2) then
-    return NORTH
-  elseif (i == 3) then
-    return NORTH_EAST
-  elseif (i == 4) then
-    return EAST
-  elseif (i == 5) then
-    return CENTER
-  elseif (i == 6) then
-    return WEST
-  elseif (i == 7) then
-    return SOUTH_WEST
-  elseif (i == 8) then
-    return SOUTH
-  elseif (i == 9) then
-    return SOUTH_EAST
-  end
-end
-
-function GameFieldToLocations(gf)
-  local Team1={}
-  local Team2={}
-  for i=1,3 do
-    for j=1,3 do
-      if (gf[i][j] == 1) then
-	Team1[#Team1+1] = AddCoor(3*i-3+j)
-      elseif (gf[i][j] == 2) then
-	Team2[#Team2+1] = AddCoor(3*i-3+j)
-      end
+function FigureSide(x, y)
+  if (x < mapWidth/3) then 
+    if (y < mapHeight/3) then
+      return 1
+    elseif (y < mapHeight/(3/2)) then
+      return 2
+    else
+      return 3
+    end
+  elseif (y < mapWidth/(3/2)) then 
+    if (y < mapHeight/3) then
+      return 4
+    elseif (y < mapHeight/(3/2)) then
+      return 5
+    else
+      return 6
+    end
+  else 
+    if (y < mapHeight/3) then
+      return 7
+    elseif (y < mapHeight/(3/2)) then
+      return 8
+    else
+      return 9
     end
   end
-  return { Team1 , Team2 }
+  return 5 -- LOL
 end
 
-function DetermineSides(x,z,x2,z2,player_num)
-  local east = 0
-  local south = 0
-  --TODO rewrite this!
-  if (x < mapWidth/2-10) then -- west?
-    east=-1
-  end
-  if (x > mapWidth/2+10) then -- east...
-    east=1
-  end
-  if (z < mapHeight/2-10) then -- north?
-    south=-1
-  end
-  if (z > mapHeight/2+10) then -- south...
-    south=1
-  end
-  local game_field = { {0,0,0},{0,0,0},{0,0,0} }
-  game_field[2+south][2+east] = 1
-  if (x2 < mapWidth/2-10) then -- west?
-    east=-1
-  end
-  if (x2 > mapWidth/2+10) then -- east...
-    east=1
-  end
-  if (z2 < mapHeight/2-10) then -- north?
-    south=-1
-  end
-  if (z2 > mapHeight/2+10) then -- south...
-    south=1
-  end
-  game_field[2+south][2+east] = 2
-  -- game field could look like this
-  -- 000
-  -- 100
-  -- 020
-  -- this represents west vs south...
-  -- if it's clusterfork it should become
-  -- 110
-  -- 102
-  -- 022
-  local size = 1
-  -- if map is big
-  if (not((mapHeight*2 < mapWidth) or (mapWidth*2 < mapHeight))) then
-    if (player_num >= 6) then
-      size = 3
+function ToFacing(x, y)
+  local lol = FigureSide(x,y)
+  if (lol == 2) then
+    return "s"
+  elseif (lol == 4) then
+    return "e"
+  elseif (lol == 6) then
+    return "w"
+  elseif (lol == 8) then
+    return "n"
+  elseif (lol == 1) then
+    local n = random (1,2)
+    if (n == 1) then
+      return "e"
+    else
+      return "s"
     end
-  end -- narrow map means less bases, sorry lads!
-  if (player_num >= 3) then
-    size = 2
-  end
-  if (size == 1) then
-    return GameFieldToLocations(game_field)
-  elseif (size == 2) then
-    -- well well damn it, i have no idea how to make it any shorter
-    -- TODO rewrite this, also this can't work if some spawn position is in center of the map!
-    if ((game_field[2][1] ~= 0) and (game_field[2][3] ~= 0)) then -- west vs east
-      game_field[1][1] = game_field[2][1]
-      game_field[1][3] = game_field[2][1]
-      game_field[3][1] = game_field[2][3]
-      game_field[3][3] = game_field[2][3]
-      game_field[2][1] = 0
-      game_field[2][3] = 0
-    elseif ((game_field[1][2] ~= 0) and (game_field[3][2] ~= 0)) then -- north vs south
-      game_field[1][1] = game_field[1][2]
-      game_field[1][3] = game_field[1][2]
-      game_field[3][1] = game_field[3][2]
-      game_field[3][3] = game_field[3][2]
-      game_field[1][2] = 0
-      game_field[3][2] = 0
-    elseif ((game_field[2][1] ~= 0) and (game_field[3][2] ~= 0)) then -- west vs south
-      game_field[1][1] = game_field[2][1]
-      game_field[3][3] = game_field[3][2]
-    elseif ((game_field[2][1] ~= 0) and (game_field[1][2] ~= 0)) then -- west vs north
-      game_field[3][1] = game_field[2][1]
-      game_field[1][3] = game_field[1][2]
-    elseif ((game_field[2][3] ~= 0) and (game_field[3][2] ~= 0)) then -- east vs south
-      game_field[1][3] = game_field[2][3]
-      game_field[3][1] = game_field[3][2]
-    elseif ((game_field[2][3] ~= 0) and (game_field[1][2] ~= 0)) then -- east vs north
-      game_field[3][3] = game_field[2][3]
-      game_field[1][1] = game_field[1][2]
-    elseif ((game_field[1][1] ~= 0) and (game_field[3][3] ~= 0)) then -- northwest vs southeast
-      game_field[1][2] = game_field[1][1]
-      game_field[2][1] = game_field[1][1]
-      game_field[2][3] = game_field[3][3]
-      game_field[3][2] = game_field[3][3]
-      game_field[1][1] = 0
-      game_field[3][3] = 0
-    elseif ((game_field[1][3] ~= 0) and (game_field[3][1] ~= 0)) then -- northeast vs southwest
-      game_field[1][2] = game_field[1][3]
-      game_field[2][3] = game_field[1][3]
-      game_field[2][1] = game_field[3][1]
-      game_field[3][2] = game_field[3][1]
-      game_field[1][3] = 0
-      game_field[3][1] = 0
-    elseif ((game_field[1][1] ~= 0) and (game_field[1][3] ~= 0)) then -- northwest vs northeast
-      game_field[2][1] = game_field[1][1]
-      game_field[2][3] = game_field[1][3]
-    elseif ((game_field[1][3] ~= 0) and (game_field[3][3] ~= 0)) then -- northeast vs southeast
-      game_field[1][2] = game_field[1][3]
-      game_field[3][2] = game_field[3][3]
-    elseif ((game_field[3][3] ~= 0) and (game_field[3][1] ~= 0)) then -- southeast vs southwest
-      game_field[2][3] = game_field[3][3]
-      game_field[2][1] = game_field[3][1]
-    elseif ((game_field[3][1] ~= 0) and (game_field[1][1] ~= 0)) then -- southwest vs northeast
-      game_field[3][2] = game_field[3][1]
-      game_field[1][2] = game_field[1][1]
+  elseif (lol == 3) then
+    local n = random (1,2)
+    if (n == 1) then
+      return "w"
+    else
+      return "s"
     end
-    return GameFieldToLocations(game_field)
+  elseif (lol == 7) then
+    local n = random (1,2)
+    if (n == 1) then
+      return "e"
+    else
+      return "n"
+    end
+  elseif (lol == 9) then
+    local n = random (1,2)
+    if (n == 1) then
+      return "w"
+    else
+      return "n"
+    end
+  else -- 5 lol
+    local n = random(1,4)
+    if (n == 1) then
+      return "n"
+    elseif (n == 2) then
+      return "w"
+    elseif (n == 3) then
+      return "s"
+    else
+      return "e"
+    end
+  end
+end
+
+function FindClosest(ex,ey,cx,cy)
+  local closest_index = 0
+  local closest_dist = nil
+  for index=1,#ex do
+    local dist = disSQ(ex[index],ey[index],cx,cy)
+    if (closest_dist == nil) or (dist < closest_dist) then
+      closest_index = index
+      closest_dist = dist
+    end
+  end
+  return ex[closest_index],ey[closest_index],closest_index
+end
+
+function MakeGoodIndex(index,min,max)
+  while (index<min) do
+    index=index+max
+  end
+  while (index > max) do
+    index=index-max
+  end
+  return index
+end
+
+function DetermineSpawns(SpawnBoxes)
+  local CentreSpawns,player_num,allyTeam_num
+  allyTeam_num = #SpawnBoxes
+  player_num = 0
+  players_per_team = 0
+  for _,data in ipairs(SpawnBoxes) do
+    player_num = player_num + data.player_count
+    if (player_num > players_per_team) then
+      players_per_team = player_num
+    end
+  end
+  -- now figure out if map is narrow, if it is too narrow spawn only 1 CC, otherwise draw ellipse inside spring map and figure out fair coordinates to spawn centers
+  -- this allows to support 2 & 4 teams just fine, though i won't put any limit for team number
+  local cc_count = 1
+  local narrow = false
+  if ((mapWidth/5) > mapHeight) or ((mapHeight/5) > mapWidth) or (mapHeight < 400) or (mapWidth < 400) then
+    narrow = true -- only 1 CC per allyteam, otherwise depending on player count
+  end
+  local X1=200
+  local Y1=200
+  local X2=mapWidth-200
+  local Y2=mapHeight-200
+  if ((mapWidth >= 1800) and (mapHeight >= 1800)) or ((mapWidth/3 >= 600) and (mapHeight/3 >= 600) and ((mapWidth+mapHeight)/2) >= 1800) then
+    -- we can afford to do so!
+    X1 = mapWidth*0.25
+    Y1 = mapHeight*0.25
+    X2 = mapWidth*0.75
+    Y2 = mapHeight*0.75
+  end
+  local RX = (X2 - X1) / 2
+  local RY = (Y2 - Y1) / 2
+  local CX = (X2 + X1) / 2
+  local CY = (Y2 + Y1) / 2
+  local ex = {}; local ey = {}
+  local angle = 0
+  local step = 30 -- this makes 14 coordinates
+  if (allyTeam_num > 4) then
+    step = 10 + allyTeam_num * 3
+  end
+  while (angle < 360) do
+    ex[#ex+1] = CX + cos(angle) * RX
+    ey[#ey+1] = CY + sin(angle) * RY
+    angle = angle + step
+  end
+  -- basically the most interesting thing in a way... determine the most closest ex,ey to spawn center, this one should be "base" while
+  -- farsest to "base" should be extra centers, mark all 3, and remove "extra" ones depending on how many there should be (cc_count) param
+  CentreSpawns = {}
+  -- TODO more checks so that centers dont spawn too near each other
+  local coord_per_team = floor(step/allyTeam_num/2) -- 30/8 = 3, that means we can have more 3 CCs, how? by select prev,next,prev-1,next+1 coord for each team :)
+  local index
+  if not(narrow) then
+    index = MakeGoodIndex(5+coord_per_team, 1, #ex)
+    if (disSQ(ex[1],ey[1],ex[index],ey[index]) < (550^2)) then
+      narrow = true
+    end
+    index = MakeGoodIndex((-8+(1-coord_per_team)), 1, #ex)
+    if (disSQ(ex[1],ey[1],ex[index],ey[index]) < (550^2)) then
+      narrow = true
+    end
+  end
+  if not(narrow) then
+    if (player_num > 5) then
+      cc_count = 3
+    elseif (player_num > 2) then
+      cc_count = 2
+    end
   else
-    if ((game_field[2][1] ~= 0) and (game_field[2][3] ~= 0)) then -- west vs east
-      game_field[1][1] = game_field[2][1]
-      game_field[1][3] = game_field[2][1]
-      game_field[3][1] = game_field[2][3]
-      game_field[3][3] = game_field[2][3]
-    elseif ((game_field[1][2] ~= 0) and (game_field[3][2] ~= 0)) then -- north vs south
-      game_field[1][1] = game_field[1][2]
-      game_field[1][3] = game_field[1][2]
-      game_field[3][1] = game_field[3][2]
-      game_field[3][3] = game_field[3][2]
-    elseif ((game_field[2][1] ~= 0) and (game_field[3][2] ~= 0)) then -- west vs south
-      game_field[1][1] = game_field[2][1]
-      game_field[1][2] = game_field[2][1]
-      game_field[2][3] = game_field[3][2]
-      game_field[3][3] = game_field[3][2]
-    elseif ((game_field[2][1] ~= 0) and (game_field[1][2] ~= 0)) then -- west vs north
-      game_field[3][1] = game_field[2][1]
-      game_field[3][2] = game_field[2][1]
-      game_field[1][3] = game_field[1][2]
-      game_field[2][3] = game_field[1][2]
-    elseif ((game_field[2][3] ~= 0) and (game_field[3][2] ~= 0)) then -- east vs south
-      game_field[1][3] = game_field[2][3]
-      game_field[1][2] = game_field[2][3]
-      game_field[3][1] = game_field[3][2]
-      game_field[2][1] = game_field[3][2]
-    elseif ((game_field[2][3] ~= 0) and (game_field[1][2] ~= 0)) then -- east vs north
-      game_field[3][3] = game_field[2][3]
-      game_field[3][2] = game_field[2][3]
-      game_field[1][1] = game_field[1][2]
-      game_field[2][1] = game_field[1][2]
-    elseif ((game_field[1][1] ~= 0) and (game_field[3][3] ~= 0)) then -- northwest vs southeast
-      game_field[1][2] = game_field[1][1]
-      game_field[2][1] = game_field[1][1]
-      game_field[2][3] = game_field[3][3]
-      game_field[3][2] = game_field[3][3]
-    elseif ((game_field[1][3] ~= 0) and (game_field[3][1] ~= 0)) then -- northeast vs southwest
-      game_field[1][2] = game_field[1][3]
-      game_field[2][3] = game_field[1][3]
-      game_field[2][1] = game_field[3][1]
-      game_field[3][2] = game_field[3][1]
-    elseif ((game_field[1][1] ~= 0) and (game_field[1][3] ~= 0)) then -- northwest vs northeast
-      game_field[2][1] = game_field[1][1]
-      game_field[3][1] = game_field[1][1]
-      game_field[2][3] = game_field[1][3]
-      game_field[3][3] = game_field[1][3]
-    elseif ((game_field[1][3] ~= 0) and (game_field[3][3] ~= 0)) then -- northeast vs southeast
-      game_field[1][2] = game_field[1][3]
-      game_field[1][1] = game_field[1][3]
-      game_field[3][2] = game_field[3][3]
-      game_field[3][1] = game_field[3][3]
-    elseif ((game_field[3][3] ~= 0) and (game_field[3][1] ~= 0)) then -- southeast vs southwest
-      game_field[2][3] = game_field[3][3]
-      game_field[1][3] = game_field[3][3]
-      game_field[2][1] = game_field[3][1]
-      game_field[3][1] = game_field[3][1]
-    elseif ((game_field[3][1] ~= 0) and (game_field[1][1] ~= 0)) then -- southwest vs northeast
-      game_field[3][2] = game_field[3][1]
-      game_field[3][3] = game_field[3][1]
-      game_field[1][2] = game_field[1][1]
-      game_field[1][3] = game_field[1][1]
-    end
-    return GameFieldToLocations(game_field)
+    cc_count = 1
   end
+  local cx,cy,cx2,cy2,cx3,cy3
+  for _,spawn in ipairs(SpawnBoxes) do
+    cx,cy,index = FindClosest(ex, ey, spawn.centerx, spawn.centerz)
+    if (coord_per_team >= 2) then
+      index = MakeGoodIndex(4+index+coord_per_team, 1, #ex)
+      cx2 = ex[index]
+      cy2 = ey[index]
+      index = MakeGoodIndex((-8+(index-coord_per_team)), 1, #ex) -- god.. i will totally not understand how it works pretty soon
+      cx3 = ex[index]
+      cy3 = ey[index]
+      -- we have 3 CCs, now depending on how many we actually need...
+      if (cc_count == 1) then
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx, z = cy, allyTeam = spawn.allyTeam
+	}
+      elseif (cc_count == 2) then
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx2, z = cy2, allyTeam = spawn.allyTeam
+	}
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx3, z = cy3, allyTeam = spawn.allyTeam
+	}
+      else
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx, z = cy, allyTeam = spawn.allyTeam
+	}
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx2, z = cy2, allyTeam = spawn.allyTeam
+	}
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx3, z = cy3, allyTeam = spawn.allyTeam
+	}
+      end
+    elseif (coord_per_team == 1) then
+      if (cc_count == 1) then
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx, z = cy, allyTeam = spawn.allyTeam
+	}
+      elseif (cc_count == 2) then
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx2, z = cy2, allyTeam = spawn.allyTeam
+	}
+	CentreSpawns[#CentreSpawns+1] = {
+	  x = cx3, z = cy3, allyTeam = spawn.allyTeam
+	}
+      end
+    else
+      CentreSpawns[#CentreSpawns+1] = {
+	x = cx, z = cy, allyTeam = spawn.allyTeam
+      }
+    end
+  end
+  -- TODO detect if mex position is inside CC, if yes shift CC slightly
+  return CentreSpawns,players_per_team,player_num,allyTeam_num
 end
 
 function SpawnCommandCenters()
@@ -421,26 +442,17 @@ function SpawnCommandCenters()
 	SpawnBoxes[#SpawnBoxes+1] = {
 	  player_count = #spGetTeamList(allyTeam),
 	  allyTeam = allyTeam,
-	  x1 = x1, x2 = x2,
-	  z1 = z1, z2 = z2,
+	  x1 = x1, x2 = x2, -- not needed?
+	  z1 = z1, z2 = z2, -- not needed?
 	  centerx = (x1+x2)/2, 
 	  centerz = (z1+z2)/2,
-	  width = width, height = height,
 	}
       end
     end
   end
   
-  if (#SpawnBoxes ~= 2) then -- Blast it! No 2 spawn boxes? Not 2 teams then!
-    gadgetHandler:RemoveGadget()
-    return
-  end
-  -- NOTE all code below is hardcoded to 2 allyteams
-  -- now let's place centers.
-  -- closer to 0,0 would be north-west, hmmm
-  local player_num = SpawnBoxes[1].player_count + SpawnBoxes[2].player_count
-  local players_per_team = ceil(player_num/2)
-  local CentreSpawns = DetermineSides(SpawnBoxes[1].centerx,SpawnBoxes[1].centerz,SpawnBoxes[2].centerx,SpawnBoxes[2].centerz,players_per_team)
+  local CentreSpawns,PlayersPerTeam,player_num,allyTeam_num = DetermineSpawns(SpawnBoxes)
+  
   if (CentreSpawns == nil) then
     gadgetHandler:RemoveGadget()
     return
@@ -449,6 +461,7 @@ function SpawnCommandCenters()
   for _,a in ipairs(SpawnBoxes) do
     DefeatTimer[a.allyTeam] = TIMER_DEFEAT
     FlagAmount[a.allyTeam] = FLAG_AMOUNT_INIT
+    PlayersInTeam[a.allyTeam] = {}
     spSetGameRulesParam("ctf_contest_time_team"..a.allyTeam,TIMER_TELEPORT_FLAGS)
     spSetGameRulesParam("ctf_flags_team"..a.allyTeam, FLAG_AMOUNT_INIT)
     spSetGameRulesParam("ctf_defeat_time_team"..a.allyTeam, TIMER_DEFEAT)
@@ -466,26 +479,35 @@ function SpawnCommandCenters()
   end
   
   -- TODO disperse CCs amongst players, rather than giving all to single player
-  for i=1,#CentreSpawns[1] do
-    local y = spGetGroundHeight(CentreSpawns[1][i][1], CentreSpawns[1][i][2])
+  for _,data in ipairs(CentreSpawns) do
+    local y = spGetGroundHeight(data.x, data.z)
     if (y < waterLevel) then
       y = waterLevel end
-    CommandCenters[#CommandCenters+1] = { id = spCreateUnit("ctf_center", CentreSpawns[1][i][1], y, CentreSpawns[1][i][2],"n",GetTeamFromAlly(SpawnBoxes[1].allyTeam).team), allyTeam = SpawnBoxes[1].allyTeam, x = CentreSpawns[1][i][1], y = y, z = CentreSpawns[1][i][2] }
-    UnStuckGuys(CentreSpawns[1][i][1], CentreSpawns[1][i][2], 130)
+    CommandCenters[#CommandCenters+1] = { id = spCreateUnit("ctf_center", data.x, y, data.z, ToFacing(data.x, data.z), GetTeamFromAlly(data.allyTeam).team), allyTeam = data.allyTeam, x = data.x, y = y, z = data.z }
+    spSetUnitAlwaysVisible(CommandCenters[#CommandCenters].id, true)
+    Godmode[CommandCenters[#CommandCenters].id] = true
+    UnStuckGuys(data.x, data.z, 130)
   end
-  for i=1,#CentreSpawns[2] do
-    local y = spGetGroundHeight(CentreSpawns[2][i][1], CentreSpawns[2][i][2])
-    if (y < waterLevel) then
-      y = waterLevel end
-    CommandCenters[#CommandCenters+1] = { id = spCreateUnit("ctf_center", CentreSpawns[2][i][1], y, CentreSpawns[2][i][2],"n",GetTeamFromAlly(SpawnBoxes[2].allyTeam).team), allyTeam = SpawnBoxes[2].allyTeam, x = CentreSpawns[2][i][1], y = y, z = CentreSpawns[2][i][2] }
-    UnStuckGuys(CentreSpawns[2][i][1], CentreSpawns[2][i][2], 130)
-  end
-  PlayersPerTeam = players_per_team
   local max_flags = #SpawnBoxes * FLAG_AMOUNT_INIT
   for ip=0, max_flags do
-    ME_BONUS_C[ip] = ME_BONUS(ip) * ME_BONUS_MULT * players_per_team
+    ME_BONUS_C[ip] = ME_BONUS(ip) * ME_BONUS_MULT * PlayersPerTeam
   end
   ME_BONUS_DELAY = ME_BONUS_DELAY * player_num
+  
+  for allyTeam,_ in pairs(FlagAmount) do
+    teams = spGetTeamList(allyTeam)
+    for i=1,#teams do
+      local teamID = teams[i]
+      CommanderPool[teamID]=0
+      CommanderTickets[teamID]=0
+      CommanderTimer[teamID]=COM_DROP_TIMER
+      spSetGameRulesParam("ctf_orbit_pool"..teamID, 0)
+      spSetGameRulesParam("ctf_orbit_tickets"..teamID, 0)
+      spSetGameRulesParam("ctf_orbit_timer"..teamID, COM_DROP_TIMER)
+      ActivePlayers[teamID] = allyTeam
+      PlayersInTeam[allyTeam][#PlayersInTeam[allyTeam]+1] = teamID
+    end
+  end
 end
 
 function UnStuckGuys(x, z, sq)
@@ -555,21 +577,12 @@ function Payday()
   local candidatesForTake
   for allyTeam,flags in pairs(FlagAmount) do
     if (flags > 0) then
-      teams = spGetTeamList(allyTeam)
       income = ME_BONUS_C[FlagAmount[allyTeam]] * ME_CENTER_CURRENT_BONUS
       spSetGameRulesParam("ctf_income_team"..allyTeam, floor(income*metal_mult*100))
-      candidatesForTake = {}
-      for i=1,#teams do
-	local _, active, spectator = spGetPlayerInfo(select(2, spGetTeamInfo(teams[i])))
-	if active and not spectator and not spGetTeamRulesParam(teams[i], "WasKilled") then
-	  candidatesForTake[#candidatesForTake+1] = teams[i]
-	end
-      end
-      local inc = income/#candidatesForTake
-      for i=1,#candidatesForTake do
-	local player = candidatesForTake[i]
-	spAddTeamResource(player, "m", inc*metal_mult)
-	spAddTeamResource(player, "e", inc*energy_mult)
+      local inc = income/#PlayersInTeam[allyTeam]
+      for _,teamID in pairs(PlayersInTeam[allyTeam]) do
+	spAddTeamResource(teamID, "m", inc*metal_mult)
+	spAddTeamResource(teamID, "e", inc*energy_mult)
       end
     end
   end
@@ -591,23 +604,24 @@ function UpgradeCenters()
   ME_CENTER_CURRENT_BONUS = extra
 end
 
-function gadget:UnitDamaged(unitID)
-  if (CommandCenters[unitID]) or (DroppedFlags[unitID]) then
+function gadget:UnitPreDamaged(unitID) --, unitDefID, unitTeam, damage, paralyzer)
+  if (Godmode[unitID]) then --or (DroppedFlags[unitID]) then
     return 0
   end
+  --return damage
 end
 
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) --, fromSynced)
-  -- you shall not use the dormant unit
-  for i=1,#CommandCenters do
-    local cc = CommandCenters[i]
-    local ccID = cc.id
-    if (CMD_ATTACK == cmdID) and (#cmdParams == 1) and (cmdParams[1] == ccID) then -- you shall not reclaim me or touch me      
-      return false
-    end
-  end
-  return true
-end
+-- function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) --, fromSynced)
+--   -- you shall not use the dormant unit
+--   for i=1,#CommandCenters do
+--     local cc = CommandCenters[i]
+--     local ccID = cc.id
+--     if (CMD_ATTACK == cmdID) and (#cmdParams == 1) and (cmdParams[1] == ccID) then -- you shall not reclaim me or touch me      
+--       return false
+--     end
+--   end
+--   return true
+-- end
 
 function ParseCoords(line)
   params={}
@@ -667,11 +681,15 @@ function CommDrop(playerID,teamID,allyTeam,x,y,z)
       end
     end
     OrbitDrop[#OrbitDrop+1] = {
-      at = spGetGameFrame()+(32*COM_DROP_DELAY),
+      at = spGetGameFrame()+(CTF_ONE_SECOND_FRAME*COM_DROP_DELAY),
       startUnit = startUnit, x = x,
-      y = y, z = z, facing = "n", teamID = teamID }
-    spSetGameRulesParam("ctf_allow_respawn_team"..teamID,0)
-    UsedOrbitDrop[teamID] = true
+      y = y, z = z, facing = ToFacing(x,z), teamID = teamID }
+    CommanderPool[teamID]=CommanderPool[teamID]-1
+    CommanderTickets[teamID]=CommanderTickets[teamID]-1
+    CommanderTimer[teamID]=COM_DROP_TIMER
+    spSetGameRulesParam("ctf_orbit_pool"..teamID, CommanderPool[teamID])
+    spSetGameRulesParam("ctf_orbit_tickets"..teamID, CommanderTickets[teamID])
+    spSetGameRulesParam("ctf_orbit_timer"..teamID, COM_DROP_TIMER)
   end
 end
 
@@ -679,16 +697,112 @@ function DeliverDrops(f)
   for i,data in pairs(OrbitDrop) do
     if (data) and (data.at <= f) then
       local unitID = GG.DropUnit(data.startUnit, data.x, data.y, data.z, data.facing, data.teamID)
-      Spring.SpawnCEG("teleport_in", data.x, data.y, data.z)
-      OrbitDrop[i] = nil
+      if (unitID) then
+	Spring.SpawnCEG("teleport_in", data.x, data.y, data.z)
+	OrbitDrop[i] = nil
+      end -- else give ability again, com drop failed... FIXME
+    end
+  end
+end
+
+function PlayerDied(teamID, allyTeam)
+  -- basically if team dies or player resigns, give his pool and tickets to other alive players
+  -- so if it's 2 vs 5 in the end, the team of 2 guys will probably have 3 and 2 commanders lol
+  -- and they will be able to call in as many!
+  local pool_to_give = CommanderPool[teamID]
+  local tickets_to_give = CommanderTickets[teamID]
+  Spring.Echo("teamID "..teamID.." died having "..pool_to_give.." commanders and "..tickets_to_give.." tickets")
+  CommanderPool[teamID]=0
+  CommanderTickets[teamID]=0
+  CommanderTimer[teamID]=COM_DROP_TIMER
+  spSetGameRulesParam("ctf_orbit_pool"..teamID, 0)
+  spSetGameRulesParam("ctf_orbit_tickets"..teamID, 0)
+  spSetGameRulesParam("ctf_orbit_timer"..teamID, COM_DROP_TIMER)
+  local teams = spGetTeamList(ActivePlayers[teamID])
+  ActivePlayers[teamID] = nil
+  for i=1,#PlayersInTeam[allyTeam] do
+    if (PlayersInTeam[allyTeam][i] == teamID) then
+      PlayersInTeam[allyTeam][i] = nil
+      break
+    end
+  end
+  if (pool_to_give == 0) and (tickets_to_give == 0) then return end -- job well done
+  local highestRank = 0
+  local highestPool = 0
+  local candidatesForTake = {}
+  for i=1,#teams do
+    local leader = select(2, spGetTeamInfo(teams[i]))
+    local name, active, spectator, _, _, _, _, _, _, customKeys = spGetPlayerInfo(leader)
+    if active and not spectator and not spGetTeamRulesParam(teams[i], "WasKilled") then -- only consider giving to someone in position to take!
+      candidatesForTake[#candidatesForTake+1] = {team = teams[i], rank = ((tonumber(customKeys.elo) or 0)), pool = CommanderPool[teamID], tickets = CommanderTickets[teamID]}
+      if ((tonumber(customKeys.elo) or 0)) > highestRank then
+	highestRank = rank
+      end
+      if (CommanderPool[teams[i]] > highestPool) then
+	highestPool = CommanderPool[teams[i]]
+      end
+    end
+  end
+  
+  if (#candidatesForTake==0) then return end -- job well done
+  
+  -- TODO implement it the way so it prefers to give high elo players pool first, and tickets too, and then the rest of the team
+  -- just sort candidatesForTake by elo... in some function
+  local try_again = true
+  while (try_again) and (pool_to_give > 0) do
+    for i=1,#candidatesForTake do
+      if (pool_to_give == 0) then break end
+      local player = candidatesForTake[i]
+      if highestPool > player.pool then
+	CommanderPool[player.team] = CommanderPool[player.team] + 1
+	spSetGameRulesParam("ctf_orbit_pool"..player.team, CommanderPool[player.team])
+	pool_to_give = pool_to_give - 1
+	try_again = false
+      end
+    end
+    if (try_again) then
+      highestPool = highestPool + 1
+    end
+  end
+  try_again = true
+  -- new tickets do not reset com timer... hope that's fine?
+  while (try_again) and (tickets_to_give > 0) do
+    try_again = false
+    for i=1,#candidatesForTake do
+      if (tickets_to_give == 0) then break end
+      local player = candidatesForTake[i]
+      if player.tickets < player.pool then
+	CommanderTickets[player.team] = CommanderTickets[player.team] + 1
+	spSetGameRulesParam("ctf_orbit_tickets"..player.team, CommanderTickets[player.team])
+	tickets_to_give = tickets_to_give - 1
+	try_again = true
+      end
     end
   end
 end
 
 function LetThemCallBackup(allyTeam)
   teams = spGetTeamList(allyTeam)
-  for i=1,#teams do
-    UsedOrbitDrop[teams[i]] = nil
+  for _,teamID in pairs(PlayersInTeam[allyTeam]) do
+    if (CommanderSpeedUpTimer[teamID]) then -- if you suicided com you get no extra :)
+      CommanderTimer[teamID] = 3 -- or maybe 1.. or 0?
+    end
+  end
+end
+
+function OrbitTimer()
+  for allyTeam,flags in pairs(FlagAmount) do
+    for _,teamID in pairs(PlayersInTeam[allyTeam]) do
+      if (CommanderPool[teamID] > CommanderTickets[teamID]) then
+	CommanderTimer[teamID] = CommanderTimer[teamID] - 1
+      end
+      if (CommanderTimer[teamID]) <= 0 then
+	CommanderTimer[teamID] = COM_DROP_TIMER
+	CommanderTickets[teamID] = CommanderTickets[teamID] + 1
+	spSetGameRulesParam("ctf_orbit_tickets"..teamID, CommanderTickets[teamID])
+      end
+      spSetGameRulesParam("ctf_orbit_timer"..teamID, CommanderTimer[teamID])
+    end
   end
 end
 
@@ -708,6 +822,10 @@ function gadget:UnitLoaded(unitID)
   BlackList[unitID] = true
 end
 
+function disSQ(x1,y1,x2,y2)
+  return (x1 - x2)^2 + (y1 - y2)^2
+end
+
 --//------------------ Misc code -- BEGIN
 --//------------------ CTF logic code -- BEGIN
 
@@ -719,16 +837,20 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
       if (FlagCarrier[unitID] == allyTeam) then -- contested flag is the same as unit owner
 	ReturnFlag(nil, unitID, allyTeam)
       else
-	TransferFlag(unitID, oldAllyTeam, unitID, allyTeam)
+	TransferFlag(unitID, oldAllyTeam, unitID, allyTeam, FlagCarrier[unitID])
       end
     end
   end
 end
 
-function TransferFlag(unitID, oldAllyTeam, newUnitID, allyTeam)
-  -- TODO this is half baked function
-  -- this it assumes oldunitid is same as new... for now
-  ContestedTeam[oldAllyTeam] = allyTeam
+-- new func, hope i didn't mess up
+function TransferFlag(unitID, oldAllyTeam, newUnitID, allyTeam, FlagAllyTeam)
+  ContestedTeam[FlagAllyTeam] = allyTeam
+  if (unitID ~= newUnitID) then -- probably morphed unit
+    FlagCarrier[newUnitID] = FlagAllyTeam
+    spSetUnitAlwaysVisible(newUnitID, true)
+    spSetGameRulesParam("ctf_unit_stole_team"..FlagAllyTeam, newUnitID)
+  end
 end
 
 function TeleportFlag(TargetAllyTeam)
@@ -775,7 +897,7 @@ function DropFlag(allyTeam, x, y, z)
   local y = spGetGroundHeight(x,z)
   if (y < waterLevel) then
     y = waterLevel end
-  local flagID = spCreateUnit("ctf_flag", x, y, z, "n", GetTeamFromAlly(allyTeam).team) -- FIXME i think better would be to make it to rely on some var instead of func
+  local flagID = spCreateUnit("ctf_flag", x, y, z, ToFacing(x,z), GetTeamFromAlly(allyTeam).team) -- FIXME i think better would be to make it to rely on some var instead of func
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, flagID)
   DroppedFlags[flagID] = { allyTeam = allyTeam, x = x, y = y, z = z, id = flagID }
   spSetUnitAlwaysVisible(flagID, true)
@@ -827,11 +949,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
   if (spValidUnitID(unitID)) then
     if (FlagCarrier[unitID]) then
       BlackList[unitID] = true -- lol, awesome bug when unit that dies picks flag back up and dies with it
-      local x,y,z = spGetUnitPosition(unitID)
-      if (InsideMap(x,z) == false) then
-	ReturnFlag(nil, nil, allyTeam) -- flag outside of map
+      if (spGetUnitRulesParam(unitID, "wasMorphedTo") ~= nil) then
+	TransferFlag(unitID, spGetUnitAllyTeam(unitID), spGetUnitRulesParam(unitID, "wasMorphedTo"), spGetUnitAllyTeam(unitID), FlagCarrier[unitID])
       else
-	DropFlag(FlagCarrier[unitID], x, y, z)
+	local x,y,z = spGetUnitPosition(unitID)
+	if (InsideMap(x,z) == false) then
+	  ReturnFlag(nil, nil, allyTeam) -- flag outside of map
+	else
+	  DropFlag(FlagCarrier[unitID], x, y, z)
+	end
       end
       FlagCarrier[unitID] = nil
     end
@@ -839,17 +965,26 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
       ReturnFlag(nil, nil, DroppedFlags[unitID].allyTeam) -- flag destroyed
       DroppedFlags[flagID] = nil
     end
-    if (spValidUnitID(attackerID) and UnitDefs[unitDefID].customParams.commtype and not(spAreTeamsAllied(teamID,attackerTeamID)) and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil)) then -- this commander was in battle, allow him to respawn!
-      if (UsedOrbitDrop[teamID] ~= true) and (FlagAmount[select(6,spGetTeamInfo(teamID))] < FLAG_AMOUNT_INIT) then
-	spSetGameRulesParam("ctf_allow_respawn_team"..spGetUnitTeam(unitID),1)
-      end
+    if UnitDefs[unitDefID].customParams.commtype and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil) then
+      CommanderPool[teamID]=CommanderPool[teamID]+1
+      spSetGameRulesParam("ctf_orbit_pool"..teamID, CommanderPool[teamID])
+    end
+    if (spValidUnitID(attackerID) and UnitDefs[unitDefID].customParams.commtype and not(spAreTeamsAllied(teamID,attackerTeamID)) and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil)) and -- this commander was in battle, allow him to respawn!
+	(FlagAmount[select(6,spGetTeamInfo(teamID))] < FLAG_AMOUNT_INIT) then
+      CommanderSpeedUpTimer[teamID] = true
     end
   end
 end
 
-function gadget:UnitCreated(unitID) -- FIXME probably not needed, in 91 at least
+function gadget:UnitCreated(unitID, unitDefID, teamID)
   if (BlackList[unitID]) then
-    BlackList[unitID] = false
+    BlackList[unitID] = false -- FIXME probably not needed, in 91 at least
+  end
+end
+
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+  if (BlackList[unitID]) then
+    BlackList[unitID] = false -- FIXME probably not needed, in 91 at least
   end
 end
 
@@ -1016,32 +1151,43 @@ function CountDefeat()
     if (flags == 0) and (ContestedTeam[allyTeam] == nil) and (not(ContestAnyone(allyTeam))) then
       if (DefeatTimer[allyTeam] <= 0) then
 	-- die :(
-	local teams = spGetTeamList(allyTeam)
-	for i=1,#teams do -- TODO add unsycned forceresign command as well
-	  local team = teams[i]
-	  Spring.KillTeam(team)
-	  Spring.SetTeamRulesParam(team, "WasKilled", 1)
+	for _,teamID in pairs(PlayersInTeam[allyTeam]) do
+	  Spring.KillTeam(teamID)
+	  Spring.SetTeamRulesParam(teamID, "WasKilled", 1)
 	end
       end
       DefeatTimer[allyTeam] = DefeatTimer[allyTeam]-1
       spSetGameRulesParam("ctf_defeat_time_team"..allyTeam, DefeatTimer[allyTeam])
     end
   end
-  
+end
+
+function CheckForDead()
+  for allyTeam,flags in pairs(FlagAmount) do
+    for _,teamID in pairs(PlayersInTeam[allyTeam]) do
+      --local name, active, spectator = select(3,spGetPlayerInfo(select(2, spGetTeamInfo(teamID))))
+      if  spGetTeamRulesParam(teamID, "WasKilled") then
+	PlayerDied(teamID, allyTeam)
+      end
+    end
+  end
 end
 
 function gadget:GameFrame (f)
+  if not(GameStarted) then return end
   if ((f%ME_BONUS_DELAY)==0) then
     if (ME_CENTER_LVL < ME_CENTER_UP_MAX) then
       UpgradeCenters()
     end
   end
-  if ((f%32)==0) then
+  if ((f%CTF_ONE_SECOND_FRAME)==0) then
+    CheckForDead()
     Payday() -- give resources for having flags
     StealScoreFlags() -- any enemy unit near any of your command centers takes your flag and contest begins!
     -- any friendly unit carrying flag near your commander center scores!
     SolveContested() -- if teams hold each other flags in units
     CountDefeat() -- if you have 0 flags left and no contested flags either, you are doomed
+    OrbitTimer()
     DeliverDrops(f)
   end
 end
@@ -1059,6 +1205,7 @@ function gadget:GameStart()
   mapWidth = Game.mapSizeX
   mapHeight = Game.mapSizeZ
   SpawnCommandCenters()
+  GameStarted = true
 end
 
 --//------------------ Core -- END

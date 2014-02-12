@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.2b" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.0.3" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -89,6 +89,8 @@ local timer = 0
 local UPDATE_FREQUENCY = 0.6	-- seconds
 
 local respawn_button
+local respawn_info
+local respawn_timer
 local blue_score
 local red_score
 local blue_income
@@ -118,14 +120,20 @@ local spawn_text2 = "Press Right Mouse Button to exit spawn mode!"
 
 local iconsize   = 40
 local iconhsize  = iconsize * 0.5
+local iconsize2   = 60
+local iconhsize2  = iconsize2 * 0.5
 
 local sfx_stolen = "sounds/ctf/stolen.wav"
 local sfx_return = "sounds/ctf/return.wav"
 local sfx_blue_score = "sounds/ctf/capture-blue.wav"
 local sfx_red_score = "sounds/ctf/capture-red.wav"
 
+local bs,rs
 local memo_bs = -1
 local memo_rs = -1 -- used in clever way to detect capture/stolen/return
+
+local CommandCenters = {}
+local Rotation = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -186,6 +194,14 @@ function UpdateTeamData()
       red_team:RemoveChild(red_defeat)
       red_defeat = nil	
     end
+    if (respawn_info) then
+      mid_stack:RemoveChild(respawn_info)
+      respawn_info = nil
+    end
+    if (respawn_timer) then
+      mid_stack:RemoveChild(respawn_timer)
+      respawn_timer = nil
+    end
     myOldAllyTeam = myAllyTeam
   end
   if (Spring.GetGameRulesParam("ctf_flags_team"..myAllyTeam) == nil) then
@@ -200,13 +216,17 @@ function UpdateTeamData()
 end
 
 function widget:Update(s)
+  Rotation=Rotation+1
+  if (Rotation > 360) then
+    Rotation = 0
+  end
   timer = timer + s
   if timer > UPDATE_FREQUENCY then
     timer = 0
     UpdateTeamData()
     if (myTeam == nil) or (myAllyTeam == nil) or (RedAllyTeam == nil) then return end
-    local bs = Spring.GetGameRulesParam("ctf_flags_team"..myAllyTeam)
-    local rs = Spring.GetGameRulesParam("ctf_flags_team"..RedAllyTeam)
+    bs = Spring.GetGameRulesParam("ctf_flags_team"..myAllyTeam)
+    rs = Spring.GetGameRulesParam("ctf_flags_team"..RedAllyTeam)
     -- update labels
     blue_score:SetCaption(bs)
     red_score:SetCaption(rs)
@@ -222,14 +242,14 @@ function widget:Update(s)
       red_income:SetCaption(string.format("+%.2f/s",rt_inc))
     end
     -- can i respawn?
-    local respawn = Spring.GetGameRulesParam("ctf_allow_respawn_team"..myTeam)
-    if (respawn ~= nil) then
-      if (respawn == 1) and (respawn_button == nil) then
+    local spawn_tickets = Spring.GetGameRulesParam("ctf_orbit_tickets"..myTeam)
+    if (spawn_tickets ~= nil) then
+      if (spawn_tickets > 0) and (respawn_button == nil) then
 	respawn_button = Button:New {
 	  width = 50,
 	  height = 50,
 	  padding = {0, 0, 0, 0},
-	  margin = {0, 0, 0, 0},
+	  margin = {15, 0, 0, 0},
 -- 	  backgroundColor = {1, 1, 1, 0.4},
 	  caption = "";
 	  tooltip = "Orbital drop! Press and select place where to respawn your commander!";
@@ -245,9 +265,50 @@ function widget:Update(s)
 	  }
 	}
 	mid_stack:AddChild(respawn_button)
-      elseif (respawn == 0) and (respawn_button ~= nil) then
+      elseif (spawn_tickets == 0) and (respawn_button ~= nil) then
 	mid_stack:RemoveChild(respawn_button)
 	respawn_button = nil
+      end
+    end
+    -- respawn timer update
+    if (spawn_tickets ~= nil) then
+      -- sup
+      if (spawn_tickets == 0) and (respawn_info == nil) then
+	respawn_info = Label:New {
+	  autosize = false;
+	  align = "center";
+	  caption = "Extra com in:";
+	  height = 20,
+	  width = "100%";
+	  fontsize = 11;
+	}
+	mid_stack:AddChild(respawn_info)
+      elseif (respawn_info ~= nil) and (spawn_tickets > 0) then
+	mid_stack:RemoveChild(respawn_info)
+	respawn_info = nil
+      end
+    end
+    local spawn_time = Spring.GetGameRulesParam("ctf_orbit_timer"..myTeam)
+    local spawn_pool = Spring.GetGameRulesParam("ctf_orbit_pool"..myTeam)
+    if (spawn_time ~= nil) then
+      if (respawn_timer == nil) then--and (spawn_pool > spawn_tickets) then
+	respawn_timer = Label:New {
+	  autosize = false;
+	  align = "center";
+	  caption = GetTimeFormatted(spawn_time);
+	  height = 10,
+	  width = "100%";
+	  fontsize = 10;
+	  textColor = green;
+	}
+	mid_stack:AddChild(respawn_timer)
+      end
+      if (spawn_pool == spawn_tickets) then
+	respawn_timer:SetCaption("Full ("..spawn_tickets.."/"..spawn_pool..")")
+	respawn_timer.font:SetColor(white)
+      else
+	respawn_timer:SetCaption(GetTimeFormatted(spawn_time).." ("..spawn_tickets.."/"..spawn_pool..")")
+	respawn_timer.font:SetColor(green)
       end
     end
     -- stolen?
@@ -383,6 +444,31 @@ function widget:Update(s)
   end
 end
 
+function widget:UnitFinished(unitID, unitDefID)
+  SpotCC(unitID, unitDefID)
+end
+
+function widget:UnitFinished(unitID, unitDefID)--, team)
+  SpotCC(unitID, unitDefID)
+end
+
+function widget:UnitEnteredLos(unitID)
+  SpotCC(unitID, Spring.GetUnitDefID(unitID))
+end
+
+function SpotCC(unitID, unitDefID)
+  if (UnitDefs[unitDefID].name == "ctf_center") then
+    CommandCenters[unitID] = Spring.GetUnitAllyTeam(unitID)
+  end  
+end
+
+function ReInit()
+  for _, unitID in ipairs(Spring.GetAllUnits()) do
+    local unitDefID = Spring.GetUnitDefID(unitID)
+    SpotCC(unitID, unitDefID)
+  end
+end
+
 function spGetUnitPieceMap(unitID,piecename)
   local pieceMap = {}
   for piecenum,piecename in pairs(Spring.GetUnitPieceList(unitID)) do
@@ -391,40 +477,121 @@ function spGetUnitPieceMap(unitID,piecename)
   return pieceMap
 end
 
+local function PillarVertsBlue(x, y, z)
+  glColor(0, 1, 0.5, 1)
+  glVertex(x, y, z)
+  glColor(0, 1, 0.5, 0)
+  glVertex(x, y + 500, z)
+end
+
+local function PillarVertsRed(x, y, z)
+  glColor(1, 0, 0, 1)
+  glVertex(x, y, z)
+  glColor(1, 0, 0, 0)
+  glVertex(x, y + 500, z)
+end
+
 function widget:DrawWorld()
   if not Spring.IsGUIHidden() then
-    if (RedAllyTeam == nil) then return end
+    local redHolder, blueHolder
+    local fx,fy,fz
     glDepthTest(true)
     glAlphaTest(GL_GREATER, 0)
     -- blue flag stolen by
-    local blueHolder = Spring.GetGameRulesParam("ctf_unit_stole_team"..myAllyTeam)
-    if (blueHolder ~= nil) and (blueHolder > 0) and (Spring.ValidUnitID(blueHolder)) then
-      local unitID = blueHolder
-      local unitDefID = Spring.GetUnitDefID(unitID)
-      if (UnitDefs[unitDefID].name ~= "ctf_flag") then
-	glTexture('LuaUI/Images/ctf_blue_flag.png')
+    if (myAllyTeam ~= nil) then
+      blueHolder = Spring.GetGameRulesParam("ctf_unit_stole_team"..myAllyTeam)
+      if (blueHolder ~= nil) and (blueHolder > 0) and (Spring.ValidUnitID(blueHolder)) then
+	local unitID = blueHolder
+	fx,fy,fz = Spring.GetUnitPosition(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
 	glPushMatrix()
-	glUnitMultMatrix(unitID)
-	glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
+	glLineWidth(20)
 	glColor(1,1,1,1)
-	glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	glBeginEnd(GL_LINE_STRIP, PillarVertsBlue, fx, fy, fz)
+	glLineWidth(1)
+	glPopMatrix()
+	if (UnitDefs[unitDefID].name ~= "ctf_flag") then
+	  glTexture('LuaUI/Images/ctf_blue_flag.png')
+	  glPushMatrix()
+	  glUnitMultMatrix(unitID)
+	  glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
+	  glRotate(Rotation,0,1,0)
+	  glColor(1,1,1,1)
+	  glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	  glPopMatrix()
+	end
       end
-      glPopMatrix()
     end
     -- red flag stolen by
-    local redHolder = Spring.GetGameRulesParam("ctf_unit_stole_team"..RedAllyTeam)
-    if (redHolder ~= nil) and (redHolder > 0) and (Spring.ValidUnitID(redHolder)) then
-      local unitID = redHolder
-      local unitDefID = Spring.GetUnitDefID(unitID)
-      if (UnitDefs[unitDefID].name ~= "ctf_flag") then
-	glTexture('LuaUI/Images/ctf_red_flag.png')
+    if (RedAllyTeam ~= nil) then
+      redHolder = Spring.GetGameRulesParam("ctf_unit_stole_team"..RedAllyTeam)
+      if (redHolder ~= nil) and (redHolder > 0) and (Spring.ValidUnitID(redHolder)) then
+	local unitID = redHolder
+	fx,fy,fz = Spring.GetUnitPosition(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
 	glPushMatrix()
-	glUnitMultMatrix(unitID)
-	glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
+	glLineWidth(20)
 	glColor(1,1,1,1)
-	glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	glBeginEnd(GL_LINE_STRIP, PillarVertsRed, fx, fy, fz)
+	glLineWidth(1)
+	glPopMatrix()
+	if (UnitDefs[unitDefID].name ~= "ctf_flag") then
+	  glTexture('LuaUI/Images/ctf_red_flag.png')
+	  glPushMatrix()
+	  glUnitMultMatrix(unitID)
+	  glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
+	  glRotate(Rotation,0,1,0)
+	  glColor(1,1,1,1)
+	  glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	  glPopMatrix()
+	end
       end
-      glPopMatrix()
+    end
+    for unitID,allyTeam in pairs(CommandCenters) do
+      fx,fy,fz = Spring.GetUnitPosition(unitID)
+      if (allyTeam == myAllyTeam) then
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if (blue_stolen == nil) then
+	  glPushMatrix()
+	  glTexture(false)
+	  glLineWidth(20)
+	  glColor(1,1,1,1)
+	  glBeginEnd(GL_LINE_STRIP, PillarVertsBlue, fx, fy, fz)
+	  glLineWidth(1)
+	  glPopMatrix()
+	end
+	if (bs ~= nil) and (bs > 0) then
+	  glPushMatrix()
+	  glTexture('LuaUI/Images/ctf_blue_flag.png')
+	  glUnitMultMatrix(unitID)
+	  glTranslate(0, UnitDefs[unitDefID].height + 20, 0)
+	  glRotate(Rotation,0,1,0)
+	  glColor(1,1,1,1)
+	  glTexRect(-iconhsize2, 0, iconhsize2, iconsize2)
+	  glPopMatrix()
+	end
+      elseif (allyTeam == RedAllyTeam) then
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if (red_stolen == nil) then
+	  glPushMatrix()
+	  glTexture(false)
+	  glLineWidth(20)
+	  glColor(1,1,1,1)
+	  glBeginEnd(GL_LINE_STRIP, PillarVertsRed, fx, fy, fz)
+	  glLineWidth(1)
+	  glPopMatrix()
+	end
+	if (rs ~= nil) and (rs > 0) then
+	  glPushMatrix()
+	  glTexture('LuaUI/Images/ctf_red_flag.png')
+	  glUnitMultMatrix(unitID)
+	  glTranslate(0, UnitDefs[unitDefID].height + 20, 0)
+	  glRotate(Rotation,0,1,0)
+	  glColor(1,1,1,1)
+	  glTexRect(-iconhsize2, 0, iconhsize2, iconsize2)
+	  glPopMatrix()
+	end
+      end
     end
     -- done
     glAlphaTest(false)
@@ -508,7 +675,7 @@ function widget:Initialize()
     width = 50;
   }
   mid_stack = StackPanel:New {
-    width = 50;
+    width = 80;
     height = "100%";
     centerItems = false,
     resizeItems = false;
@@ -522,7 +689,7 @@ function widget:Initialize()
 	caption = "CTF stats";
 	height = 20,
 	width = "100%";
-	fontsize = 11; -- so cost values are better? for now atleast...
+	fontsize = 11;
       },
     },
   }
@@ -656,6 +823,7 @@ function widget:Initialize()
     },
   }
   screen0:AddChild(status_window)
+  ReInit()
 end
 
 function widget:Shutdown()
