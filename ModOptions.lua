@@ -169,7 +169,7 @@ local options = {
 	name	= "Disable units",
 	desc	= "Prevents specified units from being built ingame",
 	section	= 'startconds',
-	type	= string,
+	type	= "string",
 	def		= nil,
   },
    {
