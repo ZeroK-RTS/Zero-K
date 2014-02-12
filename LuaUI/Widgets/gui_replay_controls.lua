@@ -34,7 +34,7 @@ local speeds = {0.5, 1, 2, 3, 4, 5,10}
 
 local isPaused = false
 local wantedSpeed = nil
-
+local skipped = false
 
 function widget:Initialize()
 	if (not Spring.IsReplay()) then
@@ -208,6 +208,13 @@ function widget:Update()
 			wantedSpeed = nil
 		end
 	end
+	if skipped = true then
+		if Spring.GetGameFrame() == 0 then
+			Spring.SendCommands ("skip 1")
+		else
+			skipped = false
+		end
+	end
 end
 
 function widget:GameFrame (f)
@@ -219,5 +226,6 @@ end
 function skipPreGameChatter ()
 	Spring.Echo ("Skipping pregame chatter")
 	Spring.SendCommands ("skip 1")
+	skipped = true
 	window:RemoveChild(button_skipPreGame)
 end

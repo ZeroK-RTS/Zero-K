@@ -139,51 +139,47 @@ local function drawGraph(graphArray, graph_m, teamID)
 		playerName = shortName .."-" .. botID .. ""
 	end
 
-
---	if isActive or wasActive[teamID] then --Prevents specs from being included in Graph
-	if isActive or isDead then --Prevents specs from being included in Graph
-		for i=1, #graphArray do
-			if (graph_m < graphArray[i]) then graph_m = graphArray[i] end
-		end
-
-		--gets vertex's from array and plots them
-		local drawLine = function()
-			for i=1, #graphArray do
-				local ordinate = graphArray[i]
-				gl.Vertex((i - 1)/(#graphArray - 1), 1 - ordinate/graph_m)
-			end
-		end
-
-		--adds value to end of graph
-		local label1 = Chili.Label:New{parent = lineLabels, y = (1 - graphArray[#graphArray]/graph_m) * 88 - 1 .. "%", width = "100%", caption = lineLabel, font = {color = teamColor}}
-
-		--adds player to Legend
-		local label2 = Chili.Label:New{parent = graphPanel, x = 55, y = (teamID)*20 + 5, width = "100%", height  = 20, caption = playerName, font = {color = teamColor}}
-
-		--creates graph element
-		local graph = Chili.Control:New{
-			parent	= graphPanel,
-			x       = 0,
-			y       = 0,
-			height  = "100%",
-			width   = "100%",
-			padding = {0,0,0,0},
-			DrawControl = function (obj)
-				local x = obj.x
-				local y = obj.y
-				local w = obj.width
-				local h = obj.height
-
-				gl.Color(teamColor)
-				gl.PushMatrix()
-				gl.Translate(x, y, 0)
-				gl.Scale(w, h, 1)
-				gl.LineWidth(3)
-				gl.BeginEnd(GL.LINE_STRIP, drawLine)
-				gl.PopMatrix()
-			end
-			}
+	for i=1, #graphArray do
+		if (graph_m < graphArray[i]) then graph_m = graphArray[i] end
 	end
+
+	--gets vertex's from array and plots them
+	local drawLine = function()
+		for i=1, #graphArray do
+			local ordinate = graphArray[i]
+			gl.Vertex((i - 1)/(#graphArray - 1), 1 - ordinate/graph_m)
+		end
+	end
+
+	--adds value to end of graph
+	local label1 = Chili.Label:New{parent = lineLabels, y = (1 - graphArray[#graphArray]/graph_m) * 88 - 1 .. "%", width = "100%", caption = lineLabel, font = {color = teamColor}}
+
+	--adds player to Legend
+	local label2 = Chili.Label:New{parent = graphPanel, x = 55, y = (teamID)*20 + 5, width = "100%", height  = 20, caption = playerName, font = {color = teamColor}}
+
+	--creates graph element
+	local graph = Chili.Control:New{
+		parent	= graphPanel,
+		x       = 0,
+		y       = 0,
+		height  = "100%",
+		width   = "100%",
+		padding = {0,0,0,0},
+		DrawControl = function (obj)
+			local x = obj.x
+			local y = obj.y
+			local w = obj.width
+			local h = obj.height
+
+			gl.Color(teamColor)
+			gl.PushMatrix()
+			gl.Translate(x, y, 0)
+			gl.Scale(w, h, 1)
+			gl.LineWidth(3)
+			gl.BeginEnd(GL.LINE_STRIP, drawLine)
+			gl.PopMatrix()
+		end
+		}
 end
 ----------------------------------------------------------------
 ----------------------------------------------------------------
@@ -215,7 +211,7 @@ local function getEngineArrays(statistic, labelCaption)
 		teamScores[a] = temp
 	end
 	if graphMax > 5 then drawIntervals(graphMax) end
-	for a=0, teams do
+	for a=0, teams-1 do -- teams-1 because gaia is the last team.
 		drawGraph(teamScores[a], graphMax, a)	--Applies per player elements
 	end
 	fixLabelAlignment()

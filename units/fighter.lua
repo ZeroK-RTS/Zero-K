@@ -34,7 +34,6 @@ unitDef = {
     helptext_fr    = [[Capable de tirer en l'air ou au sol le Avenger n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
 	helptext_de    = [[Der Avenger kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
 	helptext_pl    = [[Avenger to wielozadaniowy mysliwiec szybkiego reagowania, ktory moze atakowac zarowno cele powietrzne, jak i naziemne. Jest bardzo zwinny i swietnie sobie radzi z wrogim lotnictwem dzieki samonaprowadzajacym rakietom i laserom, jednak jest bardzo lekki i latwo go zestrzelic. Posiada pasywny zaklocacz radaru oraz aktywny dopalacz.]],
-	modelradius    = [[20]],
 	specialreloadtime = [[850]],
 	modelradius    = [[5]],
 	refuelturnradius = [[80]],
