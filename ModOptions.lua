@@ -167,7 +167,7 @@ local options = {
   {
 	key		= "disabledunits",
 	name	= "Disable units",
-	desc	= "Prevents specified units from being built ingame",
+	desc	= "Prevents specified units from being built ingame. Specify multiple units by using + ",
 	section	= 'startconds',
 	type	= "string",
 	def		= nil,

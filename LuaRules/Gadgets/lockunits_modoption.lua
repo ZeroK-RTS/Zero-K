@@ -35,7 +35,7 @@ end
 --SYNCED
 --------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
-	for i in string.gmatch(disabledunitsstring, '([^,]+)') do
+	for i in string.gmatch(disabledunitsstring, '([^+]+)') do
 		--I should check whether the unit name actually exists, but it seems UnitDefNames hasn't been created at this stage yet
 		disabledunits[#disabledunits+1] = i
 	end
