@@ -35,6 +35,7 @@ local speeds = {0.5, 1, 2, 3, 4, 5,10}
 local isPaused = false
 local wantedSpeed = nil
 local skipped = false
+local lastSkippedTime = 0
 
 function widget:Initialize()
 	if (not Spring.IsReplay()) then
@@ -200,7 +201,7 @@ function setReplaySpeed (speed, i)
 	progress_speed:SetValue(i)
 end
 
-function widget:Update()
+function widget:Update(dt)
 	if (wantedSpeed) then
 		if (Spring.GetGameSpeed() > wantedSpeed) then
 			Spring.SendCommands ("slowdown")
@@ -209,14 +210,20 @@ function widget:Update()
 		end
 	end
 	if skipped == true then
-		Spring.SendCommands("skip 1")
+		if lastSkippedTime > 1.5 then
+			Spring.SendCommands("skip 1")
+			lastSkippedTime = 0
+		else
+			lastSkippedTime = lastSkippedTime + dt
+		end
 	end
 end
 
 function widget:GameFrame (f)
 	if (f==1) then
 		window:RemoveChild(button_skipPreGame)
-		skipped = false
+		skipped = nil
+		lastSkippedTime = nil
 	end
 end
 
