@@ -58,7 +58,7 @@ local cmdFirezone = {
 	action  = 'setfirezone',
 	params  = { }, 
 	texture = 'LuaUI/Images/commands/Bold/capture.png',
-	params  = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
+	params  = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
 }
 
 local cmdStopFirezone = {
@@ -69,7 +69,7 @@ local cmdStopFirezone = {
 	action  = 'cancelfirezone',
 	params  = { }, 
 	texture = 'LuaUI/Images/commands/Bold/stop.png',
-	params  = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
+	params  = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
 }
 --------------
 --VARIABLE----

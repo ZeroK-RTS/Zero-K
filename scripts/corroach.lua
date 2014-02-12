@@ -85,7 +85,7 @@ local function Burrow()
 		Turn( rb_foot, 3, 0, up )
 	--]]
 	if( burrowed == true ) then
-		Spring.UnitScript.SetUnitValue( cloaked, 1 )
+		GG.SetWantedCloaked(unitID, 1)
 		Spring.UnitScript.SetUnitValue( stealth, 1 )
 		--Spring.UnitScript.SetUnitValue() MAX_SPEED to maxSpeed/4
 		--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 2
@@ -147,7 +147,7 @@ end
 local function UnBurrow()
 	Signal( SIG_BURROW )
 	burrowed = false
-	Spring.UnitScript.SetUnitValue( cloaked, 0 )
+	GG.SetWantedCloaked(unitID, 0)
 	Spring.UnitScript.SetUnitValue( stealth, 0 )
 	Move( body, 2, 0, 3 )
 	Turn( body, 1, 0, 3 )

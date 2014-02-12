@@ -649,6 +649,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Remove initCloaked because cloak state is no longer used
+-- 
+
+for name, ud in pairs(UnitDefs) do
+	if tobool(ud.initcloaked) then
+		ud.initcloaked = false
+		ud.customparams.initcloaked = "1"
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Remove Restore
 -- 
 

@@ -246,7 +246,6 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	end
 end
 
-local CMD_CLOAK         = CMD.CLOAK
 local CMD_ONOFF         = CMD.ONOFF
 local CMD_REPEAT        = CMD.REPEAT
 local CMD_MOVE_STATE    = CMD.MOVE_STATE
@@ -271,7 +270,7 @@ function widget:CommandsChanged()
 				action  = 'autoassist',
 				params  = {order, 'off', 'on'}, 
 				
-				pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
+				pos = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
 			})
 			break
 		end

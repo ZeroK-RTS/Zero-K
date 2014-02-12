@@ -43,7 +43,7 @@ local function Burrow()
 	Turn( base , x_axis, math.rad(-20.000000), math.rad(20.000000) )
 	
 	if( burrowed == true ) then
-		Spring.UnitScript.SetUnitValue( cloaked, 1 )
+		GG.SetWantedCloaked(unitID, 1)
 		Spring.UnitScript.SetUnitValue( stealth, 1 )
 	end
 end
@@ -195,7 +195,7 @@ end
 local function UnBurrow()
 	Signal( SIG_BURROW )
 	burrowed = false
-	Spring.UnitScript.SetUnitValue( cloaked, 0 )
+	GG.SetWantedCloaked(unitID, 0)
 	Spring.UnitScript.SetUnitValue( stealth, 0 )
 	Move( base , y_axis, 0.000000 , 2.000000 )
 	Turn( base , x_axis, 0, math.rad(60.000000) )

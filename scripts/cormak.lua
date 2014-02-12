@@ -152,7 +152,7 @@ function AutoAttack_Thread()
 			local reloadMult  = GG.att_reload[unitID] or 1.0
 			local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame} )
-			GG.PokeDecloakUnit(unitID,30)
+			GG.PokeDecloakUnit(unitID,100)
 			
 			lastWaveFrame = gameFrame
 			EmitSfx( emit,  UNIT_SFX1 )

@@ -654,7 +654,7 @@ local function FinishMorph(unitID, morphData)
     { CMD.FIRE_STATE, { states.firestate },             { } },
     { CMD.MOVE_STATE, { states.movestate },             { } },
     { CMD.REPEAT,     { states["repeat"] and 1 or 0 },  { } },
-    { CMD.CLOAK,      { states.cloak     and 1 or udDst.initCloaked },  { } },
+    { CMD_WANT_CLOAK,      { states.cloak     and 1 or udDst.initCloaked },  { } },
     { CMD.ONOFF,      { 1 },                            { } },
     { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, { } },
   })

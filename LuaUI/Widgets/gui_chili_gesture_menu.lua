@@ -782,7 +782,7 @@ function widget:CommandsChanged()
       cursor  = 'Build',
       action  = '',
       params  = { }, 
-      pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE}, 
+      pos = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE}, 
     })
   end 
 ]]--

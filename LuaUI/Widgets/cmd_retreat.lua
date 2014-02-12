@@ -29,8 +29,6 @@ local CMD_PATROL        = CMD.PATROL
 local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP			= CMD.STOP
 
-local CMD_CLOAK         = CMD.CLOAK
-
 local CMD_INSERT        = CMD.INSERT
 local CMD_REMOVE        = CMD.REMOVE
 
@@ -410,7 +408,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 			and cmdID ~= CMD_SET_WANTED_MAX_SPEED	
 			and cmdID ~= CMD_FIRE_STATE	and cmdID ~= CMD_MOVE_STATE
 			and cmdID ~= CMD_ONOFF		and cmdID ~= CMD_REPEAT
-			and cmdID ~= CMD_CLOAK		and cmdID ~= CMD_CLOAK_SHIELD	
+			and cmdID ~= CMD_WANT_CLOAK		and cmdID ~= CMD_CLOAK_SHIELD	
 			and cmdID ~= CMD_STEALTH	and cmdID ~= CMD_WAIT
 			and cmdID ~= CMD_IDLEMODE
 		then
@@ -602,7 +600,7 @@ function widget:CommandsChanged()
 		params  = { }, 
 		texture = 'LuaUI/Images/commands/Bold/retreat.png',
 
-		pos = {CMD_CLOAK}, 
+		pos = {CMD_WANT_CLOAK}, 
 	})
 
 	-- Find out if menu should display retreat-state button 
@@ -627,7 +625,7 @@ function widget:CommandsChanged()
 				action  = 'retreat',
 				params  = { retreatOrder , 'Retreat Off', 'Retreat 30%', 'Retreat 60%', 'Retreat 90%' }, 
 
-				pos = {CMD_CLOAK}, 
+				pos = {CMD_WANT_CLOAK}, 
 			})
 		end--if canmove
 		
