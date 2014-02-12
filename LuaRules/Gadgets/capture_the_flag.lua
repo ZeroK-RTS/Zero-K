@@ -160,7 +160,7 @@ local PlayersPerTeam
 local CopyTable = Spring.Utilities.CopyTable
 
 -- rules
-local TIMER_DEFEAT = 30 -- time in seconds when you lose because you have 0 flags left.
+local TIMER_DEFEAT = 180 -- time in seconds when you lose because you have 0 flags left.
 local TIMER_TELEPORT_FLAGS = 120 -- time in seconds if 2 teams hold each other flags - flags teleport back to bases
 local PICK_RADIUS = 75
 local PICK_RADIUS_SQ = PICK_RADIUS*PICK_RADIUS
@@ -169,7 +169,7 @@ local CAP_RADIUS_SQ = CAP_RADIUS*CAP_RADIUS
 local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
 local MAX_Z_DIFFERENCE = 75 -- no capturing from space lol
-local FLAG_AMOUNT_INIT = 1
+local FLAG_AMOUNT_INIT = 3
 local ME_BONUS = function(i) return ((1.4^(1+i)+(1.5+(i*1.5)))-2.9)/2 end --[[
 for every flag your team owns from 0 to 6 - your own income, examples:
 flags 	1 second	1 minute
