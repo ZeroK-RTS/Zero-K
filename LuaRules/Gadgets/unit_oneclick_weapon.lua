@@ -66,7 +66,6 @@ function gadget:UnitCreated(unitID, unitDefID, team)
 		--reloadFrame[unitID] = {}
 		-- add oneclick weapon commands
 		for i=1, #defs[unitDefID] do
-			Spring.Echo("bla")
 			local desc = Spring.Utilities.CopyTable(oneClickWepCMD)
 			desc.name = defs[unitDefID][i].name
 			desc.tooltip = defs[unitDefID][i].tooltip or desc.tooltip

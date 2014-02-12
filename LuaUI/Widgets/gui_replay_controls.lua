@@ -208,24 +208,21 @@ function widget:Update()
 			wantedSpeed = nil
 		end
 	end
-	if skipped = true then
-		if Spring.GetGameFrame() == 0 then
-			Spring.SendCommands ("skip 1")
-		else
-			skipped = false
-		end
+	if skipped == true then
+		Spring.SendCommands("skip 1")
 	end
 end
 
 function widget:GameFrame (f)
 	if (f==1) then
 		window:RemoveChild(button_skipPreGame)
+		skipped = false
 	end
 end
 
 function skipPreGameChatter ()
-	Spring.Echo ("Skipping pregame chatter")
-	Spring.SendCommands ("skip 1")
+	Spring.Echo("Skipping pregame chatter")
+	Spring.SendCommands("skip 1")
 	skipped = true
 	window:RemoveChild(button_skipPreGame)
 end
