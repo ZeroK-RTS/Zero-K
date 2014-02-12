@@ -1004,7 +1004,7 @@ function RemoveCC(unitID)
   end
   if (index ~= nil) then
     CommandCenters[index].allyTeam = GaiaAllyTeamID
-    spTransferUnit(unitID, GaiaTeamID, false))
+    spTransferUnit(unitID, GaiaTeamID, false)
   end
 end
 
