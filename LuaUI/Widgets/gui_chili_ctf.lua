@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.3" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.0.4" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -87,6 +87,7 @@ local myOldAllyTeam
 local RedAllyTeam --= nil
 local timer = 0
 local UPDATE_FREQUENCY = 0.6	-- seconds
+local CAP_RADIUS = 250
 
 local respawn_button
 local respawn_info
@@ -491,6 +492,77 @@ local function PillarVertsRed(x, y, z)
   glVertex(x, y + 500, z)
 end
 
+local function BuildVertexList(verts) -- this code was stolen from defence range widget
+  local count =  #verts
+  for i = 1, count do
+    glVertex(verts[i])
+  end
+  if count > 0 then
+    glVertex(verts[1])
+  end
+end
+
+local function GetRange2D(range, yDiff) -- this code was stolen from defence range widget
+  local root1 = range * range - yDiff * yDiff
+  if ( root1 < 0 ) then
+    return 0
+  else
+    return sqrt( root1 )
+  end
+end
+
+function DrawCircle(x, y, z, range) -- thanks defence range widget
+  local rangeLineStrip = {}
+  local yGround = Spring.GetGroundHeight(x,z)
+  for i = 1,40 do
+    local radians = 2.0 * PI * i / 40
+    local rad = range
+
+    local sinR = sin( radians )
+    local cosR = cos( radians )
+
+    local posx = x + sinR * rad
+    local posz = z + cosR * rad
+    local posy = Spring.GetGroundHeight( posx, posz )
+
+    local heightDiff = ( posy - yGround) / 2.0	-- maybe y has to be getGroundHeight(x,z) cause y is unit center and not aligned to ground
+
+--     rad = rad - heightDiff * slope
+    local adjRadius = GetRange2D( range, 0) --heightDiff * 0.0)
+    local adjustment = rad / 2.0
+    local yDiff = 0.0
+
+    for j = 0, 49 do
+      if ( abs( adjRadius - rad ) + yDiff <= 0.01 * rad ) then
+	break
+      end
+
+      if ( adjRadius > rad ) then
+	rad = rad + adjustment
+      else
+	rad = rad - adjustment
+	adjustment = adjustment / 2.0
+      end
+      posx = x + ( sinR * rad )
+      posz = z + ( cosR * rad )
+      local newY = Spring.GetGroundHeight( posx, posz )
+      yDiff = abs( posy - newY )
+      posy = newY
+      posy = max( posy, 0.0 )  --hack
+      heightDiff = ( posy - yGround )	--maybe y has to be Ground(x,z)
+      adjRadius = GetRange2D( range, heightDiff * 0.0)
+    end
+
+    posx = x + ( sinR * adjRadius )
+    posz = z + ( cosR * adjRadius )
+    posy = Spring.GetGroundHeight( posx, posz ) + 5.0
+    posy = max( posy, 0.0 )   --hack
+    
+    table.insert( rangeLineStrip, { posx, posy, posz } )
+  end
+  return rangeLineStrip
+end
+
 function widget:DrawWorld()
   if not Spring.IsGUIHidden() then
     local redHolder, blueHolder
@@ -557,6 +629,9 @@ function widget:DrawWorld()
 	  glLineWidth(20)
 	  glColor(1,1,1,1)
 	  glBeginEnd(GL_LINE_STRIP, PillarVertsBlue, fx, fy, fz)
+	  glLineWidth(2.5)
+	  glColor(0, 1, 0.5, 0.3)
+	  glBeginEnd(GL_LINE_STRIP, BuildVertexList, DrawCircle(fx, fy, fz, CAP_RADIUS))
 	  glLineWidth(1)
 	  glPopMatrix()
 	end
@@ -578,6 +653,9 @@ function widget:DrawWorld()
 	  glLineWidth(20)
 	  glColor(1,1,1,1)
 	  glBeginEnd(GL_LINE_STRIP, PillarVertsRed, fx, fy, fz)
+	  glLineWidth(2.5)
+	  glColor(1, 0, 0, 0.3)
+	  glBeginEnd(GL_LINE_STRIP, BuildVertexList, DrawCircle(fx, fy, fz, CAP_RADIUS))
 	  glLineWidth(1)
 	  glPopMatrix()
 	end

@@ -1,4 +1,4 @@
-local version = "0.0.3"
+local version = "0.0.4"
 
 function gadget:GetInfo()
   return {
@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "Feb 2014",
     license   = "GPL v2 or later",
     layer     = 1,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -46,12 +46,13 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 
   immediate TODO:
 - Fix, improve and finalize CC spawn position system (almost done, it should support ffa and very small maps when it's done, and any amount of teams).
+  Right now if spawn boxes are too near, it's likely to game get honked...
 - Transfer and drop flag buttons.
-- Detect if players resign.
+- Detect if players resign. (fix pool/tickets giveaway)
 - Rewrite widget (it only shows 2 teams, yet gadget supports more, almost).
 - Multi-contest resolution (when multiple teams are stuck because they stealed each other flags).
 - Some more endgame content (either superunit or turn CCs into superweapons for last team standing, so they finish other teams in spectacular way).
-- Search and destroy last bugs and release this is 0.1 or smth.
+- Search and destroy last bugs and release this as 0.1 or smth.
 
   Changelog:
 9 February 2014 - 0.0.1 beta	- First version. 
@@ -112,6 +113,7 @@ local spGetGameFrame	    = Spring.GetGameFrame
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetGameRulesParam   = Spring.GetGameRulesParam
 local spSetGameRulesParam   = Spring.SetGameRulesParam
+local spSetTeamRulesParam   = Spring.SetTeamRulesParam
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetTeamRulesParam   = Spring.GetTeamRulesParam
@@ -126,6 +128,7 @@ local spIsPosInLos	    = Spring.IsPosInLos
 local spGetTeamList	    = Spring.GetTeamList
 local spValidUnitID	    = Spring.ValidUnitID
 local spEcho                = Spring.Echo
+local spKillTeam	    = Spring.KillTeam
 
 local spGetPlayerInfo	    = Spring.GetPlayerInfo
 local spGetAllyTeamList	    = Spring.GetAllyTeamList
@@ -157,7 +160,7 @@ local PlayersPerTeam
 local CopyTable = Spring.Utilities.CopyTable
 
 -- rules
-local TIMER_DEFEAT = 180 -- time in seconds when you lose because you have 0 flags left.
+local TIMER_DEFEAT = 30 -- time in seconds when you lose because you have 0 flags left.
 local TIMER_TELEPORT_FLAGS = 120 -- time in seconds if 2 teams hold each other flags - flags teleport back to bases
 local PICK_RADIUS = 75
 local PICK_RADIUS_SQ = PICK_RADIUS*PICK_RADIUS
@@ -166,7 +169,7 @@ local CAP_RADIUS_SQ = CAP_RADIUS*CAP_RADIUS
 local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
 local MAX_Z_DIFFERENCE = 75 -- no capturing from space lol
-local FLAG_AMOUNT_INIT = 3
+local FLAG_AMOUNT_INIT = 1
 local ME_BONUS = function(i) return ((1.4^(1+i)+(1.5+(i*1.5)))-2.9)/2 end --[[
 for every flag your team owns from 0 to 6 - your own income, examples:
 flags 	1 second	1 minute
@@ -584,6 +587,8 @@ function Payday()
 	spAddTeamResource(teamID, "m", inc*metal_mult)
 	spAddTeamResource(teamID, "e", inc*energy_mult)
       end
+    else
+      spSetGameRulesParam("ctf_income_team"..allyTeam, 0)
     end
   end
 end
@@ -711,7 +716,7 @@ function PlayerDied(teamID, allyTeam)
   -- and they will be able to call in as many!
   local pool_to_give = CommanderPool[teamID]
   local tickets_to_give = CommanderTickets[teamID]
-  Spring.Echo("teamID "..teamID.." died having "..pool_to_give.." commanders and "..tickets_to_give.." tickets")
+--   Spring.Echo("teamID "..teamID.." died having "..pool_to_give.." commanders and "..tickets_to_give.." tickets")
   CommanderPool[teamID]=0
   CommanderTickets[teamID]=0
   CommanderTimer[teamID]=COM_DROP_TIMER
@@ -988,6 +993,21 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
   end
 end
 
+function RemoveCC(unitID)
+  local index
+  for i=1,#CommandCenters do
+    local cc = CommandCenters[i]
+    if (cc.id == unitID) then
+      index = i
+      break
+    end
+  end
+  if (index ~= nil) then
+    CommandCenters[index].allyTeam = GaiaAllyTeamID
+    spTransferUnit(unitID, GaiaTeamID, false))
+  end
+end
+
 function StealScoreFlags()
   -- any flags on the ground?
   for flagID,data in pairs(DroppedFlags) do
@@ -1009,19 +1029,21 @@ function StealScoreFlags()
   for i=1,#CommandCenters do
     local cc = CommandCenters[i]
     local allyTeam = cc.allyTeam
-    local x = cc.x
-    local y = cc.y
-    local z = cc.z
-    local unitID
-    if (FlagAmount[allyTeam] > 0) and (ContestedTeam[allyTeam] == nil) then
-      unitID = GetAnyFlagThief(allyTeam, x, y, z, CAP_RADIUS)
-      if ((unitID ~= nil) and (spValidUnitID(unitID))) then
-	StealFlag(unitID, allyTeam, spGetUnitAllyTeam(unitID))
+    if (GaiaAllyTeamID ~= allyTeam) then
+      local x = cc.x
+      local y = cc.y
+      local z = cc.z
+      local unitID
+      if (FlagAmount[allyTeam] > 0) and (ContestedTeam[allyTeam] == nil) then
+	unitID = GetAnyFlagThief(allyTeam, x, y, z, CAP_RADIUS)
+	if ((unitID ~= nil) and (spValidUnitID(unitID))) then
+	  StealFlag(unitID, allyTeam, spGetUnitAllyTeam(unitID))
+	end
       end
-    end
-    unitID = GetAnyFlagCarrier(allyTeam, x, y, z, CAP_RADIUS)
-    if (unitID ~= nil) and (spValidUnitID(unitID)) and (ContestedTeam[allyTeam] == nil) then
-      ScoreFlag(unitID, allyTeam, spGetUnitAllyTeam(unitID))
+      unitID = GetAnyFlagCarrier(allyTeam, x, y, z, CAP_RADIUS)
+      if (unitID ~= nil) and (spValidUnitID(unitID)) and (ContestedTeam[allyTeam] == nil) then
+	ScoreFlag(unitID, allyTeam, spGetUnitAllyTeam(unitID))
+      end
     end
   end
 end
@@ -1152,8 +1174,24 @@ function CountDefeat()
       if (DefeatTimer[allyTeam] <= 0) then
 	-- die :(
 	for _,teamID in pairs(PlayersInTeam[allyTeam]) do
-	  Spring.KillTeam(teamID)
-	  Spring.SetTeamRulesParam(teamID, "WasKilled", 1)
+	  spKillTeam(teamID)
+	  spSetTeamRulesParam(teamID, "WasKilled", 1)
+	  local units = spGetTeamUnits(team)
+	  for i = 1, #units do
+	    if (spValidUnitID(units[i])) then
+	      if (Godmode[units[i]]) then
+		-- probably command center
+		RemoveCC(units[i]) -- actually makes CC neutral, and disables it
+	      else
+		if (DroppedFlags[units[i]]) then
+		  DroppedFlags[units[i]] = nil
+		  spDestroyUnit(units[i], false, true)
+		else
+		  spDestroyUnit(units[i], true, false)
+		end
+	      end
+	    end
+	  end
 	end
       end
       DefeatTimer[allyTeam] = DefeatTimer[allyTeam]-1
