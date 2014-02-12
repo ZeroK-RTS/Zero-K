@@ -445,6 +445,12 @@ function widget:Update(s)
   end
 end
 
+function widget:UnitDestroyed(unitID)
+  if (CommandCenters[unitID]) then
+    CommandCenters[unitID] = nil
+  end
+end
+
 function widget:UnitFinished(unitID, unitDefID)
   SpotCC(unitID, unitDefID)
 end
@@ -577,14 +583,15 @@ function widget:DrawWorld()
 	fx,fy,fz = Spring.GetUnitPosition(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	glPushMatrix()
+	glTexture(false)
 	glLineWidth(20)
 	glColor(1,1,1,1)
 	glBeginEnd(GL_LINE_STRIP, PillarVertsBlue, fx, fy, fz)
 	glLineWidth(1)
 	glPopMatrix()
 	if (UnitDefs[unitDefID].name ~= "ctf_flag") then
-	  glTexture('LuaUI/Images/ctf_blue_flag.png')
 	  glPushMatrix()
+	  glTexture('LuaUI/Images/ctf_blue_flag.png')
 	  glUnitMultMatrix(unitID)
 	  glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
 	  glRotate(Rotation,0,1,0)
@@ -602,14 +609,15 @@ function widget:DrawWorld()
 	fx,fy,fz = Spring.GetUnitPosition(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	glPushMatrix()
+	glTexture(false)
 	glLineWidth(20)
 	glColor(1,1,1,1)
 	glBeginEnd(GL_LINE_STRIP, PillarVertsRed, fx, fy, fz)
 	glLineWidth(1)
 	glPopMatrix()
 	if (UnitDefs[unitDefID].name ~= "ctf_flag") then
-	  glTexture('LuaUI/Images/ctf_red_flag.png')
 	  glPushMatrix()
+	  glTexture('LuaUI/Images/ctf_red_flag.png')
 	  glUnitMultMatrix(unitID)
 	  glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
 	  glRotate(Rotation,0,1,0)
@@ -645,7 +653,7 @@ function widget:DrawWorld()
 	  glTexRect(-iconhsize2, 0, iconhsize2, iconsize2)
 	  glPopMatrix()
 	end
-      elseif (allyTeam == RedAllyTeam) then
+      elseif (allyTeam ~= nil) and (allyTeam == RedAllyTeam) then
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	if (red_stolen == nil) then
 	  glPushMatrix()
