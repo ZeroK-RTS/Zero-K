@@ -1,4 +1,4 @@
-local version = "0.0.4"
+local version = "0.0.5"
 
 function gadget:GetInfo()
   return {
@@ -7,7 +7,7 @@ function gadget:GetInfo()
     author    = "Tom Fyuri",
     date      = "Feb 2014",
     license   = "GPL v2 or later",
-    layer     = 1,
+    layer     = -1,
     enabled   = true
   }
 end
@@ -57,8 +57,10 @@ You can capture flag using any unit apart from flying units. You can pick up fla
   Changelog:
 9 February 2014 - 0.0.1 beta	- First version. 
 10 February 2014 - 0.0.2	- Second version with water support and few bug fixes.
-11 February 2014 - 0.0.3	- Income lowered by 2. Bug fixes. CC spawn logic changed. Backup commanders are stackable. And lots of bug fixes. ]]--
-  
+11 February 2014 - 0.0.3	- Income lowered by 2. Bug fixes. CC spawn logic changed. Backup commanders are stackable. And lots of bug fixes.
+12 February 2014 - 0.0.4	- Few bug fixes, CCs should also show capture range rings.
+12 February 2014 - 0.0.5	- Flags in limbo eventually return to their base and allow game to proceed smoothly and critical bugs with duplicating flags and/or disappearing fixed.
+]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
 -- TODO FIXME write good randomizer... unless spring will pick some randomseed on it's own...
@@ -138,7 +140,6 @@ local DroppedFlags = {} -- functions almost same as CC, expect if you pick your 
 local CommandCenters = {} -- arraylist centers
 local FlagAmount = {} -- number per allyteam, essentially score
 local ContestedTeam = {} -- if team's flag stolen it gets into this array
-local ContestedTimer = {}
 local ContestData = {} -- holds a tables with opposing allyTeams and timer...
 local DefeatTimer = {} -- every second you have 0 flags you are doomed :D
 -- if both teams are in this array a timer is set to teleport their flags to bases in 120 sec
@@ -146,6 +147,7 @@ local CallBackup = {} -- per team, holds lvl of commander player may call in (re
 local CommChoice = {} -- players can change commchoice ingame...
 local OrbitDrop = {} -- delayed delivering...
 local BlackList = {} -- per unitid.. i put here transported units and unblacklist on unloading/death
+local ReturnFlagTimer = {}
 local CommanderPool = {} -- maximum amount of commanders per player
 local CommanderTickets = {} -- amount of tickets per player
 local CommanderTimer = {} -- timer starts to go down if player has less commanders than his pool allows, timer resets (and comm ticket is given) if enemy scores your team's flag
@@ -195,6 +197,7 @@ local ME_CENTER_LVL = ME_CENTER_INIT_LVL
 local ME_CENTER_CURRENT_BONUS = 1 -- this get's changed to 1.5 1.75 and 1.875...
 local COM_DROP_DELAY = 3 -- in seconds
 local COM_DROP_TIMER = 300 -- 1 free ticket per 5 minutes
+local LONELY_FLAG_TIMER = 120 -- if flag is untouched for 120 seconds teleport it back, may be super useful if for some reason flag disappeared (bug)?
 local CTF_ONE_SECOND_FRAME = 30 -- frames per second
 -- NOTE maybe it's better to simply make centers behave like mexes so you may connect them to OD grid...
 
@@ -870,54 +873,52 @@ function TeleportFlag(TargetAllyTeam)
       ReturnFlag(flagID, nil, data.allyTeam)
     end
   end
-  -- now restore score
-  FlagAmount[TargetAllyTeam] = FlagAmount[TargetAllyTeam]+1
-  spSetGameRulesParam("ctf_flags_team"..TargetAllyTeam, FlagAmount[TargetAllyTeam])
   -- done
-end
-
-function ReturnFlag(flagID, unitID, allyTeam)      
-  FlagAmount[allyTeam] = FlagAmount[allyTeam]+1
-  spSetGameRulesParam("ctf_flags_team"..allyTeam, FlagAmount[allyTeam])
-  ContestedTeam[allyTeam] = nil
-  spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, 0)
-  DefeatTimer[allyTeam] = TIMER_DEFEAT
-  spSetGameRulesParam("ctf_defeat_time_team"..allyTeam, DefeatTimer[allyTeam])
-  
-  if (unitID) then
-    spSetUnitAlwaysVisible(unitID, false)
-    spSetGameRulesParam("ctf_unit_stole_team"..FlagCarrier[unitID], 0)
-  end
-  
---   Spring.Echo("error team "..allyTeam.." returns it's flag!")
---   Spring.Echo("error team "..allyTeam.." flags: "..FlagAmount[allyTeam])
-  
-  if (flagID) then
-    DroppedFlags[flagID] = nil
-    spDestroyUnit(flagID, false, true)
-  end
 end
 
 function DropFlag(allyTeam, x, y, z)
   local y = spGetGroundHeight(x,z)
   if (y < waterLevel) then
     y = waterLevel end
-  local flagID = spCreateUnit("ctf_flag", x, y, z, ToFacing(x,z), GetTeamFromAlly(allyTeam).team) -- FIXME i think better would be to make it to rely on some var instead of func
-  spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, flagID)
-  DroppedFlags[flagID] = { allyTeam = allyTeam, x = x, y = y, z = z, id = flagID }
-  spSetUnitAlwaysVisible(flagID, true)
+  local flagID = spCreateUnit("ctf_flag", x, y, z, ToFacing(x,z), GetTeamFromAlly(allyTeam).team)
+  if (flagID == nil) then
+--     Spring.Echo("DropFlag failed")
+    ReturnFlag(nil, nil, allyTeam)
+  else
+--     Spring.Echo("Dropped flag success")
+    ReturnFlagTimer[flagID] = LONELY_FLAG_TIMER
+    spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, flagID)
+    DroppedFlags[flagID] = { allyTeam = allyTeam, x = x, y = y, z = z, id = flagID }
+    spSetUnitAlwaysVisible(flagID, true)
+  end
+end
+
+function ReturnFlag(flagID, unitID, allyTeam)
+  if (flagID) then
+    DroppedFlags[flagID] = nil
+    spDestroyUnit(flagID, false, true)
+  end
+  FlagAmount[allyTeam] = FlagAmount[allyTeam]+1
+  spSetGameRulesParam("ctf_flags_team"..allyTeam, FlagAmount[allyTeam])
+  ContestedTeam[allyTeam] = nil
+  spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, 0)
+  DefeatTimer[allyTeam] = TIMER_DEFEAT
+  spSetGameRulesParam("ctf_defeat_time_team"..allyTeam, DefeatTimer[allyTeam])
+  if (unitID) then
+    spSetUnitAlwaysVisible(unitID, false)
+    spSetGameRulesParam("ctf_unit_stole_team"..FlagCarrier[unitID], 0)
+  end
+--   Spring.Echo("Return flag "..tostring(flagID).." "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
 function PickFlag(flagID, unitID, allyTeam, enemyTeam)
+  DroppedFlags[flagID] = nil
+  spDestroyUnit(flagID, false, true)
   FlagCarrier[unitID] = allyTeam
   ContestedTeam[allyTeam] = enemyTeam
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, unitID)
   spSetUnitAlwaysVisible(unitID, true)
-  
---   Spring.Echo("error team "..enemyTeam.." picks "..allyTeam.." flag!")
-  
-  DroppedFlags[flagID] = nil
-  spDestroyUnit(flagID, false, true)
+--   Spring.Echo("Pick flag "..tostring(flagID).." "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
 function StealFlag(unitID, allyTeam, enemyTeam)
@@ -927,10 +928,7 @@ function StealFlag(unitID, allyTeam, enemyTeam)
   spSetGameRulesParam("ctf_flags_team"..allyTeam, FlagAmount[allyTeam])
   spSetUnitAlwaysVisible(unitID, true)
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, unitID)
-  
---   Spring.Echo("error team "..enemyTeam.." steals "..allyTeam.." flag!")
---   Spring.Echo("error team "..enemyTeam.." flags: "..FlagAmount[enemyTeam])
---   Spring.Echo("error team "..allyTeam.." flags: "..FlagAmount[allyTeam])
+--   Spring.Echo("Steal flag "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
 function ScoreFlag(unitID, allyTeam, enemyTeam)
@@ -941,19 +939,17 @@ function ScoreFlag(unitID, allyTeam, enemyTeam)
   DefeatTimer[allyTeam] = TIMER_DEFEAT
   spSetGameRulesParam("ctf_defeat_time_team"..allyTeam, DefeatTimer[allyTeam])
   LetThemCallBackup(FlagCarrier[unitID])
-  
---   Spring.Echo("error team "..allyTeam.." scores "..FlagCarrier[unitID].." flag!")
---   Spring.Echo("error team "..allyTeam.." flags: "..FlagAmount[enemyTeam])
---   Spring.Echo("error team "..FlagCarrier[unitID].." flags: "..FlagAmount[FlagCarrier[unitID]])
-  
+--   Spring.Echo("Score flag "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
   ContestedTeam[FlagCarrier[unitID]] = nil
   FlagCarrier[unitID] = nil
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (spValidUnitID(unitID)) then
+    BlackList[unitID] = true -- lol, awesome bug when unit that dies picks flag back up and dies with it
+    -- smbdy drops flag on death
     if (FlagCarrier[unitID]) then
-      BlackList[unitID] = true -- lol, awesome bug when unit that dies picks flag back up and dies with it
+--       Spring.Echo("Unit destroyed, had flag")
       if (spGetUnitRulesParam(unitID, "wasMorphedTo") ~= nil) then
 	TransferFlag(unitID, spGetUnitAllyTeam(unitID), spGetUnitRulesParam(unitID, "wasMorphedTo"), spGetUnitAllyTeam(unitID), FlagCarrier[unitID])
       else
@@ -966,14 +962,17 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
       end
       FlagCarrier[unitID] = nil
     end
+    -- dropped flags return if they die for some reason
     if (DroppedFlags[unitID]) then
       ReturnFlag(nil, nil, DroppedFlags[unitID].allyTeam) -- flag destroyed
       DroppedFlags[flagID] = nil
     end
+    -- commander died, pool+1
     if UnitDefs[unitDefID].customParams.commtype and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil) then
       CommanderPool[teamID]=CommanderPool[teamID]+1
       spSetGameRulesParam("ctf_orbit_pool"..teamID, CommanderPool[teamID])
     end
+    -- commander died in battle, if enemy scores flag, this will speedup timer for com dropping for entire team
     if (spValidUnitID(attackerID) and UnitDefs[unitDefID].customParams.commtype and not(spAreTeamsAllied(teamID,attackerTeamID)) and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil)) and -- this commander was in battle, allow him to respawn!
 	(FlagAmount[select(6,spGetTeamInfo(teamID))] < FLAG_AMOUNT_INIT) then
       CommanderSpeedUpTimer[teamID] = true
@@ -983,13 +982,13 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
   if (BlackList[unitID]) then
-    BlackList[unitID] = false -- FIXME probably not needed, in 91 at least
+    BlackList[unitID] = nil -- FIXME probably not needed, in 91 at least
   end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
   if (BlackList[unitID]) then
-    BlackList[unitID] = false -- FIXME probably not needed, in 91 at least
+    BlackList[unitID] = nil -- FIXME probably not needed, in 91 at least
   end
 end
 
@@ -1008,24 +1007,7 @@ function RemoveCC(unitID)
   end
 end
 
-function StealScoreFlags()
-  -- any flags on the ground?
-  for flagID,data in pairs(DroppedFlags) do
-    local x = data.x
-    local y = data.y
-    local z = data.z
-    local allyTeam = data.allyTeam
-    local unitID
-    unitID = GetAnyFlagThief(allyTeam, x, y, z, PICK_RADIUS)
-    if ((unitID ~= nil) and (spValidUnitID(unitID))) then
-      PickFlag(flagID, unitID, allyTeam, spGetUnitAllyTeam(unitID))
-    end
-    unitID = GetAnyAlly(allyTeam, x, y, z, PICK_RADIUS)
-    if ((unitID ~= nil) and (spValidUnitID(unitID))) then
-      ReturnFlag(flagID, nil, allyTeam)
-    end
-  end
-  -- any flags in bases?
+function StealFlags()
   for i=1,#CommandCenters do
     local cc = CommandCenters[i]
     local allyTeam = cc.allyTeam
@@ -1040,6 +1022,50 @@ function StealScoreFlags()
 	  StealFlag(unitID, allyTeam, spGetUnitAllyTeam(unitID))
 	end
       end
+    end
+  end
+end
+
+function PickFlags()
+  -- any flags on the ground?
+  for flagID,data in pairs(DroppedFlags) do
+    local x = data.x
+    local y = data.y
+    local z = data.z
+    local allyTeam = data.allyTeam
+    local unitID
+    unitID = GetAnyFlagThief(allyTeam, x, y, z, PICK_RADIUS)
+    if ((unitID ~= nil) and (spValidUnitID(unitID))) then
+      PickFlag(flagID, unitID, allyTeam, spGetUnitAllyTeam(unitID))
+    end
+  end
+  -- any flags in bases?
+end
+
+function ReturnFlags()
+  -- any flags on the ground?
+  for flagID,data in pairs(DroppedFlags) do
+    local x = data.x
+    local y = data.y
+    local z = data.z
+    local allyTeam = data.allyTeam
+    local unitID
+    unitID = GetAnyAlly(allyTeam, x, y, z, PICK_RADIUS)
+    if ((unitID ~= nil) and (spValidUnitID(unitID))) then
+      ReturnFlag(flagID, nil, allyTeam)
+    end
+  end
+end
+
+function ScoreFlags()
+  for i=1,#CommandCenters do
+    local cc = CommandCenters[i]
+    local allyTeam = cc.allyTeam
+    if (GaiaAllyTeamID ~= allyTeam) then
+      local x = cc.x
+      local y = cc.y
+      local z = cc.z
+      local unitID
       unitID = GetAnyFlagCarrier(allyTeam, x, y, z, CAP_RADIUS)
       if (unitID ~= nil) and (spValidUnitID(unitID)) and (ContestedTeam[allyTeam] == nil) then
 	ScoreFlag(unitID, allyTeam, spGetUnitAllyTeam(unitID))
@@ -1128,6 +1154,15 @@ function ContestTick(index)
   spSetGameRulesParam("ctf_contest_time_team"..ContestData[index].rival2,ContestData[index].timer)
   ContestData[index].timer = ContestData[index].timer-1
   return ContestData[index].timer
+end
+
+function ReturnStucked() -- TODO make widget know about this, otherwise it's not obvious
+  for _,data in pairs(DroppedFlags) do
+    ReturnFlagTimer[data.id] = ReturnFlagTimer[data.id] - 1
+    if (ReturnFlagTimer[data.id] <= 0) then
+      ReturnFlag(data.id, nil, data.allyTeam)
+    end
+  end
 end
 
 function SolveContested()
@@ -1220,10 +1255,16 @@ function gadget:GameFrame (f)
   end
   if ((f%CTF_ONE_SECOND_FRAME)==0) then
     CheckForDead()
-    Payday() -- give resources for having flags
-    StealScoreFlags() -- any enemy unit near any of your command centers takes your flag and contest begins!
-    -- any friendly unit carrying flag near your commander center scores!
+    ---
+    -- any enemy unit near any of your command centers takes your flag and contest begins!
+    ScoreFlags()
+    ReturnFlags()
+    PickFlags()
+    StealFlags()
+    ReturnStucked()
+    ---
     SolveContested() -- if teams hold each other flags in units
+    Payday() -- give resources for having flags
     CountDefeat() -- if you have 0 flags left and no contested flags either, you are doomed
     OrbitTimer()
     DeliverDrops(f)

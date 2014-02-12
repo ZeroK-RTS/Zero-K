@@ -458,7 +458,7 @@ function widget:UnitEnteredLos(unitID)
 end
 
 function SpotCC(unitID, unitDefID)
-  if (UnitDefs[unitDefID].name == "ctf_center") then
+  if Spring.ValidUnitID(unitID) and unitDefID and (UnitDefs[unitDefID].name == "ctf_center") then
     CommandCenters[unitID] = Spring.GetUnitAllyTeam(unitID)
   end  
 end
