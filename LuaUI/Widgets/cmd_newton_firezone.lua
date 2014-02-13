@@ -1,4 +1,4 @@
-local versionNum = '0.307'
+local versionNum = '0.308'
 
 function widget:GetInfo()
 	return {
@@ -8,7 +8,7 @@ function widget:GetInfo()
 		date		= "2013",
 		license		= "GNU GPL, v2 or later",
 		layer		= 20,
-		handler		= true,
+		handler		= true, --for adding customCommand into UI
 		enabled		= true  --loaded by default?
 	}
 end
@@ -24,7 +24,7 @@ local newtonUnitDefID = UnitDefNames["corgrav"].id
 local newtonUnitDefRange = UnitDefNames["corgrav"].maxWeaponRange
 local calculateSimpleBallistic = Game.version:find('91.')
 local mapGravity = Game.gravity/30/30
-local flyThreshold = mapGravity*10
+local goneBallisticThresholdSQ = 8^2 --square of speed (in elmo per frame) before ballistic calculator predict unit trajectory
 
 local GL_LINE_STRIP = GL.LINE_STRIP
 local glLineWidth = gl.LineWidth
@@ -329,7 +329,23 @@ function widget:CommandsChanged()
 		customCommands[#customCommands+1] = cmdStopFirezone
 	end
 end
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+--- SPECTATOR CHECK
+local function IsSpectatorAndExit()
+	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	if spec then 
+		Spring.Echo("Newton Firezone disabled for spectator.")
+		widgetHandler:RemoveWidget(widget)
+	end
+end
 
+function widget:PlayerChanged()
+	if Spring.GetSpectatingState() and (not Spring.IsCheatingEnabled()) then 
+		Spring.Echo("Newton Firezone disabled for spectator.")
+		widgetHandler:RemoveWidget(widget) --input self (widget) because we are using handler=true,
+	end
+end
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 --- UNIT HANDLING
@@ -354,12 +370,14 @@ end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer)
 	if victim[unitID] then --is current victim of any Newton group?
-		for g=1, groups.count do
-			if groupTarget[g] == unitID then
-				victimStillBeingAttacked[g] = unitID --signal a "wait, this group is attacking this unit!"
+		victim[unitID] = currentFrame + 90 --delete 3 second later (if nobody attack it afterward)
+		
+		--notify group that target is still being attacked
+		for group=1, groups.count do
+			if groupTarget[group] == unitID then
+				victimStillBeingAttacked[group] = unitID --signal a "wait, this group is attacking this unit!"
 			end
 		end
-		victim[unitID] = currentFrame + 90 --delete 3 second later
 		--ech("still being attacked")
 		
 		--estimate trajectory of any unit hit by weapon
@@ -544,9 +562,10 @@ function EstimateCrashLocation(victimID)
 	if not UnitDefs[defID] or UnitDefs[defID].canFly then --if speccing with limited LOS or the unit can fly, then skip predicting trajectory.
 		return
 	end
-	local xVel,yVel,zVel = spGetUnitVelocity(victimID)
+	local xVel,yVel,zVel, compositeVelocity= spGetUnitVelocity(victimID)
+	local currentVelocitySQ = (compositeVelocity and compositeVelocity^2 or (xVel^2+yVel^2+zVel^2)) --elmo per second square
 	local gravity = mapGravity
-	if math.abs(yVel) < flyThreshold then --speed insignificant compared to gravity?
+	if currentVelocitySQ < goneBallisticThresholdSQ then --speed insignificant compared to unit speed
 		victimLandingLocation[victimID]=nil
 		return
 	end
@@ -568,8 +587,9 @@ function EstimateCrashLocation(victimID)
 end
 
 function widget:Initialize()
-	local circleVertex = 
-		function() 
+	IsSpectatorAndExit()
+	
+	local circleVertex = function() 
 			local circleDivs, PI = 64 , math.pi
 			for i = 1, circleDivs do
 				local theta = 2 * PI * i / circleDivs
@@ -581,7 +601,9 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	gl.DeleteList(circleList)
+	if circleList then
+		gl.DeleteList(circleList)
+	end
 end
 ---------------------------------
 ---------------------------------
@@ -658,12 +680,12 @@ local function f_v(t,xold,vold,mass,area,gravity,airDensity) -- a function that 
   local horizontalSign = -1*math.abs(vold.hrzn)/vold.hrzn
   local verticalSign = -1*math.abs(vold.vert)/vold.vert
   --MethodA: current spring implementation--
-  tmp.hrzn = (b/mass)*(vold.hrzn*vold.hrzn)*horizontalSign;--horizontal is back-and-forth movement
-  tmp.vert = -gravity+(b/mass)*(vold.vert*vold.vert)*verticalSign; --is vertical movement
+  tmp.hrzn = (b/mass)*(vold.hrzn^2)*horizontalSign;--horizontal is back-and-forth movement
+  tmp.vert = -gravity+(b/mass)*(vold.vert^2)*verticalSign; --is vertical movement
   --MethodB: ideal implementation (more accurate to real airdrag, not implemented in spring)--
-  -- local totalVelocity = math.sqrt(vold.hrzn*vold.hrzn+vold.vert*vold.vert)
-  -- tmp.hrzn = (b/mass)*(totalVelocity*totalVelocity)*(vold.hrzn/totalVelocity)*horizontalSign;
-  -- tmp.vert = -g+(b/mass)*(totalVelocity*totalVelocity)*(vold.vert/totalVelocity)*verticalSign; 
+  -- local totalVelocity = math.sqrt(vold.hrzn^2+vold.vert^2)
+  -- tmp.hrzn = (b/mass)*(totalVelocity^2)*(vold.hrzn/totalVelocity)*horizontalSign;
+  -- tmp.vert = -g+(b/mass)*(totalVelocity^2)*(vold.vert/totalVelocity)*verticalSign; 
   return(tmp);
 end
 
@@ -706,7 +728,7 @@ end
 
 function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity)
 	radius = radius *0.01 --in centi-elmo (centimeter, or 10^-2) instead of elmo. See Spring/rts/Sim/Objects/SolidObject.cpp  
-	local horizontalVelocity = math.sqrt(velX*velX+velZ*velZ)
+	local horizontalVelocity = math.sqrt(velX^2+velZ^2)
 	local horizontalAngle = math.atan2 (velX/horizontalVelocity, velZ/horizontalVelocity)
 	local hrznAngleCos = math.cos(horizontalAngle)
 	local hrznAngleSin = math.sin(horizontalAngle)

@@ -1,4 +1,4 @@
-local versionName = "v2.869"
+local versionName = "v2.870"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -913,8 +913,7 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
 	local iAmConstructor = unitDef.isBuilder
-	local unitState = spGetUnitStates(unitID) --unitID is "this" unit (our unit)
-	local iAmNotCloaked = not unitState["cloak"]
+	local iAmNotCloaked = not spGetUnitIsCloaked(unitID) --unitID is "this" unit (our unit)
 	
 	local unitsInRectangle = spGetUnitsInRectangle(x-losRadius, z-losRadius, x+losRadius, z+losRadius)
 	local relevantUnit={}

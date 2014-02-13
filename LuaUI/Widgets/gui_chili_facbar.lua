@@ -123,7 +123,6 @@ end
 
 local GetUnitDefID      = Spring.GetUnitDefID
 local GetUnitHealth     = Spring.GetUnitHealth
-local GetUnitStates     = Spring.GetUnitStates
 local DrawUnitCommands  = Spring.DrawUnitCommands
 local GetSelectedUnits  = Spring.GetSelectedUnits
 local GetFullBuildQueue = Spring.GetFullBuildQueue

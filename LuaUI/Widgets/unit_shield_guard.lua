@@ -268,7 +268,6 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetSelectedUnits 	= Spring.GetSelectedUnits
-local spGetUnitStates 		= Spring.GetUnitStates
 local spValidUnitID 		= Spring.ValidUnitID
 local spGetUnitDefID 		= Spring.GetUnitDefID
 local spGetCommandQueue 	= Spring.GetCommandQueue
