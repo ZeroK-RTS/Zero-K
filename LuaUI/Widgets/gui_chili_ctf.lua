@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.4" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.0.6" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -642,8 +642,6 @@ function widget:DrawWorld()
 	  glBeginEnd(GL_LINE_STRIP, BuildVertexList, DrawCircle(fx, fy, fz, CAP_RADIUS))
 	  glLineWidth(1)
 	  glPopMatrix()
-	end
-	if (bs ~= nil) and (bs > 0) then
 	  glPushMatrix()
 	  glTexture('LuaUI/Images/ctf_blue_flag.png')
 	  glUnitMultMatrix(unitID)
@@ -666,8 +664,6 @@ function widget:DrawWorld()
 	  glBeginEnd(GL_LINE_STRIP, BuildVertexList, DrawCircle(fx, fy, fz, CAP_RADIUS))
 	  glLineWidth(1)
 	  glPopMatrix()
-	end
-	if (rs ~= nil) and (rs > 0) then
 	  glPushMatrix()
 	  glTexture('LuaUI/Images/ctf_red_flag.png')
 	  glUnitMultMatrix(unitID)
@@ -909,6 +905,7 @@ function widget:Initialize()
     },
   }
   screen0:AddChild(status_window)
+  
   ReInit()
 end
 
