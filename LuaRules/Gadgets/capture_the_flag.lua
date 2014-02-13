@@ -156,7 +156,6 @@ local CommanderTickets = {} -- amount of tickets per player
 local CommanderTimer = {} -- timer starts to go down if player has less commanders than his pool allows, timer resets (and comm ticket is given) if enemy scores your team's flag
 local CommanderSpeedUpTimer = {} -- by teamID, if enemy team scores, it will allow to call in backup comm much sooner
 local Godmode = {} -- unitid... only CCs are dropped here, flags are not though
--- next 3 vars could be optimized...
 local TeamsInAlliance = {} -- by allyteam... teamIDs
 local ActivePlayers = {} -- by playerID, holds teamID, when game starts all plays are dumped inside
 
@@ -360,7 +359,7 @@ function DetermineSpawns(allyTeams)
       end
     end
   end
-  -- now figure out if ma	p is narrow, if it is too narrow spawn only 1 CC, otherwise draw ellipse inside spring map and figure out fair coordinates to spawn centers
+  -- now figure out if map is narrow, if it is too narrow spawn only 1 CC, otherwise draw ellipse inside spring map and figure out fair coordinates to spawn centers
   -- this allows to support 2 & 4 teams just fine, though i won't put any limit for team number
   local cc_count = 1
   local narrow = false
