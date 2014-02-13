@@ -582,8 +582,10 @@ local function FinishMorph(unitID, morphData)
   local facplop = GG.HasFacplop(unitID)  
   --//copy command queue
   local cmds = Spring.GetUnitCommands(unitID)
-  --//copy some state
+  --// copy some state
   local states = Spring.GetUnitStates(unitID)
+  --// copy cloak state
+  local wantCloakState = Spring.GetUnitRulesParam(unitID, "wantcloak")
   --// copy shield power
   local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)
   --//copy experience
@@ -655,7 +657,7 @@ local function FinishMorph(unitID, morphData)
     { CMD.FIRE_STATE, { states.firestate },             { } },
     { CMD.MOVE_STATE, { states.movestate },             { } },
     { CMD.REPEAT,     { states["repeat"] and 1 or 0 },  { } },
-    { CMD_WANT_CLOAK,      { states.cloak     and 1 or udDst.initCloaked },  { } },
+    { CMD_WANT_CLOAK, { wantCloakState or 0 },  { } },
     { CMD.ONOFF,      { 1 },                            { } },
     { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, { } },
   })
