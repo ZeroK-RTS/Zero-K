@@ -1,4 +1,4 @@
-local version = "0.0.6"
+local version = "0.0.7"
 
 function gadget:GetInfo()
   return {
@@ -63,6 +63,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 12 February 2014 - 0.0.4	- Few bug fixes, CCs should also show capture range rings.
 12 February 2014 - 0.0.5	- Flags in limbo eventually return to their base and allow game to proceed smoothly and critical bugs with duplicating flags and/or disappearing fixed.
 13 February 2014 - 0.0.6	- Improved CC spawn logic, it should support team fights, ffa fights (simply spawnings CCs inside spawn boxes). It also works for no spawn boxes maps too. Tweaked income, was too big and calculated wrong. Fixes to commander pool logic.
+14 February 2014 - 0.0.7	- Improved CC spawn logic again. Now it supports for example BlueBend.
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -93,6 +94,7 @@ local max	= math.max
 local abs	= math.abs
 local cos	= math.cos
 local sin	= math.sin
+local PI	= math.pi
 local spGetTeamInfo 	    = Spring.GetTeamInfo
 local GaiaTeamID 	    = Spring.GetGaiaTeamID()
 local GaiaAllyTeamID	    = select(6,spGetTeamInfo(GaiaTeamID))
@@ -157,7 +159,7 @@ local CommanderTimer = {} -- timer starts to go down if player has less commande
 local CommanderSpeedUpTimer = {} -- by teamID, if enemy team scores, it will allow to call in backup comm much sooner
 local Godmode = {} -- unitid... only CCs are dropped here, flags are not though
 local TeamsInAlliance = {} -- by allyteam... teamIDs
-local ActivePlayers = {} -- by playerID, holds teamID, when game starts all plays are dumped inside
+local ActivePlayers = {} -- by playerID, holds teamID, when game starts all players are dumped inside
 
 local CopyTable = Spring.Utilities.CopyTable
 
@@ -202,6 +204,10 @@ local COM_DROP_DELAY = 3 -- in seconds
 local COM_DROP_TIMER = 300 -- 1 free ticket per 5 minutes
 local LONELY_FLAG_TIMER = 120 -- if flag is untouched for 120 seconds teleport it back, may be super useful if for some reason flag disappeared (bug)?
 local CTF_ONE_SECOND_FRAME = 30 -- frames per second
+local MERGE_DIST = 450 -- spawn positions below 450 dist? merge them!
+local MERGE_DIST_SQ = MERGE_DIST*MERGE_DIST
+local CC_TOO_NEAR = 450
+local CC_TOO_NEAR_SQ = CC_TOO_NEAR*CC_TOO_NEAR
 -- NOTE maybe it's better to simply make centers behave like mexes so you may connect them to OD grid...
 
 local energy_mult = 1.0 -- why not obey them too
@@ -293,27 +299,49 @@ function ToFacing(x, y)
   end
 end
 
-function FindClosest(ex,ey,cx,cy)
+function FindClosest(ex,ey,cx,cy,ignore_list)
   local closest_index = 0
   local closest_dist = nil
   for index=1,#ex do
-    local dist = disSQ(ex[index],ey[index],cx,cy)
-    if (closest_dist == nil) or (dist < closest_dist) then
-      closest_index = index
-      closest_dist = dist
+    if ignore_list==nil or not(ignore_list[index]) then
+      local dist = disSQ(ex[index],ey[index],cx,cy)
+      if (closest_dist == nil) or (dist < closest_dist) then
+	closest_index = index
+	closest_dist = dist
+      end
     end
   end
-  return ex[closest_index],ey[closest_index],closest_index
+  if (closest_dist == nil) then return nil end
+  return closest_index,ex[closest_index],ey[closest_index]
 end
 
-function MakeGoodIndex(index,min,max)
-  while (index<min) do
-    index=index+max
+function CalcSpawnPos(spawns)
+  local ex = {}
+  local ey = {}
+  local m = floor((spawns-2)*4+8)
+  local x = mapWidth/2
+  local z = mapHeight/2
+  local adjRadius1 = x * 0.6
+  local adjRadius2 = z * 0.6
+  if ((mapWidth >= 6000) and (mapHeight >= 6000)) or ((mapWidth/3 >= 2800) and (mapHeight/3 >= 2800) and ((mapWidth+mapHeight)/2) >= 6000) then
+    adjRadius1 = x * 0.5
+    adjRadius2 = z * 0.5
+  elseif ((mapWidth >= 2400) and (mapHeight >= 2400)) or ((mapWidth/3 >= 900) and (mapHeight/3 >= 900) and ((mapWidth+mapHeight)/2) >= 2400) then
+    adjRadius1 = x * 0.55
+    adjRadius2 = z * 0.55
   end
-  while (index > max) do
-    index=index-max
+  for i = 1,m do
+    local radians = 2.0 * PI * i / m
+    local sinR = sin( radians )
+    local cosR = cos( radians )
+    local posx = x + sinR
+    local posz = z + cosR
+    posx = x + ( sinR * adjRadius1 )
+    posz = z + ( cosR * adjRadius2 )
+    ex[#ex+1] = posx
+    ey[#ey+1] = posz
   end
-  return index
+  return ex,ey
 end
 
 function DetermineSpawns(allyTeams)
@@ -325,6 +353,7 @@ function DetermineSpawns(allyTeams)
       local height = abs(z2-z1)
       if (width < mapWidth) or (height < mapHeight) then
 	SpawnBoxes[#SpawnBoxes+1] = {
+	  cc_count = 0,
 	  player_count = #spGetTeamList(allyTeam),
 	  allyTeam = allyTeam,
 	  x1 = x1, x2 = x2, -- not needed?
@@ -366,51 +395,6 @@ function DetermineSpawns(allyTeams)
   if ((mapWidth/5) > mapHeight) or ((mapHeight/5) > mapWidth) or (mapHeight < 400) or (mapWidth < 400) then
     narrow = true -- only 1 CC per allyteam, otherwise depending on player count
   end
-  local X1=200
-  local Y1=200
-  local X2=mapWidth-200
-  local Y2=mapHeight-200
-  if ((mapWidth >= 1800) and (mapHeight >= 1800)) or ((mapWidth/3 >= 600) and (mapHeight/3 >= 600) and ((mapWidth+mapHeight)/2) >= 1800) then
-    -- we can afford to do so!
-    X1 = mapWidth*0.25
-    Y1 = mapHeight*0.25
-    X2 = mapWidth*0.75
-    Y2 = mapHeight*0.75
-  end
-  local RX = (X2 - X1) / 2
-  local RY = (Y2 - Y1) / 2
-  local CX = (X2 + X1) / 2
-  local CY = (Y2 + Y1) / 2
-  local ex = {}; local ey = {}
-  local angle = 0
-  local step = 30 -- this makes 14 coordinates
-  if (allyTeam_num > 4) then
-    step = 10 + allyTeam_num * 3
-  end
-  while (angle < 360) do
-    ex[#ex+1] = CX + cos(angle) * RX
-    ey[#ey+1] = CY + sin(angle) * RY
-    angle = angle + step
-  end
-  -- basically the most interesting thing in a way... determine the most closest ex,ey to spawn center, this one should be "base" while
-  -- farsest to "base" should be extra centers, mark all 3, and remove "extra" ones depending on how many there should be (cc_count) param
-  -- TODO more checks so that centers dont spawn too near each other
-  local coord_per_team = floor(step/allyTeam_num/2) -- 30/8 = 3, that means we can have more 3 CCs, how? by select prev,next,prev-1,next+1 coord for each team :)
-  coord_per_team = coord_per_team-3
-  if (coord_per_team < 0) then
-    cc_count = 1 -- arrghhh wut?
-  end
-  local index,indexp,indexn
-  if not(narrow) then
-    local indexn = MakeGoodIndex(5+coord_per_team, 1, #ex)
-    if (disSQ(ex[1],ey[1],ex[indexn],ey[indexn]) < (550^2)) then
-      narrow = true
-    end
-    local indexp = MakeGoodIndex(-3-coord_per_team, 1, #ex)
-    if (disSQ(ex[1],ey[1],ex[indexp],ey[indexp]) < (550^2)) then
-      narrow = true
-    end
-  end
   if not(narrow) then
     if (player_num > 5) then
       cc_count = 3
@@ -421,7 +405,7 @@ function DetermineSpawns(allyTeams)
     cc_count = 1
   end
   if (SpawnBoxes ~= nil) then
-    CentreSpawns = EllipseWay(SpawnBoxes,ex,ey,cc_count,coord_per_team,player_num,players_per_team,allyTeam_num)
+    CentreSpawns = EllipseWay(SpawnBoxes,cc_count,player_num,players_per_team,allyTeam_num)
     if (CentreSpawns == nil) then -- so they overlap this is kinda bad but spawn boxes are there
       spEcho("CTF: Spawning flag bases the fallback plan A way.")
      CentreSpawns = PlayerBoxWay(SpawnBoxes)
@@ -442,6 +426,27 @@ function DetermineSpawns(allyTeams)
     CentreSpawns = nil
   end
   return CentreSpawns,players_per_team,player_num
+end
+
+function MergeTooNear(ex, ey)
+  local nx = {}
+  local ny = {}
+  -- this works rather simple
+  for i=1,#ex do
+    local merged = false
+    for j=1,#nx do
+      if (ex[i] ~= nx[j]) and (ey[i] ~= ny[j]) and (disSQ(ex[i], ey[i], nx[j], ny[j]) < MERGE_DIST_SQ) then
+	nx[j] = (nx[j]+ex[i])/2
+	ny[j] = (ny[j]+ey[i])/2
+	merged = true
+      end
+    end
+    if not(merged) then
+      nx[#nx+1]=ex[i]
+      ny[#ny+1]=ey[i]
+    end
+  end
+  return nx,ny
 end
 
 function PlayerBoxWay(SpawnBoxes) -- TODO if playerbox is huge, spawn multiple CCs depending on playercount
@@ -501,82 +506,118 @@ function FallbackWay(allyTeams) -- TODO incase players spawn extrimely close to 
   return CentreSpawns
 end
 
-function EllipseWay(SpawnBoxes,ex,ey,cc_count,coord_per_team,player_num,players_per_team,allyTeam_num)
+function EllipseWay(SpawnBoxes,cc_count,player_num,players_per_team,allyTeam_num)
+  -- TODO detect if mex position is inside CC, if yes shift CC slightly
+  local ex, ey = CalcSpawnPos(allyTeam_num)
+  ex, ey = MergeTooNear(ex, ey)
   local CentreSpawns = {}
-  local cx,cy,cx2,cy2,cx3,cy3
-  local used = {} -- if spawn positions overlap, for any reason, fallback to spawn in center of playerbox OR simply near players
+  local core
+  local cx,cy
+  local used = {}
+  local index_to_center = {}
   for _,spawn in ipairs(SpawnBoxes) do
-    cx,cy,index = FindClosest(ex, ey, spawn.centerx, spawn.centerz)
-    if (coord_per_team >= 2) then
-      indexn = MakeGoodIndex(index+4+coord_per_team, 1, #ex)
-      cx2 = ex[indexn]
-      cy2 = ey[indexn]
-      indexp = MakeGoodIndex(index-4-coord_per_team, 1, #ex) -- god.. i will totally not understand how it works pretty soon
-      cx3 = ex[indexp]
-      cy3 = ey[indexp]
-      -- we have 3 CCs, now depending on how many we actually need...
-      if (cc_count == 1) then
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx, z = cy, allyTeam = spawn.allyTeam
-	}
-	if (used[index]) then return nil end -- bad pos, overlap
-	used[index] = true
-      elseif (cc_count == 2) then
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx2, z = cy2, allyTeam = spawn.allyTeam
-	}
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx3, z = cy3, allyTeam = spawn.allyTeam
-	}
-	if (used[indexn]) then return nil end -- bad pos, overlap
-	used[indexn] = true
-	if (used[indexp]) then return nil end -- bad pos, overlap
-	used[indexp] = true
-      else
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx, z = cy, allyTeam = spawn.allyTeam
-	}
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx2, z = cy2, allyTeam = spawn.allyTeam
-	}
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx3, z = cy3, allyTeam = spawn.allyTeam
-	}
-	if (used[index]) then return nil end -- bad pos, overlap
-	used[index] = true
-	if (used[indexn]) then return nil end -- bad pos, overlap
-	used[indexn] = true
-	if (used[indexp]) then return nil end -- bad pos, overlap
-	used[indexp] = true
-      end
-    elseif (coord_per_team == 1) then
-      if (cc_count == 1) then
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx, z = cy, allyTeam = spawn.allyTeam
-	}
-	if (used[index]) then return nil end -- bad pos, overlap
-	used[index] = true
-      elseif (cc_count == 2) then
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx2, z = cy2, allyTeam = spawn.allyTeam
-	}
-	CentreSpawns[#CentreSpawns+1] = {
-	  x = cx3, z = cy3, allyTeam = spawn.allyTeam
-	}
-	if (used[indexn]) then return nil end -- bad pos, overlap
-	used[indexn] = true
-	if (used[indexp]) then return nil end -- bad pos, overlap
-	used[indexp] = true
+    index,cx,cy = FindClosest(ex, ey, spawn.centerx, spawn.centerz, nil)
+    if (used[index]) then return nil end
+    used[index] = true
+     CentreSpawns[#CentreSpawns+1] = {
+      x = cx, z = cy, allyTeam = spawn.allyTeam, index=index
+    }
+    spawn.cc_count = spawn.cc_count + 1
+    index_to_center[index] = index
+--     spEcho("used "..index)
+  end
+  local j = -1
+  local Ignore = {}
+  for i=1, #ex do
+    -- if 1 and 3 has cores then ignore index 2 because too near
+    if j > 0 then
+--       spEcho("compare b "..i.." "..j)
+      if (index_to_center[j] ~= nil) and (index_to_center[i] ~= nil) then
+	Ignore[j+1] = true
+-- 	spEcho("Ignore "..ex[j+1].." "..ey[j+1])
       end
     else
-      CentreSpawns[#CentreSpawns+1] = {
-	x = cx, z = cy, allyTeam = spawn.allyTeam
-      }
-      if (used[index]) then return nil end -- bad pos, overlap
+      local t = #ex+j
+--       spEcho("compare a "..i.." "..t)
+      if (index_to_center[t] ~= nil) and (index_to_center[i] ~= nil) then
+	local n = t+1
+	if (n > #ex) then
+	  n = i-1
+	end
+	Ignore[n] = true
+-- 	spEcho("Ignore "..ex[n].." "..ey[n])
+      end
+    end
+    j=j+1
+  end
+  if (cc_count > 1) then
+    core = #CentreSpawns
+    for i=1,core do
+      Ignore[CentreSpawns[i].index]=true
+      index_to_center[CentreSpawns[i].index] = i
+    end
+  --
+    for _,spawn in ipairs(SpawnBoxes) do
+      index,cx,cy = FindClosest(ex, ey, spawn.centerx, spawn.centerz, Ignore)
+      if (used[index]) then return nil end -- damn it
       used[index] = true
+      CentreSpawns[#CentreSpawns+1] = {
+	x = cx, z = cy, allyTeam = spawn.allyTeam, index=index
+      }
+      spawn.cc_count = spawn.cc_count + 1
+    end
+  --
+    for i=core+1,#CentreSpawns do
+      Ignore[CentreSpawns[i].index]=true
+      index_to_center[CentreSpawns[i].index] = i
+    end
+    for _,spawn in ipairs(SpawnBoxes) do
+      index,cx,cy = FindClosest(ex, ey, spawn.centerx, spawn.centerz, Ignore)
+      if (used[index]) then return nil end -- damn it
+      used[index] = true
+      CentreSpawns[#CentreSpawns+1] = {
+	x = cx, z = cy, allyTeam = spawn.allyTeam, index=index
+      }
+      spawn.cc_count = spawn.cc_count + 1
+    end
+  -- detect whether any neighbour center is..
+    for i=#index_to_center+1,#CentreSpawns do
+      index_to_center[CentreSpawns[i].index] = i
+    end
+    if (cc_count == 2) then
+      local sx,sy
+      -- now find middle CC of every team and remove it
+      for _,spawn in ipairs(SpawnBoxes) do
+	sx = 0
+	sy = 0
+	for _,data in pairs(CentreSpawns) do
+	  if (data.allyTeam == spawn.allyTeam) then
+	    sx=sx+data.x
+	    sy=sy+data.z
+	  end
+	end
+	sx = sx/3
+	sy = sy/3
+	index,_,_ = FindClosest(ex,ey,sx,sy,nil)
+	CentreSpawns[index_to_center[index]] = nil
+	spawn.cc_count = spawn.cc_count - 1
+      end
     end
   end
-  -- TODO detect if mex position is inside CC, if yes shift CC slightly
+  -- now important, if CC's distance between each other is too near -> return nil...
+  for a,data in pairs(CentreSpawns) do
+    for b,datb in pairs(CentreSpawns) do
+      if (a ~= b) then
+	local ax = data.x
+	local ay = data.z
+	local bx = datb.x
+	local by = datb.z
+	if (disSQ(ax,ay,bx,by) < CC_TOO_NEAR_SQ) then
+	  return nil -- :(
+	end
+      end
+    end
+  end
   return CentreSpawns
 end
 
@@ -645,7 +686,7 @@ function ProceedSmoothly(allyTeams,CentreSpawns,PlayersPerTeam,player_num)
     end
   end
   -- TODO disperse CCs amongst players, rather than giving all to single player
-  for _,data in ipairs(CentreSpawns) do
+  for _,data in pairs(CentreSpawns) do
     local y = spGetGroundHeight(data.x, data.z)
     if (y < waterLevel) then
       y = waterLevel end
@@ -1373,11 +1414,11 @@ function CheckForDead()
 --   for i=1,#players do
 --     local playerID = players[i]
 --     local name,active,spec,team,allyTeam,ping = spGetPlayerInfo(playerID)
---     Spring.Echo("___"..tostring(name).." "..tostring(spec).." "..tostring(team).." "..tostring(allyTeam))
+--     spEcho("___"..tostring(name).." "..tostring(spec).." "..tostring(team).." "..tostring(allyTeam))
 --   end
   for playerID,_ in pairs(ActivePlayers) do
     local name, active, spec = spGetPlayerInfo(playerID)
---     Spring.Echo("___"..tostring(name).." "..tostring(spec).." "..tostring(teamID).." "..tostring(select(6,spGetTeamInfo(teamID))))
+--     spEcho("___"..tostring(name).." "..tostring(spec).." "..tostring(teamID).." "..tostring(select(6,spGetTeamInfo(teamID))))
     local teamID = select(4,spGetPlayerInfo(playerID))
     if name==nil or spec or spGetTeamRulesParam(teamID, "WasKilled") then -- apparently this is old team, "WasKilled") then
       PlayerDied(playerID, teamID)

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.6" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.0.7" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -905,7 +905,6 @@ function widget:Initialize()
     },
   }
   screen0:AddChild(status_window)
-  
   ReInit()
 end
 
