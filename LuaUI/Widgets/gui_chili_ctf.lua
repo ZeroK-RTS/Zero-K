@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.9" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.1.0" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -279,6 +279,11 @@ function widget:Update(s)
 	  }
 	}
 	mid_stack:AddChild(respawn_button)
+	local check_time = tonumber(Spring.GetModOptions().ctf_resp_time or 150)
+	if (check_time >= 60) then -- don't spam if it's less than a minute FIXME need option to disable this or just improve ui
+	  Spring.SendCommands("say a:I can call in extra commander!")
+	end
+	Spring.Echo("CTF: You can now respawn your commander, press the button under \"CTF Stats\" label!")
       elseif (spawn_tickets == 0) and (respawn_button ~= nil) then
 	mid_stack:RemoveChild(respawn_button)
 	respawn_button = nil
@@ -730,6 +735,10 @@ function widget:MousePress(mx, my, mb)
     elseif (mb == 1) then
       _, cursorWorldCoors = Spring.TraceScreenRay(mx, my, true)
       local x, y, z = cursorWorldCoors[1], cursorWorldCoors[2], cursorWorldCoors[3]
+      local _, inLos = Spring.GetPositionLosState(x,y,z, myAllyTeam)
+      if (inLos) then
+	Spring.MarkerAddPoint(x,y,z, "Calling in backup commander here!")
+      end
       Spring.SendLuaRulesMsg("ctf_respawn "..x.." "..y.." "..z)
       spawn_mode = false
     end

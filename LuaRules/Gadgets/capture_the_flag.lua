@@ -1,4 +1,4 @@
-local version = "0.0.9"
+local version = "0.1.0"
 
 function gadget:GetInfo()
   return {
@@ -46,13 +46,14 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 
   immediate TODO:
 - Rewrite widget (it only shows 2 teams, yet gadget supports more allyteams!).
-- Release this as 0.1.0 and make wiki page.
+- Make a wiki page.
   
   things to test/tweak:
 - Backup commander logic needed to be tested more, and the extra income should be balanced on the results of testing. (this needs actual playing)
 - Flag shouldn't terraform place where it is dropped. (it can also float on water)
   
   later TODO:
+- Make mode options tweakable.
 - Drop flag button should drop flag infront of unit, yet be smart and if flag will be in inaccessable place or out of map - refuse to drop.
 - Sub gamemode: Reverse CTF or escort - instead of capturing and bringing enemy flag to your base, you should bring your own flag to enemy base to score, all the other rules stay the same!
 - Somehow terraforming flag bases should be pointless or less useful as it stands now.
@@ -74,6 +75,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 14 February 2014 - 0.0.7	- Improved CC spawn logic again. Now it supports for example BlueBend.
 15 February 2014 - 0.0.8	- Dropflag button added. Also income is fixed again. (it was broken in 0.0.6 and 0.0.7 for 1 team...)
 15 Februray 2014 - 0.0.9	- CAI knows how to cap enemy flag, albeit algo is simple, run towards nearest flag base.
+15 Februray 2014 - 0.1.0	- Some options made tweakable. Fixed inablity to select different com.
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -175,7 +177,7 @@ local CountInAlliance = {} -- by allyteam... number of teamIDs, to make Payday f
 local ActivePlayers = {} -- by playerID, holds teamID, when game starts all players are dumped inside
 
 -- rules
-local TIMER_DEFEAT = 120 -- time in seconds when you lose because you have 0 flags left.
+local TIMER_DEFEAT = tonumber(modOptions.ctf_death_time or 120) -- time in seconds when you lose because you have 0 flags left. by default 2min.
 local TIMER_TELEPORT_FLAGS = 120 -- time in seconds if 2 teams hold each other flags - flags teleport back to bases
 local PICK_RADIUS = 75
 local PICK_RADIUS_SQ = PICK_RADIUS*PICK_RADIUS
@@ -184,7 +186,7 @@ local CAP_RADIUS_SQ = CAP_RADIUS*CAP_RADIUS
 local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
 local MAX_Z_DIFFERENCE = 75 -- no capturing from space lol
-local FLAG_AMOUNT_INIT = 3
+local FLAG_AMOUNT_INIT = floor(tonumber(modOptions.ctf_flags or 1))
 local ME_BONUS = function(i) return ((1.4^(1+i)+(1.5+(i*1.5))))*0.4-1.16 end --[[
 NOTE: this table is for income
 for every flag your team owns from 0 to 6 - your own income, examples:
@@ -203,8 +205,9 @@ also, the longer game progresses the more income all teams will get, it is incre
 this makes this entirely worthwhile to capture flags. because even by losing single flag you make your own position less favorable in the long run.
 no matter what you do command center is indestructible, yet gives constant bonus income.
 ]]-- 
+-- TODO some of these could be modifyable by modoptions
 local ME_BONUS_C = {} -- this one fills in automatically from function above on gamestart, it's income per TEAM, NOT PER PLAYER!
-local ME_BONUS_MULT = 1.0 -- tweaking?
+local ME_BONUS_MULT = tonumber(modOptions.ctf_inc_mult or 1.0)
 local ME_BONUS_DELAY = 1920 -- 1 minute, this will be multiplied by player amount, so every DELAY minutes centres upgrade
 local ME_CENTER_UP_MAX = 3 -- 3 upgrades max
 local ME_CENTER_BONUS_INIT = 0.5 -- for every level the bonus is halved... read below ME_CENTER_CURRENT_BONUS
@@ -212,7 +215,7 @@ local ME_CENTER_INIT_LVL = 0
 local ME_CENTER_LVL = ME_CENTER_INIT_LVL
 local ME_CENTER_CURRENT_BONUS = 1 -- this get's changed to 1.5 1.75 and 1.875...
 local COM_DROP_DELAY = 3 -- in seconds
-local COM_DROP_TIMER = 150 -- 1 free ticket per 2 and half minutes
+local COM_DROP_TIMER = tonumber(modOptions.ctf_resp_time or 150) -- 1 free ticket per 2 and half minutes by default
 local LONELY_FLAG_TIMER = 120 -- if flag is untouched for 120 seconds teleport it back, may be super useful if for some reason flag disappeared (bug)?
 local CTF_ONE_SECOND_FRAME = 30 -- frames per second
 local MERGE_DIST = 450 -- spawn positions below 450 dist? merge them!
@@ -261,6 +264,18 @@ function FigureSide(x, y)
     end
   end
   return 5 -- LOL
+end
+
+function InvertFacing(s)
+  if (s == "w") then
+    return "e"
+  elseif (s == "e") then
+    return "w"
+  elseif (s == "n") then
+    return "s"
+  else
+    return "n"
+  end
 end
 
 function ToFacing(x, y)
@@ -882,7 +897,7 @@ function CommDrop(playerID,teamID,allyTeam,x,y,z)
     OrbitDrop[#OrbitDrop+1] = {
       at = spGetGameFrame()+(CTF_ONE_SECOND_FRAME*COM_DROP_DELAY),
       startUnit = startUnit, x = x,
-      y = y, z = z, facing = ToFacing(x,z), teamID = teamID }
+      y = y, z = z, facing = InvertFacing(ToFacing(x,z)), teamID = teamID }
     CommanderPool[teamID]=CommanderPool[teamID]-1
     CommanderTickets[teamID]=CommanderTickets[teamID]-1
     CommanderTimer[teamID]=COM_DROP_TIMER
