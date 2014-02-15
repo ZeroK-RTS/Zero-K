@@ -279,10 +279,10 @@ function widget:Update(s)
 	  }
 	}
 	mid_stack:AddChild(respawn_button)
-	local check_time = tonumber(Spring.GetModOptions().ctf_resp_time or 150)
-	if (check_time >= 60) then -- don't spam if it's less than a minute FIXME need option to disable this or just improve ui
-	  Spring.SendCommands("say a:I can call in extra commander!")
-	end
+-- 	local check_time = tonumber(Spring.GetModOptions().ctf_resp_time or 150)
+-- 	if (check_time >= 60) then -- don't spam if it's less than a minute FIXME need option to disable this or just improve ui
+-- 	  Spring.SendCommands("say a:I can call in extra commander!")
+-- 	end
 	Spring.Echo("CTF: You can now respawn your commander, press the button under \"CTF Stats\" label!")
       elseif (spawn_tickets == 0) and (respawn_button ~= nil) then
 	mid_stack:RemoveChild(respawn_button)

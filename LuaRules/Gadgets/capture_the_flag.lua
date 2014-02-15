@@ -13,7 +13,7 @@ function gadget:GetInfo()
 end
 
 --[[ Capture The Flag.
-1. Teams spawn with 3 flags. Flag icon appears of top of all command centers. Centers spawn slightly closer to front lines.
+1. Teams spawn with 4 flags. Flag icon appears of top of all command centers. Centers spawn slightly closer to front lines.
 2. It's invincible, you can't attack it, to capture enemy flag walk close by it's command center. To score stolen flag, walk close by your team's center.
 3. The more flags you own, the more resources every player on your team gets (both M&E). Bonus is everytime bigger the more you have. Losing flags, on the other hand will give a lot less resources.
 4. Losing team get's ability to call in dead commanders again. They get brand new ones delivered from orbit to any place they want in LoS.
@@ -55,7 +55,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
   later TODO:
 - Make more options tweakable.
 - Drop flag button should drop flag infront of unit, yet be smart and if flag will be in inaccessable place or out of map - refuse to drop.
-- Sub gamemode: Reverse CTF or escort - instead of capturing and bringing enemy flag to your base, you should bring your own flag to enemy base to score, all the other rules stay the same!
+- Sub gamemode: Reverse CTF or escort - instead of capturing and bringing enemy flag to your base, you should bring your own flag to enemy base to score, all the other rules stay the same! <- could be considered as escort gamemode xD?
 - Somehow terraforming flag bases should be pointless or less useful as it stands now.
 - If map is big, flag capture ranges should scale slightly.
 - If CC spawns above ground it should level ground actually.
@@ -65,6 +65,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 - Some more endgame content (either superunit or turn CCs into superweapons for last team standing (having non 0 flags), so they finish other teams in spectacular way).
 - Make CAI search it's own team's flags and pick them up. CAI also should stay there until flag is scored.
 
+Development started on 8 february 2014. First playable version could be considered 0.0.8 (no crashes) and 0.0.9 including AI.
   Changelog:
 9 February 2014 - 0.0.1 beta	- First version. 
 10 February 2014 - 0.0.2	- Second version with water support and few bug fixes.
@@ -73,9 +74,9 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 12 February 2014 - 0.0.5	- Flags in limbo eventually return to their base and allow game to proceed smoothly and critical bugs with duplicating flags and/or disappearing fixed.
 13 February 2014 - 0.0.6	- Improved CC spawn logic, it should support team fights, ffa fights (simply spawnings CCs inside spawn boxes). It also works for no spawn boxes maps too. Tweaked income, was too big and calculated wrong. Fixes to commander pool logic.
 14 February 2014 - 0.0.7	- Improved CC spawn logic again. Now it supports for example BlueBend.
-15 February 2014 - 0.0.8	- Dropflag button added. Also income is fixed again. (it was broken in 0.0.6 and 0.0.7 for 1 team...)
-15 Februray 2014 - 0.0.9	- CAI knows how to cap enemy flag, albeit algo is simple, run towards nearest flag base.
-15 Februray 2014 - 0.1.0	- Some options made tweakable. Fixed inablity to select different com.
+15 February 2014 - 0.0.8	- Dropflag button added. Also income is fixed again. (it was broken in 0.0.6 and 0.0.7 for 1 team... lot's of things were broken before this version)
+15 Februray 2014 - 0.0.9	- CAI knows how to cap enemy flag, albeit algo is simple, run towards nearest flag base. Also CAI selfd fixed.
+15 Februray 2014 - 0.1.0	- Some options made tweakable. Fixed inablity to select different com. It's now 1 week old.
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
