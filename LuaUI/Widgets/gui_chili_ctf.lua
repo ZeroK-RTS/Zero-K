@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.8" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.0.9" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -644,7 +644,7 @@ function widget:DrawWorld()
       fx,fy,fz = Spring.GetUnitPosition(unitID)
       if (allyTeam == myAllyTeam) then
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if (blue_stolen == nil) then
+	if (blue_stolen == nil) and (bs ~= nil) and (bs > 0) then
 	  glPushMatrix()
 	  glTexture(false)
 	  glLineWidth(20)
@@ -666,7 +666,7 @@ function widget:DrawWorld()
 	end
       elseif (allyTeam ~= nil) and (allyTeam == RedAllyTeam) then
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	if (red_stolen == nil) then
+	if (red_stolen == nil) and (rs ~= nil) and (rs > 0) then
 	  glPushMatrix()
 	  glTexture(false)
 	  glLineWidth(20)

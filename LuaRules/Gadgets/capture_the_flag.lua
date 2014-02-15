@@ -1,4 +1,4 @@
-local version = "0.0.8"
+local version = "0.0.9"
 
 function gadget:GetInfo()
   return {
@@ -20,7 +20,7 @@ end
   Commanders also the level of [amount_of_flags_initialy - amount_of_flags_left], so if number is bigger than 0 and you lost commander in battle. You may call in another one.
   NOTE: If you reclaimed commander or you made it suicide, you are not given this ability.
   In some cases you may have multiple commanders, if that's the case, you might get ability to stack extra backup coms.
-5. If you lose all flags (enemy scores your last flag), you have 3 minutes to redeem your team by scoring 1 flag. If you fail to do so, you will lose the game.
+5. If you lose all flags (enemy scores your last flag), you have 2 minutes to redeem your team by scoring 1 flag. If you fail to do so, you will lose the game.
 6. There can be multiple command centers (the more players the more centers), and they upgrade themselves overtime (for every level of command center they give additional 50% resources).
 
 You can have multiple command structures, the number is:
@@ -36,7 +36,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
   Summary (features):
 - Controlling flags increase m&e income.
 - Losing flags gives free commanders (but overtime having more flags benefits you more).
-- Having 0 flags will result in defeat within 3 minutes (it's okay if last flag is stolen though).
+- Having 0 flags will result in defeat within 2 minutes (it's okay if last flag is stolen though).
 - Having many players in single team will result in multiple flag bases.
 - You can capture only 1 flag at a time. If 2 teams control each other flags for 120 secs, flags are teleported back.
 - Walking over your own team's flag will teleport it back to the base.
@@ -50,6 +50,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
   
   things to test/tweak:
 - Backup commander logic needed to be tested more, and the extra income should be balanced on the results of testing. (this needs actual playing)
+- Flag shouldn't terraform place where it is dropped. (it can also float on water)
   
   later TODO:
 - Drop flag button should drop flag infront of unit, yet be smart and if flag will be in inaccessable place or out of map - refuse to drop.
@@ -61,7 +62,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 - Tweak pool/tickets and make AI call in coms if available right away.
 - Multi-contest resolution (when multiple teams are stuck because they stealed each other flags).
 - Some more endgame content (either superunit or turn CCs into superweapons for last team standing (having non 0 flags), so they finish other teams in spectacular way).
-- Make CAI if it has flag captured, order the flag carrier to run towards it's own CC. No need to teach/make CAI know anything else.
+- Make CAI search it's own team's flags and pick them up. CAI also should stay there until flag is scored.
 
   Changelog:
 9 February 2014 - 0.0.1 beta	- First version. 
@@ -72,6 +73,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 13 February 2014 - 0.0.6	- Improved CC spawn logic, it should support team fights, ffa fights (simply spawnings CCs inside spawn boxes). It also works for no spawn boxes maps too. Tweaked income, was too big and calculated wrong. Fixes to commander pool logic.
 14 February 2014 - 0.0.7	- Improved CC spawn logic again. Now it supports for example BlueBend.
 15 February 2014 - 0.0.8	- Dropflag button added. Also income is fixed again. (it was broken in 0.0.6 and 0.0.7 for 1 team...)
+15 Februray 2014 - 0.0.9	- CAI knows how to cap enemy flag, albeit algo is simple, run towards nearest flag base.
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -172,10 +174,8 @@ local TeamsInAlliance = {} -- by allyteam... teamIDs
 local CountInAlliance = {} -- by allyteam... number of teamIDs, to make Payday function work better and faster
 local ActivePlayers = {} -- by playerID, holds teamID, when game starts all players are dumped inside
 
-local CopyTable = Spring.Utilities.CopyTable
-
 -- rules
-local TIMER_DEFEAT = 180 -- time in seconds when you lose because you have 0 flags left.
+local TIMER_DEFEAT = 120 -- time in seconds when you lose because you have 0 flags left.
 local TIMER_TELEPORT_FLAGS = 120 -- time in seconds if 2 teams hold each other flags - flags teleport back to bases
 local PICK_RADIUS = 75
 local PICK_RADIUS_SQ = PICK_RADIUS*PICK_RADIUS
@@ -227,7 +227,10 @@ local metal_mult = 1.0
 local DelayedInit = nil -- non nil if gamestarted event failed, this is fallback thing to retry spawning
 local GameStarted = false
 
-local CMD_DROP_FLAG = 35300
+local CMD_DROP_FLAG 	= 35300
+local CMD_INSERT	= CMD.INSERT
+local CMD_MOVE		= CMD.MOVE
+local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 
 --//------------------ Code to determine command center spawn positions and teleport stucked commanders away and so on -- BEGIN
 
@@ -761,10 +764,15 @@ function GetTeamFromAlly(allyTeam)
   end
   if (best_target) then 
     return best_target
-  elseif (teams ~= nil) then
+  elseif (teams ~= nil) and (#teams > 0) then
     return teams[random(1,#teams)]
   else -- uh uh
     teams = spGetTeamList(allyTeam)
+    if (teams == nil) or (#teams < 1) then
+      spEcho("CTF: Couldn't spawn flag base, no players present in ally team. Exiting...")
+      gadgetHandler:RemoveGadget()
+      return
+    end
     return teams[random(1,#teams)]
   end
 end
@@ -1025,6 +1033,33 @@ function disSQ(x1,y1,x2,y2)
   return (x1 - x2)^2 + (y1 - y2)^2
 end
 
+function RunToBase(unitID, teamID, allyTeam)
+  local best_id = 0
+  local best_dist = nil
+  local x,y,z = spGetUnitPosition(unitID)
+  for i=1,#CommandCenters do
+    local cc = CommandCenters[i]
+    if (cc.allyTeam == allyTeam) then
+      local dist = disSQ(x,z,cc.x,cc.z)
+      if (best_dist == nil) or (dist < best_dist) then
+	best_dist = dist
+	best_id = i
+      end
+    end
+  end
+  -- run towards it
+  if (best_dist ~= nil) then
+    local tx = CommandCenters[best_id].x
+    local tz = CommandCenters[best_id].z
+    if (tx > x) then tx = tx-100
+    else tx = tx+100 end
+    if (tz > z) then tz = tz-100
+    else tz = tz+100 end
+    -- FIXME make sure unit does this, and not stands...
+    spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, 0, tx, 0, tz}, {"alt"}) -- FIXME not always works
+  end
+end
+
 --//------------------ Misc code -- BEGIN
 --//------------------ CTF logic code -- BEGIN
 
@@ -1145,6 +1180,10 @@ function PickFlag(flagID, unitID, allyTeam, enemyTeam)
   ContestedTeam[allyTeam] = enemyTeam
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, unitID)
   spSetUnitAlwaysVisible(unitID, true)
+  local isAI = select(4,spGetTeamInfo(spGetUnitTeam(unitID)))
+  if (isAI) then
+    RunToBase(unitID, teamID, enemyTeam)
+  end
 --   spEcho("Pick flag "..tostring(flagID).." "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
@@ -1155,6 +1194,11 @@ function StealFlag(unitID, allyTeam, enemyTeam)
   spSetGameRulesParam("ctf_flags_team"..allyTeam, FlagAmount[allyTeam])
   spSetUnitAlwaysVisible(unitID, true)
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, unitID)
+  -- if it's AI make AI run towards nearest command center
+  local isAI = select(4,spGetTeamInfo(spGetUnitTeam(unitID)))
+  if (isAI) then
+    RunToBase(unitID, teamID, enemyTeam)
+  end
 --   spEcho("Steal flag "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
@@ -1294,7 +1338,7 @@ function IsUnitAllied(unitID,allyTeam)
   return (spGetUnitAllyTeam(unitID) == allyTeam)
 end
 
-function GetAnyFlagCarrier(allyTeam, x, y, z, cap_radius)
+function GetAnyFlagCarrier(allyTeam, x, y, z, cap_radius) -- BlockListed unit can't return flag, but that's kinda ok
   local units = spGetUnitsInCylinder(x, z, cap_radius)
   for i=1,#units do
     local unitID = units[i]
@@ -1427,7 +1471,7 @@ function CountDefeat()
 	for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
 	  spKillTeam(teamID)
 	  spSetTeamRulesParam(teamID, "WasKilled", 1)
-	  local units = spGetTeamUnits(team)
+	  local units = spGetTeamUnits(teamID)
 	  for i = 1, #units do
 	    if (spValidUnitID(units[i])) then
 	      if (Godmode[units[i]]) then
