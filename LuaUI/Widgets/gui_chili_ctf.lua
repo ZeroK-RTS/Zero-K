@@ -302,6 +302,10 @@ function widget:Update(s)
 	  fontsize = 11;
 	}
 	mid_stack:AddChild(respawn_info)
+	if (respawn_timer ~= nil) then -- changing wrong ordering
+	  mid_stack:RemoveChild(respawn_timer)
+	  mid_stack:AddChild(respawn_timer)
+	end
       elseif (respawn_info ~= nil) and (spawn_tickets > 0) then
 	mid_stack:RemoveChild(respawn_info)
 	respawn_info = nil

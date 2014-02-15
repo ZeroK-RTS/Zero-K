@@ -33,17 +33,6 @@ Spawn center will push out any unit that was stuck inside it, upon spawning.
 
 You can capture flag using any unit apart from flying units. You can pick up flag carriers using transport though.
 
-  Summary (features):
-- Controlling flags increase m&e income.
-- Losing flags gives free commanders (but overtime having more flags benefits you more).
-- Having 0 flags will result in defeat within 2 minutes (it's okay if last flag is stolen though).
-- Having many players in single team will result in multiple flag bases.
-- You can capture only 1 flag at a time. If 2 teams control each other flags for 120 secs, flags are teleported back.
-- Walking over your own team's flag will teleport it back to the base.
-- Walking over your enemy's flag will pick it up, bring it to your own base!
-- Contested flags do not count towards bonus income!
-- There can only be one single stolen&contested flag at a time!
-
   immediate TODO:
 - Rewrite widget (it only shows 2 teams, yet gadget supports more allyteams!).
 - Make a wiki page.
