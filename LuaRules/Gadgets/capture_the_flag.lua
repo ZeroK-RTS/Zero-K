@@ -175,10 +175,10 @@ local CAP_RADIUS = 250
 local CAP_RADIUS_SQ = CAP_RADIUS*CAP_RADIUS
 local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
-local MAX_Z_DIFFERENCE = 75 -- no capturing from space lol
+local MAX_Z_DIFFERENCE = 1400 -- no capturing from space lol
 local FLAG_AMOUNT_INIT = floor(tonumber(modOptions.ctf_flags or 4))
 local ME_BONUS = function(i) return ((1.4^(1+i)+(1.5+(i*1.5))))*0.4-1.16 end --[[
-NOTE: this table is for income
+NOTE: this table is for income, example if 3 flags are given to 2 teams. also pic: http://i.imgur.com/okNUEqV.png
 for every flag your team owns from 0 to 6 - your own income, examples:
 flags 	1 second	1 minute
 0	0		0
