@@ -617,7 +617,6 @@ function widget:DrawWorld()
     -- red flag stolen by
     if (RedAllyTeam ~= nil) then
       redHolder = Spring.GetGameRulesParam("ctf_unit_stole_team"..RedAllyTeam)
-      FlagCarrier = redHolder
       if (redHolder ~= nil) and (redHolder > 0) and (Spring.ValidUnitID(redHolder)) then
 	local unitID = redHolder
 	fx,fy,fz = Spring.GetUnitPosition(unitID)
