@@ -1056,7 +1056,7 @@ function DropFlagCmd(unitID, unitDefID, teamID, cmdID, cmdParams)
   if (InsideMap(x,z) == false) then
     ReturnFlag(nil, nil, FlagCarrier[unitID]) -- flag outside of map
   else
-    BlackList(unitID,2) -- forbid unit to pick up flags for 2 seconds
+    BlackList(unitID, 3) -- forbid unit to pick up flags for 3 seconds
     DropFlag(FlagCarrier[unitID], x, y, z)
   end
   FlagCarrier[unitID] = nil
