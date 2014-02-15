@@ -595,22 +595,24 @@ function widget:DrawWorld()
 	local unitID = blueHolder
 	fx,fy,fz = Spring.GetUnitPosition(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	glPushMatrix()
-	glTexture(false)
-	glLineWidth(20)
-	glColor(1,1,1,1)
-	glBeginEnd(GL_LINE_STRIP, PillarVertsBlue, fx, fy, fz)
-	glLineWidth(1)
-	glPopMatrix()
-	if (UnitDefs[unitDefID].name ~= "ctf_flag") then
+	if (fx ~= nil) and (unitDefID) then --FIXME quick fix for ui crash
 	  glPushMatrix()
-	  glTexture('LuaUI/Images/ctf_blue_flag.png')
-	  glUnitMultMatrix(unitID)
-	  glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
-	  glRotate(Rotation,0,1,0)
+	  glTexture(false)
+	  glLineWidth(20)
 	  glColor(1,1,1,1)
-	  glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	  glBeginEnd(GL_LINE_STRIP, PillarVertsBlue, fx, fy, fz)
+	  glLineWidth(1)
 	  glPopMatrix()
+	  if (UnitDefs[unitDefID].name ~= "ctf_flag") then
+	    glPushMatrix()
+	    glTexture('LuaUI/Images/ctf_blue_flag.png')
+	    glUnitMultMatrix(unitID)
+	    glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
+	    glRotate(Rotation,0,1,0)
+	    glColor(1,1,1,1)
+	    glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	    glPopMatrix()
+	  end
 	end
       end
     end
@@ -621,22 +623,24 @@ function widget:DrawWorld()
 	local unitID = redHolder
 	fx,fy,fz = Spring.GetUnitPosition(unitID)
 	local unitDefID = Spring.GetUnitDefID(unitID)
-	glPushMatrix()
-	glTexture(false)
-	glLineWidth(20)
-	glColor(1,1,1,1)
-	glBeginEnd(GL_LINE_STRIP, PillarVertsRed, fx, fy, fz)
-	glLineWidth(1)
-	glPopMatrix()
-	if (UnitDefs[unitDefID].name ~= "ctf_flag") then
+	if (fx ~= nil) and (unitDefID) then --FIXME quick fix for ui crash
 	  glPushMatrix()
-	  glTexture('LuaUI/Images/ctf_red_flag.png')
-	  glUnitMultMatrix(unitID)
-	  glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
-	  glRotate(Rotation,0,1,0)
+	  glTexture(false)
+	  glLineWidth(20)
 	  glColor(1,1,1,1)
-	  glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	  glBeginEnd(GL_LINE_STRIP, PillarVertsRed, fx, fy, fz)
+	  glLineWidth(1)
 	  glPopMatrix()
+	  if (UnitDefs[unitDefID].name ~= "ctf_flag") then
+	    glPushMatrix()
+	    glTexture('LuaUI/Images/ctf_red_flag.png')
+	    glUnitMultMatrix(unitID)
+	    glTranslate(0, UnitDefs[unitDefID].height + 10, 0)
+	    glRotate(Rotation,0,1,0)
+	    glColor(1,1,1,1)
+	    glTexRect(-iconhsize, 0, iconhsize, iconsize)
+	    glPopMatrix()
+	  end
 	end
       end
     end
