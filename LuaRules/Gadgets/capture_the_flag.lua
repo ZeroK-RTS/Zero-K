@@ -995,7 +995,7 @@ end
 function LetThemCallBackup(allyTeam)
   teams = spGetTeamList(allyTeam)
   for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
-    if (CommanderSpeedUpTimer[teamID]) then -- if you suicided com you get no extra :)
+    if (CommanderSpeedUpTimer[teamID]) and (CommanderTimer[teamID] > 3) then -- if you suicided com you get no extra :)
       CommanderTimer[teamID] = 3 -- or maybe 1.. or 0?
     end
   end
