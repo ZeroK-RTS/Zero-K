@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.0.7" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.0.8" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
@@ -11,6 +11,7 @@ function widget:GetInfo()
     date      = "Feb 2014",
     license   = "GPL v2 or later",
     layer     = 1, 
+    handler   = true, --for adding customCommand into UI
     enabled   = true  --  loaded by default?
   }
 end
@@ -135,6 +136,18 @@ local memo_rs = -1 -- used in clever way to detect capture/stolen/return
 
 local CommandCenters = {}
 local Rotation = 0
+
+local CMD_DROP_FLAG = 35300
+
+local cmdDropflag = {
+  id      = CMD_DROP_FLAG,
+  type    = CMDTYPE.ICON,
+  tooltip = 'Drop flag on the ground.',
+  cursor  = 'Attack',
+  action  = 'dropflag',
+  params  = { }, 
+  texture = 'LuaUI/Images/commands/Bold/drop_flag.png',
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -604,6 +617,7 @@ function widget:DrawWorld()
     -- red flag stolen by
     if (RedAllyTeam ~= nil) then
       redHolder = Spring.GetGameRulesParam("ctf_unit_stole_team"..RedAllyTeam)
+      FlagCarrier = redHolder
       if (redHolder ~= nil) and (redHolder > 0) and (Spring.ValidUnitID(redHolder)) then
 	local unitID = redHolder
 	fx,fy,fz = Spring.GetUnitPosition(unitID)
@@ -718,6 +732,22 @@ function widget:MousePress(mx, my, mb)
     end
   end
 end
+
+function widget:CommandsChanged()
+  local selectedUnits = Spring.GetSelectedUnits()
+  local customCommands = widgetHandler.customCommands
+--   for _, unitID in ipairs(selectedUnits) do
+  local unitID = Spring.GetSelectedUnits()[1]
+    if (unitID) then
+    local unitDefID = Spring.GetUnitDefID(unitID)
+    local ud = UnitDefs[unitDefID]
+    if ud and ud.canMove and not(ud.canFly) then --Note: canMove include factory
+      table.insert(customCommands, cmdDropflag)
+      return
+    end
+  end 
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

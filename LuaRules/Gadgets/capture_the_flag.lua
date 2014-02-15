@@ -1,4 +1,4 @@
-local version = "0.0.7"
+local version = "0.0.8"
 
 function gadget:GetInfo()
   return {
@@ -45,12 +45,19 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 - There can only be one single stolen&contested flag at a time!
 
   immediate TODO:
-- Transfer and drop flag buttons.
 - Rewrite widget (it only shows 2 teams, yet gadget supports more allyteams!).
-- Search and destroy last bugs and release this as 0.1 or smth.
+- Release this as 0.1.0 and make wiki page.
+  
+  things to test/tweak:
+- Backup commander logic needed to be tested more, and the extra income should be balanced on the results of testing. (this needs actual playing)
   
   later TODO:
-- Right now if spawn boxes are too near, it's likely to game get honked... code something to detect if CCs are too near and fix them.
+- Drop flag button should drop flag infront of unit, yet be smart and if flag will be in inaccessable place or out of map - refuse to drop.
+- Sub gamemode: Reverse CTF or escort - instead of capturing and bringing enemy flag to your base, you should bring your own flag to enemy base to score, all the other rules stay the same!
+- Somehow terraforming flag bases should be pointless or less useful as it stands now.
+- If map is big, flag capture ranges should scale slightly.
+- If CC spawns above ground it should level ground actually.
+- Gadget should be able to send some text string for clients (widget) to display.
 - Tweak pool/tickets and make AI call in coms if available right away.
 - Multi-contest resolution (when multiple teams are stuck because they stealed each other flags).
 - Some more endgame content (either superunit or turn CCs into superweapons for last team standing (having non 0 flags), so they finish other teams in spectacular way).
@@ -64,6 +71,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 12 February 2014 - 0.0.5	- Flags in limbo eventually return to their base and allow game to proceed smoothly and critical bugs with duplicating flags and/or disappearing fixed.
 13 February 2014 - 0.0.6	- Improved CC spawn logic, it should support team fights, ffa fights (simply spawnings CCs inside spawn boxes). It also works for no spawn boxes maps too. Tweaked income, was too big and calculated wrong. Fixes to commander pool logic.
 14 February 2014 - 0.0.7	- Improved CC spawn logic again. Now it supports for example BlueBend.
+15 February 2014 - 0.0.8	- Dropflag button added. Also income is fixed again. (it was broken in 0.0.6 and 0.0.7 for 1 team...)
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -73,6 +81,8 @@ if (math.randomseed ~= nil) then
   math.random()
   --math.randomseed(r)
 end
+
+include("LuaRules/Configs/customcmds.h.lua")
 
 --SYNCED-------------------------------------------------------------------
 
@@ -151,7 +161,7 @@ local DefeatTimer = {} -- every second you have 0 flags you are doomed :D
 local CallBackup = {} -- per team, holds lvl of commander player may call in (respawn)
 local CommChoice = {} -- players can change commchoice ingame...
 local OrbitDrop = {} -- delayed delivering...
-local BlackList = {} -- per unitid.. i put here transported units and unblacklist on unloading/death
+local BlackListed = {} -- per unitid.. i put here transported units and unblacklist on unloading/death
 local ReturnFlagTimer = {}
 local CommanderPool = {} -- maximum amount of commanders per player
 local CommanderTickets = {} -- amount of tickets per player
@@ -159,6 +169,7 @@ local CommanderTimer = {} -- timer starts to go down if player has less commande
 local CommanderSpeedUpTimer = {} -- by teamID, if enemy team scores, it will allow to call in backup comm much sooner
 local Godmode = {} -- unitid... only CCs are dropped here, flags are not though
 local TeamsInAlliance = {} -- by allyteam... teamIDs
+local CountInAlliance = {} -- by allyteam... number of teamIDs, to make Payday function work better and faster
 local ActivePlayers = {} -- by playerID, holds teamID, when game starts all players are dumped inside
 
 local CopyTable = Spring.Utilities.CopyTable
@@ -215,6 +226,8 @@ local metal_mult = 1.0
 
 local DelayedInit = nil -- non nil if gamestarted event failed, this is fallback thing to retry spawning
 local GameStarted = false
+
+local CMD_DROP_FLAG = 35300
 
 --//------------------ Code to determine command center spawn positions and teleport stucked commanders away and so on -- BEGIN
 
@@ -650,6 +663,7 @@ function ProceedSmoothly(allyTeams,CentreSpawns,PlayersPerTeam,player_num)
     DefeatTimer[allyTeam] = TIMER_DEFEAT
     FlagAmount[allyTeam] = FLAG_AMOUNT_INIT
     TeamsInAlliance[allyTeam] = {}
+    CountInAlliance[allyTeam] = 0
     spSetGameRulesParam("ctf_contest_time_team"..allyTeam,TIMER_TELEPORT_FLAGS)
     spSetGameRulesParam("ctf_flags_team"..allyTeam, FLAG_AMOUNT_INIT)
     spSetGameRulesParam("ctf_defeat_time_team"..allyTeam, TIMER_DEFEAT)
@@ -683,6 +697,7 @@ function ProceedSmoothly(allyTeams,CentreSpawns,PlayersPerTeam,player_num)
       spSetGameRulesParam("ctf_orbit_timer"..teamID, COM_DROP_TIMER)
       ActivePlayers[select(2,spGetTeamInfo(teamID))] = teamID
       TeamsInAlliance[allyTeam][teamID] = true
+      CountInAlliance[allyTeam] = CountInAlliance[allyTeam] + 1
     end
   end
   -- TODO disperse CCs amongst players, rather than giving all to single player
@@ -764,7 +779,7 @@ function Payday()
     if (flags > 0) then
       income = ME_BONUS_C[FlagAmount[allyTeam]] * ME_CENTER_CURRENT_BONUS
       spSetGameRulesParam("ctf_income_team"..allyTeam, floor(income*metal_mult*100))
-      local inc = income/#TeamsInAlliance[allyTeam]
+      local inc = income*(1/CountInAlliance[allyTeam])
       for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
 	spAddTeamResource(teamID, "m", inc*metal_mult)
 	spAddTeamResource(teamID, "e", inc*energy_mult)
@@ -871,7 +886,7 @@ end
 
 function DeliverDrops(f)
   for i,data in pairs(OrbitDrop) do
-    if (data) and (data.at <= f) then
+    if (data) and (data.at < f) then
       local unitID = GG.DropUnit(data.startUnit, data.x, data.y, data.z, data.facing, data.teamID)
       if (unitID) then
 	Spring.SpawnCEG("teleport_in", data.x, data.y, data.z)
@@ -900,6 +915,7 @@ function PlayerDied(playerID, teamID)--, allyTeam)
     for compareID,_ in pairs(TeamsInAlliance[allyTeam]) do
       if (compareID == teamID) then
 	TeamsInAlliance[allyTeam][teamID] = nil
+	CountInAlliance[allyTeam] = CountInAlliance[allyTeam] - 1
 	oldAllyTeam = allyTeam
 	break
       end
@@ -997,11 +1013,12 @@ function zDifference(z,z2)
 end
   
 function gadget:UnitUnloaded(unitID)
-  BlackList[unitID] = false
+  --BlackListed[unitID] = nil -- ok
+  BlackList(unitID, 3) -- no insta grab and pickup! lal
 end
 
 function gadget:UnitLoaded(unitID)
-  BlackList[unitID] = true
+  BlackListed[unitID] = -1 -- forever blacklisted
 end
 
 function disSQ(x1,y1,x2,y2)
@@ -1010,6 +1027,42 @@ end
 
 --//------------------ Misc code -- BEGIN
 --//------------------ CTF logic code -- BEGIN
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+  if (cmdID == CMD_DROP_FLAG) then
+    DropFlagCmd(unitID, unitDefID, teamID, cmdID, cmdParams)
+    return false
+  end
+  return true
+end
+
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+  if (cmdID ~= CMD_DROP_FLAG) then
+    return false
+  end
+  return true, DropFlagCmd(unitID, unitDefID, teamID, cmdID, cmdParams)
+end
+
+function BlackList(unitID, time)
+  BlackListed[unitID] = (time*CTF_ONE_SECOND_FRAME)+spGetGameFrame()
+end
+
+function DropFlagCmd(unitID, unitDefID, teamID, cmdID, cmdParams)
+  if not(FlagCarrier[unitID]) then
+    return false
+  end
+  local x,y,z = spGetUnitPosition(unitID)
+  -- TODO forbid flag drop instead of returning it to enemy, lol, if it's impossible to drop flag or terrain is really bad (highslope/etc)
+  if (InsideMap(x,z) == false) then
+    ReturnFlag(nil, nil, FlagCarrier[unitID]) -- flag outside of map
+  else
+    BlackList(unitID,2) -- forbid unit to pick up flags for 2 seconds
+    DropFlag(FlagCarrier[unitID], x, y, z)
+  end
+  FlagCarrier[unitID] = nil
+  spSetUnitAlwaysVisible(unitID, false)
+  return true
+end
 
 function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
   if (FlagCarrier[unitID]) then
@@ -1120,7 +1173,8 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (spValidUnitID(unitID)) then
-    BlackList[unitID] = true -- lol, awesome bug when unit that dies picks flag back up and dies with it
+    --BlackListed[unitID] = -1 -- lol, awesome bug when unit that dies picks flag back up and dies with it
+    BlackList(unitID, 10) -- forbid for 10 seconds, by that time unit should be complitely removed from game
     -- smbdy drops flag on death
     if (FlagCarrier[unitID]) then
 --       spEcho("Unit destroyed, had flag")
@@ -1129,7 +1183,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
       else
 	local x,y,z = spGetUnitPosition(unitID)
 	if (InsideMap(x,z) == false) then
-	  ReturnFlag(nil, nil, allyTeam) -- flag outside of map
+	  ReturnFlag(nil, nil, FlagCarrier[unitID]) -- flag outside of map
 	else
 	  DropFlag(FlagCarrier[unitID], x, y, z)
 	end
@@ -1151,18 +1205,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 	(FlagAmount[select(6,spGetTeamInfo(teamID))] < FLAG_AMOUNT_INIT) then
       CommanderSpeedUpTimer[teamID] = true
     end
-  end
-end
-
-function gadget:UnitCreated(unitID, unitDefID, teamID)
-  if (BlackList[unitID]) then
-    BlackList[unitID] = nil -- FIXME probably not needed, in 91 at least
-  end
-end
-
-function gadget:UnitFinished(unitID, unitDefID, teamID)
-  if (BlackList[unitID]) then
-    BlackList[unitID] = nil -- FIXME probably not needed, in 91 at least
   end
 end
 
@@ -1257,7 +1299,7 @@ function GetAnyFlagCarrier(allyTeam, x, y, z, cap_radius)
   for i=1,#units do
     local unitID = units[i]
     local _, y2, _ = spGetUnitPosition(unitID)
-    if IsUnitAllied(unitID, allyTeam) and (not(BlackList[unitID])) and (FlagCarrier[unitID] ~= nil) and (FlagCarrier[unitID] ~= allyTeam) and zDifference(y,y2) then
+    if IsUnitAllied(unitID, allyTeam) and (BlackListed[unitID]==nil) and (FlagCarrier[unitID] ~= nil) and (FlagCarrier[unitID] ~= allyTeam) and zDifference(y,y2) then
       return unitID
     end
   end
@@ -1272,7 +1314,7 @@ function GetAnyAlly(allyTeam, x, y, z, cap_radius)
       local _, y2, _ = spGetUnitPosition(unitID)
       local udefId = spGetUnitDefID(unitID)
       local udef = UnitDefs[udefId]
-      if (udef.canMove) and (not(udef.canFly)) and (not(BlackList[unitID])) and (not(spGetUnitIsCloaked(unitID))) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
+      if (udef.canMove) and (not(udef.canFly)) and (BlackListed[unitID]==nil) and (not(spGetUnitIsCloaked(unitID))) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
 	return unitID
       end
     end
@@ -1288,7 +1330,7 @@ function GetAnyFlagThief(allyTeam, x, y, z, cap_radius)
       local _, y2, _ = spGetUnitPosition(unitID)
       local udefId = spGetUnitDefID(unitID)
       local udef = UnitDefs[udefId]
-      if (udef.canMove) and (not(udef.canFly)) and (not(BlackList[unitID])) and (not(spGetUnitIsCloaked(unitID))) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
+      if (udef.canMove) and (not(udef.canFly)) and (BlackListed[unitID]==nil) and (not(spGetUnitIsCloaked(unitID))) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
 	return unitID
       end
     end
@@ -1426,6 +1468,16 @@ function CheckForDead()
   end
 end
 
+function BlackListTimer(f)
+  for unitID,time in pairs(BlackListed) do
+    if (time ~= -1) then
+      if (time < f) then
+	BlackListed[unitID] = nil
+      end
+    end
+  end
+end
+
 function gadget:GameFrame (f)
   if not(GameStarted) then
     if DelayedInit ~= nil then -- i so did not want to do this
@@ -1455,6 +1507,7 @@ function gadget:GameFrame (f)
     CountDefeat() -- if you have 0 flags left and no contested flags either, you are doomed
     OrbitTimer()
     DeliverDrops(f)
+    BlackListTimer(f)
   end
 end
   

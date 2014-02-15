@@ -13,6 +13,7 @@ local tooltips = {
 	fireState = "Fire State: Sets under what conditions a unit will fire without an explicit attack order (never, when attacked, always)",
 	moveState = "Move State: Sets how far out of its way a unit will move to attack enemies",
 	["repeat"] = "Repeat: if on the unit will continously push finished orders to the end of its order queue",
+	dropflag = "Drop flag on the ground.",
 }
 
 local factories = {
@@ -321,6 +322,7 @@ local custom_cmd_actions = {
 	placebeacon=1,
 	buildprev=1,
 	areaguard=1,
+	dropflag=3,
 	
 	-- terraform
 	rampground=1,
