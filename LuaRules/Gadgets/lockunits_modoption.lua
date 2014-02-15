@@ -11,14 +11,14 @@ end
 
 
 
-local disabledunitsstring = Spring.GetModOptions().disabledunits
+local disabledunitsstring = Spring.GetModOptions().disabledunits or ""
 local disabledunits = { }
 local defenceunits = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corrazor", "missiletower", "corflak", "armcir", "screamer", "corgrav", "cortl", "cordoom", "armanni", "corjamt" }
 
 --Different lock modoptions are compatible
 if tobool(Spring.GetModOptions().noair) then
-	table.insert(disabledunits,"factoryplane")
-	table.insert(disabledunits,"factorygunship")
+	disabledunits[1]="factoryplane"
+	disabledunits[2]="factorygunship"
 end
 
 if tobool(Spring.GetModOptions().nodef) then
@@ -27,7 +27,7 @@ if tobool(Spring.GetModOptions().nodef) then
 	end
 end
 
-if (disabledunits == nil) then
+if (disabledunitsstring=="" and #disabledunits==0) then --no unit to disable, exit
 	return
 end
 
@@ -35,7 +35,7 @@ end
 --SYNCED
 --------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
-	if disabledunitsstring then
+	if disabledunitsstring ~= "" then 
 		for i in string.gmatch(disabledunitsstring, '([^+]+)') do
 			--I should check whether the unit name actually exists, but it seems UnitDefNames hasn't been created at this stage yet
 			disabledunits[#disabledunits+1] = i

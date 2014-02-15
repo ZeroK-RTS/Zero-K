@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.281 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.282 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2014-2-3
     license   = "GNU GPL, v2 or later",
@@ -605,9 +605,9 @@ function widget:CommandsChanged()
 
 	-- Find out if menu should display retreat-state button 
 	--(current unit selection may or may not contain a retreatable unit, this code checks for retreatable unit and add button to menu if appropriate)
-	for _, unitID in ipairs(selectedUnits) do
-
-		local unitID = GetSelectedUnits()[1]
+	-- for _, unitID in ipairs(selectedUnits) do
+	if selectedUnits[1] then
+		local unitID = selectedUnits[1]
 
 		local unitDefID = GetUnitDefID(unitID)
 		local ud = UnitDefs[unitDefID]
@@ -632,7 +632,7 @@ function widget:CommandsChanged()
 		if foundRetreatable then
 			return
 		end
-	end--for 
+	end 
 end
 
 function widget:SelectionChanged(newSelection)
