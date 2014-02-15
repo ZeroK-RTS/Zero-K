@@ -53,7 +53,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 - Flag shouldn't terraform place where it is dropped. (it can also float on water)
   
   later TODO:
-- Make mode options tweakable.
+- Make more options tweakable.
 - Drop flag button should drop flag infront of unit, yet be smart and if flag will be in inaccessable place or out of map - refuse to drop.
 - Sub gamemode: Reverse CTF or escort - instead of capturing and bringing enemy flag to your base, you should bring your own flag to enemy base to score, all the other rules stay the same!
 - Somehow terraforming flag bases should be pointless or less useful as it stands now.
@@ -186,7 +186,7 @@ local CAP_RADIUS_SQ = CAP_RADIUS*CAP_RADIUS
 local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
 local MAX_Z_DIFFERENCE = 75 -- no capturing from space lol
-local FLAG_AMOUNT_INIT = floor(tonumber(modOptions.ctf_flags or 1))
+local FLAG_AMOUNT_INIT = floor(tonumber(modOptions.ctf_flags or 4))
 local ME_BONUS = function(i) return ((1.4^(1+i)+(1.5+(i*1.5))))*0.4-1.16 end --[[
 NOTE: this table is for income
 for every flag your team owns from 0 to 6 - your own income, examples:
