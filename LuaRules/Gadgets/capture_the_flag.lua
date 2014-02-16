@@ -1234,7 +1234,7 @@ function SlowBurst(carrierID, allyTeam) -- FIXME do i really need to check every
     local units = spGetUnitsInCylinder(x, z, FLAG_SLOW_BURST_DIST)
     for i=1,#units do
       local unitID = units[i]
-      if spValidUnitID(unitID) then
+      if spValidUnitID(unitID) and (spGetUnitAllyTeam(unitID) ~= allyTeam) then
 	local maxHealth = select(2, spGetUnitHealth(unitID))
 	if maxHealth then
 	  local cx,_,cz = spGetUnitPosition(unitID)
