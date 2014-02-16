@@ -1143,7 +1143,7 @@ function DropFlagCmd(unitID, unitDefID, teamID, cmdID, cmdParams)
   local x,y,z = spGetUnitPosition(unitID)
   -- TODO forbid flag drop instead of returning it to enemy, lol, if it's impossible to drop flag or terrain is really bad (highslope/etc)
   if (InsideMap(x,z) == false) then
-    ReturnFlag(nil, nil, FlagCarrier[unitID]) -- flag outside of map
+    ReturnFlag(nil, nil, FlagCarrier[unitID], true) -- flag outside of map
   else
     BlackList(unitID, 3) -- forbid unit to pick up flags for 3 seconds
     DropFlag(FlagCarrier[unitID], x, y, z)
@@ -1159,7 +1159,7 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
     local allyTeam = select(6,spGetTeamInfo(newTeamID))
     if (oldAllyTeam ~= allyTeam) then -- transfer things
       if (FlagCarrier[unitID] == allyTeam) then -- contested flag is the same as unit owner
-	ReturnFlag(nil, unitID, allyTeam)
+	ReturnFlag(nil, unitID, allyTeam, true)
       else
 	TransferFlag(unitID, oldAllyTeam, unitID, allyTeam, FlagCarrier[unitID])
       end
@@ -1177,16 +1177,24 @@ function TransferFlag(unitID, oldAllyTeam, newUnitID, allyTeam, FlagAllyTeam)
   end
 end
 
-function TeleportFlag(TargetAllyTeam)
+function ResolveFlags(TargetAllyTeam1, TargetAllyTeam2)
   -- find who's holding this flag
   for unitID, allyTeam in pairs(FlagCarrier) do
-    if (allyTeam == TargetAllyTeam) then
-      ReturnFlag(nil, unitID, allyTeam)
+    if (allyTeam ~= nil) then
+      if (allyTeam == TargetAllyTeam1) then
+	ReturnFlag(nil, unitID, allyTeam, false)
+      elseif (allyTeam == TargetAllyTeam2) then
+	ReturnFlag(nil, unitID, allyTeam, false)
+      end
     end
   end
   for flagID, data in pairs(DroppedFlags) do
-    if (data.allyTeam == TargetAllyTeam) then
-      ReturnFlag(flagID, nil, data.allyTeam)
+    if (data.allyTeam ~= nil) then
+      if (data.allyTeam == TargetAllyTeam1) then
+	ReturnFlag(flagID, nil, data.allyTeam, false)
+      elseif (data.allyTeam == TargetAllyTeam2) then
+	ReturnFlag(flagID, nil, data.allyTeam, false)
+      end
     end
   end
   -- done
@@ -1199,7 +1207,7 @@ function DropFlag(allyTeam, x, y, z)
   local flagID = spCreateUnit("ctf_flag", x, y, z, ToFacing(x,z), GetTeamFromAlly(allyTeam))
   if (flagID == nil) then
 --     spEcho("DropFlag failed")
-    ReturnFlag(nil, nil, allyTeam)
+    ReturnFlag(nil, nil, allyTeam, true)
   else
 --     spEcho("Dropped flag success")
     ReturnFlagTimer[flagID] = LONELY_FLAG_TIMER
@@ -1209,21 +1217,23 @@ function DropFlag(allyTeam, x, y, z)
   end
 end
 
-function ReturnFlag(flagID, unitID, allyTeam)
+function ReturnFlag(flagID, unitID, allyTeam, uncontest)
   if (flagID) then
     DroppedFlags[flagID] = nil
     spDestroyUnit(flagID, false, true)
   end
   FlagAmount[allyTeam] = FlagAmount[allyTeam]+1
   spSetGameRulesParam("ctf_flags_team"..allyTeam, FlagAmount[allyTeam])
-  ContestedTeam[allyTeam] = nil
+  if (uncontest) then
+    ContestedTeam[allyTeam] = nil
+  end
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, 0)
   DefeatTimer[allyTeam] = TIMER_DEFEAT
   spSetGameRulesParam("ctf_defeat_time_team"..allyTeam, DefeatTimer[allyTeam])
   if (unitID) then
     spSetUnitAlwaysVisible(unitID, false)
     spSetGameRulesParam("ctf_unit_stole_team"..FlagCarrier[unitID], 0)
-    FlagCarrier[unitID] = false -- otherwise flags multiply lmao
+    FlagCarrier[unitID] = nil -- otherwise flags multiply
   end
 --   spEcho("Return flag "..tostring(flagID).." "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(spValidUnitID(unitID)))
 end
@@ -1304,7 +1314,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
       else
 	local x,y,z = spGetUnitPosition(unitID)
 	if (InsideMap(x,z) == false) then
-	  ReturnFlag(nil, nil, FlagCarrier[unitID]) -- flag outside of map
+	  ReturnFlag(nil, nil, FlagCarrier[unitID], true) -- flag outside of map
 	else
 	  DropFlag(FlagCarrier[unitID], x, y, z)
 	end
@@ -1313,7 +1323,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
     end
     -- dropped flags return if they die for some reason
     if (DroppedFlags[unitID]) then
-      ReturnFlag(nil, nil, DroppedFlags[unitID].allyTeam) -- flag destroyed
+      ReturnFlag(nil, nil, DroppedFlags[unitID].allyTeam, true) -- flag destroyed
       DroppedFlags[flagID] = nil
     end
     -- commander died, pool+1
@@ -1389,7 +1399,7 @@ function ReturnFlags()
     local unitID
     unitID = GetAnyAlly(allyTeam, x, y, z, PICK_RADIUS)
     if ((unitID ~= nil) and (spValidUnitID(unitID))) then
-      ReturnFlag(flagID, nil, allyTeam)
+      ReturnFlag(flagID, nil, allyTeam, true)
     end
   end
 end
@@ -1499,7 +1509,7 @@ function ReturnStucked() -- TODO make widget know about this, otherwise it's not
   for _,data in pairs(DroppedFlags) do
     ReturnFlagTimer[data.id] = ReturnFlagTimer[data.id] - 1
     if (ReturnFlagTimer[data.id] <= 0) then
-      ReturnFlag(data.id, nil, data.allyTeam)
+      ReturnFlag(data.id, nil, data.allyTeam, true)
     end
   end
 end
@@ -1518,10 +1528,9 @@ function SolveContested()
   for index,data in pairs(ContestData) do -- FIXME i will find some faster and better way...
     if data then -- FIXME probably not needed to check this
       if (ContestedTeam[data.rival1] ~= nil) and (ContestedTeam[data.rival2] ~= nil) then
-	local time = ContestTick(index)+1 -- TODO make this visible to widgets
+	local time = ContestTick(index)+1
 	if (time <= 0) then
-	  TeleportFlag(data.rival1)
-	  TeleportFlag(data.rival2)
+	  ResolveFlags(data.rival1,data.rival2)
 	  ContestedTeam[data.rival1] = nil
 	  ContestedTeam[data.rival2] = nil
 	  DestroyContest(index)

@@ -199,6 +199,7 @@ function UpdateTeamData()
     if (contest_timer) then
       status_window:RemoveChild(contest_text)
       status_window:RemoveChild(contest_timer)
+      contest_timer = nil
     end
     if (blue_defeat) then
       blue_team:RemoveChild(blue_defeat)
