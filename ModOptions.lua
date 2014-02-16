@@ -165,6 +165,14 @@ local options = {
       section='ctf',
   },
   {
+      key='ctf_orbit_drop',
+      name='Allow com orbit drop',
+      desc='Allow players to orbit drop their commander into battle again, should it die.',
+      type='bool',
+      def = true,
+      section='ctf',
+  },
+  {
       key='ctf_resp_time',
       name='Commander respawn time in',
       desc='Set how much time should pass in seconds before you may call in another commander.',

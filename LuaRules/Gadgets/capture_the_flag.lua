@@ -1,4 +1,4 @@
-local version = "0.1.0"
+local version = "0.1.1"
 
 function gadget:GetInfo()
   return {
@@ -66,6 +66,7 @@ Development started on 8 february 2014. First playable version could be consider
 15 February 2014 - 0.0.8	- Dropflag button added. Also income is fixed again. (it was broken in 0.0.6 and 0.0.7 for 1 team... lot's of things were broken before this version)
 15 Februray 2014 - 0.0.9	- CAI knows how to cap enemy flag, albeit algo is simple, run towards nearest flag base. Also CAI selfd fixed.
 15 Februray 2014 - 0.1.0	- Some options made tweakable. Fixed inablity to select different com. It's now 1 week old.
+16 February 2014 - 0.1.1	- Balance changes. Income and bonus income formula changed. It's almost nonexponential and lowered aprox. by 2. CAI can orbit drop. Possible to disable orbit drop.
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -96,6 +97,7 @@ local ceil	= math.ceil
 local min	= math.min
 local max	= math.max
 local abs	= math.abs
+local sqrt	= math.sqrt
 local cos	= math.cos
 local sin	= math.sin
 local PI	= math.pi
@@ -165,45 +167,31 @@ local Godmode = {} -- unitid... only CCs are dropped here, flags are not though
 local TeamsInAlliance = {} -- by allyteam... teamIDs
 local CountInAlliance = {} -- by allyteam... number of teamIDs, to make Payday function work better and faster
 local ActivePlayers = {} -- by playerID, holds teamID, when game starts all players are dumped inside
+local Borgs = {} -- by teamID holds allyTeam, only AI inside
 
 -- rules
+-- TODO some of these could be modifyable by modoptions
 local TIMER_DEFEAT = tonumber(modOptions.ctf_death_time or 120) -- time in seconds when you lose because you have 0 flags left. by default 2min.
 local TIMER_TELEPORT_FLAGS = 120 -- time in seconds if 2 teams hold each other flags - flags teleport back to bases
 local PICK_RADIUS = 75
 local PICK_RADIUS_SQ = PICK_RADIUS*PICK_RADIUS
 local CAP_RADIUS = 250
 local CAP_RADIUS_SQ = CAP_RADIUS*CAP_RADIUS
+local FLAG_SLOW_BURST_DIST = 150
+local FLAG_SLOW_BURST_DIST_SQ = FLAG_SLOW_BURST_DIST*FLAG_SLOW_BURST_DIST
 local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
 local MAX_Z_DIFFERENCE = 1400 -- no capturing from space lol
 local FLAG_AMOUNT_INIT = floor(tonumber(modOptions.ctf_flags or 4))
-local ME_BONUS = function(i) return ((1.4^(1+i)+(1.5+(i*1.5))))*0.4-1.16 end --[[
-NOTE: this table is for income, example if 3 flags are given to 2 teams. also pic: http://i.imgur.com/okNUEqV.png
-for every flag your team owns from 0 to 6 - your own income, examples:
-flags 	1 second	1 minute
-0	0		0
-1	0.824		49.44
-2	1.7376		104.256
-3	2.77664		166.5984
-4	3.991296	239.47776
-5	5.4518144	327.108864
-6	7.25654016	435.3924096
-4 vs 2 - ~135 per minute advantage, your enemy respawns with 1lvl coms. -- additional +2.25m&e income per player (comparing to enemy team) seems fair to counter this with respawning few commanders being lvl1.
-5 vs 1 - ~277 per minute advantage, your enemy respawns with 2lvl coms. -- additional +4.63m&e income per player (comparing to enemy team) seems fair to counter this with respawning few commanders being lvl2.
-6 vs 0 - ~435 per minute advantage, your enemy respawns with 3lvl coms and have 3 minutes to grab 1 flag before auto-resign.
-also, the longer game progresses the more income all teams will get, it is increased from 1.00 multiplier (base) to 1.875 (which should be at 1*player_amount minute into the game).
-this makes this entirely worthwhile to capture flags. because even by losing single flag you make your own position less favorable in the long run.
-no matter what you do command center is indestructible, yet gives constant bonus income.
-]]-- 
--- TODO some of these could be modifyable by modoptions
+local ME_BONUS = function(i) return (sqrt(i)*(1.05^i)) end -- income per player, is turned into constant on gamestart, see http://i.imgur.com/RkoedXl.png
 local ME_BONUS_C = {} -- this one fills in automatically from function above on gamestart, it's income per TEAM, NOT PER PLAYER!
 local ME_BONUS_MULT = tonumber(modOptions.ctf_inc_mult or 1.0)
 local ME_BONUS_DELAY = 1920 -- 1 minute, this will be multiplied by player amount, so every DELAY minutes centres upgrade
 local ME_CENTER_UP_MAX = 3 -- 3 upgrades max
-local ME_CENTER_BONUS_INIT = 0.5 -- for every level the bonus is halved... read below ME_CENTER_CURRENT_BONUS
+local ME_CENTER_BONUS_INIT = 0.125 -- for every level the bonus is doubled... read below ME_CENTER_CURRENT_BONUS
 local ME_CENTER_INIT_LVL = 0
 local ME_CENTER_LVL = ME_CENTER_INIT_LVL
-local ME_CENTER_CURRENT_BONUS = 1 -- this get's changed to 1.5 1.75 and 1.875...
+local ME_CENTER_CURRENT_BONUS = 1 -- this get's changed to 1.125 1.375 and 1.875...
 local COM_DROP_DELAY = 3 -- in seconds
 local COM_DROP_TIMER = tonumber(modOptions.ctf_resp_time or 150) -- 1 free ticket per 2 and half minutes by default
 local LONELY_FLAG_TIMER = 120 -- if flag is untouched for 120 seconds teleport it back, may be super useful if for some reason flag disappeared (bug)?
@@ -213,6 +201,7 @@ local MERGE_DIST = 450 -- spawn positions below 450 dist? merge them!
 local MERGE_DIST_SQ = MERGE_DIST*MERGE_DIST
 local CC_TOO_NEAR = 450
 local CC_TOO_NEAR_SQ = CC_TOO_NEAR*CC_TOO_NEAR
+local COM_DROP_ENABLED = Spring.GetModOption("ctf_orbit_drop", true, "1")
 -- NOTE maybe it's better to simply make centers behave like mexes so you may connect them to OD grid...
 
 local energy_mult = 1.0 -- why not obey them too
@@ -706,6 +695,9 @@ function ProceedSmoothly(allyTeams,CentreSpawns,PlayersPerTeam,player_num)
       spSetGameRulesParam("ctf_orbit_timer"..teamID, COM_DROP_TIMER)
       ActivePlayers[select(2,spGetTeamInfo(teamID))] = teamID
       TeamsInAlliance[allyTeam][teamID] = true
+      if (select(4,spGetTeamInfo(teamID))) then
+	Borgs[teamID] = allyTeam
+      end
       CountInAlliance[allyTeam] = CountInAlliance[allyTeam] + 1
     end
   end
@@ -812,11 +804,11 @@ function UpgradeCenters()
   local extra = 1
   for i=1,ME_CENTER_LVL do
     extra = extra+bonus
-    bonus = bonus/2
+    bonus = bonus*2
   end
   -- so it's 1 on lvl 0
-  -- 1.5 on lvl 1
-  -- 1.75 on lvl 2
+  -- 1.125 on lvl 1
+  -- 1.375 on lvl 2
   -- and finaly 1.875 extra on lvl 3
   ME_CENTER_CURRENT_BONUS = extra
 end
@@ -931,6 +923,9 @@ function PlayerDied(playerID, teamID)--, allyTeam)
     for compareID,_ in pairs(TeamsInAlliance[allyTeam]) do
       if (compareID == teamID) then
 	TeamsInAlliance[allyTeam][teamID] = nil
+	if (Borgs[teamID]) then
+	  Borgs[teamID] = nil
+	end
 	CountInAlliance[allyTeam] = CountInAlliance[allyTeam] - 1
 	oldAllyTeam = allyTeam
 	break
@@ -950,7 +945,7 @@ function PlayerDied(playerID, teamID)--, allyTeam)
       if (customKeys) and (customKeys.elo) then
 	elo = tonumber(customKeys.elo)
       end
-      candidatesForTake[#candidatesForTake+1] = {team = cteamID, rank = elo, pool = CommanderPool[cteamID], tickets = CommanderTickets[cteamID]}
+      candidatesForTake[#candidatesForTake+1] = {team = cteamID, rank = elo, pool = CommanderPool[cteamID], tickets = CommanderTickets[cteamID], allyTeam = oldAllyTeam}
       if (elo > highestRank) then
 	highestRank = rank
       end
@@ -988,7 +983,9 @@ function PlayerDied(playerID, teamID)--, allyTeam)
       if player.tickets < player.pool then
 	CommanderTickets[player.team] = CommanderTickets[player.team] + 1
 	spSetGameRulesParam("ctf_orbit_tickets"..player.team, CommanderTickets[player.team])
-	IfItsAICallInNOW(player.team)
+	if (select(4,spGetTeamInfo(player.team))) then
+	  IfItsAICallInNOW(player.team, player.allyTeam)
+	end
 	tickets_to_give = tickets_to_give - 1
 	try_again = true
       end
@@ -1014,7 +1011,9 @@ function OrbitTimer()
 	CommanderTimer[teamID] = COM_DROP_TIMER
 	CommanderTickets[teamID] = CommanderTickets[teamID] + 1
 	spSetGameRulesParam("ctf_orbit_tickets"..teamID, CommanderTickets[teamID])
-	IfItsAICallInNOW(teamID)
+	if (select(4,spGetTeamInfo(teamID))) then
+	  IfItsAICallInNOW(teamID, allyTeam)
+	end
       end
       spSetGameRulesParam("ctf_orbit_timer"..teamID, CommanderTimer[teamID])
     end
@@ -1043,20 +1042,16 @@ function disSQ(x1,y1,x2,y2)
 end
 
 function AIcomDrop()
-  for allyTeam,flags in pairs(FlagAmount) do
-    for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
-      IfItsAICallInNOW(teamID)
+  for teamID,allyTeam in pairs(Borgs) do
+    if (allyTeam ~= nil) then
+      IfItsAICallInNOW(teamID, allyTeam)
     end
   end
 end
 
-function IfItsAICallInNOW(teamID) -- this one isn't rocket science
+function IfItsAICallInNOW(teamID, allyTeam) -- this one isn't rocket science
   -- test how many tickets CAI has, found any 1: factory 2: ally coms.
   -- spawn near them:
-  local _,_,_,isAI,_,allyTeam = spGetTeamInfo(teamID)
-  if not(isAI) then
-    return -- players decide for themselves
-  end
   if (CommanderTickets[teamID] < 1) then return end -- no tickets, don't bother
   local try = 0
   local goodspawnpos = {}
@@ -1232,10 +1227,31 @@ function ReturnFlag(flagID, unitID, allyTeam)
 --   spEcho("Return flag "..tostring(flagID).." "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
+function SlowBurst(carrierID, allyTeam) -- FIXME do i really need to check everything with ValidUnitID?
+  local x,_,z = spGetUnitPosition(carrierID)
+  if spValidUnitID(carrierID) then
+    local units = spGetUnitsInCylinder(x, z, FLAG_SLOW_BURST_DIST)
+    for i=1,#units do
+      local unitID = units[i]
+      if spValidUnitID(unitID) then
+	local maxHealth = select(2, spGetUnitHealth(unitID))
+	if maxHealth then
+	  local cx,_,cz = spGetUnitPosition(unitID)
+	  local dist = disSQ(x,z,cx,cz)
+	  local mult = 1-(dist/FLAG_SLOW_BURST_DIST_SQ)
+	  if (mult < 0) then mult = 0 end
+	  GG.addSlowDamage(unitID,(maxHealth/2)*mult) -- the closer you are to carrier the more slow you pickup
+	end
+      end
+    end
+  end
+end
+
 function PickFlag(flagID, unitID, allyTeam, enemyTeam)
   DroppedFlags[flagID] = nil
   spDestroyUnit(flagID, false, true)
   FlagCarrier[unitID] = allyTeam
+  SlowBurst(unitID, allyTeam)
   ContestedTeam[allyTeam] = enemyTeam
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, unitID)
   spSetUnitAlwaysVisible(unitID, true)
@@ -1248,6 +1264,7 @@ end
 
 function StealFlag(unitID, allyTeam, enemyTeam)
   FlagCarrier[unitID] = allyTeam
+  SlowBurst(unitID, allyTeam)
   ContestedTeam[allyTeam] = enemyTeam
   FlagAmount[allyTeam] = FlagAmount[allyTeam]-1
   spSetGameRulesParam("ctf_flags_team"..allyTeam, FlagAmount[allyTeam])
@@ -1299,7 +1316,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
       DroppedFlags[flagID] = nil
     end
     -- commander died, pool+1
-    if UnitDefs[unitDefID].customParams.commtype and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil) then
+    if UnitDefs[unitDefID].customParams.commtype and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil) and COM_DROP_ENABLED then
       CommanderPool[teamID]=CommanderPool[teamID]+1
       spSetGameRulesParam("ctf_orbit_pool"..teamID, CommanderPool[teamID])
     end

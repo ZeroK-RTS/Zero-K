@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.1.0" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.1.1" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
