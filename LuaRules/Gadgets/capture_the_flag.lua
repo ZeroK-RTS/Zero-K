@@ -1221,6 +1221,7 @@ function ReturnFlag(flagID, unitID, allyTeam)
   DefeatTimer[allyTeam] = TIMER_DEFEAT
   spSetGameRulesParam("ctf_defeat_time_team"..allyTeam, DefeatTimer[allyTeam])
   if (unitID) then
+    FlagCarrier[unitID] = false -- otherwise flags multiply lmao
     spSetUnitAlwaysVisible(unitID, false)
     spSetGameRulesParam("ctf_unit_stole_team"..FlagCarrier[unitID], 0)
   end
