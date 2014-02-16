@@ -119,12 +119,15 @@ local gAlpha = 0.8
 --// app var
 
 local offscreentex
+local outlinemasktex
 local depthtex
 local blurtex
 local fbo
 
 local blurShader_h
 local blurShader_v
+local maskGenShader
+local maskApplyShader
 local uniformScreenX, uniformScreenY
 
 local vsx, vsy = 0,0
@@ -181,6 +184,7 @@ local GL_BACK  = GL.BACK
 local GL_MODELVIEW  = GL.MODELVIEW
 local GL_PROJECTION = GL.PROJECTION
 local GL_COLOR_BUFFER_BIT = GL.COLOR_BUFFER_BIT
+local GL_DEPTH_BUFFER_BIT = GL.DEPTH_BUFFER_BIT
 
 local glUnit            = gl.Unit
 local glFeature         = gl.Feature
@@ -287,18 +291,24 @@ local function DrawHaloFunc()
   
 end
 
-
 local DrawVisibleUnits
 
 DrawVisibleUnits = DrawHaloFunc
 
 local MyDrawVisibleUnits = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
+  -- glClear(GL_DEPTH_BUFFER_BIT)
   --glCulling(GL_FRONT)
   DrawVisibleUnits()
   --glCulling(GL_BACK)
   --glCulling(false)
   glColor(1,1,1,1)
+end
+local maskGen = function()
+  glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
+  glUseShader(maskGenShader)
+  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
+  --glTexRect(-1-1/vsx,1+1/vsy,1+1/vsx,-1-1/vsy)
 end
 local blur_h = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
@@ -317,7 +327,7 @@ function widget:DrawWorldPreUnit()
   if Spring.IsGUIHidden() then
 	return
   end
-  glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
+  -- glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
 
   glBlending(true)
   
@@ -330,21 +340,33 @@ function widget:DrawWorldPreUnit()
     glUniformInt(uniformScreenY,  math.ceil(vsy*0.5) )
   end
 
-  glDepthTest(true)
+  glDepthTest(GL.GEQUAL)
   glActiveFBO(fbo,MyDrawVisibleUnits)
   glDepthTest(false)
 
   glTexture(offscreentex)
+  glRenderToTexture(outlinemasktex, maskGen)
   glRenderToTexture(blurtex, blur_h)
   glTexture(blurtex)
   glRenderToTexture(offscreentex, blur_v)
+  
+  glBlending(false)
+end
+
+function widget:DrawWorld()
+  if Spring.IsGUIHidden() then
+  return
+  end
+  glBlending(true)
+
   glColor(1,1,1,gAlpha)
 
   glCallList(enter2d)
-  glTexture(offscreentex)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy) --this line breaks mearth labels
+  glTexture(0, offscreentex)
+  glTexture(1, outlinemasktex)
+  glUseShader(maskApplyShader)
+  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy) --this line breaks mearth labels
   glCallList(leave2d)
-  
   glBlending(false)
 end
 
@@ -374,6 +396,26 @@ function widget:Initialize()
   end
 
   vsx, vsy = widgetHandler:GetViewSizes()
+
+  maskGenShader = gl.CreateShader({
+    fragment = [[
+      uniform sampler2D tex0;
+
+      void main(void) {
+        vec4 color = texture2D(tex0, gl_TexCoord[0].st);
+        gl_FragColor = vec4(1.0 - ((color.r + color.g + color.b) * 255.0));
+      }
+    ]],
+    uniformInt = {
+      tex0 = 0,
+    },
+  })
+
+  if (maskGenShader == nil) then
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: mask generation shader error: "..gl.GetShaderLog())
+    widgetHandler:RemoveWidget()
+    return false
+  end
 
   blurShader_h = gl.CreateShader({
     fragment = [[
@@ -412,7 +454,7 @@ function widget:Initialize()
 
 
   if (blurShader_h == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo widget: hblur shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: hblur shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
@@ -453,7 +495,28 @@ function widget:Initialize()
   })
 
   if (blurShader_v == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo widget: vblur shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: vblur shader error: "..gl.GetShaderLog())
+    widgetHandler:RemoveWidget()
+    return false
+  end
+
+  maskApplyShader = gl.CreateShader({
+    fragment = [[
+      uniform sampler2D tex0;
+      uniform sampler2D tex1;
+
+      void main(void) {
+        gl_FragColor = texture2D(tex0, gl_TexCoord[0].st) * texture2D(tex1, gl_TexCoord[0].st);
+      }
+    ]],
+    uniformInt = {
+      tex0 = 0,
+      tex1 = 1,
+    },
+  })
+
+  if (maskApplyShader == nil) then
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: mask application shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
@@ -490,6 +553,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   gl.DeleteTexture(depthtex or 0)
   gl.DeleteTextureFBO(offscreentex or 0)
   gl.DeleteTextureFBO(blurtex or 0)
+  gl.DeleteTextureFBO(outlinemasktex or 0)
 
   depthtex = gl.CreateTexture(vsx,vsy, {
     border = false,
@@ -499,6 +563,15 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   })
 
   offscreentex = gl.CreateTexture(vsx,vsy, {
+    border = false,
+    min_filter = GL.LINEAR,
+    mag_filter = GL.LINEAR,
+    wrap_s = GL.CLAMP,
+    wrap_t = GL.CLAMP,
+    fbo = true,
+  })
+
+  outlinemasktex = gl.CreateTexture(vsx,vsy, {
     border = false,
     min_filter = GL.LINEAR,
     mag_filter = GL.LINEAR,
@@ -529,6 +602,7 @@ function widget:Shutdown()
   if (gl.DeleteTextureFBO) then
     gl.DeleteTextureFBO(offscreentex)
     gl.DeleteTextureFBO(blurtex)
+    gl.DeleteTextureFBO(outlinemasktex)
   end
 
   if (gl.DeleteFBO) then
