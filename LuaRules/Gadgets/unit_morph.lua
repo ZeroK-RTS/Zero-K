@@ -599,7 +599,20 @@ local function FinishMorph(unitID, morphData)
   GG.wasMorphedTo[unitID] = newUnit
   Spring.SetUnitRulesParam(unitID, "wasMorphedTo", newUnit)
   
-  Spring.SetUnitBlocking(newUnit, true)  
+  Spring.SetUnitBlocking(newUnit, true)
+  
+  -- copy disarmed
+  local paradisdmg, pdtime = GG.getUnitParalysisExternal(unitID)
+  if (paradisdmg ~= nil) then
+    GG.setUnitParalysisExternal(newUnit, paradisdmg, pdtime)
+  end
+  
+  -- copy dominatrix stuff
+  local originTeam, originAllyTeam, controllerID, controllerAllyTeam = GG.getMastermind(unitID)
+  if (originTeam ~= nil) then
+    GG.setMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
+  end
+  
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
   
   --//transfer lineage
@@ -629,7 +642,8 @@ local function FinishMorph(unitID, morphData)
 	  GG.addSlowDamage(newUnit, slowDamage)
 	end
   end
-  Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})  
+  Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
+  
   --//transfer experience
   local nextMorph = morphDefs[morphData.def.into]
   if nextMorph~= nil and nextMorph.into ~= nil then nextMorph = {morphDefs[morphData.def.into]} end

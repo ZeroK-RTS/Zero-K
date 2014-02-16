@@ -1434,7 +1434,8 @@ function GetAnyAlly(allyTeam, x, y, z, cap_radius)
       local _, y2, _ = spGetUnitPosition(unitID)
       local udefId = spGetUnitDefID(unitID)
       local udef = UnitDefs[udefId]
-      if (udef.canMove) and (not(udef.canFly)) and (BlackListed[unitID]==nil) and (not(spGetUnitIsCloaked(unitID))) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
+      local build = select(5,spGetUnitHealth(unitID))
+      if (udef.canMove) and (not(udef.canFly)) and (BlackListed[unitID]==nil) and (not(spGetUnitIsCloaked(unitID))) and (build==1) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
 	return unitID
       end
     end
@@ -1450,7 +1451,8 @@ function GetAnyFlagThief(allyTeam, x, y, z, cap_radius)
       local _, y2, _ = spGetUnitPosition(unitID)
       local udefId = spGetUnitDefID(unitID)
       local udef = UnitDefs[udefId]
-      if (udef.canMove) and (not(udef.canFly)) and (BlackListed[unitID]==nil) and (not(spGetUnitIsCloaked(unitID))) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
+      local build = select(5,spGetUnitHealth(unitID))
+      if (udef.canMove) and (not(udef.canFly)) and (BlackListed[unitID]==nil) and (not(spGetUnitIsCloaked(unitID))) and (build==1) and zDifference(y,y2) then -- I so imagine rage when smbdy steals with rectors or such
 	return unitID
       end
     end
