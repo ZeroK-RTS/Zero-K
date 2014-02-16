@@ -846,17 +846,17 @@ function InsideMap(x,z)
   end
 end
 
-function NoEnemyCarriersNear(allyTeam, x, z)
-  for unitID, enemyTeam in pairs(FlagCarrier) do
-    if (enemyTeam ~= allyTeam) then
-      local cx,_,cz = spGetUnitPosition(unitID)
-      if (disSQ(x,z,cx,cz) <= DENY_DROP_RADIUS) then
-	return false
-      end
-    end
-  end
-  return true
-end
+-- function NoEnemyCarriersNear(allyTeam, x, z)
+--   for unitID, enemyTeam in pairs(FlagCarrier) do
+--     if (enemyTeam ~= allyTeam) then
+--       local cx,_,cz = spGetUnitPosition(unitID)
+--       if (disSQ(x,z,cx,cz) <= DENY_DROP_RADIUS) then
+-- 	return false
+--       end
+--     end
+--   end
+--   return true
+-- end
 
 -- modified start_unit_setup code FIXME this needs to be tested with commends lol
 function CommDrop(playerID,isAI,teamID,allyTeam,x,y,z)
@@ -869,7 +869,7 @@ function CommDrop(playerID,isAI,teamID,allyTeam,x,y,z)
       startUnit = "armcom1"
     end
   end
-  if startUnit and spIsPosInLos(x,y,z,allyTeam) and InsideMap(x,z) and NoEnemyCarriersNear(allyTeam,x,z) then -- if not in LoS... well, try again!
+  if startUnit and spIsPosInLos(x,y,z,allyTeam) and InsideMap(x,z) then -- if not in LoS... well, try again!
     -- check whether there is better com
     local max_morph = FLAG_AMOUNT_INIT - FlagAmount[allyTeam]
     if (max_morph > 5) then max_morph = 5 end
