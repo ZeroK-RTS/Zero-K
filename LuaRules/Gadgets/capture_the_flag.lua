@@ -35,7 +35,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
 
   immediate TODO:
 - Rewrite widget (it only shows 2 teams, yet gadget supports more allyteams!).
-- Make a wiki page.
+- Sfx could be improved. They don't play always. Needs to be rewritten so gadget tells widget when to play.
   
   things to test/tweak:
 - Backup commander logic needed to be tested more, and the extra income should be balanced on the results of testing. (this needs actual playing)
@@ -208,6 +208,7 @@ local COM_DROP_DELAY = 3 -- in seconds
 local COM_DROP_TIMER = tonumber(modOptions.ctf_resp_time or 150) -- 1 free ticket per 2 and half minutes by default
 local LONELY_FLAG_TIMER = 120 -- if flag is untouched for 120 seconds teleport it back, may be super useful if for some reason flag disappeared (bug)?
 local CTF_ONE_SECOND_FRAME = 30 -- frames per second
+local CTF_1_MINUTE = CTF_ONE_SECOND_FRAME*60
 local MERGE_DIST = 450 -- spawn positions below 450 dist? merge them!
 local MERGE_DIST_SQ = MERGE_DIST*MERGE_DIST
 local CC_TOO_NEAR = 450
@@ -840,7 +841,7 @@ function gadget:RecvLuaMsg(line, playerID)
   if (not spectator) then
     if line:find("ctf_respawn") then
       local params = ParseCoords(line)
-      CommDrop(playerID,teamID,allyTeam,params[1],params[2],params[3])
+      CommDrop(playerID,false,teamID,allyTeam,params[1],params[2],params[3])
     end
   end
 end
@@ -866,13 +867,15 @@ function NoEnemyCarriersNear(allyTeam, x, z)
 end
 
 -- modified start_unit_setup code FIXME this needs to be tested with commends lol
-function CommDrop(playerID,teamID,allyTeam,x,y,z)
+function CommDrop(playerID,isAI,teamID,allyTeam,x,y,z)
   -- get start unit
   local startUnit = GG.startUnits[teamID] and GG.startUnits[teamID] or "armcom1"
   
-  local customKeys = select(10, spGetPlayerInfo(playerID))
-  if customKeys and customKeys.jokecomm then
-    startUnit = DEFAULT_UNIT
+  if not(isAI) then
+    local customKeys = select(10, spGetPlayerInfo(playerID))
+    if customKeys and customKeys.jokecomm then
+      startUnit = "armcom1"
+    end
   end
   if startUnit and spIsPosInLos(x,y,z,allyTeam) and InsideMap(x,z) and NoEnemyCarriersNear(allyTeam,x,z) then -- if not in LoS... well, try again!
     -- check whether there is better com
@@ -985,6 +988,7 @@ function PlayerDied(playerID, teamID)--, allyTeam)
       if player.tickets < player.pool then
 	CommanderTickets[player.team] = CommanderTickets[player.team] + 1
 	spSetGameRulesParam("ctf_orbit_tickets"..player.team, CommanderTickets[player.team])
+	IfItsAICallInNOW(player.team)
 	tickets_to_give = tickets_to_give - 1
 	try_again = true
       end
@@ -993,7 +997,6 @@ function PlayerDied(playerID, teamID)--, allyTeam)
 end
 
 function LetThemCallBackup(allyTeam)
-  teams = spGetTeamList(allyTeam)
   for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
     if (CommanderSpeedUpTimer[teamID]) and (CommanderTimer[teamID] > 3) then -- if you suicided com you get no extra :)
       CommanderTimer[teamID] = 3 -- or maybe 1.. or 0?
@@ -1011,6 +1014,7 @@ function OrbitTimer()
 	CommanderTimer[teamID] = COM_DROP_TIMER
 	CommanderTickets[teamID] = CommanderTickets[teamID] + 1
 	spSetGameRulesParam("ctf_orbit_tickets"..teamID, CommanderTickets[teamID])
+	IfItsAICallInNOW(teamID)
       end
       spSetGameRulesParam("ctf_orbit_timer"..teamID, CommanderTimer[teamID])
     end
@@ -1036,6 +1040,56 @@ end
 
 function disSQ(x1,y1,x2,y2)
   return (x1 - x2)^2 + (y1 - y2)^2
+end
+
+function AIcomDrop()
+  for allyTeam,flags in pairs(FlagAmount) do
+    for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
+      IfItsAICallInNOW(teamID)
+    end
+  end
+end
+
+function IfItsAICallInNOW(teamID) -- this one isn't rocket science
+  -- test how many tickets CAI has, found any 1: factory 2: ally coms.
+  -- spawn near them:
+  local _,_,_,isAI,_,allyTeam = spGetTeamInfo(teamID)
+  if not(isAI) then
+    return -- players decide for themselves
+  end
+  if (CommanderTickets[teamID] < 1) then return end -- no tickets, don't bother
+  local try = 0
+  local goodspawnpos = {}
+  for teamIDs,_ in pairs(TeamsInAlliance[allyTeam]) do
+    local units = spGetTeamUnits(teamIDs)
+    for i = 1, #units do
+      local unitDefID = spGetUnitDefID(units[i])
+      if spValidUnitID(units[i]) and (UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].isFactory) then
+	goodspawnpos[#goodspawnpos+1] = units[i]
+      end
+    end
+  end
+  if (#goodspawnpos < 1) then return end -- don't respawn, TODO detect if CC is in LOS, and decide to spawn near CC then
+  while (try < CommanderTickets[teamID]) do
+    -- now, pick random goodspawnpos and get unit position, then pick a way so it's closer to the center of map and Z difference isn't too big, respawn
+    local unitID = goodspawnpos[random(1,#goodspawnpos)]
+    local x,y,z = spGetUnitPosition(unitID)
+    if (x==nil) then return end -- damn it
+    local tx,ty,tz
+    if (x > mapWidth) then tx=x-120
+    else tx=x+120 end
+    if (z > mapHeight) then tz=z-120
+    else tz=z+120 end
+    if not(InsideMap(tx,tz)) then return end -- damn it
+    ty = spGetGroundHeight(tx,tz)
+    if (abs(ty-y) > MAX_Z_DIFFERENCE) then return end -- oh wow, don't spawn in space
+    -- tx,ty,tz are good, it's okay to spawn if it's in los, this is a last check
+    if (spIsPosInLos(tx,ty,tz,allyTeam) == false) then return end
+    -- yay
+    -- TODO check whether position is inside building
+    CommDrop(nil,true,teamID,allyTeam,tx,ty,tz)
+    try=try+1
+  end
 end
 
 function RunToBase(unitID, teamID, allyTeam)
@@ -1557,6 +1611,9 @@ function gadget:GameFrame (f)
     OrbitTimer()
     DeliverDrops(f)
     BlackListTimer(f)
+  end
+  if ((f%CTF_1_MINUTE)==0) then
+    AIcomDrop()
   end
 end
   
