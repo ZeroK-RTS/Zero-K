@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[corrazor]],
-  name                          = [[Razor's Kiss]],
+  name                          = [[Razor]],
   description                   = [[Hardened Anti-Air Laser]],
   buildAngle                    = 8192,
   buildCostEnergy               = 280,
@@ -22,9 +22,9 @@ unitDef = {
     description_fr = [[Laser Anti-Air]],
 	description_de = [[Gehärtetes Flugabwehrlaser]],
 	description_pl = [[Laser przeciwlotniczy]],
-    helptext       = [[The Razor's Kiss is a hardy anti-air turret. Its high hit points and 4x armour bonus when closed makes it very hard for the enemy to dislodge.]],
-    helptext_fr    = [[le Razor est une tourelle Anti-Air de portée moyenne. Enterrée et protégée par un blindage, elle sort et tir avec son laser r haute cadence. Assez imprécise r distance, elle compense par sa solidité.]],
-	helptext_de    = [[Der Razor's Kiss ist ein abgehärteter Flugabwehrturm, dessen hohe Trefferpunkte und Panzerungsbonus es für Gegner, sobald geschlossen, enorm schwer macht, ihn zu zerstören.]],
+    helptext       = [[The Razor is a hardy anti-air turret. Its high hit points and 4x armour bonus when closed makes it very hard for the enemy to dislodge.]],
+    helptext_fr    = [[Le Razor est une tourelle Anti-Air de portée moyenne. Enterrée et protégée par un blindage, elle sort et tir avec son laser r haute cadence. Assez imprécise r distance, elle compense par sa solidité.]],
+	helptext_de    = [[Der Razor ist ein abgehärteter Flugabwehrturm, dessen hohe Trefferpunkte und Panzerungsbonus es für Gegner, sobald geschlossen, enorm schwer macht, ihn zu zerstören.]],
 	helptext_pl    = [[Razor to ufortyfikowany laser przeciwlotniczy, ktory otrzymuje tylko cwierc obrazen, gdy nie prowadzi ostrzalu.]],
   },
 
@@ -126,7 +126,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Razor's Kiss]],
+      description      = [[Wreckage - Razor]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 3000,
@@ -146,7 +146,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Razor's Kiss]],
+      description      = [[Debris - Razor]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 3000,
@@ -166,7 +166,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Razor's Kiss]],
+      description      = [[Debris - Razor]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 3000,
