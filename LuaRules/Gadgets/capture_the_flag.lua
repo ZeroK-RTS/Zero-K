@@ -689,6 +689,7 @@ function ProceedSmoothly(allyTeams,CentreSpawns,PlayersPerTeam,player_num)
       local teamID = teams[i]
       CommanderPool[teamID]=0
       CommanderTickets[teamID]=0
+      CommanderSpeedUpTimer[teamID]=0
       CommanderTimer[teamID]=COM_DROP_TIMER
       spSetGameRulesParam("ctf_orbit_pool"..teamID, 0)
       spSetGameRulesParam("ctf_orbit_tickets"..teamID, 0)
@@ -995,8 +996,13 @@ end
 
 function LetThemCallBackup(allyTeam)
   for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
-    if (CommanderSpeedUpTimer[teamID]) and (CommanderTimer[teamID] > 3) then -- if you suicided com you get no extra :)
+    if (CommanderSpeedUpTimer[teamID] > 0) and (CommanderTimer[teamID] > 3) then -- if you suicided com you get no extra :)
+      while (CommanderSpeedUpTimer[teamID] > 1) do
+	CommanderTickets[teamID] CommanderTickets[teamID] + 1 -- extra free coms
+	CommanderSpeedUpTimer[teamID] = CommanderSpeedUpTimer[teamID]-1
+      end
       CommanderTimer[teamID] = 3 -- or maybe 1.. or 0?
+      CommanderSpeedUpTimer[teamID] = 0
     end
   end
 end
@@ -1334,7 +1340,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
     -- commander died in battle, if enemy scores flag, this will speedup timer for com dropping for entire team
     if (spValidUnitID(attackerID) and UnitDefs[unitDefID].customParams.commtype and not(spAreTeamsAllied(teamID,attackerTeamID)) and (spGetUnitRulesParam(unitID, "wasMorphedTo") == nil)) and -- this commander was in battle, allow him to respawn!
 	(FlagAmount[select(6,spGetTeamInfo(teamID))] < FLAG_AMOUNT_INIT) then
-      CommanderSpeedUpTimer[teamID] = true
+      CommanderSpeedUpTimer[teamID] = CommanderSpeedUpTimer[teamID]+1
     end
   end
 end
