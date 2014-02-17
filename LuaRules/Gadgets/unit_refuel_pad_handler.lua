@@ -138,6 +138,7 @@ local function SitOnPad(unitID)
 					spSetUnitLeaveTracks(unitID, true)
 					spSetUnitVelocity(unitID, 0, 0, 0)
 					mcDisable(unitID)
+					GG.UpdateUnitAttributes(unitID)
 				end
 				unitMovectrled[unitID] = nil
 				landingUnit[unitID] = nil
@@ -180,6 +181,7 @@ local function SitOnPad(unitID)
 		spSetUnitLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
 		mcDisable(unitID)
+		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available 
 		unitMovectrled[unitID] = nil
 		landingUnit[unitID] = nil
 		
@@ -378,6 +380,7 @@ local function CircleToLand(unitID, goal)
 				if not spGetUnitIsDead(unitID) then
 					spSetUnitLeaveTracks(unitID, true)
 					mcDisable(unitID)
+					GG.UpdateUnitAttributes(unitID)
 				end
 				unitMovectrled[unitID] = nil
 				landingUnit[unitID] = nil
