@@ -947,7 +947,7 @@ function PlayerDied(playerID, teamID)--, allyTeam)
       end
       candidatesForTake[#candidatesForTake+1] = {team = cteamID, rank = elo, pool = CommanderPool[cteamID], tickets = CommanderTickets[cteamID], allyTeam = oldAllyTeam}
       if (elo > highestRank) then
-	highestRank = rank
+	highestRank = elo
       end
       if (CommanderPool[cteamID] > highestPool) then
 	highestPool = CommanderPool[cteamID]
