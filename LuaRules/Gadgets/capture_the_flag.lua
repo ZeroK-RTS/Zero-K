@@ -998,7 +998,7 @@ function LetThemCallBackup(allyTeam)
   for teamID,_ in pairs(TeamsInAlliance[allyTeam]) do
     if (CommanderSpeedUpTimer[teamID] > 0) and (CommanderTimer[teamID] > 3) then -- if you suicided com you get no extra :)
       while (CommanderSpeedUpTimer[teamID] > 1) do
-	CommanderTickets[teamID] CommanderTickets[teamID] + 1 -- extra free coms
+	CommanderTickets[teamID] = CommanderTickets[teamID] + 1 -- extra free coms
 	CommanderSpeedUpTimer[teamID] = CommanderSpeedUpTimer[teamID]-1
       end
       CommanderTimer[teamID] = 3 -- or maybe 1.. or 0?
