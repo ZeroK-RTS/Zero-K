@@ -454,7 +454,7 @@ end
 -- Set turnInPlace speed limits, reverse velocities (but not for ships)
 --
 for name, ud in pairs(UnitDefs) do
-	if ud.turnrate and ud.turnrate > 600 then
+	if ud.turnrate and (ud.turnrate > 600 or (ud.category:find("SHIP",1,true)) or (ud.category:find("SUB",1,true))) then
 		ud.turninplace = false
 		ud.turninplacespeedlimit = (ud.maxvelocity or 0)
 	else
@@ -553,6 +553,9 @@ end
 -- 
 for name, ud in pairs(UnitDefs) do
 	ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
+	if ud.customparams.massmult then
+		ud.mass = ud.mass*ud.customparams.massmult
+	end
 end
 
 --------------------------------------------------------------------------------

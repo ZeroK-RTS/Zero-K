@@ -35,7 +35,7 @@ local buildOpts = {
 	[[armpb]],
 	[[armanni]],
 	[[cordoom]],
-	[[cortl]],
+	[[turrettorp]],
 	[[corrazor]],
 	[[missiletower]],
 	[[armcir]],

@@ -59,7 +59,7 @@ local buildoptions = {
 	{-- point_defense
 		{ "corllt",  notSea=true },
 		{ "armartic",  notSea=true },-- Faraday
-		{ "cortl",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
+		{ "turrettorp",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
 		{ "armdeva" },-- Stardust
 		{ "corgrav",  notSea=true },-- newton
 		{ "armpb",  notSea=true },-- Popup gauss

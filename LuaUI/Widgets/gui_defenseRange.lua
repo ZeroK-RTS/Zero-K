@@ -68,6 +68,7 @@ modConfig["ZK"]["unitList"] =
 	missiletower = { weapons = { 2 } },	--hacksaw
 	corbhmth = { weapons = { 1 } },		--behemoth
 	cortl = { weapons = { 1 } },		--torpedo launcher
+	turrettorp = { weapons = { 1 } },		--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
 	corgrav = { weapons = { 1 } },		--newton
 	

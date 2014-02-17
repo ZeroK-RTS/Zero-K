@@ -10,14 +10,14 @@ unitDef = {
 
   buildoptions           = {
     [[shipcon]],
-    [[armpt]],
-    [[coresupp]],
-    [[dclship]],
-    [[corsub]],
-    [[armroy]],
-    [[corroy]],
-    [[serpent]],
-    [[corarch]],
+    [[shipscout]],
+    [[shipraider]],
+    [[shiptorp]],
+    [[subraider]],
+    [[shiparty]],
+    [[shipskirm]],
+    [[subarty]],
+    [[shipaa]],
     [[armtboat]],
   },
 

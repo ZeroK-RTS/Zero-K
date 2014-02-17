@@ -13,7 +13,7 @@ end
 
 local disabledunitsstring = Spring.GetModOptions().disabledunits or ""
 local disabledunits = { }
-local defenceunits = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corrazor", "missiletower", "corflak", "armcir", "screamer", "corgrav", "cortl", "cordoom", "armanni", "corjamt" }
+local defenceunits = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corrazor", "missiletower", "corflak", "armcir", "screamer", "corgrav", "turrettorp", "cordoom", "armanni", "corjamt" }
 
 --Different lock modoptions are compatible
 if tobool(Spring.GetModOptions().noair) then

@@ -15,7 +15,7 @@ local longRangeSwarmieeArray = {
 	["firewalker"] = true,
 	["armsptk"] = true,
 	["corstorm"] = true,
-	["armroy"] = true,
+	["shiparty"] = true,
 	["armham"] = true,
 }
 
@@ -31,6 +31,7 @@ local lowRangeSwarmieeArray = {
 	["corraid"] = true,
 	["armzeus"] = true,
 	["logkoda"] = true,
+	["hoverassault"] = true,
 	
 	["correap"] = true,
 	["corgol"] = true,
@@ -77,7 +78,8 @@ local riotRangeSkirmieeArray = {
 	["corak"] = true,
 	["panther"] = true,
 	["corsh"] = true,
-	["coresupp"] = true,
+	["shipscout"] = true,
+	["shipraider"] = true,
 	["amphriot"] = true,
 	["armcomdgun"] = true,
 	["dante"] = true,
@@ -134,6 +136,7 @@ local longRangeSkirmieeArray = {
 }
 
 local artyRangeSkirmieeArray = {
+	["shipskirm"] = true,
 	["armsptk"] = true,
 	["corstorm"] = true,
 	["amphassault"] = true,
@@ -398,7 +401,7 @@ local behaviourConfig = {
 		skirmOrderDis = 150,
 	},
 
-	["armpt"] = { -- scout boat
+	["shipscout"] = { -- scout boat
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -514,7 +517,7 @@ local behaviourConfig = {
 		flees = {},
 		skirmLeeway = 40, 
 	},	
-	["coresupp"] = {
+	["shipraider"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -550,7 +553,7 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
 	},
-	["dclship"] = {
+	["shiptorp"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -637,6 +640,15 @@ local behaviourConfig = {
 		skirmLeeway = 10, 
 	},
 	["armham"] = {
+		skirms = artyRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
+	},
+	["shiparty"] = {
 		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
@@ -762,6 +774,16 @@ local behaviourConfig = {
 		skirmOrderDis = 200, 
 	},
 	["amphaa"] = {
+		skirms = skirmableAir, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+        skirmLeeway = 50,
+		skirmOrderDis = 200, 
+	},
+	["shipaa"] = {
 		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,

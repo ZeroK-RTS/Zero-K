@@ -191,9 +191,29 @@ function script.StopMoving()
 	StartThread(Stopping)
 end
 
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
+local function WeaponRangeUpdate()
+	while true do
+		local height = select(2, Spring.GetUnitPosition(unitID))
+		if height < -20 then
+			Spring.SetUnitWeaponState(unitID, 1, {range = 400-height})
+		else
+			Spring.SetUnitWeaponState(unitID, 1, {range = 450})
+		end
+		Sleep(500)
+	end
+end
+
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)	
+	StartThread(WeaponRangeUpdate)
 end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
 
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)

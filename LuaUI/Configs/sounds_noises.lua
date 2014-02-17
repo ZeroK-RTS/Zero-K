@@ -32,6 +32,14 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
+	turrettorp = {
+		ok = {
+			[1] = "turret_move",
+		},
+		select = {
+			[1] = "light_turret_select",
+		},
+	},
 	cormine1 = {
 		ok = {
 			[1] = "light_bot_move",
@@ -940,7 +948,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	armpt = {
+	shipscout = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -950,7 +958,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	coresupp = {
+	shipraider = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -960,7 +968,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	dclship = {
+	shiptorp = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -970,7 +978,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	corsub = {
+	subraider = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -980,7 +988,7 @@ local sounds = {
 			volume = 1.1,
 		},
 	},
-	armroy = {
+	shiparty = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -990,7 +998,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	corroy = {
+	shipskirm = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1000,7 +1008,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	serpent = {
+	subarty = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1040,7 +1048,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	corarch = {
+	shipaa = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,

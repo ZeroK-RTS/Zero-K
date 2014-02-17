@@ -155,7 +155,7 @@ local menu_armcom = {
       },
       {
         angle = 180,
-        unit = "cortl"
+        unit = "turrettorp"
       }
     }
   },
