@@ -740,10 +740,10 @@ function widget:MousePress(mx, my, mb)
     elseif (mb == 1) then
       _, cursorWorldCoors = Spring.TraceScreenRay(mx, my, true)
       local x, y, z = cursorWorldCoors[1], cursorWorldCoors[2], cursorWorldCoors[3]
-      local _, inLos = Spring.GetPositionLosState(x,y,z, myAllyTeam)
-      if (inLos) then
-	Spring.MarkerAddPoint(x,y,z, "Calling in backup commander here!")
-      end
+--       local _, inLos = Spring.GetPositionLosState(x,y,z, myAllyTeam)
+--       if (inLos) then
+-- 	Spring.MarkerAddPoint(x,y,z, "Calling in backup commander here!")
+--       end
       Spring.SendLuaRulesMsg("ctf_respawn "..x.." "..y.." "..z)
       spawn_mode = false
     end
