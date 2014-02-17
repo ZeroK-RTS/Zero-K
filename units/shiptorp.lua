@@ -51,9 +51,9 @@ unitDef = {
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[ARM]],
-  sightDistance       = 396,
+  sightDistance       = 374,
   smoothAnim          = true,
-  sonarDistance       = 396,
+  sonarDistance       = 374,
   turninplace         = 0,
   turnRate            = 380,
   waterline           = 4,
@@ -62,7 +62,7 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[DEPTHCHARGE]],
+      def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP]],
     },
@@ -72,8 +72,8 @@ unitDef = {
 
   weaponDefs          = {
 
-    DEPTHCHARGE = {
-      name                    = [[Depth Charge]],
+    TORPEDO = {
+      name                    = [[Torpedo]],
       areaOfEffect            = 96,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
@@ -94,8 +94,8 @@ unitDef = {
       groundbounce            = 1,
       guidance                = true,
       impactOnly              = true,
-      impulseBoost            = 0.5,
-      impulseFactor           = 1.2,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
       interceptedByShieldType = 1,
 	  flightTime              = 6,
       model                   = [[wep_t_longbolt.s3o]],
@@ -103,7 +103,7 @@ unitDef = {
       numbounce               = 4,
       noSelfDamage            = true,
       propeller               = [[1]],
-      range                   = 360,
+      range                   = 340,
       reloadtime              = 5,
       renderType              = 1,
       selfprop                = true,
