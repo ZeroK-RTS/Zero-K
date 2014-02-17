@@ -4,8 +4,8 @@ unitDef = {
   description            = [[Construction Ship, Builds at 10 m/s]],
   acceleration           = 0.051375,
   brakeRate              = 0.061,
-  buildCostEnergy        = 250,
-  buildCostMetal         = 250,
+  buildCostEnergy        = 200,
+  buildCostMetal         = 200,
   buildDistance          = 300,
   builder                = true,
 
@@ -13,7 +13,7 @@ unitDef = {
   },
 
   buildPic               = [[SHIPCON.png]],
-  buildTime              = 250,
+  buildTime              = 200,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -47,7 +47,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 184,
-  maxDamage              = 1850,
+  maxDamage              = 1500,
   maxVelocity            = 2.5,
   metalMake              = 0.3,
   minCloakDistance       = 75,
@@ -66,7 +66,7 @@ unitDef = {
   terraformSpeed         = 600,
   turninplace            = 0,
   turnRate               = 508,
-  workerTime             = 10,
+  workerTime             = 7.5,
 
   featureDefs            = {
 
@@ -94,7 +94,7 @@ unitDef = {
       description      = [[Debris - Mariner]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 1850,
+      damage           = 1500,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -114,7 +114,7 @@ unitDef = {
       description      = [[Debris - Mariner]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 1850,
+      damage           = 1500,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
