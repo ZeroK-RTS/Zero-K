@@ -6,9 +6,8 @@ function widget:GetInfo()
     author    = "xponen",
     date      = "July 19 2013",
     license   = "GNU GPL, v2 or later",
-	layer		= 0, --only layer > -4 works because it seems to be blocked by something.
+	layer	  = 0, --only layer > -4 works because it seems to be blocked by something.
 	enabled   = true,  --  loaded by default?
-	alwaysStart    = true,
     handler   = true,
   }
 end
@@ -40,23 +39,23 @@ options = {
 }
 
 --------------------------------------------------------------------------------------
---Action registration. Copied fully from gui_epicmenu.lua (widget by CarRepairer)
-function PylonOut(pylonString)
-	local chunk, err = loadstring("return"..pylonString) --This code is from cawidgets.lua
-	pylon = chunk and chunk() or {}
-end
---------------------------------------------------------------------------------------
 --Grid drawing. Copied and trimmed from unit_mex_overdrive.lua gadget (by licho & googlefrog)
 VFS.Include("LuaRules/Configs/constants.lua", nil, VFS.ZIP_FIRST)
 VFS.Include("LuaRules/Configs/mex_overdrive.lua", nil, VFS.ZIP_FIRST)
 VFS.Include("LuaRules/Utilities/glVolumes.lua") --have to import this incase it fail to load before this widget
 
-local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetUnitDefID     = Spring.GetUnitDefID
-local spGetUnitPosition  = Spring.GetUnitPosition
-local spGetActiveCommand = Spring.GetActiveCommand
-local spTraceScreenRay   = Spring.TraceScreenRay
-local spGetMouseState    = Spring.GetMouseState
+local spGetSelectedUnits   = Spring.GetSelectedUnits
+local spGetUnitDefID       = Spring.GetUnitDefID
+local spGetUnitPosition    = Spring.GetUnitPosition
+local spGetActiveCommand   = Spring.GetActiveCommand
+local spTraceScreenRay     = Spring.TraceScreenRay
+local spGetMouseState      = Spring.GetMouseState
+local spAreTeamsAllied     = Spring.AreTeamsAllied
+local spGetMyTeamID        = Spring.GetMyTeamID
+local spGetUnitPosition    = Spring.GetUnitPosition
+local spValidUnitID        = Spring.ValidUnitID
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spGetSpectatingState = Spring.GetSpectatingState
 
 local glVertex        = gl.Vertex
 local glCallList      = gl.CallList
@@ -66,27 +65,159 @@ local glCreateList    = gl.CreateList
 
 local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
 
+local pylons = {count = 0, data = {}}
+local pylonByID = {}
+
 local pylonDefs = {}
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
 	if (tonumber(udef.customParams.pylonrange) or 0 > 0) then
 		pylonDefs[i] = {
-			range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,
-			extractor = (udef.customParams.ismex and true or false),
-			neededLink = tonumber(udef.customParams.neededlink) or false,
-			keeptooltip = udef.customParams.keeptooltip or false,
+			range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE
 		}
 	end
-		
 end
 
 local floor = math.floor
-
 local circlePolys = 0 -- list for circles
 
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- local functions
+
+local disabledColor = { 0.6,0.7,0.5,0.2}
+
+local function HSLtoRGB(ch,cs,cl)
+ 
+if cs == 0 then
+  cr = cl
+  cg = cl
+  cb = cl
+else
+  if cl < 0.5 then temp2 = cl * (cl + cs)
+  else temp2 = (cl + cs) - (cl * cs)
+  end
+ 
+  temp1 = 2 * cl - temp2
+  tempr = ch + 1 / 3
+ 
+  if tempr > 1 then tempr = tempr - 1 end
+  tempg = ch
+  tempb = ch - 1 / 3
+  if tempb < 0 then tempb = tempb + 1 end
+ 
+  if tempr < 1 / 6 then cr = temp1 + (temp2 - temp1) * 6 * tempr
+  elseif tempr < 0.5 then cr = temp2
+  elseif tempr < 2 / 3 then cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
+  else cr = temp1
+  end
+ 
+  if tempg < 1 / 6 then cg = temp1 + (temp2 - temp1) * 6 * tempg
+  elseif tempg < 0.5 then cg = temp2
+  elseif tempg < 2 / 3 then cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
+  else cg = temp1
+  end
+ 
+  if tempb < 1 / 6 then cb = temp1 + (temp2 - temp1) * 6 * tempb
+  elseif tempb < 0.5 then cb = temp2
+  elseif tempb < 2 / 3 then cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
+  else cb = temp1
+  end
+ 
+end
+return {cr,cg,cb, 0.2}
+end --HSLtoRGB
+
+
+local function GetGridColor(efficiency) 
+ 	local n = efficiency      
+	-- mex has no esource/esource has no mex
+	if n==0 then
+		return {1, .25, 1, 0.2}
+	else
+		if n < 3.5 then 
+			h = 5760/(3.5+2)^2 
+		else
+			h=5760/(n+2)^2
+		end
+		return HSLtoRGB(h/255,1,0.5)
+	end
+        
+--[[
+--	average/good - will be green
+	local good = 3
+	--max/inefficient - will be red
+	local bad = 15
+		 -- mex has no esource/esource has no mex
+	if n == 0 then
+		return {1, 0.25, 1, 0.25}
+	else
+                -- red, green, blue
+                r, g, b = 0, 0, 0
+                
+                if n <= good then
+                        b = (1 - n/good)^.5
+                        g = (n/good)^.5
+                elseif n <= bad then
+                        -- difference of bad and good
+                        local z = bad-good
+                        -- n - good, since we are inside "good-bad" now
+                        -- n must not be bigger than z
+                        nRemain = min(n-good, z)
+                        
+                        g = 1 - nRemain/z
+                        r = (nRemain/z)^.3
+                else
+                        r = bad/n
+                end
+        end
+	return {r, g, b, 0.2}]]--
+end 
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Unit Handling
+
+local function addUnit(unitID, unitDefID, unitTeam)
+	if pylonDefs[unitDefID] and not pylonByID[unitID] then
+		local spec, fullview = spGetSpectatingState()
+		spec = spec or fullview
+		if spec or spAreTeamsAllied(unitTeam, spGetMyTeamID()) then
+			local x,y,z = spGetUnitPosition(unitID)
+			pylons.count = pylons.count + 1
+			pylons.data[pylons.count] = {unitID = unitID, x = x, y = y, z = z, range = pylonDefs[unitDefID].range}
+			pylonByID[unitID] = pylons.count
+		end
+	end
+end
+
+local function removeUnit(unitID, unitDefID, unitTeam)
+	pylons.data[pylonByID[unitID]] = pylons.data[pylons.count]
+	pylonByID[pylons.data[pylons.count].unitID] = pylonByID[unitID]
+	pylons.data[pylons.count] = nil
+	pylons.count = pylons.count - 1
+	pylonByID[unitID] = nil
+end
+
+function widget:UnitCreated(unitID, unitDefID, unitTeam)
+	addUnit(unitID, unitDefID, unitTeam)
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if pylonByID[unitID] then
+		removeUnit(unitID, unitDefID, unitTeam)
+	end
+end
+
+function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
+	addUnit(unitID, unitDefID, unitTeam)
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 function widget:Initialize()
-	widgetHandler:RegisterGlobal(widget,"PylonOut", PylonOut)
 	local circleDivs = 32
 	circlePolys = glCreateList(function()
 		glBeginEnd(GL_TRIANGLE_FAN, function()
@@ -97,39 +228,101 @@ function widget:Initialize()
 			end
 		end)
 	end)
+	
+	local allUnits = Spring.GetAllUnits()
+	for i=1, #allUnits do
+		local unitID = allUnits[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		local unitTeam = Spring.GetUnitTeam(unitID)
+		widget:UnitCreated(unitID, unitDefID, unitTeam)
+	end
 end
 
-local disabledColor = { 0.6,0.7,0.5,0.2}
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Drawing
 
-local function HighlightPylons(selectedUnitDefID)
-	for id, data in pairs(pylon) do
-		if pylonDefs[spGetUnitDefID(id)] then
-			local radius = pylonDefs[spGetUnitDefID(id)].range
-			if (radius) then 
-				glColor(data.color[1],data.color[2], data.color[3], data.color[4])
+local drawList = 0
+local lastDrawnFrame = 0
+local lastFrame = 2
 
-				local x,y,z = spGetUnitPosition(id)
-				gl.Utilities.DrawGroundCircle(x,z, radius)
-			end 
-		end
-	end 
-	
-	if selectedUnitDefID then 
-		local mx, my = spGetMouseState()
-		local _, coords = spTraceScreenRay(mx, my, true, true)
-		if coords then 
-			local radius = pylonDefs[selectedUnitDefID].range
-			if (radius == 0) then
-			else
-				local x = floor((coords[1])/16)*16 +8
-				local z = floor((coords[3])/16)*16 +8
+function widget:GameFrame(f)
+	if f%32 == 2 then
+		lastFrame = f
+	end
+end
+
+local function makePylonListVolume()
+	local i = 1
+	while i <= pylons.count do
+		local data = pylons.data[i]
+		local unitID = data.unitID
+		if spValidUnitID(unitID) then
+			local efficiency = spGetUnitRulesParam(unitID, "gridefficiency") or -1
+			if efficiency == -1 then
 				glColor(disabledColor)
-				gl.Utilities.DrawGroundCircle(x,z, radius)
+			else
+				local color = GetGridColor(efficiency)
+				glColor(color)
 			end
-		end 
-	end 
+			gl.Utilities.DrawMyCylinder(data.x,data.y,data.z,data.range,data.range,35)
+			--gl.Utilities.DrawGroundCircle(data.x, data.z, data.range)
+			i = i + 1
+		else
+			pylons.data[i] = pylons.data[pylons.count]
+			pylonByID[pylons.data[i].unitID] = i
+			pylons.data[pylons.count] = nil
+			pylons.count = pylons.count - 1
+		end
+	end  
+end
+
+local function HighlightPylons()
+	if lastDrawnFrame < lastFrame then
+		lastDrawnFrame = lastFrame
+		drawList = gl.CreateList(makePylonListVolume)
+	end
+	gl.Utilities.DrawVolume(drawList)
+	--[[
+	local i = 1
+	while i <= pylons.count do
+		local data = pylons.data[i]
+		local unitID = data.unitID
+		if spValidUnitID(unitID) then
+			local efficiency = spGetUnitRulesParam(unitID, "gridefficiency") or -1
+			if efficiency == -1 then
+				glColor(disabledColor)
+			else
+				local color = GetGridColor(efficiency)
+				glColor(color)
+			end
+			
+			gl.Utilities.DrawGroundCircle(data.x, data.z, data.range)
+			i = i + 1
+		else
+			pylons.data[i] = pylons.data[pylons.count]
+			pylonByID[pylons.data[i].unitID] = i
+			pylons.data[pylons.count] = nil
+			pylons.count = pylons.count - 1
+		end
+	end  
+	--]]
 end 
 
+local function HighlightPlacement(unitDefID)
+	local mx, my = spGetMouseState()
+	local _, coords = spTraceScreenRay(mx, my, true, true)
+	if coords then 
+		local radius = pylonDefs[unitDefID].range
+		if (radius == 0) then
+		else
+			local x = floor((coords[1])/16)*16 +8
+			local z = floor((coords[3])/16)*16 +8
+			glColor(disabledColor)
+			gl.Utilities.DrawGroundCircle(x,z, radius)
+		end
+	end 
+end
 
 function widget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() then return end
@@ -137,7 +330,8 @@ function widget:DrawWorldPreUnit()
 	local _, cmd_id = spGetActiveCommand()  -- show pylons if pylon is about to be placed
 	if (cmd_id) then 
 		if pylonDefs[-cmd_id] then 
-			HighlightPylons(-cmd_id)
+			HighlightPylons()
+			HighlightPlacement(-cmd_id)
 			glColor(1,1,1,1)
 			return
 		end 
@@ -148,7 +342,7 @@ function widget:DrawWorldPreUnit()
 		for i=1,#selUnits do 
 			local ud = spGetUnitDefID(selUnits[i])
 			if (pylonDefs[ud]) then 
-				HighlightPylons(nil)
+				HighlightPylons()
 				glColor(1,1,1,1)
 				return 
 			end 
@@ -157,7 +351,7 @@ function widget:DrawWorldPreUnit()
 	
 	local showecoMode = WG.showeco
 	if showecoMode then
-		HighlightPylons(nil)
+		HighlightPylons()
 		glColor(1,1,1,1)
 		return
 	end

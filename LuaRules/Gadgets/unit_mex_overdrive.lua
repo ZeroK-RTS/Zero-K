@@ -44,6 +44,9 @@ for i=1,#UnitDefs do
 		
 end
 
+local alliedTrueTable = {allied = true}
+local inlosTrueTable = {inlos = true}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -206,95 +209,6 @@ end
 local function energyToExtraM(energy)  
 	return -1+sqrt(1+(energy*0.25))
 end
-
-
-local function HSLtoRGB(ch,cs,cl)
- 
-if cs == 0 then
-  cr = cl
-  cg = cl
-  cb = cl
-else
-  if cl < 0.5 then temp2 = cl * (cl + cs)
-  else temp2 = (cl + cs) - (cl * cs)
-  end
- 
-  temp1 = 2 * cl - temp2
-  tempr = ch + 1 / 3
- 
-  if tempr > 1 then tempr = tempr - 1 end
-  tempg = ch
-  tempb = ch - 1 / 3
-  if tempb < 0 then tempb = tempb + 1 end
- 
-  if tempr < 1 / 6 then cr = temp1 + (temp2 - temp1) * 6 * tempr
-  elseif tempr < 0.5 then cr = temp2
-  elseif tempr < 2 / 3 then cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
-  else cr = temp1
-  end
- 
-  if tempg < 1 / 6 then cg = temp1 + (temp2 - temp1) * 6 * tempg
-  elseif tempg < 0.5 then cg = temp2
-  elseif tempg < 2 / 3 then cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
-  else cg = temp1
-  end
- 
-  if tempb < 1 / 6 then cb = temp1 + (temp2 - temp1) * 6 * tempb
-  elseif tempb < 0.5 then cb = temp2
-  elseif tempb < 2 / 3 then cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
-  else cb = temp1
-  end
- 
-end
-return {cr,cg,cb, 0.2}
-end --HSLtoRGB
-
-
-local function GetGridColor(conversion, isExcess) 
- 	local n = conversion      
-	  -- mex has no esource/esource has no mex
-		if n==0 then
-                return {1, .25, 1, 0.2}
- 
-        else
-                 if n < 3.5 then 
-                 h = 5760/(3.5+2)^2 
-                 else
-                 h=5760/(n+2)^2
-                 end
-			return HSLtoRGB(h/255,1,0.5)
-        end
-        
---[[
---	average/good - will be green
-	local good = 3
-	--max/inefficient - will be red
-	local bad = 15
-		 -- mex has no esource/esource has no mex
-	if n == 0 then
-		return {1, 0.25, 1, 0.25}
-	else
-                -- red, green, blue
-                r, g, b = 0, 0, 0
-                
-                if n <= good then
-                        b = (1 - n/good)^.5
-                        g = (n/good)^.5
-                elseif n <= bad then
-                        -- difference of bad and good
-                        local z = bad-good
-                        -- n - good, since we are inside "good-bad" now
-                        -- n must not be bigger than z
-                        nRemain = min(n-good, z)
-                        
-                        g = 1 - nRemain/z
-                        r = (nRemain/z)^.3
-                else
-                        r = bad/n
-                end
-        end
-	return {r, g, b, 0.2}]]--
-end 
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -726,7 +640,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								end
 								local mexE = gridE*(orgMetal * orgMetal)/ gridMetalSquared 
 								local metalMult = energyToExtraM(mexE)
-								spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
+								spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, alliedTrueTable)
 								local thisMexM = orgMetal + orgMetal * metalMult
 								spCallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
  
@@ -759,7 +673,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					end 
 					
 					local metalMult = energyToExtraM(mexE)
-					spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
+					spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, alliedTrueTable)
 					local thisMexM = orgMetal + orgMetal * metalMult
 					spCallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 					
@@ -843,9 +757,6 @@ end
 
 local lastTeamNe = {}
 function gadget:GameFrame(n)
-	if (n%32 == 2) then
-		SendToUnsynced("PylonOut",1) --send pylon info to widget
-	end
 	if (n%32 == 1) then
 		lowPowerUnits.inner = {count = 0, units = {}}
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
@@ -953,11 +864,11 @@ function gadget:GameFrame(n)
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
 				if pylonData.neededLink then
 					if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
-						spSetUnitRulesParam(unitID,"lowpower",1, {inlos = true})
+						spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
 						lowPowerUnits.inner.count = lowPowerUnits.inner.count + 1
 						lowPowerUnits.inner.units[lowPowerUnits.inner.count] = unitID
 					else
-						spSetUnitRulesParam(unitID,"lowpower",0, {inlos = true})
+						spSetUnitRulesParam(unitID,"lowpower",0, inlosTrueTable)
 					end
 				end
 			end
@@ -1021,7 +932,7 @@ function gadget:GameFrame(n)
 				end
 				summedBaseMetal = summedBaseMetal + orgMetal
                 
-				spSetUnitRulesParam(unitID, "overdrive", 1)
+				spSetUnitRulesParam(unitID, "overdrive", 1, alliedTrueTable)
 				spCallCOBScript(unitID, "SetSpeed", 0, orgMetal * 500) 
 				
 				if mexByID[unitID].refundTeamID then
@@ -1053,10 +964,16 @@ function gadget:GameFrame(n)
 			--// Update pylon tooltips
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
 				local grid = pylonData.gridID
-				local conversion = 0
-				if (grid ~= 0 and gridMetalGain[grid]>0) then conversion = gridEnergySpent[grid]/gridMetalGain[grid] end 
+				local gridEfficiency = -1
+				if grid ~= 0 then
+					if gridMetalGain[grid] > 0 then 
+						gridEfficiency = gridEnergySpent[grid]/gridMetalGain[grid]
+					else 
+						gridEfficiency = 0
+					end
+				end 
 				
-				pylonData.color = GetGridColor(conversion, false)
+				spSetUnitRulesParam(unitID, "gridefficiency", gridEfficiency, alliedTrueTable)
 				
 				if not pylonData.overdrive then
 					local unitDefID = spGetUnitDefID(unitID)
@@ -1433,49 +1350,8 @@ end
 -------------------------------------------------------------------------------------
 else  -- UNSYNCED
 -------------------------------------------------------------------------------------
---[[ draw OVERDRIVE CIRCLE, moved to gui_showeco_action.lua
-local spValidUnitID      = Spring.ValidUnitID
-local isUnitInView       = Spring.IsUnitInView
-local getUnitTeam        = Spring.GetUnitTeam
-local getUnitLosState    = Spring.GetUnitLosState
-local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetUnitDefID     = Spring.GetUnitDefID
-local spGetUnitBasePosition = Spring.GetUnitBasePosition
-local spGetUnitPosition  = Spring.GetUnitPosition
 
---local spGetLocalTeamID   = Spring.GetLocalTeamID
 local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
-local spGetMyAllyTeamID  = Spring.GetMyAllyTeamID
-local spGetTeamList      = Spring.GetTeamList
-local spGetTeamUnits     = Spring.GetTeamUnits
-local areTeamsAllied     = Spring.AreTeamsAllied
-local spGetSpectatingState = Spring.GetSpectatingState
-local spGetActiveCommand = Spring.GetActiveCommand
-local spTraceScreenRay   = Spring.TraceScreenRay
-local spGetMouseState    = Spring.GetMouseState
-
-local glVertex        = gl.Vertex
-local glPolygonOffset = gl.PolygonOffset
-local glDepthTest     = gl.DepthTest
-local glCallList      = gl.CallList
-local glColor         = gl.Color
-local glBeginEnd      = gl.BeginEnd
-local glCreateList    = gl.CreateList
-local glPushMatrix    = gl.PushMatrix
-local glPopMatrix     = gl.PopMatrix
-local glTranslate     = gl.Translate
-local glScale         = gl.Scale
-
-local GL_QUADS        = GL.QUADS
-local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
-
-local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
-
-
-
-local floor = math.floor
-
-local circlePolys = 0 -- list for circles
 
 function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
   if (allyTeamID ~= spGetLocalAllyTeamID()) then return end
@@ -1486,308 +1362,6 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:AddSyncAction('MexEnergyEvent',WrapToLuaUI)
-
-	local circleDivs = 32
-
-	circlePolys = glCreateList(function()
-		glBeginEnd(GL_TRIANGLE_FAN, function()
-		local radstep = (2.0 * math.pi) / circleDivs
-			for i = 1, circleDivs do
-				local a = (i * radstep)
-				glVertex(math.sin(a), 0, math.cos(a))
-			end
-		end)
-	end)
-
-end
-
-
-local function DrawArray(ar, unitID)  -- renders lines from unitID to array memebers
-	if (not ar) then return end
-	if (not spValidUnitID(unitID)) then return end 
-	
-	--local uvisible = isUnitInView(unitID)
-	local ux,uy,uz = spGetUnitPosition(unitID)
-	
-	for id,_ in spairs(ar) do		
-		if (spValidUnitID(id)) then 
-			glVertex(ux,uy,uz)
-			--if (uvisible or isUnitInView(id)) then
-				glVertex(spGetUnitPosition(id))
-			--end 
-		end 
-	end
-end 
-
--- local function DrawPylonEnergyLines()
-	-- myAllyID = spGetMyAllyTeamID()
-	-- local spec, fullview = spGetSpectatingState()
-	-- spec = spec or fullview
-
-  	-- local pylon = SYNCED.pylon
-
-	
-	-- if (spec) then 
-		-- for _,pylonGroup in spairs(pylon) do 
-			-- for unitID, pylonData in spairs(pylonGroup) do 
-				-- DrawArray(pylonData.nearEnergy, unitID)
-			-- end
-		-- end 
-	-- else 
-		-- for unitID, pylonData in spairs(pylon[myAllyID]) do 
-			-- DrawArray(pylonData.nearEnergy, unitID)
-		-- end
-	-- end 
--- end 
-
-local function DrawPylonMexLines()
-	myAllyID = spGetMyAllyTeamID()
-	local spec, fullview = spGetSpectatingState()
-	spec = spec or fullview
-
-  	local pylon = SYNCED.pylon
-
-	if (spec) then 
-		for _,pylonGroup in spairs(pylon) do 
-			for unitID, pylonData in spairs(pylonGroup) do 
-				DrawArray(pylonData.mex, unitID)
-			end
-		end 
-	else 
-		for unitID, pylonData in spairs(pylon[myAllyID]) do 
-			DrawArray(pylonData.mex, unitID)
-		end
-	end
-end 
-
-local function DrawPylonLinkLines()
-	myAllyID = spGetMyAllyTeamID()
-	local spec, fullview = spGetSpectatingState()
-	spec = spec or fullview
-
-  	local pylon = SYNCED.pylon
-
-	if (spec) then 
-		for _,pylonGroup in spairs(pylon) do 
-			for unitID, pylonData in spairs(pylonGroup) do 
-				DrawArray(pylonData.nearPylon, unitID)
-			end
-		end 
-	else 
-		for unitID, pylonData in spairs(pylon[myAllyID]) do 
-			DrawArray(pylonData.nearPylon, unitID)
-		end
-	end
-end 
-
-local disabledColor = { 0.6,0.7,0.5,0.2}
-
-local colors = {
-	{0.9,0.9,0.2,0.2},
-	{0.9,0.2,0.2,0.2},
-	{0.2,0.9,0.2,0.2},
-	{0.2,0.2,0.9,0.2},
-	{0.2,0.9,0.9,0.2},
-	{0.9,0.2,0.9,0.2},
-}
-
-local function HighlightPylons(selectedUnitDefID)
-	local myAlly = spGetMyAllyTeamID()
-	local pylon = SYNCED.pylon
-
-	--gl.PushAttrib(GL.COLOR_BUFFER_BIT)
-	--gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.ZERO)
-	for id, data in spairs(pylon[myAlly]) do 
-		local radius = pylonDefs[spGetUnitDefID(id)].range
-		if (radius) then 
-			local color
-			if (not data.gridID) or data.gridID == 0 or data.color == nil then
-				color = disabledColor
-			else 
-				color = data.color
-			end 
-			glColor(color[1],color[2], color[3], color[4])
-
-			local x,y,z = spGetUnitBasePosition(id)
-			Util_DrawGroundCircle(x,z, radius)
-		end 
-	end 
-	
-	
-	if selectedUnitDefID then 
-		local mx, my = spGetMouseState()
-		local _, coords = spTraceScreenRay(mx, my, true, true)
-		if coords then 
-			local radius = pylonDefs[selectedUnitDefID].range
-			if (radius == 0) then
-			else
-				local x = floor((coords[1])/16)*16 +8
-				local z = floor((coords[3])/16)*16 +8
-				glColor(disabledColor)
---				coords[1] = floor((coords[1]+8)/16)*16
-				--coords[3] = floor((coords[3]+8)/16)*16
-				Util_DrawGroundCircle(x,z, radius)
-
-				-- glPushMatrix()
-				-- glTranslate(unpack(coords))
-				-- glScale(radius,1,radius)
-				-- glCallList(circlePolys)
-				-- glPopMatrix()
-			end
-		end 
-	end 
-	
-	--glPolygonOffset(false)
-
-	--glDepthTest(true)
-
-	-- if SYNCED.pylon and snext(SYNCED.pylon) then
-		-- gl.PushAttrib(GL.LINE_BITS)
-		
-		-- glDepthTest(true)
-		-- glColor(0.8,0.8,0.2,math.random()*0.1+0.3)
-		-- gl.LineWidth(1)
-		-- glBeginEnd(GL.LINES, DrawPylonEnergyLines)
-		
-		-- gl.PopAttrib() 
-	-- end
-
-	--gl.PopAttrib()
-end 
-
-
-function gadget:DrawWorldPreUnit()
-	if Spring.IsGUIHidden() then return end
-	-- if SYNCED.pylon and snext(SYNCED.pylon) then
-		-- gl.PushAttrib(GL.LINE_BITS)
-		
-		-- glColor(0.5,0.4,1,math.random()*0.1+0.5)
-		-- gl.LineWidth(3)
-		-- glBeginEnd(GL.LINES, DrawPylonMexLines)
-		
-		-- glColor(0.9,0.8,0.2,math.random()*0.1+0.5)
-		-- gl.LineWidth(3)
-		-- glBeginEnd(GL.LINES, DrawPylonLinkLines)
-			
-		-- glDepthTest(false)
-		-- glColor(1,1,1,1)
-			
-		-- gl.PopAttrib() 
-	-- end
-
-	local _, cmd_id = spGetActiveCommand()  -- show pylons if pylon is about to be placed
-	if (cmd_id) then 
-		if pylonDefs[-cmd_id] then 
-			HighlightPylons(-cmd_id)
-			glColor(1,1,1,1)
-			return
-		--elseif energyDefs[-cmd_id] or mexDefs[-cmd_id] then
-		--	HighlightPylons(nil)
-		--	return
-		end 
-	return end
-	
-	
-	local selUnits = spGetSelectedUnits()  -- or show it if its selected 
-	if not selUnits then return end 
-  
-	for i=1,#selUnits do 
-		local ud = spGetUnitDefID(selUnits[i])
-		if (pylonDefs[ud]) then 
-			HighlightPylons(nil)
-			glColor(1,1,1,1)
-		return 
-		end 
-	end
-end
---]]
-
---[[ draw POWER ICON, moved to widget
-local powerTexture = 'Luaui/Images/visible_energy.png'
-
-local function DrawUnitFunc(yshift)
-	glTranslate(0,yshift,0)
-	gl.Billboard()
-	gl.TexRect(-10, -10, 10, 10)
-end
-
-function gadget:DrawWorld()
-	if Spring.IsGUIHidden() then return end
-	local lowPowerUnits = SYNCED.lowPowerUnits.inner
-	
-	if lowPowerUnits.count > 0 then
-		local spec, fullview = spGetSpectatingState()
-		local myAllyID = spGetMyAllyTeamID()
-
-		spec = spec or fullview
-		glColor(1,1,1,1)
-		gl.Texture(powerTexture )
-		for i = 1, lowPowerUnits.count do
-			local los = Spring.GetUnitLosState(lowPowerUnits.units[i], myAllyID, false)
-			if spValidUnitID(lowPowerUnits.units[i]) and spGetUnitDefID(lowPowerUnits.units[i]) and ((los and los.los) or spec) then
-				gl.DrawFuncAtUnit(lowPowerUnits.units[i], false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(lowPowerUnits.units[i])].height+30)
-			end
-		end
-		gl.Texture("")
-	end
-	
-end
---]]
-
-local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
-local spGetUnitDefID     = Spring.GetUnitDefID
-local spGetSpectatingState = Spring.GetSpectatingState
-local disabledColor = { 0.6,0.7,0.5,0.2}
-
-function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
-  if (allyTeamID ~= spGetLocalAllyTeamID()) then return end
-  if (Script.LuaUI('MexEnergyEvent')) then
-    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
-  end
-end
-
-function ToStringTable(pylonToString, myAlly)
-	local pylon = SYNCED.pylon
-	if pylon[myAlly] then
-		for id, data in spairs(pylon[myAlly]) do 
-			local radius = pylonDefs[spGetUnitDefID(id)].range
-			if (radius) then
-				pylonToString = pylonToString .. "["..id.."]" .."={"
-				pylonToString = pylonToString .. "gridID="..data.gridID..","
-				if (not data.gridID) or data.gridID == 0 or data.color == nil then
-					pylonToString = pylonToString .. "color={"..disabledColor[1]..","..disabledColor[2]..","..disabledColor[3]..","..disabledColor[4].."},"
-				else
-					pylonToString = pylonToString .. "color={"..data.color[1]..","..data.color[2]..","..data.color[3]..","..data.color[4].."},"
-				end
-				pylonToString = pylonToString .. "},"
-			end
-		end 
-	end
-	return pylonToString
-end
-
-function WrapToLuaUI2(_,zzZ)
-  if (Script.LuaUI('PylonOut')) then
-	local pylonToString= "{"
-	local pylon = SYNCED.pylon
-	local spec, fullview = spGetSpectatingState()
-	spec = spec or fullview
-	if (spec) then 
-		for allyID,_ in spairs(pylon) do 
-			pylonToString = ToStringTable(pylonToString, allyID)
-		end 
-	else 
-		local myAlly = spGetLocalAllyTeamID()
-		pylonToString = ToStringTable(pylonToString, myAlly)
-	end
-	pylonToString = pylonToString .. "}"		
-    Script.LuaUI.PylonOut(pylonToString)
-  end
-end
-
-function gadget:Initialize()
-	gadgetHandler:AddSyncAction('MexEnergyEvent',WrapToLuaUI)
-	gadgetHandler:AddSyncAction('PylonOut',WrapToLuaUI2)
 end
 
 -------------------------------------------------------------------------------------
