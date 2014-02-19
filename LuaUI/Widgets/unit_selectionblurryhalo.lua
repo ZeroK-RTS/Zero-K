@@ -419,30 +419,29 @@ function widget:Initialize()
 
   blurShader_h = gl.CreateShader({
     fragment = [[
-      float kernel[2]; // = float[7]( 0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);
       uniform sampler2D tex0;
       uniform int screenX;
 
-      void InitKernel(void) {
-        kernel[0] = 0.6;
-        kernel[1] = 0.7;
-      }
+      const vec2 kernel = vec2(0.6,0.7);
 
       void main(void) {
-        InitKernel();
+        vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
+        gl_FragColor = vec4(0.0);
 
-        int n;
+        int i;
+        int n = 1;
         float pixelsize = 1.0/float(screenX);
+        for(i = 1; i < 3; ++i){
+          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s + i*pixelsize,texCoord.t) );
+          --n;
+        }
 
-        gl_FragColor = 0.4 * texture2D(tex0, gl_TexCoord[0].st );
+        gl_FragColor += texture2D(tex0, texCoord );
 
-        vec2 tc1 = gl_TexCoord[0].st;
-        vec2 tc2 = gl_TexCoord[0].st;
-
-        for(n=1; n>= 0; --n){
-          tc1.s += pixelsize;
-          tc2.s -= pixelsize;
-          gl_FragColor += kernel[n] * ( texture2D(tex0, tc1 )+texture2D(tex0, tc2 ) );
+        n = 0;
+        for(i = -2; i < 0; ++i){
+          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s + i*pixelsize,texCoord.t) );
+          ++n;
         }
       }
     ]],
@@ -460,31 +459,29 @@ function widget:Initialize()
   end
 
   blurShader_v = gl.CreateShader({
-    fragment = [[
-      float kernel[2]; // = float[7]( 0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);
-      uniform sampler2D tex0;
+    fragment = [[      uniform sampler2D tex0;
       uniform int screenY;
 
-      void InitKernel(void) {
-        kernel[0] = 0.6;
-        kernel[1] = 0.7;
-      }
+      const vec2 kernel = vec2(0.6,0.7);
 
       void main(void) {
-        InitKernel();
+        vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
+        gl_FragColor = vec4(0.0);
 
-        int n;
+        int i;
+        int n = 1;
         float pixelsize = 1.0/float(screenY);
+        for(i = 0; i < 2; ++i){
+          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s,texCoord.t + i*pixelsize) );
+          --n;
+        }
 
-        gl_FragColor = 0.4 * texture2D(tex0, gl_TexCoord[0].st );
+        gl_FragColor += texture2D(tex0, texCoord );
 
-        vec2 tc1 = gl_TexCoord[0].st;
-        vec2 tc2 = gl_TexCoord[0].st;
-
-        for(n=1; n>= 0; --n){
-          tc1.t += pixelsize;
-          tc2.t -= pixelsize;
-          gl_FragColor += kernel[n] * ( texture2D(tex0, tc1 )+texture2D(tex0, tc2 ) );
+        n = 0;
+        for(i = -2; i < 0; ++i){
+          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s,texCoord.t + i*pixelsize) );
+          ++n;
         }
       }
     ]],
