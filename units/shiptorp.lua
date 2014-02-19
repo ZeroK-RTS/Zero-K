@@ -28,6 +28,7 @@ unitDef = {
 	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
 	helptext_pl    = [[Fregata torpedowa to odpowiedz na jednostki podwodne; moze tez strzelac w statki.]],
 	modelradius    = [[14]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

@@ -31,6 +31,7 @@ unitDef = {
     helptext_fr    = [[Pas cher, rapide et peu solide, voici venir le Skeeter et ses canons laser. Utile en début de conflit ou en tant qu'éclaireur son blindage le rends trcs vite obsolcte.]],
     helptext_pl    = [[Lekki i szybki, Skeeter jest dobrym zwiadowcą dla większych okrętów. Nie ma jednak wytrzymałości ani siły ognia potrzebnych do dłuższej walki.]],
     modelradius    = [[12]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],

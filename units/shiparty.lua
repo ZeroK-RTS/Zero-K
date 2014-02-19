@@ -32,6 +32,7 @@ unitDef = {
     helptext_de    = [[Der Zerstörer kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Torpedowerfer gegen U-Boote. Hüte dich vor Flugzeugen und Korvetten - Zerstörer haben einige Probleme damit, schnelle Ziele zu treffen.]],
     extradrawrange = 200,
 	modelradius    = [[17]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

@@ -32,6 +32,7 @@ unitDef = {
 	helptext_de    = [[Der Typhoon ist ein Schiff, welches Geschwindigkeite, Panzerung und Feuerkraft verhältnismäßig günstig verbindet - zumindest für ein Schiff. Nutze Korvetten gegen alles auf der Oberfläche, achte aber auf feindliche U-Boote.]],
 	helptext_pl    = [[Korweta oferuje wysoka predkosc, duza wytrzymalosc i silne dzialka za niska (jak na statek) cene. Grupy korwet dobrze niszcza cele na powierzchni, ale nie maja obrony glebinowej.]],
     modelradius    = [[15]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

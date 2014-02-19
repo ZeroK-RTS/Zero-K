@@ -35,6 +35,7 @@ unitDef = {
 	helptext_de    = [[Obwohl teuer, bietet diese Konstruktionseinheit extrem hohe Nanoleistung, kombiniert mit robuster Panzerung und Schnelligkeit.]],
 	helptext_pl    = [[Mimo ze jest drogi, statek konstrukcyjny ma wysoka moc, duza wytrzymalosc i jest w miare szybki.]],
 	modelradius    = [[15]],
+	turnatfullspeed = [[1]],
   },
 
   energyMake             = 0.3,

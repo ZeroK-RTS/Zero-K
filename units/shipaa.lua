@@ -31,6 +31,7 @@ unitDef = {
 	helptext_de    = [[Mit seinem schlagkräftigen, doppelläufigen Flugabwehrlaser schützt diese Fregatte deine Flotte vor Luftangriffen. Wie immer ist aber auch diese Flugabwehr gegen Ziele, die sich nicht in der Luft befinden, machtlos.]],
 	helptext_pl    = [[Fregata przeciwlotnicza skutecznie broni floty przed atakami z powietrza, ale nie jest w stanie atakowac innych celow.]],
 	modelradius    = [[17]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

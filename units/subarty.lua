@@ -31,6 +31,7 @@ unitDef = {
 	helptext_de    = [[Der Serpent ist wahrlich ein Albtraum. Seine weitreichenden, tödlich genauen und hochtödlichen, schweren Torpedos können fast jedes Schiff mit ein paar Schüssen zum Sinken bringen. Es ist allerdings extrem teuer und nicht sehr wendig.]],
 	helptext_pl    = [[Serpent jest bardzo drogi i ma niska wytrzymalosc, ale jego potezne torpedy dalekiego zasiegu zatapiaja wszystko, co plywa.]],
 	modelradius    = [[15]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

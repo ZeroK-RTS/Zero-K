@@ -32,6 +32,7 @@ unitDef = {
 	helptext_de    = [[Teuer, versteckt und gebrechlich ist dieses U-Boot. Es kann nicht nach hinten schießen und seine Ausrichtung dauert lange. Daher lieber gleich richtig positionieren. Achte auf alles mit Anti-U-Boot Ausrüstung, besonders 'Hunter' - Torpedofregatten.]],
 	helptext_pl    = [[Lodzie powolne, mimo ze sa drogie i delikatne, zadaja duze obrazenia i moga zostac wykryte tylko przez sonar. Wyrzutnie torped maja zamontowane tylko z przodu, zatem odpowienie ustawienie jest kluczem w bitwach, w ktorych uczestnicza. Torpedy to glowna kategoria broni, ktora moze atakowac lodzie podwodne, zatem nalezy ich unikac - szczegolnie fregat torpedowych.]],
 	modelradius    = [[15]],
+	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
