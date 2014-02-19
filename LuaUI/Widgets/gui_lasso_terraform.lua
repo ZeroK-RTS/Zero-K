@@ -98,7 +98,7 @@ local maxHeightDifference = 30
 local mouseSensitivity = 2 
 
 -- snap to Y grid for raise
-local heightSnap = 15
+local heightSnap = 6
 
 -- max sizes of non-ramp command, reduces slowdown MUST AGREE WITH GADGET VALUES
 local maxAreaSize = 2000 -- max width or length
