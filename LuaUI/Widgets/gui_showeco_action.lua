@@ -265,8 +265,8 @@ local function makePylonListVolume()
 				local color = GetGridColor(efficiency)
 				glColor(color)
 			end
-			gl.Utilities.DrawMyCylinder(data.x,data.y,data.z,data.range,data.range,35)
-			--gl.Utilities.DrawGroundCircle(data.x, data.z, data.range)
+			--gl.Utilities.DrawMyCylinder(data.x,data.y,data.z,data.range,data.range,35)
+			gl.Utilities.DrawGroundCircle(data.x, data.z, data.range)
 			i = i + 1
 		else
 			pylons.data[i] = pylons.data[pylons.count]
@@ -282,7 +282,8 @@ local function HighlightPylons()
 		lastDrawnFrame = lastFrame
 		drawList = gl.CreateList(makePylonListVolume)
 	end
-	gl.Utilities.DrawVolume(drawList)
+	--gl.Utilities.DrawVolume(drawList)
+	gl.CallList(drawList)
 	--[[
 	local i = 1
 	while i <= pylons.count do
