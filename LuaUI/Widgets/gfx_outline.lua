@@ -78,6 +78,7 @@ local GL_DEPTH_COMPONENT32 = 0x81A7
 
 --// speed ups
 local ALL_UNITS       = Spring.ALL_UNITS
+local GetUnitHealth   = Spring.GetUnitHealth
 local GetVisibleUnits = Spring.GetVisibleUnits
 
 local GL_MODELVIEW  = GL.MODELVIEW
@@ -299,7 +300,9 @@ end
 local function DrawVisibleUnits()
   local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,false)
   for i=1,#visibleUnits do  
-    glUnit(visibleUnits[i],true)
+    if select(5, GetUnitHealth(visibleUnits[i])) >= 1.0 then
+      glUnit(visibleUnits[i],true)
+    end
   end
 end
 
