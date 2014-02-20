@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Custom Cursor Sets",
-    desc      = "v1.002 Choose different cursor sets.",
+    desc      = "v1.003 Choose different cursor sets.",
     author    = "CarRepairer",
     date      = "2012-01-11",
     license   = "GNU GPL, v2 or later",
@@ -58,7 +58,6 @@ local cursorNames = {
   'cursornormal',
   'cursorareaattack',
   'cursorattack',
-  'cursorattack',
   'cursorbuildbad',
   'cursorbuildgood',
   'cursorcapture',
@@ -66,11 +65,8 @@ local cursorNames = {
   'cursordwatch',
   'cursorwait',
   'cursordgun',
-  'cursorattack',
   'cursorfight',
-  'cursorattack',
   'cursorgather',
-  'cursorwait',
   'cursordefend',
   'cursorpickup',
   'cursormove',
@@ -78,16 +74,11 @@ local cursorNames = {
   'cursorreclamate',
   'cursorrepair',
   'cursorrevive',
-  'cursorrepair',
   'cursorrestore',
-  'cursorrepair',
   'cursorselfd',
   'cursornumber',
-  'cursorwait',
   'cursortime',
-  'cursorwait',
   'cursorunload',
-  'cursorwait',
 }
 
 SetCursor = function(cursorSet)
