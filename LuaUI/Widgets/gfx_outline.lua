@@ -108,6 +108,13 @@ local glPopMatrix     = gl.PopMatrix
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+--tables
+local unbuiltUnits = {}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
 function widget:Initialize()
   vsx, vsy = widgetHandler:GetViewSizes()
 
@@ -298,9 +305,21 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawVisibleUnits()
+  if (Spring.GetGameFrame() % 15 == 0) then
+        checknow = true
+  end
+ 
   local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,false)
   for i=1,#visibleUnits do  
-    if select(5, GetUnitHealth(visibleUnits[i])) >= 1.0 then
+    if checknow then
+      if select(5, GetUnitHealth(visibleUnits[i])) >= 1 then
+        unbuiltUnits[visibleUnits[i]] = nil
+      else
+        unbuiltUnits[visibleUnits[i]] = true
+      end
+    end
+ 
+    if not unbuiltUnits[visibleUnits[i]] then
       glUnit(visibleUnits[i],true)
     end
   end
@@ -356,6 +375,11 @@ function widget:DrawWorldPreUnit()
   glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
   glCallList(leave2d)
 end
+
+function widget:UnitCreated(unitID)
+  unbuiltUnits[unitID] = true
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
