@@ -176,6 +176,7 @@ local spGetMouseState	= Spring.GetMouseState
 local spTraceScreenRay	= Spring.TraceScreenRay
 local spGetPlayerControlledUnit		= Spring.GetPlayerControlledUnit
 local spGetVisibleUnits			= Spring.GetVisibleUnits
+local spIsUnitIcon = Spring.IsUnitIcon
 
 --local myPlayerID = Spring.GetMyPlayerID()
 
@@ -273,7 +274,7 @@ local function DrawHaloFunc()
     
 	local mx, my = spGetMouseState()
     local pointedType, data = spTraceScreenRay(mx, my)
-	if pointedType == 'unit' and spValidUnitID(data) then
+	if pointedType == 'unit' and spValidUnitID(data) and not spIsUnitIcon(data) then
 		local teamID = spGetUnitTeam(data)
 		if teamID == spGetMyTeamID() then
 			glColor(myHoverColor)

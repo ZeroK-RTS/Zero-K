@@ -297,7 +297,7 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawVisibleUnits()
-  local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,true)
+  local visibleUnits = GetVisibleUnits(ALL_UNITS,nil,false)
   for i=1,#visibleUnits do  
     glUnit(visibleUnits[i],true)
   end
