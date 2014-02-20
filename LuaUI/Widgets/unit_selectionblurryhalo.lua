@@ -228,7 +228,7 @@ UpdateHaloColors = function(self)
 end
 
 local function GetVisibleUnits()
-    local units = spGetVisibleUnits(-1, 30, true)
+    local units = spGetVisibleUnits(-1, 30, false)
     
 	local visibleAllySelUnits = {}
     local visibleSelected = {}
@@ -353,7 +353,7 @@ function widget:DrawWorldPreUnit()
   glBlending(false)
 end
 
-function widget:DrawWorld()
+function widget:DrawScreenEffects()
   if Spring.IsGUIHidden() then
   return
   end
@@ -533,7 +533,8 @@ function widget:Initialize()
   leave2d = gl.CreateList(function()
     glMatrixMode(GL_PROJECTION); glPopMatrix()
     glMatrixMode(GL_MODELVIEW);  glPopMatrix()
-    glTexture(false)
+    glTexture(0, false)
+    glTexture(1, false)
     glUseShader(0)
   end)
   
@@ -607,8 +608,10 @@ function widget:Shutdown()
   end
 
   if (gl.DeleteShader) then
+    gl.DeleteShader(maskGenShader or 0)
     gl.DeleteShader(blurShader_h or 0)
     gl.DeleteShader(blurShader_v or 0)
+    gl.DeleteShader(maskApplyShader or 0)
   end
 
   gl.DeleteList(enter2d)
