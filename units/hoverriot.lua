@@ -15,10 +15,10 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[45 20 50]],
+  collisionVolumeOffsets = [[0 -8 0]],
+  collisionVolumeScales  = [[48 36 48]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]], 
+  collisionVolumeType    = [[cylY]], 
   corpse              = [[DEAD]],
 
   customParams        = {

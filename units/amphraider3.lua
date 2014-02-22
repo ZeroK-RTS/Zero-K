@@ -66,7 +66,7 @@ unitDef = {
     {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP]],
+      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
     },
   },
 
@@ -111,8 +111,8 @@ unitDef = {
     TORPEDO = {
       name                    = [[Torpedo]],
       areaOfEffect            = 32,
-      --avoidFriendly           = false,
-      --collideFriendly         = false,
+      avoidFriendly           = false,
+      collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 

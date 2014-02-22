@@ -43,7 +43,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maxDamage              = 1700,
-  maxVelocity            = 2.9,
+  maxVelocity            = 2.8,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],
@@ -93,15 +93,16 @@ unitDef = {
 
     EMG = {
       name                    = [[Medium Pulse MG]],
-      areaOfEffect            = 64,
+      areaOfEffect            = 96,
       burst                   = 4,
       burstrate               = 0.1,
+      burnblow                = true,
       craterBoost             = 0.15,
       craterMult              = 0.3,
 
       damage                  = {
-        default = 8,
-        planes  = 8,
+        default = 9,
+        planes  = 9,
         subs    = 0.5,
       },
 

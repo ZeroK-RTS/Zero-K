@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Scalpel]],
   description         = [[Skirmisher Hover (Anti-Heavy)]],
   acceleration        = 0.0435,
+  activateWhenBuilt   = true,
   brakeRate           = 0.205,
   buildCostEnergy     = 220,
   buildCostMetal      = 220,
@@ -65,9 +66,10 @@ unitDef = {
 
   side                = [[ARM]],
   sightDistance       = 484,
+  sonarDistance       = 484,
   smoothAnim          = true,
   turninplace         = 0,
-  turnRate            = 600,
+  turnRate            = 480,
   workerTime          = 0,
 
   weapons             = {
@@ -75,7 +77,7 @@ unitDef = {
     {
       def                = [[MISSILE]],
 	  badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 
   },
@@ -120,6 +122,7 @@ unitDef = {
       trajectoryHeight        = 0.4,
       turnRate                = 24000,
       turret                  = true,
+      waterweapon             = true,
       weaponAcceleration      = 90,
       weaponTimer             = 3,
       weaponType              = [[MissileLauncher]],
