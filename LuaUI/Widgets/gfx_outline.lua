@@ -313,7 +313,7 @@ local function DrawVisibleUnits()
   for i=1,#visibleUnits do  
     if checknow then
       local unitProgress = select(5, GetUnitHealth(visibleUnits[i]))
-      if unitProgress ~= nil and unitProgress >= 1 then
+      if unitProgress == nil or unitProgress >= 1 then
         unbuiltUnits[visibleUnits[i]] = nil
       else
         unbuiltUnits[visibleUnits[i]] = true
