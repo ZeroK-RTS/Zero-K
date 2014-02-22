@@ -197,7 +197,6 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
     HEAP = {
       description      = [[Debris - Skeeter]],
       blocking         = false,

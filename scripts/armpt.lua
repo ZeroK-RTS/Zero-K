@@ -103,11 +103,12 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, sfxShatter)
 		Explode(wake1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(wake2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		return (0)
+		return 2
 	else
 		Explode(base, sfxNone)
 		Explode(turret, sfxShatter)
 		Explode(wake1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(wake2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		return 2
 	end
 end
