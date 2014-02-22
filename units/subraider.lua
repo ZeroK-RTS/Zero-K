@@ -32,7 +32,6 @@ unitDef = {
 	helptext_de    = [[Teuer, versteckt und gebrechlich ist dieses U-Boot. Es kann nicht nach hinten schießen und seine Ausrichtung dauert lange. Daher lieber gleich richtig positionieren. Achte auf alles mit Anti-U-Boot Ausrüstung, besonders 'Hunter' - Torpedofregatten.]],
 	helptext_pl    = [[Lodzie powolne, mimo ze sa drogie i delikatne, zadaja duze obrazenia i moga zostac wykryte tylko przez sonar. Wyrzutnie torped maja zamontowane tylko z przodu, zatem odpowienie ustawienie jest kluczem w bitwach, w ktorych uczestnicza. Torpedy to glowna kategoria broni, ktora moze atakowac lodzie podwodne, zatem nalezy ich unikac - szczegolnie fregat torpedowych.]],
 	modelradius    = [[15]],
-	turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -42,7 +41,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 240,
-  maxDamage              = 800,
+  maxDamage              = 875,
   maxVelocity            = 2.9,
   minCloakDistance       = 75,
   minWaterDepth          = 15,
@@ -78,7 +77,7 @@ unitDef = {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 120,
+      maxAngleDif        = 270,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -97,8 +96,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 380,
-        subs    = 380,
+        default = 420,
+        subs    = 420,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -113,18 +112,18 @@ unitDef = {
 	  numbounce               = 4,
       noSelfDamage            = true,
       range                   = 360,
-      reloadtime              = 3.5,
+      reloadtime              = 4.5,
       soundHit                = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torpedo]],
       startVelocity           = 80,
       tolerance               = 32767,
       tracks                  = true,
-      turnRate                = 16000,
+      turnRate                = 32000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 30,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 180,
     },
 
 
