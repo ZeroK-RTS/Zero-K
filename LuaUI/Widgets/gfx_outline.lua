@@ -381,6 +381,10 @@ function widget:UnitCreated(unitID)
   unbuiltUnits[unitID] = true
 end
 
+function widget:UnitDestroyed(unitID)
+  unbuiltUnits[unitID] = nil
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
