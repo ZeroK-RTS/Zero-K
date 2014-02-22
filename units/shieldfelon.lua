@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[shieldfelon]],
   name                = [[Felon]],
-  description         = [[Shielded Skirmisher]],
+  description         = [[Shielded Fire Support Bot]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   brakeRate           = 0.22,
