@@ -94,8 +94,6 @@ unitDef = {
 
       damage                  = {
         default = 310,
-        planes  = 310,
-        subs    = 15,
       },
 
       fireStarter             = 70,
