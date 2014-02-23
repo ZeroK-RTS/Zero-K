@@ -529,6 +529,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'quakesounds',
+    name   = 'Enable quakesounds gadget',
+    desc   = "Should you have quakesounds installed, it will work for you.",
+    type   = 'bool',
+    section= 'fun',
+    def    = true,
+  },
+  {
     key    = 'iwinbutton',
     name   = 'Enable giant expensive "I Win" button',
     desc   = "For speed games. Race to build it!",
