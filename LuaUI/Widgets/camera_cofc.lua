@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.132 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.133 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-November-12
     license   = "GNU GPL, v2 or later",
@@ -848,7 +848,7 @@ end
 --Note: If the x,y is not pointing at an onmap point, this function traces a virtual ray to an
 --          offmap position using the camera direction and disregards the x,y parameters.
 local function VirtTraceRay(x,y, cs)
-	local _, gpos = spTraceScreenRay(x, y, true)
+	local _, gpos = spTraceScreenRay(x, y, true, false,false, true) --only coordinate, NOT thru minimap, NOT include sky, ignore water surface
 
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
@@ -885,8 +885,6 @@ local function SetLockSpot2(cs, x, y) --set an anchor on the ground for camera r
 		x, y = cx, cy --center of screen
 	end
 
-	--local gpos
-	--_, gpos = spTraceScreenRay(x, y, true)
 	local onmap, gx,gy,gz = VirtTraceRay(x, y, cs) --convert screen coordinate to ground coordinate
 	
 	if gx then
@@ -914,8 +912,7 @@ local function UpdateCam(cs)
 	cs.pz = ls_z - cos(cs.ry) * opp
 	
 	if not options.freemode.value then
-		local gndheight = spGetGroundHeight(cs.px, cs.pz)+5
-		--gndheight = spGetSmoothMeshHeight(cs.px, cs.pz)+5
+		local gndheight = spGetGroundHeight(cs.px, cs.pz) + 10
 		if cs.py < gndheight then --prevent camera from going underground
 			if options.groundrot.value then
 				cs.py = gndheight
@@ -1420,7 +1417,7 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	if not ls_onmap then
 		smoothlevel = 0.5
 	end
-
+	
 	-- forward, up, right, top, bottom, left, right
 	local camVecs = spGetCameraVectors()
 	local cf = camVecs.forward
@@ -1452,10 +1449,9 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 		ls_y = spGetSmoothMeshHeight(ls_x, ls_z) or 0
 	else
 		if not options.freemode.value then
-			ls_y = spGetGroundHeight(ls_x, ls_z) or 0 --limit lockspot to groundheight if not free
+			ls_y = spGetGroundHeight(ls_x, ls_z) or 0 --bind lockspot to groundheight if not free
 		end
 	end
-	
 	
 	local csnew = UpdateCam(cs)
 	if csnew then
