@@ -1671,18 +1671,18 @@ end
 
 else --------------------------------------------------------------------------------------------------- unsycned
 
-function ParseRespawn(cmd, line, words, playerID)
-  if (#words == 4) then
-    spSendLuaRulesMsg("ctf_respawn".." "..words[1].." "..words[2].." "..words[3])
-  end
-end
+-- function ParseRespawn(cmd, line, words, playerID)
+--   if (#words == 4) then
+--     spSendLuaRulesMsg("ctf_respawn".." "..words[1].." "..words[2].." "..words[3])
+--   end
+-- end
 
 function gadget:Initialize()
   if (not Spring.GetModOptions().zkmode) or (tostring(Spring.GetModOptions().zkmode) ~= "ctf") then
     gadgetHandler:RemoveGadget()
     return
   end
-  gadgetHandler:AddChatAction("ctf_respawn", ParseRespawn)
+--   gadgetHandler:AddChatAction("ctf_respawn", ParseRespawn)
 end
 
 end

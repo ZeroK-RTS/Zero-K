@@ -25,7 +25,7 @@ end
 -- WARNING CONVERT ALL STEREO MP3/WAV INTO MONO WAV! how to do it? well google...
 -- So it's like this: ~/.spring/sounds/quake/female/dominating.wav
 
-------------------------------INTERNAL CONFIG--------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 
 local sound_mode = -1
 local sound_volume = 15
@@ -64,6 +64,8 @@ options = {
     OnChange = OptionsChanged,
   },
 }
+
+-----------------------------------------------------------------------------------------------------------------------------
 
 function widget:Initialize()
   local path = "sounds/quake/standard/dominating.wav"

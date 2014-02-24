@@ -196,8 +196,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
   LastFrag[unitID] = nil
 end
 
--- probably no need for predamaged
-function gadget:UnitPreDamaged(unitID, unitDefID, teamID, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeamID)
+-- probably no need for predamaged, testing is needed
+function gadget:UnitDamaged(unitID, unitDefID, teamID, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeamID)
   if (unitDefID ~= nil) then
     local ud = UnitDefs[unitDefID]
     if (not ud.customParams.dontcount) and (not spGetUnitRulesParam(unitID, 'wasMorphedTo')) then
