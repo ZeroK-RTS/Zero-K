@@ -1,18 +1,18 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.1.1" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.1.2" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
   return {
-    name      = "Chili CTF GUI",
+    name      = "Chili CTF GUI (part 1)",
     desc      = "GUI for Capture The Flag game mode. Version: "..version,
     author    = "Tom Fyuri",
     date      = "Feb 2014",
     license   = "GPL v2 or later",
-    layer     = 1, 
-    handler   = true, --for adding customCommand into UI
-    enabled   = true  --  loaded by default?
+    layer     = -1, 
+    handler   = false, -- for adding customCommand into UI
+    enabled   = true  -- loaded by default?
   }
 end
 
@@ -125,10 +125,7 @@ local iconhsize  = iconsize * 0.5
 local iconsize2   = 60
 local iconhsize2  = iconsize2 * 0.5
 
-local sfx_stolen = "sounds/ctf/stolen.wav"
-local sfx_return = "sounds/ctf/return.wav"
-local sfx_blue_score = "sounds/ctf/capture-blue.wav"
-local sfx_red_score = "sounds/ctf/capture-red.wav"
+local sfx_path = "sounds/ctf/"
 
 local bs,rs
 local memo_bs = -1
@@ -136,18 +133,7 @@ local memo_rs = -1 -- used in clever way to detect capture/stolen/return
 
 local CommandCenters = {}
 local Rotation = 0
-
-local CMD_DROP_FLAG = 35300
-
-local cmdDropflag = {
-  id      = CMD_DROP_FLAG,
-  type    = CMDTYPE.ICON,
-  tooltip = 'Drop flag on the ground.',
-  cursor  = 'Attack',
-  action  = 'dropflag',
-  params  = { }, 
-  texture = 'LuaUI/Images/commands/Bold/drop_flag.png',
-}
+local LastSpam = -100
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -350,15 +336,15 @@ function widget:Update(s)
 	  textColor = red;
 	}
 	blue_team:AddChild(blue_stolen)
-	if (memo_bs ~= nil) and (bs < memo_bs) then
-	  Spring.PlaySoundFile(sfx_stolen)
-	end
+-- 	if (memo_bs ~= nil) and (bs < memo_bs) then
+-- 	  --Spring.PlaySoundFile(sfx_stolen)
+-- 	end
       elseif (bf_stolen == 0) and (blue_stolen ~= nil) then
-	if (memo_bs ~= nil) and (bs == (memo_bs+1)) then
-	  Spring.PlaySoundFile(sfx_return)
-	elseif (memo_rs ~= nil) and (rs == (memo_rs+1)) then
-	  Spring.PlaySoundFile(sfx_red_score)
-	end
+-- 	if (memo_bs ~= nil) and (bs == (memo_bs+1)) then
+-- 	  --Spring.PlaySoundFile(sfx_return)
+-- 	elseif (memo_rs ~= nil) and (rs == (memo_rs+1)) then
+-- 	  --Spring.PlaySoundFile(sfx_red_score)
+-- 	end
 	blue_team:RemoveChild(blue_stolen)
 	blue_stolen = nil
       end
@@ -374,16 +360,16 @@ function widget:Update(s)
 	  fontsize = 13;
 	  textColor = green;
 	}
-	if (memo_rs ~= nil) and (rs < memo_rs) then
-	  Spring.PlaySoundFile(sfx_stolen)
-	end
+-- 	if (memo_rs ~= nil) and (rs < memo_rs) then
+-- 	  --Spring.PlaySoundFile(sfx_stolen)
+-- 	end
 	red_team:AddChild(red_stolen)
       elseif (rf_stolen == 0) and (red_stolen ~= nil) then
-	if (memo_rs ~= nil) and (rs == (memo_rs+1)) then
-	  Spring.PlaySoundFile(sfx_return)
-	elseif (memo_bs ~= nil) and (bs == (memo_bs+1)) then
-	  Spring.PlaySoundFile(sfx_blue_score)
-	end
+-- 	if (memo_rs ~= nil) and (rs == (memo_rs+1)) then
+-- 	  --Spring.PlaySoundFile(sfx_return)
+-- 	elseif (memo_bs ~= nil) and (bs == (memo_bs+1)) then
+-- 	  --Spring.PlaySoundFile(sfx_blue_score)
+-- 	end
 	red_team:RemoveChild(red_stolen)
 	red_stolen = nil
       end
@@ -750,27 +736,73 @@ function widget:MousePress(mx, my, mb)
   end
 end
 
-function widget:CommandsChanged()
-  local selectedUnits = Spring.GetSelectedUnits()
-  local customCommands = widgetHandler.customCommands
---   for _, unitID in ipairs(selectedUnits) do
-  local unitID = Spring.GetSelectedUnits()[1]
-    if (unitID) then
-    local unitDefID = Spring.GetUnitDefID(unitID)
-    local ud = UnitDefs[unitDefID]
-    if ud and ud.canMove and not(ud.canFly) then --Note: canMove include factory
-      table.insert(customCommands, cmdDropflag)
-      return
-    end
-  end 
+function CtfUIRespawn(PlayerID)
+  if (PlayerID ~= Spring.GetMyPlayerID()) then return true end
+  if (LastSpam+30 >= Spring.GetGameFrame()) then return true end
+  Spring.PlaySoundFile(sfx_path.."respawn.wav", 0.7)
+  LastSpam = Spring.GetGameFrame()
+  return true
 end
 
+function CtfUIScore(PlayerID, AllyTeam)
+  if (PlayerID ~= Spring.GetMyPlayerID()) then return true end
+  if (LastSpam+30 >= Spring.GetGameFrame()) then return true end
+  if (AllyTeam == myAllyTeam) then
+    Spring.PlaySoundFile(sfx_path.."blue_capture.wav", 0.7)
+  else
+    Spring.PlaySoundFile(sfx_path.."red_capture.wav", 0.7)
+  end
+  LastSpam = Spring.GetGameFrame()
+  return true
+end
+
+function CtfUIReturn(PlayerID, AllyTeam)
+  if (PlayerID ~= Spring.GetMyPlayerID()) then return true end
+  if (LastSpam+30 >= Spring.GetGameFrame()) then return true end
+  if (AllyTeam == myAllyTeam) then
+    Spring.PlaySoundFile(sfx_path.."blue_returned.wav", 0.7)
+  else
+    Spring.PlaySoundFile(sfx_path.."red_returned.wav", 0.7)
+  end
+  LastSpam = Spring.GetGameFrame()
+  return true
+end
+
+function CtfUIDrop(PlayerID, AllyTeam)
+  if (PlayerID ~= Spring.GetMyPlayerID()) then return true end
+  if (LastSpam+30 >= Spring.GetGameFrame()) then return true end
+  if (AllyTeam == myAllyTeam) then
+    Spring.PlaySoundFile(sfx_path.."blue_dropped.wav", 0.7)
+  else
+    Spring.PlaySoundFile(sfx_path.."red_dropped.wav", 0.7)
+  end
+  LastSpam = Spring.GetGameFrame()
+  return true
+end
+
+function CtfUISteal(PlayerID, AllyTeam)
+  if (PlayerID ~= Spring.GetMyPlayerID()) then return true end
+  if (LastSpam+30 >= Spring.GetGameFrame()) then return true end
+  if (AllyTeam == myAllyTeam) then
+    Spring.PlaySoundFile(sfx_path.."blue_taken.wav", 0.7)
+  else
+    Spring.PlaySoundFile(sfx_path.."red_taken.wav", 0.7)
+  end
+  LastSpam = Spring.GetGameFrame()
+  return true
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
   local ctf = (Spring.GetModOptions().zkmode) == "ctf"
+  
+  widgetHandler:RegisterGlobal("CtfUIRespawn", CtfUIRespawn)
+  widgetHandler:RegisterGlobal("CtfUIScore", CtfUIScore)
+  widgetHandler:RegisterGlobal("CtfUIReturn", CtfUIReturn)
+  widgetHandler:RegisterGlobal("CtfUIDrop", CtfUIDrop)
+  widgetHandler:RegisterGlobal("CtfUISteal", CtfUISteal)
   
   if (ctf == false) then
     widgetHandler:RemoveWidget()
@@ -968,6 +1000,11 @@ function widget:Shutdown()
   if (help_window) then
     help_window:Dispose()
   end
+  widgetHandler:DeregisterGlobal("CtfUIRespawn", CtfUIRespawn)
+  widgetHandler:DeregisterGlobal("CtfUIScore", CtfUIScore)
+  widgetHandler:DeregisterGlobal("CtfUIReturn", CtfUIReturn)
+  widgetHandler:DeregisterGlobal("CtfUIDrop", CtfUIDrop)
+  widgetHandler:DeregisterGlobal("CtfUISteal", CtfUISteal)
 end
 
 --------------------------------------------------------------------------------

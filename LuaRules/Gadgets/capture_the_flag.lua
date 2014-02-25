@@ -1,4 +1,4 @@
-local version = "0.1.1"
+local version = "0.1.2"
 
 function gadget:GetInfo()
   return {
@@ -67,6 +67,7 @@ Development started on 8 february 2014. First playable version could be consider
 15 Februray 2014 - 0.0.9	- CAI knows how to cap enemy flag, albeit algo is simple, run towards nearest flag base. Also CAI selfd fixed.
 15 Februray 2014 - 0.1.0	- Some options made tweakable. Fixed inablity to select different com. It's now 1 week old.
 16 February 2014 - 0.1.1	- Balance changes. Income and bonus income formula changed. It's almost nonexponential and lowered aprox. by 2. CAI can orbit drop. Possible to disable orbit drop.
+25 February 2014 - 0.1.2	- Sounds replaced with more lively ones. And the way they are played was rewritten.
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -1203,6 +1204,7 @@ function ResolveFlags(TargetAllyTeam1, TargetAllyTeam2)
       end
     end
   end
+  SendToUnsynced("ctf_respawn")
   -- done
 end
 
@@ -1220,6 +1222,7 @@ function DropFlag(allyTeam, x, y, z)
     spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, flagID)
     DroppedFlags[flagID] = { allyTeam = allyTeam, x = x, y = y, z = z, id = flagID }
     spSetUnitAlwaysVisible(flagID, true)
+    SendToUnsynced("ctf_drop", allyTeam)
   end
 end
 
@@ -1232,6 +1235,7 @@ function ReturnFlag(flagID, unitID, allyTeam, uncontest)
   spSetGameRulesParam("ctf_flags_team"..allyTeam, FlagAmount[allyTeam])
   if (uncontest) then
     ContestedTeam[allyTeam] = nil
+    SendToUnsynced("ctf_return", allyTeam)
   end
   spSetGameRulesParam("ctf_unit_stole_team"..allyTeam, 0)
   DefeatTimer[allyTeam] = TIMER_DEFEAT
@@ -1276,6 +1280,7 @@ function PickFlag(flagID, unitID, allyTeam, enemyTeam)
   if (isAI) then
     RunToBase(unitID, teamID, enemyTeam)
   end
+  SendToUnsynced("ctf_steal", AllyTeam)
 --   spEcho("Pick flag "..tostring(flagID).." "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
@@ -1292,6 +1297,7 @@ function StealFlag(unitID, allyTeam, enemyTeam)
   if (isAI) then
     RunToBase(unitID, teamID, enemyTeam)
   end
+  SendToUnsynced("ctf_steal", allyTeam)
 --   spEcho("Steal flag "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
 end
 
@@ -1306,6 +1312,7 @@ function ScoreFlag(unitID, allyTeam, enemyTeam)
 --   spEcho("Score flag "..tostring(unitID).." "..tostring(allyTeam).." "..tostring(enemyTeam).." "..tostring(spValidUnitID(unitID)))
   ContestedTeam[FlagCarrier[unitID]] = nil
   FlagCarrier[unitID] = nil
+  SendToUnsynced("ctf_score", allyTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
@@ -1671,18 +1678,56 @@ end
 
 else --------------------------------------------------------------------------------------------------- unsycned
 
--- function ParseRespawn(cmd, line, words, playerID)
---   if (#words == 4) then
---     spSendLuaRulesMsg("ctf_respawn".." "..words[1].." "..words[2].." "..words[3])
---   end
--- end
+local spGetMyPlayerID	   = Spring.GetMyPlayerID
+
+function CtfRespawn(_)
+  if (Script.LuaUI('CtfUIRespawn')) then
+    Script.LuaUI.CtfUIReturn(spGetMyPlayerID())
+  end
+end
+
+function CtfReturn(_, AllyTeam)
+  if (Script.LuaUI('CtfUIReturn')) then
+    Script.LuaUI.CtfUIReturn(spGetMyPlayerID())
+  end
+end
+
+function CtfScore(_, AllyTeam)
+  if (Script.LuaUI('CtfUIScore')) then
+    Script.LuaUI.CtfUIScore(spGetMyPlayerID(), AllyTeam)
+  end
+end
+
+function CtfDrop(_, AllyTeam)
+  if (Script.LuaUI('CtfUIDrop')) then
+    Script.LuaUI.CtfUIDrop(spGetMyPlayerID(), AllyTeam)
+  end
+end
+
+function CtfSteal(_, AllyTeam)
+  if (Script.LuaUI('CtfUISteal')) then
+    Script.LuaUI.CtfUISteal(spGetMyPlayerID(), AllyTeam)
+  end
+end
 
 function gadget:Initialize()
   if (not Spring.GetModOptions().zkmode) or (tostring(Spring.GetModOptions().zkmode) ~= "ctf") then
     gadgetHandler:RemoveGadget()
-    return
+--     return
   end
---   gadgetHandler:AddChatAction("ctf_respawn", ParseRespawn)
+  gadgetHandler:AddSyncAction("ctf_steal", CtfSteal)
+  gadgetHandler:AddSyncAction("ctf_drop", CtfDrop)
+  gadgetHandler:AddSyncAction("ctf_score", CtfScore)
+  gadgetHandler:AddSyncAction("ctf_return", CtfReturn)
+  gadgetHandler:AddSyncAction("ctf_respawn", CtfRespawn)
+end
+
+function gadget:Shutdown()
+  gadgetHandler:RemoveSyncAction("ctf_steal")
+  gadgetHandler:RemoveSyncAction("ctf_drop")
+  gadgetHandler:RemoveSyncAction("ctf_score")
+  gadgetHandler:RemoveSyncAction("ctf_return")
+  gadgetHandler:RemoveSyncAction("ctf_respawn")
 end
 
 end

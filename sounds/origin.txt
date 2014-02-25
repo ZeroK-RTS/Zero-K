@@ -18,8 +18,5 @@ nexuiz:
 talk.wav
 sparks.wav
 
-UrbanTerror:
-capture-blue.wav
-capture-red.wav
-return.wav
-stolen.wav
+Xonotic:
+entire ctf folder
