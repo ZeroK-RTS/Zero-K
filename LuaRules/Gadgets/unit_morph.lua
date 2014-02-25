@@ -103,8 +103,8 @@ include("LuaRules/Configs/customcmds.h.lua")
 --   30000 - 39999:  LuaRules
 --
 
-local CMD_MORPH_STOP = 32210
-local CMD_MORPH = 31210
+-- local CMD_MORPH_STOP = 32210 --defined in customcmds.h.lua because its easier to see from there the position of CMD_MORPH in relative to other custom command.
+-- local CMD_MORPH = 31210
 
 local MAX_MORPH = 0 --// will increase dynamically
 
@@ -243,6 +243,9 @@ local function BuildMorphDef(udSrc, morphData)
     Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Bad morph dst type: ' .. morphData.into)
     return
   else
+    if (CMD_MORPH + MAX_MORPH >= CMD_STEALTH ) then --reached next custom command ID in the list (see: customcmds.h.lua)
+	    Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Morph Command ID is overflowing/overlapping with other command.')
+	end
     local unitDef = udDst
     local newData = {}
     newData.into = udDst.id

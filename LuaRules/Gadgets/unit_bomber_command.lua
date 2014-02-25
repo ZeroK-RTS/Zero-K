@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "11 February 2014, 22 Jan 2011",
+    date      = "11 February 2014, 25 Feb 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -432,6 +432,13 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 	end
 end
 
+function GG.AircraftCrashingDown(unitID)
+	CancelAirpadReservation(unitID)
+	bomberUnitIDs[unitID] = nil
+	--note: we don't worry about user re-doing REARM cmd or CommandFallback re-doing reservation because crashing airplane do not call CommandFallback
+	--and unit_aircraft_crash.lua SetUnitNoSelect
+end
+
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	gadget:UnitDestroyed(unitID, unitDefID, oldteam)
 	gadget:UnitFinished(unitID, unitDefID, newTeam)
@@ -520,7 +527,7 @@ end
 ]]--
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD_REARM then	-- return to pad'
+	if cmdID == CMD_REARM then	-- return to pad
 		if not bomberDefs[unitDefID] then
 			return true, true	-- trying to REARM using unauthorized unit
 		end
@@ -560,7 +567,7 @@ function gadget:AllowCommand_GetWantedCommand()
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	return boolBomberDefs
+	return boolBomberDefs --gadget:AllowCommand only check bombers/gunships
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
@@ -591,6 +598,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			CancelAirpadReservation(unitID) --don't leave airpad reservation hanging, empty them when bomber is given other task
 		end
 	end
+	
 	return true
 end
 

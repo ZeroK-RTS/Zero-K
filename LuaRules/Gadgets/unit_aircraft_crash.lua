@@ -9,7 +9,7 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
---Revision 3
+--Revision 4
 --------------------------------------------------------------------------------
 -- speedups
 --------------------------------------------------------------------------------
@@ -68,6 +68,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			Spring.SetUnitSensorRadius(unitID, "los", 0)
 			Spring.SetUnitSensorRadius(unitID, "radar", 0)
 			Spring.SetUnitSensorRadius(unitID, "sonar", 0)
+			if GG.AircraftCrashingDown then
+				GG.AircraftCrashingDown(unitID) --send event to unit_bomber_command.lua to cancel any airpad reservation hold by this airplane
+			end
 		end	
 		recentDamage[unitID] = nil	-- no longer need to track this plane
 	end
