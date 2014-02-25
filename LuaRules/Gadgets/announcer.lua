@@ -92,9 +92,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 	  DeathMarkers[markerID].z = (DeathMarkers[markerID].z+z)/2
 	  DeathMarkers[markerID].y = spGetGroundHeight(DeathMarkers[markerID].x,DeathMarkers[markerID].z)
 	  DeathMarkers[markerID].time = spGetGameFrame()
-	  DeathMarkers[markerID][teamID] = true
+	  DeathMarkers[markerID].teams[teamID] = true
 	  if (attackerTeamID ~= nil) then
-	    DeathMarkers[markerID][attackerTeamID] = true
+	    DeathMarkers[markerID].teams[attackerTeamID] = true
 	  end
 	else
 	  DeathMarkers[unitID] = {
@@ -106,9 +106,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 	    time = spGetGameFrame(),
 	    teams = {}
 	  }
-	  DeathMarkers[unitID][teamID] = true
+	  DeathMarkers[unitID].teams[teamID] = true
 	  if (attackerTeamID ~= nil) then
-	    DeathMarkers[unitID][attackerTeamID] = true
+	    DeathMarkers[unitID].teams[attackerTeamID] = true
 	  end
 	end
 	if (select(6,spGetTeamInfo(teamID)) ~= select(6,spGetTeamInfo(attackerTeamID))) then
@@ -163,7 +163,7 @@ function gadget:GameFrame(n)
       local kills = data.kills
       local wasted = data.wasted
       if ((kills >= 10) and (wasted >= 900)) or (wasted >= 4500) then -- hard to get in the begining 'ey?
-	for teamID, _ in pairs(data) do
+	for teamID, _ in pairs(data.teams) do
 	  SendToUnsynced("announcer_awesome", teamID, x, y, z)
 	end
       end
