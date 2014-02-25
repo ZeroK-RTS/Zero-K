@@ -19,4 +19,4 @@ talk.wav
 sparks.wav
 
 Xonotic:
-entire ctf folder
+entire ctf & announcer folders
