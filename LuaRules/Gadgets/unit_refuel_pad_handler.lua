@@ -128,6 +128,9 @@ local function SitOnPad(unitID)
 	mcSetVelocity(unitID, 0, 0, 0)
 	mcSetPosition(unitID, px, py, pz)
 	
+	-- deactivate unit to cause the lups jets away
+	Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 0)
+	
 	local function SitLoop()
 		local landDuration = 0
 		local refuelComplete = false
@@ -184,6 +187,9 @@ local function SitOnPad(unitID)
 		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available 
 		unitMovectrled[unitID] = nil
 		landingUnit[unitID] = nil
+		
+		-- activate unit and its jets
+		Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		
 		GG.LandComplete(unitID)
 	end
