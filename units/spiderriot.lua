@@ -4,10 +4,10 @@ unitDef = {
   description            = [[Riot Spider]],
   acceleration           = 0.22,
   brakeRate              = 0.22,
-  buildCostEnergy        = 400,
-  buildCostMetal         = 400,
+  buildCostEnergy        = 280,
+  buildCostMetal         = 280,
   buildPic               = [[spideraa.png]],
-  buildTime              = 400,
+  buildTime              = 280,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -57,7 +57,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[HE_EMG]],
+      def                = [[PARTICLEBEAM]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -66,46 +66,39 @@ unitDef = {
   
   weaponDefs             = {
 
-
-    HE_EMG = {
-      name                    = [[Heavy Pulse MG]],
-      accuracy                = 350,
-      alphaDecay              = 0.7,
-      areaOfEffect            = 96,
-      burnblow                = true,
-      burst                   = 3,
-      burstrate               = 0.1,
-      craterBoost             = 0.15,
-      craterMult              = 0.3,
+    PARTICLEBEAM = {
+      name                    = [[Auto Particle Beam]],
+      beamDecay               = 0.85,
+      beamTime                = 0.01,
+      beamttl                 = 45,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       damage                  = {
-        default = 36.7,
-        planes  = 36.7,
-        subs    = 1.8,
+        default = 60,
+        subs    = 3,
       },
 
-      edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:EMG_HIT_HE]],
-      firestarter             = 70,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      intensity               = 0.7,
+      explosionGenerator      = [[custom:flash1red]],
+      fireStarter             = 100,
+      impactOnly              = true,
+      impulseFactor           = 0,
       interceptedByShieldType = 1,
-      noSelfDamage            = true,
-      range                   = 270,
-      reloadtime              = 0.52,
-      rgbColor                = [[1 0.95 0.4]],
-      separation              = 1.5,
-      soundHit                = [[weapon/cannon/emg_hit]],
-      soundStart              = [[weapon/heavy_emg]],
-      stages                  = 10,
-      targetMoveError         = 0,
+      laserFlareSize          = 7.5,
+      minIntensity            = 1,
+      pitchtolerance          = 8192,
+      range                   = 300,
+      reloadtime              = 0.33,
+      rgbColor                = [[1 0 0]],
+      soundStart              = [[weapon/laser/mini_laser]],
+      soundStartVolume        = 6,
+      thickness               = 5,
+      tolerance               = 8192,
       turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 550,
+      weaponType              = [[BeamLaser]],
     },
-
-
+	
   },
 
   featureDefs            = {
@@ -118,7 +111,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 160,
+      metal            = 112,
       object           = [[tarantula_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 160,
@@ -131,7 +124,7 @@ unitDef = {
       energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 80,
+      metal            = 56,
       object           = [[debris3x3a.s3o]],
       reclaimable      = true,
       reclaimTime      = 80,

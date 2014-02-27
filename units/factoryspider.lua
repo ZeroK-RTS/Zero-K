@@ -18,6 +18,7 @@ unitDef = {
     [[armflea]],
     [[arm_venom]],
 	[[spiderassault]],
+	[[spiderriot]],
     [[armsptk]],
     [[armcrabe]],
     [[spideraa]],
