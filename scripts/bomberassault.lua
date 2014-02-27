@@ -27,16 +27,18 @@ local bombs = 1
 include "bombers.lua"
 include "constants.lua"
 
-function script.StartMoving()
-	--Spin(turbineTop, y_axis, 8,2);
-	--Spin(turbineLeft, y_axis, 8,2);
-	--Spin(turbineRight, y_axis, -8,2);
+function script.Deactivate()
+	StopSpin(turbineTop, y_axis, 0.5);
+	StopSpin(turbineLeft, y_axis, 0.5);
+	StopSpin(turbineRight, y_axis, 0.5);
 end
 
-function script.StopMoving()
-	--StopSpin(turbineTop, y_axis, 0.5);
-	--StopSpin(turbineLeft, y_axis, 0.5);
-	--StopSpin(turbineRight, y_axis, 0.5);
+function script.Activate()
+	local px, py, pz = Spring.GetUnitPosition(unitID)
+	Spring.PlaySoundFile("sounds/misc/blowtorch.wav", 10, px, py, pz)
+	Spin(turbineTop, y_axis, 8,2);
+	Spin(turbineLeft, y_axis, 8,2);
+	Spin(turbineRight, y_axis, -8,2);
 end
 
 function script.Create()
