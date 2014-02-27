@@ -20,6 +20,7 @@ unitDef = {
 	[[corshad]],
 	[[corhurc2]],
     [[armstiletto_laser]],
+    [[bomberassault]],
     [[armcybr]],
     [[corawac]],
   },
