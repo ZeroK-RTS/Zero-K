@@ -34,17 +34,17 @@ local legLowerSpeed = legRaiseAngle/PERIOD
 
 local legForwardAngle = math.rad(20)
 local legForwardTheta = math.rad(45)
-local legForwardOffset = 0
+local legForwardOffset = math.rad(-20)
 local legForwardSpeed = legForwardAngle/PERIOD
 
-local legMiddleAngle = math.rad(20)
+local legMiddleAngle = math.rad(30)
 local legMiddleTheta = 0
 local legMiddleOffset = 0
 local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
 local legBackwardTheta = -math.rad(45)
-local legBackwardOffset = 0
+local legBackwardOffset = math.rad(30)
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
 local restore_delay = 3000
@@ -102,7 +102,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.AimFromWeapon(num)
-	return turret
+	return barrel
 end
 
 function script.QueryWeapon(num)

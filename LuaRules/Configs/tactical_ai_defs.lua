@@ -94,6 +94,7 @@ local medRangeSkirmieeArray = {
 	["commadvsupport"] = true,
 	
 	["armwar"] = true,
+	["spiderriot"] = true,
 	["armzeus"] = true,
 	["amphraider2"] = true,
 	
@@ -422,6 +423,13 @@ local behaviourConfig = {
 	
 	-- riots
 	["armwar"] = {
+		skirms = riotRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		maxSwarmLeeway = 0, 
+		skirmLeeway = 0, 
+	},
+	["spiderriot"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
