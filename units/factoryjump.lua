@@ -19,7 +19,6 @@ unitDef = {
     [[corpyro]],
 	[[slowmort]],
 	[[jumpblackhole]],
-	[[jumpblackhole2]],
     [[corcan]],
     [[corsumo]],
 	[[firewalker]],
