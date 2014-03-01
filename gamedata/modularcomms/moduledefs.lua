@@ -478,22 +478,27 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					--local id = v.customparams.idstring
+					local id = v.customparams.idstring
+					-- linear rather than exponential increase with stacking
+					local previousCount = v.customparams.burstloaders or 0
+					local baseReload = v.reloadtime / (1 + 0.7*previousCount)
 					if id == "commweapon_beamlaser" or id == "commweapon_disruptor" or id == "commweapon_slowbeam" then
 						-- v.beamtime = v.beamtime + 10 -- beamlaser has 0.1, it's in seconds
-						v.coreThickness = v.coreThickness * 3
+						v.corethickness = v.corethickness + v.corethickness/(previousCount + 1)	
 						for armorname, dmg in pairs(v.damage) do
-							v.damage[armorname] = dmg * 2
+							v.damage[armorname] = dmg + dmg/(previousCount + 1)	
 						end
 					elseif id == "commweapon_shotgun" then
-						v.burst = (v.burst or 0) + 3
+						v.burst = (v.burst or 1) + 3
 						v.sprayangle = (v.sprayangle or 0) + 256
+						v.reloadtime = v.reloadtime + baseReload * 0.7
 					else
 						v.burstrate = (v.burstrate or 0.1 )
-						v.reloadtime = v.reloadtime * 1.7
-						v.burst = (v.burst or 0) + 1
+						v.reloadtime = v.reloadtime + baseReload * 0.7
+						v.burst = (v.burst or 1) + 1
 						v.sprayangle = (v.sprayangle or 0) + 256
 					end
+					v.customparams.burstloaders = previousCount + 1
 				end
 			end,	
 	},
