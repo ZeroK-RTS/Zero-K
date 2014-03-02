@@ -231,7 +231,6 @@ local function AddPylonToGrid(unitID)
 	--check for nearby pylons
 	local ownRange = pylon[allyTeamID][unitID].linkRange
 	local list = pylonList[allyTeamID]
-	--for pid, pylonData in pairs(pylon[allyTeamID]) do
 	for i = 1, list.count do
 		local pid = list.data[i]
 		local pylonData = pylon[allyTeamID][pid]
@@ -462,25 +461,6 @@ local function DeactivatePylon(unitID)
 	end
 	
 	pylon[allyTeamID][unitID].active = false
-	
-	--pylon[allyTeamID][unitID].nearEnergy = {}
-	-- energy
-	--[[
-	for eid,_ in pairs(energyList) do
-		ai.plant[eid] = 0
-		local eX,_,eZ = spGetUnitPosition(eid)
-		-- check for nearby pylons
-		for pid, pylonData in pairs(pylon[allyTeamID]) do
-			if (pylonData.x-eX)^2 + (pylonData.z-eZ)^2 < PYLON_ENERGY_RANGESQ and pylonData.active then
-				ai.plant[eid] = 1
-				ai.grid[pylonData.gridID].plant[eid] = true
-				pylon[allyTeamID][pid].nearEnergy[eid] = true
-				break
-			end
-		end
-		
-	end
-	--]]
 end
 
 local function RemovePylon(unitID)
@@ -530,11 +510,12 @@ local function RemovePylon(unitID)
 		takenMexId[mid] = false
 		
 		local mX, _, mZ = spGetUnitPosition(mid)
-						
-		for pid, pylonData in pairs(pylon[allyTeamID]) do
+		
+		local list = pylonList[allyTeamID]
+		for i = 1, list.count do
+			local pid = list.data[i]
+			local pylonData = pylon[allyTeamID][pid]
 			if pid == mid then
-			--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2 then
-				--pylonData.mexes = pylonData.mexes+1
 				pylonData.mex[mid] = true
 				mexGridID = pylonData.gridID
 				break
@@ -791,7 +772,10 @@ function gadget:GameFrame(n)
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
 			
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
-			for unitID, pylonData in pairs(pylon[allyTeamID]) do
+			local list = pylonList[allyTeamID]
+			for i = 1, list.count do
+				local unitID = list.data[i]
+				local pylonData = pylon[allyTeamID][unitID]
 				if spValidUnitID(unitID) then
 					local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
 					local states = spGetUnitStates(unitID)
@@ -892,7 +876,10 @@ function gadget:GameFrame(n)
 			end
 			
 			--// check if pylons disable due to low grid power (eg weapons)
-			for unitID, pylonData in pairs(pylon[allyTeamID]) do
+			local list = pylonList[allyTeamID]
+			for i = 1, list.count do
+				local unitID = list.data[i]
+				local pylonData = pylon[allyTeamID][unitID]
 				if pylonData.neededLink then
 					if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
 						spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
@@ -993,7 +980,10 @@ function gadget:GameFrame(n)
 			end
 			
 			--// Update pylon tooltips
-			for unitID, pylonData in pairs(pylon[allyTeamID]) do
+			local list = pylonList[allyTeamID]
+			for i = 1, list.count do
+				local unitID = list.data[i]
+				local pylonData = pylon[allyTeamID][unitID]
 				local grid = pylonData.gridID
 				local gridEfficiency = -1
 				if grid ~= 0 then
@@ -1161,7 +1151,10 @@ local function AddMex(unitID, teamID, metalMake)
 		spCallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
 		local mexGridID = 0
 		local mX, _, mZ = spGetUnitPosition(unitID)
-		for pid, pylonData in pairs(pylon[allyTeamID]) do
+		local list = pylonList[allyTeamID]
+		for i = 1, list.count do
+			local pid = list.data[i]
+			local pylonData = pylon[allyTeamID][pid]
 			if unitID == pid then -- self OD mexes
 			--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2  then
 				--pylonData.mexes = pylonData.mexes+1
@@ -1200,8 +1193,10 @@ local function RemoveMex(unitID)
 			ai.mexMetal = ai.mexMetal - orgMetal
 			ai.mexSquaredSum = ai.mexSquaredSum - (orgMetal * orgMetal)
 		end
-		
-		for pid, pylonData in pairs(pylon[mex.allyTeamID]) do
+		local list = pylonList[mex.allyTeamID]
+		for i = 1, list.count do
+			local pid = list.data[i]
+			local pylonData = pylon[mex.allyTeamID][pid]
 			if (pylonData.mex[unitID] ~= nil) then
 				--pylonData.mexes = pylonData.mexes - 1
 				pylonData.mex[unitID] = nil
@@ -1224,42 +1219,6 @@ local function RemoveMex(unitID)
 	end
 
 end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
--- ENERGY
---[[
-local function AddEnergy(unitID, unitDefID, unitTeam)
-	local allyTeamID = spGetUnitAllyTeam(unitID)
-	local ai = allyTeamInfo[allyTeamID]
-	ai.plant[unitID] = 0
-	
-	-- check for nearby pylons
-	local eX,_,eZ = spGetUnitPosition(unitID)
-	for pid, pylonData in pairs(pylon[allyTeamID]) do
-		if (pylonData.x-eX)^2 + (pylonData.z-eZ)^2 < PYLON_ENERGY_RANGESQ and pylonData.active then
-			ai.plant[unitID] = 1
-			ai.grid[pylonData.gridID].plant[unitID] = true
-			pylon[allyTeamID][pid].nearEnergy[unitID] = true
-			break
-		end
-	end
-end
-
-local function RemoveEnergy(unitID, unitDefID, unitTeam)
-	local allyTeamID = spGetUnitAllyTeam(unitID)
-	local ai = allyTeamInfo[allyTeamID]
-	ai.plant[unitID] = nil
-	
-	-- check for nearby pylons
-	for pid, pylonData in pairs(pylon[allyTeamID]) do
-		if (pylonData.nearEnergy[unitID] ~= nil) then
-			pylonData.nearEnergy[unitID] = nil
-			ai.grid[pylonData.gridID].plant[unitID] = nil
-		end
-	end
-end
---]]
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
