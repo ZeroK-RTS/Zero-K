@@ -128,6 +128,8 @@ local lowPowerUnits = {inner = {count = 0, units = {}}}
 
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, nearPlant[unitID],nearPylon[unitID], color}
 
+local pylonGridQueue = false -- pylonGridQueue[unitID] = true
+
 local unitPaybackTeamID = {} -- indexed by unitID, tells unit which team gets it's payback.
 local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 
@@ -237,7 +239,14 @@ local function AddPylonToGrid(unitID)
 			end
 		end
 	end
-	
+	--[[
+	for i = 1, 10 do
+		local j = 1
+		for pid, pylonData in pairs(pylon[allyTeamID]) do
+			j = j + 1
+		end
+	end
+	--]]
 	if attachedGrids == 0 then -- create a new grid
 		local foundSpot = false
 		for i = 1, ai.grids  do
@@ -313,6 +322,19 @@ local function AddPylonToGrid(unitID)
 	end--]]
 end
 
+local function QueueAddPylonToGrid(unitID)
+	if not pylonGridQueue then
+		pylonGridQueue = {}
+	end
+	pylonGridQueue[unitID] = true
+end
+
+local function RemovePylonsFromGridQueue(unitID)
+	if pylonGridQueue then
+		pylonGridQueue[unitID] = nil
+	end
+end
+
 local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local pX,_,pZ = spGetUnitPosition(unitID)
@@ -364,7 +386,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	end
 	--]]
 	
-	AddPylonToGrid(unitID)
+	QueueAddPylonToGrid(unitID)
 end
 
 local function DestoryGrid(allyTeamID,oldGridID)
@@ -411,27 +433,32 @@ local function ReactivatePylon(unitID)
 	end
 	--]]
 	
-	AddPylonToGrid(unitID)
+	QueueAddPylonToGrid(unitID)
 end
 
 local function DeactivatePylon(unitID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	
+	RemovePylonsFromGridQueue(unitID)
+	
 	local oldGridID = pylon[allyTeamID][unitID].gridID
-	
-	local pylonList = ai.grid[oldGridID].pylon
-	local energyList = pylon[allyTeamID][unitID].nearEnergy
-	
-	DestoryGrid(allyTeamID,oldGridID)
-	
-	pylon[allyTeamID][unitID].active = false
-	
-	for pid,_ in pairs(pylonList) do
-		if (pid ~= unitID) then
-			AddPylonToGrid(pid)
+	if oldGridID ~= 0 then
+		local pylonList = ai.grid[oldGridID].pylon
+		local energyList = pylon[allyTeamID][unitID].nearEnergy
+		
+		DestoryGrid(allyTeamID,oldGridID)
+		
+		
+		
+		for pid,_ in pairs(pylonList) do
+			if (pid ~= unitID) then
+				QueueAddPylonToGrid(pid)
+			end
 		end
 	end
+	
+	pylon[allyTeamID][unitID].active = false
 	
 	--pylon[allyTeamID][unitID].nearEnergy = {}
 	-- energy
@@ -477,7 +504,7 @@ local function RemovePylon(unitID)
 		pylon[allyTeamID][unitID] = nil
 		for pid,_ in pairs(pylonList) do
 			if (pid ~= unitID) then
-				AddPylonToGrid(pid)
+				QueueAddPylonToGrid(pid)
 			end
 		end
 		
@@ -533,6 +560,15 @@ local function RemovePylon(unitID)
 		end
 	end
 	
+end
+
+local function AddPylonsInQueueToGrid()
+	if pylonGridQueue then
+		for pid,_ in pairs(pylonGridQueue) do
+			AddPylonToGrid(pid)
+		end
+		pylonGridQueue =false
+	end
 end
 
 -------------------------------------------------------------------------------------
@@ -774,6 +810,8 @@ function gadget:GameFrame(n)
 					end
 				end
 			end
+			
+			AddPylonsInQueueToGrid()
 			
 			local allyE = 0
 			local allyEExcess = 0

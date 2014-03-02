@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
-    name	= "Announcer",
-    desc	= "Zero-K announcer, reacts to ingame events and broadcast them to widgets. v1.1.",
+    name	= "Send Enemy Death",
+    desc	= "Sends the destruction of visible, enemy units to widget space.",
     author	= "Tom Fyuri",
     date	= "2014",
     license	= "GPL v2 or later",
@@ -41,7 +41,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
   for i=1,#AllyTeams do
     local allyTeam = AllyTeams[i]
     if (isUnitVisible(unitID, allyTeam)) then
-      SendToUnsynced("announcerUnitDestroyed", allyTeam, unitID, attackerID) -- do not broadcast defids! widgets may figure this out on their own!
+      SendToUnsynced("unitDiedInLos", allyTeam, unitID, attackerID) -- do not broadcast defids! widgets may figure this out on their own!
     end
   end
 end
@@ -55,18 +55,18 @@ local spGetMyPlayerID	   = Spring.GetMyPlayerID
 -- this reminds me of FPS where you can see who killed who at top-right of the screen
 local function UnitDead(_, allyTeam, unitID, attackerID)
   local myAllyTeam = spGetLocalAllyTeamID()
-  if (Script.LuaUI('AnnouncerUnitDestroyed') and (myAllyTeam == allyTeam)) then
-    Script.LuaUI.AnnouncerUnitDestroyed(spGetMyPlayerID(),unitID,attackerID)
+  if (Script.LuaUI('unitDiedInLos') and (myAllyTeam == allyTeam)) then
+    Script.LuaUI.unitDiedInLos(spGetMyPlayerID(),unitID,attackerID)
   end
 end
 
 function gadget:Initialize()
-  gadgetHandler:AddSyncAction("announcerUnitDestroyed", UnitDead)
+  gadgetHandler:AddSyncAction("unitDiedInLos", UnitDead)
 end
 
 
 function gadget:Shutdown()
-  gadgetHandler:RemoveSyncAction("announcerUnitDestroyed")
+  gadgetHandler:RemoveSyncAction("unitDiedInLos")
 end
 
 end

@@ -240,9 +240,9 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-  widgetHandler:RegisterGlobal("AnnouncerUnitDestroyed", AnnouncerUnitDestroyed)
+  widgetHandler:RegisterGlobal("unitDiedInLos", AnnouncerUnitDestroyed)
 end
 
 function widget:Shutdown()
-  widgetHandler:DeregisterGlobal("AnnouncerUnitDestroyed", AnnouncerUnitDestroyed)
+  widgetHandler:DeregisterGlobal("unitDiedInLos", AnnouncerUnitDestroyed)
 end
