@@ -127,6 +127,7 @@ local mexesToAdd = {}
 local lowPowerUnits = {inner = {count = 0, units = {}}}
 
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, nearPlant[unitID],nearPylon[unitID], color}
+local pylonList = {} -- pylon[allyTeamID] = {data = {[1] = unitID, [2] = unitID, ...}, count}
 
 local pylonGridQueue = false -- pylonGridQueue[unitID] = true
 
@@ -140,6 +141,7 @@ do
   for i=1,#allyTeamList do
 	local allyTeamID = allyTeamList[i]
 	pylon[allyTeamID] = {}
+	pylonList[allyTeamID] = {data = {}, count = 0}
 	mexes[allyTeamID] = {}
 	mexes[allyTeamID][0] = {}
 	
@@ -228,7 +230,11 @@ local function AddPylonToGrid(unitID)
 	
 	--check for nearby pylons
 	local ownRange = pylon[allyTeamID][unitID].linkRange
-	for pid, pylonData in pairs(pylon[allyTeamID]) do
+	local list = pylonList[allyTeamID]
+	--for pid, pylonData in pairs(pylon[allyTeamID]) do
+	for i = 1, list.count do
+		local pid = list.data[i]
+		local pylonData = pylon[allyTeamID][pid]
 		if pid ~= unitID and (pylonData.x-pX)^2 + (pylonData.z-pZ)^2 <= (pylonData.linkRange+ownRange)^2  and pylonData.gridID ~= 0 and pylonData.active then
 			pylon[allyTeamID][unitID].nearPylon[pid] = true
 			if not attachedGridID[pylonData.gridID] then
@@ -239,14 +245,7 @@ local function AddPylonToGrid(unitID)
 			end
 		end
 	end
-	--[[
-	for i = 1, 10 do
-		local j = 1
-		for pid, pylonData in pairs(pylon[allyTeamID]) do
-			j = j + 1
-		end
-	end
-	--]]
+	
 	if attachedGrids == 0 then -- create a new grid
 		local foundSpot = false
 		for i = 1, ai.grids  do
@@ -355,6 +354,12 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 		active = true,
 	}
 	
+	local list = pylonList[allyTeamID]
+	list.count = list.count + 1
+	list.data[list.count] = unitID
+	
+	pylon[allyTeamID][unitID].listID = list.count
+	
 	-- check for mexes
 	if unitOverdrive then 
 		for mid, orgMetal in pairs(mexes[allyTeamID][0]) do
@@ -449,8 +454,6 @@ local function DeactivatePylon(unitID)
 		
 		DestoryGrid(allyTeamID,oldGridID)
 		
-		
-		
 		for pid,_ in pairs(pylonList) do
 			if (pid ~= unitID) then
 				QueueAddPylonToGrid(pid)
@@ -487,6 +490,8 @@ local function RemovePylon(unitID)
 		return
 	end
 	
+	RemovePylonsFromGridQueue(unitID)
+	
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	
@@ -495,38 +500,26 @@ local function RemovePylon(unitID)
 	
 	local mexList = pylon[allyTeamID][unitID].mex
 	
-	if activeState then
+	if activeState and oldGridID ~= 0 then
 		local pylonList = ai.grid[oldGridID].pylon	
 		local energyList = pylon[allyTeamID][unitID].nearEnergy
 	
 		DestoryGrid(allyTeamID,oldGridID)
 		
-		pylon[allyTeamID][unitID] = nil
 		for pid,_ in pairs(pylonList) do
 			if (pid ~= unitID) then
 				QueueAddPylonToGrid(pid)
 			end
-		end
-		
-		-- energy
-		--[[
-		for eid,_ in pairs(energyList) do
-			ai.plant[eid] = 0
-			local eX,_,eZ = spGetUnitPosition(eid)
-			-- check for nearby pylons
-			for pid, pylonData in pairs(pylon[allyTeamID]) do
-				if (pylonData.x-eX)^2 + (pylonData.z-eZ)^2 < PYLON_ENERGY_RANGESQ  and pylonData.active then
-					ai.plant[eid] = 1
-					ai.grid[pylonData.gridID].plant[eid] = true
-					pylon[allyTeamID][pid].nearEnergy[eid] = true
-					break
-				end
-			end
-		end
-		--]]
-	else
-		pylon[allyTeamID][unitID] = nil
+		end	
 	end
+	
+	local list = pylonList[allyTeamID]
+	local listID = pylon[allyTeamID][unitID].listID
+	list.data[listID] = list.data[list.count]
+	pylon[allyTeamID][list.data[listID]].listID = listID
+	list.data[list.count] = nil
+	list.count = list.count - 1
+	pylon[allyTeamID][unitID] = nil
 	
 	-- mexes
 	for mid,_ in pairs(mexList) do
