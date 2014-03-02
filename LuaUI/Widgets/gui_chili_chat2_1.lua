@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.915 Chili Chat Console.",
+    desc      = "v0.916 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -170,6 +170,8 @@ local DiffTimers = Spring.DiffTimers
 
 options_path = "Settings/HUD Panels/Chat/Console"
 options_order = {
+	'lblError',
+	'error_opengl_source',	
 	
 	'lblGeneral',
 	'mousewheel', 
@@ -194,12 +196,6 @@ options_order = {
 	
 	'lblDedupe',
 	'dedupe_messages', 'dedupe_points','color_dup',
-	
-	'lblError',
-	'error_opengl_source',	
-	
-	
-	
 }
 
 --------------------------------------------------------------------------------
@@ -214,19 +210,20 @@ end
 
 options = {
 	
+	lblError = {name='Error Filter', type='label'},
 	lblFilter = {name='Filtering', type='label', advanced = true},
 	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
 	lblHilite = {name='Highlighting', type='label'},
 	lblDedupe = {name='De-Duplication', type='label'},
 	lblGeneral = {name='General Settings', type='label'},
-	lblError = {name='Error Filter', type='label'},
 	
 	error_opengl_source = {
 		name = "Filter out \'Error: OpenGL: source\' error",
 		type = 'bool',
-		value = false,
-		desc = "Block \'Error: OpenGL: source\' error spam in Spring 91 for Intel Mesa driver.",
+		value = true,
+		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
+		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 	},
 	
 	text_height = {
