@@ -121,8 +121,7 @@ local takenMexId = {} -- mex ids that are taken by disabled pylons
 local notDestroyed = {}
 
 local mexes = {}   -- mexes[teamID][gridID][unitID] == mexMetal
-local mexByID = {}
-local mexesToAdd = {}
+local mexByID = {} -- mexByID[unitID] = {gridID, allyTeamID, refundTeamID, refundTime}
 
 local lowPowerUnits = {inner = {count = 0, units = {}}}
 

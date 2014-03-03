@@ -433,6 +433,10 @@ local icontypes = {
     bitmap='icons/spiderriot.dds',
     size=1.8,
   },
+  spiderriotspecial = {
+    bitmap='icons/spiderriotspecial.png',
+    size=1.8,
+  },
   spiderassault = {
     bitmap='icons/spiderassault.dds',
     size=1.8,
