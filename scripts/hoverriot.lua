@@ -13,8 +13,6 @@ local barrel = piece 'barrel'
 
 include "constants.lua"
 
-local wobble = true
-
 -- Signal definitions
 local SIG_MOVE = 2
 local SIG_AIM = 4
@@ -23,56 +21,42 @@ local RESTORE_DELAY = 3000
 
 local function WobbleUnit()
 	while true do
-		if  wobble == true  then
-			Move( base , y_axis, 0.800000 , 1.20000 )
-		end
-		if  wobble == false  then
-			Move( base , y_axis, -0.800000 , 1.20000 )
-		end
-		wobble = not wobble
-		Sleep( 750)
+		Move( base , y_axis, 0.8 , 1.2)
+		Sleep(750)
+		Move( base , y_axis, -0.80 , 1.2)
+		Sleep(750)
 	end
 end
 
-local function RockUnit(anglex, anglez)
-	Turn( base , x_axis, math.rad(anglex ), math.rad(50.000000) )
-	Turn( base , z_axis, math.rad(-(anglez )), math.rad(50.000000) )
+function script.HitByWeapon(x, z)
+	Turn( base , z_axis, math.rad(-z), math.rad(105))
+	Turn( base , x_axis, math.rad(x ), math.rad(105))
 	WaitForTurn(base, z_axis)
 	WaitForTurn(base, x_axis)
-	Turn( base , z_axis, math.rad(-(0.000000)), math.rad(20.000000) )
-	Turn( base , x_axis, 0, math.rad(20.000000) )
-end
-
-function script.HitByWeapon(Func_Var_1, Func_Var_2)
-	Turn( base , z_axis, math.rad(-(Func_Var_2 )), math.rad(105.000000) )
-	Turn( base , x_axis, math.rad(Func_Var_1 ), math.rad(105.000000) )
-	WaitForTurn(base, z_axis)
-	WaitForTurn(base, x_axis)
-	Turn( base , z_axis, math.rad(-(0.000000)), math.rad(30.000000) )
-	Turn( base , x_axis, 0, math.rad(30.000000) )
+	Turn( base , z_axis, 0, math.rad(30))
+	Turn( base , x_axis, 0, math.rad(30))
 end
 
 local function MoveScript()
 	while true do 
 		if math.random() < 0.5  then
-		
-			EmitSfx( wake1,  5 )
-			EmitSfx( wake3,  5 )
-			EmitSfx( wake5,  5 )
-			EmitSfx( wake7,  5 )
-			EmitSfx( wake1,  3 )
-			EmitSfx( wake3,  3 )
-			EmitSfx( wake5,  3 )
-			EmitSfx( wake7,  3 )
+			EmitSfx(wake1, 5)
+			EmitSfx(wake3, 5)
+			EmitSfx(wake5, 5)
+			EmitSfx(wake7, 5)
+			EmitSfx(wake1, 3)
+			EmitSfx(wake3, 3)
+			EmitSfx(wake5, 3)
+			EmitSfx(wake7, 3)
 		else
-			EmitSfx( wake2,  5 )
-			EmitSfx( wake4,  5 )
-			EmitSfx( wake6,  5 )
-			EmitSfx( wake8,  5 )
-			EmitSfx( wake2,  3 )
-			EmitSfx( wake4,  3 )
-			EmitSfx( wake6,  3 )
-			EmitSfx( wake8,  3 )
+			EmitSfx(wake2, 5)
+			EmitSfx(wake4, 5)
+			EmitSfx(wake6, 5)
+			EmitSfx(wake8, 5)
+			EmitSfx(wake2, 3)
+			EmitSfx(wake4, 3)
+			EmitSfx(wake6, 3)
+			EmitSfx(wake8, 3)
 		end
 	
 		EmitSfx( ground1,  1024+0 )
@@ -81,8 +65,10 @@ local function MoveScript()
 end
 
 function script.Create()
-	Hide( flare)
-	Hide( ground1)
+	Hide(flare)
+	Hide(ground1)
+	Move(ground1, x_axis, 24.2)
+	Move(ground1, y_axis, -8)
 	StartThread(SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
