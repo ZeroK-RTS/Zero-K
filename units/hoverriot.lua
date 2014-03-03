@@ -48,6 +48,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[hoverriot.s3o]],
+  script              = [[hoverriot.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
@@ -89,7 +90,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 35,
+        default = 28,
         subs    = 1.75,
       },
 
