@@ -85,32 +85,34 @@ local riotRangeSkirmieeArray = {
 	["dante"] = true,
 }
 
-local medRangeSkirmieeArray = {
+local lowMedRangeSkirmieeArray = {
 	["armcom"] = true,
 	["armadvcom"] = true,
+
+	["armwar"] = true,
+	["hoverassault"] = true,
+	["arm_venom"] = true,
+	
+	["cormak"] = true,
+	["corthud"] = true,
+	["corraid"] = true,
+}
+
+local medRangeSkirmieeArray = {
 	["corcom"] = true,
 	["coradvcom"] = true,
 	["commsupport"] = true,
 	["commadvsupport"] = true,
 	
-	["armwar"] = true,
 	["spiderriot"] = true,
 	["armzeus"] = true,
 	["amphraider2"] = true,
 	
-	["arm_venom"] = true,
 	["spiderassault"] = true,
-	
-	["corraid"] = true,
 	["corlevlr"] = true,
-	
 	
 	["hoverriot"] = true,
     ["shieldfelon"] = true,
-	["hoverassault"] = true,
-	
-	["cormak"] = true,
-	["corthud"] = true,
 
 	["correap"] = true,
 	["corgol"] = true,
@@ -151,7 +153,8 @@ local artyRangeSkirmieeArray = {
 
 merge(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
 merge(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
-merge(medRangeSkirmieeArray,riotRangeSkirmieeArray)
+merge(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
+merge(medRangeSkirmieeArray, lowMedRangeSkirmieeArray)
 merge(longRangeSkirmieeArray,medRangeSkirmieeArray)
 merge(artyRangeSkirmieeArray,longRangeSkirmieeArray)
 
@@ -430,7 +433,7 @@ local behaviourConfig = {
 		skirmLeeway = 0, 
 	},
 	["spiderriot"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 0, 
@@ -453,7 +456,7 @@ local behaviourConfig = {
 		skirmLeeway = 50, 
 	},
 	["corlevlr"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 0, 
@@ -461,7 +464,7 @@ local behaviourConfig = {
 		stoppingDistance = 5
 	},
     ["shieldfelon"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 0, 
@@ -469,7 +472,7 @@ local behaviourConfig = {
 		stoppingDistance = 5
 	},
 	["hoverriot"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 0, 
@@ -477,7 +480,7 @@ local behaviourConfig = {
 		stoppingDistance = 5
 	},
 	["tawf114"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 0, 
@@ -496,7 +499,7 @@ local behaviourConfig = {
 		
 	--assaults
 	["armzeus"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 30, 
@@ -512,7 +515,7 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},
 	["spiderassault"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 50, 
@@ -520,7 +523,7 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},
 	["dante"] = {
-		skirms = riotRangeSkirmieeArray, 
+		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		skirmLeeway = 40, 
