@@ -50,6 +50,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[lotustest2.s3o]],
+  script                        = [[corllt.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
@@ -91,7 +92,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 9.4,
+        default = 7.52,
         subs    = 0.5,
       },
 
