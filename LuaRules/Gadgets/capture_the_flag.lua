@@ -186,7 +186,7 @@ local MAX_Z_DIFFERENCE = 1400 -- no capturing from space lol
 local FLAG_AMOUNT_INIT = floor(tonumber(modOptions.ctf_flags or 4))
 local ME_BONUS = function(i) return (sqrt(i)*(1.05^i)) end -- income per player, is turned into constant on gamestart, see http://i.imgur.com/RkoedXl.png
 local ME_BONUS_C = {} -- this one fills in automatically from function above on gamestart, it's income per TEAM, NOT PER PLAYER!
-local ME_BONUS_MULT = tonumber(modOptions.ctf_inc_mult or 1.0)
+local ME_BONUS_MULT = tonumber(modOptions.ctf_inc_mult or 0)
 local ME_BONUS_DELAY = 1920 -- 1 minute, this will be multiplied by player amount, so every DELAY minutes centres upgrade
 local ME_CENTER_UP_MAX = 3 -- 3 upgrades max
 local ME_CENTER_BONUS_INIT = 0.125 -- for every level the bonus is doubled... read below ME_CENTER_CURRENT_BONUS
@@ -202,7 +202,7 @@ local MERGE_DIST = 450 -- spawn positions below 450 dist? merge them!
 local MERGE_DIST_SQ = MERGE_DIST*MERGE_DIST
 local CC_TOO_NEAR = 450
 local CC_TOO_NEAR_SQ = CC_TOO_NEAR*CC_TOO_NEAR
-local COM_DROP_ENABLED = Spring.GetModOption("ctf_orbit_drop", true, "1")
+local COM_DROP_ENABLED = (tonumber(modOptions.ctf_orbit_drop) == 1)
 -- NOTE maybe it's better to simply make centers behave like mexes so you may connect them to OD grid...
 
 local energy_mult = 1.0 -- why not obey them too
@@ -1663,7 +1663,7 @@ end
 --//------------------ Core -- BEGIN
 
 function gadget:Initialize()
-  if not modOptions.ctf_enabled then
+  if not (tonumber(modOptions.ctf_enabled) == 1) then
     gadgetHandler:RemoveGadget()
   end
 end
@@ -1711,9 +1711,8 @@ function CtfSteal(_, AllyTeam)
 end
 
 function gadget:Initialize()
-  if not modOptions.ctf_enabled then
+  if not (tonumber(modOptions.ctf_enabled) == 1) then
     gadgetHandler:RemoveGadget()
---     return
   end
   gadgetHandler:AddSyncAction("ctf_steal", CtfSteal)
   gadgetHandler:AddSyncAction("ctf_drop", CtfDrop)
