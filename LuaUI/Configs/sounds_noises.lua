@@ -128,6 +128,14 @@ local sounds = {
 			[1] = "spider_select",
 		},
 	},
+	spiderriot = {
+		ok = {
+			[1] = "spider_move",
+		},
+		select = {
+			[1] = "spider_select",
+		},
+	},
 	arm_venom = {
 		ok = {
 			[1] = "spider_move",

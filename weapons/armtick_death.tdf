@@ -1,7 +1,7 @@
 [ARMTICK_DEATH]
 {
   name=EMPboom;
-  areaofeffect=320;
+  areaofeffect=352;
   commandfire=1;
   craterboost=0;
   cratermult=0;

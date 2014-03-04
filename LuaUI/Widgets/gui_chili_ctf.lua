@@ -424,7 +424,7 @@ function widget:Update(s)
 					fontsize = 13;
 					textColor = color;
 				}
-				if (blue_sd + 6 > TIMER_DEFEAT or blue_sd < 10) and blue_sd > 1  then
+				if (blue_sd + 6 > TIMER_DEFEAT or blue_sd < 10) and blue_sd >= 1  then
 					otherText = "You have no flags! Defeat in " .. GetTimeFormatted(blue_sd)
 				end
 				blue_team:AddChild(blue_defeat)
@@ -438,7 +438,7 @@ function widget:Update(s)
 				end
 				blue_defeat:SetCaption(GetTimeFormatted(blue_sd))
 				blue_defeat.font:SetColor(color)
-				if (blue_sd + 6 > TIMER_DEFEAT or blue_sd < 10) and blue_sd > 1 then
+				if (blue_sd + 6 > TIMER_DEFEAT or blue_sd < 10) and blue_sd >= 1 then
 					otherText = "You have no flags! Defeat in " .. GetTimeFormatted(blue_sd)
 				end
 			end
@@ -458,7 +458,7 @@ function widget:Update(s)
 					fontsize = 13;
 					textColor = color;
 				}
-				if (red_sd + 6 > TIMER_DEFEAT or red_sd < 10) and red_sd > 1 then
+				if (red_sd + 6 > TIMER_DEFEAT or red_sd < 10) and red_sd >= 1 then
 					otherText = "You have all the flags! Victory in " .. GetTimeFormatted(red_sd)
 				end
 				red_team:AddChild(red_defeat)
@@ -472,7 +472,7 @@ function widget:Update(s)
 				end
 				red_defeat:SetCaption(GetTimeFormatted(red_sd))
 				red_defeat.font:SetColor(color)
-				if (red_sd + 6 > TIMER_DEFEAT or red_sd < 10) and red_sd > 1 then
+				if (red_sd + 6 > TIMER_DEFEAT or red_sd < 10) and red_sd >= 1 then
 					otherText = "You have all the flags! Victory in " .. GetTimeFormatted(red_sd)
 				end
 			end
