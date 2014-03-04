@@ -745,7 +745,6 @@ function widget:DrawScreen()
 		--end
 		glPopMatrix()
 	elseif otherText then
-Spring.Echo("bla")
 		glPushMatrix()
 		glTranslate((vsx * 0.5), (vsy * 0.5) + 50, 0)
 		glScale(1.5, 1.5, 1)
