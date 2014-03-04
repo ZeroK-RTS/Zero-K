@@ -1663,7 +1663,7 @@ end
 --//------------------ Core -- BEGIN
 
 function gadget:Initialize()
-  if (not modOptions.zkmode) or (tostring(modOptions.zkmode) ~= "ctf") then
+  if not modOptions.ctf_enabled then
     gadgetHandler:RemoveGadget()
   end
 end
@@ -1711,7 +1711,7 @@ function CtfSteal(_, AllyTeam)
 end
 
 function gadget:Initialize()
-  if (not Spring.GetModOptions().zkmode) or (tostring(Spring.GetModOptions().zkmode) ~= "ctf") then
+  if not modOptions.ctf_enabled then
     gadgetHandler:RemoveGadget()
 --     return
   end

@@ -54,11 +54,6 @@ local options = {
 	name = 'Lava Rising',
 	desc = 'Endlessly rising lava!  Fiery fun for the whole family!',
       },
-      {
-	key  = 'ctf',
-	name = 'Capture The Flag',
-	desc = 'Rob enemy base from all flags and watch them selfd!',
-      },
     },
   },
   {
@@ -141,6 +136,14 @@ local options = {
     name   = 'Capture The Flag Settings',
     desc   = 'Settings for Capture The Flag mode.',
     type   = 'section',
+  },
+  {
+      key='ctf_enabled',
+      name='Enable CTF Mode',
+      desc='Tick to enable Capture the Flag mode.',
+      type='bool',
+      def = false,
+      section='ctf',
   },
   {
       key='ctf_flags',
