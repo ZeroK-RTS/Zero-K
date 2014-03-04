@@ -5,13 +5,12 @@ local version = "0.1.2" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
 	return {
-	name		= "Chili CTF GUI (part 1)",
+	name		= "Chili CTF GUI",
 	desc		= "GUI for Capture The Flag game mode. Version: "..version,
 	author	= "Tom Fyuri",
 	date		= "Feb 2014",
 	license	 = "GPL v2 or later",
 	layer	 = -1, 
-	handler	 = true, -- for adding customCommand into UI
 	enabled	 = true	-- loaded by default?
 	}
 end
@@ -138,39 +137,23 @@ local memo_rs = -1 -- used in clever way to detect capture/stolen/return
 
 local CommandCenters = {}
 local Rotation = 0
-local LastSpam = -100
-
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local cmdDropflag = {
-  id      = CMD_DROP_FLAG,
-  type    = CMDTYPE.ICON,
-  tooltip = 'Drop flag on the ground.',
-  cursor  = 'Attack',
-  action  = 'dropflag',
-  params  = {}, 
-  texture = 'LuaUI/Images/commands/Bold/drop_flag.png',
+options_path = 'Settings/Audio/Capture The Flag'
+options_order = { 'volume'}
+options = {
+	volume = {
+		name = 'Notification Volume',
+		type = "number", 
+		value = 1, 
+		min = 0,
+		max = 20,
+		step = 0.5,
+	},
 }
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function widget:CommandsChanged()
-	local selectedUnits = Spring.GetSelectedUnits()
-	local customCommands = widgetHandler.customCommands
-	local unitID = Spring.GetSelectedUnits()[1]
-	if (unitID) then
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		local ud = UnitDefs[unitDefID]
-		if ud and ud.canMove and not(ud.canFly) then --Note: canMove include factory
-			table.insert(customCommands, cmdDropflag)
-			return
-		end
-	end 
-end
+local LastSpam = -100
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -807,6 +790,8 @@ function widget:MousePress(mx, my, mb)
 	end
 	end
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function CtfUIRespawn(PlayerID)
 	if (PlayerID ~= Spring.GetMyPlayerID()) then 
@@ -815,7 +800,7 @@ function CtfUIRespawn(PlayerID)
 	if (LastSpam+30 >= Spring.GetGameFrame()) then 
 		return true 
 	end
-	Spring.PlaySoundFile(sfx_path.."respawn.wav", 0.7)
+	Spring.PlaySoundFile(sfx_path.."respawn.wav", options.volume.value)
 	LastSpam = Spring.GetGameFrame()
 	return true
 end
@@ -828,9 +813,9 @@ function CtfUIScore(PlayerID, AllyTeam)
 		return true 
 	end
 	if (AllyTeam == myAllyTeam) then
-		Spring.PlaySoundFile(sfx_path.."blue_capture.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."blue_capture.wav", options.volume.value)
 	else
-		Spring.PlaySoundFile(sfx_path.."red_capture.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."red_capture.wav", options.volume.value)
 	end
 	LastSpam = Spring.GetGameFrame()
 	return true
@@ -844,9 +829,9 @@ function CtfUIReturn(PlayerID, AllyTeam)
 		return true 
 	end
 	if (AllyTeam == myAllyTeam) then
-		Spring.PlaySoundFile(sfx_path.."blue_returned.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."blue_returned.wav", options.volume.value)
 	else
-		Spring.PlaySoundFile(sfx_path.."red_returned.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."red_returned.wav", options.volume.value)
 	end
 	LastSpam = Spring.GetGameFrame()
 	return true
@@ -860,9 +845,9 @@ function CtfUIDrop(PlayerID, AllyTeam)
 		return true
 	end
 	if (AllyTeam == myAllyTeam) then
-		Spring.PlaySoundFile(sfx_path.."blue_dropped.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."blue_dropped.wav", options.volume.value)
 	else
-		Spring.PlaySoundFile(sfx_path.."red_dropped.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."red_dropped.wav", options.volume.value)
 	end
 	LastSpam = Spring.GetGameFrame()
 	return true
@@ -876,9 +861,9 @@ function CtfUISteal(PlayerID, AllyTeam)
 		return true 
 	end
 	if (AllyTeam == myAllyTeam) then
-		Spring.PlaySoundFile(sfx_path.."blue_taken.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."blue_taken.wav", options.volume.value)
 	else
-		Spring.PlaySoundFile(sfx_path.."red_taken.wav", 0.7)
+		Spring.PlaySoundFile(sfx_path.."red_taken.wav", options.volume.value)
 	end
 	LastSpam = Spring.GetGameFrame()
 	return true
@@ -1080,6 +1065,12 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	widgetHandler:DeregisterGlobal("CtfUIRespawn", CtfUIRespawn)
+	widgetHandler:DeregisterGlobal("CtfUIScore", CtfUIScore)
+	widgetHandler:DeregisterGlobal("CtfUIReturn", CtfUIReturn)
+	widgetHandler:DeregisterGlobal("CtfUIDrop", CtfUIDrop)
+	widgetHandler:DeregisterGlobal("CtfUISteal", CtfUISteal)
+	
 	if (status_window) then
 		status_window:Dispose()
 	end
@@ -1092,11 +1083,6 @@ function widget:Shutdown()
 	if (help_window) then
 		help_window:Dispose()
 	end
-	widgetHandler:DeregisterGlobal("CtfUIRespawn", CtfUIRespawn)
-	widgetHandler:DeregisterGlobal("CtfUIScore", CtfUIScore)
-	widgetHandler:DeregisterGlobal("CtfUIReturn", CtfUIReturn)
-	widgetHandler:DeregisterGlobal("CtfUIDrop", CtfUIDrop)
-	widgetHandler:DeregisterGlobal("CtfUISteal", CtfUISteal)
 end
 
 --------------------------------------------------------------------------------

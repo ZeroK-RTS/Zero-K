@@ -6,7 +6,7 @@ local versionNumber = "1.1.4"
 function widget:GetInfo()
 	return {
 	name      = "Voices",
-	desc	= "[v" .. string.format("%s", versionNumber ) .. "] Unit replies and notifications",
+	desc	  = "[v" .. string.format("%s", versionNumber ) .. "] Unit replies and notifications",
 	author    = "quantum",
 	date      = "1/7/2007",
 	license   = "GNU GPL, v2 or later",

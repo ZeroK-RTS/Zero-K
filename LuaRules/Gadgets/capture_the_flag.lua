@@ -84,6 +84,8 @@ include("LuaRules/Configs/customcmds.h.lua")
 
 if (gadgetHandler:IsSyncedCode()) then
 
+local getMovetype = Spring.Utilities.getMovetype
+
 local modOptions = Spring.GetModOptions()
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local squareSize      = Game.squareSize
@@ -1213,6 +1215,7 @@ function DropFlag(allyTeam, x, y, z)
   if (y < waterLevel) then
     y = waterLevel end
   local flagID = spCreateUnit("ctf_flag", x, y, z, ToFacing(x,z), GetTeamFromAlly(allyTeam))
+  Spring.SetUnitBlocking(flagID, false, false, false)
   if (flagID == nil) then
 --     spEcho("DropFlag failed")
     ReturnFlag(nil, nil, allyTeam, true)
@@ -1314,6 +1317,23 @@ function ScoreFlag(unitID, allyTeam, enemyTeam)
   FlagCarrier[unitID] = nil
   SendToUnsynced("ctf_score", allyTeam)
 end
+
+local cmdDropflag = {
+  id      = CMD_DROP_FLAG,
+  type    = CMDTYPE.ICON,
+  tooltip = 'Drop flag on the ground.',
+  cursor  = 'Attack',
+  action  = 'dropflag',
+  params  = {}, 
+  texture = 'LuaUI/Images/commands/Bold/drop_flag.png',
+}
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if unitDefID and getMovetype(UnitDefs[unitDefID]) == 2 then
+		Spring.InsertUnitCmdDesc(unitID, cmdDropflag)
+	end
+end
+
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (spValidUnitID(unitID)) then

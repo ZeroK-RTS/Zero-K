@@ -559,58 +559,60 @@ end
 function calcMainMexDrawList()
 	local specatate = spGetSpectatingState()
 
-	for i = 1, #WG.metalSpots do
-		local spot = WG.metalSpots[i]
-		local x,z = spot.x, spot.z
-		local y = spGetGroundHeight(x,z)
-		if y < 0 then y = 0 end
+	if WG.metalSpots then
+		for i = 1, #WG.metalSpots do
+			local spot = WG.metalSpots[i]
+			local x,z = spot.x, spot.z
+			local y = spGetGroundHeight(x,z)
+			if y < 0 then y = 0 end
 
-		local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
-		local metal = spot.metal
-		
-		glPushMatrix()
-		
-		glLineWidth(spot.metal*1.5)
-		glColor(mexColor)
-		glDepthTest(true)
-		glDrawGroundCircle(x, 1, z, 40, 32)
-		
-		if options.drawicons.value then
-			local size = 1
-			if metal > 10 then
-				if metal > 100 then
-					metal = metal*0.01
-					size = 5
-				else
-					metal = metal*0.1
-					size = 2.5
+			local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
+			local metal = spot.metal
+			
+			glPushMatrix()
+			
+			glLineWidth(spot.metal*1.5)
+			glColor(mexColor)
+			glDepthTest(true)
+			glDrawGroundCircle(x, 1, z, 40, 32)
+			
+			if options.drawicons.value then
+				local size = 1
+				if metal > 10 then
+					if metal > 100 then
+						metal = metal*0.01
+						size = 5
+					else
+						metal = metal*0.1
+						size = 2.5
+					end
 				end
-			end
+				
+				size = options.size.value
+				
+				glRotate(90,1,0,0)	
+				glTranslate(0,0,-y-10)
+				glColor(1,1,1)
+				glTexture("LuaUI/Images/ibeam.png")
+				local width = metal*size
+				glTexRect(x-width/2, z+20, x+width/2, z+20+size,0,0,metal,1)
+				glTexture(false)
+			else
+				glRotate(-90,1,0,0)		
+				glTranslate(x,-z-20-options.size.value, y+2)
+				glColor(1,1,1)
+				glText( ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+			end	
 			
-			size = options.size.value
-			
-			glRotate(90,1,0,0)	
-			glTranslate(0,0,-y-10)
-			glColor(1,1,1)
-			glTexture("LuaUI/Images/ibeam.png")
-			local width = metal*size
-			glTexRect(x-width/2, z+20, x+width/2, z+20+size,0,0,metal,1)
-			glTexture(false)
-		else
-			glRotate(-90,1,0,0)		
-			glTranslate(x,-z-20-options.size.value, y+2)
-			glColor(1,1,1)
-			glText( ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
-		end	
-		
-		--glColor(0,1,1)
-		--glRect(x-width/2, z+18, x+width/2, z+20)
-		glDepthTest(false)
-		glPopMatrix()
-	end
+			--glColor(0,1,1)
+			--glRect(x-width/2, z+18, x+width/2, z+20)
+			glDepthTest(false)
+			glPopMatrix()
+		end
 
-	glLineWidth(1.0)
-	glColor(1,1,1,1)
+		glLineWidth(1.0)
+		glColor(1,1,1,1)
+	end
 end
 --[[
 function calcMiniMexDrawList()
