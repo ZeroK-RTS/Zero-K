@@ -11,7 +11,7 @@ function widget:GetInfo()
 	date		= "Feb 2014",
 	license	 = "GPL v2 or later",
 	layer	 = -1, 
-	handler	 = false, -- for adding customCommand into UI
+	handler	 = true, -- for adding customCommand into UI
 	enabled	 = true	-- loaded by default?
 	}
 end
@@ -139,6 +139,38 @@ local memo_rs = -1 -- used in clever way to detect capture/stolen/return
 local CommandCenters = {}
 local Rotation = 0
 local LastSpam = -100
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local cmdDropflag = {
+  id      = CMD_DROP_FLAG,
+  type    = CMDTYPE.ICON,
+  tooltip = 'Drop flag on the ground.',
+  cursor  = 'Attack',
+  action  = 'dropflag',
+  params  = {}, 
+  texture = 'LuaUI/Images/commands/Bold/drop_flag.png',
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function widget:CommandsChanged()
+	local selectedUnits = Spring.GetSelectedUnits()
+	local customCommands = widgetHandler.customCommands
+	local unitID = Spring.GetSelectedUnits()[1]
+	if (unitID) then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local ud = UnitDefs[unitDefID]
+		if ud and ud.canMove and not(ud.canFly) then --Note: canMove include factory
+			table.insert(customCommands, cmdDropflag)
+			return
+		end
+	end 
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
