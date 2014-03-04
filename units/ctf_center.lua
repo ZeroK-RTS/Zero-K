@@ -21,6 +21,7 @@ unitDef = {
   customParams           = {
     dontcount      = [[1]],
     helptext       = [[This building is your base in capture the flag game mode. It holds your flags. Used by enemy to steal your flags. Provides constant income.]],
+	midposoffset   = [[0 -20 0]],
   },
 
   energyUse              = 0,

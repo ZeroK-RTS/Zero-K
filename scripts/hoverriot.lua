@@ -14,7 +14,7 @@ local barrel = piece 'barrel'
 include "constants.lua"
 
 -- Signal definitions
-local SIG_MOVE = 2
+local SIG_HIT = 2
 local SIG_AIM = 4
 
 local RESTORE_DELAY = 3000
@@ -28,13 +28,18 @@ local function WobbleUnit()
 	end
 end
 
-function script.HitByWeapon(x, z)
+function HitByWeaponThread(x, z)
+	Signal( SIG_HIT)
+	SetSignalMask( SIG_HIT)
 	Turn( base , z_axis, math.rad(-z), math.rad(105))
 	Turn( base , x_axis, math.rad(x ), math.rad(105))
 	WaitForTurn(base, z_axis)
 	WaitForTurn(base, x_axis)
 	Turn( base , z_axis, 0, math.rad(30))
 	Turn( base , x_axis, 0, math.rad(30))
+end
+function script.HitByWeapon(x, z)
+	StartThread(HitByWeaponThread, x, z)
 end
 
 local function MoveScript()

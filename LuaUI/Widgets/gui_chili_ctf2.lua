@@ -53,7 +53,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-  local ctf = (Spring.GetModOptions().zkmode) == "ctf"
+  local ctf = (tonumber(Spring.GetModOptions().ctf_enabled) == 1)
   
   if (ctf == false) then
     widgetHandler:RemoveWidget()
