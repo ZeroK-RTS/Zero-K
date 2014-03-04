@@ -1679,6 +1679,7 @@ end
 else --------------------------------------------------------------------------------------------------- unsycned
 
 local spGetMyPlayerID	   = Spring.GetMyPlayerID
+local modOptions = Spring.GetModOptions()
 
 function CtfRespawn(_)
   if (Script.LuaUI('CtfUIRespawn')) then
