@@ -179,6 +179,16 @@ end
 -------------------------------------------------------------------------------------
 -- Unit Handling
 
+function InitializeUnits()
+	local allUnits = Spring.GetAllUnits()
+	for i=1, #allUnits do
+		local unitID = allUnits[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		local unitTeam = Spring.GetUnitTeam(unitID)
+		widget:UnitCreated(unitID, unitDefID, unitTeam)
+	end
+end
+
 local function addUnit(unitID, unitDefID, unitTeam)
 	if pylonDefs[unitDefID] and not pylonByID[unitID] then
 		local spec, fullview = spGetSpectatingState()
@@ -217,6 +227,28 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local prevFullView = false
+local prevTeamID = -1
+local doTest = 0
+
+function widget:Update(dt)
+	doTest = doTest + 1
+	if doTest > 30 then
+		local teamID = Spring.GetMyTeamID()
+		local _, fullView = Spring.GetSpectatingState()
+		if (fullView and not prevFullView) or (teamID ~= prevTeamID) then
+			InitializeUnits()
+			prevFullView = true
+		end
+		prevFullView = fullView
+		prevTeamID = teamID
+		doTest = 0
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 function widget:Initialize()
 	local circleDivs = 32
 	circlePolys = glCreateList(function()
@@ -229,13 +261,7 @@ function widget:Initialize()
 		end)
 	end)
 	
-	local allUnits = Spring.GetAllUnits()
-	for i=1, #allUnits do
-		local unitID = allUnits[i]
-		local unitDefID = spGetUnitDefID(unitID)
-		local unitTeam = Spring.GetUnitTeam(unitID)
-		widget:UnitCreated(unitID, unitDefID, unitTeam)
-	end
+	InitializeUnits()
 end
 
 -------------------------------------------------------------------------------------
