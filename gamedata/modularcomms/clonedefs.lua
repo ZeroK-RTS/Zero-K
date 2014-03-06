@@ -42,25 +42,25 @@ local copy = {
 	armcom1 = {
 		armcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 3000, autoheal = 10, objectname = "armcom2.3do", collisionvolumescales  = [[50 55 50]],},
+			mainstats = {maxdamage = 3000, autoheal = 12.5, objectname = "armcom2.3do", collisionvolumescales  = [[50 55 50]],},
 			--customparams = {speedbonus = "0.025"},
 			wreckmodel = "armcom2_dead",
 		},
 		armcom3 = {
 			level = 3,
-			mainstats = {maxdamage = 4000, autoheal = 15, objectname = "armcom3.3do", collisionvolumescales  = [[55 60 55]],},
+			mainstats = {maxdamage = 4000, autoheal = 20, objectname = "armcom3.3do", collisionvolumescales  = [[55 60 55]],},
 			--customparams = {speedbonus = "0.05"},
 			wreckmodel = "armcom3_dead",
 		},
 		armcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 5000, autoheal = 20, objectname = "armcom4.3do", collisionvolumescales  = [[60 65 60]],},
+			mainstats = {maxdamage = 5000, autoheal = 27.5, objectname = "armcom4.3do", collisionvolumescales  = [[60 65 60]],},
 			--customparams = {speedbonus = "0.075"},
 			wreckmodel = "armcom4_dead",
 		},
 		armcom5 = {
 			level = 5,
-			mainstats = {maxdamage = 6000, autoheal = 25, objectname = "armcom5.3do", collisionvolumescales  = [[65 70 65]],},
+			mainstats = {maxdamage = 6000, autoheal = 35, objectname = "armcom5.3do", collisionvolumescales  = [[65 70 65]],},
 			--customparams = {speedbonus = "0.1"},
 			wreckmodel = "armcom5_dead",
 		},		
@@ -146,25 +146,25 @@ local copy = {
 	cremcom1 = {
 		cremcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 3000, autoheal = 10, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
+			mainstats = {maxdamage = 3000, autoheal = 12.5, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
 			--customparams = {speedbonus = "0.025"},
 			wreckmodel = "armcom2_dead",
 		},
 		cremcom3 = {
 			level = 3,
-			mainstats = {maxdamage = 4000, autoheal = 15, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
+			mainstats = {maxdamage = 4000, autoheal = 20, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
 			--customparams = {speedbonus = "0.05"},
 			wreckmodel = "armcom3_dead",
 		},
 		cremcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 5000, autoheal = 20, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
+			mainstats = {maxdamage = 5000, autoheal = 27.5, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
 			--customparams = {speedbonus = "0.075"},
 			wreckmodel = "armcom4_dead",
 		},
 		cremcom5 = {
 			level = 5,
-			mainstats = {maxdamage = 6000, autoheal = 25, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
+			mainstats = {maxdamage = 6000, autoheal = 35, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
 			--customparams = {speedbonus = "0.1"},
 			wreckmodel = "armcom5_dead",
 		},			

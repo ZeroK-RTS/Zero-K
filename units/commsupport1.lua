@@ -45,7 +45,7 @@ unitDef = {
     commtype = [[4]],
   },
 
-  energyMake          = 4,
+  energyMake          = 8,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,

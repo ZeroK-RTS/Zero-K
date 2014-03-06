@@ -45,7 +45,7 @@ unitDef = {
     commtype = [[2]],
   },
 
-  energyMake          = 3.2,
+  energyMake          = 8,
   energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
@@ -61,7 +61,7 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
-  metalMake           = 3.2,
+  metalMake           = 4,
   metalStorage        = 0,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
