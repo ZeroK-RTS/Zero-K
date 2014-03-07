@@ -21,7 +21,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[A rapid fire spider which excells at picking off fast units.]],
+    helptext       = [[A rapid fire spider which excels at picking off fast units.]],
+    description_pl = [[Pajak wsparcia]],
+    helptext_pl    = [[Szybkostrzelny pajak, ktory swietnie radzi sobie z niszczeniem lekkich jednostek.]],
     aimposoffset   = [[0 10 0]],
   },
 
@@ -40,7 +42,7 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[spiderriot.s3o]],
-  script				 = [[spiderriot.lua]],
+  script                 = [[spiderriot.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
