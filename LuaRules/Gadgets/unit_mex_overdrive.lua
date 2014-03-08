@@ -23,6 +23,9 @@ local pylonDefs = {}
 local linkdefs = {}
 local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 
+-- this is "fun" mod
+local CCModOptions = tonumber((Spring.GetModOptions()).ccmex) or 0 -- Command and Conquer style income, instead of directly supplying players with metal it makes mexes spill asteroids nearby
+
 local communismOverdrive = odSharingModOptions == "communism"
 
 include("LuaRules/Configs/constants.lua")
@@ -95,6 +98,10 @@ local sqrt  = math.sqrt
 local round = math.round
 local min   = math.min
 local max   = math.max
+local random = math.random
+local cos   = math.cos
+local sin   = math.sin
+local pi    = math.pi
 
 local spValidUnitID       = Spring.ValidUnitID
 local spGetUnitDefID      = Spring.GetUnitDefID
@@ -134,6 +141,8 @@ local unitPaybackTeamID = {} -- indexed by unitID, tells unit which team gets it
 local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 
 local allyTeamInfo = {} 
+
+local oreToSpawn = {} -- by unitID, mex should spawn at least 10 ore metal asteroids
 
 do
   local allyTeamList = Spring.GetAllyTeamList()
@@ -377,17 +386,15 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	end
 	
 	-- check for energy
-	--[[
-	for eid, state in pairs(ai.plant) do
-		if (state == 0) then
-			local eX,_,eZ = spGetUnitPosition(eid)
-			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
-				ai.plant[eid] = 1
-				pylon[allyTeamID][unitID].nearEnergy[eid] = true
-			end
-		end
-	end
-	--]]
+-- 	for eid, state in pairs(ai.plant) do
+-- 		if (state == 0) then
+-- 			local eX,_,eZ = spGetUnitPosition(eid)
+-- 			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
+-- 				ai.plant[eid] = 1
+-- 				pylon[allyTeamID][unitID].nearEnergy[eid] = true
+-- 			end
+-- 		end
+-- 	end
 	
 	QueueAddPylonToGrid(unitID)
 end
@@ -423,18 +430,16 @@ local function ReactivatePylon(unitID)
 	pylon[allyTeamID][unitID].active = true
 
 	-- check for energy
-	--[[
-	for eid, state in pairs(ai.plant) do
-		if state == 0 then
-			local eX,_,eZ = spGetUnitPosition(eid)
-			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
-				state = 1
-				pylon[allyTeamID][unitID].nearEnergy[eid] = true
-			end
-		end
-	
-	end
-	--]]
+-- 	for eid, state in pairs(ai.plant) do
+-- 		if state == 0 then
+-- 			local eX,_,eZ = spGetUnitPosition(eid)
+-- 			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
+-- 				state = 1
+-- 				pylon[allyTeamID][unitID].nearEnergy[eid] = true
+-- 			end
+-- 		end
+-- 	
+-- 	end
 	
 	QueueAddPylonToGrid(unitID)
 end
@@ -575,6 +580,27 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Command and Conquer mexes
+local function SpitMetalOre(unitID, howMuch)
+	oreToSpawn[unitID] = oreToSpawn[unitID] + howMuch
+	Spring.Echo(unitID.." "..oreToSpawn[unitID])
+	if (oreToSpawn[unitID] >= 10) then
+		howMuch = oreToSpawn[unitID]
+		local x,y,z = spGetUnitPosition(unitID)
+		local sx = x+random(-75,75)
+		local sz = z+random(-75,75)
+		local oreID = Spring.CreateFeature("asteroid_dead", sx,Spring.GetGroundHeight(sx,sz)+15,sz) -- TODO need an ore rock feature :3
+		if (oreID) then
+			Spring.SetFeatureReclaim(oreID, howMuch*0.1) -- weird
+			local rd = random(360) * pi / 180
+			Spring.SetFeatureDirection(oreID,sin(rd),0,cos(rd))
+			oreToSpawn[unitID] = 0
+		end
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 -- Overdrive and resource handling
 
 local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
@@ -669,6 +695,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									local unitDef = UnitDefs[unitDefID]
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
+										if (CCModOptions==1) then
+											SpitMetalOre(unitID, orgMetal + orgMetal * metalMult)
+										end
 									else
 										if not spammedError then
 											Spring.Echo("unitDefID missing for maxxed metal extractor")
@@ -969,6 +998,9 @@ function gadget:GameFrame(n)
 					local unitDef = UnitDefs[unitDefID]
 					if unitDef then
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
+						if (CCModOptions==1) then
+							SpitMetalOre(unitID, orgMetal)
+						end
 					else
 						if not spammedError then
 							Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for ungridded mex")
@@ -1115,7 +1147,8 @@ function gadget:GameFrame(n)
 						
 						sendTeamInformationToAwards(teamID, baseShare, odShare, te.totalChange)
 						
-						spAddTeamResource(teamID, "m", odShare + baseShare)
+						if (CCModOptions==0) then
+						spAddTeamResource(teamID, "m", odShare + baseShare) end
 						--Spring.Echo(teamID .. " got odShare " .. odShare)
 						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, allyTeamEnergyIncome, allyTeamID) 
 					end
@@ -1141,6 +1174,7 @@ local function AddMex(unitID, teamID, metalMake)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
+		oreToSpawn[unitID] = 0
 		
 		if teamID then
 			mexByID[unitID].refundTeamID = teamID
