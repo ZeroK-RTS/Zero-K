@@ -243,8 +243,11 @@ local function BuildMorphDef(udSrc, morphData)
     Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Bad morph dst type: ' .. morphData.into)
     return
   else
-    if (CMD_MORPH + MAX_MORPH >= CMD_STEALTH ) then --reached next custom command ID in the list (see: customcmds.h.lua)
-	    Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Morph Command ID is overflowing/overlapping with other command.')
+    if (CMD_MORPH + MAX_MORPH >= CMD_MORPH_STOP ) then --reached next custom command ID in the list (see: customcmds.h.lua)
+	    Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph CMD_ID is overflowing/overlapping with other command.')
+	end
+	if (CMD_MORPH_STOP + MAX_MORPH >= 2*CMD_MORPH_STOP-CMD_MORPH ) then --reached next custom command ID in the list (see: customcmds.h.lua)
+	    Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph Stop CMD_ID is overflowing/overlapping with other command.')
 	end
     local unitDef = udDst
     local newData = {}
