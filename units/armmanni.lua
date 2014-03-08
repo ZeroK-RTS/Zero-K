@@ -7,7 +7,7 @@ unitDef = {
   buildCostEnergy     = 1000,
   buildCostMetal      = 1000,
   builder             = false,
-  buildPic            = [[ARMMANNI.png]],
+  buildPic            = [[armmanni.png]],
   buildTime           = 1000,
   canAttack           = true,
   canGuard            = true,
@@ -52,7 +52,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[penetrator_lordmuffe.s3o]],
-  script	          = [[armmanni2.lua]],
+  script	          = [[armmanni.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[MEDIUM_BUILDINGEX]],
   

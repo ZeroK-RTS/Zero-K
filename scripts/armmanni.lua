@@ -2,12 +2,16 @@ include "constants.lua"
 
 local base = piece 'base' 
 local turret = piece 'turret' 
-local gun = piece 'gun' 
-local wheels1 = piece 'wheels1' 
-local wheels2 = piece 'wheels2' 
-local wheels3 = piece 'wheels3' 
-local wheels4 = piece 'wheels4' 
-local flare = piece 'flare' 
+local gun = piece 'barrel1' 
+local wheels1 = piece 'frdirt' 
+local wheels2 = piece 'fldirt' 
+local wheels3 = piece 'rrdirt' 
+local wheels4 = piece 'rldirt' 
+local frpontoon = piece 'frpontoon' 
+local flpontoon = piece 'flpontoon' 
+local rrpontoon = piece 'rrpontoon' 
+local rlpontoon = piece 'rlpontoon' 
+local flare = piece 'firepoint1' 
 
 local smokePiece = {base, turret}
 
@@ -126,11 +130,19 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
 		Explode(base, sfxNone)
 		Explode(turret, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(flpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(frpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(rlpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(rrpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
 		return 2
 	else
 		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
 		Explode(base, sfxNone)
 		Explode(turret, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(flpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(frpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(rlpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(rrpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
 		return 2
 	end
 end
