@@ -68,6 +68,7 @@ Development started on 8 february 2014. First playable version could be consider
 15 Februray 2014 - 0.1.0	- Some options made tweakable. Fixed inablity to select different com. It's now 1 week old.
 16 February 2014 - 0.1.1	- Balance changes. Income and bonus income formula changed. It's almost nonexponential and lowered aprox. by 2. CAI can orbit drop. Possible to disable orbit drop.
 25 February 2014 - 0.1.2	- Sounds replaced with more lively ones. And the way they are played was rewritten.
+08 March	2014 - 0.1.3	- Terraform protection was added, so now ground around CC is slowly terraforming back to its original state
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
@@ -140,14 +141,16 @@ local spSetUnitAlwaysVisible= Spring.SetUnitAlwaysVisible
 local spAreTeamsAllied	    = Spring.AreTeamsAllied
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spSetUnitPosition	    = Spring.SetUnitPosition
-local spIsPosInLos	    = Spring.IsPosInLos
-local spGetTeamList	    = Spring.GetTeamList
-local spValidUnitID	    = Spring.ValidUnitID
+local spIsPosInLos	    	= Spring.IsPosInLos
+local spGetTeamList	    	= Spring.GetTeamList
+local spValidUnitID	    	= Spring.ValidUnitID
 local spEcho                = Spring.Echo
-local spKillTeam	    = Spring.KillTeam
+local spKillTeam	    	= Spring.KillTeam
 
 local spGetPlayerInfo	    = Spring.GetPlayerInfo
 local spGetAllyTeamList	    = Spring.GetAllyTeamList
+
+local spRevertHeightMap		= Spring.RevertHeightMap
 
 local FlagCarrier = {} -- unitID has allyTeam's flag
 local DroppedFlags = {} -- functions almost same as CC, expect if you pick your own flag it's teleported to CC instead of being picked up
@@ -205,6 +208,8 @@ local MERGE_DIST_SQ = MERGE_DIST*MERGE_DIST
 local CC_TOO_NEAR = 450
 local CC_TOO_NEAR_SQ = CC_TOO_NEAR*CC_TOO_NEAR
 local COM_DROP_ENABLED = (tonumber(modOptions.ctf_orbit_drop) == 1)
+local CC_TERRA_RESTORE_SPEED = 0.2
+local CC_TERRA_RESTORE_RANGE = 500
 -- NOTE maybe it's better to simply make centers behave like mexes so you may connect them to OD grid...
 
 local energy_mult = 1.0 -- why not obey them too
@@ -1642,6 +1647,13 @@ function BlackListTimer(f)
   end
 end
 
+function RestoreCCTerraform()
+	for _,data in ipairs(CommandCenters) do
+		Spring.RevertHeightMap(data.x-CC_TERRA_RESTORE_RANGE,data.z-CC_TERRA_RESTORE_RANGE,
+			data.x+CC_TERRA_RESTORE_RANGE,data.z+CC_TERRA_RESTORE_RANGE,CC_TERRA_RESTORE_SPEED)
+	end
+end
+
 function gadget:GameFrame (f)
   if not(GameStarted) then
     if DelayedInit ~= nil then -- i so did not want to do this
@@ -1672,6 +1684,7 @@ function gadget:GameFrame (f)
     OrbitTimer()
     DeliverDrops(f)
     BlackListTimer(f)
+    RestoreCCTerraform()
   end
   if ((f%CTF_1_MINUTE)==0) then
     AIcomDrop()
