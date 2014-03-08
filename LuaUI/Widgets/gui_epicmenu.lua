@@ -2562,6 +2562,7 @@ local function MakeMenuBar()
 	
 	mainstack:AddChild(img_flag)
 	
+	-- we love old menu, pls dont kill
 	local crude_width_old = 460
 	local crude_height_old = B_HEIGHT+10
 	window_crude_old = Window:New{
