@@ -532,6 +532,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'ccmex',
+    name   = 'Enable C&C style mexes',
+    desc   = "You have to reclaim ore with this option being enabled.",
+    type   = 'bool',
+    section= 'fun',
+    def    = false,
+  },
+  {
     key    = 'iwinbutton',
     name   = 'Enable giant expensive "I Win" button',
     desc   = "For speed games. Race to build it!",
