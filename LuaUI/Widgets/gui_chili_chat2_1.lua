@@ -796,6 +796,8 @@ end
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
+	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
+	
 	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
 	and #messages > 0 and messages[#messages].text == msg.text then
 		-- update MapPoint position with most recent, as it is probably more relevant
