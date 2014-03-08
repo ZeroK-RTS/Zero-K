@@ -583,7 +583,7 @@ end
 -- Command and Conquer mexes
 local function SpitMetalOre(unitID, howMuch)
 	oreToSpawn[unitID] = oreToSpawn[unitID] + howMuch
-	Spring.Echo(unitID.." "..oreToSpawn[unitID])
+-- 	Spring.Echo(unitID.." "..oreToSpawn[unitID])
 	if (oreToSpawn[unitID] >= 10) then
 		howMuch = oreToSpawn[unitID]
 		local x,y,z = spGetUnitPosition(unitID)
