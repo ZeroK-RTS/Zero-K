@@ -1733,7 +1733,6 @@ end
 function gadget:Initialize()
   if not (tonumber(modOptions.ctf_enabled) == 1) then
     gadgetHandler:RemoveGadget()
-    return
   end
   gadgetHandler:AddSyncAction("ctf_steal", CtfSteal)
   gadgetHandler:AddSyncAction("ctf_drop", CtfDrop)
