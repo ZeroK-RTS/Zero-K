@@ -102,6 +102,7 @@ local screen0
 --------------------------------------------------------------------------------
 -- Global chili controls
 local window_crude 
+local window_crude_old
 local window_exit
 local window_exit_confirm
 local window_flags
@@ -2561,21 +2562,21 @@ local function MakeMenuBar()
 	
 	mainstack:AddChild(img_flag)
 	
-	
-	--[[
-	window_crude = Window:New{
+	local crude_width_old = 460
+	local crude_height_old = B_HEIGHT+10
+	window_crude_old = Window:New{
 		name='epicmenubar',
 		right = 0,  
 		y = 50, -- resbar height
 		dockable = true,
-		clientWidth = crude_width,
-		clientHeight = crude_height,
+		clientWidth = crude_width_old,
+		clientHeight = crude_height_old,
 		draggable = false,
 		tweakDraggable = true,
 		resizable = false,
 		minimizable = false,
 		backgroundColor = color.main_bg,
-		color = {nil,nil,nil,0.5},
+		color = {1,1,1,0.5},
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		
@@ -2599,7 +2600,9 @@ local function MakeMenuBar()
 					-- odd-number button width keeps image centered
 					Button:New{
 						name= 'gameSettingButton',
-						caption = "", OnMouseUp = { function() MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() 
+								ActionMenu()
+								MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions and Settings...',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png', height=B_HEIGHT-2,width=B_HEIGHT-2},
@@ -2607,7 +2610,9 @@ local function MakeMenuBar()
 					},
 					Button:New{
 						name= 'settingButton',
-						caption = "", OnMouseUp = { function() MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() 
+								ActionMenu()
+								MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'General Settings...', 
 						children = {
 							Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
@@ -2740,10 +2745,11 @@ local function MakeMenuBar()
 					Button:New{
 						name= 'quitButton',
 						caption = "", OnMouseUp = { function() 
-								if not exitWindowVisible then
-									screen0:AddChild(window_exit) 
-									exitWindowVisible = true
-								end
+-- 								if not exitWindowVisible then
+-- 									screen0:AddChild(window_exit) 
+-- 									exitWindowVisible = true
+-- 								end
+								ActionMenu()
 							end, }, 
 						textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin, tooltip = 'Exit or Resign...',
@@ -2755,7 +2761,7 @@ local function MakeMenuBar()
 			}
 		}
 	}
-	]]--
+	screen0:AddChild(window_crude_old)
 	ShowHideCrudeMenu()
 end
 

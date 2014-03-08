@@ -142,7 +142,7 @@ local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data 
 
 local allyTeamInfo = {} 
 
-local oreToSpawn = {} -- by unitID, mex should spawn at least 10 ore metal asteroids
+local oreToSpawn = {} -- by unitID, mex should spawn at least 5 ore metal asteroids
 
 do
   local allyTeamList = Spring.GetAllyTeamList()
@@ -581,20 +581,43 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Command and Conquer mexes
-local function SpitMetalOre(unitID, howMuch)
+local function SpitMetalOre(unitID, howMuch, forcefully)
 	oreToSpawn[unitID] = oreToSpawn[unitID] + howMuch
 -- 	Spring.Echo(unitID.." "..oreToSpawn[unitID])
-	if (oreToSpawn[unitID] >= 10) then
+	if (oreToSpawn[unitID] >= 5) or (forcefully) then
 		howMuch = oreToSpawn[unitID]
-		local x,y,z = spGetUnitPosition(unitID)
-		local sx = x+random(-75,75)
-		local sz = z+random(-75,75)
-		local oreID = Spring.CreateFeature("asteroid_dead", sx,Spring.GetGroundHeight(sx,sz)+15,sz) -- TODO need an ore rock feature :3
-		if (oreID) then
-			Spring.SetFeatureReclaim(oreID, howMuch*0.1) -- weird
-			local rd = random(360) * pi / 180
-			Spring.SetFeatureDirection(oreID,sin(rd),0,cos(rd))
-			oreToSpawn[unitID] = 0
+		if (howMuch >= 18) then -- split into 2 chunks, why not
+			howMuch = howMuch*0.5
+			local x,y,z = spGetUnitPosition(unitID)
+			local sx = x+random(-75,75)
+			local sz = z+random(-75,75)
+			local oreID = Spring.CreateFeature("asteroid_dead", sx,Spring.GetGroundHeight(sx,sz)+15,sz) -- TODO need an ore rock feature :3
+			if (oreID) then
+				Spring.SetFeatureReclaim(oreID, howMuch*0.1) -- weird
+				local rd = random(360) * pi / 180
+				Spring.SetFeatureDirection(oreID,sin(rd),0,cos(rd))
+				oreToSpawn[unitID] = oreToSpawn[unitID] - howMuch -- 50% left to spawn
+			end
+			sx = x+random(-75,75)
+			sz = z+random(-75,75)
+			oreID = Spring.CreateFeature("asteroid_dead", sx,Spring.GetGroundHeight(sx,sz)+15,sz) -- TODO need an ore rock feature :3
+			if (oreID) then
+				Spring.SetFeatureReclaim(oreID, howMuch*0.1) -- weird
+				local rd = random(360) * pi / 180
+				Spring.SetFeatureDirection(oreID,sin(rd),0,cos(rd))
+				oreToSpawn[unitID] = oreToSpawn[unitID] - howMuch
+			end
+		else
+			local x,y,z = spGetUnitPosition(unitID)
+			local sx = x+random(-75,75)
+			local sz = z+random(-75,75)
+			local oreID = Spring.CreateFeature("asteroid_dead", sx,Spring.GetGroundHeight(sx,sz)+15,sz) -- TODO need an ore rock feature :3
+			if (oreID) then
+				Spring.SetFeatureReclaim(oreID, howMuch*0.1) -- weird
+				local rd = random(360) * pi / 180
+				Spring.SetFeatureDirection(oreID,sin(rd),0,cos(rd))
+				oreToSpawn[unitID] = 0
+			end
 		end
 	end
 end
@@ -657,7 +680,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							gridEnergySpent[i] = maxGridCapacity[i]
                             
 							summedMetalProduction = 0
-                            summedBaseMetal = 0
+							summedBaseMetal = 0
 							summedOverdrive = 0
                             
 							maxedGrid[i] = true
@@ -696,7 +719,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
 										if (CCModOptions==1) then
-											SpitMetalOre(unitID, orgMetal + orgMetal * metalMult)
+											SpitMetalOre(unitID, thisMexM, false)
 										end
 									else
 										if not spammedError then
@@ -717,7 +740,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedBaseMetal = summedBaseMetal + orgMetal
-                    summedOverdrive = summedOverdrive + orgMetal * metalMult
+					summedOverdrive = summedOverdrive + orgMetal * metalMult
                     
 					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 					
@@ -735,7 +758,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
 							end
 							if (CCModOptions==1) then
-								SpitMetalOre(unitID, orgMetal + orgMetal * metalMult)
+								SpitMetalOre(unitID, thisMexM, false)
 							end
 						else
 							if not spammedError then
@@ -1002,7 +1025,7 @@ function gadget:GameFrame(n)
 					if unitDef then
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
 						if (CCModOptions==1) then
-							SpitMetalOre(unitID, orgMetal)
+							SpitMetalOre(unitID, orgMetal, false)
 						end
 					else
 						if not spammedError then
@@ -1218,6 +1241,7 @@ local function RemoveMex(unitID)
 	
 	if mex and mexes[mex.allyTeamID][mex.gridID][unitID] then
 				
+		SpitMetalOre(unitID, 0, true) -- spit all that's left
 		local orgMetal = mexes[mex.allyTeamID][mex.gridID][unitID]
 		local ai = allyTeamInfo[mex.allyTeamID]
 		local g = ai.grid[mex.gridID]
