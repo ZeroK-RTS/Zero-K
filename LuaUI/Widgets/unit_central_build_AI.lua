@@ -11,13 +11,13 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "v1.350"
+local version = "v1.351"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group 0 (use \255\90\255\90Auto Group\255\255\255\255 widget or manually), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 19 September 2013",
+    date      = "July 20, 2009, 8 March 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -347,7 +347,7 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 	end
 end
 
---If one of our units completed an order, cancel units guarding/assisting it.
+--If one of our units finished a build order, cancel units guarding/assisting it.
 --This replace UnitCmdDone() because UnitCmdDone() is called even if command is not finished, such as when new command is inserted into existing queue
 --Credit to Niobium for pointing out UnitCmdDone() originally.
 
@@ -360,8 +360,10 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			local cmd2 = GetFirstCommand(unit2)
 			if ( cmd2 == nil ) then	-- no orders?  Must be idle.
 				myUnits[unit2]="idle"
-			else 
-				spGiveOrderToUnit(unit2, CMD_REMOVE, {-unitDefID}, {"alt"} ) --remove
+			else
+				if (cmd2.params[1] == ux and cmd2.params[3] == uz) then
+					spGiveOrderToUnit(unit2, CMD_REMOVE, {cmd2.tag}, {""} ) --remove
+				end
 				spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
 				myUnits[unit2]="busy" -- command done but still busy. Example scenario: unit attempt to assist a construction while user SHIFT queued a reclaim command, however the construction finishes first before this unit arrives, so this unit continue finishing the RECLAIM command with "busy" tag.
 			end
@@ -946,10 +948,6 @@ function SetQueueUnreachableValue(unitID,moveID,ux,uy,uz,x,y,z,queueKey)
 		local result,finCoord = IsTargetReachable(moveID, ux,uy,uz,x,y,z,128)
 		if result == "outofreach" then --if result not reachable but we have the closest coordinate, then:
 			reach = false --target is unreachable
-			-- result = IsTargetReachable(moveID, finCoord[1],finCoord[2],finCoord[3],x,y,z,8) --refine pathing
-			-- if result ~= "reach" then --if result still not reach, then:
-				-- reach = false --target is unreachable
-			-- end
 		else -- Spring.PathRequest() must be non-functional. (unsynced blocked?)
 		end
 		--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, may change in different version)

@@ -1,4 +1,4 @@
-local versionName = "v2.870"
+local versionName = "v2.871"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "November 1, 2013", --clean up June 25, 2013
+    date      = "March 8, 2014", --clean up June 25, 2013
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -109,7 +109,7 @@ local maximumTurnAngleG = math.pi --(default is pi rad) safety measure. Prevent 
 --pi is 180 degrees
 
 --Update constant:
-local cmd_then_DoCalculation_delayG = 0.5  --elapsed second (Wait) before issuing new command (default: 0.25 second)
+local cmd_then_DoCalculation_delayG = 0.25  --elapsed second (Wait) before issuing new command (default: 0.25 second)
 
 -- Distance or velocity constant:
 local timeToContactCONSTANTg= cmd_then_DoCalculation_delayG --time scale for move command; to calculate collision calculation & command lenght (default = 0.5 second). Will change based on user's Ping
@@ -123,8 +123,8 @@ local reloadableWeaponCriteriaG = 0.5 --second at which reload time is considere
 local criticalShieldLevelG = 0.5 --percent at which shield is considered low and should activate avoidance. eg: 50%
 local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate (note: overriden by 1/4 of weapon's reload time if its bigger). eg: 0.9 second before finish (or 7 second for armspy)
 local thresholdForArtyG = 459 --elmo (weapon range) before unit is considered an arty. Arty will never set enemy as target and will always avoid. default: 459elmo (1 elmo smaller than Rocko range)
-local maximumMeleeRangeG = 101 --elmo (weapon range) before unit is cosidered a melee. Melee will target enemy and do not avoid at halfTargetBoxSize_g[1]. default: 101elmo (1 elmo bigger than Sycthe range)
-local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calculating remaining reload time). eg: 0.0333 second-per-frame or 0.5sec/15frame
+local maximumMeleeRangeG = 101 --elmo (weapon range) before unit is considered a melee. Melee will target enemy and do not avoid at halfTargetBoxSize_g[1]. default: 101elmo (1 elmo bigger than Sycthe range)
+local secondPerGameFrameG = 1/30 --engine depended second-per-frame (for calculating remaining reload time). eg: 0.0333 second-per-frame or 0.5sec/15frame
 
 --Command Timeout constants:
 local commandTimeoutG = 2 --multiply by 1.1 second
@@ -528,7 +528,11 @@ function DoCalculation(unitInMotion,commandIndexTable, attacker, selectedCons_Me
 						end
 						local avoidanceCommand = true
 						local orderArray = {nil}
-						commandTTL, avoidanceCommand,orderArray= InsertCommandQueue(cQueue,cQueueTemp, unitID, newCommand, now, commandTTL)--delete old widget command, update commandTTL, and send constructor to base for retreat
+						local infoToInsertOnCmdQueue = {
+							cQueue,cQueueTemp, unitID, newCommand,
+							now,commandTTL,commandIndexTable,
+						}
+						commandTTL, avoidanceCommand,orderArray= InsertCommandQueue(infoToInsertOnCmdQueue)--delete old widget command, update commandTTL, and send constructor to base for retreat
 						if avoidanceCommand or (not options.dbg_RemoveAvoidanceSplitSecond.value) then 
 							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,surroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand,decloakScaling) --calculate move solution
 							local newY=spGetGroundHeight(newX,newZ)
@@ -794,7 +798,7 @@ function IdentifyTargetOnCommandQueue(passedInfo) --//used by DoCalculation()
 	local case=''
 	--------------------------------------------------
 	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros or non-significant number
-		commandIndexTable[unitID]={widgetX=-2, widgetZ=-2 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
+		commandIndexTable[unitID]={widgetX=-2, widgetZ=-2 , patienceIndexA=0}
 	else
 		local a = -1
 		local c = -1
@@ -823,14 +827,14 @@ function IdentifyTargetOnCommandQueue(passedInfo) --//used by DoCalculation()
 		end
 	end
 	local infoForExtractingTargetPosition = {
-		unitID,cQueueGKPed,commandIndexTable,targetCoordinate,
+		unitID,cQueueGKPed,targetCoordinate,
 		fixedPointCONSTANTtrigger,unitVisible,weaponRange,weaponType,
 		}
 	if newCommand then	--if user's new command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case = ExtractTarget (1,infoForExtractingTargetPosition)
+		targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case = ExtractTarget (1,infoForExtractingTargetPosition)
 		commandIndexTable[unitID]["patienceIndexA"]=0 --//reset impatience counter
 	else  --if widget's previous command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case = ExtractTarget (2,infoForExtractingTargetPosition)	
+		targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case = ExtractTarget (2,infoForExtractingTargetPosition)	
 	end
 	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case --return target coordinate
 end
@@ -1052,7 +1056,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 		--convert an angular command into a coordinate command
-		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, wasMoving, newCommand)
+		local newX, newZ= ToCoordinate(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, wasMoving, newCommand)
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -1076,11 +1080,19 @@ end
 
 -- maintain the visibility of original command
 -- reference: "unit_tactical_ai.lua" -ZeroK gadget by Google Frog
-function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, commandTTL)
+function InsertCommandQueue(passedInfo)
 	------- localize global constant:
 	local consRetreatTimeout = consRetreatTimeoutG
 	local commandTimeout = commandTimeoutG
 	------- end global constant
+	local cQueue = passedInfo[1]
+	local cQueueGKPed = passedInfo[2]
+	local unitID = passedInfo[3]
+	local newCommand = passedInfo[4]
+	local now = passedInfo[5]
+	local commandTTL = passedInfo[6]
+	local commandIndexTable = passedInfo[7]	
+	-------
 	--Method 1: doesn't work online
 	--if not newCommand then spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) end --delete old command
 	-- spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
@@ -1140,6 +1152,10 @@ function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, command
 				Spring.Echo(Spring.GetUnitIsDead(unitID))
 				Spring.Echo("ValidUnitID (InsertCommandQueue):")
 				Spring.Echo(Spring.ValidUnitID(unitID))
+				Spring.Echo("WidgetX (InsertCommandQueue):")
+				Spring.Echo(commandIndexTable[unitID]["widgetX"])
+				Spring.Echo("WidgetZ (InsertCommandQueue):")
+				Spring.Echo(commandIndexTable[unitID]["widgetZ"])
 			end
 		else 
 			orderArray[1] = {CMD_REMOVE, {cQueue[1].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
@@ -1180,8 +1196,6 @@ function InsertCommandQueue(cQueue,cQueueGKPed, unitID, newCommand, now, command
 	end
 	if (turnOnEcho == 1) then
 		Spring.Echo("unitID(InsertCommandQueue)" .. unitID)
-		--Spring.Echo("commandIndexTable[unitID][widgetX](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetX"])
-		--Spring.Echo("commandIndexTable[unitID][widgetZ](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetZ"])
 		Spring.Echo("newCommand(InsertCommandQueue):")
 		Spring.Echo(newCommand)
 		Spring.Echo("cQueue[1].params[1](InsertCommandQueue):" .. cQueue[1].params[1])
@@ -1257,12 +1271,11 @@ end
 function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnCommandQueue()
 	local unitID = passedInfo[1]
 	local cQueue = passedInfo[2]
-	local commandIndexTable = passedInfo[3]
-	local targetCoordinate = passedInfo[4]
-	local fixedPointCONSTANTtrigger = passedInfo[5]
-	local unitVisible = passedInfo[6]
-	local weaponRange = passedInfo[7]
-	local weaponType = passedInfo[8]
+	local targetCoordinate = passedInfo[3]
+	local fixedPointCONSTANTtrigger = passedInfo[4]
+	local unitVisible = passedInfo[5]
+	local weaponRange = passedInfo[6]
+	local weaponType = passedInfo[7]
 	
 	local boxSizeTrigger=0 --an arbitrary constant/variable, which trigger some other action/choice way way downstream. The purpose is to control when avoidance must be cut-off using custom value (ie: 1,2,3,4) for specific cases.
 	local graphCONSTANTtrigger = {}
@@ -1307,9 +1320,6 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 		end
 		
 		targetCoordinate={targetPosX, targetPosY, targetPosZ } --send away the target for move command
-		commandIndexTable[unitID]["backupTargetX"]=targetPosX --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=targetPosY
-		commandIndexTable[unitID]["backupTargetZ"]=targetPosZ
 		case = 'movebuild'
 	elseif cQueue[queueIndex].id==CMD_RECLAIM or cQueue[queueIndex].id==CMD_RESURRECT then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
@@ -1384,9 +1394,6 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 		--]]
 		
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck/center-of-area-command as target
-		commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
-		commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
 		--graphCONSTANTtrigger[1] = 2 --use bigger angle scale for initial avoidance: after that is a MOVE command to the center or area-command which uses standard angle scale (take ~4 cycle to do 180 flip, but more chaotic) 
 		--graphCONSTANTtrigger[2] = 2
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
@@ -1411,9 +1418,6 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target") end
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
-		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=unitPosY
-		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
 		boxSizeTrigger=3 --change to deactivation 'halfboxsize' similar to REPAIR command
 		graphCONSTANTtrigger[1] = 1
 		graphCONSTANTtrigger[2] = 1
@@ -1436,9 +1440,6 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target") end
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
-		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=unitPosY
-		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
 		boxSizeTrigger = 4 --//deactivation 'halfboxsize' for GUARD command
 		graphCONSTANTtrigger[1] = 2 --//use more aggressive attraction because it GUARD units. It need big result.
 		graphCONSTANTtrigger[2] = 1	--//(if 1) use less aggressive avoidance because need to stay close to units. It need not stray.
@@ -1447,9 +1448,6 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		boxSizeTrigger = nil --//value not needed when target is "-1" which always return "not reached" (a case where boxSizeTrigger is not used)
 		targetCoordinate={targetPosX, targetPosY, targetPosZ} --set target to enemy unit or none
-		commandIndexTable[unitID]["backupTargetX"]=targetPosX --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=targetPosY
-		commandIndexTable[unitID]["backupTargetZ"]=targetPosZ
 		graphCONSTANTtrigger[1] = 1 --//this value doesn't matter because 'CMD_ATTACK' don't use attractor (-1 already disabled the attractor calculation, and 'fixedPointCONSTANTtrigger' ignore attractor). Needed because "fTarget" is tied to this variable in "AvoidanceCalculator()".
 		graphCONSTANTtrigger[2] = 2	--//use more aggressive avoidance because it often run just once or twice. It need big result.
 		fixedPointCONSTANTtrigger = 3 --//use behaviour that promote avoidance/ignore attractor (incase -1 is not enough)
@@ -1470,17 +1468,13 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 	else --if queue has no match/ is empty: then use no-target. eg: A case where undefined command is allowed into the system, or when engine delete the next queues of a valid command and widget expect it to still be there.
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
-		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
 		boxSizeTrigger = nil --//value not needed when target is "-1" which always return "not reached" (a case where boxSizeTrigger is not used)
-		commandIndexTable[unitID]["backupTargetX"]=-1 --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=-1
-		commandIndexTable[unitID]["backupTargetZ"]=-1
 		graphCONSTANTtrigger[1] = 1  --//needed because "fTarget" is tied to this variable in "AvoidanceCalculator()". This value doesn't matter because -1 already skip attractor calculation & 'fixedPointCONSTANTtrigger' already ignore attractor values.
 		graphCONSTANTtrigger[2] = 1
 		fixedPointCONSTANTtrigger = 3
 		case = 'none'
 	end
-	return commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case
+	return targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case
 end
 
 function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
@@ -1753,16 +1747,15 @@ function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, 
 end
 
 --convert angular command into coordinate, plus other function
-function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, wasMoving, newCommand)
+function ToCoordinate(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, wasMoving, newCommand)
 	local safetyDistanceCONSTANT=safetyDistanceCONSTANT_fG
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
-	local cmd_then_DoCalculation_delay = cmd_then_DoCalculation_delayG
-	------
+	---------
 	if (nearestFrontObstacleRange> losRadius) then nearestFrontObstacleRange = 999 end --if no obstacle infront of unit then set nearest obstacle as far as LOS to prevent infinite velocity.
 	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor) --derive a new angle from calculation for move solution
 
-	local velocity=unitSpeed*(math.max(timeToContactCONSTANT, skippingTimer.averageDelay + cmd_then_DoCalculation_delay)) --scale-down/scale-up command lenght based on system delay (because short command will make unit move in jittery way & avoidance stop prematurely). *NOTE: select either preset velocity (timeToContactCONSTANT==cmd_then_DoCalculation_delayG) or the one taking account delay measurement (skippingTimer.networkDelay + cmd_then_DoCalculation_delay), which one is highest, times unitSpeed as defined by UnitDefs.
+	local velocity=unitSpeed*(math.max(timeToContactCONSTANT, skippingTimer.averageDelay + timeToContactCONSTANT)) --scale-down/scale-up command lenght based on system delay (because short command will make unit move in jittery way & avoidance stop prematurely). *NOTE: select either preset velocity (timeToContactCONSTANT==cmd_then_DoCalculation_delayG) or the one taking account delay measurement (skippingTimer.networkDelay + cmd_then_DoCalculation_delay), which one is highest, times unitSpeed as defined by UnitDefs.
 	local networkDelayDrift = 0
 	if wasMoving then  --unit drift contributed by network lag/2 (divide-by-2 because averageDelay is a roundtrip delay and we just want the delay of stuff measured on screen), only calculated when unit is known to be moving (eg: is using lastPosition to determine direction), but network lag value is not accurate enough to yield an accurate drift prediction.
 		networkDelayDrift = unitSpeed*(skippingTimer.averageDelay/2)
@@ -1778,9 +1771,9 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 	end 
 	
 	if (turnOnEcho == 1) then 
-		Spring.Echo("maximumVelocity(SendCommand)" .. maximumVelocity) 
-		Spring.Echo("activateAutoReverse(SendCommand)" .. activateAutoReverse)
-		Spring.Echo("unitDirection(SendCommand)" .. unitDirection)
+		Spring.Echo("maximumVelocity(ToCoordinate)" .. maximumVelocity) 
+		Spring.Echo("activateAutoReverse(ToCoordinate)" .. activateAutoReverse)
+		Spring.Echo("unitDirection(ToCoordinate)" .. unitDirection)
 	end
 	
 	local newX, newZ= ConvertToXZ(thisUnitID, newUnitAngleDerived,velocity, unitDirection, networkDelayDrift,doReverseNow) --convert angle into coordinate form
@@ -1907,6 +1900,11 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 		newX = distanceTraveledDueToNetworkDelay*math.sin(unitDirection) + newX -- translate move command abit further forward; to account for lag. Network Lag makes move command lags behind the unit. 
 		newZ = distanceTraveledDueToNetworkDelay*math.cos(unitDirection) + newZ
 	end
+	
+	newX = math.min(newX,Game.mapSizeX)
+	newX = math.max(newX,0)
+	newZ = math.min(newZ,Game.mapSizeZ)
+	newZ = math.max(newZ,0)
 	
 	if (turnOnEcho == 1) then
 		Spring.Echo("x(ConvertToXZ) " .. x)
