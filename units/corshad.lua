@@ -141,6 +141,10 @@ unitDef = {
         planes  = 800,
         subs    = 800,
       },
+	  
+	  customParams            = {
+		torp_underwater = [[corshad_a_torpedo]],
+	  },
 
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
@@ -206,6 +210,37 @@ unitDef = {
 	  waterWeapon             = true,
     },
 
+	A_TORPEDO = {
+      name                    = [[Torpedo BombSabot For Bubble Effect]],
+      areaOfEffect            = 32,
+      craterBoost             = 1,
+      craterMult              = 2,
+
+      damage                  = {
+        default = 800,
+      },
+
+      explosionGenerator      = [[custom:TORPEDO_HIT]],
+      fixedLauncher           = true,
+      flightTime              = 1.5,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[wep_b_paveway.s3o]],
+	  numbounce               = 4,
+      range                   = 225,
+      reloadtime              = 5,
+      soundHit                = [[explosion/wet/ex_underwater]],
+      soundStart              = [[weapon/torpedo]],
+      startVelocity           = 200,
+      tracks                  = false,
+      turnRate                = 3750,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponAcceleration      = 50,
+      weaponType              = [[TorpedoLauncher]],
+      weaponVelocity          = 200,
+    },	
   },
 
 

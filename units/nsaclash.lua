@@ -99,8 +99,6 @@ unitDef = {
 	  
 	  customParams            = {
 		torp_underwater = [[nsaclash_a_torpedo]],
-		tracking = [[true]],
-		model = [[wep_m_dragonsfang.s3o]],
 	  },
 
       fireStarter             = 70,
@@ -136,7 +134,7 @@ unitDef = {
 
 	
 	A_TORPEDO = {
-      name                    = [[Torpedo]],
+      name                    = [[Torpedo Missile For Bubble Effect]],
       areaOfEffect            = 96,
       craterBoost             = 1,
       craterMult              = 2,

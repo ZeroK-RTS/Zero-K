@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		author = "Anarchid",
 		date = "14.01.2013",
 		license = "Public domain",
-		layer = 21,
+		layer = -1, --before lups_shockwaves.lua (so that there's no shockwave after we block explosion effect)
 		enabled = true
 	}
 end
@@ -18,6 +18,7 @@ local burnoutWeapon = {}
 local burnoutProjectile = {}
 local underwaterWeapon = {}
 local underwaterProjectile = {}
+local noExplosionVFX = {}
 
 local spGetGameFrame     = Spring.GetGameFrame
 local spSetProjectileCeg = Spring.SetProjectileCEG
@@ -26,6 +27,8 @@ local spGetProjectilePosition = Spring.GetProjectilePosition
 local spGetProjectileVelocity = Spring.GetProjectileVelocity
 local spGetProjectileTarget = Spring.GetProjectileTarget
 local spSetProjectileCollision = Spring.SetProjectileCollision
+local spSetProjectileVelocity = Spring.SetProjectileVelocity
+local spSetProjectileGravity  = Spring.SetProjectileGravity 
 local spSpawnProjectile = Spring.SpawnProjectile
 local spSetProjectileTarget = Spring.SetProjectileTarget
 local spGetUnitTeam = Spring.GetUnitTeam
@@ -46,8 +49,6 @@ function gadget:Initialize()
 			if wd.customParams.torp_underwater then
 				underwaterWeapon[wd.id] = {
 					torpName = wd.customParams.torp_underwater,
-					tracking = wd.customParams.tracking,
-					model = wd.customParams.model,
 				}
 				scSetWatchWeapon(wd.id, true)
 			end
@@ -66,9 +67,8 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if underwaterWeapon[weaponID] then
 		underwaterProjectile[proID] = {
 			owner = proOwnerID,
+			weaponID = weaponID,
 			torpName = underwaterWeapon[weaponID].torpName,
-			tracking = underwaterWeapon[weaponID].tracking,
-			model = underwaterWeapon[weaponID].model,
 		}
 	end	
 end
@@ -76,6 +76,17 @@ end
 function gadget:ProjectileDestroyed(proID, proOwnerID, weaponID)
 	burnoutProjectile[proID] = nil
 	underwaterProjectile[proID] = nil
+end
+
+function gadget:Explosion(weaponDefID, px, py, pz, ownerID)
+	if noExplosionVFX[weaponDefID] then
+		px = math.modf(px+0.5)
+		pz = math.modf(pz+0.5)
+		if noExplosionVFX[weaponDefID][px..pz]==ownerID then
+			noExplosionVFX[weaponDefID][px..pz] = nil
+			return true --noVFX
+		end
+	end
 end
 
 function gadget:GameFrame(f)
@@ -99,20 +110,27 @@ function ConvertWeaponUnderwater()
 	for id,proj in pairs(underwaterProjectile) do
 		if spSpawnProjectile and proj.torpName and WeaponDefNames[proj.torpName] then
 			local px,py,pz = Spring.GetProjectilePosition(id)
-			if py <= 0 then
+			if py <= -9 then -- projectile is underwater. Set to submarine waterline (bottom = -20, top = 0) to let it hit submarine first rather than doing a conversion to torpedo
 				local defID = WeaponDefNames[proj.torpName].id
+				local ownerTeamID = spGetUnitTeam(proj.owner)
 				local pvx, pvy, pvz = spGetProjectileVelocity(id)
 				local projectileParams = {
 					pos = {px, py, pz},
 					speed = {pvx, pvy, pvz},
 					owner = proj.owner,
-					tracking = (proj.tracking=="true"),
-					model = proj.model,
-					team = spGetUnitTeam(proj.owner),
+					team = ownerTeamID,
 				}
 				local a, b = spGetProjectileTarget(id)
-				spSetPieceProjectileParams(id,0) --should disable explosion but may not work
-				spSetProjectileCollision(id)
+				
+				spSetPieceProjectileParams(id,0) --not sure what this do, it set piece explosion tag to 0 (disable)
+				px = math.modf(px+0.5) --round the number to nearest integer
+				pz = math.modf(pz+0.5)
+				noExplosionVFX[proj.weaponID] = noExplosionVFX[proj.weaponID] or {}
+				noExplosionVFX[proj.weaponID][px..pz] = proj.owner
+				spSetProjectileVelocity(id,0,0,0) --stop projectile for more accurate
+				spSetProjectileGravity(id,0)
+				
+				spSetProjectileCollision(id) --explosion to destroy projectile. It also trigger wave in Dynamic water
 				local newID = spSpawnProjectile(defID, projectileParams)
 				if type(b)=='number' then
 					spSetProjectileTarget(newID,b)
