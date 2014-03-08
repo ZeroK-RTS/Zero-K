@@ -218,6 +218,22 @@ local CMD_INSERT	= CMD.INSERT
 local CMD_MOVE		= CMD.MOVE
 local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 
+local cmdDropflag = {
+  id      = CMD_DROP_FLAG,
+  type    = CMDTYPE.ICON,
+  tooltip = 'Drop flag on the ground.',
+--   cursor  = 'Attack',
+  action  = 'dropflag',
+  --params  = {}, 
+  texture = 'LuaUI/Images/commands/Bold/drop_flag.png',
+}
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if unitDefID and getMovetype(UnitDefs[unitDefID]) == 2 then
+		Spring.InsertUnitCmdDesc(unitID, cmdDropflag)
+	end
+end
+
 --//------------------ Code to determine command center spawn positions and teleport stucked commanders away and so on -- BEGIN
 
 function FigureSide(x, y)
@@ -1318,23 +1334,6 @@ function ScoreFlag(unitID, allyTeam, enemyTeam)
   SendToUnsynced("ctf_score", allyTeam)
 end
 
-local cmdDropflag = {
-  id      = CMD_DROP_FLAG,
-  type    = CMDTYPE.ICON,
-  tooltip = 'Drop flag on the ground.',
-  cursor  = 'Attack',
-  action  = 'dropflag',
-  params  = {}, 
-  texture = 'LuaUI/Images/commands/Bold/drop_flag.png',
-}
-
-function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if unitDefID and getMovetype(UnitDefs[unitDefID]) == 2 then
-		Spring.InsertUnitCmdDesc(unitID, cmdDropflag)
-	end
-end
-
-
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (spValidUnitID(unitID)) then
     --BlackListed[unitID] = -1 -- lol, awesome bug when unit that dies picks flag back up and dies with it
@@ -1734,6 +1733,7 @@ end
 function gadget:Initialize()
   if not (tonumber(modOptions.ctf_enabled) == 1) then
     gadgetHandler:RemoveGadget()
+    return
   end
   gadgetHandler:AddSyncAction("ctf_steal", CtfSteal)
   gadgetHandler:AddSyncAction("ctf_drop", CtfDrop)

@@ -779,7 +779,8 @@ function widget:MousePress(mx, my, mb)
 	if (mb == 3) then
 		spawn_mode = false
 	elseif (mb == 1) then
-		_, cursorWorldCoors = Spring.TraceScreenRay(mx, my, true)
+		local category, cursorWorldCoors = Spring.TraceScreenRay(mx, my, true)
+		if (category == 'ground') and (cursorWorldCoors ~= nil) then
 		local x, y, z = cursorWorldCoors[1], cursorWorldCoors[2], cursorWorldCoors[3]
 --		 local _, inLos = Spring.GetPositionLosState(x,y,z, myAllyTeam)
 --		 if (inLos) then
@@ -787,6 +788,7 @@ function widget:MousePress(mx, my, mb)
 --		 end
 		Spring.SendLuaRulesMsg("ctf_respawn "..x.." "..y.." "..z)
 		spawn_mode = false
+		end
 	end
 	end
 end
