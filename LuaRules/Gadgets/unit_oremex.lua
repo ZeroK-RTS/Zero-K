@@ -215,13 +215,13 @@ local function get_grid_coord(size)
 end
 
 local function grid_size(ore_count)
-  if (ore_count == 0) then return 1 end
   local size = 1
   local count = ore_count
   while (count >= (size*size-2)) do
     size = size+2
   end
 --   Spring.Echo(size.."x"..size.." can hold "..count.." ore")
+  if (size < 3) then return 3 end -- quickfix to spawn stopping
   return size
   -- 3x3 grid can hold 9 ore
   -- 5x5 grid can hold 25 ore
