@@ -211,6 +211,7 @@ local function chooseUnitDefID(array)
 		end
 	end
 	Spring.Echo(" ******* Chance Wrong ******* ")
+	return array[1].ID
 end
 
 -- chooses a unitDef at random from the chance of each being chosen and prints useful debug
