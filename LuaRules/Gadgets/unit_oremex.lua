@@ -42,6 +42,7 @@ local GaiaAllyTeamID		= select(6,spGetTeamInfo(GaiaTeamID))
 local spGetFeatureDefID		= Spring.GetFeatureDefID
 local spTransferUnit		= Spring.TransferUnit
 local spGetAllUnits		= Spring.GetAllUnits
+local spGetGameFrame		= Spring.GetGameFrame
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
 local random = math.random
@@ -394,14 +395,16 @@ function gadget:Initialize()
     gadgetHandler:RemoveCallIn("GameFrame")
   end
   -- partial luarules reload support, you have to reclaim all ore nearby mex for it to begin working again
-  local units = spGetAllUnits()
-  for i=1,#units do
-    UnitFin(units[i], spGetUnitDefID(units[i]), spGetUnitTeam(units[i]))
-  end
-  mapWidth = Game.mapSizeX
-  mapHeight = Game.mapSizeZ
-  if (PRESPAWN_EXTRACTORS) then
-    PreSpawn()
+  if (spGetGameFrame() > 1) then
+    local units = spGetAllUnits()
+    for i=1,#units do
+      UnitFin(units[i], spGetUnitDefID(units[i]), spGetUnitTeam(units[i]))
+    end
+    mapWidth = Game.mapSizeX
+    mapHeight = Game.mapSizeZ
+    if (PRESPAWN_EXTRACTORS) then
+      PreSpawn()
+    end
   end
 end
 
