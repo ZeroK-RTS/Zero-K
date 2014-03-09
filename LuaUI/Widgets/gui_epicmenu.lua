@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.4 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.325 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2013-08-31
     license   = "GNU GPL, v2 or later",
@@ -9,7 +9,7 @@ function widget:GetInfo()
     handler   = true,
     experimental = false,	
     enabled   = true,
-    alwaysStart = true,
+	alwaysStart = true,
   }
 end
 
@@ -66,17 +66,9 @@ local title_text = confdata.title
 local title_image = confdata.title_image
 local subMenuIcons = confdata.subMenuIcons  
 local useUiKeys = false
-local singleplayer = false
 --file_return = nil
 
 local custom_cmd_actions = select(9, include("Configs/integral_menu_commands.lua"))
-
-do
-	local playerlist = Spring.GetPlayerList() or {}
-	if (#playerlist <= 1) then
-		singleplayer = true
-	end
-end
 
 --------------------------------------------------------------------------------
 
@@ -102,9 +94,7 @@ local screen0
 --------------------------------------------------------------------------------
 -- Global chili controls
 local window_crude 
-local window_crude_old
 local window_exit
-local window_exit_confirm
 local window_flags
 local window_help
 local window_getkey
@@ -2233,73 +2223,6 @@ local function ShowHideCrudeMenu()
 	end
 end
 
-local function DisposeExitConfirmWindow()
-	if window_exit_confirm then
-		window_exit_confirm:Dispose()
-		window_exit_confirm = nil
-	end
-end
-
-local function MakeExitConfirmWindow(text, action)
-	local screen_width,screen_height = Spring.GetWindowGeometry()
-	local menu_width = 320
-	local menu_height = 64
-    
-	ActionMenu()
-	window_exit_confirm = Window:New{
-		name='exitwindow_confirm',
-		parent = screen0,
-		x = screen_width/2 - menu_width/2,  
-		y = screen_height/2 - menu_height/2,  
-		dockable = false,
-		clientWidth = menu_width,
-		clientHeight = menu_height,
-		draggable = false,
-		tweakDraggable = false,
-		resizable = false,
-		tweakResizable = false,
-		minimizable = false,
-	}
-	Label:New{
-		parent = window_exit_confirm,
-		caption = text,
-		width = "100%",
-                --x = "50%",
-                y = 4,
-		align="center",
-		textColor = color.main_fg
-	}
-	Button:New{
-		name = 'confirmExitYesButton';
-		parent = window_exit_confirm,
-                caption = "Yes",
-                OnMouseUp = { function()
-				action()
-				DisposeExitConfirmWindow()
-			end
-		},
-		height=32,
-		x = 4,
-		right = "55%",
-		bottom = 4,
-	}
-	Button:New{
-		name = 'confirmExitNoButton';
-		parent = window_exit_confirm,
-                caption = "No",
-                OnMouseUp = { function()
-				DisposeExitConfirmWindow()
-				ActionMenu()
-			end
-		},
-		height=32,
-		x = "55%",
-		right = 4,
-		bottom = 4,
-	}
-	
-end
-
 local function MakeMenuBar()
 	local btn_padding = {4,3,2,2}
 	local btn_margin = {0,0,0,0}
@@ -2310,17 +2233,17 @@ local function MakeMenuBar()
     local exit_menu_cancel_width = exit_menu_btn_width/2
     local exit_menu_cancel_height = 2*exit_menu_btn_height/3
 
-	local crude_width = 240
-	local crude_height = 400
+	local crude_width = 460
+	local crude_height = B_HEIGHT+10
 	
+
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={4,4,4,4}, }
 	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
-	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 32,height = 22, OnClick = { MakeFlags }, margin={4,4,4,6}  }
+	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,6}  }
 	
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	
-	--[[
 	window_exit = Window:New{
 		name='exitwindow',
 		x = screen_width/2 - exit_menu_width/2,  
@@ -2333,7 +2256,7 @@ local function MakeMenuBar()
 		resizable = false,
 		minimizable = false,
 		backgroundColor = color.main_bg,
-		color = {nil,nil,nil,0.5},
+		color = {0,0,0,0.5},
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		
@@ -2403,175 +2326,16 @@ local function MakeMenuBar()
 			},
 		},
 	}
+	
 	screen0:RemoveChild(window_exit)
-	]]
-	
+		
 	window_crude = Window:New{
-		name='epicmenu_window',
-		x = screen_width/2 - crude_width/2,  
-		y = screen_height/2 - crude_height/2, 
-		dockable = false,
-		clientWidth = crude_width,
-		clientHeight = crude_height,
-		draggable = true,
-		tweakDraggable = true,
-		resizable = false,
-		tweakResizable = false,
-		minimizable = false,
-		--color = {nil,nil,nil,0.5},
-	}
-	Label:New{
-		parent = window_crude,
-		caption = 'MAIN MENU', 
-		width = exit_menu_width,
-                --x = "50%",
-                y = 4,
-		align="center",
-		textColor = color.main_fg
-	}
-	Image:New{
-		parent = window_crude,
-		tooltip = title_text,
-		file = title_image,
-		height=32,
-		width=32,
-		y = 0,
-		right = 0,
-	}
-	
-	local mainstack = StackPanel:New{
-		name='stack_main',
-		parent = window_crude,
-		orientation = 'vertical',
-		width = '100%',
-		y = 32,
-		bottom = 0,
-		resizeItems = false,
-		padding = {0,0,0,0},
-		itemPadding = {1,1,1,1},
-		itemMargin = {1,1,1,1},
-		autoArrangeV = true,
-		autoArrangeH = false,
-	}
-	
-	Button:New{
-		name= 'gameConfigButton',
-		parent = mainstack,
-		caption = "Game Functions",
-		OnClick = { function() MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-		padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions and Settings...',
-		height=32,
-		width="100%",
-		children = {
-			Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png', height=B_HEIGHT-2,width=B_HEIGHT-2, y=2},
-		},
-	}
-	Button:New{
-		name= 'settingButton',
-		parent = mainstack,
-		caption = "Settings",
-		OnClick = { function() MakeSubWindow('Settings') end, },
-		textColor=color.menu_fg,
-		padding = btn_padding, margin = btn_margin,	tooltip = 'General Settings...',
-		height=32,
-		width="100%",
-		children = {
-			Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, y=2},
-		},
-	}
-	Button:New{
-		name= 'tweakGuiButton',
-		parent = mainstack,
-		caption = "GUI Tweak",
-		OnClick = { function() spSendCommands{"luaui tweakgui"} end, },
-		textColor=color.menu_fg,
-		padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
-		height=32,
-		width="100%",
-		children = {
-			Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, y=2},
-		},
-	}
-	Button:New{
-		name= 'helpButton',
-		parent = mainstack,
-		caption = "Help",
-		OnClick = { function() MakeSubWindow('Help') end, },
-		textColor=color.menu_fg,
-		padding = btn_padding, margin = btn_margin, tooltip = 'Help...',
-		height=32,
-		width="100%",
-		children = {
-			Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/questionmark.png', height=B_HEIGHT-2,width=B_HEIGHT-2, y=2 },
-		},
-	}
-	Button:New{
-		name = 'voteResignButton';
-		parent = mainstack,
-                caption = "Vote Resign",
-                OnClick = singleplayer and {} or { function()
-				spSendCommands("say !voteresign") --after this gui_chili_vote.lua will handle vote GUI
-				ActionMenu()
-			end,
-		},
-		tooltip = "Ask teammates to resign",
-		height=32,
-		width="100%",
-		backgroundColor = singleplayer and {0.3, 0.3, 0.3, 0.8},
-		font = {
-			color = singleplayer and {0.3, 0.3, 0.3, 1},
-		}
-	}
-	--Spring.Echo("blah", singleplayer)
-	Button:New{
-		name= 'resignButton',
-		parent = mainstack,
-                caption = "Resign",
-                OnClick = singleplayer and {} or { function()
-				MakeExitConfirmWindow("Are you sure you want to resign?", function() spSendCommands{"spectator"} end)
-			end,
-		},
-		tooltip = "Abandon team and become spectator",
-		height=32,
-		width="100%",
-		backgroundColor = singleplayer and {0.3, 0.3, 0.3, 0.8},
-		font = {
-			color = singleplayer and {0.3, 0.3, 0.3, 1},
-		}
-	}
-	Button:New{
-		name= 'exitGameButton',
-		parent = mainstack,
-		caption = "Exit game",
-		OnClick = { function()
-				MakeExitConfirmWindow("Are you sure you want to quit the game?", function() spSendCommands{"quit","quitforce"} end)
-			end,
-		},
-		tooltip = "Leave game completely.",
-		height=32,
-		width="100%",
-	}
-	Button:New{
-		name= 'returnToGameButton',
-		parent = mainstack,
-		caption = "Return to Game", 
-		OnClick = { function() ActionMenu() end,},
-		height=32,
-		width="100%",
-	}
-	
-	mainstack:AddChild(img_flag)
-	
-	-- we love old menu, pls dont kill
-	local crude_width_old = 460
-	local crude_height_old = B_HEIGHT+10
-	window_crude_old = Window:New{
 		name='epicmenubar',
 		right = 0,  
 		y = 50, -- resbar height
 		dockable = true,
-		clientWidth = crude_width_old,
-		clientHeight = crude_height_old,
+		clientWidth = crude_width,
+		clientHeight = crude_height,
 		draggable = false,
 		tweakDraggable = true,
 		resizable = false,
@@ -2601,9 +2365,7 @@ local function MakeMenuBar()
 					-- odd-number button width keeps image centered
 					Button:New{
 						name= 'gameSettingButton',
-						caption = "", OnMouseUp = { function() 
-								ActionMenu()
-								MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions and Settings...',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png', height=B_HEIGHT-2,width=B_HEIGHT-2},
@@ -2611,9 +2373,7 @@ local function MakeMenuBar()
 					},
 					Button:New{
 						name= 'settingButton',
-						caption = "", OnMouseUp = { function() 
-								ActionMenu()
-								MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'General Settings...', 
 						children = {
 							Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
@@ -2746,11 +2506,10 @@ local function MakeMenuBar()
 					Button:New{
 						name= 'quitButton',
 						caption = "", OnMouseUp = { function() 
--- 								if not exitWindowVisible then
--- 									screen0:AddChild(window_exit) 
--- 									exitWindowVisible = true
--- 								end
-								ActionMenu()
+								if not exitWindowVisible then
+									screen0:AddChild(window_exit) 
+									exitWindowVisible = true
+								end
 							end, }, 
 						textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin, tooltip = 'Exit or Resign...',
@@ -2762,7 +2521,6 @@ local function MakeMenuBar()
 			}
 		}
 	}
-	screen0:AddChild(window_crude_old)
 	ShowHideCrudeMenu()
 end
 
@@ -3165,21 +2923,17 @@ function widget:KeyPress(key, modifier, isRepeat)
 end
 
 function ActionExitWindow()
-	--[[
 	if exitWindowVisible then
 		screen0:RemoveChild(window_exit) 
 		exitWindowVisible = false
 	else
 		screen0:AddChild(window_exit) 
 		exitWindowVisible = true
-	end
-	]]
-	ActionMenu()
+	end						
 end
 
 function ActionMenu()
 	settings.show_crudemenu = not settings.show_crudemenu
-	DisposeExitConfirmWindow()
 	ShowHideCrudeMenu()
 end
 

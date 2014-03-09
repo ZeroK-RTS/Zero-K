@@ -90,6 +90,7 @@ local paybackDefs = { -- cost is how much to pay back
 --local CMD_MEXE = 30666
 
 local spammedError = false
+local debugMode = false
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -213,6 +214,37 @@ local function sendTeamInformationToAwards(teamID, baseMetal, overdriveMetal, ov
 		overdriveEnergyChange = overdriveEnergyChange,
 	}
 end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Debug Functions
+ 
+ function TableEcho(data, indent)
+	indent = indent or ""
+	for name, v in pairs(data) do
+		local ty =  type(v)
+		if ty == "table" then
+			Spring.Echo(indent .. name .. " = {")
+			GG.TableEcho(v, indent .. "    ")
+			--Spring.Echo(indent .. "}")
+		elseif ty == "boolean" then
+			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
+		else
+			Spring.Echo(indent .. name .. " = " .. v)
+		end
+	end
+end
+
+function UnitEcho(unitID, st)
+	st = st or unitID
+	if Spring.ValidUnitID(unitID) then
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		Spring.MarkerAddPoint(x,y,z, st)
+	else
+		Spring.Echo("Invalid unitID")
+		Spring.Echo(unitID)
+	end
+end
  
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -231,6 +263,10 @@ local function AddPylonToGrid(unitID)
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 
+	if debugMode then
+		Spring.Echo("AddPylonToGrid " .. unitID)
+	end
+	
 	local newGridID = 0
 	local attachedGrids = 0
 	local attachedGrid = {}
@@ -242,14 +278,18 @@ local function AddPylonToGrid(unitID)
 	for i = 1, list.count do
 		local pid = list.data[i]
 		local pylonData = pylon[allyTeamID][pid]
-		if pid ~= unitID and (pylonData.x-pX)^2 + (pylonData.z-pZ)^2 <= (pylonData.linkRange+ownRange)^2  and pylonData.gridID ~= 0 and pylonData.active then
-			pylon[allyTeamID][unitID].nearPylon[pid] = true
-			if not attachedGridID[pylonData.gridID] then
-				attachedGrids = attachedGrids + 1
-				
-				attachedGrid[attachedGrids] = pylonData.gridID
-				attachedGridID[pylonData.gridID] = true
+		if pylonData then
+			if pid ~= unitID and (pylonData.x-pX)^2 + (pylonData.z-pZ)^2 <= (pylonData.linkRange+ownRange)^2  and pylonData.gridID ~= 0 and pylonData.active then
+				pylon[allyTeamID][unitID].nearPylon[pid] = true
+				if not attachedGridID[pylonData.gridID] then
+					attachedGrids = attachedGrids + 1
+					
+					attachedGrid[attachedGrids] = pylonData.gridID
+					attachedGridID[pylonData.gridID] = true
+				end
 			end
+		elseif not spammedError then
+			Spring.Echo("Pylon problem detected in AddPylonToGrid.")
 		end
 	end
 	
@@ -329,6 +369,9 @@ local function AddPylonToGrid(unitID)
 end
 
 local function QueueAddPylonToGrid(unitID)
+	if debugMode then
+		Spring.Echo("QueueAddPylonToGrid " .. unitID)
+	end
 	if not pylonGridQueue then
 		pylonGridQueue = {}
 	end
@@ -336,6 +379,9 @@ local function QueueAddPylonToGrid(unitID)
 end
 
 local function RemovePylonsFromGridQueue(unitID)
+	if debugMode then
+		Spring.Echo("RemovePylonsFromGridQueue " .. unitID)
+	end
 	if pylonGridQueue then
 		pylonGridQueue[unitID] = nil
 	end
@@ -366,6 +412,11 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	list.data[list.count] = unitID
 	
 	pylon[allyTeamID][unitID].listID = list.count
+	
+	if debugMode then
+		Spring.Echo("AddPylon " .. unitID)
+		UnitEcho(unitID, list.count .. ", " .. unitID)
+	end
 	
 	-- check for mexes
 	if unitOverdrive then 
@@ -402,6 +453,10 @@ end
 local function DestoryGrid(allyTeamID,oldGridID)
 	local ai = allyTeamInfo[allyTeamID]
 	
+	if debugMode then
+		Spring.Echo("DestoryGrid " .. oldGridID)
+	end
+	
 	for pid,_ in pairs(ai.grid[oldGridID].pylon) do
 		pylon[allyTeamID][pid].gridID = 0
 		pylon[allyTeamID][pid].nearPylon = {}
@@ -424,6 +479,10 @@ end
 local function ReactivatePylon(unitID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
+	
+	if debugMode then
+		Spring.Echo("ReactivatePylon " .. unitID)
+	end
 	
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	
@@ -448,16 +507,20 @@ local function DeactivatePylon(unitID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	
+	if debugMode then
+		Spring.Echo("DeactivatePylon " .. unitID)
+	end
+	
 	RemovePylonsFromGridQueue(unitID)
 	
 	local oldGridID = pylon[allyTeamID][unitID].gridID
 	if oldGridID ~= 0 then
-		local pylonList = ai.grid[oldGridID].pylon
+		local pylonMap = ai.grid[oldGridID].pylon
 		local energyList = pylon[allyTeamID][unitID].nearEnergy
 		
 		DestoryGrid(allyTeamID,oldGridID)
 		
-		for pid,_ in pairs(pylonList) do
+		for pid,_ in pairs(pylonMap) do
 			if (pid ~= unitID) then
 				QueueAddPylonToGrid(pid)
 			end
@@ -469,12 +532,19 @@ end
 
 local function RemovePylon(unitID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
+	
+	if debugMode then
+		Spring.Echo("RemovePylon start " .. unitID)
+		TableEcho(pylonList[allyTeamID])
+		TableEcho(pylon[allyTeamID])
+	end
+	
+	RemovePylonsFromGridQueue(unitID)
+	
 	if not pylon[allyTeamID][unitID] then
 		--Spring.Echo("RemovePylon not pylon[allyTeamID][unitID] " .. unitID)
 		return
 	end
-	
-	RemovePylonsFromGridQueue(unitID)
 	
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
@@ -485,12 +555,12 @@ local function RemovePylon(unitID)
 	local mexList = pylon[allyTeamID][unitID].mex
 	
 	if activeState and oldGridID ~= 0 then
-		local pylonList = ai.grid[oldGridID].pylon	
+		local pylonMap = ai.grid[oldGridID].pylon	
 		local energyList = pylon[allyTeamID][unitID].nearEnergy
 	
 		DestoryGrid(allyTeamID,oldGridID)
 		
-		for pid,_ in pairs(pylonList) do
+		for pid,_ in pairs(pylonMap) do
 			if (pid ~= unitID) then
 				QueueAddPylonToGrid(pid)
 			end
@@ -519,10 +589,14 @@ local function RemovePylon(unitID)
 		for i = 1, list.count do
 			local pid = list.data[i]
 			local pylonData = pylon[allyTeamID][pid]
-			if pid == mid then
-				pylonData.mex[mid] = true
-				mexGridID = pylonData.gridID
-				break
+			if pylonData then
+				if pid == mid then
+					pylonData.mex[mid] = true
+					mexGridID = pylonData.gridID
+					break
+				end
+			elseif not spammedError then
+				Spring.Echo("Pylon problem detected in RemovePylon.")
 			end
 		end
 		
@@ -536,6 +610,12 @@ local function RemovePylon(unitID)
 			ai.grid[mexGridID].mexMetal = ai.grid[mexGridID].mexMetal + orgMetal
 			ai.grid[mexGridID].mexSquaredSum = ai.grid[mexGridID].mexSquaredSum + (orgMetal * orgMetal)
 		end
+	end
+	
+	if debugMode then
+		Spring.Echo("RemovePylon end " .. unitID)
+		TableEcho(pylonList[allyTeamID])
+		TableEcho(pylon[allyTeamID])
 	end
 	
 end
@@ -830,15 +910,19 @@ function gadget:GameFrame(n)
 			for i = 1, list.count do
 				local unitID = list.data[i]
 				local pylonData = pylon[allyTeamID][unitID]
-				if spValidUnitID(unitID) then
-					local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
-					local states = spGetUnitStates(unitID)
-					local currentlyActive = (not stunned_or_inbuld) and states and states.active
-					if (currentlyActive) and (not pylonData.active) then
-						ReactivatePylon(unitID)
-					elseif (not currentlyActive) and (pylonData.active) then
-						DeactivatePylon(unitID)
+				if pylonData then
+					if spValidUnitID(unitID) then
+						local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
+						local states = spGetUnitStates(unitID)
+						local currentlyActive = (not stunned_or_inbuld) and states and states.active
+						if (currentlyActive) and (not pylonData.active) then
+							ReactivatePylon(unitID)
+						elseif (not currentlyActive) and (pylonData.active) then
+							DeactivatePylon(unitID)
+						end
 					end
+				elseif not spammedError then
+					Spring.Echo("Pylon problem detected in status check.")
 				end
 			end
 			
@@ -934,14 +1018,18 @@ function gadget:GameFrame(n)
 			for i = 1, list.count do
 				local unitID = list.data[i]
 				local pylonData = pylon[allyTeamID][unitID]
-				if pylonData.neededLink then
-					if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
-						spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
-						lowPowerUnits.inner.count = lowPowerUnits.inner.count + 1
-						lowPowerUnits.inner.units[lowPowerUnits.inner.count] = unitID
-					else
-						spSetUnitRulesParam(unitID,"lowpower",0, inlosTrueTable)
+				if pylonData then
+					if pylonData.neededLink then
+						if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
+							spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
+							lowPowerUnits.inner.count = lowPowerUnits.inner.count + 1
+							lowPowerUnits.inner.units[lowPowerUnits.inner.count] = unitID
+						else
+							spSetUnitRulesParam(unitID,"lowpower",0, inlosTrueTable)
+						end
 					end
+				elseif not spammedError then
+					Spring.Echo("Pylon problem detected in low power check.")
 				end
 			end
 
@@ -1041,35 +1129,39 @@ function gadget:GameFrame(n)
 			for i = 1, list.count do
 				local unitID = list.data[i]
 				local pylonData = pylon[allyTeamID][unitID]
-				local grid = pylonData.gridID
-				local gridEfficiency = -1
-				if grid ~= 0 then
-					if gridMetalGain[grid] > 0 then 
-						gridEfficiency = gridEnergySpent[grid]/gridMetalGain[grid]
-					else 
-						gridEfficiency = 0
-					end
-				end 
-				
-				spSetUnitRulesParam(unitID, "gridefficiency", gridEfficiency, alliedTrueTable)
-				
-				if not pylonData.overdrive then
-					local unitDefID = spGetUnitDefID(unitID)
-					local unitDef = unitDefID and UnitDefs[unitDefID]
-					if not unitDef then
-						if not spammedError then
-							Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for pylon")
-							spammedError = true
+				if pylonData then
+					local grid = pylonData.gridID
+					local gridEfficiency = -1
+					if grid ~= 0 then
+						if gridMetalGain[grid] > 0 then 
+							gridEfficiency = gridEnergySpent[grid]/gridMetalGain[grid]
+						else 
+							gridEfficiency = 0
 						end
-					else
-						if not pylonDefs[unitDefID].keeptooltip then
-							if grid ~= 0 then
-								spSetUnitTooltip(unitID,"GRID: "  .. round(gridEnergySpent[grid],2) .. "/" .. round(maxGridCapacity[grid],2) .. "E => " .. round(gridMetalGain[grid],2).."M")
-							else
-								spSetUnitTooltip(unitID,unitDef.humanName .. " - Currently Disabled")
+					end 
+					
+					spSetUnitRulesParam(unitID, "gridefficiency", gridEfficiency, alliedTrueTable)
+					
+					if not pylonData.overdrive then
+						local unitDefID = spGetUnitDefID(unitID)
+						local unitDef = unitDefID and UnitDefs[unitDefID]
+						if not unitDef then
+							if not spammedError then
+								Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for pylon")
+								spammedError = true
+							end
+						else
+							if not pylonDefs[unitDefID].keeptooltip then
+								if grid ~= 0 then
+									spSetUnitTooltip(unitID,"GRID: "  .. round(gridEnergySpent[grid],2) .. "/" .. round(maxGridCapacity[grid],2) .. "E => " .. round(gridMetalGain[grid],2).."M")
+								else
+									spSetUnitTooltip(unitID,unitDef.humanName .. " - Currently Disabled")
+								end
 							end
 						end
 					end
+				elseif not spammedError then
+					Spring.Echo("Pylon problem detected in tooltip update.")
 				end
 			end
 
@@ -1214,12 +1306,16 @@ local function AddMex(unitID, teamID, metalMake)
 		for i = 1, list.count do
 			local pid = list.data[i]
 			local pylonData = pylon[allyTeamID][pid]
-			if unitID == pid then -- self OD mexes
-			--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2  then
-				--pylonData.mexes = pylonData.mexes+1
-				pylonData.mex[unitID] = true
-				mexGridID = pylonData.gridID
-				break
+			if pylonData then
+				if unitID == pid then -- self OD mexes
+				--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2  then
+					--pylonData.mexes = pylonData.mexes+1
+					pylonData.mex[unitID] = true
+					mexGridID = pylonData.gridID
+					break
+				end
+			elseif not spammedError then
+				Spring.Echo("Pylon problem detected in AddMex.")
 			end
 		end
 		mexes[allyTeamID][mexGridID][unitID] = metalMake
@@ -1257,9 +1353,13 @@ local function RemoveMex(unitID)
 		for i = 1, list.count do
 			local pid = list.data[i]
 			local pylonData = pylon[mex.allyTeamID][pid]
-			if (pylonData.mex[unitID] ~= nil) then
-				--pylonData.mexes = pylonData.mexes - 1
-				pylonData.mex[unitID] = nil
+			if pylonData then
+				if (pylonData.mex[unitID] ~= nil) then
+					--pylonData.mexes = pylonData.mexes - 1
+					pylonData.mex[unitID] = nil
+				end
+			elseif not spammedError then
+				Spring.Echo("Pylon problem detected in RemoveMex.")
 			end
 		end
 		mexes[mex.allyTeamID][mex.gridID][unitID] = nil
@@ -1278,6 +1378,26 @@ local function RemoveMex(unitID)
 		end
 	end
 
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local function OverdriveDebugToggle()
+	if Spring.IsCheatingEnabled() then
+		debugMode = not debugMode
+		if debugMode then
+			local allyTeamList = Spring.GetAllyTeamList()
+			for i=1,#allyTeamList do
+				local allyTeamID = allyTeamList[i]
+				local list = pylonList[allyTeamID]
+				for i = 1, list.count do
+					local unitID = list.data[i]
+					UnitEcho(unitID, i .. ", " .. unitID)
+				end
+			end
+		end
+	end
 end
 
 -------------------------------------------------------------------------------------
@@ -1302,6 +1422,8 @@ function gadget:Initialize()
 		--	AddEnergy(unitID, unitDefID, unitTeam)
 		--end
 	end
+	
+	gadgetHandler:AddChatAction("odb",OverdriveDebugToggle,"Toggles debug mode for overdrive.")
 end
 
 -------------------------------------------------------------------------------------
