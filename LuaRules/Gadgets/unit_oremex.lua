@@ -30,6 +30,7 @@ local spGetTeamInfo 	    	= Spring.GetTeamInfo
 local spCreateFeature		= Spring.CreateFeature
 local spSetFeatureReclaim	= Spring.SetFeatureReclaim
 local spSetFeatureDirection	= Spring.SetFeatureDirection
+local spSetFeatureAlwaysVisible	= Spring.SetFeatureAlwaysVisible
 local spCreateUnit		= Spring.CreateUnit
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local spSetUnitRulesParam	= Spring.SetUnitRulesParam
@@ -43,6 +44,8 @@ local spGetFeatureDefID		= Spring.GetFeatureDefID
 local spTransferUnit		= Spring.TransferUnit
 local spGetAllUnits		= Spring.GetAllUnits
 local spGetGameFrame		= Spring.GetGameFrame
+local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
+local spGetAllyTeamList		= Spring.GetAllyTeamList
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
 local random = math.random
@@ -53,6 +56,7 @@ local floor = math.floor
 
 local mapWidth
 local mapHeight
+local allyTeams
 
 local energyDefs = { -- if gaia mex get's in range of any of below structures, it will trasmit it ownership
   [UnitDefNames["armestor"].id] = UnitDefNames["armestor"].customParams.pylonrange,
@@ -187,44 +191,6 @@ local function UnitFin(unitID, unitDefID, unitTeam)
   end
 end
 
--- local function get_grid_coord(size)
--- --   Spring.Echo("full_size "..full_size)
---   if (size == 1) then return 0,0
---   else
---     if (random(0,1)==1) then
---       local mid = (size+1)*0.5
---       local i = random(1,size)-mid
---       local j = size
---       if (random(0,1)==1) then j = 1 end
---       j=j-mid
--- --       Spring.Echo(i.." "..j)
---       return i*40, j*40
---     else
---       local mid = (size+1)*0.5
---       local i = size
---       if (random(0,1)==1) then i = 1 end
---       i=i-mid
---       local j = random(1,size)-mid
--- --       Spring.Echo(i.." "..j)
---       return i*40, j*40
---     end
---   end
--- end
--- 
--- local function grid_size(ore_count)
---   local size = 1
---   local count = ore_count
---   while (count >= (size*size-2)) do
---     size = size+2
---   end
--- --   Spring.Echo(size.."x"..size.." can hold "..count.." ore")
---   if (size < 3) then return 3 end -- quickfix to spawn stopping
---   return size
---   -- 3x3 grid can hold 9 ore
---   -- 5x5 grid can hold 25 ore
---   -- etc
--- end
-
 local function CanSpawnOreAt(x,z)
   local features = spGetFeaturesInRectangle(x-30,z-30,x+30,z+30)
   for i=1,#features do
@@ -284,6 +250,13 @@ function MineMoreOre(unitID, howMuch, forcefully)
   end
   local x,_,z = spGetUnitPosition(unitID)
   local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
+  local allyTeam = spGetUnitAllyTeam(unitID)
+  if (#allyTeams>1) and (allyTeam == GaiaAllyTeamID) then
+    allyTeam = random(0,#allyTeams)
+    while (allyTeam == GaiaAllyTeamID) do
+      allyTeam = random(0,#allyTeams)
+    end
+  end
   if (#features >= 144) and not(forcefully) then return end -- too much reclaim, please reclaim
   if (ore>=1) then
     try=0
@@ -305,9 +278,10 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	end
 -- 	Spring.Echo("test "..spawn_amount.." "..ore-spawn_amount)
 	if (spawn_amount <= (ore-spawn_amount)) then
-	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b)
+	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", allyTeam)
 	  if (oreID) then
 	    spSetFeatureReclaim(oreID, spawn_amount)
+	    spSetFeatureAlwaysVisible(oreID, false)
 	    local rd = random(360) * pi / 180
 	    spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
 	    ore = ore - spawn_amount
@@ -317,9 +291,10 @@ function MineMoreOre(unitID, howMuch, forcefully)
       try=try+1
     end
     if (forcefully) then -- drop all thats left on mex
-    local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z)
+    local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z, "n", allyTeam)
       if (oreID) then
 	spSetFeatureReclaim(oreID, ore)
+	spSetFeatureAlwaysVisible(oreID, false)
 	local rd = random(360) * pi / 180
 	spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
 	ore = 0
@@ -394,14 +369,15 @@ function gadget:Initialize()
     gadgetHandler:RemoveCallIn("UnitPreDamaged")
     gadgetHandler:RemoveCallIn("GameFrame")
   end
+  mapWidth = Game.mapSizeX
+  mapHeight = Game.mapSizeZ
+  allyTeams = spGetAllyTeamList()
   -- partial luarules reload support, you have to reclaim all ore nearby mex for it to begin working again
   if (spGetGameFrame() > 1) then
     local units = spGetAllUnits()
     for i=1,#units do
       UnitFin(units[i], spGetUnitDefID(units[i]), spGetUnitTeam(units[i]))
     end
-    mapWidth = Game.mapSizeX
-    mapHeight = Game.mapSizeZ
     if (PRESPAWN_EXTRACTORS) then
       PreSpawn()
     end
@@ -411,6 +387,7 @@ end
 function gadget:GameStart()
   mapWidth = Game.mapSizeX
   mapHeight = Game.mapSizeZ
+  allyTeams = spGetAllyTeamList()
   if (PRESPAWN_EXTRACTORS) then
     PreSpawn()
   end
