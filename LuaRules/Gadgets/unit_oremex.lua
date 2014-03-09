@@ -16,8 +16,6 @@ end
 
 -- TODO annoying units try to attack invulnerable mexes if you enable that modoption
 -- something needs to be done...
--- Also ore spawn algo should be improved, although it's fair and if it can't spawn feature for any reason
--- it will store how much it needs to spawn and simply try to spawn more fat ore next second
 
 local modOptions = Spring.GetModOptions()
 if (gadgetHandler:IsSyncedCode()) then
@@ -46,15 +44,14 @@ local spTransferUnit		= Spring.TransferUnit
 local spGetAllUnits		= Spring.GetAllUnits
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
-local Ore = {} -- by FeatureID, should feature die (reclaimed) it will tell oremex to spawn more ore if it's fine.
--- NOTE ore extractors will keep ore inside if they already spawned a lot, they will drop fat should more ore get reclaimed or on death though.
--- this is intended so ore features do not flood map and 'cause perfomence drop.
-
 local random = math.random
 local cos   = math.cos
 local sin   = math.sin
 local pi    = math.pi
 local floor = math.floor
+
+local mapWidth
+local mapHeight
 
 local energyDefs = { -- if gaia mex get's in range of any of below structures, it will trasmit it ownership
   [UnitDefNames["armestor"].id] = UnitDefNames["armestor"].customParams.pylonrange,
@@ -73,6 +70,7 @@ local PylonRange = UnitDefNames["armestor"].customParams.pylonrange
 local INVULNERABLE_EXTRACTORS = tonumber(modOptions.oremex_invul or 0) -- invulnerability of extractors. they can still switch team side should OD get connected
 local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 120)
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn)==1)
+local MAX_STEPS = 15 -- vine length
 
 -- godmode stuff
 function gadget:UnitPreDamaged(unitID)
@@ -88,6 +86,7 @@ end
 -- if mex OD is <= 1 and it's godmode on, transfer mex to gaia team
 -- if mex is inside energyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
 local function GaiaLoopTransfer()
+--   if (INVULNERABLE_EXTRACTORS==1) then -- otherwise just destroy it and build your own, this is buggy anyway
   for i=1,#OreMex do
     if (OreMex[i]~=nil) then
       local unitID = OreMex[i].unitID
@@ -128,6 +127,7 @@ local function GaiaLoopTransfer()
       end
     end
   end
+--   end
 end
 
 -- godmode stuff end
@@ -136,6 +136,14 @@ function gadget:GameFrame(f)
   if ((f%32)==1) then
     GaiaLoopTransfer()
   end
+--   if ((f%(32*60))==1) then
+--     for i=1,#OreMex do
+--       if (OreMex[i]~=nil) then
+-- 	local unitID = OreMex[i].unitID
+-- 	TellDebugInfo(unitID)
+--       end
+--     end
+--   end
 end
 
 -- function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
@@ -181,7 +189,6 @@ local function UnitFin(unitID, unitDefID, unitTeam)
 	unitID = unitID,
 	ore = 0, -- metal.
 	income = income, -- should mex have bigger income it will drop ore less frequent but more fat ore.
-	ore_count = 0, -- number of features.
 	x = x,
 	z = z,
       }
@@ -190,43 +197,43 @@ local function UnitFin(unitID, unitDefID, unitTeam)
   end
 end
 
-local function get_grid_coord(size)
---   Spring.Echo("full_size "..full_size)
-  if (size == 1) then return 0,0
-  else
-    if (random(0,1)==1) then
-      local mid = (size+1)*0.5
-      local i = random(1,size)-mid
-      local j = size
-      if (random(0,1)==1) then j = 1 end
-      j=j-mid
---       Spring.Echo(i.." "..j)
-      return i*40, j*40
-    else
-      local mid = (size+1)*0.5
-      local i = size
-      if (random(0,1)==1) then i = 1 end
-      i=i-mid
-      local j = random(1,size)-mid
---       Spring.Echo(i.." "..j)
-      return i*40, j*40
-    end
-  end
-end
-
-local function grid_size(ore_count)
-  local size = 1
-  local count = ore_count
-  while (count >= (size*size-2)) do
-    size = size+2
-  end
---   Spring.Echo(size.."x"..size.." can hold "..count.." ore")
-  if (size < 3) then return 3 end -- quickfix to spawn stopping
-  return size
-  -- 3x3 grid can hold 9 ore
-  -- 5x5 grid can hold 25 ore
-  -- etc
-end
+-- local function get_grid_coord(size)
+-- --   Spring.Echo("full_size "..full_size)
+--   if (size == 1) then return 0,0
+--   else
+--     if (random(0,1)==1) then
+--       local mid = (size+1)*0.5
+--       local i = random(1,size)-mid
+--       local j = size
+--       if (random(0,1)==1) then j = 1 end
+--       j=j-mid
+-- --       Spring.Echo(i.." "..j)
+--       return i*40, j*40
+--     else
+--       local mid = (size+1)*0.5
+--       local i = size
+--       if (random(0,1)==1) then i = 1 end
+--       i=i-mid
+--       local j = random(1,size)-mid
+-- --       Spring.Echo(i.." "..j)
+--       return i*40, j*40
+--     end
+--   end
+-- end
+-- 
+-- local function grid_size(ore_count)
+--   local size = 1
+--   local count = ore_count
+--   while (count >= (size*size-2)) do
+--     size = size+2
+--   end
+-- --   Spring.Echo(size.."x"..size.." can hold "..count.." ore")
+--   if (size < 3) then return 3 end -- quickfix to spawn stopping
+--   return size
+--   -- 3x3 grid can hold 9 ore
+--   -- 5x5 grid can hold 25 ore
+--   -- etc
+-- end
 
 local function CanSpawnOreAt(x,z)
   local features = spGetFeaturesInRectangle(x-30,z-30,x+30,z+30)
@@ -242,8 +249,35 @@ local function CanSpawnOreAt(x,z)
   return true
 end
 
+local function spDrawVine(x,z)
+  local steps=0
+  while (steps < MAX_STEPS) do
+    if (CanSpawnOreAt(x,z)) then return x,z
+    else
+      local way = random(0,4)
+      if (way==0) and (x-40>0) then
+	x=x-40
+      elseif (way==2) and (x+40<mapWidth) then
+	x=x+40
+      elseif (way==1) and (z-40>0) then
+	z=z-40
+      elseif (z+40<mapHeight) then
+	z=z+40
+      end -- otherwise stay at place
+    end
+    steps = steps+1
+  end
+  return nil
+end
+
+-- function TellDebugInfo(unitID)
+--   local MexID = OreMexByID[unitID]
+--   if not(OreMex[MexID]) then return end -- probably just built, otherwise should never happen...
+--   local x,y,z = spGetUnitPosition(unitID)
+--   Spring.MarkerAddPoint(x,y,z,"there is "..OreMex[MexID].ore_count.." unreclaimed chunks and I store "..OreMex[MexID].ore.." metal.")
+-- end
+
 function MineMoreOre(unitID, howMuch, forcefully)
-  -- ore extractor make 3x3 grid always, albeit if it's forcefully is true, it can make bigger grids
   local MexID = OreMexByID[unitID]
   if not(OreMex[MexID]) then return end -- probably just built, otherwise should never happen...
   OreMex[MexID].ore = OreMex[MexID].ore + howMuch
@@ -251,8 +285,6 @@ function MineMoreOre(unitID, howMuch, forcefully)
   if not(forcefully) then
     OreMex[MexID].income = howMuch
   end
-  -- try spawning 3 ore rocks for every mex until we fill entire field on low income, other go fat
-  -- if any or all spawns fail, ore extractor simply "stores" ore to spawn next time
   local sp_count = 3
   if (ore < 6) then
     sp_count = 2
@@ -260,19 +292,12 @@ function MineMoreOre(unitID, howMuch, forcefully)
       sp_count = 1
     end
   end
---   Spring.Echo("spcount: "..sp_count)
---   Spring.Echo("hold: "..ore)
-  local ore_count = OreMex[MexID].ore_count
   local x,_,z = spGetUnitPosition(unitID)
---   Spring.Echo("unreclaimed ore: "..ore_count)
-  if ((ore >= 1) and ((ore_count+sp_count)<81)) or (forcefully) then
-    -- time to spawn!
+  if (ore>=1) then
     try=0
     while (try < sp_count) do
-      local a,b = get_grid_coord(grid_size(ore_count))
-      a = x+a
-      b = z+b
-      if (CanSpawnOreAt(a,b)) then
+      local a,b = spDrawVine(x,z) -- simply go left,right,top,bottom randomly until vine is build, max amount of steps is MAX_STEPS, if fail -> dont spawn
+      if (a~=nil) then
 	local spawn_amount = ore*0.5
 -- 	Spring.Echo("want to spawn: "..spawn_amount)
 	if (spawn_amount>10) then
@@ -285,34 +310,27 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	  spawn_amount = 1
 	end
 	if (spawn_amount >= (ore-spawn_amount)) then
--- 	  Spring.Echo(x.." "..z)
--- 	  Spring.Echo("grid size: "..grid_size(ore_count))
 	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b)
 	  if (oreID) then
-	    Ore[oreID] = MexID
 	    spSetFeatureReclaim(oreID, spawn_amount)
 	    local rd = random(360) * pi / 180
 	    spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
 	    ore = ore - spawn_amount
-	    ore_count=ore_count+1
 	  end
 	end
       end
       try=try+1
     end
-  end
-  if (forcefully) and (ore>=1) then -- drop all thats left on mex
+    if (forcefully) then -- drop all thats left on mex
     local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z)
-    if (oreID) then
-      Ore[oreID] = MexID
-      spSetFeatureReclaim(oreID, ore)
-      local rd = random(360) * pi / 180
-      spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
-      ore_count=ore_count+1
-      ore = 0
+      if (oreID) then
+	spSetFeatureReclaim(oreID, ore)
+	local rd = random(360) * pi / 180
+	spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
+	ore = 0
+      end
     end
   end
-  OreMex[MexID].ore_count = ore_count
   OreMex[MexID].ore = ore
 end
 GG.SpawnMoreOre = MineMoreOre
@@ -328,7 +346,13 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (OreMexByID[unitID]) then
     MineMoreOre(unitID, 0, true) -- this will order it to spawn everything it has left
-    OreMex[OreMexByID[unitID]]=nil
+    local mexID = OreMexByID[unitID]
+--     for OreID,targetID in pairs(Ore) do
+--       if (targetID == mexID) then
+-- 	Ore[OreID] = nil
+--       end
+--     end
+    OreMex[mexID]=nil
     OreMexByID[unitID]=nil
   end
 end
@@ -345,7 +369,7 @@ local function PreSpawn()
 	    unitID = unitID,
 	    ore = 0, -- metal.
 	    income = GG.metalSpots[i].metal, -- should mex have bigger income it will drop ore less frequent but more fat ore.
-	    ore_count = 0, -- number of features.
+-- 	    ore_count = 0, -- number of features.
 	    x = GG.metalSpots[i].x,
 	    z = GG.metalSpots[i].z,
 	  }
@@ -373,19 +397,23 @@ function gadget:Initialize()
   end
   if (INVULNERABLE_EXTRACTORS == 0) then
     gadgetHandler:RemoveCallIn("UnitPreDamaged")
---     gadgetHandler:RemoveCallIn("GameFrame")
+    gadgetHandler:RemoveCallIn("GameFrame")
   end
   -- partial luarules reload support, you have to reclaim all ore nearby mex for it to begin working again
   local units = spGetAllUnits()
   for i=1,#units do
     UnitFin(units[i], spGetUnitDefID(units[i]), spGetUnitTeam(units[i]))
   end
+  mapWidth = Game.mapSizeX
+  mapHeight = Game.mapSizeZ
   if (PRESPAWN_EXTRACTORS) then
     PreSpawn()
   end
 end
 
 function gadget:GameStart()
+  mapWidth = Game.mapSizeX
+  mapHeight = Game.mapSizeZ
   if (PRESPAWN_EXTRACTORS) then
     PreSpawn()
   end
@@ -393,15 +421,6 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
   UnitFin(unitID, unitDefID, unitTeam)
-end
-
-function gadget:FeatureDestroyed(featureID, allyTeam)
-  if (Ore[featureID]) then
-    local ownerID = Ore[featureID]
-    if (OreMex[ownerID]) then
-      OreMex[ownerID].ore_count=OreMex[ownerID].ore_count-1
-    end
-  end
 end
 
 end
