@@ -1,4 +1,4 @@
-local version = "0.9"
+local version = "0.9.1"
 
 function gadget:GetInfo()
   return {
@@ -303,7 +303,7 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	  spawn_amount = 1
 	end
 -- 	Spring.Echo("test "..spawn_amount.." "..ore-spawn_amount)
-	if (spawn_amount < (ore-spawn_amount)) then
+	if (spawn_amount <= (ore-spawn_amount)) then
 	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b)
 	  if (oreID) then
 	    spSetFeatureReclaim(oreID, spawn_amount)
