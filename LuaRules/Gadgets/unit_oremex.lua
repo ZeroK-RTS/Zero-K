@@ -350,7 +350,7 @@ local function PreSpawn()
 	    z = GG.metalSpots[i].z,
 	  }
 	  OreMexByID[unitID] = id
-	  Spring.Echo(GG.metalSpots.metal)
+-- 	  Spring.Echo(GG.metalSpots.metal)
 	  spSetUnitRulesParam(unitID, "mexIncome", GG.metalSpots[i].metal)
 	  spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) 
 	  local prespawn = 0
