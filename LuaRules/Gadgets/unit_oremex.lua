@@ -138,11 +138,11 @@ function gadget:GameFrame(f)
   end
 end
 
-function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-  if (unitID) and (targetID) and (mexDefs[spGetUnitDefID(targetID)]) then
-    return false
-  end
-end
+-- function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
+--   if (unitID) and (targetID) and (mexDefs[spGetUnitDefID(targetID)]) then
+--     return false
+--   end
+-- end
 
 local function UnitFin(unitID, unitDefID, unitTeam)
   if (unitTeam ~= GaiaTeamID) then
