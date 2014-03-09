@@ -92,6 +92,7 @@ local function GaiaLoopTransfer()
     if (OreMex[i]~=nil) then
       local unitID = OreMex[i].unitID
 --       Spring.Echo(spGetUnitTeam(unitID).." "..GaiaTeamID)
+--       Spring.Echo("spit "..OreMex[i].income)
       MineMoreOre(unitID, OreMex[i].income, false)
       if (spGetUnitTeam(unitID)==GaiaTeamID) then
 	local x = OreMex[i].x
@@ -165,6 +166,7 @@ local function UnitFin(unitID, unitDefID, unitTeam)
       while (OreMex[id]~=nil) do
 	id=id+1
       end
+--       Spring.Echo(unitID.." is now mex number "..id)
       local income = 0
       if (GG.metalSpots) then --byPos didnt work :(
 	for i=1,#GG.metalSpots do
@@ -213,13 +215,14 @@ local function get_grid_coord(size)
 end
 
 local function grid_size(ore_count)
+  if (ore_count == 0) then return 1 end
   local size = 1
   local count = ore_count
-  while (count >= (size*size-size)) do
+  while (count >= (size*size-2)) do
     size = size+2
   end
 --   Spring.Echo(size.."x"..size.." can hold "..count.." ore")
-  return size -- thats actually halfwidth-1
+  return size
   -- 3x3 grid can hold 9 ore
   -- 5x5 grid can hold 25 ore
   -- etc
@@ -232,7 +235,7 @@ local function CanSpawnOreAt(x,z)
     local featureDefID = spGetFeatureDefID(featureID)
 --     Spring.Echo(FeatureDefs[featureDefID].name)
     if (FeatureDefs[featureDefID].name=="ore") then
---       Spring.Echo("dont spawn at "..x.." "..z)
+--       Spring.Echo("cant spawn at "..x.." "..z)
       return false
     end
   end
@@ -298,8 +301,6 @@ function MineMoreOre(unitID, howMuch, forcefully)
       try=try+1
     end
   end
-  OreMex[MexID].ore_count = ore_count
-  OreMex[MexID].ore = ore
   if (forcefully) and (ore>=1) then -- drop all thats left on mex
     local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z)
     if (oreID) then
@@ -307,8 +308,12 @@ function MineMoreOre(unitID, howMuch, forcefully)
       spSetFeatureReclaim(oreID, ore)
       local rd = random(360) * pi / 180
       spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
+      ore_count=ore_count+1
+      ore = 0
     end
   end
+  OreMex[MexID].ore_count = ore_count
+  OreMex[MexID].ore = ore
 end
 GG.SpawnMoreOre = MineMoreOre
 
@@ -335,7 +340,8 @@ local function PreSpawn()
       if (units == nil) or (#units==0) then
 	local unitID = spCreateUnit("cormex",GG.metalSpots[i].x, GetFloatHeight(GG.metalSpots[i].x,GG.metalSpots[i].z), GG.metalSpots[i].z, "n", GaiaTeamID)
 	if (unitID) then
-	  OreMex[#OreMex+1] = {
+	  local id = #OreMex+1
+	  OreMex[id] = {
 	    unitID = unitID,
 	    ore = 0, -- metal.
 	    income = GG.metalSpots[i].metal, -- should mex have bigger income it will drop ore less frequent but more fat ore.
@@ -343,7 +349,7 @@ local function PreSpawn()
 	    x = GG.metalSpots[i].x,
 	    z = GG.metalSpots[i].z,
 	  }
-	  OreMexByID[unitID] = #OreMex
+	  OreMexByID[unitID] = id
 	  Spring.Echo(GG.metalSpots.metal)
 	  spSetUnitRulesParam(unitID, "mexIncome", GG.metalSpots[i].metal)
 	  spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) 
