@@ -31,6 +31,7 @@ local spCreateFeature		= Spring.CreateFeature
 local spSetFeatureReclaim	= Spring.SetFeatureReclaim
 local spSetFeatureDirection	= Spring.SetFeatureDirection
 local spSetFeatureAlwaysVisible	= Spring.SetFeatureAlwaysVisible
+local spSetFeatureNoSelect	= Spring.SetFeatureNoSelect
 local spCreateUnit		= Spring.CreateUnit
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local spSetUnitRulesParam	= Spring.SetUnitRulesParam
@@ -76,6 +77,7 @@ local INVULNERABLE_EXTRACTORS = tonumber(modOptions.oremex_invul or 0) -- invuln
 local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 120)
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn)==1)
 local MAX_STEPS = 15 -- vine length
+local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
 -- godmode stuff
 function gadget:UnitPreDamaged(unitID)
@@ -273,15 +275,16 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	  else
 	    spawn_amount = 10
 	  end
-	elseif (spawn_amount<1) then
-	  spawn_amount = 1
+	elseif (spawn_amount<MIN_PRODUCE) then
+	  spawn_amount = MIN_PRODUCE
 	end
 -- 	Spring.Echo("test "..spawn_amount.." "..ore-spawn_amount)
 	if (spawn_amount <= (ore-spawn_amount)) then
 	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", allyTeam)
 	  if (oreID) then
 	    spSetFeatureReclaim(oreID, spawn_amount)
-	    spSetFeatureAlwaysVisible(oreID, false)
+-- 	    spSetFeatureAlwaysVisible(oreID, false)
+-- 	    spSetFeatureNoSelect(oreID, false)
 	    local rd = random(360) * pi / 180
 	    spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
 	    ore = ore - spawn_amount
@@ -294,7 +297,8 @@ function MineMoreOre(unitID, howMuch, forcefully)
     local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z, "n", allyTeam)
       if (oreID) then
 	spSetFeatureReclaim(oreID, ore)
-	spSetFeatureAlwaysVisible(oreID, false)
+-- 	spSetFeatureAlwaysVisible(oreID, false)
+-- 	spSetFeatureNoSelect(oreID, false)
 	local rd = random(360) * pi / 180
 	spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
 	ore = 0
