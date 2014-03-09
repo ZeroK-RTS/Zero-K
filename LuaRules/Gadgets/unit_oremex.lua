@@ -174,21 +174,10 @@ local function UnitFin(unitID, unitDefID, unitTeam)
       while (OreMex[id]~=nil) do
 	id=id+1
       end
---       Spring.Echo(unitID.." is now mex number "..id)
-      local income = 0
-      if (GG.metalSpots) then --byPos didnt work :(
-	for i=1,#GG.metalSpots do
-	  if (GG.metalSpots[i].x == x) and (GG.metalSpots[i].z == z) then
-	    income = GG.metalSpots[i].metal
-	    break
-	  end
-	end
-      end
---       Spring.Echo(income)
       OreMex[id] = {
 	unitID = unitID,
 	ore = 0, -- metal.
-	income = income, -- should mex have bigger income it will drop ore less frequent but more fat ore.
+	income = spGetUnitRulesParam(unitID,"mexIncome"), -- should mex have bigger income it will drop ore less frequent but more fat ore.
 	x = x,
 	z = z,
       }
@@ -293,6 +282,8 @@ function MineMoreOre(unitID, howMuch, forcefully)
     end
   end
   local x,_,z = spGetUnitPosition(unitID)
+  local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
+  if (#features >= 144) and not(forcefully) then return end -- too much reclaim, please reclaim
   if (ore>=1) then
     try=0
     while (try < sp_count) do
@@ -303,13 +294,16 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	if (spawn_amount>10) then
 	  if (forcefully) then
 	    spawn_amount = howMuch*0.5 -- 0.33
+	  elseif (10 < ore*0.01) then
+	    spawn_amount = ore*0.01
 	  else
 	    spawn_amount = 10
 	  end
 	elseif (spawn_amount<1) then
 	  spawn_amount = 1
 	end
-	if (spawn_amount >= (ore-spawn_amount)) then
+-- 	Spring.Echo("test "..spawn_amount.." "..ore-spawn_amount)
+	if (spawn_amount < (ore-spawn_amount)) then
 	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b)
 	  if (oreID) then
 	    spSetFeatureReclaim(oreID, spawn_amount)
