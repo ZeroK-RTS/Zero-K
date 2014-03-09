@@ -278,8 +278,8 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	elseif (spawn_amount<MIN_PRODUCE) then
 	  spawn_amount = MIN_PRODUCE
 	end
--- 	Spring.Echo("test "..spawn_amount.." "..ore-spawn_amount)
-	if (spawn_amount <= (ore-spawn_amount)) then
+	if (ore >= spawn_amount) then
+-- 	  Spring.Echo("I spawn: "..spawn_amount.." i have: "..ore)
 	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", allyTeam)
 	  if (oreID) then
 	    spSetFeatureReclaim(oreID, spawn_amount)
