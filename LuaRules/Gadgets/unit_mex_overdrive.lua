@@ -754,7 +754,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									local unitDef = UnitDefs[unitDefID]
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
-										SpitMetalOre(unitID, thisMexM, false)
+										SpitMetalOre(unitID, thisMexM, false) -- this function does nothing if mexore==0 (line ~142)
 									else
 										if not spammedError then
 											Spring.Echo("unitDefID missing for maxxed metal extractor")
@@ -791,7 +791,6 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							else
 								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
 							end
-							SpitMetalOre(unitID, thisMexM, false)
 						else
 							if not spammedError then
 								Spring.Echo("unitDefID missing for metal extractor")
@@ -1064,7 +1063,6 @@ function gadget:GameFrame(n)
 					local unitDef = UnitDefs[unitDefID]
 					if unitDef then
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
-						SpitMetalOre(unitID, orgMetal, false)
 					else
 						if not spammedError then
 							Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for ungridded mex")

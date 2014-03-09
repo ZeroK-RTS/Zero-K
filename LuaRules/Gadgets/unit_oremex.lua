@@ -1,4 +1,4 @@
-local version = "0.9.1"
+local version = "0.9.2"
 
 function gadget:GetInfo()
   return {
