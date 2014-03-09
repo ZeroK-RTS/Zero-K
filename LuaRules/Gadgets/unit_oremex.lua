@@ -254,14 +254,14 @@ local function spDrawVine(x,z)
   while (steps < MAX_STEPS) do
     if (CanSpawnOreAt(x,z)) then return x,z
     else
-      local way = random(0,4)
+      local way = random(0,3)
       if (way==0) and (x-40>0) then
 	x=x-40
       elseif (way==2) and (x+40<mapWidth) then
 	x=x+40
       elseif (way==1) and (z-40>0) then
 	z=z-40
-      elseif (z+40<mapHeight) then
+      elseif (way==3) and (z+40<mapHeight) then
 	z=z+40
       end -- otherwise stay at place
     end
