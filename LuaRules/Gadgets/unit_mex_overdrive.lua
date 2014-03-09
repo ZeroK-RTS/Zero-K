@@ -23,6 +23,9 @@ local pylonDefs = {}
 local linkdefs = {}
 local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 
+-- this is "fun" mod
+local OreMexModOption = tonumber((Spring.GetModOptions()).oremex) or 0 -- Red Annihilation mexes, no harvesters though, use cons/coms to reclaim ore.
+
 local communismOverdrive = odSharingModOptions == "communism"
 
 include("LuaRules/Configs/constants.lua")
@@ -135,6 +138,8 @@ local unitPaybackTeamID = {} -- indexed by unitID, tells unit which team gets it
 local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 
 local allyTeamInfo = {} 
+
+local SpitMetalOre = function(_,_,_) end
 
 do
   local allyTeamList = Spring.GetAllyTeamList()
@@ -749,6 +754,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									local unitDef = UnitDefs[unitDefID]
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
+										SpitMetalOre(unitID, thisMexM, false)
 									else
 										if not spammedError then
 											Spring.Echo("unitDefID missing for maxxed metal extractor")
@@ -785,6 +791,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							else
 								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
 							end
+							SpitMetalOre(unitID, thisMexM, false)
 						else
 							if not spammedError then
 								Spring.Echo("unitDefID missing for metal extractor")
@@ -1057,6 +1064,7 @@ function gadget:GameFrame(n)
 					local unitDef = UnitDefs[unitDefID]
 					if unitDef then
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
+						SpitMetalOre(unitID, orgMetal, false)
 					else
 						if not spammedError then
 							Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for ungridded mex")
@@ -1360,6 +1368,13 @@ function gadget:Initialize()
 		--if (energyDefs[unitDefID]) then
 		--	AddEnergy(unitID, unitDefID, unitTeam)
 		--end
+	end
+	
+	-- "oremex" modoption, instead of modyfing overdrive code integrity and decreasing readability, this will do
+	-- check unit_oremex.lua for oremex code.
+	if (OreMexModOption == 1) and (GG.SpawnMoreOre ~= nil) then
+	  spAddTeamResource = function(a,b,c) if b~="m" then Spring.AddTeamResource(a,b,c) end end
+	  SpitMetalOre = GG.SpawnMoreOre
 	end
 	
 	gadgetHandler:AddChatAction("odb",OverdriveDebugToggle,"Toggles debug mode for overdrive.")
