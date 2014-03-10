@@ -1,4 +1,4 @@
-local version = "0.9.2"
+local version = "0.9.9"
 
 function gadget:GetInfo()
   return {
@@ -14,14 +14,12 @@ end
 
 --SYNCED-------------------------------------------------------------------
 
--- TODO annoying units try to attack invulnerable mexes if you enable that modoption
--- something needs to be done...
+--TODO some people want actual tiberium ;) ;)
 
 local modOptions = Spring.GetModOptions()
 if (gadgetHandler:IsSyncedCode()) then
   
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
--- currently oremex obeys zero-k OD system, personally I don't think it shouldn't, though implementing option for not obeying it isn't hard to do.
 local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
 local spCallCOBScript  		= Spring.CallCOBScript
 local spGetGroundHeight		= Spring.GetGroundHeight
@@ -30,8 +28,6 @@ local spGetTeamInfo 	    	= Spring.GetTeamInfo
 local spCreateFeature		= Spring.CreateFeature
 local spSetFeatureReclaim	= Spring.SetFeatureReclaim
 local spSetFeatureDirection	= Spring.SetFeatureDirection
-local spSetFeatureAlwaysVisible	= Spring.SetFeatureAlwaysVisible
-local spSetFeatureNoSelect	= Spring.SetFeatureNoSelect
 local spCreateUnit		= Spring.CreateUnit
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local spSetUnitRulesParam	= Spring.SetUnitRulesParam
@@ -47,6 +43,8 @@ local spGetAllUnits		= Spring.GetAllUnits
 local spGetGameFrame		= Spring.GetGameFrame
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetAllyTeamList		= Spring.GetAllyTeamList
+local spSetUnitNoSelect		= Spring.SetUnitNoSelect
+local spSetUnitNeutral		= Spring.SetUnitNeutral
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
 local random = math.random
@@ -73,9 +71,10 @@ local mexDefs = {
 }
 local PylonRange = UnitDefNames["armestor"].customParams.pylonrange
 
-local INVULNERABLE_EXTRACTORS = tonumber(modOptions.oremex_invul or 0) -- invulnerability of extractors. they can still switch team side should OD get connected
-local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 120)
+local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul)==1) -- invulnerability of extractors. they can still switch team side should OD get connected
+local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 300)
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn)==1)
+local OBEY_OD = (tonumber(modOptions.oremex_overdrive)==1)
 local MAX_STEPS = 15 -- vine length
 local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
@@ -92,72 +91,68 @@ end
 
 -- if mex OD is <= 1 and it's godmode on, transfer mex to gaia team
 -- if mex is inside energyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
-local function GaiaLoopTransfer()
---   if (INVULNERABLE_EXTRACTORS==1) then -- otherwise just destroy it and build your own, this is buggy anyway
+local GaiaLoopTransfer = function()
   for i=1,#OreMex do
     if (OreMex[i]~=nil) then
       local unitID = OreMex[i].unitID
---       Spring.Echo(spGetUnitTeam(unitID).." "..GaiaTeamID)
---       Spring.Echo("spit "..OreMex[i].income)
-      MineMoreOre(unitID, OreMex[i].income, false)
-      if (spGetUnitTeam(unitID)==GaiaTeamID) then
-	local x = OreMex[i].x
-	local z = OreMex[i].z
-	if (x) then
--- 	  Spring.Echo(PylonRange)
-	  local units = spGetUnitsInCylinder(x, z, PylonRange+10)
-	  local best_eff = 0
-	  local best_team
-	  for i=1,#units do
-	    local targetID = units[i]
-	    local targetDefID = spGetUnitDefID(targetID)
-	    local targetTeam = spGetUnitTeam(targetID)
-	    if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
+      local x = OreMex[i].x
+      local z = OreMex[i].z
+      local unitTeam = spGetUnitTeam(unitID)
+      local allyTeam = spGetUnitAllyTeam(unitID)
+      if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) then
+	local units = spGetUnitsInCylinder(x, z, PylonRange+21)
+	local best_eff = 0
+	local best_team
+	local best_ally
+	for i=1,#units do
+	  local targetID = units[i]
+	  local targetDefID = spGetUnitDefID(targetID)
+	  local targetTeam = spGetUnitTeam(targetID)
+	  local targetAllyTeam = spGetUnitAllyTeam(targetID)
+	  if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
 -- 	      Spring.Echo(UnitDefs[targetDefID].humanName)
-	      local maxdist = energyDefs[targetDefID]
-	      maxdist=maxdist*maxdist
-	      local x2,_,z2 = spGetUnitPosition(targetID)
-	      if (disSQ(x,z,x2,z2) <= maxdist) then
-		local eff = spGetUnitRulesParam(targetID,"gridefficiency")
--- 		Spring.Echo(tostring(eff))
-		if (eff) and (eff >= 0.1) and (best_eff < eff) then
-		  best_eff = eff
-		  best_team = targetTeam
-		end
+	    local maxdist = energyDefs[targetDefID]
+	    maxdist=maxdist*maxdist
+	    local x2,_,z2 = spGetUnitPosition(targetID)
+	    if (disSQ(x,z,x2,z2) <= maxdist) then
+	      local eff = spGetUnitRulesParam(targetID,"gridefficiency")
+	      if (eff~=nil) and (eff >= 0.1) and (best_eff < eff) then
+		best_eff = eff
+		best_team = targetTeam
+		best_ally = targetAllyTeam
 	      end
 	    end
 	  end
-	  if (best_team ~= nil) then
-	    spTransferUnit(unitID, best_team, false)
-	  end
+	end
+	if (best_team ~= nil) and (unitTeam ~= best_team) and (allyTeam ~= best_ally) then
+	  spTransferUnit(unitID, best_team, true)
+	  spSetUnitNeutral(unitID, true)
 	end
       end
     end
   end
---   end
 end
-
 -- godmode stuff end
+
+local function GaiaMineMetal()
+  for i=1,#OreMex do
+    if (OreMex[i]~=nil) then
+      local unitID = OreMex[i].unitID
+      if (spGetUnitTeam(unitID)==GaiaTeamID) then
+	-- apparently OD gadget dont spawn ore for Gaia :D
+	-- if they are invincible its fine to produce ore even if mex is emped w/e i guess
+	MineMoreOre(unitID, OreMex[i].income, false)
+      end
+    end
+  end
+end
 
 function gadget:GameFrame(f)
   if ((f%32)==1) then
+    GaiaMineMetal()
     GaiaLoopTransfer()
   end
---   if ((f%(32*60))==1) then
---     for i=1,#OreMex do
---       if (OreMex[i]~=nil) then
--- 	local unitID = OreMex[i].unitID
--- 	TellDebugInfo(unitID)
---       end
---     end
---   end
 end
-
--- function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
---   if (unitID) and (targetID) and (mexDefs[spGetUnitDefID(targetID)]) then
---     return false
---   end
--- end
 
 local function UnitFin(unitID, unitDefID, unitTeam)
   if (unitTeam ~= GaiaTeamID) then
@@ -184,7 +179,7 @@ local function UnitFin(unitID, unitDefID, unitTeam)
       OreMex[id] = {
 	unitID = unitID,
 	ore = 0, -- metal.
-	income = spGetUnitRulesParam(unitID,"mexIncome"), -- should mex have bigger income it will drop ore less frequent but more fat ore.
+	income = spGetUnitRulesParam(unitID,"mexIncome"),
 	x = x,
 	z = z,
       }
@@ -198,9 +193,7 @@ local function CanSpawnOreAt(x,z)
   for i=1,#features do
     local featureID = features[i]
     local featureDefID = spGetFeatureDefID(featureID)
---     Spring.Echo(FeatureDefs[featureDefID].name)
     if (FeatureDefs[featureDefID].name=="ore") then
---       Spring.Echo("cant spawn at "..x.." "..z)
       return false
     end
   end
@@ -228,16 +221,9 @@ local function spDrawVine(x,z)
   return nil
 end
 
--- function TellDebugInfo(unitID)
---   local MexID = OreMexByID[unitID]
---   if not(OreMex[MexID]) then return end -- probably just built, otherwise should never happen...
---   local x,y,z = spGetUnitPosition(unitID)
---   Spring.MarkerAddPoint(x,y,z,"there is "..OreMex[MexID].ore_count.." unreclaimed chunks and I store "..OreMex[MexID].ore.." metal.")
--- end
-
 function MineMoreOre(unitID, howMuch, forcefully)
   local MexID = OreMexByID[unitID]
-  if not(OreMex[MexID]) then return end -- probably just built, otherwise should never happen...
+  if not(OreMex[MexID]) then return end -- in theory never happens...
   OreMex[MexID].ore = OreMex[MexID].ore + howMuch
   local ore = OreMex[MexID].ore
   if not(forcefully) then
@@ -266,7 +252,6 @@ function MineMoreOre(unitID, howMuch, forcefully)
       local a,b = spDrawVine(x,z) -- simply go left,right,top,bottom randomly until vine is build, max amount of steps is MAX_STEPS, if fail -> dont spawn
       if (a~=nil) then
 	local spawn_amount = ore*0.5
--- 	Spring.Echo("want to spawn: "..spawn_amount)
 	if (spawn_amount>10) then
 	  if (forcefully) then
 	    spawn_amount = howMuch*0.5 -- 0.33
@@ -279,12 +264,9 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	  spawn_amount = MIN_PRODUCE
 	end
 	if (ore >= spawn_amount) then
--- 	  Spring.Echo("I spawn: "..spawn_amount.." i have: "..ore)
 	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", allyTeam)
 	  if (oreID) then
 	    spSetFeatureReclaim(oreID, spawn_amount)
--- 	    spSetFeatureAlwaysVisible(oreID, false)
--- 	    spSetFeatureNoSelect(oreID, false)
 	    local rd = random(360) * pi / 180
 	    spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
 	    ore = ore - spawn_amount
@@ -297,8 +279,6 @@ function MineMoreOre(unitID, howMuch, forcefully)
     local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z, "n", allyTeam)
       if (oreID) then
 	spSetFeatureReclaim(oreID, ore)
--- 	spSetFeatureAlwaysVisible(oreID, false)
--- 	spSetFeatureNoSelect(oreID, false)
 	local rd = random(360) * pi / 180
 	spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
 	ore = 0
@@ -319,13 +299,9 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (OreMexByID[unitID]) then
+    Spring.Echo("ERROR MEX DIED")
     MineMoreOre(unitID, 0, true) -- this will order it to spawn everything it has left
     local mexID = OreMexByID[unitID]
---     for OreID,targetID in pairs(Ore) do
---       if (targetID == mexID) then
--- 	Ore[OreID] = nil
---       end
---     end
     OreMex[mexID]=nil
     OreMexByID[unitID]=nil
   end
@@ -342,13 +318,15 @@ local function PreSpawn()
 	  OreMex[id] = {
 	    unitID = unitID,
 	    ore = 0, -- metal.
-	    income = GG.metalSpots[i].metal, -- should mex have bigger income it will drop ore less frequent but more fat ore.
--- 	    ore_count = 0, -- number of features.
+	    income = GG.metalSpots[i].metal,
 	    x = GG.metalSpots[i].x,
 	    z = GG.metalSpots[i].z,
 	  }
+	  if (INVULNERABLE_EXTRACTORS) then
+	    spSetUnitNeutral(unitID, true)
+-- 	    spSetUnitNoSelect(unitID, true)
+	  end
 	  OreMexByID[unitID] = id
--- 	  Spring.Echo(GG.metalSpots.metal)
 	  spSetUnitRulesParam(unitID, "mexIncome", GG.metalSpots[i].metal)
 	  spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) 
 	  local prespawn = 0
@@ -356,7 +334,7 @@ local function PreSpawn()
 	    MineMoreOre(unitID, 30, true)
 	    prespawn=prespawn+30
 	  end
-	  if (LIMIT_PRESPAWNED_METAL-prespawn)>=5 then -- i dont want to spawn ~5 m "leftovers", chunks are ok
+	  if (LIMIT_PRESPAWNED_METAL-prespawn)>=5 then -- i dont want to spawn ~1m "leftovers", chunks are ok
 	    MineMoreOre(unitID, LIMIT_PRESPAWNED_METAL-prespawn, true)
 	  end
 	end
@@ -369,14 +347,15 @@ function gadget:Initialize()
   if not(tonumber(modOptions.oremex) == 1) then
     gadgetHandler:RemoveGadget()
   end
-  if (INVULNERABLE_EXTRACTORS == 0) then
+  if not(INVULNERABLE_EXTRACTORS) then
     gadgetHandler:RemoveCallIn("UnitPreDamaged")
-    gadgetHandler:RemoveCallIn("GameFrame")
   end
   mapWidth = Game.mapSizeX
   mapHeight = Game.mapSizeZ
   allyTeams = spGetAllyTeamList()
-  -- partial luarules reload support, you have to reclaim all ore nearby mex for it to begin working again
+  if not(INVULNERABLE_EXTRACTORS or OBEY_OD) then
+    GaiaLoopTransfer = function() end
+  end
   if (spGetGameFrame() > 1) then
     local units = spGetAllUnits()
     for i=1,#units do
