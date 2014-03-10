@@ -351,6 +351,9 @@ local function PreSpawn()
 	end
       end
     end
+    return true
+  else
+    return false
   end
 end
     
@@ -376,7 +379,11 @@ function gadget:Initialize()
       UnitFin(units[i], spGetUnitDefID(units[i]), spGetUnitTeam(units[i]))
     end
     if (PRESPAWN_EXTRACTORS) then
-      PreSpawn()
+      if not(PreSpawn()) and INVULNERABLE_EXTRACTORS then
+	INVULNERABLE_EXTRACTORS = false
+	gadgetHandler:RemoveCallIn("AllowWeaponTarget")
+	gadgetHandler:RemoveCallIn("UnitPreDamaged")
+      end
     end
   end
 end
@@ -386,7 +393,11 @@ function gadget:GameStart()
   mapHeight = Game.mapSizeZ
   teamIDs = spGetTeamList()
   if (PRESPAWN_EXTRACTORS) then
-    PreSpawn()
+    if not(PreSpawn()) and INVULNERABLE_EXTRACTORS then
+      INVULNERABLE_EXTRACTORS = false
+      gadgetHandler:RemoveCallIn("AllowWeaponTarget")
+      gadgetHandler:RemoveCallIn("UnitPreDamaged")
+    end
   end
 end
 
