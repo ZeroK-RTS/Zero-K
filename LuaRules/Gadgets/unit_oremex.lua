@@ -1,4 +1,4 @@
-local version = "0.9.9"
+local version = "1.0.0"
 
 function gadget:GetInfo()
   return {
@@ -14,7 +14,7 @@ end
 
 --SYNCED-------------------------------------------------------------------
 
---TODO some people want actual tiberium ;) ;)
+--TODO some people want actual tiberium (hurt units modoption) ;) ;)
 
 local modOptions = Spring.GetModOptions()
 if (gadgetHandler:IsSyncedCode()) then
@@ -57,6 +57,8 @@ local mapWidth
 local mapHeight
 local allyTeams
 
+local UnderAttack = {} -- holds frameID per mex so it goes neutral, if someone attacks it, for 5 seconds, it will not return to owner if no grid connected.
+
 local energyDefs = { -- if gaia mex get's in range of any of below structures, it will trasmit it ownership
   [UnitDefNames["armestor"].id] = UnitDefNames["armestor"].customParams.pylonrange,
   [UnitDefNames["armwin"].id] = UnitDefNames["armwin"].customParams.pylonrange,
@@ -78,9 +80,23 @@ local OBEY_OD = (tonumber(modOptions.oremex_overdrive)==1)
 local MAX_STEPS = 15 -- vine length
 local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
+local function TransferMexTo(unitID, mexID, unitTeam, give)
+  if (mexID) then
+    spSetUnitRulesParam(unitID, "mexIncome", OreMex[mexID].income)
+    spCallCOBScript(unitID, "SetSpeed", 0, OreMex[mexID].income * 500) 
+    -- ^ hacks?
+    spTransferUnit(unitID, unitTeam, give)
+    spSetUnitNeutral(unitID, give)
+  end
+end
+
 -- godmode stuff
-function gadget:UnitPreDamaged(unitID)
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam)
   if (OreMexByID[unitID]) then
+    if (unitTeam ~= GaiaTeamID) then
+      UnderAttack[unitID] = spGetGameFrame()+160
+      TransferMexTo(unitID, OreMexByID[unitID], GaiaTeamID, true)
+    end
     return 0
   end
 end
@@ -91,7 +107,7 @@ end
 
 -- if mex OD is <= 1 and it's godmode on, transfer mex to gaia team
 -- if mex is inside energyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
-local GaiaLoopTransfer = function()
+local GaiaLoopTransfer = function(f)
   for i=1,#OreMex do
     if (OreMex[i]~=nil) then
       local unitID = OreMex[i].unitID
@@ -99,11 +115,12 @@ local GaiaLoopTransfer = function()
       local z = OreMex[i].z
       local unitTeam = spGetUnitTeam(unitID)
       local allyTeam = spGetUnitAllyTeam(unitID)
-      if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) then
+      if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
 	local units = spGetUnitsInCylinder(x, z, PylonRange+21)
 	local best_eff = 0
 	local best_team
 	local best_ally
+	local enearby = false
 	for i=1,#units do
 	  local targetID = units[i]
 	  local targetDefID = spGetUnitDefID(targetID)
@@ -115,8 +132,9 @@ local GaiaLoopTransfer = function()
 	    maxdist=maxdist*maxdist
 	    local x2,_,z2 = spGetUnitPosition(targetID)
 	    if (disSQ(x,z,x2,z2) <= maxdist) then
+	      enearby = true
 	      local eff = spGetUnitRulesParam(targetID,"gridefficiency")
-	      if (eff~=nil) and (eff >= 0.1) and (best_eff < eff) then
+	      if (eff~=nil) and (best_eff < eff) then
 		best_eff = eff
 		best_team = targetTeam
 		best_ally = targetAllyTeam
@@ -125,8 +143,9 @@ local GaiaLoopTransfer = function()
 	  end
 	end
 	if (best_team ~= nil) and (unitTeam ~= best_team) and (allyTeam ~= best_ally) then
-	  spTransferUnit(unitID, best_team, true)
-	  spSetUnitNeutral(unitID, true)
+	  TransferMexTo(unitID, i, best_team, true)
+	elseif (INVULNERABLE_EXTRACTORS) and not(enearby) and (best_team == nil) and (unitTeam ~= GaiaTeamID) then -- back to Gaia you go
+	  TransferMexTo(unitID, i, GaiaTeamID, true)
 	end
       end
     end
@@ -134,24 +153,31 @@ local GaiaLoopTransfer = function()
 end
 -- godmode stuff end
 
-local function GaiaMineMetal()
-  for i=1,#OreMex do
-    if (OreMex[i]~=nil) then
-      local unitID = OreMex[i].unitID
-      if (spGetUnitTeam(unitID)==GaiaTeamID) then
-	-- apparently OD gadget dont spawn ore for Gaia :D
-	-- if they are invincible its fine to produce ore even if mex is emped w/e i guess
-	MineMoreOre(unitID, OreMex[i].income, false)
-      end
-    end
-  end
-end
+-- local function GaiaMineMetal()
+--   for i=1,#OreMex do
+--     if (OreMex[i]~=nil) then
+--       local unitID = OreMex[i].unitID
+--       if (spGetUnitTeam(unitID)==GaiaTeamID) then
+-- 	-- apparently OD gadget dont spawn ore for Gaia :D
+-- 	-- if they are invincible its fine to produce ore even if mex is emped w/e i guess
+-- 	MineMoreOre(unitID, OreMex[i].income, false)
+--       end
+--     end
+--   end
+-- end
 
 function gadget:GameFrame(f)
   if ((f%32)==1) then
-    GaiaMineMetal()
-    GaiaLoopTransfer()
+--     GaiaMineMetal() -- fixed in OD code, not needed anymore
+    GaiaLoopTransfer(f)
   end
+end
+
+function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
+  if (attackerID) and (targetID) and (OreMexByID[targetID]) then
+    return false, 1
+  end
+  return true, 1
 end
 
 local function UnitFin(unitID, unitDefID, unitTeam)
@@ -163,7 +189,7 @@ local function UnitFin(unitID, unitDefID, unitTeam)
 	for i=1,#units do
 	  local targetID = units[i]
 	  if (OreMexByID[targetID]) and (spGetUnitTeam(targetID)==GaiaTeamID) then
-	    spTransferUnit(targetID, unitTeam, false)
+	    TransferMexTo(targetID, i, unitTeam, true)
 	  end
 	end
       end
@@ -184,6 +210,7 @@ local function UnitFin(unitID, unitDefID, unitTeam)
 	z = z,
       }
       OreMexByID[unitID] = id
+      UnderAttack[unitID] = -100
     end
   end
 end
@@ -303,6 +330,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
     local mexID = OreMexByID[unitID]
     OreMex[mexID]=nil
     OreMexByID[unitID]=nil
+    UnderAttack[unitID]=0
   end
 end
 
@@ -326,6 +354,7 @@ local function PreSpawn()
 -- 	    spSetUnitNoSelect(unitID, true)
 	  end
 	  OreMexByID[unitID] = id
+	  UnderAttack[unitID] = -100
 	  spSetUnitRulesParam(unitID, "mexIncome", GG.metalSpots[i].metal)
 	  spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) 
 	  local prespawn = 0
