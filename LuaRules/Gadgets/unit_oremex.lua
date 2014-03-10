@@ -249,7 +249,7 @@ function MineMoreOre(unitID, howMuch, forcefully)
   local x,_,z = spGetUnitPosition(unitID)
   local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
   local teamID = spGetUnitTeam(unitID)
-  if (#teamIDs>1) and (teamID == GaiaTeamID) then
+  if (#teamIDs>1) then
     teamID = random(0,#teamIDs)
     while (teamID == GaiaTeamID) do
       teamID = random(0,#teamIDs)
