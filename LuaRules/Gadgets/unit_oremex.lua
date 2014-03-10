@@ -299,7 +299,6 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (OreMexByID[unitID]) then
-    Spring.Echo("ERROR MEX DIED")
     MineMoreOre(unitID, 0, true) -- this will order it to spawn everything it has left
     local mexID = OreMexByID[unitID]
     OreMex[mexID]=nil
