@@ -1,4 +1,4 @@
-local version = "1.0.1"
+local version = "1.0.2"
 
 function gadget:GetInfo()
   return {
@@ -76,10 +76,11 @@ local mexDefs = {
 local PylonRange = UnitDefNames["armestor"].customParams.pylonrange
 
 local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
-local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 300)
+local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 30)
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn) == 1)
 local OBEY_OD = (tonumber(modOptions.oremex_overdrive) == 1)
 local MAX_STEPS = 15 -- vine length
+local MAX_PIECES = 144 -- anti spam measure
 local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
 local function TransferMexTo(unitID, mexID, unitTeam)
@@ -255,7 +256,7 @@ function MineMoreOre(unitID, howMuch, forcefully)
       teamID = random(0,#teamIDs)
     end
   end
-  if (#features > 144) and not(forcefully) then return end -- too much reclaim, please reclaim
+  if (#features > MAX_PIECES) and not(forcefully) then return end -- too much reclaim, please reclaim
   if (ore>=1) then
     try=0
     while (try < sp_count) do
@@ -264,9 +265,9 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	local spawn_amount = ore*0.5
 	if (spawn_amount>10) then
 	  if (forcefully) then
-	    spawn_amount = howMuch*0.5 -- 0.33
-	  elseif (10 < ore*0.01) then
-	    spawn_amount = ore*0.01
+	    spawn_amount = ore*0.5 -- 0.33
+	  elseif (ore*0.05 > 10) then
+	    spawn_amount = ore*0.05
 	  else
 	    spawn_amount = 10
 	  end
@@ -361,8 +362,6 @@ function gadget:Initialize()
   if not(tonumber(modOptions.oremex) == 1) then
     gadgetHandler:RemoveGadget()
   end
-  Spring.Echo(tostring(INVULNERABLE_EXTRACTORS))
-  Spring.Echo(tostring(OBEY_OD))
   if not(INVULNERABLE_EXTRACTORS) then
     gadgetHandler:RemoveCallIn("AllowWeaponTarget")
     gadgetHandler:RemoveCallIn("UnitPreDamaged")
