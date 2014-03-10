@@ -1,4 +1,4 @@
-local version = "1.0.0"
+local version = "1.0.1"
 
 function gadget:GetInfo()
   return {
@@ -15,6 +15,7 @@ end
 --SYNCED-------------------------------------------------------------------
 
 --TODO some people want actual tiberium (hurt units modoption) ;) ;)
+--TODO if modoptions return nil, make all options enabled by default..
 
 local modOptions = Spring.GetModOptions()
 if (gadgetHandler:IsSyncedCode()) then
@@ -73,21 +74,21 @@ local mexDefs = {
 }
 local PylonRange = UnitDefNames["armestor"].customParams.pylonrange
 
-local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul)==1) -- invulnerability of extractors. they can still switch team side should OD get connected
+local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
 local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 300)
-local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn)==1)
-local OBEY_OD = (tonumber(modOptions.oremex_overdrive)==1)
+local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn) == 1)
+local OBEY_OD = (tonumber(modOptions.oremex_overdrive) == 1)
 local MAX_STEPS = 15 -- vine length
 local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
-local function TransferMexTo(unitID, mexID, unitTeam, give)
+local function TransferMexTo(unitID, mexID, unitTeam)
   if (mexID) then
     spSetUnitRulesParam(unitID, "mexIncome", OreMex[mexID].income)
     spCallCOBScript(unitID, "SetSpeed", 0, OreMex[mexID].income * 500) 
     -- ^ hacks?
     UnderAttack[unitID] = spGetGameFrame()+160
-    spTransferUnit(unitID, unitTeam, give)
-    spSetUnitNeutral(unitID, give)
+    spTransferUnit(unitID, unitTeam, false)
+    spSetUnitNeutral(unitID, true)
   end
 end
 
@@ -95,7 +96,7 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam)
   if (OreMexByID[unitID]) then
     if (unitTeam ~= GaiaTeamID) then
-      TransferMexTo(unitID, OreMexByID[unitID], GaiaTeamID, true)
+      TransferMexTo(unitID, OreMexByID[unitID], GaiaTeamID)
     end
     return 0
   end
@@ -107,71 +108,52 @@ end
 
 -- if mex OD is <= 1 and it's godmode on, transfer mex to gaia team
 -- if mex is inside energyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
-local GaiaLoopTransfer = function(f)
-  for i=1,#OreMex do
-    if (OreMex[i]~=nil) then
-      local unitID = OreMex[i].unitID
-      local x = OreMex[i].x
-      local z = OreMex[i].z
-      local unitTeam = spGetUnitTeam(unitID)
-      local allyTeam = spGetUnitAllyTeam(unitID)
-      if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
-	local units = spGetUnitsInCylinder(x, z, PylonRange+21)
-	local best_eff = 0
-	local best_team
-	local best_ally
-	local enearby = false
-	for i=1,#units do
-	  local targetID = units[i]
-	  local targetDefID = spGetUnitDefID(targetID)
-	  local targetTeam = spGetUnitTeam(targetID)
-	  local targetAllyTeam = spGetUnitAllyTeam(targetID)
-	  if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
--- 	      Spring.Echo(UnitDefs[targetDefID].humanName)
-	    local maxdist = energyDefs[targetDefID]
-	    maxdist=maxdist*maxdist
-	    local x2,_,z2 = spGetUnitPosition(targetID)
-	    if (disSQ(x,z,x2,z2) <= maxdist) then
-	      enearby = true
-	      local eff = spGetUnitRulesParam(targetID,"gridefficiency")
-	      if (eff~=nil) and (best_eff < eff) then
-		best_eff = eff
-		best_team = targetTeam
-		best_ally = targetAllyTeam
+function gadget:GameFrame(f)
+  if ((f%32)==1) then
+    for i=1,#OreMex do
+      if (OreMex[i]~=nil) then
+	local unitID = OreMex[i].unitID
+	local x = OreMex[i].x
+	local z = OreMex[i].z
+	local unitTeam = spGetUnitTeam(unitID)
+	local allyTeam = spGetUnitAllyTeam(unitID)
+	if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
+	  local units = spGetUnitsInCylinder(x, z, PylonRange+21)
+	  local best_eff = 0
+	  local best_team
+	  local best_ally
+	  local enearby = false
+	  for i=1,#units do
+	    local targetID = units[i]
+	    local targetDefID = spGetUnitDefID(targetID)
+	    local targetTeam = spGetUnitTeam(targetID)
+	    local targetAllyTeam = spGetUnitAllyTeam(targetID)
+	    if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
+	      local maxdist = energyDefs[targetDefID]
+	      maxdist=maxdist*maxdist
+	      local x2,_,z2 = spGetUnitPosition(targetID)
+	      if (disSQ(x,z,x2,z2) <= maxdist) then
+		enearby = true
+		local eff = spGetUnitRulesParam(targetID,"gridefficiency")
+		if (eff~=nil) and (best_eff < eff) then
+		  best_eff = eff
+		  best_team = targetTeam
+		  best_ally = targetAllyTeam
+		end
 	      end
 	    end
 	  end
-	end
-	if (best_team ~= nil) and (unitTeam ~= best_team) and (allyTeam ~= best_ally) then
-	  TransferMexTo(unitID, i, best_team, true)
-	elseif (INVULNERABLE_EXTRACTORS) and not(enearby) and (best_team == nil) and (unitTeam ~= GaiaTeamID) then -- back to Gaia you go
-	  TransferMexTo(unitID, i, GaiaTeamID, true)
+	  if (best_team ~= nil) and (unitTeam ~= best_team) and (allyTeam ~= best_ally) then
+	    TransferMexTo(unitID, i, best_team)
+	  elseif (INVULNERABLE_EXTRACTORS) and not(enearby) and (best_team == nil) and (unitTeam ~= GaiaTeamID) then -- back to Gaia you go
+	    TransferMexTo(unitID, i, GaiaTeamID)
+	  end
 	end
       end
     end
   end
 end
 -- godmode stuff end
-
--- local function GaiaMineMetal()
---   for i=1,#OreMex do
---     if (OreMex[i]~=nil) then
---       local unitID = OreMex[i].unitID
---       if (spGetUnitTeam(unitID)==GaiaTeamID) then
--- 	-- apparently OD gadget dont spawn ore for Gaia :D
--- 	-- if they are invincible its fine to produce ore even if mex is emped w/e i guess
--- 	MineMoreOre(unitID, OreMex[i].income, false)
---       end
---     end
---   end
--- end
-
-function gadget:GameFrame(f)
-  if ((f%32)==1) then
---     GaiaMineMetal() -- fixed in OD code, not needed anymore
-    GaiaLoopTransfer(f)
-  end
-end
 
 function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
   if (attackerID) and (targetID) and (OreMexByID[targetID]) then
@@ -188,8 +170,8 @@ local function UnitFin(unitID, unitDefID, unitTeam)
 	local units = spGetUnitsInCylinder(x, z, energyDefs[unitDefID]+10)
 	for i=1,#units do
 	  local targetID = units[i]
-	  if (OreMexByID[targetID]) and (spGetUnitTeam(targetID)==GaiaTeamID) then
-	    TransferMexTo(targetID, i, unitTeam, true)
+	  if (OreMexByID[targetID]) and (spGetUnitTeam(targetID)==GaiaTeamID) and (UnderAttack[targetID] <= spGetGameFrame()) then
+	    TransferMexTo(targetID, i, unitTeam)
 	  end
 	end
       end
@@ -375,14 +357,17 @@ function gadget:Initialize()
   if not(tonumber(modOptions.oremex) == 1) then
     gadgetHandler:RemoveGadget()
   end
+  Spring.Echo(tostring(INVULNERABLE_EXTRACTORS))
+  Spring.Echo(tostring(OBEY_OD))
   if not(INVULNERABLE_EXTRACTORS) then
+    gadgetHandler:RemoveCallIn("AllowWeaponTarget")
     gadgetHandler:RemoveCallIn("UnitPreDamaged")
   end
   mapWidth = Game.mapSizeX
   mapHeight = Game.mapSizeZ
   allyTeams = spGetAllyTeamList()
-  if not(INVULNERABLE_EXTRACTORS or OBEY_OD) then
-    GaiaLoopTransfer = function() end
+  if not(INVULNERABLE_EXTRACTORS) or not(OBEY_OD) then
+    gadgetHandler:RemoveCallIn("GameFrame")
   end
   if (spGetGameFrame() > 1) then
     local units = spGetAllUnits()
