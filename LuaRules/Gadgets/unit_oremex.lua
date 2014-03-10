@@ -83,7 +83,7 @@ local MAX_STEPS = 15 -- vine length
 local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
 local function TransferMexTo(unitID, mexID, unitTeam)
-  if (spValidUnitID(unitID) and (mexID) then
+  if (spValidUnitID(unitID)) and (mexID) then
     spSetUnitRulesParam(unitID, "mexIncome", OreMex[mexID].income)
     spCallCOBScript(unitID, "SetSpeed", 0, OreMex[mexID].income * 500) 
     -- ^ hacks?
