@@ -76,7 +76,7 @@ local mexDefs = {
 local PylonRange = UnitDefNames["armestor"].customParams.pylonrange
 
 local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
-local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 30)
+local LIMIT_PRESPAWNED_METAL = floor(tonumber(modOptions.oremex_metal) or 220)
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn) == 1)
 local OBEY_OD = (tonumber(modOptions.oremex_overdrive) == 1)
 local MAX_STEPS = 15 -- vine length
