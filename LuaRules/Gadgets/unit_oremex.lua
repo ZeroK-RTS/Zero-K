@@ -119,7 +119,7 @@ function gadget:GameFrame(f)
 	local unitTeam = spGetUnitTeam(unitID)
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
-	  local units = spGetUnitsInCylinder(x, z, PylonRange+21)
+	  local units = spGetUnitsInCylinder(x, z, PylonRange+41)
 	  local best_eff = 0
 	  local best_team
 	  local best_ally
