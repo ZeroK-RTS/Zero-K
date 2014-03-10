@@ -85,6 +85,7 @@ local function TransferMexTo(unitID, mexID, unitTeam, give)
     spSetUnitRulesParam(unitID, "mexIncome", OreMex[mexID].income)
     spCallCOBScript(unitID, "SetSpeed", 0, OreMex[mexID].income * 500) 
     -- ^ hacks?
+    UnderAttack[unitID] = spGetGameFrame()+160
     spTransferUnit(unitID, unitTeam, give)
     spSetUnitNeutral(unitID, give)
   end
@@ -94,7 +95,6 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam)
   if (OreMexByID[unitID]) then
     if (unitTeam ~= GaiaTeamID) then
-      UnderAttack[unitID] = spGetGameFrame()+160
       TransferMexTo(unitID, OreMexByID[unitID], GaiaTeamID, true)
     end
     return 0

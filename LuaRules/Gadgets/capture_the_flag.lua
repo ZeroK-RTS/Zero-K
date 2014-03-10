@@ -4,8 +4,8 @@ function gadget:GetInfo()
   return {
     name      = "Capture The Flag",
     desc      = "CTF original game mode. Capture the flags! Version "..version,
-    author    = "Tom Fyuri",
-    date      = "Feb 2014",
+    author    = "Tom Fyuri, banana_troll_killer",
+    date      = "Feb-Mar 2014",
     license   = "GPL v2 or later",
     layer     = -1,
     enabled   = true	-- don't disable me please
@@ -68,7 +68,7 @@ Development started on 8 february 2014. First playable version could be consider
 15 Februray 2014 - 0.1.0	- Some options made tweakable. Fixed inablity to select different com. It's now 1 week old.
 16 February 2014 - 0.1.1	- Balance changes. Income and bonus income formula changed. It's almost nonexponential and lowered aprox. by 2. CAI can orbit drop. Possible to disable orbit drop.
 25 February 2014 - 0.1.2	- Sounds replaced with more lively ones. And the way they are played was rewritten.
-08 March	2014 - 0.1.3	- Terraform protection was added, so now ground around CC is slowly terraforming back to its original state
+08 March    2014 - 0.1.3	- Terraform protection was added, so now ground around CC is slowly terraforming back to its original state
 ]]--  
 -- NOTE: code is largely based on abandoned takeover game mode, it just doesn't have anything ingame voting related...
 
