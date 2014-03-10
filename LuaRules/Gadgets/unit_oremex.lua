@@ -46,6 +46,7 @@ local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetTeamList		= Spring.GetTeamList
 local spSetUnitNoSelect		= Spring.SetUnitNoSelect
 local spSetUnitNeutral		= Spring.SetUnitNeutral
+local spValidUnitID	    	= Spring.ValidUnitID
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
 local random = math.random
@@ -82,7 +83,7 @@ local MAX_STEPS = 15 -- vine length
 local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
 local function TransferMexTo(unitID, mexID, unitTeam)
-  if (mexID) then
+  if (spValidUnitID(unitID) and (mexID) then
     spSetUnitRulesParam(unitID, "mexIncome", OreMex[mexID].income)
     spCallCOBScript(unitID, "SetSpeed", 0, OreMex[mexID].income * 500) 
     -- ^ hacks?
