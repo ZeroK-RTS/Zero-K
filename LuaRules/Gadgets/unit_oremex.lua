@@ -43,7 +43,7 @@ local spTransferUnit		= Spring.TransferUnit
 local spGetAllUnits		= Spring.GetAllUnits
 local spGetGameFrame		= Spring.GetGameFrame
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetAllyTeamList		= Spring.GetAllyTeamList
+local spGetTeamList		= Spring.GetTeamList
 local spSetUnitNoSelect		= Spring.SetUnitNoSelect
 local spSetUnitNeutral		= Spring.SetUnitNeutral
 local OreMexByID = {} -- by UnitID
@@ -56,7 +56,7 @@ local floor = math.floor
 
 local mapWidth
 local mapHeight
-local allyTeams
+local teamIDs
 
 local UnderAttack = {} -- holds frameID per mex so it goes neutral, if someone attacks it, for 5 seconds, it will not return to owner if no grid connected.
 
@@ -247,14 +247,14 @@ function MineMoreOre(unitID, howMuch, forcefully)
   end
   local x,_,z = spGetUnitPosition(unitID)
   local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
-  local allyTeam = spGetUnitAllyTeam(unitID)
-  if (#allyTeams>1) and (allyTeam == GaiaAllyTeamID) then
-    allyTeam = random(0,#allyTeams)
-    while (allyTeam == GaiaAllyTeamID) do
-      allyTeam = random(0,#allyTeams)
+  local teamID = spGetUnitTeam(unitID)
+  if (#teamIDs>1) and (teamID == GaiaTeamID) then
+    teamID = random(0,#teamIDs)
+    while (teamID == GaiaTeamID) do
+      teamID = random(0,#teamIDs)
     end
   end
-  if (#features >= 144) and not(forcefully) then return end -- too much reclaim, please reclaim
+  if (#features > 144) and not(forcefully) then return end -- too much reclaim, please reclaim
   if (ore>=1) then
     try=0
     while (try < sp_count) do
@@ -273,7 +273,7 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	  spawn_amount = MIN_PRODUCE
 	end
 	if (ore >= spawn_amount) then
-	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", allyTeam)
+	  local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", teamID)
 	  if (oreID) then
 	    spSetFeatureReclaim(oreID, spawn_amount)
 	    local rd = random(360) * pi / 180
@@ -285,7 +285,7 @@ function MineMoreOre(unitID, howMuch, forcefully)
       try=try+1
     end
     if (forcefully) then -- drop all thats left on mex
-    local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z, "n", allyTeam)
+    local oreID = spCreateFeature("ore", x, spGetGroundHeight(x, z), z, "n", teamID)
       if (oreID) then
 	spSetFeatureReclaim(oreID, ore)
 	local rd = random(360) * pi / 180
@@ -365,7 +365,7 @@ function gadget:Initialize()
   end
   mapWidth = Game.mapSizeX
   mapHeight = Game.mapSizeZ
-  allyTeams = spGetAllyTeamList()
+  teamIDs = spGetTeamList()
   if not(INVULNERABLE_EXTRACTORS) or not(OBEY_OD) then
     gadgetHandler:RemoveCallIn("GameFrame")
   end
@@ -383,7 +383,7 @@ end
 function gadget:GameStart()
   mapWidth = Game.mapSizeX
   mapHeight = Game.mapSizeZ
-  allyTeams = spGetAllyTeamList()
+  teamIDs = spGetTeamList()
   if (PRESPAWN_EXTRACTORS) then
     PreSpawn()
   end
