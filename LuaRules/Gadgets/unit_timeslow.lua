@@ -184,6 +184,8 @@ local function addSlowDamage(unitID, damage)
 	-- add slow damage
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + damage
 	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
+	
+	updateSlow( unitID, slowedUnits[unitID]) -- without this unit does not fire slower, only moves slower
 end
 
 local function getSlowDamage(unitID)

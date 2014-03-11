@@ -36,6 +36,7 @@ You can capture flag using any unit apart from flying units. You can pick up fla
   immediate TODO:
 - Rewrite widget (it only shows 2 teams, yet gadget supports more allyteams!).
 - Sfx could be improved. They don't play always. Needs to be rewritten so gadget tells widget when to play.
+- Rewrite all parts that use ipairs and use for instead. Lets increase perfomence.
   
   things to test/tweak:
 - Backup commander logic needed to be tested more, and the extra income should be balanced on the results of testing. (this needs actual playing)
@@ -188,7 +189,7 @@ local FLAG_SLOW_BURST_DIST_SQ = FLAG_SLOW_BURST_DIST*FLAG_SLOW_BURST_DIST
 local DENY_DROP_RADIUS = 400 -- dont comdrop on enemy carrier... no fun
 local DENY_DROP_RADIUS_SQ = DENY_DROP_RADIUS*DENY_DROP_RADIUS
 local MAX_Z_DIFFERENCE = 1400 -- no capturing from space lol
-local FLAG_AMOUNT_INIT = floor(tonumber(modOptions.ctf_flags or 4))
+local FLAG_AMOUNT_INIT = tonumber(modOptions.ctf_flags or 4)
 local ME_BONUS = function(i) return (sqrt(i)*(1.05^i)) end -- income per player, is turned into constant on gamestart, see http://i.imgur.com/RkoedXl.png
 local ME_BONUS_C = {} -- this one fills in automatically from function above on gamestart, it's income per TEAM, NOT PER PLAYER!
 local ME_BONUS_MULT = tonumber(modOptions.ctf_inc_mult or 0)

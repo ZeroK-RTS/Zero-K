@@ -47,7 +47,7 @@ options = {
 		value = true,
 	},
 	showpriorityonshift = {
-		name = "Show priorty on shift",
+		name = "Show priority on shift",
 		desc = "When holding shift, an icon appears over unit with low or high priority.",
 		type = 'bool',
 		value = true,
