@@ -122,13 +122,13 @@ local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn) == 1)
 local OBEY_OD = (tonumber(modOptions.oremex_overdrive) == 1)
 local INFINITE_GROWTH = (tonumber(modOptions.oremex_inf) == 1) -- this causes performance drop you know...
 local ORE_DMG = modOptions.oremex_harm
-if (tonumber(ORE_DMG)==nil) then ORE_DMG = 2 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
+if (tonumber(ORE_DMG)==nil) then ORE_DMG = 0 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
 local ORE_DMG_RANGE = 81 -- so standing in adjacent tile is gonna harm you
 local OBEY_ZLEVEL = (tonumber(modOptions.oremex_uphill) == 1) -- slower uphill growth
 if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = true end
 local ZLEVEL_PROTECTION = 400 -- if adjacent tile is over 400 it's not gonna grow there at all -- lower Z tiles do not give speed boost though
 local MAX_STEPS = 15 -- vine length
-local MAX_PIECES = 192 -- anti spam measure -- buffed from 144 to 192, if it's too much, revert back to 144, it looks like cute ~7x7 square rotated 45 degree
+local MAX_PIECES = 144 -- anti spam measure, 144, it looks like cute ~7x7 square rotated 45 degree
 local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
 
 if (INFINITE_GROWTH) then -- not enabled by default
@@ -237,7 +237,7 @@ local InflictOreDamage = function()
   end
 end
 
--- if mex OD is <= 1 and it's godmode on, transfer mex to gaia team
+-- if mex OD is off and it's godmode on, transfer mex to gaia team
 -- if mex is inside energyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
 function gadget:GameFrame(f)
   if ((f%32)==1) then
