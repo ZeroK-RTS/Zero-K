@@ -5,8 +5,11 @@ local version= "1.001"
 function widget:GetInfo()
   return {
     name = "CommandInsert",
-    desc = "[v" .. version .. "] When pressing Spacebar and Shift, you can insert commands to arbitrary places in queue. When pressing Spacebar alone, commands are inserted on front of queue. Based on FrontInsert by jK",
-    author = "dizekat",
+    desc = "[v" .. version .. "] Allow you to add command into existing queue. Based on FrontInsert by jK"..
+			"\n• SPACEBAR+SHIFT insert command to arbitrary places in queue."..
+			"\n• SPACEBAR insert command in front of queue."..
+			"\n• CTRL+Reclaim force reclaim your own unit in an area.",
+	author = "dizekat",
     date = "Jan,2008", --16 October 2013
     license = "GNU GPL, v2 or later",
     layer = 5,

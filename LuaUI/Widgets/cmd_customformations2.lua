@@ -1,9 +1,9 @@
---FIXME: use customcommands.h.lua instead of defining jump by its cmdid	(>:|)
-
 function widget:GetInfo()
 	return {
 		name      = "CustomFormations2",
-		desc      = "Allows you to draw your own formation line.",
+		desc      = "Allows you to draw formation line:"..
+					"\n• mouse drag draw various command on ground."..
+					"\n• ALT+Attack draw attack command on the ground.",
 		author    = "Niobium", -- Based on 'Custom Formations' by jK and gunblob
 		version   = "v3.3",
 		date      = "Mar, 2010",
