@@ -86,7 +86,7 @@ local emptyTable = {}
 
 local coroutines = {}
 local lastJump = {}
-local justFinishedJump = {}
+local lastJumpPosition = {}
 local landBoxSize = 60
 local jumps = {}
 local jumping = {}
@@ -203,7 +203,7 @@ local function CopyJumpData(unitID,lineDist,flightDist )
 	return unitID,reloadTime,env,cob,speed,step,rotateMidAir,delay,height
 end
 
-local function Jump(unitID, goal, cmdTag)
+local function Jump(unitID, goal, cmdTag, origCmdParams)
 	goal[2]						 = spGetGroundHeight(goal[1],goal[3])
 	local start				 = {spGetUnitBasePosition(unitID)}
 
@@ -387,7 +387,7 @@ local function Jump(unitID, goal, cmdTag)
 		end
 		local jumpEndTime = spGetGameSeconds()
 		lastJump[unitID] = jumpEndTime
-		justFinishedJump[unitID] = true
+		lastJumpPosition[unitID] = origCmdParams
 		jumping[unitID] = false
 		SetLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
@@ -520,7 +520,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if (not jumpDefs[unitDefID]) then
 		return false
 	end
-	
+
 	if (cmdID ~= CMD_JUMP) then
 		return false
 	end
@@ -533,9 +533,13 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return true, false -- command was used but don't remove it (unit is still jumping)
 	end
 
-	if justFinishedJump[unitID] then
-		justFinishedJump[unitID] = nil
-		return true, true -- command was used, remove it (unit finished jump)
+	if lastJumpPosition[unitID] then
+		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and 
+				abs(lastJumpPosition[unitID][2] - cmdParams[2]) < 1 and 
+				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
+			return true, true -- command was used, remove it (unit finished jump)
+		end
+		lastJumpPosition[unitID] = nil
 	end
 	
 	local t = spGetGameSeconds()
@@ -556,14 +560,14 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				end
 			end
 			if (not jumps[coords]) then
-				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag)
+				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
 				end
 				jumps[coords] = {1, currFrame}
 				return true, false -- command was used but don't remove it (unit have not finish jump yet)
 			elseif JumpSpreadException[unitDefID] then
-				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag)
+				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
 				end
@@ -574,7 +578,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 					cmdParams[1] + random(-r, r),
 					cmdParams[2],
 					cmdParams[3] + random(-r, r)}
-				local didJump, removeCommand = Jump(unitID, randpos, cmdTag)
+				local didJump, removeCommand = Jump(unitID, randpos, cmdTag, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
 				end
