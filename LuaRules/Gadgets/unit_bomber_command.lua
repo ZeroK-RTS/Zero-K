@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "11 February 2014, 25 Feb 2011",
+    date      = "11 March 2014, 25 Feb 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -259,7 +259,11 @@ end
 local function RefreshEmptyspot_minusBomberLanding()
 	for allyTeam in pairs(airpadsPerAllyteam) do --all airpads
 		for airpadID,airpadUnitDefID in pairs (airpadsPerAllyteam[allyTeam]) do
-			RefreshEmptyPad(airpadID,airpadUnitDefID)
+			if spGetUnitIsDead(airpadID) then --rare case. Can happen if airpad is built & die in same frame
+				airpadsPerAllyteam[allyTeam][airpadID] = nil
+			else
+				RefreshEmptyPad(airpadID,airpadUnitDefID)
+			end
 		end
 	end
 	for bomberID,data in pairs(bomberLanding) do --airplane about to land
@@ -284,10 +288,13 @@ local function FindNearestAirpad(unitID, team)
 	end
 	-- first go through all the pads to see which ones are unbooked
 	for airpadID,airpadDefID in pairs(airpadsPerAllyteam[allyTeam]) do
-		if not spGetUnitIsDead(airpadID) and 
-		(airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) then
-			freePads[airpadID] = true
-			freePadCount = freePadCount + 1
+		if spGetUnitIsDead(airpadID) then --rare case. Can happen if airpad is built & die in same frame
+			airpadsPerAllyteam[allyTeam][airpadID] = nil
+		else
+			if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) then
+				freePads[airpadID] = true
+				freePadCount = freePadCount + 1
+			end
 		end
 	end
 	-- if no free pads, just use all of them
@@ -299,9 +306,11 @@ local function FindNearestAirpad(unitID, team)
 	local minDist = 999999
 	local closestPad
 	for airpadID in pairs(freePads) do
-		local excessReservation = math.max(0, airpadsData[airpadID].reservations.count - airpadsData[airpadID].cap)
-		local dist = Spring.GetUnitSeparation(unitID, airpadID, true) or minDist
+		local excessReservation = math.modf(airpadsData[airpadID].reservations.count/airpadsData[airpadID].cap) --output: return "0" if airpad NOT full, return "1" if airpad is full, return "2" if twice as full, return "3" if thrice as full.
+		excessReservation = math.min(10,excessReservation) --clamp to avoid crazy value
+		local dist = Spring.GetUnitSeparation(unitID, airpadID, true)
 		dist = dist + (10*excessReservation)^2
+		dist = math.min(minDist-1, dist) --clamp to avoid crazy value
 		if (dist < minDist) then
 			minDist = dist
 			closestPad = airpadID
