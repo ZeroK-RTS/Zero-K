@@ -33,7 +33,7 @@ unitDef = {
     pylonrange         = 50,
 	ismex              = 1,
 	midposoffset       = [[0 -10 0]],
-	modelradius        = [[20]],
+	modelradius        = [[15]],
   },
 
   energyUse              = 0,
