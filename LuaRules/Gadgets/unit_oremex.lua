@@ -481,7 +481,7 @@ function MineMoreOre(unitID, howMuch, forcefully)
       try=try+1
     end
     if (ore >= 1) then
-      if not(forcefully) and (ore >= MIN_PRODUCE) then -- simply grow "random_feature"
+      if not(forcefully) and (ore >= MIN_PRODUCE) and (Ore[random_feature]) then -- simply grow "random_feature"
 	AddOreMetal(random_feature, ore)
 	ore = 0
       elseif (forcefully) then -- drop all thats left on mex
