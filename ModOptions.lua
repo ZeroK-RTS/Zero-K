@@ -262,6 +262,7 @@ local options = {
     section= 'cncmex',
     def    = true,
   },
+  {
     key='oremex_harm',
     name='Ore damage',
     desc='Set how much damage should ore inflict on contact, it stacks. Some units are ore proof.',

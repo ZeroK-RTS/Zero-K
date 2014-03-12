@@ -54,7 +54,7 @@ local mexDefs = {
 --------------------------------------------------------------------------------
 
 function widget:UnitFinished(unitID, unitDefID)
-	if Spring.ValidUnitID(unitID) and unitDefID and (UmexDefs[unitDefID]) then
+	if Spring.ValidUnitID(unitID) and unitDefID and (mexDefs[unitDefID]) then
 		OreExtractors[unitID] = true
 	end	
 end
