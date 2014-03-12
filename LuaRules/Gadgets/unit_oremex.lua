@@ -122,7 +122,7 @@ local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 61
 
 local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
 if (modOptions.oremex_invul == nil) then INVULNERABLE_EXTRACTORS = 1 end
-local LIMIT_PRESPAWNED_METAL = modOptions.oremex_metal
+local LIMIT_PRESPAWNED_METAL = tonumber(modOptions.oremex_metal)
 if (tonumber(LIMIT_PRESPAWNED_METAL)==nil) then LIMIT_PRESPAWNED_METAL = 35 end
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn) == 1)
 if (modOptions.oremex_prespawn == nil) then PRESPAWN_EXTRACTORS = 1 end
@@ -130,7 +130,7 @@ local OBEY_OD = (tonumber(modOptions.oremex_overdrive) == 1)
 if (modOptions.oremex_overdrive == nil) then OBEY_OD = 1 end
 local INFINITE_GROWTH = (tonumber(modOptions.oremex_inf) == 1) -- this causes performance drop you know...
 if (modOptions.oremex_inf == nil) then INFINITE_GROWTH = 0 end
-local ORE_DMG = modOptions.oremex_harm
+local ORE_DMG = tonumber(modOptions.oremex_harm) -- TODO does it take float?
 if (tonumber(ORE_DMG)==nil) then ORE_DMG = 2 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
 local ORE_DMG_RANGE = 81 -- so standing in adjacent tile is gonna harm you
 local OBEY_ZLEVEL = (tonumber(modOptions.oremex_uphill) == 1) -- slower uphill growth
