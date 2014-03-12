@@ -16,8 +16,9 @@ end
 
 --TODO storage should drop ore on death should you have no allies left to transfer ore to.
 --TODO units should refuse to reclaim ore once entire allyteam is full on metal.
---TODO if dmg is enabled it should corrupt terrain!!!
+--TODO if dmg is enabled it should corrupt terrain visually!!!
 --TODO different ore colors.
+--TODO different ore size models, pile of chunks should combine into bigger pile of chunks so we keep less features overall and less lag...
 
 -- changelog
 -- 11 march 2014 - 1.0.3. Growth rewrite, ore metal yield change, ore harm units now. Disobey OD fix. And transfer logic improvement.
@@ -25,6 +26,8 @@ end
 
 local modOptions = Spring.GetModOptions()
 if (gadgetHandler:IsSyncedCode()) then
+
+local getMovetype = Spring.Utilities.getMovetype
   
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
@@ -58,6 +61,9 @@ local spSetUnitHealth 		= Spring.SetUnitHealth
 local spAddUnitDamage		= Spring.AddUnitDamage
 local spDestroyUnit		= Spring.DestroyUnit
 local spGetAllFeatures          = Spring.GetAllFeatures
+local spGetFeatureResources	= Spring.GetFeatureResources
+local spGiveOrderToUnit	 	= Spring.GiveOrderToUnit
+local spGetUnitCommands		= Spring.GetUnitCommands
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
 local random = math.random
@@ -92,13 +98,12 @@ local TiberiumProofDefs = {
 -- more setup
 for i=1,#UnitDefs do
   local ud = UnitDefs[i]
-  if (ud.isBuilder and not(ud.isFactory) and not(ud.customParams.commtype)) or ud.name:find("chicken") then -- I pray this works and doesn't slow down load times too much
+--   if (ud.isBuilder and not(ud.isFactory) and not(ud.customParams.commtype)) or ud.name:find("chicken") then -- I pray this works and doesn't slow down load times too much
 --   if (ud.isBuilder and not(ud.isFactory)) or (ud.customParams.commtype) or ud.name:find("chicken") then -- I pray this works and doesn't slow down load times too much
+  if not((getMovetype(ud) == 2) or ud.name:find("chicken")) then -- anything that can move and not chicken can be damaged by tiberium
     TiberiumProofDefs[i] = true
   end
 end
--- probably ore should damage commander, despite it having reclaim ability, otherwise you can stay in ore field and have advantage against raiders...
--- also maybe only pylon should be tiberium proof...
 
 -- NOTE probably below defs could be generated on gamestart too
 local energyDefs = { -- if gaia mex get's in range of any of below structures, it will trasmit it ownership
@@ -113,27 +118,35 @@ local energyDefs = { -- if gaia mex get's in range of any of below structures, i
 local mexDefs = {
   [UnitDefNames["cormex"].id] = true,
 }
-local PylonRange = UnitDefNames["armestor"].customParams.pylonrange
+local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 61
 
 local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
+if (modOptions.oremex_invul == nil) then INVULNERABLE_EXTRACTORS = 1 end
 local LIMIT_PRESPAWNED_METAL = modOptions.oremex_metal
-if (tonumber(LIMIT_PRESPAWNED_METAL)==nil) then LIMIT_PRESPAWNED_METAL = 220 end
+if (tonumber(LIMIT_PRESPAWNED_METAL)==nil) then LIMIT_PRESPAWNED_METAL = 35 end
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn) == 1)
+if (modOptions.oremex_prespawn == nil) then PRESPAWN_EXTRACTORS = 1 end
 local OBEY_OD = (tonumber(modOptions.oremex_overdrive) == 1)
+if (modOptions.oremex_overdrive == nil) then OBEY_OD = 1 end
 local INFINITE_GROWTH = (tonumber(modOptions.oremex_inf) == 1) -- this causes performance drop you know...
+if (modOptions.oremex_inf == nil) then INFINITE_GROWTH = 0 end
 local ORE_DMG = modOptions.oremex_harm
-if (tonumber(ORE_DMG)==nil) then ORE_DMG = 0 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
+if (tonumber(ORE_DMG)==nil) then ORE_DMG = 2 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
 local ORE_DMG_RANGE = 81 -- so standing in adjacent tile is gonna harm you
 local OBEY_ZLEVEL = (tonumber(modOptions.oremex_uphill) == 1) -- slower uphill growth
-if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = true end
-local ZLEVEL_PROTECTION = 400 -- if adjacent tile is over 400 it's not gonna grow there at all -- lower Z tiles do not give speed boost though
+if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = 1 end
+local ZLEVEL_PROTECTION = 300 -- if adjacent tile is over 300 it's not gonna grow there at all -- lower Z tiles do not give speed boost though
 local MAX_STEPS = 15 -- vine length
-local MAX_PIECES = 144 -- anti spam measure, 144, it looks like cute ~7x7 square rotated 45 degree
-local MIN_PRODUCE = 5 -- no less than 5 ore per 40x40 square otherwise spam lol...
+local MAX_PIECES = 50 -- anti spam measure, 144, it looks like cute ~7x7 square rotated 45 degree
+local MIN_PRODUCE = 10 -- no less than 10 ore per 40x40 square otherwise spam lol...
 
 if (INFINITE_GROWTH) then -- not enabled by default
   MAX_STEPS = 40 -- 40*40 = 1600 distance is maximum in length per mex, considering there are usually more than 1 mex on 2000x2000 map, it's supposed to surely cover entire map in "tiberium"
 end
+
+local CMD_SELFD		= CMD.SELFD
+local CMD_ATTACK	= CMD.ATTACK
+local CMD_REMOVE	= CMD.REMOVE
 
 local function TransferMexTo(unitID, mexID, unitTeam)
   if (spValidUnitID(unitID)) and (mexID) then
@@ -168,7 +181,7 @@ local TransferLoop = function()
       local unitTeam = spGetUnitTeam(unitID)
       local allyTeam = spGetUnitAllyTeam(unitID)
       if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
-	local units = spGetUnitsInCylinder(x, z, PylonRange+41)
+	local units = spGetUnitsInCylinder(x, z, PylonRange)
 	local best_eff = -1 -- lel
 	local best_team
 	local best_ally
@@ -209,8 +222,8 @@ local function OreHarms(unitID)
   if (health ~= nil) then
     if (health > ORE_DMG) then
       GG.addSlowDamage(unitID, ORE_DMG*2)
---       spAddUnitDamage(unitID, ORE_DMG, 0, GaiaTeamID) -- FIXME doesnt work, adds 40 damage regardless and instakills bots
-      spSetUnitHealth(unitID, health-ORE_DMG) -- works flawlessly albeit regen doesnt disable, i can live with that
+      spAddUnitDamage(unitID, ORE_DMG, 0, GaiaTeamID, 1)
+--       spSetUnitHealth(unitID, health-ORE_DMG)
     else
       spDestroyUnit(unitID, false, false, GaiaTeamID)
     end
@@ -254,20 +267,6 @@ function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attac
 end
 
 local function UnitFin(unitID, unitDefID, unitTeam)
---   if (unitTeam ~= GaiaTeamID) and (OBEY_OD) then
---     if (energyDefs[unitDefID]) then
---       local x,_,z = spGetUnitPosition(unitID)
---       if (x) then
--- 	local units = spGetUnitsInCylinder(x, z, energyDefs[unitDefID]+10)
--- 	for i=1,#units do
--- 	  local targetID = units[i]
--- 	  if (OreMexByID[targetID]) and (spGetUnitTeam(targetID)==GaiaTeamID) and (UnderAttack[targetID] <= spGetGameFrame()) then
--- 	    TransferMexTo(targetID, i, unitTeam)
--- 	  end
--- 	end
---       end
---     end
---   end
   if (mexDefs[unitDefID]) then
     local x,y,z = spGetUnitPosition(unitID)
     if (x) then
@@ -417,6 +416,12 @@ local function SpawnOre(a, b, spawn_amount, teamID)
   return false
 end
 
+local function AddOreMetal(oreID, amount) -- should add more metal on existing ore tile, hopefully it works...
+  --local remM, maxM, remE, maxE, left = spGetFeatureResources(oreID)
+  local left = select(5,spGetFeatureResources(oreID))
+  spSetFeatureReclaim(oreID, left+amount)
+end
+
 function gadget:FeatureDestroyed(featureID, allyTeam)
   if (Ore[featureID]) then
     Ore[featureID] = nil
@@ -432,8 +437,12 @@ function MineMoreOre(unitID, howMuch, forcefully)
     OreMex[MexID].income = howMuch
   end
   local x,y,z = spGetUnitPosition(unitID)
+  local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
+  local random_feature
+  if (#features > 0) then
+    random_feature = features[random(1,#features)]
+  end
   if not(INFINITE_GROWTH) then -- rejoice Killer
-    local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
     if (#features > MAX_PIECES) and not(forcefully) then return end -- too much reclaim, please reclaim
   end
   local sp_count = 3
@@ -471,9 +480,14 @@ function MineMoreOre(unitID, howMuch, forcefully)
       end
       try=try+1
     end
-    if (forcefully) and (ore >= 1) then -- drop all thats left on mex
-      if (SpawnOre(x,z,ore,teamID)) then
+    if (ore >= 1) then
+      if not(forcefully) and (ore >= MIN_PRODUCE) then -- simply grow "random_feature"
+	AddOreMetal(random_feature, ore)
 	ore = 0
+      elseif (forcefully) then -- drop all thats left on mex
+	if (SpawnOre(x,z,ore,teamID)) then
+	  ore = 0
+	end
       end
     end
   end
@@ -523,8 +537,8 @@ local function PreSpawn()
 	  spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) 
 	  local prespawn = 0
 	  while (prespawn < LIMIT_PRESPAWNED_METAL) do
-	    MineMoreOre(unitID, 30, true)
-	    prespawn=prespawn+30
+	    MineMoreOre(unitID, 10, true)
+	    prespawn=prespawn+10
 	  end
 	  if (LIMIT_PRESPAWNED_METAL-prespawn)>=5 then -- i dont want to spawn ~1m "leftovers", chunks are ok
 	    MineMoreOre(unitID, LIMIT_PRESPAWNED_METAL-prespawn, true)
@@ -547,6 +561,7 @@ local function ReInit(reinit)
       INVULNERABLE_EXTRACTORS = false
       gadgetHandler:RemoveCallIn("AllowWeaponTarget")
       gadgetHandler:RemoveCallIn("UnitPreDamaged")
+      gadgetHandler:RemoveCallIn("AllowCommand")
     end
   end
   if (reinit) then
@@ -571,6 +586,7 @@ function gadget:Initialize()
   if not(INVULNERABLE_EXTRACTORS) then
     gadgetHandler:RemoveCallIn("AllowWeaponTarget")
     gadgetHandler:RemoveCallIn("UnitPreDamaged")
+    gadgetHandler:RemoveCallIn("AllowCommand")
   end
   if not(INVULNERABLE_EXTRACTORS) or not(OBEY_OD) then
     TransferLoop = function() end
@@ -589,6 +605,25 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
   UnitFin(unitID, unitDefID, unitTeam)
+end
+
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) --, fromSynced)
+  if (cmdID == CMD_ATTACK) then
+--     local unitIDs = {}
+    cmdList = Spring.GetUnitCommands(unitID)
+    for i=1,#cmdList do
+      if (OreMexByID[cmdList[i].params[1]]) then
+	spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdList[i].tag}, {})
+      end
+    end
+    if (#cmdParams == 1) and (OreMexByID[cmdParams[1]]) then
+      return false 
+    end
+  end
+  if (OreMexByID[unitID]) and (cmdID == CMD_SELFD) then
+    return false
+  end
+  return true
 end
 
 end

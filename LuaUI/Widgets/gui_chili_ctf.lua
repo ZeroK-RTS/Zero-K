@@ -503,10 +503,6 @@ function widget:UnitDestroyed(unitID)
 	end
 end
 
-function widget:UnitFinished(unitID, unitDefID)
-	SpotCC(unitID, unitDefID)
-end
-
 function widget:UnitFinished(unitID, unitDefID)--, team)
 	SpotCC(unitID, unitDefID)
 end

@@ -147,6 +147,14 @@ local function GetNearestMarker(x,z)
   return best_marker
 end
 
+local function spGetGroundHeight2(x,z)
+  local y = spGetGroundHeight(x,z)
+  if (y < waterLevel) then
+    return waterLevel
+  end
+  return y
+end
+
 local function UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
   if (unitDefID ~= nil ) then
     local ud = UnitDefs[unitDefID]
@@ -160,7 +168,7 @@ local function UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, at
 	  DeathMarkers[markerID].wasted = DeathMarkers[markerID].wasted + ud.metalCost
 	  DeathMarkers[markerID].x = (DeathMarkers[markerID].x+x)/2
 	  DeathMarkers[markerID].z = (DeathMarkers[markerID].z+z)/2
-	  DeathMarkers[markerID].y = spGetGroundHeight(DeathMarkers[markerID].x,DeathMarkers[markerID].z)
+	  DeathMarkers[markerID].y = spGetGroundHeight2(DeathMarkers[markerID].x,DeathMarkers[markerID].z)
 	  DeathMarkers[markerID].time = spGetGameFrame()
 	  DeathMarkers[markerID].teams[teamID] = true
 	  if (attackerTeamID ~= nil) then
@@ -191,10 +199,7 @@ local function UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, at
 	    end
 	  end
 	  if (x ~= nil) then
-	    local groundHeight = spGetGroundHeight(x,z)
-	    if (y < waterLevel) then
-	      groundHeight = waterLevel
-	    end
+	    local groundHeight = spGetGroundHeight2(x,z)
 	    if (not(ud.canFly) and ((y-40) >= groundHeight)) then -- 40 diff is just above defender
 	      AnnouncerAirshot(x, y, z)
 	    end
