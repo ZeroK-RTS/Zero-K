@@ -135,7 +135,7 @@ local function WriteTooltip(seriesName)
 	local str = ''
 	local upgrades = WG.GetCommUpgradeList()
 	for i=2,#data do	-- exclude level 0 comm
-		str = str .. "\nLEVEL "..i.. " ("..data[i].cost.." metal)\n\tModules:"
+		str = str .. "\nLEVEL "..(i-1).. " ("..data[i].cost.." metal)\n\tModules:"
 		for j, modulename in pairs(data[i].modules) do
 			if upgrades[modulename] then
 				local substr = upgrades[modulename].name
