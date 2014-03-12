@@ -100,7 +100,7 @@ for i=1,#UnitDefs do
   local ud = UnitDefs[i]
 --   if (ud.isBuilder and not(ud.isFactory) and not(ud.customParams.commtype)) or ud.name:find("chicken") then -- I pray this works and doesn't slow down load times too much
 --   if (ud.isBuilder and not(ud.isFactory)) or (ud.customParams.commtype) or ud.name:find("chicken") then -- I pray this works and doesn't slow down load times too much
-  if not((getMovetype(ud) == 2) or ud.name:find("chicken")) then -- anything that can move and not chicken can be damaged by tiberium
+  if not((getMovetype(ud) ~= false) or ud.name:find("chicken")) then -- anything that can move and not chicken can be damaged by tiberium
     TiberiumProofDefs[i] = true
   end
 end

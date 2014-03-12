@@ -46,17 +46,22 @@ local iconhsize	= iconsize * 0.5
 local OreExtractors = {}
 local Rotation = 0
 
+local mexDefs = {
+  [UnitDefNames["cormex"].id] = true,
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:UnitFinished(unitID, unitDefID)
-	if Spring.ValidUnitID(unitID) and unitDefID and (UnitDefs[unitDefID].name == "cormex") then
+	if Spring.ValidUnitID(unitID) and unitDefID and (UmexDefs[unitDefID]) then
 		OreExtractors[unitID] = true
 	end	
 end
 
-function widget:UnitEnteredLos(unitID, unitDefID)
-	if Spring.ValidUnitID(unitID) and unitDefID and (UnitDefs[unitDefID].name == "cormex") then
+function widget:UnitEnteredLos(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if (mexDefs[unitDefID]) then
 		OreExtractors[unitID] = true
 	end	
 end
@@ -121,7 +126,7 @@ function widget:Initialize()
 	for i=1,#units do
 		local unitID = units[i]
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		if Spring.ValidUnitID(unitID) and unitDefID and (UnitDefs[unitDefID].name == "cormex") then
+		if Spring.ValidUnitID(unitID) and unitDefID and (mexDefs[unitDefID]) then
 			OreExtractors[unitID] = true
 		end
 	end
