@@ -64,6 +64,7 @@ local spGetAllFeatures          = Spring.GetAllFeatures
 local spGetFeatureResources	= Spring.GetFeatureResources
 local spGiveOrderToUnit	 	= Spring.GiveOrderToUnit
 local spGetUnitCommands		= Spring.GetUnitCommands
+local spValidFeatureID		= Spring.ValidFeatureID
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
 local random = math.random
@@ -418,8 +419,12 @@ end
 
 local function AddOreMetal(oreID, amount) -- should add more metal on existing ore tile, hopefully it works...
   --local remM, maxM, remE, maxE, left = spGetFeatureResources(oreID)
-  local left = select(5,spGetFeatureResources(oreID))
-  spSetFeatureReclaim(oreID, left+amount)
+  if (spValidFeatureID(oreID)) then
+    local left = select(5,spGetFeatureResources(oreID))
+    spSetFeatureReclaim(oreID, left+amount)
+    return true
+  end
+  return false
 end
 
 function gadget:FeatureDestroyed(featureID, allyTeam)
@@ -482,8 +487,9 @@ function MineMoreOre(unitID, howMuch, forcefully)
     end
     if (ore >= 1) then
       if not(forcefully) and (ore >= MIN_PRODUCE) and (Ore[random_feature]) then -- simply grow "random_feature"
-	AddOreMetal(random_feature, ore)
-	ore = 0
+	if (AddOreMetal(random_feature, ore)) then
+	  ore = 0
+	end
       elseif (forcefully) then -- drop all thats left on mex
 	if (SpawnOre(x,z,ore,teamID)) then
 	  ore = 0
