@@ -134,7 +134,7 @@ local function WriteTooltip(seriesName)
 	local data = WG.GetCommSeriesInfo(seriesName, true)
 	local str = ''
 	local upgrades = WG.GetCommUpgradeList()
-	for i=1,#data do
+	for i=2,#data do	-- exclude level 0 comm
 		str = str .. "\nLEVEL "..i.. " ("..data[i].cost.." metal)\n\tModules:"
 		for j, modulename in pairs(data[i].modules) do
 			if upgrades[modulename] then
