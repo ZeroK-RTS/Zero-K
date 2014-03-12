@@ -119,7 +119,7 @@ local energyDefs = { -- if gaia mex get's in range of any of below structures, i
 local mexDefs = {
   [UnitDefNames["cormex"].id] = true,
 }
-local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 61
+local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 21
 
 local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
 if (modOptions.oremex_invul == nil) then INVULNERABLE_EXTRACTORS = 1 end
@@ -193,7 +193,7 @@ local TransferLoop = function()
 	  local targetTeam = spGetUnitTeam(targetID)
 	  local targetAllyTeam = spGetUnitAllyTeam(targetID)
 	  if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
-	    local maxdist = energyDefs[targetDefID]
+	    local maxdist = energyDefs[targetDefID]+21
 	    maxdist=maxdist*maxdist
 	    local x2,_,z2 = spGetUnitPosition(targetID)
 	    if (disSQ(x,z,x2,z2) <= maxdist) then
