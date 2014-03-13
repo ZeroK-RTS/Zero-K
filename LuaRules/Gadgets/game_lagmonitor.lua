@@ -374,6 +374,10 @@ function gadget:GameFrame(n)
 	end	-- if
 end
 
+function gadget:GameOver()
+	gadgetHandler:RemoveGadget() --shutdown after game over, so that at end of a REPLAY Lagmonitor doesn't bounce unit among player
+end
+
 else -- UNSYNCED ---
 
 	function WrapToLuaUI(_,afkPlayer)
