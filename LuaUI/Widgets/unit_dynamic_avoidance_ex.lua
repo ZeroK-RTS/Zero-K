@@ -1,4 +1,4 @@
-local versionName = "v2.871"
+local versionName = "v2.872"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -143,7 +143,6 @@ local commandIndexTableG= {} --store latest widget command for comparison
 local myTeamID_gbl=-1
 local myPlayerID=-1
 local gaiaTeamID = Spring.GetGaiaTeamID()
-local wreckageID_offset=0
 local attackerG= {} --for recording last attacker
 local commandTTL_G = {} --for recording command's age. To check for expiration. Note: Each table entry is indexed by unitID
 local iNotLagging_gbl = true --//variable: indicate if player(me) is lagging in current game. If lagging then do not process anything.
@@ -239,21 +238,11 @@ function widget:Initialize()
 	if spec then widgetHandler:RemoveWidget() return false end
 	myTeamID_gbl= spGetMyTeamID()
 	
-	--find maxUnits 
-	--offset the ID of wreckage
-	wreckageID_offset = Game.maxUnits
-	--
-	
 	if (turnOnEcho == 1) then Spring.Echo("myTeamID_gbl(Initialize)" .. myTeamID_gbl) end
 end
 
 function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end
-	
-	--find maxUnits
-	--offset the ID of wreckage
-	wreckageID_offset = Game.maxUnits
-	--
 end
 
 --execute different function at different timescale
@@ -1169,7 +1158,7 @@ function InsertCommandQueue(passedInfo)
 	if (#cQueue>=queueIndex+1) then --if is queue={reclaim, area reclaim,stop}, or: queue={move,reclaim, area reclaim,stop}, or: queue={area reclaim, stop}, or:queue={move, area reclaim, stop}.
 		if (cQueue[queueIndex].id==CMD_REPAIR or cQueue[queueIndex].id==CMD_RECLAIM or cQueue[queueIndex].id==CMD_RESURRECT) then --if first (1) queue is reclaim/ressurect/repair
 			if cQueue[queueIndex+1].id==CMD_RECLAIM or cQueue[queueIndex+1].id==CMD_RESURRECT then --if second (2) queue is also reclaim/ressurect
-				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
+				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-Game.maxUnits) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
 				if (cQueue[queueIndex+1].params[4]~=nil) then  --second (2) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
 					orderArray[#orderArray+1] = {CMD_REMOVE, {cQueue[queueIndex].tag}, {}} -- spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete latest reclaiming/ressurecting command (skip the target:wreck/units). Allow command reset
 					local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex+1])
@@ -1180,7 +1169,7 @@ function InsertCommandQueue(passedInfo)
 					avoidanceCommand = false
 				end
 			elseif cQueue[queueIndex+1].id==CMD_REPAIR then --if second (2) queue is also repair
-				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
+				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-Game.maxUnits) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
 				if (cQueue[queueIndex+1].params[4]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
 					orderArray[#orderArray+1] = {CMD_REMOVE, {cQueue[queueIndex].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete current repair command, (skip the target:units). Reset the repair command
 				end
@@ -1329,22 +1318,10 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 		local foundMatch = false
 		--Method 1: set target to individual wreckage, else (if failed) revert to center of current area-command or to no target.
 		-- [[
-		local targetFeatureID=-1
-		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
+		local posX, posY, posZ = GetUnitOrFeaturePosition(cQueue[queueIndex].params[1])
+		if posX then
 			foundMatch=true
-			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
-		elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --if reclaim trees and rock
-			foundMatch=true
-			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
-		else --if not own unit or trees or rock then
-			targetFeatureID=cQueue[queueIndex].params[1]-wreckageID_offset --remove the inherent offset
-			if Spring.ValidFeatureID(targetFeatureID) then
-				foundMatch=true
-				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
-			elseif Spring.ValidUnitID(targetFeatureID) then
-				foundMatch=true
-				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
-			end
+			wreckPosX, wreckPosY, wreckPosZ = posX, posY, posZ
 		end
 		if foundMatch then --if no wreckage, no trees, no rock, and no unitID then use coordinate
 			if cQueue[queueIndex].params[4] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4 and in this case params 1 contain featureID/unitID because its the 2nd part of the area-reclaim command that reclaim wreck/target
@@ -1371,22 +1348,11 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 			foundMatch = true
 		end
 		if not areaMode then
-			if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --reclaim own unit?
-				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
+			local posX, posY, posZ = GetUnitOrFeaturePosition(cQueue[queueIndex].params[1])
+			if posX then
 				foundMatch = true
-			elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --reclaim trees and rock?
-				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
-				foundMatch = true
-			else --if not own unit or trees or rock then:
-				local targetFeatureID=cQueue[queueIndex].params[1]-wreckageID_offset --remove the game's offset. Reclaim wreck?
-				if Spring.ValidFeatureID(targetFeatureID) then --reclaim wreck?
-					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
-					foundMatch = true
-				elseif Spring.ValidUnitID(targetFeatureID) then --reclaim enemy?
-					wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
-					foundMatch = true
-				end
-			end		
+				wreckPosX, wreckPosY, wreckPosZ = posX, posY, posZ
+			end
 		end
 		if not foundMatch then --if no area-command, no wreckage, no trees, no rock, and no unitID then return error
 			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target") end
@@ -1858,6 +1824,14 @@ function FindSafeHavenForCons(unitID, now)
 end
 ---------------------------------Level3
 ---------------------------------Level4 (lower than low-level function)
+
+function GetUnitOrFeaturePosition(id) --copied from cmd_commandinsert.lua widget (by dizekat)
+	if id<=Game.maxUnits then
+		return spGetUnitPosition(id)
+	else
+		return spGetFeaturePosition(id-Game.maxUnits) --featureID is always offset by maxunit count
+	end
+end
 
 function GetUnitDirection(unitID) --give unit direction in radian, 2D
 	local dx, dz = 0,0

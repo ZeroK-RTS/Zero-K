@@ -1,4 +1,4 @@
-local version = "v0.503"
+local version = "v0.504"
 function widget:GetInfo()
   return {
     name      = "Auto Jump Over Terrain",
@@ -18,7 +18,6 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spValidUnitID = Spring.ValidUnitID
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
-local spValidFeatureID = Spring.ValidFeatureID
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameSeconds = Spring.GetGameSeconds
@@ -194,7 +193,7 @@ function widget:GameFrame(n)
 						local totalTimeWithJump = timeToJump + timeFromExitToDestination + jumpTime
 
 						--NOTE: time to destination is in second.
-						local normalPathTime = normalTimeToDest - 1 --add 1 second benefit to regular walking (make walking more attractive choice unless jump can save more than 1 second travel time)
+						local normalPathTime = normalTimeToDest - 2 --add 2 second benefit to regular walking (make walking more attractive choice unless jump can save more than 1 second travel time)
 						if totalTimeWithJump < normalPathTime then	
 							local commandArray = {[1]=nil,[2]=nil,[3]=nil,[4]=nil}
 							if (math.abs(enterPoint_X-px)>50 or math.abs(enterPoint_Z-pz)>50) then
@@ -332,7 +331,7 @@ function GetNearestObstacleEnterAndExitPoint(currPosX,currPosY, currPosZ, target
 		local gradient = zDiff/xDiff
 		unitBoxDist = math.sqrt(unitBoxSize*unitBoxSize + unitBoxSize*gradient*unitBoxSize*gradient)
 		local xadd = unitBoxSize*xSgn
-		addingFunction = function(x,z,addValue,gradient) 
+		addingFunction = function(x,z,addValue,gradient)
 			return x+addValue, z+addValue*gradient 
 		end
 		for i=1, 9999 do
@@ -415,19 +414,9 @@ function ConvertCMDToMOVE(command)
 			if not command.params[2] or isPossible2PartAreaCmd then
 				local x,y,z
 				if command.id == CMD.REPAIR or command.id == CMD.GUARD then
-					if spValidUnitID(command.params[1]) then
-						x,y,z = spGetUnitPosition(command.params[1])
-					elseif spValidFeatureID(command.params[1]) then
-						x,y,z = spGetFeaturePosition(command.params[1])
-					end
+					x,y,z = GetUnitOrFeaturePosition(command.params[1])
 				elseif command.id == CMD.RECLAIM or command.id == CMD.RESSURECT then
-					if spValidFeatureID(command.params[1]) then
-						x,y,z = spGetFeaturePosition(command.params[1])
-					elseif spValidFeatureID(command.params[1]-Game.maxUnits) then --featureID is always offset by maxunit count
-						x,y,z = spGetFeaturePosition(command.params[1]-Game.maxUnits)
-					elseif spValidUnitID(command.params[1]) then
-						x,y,z = spGetUnitPosition(command.params[1])
-					end
+					x,y,z = GetUnitOrFeaturePosition(command.params[1])
 				end
 				if not x then
 					return nil
@@ -499,6 +488,14 @@ function Dist(x,y,z, x2, y2, z2)
 	local yd = y2-y
 	local zd = z2-z
 	return math.sqrt(xd*xd + yd*yd + zd*zd)
+end
+
+function GetUnitOrFeaturePosition(id)
+	if id<=Game.maxUnits then
+		return spGetUnitPosition(id)
+	else
+		return spGetFeaturePosition(id-Game.maxUnits) --featureID is always offset by maxunit count
+	end
 end
 
 ------------------------------------------------------------

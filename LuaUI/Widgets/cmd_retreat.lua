@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.282 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.283 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2014-2-3
     license   = "GNU GPL, v2 or later",
@@ -44,6 +44,7 @@ local GetUnitDefID     = Spring.GetUnitDefID
 local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitIsStunned	   = Spring.GetUnitIsStunned
 local SelectUnitArray = Spring.SelectUnitArray
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 --local AreTeamsAllied   = Spring.AreTeamsAllied
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
@@ -63,7 +64,7 @@ local tooltips = {}
 local retreatMoveOrders,retreatRearmOrders, wantRetreat, retreatOrdersArray = {}, {}, {}, {}
 local mobileUnits,pauseRetreatChecks, havens = {}, {}, {}
 local havenCount = 0
-local airpadCount = 0
+local airpadList = {}
 
 local retreatedUnits = {} --recently retreating unit that is about to be deselected from user selection
 local currentSelection = nil --current unit selection (for deselecting any retreating units. See code for more detail)
@@ -250,6 +251,15 @@ function StopRetreating(unitID)
 	end
 end
 
+local function HaveEmptyAirpad()
+	local emptyPadCount = 0
+	for i=1, #airpadList do
+		if(spGetUnitRulesParam(airpadList[i],"unreservedPad") or 1) >= 1 then
+			return true
+		end
+	end
+	return false
+end
 
 local function StartRearm(unitID)
 	local insertIndex = 0
@@ -290,15 +300,15 @@ end
 
 local function SetWantRetreat(unitID, want)
 	if want then
-		if (not pauseRetreatChecks[unitID])then
+		if not pauseRetreatChecks[unitID] and not (retreatRearmOrders[unitID] or retreatMoveOrders[unitID]) then
 			local unitDefID = GetUnitDefID(unitID)
 			local movetype = Spring.Utilities.getMovetype(UnitDefs[unitDefID])
-			if (movetype==0 or movetype==1) and (airpadCount> 0) and (not retreatRearmOrders[unitID]) then
+			if (movetype==0 or movetype==1) and (#airpadList > 0) and (havenCount==0 or HaveEmptyAirpad()) then
 				StartRearm(unitID)
 				if options.removeFromSelection.value then
 					retreatedUnits[#retreatedUnits+1] = unitID
 				end
-			elseif (havenCount > 0) and (not retreatMoveOrders[unitID]) then
+			elseif (havenCount > 0) then
 				StartRetreat(unitID)
 				if options.removeFromSelection.value then
 					retreatedUnits[#retreatedUnits+1] = unitID
@@ -465,7 +475,7 @@ function widget:Initialize()
 	for i=1, #allUnits do
 		local unitID = allUnits[i]
 		if airpadDefs[GetUnitDefID(unitID)] then
-			airpadCount = airpadCount + 1
+			airpadList[#airpadList+1] = unitID
 		end
 	end
 end
@@ -480,14 +490,20 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if airpadDefs[unitDefID] then
-		airpadCount = airpadCount + 1
+		airpadList[#airpadList+1] = unitID
 	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	RemoveUnitData(unitID)
 	if airpadDefs[unitDefID] then
-		airpadCount = airpadCount - 1
+		for i=1, #airpadList do
+			if airpadList[i]==unitID then
+				airpadList[i] = airpadList[#airpadList]
+				airpadList[#airpadList] = nil
+				break;
+			end
+		end
 	end
 end
 
@@ -495,9 +511,15 @@ function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	RemoveUnitData(unitID)
 	if airpadDefs[unitDefID] then
 		if newTeam == myTeamID then
-			airpadCount = airpadCount + 1
+			airpadList[#airpadList+1] = unitID
 		elseif oldTeam== myTeamID then
-			airpadCount = airpadCount - 1
+			for i=1, #airpadList do
+				if airpadList[i]==unitID then
+					airpadList[i] = airpadList[#airpadList]
+					airpadList[#airpadList] = nil
+					break;
+				end
+			end
 		end
 	end
 end
@@ -568,7 +590,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		return true
 	else
 		--exclude currently retreating unit until idle
-		if ((havenCount > 0) or (airpadCount>0)) and options.overrideableCommand.value then
+		if ((havenCount > 0) or (#airpadList>0)) and options.overrideableCommand.value then
 			local selectedUnits = GetSelectedUnits()
 			for i=1, #selectedUnits do
 				local unitID = selectedUnits[i]
@@ -636,7 +658,7 @@ function widget:CommandsChanged()
 end
 
 function widget:SelectionChanged(newSelection)
-	if ((havenCount > 0) or (airpadCount>0)) and options.removeFromSelection.value then
+	if ((havenCount > 0) or (#airpadList>0)) and options.removeFromSelection.value then
 		currentSelection = newSelection
 	end
 end
@@ -644,7 +666,7 @@ end
 function widget:UnitDamaged(unitID) 
 	local retreatOrder = retreatOrdersArray[unitID]
 	
-	if ((havenCount > 0) or (airpadCount>0))
+	if ((havenCount > 0) or (#airpadList>0))
 		and retreatOrder ~= nil
 		and retreatOrder > 0
 		and mobileUnits[unitID]

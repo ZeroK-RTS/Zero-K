@@ -1,4 +1,4 @@
-local version = "v0.841"
+local version = "v0.842"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -25,7 +25,6 @@ local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
-local spValidFeatureID = Spring.ValidFeatureID
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spRequestPath = Spring.RequestPath
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
@@ -533,19 +532,9 @@ function ConvertCMDToMOVE(command)
 			if not command.params[2] or isPossible2PartAreaCmd then
 				local x,y,z
 				if command.id == CMD.REPAIR or command.id == CMD.GUARD then
-					if spValidUnitID(command.params[1]) then
-						x,y,z = spGetUnitPosition(command.params[1])
-					elseif spValidFeatureID(command.params[1]) then
-						x,y,z = spGetFeaturePosition(command.params[1])
-					end
+					x,y,z = GetUnitOrFeaturePosition(command.params[1])
 				elseif command.id == CMD.RECLAIM or command.id == CMD.RESSURECT then
-					if spValidFeatureID(command.params[1]) then
-						x,y,z = spGetFeaturePosition(command.params[1])
-					elseif spValidFeatureID(command.params[1]-Game.maxUnits) then --featureID is always offset by maxunit count
-						x,y,z = spGetFeaturePosition(command.params[1]-Game.maxUnits)
-					elseif spValidUnitID(command.params[1]) then
-						x,y,z = spGetUnitPosition(command.params[1])
-					end
+					x,y,z = GetUnitOrFeaturePosition(command.params[1])
 				end
 				if not x then
 					return nil
@@ -617,6 +606,14 @@ function Dist(x,y,z, x2, y2, z2)
 	local yd = y2-y
 	local zd = z2-z
 	return math.sqrt(xd*xd + yd*yd + zd*zd)
+end
+
+function GetUnitOrFeaturePosition(id)
+	if id<=Game.maxUnits then
+		return spGetUnitPosition(id)
+	else
+		return spGetFeaturePosition(id-Game.maxUnits) --featureID is always offset by maxunit count
+	end
 end
 
 ------------------------------------------------------------

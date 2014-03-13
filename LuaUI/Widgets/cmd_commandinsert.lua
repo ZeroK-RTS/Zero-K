@@ -1,7 +1,7 @@
 -- $Id: gui_commandinsert.lua 3171 2008-11-06 09:06:29Z det $
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-local version= "1.001"
+local version= "1.002"
 function widget:GetInfo()
   return {
     name = "CommandInsert",
@@ -16,6 +16,8 @@ function widget:GetInfo()
     enabled = true,
   }
 end
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --[[
 -- use this for debugging:
@@ -69,7 +71,7 @@ end
 local function GetCommandPos(command)	--- get the command position
   if command.id<0 or command.id==CMD.MOVE or command.id==CMD.REPAIR or command.id==CMD.RECLAIM or 
   command.id==CMD.RESURRECT or command.id==CMD.MANUALFIRE or command.id==CMD.GUARD or 
-  command.id==CMD.FIGHT or command.id==CMD.ATTACK then
+  command.id==CMD.FIGHT or command.id==CMD.ATTACK or command.id == CMD_JUMP then
     if table.getn(command.params)>=3 then
 		  return command.params[1], command.params[2], command.params[3]			
 	  elseif table.getn(command.params)>=1 then
@@ -124,7 +126,7 @@ local function ProcessCommand(id, params, options)
       local insert_tag=0
       local insert_pos=0
       for j=1, #commands do
-	local command = commands[j]
+        local command = commands[j]
         --Spring.Echo("cmd:"..table.tostring(command))
         local px2,py2,pz2=GetCommandPos(command)
         if px2>-1 then

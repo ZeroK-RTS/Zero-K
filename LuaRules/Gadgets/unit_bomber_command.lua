@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "11 March 2014, 25 Feb 2011",
+    date      = "13 March 2014, 25 Feb 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -32,6 +32,7 @@ local spGetUnitAllyTeam	= Spring.GetUnitAllyTeam
 local spGetUnitDefID	= Spring.GetUnitDefID
 local spGetUnitIsDead	= Spring.GetUnitIsDead
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spSetUnitRulesParam	= Spring.SetUnitRulesParam
 
 include "LuaRules/Configs/customcmds.h.lua"
 
@@ -343,12 +344,7 @@ local function RequestRearm(unitID, team, forceNow)
 	end
 	local targetPad = FindNearestAirpad(unitID, team) --UnitID find non-reserved airpad as target
 	if targetPad then
-		local reservations = airpadsData[targetPad].reservations
-		if not reservations.units[unitID] then
-			-- totalReservedPad = totalReservedPad + 1
-			reservations.units[unitID] = true --UnitID pre-reserve airpads so that next UnitID (if available) don't try to reserve the same spot
-			reservations.count = reservations.count + 1
-		end
+		ReserveAirpad(unitID,targetPad)
 		--Spring.Echo(unitID.." directed to airpad "..targetPad)
 		InsertCommand(unitID, index, CMD_REARM, {targetPad}) --UnitID get RE-ARM command with reserved airpad as its Params
 		--spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, 0, targetPad}, {"alt"})
@@ -386,6 +382,7 @@ function gadget:UnitFinished(unitID, unitDefID, team)
 		airpadsData[unitID].reservations = {count = 0, units = {}}
 		airpadsData[unitID].emptySpot = {}
 		airpadsPerAllyteam[allyTeam][unitID] = unitDefID
+		spSetUnitRulesParam(unitID,"unreservedPad",airpadsData[unitID].cap) --hint widgets
 	end
 end
 
@@ -397,15 +394,15 @@ local function CancelAirpadReservation(unitID)
 	
 	--value greater than 1 for icon state:
 	if spGetUnitRulesParam(unitID, "noammo") == 3 then --repairing
-		Spring.SetUnitRulesParam(unitID, "noammo", 0)
+		spSetUnitRulesParam(unitID, "noammo", 0)
 	elseif spGetUnitRulesParam(unitID, "noammo") == 2 then --refueling
-		Spring.SetUnitRulesParam(unitID, "noammo", 1)
+		spSetUnitRulesParam(unitID, "noammo", 1)
 	end
 	
 	local targetPad
-	if bomberToPad[unitID] then
+	if bomberToPad[unitID] then --unit was going toward an airpad
 		targetPad = bomberToPad[unitID].padID
-	elseif bomberLanding[unitID] then
+	elseif bomberLanding[unitID] then --unit was on the airpad
 		targetPad = bomberLanding[unitID].padID
 	end
 	if not targetPad then
@@ -423,6 +420,17 @@ local function CancelAirpadReservation(unitID)
 		-- totalReservedPad = totalReservedPad -1
 		reservations.units[unitID] = nil
 		reservations.count = math.max(reservations.count - 1, 0)
+		spSetUnitRulesParam(targetPad,"unreservedPad",math.max(0,airpadsData[targetPad].cap-reservations.count)) --hint widgets
+	end
+end
+
+function ReserveAirpad(bomberID,airpadID)
+	local reservations = airpadsData[airpadID].reservations
+	if not reservations.units[bomberID] then
+		-- totalReservedPad = totalReservedPad + 1
+		reservations.units[bomberID] = true --UnitID pre-reserve airpads so that next UnitID (if available) don't try to reserve the same spot
+		reservations.count = reservations.count + 1
+		spSetUnitRulesParam(airpadID,"unreservedPad",math.max(0,airpadsData[airpadID].cap-reservations.count)) --hint widgets
 	end
 end
 
@@ -492,9 +500,9 @@ function gadget:GameFrame(n)
 					--value greater than 1 is for icon state, and it block bomber from firing while on airpad:
 					local noAmmo = spGetUnitRulesParam(bomberID, "noammo")
 					if noAmmo == 1 then
-						Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- mark bomber as refuelling
+						spSetUnitRulesParam(bomberID, "noammo", 2)	-- mark bomber as refuelling
 					elseif not noAmmo or noAmmo==0 then
-						Spring.SetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing
+						spSetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing
 					end
 				end
 			end
@@ -513,7 +521,7 @@ function gadget:GameFrame(n)
 end
 
 function GG.RefuelComplete(bomberID)
-	Spring.SetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing/ not refueling anymore
+	spSetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing/ not refueling anymore
 end
 
 function GG.LandComplete(bomberID)
@@ -553,12 +561,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			return true, true	-- trying to land on an unregistered (probably under construction) pad, abort
 		end
 		bomberToPad[unitID] = {padID = targetAirpad, unitDefID = unitDefID}
-		local reservations = airpadsData[targetAirpad].reservations
-		if not reservations.units[unitID] then --Reserve the airpad specified in RE-ARM params (if not yet reserved)
-			-- totalReservedPad = totalReservedPad + 1
-			reservations.units[unitID] = true 
-			reservations.count = reservations.count + 1
-		end
+		ReserveAirpad(unitID,targetAirpad) --Reserve the airpad specified in RE-ARM params (if not yet reserved)
 		local x, y, z = Spring.GetUnitPosition(targetAirpad)
 		Spring.SetUnitMoveGoal(unitID, x, y, z) -- try circle the airpad until free airpad allow bomberLanding.
 		return true, false	-- command used, don't remove
