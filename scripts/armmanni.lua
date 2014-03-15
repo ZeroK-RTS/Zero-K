@@ -117,12 +117,12 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= .25  then
-		Explode(gun, sfxNone)
+		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
 		Explode(base, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
 	elseif  severity <= .50  then
-		Explode(gun, SFX.FALL)
+		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
 		Explode(base, sfxNone)
 		Explode(turret, SFX.FALL)
 		return 1
