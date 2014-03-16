@@ -1250,8 +1250,6 @@ local useLuaUI = false
 local oldFrame = 0        --//used to save bandwidth between unsynced->LuaUI
 local drawProgress = true --//a widget can do this job too (see healthbars)
 
-local morphUnits
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1341,7 +1339,8 @@ function gadget:Update()
   local frame = spGetGameFrame()
   if (frame>oldFrame) then
     oldFrame = frame
-    if snext(SYNCED.morphUnits) then
+    local morphUnitsSynced = SYNCED.morphUnits
+    if snext(morphUnitsSynced) then
       local useLuaUI_ = Script.LuaUI('MorphUpdate')
       if (useLuaUI_~=useLuaUI) then --//Update Callins on change
         drawProgress = not Script.LuaUI('MorphDrawProgress')
@@ -1355,7 +1354,7 @@ function gadget:Update()
           then readTeam = Script.ALL_ACCESS_TEAM
           else readTeam = GetLocalTeamID() end
         CallAsTeam({ ['read'] = readTeam }, function()
-          for unitID, morphData in spairs(SYNCED.morphUnits) do
+          for unitID, morphData in spairs(morphUnitsSynced) do
             if (unitID and morphData)and(IsUnitVisible(unitID)) then
               morphTable[unitID] = {progress=morphData.progress, into=morphData.def.into, combatMorph = morphData.combatMorph}
             end
@@ -1469,11 +1468,7 @@ local function DrawCombatMorphUnit(unitID, morphData, localTeamID)
 end
 
 function gadget:DrawWorld()
-  if (not morphUnits) then
-    morphUnits = SYNCED.morphUnits
-    if (not morphUnits) then return end
-  end
-
+  local morphUnits = SYNCED.morphUnits
 
   if (not snext(morphUnits)) then
     return --//no morphs to draw

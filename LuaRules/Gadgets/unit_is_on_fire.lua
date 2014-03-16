@@ -182,13 +182,13 @@ else
 -- BEGIN UNSYNCED
 --------------------------------------------------------------------------------
 
-local SYNCED  = SYNCED
 local scLuaUI = Script.LuaUI
 
 function WrapToLuaUI()
 	if (scLuaUI('onFire')) then
 		local burningUnits = {}
-		for i,unitID in spairs(SYNCED.burningUnits) do
+		local burningUnitsSynced = SYNCED.burningUnits
+		for i,unitID in spairs(burningUnitsSynced) do
 			burningUnits[i] = unitID
 		end
 		scLuaUI.onFire(burningUnits)

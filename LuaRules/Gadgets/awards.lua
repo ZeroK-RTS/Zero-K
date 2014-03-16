@@ -892,7 +892,8 @@ end
 -- function to convert SYNCED table to regular table. assumes no self referential loops
 local function ConvertToRegularTable(stable)
 	local ret = {}
-	for k,v in spairs(stable) do
+	local stableLocal = stable
+	for k,v in spairs(stableLocal) do
 		if type(v) == 'table' then
 			v = ConvertToRegularTable(v)
 		end

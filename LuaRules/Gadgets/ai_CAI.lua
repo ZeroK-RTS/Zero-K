@@ -4110,8 +4110,9 @@ else
 --------------------------------------------------------------------------------
 -- need this because SYNCED.tables are merely proxies, not real tables
 local function MakeRealTable(proxy)
+	local proxyLocal = proxy
 	local ret = {}
-	for i,v in spairs(proxy) do
+	for i,v in spairs(proxyLocal) do
 		if type(v) == "table" then
 			ret[i] = MakeRealTable(v)
 		else
