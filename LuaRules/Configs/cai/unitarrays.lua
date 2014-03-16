@@ -72,6 +72,7 @@ local riot = {
 	"armwar",
 	"cormak",
 	"corlevlr",
+	"spiderriot",
 	
 	"arm_venom",
 	"tawf003",
@@ -128,6 +129,8 @@ local prioritySos = {
 	"corcom1",
 	"commrecon1",
 	"commsupport1",
+	"benzcom1",
+	"cremcom1",
 }
 
 --global versions

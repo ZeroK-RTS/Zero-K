@@ -164,7 +164,7 @@ factionBuildConfig = {
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
 				BPQuota = 70,
-				minFacCount = 1,
+				minFacCount = 0,
 				
 				[1] = { -- con
 					importanceMult = 0.9,
@@ -204,9 +204,10 @@ factionBuildConfig = {
 				},
 				
 				[7] = { -- riot
-					importanceMult = 0.3,
+					importanceMult = 0.5,
 					count = 1,
-					[1] = {ID = UnitDefNames['arm_venom'].id, chance = 1},
+					[1] = {ID = UnitDefNames['arm_venom'].id, chance = 0.4},
+					[2] = {ID = UnitDefNames['spiderriot'].id, chance = 0.6},
 				},
 				
 				[8] = { -- aa

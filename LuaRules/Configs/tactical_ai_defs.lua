@@ -188,6 +188,7 @@ local fleeables = {
 	["armzeus"] = true,
 	
 	["arm_venom"] = true,
+	["spiderriot"] = true,
 	
 	["cormak"] = true,
 	
