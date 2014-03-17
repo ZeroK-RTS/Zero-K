@@ -109,7 +109,7 @@ unitDef = {
       interceptedByShieldType = 1,
       myGravity               = 0.1,
       projectiles             = 1,
-      range                   = 450,
+      range                   = 475,
       reloadtime              = 14,
       rgbColor                = [[0.05 0.05 0.05]],
       size                    = 16,
@@ -121,7 +121,7 @@ unitDef = {
       targetMoveError         = 0,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 500,
+      weaponVelocity          = 550,
     },
 
   },
