@@ -547,6 +547,14 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
+	["slowmort"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 20, 
+	},
 	["amphfloater"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
@@ -606,14 +614,6 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 20, 
-	},
-	["slowmort"] = {
-		skirms = longRangeSkirmieeArray, 
-		swarms = longRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
 	},
 	["capturecar"] = {
 		skirms = longRangeSkirmieeArray, 

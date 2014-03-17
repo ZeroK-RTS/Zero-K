@@ -119,8 +119,7 @@ jumpriot = {
 jumpimpulse = {
 	cobscript = false},
 	
-corpyro = {
-	range = 800, height = 120, speed = 8,  reload = 10, cobscript = false},	
+corpyro = {cobscript = false},	
 }
 
 
