@@ -1162,17 +1162,10 @@ local function assignFactory(team,unitID,cQueue)
 			local buildableFactory = {}
 			local totalImportance = 0
 			
+			-- first see if we want to make an air fac
 			if math.random() < conJob.factory.airFactor then
 				for id,data in pairs(buildDefs.factoryByDefId) do
-					if data.airFactory and data.minFacCount <= controlledUnit.factory.count and ((not a.factoryCountByDefID[id]) or a.factoryCountByDefID[id] == 0) then
-						buildableFactoryCount = buildableFactoryCount + 1
-						buildableFactory[buildableFactoryCount] = {ID = id, importance = data.importance}
-						totalImportance = totalImportance + data.importance
-					end
-				end
-			else
-				for id,data in pairs(buildDefs.factoryByDefId) do
-					if (not data.airFactory) and data.minFacCount <= controlledUnit.factory.count and ((not a.factoryCountByDefID[id]) or a.factoryCountByDefID[id] == 0) then
+					if data.airFactory and data.minFacCount <= controlledUnit.factory.count and ((not a.factoryCountByDefID[id]) or a.factoryCountByDefID[id] == 0) and data.importance > 0 then
 						buildableFactoryCount = buildableFactoryCount + 1
 						buildableFactory[buildableFactoryCount] = {ID = id, importance = data.importance}
 						totalImportance = totalImportance + data.importance
@@ -1180,9 +1173,10 @@ local function assignFactory(team,unitID,cQueue)
 				end
 			end
 			
+			-- if we didn't try to make an air fac, or tried to but couldn't find one, try a land one
 			if buildableFactoryCount == 0 then
 				for id,data in pairs(buildDefs.factoryByDefId) do
-					if data.minFacCount <= controlledUnit.factory.count and ((not a.factoryCountByDefID[id]) or a.factoryCountByDefID[id] == 0) then
+					if (not data.airFactory) and data.minFacCount <= controlledUnit.factory.count and ((not a.factoryCountByDefID[id]) or a.factoryCountByDefID[id] == 0) and data.importance > 0  then
 						buildableFactoryCount = buildableFactoryCount + 1
 						buildableFactory[buildableFactoryCount] = {ID = id, importance = data.importance}
 						totalImportance = totalImportance + data.importance
@@ -1190,19 +1184,41 @@ local function assignFactory(team,unitID,cQueue)
 				end
 			end
 			
+			-- can't find any valid facs, try with loosened requirements
+			-- before we could only build facs that we didn't have any of AND that met requirements for number of existing facs, now it's only an OR condition
+			-- fac may be either air or land
 			if buildableFactoryCount == 0 then
 				for id,data in pairs(buildDefs.factoryByDefId) do
-					buildableFactoryCount = buildableFactoryCount + 1
-					buildableFactory[buildableFactoryCount] = {ID = id, importance = data.importance}
-					totalImportance = totalImportance + data.importance
+					if (data.minFacCount <= controlledUnit.factory.count or ((not a.factoryCountByDefID[id]) or a.factoryCountByDefID[id] == 0)) and data.importance > 0  then
+						buildableFactoryCount = buildableFactoryCount + 1
+						buildableFactory[buildableFactoryCount] = {ID = id, importance = data.importance}
+						totalImportance = totalImportance + data.importance
+					end
 				end
-			end	
+			end
+
+			-- give up and just allow any factory (that isn't disabled)
+			if buildableFactoryCount == 0 then
+				for id,data in pairs(buildDefs.factoryByDefId) do
+					if data.importance > 0  then
+						buildableFactoryCount = buildableFactoryCount + 1
+						buildableFactory[buildableFactoryCount] = {ID = id, importance = data.importance}
+						totalImportance = totalImportance + data.importance
+					end
+				end
+			end
+
+			if buildableFactoryCount == 0 then
+				return
+			end
 			
-			local choice = 1
+			local choice = (buildableFactoryCount > 1) and math.random(buildableFactoryCount) or 1
 			local rand = math.random()*totalImportance
 			local total = 0
+			--Spring.Echo(buildableFactoryCount, totalImportance, rand)
 			for i = 1, buildableFactoryCount do
 				total = total + buildableFactory[i].importance
+				--Spring.Echo(UnitDefs[buildableFactory[i].ID].name, buildableFactory[i].importance, total)
 				if rand < total then
 					choice = i
 					break
@@ -3806,6 +3822,7 @@ local function SetFactoryDefImportance(team, factoryDefID, importance)
 	
 	importance = importance or 1
 	a.buildDefs.factoryByDefId[factoryDefID].importance = importance
+	Spring.Echo(a.buildDefs.factoryByDefId[factoryDefID])
 end
 
 local function RemoveUnit(unitID, unitDefID, unitTeam)
