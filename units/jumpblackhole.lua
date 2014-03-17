@@ -101,7 +101,7 @@ unitDef = {
         default = 0,
       },
 
-      explosionGenerator      = [[custom:black_hole]],
+      explosionGenerator      = [[custom:black_hole_long]],
       explosionSpeed          = 50,
       impulseBoost            = 150,
       impulseFactor           = -2.5,
