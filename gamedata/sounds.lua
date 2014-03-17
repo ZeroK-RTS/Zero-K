@@ -1,8 +1,9 @@
--- $Id$
---- Valid entries used by engine: IncomingChat, MultiSelect, MapPoint
---- other than that, you can give it any name and access it like before with filenames
+-- see http://springrts.com/wiki/Sounds.lua for help
 local Sounds = {
    SoundItems = {
+      --default = {
+      --pitchMod = 0.04,
+      --}
       IncomingChat = {
          --file = "sounds/talk.wav",
 		 file = nil,
@@ -11,7 +12,10 @@ local Sounds = {
       --   file = "sounds/button9.wav",
       --},
       MapPoint = {
-         file = "sounds/marker_place.wav",
+         file = "sounds/beep4.wav", --"sounds/marker_place.wav",
+         --pitchMod = 0.01,
+         --pitch = 0.8,
+         maxconcurrent = 3,
       },
 --[[
       MyAwesomeSounds = {
@@ -48,7 +52,7 @@ local Sounds = {
          maxconcurrent = 4, --- some reasonable limits
          maxdist = FLT_MAX, --- no cutoff at all
       },
-	  Sparks = {
+      Sparks = {
          file = "sounds/sparks.wav",
          priority = -10,
          maxconcurrent = 1,
@@ -66,13 +70,15 @@ local Sounds = {
 local VFSUtils = VFS.Include('gamedata/VFSUtils.lua')
 
 local defaultOpts = {
-	pitchMod = 0,
+	pitchMod = 0, --0.02,
 	gainMod = 0,
 }
 local replyOpts = {
-	pitchMod = 0,
+	pitchMod = 0, --0.02,
 	gainMod = 0,
 }
+
+local noVariation = {}
 
 local ignoredExtensions = {
 	["svn-base"] = true,
@@ -95,8 +101,9 @@ local function AutoAdd(subDir, opts)
 end
 
 -- add sounds
---AutoAdd("weapon", defaultOpts)
+AutoAdd("weapon", defaultOpts)
 AutoAdd("explosion", defaultOpts)
 AutoAdd("reply", replyOpts)
+AutoAdd("music", noVariation)
 
 return Sounds
