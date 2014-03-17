@@ -41,12 +41,9 @@ local RESTORE_DELAY = 2000
 local TURRET_TURN_SPEED = 220
 local SLEEVE_TURN_SPEED = 70
 
-local spGetGroundHeight = Spring.GetGroundHeight;
+local spGetGroundHeight = Spring.GetGroundHeight
 local spGetPiecePosition = Spring.GetUnitPiecePosition;
 local spGetUnitVelocity = Spring.GetUnitVelocity;
-
-local lastFiredFrame = 0;
-local SPINDOWN_TIME = 30;
 
 function Suspension()
    while true do   
@@ -188,14 +185,7 @@ function script.AimWeapon(num, heading, pitch)
 	return (true)
 end
 
-function script.Shot(num)
-	local frame = Spring.GetGameFrame();
-
-	if (frame >= lastFiredFrame+SPINDOWN_TIME) then
-		local px, py, pz = Spring.GetUnitPosition(unitID)
-		Spring.PlaySoundFile("sounds/weapon/heatray_fire.wav", 15, px, py, pz)
-	end
-	lastFiredFrame = frame;
+function FireWeapon(num)
 	EmitSfx( firepoint,  UNIT_SFX1 )
 end
 

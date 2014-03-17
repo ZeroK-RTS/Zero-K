@@ -581,7 +581,7 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
+		skirmLeeway = 20, 
 	},
 	["corstorm"] = {
 		skirms = longRangeSkirmieeArray, 
