@@ -1,4 +1,4 @@
-local version = "v0.842"
+local version = "v0.843"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -21,6 +21,7 @@ VFS.Include("LuaRules/Utilities/unitTypeChecker.lua")
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spValidUnitID = Spring.ValidUnitID
+local spValidFeatureID = Spring.ValidFeatureID
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spGetUnitDefID = Spring.GetUnitDefID
@@ -608,12 +609,13 @@ function Dist(x,y,z, x2, y2, z2)
 	return math.sqrt(xd*xd + yd*yd + zd*zd)
 end
 
-function GetUnitOrFeaturePosition(id)
-	if id<=Game.maxUnits then
+function GetUnitOrFeaturePosition(id) --copied from cmd_commandinsert.lua widget (by dizekat)
+	if id<=Game.maxUnits and spValidUnitID(id) then
 		return spGetUnitPosition(id)
-	else
+	elseif spValidFeatureID(id-Game.maxUnits) then
 		return spGetFeaturePosition(id-Game.maxUnits) --featureID is always offset by maxunit count
 	end
+	return nil
 end
 
 ------------------------------------------------------------

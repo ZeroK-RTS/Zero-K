@@ -24,6 +24,8 @@ end
 --------------------------------------------------------------------------------
 -- Functions:
 local spGetTeamUnits 	= Spring.GetTeamUnits
+local spGetAllUnits		= Spring.GetAllUnits
+local spGetTeamResources = Spring.GetTeamResources
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGiveOrderToUnit =Spring.GiveOrderToUnit
 local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
@@ -39,7 +41,6 @@ local spGetVisibleUnits = Spring.GetVisibleUnits
 local spGetCommandQueue	= Spring.GetCommandQueue
 local spGetGameSeconds	= Spring.GetGameSeconds
 local spGetFeaturePosition = Spring.GetFeaturePosition
-local spValidFeatureID = Spring.ValidFeatureID
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetUnitStates = Spring.GetUnitStates
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
@@ -53,7 +54,8 @@ local spGetGameFrame = Spring.GetGameFrame
 local spSendCommands = Spring.SendCommands
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitIsDead 	= Spring.GetUnitIsDead
---local spValidUnitID = Spring.ValidUnitID
+local spValidUnitID = Spring.ValidUnitID
+local spValidFeatureID = Spring.ValidFeatureID
 local CMD_STOP			= CMD.STOP
 local CMD_ATTACK 		= CMD.ATTACK
 local CMD_GUARD			= CMD.GUARD
@@ -149,6 +151,7 @@ local iNotLagging_gbl = true --//variable: indicate if player(me) is lagging in 
 local selectedCons_Meta_gbl = {} --//variable: remember which Constructor is selected by player.
 local waitForNetworkDelay_gbl = nil
 local issuedOrderTo = {}
+local allyClusterInfo_gbl = {coords={},age=0}
 
 --------------------------------------------------------------------------------
 --Methods:
@@ -195,8 +198,8 @@ options = {
 	consRetreatTimeoutOption = {
 		name = 'Constructor retreat auto-expire:',
 		type = 'number',
-		value = 15,
-		desc = "Amount in second before constructor retreat command auto-expire (is deleted), and then contructor will return to its previous area-reclaim command.\n\nTips: small value is better.",
+		value = 3,
+		desc = "Amount in second before constructor retreat command auto-expire (is deleted), and then constructor will return to its previous area-reclaim command.\n\nTips: small value is better.",
 		min=3,max=15,step=1,
 		OnChange = function(self) 
 					consRetreatTimeoutG = self.value
@@ -257,6 +260,7 @@ function widget:Update()
 	local cmd_then_DoCalculation_delay = cmd_then_DoCalculation_delayG
 	local myTeamID = myTeamID_gbl
 	local waitForNetworkDelay = waitForNetworkDelay_gbl
+	local allyClusterInfo = allyClusterInfo_gbl
 	-----
 	if iNotLagging_gbl then
 		local now=spGetGameSeconds()
@@ -264,6 +268,7 @@ function widget:Update()
 		if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 			unitInMotion, attacker, commandTTL, selectedCons_Meta =RefreshUnitList(attacker, commandTTL) --create unit list
+			allyClusterInfo["age"]=allyClusterInfo["age"]+1 --indicate that allyClusterInfo is 1 cycle older
 			
 			local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --create list every 1.1 second OR every (0+latency) second, depending on which is greater.
 			skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
@@ -282,7 +287,12 @@ function widget:Update()
 		--GATHER SOME INFORMATION ON UNITS-- *part 1, start*
 		if (now >=skippingTimer[2]) and (not waitForNetworkDelay) then --wait until 'skippingTimer[2] second', and wait for 'LUA message received', and wait for 'cycle==1', then do "DoCalculation()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
-			commandIndexTable, commandTTL,isAvoiding,waitForNetworkDelay =DoCalculation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta,myTeamID, skippingTimer, now, commandTTL,waitForNetworkDelay)
+			local infoForDoCalculation = { unitInMotion,commandIndexTable, attacker,
+						selectedCons_Meta,myTeamID,
+						skippingTimer, now, commandTTL,
+						waitForNetworkDelay,allyClusterInfo
+					}
+			commandIndexTable, commandTTL,isAvoiding,waitForNetworkDelay,allyClusterInfo =DoCalculation(infoForDoCalculation)
 			
 			if isAvoiding then  
 				skippingTimer.echoTimestamp = now -- --prepare delay statistic to measure new delay (aka: reset stopwatch), --same as "CalculateNetworkDelay("restart", , )"^/
@@ -298,6 +308,7 @@ function widget:Update()
 		end
 	end
 	-------return global table
+	allyClusterInfo_gbl = allyClusterInfo
 	commandIndexTableG=commandIndexTable
 	unitInMotionG = unitInMotion
 	skippingTimerG = skippingTimer
@@ -467,14 +478,25 @@ function RefreshUnitList(attacker, commandTTL)
 end
 
 -- detect initial enemy separation to detect "fleeing enemy"  later
-function DoCalculation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta,myTeamID, skippingTimer, now, commandTTL,waitForNetworkDelay)
+function DoCalculation(passedInfo)
+	local unitInMotion = passedInfo[1]
+	local commandIndexTable = passedInfo[2]
+	local attacker = passedInfo[3]
+	local selectedCons_Meta = passedInfo[4]
+	local myTeamID = passedInfo[5]
+	local skippingTimer = passedInfo[6]
+	local now = passedInfo[7]
+	local commandTTL = passedInfo[8]
+	local waitForNetworkDelay = passedInfo[9]
+	local allyClusterInfo = passedInfo[10]
+	-----
 	local isAvoiding = nil
 	if unitInMotion[1]~=nil then --don't execute if no unit present
 		for i=2, unitInMotion[1], 1 do --array index 1 contain the array's lenght, start from 2
 			local unitID= unitInMotion[i][1] --get unitID for commandqueue
 			if not spGetUnitIsDead(unitID) and (spGetUnitTeam(unitID)==myTeamID) then --prevent execution if unit died during transit
 				local cQueue = spGetCommandQueue(unitID)
-				local executionAllow, cQueueTemp,_ = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i]) --filter/alter unwanted unit state by reading the command queue
+				local executionAllow, cQueueTemp,_ = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i],myTeamID) --filter/alter unwanted unit state by reading the command queue
 				if executionAllow then
 					--cQueue = cQueueTemp --cQueueTemp has been altered for identification, copy it to cQueue for use in DoCalculation() phase (note: command is not yet issued)
 					--local boxSizeTrigger= unitInMotion[i][2]
@@ -522,7 +544,10 @@ function DoCalculation(unitInMotion,commandIndexTable, attacker, selectedCons_Me
 							now,commandTTL,commandIndexTable,
 						}
 						commandTTL, avoidanceCommand,orderArray= InsertCommandQueue(infoToInsertOnCmdQueue)--delete old widget command, update commandTTL, and send constructor to base for retreat
-						if avoidanceCommand or (not options.dbg_RemoveAvoidanceSplitSecond.value) then 
+						if avoidanceCommand or (not options.dbg_RemoveAvoidanceSplitSecond.value) then
+							if targetCoordinate[1] == -1 then --no target
+								targetCoordinate,allyClusterInfo = UseNearbyAllyAsTarget(unitID,allyClusterInfo,myTeamID)
+							end
 							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,surroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand,decloakScaling) --calculate move solution
 							local newY=spGetGroundHeight(newX,newZ)
 							--Inserting command queue:--
@@ -556,7 +581,7 @@ function DoCalculation(unitInMotion,commandIndexTable, attacker, selectedCons_Me
 			end --if spGetUnitIsDead(unitID)==false
 		end
 	end --if unitInMotion[1]~=nil
-	return commandIndexTable, commandTTL, isAvoiding,waitForNetworkDelay --send separation result away
+	return commandIndexTable, commandTTL, isAvoiding,waitForNetworkDelay,allyClusterInfo --send separation result away
 end
 
 function CountdownNetworkDelayWait(unitID)
@@ -701,7 +726,7 @@ function CheckWeaponsAndShield (unitDef)
 	return unitShieldPower, reloadableWeaponIndex,fastestReloadTime,fastReloadRange
 end
 
-function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
+function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit,myTeamID)
 	local allowExecution = false
 	local returnReload = false -- indicate to way way downstream processes whether avoidance is based on weapon reload/shieldstate 
 	if cQueue~=nil then --prevent ?. Forgot...
@@ -732,23 +757,25 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
 			local isStealthUnit = (unitType == 1)
 			local isNotViewed = (unitInView ~= "yes")
-			local isConstructorCmd = (cQueue[1].id == CMD_REPAIR or cQueue[1].id < 0 or cQueue[1].id == CMD_RECLAIM or cQueue[1].id == CMD_RESURRECT)
+			local isCommonConstructorCmd = (cQueue[1].id == CMD_REPAIR or cQueue[1].id < 0 or cQueue[1].id == CMD_RESURRECT)
+			local isReclaimCmd = (cQueue[1].id == CMD_RECLAIM)
 			local isMoveCommand = (cQueue[1].id == CMD_MOVE)
-			local isNormCommand = (isConstructorCmd or isMoveCommand) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10),
-			--local isStealthUnitTypeOrIsNotViewed = isStealthUnit or (unitInView ~= "yes" and unitType~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
-			local isStealthUnitTypeOrIsNotViewed = isStealthUnit or isNotViewed--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
+			local isNormCommand = (isCommonConstructorCmd or isMoveCommand) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10),
+			--local isImportantUnitTypeOrIsNotViewed = isStealthUnit or (unitInView ~= "yes" and unitType~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
+			local isImportantUnitTypeOrIsNotViewed = isStealthUnit or isNotViewed--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
 			local _2ndAttackSignature = false --attack command signature
 			local _2ndGuardSignature = false --guard command signature
 			if #cQueue >=2 then --check if the command-queue is masked by widget's previous command, but the actual originality check will be performed by TargetBoxReached() later.
 				_2ndAttackSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)
 				_2ndGuardSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_GUARD)
 			end
+			local isAbundanceResource = (spGetTeamResources(myTeamID, "metal") > 10)
 			local isReloadingAttack = (isReloading and (cQueue[1].id == CMD_ATTACK or (cQueue[1].id == cMD_DummyG or cQueue[1].id == cMD_Dummy_atkG) or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (cQueue[1].id == CMD_GUARD or _2ndGuardSignature)
 			local isForceCloaked = spGetUnitIsCloaked(unitID) and (unitType==2 or unitType==3) --any unit with type 3 (gunship) or type 2 (ground units except cloaky) that is cloaked.
 			local isRealIdle = cQueue[1].id == cMD_DummyG --FAKE (IDLE) COMMAND
 			local isStealthUnitAlwaysFlee = isStealthUnit and options.cloakyAlwaysFlee.value
-			if (isNormCommand and isStealthUnitTypeOrIsNotViewed and not holdPosition) or --execute on: unit with generic mobility command: for UnitType==1 unit (cloaky, constructor) OR for any unit outside player view... & which is not holding position
+			if ((isNormCommand or (isReclaimCmd and isAbundanceResource)) and isImportantUnitTypeOrIsNotViewed and not holdPosition) or --execute on: unit with generic mobility command (or reclaiming during abundance resource): for UnitType==1 unit (cloaky, constructor) OR for any unit outside player view... & which is not holding position
 			(isRealIdle and (isNotViewed or isStealthUnitAlwaysFlee) and not holdPosition) or --execute on: any unit that is really idle and out of view... & is not hold position
 			(isReloadingAttack and not holdPosition) or --execute on: any unit which is reloading... & is not holding position
 			(isGuardState and not holdPosition) or --execute on: any unit which is guarding another unit...  & is not hold position
@@ -799,7 +826,7 @@ function IdentifyTargetOnCommandQueue(passedInfo) --//used by DoCalculation()
 		end
 		newCommand= (a~= b and c~=d)--compare current command with in memory
 		if (turnOnEcho == 1) then --debugging
-			Spring.Echo("unitID(DoCalculation)" .. unitID)
+			Spring.Echo("unitID(IdentifyTargetOnCommandQueue)" .. unitID)
 			Spring.Echo("commandIndexTable[unitID][widgetX](IdentifyTargetOnCommandQueue):" .. commandIndexTable[unitID]["widgetX"])
 			Spring.Echo("commandIndexTable[unitID][widgetZ](IdentifyTargetOnCommandQueue):" .. commandIndexTable[unitID]["widgetZ"])
 			Spring.Echo("newCommand(IdentifyTargetOnCommandQueue):")
@@ -1010,6 +1037,77 @@ function GetImpatience(newCommand, unitID, commandIndexTable)
 	end
 	if (turnOnEcho == 1) then Spring.Echo("commandIndexTable[unitID][patienceIndexA] (GetImpatienceLevel) " .. commandIndexTable[unitID]["patienceIndexA"]) end
 	return impatienceTrigger, commandIndexTable
+end
+
+function UseNearbyAllyAsTarget(unitID, allyClusterInfo,myTeamID)
+	local x,y,z = -1,-1,-1
+	if WG.OPTICS_cluster then
+		if (allyClusterInfo["age"]>= 4) then --//only update after 5 cycle:
+			allyClusterInfo["age"]= 0
+			allyClusterInfo["coords"] = {}
+			local allUnits = spGetAllUnits()
+			local unorderedUnitList = {}
+			for i=1, #allUnits, 1 do --//convert unit list into a compatible format for the Clustering function below
+				local unitID_list = allUnits[i]
+				if spIsUnitAllied(unitID_list, unitID) then
+					local x,y,z = spGetUnitPosition(unitID_list)
+					local unitDefID_list = spGetUnitDefID(unitID_list)
+					local unitDef = UnitDefs[unitDefID_list]
+					local unitSpeed =unitDef["speed"]
+					if (unitSpeed>0) then --//if moving units
+						if (unitDef.isBuilder) and not unitDef.customParams.commtype then --if constructor
+							--intentionally empty. Not include builder.
+						elseif unitDef.customParams.commtype then --if COMMANDER,
+							unorderedUnitList[unitID_list] = {x,y,z} --//store
+						elseif not unitDef["canFly"] then --if all ground unit, amphibious, and ships (except commander)
+							unorderedUnitList[unitID_list] = {x,y,z} --//store
+						elseif (unitDef.hoverAttack== true) then --if gunships
+							--intentionally empty. Not include gunships.
+						end
+					else --if buildings
+						unorderedUnitList[unitID_list] = {x,y,z} --//store
+					end
+				end
+			end
+			local cluster, _ = WG.OPTICS_cluster(unorderedUnitList, 600,3, myTeamID,300) --//find clusters with atleast 3 unit per cluster and with at least within 300-elmo from each other 
+			for index=1 , #cluster do
+				local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
+				for unitIndex=1, #cluster[index] do
+					local unitID_list = cluster[index][unitIndex]
+					local x,y,z= unorderedUnitList[unitID_list][1],unorderedUnitList[unitID_list][2],unorderedUnitList[unitID_list][3] --// get stored unit position
+					sumX= sumX+x
+					sumY = sumY+y
+					sumZ = sumZ+z
+					unitCount=unitCount+1
+				end
+				meanX = sumX/unitCount --//calculate center of cluster
+				meanY = sumY/unitCount
+				meanZ = sumZ/unitCount
+				allyClusterInfo["coords"][#allyClusterInfo["coords"]+1] = {meanX, meanY, meanZ} --//record cluster position
+			end
+		end --//end cluster detection
+		local nearestCluster = -1
+		local nearestDistance = 99999
+		local coordinateList = allyClusterInfo["coords"]
+		local px,_,pz = spGetUnitPosition(unitID)
+		for i=1, #coordinateList do
+			local distance = Distance(coordinateList[i][1], coordinateList[i][3] , px, pz)
+			if distance < nearestDistance then
+				nearestDistance = distance
+				nearestCluster = i
+			end
+		end
+		if nearestCluster > 0 then
+			x,y,z = coordinateList[nearestCluster][1],coordinateList[nearestCluster][2],coordinateList[nearestCluster][3]
+		end
+	end
+	if x == -1 then
+		local nearbyAllyUnitID = Spring.GetUnitNearestAlly (unitID, 600)
+		if nearbyAllyUnitID ~= nearbyAllyUnitID then
+			x,y,z = spGetUnitPosition(nearbyAllyUnitID)
+		end
+	end
+	return {x,y,z},allyClusterInfo
 end
 
 function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand, decloakScaling)
@@ -1826,11 +1924,12 @@ end
 ---------------------------------Level4 (lower than low-level function)
 
 function GetUnitOrFeaturePosition(id) --copied from cmd_commandinsert.lua widget (by dizekat)
-	if id<=Game.maxUnits then
+	if id<=Game.maxUnits and spValidUnitID(id) then
 		return spGetUnitPosition(id)
-	else
+	elseif spValidFeatureID(id-Game.maxUnits) then
 		return spGetFeaturePosition(id-Game.maxUnits) --featureID is always offset by maxunit count
 	end
+	return nil
 end
 
 function GetUnitDirection(unitID) --give unit direction in radian, 2D
@@ -1868,7 +1967,7 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 		newX = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
 		newZ = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + z
 	end
-	
+
 	if (unitDirection ~= nil) and (networkDelayDrift~=0) then --need this check because argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
 		local distanceTraveledDueToNetworkDelay = networkDelayDrift 
 		newX = distanceTraveledDueToNetworkDelay*math.sin(unitDirection) + newX -- translate move command abit further forward; to account for lag. Network Lag makes move command lags behind the unit. 
@@ -1883,6 +1982,8 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 	if (turnOnEcho == 1) then
 		Spring.Echo("x(ConvertToXZ) " .. x)
 		Spring.Echo("z(ConvertToXZ) " .. z)
+		Spring.Echo("newX(ConvertToXZ) " .. newX)
+		Spring.Echo("newZ(ConvertToXZ) " .. newZ)
 	end
 	return newX, newZ
 end
@@ -1965,9 +2066,11 @@ function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, 
 		newUnitAngleDerived = newUnitAngleDerived + 2*math.pi
 	end
 	if (turnOnEcho == 1) then
-		Spring.Echo("unitAngleDerived (getNewAngle)" ..unitAngleDerived*180/math.pi)
-		Spring.Echo("newUnitAngleDerived (getNewAngle)" .. newUnitAngleDerived*180/math.pi)
-		--Spring.Echo("fTarget (getNewAngle)" .. fTarget)
+		-- Spring.Echo("unitAngleDerived (getNewAngle)" ..unitAngleDerived*180/math.pi)
+		-- Spring.Echo("newUnitAngleDerived (getNewAngle)" .. newUnitAngleDerived*180/math.pi)
+		-- Spring.Echo("angleFromTarget (getNewAngle)" .. angleFromTarget*180/math.pi)
+		-- Spring.Echo("angleFromObstacle (getNewAngle)" .. angleFromObstacle*180/math.pi)
+		-- Spring.Echo("fTarget (getNewAngle)" .. fTarget)
 		--Spring.Echo("fObstacleSum (getNewAngle)" ..fObstacleSum)
 		--Spring.Echo("unitAngleDerived(GetNewAngle) " .. unitAngleDerived) 
 		--Spring.Echo("newUnitAngleDerived(GetNewAngle) " .. newUnitAngleDerived)
