@@ -2,13 +2,13 @@ local version = "1.0.3"
 
 function gadget:GetInfo()
 	return {
-		name			= "Ore mexes!",
-		desc			= "Prespawn mex spots and make them spit ore. Version "..version,
+		name		= "Ore mexes!",
+		desc		= "Prespawn mex spots and make them spit ore. Version "..version,
 		author		= "Tom Fyuri",
-		date			= "Mar 2014",
-		license	 = "GPL v2 or later",
-		layer		 = -5,
-		enabled	 = true				-- now it comes with design!
+		date		= "Mar 2014",
+		license		= "GPL v2 or later",
+		layer		= -5,
+		enabled	 	= true				-- now it comes with design!
 	}
 end
 
@@ -28,9 +28,6 @@ local modOptions = Spring.GetModOptions()
 if (gadgetHandler:IsSyncedCode()) then
 
 local getMovetype = Spring.Utilities.getMovetype
-	
-local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
-local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
 
 local spGetUnitsInCylinder				= Spring.GetUnitsInCylinder
 local spCallCOBScript					= Spring.CallCOBScript
@@ -66,8 +63,13 @@ local spGetFeatureResources				= Spring.GetFeatureResources
 local spGiveOrderToUnit					= Spring.GiveOrderToUnit
 local spGetUnitCommands					= Spring.GetUnitCommands
 local spValidFeatureID					= Spring.ValidFeatureID
+
+local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
+local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
+
 local OreMexByID = {} -- by UnitID
 local OreMex = {} -- for loop
+
 local random = math.random
 local cos	 = math.cos
 local sin	 = math.sin
@@ -560,6 +562,10 @@ local function PreSpawn()
 end
 
 local function ReInit(reinit)
+	if not (tonumber(modOptions.oremex) == 1) then
+		return
+	end
+	
 	mapWidth = Game.mapSizeX
 	mapHeight = Game.mapSizeZ
 	teamIDs = spGetTeamList()
@@ -587,8 +593,9 @@ local function ReInit(reinit)
 end
 		
 function gadget:Initialize()
-	if not(tonumber(modOptions.oremex) == 1) then
+	if not (tonumber(modOptions.oremex) == 1) then
 		gadgetHandler:RemoveGadget()
+		return
 	end
 	if not(INVULNERABLE_EXTRACTORS) then
 		gadgetHandler:RemoveCallIn("AllowWeaponTarget")
