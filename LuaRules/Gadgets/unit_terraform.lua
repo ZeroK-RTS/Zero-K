@@ -2510,7 +2510,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						if not extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
-							spDestroyUnit(id,{reclaimed = true})
+							spDestroyUnit(id, false, true)
 							return 0
 						end
 						index = overlap
@@ -2555,7 +2555,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						if extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
-							spDestroyUnit(id,{reclaimed = true})
+							spDestroyUnit(id, false, true)
 							return 0
 						end
 						index = overlap
@@ -2630,7 +2630,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						if not extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
-							spDestroyUnit(id,{reclaimed = true})
+							spDestroyUnit(id, false, true)
 							return 0
 						end
 						index = overlap
@@ -2674,7 +2674,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						if extraPoint[overlap].pyramid then
 							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
-							spDestroyUnit(id,{reclaimed = true})
+							spDestroyUnit(id, false, true)
 							return 0
 						end
 						index = overlap
@@ -2787,7 +2787,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Strange pyramid construction")
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Destroying Terraform Unit")
 			deregisterTerraformUnit(id,arrayIndex,2)			
-			spDestroyUnit(id,{reclaimed = true})
+			spDestroyUnit(id, false, true)
 			return 0
 		end
 	end
@@ -2879,7 +2879,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	
 	if terra.progress > 1 then
 		deregisterTerraformUnit(id,arrayIndex,2)			
-		spDestroyUnit(id,{reclaimed = true})
+		spDestroyUnit(id, false, true)
 		return 0
 	end
 	
@@ -2908,7 +2908,7 @@ function gadget:GameFrame(n)
 			if diffProgress == 0 then
 				if n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n then
 					deregisterTerraformUnit(id,i,3)
-					spDestroyUnit(id,{reclaimed = true})
+					spDestroyUnit(id, false, true)
 				else
 					i = i + 1
 				end
