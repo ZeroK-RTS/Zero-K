@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipcon]],
   name                   = [[Mariner]],
-  description            = [[Construction Ship, Builds at 10 m/s]],
+  description            = [[Construction Ship, Builds at 7.5 m/s]],
   acceleration           = 0.051375,
   brakeRate              = 0.061,
   buildCostEnergy        = 200,
@@ -27,9 +27,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Navire de Construction, Construit r 10 m/s]],
-	description_de = [[Konstruktionsschiff, Baut mit 10 M/s]],
-	description_pl = [[Statek konstrukcyjny, moc 10 m/s]],
+    description_fr = [[Navire de Construction, Construit r 7.5 m/s]],
+	description_de = [[Konstruktionsschiff, Baut mit 7,5 M/s]],
+	description_pl = [[Statek konstrukcyjny, moc 7.5 m/s]],
     helptext       = [[Although expensive, the Construction Ship boasts extremely high nano power, combined with tough armor and good speed.]],
     helptext_fr    = [[Meme si il est couteux, le Shipcon construit plus vite qu'un constructeur terrestre et est aussi rapide que solide.]],
 	helptext_de    = [[Obwohl teuer, bietet diese Konstruktionseinheit extrem hohe Nanoleistung, kombiniert mit robuster Panzerung und Schnelligkeit.]],
