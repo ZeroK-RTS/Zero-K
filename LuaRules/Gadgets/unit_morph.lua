@@ -624,6 +624,10 @@ local function FinishMorph(unitID, morphData)
     GG.setMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
   end
   
+  if (GG.isCarrier(unitID)) then
+    GG.transferCarrierData(unitID, ud, unitTeam, newUnit)
+  end
+  
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
   
   --//transfer lineage

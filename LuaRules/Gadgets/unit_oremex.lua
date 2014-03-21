@@ -562,10 +562,6 @@ local function PreSpawn()
 end
 
 local function ReInit(reinit)
-	if not (tonumber(modOptions.oremex) == 1) then
-		return
-	end
-	
 	mapWidth = Game.mapSizeX
 	mapHeight = Game.mapSizeZ
 	teamIDs = spGetTeamList()
@@ -614,7 +610,9 @@ function gadget:Initialize()
 end
 
 function gadget:GameStart()
-	ReInit(false)
+	if (tonumber(modOptions.oremex) == 1) then
+		ReInit(false)
+	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)

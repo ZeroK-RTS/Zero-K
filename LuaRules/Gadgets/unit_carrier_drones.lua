@@ -98,6 +98,35 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 end
 
+-- morph uses this
+local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
+	-- UnitFinished (above) should already be called for this new unit.
+	if carrierList[newUnitID] then
+		carrierList[newUnitID] = Spring.Utilities.CopyTable(carrierList[unitID], true) -- deep copy?
+		  -- old carrier data removal (transfering drones to new carrier, old will "die" (on morph) silently without taking drones together to the grave)...
+		local carrier = carrierList[unitID]
+		for i=1,#carrier.droneSets do
+			local set = carrier.droneSets[i]
+			for droneID in pairs(set.drones) do
+				droneList[droneID].carrier = newUnitID
+				GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , {"shift"})
+			end
+		end
+		carrierList[unitID] = nil
+	end
+end
+
+local function isCarrier(unitID)
+	if (carrierList[unitID]) then
+		return true
+	end
+	return false
+end
+
+-- morph uses this
+GG.isCarrier = isCarrier
+GG.transferCarrierData = transferCarrierData
+
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if carrierList[unitID] then
 		carrierList[unitID].teamID = newTeam
