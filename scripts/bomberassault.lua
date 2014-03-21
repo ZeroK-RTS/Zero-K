@@ -36,9 +36,9 @@ end
 function script.Activate()
 	local px, py, pz = Spring.GetUnitPosition(unitID)
 	Spring.PlaySoundFile("sounds/misc/blowtorch.wav", 10, px, py, pz)
-	Spin(turbineTop, y_axis, 8,2);
-	Spin(turbineLeft, y_axis, 8,2);
-	Spin(turbineRight, y_axis, -8,2);
+	--Spin(turbineTop, y_axis, 8,2);
+	--Spin(turbineLeft, y_axis, 8,2);
+	--Spin(turbineRight, y_axis, -8,2);
 end
 
 function script.Create()
