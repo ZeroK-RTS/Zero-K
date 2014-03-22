@@ -95,7 +95,7 @@ unitDef = {
   terraformSpeed      = 600,
   turnRate            = 1350,
   upright             = true,
-  workerTime          = 10,
+  workerTime          = 12,
 
   weapons             = {
 
@@ -169,6 +169,10 @@ unitDef = {
         default = 140,
         planes  = 140,
         subs    = 8,
+      },
+      
+      customParams = {
+        single_hit = true,
       },
 
       explosionGenerator      = [[custom:gauss_hit_l]],
