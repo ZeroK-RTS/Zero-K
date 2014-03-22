@@ -131,52 +131,6 @@ unitDef = {
       weaponType              = [[BeamLaser]],
     },
   },
-
---[[
-  featureDefs            = {
-
-    DEAD  = {
-      description      = [[Wreckage - Spicula]],
-      blocking         = true,
-      category         = [[corpses]],
-      damage           = 400,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 40,
-      object           = [[fighter_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    HEAP  = {
-      description      = [[Debris - Avenger]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 400,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 20,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 20,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-  },
-]]--
 }
 
 return lowerkeys({ fighterdrone = unitDef })
