@@ -11,7 +11,7 @@ local holder, sphere = piece('holder', 'sphere')
 local smokePiece = {pelvis}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-local SPEED = 3
+local SPEED = 3.6
 
 local SIG_WALK = 1
 local SIG_DEPLOY = 2
