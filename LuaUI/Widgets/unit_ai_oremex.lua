@@ -297,8 +297,8 @@ local function pAIthink(goodMetal,f)
 								spGiveOrderToUnit(unitID, CMD_FIGHT, {x+random(-200,200),0,z+random(-200,200)},{})
 							end
 						else
-							if (pAIjob[unitID] == nil) then
-								if not(goodMetal) and (queue[1].id ~= CMD_RECLAIM) then -- RECLAIM LEL
+							if (pAIjob[unitID] == 0) then
+								if not(goodMetal) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
 									  local oreID = FindAnyOreInRange(x,z,501)
 									  if (oreID) then
 										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
@@ -306,7 +306,7 @@ local function pAIthink(goodMetal,f)
 									  else
 										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,1000},{})
 									  end
-								elseif (queue[1].id ~= CMD_REPAIR) -- ASSIST LEL
+								elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
 									  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,501)
 									  if (repairNearestID) then
 										  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
@@ -316,7 +316,7 @@ local function pAIthink(goodMetal,f)
 									  end
 								end
 							else
-								if (pAIjob[unitID] == 1) and (queue[1].id ~= CMD_RECLAIM) then -- RECLAIM LEL
+								if (pAIjob[unitID] == 1) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
 									  local oreID = FindAnyOreInRange(x,z,501)
 									  if (oreID) then
 										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
@@ -324,7 +324,7 @@ local function pAIthink(goodMetal,f)
 									  else
 										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,1000},{})
 									  end
-								elseif (pAIjob[unitID] == 2) and (queue[1].id ~= CMD_REPAIR) -- ASSIST LEL
+								elseif (pAIjob[unitID] == 2) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
 									  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,501)
 									  if (repairNearestID) then
 										  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
@@ -338,8 +338,8 @@ local function pAIthink(goodMetal,f)
 						NextOrderTick[unitID] = f+ORDER_FRAME_LIMIT
 					end
 				elseif (NextOrderTick[unitID] < f) then
-					if (pAIjob[unitID] == nil) then
-						if not(goodMetal) and (queue[1].id ~= CMD_RECLAIM) then -- RECLAIM LEL
+					if (pAIjob[unitID] == 0) then
+						if not(goodMetal) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
 							  local oreID = FindAnyOreInRange(x,z,501)
 							  if (oreID) then
 								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
@@ -347,7 +347,7 @@ local function pAIthink(goodMetal,f)
 							  else
 								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,501},{})
 							  end
-						elseif (queue[1].id ~= CMD_REPAIR) -- ASSIST LEL
+						elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
 							  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,501)
 							  if (repairNearestID) then
 								  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
@@ -357,7 +357,7 @@ local function pAIthink(goodMetal,f)
 							  end
 						end
 					else
-						if (pAIjob[unitID] == 1) and (queue[1].id ~= CMD_RECLAIM) then -- RECLAIM LEL
+						if (pAIjob[unitID] == 1) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
 							  local oreID = FindAnyOreInRange(x,z,501)
 							  if (oreID) then
 								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
@@ -365,7 +365,7 @@ local function pAIthink(goodMetal,f)
 							  else
 								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,501},{})
 							  end
-						elseif (pAIjob[unitID] == 2) and (queue[1].id ~= CMD_REPAIR) -- ASSIST LEL
+						elseif (pAIjob[unitID] == 2) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
 							  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,501)
 							  if (repairNearestID) then
 								  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
@@ -395,54 +395,58 @@ function widget:TeamChanged(teamID)
 end
   
 function widget:GameFrame(n)
-	if ((n%1800)==0) then
-		local new_limit = 150
-		local controlled = #pAIcontrolled
-		while (controlled >= 50) do
-		      controlled = controlled - 50
-		      new_limit = new_limit + 150
-		end
-		if (new_limit > ORDER_FRAME_LIMIT_MIN) then
-			ORDER_FRAME_LIMIT = new_limit
+	if ((n%1800)==1) then
+		if (#pAIcontrolled > 0) then
+			local new_limit = 150
+			local controlled = #pAIcontrolled
+			while (controlled >= 50) do
+			      controlled = controlled - 50
+			      new_limit = new_limit + 150
+			end
+			if (new_limit > ORDER_FRAME_LIMIT_MIN) then
+				ORDER_FRAME_LIMIT = new_limit
+			end
 		end
 	end
 	if ((n%900)==1) then
-		local controlled = #pAIcontrolled
-		local noJob = {}
-		local miner = {}
-		local assist = {}
-		for unitID,_ in pairs(pAIcontrolled) do
-			if (pAIjob[unitID] == nil) then
-				noJob[unitID] = true
-			elseif (pAIjob[unitID] == 1) then
-				miner[unitID] = true
-			elseif (pAIjob[unitID] == 2) then
-				assist[unitID] = 1
-			end
-		end
-		local want_miner = floor(controlled/10*6)
-		if (#miner < want_miner) then
-			for unitID,_ in pairs(noJob) do
-			      miner[unitID] = true
-			      pAIjob[unitID] = 1
-			      noJob[unitID] = nil
-			      if (#miner >= want_miner) then
-				    break
+		if (#pAIcontrolled > 0) then
+		      local controlled = #pAIcontrolled
+		      local noJob = {}
+		      local miner = {}
+		      local assist = {}
+		      for unitID,_ in pairs(pAIcontrolled) do
+			      if (pAIjob[unitID] == nil) then
+				      noJob[unitID] = true
+			      elseif (pAIjob[unitID] == 1) then
+				      miner[unitID] = true
+			      elseif (pAIjob[unitID] == 2) then
+				      assist[unitID] = 1
 			      end
-			end
-			for unitID,_ in pairs(assist) do
-			      miner[unitID] = true
-			      pAIjob[unitID] = 1
-			      assist[unitID] = nil
-			      if (#miner >= want_miner) then
-				    break
+		      end
+		      local want_miner = floor(controlled/10*6)
+		      if (#miner < want_miner) then
+			      for unitID,_ in pairs(noJob) do
+				    miner[unitID] = true
+				    pAIjob[unitID] = 1
+				    noJob[unitID] = nil
+				    if (#miner >= want_miner) then
+					  break
+				    end
 			      end
-			end
-		end
-		for unitID,_ in pairs(noJob) do
-		      assist[unitID] = true
-		      pAIjob[unitID] = 2
-		      noJob[unitID] = nil
+			      for unitID,_ in pairs(assist) do
+				    miner[unitID] = true
+				    pAIjob[unitID] = 1
+				    assist[unitID] = nil
+				    if (#miner >= want_miner) then
+					  break
+				    end
+			      end
+		      end
+		      for unitID,_ in pairs(noJob) do
+			    assist[unitID] = true
+			    pAIjob[unitID] = 2
+			    noJob[unitID] = nil
+		      end
 		end
 	end
 	if ((n%30)==1) then
@@ -498,6 +502,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 					pAIcontrolled[unitID] = true
 					NextOrderTick[unitID] = -100
 					pAIretreat[unitID] = 0
+					pAIjob[unitID] = 0
 					pAIretreatIgnore[unitID] = {}
 					pAIwait[unitID] = false
 				elseif (pAIcontrolled[unitID]) then
@@ -572,6 +577,7 @@ function widget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	if OnDefaultDefs[unitDefID] or pAIcontrolled[builderID] then
 		pAIcontrolled[unitID] = true
 		NextOrderTick[unitID] = -100
+		pAIjob[unitID] = 0
 		pAIretreat[unitID] = 0
 		pAIretreatIgnore[unitID] = {}
 		pAIwait[unitID] = false
@@ -621,6 +627,7 @@ function widget:Initialize()
 			if OnDefaultDefs[unitDefID] then
 				pAIcontrolled[unitID] = true
 				NextOrderTick[unitID] = -100
+				pAIjob[unitID] = 0
 				pAIretreat[unitID] = 0
 				pAIretreatIgnore[unitID] = {}
 				pAIwait[unitID] = false
