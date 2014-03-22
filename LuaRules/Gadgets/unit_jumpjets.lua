@@ -51,7 +51,7 @@ local CMD_STOP = CMD.STOP
 local CMD_WAIT = CMD.WAIT
 
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
-local spGetUnitBasePosition  = Spring.GetUnitBasePosition
+local spGetUnitPosition  = Spring.GetUnitPosition
 local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 local spSetUnitNoMinimap   = Spring.SetUnitNoMinimap
@@ -141,7 +141,7 @@ local function StartScript(fn)
 	coroutines[#coroutines + 1] = co
 end
 
-
+--[[
 local function ReloadQueue(unitID, queue, cmdTag)
 	if (not queue) then
 		return
@@ -174,6 +174,7 @@ local function ReloadQueue(unitID, queue, cmdTag)
 	end
 	
 end
+--]]
 
 local function CopyJumpData(unitID,lineDist,flightDist )
 	local oldUnitID = unitID --previous unitID
@@ -205,7 +206,7 @@ end
 
 local function Jump(unitID, goal, cmdTag, origCmdParams)
 	goal[2]						 = spGetGroundHeight(goal[1],goal[3])
-	local start				 = {spGetUnitBasePosition(unitID)}
+	local start				 = {spGetUnitPosition(unitID)}
 
 	local fakeUnitID
 	local unitDefID		 = spGetUnitDefID(unitID)
@@ -346,7 +347,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				spDestroyUnit(fakeUnitID, false, true)
 				return -- unit died
 			end
-			local x0, y0, z0 = spGetUnitBasePosition(unitID)
+			local x0, y0, z0 = spGetUnitPosition(unitID)
 			local x = start[1] + vector[1]*i
 			local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height -- parabola
 			local z = start[3] + vector[3]*i
@@ -543,7 +544,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	
 	local t = spGetGameSeconds()
-	local x, y, z = spGetUnitBasePosition(unitID)
+	local x, y, z = spGetUnitPosition(unitID)
 	local distSqr = GetDist2Sqr({x, y, z}, cmdParams)
 	local jumpDef = jumpDefs[unitDefID]
 	local range   = jumpDef.range
