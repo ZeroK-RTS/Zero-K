@@ -54,6 +54,7 @@ CMD_WAIT_AT_BEACON = 35171
 CMD_ABANDON_PW = 35200
 CMD_ANTINUKEZONE = 35130	-- ceasefire
 CMD_DROP_FLAG = 35300	-- capture_the_flag.lua gui_chili_ctf.lua
+CMD_AUTOECO = 35301	-- gui_oremex.lua
 CMD_UNIT_KILL_SUBORDINATES = 35821	-- unit_capture
 CMD_UNIT_AI = 36214
 CMD_WANT_CLOAK = 37382

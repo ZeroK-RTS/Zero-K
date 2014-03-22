@@ -1,4 +1,4 @@
-local version = "1.0.3"
+local version = "1.0.4"
 
 function gadget:GetInfo()
 	return {
@@ -21,6 +21,7 @@ end
 --TODO different ore size models, pile of chunks should combine into bigger pile of chunks so we keep less features overall and less lag...
 
 -- changelog
+-- 22 march 2014 - 1.0.4. Widget is now AI micro assistant. It also has it's own changelog from now on.
 -- 11 march 2014 - 1.0.3. Growth rewrite, ore metal yield change, ore harm units now. Disobey OD fix. And transfer logic improvement.
 -- 10 march 2014 - 1.0.2. Could be considered first working version.
 
