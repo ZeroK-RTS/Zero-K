@@ -400,8 +400,8 @@ function widget:GameFrame(n)
 			local new_limit = 150
 			local controlled = #pAIcontrolled
 			while (controlled >= 50) do
-			      controlled = controlled - 50
-			      new_limit = new_limit + 150
+				controlled = controlled - 50
+				new_limit = new_limit + 150
 			end
 			if (new_limit > ORDER_FRAME_LIMIT_MIN) then
 				ORDER_FRAME_LIMIT = new_limit
@@ -410,21 +410,24 @@ function widget:GameFrame(n)
 	end
 	if ((n%900)==1) then
 		if (#pAIcontrolled > 0) then
-		      local controlled = #pAIcontrolled
-		      local noJob = {}
-		      local miner = {}
-		      local assist = {}
-		      for unitID,_ in pairs(pAIcontrolled) do
-			      if (pAIjob[unitID] == nil) then
-				      noJob[unitID] = true
-			      elseif (pAIjob[unitID] == 1) then
-				      miner[unitID] = true
-			      elseif (pAIjob[unitID] == 2) then
-				      assist[unitID] = 1
-			      end
-		      end
-		      local want_miner = floor(controlled/10*6)
-		      if (#miner < want_miner) then
+			local controlled = #pAIcontrolled
+			local noJob = {}
+			local miner = {}
+			local assist = {}
+			for unitID,_ in pairs(pAIcontrolled) do
+				if (pAIjob[unitID] == nil) then
+					noJob[unitID] = true
+				elseif (pAIjob[unitID] == 1) then
+					miner[unitID] = true
+				elseif (pAIjob[unitID] == 2) then
+					assist[unitID] = 1
+				end
+			end
+			local want_miner = floor(controlled/10*6)
+			if (want_miner == 0) then
+				  want_miner = 1
+			end
+			if (#miner < want_miner) then
 			      for unitID,_ in pairs(noJob) do
 				    miner[unitID] = true
 				    pAIjob[unitID] = 1
@@ -441,12 +444,12 @@ function widget:GameFrame(n)
 					  break
 				    end
 			      end
-		      end
-		      for unitID,_ in pairs(noJob) do
-			    assist[unitID] = true
-			    pAIjob[unitID] = 2
-			    noJob[unitID] = nil
-		      end
+			end
+			for unitID,_ in pairs(noJob) do
+				assist[unitID] = true
+				pAIjob[unitID] = 2
+				noJob[unitID] = nil
+			end
 		end
 	end
 	if ((n%30)==1) then
