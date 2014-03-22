@@ -44,10 +44,12 @@ function script.BlockShot(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
+--[[
 	local severity = (recentDamage/maxHealth) * 100
 	if severity < 100 then
 		return 1
 	else
 		return 2
 	end
+]]--
 end
