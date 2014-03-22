@@ -229,7 +229,7 @@ UpdateHaloColors = function(self)
 end
 
 local function GetVisibleUnits()
-    local units = spGetVisibleUnits(-1, 30, false)
+  local units = spGetVisibleUnits(-1, 30, false)
     
 	local visibleAllySelUnits = {}
     local visibleSelected = {}
@@ -238,7 +238,7 @@ local function GetVisibleUnits()
 	    local unitID = units[i]
 	    if (spIsUnitSelected(unitID)) then
 		    visibleSelected[#visibleSelected+1] = unitID
-	    elseif showAlly and WG.allySelUnits[unitID] then
+	    elseif showAlly and not WG.allySelUnits == nil and WG.allySelUnits[unitID] then
 		    visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
 	    end
     end

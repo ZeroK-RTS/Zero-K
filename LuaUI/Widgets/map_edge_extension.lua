@@ -32,8 +32,11 @@ local mirrorShader
 
 local umirrorX
 local umirrorZ
+local ulengthX
+local ulengthZ
 local uup
 local uleft
+local ugrid
 local ubrightness
 
 local island = false
@@ -125,8 +128,12 @@ local function SetupShaderTable()
 	  uniform = {
 		mirrorX = 0,
 		mirrorZ = 0,
+		lengthX = 0,
+		lengthZ = 0,
+		tex0 = 0,
 		up = 0,
 		left = 0,
+		grid = 0,
 		brightness = 1.0,
 	  },
 	  vertex = (options.curvature.value and "#define curvature \n" or '')
@@ -135,9 +142,14 @@ local function SetupShaderTable()
 		// Application to vertex shader
 		uniform float mirrorX;
 		uniform float mirrorZ;
+		uniform float lengthX;
+	  uniform float lengthZ;
 		uniform float left;
 		uniform float up;
 		uniform float brightness;
+
+		varying vec4 vertex;
+		varying vec4 color;
   
 		void main()
 		{
@@ -145,9 +157,14 @@ local function SetupShaderTable()
 		gl_Vertex.x = abs(mirrorX-gl_Vertex.x);
 		gl_Vertex.z = abs(mirrorZ-gl_Vertex.z);
 		
+		float alpha = 1.0;
 		#ifdef curvature
 		  if(mirrorX)gl_Vertex.y -= pow(abs(gl_Vertex.x-left*mirrorX)/150, 2);
 		  if(mirrorZ)gl_Vertex.y -= pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2);
+		  alpha = 0.0;
+			if(mirrorX) alpha -= pow(abs(gl_Vertex.x-left*mirrorX)/lengthX, 2);
+			if(mirrorZ) alpha -= pow(abs(gl_Vertex.z-up*mirrorZ)/lengthZ, 2);
+			alpha = 1.0 + (6.0 * (alpha + 0.18));
 		#endif
   
 		float ff = 20000;
@@ -159,15 +176,40 @@ local function SetupShaderTable()
 		  ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+2);
   
 		gl_Position  = gl_ModelViewProjectionMatrix*gl_Vertex;
-		gl_FogFragCoord = //gl_Position.z+ff;
+		//gl_Position.z+ff;
 		
 		#ifdef edgeFog
-		  length((gl_ModelViewMatrix * gl_Vertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
+		  gl_FogFragCoord = length((gl_ModelViewMatrix * gl_Vertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
 		#endif
 		
-		gl_FrontColor = vec4(brightness * gl_Color.rgb, 1.0);
+		gl_FrontColor = vec4(brightness * gl_Color.rgb, alpha);
+
+		color = gl_FrontColor;
+		vertex = gl_Vertex;
 		}
 	  ]],
+	 --  fragment = [[
+	 --  uniform float mirrorX;
+	 --  uniform float mirrorZ;
+	 --  uniform float lengthX;
+	 --  uniform float lengthZ;
+		-- uniform float left;
+		-- uniform float up;
+		-- uniform int grid;
+		-- uniform sampler2D tex0;
+
+		-- varying vec4 vertex;
+		-- varying vec4 color;
+
+		-- void main()
+		-- {
+		-- 	float alpha = 0.0;
+		-- 	if(mirrorX) alpha -= pow(abs(vertex.x-left*mirrorX)/lengthX, 2);
+		-- 	if(mirrorZ) alpha -= pow(abs(vertex.z-up*mirrorZ)/lengthZ, 2);
+		-- 	alpha = 1.0 + (4.0 * (alpha + 0.28));
+		-- 	gl_FragColor = vec4(mix(gl_Fog.color, color.rgb, clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.0, 1.0)), clamp(alpha, 0.0, 1.0)) * texture2D(tex0, gl_TexCoord[0].xy);
+		-- }
+	 --  ]],
   }
 end
 
@@ -321,6 +363,9 @@ function widget:Initialize()
         island = IsIsland()
 	if gl.CreateShader and options.useShader.value then
 		mirrorShader = gl.CreateShader(shaderTable)
+		if (mirrorShader == nil) then
+	    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Map Edge Extension widget: mirror shader error: "..gl.GetShaderLog())
+	  end
 	end
 	if not mirrorShader then
 		widget.DrawWorldPreUnit = function()
@@ -334,8 +379,11 @@ function widget:Initialize()
 	else
 		umirrorX = gl.GetUniformLocation(mirrorShader,"mirrorX")
 		umirrorZ = gl.GetUniformLocation(mirrorShader,"mirrorZ")
+		ulengthX = gl.GetUniformLocation(mirrorShader,"lengthX")
+		ulengthZ = gl.GetUniformLocation(mirrorShader,"lengthZ")
 		uup = gl.GetUniformLocation(mirrorShader,"up")
 		uleft = gl.GetUniformLocation(mirrorShader,"left")
+		ugrid = gl.GetUniformLocation(mirrorShader,"grid")
 		ubrightness = gl.GetUniformLocation(mirrorShader,"brightness")
 	end
 	dList = gl.CreateList(DrawOMap, mirrorShader)
@@ -364,15 +412,19 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
         if options.useRealTex.value then 
         		gl.Texture(realTex)
         		glUniform(ubrightness, options.textureBrightness.value)
+        		glUniform(ugrid, 0)
 				else 
 						gl.Texture(gridTex) 
         		glUniform(ubrightness, 1.0)
+        		glUniform(ugrid, 1)
 				end
         if wiremap then
             gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
         end
         glUniform(umirrorX, GamemapSizeX)
         glUniform(umirrorZ, GamemapSizeZ)
+        glUniform(ulengthX, GamemapSizeX)
+        glUniform(ulengthZ, GamemapSizeZ)
         glUniform(uleft, 1)
         glUniform(uup, 1)
         glTranslate(-GamemapSizeX,0,-GamemapSizeZ)
