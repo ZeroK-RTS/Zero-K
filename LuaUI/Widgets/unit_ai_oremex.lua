@@ -96,6 +96,7 @@ local pAIretreatIgnore = {}
 local myTeamID
 local getMovetype = Spring.Utilities.getMovetype
 
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT 
 local CMD_RECLAIM = CMD.RECLAIM
 local CMD_PATROL = CMD.PATROL
 local CMD_REPAIR = CMD.REPAIR
@@ -230,7 +231,7 @@ local function FindAnythingNearToRepair(myUnit,x,z,range)
 		local unitID = units[i]
 		if (spIsUnitAllied(unitID)) and (myUnit ~= unitID) then
 			local hp,maxHp,_,_,build = spGetUnitHealth(unitID)
-			if (hp < maxHp) or (build ~= 1) then
+			if (hp < maxHp) or (build < 1) then
 				local cx,_,cz = spGetUnitPosition(unitID)
 				local dist = disSQ(x,z,cx,cz)
 				if (best_dist == nil) or (best_dist > dist) then
@@ -241,6 +242,7 @@ local function FindAnythingNearToRepair(myUnit,x,z,range)
 		end
 	end
 	if (unit) then
+		local cx,_,cz = spGetUnitPosition(unit)
 		return unit
 	end
 	return nil
@@ -285,7 +287,7 @@ local function pAIthink(goodMetal,f)
 									if (tx) then
 										  --spGiveOrderToUnit(unitID, CMD_MOVE, {tx,ty,tz},{})
 										  spGiveOrderToUnit(unitID, CMD_REPAIR, {allyID},{}) -- why run, lets help allies!
-										  spGiveOrderToUnit(unitID, CMD_FIGHT, {x+random(-200,200),0,z+random(-200,200)},{shift})
+										  spGiveOrderToUnit(unitID, CMD_FIGHT, {x+random(-200,200),0,z+random(-200,200)},CMD_OPT_SHIFT)
 									else
 										  spGiveOrderToUnit(unitID, CMD_FIGHT, {x+random(-200,200),0,z+random(-200,200)},{})
 									end
@@ -301,39 +303,42 @@ local function pAIthink(goodMetal,f)
 						else
 							if (pAIjob[unitID] == 0) then
 								if not(goodMetal) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
-									  local oreID = FindAnyOreInRange(x,z,MAX_TRANVEL_RANGE)
-									  if (oreID) then
-										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
-										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{shift})
-									  else
-										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{})
-									  end
+									local oreID = FindAnyOreInRange(x,z,MAX_TRANVEL_RANGE)
+									if (oreID) then
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
+									else
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{})
+									end
 								elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
-									  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
-									  if (repairNearestID) then
-										  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
-										  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},{shift})
-									  else
-										  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},{})
-									  end
+									local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
+									if (repairNearestID) then
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
+									else
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},{})
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
+									end
 								end
 							else
 								if (pAIjob[unitID] == 1) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
-									  local oreID = FindAnyOreInRange(x,z,MAX_TRANVEL_RANGE)
-									  if (oreID) then
-										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
-										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{shift})
-									  else
-										  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{})
-									  end
+									local oreID = FindAnyOreInRange(x,z,MAX_TRANVEL_RANGE)
+									if (oreID) then
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
+									else
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{})
+									end
 								elseif (pAIjob[unitID] == 2) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
-									  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
+									local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
 									  if (repairNearestID) then
-										  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
-										  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},{shift})
-									  else
-										  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},{})
-									  end
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
+									else
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},{})
+										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
+									end
 								end
 							end
 						end
@@ -342,39 +347,42 @@ local function pAIthink(goodMetal,f)
 				elseif (NextOrderTick[unitID] < f) then
 					if (pAIjob[unitID] == 0) then
 						if not(goodMetal) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
-							  local oreID = FindAnyOreInRange(x,z,MAX_CARETAKER_RANGE)
-							  if (oreID) then
-								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
-								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{shift})
-							  else
-								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{})
-							  end
+							local oreID = FindAnyOreInRange(x,z,MAX_CARETAKER_RANGE)
+							if (oreID) then
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
+							else
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{})
+							end
 						elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
-							  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
-							  if (repairNearestID) then
-								  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
-								  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},{shift})
-							  else
-								  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},{})
-							  end
+							local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
+							if (repairNearestID) then
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
+							else
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},{})
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
+							end
 						end
 					else
 						if (pAIjob[unitID] == 1) and ((#queue == 0) or (queue[1].id ~= CMD_RECLAIM)) then -- RECLAIM LEL
-							  local oreID = FindAnyOreInRange(x,z,MAX_CARETAKER_RANGE)
-							  if (oreID) then
-								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
-								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{shift})
-							  else
-								  spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{})
-							  end
+							local oreID = FindAnyOreInRange(x,z,MAX_CARETAKER_RANGE)
+							if (oreID) then
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {oreID},{})
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
+							else
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{})
+							end
 						elseif (pAIjob[unitID] == 2) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
-							  local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
-							  if (repairNearestID) then
-								  spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
-								  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},{shift})
-							  else
-								  spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},{})
-							  end
+							local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
+							if (repairNearestID) then
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
+							else
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},{})
+								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
+							end
 						end
 					end
 					NextOrderTick[unitID] = f+ORDER_FRAME_LIMIT
@@ -414,17 +422,21 @@ function widget:GameFrame(n)
 		if (#pAIcontrolled > 0) then
 			local mCur, mMax, _, mInc = spGetTeamResources(myTeamID, "metal")
 			if (mCur*1.3 >= mMax) then
-				local controlled = #pAIcontrolled
+				local controlled = 0
 				local noJob = {}
 				local miner = {}
 				local assist = {}
 				for unitID,_ in pairs(pAIcontrolled) do
-					if (pAIjob[unitID] == 0) then
+					local unitDefID = spGetUnitDefID(unitID)
+					if (pAIjob[unitID] == 0) and not(OnDefaultDefs[unitDefID]) then -- caretaker should do anything always
 						noJob[unitID] = true
+						controlled = controlled + 1
 					elseif (pAIjob[unitID] == 1) then
 						miner[unitID] = true
+						controlled = controlled + 1
 					elseif (pAIjob[unitID] == 2) then
 						assist[unitID] = true
+						controlled = controlled + 1
 					end
 				end
 				local want_miner = floor(controlled/10*6)
@@ -432,18 +444,18 @@ function widget:GameFrame(n)
 					  want_miner = 1
 				end
 				if (#miner < want_miner) then
-				      for unitID,_ in pairs(noJob) do
-					    miner[unitID] = true
-					    pAIjob[unitID] = 1
-					    noJob[unitID] = nil
-					    if (#miner >= want_miner) then
-						  break
-					    end
-				      end
 				      for unitID,_ in pairs(assist) do
 					    miner[unitID] = true
 					    pAIjob[unitID] = 1
 					    assist[unitID] = nil
+					    if (#miner >= want_miner) then
+						  break
+					    end
+				      end
+				      for unitID,_ in pairs(noJob) do
+					    miner[unitID] = true
+					    pAIjob[unitID] = 1
+					    noJob[unitID] = nil
 					    if (#miner >= want_miner) then
 						  break
 					    end
@@ -592,7 +604,11 @@ function widget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		pAIjob[unitID] = 0
 		pAIretreat[unitID] = 0
 		pAIretreatIgnore[unitID] = {}
-		pAIwait[unitID] = true
+		if (OnDefaultDefs[unitDefID]) then
+			pAIwait[unitID] = false
+		else
+			pAIwait[unitID] = true
+		end
 	end
 end
 
