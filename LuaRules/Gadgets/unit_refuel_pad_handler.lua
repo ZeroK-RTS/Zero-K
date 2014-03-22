@@ -3,7 +3,7 @@ function gadget:GetInfo()
 		name    = "Refuel Pad Handler",
 		desc    = "Replaces the engine implementation of the refuel pad.",
 		author  = "Google Frog",
-		date    = "5 Jan 2014",
+		date    = "5 Jan 2014", --changes: 22 March 2014
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
 		enabled = true, -- loaded by default?
@@ -336,14 +336,15 @@ local function CircleToLand(unitID, goal)
 	local estimatedTime = (2*totalDist)/(maxSpeed+targetSpeed)
 	local acceleration = (targetSpeed^2 - maxSpeed^2)/(2*totalDist)
 	
-	-- Sigmoid Version
-	local function TimeToVerticalPositon(t)
-		return start[2] + (goal[2] - start[2])*(1/(1 + exp(6*(-2*t/estimatedTime +1))))
-	end
+	-- Sigmoid Version (have problem with landing on mobile airpad)
+	-- local function TimeToVerticalPositon(t)
+		-- return start[2] + (goal[2] - start[2])*(1/(1 + exp(6*(-2*t/estimatedTime +1))))
+	-- end
 	
-	--local function TimeToVerticalPositon(t)
-	--	return start[2] + (goal[2] - start[2])*t/estimatedTime
-	--end
+	-- Straight line Version
+	local function TimeToVerticalPositon(t)
+		return start[2] + (goal[2] - start[2])*t/estimatedTime
+	end
 	
 	--[[
 	for i = 0, totalDist, maxSpeed do

@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "13 March 2014, 25 Feb 2011",
+    date      = "22 March 2014, 25 Feb 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -82,6 +82,7 @@ local spGetUnitPieceMap = Spring.GetUnitPieceMap
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosition = Spring.GetUnitPiecePosition 
 local spGetUnitVectors = Spring.GetUnitVectors
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 --------------------------------------------------------------------------------
 -- config
@@ -200,7 +201,7 @@ local function InsertCommandAfter(unitID, afterCmd, cmdID, params, opts)
 end
 --]]
 
-local function InsertCommand(unitID, index, cmdID, params, opts)
+local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local queue = Spring.GetUnitCommands(unitID)
@@ -216,6 +217,9 @@ local function InsertCommand(unitID, index, cmdID, params, opts)
 			if i-1 == index and toInsert then
 				spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
 				toInsert = false
+				if toReplace then
+					i = i + 1
+				end
 			else
 				local cmd = queue[i]
 				spGiveOrderToUnit(unitID, cmd.id, cmd.params, MakeOptsWithShift(cmd.options))
@@ -311,7 +315,7 @@ local function FindNearestAirpad(unitID, team)
 		excessReservation = math.min(10,excessReservation) --clamp to avoid crazy value
 		local dist = Spring.GetUnitSeparation(unitID, airpadID, true)
 		dist = dist + (10*excessReservation)^2
-		dist = math.min(minDist-1, dist) --clamp to avoid crazy value
+		dist = math.min(999998, dist) --clamp to avoid crazy value
 		if (dist < minDist) then
 			minDist = dist
 			closestPad = airpadID
@@ -320,7 +324,7 @@ local function FindNearestAirpad(unitID, team)
 	return closestPad
 end
 
-local function RequestRearm(unitID, team, forceNow)
+local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	team = team or spGetUnitTeam(unitID)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
@@ -329,13 +333,19 @@ local function RequestRearm(unitID, team, forceNow)
 		end
 	end
 	--Spring.Echo(unitID.." requesting rearm")
+	local detectedRearm = false
 	local queue = Spring.GetUnitCommands(unitID) or {}
 	local index = #queue + 1
 	for i=1, #queue do
 		if combatCommands[queue[i].id] then
 			index = i-1
 			break
-		elseif queue[i].id == CMD_REARM or queue[i].id == CMD_FIND_PAD then	-- already have manually set rearm point, we have nothing left to do here
+		elseif queue[i].id == CMD_REARM then -- already have set rearm point, we have nothing left to do here
+			detectedRearm = true
+			if (not replaceExisting) then
+				return
+			end
+		elseif queue[i].id == CMD_FIND_PAD then	-- already have find airpad command, we might be doing same work twice, skip
 			return
 		end
 	end
@@ -346,7 +356,8 @@ local function RequestRearm(unitID, team, forceNow)
 	if targetPad then
 		ReserveAirpad(unitID,targetPad)
 		--Spring.Echo(unitID.." directed to airpad "..targetPad)
-		InsertCommand(unitID, index, CMD_REARM, {targetPad}) --UnitID get RE-ARM command with reserved airpad as its Params
+		local replaceExistingRearm = (detectedRearm and replaceExisting)
+		InsertCommand(unitID, index, CMD_REARM, {targetPad}, nil, replaceExistingRearm) --UnitID get RE-ARM command with reserved airpad as its Params
 		--spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, 0, targetPad}, {"alt"})
 		return targetPad
 	end
@@ -402,16 +413,16 @@ local function CancelAirpadReservation(unitID)
 	local targetPad
 	if bomberToPad[unitID] then --unit was going toward an airpad
 		targetPad = bomberToPad[unitID].padID
+		bomberToPad[unitID] = nil
 	elseif bomberLanding[unitID] then --unit was on the airpad
 		targetPad = bomberLanding[unitID].padID
+		bomberLanding[unitID] = nil
 	end
 	if not targetPad then
 		return
 	end
 
 	--Spring.Echo("Clearing reservation by "..unitID.." at pad "..targetPad)
-	bomberToPad[unitID] = nil
-	bomberLanding[unitID] = nil
 	if not airpadsData[targetPad] then 
 		return 
 	end
@@ -471,7 +482,22 @@ function gadget:GameFrame(n)
 		RequestRearm(bomberID, nil, true)
 		rearmRequest[bomberID] = nil
 	end
-	-- track proximity to bombers
+	
+	if n%120 == 0 then
+		for airpadID, data in pairs(airpadsData) do
+			local _,_,inbuild = spGetUnitIsStunned(airpadID)
+			if inbuild then --if user reclaim airpad, send airplane elsewhere
+				local allyTeam = spGetUnitAllyTeam(airpadID)
+				airpadsPerAllyteam[allyTeam][airpadID] = nil
+				for bomberID in pairs(airpadsData[airpadID].reservations.units) do
+					CancelAirpadReservation(bomberID)	-- send anyone who was going here elsewhere
+					RequestRearm(bomberID, nil, false, true) --argument: (bomberID, team, forceNow, replaceExisting)
+				end
+				airpadsData[airpadID] = nil
+			end
+		end
+	end
+	-- track bomber-airpad distance
 	if n%10 == 0 then
 		local airpadRefreshEmptyspot = nil;
 		for bomberID, data in pairs(bomberToPad) do
