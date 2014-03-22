@@ -231,7 +231,7 @@ local function FindAnythingNearToRepair(myUnit,x,z,range)
 		local unitID = units[i]
 		if (spIsUnitAllied(unitID)) and (myUnit ~= unitID) then
 			local hp,maxHp,_,_,build = spGetUnitHealth(unitID)
-			if (hp < maxHp) or (build < 1) then
+			if (hp < maxHp) or (build ~= 1) then
 				local cx,_,cz = spGetUnitPosition(unitID)
 				local dist = disSQ(x,z,cx,cz)
 				if (best_dist == nil) or (best_dist > dist) then
@@ -242,7 +242,6 @@ local function FindAnythingNearToRepair(myUnit,x,z,range)
 		end
 	end
 	if (unit) then
-		local cx,_,cz = spGetUnitPosition(unit)
 		return unit
 	end
 	return nil
@@ -309,6 +308,11 @@ local function pAIthink(goodMetal,f)
 										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
 									else
 										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{})
+										local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
+										if (repairNearestID) then
+											spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},CMD_OPT_SHIFT)
+										end
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT) -- NO ORE QQ
 									end
 								elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
 									local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
@@ -329,6 +333,11 @@ local function pAIthink(goodMetal,f)
 										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT)
 									else
 										spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_TRANVEL_RANGE},{})
+										local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
+										if (repairNearestID) then
+											spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},CMD_OPT_SHIFT)
+										end
+										spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT) -- NO ORE QQ
 									end
 								elseif (pAIjob[unitID] == 2) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
 									local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
@@ -353,6 +362,11 @@ local function pAIthink(goodMetal,f)
 								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
 							else
 								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{})
+								local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
+								if (repairNearestID) then
+									spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},CMD_OPT_SHIFT)
+								end
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT) -- NO ORE QQ
 							end
 						elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
 							local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
@@ -373,6 +387,11 @@ local function pAIthink(goodMetal,f)
 								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT)
 							else
 								spGiveOrderToUnit(unitID, CMD_RECLAIM, {x,y,z,MAX_CARETAKER_RANGE},{})
+								local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
+								if (repairNearestID) then
+									spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},CMD_OPT_SHIFT)
+								end
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT) -- NO ORE QQ
 							end
 						elseif (pAIjob[unitID] == 2) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
 							local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
@@ -418,7 +437,7 @@ function widget:GameFrame(n)
 			end
 		end
 	end
-	if ((n%900)==1) then
+	if ((n%900)==0) then
 		if (#pAIcontrolled > 0) then
 			local mCur, mMax, _, mInc = spGetTeamResources(myTeamID, "metal")
 			if (mCur*1.3 >= mMax) then
@@ -476,7 +495,7 @@ function widget:GameFrame(n)
 	if ((n%30)==1) then
 		local mCur, mMax, _, mInc = spGetTeamResources(myTeamID, "metal")
 		local goodMetal = false
-		if ((mMax - mCur) < mInc) then goodMetal = true end
+		if ((mMax - mCur) < mInc) or ((mCur*0.9) > mMax) then goodMetal = true end
 		pAIthink(goodMetal,n)
 	end
 end
