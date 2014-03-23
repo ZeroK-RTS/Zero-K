@@ -50,10 +50,12 @@ unitDef = {
   idleTime               = 1800,
   maneuverleashlength    = [[400]],
   mass                   = 114,
-  maxAcc                 = 1.4,
+  maxAcc                 = 0.7,
   maxDamage              = 400,
   maxVelocity            = 8,
-  maxPitch               = 0.1,
+  maxElevator            = 0.02,
+  maxRudder              = 0.006,
+  --maxPitch               = 0.1,
   minCloakDistance       = 75,
   mygravity              = 1,
   noAutoFire             = false,
@@ -80,14 +82,13 @@ unitDef = {
   smoothAnim             = true,
   speedToFront           = 0,
   stealth                = true,
-  turnRate               = 839,
+  turnRate               = 9001,
   turnRadius             = 90,
 
   weapons                = {
 
     {
       def                = [[LASER]],
-      badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 90,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
