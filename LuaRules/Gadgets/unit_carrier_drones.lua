@@ -85,10 +85,10 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 		droneSet.drones[droneID] = true
 		
 		--SetUnitPosition(droneID, xS, zS, true)
-		Spring.MoveCtrl.Enable(unitID)
+		Spring.MoveCtrl.Enable(droneID)
 		Spring.MoveCtrl.SetPosition(droneID, xS, yS, zS)
 		--Spring.MoveCtrl.SetRotation(droneID, 0, rot, 0)
-		Spring.MoveCtrl.Disable(unitID)
+		Spring.MoveCtrl.Disable(droneID)
 		Spring.SetUnitCOBValue(droneID,82,(rot - math.pi)*65536/2/math.pi)
 		
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
