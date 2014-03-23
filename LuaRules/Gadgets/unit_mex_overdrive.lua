@@ -221,7 +221,7 @@ end
 		local ty =  type(v)
 		if ty == "table" then
 			Spring.Echo(indent .. name .. " = {")
-			GG.TableEcho(v, indent .. "    ")
+			TableEcho(v, indent .. "    ")
 			--Spring.Echo(indent .. "}")
 		elseif ty == "boolean" then
 			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
@@ -388,6 +388,10 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 
+	if pylon[allyTeamID][unitID] then
+		return
+	end
+	
 	pylon[allyTeamID][unitID] = {
 		gridID = 0,
 		--mexes = 0,
