@@ -165,18 +165,6 @@ local function IgnoreGaia(unitID)
 	return false
 end
 
-local function FindAnyOreInRange(x,z,range)
-	local features = spGetFeaturesInRectangle(x-range,z-range,x+range,z+range)
-	for i=1,#features do
-		local featureID = features[i]
-		local featureDefID = spGetFeatureDefID(featureID)
-		if (FeatureDefs[featureDefID].name=="ore") then
-			return featureID
-		end
-	end
-	return nil
-end
-
 local function pAIgetsafelocation(myUnit,x,y,z,teamID,far)
 	local units = spGetUnitsInCylinder(x,z,MAX_TRANVEL_RANGE)
 	-- nearest unit that can fire... go there!
@@ -221,6 +209,29 @@ local function pAIgetsafelocation(myUnit,x,y,z,teamID,far)
 	else
 		return nil
 	end
+end
+
+local function FindAnyOreInRange(x,z,range)
+	local features = spGetFeaturesInRectangle(x-range,z-range,x+range,z+range)
+	local oreid
+	local best_dist
+	local max_dist = range*range
+	for i=1,#features do
+		local featureID = features[i]
+		local featureDefID = spGetFeatureDefID(featureID)
+		if (FeatureDefs[featureDefID].name=="ore") then
+			local ox,_,oz = Spring.GetFeaturePosition(featureID)
+			local dist = disSQ(x,z,ox,oz)
+			if ((best_dist == nil) or (dist < best_dist)) and (dist <= max_dist) then
+				oreid = featureID
+				best_dist = dist
+			end
+		end
+	end
+	if (oreid) then
+		return oreid
+	end
+	return nil
 end
 
 local function FindAnythingNearToRepair(myUnit,x,z,range)
@@ -314,7 +325,7 @@ local function pAIthink(goodMetal,f)
 										end
 										spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_TRANVEL_RANGE},CMD_OPT_SHIFT) -- NO ORE QQ
 									end
-								elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
+								elseif (goodMetal) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
 									local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_TRANVEL_RANGE)
 									if (repairNearestID) then
 										spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
@@ -368,7 +379,7 @@ local function pAIthink(goodMetal,f)
 								end
 								spGiveOrderToUnit(unitID, CMD_REPAIR, {x,y,z,MAX_CARETAKER_RANGE},CMD_OPT_SHIFT) -- NO ORE QQ
 							end
-						elseif (#queue == 0) or (queue[1].id ~= CMD_REPAIR) then -- ASSIST LEL
+						elseif (goodMetal) and ((#queue == 0) or (queue[1].id ~= CMD_REPAIR)) then -- ASSIST LEL
 							local repairNearestID = FindAnythingNearToRepair(unitID,x,z,MAX_CARETAKER_RANGE)
 							if (repairNearestID) then
 								spGiveOrderToUnit(unitID, CMD_REPAIR, {repairNearestID},{})
