@@ -1,5 +1,6 @@
 if (not gadgetHandler:IsSyncedCode()) then return end
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name      = "Carrier Drones",
@@ -11,11 +12,14 @@ function gadget:GetInfo()
 		enabled   = true
 	}
 end
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local AddUnitDamage     = Spring.AddUnitDamage
 local CreateUnit        = Spring.CreateUnit
 local GetCommandQueue   = Spring.GetCommandQueue
 local GetUnitIsStunned  = Spring.GetUnitIsStunned
+local GetUnitPieceMap	= Spring.GetUnitPieceMap
+local GetUnitPiecePosDir= Spring.GetUnitPiecePosDir
 local GetUnitPosition   = Spring.GetUnitPosition
 local GiveOrderToUnit   = Spring.GiveOrderToUnit
 local SetUnitPosition   = Spring.SetUnitPosition
@@ -35,9 +39,19 @@ local droneList = {}
 local drones_to_move = {}
 local killList = {}
 
-local function InitCarrier(unitDefID, teamID)
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local function InitCarrier(unitID, unitDefID, teamID)
 	local carrierData = carrierDefs[unitDefID]
 	local toReturn  = {unitDefID = unitDefID, teamID = teamID, droneSets = {}}
+	local unitPieces = GetUnitPieceMap(unitID)
+	local usedPieces = carrierData.spawnPieces
+	if usedPieces then
+		toReturn.spawnPieces = {}
+		for i=1,#usedPieces do
+			toReturn.spawnPieces[i] = unitPieces[usedPieces[i]]
+		end
+	end
 	for i=1,#carrierData do
 		toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
 		toReturn.droneSets[i].reload = toReturn.droneSets[i].reloadTime
@@ -48,18 +62,31 @@ local function InitCarrier(unitDefID, teamID)
 end
 
 local function NewDrone(unitID, unitDefID, droneName, setNum)
+	local carrierEntry = carrierList[unitID]
 	local _, _, _, x, y, z = GetUnitPosition(unitID, true)
-	local angle = math.rad(random(1,360))
-	local xS = (x + (math.sin(angle) * 20))
-	local zS = (z + (math.cos(angle) * 20))
-	local droneID = CreateUnit(droneName,x,y,z,1,carrierList[unitID].teamID)
+	local xS, yS, zS = x, y, z
+	if carrierEntry.spawnPieces then
+		local piece = math.random(#carrierEntry.spawnPieces)
+		local px, py, pz = GetUnitPiecePosDir(unitID, carrierEntry.spawnPieces[piece])
+		-- TODO: might want to allow customizable direction as well
+		xS, yS, zS = px, py, pz
+	else
+		local angle = math.rad(random(1,360))
+		xS = (x + (math.sin(angle) * 20))
+		zS = (z + (math.cos(angle) * 20))
+	end
+	local droneID = CreateUnit(droneName,xS,yS,zS,1,carrierList[unitID].teamID)
 	if droneID then
-		local droneSet = carrierList[unitID].droneSets[setNum]
+		local droneSet = carrierEntry.droneSets[setNum]
 		droneSet.reload = carrierDefs[unitDefID][setNum].reloadTime
 		droneSet.droneCount = droneSet.droneCount + 1
 		droneSet.drones[droneID] = true
-
-		SetUnitPosition(droneID, xS, zS, true)
+		
+		--SetUnitPosition(droneID, xS, zS, true)
+		Spring.MoveCtrl.Enable(unitID)
+		Spring.MoveCtrl.SetPosition(droneID, xS, yS, zS)
+		Spring.MoveCtrl.Disable(unitID)
+		
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
 		GiveOrderToUnit(droneID, CMD.FIGHT,	{x + random(-300,300), 60, z + random(-300,300)}, {""})
@@ -68,33 +95,6 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 		SetUnitNoSelect(droneID,true)
 
 		droneList[droneID] = {carrier = unitID, set = setNum}
-	end
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if (carrierList[unitID]) then
-		local carrier = carrierList[unitID]
-		for i=1,#carrier.droneSets do
-			local set = carrier.droneSets[i]
-			for droneID in pairs(set.drones) do
-				droneList[droneID] = nil
-				killList[droneID] = true
-			end
-		end
-		carrierList[unitID] = nil
-	elseif (droneList[unitID]) then
-		local carrierID = droneList[unitID].carrier
-		local setID = droneList[unitID].set
-		local droneSet = carrierList[carrierID].droneSets[setID]
-		droneSet.droneCount = (droneSet.droneCount - 1)
-		droneSet.drones[unitID] = nil
-		droneList[unitID] = nil
-	end
-end
-
-function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (carrierDefs[unitDefID]) then
-		carrierList[unitID] = InitCarrier(unitDefID, unitTeam)
 	end
 end
 
@@ -126,18 +126,6 @@ end
 -- morph uses this
 GG.isCarrier = isCarrier
 GG.transferCarrierData = transferCarrierData
-
-function gadget:UnitGiven(unitID, unitDefID, newTeam)
-	if carrierList[unitID] then
-		carrierList[unitID].teamID = newTeam
-		for i=1,#carrierList[unitID].droneSets do
-			local set = carrierList[unitID].droneSets[i]
-			for droneID, _ in pairs(set.drones) do
-				drones_to_move[droneID] = newTeam
-			end
-		end
-	end
-end
 
 local function GetDistance(x1, x2, y1, y2)
 	return ((x1-x2)^2 + (y1-y2)^2)^0.5
@@ -193,6 +181,9 @@ local function UpdateCarrierTarget(carrierID)
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
@@ -206,6 +197,45 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return false
 	else
 		return true
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if (carrierList[unitID]) then
+		local carrier = carrierList[unitID]
+		for i=1,#carrier.droneSets do
+			local set = carrier.droneSets[i]
+			for droneID in pairs(set.drones) do
+				droneList[droneID] = nil
+				killList[droneID] = true
+			end
+		end
+		carrierList[unitID] = nil
+	elseif (droneList[unitID]) then
+		local carrierID = droneList[unitID].carrier
+		local setID = droneList[unitID].set
+		local droneSet = carrierList[carrierID].droneSets[setID]
+		droneSet.droneCount = (droneSet.droneCount - 1)
+		droneSet.drones[unitID] = nil
+		droneList[unitID] = nil
+	end
+end
+
+function gadget:UnitFinished(unitID, unitDefID, unitTeam)
+	if (carrierDefs[unitDefID]) then
+		carrierList[unitID] = InitCarrier(unitID, unitDefID, unitTeam)
+	end
+end
+
+function gadget:UnitGiven(unitID, unitDefID, newTeam)
+	if carrierList[unitID] then
+		carrierList[unitID].teamID = newTeam
+		for i=1,#carrierList[unitID].droneSets do
+			local set = carrierList[unitID].droneSets[i]
+			for droneID, _ in pairs(set.drones) do
+				drones_to_move[droneID] = newTeam
+			end
+		end
 	end
 end
 
@@ -255,3 +285,6 @@ function gadget:Initialize()
 		end
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
