@@ -335,6 +335,19 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true, emitVector = {0, 0, 1}}},
     {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true, emitVector = {0, 0, 1}}},
   },
+  nebula = {
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=15, length=60, piece="exhaustmain", onActive=true}}, 
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=8, length=25, piece="exhaust1", onActive=true, emitVector = {0, 1, 0}}},  
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=8, length=25, piece="exhaust2", onActive=true, emitVector = {0, 1, 0}}},
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=8, length=25, piece="exhaust3", onActive=true, emitVector = {0, 1, 0}}},
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=8, length=25, piece="exhaust4", onActive=true, emitVector = {0, 1, 0}}},
+    {class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="light2"}) },
+    {class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light1"}) },    
+  },
+  fighterdrone = {
+    --{class='AirJet', options={color={0.6,0.1,0.0}, width=3, length=40, piece="DroneMain", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
+    {class='Ribbon', options={width=1, size=24, piece="DroneMain"}},
+  },
  }
 
 effectUnitDefsXmas = {}

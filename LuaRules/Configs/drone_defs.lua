@@ -9,7 +9,8 @@ local carrierDefNames = {
 		{drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 6, spawnSize = 2, range = 800},
 		{drone = UnitDefNames.battledrone.id, reloadTime = 15, maxDrones = 2, spawnSize = 1, range = 800},
 	},
-	nebula = { 
+	nebula = {
+		spawnPieces = {"pad1", "pad2", "pad3", "pad4"},
 		{drone = UnitDefNames.fighterdrone.id, reloadTime = 15, maxDrones = 8, spawnSize = 2, range = 1000},
 	},
 }

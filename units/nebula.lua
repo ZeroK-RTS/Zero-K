@@ -22,7 +22,7 @@ unitDef = {
   canSubmerge            = false,
   category               = [[GUNSHIP]],
   collide                = true,
-  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeOffsets = [[0 30 0]],
   collisionVolumeScales  = [[40 50 220]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
@@ -35,7 +35,7 @@ unitDef = {
    -- description_fr = [[Forteresse Volante]],
     description_de = [[Lufttraeger]], -- "aerial carrier"
     description_pl = [[Statek-matka]],
-    helptext       = [[As maneuverable as a brick and barely armed itself, the Nebula is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement.]],
+    helptext       = [[As maneuverable as a brick and only modestly armed itself, the Nebula is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement.]],
    -- helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
    -- helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
     helptext_de    = [[Die Nebula ist stark und ungeschickt, aber sie hat ein Schild um sich zu schutzen und kann seine einige Jaegerdrohne herstellen.]],
@@ -51,15 +51,13 @@ unitDef = {
   iconType               = [[supergunship]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maneuverleashlength    = [[500]],
   mass                   = 886,
   maxDamage              = 17500,
   maxVelocity            = 3.3,
   minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[picarrier.dae]],
-  scale                  = [[1]],
+  objectName             = [[nebula.s3o]],
   script                 = [[nebula.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
@@ -67,8 +65,9 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:BEAMWEAPON_MUZZLE_RED]],
-      [[custom:BEAMWEAPON_MUZZLE_RED]],
+      [[custom:brawlermuzzle]],
+      [[custom:plasma_hit_96]],
+      [[custom:EXP_MEDIUM_BUILDING_SMALL]],
     },
 
   },
@@ -82,61 +81,79 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[KROWLASER]],
-	  mainDir            = [[0.38 0.1 0.2]],
-	  maxAngleDif        = 180,
+      def                = [[CANNON]],
+      mainDir            = [[0 1 0]],	-- top
+      maxAngleDif        = 210,
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+    {
+      def                = [[CANNON]],
+      mainDir            = [[0 -1 0]],	-- bottom
+      maxAngleDif        = 210,
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+    {
+      def                = [[CANNON]],
+      mainDir            = [[-1 0 0]],	-- left
+      maxAngleDif        = 180,
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+    {
+      def                = [[CANNON]],
+      mainDir            = [[1 0 0]],	-- right
+      maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
     {
-      def         = [[COR_SHIELD_SMALL]],
-      maxAngleDif = 1,
+      def         = [[SHIELD]],
     },
   },
 
 
   weaponDefs             = {
 
-    KROWLASER  = {
-      name                    = [[Laserbeam]],
-      areaOfEffect            = 8,
-      avoidFeature            = false,
-      canattackground         = true,
-      collideFriendly         = false,
-      coreThickness           = 0.5,
+    CANNON = {
+      name                    = [[Kinetic Driver]],
+      alphaDecay              = 0.1,
+      areaOfEffect            = 32,
+      colormap                = [[1 0.95 0.4 1   1 0.95 0.4 1    0 0 0 0.01    1 0.7 0.2 1]],
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 36,
-        subs    = 1.8,
+        default = 40,
+        subs    = 2,
       },
 
-      duration                = 0.02,
-      explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
-      fireStarter             = 50,
-      impactOnly              = true,
+      explosionGenerator      = [[custom:plasma_hit_32]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
+      intensity               = 0.7,
       interceptedByShieldType = 1,
+      noGap                   = false,
+      noSelfDamage            = true,
       range                   = 450,
-      reloadtime              = 0.2,
-      rgbColor                = [[1 0 0]],
-      soundHit                = [[weapon/laser/lasercannon_hit]],
-      soundStart              = [[weapon/laser/heavylaser_fire2]],
-	  soundStartVolume		  = 0.7,
-      soundTrigger            = true,
-      targetMoveError         = 0.2,
-      thickness               = 3.25,
-      tolerance               = 10000,
+      reloadtime              = 0.4,
+      rgbColor                = [[1 0.95 0.4]],
+      separation              = 2,
+      size                    = 2.5,
+      sizeDecay               = 0,
+      soundStart              = [[weapon/cannon/cannon_fire8]],
+      soundHit                = [[explosion/ex_small14]],
+      sprayAngle              = 360,
+      stages                  = 12,
+      tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2300,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 1200,
     },
 
-    COR_SHIELD_SMALL = {
+    SHIELD = {
       name                    = [[Energy Shield]],
       craterMult              = 0,
 
@@ -172,10 +189,10 @@ unitDef = {
       description      = [[Wreckage - Nebula]],
       blocking         = true,
       category         = [[corpses]],
-	  collisionVolumeOffsets = [[0 0 0]],
-	  collisionVolumeScales  = [[80 30 80]],
-	  collisionVolumeTest    = 1,
-	  collisionVolumeType    = [[ellipsoid]],	  
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[40 50 220]],
+      collisionVolumeTest    = 1,
+      collisionVolumeType    = [[box]],	  
       damage           = 17500,
       energy           = 0,
       featureDead      = [[HEAP]],
@@ -185,7 +202,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 2400,
-      object           = [[krow_dead.s3o]],
+      object           = [[nebula_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 2400,
       seqnamereclamate = [[TREE1RECLAMATE]],
