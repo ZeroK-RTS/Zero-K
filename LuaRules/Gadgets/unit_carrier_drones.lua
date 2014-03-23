@@ -65,15 +65,17 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 	local carrierEntry = carrierList[unitID]
 	local _, _, _, x, y, z = GetUnitPosition(unitID, true)
 	local xS, yS, zS = x, y, z
+	local rot = 0
 	if carrierEntry.spawnPieces then
 		local piece = math.random(#carrierEntry.spawnPieces)
-		local px, py, pz = GetUnitPiecePosDir(unitID, carrierEntry.spawnPieces[piece])
-		-- TODO: might want to allow customizable direction as well
+		local px, py, pz, pdx, pdy, pdz = GetUnitPiecePosDir(unitID, carrierEntry.spawnPieces[piece])
 		xS, yS, zS = px, py, pz
+		rot = Spring.GetHeadingFromVector(pdx, pdz)/65536*2*math.pi + math.pi
 	else
 		local angle = math.rad(random(1,360))
 		xS = (x + (math.sin(angle) * 20))
 		zS = (z + (math.cos(angle) * 20))
+		rot = angle
 	end
 	local droneID = CreateUnit(droneName,xS,yS,zS,1,carrierList[unitID].teamID)
 	if droneID then
@@ -85,7 +87,9 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 		--SetUnitPosition(droneID, xS, zS, true)
 		Spring.MoveCtrl.Enable(unitID)
 		Spring.MoveCtrl.SetPosition(droneID, xS, yS, zS)
+		--Spring.MoveCtrl.SetRotation(droneID, 0, rot, 0)
 		Spring.MoveCtrl.Disable(unitID)
+		Spring.SetUnitCOBValue(droneID,82,(rot - math.pi)*65536/2/math.pi)
 		
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
