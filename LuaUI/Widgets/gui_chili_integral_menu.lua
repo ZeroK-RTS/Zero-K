@@ -477,6 +477,22 @@ local function MakeButton(container, cmd, insertItem, index)
 			}
 		end
 		
+		if isBuild then
+			local costLabel = Label:New {
+				parent = button,
+				right = 0;
+				y = 0;
+				x = 3;
+				bottom = 3;
+				autosize=false;
+				align="left";
+				valign="bottom";
+				caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
+				fontSize = 11;
+				fontShadow = true;
+			}		
+		end
+		
 		local image
 		if (texture and texture ~= "") then
 			image= Image:New {
@@ -513,19 +529,6 @@ local function MakeButton(container, cmd, insertItem, index)
 				valign="bottom";
 				caption = countText;
 				fontSize = 16;
-				fontShadow = true;
-			}
-			local costLabel = Label:New {
-				parent = button,
-				right = 0;
-				y = 0;
-				x = 3;
-				bottom = 3;
-				autosize=false;
-				align="left";
-				valign="bottom";
-				caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
-				fontSize = 11;
 				fontShadow = true;
 			}
 		end
