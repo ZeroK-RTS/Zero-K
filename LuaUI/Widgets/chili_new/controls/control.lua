@@ -73,7 +73,7 @@ Control = Object:Inherit{
   skinName        = nil,
   
   drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
-  noSelfHitTest = nil,
+  noSelfHitTest = true,
 
   useRTT = ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
   useDLists = (gl.CreateList ~= nil) and false, --FIXME broken in combination with RTT (wrong blending)
@@ -1359,6 +1359,7 @@ function Control:HitTest(x,y)
           end
         end
       end
+      --//an option that allow you to mouse click on empty panel without stealing click
 	  if self.hitTestAllowEmpty then
 		return self
 	  end
@@ -1372,14 +1373,15 @@ function Control:HitTest(x,y)
     end
   end
 
-  if
-	self.tooltip
+  if (not self.noSelfHitTest) and 
+	( self.tooltip
 	or (#self.OnMouseDown > 0)
 	or (#self.OnMouseUp > 0)
 	or (#self.OnClick > 0)
 	or (#self.OnDblClick > 0)
 	or (#self.OnMouseMove > 0)
 	or (#self.OnMouseWheel > 0)
+	)
   then
     return self
   end
