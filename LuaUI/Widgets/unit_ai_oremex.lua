@@ -427,11 +427,13 @@ local function pAIthink(goodMetal,f)
 	end
 end
 
-function widget:TeamChanged(teamID)
+local function CheckMyTeam()
 	if (spGetSpectatingState()) then
 		widgetHandler:RemoveCallIn("GameFrame")
+		return false
 	end
 	myTeamID = spGetMyTeamID()
+	return true
 end
   
 function widget:GameFrame(n)
@@ -449,7 +451,7 @@ function widget:GameFrame(n)
 		end
 	end
 	if ((n%900)==0) then
-		if (#pAIcontrolled > 0) then
+		if (#pAIcontrolled > 0) and (CheckMyTeam()) then
 			local mCur, mMax, _, mInc = spGetTeamResources(myTeamID, "metal")
 			if (mCur*1.3 >= mMax) then
 				local controlled = 0
@@ -504,10 +506,12 @@ function widget:GameFrame(n)
 		end
 	end
 	if ((n%30)==1) then
-		local mCur, mMax, _, mInc = spGetTeamResources(myTeamID, "metal")
-		local goodMetal = false
-		if ((mMax - mCur) < mInc) or ((mCur*0.9) > mMax) then goodMetal = true end
-		pAIthink(goodMetal,n)
+		if (CheckMyTeam()) then
+			local mCur, mMax, _, mInc = spGetTeamResources(myTeamID, "metal")
+			local goodMetal = false
+			if ((mMax - mCur) < mInc) or ((mCur*0.9) > mMax) then goodMetal = true end
+			pAIthink(goodMetal,n)
+		end
 	end
 end
 
