@@ -20,9 +20,9 @@ unitDef = {
   customParams        = {
     description_de = [[Kurzstrahl Roboter]],
     description_pl = [[Robot spowalniajacy]],
-    helptext       = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to 50%. Though doing no damage themselves, Moderators are effective against almost all targets.]],
-	helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 50%. Obwohl Moderatoren kein Schaden machen, sind sie effektiv gegen fast alle Ziele.]],
-	helptext_pl    = [[Promien spowalniajacy Moderatora zmniejsza predkosc ruchu i ataku trafionych jednostek maksymalnie dwukrotnie. Mimo ze nie zadaja bezposrednio obrazen, jest pomocny w walce z kazdym przeciwnikiem.]],
+    helptext       = [[The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50% in addition to dealing damage, making it effective against almost all targets.]],
+    helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 50%, deshalb sind sie effektiv gegen fast alle Ziele.]],
+    helptext_pl    = [[Promien spowalniajacy Moderatora oprocz zadawania obrazen zmniejsza predkosc ruchu i ataku trafionych jednostek maksymalnie dwukrotnie, dzieki czemu jest pomocny w walce z kazdym przeciwnikiem.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -41,7 +41,7 @@ unitDef = {
   movementClass       = [[KBOT3]],
   moveState           = 0,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB UNARMED]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SUB UNARMED]],
   objectName          = [[CORMORT.s3o]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
@@ -54,7 +54,6 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 660,
   smoothAnim          = true,
   trackOffset         = 0,
@@ -80,7 +79,7 @@ unitDef = {
   weaponDefs          = {
 
     DISRUPTOR_BEAM = {
-      name                    = [[Disruptor Pulse Beam]],
+    name                    = [[Disruptor Pulse Beam]],
 	  areaOfEffect            = 32,
 	  beamdecay               = 0.9,
 	  beamTime                = 0.03,
