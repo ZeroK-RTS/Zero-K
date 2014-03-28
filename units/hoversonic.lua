@@ -54,6 +54,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 385,
+  sonarDistance       = 360,
   smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 616,
@@ -73,7 +74,7 @@ unitDef = {
   
     SONICGUN         = {
 		name                    = [[Sonic Blaster]],
-		areaOfEffect            = 70,
+		areaOfEffect            = 50,
 		avoidFeature            = true,
 		avoidFriendly           = true,
 		burnblow                = true,
@@ -89,22 +90,22 @@ unitDef = {
 		},
 
 		damage                  = {
-			default = 175,
-			planes  = 175,
-			subs    = 175,
+			default = 350,
+			planes  = 350,
+			subs    = 350,
 		},
 		
 		cegTag					= [[sonictrail]],
 		explosionGenerator		= [[custom:sonic]],
 		edgeEffectiveness       = 0.75,
 		fireStarter             = 150,
-		impulseBoost            = 60,
-		impulseFactor           = 0.5,
+		impulseBoost            = 70,
+		impulseFactor           = 0.6,
 		interceptedByShieldType = 1,
 		lineOfSight             = true,
 		noSelfDamage            = true,
-		range                   = 320,
-		reloadtime              = 1.1,
+		range                   = 230,
+		reloadtime              = 2,
 		soundStart              = [[weapon/sonicgun]],
 		soundHit                = [[weapon/sonicgun_hit]],
 		soundStartVolume        = 12,

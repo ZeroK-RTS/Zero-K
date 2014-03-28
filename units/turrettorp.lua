@@ -46,7 +46,7 @@ unitDef = {
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
   side              = [[CORE]],
   sightDistance     = 660,
-  sonarDistance     = 800,
+  sonarDistance     = 600,
   turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
@@ -67,7 +67,7 @@ unitDef = {
 
     TORPEDO = {
       name                    = [[Torpedo Launcher]],
-      areaOfEffect            = 16,
+      areaOfEffect            = 160,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
@@ -77,7 +77,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 295,
+        default = 195,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],

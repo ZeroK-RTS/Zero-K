@@ -75,7 +75,7 @@ unitDef = {
     {
       def                = [[ATA]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER SUB]],
     },
 
   },
@@ -95,7 +95,7 @@ unitDef = {
       damage                  = {
         default = 600,
         planes  = 600,
-        subs    = 30,
+        subs    = 600,
       },
 
       explosionGenerator      = [[custom:ataalaser]],

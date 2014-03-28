@@ -16,6 +16,7 @@ unitDef = {
 	[[hoverriot]],
     [[armmanni]],
     [[hoveraa]],
+    [[hoversonic]],
   },
 
   buildPic         = [[factoryhover.png]],
