@@ -6,11 +6,11 @@ unitDef = {
   activateWhenBuilt      = true,
   brakeRate              = 0.042,
   buildAngle             = 16384,
-  buildCostEnergy        = 300,
-  buildCostMetal         = 300,
+  buildCostEnergy        = 240,
+  buildCostMetal         = 240,
   builder                = false,
   buildPic               = [[CORESUPP.png]],
-  buildTime              = 300,
+  buildTime              = 240,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -42,7 +42,7 @@ unitDef = {
   iconType               = [[corvette]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 1400,
+  maxDamage              = 800,
   maxVelocity            = 2.9,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -93,7 +93,7 @@ unitDef = {
 
     EMG = {
       name                    = [[Medium Pulse MG]],
-      areaOfEffect            = 96,
+      areaOfEffect            = 110,
       burst                   = 4,
       burstrate               = 0.1,
       burnblow                = true,
@@ -101,8 +101,8 @@ unitDef = {
       craterMult              = 0.3,
 
       damage                  = {
-        default = 9,
-        planes  = 9,
+        default = 7,
+        planes  = 7,
         subs    = 0.5,
       },
 

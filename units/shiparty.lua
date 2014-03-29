@@ -75,8 +75,8 @@ unitDef = {
 
     {
       def                = [[DEPTHCHARGE]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SUB SINK]],
+      badTargetCategory  = [[LAND]],
+      onlyTargetCategory = [[SUB SINK LAND]],
     },
 
   },
