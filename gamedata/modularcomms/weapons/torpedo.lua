@@ -1,6 +1,6 @@
 local name = "commweapon_torpedo"
 local weaponDef = {
-	name                    = [[Torpedo]],
+	name                    = [[Torpedo Launcher]],
 	areaOfEffect            = 16,
 	avoidFriendly           = false,
 	bouncerebound           = 0.5,
@@ -12,7 +12,7 @@ local weaponDef = {
 
 	customParams            = {
 		badTargetCategory  = [[FIXEDWING]],
-		onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
+		onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
 		slot = [[5]],
 	},
 
