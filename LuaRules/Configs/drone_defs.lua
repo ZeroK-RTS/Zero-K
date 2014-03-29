@@ -3,9 +3,12 @@
 local carrierDefs = {}
 
 local carrierDefNames = {
-	armcarry = { {drone = UnitDefNames.carrydrone.id, reloadTime = 15, maxDrones = 8, spawnSize = 2, range = 1600} },
+	armcarry = {
+		spawnPieces = {"support4"},
+		{drone = UnitDefNames.carrydrone.id, reloadTime = 15, maxDrones = 8, spawnSize = 2, range = 1600} },
 	--corcrw = { {drone = UnitDefNames.attackdrone.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 900} },
-	funnelweb = { 
+	funnelweb = {
+		spawnPieces = {"emitl", "emitr"},
 		{drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 6, spawnSize = 2, range = 800},
 		{drone = UnitDefNames.battledrone.id, reloadTime = 15, maxDrones = 2, spawnSize = 1, range = 800},
 	},
