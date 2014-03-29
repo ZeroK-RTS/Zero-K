@@ -224,7 +224,7 @@ end
 local function CloseButton(width)
 	return Button:New{ 
 		caption = 'Close', 
-		OnMouseUp = { CloseButtonFunc }, 
+		OnClick = { CloseButtonFunc }, 
 		width=width, 
 		height = B_HEIGHT,
 		backgroundColor=color.sub_back_bg, 
@@ -747,7 +747,7 @@ MakeStatsWindow = function(ud, x,y)
 		},	
 		Button:New{ 
 			caption = 'Close', 
-			OnMouseUp = { function(self) KillStatsWindow(num) end }, 
+			OnClick = { function(self) KillStatsWindow(num) end }, 
 			
 			x=0,
 			height=B_HEIGHT,
@@ -822,7 +822,7 @@ local function PriceWindow(unitID, action)
 		if caption then
 			grid_children[#grid_children+1] = Button:New{ 
 				caption = caption, 
-				OnMouseUp = { func, CloseButtonFunc2 }, 
+				OnClick = { func, CloseButtonFunc2 }, 
 				width=window_width,
 				height=B_HEIGHT,
 				backgroundColor=color.sub_back_bg, 
@@ -899,7 +899,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 		
 		Button:New{ 
 			caption = 'Unit Info', 
-			OnMouseUp = { function() MakeStatsWindow(ud,x,y) end }, 
+			OnClick = { function() MakeStatsWindow(ud,x,y) end }, 
 			width=window_width,
 			backgroundColor=color.sub_back_bg, 
 			textColor=color.sub_back_fg,
@@ -912,7 +912,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 		if team == myTeamID then
 			children[#children+1] =  Button:New{ 
 				caption = 'Set Sale Price', 
-				OnMouseUp = { function(self) PriceWindow(unitID, 'sell') end }, 
+				OnClick = { function(self) PriceWindow(unitID, 'sell') end }, 
 				width=window_width, 
 				backgroundColor=color.sub_back_bg, 
 				textColor=color.sub_back_fg,
@@ -920,7 +920,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 		else
 			children[#children+1] =  Button:New{ 
 				caption = 'Offer To Buy', 
-				OnMouseUp = { function(self) PriceWindow(unitID, 'buy') end }, 
+				OnClick = { function(self) PriceWindow(unitID, 'buy') end }, 
 				width=window_width, 
 				backgroundColor=color.sub_back_bg, 
 				textColor=color.sub_back_fg,
@@ -929,7 +929,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 		if myAlliance ~= alliance then
 			children[#children+1] =  Button:New{ 
 				caption = 'Place Bounty', 
-				OnMouseUp = { function(self) PriceWindow(unitID, 'bounty') end }, 
+				OnClick = { function(self) PriceWindow(unitID, 'bounty') end }, 
 				width=window_width, 
 				backgroundColor=color.sub_back_bg, 
 				textColor=color.sub_back_fg,
@@ -940,8 +940,8 @@ local function MakeUnitContextMenu(unitID,x,y)
 	
 	if ceasefires and myAlliance ~= alliance then
 		--window_height = window_height + B_HEIGHT*2 --error no such window_height!
-		children[#children+1] = Button:New{ caption = 'Vote for ceasefire', OnMouseUp = { function() spSendLuaRulesMsg('cf:y'..alliance) end }, width=window_width}
-		children[#children+1] = Button:New{ caption = 'Break ceasefire/unvote', OnMouseUp = { function() spSendLuaRulesMsg('cf:n'..alliance) spSendLuaRulesMsg('cf:b'..alliance) end }, width=window_width}
+		children[#children+1] = Button:New{ caption = 'Vote for ceasefire', OnClick = { function() spSendLuaRulesMsg('cf:y'..alliance) end }, width=window_width}
+		children[#children+1] = Button:New{ caption = 'Break ceasefire/unvote', OnClick = { function() spSendLuaRulesMsg('cf:n'..alliance) spSendLuaRulesMsg('cf:b'..alliance) end }, width=window_width}
 	end
 	children[#children+1] = CloseButton()
 	

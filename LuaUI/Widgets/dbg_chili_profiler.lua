@@ -146,13 +146,13 @@ function widget:Initialize()
 				x=0, right="50%",
 				y=-20, bottom=0,
 				caption="start",
-				OnMouseUp = {AddProfiler},
+				OnClick = {AddProfiler},
 			},
 			Chili.Button:New{
 				x="50%", right=0,
 				y=-20, bottom=0,
 				caption = "stop",
-				OnMouseUp = {function() debug.sethook( nil ); profiling = false; rendertree() end},
+				OnClick = {function() debug.sethook( nil ); profiling = false; rendertree() end},
 			},
 		},
 	}

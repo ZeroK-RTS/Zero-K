@@ -461,7 +461,7 @@ function CreateWindow()
 		tweakResizable = true,
 		minimizable = false,
 		
-		OnMouseDown={ function(self)
+		OnClick={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
 			WG.crude.OpenPath(options_path)
@@ -481,7 +481,7 @@ function CreateWindow()
 		min=0, 
 		max=1, 
 		step=0.01,
-		OnMouseUp = { 
+		OnClick = { 
 			function (self, x, y, mouse)
 				updateReserveBars(true, mouse ~= 3, trkbar_metal.value)
 			end
@@ -577,7 +577,7 @@ function CreateWindow()
 		min=0, 
 		max=1, 
 		step=0.01,
-		OnMouseUp = { 
+		OnClick = { 
 			function (self, x, y, mouse)
 				updateReserveBars(mouse ~= 3, true, trkbar_energy.value)
 			end

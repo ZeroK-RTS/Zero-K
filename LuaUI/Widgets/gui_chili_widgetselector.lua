@@ -330,7 +330,7 @@ MakeWidgetList = function()
 			Checkbox:New{ 
 				caption = 'Categorize', 
 				tooltip = 'List widgets by category',
-				OnMouseUp = { function() widget_categorize = not widget_categorize end, KillWidgetList, MakeWidgetList }, 
+				OnClick = { function() widget_categorize = not widget_categorize end, KillWidgetList, MakeWidgetList }, 
 				textColor=color.sub_fg, 
 				checked = widget_categorize,
 				

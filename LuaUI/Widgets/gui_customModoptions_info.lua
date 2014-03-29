@@ -75,7 +75,7 @@ function widget:Initialize()
 				textColor = {1,1,1,0.55}, 
 				caption="x";
 				tooltip = "Close window";
-				OnMouseUp = {function()
+				OnClick = {function()
 							window2:Dispose()
 							widgetHandler:RemoveWidget()
 						end}

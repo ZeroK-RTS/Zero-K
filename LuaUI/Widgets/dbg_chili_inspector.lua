@@ -104,7 +104,7 @@ function widget:Initialize()
 				right = 0, width = 50,
 				y=5, bottom=-25,
 				caption="gc",
-				OnMouseUp = {function() collectgarbage("collect") end},
+				OnClick = {function() collectgarbage("collect") end},
 			},
 			Chili.ScrollPanel:New{
 				x=0, right=0,
@@ -127,15 +127,15 @@ function widget:Initialize()
 				children = {
 					Chili.Button:New{
 						caption="visible objects",
-						OnMouseUp = {function() tree0.root:Clear(); trace(Chili.Screen0.children, tree0.root) end},
+						OnClick = {function() tree0.root:Clear(); trace(Chili.Screen0.children, tree0.root) end},
 					},
 					Chili.Button:New{
 						caption="lost objects",
-						OnMouseUp = {function() tree0.root:Clear(); traceLost(tree0.root) end},
+						OnClick = {function() tree0.root:Clear(); traceLost(tree0.root) end},
 					},
 					Chili.Button:New{
 						caption="per widget",
-						OnMouseUp = {function() tree0.root:Clear(); tracePerWidget(tree0.root) end},
+						OnClick = {function() tree0.root:Clear(); tracePerWidget(tree0.root) end},
 					},
 				},
 			},

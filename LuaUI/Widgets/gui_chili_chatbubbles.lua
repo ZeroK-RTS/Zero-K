@@ -317,7 +317,7 @@ function widget:AddChatMessage(msg)
 
 		custom_timeadded = GetTimer(),
 		window_id = newWindowID(),
-		OnMouseDown = {function()
+		OnClick = {function()
 			local _, _, meta, _ = Spring.GetModKeyState()
 			if meta then
 				WG.crude.OpenPath('Settings/HUD Panels/Chat') --click + space will shortcut to option-menu
@@ -452,13 +452,13 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		window_id = window_id,
 
 		draggable = false,
-		OnMouseDown = {function()
+		OnClick = {function()
 			local p = windows_points[window_id]
 			Spring.SetCameraTarget(p.x, p.y, p.z,1)
 			return true --capture click (don't allow window to pass the click). this prevent user from accidentally clicking on the ground while clicking on the window.
 		end},
 	}
-	function w:HitTest(x,y)  -- FIXME: chili hacked to allow OnMouseDown on window
+	function w:HitTest(x,y)  -- FIXME: chili hacked to allow OnClick on window
 		return self
 	end 
 

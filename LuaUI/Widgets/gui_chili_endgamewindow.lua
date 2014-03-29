@@ -260,7 +260,7 @@ local function SetupControls()
 		height=B_HEIGHT;
 		caption="Awards",
 		backgroundColor = magenta_table;
-		OnMouseUp = {
+		OnClick = {
 			ShowAwards
 		};
 		parent = window_endgame;
@@ -269,7 +269,7 @@ local function SetupControls()
 		x=80, y=0,
 		height=B_HEIGHT;
 		caption="Statistics",
-		OnMouseUp = {
+		OnClick = {
 			ShowStats
 		};
 		parent = window_endgame;
@@ -281,7 +281,7 @@ local function SetupControls()
 		right=0;
 		height=B_HEIGHT;
 		caption="Exit",
-		OnMouseUp = {
+		OnClick = {
 			function() Spring.SendCommands("quit","quitforce") end
 		};
 		parent = window_endgame;

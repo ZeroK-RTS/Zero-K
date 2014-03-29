@@ -465,7 +465,7 @@ function widget:Initialize()
 		backgroundColor = {1, 1, 1, 0.4},
 		caption="";
 		tooltip = "Close Tip Dispenser";
-		OnMouseDown = {function() Spring.SendCommands("luaui disablewidget ".. widgetName) end}
+		OnClick = {function() Spring.SendCommands("luaui disablewidget ".. widgetName) end}
 	}
 	closeImage = Image:New {
 		width = 16,

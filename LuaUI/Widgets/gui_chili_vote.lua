@@ -252,7 +252,7 @@ function widget:Initialize()
 			width = "20%",
 			height = "100%",
 			caption = (i==1) and 'Yes' or 'No',
-			OnMouseDown = {	function () 
+			OnClick = {	function () 
 					--if voteAntiSpam then return end
 					--voteAntiSpam = true
 					local notSpam = CheckForVoteSpam (os.clock())
@@ -278,7 +278,7 @@ function widget:Initialize()
 		backgroundColor = {1, 1, 1, 0.4},
 		caption="";
 		tooltip = "End vote (requires server admin)";
-		OnMouseDown = {function() 
+		OnClick = {function() 
 				--if voteAntiSpam then return end
 				--voteAntiSpam = true
 				local notSpam = CheckForVoteSpam (os.clock())

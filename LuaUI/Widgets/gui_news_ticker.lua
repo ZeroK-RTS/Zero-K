@@ -449,7 +449,7 @@ function widget:Initialize()
 		height = fontSize * 2,
 		parent = window_ticker,
 		backgroundColor = {nil,nil,nil,options.backgroundOpacity.value or 0.7},
-		OnMouseDown={ function(self) --//shortcut to option menu.
+		OnClick={ function(self) --//shortcut to option menu.
 				local _,_, meta,_ = Spring.GetModKeyState()
 				if not meta then return false end
 				WG.crude.OpenPath(options_path)

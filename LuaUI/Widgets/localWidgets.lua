@@ -98,7 +98,7 @@ function CreateWindow()
 
   local button = Chili.Button:New({
     caption = "close",
-    OnMouseUp = {Close}
+    OnClick = {Close}
   })
   contentPane:AddChild(button)
 

@@ -75,7 +75,7 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
     children = {
       Chili.Button:New{ 
         caption = 'Close', 
-        OnMouseUp = { function(self) 
+        OnClick = { function(self) 
           window:Dispose()
           if pause then
             Spring.SendCommands("pause 0")

@@ -647,7 +647,7 @@ local function displayMessage(msg, remake)
 					backgroundColor = {1,1,1,options.pointButtonOpacity.value},
 					caption = '',
 					children = { textbox, },
-					OnMouseDown = {function(self, x, y, mouse)
+					OnClick = {function(self, x, y, mouse)
 						local alt,ctrl, meta,shift = Spring.GetModKeyState()
 						if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
 						Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
@@ -657,7 +657,7 @@ local function displayMessage(msg, remake)
 			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
 				local cur = WG.alliedCursorsPos[msg.player.id]
 				if cur then
-					textbox.OnMouseDown = {function(self, x, y, mouse)
+					textbox.OnClick = {function(self, x, y, mouse)
 							local alt,ctrl, meta,shift = Spring.GetModKeyState()
 							if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
 							local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
@@ -994,7 +994,7 @@ function widget:Initialize()
 			scrollpanel1,
 			inputspace,
 		},
-		OnMouseDown = {
+		OnClick = {
 			function(self) --//click on scroll bar shortcut to "Settings/HUD Panels/Chat/Console".
 				local _,_, meta,_ = Spring.GetModKeyState()
 				if not meta then return false end

@@ -378,13 +378,13 @@ function widget:Initialize()
 	Trackbar = Chili.Trackbar
 	screen0 = Chili.Screen0
 	
-	rotX = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|turn|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	rotY = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|turn|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	rotZ = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|turn|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotX = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnClick = { function(self) SendMessageCheck("animator|turn|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotY = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnClick = { function(self) SendMessageCheck("animator|turn|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	rotZ = Trackbar:New{ min=-PI,max=PI, step=0.1, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnClick = { function(self) SendMessageCheck("animator|turn|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
 	
-	posX = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|move|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	posY = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|move|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
-	posZ = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnMouseUp = { function(self) SendMessageCheck("animator|move|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posX = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnClick = { function(self) SendMessageCheck("animator|move|x|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posY = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnClick = { function(self) SendMessageCheck("animator|move|y|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
+	posZ = Trackbar:New{ min=-100,max=100, step=2, value = 0, width="80%",right=0, height=B_HEIGHT, unitID=0, pieceNum=0, OnClick = { function(self) SendMessageCheck("animator|move|z|" .. self.unitID .. '|' .. self.pieceNum .. '|' .. self.value ) end }, }
 	
 	showButton = Button:New{ caption = 'Show', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) SendMessageCheck("animator|show|" .. self.unitID .. '|' .. self.pieceNum ) end }, }
 	hideButton = Button:New{ caption = 'Hide', width='30%', pieceNum=0, height=B_HEIGHT, OnClick = { function(self) SendMessageCheck("animator|hide|" .. self.unitID .. '|' .. self.pieceNum ) end }, }

@@ -82,7 +82,7 @@ local function AddObjective(id, title, details, pos, status, color)
 		tooltip = details,
 		hitTestAllowEmpty = true,
 		--backgroundColor = {1, 1, 1, 0},
-		OnMouseUp = pos and {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end} or nil
+		OnClick = pos and {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end} or nil
 	}
 	obj.label = Label:New{
 		parent = obj.panel,
@@ -142,7 +142,7 @@ local function ModifyObjective(id, title, details, pos, status, color)
 		obj.panel.tooltip = details
 	end
 	if pos then
-		obj.panel.OnMouseUp = {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end}
+		obj.panel.OnClick = {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end}
 	end
 	if status then
 		status = string.lower(status)
@@ -227,7 +227,7 @@ function widget:Initialize()
 		height = 64,
 		width = 64,
 		caption = '',
-		OnMouseUp = {	function () 
+		OnClick = {	function () 
 				Expand()
 			end},
 		padding = {8,8,8,8},
@@ -261,7 +261,7 @@ function widget:Initialize()
 		height = 24,
 		width = 24,
 		caption = '',
-		OnMouseUp = {	function () 
+		OnClick = {	function () 
 				Minimize()
 			end},
 		backgroundColor = {1, 1, 1, 0},

@@ -151,7 +151,6 @@ local function CreateWindow()
 					x = (i*posterx),
 					padding = {1,1,1,1},
 					OnClick = {option.button},
-					--OnMouseUp = {option.button},
 					y = 9 
 					}
 				local buttonWidth = posterx*2/3
@@ -165,7 +164,6 @@ local function CreateWindow()
 							width = buttonWidth,
 							height = 30,
 							padding={1,1,1,1},
-						--OnMouseUp = {option.button},
 							OnClick = {option.button},-- used onclick in case people change their mind, mouseup register the option you were when pressed on, even if you moved somewhere else while still hold mouse button. onclick register it only if you're still on it (even if you moved to another part of the comm button).
 							}
 					end 
@@ -183,7 +181,6 @@ local function CreateWindow()
 			height = 30,
 			x = (posterx*active - cbWidth)/2,
 			y = postery + (buttonspace)/2+14,
-			--OnMouseUp = {Close}
 			OnClick = {function() Close(false) end}
 		}
 	else
@@ -247,7 +244,6 @@ function widget:Initialize()
 			height = "100%",
 			x = 0,
 			y = 0,
-			--OnMouseUp = {Close}
 			OnClick = {function() Spring.SendCommands({"luaui "..actionShow}) end}	
 		}
 		

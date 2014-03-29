@@ -94,7 +94,7 @@ function widget:Initialize()
 		backgroundColor = {1, 1, 0, 1},		
 		caption=speeds[i] .."x",
 		tooltip = "play at " .. speeds[i] .. "x speed";
-		OnMouseDown = {function()
+		OnClick = {function()
 			setReplaySpeed (speeds[i], i)
 			button_setspeed.backgroundColor = {0, 0, 1, 1}
 			end}
@@ -111,7 +111,7 @@ function widget:Initialize()
 		margin = {0, 0, 0, 0},
 		caption="skip pregame chatter",
 		tooltip = "Skip the pregame chat and startposition chosing, directly to the action!";
-		OnMouseDown = {function()
+		OnClick = {function()
 			skipPreGameChatter ()
 			end}
 	}
@@ -126,7 +126,7 @@ function widget:Initialize()
 		margin = {0, 0, 0, 0},
 		caption="pause", --pause/continue
 		tooltip = "pause or continue playback";
-		OnMouseDown = {function()
+		OnClick = {function()
 			if (isPaused) then
 				unpause ()
 			else

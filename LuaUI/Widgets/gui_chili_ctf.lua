@@ -279,7 +279,7 @@ function widget:Update(s)
 					children = {
 						extra_com, 
 					},
-					OnMouseDown = {
+					OnClick = {
 						function()
 							if (not Spring.GetSpectatingState()) then
 								spawn_mode = not(spawn_mode)
