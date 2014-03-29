@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.283 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.284 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2014-2-3
     license   = "GNU GPL, v2 or later",
@@ -45,8 +45,8 @@ local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitIsStunned	   = Spring.GetUnitIsStunned
 local SelectUnitArray = Spring.SelectUnitArray
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spAreTeamsAllied = Spring.AreTeamsAllied
 
---local AreTeamsAllied   = Spring.AreTeamsAllied
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
 --local IsGuiHidden		=	Spring.IsGUIHidden
 
@@ -300,19 +300,32 @@ end
 
 local function SetWantRetreat(unitID, want)
 	if want then
-		if not pauseRetreatChecks[unitID] and not (retreatRearmOrders[unitID] or retreatMoveOrders[unitID]) then
-			local unitDefID = GetUnitDefID(unitID)
-			local movetype = Spring.Utilities.getMovetype(UnitDefs[unitDefID])
-			if (movetype==0 or movetype==1) and (#airpadList > 0) and (havenCount==0 or HaveEmptyAirpad()) then
+		local movetype = Spring.Utilities.getMovetype(UnitDefs[GetUnitDefID(unitID)])
+		local isFlyingUnit = (movetype==0 or movetype==1)
+		local isRetreating = (retreatRearmOrders[unitID] or retreatMoveOrders[unitID])
+		local haveRetreatZone = (havenCount > 0)
+		local haveAirpad = (#airpadList > 0)
+		if not pauseRetreatChecks[unitID] then
+			--//if User did not override command
+			if not isRetreating then
+				--//if Unit did not retreating
+				if isFlyingUnit and haveAirpad and (not haveRetreatZone or HaveEmptyAirpad()) then
+					--//if Unit is flying unit and have airpad, then rearm
+					StartRearm(unitID)
+					if options.removeFromSelection.value then
+						retreatedUnits[#retreatedUnits+1] = unitID
+					end
+				elseif haveRetreatZone then
+					--//if Unit is not flying unit, retreat to retreat zone
+					StartRetreat(unitID)
+					if options.removeFromSelection.value then
+						retreatedUnits[#retreatedUnits+1] = unitID
+					end
+				end
+			elseif retreatMoveOrders[unitID] and isFlyingUnit and haveAirpad and (not haveRetreatZone or HaveEmptyAirpad()) then
+				--//if Unit is (was) retreating to retreat zone and is flying unit and have empty airpad, then rearm
+				StopRetreating(unitID)
 				StartRearm(unitID)
-				if options.removeFromSelection.value then
-					retreatedUnits[#retreatedUnits+1] = unitID
-				end
-			elseif (havenCount > 0) then
-				StartRetreat(unitID)
-				if options.removeFromSelection.value then
-					retreatedUnits[#retreatedUnits+1] = unitID
-				end
 			end
 		end
 	elseif retreatMoveOrders[unitID] then 
@@ -509,17 +522,18 @@ end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	RemoveUnitData(unitID)
-	if airpadDefs[unitDefID] then
-		if newTeam == myTeamID then
-			airpadList[#airpadList+1] = unitID
-		elseif oldTeam== myTeamID then
-			for i=1, #airpadList do
-				if airpadList[i]==unitID then
-					airpadList[i] = airpadList[#airpadList]
-					airpadList[#airpadList] = nil
-					break;
-				end
+	if airpadDefs[unitDefID] and not spAreTeamsAllied(newTeam,myTeamID) then --airpad changed ally
+		local wasOurs = false
+		for i=1, #airpadList do
+			if airpadList[i]==unitID then
+				airpadList[i] = airpadList[#airpadList]
+				airpadList[#airpadList] = nil --was ours, enemy took
+				wasOurs = true
+				break;
 			end
+		end
+		if not wasOurs then
+			airpadList[#airpadList+1] = unitID --not ours, we took
 		end
 	end
 end

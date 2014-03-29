@@ -17,7 +17,7 @@ function gadget:GetInfo()
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
     author    = "xponen, KingRaptor",
-    date      = "22 March 2014, 25 Feb 2011",
+    date      = "29 March 2014, 25 Feb 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -314,7 +314,7 @@ local function FindNearestAirpad(unitID, team)
 		local excessReservation = math.modf(airpadsData[airpadID].reservations.count/airpadsData[airpadID].cap) --output: return "0" if airpad NOT full, return "1" if airpad is full, return "2" if twice as full, return "3" if thrice as full.
 		excessReservation = math.min(10,excessReservation) --clamp to avoid crazy value
 		local dist = Spring.GetUnitSeparation(unitID, airpadID, true)
-		dist = dist + (10*excessReservation)^2
+		dist = dist + (50*excessReservation)^2
 		dist = math.min(999998, dist) --clamp to avoid crazy value
 		if (dist < minDist) then
 			minDist = dist

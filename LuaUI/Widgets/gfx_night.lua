@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.11"
+local versionNumber = "v1.5.12"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -79,6 +79,7 @@ local cache = {} --cache some calculation result for efficiency
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function UpdateColors() end	-- redefined below
+local function UpdateDayPeriod() end
 
 options_path = 'Settings/Graphics/Effects/Night View'
 options_order = {"coloredUnits", "cycle", "time","secperday", "beam", "bases"}
@@ -120,11 +121,12 @@ options = {
 		name = "Game Minute Per Day",
 		type = 'number',
 		min = 1, 
-		max = 100, 
+		max = 20, 
 		step = 1,		
 		value = 2,
 		OnChange = function(self)
 			secondsPerDay = self.value*60
+			UpdateDayPeriod()
 			Spring.Echo(self.value .. " Minute") 
 		end,
 	},	
@@ -516,21 +518,25 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 local update = 0
-local updatePeriod = 0.25
-function widget:Update(dt)
-  local userSpeed, speedFactor, paused = GetGameSpeed()
-  if (not paused) then
-    update = update + dt
-    searchlightBuildingAngle = searchlightBuildingAngle + dt * userSpeed
-    if update > updatePeriod then
+local updatePeriod = 7
+local updateSecond = updatePeriod*0.0333
+local dayPerUpdate = updateSecond/secondsPerDay --dayPerUpdate range from 0 -> 1
+
+UpdateDayPeriod = function()
+	dayPerUpdate = updateSecond/secondsPerDay
+end
+
+function widget:GameFrame(n)
+	update = update + 1
+	searchlightBuildingAngle = searchlightBuildingAngle + 0.0333
+	if update > updatePeriod then
 		if (options.cycle.value) then
-			currDayTime = currDayTime + update * userSpeed / secondsPerDay
+			currDayTime = currDayTime + dayPerUpdate
 			currDayTime = currDayTime - math.floor(currDayTime) --currDayTime range from 0 -> 1
 			UpdateColors()
 		end
 		update = 0
-    end
-  end
+	end
 end
 
 function widget:DrawWorldPreUnit()
