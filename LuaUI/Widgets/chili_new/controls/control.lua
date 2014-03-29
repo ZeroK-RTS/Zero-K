@@ -69,15 +69,13 @@ Control = Object:Inherit{
     pressed  = false,
     enabled  = true, --FIXME implement
   },
+
   skin            = nil,
   skinName        = nil,
-  
+
   drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
   noSelfHitTest = true,
 
-  useRTT = ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
-  useDLists = (gl.CreateList ~= nil) and false, --FIXME broken in combination with RTT (wrong blending)
-  
   OnResize        = {},
 }
 
@@ -185,8 +183,8 @@ end
 --- Adds a child object to the control
 -- @tparam object.Object obj child object
 -- @param dontUpdate if true won't trigger a RequestRealign()
-function Control:AddChild(obj, dontUpdate, index)
-  inherited.AddChild(self,obj, dontUpdate, index)
+function Control:AddChild(obj, dontUpdate)
+  inherited.AddChild(self,obj)
   if (not dontUpdate) then
     self:RequestRealign()
   end
@@ -888,11 +886,7 @@ end
 --//=============================================================================
 
 function Control:_CheckIfRTTisAppreciated()
-	if (self.width <= 0)or(self.height <= 0) then
-		return false
-	end
-
-	if self._cantUseRTT or not(self.useRTT) then
+	if self._cantUseRTT then
 		return false
 	end
 
@@ -913,10 +907,12 @@ end
 function Control:_UpdateOwnDList()
 	if not self.parent then return end
 	if not self:IsInView() then return end
-	if not self.useDLists then return end
+
+	self:CallChildren('_UpdateOwnDList')
 
 	gl.DeleteList(self._own_dlist)
-	self._own_dlist = gl.CreateList(self.DrawControl, self)
+	--self._own_dlist = nil
+	--self._own_dlist = gl.CreateList(self.DrawControl, self)
 end
 
 
@@ -929,21 +925,15 @@ function Control:_UpdateChildrenDList()
 		if (contentWidth <= 0)or(contentHeight <= 0) then return end
 		self:CreateViewTexture("children", contentWidth, contentHeight, self.DrawChildrenForList, self, true)
 	end
-
-	--FIXME
-	--if self.useDLists then
-	--	self._children_dlist = gl.CreateList(self.DrawChildrenForList, self, true)
-	--end
 end
 
 
 function Control:_UpdateAllDList()
 	if not self.parent then return end
 	if not self:IsInView() then return end
+	if (self.width <= 0)or(self.height <= 0) then return end
 
 	local RTT = self:_CheckIfRTTisAppreciated()
-
-	gl.DeleteList(self._all_dlist)
 
 	if RTT then
 		self._usingRTT = true
@@ -955,23 +945,19 @@ function Control:_UpdateAllDList()
 		local fboName = "_fbo_" .. suffix_name
 		local texw = "_texw_" .. suffix_name
 		local texh = "_texh_" .. suffix_name
-		if gl.DeleteFBO then
-			gl.DeleteFBO(self[fboName])
-			gl.DeleteTexture(self[texname])
-			gl.DeleteRBO(self[texStencilName])
-		end
+		gl.DeleteFBO(self[fboName])
+		gl.DeleteTexture(self[texname])
+		gl.DeleteRBO(self[texStencilName])
 		self[texStencilName] = nil
 		self[texname] = nil
 		self[fboName] = nil
 		self[texw] = nil
 		self[texh] = nil
 		self._usingRTT = false
-
-		--FIXME
-		--if self.useDLists then
-		--	self._all_dlist = gl.CreateList(self.DrawForList,self)
-		--end
 	end
+
+	--gl.DeleteList(self._all_dlist)
+	--self._all_dlist = gl.CreateList(self.DrawForList,self)
 
 	if (self.parent)and(not self.parent._needRedraw)and(self.parent._UpdateAllDList) then
 		TaskHandler.RequestInstantUpdate(self.parent)
@@ -1265,6 +1251,7 @@ end
 function Control:Draw()
 	self._redrawCounter = (self._redrawCounter or 0) + 1
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then self:InvalidateSelf() end
+	if (self.width <= 0)or(self.height <= 0) then return end
 
 	if (self._tex_all) then
 		gl.PushMatrix()
@@ -1359,10 +1346,6 @@ function Control:HitTest(x,y)
           end
         end
       end
-      --//an option that allow you to mouse click on empty panel without stealing click
-	  if self.hitTestAllowEmpty then
-		return self
-	  end
     end
   end
 
@@ -1373,15 +1356,14 @@ function Control:HitTest(x,y)
     end
   end
 
-  if (not self.noSelfHitTest) and 
-	( self.tooltip
+  if (not self.noSelfHitTest) and
+	self.tooltip
 	or (#self.OnMouseDown > 0)
 	or (#self.OnMouseUp > 0)
 	or (#self.OnClick > 0)
 	or (#self.OnDblClick > 0)
 	or (#self.OnMouseMove > 0)
 	or (#self.OnMouseWheel > 0)
-	)
   then
     return self
   end

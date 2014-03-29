@@ -251,7 +251,7 @@ SafeCall = xpcall_va --// external code should access it via Chili.SafeCall()
 local orig_gl = gl
 local cdCreateList = gl.CreateList
 gl = {}
-setmetatable(gl,{__index=function(t,i) t[i] = orig_gl[i] or false; return t[i]; end}) --// use metatable to copy table entries on-demand
+setmetatable(gl,{__index=function(t,i) t[i] = orig_gl[i]; return t[i]; end}) --// use metatable to copy table entries on-demand
 gl.CreateList = function(...)
 	return cdCreateList(xpcall_va, ...)
 end
