@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.284 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.285 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2014-2-3
     license   = "GNU GPL, v2 or later",
@@ -298,35 +298,41 @@ local function StartRetreat(unitID, force)
 	end
 end
 
-local function SetWantRetreat(unitID, want)
+local function SetWantRetreat(unitID, want,divert)
 	if want then
 		local movetype = Spring.Utilities.getMovetype(UnitDefs[GetUnitDefID(unitID)])
 		local isFlyingUnit = (movetype==0 or movetype==1)
 		local isRetreating = (retreatRearmOrders[unitID] or retreatMoveOrders[unitID])
-		local haveRetreatZone = (havenCount > 0)
-		local haveAirpad = (#airpadList > 0)
 		if not pauseRetreatChecks[unitID] then
 			--//if User did not override command
 			if not isRetreating then
 				--//if Unit did not retreating
-				if isFlyingUnit and haveAirpad and (not haveRetreatZone or HaveEmptyAirpad()) then
+				if isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
 					--//if Unit is flying unit and have airpad, then rearm
 					StartRearm(unitID)
 					if options.removeFromSelection.value then
 						retreatedUnits[#retreatedUnits+1] = unitID
 					end
-				elseif haveRetreatZone then
+				elseif (havenCount > 0) then
 					--//if Unit is not flying unit, retreat to retreat zone
 					StartRetreat(unitID)
 					if options.removeFromSelection.value then
 						retreatedUnits[#retreatedUnits+1] = unitID
 					end
 				end
-			elseif retreatMoveOrders[unitID] and isFlyingUnit and haveAirpad and (not haveRetreatZone or HaveEmptyAirpad()) then
+			elseif retreatMoveOrders[unitID] and isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
 				--//if Unit is (was) retreating to retreat zone and is flying unit and have empty airpad, then rearm
 				StopRetreating(unitID)
 				StartRearm(unitID)
 			end
+		end
+	elseif divert then
+		local movetype = Spring.Utilities.getMovetype(UnitDefs[GetUnitDefID(unitID)])
+		local isFlyingUnit = (movetype==0 or movetype==1)
+		if not pauseRetreatChecks[unitID] and retreatMoveOrders[unitID] and isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
+			--//if Unit is (was) retreating to retreat zone and is flying unit and have empty airpad, then rearm
+			StopRetreating(unitID)
+			StartRearm(unitID)
 		end
 	elseif retreatMoveOrders[unitID] then 
 		StopRetreating(unitID)
@@ -351,6 +357,8 @@ local function CheckSetWantRetreat(unitID, retreatOrder)
 			SetWantRetreat(unitID, true)
 		elseif (healthRatio == 1) then
 			SetWantRetreat(unitID, nil)
+		elseif healthRatio > threshold and healthRatio ~= 1 and (not inBuild) then
+			SetWantRetreat(unitID, nil,true)
 		end
 	end
 end
