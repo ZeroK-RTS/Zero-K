@@ -513,7 +513,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-    dante = {
+	dante = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -554,7 +554,7 @@ local sounds = {
 		},
 	},
 	scorpion = {
-        ok = {
+		ok = {
 			[1] = "spy_move",
 		},
 		select = {
@@ -567,6 +567,14 @@ local sounds = {
 		},
 		select = {
 			[1] = "turret_select",
+		},
+	},
+	nebula = {
+		ok = {
+			[1] = "gunship_move",
+		},
+		select = {
+			[1] = "heavy_gunship_select",
 		},
 	},
 	

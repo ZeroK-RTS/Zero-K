@@ -769,6 +769,10 @@ local icontypes = {
     bitmap='icons/supergunship.dds',
     size=2.8,
   },
+  nebula = {
+    bitmap='icons/nebula.dds',
+    size=4,
+  },
   airtransport = {
     bitmap='icons/airtransport.dds',
     size=2.3,

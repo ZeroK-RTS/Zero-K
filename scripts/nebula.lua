@@ -69,12 +69,14 @@ function script.AimWeapon(num, heading, pitch)
 		return false
 	end
 	if num == 3 or num == 4 then
-		if num == 4 and heading/math.pi < 1.5 then
-		    heading = -2*math.pi/2 + heading
-		    pitch = -pitch + math.pi 
-		elseif num == 3 and heading/math.pi > 0.5 then
-		    heading = -2*math.pi/2 + heading
-		    pitch = -pitch + math.pi 
+		if (heading/math.pi < 1.5 and heading/math.pi > 0.5) then
+		    if num == 4 then
+			heading = -2*math.pi/2 + heading
+			pitch = -pitch + math.pi 
+		    elseif num == 3 then
+			heading = -2*math.pi/2 + heading
+			pitch = -pitch + math.pi 
+		    end
 		end
 		Turn(weapons[num].pitch, x_axis, -pitch, math.rad(240))
 		Turn(weapons[num].yaw, y_axis, heading, math.rad(120))
