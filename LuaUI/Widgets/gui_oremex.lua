@@ -171,8 +171,8 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	local oremex = (tonumber(modOptions.oremex) == 1)
-	local oredmg = (tonumber(modOptions.oremex_harm) > 0)
+	local oremex = modOptions.oremex and (tonumber(modOptions.oremex) == 1) or false
+	local oredmg = modOptions.oremex_harm and (tonumber(modOptions.oremex_harm) > 0) or 0
 	
 	if (oremex == false) then
 		widgetHandler:RemoveWidget()
