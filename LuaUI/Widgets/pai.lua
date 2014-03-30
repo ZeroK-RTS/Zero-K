@@ -1158,7 +1158,6 @@ local function pAI_CentralCommandOrders(f)
 			elseif (type == JOB_SCOUT) then
 				if (inLos) then
 					if (data.cmdID > 0) and (spTestBuildOrder(UnitDefNames["cormex"].id, x, 0 ,z, 0) == 2) then
-					  Spring.Echo('yay')
 						pAI_jobs[jobID].type = JOB_BUILD -- inLOS, switch for build order
 					else
 						pAI_JobDestroyed(jobID, false)
