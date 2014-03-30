@@ -616,7 +616,7 @@ function widget:DrawWorld()
   local info, unitID
   
   if extraDrawRange and selUnitID and cmd == CMD_ATTACK then
-    local fx, fy, fz = GetUnitPosition(selUnitID)
+    local _,_,_,fx, fy, fz = GetUnitPosition(selUnitID, true)
 	if fx then
 		glColor(1, 0.35, 0.35, 0.75)
 		glLineWidth(1)
@@ -635,7 +635,7 @@ function widget:DrawWorld()
     return
   end
   
-  local fx, fy, fz = GetUnitPosition(unitID)
+  local _,_,_,fx, fy, fz = GetUnitPosition(unitID, true)
   
   if (not fx) then return end
   if (not info.mobile) then fy = fy + GetUnitRadius(unitID) end
