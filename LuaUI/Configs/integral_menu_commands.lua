@@ -14,7 +14,6 @@ local tooltips = {
 	moveState = "Move State: Sets how far out of its way a unit will move to attack enemies",
 	["repeat"] = "Repeat: if on the unit will continously push finished orders to the end of its order queue",
 	dropflag = "Drop flag on the ground.",
-	autoeco = "Automaticly hunt down ore.",
 }
 
 local factories = {
@@ -29,7 +28,7 @@ local factories = {
 	factorytank = {order = 9},
 	factoryamph = {order = 10},
 	factoryship = {order = 11},
-    striderhub = {order = 12},
+	striderhub = {order = 12},
 }
 
 --Integral menu is NON-ROBUST
@@ -267,7 +266,7 @@ local overrides = {
 	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, text=''},
 	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, text=''},
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
-	[CMD_AUTOECO] = { texture = {imageDir .. 'states/autoeco_off.png', imageDir .. 'states/autoeco_on.png'}, text=''},
+	[CMD_AUTOECO] = { texture = {imageDir .. 'states/autoeco_off.png', imageDir .. 'states/autoeco_misc.png', imageDir .. 'states/autoeco_on.png'}, text=''},
 	}
 
 -- This is the list of name ("action name") related to unit command. This name won't work using command line (eg: /fight, won't activate FIGHT command) but it can be binded to a key (eg: /bind f fight, will activate FIGHT when f is pressed)

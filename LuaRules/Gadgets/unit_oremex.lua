@@ -1,4 +1,4 @@
-local version = "1.0.4"
+local version = "1.0.5"
 
 function gadget:GetInfo()
 	return {
@@ -20,7 +20,18 @@ end
 --TODO different ore colors.
 --TODO different ore size models, pile of chunks should combine into bigger pile of chunks so we keep less features overall and less lag...
 
+--BUGS:
+-- 1) Overdrive breakage.
+--	Steps to reproduce:
+-- 	1) connect gaia mex to grid.
+--	2) disconnect gaia mex by destroying your own stuff.
+--	3) /luarules reload.
+--	4) reconnect mex.
+--	5) it will say "not connected to grid".
+-- Impossible to reproduce in regular zero-k, because you never meet gaia giving you stuff, so I don't know what's wrong.
+
 -- changelog
+-- 30 march 2014 - 1.0.5. Income rewrite. Damage off. Crystals on. You can check income by looking over extractors.
 -- 22 march 2014 - 1.0.4. Widget is now AI micro assistant. It also has it's own changelog from now on.
 -- 11 march 2014 - 1.0.3. Growth rewrite, ore metal yield change, ore harm units now. Disobey OD fix. And transfer logic improvement.
 -- 10 march 2014 - 1.0.2. Could be considered first working version.
@@ -64,12 +75,13 @@ local spGetFeatureResources				= Spring.GetFeatureResources
 local spGiveOrderToUnit					= Spring.GiveOrderToUnit
 local spGetUnitCommands					= Spring.GetUnitCommands
 local spValidFeatureID					= Spring.ValidFeatureID
+local spGetUnitLosState					= Spring.GetUnitLosState
+local spGetAllyTeamList	  				= Spring.GetAllyTeamList
 
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
 
-local OreMexByID = {} -- by UnitID
-local OreMex = {} -- for loop
+local OreMex = {} -- by UnitID
 
 local random = math.random
 local cos	 = math.cos
@@ -83,6 +95,7 @@ local mapHeight
 local teamIDs
 local UnderAttack = {} -- holds frameID per mex so it goes neutral, if someone attacks it, for 5 seconds, it will not return to owner if no grid connected.
 local Ore = {} -- hold features should they emit harm they will ongameframe
+local OreIncome = GG.oreIncome
 
 local TiberiumProofDefs = {
 	[UnitDefNames["armestor"].id] = true,
@@ -111,7 +124,7 @@ for i=1,#UnitDefs do
 end
 
 -- NOTE probably below defs could be generated on gamestart too
-local energyDefs = { -- if gaia mex get's in range of any of below structures, it will trasmit it ownership
+local energyDefs = { -- if gaia mex get's in range of any of below structures, it will transmit it ownership
 	[UnitDefNames["armestor"].id] = UnitDefNames["armestor"].customParams.pylonrange,
 	[UnitDefNames["armwin"].id] = UnitDefNames["armwin"].customParams.pylonrange,
 	[UnitDefNames["armsolar"].id] = UnitDefNames["armsolar"].customParams.pylonrange,
@@ -126,20 +139,22 @@ local mexDefs = {
 local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 21
 
 local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
-if (modOptions.oremex_invul == nil) then INVULNERABLE_EXTRACTORS = 1 end
+if (modOptions.oremex_invul == nil) then INVULNERABLE_EXTRACTORS = true end
 local LIMIT_PRESPAWNED_METAL = tonumber(modOptions.oremex_metal)
 if (tonumber(LIMIT_PRESPAWNED_METAL)==nil) then LIMIT_PRESPAWNED_METAL = 35 end
 local PRESPAWN_EXTRACTORS = (tonumber(modOptions.oremex_prespawn) == 1)
-if (modOptions.oremex_prespawn == nil) then PRESPAWN_EXTRACTORS = 1 end
+if (modOptions.oremex_prespawn == nil) then PRESPAWN_EXTRACTORS = true end
 local OBEY_OD = (tonumber(modOptions.oremex_overdrive) == 1)
-if (modOptions.oremex_overdrive == nil) then OBEY_OD = 1 end
+if (modOptions.oremex_overdrive == nil) then OBEY_OD = true end
 local INFINITE_GROWTH = (tonumber(modOptions.oremex_inf) == 1) -- this causes performance drop you know...
-if (modOptions.oremex_inf == nil) then INFINITE_GROWTH = 0 end
+if (modOptions.oremex_inf == nil) then INFINITE_GROWTH = false end
 local ORE_DMG = tonumber(modOptions.oremex_harm) -- TODO does it take float?
 if (tonumber(ORE_DMG)==nil) then ORE_DMG = 2 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
 local ORE_DMG_RANGE = 81 -- so standing in adjacent tile is gonna harm you
 local OBEY_ZLEVEL = (tonumber(modOptions.oremex_uphill) == 1) -- slower uphill growth
-if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = 1 end
+if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = true end
+local CRYSTALS = (tonumber(modOptions.oremex_tiberium) == 1) -- crystals instead of ore
+if (modOptions.oremex_tiberium == nil) then CRYSTALS = true end
 local ZLEVEL_PROTECTION = 300 -- if adjacent tile is over 300 it's not gonna grow there at all -- lower Z tiles do not give speed boost though
 local MAX_STEPS = 15 -- vine length
 local MAX_PIECES = 50 -- anti spam measure, 144, it looks like cute ~7x7 square rotated 45 degree
@@ -149,14 +164,24 @@ if (INFINITE_GROWTH) then -- not enabled by default
 	MAX_STEPS = 40 -- 40*40 = 1600 distance is maximum in length per mex, considering there are usually more than 1 mex on 2000x2000 map, it's supposed to surely cover entire map in "tiberium"
 end
 
+local OreDefs = {
+      [FeatureDefNames["ore"].id] = true,
+      [FeatureDefNames["ore_tiberium1"].id] = true,
+      [FeatureDefNames["ore_tiberium2"].id] = true,
+      [FeatureDefNames["ore_tiberium3"].id] = true,
+      [FeatureDefNames["ore_tiberium4"].id] = true,
+}
+
+local AllyTeams = {}
+
 local CMD_SELFD								= CMD.SELFD
 local CMD_ATTACK				= CMD.ATTACK
 local CMD_REMOVE				= CMD.REMOVE
 
-local function TransferMexTo(unitID, mexID, unitTeam)
-	if (spValidUnitID(unitID)) and (mexID) then
-		spSetUnitRulesParam(unitID, "mexIncome", OreMex[mexID].income)
-		spCallCOBScript(unitID, "SetSpeed", 0, OreMex[mexID].income * 500) 
+local function TransferMexTo(unitID, unitTeam)
+	if (spValidUnitID(unitID)) and (OreMex[unitID]) then
+-- 		spSetUnitRulesParam(unitID, "mexIncome", OreMex[unitID].income)
+-- 		spCallCOBScript(unitID, "SetSpeed", 0, OreMex[unitID].income * 500) 
 		-- ^ hacks?
 		UnderAttack[unitID] = spGetGameFrame()+160
 		spTransferUnit(unitID, unitTeam, false)
@@ -169,54 +194,52 @@ local function disSQ(x1,y1,x2,y2)
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam)
-	if (OreMexByID[unitID]) then
+	if (OreMex[unitID]) then
 		if (unitTeam ~= GaiaTeamID) then
-			TransferMexTo(unitID, OreMexByID[unitID], GaiaTeamID)
+			TransferMexTo(unitID, GaiaTeamID)
 		end
 		return 0
 	end
 end
 
 local TransferLoop = function()
-	for i=1,#OreMex do
-		if (OreMex[i]~=nil) then
-			local unitID = OreMex[i].unitID
-			local x = OreMex[i].x
-			local z = OreMex[i].z
-			local unitTeam = spGetUnitTeam(unitID)
-			local allyTeam = spGetUnitAllyTeam(unitID)
-			if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
-				local units = spGetUnitsInCylinder(x, z, PylonRange)
-				local best_eff = -1 -- lel
-				local best_team
-				local best_ally
-				local enearby = false
-				for i=1,#units do
-					local targetID = units[i]
-					local targetDefID = spGetUnitDefID(targetID)
-					local targetTeam = spGetUnitTeam(targetID)
-					local targetAllyTeam = spGetUnitAllyTeam(targetID)
-					if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
-						local maxdist = energyDefs[targetDefID]+21
-						maxdist=maxdist*maxdist
-						local x2,_,z2 = spGetUnitPosition(targetID)
-						if (disSQ(x,z,x2,z2) <= maxdist) then
-							enearby = true
-							local eff = spGetUnitRulesParam(targetID,"gridefficiency")
+	for mexID, data in pairs(OreMex) do
+		local unitID = data.unitID
+		local x = data.x
+		local z = data.z
+		local unitTeam = spGetUnitTeam(unitID)
+		local allyTeam = spGetUnitAllyTeam(unitID)
+		if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
+			local units = spGetUnitsInCylinder(x, z, PylonRange)
+			local best_eff = -1 -- lel
+			local best_team
+			local best_ally
+			local enearby = false
+			for i=1,#units do
+				local targetID = units[i]
+				local targetDefID = spGetUnitDefID(targetID)
+				local targetTeam = spGetUnitTeam(targetID)
+				local targetAllyTeam = spGetUnitAllyTeam(targetID)
+				if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
+					local maxdist = energyDefs[targetDefID]+21
+					maxdist=maxdist*maxdist
+					local x2,_,z2 = spGetUnitPosition(targetID)
+					if (disSQ(x,z,x2,z2) <= maxdist) then
+						enearby = true
+						local eff = spGetUnitRulesParam(targetID,"gridefficiency")
 --							 Spring.MarkerAddPoint(x2,0,z2,eff)
-							if (eff~=nil) and (best_eff < eff) then
-								best_eff = eff
-								best_team = targetTeam
-								best_ally = targetAllyTeam
-							end
+						if (eff~=nil) and (best_eff < eff) then
+							best_eff = eff
+							best_team = targetTeam
+							best_ally = targetAllyTeam
 						end
 					end
 				end
-				if (best_team ~= nil) and (unitTeam ~= best_team) and (allyTeam ~= best_ally) then
-					TransferMexTo(unitID, i, best_team)
-				elseif (INVULNERABLE_EXTRACTORS) and not(enearby) and (best_team == nil) and (unitTeam ~= GaiaTeamID) then -- back to Gaia you go
-					TransferMexTo(unitID, i, GaiaTeamID)
-				end
+			end
+			if (best_team ~= nil) and (unitTeam ~= best_team) and (allyTeam ~= best_ally) then
+				TransferMexTo(unitID, best_team)
+			elseif (INVULNERABLE_EXTRACTORS) and not(enearby) and (best_team == nil) and (unitTeam ~= GaiaTeamID) then -- back to Gaia you go
+				TransferMexTo(unitID, GaiaTeamID)
 			end
 		end
 	end
@@ -259,13 +282,14 @@ end
 -- if mex is inside energyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
 function gadget:GameFrame(f)
 	if ((f%32)==1) then
-		TransferLoop()
+		MineMoreOreLoop()
 		InflictOreDamage()
+		TransferLoop()
 	end
 end
 
 function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-	if (attackerID) and (targetID) and (OreMexByID[targetID]) then
+	if (attackerID) and (OreMex[targetID]) then
 		return false, 1
 	end
 	return true, 1
@@ -275,32 +299,37 @@ local function UnitFin(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
 		local x,y,z = spGetUnitPosition(unitID)
 		if (x) then
-			id = 1
-			while (OreMex[id]~=nil) do
-				id=id+1
-			end
-			OreMex[id] = {
+			OreMex[unitID] = {
 				unitID = unitID,
 				ore = 0, -- metal.
 				income = spGetUnitRulesParam(unitID,"mexIncome"),
 				x = x,
 				z = z,
 			}
-			OreMexByID[unitID] = id
 			UnderAttack[unitID] = -100
 			if not(OBEY_OD) then -- this blocks OD should oremex_overdrive==false
-				TransferMexTo(unitID, id, GaiaTeamID)
+				TransferMexTo(unitID, GaiaTeamID)
 			end
 		end
 	end
 end
 
 local function CanSpawnOreAt(x,z)
+	if (CRYSTALS) then -- extra check, don't spawn crystals inside building it's lame... extractor is exception
+		local units = spGetUnitsInRectangle(x-15,z-15,x+15,z+15)
+		for i=1,#units do
+			local unitID = units[i]
+			local unitDefID = spGetUnitDefID(unitID)
+			if (getMovetype(UnitDefs[unitDefID]) == false) and not(mexDefs[unitDefID]) then
+				return false
+			end
+		end
+	end
 	local features = spGetFeaturesInRectangle(x-30,z-30,x+30,z+30)
 	for i=1,#features do
 		local featureID = features[i]
 		local featureDefID = spGetFeatureDefID(featureID)
-		if (FeatureDefs[featureDefID].name=="ore") then
+		if (OreDefs[featureDefID]) then
 			return false
 		end
 	end
@@ -410,11 +439,18 @@ if (OBEY_ZLEVEL) then -- more expensive algo if we obey z level (dont grow uphil
 end
 
 local function SpawnOre(a, b, spawn_amount, teamID)
-	local oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", teamID)
+	local oreID
+	if (CRYSTALS) then
+		oreID = spCreateFeature("ore_tiberium"..(random(1,3)), a, spGetGroundHeight(a, b), b, "n", teamID)
+	else
+		oreID = spCreateFeature("ore", a, spGetGroundHeight(a, b), b, "n", teamID)
+	end
 	if (oreID) then
 		spSetFeatureReclaim(oreID, spawn_amount)
 		local rd = random(360) * pi / 180
-		spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
+		if not(CRYSTALS) then
+			spSetFeatureDirection(oreID,sin(rd),0,cos(rd))
+		end
 		Ore[oreID] = true
 		return true
 	end
@@ -437,13 +473,38 @@ function gadget:FeatureDestroyed(featureID, allyTeam)
 	end
 end
 
+function MineMoreOreLoop()
+	for unitID, data in pairs(OreMex) do
+		if (OreIncome[unitID]) then
+			MineMoreOre(unitID, OreIncome[unitID], false)
+		end
+	end
+end
+
+local function isUnitVisible(unitID, allyTeam)
+	if spValidUnitID(unitID) then
+	      local state = spGetUnitLosState(unitID,allyTeam)
+	      return state and state.los
+	else
+	      return false
+	end
+end
+
+local function notifyPlayers(unitID, spawn_amount)
+	for i=1,#AllyTeams do
+		local allyTeam = AllyTeams[i]
+		if (isUnitVisible(unitID, allyTeam)) then
+			SendToUnsynced("oremexIncomeAdd", allyTeam, unitID, spawn_amount)
+		end
+	end
+end
+
 function MineMoreOre(unitID, howMuch, forcefully)
-	local MexID = OreMexByID[unitID]
-	if not(OreMex[MexID]) then return end -- in theory never happens...
-	OreMex[MexID].ore = OreMex[MexID].ore + howMuch
-	local ore = OreMex[MexID].ore
+	if not(OreMex[unitID]) then return end -- in theory never happens...
+	OreMex[unitID].ore = OreMex[unitID].ore + howMuch
+	local ore = OreMex[unitID].ore
 	if not(forcefully) then
-		OreMex[MexID].income = howMuch
+		OreMex[unitID].income = howMuch
 	end
 	local x,y,z = spGetUnitPosition(unitID)
 	local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
@@ -451,8 +512,9 @@ function MineMoreOre(unitID, howMuch, forcefully)
 	if (#features > 0) then
 		random_feature = features[random(1,#features)]
 	end
+	local spawn_allow = true
 	if not(INFINITE_GROWTH) then -- rejoice Killer
-		if (#features > MAX_PIECES) and not(forcefully) then return end -- too much reclaim, please reclaim
+		if (#features > MAX_PIECES) and not(forcefully) then spawn_allow = false end -- too much reclaim, please reclaim
 	end
 	local sp_count = 3
 	if (ore < 6) then
@@ -469,41 +531,45 @@ function MineMoreOre(unitID, howMuch, forcefully)
 		end
 	end
 	if (ore>=1) then
-		try=0
-		-- lets see, it tries to spawn 3 ore chunks every time
-		-- lets try spawning 40% of ore amount every time
-		local spawn_amount = ore*0.4
-		if (forcefully) then
-			spawn_amount = ore*0.6 -- more chance to drop everything, regardless
-		elseif (spawn_amount<MIN_PRODUCE) then -- try to spawn minchunk
-			spawn_amount = MIN_PRODUCE
-		end
-		while (try < sp_count) do
-			local a,b = GrowBranch(x,y,z) -- v2, pick direction grow there, do not go back in direction, it should be more like a tree, probably
-			if (a~=nil) then
-				if (ore >= spawn_amount) then -- is it enough?
-					if (SpawnOre(a,b,spawn_amount,teamID)) then
-						ore = ore - spawn_amount
+		if spawn_allow then
+			try=0
+			-- lets see, it tries to spawn 3 ore chunks every time
+			-- lets try spawning 40% of ore amount every time
+			local spawn_amount = ore*0.4
+			if (forcefully) then
+				spawn_amount = ore*0.6 -- more chance to drop everything, regardless
+			elseif (spawn_amount<MIN_PRODUCE) then -- try to spawn minchunk
+				spawn_amount = MIN_PRODUCE
+			end
+			while (try < sp_count) do
+				local a,b = GrowBranch(x,y,z) -- v2, pick direction grow there, do not go back in direction, it should be more like a tree, probably
+				if (a~=nil) then
+					if (ore >= spawn_amount) then -- is it enough?
+						if (SpawnOre(a,b,spawn_amount,teamID)) then
+							notifyPlayers(unitID, spawn_amount)
+							ore = ore - spawn_amount
+						end
 					end
 				end
+				try=try+1
 			end
-			try=try+1
 		end
 		if (ore >= 1) then
 			if not(forcefully) and (ore >= MIN_PRODUCE) and (Ore[random_feature]) then -- simply grow "random_feature"
 				if (AddOreMetal(random_feature, ore)) then
+					notifyPlayers(unitID, ore)
 					ore = 0
 				end
 			elseif (forcefully) then -- drop all thats left on mex
 				if (SpawnOre(x,z,ore,teamID)) then
+					notifyPlayers(unitID, ore)
 					ore = 0
 				end
 			end
 		end
 	end
-	OreMex[MexID].ore = ore
+	OreMex[unitID].ore = ore
 end
-GG.SpawnMoreOre = MineMoreOre
 
 local function GetFloatHeight(x,z)
 	local height = spGetGroundHeight(x,z)
@@ -514,12 +580,11 @@ local function GetFloatHeight(x,z)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
-	if (OreMexByID[unitID]) then
-		MineMoreOre(unitID, 0, true) -- this will order it to spawn everything it has left
-		local mexID = OreMexByID[unitID]
-		OreMex[mexID]=nil
-		OreMexByID[unitID]=nil
+	if (OreMex[unitID]) then
+		MineMoreOre(unitID, 0, true) -- this will order it to spawn everything it ha
+		OreMex[unitID]=nil
 		UnderAttack[unitID]=0
+		OreIncome[unitID]=0
 	end
 end
 
@@ -530,8 +595,7 @@ local function PreSpawn()
 			if (units == nil) or (#units==0) then
 				local unitID = spCreateUnit("cormex",GG.metalSpots[i].x, GetFloatHeight(GG.metalSpots[i].x,GG.metalSpots[i].z), GG.metalSpots[i].z, "n", GaiaTeamID)
 				if (unitID) then
-					local id = #OreMex+1
-					OreMex[id] = {
+					OreMex[unitID] = {
 						unitID = unitID,
 						ore = 0, -- metal.
 						income = GG.metalSpots[i].metal,
@@ -541,10 +605,9 @@ local function PreSpawn()
 					if (INVULNERABLE_EXTRACTORS) then
 						spSetUnitNeutral(unitID, true)
 					end
-					OreMexByID[unitID] = id
 					UnderAttack[unitID] = -100
-					spSetUnitRulesParam(unitID, "mexIncome", GG.metalSpots[i].metal)
-					spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) 
+					spSetUnitRulesParam(unitID, "mexIncome", GG.metalSpots[i].metal) --hacky
+					spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) --hacky
 					local prespawn = 0
 					while (prespawn < LIMIT_PRESPAWNED_METAL) do
 						MineMoreOre(unitID, 10, true)
@@ -582,7 +645,7 @@ local function ReInit(reinit)
 		local features = spGetAllFeatures()
 		for i=1,#features do
 			local featureDefID = spGetFeatureDefID(features[i])
-			if (FeatureDefs[featureDefID].name == "ore") then
+			if (OreDefs[featureDefID]) then
 				Ore[features[i]] = true
 			end
 		end
@@ -593,6 +656,10 @@ function gadget:Initialize()
 	if not (tonumber(modOptions.oremex) == 1) then
 		gadgetHandler:RemoveGadget()
 		return
+	end
+	local allyteams = spGetAllyTeamList()
+	for _,allyTeam in ipairs(allyteams) do
+		AllyTeams[#AllyTeams+1] = allyTeam
 	end
 	if not(INVULNERABLE_EXTRACTORS) then
 		gadgetHandler:RemoveCallIn("AllowWeaponTarget")
@@ -625,18 +692,41 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 --		 local unitIDs = {}
 		cmdList = Spring.GetUnitCommands(unitID)
 		for i=1,#cmdList do
-			if (OreMexByID[cmdList[i].params[1]]) then
+			if (OreMex[cmdList[i].params[1]]) then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdList[i].tag}, {})
 			end
 		end
-		if (#cmdParams == 1) and (OreMexByID[cmdParams[1]]) then
+		if (#cmdParams == 1) and (OreMex[cmdParams[1]]) then
 			return false 
 		end
 	end
-	if (OreMexByID[unitID]) and (cmdID == CMD_SELFD) then
+	if (OreMex[unitID]) and (cmdID == CMD_SELFD) then
 		return false
 	end
 	return true
+end
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+else
+
+local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
+local spGetMyPlayerID	   = Spring.GetMyPlayerID
+
+local function showIncomeLabel(_, allyTeam, unitID, income)
+	local myAllyTeam = spGetLocalAllyTeamID()
+	if (Script.LuaUI('oremexIncomeAdd') and (myAllyTeam == allyTeam)) then
+		Script.LuaUI.oremexIncomeAdd(spGetMyPlayerID(),unitID,income)
+	end
+end
+
+function gadget:Initialize()
+	gadgetHandler:AddSyncAction("oremexIncomeAdd", showIncomeLabel)
+end
+
+
+function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction("oremexIncomeAdd")
 end
 
 end
