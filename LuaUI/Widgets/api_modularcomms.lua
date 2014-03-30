@@ -23,10 +23,11 @@ local CopyTable = Spring.Utilities.CopyTable
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
---[[
 local success, err
 
 -- global comm data (from the modoption)
+-- abolished - exceeeds memory usage during loading
+--[[
 local commDataGlobal
 local commDataGlobalRaw = Spring.GetModOptions().commandertypes
 if not (commDataGlobalRaw and type(commDataGlobalRaw) == 'string') then
@@ -50,6 +51,7 @@ if err then
 	--Spring.Echo('Modular Comm Info error: ' .. err)	-- unitdefgen will already baww about it; no need to do it here
 end
 WG.commDataGlobal = commDataGlobal
+]]
 
 -- player comm data (from customkeys)
 local myID = Spring.GetMyPlayerID()
@@ -80,17 +82,19 @@ WG.commData = commData
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
-local commsWithModules = {}
+local commModulesByComms = {}
 for i=1,#UnitDefs do
 	if UnitDefs[i].customParams.modules then
-		local modules = {}
+		local modulesRaw = {}
+		local modulesHuman = {}
 		local modulesInternalFunc = loadstring("return ".. UnitDefs[i].customParams.modules)
 		local modulesInternal = modulesInternalFunc()
 		for i=1, #modulesInternal do
 			local modulename = modulesInternal[i]
-			modules[i] = upgrades[modulename].name
+			modulesRaw[i] = modulename
+			modulesHuman[i] = upgrades[modulename].name
 		end
-		commsWithModules[UnitDefs[i].name] = modules
+		commModulesByComms[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
 	end
 end
 --------------------------------------------------------------------------------
@@ -112,7 +116,7 @@ end
 
 -- recursive magic (likely broken)
 local function MergeModuleTables(moduleTable, previous)
-	local data = commDataGlobal[previous]
+	local data = UnitDefNames[previous].customParams
 	if data then
 		if data.prev then
 			MergeModuleTables(moduleTable, data.prev)
@@ -135,11 +139,12 @@ local function GetCommSeriesInfo(seriesName, purgeDuplicates)
 	end
 	for i=1,#data do
 		local name = data[i].name
-		if name and commDataGlobal[name] then
-			local moduleTable = commDataGlobal[name].modules or {}
-			data[i].modules = CopyTable(moduleTable, true)
-			data[i].cost = commDataGlobal[name].cost or 0
-			data[i].prev = commDataGlobal[name].prev
+		local unitDef = UnitDefNames[name]
+		if name and unitDef then
+			data[i].modules = CopyTable(commModulesByComms[name].human, true)
+			data[i].modulesRaw = CopyTable(commModulesByComms[name].raw, true)
+			data[i].cost = unitDef.metalCost
+			data[i].prev = unitDef.customParams.prev
 		end
 	end
 	-- remove reference to modules already in previous levels
@@ -147,14 +152,16 @@ local function GetCommSeriesInfo(seriesName, purgeDuplicates)
 		for i = #data, 2, -1 do
 			if not data[i].prev then	-- having a previous comm specified indicates we are using per-level module tables instead of lifetime; no need to purge duplicates
 				RemoveDuplicates(data[i].modules, data[i-1].modules)
-				data[i].cost = data[i].cost - data[i-1].cost
+				RemoveDuplicates(data[i].modulesRaw, data[i-1].modulesRaw)
 			end
+			data[i].cost = data[i].cost - data[i-1].cost
 		end
 	end
 	return data
 end
 WG.GetCommSeriesInfo = GetCommSeriesInfo
 
+--[[
 local function GetCommUnitInfo(unitDef)
 	if type(unitDef) == "number" then unitDef = UnitDefs[unitDef].name end
 	if commDataGlobal[unitDef] then
@@ -162,22 +169,22 @@ local function GetCommUnitInfo(unitDef)
 	end
 end
 WG.GetCommUnitInfo = GetCommUnitInfo
+]]
 
--- returns the raw module table
+-- returns the moduledef table
 local function GetCommUpgradeList()
 	return upgrades
 end
 WG.GetCommUpgradeList = GetCommUpgradeList
 
-local function GetCommModules(unitDef)
-	if type(unitDef) == "number" then unitDef = UnitDefs[unitDef].name end
-	if commsWithModules[unitDef] then
-		for i=1,#commsWithModules do
-			Spring.Echo(i, commsWithModules[i])
-		end
-		return commsWithModules[unitDef]
+local function GetCommModules(unitDef, raw)
+	if type(unitDef) == "number" then
+		unitDef = UnitDefs[unitDef].name
 	end
-	
+	if commModulesByComms[unitDef] then
+		return commModulesByComms[unitDef][raw and "raw" or "human"]
+	end
+	--[[
 	if commDataGlobal[unitDef] then
 		local modules = {}
 		local modulesInternal = commDataGlobal[unitDef] and commDataGlobal[unitDef].modules or {}
@@ -197,6 +204,6 @@ local function GetCommModules(unitDef)
 		end
 		return modules
 	end
+	]]
 end
 WG.GetCommModules = GetCommModules
-]]

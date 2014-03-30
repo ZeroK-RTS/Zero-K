@@ -7,7 +7,7 @@ local function ReturnFalse()
 	return false
 end
 
-local noCustomComms = true --((Spring.GetModOptions().commandertypes == nil or Spring.GetModOptions().commandertypes == '') and true) or false
+local noCustomComms = ((Spring.GetModOptions().commandertypes == nil or Spring.GetModOptions().commandertypes == '') and true) or false
 local function ReturnNoCustomComms()
 	return noCustomComms
 end
@@ -106,7 +106,7 @@ local optionData = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- most of the data processing was moved to api_modularcomms.lua
---[[
+
 local commDataOrdered = {}
 local numComms = 0
 for seriesName, comms in pairs(WG.commData) do
@@ -136,7 +136,7 @@ local function WriteTooltip(seriesName)
 	local upgrades = WG.GetCommUpgradeList()
 	for i=2,#data do	-- exclude level 0 comm
 		str = str .. "\nLEVEL "..(i-1).. " ("..data[i].cost.." metal)\n\tModules:"
-		for j, modulename in pairs(data[i].modules) do
+		for j, modulename in pairs(data[i].modulesRaw) do
 			if upgrades[modulename] then
 				local substr = upgrades[modulename].name
 				-- assign color
@@ -183,7 +183,7 @@ local i = 0
 for i = 1, numComms do
 	local option = CommSelectTemplate(i, commDataOrdered[i].seriesName, commDataOrdered[i][1])
 	optionData[#optionData+1] = option
-end]]
+end
 
 
 return optionData
