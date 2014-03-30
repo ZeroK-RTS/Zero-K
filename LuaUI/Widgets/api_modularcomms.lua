@@ -23,6 +23,7 @@ local CopyTable = Spring.Utilities.CopyTable
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
+--[[
 local success, err
 
 -- global comm data (from the modoption)
@@ -198,3 +199,4 @@ local function GetCommModules(unitDef)
 	end
 end
 WG.GetCommModules = GetCommModules
+]]
