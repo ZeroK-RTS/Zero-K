@@ -58,7 +58,7 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 660,
   smoothAnim             = true,
-  sonarDistance          = 360,
+  sonarDistance          = 800,
   turninplace            = 0,
   turnRate               = 350,
   waterline              = 0,
@@ -75,8 +75,8 @@ unitDef = {
 
     {
       def                = [[DEPTHCHARGE]],
-      badTargetCategory  = [[LAND]],
-      onlyTargetCategory = [[SUB SINK LAND]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
     },
 
   },
@@ -86,14 +86,14 @@ unitDef = {
 
     DEPTHCHARGE = {
       name                    = [[Depth Charge]],
-      areaOfEffect            = 190,
+      areaOfEffect            = 128,
       avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 250,
+        default = 200,
       },
 
       edgeEffectiveness       = 0.99,
@@ -104,7 +104,7 @@ unitDef = {
       model                   = [[depthcharge.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
-      range                   = 280,
+      range                   = 200,
       reloadtime              = 3,
       soundHit                = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torpedo]],
