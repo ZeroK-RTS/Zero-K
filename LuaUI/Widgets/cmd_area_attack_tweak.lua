@@ -16,6 +16,9 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
+
 function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator.lua by msafwan, and central_build_AI.lua by Troy H. Creek
 	if (id == CMD.ATTACK) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], params[4]
@@ -72,8 +75,14 @@ function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator
 							IssueCommand(normalUnits,allTargets,options)
 							return true
 						else 
-							--let Spring handle
-							return false
+							-- See http://springrts.com/mantis/view.php?id=4351
+							if reverseCompatibility then
+								--let Spring handle
+								return false
+							else
+								IssueCommand(normalUnits,allTargets,options)
+								return true
+							end
 						end
 					end
 				end
