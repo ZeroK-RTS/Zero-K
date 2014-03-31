@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.1.0" -- this now has it's own changelog
+local version = "0.1.1" -- this now has it's own changelog
 
 function widget:GetInfo()
   return {
@@ -18,6 +18,19 @@ end
 
 -- changelog
 -- 30 march 2014 - 0.1.0. First release.
+-- 31 march 2014 - 0.1.1. Nothing new imporant...
+
+-- TODO, this I want to implement:
+-- Energy logic: <- right now it has idiot logic but kinda works, lel, also has no idea about geo spots yet
+-- pAI should have energy lines always layed out in some form always, and order immediate additional E structures to be constructed at/near those lines should it be appropriate.
+-- Wise retreat:
+-- Gather all enemy weapon ranges, if AI controlled unit is near any of weapon ranges it should fall back a bit and area should be marker as dangerous, any ghost jobs should be suspended unless permited by user.
+-- Global construction menu:
+-- Actually because of this I started coding this widget, I want a way to design my defenses/grid layout myself sometimes, but before the match starts.
+-- So pAI will just build/rebuild it and I can keep my eyes focuses on battlefield at hand. Also once basic design is completed pAI should have freewill to spend any excess probabilities into more overdriving.
+
+-- What can it do now?
+-- It can retreat once hurt. Repair/reclaim/assist stuff. Claim gaia oremexes (oremex gamemode). And tries to construct solars/winds near mexes, albeit only 1 yet.
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -91,11 +104,14 @@ local glTexture		= gl.Texture
 local glTexRect		= gl.TexRect
 
 local modOptions = Spring.GetModOptions()
+local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
+local oremex = modOptions.oremex and (tonumber(modOptions.oremex) == 1) or false
+local oremex_overdrive = modOptions.oremex_overdrive and (tonumber(modOptions.oremex_overdrive) == 1) or true
+local oremex_prespawn = modOptions.oremex_prespawn and (tonumber(modOptions.oremex_prespawn) == 1) or true
 
 local MexDefs = {
 	[UnitDefNames["cormex"].id] = true,
 }
-
 local EnergyDefs = { -- importance (higher better), pylon range.
 	[UnitDefNames["armestor"].id] = { 3, UnitDefNames["armestor"].customParams.pylonrange }, -- pylon
 	[UnitDefNames["armwin"].id] = { 4, UnitDefNames["armwin"].customParams.pylonrange }, -- wind
@@ -105,7 +121,17 @@ local EnergyDefs = { -- importance (higher better), pylon range.
 	[UnitDefNames["geo"].id] = { 3, UnitDefNames["geo"].customParams.pylonrange }, -- geo
 	[UnitDefNames["amgeo"].id] = { 2, UnitDefNames["amgeo"].customParams.pylonrange }, -- moho
 }
-local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 21
+local GridDefs = {}
+for unitID, data in pairs(EnergyDefs) do
+	EnergyDefs[unitID] = {data[1],data[2]}
+end
+for unitID, data in pairs(MexDefs) do
+	GridDefs[unitID] = { 0, UnitDefs[unitID].customParams.pylonrange }
+end
+for unitID, data in pairs(EnergyDefs) do
+	GridDefs[unitID] = data
+end
+local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 39
 
 local CMD_AUTOECO = 35301
 
@@ -157,6 +183,7 @@ local CMD_INSERT = CMD.INSERT
 local random = math.random
 local floor = math.floor
 local abs = math.abs
+local sqrt = math.sqrt
 
 local textSize = 12.0
 local textColor = {0.3, 0.7, 1.0, 1.0}
@@ -170,6 +197,8 @@ local JOB_SCOUT = 3
 local JOB_RECLAIM = 4
 local JOB_REPAIR = 5
 local JOB_ASSIST = 6
+local JOB_HELP_FACTORY = 7
+local JOB_RELOCATE = 8
 
 local MAX_CARETAKER_RANGE_SQ = 500*500
 local MAX_MEX_DIST_SQ = 1800*1800
@@ -179,7 +208,9 @@ local tooltips = { "pAI: off.\nHuman control, not under AI control.", "pAI: this
 
 local currentGameFrame = 0
 
-local DEBUG = false
+local OreExtractors = {}
+
+local DEBUG = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -233,7 +264,7 @@ function widget:DrawWorld()
 		local fade = abs((currentGameFrame % 40) - 20) / 20
 		for jobID, data in pairs(pAI_jobs) do
 			local x, y, z, h = data.x, data.y, data.z, data.h
-			if (data.type == JOB_BUILD) or (UnitDefs[data.cmdID]) then
+			if (data.type == JOB_BUILD) or ((data.type == JOB_SCOUT) and (UnitDefs[data.cmdID])) then
 				local text1 = data.type==JOB_BUILD and "build" or "scout"
 				local degrees = h * 90
 				if spIsAABBInView(x-1,y-1,z-1,x+1,y+1,z+1) then
@@ -272,7 +303,9 @@ function widget:DrawWorld()
 					local text1 = "wtf?"
 					if data.type==JOB_RECLAIM then text1 = "reclaim"
 					elseif data.type==JOB_REPAIR then text1 = "repair"
-					elseif data.type==JOB_ASSIST then text1 = "assist" end
+					elseif data.type==JOB_ASSIST then text1 = "assist"
+					elseif data.type==JOB_HELP_FACTORY then text1 = "help"
+					elseif data.type==JOB_RELOCATE then text1 = "relocate" end
 					glPushMatrix()
 					glTranslate( x, y, z )
 					glBillboard() -- also show some debug stuff
@@ -318,7 +351,8 @@ function widget:DrawWorld()
 					glTranslate(ux, uy, uz)
 					glBillboard()
 					glColor(textColor)
-					glText("pAI:extractor", 20.0, 5.0, textSize, "pai")
+					local overdrive = pAI_econ.overdrive[unitID] and pAI_econ.overdrive[unitID] or 0
+					glText("pAI:extractor:g"..overdrive, 20.0, 5.0, textSize, "pai")
 					glPopMatrix()
 					glColor(1, 1, 1, 1)
 				end -- if InView
@@ -330,7 +364,8 @@ function widget:DrawWorld()
 					glTranslate(ux, uy, uz)
 					glBillboard()
 					glColor(textColor)
-					glText("pAI:energy", 20.0, 5.0, textSize, "pai")
+					local overdrive = pAI_econ.overdrive[unitID] and pAI_econ.overdrive[unitID] or 0
+					glText("pAI:energy:g"..overdrive, 20.0, 5.0, textSize, "pai")
 					glPopMatrix()
 					glColor(1, 1, 1, 1)
 				end -- if InView
@@ -504,7 +539,7 @@ end
 
 local function pAI_JobByTarget(cmdID) -- only for reclaim/assist/repair tbh
 	for jobID, data in pairs(pAI_jobs) do
-		if (data.cmdID == cmdID) then
+		if (data.cmdID == cmdID) and (data.type > JOB_SCOUT) then
 			return jobID
 		end
 	end
@@ -535,10 +570,10 @@ local function pAI_JobCreate(type, cmdID, x, y, z, h, importance, user)
 			pAI_econ.commander_count = pAI_econ.commander_count + 1
 		elseif (UnitDefs[cmdID].isBuilder) then
 			pAI_econ.builder_count = pAI_econ.builder_count + 1
-		elseif (EnergyDefs[cmdID]) then
-			pAI_econ.energy_count = pAI_econ.energy_count + 1
 		elseif (MexDefs[cmdID]) then
 			pAI_econ.extractor_count = pAI_econ.extractor_count + 1
+		elseif (EnergyDefs[cmdID]) then
+			pAI_econ.energy_count = pAI_econ.energy_count + 1
 		end
 	else
 		local exist = false
@@ -577,10 +612,10 @@ local function pAI_JobDestroyed(jobID, unassign)
 			pAI_econ.commander_count = pAI_econ.commander_count - 1
 		elseif (UnitDefs[cmdID].isBuilder) then
 			pAI_econ.builder_count = pAI_econ.builder_count - 1
-		elseif (EnergyDefs[cmdID]) then
-			pAI_econ.energy_count = pAI_econ.energy_count - 1
 		elseif (MexDefs[cmdID]) then
 			pAI_econ.extractor_count = pAI_econ.extractor_count - 1
+		elseif (EnergyDefs[cmdID]) then
+			pAI_econ.energy_count = pAI_econ.energy_count - 1
 		end
 	end
 	if (unassign) then
@@ -614,6 +649,144 @@ local function pAI_JobUnassign(unitID)
 			end
 		end
 		pAI[unitID].job = 0
+	end
+end
+
+local function IsInsideGridConnected(badID, x, z, arraylist, consider_queued)
+	local units = spGetUnitsInCylinder(x, z, PylonRange)
+	local list = {}
+	for i=1,#units do
+		local unitID = units[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		local unitTeam = spGetUnitTeam(unitID)
+-- 		local unitAllyTeam = spGetUnitAllyTeam(unitID)
+		if ((badID == nil) or (badID ~= unitID)) and ((pAI_econ.extractor[unitID]) or (pAI_econ.energy[unitID])) and (unitTeam~=GaiaTeamID) then
+			local maxdist = GridDefs[unitDefID][2]
+			if (badID ~= nil) then
+				local badUnitDefID = spGetUnitDefID(badID)
+				maxdist = maxdist + GridDefs[badUnitDefID][2]
+			else
+				maxdist = maxdist + 39
+			end
+			maxdist=maxdist*maxdist
+			local x2,_,z2 = spGetUnitPosition(unitID)
+			if (disSQ(x,z,x2,z2) <= maxdist) or ((badID ~= nil) and (UnitDefs[spGetUnitDefID(badID)].name == "armestor")) then
+				if not(arraylist) then
+					return true
+				else
+					list[#list+1] = unitID
+				end
+			end
+		end
+	end
+	if not(arraylist) then
+		if (consider_queued) then
+			for jobID, data in pairs(pAI_jobs) do
+				if ((data.type == JOB_BUILD) or (data.type == JOB_SCOUT)) and (GridDefs[data.cmdID]) then
+					local x2,z2 = data.x,data.z
+					local maxdist = GridDefs[data.cmdID][2] + 39
+					maxdist = maxdist*maxdist
+					if (disSQ(x,z,x2,z2) <= maxdist) or ((badID ~= nil) and (UnitDefs[spGetUnitDefID(badID)].name == "armestor")) then
+						return true
+					end
+				end
+			end
+		end
+		return false
+	else
+		return list
+	end
+end
+
+local function FreeGridNumber(num)
+	local bad = falsetest
+	for _, grid in pairs(pAI_econ.overdrive) do
+		if (grid == num) then
+			bad = true
+			break
+		end
+	end
+	if (bad) then
+		return FreeGridNumber(num+1)
+	else
+		return num
+	end
+end
+
+local function MergeAllGrids(unitID, grid, badIDs) -- TODO needs serious improvement
+	-- uh uh
+	local x,_,z = spGetUnitPosition(unitID)
+-- 	Spring.Echo(unitID.." merges2 all units to "..grid)
+-- 	Spring.MarkerAddPoint(x,0,z,unitID.." to "..grid)
+	local list = IsInsideGridConnected(unitID, x, z, true, false)
+	badIDs[unitID] = true
+	for _,ecoID in pairs(list) do
+-- 		if (pAI_econ.overdrive[ecoID] ~= grid) then
+	  	if not(badIDs[ecoID]) then
+			pAI_econ.overdrive[ecoID] = grid
+			MergeAllGrids(ecoID, grid, badIDs)
+			badIDs[ecoID] = true
+		end
+	end
+end
+
+local function ConnectEcon(unitID)
+	local x,_,z = spGetUnitPosition(unitID)
+--   Spring.Echo(unitID.." new grid")
+	local list = IsInsideGridConnected(unitID, x, z, true, false)
+-- 	Spring.Echo(unitID.." "..#list)
+	if (#list > 0) then
+		local same_grid = true
+		local test = pAI_econ.overdrive[list[1]]
+		if (test == nil) or (test == 0) then
+			test = FreeGridNumber(1)
+			pAI_econ.overdrive[list[1]] = test
+		end
+-- 	Spring.Echo(unitID.." merges1 all units to "..test)
+-- 	Spring.MarkerAddPoint(x,0,z,unitID.." to "..test)
+		for i=2,#list do
+			if (pAI_econ.overdrive[list[i]] ~= test) then
+				same_grid = false
+				break
+			end
+		end
+		pAI_econ.overdrive[unitID] = test
+		if not(same_grid) then
+			MergeAllGrids(unitID, test, {})
+		end
+	else
+		pAI_econ.overdrive[unitID] = 0
+	end
+end
+
+local function DisconnectEcon(unitID)
+	-- well that's a shame
+	local x,_,z = spGetUnitPosition(unitID)
+	local test = pAI_econ.overdrive[unitID]
+	pAI_econ.overdrive[unitID] = nil
+	local list = IsInsideGridConnected(unitID, x, z, true, false)
+	if (#list > 0) then
+		local same_grid = false
+		for i=1,#list do
+			if (pAI_econ.overdrive[list[i]] == test) then
+				same_grid = true
+				break
+			end
+		end
+		if (same_grid) then
+			for i=1,#list do
+				if (IsInsideGridConnected(list[i], x, z, false, false)) then
+					pAI_econ.overdrive[list[i]] = 1
+				else
+					pAI_econ.overdrive[list[i]] = 0
+				end
+			end
+			for i=1,#list do
+				if (pAI_econ.overdrive[list[i]] > 0) then
+					MergeAllGrids(list[i], test)
+				end
+			end
+		end
 	end
 end
 
@@ -671,8 +844,12 @@ local function DestroyRetreat(unitID)
 	pAI_econ.retreat[unitID] = nil
 end
 
-local function FactoryBlock(tx,ty,tz) -- returns true if tx,tz will block some factory
+local function FactoryBlock(tx,ty,tz,large) -- returns true if tx,tz will block some factory
 	local units = spGetUnitsInCylinder(tx,tz,350)
+	local size = 60
+	if (large) then
+		size = 160
+	end
 	for i=1,#units do
 		local unitID = units[i]
 		if (spIsUnitAllied(unitID)) then
@@ -681,14 +858,14 @@ local function FactoryBlock(tx,ty,tz) -- returns true if tx,tz will block some f
 				local x,y,z = spGetUnitPosition(unitID)
 				local dx,dy,dz = spGetUnitDirection(unitID)
 				if (dx > 0) then
-					x = x + 160
+					x = x + size
 				elseif (dx < 0) then
-					x = x - 160
+					x = x - size
 				end
 				if (dy > 0) then
-					z = z + 160
+					z = z + size
 				elseif (dy < 0) then
-					z = z - 160
+					z = z - size
 				end
 				min_x = x - 120
 				max_x = x + 120
@@ -703,7 +880,7 @@ local function FactoryBlock(tx,ty,tz) -- returns true if tx,tz will block some f
 	return false
 end
 
-local function CheckAllJobsIn(x,z,size)
+local function CheckAllJobsIn(x,z,size) -- TODO detect overlap
 	local min_x = x - size
 	local max_x = x + size
 	local min_z = z - size
@@ -711,32 +888,13 @@ local function CheckAllJobsIn(x,z,size)
 	for jobID, data in pairs(pAI_jobs) do
 		if (data.type == JOB_BUILD) then
 			if (data.x >= min_x) and (data.x <= max_x) and (data.z >= min_z) and (data.z <= max_z) then
-				if (FactoryBlock(data.x,data.y,data.z)) or (spTestBuildOrder(data.cmdID, data.x, data.y, data.z, data.h) == 0) then
+				if (FactoryBlock(data.x,data.y,data.z,false)) or (spTestBuildOrder(data.cmdID, data.x, data.y, data.z, data.h) == 0) then
 					-- job died
 					pAI_JobDestroyed(jobID, false)
 				end
 			end
 		end
 	end
-end
-
-local function IsInsideGridConnected(badID, x, z)
-	local units = spGetUnitsInCylinder(x, z, PylonRange)
-	for i=1,#units do
-		local unitID = units[i]
-		local unitDefID = spGetUnitDefID(unitID)
-		local unitTeam = spGetUnitTeam(unitID)
--- 		local unitAllyTeam = spGetUnitAllyTeam(unitID)
-		if ((badID == nil) or (badID ~= unitID)) and (EnergyDefs[unitDefID]) and (unitTeam~=GaiaTeamID) then
-			local maxdist = EnergyDefs[unitDefID][2]+21
-			maxdist=maxdist*maxdist
-			local x2,_,z2 = spGetUnitPosition(unitID)
-			if (disSQ(x,z,x2,z2) <= maxdist) then
-				return true
-			end
-		end
-	end
-	return false
 end
 
 local function ScoutScore(ox,oz,base_x,base_z,dist)
@@ -819,11 +977,213 @@ end
 --------------------------------------------------------------------------------
 -- pAI brains + central command (job issuer)
 
+local function BuildEnergyCloseToMex(ox,oz) -- that's oremex function
+	local solars = 1==random(0,1)
+	local try = 0
+	while (try < 2) do
+		if (solars) then
+			local x = random(40,80)
+			local z = random(40,80)
+			if (random(0,1)==1) then x = x*-1 end
+			if (random(0,1)==1) then z = z*-1 end
+			x = x + ox;
+			z = z + oz;
+			if (InsideMap(x,z)) then
+				y = spGetGroundHeight(x,z)
+				if (y > waterLevel) then
+					if not(FactoryBlock(x,y,z,false)) and (spTestBuildOrder(UnitDefNames["armsolar"].id, x, 0 ,z, 0) >= 1) then
+						pAI_JobCreate(JOB_BUILD, UnitDefNames["armsolar"].id, x, y, z, 0, 0, false)
+						return -- success
+					end
+				else
+					try = try - 1
+				end
+			end
+			solars = false
+			try = try + 1
+		else
+			local x = random(40,80)
+			local z = random(40,80)
+			if (random(0,1)==1) then x = x*-1 end
+			if (random(0,1)==1) then z = z*-1 end
+			x = x + ox;
+			z = z + oz;
+			if (InsideMap(x,z)) then
+				y = spGetGroundHeight(x,z)
+				if not(FactoryBlock(x,y,z,false)) and (spTestBuildOrder(UnitDefNames["armwin"].id, x, 0 ,z, 0) >= 1) then
+					pAI_JobCreate(JOB_BUILD, UnitDefNames["armwin"].id, x, y, z, 0, 0, false)
+					return -- success
+				end
+			end
+			solars = true
+			try = try + 1
+		end
+	end
+end
+
+local function Magnitude(x, z)
+	return sqrt(x * x + z * z)
+end
+
+local function Normalized(x, z)
+	local mag = Magnitude(x, z)
+	if mag == 0 then
+		return 0, 0, 0, 0
+	else
+		return x / mag, z / mag, mag
+	end
+end
+
+local function AdditionalE(base_x,base_z,at_base) -- TODO teach it to build closer to existing energy buildings but space them properly
+	local income = pAI_econ.aveMInc
+	local storagem = pAI_econ[0].mCur
+	local storagee = pAI_econ[0].eCur
+	if (at_base) then
+		local dist = 400 + 100 * random(-1,3)
+		while (dist <= 1000) do
+			local x = random(0,dist)
+			local z = random(0,dist)
+			if (random(0,1) == 1) then x = x*-1 end
+			if (random(0,1) == 1) then z = z*-1 end
+			x = x + base_x
+			z = z + base_z
+			if (InsideMap(x,z)) then
+				y = spGetGroundHeight(x,z)
+				local type = UnitDefNames["armwin"].id
+				if (y > waterLevel) then
+					local chance = y/3
+					if (chance < random(0,100)) then
+						type = UnitDefNames["armsolar"].id
+					end
+				end
+				if (income > 10) and (random(0,2)==2) and (storagee > 450) then
+					type = UnitDefNames["armfus"].id
+				end
+				if (income > 20) and (random(0,5)>=4) and (storagee > 450) and (storagem > (50*random(0,4))) then
+					type = UnitDefNames["cafus"].id
+				end
+				if not(FactoryBlock(x,y,z,false)) and (spTestBuildOrder(type, x, 0 ,z, 0) == 2) then
+					pAI_JobCreate(JOB_BUILD, type, x, y, z, 0, 0, false)
+					return -- success
+				elseif (type == UnitDefNames["armsolar"].id) then
+					type = UnitDefNames["armwin"].id
+					if --[[not(FactoryBlock(x,y,z,false)) and]] (spTestBuildOrder(type, x, 0 ,z, 0) >= 1) then
+						pAI_JobCreate(JOB_BUILD, type, x, y, z, 0, 0, false)
+						return -- success
+					end
+				end
+			end
+			dist = dist+100
+		end
+	else
+		local x,z = base_x,base_z
+		for jobID, data in pairs(pAI_jobs) do
+			if ((data.type == JOB_SCOUT) or (data.type == JOB_BUILD)) and (EnergyDefs[data.cmdID]) then
+				if (data.x-20 <= x) and (x <= data.x+20) and (data.z-20 <= z) and (z <= data.z+20) then
+-- 		Spring.MarkerAddPoint(base_x,0,base_z,"FAIL")
+					return -- oh
+				end
+			end
+		end
+		local y = spGetGroundHeight(x,z)
+		local type = UnitDefNames["armwin"].id
+		Spring.MarkerAddPoint(base_x,0,base_z,"oh "..spTestBuildOrder(type, base_x, 0 ,base_z, 0))
+		if (y > waterLevel) then
+			local chance = y/3
+			if (chance < random(0,100)) then
+				type = UnitDefNames["armsolar"].id
+			end
+		end
+		if --[[not(FactoryBlock(x,y,z,false)) and]] (spTestBuildOrder(type, x, 0 ,z, 0) >= 1) then
+			pAI_JobCreate(JOB_BUILD, type, x, y, z, 0, 0, false)
+			return -- success
+		elseif (type == UnitDefNames["armsolar"].id) then
+			type = UnitDefNames["armwin"].id
+			if --[[not(FactoryBlock(x,y,z,false)) and]] (spTestBuildOrder(type, x, 0 ,z, 0) >= 1) then
+				pAI_JobCreate(JOB_BUILD, type, x, y, z, 0, 0, false)
+				return -- success
+			end
+		end
+	end
+end
+
+local function ConnectGrid(unitID1, unitID2)
+	local x1,_,z1 = spGetUnitPosition(unitID1)
+	local x2,_,z2 = spGetUnitPosition(unitID2)
+		Spring.MarkerAddPoint(x1,0,z1,"oh1")
+		Spring.MarkerAddPoint(x2,0,z2,"oh2")
+	local dist = disSQ(x1,z1,x2,z2)
+	local max_dist = PylonRange*PylonRange*1.9
+	local min_dist = PylonRange*PylonRange*1.4
+	local income = pAI_econ.aveMInc
+	local encome = pAI_econ.aveEInc
+	local storagem = pAI_econ[0].mCur
+	local storagee = pAI_econ[0].eCur
+	if (encome > 10) and (dist < max_dist) and (dist > min_dist) then
+-- 	  Spring.Echo("[debug] pylon is enough to connect shit")
+		local ox = (x1+x2)/2; local oz = (z1+z2)/2
+		try = 0
+		for jobID, data in pairs(pAI_jobs) do
+			if ((data.type == JOB_SCOUT) or (data.type == JOB_BUILD)) and (data.cmdID == UnitDefNames["armestor"].id) then
+				if (data.x-20 <= ox) and (ox <= data.x+20) and (data.z-20 <= oz) and (oz <= data.z+20) then
+					try = 3
+				end
+			end
+		end
+		while (try < 3) do
+			local x = ox + random(-20,20)
+			local z = oz + random(-20,20)
+			local y = spGetGroundHeight(x,z)
+			if (InsideMap(x,z)) then
+				pAI_JobCreate(JOB_BUILD, UnitDefNames["armestor"].id, x, y, z, 0, 0, false)
+				try = 3
+			else
+				try = try + 1
+			end
+		end
+	elseif (dist > (120*120)) then
+-- 	  Spring.Echo("[debug] long line")
+		-- from unitID1 to unitID2
+		local vector_x = x2-x1
+		local vector_z = z2-z1
+		local mag
+		vector_x, vector_z, mag = Normalized(vector_x, vector_z)
+		mag = mag - 80
+		vector_x = vector_x * mag
+		vector_z = vector_z * mag
+		local vx = x1 + vector_x
+		local vz = z1 + vector_z
+		vector_x = x1-x2
+		vector_z = z1-z2
+		vector_x, vector_z, mag = Normalized(vector_x, vector_z)
+		mag = mag - 80
+		vector_x = vector_x * mag
+		vector_z = vector_z * mag
+		local vx2 = x2 + vector_x
+		local vz2 = z2 + vector_z
+		if (disSQ(vx,vz,vx2,vz2) > (80*80)) then
+			AdditionalE(x1 + vector_x, z1 + vector_z, false)
+			AdditionalE(x2 + vector_x, z2 + vector_z, false)
+		else
+			local ox = (vx+vx2)/2; local oz = (vz+vz2)/2
+			local x = ox + random(-15,15)
+			local z = oz + random(-15,15)
+			AdditionalE(x, z, false)
+		end
+	else
+-- 	  Spring.Echo("[debug] singleunit")
+		local ox = (x1+x2)/2; local oz = (z1+z2)/2
+		local x = ox + random(-15,15)
+		local z = oz + random(-15,15)
+		AdditionalE(x, z, false)
+	end
+end
+
 local function CreateCaretaker(unitID, x,y,z)
 	local steps=0
 	local direction = random(0,3)
 	while (steps <= 18) do
-		if not(FactoryBlock(x,y,z)) and (spTestBuildOrder(UnitDefNames["armnanotc"].id, x, 0 ,z, 0) == 2) then
+		if not(FactoryBlock(x,y,z,true)) and (spTestBuildOrder(UnitDefNames["armnanotc"].id, x, 0 ,z, 0) >= 1) then
 			pAI_JobCreate(JOB_BUILD, UnitDefNames["armnanotc"].id, x, spGetGroundHeight(x,z), z, 0, 0, false)
 			return -- success
 		end
@@ -857,8 +1217,8 @@ end
 
 local function ReclaimSomeFeature(unitID, x, z, max_dist, need_e, need_m, e_first)
 	if (max_dist) then -- caretaker
-		max_dist = max_dist*max_dist
 		local features = spGetFeaturesInRectangle(x-max_dist,z-max_dist,x+max_dist,z+max_dist)
+		max_dist = max_dist*max_dist
 		local oreid
 		local best_dist
 		for i=1,#features do
@@ -912,6 +1272,7 @@ end
 local function RepairSomething(unitID, x, z, max_dist)
 	if (max_dist) then -- caretaker
 		local units = spGetUnitsInCylinder(x,z,max_dist)
+		max_dist = max_dist*max_dist
 		local bestID
 		local best_dist
 		for i=1,#units do
@@ -962,9 +1323,35 @@ local function RepairSomething(unitID, x, z, max_dist)
 	return false
 end
 
+local function HelpFactory(unitID, x, z, max_dist) -- TODO logic should be better for movable cons...
+	local units = spGetUnitsInCylinder(x,z,max_dist)
+	max_dist = max_dist*max_dist
+	local good_units = {}
+	for i=1,#units do
+		local targetID = units[i]
+		if (spIsUnitAllied(targetID) and (unitID ~= targetID)) and (pAI_econ.factory[targetID]) then
+			local ox,_,oz = spGetUnitPosition(targetID)
+			local dist = disSQ(x,z,ox,oz)
+			local queue = spGetFactoryCommands(targetID, 1)
+			local teamID = spGetUnitTeam(targetID)
+			if IsTargetReallyReachable(unitID, ox, spGetGroundHeight(ox,oz), oz, x, spGetGroundHeight(x,z), z) and (#queue > 0) and (dist <= max_dist) and ((random(0,5) > 2) or (teamID == myTeamID)) then
+				good_units[#good_units+1] = targetID
+			end
+		end
+	end
+	if (#good_units > 0) then
+		local bestID = good_units[random(1,#good_units)]
+		local ox,oy,oz = spGetUnitPosition(bestID)
+		pAI_JobAssign(unitID, pAI_JobCreate(JOB_HELP_FACTORY, bestID, ox, oy, oz, 0, 0, false))
+		spGiveOrderToUnit(unitID, CMD_GUARD, {bestID}, {})
+		return true
+	end
+end
+
 local function AssistSomething(unitID, x, z, max_dist)
 	if (max_dist) then -- caretaker
 		local units = spGetUnitsInCylinder(x,z,max_dist)
+		max_dist = max_dist*max_dist
 		local bestID
 		local best_dist
 		for i=1,#units do
@@ -1033,21 +1420,35 @@ local function pAI_CalculateJobImportance(jobID, data)
 	local _, inLos = spGetPositionLosState(x,y,z, myAllyTeamID)
 	local cmdID = data.cmdID
 	local type = data.type
+	local importance = 0
 	if (type == JOB_BUILD) then
-		local importance = 0
 		-- unitdefs bonus
 		if (MexDefs[cmdID]) then
 			importance = importance + 5
+			if not(good_m) then
+			      importance = importance + 10 -- triple points because its even more needed
+			end
 		elseif (EnergyDefs[cmdID]) then
 			importance = importance + EnergyDefs[cmdID][1]
+			if not(good_e) then -- double points because its needed
+				importance = importance + EnergyDefs[cmdID][1]
+			end
 		end
 		-- close to another building of type?
-		if (IsInsideGridConnected(nil,x,z)) then
+		if (IsInsideGridConnected(nil,x,z,false, false)) then -- TODO importance should grow the more stuff it has?
 			importance = importance + 1
 		end
-		-- final score
-		data.importance = importance + ScoutScore(x,z,pAI_econ.base[1],pAI_econ.base[3],pAI_econ.base[4]) + ConfrontationScore(x,z) - data.assigned_count
 	end
+	if (type ~= JOB_SCOUT) and (type ~= JOB_RETREAT) and (type ~= JOB_RECLAIM) then
+		if not(good_e) then
+			importance = importance - 3
+		end
+		if not(good_m) and (type ~= JOB_REPAIR) then
+			importance = importance - 7
+		end
+	end
+	-- final score
+	data.importance = importance + ScoutScore(x,z,pAI_econ.base[1],pAI_econ.base[3],pAI_econ.base[4]) + ConfrontationScore(x,z) - data.assigned_count
 end
 
 local function pAI_CentralCommandOrders(f)
@@ -1097,20 +1498,22 @@ local function pAI_CentralCommandOrders(f)
 		local base_x = pAI_econ.base[1]
 		local base_z = pAI_econ.base[3]
 		local closest_dist = nil
-		local TestSpot = {}
 		local myAllyTeamID = spGetMyAllyTeamID()
-		for i=1,#WG.metalSpots do
-			local x = WG.metalSpots[i].x
-			local z = WG.metalSpots[i].z
-			if not(pAI_JobAt(x,z)) and (spTestBuildOrder(UnitDefNames["cormex"].id, x, 0 ,z, 0) == 2) then
-				local dist = AnyMexNear(x,z,MAX_JOB_CLOSE_SQ) or disSQ(x,z,base_x,base_z)
-				TestSpot[#TestSpot+1] = {
-				   x = x,
-				   z = z,
-				   dist = dist,
-				}
-				if (closest_dist == nil) or (dist < closest_dist) then
-					closest_dist = dist
+		local TestSpot = {}
+		if not(oremex) or not(oremex_prespawn) then
+			for i=1,#WG.metalSpots do
+				local x = WG.metalSpots[i].x
+				local z = WG.metalSpots[i].z
+				if not(pAI_JobAt(x,z)) and (spTestBuildOrder(UnitDefNames["cormex"].id, x, 0 ,z, 0) >= 1) then
+					local dist = AnyMexNear(x,z,MAX_JOB_CLOSE_SQ) or disSQ(x,z,base_x,base_z)
+					TestSpot[#TestSpot+1] = {
+					  x = x,
+					  z = z,
+					  dist = dist,
+					}
+					if (closest_dist == nil) or (dist < closest_dist) then
+						closest_dist = dist
+					end
 				end
 			end
 		end
@@ -1123,7 +1526,7 @@ local function pAI_CentralCommandOrders(f)
 			end
 		end
 		pAI_econ.base[4] = closest_dist
-		-- InLos points are for build, otherwise scouting. Cons/commanders are free to scout, if it's inbase range.
+		-- 2) InLos points are for build, otherwise scouting. Cons/commanders are free to scout, if it's inbase range.
 		for i=1,#TestSpot do
 			local x = TestSpot[i].x
 			local z = TestSpot[i].z
@@ -1139,7 +1542,125 @@ local function pAI_CentralCommandOrders(f)
 				end
 			end
 		end
-		-- 2) Scout job is swapped into Build job if it has building unitdef as cmdID. otherwise destroyed.
+		-- 3) Capture any extractor that belongs to gaia with solar or windgen...
+		if (mCur > 35) or (pAI_econ.energy_count < 10) then
+			if (oremex) and (oremex_overdrive) then
+				for unitID, _ in pairs(OreExtractors) do
+					local unitDefID = spGetUnitDefID(unitID)
+					if (unitDefID) and (MexDefs[unitDefID]) then
+						-- check whether it's possible to connect it
+						local x, y, z = spGetUnitPosition(unitID)
+						local _, inLos = spGetPositionLosState(x,y,z, myAllyTeamID)
+						if inLos and not(IsInsideGridConnected(nil, x, z, false, true)) then
+							BuildEnergyCloseToMex(x, z) -- create job
+						end
+					end
+				end
+			else
+				for unitID, _ in pairs(pAI_econ.extractor) do
+					if (pAI_econ.overdrive[unitID] == 0) then
+						-- check whether it's possible to connect it
+						local x, y, z = spGetUnitPosition(unitID)
+						local _, inLos = spGetPositionLosState(x,y,z, myAllyTeamID)
+						if inLos and not(IsInsideGridConnected(nil, x, z, false, true)) then
+							BuildEnergyCloseToMex(x, z) -- create job
+						end
+					end
+				end
+			end
+			-- 4) Any built extractor inlos deserves econ, riiight? So let's check grid.
+			local energy_jobs_cost = 0
+			for jobID, data in pairs(pAI_jobs) do
+				if (data.type == BUILD) and (EnergyDefs[data.cmdID]) then
+					energy_jobs_cost = energy_jobs_cost + EnergyDefs[data.cmdID].metalCost
+				end
+			end
+			for unitID,_ in pairs(pAI_econ.energy) do
+				local _,_,_,_,build = spGetUnitHealth(unitID)
+				local teamID = spGetUnitTeam(unitID)
+				if (build < 1) and (teamID == myTeamID) then
+					energy_jobs_cost = energy_jobs_cost + UnitDefs[spGetUnitDefID(unitID)].metalCost*(1-build)
+				end
+			end
+			if (energy_jobs_cost < aveMInc*50) then
+				-- more jobs !
+				local single_grid = true
+				local test = 0
+				for _, grid in pairs(pAI_econ.overdrive) do
+				      if (test == 0) then test = grid 
+				      elseif (test ~= grid) and (grid > 0) then single_grid = false break end
+				end
+				if not(single_grid) then
+					local grids = {}
+					for unitID, grid in pairs(pAI_econ.overdrive) do
+						if (grids[grid] == nil) then
+							grids[grid] = {
+								units = {},
+								x = 0,
+								z = 0,
+								count = 0,
+							}
+						else
+							grids[grid].units[unitID] = true
+							local x,_,z = spGetUnitPosition(unitID)
+							grids[grid].x = grids[grid].x + x
+							grids[grid].z = grids[grid].z + z
+							grids[grid].count = grids[grid].count + 1
+						end
+					end
+					for grid, data in pairs(grids) do
+						grids[grid].x = data.x / data.count
+						grids[grid].z = data.z / data.count
+					end
+					-- pick 2 closest grids to playerbase
+					local grid1, grid2
+					local best_dist = nil
+					for grid, data in pairs(grids) do
+						local dist = disSQ(data.x,data.z,base_x,base_z)
+						if ((best_dist == nil) or (dist < best_dist)) then
+							if (best_dist ~= nil) then
+								grid2 = grid1
+							end
+							grid1 = grid
+							best_dist = dist
+						end
+					end
+					if (grid1) and (grid2) then
+						-- loop through all buildings within these 2 grids and order to build energydefs to connect them
+-- 						local pylon1 = PylonRange*PylonRange*2
+-- 						if (dist <= pylon1) and (mCur >= 400) and (mInc >= 5) then
+-- 							-- order pylon in between
+-- 						end
+						best_dist = nil
+						local best_unit1,best_unit2
+						for unitID1,_ in pairs(grids[grid1].units) do
+							for unitID2,_ in pairs(grids[grid2].units) do
+								local x1,_,z1 = spGetUnitPosition(unitID1)
+								local x2,_,z2 = spGetUnitPosition(unitID2)
+								local dist = disSQ(x1,z1,x2,z2)
+								if (best_dist==nil) or (best_dist > dist) then
+									best_dist = dist
+									best_unit1 = unitID1
+									best_unit2 = unitID2
+								end
+							end
+						end
+						if (best_unit1) and (best_unit2) then
+-- 				  Spring.Echo("[debug] connect grid")
+							ConnectGrid(best_unit1, best_unit2)
+						end
+					else
+						single_grid = true
+					end
+-- 					if (single_grid) then
+-- -- 				  Spring.Echo("[debug] additionale single grid")
+-- 						AdditionalE(base_x, base_z, true)
+-- 					end
+					-- if single grid or "single grid" just build E somewhere close at the end of the base
+				end
+			end
+		end
+		-- 5) Scout job is swapped into Build job if it has building unitdef as cmdID. otherwise destroyed.
 		-- The idea is, should building be outside los it's swapped into scout job first, so no cons will venture out there
 		for jobID, data in pairs(pAI_jobs) do
 			local x = data.x
@@ -1157,7 +1678,7 @@ local function pAI_CentralCommandOrders(f)
 				end
 			elseif (type == JOB_SCOUT) then
 				if (inLos) then
-					if (data.cmdID > 0) and (spTestBuildOrder(UnitDefNames["cormex"].id, x, 0 ,z, 0) == 2) then
+					if (data.cmdID > 0) and (spTestBuildOrder(UnitDefNames["cormex"].id, x, 0 ,z, 0) >= 1) then
 						pAI_jobs[jobID].type = JOB_BUILD -- inLOS, switch for build order
 					else
 						pAI_JobDestroyed(jobID, false)
@@ -1185,36 +1706,56 @@ local function pAI_CentralCommandOrders(f)
 						pAI_JobDestroyed(jobID, true)
 					end
 				end
+			elseif (type == JOB_HELP_FACTORY) then
+				if not(inLos) or not(spValidUnitID(data.cmdID)) then
+					pAI_JobDestroyed(jobID, true)
+				end
+			elseif (type == JOB_RELOCATE) then
+				if not(inLos) or not(spValidUnitID(data.cmdID)) then
+					pAI_JobDestroyed(jobID, true)
+				else
+					for unitID, data2 in pairs(pAI) do
+						if (data2.job == jobID) then
+							local ux,_,uz = spGetUnitPosition(unitID)
+							if (disSQ(ux,uz,x,z)<=(400*400)) then
+								pAI_JobUnassign(unitID)
+							end
+						end
+					end
+				end
+			end
+			if (data.importance < 0) and (random(0,20)==20) then
+				pAI_JobDestroyed(jobID, true)
 			end
 		end
-		-- 3) Calculate job's importance levels.
+		-- 6) Calculate job's importance levels.
 		for jobID, data in pairs(pAI_jobs) do
-			pAI_CalculateJobImportance(jobID, data)
+			pAI_CalculateJobImportance(jobID, data, good_e, good_m)
 		end
 		-- Note that the decision if building is buildable is decided by cons, they check whether there is some income to spend and start building most important structure.
 		-- While Job Creator will give out jobs regardless if they are even possible to complete or dangerous.
-		local factory_data = {}
+		local factory_caretakers = {}
 		local factories = false
 		for unitID, data in pairs(pAI_econ.factory) do
 			if (spGetUnitTeam(unitID) == myTeamID) then
 				local x,y,z = spGetUnitPosition(unitID)
 				local queue = spGetFactoryCommands(unitID, 1)
 				if (#queue > 0) then -- idle factories dont get caretakers
-					factory_data[unitID] = 0
+					factory_caretakers[unitID] = 0
 					if not(factories) then factories = unitID end
 					local units = spGetUnitsInCylinder(x,z,500)
 					for i=1,#units do
 						local unit = units[i]
-						if (spIsUnitAllied(unit) and CareTakerDefs[spGetUnitDefID(unit)]) then
-							factory_data[unitID] = factory_data[unitID] + 1
+						if (spIsUnitAllied(unit) and pAI_econ.caretaker[unit]) then
+							factory_caretakers[unitID] = factory_caretakers[unitID] + 1
 						end
 					end
 					for jobID, data in pairs(pAI_jobs) do
 						if (data.cmdID == UnitDefNames["armnanotc"].id) then
-							local cx, cz = data, data.z
+							local cx, cz = data.x, data.z
 							local dist = disSQ(x,z,cx,cz)
 							if (dist < MAX_CARETAKER_RANGE_SQ) then
-								factory_data[unitID] = factory_data[unitID] + 1
+								factory_caretakers[unitID] = factory_caretakers[unitID] + 1
 							end
 						end
 					end
@@ -1222,10 +1763,10 @@ local function pAI_CentralCommandOrders(f)
 			end
 		end
 		local bp_users = pAI_econ.factory_count + pAI_econ.caretaker_count
-		if (factories) and (good_eco) and (aveMInc >= (bp_users*10)) then
+		if (factories) and (good_eco) and (aveMInc >= (bp_users*10)) and (mCur > 110) and (eCur > 110) then
 			local lowest = factories
-			local lowest_amount = factory_data[factories]
-			for unitID, amount in pairs(factory_data) do
+			local lowest_amount = factory_caretakers[factories]
+			for unitID, amount in pairs(factory_caretakers) do
 				if (amount < lowest_amount) then
 					lowest_amount = amount
 					lowest = unitID
@@ -1244,8 +1785,14 @@ local function pAI_Think(f,good_m,good_e)
 	for unitID, data in pairs(pAI) do
 		if not(any) then any = true end
 		if (data.humanorders == false) and (data.completed) then
-			if (data.job > 0) and (pAI_jobs[data.job] == JOB_RETREAT) and (data.last_attacked-150 > f) then
-				pAI[unitID].job = 0
+			if (data.job > 0) then
+				if (pAI_jobs[data.job] == nil) or (pAI_jobs[data.job].importance < 0) or
+				    ((pAI_jobs[data.job].type == JOB_RETREAT) and (data.last_attacked-150 > f)) or
+				    ((random(0,3)==3) and ((pAI_jobs[data.job].type == JOB_BUILD) or (pAI_jobs[data.job].type == JOB_ASSIST)) and not(good_eco)) or
+				    ((data.builder) and (pAI_jobs[data.job].type == JOB_HELP_FACTORY) and not(good_eco)) or
+				    (pAI_jobs[data.job].type == JOB_RECLAIM and (AlliesHaveFullM()) and (AlliesHaveFullE())) then
+					pAI[unitID].job = 0
+				end
 			end
 			if (data.builder) and (data.job == 0) then
 				-- no time to waste!
@@ -1255,7 +1802,7 @@ local function pAI_Think(f,good_m,good_e)
 				local goodJobs = {}
 				local farJobs = {}
 				for jobID, job_data in pairs(pAI_jobs) do
-					if not(data.limited) or not(JOB_BUILD) then
+					if (not(data.limited) or not(JOB_BUILD)) then
 						local jx, jy, jz = job_data.x, job_data.y, job_data.z
 						if IsTargetReallyReachable(unitID, jx, jy, jz, x, y, z) then
 							local dist = disSQ(jx,jz,x,z)
@@ -1278,7 +1825,7 @@ local function pAI_Think(f,good_m,good_e)
 							local jobID = goodJobs[i]
 							local job_data = pAI_jobs[jobID]
 							local dist = disSQ(job_data.x,job_data.z,x,z)
-							if (job_data.importance > importance) or ((job_data.importance == importance) and ((closest_dist == nil) or (closest_dist < dist))) then
+							if ((random(0,2)==2) and (job_data.importance > importance)) or ((job_data.importance == importance) and ((closest_dist == nil) or (closest_dist < dist))) then
 								 importance = job_data.importance
 								 most_important = jobID
 								 closest_dist = dist
@@ -1286,7 +1833,7 @@ local function pAI_Think(f,good_m,good_e)
 						end
 -- 						CheckAllJobsIn(data.x,data.z,100)
 						local data = pAI_jobs[most_important]
-						if (data) and (data.type == JOB_BUILD) then
+						if (data) and (data.type == JOB_BUILD) and (data.importance >= 0) then
 							local units = spGetUnitsInRectangle(data.x-1,data.z-1,data.x+1,data.z+1)
 							if (#units > 0) then
 								local orders = {}
@@ -1312,7 +1859,14 @@ local function pAI_Think(f,good_m,good_e)
 						end
 					end
 				end
-				if not(assigned) then -- income is lower than activebp, any reclaimablities?
+				local minimum_resource = pAI_econ[0].mCur
+				if (pAI_econ[0].eCur < minimum_resource) then
+					minimum_resource = pAI_econ[0].eCur
+				end
+				local max_resource = pAI_econ[0].mMax
+				if (max_resource < 500) then max_resource = 500 end
+				local skip_reclaim = minimum_resource / pAI_econ[0].mMax * 100
+				if not(assigned) and (skip_reclaim < random(1,100)) then -- income is lower than activebp, any reclaimablities?
 					local e_first = false
 					if (pAI_econ[0].eCur <= pAI_econ[0].eMax*0.1) then
 						e_first = true
@@ -1352,8 +1906,22 @@ local function pAI_Think(f,good_m,good_e)
 					if not(assigned) then
 						if (data.caretaker) then
 							assigned = RepairSomething(unitID, x, z, 500)
-						else
+						elseif (good_e) then
 							assigned = RepairSomething(unitID, x, z, nil)
+						end
+					end
+					if not(assigned) and (good_eco) then -- nothing at all? help nearest player/ally factory ?
+						assigned = HelpFactory(unitID, x, z, 500)
+					end
+				end
+				if not(data.caretaker) and not(assigned) and (random(0,5)>=4) then
+					if (#farJobs > 0) then
+						local randJob = farJobs[random(1,#farJobs)]
+						local ox = pAI_jobs[randJob].x
+						local oz = pAI_jobs[randJob].z
+						local oy = spGetGroundHeight(ox,oz)
+						if IsTargetReallyReachable(unitID, ox, oy, oz, x, y, z) then
+							assigned = pAI_JobAssign(unitID, pAI_JobCreate(JOB_RELOCATE, 0, ox, oy, oz, 0, 0, false))
 						end
 					end
 				end
@@ -1527,20 +2095,6 @@ local function ProcessUnitCreated(unitID, unitDefID, teamID, builderID)
 		ecoUnit[unitID] = true	
 	end
 	if (teamID == myTeamID) then
-		if (UnitDefs[unitDefID].isFactory) and not(pAI_econ.factory[unitID]) then
-			pAI_econ.factory[unitID] = true
-			pAI_econ.factory_count = pAI_econ.factory_count + 1
-			PlaceRetreatLocation(unitID)
-		elseif (CareTakerDefs[unitDefID]) and not (pAI_econ.caretaker[unitID]) then
-			pAI_econ.caretaker[unitID] = true
-			pAI_econ.caretaker_count = pAI_econ.caretaker_count + 1
-		elseif (UnitDefs[unitDefID].customParams.commtype) and not (pAI_econ.commander[unitID]) then
-			pAI_econ.commander[unitID] = true
-			pAI_econ.commander_count = pAI_econ.commander_count + 1
-		elseif (UnitDefs[unitDefID].isBuilder) and not (pAI_econ.builder[unitID]) then
-			pAI_econ.builder[unitID] = true
-			pAI_econ.builder_count = pAI_econ.builder_count + 1
-		end
 		if OnDefaultDefs[unitDefID] or pAI_isControlled(builderID)==2 then
 			if OnDefaultDefs[unitDefID] then
 				pAI_SwitchControl(unitID, unitDefID, OnDefaultDefs[unitDefID])
@@ -1550,12 +2104,27 @@ local function ProcessUnitCreated(unitID, unitDefID, teamID, builderID)
 			pAI[unitID].humanorders = true -- hacky way to force con to complete factory orders first
 		end	
 	end
-	if (EnergyDefs[unitDefID]) and not (pAI_econ.energy[unitID]) then
+	if (UnitDefs[unitDefID].isFactory) and not(pAI_econ.factory[unitID]) then
+		pAI_econ.factory[unitID] = true
+		pAI_econ.factory_count = pAI_econ.factory_count + 1
+		PlaceRetreatLocation(unitID)
+	elseif (CareTakerDefs[unitDefID]) and not (pAI_econ.caretaker[unitID]) then
+		pAI_econ.caretaker[unitID] = true
+		pAI_econ.caretaker_count = pAI_econ.caretaker_count + 1
+	elseif (UnitDefs[unitDefID].customParams.commtype) and not (pAI_econ.commander[unitID]) then
+		pAI_econ.commander[unitID] = true
+		pAI_econ.commander_count = pAI_econ.commander_count + 1
+	elseif (UnitDefs[unitDefID].isBuilder) and not (pAI_econ.builder[unitID]) then
+		pAI_econ.builder[unitID] = true
+		pAI_econ.builder_count = pAI_econ.builder_count + 1
+	elseif (EnergyDefs[unitDefID]) and not (pAI_econ.energy[unitID]) then
 		pAI_econ.energy[unitID] = true
 		pAI_econ.energy_count = pAI_econ.energy_count + 1
+		ConnectEcon(unitID)
 	elseif (MexDefs[unitDefID]) and not (pAI_econ.extractor[unitID]) then
 		pAI_econ.extractor[unitID] = true
 		pAI_econ.extractor_count = pAI_econ.extractor_count + 1
+		ConnectEcon(unitID)
 	end
 	-- if it's building render job that is inside building impossible to build
 	if (getMovetype(UnitDefs[unitDefID]) == false) then
@@ -1587,30 +2156,29 @@ local function ProcessUnitDestroyed(unitID, unitDefID, teamID)
 		end
 		ecoUnit[unitID] = nil
 	end
-	if (teamID == myTeamID) then
-		if (UnitDefs[unitDefID].isFactory) and (pAI_econ.factory[unitID]) then
-			pAI_econ.factory[unitID] = nil
-			pAI_econ.factory_count = pAI_econ.factory_count - 1
-			DestroyRetreat(unitID)
-		elseif (CareTakerDefs[unitDefID]) and (pAI_econ.caretaker[unitID]) then
-			pAI_econ.caretaker[unitID] = nil
-			pAI_econ.caretaker_count = pAI_econ.caretaker_count - 1
-		elseif (UnitDefs[unitDefID].customParams.commtype) and (pAI_econ.commander[unitID]) then
-			pAI_econ.commander[unitID] = nil
-			pAI_econ.commander_count = pAI_econ.commander_count - 1
-		elseif (UnitDefs[unitDefID].isBuilder) and (pAI_econ.builder[unitID]) then
-			pAI_econ.builder[unitID] = nil
-			pAI_econ.builder_count = pAI_econ.builder_count - 1
-		end
-	end
-	if (EnergyDefs[unitDefID]) and (pAI_econ.energy[unitID]) then
-		pAI_econ.energy[unitID] = nil
-		pAI_econ.energy_count = pAI_econ.energy_count - 1
+	if (UnitDefs[unitDefID].isFactory) and (pAI_econ.factory[unitID]) then
+		pAI_econ.factory[unitID] = nil
+		pAI_econ.factory_count = pAI_econ.factory_count - 1
+		DestroyRetreat(unitID)
+	elseif (CareTakerDefs[unitDefID]) and (pAI_econ.caretaker[unitID]) then
+		pAI_econ.caretaker[unitID] = nil
+		pAI_econ.caretaker_count = pAI_econ.caretaker_count - 1
+	elseif (UnitDefs[unitDefID].customParams.commtype) and (pAI_econ.commander[unitID]) then
+		pAI_econ.commander[unitID] = nil
+		pAI_econ.commander_count = pAI_econ.commander_count - 1
+	elseif (UnitDefs[unitDefID].isBuilder) and (pAI_econ.builder[unitID]) then
+		pAI_econ.builder[unitID] = nil
+		pAI_econ.builder_count = pAI_econ.builder_count - 1
 	elseif (MexDefs[unitDefID]) and (pAI_econ.extractor[unitID]) then
 		pAI_econ.extractor[unitID] = nil
 		pAI_econ.extractor_count = pAI_econ.extractor_count - 1
+		DisconnectEcon(unitID)
+	elseif (EnergyDefs[unitDefID]) and (pAI_econ.energy[unitID]) then
+		pAI_econ.energy[unitID] = nil
+		pAI_econ.energy_count = pAI_econ.energy_count - 1
+		DisconnectEcon(unitID)
 	end
--- 	if pAI_enemy[unitID] then
+	if pAI_enemy[unitID] then
 -- 		if (pAI_econ.danger[unitID]) then
 -- 			pAI_econ.danger = nil
 -- 			local x,y,z = spGetUnitPosition(unitID)
@@ -1618,8 +2186,11 @@ local function ProcessUnitDestroyed(unitID, unitDefID, teamID)
 -- 				MakeScoutJobs(x,z)
 -- 			end
 -- 		end
--- 		pAI_enemy[unitID] = nil
--- 	end
+		pAI_enemy[unitID] = nil
+	end
+	if (OreExtractors[unitID]) then
+		OreExtractors[unitID] = nil
+	end
 end
 
 function widget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -1659,6 +2230,14 @@ function widget:UnitEnteredLos(unitID, teamID)
 				end
 			end
 		end
+		if (oremex) and (oremex_overdrive) then
+			if (teamID == GaiaTeamID) then
+				local unitDefID = spGetUnitDefID(unitID)
+				if (unitDefID) and (MexDefs[unitDefID]) then
+					OreExtractors[unitID] = true
+				end
+			end
+		end
 	end
 end
 
@@ -1670,10 +2249,25 @@ function widget:UnitLeftLos(unitID, teamID)
 -- 		end
 		pAI_enemy[unitID] = nil
 	end
+	if (OreExtractors[unitID]) then
+		OreExtractors[unitID] = nil
+	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	ProcessUnitDestroyed(unitID, unitDefID, teamID)
+end
+
+local function AnnouncerUnitDestroyed(PlayerID, unitID, attackerID)
+	local unitDefID = spGetUnitDefID(unitID)
+	local teamID = spGetUnitTeam(unitID)
+-- 	local attackerDefID, attackerTeamID
+-- 	if (attackerID ~= nil) then
+-- 		attackerDefID = spGetUnitDefID(attackerID)
+-- 		attackerTeamID = spGetUnitTeam(attackerID)
+-- 	end
+	ProcessUnitDestroyed(unitID, unitDefID, teamID)
+-- 	UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
 end
 
 --------------------------------------------------------------------------------
@@ -1724,6 +2318,7 @@ function widget:Initialize()
 		caretaker = {},
 		caretaker_count = 0,
 		retreat = {},
+		overdrive = {},
 	}
   
 	local units = spGetTeamUnits(myTeamID)
@@ -1777,6 +2372,12 @@ function widget:Initialize()
 	if (spGetGameFrame() > 1) then
 		ReInit(true)
 	end
+	
+	widgetHandler:RegisterGlobal("unitDiedInLos", AnnouncerUnitDestroyed)
+end
+
+function widget:Shutdown()
+	widgetHandler:DeregisterGlobal("unitDiedInLos", AnnouncerUnitDestroyed)
 end
 
 function widget:GameStart()

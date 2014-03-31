@@ -124,7 +124,7 @@ for i=1,#UnitDefs do
 end
 
 -- NOTE probably below defs could be generated on gamestart too
-local energyDefs = { -- if gaia mex get's in range of any of below structures, it will transmit it ownership
+local EnergyDefs = { -- if gaia mex get's in range of any of below structures, it will transmit it ownership
 	[UnitDefNames["armestor"].id] = UnitDefNames["armestor"].customParams.pylonrange,
 	[UnitDefNames["armwin"].id] = UnitDefNames["armwin"].customParams.pylonrange,
 	[UnitDefNames["armsolar"].id] = UnitDefNames["armsolar"].customParams.pylonrange,
@@ -132,11 +132,12 @@ local energyDefs = { -- if gaia mex get's in range of any of below structures, i
 	[UnitDefNames["cafus"].id] = UnitDefNames["cafus"].customParams.pylonrange,
 	[UnitDefNames["geo"].id] = UnitDefNames["geo"].customParams.pylonrange,
 	[UnitDefNames["amgeo"].id] = UnitDefNames["amgeo"].customParams.pylonrange,
+	[UnitDefNames["cormex"].id] = UnitDefNames["cormex"].customParams.pylonrange,
 }
-local mexDefs = {
+local MexDefs = {
 	[UnitDefNames["cormex"].id] = true,
 }
-local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 21
+local PylonRange = UnitDefNames["armestor"].customParams.pylonrange + 39
 
 local INVULNERABLE_EXTRACTORS = (tonumber(modOptions.oremex_invul) == 1) -- invulnerability of extractors. they can still switch team side should OD get connected
 if (modOptions.oremex_invul == nil) then INVULNERABLE_EXTRACTORS = true end
@@ -220,11 +221,11 @@ local TransferLoop = function()
 				local targetDefID = spGetUnitDefID(targetID)
 				local targetTeam = spGetUnitTeam(targetID)
 				local targetAllyTeam = spGetUnitAllyTeam(targetID)
-				if (energyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
-					local maxdist = energyDefs[targetDefID]+21
+				if (EnergyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
+					local maxdist = EnergyDefs[targetDefID] + 39
 					maxdist=maxdist*maxdist
 					local x2,_,z2 = spGetUnitPosition(targetID)
-					if (disSQ(x,z,x2,z2) <= maxdist) then
+					if (disSQ(x,z,x2,z2) <= maxdist) or (UnitDefs[targetDefID].name == "armestor") then
 						enearby = true
 						local eff = spGetUnitRulesParam(targetID,"gridefficiency")
 --							 Spring.MarkerAddPoint(x2,0,z2,eff)
@@ -279,7 +280,7 @@ local InflictOreDamage = function()
 end
 
 -- if mex OD is off and it's godmode on, transfer mex to gaia team
--- if mex is inside energyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
+-- if mex is inside EnergyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
 function gadget:GameFrame(f)
 	if ((f%32)==1) then
 		MineMoreOreLoop()
@@ -296,7 +297,7 @@ function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attac
 end
 
 local function UnitFin(unitID, unitDefID, unitTeam)
-	if (mexDefs[unitDefID]) then
+	if (MexDefs[unitDefID]) then
 		local x,y,z = spGetUnitPosition(unitID)
 		if (x) then
 			OreMex[unitID] = {
@@ -320,7 +321,7 @@ local function CanSpawnOreAt(x,z)
 		for i=1,#units do
 			local unitID = units[i]
 			local unitDefID = spGetUnitDefID(unitID)
-			if (getMovetype(UnitDefs[unitDefID]) == false) and not(mexDefs[unitDefID]) then
+			if (getMovetype(UnitDefs[unitDefID]) == false) and not(MexDefs[unitDefID]) then
 				return false
 			end
 		end
