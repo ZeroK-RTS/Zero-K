@@ -1087,7 +1087,7 @@ local function AdditionalE(base_x,base_z,at_base) -- TODO teach it to build clos
 		end
 		local y = spGetGroundHeight(x,z)
 		local type = UnitDefNames["armwin"].id
-		Spring.MarkerAddPoint(base_x,0,base_z,"oh "..spTestBuildOrder(type, base_x, 0 ,base_z, 0))
+-- 		Spring.MarkerAddPoint(base_x,0,base_z,"oh "..spTestBuildOrder(type, base_x, 0 ,base_z, 0))
 		if (y > waterLevel) then
 			local chance = y/3
 			if (chance < random(0,100)) then
@@ -1110,8 +1110,8 @@ end
 local function ConnectGrid(unitID1, unitID2)
 	local x1,_,z1 = spGetUnitPosition(unitID1)
 	local x2,_,z2 = spGetUnitPosition(unitID2)
-		Spring.MarkerAddPoint(x1,0,z1,"oh1")
-		Spring.MarkerAddPoint(x2,0,z2,"oh2")
+-- 		Spring.MarkerAddPoint(x1,0,z1,"oh1")
+-- 		Spring.MarkerAddPoint(x2,0,z2,"oh2")
 	local dist = disSQ(x1,z1,x2,z2)
 	local max_dist = PylonRange*PylonRange*1.9
 	local min_dist = PylonRange*PylonRange*1.4
@@ -1141,7 +1141,7 @@ local function ConnectGrid(unitID1, unitID2)
 				try = try + 1
 			end
 		end
-	elseif (dist > (120*120)) then
+	elseif (dist > (140*140)) then
 -- 	  Spring.Echo("[debug] long line")
 		-- from unitID1 to unitID2
 		local vector_x = x2-x1
@@ -1162,9 +1162,11 @@ local function ConnectGrid(unitID1, unitID2)
 		local vx2 = x2 + vector_x
 		local vz2 = z2 + vector_z
 		if (disSQ(vx,vz,vx2,vz2) > (80*80)) then
-			AdditionalE(x1 + vector_x, z1 + vector_z, false)
-			AdditionalE(x2 + vector_x, z2 + vector_z, false)
+-- 		  Spring.Echo("[debug] yea")
+			AdditionalE(vx, vz, false)
+			AdditionalE(vx2, vz2, false)
 		else
+-- 		  Spring.Echo("[debug] nea")
 			local ox = (vx+vx2)/2; local oz = (vz+vz2)/2
 			local x = ox + random(-15,15)
 			local z = oz + random(-15,15)
@@ -1612,17 +1614,27 @@ local function pAI_CentralCommandOrders(f)
 						grids[grid].x = data.x / data.count
 						grids[grid].z = data.z / data.count
 					end
-					-- pick 2 closest grids to playerbase
 					local grid1, grid2
 					local best_dist = nil
-					for grid, data in pairs(grids) do
-						local dist = disSQ(data.x,data.z,base_x,base_z)
-						if ((best_dist == nil) or (dist < best_dist)) then
-							if (best_dist ~= nil) then
-								grid2 = grid1
+					if (#grids > 2) then
+						-- pick 2 closest grids to playerbase
+						for grid, data in pairs(grids) do
+							local dist = disSQ(data.x,data.z,base_x,base_z)
+							if ((best_dist == nil) or (dist < best_dist)) then
+								if (best_dist ~= nil) then
+									grid2 = grid1
+								end
+								grid1 = grid
+								best_dist = dist
 							end
-							grid1 = grid
-							best_dist = dist
+						end
+					else
+						for grid, _ in pairs(grids) do
+							if not(grid1) then
+								grid1 = grid
+							else
+								grid2 = grid
+							end
 						end
 					end
 					if (grid1) and (grid2) then
