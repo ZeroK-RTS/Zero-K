@@ -221,7 +221,7 @@ local TransferLoop = function()
 				local targetDefID = spGetUnitDefID(targetID)
 				local targetTeam = spGetUnitTeam(targetID)
 				local targetAllyTeam = spGetUnitAllyTeam(targetID)
-				if (EnergyDefs[targetDefID]) and (targetTeam~=GaiaTeamID) then
+				if (EnergyDefs[targetDefID]) and (mexID ~= targetID) and (targetTeam~=GaiaTeamID) then
 					local maxdist = EnergyDefs[targetDefID] + 39
 					maxdist=maxdist*maxdist
 					local x2,_,z2 = spGetUnitPosition(targetID)
