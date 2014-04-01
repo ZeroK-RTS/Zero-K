@@ -145,7 +145,7 @@ function widget:DrawWorld()
 end
 
 local function ShowOreMexIncome(playerID, unitID, income)
-	if (spValidUnitID(unitID)) then
+	if (spValidUnitID(unitID) and OreExtractors[unitID]) then
 		OreExtractors[unitID].income = income
 		if (OreExtractors[unitID].income > 0) then
 			OreExtractors[unitID].label = true

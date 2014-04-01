@@ -150,7 +150,7 @@ if (modOptions.oremex_overdrive == nil) then OBEY_OD = true end
 local INFINITE_GROWTH = (tonumber(modOptions.oremex_inf) == 1) -- this causes performance drop you know...
 if (modOptions.oremex_inf == nil) then INFINITE_GROWTH = false end
 local ORE_DMG = tonumber(modOptions.oremex_harm) -- TODO does it take float?
-if (tonumber(ORE_DMG)==nil) then ORE_DMG = 2 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
+if (tonumber(ORE_DMG)==nil) then ORE_DMG = 0 end -- it's both slow and physical damage, be advised. albeit range is small. also it stacks, ore damages adjacent tiles!!
 local ORE_DMG_RANGE = 81 -- so standing in adjacent tile is gonna harm you
 local OBEY_ZLEVEL = (tonumber(modOptions.oremex_uphill) == 1) -- slower uphill growth
 if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = true end
