@@ -11,7 +11,7 @@ function widget:GetInfo()
     date      = "Mar 2014",
     license   = "GPL v2 or later",
     layer     = 4,
-    enabled   = true,
+    enabled   = false,	-- i will re-enable this once it's player more friendly
     handler   = true,	-- geh
   }
 end
