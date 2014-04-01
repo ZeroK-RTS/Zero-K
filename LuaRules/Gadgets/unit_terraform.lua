@@ -2966,7 +2966,7 @@ function gadget:GameFrame(n)
 				currentCon = 1
 			end
 			
-			local cQueue = spGetCommandQueue(constructorTable[currentCon])
+			local cQueue = spGetCommandQueue(constructorTable[currentCon], -1)
 			if cQueue then
 				local ncq = #cQueue
 				for i = 1, ncq do

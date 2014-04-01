@@ -432,7 +432,7 @@ local function ReAssignAssists(newUnit,oldUnit)
     local alliedUnits = Spring.GetTeamUnits(teamID)
     for i=1,#alliedUnits do
       local unitID = alliedUnits[i]
-      local cmds = Spring.GetCommandQueue(unitID)
+      local cmds = Spring.GetCommandQueue(unitID, -1)
       for j=1,#cmds do
         local cmd = cmds[j]
         if (cmd.id == CMD.GUARD)and(cmd.params[1] == oldUnit) then
@@ -593,7 +593,7 @@ local function FinishMorph(unitID, morphData)
   --// copy facplop
   local facplop = GG.HasFacplop(unitID)  
   --//copy command queue
-  local cmds = Spring.GetCommandQueue(unitID)
+  local cmds = Spring.GetCommandQueue(unitID, -1)
   --// copy some state
   local states = Spring.GetUnitStates(unitID)
   --// copy cloak state

@@ -690,7 +690,7 @@ end
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) --, fromSynced)
 	if (cmdID == CMD_ATTACK) then
 --		 local unitIDs = {}
-		cmdList = Spring.GetCommandQueue(unitID)
+		cmdList = Spring.GetCommandQueue(unitID, -1)
 		for i=1,#cmdList do
 			if (OreMex[cmdList[i].params[1]]) then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdList[i].tag}, {})

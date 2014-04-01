@@ -18,6 +18,7 @@ if (gadgetHandler:IsSyncedCode()) then
 --  «SYNCED»  ------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local reverseCompat = (Game.version:find('91.'))
 
 --Speed-ups
 local spGetUnitDefID    = Spring.GetUnitDefID;
@@ -134,8 +135,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					spGiveOrderToUnit(unitID, CMD.STOP,{},{})
 					transportPhase[unitID] = nil
 				end
-				local cmd=spGetCommandQueue(unitID)
-				local index = (cmd and #cmd) or 0 --get the lenght of current queue
+				local index
+				if reverseCompat then
+					local cmd=spGetCommandQueue(unitID, -1)
+					index = (cmd and #cmd) or 0 --get the lenght of current queue
+				else
+					index = spGetCommandQueue(unitID,0) or 0
+				end
+				
 				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,cmdParams[1]}, {"alt"}) --insert LOAD-Extension command at current index in queue
 				--"PHASE A"--
 				--Spring.Echo("A")
@@ -157,8 +164,13 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					spGiveOrderToUnit(unitID, CMD.STOP,{},{})
 					transportPhase[unitID] = nil
 				end
-				local cmd=spGetCommandQueue(unitID)
-				local index = (cmd and #cmd) or 0
+				local index
+				if reverseCompat then
+					local cmd=spGetCommandQueue(unitID, -1)
+					index = (cmd and #cmd) or 0 --get the lenght of current queue
+				else
+					index = spGetCommandQueue(unitID,0) or 0
+				end
 				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"})
 				return false
 			end
@@ -169,8 +181,13 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			spGiveOrderToUnit(unitID, CMD.STOP,{},{})
 			transportPhase[unitID] = nil
 		end
-		local cmd=spGetCommandQueue(unitID)
-		local index = (cmd and #cmd) or 0
+		local index
+		if reverseCompat then
+			local cmd=spGetCommandQueue(unitID, -1)
+			index = (cmd and #cmd) or 0 --get the lenght of current queue
+		else
+			index = spGetCommandQueue(unitID,0) or 0
+		end
 		local orderToSandwich = {
 			{CMD.INSERT,{index,CMD.UNLOAD_UNITS,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"}},
 			{CMD.INSERT,{index+1,CMD_EXTENDED_UNLOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"}},

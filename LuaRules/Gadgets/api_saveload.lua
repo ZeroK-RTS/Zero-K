@@ -582,7 +582,7 @@ local function SaveUnits()
 		end
 		
 		-- save commands and states
-		local commands = spGetCommandQueue(unitID)
+		local commands = spGetCommandQueue(unitID, -1)
 		for i,v in pairs(commands) do
 			if (type(v) == "table" and v.params) then v.params.n = nil end
 		end

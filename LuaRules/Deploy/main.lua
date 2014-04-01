@@ -321,7 +321,7 @@ local function CopyUnit(unitID)
   local px, py, pz = Spring.GetUnitBasePosition(unitID)
   local facing = Spring.GetUnitBuildFacing(unitID)
   local team   = Spring.GetUnitTeam(unitID)
-  local cmds   = Spring.GetCommandQueue(unitID)
+  local cmds   = Spring.GetCommandQueue(unitID, -1)
   local fcmds  = Spring.GetFactoryCommands(unitID)
   local states = Spring.GetUnitStates(unitID)
 

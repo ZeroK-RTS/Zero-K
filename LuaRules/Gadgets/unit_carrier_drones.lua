@@ -165,7 +165,7 @@ local function UpdateCarrierTarget(carrierID)
 			end
 		else
 			for droneID in pairs(set.drones) do
-				local cQueue = GetCommandQueue(droneID)
+				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
 				for i=1, (cQueue and #cQueue or 0) do
 					if cQueue[i].id == CMD.FIGHT then

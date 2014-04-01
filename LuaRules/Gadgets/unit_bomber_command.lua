@@ -204,7 +204,7 @@ end
 local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
-	local queue = Spring.GetCommandQueue(unitID)
+	local queue = Spring.GetCommandQueue(unitID, -1)
 	local firestate = Spring.GetUnitStates(unitID).firestate
 	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
 	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
@@ -334,7 +334,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	end
 	--Spring.Echo(unitID.." requesting rearm")
 	local detectedRearm = false
-	local queue = Spring.GetCommandQueue(unitID) or {}
+	local queue = Spring.GetCommandQueue(unitID, -1) or {}
 	local index = #queue + 1
 	for i=1, #queue do
 		if combatCommands[queue[i].id] then
