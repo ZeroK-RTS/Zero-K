@@ -39,6 +39,8 @@ local droneList = {}
 local drones_to_move = {}
 local killList = {}
 
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function InitCarrier(unitID, unitDefID, teamID)
@@ -93,7 +95,7 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 		
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
-		GiveOrderToUnit(droneID, CMD.FIGHT,	{x + random(-300,300), 60, z + random(-300,300)}, {""})
+		GiveClampedOrderToUnit(droneID, CMD.FIGHT,	{x + random(-300,300), 60, z + random(-300,300)}, {""})
 		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 
 		SetUnitNoSelect(droneID,true)
@@ -159,7 +161,7 @@ local function UpdateCarrierTarget(carrierID)
 		if droneSendDistance and droneSendDistance < set.range then
 			for droneID in pairs(set.drones) do
 				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-				GiveOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,300) - 150)), (py+120), (pz + (random(0,300) - 150))} , {""})
+				GiveClampedOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,300) - 150)), (py+120), (pz + (random(0,300) - 150))} , {""})
 				--GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 				droneList[droneID] = {carrier = carrierID, set = i}
 			end
@@ -176,7 +178,7 @@ local function UpdateCarrierTarget(carrierID)
 				if not engaged then
 					px,py,pz = GetUnitPosition(carrierID)
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-					GiveOrderToUnit(droneID, CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
+					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 					droneList[droneID] = {carrier = carrierID, set = i}
 				end
