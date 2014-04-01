@@ -108,8 +108,8 @@ unitDef = {
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 24,
-        subs    = 1.6,
+        default = 33,
+        subs    = 2.2,
       },
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
@@ -121,7 +121,7 @@ unitDef = {
       minIntensity            = 1,
       pitchtolerance          = 8192,
       range                   = 500,
-      reloadtime              = 0.1,
+      reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
       soundStartVolume        = 4,

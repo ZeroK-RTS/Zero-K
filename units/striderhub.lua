@@ -24,6 +24,7 @@ unitDef = {
     [[cornukesub]],
     [[armcarry]],
     [[corbats]],
+    [[nebula]],
   },
 
   buildPic                      = [[striderhub.png]],
