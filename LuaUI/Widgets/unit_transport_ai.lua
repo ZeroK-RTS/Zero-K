@@ -318,7 +318,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
     if (IsTransportable(unitDefID, unitID) and not userOrders) then 
 --      Echo ("new unit from factory "..unitID)
 
-      local commands = GetCommandQueue(unitID)
+      local commands = GetCommandQueue(unitID, -1)
       for i=1, #commands do
         if (IsEmbark(commands[i])) then 
           priorityUnits[unitID] = unitDefID
@@ -414,7 +414,7 @@ end
 function widget:UnitLoaded(unitID, unitDefID, teamID, transportID) 
   if (teamID ~= myTeamID or toPick[transportID]==nil) then return end
 
-  local queue = GetCommandQueue(unitID);
+  local queue = GetCommandQueue(unitID, -1);
   if (queue == nil) then return end
 
 --  Echo("unit loaded " .. transportID .. " " ..unitID)
@@ -609,7 +609,7 @@ function GetPathLength(unitID)
   if (h > maxi) then maxi = h end
 
   local d = 0
-  local queue = GetCommandQueue(unitID);
+  local queue = GetCommandQueue(unitID, -1);
   local udid = Spring.GetUnitDefID(unitID)
   local moveID = UnitDefs[udid].moveDef.id
   if (queue == nil) then return 0 end
@@ -719,7 +719,7 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 		widget:UnitDestroyed(unitID, GetUnitDefID(unitID), myTeamID) --remove existing command ASAP
 	end
 	
-	local queue = GetCommandQueue(unitID)
+	local queue = GetCommandQueue(unitID, -1)
 	if (queue == nil) and (not shift) then  --unit has no command at all?! and not queueing embark/disembark command?!
 		Spring.Echo("Transport: Select destination")
 		Spring.SetActiveCommand("transportto") --Force user to add move command. See unit_transport_ai_buttons.lua for more info.

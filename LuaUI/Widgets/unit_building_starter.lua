@@ -94,9 +94,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
   
   if CheckBuilding(ux,uz,unitID) then
     for _, unit_id in ipairs(units) do
-      local cQueue = spGetCommandQueue(unit_id)
+      local cQueue = spGetCommandQueue(unit_id, 1)
 	
-		for _, command in ipairs(cQueue) do
+		if cQueue and cQueue[1] then
+		
+		  local command = cQueue[1]
 		  
 		  if command.id < 0 then 
 	        local cx = command.params[1]

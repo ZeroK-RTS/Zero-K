@@ -495,7 +495,7 @@ function DoCalculation(passedInfo)
 		for i=2, unitInMotion[1], 1 do --array index 1 contain the array's lenght, start from 2
 			local unitID= unitInMotion[i][1] --get unitID for commandqueue
 			if not spGetUnitIsDead(unitID) and (spGetUnitTeam(unitID)==myTeamID) then --prevent execution if unit died during transit
-				local cQueue = spGetCommandQueue(unitID)
+				local cQueue = spGetCommandQueue(unitID, -1)
 				local executionAllow, cQueueTemp,reloadAvoidance = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i],myTeamID) --filter/alter unwanted unit state by reading the command queue
 				if executionAllow then
 					--cQueue = cQueueTemp --cQueueTemp has been altered for identification, copy it to cQueue for use in DoCalculation() phase (note: command is not yet issued)

@@ -87,7 +87,7 @@ function widget:CommandNotify(id, params, options)
           if not blockUnits[unitID] then
             GiveOrderToUnit(unitID, id, params, options)
           else
-            local cQueue = GetCommandQueue(unitID)
+            local cQueue = GetCommandQueue(unitID, -1)
             for _,v in ipairs(cQueue) do
               if (v.tag ~= cQueue[1].tag) then
                 GiveOrderToUnit(unitID,v.id,v.params,{"shift"})
@@ -116,7 +116,7 @@ function widget:CommandNotify(id, params, options)
           if not blockUnits[unitID] then
             GiveOrderToUnit(unitID, id, params, options)
           else
-            local cQueue = GetCommandQueue(unitID)
+            local cQueue = GetCommandQueue(unitID, -1)
             for j=1, #cQueue do
               local v = cQueue[j]
               if (v.tag ~= cQueue[1].tag) then

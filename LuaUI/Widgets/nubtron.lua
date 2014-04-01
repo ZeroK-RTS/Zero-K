@@ -162,7 +162,7 @@ local function remCondition(condition)
 end
 
 local function GetFirstCommand(unitID)
-	local queue = GetCommandQueue(unitID)
+	local queue = GetCommandQueue(unitID, 1)
 	return queue and queue[1]
 end
 

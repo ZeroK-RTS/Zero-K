@@ -10,6 +10,8 @@ function widget:GetInfo()
   }
 end
 
+local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
+
 local customMyGravity = 130
 local customWeaponVelocity = 232
 local flightTime =0
@@ -42,9 +44,18 @@ function DrawMouseArc(unitID, shift, groundPos)
 	if (not groundPos) then
 		return
 	end
-	local queue = spGetCommandQueue(unitID)
-	local deltaV = customWeaponVelocity
-	if (not queue or #queue == 0 or not shift) then
+	
+	local passIf
+	if reverseCompatibility then
+		local queue = spGetCommandQueue(unitID, 1)
+		passIf = (not queue or #queue == 0 or not shift)
+	else
+		local queueCount = spGetCommandQueue(unitID, 0)
+		passIf = (not queue or queueCount == 0 or not shift)
+	end
+	
+	if passIf then
+		local deltaV = customWeaponVelocity
 		local unitPos = {spGetUnitPosition(unitID)}
 		local dist = GetDist2D(unitPos, groundPos)
 		local maxRange,_ = CalculateBallisticConstant(deltaV,customMyGravity,unitPos, groundPos)

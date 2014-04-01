@@ -77,7 +77,7 @@ end
 
 
 local function RemoveMove(unitID)
-  local queue = spGetCommandQueue(unitID)
+  local queue = spGetCommandQueue(unitID, -1)
   local qLast = #queue
   if (qLast < 1) then
     return false

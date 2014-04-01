@@ -108,7 +108,7 @@ function widget:GameFrame(n)
 					--IS NEW UNIT? initialize them--
 					effectedUnit[unitID] = effectedUnit[unitID] or {cmdCount=0,cmdOne={id=nil,x=nil,y=nil,z=nil},cmdTwo={id=nil,x=nil,y=nil,z=nil}}
 					--IS UNIT IDLE? skip--
-					local cmd_queue = spGetCommandQueue(unitID);
+					local cmd_queue = spGetCommandQueue(unitID, -1);
 					if not (cmd_queue and cmd_queue[1]) then
 						MoveLastPositionToCurrentPosition(k,unitID)
 						k = k -1

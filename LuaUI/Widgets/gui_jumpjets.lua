@@ -20,6 +20,8 @@ function widget:GetInfo()
   }
 end
 
+local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -210,33 +212,44 @@ local function DrawQueue(unitID)
 end
 --]]
 
-local function  DrawMouseArc(unitID, shift, groundPos, quality)
-  local unitDefID = spGetUnitDefID(unitID)
-  if (not groundPos or not jumpDefs[unitDefID]) then
-    return
-  end
-  local queue = spGetCommandQueue(unitID)
-  local range = jumpDefs[unitDefID].range
-  if (not queue or #queue == 0 or not shift) then
-    local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
-    local unitPos = {ux,uy,uz}
-    local dist = GetDist2(unitPos, groundPos)
-    local color = range > dist and green or pink
-    DrawArc(unitID, unitPos, groundPos, color, nil, range, false, quality)
-  elseif (shift) then
-    local i = #queue
-    while (ignore[queue[i].id] and i > 0) do
-      i = i - 1
-    end
-    if (curve[queue[i].id]) or (queue[i].id < 0) or (#queue[i].params == 3) or (#queue[i].params == 4) then
-	  local isEstimate = not curve[queue[i].id]
-      local dist  = GetDist2(queue[i].params, groundPos)
-	  local cGood = isEstimate and yellow or green
-	  local cBad = isEstimate and orange or pink
-      local color = range > dist and cGood or cBad
-      DrawArc(unitID, queue[i].params, groundPos, color, nil, range, isEstimate, quality)
-    end
-  end
+	local function  DrawMouseArc(unitID, shift, groundPos, quality)
+	local unitDefID = spGetUnitDefID(unitID)
+	if (not groundPos or not jumpDefs[unitDefID]) then
+		return
+	end
+	local queue = spGetCommandQueue(unitID)
+
+	local passIf
+	if reverseCompatibility then
+		local queue = spGetCommandQueue(unitID, 1)
+		passIf = (not queue or #queue == 0 or not shift)
+	else
+		local queueCount = spGetCommandQueue(unitID, 0)
+		passIf = (not queue or #queue == 0 or not shift)
+	end
+
+	local range = jumpDefs[unitDefID].range
+	if passIf then
+		local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
+		local unitPos = {ux,uy,uz}
+		local dist = GetDist2(unitPos, groundPos)
+		local color = range > dist and green or pink
+		DrawArc(unitID, unitPos, groundPos, color, nil, range, false, quality)
+	elseif (shift) then
+		local queue = spGetCommandQueue(unitID, -1)
+		local i = #queue
+		while (ignore[queue[i].id] and i > 0) do
+			i = i - 1
+		end
+		if (curve[queue[i].id]) or (queue[i].id < 0) or (#queue[i].params == 3) or (#queue[i].params == 4) then
+			local isEstimate = not curve[queue[i].id]
+			local dist  = GetDist2(queue[i].params, groundPos)
+			local cGood = isEstimate and yellow or green
+			local cBad = isEstimate and orange or pink
+			local color = range > dist and cGood or cBad
+			DrawArc(unitID, queue[i].params, groundPos, color, nil, range, isEstimate, quality)
+		end
+	end
 end
 
 

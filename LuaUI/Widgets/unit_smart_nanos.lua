@@ -23,6 +23,8 @@ function widget:GetInfo()
   }
 end
 
+local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -321,20 +323,27 @@ function widget:Update(deltaTime)
         else
           nanoTurrets[unitID].damaged = false
         end
-                
-        local cQueue = GetCommandQueue(unitID)
+        
+        local cQueue = GetCommandQueue(unitID, 1)
+		local cQueueCount
+		if reverseCompatibility then
+			local tempQueue = GetCommandQueue(unitID, 5)
+			cQueueCount = #tempQueue
+		else
+			cQueueCount = GetCommandQueue(unitID, 0)
+		end
      
         local commandMe = false
       
         local prevCommand = nil
         local prevUnit = nil
       
-        if (#cQueue == 0) then
-          commandMe = true
-          nanoTurrets[unitID].auto = false
-	      else
+        if (cQueueCount == 0) then
+			commandMe = true
+			nanoTurrets[unitID].auto = false
+		else
 	      
-	        if (cQueue[1].id == CMD.PATROL) and (#cQueue <= 4) then
+	        if (cQueue[1].id == CMD.PATROL) and (cQueueCount <= 4) then
 	          commandMe = true
 	          nanoTurrets[unitID].auto = false
 	        end
@@ -485,7 +494,7 @@ function widget:Update(deltaTime)
             end
           end
           
-          if (nanoTurrets[unitID].auto) and (not ordered) and (#cQueue > 0) and 
+          if (nanoTurrets[unitID].auto) and (not ordered) and (cQueueCount > 0) and 
              ((cQueue[1].id == CMD.REPAIR) or (cQueue[1].id == CMD.RECLAIM)) then
             orderQueue[unitID] = {0, cQueue[1].id, cQueue[1].params[1]}
           elseif ordered then
