@@ -86,6 +86,7 @@ include("LuaRules/Configs/customcmds.h.lua")
 
 if (gadgetHandler:IsSyncedCode()) then
 
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local getMovetype = Spring.Utilities.getMovetype
 
 local modOptions = Spring.GetModOptions()
@@ -1141,7 +1142,7 @@ function RunToBase(unitID, teamID, allyTeam)
     if (tz > z) then tz = tz-100
     else tz = tz+100 end
     -- FIXME make sure unit does this, and not stands...
-    spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, 0, tx, 0, tz}, {"alt"}) -- FIXME not always works
+    GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, 0, tx, 0, tz}, {"alt"}) -- FIXME not always works
   end
 end
 

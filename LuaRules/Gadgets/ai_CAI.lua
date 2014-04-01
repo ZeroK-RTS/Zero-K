@@ -49,6 +49,8 @@ local spGetUnitTeam			= Spring.GetUnitTeam
 local spIsPosInRadar		= Spring.IsPosInRadar
 local spGetTeamUnits		= Spring.GetTeamUnits
 
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+
 local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 local jumpDefs = {}
 for name, data in pairs(jumpDefNames) do
@@ -623,7 +625,7 @@ local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 		end
 		
 		conByID[unitID].makingDefence = true
-		spGiveOrderToUnit(unitID, -defenceDef, {x,0,z}, {})
+		GiveClampedOrderToUnit(unitID, -defenceDef, {x,0,z}, {})
 	else
 		
 		local vectorX = ex - ux
@@ -642,7 +644,7 @@ local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 			end
 		end
 		
-		spGiveOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*(range+200), 0, ez - vectorZ*(range+200)}, {})
+		GiveClampedOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*(range+200), 0, ez - vectorZ*(range+200)}, {})
 		
 		local bx = ex - vectorX*(range+70)
 		local bz = ez - vectorZ*(range+70)
@@ -658,7 +660,7 @@ local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 		end
 		
 		conByID[unitID].makingDefence = true
-		spGiveOrderToUnit(unitID, -defenceDef, { bx, 0, bz}, CMD_OPT_SHIFT)
+		GiveClampedOrderToUnit(unitID, -defenceDef, { bx, 0, bz}, CMD_OPT_SHIFT)
 	end
 end
 
@@ -679,9 +681,9 @@ local function runAway(unitID, enemyID, range)
 	
 	local jump = spGetUnitRulesParam(unitID, "jumpReload")
 	if ((not jump) or jump == 1) and jumpDefs[spGetUnitDefID(unitID)] then
-		spGiveOrderToUnit(unitID, CMD_JUMP, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
+		GiveClampedOrderToUnit(unitID, CMD_JUMP, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
 	else
-		spGiveOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
+		GiveClampedOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
 	end
 end
 
@@ -730,7 +732,7 @@ local function makeWantedDefence(team,unitID,searchRange, maxDistance, priorityD
 	end
 	
 	if minDeftID ~= 0 then
-		spGiveOrderToUnit(unitID, -wantedDefence[minDeftID].ID, {wantedDefence[minDeftID].x,0,wantedDefence[minDeftID].z}, {})
+		GiveClampedOrderToUnit(unitID, -wantedDefence[minDeftID].ID, {wantedDefence[minDeftID].x,0,wantedDefence[minDeftID].z}, {})
 		return true
 	else
 		return false
@@ -821,7 +823,7 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 		end
 		
 		data[defIndex].air = data[defIndex].air - 1
-		spGiveOrderToUnit(unitID, -deID, {bx,0,bz}, {})
+		GiveClampedOrderToUnit(unitID, -deID, {bx,0,bz}, {})
 		
 		local empty = true
 		for i = 1, buildDefs.airDefenceIdCount do
@@ -872,7 +874,7 @@ local function makeMiscBuilding(team, unitID, defId, searchRange, maxRange)
 		end
 	end
 	
-	spGiveOrderToUnit(unitID, -defId, {x,0,z}, {})	
+	GiveClampedOrderToUnit(unitID, -defId, {x,0,z}, {})	
 	return true
 end
 
@@ -909,7 +911,7 @@ local function makeRadar(team, unitID, searchRange, minDistance)
 		end
 	end
 	
-	spGiveOrderToUnit(unitID, -radarDefID, {x,0,z}, {})	
+	GiveClampedOrderToUnit(unitID, -radarDefID, {x,0,z}, {})	
 	return true
 end
 
@@ -1021,7 +1023,7 @@ local function makeNano(team,unitID)
 		end
 	end
 
-	spGiveOrderToUnit(unitID, -nanoDefID, {x,0,z}, {})
+	GiveClampedOrderToUnit(unitID, -nanoDefID, {x,0,z}, {})
 end
 
 -- queues energy order or helps nearby construction
@@ -1089,12 +1091,12 @@ local function makeEnergy(team,unitID)
 		if searchRange > 500 then
 			x = ux + math.random(-700,700)
 			z = uz + math.random(-700,700)
-			spGiveOrderToUnit(unitID, CMD_MOVE, { x , 0, z },{})
+			GiveClampedOrderToUnit(unitID, CMD_MOVE, { x , 0, z },{})
 			return
 		end
 	end
 	
-	spGiveOrderToUnit(unitID, -energyDefID, {x,0,z}, {})
+	GiveClampedOrderToUnit(unitID, -energyDefID, {x,0,z}, {})
 	
 end
 
@@ -1149,9 +1151,9 @@ local function assignFactory(team,unitID,cQueue)
 
 			dist = dist * (math.floor(math.random(0,1))*2-1)
 			if (facing == 0) or (facing == 2) then
-				spGiveOrderToUnit(unitID, CMD_MOVE, { x + dist, y, z },{})
+				GiveClampedOrderToUnit(unitID, CMD_MOVE, { x + dist, y, z },{})
 			else
-				spGiveOrderToUnit(unitID, CMD_MOVE, { x , y, z + dist},{})
+				GiveClampedOrderToUnit(unitID, CMD_MOVE, { x , y, z + dist},{})
 			end
 			
 			
@@ -1239,7 +1241,7 @@ local function assignFactory(team,unitID,cQueue)
 				end
 			end
 			a.uncompletedFactory = true
-			spGiveOrderToUnit(unitID, -buildableFactory[choice].ID, {x,0,z,getBuildFacing(x,z)}, {})
+			GiveClampedOrderToUnit(unitID, -buildableFactory[choice].ID, {x,0,z,getBuildFacing(x,z)}, {})
 		end
 	end
 	
@@ -1381,7 +1383,7 @@ local function setUnitPosting(team, unitID)
 		total = total + a.controlledUnit.conByID[cid].bp
 		if total > rand then
 			local x,y,z = spGetUnitPosition(cid)
-			spGiveOrderToUnit(unitID, CMD_FIGHT , {x+math.random(-100,100),y,z+math.random(-100,100)}, {})
+			GiveClampedOrderToUnit(unitID, CMD_FIGHT , {x+math.random(-100,100),y,z+math.random(-100,100)}, {})
 			break
 		end
 	end
@@ -1451,7 +1453,7 @@ local function factoryJobHandler(team)
 				if math.random() < a.unitHordingChance then
 					setUnitPosting(team, unitID)
 				else
-					spGiveOrderToUnit(unitID, CMD_FIGHT, { data.wayX+math.random(-200,200), data.wayY, data.wayZ+math.random(-200,200)}, {})
+					GiveClampedOrderToUnit(unitID, CMD_FIGHT, { data.wayX+math.random(-200,200), data.wayY, data.wayZ+math.random(-200,200)}, {})
 				end
 				local facJob = a.facJob
 				local totalImportance = 0
@@ -1644,7 +1646,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 	
 		local gy = spGetGroundHeight(averageX,averageZ)
 		for unitID,_ in pairs(data.aa) do
-			spGiveOrderToUnit(unitID, CMD_MOVE , {averageX,gy,averageZ}, {})
+			GiveClampedOrderToUnit(unitID, CMD_MOVE , {averageX,gy,averageZ}, {})
 		end
 
 		if data.tempTarget then
@@ -1652,7 +1654,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 				local x, y, z = spGetUnitPosition(data.tempTarget)
 				for unitID,_ in pairs(data.unit) do
 					if not data.aa[unitID] then
-						spGiveOrderToUnit(unitID, CMD_FIGHT , {x,y,z}, {})
+						GiveClampedOrderToUnit(unitID, CMD_FIGHT , {x,y,z}, {})
 					end
 				end
 			else
@@ -1698,8 +1700,8 @@ local function battleGroupHandler(team, frame, slowUpdate)
 						for unitID,_ in pairs(data.unit) do
 							if not data.aa[unitID] then
 								local x, y, z = spGetUnitPosition(unitID)
-								--spGiveOrderToUnit(unitID, CMD_FIGHT , {data.aimX ,data.aimY,data.aimZ,}, {})
-								spGiveOrderToUnit(unitID, CMD_FIGHT , {data.aimX + math.random(-moveGroupRange,moveGroupRange),
+								--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX ,data.aimY,data.aimZ,}, {})
+								GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX + math.random(-moveGroupRange,moveGroupRange),
 								data.aimY,data.aimZ + math.random(-moveGroupRange,moveGroupRange),}, {})
 							end
 						end
@@ -1759,7 +1761,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 					data.regroup = true
 					for unitID,_ in pairs(data.unit) do
 						if not data.aa[unitID] then
-							spGiveOrderToUnit(unitID, CMD_FIGHT , {averageX,gy,averageZ}, {})
+							GiveClampedOrderToUnit(unitID, CMD_FIGHT , {averageX,gy,averageZ}, {})
 						end
 					end
 				else
@@ -1767,8 +1769,8 @@ local function battleGroupHandler(team, frame, slowUpdate)
 						data.regroup = false
 						for unitID,_ in pairs(data.unit) do
 							if not data.aa[unitID] then
-								--spGiveOrderToUnit(unitID, CMD_FIGHT , {data.aimX ,data.aimY,data.aimZ,}, {})
-								spGiveOrderToUnit(unitID, CMD_FIGHT , {data.aimX + math.random(-moveGroupRange,moveGroupRange),
+								--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX ,data.aimY,data.aimZ,}, {})
+								GiveClampedOrderToUnit(unitID, CMD_FIGHT , {data.aimX + math.random(-moveGroupRange,moveGroupRange),
 								data.aimY,data.aimZ + math.random(-moveGroupRange,moveGroupRange),}, {})
 							end
 							
@@ -1873,7 +1875,7 @@ local function raiderJobHandler(team)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
 			elseif tX and not unitInBattleGroupByID[unitID] then
-				--spGiveOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, {})
+				--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, {})
 				for i = 1, battleGroup.count do
 					if battleGroup[i].unit[unitID] then
 						Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Unit already in battle group")
@@ -1907,7 +1909,7 @@ local function artyJobHandler(team)
 			local cQueue = spGetCommandQueue(unitID, 1)
 			if #cQueue == 0 then
 				local randIndex = math.floor(math.random(1,enemyDefence.count))
-				spGiveOrderToUnit(unitID, CMD_FIGHT , {enemyDefence[randIndex].x,enemyDefence[randIndex].y, enemyDefence[randIndex].z,}, {})
+				GiveClampedOrderToUnit(unitID, CMD_FIGHT , {enemyDefence[randIndex].x,enemyDefence[randIndex].y, enemyDefence[randIndex].z,}, {})
 			end
 		end
 	end
@@ -1936,7 +1938,7 @@ local function bomberJobHandler(team)
 				local randIndex = math.floor(math.random(1,enemyOffense.count))
 				local static, mobile = getEnemyAntiAirInRange(a.allyTeam, enemyOffense[randIndex].x, enemyOffense[randIndex].z)
 				if static*2 + mobile < 600 then
-					spGiveOrderToUnit(unitID, CMD_FIGHT , {enemyOffense[randIndex].x,enemyOffense[randIndex].y, enemyOffense[randIndex].z,}, {})
+					GiveClampedOrderToUnit(unitID, CMD_FIGHT , {enemyOffense[randIndex].x,enemyOffense[randIndex].y, enemyOffense[randIndex].z,}, {})
 				end
 			end
 		end
@@ -2038,7 +2040,7 @@ local function gunshipJobHandler(team)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
 			elseif tX and not unitInBattleGroupByID[unitID] then
-				--spGiveOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, {})
+				--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, {})
 				for i = 1, battleGroup.count do
 					if battleGroup[i].unit[unitID] then
 						Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Unit already in battle group")
@@ -2200,7 +2202,7 @@ local function combatJobHandler(team)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
 			elseif tX and not unitInBattleGroupByID[unitID] then
-				--spGiveOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-300,300),tY,tZ + math.random(-300,300),}, {})
+				--GiveClampedOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-300,300),tY,tZ + math.random(-300,300),}, {})
 				for i = 1, battleGroup.count do
 					if battleGroup[i].unit[unitID] then
 						Spring.Echo("Unit already in battle group")
@@ -2227,7 +2229,7 @@ local function scoutJobHandler(team)
 			local cQueue = spGetCommandQueue(unitID, 1)
 			if #cQueue == 0 then
 				local randIndex = math.floor(math.random(1,unScoutedPoint.count))
-				spGiveOrderToUnit(unitID, CMD_FIGHT , {unScoutedPoint[randIndex].x,unScoutedPoint[randIndex].y,unScoutedPoint[randIndex].z}, {})
+				GiveClampedOrderToUnit(unitID, CMD_FIGHT , {unScoutedPoint[randIndex].x,unScoutedPoint[randIndex].y,unScoutedPoint[randIndex].z}, {})
 			end
 
 		end
@@ -2533,7 +2535,7 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange, priorit
 			for i=1, #friendlies do
 				fid = friendlies[i]
 				if (a.controlledUnit.combatByID[fid] or a.controlledUnit.raiderByID[fid]) and (not a.unitInBattleGroupByID[fid]) then
-					spGiveOrderToUnit(fid, CMD_FIGHT, { dx, 0, dz }, {})
+					GiveClampedOrderToUnit(fid, CMD_FIGHT, { dx, 0, dz }, {})
 				end
 			end
 		end
@@ -2658,7 +2660,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 					local cQueue = spGetCommandQueue(unitID, 1)
 					if #cQueue == 0 or cQueue[1].id ~= CMD_JUMP then
 						local x,y,z = spGetUnitPosition(attackerID)
-						spGiveOrderToUnit(unitID, CMD_JUMP, {x+math.random(-30,30),y,z+math.random(-30,30)}, {"alt"} )
+						GiveClampedOrderToUnit(unitID, CMD_JUMP, {x+math.random(-30,30),y,z+math.random(-30,30)}, {"alt"} )
 					end
 				end
 			end
@@ -3413,7 +3415,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				else -- nano turret
 					local x,y,z = spGetUnitPosition(unitID)
 					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 2 }, {})
-					spGiveOrderToUnit(unitID, CMD_PATROL, { x + 25, y, z - 25 }, {})
+					GiveClampedOrderToUnit(unitID, CMD_PATROL, { x + 25, y, z - 25 }, {})
 					controlledUnit.nanoByID[unitID].finished = true
 				end
 			elseif controlledUnit.anyByID[unitID].isScout then
