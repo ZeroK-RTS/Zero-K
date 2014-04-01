@@ -1,7 +1,7 @@
 -- $Id: gui_commandinsert.lua 3171 2008-11-06 09:06:29Z det $
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-local version= "1.002"
+local version= "1.003"
 function widget:GetInfo()
   return {
     name = "CommandInsert",
@@ -82,29 +82,29 @@ local function GetCommandPos(command)	--- get the command position
 end
 
 local function ProcessCommand(id, params, options)
-  local _,ctrl,meta,_ = Spring.GetModKeyState()
+  local alt,ctrl,meta,shift = Spring.GetModKeyState() --must use this because "options" table turn into different format when right+click. Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than in local game)
   if (ctrl) and not (meta) and id==CMD.RECLAIM then --Reclaim + CTRL
 	local opt = 0
-	if options.alt then opt = opt + CMD.OPT_ALT end
+	if options.alt or alt then opt = opt + CMD.OPT_ALT end
 	opt = opt + CMD.OPT_META; --add META. Force-reclaim-own-unit
 	if options.right then opt = opt + CMD.OPT_RIGHT end
-	if options.shift then opt = opt + CMD.OPT_SHIFT end
+	if options.shift or shift then opt = opt + CMD.OPT_SHIFT end
 	Spring.GiveOrder(id,params,opt)
 	return true
   end
   if (meta) then
     local opt = 0
     local insertfront=false
-    if options.alt then opt = opt + CMD.OPT_ALT end
-	if options.ctrl then
+    if options.alt or alt then opt = opt + CMD.OPT_ALT end
+	if options.ctrl or ctrl then
 		if id~=CMD.RECLAIM then  
 			opt = opt + CMD.OPT_CTRL --add CTRL like normal
 		else --add CTRL+Reclaim as force-reclaim
 			opt = opt + CMD.OPT_META; --add META. Force-reclaim-own-unit(originally META+Reclaim). Can't change CommandInsert() to other modifier because META is already established (culturally) for CommandInsert()
 		end
-	end     
+	end
     if options.right then opt = opt + CMD.OPT_RIGHT end
-    if options.shift then 
+    if options.shift or shift then 
       opt = opt + CMD.OPT_SHIFT       
     else
       Spring.GiveOrder(CMD.INSERT,{0,id,opt,unpack(params)},{"alt"})
@@ -112,7 +112,7 @@ local function ProcessCommand(id, params, options)
     end
     
     -- Spring.GiveOrder(CMD.INSERT,{0,id,opt,unpack(params)},{"alt"})
-    local my_command={["id"]=id,["params"]=params,["options"]=options}
+    local my_command={["id"]=id,["params"]=params}
     local cx,cy,cz=GetCommandPos(my_command)
     if cx < -1 then
       return false
@@ -120,7 +120,7 @@ local function ProcessCommand(id, params, options)
     
     local units=Spring.GetSelectedUnits()
     for i, unit_id in ipairs(units) do
-      local commands=Spring.GetCommandQueue(unit_id, -1)
+      local commands=Spring.GetCommandQueue(unit_id)
       local px,py,pz=Spring.GetUnitPosition(unit_id)
       local min_dlen=1000000
       local insert_tag=0
