@@ -110,8 +110,20 @@ end
 --
 -- Disable sweepfire until we know how to use it
 
- for _, weaponDef in pairs(WeaponDefs) do
+for _, weaponDef in pairs(WeaponDefs) do
 	weaponDef.sweepfire = false
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Disable burnblow for LaserCannons because overshoot is not a problem for any
+-- of them and is important for some.
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "LaserCannon" then
+		weaponDef.burnblow = false
+	end
 end
 
 --------------------------------------------------------------------------------
