@@ -120,7 +120,7 @@ local function ProcessCommand(id, params, options)
     
     local units=Spring.GetSelectedUnits()
     for i, unit_id in ipairs(units) do
-      local commands=Spring.GetCommandQueue(unit_id)
+      local commands=Spring.GetCommandQueue(unit_id, -1)
       local px,py,pz=Spring.GetUnitPosition(unit_id)
       local min_dlen=1000000
       local insert_tag=0
