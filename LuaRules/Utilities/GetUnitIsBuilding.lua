@@ -34,7 +34,7 @@ function Spring.Utilities.GetUnitNanoTarget(unitID)
   else
     --local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)] or {}
     --local buildRange = unitDef.buildDistance or 0
-    local cmds = Spring.GetUnitCommands(unitID,1)
+    local cmds = Spring.GetCommandQueue(unitID,1)
     if (cmds)and(cmds[1]) then
       local cmd   = cmds[1]
       local cmdID = cmd.id

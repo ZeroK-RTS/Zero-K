@@ -38,7 +38,7 @@ local CMD_SETHAVEN      = 10001
 local GetGameFrame     = Spring.GetGameFrame
 local GetLocalTeamID   = Spring.GetLocalTeamID
 local GetUnitHealth    = Spring.GetUnitHealth
-local GetUnitCommands  = Spring.GetUnitCommands
+local GetCommandQueue  = Spring.GetCommandQueue
 local GetUnitPosition  = Spring.GetUnitPosition
 local GetUnitDefID     = Spring.GetUnitDefID
 local GetSelectedUnits = Spring.GetSelectedUnits
@@ -190,12 +190,12 @@ local function IsRetreatMove(unitID, cmd)
 end
 
 function GetFirstCommand(unitID)
-	local queue = GetUnitCommands(unitID, 1)
+	local queue = GetCommandQueue(unitID, 1)
 	return queue and queue[1]
 end
 
 function GetFirst3Command(unitID)
-	local queue = GetUnitCommands(unitID, 3)
+	local queue = GetCommandQueue(unitID, 3)
 	return queue
 end
 

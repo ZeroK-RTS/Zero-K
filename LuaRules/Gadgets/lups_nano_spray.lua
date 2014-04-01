@@ -16,7 +16,7 @@ end
 
 
 local spGetFactoryCommands = Spring.GetFactoryCommands
-local spGetUnitCommands    = Spring.GetUnitCommands
+local spGetCommandQueue    = Spring.GetCommandQueue
 
 local function GetCmdTag(unitID) 
     local cmdTag = 0
@@ -28,7 +28,7 @@ local function GetCmdTag(unitID)
 		end
 	end
 	if cmdTag == 0 then 
-		local cmds = spGetUnitCommands(unitID,1)
+		local cmds = spGetCommandQueue(unitID,1)
 		if (cmds) then
 			local cmd = cmds[1]
 			if cmd then

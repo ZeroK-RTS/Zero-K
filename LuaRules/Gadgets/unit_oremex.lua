@@ -73,7 +73,7 @@ local spDestroyUnit						= Spring.DestroyUnit
 local spGetAllFeatures					= Spring.GetAllFeatures
 local spGetFeatureResources				= Spring.GetFeatureResources
 local spGiveOrderToUnit					= Spring.GiveOrderToUnit
-local spGetUnitCommands					= Spring.GetUnitCommands
+local spGetCommandQueue					= Spring.GetCommandQueue
 local spValidFeatureID					= Spring.ValidFeatureID
 local spGetUnitLosState					= Spring.GetUnitLosState
 local spGetAllyTeamList	  				= Spring.GetAllyTeamList
@@ -690,7 +690,7 @@ end
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) --, fromSynced)
 	if (cmdID == CMD_ATTACK) then
 --		 local unitIDs = {}
-		cmdList = Spring.GetUnitCommands(unitID)
+		cmdList = Spring.GetCommandQueue(unitID)
 		for i=1,#cmdList do
 			if (OreMex[cmdList[i].params[1]]) then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cmdList[i].tag}, {})

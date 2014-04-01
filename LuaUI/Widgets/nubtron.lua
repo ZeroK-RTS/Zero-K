@@ -51,7 +51,7 @@ local GetUnitPosition	= Spring.GetUnitPosition
 local GetMapDrawMode	= Spring.GetMapDrawMode
 local GetMouseState	= Spring.GetMouseState 
 local GetSelectedUnits	= Spring.GetSelectedUnits
-local GetUnitCommands	= Spring.GetUnitCommands
+local GetCommandQueue	= Spring.GetCommandQueue
 local GetUnitDefID	= Spring.GetUnitDefID
 local GetUnitHealth	= Spring.GetUnitHealth
 local GetUnitIsBuilding	= Spring.GetUnitIsBuilding
@@ -162,7 +162,7 @@ local function remCondition(condition)
 end
 
 local function GetFirstCommand(unitID)
-	local queue = GetUnitCommands(unitID)
+	local queue = GetCommandQueue(unitID)
 	return queue and queue[1]
 end
 

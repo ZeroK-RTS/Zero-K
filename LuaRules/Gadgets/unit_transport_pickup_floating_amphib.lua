@@ -24,7 +24,7 @@ local spGetUnitDefID    = Spring.GetUnitDefID;
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetUnitMoveGoal = Spring.SetUnitMoveGoal
 local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGetUnitCommands = Spring.GetUnitCommands
+local spGetCommandQueue = Spring.GetCommandQueue
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -134,7 +134,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					spGiveOrderToUnit(unitID, CMD.STOP,{},{})
 					transportPhase[unitID] = nil
 				end
-				local cmd=spGetUnitCommands(unitID)
+				local cmd=spGetCommandQueue(unitID)
 				local index = (cmd and #cmd) or 0 --get the lenght of current queue
 				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,cmdParams[1]}, {"alt"}) --insert LOAD-Extension command at current index in queue
 				--"PHASE A"--
@@ -157,7 +157,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					spGiveOrderToUnit(unitID, CMD.STOP,{},{})
 					transportPhase[unitID] = nil
 				end
-				local cmd=spGetUnitCommands(unitID)
+				local cmd=spGetCommandQueue(unitID)
 				local index = (cmd and #cmd) or 0
 				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"})
 				return false
@@ -169,7 +169,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			spGiveOrderToUnit(unitID, CMD.STOP,{},{})
 			transportPhase[unitID] = nil
 		end
-		local cmd=spGetUnitCommands(unitID)
+		local cmd=spGetCommandQueue(unitID)
 		local index = (cmd and #cmd) or 0
 		local orderToSandwich = {
 			{CMD.INSERT,{index,CMD.UNLOAD_UNITS,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"}},
@@ -275,7 +275,7 @@ function gadget:GameFrame(f)
 						haveFloater = true
 					end
 				end
-				local cmd=spGetUnitCommands(transportID,1)
+				local cmd=spGetCommandQueue(transportID,1)
 				if cmd and cmd[1] then					
 					if cmd[1]['id'] == CMD.LOAD_UNITS and haveFloater then
 						i = i + 1 --go to next entry

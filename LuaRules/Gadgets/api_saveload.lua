@@ -372,7 +372,7 @@ local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitTeam			= Spring.GetUnitTeam
 local spGetUnitNeutral		= Spring.GetUnitNeutral
 local spGetUnitHealth		= Spring.GetUnitHealth
-local spGetUnitCommands		= Spring.GetUnitCommands
+local spGetCommandQueue		= Spring.GetCommandQueue
 local spGetUnitStates		= Spring.GetUnitStates
 local spGetUnitStockpile	= Spring.GetUnitStockpile
 local spGetUnitDirection	= Spring.GetUnitDirection
@@ -582,7 +582,7 @@ local function SaveUnits()
 		end
 		
 		-- save commands and states
-		local commands = spGetUnitCommands(unitID)
+		local commands = spGetCommandQueue(unitID)
 		for i,v in pairs(commands) do
 			if (type(v) == "table" and v.params) then v.params.n = nil end
 		end

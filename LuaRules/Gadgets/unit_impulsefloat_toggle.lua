@@ -200,7 +200,7 @@ function gadget:GameFrame(f)
 				local _,dy = Spring.GetUnitVelocity(unitID)
 				data.speed = dy --Note: data.speed is designed for speed on y axis
 				data.isFlying = false
-				local cmdQueue = Spring.GetUnitCommands(unitID);
+				local cmdQueue = Spring.GetCommandQueue(unitID);
 				if (#cmdQueue>0) then 
 					local cmdOpt = cmdQueue[1].options
 					if cmdQueue[1].id == CMD.MOVE and cmdOpt.coded == 16 and cmdOpt.right then --Note: not sure what is "coded == 16" and "right" is but we want to remove any MOVE command as soon as amphfloater touch down so that it doesn't try to return to old position

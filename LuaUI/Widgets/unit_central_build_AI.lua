@@ -66,7 +66,7 @@ local spIsUnitInView 		= Spring.IsUnitInView
 local spIsAABBInView		= Spring.IsAABBInView
 local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
-local spGetUnitCommands    	= Spring.GetUnitCommands
+local spGetCommandQueue    	= Spring.GetCommandQueue
 local spGetUnitPosition		= Spring.GetUnitPosition
 local spGetUnitHealth		= Spring.GetUnitHealth
 local spGiveOrderToUnit    	= Spring.GiveOrderToUnit
@@ -505,7 +505,7 @@ end
 --	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
 
 function GetFirstCommand(unitID)
-	local queue = spGetUnitCommands(unitID, 1)
+	local queue = spGetCommandQueue(unitID, 1)
 	return queue and queue[1]
 end
 

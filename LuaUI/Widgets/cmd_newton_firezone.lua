@@ -40,7 +40,7 @@ local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
-local spGetUnitCommands = Spring.GetUnitCommands
+local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 --local ech = Spring.Echo
@@ -463,7 +463,7 @@ function widget:GameFrame(n)
 						victim[unitToAttack] = n + 90 --add UnitDamaged() whitelist, and expire after 3 second later
 					end
 					if stop and groupTarget[g] then --no unit in the box, and still have target?
-						local orders = spGetUnitCommands(newtons[1],1)[1]
+						local orders = spGetCommandQueue(newtons[1],1)[1]
 						if orders and orders.id ==CMD.ATTACK and orders.params[1]==groupTarget[g] then --is currently attacking old target??
 							spGiveOrderToUnitArray(newtons,CMD.STOP, {}, {}) --cancel attacking any out-of-box unit
 							--cmdRateS = cmdRateS +1

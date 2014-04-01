@@ -593,7 +593,7 @@ local function FinishMorph(unitID, morphData)
   --// copy facplop
   local facplop = GG.HasFacplop(unitID)  
   --//copy command queue
-  local cmds = Spring.GetUnitCommands(unitID)
+  local cmds = Spring.GetCommandQueue(unitID)
   --// copy some state
   local states = Spring.GetUnitStates(unitID)
   --// copy cloak state

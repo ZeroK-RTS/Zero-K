@@ -169,7 +169,7 @@ end
 local function InsertCommandAfter(unitID, afterCmd, cmdID, params, opts)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
-	local queue = Spring.GetUnitCommands(unitID)
+	local queue = Spring.GetCommandQueue(unitID)
 	local firestate = Spring.GetUnitStates(unitID).firestate
 	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
 	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
@@ -191,7 +191,7 @@ local function InsertCommandAfter(unitID, afterCmd, cmdID, params, opts)
 				end
 				i = i + 1
 			end
-			--local cq = Spring.GetUnitCommands(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
+			--local cq = Spring.GetCommandQueue(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
 		end
 		if toInsert then
 			spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
@@ -204,7 +204,7 @@ end
 local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
-	local queue = Spring.GetUnitCommands(unitID)
+	local queue = Spring.GetCommandQueue(unitID)
 	local firestate = Spring.GetUnitStates(unitID).firestate
 	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
 	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
@@ -225,7 +225,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 				spGiveOrderToUnit(unitID, cmd.id, cmd.params, MakeOptsWithShift(cmd.options))
 				i = i + 1
 			end
-			--local cq = Spring.GetUnitCommands(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
+			--local cq = Spring.GetCommandQueue(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
 		end
 		if toInsert or index < 0 then
 			spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
@@ -334,7 +334,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	end
 	--Spring.Echo(unitID.." requesting rearm")
 	local detectedRearm = false
-	local queue = Spring.GetUnitCommands(unitID) or {}
+	local queue = Spring.GetCommandQueue(unitID) or {}
 	local index = #queue + 1
 	for i=1, #queue do
 		if combatCommands[queue[i].id] then
@@ -503,7 +503,7 @@ function gadget:GameFrame(n)
 		for bomberID, data in pairs(bomberToPad) do
 			local padID = data.padID
 			local unitDefID = data.unitDefID
-			local queue = Spring.GetUnitCommands(bomberID, 1)
+			local queue = Spring.GetCommandQueue(bomberID, 1)
 			if (queue and queue[1] and queue[1].id == CMD_REARM) and 
 					(Spring.GetUnitSeparation(bomberID, padID, true) < ((unitDefID and bomberDefs[unitDefID] and bomberDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
 				if not airpadRefreshEmptyspot then
@@ -536,7 +536,7 @@ function gadget:GameFrame(n)
 		
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!!
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
-				local queue = Spring.GetUnitCommands(unitID, 1)
+				local queue = Spring.GetCommandQueue(unitID, 1)
 				if queue and #queue > 0 and combatCommands[queue[1].id] then
 					RequestRearm(unitID, nil, true)
 				end

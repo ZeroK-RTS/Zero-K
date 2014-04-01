@@ -35,7 +35,7 @@ local CMD_STOP          = CMD.STOP
 local spGetGameFrame    = Spring.GetGameFrame
 local spGetMyTeamID     = Spring.GetMyTeamID
 local spGetTeamUnits    = Spring.GetTeamUnits
-local spGetUnitCommands = Spring.GetUnitCommands
+local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitDefID    = Spring.GetUnitDefID
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
@@ -147,7 +147,7 @@ if true then
     for unitID, f in pairs(idlers) do
       local idler = idlers[k]
       if ((frame - f) > idleFrames) then
-        local cmds = spGetUnitCommands(unitID, 1)
+        local cmds = spGetCommandQueue(unitID, 1)
         if (cmds and (#cmds <= 0)) then
           SetupUnit(unitID)
         else
