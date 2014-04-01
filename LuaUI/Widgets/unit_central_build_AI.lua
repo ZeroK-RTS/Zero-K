@@ -11,7 +11,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "v1.351"
+local version = "v1.352"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -191,7 +191,7 @@ if not Spring.IsGUIHidden() then
 			glPushMatrix()
 			glTranslate( x, y, z )
 			glRotate( degrees, 0, 1.0, 0 )
-			glUnitShape( cmd, spGetMyPlayerID() )
+			glUnitShape( cmd, spGetMyTeamID() )
 			glRotate( degrees, 0, -1.0, 0 )
 			glBillboard()					-- also show some debug stuff
 			glColor(textColor)
