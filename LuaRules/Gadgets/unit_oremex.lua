@@ -617,6 +617,7 @@ function MineMoreOre(unitID, howMuch, forcefully, wait)
 				teamID = random(0,#teamIDs)
 			end
 		end
+		local spawned = 0
 		if (ore>=1) then
 			if spawn_allow then
 				try=0
@@ -633,7 +634,7 @@ function MineMoreOre(unitID, howMuch, forcefully, wait)
 					if (a~=nil) then
 						if (ore >= spawn_amount) then -- is it enough?
 							if (SpawnOre(a,b,spawn_amount,teamID)) then
-								notifyPlayers(unitID, spawn_amount)
+								spawned = spawned + spawn_amount
 								ore = ore - spawn_amount
 							end
 						end
@@ -644,16 +645,19 @@ function MineMoreOre(unitID, howMuch, forcefully, wait)
 			if (ore >= 1) then
 				if not(forcefully) and (ore >= MIN_PRODUCE) and (Ore[random_feature]) then -- simply grow "random_feature"
 					if (AddOreMetal(random_feature, ore)) then
-						notifyPlayers(unitID, ore)
+						spawned = spawned + ore
 						ore = 0
 					end
 				elseif (forcefully) then -- drop all thats left on mex
 					if (SpawnOre(x,z,ore,teamID)) then
-						notifyPlayers(unitID, ore)
+						spawned = spawned + ore
 						ore = 0
 					end
 				end
 			end
+		end
+		if (spawned > 0) then
+			notifyPlayers(unitID, spawned)
 		end
 		OreMex[unitID].ore = ore
 	end
