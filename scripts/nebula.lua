@@ -40,11 +40,11 @@ local smokePiece = {hull, engines[2], engines[4], pads[3]};
 --------------------------------------------------------------------------------
 local function EngineLoop()
     while true do
-	for i=1,4 do
-	    Turn(engines[i], x_axis, GetUnitValue(COB.CURRENT_SPEED)/65536*0.25, math.rad(30))
-	end
-	--Spring.Echo(GetUnitValue(COB.CURRENT_SPEED)/65536)
-	Sleep(200)
+		for i=1,4 do
+			Turn(engines[i], x_axis, GetUnitValue(COB.CURRENT_SPEED)/65536*0.25, math.rad(30))
+		end
+		--Spring.Echo(GetUnitValue(COB.CURRENT_SPEED)/65536)
+		Sleep(200)
     end
 end
 
@@ -107,7 +107,8 @@ function script.Killed(recentDamage, maxHealth)
 	if severity < 50 then
 		EmitSfx(pads[math.random(#pads)], UNIT_SFX2)
 		Sleep(300)
-		local fallOff = math.random(#docked)
+		
+		local fallOff = math.random(#pads)
 		EmitSfx(pads[fallOff], UNIT_SFX2)
 		Explode(docked[fallOff], sfxFall + sfxSmoke + sfxFire)
 		table.remove(docked, fallOff)
@@ -116,7 +117,8 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(engines[4], sfxShatter)
 		Sleep(300)
 		Explode(weapons[1].aimFrom, UNIT_SFX2)
-		fallOff = math.random(#docked)
+		
+		fallOff = math.random(#pads)
 		EmitSfx(pads[fallOff], UNIT_SFX2)
 		Explode(docked[fallOff], sfxFall + sfxSmoke + sfxFire)
 		table.remove(docked, fallOff)
