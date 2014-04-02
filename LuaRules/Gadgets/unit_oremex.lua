@@ -180,6 +180,7 @@ local OreDefs = {
 local AllyTeams = {}
 local TeamData = {} -- by teamID, holds array of allied teamIDs
 local MinedOre = {} -- by teamID, holds amount of ore mined
+local OwnsOreToTeam = {}
 
 local CMD_SELFD								= CMD.SELFD
 local CMD_ATTACK				= CMD.ATTACK
@@ -288,21 +289,24 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 	if not(OreDefs[featureDefID]) or not(MinedOre[builderTeam]) or (builderTeam == GaiaTeamID) then
 		return true
 	end
--- 	Spring.Echo(part.." "..FeatureDefs[featureDefID].metal)
  	MinedOre[builderTeam] = MinedOre[builderTeam] + (-part/FeatureDefs[featureDefID].metal)
+	return true
+end
+
+function gadget:AllowUnitBuildStep(builderID, builderTeam, step) -- was not documented in spring wiki
+	if (OwnsOreToTeam[builderTeam]) and (MinedOre[builderTeam] >= 10) then -- you own your team some metal, until you repay the amount you can't build, i'm so sorry
+		return false
+	end
 	return true
 end
 
 local function AlliesNeedM(teamIDs)
 	local needs = {}
--- 	Spring.Echo(tostring(#teamIDs))
 	for i=1, #teamIDs do
 		local teamID = teamIDs[i]
 		local _,leader,_,isAI = spGetTeamInfo(teamID)
--- 		Spring.Echo(tostring(leader).." "..tostring(isAI))
 		if (leader >= 0) or (isAI) then -- otherwise spec
 			if (isAI) then
--- 			  Spring.Echo(teamID.." active ai")
 				local mCur, mMax, mPull, mInc, _, _, _, _ = spGetTeamResources(teamID, "metal")
 				if (mCur+mInc) < mMax then 
 					needs[#needs+1] = teamID
@@ -310,7 +314,6 @@ local function AlliesNeedM(teamIDs)
 			else
 				local active = select(2, spGetPlayerInfo(leader))
 				if (active) then
--- 				  Spring.Echo(teamID.." active")
 					local mCur, mMax, mPull, mInc, _, _, _, _ = spGetTeamResources(teamID, "metal")
 					if (mCur+mInc) < mMax then 
 						needs[#needs+1] = teamID
@@ -324,24 +327,24 @@ end
 
 local ShareMinedOre = function()
 	for teamID, allies in pairs(TeamData) do
-		if (MinedOre[teamID] > 0) then
+		if (MinedOre[teamID] > 1) then
 			MinedOre[teamID] = floor(MinedOre[teamID]) -- keep the change!
 			local needs = AlliesNeedM(allies)
 			if (#needs > 0) then
 				local mCur, mMax, mPull, mInc, _, _, _, _ = spGetTeamResources(teamID, "metal")
--- 				Spring.Echo(teamID.." has "..mCur.." and mined "..MinedOre[teamID])
 				local single_member = MinedOre[teamID]/(#needs+1)
 				local to_allies = MinedOre[teamID] - single_member
--- 				Spring.Echo(single_member.." "..to_allies.." "..mCur)
-				if (to_allies < mCur) then
+				if (to_allies <= mCur) then
 					-- give all
--- 					Spring.Echo(teamID.." gives away fully "..to_allies)
 					for i=1, #needs do
 						spUseTeamResource(teamID, "metal", single_member)
 						spAddTeamResource(needs[i], "metal", single_member)
 -- 						spShareTeamResource(teamID, needs[i], "metal", single_member) -- interferes with share bear
 					end
 					MinedOre[teamID] = 0 -- gave everything, very good comrade
+					if (OwnsOreToTeam[teamID]) then
+						OwnsOreToTeam[teamID] = nil
+					end
 				else	-- can't give all? O_o
 					single_member = mCur/(#needs+1)
 					to_allies = mCur - single_member
@@ -351,7 +354,7 @@ local ShareMinedOre = function()
 -- 						spShareTeamResource(teamID, needs[i], "metal", single_member) -- interferes with share bear
 					end
 					MinedOre[teamID] = MinedOre[teamID] - to_allies -- since we are gonna give out more than we should
--- 					Spring.Echo(teamID.." gives away "..to_allies.." and has to give "..MinedOre[teamID])
+					OwnsOreToTeam[teamID] = true
 				end
 			end
 		end
@@ -761,6 +764,7 @@ function gadget:Initialize()
 		local teams = spGetTeamList()
 		for _,t in pairs(teams) do
 			TeamData[t] = {}
+			OwnsOreToTeam[t] = false
 			local allies = 0
 			local myAllyTeam = select(6,spGetTeamInfo(t))
 			for _,t2 in pairs(teams) do
@@ -777,6 +781,7 @@ function gadget:Initialize()
 		end
 	else
 		gadgetHandler:RemoveCallIn("AllowFeatureBuildStep")
+		gadgetHandler:RemoveCallIn("AllowUnitBuildStep")
 		ShareMinedOre = function() end
 	end
 	if not(INVULNERABLE_EXTRACTORS) then
