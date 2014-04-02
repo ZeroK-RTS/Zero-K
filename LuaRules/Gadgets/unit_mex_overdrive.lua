@@ -23,10 +23,10 @@ local pylonDefs = {}
 local linkdefs = {}
 local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 
+local communismOverdrive = odSharingModOptions == "communism"
+
 -- this is "fun" mod
 local OreMexModOption = tonumber((Spring.GetModOptions()).oremex) or 0 -- Red Annihilation mexes, no harvesters though, use cons/coms to reclaim ore.
-
-local communismOverdrive = odSharingModOptions == "communism"
 
 include("LuaRules/Configs/constants.lua")
 include("LuaRules/Configs/mex_overdrive.lua")
@@ -1381,6 +1381,7 @@ function gadget:Initialize()
 		setOreIncome = function(unitID, oreAmount)
 			 GG.oreIncome[unitID] = oreAmount -- this is set to nil, if unitID is destroyed in unit_oremex.lua anyway
 		end
+		communismOverdrive = false -- because OD communism is handled within oremex. -- or does oremex communism need seperate modoption?
 	end
 	
 	gadgetHandler:AddChatAction("odb",OverdriveDebugToggle,"Toggles debug mode for overdrive.")

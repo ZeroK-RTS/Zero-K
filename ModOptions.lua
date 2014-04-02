@@ -249,7 +249,7 @@ local options = {
   {
     key    = 'oremex_inf',
     name   = 'Ore mex infinite growth',
-    desc   = "With this you can have tiberium apocalypse should it hurt units...",
+    desc   = "With this you can have crystal apocalypse should it hurt units...",
     type   = 'bool',
     section= 'cncmex',
     def    = false,
@@ -263,9 +263,9 @@ local options = {
     def    = true,
   },
   {
-    key    = 'oremex_tiberium',
-    name   = 'Ore mex tiberium models',
-    desc   = "If true, ore will look like tiberium, otherwise will look like metal chunks.",
+    key    = 'oremex_crystal',
+    name   = 'Ore mex crystal models',
+    desc   = "If true, ore will look like crystal, otherwise will look like metal chunks.",
     type   = 'bool',
     section= 'cncmex',
     def    = true,

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "1.0.5" -- you may find changelog in unit_oremex.lua gadget
+local version = "1.0.6" -- you may find changelog in unit_oremex.lua gadget
 
 function widget:GetInfo()
   return {
@@ -149,6 +149,8 @@ local function ShowOreMexIncome(playerID, unitID, income)
 		OreExtractors[unitID].income = income
 		if (OreExtractors[unitID].income > 0) then
 			OreExtractors[unitID].label = true
+			OreExtractors[unitID].x = 0
+			OreExtractors[unitID].fade = 0
 		end
 	end
 end
@@ -160,8 +162,6 @@ function widget:GameFrame(n)
 			OreExtractors[unitID].fade = OreExtractors[unitID].fade + 0.02
 			if (OreExtractors[unitID].fade >= 1.0) then
 				OreExtractors[unitID].label = false
-				OreExtractors[unitID].x = 0
-				OreExtractors[unitID].fade = 0
 			end
 		end
 	end

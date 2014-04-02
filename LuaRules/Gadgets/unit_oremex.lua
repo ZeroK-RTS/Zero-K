@@ -1,4 +1,4 @@
-local version = "1.0.5"
+local version = "1.0.6"
 
 function gadget:GetInfo()
 	return {
@@ -15,10 +15,7 @@ end
 --SYNCED-------------------------------------------------------------------
 
 --TODO storage should drop ore on death should you have no allies left to transfer ore to.
---TODO units should refuse to reclaim ore once entire allyteam is full on metal.
---TODO if dmg is enabled it should corrupt terrain visually!!!
---TODO different ore colors.
---TODO different ore size models, pile of chunks should combine into bigger pile of chunks so we keep less features overall and less lag...
+--TODO terrain and smoke gfx...
 
 --BUGS:
 -- 1) Overdrive breakage.
@@ -31,6 +28,7 @@ end
 -- Impossible to reproduce in regular zero-k, because you never meet gaia giving you stuff, so I don't know what's wrong.
 
 -- changelog
+-- 1 april 2014  - 1.0.6. Spawn rate is now once per 2 seconds (or slower). Map size ore hardlimits. Mining communism.
 -- 30 march 2014 - 1.0.5. Income rewrite. Damage off. Crystals on. You can check income by looking over extractors.
 -- 22 march 2014 - 1.0.4. Widget is now AI micro assistant. It also has it's own changelog from now on.
 -- 11 march 2014 - 1.0.3. Growth rewrite, ore metal yield change, ore harm units now. Disobey OD fix. And transfer logic improvement.
@@ -77,6 +75,11 @@ local spGetCommandQueue					= Spring.GetCommandQueue
 local spValidFeatureID					= Spring.ValidFeatureID
 local spGetUnitLosState					= Spring.GetUnitLosState
 local spGetAllyTeamList	  				= Spring.GetAllyTeamList
+local spGetTeamResources  				= Spring.GetTeamResources
+local spAddTeamResource   				= Spring.AddTeamResource
+local spUseTeamResource   				= Spring.UseTeamResource
+local spShareTeamResource				= Spring.ShareTeamResource
+local spGetPlayerInfo					= Spring.GetPlayerInfo
 
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
@@ -154,8 +157,9 @@ if (tonumber(ORE_DMG)==nil) then ORE_DMG = 0 end -- it's both slow and physical 
 local ORE_DMG_RANGE = 81 -- so standing in adjacent tile is gonna harm you
 local OBEY_ZLEVEL = (tonumber(modOptions.oremex_uphill) == 1) -- slower uphill growth
 if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = true end
-local CRYSTALS = (tonumber(modOptions.oremex_tiberium) == 1) -- crystals instead of ore
-if (modOptions.oremex_tiberium == nil) then CRYSTALS = true end
+local CRYSTALS = (tonumber(modOptions.oremex_crystal) == 1) -- crystals instead of ore
+if (modOptions.oremex_crystal == nil) then CRYSTALS = true end
+local COMMUNISM = modOptions.overdrivesharingscheme == "communism" -- or does oremex communism need seperate modoption?
 local ZLEVEL_PROTECTION = 300 -- if adjacent tile is over 300 it's not gonna grow there at all -- lower Z tiles do not give speed boost though
 local MAX_STEPS = 15 -- vine length
 local MAX_PIECES = 50 -- anti spam measure, 144, it looks like cute ~7x7 square rotated 45 degree
@@ -174,6 +178,8 @@ local OreDefs = {
 }
 
 local AllyTeams = {}
+local TeamData = {} -- by teamID, holds array of allied teamIDs
+local MinedOre = {} -- by teamID, holds amount of ore mined
 
 local CMD_SELFD								= CMD.SELFD
 local CMD_ATTACK				= CMD.ATTACK
@@ -278,10 +284,85 @@ local InflictOreDamage = function()
 	end
 end
 
+function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
+	if not(OreDefs[featureDefID]) or not(MinedOre[builderTeam]) or (builderTeam == GaiaTeamID) then
+		return true
+	end
+-- 	Spring.Echo(part.." "..FeatureDefs[featureDefID].metal)
+ 	MinedOre[builderTeam] = MinedOre[builderTeam] + (-part/FeatureDefs[featureDefID].metal)
+	return true
+end
+
+local function AlliesNeedM(teamIDs)
+	local needs = {}
+-- 	Spring.Echo(tostring(#teamIDs))
+	for i=1, #teamIDs do
+		local teamID = teamIDs[i]
+		local _,leader,_,isAI = spGetTeamInfo(teamID)
+-- 		Spring.Echo(tostring(leader).." "..tostring(isAI))
+		if (leader >= 0) or (isAI) then -- otherwise spec
+			if (isAI) then
+-- 			  Spring.Echo(teamID.." active ai")
+				local mCur, mMax, mPull, mInc, _, _, _, _ = spGetTeamResources(teamID, "metal")
+				if (mCur+mInc) < mMax then 
+					needs[#needs+1] = teamID
+				end
+			else
+				local active = select(2, spGetPlayerInfo(leader))
+				if (active) then
+-- 				  Spring.Echo(teamID.." active")
+					local mCur, mMax, mPull, mInc, _, _, _, _ = spGetTeamResources(teamID, "metal")
+					if (mCur+mInc) < mMax then 
+						needs[#needs+1] = teamID
+					end
+				end
+			end
+		end
+	end
+	return needs
+end
+
+local ShareMinedOre = function()
+	for teamID, allies in pairs(TeamData) do
+		if (MinedOre[teamID] > 0) then
+			MinedOre[teamID] = floor(MinedOre[teamID]) -- keep the change!
+			local needs = AlliesNeedM(allies)
+			if (#needs > 0) then
+				local mCur, mMax, mPull, mInc, _, _, _, _ = spGetTeamResources(teamID, "metal")
+-- 				Spring.Echo(teamID.." has "..mCur.." and mined "..MinedOre[teamID])
+				local single_member = MinedOre[teamID]/(#needs+1)
+				local to_allies = MinedOre[teamID] - single_member
+-- 				Spring.Echo(single_member.." "..to_allies.." "..mCur)
+				if (to_allies < mCur) then
+					-- give all
+-- 					Spring.Echo(teamID.." gives away fully "..to_allies)
+					for i=1, #needs do
+						spUseTeamResource(teamID, "metal", single_member)
+						spAddTeamResource(needs[i], "metal", single_member)
+-- 						spShareTeamResource(teamID, needs[i], "metal", single_member) -- interferes with share bear
+					end
+					MinedOre[teamID] = 0 -- gave everything, very good comrade
+				else	-- can't give all? O_o
+					single_member = mCur/(#needs+1)
+					to_allies = mCur - single_member
+					for i=1, #needs do
+						spUseTeamResource(teamID, "metal", to_allies)
+						spAddTeamResource(needs[i], "metal", to_allies)
+-- 						spShareTeamResource(teamID, needs[i], "metal", single_member) -- interferes with share bear
+					end
+					MinedOre[teamID] = MinedOre[teamID] - to_allies -- since we are gonna give out more than we should
+-- 					Spring.Echo(teamID.." gives away "..to_allies.." and has to give "..MinedOre[teamID])
+				end
+			end
+		end
+	end
+end
+
 -- if mex OD is off and it's godmode on, transfer mex to gaia team
 -- if mex is inside EnergyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
 function gadget:GameFrame(f)
 	if ((f%32)==1) then
+		ShareMinedOre()
 		MineMoreOreLoop()
 		InflictOreDamage()
 		TransferLoop()
@@ -302,7 +383,7 @@ local function UnitFin(unitID, unitDefID, unitTeam)
 			OreMex[unitID] = {
 				unitID = unitID,
 				ore = 0, -- metal.
-				income = spGetUnitRulesParam(unitID,"mexIncome"),
+-- 				income = spGetUnitRulesParam(unitID,"mexIncome"),
 				x = x,
 				z = z,
 			}
@@ -473,10 +554,12 @@ function gadget:FeatureDestroyed(featureID, allyTeam)
 	end
 end
 
+local spawn_or_wait = false
 function MineMoreOreLoop()
+	spawn_or_wait = not(spawn_or_wait)
 	for unitID, data in pairs(OreMex) do
 		if (OreIncome[unitID]) then
-			MineMoreOre(unitID, OreIncome[unitID], false)
+			MineMoreOre(unitID, OreIncome[unitID], false, spawn_or_wait)
 		end
 	end
 end
@@ -499,76 +582,78 @@ local function notifyPlayers(unitID, spawn_amount)
 	end
 end
 
-function MineMoreOre(unitID, howMuch, forcefully)
+function MineMoreOre(unitID, howMuch, forcefully, wait)
 	if not(OreMex[unitID]) then return end -- in theory never happens...
 	OreMex[unitID].ore = OreMex[unitID].ore + howMuch
-	local ore = OreMex[unitID].ore
-	if not(forcefully) then
-		OreMex[unitID].income = howMuch
-	end
-	local x,y,z = spGetUnitPosition(unitID)
-	local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
-	local random_feature
-	if (#features > 0) then
-		random_feature = features[random(1,#features)]
-	end
-	local spawn_allow = true
-	if not(INFINITE_GROWTH) then -- rejoice Killer
-		if (#features > MAX_PIECES) and not(forcefully) then spawn_allow = false end -- too much reclaim, please reclaim
-	end
-	local sp_count = 3
-	if (ore < 6) then
-		sp_count = 2
-		if (ore < 3) then
-			sp_count = 1
+	if not(wait) then
+		local ore = OreMex[unitID].ore
+	-- 	if not(forcefully) then
+	-- 		OreMex[unitID].income = howMuch
+	-- 	end
+		local x,y,z = spGetUnitPosition(unitID)
+		local features = spGetFeaturesInRectangle(x-240,z-240,x+240,z+240)
+		local random_feature
+		if (#features > 0) then
+			random_feature = features[random(1,#features)]
 		end
-	end
-	local teamID = spGetUnitTeam(unitID)
-	if (#teamIDs>1) then
-		teamID = random(0,#teamIDs)
-		while (teamID == GaiaTeamID) do
-			teamID = random(0,#teamIDs)
+		local spawn_allow = true
+		if not(INFINITE_GROWTH) then -- rejoice Killer
+			if (#features > MAX_PIECES) and not(forcefully) then spawn_allow = false end -- too much reclaim, please reclaim
 		end
-	end
-	if (ore>=1) then
-		if spawn_allow then
-			try=0
-			-- lets see, it tries to spawn 3 ore chunks every time
-			-- lets try spawning 40% of ore amount every time
-			local spawn_amount = ore*0.4
-			if (forcefully) then
-				spawn_amount = ore*0.6 -- more chance to drop everything, regardless
-			elseif (spawn_amount<MIN_PRODUCE) then -- try to spawn minchunk
-				spawn_amount = MIN_PRODUCE
+		local sp_count = 3
+		if (ore < 6) then
+			sp_count = 2
+			if (ore < 3) then
+				sp_count = 1
 			end
-			while (try < sp_count) do
-				local a,b = GrowBranch(x,y,z) -- v2, pick direction grow there, do not go back in direction, it should be more like a tree, probably
-				if (a~=nil) then
-					if (ore >= spawn_amount) then -- is it enough?
-						if (SpawnOre(a,b,spawn_amount,teamID)) then
-							notifyPlayers(unitID, spawn_amount)
-							ore = ore - spawn_amount
+		end
+		local teamID = spGetUnitTeam(unitID)
+		if (#teamIDs>1) then
+			teamID = random(0,#teamIDs)
+			while (teamID == GaiaTeamID) do
+				teamID = random(0,#teamIDs)
+			end
+		end
+		if (ore>=1) then
+			if spawn_allow then
+				try=0
+				-- lets see, it tries to spawn 3 ore chunks every time
+				-- lets try spawning 40% of ore amount every time
+				local spawn_amount = ore*0.4
+				if (forcefully) then
+					spawn_amount = ore*0.6 -- more chance to drop everything, regardless
+				elseif (spawn_amount<MIN_PRODUCE) then -- try to spawn minchunk
+					spawn_amount = MIN_PRODUCE
+				end
+				while (try < sp_count) do
+					local a,b = GrowBranch(x,y,z) -- v2, pick direction grow there, do not go back in direction, it should be more like a tree, probably
+					if (a~=nil) then
+						if (ore >= spawn_amount) then -- is it enough?
+							if (SpawnOre(a,b,spawn_amount,teamID)) then
+								notifyPlayers(unitID, spawn_amount)
+								ore = ore - spawn_amount
+							end
 						end
 					end
-				end
-				try=try+1
-			end
-		end
-		if (ore >= 1) then
-			if not(forcefully) and (ore >= MIN_PRODUCE) and (Ore[random_feature]) then -- simply grow "random_feature"
-				if (AddOreMetal(random_feature, ore)) then
-					notifyPlayers(unitID, ore)
-					ore = 0
-				end
-			elseif (forcefully) then -- drop all thats left on mex
-				if (SpawnOre(x,z,ore,teamID)) then
-					notifyPlayers(unitID, ore)
-					ore = 0
+					try=try+1
 				end
 			end
+			if (ore >= 1) then
+				if not(forcefully) and (ore >= MIN_PRODUCE) and (Ore[random_feature]) then -- simply grow "random_feature"
+					if (AddOreMetal(random_feature, ore)) then
+						notifyPlayers(unitID, ore)
+						ore = 0
+					end
+				elseif (forcefully) then -- drop all thats left on mex
+					if (SpawnOre(x,z,ore,teamID)) then
+						notifyPlayers(unitID, ore)
+						ore = 0
+					end
+				end
+			end
 		end
+		OreMex[unitID].ore = ore
 	end
-	OreMex[unitID].ore = ore
 end
 
 local function GetFloatHeight(x,z)
@@ -581,7 +666,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
 	if (OreMex[unitID]) then
-		MineMoreOre(unitID, 0, true) -- this will order it to spawn everything it ha
+		MineMoreOre(unitID, 0, true, false) -- this will order it to spawn everything it ha
 		OreMex[unitID]=nil
 		UnderAttack[unitID]=0
 		OreIncome[unitID]=0
@@ -598,7 +683,7 @@ local function PreSpawn()
 					OreMex[unitID] = {
 						unitID = unitID,
 						ore = 0, -- metal.
-						income = GG.metalSpots[i].metal,
+-- 						income = GG.metalSpots[i].metal,
 						x = GG.metalSpots[i].x,
 						z = GG.metalSpots[i].z,
 					}
@@ -610,11 +695,11 @@ local function PreSpawn()
 					spCallCOBScript(unitID, "SetSpeed", 0, GG.metalSpots[i].metal * 500) --hacky
 					local prespawn = 0
 					while (prespawn < LIMIT_PRESPAWNED_METAL) do
-						MineMoreOre(unitID, 10, true)
+						MineMoreOre(unitID, 10, true, false)
 						prespawn=prespawn+10
 					end
 					if (LIMIT_PRESPAWNED_METAL-prespawn)>=5 then -- i dont want to spawn ~1m "leftovers", chunks are ok
-						MineMoreOre(unitID, LIMIT_PRESPAWNED_METAL-prespawn, true)
+						MineMoreOre(unitID, LIMIT_PRESPAWNED_METAL-prespawn, true, false)
 					end
 				end
 			end
@@ -628,6 +713,17 @@ end
 local function ReInit(reinit)
 	mapWidth = Game.mapSizeX
 	mapHeight = Game.mapSizeZ
+	if not(INFINITE_GROWTH) then -- TODO should also consider mex amount, if possible
+		local size = mapWidth + mapHeight
+		if (size > 16001) then
+			MAX_PIECES = 10
+		elseif (size > 12001) then
+			MAX_PIECES = 25
+		elseif (size > 8001) then
+			MAX_PIECES = 35
+		end	-- else size is small and 50 pieces by default
+	end
+-- 	Spring.Echo("yay for "..MAX_PIECES)
 	teamIDs = spGetTeamList()
 	if (PRESPAWN_EXTRACTORS) then
 		if not(PreSpawn()) and INVULNERABLE_EXTRACTORS then
@@ -658,8 +754,30 @@ function gadget:Initialize()
 		return
 	end
 	local allyteams = spGetAllyTeamList()
-	for _,allyTeam in ipairs(allyteams) do
+	for _,allyTeam in pairs(allyteams) do
 		AllyTeams[#AllyTeams+1] = allyTeam
+	end
+	if (COMMUNISM) then -- TODO, spectator team should be ignored... not like it matters much
+		local teams = spGetTeamList()
+		for _,t in pairs(teams) do
+			TeamData[t] = {}
+			local allies = 0
+			local myAllyTeam = select(6,spGetTeamInfo(t))
+			for _,t2 in pairs(teams) do
+				if (t ~= t2) and (myAllyTeam == select(6,spGetTeamInfo(t2))) then
+					TeamData[t][#TeamData[t]+1] = t2
+					allies = allies + 1
+				end
+			end
+			if (allies > 0) then
+				MinedOre[t] = 0 -- more than 1 ally, >=2 player team!
+			else
+				TeamData[t] = nil -- 1 team allyteam, no need to share income!
+			end
+		end
+	else
+		gadgetHandler:RemoveCallIn("AllowFeatureBuildStep")
+		ShareMinedOre = function() end
 	end
 	if not(INVULNERABLE_EXTRACTORS) then
 		gadgetHandler:RemoveCallIn("AllowWeaponTarget")
