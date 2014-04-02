@@ -20,11 +20,11 @@ unitDef = {
     description_fr = [[Lance Torpille]],
 	description_de = [[Torpedowerfer]],
 	description_pl = [[Wyrzutnia torped]],
-	-- commented out: mentions of exterior sonar (now torp has its own)
-    helptext       = [[This Torpedo Launcher provides defense against both surface and submerged vessels.]]-- The Torpedo Launcher can hit hovercraft.]], -- Remember to build sonar so that the Torpedo Launcher can hit submerged targets. 
-    helptext_fr    = [[Ce lance torpille permet de torpiller les unités flottantes ou immergés ou Hovercraft.]] -- Attention, le Harpoon est inefficace contre les Hovercraft.]], -- Construisez un sonar afin de d?tecter le plus t?t possible les cibles potentielles du Harpoon. 
-	helptext_de    = [[Dieser Torpedowerfer dient zur Verteidigung gegen Schiffe und U-Boote, und Luftkissenfahrzeuge.]]-- Luftkissenfahrzeuge können nicht getroffen werden.]], -- Achte darauf, dass du ein Sonar baust, damit der Torpedowerfer U-Boote lokalisieren kann. 
-	helptext_pl    = [[Torpedy sa w stanie trafic zarowno cele plywajace po powierzchni jak i pod woda]]--, jednak nie moga atakowac poduszkowcow, ktore unosza sie nad powierzchnia.]], -- Pamietaj, ze do atakowania zanurzonych celow potrzebny jest sonar.
+	-- commented out: mentions of exterior sonar (now torp has its own), and mention of not able to shoot Hovercraft.
+    helptext       = [[This Torpedo Launcher provides defense against both surface and submerged vessels.]],-- The Torpedo Launcher can hit hovercraft.]], -- Remember to build sonar so that the Torpedo Launcher can hit submerged targets. 
+    helptext_fr    = [[Ce lance torpille permet de torpiller les unités flottantes ou immergés ou Hovercraft.]], -- Attention, le Harpoon est inefficace contre les Hovercraft.]], -- Construisez un sonar afin de d?tecter le plus t?t possible les cibles potentielles du Harpoon. 
+	helptext_de    = [[Dieser Torpedowerfer dient zur Verteidigung gegen Schiffe und U-Boote, und Luftkissenfahrzeuge.]],-- Luftkissenfahrzeuge können nicht getroffen werden.]], -- Achte darauf, dass du ein Sonar baust, damit der Torpedowerfer U-Boote lokalisieren kann. 
+	helptext_pl    = [[Torpedy sa w stanie trafic zarowno cele plywajace po powierzchni jak i pod woda]],--, jednak nie moga atakowac poduszkowcow, ktore unosza sie nad powierzchnia.]], -- Pamietaj, ze do atakowania zanurzonych celow potrzebny jest sonar.
   },
 
   explodeAs         = [[MEDIUM_BUILDINGEX]],
