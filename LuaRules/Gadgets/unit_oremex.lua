@@ -723,11 +723,11 @@ local function ReInit(reinit)
 	mapHeight = Game.mapSizeZ
 	if not(INFINITE_GROWTH) then -- TODO should also consider mex amount, if possible
 		local size = mapWidth + mapHeight
-		if (size > 16001) then
+		if (size > 12001) then
 			MAX_PIECES = 10
-		elseif (size > 12001) then
+		elseif (size > 9001) then
 			MAX_PIECES = 25
-		elseif (size > 8001) then
+		elseif (size > 6001) then
 			MAX_PIECES = 35
 		end	-- else size is small and 50 pieces by default
 	end
