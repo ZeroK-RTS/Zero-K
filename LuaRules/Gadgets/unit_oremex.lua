@@ -159,7 +159,8 @@ local OBEY_ZLEVEL = (tonumber(modOptions.oremex_uphill) == 1) -- slower uphill g
 if (modOptions.oremex_uphill == nil) then OBEY_ZLEVEL = true end
 local CRYSTALS = (tonumber(modOptions.oremex_crystal) == 1) -- crystals instead of ore
 if (modOptions.oremex_crystal == nil) then CRYSTALS = true end
-local COMMUNISM = modOptions.overdrivesharingscheme == "communism" -- or does oremex communism need seperate modoption?
+local COMMUNISM = (tonumber(modOptions.oremex_communism) == 1) -- implemented as seperate modoption... because it's not overdrive, but rather all ore reclaim income...
+if (modOptions.oremex_communism == nil) then COMMUNISM = true end
 local ZLEVEL_PROTECTION = 300 -- if adjacent tile is over 300 it's not gonna grow there at all -- lower Z tiles do not give speed boost though
 local MAX_STEPS = 15 -- vine length
 local MAX_PIECES = 50 -- anti spam measure, 144, it looks like cute ~7x7 square rotated 45 degree

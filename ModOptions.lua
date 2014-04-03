@@ -271,6 +271,14 @@ local options = {
     def    = true,
   },
   {
+    key    = 'oremex_communism',
+    name   = 'Ore mex communism',
+    desc   = "If true, ore income will be fully equally shared between active&alive players.",
+    type   = 'bool',
+    section= 'cncmex',
+    def    = true,
+  },
+  {
     key='oremex_harm',
     name='Ore damage',
     desc='Set how much damage should ore inflict on contact, it stacks. Some units are ore proof.',
