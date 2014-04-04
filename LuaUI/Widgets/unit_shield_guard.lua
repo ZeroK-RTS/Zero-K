@@ -274,6 +274,8 @@ local spGetCommandQueue 	= Spring.GetCommandQueue
 local spGetTeamUnits 		= Spring.GetTeamUnits
 local spGetUnitSeparation 	= Spring.GetUnitSeparation
 
+VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
 local team = Spring.GetMyTeamID()
 
@@ -363,9 +365,9 @@ local function updateFollowers()
 	if (v.fol) then -- give move orders to shieldiees
 	  local dis = spGetUnitSeparation(unit,v.fol)
 	  if dis > v.range then
-	    spGiveOrderToUnit(unit,CMD_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
+	    GiveClampedOrderToUnit(unit,CMD_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
 	  elseif (shieldieeStopDis < dis) then
-	    spGiveOrderToUnit(unit,CMD_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
+	    GiveClampedOrderToUnit(unit,CMD_MOVE,{shields[v.fol].ux,shields[v.fol].uy,shields[v.fol].uz},CMD_OPT_RIGHT)
 	  else
 	    spGiveOrderToUnit(unit,CMD_STOP,{},CMD_OPT_RIGHT)
 	  end

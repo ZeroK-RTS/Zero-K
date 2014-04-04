@@ -48,6 +48,9 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spAreTeamsAllied = Spring.AreTeamsAllied
 
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
+
+VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 --local IsGuiHidden		=	Spring.IsGUIHidden
 
 local echo = Spring.Echo
@@ -208,7 +211,7 @@ function StopRearm(unitID) --is called until rearm is cancelled
 	elseif (not queue or not queue[1] or queue[1].id==CMD_STOP) and --no work to do??
 	retreatRearmOrders[unitID][1] then --returnLastPosition enabled??
 		local x,y,z = retreatRearmOrders[unitID][1],retreatRearmOrders[unitID][2],retreatRearmOrders[unitID][3]
-		GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
+		GiveClampedOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 		retreatRearmOrders[unitID]= nil
 	end
 end
@@ -226,7 +229,7 @@ function StopRetreating(unitID)
 				GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[2].tag}, {})
 				if (not cmds[3] or cmds[3].id==CMD_STOP) and retreatMoveOrders[unitID][4] then --no work to return to?? returnLastPosition enabled??
 					local x,y,z = retreatMoveOrders[unitID][4],retreatMoveOrders[unitID][5],retreatMoveOrders[unitID][6]
-					GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
+					GiveClampedOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 				end
 				
 				retreatMoveOrders[unitID] = nil --unit no longer considered retreating
@@ -236,7 +239,7 @@ function StopRetreating(unitID)
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
 			if (not cmds[2] or cmds[2].id==CMD_STOP) and retreatMoveOrders[unitID][4] then --no work to return to?? returnLastPosition enabled??
 				local x,y,z = retreatMoveOrders[unitID][4],retreatMoveOrders[unitID][5],retreatMoveOrders[unitID][6]
-				GiveOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
+				GiveClampedOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 			end
 			retreatMoveOrders[unitID] = nil
 		else --is currently some other command
@@ -283,7 +286,7 @@ local function StartRetreat(unitID, force)
 	if force or dSquared > maxDistSqr then
 		local insertIndex = 0
 		-- using OPT_INTERNAL so that the CMD.MOVE order is not cycled when the unit has repeat enabled
-		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
+		GiveClampedOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex+1, CMD_WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 		
 		retreatMoveOrders[unitID] = {hx, hy, hz}

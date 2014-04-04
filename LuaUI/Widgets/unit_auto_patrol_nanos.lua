@@ -73,6 +73,9 @@ options =
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+
 local function IsImmobileBuilder(ud)
   return(ud and ud.isBuilder and not ud.canMove
          and not ud.isFactory)
@@ -91,7 +94,7 @@ local function SetupUnit(unitID)
     x = x + vx*25/abs(vx)
     z = z + vz*25/abs(vz)
 
-    spGiveOrderToUnit(unitID, CMD_PATROL, { x, y, z }, {})
+    GiveClampedOrderToUnit(unitID, CMD_PATROL, { x, y, z }, {})
   end
 end
 

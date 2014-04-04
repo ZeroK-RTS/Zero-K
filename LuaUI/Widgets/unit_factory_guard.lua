@@ -43,6 +43,8 @@ local spSetUnitGroup       = Spring.SetUnitGroup
 local spGetUnitDefID	   = Spring.GetUnitDefID
 local spGetTeamUnits	   = Spring.GetTeamUnits
 
+VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
 
 local factoryDefs = {
@@ -167,12 +169,12 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 		dx, dz = -dist,  0
 		rx, rz =  0,  dist
 	end
-  
-	local OrderUnit = spGiveOrderToUnit
-
-	OrderUnit(unitID, CMD_MOVE,  { x + dx, y, z + dz }, { "" })
-	OrderUnit(unitID, CMD_MOVE,  { x + rx, y, z + rz }, { "shift" })
-	OrderUnit(unitID, CMD_GUARD, { factID },            { "shift" })
+	
+	GiveClampedOrderToUnit(unitID, CMD_MOVE,  { x + dx, y, z + dz }, { "" })
+	if not GiveClampedOrderToUnit(unitID, CMD_MOVE,  { x + rx, y, z + rz }, { "shift" }, true) then
+		GiveClampedOrderToUnit(unitID, CMD_MOVE,  { x - rx, y, z - rz }, { "shift" })
+	end
+	spGiveOrderToUnit(unitID, CMD_GUARD, { factID },            { "shift" })
 end
 
 

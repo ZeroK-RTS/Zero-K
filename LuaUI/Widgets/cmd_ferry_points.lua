@@ -27,6 +27,9 @@ local CMD_MOVE 		= CMD.MOVE
 local CMD_FIGHT		= CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
+VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+
 local ferryRoutes = {count = 0, route = {}}
 
 local placedRoute = false
@@ -408,7 +411,7 @@ function widget:GameFrame(frame)
 								Spring.GiveOrderToUnit(unitID, CMD.UNLOAD_UNITS, 
 									{route.finish.x, route.finish.y, route.finish.z, UNLOAD_RADIUS}, {} )
 							else
-								Spring.GiveOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
 									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, {} )
 							end
 						end
@@ -420,10 +423,10 @@ function widget:GameFrame(frame)
 						if trans.waypoint > route.pointcount or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
 							trans.waypoint = trans.waypoint - 1
 							if trans.waypoint == 0 then
-								Spring.GiveOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
 									{route.start.x, route.start.y, route.start.z}, {} )
 							else
-								Spring.GiveOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
 									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, {} )
 							end
 						end
@@ -442,7 +445,7 @@ function widget:GameFrame(frame)
 							end
 						end
 					elseif disSQ(x, z, route.start.x, route.start.z) > NEAR_WAYPOINT_RANGE_SQ then
-						Spring.GiveOrderToUnit(unitID, CMD_MOVE, 
+						GiveClampedOrderToUnit(unitID, CMD_MOVE, 
 							{route.start.x, route.start.y, route.start.z}, {} )
 					end
 				

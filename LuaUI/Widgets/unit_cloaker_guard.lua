@@ -39,6 +39,9 @@ local spGetCommandQueue 	= Spring.GetCommandQueue
 local spGetTeamUnits 		= Spring.GetTeamUnits
 local spGetUnitSeparation 	= Spring.GetUnitSeparation
 
+VFS.Include("LuaRules/Utilities/ClampPosition.lua")
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+
 local team = Spring.GetMyTeamID()
 
 local cloakers = {}
@@ -140,9 +143,9 @@ local function updateFollowers()
 	if (v.fol) then -- give move orders to cloakiees
 	  local dis = spGetUnitSeparation(unit,v.fol)
 	  if dis > v.range then
-	    spGiveOrderToUnit(unit,CMD_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
+	    GiveClampedOrderToUnit(unit,CMD_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
 	  elseif (cloakieeStopDis < dis) then
-	    spGiveOrderToUnit(unit,CMD_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
+	    GiveClampedOrderToUnit(unit,CMD_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
 	  else
 	    spGiveOrderToUnit(unit,CMD_STOP,{},CMD_OPT_RIGHT)
 	  end
