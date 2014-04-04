@@ -73,7 +73,6 @@ unitDef = {
   trackType              = [[ChickenTrackPointy]],
   trackWidth             = 26,
   turnRate               = 2000,
-  upright                = true,
   workerTime             = 0,
 }
 
