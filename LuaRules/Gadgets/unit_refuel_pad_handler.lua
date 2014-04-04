@@ -81,6 +81,7 @@ end
 local padSnapRangeSqr = 80^2
 local REFUEL_TIME = 5*30
 local HEAL_PER_HALF_SECOND = 15
+local PAD_ENERGY_DRAIN = 2.5
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -104,6 +105,10 @@ local function SitOnPad(unitID)
 	
 	local heading = spGetUnitHeading(unitID)*HEADING_TO_RAD
 	
+	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	local cost = ud.metalCost
+	local maxHP = ud.health
+	local healPerHalfSecond = 3*PAD_ENERGY_DRAIN*maxHP/(cost*2)
 	
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
@@ -134,6 +139,7 @@ local function SitOnPad(unitID)
 	local function SitLoop()
 		local landDuration = 0
 		local refuelComplete = false
+		Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN)
 		
 		while true do
 			if (not landingUnit[unitID]) or landingUnit[unitID].abort or (not landingUnit[unitID].landed) then
@@ -169,11 +175,18 @@ local function SitOnPad(unitID)
 						refuelComplete = true
 						GG.RefuelComplete(unitID)
 					end
-					local hp, maxHP = spGetUnitHealth(unitID)
+					local hp = spGetUnitHealth(unitID)
 					if hp < maxHP then
-						spSetUnitHealth(unitID, min(maxHP, hp + HEAL_PER_HALF_SECOND))
-					elseif refuelComplete then
-						break
+						local _,_,_,energyUse = Spring.GetUnitResources(unitID)
+						spSetUnitHealth(unitID, min(maxHP, hp + healPerHalfSecond*energyUse/PAD_ENERGY_DRAIN))
+					else
+						if healPerHalfSecond then
+							Spring.SetUnitResourcing(unitID, "uue" ,0)
+							healPerHalfSecond = false
+						end
+						if refuelComplete then
+							break
+						end
 					end
 				end
 			end
