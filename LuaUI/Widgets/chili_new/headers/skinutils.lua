@@ -699,7 +699,7 @@ function DrawProgressbar(obj)
     local tw,th = texInfo.xsize, texInfo.ysize
 
 	-- workaround for catalyst >12.6 drivers: do the "clipping" by multiplying width by percentage in glBeginEnd instead of using glClipPlane
-    -- fuck AMD
+    -- AMD :(
     --gl.ClipPlane(1, -1,0,0, w*percent)
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0,0,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
     --gl.ClipPlane(1, false)
