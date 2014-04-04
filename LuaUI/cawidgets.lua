@@ -1237,6 +1237,8 @@ function widgetHandler:CommandNotify(id, params, options)
   return false
 end
 
+local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
+
 --NOTE: StringStarts() and MessageProcessor is included in "chat_preprocess.lua"
 function widgetHandler:AddConsoleLine(msg, priority)
   if StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
@@ -1261,6 +1263,12 @@ function widgetHandler:AddConsoleLine(msg, priority)
 	MessageProcessor:ProcessConsoleLine(newMsg) --chat_preprocess.lua
 	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' then 
 		local playerID_msg = newMsg.player and newMsg.player.id --retrieve playerID from message.
+		if MUTE_SPECTATORS and not select(1, Spring.GetSpectatingState()) then
+			local specMessage = select(3, Spring.GetPlayerInfo(playerID_msg))
+			if specMessage then
+				return
+			end
+		end
 		local customkeys = select(10, Spring.GetPlayerInfo(playerID_msg))
 		if customkeys and customkeys.muted then
 			local myPlayerID = Spring.GetLocalPlayerID()
