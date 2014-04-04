@@ -1241,7 +1241,9 @@ local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
 
 --NOTE: StringStarts() and MessageProcessor is included in "chat_preprocess.lua"
 function widgetHandler:AddConsoleLine(msg, priority)
-  if StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
+  if StringStarts(msg, "Error: Invalid command received") then
+	return
+  elseif StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
     return -- ignore
   elseif StringStarts(msg, transmitMagic) then -- receiving from the lobby
     if StringStarts(msg, voiceMagic) then
