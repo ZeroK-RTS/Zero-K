@@ -17,8 +17,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 410,
-		subs    = 410,
+		default = 220,
+		subs    = 220,
 	},
 
 	explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -31,8 +31,8 @@ local weaponDef = {
 	model                   = [[wep_t_longbolt.s3o]],
 	numbounce               = 4,
 	noSelfDamage            = true,
-	range                   = 350,
-	reloadtime              = 5,
+	range                   = 330,
+	reloadtime              = 3.5,
 	soundHit                = [[explosion/wet/ex_underwater]],
 	soundStart              = [[weapon/torpedo]],
 	startVelocity           = 90,
