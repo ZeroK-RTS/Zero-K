@@ -7,6 +7,17 @@ local function merge(t1, t2)
 	end
 end
 
+local function NameTableToUnitDefID(nameTable)
+	local defTable = {}
+	for unitName,_  in pairs(nameTable) do
+		local ud = UnitDefNames[unitName]
+		if ud then
+			defTable[ud.id] = true
+		end
+	end
+	return defTable
+end
+
 -- swarm arrays
 -- these are not strictly required they just help with inputting the units
 
@@ -43,6 +54,10 @@ local lowRangeSwarmieeArray = {
 	["chickenblobber"] = true,
 	["armsnipe"] = true, -- only worth swarming sniper at low range, too accurate otherwise.
 }
+
+longRangeSwarmieeArray = NameTableToUnitDefID(longRangeSwarmieeArray)
+medRangeSwarmieeArray = NameTableToUnitDefID(medRangeSwarmieeArray)
+lowRangeSwarmieeArray = NameTableToUnitDefID(lowRangeSwarmieeArray)
 
 merge(medRangeSwarmieeArray,longRangeSwarmieeArray)
 merge(lowRangeSwarmieeArray,medRangeSwarmieeArray)
@@ -151,6 +166,13 @@ local artyRangeSkirmieeArray = {
 	["armorco"] = true,
 }
 
+shortRangeSkirmieeArray = NameTableToUnitDefID(shortRangeSkirmieeArray)
+riotRangeSkirmieeArray = NameTableToUnitDefID(riotRangeSkirmieeArray)
+lowMedRangeSkirmieeArray = NameTableToUnitDefID(lowMedRangeSkirmieeArray)
+medRangeSkirmieeArray = NameTableToUnitDefID(medRangeSkirmieeArray)
+longRangeSkirmieeArray = NameTableToUnitDefID(longRangeSkirmieeArray)
+artyRangeSkirmieeArray = NameTableToUnitDefID(artyRangeSkirmieeArray)
+
 merge(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
 merge(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
 merge(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
@@ -170,6 +192,8 @@ local skirmableAir = {
 	["corbtrans"] = true,
 	["corcrw"] = true,
 }
+
+skirmableAir = NameTableToUnitDefID(skirmableAir)
 
 -- Things that are fled by some things
 
@@ -208,6 +232,14 @@ for name,data in pairs(UnitDefNames) do
 	end
 end
 
+fleeables = NameTableToUnitDefID(fleeables)
+armedLand = NameTableToUnitDefID(armedLand)
+
+-- waterline(defaults to 0): Water level at which the unit switches between land and sea behaviour
+-- sea: table of behaviour for sea. Note that these tables are optional.
+-- land: table of behaviour for land 
+
+-- weaponNum(defaults to 1): Weapon to use when skirming
 -- searchRange(defaults to 800): max range of GetNearestEnemy for the unit.
 -- defaultAIState (defaults in config): (1 or 0) state of AI when unit is initialised
 
@@ -489,13 +521,27 @@ local behaviourConfig = {
 		stoppingDistance = 10
 	},
 	["amphriot"] = {
-		skirms = riotRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		circleStrafe = true,
-		maxSwarmLeeway = 40,
-		skirmLeeway = 30, 
-		minCircleStrafeDistance = 10,
+		waterline = -5,
+		land = {
+			weaponNum = 1,
+			skirms = riotRangeSkirmieeArray, 
+			swarms = {}, 
+			flees = {},
+			circleStrafe = true,
+			maxSwarmLeeway = 40,
+			skirmLeeway = 30, 
+			minCircleStrafeDistance = 10,
+		},
+		sea = {
+			weaponNum = 2,
+			skirms = armedLand, 
+			swarms = {}, 
+			flees = {},
+			circleStrafe = true,
+			maxSwarmLeeway = 40,
+			skirmLeeway = 30, 
+			minCircleStrafeDistance = 10,
+		},
 	},
 		
 	--assaults
