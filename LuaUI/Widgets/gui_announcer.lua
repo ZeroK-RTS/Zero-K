@@ -543,12 +543,14 @@ local function CheckResources()
 		metal_excess = false
 	end
 	local eCur, eMax, ePull, eInc, _, _, _, _ = spGetTeamResources(myTeamID, "energy")
-	local NotEnoughEnergy = ((eCur+eInc) <= 1)
-	if NotEnoughEnergy and not(energy_stall) then
-		energy_stall = true
-		AnnounceEstall()
-	elseif not(NotEnoughEnergy) and energy_stall then
-		energy_stall = false
+	if (eCur) and (eMax > 0) then -- TODO it crashes here if i don't check for nil when i use cheat stuff
+		local NotEnoughEnergy = ((eCur+eInc) <= 1)
+		if NotEnoughEnergy and not(energy_stall) then
+			energy_stall = true
+			AnnounceEstall()
+		elseif not(NotEnoughEnergy) and energy_stall then
+			energy_stall = false
+		end
 	end
 end
 

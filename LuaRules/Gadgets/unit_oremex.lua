@@ -287,6 +287,11 @@ local InflictOreDamage = function()
 	end
 end
 
+-- example how it works:
+-- consider 31 metal ore chunk/crystal,
+-- reclaiming it will call this function 84 times, part will be 0.375,
+-- doing some math 0.375/1*84=31.5 which is very accurate to what we had in the begining: 31.
+-- test was done with 12 BP com. same test in similar fashion was performed for other cons, result was aprox the same.
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
 	if not(OreDefs[featureDefID]) or not(MinedOre[builderTeam]) or (builderTeam == GaiaTeamID) then
 		return true

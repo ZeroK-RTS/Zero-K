@@ -1,4 +1,4 @@
-local version = "0.1.0"
+local version = "0.1.1"
 
 function gadget:GetInfo()
 	return {
@@ -14,10 +14,8 @@ end
 
 --SYNCED-------------------------------------------------------------------
 
---TODO need ambient sfx to tell players something is gonna res... soon...
---TODO maybe slow down res-zombie timer if feature is getting reclaimed?
-
 -- changelog
+-- 5 april 2014 - 0.1.1. Sfx, gfx, factory orders added. Slow down upon reclaim added. Thanks Anarchid.
 -- 5 april 2014 - 0.1.0. Release.
 
 local modOptions = Spring.GetModOptions()
@@ -49,11 +47,15 @@ local spGetUnitsInCylinder		= Spring.GetUnitsInCylinder
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
 
+local gameframe = 0
+
 local random = math.random
+local floor = math.floor
 
 local mapWidth
 local mapHeight
 
+local base_respawn_time = {} -- holds initial gameframe, initial time in seconds, amount of times feature was reclaimed
 local zombies_to_spawn = {}
 local zombies = {}
 
@@ -71,15 +73,6 @@ local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_GUARD = CMD.GUARD
 
 local CEG_SPAWN = [[zombie]];
-
-local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
-	for unitID, _ in pairs(zombies) do
-		local cQueue = spGetCommandQueue(unitID, 1)
-		if not(cQueue) or not(#cQueue > 0) then -- oh
-			BringingDownTheHeavens(unitID)
-		end
-	end
-end
 
 local function disSQ(x1,y1,x2,y2)
 	return (x1 - x2)^2 + (y1 - y2)^2
@@ -106,13 +99,40 @@ local function GetUnitNearestAlly(unitID, range)
 	return best_ally
 end
 
+local function OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
+	local buildopts = UnitDefs[unitDefID].buildOptions
+	local orders = {}
+	local x,y,z = spGetUnitPosition(unitID)
+	for i=1,random(10,30) do
+		orders[#orders+1] = { -buildopts[random(1,#buildopts)], {random(-30,30)+x, y, random(-30,30)+z }, CMD_OPT_SHIFT }
+	end
+	if (#orders > 0) then
+		if (spGetUnitIsDead(unitID) == false) then
+			spGiveOrderArrayToUnitArray({unitID},orders)
+		end
+	end
+end
+
+-- reclaiming zombies 'causes delay in rez, basically you have to have about ZOMBIES_REZ_SPEED/2 or bigger BP to reclaim faster than it resurrects...
+-- TODO do more math to figure out how to perform it better?
+function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
+	if (zombies_to_spawn[featureID]) then
+		local base_time = base_respawn_time[featureID]
+		zombies_to_spawn[featureID] = base_time[1] + base_time[2] * (base_time[3]*-part+1) * 32
+		base_time[3] = base_time[3]+1
+	end
+	return true
+end
+
 -- in halloween gadget, sometimes giving order to unit would result in crash because unit happened to be dead at the time order was given
 -- TODO probably same units in groups could get same orders...
+-- TODO anthena should try to resurrect units if Gaia has positive E income
 local function BringingDownTheHeavens(unitID)
 	if (spGetUnitIsDead(unitID) == false) then
+		local unitDefID = spGetUnitDefID(unitID)
+-- 		if (getMovetype(UnitDefs[unitDefID]) ~= false) then
 		local rx,rz,ry
 		local orders = {}
-		local unitDefID = spGetUnitDefID(unitID)
 		local near_ally
 		if (UnitDefs[unitDefID].canAttack) then
 			near_ally = GetUnitNearestAlly(unitID, 300)
@@ -138,16 +158,26 @@ local function BringingDownTheHeavens(unitID)
 		if (#orders > 0) then
 			if (spGetUnitIsDead(unitID) == false) then
 				spGiveOrderArrayToUnitArray({unitID},orders)
--- 			else
--- 				zombies[unitID] = nil
 			end
 		end
--- 	else
--- 		zombies[unitID] = nil
+		if (UnitDefs[unitDefID].isFactory) then
+			OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
+			zombies[unitID] = nil -- no need to update factory orders anymore
+		end
+	end
+end
+
+local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
+	for unitID, _ in pairs(zombies) do
+		local cQueue = spGetCommandQueue(unitID, 1)
+		if not(cQueue) or not(#cQueue > 0) then -- oh
+			BringingDownTheHeavens(unitID)
+		end
 	end
 end
 
 function gadget:GameFrame(f)
+	gameframe = f
 	if (f%32)==0 then
 		local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
 		for id, time_to_spawn in pairs(zombies_to_spawn) do
@@ -169,7 +199,7 @@ function gadget:GameFrame(f)
 					zombies[unitID] = true
 				end
 			else
-				local steps_to_spawn = math.floor((time_to_spawn-f) / 32)
+				local steps_to_spawn = floor((time_to_spawn-f) / 32)
 				local resName,face=spGetFeatureResurrect(id);
 				if steps_to_spawn <= WARNING_TIME then
 					local r = Spring.GetFeatureRadius(id);
@@ -217,7 +247,8 @@ function gadget:FeatureCreated(featureID, allyTeam)
 			if (rez_time < ZOMBIES_REZ_MIN) then
 				  rez_time = ZOMBIES_REZ_MIN
 			end
-			zombies_to_spawn[featureID] = spGetGameFrame()+(rez_time*32)
+			base_respawn_time[featureID] = {gameframe,rez_time,1}
+			zombies_to_spawn[featureID] = gameframe+(rez_time*32)
 		end
 	end
 end
@@ -225,6 +256,7 @@ end
 function gadget:FeatureDestroyed(featureID, allyTeam)
 	if (zombies_to_spawn[featureID]) then
 		zombies_to_spawn[featureID]=nil
+		base_respawn_time[featureID]=nil
 	end
 end
 
