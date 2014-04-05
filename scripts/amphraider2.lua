@@ -362,7 +362,6 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-		GG.Floating_AimWeapon(unitID)
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
 		Turn( torso, y_axis, heading, math.rad(480) )
@@ -372,6 +371,9 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(lshoulder, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
+	elseif num == 2 then
+		GG.Floating_AimWeapon(unitID)
+		return false
 	end
 end
 

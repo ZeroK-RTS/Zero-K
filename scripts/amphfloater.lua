@@ -198,9 +198,9 @@ local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		if height < -20 then
-			Spring.SetUnitWeaponState(unitID, 1, {range = 400-height})
+			Spring.SetUnitWeaponState(unitID, 2, {range = 400-height})
 		else
-			Spring.SetUnitWeaponState(unitID, 1, {range = 450})
+			Spring.SetUnitWeaponState(unitID, 2, {range = 450})
 		end
 		Sleep(500)
 	end
@@ -229,21 +229,15 @@ function script.AimFromWeapon()
 	
 	local height = select(2, Spring.GetUnitBasePosition(unitID))
 	if height < -130 then
-		Spring.SetUnitWeaponState(unitID,1,{projectileSpeed = 200})
+		Spring.SetUnitWeaponState(unitID,2,{projectileSpeed = 200})
 	else
-		Spring.SetUnitWeaponState(unitID,1,{projectileSpeed = PROJECTILE_SPEED})
+		Spring.SetUnitWeaponState(unitID,2,{projectileSpeed = PROJECTILE_SPEED})
 	end
 	
 	return barrel
 end
 
 function script.AimWeapon(num, heading, pitch)
-	--if not bUnpacked then
-	--    return false
-	--end
-	
-	GG.Floating_AimWeapon(unitID)
-	
 	if num == 1 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
@@ -253,6 +247,9 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(barrel, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
+	elseif num == 2 then
+		GG.Floating_AimWeapon(unitID)
+		return false
 	end
 end
 

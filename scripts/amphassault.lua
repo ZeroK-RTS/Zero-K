@@ -330,12 +330,7 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Spring.Echo("AimWeapon " .. num)
 	if num == 1 then
-		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
-		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 90 then
-			GG.Floating_AimWeapon(unitID)
-		end
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		Turn(turret, y_axis, heading, math.rad(180))
@@ -347,7 +342,11 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 2 then
-		return true
+		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
+		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 90 then
+			GG.Floating_AimWeapon(unitID)
+		end
+		return false
 	end
 end
 

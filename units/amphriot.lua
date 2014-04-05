@@ -21,7 +21,7 @@ unitDef = {
     description_pl = [[Amfibijny bot wsparcia]],
     helptext       = [[A flexible unit, the Scallop is armed with torpedoes for underwater use and a quadruple shotgun when on land. It is the closest thing there is to a mainline torpedo unit that can stand up to armed ships. That is not to say it is good against them.]],
     helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz torped ma takze shotgun do walk na ladzie.]],
-    extradrawrange = 460,
+    extradrawrange = 440,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -101,7 +101,7 @@ unitDef = {
       interceptedByShieldType = 1,
       model                   = [[wep_t_longbolt.s3o]],
       numbounce               = 4,
-      range                   = 430,
+      range                   = 440,
       reloadtime              = 3.5,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
