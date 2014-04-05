@@ -57,6 +57,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[shipcon.s3o]],
+  script				 = [[shipcon.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   showNanoSpray          = false,

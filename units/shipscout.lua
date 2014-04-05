@@ -50,7 +50,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[scoutboat.s3o]],
-  script				 = [[armpt.lua]],
+  script				 = [[shipscout.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
