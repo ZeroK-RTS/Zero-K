@@ -20,6 +20,7 @@ local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers
 
 local Chili
+local color2incolor
 
 local msgTypeToColor = {
   player_to_allies = {0,1,0,1},
@@ -155,15 +156,6 @@ local function newWindowID()
   return _window_id
 end
 
--- explanation for string.char: http://springrts.com/phpbb/viewtopic.php?f=23&t=24952
-local function GetColorChar(colorArg)
-	local color = {}
-	for i=1,3 do
-		color[i] = math.floor(colorArg[i] * 255)
-	end
-	return string.char(255,color[1],color[2],color[3])
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -284,7 +276,7 @@ function widget:AddChatMessage(msg)
 		teamcolor = {1,1,1,0.7}
 	end
 	local bubbleColor = msgTypeToColor[type] or {1,1,1,1}
-	local textColor = GetColorChar(teamcolor)
+	local textColor = color2incolor(teamcolor)
 	
 	if type == 'player_to_player_received' or type == 'player_to_player_sent' then
 		text = "Private: " .. text
@@ -375,7 +367,7 @@ function widget:AddChatMessage(msg)
 
 	Chili.TextBox:New{
 		parent  = w;
-		text    = textColor .. playerName .. ":\008 " .. GetColorChar(bubbleColor) .. text .. "\008";
+		text    = textColor .. playerName .. ":\008 " .. color2incolor(bubbleColor) .. text .. "\008";
 		x       = options.window_height.value - 24;
 		y       = 2;
 		width   = w.clientWidth - (options.window_height.value - 24) - 5;
@@ -468,7 +460,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		width  = options.window_height.value-24;
 		height = options.window_height.value-24;
 	}
-	local text = GetColorChar(teamcolor) .. playerName .. "\008 added point" .. (caption and (": " .. caption) or '')
+	local text = color2incolor(teamcolor) .. playerName .. "\008 added point" .. (caption and (": " .. caption) or '')
 	
 	local l = Chili.TextBox:New{
 		parent   = w;
@@ -624,6 +616,7 @@ function widget:Initialize()
 	end
 
 	Chili = WG.Chili
+	color2incolor = Chili.color2incolor
 
 	widget:ViewResize(Spring.GetViewGeometry())
 end

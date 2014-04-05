@@ -134,6 +134,7 @@ local stack_console
 local window_console
 local scrollpanel1
 local inputspace
+local color2incolor
 WG.enteringText = false
 WG.chat = WG.chat or {}
 
@@ -515,34 +516,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- TODO get rid of bogus color2incolor - http://springrts.com/phpbb/viewtopic.php?f=23&t=28208
--- move to LuaUI/Chili/headers/util.lua or to LuaUI/modfonts.lua?
--- also competing with bubbles::GetColorChar()
-local function color2textColor(r, g, b, a)
-
-	local function colorComponent(x)
-		local c = string.char(x * 255)
-		-- use lookup table to weed out other unwanted output values?
-		if c == '\0' then
-			c = '\1'
-		end
-		return c
-	end
-
-	if not r then
-		return '' -- '\255\255\255\255'
-	end
-	
-	if type(r) == 'table' then
-		r, g, b, a = unpack(r)
-	end
-
-	return '\255' .. colorComponent(r) .. colorComponent(g) .. colorComponent(b)
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local function detectHighlight(msg)
 	-- must handle case where we are spec and message comes from player
 
@@ -684,22 +657,16 @@ end
 
 
 local function setupColors()
-	--local textColorizer = WG.Chili.color2incolor
-	local textColorizer = color2textColor
-
-	incolor_dup			= textColorizer(options.color_dup.value)
-	incolor_highlight	= textColorizer(options.color_highlight.value)
+	incolor_dup			= color2incolor(options.color_dup.value)
+	incolor_highlight	= color2incolor(options.color_highlight.value)
 	incolors['#h']		= incolor_highlight
-	incolors['#a'] 		= textColorizer(options.color_ally.value)
-	incolors['#e'] 		= textColorizer(options.color_chat.value)
-	incolors['#o'] 		= textColorizer(options.color_other.value)
-	incolors['#s'] 		= textColorizer(options.color_spec.value)
+	incolors['#a'] 		= color2incolor(options.color_ally.value)
+	incolors['#e'] 		= color2incolor(options.color_chat.value)
+	incolors['#o'] 		= color2incolor(options.color_other.value)
+	incolors['#s'] 		= color2incolor(options.color_spec.value)
 end
 
 local function setupPlayers()
-	--local textColorizer = WG.Chili.color2incolor
-	local textColorizer = color2textColor
-	
 --	local myallyteamid = Spring.GetMyAllyTeamID()
 
 	local playerroster = Spring.GetPlayerList()
@@ -708,7 +675,7 @@ local function setupPlayers()
 		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
 --		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
 -- Spring.Echo('################## ' .. id .. " name " .. name .. " teamId " .. teamId .. " ally " .. allyTeamId)
-		incolors[name] = spec and incolors['#s'] or textColorizer(Spring.GetTeamColor(teamId))
+		incolors[name] = spec and incolors['#s'] or color2incolor(Spring.GetTeamColor(teamId))
 	end
 end
 
@@ -895,7 +862,8 @@ function widget:Initialize()
 	end
 
 	screen0 = WG.Chili.Screen0
-
+	color2incolor = WG.Chili.color2incolor
+	
 	hideConsole = function()
 		if visible then
 			screen0:RemoveChild(window_console)
