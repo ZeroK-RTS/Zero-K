@@ -187,16 +187,11 @@ function gadget:GameFrame(f)
 				zombies_to_spawn[id] = nil
 				local resName,face=spGetFeatureResurrect(id)
 				spDestroyFeature(id)
-				local unitID=spCreateUnit(resName,x,y,z,face,GaiaTeamID)
+				local unitID = spCreateUnit(resName,x,y,z,face,GaiaTeamID)
 				if (unitID) then
-					spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
-					spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
-					BringingDownTheHeavens(unitID);
-					
 					local size = UnitDefNames[resName].xsize
 					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
 					SendToUnsynced("rez_sound", x, y, z);
-					zombies[unitID] = true
 				end
 			else
 				local steps_to_spawn = floor((time_to_spawn-f) / 32)
@@ -237,10 +232,7 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 	if zombies[unitID] and newTeamID~=GaiaTeamID then
 		zombies[unitID] = nil
 	elseif newTeamID==GaiaTeamID then
-		spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
-		spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
-		BringingDownTheHeavens(unitID)
-		zombies[unitID] = true
+		gadget:UnitFinished(unitID, unitDefID, newTeamID)
 	end
 end
 
@@ -282,15 +274,13 @@ local function ReInit(reinit)
 	mapWidth = Game.mapSizeX
 	mapHeight = Game.mapSizeZ
 	if (reinit) then
+		gameframe = spGetGameFrame()
 		local units = spGetAllUnits()
 		for i=1,#units do
 			local unitID = units[i]
 			local unitTeam = spGetUnitTeam(unitID)
 			if (unitTeam == GaiaTeamID) then
-				spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
-				spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
-				BringingDownTheHeavens(unitID)
-				zombies[unitID] = true
+				gadget:UnitFinished(unitID, spGetUnitDefID(unitID), unitTeam)
 			end
 		end
 		local features = spGetAllFeatures()
