@@ -76,12 +76,12 @@ local veryShortRangeSkirmieeArray = {
 	["chickena"] = true,
 	["chicken_tiamat"] = true,
 	["chicken_dragon"] = true,
+	["hoverdepthcharge"] = true,
 }
 
 local shortRangeSkirmieeArray = {
 	["armflea"] = true,
 	["armpw"] = true,
-	["hoverdepthcharge"] = true,
 	["corfav"] = true,
 	["corgator"] = true,
 	["corpyro"] = true,
