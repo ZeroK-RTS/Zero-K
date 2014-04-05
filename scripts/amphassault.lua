@@ -330,6 +330,7 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	Spring.Echo("AimWeapon " .. num)
 	if num == 1 then
 		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
 		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 90 then
