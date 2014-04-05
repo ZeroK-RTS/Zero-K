@@ -75,7 +75,7 @@ function script.Create()
 	
 	Move(back, y_axis, 5)
 	Move(back, x_axis, 0)
-	Move(back, z_axis, 35)
+	Move(back, z_axis, 33.5)
 	
 	
 	Turn(rim1, y_axis, math.rad(-35))
@@ -98,9 +98,16 @@ function script.AimWeapon(num)
 	return true
 end
 
-function script.Shot(num)
-	Move(gun, y_axis, -2)
+local function ShotThread()
+	Move(gun, y_axis, -2, 40)
+	Turn(turretbase, x_axis, math.rad(165), math.rad(200))
+	Sleep(100)
+	Turn(turretbase, x_axis, math.rad(180), math.rad(40))
 	Move(gun, y_axis, 2, 2)
+end
+
+function script.Shot(num)
+	StartThread(ShotThread)
 end
 
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
@@ -111,6 +118,11 @@ local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
 local RELOAD = math.ceil( depthchargeWeaponDef.reload * Game.gameSpeed )
 
 function ShootDepthcharge()
+	EmitSfx(pads, FIRE_W1)
+	StartThread(ShotThread)
+end
+
+local function FakeWeaponShoot()
 	local reloaded = select(2, spGetUnitWeaponState(unitID,1))
 	if reloaded then
 		local x,y,z = Spring.GetUnitPosition(unitID)
@@ -121,7 +133,9 @@ function ShootDepthcharge()
 			local reloadFrame = gameFrame + RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame} )
 			
+			Spring.Echo("SHOT")
 			EmitSfx(pads, FIRE_W1)
+			StartThread(ShotThread)
 			Move(gun, y_axis, -2)
 			Move(gun, y_axis, 2, 2)
 	
@@ -134,7 +148,7 @@ function script.BlockShot(num)
 	if num == 1 then
 		return false
 	end
-	ShootDepthcharge()
+	FakeWeaponShoot()
 	return true
 end
 

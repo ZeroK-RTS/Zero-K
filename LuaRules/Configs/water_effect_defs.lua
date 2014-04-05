@@ -24,7 +24,7 @@ local unitDefData = {
 		submergedAt = 40,
 	},
 	[UnitDefNames["amphfloater"].id] = {
-		healthRegen = 25,
+		healthRegen = 60,
 		submergedAt = 30,
 	},
 	[UnitDefNames["amphriot"].id] = {
