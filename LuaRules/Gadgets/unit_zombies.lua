@@ -58,7 +58,7 @@ local zombies_to_spawn = {}
 local zombies = {}
 
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
-if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 3 end -- minimum of 3 seconds, max is determined by rez speed
+if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 10 end -- minimum of 10 seconds, max is determined by rez speed
 local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
 if (tonumber(ZOMBIES_REZ_SPEED)==nil) then ZOMBIES_REZ_SPEED = 25 end -- 25m/s, big units have a really long time to respawn
 
