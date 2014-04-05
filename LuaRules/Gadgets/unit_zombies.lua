@@ -105,7 +105,7 @@ local function OpenAllClownSlots(unitID, unitDefID) -- give factory something to
 	local orders = {}
 	local x,y,z = spGetUnitPosition(unitID)
 	for i=1,random(10,30) do
-		orders[#orders+1] = { -buildopts[random(1,#buildopts)], {random(-30,30)+x, y, random(-30,30)+z }, CMD_OPT_SHIFT }
+		orders[#orders+1] = { -buildopts[random(1,#buildopts)], {random(-30,30)+x, y, random(-30,30)+z }, {} }
 	end
 	if (#orders > 0) then
 		if (spGetUnitIsDead(unitID) == false) then
@@ -222,7 +222,7 @@ function gadget:GameFrame(f)
 	end
 	if (f==1) then
 		spSetTeamResource(GaiaTeamID, "ms", 500)
-		spSetTeamResource(GaiaTeamID, "es", 500)
+		spSetTeamResource(GaiaTeamID, "es", 10500)
 	end
 end
 -- settings gaiastorage before frame 1 somehow doesnt work, well i can guess why...
@@ -237,6 +237,19 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 	if zombies[unitID] and newTeamID~=GaiaTeamID then
 		zombies[unitID] = nil
 	elseif newTeamID==GaiaTeamID then
+		spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
+		spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
+		BringingDownTheHeavens(unitID)
+		zombies[unitID] = true
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	gadget:UnitFinished(unitID, unitDefID, teamID)
+end
+  
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+	if (teamID == GaiaTeamID) and not(zombies[unitID]) then
 		spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
 		spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
 		BringingDownTheHeavens(unitID)
