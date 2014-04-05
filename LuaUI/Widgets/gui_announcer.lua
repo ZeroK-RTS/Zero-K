@@ -526,7 +526,9 @@ end
 local function AlliesHaveFullM()
 	for teamID, _ in pairs(myTeamIDs) do
 		local mCur, mMax, mPull, mInc, _, _, _, _ = spGetTeamResources(teamID, "metal")
-		if (mCur+(mInc*3)) < mMax then return false end
+		if (mInc) and (mMax > 0) then -- TODO it crashes here if i don't check for nil when i use cheat stuff
+			if (mCur+(mInc*3)) < mMax then return false end
+		end
 	end
 	return true
 end

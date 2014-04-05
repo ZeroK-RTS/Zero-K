@@ -14,7 +14,8 @@ end
 
 --SYNCED-------------------------------------------------------------------
 
---TODO need rumble gfx/sfx to tell players something is gonna res. Ambient sfx is there is ANY feature that's gonna res, and per unit gfx.. maybe some dust like puppies do...
+--TODO need ambient sfx to tell players something is gonna res... soon...
+--TODO maybe slow down res-zombie timer if feature is getting reclaimed?
 
 -- changelog
 -- 5 april 2014 - 0.1.0. Release.
@@ -67,6 +68,8 @@ local CMD_INSERT = CMD.INSERT
 local CMD_FIGHT = CMD.FIGHT
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_GUARD = CMD.GUARD
+
+local CEG_SPAWN = [[dirt2]];
 
 local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
@@ -145,11 +148,17 @@ end
 
 function gadget:GameFrame(f)
 	if (f%32)==0 then
+		local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
 		for id, time_to_spawn in pairs(zombies_to_spawn) do
+			local x,y,z=spGetFeaturePosition(id)
+			spSpawnCEG( CEG_SPAWN,
+			    x,y,z,
+			    0,0,0,
+			    30, 30
+			);
 			if time_to_spawn <= f then
 				zombies_to_spawn[id] = nil
 				local resName,face=spGetFeatureResurrect(id)
-				local x,y,z=spGetFeaturePosition(id)
 				spDestroyFeature(id)
 				local unitID=spCreateUnit(resName,x,y,z,face,GaiaTeamID)
 				if (unitID) then
@@ -161,7 +170,7 @@ function gadget:GameFrame(f)
 			end
 		end
 	end
-	if (f%96)==1 then
+	if (f%640)==1 then
 		CheckZombieOrders()
 	end
 end
