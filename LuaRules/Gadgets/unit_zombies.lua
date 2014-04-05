@@ -43,6 +43,7 @@ local spGetFeatureResurrect		= Spring.GetFeatureResurrect
 local spGetUnitIsDead	  		= Spring.GetUnitIsDead
 local spGiveOrderArrayToUnitArray	= Spring.GiveOrderArrayToUnitArray
 local spGetUnitsInCylinder		= Spring.GetUnitsInCylinder
+local spSetTeamResource			= Spring.SetTeamResource
 
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
@@ -219,7 +220,12 @@ function gadget:GameFrame(f)
 	if (f%640)==1 then
 		CheckZombieOrders()
 	end
+	if (f==1) then
+		spSetTeamResource(GaiaTeamID, "ms", 500)
+		spSetTeamResource(GaiaTeamID, "es", 500)
+	end
 end
+-- settings gaiastorage before frame 1 somehow doesnt work, well i can guess why...
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if zombies[unitID] then
