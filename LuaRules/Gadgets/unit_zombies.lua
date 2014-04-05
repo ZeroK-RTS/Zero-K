@@ -56,7 +56,7 @@ local floor = math.floor
 local mapWidth
 local mapHeight
 
-local base_respawn_time = {} -- holds initial gameframe, initial time in seconds, amount of times feature was reclaimed
+local reclaimed_data = {} -- holds initial gameframe, initial time in seconds, % of feature reclaimed
 local zombies_to_spawn = {}
 local zombies = {}
 
@@ -64,7 +64,7 @@ local WARNING_TIME = 5; -- seconds to start being scary before actual reanimatio
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
 if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 10 end -- minimum of 10 seconds, max is determined by rez speed
 local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
-if (tonumber(ZOMBIES_REZ_SPEED)==nil) then ZOMBIES_REZ_SPEED = 25 end -- 25m/s, big units have a really long time to respawn
+if (tonumber(ZOMBIES_REZ_SPEED)==nil) then ZOMBIES_REZ_SPEED = 12 end -- 12m/s, big units have a really long time to respawn
 
 local CMD_REPEAT = CMD.REPEAT
 local CMD_MOVE_STATE = CMD.MOVE_STATE
@@ -118,9 +118,9 @@ end
 -- TODO do more math to figure out how to perform it better?
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
 	if (zombies_to_spawn[featureID]) then
-		local base_time = base_respawn_time[featureID]
-		zombies_to_spawn[featureID] = base_time[1] + base_time[2] * (base_time[3]*-part+1) * 32
-		base_time[3] = base_time[3]+1
+		local base_time = reclaimed_data[featureID]
+		base_time[3] = base_time[3]-part
+		zombies_to_spawn[featureID] = base_time[1] + base_time[2] * (1+base_time[3]) * 32
 	end
 	return true
 end
@@ -252,7 +252,7 @@ function gadget:FeatureCreated(featureID, allyTeam)
 			if (rez_time < ZOMBIES_REZ_MIN) then
 				  rez_time = ZOMBIES_REZ_MIN
 			end
-			base_respawn_time[featureID] = {gameframe,rez_time,1}
+			reclaimed_data[featureID] = {gameframe,rez_time,0}
 			zombies_to_spawn[featureID] = gameframe+(rez_time*32)
 		end
 	end
@@ -261,7 +261,7 @@ end
 function gadget:FeatureDestroyed(featureID, allyTeam)
 	if (zombies_to_spawn[featureID]) then
 		zombies_to_spawn[featureID]=nil
-		base_respawn_time[featureID]=nil
+		reclaimed_data[featureID]=nil
 	end
 end
 
