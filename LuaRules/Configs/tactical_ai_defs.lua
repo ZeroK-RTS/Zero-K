@@ -81,6 +81,7 @@ local veryShortRangeSkirmieeArray = {
 local shortRangeSkirmieeArray = {
 	["armflea"] = true,
 	["armpw"] = true,
+	["hoverdepthcharge"] = true,
 	["corfav"] = true,
 	["corgator"] = true,
 	["corpyro"] = true,

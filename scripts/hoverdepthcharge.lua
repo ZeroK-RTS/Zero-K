@@ -133,7 +133,6 @@ local function FakeWeaponShoot()
 			local reloadFrame = gameFrame + RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame} )
 			
-			Spring.Echo("SHOT")
 			EmitSfx(pads, FIRE_W1)
 			StartThread(ShotThread)
 			Move(gun, y_axis, -2)

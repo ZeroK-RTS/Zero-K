@@ -77,8 +77,6 @@ unitDef = {
       def                = [[DEPTHCHARGE]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
-	  mainDir            = [[0 -1 0]],
-      maxAngleDif        = 165,
     },
 
   },
