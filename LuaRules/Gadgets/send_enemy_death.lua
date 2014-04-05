@@ -62,8 +62,8 @@ function ParseParams(line) -- imagine here goes "unit_taunt 866 test"
 end
 
 function gadget:RecvLuaMsg(line, playerID)
-  local _, _, _, teamID, allyTeam = spGetPlayerInfo(playerID)
-  if line:find("unit_taunt") then
+  local _, _, spectator, teamID, allyTeam = spGetPlayerInfo(playerID)
+  if (not spectator) and line:find("unit_taunt") then
     local unitID,text = ParseParams(line)
     if (unitID) and (text) then
       for i=1,#AllyTeams do
