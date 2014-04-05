@@ -53,6 +53,7 @@ local Grid
 local TextBox
 local Image
 local screen0
+local color2incolor
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -70,7 +71,7 @@ local marketandbounty 	= false
 local window_unitcontext, window_unitstats
 local statswindows = {}
 
-
+local colorCyan = {0.2, 0.7, 1, 1}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -333,15 +334,18 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		local dps_str, dam_str = '', ''
 		if ws.dps > 0 then
 			dam_str = dam_str .. numformat(ws.dam,2)
-			dps_str = dps_str .. numformat(ws.dps,2)
+			dps_str = dps_str .. numformat(ws.dps*ws.mult,2)
 		end
 		if ws.dpsw > 0 then
 			if dps_str ~= '' then
 				dps_str = dps_str .. ' + '
 				dam_str = dam_str .. ' + '
 			end
-			dam_str = dam_str .. numformat(ws.damw,2) .. ' (P)'
-			dps_str = dps_str .. numformat(ws.dpsw,2) .. ' (P)'
+			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(ws.damw,2) .. " (P)\008"
+			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(ws.dpsw*ws.mult,2) .. " (P)\008"
+		end
+		if ws.mult > 1 then
+			dam_str = dam_str .. " x " .. ws.mult
 		end
 
 		cells[#cells+1] = ws.wname
@@ -410,10 +414,11 @@ local function printWeapons(unitDef)
 				wsTemp.projectiles = weaponDef.projectiles or 1
 				wsTemp.dam = 0
 				wsTemp.damw = 0
+				wsTemp.mult = wsTemp.burst * wsTemp.projectiles
 				if wsTemp.paralyzer then
-					wsTemp.damw = wsTemp.bestTypeDamagew * wsTemp.burst * wsTemp.projectiles
+					wsTemp.damw = wsTemp.bestTypeDamagew
 				else
-					wsTemp.dam = wsTemp.bestTypeDamage * wsTemp.burst * wsTemp.projectiles
+					wsTemp.dam = wsTemp.bestTypeDamage
 				end
 				wsTemp.reloadtime = weaponDef.reload or ''
 				wsTemp.airWeapon = weaponDef.toAirWeapon or false
@@ -1089,6 +1094,7 @@ function widget:Initialize()
 	 TextBox = Chili.TextBox
 	 Image = Chili.Image
 	 screen0 = Chili.Screen0
+	 color2incolor = Chili.color2incolor
 
 	widget:ViewResize(Spring.GetViewGeometry())
 	
