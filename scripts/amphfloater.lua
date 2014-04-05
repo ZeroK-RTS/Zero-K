@@ -254,9 +254,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.QueryWeapon(num)
-	if num == 1 then
-		return barrel
-	end
+	return barrel
 end
 
 function script.Killed(recentDamage, maxHealth)
