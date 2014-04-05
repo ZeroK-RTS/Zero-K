@@ -216,7 +216,7 @@ end
 -- I'm leaving all the code in place, but disabling the buttons.
 -- Someone can come back in and fix it later.
 --
-local cf = IsFFA()
+local cf = Spring.GetModOptions().noceasefire ~= "1" and IsFFA()
 --local cf = false
 
 local localTeam = 0
