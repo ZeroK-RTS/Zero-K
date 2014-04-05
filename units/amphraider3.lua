@@ -5,10 +5,10 @@ unitDef = {
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
-  buildCostEnergy        = 150,
-  buildCostMetal         = 150,
+  buildCostEnergy        = 80,
+  buildCostMetal         = 80,
   buildPic               = [[amphraider3.png]],
-  buildTime              = 150,
+  buildTime              = 80,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -30,9 +30,9 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 400,
+  maxDamage              = 240,
   maxSlope               = 36,
-  maxVelocity            = 2.7,
+  maxVelocity            = 2.8,
   maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
@@ -80,7 +80,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 215,
+        default = 115,
         subs    = 10,
       },
 
@@ -117,7 +117,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 215,
+        default = 115,
       },
 
       edgeEffectiveness       = 0.99,

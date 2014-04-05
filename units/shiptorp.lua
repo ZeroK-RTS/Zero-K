@@ -75,7 +75,7 @@ unitDef = {
 
     TORPEDO = {
       name                    = [[Torpedo]],
-      areaOfEffect            = 96,
+      areaOfEffect            = 128,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
@@ -89,12 +89,11 @@ unitDef = {
         subs    = 450,
       },
 
-      edgeEffectiveness       = 0.99,
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
+      edgeEffectiveness       = 0.4,
+      explosionGenerator      = [[custom:TORPEDO_HIT_LARGE]],
       fixedLauncher           = true,
       groundbounce            = 1,
       guidance                = true,
-      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

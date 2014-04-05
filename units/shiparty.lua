@@ -96,7 +96,7 @@ unitDef = {
         default = 200,
       },
 
-      edgeEffectiveness       = 0.99,
+      edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDO_HIT_LARGE]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

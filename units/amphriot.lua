@@ -21,7 +21,7 @@ unitDef = {
     description_pl = [[Amfibijny bot wsparcia]],
     helptext       = [[A flexible unit, the Scallop is armed with torpedoes for underwater use and a quadruple shotgun when on land. It is the closest thing there is to a mainline torpedo unit that can stand up to armed ships. That is not to say it is good against them.]],
     helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz torped ma takze shotgun do walk na ladzie.]],
-    extradrawrange = 440,
+    extradrawrange = 460,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -90,7 +90,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 115,
+        default = 140,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -101,7 +101,7 @@ unitDef = {
       interceptedByShieldType = 1,
       model                   = [[wep_t_longbolt.s3o]],
       numbounce               = 4,
-      range                   = 440,
+      range                   = 460,
       reloadtime              = 3.5,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
@@ -125,7 +125,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-	    default = 22,
+	    default = 26,
 	    subs    = 1.6,
       },
 
@@ -137,14 +137,14 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       projectiles	          = 3,
-      range                   = 280,
-      reloadtime              = 0.9,
+      range                   = 300,
+      reloadtime              = 0.8,
       rgbColor                = [[1 1 0]],
       soundHit                = [[impacts/shotgun_impactv5]],
       soundStart              = [[weapon/shotgun_firev4]],
       soundStartVolume	      = 0.5,
       soundTrigger            = true,
-      sprayangle	      = 1600,
+      sprayangle	          = 1500,
       targetMoveError         = 0,
       thickness               = 2,
       tolerance               = 10000,
