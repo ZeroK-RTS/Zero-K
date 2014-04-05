@@ -22,3 +22,6 @@ Xonotic:
 entire ctf & announcer folder contents
 Kmar:
 entire announcer/kmar folder contents
+
+Sunniterri:
+All zombie sounds (derived from http://www.freesound.org/people/sunnyterri/sounds/168204/)
