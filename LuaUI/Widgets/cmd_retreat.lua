@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.285 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.286 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
-    date      = "2008-03-17", --2014-2-3
+    date      = "2008-03-17", --2014-4-5
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
@@ -260,6 +260,20 @@ function StopRetreating(unitID)
 	end
 end
 
+local function QueueFighterBoost(unitID,unitDefID)
+	if boostDefs[unitDefID] then
+		local frame = GetGameFrame()
+		boostOnFrame[frame + 30] = boostOnFrame[frame + 30] or {}
+		boostOnFrame[frame + 30][unitID] = unitDefID
+	end 
+end
+
+local function StartFighterBoost(unitID,unitDefID)
+	if boostDefs[unitDefID] then
+		GiveOrderToUnit(unitID, CMD_INSERT, { 0, CMD_ONECLICK_WEAPON, CMD.OPT_INTERNAL,}, CMD.OPT_ALT)
+	end 
+end
+
 local function HaveEmptyAirpad()
 	local emptyPadCount = 0
 	for i=1, #airpadList do
@@ -274,15 +288,6 @@ local function StartRearm(unitID)
 	local insertIndex = 0
 	GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_FIND_PAD, CMD.OPT_INTERNAL}, CMD.OPT_ALT)
 	retreatRearmOrders[unitID] = {nil,nil,nil}
-	
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	if unitDefID then
-		if boostDefs[unitDefID] then
-			local frame = Spring.GetGameFrame()
-			boostOnFrame[frame + 30] = boostOnFrame[frame + 30] or {}
-			boostOnFrame[frame + 30][unitID] = true
-		end 
-	end
 	
 	--add last position
 	if options.returnLastPosition.value then
@@ -305,15 +310,6 @@ local function StartRetreat(unitID, force)
 		GiveClampedOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex+1, CMD_WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 		
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		Spring.Echo(unitDefID)
-		if unitDefID then
-			if boostDefs[unitDefID] then
-				Spring.Echo("Boosting")
-				GiveOrderToUnit(unitID, CMD_ONECLICK_WEAPON, {}, {})
-			end 
-		end
-		
 		retreatMoveOrders[unitID] = {hx, hy, hz}
 		
 		--add last position
@@ -328,7 +324,8 @@ end
 
 local function SetWantRetreat(unitID, want,divert)
 	if want then
-		local movetype = Spring.Utilities.getMovetype(UnitDefs[GetUnitDefID(unitID)])
+		local unitDefID = GetUnitDefID(unitID)
+		local movetype = Spring.Utilities.getMovetype(UnitDefs[unitDefID])
 		local isFlyingUnit = (movetype==0 or movetype==1)
 		local isRetreating = (retreatRearmOrders[unitID] or retreatMoveOrders[unitID])
 		if not pauseRetreatChecks[unitID] then
@@ -337,12 +334,14 @@ local function SetWantRetreat(unitID, want,divert)
 				--//if Unit did not retreating
 				if isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
 					--//if Unit is flying unit and have airpad, then rearm
+					QueueFighterBoost(unitID,unitDefID)
 					StartRearm(unitID)
 					if options.removeFromSelection.value then
 						retreatedUnits[#retreatedUnits+1] = unitID
 					end
 				elseif (havenCount > 0) then
 					--//if Unit is not flying unit, retreat to retreat zone
+					StartFighterBoost(unitID,unitDefID)
 					StartRetreat(unitID)
 					if options.removeFromSelection.value then
 						retreatedUnits[#retreatedUnits+1] = unitID
@@ -752,9 +751,9 @@ function widget:GameFrame(gameFrame)
 	end
 	
 	if boostOnFrame[gameFrame] then
-		for unitID,_ in pairs(boostOnFrame[gameFrame]) do
+		for unitID,unitDefID in pairs(boostOnFrame[gameFrame]) do
 			if Spring.ValidUnitID(unitID) then
-				GiveOrderToUnit(unitID, CMD_ONECLICK_WEAPON, {}, {"right"})
+				StartFighterBoost(unitID,unitDefID)
 			end
 		end
 		boostOnFrame[gameFrame] = nil
