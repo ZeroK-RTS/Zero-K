@@ -778,6 +778,14 @@ local sounds = {
 			[1] = "hovercraft_select",
 		},
 	},
+	hoverdepthcharge = {
+		ok = {
+			[1] = "hovercraft_move",
+		},
+		select = {
+			[1] = "hovercraft_select",
+		},
+	},
 	hoverriot = {
 		ok = {
 			[1] = "hovercraft_move",

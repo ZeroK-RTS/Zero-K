@@ -89,17 +89,13 @@ unitDef = {
     MISSILE = {
       name                    = [[Heavy Missile Battery]],
       areaOfEffect            = 96,
-      cegTag                  = [[missiletrailgreen]],
+      cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
         default = 310,
       },
-	  
-	  customParams            = {
-		torp_underwater = [[nsaclash_a_torpedo]],
-	  },
 
       fireStarter             = 70,
       fixedlauncher           = true,
@@ -125,7 +121,6 @@ unitDef = {
       trajectoryHeight        = 0.4,
       turnRate                = 24000,
       turret                  = true,
-      waterweapon             = true,
       weaponAcceleration      = 90,
       weaponTimer             = 3,
       weaponType              = [[MissileLauncher]],

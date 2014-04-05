@@ -390,6 +390,10 @@ local icontypes = {
     bitmap='icons/hoverskirm.dds',
     size=1.8,
   },
+  hoverspecial = {
+    bitmap='icons/hoverspecial.png',
+    size=1.8,
+  },
   hoverriot = {
     bitmap='icons/hoverriot.dds',
     size=1.8,
