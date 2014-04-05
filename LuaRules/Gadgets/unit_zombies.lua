@@ -57,6 +57,7 @@ local mapHeight
 local zombies_to_spawn = {}
 local zombies = {}
 
+local WARNING_TIME = 5; -- seconds to start being scary before actual reanimation event
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
 if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 10 end -- minimum of 10 seconds, max is determined by rez speed
 local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
@@ -69,7 +70,7 @@ local CMD_FIGHT = CMD.FIGHT
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_GUARD = CMD.GUARD
 
-local CEG_SPAWN = [[dirt2]];
+local CEG_SPAWN = [[zombie]];
 
 local function CheckZombieOrders(unitID)	-- i can't rely on Idle because if for example unit is unloaded it doesnt count as idle... weird
 	for unitID, _ in pairs(zombies) do
@@ -151,11 +152,7 @@ function gadget:GameFrame(f)
 		local spSpawnCEG = Spring.SpawnCEG -- putting the localization here because cannot localize in global scope since spring 97
 		for id, time_to_spawn in pairs(zombies_to_spawn) do
 			local x,y,z=spGetFeaturePosition(id)
-			spSpawnCEG( CEG_SPAWN,
-			    x,y,z,
-			    0,0,0,
-			    30, 30
-			);
+			
 			if time_to_spawn <= f then
 				zombies_to_spawn[id] = nil
 				local resName,face=spGetFeatureResurrect(id)
@@ -164,10 +161,30 @@ function gadget:GameFrame(f)
 				if (unitID) then
 					spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
 					spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
-					BringingDownTheHeavens(unitID)
+					BringingDownTheHeavens(unitID);
+					
+					local size = UnitDefNames[resName].xsize
+					spSpawnCEG("resurrect", x, y, z, 0, 0, 0, size)
+					SendToUnsynced("rez_sound", x, y, z);
 					zombies[unitID] = true
 				end
-			end
+			else
+				local steps_to_spawn = math.floor((time_to_spawn-f) / 32)
+				local resName,face=spGetFeatureResurrect(id);
+				if steps_to_spawn <= WARNING_TIME then
+					local r = Spring.GetFeatureRadius(id);
+					
+					spSpawnCEG( CEG_SPAWN,
+						x,y,z,
+						0,0,0,
+						10+r, 10+r
+					);
+					
+					if steps_to_spawn == WARNING_TIME then
+						SendToUnsynced("zombie_sound", x, y, z);
+					end
+				end
+			end 
 		end
 	end
 	if (f%640)==1 then
@@ -200,7 +217,6 @@ function gadget:FeatureCreated(featureID, allyTeam)
 			if (rez_time < ZOMBIES_REZ_MIN) then
 				  rez_time = ZOMBIES_REZ_MIN
 			end
--- 			Spring.Echo("will respawn "..resName.." in "..rez_time.." seconds")
 			zombies_to_spawn[featureID] = spGetGameFrame()+(rez_time*32)
 		end
 	end
@@ -235,6 +251,7 @@ local function ReInit(reinit)
 end
 		
 function gadget:Initialize()
+	Spring.Echo("Initializing gadget");
 	if not (tonumber(modOptions.zombies) == 1) then
 		gadgetHandler:RemoveGadget()
 		return
@@ -249,5 +266,30 @@ function gadget:GameStart()
 		ReInit(false)
 	end
 end
+
+else -- UNSYNCED
+	Spring.Echo("zombies: unsynced mode");
+	local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
+	local spGetSpectatingState = Spring.GetSpectatingState
+	local spIsPosInLos         = Spring.IsPosInLos
+	local spPlaySoundFile      = Spring.PlaySoundFile
+	local ZOMBIE_SOUNDS = {
+		"sounds/misc/zombie_1.wav",
+		"sounds/misc/zombie_2.wav",
+		"sounds/misc/zombie_3.wav",
+	}
+
+	local function zombie_sound(_, x, y, z)
+		local spec = select(2, spGetSpectatingState())
+		local myAllyTeam = spGetLocalAllyTeamID()
+		if (spec or spIsPosInLos(x, y, z, myAllyTeam)) then
+			local sound = ZOMBIE_SOUNDS[math.random(#ZOMBIE_SOUNDS)]
+			spPlaySoundFile(sound, 10, x, y, z);
+		end
+	end
+
+	function gadget:Initialize()
+		gadgetHandler:AddSyncAction("zombie_sound", zombie_sound)
+	end
 
 end
