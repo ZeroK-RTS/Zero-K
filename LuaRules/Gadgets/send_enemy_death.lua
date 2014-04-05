@@ -18,6 +18,7 @@ if (gadgetHandler:IsSyncedCode()) then
 local spValidUnitID		= Spring.ValidUnitID
 local spGetUnitLosState		= Spring.GetUnitLosState
 local spGetAllyTeamList	  	= Spring.GetAllyTeamList
+local spGetPlayerInfo		= Spring.GetPlayerInfo
 local AllyTeams = {}
 
 -- is the enemy unitID position knowable to an allyteam
@@ -46,6 +47,35 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
   end
 end
 
+function ParseParams(line) -- imagine here goes "unit_taunt 866 test"
+  local s1 = ""
+  local skip = true
+  line = line:sub(12) -- skip "unit_taunt "
+  local unitID = line:match("[^%s]+") -- get "866" or smth unitID
+  if (unitID) then
+    line = line:sub(#unitID+2) -- skip "866 " and get "test"
+    if (line) then
+      unitID = tonumber(unitID)
+      return unitID,line
+    end
+  end
+end
+
+function gadget:RecvLuaMsg(line, playerID)
+  local _, _, _, teamID, allyTeam = spGetPlayerInfo(playerID)
+  if line:find("unit_taunt") then
+    local unitID,text = ParseParams(line)
+    if (unitID) and (text) then
+      for i=1,#AllyTeams do
+	local allyTeam = AllyTeams[i]
+	if (isUnitVisible(unitID, allyTeam)) then
+	  SendToUnsynced("unitTaunt", allyTeam, unitID, text)
+	end
+      end
+    end
+  end
+end
+
 -----------------------------------------------------------------------------------------------------------------------------
 else
 
@@ -60,13 +90,22 @@ local function UnitDead(_, allyTeam, unitID, attackerID)
   end
 end
 
+local function unitTaunt(_, allyTeam, unitID, text)
+  local myAllyTeam = spGetLocalAllyTeamID()
+  if (Script.LuaUI('unitTaunt') and (myAllyTeam == allyTeam)) then
+    Script.LuaUI.unitTaunt(spGetMyPlayerID(),unitID,text)
+  end
+end
+
 function gadget:Initialize()
   gadgetHandler:AddSyncAction("unitDiedInLos", UnitDead)
+  gadgetHandler:AddSyncAction("unitTaunt", unitTaunt)
 end
 
 
 function gadget:Shutdown()
   gadgetHandler:RemoveSyncAction("unitDiedInLos")
+  gadgetHandler:RemoveSyncAction("unitTaunt")
 end
 
 end

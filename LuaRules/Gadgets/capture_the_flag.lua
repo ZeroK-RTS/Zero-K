@@ -848,7 +848,7 @@ function gadget:UnitPreDamaged(unitID) --, unitDefID, unitTeam, damage, paralyze
 end
 
 function ParseCoords(line)
-  params={}
+  local params={}
   for word in line:gmatch("[^%s]+") do
     params[#params+1]=tonumber(word)
   end

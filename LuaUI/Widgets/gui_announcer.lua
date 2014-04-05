@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name	= "Announcer",
-    desc	= "Zero-K announcer, reacts to ingame events and notifies players. v1.2.",
+    desc	= "Zero-K announcer, reacts to ingame events and notifies players. v1.3.",
     author	= "Tom Fyuri",
     date	= "2014",
     license	= "GPL v2 or later",
@@ -105,9 +105,20 @@ local spGetMyTeamID		= Spring.GetMyTeamID
 local spGetTeamResources    	= Spring.GetTeamResources
 local spPlaySoundFile		= Spring.PlaySoundFile
 local spGetTeamList         	= Spring.GetTeamList
+local spGetSelectedUnits 	= Spring.GetSelectedUnits
+local spGetMyPlayerID		= Spring.GetMyPlayerID
+local spGetPlayerInfo		= Spring.GetPlayerInfo
+local spSendLuaRulesMsg		= Spring.SendLuaRulesMsg
+local spGetUnitIsDead		= Spring.GetUnitIsDead
+local spValidUnitID		= Spring.ValidUnitID
+local spGetUnitHeight		= Spring.GetUnitHeight
+local spWorldToScreenCoords	= Spring.WorldToScreenCoords
+local spIsUnitInView		= Spring.IsUnitInView
+local spGetTeamColor		= Spring.GetTeamColor
 
 local modOptions = Spring.GetModOptions()
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
+local getMovetype = Spring.Utilities.getMovetype
 
 local GaiaTeamID	   	= Spring.GetGaiaTeamID()
 local DeathDistance		= 500
@@ -118,6 +129,7 @@ local DeathExpire		= 30 -- frames after which DeathMarker is destroyed
 
 local myTeamID
 local myTeamIDs = {}
+local myName = "Player"
 
 -- basically you are gonna be able to mix any soundpack... i also TODO for myself user defined config ability...
 local BASE_VOLUME = 18.0 -- for area sounds
@@ -125,12 +137,36 @@ local announcer_mode = 0 -- off/on
 local announcer_use_xonotic = 1
 local announcer_use_kmar = 1
 local announcer_volume = 1.0
+local announcer_tauntshow = 9
+local announcer_tauntsize = 16
+local announcer_tauntdecay = 6
 
 local LastSpam = -100
+local LastTaunt = -100
 
 local sfx_path = "sounds/announcer/"
 
 local check_later = {}
+
+local activeTaunts = {}	-- [unitID] = {stuff for tip being displayed}
+
+local glGetTextHeight		= gl.GetTextHeight
+
+-- Chili classes
+local Chili
+local Window
+local TextBox
+local Image
+local Font
+local color2incolor
+local incolor2color
+
+-- Chili instances
+local screen0
+
+local font = "LuaUI/Fonts/komtxt__.ttf" -- I would change the font...
+
+local gameframe = -100
 
 local function InitSoundTable()
 	return {
@@ -196,15 +232,27 @@ local function OptionsChanged()
   if (announcer_volume ~= options.announcer_volume) then
     announcer_volume = options.announcer_volume.value
   end
+  if (announcer_tauntshow ~= options.announcer_tauntshow) then
+    announcer_tauntshow = options.announcer_tauntshow.value
+  end
+  if (announcer_tauntdecay ~= options.announcer_tauntdecay) then
+    announcer_tauntdecay = options.announcer_tauntdecay.value
+  end
+  if (announcer_tauntsize ~= options.announcer_tauntsize) then
+    announcer_tauntsize = options.announcer_tauntsize.value
+  end
   ReloadSounds()
 end
 
-options_path = 'Settings/Audio/Announcer'
+options_path = 'Settings/Misc/Announcer' -- don't know where to put it!
 options_order = { 
   'announcer_mode',
   'announcer_volume',
   'announcer_use_xonotic',
   'announcer_use_kmar',
+  'announcer_tauntshow',
+  'announcer_tauntdecay',
+  'announcer_tauntsize',
 }
 options = {
   announcer_mode = {
@@ -239,6 +287,28 @@ options = {
 --     value = true,
 --     OnChange = OptionsChanged,
 --   },
+  announcer_tauntshow = {
+    name = 'Enable taunts (u: or /u chatcmd)',
+    type = 'bool',
+    value = true,
+    OnChange = OptionsChanged,
+  },
+  announcer_tauntdecay = { -- it obeys global volume
+    name = 'Taunt text lifespan',
+    type = "number", 
+    value = 9, 
+    min = 1,
+    max = 20,
+    step = 1,
+  },
+  announcer_tauntsize = { -- it obeys global volume
+    name = 'Taunt font size',
+    type = "number", 
+    value = 16, 
+    min = 6,
+    max = 46,
+    step = 1,
+  },
 }
 
 -- local function LoadCustomConfig() -- TODO
@@ -256,91 +326,91 @@ end
 
 local function AnnouncerAirshot(x, y, z)
   if not(announcer_mode) or (announcer_volume == 0) then return end
-  if (LastSpam+30 >= spGetGameFrame()) then return end
+  if (LastSpam+30 >= gameframe) then return end
   if (#asounds.airshot > 0) then
     local sound_file = asounds.airshot[random(1,#asounds.airshot)]
     spPlaySoundFile(sfx_path..sound_file, BASE_VOLUME * announcer_volume, x, y, z)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnouncerAwesome(x, y, z) -- multikill
   if not(announcer_mode) or (announcer_volume == 0) then return end
-  if (LastSpam+30 >= spGetGameFrame()) then return end
+  if (LastSpam+30 >= gameframe) then return end
   if (#asounds.multikill_generic > 0) then
     local sound_file = asounds.multikill_generic[random(1,#asounds.multikill_generic)]
     spPlaySoundFile(sfx_path..sound_file, BASE_VOLUME * announcer_volume, x, y, z)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnouncerImpressive(x, y, z) -- heavycost kill/death
   if not(announcer_mode) or (announcer_volume == 0) then return end
-  if (LastSpam+30 >= spGetGameFrame()) then return end
+  if (LastSpam+30 >= gameframe) then return end
   if (#asounds.highcost_kill > 0) then
     local sound_file = asounds.highcost_kill[random(1,#asounds.highcost_kill)]
     spPlaySoundFile(sfx_path..sound_file, BASE_VOLUME * announcer_volume, x, y, z)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnouncerHeadshot(x, y, z)
   if not(announcer_mode) or (announcer_volume == 0) then return end
-  if (LastSpam+30 >= spGetGameFrame()) then return end
+  if (LastSpam+30 >= gameframe) then return end
   if (#asounds.headshot > 0) then
     local sound_file = asounds.headshot[random(1,#asounds.headshot)]
     spPlaySoundFile(sfx_path..sound_file, BASE_VOLUME * announcer_volume, x, y, z)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnounceComDeath()
   if not(announcer_mode) or (announcer_volume == 0) then return end
---   if (LastSpam+30 >= spGetGameFrame()) then return end -- rare event, it's your own commander after all
+--   if (LastSpam+30 >= gameframe) then return end -- rare event, it's your own commander after all
   if (#asounds.commander_lost > 0) then
     local sound_file = asounds.commander_lost[random(1,#asounds.commander_lost)]
     spPlaySoundFile(sfx_path..sound_file, announcer_volume)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnounceAircraft()
   if not(announcer_mode) or (announcer_volume == 0) then return end
---   if (LastSpam+30 >= spGetGameFrame()) then return end -- ignore limit, always play, because it's one-time
+--   if (LastSpam+30 >= gameframe) then return end -- ignore limit, always play, because it's one-time
   if (#asounds.airplanes > 0) then
     local sound_file = asounds.airplanes[random(1,#asounds.airplanes)]
     spPlaySoundFile(sfx_path..sound_file, announcer_volume)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnounceStrider()
   if not(announcer_mode) or (announcer_volume == 0) then return end
---   if (LastSpam+30 >= spGetGameFrame()) then return end -- ignore limit, always play, because it's one-time
+--   if (LastSpam+30 >= gameframe) then return end -- ignore limit, always play, because it's one-time
   if (#asounds.strider > 0) then
     local sound_file = asounds.strider[random(1,#asounds.strider)]
     spPlaySoundFile(sfx_path..sound_file, announcer_volume)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnounceMexcess()
   if not(announcer_mode) or (announcer_volume == 0) then return end
---   if (LastSpam+30 >= spGetGameFrame()) then return end -- hopefully not spammy
+--   if (LastSpam+30 >= gameframe) then return end -- hopefully not spammy
   if (#asounds.mexcess > 0) then
     local sound_file = asounds.mexcess[random(1,#asounds.mexcess)]
     spPlaySoundFile(sfx_path..sound_file, announcer_volume)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
 local function AnnounceEstall()
   if not(announcer_mode) or (announcer_volume == 0) then return end
---   if (LastSpam+30 >= spGetGameFrame()) then return end -- hopefully not spammy
+--   if (LastSpam+30 >= gameframe) then return end -- hopefully not spammy
   if (#asounds.estall > 0) then
     local sound_file = asounds.estall[random(1,#asounds.estall)]
     spPlaySoundFile(sfx_path..sound_file, announcer_volume)
-    LastSpam = spGetGameFrame()
+    LastSpam = gameframe
   end
 end
 
@@ -376,7 +446,15 @@ local function CheckUnitType(unitID, unitDefID)
   end
 end
 
+local function DisposeTaunt(unitID)
+	if activeTaunts[unitID] and activeTaunts[unitID].img then
+		activeTaunts[unitID].img:Dispose()
+	end
+	activeTaunts[unitID] = nil
+end
+
 local function UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
+  DisposeTaunt(unitID)
   if (unitDefID ~= nil ) then
     local ud = UnitDefs[unitDefID]
     if (not ud.customParams.dontcount) and (not spGetUnitRulesParam(unitID, 'wasMorphedTo')) then
@@ -390,7 +468,7 @@ local function UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, at
 	  DeathMarkers[markerID].x = (DeathMarkers[markerID].x+x)/2
 	  DeathMarkers[markerID].z = (DeathMarkers[markerID].z+z)/2
 	  DeathMarkers[markerID].y = spGetGroundHeight2(DeathMarkers[markerID].x,DeathMarkers[markerID].z)
-	  DeathMarkers[markerID].time = spGetGameFrame()
+	  DeathMarkers[markerID].time = gameframe
 	  DeathMarkers[markerID].teams[teamID] = true
 	  if (attackerTeamID ~= nil) then
 	    DeathMarkers[markerID].teams[attackerTeamID] = true
@@ -402,7 +480,7 @@ local function UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, at
 	    x = x,
 	    y = y,
 	    z = z,
-	    time = spGetGameFrame(),
+	    time = gameframe,
 	    teams = {}
 	  }
 	  DeathMarkers[unitID].teams[teamID] = true
@@ -471,6 +549,7 @@ local function CheckResources()
 end
 
 function widget:GameFrame(n)
+  gameframe = n
   for markerID, data in pairs(DeathMarkers) do
     if (n-45) >= data.time then
       local x = data.x
@@ -513,11 +592,152 @@ local function AnnouncerUnitDestroyed(PlayerID, unitID, attackerID)
   UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
 end
 
+local function GetNiceUnit(units) -- TODO it needs to select unit that is 1) movable 2) closest to the center of group, but i'm too lazy right now
+  if (#units > 100) then return units[1] end
+  for i=1,#units do
+    local unitID = units[i]
+    local unitDefID = spGetUnitDefID(unitID)
+    if getMovetype(UnitDefs[unitDefID]) ~= false then
+      return unitID
+    end
+  end
+  return units[1]
+end
+
+function trim(s)
+ return s:find'^%s*$' and '' or s:match'^%s*(.*%S)'
+end
+
+local function TryTaunt(msg)
+  if (msg ~= "") then
+    msg = trim(msg)
+    local units = spGetSelectedUnits()
+    if (#units > 0) then
+      spSendLuaRulesMsg("unit_taunt "..GetNiceUnit(units).." "..msg)
+    end
+  end
+end
+
+function widget:TextCommand(command)
+  local cmd = command:sub(1,2)
+  if cmd == "u " then
+    local msg = command:sub(3)
+    TryTaunt(msg)
+  end
+end
+    
+function widget:AddConsoleMessage(msg) -- I'm too lazy to detect specsay, and why would you "secretly" unit taunt? you have /u already ^
+  if (msg ~= nil) then
+    local allies = (msg.msgtype == "player_to_allies")
+    local msg = msg.text
+    if msg:find("<"..myName.."> u:") then
+      if (LastTaunt+10 >= gameframe) then return end
+      TryTaunt(msg:sub(6+#myName))
+      LastTaunt = gameframe
+    elseif (allies) then
+      msg = msg:sub(12+#myName)
+      local index = msg:find("u:")
+      if index then
+	msg = msg:sub(index+2)
+	if (LastTaunt+10 >= gameframe) then return end
+	TryTaunt(msg)
+	LastTaunt = gameframe
+      end
+    end
+  end
+end
+
+local function GetTauntDimensions(unitID, str, height, invert)
+	local textHeight, _, numLines = glGetTextHeight(str)
+	textHeight = textHeight*announcer_tauntsize*numLines
+	local textWidth = gl.GetTextWidth(str)*announcer_tauntsize
+
+	local ux, uy, uz = spGetUnitPosition(unitID)
+	uy = uy + height
+	local x,y,z = spWorldToScreenCoords(ux, uy, uz)
+	if not invert then
+		y = screen0.height - y
+	end
+	
+	return textWidth, textHeight, x, y, height
+end
+
+function widget:Update(dt)
+	-- chili code
+	for unitID, tipData in pairs(activeTaunts) do
+		if spIsUnitInView(unitID) then
+			local textWidth, textHeight, x, y = GetTauntDimensions(unitID, tipData.str, tipData.height)
+			
+			local img = tipData.img
+			if img.hidden then
+				screen0:AddChild(img)
+				img.hidden = false
+			end
+			
+			--img.x = x - (textWidth+8)/2
+			--img.y = y - textHeight - 4 - announcer_tauntsize
+			--img:Invalidate()
+			
+			img:SetPos(x - (textWidth+8)/2, y - textHeight - 4 - announcer_tauntsize)
+		elseif not tipData.img.hidden then
+			screen0:RemoveChild(tipData.img)
+			tipData.img.hidden = true
+		end
+		if tipData.expire < gameframe then
+			DisposeTaunt(unitID)
+		end
+	end
+end
+
+-- cheers to KingRaptor for unit_clippy.lua widget, got inspired!
+local function unitTaunt(PlayerID, unitID, text)
+	if spGetUnitIsDead(unitID) or not(spValidUnitID(unitID)) or not(unitID) then
+		return
+	end
+	DisposeTaunt(unitID)
+	
+	local height = spGetUnitHeight(unitID)
+	if not height then return end
+	
+	local textWidth, textHeight, x, y = GetTauntDimensions(unitID, text, height)
+
+	local img = Image:New {
+		width = textWidth + 4,
+		height = textHeight + 4 + announcer_tauntsize,
+		x = x - (textWidth+8)/2;
+		y = y - textHeight - 4 - announcer_tauntsize;
+		keepAspect = false,
+		color = {0.7,0.7,0.7,0.4},
+		file = "LuaUI/Images/speechbubble.png";
+		parent = screen0;
+	}
+	local teamcolor = {Spring.GetTeamColor(spGetUnitTeam(unitID))} or {1,1,1,1}
+	local textBox = TextBox:New{
+		parent  = img;
+		text    = text,
+		height	= textHeight,
+		width   = textWidth,
+		x = 4,
+		y = 4,
+		valign  = "center";
+		align   = "left";
+		font    = {
+			font   = font;
+			size   = announcer_tauntsize;
+			color  = teamcolor;
+			outlineColor  = {0,0,0,0},
+		},
+	}
+	
+	activeTaunts[unitID] = {str = text, expire = gameframe + 32*announcer_tauntdecay, height = height, img = img, textBox = textBox}
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
   widgetHandler:RegisterGlobal("unitDiedInLos", AnnouncerUnitDestroyed)
+  widgetHandler:RegisterGlobal("unitTaunt", unitTaunt)
   local myAllyTeam = spGetMyAllyTeamID()
   for _,t in pairs(spGetTeamList()) do
 	  if myAllyTeam == select(6,spGetTeamInfo(t)) then
@@ -525,12 +745,24 @@ function widget:Initialize()
 	  end
   end
   myTeamID=spGetMyTeamID()
+  myName = select(1,spGetPlayerInfo(spGetMyPlayerID()))
   if (options.announcer_mode) then announcer_mode = options.announcer_mode.value end
   if (options.announcer_use_xonotic) then announcer_use_xonotic = options.announcer_use_xonotic.value end
   if (options.announcer_use_kmar) then announcer_use_kmar = options.announcer_use_kmar.value end
   if (options.announcer_volume) then announcer_volume = options.announcer_volume.value end
+  if (options.announcer_tauntdecay) then announcer_tauntdecay = options.announcer_tauntdecay.value end
+  if (options.announcer_tauntshow) then announcer_tauntshow = options.announcer_tauntshow.value end
+  if (options.announcer_tauntsize) then announcer_tauntsize = options.announcer_tauntsize.value end
+  Chili = WG.Chili
+  TextBox = Chili.TextBox
+  Image = Chili.Image
+  Font = Chili.Font
+  screen0 = Chili.Screen0
+  color2incolor = Chili.color2incolor
+  incolor2color = Chili.incolor2color
 end
 
 function widget:Shutdown()
   widgetHandler:DeregisterGlobal("unitDiedInLos", AnnouncerUnitDestroyed)
+  widgetHandler:DeregisterGlobal("unitTaunt", unitTaunt)
 end
