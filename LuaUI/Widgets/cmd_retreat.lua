@@ -102,6 +102,12 @@ local airpadDefs = {
 	[UnitDefNames["armasp"].id] = true,
 	[UnitDefNames["armcarry"].id] = true,
 }
+
+
+local boostOnFrame = {}
+local boostDefs = {
+	[UnitDefNames["fighter"].id] = true,
+}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -268,6 +274,16 @@ local function StartRearm(unitID)
 	local insertIndex = 0
 	GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_FIND_PAD, CMD.OPT_INTERNAL}, CMD.OPT_ALT)
 	retreatRearmOrders[unitID] = {nil,nil,nil}
+	
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if unitDefID then
+		if boostDefs[unitDefID] then
+			local frame = Spring.GetGameFrame()
+			boostOnFrame[frame + 30] = boostOnFrame[frame + 30] or {}
+			boostOnFrame[frame + 30][unitID] = true
+		end 
+	end
+	
 	--add last position
 	if options.returnLastPosition.value then
 		local ux, uy, uz = GetUnitPosition(unitID)
@@ -288,6 +304,15 @@ local function StartRetreat(unitID, force)
 		-- using OPT_INTERNAL so that the CMD.MOVE order is not cycled when the unit has repeat enabled
 		GiveClampedOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, CMD.OPT_ALT) -- ALT makes the 0 positional
 		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex+1, CMD_WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
+		
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		Spring.Echo(unitDefID)
+		if unitDefID then
+			if boostDefs[unitDefID] then
+				Spring.Echo("Boosting")
+				GiveOrderToUnit(unitID, CMD_ONECLICK_WEAPON, {}, {})
+			end 
+		end
 		
 		retreatMoveOrders[unitID] = {hx, hy, hz}
 		
@@ -724,6 +749,15 @@ function widget:GameFrame(gameFrame)
 				StopRetreating(unitID) --remove retreat queue and nullify "retreatMoveOrders[unitID]"
 			end
 		end
+	end
+	
+	if boostOnFrame[gameFrame] then
+		for unitID,_ in pairs(boostOnFrame[gameFrame]) do
+			if Spring.ValidUnitID(unitID) then
+				GiveOrderToUnit(unitID, CMD_ONECLICK_WEAPON, {}, {"right"})
+			end
+		end
+		boostOnFrame[gameFrame] = nil
 	end
 	
 	--remove retreating unit from selection (only perform at selection change or when retreat is ordered)
