@@ -294,6 +294,9 @@ local function FindNearestAirpad(unitID, team)
 	-- first go through all the pads to see which ones are unbooked
 	for airpadID,airpadDefID in pairs(airpadsPerAllyteam[allyTeam]) do
 		if spGetUnitIsDead(airpadID) or (not airpadsData[airpadID]) then --rare case. Can happen if airpad is built & die in same frame
+			if (not airpadsData[airpadID]) then
+				Spring.Echo("Warning: airpadsData for " .. airpadID .. " is NIL")
+			end
 			airpadsPerAllyteam[allyTeam][airpadID] = nil
 		else
 			if (airpadsData[airpadID].reservations.count < airpadsData[airpadID].cap) then
