@@ -126,7 +126,6 @@ end
 
 -- in halloween gadget, sometimes giving order to unit would result in crash because unit happened to be dead at the time order was given
 -- TODO probably same units in groups could get same orders...
--- TODO anthena should try to resurrect units if Gaia has positive E income
 local function BringingDownTheHeavens(unitID)
 	if (spGetUnitIsDead(unitID) == false) then
 		local unitDefID = spGetUnitDefID(unitID)
