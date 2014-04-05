@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		name		= "Ore mexes!",
 		desc		= "Prespawn mex spots and make them spit ore. Version "..version,
 		author		= "Tom Fyuri",
-		date		= "Mar 2014",
+		date		= "Mar-Apr 2014",
 		license		= "GPL v2 or later",
 		layer		= -5,
 		enabled	 	= true				-- now it comes with design!
@@ -95,6 +95,7 @@ local abs	 = math.abs
 
 local mapWidth
 local mapHeight
+
 local teamIDs
 local UnderAttack = {} -- holds frameID per mex so it goes neutral, if someone attacks it, for 5 seconds, it will not return to owner if no grid connected.
 local Ore = {} -- hold features should they emit harm they will ongameframe

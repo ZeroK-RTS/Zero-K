@@ -115,6 +115,7 @@ local spGetUnitHeight		= Spring.GetUnitHeight
 local spWorldToScreenCoords	= Spring.WorldToScreenCoords
 local spIsUnitInView		= Spring.IsUnitInView
 local spGetTeamColor		= Spring.GetTeamColor
+local spGetSpectatingState	= Spring.GetSpectatingState
 
 local modOptions = Spring.GetModOptions()
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
@@ -130,6 +131,7 @@ local DeathExpire		= 30 -- frames after which DeathMarker is destroyed
 local myTeamID
 local myTeamIDs = {}
 local myName = "Player"
+local spec
 
 -- basically you are gonna be able to mix any soundpack... i also TODO for myself user defined config ability...
 local BASE_VOLUME = 18.0 -- for area sounds
@@ -569,14 +571,19 @@ function widget:GameFrame(n)
     end
   end
   if (n%32)==0 then
-    for unitID,_ in pairs(check_later) do
-	local unitDefID = spGetUnitDefID()
-	if (unitDefID ~= nil) then
-	  check_later[unitID] = nil
-	  CheckUnitType(unitID, unitDefID)
-	end
+    if spec ~= spGetSpectatingState() then
+	  spec = spGetSpectatingState()
     end
-    CheckResources()
+    if spec==false then
+      for unitID,_ in pairs(check_later) do
+	  local unitDefID = spGetUnitDefID()
+	  if (unitDefID ~= nil) then
+	    check_later[unitID] = nil
+	    CheckUnitType(unitID, unitDefID)
+	  end
+      end
+      CheckResources()
+    end
   end
 end
 
