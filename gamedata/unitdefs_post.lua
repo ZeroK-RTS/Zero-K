@@ -9,6 +9,7 @@ end
 
 local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility
@@ -66,12 +67,12 @@ for _, ud in pairs(UnitDefs) do
 --
 -- because the way lua access to unitdefs and weapondefs is setup is insane
 --
---[[
-for _, ud in pairs(UnitDefs) do
-    if ud.collisionVolumeOffsets then
-		ud.customparams.collisionVolumeOffsets = ud.collisionVolumeOffsets  -- For ghost site
-    end
- end--]]
+
+--for _, ud in pairs(UnitDefs) do
+--    if ud.collisionVolumeOffsets then
+--		ud.customparams.collisionVolumeOffsets = ud.collisionVolumeOffsets  -- For ghost site
+--    end
+--end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -162,18 +163,17 @@ local function TagTree(unit, faction, newbuildoptions)
 	  for _, buildoption in ipairs(ud.buildoptions) do
         Tag(buildoption)
       end
-    end
---[[	
-    if (morphDefs[unit]) then
-      if (morphDefs[unit].into) then
-        Tag(morphDefs[unit].into)
-      else
-        for _, t in ipairs(morphDefs[unit]) do
-          Tag(t.into)
-        end
-      end        
-    end
-]]--  
+    end	
+    --if (morphDefs[unit]) then
+    --  if (morphDefs[unit].into) then
+    --    Tag(morphDefs[unit].into)
+    --  else
+    --    for _, t in ipairs(morphDefs[unit]) do
+    --      Tag(t.into)
+    --    end
+    --  end        
+    --end
+  
   end
 
   Tag(unit)
@@ -224,13 +224,13 @@ end
 --------------------------------------------------------------------------------
 -- 3dbuildrange for all none plane builders
 --
---[[
-for name, ud in pairs(UnitDefs) do
-  if (tobool(ud.builder) and not tobool(ud.canfly)) then
-    ud.buildrange3d = true
-  end
-end
---]]
+
+--for name, ud in pairs(UnitDefs) do
+--  if (tobool(ud.builder) and not tobool(ud.canfly)) then
+--    ud.buildrange3d = true
+--  end
+--end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -295,7 +295,7 @@ end
 if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if (ud.canfly) then
-			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 0.1
+			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 0.8
 		end
 	end
 end
@@ -335,23 +335,23 @@ end
 --------------------------------------------------------------------------------
 -- Special Air
 --
---[[
-if (modOptions and tobool(modOptions.specialair)) then
-  local replacements = VFS.Include("LuaRules/Configs/specialair.lua")
-  if (replacements[modOptions.specialair]) then
-    replacements = replacements[modOptions.specialair]
-    for name, ud in pairs(UnitDefs) do
-      if (ud.buildoptions) then
-        for buildKey, buildOption in pairs(ud.buildoptions) do
-          if (replacements[buildOption]) then
-            ud.buildoptions[buildKey] = replacements[buildOption];
-          end
-        end
-      end
-    end
-  end
-end
---]]
+
+--if (modOptions and tobool(modOptions.specialair)) then
+--  local replacements = VFS.Include("LuaRules/Configs/specialair.lua")
+--  if (replacements[modOptions.specialair]) then
+--    replacements = replacements[modOptions.specialair]
+--    for name, ud in pairs(UnitDefs) do
+--      if (ud.buildoptions) then
+--        for buildKey, buildOption in pairs(ud.buildoptions) do
+--          if (replacements[buildOption]) then
+--            ud.buildoptions[buildKey] = replacements[buildOption];
+--          end
+--        end
+--      end
+--    end
+--  end
+--end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -506,15 +506,15 @@ end
 --------------------------------------------------------------------------------
 -- Burrowed
 -- 
---[[
-for name, ud in pairs(UnitDefs) do
-  if (ud.weapondefs) then
-    for wName,wDef in pairs(ud.weapondefs) do      
-      wDef.damage.burrowed = 0.001
-    end
-  end
-end --for
-]]
+
+--for name, ud in pairs(UnitDefs) do
+--  if (ud.weapondefs) then
+--    for wName,wDef in pairs(ud.weapondefs) do      
+--      wDef.damage.burrowed = 0.001
+--    end
+--  end
+--end --for
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -537,15 +537,15 @@ end
 --------------------------------------------------------------------------------
 -- Avoid neutral	-- breaks explicit attack orders
 --
---[[
-for name, ud in pairs(UnitDefs) do
-  if (ud.weapondefs) then
-    for wName,wDef in pairs(ud.weapondefs) do      
-      wDef.avoidneutral = true
-    end
-  end
-end
-]]--
+
+--for name, ud in pairs(UnitDefs) do
+--  if (ud.weapondefs) then
+--    for wName,wDef in pairs(ud.weapondefs) do      
+--      wDef.avoidneutral = true
+--    end
+--  end
+--end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -562,13 +562,13 @@ end
 --------------------------------------------------------------------------------
 -- Cost Checking
 -- 
---[[
-for name, ud in pairs(UnitDefs) do
-	if ud.buildcostmetal ~= ud.buildcostenergy or ud.buildtime ~= ud.buildcostenergy then
-		Spring.Echo("Inconsistent Cost for " .. ud.name)
-	end
-end
---]]
+
+--for name, ud in pairs(UnitDefs) do
+--	if ud.buildcostmetal ~= ud.buildcostenergy or ud.buildtime ~= ud.buildcostenergy then
+--		Spring.Echo("Inconsistent Cost for " .. ud.name)
+--	end
+--end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -584,13 +584,13 @@ end
 --------------------------------------------------------------------------------
 --  No leveling ground
 
---[[
-for name, ud in pairs(UnitDefs) do
-  if (ud.yardmap)  then
-    ud.levelGround = false
-  end
-end
---]]
+
+--for name, ud in pairs(UnitDefs) do
+--  if (ud.yardmap)  then
+--    ud.levelGround = false
+--  end
+--end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -678,14 +678,14 @@ end
 --------------------------------------------------------------------------------
 -- Set chicken cost
 -- 
---[[
-for name, ud in pairs(UnitDefs) do
-  if (ud.unitname:sub(1,7) == "chicken") then
-	ud.buildcostmetal = ud.buildtime
-	ud.buildcostenergy = ud.buildtime
-  end
-end
-]]--
+
+--for name, ud in pairs(UnitDefs) do
+--  if (ud.unitname:sub(1,7) == "chicken") then
+--	ud.buildcostmetal = ud.buildtime
+--	ud.buildcostenergy = ud.buildtime
+--  end
+--end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Category changes
