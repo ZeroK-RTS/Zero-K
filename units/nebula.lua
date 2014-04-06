@@ -31,6 +31,7 @@ unitDef = {
   cruiseAlt              = 300,
 
   customParams           = {
+    cantuseairpads = 1,
    -- description_bp = [[Fortaleza voadora]],
    -- description_fr = [[Forteresse Volante]],
     description_de = [[Lufttraeger]], -- "aerial carrier"
@@ -40,7 +41,7 @@ unitDef = {
    -- helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
     helptext_de    = [[Die Nebula ist stark und ungeschickt, aber sie hat ein Schild um sich zu schutzen und kann seine einige Jaegerdrohne herstellen.]],
     helptext_pl    = [[Nebula jest wytrzymala i ma problemy ze zwrotnoscia niczym latajaca cegla, jednak jest ona uzbrojona w oddzial dronow bojowych oraz tarcze obszarowa do ich ochrony.]],
-   modelradius    = [[40]],
+    modelradius    = [[40]],
   },
 
   explodeAs              = [[LARGE_BUILDINGEX]],
@@ -97,14 +98,14 @@ unitDef = {
     {
       def                = [[CANNON]],
       mainDir            = [[-1 0 0]],	-- left
-      maxAngleDif        = 180,
+      maxAngleDif        = 210,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
     {
       def                = [[CANNON]],
       mainDir            = [[1 0 0]],	-- right
-      maxAngleDif        = 180,
+      maxAngleDif        = 210,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },

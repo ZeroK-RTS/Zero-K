@@ -2,7 +2,7 @@ include "constants.lua"
 --include 'letsNotFailAtTrig.lua'
 --------------------------------------------------------------------------------
 --pieces
-local hull = piece "hull"
+local hull, facframe = piece ("hull", "facframe")
 local engines = {}
 local pads = {}
 local docked = {}
@@ -40,11 +40,13 @@ local smokePiece = {hull, engines[2], engines[4], pads[3]};
 --------------------------------------------------------------------------------
 local function EngineLoop()
     while true do
+		local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+		local v2d = (vx^2 + vz^2)^0.5
 		for i=1,4 do
-			Turn(engines[i], x_axis, GetUnitValue(COB.CURRENT_SPEED)/65536*0.25, math.rad(30))
+			Turn(engines[i], x_axis, v2d*0.25, math.rad(30))
 		end
 		--Spring.Echo(GetUnitValue(COB.CURRENT_SPEED)/65536)
-		Sleep(200)
+		Sleep(250)
     end
 end
 
@@ -53,6 +55,9 @@ function script.Create()
     StartThread(SmokeUnit, smokePiece)
     --Turn(piece "turret3", z_axis, math.rad(-90))
     --Turn(piece "turret4", z_axis, math.rad(90))
+    for i=1,2 do
+		Turn(pads[i], y_axis, math.pi)
+    end
 end
 
 function script.QueryWeapon(num) 
@@ -108,8 +113,8 @@ function script.Killed(recentDamage, maxHealth)
 		EmitSfx(pads[math.random(#pads)], UNIT_SFX2)
 		Sleep(300)
 		
-		local fallOff = math.random(#pads)
-		EmitSfx(pads[fallOff], UNIT_SFX2)
+		local fallOff = math.random(#docked)
+		EmitSfx(docked[fallOff], UNIT_SFX2)
 		Explode(docked[fallOff], sfxFall + sfxSmoke + sfxFire)
 		table.remove(docked, fallOff)
 		Sleep(300)
@@ -118,12 +123,12 @@ function script.Killed(recentDamage, maxHealth)
 		Sleep(300)
 		Explode(weapons[1].aimFrom, UNIT_SFX2)
 		
-		fallOff = math.random(#pads)
-		EmitSfx(pads[fallOff], UNIT_SFX2)
+		fallOff = math.random(#docked)
+		EmitSfx(docked[fallOff], UNIT_SFX2)
 		Explode(docked[fallOff], sfxFall + sfxSmoke + sfxFire)
 		table.remove(docked, fallOff)
 		Sleep(600)
-		EmitSfx(hull, UNIT_SFX3)
+		EmitSfx(facframe, UNIT_SFX3)
 		Sleep(100)
 		return 1
 	else

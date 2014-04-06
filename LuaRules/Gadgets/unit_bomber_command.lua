@@ -62,8 +62,12 @@ local DEFAULT_PAD_RADIUS = 300
 local bomberDefs = {}
 local boolBomberDefs = {}
 for i=1,#UnitDefs do
-	local movetype = Spring.Utilities.getMovetype(UnitDefs[i])
-	if movetype == 1 or movetype == 0 then
+	local unitDef = UnitDefs[i]
+	local movetype = Spring.Utilities.getMovetype(unitDef)
+	if Spring.Utilities.tobool(unitDef.customParams.cantuseairpads) then
+		Spring.Echo("wololo", unitDef.name)
+	end
+	if (movetype == 1 or movetype == 0) and (not Spring.Utilities.tobool(unitDef.customParams.cantuseairpads)) then
 		bomberDefs[i] = {
 			fixedwing = (movetype == 0),
 			padRadius = ((movetype == 0) and fixedwingPadRadius) or gunshipPadRadius

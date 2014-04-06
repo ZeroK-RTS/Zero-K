@@ -53,6 +53,7 @@ local function InitCarrier(unitID, unitDefID, teamID)
 		for i=1,#usedPieces do
 			toReturn.spawnPieces[i] = unitPieces[usedPieces[i]]
 		end
+		toReturn.pieceIndex = 1
 	end
 	for i=1,#carrierData do
 		toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
@@ -69,10 +70,16 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 	local xS, yS, zS = x, y, z
 	local rot = 0
 	if carrierEntry.spawnPieces then
-		local piece = math.random(#carrierEntry.spawnPieces)
-		local px, py, pz, pdx, pdy, pdz = GetUnitPiecePosDir(unitID, carrierEntry.spawnPieces[piece])
+		local index = carrierEntry.pieceIndex
+		local px, py, pz, pdx, pdy, pdz = GetUnitPiecePosDir(unitID, carrierEntry.spawnPieces[index])
 		xS, yS, zS = px, py, pz
 		rot = Spring.GetHeadingFromVector(pdx, pdz)/65536*2*math.pi + math.pi
+		
+		index = index + 1
+		if index > #carrierEntry.spawnPieces then
+			index = 1
+		end
+		carrierEntry.pieceIndex = index
 	else
 		local angle = math.rad(random(1,360))
 		xS = (x + (math.sin(angle) * 20))
@@ -95,7 +102,7 @@ local function NewDrone(unitID, unitDefID, droneName, setNum)
 		
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
-		GiveClampedOrderToUnit(droneID, CMD.FIGHT,	{x + random(-300,300), 60, z + random(-300,300)}, {""})
+		GiveClampedOrderToUnit(droneID, CMD.FIGHT, {x + random(-300,300), 60, z + random(-300,300)}, {""})
 		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 
 		SetUnitNoSelect(droneID,true)
