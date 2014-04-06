@@ -455,8 +455,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
 		local orderArray={}
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-			local ud = UnitDefs[spGetUnitDefID(commanders[c])]
-			if not(ud.humanName:find("0$") == #ud.humanName) then return end -- the 0 in the end means level 0, unit states are applied in unit_morph gadget
+			if (UnitDefs[unitDefID].customParams.level ~= 0) then return end -- unit states are applied in unit_morph gadget
 			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
             -- Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
 			-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
