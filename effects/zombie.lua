@@ -43,7 +43,7 @@ return {
         heat               = "18 r20",
         heatfalloff        = 0.6,
         maxheat            = 38,
-        pos                = [[-2d 4dr, 0, -2d 4dr]],
+        pos                = [[-15 r30, r10, -15 r30]],
         size               = "3r",
         sizegrowth         = -0.01,
         speed              = [[0, 1, 0]],
