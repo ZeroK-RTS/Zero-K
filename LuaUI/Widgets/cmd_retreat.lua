@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat",
-    desc      = "v0.286 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.287 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2014-4-5
     license   = "GNU GPL, v2 or later",
@@ -10,6 +10,9 @@ function widget:GetInfo()
     enabled   = true
   }
 end
+--TODO: workaround for airplane overshoot while landing in Spring 96
+--TODO: clear retreatRearmOrders[] entry for airplane that has its ReARM order >>externally<< removed because airpad is reclaimed (line 542 cause reArm command reinserted twice (failed))
+--TODO: handle case where user give CMD.WAIT
 
 -- speed-ups
 local glDepthTest      = gl.DepthTest
@@ -28,6 +31,12 @@ local CMD_MOVE          = CMD.MOVE
 local CMD_PATROL        = CMD.PATROL
 local CMD_REPAIR        = CMD.REPAIR
 local CMD_STOP			= CMD.STOP
+local CMD_IDLEMODE		= CMD.IDLEMODE
+local CMD_ONOFF			= CMD.ONOFF
+local CMD_FIRE_STATE	= CMD.FIRE_STATE
+local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+local CMD_MOVE_STATE 	= CMD.MOVE_STATE
+local CMD_REPEAT		= CMD.REPEAT
 
 local CMD_INSERT        = CMD.INSERT
 local CMD_REMOVE        = CMD.REMOVE
@@ -97,17 +106,18 @@ options = {
 	},
 }
 
+--AIRPLANE STUFF
 local airpadDefs = {
 	[UnitDefNames["factoryplane"].id] = true,
 	[UnitDefNames["armasp"].id] = true,
 	[UnitDefNames["armcarry"].id] = true,
 }
 
-
 local boostOnFrame = {}
 local boostDefs = {
 	[UnitDefNames["fighter"].id] = true,
 }
+local alwaysFlyState = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -212,13 +222,13 @@ function StopRearm(unitID) --is called until rearm is cancelled
 	local queue = GetFirst3Command(unitID)
 	if (queue and queue[1] and queue[1].id == CMD_REARM) then
 		local tag = queue[1].tag
-		GiveOrderToUnit(unitID, CMD_REMOVE, {tag}, {})
 		retreatRearmOrders[unitID]= nil
+		GiveOrderToUnit(unitID, CMD_REMOVE, {tag}, {})
 	elseif (not queue or not queue[1] or queue[1].id==CMD_STOP) and --no work to do??
 	retreatRearmOrders[unitID][1] then --returnLastPosition enabled??
 		local x,y,z = retreatRearmOrders[unitID][1],retreatRearmOrders[unitID][2],retreatRearmOrders[unitID][3]
-		GiveClampedOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 		retreatRearmOrders[unitID]= nil
+		GiveClampedOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 	end
 end
 
@@ -229,25 +239,24 @@ function StopRetreating(unitID)
 		if not cmds or not cmds[1] then
 			retreatMoveOrders[unitID] = nil
 
-		elseif IsRetreatMove(unitID, cmds[1]) then --is retreating to repair zone(?)	
+		elseif IsRetreatMove(unitID, cmds[1]) then --is retreating to repair zone(?)
+			local x,y,z = retreatMoveOrders[unitID][4],retreatMoveOrders[unitID][5],retreatMoveOrders[unitID][6]
+			retreatMoveOrders[unitID] = nil --unit no longer considered retreating
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
 			if cmds[2] and cmds[2].id==CMD_WAIT then --is the move+wait retreat combo(?)
 				GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[2].tag}, {})
-				if (not cmds[3] or cmds[3].id==CMD_STOP) and retreatMoveOrders[unitID][4] then --no work to return to?? returnLastPosition enabled??
-					local x,y,z = retreatMoveOrders[unitID][4],retreatMoveOrders[unitID][5],retreatMoveOrders[unitID][6]
+				if (not cmds[3] or cmds[3].id==CMD_STOP) and x then --no work to return to?? returnLastPosition enabled??
 					GiveClampedOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 				end
-				
-				retreatMoveOrders[unitID] = nil --unit no longer considered retreating
 			end
 			
-		elseif (cmds[1].id == CMD_WAIT) then --is waiting for repair(?)		
+		elseif (cmds[1].id == CMD_WAIT) then --is waiting for repair(?)	
+			local x,y,z = retreatMoveOrders[unitID][4],retreatMoveOrders[unitID][5],retreatMoveOrders[unitID][6]
+			retreatMoveOrders[unitID] = nil --empty this before issuing command so widget:UnitCommand() don't check them.
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmds[1].tag}, {})
-			if (not cmds[2] or cmds[2].id==CMD_STOP) and retreatMoveOrders[unitID][4] then --no work to return to?? returnLastPosition enabled??
-				local x,y,z = retreatMoveOrders[unitID][4],retreatMoveOrders[unitID][5],retreatMoveOrders[unitID][6]
+			if (not cmds[2] or cmds[2].id==CMD_STOP) and x then --no work to return to?? returnLastPosition enabled??
 				GiveClampedOrderToUnit(unitID, CMD_MOVE, { x,y,z}, {})
 			end
-			retreatMoveOrders[unitID] = nil
 		else --is currently some other command
 			-- retreatMoveOrders[unitID] = nil
 			--Note: didn't NIL-ify retreatingUnits[unitID] here so that StopRetreating() can run 2nd time later
@@ -260,24 +269,42 @@ function StopRetreating(unitID)
 	end
 end
 
+local function RemoveAlwaysFly( unitID)
+	if (not Spring.GetUnitStates(unitID)["autoland"]) then
+		alwaysFlyState[unitID] = true
+		GiveOrderToUnit(unitID,CMD_IDLEMODE, {1,}, {""})
+	end
+end
+
+local function RestoreAlwaysFly (unitID)
+	if alwaysFlyState[unitID] and Spring.GetUnitStates(unitID)["autoland"] then
+		alwaysFlyState[unitID] = nil
+		GiveOrderToUnit(unitID,CMD_IDLEMODE, {0,}, {""})
+	end
+end
+
 local function QueueFighterBoost(unitID,unitDefID)
 	if boostDefs[unitDefID] then
-		local frame = GetGameFrame()
-		boostOnFrame[frame + 30] = boostOnFrame[frame + 30] or {}
-		boostOnFrame[frame + 30][unitID] = unitDefID
+		boostOnFrame[currentGameFrame + 30] = boostOnFrame[currentGameFrame + 30] or {}
+		boostOnFrame[currentGameFrame + 30][unitID] = unitDefID
 	end 
 end
 
 local function StartFighterBoost(unitID,unitDefID)
 	if boostDefs[unitDefID] then
-		GiveOrderToUnit(unitID, CMD_INSERT, { 0, CMD_ONECLICK_WEAPON, CMD.OPT_INTERNAL,}, CMD.OPT_ALT)
+		local specialReloadState = spGetUnitRulesParam(unitID,"specialReloadFrame")
+		if (not specialReloadState or (specialReloadState <= currentGameFrame)) then
+			GiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ONECLICK_WEAPON, CMD.OPT_INTERNAL,}, CMD.OPT_ALT)
+		end
 	end 
 end
 
 local function HaveEmptyAirpad()
 	local emptyPadCount = 0
 	for i=1, #airpadList do
-		if(spGetUnitRulesParam(airpadList[i],"unreservedPad") or 1) >= 1 then
+		local airpadID = airpadList[i]
+		local _,_,inbuild = GetUnitIsStunned(airpadID)
+		if(spGetUnitRulesParam(airpadID,"unreservedPad") or 1) >= 1 and not inbuild then
 			return true
 		end
 	end
@@ -341,7 +368,8 @@ local function SetWantRetreat(unitID, want,divert)
 					end
 				elseif (havenCount > 0) then
 					--//if Unit is not flying unit, retreat to retreat zone
-					StartFighterBoost(unitID,unitDefID)
+					RemoveAlwaysFly(unitID)
+					QueueFighterBoost(unitID,unitDefID)
 					StartRetreat(unitID)
 					if options.removeFromSelection.value then
 						retreatedUnits[#retreatedUnits+1] = unitID
@@ -349,6 +377,7 @@ local function SetWantRetreat(unitID, want,divert)
 				end
 			elseif retreatMoveOrders[unitID] and isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
 				--//if Unit is (was) retreating to retreat zone and is flying unit and have empty airpad, then rearm
+				RestoreAlwaysFly(unitID)
 				StopRetreating(unitID)
 				StartRearm(unitID)
 			end
@@ -358,10 +387,12 @@ local function SetWantRetreat(unitID, want,divert)
 		local isFlyingUnit = (movetype==0 or movetype==1)
 		if not pauseRetreatChecks[unitID] and retreatMoveOrders[unitID] and isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
 			--//if Unit is (was) retreating to retreat zone and is flying unit and have empty airpad, then rearm
+			RestoreAlwaysFly(unitID)
 			StopRetreating(unitID)
 			StartRearm(unitID)
 		end
 	elseif retreatMoveOrders[unitID] then 
+		RestoreAlwaysFly(unitID)
 		StopRetreating(unitID)
 	elseif retreatRearmOrders[unitID] then
 		StopRearm(unitID)
@@ -382,10 +413,10 @@ local function CheckSetWantRetreat(unitID, retreatOrder)
 
 		if healthRatio < threshold and (not inBuild) then        
 			SetWantRetreat(unitID, true)
-		elseif (healthRatio == 1) then
+		elseif (healthRatio >= 1) then
 			SetWantRetreat(unitID, nil)
-		elseif healthRatio > threshold and healthRatio ~= 1 and (not inBuild) then
-			SetWantRetreat(unitID, nil,true)
+		elseif healthRatio > threshold and healthRatio < 1 and (not inBuild) then
+			SetWantRetreat(unitID, nil,true) --unit already repairing, check if divert is needed.
 		end
 	end
 end
@@ -452,7 +483,6 @@ end
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdParams) 
 	if not options.overrideableCommand.value then
 		local commandOverriden = false
-		
 		if cmdID == CMD_MOVE then
 			if not (math.bit_and(cmdOptions,CMD.OPT_SHIFT) > 0) then
 				--move command not queued with SHIFT
@@ -466,35 +496,34 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 			and cmdID ~= CMD_SET_WANTED_MAX_SPEED	
 			and cmdID ~= CMD_FIRE_STATE	and cmdID ~= CMD_MOVE_STATE
 			and cmdID ~= CMD_ONOFF		and cmdID ~= CMD_REPEAT
-			and cmdID ~= CMD_WANT_CLOAK		and cmdID ~= CMD_CLOAK_SHIELD	
+			and cmdID ~= CMD_WANT_CLOAK	and cmdID ~= CMD_CLOAK_SHIELD	
 			and cmdID ~= CMD_STEALTH	and cmdID ~= CMD_WAIT
-			and cmdID ~= CMD_IDLEMODE
+			and cmdID ~= CMD_IDLEMODE	--and cmdID ~= CMD_ONECLICK_WEAPON
 		then
 			--any other command that is not STATE-button and not queued with SHIFT
 			commandOverriden = true
 		end
 
-		if commandOverriden and retreatMoveOrders[unitID] then
-			local cmd1 = GetFirstCommand(unitID)
+		if commandOverriden then
+			if retreatMoveOrders[unitID] then
+				local cmd1 = GetFirstCommand(unitID)
 
-			if not cmd1 then
-				--retreatMoveOrders[unitID] = nil
-			elseif IsRetreatMove(unitID, cmd1) then
-				StartRetreat(unitID, true) --add retreat each time user issued new command, and FORCE it so that unit inside retreat zone remain in retreat zone.
-			elseif (cmd1.id == CMD_WAIT) then			
-				GiveOrderToUnit(unitID, CMD_WAIT, {}, {})
-			end
-			
-			--local selectedUnits = GetSelectedUnits()
-			--for i=1, #selectedUnits do
-				--local unitID = selectedUnits[i]
-				--retreatMoveOrders[unitID] = nil
-			--end
-
-		elseif  commandOverriden and retreatRearmOrders[unitID] then
-			local cmd1 = GetFirstCommand(unitID)
-			if (cmd1 and cmd1.id == CMD_REARM) then
-				StartRearm(unitID) --add rearm each time user issued new command
+				if not cmd1 then
+					retreatMoveOrders[unitID] = nil
+				elseif IsRetreatMove(unitID, cmd1) then
+					StartRetreat(unitID, true) --add retreat each time user issued new command, and FORCE it so that unit inside retreat zone remain in retreat zone.
+				elseif (cmd1.id == CMD_WAIT) then
+					StartRetreat(unitID, true)
+					-- GiveOrderToUnit(unitID, CMD_WAIT, {}, {})
+				end
+				
+			elseif retreatRearmOrders[unitID] then
+				local cmd1 = GetFirstCommand(unitID)
+				if (cmd1) and (cmd1.id == CMD_REARM) then
+					StartRearm(unitID) --add rearm each time user issued new command
+				-- elseif not HaveEmptyAirpad() then
+					-- retreatRearmOrders[unitID] = nil --in case bomber_command gadget forcefully remove CMD_REARM when airpad was reclaimed
+				end
 			end
 		end
 	end
