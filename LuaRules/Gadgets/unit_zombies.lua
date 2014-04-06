@@ -60,6 +60,8 @@ local reclaimed_data = {} -- holds initial gameframe, initial time in seconds, %
 local zombies_to_spawn = {}
 local zombies = {}
 
+local defined = false -- wordaround, because i meet some kind of racing condition, if any gadget spawns gaia BEFORE this gadget can process all the stuff...
+
 local WARNING_TIME = 5; -- seconds to start being scary before actual reanimation event
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
 if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 10 end -- minimum of 10 seconds, max is determined by rez speed
@@ -239,19 +241,16 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	gadget:UnitFinished(unitID, unitDefID, teamID)
 end
+
+local UnitFinished = function(_,_,_) end
   
 function gadget:UnitFinished(unitID, unitDefID, teamID)
-	if (teamID == GaiaTeamID) and not(zombies[unitID]) then
-		spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
-		spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
-		BringingDownTheHeavens(unitID)
-		zombies[unitID] = true
-	end
+	UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:FeatureCreated(featureID, allyTeam)
 	local resName, face = spGetFeatureResurrect(featureID)
-	if resName and face then
+	if resName and face and not(zombies_to_spawn[featureID]) then
 		if UnitDefNames[resName] then
 			local rez_time = UnitDefNames[resName].metalCost / ZOMBIES_REZ_SPEED
 			if (rez_time < ZOMBIES_REZ_MIN) then
@@ -273,6 +272,17 @@ end
 local function ReInit(reinit)
 	mapWidth = Game.mapSizeX
 	mapHeight = Game.mapSizeZ
+	if not(defined) then
+		UnitFinished = function(unitID, unitDefID, teamID, builderID)
+			if (teamID == GaiaTeamID) and not(zombies[unitID]) then
+				spGiveOrderToUnit(unitID,CMD_REPEAT,{1},{})
+				spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
+				BringingDownTheHeavens(unitID)
+				zombies[unitID] = true
+			end
+		end
+		defined = true
+	end
 	if (reinit) then
 		gameframe = spGetGameFrame()
 		local units = spGetAllUnits()
@@ -302,12 +312,13 @@ function gadget:Initialize()
 end
 
 function gadget:GameStart()
-	if (tonumber(modOptions.zombies) == 1) then
-		ReInit(false)
-	end
+-- 	if (tonumber(modOptions.zombies) == 1) then
+		ReInit(true) -- anything it does doesnt mess with existing zombies
+-- 	end
 end
 
 else -- UNSYNCED
+
 	Spring.Echo("zombies: unsynced mode");
 	local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 	local spGetSpectatingState = Spring.GetSpectatingState
