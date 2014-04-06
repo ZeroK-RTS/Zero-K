@@ -300,9 +300,8 @@ local function getDescription(unitDef)
 	
 end	
 
-local function weapons2Table(cells, weaponStats, ws, merw, index)
+local function weapons2Table(cells, weaponStats, ws)
 	local cells = cells
-	local mainweapon = merw and merw[index]
 	if ws.isShield then
 		cells[#cells+1] = ws.wname
 		cells[#cells+1] = ''
@@ -317,20 +316,16 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
-	elseif not ws.slaveTo then
-		if mainweapon then
-			for i=1, #mainweapon do
-				wsm = weaponStats[mainweapon[i]]
-				ws.damw = ws.damw + wsm.bestTypeDamagew
-				ws.dpsw = ws.dpsw + wsm.dpsw
-				ws.dam = ws.dam + wsm.bestTypeDamage
-				ws.dps = ws.dps + wsm.dps
-			end
-		end
+	else
 		-- multiply paralyze damage by 3 due to armor.txt
 		ws.damw = ws.damw * 3
 		ws.dpsw = ws.dpsw * 3
-
+		
+		local name_str = ws.wname
+		if ws.count > 1 then
+			name_str = name_str .. " x " .. ws.count
+		end
+		
 		local dps_str, dam_str = '', ''
 		if ws.dps > 0 then
 			dam_str = dam_str .. numformat(ws.dam,2)
@@ -347,13 +342,20 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		if ws.mult > 1 then
 			dam_str = dam_str .. " x " .. ws.mult
 		end
+		
+		local reload_str
+		if ws.reloadtime < 1 then
+			reload_str = string.format("%.2f", ws.reloadtime)
+		else
+			reload_str = string.format("%.1f", ws.reloadtime)
+		end
 
-		cells[#cells+1] = ws.wname
+		cells[#cells+1] = name_str
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Damage:'
 		cells[#cells+1] = dam_str
 		cells[#cells+1] = ' - Reloadtime:'
-		cells[#cells+1] = string.format("%.1f", ws.reloadtime) ..'s'
+		cells[#cells+1] = reload_str ..'s'
 		cells[#cells+1] = ' - Damage/second:'
 		cells[#cells+1] = dps_str
 		cells[#cells+1] = ' - Range:'
@@ -370,8 +372,6 @@ local function printWeapons(unitDef)
 	local weaponStats = {}
 	local bestDamage, bestDamageIndex, bestTypeDamage = 0,0,0
 
-	local merw = {}
-
 	local wd = WeaponDefs
 	if not wd then return false end	
 	
@@ -380,31 +380,32 @@ local function printWeapons(unitDef)
 		local weaponID = weapon.weaponDef
 		local weaponDef = WeaponDefs[weaponID]
 	
-		local weaponName = weaponDef.description
+		local weaponName = weaponDef.description or 'NoName Weapon'
+		local isDuplicate = false
 		
-		if (weaponName) then
-			local wsTemp = {}
+		for i=1,#weaponStats do
+			if weaponStats[i].weaponID == weaponID then
+				weaponStats[i].count = weaponStats[i].count + 1
+				isDuplicate = true
+				break
+			end
+		end
+		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('NoWeapon')) then 
+			local wsTemp = {weaponID = weaponID, count = 1}
 			if weaponDef.isShield then
-				wsTemp.wname = weaponDef.description or 'NoName Weapon'
+				wsTemp.wname = weaponName
 				wsTemp.isShield = true
 				wsTemp.radius = weaponDef.shieldRadius
 				wsTemp.power = weaponDef.shieldPower
 				wsTemp.regen = weaponDef.shieldPowerRegen
 				wsTemp.regenE = weaponDef.shieldPowerRegenEnergy
 			else
-				-- in 95.0 weapons are slaved to themselves for some reason
-				wsTemp.slaveTo = (weapon.slavedTo ~= 0 and weapon.slavedTo ~= i) and weapon.slavedTo or nil
-
-				if wsTemp.slaveTo then
-					merw[wsTemp.slaveTo] = merw[wsTemp.slaveTo] or {}
-					merw[wsTemp.slaveTo][#(merw[wsTemp.slaveTo])+1] = i
-				end
 				wsTemp.bestTypeDamage = 0
 				wsTemp.bestTypeDamagew = 0
 				wsTemp.paralyzer = weaponDef.paralyzer	
 				local val = weaponDef.damages[0]
 				if val then
-				  	if wsTemp.paralyzer then
+					if wsTemp.paralyzer then
 						wsTemp.bestTypeDamagew = val 
 					else
 						wsTemp.bestTypeDamage = val
@@ -454,15 +455,7 @@ local function printWeapons(unitDef)
 			if weaponDef.customParams.stats_empdamage then
 				wsTemp.damw = weaponDef.customParams.stats_empdamage
 			end
-			if not wsTemp.wname 
-				or wsTemp.wname:find('fake')
-				or wsTemp.wname:find('Fake')
-				or wsTemp.wname:find('NoWeapon')
-				then 
-				weaponStats[i] = nil
-			else
-				weaponStats[i] = wsTemp
-			end 
+			weaponStats[#weaponStats+1] = wsTemp
 		end
 	end
 	
@@ -470,7 +463,7 @@ local function printWeapons(unitDef)
 		
 	for index,ws in pairs(weaponStats) do
 		--if not ignoreweapon[unitDef.name] or not ignoreweapon[unitDef.name][index] then
-		cells = weapons2Table(cells, weaponStats, ws, merw, index)
+		cells = weapons2Table(cells, weaponStats, ws)
 		--end
 	end
 	
