@@ -278,6 +278,10 @@ unitConfigs = {
     rot    = 28,
     angle  = 10,
   },
+  [UnitDefNames.nebula.id] = {
+    rot    = 28,
+    angle  = 10,
+  },  
   [UnitDefNames.screamer.id] = {
     rot    = 30,
     angle  = 30,

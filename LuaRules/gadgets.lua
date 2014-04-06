@@ -20,7 +20,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local HANDLER_BASENAME = "gadgets.lua"
-local isMission = VFS.FileExists("mission.lua")
+local isMission = VFS.FileExists("mission.lua")	-- or Game.gameName:find("Scenario Editor")
 
 local DepthMod = 10
 local DepthValue = -1

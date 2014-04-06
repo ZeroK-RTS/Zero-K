@@ -121,7 +121,6 @@ local base = {
 			"module_companion_drone",
 		}
 	},
-	]]
 	{
 		name = "doubleshield",
 		modules = {
@@ -134,6 +133,7 @@ local base = {
 			"module_areashield",
 		},
 	},
+	]]
 }
 
 local ret = {count = 0}
