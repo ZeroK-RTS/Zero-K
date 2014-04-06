@@ -84,10 +84,15 @@ unitDef = {
       name                    = [[High-Energy Laserbeam]],
       areaOfEffect            = 14,
       beamTime                = 0.8,
-	  beamttl                 = 1,
+      beamttl                 = 1,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams            = {
+        statsprojectiles = 1,
+        statsdamage = 1500,
+      },
 
       damage                  = {
         default = 300,
@@ -105,7 +110,7 @@ unitDef = {
       laserFlareSize          = 10.4,
       minIntensity            = 1,
       noSelfDamage            = true,
-	  projectiles             = 5,
+      projectiles             = 5,
       range                   = 600,
       reloadtime              = 6,
       rgbColor                = [[0 0 1]],

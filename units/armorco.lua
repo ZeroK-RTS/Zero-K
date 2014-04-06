@@ -242,7 +242,12 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-
+      
+      customParams            = {
+        statsprojectiles = 3,
+        statsdamage = 600,
+      },
+      
       damage                  = {
         default = 300,
         planes  = 300,

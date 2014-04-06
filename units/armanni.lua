@@ -31,7 +31,7 @@ unitDef = {
 	helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter.]],
     helptext_fr    = [[Protégé derri?re le blindage lourd de l'Annihilator se trouve le terrible Canon Accélerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantités colossales d'énergie sur un point précis, percant tous les blindages aisément, le tout ? une distance terrifiante. Son co?t et sa consommation d'énergie la rendent cependant difficile ? employer.]],
     helptext_de    = [[Innerhalb der hart gepanzerten Hülle befindet sich ein verheerender Tachyonen Beschleuniger. Diese furchteinregende Waffe ist imstande in einem riesigen Umkreis punktgenaue Zerstörung nach sich zu ziehen, vorausgesetzt du verbindest es mit einer Energiequelle. Beachte aber, dass der Anniilator eine dezidierte Unterstützungswaffe ist; unbewacht wird er schnell von Angreifern überrumpelt.]],
-    helptext_pl    = [[Pod ciężkim pancerzem Annihilatora znajduje się niszczycielski Projektor Tachyonów. Ta straszliwa broń pozwala na zadawanie wysokich obrażeń oddalonym celom zakładając, że masz dość energii, by ją zasilić - musi znajdowac sie w sieci energetycznej o mocy co najmniej 50 energii. Mimo swej mocy Annihilator nie jest odpowiedzią na wszystkie problemy - ma niską szybkostrzelność, co czyni go podatnym na ataki wielu małych jednostek. W razie ataku artylerii lub bombowców można schować działo, co nie pozwala na strzelanie, ale zmniejsza otrzymane obrażenia czterokrotnie.]],
+    helptext_pl    = [[Pod ciężkim pancerzem Annihilatora znajduje si�?niszczycielski Projektor Tachyonów. Ta straszliwa bro�?pozwala na zadawanie wysokich obraże�?oddalonym celom zakładaj�?, że masz doś�?energii, by j�?zasili�?- musi znajdowac sie w sieci energetycznej o mocy co najmniej 50 energii. Mimo swej mocy Annihilator nie jest odpowiedzi�?na wszystkie problemy - ma nisk�?szybkostrzelnoś�? co czyni go podatnym na ataki wielu małych jednostek. W razie ataku artylerii lub bombowców można schowa�?działo, co nie pozwala na strzelanie, ale zmniejsza otrzymane obrażenia czterokrotnie.]],
 	keeptooltip    = [[any string I want]],
     neededlink     = 50,
     pylonrange     = 50,
@@ -91,7 +91,11 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-
+      
+      customParams            = {
+        statsprojectiles = 1,
+        statsdamage = 4000,
+      },
       damage                  = {
         default = 800,
         planes  = 800,

@@ -109,6 +109,11 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams            = {
+        statsprojectiles = 1,
+        statsdamage = 3000,
+      },
 
       damage                  = {
         default = 600,
@@ -125,12 +130,12 @@ unitDef = {
       laserFlareSize          = 16.94,
       minIntensity            = 1,
       noSelfDamage            = true,
-	  projectiles             = 5,
+      projectiles             = 5,
       range                   = 950,
       reloadtime              = 10,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
-	  soundStartVolume        = 3,
+      soundStartVolume        = 3,
       targetMoveError         = 0.3,
       texture1                = [[largelaserdark]],
       texture2                = [[flaredark]],

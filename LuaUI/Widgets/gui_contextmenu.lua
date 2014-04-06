@@ -40,6 +40,8 @@ local color = confdata.color
 local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
+local emptyTable = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -379,6 +381,7 @@ local function printWeapons(unitDef)
 		local weapon = unitDef.weapons[i]
 		local weaponID = weapon.weaponDef
 		local weaponDef = WeaponDefs[weaponID]
+		local cp = weaponDef.customParams or emptyTable
 	
 		local weaponName = weaponDef.description or 'NoName Weapon'
 		local isDuplicate = false
@@ -403,7 +406,7 @@ local function printWeapons(unitDef)
 				wsTemp.bestTypeDamage = 0
 				wsTemp.bestTypeDamagew = 0
 				wsTemp.paralyzer = weaponDef.paralyzer	
-				local val = weaponDef.damages[0]
+				local val = tonumber(cp.statsdamage) or weaponDef.damages[0]
 				if val then
 					if wsTemp.paralyzer then
 						wsTemp.bestTypeDamagew = val 
@@ -415,7 +418,8 @@ local function printWeapons(unitDef)
 				wsTemp.projectiles = weaponDef.projectiles or 1
 				wsTemp.dam = 0
 				wsTemp.damw = 0
-				wsTemp.mult = wsTemp.burst * wsTemp.projectiles
+				
+				wsTemp.mult = tonumber(cp.statsprojectiles) or wsTemp.burst * wsTemp.projectiles
 				if wsTemp.paralyzer then
 					wsTemp.damw = wsTemp.bestTypeDamagew
 				else
