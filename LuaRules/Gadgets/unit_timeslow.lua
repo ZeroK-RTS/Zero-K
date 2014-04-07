@@ -89,6 +89,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		slowedUnits[unitID] = {
 			slowDamage = 0,
 			degradeTimer = DEGRADE_TIMER,
+			perma = false,
 		}
 		GG.attUnits[unitID] = true -- unit with attribute change to be handled by unit_attributes
 	end
@@ -177,6 +178,7 @@ local function addSlowDamage(unitID, damage)
 		slowedUnits[unitID] = {
 			slowDamage = 0,
 			degradeTimer = DEGRADE_TIMER,
+			perma = false,
 		}
 		GG.attUnits[unitID] = true -- unit with attribute change to be handled by unit_attributes
 	end
@@ -195,9 +197,16 @@ local function getSlowDamage(unitID)
 	return false
 end
 
+local function permaSlowDamage(unitID, perma)
+	if slowedUnits[unitID] then
+		slowedUnits[unitID].perma = perma
+	end
+end
+
 -- morph uses this
 GG.getSlowDamage = getSlowDamage
 GG.addSlowDamage = addSlowDamage
+GG.permaSlowDamage = permaSlowDamage -- true/false whether unit is permaslowed, used by unit_zombies.lua
 
 local function removeUnit(unitID)
 	slowedUnits[unitID] = nil
@@ -206,7 +215,7 @@ end
 function gadget:GameFrame(f)
     if (f-1) % UPDATE_PERIOD == 0 then
         for unitID, state in pairs(slowedUnits) do
-
+		if not(state.perma) then
 			if state.degradeTimer <= 0 then
 
 				local health = spGetUnitHealth(unitID) or 0
@@ -222,7 +231,7 @@ function gadget:GameFrame(f)
 			else
 				state.degradeTimer = state.degradeTimer-1
 			end
-
+		end
         end
     end
 end

@@ -1,10 +1,10 @@
-local version = "0.1.1"
+local version = "0.1.2"
 
 function gadget:GetInfo()
 	return {
 		name		= "Zombies!",
 		desc		= "Features are dangerous, reclaim them, as fast, as possible! Version "..version,
-		author		= "Tom Fyuri",		-- original gadget was mapmod for trololo by banana_Ai, this is revamped version as a zk anymap gamemode
+		author		= "Tom Fyuri",		-- original gadget was mapmod for trololo by banana_Ai, this is revamped version as a zk anymap gamemode. Thanks Anarchid!
 		date		= "Mar 2014",
 		license		= "GPL v2 or later",
 		layer		= -3,
@@ -15,6 +15,7 @@ end
 --SYNCED-------------------------------------------------------------------
 
 -- changelog
+-- 7 april 2014 - 0.1.2. Added permaslow option. Default on. 50% is max slow for now.
 -- 5 april 2014 - 0.1.1. Sfx, gfx, factory orders added. Slow down upon reclaim added. Thanks Anarchid.
 -- 5 april 2014 - 0.1.0. Release.
 
@@ -44,6 +45,7 @@ local spGetUnitIsDead	  		= Spring.GetUnitIsDead
 local spGiveOrderArrayToUnitArray	= Spring.GiveOrderArrayToUnitArray
 local spGetUnitsInCylinder		= Spring.GetUnitsInCylinder
 local spSetTeamResource			= Spring.SetTeamResource
+local spGetUnitHealth			= Spring.GetUnitHealth
 
 local waterLevel = modOptions.waterlevel and tonumber(modOptions.waterlevel) or 0
 local GaiaAllyTeamID					= select(6,spGetTeamInfo(GaiaTeamID))
@@ -67,6 +69,12 @@ local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
 if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 10 end -- minimum of 10 seconds, max is determined by rez speed
 local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
 if (tonumber(ZOMBIES_REZ_SPEED)==nil) then ZOMBIES_REZ_SPEED = 12 end -- 12m/s, big units have a really long time to respawn
+local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow)
+if (tonumber(ZOMBIES_PERMA_SLOW)==nil) then ZOMBIES_PERMA_SLOW = 1 end -- from 0 to 1, symbolises from 0% to 50% slow which is always on
+local OREMEX = (tonumber(modOptions.oremex) == 1) -- if its oremex, do not slow down ore extractors, no point
+
+local permaSlowDamage = GG.permaSlowDamage
+local addSlowDamage = GG.addSlowDamage
 
 local CMD_REPEAT = CMD.REPEAT
 local CMD_MOVE_STATE = CMD.MOVE_STATE
@@ -76,6 +84,10 @@ local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_GUARD = CMD.GUARD
 
 local CEG_SPAWN = [[zombie]];
+
+local MexDefs = {
+	[UnitDefNames["cormex"].id] = true,
+}
 
 local function disSQ(x1,y1,x2,y2)
 	return (x1 - x2)^2 + (y1 - y2)^2
@@ -233,6 +245,10 @@ end
 function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 	if zombies[unitID] and newTeamID~=GaiaTeamID then
 		zombies[unitID] = nil
+		-- taking away zombie from zombie team unpermaslows it
+		if (ZOMBIES_PERMA_SLOW > 0) then
+			permaSlowDamage(unitID, false)
+		end
 	elseif newTeamID==GaiaTeamID then
 		gadget:UnitFinished(unitID, unitDefID, newTeamID)
 	end
@@ -279,6 +295,17 @@ local function ReInit(reinit)
 				spGiveOrderToUnit(unitID,CMD_MOVE_STATE,{2},{})
 				BringingDownTheHeavens(unitID)
 				zombies[unitID] = true
+				if (ZOMBIES_PERMA_SLOW > 0) then
+					if not(OREMEX and MexDefs[unitDefID]) then
+						local maxHealth = select(2, spGetUnitHealth(unitID))
+						if maxHealth then
+							local mult = ZOMBIES_PERMA_SLOW
+							if (mult < 0) then mult = 0 end
+							addSlowDamage(unitID,(maxHealth/2)*mult)
+							permaSlowDamage(unitID, true)
+						end
+					end
+				end
 			end
 		end
 		defined = true

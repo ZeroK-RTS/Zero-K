@@ -242,6 +242,17 @@ local options = {
     step=1,
   },
   {
+    key    = 'zombies_permaslow',
+    name   = 'Zombie permaslow modifier',
+    desc   = "If more than 0 zombies are permaslowed to half of that amount, so 1 means 50% slow.",
+    type   = 'int',
+    section= 'zombie',
+    def=1,
+    min=0,
+    max=1,
+    step=0.01,
+  },
+  {
     key    = 'cncmex',
     name   = 'Ore Mex Settings',
     desc   = 'Settings for Ore Mex mutator.',
