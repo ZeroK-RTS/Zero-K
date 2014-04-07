@@ -82,6 +82,12 @@ local retreatedUnits = {} --recently retreating unit that is about to be deselec
 local currentSelection = nil --current unit selection (for deselecting any retreating units. See code for more detail)
 local maximumDeselect = 0.51 -- (fraction), threshold ratio of retreating-unit to healthy-unit where retreating-unit become the majority and thus turning off auto-deselect.
 
+local jumpDefNames = VFS.Include("LuaRules/Configs/jump_defs.lua")
+local jumpRange = {}
+for name, data in pairs(jumpDefNames) do
+	jumpRange[UnitDefNames[name].id] = data.range
+end
+
 -------------------------------------
 options_path = 'Game/Unit AI/Retreat Zone' --//for use 'with gui_epicmenu.lua'
 options_order = {'overrideableCommand','removeFromSelection','returnLastPosition'}
@@ -338,6 +344,17 @@ local function StartRetreat(unitID, force)
 		GiveOrderToUnit(unitID, CMD_INSERT, { insertIndex+1, CMD_WAIT, CMD.OPT_SHIFT}, CMD.OPT_ALT) --SHIFT W
 		
 		retreatMoveOrders[unitID] = {hx, hy, hz}
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if unitDefID and jumpRange[unitDefID] then
+			local jumpReload = spGetUnitRulesParam(unitID,"jumpReload")
+			if not jumpReload or jumpReload == 1 then
+				local ux, uy, uz = GetUnitPosition(unitID)
+				local moveDistance = math.sqrt((ux - hx)^2 + (uz - hz)^2)
+				local disScale = jumpRange[unitDefID]/moveDistance*0.95
+				local cx, cy, cz = ux + disScale*(hx - ux), hy, uz + disScale*(hz - uz)
+				GiveClampedOrderToUnit(unitID, CMD_INSERT, { insertIndex, CMD_JUMP, CMD.OPT_INTERNAL, cx, cy, cz}, CMD.OPT_ALT)
+			end
+		end
 		
 		--add last position
 		if options.returnLastPosition.value then

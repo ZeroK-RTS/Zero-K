@@ -63,6 +63,9 @@ function script.Create()
 	Hide(door2)
 	Hide(bottom)
 	
+	Move(base, x_axis, -3)
+	Move(base, z_axis, -6)
+	
 	Move(gun, y_axis, 2)
 	Turn(base, y_axis, math.rad(180))
 
@@ -155,15 +158,17 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if  severity <= 0.25  then
 		Explode(base, sfxNone)
-		Explode(wake1, sfxNone)
-		Explode(wake2, sfxNone)
-		Explode(wake3, sfxNone)
-		Explode(wake4, sfxNone)
-		Explode(wake5, sfxNone)
-		Explode(wake6, sfxNone)
+		Explode(door1, sfxNone)
+		Explode(door2, sfxNone)
+		Explode(back, sfxNone)
 		return 1
 	elseif severity <= 0.50  then
 		Explode(base, sfxNone)
+		Explode(door1, sfxNone)
+		Explode(door2, sfxNone)
+		Explode(back, sfxNone)
+		Explode(rim1, sfxShatter)
+		Explode(rim2, sfxShatter)
 		Explode(wake1, sfxFall)
 		Explode(wake2, sfxFall)
 		Explode(wake3, sfxFall)
@@ -172,7 +177,11 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(wake6, sfxFall)
 		return 1
 	end
-	Explode(base, sfxNone)
+	Explode(door1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
+	Explode(door2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
+	Explode(back, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
+	Explode(rim1, sfxShatter)
+	Explode(rim2, sfxShatter)
 	Explode(wake1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
 	Explode(wake2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
 	Explode(wake3, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
