@@ -72,14 +72,14 @@ local options = {
     section= 'modifiers',
     def = false,
   },
-  {
-    key = "mutespec",
-    name = "Mute Spectators",
-    desc = "Prevent spectators from communcating with players",
-    type = "bool",
-    section= 'modifiers',
-    def = false,
-  },
+  --{
+  --  key = "mutespec",
+  --  name = "Mute Spectators",
+  --  desc = "Prevent spectators from communcating with players",
+  --  type = "bool",
+  --  section= 'modifiers',
+  --  def = false,
+  --},
   {
     key    = 'koth',
     name   = 'King of the Hill Settings',
