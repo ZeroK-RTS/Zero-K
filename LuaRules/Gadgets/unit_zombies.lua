@@ -64,6 +64,10 @@ local zombies = {}
 
 local defined = false -- wordaround, because i meet some kind of racing condition, if any gadget spawns gaia BEFORE this gadget can process all the stuff...
 
+local MexDefs = {
+	[UnitDefNames["cormex"].id] = true,
+}
+
 local WARNING_TIME = 5; -- seconds to start being scary before actual reanimation event
 local ZOMBIES_REZ_MIN = tonumber(modOptions.zombies_delay)
 if (tonumber(ZOMBIES_REZ_MIN)==nil) then ZOMBIES_REZ_MIN = 10 end -- minimum of 10 seconds, max is determined by rez speed
@@ -84,10 +88,6 @@ local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_GUARD = CMD.GUARD
 
 local CEG_SPAWN = [[zombie]];
-
-local MexDefs = {
-	[UnitDefNames["cormex"].id] = true,
-}
 
 local function disSQ(x1,y1,x2,y2)
 	return (x1 - x2)^2 + (y1 - y2)^2
