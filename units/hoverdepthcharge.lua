@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[hoverdepthcharge]],
-  name                = [[Morningstar]],
+  name                = [[Claymore]],
   description         = [[Antisub Hovercraft]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
@@ -23,9 +23,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext        = [[The somewhat suicidal Morningstar is armed with a heavy depthcharge launcher and has no qualms about dropping it on land.]],
+    helptext        = [[The somewhat suicidal Claymore is armed with a heavy depthcharge launcher and has no qualms about dropping it on land.]],
     description_pl  = [[Poduszkowiec przeciwpodwodny]],
-    helptext_pl     = [[Morningstar jest uzbrojony w ciezkie ladunki glebinowe, ktore moze wyrzucac takze na ladzie.]],
+    helptext_pl     = [[Claymore jest uzbrojony w ciezkie ladunki glebinowe, ktore moze wyrzucac takze na ladzie.]],
     turnatfullspeed = [[1]],
   },
 
@@ -104,7 +104,7 @@ unitDef = {
       impulseFactor           = 1,
       interceptedByShieldType = 1,
       model                   = [[depthcharge_big.s3o]],
-	  myGravity               = 0.1,
+	  myGravity               = 0.2,
       noSelfDamage            = false,
       numbounce               = 4,
       predictBoost            = 0,
@@ -114,7 +114,7 @@ unitDef = {
       soundHitWet             = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
       soundStartVolume        = 8,
-      startVelocity           = 20,
+      startVelocity           = 5,
       tolerance               = 1000000,
       tracks                  = true,
       turnRate                = 30000,
@@ -168,7 +168,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Morningstar]],
+      description      = [[Wreckage - Claymore]],
       blocking         = false,
       category         = [[corpses]],
       damage           = 900,
@@ -189,7 +189,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Morningstar]],
+      description      = [[Debris - Claymore]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 750,

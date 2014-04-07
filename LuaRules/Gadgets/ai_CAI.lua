@@ -2372,7 +2372,7 @@ local function diluteEnemyForceComposition(allyTeam)
 end
 
 local function addValueToHeatmap(indexer,heatmap, value, aX, aZ)
-	if value > 0 then
+	if value > 0 and heatmap[aX] and heatmap[aX][aZ] then
 		if heatmap[aX][aZ].cost == 0 then
 			indexer.count = indexer.count + 1
 			indexer[indexer.count] = {x = heatmapPosition[aX][aZ].x, y = heatmapPosition[aX][aZ].y, z = heatmapPosition[aX][aZ].z, aX = aX, aZ = aZ}
