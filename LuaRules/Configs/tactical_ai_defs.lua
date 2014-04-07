@@ -167,6 +167,7 @@ local artyRangeSkirmieeArray = {
 	["armorco"] = true,
 }
 
+veryShortRangeSkirmieeArray = NameTableToUnitDefID(veryShortRangeSkirmieeArray)
 shortRangeSkirmieeArray = NameTableToUnitDefID(shortRangeSkirmieeArray)
 riotRangeSkirmieeArray = NameTableToUnitDefID(riotRangeSkirmieeArray)
 lowMedRangeSkirmieeArray = NameTableToUnitDefID(lowMedRangeSkirmieeArray)
