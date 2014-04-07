@@ -105,9 +105,9 @@ end
 local function OpenAllClownSlots(unitID, unitDefID) -- give factory something to do
 	local buildopts = UnitDefs[unitDefID].buildOptions
 	local orders = {}
-	local x,y,z = spGetUnitPosition(unitID)
+	--local x,y,z = spGetUnitPosition(unitID)
 	for i=1,random(10,30) do
-		orders[#orders+1] = { -buildopts[random(1,#buildopts)], {random(-30,30)+x, y, random(-30,30)+z }, {} }
+		orders[#orders+1] = { -buildopts[random(1,#buildopts)], {}, {} }
 	end
 	if (#orders > 0) then
 		if (spGetUnitIsDead(unitID) == false) then
