@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[armrectr]],
-  name                   = [[Rector]],
+  name                   = [[Conjuror]],
   description            = [[Cloaking Construction Bot, Builds at 5 m/s]],
   acceleration           = 0.5,
   activateWhenBuilt      = true,
