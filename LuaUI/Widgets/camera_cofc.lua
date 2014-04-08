@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.133 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.134 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-November-12
+    date      = "2011-03-16", --2013-April-9
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -1484,7 +1484,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+local missedMouseRelease = false
 function widget:Update(dt)
 	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
     
@@ -1726,6 +1726,20 @@ function widget:Update(dt)
 		spSetCameraState(cs,0)
 	end
 	
+	if missedMouseRelease and camcycle==0 then 
+		--Workaround/Fix for middle-mouse button release event not detected:
+		--We request MouseRelease event for middle-mouse release in MousePress by returning "true",
+		--but when 2 key is pressed at same time, the MouseRelease is called for the first key which is released (not necessarily middle-mouse button).
+		--If that happen, we will loop here every half-second until the middle-mouse button is really released.
+		local _,_, _, mmb = spGetMouseState()
+		if (not mmb) then
+			rotate = nil
+			smoothscroll = false
+			springscroll = false
+			missedMouseRelease = false
+		end
+	end
+	
 end
 
 function widget:MouseMove(x, y, dx, dy, button)
@@ -1867,6 +1881,8 @@ function widget:MouseRelease(x, y, button)
 		smoothscroll = false
 		springscroll = false
 		return -1
+	else
+		missedMouseRelease = true
 	end
 end
 
