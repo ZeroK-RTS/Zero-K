@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armasp]],
   name                = [[Air Repair/Rearm Pad]],
-  description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s]],
+  description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad]],
   acceleration        = 0,
   activateWhenBuilt   = true,
   brakeRate           = 0,
@@ -24,8 +24,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Repariert automatisch eigene/verbündete Lufteinheiten, repariert mit 2.5 e/s]],
-    description_pl = [[Stacja naprawy i dozbrajania samolotow, moc 2.5 e/s]],
+    description_de = [[Repariert automatisch eigene/verbündete Lufteinheiten, jedes Pad repariert mit 2.5 e/s]],
+    description_pl = [[Stacja naprawy i dozbrajania samolotow, moc stanowiska 2.5 e/s]],
     helptext       = [[The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
     helptext_de    = [[Das Air Repair/Rearm Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
     helptext_pl    = [[Ta Stacja moze naprawiac samoloty i odnawiac amunicje bombowcom. Posiada 4 stanowiska.]],
