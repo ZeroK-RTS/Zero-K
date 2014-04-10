@@ -17,8 +17,6 @@ return {
 		{	"chatswitchally",	"Alt+enter",},
 		{	"chatall",	"Ctrl+enter",},
 		{	"chatswitchall",	"Ctrl+enter",},
-		{	"chatspec",	"Shift+enter",},
-		{	"chatswitchspec",	"Shift+enter",},
 		{	"chat",	"Any+enter",},
 		{	"edit_return",	"Any+enter",},
 		{	"pause",	"pause",},
