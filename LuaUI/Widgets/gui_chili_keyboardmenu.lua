@@ -397,8 +397,8 @@ end
 local function ClearKeyButtons()
 	for k, v in pairs( key_buttons ) do
 		key_buttons[k]:SetCaption( '' )
-		key_buttons[k].OnClick = {}
-		key_buttons[k].OnClick = {}
+		key_buttons[k].OnMouseDown = {}
+		key_buttons[k].OnMouseUp = {}
 		key_buttons[k]:ClearChildren()
 		key_buttons[k].tooltip = nil
 		SetButtonColor( key_buttons[k], white_table )
@@ -466,7 +466,7 @@ local function AddBuildButton(color)
 			height = '80%',
 		}
 	)
-	key_buttons['D'].OnClick = { function() MakeBuildMenu(); end }
+	key_buttons['D'].OnMouseDown = { function() MakeBuildMenu(); end }
 	if color then
 		SetButtonColor(key_buttons['D'], color)
 	end
@@ -534,7 +534,7 @@ local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
 	button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', height='20%', fontSize = 11, bottom=0, fontShadow = true,  } )
 	
 	
-	button1.OnClick = { function() CommandFunction( -(ud.id) ); end }
+	button1.OnMouseDown = { function() CommandFunction( -(ud.id) ); end }
 end
 
 local function AddBuildStructureButton(item, index)
@@ -587,8 +587,8 @@ local function AddBuildStructureButton(item, index)
 	local tooltip1 = (menu_level ~= 0) and ('Build: ' ..ud.humanName .. ' - ' .. ud.tooltip) or ('Category: ' .. item.label)
 
 	local button1 = key_buttons[index]
-	--button1.OnClick = { function() BuildMode(false); end }
-	button1.OnClick = { func }
+	--button1.OnMouseDown = { function() BuildMode(false); end }
+	button1.OnMouseUp = { func }
 	button1.tooltip = tooltip1
 	
 	if menu_level == 0 and item.label then
@@ -756,7 +756,7 @@ local function SetupTabs()
 			--tooltip = '',
 			backgroundColor = white_table,
 			
-			OnClick = { function()
+			OnMouseDown = { function()
 				SetCurTab(tab)
 				BuildMode(false)
 			end },
@@ -867,7 +867,7 @@ end
 
 local function UpdateButton( hotkey_key, hotkey, name, fcn, tooltip, texture, color )
 
-	key_buttons[hotkey_key].OnClick = { fcn }
+	key_buttons[hotkey_key].OnMouseDown = { fcn }
 	key_buttons[hotkey_key].tooltip = tooltip
 	AddHotkeyLabel( hotkey_key, hotkey )
 	if texture and texture ~= "" then
@@ -1206,8 +1206,8 @@ function widget:KeyPress(key, modifier)
 		
 		local pressbutton = key_buttons[index]
 		if pressbutton then
-			if #(pressbutton.OnClick) > 0 then
-				pressbutton.OnClick[1]()
+			if #(pressbutton.OnMouseUp) > 0 then
+				pressbutton.OnMouseUp[1]()
 			end
 			return true
 		end
