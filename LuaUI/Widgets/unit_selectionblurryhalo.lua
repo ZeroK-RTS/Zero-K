@@ -238,7 +238,7 @@ local function GetVisibleUnits()
 	    local unitID = units[i]
 	    if (spIsUnitSelected(unitID)) then
 		    visibleSelected[#visibleSelected+1] = unitID
-	    elseif showAlly and not WG.allySelUnits == nil and WG.allySelUnits[unitID] then
+	    elseif showAlly and WG.allySelUnits and WG.allySelUnits[unitID] then
 		    visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
 	    end
     end
