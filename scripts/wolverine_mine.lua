@@ -3,6 +3,7 @@ local flare = piece 'flare'
 
 function script.Create()
 	Spin( flare , y_axis, 9000 )
+	GG.SetWantedCloaked(unitID, 1)
 end
 
 function script.AimFromWeapon(num)
