@@ -231,6 +231,10 @@ local function getMeanMetalIncome()
 end
 
 local function awardAward(team, awardType, record)
+	if not awardList[team] then --random check for devving.
+		echo('<Award Error> Missing award list for team ' .. team)
+		return
+	end
 	awardList[team][awardType] = record
 
 	if TESTMODE then
