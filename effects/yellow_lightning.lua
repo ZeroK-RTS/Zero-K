@@ -22,18 +22,6 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
-    electricstorm = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[10 r200]],
-        explosiongenerator = [[custom:WHITE_LIGHTNING_STORMBOLT]],
-        pos                = [[-100 r200, 1, -100 r200]],
-      },
-    },
     groundflash = {
       circlealpha        = 1,
       circlegrowth       = 0,
@@ -92,7 +80,7 @@ return {
       },
     },
   },
-
+  
   ["yellow_lightning_stormbolt"] = {
     groundflash = {
       circlealpha        = 1,

@@ -9,7 +9,6 @@ return {
       ground             = true,
       properties = {
         color              = [[.2, .15, .1]],
-        lifetime           = 220,
         pos                = [[-3 r6, r6, -3 r6]],
         size               = 10,
         slowdown           = 1,
