@@ -1,13 +1,13 @@
 function widget:GetInfo()
   return {
-    name      = "Retreat",
+    name      = "Retreat2",
     desc      = "v0.287 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2014-4-5
     license   = "GNU GPL, v2 or later",
     handler   = true,
     layer     = 2, --start after unit_start_state.lua (to apply saved initial retreat state)
-    enabled   = true
+    enabled   = false
   }
 end
 --TODO: workaround for airplane overshoot while landing in Spring 96

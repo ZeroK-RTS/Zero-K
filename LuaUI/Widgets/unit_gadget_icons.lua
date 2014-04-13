@@ -31,10 +31,12 @@ local myAllyTeamID = 666
 local powerTexture = 'Luaui/Images/visible_energy.png'
 local facplopTexture = 'Luaui/Images/factory.png'
 local rearmTexture = 'LuaUI/Images/noammo.png'
+local retreatTexture = 'Anims/cursorrepair_old.png'
 
 local lastLowPower = {}
 local lastFacPlop = {}
 local lastRearm = {}
+local lastRetreat = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -82,6 +84,18 @@ function SetIcons(unitID)
 				end
 			end
 		end
+		
+		local retreat = Spring.GetUnitRulesParam(unitID, "retreat") 
+		if retreat then
+			if (not lastRetreat[unitID]) or lastRetreat[unitID] ~= lowpower then
+				lastRetreat[unitID] = retreat
+				if retreat ~= 0 then
+					WG.icons.SetUnitIcon( unitID, {name='retreat', texture=retreatTexture} )
+				else
+					WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
+				end
+			end
+		end
 	end
 end
 
@@ -90,6 +104,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	WG.icons.SetUnitIcon( unitID, {name='lowpower', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
+	WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
 end
 
 -------------------------------------------------------------------------------------
@@ -105,6 +120,11 @@ end
 
 function widget:Initialize()
 	WG.icons.SetOrder( 'lowpower', 2 )
+	
+	
+	WG.icons.SetOrder( 'retreat', 5 )
+	WG.icons.SetDisplay( 'retreat', true )
+	WG.icons.SetPulse( 'retreat', true )
 end
 
 --------------------------------------------------------------------------------
