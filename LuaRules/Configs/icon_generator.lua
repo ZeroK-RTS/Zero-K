@@ -227,6 +227,9 @@ unitConfigs = {
     unfold = true,
     attack = true,
   },
+  [UnitDefNames.hoverdepthcharge.id] = {
+    unfold = true,
+  },
   [UnitDefNames.cormex.id] = {
     clamp  = 0,
     unfold = true,
