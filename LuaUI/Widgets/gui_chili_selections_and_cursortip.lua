@@ -2360,7 +2360,7 @@ function widget:Initialize()
 		dockable = false,
 		resizable   = false;
 		draggable = false,
-		OnClick={ function(self)
+		OnMouseDown={ function(self)
 			local _,_, meta,_ = spGetModKeyState()
 			if not meta then return false end
 			WG.crude.OpenPath('Settings/HUD Panels/Selected Units Window')

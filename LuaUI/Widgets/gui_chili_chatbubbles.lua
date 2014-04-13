@@ -444,10 +444,11 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		window_id = window_id,
 
 		draggable = false,
-		OnClick = {function()
+		-- OnMouseDown is needed for OnClick
+		OnMouseDown = {function(self) return true end}, --capture click (don't allow window to pass the click). this prevent user from accidentally clicking on the ground while clicking on the window.
+		OnClick = {function(self)
 			local p = windows_points[window_id]
 			Spring.SetCameraTarget(p.x, p.y, p.z,1)
-			return true --capture click (don't allow window to pass the click). this prevent user from accidentally clicking on the ground while clicking on the window.
 		end},
 	}
 	function w:HitTest(x,y)  -- FIXME: chili hacked to allow OnClick on window

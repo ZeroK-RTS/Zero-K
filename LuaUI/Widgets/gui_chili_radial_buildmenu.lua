@@ -136,7 +136,7 @@ local function AddBuildButton()
 		caption = '', 
 		tooltip = 'Click or press ' .. green .. 'D' .. white .. ' to activate build menu hotkeys.\n' 
 			.. 'Press ' .. green .. 'Space+D' .. white .. ' to build the last thing you built.' ,
-		OnClick = { Make_KB_Menu, },
+		OnMouseUp = { Make_KB_Menu, },
 		children = {
 			Label:New{ caption = 'BUIL'.. green ..'D', fontSize=14, bottom='1', fontShadow = true, },
 			Image:New {
@@ -204,8 +204,8 @@ local function AddButton(item, index)
 		name = index ,
 		caption = '', 
 		tooltip = tooltip1,
-		OnClick = { function() HotKeyMode(false); end }, 
-		OnClick = { func }, 
+		OnMouseDown = { function() HotKeyMode(false); end }, 
+		OnMouseUp = { func }, 
 		children = {
 		},
 	}
@@ -343,7 +343,7 @@ function widget:KeyPress(k, modifier)
 		local index = AngleToIndex(angle)
 		local pressbutton = grid_menu:GetChildByName(index+0)
 		if pressbutton then
-			pressbutton.OnClick[1]()
+			pressbutton.OnMouseUp[1]()
 			return true
 		end
 	end

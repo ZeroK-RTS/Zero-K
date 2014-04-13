@@ -630,7 +630,7 @@ local function displayMessage(msg, remake)
 			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
 				local cur = WG.alliedCursorsPos[msg.player.id]
 				if cur then
-					textbox.OnClick = {function(self, x, y, mouse)
+					textbox.OnMouseDown = {function(self, x, y, mouse)
 							local alt,ctrl, meta,shift = Spring.GetModKeyState()
 							if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
 							local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
@@ -945,16 +945,16 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
-        selfImplementedMinimizable = 
-            function (show)
-                if show then
+		selfImplementedMinimizable = 
+			function (show)
+				if show then
 					options.autohide.value = false
 					showConsole()
-                else
+				else
 					options.autohide.value = true
 					hideConsole()
-                end
-            end,
+				end
+			end,
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
 		color = { 0, 0, 0, 0 },
@@ -962,7 +962,7 @@ function widget:Initialize()
 			scrollpanel1,
 			inputspace,
 		},
-		OnClick = {
+		OnMouseDown = {
 			function(self) --//click on scroll bar shortcut to "Settings/HUD Panels/Chat/Console".
 				local _,_, meta,_ = Spring.GetModKeyState()
 				if not meta then return false end

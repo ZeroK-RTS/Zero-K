@@ -1294,7 +1294,7 @@ function widget:Initialize()
 		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
-		OnClick={ function(self) --// click+ space on integral-menu tab will open a Game-menu.
+		OnMouseDown={ function(self) --// click+ space on integral-menu tab will open a Game-menu.
 			local _,_, meta,_ = Spring.GetModKeyState()
 			if not meta then return false end --allow button to continue its function
 			WG.crude.OpenPath(options_path)

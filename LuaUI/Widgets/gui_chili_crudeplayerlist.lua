@@ -826,7 +826,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimizable = true,
 		minWidth = x_bound,
-		OnClick={ function(self)
+		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
 			WG.crude.OpenPath(options_path)
