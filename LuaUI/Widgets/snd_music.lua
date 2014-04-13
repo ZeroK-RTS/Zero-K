@@ -155,6 +155,9 @@ local function StopTrack(noContinue)
 	Spring.StopSoundStream()
 	if noContinue then
 		haltMusic = true
+	else
+		haltMusic = false
+		StartTrack()
 	end
 end
 
@@ -170,7 +173,7 @@ local function SetPeaceThreshold(num)
 	if num and num >= 0 then
 		peaceThreshold = num
 	else
-		peaceThreshold = 5000
+		peaceThreshold = 1000
 	end	
 end
 
@@ -244,7 +247,7 @@ function widget:Update(dt)
 		end
 		dethklok[1] = 0 -- empty the first row
 		
-		if (musicType ~= "custom") then
+		if (musicType == 'war' or musicType == 'peace') then
 			if (totalKilled >= warThreshold) then
 				musicType = 'war'
 			elseif (totalKilled <= peaceThreshold) then
