@@ -1318,7 +1318,7 @@ function widget:Initialize()
 		--backgroundColor = {0.1, 0.1, 0.1, 1},
 --		skinName  = "DarkGlass",
 
-		OnClick={ function(self) --// click+ space on any button on the integral-menu will open a Game-menu.
+		OnMouseDown={ function(self) --// click+ space on any button on the integral-menu will open a Game-menu.
 			-- local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
 			-- if not forwardSlash then return false end
 			local _,_, meta,_ = Spring.GetModKeyState()
@@ -1396,7 +1396,7 @@ function widget:Initialize()
 			y = "0%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
-			OnClick={ function(self) --// click+ space on any unit-State button will open Unit-AI menu, it overrides similar function above.
+			OnMouseDown={ function(self) --// click+ space on any unit-State button will open Unit-AI menu, it overrides similar function above.
 				-- local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
 				-- if not forwardSlash then return false end
 				local _,_, meta,_ = Spring.GetModKeyState()
