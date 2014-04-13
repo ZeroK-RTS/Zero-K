@@ -51,10 +51,8 @@ local col_buildpower = {0.8, 0.8, 0.2, 1}
 --------------------------------------------------------------------------------
 
 local window
-local trkbar_metal
 local bar_metal
 local bar_metal_reserve_overlay
-local trkbar_energy
 local bar_energy
 local bar_energy_overlay
 local bar_energy_reserve_overlay
@@ -417,6 +415,8 @@ end
 
 local function updateReserveBars(metal, energy, value)
 	if options.enableReserveBar.value then
+		if value < 0 then value = 0 end
+		if value > 1 then value = 1 end
 		if metal then
 			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
 			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
@@ -471,26 +471,6 @@ function CreateWindow()
 	}
 
 	--// METAL
-	trkbar_metal = 	Chili.Trackbar:New{
-		parent = window,
-		height = p(100/bars),
-		right  = 26,
-		x      = 110,
-		y      = p(100/bars),		 
-		value = 0,
-		min=0, 
-		max=1, 
-		step=0.01,
-		OnClick = { 
-			function (self, x, y, mouse)
-				updateReserveBars(true, mouse ~= 3, trkbar_metal.value)
-			end
-			}, 
-		noDrawStep = true,
-		noDrawBar = true,
-		noDrawThumb = true,
-	}
-	
 	Chili.Image:New{
 		parent = window,
 		height = p(100/bars),
@@ -523,6 +503,11 @@ function CreateWindow()
                 y      = p(100/bars),
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+		OnMouseDown = {function() return true end},	-- this is needed for OnMouseUp to work
+		OnMouseUp = {function(self, x, y, mouse)
+			local reserve = x / (self.width - self.padding[1] - self.padding[3])
+			updateReserveBars(true, mouse ~= 3, reserve)
+		end},
 	}
 	
 	lbl_metal = Chili.Label:New{
@@ -567,26 +552,6 @@ function CreateWindow()
 
 
 	--// ENERGY
-	trkbar_energy = Chili.Trackbar:New{
-		parent = window,
-		height = p(100/bars),
-		right  = 36,
-		x      = 100,
-		y      = 1,	 
-		value = 0,
-		min=0, 
-		max=1, 
-		step=0.01,
-		OnClick = { 
-			function (self, x, y, mouse)
-				updateReserveBars(mouse ~= 3, true, trkbar_energy.value)
-			end
-		}, 
-		noDrawStep = true,
-		noDrawBar = true,
-		noDrawThumb = true,
-	}
-	
 	Chili.Image:New{
 		parent = window,
 		height = p(100/bars),
@@ -633,6 +598,11 @@ function CreateWindow()
                 y      = 1,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+		OnMouseDown = {function() return true end},	-- this is needed for OnMouseUp to work
+		OnMouseUp = {function(self, x, y, mouse)
+			local reserve = x / (self.width - self.padding[1] - self.padding[3])
+			updateReserveBars(mouse ~= 3, true, reserve)
+		end},
 	}
 	
 	lbl_energy = Chili.Label:New{
@@ -678,8 +648,6 @@ function CreateWindow()
 	-- Activate tooltips for lables and bars, they do not have them in default chili
 	function bar_metal:HitTest(x,y) return self	end
 	function bar_energy:HitTest(x,y) return self end
-    function trkbar_metal:HitTest(x,y) return bar_metal end
-    function trkbar_energy:HitTest(x,y) return bar_energy end
 	function lbl_energy:HitTest(x,y) return self end
 	function lbl_metal:HitTest(x,y) return self end
 	function lbl_e_income:HitTest(x,y) return self end
@@ -742,21 +710,19 @@ local lastEstor = 0
 function ReserveState(teamID, metalStorageReserve, energyStorageReserve)
     if (Spring.GetLocalTeamID() == teamID) then 
         local _, mStor = GetTeamResources(teamID, "metal")
-		local _, eStor = GetTeamResources(teamID, "energy")
-		
+        local _, eStor = GetTeamResources(teamID, "energy")
+
         if ((not WG.metalStorageReserve) or WG.metalStorageReserve ~= metalStorageReserve) or (lastMstor ~= mStor) and mStor > 0 then
             lastMstor = mStor
-            trkbar_metal:SetValue(metalStorageReserve/mStor)
-            bar_metal_reserve_overlay:SetValue(trkbar_metal.value)
+            bar_metal_reserve_overlay:SetValue(metalStorageReserve/mStor)
         end
-		WG.metalStorageReserve = metalStorageReserve
+        WG.metalStorageReserve = metalStorageReserve
        
-		if ((not WG.energyStorageReserve) or WG.energyStorageReserve ~= energyStorageReserve) or (lastEstor ~= eStor) and (eStor - HIDDEN_STORAGE) > 0 then
+        if ((not WG.energyStorageReserve) or WG.energyStorageReserve ~= energyStorageReserve) or (lastEstor ~= eStor) and (eStor - HIDDEN_STORAGE) > 0 then
             lastEstor = eStor
-            trkbar_energy:SetValue(energyStorageReserve/(eStor - HIDDEN_STORAGE))
-            bar_energy_reserve_overlay:SetValue(trkbar_energy.value)
+            bar_energy_reserve_overlay:SetValue(energyStorageReserve/(eStor - HIDDEN_STORAGE))
         end
-         WG.energyStorageReserve = energyStorageReserve
+        WG.energyStorageReserve = energyStorageReserve
     end
 end
 
