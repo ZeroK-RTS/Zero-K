@@ -10,7 +10,7 @@ local comms = {
     chassis = "cremcom2",
     name = "Ada's Commander",
     description = "Relic Commander, Builds at 10 m/s",
-    helptext = "A manned Strike Commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxiliary Cohort.",
+    helptext = "A special piloted commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxiliary Cohort.",
     modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
   },
   
@@ -55,7 +55,7 @@ local comms = {
   comm_campaign_legion = {
     chassis = "corcom2",
     name = "Legate Fidus",
-    helptext = "Commander of the elite Praetorian Guard, the Empire's paladins. A loyal, steadfast soldier.",
+    helptext = "Commander of the Imperial Vanguard Legion, enforcers of the Emperor's will.  A loyal, steadfast soldier.",
     modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
     --decorations = { "skin_battle_tiger" }
   },  
@@ -63,7 +63,7 @@ local comms = {
   comm_campaign_praetorian = {
     chassis = "benzcom2",
     name = "Scipio Astra",
-    helptext = "Commander of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower.",
+    helptext = "Prefect of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower.",
     modules = { "commweapon_assaultcannon", "module_heavy_armor", "weaponmod_high_caliber_barrel", "module_adv_targeting", "module_autorepair"},
   },
   
