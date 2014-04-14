@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[armstiletto_laser]],
-  name                = [[Dove]],
+  name                = [[Thunderbird]],
   description         = [[Disarming Lightning Bomber]],
   amphibious          = true,
   buildCostEnergy     = 550,
@@ -163,7 +163,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Dove]],
+      description      = [[Wreckage - Thunderbird]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1130,
@@ -184,7 +184,7 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Dove]],
+      description      = [[Debris - Thunderbird]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1130,
