@@ -205,6 +205,8 @@ end
 --]]
 
 local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
+	--Note: 'toReplace==true' means command at 'index' is replaced with 'cmdID' instead of being sandwiched between old commands at 'index'
+	
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local queue = Spring.GetCommandQueue(unitID, -1)
@@ -331,6 +333,9 @@ local function FindNearestAirpad(unitID, team)
 end
 
 local function RequestRearm(unitID, team, forceNow, replaceExisting)
+	if spGetUnitRulesParam(unitID, "airpadReservation") == 1 then
+		return false --already reserved an airpad, do not reserve another one again
+	end
 	team = team or spGetUnitTeam(unitID)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
@@ -404,6 +409,7 @@ end
 
 -- we don't need the airpad for now, free up a slot
 local function CancelAirpadReservation(unitID)
+	spSetUnitRulesParam(unitID, "airpadReservation",0)
 	if GG.LandAborted then
 		GG.LandAborted(unitID)
 	end
@@ -441,6 +447,7 @@ local function CancelAirpadReservation(unitID)
 end
 
 function ReserveAirpad(bomberID,airpadID)
+	spSetUnitRulesParam(bomberID, "airpadReservation",1)
 	local reservations = airpadsData[airpadID].reservations
 	if not reservations.units[bomberID] then
 		-- totalReservedPad = totalReservedPad + 1
