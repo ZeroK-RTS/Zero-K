@@ -200,8 +200,8 @@ unitDef = {
       burst                   = 2,
       burstrate               = 0.1,
 	  cegTag                  = [[missiletrailredsmall]],
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0,
+      craterMult              = 0,
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
@@ -255,8 +255,8 @@ unitDef = {
       burstrate               = 0.1,
       cegTag                  = [[missiletrailredsmall]],
       commandfire             = true,
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0,
+      craterMult              = 0,
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
