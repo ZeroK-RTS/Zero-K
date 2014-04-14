@@ -34,6 +34,8 @@ local SIG_AIM = 4
 -- JUMPING
 
 local function BeginJumpThread()
+	Signal(SIG_MOVE)
+	
 	--crouch and prepare to jump
 	Turn( l_leg , x_axis, 0, ANGULAR_SPEED*6 )
 	Turn( l_foot , x_axis, math.rad(30), ANGULAR_SPEED*4 )

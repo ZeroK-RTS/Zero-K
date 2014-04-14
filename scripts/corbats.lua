@@ -34,16 +34,16 @@ local RECOIL_DISTANCE =	-3
 local RECOIL_RESTORE_SPEED = 2.5
 
 --rockz
-include 'rockz.h.lua'
+include 'RockPiece.lua'
 
-ROCK_PIECE = ground		--piece to rock
-ROCK_Z_SPEED = 1		--number of rock angles per second around z-axis
-ROCK_Z_DECAY = -0.5	--rocking around z-axis is reduced by this factor each time; should be negative to alternate rocking direction
-ROCK_Z_MIN  = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
-ROCK_Z_MAX = math.rad(15)
-SIG_ROCK_Z = 1024		--signal to prevent multiple rocking
+local ROCK_PIECE = ground		--piece to rock
+local ROCK_Z_SPEED = 1		--number of rock angles per second around z-axis
+local ROCK_Z_DECAY = -0.5	--rocking around z-axis is reduced by this factor each time; should be negative to alternate rocking direction
+local ROCK_Z_MIN  = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
+local ROCK_Z_MAX = math.rad(15)
+local SIG_ROCK_Z = 1024		--signal to prevent multiple rocking
 
-ROCK_Z_FIRE = 0.1
+local ROCK_FORCE = 0.1
 
 --------------------------------------------------------------------
 --variables
@@ -53,14 +53,12 @@ local gunHeading = {0, 0, 0}
 
 local dead = false
 
-rockZAngle = 0
-
 function script.Create()
 	Turn(turret2, y_axis, math.rad(180))
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
 	StartThread(SmokeUnit, smokePiece)
-	--RockZInit()
+	InitializeRock(ROCK_PIECE, ROCK_Z_SPEED, ROCK_Z_DECAY, ROCK_Z_MIN, ROCK_Z_MAX, SIG_ROCK_Z, z_axis)
 end
 
 local function RestoreAfterDelay()
@@ -106,7 +104,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	StartThread(RockZ, gunHeading[num], ROCK_Z_FIRE)
+	StartThread(Rock, gunHeading[num], ROCK_FORCE, z_axis)
 end
 
 function script.Shot(num)
