@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[fighter]],
-  name                   = [[Avenger]],
+  name                   = [[Swift]],
   description            = [[Multi-role Stealth Fighter]],
   amphibious             = true,
   buildCostEnergy        = 150,
@@ -29,11 +29,11 @@ unitDef = {
     description_fr = [[Chasseur Multirôle]],
 	description_de = [[Mehrzweck-Tarnkappenjäger]],
 	description_pl = [[Mysliwiec wielozadaniowy]],
-    helptext       = [[The Avenger can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they have a passive stealth system that renders them invisible to enemy radar, and are equipped with afterburner jets that can be used to give the Avenger a massive speed boost, allowing them to execute incredible combat and evasive maneuvers.]],
+    helptext       = [[The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they have a passive stealth system that renders them invisible to enemy radar, and are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers.]],
     helptext_bp    = [[Este caça pode atacar unidades aéreas e terrestres e protege bem outras unidades contra unidades aéreas, mas é morto rapidamente por fogo anti-aéreo e caças de superioridade aérea. Funciona melhor contra unidades terrestres quando em grandes números.]],
-    helptext_fr    = [[Capable de tirer en l'air ou au sol le Avenger n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
-	helptext_de    = [[Der Avenger kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
-	helptext_pl    = [[Avenger to wielozadaniowy mysliwiec szybkiego reagowania, ktory moze atakowac zarowno cele powietrzne, jak i naziemne. Jest bardzo zwinny i swietnie sobie radzi z wrogim lotnictwem dzieki samonaprowadzajacym rakietom i laserom, jednak jest bardzo lekki i latwo go zestrzelic. Posiada pasywny zaklocacz radaru oraz aktywny dopalacz.]],
+    helptext_fr    = [[Capable de tirer en l'air ou au sol le Swift n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
+	helptext_de    = [[Der Swift kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
+	helptext_pl    = [[Swift to wielozadaniowy mysliwiec szybkiego reagowania, ktory moze atakowac zarowno cele powietrzne, jak i naziemne. Jest bardzo zwinny i swietnie sobie radzi z wrogim lotnictwem dzieki samonaprowadzajacym rakietom i laserom, jednak jest bardzo lekki i latwo go zestrzelic. Posiada pasywny zaklocacz radaru oraz aktywny dopalacz.]],
 	specialreloadtime = [[850]],
 	modelradius    = [[5]],
 	refuelturnradius = [[80]],
@@ -86,7 +86,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[AVENGER_GUN]],
+      def                = [[SWIFT_GUN]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 60,
@@ -106,7 +106,7 @@ unitDef = {
 
   weaponDefs             = {
 
-    AVENGER_GUN  = {
+    SWIFT_GUN  = {
       name                    = [[Mini Laser Blaster]],
       areaOfEffect            = 8,
       beamWeapon              = true,
@@ -205,7 +205,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Avenger]],
+      description      = [[Wreckage - Swift]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 300,
@@ -226,7 +226,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Avenger]],
+      description      = [[Debris - Swift]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 320,

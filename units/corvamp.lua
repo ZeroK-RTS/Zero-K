@@ -1,11 +1,11 @@
 unitDef = {
   unitname               = [[corvamp]],
-  name                   = [[Vamp]],
+  name                   = [[Hawk]],
   description            = [[Air Superiority Fighter]],
   amphibious             = true,
   buildCostEnergy        = 300,
   buildCostMetal         = 300,
-  buildPic               = [[CORVAMP.png]],
+  buildPic               = [[corvamp.png]],
   buildTime              = 300,
   canAttack              = true,
   canDropFlare           = false,
@@ -30,11 +30,11 @@ unitDef = {
     description_fr = [[Chasseur Anti-Air Sup?rieur]],
 	description_de = [[Luftüberlegenheitsjäger]],
 	description_pl = [[Mysliwiec]],
-    helptext       = [[The Vamp specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability.]],
-    helptext_bp    = [[Vamp é um caça poderoso contra unidades aéreas mas incapaz de atacar unidades terrestres.]],
-    helptext_fr    = [[le Vamp combine, vitesse, invisibilit? au radar, et puissante force offensive Air/Air, afin d'abatre les aeronefs ennemis. Sans d?fense contre les attaques Sol/Air.]],
-	helptext_de    = [[Der Vamp ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
-	helptext_pl    = [[Vamp to ciezki mysliwiec, ktory jest przeznaczony do niszczenia wszystkiego, co lata. Jest dosc wytrzymaly, jednak nie jest w stanie atakowac celow naziemnych.]],
+    helptext       = [[The Hawk specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability.]],
+    helptext_bp    = [[Hawk é um caça poderoso contra unidades aéreas mas incapaz de atacar unidades terrestres.]],
+    helptext_fr    = [[le Hawk combine, vitesse, invisibilit? au radar, et puissante force offensive Air/Air, afin d'abatre les aeronefs ennemis. Sans d?fense contre les attaques Sol/Air.]],
+	helptext_de    = [[Der Hawk ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
+	helptext_pl    = [[Hawk to ciezki mysliwiec, ktory jest przeznaczony do niszczenia wszystkiego, co lata. Jest dosc wytrzymaly, jednak nie jest w stanie atakowac celow naziemnych.]],
 	modelradius    = [[10]],
 	refuelturnradius = [[120]],
   },
@@ -133,7 +133,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Vamp]],
+      description      = [[Wreckage - Hawk]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1100,
@@ -154,7 +154,7 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Vamp]],
+      description      = [[Debris - Hawk]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1100,

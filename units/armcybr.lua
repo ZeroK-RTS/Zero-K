@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[armcybr]],
-  name                = [[Licho]],
+  name                = [[Eagle]],
   description         = [[Singularity Bomber]],
   amphibious          = true,
   --autoheal			  = 25,
@@ -27,15 +27,15 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    helptext       = [[The Licho drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that.]],
+    helptext       = [[The Eagle drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that.]],
     description_bp = [[Bombardeiro de implos?o]],
     description_de = [[Implosion Bomber]],
     description_fr = [[Bombardier r Implosion]],
     description_pl = [[Bombowiec Implozyjny]],
     helptext_bp    = [[]],
-    helptext_de    = [[Licho ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert.]],
-    helptext_fr    = [[Le Licho est tout simplement la mort venue du ciel. Ce bombardier lourdement blindé et relativement lent transporte une tete nucléaire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de détruire des structures lourdement blindées. Tout simplement mortel utilisé en petites escadres.]],
-    helptext_pl    = [[Licho spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie.]],
+    helptext_de    = [[Eagle ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert.]],
+    helptext_fr    = [[Le Eagle est tout simplement la mort venue du ciel. Ce bombardier lourdement blindé et relativement lent transporte une tete nucléaire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de détruire des structures lourdement blindées. Tout simplement mortel utilisé en petites escadres.]],
+    helptext_pl    = [[Eagle spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie.]],
     modelradius    = [[10]],
   },
 
@@ -133,7 +133,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Licho]],
+      description      = [[Wreckage - Eagle]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2800,
@@ -145,7 +145,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 1000,
-      object           = [[licho_d.s3o]],
+      object           = [[Eagle_d.s3o]],
       reclaimable      = true,
       reclaimTime      = 1000,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -153,7 +153,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Licho]],
+      description      = [[Debris - Eagle]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2800,

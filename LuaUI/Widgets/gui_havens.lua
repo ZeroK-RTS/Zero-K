@@ -17,6 +17,20 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+options_path = 'Settings/Interface/Retreat Zones'
+options_order = {'onlyShowMyZones'}
+
+options = {
+	onlyShowMyZones = {
+		name = 'Only Show My Zones',
+		desc = 'With this enabled you will only see your retreat zones.',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			GetHavens()
+		end,
+	},
+}
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -39,7 +53,6 @@ local min	= math.min
 local floor = math.floor
 local abs 	= math.abs
 
-
 local havens = {}
 local havenCount = 0
 local RADIUS = 0
@@ -47,23 +60,42 @@ local RADIUS = 0
 ----------------------------------------------------------------------------------------
 -- functions
 
-local function GetHavens()
-	havens = {}
-	local myTeamID = Spring.GetLocalTeamID()
-	havenCount = Spring.GetTeamRulesParam(myTeamID, "haven_count")
-	if havenCount then
-		for i = 1, havenCount do
-			havens[i] = {
-				x = Spring.GetTeamRulesParam(myTeamID, "haven_x" .. i),
-				z = Spring.GetTeamRulesParam(myTeamID, "haven_z" .. i)
-			}
-			havens[i].y = Spring.GetGroundHeight(havens[i].x, havens[i].z)
+function GetTeamHavens(teamID)
+	local start = havenCount
+	local teamHavenCount = Spring.GetTeamRulesParam(teamID, "haven_count")
+	if teamHavenCount then
+		havenCount = havenCount + teamHavenCount
+		if havenCount then
+			for i = 1, teamHavenCount do
+				havens[start + i] = {
+					x = Spring.GetTeamRulesParam(teamID, "haven_x" .. i),
+					z = Spring.GetTeamRulesParam(teamID, "haven_z" .. i)
+				}
+				havens[start + i].y = Spring.GetGroundHeight(havens[start + i].x, havens[start + i].z)
+			end
 		end
 	end
 end
 
-function HavenUpdate(teamID)
-	if (Spring.GetLocalTeamID() == teamID) then 
+function GetHavens()
+	havens = {}
+	havenCount = 0
+	if options.onlyShowMyZones.value then
+		local spectating = Spring.GetSpectatingState()
+		if not spectating then
+			GetTeamHavens(Spring.GetLocalTeamID())
+		end
+	else
+		local teams = Spring.GetTeamList()
+		for i = 0, #teams-1 do
+			GetTeamHavens(i)
+		end
+	end
+end
+
+function HavenUpdate(teamID, allyTeamID)
+	local spectating = Spring.GetSpectatingState()
+	if (not spectating and Spring.GetLocalTeamID() == teamID) or (not options.onlyShowMyZones.value) then 
 		GetHavens()
 	end
 end
@@ -117,7 +149,9 @@ end
 function widget:DrawWorld()
 	local fade = abs((spGetGameFrame() % 40) - 20) / 20
 	--Draw ambulance on havens.
-	if #havens == 0 then return end
+	if #havens == 0 or Spring.IsGUIHidden() then 
+		return 
+	end
 	
 	glDepthTest(true)
 	gl.LineWidth(2)

@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[armstiletto_laser]],
-  name                = [[Stiletto]],
+  name                = [[Dove]],
   description         = [[Disarming Lightning Bomber]],
   amphibious          = true,
   buildCostEnergy     = 550,
@@ -163,7 +163,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Stiletto]],
+      description      = [[Wreckage - Dove]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1130,
@@ -184,7 +184,7 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Stiletto]],
+      description      = [[Debris - Dove]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1130,

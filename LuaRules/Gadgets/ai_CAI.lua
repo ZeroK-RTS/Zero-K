@@ -4173,20 +4173,24 @@ local heatmapPosition
 -- draw scoutmap
 -- FIXME: could use some big time optimizations
 function gadget:DrawWorldPreUnit()
-	local scoutmaps = SYNCED.debugData.drawScoutmap
-	for allyTeam in spairs(scoutmaps) do
-		local scoutmap = SYNCED.allyTeamData[allyTeam].scoutingHeatmap
-		for x,xdata in spairs(scoutmap) do
-			for z,zdata in spairs(xdata) do
-				local px, pz = heatmapPosition[x][z].x, heatmapPosition[x][z].z
-				if not zdata.scouted then
-					gl.Color(0,0,0,0.5)
-					gl.DrawGroundQuad(px-256,pz-256,px+256,pz+256)
+	if Spring.IsCheatingEnabled() then
+		if SYNCED and SYNCED.debugData and SYNCED.debugData.drawScoutmap then
+			local scoutmaps = SYNCED.debugData.drawScoutmap
+			for allyTeam in spairs(scoutmaps) do
+				local scoutmap = SYNCED.allyTeamData[allyTeam].scoutingHeatmap
+				for x,xdata in spairs(scoutmap) do
+					for z,zdata in spairs(xdata) do
+						local px, pz = heatmapPosition[x][z].x, heatmapPosition[x][z].z
+						if not zdata.scouted then
+							gl.Color(0,0,0,0.5)
+							gl.DrawGroundQuad(px-256,pz-256,px+256,pz+256)
+						end
+					end
 				end
+				gl.Color(1,1,1,1)
+				break
 			end
 		end
-		gl.Color(1,1,1,1)
-		break
 	end
 end
 
