@@ -109,6 +109,7 @@ local function SitOnPad(unitID)
 	local cost = ud.metalCost
 	local maxHP = ud.health
 	local healPerHalfSecond = 3*PAD_ENERGY_DRAIN*maxHP/(cost*2)
+	local healing = true
 	
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
@@ -177,12 +178,16 @@ local function SitOnPad(unitID)
 					end
 					local hp = spGetUnitHealth(unitID)
 					if hp < maxHP then
+						if not healing then
+							Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN)
+							healing = true
+						end
 						local _,_,_,energyUse = Spring.GetUnitResources(unitID)
 						spSetUnitHealth(unitID, min(maxHP, hp + healPerHalfSecond*energyUse/PAD_ENERGY_DRAIN))
 					else
-						if healPerHalfSecond then
+						if healing then
 							Spring.SetUnitResourcing(unitID, "uue" ,0)
-							healPerHalfSecond = false
+							healing = false
 						end
 						if refuelComplete then
 							break

@@ -12,7 +12,7 @@ local weapons = {
 local units = {
 	corshad = {
 		diveDamage = 600,
-		diveHeight = 80,
+		diveHeight = 70,
 		orgHeight = UnitDefNames["corshad"].wantedHeight*FUDGE_FACTOR,
 	},
 }
