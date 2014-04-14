@@ -106,6 +106,8 @@ for name, data in pairs(jumpDefNames) do
 	end
 end
 
+GG.jumpDefs = jumpDefs
+
 local jumpCmdDesc = {
 	id			= CMD_JUMP,
 	type		= CMDTYPE.ICON_MAP,
@@ -536,7 +538,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 
 	if lastJumpPosition[unitID] then
 		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and 
-				abs(lastJumpPosition[unitID][2] - cmdParams[2]) < 1 and 
 				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
 			return true, true -- command was used, remove it (unit finished jump)
 		end

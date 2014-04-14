@@ -1,4 +1,5 @@
 include "constants.lua"
+include "JumpRetreat.lua"
 
 local jump = piece 'jump' 
 local torso = piece 'torso' 

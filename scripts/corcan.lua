@@ -14,6 +14,7 @@ local spike = piece 'spike'
 
 include "constants.lua"
 include "RockPiece.lua"
+include "JumpRetreat.lua"
 
 local smokePiece = {turret}
 

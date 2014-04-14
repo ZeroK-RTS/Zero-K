@@ -19,6 +19,7 @@ local r_jetpt = piece 'r_jetpt'
 --linear constant 163840
 
 include "constants.lua"
+include "JumpRetreat.lua"
 
 local smokePiece = {base}
 

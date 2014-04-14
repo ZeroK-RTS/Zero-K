@@ -41,45 +41,46 @@ local abs 	= math.abs
 
 
 local havens = {}
-local myTeamID = 0
+local havenCount = 0
 local RADIUS = 0
 
 ----------------------------------------------------------------------------------------
 -- functions
 
-local function explode(div,str)
-  if (div=='') then return false end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
-end
-
-
-function GetHavens()
+local function GetHavens()
 	havens = {}
-	local temp = Spring.GetTeamRulesParam(myTeamID, "havens")
-	if not temp or temp == 0 then return end
-	
-	temp = explode('|', temp)
-	for i, v in ipairs(temp) do
-		havens[#havens+1] = explode(',', v)
+	local myTeamID = Spring.GetLocalTeamID()
+	havenCount = Spring.GetTeamRulesParam(myTeamID, "haven_count")
+	if havenCount then
+		for i = 1, havenCount do
+			havens[i] = {
+				x = Spring.GetTeamRulesParam(myTeamID, "haven_x" .. i),
+				z = Spring.GetTeamRulesParam(myTeamID, "haven_z" .. i)
+			}
+			havens[i].y = Spring.GetGroundHeight(havens[i].x, havens[i].z)
+		end
 	end
-	
 end
 
+function HavenUpdate(teamID)
+	if (Spring.GetLocalTeamID() == teamID) then 
+		GetHavens()
+	end
+end
 
 ----------------------------------------------------------------------------------------
 --callins
 
-
+function widget:PlayerChanged(playerID)
+	if playerID == Spring.GetMyPlayerID() then
+		GetHavens()
+	end
+end
 
 function widget:Initialize()
 	RADIUS = Spring.GetGameRulesParam('retreatZoneRadius') or 5
+	widgetHandler:RegisterGlobal(widget, "HavenUpdate", HavenUpdate)
+	GetHavens()
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
@@ -109,8 +110,7 @@ end
 
 function widget:GameFrame(f)
 	if f % 30 == 0 then
-		myTeamID = Spring.GetLocalTeamID()
-		GetHavens()
+		--GetHavens()
 	end
 end
 	
@@ -122,8 +122,9 @@ function widget:DrawWorld()
 	glDepthTest(true)
 	gl.LineWidth(2)
 
-	for _, havenPosition in ipairs(havens) do
-		local x, y, z = havenPosition[1], havenPosition[2], havenPosition[3]
+	for i = 1, havenCount do
+		local havenPosition = havens[i]
+		local x, y, z = havenPosition.x, havenPosition.y, havenPosition.z
 
 		gl.LineWidth(4)
 		glColor(1, 1, 1, 0.5)
@@ -138,8 +139,9 @@ function widget:DrawWorld()
 	glColor(1,fade,fade,fade+0.1)
 	glTexture('LuaUI/Images/commands/Bold/retreat.png')
 	
-	for unitID, havenPosition in pairs(havens) do
-		local x, y, z = havenPosition[1], havenPosition[2], havenPosition[3]
+	for i = 1, havenCount do
+		local havenPosition = havens[i]
+		local x, y, z = havenPosition.x, havenPosition.y, havenPosition.z
 		gl.PushMatrix()
 		glTranslate(x, y, z)
 		glBillboard()

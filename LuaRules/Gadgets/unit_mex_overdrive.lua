@@ -1487,10 +1487,12 @@ else  -- UNSYNCED
 local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 
 function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
-  if (allyTeamID ~= spGetLocalAllyTeamID()) then return end
-  if (Script.LuaUI('MexEnergyEvent')) then
-    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
-  end
+	if (allyTeamID ~= spGetLocalAllyTeamID()) then 
+		return 
+	end
+	if (Script.LuaUI('MexEnergyEvent')) then
+		Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
+	end
 end
 
 function gadget:Initialize()

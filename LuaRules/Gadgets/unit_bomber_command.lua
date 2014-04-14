@@ -335,7 +335,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
 		if health and maxHealth and health > maxHealth - 1 then
-			return
+			return false
 		end
 	end
 	--Spring.Echo(unitID.." requesting rearm")
@@ -349,10 +349,10 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		elseif queue[i].id == CMD_REARM then -- already have set rearm point, we have nothing left to do here
 			detectedRearm = true
 			if (not replaceExisting) then
-				return
+				return false
 			end
 		elseif queue[i].id == CMD_FIND_PAD then	-- already have find airpad command, we might be doing same work twice, skip
-			return
+			return false
 		end
 	end
 	if forceNow then
@@ -368,9 +368,8 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		return targetPad
 	end
 end
-GG.RequestRearm = function(bomberID)
-	rearmRequest[bomberID] = true
-end
+
+GG.RequestRearm = RequestRearm
 
 function gadget:UnitCreated(unitID, unitDefID, team)
 	if bomberDefs[unitDefID] then

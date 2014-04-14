@@ -2,6 +2,7 @@
 --modified from Argh\'s PURE Artillery Shell Script
 
 include "constants.lua"
+include "JumpRetreat.lua"
 
 local base, hips, torso = piece('base', 'hips', 'torso')
 local launcher, rflare, rblast, lflare, lblast, cflare, cblast = piece('launcher', 'rflare', 'rblast', 'lflare', 'lblast', 'cflare', 'cblast')

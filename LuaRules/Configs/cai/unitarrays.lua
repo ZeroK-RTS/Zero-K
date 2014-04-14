@@ -63,7 +63,6 @@ local skirm = {
 }
 
 local jumper = { -- uses jump for offense. IE do not put commander or AA here.
-	"corpyro",
 	"corcan",
 	"corsumo",
 }

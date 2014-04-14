@@ -15,6 +15,22 @@ local flare = {
 
 local SPEEDUP_FACTOR = 5
 local BOOSTUP_FACTOR = 6
+		
+----------------------------------------------------------
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local function RetreatThread()
+	Sleep(800)
+	local specialReloadState = Spring.GetUnitRulesParam(unitID,"specialReloadFrame")
+	if (not specialReloadState or (specialReloadState <= Spring.GetGameFrame())) then
+		Spring.GiveOrderToUnit(unitID, CMD.INSERT, {0, CMD_ONECLICK_WEAPON, CMD.OPT_INTERNAL,}, CMD.OPT_ALT)
+	end
+end
+
+function RetreatFunction()
+	StartThread(RetreatThread)
+end
 
 ----------------------------------------------------------
 
