@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Retreat2",
-    desc      = "v0.287 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
+    desc      = "v0.288 Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages.",
     author    = "CarRepairer",
     date      = "2008-03-17", --2014-4-5
     license   = "GNU GPL, v2 or later",
@@ -275,15 +275,15 @@ function StopRetreating(unitID)
 	end
 end
 
-local function RemoveAlwaysFly( unitID)
-	if (not Spring.GetUnitStates(unitID)["autoland"]) then
+local function RemoveAlwaysFly( unitID,unitDefID)
+	if UnitDefs[unitDefID].canFly and (not Spring.GetUnitStates(unitID)["autoland"]) then
 		alwaysFlyState[unitID] = true
 		GiveOrderToUnit(unitID,CMD_IDLEMODE, {1,}, {""})
 	end
 end
 
-local function RestoreAlwaysFly (unitID)
-	if alwaysFlyState[unitID] and Spring.GetUnitStates(unitID)["autoland"] then
+local function RestoreAlwaysFly (unitID,unitDefID)
+	if UnitDefs[unitDefID].canFly and alwaysFlyState[unitID] and Spring.GetUnitStates(unitID)["autoland"] then
 		alwaysFlyState[unitID] = nil
 		GiveOrderToUnit(unitID,CMD_IDLEMODE, {0,}, {""})
 	end
@@ -385,7 +385,7 @@ local function SetWantRetreat(unitID, want,divert)
 					end
 				elseif (havenCount > 0) then
 					--//if Unit is not flying unit, retreat to retreat zone
-					RemoveAlwaysFly(unitID)
+					RemoveAlwaysFly(unitID,unitDefID)
 					QueueFighterBoost(unitID,unitDefID)
 					StartRetreat(unitID)
 					if options.removeFromSelection.value then
@@ -394,22 +394,23 @@ local function SetWantRetreat(unitID, want,divert)
 				end
 			elseif retreatMoveOrders[unitID] and isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
 				--//if Unit is (was) retreating to retreat zone and is flying unit and have empty airpad, then rearm
-				RestoreAlwaysFly(unitID)
+				RestoreAlwaysFly(unitID,unitDefID)
 				StopRetreating(unitID)
 				StartRearm(unitID)
 			end
 		end
 	elseif divert then
-		local movetype = Spring.Utilities.getMovetype(UnitDefs[GetUnitDefID(unitID)])
+		local unitDefID = GetUnitDefID(unitID)
+		local movetype = Spring.Utilities.getMovetype(UnitDefs[unitDefID])
 		local isFlyingUnit = (movetype==0 or movetype==1)
 		if not pauseRetreatChecks[unitID] and retreatMoveOrders[unitID] and isFlyingUnit and (#airpadList > 0) and ((havenCount == 0) or HaveEmptyAirpad()) then
 			--//if Unit is (was) retreating to retreat zone and is flying unit and have empty airpad, then rearm
-			RestoreAlwaysFly(unitID)
+			RestoreAlwaysFly(unitID,unitDefID)
 			StopRetreating(unitID)
 			StartRearm(unitID)
 		end
 	elseif retreatMoveOrders[unitID] then 
-		RestoreAlwaysFly(unitID)
+		RestoreAlwaysFly(unitID,GetUnitDefID(unitID))
 		StopRetreating(unitID)
 	elseif retreatRearmOrders[unitID] then
 		StopRearm(unitID)
@@ -515,7 +516,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 			and cmdID ~= CMD_ONOFF		and cmdID ~= CMD_REPEAT
 			and cmdID ~= CMD_WANT_CLOAK	and cmdID ~= CMD_CLOAK_SHIELD	
 			and cmdID ~= CMD_STEALTH	and cmdID ~= CMD_WAIT
-			and cmdID ~= CMD_IDLEMODE	--and cmdID ~= CMD_ONECLICK_WEAPON
+			and cmdID ~= CMD_IDLEMODE	and cmdID ~= CMD_ONECLICK_WEAPON
 		then
 			--any other command that is not STATE-button and not queued with SHIFT
 			commandOverriden = true
