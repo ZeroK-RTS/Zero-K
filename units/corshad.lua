@@ -49,7 +49,7 @@ unitDef = {
   maxBank             = 0.6,
   maxDamage           = 1100,
   maxElevator         = 0.02,
-  maxRudder           = 0.006,
+  maxRudder           = 0.09,
   maxFuel             = 1000000,
   maxPitch            = 0.3,
   maxVelocity         = 7.8,
@@ -72,7 +72,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
-  turnRadius          = 120,
+  turnRadius          = 160,
   workerTime          = 0,
 
   weapons             = {
