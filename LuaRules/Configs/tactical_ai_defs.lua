@@ -564,7 +564,7 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},
 	["spiderassault"] = {
-		skirms = lowMedRangeSkirmieeArray, 
+		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 50, 
@@ -572,7 +572,7 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},
 	["dante"] = {
-		skirms = lowMedRangeSkirmieeArray, 
+		skirms = medRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		skirmLeeway = 40, 

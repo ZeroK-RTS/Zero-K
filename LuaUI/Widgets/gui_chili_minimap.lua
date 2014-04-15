@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.894 Chili Minimap",
+    desc      = "v0.893 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -14,7 +14,6 @@ end
 
 local window_minimap
 local map_panel 
-local map_border_panel
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
 local glResetState = gl.ResetState
@@ -22,7 +21,7 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local bgColor_panel = {nil, nil, nil, 0}
+local bgColor_panel = {nil, nil, nil, 1}
 
 local tabbedMode = false
 --local init = true
@@ -64,7 +63,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los'}
@@ -125,6 +124,13 @@ options = {
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		
+		path = minimap_path,
+	},
+	alwaysResizable = {
+		name = 'Resizable',
+		type = 'bool',
+		value = true,
+		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
 	
@@ -259,11 +265,17 @@ options = {
 		path = minimap_path,
 	},
 	opacity = {
-		name = "Window Opacity", 
+		name = "Opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
+			if self.value == 0 then
+				bgColor_panel = {nil, nil, nil, 1}
+			else
+				bgColor_panel = {nil, nil, nil, value}
+			end
 			MakeMinimapWindow()
+			
 			window_minimap:Invalidate()
 		end,
 		path = minimap_path,
@@ -376,16 +388,6 @@ MakeMinimapWindow = function()
 		buttons_width = iconsize+3
 	end
 	
-	
-	map_border_panel = Chili.Panel:New {
-		x=3,y=3,
-		width=40,
-		height=30,
-		margin={0,0,0,0},
-		padding = {2,2,2,2},
-		backgroundColor = {0,0,0,1}
-		}
-	
 	map_panel = Chili.Panel:New {
 		bottom = map_panel_bottom,
 		x = 0,
@@ -394,8 +396,7 @@ MakeMinimapWindow = function()
 		
 		margin={0,0,0,0},
 		padding = {8,5,8,8},
-		backgroundColor = bgColor_panel,
-		children={map_border_panel}
+		backgroundColor = bgColor_panel
 		}
 	
 	local buttons_panel = Chili.StackPanel:New{
@@ -463,7 +464,7 @@ MakeMinimapWindow = function()
 		parent = Chili.Screen0,
 		draggable = false,
 		tweakDraggable = true,
-		resizable = true,
+		resizable = options.alwaysResizable.value,
 	    tweakResizable   = true,
 		minimizable = true,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
@@ -570,19 +571,24 @@ function widget:DrawScreen()
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
 	
+	--if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) or init then
 	if (lw ~= cx or lh ~= ch or lx ~= cx or ly ~= cy) then
+		--[[
+		if init then
+			window_minimap:Update() --required otherwise size stackpanel is calculated wrong when first loaded
+			init = false
+		end
+		--]]
+			
 		lx = cx
 		ly = cy
 		lh = ch
 		lw = cw
 		
-		local vsx,vsy = gl.GetViewSizes()
-		
-		map_border_panel:SetPos( cx, cy, cw, ch )
-		
-		local wx,wy,ww,wh = Chili.unpack4(window_minimap.clientArea)
 		cx,cy = window_minimap:LocalToScreen(cx,cy)
-		gl.ConfigMiniMap(cx+15, vsy-ch-cy+5, cw-20,ch-15)
+		local vsx,vsy = gl.GetViewSizes()
+		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
+
 		
 	end
 
