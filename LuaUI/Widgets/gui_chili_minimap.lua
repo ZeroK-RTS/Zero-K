@@ -21,7 +21,7 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local bgColor_panel = {nil, nil, nil, 1}
+local bgColor_panel = {nil,nil,nil,1}
 
 local tabbedMode = false
 --local init = true
@@ -63,7 +63,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los'}
@@ -124,13 +124,6 @@ options = {
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		
-		path = minimap_path,
-	},
-	alwaysResizable = {
-		name = 'Resizable',
-		type = 'bool',
-		value = true,
-		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
 	
@@ -270,9 +263,9 @@ options = {
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			if self.value == 0 then
-				bgColor_panel = {nil, nil, nil, 1}
+				bgColor_panel = {nil,nil,nil,1}
 			else
-				bgColor_panel = {nil, nil, nil, value}
+				bgColor_panel = {nil,nil,nil,0}
 			end
 			MakeMinimapWindow()
 			
@@ -456,7 +449,7 @@ MakeMinimapWindow = function()
 		name = "Minimap",
 		x = 0,  
 		y = 0,
-		color = {1,1,1, options.opacity.value},
+		color = {nil, nil, nil, options.opacity.value},
 		padding = {0,0,0,0},
 		margin = {0,0,0,0},
 		width  = w,
@@ -464,7 +457,7 @@ MakeMinimapWindow = function()
 		parent = Chili.Screen0,
 		draggable = false,
 		tweakDraggable = true,
-		resizable = options.alwaysResizable.value,
+		resizable = true,
 	    tweakResizable   = true,
 		minimizable = true,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
