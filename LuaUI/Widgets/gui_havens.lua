@@ -14,11 +14,13 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Retreat Zones'
-options_order = {'onlyShowMyZones'}
+options_order = {'onlyShowMyZones', 'cancelRetreat'}
 
 options = {
 	onlyShowMyZones = {
@@ -30,9 +32,15 @@ options = {
 			GetHavens()
 		end,
 	},
+	cancelRetreat = {
+		name = 'Cancel Retreat',
+		desc = 'Set your selected units to not retreat. It might be useful to assign it a hotkey.',
+		type = 'button',
+		OnChange = function(self)
+			Spring.GiveOrder(CMD_RETREAT, {0}, {"right"})
+		end,
+	},
 }
-
-VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 -- speed-ups
 
