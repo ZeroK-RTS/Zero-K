@@ -153,7 +153,7 @@ options = {
 	
 	commander_retreat = {
 		name = "  Retreat at value",
-		desc = "Values: no retreat, 30%, 60%, 90% health remaining",
+		desc = "Values: no retreat, 30%, 65%, 99% health remaining",
         type = 'number',
         value = 0,
         min = 0,
@@ -546,11 +546,14 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 
 			if options[name .. "_retreatpercent"] and options[name .. "_retreatpercent"].value then
-				--NOTE: cmd_retreat.lua widget will handle the inherit
 				if options[name .. "_retreatpercent"].value == -1 then --if inherit
-					--do nothing! (cmd_retreat.lua widget will automatically inherit retreat OR will apply no-retreat if no builder is present)
+					local retreat = Spring.GetUnitRulesParam(builderID,"retreatState")
+					if retreat then
+						-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, {"shift"})
+						orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, {"shift"}}
+					end
 				else --if not inherit
-					WG['retreat'].addRetreatCommand(unitID, unitDefID, options[name .. "_retreatpercent"].value) --apply retreat value
+					orderArray[#orderArray + 1] = {CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"}}
 				end
 			end
 
