@@ -48,6 +48,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[hoverassault.s3o]],
+  script              = [[hoverassault.lua]],
   onoffable           = true,
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],

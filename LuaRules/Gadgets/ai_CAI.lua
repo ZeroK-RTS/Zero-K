@@ -3438,10 +3438,10 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				end
 			elseif controlledUnit.anyByID[unitID].isScout then
 				controlledUnit.scoutByID[unitID].finished = true
-				spGiveOrderToUnit(unitID, CMD_RETREAT, { 1 }, {})
+				spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
 			elseif controlledUnit.anyByID[unitID].isRaider then
 				controlledUnit.raiderByID[unitID].finished = true
-				spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
+				spGiveOrderToUnit(unitID, CMD_RETREAT, { 1 }, {})
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, {})
@@ -3464,17 +3464,17 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
 					if ud.speed >= 3*30 then -- raider
 						controlledUnit.raiderByID[unitID].finished = true
-						spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
+						spGiveOrderToUnit(unitID, CMD_RETREAT, { 1 }, {})
 					elseif ud.maxWeaponRange > 650 then -- arty
 						controlledUnit.artyByID[unitID].finished = true
-						spGiveOrderToUnit(unitID, CMD_RETREAT, { 1 }, {})
+						spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
 					else -- other combat
 						controlledUnit.combatByID[unitID].finished = true
 						spGiveOrderToUnit(unitID, CMD_RETREAT, { 2 }, {})
 					end
 				else -- mobile anti air
 					controlledUnit.aaByID[unitID].finished = true
-					spGiveOrderToUnit(unitID, CMD_RETREAT, { 1 }, {})
+					spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
 				end
 				
 			elseif ud.isBuilding or ud.speed == 0 then -- building

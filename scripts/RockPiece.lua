@@ -58,7 +58,7 @@ end
 function Rock(heading, rockAmount, axis)
 	Signal(SIG_ROCK[axis])
 	SetSignalMask(SIG_ROCK[axis])
-	local magnitude = math.sin(heading)
+	local magnitude = (heading and math.sin(heading)) or 1
 	--Spring.Echo(magnitude)
 	rockAngle[axis] = rockAngle[axis] + (rockAmount * magnitude)
 	if rockAngle[axis] > ROCK_MAX[axis] then 
