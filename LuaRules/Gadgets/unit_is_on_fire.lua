@@ -43,6 +43,8 @@ local MIN_IMMERSION_FOR_EXTINGUISH = 0.8
 
 local CHECK_INTERVAL = 6
 
+local LOS_ACCESS = {inlos = true}
+
 --//VARS
 
 local gameFrame = 0
@@ -129,7 +131,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 						--attackerDefID = attackerDefID,
 						weaponID    = weaponID,
 					}
-					SetUnitRulesParam(unitID, "on_fire", 1, {inlos = true})
+					SetUnitRulesParam(unitID, "on_fire", 1, LOS_ACCESS)
 					GG.attUnits[unitID] = true
 					GG.UpdateUnitAttributes(unitID)
 				end

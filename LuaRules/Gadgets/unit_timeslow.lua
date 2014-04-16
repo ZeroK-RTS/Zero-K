@@ -42,6 +42,7 @@ local CMD_REMOVE = CMD.REMOVE
 local CMD_MOVE   = CMD.MOVE
 local CMD_FIGHT  = CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+local LOS_ACCESS = {inlos = true}
 
 local gaiaTeamID			= Spring.GetGaiaTeamID()
 
@@ -71,7 +72,7 @@ local function updateSlow(unitID, state)
 
 		local percentSlow = state.slowDamage/health
 
-		spSetUnitRulesParam(unitID,"slowState",percentSlow, {inlos = true})
+		spSetUnitRulesParam(unitID,"slowState",percentSlow, LOS_ACCESS)
 	end
 end
 

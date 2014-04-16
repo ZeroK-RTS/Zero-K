@@ -49,7 +49,7 @@ local defs = include "LuaRules/Configs/oneclick_weapon_defs.lua"
 --local reloadFrame = {}
 --local scheduledReload = {}
 --local scheduledReloadByUnitID = {}
-
+local LOS_ACCESS = {inlos = true}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:Initialize()
@@ -123,8 +123,8 @@ local function doTheCommand(unitID, unitDefID, num)
 			end
 			if (data.reloadTime and data.useSpecialReloadFrame) then
 				local reloadFrameVal = frame + data.reloadTime
-				Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, {inlos = true})
-				Spring.SetUnitRulesParam(unitID, "specialReloadStart", frame, {inlos = true})
+				Spring.SetUnitRulesParam(unitID, "specialReloadFrame", reloadFrameVal, LOS_ACCESS)
+				Spring.SetUnitRulesParam(unitID, "specialReloadStart", frame, LOS_ACCESS)
 			end
 			return true
 		end
