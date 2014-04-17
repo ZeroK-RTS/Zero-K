@@ -66,11 +66,11 @@ local optionData = {
 	{	-- benzcom
 		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/benzcom.jpg",
-		selector = "Bombard Comm",
-		tooltip = "Bombard Commander\nUses an assault cannon; extended range and diminished speed with otherwise average stats.",
+		selector = "Siege Comm",
+		tooltip = "Siege Commander\nUses an assault cannon; extended range and diminished speed with otherwise average stats.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:benzcom")
-			Spring.SendCommands({'say a:I choose: Bombard Commander!'})
+			Spring.SendCommands({'say a:I choose: Siege Commander!'})
 			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
 			Close(true)
 		end 
