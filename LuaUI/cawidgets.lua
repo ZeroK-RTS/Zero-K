@@ -1241,7 +1241,7 @@ end
 
 --NOTE: StringStarts() and MessageProcessor is included in "chat_preprocess.lua"
 function widgetHandler:AddConsoleLine(msg, priority)
-  if StringStarts(msg, "Error: Invalid command received") then
+  if StringStarts(msg, "Error: Invalid command received") or StringStarts(msg, "Error: Dropped command ") then
 	return
   elseif StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
     return -- ignore
