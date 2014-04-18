@@ -20,6 +20,7 @@ end
 local showAlly = false
 local visibleAllySelUnits = {}
 local visibleSelected = {}
+local thickness = 1.0
 
 local function UpdateHaloColors(self) end
 
@@ -28,7 +29,8 @@ options_path = 'Settings/Interface/Selection/Blurry Halo Selections'
 options_order = {
 	'showally',
 	'useteamcolors',
-	
+	'thickness',
+
 	
 	'lblPresetColors',
 	'selectColor',
@@ -58,28 +60,36 @@ options = {
 		desc = 'Highlight your allies\' selections with their team colors instead of the preset colors.',
 		value = false,
 	},
-	
+
+	thickness = {
+    name = 'Outline Thickness',
+    desc = 'How thick the outline appears around objects',
+    type = 'number',
+    min = 0.4, max = 2, step = 0.01,
+    value = 0.8,
+    OnChange = function(self) UpdateHaloColors(); end
+  },
 	-----
 	
 	lblPresetColors = {type='label', name = 'Preset Colors' },
 	selectColor = {
 		name = 'Selected Units Color',
 		type = 'colors',
-		value = { 0, 1, 0, 1 },
+		value = { 0.1, 1, 0.25, 1 },
 		OnChange = function(self) UpdateHaloColors(); end
 	},
 	
 	allySelectColor = {
 		name = 'Ally Selected Units Color',
 		type = 'colors',
-		value = { 1, 1, 0, 1 },
+		value = { 1, 1, 0.25, 1 },
 		OnChange = function(self) UpdateHaloColors(); end
 	}, 
 	
 	myHoverColor = {
 		name = 'My Unit Hover Color',
 		type = 'colors',
-		value = { 0, 1, 1, 1 },
+		value = { 0.3, 1, 1, 1 },
 		OnChange = function(self) UpdateHaloColors(); end
 	},
 	
@@ -93,7 +103,7 @@ options = {
 	enemyHoverColor = {
 		name = 'Enemy Unit Hover Color',
 		type = 'colors',
-		value = { 1, 0, 0, 1 },
+		value = { 1, 0.3, 0.2, 1 },
 		OnChange = function(self) UpdateHaloColors(); end
 	}, 
 	
@@ -101,7 +111,7 @@ options = {
 	featureHoverColor = {
 		name = 'Feature Hover Color',
 		type = 'colors',
-		value = { 1, 0, 1, 1 },
+		value = { 1, 0.25, 1, 1 },
 		OnChange = function(self) UpdateHaloColors(); end
 	}, 
 	
@@ -129,6 +139,7 @@ local blurShader_v
 local maskGenShader
 local maskApplyShader
 local uniformScreenX, uniformScreenY
+local uniformThicknessX, uniformThicknessY
 
 local vsx, vsy = 0,0
 local resChanged = false
@@ -226,6 +237,8 @@ UpdateHaloColors = function(self)
 	allyHoverColor = options.allyHoverColor.value
 	enemyHoverColor = options.enemyHoverColor.value
 	featureHoverColor = options.featureHoverColor.value
+
+  thickness = options.thickness.value
 end
 
 local function GetVisibleUnits()
@@ -308,19 +321,21 @@ end
 local maskGen = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glUseShader(maskGenShader)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
   --glTexRect(-1-1/vsx,1+1/vsy,1+1/vsx,-1-1/vsy)
 end
 local blur_h = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glUseShader(blurShader_h)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+    glUniform(uniformThicknessX, thickness)
+  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
   --glTexRect(-1-1/vsx,1+1/vsy,1+1/vsx,-1-1/vsy)
 end
 local blur_v = function()
   --glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glUseShader(blurShader_v)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+    glUniform(uniformThicknessY, thickness)
+  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
   --glTexRect(-1-1/vsx,1+1/vsy,1+1/vsx,-1-1/vsy)
 end
 
@@ -366,7 +381,7 @@ function widget:DrawScreenEffects()
   glTexture(0, offscreentex)
   glTexture(1, outlinemasktex)
   glUseShader(maskApplyShader)
-  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy) --this line breaks mearth labels
+  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy) --this line breaks mearth labels
   glCallList(leave2d)
   glBlending(false)
 end
@@ -422,12 +437,13 @@ function widget:Initialize()
     fragment = [[
       uniform sampler2D tex0;
       uniform int screenX;
+      uniform float thickness;
 
       void main(void) {
         vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
         gl_FragColor = vec4(0.0);
 
-        float pixelsize = 1.0/float(screenX);
+        float pixelsize = thickness/float(screenX);
         gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
         gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
 
@@ -435,11 +451,16 @@ function widget:Initialize()
 
         gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s - 1.0*pixelsize,texCoord.t) );
         gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s - 2.0*pixelsize,texCoord.t) );
+
+        gl_FragColor.rgb /= max(max(gl_FragColor.r, gl_FragColor.g), max(gl_FragColor.b, 1.0));
       }
     ]],
     uniformInt = {
       tex0 = 0,
       screenX = vsx,
+    },
+    uniformFloat = {
+      thickness = 1.0,
     },
   })
 
@@ -453,12 +474,13 @@ function widget:Initialize()
   blurShader_v = gl.CreateShader({
     fragment = [[      uniform sampler2D tex0;
       uniform int screenY;
+      uniform float thickness;
 
       void main(void) {
         vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
         gl_FragColor = vec4(0.0);
 
-        float pixelsize = 1.0/float(screenY);
+        float pixelsize = thickness/float(screenY);
         gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
         gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
 
@@ -466,11 +488,16 @@ function widget:Initialize()
 
         gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 1.0*pixelsize) );
         gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 2.0*pixelsize) );
+
+        gl_FragColor.rgb /= max(max(gl_FragColor.r, gl_FragColor.g), max(gl_FragColor.b, 1.0));
       }
     ]],
     uniformInt = {
       tex0 = 0,
       screenY = vsy,
+    },
+    uniformFloat = {
+      thickness = 1.0,
     },
   })
 
@@ -503,6 +530,8 @@ function widget:Initialize()
 
   uniformScreenX  = gl.GetUniformLocation(blurShader_h, 'screenX')
   uniformScreenY  = gl.GetUniformLocation(blurShader_v, 'screenY')
+  uniformThicknessX = gl.GetUniformLocation(blurShader_h, 'thickness')
+  uniformThicknessY = gl.GetUniformLocation(blurShader_v, 'thickness')
 
   fbo = gl.CreateFBO()
 
