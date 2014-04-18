@@ -417,6 +417,14 @@ local options = {
     },
   },  
   {
+    key         = "allyreclaim",
+    name        = "Reclaimable allies",
+    desc        = "Allows reclaiming allied units and structures",
+    type        = "bool",
+    section     = "modifiers",
+    def         = false,
+  },
+  {
     key    = "shuffle",
     name   = "Shuffle Start Points",
     desc   = "Shuffles start positions.",
