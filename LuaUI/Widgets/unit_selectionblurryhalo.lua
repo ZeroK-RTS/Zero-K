@@ -308,19 +308,19 @@ end
 local maskGen = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glUseShader(maskGenShader)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
+  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
   --glTexRect(-1-1/vsx,1+1/vsy,1+1/vsx,-1-1/vsy)
 end
 local blur_h = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glUseShader(blurShader_h)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
+  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
   --glTexRect(-1-1/vsx,1+1/vsy,1+1/vsx,-1-1/vsy)
 end
 local blur_v = function()
   --glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glUseShader(blurShader_v)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
+  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
   --glTexRect(-1-1/vsx,1+1/vsy,1+1/vsx,-1-1/vsy)
 end
 
@@ -336,9 +336,9 @@ function widget:DrawWorldPreUnit()
     resChanged = false
     if (vsx==1) or (vsy==1) then return end
      glUseShader(blurShader_h)
-    glUniformInt(uniformScreenX,  math.ceil(vsx*0.5) )
+    glUniformInt(uniformScreenX,  vsx )
      glUseShader(blurShader_v)
-    glUniformInt(uniformScreenY,  math.ceil(vsy*0.5) )
+    glUniformInt(uniformScreenY,  vsy )
   end
 
   glDepthTest(GL.GEQUAL)
@@ -366,7 +366,7 @@ function widget:DrawScreenEffects()
   glTexture(0, offscreentex)
   glTexture(1, outlinemasktex)
   glUseShader(maskApplyShader)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy) --this line breaks mearth labels
+  glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy) --this line breaks mearth labels
   glCallList(leave2d)
   glBlending(false)
 end
@@ -428,18 +428,18 @@ function widget:Initialize()
         gl_FragColor = vec4(0.0);
 
         float pixelsize = 1.0/float(screenX);
-        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
-        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
+        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
+        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s - 1.0*pixelsize,texCoord.t) );
-        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s - 2.0*pixelsize,texCoord.t) );
+        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s - 1.0*pixelsize,texCoord.t) );
+        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s - 2.0*pixelsize,texCoord.t) );
       }
     ]],
     uniformInt = {
       tex0 = 0,
-      screenX = math.ceil(vsx*0.5),
+      screenX = vsx,
     },
   })
 
@@ -459,18 +459,18 @@ function widget:Initialize()
         gl_FragColor = vec4(0.0);
 
         float pixelsize = 1.0/float(screenY);
-        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
-        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
+        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
+        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 1.0*pixelsize) );
-        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 2.0*pixelsize) );
+        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 1.0*pixelsize) );
+        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 2.0*pixelsize) );
       }
     ]],
     uniformInt = {
       tex0 = 0,
-      screenY = math.ceil(vsy*0.5),
+      screenY = vsy,
     },
   })
 
