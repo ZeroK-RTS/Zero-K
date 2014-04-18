@@ -428,13 +428,13 @@ function widget:Initialize()
         gl_FragColor = vec4(0.0);
 
         float pixelsize = 1.0/float(screenX);
-        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
-        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
+        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
+        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s - 1.0*pixelsize,texCoord.t) );
-        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s - 2.0*pixelsize,texCoord.t) );
+        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s - 1.0*pixelsize,texCoord.t) );
+        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s - 2.0*pixelsize,texCoord.t) );
       }
     ]],
     uniformInt = {
@@ -459,13 +459,13 @@ function widget:Initialize()
         gl_FragColor = vec4(0.0);
 
         float pixelsize = 1.0/float(screenY);
-        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
-        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
+        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
+        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 1.0*pixelsize) );
-        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 2.0*pixelsize) );
+        gl_FragColor += 0.9 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 1.0*pixelsize) );
+        //gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 2.0*pixelsize) );
       }
     ]],
     uniformInt = {
