@@ -423,27 +423,18 @@ function widget:Initialize()
       uniform sampler2D tex0;
       uniform int screenX;
 
-      const vec2 kernel = vec2(0.6,0.7);
-
       void main(void) {
         vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
         gl_FragColor = vec4(0.0);
 
-        int i;
-        int n = 1;
         float pixelsize = 1.0/float(screenX);
-        for(i = 1; i < 3; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s + i*pixelsize,texCoord.t) );
-          --n;
-        }
+        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
+        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        n = 0;
-        for(i = -2; i < 0; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s + i*pixelsize,texCoord.t) );
-          ++n;
-        }
+        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s - 1.0*pixelsize,texCoord.t) );
+        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s - 2.0*pixelsize,texCoord.t) );
       }
     ]],
     uniformInt = {
@@ -463,27 +454,18 @@ function widget:Initialize()
     fragment = [[      uniform sampler2D tex0;
       uniform int screenY;
 
-      const vec2 kernel = vec2(0.6,0.7);
-
       void main(void) {
         vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
         gl_FragColor = vec4(0.0);
 
-        int i;
-        int n = 1;
         float pixelsize = 1.0/float(screenY);
-        for(i = 0; i < 2; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s,texCoord.t + i*pixelsize) );
-          --n;
-        }
+        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
+        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        n = 0;
-        for(i = -2; i < 0; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s,texCoord.t + i*pixelsize) );
-          ++n;
-        }
+        gl_FragColor += 0.8 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 1.0*pixelsize) );
+        gl_FragColor += 0.3 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 2.0*pixelsize) );
       }
     ]],
     uniformInt = {
