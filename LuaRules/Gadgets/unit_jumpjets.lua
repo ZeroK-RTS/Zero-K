@@ -54,7 +54,9 @@ local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitPosition  = Spring.GetUnitPosition
 local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spSetUnitNoMinimap   = Spring.SetUnitNoMinimap
+local spGetUnitIsStunned   = Spring.GetUnitIsStunned
 local spGetCommandQueue    = Spring.GetCommandQueue
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
 local spSetUnitVelocity    = Spring.SetUnitVelocity
@@ -64,11 +66,11 @@ local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
 local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
-local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spCallCOBScript      = Spring.CallCOBScript
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
+local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitDefID       = Spring.GetUnitDefID
 local spGetUnitTeam        = Spring.GetUnitTeam
 local spDestroyUnit        = Spring.DestroyUnit
@@ -404,26 +406,32 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		--mcSetPosition(unitID, start[1] + vector[1],start[2] + vector[2]-6,start[3] + vector[3])
 		-- local oldQueue = spGetCommandQueue(unitID)
 		-- ReloadQueue(unitID, oldQueue, cmdTag)
-	
-		spSetUnitRulesParam(unitID,"jumpReloadStart",jumpEndTime)
-		for j=1, reloadTime do
-			if GG.wasMorphedTo[unitID] then
-				unitID,reloadTime = CopyJumpData(unitID,lineDist,flightDist )
-				lastJump[unitID] = jumpEndTime
-				jumping[unitID] = false
-				SetLeaveTracks(unitID, true)
-				mcDisable(unitID)
-				if unitID == nil then 
-					return
-				end
+		
+		if GG.wasMorphedTo[unitID] then
+			unitID,reloadTime = CopyJumpData(unitID,lineDist,flightDist )
+			lastJump[unitID] = jumpEndTime
+			jumping[unitID] = false
+			SetLeaveTracks(unitID, true)
+			mcDisable(unitID)
+			if unitID == nil then 
+				return
 			end
-			spSetUnitRulesParam(unitID,"jumpReload",j/reloadTime)
+		end
+		
+		Sleep()
+		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
+			Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
+		end
+		
+		local reloadSpeed = 1/reloadTime
+		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
+		
+		while reloadAmount < 1 do
+			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
+			local reloadFactor = (stunnedOrInbuild and 0) or spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
+			spSetUnitRulesParam(unitID,"jumpReload",reloadAmount)
 			Sleep()
-			if j == 1 then
-				if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
-					Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
-				end
-			end
 		end
 	end
 	
