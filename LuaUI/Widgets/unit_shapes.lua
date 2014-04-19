@@ -14,6 +14,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local usingDevEngine = Game.version:find('96.0.1')
+
 local function SetupCommandColors(state)
   local alpha = state and 1 or 0
   local f = io.open('cmdcolors.tmp', 'w+')
@@ -127,7 +129,7 @@ local visibleAllySelUnits = {}
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'showally','useteamcolors','debugMode',}
+options_order = {'showally','useteamcolors','debugMode', 'disableWithNewEngine'}
 options = {
 	showally = {
 		name = 'Show Ally Selections',
@@ -150,6 +152,22 @@ options = {
 		value = false,
 		advanced = true,
 		desc = 'Pings visible or selected units',
+	},
+	disableWithNewEngine = {
+		name = 'Disable for 96.0+',
+		type = 'bool',
+		value = true,
+		advanced = not usingDevEngine,
+		desc = 'Disable Selection Shapes with the development engine by default due to some graphics issues.',
+		OnChange = function(self)
+			if usingDevEngine then
+				if self.value then
+					widget:Shutdown()
+				else
+					widget:Initialize()
+				end
+			end
+		end,
 	},
 }
 
@@ -370,6 +388,10 @@ local function DestroyShape(shape)
 end
 
 function widget:Initialize()
+	if (usingDevEngine and options.disableWithNewEngine.value) then
+		return
+	end
+	
 	if not WG.allySelUnits then 
 		WG.allySelUnits = {} 
 	end
@@ -427,6 +449,10 @@ local visibleUnits, visibleSelected = {}, {}
 local degrot = {}
 local lastFrame = 0
 function widget:Update()
+	if (usingDevEngine and options.disableWithNewEngine.value) then
+		return
+	end
+	
 	-- [[
 	local mx, my = spGetMouseState()
 	local ct, id = spTraceScreenRay(mx, my)
@@ -610,7 +636,9 @@ local function DrawUnitShapes(allies)
 end
 
 function widget:DrawWorldPreUnit()
-	if Spring.IsGUIHidden() or (#visibleAllySelUnits + #visibleSelected == 0) then return end
+	if Spring.IsGUIHidden() or (#visibleAllySelUnits + #visibleSelected == 0) or (usingDevEngine and options.disableWithNewEngine.value) then 
+		return 
+	end
 	
 	glPushAttrib(GL_COLOR_BUFFER_BIT)
 
