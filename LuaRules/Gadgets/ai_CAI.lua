@@ -945,7 +945,7 @@ local function makeMex(team, unitID)
 	for i = 1, #GG.metalSpots do
 		if CallAsTeam(team, function () return (spTestBuildOrder(buildDefs.mexIds[1].ID, GG.metalSpots[i].x, 0 ,GG.metalSpots[i].z, 1) ~= 0 and IsTargetReallyReachable(unitID, GG.metalSpots[i].x, 0 ,GG.metalSpots[i].z)) end) then
 			local dis = disSQ(GG.metalSpots[i].x,GG.metalSpots[i].z,x,z)
-			if (not minMexSpotDisSQ) or ((dis < minMexSpotDisSQ) and (not isPosThreatened(a.allyTeam, GG.metalSpots[i].x, GG.metalSpots[i].z))) then
+			if (not minMexSpotDisSQ) or (dis < minMexSpotDisSQ) then
 				minMexSpotDisSQ = dis
 				minMexSpotID = i
 			end
