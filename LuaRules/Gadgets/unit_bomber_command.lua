@@ -16,7 +16,7 @@ function gadget:GetInfo()
   return {
     name      = "Aircraft Command",
     desc      = "Handles aircraft repair/rearm",
-    author    = "xponen, KingRaptor",
+    author    = "xponen, KingRaptor, GoogleFrog",
     date      = "20 April 2014, 25 Feb 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
@@ -377,7 +377,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		if replaceExistingRearm then
 			spGiveOrderToUnit(unitID, CMD.REMOVE, {index,}, {""})
 		end
-		spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, CMD.OPT_SHIFT, targetPad}, {"alt"})
+		spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, {"alt"}) --Internal to avoid repeat
 		cmdIgnoreSelf = false
 		return targetPad
 	end
@@ -539,8 +539,8 @@ function gadget:GameFrame(n)
 					table.remove(airpadsData[padID].emptySpot) --remove used spot
 					if Spring.GetUnitStates(bomberID)["repeat"] then 
 						cmdIgnoreSelf = true
-						--InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
-						spGiveOrderToUnit(bomberID, CMD_REARM, {targetPad}, {"shift"})
+						-- InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+						spGiveOrderToUnit(bomberID, CMD.INSERT, {-1, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, {"alt"}) --Internal to avoid repeat
 						cmdIgnoreSelf = false
 					end
 					if GG.SendBomberToPad then
