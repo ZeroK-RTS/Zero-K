@@ -490,6 +490,7 @@ end
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	if not spAreTeamsAllied(oldTeam, newTeam) then
 		gadget:UnitDestroyed(unitID, unitDefID, oldTeam)
+		gadget:UnitCreated(unitID, unitDefID, newTeam)
 		gadget:UnitFinished(unitID, unitDefID, newTeam)
 	end
 end
