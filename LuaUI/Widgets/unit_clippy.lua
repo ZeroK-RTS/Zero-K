@@ -113,6 +113,7 @@ local function GetTipDimensions(unitID, str, height, invert)
 end
 
 local function MakeTip(unitID, tip)
+	if not (unitID and tip) then return end
 	if (options.rankLimit.value and (rank > RANK_LIMIT)) then
 		return
 	end

@@ -1524,9 +1524,11 @@ local function getEnemyAntiAirInRange(allyTeam, x, z)
 	end
 	
 	for id, data in pairs(at.enemyMobileAA) do
-		if (x-data.x)^2 + (z-data.z)^2 < data.rangeSQ then
-			mobile = mobile + data.cost
-		end	
+		if data.x and data.z then
+			if (x-data.x)^2 + (z-data.z)^2 < data.rangeSQ then
+				mobile = mobile + data.cost
+			end
+		end
 	end
 	
 	return static, mobile
