@@ -7,7 +7,7 @@ function widget:GetInfo()
 		version   = "1.5",
 		date      = "7 April 2010",
 		license   = "GNU GPL, v2 or later",
-		layer     = -1, -- Puts it above minimap_startboxes with layer 0
+		layer     = 1001, -- Puts it above minimap_startboxes with layer 1002
 		enabled   = true,
 		handler   = true
 	}

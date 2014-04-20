@@ -19,7 +19,7 @@ function widget:GetInfo()
     author    = "trepan, jK, Rafal",
     date      = "2007-2012",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = 1002,
     enabled   = true  --  loaded by default?
   }
 end
