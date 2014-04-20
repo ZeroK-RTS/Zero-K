@@ -1,5 +1,6 @@
 -- scripts common to bombers
-local CMD_REARM = 32768
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+-- local CMD_REARM = 33410 --get from customcmds.h.lua
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local function ReloadQueue(queue, cmdTag, id)
