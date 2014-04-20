@@ -33,6 +33,7 @@ local spGetUnitDefID	= Spring.GetUnitDefID
 local spGetUnitIsDead	= Spring.GetUnitIsDead
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local spSetUnitRulesParam	= Spring.SetUnitRulesParam
+local spAreTeamsAllied = Spring.AreTeamsAllied
 
 include "LuaRules/Configs/customcmds.h.lua"
 
@@ -487,9 +488,10 @@ function GG.AircraftCrashingDown(unitID)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
-	gadget:UnitDestroyed(unitID, unitDefID, oldTeam)
-	gadget:UnitFinished(unitID, unitDefID, newTeam)
-	gadget:UnitCreated(unitID, unitDefID, newTeam)
+	if not spAreTeamsAllied(oldTeam, newTeam) then
+		gadget:UnitDestroyed(unitID, unitDefID, oldTeam)
+		gadget:UnitFinished(unitID, unitDefID, newTeam)
+	end
 end
 
 function gadget:GameFrame(n)
@@ -676,7 +678,6 @@ else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
-local airpadsData = SYNCED.airpadsData
 local spGetLocalTeamID = Spring.GetLocalTeamID
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetSpectatingState = Spring.GetSpectatingState
