@@ -24,8 +24,8 @@ unitDef = {
   
   explodeAs             = [[TINY_BUILDINGEX]],
   floater               = true,
-  footprintX            = 1,
-  footprintZ            = 1,
+  footprintX            = 3,
+  footprintZ            = 3,
   hoverAttack           = true,
   iconType              = [[none]],
   idleAutoHeal          = 10,
