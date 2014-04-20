@@ -97,6 +97,7 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.PATROL] = true,
 	[CMD.GUARD] = true,
 	[CMD.MANUALFIRE] = true,
+	[CMD.STOP] = true,
 }
 
 local defaultCommands = { -- commands that is processed by gadget
@@ -111,6 +112,7 @@ local defaultCommands = { -- commands that is processed by gadget
 	[CMD.MOVE] = true,
 	[CMD.REMOVE] = true,
 	[CMD.INSERT] = true,
+	[CMD.STOP] = true,
 }
 
 --------------------------------------------------------------------------------
