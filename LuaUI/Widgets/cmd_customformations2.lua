@@ -5,7 +5,7 @@ function widget:GetInfo()
 					"\n• mouse drag draw various command on ground."..
 					"\n• ALT+Attack draw attack command on the ground.",
 		author    = "Niobium", -- Based on 'Custom Formations' by jK and gunblob
-		version   = "v3.3",
+		version   = "v3.3", -- With dot drawing from v4.3
 		date      = "Mar, 2010",
 		license   = "GNU GPL, v2 or later",
 		layer     = 1000000,
@@ -15,6 +15,21 @@ function widget:GetInfo()
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+--------------------------------------------------------------------------------
+-- Epic Menu Options
+--------------------------------------------------------------------------------
+
+options_path = 'Settings/Interface/Custom Formations'
+options_order = { 'drawdots'}
+options = {
+	drawdots = {
+		name = "Draw expected location dots", 
+		desc = "Enable to draw dots where the units will move to, disable to draw a line",
+		type = 'bool', 
+		value = true
+	},
+}
 
 --------------------------------------------------------------------------------
 -- User Configurable Constants
@@ -78,6 +93,7 @@ local maxHungarianUnits = defaultHungarianUnits -- Also set when loading config
 local fNodes = {} -- Formation nodes, filled as we draw
 local fDists = {} -- fDists[i] = distance from node 1 to node i
 local totaldxy = 0 -- Measure of distance mouse has moved, used to unjag lines drawn in minimap
+local lineLength = 0 -- Total length of the line
 
 local dimmCmd = nil -- The dimming command (Used for color)
 local dimmNodes = {} -- The current nodes of dimming line
@@ -119,7 +135,7 @@ local spFindUnitCmdDesc = Spring.FindUnitCmdDesc
 local spGetModKeyState = Spring.GetModKeyState
 local spGetInvertQueueKey = Spring.GetInvertQueueKey
 local spIsAboveMiniMap = Spring.IsAboveMiniMap
-local spGetSelectedUnitCount = Spring.GetSelectedUnitsCount
+local spGetSelectedUnitsCount = Spring.GetSelectedUnitsCount
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGiveOrder = Spring.GiveOrder
@@ -130,6 +146,10 @@ local spTraceScreenRay = Spring.TraceScreenRay
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetUnitHeight = Spring.GetUnitHeight
+local spGetCameraPosition = Spring.GetCameraPosition
+local spGetViewGeometry = Spring.GetViewGeometry
+local spTraceScreenRay = Spring.TraceScreenRay
 
 local mapSizeX, mapSizeZ = Game.mapSizeX, Game.mapSizeZ
 local maxUnits = Game.maxUnits
@@ -139,7 +159,11 @@ local tsort = table.sort
 local floor = math.floor
 local ceil = math.ceil
 local sqrt = math.sqrt
+local sin = math.sin
+local cos = math.cos
+local max = math.max
 local huge = math.huge
+local pi2 = 2*math.pi
 
 local CMD_INSERT = CMD.INSERT
 local CMD_MOVE = CMD.MOVE
@@ -154,15 +178,6 @@ local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
 local keyShift = 304
-
---[[
-function widget:Initialize()
-	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
-		Spring.Echo("<CustomFormations2>: disabled for spectators")
-		widgetHandler:RemoveWidget()
-	end
-end
---]]
 
 --------------------------------------------------------------------------------
 -- Helper Functions
@@ -241,6 +256,7 @@ local function GetExecutingUnits(cmdID)
 	end
 	return units
 end
+
 local function AddFNode(pos)
 	
 	local px, pz = pos[1], pos[3]
@@ -260,8 +276,11 @@ local function AddFNode(pos)
 			return false
 		end
 		
+		local dis = sqrt(distSq)
+		
 		fNodes[n + 1] = pos
-		fDists[n + 1] = fDists[n] + sqrt(distSq)
+		fDists[n + 1] = fDists[n] + dis
+		lineLength = lineLength + dis
 	end
 	
 	totaldxy = 0
@@ -308,7 +327,11 @@ local function GetInterpNodes(mUnits)
 	local eDist = fDists[2]
 	
 	local sY 
-	if haswaterweapon[1] then sY=spGetGroundHeight(sX, sZ) else sY=math.max(0,spGetGroundHeight(sX,sZ)) end
+	if haswaterweapon[1] then 
+		sY = spGetGroundHeight(sX, sZ) 
+	else 
+		sY = math.max(0,spGetGroundHeight(sX,sZ)) 
+	end
 	interpNodes[1] = {sX, sY, sZ}
 	
 	for n = 1, number - 2 do
@@ -331,7 +354,11 @@ local function GetInterpNodes(mUnits)
 		local nX = sX * (1 - nFrac) + eX * nFrac
 		local nZ = sZ * (1 - nFrac) + eZ * nFrac
 		local nY 
-		if haswaterweapon[number+1] then nY=spGetGroundHeight(nX, nZ) else nY=math.max(0,spGetGroundHeight(nX, nZ)) end
+		if haswaterweapon[number+1] then 
+			nY = spGetGroundHeight(nX, nZ) 
+		else 
+			nY = math.max(0,spGetGroundHeight(nX, nZ)) 
+		end
 		interpNodes[n + 1] = {nX, nY, nZ}
 	end
 	
@@ -389,6 +416,7 @@ end
 --------------------------------------------------------------------------------
 function widget:MousePress(mx, my, mButton)
 	
+	lineLength = 0
 	-- Where did we click
 	inMinimap = spIsAboveMiniMap(mx, my)
 	if inMinimap and not MiniMapFullProxy then return false end
@@ -396,12 +424,16 @@ function widget:MousePress(mx, my, mButton)
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
 	if activeCmdID then
-		if mButton ~= 1 then return false end
+		if mButton ~= 1 then 
+			return false 
+		end
 		
 		usingCmd = activeCmdID
 		usingRMB = false
 	else
-		if mButton ~= 3 then return false end
+		if mButton ~= 3 then 
+			return false 
+		end
 		
 		local _, defaultCmdID = spGetDefaultCommand()
 		if not defaultCmdID then return false end
@@ -451,7 +483,7 @@ function widget:MousePress(mx, my, mButton)
 	if not AddFNode(pos) then return false end
 	
 	-- Is this line a path candidate (We don't do a path off an overriden command)
-	pathCandidate = (not overriddenCmd) and (spGetSelectedUnitCount()==1 or (alt and not requiresAlt[usingCmd]))
+	pathCandidate = (not overriddenCmd) and (spGetSelectedUnitsCount()==1 or (alt and not requiresAlt[usingCmd]))
 	
 	-- We handled the mouse press
 	return true
@@ -651,6 +683,7 @@ end
 --------------------------------------------------------------------------------
 -- Drawing
 --------------------------------------------------------------------------------
+
 local function tVerts(verts)
 	for i = 1, #verts do
 		local v = verts[i]
@@ -659,6 +692,7 @@ local function tVerts(verts)
         end
 	end
 end
+
 local function tVertsMinimap(verts)
 	for i = 1, #verts do
 		local v = verts[i]
@@ -667,6 +701,76 @@ local function tVertsMinimap(verts)
         end
 	end
 end
+
+local function DrawFilledCircle(pos, size, cornerCount)
+	glPushMatrix()
+	glTranslate(pos[1], pos[2], pos[3])
+	glBeginEnd(GL.TRIANGLE_FAN, function()
+		glVertex(0,0,0)
+		for t = 0, pi2, pi2 / cornerCount do
+			glVertex(sin(t) * size, 0, cos(t) * size)
+		end
+	end)
+	glPopMatrix()
+end
+
+local function DrawFilledCircleOutFading(pos, size, cornerCount)
+	glPushMatrix()
+	glTranslate(pos[1], pos[2], pos[3])
+	glBeginEnd(GL.TRIANGLE_FAN, function()
+		SetColor(usingCmd, 1)
+		glVertex(0,0,0)
+		SetColor(usingCmd, 0)
+		for t = 0, pi2, pi2 / cornerCount do
+			glVertex(sin(t) * size, 0, cos(t) * size)
+		end
+	end)
+	-- draw extra glow as base
+	glBeginEnd(GL.TRIANGLE_FAN, function()
+		SetColor(usingCmd, 1/15)
+		glVertex(0,0,0)
+		SetColor(usingCmd, 0)
+		local baseSize = size * 2.8
+		for t = 0, pi2, pi2 / 8 do
+			glVertex(sin(t) * baseSize, 0, cos(t) * baseSize)
+		end
+	end)
+	glPopMatrix()
+end
+
+local function DrawFormationDots(vertFunction, zoomY, unitCount)
+	local currentLength = 0
+	local lengthPerUnit = lineLength / (unitCount-1)
+	local lengthUnitNext = lengthPerUnit
+	local dotSize = sqrt(zoomY*0.075)
+	if (#fNodes > 1) and (unitCount > 1) then
+		SetColor(usingCmd, 0.6)
+		DrawFilledCircleOutFading(fNodes[1], dotSize, 11)
+		if (#fNodes > 2) then
+			for i=1, #fNodes-1 do
+				local x = fNodes[i][1]
+				local y = fNodes[i][3]
+				local x2 = fNodes[i+1][1]
+				local y2 = fNodes[i+1][3]
+				local dx = x - x2
+				local dy = y - y2
+				local length = sqrt((dx*dx)+(dy*dy))
+				while (currentLength + length >= lengthUnitNext) do
+					local factor = (lengthUnitNext - currentLength) / length
+					local factorPos =
+						{fNodes[i][1] + ((fNodes[i+1][1] - fNodes[i][1]) * factor),
+						fNodes[i][2] + ((fNodes[i+1][2] - fNodes[i][2]) * factor),
+						fNodes[i][3] + ((fNodes[i+1][3] - fNodes[i][3]) * factor)}
+					DrawFilledCircleOutFading(factorPos, dotSize, 11)
+					lengthUnitNext = lengthUnitNext + lengthPerUnit
+				end
+				currentLength = currentLength + length
+			end
+		end
+		DrawFilledCircleOutFading(fNodes[#fNodes], dotSize, 11)
+	end
+end
+
 local function DrawFormationLines(vertFunction, lineStipple)
 	
 	glLineStipple(lineStipple, 4095)
@@ -688,9 +792,36 @@ local function DrawFormationLines(vertFunction, lineStipple)
 	glLineStipple(false)
 end
 
+local Xs, Ys = spGetViewGeometry()
+Xs, Ys = Xs*0.5, Ys*0.5
+function widget:ViewResize(viewSizeX, viewSizeY)
+	Xs, Ys = spGetViewGeometry()
+	Xs, Ys = Xs*0.5, Ys*0.5
+end
+
 function widget:DrawWorld()
 	
-	DrawFormationLines(tVerts, 2)
+	if pathCandidate or not options.drawdots.value then
+		DrawFormationLines(tVerts, 2)
+	elseif #fNodes > 1 or #dimmNodes > 1 then
+		local camX, camY, camZ = spGetCameraPosition()
+		local at, p = spTraceScreenRay(Xs,Ys,true,false,false)
+		if at == "ground" then 
+			local dx, dy, dz = camX-p[1], camY-p[2], camZ-p[3]
+			--zoomY = ((dx*dx + dy*dy + dz*dz)*0.01)^0.25	--tests show that sqrt(sqrt(x)) is faster than x^0.25
+			zoomY = sqrt(dx*dx + dy*dy + dz*dz)
+		else
+			--zoomY = sqrt((camY - max(spGetGroundHeight(camX, camZ), 0))*0.1)
+			zoomY = camY - max(spGetGroundHeight(camX, camZ), 0)
+		end
+		if zoomY < 6 then 
+			zoomY = 6 
+		end
+		if lineLength > 0 then  --don't try and draw if the command was cancelled by having two mouse buttons pressed at once
+			local unitCount = spGetSelectedUnitsCount()
+			DrawFormationDots(tVerts, zoomY, unitCount)
+		end
+	end
 end
 function widget:DrawInMiniMap()
 	
@@ -702,6 +833,7 @@ function widget:DrawInMiniMap()
 		DrawFormationLines(tVertsMinimap, 1)
 	glPopMatrix()
 end
+
 function widget:Update(deltaTime)
 	
 	dimmAlpha = dimmAlpha - lineFadeRate * deltaTime

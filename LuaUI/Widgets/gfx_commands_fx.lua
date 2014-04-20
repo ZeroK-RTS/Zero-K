@@ -16,6 +16,8 @@ end
 -- NOTE:  STILL IN DEVELOPMENT!
 -- dont change without asking/permission please
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -96,6 +98,12 @@ local OPTIONS = {
 			duration		= 1,
 			baseColor		= {0.40 ,0.40 ,1.00 ,0.30},
 			ringColor		= {0.40 ,0.40 ,1.00 ,0.40}
+		},
+		jump = {
+			size			= 1.2,
+			duration		= 1,
+			baseColor		= {0.00 ,1.00 ,1.00 ,0.25},
+			ringColor		= {0.00 ,1.00 ,1.00 ,0.25}
 		},
 		map_mark = {
 			size			= 2,
@@ -306,18 +314,17 @@ end
 
 function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	local cmdType = false
-	if type(cmdOptions) == 'table'  and  #cmdOptions >= 3 then
+	if type(cmdOptions) == 'table' and #cmdOptions >= 3 then
 		if cmdID == CMD.MOVE then
 			cmdType = 'move'
-			
-		elseif cmdID == CMD.FIGHT  and   cmdID ~= CMD.DGUN  then
+		elseif cmdID == CMD.FIGHT and cmdID ~= CMD.DGUN  then
 			cmdType = 'fight'
-			
-		elseif cmdID == CMD.ATTACK  or   cmdID == CMD.DGUN  then
+		elseif cmdID == CMD.ATTACK or cmdID == CMD.DGUN  then
 			cmdType = 'attack'
-			
-		elseif cmdID == CMD.PATROL  then
+		elseif cmdID == CMD.PATROL then
 			cmdType = 'patrol'
+		elseif cmdID == CMD_JUMP then
+			cmdType = 'jump'
 		end
 		if cmdType then
 			AddCommandSpotter(cmdType, cmdOptions[1], cmdOptions[2], cmdOptions[3], os.clock(), unitID)
