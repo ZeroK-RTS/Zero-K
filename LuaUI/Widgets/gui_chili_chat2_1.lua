@@ -182,7 +182,7 @@ options_order = {
 	
 	
 	'lblFilter',
-	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel',
+	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
 	
 	'lblPointButtons',
 	'clickable_points','pointButtonOpacity',
@@ -358,6 +358,13 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
+	hideLog = {
+		name = "Hide Engine Logging Messages",
+		type = 'bool',
+		value = true,
+		OnChange = onOptionsChanged,
+		advanced = true,
+	},
 	max_lines = {
 		name = 'Maximum Lines (20-300)',
 		type = 'number',
@@ -437,7 +444,7 @@ options = {
 	autohide_time = {
 		name = "Autohide time",
 		type = 'number',
-		value = 4,
+		value = 8,
 		min = 1, max = 10, step = 1, 
 		OnChange = onOptionsChanged,
 	},
@@ -562,6 +569,8 @@ local function hideMessage(msg)
 		or (msg.msgtype == "player_to_allies" and options.hideAlly.value)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
+		or (msg.msgtype == 'other' and options.hideLog.value and not ((msg.argument):find('enabled!') or (msg.argument):find('disabled!') or 
+			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') ))
 end
 
 local function displayMessage(msg, remake)
@@ -793,17 +802,19 @@ function widget:AddConsoleMessage(msg)
 	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
 	while #messages > options.max_lines.value do
 		-- stack_console:RemoveChild(stack_console.children[1]) --disconnect children
-		stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+		if stack_console.children[1] and stack_console.children[1].text == messages[1].argument then
+			stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+		end
 		table.remove(messages, 1)
 		--stack_console:UpdateLayout()
 	end
 	
-	if playername == myName then
+	-- if playername == myName then
 		if WG.enteringText then
 			WG.enteringText = false
-			hideConsole()
+			-- hideConsole()
 		end 		
-	end
+	-- end
 end
 
 -----------------------------------------------------------------------
@@ -814,7 +825,10 @@ local timer = 0
 function widget:Update(s)
 
 	if options.autohide.value and time_opened and (DiffTimers(GetTimer(), time_opened) > options.autohide_time.value) then
-		hideConsole()	
+		-- echo(inputspace.state.enabled)
+		-- if not inputspace.visible then --TODO find some way to guarantee this doesn't go off when, and only when, text is being entered
+			hideConsole() 
+		-- end
 	end
 
 	timer = timer + s
@@ -876,8 +890,8 @@ function widget:Initialize()
 		if not visible then
 			screen0:AddChild(window_console)
 			visible = true
-			time_opened = GetTimer()
 		end
+		time_opened = GetTimer()
 	end
 	WG.chat.hideConsole = hideConsole
 	WG.chat.showConsole = showConsole
