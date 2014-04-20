@@ -365,11 +365,13 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	end
 	local targetPad = FindNearestAirpad(unitID, team) --UnitID find non-reserved airpad as target
 	if targetPad then
+		cmdIgnoreSelf = true
 		ReserveAirpad(unitID,targetPad)
 		--Spring.Echo(unitID.." directed to airpad "..targetPad)
-		local replaceExistingRearm = (detectedRearm and replaceExisting)
-		InsertCommand(unitID, index, CMD_REARM, {targetPad}, nil, replaceExistingRearm) --UnitID get RE-ARM command with reserved airpad as its Params
+		local replaceExistingRearm = (detectedRearm and replaceExisting) --replace existing Rearm (if available)
+		InsertCommand(unitID, index, CMD_REARM, {targetPad}, nil, replaceExistingRearm) --UnitID get RE-ARM commandID. airpadID as its Params[1]
 		--spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, 0, targetPad}, {"alt"})
+		cmdIgnoreSelf = false
 		return targetPad
 	end
 end
@@ -450,6 +452,7 @@ function ReserveAirpad(bomberID,airpadID)
 	spSetUnitRulesParam(bomberID, "airpadReservation",1)
 	local reservations = airpadsData[airpadID].reservations
 	if not reservations.units[bomberID] then
+		bomberToPad[bomberID] = {padID = airpadID, unitDefID = spGetUnitDefID(bomberID)}
 		-- totalReservedPad = totalReservedPad + 1
 		reservations.units[bomberID] = true --UnitID pre-reserve airpads so that next UnitID (if available) don't try to reserve the same spot
 		reservations.count = reservations.count + 1
@@ -489,7 +492,6 @@ function gadget:GameFrame(n)
 	-- if n%30 == 0 then
 		-- Spring.Echo(totalReservedPad)
 	-- end
-	cmdIgnoreSelf = true
 	for bomberID in pairs(rearmRequest) do
 		RequestRearm(bomberID, nil, true)
 		rearmRequest[bomberID] = nil
@@ -527,7 +529,9 @@ function gadget:GameFrame(n)
 					local padPiece = airpadsData[padID].emptySpot[spotCount]
 					table.remove(airpadsData[padID].emptySpot) --remove used spot
 					if Spring.GetUnitStates(bomberID)["repeat"] then 
+						cmdIgnoreSelf = true
 						InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+						cmdIgnoreSelf = false
 					end
 					if GG.SendBomberToPad then
 						GG.SendBomberToPad(bomberID, padID, padPiece)
@@ -546,16 +550,15 @@ function gadget:GameFrame(n)
 			end
 		end
 		
-		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!!
+		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!! <-- What this really mean?
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
 				local queue = Spring.GetCommandQueue(unitID, 1)
-				if queue and #queue > 0 and combatCommands[queue[1].id] then
+				if queue and #queue > 0 and combatCommands[queue[1].id] then --should never happen... (all should be catch by AllowCommand) 
 					RequestRearm(unitID, nil, true)
 				end
 			end
 		end
 	end
-	cmdIgnoreSelf = false
 end
 
 function GG.RefuelComplete(bomberID)
@@ -598,7 +601,6 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		if not airpadsData[targetAirpad] then
 			return true, true	-- trying to land on an unregistered (probably under construction) pad, abort
 		end
-		bomberToPad[unitID] = {padID = targetAirpad, unitDefID = unitDefID}
 		ReserveAirpad(unitID,targetAirpad) --Reserve the airpad specified in RE-ARM params (if not yet reserved)
 		local x, y, z = Spring.GetUnitPosition(targetAirpad)
 		Spring.SetUnitMoveGoal(unitID, x, y, z) -- try circle the airpad until free airpad allow bomberLanding.
@@ -636,7 +638,8 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			return false --don't find new pad if already on the pad currently refueling or repairing.
 		end
 		if combatCommands[cmdID] then
-			return true --don't leave pad when given attack/fight command when refueling, allow command and skip CancelAirpadReservation
+			-- return true --don't leave pad when given attack/fight command when refueling, allow command and skip CancelAirpadReservation
+			--Cannot be used at moment, somehow trigger a bug, where giving attack command while on airpad cause no auto-rearm after attack (fix later)
 		end
 	elseif noAmmo == 1 then
 		if combatCommands[cmdID] then	-- don't fight without ammo, go get ammo first!
