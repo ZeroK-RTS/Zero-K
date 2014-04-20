@@ -17,13 +17,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
 
 function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator.lua by msafwan, and central_build_AI.lua by Troy H. Creek
-	if (id == CMD.ATTACK) then
+	if (id == CMD.ATTACK or id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], params[4]
-		if (cr == nil) then return false end --skip the whole thing if player use a single-click (widget only accept area-attack)
-		if (cx == nil or cy == nil or cz == nil) then return false end --skip whole thing if coordinate was nil (eg: issue command outside of map)
+		if (cr == nil) then 
+			return false 
+		end --skip the whole thing if player use a single-click (widget only accept area-attack)
+		if (cx == nil or cy == nil or cz == nil) then 
+			return false 
+		end --skip whole thing if coordinate was nil (eg: issue command outside of map)
 		local cx2, cy2, cz2 = params[4], params[5], params[6]
 		local units	= Spring.GetSelectedUnits()
 		local antiAirUnits = {}
@@ -65,22 +71,22 @@ function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator
 				if #allTargets>1 then
 					if options.ctrl then
 						--split between AA and ground, and split target between units
-						IssueSplitedCommand(antiAirUnits,airTargets,options)
-						IssueSplitedCommand(normalUnits,allTargets,options)
+						IssueSplitedCommand(antiAirUnits,airTargets,id,options)
+						IssueSplitedCommand(normalUnits,allTargets,id,options)
 						return true --return true after widget issued a replacement command.
 					else
 						if #antiAirUnits>1 then
 							--split between AA and ground
-							IssueCommand(antiAirUnits,airTargets,options)
-							IssueCommand(normalUnits,allTargets,options)
+							IssueCommand(antiAirUnits,airTargets,id,options)
+							IssueCommand(normalUnits,allTargets,id,options)
 							return true
 						else 
 							-- See http://springrts.com/mantis/view.php?id=4351
-							if reverseCompatibility then
+							if reverseCompatibility or id ~= CMD.ATTACK then
 								--let Spring handle
 								return false
 							else
-								IssueCommand(normalUnits,allTargets,options)
+								IssueCommand(normalUnits,allTargets,id,options)
 								return true
 							end
 						end
@@ -118,17 +124,17 @@ function ReturnAllAirTarget(targetUnits, selectedAlly,checkAir)
 	return filteredTargets, nonFilteredTargets
 end
 
-function IssueCommand(selectedUnits,allTargets,options)
+function IssueCommand(selectedUnits,allTargets,cmdID,options)
 	if #selectedUnits>=1 and #allTargets>=1 then
-		local attackCommandListAll = PrepareCommandArray(allTargets, options,1)
+		local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,1)
 		Spring.GiveOrderArrayToUnitArray (selectedUnits, attackCommandListAll)
 	end
 end
 
-function IssueSplitedCommand(selectedUnits,allTargets,options)
+function IssueSplitedCommand(selectedUnits,allTargets,cmdID,options)
 	if #selectedUnits>=1 and #allTargets>=1 then
 		for i=1, #selectedUnits do
-			local attackCommandListAll = PrepareCommandArray(allTargets, options,i,true)
+			local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,i,true)
 			Spring.GiveOrderArrayToUnitArray ({selectedUnits[i]}, attackCommandListAll)
 		end
 	end
@@ -148,7 +154,7 @@ function GetDotsFloating (unitID) --ref: gui_vertLineAid.lua by msafwan
 	return isFloating
 end
 
-function PrepareCommandArray (targetUnits, options,indx,shuffle)
+function PrepareCommandArray (targetUnits, cmdID, options,indx,shuffle)
 	indx = LoopAroundIndex(indx, #targetUnits)
 	local stepSkip = 1
 	if shuffle then
@@ -158,12 +164,14 @@ function PrepareCommandArray (targetUnits, options,indx,shuffle)
 	end
 	local attackCommandList = {}
 	local j = 1
-	attackCommandList[j] = {CMD.ATTACK,{targetUnits[indx],},{((options.shift and "shift") or nil),}}
-	for i=1, #targetUnits-1, 1 do
-		j= j + 1
-		indx = indx + stepSkip --stepSkip>1 will shuffle the queue
-		indx = LoopAroundIndex(indx, #targetUnits)
-		attackCommandList[j] = {CMD.ATTACK,{targetUnits[indx],},{"shift",}}
+	attackCommandList[j] = {cmdID,{targetUnits[indx],},{((options.shift and "shift") or nil),}}
+	if cmdID == CMD.ATTACK then
+		for i=1, #targetUnits-1, 1 do
+			j= j + 1
+			indx = indx + stepSkip --stepSkip>1 will shuffle the queue
+			indx = LoopAroundIndex(indx, #targetUnits)
+			attackCommandList[j] = {cmdID,{targetUnits[indx],},{"shift",}}
+		end
 	end
 	return attackCommandList
 end

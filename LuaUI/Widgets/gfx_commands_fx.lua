@@ -312,9 +312,9 @@ end
 
 
 
-function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdOptions, cmdParams)
 	local cmdType = false
-	if type(cmdOptions) == 'table' and #cmdOptions >= 3 then
+	if type(cmdParams) == 'table' and #cmdParams >= 3 then
 		if cmdID == CMD.MOVE then
 			cmdType = 'move'
 		elseif cmdID == CMD.FIGHT and cmdID ~= CMD.DGUN  then
@@ -327,7 +327,7 @@ function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpti
 			cmdType = 'jump'
 		end
 		if cmdType then
-			AddCommandSpotter(cmdType, cmdOptions[1], cmdOptions[2], cmdOptions[3], os.clock(), unitID)
+			AddCommandSpotter(cmdType, cmdParams[1], cmdParams[2], cmdParams[3], os.clock(), unitID)
 		end
 	end
 end
