@@ -186,6 +186,7 @@ local function GetClosestMetalSpot(x, z) --is used by single mex placement, not 
 	end
 	return bestSpot, sqrt(bestDist), bestIndex
 end
+WG.GetClosestMetalSpot = GetClosestMetalSpot
 
 local function Distance(x1,z1,x2,z2)
 	local dis = (x1-x2)*(x1-x2)+(z1-z2)*(z1-z2)
@@ -668,6 +669,8 @@ function widget:DrawWorld()
 	local _, cmdID = spGetActiveCommand()
 	local showecoMode = WG.showeco
 	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
+	cmdID = cmdID or (WG.InitialQueue and -(WG.InitialQueue.GetSelDefID() or 0))
+	
 	
 	local mx, my = spGetMouseState()
 	local _, pos = spTraceScreenRay(mx, my, true)

@@ -333,21 +333,36 @@ local config = {
 --  FUNCTIONS
 ------------------------
 -- this gets invoked when button is clicked 
-local function ClickFunc(button, x, y, mouse)
+local function ClickFunc(button, x, y, mouse, customFunc, customFuncArgs)
 	local left, right = mouse == 1, mouse == 3
 	local alt,ctrl,meta,shift = Spring.GetModKeyState()
-	local index = Spring.GetCmdDescIndex(button.cmdid)
-	if (left) then
-		Spring.SetActiveCommand(index,1,left,right,alt,ctrl,meta,shift)
-	elseif (right) then
-		Spring.SetActiveCommand(index,3,left,right,alt,ctrl,meta,shift)
+	local mb = (left and 1) or (right and 3)
+	if mb then
+		if customFunc then
+			customFunc(unpack(customFuncArgs))
+		end
+		local index = Spring.GetCmdDescIndex(button.cmdid)
+		if index then
+			Spring.SetActiveCommand(index,mb,left,right,alt,ctrl,meta,shift)
+		end
 	end
-end 
+end
+
+-- this lets you create special buttons in integral
+local function MakeSpecialCmdDesc(cmdID, customFunc, customFuncArgs, params)
+	return {
+		id = cmdID,
+		tooltip = params and params.tooltip,
+		disabled = params and params.disabled,
+		customFunc = customFunc,
+		customFuncArgs = customFuncArgs,
+	}
+end
 
 ------------------------
 --  Generates or updates chili button - either image or text or both based - container is parent of button, cmd is command desc structure
 ------------------------
-local function MakeButton(container, cmd, insertItem, index) 
+local function MakeButton(container, cmd, insertItem, index)
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
 	local gridHotkeyed = not isState and menuChoice ~= 1 and menuChoice ~= 6 
@@ -448,7 +463,7 @@ local function MakeButton(container, cmd, insertItem, index)
 			isDisabled = cmd.disabled;
 			tooltip = tooltip;
 			cmdid = cmd.id;
-			OnClick = {ClickFunc} --activate the clicked command	
+			OnClick = {function(self, x, y, mouse) ClickFunc(self, x, y, mouse, cmd.customFunc, cmd.customFuncArgs) end}
 		}
 		if (isState) then 
 			button.padding = {4,4,2.5,2}
@@ -667,11 +682,11 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 		else return 0 end
 	end
 	
-	--Spring.Echo(CMD.OPT_META) = 4
-	--Spring.Echo(CMD.OPT_RIGHT) = 16
-	--Spring.Echo(CMD.OPT_SHIFT) = 32
-	--Spring.Echo(CMD.OPT_CTRL) = 64
-	--Spring.Echo(CMD.OPT_ALT) = 128
+	--CMD.OPT_META = 4
+	--CMD.OPT_RIGHT = 16
+	--CMD.OPT_SHIFT = 32
+	--CMD.OPT_CTRL = 64
+	--CMD.OPT_ALT = 128
 	
 	--it's not using the options, even though it's receiving them correctly
 	--so we have to do it manually
@@ -871,8 +886,8 @@ local function ManageCommandIcons(useRowSort)
 end
 
 local function Update(buttonpush) 
-    local commands = widgetHandler.commands
-    local customCommands = widgetHandler.customCommands
+	local commands = widgetHandler.commands
+	local customCommands = widgetHandler.customCommands
 	--most commands don't use row sorting; econ, defense and special do
 	local useRowSort = (menuChoice == 3 or menuChoice == 4 or menuChoice == 5)
 	
@@ -902,7 +917,22 @@ local function Update(buttonpush)
 	--Spring.Echo(#commands)
 	for i = 1, #commands do ProcessCommand(commands[i]) end 
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
-	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end 
+	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
+	
+	-- handling for initial queue
+	if Spring.GetGameFrame() <= 0 then
+		local buildOptions = WG.InitialQueue and WG.InitialQueue.GetBuildOptions()
+		if buildOptions then
+			for i=1,#buildOptions do
+				local ud = UnitDefNames[buildOptions[i]]
+				local udid = ud.id
+				local func = WG.InitialQueue.SetSelDefID
+				local args = {udid}
+				local cmdDesc = MakeSpecialCmdDesc(-udid, func, args, {tooltip = "Build: " .. ud.humanName .. " - "})
+				ProcessCommand(cmdDesc)
+			end
+		end
+	end
 
 	menuChoices[1].array = n_common
 	menuChoices[2].array = n_factories
@@ -1090,6 +1120,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 					local index = Spring.GetCmdDescIndex(cmdid)
 					if index then
 						Spring.SetActiveCommand(index,1,true,false,false,false,false,false)
+						thingsDone = true
+					elseif commandButtons[cmdid] then
+						local button = commandButtons[cmdid].button
+						button.OnClick[1](button, nil, nil, 1)
 						thingsDone = true
 					end
 				end
