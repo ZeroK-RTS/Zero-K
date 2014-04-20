@@ -212,7 +212,7 @@ end
 options = {
 	
 	lblError = {name='Error Filter', type='label'},
-	lblFilter = {name='Filtering', type='label', advanced = true},
+	lblFilter = {name='Filtering', type='label', advanced = false},
 	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
 	lblHilite = {name='Highlighting', type='label'},
@@ -335,14 +335,14 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
-		advanced = true,
+		advanced = false,
 	},
 	hideAlly = {
 		name = "Hide Ally Chat",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
-		advanced = true,
+		advanced = false,
 	},
 	hidePoint = {
 		name = "Hide Points",
@@ -570,7 +570,7 @@ local function hideMessage(msg)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
 		or (msg.msgtype == 'other' and options.hideLog.value and not ((msg.argument):find('enabled!') or (msg.argument):find('disabled!') or 
-			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') ))
+			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') or (msg.argument:find('following') )))
 end
 
 local function displayMessage(msg, remake)
