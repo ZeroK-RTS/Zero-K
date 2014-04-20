@@ -179,7 +179,7 @@ function setReplaySpeed (speed, i)
 		Spring.SendCommands ("setminspeed " .. speed)
 		Spring.SendCommands ("setminspeed " ..0.1)
 	else	--slowdown
-		wantedSpeed = speed
+		-- wantedSpeed = speed
 		--[[
 		--does not work:
 		Spring.SendCommands ("slowdown")
@@ -187,28 +187,29 @@ function setReplaySpeed (speed, i)
 		Spring.SendCommands ("slowdown")
 		Spring.SendCommands ("slowdown")
 		Spring.SendCommands ("slowdown")
+		]]--
 		--does not work:
-		local i = 0
-		while (Spring.GetGameSpeed() > speed and i < 50) do
-			--Spring.SendCommands ("setminspeed " ..0.4)
-			--Spring.SendCommands ("setmaxpeed " .. speed)
-			Spring.SendCommands ("slowdown")
-			i=i+1
-		end
-		--]]		
+		-- local i = 0
+		-- while (Spring.GetGameSpeed() > speed and i < 50) do
+			-- Spring.SendCommands ("setminspeed " ..0.1)
+			Spring.SendCommands ("setmaxspeed " .. speed)
+		  Spring.SendCommands ("setmaxspeed " .. 10.0)
+			-- Spring.SendCommands ("slowdown")
+			-- i=i+1
+		-- end	
 	end	
 	--Spring.SendCommands ("setmaxpeed " .. speed)
 	progress_speed:SetValue(i)
 end
 
 function widget:Update(dt)
-	if (wantedSpeed) then
-		if (Spring.GetGameSpeed() > wantedSpeed) then
-			Spring.SendCommands ("slowdown")
-		else
-			wantedSpeed = nil
-		end
-	end
+	-- if (wantedSpeed) then
+	-- 	if (Spring.GetGameSpeed() > wantedSpeed) then
+	-- 		Spring.SendCommands ("slowdown")
+	-- 	else
+	-- 		wantedSpeed = nil
+	-- 	end
+	-- end
 	if skipped == true then
 		if lastSkippedTime > 1.5 then
 			Spring.SendCommands("skip 1")

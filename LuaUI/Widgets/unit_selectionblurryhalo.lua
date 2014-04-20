@@ -287,7 +287,7 @@ local function DrawHaloFunc()
     
 	local mx, my = spGetMouseState()
     local pointedType, data = spTraceScreenRay(mx, my)
-	if pointedType == 'unit' and spValidUnitID(data) and not spIsUnitIcon(data) then
+	if pointedType == 'unit' and spValidUnitID(data) then -- and not spIsUnitIcon(data) then
 		local teamID = spGetUnitTeam(data)
 		if teamID == spGetMyTeamID() then
 			glColor(myHoverColor)
