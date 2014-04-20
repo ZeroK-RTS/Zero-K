@@ -155,7 +155,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode tamper type SHATTER | BITMAP1;
 		explode bottom type BITMAPONLY | BITMAP2;
 		explode furnace type BITMAPONLY | BITMAP2;
@@ -163,13 +163,13 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode tamper type SHATTER | EXPLODE_ON_HIT | BITMAP1;
 		explode bottom type BITMAPONLY | BITMAP2;
 		explode furnace type BITMAPONLY | BITMAP2;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode tamper type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 	explode bottom type SHATTER | EXPLODE_ON_HIT | BITMAP2;
 	explode furnace type SHATTER | EXPLODE_ON_HIT | BITMAP2;
