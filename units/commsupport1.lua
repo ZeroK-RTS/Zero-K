@@ -45,7 +45,7 @@ unitDef = {
     commtype = [[4]],
   },
 
-  energyMake          = 8,
+  energyMake          = 6,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
@@ -95,7 +95,7 @@ unitDef = {
   terraformSpeed      = 600,
   turnRate            = 1350,
   upright             = true,
-  workerTime          = 12,
+  workerTime          = 10,
 
   weapons             = {
 

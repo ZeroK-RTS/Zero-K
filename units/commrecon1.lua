@@ -47,7 +47,7 @@ unitDef = {
     commtype = [[3]],
   },
 
-  energyMake          = 8,
+  energyMake          = 6,
   energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
@@ -59,7 +59,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   mass                = 407,
-  maxDamage           = 1800,
+  maxDamage           = 1600,
   maxSlope            = 36,
   maxVelocity         = 1.45,
   maxWaterDepth       = 5000,

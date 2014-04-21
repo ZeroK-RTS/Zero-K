@@ -47,7 +47,7 @@ unitDef = {
 	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
   },
 
-  energyMake             = 8,
+  energyMake             = 6,
   energyStorage          = 0,
   energyUse              = 0,
   explodeAs              = [[ESTOR_BUILDINGEX]],

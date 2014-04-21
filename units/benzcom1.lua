@@ -44,7 +44,7 @@ unitDef = {
 	commtype = [[5]],
   },
 
-  energyMake          = 8,
+  energyMake          = 6,
   energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
