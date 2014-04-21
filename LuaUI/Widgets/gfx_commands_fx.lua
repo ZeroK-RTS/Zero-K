@@ -58,10 +58,6 @@ local OPTIONS = {
 	ringScale					= 0.75,
 	reduceOverlapEffect			= 0.08,		-- when spotters have the same coordinates: reduce the opacity: 1 is no reducing while 0 is no adding
 	
-	drawLine					= false,
-	linePartWidth				= 15,
-	linePartLength				= 20,
-	
 	types = {
 		leftclick = {
 			size			= 0.58,
@@ -180,48 +176,6 @@ local function DrawRingCircle(parts, ringSize, ringInnerSize, ringOuterSize, rRi
 	end
 end
 
-
-local function DrawLine(x1,y1,z1, x2,y2,z2, width, partLength)
-	local xDifference		= x2 - x1
-	local yDifference		= y2 - y1
-	local zDifference		= z2 - z1
-	local halfWidth			= width / 2
-	local thetaInRadians	= math.atan2(yDifference, xDifference)
-	local theta				= thetaInRadians * 180 / math.pi
-	local perpendicular		= theta + 90;
-	if (perpendicular > 360) then
-		perpendicular = perpendicular - 360
-	elseif (perpendicular < 0) then
-		perpendicular = perpendicular + 360
-	end
-	local perpendicularInRadians = perpendicular * math.pi / 180
-
-	local yOffset = math.sin(perpendicularInRadians) * halfWidth
-	local xOffset = math.cos(perpendicularInRadians) * halfWidth
-	
-	--Spring.Echo(yOffset .. '   ' .. xOffset)
-	
-	gl.Vertex(0+xOffset, 0+yOffset, 0)
-	gl.Vertex(0-xOffset, 0-yOffset, 0)
-	
-	gl.Vertex((x2-x1)-xOffset, (y2-y1)-yOffset, z2-z1)
-	gl.Vertex((x2-x1)+xOffset, (y2-y1)+yOffset, z2-z1)
-	
-	
-	if 1 == 2 then
-		local distance = math.sqrt(xDifference*xDifference + yDifference*yDifference + zDifference*zDifference)
-		local parts = Round(distance / partLength)
-		local partDistance = distance / parts
-		local partSpacing = 0.8
-		for i = 1, parts do
-			
-			
-			
-		end
-	end
-end
-
-
 local function DrawGroundquad(wx,gy,wz,size)
 	gl.TexCoord(0,0)
 	gl.Vertex(wx-size,gy+size,wz-size)
@@ -311,8 +265,7 @@ function widget:MousePress(x, y, button)
 end
 
 
-
-function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdOptions, cmdParams)
+function widget:CommandNotify(cmdID, cmdParams, options)
 	local cmdType = false
 	if type(cmdParams) == 'table' and #cmdParams >= 3 then
 		if cmdID == CMD.MOVE then
@@ -327,7 +280,7 @@ function widget:UnitCommand(unitID, unitDefID, teamID, cmdID, cmdOptions, cmdPar
 			cmdType = 'jump'
 		end
 		if cmdType then
-			AddCommandSpotter(cmdType, cmdParams[1], cmdParams[2], cmdParams[3], os.clock(), unitID)
+			AddCommandSpotter(cmdType, cmdParams[1], cmdParams[2], cmdParams[3], os.clock())
 		end
 	end
 end
@@ -428,40 +381,6 @@ function widget:DrawWorldPreUnit()
 					--parts = parts * (ringSize / (size*OPTIONS.ringScale))		-- this reduces parts when ring is little, but introduces temporary gaps when a part is added
 					if parts < 6 then parts = 6 end
 					gl.BeginEnd(GL.QUADS, DrawRingCircle, parts, ringSize, ringInnerSize, ringOuterSize, rRing,gRing,bRing,aRing)
-				end
-				
-				-- line
-				if OPTIONS.drawLine and cmdType == 'move' then
-					gl.Color(r,g,b,a)
-					local cmdQueue = spGetUnitCommands(unitID)
-					if cmdQueue ~= nil then
-						if #cmdQueue < 2  and 1 == 2 then		-- should only be unit coords if unit has no queue with cmd-coords
-							local originX, originY, originZ = spGetUnitPosition(unitID)
-							gl.BeginEnd(GL.QUADS, DrawLine, cmdValue.x, cmdValue.y, cmdValue.z, originX, originY, originZ, OPTIONS.linePartWidth, OPTIONS.linePartLength)
-						end
-						
-						for i=1, #cmdQueue do
-							
-							if (cmdQueue[i].id == CMD.MOVE) then
-								local originX	= cmdQueue[i].params[1]
-								local originY	= cmdQueue[i].params[2]
-								local originZ	= cmdQueue[i].params[3]
-								if i == 1 then
-									local prevX, prevY, prevZ = spGetUnitPosition(unitID)
-									--gl.Translate(originX, originY, originZ)
-									gl.BeginEnd(GL.QUADS, DrawLine, originX, originY, originZ, prevX, prevY, prevZ, OPTIONS.linePartWidth, OPTIONS.linePartLength)
-								else
-									local prevX		= cmdQueue[i-1].params[1]
-									local prevY		= cmdQueue[i-1].params[2]
-									local prevZ		= cmdQueue[i-1].params[3]
-									if cmdQueue[i-1].id == CMD.MOVE then
-										gl.Translate(originX, originY, originZ)
-										--gl.BeginEnd(GL.QUADS, DrawLine, originX, originY, originZ, prevX, prevY, prevZ, OPTIONS.linePartWidth, OPTIONS.linePartLength)
-									end
-								end
-							end
-						end
-					end
 				end
 				
 				-- draw + erase:   nickname / draw icon
