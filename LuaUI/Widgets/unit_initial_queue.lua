@@ -265,7 +265,8 @@ function widget:Update(dt)
 		timer = 0
 	end
 end
-	
+
+--[[
 function widget:DrawScreen()
 	gl.PushMatrix()
 	gl.Translate(scrW/2, scrH*0.4, 0)
@@ -274,10 +275,14 @@ function widget:DrawScreen()
 	end
 	gl.PopMatrix()
 end
+]]--
+
 function widget:DrawWorld()
 	--don't draw anything once the game has started; after that engine can draw queues itself
 	if gameStarted then return end
 
+	local clash = false
+	
 	-- Set up gl
 	gl.LineWidth(1.49)
 
@@ -314,10 +319,12 @@ function widget:DrawWorld()
 		local buildData = buildQueue[b]
 
 		if selBuildData and DoBuildingsClash(selBuildData, buildData) then
-			DrawBuilding(buildData, borderClashColor, buildingQueuedAlpha)
-		else
-			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha)
+		--	DrawBuilding(buildData, borderClashColor, buildingQueuedAlpha)
+			clash = true
 		end
+		--else
+			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha)
+		--end
 
 		queueLineVerts[#queueLineVerts + 1] = {v={buildData[2], buildData[3], buildData[4]}}
 	end
@@ -325,12 +332,12 @@ function widget:DrawWorld()
 	-- Draw queue lines
 	gl.Color(buildLinesColor)
 	gl.LineStipple("springdefault")
-		gl.Shape(GL.LINE_STRIP, queueLineVerts)
+	gl.Shape(GL.LINE_STRIP, queueLineVerts)
 	gl.LineStipple(false)
 
 	-- Draw selected building
 	if selBuildData then
-		if Spring.TestBuildOrder(selDefID, selBuildData[2], selBuildData[3], selBuildData[4], selBuildData[5]) ~= 0 then
+		if (not clash) and Spring.TestBuildOrder(selDefID, selBuildData[2], selBuildData[3], selBuildData[4], selBuildData[5]) ~= 0 then
 			DrawBuilding(selBuildData, borderValidColor, 1.0, true)
 		else
 			DrawBuilding(selBuildData, borderInvalidColor, 1.0, true)
