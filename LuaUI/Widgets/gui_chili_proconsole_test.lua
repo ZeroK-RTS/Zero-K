@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.003 Chili Chat Pro Console.",
+    desc      = "v0.004 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -76,8 +76,8 @@ local MESSAGE_RULES = {
 	replay_spec_to_allies = { format = '#s[$playername (replay)] $argument' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
 	replay_spec_to_everyone = { format = '#s[$playername (replay)] #e$argument' },
 
-	label = { format = '#p *** $playername added label \'$argument\'' },
-	point = { format = '#p *** $playername added point' },
+	label = { format = '#p$playername#e added label: $argument' },
+	point = { format = '#p$playername#e added point.' },
 	autohost = { format = '#o> $argument', noplayername = true },
 	other = { format = '#o$text' } -- no pattern... will match anything else
 }
@@ -169,30 +169,30 @@ local DiffTimers = Spring.DiffTimers
 
 options_path = "Settings/HUD Panels/Chat/Pro Console"
 options_order = {
-	'lblError',
-	'error_opengl_source',	
 	
 	'lblGeneral',
-	'mousewheel', 
+	--'mousewheel', 
 	'defaultAllyChat',
-	'text_height', 'max_lines',
+	'text_height_chat', 'text_height_console',
+	'autohide_text_time',
+	'max_lines',
+	
 	'color_chat_background','color_console_background',
 	'color_chat', 'color_ally', 'color_other', 'color_spec',
 	
 	
 	'lblFilter',
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
+	'error_opengl_source',	
 	
 	'lblPointButtons',
 	'clickable_points','pointButtonOpacity',
 	
-	'lblAutohide',
-	'autohide_text_time',
-	
-	
 	'lblHilite',
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight','highlighted_text_height', 
+	'highlight_surround', 'highlight_sound', 'color_highlight',
+	
+	--'highlighted_text_height', 
 	
 	'lblDedupe',
 	'dedupe_messages', 'dedupe_points','color_dup',
@@ -210,7 +210,6 @@ end
 
 options = {
 	
-	lblError = {name='Error Filter', type='label'},
 	lblFilter = {name='Filtering', type='label', advanced = false},
 	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
@@ -226,13 +225,21 @@ options = {
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 	},
 	
-	text_height = {
-		name = 'Text Size',
+	text_height_chat = {
+		name = 'Chat Text Size',
 		type = 'number',
 		value = 14,
 		min = 8, max = 30, step = 1,
 		OnChange = onOptionsChanged,
 	},
+	text_height_console = {
+		name = 'Log Text Size',
+		type = 'number',
+		value = 14,
+		min = 8, max = 30, step = 1,
+		OnChange = onOptionsChanged,
+	},
+	
 	highlighted_text_height = {
 		name = 'Highlighted Text Size',
 		type = 'number',
@@ -433,12 +440,14 @@ options = {
 			window_console:Invalidate()
 		end,
 	},
+	--[[
 	mousewheel = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
 		OnChange = function(self) scrollpanel_console.ignoreMouseWheel = not self.value; end,
 	},
+	--]]
 	defaultAllyChat = {
 		name = "Default ally chat",
 		desc = "Sets default chat mode to allies at game start",
@@ -577,10 +586,29 @@ local function hideMessage(msg)
 			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') or (msg.argument:find('following') )))
 end
 
-local function AddMessage(msg, stack, isChat, remake)
+local function AddMessage(msg, target, fade2, remake)
 	if hideMessage(msg)	or (not WG.Chili) then
 		return
 	end
+	
+	local stack
+	local fade
+	local size
+	if target == 'chat' then
+		stack = stack_chat
+		size = options.text_height_chat.value
+		if not remake then
+			fade = true
+		end
+	elseif target == 'console' then
+		stack = stack_console
+		size = options.text_height_console.value
+	elseif target == 'backchat' then
+		size = options.text_height_chat.value
+		stack = stack_backchat
+	end	
+	
+	--if msg.highlight and options.highlighted_text_height.value
 	
 	-- TODO betterify this / make configurable
 	local highlight_sequence1 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_1) or '')
@@ -600,7 +628,7 @@ local function AddMessage(msg, stack, isChat, remake)
 		local textbox = WG.Chili.TextBox:New{
 			width = '100%',
 			align = "left",
-			fontsize = (msg.highlight and options.highlighted_text_height.value or options.text_height.value),
+			fontsize = size,
 			valign = "ascender",
 			lineSpacing = 0,
 			padding = { 0, 0, 0, 0 },
@@ -623,23 +651,46 @@ local function AddMessage(msg, stack, isChat, remake)
 		if options.clickable_points.value then
 			local control = textbox
 			if msg.point then --message is a marker, make obvious looking button
-				textbox:SetPos( nil, 3, stack.width - 6 )
+				textbox:SetPos( 35, 3, stack.width - 40 )
 				textbox:Update()
 				local tbheight = textbox.height -- not perfect
 				tbheight = math.max( tbheight, 15 ) --hack
 				--echo('tbheight', tbheight)
-				control = WG.Chili.Button:New{
+				control = WG.Chili.Panel:New{
 					width = '100%',
 					height = tbheight + 8,
-					padding = { 3,3,3,3 },
-					backgroundColor = {1,1,1,options.pointButtonOpacity.value},
+					padding = { 1,1,1,1 },
+					backgroundColor = {0,0,0,0},
 					caption = '',
-					children = { textbox, },
-					OnClick = {function(self, x, y, mouse)
-						local alt,ctrl, meta,shift = Spring.GetModKeyState()
-						if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
-						Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
-					end}
+					children = {
+						-- [[
+						WG.Chili.Button:New{
+							caption='',
+							x=0;y=0;
+							width = 30,
+							height = 20,
+							--backgroundColor = {1,1,1,options.pointButtonOpacity.value},
+							backgroundColor = {1,1,1,1},
+							padding = {2,2,2,2},
+							children = {
+								WG.Chili.Image:New {
+									x=7;y=2;
+									width = 14,
+									height = 14,
+									keepAspect = true,
+									file = 'LuaUI/Images/Crystal_Clear_action_flag.png',
+								}
+							},
+							OnClick = {function(self, x, y, mouse)
+								local alt,ctrl, meta,shift = Spring.GetModKeyState()
+								if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
+								Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+							end}
+						},
+						--]]
+						textbox,
+					},
+					
 				}
 				
 			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
@@ -659,7 +710,7 @@ local function AddMessage(msg, stack, isChat, remake)
 				end
 			end
 			stack:AddChild(control, false)
-			if isChat then
+			if fade then
 				control.fade = 1
 				fadeTracker[control_id] = control
 				control_id = control_id + 1
@@ -667,7 +718,7 @@ local function AddMessage(msg, stack, isChat, remake)
 			--]]
 		else
 			stack:AddChild(textbox, false)
-			if isChat then
+			if fade then
 				textbox.fade = 1
 				fadeTracker[control_id] = textbox
 				control_id = control_id + 1
@@ -724,19 +775,19 @@ function RemakeConsole()
 		stack_console.children[1]:Dispose() --dispose/disconnect all children (safer)
 	end
 	
-	
-	for i = 1, 10 do
-		AddMessage({dup=0, formatted=''}, stack_chat, false, true )
+	for i=1, #stack_backchat.children do
+		stack_backchat.children[1]:Dispose() --dispose/disconnect all children (safer)
 	end
 	
 	-- FIXME : messages collection changing while iterating (if max_lines option has been shrinked)
 	for i = 1, #chatMessages do 
 		local msg = chatMessages[i]
-		AddMessage(msg, stack_chat, true, true )
+		--AddMessage(msg, 'chat', true, true )
+		AddMessage(msg, 'backchat', true, true )
 	end
 	for i = 1, #consoleMessages do 
 		local msg = consoleMessages[i]
-		AddMessage(msg, stack_console, false, true )
+		AddMessage(msg, 'console', false, true )
 	end
 	
 end
@@ -879,6 +930,7 @@ function widget:AddConsoleMessage(msg)
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
 	local stack
+	local target
 	local messages
 	
 	local isChat = msg.msgtype ~= 'other' 
@@ -886,9 +938,11 @@ function widget:AddConsoleMessage(msg)
 	if isChat then
 		stack = stack_chat
 		messages = chatMessages
+		target = 'chat'
 	else
 		stack = stack_console
 		messages = consoleMessages
+		target = 'console'
 	end
 		
 		
@@ -897,7 +951,7 @@ function widget:AddConsoleMessage(msg)
 		-- update MapPoint position with most recent, as it is probably more relevant
 		messages[#messages].point = msg.point
 		messages[#messages].dup = messages[#messages].dup + 1
-		AddMessage(messages[#messages], stack, isChat)
+		AddMessage(messages[#messages], target, isChat)
 		
 		return
 	end
@@ -908,11 +962,11 @@ function widget:AddConsoleMessage(msg)
 	formatMessage(msg) -- does not handle dedupe or highlight
 	
 	messages[#messages + 1] = msg
-	AddMessage(msg, stack, isChat)
+	AddMessage(msg, target, isChat)
 	
 	if isChat then 
 		--AddMessage(msg, stack_console) --also add chat to console
-		AddMessage(msg, stack_backchat) --also add chat to backchat log
+		AddMessage(msg, 'backchat') --also add chat to backchat log
 	end
 	
 	if msg.highlight and options.highlight_sound.value then
@@ -962,7 +1016,8 @@ function widget:Update(s)
 			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
 			
 			if control.fade == 0 then
-				control.parent:RemoveChild(control)
+				--control.parent:RemoveChild(control)
+				control:Dispose()
 				fadeTracker[k] = nil
 			end
 		end
@@ -1039,7 +1094,7 @@ function widget:Initialize()
 		padding = { 1,1,1,1 },
 		backgroundColor = {1,1,1,1},
 		caption = '',
-		
+		tooltip = 'Swap between decaying chat and scrollable chat backlog.',
 		OnClick = {SwapBacklog},
 		children={ backlogButtonImage },
 	}
@@ -1063,6 +1118,10 @@ function widget:Initialize()
 		verticalScrollbar = false,
 	}
 	
+	for i = 1, 10 do
+		AddMessage({dup=0, formatted=''}, 'chat', false, true )
+	end
+	
 	
 	
 	scrollpanel_backchat = WG.Chili.ScrollPanel:New{
@@ -1072,7 +1131,7 @@ function widget:Initialize()
 		y = 0,
 		width = '100%',
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
-		--verticalSmartScroll = true,
+		verticalSmartScroll = true,
 		backgroundColor = options.color_chat_background.value,
 		borderColor = options.color_chat_background.value,
 		
@@ -1094,7 +1153,7 @@ function widget:Initialize()
 		backgroundColor = {0,0,0,0},
 		borderColor = {0,0,0,0},
 		
-		ignoreMouseWheel = not options.mousewheel.value,
+		--ignoreMouseWheel = not options.mousewheel.value,
 		children = {
 			stack_console,
 		},
