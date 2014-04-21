@@ -28,6 +28,8 @@ local mapDrawNicknameTime		= {}	-- this table is used to filter out previous map
 local mapEraseNicknameTime		= {}	-- 
 local ownPlayerID				= Spring.GetMyPlayerID()
 
+local commandCount = 0
+local commandList = {}
 
 local spGetUnitPosition			= Spring.GetUnitPosition
 local spGetCameraPosition		= Spring.GetCameraPosition
@@ -37,6 +39,25 @@ local spTraceScreenRay			= Spring.TraceScreenRay
 local spLoadCmdColorsConfig		= Spring.LoadCmdColorsConfig
 local spGetTeamColor			= Spring.GetTeamColor
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+options_path = 'Settings/Interface/Command Visibility/Formations'
+options_order = { 'indicate_cf', 'onClick'}
+options = {
+	indicate_cf = {
+		name = "Indicate for custom formations", 
+		desc = "Draw the command indication for commands given with custom formations.",
+		type = 'bool', 
+		value = false
+	},
+	onClick = {
+		name = "Indicate for clicks", 
+		desc = "Draw the command indication for every click.",
+		type = 'bool', 
+		value = false
+	}
+}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -71,36 +92,6 @@ local OPTIONS = {
 			baseColor		= {1.00 ,0.75 ,0.00 ,0.25},
 			ringColor		= {1.00 ,0.75 ,0.00 ,0.11}
 		},
-		move = {
-			size			= 1,
-			duration		= 1,
-			baseColor		= {0.00 ,1.00 ,0.00 ,0.25},
-			ringColor		= {0.00 ,1.00 ,0.00 ,0.25}
-		},
-		fight = {
-			size			= 1.2,
-			duration		= 1,
-			baseColor		= {0.20 ,0.60 ,1.00 ,0.30},
-			ringColor		= {0.20 ,0.60 ,1.00 ,0.40}
-		},
-		attack = {
-			size			= 1.4,
-			duration		= 1,
-			baseColor		= {1.00 ,0.00 ,0.00 ,0.30},
-			ringColor		= {1.00 ,0.00 ,0.00 ,0.40}
-		},
-		patrol = {
-			size			= 1.4,
-			duration		= 1,
-			baseColor		= {0.40 ,0.40 ,1.00 ,0.30},
-			ringColor		= {0.40 ,0.40 ,1.00 ,0.40}
-		},
-		jump = {
-			size			= 1.2,
-			duration		= 1,
-			baseColor		= {0.00 ,1.00 ,1.00 ,0.25},
-			ringColor		= {0.00 ,1.00 ,1.00 ,0.25}
-		},
 		map_mark = {
 			size			= 2,
 			duration		= 4.5,
@@ -118,7 +109,67 @@ local OPTIONS = {
 			duration		= 3,
 			baseColor		= {1.00 ,1.00 ,1.00 ,0.13},
 			ringColor		= {1.00 ,1.00 ,1.00 ,0.00}
-		}
+		},
+		[CMD.MOVE] = {
+			size			= 1,
+			duration		= 1,
+			baseColor		= {0.00 ,1.00 ,0.00 ,0.25},
+			ringColor		= {0.00 ,1.00 ,0.00 ,0.25}
+		},
+		[CMD.FIGHT] = {
+			size			= 1.2,
+			duration		= 1,
+			baseColor		= {0.20 ,0.60 ,1.00 ,0.30},
+			ringColor		= {0.20 ,0.60 ,1.00 ,0.40}
+		},
+		[CMD.DGUN] = {
+			size			= 1.4,
+			duration		= 1,
+			baseColor		= {1.00 ,0.00 ,0.00 ,0.30},
+			ringColor		= {1.00 ,0.00 ,0.00 ,0.40}
+		},
+		[CMD.ATTACK] = {
+			size			= 1.4,
+			duration		= 1,
+			baseColor		= {1.00 ,0.00 ,0.00 ,0.30},
+			ringColor		= {1.00 ,0.00 ,0.00 ,0.40}
+		},
+		[CMD.PATROL] = {
+			size			= 1.4,
+			duration		= 1,
+			baseColor		= {0.40 ,0.40 ,1.00 ,0.30},
+			ringColor		= {0.40 ,0.40 ,1.00 ,0.40}
+		},
+		[CMD_JUMP] = {
+			size			= 1.2,
+			duration		= 1,
+			baseColor		= {0.00 ,1.00 ,1.00 ,0.25},
+			ringColor		= {0.00 ,1.00 ,1.00 ,0.25}
+		},
+		[CMD_PLACE_BEACON] = {
+			size			= 1.2,
+			duration		= 1,
+			baseColor		= {0.10 ,0.80 ,0.80 ,0.25},
+			ringColor		= {0.10 ,0.80 ,0.80 ,0.25}
+		},
+		[CMD_WAIT_AT_BEACON] = {
+			size			= 1.2,
+			duration		= 1,
+			baseColor		= {0.10 ,0.10 ,0.90 ,0.25},
+			ringColor		= {0.10 ,0.10 ,0.90 ,0.25}
+		},
+		[CMD_UNIT_SET_TARGET] = {
+			size			= 1.2,
+			duration		= 1,
+			baseColor		= {0.80 ,0.80 ,0.10 ,0.25},
+			ringColor		= {0.80 ,0.80 ,0.10 ,0.25}
+		},
+		[CMD_UNIT_SET_TARGET_CIRCLE] = {
+			size			= 1.2,
+			duration		= 1,
+			baseColor		= {0.80 ,0.80 ,0.10 ,0.25},
+			ringColor		= {0.80 ,0.80 ,0.10 ,0.25}
+		},
 	}
 }
 
@@ -176,6 +227,13 @@ local function DrawRingCircle(parts, ringSize, ringInnerSize, ringOuterSize, rRi
 	end
 end
 
+local function CircleVerticies(circleDivs)
+	for i = 1, circleDivs do
+		local theta = 2 * math.pi * i / circleDivs
+		gl.Vertex(math.cos(theta), 0, math.sin(theta))
+	end
+end
+
 local function DrawGroundquad(wx,gy,wz,size)
 	gl.TexCoord(0,0)
 	gl.Vertex(wx-size,gy+size,wz-size)
@@ -187,13 +245,6 @@ local function DrawGroundquad(wx,gy,wz,size)
 	gl.Vertex(wx+size,gy+size,wz-size)
 end
 
-
-local function SetupCommandColors(state)
-	local alpha = state and 1 or 0
-	--spLoadCmdColorsConfig('move  0.5 1.0 0.5 ' .. alpha)
-end
-
-
 local function AddCommandSpotter(cmdType, x, y, z, osClock, unitID, playerID)
 	if not unitID then
 		unitID = 0
@@ -201,23 +252,32 @@ local function AddCommandSpotter(cmdType, x, y, z, osClock, unitID, playerID)
 	if not playerID then
 		playerID = false
 	end
-	local uniqueNumber = unitID..'_'..osClock
-	commandHistory[uniqueNumber] = {
+	--local uniqueNumber = unitID..'_'..osClock .. math.random()
+	--commandHistory[uniqueNumber] = {
+	--	cmdType		= cmdType,
+	--	x			= x,
+	--	y			= y,
+	--	z			= z,
+	--	osClock		= osClock,
+	--	playerID	= playerID
+	--}
+	
+	commandCount = commandCount + 1
+	commandList[commandCount] = {
 		cmdType		= cmdType,
 		x			= x,
 		y			= y,
 		z			= z,
 		osClock		= osClock,
-		unitID		= unitID,
 		playerID	= playerID
 	}
+	
 	if commandHistoryCoords[cmdType..x..y..z] then
 		commandHistoryCoords[cmdType..x..y..z] = commandHistoryCoords[cmdType..x..y..z] + 1
 	else
 		commandHistoryCoords[cmdType..x..y..z] = 1
 	end
 end
-
 
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
@@ -227,16 +287,11 @@ end
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 
+local circleDrawList
 
 function widget:Initialize()
-	SetupCommandColors(false)
+	circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVerticies, 18)
 end
-
-
-function widget:Shutdown()
-	SetupCommandColors(true)
-end
-
 
 function widget:MapDrawCmd(playerID, cmdType, x, y, z, a, b, c)
 	local osClock = os.clock()
@@ -253,53 +308,52 @@ function widget:MapDrawCmd(playerID, cmdType, x, y, z, a, b, c)
 	end
 end
 
-
 function widget:MousePress(x, y, button)
-	local traceType, tracedScreenRay = spTraceScreenRay(x, y, true)
-	if button == 1 and tracedScreenRay  and tracedScreenRay[3] then
-		AddCommandSpotter('leftclick', tracedScreenRay[1], tracedScreenRay[2], tracedScreenRay[3], os.clock())
-	end
-	if button == 3 and tracedScreenRay  and tracedScreenRay[3] then
-		AddCommandSpotter('rightclick', tracedScreenRay[1], tracedScreenRay[2], tracedScreenRay[3], os.clock())
+	if options.onClick.value then
+		local traceType, tracedScreenRay = spTraceScreenRay(x, y, true)
+		if button == 1 and tracedScreenRay  and tracedScreenRay[3] then
+			AddCommandSpotter('leftclick', tracedScreenRay[1], tracedScreenRay[2], tracedScreenRay[3], os.clock())
+		end
+		if button == 3 and tracedScreenRay  and tracedScreenRay[3] then
+			AddCommandSpotter('rightclick', tracedScreenRay[1], tracedScreenRay[2], tracedScreenRay[3], os.clock())
+		end
 	end
 end
-
 
 function widget:CommandNotify(cmdID, cmdParams, options)
-	local cmdType = false
-	if type(cmdParams) == 'table' and #cmdParams >= 3 then
-		if cmdID == CMD.MOVE then
-			cmdType = 'move'
-		elseif cmdID == CMD.FIGHT and cmdID ~= CMD.DGUN  then
-			cmdType = 'fight'
-		elseif cmdID == CMD.ATTACK or cmdID == CMD.DGUN  then
-			cmdType = 'attack'
-		elseif cmdID == CMD.PATROL then
-			cmdType = 'patrol'
-		elseif cmdID == CMD_JUMP then
-			cmdType = 'jump'
-		end
-		if cmdType then
-			AddCommandSpotter(cmdType, cmdParams[1], cmdParams[2], cmdParams[3], os.clock())
+	if type(cmdParams) == 'table' and #cmdParams >= 3 and OPTIONS.types[cmdID] then
+		AddCommandSpotter(cmdID, cmdParams[1], cmdParams[2], cmdParams[3], os.clock())
+	end
+end
+
+function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOptions)
+	if options.indicate_cf.value then
+		if type(cmdParams) == 'table' and #cmdParams >= 3 and OPTIONS.types[cmdID] then
+			AddCommandSpotter(cmdID, cmdParams[1], cmdParams[2], cmdParams[3], os.clock(), unitID)
 		end
 	end
 end
 
+--function widget:GameFrame(f)
+--	AddCommandSpotter(CMD.MOVE, (f%25)*40+40, 48, (math.floor(f/25)%25)*40+40, os.clock())
+--end
 
 function widget:DrawWorldPreUnit()
 	
 	local osClock = os.clock()
-	local camX, camY, camZ = spGetCameraPosition()
+	--local camX, camY, camZ = spGetCameraPosition()
 	gl.Blending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 	gl.DepthTest(false)
 	
 	commandCoordsRendered = {}
 	
-	for cmdKey, cmdValue in pairs(commandHistory) do
+	local index = 1
+	while index <= commandCount do
+		local cmdValue = commandList[index]
+	--for cmdKey, cmdValue in pairs(commandHistory) do
 	
 		local clickOsClock	= cmdValue.osClock
 		local cmdType		= cmdValue.cmdType
-		local unitID		= cmdValue.unitID
 		local playerID		= cmdValue.playerID
 		local duration		= OPTIONS.types[cmdType].duration * OPTIONS.duration
 		
@@ -310,15 +364,24 @@ function widget:DrawWorldPreUnit()
 			else
 				commandHistoryCoords[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] = commandHistoryCoords[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] - 1
 			end
-			commandHistory[cmdKey] = nil
+			--commandHistory[cmdKey] = nil
+			
+			commandList[index] = commandList[commandCount]
+			commandList[commandCount] = nil
+			commandCount = commandCount - 1
 			
 		-- remove nicknames when user has drawn something new
 		elseif  OPTIONS.showMapmarkSpecNames  and  cmdType == 'map_draw'  and  mapDrawNicknameTime[playerID] ~= nil  and  clickOsClock < mapDrawNicknameTime[playerID] then
 			
-			commandHistory[cmdKey] = nil
+			--commandHistory[cmdKey] = nil
+			commandList[index] = commandList[commandCount]
+			commandList[commandCount] = nil
+			commandCount = commandCount - 1
 			
 		-- draw all
 		elseif  OPTIONS.types[cmdType].baseColor[4] > 0  or  OPTIONS.types[cmdType].ringColor[4] > 0  then
+			index = index + 1
+			
 			if commandCoordsRendered[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] == nil then
 				commandCoordsRendered[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] = true
 				local alphaMultiplier = 1 + (OPTIONS.reduceOverlapEffect * (commandHistoryCoords[cmdType..cmdValue.x..cmdValue.y..cmdValue.z] - 1))	 -- add a bit to the multiplier for each cmd issued on the same coords
@@ -350,37 +413,43 @@ function widget:DrawWorldPreUnit()
 				a			= a * baseColor[4]
 					
 				local ringSize = OPTIONS.ringStartSize + (size * OPTIONS.ringScale) * ((osClock - clickOsClock) / duration)
-				local ringInnerSize = ringSize - OPTIONS.ringWidth
-				local ringOuterSize = ringSize + OPTIONS.ringWidth
+				--local ringInnerSize = ringSize - OPTIONS.ringWidth
+				--local ringOuterSize = ringSize + OPTIONS.ringWidth
 				
 				gl.PushMatrix()
 				gl.Translate(cmdValue.x, cmdValue.y, cmdValue.z)
 				
-				local xDifference = camX - cmdValue.x
-				local yDifference = camY - cmdValue.y
-				local zDifference = camZ - cmdValue.z
-				local camDistance = math.sqrt(xDifference*xDifference + yDifference*yDifference + zDifference*zDifference)
+				--local xDifference = camX - cmdValue.x
+				--local yDifference = camY - cmdValue.y
+				--local zDifference = camZ - cmdValue.z
+				--local camDistance = math.sqrt(xDifference*xDifference + yDifference*yDifference + zDifference*zDifference)
+				local camDistance = 4000
 				
-				-- set scale   (based on camera distance)
+				-- set scale (based on camera distance)
 				local scale = 1
 				if OPTIONS.scaleWithCamera and camZ then
 					scale = 0.82 + camDistance / 7500
 					gl.Scale(scale,scale,scale)
 				end
+				local parts = 8
 						
 				-- base glow
 				if baseColor[4] > 0 then
-					local parts = Round(((OPTIONS.baseParts - (camDistance / 800)) + (size / 20)) * scale)
-					if parts < 6 then parts = 6 end
+					--local parts = Round(((OPTIONS.baseParts - (camDistance / 800)) + (size / 20)) * scale)
+					--if parts < 6 then parts = 6 end
 					gl.BeginEnd(GL.TRIANGLE_FAN, DrawBaseGlow, parts, size, r,g,b,a)
 				end
 				
 				-- ring circle:
 				if aRing > 0 then
-					local parts = Round(((OPTIONS.ringParts - (camDistance / 800)) + (ringSize / 10)) * scale)
-					--parts = parts * (ringSize / (size*OPTIONS.ringScale))		-- this reduces parts when ring is little, but introduces temporary gaps when a part is added
-					if parts < 6 then parts = 6 end
-					gl.BeginEnd(GL.QUADS, DrawRingCircle, parts, ringSize, ringInnerSize, ringOuterSize, rRing,gRing,bRing,aRing)
+					--local parts = Round(((OPTIONS.ringParts - (camDistance / 800)) + (ringSize / 10)) * scale)
+					----parts = parts * (ringSize / (size*OPTIONS.ringScale))		-- this reduces parts when ring is little, but introduces temporary gaps when a part is added
+					--if parts < 6 then parts = 6 end
+					gl.Color(rRing,gRing,bRing,aRing)
+					gl.Scale(ringSize,ringSize,ringSize)
+					gl.LineWidth(OPTIONS.ringWidth)
+					gl.CallList(circleDrawList)
+					--gl.BeginEnd(GL.QUADS, DrawRingCircle, parts, ringSize, ringInnerSize, ringOuterSize, rRing,gRing,bRing,aRing)
 				end
 				
 				-- draw + erase:   nickname / draw icon
@@ -412,6 +481,7 @@ function widget:DrawWorldPreUnit()
 		end
 	end
 	
+	gl.LineWidth(1)
 	gl.Scale(1,1,1)
 	gl.Color(1,1,1,1)
 end

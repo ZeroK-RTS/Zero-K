@@ -191,6 +191,18 @@ function widget:CommandNotify(id, params, options)
 	return false	-- don't do anything to the command
 end
 
+--function widget:GameFrame(f)
+--	commands[#commands+1] = {
+--		cmdID = id,
+--		pos = {(f%25)*40+40, 42 + INIT_Y_OFFSET, (math.floor(f/25)%25)*40+40},
+--		time = 0,
+--		phase = 1,
+--		alpha = 1,
+--		offset = 0,
+--		radius = 0,
+--	}
+--end
+
 function widget:DrawWorld()
 	if Spring.IsGUIHidden() then return end
 	gl.DepthTest(true)

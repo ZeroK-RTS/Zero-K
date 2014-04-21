@@ -20,14 +20,14 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Custom Formations'
+options_path = 'Settings/Interface/Command Visibility/Formations'
 options_order = { 'drawdots'}
 options = {
 	drawdots = {
-		name = "Draw expected location dots", 
-		desc = "Enable to draw dots where the units will move to, disable to draw a line",
+		name = "Draw formation dots", 
+		desc = "Enable to draw dots at the expected unit locations, disable to draw a line.",
 		type = 'bool', 
-		value = true
+		value = false
 	},
 }
 
