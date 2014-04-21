@@ -152,7 +152,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 160,
-      object           = [[gunshipaa_dead.s3o]],
+      object           = [[trifighter_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 160,
     },
