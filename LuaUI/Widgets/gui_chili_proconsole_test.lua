@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.001 Chili Chat Pro Console.",
+    desc      = "v0.002 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -174,7 +174,8 @@ options_order = {
 	'mousewheel', 
 	'defaultAllyChat',
 	'text_height', 'max_lines',
-	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
+	'color_chat_background','color_console_background',
+	'color_chat', 'color_ally', 'color_other', 'color_spec',
 	
 	
 	'lblFilter',
@@ -184,7 +185,7 @@ options_order = {
 	'clickable_points','pointButtonOpacity',
 	
 	'lblAutohide',
-	'autohide', 'autohide_time',
+	'autohide_text_time',
 	
 	
 	'lblHilite',
@@ -405,14 +406,29 @@ options = {
 		value = { 1, 1, 0.2, 1 },
 		OnChange = onOptionsChanged,
 	},
-	color_background = {
-		name = "Background color",
+	color_chat_background = {
+		name = "Chat Background color",
 		type = "colors",
 		value = { 0, 0, 0, 0},
 		OnChange = function(self) 
 			scrollpanel_chat.backgroundColor = self.value
 			scrollpanel_chat.borderColor = self.value
 			scrollpanel_chat:Invalidate()
+		end,
+	},
+	color_console_background = {
+		name = "Console Background color",
+		type = "colors",
+		value = { 0, 0, 0, 0},
+		OnChange = function(self)
+			-- [[
+			scrollpanel_console.backgroundColor = self.value
+			scrollpanel_console.borderColor = self.value
+			scrollpanel_console:Invalidate()
+			--]]
+			window_console.backgroundColor = self.value
+			window_console.color = self.value
+			window_console:Invalidate()
 		end,
 	},
 	mousewheel = {
@@ -427,19 +443,12 @@ options = {
 		type = 'bool',
 		value = true,
 	},	
-	autohide = {
-		name = "Autohide chat",
-		desc = "Hides the chat when not in use",
-		type = 'bool',
-		value = false,
-		OnChange = onOptionsChanged,
-	},
-	autohide_time = {
-		name = "Autohide time",
+	autohide_text_time = {
+		name = "Text decay time",
 		type = 'number',
-		value = 8,
-		min = 1, max = 10, step = 1, 
-		OnChange = onOptionsChanged,
+		value = 20,
+		min = 10, max = 60, step = 5,
+		--OnChange = onOptionsChanged,
 	},
 	
 }
@@ -576,7 +585,7 @@ local function AddMessage(msg, stack, isChat, remake)
 	local highlight_sequence2 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_2) or '')
 	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.formatted .. highlight_sequence2
 
-	if (msg.dup > 1 and not remake) then
+	if (msg.dup > 1 and not remake) and fadeTracker[control_id-1] then
 		local last = stack.children[#(stack.children)]
 		if last then
 			if last.SetText then
@@ -593,10 +602,8 @@ local function AddMessage(msg, stack, isChat, remake)
 			valign = "ascender",
 			lineSpacing = 0,
 			padding = { 0, 0, 0, 0 },
-			
 			text = text,
 			
-			--fontShadow = true,
 			--[[
 			autoHeight=true,
 			autoObeyLineHeight=true,
@@ -729,14 +736,7 @@ function RemakeConsole()
 		local msg = consoleMessages[i]
 		AddMessage(msg, stack_console, false, true )
 	end
-	--[[
-	-- set initial state for the chat, hide the dock for autohide
-	if (options.autohide.value) then
-		hideConsole()
-	else
-		showConsole()
-	end
-	--]]
+	
 end
 
 local function ShowInputSpace()
@@ -780,9 +780,6 @@ local function MakeMessageWindow(name)
 		right = 425, -- epic/resbar width
 		width  = screenWidth * 0.30,
 		height = screenHeight * 0.20,
-		--parent = screen0,
-		--visible = false,
-		--backgroundColor = settings.col_bg,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -819,7 +816,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			firstEnter = false
 		end
 		WG.enteringText = true
-		--showConsole()
+		
 		ShowInputSpace()
 	else
 		WG.enteringText = false
@@ -876,11 +873,12 @@ function widget:AddConsoleMessage(msg)
 		
 		
 	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
-	and #messages > 0 and messages[#messages].text == msg.text then
+		and #messages > 0 and messages[#messages].text == msg.text then
 		-- update MapPoint position with most recent, as it is probably more relevant
 		messages[#messages].point = msg.point
 		messages[#messages].dup = messages[#messages].dup + 1
 		AddMessage(messages[#messages], stack, isChat)
+		
 		return
 	end
 	
@@ -891,6 +889,9 @@ function widget:AddConsoleMessage(msg)
 	
 	messages[#messages + 1] = msg
 	AddMessage(msg, stack, isChat)
+	if isChat then --also add chat to console
+		AddMessage(msg, stack_console)
+	end
 	
 	if msg.highlight and options.highlight_sound.value then
 		PlaySound("highlight")
@@ -926,13 +927,6 @@ local timer = 0
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
 
-	if options.autohide.value and time_opened and (DiffTimers(GetTimer(), time_opened) > options.autohide_time.value) then
-		-- echo(inputspace.state.enabled)
-		-- if not inputspace.visible then --TODO find some way to guarantee this doesn't go off when, and only when, text is being entered
-			--hideConsole() 
-		-- end
-	end
-
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
@@ -942,7 +936,8 @@ function widget:Update(s)
 			window_chat.width / screen0.width)})
 
 		for k,control in pairs(fadeTracker) do
-			fadeTracker[k].fade = math.max( control.fade - 0.1, 0 ) --removes old lines after 10 seconds
+			local sub = 2 / options.autohide_text_time.value
+			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
 			
 			if control.fade == 0 then
 				control.parent:RemoveChild(control)
@@ -1008,15 +1003,15 @@ function widget:Initialize()
 	
 	scrollpanel_chat = WG.Chili.ScrollPanel:New{
 		--margin = {5,5,5,5},
-		padding = { 5, 5, 5, 5 },
+		padding = { 1,1,1,1 },
 		x = 0,
 		y = 0,
 		width = '100%',
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
 -- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
-		backgroundColor = options.color_background.value,
-		borderColor = options.color_background.value,
+		backgroundColor = options.color_chat_background.value,
+		borderColor = options.color_chat_background.value,
 		ignoreMouseWheel = true,
 		children = {
 			stack_chat,
@@ -1028,13 +1023,18 @@ function widget:Initialize()
 	scrollpanel_console = WG.Chili.ScrollPanel:New{
 		--margin = {5,5,5,5},
 		padding = { 5, 5, 5, 5 },
-		x = 0,
-		y = 0,
-		width = '100%',
-		bottom = 0, 
+		x = 5,
+		y = 5,
+		right = 5,
+		bottom = 5, 
 		verticalSmartScroll = true,
-		backgroundColor = options.color_background.value,
-		borderColor = options.color_background.value,
+		--[[
+		backgroundColor = options.color_console_background.value,
+		borderColor = options.color_console_background.value,
+		]]
+		backgroundColor = {0,0,0,0},
+		borderColor = {0,0,0,0},
+		
 		ignoreMouseWheel = not options.mousewheel.value,
 		children = {
 			stack_console,
