@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.002 Chili Chat Pro Console.",
+    desc      = "v0.003 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -122,11 +122,13 @@ local MIN_HEIGHT = 150
 local MIN_WIDTH = 300
 
 local control_id = 0
-local stack_console, stack_chat
+local stack_console, stack_chat, stack_backchat
 local window_console, window_chat
 local fadeTracker = {}
-local scrollpanel_chat, scrollpanel_console
+local scrollpanel_chat, scrollpanel_console, scrollpanel_backchat
 local inputspace
+local backlogButton
+local backlogButtonImage
 local color2incolor
 WG.enteringText = false
 WG.chat = WG.chat or {}
@@ -756,7 +758,8 @@ local function MakeMessageStack()
 		padding = { 0, 0, 0, 0 },
 		x = 0,
 		y = 0,
-		width = '100%',
+		--width = '100%',
+		right=5,
 		height = 10,
 		resizeItems = false,
 		itemPadding  = { 1, 1, 1, 1 },
@@ -766,7 +769,7 @@ local function MakeMessageStack()
 	}
 end
 
-local function MakeMessageWindow(name)
+local function MakeMessageWindow(name, minimizable)
 
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
@@ -784,6 +787,7 @@ local function MakeMessageWindow(name)
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
+		minimizable = minimizable,
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
 		color = { 0, 0, 0, 0 },
@@ -797,6 +801,22 @@ local function MakeMessageWindow(name)
 			end
 		},
 	}
+end
+
+local showingBackchat = false
+local function SwapBacklog()
+	if showingBackchat then
+		window_chat:RemoveChild(scrollpanel_backchat)
+		window_chat:AddChild(scrollpanel_chat)
+		backlogButtonImage.file = 'LuaUI/Images/arrowhead.png'
+		backlogButtonImage:Invalidate()
+	else
+		window_chat:RemoveChild(scrollpanel_chat)
+		window_chat:AddChild(scrollpanel_backchat)
+		backlogButtonImage.file = 'LuaUI/Images/arrowhead_flipped.png'
+		backlogButtonImage:Invalidate()
+	end
+	showingBackchat = not showingBackchat
 end
 -----------------------------------------------------------------------
 -- callins
@@ -889,8 +909,10 @@ function widget:AddConsoleMessage(msg)
 	
 	messages[#messages + 1] = msg
 	AddMessage(msg, stack, isChat)
-	if isChat then --also add chat to console
-		AddMessage(msg, stack_console)
+	
+	if isChat then 
+		--AddMessage(msg, stack_console) --also add chat to console
+		AddMessage(msg, stack_backchat) --also add chat to backchat log
 	end
 	
 	if msg.highlight and options.highlight_sound.value then
@@ -991,14 +1013,35 @@ function widget:Initialize()
 	
 	stack_chat = MakeMessageStack()
 	
+	stack_backchat = MakeMessageStack()
+	
 	inputspace = WG.Chili.ScrollPanel:New{
 		x = 0,
 		bottom = 0,
-		right = 5,
+		right = 32,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
 		--backgroundColor = {1,1,1,1},
+	}
+	backlogButtonImage = WG.Chili.Image:New {
+		width = 25,
+		height = 25,
+		keepAspect = true,
+		--color = {0.7,0.7,0.7,0.4},
+		file = 'LuaUI/Images/arrowhead.png',
+	}
+	backlogButton = WG.Chili.Button:New{
+		right=0,
+		bottom=1,
+		width = 30,
+		height = 30,
+		padding = { 1,1,1,1 },
+		backgroundColor = {1,1,1,1},
+		caption = '',
+		
+		OnClick = {SwapBacklog},
+		children={ backlogButtonImage },
 	}
 	
 	scrollpanel_chat = WG.Chili.ScrollPanel:New{
@@ -1020,6 +1063,26 @@ function widget:Initialize()
 		verticalScrollbar = false,
 	}
 	
+	
+	
+	scrollpanel_backchat = WG.Chili.ScrollPanel:New{
+		--margin = {5,5,5,5},
+		padding = { 1,1,1,1 },
+		x = 0,
+		y = 0,
+		width = '100%',
+		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
+		--verticalSmartScroll = true,
+		backgroundColor = options.color_chat_background.value,
+		borderColor = options.color_chat_background.value,
+		
+		horizontalScrollbar=false,
+
+		children = {
+			stack_backchat,
+		},
+	}
+	
 	scrollpanel_console = WG.Chili.ScrollPanel:New{
 		--margin = {5,5,5,5},
 		padding = { 5, 5, 5, 5 },
@@ -1028,10 +1091,6 @@ function widget:Initialize()
 		right = 5,
 		bottom = 5, 
 		verticalSmartScroll = true,
-		--[[
-		backgroundColor = options.color_console_background.value,
-		borderColor = options.color_console_background.value,
-		]]
 		backgroundColor = {0,0,0,0},
 		borderColor = {0,0,0,0},
 		
@@ -1041,50 +1100,13 @@ function widget:Initialize()
 		},
 	}
 	
-	
 	window_chat = MakeMessageWindow("ProChat")
 	window_chat:AddChild(scrollpanel_chat)
+	window_chat:AddChild(backlogButton)
 	window_chat:AddChild(inputspace)
 	
-	window_console = MakeMessageWindow("ProConsole")
+	window_console = MakeMessageWindow("ProConsole", true)
 	window_console:AddChild(scrollpanel_console)
-			
-	--[=[
-	window_chat = WG.Chili.Window:New{
-		parent = screen0,
-		margin = { 0, 0, 0, 0 },
-		padding = { 0, 0, 0, 0 },
-		dockable = true,
-		name = "ProChat",
-		y = 0,
-		right = 425, -- epic/resbar width
-		width  = screenWidth * 0.30,
-		height = screenHeight * 0.20,
-		--parent = screen0,
-		--visible = false,
-		--backgroundColor = settings.col_bg,
-		draggable = false,
-		resizable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		minWidth = MIN_WIDTH,
-		minHeight = MIN_HEIGHT,
-		color = { 0, 0, 0, 0 },
-		children = {
-			scrollpanel_chat,
-			inputspace,
-		},
-		OnMouseDown = {
-			function(self) --//click on scroll bar shortcut to "Settings/HUD Panels/Chat/Console".
-				local _,_, meta,_ = Spring.GetModKeyState()
-				if not meta then return false end
-				WG.crude.OpenPath(options_path)
-				WG.crude.ShowMenu() --make epic Chili menu appear.
-				return true
-			end
-		},
-	}
-	--]=]
 	
 	RemakeConsole()
 	local buffer = widget:ProcessConsoleBuffer(nil, options.max_lines.value)
