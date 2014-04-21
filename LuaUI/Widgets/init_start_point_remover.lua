@@ -26,20 +26,26 @@ function CheckForSpec()
   end
 end
 
-function widget:Update()
-	local t = Spring.GetGameSeconds()
-	if (t < 0.1) then return end
-	local teamUnits = Spring.GetTeamUnits(Spring.GetMyTeamID())
-	for _,unitID in ipairs(teamUnits) do
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	local unitDef   = UnitDefs[unitDefID]
-		if (unitDef.customParams.commtype) then
-			local x, y, z = Spring.GetUnitPosition(unitID)
-			Spring.MarkerErasePosition(x, y, z)
-			Spring.SetCameraTarget(x, y, z)
-			Spring.SelectUnitArray{teamUnits[n]}
+function widget:GameFrame(f)
+	if f == 4 then
+		local teamUnits = Spring.GetTeamUnits(Spring.GetMyTeamID())
+		for _,unitID in ipairs(teamUnits) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local unitDef   = UnitDefs[unitDefID]
+			if (unitDef.customParams.commtype) then
+				local x, y, z = Spring.GetUnitPosition(unitID)
+				Spring.MarkerErasePosition(x, y, z)
+				Spring.SetCameraTarget(x, y, z)
+				Spring.SelectUnitArray{teamUnits[n]}
+			end
+			n=n+1
 		end
-		n=n+1
 	end
-	widgetHandler:RemoveWidget()
+	if f == 7 then
+		if WG.InitialActiveCommand then
+			Spring.Echo("SENDING " .. WG.InitialActiveCommand)
+			Spring.SetActiveCommand(WG.InitialActiveCommand)
+		end
+		widgetHandler:RemoveWidget()
+	end
 end

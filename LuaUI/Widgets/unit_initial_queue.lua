@@ -406,6 +406,9 @@ function widget:GameFrame(n)
 			local buildData = buildQueue[b]
 			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, {"shift"})
 		end
+		if selDefID and UnitDefs[selDefID] and UnitDefs[selDefID].name then
+			WG.InitialActiveCommand = "buildunit_" .. UnitDefs[selDefID].name
+		end
 		widgetHandler:RemoveWidget(self)
 	end
 end
