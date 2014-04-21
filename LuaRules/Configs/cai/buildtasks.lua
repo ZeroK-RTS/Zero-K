@@ -39,6 +39,7 @@ factionBuildConfig = {
 			[5] = {ID = UnitDefNames['factoryshield'].id},
 			[6] = {ID = UnitDefNames['factoryspider'].id},
 			[7] = {ID = UnitDefNames['factoryjump'].id},
+			[8] = {ID = UnitDefNames['factoryamph'].id},
 		},
 		factoryByDefId = {	
 			[UnitDefNames['factoryveh'].id] = {
@@ -447,6 +448,65 @@ factionBuildConfig = {
 					importanceMult = 0.8,
 					count = 1,
 					[1] = {ID = UnitDefNames['corsent'].id, chance = 1},
+				},	
+			},
+			[UnitDefNames['factoryamph'].id] = {
+				defenceQuota = {2,0.6,0.3},
+				defenceRange = 400,
+				airDefenceQuota = {2,1,0.1},
+				importance = 0.8,
+				BPQuota = 70,
+				minFacCount = 0,
+				
+				[1] = { -- con
+					importanceMult = 1,
+					count = 1,
+					[1] = {ID = UnitDefNames['amphcon'].id, chance = 1},
+				},
+				
+				[2] = { -- scout
+					importanceMult = 1,
+					count = 1,
+					[1] = {ID = UnitDefNames['amphraider3'].id, chance = 1},
+				},
+				
+				[3] = { -- raider
+					importanceMult = 1,
+					count = 2,
+					[1] = {ID = UnitDefNames['amphraider3'].id, chance = 0.8},
+					[2] = {ID = UnitDefNames['amphraider2'].id, chance = 0.2},
+				},
+				
+				[4] = { -- arty
+					importanceMult = 0.1,
+					count = 1,
+					[1] = {ID = UnitDefNames['amphassault'].id, chance = 0.7},
+				},
+				
+				[5] = { --assault
+					importanceMult = 0.7,
+					count = 2,
+					[1] = {ID = UnitDefNames['amphriot'].id, chance = 0.3},
+					[2] = {ID = UnitDefNames['amphfloater'].id, chance = 0.7},
+				},
+				
+				[6] = { -- skirm
+					importanceMult = 1.4,
+					count = 1,
+					[1] = {ID = UnitDefNames['amphfloater'].id, chance = 1},
+				},
+				
+				[7] = { -- riot
+					importanceMult = 0.6,
+					count = 2,
+					[2] = {ID = UnitDefNames['amphraider2'].id, chance = 0.7},
+					[1] = {ID = UnitDefNames['amphriot'].id, chance = 0.3},
+				},
+				
+				[8] = { -- aa
+					importanceMult = 1,
+					count = 1,
+					[1] = {ID = UnitDefNames['amphaa'].id, chance = 1},
 				},	
 			},
 			[UnitDefNames['factoryplane'].id] = {

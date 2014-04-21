@@ -5,6 +5,7 @@ local raider = {
 	"armflash",
 	"corfav",
 	"corgator",
+	"amphraider3",
 	
 	"corpyro",
 	"panther",
@@ -29,6 +30,7 @@ local assault = {
 	"armbull",
 	"correap",
 	"corgol",
+	"amphassault",
 	
 	"armanac",
 	"hoverassault",
@@ -47,6 +49,7 @@ local skirm = {
 	"corstorm",
 	"armjanus",
 	"armstump",
+	"amphfloater",
 	
 	"armsptk",
 	"armsnipe",
@@ -72,6 +75,8 @@ local riot = {
 	"cormak",
 	"corlevlr",
 	"spiderriot",
+	"amphraider2",
+	"amphriot",
 	
 	"arm_venom",
 	"tawf003",

@@ -18,11 +18,11 @@ function constructionAndEconomyHandler(a, at, frame)
 	a.unitHordingChance = 0.3 --value [0..1]
 	a.nanoChance = 0.05 --chance of making a nano
 	if averagedEcon.aveMInc < 50 then
-		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/24)
+		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/20)
 	elseif averagedEcon.aveMInc < 100 then
-		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/15)
-	else
 		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/10)
+	else
+		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/4)
 	end
 	
 	-- example of setting default values
