@@ -134,58 +134,58 @@ local highlightPattern -- currently based on player name -- TODO add configurabl
 local firstEnter = true --used to activate ally-chat at game start. To run once
 local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 
-----
+------------------------------------------------------------
+-- options
 
 options_path = "Settings/HUD Panels/Chat/Pro Console"
+
+local dedupe_path = options_path .. '/De-Duplication'
+local hilite_path = options_path .. '/Highlighting'
+local filter_path = options_path .. '/Filtering'
+local color_path = options_path .. '/Color Setup'
+
 options_order = {
 	
 	'lblGeneral',
+	
 	--'mousewheel', 
 	'defaultAllyChat',
 	'text_height_chat', 'text_height_console',
 	'autohide_text_time',
 	'max_lines',
+	'clickable_points',
+	
+	'lblMisc',
 	
 	'color_chat_background','color_console_background',
 	'color_chat', 'color_ally', 'color_other', 'color_spec',
 	
-	
-	'lblFilter',
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
 	'error_opengl_source',	
 	
-	'lblPointButtons',
-	'clickable_points',
 	--'pointButtonOpacity',
 	
-	'lblHilite',
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
 	'highlight_surround', 'highlight_sound', 'color_highlight',
 	
 	--'highlighted_text_height', 
 	
-	'lblDedupe',
 	'dedupe_messages', 'dedupe_points','color_dup',
 }
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 local function onOptionsChanged()
 	RemakeConsole()
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 options = {
 	
-	lblFilter = {name='Filtering', type='label', advanced = false},
-	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
+	--lblFilter = {name='Filtering', type='label', advanced = false},
+	--lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
-	lblHilite = {name='Highlighting', type='label'},
-	lblDedupe = {name='De-Duplication', type='label'},
+	--lblHilite = {name='Highlighting', type='label'},
+	--lblDedupe = {name='De-Duplication', type='label'},
 	lblGeneral = {name='General Settings', type='label'},
+	lblMisc = {name='Misc. Settings', type='label'},
 	
 	error_opengl_source = {
 		name = "Filter out \'Error: OpenGL: source\' error",
@@ -193,6 +193,7 @@ options = {
 		value = true,
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
+		path = filter_path ,
 	},
 	
 	text_height_chat = {
@@ -240,6 +241,7 @@ options = {
 		value = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		path = dedupe_path,
 	},
 	dedupe_points = {
 		name = "Dedupe points and labels",
@@ -247,36 +249,42 @@ options = {
 		value = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		path = dedupe_path,
 	},
 	highlight_all_private = {
 		name = "Highlight all private messages",
 		type = 'bool',
 		value = true,
 		advanced = true,
+		path = hilite_path,
 	},
 	highlight_filter_allies = {
 		name = "Check allies messages for highlight",
 		type = 'bool',
 		value = true,
 		advanced = true,
+		path = hilite_path,
 	},
 	highlight_filter_enemies = {
 		name = "Check enemy messages for highlight",
 		type = 'bool',
 		value = true,
 		advanced = true,
+		path = hilite_path,
 	},
 	highlight_filter_specs = {
 		name = "Check spec messages for highlight",
 		type = 'bool',
 		value = true,
 		advanced = true,
+		path = hilite_path,
 	},
 	highlight_filter_other = {
 		name = "Check other messages for highlight",
 		type = 'bool',
 		value = false,
 		advanced = true,
+		path = hilite_path,
 	},
 --[[
 	highlight_filter = {
@@ -299,6 +307,7 @@ options = {
 		value = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		path = hilite_path,
 	},
 	highlight_sound = {
 		name = "Sound for highlighted messages",
@@ -306,6 +315,7 @@ options = {
 		value = false,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		path = hilite_path,
 	},
 	hideSpec = {
 		name = "Hide Spectator Chat",
@@ -313,13 +323,15 @@ options = {
 		value = false,
 		OnChange = onOptionsChanged,
 		advanced = false,
+		path = filter_path,
 	},
 	hideAlly = {
 		name = "Hide Ally Chat",
 		type = 'bool',
 		value = false,
 		OnChange = onOptionsChanged,
-		advanced = false,
+		advanced = true,
+		path = filter_path,
 	},
 	hidePoint = {
 		name = "Hide Points",
@@ -327,6 +339,7 @@ options = {
 		value = false,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		path = filter_path,
 	},
 	hideLabel = {
 		name = "Hide Labels",         
@@ -334,6 +347,7 @@ options = {
 		value = false,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		path = filter_path,
 	},
 	hideLog = {
 		name = "Hide Engine Logging Messages",
@@ -341,6 +355,7 @@ options = {
 		value = false,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		path = filter_path,
 	},
 	max_lines = {
 		name = 'Maximum Lines (20-300)',
@@ -355,36 +370,42 @@ options = {
 		type = 'colors',
 		value = { 1, 1, 1, 1 },
 		OnChange = onOptionsChanged,
+		path = color_path,
 	},
 	color_ally = {
 		name = 'Ally text',
 		type = 'colors',
 		value = { 0.2, 1, 0.2, 1 },
 		OnChange = onOptionsChanged,
+		path = color_path,
 	},
 	color_other = {
 		name = 'Other text',
 		type = 'colors',
 		value = { 0.6, 0.6, 0.6, 1 },
 		OnChange = onOptionsChanged,
+		path = color_path,
 	},
 	color_spec = {
 		name = 'Spectator text',
 		type = 'colors',
 		value = { 0.8, 0.8, 0.8, 1 },
 		OnChange = onOptionsChanged,
+		path = color_path,
 	},
 	color_dup = {
 		name = 'Duplicate message mark',
 		type = 'colors',
 		value = { 1, 0.2, 0.2, 1 },
 		OnChange = onOptionsChanged,
+		path = dedupe_path,
 	},
 	color_highlight = {
 		name = 'Highlight mark',
 		type = 'colors',
 		value = { 1, 1, 0.2, 1 },
 		OnChange = onOptionsChanged,
+		path = hilite_path,
 	},
 	color_chat_background = {
 		name = "Chat Background color",
@@ -395,6 +416,7 @@ options = {
 			scrollpanel_chat.borderColor = self.value
 			scrollpanel_chat:Invalidate()
 		end,
+		path = color_path,
 	},
 	color_console_background = {
 		name = "Console Background color",
@@ -410,6 +432,7 @@ options = {
 			window_console.color = self.value
 			window_console:Invalidate()
 		end,
+		path = color_path,
 	},
 	--[[
 	mousewheel = {
