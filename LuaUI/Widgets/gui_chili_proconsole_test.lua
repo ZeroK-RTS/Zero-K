@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.004 Chili Chat Pro Console.",
+    desc      = "v0.005 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -91,16 +91,6 @@ local SOUNDS = {
 	highlight = "LuaUI/Sounds/communism/cash-register-01.wav" -- TODO find a better sound :)
 }
 
-local function PlaySound(id, condition)
-	if condition ~= nil and not condition then
-		return
-	end
-	local file = SOUNDS[id]
-	if file then
-		Spring.PlaySoundFile(file, 1, 'ui')
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -108,18 +98,18 @@ local HIGHLIGHT_SURROUND_SEQUENCE_1 = ' >>> '
 local HIGHLIGHT_SURROUND_SEQUENCE_2 = ' <<<'
 local DEDUPE_SUFFIX = 'x '
 
+local MIN_HEIGHT = 50
+local MIN_WIDTH = 300
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+WG.enteringText = false
+WG.chat = WG.chat or {}
 
 local screen0
 local myName -- my console name
 local myAllyTeamId
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local MIN_HEIGHT = 150
-local MIN_WIDTH = 300
 
 local control_id = 0
 local stack_console, stack_chat, stack_backchat
@@ -130,40 +120,19 @@ local inputspace
 local backlogButton
 local backlogButtonImage
 local color2incolor
-WG.enteringText = false
-WG.chat = WG.chat or {}
 
 local echo = Spring.Echo
-
--- redefined in Initialize()
---[[
-local function showConsole() end
-local function hideConsole() end
-WG.chat.hideConsole = hideConsole
-WG.chat.showConsole = showConsole
---]]
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 local incolor_dup
 local incolor_highlight
 local incolors = {} -- incolors indexed by playername + special #a/#e/#o/#s/#h colors based on config
 
---local messages = {} -- message buffer
 local consoleMessages = {} -- message buffer
 local chatMessages = {} -- message buffer
 local highlightPattern -- currently based on player name -- TODO add configurable list of highlight patterns
 
 local firstEnter = true --used to activate ally-chat at game start. To run once
 local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
-
-local wasSimpleColor = nil -- variable: indicate if simple color was toggled on or off. Used to trigger refresh.
-
-local time_opened = nil
-
-local GetTimer = Spring.GetTimer 
-local DiffTimers = Spring.DiffTimers
 
 ----
 
@@ -186,7 +155,8 @@ options_order = {
 	'error_opengl_source',	
 	
 	'lblPointButtons',
-	'clickable_points','pointButtonOpacity',
+	'clickable_points',
+	--'pointButtonOpacity',
 	
 	'lblHilite',
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
@@ -254,6 +224,7 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
+	--[[
 	pointButtonOpacity = {
 		name = "Point button opacity",
 		type = 'number',
@@ -261,7 +232,7 @@ options = {
 		min = 0, max = 1, step = 0.05,
 		advanced = true,
 	},
-	
+	--]]
 	-- TODO work in progress
 	dedupe_messages = {
 		name = "Dedupe messages",
@@ -465,6 +436,14 @@ options = {
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--functions
+
+local function SetInputFontSize(size)
+	Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
+	Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
+end	
+
+--------------------------------------------------------------------------------
 -- TODO : should these pattern/escape functions be moved to some shared file/library?
 
 local function nocase(s)
@@ -535,6 +514,16 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function PlaySound(id, condition)
+	if condition ~= nil and not condition then
+		return
+	end
+	local file = SOUNDS[id]
+	if file then
+		Spring.PlaySoundFile(file, 1, 'ui')
+	end
+end
 
 local function detectHighlight(msg)
 	-- must handle case where we are spec and message comes from player
@@ -728,8 +717,6 @@ local function AddMessage(msg, target, fade2, remake)
 		stack:UpdateClientArea()
 		
 	end 
-
-	--showConsole()
 end 
 
 
@@ -990,7 +977,6 @@ function widget:AddConsoleMessage(msg)
 	-- if playername == myName then
 		if WG.enteringText then
 			WG.enteringText = false
-			-- hideConsole()
 			HideInputSpace()
 		end 		
 	-- end
@@ -1007,10 +993,10 @@ function widget:Update(s)
 	if timer > 2 then
 		timer = 0
 		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_chat.x / screen0.width + 0.004, 
-			1 - (window_chat.y + window_chat.height) / screen0.height + 0.005, 
+			window_chat.x / screen0.width + 0.003, 
+			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
 			window_chat.width / screen0.width)})
-
+	
 		for k,control in pairs(fadeTracker) do
 			local sub = 2 / options.autohide_text_time.value
 			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
@@ -1050,6 +1036,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	
 	local spectating = Spring.GetSpectatingState()
 	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
 	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
@@ -1062,7 +1049,7 @@ function widget:Initialize()
 	
 	Spring.SendCommands("bind Any+enter  chat")
 	
-	local inputsize = 33
+	local inputsize = 25
 	
 	stack_console = MakeMessageStack()
 	
@@ -1073,15 +1060,15 @@ function widget:Initialize()
 	inputspace = WG.Chili.ScrollPanel:New{
 		x = 0,
 		bottom = 0,
-		right = 32,
+		right = inputsize,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
 		--backgroundColor = {1,1,1,1},
 	}
 	backlogButtonImage = WG.Chili.Image:New {
-		width = 25,
-		height = 25,
+		width = inputsize - 7,
+		height = inputsize - 7,
 		keepAspect = true,
 		--color = {0.7,0.7,0.7,0.4},
 		file = 'LuaUI/Images/arrowhead.png',
@@ -1089,8 +1076,8 @@ function widget:Initialize()
 	backlogButton = WG.Chili.Button:New{
 		right=0,
 		bottom=1,
-		width = 30,
-		height = 30,
+		width = inputsize - 3,
+		height = inputsize - 3,
 		padding = { 1,1,1,1 },
 		backgroundColor = {1,1,1,1},
 		caption = '',
@@ -1126,14 +1113,14 @@ function widget:Initialize()
 	
 	scrollpanel_backchat = WG.Chili.ScrollPanel:New{
 		--margin = {5,5,5,5},
-		padding = { 1,1,1,1 },
+		padding = { 3,3,3,3 },
 		x = 0,
 		y = 0,
 		width = '100%',
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
 		backgroundColor = options.color_chat_background.value,
-		borderColor = options.color_chat_background.value,
+		borderColor = {0,0,0,0.5},
 		
 		horizontalScrollbar=false,
 
@@ -1174,6 +1161,8 @@ function widget:Initialize()
 	end
 	
 	Spring.SendCommands({"console 0"})
+	
+	SetInputFontSize(15)
  	
 	self:LocalColorRegister()
 end
@@ -1184,6 +1173,7 @@ function widget:Shutdown()
 	if (window_chat) then
 		window_chat:Dispose()
 	end
+	SetInputFontSize(20)
 	Spring.SendCommands({"console 1", "inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
 	
