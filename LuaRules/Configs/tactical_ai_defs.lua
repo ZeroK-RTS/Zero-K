@@ -500,7 +500,7 @@ local behaviourConfig = {
 	},
     ["shieldfelon"] = {
 		skirms = lowMedRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
+		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 0, 
 		skirmLeeway = -30, 
