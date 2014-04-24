@@ -100,6 +100,7 @@ local DEDUPE_SUFFIX = 'x '
 
 local MIN_HEIGHT = 50
 local MIN_WIDTH = 300
+local MAX_STORED_MESSAGES = 300
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -358,7 +359,7 @@ options = {
 		path = filter_path,
 	},
 	max_lines = {
-		name = 'Maximum Lines (20-300)',
+		name = 'Maximum Lines (20-100)',
 		type = 'number',
 		value = 60,
 		min = 20, max = 100, step = 1, 
@@ -778,6 +779,23 @@ local function setup()
 	setupPlayers()
 end
 
+local function removeToMaxLines()
+	while #stack_console.children > options.max_lines.value do
+		-- stack:RemoveChild(stack.children[1]) --disconnect children
+		if stack_console.children[1] then
+			stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+		end
+		--stack:UpdateLayout()
+	end
+	while #stack_backchat.children > options.max_lines.value do
+		-- stack:RemoveChild(stack.children[1]) --disconnect children
+		if stack_backchat.children[1] then
+			stack_backchat.children[1]:Dispose() --dispose/disconnect children (safer)
+		end
+		--stack:UpdateLayout()
+	end
+end
+
 
 function RemakeConsole()
 	setup()
@@ -800,6 +818,7 @@ function RemakeConsole()
 		local msg = consoleMessages[i]
 		AddMessage(msg, 'console', false, true )
 	end
+	removeToMaxLines()
 	
 end
 
@@ -987,16 +1006,12 @@ function widget:AddConsoleMessage(msg)
 	elseif msg.msgtype == "label" then
 		PlaySound("label")
 	end
-	
-	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
-	while #messages > options.max_lines.value do
-		-- stack:RemoveChild(stack.children[1]) --disconnect children
-		if stack.children[1] and stack.children[1].text == messages[1].argument then
-			stack.children[1]:Dispose() --dispose/disconnect children (safer)
-		end
+
+	if #messages > MAX_STORED_MESSAGES then
 		table.remove(messages, 1)
-		--stack:UpdateLayout()
 	end
+	
+	removeToMaxLines()
 	
 	-- if playername == myName then
 		if WG.enteringText then

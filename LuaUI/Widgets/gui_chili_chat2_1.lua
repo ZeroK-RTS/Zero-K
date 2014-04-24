@@ -129,6 +129,7 @@ local myAllyTeamId
 
 local MIN_HEIGHT = 150
 local MIN_WIDTH = 300
+local MAX_STORED_MESSAGES = 300
 
 local stack_console
 local window_console
@@ -366,7 +367,7 @@ options = {
 		advanced = true,
 	},
 	max_lines = {
-		name = 'Maximum Lines (20-300)',
+		name = 'Maximum Lines (20-100)',
 		type = 'number',
 		value = 60,
 		min = 20, max = 100, step = 1, 
@@ -701,6 +702,15 @@ local function setup()
 	setupPlayers()
 end
 
+local function removeToMaxLines()
+	while #stack_console.children > options.max_lines.value do
+		-- stack_console:RemoveChild(stack_console.children[1]) --disconnect children
+		if stack_console.children[1] then
+			stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
+		end
+		--stack_console:UpdateLayout()
+	end
+end
 
 function RemakeConsole()
 	setup()
@@ -712,6 +722,7 @@ function RemakeConsole()
 		local msg = messages[i]
 		displayMessage(msg, true)
 	end	
+	removeToMaxLines()
 	-- set initial state for the chat, hide the dock for autohide
 	if (options.autohide.value) then
 		hideConsole()
@@ -800,17 +811,13 @@ function widget:AddConsoleMessage(msg)
 	elseif msg.msgtype == "label" then
 		PlaySound("label")
 	end
-	
-	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
-	while #messages > options.max_lines.value do
-		-- stack_console:RemoveChild(stack_console.children[1]) --disconnect children
-		if stack_console.children[1] and stack_console.children[1].text == messages[1].argument then
-			stack_console.children[1]:Dispose() --dispose/disconnect children (safer)
-		end
+
+	if #messages > MAX_STORED_MESSAGES then
 		table.remove(messages, 1)
-		--stack_console:UpdateLayout()
 	end
 	
+	removeToMaxLines()
+
 	-- if playername == myName then
 		if WG.enteringText then
 			WG.enteringText = false
