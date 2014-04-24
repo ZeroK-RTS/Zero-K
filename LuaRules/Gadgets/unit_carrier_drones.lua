@@ -261,8 +261,8 @@ function gadget:GameFrame(n)
 					local set = carrier.droneSets[i]
 					if (set.reload > 0) then
 						set.reload = (set.reload - 1)
-					elseif (set.droneCount < carrierDef.maxDrones) then
-						for n=1,carrierDef.spawnSize do
+					elseif (set.droneCount < set.maxDrones) then
+						for n=1,set.spawnSize do
 							if (set.droneCount >= set.maxDrones) then
 								break
 							end
