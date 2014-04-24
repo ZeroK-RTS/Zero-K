@@ -595,7 +595,8 @@ local function hideMessage(msg)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
 		or (msg.msgtype == 'other' and options.hideLog.value and not ((msg.argument):find('enabled!') or (msg.argument):find('disabled!') or 
-			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') or (msg.argument:find('following') )))
+			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') or (msg.argument):find('following') or (msg.argument):find('Connection attempted') or
+				(msg.argument):find('wins!') or (msg.argument):find('resigned') or (msg.argument):find('exited') or (msg.argument):find('is no more') or (msg.argument):find('paused the game') ))
 end
 
 local function AddMessage(msg, target, fade2, remake)
