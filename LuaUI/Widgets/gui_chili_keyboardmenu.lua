@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.029 Chili Keyboard Menu",
+    desc      = "v0.030 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -28,6 +28,8 @@ local common_commands, states_commands, factory_commands,
 	globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
 local build_menu_use = include("Configs/marking_menu_menus.lua")
+
+local initialBuilder = 'armcom1'
 
 ------------------------------------------------
 -- Chili classes
@@ -95,6 +97,7 @@ local lastCmd, lastColor
 local curTab = 'none'
 local keyRows = {}
 local unboundKeyList = {}
+
 
 local selections = {
 	'select_all',
@@ -385,7 +388,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units (copied from ca_layout.lua)
 	end	
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
-end 
+end --LayoutHandler
 
 
 local function SetButtonColor(button, color)
@@ -454,13 +457,19 @@ local function AddHotkeyLabel( key, text )
 	}
 end
 
+local gameStarted = Spring.GetGameFrame() > 0
+
+local function CanInitialQueue()
+	return (not gameStarted) and WG.InitialQueue ~= nil
+end
+
 local function AddBuildButton(color)
 	key_buttons['D']:AddChild(
 		Label:New{ caption = 'BUIL'.. green ..'D', fontSize=14, bottom='1', fontShadow = true, }
 	)
 	key_buttons['D']:AddChild(
 		Image:New {
-			file = "#".. builder_ids_i[curbuilder], 
+			file = builder_ids_i[curbuilder] and "#".. builder_ids_i[curbuilder], 
 			file2 = 'LuaUI/Images/nested_buildmenu/frame_Fac.png',
 			width = '100%',
 			height = '80%',
@@ -515,7 +524,6 @@ local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
 	local button1 = key_buttons[hotkey_key]
 	
 	local ud = UnitDefNames[unitName]
-	
 	button1.tooltip = 'Build: ' ..ud.humanName .. ' - ' .. ud.tooltip
 	
 	local label_hotkey
@@ -534,7 +542,13 @@ local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
 	button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', height='20%', fontSize = 11, bottom=0, fontShadow = true,  } )
 	
 	
-	button1.OnMouseDown = { function() CommandFunction( -(ud.id) ); end }
+	button1.OnMouseDown = { function()
+		if CanInitialQueue() then
+			WG.InitialQueue.SetSelDefID(ud.id);
+			return
+		end
+		CommandFunction( -(ud.id) );
+	end }
 end
 
 local function AddBuildStructureButton(item, index)
@@ -556,13 +570,17 @@ local function AddBuildStructureButton(item, index)
 		--if menu_level ~= 0 then 
 		if menu_level ~= 0 or not item.items then  --account for first level items without subitems
 			local cmdid = build_menu_selected.cmd
+			
+			if CanInitialQueue() then
+				WG.InitialQueue.SetSelDefID( UnitDefNames[item.unit].id );
+			end
 			if (cmdid == nil) then 
 				local ud = UnitDefNames[item.unit]
 				if (ud ~= nil) then
 					cmdid = Spring.GetCmdDescIndex(-ud.id)
 				end
+				
 			end 
-
 			if (cmdid) then
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
 				local _, _, left, _, right = Spring.GetMouseState()
@@ -659,6 +677,10 @@ local function SetupBuilderMenuData()
 	
 	local buildername = builder_types_i[curbuilder]
 	
+	if CanInitialQueue() then
+		buildername = initialBuilder
+	end
+	
 	if buildername then 
 		menu_level = 0
 		build_menu = build_menu_use[buildername]
@@ -700,8 +722,16 @@ end
 
 
 local function AddCustomCommands(selectedUnits)
+	if CanInitialQueue() then
+		selectedUnits = {'a'}
+	end
 	for _, unitID in ipairs(selectedUnits) do
-		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+		local ud
+		if CanInitialQueue() then
+			ud = UnitDefNames[initialBuilder]	
+		else
+			ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+		end
 		if ud and ud.isBuilder and build_menu_use[ud.name] then
 			table.insert(widgetHandler.customCommands, {
 				id      = CMD_RADIALBUILDMENU,
@@ -906,6 +936,20 @@ local function BreakDownHotkey(hotkey)
 	return hotkey_key, hotkey_mod
 end
 
+
+-- this lets you create special buttons in integral
+local function MakeSpecialCmdDesc(cmdID, customFunc, customFuncArgs, params, name)
+	return {
+		id = cmdID,
+		tooltip = params and params.tooltip,
+		disabled = params and params.disabled,
+		action = 'buildunit_' .. name,
+		name = name,
+		customFunc = customFunc,
+		customFuncArgs = customFuncArgs,
+	}
+end
+
 local function SetupCommands( modifier )
 
 	--AddCustomCommands(Spring.GetSelectedUnits())
@@ -914,14 +958,24 @@ local function SetupCommands( modifier )
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
 	
-	
 	curCommands = {}
 	commandButtons = {}
 	
 	for i = 1, #commands do ProcessCommand(commands[i]) end 
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
-	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end 
+	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
 	
+	local buildOptions = WG.InitialQueue and WG.InitialQueue.GetBuildOptions() or {}
+	for i=1,#buildOptions do
+		local ud = UnitDefNames[buildOptions[i]]
+		local udid = ud.id
+		local func = WG.InitialQueue.SetSelDefID
+		local args = {udid}
+		local cmdDesc = MakeSpecialCmdDesc(-udid, func, args, {tooltip = "Build: " .. ud.humanName .. " - "}, ud.name)
+		ProcessCommand(cmdDesc)
+	end
+	
+		
 	ClearKeyButtons()
 	
 	if modifier == 'none' then
@@ -988,7 +1042,7 @@ local function SetupCommands( modifier )
 			end
 			
 		end --for letterInd=1,26 
-	end --options.showGlobalCommands.value
+	end --if options.showGlobalCommands.value
 		
 	--for i, cmd in ipairs( curCommands ) do
 	for i = 1, #curCommands do
@@ -999,64 +1053,62 @@ local function SetupCommands( modifier )
 		--echo(CMD[cmd.id], cmd.name, hotkey_key, hotkey_mod)
 		
 		if not ignore[hotkey_key] then
-		
-		if ( (modifier == 'unbound' and hotkey_key == '') or not key_buttons[hotkey_key] )
-			and cmd.type ~= CMDTYPE.NEXT and cmd.type ~= CMDTYPE.PREV
-			and cmd.id >= 0
-			and cmd.id ~= CMD_RADIALBUILDMENU
-			then
-			if unboundKeyList[unboundKeyIndex] then
-				hotkey_key = unboundKeyList[unboundKeyIndex]
-				hotkey_mod = 'unbound'
-				unboundKeyIndex = unboundKeyIndex + 1
-			end
-		end
-		
-		if modifier == '' and cmd.id == CMD_RADIALBUILDMENU then
-			AddBuildButton()
-			ignore['D'] = true
-		elseif hotkey_mod == modifier and key_buttons[hotkey_key] then
-			local override = overrides[cmd.id]  -- command overrides
-			local texture = override and override.texture or cmd.texture
-			local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
-			if isState and override then 
-				texture = override.texture[cmd.params[1]+1]
-			end
-			local _,cmdid,_,cmdname = Spring.GetActiveCommand()
-			
-			local color = cmd.disabled and black_table
-			if cmd.id == cmdid then
-				color = magenta_table
-			end
-			
-			local label = cmd.name
-			if texture and texture ~= '' then
-				label = ''
-			end
-			
-			if cmd.name == 'Morph' or cmd.name == red  .. 'Stop' then
-				hotkey = cmd.name
-			end
-			
-			if cmd.id < 0 then
-				AddBuildStructureButtonBasic( cmd.name, hotkey_key, hotkey )
-			else
-				if cmd.id == 99999 then
-					UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( cmd.action ); end, cmd.tooltip, texture, color )
-				else
-					UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+			if ( (modifier == 'unbound' and hotkey_key == '') or not key_buttons[hotkey_key] )
+				and cmd.type ~= CMDTYPE.NEXT and cmd.type ~= CMDTYPE.PREV
+				and cmd.id >= 0
+				and cmd.id ~= CMD_RADIALBUILDMENU
+				then
+				if unboundKeyList[unboundKeyIndex] then
+					hotkey_key = unboundKeyList[unboundKeyIndex]
+					hotkey_mod = 'unbound'
+					unboundKeyIndex = unboundKeyIndex + 1
 				end
 			end
 			
+			if modifier == '' and cmd.id == CMD_RADIALBUILDMENU then
+				AddBuildButton()
+				ignore['D'] = true
+			elseif hotkey_mod == modifier and key_buttons[hotkey_key] then
+				local override = overrides[cmd.id]  -- command overrides
+				local texture = override and override.texture or cmd.texture
+				local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
+				if isState and override then 
+					texture = override.texture[cmd.params[1]+1]
+				end
+				local _,cmdid,_,cmdname = Spring.GetActiveCommand()
+				
+				local color = cmd.disabled and black_table
+				if cmd.id == cmdid then
+					color = magenta_table
+				end
+				
+				local label = cmd.name
+				if texture and texture ~= '' then
+					label = ''
+				end
+				
+				if cmd.name == 'Morph' or cmd.name == red  .. 'Stop' then
+					hotkey = cmd.name
+				end
+				
+				if cmd.id < 0 then
+					AddBuildStructureButtonBasic( cmd.name, hotkey_key, hotkey )
+				else
+					if cmd.id == 99999 then
+						UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( cmd.action ); end, cmd.tooltip, texture, color )
+					else
+						UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+					end
+				end
+				
+				
+				ignore[hotkey_key] = true
+			end
 			
-			ignore[hotkey_key] = true
-		end
-		
-		commandButtons[cmd.id] = key_buttons[hotkey_key]
-		
-	end --if not ignore[hotkey_key] then
-		
-	end
+			commandButtons[cmd.id] = key_buttons[hotkey_key]
+			
+		end --if not ignore[hotkey_key] then
+	end --for i = 1, #curCommands do
 	
 	--for i, selection in ipairs(selections) do
 	for i = 1, #selections do
@@ -1076,7 +1128,7 @@ local function SetupCommands( modifier )
 		end
 	end
 	
-end
+end --SetupCommands
 
 
 UpdateButtons = function()
@@ -1170,6 +1222,8 @@ function widget:Initialize()
 	if not customKeyBind then
 		--Spring.SendCommands("bind d buildprev")
 	end
+	
+	
 end 
 
 function widget:Shutdown()
@@ -1227,7 +1281,6 @@ function widget:KeyRelease(key)
 		return
 	end
 	
-	
 	if
 		key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL
 		or key == KEYSYMS.LALT or key == KEYSYMS.LALT
@@ -1283,24 +1336,25 @@ function widget:DrawScreen()
 	end
 end
 
-function widget:Update()
-end
+local timer = 0
 
-function widget:GameFrame(f)
-	--updating here seems to solve the issue if the widget layer is sufficiently large
-	if updateCommandsSoon and (f % 16 == 0) then
-		updateCommandsSoon = false
-		StoreBuilders(selectedUnits)
-		if not( build_mode and #builder_ids_i > 0 ) then
-			UpdateButtons()
+function widget:Update() --no param, see below
+	local s = Spring.GetLastUpdateSeconds() -- needed because of Update() call in this function
+	timer = timer + s
+	if timer > 0.5 then
+		timer = 0
+		
+		--updating here seems to solve the issue if the widget layer is sufficiently large
+		if updateCommandsSoon then
+			updateCommandsSoon = false
+			StoreBuilders(selectedUnits)
+			if not( build_mode and #builder_ids_i > 0 ) then
+				UpdateButtons()
+			end
+			--selectionHasChanged = false
 		end
-		--selectionHasChanged = false
 	end
 end
-
-
-
-
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_RADIALBUILDMENU then
@@ -1312,4 +1366,8 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	elseif cmdID < 0 then
 		UpdateButtons()
 	end
+end
+
+function widget:GameStart()
+	gameStarted = false
 end
