@@ -180,6 +180,7 @@ options = {
 local mapWidth, mapHeight = Game.mapSizeX, Game.mapSizeZ
 
 ------------------------------------------------
+local gameStarted = Spring.GetGameFrame() > 0
 
 local average_difference = 0 -- average movement speed/difference
 local ignored_angle = nil -- angle to currently ignore in menu
@@ -224,6 +225,9 @@ local function AngleDifference(a1,a2)
   return math.abs((a1 + 180 - a2) % 360 - 180)
 end 
 
+local function CanInitialQueue()
+  return (not gameStarted) and WG.InitialQueue ~= nil
+end
 
 
 function widget:Update(t)
@@ -322,14 +326,16 @@ end
 
 
 -- setups menu for selected unit
-function SetupMenu(keyboard, mouseless) 
+function SetupMenu(keyboard, mouseless)
   menu_keymode = keyboard
   mouselessOpen = mouseless
 
   local units = Spring.GetSelectedUnits()
+  local initialQueue = CanInitialQueue()
+  local allow = (units and (#units == 1 or (#units > 0 and (ALLOW_MULTIPLE or keyboard))) ) or initialQueue
 
   -- only show menu if a unit is selected
-  if units and (#units == 1 or (#units > 0 and (ALLOW_MULTIPLE or keyboard))) then 
+  if allow then 
     origin = {Spring.GetMouseState()} -- origin might by set by mouse hold detection so we only set it if unset
     
     local found = false
@@ -345,11 +351,11 @@ function SetupMenu(keyboard, mouseless)
     end 
 
     -- setup menu depending on selected unit
-    if found then 
+    if found or initialQueue then 
       levels = {}
       level =0
       menu_flash = nil -- erase previous flashing
-      menu = menu_use[found.name]
+      menu = found and menu_use[found.name] or menu_use["armcom1"]
       menu_selected = menu
       menu_start = os.clock()
     else
@@ -368,17 +374,18 @@ function EndMenu(ok)
   if (not ok) then 
 		menu_selected = nil
    end
+  local initialQueue = CanInitialQueue()
+  local ud
  
-  if menu_selected~=nil and menu_selected.unit ~= nil then 
+  if menu_selected~=nil and menu_selected.unit ~= nil then
     local cmdid = menu_selected.cmd
-	if (cmdid == nil) then 
-		local ud = UnitDefNames[menu_selected.unit]
-		if (ud ~= nil) then
-			cmdid = Spring.GetCmdDescIndex(-ud.id)
-		end
-	end 
-	
-    if (cmdid) then
+    if (cmdid == nil) then 
+      ud = UnitDefNames[menu_selected.unit]
+      if (ud ~= nil) then
+	cmdid = Spring.GetCmdDescIndex(-ud.id)
+      end
+    end
+    if (cmdid) or (initialQueue and ud) then
       local alt, ctrl, meta, shift = Spring.GetModKeyState()
       local _, _, left, _, right = Spring.GetMouseState()
         
@@ -388,8 +395,12 @@ function EndMenu(ok)
       end 
       if os.clock() - menu_start > level * 0.25 then  -- if speed was slower than 250ms per level, flash the gesture
         menu_flash = {origin[1], origin[2], os.clock()}  
-      end 
-      Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
+      end
+      if initialQueue then
+	WG.InitialQueue.SetSelDefID(ud.id)
+      else
+	Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
+      end
     end
   end 
   origin = nil
@@ -483,7 +494,7 @@ function widget:MousePress(x,y,button)
 			EndMenu(true) 
 			return true
 		end
-	elseif (menu == nil) and not KEYBOARD_OPEN_ONLY then 
+	elseif (menu == nil) and not KEYBOARD_OPEN_ONLY then
 		if (button == 3) then
 			local activeCmdIndex, activeid = Spring.GetActiveCommand()
 			local _, defid = Spring.GetDefaultCommand()
@@ -615,12 +626,15 @@ local function DrawMenuItem(item, x,y, size, alpha, displayLabel, angle, cmdDesc
         gl.Text(item.label,x-wid*0.5, y+size,12,"")
       end 
 
-	  local isEnabled = false
-	  for _, desc in ipairs(cmdDesc) do 
-		if desc.id == -ud.id and not desc.disabled then 
-			isEnabled = true 
-		end 
-	  end 
+	  local isEnabled = CanInitialQueue()
+	  if not isEnabled then
+		  for _, desc in ipairs(cmdDesc) do 
+			if desc.id == -ud.id and not desc.disabled then 
+				isEnabled = true
+				break
+			end 
+		  end
+	  end
 	  
 	  if isEnabled then 
 		glColor(1*alpha,1*alpha,1,alpha)
@@ -717,6 +731,9 @@ function widget:DrawScreen()
   glColor(1,1,1,1)
 end
 
+function widget:GameStart()
+  gameStarted = false
+end
 
 function widget:Initialize()
 
