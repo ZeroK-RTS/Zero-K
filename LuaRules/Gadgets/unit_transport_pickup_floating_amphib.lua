@@ -3,7 +3,7 @@ function gadget:GetInfo()
     name      = "AirTransport_SeaPickup",
     desc      = "Allow air transport to use amphibious' floatation gadget to pickup unit at sea",
     author    = "msafwan (xponen)",
-    date      = "22.12.2013",
+    date      = "22.12.2013", --25.4.2014
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -22,6 +22,7 @@ local reverseCompat = (Game.version:find('91.'))
 
 --Speed-ups
 local spGetUnitDefID    = Spring.GetUnitDefID;
+local spValidUnitID		= Spring.ValidUnitID
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spSetUnitMoveGoal = Spring.SetUnitMoveGoal
 local spGetUnitVelocity = Spring.GetUnitVelocity
@@ -82,6 +83,14 @@ local dropableUnits = {
 	[UnitDefNames["armorco"].id] = true, --detriment
 }
 
+if UnitDefNames["factoryamph"] then
+	local buildOptions = UnitDefNames["factoryamph"].buildOptions
+	for i=1, #buildOptions do
+		local unitDefID = buildOptions[i]
+		dropableUnits[unitDefID] = true
+	end
+end
+
 local transportPhase = {}
 local giveLOAD_order = {}
 local giveDROP_order = {}
@@ -105,6 +114,24 @@ local function IsUnitIdle(unitID)
 	return not moving
 end
 
+local function GetCommandLenght(unitID)
+	local cmds
+	local lenght = 0
+	if reverseCompat then
+		cmd = spGetCommandQueue(unitID, -1)
+		lenght = (cmd and #cmd) or 0
+	else
+		lenght = spGetCommandQueue(unitID,0) or 0
+	end
+	return lenght, cmds
+end
+
+local function ClearUnitCommandQueue(unitID,cmds)
+	cmds = cmds or spGetCommandQueue(unitID, -1)
+	for i=1,#cmd do
+		spGiveOrderToUnit(unitID,CMD.REMOVE,{cmd[i].tag},{})
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -129,18 +156,19 @@ end
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == CMD.LOAD_UNITS) and (not transportPhase[unitID] or transportPhase[unitID]:sub(1,19)~= "INTERNAL_LOAD_UNITS") then  --detected LOAD command not originated from this gadget
 		if not cmdParams[2] then --not area transport
+			if not spValidUnitID(cmdParams[1]) then --not loading unit
+				return true --let spring handle
+			end
 			local targetDefID = spGetUnitDefID(cmdParams[1])
 			if floatDefs[targetDefID] then --targeted unit could utilize float gadget (unit_impulsefloat.lua)
-				if not cmdOptions.shift then --the LOAD command was not part of a queue, order a STOP command to clear current queue (this create the normal behaviour when SHIFT modifier is not used)
-					spGiveOrderToUnit(unitID, CMD.STOP,{},{})
+				local cmds
+				local index = 0
+				index,cmds = GetCommandLenght(unitID)
+				 --LOAD command was not part of a queue, clear current queue (this create the normal behaviour when SHIFT modifier is not used)
+				if not cmdOptions.shift then
+					ClearUnitCommandQueue(unitID,cmds)
 					transportPhase[unitID] = nil
-				end
-				local index
-				if reverseCompat then
-					local cmd=spGetCommandQueue(unitID, -1)
-					index = (cmd and #cmd) or 0 --get the lenght of current queue
-				else
-					index = spGetCommandQueue(unitID,0) or 0
+					index = 0
 				end
 				
 				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,cmdParams[1]}, {"alt"}) --insert LOAD-Extension command at current index in queue
@@ -159,17 +187,15 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			then
 				haveWater = true
 			end 
-			if haveWater then 
+			if haveWater then
+				local cmds
+				local index = 0
+				index,cmds = GetCommandLenght(unitID)
+				--LOAD command was not part of a queue, clear current queue (this create the normal behaviour when SHIFT modifier is not used)
 				if not cmdOptions.shift then
-					spGiveOrderToUnit(unitID, CMD.STOP,{},{})
+					ClearUnitCommandQueue(unitID,cmds)
 					transportPhase[unitID] = nil
-				end
-				local index
-				if reverseCompat then
-					local cmd=spGetCommandQueue(unitID, -1)
-					index = (cmd and #cmd) or 0 --get the lenght of current queue
-				else
-					index = spGetCommandQueue(unitID,0) or 0
+					index = 0
 				end
 				spGiveOrderToUnit(unitID,CMD.INSERT,{index,CMD_EXTENDED_LOAD,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"})
 				return false
@@ -177,16 +203,13 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		end
 	end
 	if (cmdID == CMD.UNLOAD_UNITS) then
+		local cmds
+		local index = 0
+		index,cmds = GetCommandLenght(unitID)
 		if not cmdOptions.shift then
-			spGiveOrderToUnit(unitID, CMD.STOP,{},{})
+			ClearUnitCommandQueue(unitID,cmds)
 			transportPhase[unitID] = nil
-		end
-		local index
-		if reverseCompat then
-			local cmd=spGetCommandQueue(unitID, -1)
-			index = (cmd and #cmd) or 0 --get the lenght of current queue
-		else
-			index = spGetCommandQueue(unitID,0) or 0
+			index = 0
 		end
 		local orderToSandwich = {
 			{CMD.INSERT,{index,CMD.UNLOAD_UNITS,CMD.OPT_SHIFT,unpack(cmdParams)}, {"alt"}},
@@ -194,14 +217,20 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		}
 		spGiveOrderArrayToUnitArray ({unitID},orderToSandwich)
 		return false
-	end 
+	end
 	return true
 end
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
 	if cmdID == CMD_EXTENDED_LOAD then
-		if not cmdParams[2] then --is not area-ransport
+		if (transportPhase[unitID] and transportPhase[unitID]:sub(1,19)== "INTERNAL_LOAD_UNITS") then
+			return true,true --remove this command
+		end
+		if not cmdParams[2] then --is not area-transport
 			local cargoID = cmdParams[1]
+			if not spValidUnitID(cargoID) then --target dead
+				return true,true --remove this command
+			end
 			if GG.HoldStillForTransport_HoldFloat and IsUnitAllied(cargoID,unitID) then --is not targeting enemy
 				local isHolding = GG.HoldStillForTransport_HoldFloat(cargoID) --check & call targeted unit to hold its float
 				if not isHolding and transportPhase[unitID]~="ALREADY_CALL_UNIT_ONCE" and IsUnitIdle(cargoID) then --target have not float yet, and this is our first call, and targeted unit is idle enough for a float
@@ -218,12 +247,16 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				local isRepeat = spGetUnitStates(unitID)["repeat"]
 				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cargoID
-				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{0,CMD.LOAD_UNITS,options,cargoID}, {"alt"}}
-				return true,true --remove this command
+				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,cargoID}, {"alt"}}
+				-- return true,true --remove this command
+				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
 			return true,false --hold this command
 		else
 			local units = spGetUnitsInCylinder(cmdParams[1],cmdParams[3],cmdParams[4])
+			if #units == 0 then
+				return true,true --remove this command
+			end
 			local haveFloater = false
 			for i=1, #units do
 				local potentialCargo = units[i]
@@ -246,13 +279,17 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 				local isRepeat = spGetUnitStates(unitID)["repeat"]
 				local options = isRepeat and CMD.OPT_INTERNAL or CMD.OPT_SHIFT 
 				transportPhase[unitID] = "INTERNAL_LOAD_UNITS " .. cmdParams[1]+cmdParams[3]
-				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{0,CMD.LOAD_UNITS,options,unpack(cmdParams)}, {"alt"}}
-				return true,true --remove this command
+				giveLOAD_order[#giveLOAD_order+1] = {unitID,CMD.INSERT,{1,CMD.LOAD_UNITS,options,unpack(cmdParams)}, {"alt"}}
+				-- return true,true --remove this command
+				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
 			return true,false --hold this command
 		end
 		return true,true --remove this command
 	elseif cmdID == CMD_EXTENDED_UNLOAD then
+		if (transportPhase[unitID] and transportPhase[unitID]== "INTERNAL_UNLOAD_UNITS") then
+			return true,true --remove this command
+		end
 		local cargo = spGetUnitIsTransporting(unitID)
 		if cargo and #cargo==1 then
 			if transportPhase[unitID] ~= "ALREADY_CALL_UNITDROP_ONCE" then
@@ -268,9 +305,11 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 			local gy = spGetGroundHeight(x,z)
 			local cargoDefID = spGetUnitDefID(cargo[1])
 			if gy < 0 and (UnitDefs[cargoDefID].customParams.commtype or floatDefs[cargoDefID] or dropableUnits[cargoDefID]) then
-				giveDROP_order[#giveDROP_order+1] = {unitID,CMD.INSERT,{0,CMD_ONECLICK_WEAPON,CMD.OPT_INTERNAL}, {"alt"}}
+				transportPhase[unitID] = "INTERNAL_UNLOAD_UNITS"
+				giveDROP_order[#giveDROP_order+1] = {unitID,CMD.INSERT,{1,CMD_ONECLICK_WEAPON,CMD.OPT_INTERNAL}, {"alt"}}
 				-- Spring.Echo("E")
 				--"PHASE E"--
+				return true,false --hold this command (removed in next frame after giveLOAD_order have inserted command (this avoid unit trigger UnitIdle)
 			end
 		end 
 		return true,true --remove this command

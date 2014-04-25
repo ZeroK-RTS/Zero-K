@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 27.1.2014",
+    date      = "1.11.2007, 25.4.2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -100,7 +100,8 @@ function IsTransportable(unitDefID, unitID)
   ud = UnitDefs[unitDefID]
   if (ud == nil) then return false end
   udc = ud.springCategories
-  local _,y =Spring.GetUnitPosition(unitID)
+  local _,_,_,_,y =Spring.GetUnitPosition(unitID,true)
+  y = y + Spring.GetUnitRadius(unitID)
   return (udc~= nil and ud.speed > 0 and not ud.canFly and (y>-20 or floatDefs[unitDefID]))
 end
 
@@ -524,8 +525,9 @@ function AssignTransports(transportID, unitID)
   if (transportID~=0) then
      local transpeed = UnitDefs[GetUnitDefID(transportID)].speed
      for id, val in pairs(waitingUnits) do 
-       if CanTransport(transportID, id) then
-         local unitspeed = UnitDefs[val[2]].speed
+	   local waitDefID = val[2]
+       if IsTransportable(waitDefID, id) and CanTransport(transportID, id) then
+         local unitspeed = UnitDefs[waitDefID].speed
 
          local ud = GetPathLength(id)
          local td = GetUnitSeparation(id, transportID, true)
@@ -542,11 +544,12 @@ function AssignTransports(transportID, unitID)
        end 
      end
   elseif (unitID ~=0) then
-    local unitspeed = UnitDefs[GetUnitDefID(unitID)].speed
+    local unitDefID = GetUnitDefID(unitID)
+    local unitspeed = UnitDefs[unitDefID].speed
     local state = waitingUnits[unitID][1]
     local ud = GetPathLength(unitID)
     for id, def in pairs(idleTransports) do 
-      if CanTransport(id, unitID) then
+      if IsTransportable(unitDefID, unitID) and CanTransport(id, unitID) then
         local transpeed = UnitDefs[def].speed
         local td = GetUnitSeparation(unitID, id, true)
 
@@ -572,7 +575,7 @@ function AssignTransports(transportID, unitID)
     local tid = best[i][2]
     local uid = best[i][3]
     i = i +1
-    if (used[tid]==nil and used[uid]==nil) then 
+    if (used[tid]==nil and used[uid]==nil) then --check if already given transport order in same loop
       used[tid] = 1
       used[uid] = 1
 --      Echo ("ordering " .. tid .. " " .. uid )
