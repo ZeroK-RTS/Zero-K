@@ -1,3 +1,9 @@
+--[[ Handles Pathfinding
+ * Use this file to create pathfinding objects with movetypes.
+ * This ojbect can generate paths between two points or return 
+ false when there is no path.
+ * Can be passed heatmaps which weight the nodes.
+--]]
 ---------------------------------------------------------------
 -- Configuration and Localization
 ---------------------------------------------------------------
@@ -239,6 +245,8 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 	local defenseHeatmapCount = 0
 	local pathMap = CreatePathMap(pathUnitDefID, pathMoveDefName)
 	
+	local fearSumCache = {}
+	
 	-- Heatmap functions
 	function SetDefenseHeatmaps(newDefenseHeatmaps)
 		defenseHeatmaps = newDefenseHeatmaps
@@ -258,14 +266,20 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 	end
 	
 	local function GetHeatmapFearSum(x,z)
-		local sum = 0
-		if heatmapFear then
-			for i = 1, defenseHeatmapCount do
-				local heatValue = defenseHeatmaps[i].GetValueByIndex(x, z)
-				sum = sum + heatValue
+		if fearSumCache[x] then
+			if fearSumCache[x][z] then
+				return fearSumCache[x][z]
 			end
+		else
+			fearSumCache[x] = {}
 		end
-		return false
+		local sum = 0
+		for i = 1, defenseHeatmapCount do
+			local heatValue = defenseHeatmaps[i].GetValueByIndex(x, z)
+			sum = sum + heatValue
+		end
+		fearSumCache[x][z] = sum
+		return sum
 	end
 	
 	-- aStar overrides
@@ -292,16 +306,19 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 		if heatFearFactor then
 			local x1, z1 = IdToCoords(id1)
 			local x2, z2 = IdToCoords(id2)
-			return 1 + (GetHeatmapFearSum(x1, z1) + GetHeatmapFearSum(x2, z2))*newHeatFearFactor
+			return 1 + (GetHeatmapFearSum(x1, z1) + GetHeatmapFearSum(x2, z2))*heatFearFactor
 		else
 			return 1
 		end
 	end
 	
-	-- 
-	function GetPath(startX, startZ, finishX, finishZ, newHeatmapFear, newHeatFearFactor)
+	function GetPath(startX, startZ, finishX, finishZ, newHeatmapFear, newHeatFearFactor, minWaypointDistance)
+		fearSumCache = {}
+	
 		heatmapFear = newHeatmapFear
 		heatFearFactor = (newHeatFearFactor and newHeatFearFactor > 0 and newHeatFearFactor) or false
+		
+		minWaypointDistance = minWaypointDistance or 1
 		
 		local sx, sz = WorldToArray(startX,startZ)
 		local fx, fz = WorldToArray(finishX,finishZ)
@@ -317,21 +334,27 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 		
 		--for i = 1, #path do
 		--	local x, z = IdToCoords(path[i])
-		--	local wx, wz = ArrayToWorld(x,z)
-		--	Spring.MarkerAddPoint(wx, 0, wz, i)
+		--	local wx, wz = ArrayToWorld(x, z)
+		--	Spring.MarkerAddPoint(wx, 0, wz, "")
 		--end
 		
 		-- Functions for culling the path of useless nodes
-		local function CheckLink(x1, z1, x2, z2)
+		local function CheckLink(x1, z1, x2, z2, maxFear)
 			local dx, dz = x2 - x1, z2 - z1
 			local linkRelationMap = pathMap[x1][z1].linkRelationMap
+			local linked = linkRelationMap[dx] and linkRelationMap[dx][dz]
+			if linked and maxFear then
+				if GetHeatmapFearSum(x1, z1) > maxFear or GetHeatmapFearSum(x2, z2) > maxFear then
+					linked = false
+				end
+			end
 			--GG.TableEcho(linkRelationMap)
 			--Spring.Echo(dx .. "  " .. dz)
 			--Spring.Echo((linkRelationMap[dx] and linkRelationMap[dx][dz] and "link") or "no link")
-			return linkRelationMap[dx] and linkRelationMap[dx][dz]
+			return linked
 		end
 		
-		local function CheckDirectPath(x1, z1, x2, z2)
+		local function CheckDirectPath(x1, z1, x2, z2, maxFear)
 			local xDiff = x2 - x1
 			local zDiff = z2 - z1
 			local stepsNeeded = abs(xDiff) + abs(zDiff)
@@ -362,7 +385,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 				local newRx = floor(x + 0.5)
 				if newRx ~= rx then
 					steps = steps + 1
-					if (not CheckLink(rx, rz, newRx, rz)) or IsPositionHeatmapFeared(newRx, rz) then
+					if (not CheckLink(rx, rz, newRx, rz, maxFear)) or IsPositionHeatmapFeared(newRx, rz) then
 						--local w1, w2 = ArrayToWorld(rx,rz)
 						--local w3, w4 = ArrayToWorld(newRx,rz)
 						--Spring.MarkerAddLine(w1, 0, w2, w3, 0, w4)
@@ -377,7 +400,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 				local newRz = floor(z + 0.5)
 				if newRz ~= rz then
 					steps = steps + 1
-					if (not CheckLink(rx, rz, rx, newRz)) or IsPositionHeatmapFeared(rx, newRz) then
+					if (not CheckLink(rx, rz, rx, newRz, maxFear)) or IsPositionHeatmapFeared(rx, newRz) then
 						--local w1, w2 = ArrayToWorld(rx,rz)
 						--local w3, w4 = ArrayToWorld(rx,newRz)
 						--Spring.MarkerAddLine(w1, 0, w2, w3, 0, w4)
@@ -392,7 +415,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 			return directPath, rx, rz
 		end
 		
-		-- Do the path cull
+		-- Cull the path returned by aStar
 		local waypoints = {}
 		local waypointCount = 0
 		local function AddWaypoint(x, z)
@@ -404,14 +427,36 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 		
 		local from = 1
 		local fromX, fromZ = IdToCoords(path[from])
-		for to = 2, #path do
+		
+		local fromFear = false
+		if heatFearFactor then
+			fromFear = GetHeatmapFearSum(fromX, fromZ)
+		end
+		
+		local to = 1 + minWaypointDistance
+		while to <= #path do
 			local x, z = IdToCoords(path[to])
-			local clear, rx, rz = CheckDirectPath(fromX,fromZ,x,z)
-			if not clear then
+			local maxFear = fromFear
+			if heatFearFactor then
+				local toFear = GetHeatmapFearSum(x, z)
+				if toFear < maxFear then
+					maxFear = toFear
+				end
+			end
+			local clear, rx, rz = CheckDirectPath(fromX,fromZ,x,z,maxFear)
+			if clear then
+				to = to + 1
+			else
 				from = to - 1
 				fromX, fromZ = IdToCoords(path[from])
+				local fromFear = false
+				if heatFearFactor then
+					fromFear = GetHeatmapFearSum(fromX, fromZ)
+				end
+				
 				local toX, toZ = IdToCoords(path[from])
 				AddWaypoint(toX, toZ)
+				to = to + minWaypointDistance
 				--local wrx, wrz = ArrayToWorld(rx, rz)
 				--Spring.MarkerAddPoint(wx, 0, wz, "Path: " .. from)
 				--Spring.MarkerAddPoint(wrx, 0, wrz, "Blocked: " .. from)
