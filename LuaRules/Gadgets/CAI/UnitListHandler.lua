@@ -32,7 +32,7 @@ function UnitListHandler.CreateUnitList(static)
 	local unitList = {}
 	local unitCount = 0
 	
-	function GetClosestUnitWithCondition(x,z,condition)
+	function GetNearestUnit(x,z,condition)
 		local minDisSq = false
 		local closeID = false
 		local closeX = false
@@ -53,13 +53,28 @@ function UnitListHandler.CreateUnitList(static)
 		return closeID, closeX, closeZ
 	end
 	
+	function IsPositionNearUnit(x, z, radius, condition)
+		local radiusSq = radius^2
+		for i = 1, unitCount do
+			local data = unitList[i]
+			local ux,uz = GetUnitLocation(data)
+			if condition and condition(data.unitID, ux, uz, data.customData) then
+				local thisDisSq = DisSQ(x,z,ux,uz)
+				if thisDisSq < radiusSq then
+					return true
+				end
+			end
+		end
+		return false
+	end
+	
 	function ModifyUnit(unitID, newData)
 		if unitMap[unitID] then
 			unitList[index].customData = newData
 		end
 	end
 	
-	function AddUnit(unitID, cost, newData)
+	function AddUnit(unitID, newData)
 		if unitMap[unitID] then
 			ModifyUnit(unitID, cost, newData)
 		end
@@ -88,11 +103,23 @@ function UnitListHandler.CreateUnitList(static)
 		end
 	end
 	
+	function Iterator()
+		local i = 0
+		return function ()
+			i = i + 1
+			if i <= unitCount then 
+				return unitList[i].unitID, unitList[i].customData 
+			end
+		end
+	end
+	
 	local newUnitList = {
 		GetNearestUnit = GetNearestUnit,
+		IsPositionNearUnit = IsPositionNearUnit,
 		ModifyUnit = ModifyUnit,
 		AddUnit = AddUnit,
 		RemoveUnit = RemoveUnit,
+		Iterator = Iterator,
 	}
 	
 	return newUnitList

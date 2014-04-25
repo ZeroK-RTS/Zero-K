@@ -15,11 +15,14 @@ local MAP_WIDTH = Game.mapSizeX
 local MAP_HEIGHT = Game.mapSizeZ
 
 local spGetUnitPosition = Spring.GetUnitPosition
+local spGetGroundHeight = Spring.GetGroundHeight
 
 local HeatmapHandler = {}
 
-function HeatmapHandler.CreateHeatmap(minSquareSize, teamID)
+function HeatmapHandler.CreateHeatmap(minSquareSize, teamID, allowNegativeValues, defaultValue)
 
+	defaultValue = defaultValue or 0
+	
 	local HEATSQUARE_MIN_SIZE = minSquareSize
 	
 	local MODIFY_UNIT_THRESHOLD = 128
@@ -36,28 +39,35 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID)
 	local unitCount = 0
 	local unitAmountSum = 0
 	
+	local heatmapWorldPosition = {}
+	for i = 0, HEAT_SIZE_X do
+		heatmapWorldPosition[i] = {}
+		for j = 0, HEAT_SIZE_Z do
+			heatmapWorldPosition[i][j] = {
+				x = HEAT_SQUARE_SIZE*(i-0.5), z = HEAT_SQUARE_SIZE*(j-0.5)
+			}
+			heatmapWorldPosition[i][j].y = spGetGroundHeight(heatmapWorldPosition[i][j].x,heatmapWorldPosition[i][j].z)
+		end
+	end
+	
 	-- Internal Functions
 	local function WorldToArray(x,z)
 		local i,j
 		if x < 0 then
-			i = 0
+			i = 1
 		elseif x >= MAP_WIDTH then
 			i = HEAT_SIZE_X
 		else
-			i = floor(x/HEAT_SQUARE_SIZE)
+			i = ceil(x/HEAT_SQUARE_SIZE)
 		end
 		if z < 0 then
-			j = 0
+			j = 1
 		elseif z >= MAP_HEIGHT then
 			j = HEAT_SIZE_Z
 		else
-			j = floor(z/HEAT_SQUARE_SIZE)
+			j = ceil(z/HEAT_SQUARE_SIZE)
 		end
 		return i, j
-	end
-
-	local function ArrayToWorld(i,j) -- gets midpoint
-		return (i+0.5)*HEAT_SQUARE_SIZE, (j+0.5)*HEAT_SQUARE_SIZE
 	end
 
 	-- Unit tracking
@@ -151,10 +161,26 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID)
 		end
 		if not heatmap[i][j] then
 			heatmap[i][j] = {
-				value = amount,
+				value = defaultValue + amount,
 			}
 		else
 			heatmap[i][j].value = heatmap[i][j].value + amount
+			if not allowNegativeValues and heatmap[i][j].value < 0 then
+				heatmap[i][j].value = 0
+			end
+		end
+	end
+	
+	local function SetHeatPointInArray(i, j, amount)
+		if not heatmap[i] then
+			heatmap[i] = {}
+		end
+		if not heatmap[i][j] then
+			heatmap[i][j] = {
+				value = amount,
+			}
+		else
+			heatmap[i][j].value = amount
 			if heatmap[i][j].value < 0 then
 				heatmap[i][j] = nil
 			end
@@ -168,9 +194,25 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID)
 	end
 	
 	-- Extermal Functions
+	function ArrayToWorld(i,j) -- gets midpoint
+		if heatmapWorldPosition[i] and heatmapWorldPosition[i][j] then
+			return heatmapWorldPosition[i][j].x,  heatmapWorldPosition[i][j].y, heatmapWorldPosition[i][j].z
+		end
+		return (i-0.5)*HEAT_SQUARE_SIZE, (j-0.5)*HEAT_SQUARE_SIZE
+	end
+	
 	function AddHeatPoint(x, z, amount)
 		local aX, aZ = WorldToArray(x,z)
 		AddHeatToArray(aX, aZ, amount)
+	end
+	
+	function SetHeatPoint(x, z, amount)
+		local aX, aZ = WorldToArray(x,z)
+		SetHeatPointInArray(aX, aZ, amount)
+	end
+	
+	function SetHeatPointByIndex(aX, aZ, amount)
+		SetHeatPointInArray(aX, aZ, amount)
 	end
 	
 	function RemoveHeatPoint(x, z, amount)
@@ -188,12 +230,12 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID)
 		local jBound = min(aZ + aRadius, HEAT_SIZE_Z)
 		local i = max(aX - aRadius, 0)
 		while i <= iBound do
-			local squareX = (i+0.5)*HEAT_SQUARE_SIZE
+			local squareX = (i-0.5)*HEAT_SQUARE_SIZE
 			local xDisSq = (squareX - x)^2
 			local j = jStart
 			while j <= jBound do
 				local wx, wz = ArrayToWorld(i,j)
-				local squareZ = (j+0.5)*HEAT_SQUARE_SIZE
+				local squareZ = (j-0.5)*HEAT_SQUARE_SIZE
 				local disSq = xDisSq + (squareZ - z)^2
 				if disSq < radiusSq then
 					AddHeatToArray(i, j, amount)
@@ -247,13 +289,36 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID)
 		) 
 	end
 	
+	-- Get particular vaules
 	function GetValueByIndex(x, z)
-		return (heatmap[x] and heatmap[x][z] and heatmap[x][z].value) or 0
+		return (heatmap[x] and heatmap[x][z] and heatmap[x][z].value) or defaultValue
 	end
 	
+	function Iterator()
+		local i = 1
+		local j = 0
+		return function ()
+			j = j + 1
+			if j > HEAT_SIZE_Z then 
+				i = i + 1
+				j = 1
+				if i > HEAT_SIZE_X then
+					return nil
+				end
+			end
+			return i, j
+		end
+	end
+	
+	-- Return the accessible functions
 	local newHeatmap = {
-		heatmap = heatmap,
+		heatmap = heatmap, -- Heatmap is accessible for drawing
+		HEAT_SIZE_X = HEAT_SIZE_X,
+		HEAT_SIZE_Z = HEAT_SIZE_Z,
+		ArrayToWorld = ArrayToWorld,
 		AddHeatPoint = AddHeatPoint,
+		SetHeatPoint = SetHeatPoint,
+		SetHeatPointByIndex = SetHeatPointByIndex,
 		RemoveHeatPoint = RemoveHeatPoint,
 		AddHeatCircle = AddHeatCircle,
 		RemoveHeatCircle = RemoveHeatCircle,
@@ -262,6 +327,8 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID)
 		RemoveUnitHeat = RemoveUnitHeat,
 		UpdateUnitPositions = UpdateUnitPositions,
 		GetValueByIndex = GetValueByIndex,
+		DoForEachPoint = DoForEachPoint,
+		Iterator = Iterator,
 	}
 	
 	return newHeatmap

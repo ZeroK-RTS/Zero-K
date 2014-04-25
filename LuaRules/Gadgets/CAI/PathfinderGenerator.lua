@@ -18,10 +18,12 @@ local abs = math.abs
 local MAP_WIDTH = Game.mapSizeX
 local MAP_HEIGHT = Game.mapSizeZ
 
+local MAP_WATER_DAMAGE = Game.waterDamage > 0
+
 local PATH_SQUARE_SIZE = 256 -- Matches low resolution spring pathfinder size
 local PATH_MID = PATH_SQUARE_SIZE/2
-local PATH_X = ceil(MAP_WIDTH/PATH_SQUARE_SIZE) - 1
-local PATH_Z = ceil(MAP_HEIGHT/PATH_SQUARE_SIZE) - 1
+local PATH_X = ceil(MAP_WIDTH/PATH_SQUARE_SIZE)
+local PATH_Z = ceil(MAP_HEIGHT/PATH_SQUARE_SIZE)
 
 local PathfinderGenerator = {
 	PATH_SQUARE_SIZE = PATH_SQUARE_SIZE,
@@ -35,9 +37,9 @@ local PathfinderGenerator = {
 local CoordToIDarray = {}
 local IdToCoordarray = {}
 
-for i = 0, PATH_X do
+for i = 1, PATH_X do
 	CoordToIDarray[i] = {}
-	for j = 0, PATH_Z do
+	for j = 1, PATH_Z do
 		IdToCoordarray[#IdToCoordarray+1] = {x = i, z = j}
 		CoordToIDarray[i][j] = #IdToCoordarray
 	end
@@ -58,24 +60,24 @@ end
 local function WorldToArray(x,z)
 	local i,j
 	if x < 0 then
-		i = 0
+		i = 1
 	elseif x >= MAP_WIDTH then
 		i = PATH_X
 	else
-		i = floor(x/PATH_SQUARE_SIZE)
+		i = ceil(x/PATH_SQUARE_SIZE)
 	end
 	if z < 0 then
-		j = 0
+		j = 1
 	elseif z >= MAP_HEIGHT then
 		j = PATH_Z
 	else
-		j = floor(z/PATH_SQUARE_SIZE)
+		j = ceil(z/PATH_SQUARE_SIZE)
 	end
 	return i, j
 end
 
 local function ArrayToWorld(i,j) -- gets midpoint
-	return i*PATH_SQUARE_SIZE + PATH_MID, j*PATH_SQUARE_SIZE + PATH_MID
+	return i*PATH_SQUARE_SIZE - PATH_MID, j*PATH_SQUARE_SIZE - PATH_MID
 end
 
 ---------------------------------------------------------------
@@ -160,34 +162,39 @@ local function UpdatePathLink(start, finish, relation, moveDef)
 	end
 end
 
-local function CreatePathMap(pathUnitDefID, pathMoveDefName)
+local function CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 	-- pathUnitDefID is an example unitDef to use to check for valid location
 	-- pathMoveDefName is the name of the movedef used for the path
+	local avoidWater = avoidWaterDamage and MAP_WATER_DAMAGE
 	
 	local pathMap = {}
 	
 	-- Create the positions of the path map which will be used for connection testing.
-	for i = 0, PATH_X do
+	for i = 1, PATH_X do
 		pathMap[i] = {}
-		for j = 0, PATH_Z do
+		for j = 1, PATH_Z do
 			
 			pathMap[i][j] = {
 				x = i,
 				z = j,
-				mx = PATH_MID + i*PATH_SQUARE_SIZE, 
-				mz = PATH_MID + j*PATH_SQUARE_SIZE,
+				mx = i*PATH_SQUARE_SIZE - PATH_MID, 
+				mz = j*PATH_SQUARE_SIZE - PATH_MID,
 				linkList = {},
 				linkCount = 0,
 				linkRelationMap = {}
 			}
 			
+			local function IsValidUnitLocation(x, z)
+				return Spring.TestMoveOrder(pathUnitDefID, x/2, 0, z/2) and not (avoidWater and Spring.GetGroundHeight(x,z) < 0)
+			end
+			
 			local point = 1
-			local px = checkPoints[point].x + PATH_MID + i*PATH_SQUARE_SIZE
-			local pz = checkPoints[point].z + PATH_MID + j*PATH_SQUARE_SIZE
-			while point < #checkPoints and pathUnitDefID and not Spring.TestMoveOrder(pathUnitDefID, px/2, 0, pz/2) do
+			local px = checkPoints[point].x + i*PATH_SQUARE_SIZE - PATH_MID
+			local pz = checkPoints[point].z + j*PATH_SQUARE_SIZE - PATH_MID
+			while point < #checkPoints and pathUnitDefID and not IsValidUnitLocation(px,pz) do
 				point = point + 1
-				px = checkPoints[point].x + PATH_MID + i*PATH_SQUARE_SIZE
-				pz = checkPoints[point].z + PATH_MID + j*PATH_SQUARE_SIZE	
+				px = checkPoints[point].x + i*PATH_SQUARE_SIZE - PATH_MID
+				pz = checkPoints[point].z + j*PATH_SQUARE_SIZE - PATH_MID	
 				--Spring.MarkerAddPoint(px,0,pz, "")
 			end
 			
@@ -203,8 +210,8 @@ local function CreatePathMap(pathUnitDefID, pathMoveDefName)
 	end
 	
 	-- Check links between points, this only checks orthagonal but could easily change.
-	for i = 0, PATH_X do
-		for j = 0, PATH_Z do
+	for i = 1, PATH_X do
+		for j = 1, PATH_Z do
 			if i < PATH_X then
 				UpdatePathLink(pathMap[i][j], pathMap[i+1][j], {1,0}, pathMoveDefName)
 			end
@@ -234,7 +241,7 @@ end
 -- Pathfinder object definition
 ---------------------------------------------------------------
 
-function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
+function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 	
 	local aStar = VFS.Include("LuaRules/Gadgets/CAI/astar.lua")
 
@@ -243,7 +250,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 	
 	local defenseHeatmaps = {}
 	local defenseHeatmapCount = 0
-	local pathMap = CreatePathMap(pathUnitDefID, pathMoveDefName)
+	local pathMap = CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 	
 	local fearSumCache = {}
 	
@@ -334,7 +341,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 		
 		--for i = 1, #path do
 		--	local x, z = IdToCoords(path[i])
-		--	local wx, wz = ArrayToWorld(x, z)
+		--	local wx,_, wz = ArrayToWorld(x, z)
 		--	Spring.MarkerAddPoint(wx, 0, wz, "")
 		--end
 		
@@ -386,8 +393,8 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 				if newRx ~= rx then
 					steps = steps + 1
 					if (not CheckLink(rx, rz, newRx, rz, maxFear)) or IsPositionHeatmapFeared(newRx, rz) then
-						--local w1, w2 = ArrayToWorld(rx,rz)
-						--local w3, w4 = ArrayToWorld(newRx,rz)
+						--local w1,_, w2 = ArrayToWorld(rx,rz)
+						--local w3,_, w4 = ArrayToWorld(newRx,rz)
 						--Spring.MarkerAddLine(w1, 0, w2, w3, 0, w4)
 						--Spring.MarkerAddPoint(w3, 0, w4, "bla")
 						directPath = false
@@ -401,8 +408,8 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 				if newRz ~= rz then
 					steps = steps + 1
 					if (not CheckLink(rx, rz, rx, newRz, maxFear)) or IsPositionHeatmapFeared(rx, newRz) then
-						--local w1, w2 = ArrayToWorld(rx,rz)
-						--local w3, w4 = ArrayToWorld(rx,newRz)
+						--local w1,_, w2 = ArrayToWorld(rx,rz)
+						--local w3,_, w4 = ArrayToWorld(rx,newRz)
 						--Spring.MarkerAddLine(w1, 0, w2, w3, 0, w4)
 						--Spring.MarkerAddPoint(w3, 0, w4, "bla")
 						directPath = false
@@ -457,7 +464,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName)
 				local toX, toZ = IdToCoords(path[from])
 				AddWaypoint(toX, toZ)
 				to = to + minWaypointDistance
-				--local wrx, wrz = ArrayToWorld(rx, rz)
+				--local wrx,_, wrz = ArrayToWorld(rx, rz)
 				--Spring.MarkerAddPoint(wx, 0, wz, "Path: " .. from)
 				--Spring.MarkerAddPoint(wrx, 0, wrz, "Blocked: " .. from)
 			end
