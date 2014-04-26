@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.005 Chili Chat Pro Console.",
+    desc      = "v0.006 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -630,7 +630,9 @@ local function AddMessage(msg, target, fade2, remake)
 	local highlight_sequence2 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_2) or '')
 	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.formatted .. highlight_sequence2
 
-	if (msg.dup > 1 and not remake) and fadeTracker[control_id-1] then
+	if (msg.dup > 1 and not remake)
+		and (target ~= 'console' or fadeTracker[control_id-1] )
+		then
 		local last = stack.children[#(stack.children)]
 		if last then
 			if last.SetText then
@@ -984,6 +986,7 @@ function widget:AddConsoleMessage(msg)
 		messages[#messages].dup = messages[#messages].dup + 1
 		AddMessage(messages[#messages], target, isChat)
 		
+		AddMessage(messages[#messages], 'backchat') --also add chat to backchat log
 		return
 	end
 	
@@ -1032,13 +1035,14 @@ function widget:Update(s)
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
+		local sub = 2 / options.autohide_text_time.value
 		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
 			window_chat.x / screen0.width + 0.003, 
 			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
 			window_chat.width / screen0.width)})
 	
 		for k,control in pairs(fadeTracker) do
-			local sub = 2 / options.autohide_text_time.value
+			
 			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
 			
 			if control.fade == 0 then
@@ -1145,8 +1149,8 @@ function widget:Initialize()
 		verticalScrollbar = false,
 	}
 	
-	for i = 1, 10 do
-		AddMessage({dup=0, formatted=''}, 'chat', false, true )
+	for i = 1, 20 do
+		AddMessage({dup=1, formatted=''}, 'chat', false, true )
 	end
 	
 	
