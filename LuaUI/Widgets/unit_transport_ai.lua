@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 25.4.2014",
+    date      = "1.11.2007, 26.4.2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -242,6 +242,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 --     Echo("unit destroyed " ..unitID)
      idleTransports[unitID] = nil
      priorityUnits[unitID] = nil
+	 waitingUnits[unitID] = nil
      local tuid = GetToPickUnit(unitID)
      if (tuid ~= 0) then -- transport which was about to pick something was destroyed
         local state = toPick[unitID][2]
@@ -526,7 +527,7 @@ function AssignTransports(transportID, unitID)
      local transpeed = UnitDefs[GetUnitDefID(transportID)].speed
      for id, val in pairs(waitingUnits) do 
 	   local waitDefID = val[2]
-       if IsTransportable(waitDefID, id) and CanTransport(transportID, id) then
+       if CanTransport(transportID, id) and IsTransportable(waitDefID, id)  then
          local unitspeed = UnitDefs[waitDefID].speed
 
          local ud = GetPathLength(id)
@@ -549,7 +550,7 @@ function AssignTransports(transportID, unitID)
     local state = waitingUnits[unitID][1]
     local ud = GetPathLength(unitID)
     for id, def in pairs(idleTransports) do 
-      if IsTransportable(unitDefID, unitID) and CanTransport(id, unitID) then
+      if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
         local transpeed = UnitDefs[def].speed
         local td = GetUnitSeparation(unitID, id, true)
 
