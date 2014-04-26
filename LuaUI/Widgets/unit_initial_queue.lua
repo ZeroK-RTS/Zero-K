@@ -1,12 +1,13 @@
-local version = "v1.51"
+
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
-		desc      = version .. " Allows you to queue buildings before game start",
+		desc      = "Allows you to queue buildings before game start",
 		author    = "Niobium, KingRaptor",
+		version   = "1.5",
 		date      = "7 April 2010",
 		license   = "GNU GPL, v2 or later",
-		layer     = -1, -- Puts it below cmd_mex_placement.lua, to catch mex placement order before the cmd_mex_placement.lua does.
+		layer     = 1001, -- Puts it above minimap_startboxes with layer 1002
 		enabled   = true,
 		handler   = true
 	}
@@ -15,7 +16,6 @@ end
 -- 20 march 2013: added keyboard support with BA keybinds (Bluestone)
 -- august 2013: send queue length to cmd_idle_players (BrainDamage)
 
---TODO: clean up outdated/not-needed-anymore stuff
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -146,9 +146,9 @@ local function SetSelDefID(defID)
 	if (isMex[selDefID] ~= nil) ~= (Spring.GetMapDrawMode() == "metal") then
 		Spring.SendCommands("ShowMetalMap")
 	end
-	-- if defID then
-		-- Spring.SetActiveCommand(defID)
-	-- end
+	if defID then
+		Spring.SetActiveCommand(defID)
+	end
 end
 
 local function GetSelDefID(defID)
@@ -220,14 +220,12 @@ function widget:Initialize()
 			weaponRange[uDefID] = uDef.maxWeaponRange
 		end
 	end
-	if UnitDefNames["cormex"] then
-		isMex[UnitDefNames["cormex"].id] = true;
-	end
-	-- WG.InitialQueue = {
-		-- SetSelDefID = SetSelDefID,
-		-- GetBuildOptions = GetBuildOptions,
-		-- GetSelDefID = GetSelDefID,
-	-- }
+	
+	WG.InitialQueue = {
+		SetSelDefID = SetSelDefID,
+		GetBuildOptions = GetBuildOptions,
+		GetSelDefID = GetSelDefID,
+	}
 end
 
 function widget:Shutdown()
@@ -443,8 +441,6 @@ end
 
 needBuildFacing = true
 
---[[ 
---Task handled by CommandNotify()
 function widget:MousePress(mx, my, mButton)
 	if selDefID then
 		if mButton == 1 then
@@ -499,7 +495,6 @@ function widget:MousePress(mx, my, mButton)
 		end
 	end
 end
---]]
 function widget:MouseMove(mx, my, dx, dy, mButton)
 	if areDragging then
 		wl = wl + dx
@@ -508,95 +503,6 @@ function widget:MouseMove(mx, my, dx, dy, mButton)
 end
 function widget:MouseRelease(mx, my, mButton)
 	areDragging = false
-end
-------------------------------------------------------------
--- GUI
-------------------------------------------------------------
-function widget:CommandsChanged()
-	if (gameStarted) then
-		return
-	end
-		
-	local customCommands = widgetHandler.customCommands
-	for i=1, #buildOptions do
-		local unitName = buildOptions[i]
-		local action = "buildunit_" .. unitName
-		local id = -1*UnitDefNames[unitName].id
-		local tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip
-		local cursor = id
-		local name = unitName
-		local params = {}
-		local texture = "#"..id
-		local type = 20
-		table.insert(customCommands, {
-			id      = id,
-			type    = type,
-			tooltip = tooltip,
-			cursor  = cursor,
-			action  = action,
-			params  = params, 
-			texture = texture,
-		})
-	end
-end
-
-local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
-	local bestSpot
-	local bestDist = math.huge
-	local bestIndex 
-	for i = 1, #WG.metalSpots do
-		local spot = WG.metalSpots[i]
-		local dx, dz = x - spot.x, z - spot.z
-		local dist = dx*dx + dz*dz
-		if dist < bestDist then
-			bestSpot = spot
-			bestDist = dist
-			bestIndex = i
-		end
-	end
-	return bestSpot
-end
-
-function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	if cmdID > 0 or not(cmdParams[1] and cmdParams[2] and cmdParams[3]) then --can't handle other command.
-		return false
-	end
-	SetSelDefID(-1*cmdID)
-	local bx,by,bz = cmdParams[1],cmdParams[2],cmdParams[3]
-	local buildFacing = Spring.GetBuildFacing()
-	if Spring.TestBuildOrder(selDefID, bx, by, bz, buildFacing) ~= 0 then
-		if isMex[selDefID] and WG.metalSpots then
-			local bestSpot = GetClosestMetalSpot(bx, bz)
-			bx, by, bz = bestSpot.x, bestSpot.y, bestSpot.z
-		end
-		local buildData = {selDefID, bx, by, bz, buildFacing}
-		if cmdOptions.meta then
-			table.insert(buildQueue, 1, buildData)
-
-		elseif cmdOptions.shift then
-
-			local anyClashes = false
-			for i = #buildQueue, 1, -1 do
-				if DoBuildingsClash(buildData, buildQueue[i]) then
-					anyClashes = true
-					table.remove(buildQueue, i)
-				end
-			end
-
-			if not anyClashes then
-				buildQueue[#buildQueue + 1] = buildData
-			end
-		else
-			buildQueue = {buildData}
-		end
-		
-		mCost, eCost, bCost = GetQueueCosts()
-		buildTime = bCost / sDef.buildSpeed
-
-		SetSelDefID(nil)
-		return true
-	end
-	return false
 end
 
 ------------------------------------------------------------
