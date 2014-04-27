@@ -333,30 +333,16 @@ local config = {
 --  FUNCTIONS
 ------------------------
 -- this gets invoked when button is clicked 
-local function ClickFunc(button, x, y, mouse, customFunc, customFuncArgs)
+local function ClickFunc(button, x, y, mouse)
 	local left, right = mouse == 1, mouse == 3
 	local alt,ctrl,meta,shift = Spring.GetModKeyState()
 	local mb = (left and 1) or (right and 3)
 	if mb then
-		if customFunc then
-			customFunc(unpack(customFuncArgs))
-		end
 		local index = Spring.GetCmdDescIndex(button.cmdid)
 		if index then
 			Spring.SetActiveCommand(index,mb,left,right,alt,ctrl,meta,shift)
 		end
 	end
-end
-
--- this lets you create special buttons in integral
-local function MakeSpecialCmdDesc(cmdID, customFunc, customFuncArgs, params)
-	return {
-		id = cmdID,
-		tooltip = params and params.tooltip,
-		disabled = params and params.disabled,
-		customFunc = customFunc,
-		customFuncArgs = customFuncArgs,
-	}
 end
 
 ------------------------
@@ -463,7 +449,7 @@ local function MakeButton(container, cmd, insertItem, index)
 			isDisabled = cmd.disabled;
 			tooltip = tooltip;
 			cmdid = cmd.id;
-			OnClick = {function(self, x, y, mouse) ClickFunc(self, x, y, mouse, cmd.customFunc, cmd.customFuncArgs) end}
+			OnClick = {function(self, x, y, mouse) ClickFunc(self, x, y, mouse) end}
 		}
 		if (isState) then 
 			button.padding = {4,4,2.5,2}
@@ -919,21 +905,6 @@ local function Update(buttonpush)
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
 	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
 	
-	-- handling for initial queue
-	if Spring.GetGameFrame() <= 0 then
-		local buildOptions = WG.InitialQueue and WG.InitialQueue.GetBuildOptions()
-		if buildOptions then
-			for i=1,#buildOptions do
-				local ud = UnitDefNames[buildOptions[i]]
-				local udid = ud.id
-				local func = WG.InitialQueue.SetSelDefID
-				local args = {udid}
-				local cmdDesc = MakeSpecialCmdDesc(-udid, func, args, {tooltip = "Build: " .. ud.humanName .. " - "})
-				ProcessCommand(cmdDesc)
-			end
-		end
-	end
-
 	menuChoices[1].array = n_common
 	menuChoices[2].array = n_factories
 	menuChoices[3].array = n_econ
@@ -1120,10 +1091,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 					local index = Spring.GetCmdDescIndex(cmdid)
 					if index then
 						Spring.SetActiveCommand(index,1,true,false,false,false,false,false)
-						thingsDone = true
-					elseif commandButtons[cmdid] then
-						local button = commandButtons[cmdid].button
-						button.OnClick[1](button, nil, nil, 1)
 						thingsDone = true
 					end
 				end

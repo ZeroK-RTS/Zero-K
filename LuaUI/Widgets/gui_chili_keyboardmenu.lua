@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.030 Chili Keyboard Menu",
+    desc      = "v0.031 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -457,10 +457,8 @@ local function AddHotkeyLabel( key, text )
 	}
 end
 
-local gameStarted = Spring.GetGameFrame() > 0
-
 local function CanInitialQueue()
-	return (not gameStarted) and WG.InitialQueue ~= nil
+	return WG.InitialQueue~=nil and not (Spring.GetGameFrame() > 0)
 end
 
 local function AddBuildButton(color)
@@ -543,10 +541,6 @@ local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
 	
 	
 	button1.OnMouseDown = { function()
-		if CanInitialQueue() then
-			WG.InitialQueue.SetSelDefID(ud.id);
-			return
-		end
 		CommandFunction( -(ud.id) );
 	end }
 end
@@ -570,10 +564,7 @@ local function AddBuildStructureButton(item, index)
 		--if menu_level ~= 0 then 
 		if menu_level ~= 0 or not item.items then  --account for first level items without subitems
 			local cmdid = build_menu_selected.cmd
-			
-			if CanInitialQueue() then
-				WG.InitialQueue.SetSelDefID( UnitDefNames[item.unit].id );
-			end
+
 			if (cmdid == nil) then 
 				local ud = UnitDefNames[item.unit]
 				if (ud ~= nil) then
@@ -581,6 +572,7 @@ local function AddBuildStructureButton(item, index)
 				end
 				
 			end 
+
 			if (cmdid) then
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
 				local _, _, left, _, right = Spring.GetMouseState()
@@ -936,20 +928,6 @@ local function BreakDownHotkey(hotkey)
 	return hotkey_key, hotkey_mod
 end
 
-
--- this lets you create special buttons in integral
-local function MakeSpecialCmdDesc(cmdID, customFunc, customFuncArgs, params, name)
-	return {
-		id = cmdID,
-		tooltip = params and params.tooltip,
-		disabled = params and params.disabled,
-		action = 'buildunit_' .. name,
-		name = name,
-		customFunc = customFunc,
-		customFuncArgs = customFuncArgs,
-	}
-end
-
 local function SetupCommands( modifier )
 
 	--AddCustomCommands(Spring.GetSelectedUnits())
@@ -965,17 +943,6 @@ local function SetupCommands( modifier )
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
 	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
 	
-	local buildOptions = WG.InitialQueue and WG.InitialQueue.GetBuildOptions() or {}
-	for i=1,#buildOptions do
-		local ud = UnitDefNames[buildOptions[i]]
-		local udid = ud.id
-		local func = WG.InitialQueue.SetSelDefID
-		local args = {udid}
-		local cmdDesc = MakeSpecialCmdDesc(-udid, func, args, {tooltip = "Build: " .. ud.humanName .. " - "}, ud.name)
-		ProcessCommand(cmdDesc)
-	end
-	
-		
 	ClearKeyButtons()
 	
 	if modifier == 'none' then
@@ -1366,8 +1333,4 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	elseif cmdID < 0 then
 		UpdateButtons()
 	end
-end
-
-function widget:GameStart()
-	gameStarted = false
 end

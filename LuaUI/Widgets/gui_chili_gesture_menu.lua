@@ -180,8 +180,6 @@ options = {
 local mapWidth, mapHeight = Game.mapSizeX, Game.mapSizeZ
 
 ------------------------------------------------
-local gameStarted = Spring.GetGameFrame() > 0
-
 local average_difference = 0 -- average movement speed/difference
 local ignored_angle = nil -- angle to currently ignore in menu
 
@@ -226,7 +224,7 @@ local function AngleDifference(a1,a2)
 end 
 
 local function CanInitialQueue()
-  return (not gameStarted) and WG.InitialQueue ~= nil
+  return WG.InitialQueue~=nil and not (Spring.GetGameFrame() > 0)
 end
 
 
@@ -375,17 +373,16 @@ function EndMenu(ok)
 		menu_selected = nil
    end
   local initialQueue = CanInitialQueue()
-  local ud
  
   if menu_selected~=nil and menu_selected.unit ~= nil then
     local cmdid = menu_selected.cmd
     if (cmdid == nil) then 
-      ud = UnitDefNames[menu_selected.unit]
+      local ud = UnitDefNames[menu_selected.unit]
       if (ud ~= nil) then
-	cmdid = Spring.GetCmdDescIndex(-ud.id)
+        cmdid = Spring.GetCmdDescIndex(-ud.id)
       end
     end
-    if (cmdid) or (initialQueue and ud) then
+    if (cmdid) then
       local alt, ctrl, meta, shift = Spring.GetModKeyState()
       local _, _, left, _, right = Spring.GetMouseState()
         
@@ -396,11 +393,7 @@ function EndMenu(ok)
       if os.clock() - menu_start > level * 0.25 then  -- if speed was slower than 250ms per level, flash the gesture
         menu_flash = {origin[1], origin[2], os.clock()}  
       end
-      if initialQueue then
-	WG.InitialQueue.SetSelDefID(ud.id)
-      else
-	Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
-      end
+      Spring.SetActiveCommand(cmdid, 1, left, right, alt, ctrl, meta, shift)  -- FIXME set only when you close menu
     end
   end 
   origin = nil
@@ -729,10 +722,6 @@ function widget:DrawScreen()
     end 
   end 
   glColor(1,1,1,1)
-end
-
-function widget:GameStart()
-  gameStarted = false
 end
 
 function widget:Initialize()
