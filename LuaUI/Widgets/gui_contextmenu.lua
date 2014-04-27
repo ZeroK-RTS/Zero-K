@@ -484,8 +484,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
 			file = "#" .. ud.id,
 			keepAspect = false;
-			height  = 40*(4/5);
-			width   = 40;
+			height  = 64*(4/5);
+			width   = 64;
 		},
 	}
 	if ud.iconType ~= 'default' then
@@ -506,7 +506,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		textColor = color.stats_fg, 
 		width = '100%',
 		height = '100%',
-		padding = { 1, 1, 1, 1 }, 
+		padding = { 0, 0, 0, 0 }, 
 		} 
 	
 	local statschildren = {}
@@ -606,11 +606,10 @@ local function printunitinfo(ud, lang, buttonWidth)
 	
 	local stack_icons = StackPanel:New{
 		autoArrangeV  = false,
-		padding = {1,1,1,1},
-		itemPadding = {1,1,1,1},
-		itemMargin = {1,1,1,1},
+		padding = {0,0,0,0},
+		itemMargin = {0,4,0,4},
 		height = 100,
-		width = 50,
+		width = 64,
 		resizeItems = false,
 		children = icons,
 	}
@@ -635,8 +634,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 		autoArrangeV  = false,
 		autoArrangeH  = false,
 		centerItems  = false,
-		right = 60,
-		x = 1,
+		right = 66,
+		x = 0,
 		--width = 200,
 		--height = '100%',
 		autosize=true,
