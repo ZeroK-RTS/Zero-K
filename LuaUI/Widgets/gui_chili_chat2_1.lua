@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.916 Chili Chat Console.",
+    desc      = "v0.917 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -573,7 +573,9 @@ local function hideMessage(msg)
 		or (msg.msgtype == 'other' and options.hideLog.value and not ((msg.argument):find('enabled!') or (msg.argument):find('disabled!') or 
 			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') or (msg.argument):find('following') or (msg.argument):find('Connection attempted') or
 				(msg.argument):find('wins!') or (msg.argument):find('resigned') or (msg.argument):find('exited') or (msg.argument):find('is no more') or (msg.argument):find('paused the game') or
-				(msg.argument):find('Sync error for') ))
+				(msg.argument):find('Sync error for') 
+				((msg.argument):find('left the game') and (msg.argument):find('Player')) or
+				or (msg.argument):find('Team') or (msg.argument):find('AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
 
 end
 
@@ -721,9 +723,11 @@ function RemakeConsole()
 	end
 	for i = 1, #messages do -- FIXME : messages collection changing while iterating (if max_lines option has been shrinked)
 		local msg = messages[i]
-		displayMessage(msg, true)
+		displayMessage(msg, true)	
 	end	
+	
 	removeToMaxLines()
+	
 	-- set initial state for the chat, hide the dock for autohide
 	if (options.autohide.value) then
 		hideConsole()
@@ -943,6 +947,7 @@ function widget:Initialize()
 		width = '100%',
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
+		horizontalScrollbar = false,
 -- DISABLED FOR CLICKABLE TextBox		disableChildrenHitTest = true,
 		backgroundColor = options.color_background.value,
 		borderColor = options.color_background.value,

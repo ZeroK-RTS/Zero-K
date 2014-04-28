@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.006 Chili Chat Pro Console.",
+    desc      = "v0.007 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -598,7 +598,9 @@ local function hideMessage(msg)
 		or (msg.msgtype == 'other' and options.hideLog.value and not ((msg.argument):find('enabled!') or (msg.argument):find('disabled!') or 
 			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') or (msg.argument):find('following') or (msg.argument):find('Connection attempted') or
 				(msg.argument):find('wins!') or (msg.argument):find('resigned') or (msg.argument):find('exited') or (msg.argument):find('is no more') or (msg.argument):find('paused the game') or
-				(msg.argument):find('Sync error for') ))
+				(msg.argument):find('Sync error for') or
+				((msg.argument):find('left the game') and (msg.argument):find('Player')) or
+				or (msg.argument):find('Team') or (msg.argument):find('AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message				))
 end
 
 local function AddMessage(msg, target, fade2, remake)
