@@ -1,4 +1,9 @@
-
+--[[ Handles the scouting unit job
+ * Add units to this handler to have them controled by it.
+ * Maintains a heatmap of locations to scout.
+ * Requires perdiodic UpdateHeatmap and RunJobHandler.
+ * Only one of these is needed per teamID.
+--]]
 local UnitListHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitListHandler.lua")
 local HeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/HeatmapHandler.lua")
 
@@ -19,8 +24,11 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 	local HEAT_SIZE_X = scoutHeatmap.HEAT_SIZE_X
 	local HEAT_SIZE_Z = scoutHeatmap.HEAT_SIZE_Z
 	
+	local TOTAL_HEAT_POINTS = HEAT_SIZE_X*HEAT_SIZE_Z
+	
 	local unscoutedPoints = {}
 	local unscoutedCount = 0
+	local unscoutedUnweightedCount = 0
 
 	local function AddUnscoutedPoint(i,j, pos)
 		unscoutedCount = unscoutedCount + 1
@@ -37,12 +45,14 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 	
 	function UpdateHeatmap(gameFrame)
 		unscoutedCount = 0
+		unscoutedUnweightedCount = 0
 		for i, j in scoutHeatmap.Iterator() do
 			local x, y, z = scoutHeatmap.ArrayToWorld(i,j)
 			if spIsPosInLos(x, 0, z, allyTeamID) then
 				scoutHeatmap.SetHeatPointByIndex(i, j, gameFrame)
 			else
 				if scoutHeatmap.GetValueByIndex(i, j) + SCOUT_DECAY_TIME < gameFrame then
+					unscoutedUnweightedCount = unscoutedUnweightedCount + 1
 					AddUnscoutedPoint(i,j, {x, y, z})
 				end
 			end
@@ -65,11 +75,17 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 		end
 	end	
 	
+	function GetScoutedProportion()
+		return 1 - unscoutedUnweightedCount/TOTAL_HEAT_POINTS
+	end
+	
 	local newScoutHandler = {
 		UpdateHeatmap = UpdateHeatmap,
 		RunJobHandler = RunJobHandler,
+		GetScoutedProportion = GetScoutedProportion,
 		AddUnit = scoutList.AddUnit,
 		RemoveUnit = scoutList.RemoveUnit,
+		GetTotalCost = scoutList.GetTotalCost,
 	}
 	
 	return newScoutHandler

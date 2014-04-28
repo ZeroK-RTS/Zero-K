@@ -27,10 +27,11 @@ local function GetUnitLocation(data)
 	return x, z
 end
 
-function UnitListHandler.CreateUnitList(static)
+function UnitListHandler.CreateUnitList(static, useCustomData)
 	local unitMap = {}
 	local unitList = {}
 	local unitCount = 0
+	local totalCost = 0
 	
 	function GetNearestUnit(x,z,condition)
 		local minDisSq = false
@@ -40,7 +41,7 @@ function UnitListHandler.CreateUnitList(static)
 		for i = 1, unitCount do
 			local data = unitList[i]
 			local ux,uz = GetUnitLocation(data)
-			if condition and condition(data.unitID, ux, uz, data.customData) then
+			if condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
 				local thisDisSq = DisSQ(x,z,ux,uz)
 				if not minDisSq or minDisSq > thisDisSq then
 					minDisSq = thisDisSq
@@ -58,7 +59,7 @@ function UnitListHandler.CreateUnitList(static)
 		for i = 1, unitCount do
 			local data = unitList[i]
 			local ux,uz = GetUnitLocation(data)
-			if condition and condition(data.unitID, ux, uz, data.customData) then
+			if condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
 				local thisDisSq = DisSQ(x,z,ux,uz)
 				if thisDisSq < radiusSq then
 					return true
@@ -68,29 +69,40 @@ function UnitListHandler.CreateUnitList(static)
 		return false
 	end
 	
-	function ModifyUnit(unitID, newData)
+	function ModifyUnit(unitID, newData) -- Cost can not be changed.
 		if unitMap[unitID] then
+			local index = unitMap[unitID]
 			unitList[index].customData = newData
 		end
 	end
 	
-	function AddUnit(unitID, newData)
+	function AddUnit(unitID, newData, cost)
 		if unitMap[unitID] then
-			ModifyUnit(unitID, cost, newData)
+			if useCustomData then
+				ModifyUnit(unitID, newData, cost)
+			else
+				return
+			end
 		end
+		
+		cost = cost or 0
 		
 		-- Add unit to list
 		unitCount = unitCount + 1
 		unitList[unitCount] = {
 			unitID = unitID,
+			cost = cost,
 			customData = newData,
 		}
 		unitMap[unitID] = unitCount
+		totalCost = totalCost + cost
 	end
 	
 	function RemoveUnit(unitID)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
+			
+			totalCost = totalCost - unitList[index].cost
 
 			-- Copy the end of the list to this index
 			unitList[index] = unitList[unitCount]
@@ -101,6 +113,10 @@ function UnitListHandler.CreateUnitList(static)
 			unitCount = unitCount - 1
 			unitMap[unitID] = nil
 		end
+	end
+	
+	function GetTotalCost()
+		return totalCost
 	end
 	
 	function Iterator()
@@ -119,6 +135,7 @@ function UnitListHandler.CreateUnitList(static)
 		ModifyUnit = ModifyUnit,
 		AddUnit = AddUnit,
 		RemoveUnit = RemoveUnit,
+		GetTotalCost = GetTotalCost,
 		Iterator = Iterator,
 	}
 	

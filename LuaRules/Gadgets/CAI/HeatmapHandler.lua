@@ -40,9 +40,9 @@ function HeatmapHandler.CreateHeatmap(minSquareSize, teamID, allowNegativeValues
 	local unitAmountSum = 0
 	
 	local heatmapWorldPosition = {}
-	for i = 0, HEAT_SIZE_X do
+	for i = 1, HEAT_SIZE_X do
 		heatmapWorldPosition[i] = {}
-		for j = 0, HEAT_SIZE_Z do
+		for j = 1, HEAT_SIZE_Z do
 			heatmapWorldPosition[i][j] = {
 				x = HEAT_SQUARE_SIZE*(i-0.5), z = HEAT_SQUARE_SIZE*(j-0.5)
 			}
