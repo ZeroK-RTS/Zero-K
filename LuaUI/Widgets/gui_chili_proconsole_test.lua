@@ -595,12 +595,21 @@ local function hideMessage(msg)
 		or (msg.msgtype == "player_to_allies" and options.hideAlly.value)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
-		or (msg.msgtype == 'other' and options.hideLog.value and not ((msg.argument):find('enabled!') or (msg.argument):find('disabled!') or 
-			(msg.argument):find('Wind Range') or (msg.argument):find('utogroup') or (msg.argument):find('Speed set to') or (msg.argument):find('following') or (msg.argument):find('Connection attempted') or
-				(msg.argument):find('wins!') or (msg.argument):find('resigned') or (msg.argument):find('exited') or (msg.argument):find('is no more') or (msg.argument):find('paused the game') or
-				(msg.argument):find('Sync error for') or
-				((msg.argument):find('left the game') and (msg.argument):find('Player')) or
-				or (msg.argument):find('Team') or (msg.argument):find('AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message				))
+		or (msg.msgtype == 'other' and options.hideLog.value and not (string.find(msg.argument,'enabled!') or
+		string.find(msg.argument,'disabled!') or 
+		string.find(msg.argument,'Wind Range') or
+		string.find(msg.argument,'utogroup') or
+		string.find(msg.argument,'Speed set to') or
+		string.find(msg.argument,'following') or
+		string.find(msg.argument,'Connection attempted') or
+		string.find(msg.argument,'wins!') or 
+		string.find(msg.argument,'resigned') or 
+		string.find(msg.argument,'exited') or 
+		string.find(msg.argument,'is no more') or 
+		string.find(msg.argument,'paused the game') or
+		string.find(msg.argument,'Sync error for') or
+		(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
+		string.find(msg.argument,'Team') or string.find(msg.argument,'AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
 end
 
 local function AddMessage(msg, target, fade2, remake)
