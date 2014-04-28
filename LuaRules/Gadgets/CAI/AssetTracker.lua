@@ -1,8 +1,6 @@
 --[[ Handles force composition and position
  * Should be used both for the enemies of a CAI and its allyteam
  * Maintains heatmaps for static/mobile units which are anti land/AA.
- * Requires perdiodic UpdateHeatmap and RunJobHandler.
- * Only one of these is needed per allyTeamID.
 --]]
 local HeatmapUnitDefID, ListUnitDefID = VFS.Include("LuaRules/Configs/CAI/assetTrackerConfig.lua")
 
