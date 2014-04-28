@@ -68,6 +68,7 @@ local DropUnit = Spring.UnitScript.DropUnit
 
 local loaded = false
 local unitLoaded = nil
+local doorOpen = false
 local takeoffOrLanding = false
 
 local SIG_OPENDOORS = 1
@@ -123,7 +124,7 @@ local function openDoors()
 	Turn(LLowClaw4,z_axis, rad(40),doorSpeed)
 	Turn(RLowClaw4,z_axis, rad(-40),doorSpeed)
 	Sleep(200)
-	
+	doorOpen = true
 	--[[
 	WaitForTurn( LUpperClaw1, z_axis ) 
 	WaitForTurn( RUpperClaw1, z_axis ) 
@@ -188,7 +189,7 @@ function closeDoors()
 	Turn(LLowClaw4,z_axis, rad(0),doorSpeed)
 	Turn(RLowClaw4,z_axis, rad(0),doorSpeed)
 	Sleep(200)
-	
+	doorOpen = false
 	--[[
 	WaitForTurn( LUpperClaw1, z_axis ) 
 	WaitForTurn( RUpperClaw1, z_axis ) 
@@ -273,7 +274,7 @@ end
 
 --Special ability: drop unit midair
 function ForceDropUnit()
-	if (unitLoaded ~= nil) then
+	if (unitLoaded ~= nil) and Spring.ValidUnitID(unitLoaded) then
 		local x,y,z = Spring.GetUnitPosition(unitLoaded) --cargo position
 		local _,ty = Spring.GetUnitPosition(unitID) --transport position
 		local vx,vy,vz = Spring.GetUnitVelocity(unitID) --transport speed
@@ -284,8 +285,8 @@ function ForceDropUnit()
 		Spring.AddUnitImpulse(unitLoaded,0,-4,0) --hax to prevent teleport to ground
 		Spring.SetUnitVelocity(unitLoaded,0,0,0) --remove any random velocity caused by collision with transport (especially Spring 91)
 		Spring.AddUnitImpulse(unitLoaded,vx,vy,vz) --readd transport momentum
-		unitLoaded = nil
 	end
+	unitLoaded = nil
 	StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
 end
 
@@ -366,10 +367,18 @@ function isNearDropPoint(transportUnitId)
 	end	
 end
 
+function isValidCargo(soonPassenger, passenger)
+	return ((soonPassenger and Spring.ValidUnitID(soonPassenger)) or 
+	(passenger and Spring.ValidUnitID(passenger)))
+end
+
 function script.MoveRate(curRate)	
 	local passengerId = getPassengerId()
-
-	if getCommandId() == 75 and isNearPickupPoint(passengerId) then
+	
+	if doorOpen and not isValidCargo(passengerId,unitLoaded) then
+		unitLoaded = nil
+		StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
+	elseif getCommandId() == 75 and isNearPickupPoint(passengerId) then
 		StartThread(openDoors)
 	elseif getCommandId() == 81 and isNearDropPoint(unitLoaded) then	
 		StartThread(openDoors)
