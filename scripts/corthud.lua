@@ -134,16 +134,20 @@ function script.FireWeapon1()
 	if gun_1 then
 		EmitSfx( firept1, UNIT_SFX1 )
 		EmitSfx( firept1, UNIT_SFX2 )
-		Move( r_barrel , z_axis, -2 , 500 )
-		WaitForMove(r_barrel, z_axis)
-		Move( r_barrel , z_axis, 0 , 5 )
-	else
+		Move( r_barrel , z_axis, -4 , 0 )
+		Move( r_gun , z_axis, -2 , 0 )
+
+		Move( r_barrel , z_axis, 0 , 2.5 )
+    	Move( r_gun , z_axis, 0 , 1.25 )
+		else
 		EmitSfx( firept2, UNIT_SFX1 )
 		EmitSfx( firept2, UNIT_SFX2 )
-		Move( l_barrel , z_axis, -2 , 500 )
-		WaitForMove(l_barrel, z_axis)
-		Move( l_barrel , z_axis, 0 , 5 )
-	end
+		Move( l_barrel , z_axis, -4 , 0 )
+		Move( l_gun , z_axis, -2 , 0 )
+
+		Move( l_barrel , z_axis, 0 , 2.5 )
+    	Move( l_gun , z_axis, 0 , 1.25 )
+		end
 end
 
 -- shield
