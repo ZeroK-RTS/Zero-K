@@ -271,6 +271,14 @@ function widget:Initialize()
 		local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
 		local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage]]--
 	end
+	
+	local myAllyTeam = Spring.GetMyAllyTeamID()
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
+		UnitDetected(unitID, unitAllyTeam == myAllyTeam)
+	end
 end
 
 
