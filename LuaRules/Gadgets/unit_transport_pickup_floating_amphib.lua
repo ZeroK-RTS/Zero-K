@@ -3,7 +3,7 @@ function gadget:GetInfo()
     name      = "AirTransport_SeaPickup",
     desc      = "Allow air transport to use amphibious' floatation gadget to pickup unit at sea",
     author    = "msafwan (xponen)",
-    date      = "22.12.2013", --25.4.2014
+    date      = "22.12.2013", --29.4.2014
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -118,8 +118,8 @@ local function GetCommandLenght(unitID)
 	local cmds
 	local lenght = 0
 	if reverseCompat then
-		cmd = spGetCommandQueue(unitID, -1)
-		lenght = (cmd and #cmd) or 0
+		cmds = spGetCommandQueue(unitID, -1)
+		lenght = (cmds and #cmds) or 0
 	else
 		lenght = spGetCommandQueue(unitID,0) or 0
 	end
@@ -128,8 +128,8 @@ end
 
 local function ClearUnitCommandQueue(unitID,cmds)
 	cmds = cmds or spGetCommandQueue(unitID, -1)
-	for i=1,#cmd do
-		spGiveOrderToUnit(unitID,CMD.REMOVE,{cmd[i].tag},{})
+	for i=1,#cmds do
+		spGiveOrderToUnit(unitID,CMD.REMOVE,{cmds[i].tag},{})
 	end
 end
 
