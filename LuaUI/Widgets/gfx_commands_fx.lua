@@ -64,7 +64,7 @@ options = {
 local OPTIONS = {
 	showMapmarkFx 				= true,
 	showMapmarkSpecNames		= true,
-	showMapmarkSpecIcons		= true,		-- showMapmarkFx must be true for this to work
+	showMapmarkSpecIcons		= false,	-- showMapmarkFx must be true for this to work
 	nicknameOpacityMultiplier	= 6,		-- multiplier applied to the given color opacity of the type: 'map_draw'
 	scaleWithCamera				= true,
 	
