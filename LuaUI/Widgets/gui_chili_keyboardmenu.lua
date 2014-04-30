@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.031 Chili Keyboard Menu",
+    desc      = "v0.032 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -400,8 +400,8 @@ end
 local function ClearKeyButtons()
 	for k, v in pairs( key_buttons ) do
 		key_buttons[k]:SetCaption( '' )
-		key_buttons[k].OnMouseDown = {}
-		key_buttons[k].OnMouseUp = {}
+		key_buttons[k].OnClick = {}
+		--key_buttons[k].OnMouseUp = {}
 		key_buttons[k]:ClearChildren()
 		key_buttons[k].tooltip = nil
 		SetButtonColor( key_buttons[k], white_table )
@@ -473,7 +473,7 @@ local function AddBuildButton(color)
 			height = '80%',
 		}
 	)
-	key_buttons['D'].OnMouseDown = { function() MakeBuildMenu(); end }
+	key_buttons['D'].OnClick = { function() MakeBuildMenu(); end }
 	if color then
 		SetButtonColor(key_buttons['D'], color)
 	end
@@ -481,6 +481,9 @@ end
 
 
 local function SetCurTab(tab)
+	if curTab == tab then
+		return
+	end
 	SetButtonColor(tab_buttons[curTab], white_table)
 	curTab = tab
 	SetButtonColor(tab_buttons[curTab], magenta_table)
@@ -505,8 +508,8 @@ local function BuildMode(enable)
 end
 
 
-local function CommandFunction(cmdid)
-	local _,_,left,_,right = Spring.GetMouseState()
+local function CommandFunction(cmdid, left,right)
+	--local _,_,left,_,right = Spring.GetMouseState()
 	local alt,ctrl,meta,shift = Spring.GetModKeyState()
 	local index = Spring.GetCmdDescIndex(cmdid)
 	if (left) then
@@ -540,8 +543,9 @@ local function AddBuildStructureButtonBasic(unitName, hotkey_key, index )
 	button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', height='20%', fontSize = 11, bottom=0, fontShadow = true,  } )
 	
 	
-	button1.OnMouseDown = { function()
-		CommandFunction( -(ud.id) );
+	button1.OnClick = { function (self, x, y, mouse)
+		local left, right = mouse == 1, mouse == 3   
+		CommandFunction( -(ud.id), left, right );
 	end }
 end
 
@@ -560,7 +564,7 @@ local function AddBuildStructureButton(item, index)
 		return
 	end
 	--]]
-    local func = function()
+    local func = function (self, x, y, mouse) 
 		--if menu_level ~= 0 then 
 		if menu_level ~= 0 or not item.items then  --account for first level items without subitems
 			local cmdid = build_menu_selected.cmd
@@ -575,7 +579,8 @@ local function AddBuildStructureButton(item, index)
 
 			if (cmdid) then
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
-				local _, _, left, _, right = Spring.GetMouseState()
+				--local _, _, left, _, right = Spring.GetMouseState()
+				local left, right = mouse == 1, mouse == 3
 
 				if (build_menu ~= build_menu_selected) then -- store last item and menu_level to render its back path
 					menu_level = menu_level + 1  -- save menu_level
@@ -598,7 +603,7 @@ local function AddBuildStructureButton(item, index)
 
 	local button1 = key_buttons[index]
 	--button1.OnMouseDown = { function() BuildMode(false); end }
-	button1.OnMouseUp = { func }
+	button1.OnClick = { func }
 	button1.tooltip = tooltip1
 	
 	if menu_level == 0 and item.label then
@@ -778,7 +783,7 @@ local function SetupTabs()
 			--tooltip = '',
 			backgroundColor = white_table,
 			
-			OnMouseDown = { function()
+			OnClick = { function()
 				SetCurTab(tab)
 				BuildMode(false)
 			end },
@@ -889,7 +894,7 @@ end
 
 local function UpdateButton( hotkey_key, hotkey, name, fcn, tooltip, texture, color )
 
-	key_buttons[hotkey_key].OnMouseDown = { fcn }
+	key_buttons[hotkey_key].OnClick = { fcn }
 	key_buttons[hotkey_key].tooltip = tooltip
 	AddHotkeyLabel( hotkey_key, hotkey )
 	if texture and texture ~= "" then
@@ -938,10 +943,12 @@ local function SetupCommands( modifier )
 	
 	curCommands = {}
 	commandButtons = {}
-	
+	-- [=[
 	for i = 1, #commands do ProcessCommand(commands[i]) end 
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
 	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
+	--]=]
+	
 	
 	ClearKeyButtons()
 	
@@ -956,7 +963,7 @@ local function SetupCommands( modifier )
 	
 	local ignore = {}
 	
-	
+	-- [=[
 	if options.showGlobalCommands.value then
 		for letterInd=1,26 do
 			local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -1010,7 +1017,9 @@ local function SetupCommands( modifier )
 			
 		end --for letterInd=1,26 
 	end --if options.showGlobalCommands.value
-		
+	--]=]
+	
+	-- [=[
 	--for i, cmd in ipairs( curCommands ) do
 	for i = 1, #curCommands do
 		local cmd = curCommands[i]
@@ -1064,7 +1073,10 @@ local function SetupCommands( modifier )
 					if cmd.id == 99999 then
 						UpdateButton( hotkey_key, hotkey, label, function() Spring.SendCommands( cmd.action ); end, cmd.tooltip, texture, color )
 					else
-						UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+						UpdateButton( hotkey_key, hotkey, label, function (self, x, y, mouse)
+							local left, right = mouse == 1, mouse == 3
+							CommandFunction( cmd.id, left, right );
+						end, cmd.tooltip, texture, color )
 					end
 				end
 				
@@ -1076,7 +1088,9 @@ local function SetupCommands( modifier )
 			
 		end --if not ignore[hotkey_key] then
 	end --for i = 1, #curCommands do
+	--]=]
 	
+	-- [=[
 	--for i, selection in ipairs(selections) do
 	for i = 1, #selections do
 		local selection = selections[i]
@@ -1094,7 +1108,7 @@ local function SetupCommands( modifier )
 			end
 		end
 	end
-	
+	--]=]
 end --SetupCommands
 
 
@@ -1227,8 +1241,8 @@ function widget:KeyPress(key, modifier)
 		
 		local pressbutton = key_buttons[index]
 		if pressbutton then
-			if #(pressbutton.OnMouseUp) > 0 then
-				pressbutton.OnMouseUp[1]()
+			if #(pressbutton.OnClick) > 0 then
+				pressbutton.OnClick[1]()
 			end
 			return true
 		end
