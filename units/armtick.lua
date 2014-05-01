@@ -109,7 +109,7 @@ local weaponDefs = {
       EMPRESISTANT99     = "2000",
       PLANES             = "2000",
       SUBS               = "2000",
-      default            = 666.66668701172,
+      default            = 2000,
       empresistant75     = "500",
       empresistant99     = "20",
     },
