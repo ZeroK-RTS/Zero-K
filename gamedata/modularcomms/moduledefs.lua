@@ -149,6 +149,13 @@ upgrades = {
 				--unitDef.hightrajectory = 1
 			end,	
 	},		
+	conversion_hparticlebeam = {
+		name = "Heavy Particle Beam",
+		description = "Light Particle Beam: Convert to an extended range rifle weapon",
+		func = function(unitDef)
+				ReplaceWeapon(unitDef, "commweapon_lparticlebeam", "commweapon_hparticlebeam")
+			end,	
+	},
 	
 	-- weapon mods
 	weaponmod_antiair = {
