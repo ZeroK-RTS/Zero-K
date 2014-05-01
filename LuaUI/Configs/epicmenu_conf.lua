@@ -27,6 +27,7 @@ local color = {
 	
 	null = {nil, nil, nil, 1},
 	transnull = {nil, nil, nil, 0.3},
+	transnull2 = {nil, nil, nil, 0.5},
 	transnull3 = {nil, nil, nil, 0.8},
 }
 
@@ -35,7 +36,7 @@ color.tooltip_fg = color.null
 color.tooltip_info = color.cyan
 color.tooltip_help = color.green
 
-color.main_bg = color.transnull
+color.main_bg = color.transnull2
 color.main_fg = color.null
 
 color.menu_bg = color.null
@@ -65,6 +66,9 @@ color.context_bg = color.transnull
 color.context_fg = color.null
 color.context_header = color.yellow
 
+color.disabled_bg = color.transGray
+color.disabled_fg = color.darkgray
+
 confdata.color = color
 
 local spSendCommands = Spring.SendCommands
@@ -72,6 +76,17 @@ local spSendCommands = Spring.SendCommands
 
 confdata.eopt = {}
 local path = ''
+
+local function nullFunc()
+end
+
+local singleplayer = false
+do
+	local playerlist = Spring.GetPlayerList() or {}
+	if (#playerlist <= 1) then
+		singleplayer = true
+	end
+end
 
 local function AddOption(option)
 	option.path=path
@@ -82,7 +97,7 @@ local function AddOption(option)
 end
 
 --ShortHand for adding a button
-local function ShButton( caption, action2, tooltip, advanced, icon )
+local function ShButton( caption, action2, tooltip, advanced, icon, sp )
 	AddOption({
 		type='button',
 		name=caption,
@@ -92,6 +107,7 @@ local function ShButton( caption, action2, tooltip, advanced, icon )
 		key=caption,
 		advanced = advanced,
 		icon = icon,
+		sp = sp,	-- 1 = singleplayer only, -1 = multiplayer only, anything else = don't care
 	})
 end
 
@@ -122,7 +138,11 @@ end
 
 
 local imgPath = LUAUI_DIRNAME  .. 'images/'
-confdata.subMenuIcons = {	
+confdata.subMenuIcons = {
+	['Game'] = imgPath..'epicmenu/game.png',
+	['Settings'] = imgPath..'epicmenu/settings.png',
+	['Help'] = imgPath..'epicmenu/questionmark.png',
+	
 	['Game/Game Speed'] = imgPath..'epicmenu/speed-test-icon.png',
 	['Game/Unit AI'] = imgPath..'epicmenu/robot2.png',
 	['Settings/Reset Settings'] = imgPath..'epicmenu/undo.png',
@@ -175,6 +195,7 @@ path='Settings'
 		value = false,
 	})
 	--]]
+
 
 --- GAME --- Stuff for gameplay only. Spectator would never need to open this
 path='Game' 
@@ -357,7 +378,6 @@ path='Settings/Graphics'
 
 	ShLabel('Shadow Settings')
 	
-	--[[ FIXME: crashes 13.9 catalyst drivers; can be re-enabled with 95.1
 	AddOption({
 		name = 'Shadow Detail (Slide left for off)',
 		type = 'number',
@@ -373,7 +393,7 @@ path='Settings/Graphics'
 			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
 		end, 
 	} )
-	]]--
+
 	ShButton('Toggle Terrain Shadows',
 		function()
 			local curShadow=Spring.GetConfigInt("Shadows") or 0
@@ -465,6 +485,38 @@ path='Settings/Graphics/Unit Visibility'
 	path='Settings/Graphics/Unit Visibility/Outline'
 		ShButton('Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
 
+--[[
+path='Settings/Audio'
+	AddOption({
+		name = 'Sound Volume',
+		type = 'number',
+		min = 0, 
+		max = 100,
+		springsetting = 'snd_volmaster',
+		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end
+	} )
+	AddOption({
+		name = 'Music Volume',
+		type = 'number',
+		min = 0, 
+		max = 1,
+		step = 0.01,
+		value = WG.music_volume or 0.5,
+		OnChange = function(self)	
+				if (WG.music_start_volume or 0 > 0) then 
+					Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+				else 
+					Spring.SetSoundStreamVolume(self.value) 
+				end
+				local prevValue = WG.music_volume
+				--settings.music_volume = self.value
+				WG.music_volume = self.value
+				if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
+				if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
+			end,
+	} )
+]]
+		
 --- HELP ---
 path='Help'
 	AddOption({
@@ -479,5 +531,22 @@ path='Help'
 	path='Help/Clippy Comments'
 		ShButton('Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
+--- MISC
+path=''
+	ShButton('Vote Resign', function()
+			if not singleplayer then
+				spSendCommands("say !voteresign")
+				ActionMenu()
+			end
+		end,
+		"Ask teammates to resign", false, nil, -1)
+	ShButton('Resign', function()
+			if not singleplayer then
+				MakeExitConfirmWindow("Are you sure you want to resign?", function() spSendCommands{"spectator"} end)
+			end
+		end,
+		"Abandon team and become spectator", false, nil, -1)
+	ShButton('Exit to Desktop', function() MakeExitConfirmWindow("Are you sure you want to quit the game?", function() spSendCommands{"quit","quitforce"} end) end)
+	
 
 return confdata

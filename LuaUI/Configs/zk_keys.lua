@@ -164,5 +164,6 @@ return {
 		{	"epic_chili_integral_menu_tab_special",	"v",},
 		{	"epic_chili_gesture_menu_markingmenu",	"b",},
 		{	"exitwindow",	"s+escape",},
+		{	"crudesubmenu",	"f10"}
 	},
 }
