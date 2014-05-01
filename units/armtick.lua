@@ -72,4 +72,51 @@ unitDef = {
   turnRate               = 3000,
 }
 
+
+--------------------------------------------------------------------------------
+
+local weaponDefs = {
+  ARMTICK_DEATH = {
+    areaOfEffect       = 352,
+    commandfire        = true,
+    craterBoost        = 0,
+    craterMult         = 0,
+    edgeEffectiveness  = 0,
+    explosionGenerator = "custom:ARMTICK_EXPLOSION",
+    fireStarter        = 90,
+    impulseBoost       = 0,
+    impulseFactor      = 0,
+    interceptedByShieldType = 1,
+    name               = "EMPboom",
+    noSelfDamage       = false,
+    paralyzer          = true,
+    paralyzeTime       = 16,
+    range              = 600,
+    reloadtime         = 0.3,
+    renderType         = 4,
+    soundHit           = "weapon/more_lightning",
+    sweepfire          = false,
+    tolerance          = 7000,
+    turret             = true,
+    customparams = {
+    },
+    damage = {
+      BURROWED           = "2000",
+      CHICKEN            = "2000",
+      COMMANDERS         = "2000",
+      ELSE               = "2000",
+      EMPRESISTANT75     = "2000",
+      EMPRESISTANT99     = "2000",
+      PLANES             = "2000",
+      SUBS               = "2000",
+      default            = 666.66668701172,
+      empresistant75     = "500",
+      empresistant99     = "20",
+    },
+  },
+}
+unitDef.weaponDefs = weaponDefs
+
+
+--------------------------------------------------------------------------------
 return lowerkeys({ armtick = unitDef })

@@ -76,4 +76,48 @@ unitDef = {
   workerTime             = 0,
 }
 
+
+--------------------------------------------------------------------------------
+
+local weaponDefs = {
+  CORSKTL_DEATH = {
+    areaOfEffect       = 180,
+    craterBoost        = 4,
+    craterMult         = 5,
+    edgeEffectiveness  = 0.3,
+    explosionGenerator = "custom:NUKE_150",
+    explosionSpeed     = 10000,
+    impulseBoost       = 0,
+    impulseFactor      = 0.1,
+    interceptedByShieldType = 1,
+    name               = "Skuttle",
+    noSelfDamage       = false,
+    range              = 480,
+    reloadtime         = 3.6,
+    renderType         = 4,
+    shakeduration      = "0",
+    shakemagnitude     = "0",
+    soundHit           = "explosion/mini_nuke",
+    sweepfire          = false,
+    weaponVelocity     = 400,
+    customparams = {
+      weaponVelocity     = 400,
+    },
+    damage = {
+      BURROWED           = "8000",
+      CHICKEN            = "8000",
+      COMMANDERS         = "8000",
+      ELSE               = "8000",
+      EMPRESISTANT75     = "8000",
+      EMPRESISTANT99     = "8000",
+      PLANES             = "8000",
+      SUBS               = "8000",
+      default            = 8000,
+    },
+  },
+}
+unitDef.weaponDefs = weaponDefs
+
+
+--------------------------------------------------------------------------------
 return lowerkeys({ corsktl = unitDef })

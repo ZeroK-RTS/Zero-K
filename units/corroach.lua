@@ -74,4 +74,46 @@ unitDef = {
   turnRate               = 3000,
 }
 
+--------------------------------------------------------------------------------
+
+local weaponDefs = {
+  CORROACH_DEATH = {
+    areaOfEffect       = 384,
+    craterBoost        = 1,
+    craterMult         = 3.5,
+    edgeEffectiveness  = 0.4,
+    explosionGenerator = "custom:ROACHPLOSION",
+    explosionSpeed     = 10000,
+    impulseBoost       = 0,
+    impulseFactor      = 0.3,
+    interceptedByShieldType = 1,
+    name               = "CrawlingBomb",
+    noSelfDamage       = false,
+    range              = 450,
+    reloadtime         = 3.6,
+    renderType         = 4,
+    soundHit           = "explosion/mini_nuke",
+    sweepfire          = false,
+    turret             = true,
+    weaponVelocity     = 250,
+    customparams = {
+      weaponVelocity     = 250,
+    },
+    damage = {
+      BURROWED           = "1200",
+      CHICKEN            = "1200",
+      COMMANDERS         = "1200",
+      ELSE               = "1200",
+      EMPRESISTANT75     = "1200",
+      EMPRESISTANT99     = "1200",
+      PLANES             = "1200",
+      SUBS               = "1200",
+      default            = 1200,
+    },
+  },
+}
+unitDef.weaponDefs = weaponDefs
+
+
+--------------------------------------------------------------------------------
 return lowerkeys({ corroach = unitDef })
