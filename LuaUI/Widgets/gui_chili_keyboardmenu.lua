@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.032 Chili Keyboard Menu",
+    desc      = "v0.033 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -980,8 +980,18 @@ local function SetupCommands( modifier )
 				if actions and #actions > 0 then
 						
 					for i=1,#actions do
-						local v = actions[i]
-						for actionCmd, actionExtra in pairs(v) do
+						local actionData = actions[i]
+						
+						-- [[
+						--comment out after 96.0
+						for actionCmd, actionExtra in pairs(actionData) do
+						--]]
+						
+							--[[
+							--uncomment after 96.0
+							local actionCmd = actionData.command
+							local actionExtra = actionData.extra
+							--]]
 							
 							local buildCommand = actionCmd:find('buildunit_')
 							
@@ -1009,7 +1019,7 @@ local function SetupCommands( modifier )
 								}
 							end
 							
-						end
+						end --for
 					end
 				end
 				
