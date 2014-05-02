@@ -11,7 +11,7 @@ function widget:GetInfo()
     layer     = 50,
     experimental = true,
     enabled   = false,
-    detailsDefault = 1
+    --detailsDefault = 1
   }
 end
 
