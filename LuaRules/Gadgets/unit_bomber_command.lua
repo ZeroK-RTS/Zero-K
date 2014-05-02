@@ -580,7 +580,7 @@ function GG.LandComplete(bomberID)
 	spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 	spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 	local queue = spGetCommandQueue(bomberID, 1)
-	if queue and queue[1].id == CMD_REARM then
+	if queue and queue[1] and queue[1].id == CMD_REARM then
 		rearmRemove[bomberID] = true --remove current RE-ARM command
 	end
 end

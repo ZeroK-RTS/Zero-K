@@ -1,4 +1,4 @@
-local version = "v1.51"
+local version = "v1.52"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -144,9 +144,9 @@ end
 local function SetSelDefID(defID)
 	selDefID = defID
 
-	if (isMex[selDefID] ~= nil) ~= (Spring.GetMapDrawMode() == "metal") then
-		Spring.SendCommands("ShowMetalMap")
-	end
+	-- if (isMex[selDefID] ~= nil) ~= (Spring.GetMapDrawMode() == "metal") then
+		-- Spring.SendCommands("ShowMetalMap")
+	-- end
 	-- if defID then
 		-- Spring.SetActiveCommand(defID)
 	-- end
