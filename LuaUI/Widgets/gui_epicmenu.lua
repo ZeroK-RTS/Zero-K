@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.4 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.41 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
-    date      = "2009-06-02", --2013-08-31
+    date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
     layer     = -100001,
     handler   = true,
@@ -2208,11 +2208,11 @@ MakeSubWindowSearch = function(path)
 		backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
 
 	--close button
-	window_children[#window_children+1] = Button:New{ name= 'menuCloseButton', caption = 'Close', OnClick = { KillSubWindow, function() filterUserInsertedTerm = '' end }, 
+	window_children[#window_children+1] = Button:New{ name= 'menuCloseButton', caption = 'Close', OnClick = { function() KillSubWindow(); filterUserInsertedTerm = '' end }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT, }
 	
 	
-	KillSubWindow()
+	KillSubWindow(true)
 	curPath = path -- must be done after KillSubWindow
 	window_sub_cur = Window:New{  
 		caption= "Searching in: \"" .. path .. "...\"",
@@ -3158,7 +3158,7 @@ function widget:TextCommand(command)
 		filterUserInsertedTerm = command:sub(8)
 		filterUserInsertedTerm = filterUserInsertedTerm:lower() --Reference: http://lua-users.org/wiki/StringLibraryTutorial
 		Spring.Echo("EPIC Menu: searching \"" .. filterUserInsertedTerm.."\"")
-		MakeSubWindow(curPath) --remake the menu window. If search term is not "" the MakeSubWindowSearch(curPath) will be called instead
+		MakeSubWindow(curPath,true) --remake the menu window. If search term is not "" the MakeSubWindowSearch(curPath) will be called instead
 		WG.crude.ShowMenu()
 		return true
 	end

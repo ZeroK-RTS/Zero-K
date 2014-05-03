@@ -1,5 +1,5 @@
 include("keysym.h.lua")
-local versionNumber = "1.21"
+local versionNumber = "1.22"
 
 function widget:GetInfo()
 	return {
@@ -44,6 +44,7 @@ local boxWidth = 300
 local boxHeight = 60
 local slideTime = 0.4
 local fadeTime = 1
+local autoFadeTime = 1
 local wndBorderSize = 4
 local imgWidth = 160 --drawing size of the image (independent from the real image pixel size)
 local imgTexCoordX = 0.625  --image texture coordinate X -- textures image's dimension is a power of 2 (i use 0.625 cause my image has a width of 256, but region to use is only 160 pixel -> 160 / 256 = 0.625 )
@@ -55,6 +56,7 @@ local fontPath = "LuaUI/Fonts/MicrogrammaDBold.ttf"
 local windowClosePath = "LuaUI/Images/quit.png"
 local imgCloseWidth = 32
 local minTransparency = 0 -- transparency after [X] is pressed
+local minTransparency_autoFade = 0.1
 --Color config in drawPause function
 	
 ----------------
@@ -94,6 +96,18 @@ options = {
 		desc = 'Remember to not play voice-over for pausing anymore.',
 		value=false,
 		},
+	autofade = {
+		name='Pause Screen automatically fade out',
+		type='bool',
+		desc = 'Automatically fade to background without needing to click it.',
+		value=true,
+		},
+	nopicture = {
+		name='Disable Logo',
+		type='bool',
+		desc = 'Only display pause text.',
+		value=true,
+		},			
 }
 
 local SOUND_DIRNAME = 'LuaUI/Sounds/Voices/'
@@ -167,7 +181,7 @@ function isOverWindow(x, y)
  end
 
 function widget:MousePress(x, y, button)
-  if ( not clickTimestamp and not options.hideimage.value ) then
+  if ( not clickTimestamp and (not options.hideimage.value and not options.autofade.value)) then
 	if ( isOverWindow(x, y)) then	
 		--do not update clickTimestamp any more after right mouse button click
 		if ( not options.hideimage.value ) then
@@ -197,7 +211,7 @@ end
 
 function widget:IsAbove(x,y)
 	local _, _, paused = spGetGameSpeed()
-	if ( paused and not options.hideimage.value and not clickTimestamp and isOverWindow( x, y ) ) then
+	if ( paused and not options.autofade.value and not options.hideimage.value and not clickTimestamp and isOverWindow( x, y ) ) then
 		return true
 	end
 	return false
@@ -213,7 +227,7 @@ function widget:Update()
 end
 
 function widget:GetTooltip(x, y)
-	if ( ( clickTimestamp == nil and options.hideimage.value == false ) and isOverWindow(x, y) ) then
+	if ( ( clickTimestamp == nil and (options.hideimage.value == false or options.autofade.value==false)) and isOverWindow(x, y) ) then
 		return "Click here to hide pause window.\nSpace+Click here to show option menu."
 	end
 end
@@ -231,7 +245,20 @@ function drawPause(paused, now)
 	local colorWnd = { 0.0, 0.0, 0.0, 0.6 }
 	local colorWnd2 = { 0.5, 0.5, 0.5, 0.6 }
 	local iconColor = { 1.0, 1.0, 1.0, 1.0 }
+	local iconColor2 = { 1.0, 1.0, 1.0, 1.0 }
 	local mouseOverColor = { 1.0, 1.0, 0.0, 1.0 }
+	
+	if options.autofade.value then
+		local factor0 = ( 1.0 -  ( diffPauseTime ) / autoFadeTime)
+		local factor1 = max(factor0,minTransparency_autoFade)
+		colorWnd[4] = colorWnd[4]*factor1
+		text[4] = text[4]*factor1
+		text2[4] = text2[4]*factor1
+		outline[4] = outline[4]*factor1
+		iconColor[4] = iconColor[4]*factor1
+		iconColor2[4] = iconColor2[4]*0
+		mouseOverColor[4] = mouseOverColor[4]*factor1
+	end
 
 	--adjust transparency when clicked
 	if ( clickTimestamp ~= nil or options.hideimage.value) then
@@ -250,9 +277,18 @@ function drawPause(paused, now)
 		text2[4] = text2[4] * factor
 		outline[4] = outline[4] * factor
 		iconColor[4] = iconColor[4] * factor
+		iconColor2[4] = iconColor2[4]* factor
 		mouseOverColor[4] = mouseOverColor[4] * factor			
 	end
 	local imgWidthHalf = imgWidth * 0.5
+	
+	if options.nopicture.value then
+		colorWnd[4] = colorWnd[4] * 0
+		iconColor[4] = iconColor[4] * 0
+		iconColor2[4] = iconColor2[4]* 0
+		mouseOverColor[4] = mouseOverColor[4] * 0	
+	end
+	
 	
 	--draw window
 	glPushMatrix()
@@ -276,8 +312,8 @@ function drawPause(paused, now)
 	glRect( wndX1 - wndBorderSize, wndY1 + wndBorderSize, wndX2 + wndBorderSize, wndY2 - wndBorderSize)
 	
 	--draw close icon
-	glColor(  iconColor )
-	if ( mouseOverClose and clickTimestamp == nil and options.hideimage.value == false) then
+	glColor(  iconColor2 )
+	if ( mouseOverClose and clickTimestamp == nil and (options.hideimage.value == false and options.autofade.value==false)) then
 		glColor( mouseOverColor )
 	end
 	
@@ -285,14 +321,16 @@ function drawPause(paused, now)
 	glTexRect( wndX2 - imgCloseWidth - wndBorderSize, wndY1 - imgCloseWidth - wndBorderSize, wndX2 - wndBorderSize, wndY1 - wndBorderSize, 0.0, 0.0, 1.0, 1.0 )
 	
 	--draw text
+	local textBegining = options.nopicture.value and (wndX1 + ( wndX2 - wndX1 ) * 0.2) or textX
+	
 	myFont:Begin()
 	myFont:SetOutlineColor( outline )
 
 	myFont:SetTextColor( text )
-	myFont:Print( "GAME PAUSED", textX, textY, fontSizeHeadline, "O" )
+	myFont:Print( "GAME PAUSED", textBegining, textY, fontSizeHeadline, "O" )
 		
 	myFont:SetTextColor( text2 )
-	myFont:Print( "Press 'Pause' to continue.", textX, textY - lineOffset, fontSizeAddon, "O" )
+	myFont:Print( "Press 'Pause' to continue.", textBegining, textY - lineOffset, fontSizeAddon, "O" )
 	
 	myFont:End()
 	
