@@ -2,10 +2,12 @@
  * Should be used both for the enemies of a CAI and its allyteam
  * Maintains heatmaps for static/mobile units which are anti land/AA.
 --]]
-local HeatmapUnitDefID, ListUnitDefID = VFS.Include("LuaRules/Configs/CAI/assetTrackerConfig.lua")
+local HeatmapUnitDefID, ListUnitDefID, CombatListUnitDefID, EconomyTargetUnitDefID = VFS.Include("LuaRules/Configs/CAI/assetTrackerConfig.lua")
+local StaticUnits = VFS.Include("LuaRules/Configs/CAI/staticUnits.lua")
 
 local UnitListHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitListHandler.lua")
 local HeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/HeatmapHandler.lua")
+local UnitClusterHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitClusterHandler.lua")
 
 local spGetUnitPosition = Spring.GetUnitPosition
 
@@ -28,28 +30,37 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 	
 	-- This list contains every unit exactly once. Values are cost.
 	local completeUnitList = {
-		antiAirTurret = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
-		turret = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
-		economy = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
-		largeStructure = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
-		miscStructure = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
-		constructor = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		raider = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		assault = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		skirm = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		antiSkirm = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		riot = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		arty = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		antiAir = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		fighter = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		bomber = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		gunship = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		transport = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
-		miscUnit = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		turretAA = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		turret = UnitListHandler.CreateUnitList(losCheckAllyTeamIDe),
+		economy = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		miscStructure = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		constructor = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		ground = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		antiAir = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		air = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		fighter = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		miscUnit = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 	}
 	
+	local combatUnitList = {
+		raider = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		assault = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		skirm = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		antiSkirm = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		riot = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		arty = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		antiAir = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		bomber = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		gunship = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		transport = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		fighter = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+	}
+	
+	local economyTargets = UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, 800)
+	
 	function AddUnit(unitID, unitDefID)
-		--local str = ""
+		local str = ""
+		-- Heatmap
 		if HeatmapUnitDefID[unitDefID] then
 			local data = HeatmapUnitDefID[unitDefID]
 			local i = 1
@@ -58,14 +69,31 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 				local heatmapData = data[i]
 				unitHeatmaps[heatmapData.name].AddUnitHeat(unitID, x, z, heatmapData.radius, heatmapData.amount)
 				i = i + 1
-				--str = str .. heatmapData.name .. ", "
+				str = str .. heatmapData.name .. ", "
 			end
 		end
+		
+		-- Complete unit list
 		local listData = ListUnitDefID[unitDefID]
-		completeUnitList[listData.name].AddUnit(unitID, listData.cost)
+		completeUnitList[listData.name].AddUnit(unitID, listData.cost, StaticUnits[unitDefID])
 		totalCostAdded = totalCostAdded + listData.cost
-		--str = str .. "List: " .. listData.name
-		--GG.UnitEcho(unitID, str)
+		str = str .. "List: " .. listData.name
+		
+		-- Combat unit list
+		local combatListData = CombatListUnitDefID[unitDefID]
+		if combatListData then
+			combatUnitList[combatListData.name].AddUnit(unitID, combatListData.cost, StaticUnits[unitDefID])
+			str = str .. "Combat List: " .. combatListData.name
+		end
+		
+		-- Economy tagets
+		local economyTargetData = EconomyTargetUnitDefID[unitDefID]
+		if economyTargetData then
+			economyTargets.AddUnit(unitID, economyTargetData.amount, StaticUnits[unitDefID])
+			str = str .. "Economy Cluster Unit"
+		end
+		
+		GG.UnitEcho(unitID, str)
 	end
 	
 	function RemoveUnit(unitID, unitDefID)
@@ -77,7 +105,6 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 				local heatmapData = data[i]
 				unitHeatmaps[heatmapData.name].RemoveUnitHeat(unitID)
 				i = i + 1
-				--str = str .. heatmapData.name .. ", "
 			end
 		end
 		local listData = ListUnitDefID[unitDefID]

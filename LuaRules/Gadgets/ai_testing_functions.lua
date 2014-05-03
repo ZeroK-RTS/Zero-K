@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "April 20 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -40,7 +40,7 @@ local UnitClusterHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitClusterHandler.
 -- Heatmapping
 ---------------------------------------------------------------
 
-local enemyForceHandler = AssetTracker.CreateAssetTracker(0)
+local enemyForceHandler = AssetTracker.CreateAssetTracker(0,0)
 
 local aaHeatmap = HeatmapHandler.CreateHeatmap(256, 0)
 
@@ -52,7 +52,6 @@ local enemyUnitCluster = UnitClusterHandler.CreateUnitCluster(0, false, 900)
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if teamID == 1 then
-		enemyForceHandler.AddUnit(unitID, unitDefID)
 		enemyUnitCluster.AddUnit(unitID, UnitDefs[unitDefID].metalCost)
 	end
 	--scoutHandler.AddUnit(unitID)
@@ -92,6 +91,7 @@ function gadget:UnitEnteredLos(unitID, unitTeam, allyTeam, unitDefID)
 	if allyTeam == 0 then
 		local x, _,z = Spring.GetUnitPosition(unitID)
 		aaHeatmap.AddUnitHeat(unitID, x, z, 780, 260 )
+		enemyForceHandler.AddUnit(unitID, unitDefID)
 	end
 end
 
@@ -104,7 +104,7 @@ function gadget:GameFrame(f)
 	if f%30 == 3 then
 		enemyUnitCluster.UpdateUnitPositions(200)
 		for x,z,cost,count in enemyUnitCluster.ClusterIterator() do
-			Spring.MarkerAddPoint(x,0,z, cost .. "  " .. count)
+			--Spring.MarkerAddPoint(x,0,z, cost .. "  " .. count)
 		end
 		aaHeatmap.UpdateUnitPositions(true)
 	end

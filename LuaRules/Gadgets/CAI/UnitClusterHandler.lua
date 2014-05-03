@@ -6,9 +6,9 @@ local function DisSQ(x1,z1,x2,z2)
 	return (x1 - x2)^2 + (z1 - z2)^2
 end
 
-function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, static, clusterRadius)
+function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, clusterRadius)
 	
-	local unitList = UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
+	local unitList = UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 	
 	local clusterRadiusSq = clusterRadius^2
 	
@@ -37,10 +37,8 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, static, cluste
 				unitMap = {[unitID] = true},
 			}
 			
-			if not static then
-				unitList.SetUnitDataValue(unitID, "clusterX", x)
-				unitList.SetUnitDataValue(unitID, "clusterZ", z)
-			end
+			unitList.SetUnitDataValue(unitID, "clusterX", x)
+			unitList.SetUnitDataValue(unitID, "clusterZ", z)
 			
 			return
 		end
@@ -48,11 +46,9 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, static, cluste
 		local clusterData = clusterList[index]
 		local cost = unitList.GetUnitCost(unitID)
 		
-		if not static then
-			unitList.SetUnitDataValue(unitID, "clusterX", x)
-			unitList.SetUnitDataValue(unitID, "clusterZ", z)
-		end
-		
+		unitList.SetUnitDataValue(unitID, "clusterX", x)
+		unitList.SetUnitDataValue(unitID, "clusterZ", z)
+
 		clusterData.xSum = clusterData.xSum + x*cost
 		clusterData.zSum = clusterData.zSum + z*cost
 		clusterData.costSum = clusterData.costSum + cost
@@ -74,13 +70,8 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, static, cluste
 		end
 		
 		local cost = unitList.GetUnitCost(unitID)
-		local x,z
-		if not static then
-			local unitData = unitList.GetUnitData(unitID)
-			x, z = unitData.clusterX, unitData.clusterZ
-		else
-			x,_,z = unitList.GetUnitPosition(unitID)
-		end
+		local unitData = unitList.GetUnitData(unitID)
+		local x, z = unitData.clusterX, unitData.clusterZ
 		
 		clusterData.xSum = clusterData.xSum - x*cost
 		clusterData.zSum = clusterData.zSum - z*cost
@@ -146,8 +137,8 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, static, cluste
 	end
 	
 	-- UnitListHandler External Functions
-	function AddUnit(unitID, cost, newData)
-		if unitList.AddUnit(unitID, cost, newData) then
+	function AddUnit(unitID, cost, static, newData)
+		if unitList.AddUnit(unitID, cost, static, newData) then
 			HandleUnitAddition(unitID)
 		end
 	end

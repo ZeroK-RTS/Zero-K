@@ -13,8 +13,8 @@ local function DisSQ(x1,z1,x2,z2)
 	return (x1 - x2)^2 + (z1 - z2)^2
 end
 
-local function InternalGetUnitPosition(data, static, losCheckAllyTeamID)
-	if static then
+local function InternalGetUnitPosition(data, losCheckAllyTeamID)
+	if data.static then
 		if data.x then
 			return data.x, data.y, data.z
 		else
@@ -38,8 +38,7 @@ local function InternalGetUnitPosition(data, static, losCheckAllyTeamID)
 	return false
 end
 
-function UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
-	-- static is whether the unit list only contains stationary units
+function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 	local unitMap = {}
 	local unitList = {}
 	local unitCount = 0
@@ -49,17 +48,20 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
 	function GetUnitPosition(unitID)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
-			return InternalGetUnitPosition(unitList[index], static, losCheckAllyTeamID)
+			return InternalGetUnitPosition(unitList[index], losCheckAllyTeamID)
 		end
 	end
 	
 	function HasUnitMoved(unitID, range)
-		if static or not unitMap[unitID] then
+		if not unitMap[unitID] then
 			return false
 		end
 		local index = unitMap[unitID]
 		local data = unitList[index]
-		local x,_,z = InternalGetUnitPosition(data, static, losCheckAllyTeamID)
+		if data.static then
+			return false
+		end
+		local x,_,z = InternalGetUnitPosition(data, losCheckAllyTeamID)
 		if x then
 			if not data.oldX then
 				data.oldX = x
@@ -84,7 +86,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
 		local closeZ = false
 		for i = 1, unitCount do
 			local data = unitList[i]
-			local ux,_,uz = InternalGetUnitPosition(data, static, losCheckAllyTeamID)
+			local ux,_,uz = InternalGetUnitPosition(data, losCheckAllyTeamID)
 			if ux and condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
 				local thisDisSq = DisSQ(x,z,ux,uz)
 				if not minDisSq or minDisSq > thisDisSq then
@@ -102,7 +104,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
 		local radiusSq = radius^2
 		for i = 1, unitCount do
 			local data = unitList[i]
-			local ux,_,uz = InternalGetUnitPosition(data, static, losCheckAllyTeamID)
+			local ux,_,uz = InternalGetUnitPosition(data, losCheckAllyTeamID)
 			if ux and condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
 				local thisDisSq = DisSQ(x,z,ux,uz)
 				if thisDisSq < radiusSq then
@@ -140,7 +142,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
 	end
 	
 	-- Unit addition and removal handling
-	function AddUnit(unitID, cost, newData)
+	function AddUnit(unitID, static, cost, newData)
 		if unitMap[unitID] then
 			if newData then 
 				OverwriteUnitData(unitID, newData)
@@ -154,6 +156,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
 		unitCount = unitCount + 1
 		unitList[unitCount] = {
 			unitID = unitID,
+			static = static,
 			cost = cost,
 			customData = newData,
 		}
