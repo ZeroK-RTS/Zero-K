@@ -11,7 +11,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 
 local assetTracker = {}
 
-function assetTracker.CreateAssetTracker(teamID)
+function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 
 	local totalCostAdded = 0
 	local totalCostRemoved = 0
@@ -28,24 +28,24 @@ function assetTracker.CreateAssetTracker(teamID)
 	
 	-- This list contains every unit exactly once. Values are cost.
 	local completeUnitList = {
-		antiAirTurret = UnitListHandler.CreateUnitList(true),
-		turret = UnitListHandler.CreateUnitList(true),
-		economy = UnitListHandler.CreateUnitList(true),
-		largeStructure = UnitListHandler.CreateUnitList(true),
-		miscStructure = UnitListHandler.CreateUnitList(true),
-		constructor = UnitListHandler.CreateUnitList(false),
-		raider = UnitListHandler.CreateUnitList(false),
-		assault = UnitListHandler.CreateUnitList(false),
-		skirm = UnitListHandler.CreateUnitList(false),
-		antiSkirm = UnitListHandler.CreateUnitList(false),
-		riot = UnitListHandler.CreateUnitList(false),
-		arty = UnitListHandler.CreateUnitList(false),
-		antiAir = UnitListHandler.CreateUnitList(false),
-		fighter = UnitListHandler.CreateUnitList(false),
-		bomber = UnitListHandler.CreateUnitList(false),
-		gunship = UnitListHandler.CreateUnitList(false),
-		transport = UnitListHandler.CreateUnitList(false),
-		miscUnit = UnitListHandler.CreateUnitList(false),
+		antiAirTurret = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
+		turret = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
+		economy = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
+		largeStructure = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
+		miscStructure = UnitListHandler.CreateUnitList(losCheckAllyTeamID, true),
+		constructor = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		raider = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		assault = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		skirm = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		antiSkirm = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		riot = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		arty = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		antiAir = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		fighter = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		bomber = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		gunship = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		transport = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
+		miscUnit = UnitListHandler.CreateUnitList(losCheckAllyTeamID, false),
 	}
 	
 	function AddUnit(unitID, unitDefID)

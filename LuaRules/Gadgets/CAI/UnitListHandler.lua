@@ -5,6 +5,7 @@
 --]]
 
 local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitLosState = Spring.GetUnitLosState
 
 local UnitListHandler = {}
 
@@ -12,10 +13,10 @@ local function DisSQ(x1,z1,x2,z2)
 	return (x1 - x2)^2 + (z1 - z2)^2
 end
 
-local function InternalGetUnitPosition(data)
+local function InternalGetUnitPosition(data, static, losCheckAllyTeamID)
 	if static then
 		if data.x then
-			return data.x, data.z
+			return data.x, data.y, data.z
 		else
 			local x,y,z = spGetUnitPosition(data.unitID)
 			data.x = x
@@ -24,11 +25,20 @@ local function InternalGetUnitPosition(data)
 			return x, y, z
 		end
 	end
-	local x,y,z = spGetUnitPosition(data.unitID)
-	return x, y, z
+	if losCheckAllyTeamID then
+		local los = spGetUnitLosState(data.unitID, losCheckAllyTeamID, false)
+		if los and (los.los or los.radar) and los.typed then
+			local x,y,z = spGetUnitPosition(data.unitID)
+			return x, y, z
+		end
+	else
+		local x,y,z = spGetUnitPosition(data.unitID)
+		return x, y, z
+	end
+	return false
 end
 
-function UnitListHandler.CreateUnitList(static)
+function UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
 	-- static is whether the unit list only contains stationary units
 	local unitMap = {}
 	local unitList = {}
@@ -39,7 +49,7 @@ function UnitListHandler.CreateUnitList(static)
 	function GetUnitPosition(unitID)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
-			return InternalGetUnitPosition(unitList[index])
+			return InternalGetUnitPosition(unitList[index], static, losCheckAllyTeamID)
 		end
 	end
 	
@@ -49,18 +59,21 @@ function UnitListHandler.CreateUnitList(static)
 		end
 		local index = unitMap[unitID]
 		local data = unitList[index]
-		local x,_,z = InternalGetUnitPosition(data)
-		if not data.oldX then
-			data.oldX = x
-			data.oldZ = z
+		local x,_,z = InternalGetUnitPosition(data, static, losCheckAllyTeamID)
+		if x then
+			if not data.oldX then
+				data.oldX = x
+				data.oldZ = z
+				return true
+			end
+			if DisSQ(x,z,data.oldX,data.oldZ) > range^2 then
+				data.oldX = x
+				data.oldZ = z
+				return true
+			end
 			return false
 		end
-		if DisSQ(x,z,data.oldX,data.oldZ) > range^2 then
-			data.oldX = x
-			data.oldZ = z
-			return true
-		end
-		return false
+		return true
 	end
 	
 	-- Position checks over all units in the list
@@ -71,8 +84,8 @@ function UnitListHandler.CreateUnitList(static)
 		local closeZ = false
 		for i = 1, unitCount do
 			local data = unitList[i]
-			local ux,_,uz = InternalGetUnitPosition(data)
-			if condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
+			local ux,_,uz = InternalGetUnitPosition(data, static, losCheckAllyTeamID)
+			if ux and condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
 				local thisDisSq = DisSQ(x,z,ux,uz)
 				if not minDisSq or minDisSq > thisDisSq then
 					minDisSq = thisDisSq
@@ -89,8 +102,8 @@ function UnitListHandler.CreateUnitList(static)
 		local radiusSq = radius^2
 		for i = 1, unitCount do
 			local data = unitList[i]
-			local ux,_,uz = InternalGetUnitPosition(data)
-			if condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
+			local ux,_,uz = InternalGetUnitPosition(data, static, losCheckAllyTeamID)
+			if ux and condition and condition(data.unitID, ux, uz, data.customData, data.cost) then
 				local thisDisSq = DisSQ(x,z,ux,uz)
 				if thisDisSq < radiusSq then
 					return true

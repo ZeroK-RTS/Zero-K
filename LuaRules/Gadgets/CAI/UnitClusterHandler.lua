@@ -6,9 +6,9 @@ local function DisSQ(x1,z1,x2,z2)
 	return (x1 - x2)^2 + (z1 - z2)^2
 end
 
-function UnitClusterHandler.CreateUnitCluster(static, clusterRadius)
+function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, static, clusterRadius)
 	
-	local unitList = UnitListHandler.CreateUnitList(static)
+	local unitList = UnitListHandler.CreateUnitList(losCheckAllyTeamID, static)
 	
 	local clusterRadiusSq = clusterRadius^2
 	
@@ -17,8 +17,12 @@ function UnitClusterHandler.CreateUnitCluster(static, clusterRadius)
 	
 	-- Cluster Handling
 	local function AddUnitToCluster(index, unitID)
+		local x,_,z = unitList.GetUnitPosition(unitID)
+		if not x then
+			return
+		end
+		
 		if not index then
-			local x,_,z = unitList.GetUnitPosition(unitID)
 			local cost = unitList.GetUnitCost(unitID)
 			clusterCount = clusterCount + 1
 			clusterList[clusterCount] = {
@@ -42,7 +46,6 @@ function UnitClusterHandler.CreateUnitCluster(static, clusterRadius)
 		end
 		
 		local clusterData = clusterList[index]
-		local x,_,z = unitList.GetUnitPosition(unitID)
 		local cost = unitList.GetUnitCost(unitID)
 		
 		if not static then
@@ -92,6 +95,9 @@ function UnitClusterHandler.CreateUnitCluster(static, clusterRadius)
 	
 	local function HandleUnitAddition(unitID)
 		local x,_,z = unitList.GetUnitPosition(unitID)
+		if not x then
+			return false
+		end
 		local minDis = false
 		local minIndex = false
 		for i = 1, clusterCount do
@@ -150,6 +156,7 @@ function UnitClusterHandler.CreateUnitCluster(static, clusterRadius)
 		if unitList.ValidUnitID(unitID) then
 			HandleUnitRemoval(unitID)
 		end
+		unitList.RemoveUnit(unitID)
 	end
 	
 	function SetUnitDataValue(unitID, key, value)
