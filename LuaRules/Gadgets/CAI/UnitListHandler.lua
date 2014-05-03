@@ -12,8 +12,7 @@ local function DisSQ(x1,z1,x2,z2)
 	return (x1 - x2)^2 + (z1 - z2)^2
 end
 
-
-function InternalGetUnitPosition(data)
+local function InternalGetUnitPosition(data)
 	if static then
 		if data.x then
 			return data.x, data.z
@@ -29,12 +28,14 @@ function InternalGetUnitPosition(data)
 	return x, y, z
 end
 
-function UnitListHandler.CreateUnitList(static, useCustomData)
+function UnitListHandler.CreateUnitList(static)
+	-- static is whether the unit list only contains stationary units
 	local unitMap = {}
 	local unitList = {}
 	local unitCount = 0
 	local totalCost = 0
 	
+	-- Indiviual Unit Position Functions
 	function GetUnitPosition(unitID)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
@@ -42,6 +43,27 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		end
 	end
 	
+	function HasUnitMoved(unitID, range)
+		if static or not unitMap[unitID] then
+			return false
+		end
+		local index = unitMap[unitID]
+		local data = unitList[index]
+		local x,_,z = InternalGetUnitPosition(data)
+		if not data.oldX then
+			data.oldX = x
+			data.oldZ = z
+			return false
+		end
+		if DisSQ(x,z,data.oldX,data.oldZ) > range^2 then
+			data.oldX = x
+			data.oldZ = z
+			return true
+		end
+		return false
+	end
+	
+	-- Position checks over all units in the list
 	function GetNearestUnit(x,z,condition)
 		local minDisSq = false
 		local closeID = false
@@ -78,20 +100,39 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		return false
 	end
 	
-	function ModifyUnit(unitID, newData) -- Cost can not be changed.
+	-- Unit cust data handling
+	function OverwriteUnitData(unitID, newData)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
 			unitList[index].customData = newData
 		end
 	end
 	
-	function AddUnit(unitID, newData, cost)
+	function GetUnitData(unitID)
+		-- returns a table but don't edit it!
 		if unitMap[unitID] then
-			if useCustomData then
-				ModifyUnit(unitID, newData, cost)
-			else
-				return
+			local index = unitMap[unitID]
+			return unitList[index].customData or {}
+		end
+	end
+	
+	function SetUnitDataValue(unitID, key, value)
+		if unitMap[unitID] then
+			local index = unitMap[unitID]
+			if not unitList[index].customData then
+				unitList[index].customData = {}
 			end
+			unitList[index].customData[key] = value
+		end
+	end
+	
+	-- Unit addition and removal handling
+	function AddUnit(unitID, cost, newData)
+		if unitMap[unitID] then
+			if newData then 
+				OverwriteUnitData(unitID, newData)
+			end
+			return false
 		end
 		
 		cost = cost or 0
@@ -105,6 +146,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		}
 		unitMap[unitID] = unitCount
 		totalCost = totalCost + cost
+		return true
 	end
 	
 	function RemoveUnit(unitID)
@@ -121,6 +163,20 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 			unitList[unitCount] = nil
 			unitCount = unitCount - 1
 			unitMap[unitID] = nil
+			return true
+		end
+		return false
+	end
+	
+	function ValidUnitID(unitID)
+		return (unitMap[unitID] and true) or false
+	end
+	
+	-- Cost Handling
+	function GetUnitCost(unitID)
+		if unitMap[unitID] then
+			local index = unitMap[unitID]
+			return unitList[index].cost
 		end
 	end
 	
@@ -128,6 +184,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		return totalCost
 	end
 	
+	-- To use Iterator, write "for unitID, data in unitList.Iterator() do"
 	function Iterator()
 		local i = 0
 		return function ()
@@ -141,11 +198,16 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 	local newUnitList = {
 		GetUnitPosition = GetUnitPosition,
 		GetNearestUnit = GetNearestUnit,
+		HasUnitMoved = HasUnitMoved,
 		IsPositionNearUnit = IsPositionNearUnit,
-		ModifyUnit = ModifyUnit,
+		OverwriteUnitData = OverwriteUnitData,
+		GetUnitData = GetUnitData,
+		SetUnitDataValue = SetUnitDataValue,
 		AddUnit = AddUnit,
 		RemoveUnit = RemoveUnit,
+		GetUnitCost = GetUnitCost,
 		GetTotalCost = GetTotalCost,
+		ValidUnitID = ValidUnitID,
 		Iterator = Iterator,
 	}
 	

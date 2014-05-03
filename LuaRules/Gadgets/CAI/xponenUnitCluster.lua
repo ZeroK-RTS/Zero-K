@@ -3,9 +3,9 @@ local UnitListHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitListHandler.lua")
 
 local xponenUnitCluster = {}
 
-function xponenUnitCluster.CreateUnitCluster(static, useCustomData)
+function xponenUnitCluster.CreateUnitCluster(static)
 	
-	local unitList = UnitListHandler.CreateUnitList(static, useCustomData)
+	local unitList = UnitListHandler.CreateUnitList(static)
 	
 	local clusterInitialized, clusterExtracted = false,false
 	local clusterFeed_UnitPos = {}

@@ -34,6 +34,7 @@ local HeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/HeatmapHandler.lua")
 local PathfinderGenerator = VFS.Include("LuaRules/Gadgets/CAI/PathfinderGenerator.lua")
 local AssetTracker = VFS.Include("LuaRules/Gadgets/CAI/AssetTracker.lua")
 local ScoutHandler = VFS.Include("LuaRules/Gadgets/CAI/ScoutHandler.lua")
+local UnitClusterHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitClusterHandler.lua")
 
 ---------------------------------------------------------------
 -- Heatmapping
@@ -47,11 +48,20 @@ _G.heatmap = aaHeatmap.heatmap
 
 local scoutHandler = ScoutHandler.CreateScoutHandler(0)
 
+local enemyUnitCluster = UnitClusterHandler.CreateUnitCluster(false, 900)
+
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if teamID == 1 then
 		enemyForceHandler.AddUnit(unitID, unitDefID)
+		enemyUnitCluster.AddUnit(unitID, UnitDefs[unitDefID].metalCost)
 	end
 	--scoutHandler.AddUnit(unitID)
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	if teamID == 1 then
+		enemyUnitCluster.RemoveUnit(unitID, UnitDefs[unitDefID].metalCost)
+	end
 end
 
 ---------------------------------------------------------------
@@ -91,7 +101,11 @@ function gadget:GameFrame(f)
 		scoutHandler.RunJobHandler()
 		--Spring.Echo(scoutHandler.GetScoutedProportion())
 	end
-	if f%150 == 3 then
+	if f%30 == 3 then
+		enemyUnitCluster.UpdateUnitPositions(200)
+		for x,z,cost,count in enemyUnitCluster.ClusterIterator() do
+			Spring.MarkerAddPoint(x,0,z, cost .. "  " .. count)
+		end
 		aaHeatmap.UpdateUnitPositions(true)
 	end
 end
@@ -112,23 +126,24 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 	
 	if cmdID == CMD.WAIT then
-		local economyList = enemyForceHandler.GetUnitList("economy")
-		economyList.UpdateClustering()
-		economyList.ExtractCluster()
-		local coord = economyList.GetClusterCoordinates()
-		Spring.Echo(#coord)
-		for i = 1, #coord do
-			local c = coord[i]
-			Spring.MarkerAddPoint(c[1],0,c[3], "Coord, " .. c[4] .. ", Count " .. c[5])
-		end
-		local centriod = economyList.GetClusterCostCentroid()
-		Spring.Echo(#centriod)
-		for i = 1, #centriod do
-			local c = centriod[i]
-			Spring.MarkerAddPoint(c[1],0,c[3], "Centriod, Cost " .. c[4] .. ", Count " .. c[5])
-		end
-		--turretHeat.AddHeatCircle(cmdParams[1], cmdParams[3], 500, 50)
 		return false
+		--local economyList = enemyForceHandler.GetUnitList("economy")
+		--economyList.UpdateClustering()
+		--economyList.ExtractCluster()
+		--local coord = economyList.GetClusterCoordinates()
+		--Spring.Echo(#coord)
+		--for i = 1, #coord do
+		--	local c = coord[i]
+		--	Spring.MarkerAddPoint(c[1],0,c[3], "Coord, " .. c[4] .. ", Count " .. c[5])
+		--end
+		--local centriod = economyList.GetClusterCostCentroid()
+		--Spring.Echo(#centriod)
+		--for i = 1, #centriod do
+		--	local c = centriod[i]
+		--	Spring.MarkerAddPoint(c[1],0,c[3], "Centriod, Cost " .. c[4] .. ", Count " .. c[5])
+		--end
+		----turretHeat.AddHeatCircle(cmdParams[1], cmdParams[3], 500, 50)
+		--return false
 	end
 	
 	if cmdID == CMD.FIGHT then
