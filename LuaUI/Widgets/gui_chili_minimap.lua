@@ -66,7 +66,7 @@ local radar_path = 'Settings/Interface/Map'
 options_order = { 'use_map_ratio', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
-'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los'}
+'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap'}
 options = {
 	start_with_showeco = {
 		name = "Initial Showeco state",
@@ -280,6 +280,17 @@ options = {
 		end,
 		path = minimap_path,
 	},
+	leftClickOnMinimap = {
+		name = 'Left Click Behaviour',
+		type = 'radioButton',
+		value = 'unitselection',
+		items={
+			{key='unitselection', name='Unit Selection'},
+			{key='situational', name='Context Dependant'},
+			{key='camera', name='Camera Movement'},
+		},
+		path = minimap_path,
+	},
 
 }
 
@@ -478,27 +489,65 @@ MakeMinimapWindow = function()
 		},
 	}
 end
+
+local leftClickDraggingCamera = false
+
 function widget:MousePress(x, y, button)
 	if not Spring.IsAboveMiniMap(x, y) then
 		return false
 	end
-	if button == 1 then
-		local _,coord = Spring.TraceScreenRay(x,y,false,true)
-		if type(coord)=='table' then
-			Spring.SetCameraTarget(coord[1],coord[2],coord[3])
-		end
-	end
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if not meta or (shift and meta) then  --//skip epicMenu when user didn't press the Spacebar, but allow command insert widget if press SHIFT & META
-		return false 
-	end
-	if Spring.GetActiveCommand() == 0 then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
+	if meta and not shift and Spring.GetActiveCommand() == 0 then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
 		WG.crude.OpenPath(minimap_path) --click + space will shortcut to option-menu
 		WG.crude.ShowMenu() --make epic Chili menu appear.
 		return true
-	else --//skip epicMenu when user have active command. User might be trying to queue/insert command using the minimap.
-		return false
 	end
+	if options.leftClickOnMinimap.value ~= 'unitselection' then
+		if button == 1 then
+			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
+			local coord 
+			if traceType == "ground" then
+				coord = traceValue
+			end
+			if options.leftClickOnMinimap.value == 'camera' then
+				if traceType == "unit" then
+					local x,y,z = Spring.GetUnitPosition(traceValue)
+					if x and y and z then
+						coord = {x,y,z}
+					end
+				elseif traceType == "feature" then
+					local x,y,z = Spring.GetFeaturePosition(traceValue)
+					if x and y and z then
+						coord = {x,y,z}
+					end
+				end
+			end
+			if coord then
+				Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
+				leftClickDraggingCamera = true
+				return true
+			end
+		end
+	end
+end
+
+function widget:MouseMove(x, y, dx, dy, button)
+	if leftClickDraggingCamera and Spring.IsAboveMiniMap(x, y) then
+		local traceType,traceValue = Spring.TraceScreenRay(x,y,true,true)
+		local coord 
+		if traceType == "ground" then
+			coord = traceValue
+		end
+		if coord then
+			Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
+			leftClickDraggingCamera = true
+			return true
+		end
+	end
+end
+
+function widget:MouseRelease(x, y, button)
+	leftClickDraggingCamera = false
 end
 
 --[[function widget:Update(dt) 
