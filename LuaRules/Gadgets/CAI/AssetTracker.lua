@@ -11,7 +11,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 
 local assetTracker = {}
 
-function assetTracker.CreateAssetTracker(teamID, allyTeamID)
+function assetTracker.CreateAssetTracker(teamID)
 
 	local totalCostAdded = 0
 	local totalCostRemoved = 0
@@ -49,7 +49,7 @@ function assetTracker.CreateAssetTracker(teamID, allyTeamID)
 	}
 	
 	function AddUnit(unitID, unitDefID)
-		--local str = ""
+		local str = ""
 		if HeatmapUnitDefID[unitDefID] then
 			local data = HeatmapUnitDefID[unitDefID]
 			local i = 1
@@ -58,14 +58,14 @@ function assetTracker.CreateAssetTracker(teamID, allyTeamID)
 				local heatmapData = data[i]
 				unitHeatmaps[heatmapData.name].AddUnitHeat(unitID, x, z, heatmapData.radius, heatmapData.amount)
 				i = i + 1
-				--str = str .. heatmapData.name .. ", "
+				str = str .. heatmapData.name .. ", "
 			end
 		end
 		local listData = ListUnitDefID[unitDefID]
 		completeUnitList[listData.name].AddUnit(unitID, false, listData.cost)
 		totalCostRemoved = totalCostRemoved + listData.cost
-		--str = str .. "List: " .. listData.name
-		--GG.UnitEcho(unitID, str)
+		str = str .. "List: " .. listData.name
+		GG.UnitEcho(unitID, str)
 	end
 	
 	function RemoveUnit(unitID, unitDefID)
@@ -90,9 +90,19 @@ function assetTracker.CreateAssetTracker(teamID, allyTeamID)
 		heatmaps.mobileLand.UpdateUnitPositions(true)
 	end
 	
+	function GetUnitList(name)
+		return completeUnitList[name]
+	end
+	
+	function GetHeatmap(name)
+		return unitHeatmaps[name]
+	end
+	
 	local newAssetTracker = {
 		AddUnit = AddUnit,
-	
+		UpdateHeatmaps = UpdateHeatmaps,
+		GetUnitList = GetUnitList, 
+		GetHeatmap = GetHeatmap,
 	}
 	
 	return newAssetTracker

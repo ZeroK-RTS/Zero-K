@@ -66,7 +66,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		
 		-- Can be used to find clusters that match weapon AOE
 		if not clusterInitialized then
-			RedoClustering(2,350)
+			UpdateClustering(2,350)
 		end
 		desiredConnectionDistance = desiredConnectionDistance or 300 --must be less or equal to maximumConnectionDistance
 		clusterList_UnitIDs, clusterNoiseList_UnitIDs = Spring.Utilities.Extract_Cluster(clusterRaw_Objects,connectionDistance)
@@ -78,7 +78,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		--This will return a table of {x,0,z,clusterAvgRadius+100,unitCount}
 		--Can be used to see where unit is concentrating.
 		if not clusterExtracted then
-			ExtractClustering(300)
+			SetClusterDistance(300)
 		end
 		clusterCircle_Pos = Spring.Utilities.Convert_To_Circle(clusterList_UnitIDs, clusterNoiseList_UnitIDs,clusterFeed_UnitPos)
 		clusterExtracted = true
@@ -88,7 +88,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 	function GetClusterCostCentroid()
 		--This will return a table of {weightedX,0,weightedZ,totalCost,unitCount}
 		if not clusterExtracted then
-			ExtractClustering(300)
+			SetClusterDistance(300)
 		end
 		local costCentroids = {}
 		for i=1 , #clusterList_UnitIDs do
