@@ -1764,7 +1764,7 @@ MakeSubWindow = function(path, pause)
 	if settings_height < window_height then
 		window_height = settings_height+10
 	end
-	local window_width = 300
+	local window_width = 350
 	
 		
 	local window_children = {}
