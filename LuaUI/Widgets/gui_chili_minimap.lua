@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.893 Chili Minimap",
+    desc      = "v0.894 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -482,8 +482,14 @@ function widget:MousePress(x, y, button)
 	if not Spring.IsAboveMiniMap(x, y) then
 		return false
 	end
+	if button == 1 then
+		local _,coord = Spring.TraceScreenRay(x,y,false,true)
+		if type(coord)=='table' then
+			Spring.SetCameraTarget(coord[1],coord[2],coord[3])
+		end
+	end
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if not meta then  --//skip epicMenu when user didn't press the Spacebar
+	if not meta or (shift and meta) then  --//skip epicMenu when user didn't press the Spacebar, but allow command insert widget if press SHIFT & META
 		return false 
 	end
 	if Spring.GetActiveCommand() == 0 then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
