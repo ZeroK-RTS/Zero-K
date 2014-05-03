@@ -37,14 +37,7 @@ local max = math.max
 local echo = Spring.Echo
 
 --------------------------------------------------------------------------------
-MakeExitConfirmWindow = function() end
-local singleplayer = false
-do
-	local playerlist = Spring.GetPlayerList() or {}
-	if (#playerlist <= 1) then
-		singleplayer = true
-	end
-end
+local isMission = Game.modDesc:find("Mission Mutator")
 
 -- Config file data
 local keybind_file, defaultkeybinds, defaultkeybind_date, confdata
@@ -54,7 +47,6 @@ do
 	confdata = VFS.Include(file, nil, VFS.RAW_FIRST)
 	--assign keybind file:
 	keybind_file = LUAUI_DIRNAME .. 'Configs/' .. Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
-	local isMission = Game.modDesc:find("Mission Mutator")
 	if isMission then
 		--FIXME: find modname instead of using hardcoded mission_keybinds_file name
 		keybind_file = (confdata.mission_keybinds_file and LUAUI_DIRNAME .. 'Configs/' .. confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
@@ -586,7 +578,16 @@ local function WidgetEnabled(wname)
 	local order = widgetHandler.orderList[wname]
 	return order and (order > 0)
 end
-			
+
+local function AmIPlayingAlone()
+	local spectating = Spring.GetSpectatingState()
+	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
+	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
+	if #teams == 1 and (not spectating) then -- if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
+		return true
+	end
+	return false
+end			
 
 -- Kill submenu window
 local function KillSubWindow(makingNew)
@@ -596,7 +597,7 @@ local function KillSubWindow(makingNew)
 		window_sub_cur:Dispose()
 		window_sub_cur = nil
 		curPath = ''
-		if singleplayer and not makingNew then
+		if AmIPlayingAlone() and not makingNew then
 			local paused = select(3, Spring.GetGameSpeed())
 			if paused then
 				spSendCommands("pause")
@@ -1009,12 +1010,11 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			icon = subMenuIcons[path] 
 		end
 		--]]
-		
 		local pathexploded = explode('/',path)
 		local pathend = pathexploded[#pathexploded]
 		pathexploded[#pathexploded] = nil
-		path = table.concat(pathexploded, '/')
-		
+		path = table.concat(pathexploded, '/')--Example = if path2 is "Game", then current path became ""
+
 		option = {
 			type='button',
 			name=pathend .. '...',
@@ -1024,8 +1024,11 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			end,
 			desc=path2,
 		}
+		
+		if path == '' and path2 == '' then --prevent adding '...' button on '' (Main Menu)
+			return
+		end
 	end
-	
 	if not pathoptions[path] then
 		AddOption( path )
 	end
@@ -1268,7 +1271,7 @@ local function IntegrateWidget(w, addoptions, index)
 	end
 	
 	local wname = w.whInfo.name
-	local defaultpath = w.options_path or ('Settings/Misc/' .. wname)
+	local defaultpath =  w.options_path or ('Settings/Misc/' .. wname)
 	
 	
 	--[[
@@ -1600,39 +1603,37 @@ MakeSubWindow = function(path, pause)
 		if option.advanced and not settings.showAdvanced then
 			--do nothing
 		elseif option.type == 'button' then
-			if option.name ~= "..." then 	-- FIXME: hack to hide unwanted "..." useless button in main menu (path = "")
-				local hide = false
-				
-				if option.wname == 'epic' then --menu
-					local menupath = option.desc
-					if pathoptions[menupath] and #(pathoptions[menupath]) == 0 then
-						hide = true
-						settings_height = settings_height - B_HEIGHT
-					end
+			local hide = false
+			
+			if option.wname == 'epic' then --menu
+				local menupath = option.desc
+				if pathoptions[menupath] and #(pathoptions[menupath]) == 0 then
+					hide = true
+					settings_height = settings_height - B_HEIGHT
 				end
-				
-				if not hide then
-					local disable = (singleplayer and option.sp == -1) or ((not singleplayer) and option.sp == 1)
-					local icon = option.icon
-					local button = Button:New{
-						name = option.wname .. " " .. option.name;
-						x=0,
-						minHeight = root and 36 or 30,
-						caption = option.name, 
-						OnClick = {option.OnChange},
-						backgroundColor = disable and color.disabled_bg or {1, 1, 1, 1},
-						textColor = disable and color.disabled_fg or color.sub_button_fg, 
-						tooltip = option.desc,
-						
-						padding={2,2,2,2},
-					}
+			end
+			
+			if not hide then
+				local disabled = option.DisableFunc and option.DisableFunc()
+				local icon = option.icon
+				local button = Button:New{
+					name = option.wname .. " " .. option.name;
+					x=0,
+					minHeight = root and 36 or 30,
+					caption = option.name, 
+					OnClick = {option.OnChange},
+					backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
+					textColor = disabled and color.disabled_fg or color.sub_button_fg, 
+					tooltip = option.desc,
 					
-					if icon then
-						local width = root and 24 or 16
-						Image:New{ file= icon, width = width, height = width, parent = button, x=4,y=4,  }
-					end
-					tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option)
+					padding={2,2,2,2},
+				}
+				
+				if icon then
+					local width = root and 24 or 16
+					Image:New{ file= icon, width = width, height = width, parent = button, x=4,y=4,  }
 				end
+				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option)
 			end
 			
 		elseif option.type == 'label' then	
@@ -1880,7 +1881,7 @@ MakeSubWindow = function(path, pause)
 		children = window_children,
 	}
 	AdjustWindow(window_sub_cur)
-	if pause and singleplayer then
+	if pause and AmIPlayingAlone() then
 		local paused = select(3, Spring.GetGameSpeed())
 		if not paused then
 			spSendCommands("pause")
@@ -1890,10 +1891,9 @@ end
 
 -- Make submenu window based on index from flat window list (This is exclusive for search result)
 MakeSubWindowSearch = function(path)
-	
 	local settings_height = #(pathoptions[path]) * B_HEIGHT
 	local settings_width = 270
-	local maximumResult = 17 --maximum result to display. Any more it will just say "too many"
+	local maximumResult = 18 --maximum result to display. Any more it will just say "too many"
 	
 	local filtered_pathOptions = {}
 	
@@ -2237,7 +2237,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:AddChild(window_sub_cur)
-			if singleplayer and (not dontChangePause) then
+			if AmIPlayingAlone() and (not dontChangePause) then
 				local paused = select(3, Spring.GetGameSpeed())
 				if (not paused) and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -2251,7 +2251,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:RemoveChild(window_sub_cur)
-			if singleplayer and (not dontChangePause) then
+			if AmIPlayingAlone() and (not dontChangePause) then
 				local paused = select(3, Spring.GetGameSpeed())
 				if paused and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -2278,7 +2278,7 @@ local function LeaveExitConfirmWindow()
 	ShowHideCrudeMenu(true)
 end
 
-MakeExitConfirmWindow = function(text, action)
+local function MakeExitConfirmWindow(text, action)
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	local menu_width = 320
 	local menu_height = 64
@@ -2509,7 +2509,7 @@ local function MakeMenuBar()
 					--]]
 					Button:New{
 						name= 'subMenuButton',
-						OnClick = { function() ActionSubmenu('') end, },
+						OnClick = { function() ActionSubmenu(nil,'') end, },
 						textColor=color.game_fg,
 						height=B_HEIGHT+12,
 						width=B_WIDTH_TOMAINMENU + 1,
@@ -2655,12 +2655,58 @@ local function MakeMenuBar()
 	--ShowHideCrudeMenu()
 end
 
+local function MakeQuitButtons()
+	AddOption('',{
+		type='label',
+		name='Quit game',
+		value = 'Quit game',
+		key='Quit game',
+	})
+	AddOption('',{
+		type='button',
+		name='Vote Resign',
+		desc = "Ask teammates to resign",
+		OnChange = function()
+				if not (Spring.GetSpectatingState() and AmIPlayingAlone()) then
+					spSendCommands("say !voteresign")
+					ActionMenu()
+				end
+			end,
+		key='Vote Resign',
+		DisableFunc = function() 
+			return (Spring.GetSpectatingState() or AmIPlayingAlone() or isMission) 
+		end, --function that trigger grey colour on buttons (not actually disable their functions)
+	})
+	AddOption('',{
+		type='button',
+		name='Resign',
+		desc = "Abandon team and become spectator",
+		OnChange = function()
+				if not isMission then
+					MakeExitConfirmWindow("Are you sure you want to resign?", function() spSendCommands{"spectator"} end)
+				end
+			end,
+		key='Resign',
+		DisableFunc = function() 
+			return (Spring.GetSpectatingState() or isMission) 
+		end, --function that trigger grey colour on buttons (not actually disable their functions)
+	})
+	AddOption('',{
+		type='button',
+		name='Exit to Desktop',
+		desc = "Ask teammates to resign",
+		OnChange = function() 
+			MakeExitConfirmWindow("Are you sure you want to quit the game?", function() spSendCommands{"quit","quitforce"} end)
+			end,
+		key='Exit to Desktop',
+	})
+end
+
 --Remakes crudemenu and remembers last submenu open
 RemakeEpicMenu = function()
 	local lastPath = curPath
 	KillSubWindow(true)
 	if lastPath ~= '' then
-		Spring.Echo("remake")
 		MakeSubWindow(lastPath, true)
 	end
 end
@@ -2674,7 +2720,6 @@ function widget:ViewResize(vsx, vsy)
 end
 
 function widget:Initialize()
-	
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget)
 		return
@@ -2742,7 +2787,6 @@ function widget:Initialize()
 	
 		-- add custom widget settings to crudemenu
 	AddAllCustSettings()
-	
 
 	--this is done to establish order the correct button order
 	local imgPath = LUAUI_DIRNAME  .. 'images/'
@@ -2754,7 +2798,6 @@ function widget:Initialize()
 	AddOption('Settings/HUD Panels')
 	AddOption('Settings/Interface')
 	AddOption('Settings/Misc')
-	
 
 	-- Add pre-configured button/options found in epicmenu config file
 	local options_temp = CopyTable(epic_options, true)
@@ -2762,6 +2805,8 @@ function widget:Initialize()
 		local option = options_temp[i]
 		AddOption(option.path, option)
 	end
+	
+	MakeQuitButtons()
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()
@@ -3086,7 +3131,6 @@ function ActionMenu()
 	ShowHideCrudeMenu()
 end
 
---// [[ see comments in epicmenu conf (about "radioButton" camera option). UPDATE: propose re-enable "radioButton" camera option
 do --Set our prefered camera mode when first screen frame is drawn. The engine always go to default TA at first screen frame, so we need to re-apply our camera settings.
 	if Spring.GetGameFrame() == 0 then  --we check if this code is run at midgame (due to /reload). In that case we don't need to re-apply settings (the camera mode is already set at gui_epicmenu.lua\AddOption()).
 		local screenFrame = 0
@@ -3106,7 +3150,7 @@ end
 -------------------------------------------------------
 -- detect when user press ENTER to insert search term for searching option in epicmenu
 function widget:TextCommand(command)
-	if window_sub_cur and command:sub(1,7) == "search:" and curPath~="" then --Note: skip searching from Root/"" (because MakeSubWindowSearch() can't handle "" path for the moment)
+	if window_sub_cur and command:sub(1,7) == "search:" then
 		filterUserInsertedTerm = command:sub(8)
 		filterUserInsertedTerm = filterUserInsertedTerm:lower() --Reference: http://lua-users.org/wiki/StringLibraryTutorial
 		Spring.Echo("EPIC Menu: searching \"" .. filterUserInsertedTerm.."\"")
@@ -3118,33 +3162,9 @@ function widget:TextCommand(command)
 end
 
 function SearchInText(randomTexts,searchText) --this allow search term to be unordered (eg: "sel view" == "view sel")
-	if explodeSearchTerm.text ~= searchText then
-		local explodedTerms = {}
-		local termLenght = searchText:len()
-		local spaceLocation,textLocation = searchText:find("%s%l") -- spacing + letter. eg: " x"
-		if spaceLocation then
-			explodedTerms[1] = searchText:sub(1,spaceLocation-1)
-			local theRestOfTerm = searchText:sub(textLocation,termLenght)
-			termLenght = termLenght-spaceLocation --text get shorter, so lenght get shorter
-			while termLenght > 1 do
-				local index = #explodedTerms
-				spaceLocation,textLocation = theRestOfTerm:find("%s%l")
-				if not spaceLocation then
-					explodedTerms[index+1] = theRestOfTerm:gsub("%s",'') --remove any spacing
-					break
-				end
-				explodedTerms[index+1] = theRestOfTerm:sub(1,spaceLocation-1)
-				theRestOfTerm = theRestOfTerm:sub(textLocation,termLenght)
-				termLenght = termLenght-spaceLocation
-			end
-			explodeSearchTerm.terms = explodedTerms
-			explodeSearchTerm.text = searchText
-		else
-			explodedTerms[1] = searchText:gsub("%s",'') --remove any spacing
-			explodeSearchTerm.terms = explodedTerms
-			explodeSearchTerm.text = searchText
-		end
-	end
+	local explodedTerms = explode(' ',searchText)
+	explodeSearchTerm.terms = explodedTerms
+	explodeSearchTerm.text = searchText
 	local found = true --this return true if all term match (eg: found("sel") && found("view"))
 	local explodedTerms = explodeSearchTerm.terms
 	for i=1, #explodedTerms do 

@@ -80,14 +80,6 @@ local path = ''
 local function nullFunc()
 end
 
-local singleplayer = false
-do
-	local playerlist = Spring.GetPlayerList() or {}
-	if (#playerlist <= 1) then
-		singleplayer = true
-	end
-end
-
 local function AddOption(option)
 	option.path=path
 	if not option.key then
@@ -97,7 +89,7 @@ local function AddOption(option)
 end
 
 --ShortHand for adding a button
-local function ShButton( caption, action2, tooltip, advanced, icon, sp )
+local function ShButton( caption, action2, tooltip, advanced, icon, DisableFunc )
 	AddOption({
 		type='button',
 		name=caption,
@@ -107,7 +99,7 @@ local function ShButton( caption, action2, tooltip, advanced, icon, sp )
 		key=caption,
 		advanced = advanced,
 		icon = icon,
-		sp = sp,	-- 1 = singleplayer only, -1 = multiplayer only, anything else = don't care
+		DisableFunc = DisableFunc or nil, --function that trigger grey colour on buttons (not actually disable their functions, only coloured them grey)
 	})
 end
 
@@ -532,21 +524,6 @@ path='Help'
 		ShButton('Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 --- MISC
-path=''
-	ShButton('Vote Resign', function()
-			if not singleplayer then
-				spSendCommands("say !voteresign")
-				ActionMenu()
-			end
-		end,
-		"Ask teammates to resign", false, nil, -1)
-	ShButton('Resign', function()
-			if not singleplayer then
-				MakeExitConfirmWindow("Are you sure you want to resign?", function() spSendCommands{"spectator"} end)
-			end
-		end,
-		"Abandon team and become spectator", false, nil, -1)
-	ShButton('Exit to Desktop', function() MakeExitConfirmWindow("Are you sure you want to quit the game?", function() spSendCommands{"quit","quitforce"} end) end)
-	
+--
 
 return confdata
