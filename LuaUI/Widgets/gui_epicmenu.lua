@@ -1764,7 +1764,7 @@ MakeSubWindow = function(path, pause)
 	if settings_height < window_height then
 		window_height = settings_height+10
 	end
-	local window_width = 350
+	local window_width = 300
 	
 		
 	local window_children = {}
@@ -1825,43 +1825,47 @@ MakeSubWindow = function(path, pause)
 	
 	--back button
 	if parent_path then
-		Button:New{ name= 'backButton', caption = 'Back', OnClick = { KillSubWindow, function() MakeSubWindow(parent_path, false) end,  }, 
+		Button:New{ name= 'backButton', caption = '', OnClick = { KillSubWindow, function() MakeSubWindow(parent_path, false) end,  }, 
 			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, height=B_HEIGHT,
 			padding= {2,2,2,2},
 			parent = buttonBar;
 			children = {
-				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/arrow_left.png', width = 16,height = 16, parent = button, x=4,y=2,  },
+				Label:New{ caption = 'Back',x=24,y=4, }
 			}
 		}
 	end
 	
 	--search button
-	Button:New{ name= 'searchButton', caption = 'Search',
+	Button:New{ name= 'searchButton', caption = '',
 		OnClick = { function() spSendCommands("chat","PasteText /search:" ) end }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
 		padding= {2,2,2,2},parent = buttonBar;
 		children = {
-			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16,height = 16, parent = button, x=4,y=2,  },
+			Label:New{ caption = 'Search',x=24,y=4, }
 		}
 	}
 	
 	--reset button
-	Button:New{ name= 'resetButton', caption = 'Reset',
+	Button:New{ name= 'resetButton', caption = '',
 		OnClick = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
 		padding= {2,2,2,2}, parent = buttonBar;
 		children = {
-			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=2,  },
+			Label:New{ caption = 'Reset',x=24,y=4, }
 		}
 	}
 	
 	--close button
-	Button:New{ name= 'menuCloseButton', caption = 'Close',
+	Button:New{ name= 'menuCloseButton', caption = '',
 		OnClick = { function() KillSubWindow() end }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
 		padding= {2,2,2,2}, parent = buttonBar;
 		children = {
-			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16,height = 16, parent = button, x=4,y=4,  }
+			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16,height = 16, parent = button, x=4,y=2,  },
+			Label:New{ caption = 'Close',x=24,y=4, }
 		}
 	}
 	
@@ -2667,7 +2671,7 @@ local function MakeQuitButtons()
 		name='Vote Resign',
 		desc = "Ask teammates to resign",
 		OnChange = function()
-				if not (Spring.GetSpectatingState() and AmIPlayingAlone()) then
+				if not (Spring.GetSpectatingState() or AmIPlayingAlone() or isMission) then
 					spSendCommands("say !voteresign")
 					ActionMenu()
 				end
@@ -2682,7 +2686,7 @@ local function MakeQuitButtons()
 		name='Resign',
 		desc = "Abandon team and become spectator",
 		OnChange = function()
-				if not isMission then
+				if not (isMission or Spring.GetSpectatingState()) then
 					MakeExitConfirmWindow("Are you sure you want to resign?", function() spSendCommands{"spectator"} end)
 				end
 			end,
