@@ -69,7 +69,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 			UpdateClustering(2,350)
 		end
 		desiredConnectionDistance = desiredConnectionDistance or 300 --must be less or equal to maximumConnectionDistance
-		clusterList_UnitIDs, clusterNoiseList_UnitIDs = Spring.Utilities.Extract_Cluster(clusterRaw_Objects,connectionDistance)
+		clusterList_UnitIDs, clusterNoiseList_UnitIDs = Spring.Utilities.Extract_Cluster(clusterRaw_Objects,desiredConnectionDistance)
 		clusterExtracted = true
 		return clusterList_UnitIDs, clusterNoiseList_UnitIDs
 	end

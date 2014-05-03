@@ -496,36 +496,38 @@ function widget:MousePress(x, y, button)
 	if not Spring.IsAboveMiniMap(x, y) then
 		return false
 	end
-	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if meta and not shift and Spring.GetActiveCommand() == 0 then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
-		WG.crude.OpenPath(minimap_path) --click + space will shortcut to option-menu
-		WG.crude.ShowMenu() --make epic Chili menu appear.
-		return true
-	end
-	if options.leftClickOnMinimap.value ~= 'unitselection' then
-		if button == 1 then
-			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
-			local coord 
-			if traceType == "ground" then
-				coord = traceValue
-			end
-			if options.leftClickOnMinimap.value == 'camera' then
-				if traceType == "unit" then
-					local x,y,z = Spring.GetUnitPosition(traceValue)
-					if x and y and z then
-						coord = {x,y,z}
-					end
-				elseif traceType == "feature" then
-					local x,y,z = Spring.GetFeaturePosition(traceValue)
-					if x and y and z then
-						coord = {x,y,z}
+	if Spring.GetActiveCommand() == 0 then
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		if meta and not shift then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
+			WG.crude.OpenPath(minimap_path) --click + space will shortcut to option-menu
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return true
+		end
+		if options.leftClickOnMinimap.value ~= 'unitselection' then
+			if button == 1 then
+				local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
+				local coord 
+				if traceType == "ground" then
+					coord = traceValue
+				end
+				if options.leftClickOnMinimap.value == 'camera' then
+					if traceType == "unit" then
+						local x,y,z = Spring.GetUnitPosition(traceValue)
+						if x and y and z then
+							coord = {x,y,z}
+						end
+					elseif traceType == "feature" then
+						local x,y,z = Spring.GetFeaturePosition(traceValue)
+						if x and y and z then
+							coord = {x,y,z}
+						end
 					end
 				end
-			end
-			if coord then
-				Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
-				leftClickDraggingCamera = true
-				return true
+				if coord then
+					Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
+					leftClickDraggingCamera = true
+					return true
+				end
 			end
 		end
 	end
