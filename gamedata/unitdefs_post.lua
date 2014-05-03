@@ -294,8 +294,14 @@ end
 
 if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
-		if (ud.canfly) then
+		if (ud.canfly) and not ud.isHoveringAirUnit then
 			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 0.8
+		end
+	end
+else
+	for name, ud in pairs(UnitDefs) do
+		if (ud.canfly) and not (ud.isFighter or ud.isBomber) then
+			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 20
 		end
 	end
 end
