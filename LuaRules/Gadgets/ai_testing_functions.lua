@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "April 20 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -30,25 +30,27 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function DisSQ(x1,z1,x2,z2)
-	return (x1 - x2)^2 + (z1 - z2)^2
-end
+local HeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/HeatmapHandler.lua")
+local PathfinderGenerator = VFS.Include("LuaRules/Gadgets/CAI/PathfinderGenerator.lua")
+local AssetTracker = VFS.Include("LuaRules/Gadgets/CAI/AssetTracker.lua")
+local ScoutHandler = VFS.Include("LuaRules/Gadgets/CAI/ScoutHandler.lua")
 
 ---------------------------------------------------------------
 -- Heatmapping
 ---------------------------------------------------------------
 
-local HeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/HeatmapHandler.lua")
+local enemyForceHandler = AssetTracker.CreateAssetTracker(0)
 
 local aaHeatmap = HeatmapHandler.CreateHeatmap(256, 0)
 
 _G.heatmap = aaHeatmap.heatmap
 
-local ScoutHandler = VFS.Include("LuaRules/Gadgets/CAI/ScoutHandler.lua")
-
 local scoutHandler = ScoutHandler.CreateScoutHandler(0)
 
-function gadget:UnitCreated(unitID)
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if teamID == 1 then
+		enemyForceHandler.AddUnit(unitID, unitDefID)
+	end
 	--scoutHandler.AddUnit(unitID)
 end
 
@@ -56,10 +58,6 @@ end
 -- Pathfinding
 ---------------------------------------------------------------
 
-local PathfinderGenerator = VFS.Include("LuaRules/Gadgets/CAI/PathfinderGenerator.lua")
-local AssetTracker = VFS.Include("LuaRules/Gadgets/CAI/AssetTracker.lua")
-
-local enemyForceHandler = AssetTracker.CreateAssetTracker(0)
 
 -- veh, bot, spider, ship, hover, amph, air
 
@@ -84,7 +82,6 @@ function gadget:UnitEnteredLos(unitID, unitTeam, allyTeam, unitDefID)
 	if allyTeam == 0 then
 		local x, _,z = Spring.GetUnitPosition(unitID)
 		aaHeatmap.AddUnitHeat(unitID, x, z, 780, 260 )
-		enemyForceHandler.AddUnit(unitID, unitDefID)
 	end
 end
 
@@ -116,6 +113,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	
 	if cmdID == CMD.WAIT then
 		local economyList = enemyForceHandler.GetUnitList("economy")
+		economyList.UpdateClustering()
+		economyList.ExtractCluster()
 		local coord = economyList.GetClusterCoordinates()
 		Spring.Echo(#coord)
 		for i = 1, #coord do
@@ -144,6 +143,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 	
 	return true
+end
+
+function gadget:Initialize()
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
 end
 
 

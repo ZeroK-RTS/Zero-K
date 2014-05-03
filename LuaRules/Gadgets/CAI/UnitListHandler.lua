@@ -59,7 +59,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		clusterInitialized = true
 	end
 	
-	function SetClusterDistance(desiredConnectionDistance)
+	function ExtractCluster(desiredConnectionDistance)
 		-- This function translate OPTIC's result into clusters,
 		-- this can be called multiple time for different input without needing to redo the cluster algorithm,
 		-- the "desiredConnectionDistance" must be less than "maximumConnectionDistance".
@@ -78,7 +78,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		--This will return a table of {x,0,z,clusterAvgRadius+100,unitCount}
 		--Can be used to see where unit is concentrating.
 		if not clusterExtracted then
-			SetClusterDistance(300)
+			ExtractCluster(300)
 		end
 		clusterCircle_Pos = Spring.Utilities.Convert_To_Circle(clusterList_UnitIDs, clusterNoiseList_UnitIDs,clusterFeed_UnitPos)
 		clusterExtracted = true
@@ -88,7 +88,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 	function GetClusterCostCentroid()
 		--This will return a table of {weightedX,0,weightedZ,totalCost,unitCount}
 		if not clusterExtracted then
-			SetClusterDistance(300)
+			ExtractCluster(300)
 		end
 		local costCentroids = {}
 		for i=1 , #clusterList_UnitIDs do
@@ -224,7 +224,7 @@ function UnitListHandler.CreateUnitList(static, useCustomData)
 		Iterator = Iterator,
 		
 		UpdateClustering = UpdateClustering,
-		SetClusterDistance = SetClusterDistance,
+		ExtractCluster = ExtractCluster,
 		GetClusterCoordinates = GetClusterCoordinates,
 		GetClusterCostCentroid = GetClusterCostCentroid,
 	}
