@@ -114,6 +114,7 @@ local function AddObjective(id, title, details, pos, status, color)
 			width = stack.width - 5 - 5,
 			padding = {0, 0, 0, 0},
 			tooltip = details,
+			hitTestAllowEmpty = true,	-- for old ZK chili
 			noSelfHitTest = false,
 			--backgroundColor = {1, 1, 1, 0},
 			OnClick = pos and {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end} or nil
