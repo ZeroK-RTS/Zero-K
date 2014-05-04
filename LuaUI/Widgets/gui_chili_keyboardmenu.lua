@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.033 Chili Keyboard Menu",
+    desc      = "v0.034 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -981,45 +981,37 @@ local function SetupCommands( modifier )
 						
 					for i=1,#actions do
 						local actionData = actions[i]
+						local actionCmd,actionExtra = actionData.command, actionData.extra
+						if not(actionCmd) then actionCmd,actionExtra = next(actionData) end
+						assert(actionCmd)
 						
-						-- [[
-						--comment out after 96.0
-						for actionCmd, actionExtra in pairs(actionData) do
-						--]]
+						local buildCommand = actionCmd:find('buildunit_')
 						
-							--[[
-							--uncomment after 96.0
-							local actionCmd = actionData.command
-							local actionExtra = actionData.extra
-							--]]
+						if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' and not buildCommand then 
+						
+							local actionOption = WG.crude.GetActionOption(actionCmd)
+							local actionName = actionOption and actionOption.name
+							local actionDesc = actionOption and actionOption.desc
 							
-							local buildCommand = actionCmd:find('buildunit_')
+							local label = actionName or actionCmd
+							local tooltip = actionDesc or (label  .. ' ' .. actionExtra)
+							local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd
 							
-							if not custom_cmd_actions[ actionCmd ] and actionCmd ~= 'radialbuildmenu' and not buildCommand then 
-							
-								local actionOption = WG.crude.GetActionOption(actionCmd)
-								local actionName = actionOption and actionOption.name
-								local actionDesc = actionOption and actionOption.desc
-								
-								local label = actionName or actionCmd
-								local tooltip = actionDesc or (label  .. ' ' .. actionExtra)
-								local action = actionExtra and actionExtra ~= '' and actionCmd .. ' ' .. actionExtra or actionCmd
-								
-								if label == 'luaui' then
-									label = actionExtra
-								end
-								
-								--create fake command and add it to list
-								curCommands[#curCommands+1] = {
-									type = '',
-									id = 99999,
-									name = label,
-									tooltip = tooltip,
-									action = action,
-								}
+							if label == 'luaui' then
+								label = actionExtra
 							end
 							
-						end --for
+							--create fake command and add it to list
+							curCommands[#curCommands+1] = {
+								type = '',
+								id = 99999,
+								name = label,
+								tooltip = tooltip,
+								action = action,
+							}
+						end
+							
+							
 					end
 				end
 				
