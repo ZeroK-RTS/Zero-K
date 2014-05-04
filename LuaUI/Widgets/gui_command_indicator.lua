@@ -153,6 +153,9 @@ function widget:Update(dt)
 end
 
 function widget:CommandNotify(id, params, options)
+	if params == nil then
+		return false
+	end
 	if #params >= 3 then
 		commands[#commands+1] = {
 			cmdID = id,
