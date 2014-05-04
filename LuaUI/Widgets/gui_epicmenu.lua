@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.41 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.42 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -2686,7 +2686,13 @@ local function MakeQuitButtons()
 		desc = "Abandon team and become spectator",
 		OnChange = function()
 				if not (isMission or Spring.GetSpectatingState()) then
-					MakeExitConfirmWindow("Are you sure you want to resign?", function() spSendCommands{"spectator"} end)
+					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
+						local paused = select(3, Spring.GetGameSpeed())
+						if (paused) then
+							spSendCommands("pause")
+						end
+						spSendCommands{"spectator"} 
+					end)
 				end
 			end,
 		key='Resign',
@@ -2699,8 +2705,14 @@ local function MakeQuitButtons()
 		name='Exit to Desktop',
 		desc = "Exit game completely",
 		OnChange = function() 
-			MakeExitConfirmWindow("Are you sure you want to quit the game?", function() spSendCommands{"quit","quitforce"} end)
-			end,
+			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
+				local paused = select(3, Spring.GetGameSpeed())
+				if (paused) then
+					spSendCommands("pause")
+				end
+				spSendCommands{"quit","quitforce"} 
+			end)
+		end,
 		key='Exit to Desktop',
 	})
 end
