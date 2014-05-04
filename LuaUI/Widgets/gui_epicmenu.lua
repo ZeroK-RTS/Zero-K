@@ -72,7 +72,6 @@ local useUiKeys = false
 local custom_cmd_actions = select(9, include("Configs/integral_menu_commands.lua"))
 
 
-
 --------------------------------------------------------------------------------
 
 -- Chili control classes
@@ -2698,7 +2697,7 @@ local function MakeQuitButtons()
 	AddOption('',{
 		type='button',
 		name='Exit to Desktop',
-		desc = "Ask teammates to resign",
+		desc = "Exit game completely",
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function() spSendCommands{"quit","quitforce"} end)
 			end,
@@ -2709,8 +2708,10 @@ end
 --Remakes crudemenu and remembers last submenu open
 RemakeEpicMenu = function()
 	local lastPath = curPath
-	KillSubWindow(true)
-	if lastPath ~= '' then
+	local subwindowOpen = window_sub_cur ~= nil
+	
+	KillSubWindow(subwindowOpen)
+	if subwindowOpen then
 		MakeSubWindow(lastPath, true)
 	end
 end

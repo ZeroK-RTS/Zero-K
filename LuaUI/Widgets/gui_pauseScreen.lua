@@ -8,7 +8,7 @@ function widget:GetInfo()
 		author    = "very_bad_soldier",
 		date      = "2009.08.16",
 		license   = "GNU GPL v2",
-		layer     = 0,
+		layer     = 2000,	-- make sure it's higher than Chili
 		enabled   = true
 	}
 end
