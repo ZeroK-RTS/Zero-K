@@ -13,8 +13,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 420,
-		subs    = 21,
+		default = 360,
+		subs    = 18,
 	},
 
 	explosionGenerator      = [[custom:greencannonimpact]],
