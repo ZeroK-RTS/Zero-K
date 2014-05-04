@@ -15,7 +15,8 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not VFS.FileExists("mission.lua") then
+local debugMode = false
+if not (VFS.FileExists("mission.lua") or debugMode) then
 	return
 end
 
@@ -65,70 +66,6 @@ local function Minimize()
 	mainWindow:AddChild(expandButton)
 end
 
-local function AddObjective(id, title, details, pos, status, color)
-	if not id then
-		Spring.Echo("<Objectives> Error: Attempt to add objective with no ID")
-		return
-	end
-	status = string.lower(status or '')
-	objectives[id] = {}
-	local obj = objectives[id]
-	obj.panel = Panel:New{
-		parent = stack;
-		height = panelHeight,
-		x = 5,
-		width = stack.width - 5 - 5,
-		padding = {0, 0, 0, 0},
-		tooltip = details,
-		hitTestAllowEmpty = true,
-		--backgroundColor = {1, 1, 1, 0},
-		OnClick = pos and {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end} or nil
-	}
-	obj.label = Label:New{
-		parent = obj.panel,
-		autosize = false;
-		align="left";
-		valign="center";
-		caption = title or '',
-		x = statusImageWidth + 8,
-		height = panelHeight,
-		width = obj.panel.width - statusImageWidth - 8,
-		font = {font = panelFont, size = fontsize, color = color or statusColors[status], shadow = true, outline = true,},
-	}
-	obj.image = Image:New{
-		parent = obj.panel,
-		width = statusImageWidth,
-		height = statusImageWidth,
-		x = 4, 
-		y = (panelHeight - statusImageWidth)/2,
-		keepAspect = true,
-		file = statusImages[status],
-	}
-	
-	-- implements button mouse functionality for the panel
-	function obj.panel:MouseDown(...)
-		local inherited = obj.panel.inherited
-		self._down = true
-		self.state.pressed = true
-		inherited.MouseDown(self, ...)
-		self:Invalidate()
-		return self
-	end
-
-	function obj.panel:MouseUp(...)
-		local inherited = obj.panel.inherited
-		if (self._down) then
-			self._down = false
-			self.state.pressed = false
-			inherited.MouseUp(self, ...)
-			self:Invalidate()
-			return self
-		end
-	end
-	
-	Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
-end
-
 local function ModifyObjective(id, title, details, pos, status, color)
 	if not id then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "<Objectives> Error: Attempt to modify objective with no ID")
@@ -159,6 +96,74 @@ local function ModifyObjective(id, title, details, pos, status, color)
 	Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
 end
 
+local function AddObjective(id, title, details, pos, status, color)
+	if not id then
+		Spring.Log(widget:GetInfo().name, LOG.WARNING, "Attempt to add objective with no ID")
+		return
+	end
+	status = string.lower(status or '')
+	if objectives[id] then	-- duplicate objective
+		ModifyObjective(id, title, details, pos, status, color)
+	else
+		objectives[id] = {}
+		local obj = objectives[id]
+		obj.panel = Panel:New{
+			parent = stack;
+			height = panelHeight,
+			x = 5,
+			width = stack.width - 5 - 5,
+			padding = {0, 0, 0, 0},
+			tooltip = details,
+			noSelfHitTest = false,
+			--backgroundColor = {1, 1, 1, 0},
+			OnClick = pos and {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end} or nil
+		}
+		obj.label = Label:New{
+			parent = obj.panel,
+			autosize = false;
+			align="left";
+			valign="center";
+			caption = title or '',
+			x = statusImageWidth + 8,
+			height = panelHeight,
+			width = obj.panel.width - statusImageWidth - 8,
+			font = {font = panelFont, size = fontsize, color = color or statusColors[status], shadow = true, outline = true,},
+		}
+		obj.image = Image:New{
+			parent = obj.panel,
+			width = statusImageWidth,
+			height = statusImageWidth,
+			x = 4, 
+			y = (panelHeight - statusImageWidth)/2,
+			keepAspect = true,
+			file = statusImages[status],
+		}
+		
+		-- implements button mouse functionality for the panel
+		function obj.panel:MouseDown(...)
+			local inherited = obj.panel.inherited
+			self._down = true
+			self.state.pressed = true
+			inherited.MouseDown(self, ...)
+			self:Invalidate()
+			return self
+		end
+	
+		function obj.panel:MouseUp(...)
+			local inherited = obj.panel.inherited
+			if (self._down) then
+				self._down = false
+				self.state.pressed = false
+				inherited.MouseUp(self, ...)
+				self:Invalidate()
+				return self
+			end
+		end
+		
+		Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
+	end
+end
+
 local function RemoveObjective(id)
 	if not id then
 		Spring.Echo("<Objectives> Error: Attempt to delete objective with no ID")
@@ -179,7 +184,8 @@ local function MakeTestObjectives()
 	ModifyObjective("dontRead", nil, "What did I tell you? You just lost The Game!", nil, "failed")
 	AddObjective("pad1", "Padding 1", "", nil, "incomplete")
 	AddObjective("pad2", "Padding 2", nil, nil, "complete")
-	AddObjective("pad3", "Padding 3", "test", nil, "failed")
+	AddObjective("pad3", "Padding 3", "test", nil, "incomplete")
+	AddObjective("pad3", "Padding 3.1", nil, nil, "failed")
 end
 
 --------------------------------------------------------------------------------
@@ -232,7 +238,7 @@ function widget:Initialize()
 			end},
 		padding = {8,8,8,8},
 		keepAspect = true,
-		tooltip = "Show objectives"
+		tooltip = "Show objectives",
 	}
 	
 	expandButtonImage = Image:New{
@@ -310,7 +316,10 @@ function widget:Initialize()
 	WG.AddObjective = AddObjective
 	WG.ModifyObjective = ModifyObjective
 	WG.RemoveObjective = RemoveObjective
-	--MakeTestObjectives()
+	
+	if debugMode then
+		MakeTestObjectives()
+	end
 end
 
 function widget:Shutdown()
