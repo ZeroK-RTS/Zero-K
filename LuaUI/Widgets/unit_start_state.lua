@@ -41,7 +41,7 @@ options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTac
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
-    holdPosition = {
+	holdPosition = {
 		type='button',
 		name= "Hold Position",
 		desc = "Set all land units to hold position",
@@ -357,7 +357,7 @@ local function addUnit(defName, path)
 	if (ud.canMove or ud.isFactory) then
 		options[defName .. "_retreatpercent"] = {
 			name = "  Retreat at value",
-			desc = "Values: inherit from factory, no retreat, 30%, 60%, 90% health remaining",
+			desc = "Values: inherit from factory, no retreat, 33%, 65%, 99% health remaining",
 			type = 'number',
 			value = -1,
 			min = -1,
