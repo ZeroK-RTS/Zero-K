@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.42 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.43 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -578,15 +578,35 @@ local function WidgetEnabled(wname)
 	return order and (order > 0)
 end
 
-local function AmIPlayingAlone()
-	local spectating = Spring.GetSpectatingState()
+local function AmIPlayingAlone() --I am playing and playing alone with no other player existing
+	if Spring.GetSpectatingState() then
+		return false
+	end
+	local playerlist = Spring.GetPlayerList() or {}
+	local myPlayerID = Spring.GetMyPlayerID()
+ 	for i=1, #playerlist do
+		local playerID = playerlist[i]
+		if myPlayerID ~= playerID then
+			_,active,spectator = Spring.GetPlayerInfo(playerID)
+			if active and not spectator then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+local function PlayingButNoTeammate() --I am playing and playing alone with no teammate
+	if Spring.GetSpectatingState() then
+		return false
+	end
 	local myAllyTeamID = Spring.GetMyAllyTeamID() -- get my alliance ID
 	local teams = Spring.GetTeamList(myAllyTeamID) -- get list of teams in my alliance
-	if #teams == 1 and (not spectating) then -- if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
+	if #teams == 1 then -- if I'm alone and playing (no ally)
 		return true
 	end
 	return false
-end			
+end
 
 -- Kill submenu window
 local function KillSubWindow(makingNew)
@@ -596,7 +616,7 @@ local function KillSubWindow(makingNew)
 		window_sub_cur:Dispose()
 		window_sub_cur = nil
 		curPath = ''
-		if AmIPlayingAlone() and not makingNew then
+		if not makingNew and AmIPlayingAlone() then
 			local paused = select(3, Spring.GetGameSpeed())
 			if paused then
 				spSendCommands("pause")
@@ -2240,7 +2260,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:AddChild(window_sub_cur)
-			if AmIPlayingAlone() and (not dontChangePause) then
+			if (not dontChangePause) and AmIPlayingAlone() then
 				local paused = select(3, Spring.GetGameSpeed())
 				if (not paused) and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -2254,7 +2274,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:RemoveChild(window_sub_cur)
-			if AmIPlayingAlone() and (not dontChangePause) then
+			if (not dontChangePause) and AmIPlayingAlone() then
 				local paused = select(3, Spring.GetGameSpeed())
 				if paused and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -2670,14 +2690,14 @@ local function MakeQuitButtons()
 		name='Vote Resign',
 		desc = "Ask teammates to resign",
 		OnChange = function()
-				if not (Spring.GetSpectatingState() or AmIPlayingAlone() or isMission) then
+				if not (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) then
 					spSendCommands("say !voteresign")
 					ActionMenu()
 				end
 			end,
 		key='Vote Resign',
 		DisableFunc = function() 
-			return (Spring.GetSpectatingState() or AmIPlayingAlone() or isMission) 
+			return (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) 
 		end, --function that trigger grey colour on buttons (not actually disable their functions)
 	})
 	AddOption('',{
@@ -2688,7 +2708,7 @@ local function MakeQuitButtons()
 				if not (isMission or Spring.GetSpectatingState()) then
 					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
 						local paused = select(3, Spring.GetGameSpeed())
-						if (paused) then
+						if (paused) and AmIPlayingAlone() then
 							spSendCommands("pause")
 						end
 						spSendCommands{"spectator"} 
@@ -2707,7 +2727,7 @@ local function MakeQuitButtons()
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
 				local paused = select(3, Spring.GetGameSpeed())
-				if (paused) then
+				if (paused) and AmIPlayingAlone() then
 					spSendCommands("pause")
 				end
 				spSendCommands{"quit","quitforce"} 
