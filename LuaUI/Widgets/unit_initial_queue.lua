@@ -1,4 +1,4 @@
-local version = "v1.53"
+local version = "v1.54"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -74,7 +74,7 @@ local function GetBuildingDimensions(uDefID, facing)
 		return 4 * bDef.xsize, 4 * bDef.zsize
 	end
 end
-local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,teamID)
+local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,teamID,drawSelectionBox)
 
 	local bDefID, bx, by, bz, facing = buildData[1], buildData[2], buildData[3], buildData[4], buildData[5]
 	local bw, bh = GetBuildingDimensions(bDefID, facing)
@@ -82,10 +82,12 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	gl.DepthTest(false)
 	gl.Color(borderColor)
 
-	gl.Shape(GL.LINE_LOOP, {{v={bx - bw, by, bz - bh}},
-							{v={bx + bw, by, bz - bh}},
-							{v={bx + bw, by, bz + bh}},
-							{v={bx - bw, by, bz + bh}}})
+	if drawSelectionBox then
+		gl.Shape(GL.LINE_LOOP, {{v={bx - bw, by, bz - bh}},
+								{v={bx + bw, by, bz - bh}},
+								{v={bx + bw, by, bz + bh}},
+								{v={bx - bw, by, bz + bh}}})
+	end
 
 	if drawRanges then
 		--[[
@@ -327,12 +329,12 @@ function widget:DrawWorld()
 		local buildData = buildQueue[b]
 		--[[
 		if selBuildData and DoBuildingsClash(selBuildData, buildData) then
-			DrawBuilding(buildData, borderClashColor, buildingQueuedAlpha)
+			DrawBuilding(buildData, borderClashColor, buildingQueuedAlpha,false,myTeamID,true)
 			clash = true
 		end
 		--]]
 		--else
-			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha,false,myTeamID)
+			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha,false,myTeamID,true)
 		--end
 		
 		queueLineVerts[#queueLineVerts + 1] = {v={buildData[2], buildData[3], buildData[4]}}
@@ -352,7 +354,7 @@ function widget:DrawWorld()
 		queueLineVerts = startChosen and {{v={sx, sy, sz}}} or {}
 		for b = 1, #playerXBuildQueue do
 			local buildData = playerXBuildQueue[b]
-			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha,false,teamID)
+			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha,false,teamID,false)
 			queueLineVerts[#queueLineVerts + 1] = {v={buildData[2], buildData[3], buildData[4]}}
 		end
 		-- Draw queue lines
@@ -366,9 +368,9 @@ function widget:DrawWorld()
 	--[[
 	if selBuildData then
 		if (not clash) and Spring.TestBuildOrder(selDefID, selBuildData[2], selBuildData[3], selBuildData[4], selBuildData[5]) ~= 0 then
-			DrawBuilding(selBuildData, borderValidColor, 1.0, true,myTeamID)
+			DrawBuilding(selBuildData, borderValidColor, 1.0, true,myTeamID,true)
 		else
-			DrawBuilding(selBuildData, borderInvalidColor, 1.0, true,myTeamID)
+			DrawBuilding(selBuildData, borderInvalidColor, 1.0, true,myTeamID,true)
 		end
 	end
 	--]]

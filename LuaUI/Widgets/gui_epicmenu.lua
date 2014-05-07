@@ -587,7 +587,7 @@ local function AmIPlayingAlone() --I am playing and playing alone with no other 
  	for i=1, #playerlist do
 		local playerID = playerlist[i]
 		if myPlayerID ~= playerID then
-			_,active,spectator = Spring.GetPlayerInfo(playerID)
+			local _,active,spectator = Spring.GetPlayerInfo(playerID)
 			if active and not spectator then
 				return false
 			end
