@@ -1,4 +1,4 @@
-local version = "v1.52"
+local version = "v1.53"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -15,6 +15,7 @@ end
 -- 20 march 2013: added keyboard support with BA keybinds (Bluestone)
 -- august 2013: send queue length to cmd_idle_players (BrainDamage)
 
+--TODO: find way to detect GameStart countdown, so that we can remove button before GameStart (not after gamestart) since it will cause duplicate button error.
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -49,7 +50,8 @@ local buildDistance = sDef.buildDistance
 local selDefID = nil -- Currently selected def ID
 local buildQueue = {}
 local buildNameToID = {}
-local gameStarted = false 
+local gameStarted = false
+local othersBuildQueue = {}
 
 local isMex = {} -- isMex[uDefID] = true / nil
 local weaponRange = {} -- weaponRange[uDefID] = # / nil
@@ -72,7 +74,7 @@ local function GetBuildingDimensions(uDefID, facing)
 		return 4 * bDef.xsize, 4 * bDef.zsize
 	end
 end
-local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges)
+local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,teamID)
 
 	local bDefID, bx, by, bz, facing = buildData[1], buildData[2], buildData[3], buildData[4], buildData[5]
 	local bw, bh = GetBuildingDimensions(bDefID, facing)
@@ -109,7 +111,7 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges)
 		gl.Translate(bx, by, bz)
 		gl.Rotate(90 * facing, 0, 1, 0)
 		gl.Texture("%"..bDefID..":0") --.s3o texture atlas for .s3o model
-		gl.UnitShape(bDefID, Spring.GetMyTeamID())
+		gl.UnitShape(bDefID, teamID)
 		gl.Texture(false)
 	gl.PopMatrix()
 
@@ -283,11 +285,11 @@ end
 
 function widget:DrawWorld()
 	--don't draw anything once the game has started; after that engine can draw queues itself
-	if gameStarted then 
+	if gameStarted then
 		return 
 	end
 
-	local clash = false
+	-- local clash = false
 	
 	-- Set up gl
 	gl.LineWidth(1.49)
@@ -303,8 +305,8 @@ function widget:DrawWorld()
 			selBuildData = {selDefID, bx, by, bz, buildFacing}
 		end
 	end
-
-	local myTeamID = Spring.GetMyTeamID()
+	
+	-- local myTeamID = Spring.GetMyTeamID()
 	local sx, sy, sz = Spring.GetTeamStartPosition(myTeamID) -- Returns -100, -100, -100 when none chosen
 	local startChosen = (sx ~= -100)
 	if startChosen then
@@ -323,15 +325,16 @@ function widget:DrawWorld()
 	local queueLineVerts = startChosen and {{v={sx, sy, sz}}} or {}
 	for b = 1, #buildQueue do
 		local buildData = buildQueue[b]
-
+		--[[
 		if selBuildData and DoBuildingsClash(selBuildData, buildData) then
-		--	DrawBuilding(buildData, borderClashColor, buildingQueuedAlpha)
+			DrawBuilding(buildData, borderClashColor, buildingQueuedAlpha)
 			clash = true
 		end
+		--]]
 		--else
-			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha)
+			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha,false,myTeamID)
 		--end
-
+		
 		queueLineVerts[#queueLineVerts + 1] = {v={buildData[2], buildData[3], buildData[4]}}
 	end
 
@@ -341,14 +344,34 @@ function widget:DrawWorld()
 	gl.Shape(GL.LINE_STRIP, queueLineVerts)
 	gl.LineStipple(false)
 
+	for teamID,playerXBuildQueue in pairs(othersBuildQueue)do
+		sx, sy, sz = Spring.GetTeamStartPosition(teamID) -- Returns -100, -100, -100 when none chosen
+		startChosen = (sx ~= -100)
+
+		-- Draw all the buildings
+		queueLineVerts = startChosen and {{v={sx, sy, sz}}} or {}
+		for b = 1, #playerXBuildQueue do
+			local buildData = playerXBuildQueue[b]
+			DrawBuilding(buildData, borderNormalColor, buildingQueuedAlpha,false,teamID)
+			queueLineVerts[#queueLineVerts + 1] = {v={buildData[2], buildData[3], buildData[4]}}
+		end
+		-- Draw queue lines
+		gl.Color(buildLinesColor)
+		gl.LineStipple("springdefault")
+		gl.Shape(GL.LINE_STRIP, queueLineVerts)
+		gl.LineStipple(false)
+	end
+	
 	-- Draw selected building
+	--[[
 	if selBuildData then
 		if (not clash) and Spring.TestBuildOrder(selDefID, selBuildData[2], selBuildData[3], selBuildData[4], selBuildData[5]) ~= 0 then
-			DrawBuilding(selBuildData, borderValidColor, 1.0, true)
+			DrawBuilding(selBuildData, borderValidColor, 1.0, true,myTeamID)
 		else
-			DrawBuilding(selBuildData, borderInvalidColor, 1.0, true)
+			DrawBuilding(selBuildData, borderInvalidColor, 1.0, true,myTeamID)
 		end
 	end
+	--]]
 
 	-- Reset gl
 	gl.Color(1.0, 1.0, 1.0, 1.0)
@@ -358,6 +381,41 @@ end
 function widget:ViewResize(vsx, vsy)
 	scrW = vsx
 	scrH = vsy
+end
+
+local function explode(div,str) --copied from gui_epicmenu.lua
+  if (div=='') then return false end
+  local pos,arr = 0,{}
+  -- for each divider found
+  for st,sp in function() return string.find(str,div,pos,true) end do
+    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
+    pos = sp + 1 -- Jump past current divider
+  end
+  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
+  return arr
+end
+
+function widget:RecvLuaMsg(msg, playerID)
+	if myPlayerID~=playerID and msg:sub(1,3) == "IQ|" then
+		msg = msg:sub(4)
+		local msgArray = explode('|',msg)
+		local typeArg, _2ndArg = tonumber(msgArray[1]), tonumber(msgArray[2])
+		if not (_2ndArg and typeArg) then 
+			return
+		end
+		local _,_,_,teamID = Spring.GetPlayerInfo(playerID)
+		othersBuildQueue[teamID] = othersBuildQueue[teamID] or {}
+		local playerXBuildQueue = othersBuildQueue[teamID]
+		if typeArg == 1 then
+			table.insert(playerXBuildQueue, 1, {_2ndArg,tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])})
+		elseif typeArg == 2 then
+			table.remove(playerXBuildQueue, _2ndArg)
+		elseif typeArg == 3 then
+			playerXBuildQueue[#playerXBuildQueue+1] = {_2ndArg,tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])}
+		elseif typeArg == 4 then
+			othersBuildQueue[teamID] = {{_2ndArg,tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])}}
+		end
+	end
 end
 
 ------------------------------------------------------------
@@ -567,7 +625,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		if cmdOptions.meta then
 			table.insert(buildQueue, 1, buildData)
-
+			Spring.SendLuaUIMsg("IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing,"a")
 		elseif cmdOptions.shift then
 
 			local anyClashes = false
@@ -575,14 +633,17 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				if DoBuildingsClash(buildData, buildQueue[i]) then
 					anyClashes = true
 					table.remove(buildQueue, i)
+					Spring.SendLuaUIMsg("IQ|2|"..i,"a")
 				end
 			end
 
 			if not anyClashes then
 				buildQueue[#buildQueue + 1] = buildData
+				Spring.SendLuaUIMsg("IQ|3|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing,"a")
 			end
 		else
 			buildQueue = {buildData}
+			Spring.SendLuaUIMsg("IQ|4|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing,"a")
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
