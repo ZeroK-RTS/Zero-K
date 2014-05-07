@@ -23,13 +23,15 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    --description_bp = [[Veículo escaramuçador]], -- janus legacy, claims its a vehicle
+    description_bp = [[Hovercraft escaramuçador]],
+    description_de = [[Skirmisher Gleiter (Anti-Heavy)]],
     description_fr = [[Hovercraft Tirailleur]],
-	description_de = [[Skirmisher Gleiter (Anti-Heavy)]],
+    description_pl = [[Poduszkowiec harcownik]],
     helptext       = [[Use the Scalpel for hit-and-run attacks. Has a long reload time and not too many hit points, and should always be kept at range with the enemy. An arcing projectile allows it to shoot over obstacles and friendly units.]],
+    helptext_de    = [[Nutze den Scalpel für Schlag-und-Renn Attacken. Er hat eine lange Nachladezeit und nicht allzu viele Lebenspunkte. Er sollte immer auf Distanz zum Feind gehalten werden. Die bogenförmige Schussbahn ermöglicht es über Hindernisse und freundliche Einheiten zu schießen.]],
     helptext_bp    = [[Scalpel é um escaramuçador: Use-o para ataques de bater e correr. Demora para recarregar e n?o é muito resistente, devendo sempre ser mantido a distância do inimigo. Seus projéteis de trajetória curva superam obstáculos.]],
     helptext_fr    = [[Le Scalpel est un tirailleur, il est utile pour harrasser l'ennemi ? l'aide de son lance roquette. Il tire des roquettes ? t?te chercheuse au dessus des obstacles, mais son temps de rechargement, sa maniabilit? et son faible blindage le rendent vuln?rable aux contre attaques.]],
-	helptext_de    = [[Nutze den Scalpel für Schlag-und-Renn Attacken. Er hat eine lange Nachladezeit und nicht allzu viele Lebenspunkte. Er sollte immer auf Distanz zum Feind gehalten werden. Die bogenförmige Schussbahn ermöglicht es über Hindernisse und freundliche Einheiten zu schießen.]],
+    helptext_pl    = [[Scalpel najlepiej nadaje sie do atakow nekajacych. Dlugi czas przeladowania i niska wytrzymalosc powoduja, ze wymaga ochrony i poswiecenia uwagi, by nie zblizal sie zbytnio do wrogich jednostek. Zakrzywiona trajektoria pociskow pozwala Scalpelowi na strzelanie ponad przeszkodami i sojuszniczymi jednostkami.]],
 	modelradius    = [[19]],
 	turnatfullspeed = [[1]],
   },
