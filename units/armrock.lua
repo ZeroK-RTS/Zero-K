@@ -21,18 +21,20 @@ unitDef = {
 
   customParams           = {
     description_bp = [[Robô escaramuçador]],
+    description_de = [[Skirmisher Roboter (Direkt-Feuer)]],
     description_fi = [[Kahakoitsijarobotti]],
     description_fr = [[Robot Tirailleur]],
     description_it = [[Robot Da Scaramuccia]],
     description_es = [[Robot Escaramuzador]],
-	description_de = [[Skirmisher Roboter (Direkt-Feuer)]],
+    description_pl = [[Bot harcownik]],
     helptext       = [[The Rocko's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles.]],
     helptext_bp    = [[Rocko é o robô escaramuçador básico de Nova. Seu pouco poder de fogo e a baixa velocidade de seus foguetes s?o compensados por seu alcançe. Eles sao mais efetivos posicionados em linha, atirando da distância máxima. Se protega deles atacando-os com unidades rápidas ou construindo uma barreira a frente de suas defesas.]],
+    helptext_de    = [[Rockos geringer Schaden und die geringe Geschwindigkeit der Raketen wird durch seine Reichweite aufgehoben. Sie sind an Fronten sehr effektiv, da sie dort mit maximaler Reichweite agieren können. Kontere sie, indem du schnelle Einheiten schickst oder Verteidigung hinter einer Terraformmauer baust.]],
     helptext_es    = [[El bajo da?o y la baja velocidad de los cohetes sin gu?a del Rocko son redimidos por su alcance.  Son m?s efectivos en una l?nea, disparando al m?ximo alcance. Se contrastan atac?ndolos con unidades r?pidas o poiniendo tus defensas detr?s de un muro de terraform.]],
     helptext_fi    = [[Rockon hitaat, ohjaamattomat ja suhteellisen heikot raketit hy?tyv?t pitk?st? kantamastaan. Rockot ovat tehokkaimmillaan riviss?, kaukaisia kohteita ampuessaan. Torju nopealiikkeisill? yksik?ill? tai muokkaamalla maastoa puolustuslinjojen edest?.]],
     helptext_fr    = [[La faible puissance de feux et la lenteur des roquettes non guid?s du Rocko son conpens?es par sa port?e de tire. Ils sont le plus ?fficace en formation de ligne, en tirant ? port?e maximale. Contrez le en attaquant avec des unit?s rapide ou bien placer vos d?fenses derriere un mure t?rraform?.]],
     helptext_it    = [[Il basso danno e la bassa velocita dei razzi non guidati del Rocko riscattati dal suo raggio. Sono al meglio in una linea, attaccando dal suo raggio massimo. Si contrastano attaccandoli con unita veloci, o mettendo le tue difese dietro di un muro di terraform.]],
-	helptext_de    = [[Rockos geringer Schaden und die geringe Geschwindigkeit der Raketen wird durch seine Reichweite aufgehoben. Sie sind an Fronten sehr effektiv, da sie dort mit maximaler Reichweite agieren können. Kontere sie, indem du schnelle Einheiten schickst oder Verteidigung hinter einer Terraformmauer baust.]],
+    helptext_pl    = [[Rocko jest uzbrojony w powolne rakiety, ktore mimo niskich obrazen i braku samonaprowadzania maja duzy zasieg. Najlepiej sprawdzaja sie stojac w linii prostopadlej do celu, atakujac z maksymalnej odleglosci i nie dajac sie zlapac przeciwnikom. Mozna je pokonac lekkimi jednostkami, ktore sa w stanie unikac ich rakiet, dogonic je i zniszczyc.]],
 	modelradius    = [[13]],
   },
 
