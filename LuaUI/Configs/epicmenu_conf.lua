@@ -402,7 +402,7 @@ path='Settings/Graphics'
 		function()
 			local curShadow=Spring.GetConfigInt("Shadows") or 0
 			if curShadow == 0 then
-				Spring.Echo 'Shadows are turned off. You must first enable them using the above slider.'
+				Spring.Echo 'Shadows are turned off, you must first enable them.'
 				return
 			end
 			if (curShadow<2) then 

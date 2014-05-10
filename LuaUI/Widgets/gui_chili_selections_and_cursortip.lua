@@ -139,7 +139,7 @@ local iconFormat = ''
 local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
-local tildepressed, drawing, erasing, addingPoint
+local drawing, erasing, addingPoint
 
 local windTooltips = {
 	["armwin"] = true,
@@ -468,7 +468,9 @@ end
 --functions
 
 local function DrawScreenDrawTools()
-	if not tildepressed then return end
+	if not Spring.GetKeyState(KEYSYMS.BACKQUOTE) then 
+		return 
+	end
 	local x, y, lmb, mmb, rmb = Spring.GetMouseState()
 	drawing = lmb
 	erasing = rmb
@@ -1914,7 +1916,7 @@ local function MakeToolTip_Terra(cmdName)
 end
 
 local function MakeTooltip()
-	if options.showdrawtooltip.value and tildepressed and not (drawing or erasing) then
+	if options.showdrawtooltip.value and Spring.GetKeyState(KEYSYMS.BACKQUOTE) and not (drawing or erasing) then
 		MakeToolTip_Draw()
 		return
 	end
@@ -2241,7 +2243,7 @@ function widget:Update(dt)
 		showExtendedTip = true
 	
 	else
-		if (options.tooltip_delay.value > 0) and not tildepressed then
+		if (options.tooltip_delay.value > 0) and not Spring.GetKeyState(KEYSYMS.BACKQUOTE) then
 			if not mousemoved then
 				stillCursorTime = stillCursorTime + dt
 			else
@@ -2258,7 +2260,7 @@ function widget:Update(dt)
 	end
 
 	if mousemoved or changeNow then
-		if not show_cursortip and not tildepressed then
+		if not show_cursortip and not Spring.GetKeyState(KEYSYMS.BACKQUOTE) then
 			KillTooltip()
 			return
 		end
@@ -2393,23 +2395,6 @@ function widget:Shutdown()
 		window_tooltip2:Dispose()
 	end
 	Spring.SetDrawSelectionInfo(true)
-end
-
-function widget:KeyPress(key, modifier, isRepeat)
-	if key == KEYSYMS.BACKQUOTE then
-		if not tildepressed then
-			changeNow = true
-		end	
-		tildepressed = true
-	end
-end
-function widget:KeyRelease(key)
-	if key == KEYSYMS.BACKQUOTE then
-		if tildepressed then
-			changeNow = true
-		end
-		tildepressed = false
-	end
 end
 
 --lags like a brick due to being spammed constantly for unknown reason, moved all its behavior to SelectionChanged

@@ -165,6 +165,7 @@ local function drawGraph(graphArray, graph_m, teamID)
 		height  = "100%",
 		width   = "100%",
 		padding = {0,0,0,0},
+		drawcontrolv2 = true,
 		DrawControl = function (obj)
 			local x = obj.x
 			local y = obj.y
