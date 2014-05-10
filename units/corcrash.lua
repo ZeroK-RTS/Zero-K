@@ -155,6 +155,7 @@ unitDef = {
       metal            = 18,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
+      reclaimTime      = 18,
     },
 
   },
