@@ -376,15 +376,27 @@ path='Settings/Graphics'
 		valuelist = {512, 1024, 2048, 4096},
 		springsetting = 'ShadowMapSize',
 		OnChange=function(self)
-			if self.value == 512 then
-				spSendCommands{"Shadows 0 0"} --doing this sets shadowmapsize to 512. It will look at the springsetting field and we'll turn shadows off if 512.
+			local curShadow = Spring.GetConfigInt("Shadows") or 0
+			if curShadow == 0 then
 				return
 			end
-			local curShadow = Spring.GetConfigInt("Shadows") or 0
 			curShadow=math.max(1,curShadow)
 			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
 		end, 
 	} )
+	
+	ShButton('Toggle Shadows',
+		function()
+			local curShadow = Spring.GetConfigInt("Shadows") or 0
+			if curShadow == 0 then
+				spSendCommands{"Shadows 1"}
+			elseif curShadow > 0 then
+				spSendCommands{"Shadows 0"}
+			elseif curShadow == -1 then
+				Spring.Echo("Shadows cannot be toggled ingame with Shadows = -1 in springsettings")
+			end
+		end
+	)
 
 	ShButton('Toggle Terrain Shadows',
 		function()
@@ -393,7 +405,11 @@ path='Settings/Graphics'
 				Spring.Echo 'Shadows are turned off. You must first enable them using the above slider.'
 				return
 			end
-			if (curShadow<2) then curShadow=2 else curShadow=1 end
+			if (curShadow<2) then 
+				curShadow=2 
+			else 
+				curShadow=1 
+			end
 			spSendCommands{"Shadows "..curShadow}
 		end
 	)
