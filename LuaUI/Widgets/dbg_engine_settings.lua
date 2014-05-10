@@ -26,7 +26,7 @@ local tags = {
 }
 
 function widget:Initialize()
-  if not (Game.version:find('91.')) then
+  if not ((Game.version:find('91.0') == 1)) then
     for tag, value in pairs(tags) do
       Spring.SetConfigInt(tag, value)
     end

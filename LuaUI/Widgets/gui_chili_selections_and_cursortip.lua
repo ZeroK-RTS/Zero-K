@@ -61,7 +61,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local reverseCompat = Game.version:find('91.') and 1 or 0
+local reverseCompat = (Game.version:find('91.0') == 1) and 1 or 0
 
 local Chili
 local Button

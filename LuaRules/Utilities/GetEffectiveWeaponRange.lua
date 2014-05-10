@@ -55,7 +55,7 @@ local function CalculateBallisticConstant(deltaV,myGravity,heightDiff)
 	return maxRange, t --return maximum range and flight time.
 end
 
-local reverseCompat = Game.version:find('91.')
+local reverseCompat = (Game.version:find('91.0') == 1)
 local function CalculateModdedMaxRange(heightDiff,weaponDef,modType)
 	local customMaxRange = weaponDef.range
 	local customHeightMod = weaponDef.heightMod

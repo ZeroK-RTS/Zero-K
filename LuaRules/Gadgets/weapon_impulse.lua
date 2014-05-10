@@ -43,7 +43,7 @@ local getMovetype = Spring.Utilities.getMovetype
 
 
 local UNSTICK_CONSTANT = 0
-if Game.version:find('91.') then
+if (Game.version:find('91.0') == 1) then
 	UNSTICK_CONSTANT = 2.74 -- for Spring 91.0
 elseif (Game.version:find('94') and Game.version:find('94.1.1')== nil) then
 	UNSTICK_CONSTANT = 3.00 -- for Spring 94.1

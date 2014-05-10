@@ -1400,7 +1400,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 								   a, b, c, d)
   local projectileID,attackerID
   local attackerDefID,attackerTeam
-  if Game.version:find('91.0') then 
+  if (Game.version:find('91.0') == 1) then 
 	attackerID = a 
     attackerDefID = b
     attackerTeam = c
@@ -1435,7 +1435,7 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
 		
-  if Game.version:find('91.0') then
+  if (Game.version:find('91.0') == 1) then
     attackerTeam = attackerDefID
     attackerDefID = attackerID
     attackerID = projectileID

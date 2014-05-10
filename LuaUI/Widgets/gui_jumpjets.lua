@@ -20,7 +20,7 @@ function widget:GetInfo()
   }
 end
 
-local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1'))
+local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1'))
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

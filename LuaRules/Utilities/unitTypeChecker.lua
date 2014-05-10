@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local isNewEngine = not (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil))
+local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
 
 function Spring.Utilities.getMovetype(ud)
 	if ud.canFly or ud.isAirUnit then

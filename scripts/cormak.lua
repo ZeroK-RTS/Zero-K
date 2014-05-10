@@ -301,7 +301,7 @@ function script.Killed(recentDamage, maxHealth)
   end
 end
 
-if Game.version:find('91.0') and (Game.version:find('91.0.1') == nil) then
+if (Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil) then
 	script.Killed = function(recentDamage, maxHealth)
 	  -- spawn debris etc.
 	  local wreckLevel = Killed(recentDamage, maxHealth)

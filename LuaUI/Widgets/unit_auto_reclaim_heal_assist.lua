@@ -30,7 +30,7 @@ local lastOrderGivenInSecs= 0
 local idleReclaimers={} --reclaimers because they all can reclaim
 
 myTeamID=-1;
-local reverseCompatibility = Game.version:find('91.') or (Game.version:find('94') and not Game.version:find('94.1.1')) -- for UnitDef Tag
+local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1')) -- for UnitDef Tag
 --------------------------------------------------------------------------------------
 
 

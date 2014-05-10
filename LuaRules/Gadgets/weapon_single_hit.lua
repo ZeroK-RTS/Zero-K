@@ -15,7 +15,7 @@ local spGetGameFrame = Spring.GetGameFrame
 ------ SYNCED -------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then 
 
-local isNewEngine = not (Game.version:find('91.0') and (Game.version:find('91.0.1') == nil))
+local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
 
 local singleHitWeapon = {}
 local singleHitUnitId = {}

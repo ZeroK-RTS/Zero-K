@@ -18,7 +18,7 @@ if (gadgetHandler:IsSyncedCode()) then
 --  «SYNCED»  ------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local reverseCompat = (Game.version:find('91.'))
+local reverseCompat = ((Game.version:find('91.0') == 1))
 
 --Speed-ups
 local spGetUnitDefID    = Spring.GetUnitDefID;

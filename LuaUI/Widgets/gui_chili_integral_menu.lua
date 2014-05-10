@@ -255,7 +255,7 @@ local gridMap = {
 
 -- DGun button progressbar, for listening to special-weapon reload progress
 --VFS.Include("LuaRules/Configs/customcmds.h.lua") --already included in "include("Configs/integral_menu_commands.lua")"
-local reverseCompat = Game.version:find('91.') and 1 or 0
+local reverseCompat = (Game.version:find('91.0') == 1) and 1 or 0
 local turnOffReloadableWeaponChecks = false
 local reloadableButton = {
 	[CMD.MANUALFIRE] = {progress=0,status=nil},

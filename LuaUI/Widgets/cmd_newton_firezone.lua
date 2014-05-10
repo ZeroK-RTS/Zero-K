@@ -22,7 +22,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local checkRate = 2 -- how fast Newton retarget. Default every 2 frame. Basically you control responsives and accuracy. On big setups checkRate = 1 is not recomended + count your ping in
 local newtonUnitDefID = UnitDefNames["corgrav"].id
 local newtonUnitDefRange = UnitDefNames["corgrav"].maxWeaponRange
-local calculateSimpleBallistic = Game.version:find('91.')
+local calculateSimpleBallistic = (Game.version:find('91.0') == 1)
 local mapGravity = Game.gravity/30/30
 local goneBallisticThresholdSQ = 8^2 --square of speed (in elmo per frame) before ballistic calculator predict unit trajectory
 
