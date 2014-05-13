@@ -22,7 +22,7 @@ unitDef = {
   category               = [[GUNSHIP]],
   collide                = false,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[60 20 100]],
+  collisionVolumeScales  = [[60 25 100]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[Box]],
   corpse                 = [[DEAD]],
@@ -39,6 +39,7 @@ unitDef = {
 	helptext_de    = [[Der Vindicator kann jede Landeinheit im Spiel befördern. Seine doppelläufige Laserkanone und sein automatisches Frachtauswurfsystem machen ihn ideal für den Transport von Einheiten in umkämpfte Landezonen.]],
 	helptext_pl    = [[Vindicator moze przewozic kazda jednostke naziemna. Jego wytrzymalosc i lekkie uzbrojenie sprawiaja, ze dobrze nadaje sie do dzialania w warunkach bojowych.]],
 	midposoffset   = [[0 0 0]],
+	aimposoffset   = [[0 10 0]],
 	modelradius    = [[15]],
   },
 

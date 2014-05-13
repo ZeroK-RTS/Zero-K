@@ -391,7 +391,7 @@ function script.BeginTransport( passengerID )
 	if loaded then 
 		return 
 	end
-	Move(link, y_axis, -Spring.GetUnitHeight(passengerID))
+	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15)
 	
 	--local px, py, pz = Spring.GetUnitBasePosition(passengerID)
 	SetUnitValue(COB.BUSY, 1)
