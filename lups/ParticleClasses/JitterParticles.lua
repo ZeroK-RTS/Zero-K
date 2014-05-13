@@ -24,7 +24,6 @@ function JitterParticles.GetInfo()
     distortion= true,
     rtt       = false,
     ctt       = false,
-    atiseries = 2,
   }
 end
 

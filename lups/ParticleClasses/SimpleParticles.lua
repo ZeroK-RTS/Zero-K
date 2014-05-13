@@ -24,7 +24,6 @@ function SimpleParticles.GetInfo()
     shader    = true,
     rtt       = false,
     ctt       = false,
-    atiseries = 1,
   }
 end
 

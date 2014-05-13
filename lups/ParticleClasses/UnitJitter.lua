@@ -25,7 +25,6 @@ function UnitJitter.GetInfo()
     fbo       = true,
     shader    = true,
     distortion= true,
-    atiseries = 2,
     intel     = 0,
   }
 end
@@ -282,7 +281,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function UnitJitter.Create(Options)
-  --SetUnitLuaDraw(Options.unit,true)
+  SetUnitLuaDraw(Options.unit,true)
 
   local newObject = MergeTable(Options, UnitJitter.Default)
   setmetatable(newObject,UnitJitter)  -- make handle lookup
@@ -291,7 +290,7 @@ function UnitJitter.Create(Options)
 end
 
 function UnitJitter:Destroy()
-  --SetUnitLuaDraw(self.unit,false)
+  SetUnitLuaDraw(self.unit,false)
 end
 
 -----------------------------------------------------------------------------------------------------------------

@@ -27,7 +27,6 @@ function JitterParticles2.GetInfo()
     distortion= true,
     rtt       = false,
     ctt       = false,
-    atiseries = 1,
   }
 end
 

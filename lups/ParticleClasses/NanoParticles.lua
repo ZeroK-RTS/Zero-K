@@ -25,7 +25,6 @@ function NanoParticles.GetInfo()
     shader    = true,
     rtt       = false,
     ctt       = false,
-    atiseries = 1,
   }
 end
 
@@ -62,7 +61,7 @@ NanoParticles.Default = {
   sizeGrowth  = 0.05,
   rotSpeed    = 0.15,
   particles   = 1,
-  texture     = 'bitmaps/PD/nano.tga',
+  texture     = 'bitmaps/PD/nano.png',
 
   --// internal used
   dlist       = 0,

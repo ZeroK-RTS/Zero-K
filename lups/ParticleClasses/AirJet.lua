@@ -26,7 +26,6 @@ function AirJet.GetInfo()
     fbo       = true,
     shader    = true,
     distortion= true,
-    atiseries = 2,
     ms        = -1,
     intel     = -1,
   }
@@ -34,6 +33,11 @@ end
 
 
 AirJet.Default = {
+  --// visibility check
+  los            = true,
+  airLos         = true,
+  radar          = false,
+  
   layer = 4,
   life  = math.huge,
   repeatEffect  = true,
@@ -55,6 +59,15 @@ AirJet.Default = {
 
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
+local spGetPositionLosState = Spring.GetPositionLosState
+local spGetUnitLosState     = Spring.GetUnitLosState
+local spIsSphereInView      = Spring.IsSphereInView
+local spGetUnitRadius       = Spring.GetUnitRadius
+
+local IsPosInLos    = Spring.IsPosInLos
+local IsPosInAirLos = Spring.IsPosInAirLos
+local IsPosInRadar  = Spring.IsPosInRadar
 
 local spGetGameSeconds = Spring.GetGameSeconds
 local glUseShader = gl.UseShader
@@ -340,6 +353,29 @@ function AirJet:Destroy()
   glDeleteList(self.dList)
 end
 
+function AirJet:Visible()
+  local radius = self.length
+  local posX,posY,posZ = self.pos[1],self.pos[2],self.pos[3]
+  local losState
+  if (self.unit and not self.worldspace) then
+    losState = (spGetUnitLosState(self.unit, LocalAllyTeamID) or {}).los or false
+    local ux,uy,uz = spGetUnitViewPosition(self.unit)
+    posX,posY,posZ = posX+ux,posY+uy,posZ+uz
+    radius = radius + spGetUnitRadius(self.unit)
+  end
+  if (losState==nil) then
+    if (self.radar) then
+      losState = IsPosInRadar(posX,posY,posZ, LocalAllyTeamID)
+    end
+    if ((not losState) and self.airLos) then
+      losState = IsPosInAirLos(posX,posY,posZ, LocalAllyTeamID)
+    end
+    if ((not losState) and self.los) then
+      losState = IsPosInLos(posX,posY,posZ, LocalAllyTeamID)
+    end
+  end
+  return (losState)and(spIsSphereInView(posX,posY,posZ,radius))
+end
 -----------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 
