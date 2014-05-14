@@ -446,7 +446,7 @@ options = {
 		name = "Autohide time",
 		type = 'number',
 		value = 8,
-		min = 1, max = 10, step = 1, 
+		min = 1, max = 30, step = 1, 
 		OnChange = onOptionsChanged,
 	},
 	
