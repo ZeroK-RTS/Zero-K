@@ -246,7 +246,7 @@ local function OptionsChanged()
   ReloadSounds()
 end
 
-options_path = 'Settings/Misc/Announcer' -- don't know where to put it!
+options_path = 'Settings/Audio/Announcer' -- don't know where to put it!
 options_order = { 
   'announcer_mode',
   'announcer_volume',
