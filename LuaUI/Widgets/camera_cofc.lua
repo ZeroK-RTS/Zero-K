@@ -1489,8 +1489,8 @@ function widget:Update(dt)
 	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
     
 	if hideCursor then
-        spSetMouseCursor('%none%')
-    end
+		spSetMouseCursor('%none%')
+	end
 	
 	--//HANDLE TIMER FOR VARIOUS SECTION
 	--timer to block tracking when using mouse
@@ -1652,34 +1652,36 @@ function widget:Update(dt)
 	mx, my = spGetMouseState()
 	
 	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
-	if options.edgemove.value then
-		move2.right = false --reset mouse move state
-		move2.left = false
-		move2.up = false
-		move2.down = false
-		
-		if mx > vsx-2 then 
-			move2.right = true
-		elseif mx < 2 then
-			move2.left = true
-		end
-		if my > vsy-2 then
-			move2.up = true
-		elseif my < 2 then
-			move2.down = true
-		end
-		
-	elseif options.rotateonedge.value then
-		rot = {}
-		if mx > vsx-2 then 
-			rot.right = true 
-		elseif mx < 2 then
-			rot.left = true
-		end
-		if my > vsy-2 then
-			rot.up = true
-		elseif my < 2 then
-			rot.down = true
+	if WG.IsGUIHidden and (not WG.IsGUIHidden()) then
+		if options.edgemove.value then
+			move2.right = false --reset mouse move state
+			move2.left = false
+			move2.up = false
+			move2.down = false
+			
+			if mx > vsx-2 then 
+				move2.right = true
+			elseif mx < 2 then
+				move2.left = true
+			end
+			if my > vsy-2 then
+				move2.up = true
+			elseif my < 2 then
+				move2.down = true
+			end
+			
+		elseif options.rotateonedge.value then
+			rot = {}
+			if mx > vsx-2 then 
+				rot.right = true 
+			elseif mx < 2 then
+				rot.left = true
+			end
+			if my > vsy-2 then
+				rot.up = true
+			elseif my < 2 then
+				rot.down = true
+			end
 		end
 	end
 	
