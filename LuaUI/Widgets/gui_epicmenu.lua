@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.43 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.431 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -110,7 +110,7 @@ local explodeSearchTerm = {text="", terms={}} -- store exploded "filterUserInser
 --------------------------------------------------------------------------------
 -- Misc
 local B_HEIGHT = 26
-local B_WIDTH_TOMAINMENU = 100	--160
+local B_WIDTH_TOMAINMENU = 80 --100 --160
 local C_HEIGHT = 16
 
 local scrH, scrW = 0,0
@@ -2374,7 +2374,7 @@ local function MakeMenuBar()
 	local crude_height = B_HEIGHT+10
 	
 
-	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={4,4,4,4}, }
+	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
 	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
 	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,6}  }
@@ -2500,7 +2500,6 @@ local function MakeMenuBar()
 						
 				children = {
 					--GAME LOGO GOES HERE
-					
 					Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
 					
 					--[[
@@ -2521,6 +2520,8 @@ local function MakeMenuBar()
 							Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
 						},
 					},
+					--]]
+					
 					Button:New{
 						name= 'tweakGuiButton',
 						caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
@@ -2529,7 +2530,7 @@ local function MakeMenuBar()
 							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
 						},
 					},
-					--]]
+					--MAIN MENU BUTTON
 					Button:New{
 						name= 'subMenuButton',
 						OnClick = { function() ActionSubmenu(nil,'') end, },
@@ -2545,6 +2546,7 @@ local function MakeMenuBar()
 							--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
 						},
 					},
+					--VOLUME SLIDERS
 					Grid:New{
 						height = '100%',
 						width = 100,
@@ -2599,14 +2601,15 @@ local function MakeMenuBar()
 					
 					},
 
-					
+					--[[
+					--FPS, FLAG, GAME CLOCK, and REAL-LIFE CLOCK
 					Grid:New{
 						orientation = 'horizontal',
 						columns = 2,
 						rows = 2,
 						width = 150,
 						height = '100%',
-						--height = 40,
+						-- height = 40,
 						resizeItems = true,
 						autoArrangeV = true,
 						autoArrangeH = true,
@@ -2651,6 +2654,74 @@ local function MakeMenuBar()
 							
 						},
 					},
+					--]]
+					--FPS & FLAG
+					Grid:New{
+						orientation = 'horizontal',
+						columns = 1,
+						rows = 2,
+						width = 60,
+						height = '100%',
+						--height = 40,
+						resizeItems = true,
+						autoArrangeV = true,
+						autoArrangeH = true,
+						padding = {0,0,0,0},
+						itemPadding = {0,0,0,0},
+						itemMargin = {0,0,0,0},
+						
+						children = {
+							lbl_fps,
+							img_flag,
+						},
+					},
+					--GAME CLOCK AND REAL-LIFE CLOCK
+					Grid:New{
+						orientation = 'horizontal',
+						columns = 1,
+						rows = 2,
+						width = 80,
+						height = '100%',
+						--height = 40,
+						resizeItems = true,
+						autoArrangeV = true,
+						autoArrangeH = true,
+						padding = {0,0,0,0},
+						itemPadding = {0,0,0,0},
+						itemMargin = {0,0,0,0},
+						
+						children = {
+							StackPanel:New{
+								orientation = 'horizontal',
+								width = 70,
+								height = '100%',
+								resizeItems = false,
+								autoArrangeV = false,
+								autoArrangeH = false,
+								padding = {0,0,0,0},
+								itemMargin = {2,0,0,0},
+								children = {
+									Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+									lbl_gtime,
+								},
+							},
+							StackPanel:New{
+								orientation = 'horizontal',
+								width = 80,
+								height = '100%',
+								resizeItems = false,
+								autoArrangeV = false,
+								autoArrangeH = false,
+								padding = {0,0,0,0},
+								itemMargin = {2,0,0,0},
+								children = {
+									Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
+									lbl_clock,
+								},
+							},
+							
+						},
+					},					
 					--[[
 					Button:New{
 						name= 'helpButton',
