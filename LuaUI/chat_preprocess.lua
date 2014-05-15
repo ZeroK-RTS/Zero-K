@@ -82,6 +82,22 @@ local function SetupPlayers()
 		local name, _, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(id)
 		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
 	end
+	
+	-- register any AIs
+	-- Copied from gui_chili_crudeplayerlist.lua
+	local teamsSorted = Spring.GetTeamList()
+	for i=1,#teamsSorted do
+		local teamID = teamsSorted[i]
+		if teamID ~= Spring.GetGaiaTeamID() then
+			local _,_,_,isAI,_,allyTeamId = Spring.GetTeamInfo(teamID)
+			if isAI then
+				local skirmishAIID, name = Spring.GetAIInfo(teamID)
+				--Note: compared to botnames in crude playerlist, we did not include shortname. eg: crudes_playerlist_botname = '<'.. name ..'> '.. shortName
+				--Note2: to make AI appears like doing an ally chat, include string "Allies: " in echo, like: Spring.Echo("<botname> Allies: bot_say_something")
+				players[name] = { id = skirmishAIID, allyTeamId = allyTeamId, isAI = true}
+			end
+		end --if teamID ~= Spring.GetGaiaTeamID() 
+	end --for each team
 end
 
 local function getSource(spec, allyTeamId)

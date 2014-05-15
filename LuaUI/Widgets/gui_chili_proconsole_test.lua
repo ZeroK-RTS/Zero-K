@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.007 Chili Chat Pro Console.",
+    desc      = "v0.008 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -780,6 +780,20 @@ local function setupPlayers()
 -- Spring.Echo('################## ' .. id .. " name " .. name .. " teamId " .. teamId .. " ally " .. allyTeamId)
 		incolors[name] = spec and incolors['#s'] or color2incolor(Spring.GetTeamColor(teamId))
 	end
+	
+	-- register any AIs
+	-- Copied from gui_chili_crudeplayerlist.lua
+	local teamsSorted = Spring.GetTeamList()
+	for i=1,#teamsSorted do
+		local teamID = teamsSorted[i]
+		if teamID ~= Spring.GetGaiaTeamID() then
+			local isAI = select(4,Spring.GetTeamInfo(teamID))
+			if isAI then
+				local name = select(2,Spring.GetAIInfo(teamID))
+				incolors[name] = color2incolor(Spring.GetTeamColor(teamID))
+			end
+		end --if teamID ~= Spring.GetGaiaTeamID() 
+	end --for each team		
 end
 
 local function setupMyself()
