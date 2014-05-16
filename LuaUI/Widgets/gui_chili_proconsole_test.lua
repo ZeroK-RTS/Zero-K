@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.008 Chili Chat Pro Console.",
+    desc      = "v0.009 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -134,6 +134,8 @@ local highlightPattern -- currently based on player name -- TODO add configurabl
 
 local firstEnter = true --used to activate ally-chat at game start. To run once
 local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
+
+local lastMsgChat, lastMsgBackChat, lastMsgConsole
 
 ------------------------------------------------------------
 -- options
@@ -612,7 +614,7 @@ local function hideMessage(msg)
 		string.find(msg.argument,'Team') or string.find(msg.argument,'AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
 end
 
-local function AddMessage(msg, target, fade2, remake)
+local function AddMessage(msg, target, remake)
 	if hideMessage(msg)	or (not WG.Chili) then
 		return
 	end
@@ -620,18 +622,23 @@ local function AddMessage(msg, target, fade2, remake)
 	local stack
 	local fade
 	local size
+	local lastMsg
+	local size
 	if target == 'chat' then
 		stack = stack_chat
 		size = options.text_height_chat.value
 		if not remake then
 			fade = true
 		end
+		lastMsg = lastMsgChat
 	elseif target == 'console' then
 		stack = stack_console
 		size = options.text_height_console.value
+		lastMsg = lastMsgConsole
 	elseif target == 'backchat' then
 		size = options.text_height_chat.value
 		stack = stack_backchat
+		lastMsg = lastMsgBackChat
 	end	
 	
 	--if msg.highlight and options.highlighted_text_height.value
@@ -641,121 +648,127 @@ local function AddMessage(msg, target, fade2, remake)
 	local highlight_sequence2 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_2) or '')
 	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.formatted .. highlight_sequence2
 
-	if (msg.dup > 1 and not remake)
-		and (target ~= 'console' or fadeTracker[control_id-1] )
-		then
-		local last = stack.children[#(stack.children)]
-		if last then
-			if last.SetText then
-				last:SetText(text)
+	if msg.dup > 1 and not remake then
+		--local last = stack.children[#(stack.children)]
+		
+		if lastMsg then
+			if lastMsg.SetText then
+				lastMsg:SetText(text)
 				-- UpdateClientArea() is not enough - last message keeps disappearing until new message is added
-				last:Invalidate()
+				lastMsg:Invalidate()
 			end
 		end
-	else
-		local textbox = WG.Chili.TextBox:New{
-			width = '100%',
-			align = "left",
-			fontsize = size,
-			valign = "ascender",
-			lineSpacing = 0,
-			padding = { 0, 0, 0, 0 },
-			text = text,
-			
-			--[[
-			autoHeight=true,
-			autoObeyLineHeight=true,
-			--]]
-
-			font = {
-				outlineWidth = 3,
-				outlineWeight = 10,
-				outline = true,
-				
-				--color         = {0,0,0,0},
-			}
-		}
+		return
+	end
+	
+	local textbox = WG.Chili.TextBox:New{
+		width = '100%',
+		align = "left",
+		fontsize = size,
+		valign = "ascender",
+		lineSpacing = 0,
+		padding = { 0, 0, 0, 0 },
+		text = text,
 		
-		if options.clickable_points.value then
-			local control = textbox
-			if msg.point then --message is a marker, make obvious looking button
-				textbox:SetPos( 35, 3, stack.width - 40 )
-				textbox:Update()
-				local tbheight = textbox.height -- not perfect
-				tbheight = math.max( tbheight, 15 ) --hack
-				--echo('tbheight', tbheight)
-				control = WG.Chili.Panel:New{
-					width = '100%',
-					height = tbheight + 8,
-					padding = { 1,1,1,1 },
-					backgroundColor = {0,0,0,0},
-					caption = '',
-					children = {
-						-- [[
-						WG.Chili.Button:New{
-							caption='',
-							x=0;y=0;
-							width = 30,
-							height = 20,
-							--backgroundColor = {1,1,1,options.pointButtonOpacity.value},
-							backgroundColor = {1,1,1,1},
-							padding = {2,2,2,2},
-							children = {
-								WG.Chili.Image:New {
-									x=7;y=2;
-									width = 14,
-									height = 14,
-									keepAspect = true,
-									file = 'LuaUI/Images/Crystal_Clear_action_flag.png',
-								}
-							},
-							OnClick = {function(self, x, y, mouse)
-								local alt,ctrl, meta,shift = Spring.GetModKeyState()
-								if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
-								Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
-							end}
+		--[[
+		autoHeight=true,
+		autoObeyLineHeight=true,
+		--]]
+
+		font = {
+			outlineWidth = 3,
+			outlineWeight = 10,
+			outline = true,
+			
+			--color         = {0,0,0,0},
+		}
+	}
+	
+	if options.clickable_points.value then
+		local control = textbox
+		if msg.point then --message is a marker, make obvious looking button
+			textbox:SetPos( 35, 3, stack.width - 40 )
+			textbox:Update()
+			local tbheight = textbox.height -- not perfect
+			tbheight = math.max( tbheight, 15 ) --hack
+			--echo('tbheight', tbheight)
+			control = WG.Chili.Panel:New{
+				width = '100%',
+				height = tbheight + 8,
+				padding = { 1,1,1,1 },
+				backgroundColor = {0,0,0,0},
+				caption = '',
+				children = {
+					WG.Chili.Button:New{
+						caption='',
+						x=0;y=0;
+						width = 30,
+						height = 20,
+						--backgroundColor = {1,1,1,options.pointButtonOpacity.value},
+						backgroundColor = {1,1,1,1},
+						padding = {2,2,2,2},
+						children = {
+							WG.Chili.Image:New {
+								x=7;y=2;
+								width = 14,
+								height = 14,
+								keepAspect = true,
+								file = 'LuaUI/Images/Crystal_Clear_action_flag.png',
+							}
 						},
-						--]]
-						textbox,
-					},
-					
-				}
-				
-			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
-				local cur = WG.alliedCursorsPos[msg.player.id]
-				if cur then
-					textbox.OnMouseDown = {function(self, x, y, mouse)
+						OnClick = {function(self, x, y, mouse)
 							local alt,ctrl, meta,shift = Spring.GetModKeyState()
-							if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
-							local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
-							if (mouse == 1 and click_on_text) then
-								Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
-							end
-					end}
-					function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
-						return self
-					end
+							if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
+							Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+						end}
+					},
+					textbox,
+				},
+				
+			}
+			
+		elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
+			local cur = WG.alliedCursorsPos[msg.player.id]
+			if cur then
+				textbox.OnMouseDown = {function(self, x, y, mouse)
+						local alt,ctrl, meta,shift = Spring.GetModKeyState()
+						if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
+						local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
+						if (mouse == 1 and click_on_text) then
+							Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+						end
+				end}
+				function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+					return self
 				end
 			end
-			stack:AddChild(control, false)
-			if fade then
-				control.fade = 1
-				fadeTracker[control_id] = control
-				control_id = control_id + 1
-			end
-			--]]
-		else
-			stack:AddChild(textbox, false)
-			if fade then
-				textbox.fade = 1
-				fadeTracker[control_id] = textbox
-				control_id = control_id + 1
-			end
 		end
+		stack:AddChild(control, false)
+		if fade then
+			control.fade = 1
+			fadeTracker[control_id] = control
+			control_id = control_id + 1
+		end
+		--]]
+	else
+		stack:AddChild(textbox, false)
+		if fade then
+			textbox.fade = 1
+			fadeTracker[control_id] = textbox
+			control_id = control_id + 1
+		end
+	end
+	
+	if target == 'chat' then
+		lastMsgChat = textbox
+	elseif target == 'backchat' then
+		lastMsgBackChat = textbox
+	else
+		lastMsgConsole = textbox
+	end
 
-		stack:UpdateClientArea()
+	stack:UpdateClientArea()
 		
-	end 
 end 
 
 
@@ -840,11 +853,11 @@ function RemakeConsole()
 	for i = 1, #chatMessages do 
 		local msg = chatMessages[i]
 		--AddMessage(msg, 'chat', true, true )
-		AddMessage(msg, 'backchat', true, true )
+		AddMessage(msg, 'backchat', true )
 	end
 	for i = 1, #consoleMessages do 
 		local msg = consoleMessages[i]
-		AddMessage(msg, 'console', false, true )
+		AddMessage(msg, 'console', true )
 	end
 	removeToMaxLines()
 	
@@ -987,31 +1000,20 @@ function widget:AddConsoleMessage(msg)
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
-	local stack
-	local target
-	local messages
+	local isChat = msg.msgtype ~= 'other'
 	
-	local isChat = msg.msgtype ~= 'other' 
+	--not sure why this hack is needed, something going wrong on luaui reload and it shows permanently in chat panel
+	if (msg.argument):find('DISABLE TTS') then return end
 	
-	if isChat then
-		stack = stack_chat
-		messages = chatMessages
-		target = 'chat'
-	else
-		stack = stack_console
-		messages = consoleMessages
-		target = 'console'
-	end
-		
+	local messages = isChat and chatMessages or consoleMessages
 		
 	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
 		and #messages > 0 and messages[#messages].text == msg.text then
 		-- update MapPoint position with most recent, as it is probably more relevant
 		messages[#messages].point = msg.point
 		messages[#messages].dup = messages[#messages].dup + 1
-		AddMessage(messages[#messages], target, isChat)
-		
-		AddMessage(messages[#messages], 'backchat') --also add chat to backchat log
+		AddMessage(messages[#messages], 'chat')
+		AddMessage(messages[#messages], 'backchat')
 		return
 	end
 	
@@ -1021,11 +1023,12 @@ function widget:AddConsoleMessage(msg)
 	formatMessage(msg) -- does not handle dedupe or highlight
 	
 	messages[#messages + 1] = msg
-	AddMessage(msg, target, isChat)
 	
 	if isChat then 
-		--AddMessage(msg, stack_console) --also add chat to console
-		AddMessage(msg, 'backchat') --also add chat to backchat log
+		AddMessage(msg, 'chat')
+		AddMessage(msg, 'backchat')
+	else
+		AddMessage(msg, 'console')
 	end
 	
 	if msg.highlight and options.highlight_sound.value then
@@ -1175,7 +1178,7 @@ function widget:Initialize()
 	}
 	
 	for i = 1, 20 do
-		AddMessage({dup=1, formatted=''}, 'chat', false, true )
+		AddMessage({dup=1, formatted=''}, 'chat', true )
 	end
 	
 	
