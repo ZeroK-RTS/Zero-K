@@ -1714,7 +1714,7 @@ MakeSubWindow = function(path, pause)
 					min=option.min or 0, 
 					max=option.max or 100, 
 					step=option.step or 1, 
-					OnClick = { option.OnChange }, 
+					OnMouseup = { option.OnChange }, --using onchange triggers repeatedly during slide
 					tooltip=option.desc,
 					--useValueTooltip=true,
 				}
@@ -2125,7 +2125,7 @@ MakeSubWindowSearch = function(path)
 					min=option.min or 0, 
 					max=option.max or 100, 
 					step=option.step or 1, 
-					OnClick = { option.OnChange }, 
+					OnMouseup = { option.OnChange }, --using onchange triggers repeatedly during slide
 					tooltip=option.desc,
 					--useValueTooltip=true,
 				}
