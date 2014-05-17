@@ -272,6 +272,7 @@ upgrades = {
 					commweapon_shotgun = true,
 					commweapon_gaussrifle = true,
 					commweapon_partillery = true,
+					commweapon_partillery_napalm = true,
 					commweapon_riotcannon = true,
 				}
 				for i,v in pairs(weapons) do
@@ -364,11 +365,9 @@ upgrades = {
 						elseif (id == "commweapon_hpartillery") then	-- -90% damage, 256 AoE, firewalker effect
 							ReplaceWeapon(unitDef, "commweapon_hpartillery", "commweapon_hpartillery_napalm")
 							ReplaceWeapon(unitDef, "commweapon_hpartillery", "commweapon_hpartillery_napalm")
-							return
 						elseif (id == "commweapon_partillery") then	-- -25% damage, 128 AoE
 							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_partillery_napalm")
 							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_partillery_napalm")
-							return
 						else	-- -25% damage, 128 AoE
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 0.75

@@ -139,6 +139,18 @@ local function ProcessComm(name, config)
 		commDefs[name].customparams = commDefs[name].customparams or {}
 		local cp = commDefs[name].customparams
 		
+		-- set name
+		commDefs[name].unitname = name
+		if config.name then
+			commDefs[name].name = config.name
+		end
+		if config.description then
+			commDefs[name].description = config.description
+		end
+		if config.helptext then
+			commDefs[name].customparams.helptext = config.helptext
+		end
+		
 		-- store base values
 		cp.basespeed = tostring(commDefs[name].maxvelocity)
 		cp.basehp = tostring(commDefs[name].maxdamage)
@@ -209,19 +221,6 @@ local function ProcessComm(name, config)
 		end
 		commDefs[name].maxdamage = commDefs[name].maxdamage*(1+attributeMods.health)
 		
-		if config.name then
-			commDefs[name].name = config.name
-		end
-		if config.description then
-			commDefs[name].description = config.description
-		end
-		if config.helptext then
-			commDefs[name].customparams.helptext = config.helptext
-		end
-		
-		-- set name
-		commDefs[name].unitname = name
-		
 		-- set costs
 		config.cost = config.cost or 0
 		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
@@ -268,7 +267,7 @@ for name in pairs(upgrades) do
 	stressTemplate.modules[#stressTemplate.modules+1] = name
 end
 for index,name in ipairs(stressChassis) do
-	local def = stressTemplate
+	local def = CopyTable(stressTemplate, true)
 	def.chassis = name
 	def.name = def.name..name
 	ProcessComm("stresstest"..index, def)
