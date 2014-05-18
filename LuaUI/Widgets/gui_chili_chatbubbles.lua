@@ -21,6 +21,7 @@ local DiffTimers = Spring.DiffTimers
 
 local Chili
 local color2incolor
+local colorAI = {} -- color for AI team indexed by botname
 
 local msgTypeToColor = {
   player_to_allies = {0,1,0,1},
@@ -248,11 +249,11 @@ end
 
 
 function widget:AddChatMessage(msg)
-	local player = msg.player and msg.player.id
+	local playerID = msg.player and msg.player.id
 	local type = msg.msgtype
 	local text = msg.argument or ''
 	
-	if DuplicateMessage("chat", player, msg.argument, type) then 
+	if DuplicateMessage("chat", playerID, msg.argument, type) then 
 		return
 	end
 
@@ -265,11 +266,17 @@ function widget:AddChatMessage(msg)
 		isSpec = true
 		teamID = 0
 	else
-		playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(player)
-		teamcolor = {Spring.GetTeamColor(teamID)}
-		if (customKeys ~= nil) and (customKeys.avatar~=nil) then 
-			avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
-		end 
+		if msg.player and msg.player.isAI then
+			teamcolor = colorAI[msg.playername]
+			playerName = msg.playername
+			active = true
+		else
+			playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(playerID)
+			teamcolor = {Spring.GetTeamColor(teamID)}
+			if (customKeys ~= nil) and (customKeys.avatar~=nil) then 
+				avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
+			end
+		end
 	end
 	
 	if (not active or isSpec) then
@@ -284,7 +291,7 @@ function widget:AddChatMessage(msg)
 
 	local pp = nil
 	if WG.alliedCursorsPos then 
-		local cur = WG.alliedCursorsPos[player]
+		local cur = WG.alliedCursorsPos[playerID]
 		if cur ~= nil then 
 			pp = {cur[1], cur[2], cur[3], cur[4]}
 		end
@@ -553,6 +560,22 @@ function widget:TeamChanged(teamID)
 end
 --]]
 
+local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
+	-- register any AIs
+	-- Copied from gui_chili_crudeplayerlist.lua
+	local teamsSorted = Spring.GetTeamList()
+	for i=1,#teamsSorted do
+		local teamID = teamsSorted[i]
+		if teamID ~= Spring.GetGaiaTeamID() then
+			local isAI = select(4,Spring.GetTeamInfo(teamID))
+			if isAI then
+				local name = select(2,Spring.GetAIInfo(teamID))
+				colorAI[name] = {Spring.GetTeamColor(teamID)}
+			end
+		end --if teamID ~= Spring.GetGaiaTeamID() 
+	end --for each team		
+end
+
 function widget:PlayerChanged(playerID)
 	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(playerID)
   local _,_,isDead = Spring.GetTeamInfo(teamID)
@@ -618,6 +641,7 @@ function widget:Initialize()
 
 	Chili = WG.Chili
 	color2incolor = Chili.color2incolor
+	SetupAITeamColor()
 
 	widget:ViewResize(Spring.GetViewGeometry())
 end

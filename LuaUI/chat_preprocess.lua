@@ -102,7 +102,7 @@ end
 
 local function getSource(spec, allyTeamId)
 	return (spec and 'spec')
-		or ((Spring.GetMyTeamID() == allyTeamId) and 'ally')
+		or ((Spring.GetMyAllyTeamID () == allyTeamId) and 'ally')
 		or 'enemy'
 end
 

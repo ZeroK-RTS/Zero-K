@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.009 Chili Chat Pro Console.",
+    desc      = "v0.010 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -782,18 +782,23 @@ local function setupColors()
 	incolors['#s'] 		= color2incolor(options.color_spec.value)
 end
 
-local function setupPlayers()
---	local myallyteamid = Spring.GetMyAllyTeamID()
-
-	local playerroster = Spring.GetPlayerList()
-	
-	for i, id in ipairs(playerroster) do
-		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
---		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
--- Spring.Echo('################## ' .. id .. " name " .. name .. " teamId " .. teamId .. " ally " .. allyTeamId)
+local function setupPlayers(playerID)
+	if playerID then
+		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID)
 		incolors[name] = spec and incolors['#s'] or color2incolor(Spring.GetTeamColor(teamId))
+	else
+		--	local myallyteamid = Spring.GetMyAllyTeamID()
+		local playerroster = Spring.GetPlayerList()
+		for i, id in ipairs(playerroster) do
+			local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
+			--		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
+			-- Spring.Echo('################## ' .. id .. " name " .. name .. " teamId " .. teamId .. " ally " .. allyTeamId)
+			incolors[name] = spec and incolors['#s'] or color2incolor(Spring.GetTeamColor(teamId))
+		end
 	end
-	
+end
+
+local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 	-- register any AIs
 	-- Copied from gui_chili_crudeplayerlist.lua
 	local teamsSorted = Spring.GetTeamList()
@@ -818,6 +823,7 @@ local function setup()
 	setupMyself()
 	setupColors()
 	setupPlayers()
+	SetupAITeamColor()
 end
 
 local function removeToMaxLines()
@@ -1084,8 +1090,11 @@ end
 
 -----------------------------------------------------------------------
 
-function widget:PlayerAdded(playerID)
-	setup()
+-- function widget:PlayerAdded(playerID)
+	-- setup()
+-- end
+function widget:PlayerChanged(playerID)
+	setupPlayers(playerID)
 end
 
 -----------------------------------------------------------------------
