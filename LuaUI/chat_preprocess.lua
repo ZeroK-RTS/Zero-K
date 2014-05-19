@@ -1,4 +1,5 @@
 --Chat preprocessor. Provide preprocessed chat message for Chili Chat widget
+--last update: 20 May 2014
 
 local myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 local transmitMagic = "> ["..myName.."]!transmit" -- Lobby is sending to LuaUI
@@ -75,12 +76,30 @@ end
 
 local players = {}
 
+function MessageProcessor:AddPlayer(playerID)
+	local name, active, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(playerID)
+	players[name] = { id = playerID,atlobby= (not active), spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
+end
+
+function MessageProcessor:UpdatePlayer(playerID)
+	local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID)
+	players[name].id = playerID
+	players[name].atlobby = (not active)
+	players[name].spec = spec
+	players[name].allyTeamId = allyTeamId
+end
+
+function MessageProcessor:RemovePlayer(playerID)
+	local name = Spring.GetPlayerInfo(playerID)
+	players[name] = nil
+end
+
 local function SetupPlayers()
 	local playerroster = Spring.GetPlayerList()
 	
 	for i, id in ipairs(playerroster) do
-		local name, _, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(id)
-		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
+		local name,active, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(id)
+		players[name] = { id = id, atlobby = (not active), spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
 	end
 	
 	-- register any AIs
@@ -107,6 +126,7 @@ local function getSource(spec, allyTeamId)
 end
 
 -- update msg members msgtype, argument, source and playername (when relevant)
+--loop thru all pattern combination (self.MESSAGE_DEFINITIONS) until a match is found
 function MessageProcessor:ParseMessage(msg)
   for _, candidate in ipairs(self.MESSAGE_DEFINITIONS) do
     if candidate.pattern == nil then -- for fallback/other messages
@@ -120,17 +140,17 @@ function MessageProcessor:ParseMessage(msg)
       msg.msgtype = candidate.msgtype
       if candidate.noplayername then
         msg.argument = capture1
-	msg.source = 'other'
-	return
+	    msg.source = 'other'
+	    return
       else
         local playername = capture1
-        if players[playername] then
-	local player = players[playername]
-	  msg.player = player
-	  msg.source = getSource(player.spec, player.allyTeamId)
-	  msg.playername = playername
-	  msg.argument = capture2
-	  return
+		local player = players[playername]
+        if player then
+	      msg.player = player
+	      msg.source = getSource(player.spec, player.allyTeamId)
+	      msg.playername = playername
+	      msg.argument = capture2
+	      return
         end
       end
     end

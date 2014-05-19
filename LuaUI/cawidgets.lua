@@ -1736,6 +1736,7 @@ end
 
 
 function widgetHandler:PlayerAdded(playerID, reason)
+  MessageProcessor:AddPlayer(playerID)
   --ListMutedPlayers()
   for _,w in ipairs(self.PlayerAddedList) do
     w:PlayerAdded(playerID, reason)
@@ -1745,6 +1746,7 @@ end
 
 
 function widgetHandler:PlayerChanged(playerID)
+  MessageProcessor:UpdatePlayer(playerID)
   for _,w in ipairs(self.PlayerChangedList) do
     w:PlayerChanged(playerID)
   end
@@ -1753,6 +1755,7 @@ end
 
 
 function widgetHandler:PlayerRemoved(playerID, reason)
+  MessageProcessor:RemovePlayer(playerID)
   for _,w in ipairs(self.PlayerRemovedList) do
     w:PlayerRemoved(playerID, reason)
   end
