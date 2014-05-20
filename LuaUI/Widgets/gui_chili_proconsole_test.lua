@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.011 Chili Chat Pro Console.",
+    desc      = "v0.012 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -1006,20 +1006,30 @@ function widget:AddConsoleMessage(msg)
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
 	local isChat = msg.msgtype ~= 'other'
-	
-	--not sure why this hack is needed, something going wrong on luaui reload and it shows permanently in chat panel
-	if (msg.argument):find('DISABLE TTS') then return end
-	
+	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
 	local messages = isChat and chatMessages or consoleMessages
+	
+	if #messages > 0
+		and messages[#messages].text == msg.text 
+		and (isPoint and options.dedupe_points.value or options.dedupe_messages.value)
+		then
 		
-	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
-		and #messages > 0 and messages[#messages].text == msg.text then
-		-- update MapPoint position with most recent, as it is probably more relevant
-		messages[#messages].point = msg.point
+		if isPoint then
+			-- update MapPoint position with most recent, as it is probably more relevant
+			messages[#messages].point = msg.point
+		end
+		
 		messages[#messages].dup = messages[#messages].dup + 1
-		AddMessage(messages[#messages], 'chat')
-		AddMessage(messages[#messages], 'backchat')
+		
+		if isChat then
+			AddMessage(messages[#messages], 'chat')
+			AddMessage(messages[#messages], 'backchat')
+		else
+			AddMessage(messages[#messages], 'console')
+		end
+				
 		return
+	
 	end
 	
 	msg.dup = 1
