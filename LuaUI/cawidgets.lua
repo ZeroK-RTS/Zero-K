@@ -1735,7 +1735,7 @@ function widgetHandler:TeamChanged(teamID)
 end
 
 
-function widgetHandler:PlayerAdded(playerID, reason)
+function widgetHandler:PlayerAdded(playerID, reason) --when player Join Lobby
   MessageProcessor:AddPlayer(playerID)
   --ListMutedPlayers()
   for _,w in ipairs(self.PlayerAddedList) do
@@ -1745,7 +1745,7 @@ function widgetHandler:PlayerAdded(playerID, reason)
 end
 
 
-function widgetHandler:PlayerChanged(playerID)
+function widgetHandler:PlayerChanged(playerID) --when player Change from Spectator to Player or Player to Spectator.
   MessageProcessor:UpdatePlayer(playerID)
   for _,w in ipairs(self.PlayerChangedList) do
     w:PlayerChanged(playerID)
@@ -1754,8 +1754,7 @@ function widgetHandler:PlayerChanged(playerID)
 end
 
 
-function widgetHandler:PlayerRemoved(playerID, reason)
-  MessageProcessor:RemovePlayer(playerID)
+function widgetHandler:PlayerRemoved(playerID, reason) --when player Left a Running Game.
   for _,w in ipairs(self.PlayerRemovedList) do
     w:PlayerRemoved(playerID, reason)
   end

@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.013 Chili Chat Pro Console.",
+    desc      = "v0.014 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -576,6 +576,7 @@ end
 local function formatMessage(msg)
 	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
 	
+	-- insert/sandwich colour string into text
 	local formatted, _ = format:gsub('([#%$]%w+)', function(parameter) -- FIXME pattern too broad for 1-char color specifiers
 			if parameter:sub(1,1) == '$' then
 				return msg[parameter:sub(2,parameter:len())]
@@ -786,13 +787,13 @@ local function setupPlayers(playerID)
 	if playerID then
 		local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID)
 		--lobby: grey chat, spec: white chat, player: color chat
-		incolors[name] = (not active and incolors['#o']) or ((spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId)))
+		incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
 	else
 		local playerroster = Spring.GetPlayerList()
 		for i, id in ipairs(playerroster) do
 			local name,active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
 			--lobby: grey chat, spec: white chat, player: color chat
-			incolors[name] = (not active and incolors['#o']) or ((spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId)))
+			incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
 		end
 	end
 end

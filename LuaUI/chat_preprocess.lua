@@ -78,20 +78,14 @@ local players = {}
 
 function MessageProcessor:AddPlayer(playerID)
 	local name, active, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(playerID)
-	players[name] = { id = playerID,atlobby= (not active), spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
+	players[name] = { id = playerID, spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
 end
 
 function MessageProcessor:UpdatePlayer(playerID)
 	local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID)
 	players[name].id = playerID
-	players[name].atlobby = (not active)
 	players[name].spec = spec
 	players[name].allyTeamId = allyTeamId
-end
-
-function MessageProcessor:RemovePlayer(playerID)
-	local name = Spring.GetPlayerInfo(playerID)
-	players[name] = nil
 end
 
 local function SetupPlayers()
@@ -99,7 +93,7 @@ local function SetupPlayers()
 	
 	for i, id in ipairs(playerroster) do
 		local name,active, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(id)
-		players[name] = { id = id, atlobby = (not active), spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
+		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
 	end
 	
 	-- register any AIs
