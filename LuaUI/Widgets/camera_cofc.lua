@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.134 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.135 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2013-April-9
     license   = "GNU GPL, v2 or later",
@@ -1652,7 +1652,7 @@ function widget:Update(dt)
 	mx, my = spGetMouseState()
 	
 	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
-	if WG.IsGUIHidden and (not WG.IsGUIHidden()) then
+	if not (WG.IsGUIHidden and WG.IsGUIHidden()) then --not in mission or (in mission but) not GuiHidden()
 		if options.edgemove.value then
 			move2.right = false --reset mouse move state
 			move2.left = false
