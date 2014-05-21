@@ -1,4 +1,4 @@
-local version = "v1.54"
+local version = "v1.541"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -627,7 +627,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		if cmdOptions.meta then
 			table.insert(buildQueue, 1, buildData)
-			Spring.SendLuaUIMsg("IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing,"a")
+			Spring.SendLuaUIMsg("IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing)
 		elseif cmdOptions.shift then
 
 			local anyClashes = false
@@ -635,17 +635,17 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				if DoBuildingsClash(buildData, buildQueue[i]) then
 					anyClashes = true
 					table.remove(buildQueue, i)
-					Spring.SendLuaUIMsg("IQ|2|"..i,"a")
+					Spring.SendLuaUIMsg("IQ|2|"..i)
 				end
 			end
 
 			if not anyClashes then
 				buildQueue[#buildQueue + 1] = buildData
-				Spring.SendLuaUIMsg("IQ|3|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing,"a")
+				Spring.SendLuaUIMsg("IQ|3|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing)
 			end
 		else
 			buildQueue = {buildData}
-			Spring.SendLuaUIMsg("IQ|4|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing,"a")
+			Spring.SendLuaUIMsg("IQ|4|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing)
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
