@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.920 Chili Chat Console.",
+    desc      = "v0.921 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -1042,6 +1042,10 @@ function widget:Initialize()
 	Spring.SendCommands({"console 0"})
  	
 	self:LocalColorRegister()
+end
+
+function widget:GameStart()
+	setupPlayers() --re-check teamColor at gameStart for Singleplayer (special case. widget Initialized before player join).
 end
 
 -----------------------------------------------------------------------

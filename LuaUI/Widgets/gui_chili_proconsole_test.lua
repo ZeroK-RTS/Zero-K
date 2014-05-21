@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.012 Chili Chat Pro Console.",
+    desc      = "v0.013 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -1255,6 +1255,10 @@ function widget:Initialize()
 	SetInputFontSize(15)
  	
 	self:LocalColorRegister()
+end
+
+function widget:GameStart()
+	setupPlayers() --re-check teamColor at gameStart for Singleplayer (special case. widget Initialized before player join).
 end
 
 -----------------------------------------------------------------------
