@@ -133,7 +133,7 @@ options = {
 		name = 'Smooth scrolling',
 		desc = 'Use smoothscroll method when mouse scrolling.',
 		type = 'bool',
-		value = true,
+		value = false,
 	},
 	smoothmeshscroll = {
 		name = 'Smooth Mesh Scrolling',
@@ -253,7 +253,7 @@ options = {
 		name = "Invert scrolling direction",
 		desc = "Invert scrolling direction (doesn't apply to smoothscroll).",
 		type = 'bool',
-		value = false,
+		value = true,
 	},
 	restrictangle = {
 		name = "Restrict Camera Angle",
