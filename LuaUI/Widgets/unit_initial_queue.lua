@@ -1,4 +1,4 @@
-local version = "v1.541"
+local version = "v1.542"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -229,11 +229,6 @@ function widget:Initialize()
 		isMex[UnitDefNames["cormex"].id] = true;
 	end
 	WG.InitialQueue = true
-	-- WG.InitialQueue = {
-		-- SetSelDefID = SetSelDefID,
-		-- GetBuildOptions = GetBuildOptions,
-		-- GetSelDefID = GetSelDefID,
-	-- }
 end
 
 function widget:Shutdown()
@@ -310,7 +305,7 @@ function widget:DrawWorld()
 	
 	-- local myTeamID = Spring.GetMyTeamID()
 	local sx, sy, sz = Spring.GetTeamStartPosition(myTeamID) -- Returns -100, -100, -100 when none chosen
-	local startChosen = (sx ~= -100)
+	local startChosen = (sx > 0)
 	if startChosen then
 		-- Correction for start positions in the air
 		sy = Spring.GetGroundHeight(sx, sz)
@@ -348,7 +343,7 @@ function widget:DrawWorld()
 
 	for teamID,playerXBuildQueue in pairs(othersBuildQueue)do
 		sx, sy, sz = Spring.GetTeamStartPosition(teamID) -- Returns -100, -100, -100 when none chosen
-		startChosen = (sx ~= -100)
+		startChosen = (sx > 0)
 
 		-- Draw all the buildings
 		queueLineVerts = startChosen and {{v={sx, sy, sz}}} or {}
@@ -399,23 +394,29 @@ end
 
 function widget:RecvLuaMsg(msg, playerID)
 	if myPlayerID~=playerID and msg:sub(1,3) == "IQ|" then
+		--Example: IQ|4|404|648|2|3304|1
+		--Header|unitdefID|x|y|z|facing
 		msg = msg:sub(4)
 		local msgArray = explode('|',msg)
-		local typeArg, _2ndArg = tonumber(msgArray[1]), tonumber(msgArray[2])
-		if not (_2ndArg and typeArg) then 
-			return
+		local typeArg, unitDefID = tonumber(msgArray[1]), tonumber(msgArray[2])
+		if not UnitDefs[unitDefID] or typeArg>4 or typeArg<1 then 
+			return --invalid unitDefID and message type
 		end
-		local _,_,_,teamID = Spring.GetPlayerInfo(playerID)
+		local x,y,z,face = tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])
+		if not (x and y and z and face) then
+			return --invalid coordinate and facing
+		end
+		local teamID = select(4,Spring.GetPlayerInfo(playerID))
 		othersBuildQueue[teamID] = othersBuildQueue[teamID] or {}
 		local playerXBuildQueue = othersBuildQueue[teamID]
 		if typeArg == 1 then
-			table.insert(playerXBuildQueue, 1, {_2ndArg,tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])})
+			table.insert(playerXBuildQueue, 1, {unitDefID,x,y,z,face})
 		elseif typeArg == 2 then
-			table.remove(playerXBuildQueue, _2ndArg)
+			table.remove(playerXBuildQueue, unitDefID)
 		elseif typeArg == 3 then
-			playerXBuildQueue[#playerXBuildQueue+1] = {_2ndArg,tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])}
+			playerXBuildQueue[#playerXBuildQueue+1] = {unitDefID,x,y,z,face}
 		elseif typeArg == 4 then
-			othersBuildQueue[teamID] = {{_2ndArg,tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])}}
+			othersBuildQueue[teamID] = {{unitDefID,x,y,z,face}}
 		end
 	end
 end
@@ -482,6 +483,7 @@ end
 ------------------------------------------------------------
 -- Mouse
 ------------------------------------------------------------
+--[[
 function SetBuildFacing()
 	local wx,wy,_,_ = Spring.GetScreenGeometry()
 	local _, pos = Spring.TraceScreenRay(wx/2, wy/2, true)
@@ -506,7 +508,7 @@ function SetBuildFacing()
 end
 
 needBuildFacing = true
-
+--]]
 --[[ 
 --Task handled by CommandNotify()
 function widget:MousePress(mx, my, mButton)
@@ -625,9 +627,10 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			bx, by, bz = bestSpot.x, bestSpot.y, bestSpot.z
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
+		local msg
 		if cmdOptions.meta then
 			table.insert(buildQueue, 1, buildData)
-			Spring.SendLuaUIMsg("IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing)
+			msg = "IQ|1|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
 		elseif cmdOptions.shift then
 
 			local anyClashes = false
@@ -635,17 +638,22 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				if DoBuildingsClash(buildData, buildQueue[i]) then
 					anyClashes = true
 					table.remove(buildQueue, i)
-					Spring.SendLuaUIMsg("IQ|2|"..i)
+					msg = "IQ|2|"..i
 				end
 			end
 
 			if not anyClashes then
 				buildQueue[#buildQueue + 1] = buildData
-				Spring.SendLuaUIMsg("IQ|3|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing)
+				msg = "IQ|3|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
 			end
 		else
 			buildQueue = {buildData}
-			Spring.SendLuaUIMsg("IQ|4|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing)
+			msg = "IQ|4|"..selDefID.."|"..math.modf(bx).."|"..math.modf(by).."|"..math.modf(bz).."|"..buildFacing
+			--msg = "IQ|4|404|648|2|3304|1" --example spoof. This will not work
+		end
+		if msg then
+			Spring.SendLuaUIMsg(msg,'a')
+			Spring.SendLuaUIMsg(msg,"s")
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
@@ -659,6 +667,7 @@ end
 ------------------------------------------------------------
 -- Misc
 ------------------------------------------------------------
+--[[
 function widget:TextCommand(cmd)
 	-- Facing commands are only handled by spring if we have a building selected, which isn't possible pre-game
 	local m = cmd:match("^buildfacing (.+)$")
@@ -687,3 +696,4 @@ function widget:TextCommand(cmd)
 		end
 	end
 end
+--]]
