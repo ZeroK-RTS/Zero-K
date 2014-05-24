@@ -1186,6 +1186,14 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
   return true
 end
 
+function gadgetHandler:AllowStartPosition(cx, cy, cz, playerID, readyState, rx, ry, rz)
+  for _,g in ipairs(self.AllowStartPositionList) do
+    if (not g:AllowStartPosition(cx, cy, cz, playerID, readyState, rx, ry, rz)) then
+      return false
+    end
+  end
+  return true
+end
 
 function gadgetHandler:AllowUnitCreation(unitDefID, builderID,
                                          builderTeam, x, y, z, facing)
