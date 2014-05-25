@@ -1,4 +1,4 @@
-local version = "v1.542"
+local version = "v1.543"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -667,7 +667,6 @@ end
 ------------------------------------------------------------
 -- Misc
 ------------------------------------------------------------
---[[
 function widget:TextCommand(cmd)
 	-- Facing commands are only handled by spring if we have a building selected, which isn't possible pre-game
 	local m = cmd:match("^buildfacing (.+)$")
@@ -696,4 +695,3 @@ function widget:TextCommand(cmd)
 		end
 	end
 end
---]]
