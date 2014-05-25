@@ -3,7 +3,7 @@
  * Maintains heatmaps for static/mobile units which are anti land/AA.
 --]]
 local HeatmapUnitDefID, ListUnitDefID, CombatListUnitDefID, EconomyTargetUnitDefID = VFS.Include("LuaRules/Configs/CAI/assetTrackerConfig.lua")
-local StaticUnits = VFS.Include("LuaRules/Configs/CAI/staticUnits.lua")
+local StaticUnits = VFS.Include("LuaRules/Configs/CAI/unitMovetype.lua")
 
 local UnitListHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitListHandler.lua")
 local HeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/HeatmapHandler.lua")
@@ -42,6 +42,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		miscUnit = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 	}
 	
+	-- Contains every combat unit exactly once
 	local combatUnitList = {
 		raider = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		assault = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
@@ -83,20 +84,21 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		local combatListData = CombatListUnitDefID[unitDefID]
 		if combatListData then
 			combatUnitList[combatListData.name].AddUnit(unitID, combatListData.cost, StaticUnits[unitDefID])
-			str = str .. "Combat List: " .. combatListData.name
+			str = str .. ", Combat List: " .. combatListData.name
 		end
 		
 		-- Economy tagets
 		local economyTargetData = EconomyTargetUnitDefID[unitDefID]
 		if economyTargetData then
 			economyTargets.AddUnit(unitID, economyTargetData.amount, StaticUnits[unitDefID])
-			str = str .. "Economy Cluster Unit"
+			str = str .. ", Economy Cluster Unit"
 		end
 		
 		GG.UnitEcho(unitID, str)
 	end
 	
 	function RemoveUnit(unitID, unitDefID)
+		-- Heatmap
 		if HeatmapUnitDefID[unitDefID] then
 			local data = HeatmapUnitDefID[unitDefID]
 			local i = 1
@@ -107,9 +109,23 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 				i = i + 1
 			end
 		end
+		
+		-- Complete unit list
 		local listData = ListUnitDefID[unitDefID]
 		completeUnitList[listData.name].RemoveUnit(unitID)
 		totalCostRemoved = totalCostRemoved + listData.cost
+		
+		-- Combat unit list
+		local combatListData = CombatListUnitDefID[unitDefID]
+		if combatListData then
+			combatUnitList[combatListData.name].RemoveUnit(unitID)
+		end
+		
+		-- Economy tagets
+		local economyTargetData = EconomyTargetUnitDefID[unitDefID]
+		if economyTargetData then
+			economyTargets.RemoveUnit(unitID)
+		end
 	end
 	
 	function UpdateHeatmaps()
@@ -121,6 +137,10 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		return completeUnitList[name]
 	end
 	
+	function GetCombatUnitList(name)
+		return combatUnitList[name]
+	end
+	
 	function GetHeatmap(name)
 		return unitHeatmaps[name]
 	end
@@ -129,6 +149,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		AddUnit = AddUnit,
 		UpdateHeatmaps = UpdateHeatmaps,
 		GetUnitList = GetUnitList, 
+		GetCombatUnitList = GetCombatUnitList,
 		GetHeatmap = GetHeatmap,
 	}
 	

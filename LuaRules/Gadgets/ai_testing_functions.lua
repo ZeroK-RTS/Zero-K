@@ -48,7 +48,7 @@ _G.heatmap = aaHeatmap.heatmap
 
 local scoutHandler = ScoutHandler.CreateScoutHandler(0)
 
-local enemyUnitCluster = UnitClusterHandler.CreateUnitCluster(0, false, 900)
+local enemyUnitCluster = UnitClusterHandler.CreateUnitCluster(0, 900)
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if teamID == 1 then
