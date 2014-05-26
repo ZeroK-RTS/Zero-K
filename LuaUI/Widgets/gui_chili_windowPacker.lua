@@ -1,7 +1,9 @@
+local version = "v1.001"
+
 function widget:GetInfo()
   return {
     name      = "Chili Window Packer",
-    desc      = "Provides functionality to automatically arrange windows in space-saving manners. Activate-able thru \"packNow\" button (\255\90\255\90Setting/HUD Panels/Docking\255\255\255\255).",
+    desc      =  version .. " Provides functionality to automatically arrange windows in space-saving manners. Activate-able thru \"packNow\" button (\255\90\255\90Setting/HUD Panels/Docking\255\255\255\255).",
     author    = "xponen",
     date      = "12 May 2014",
     license   = "GNU GPL, v2 or later",
@@ -14,7 +16,7 @@ end
 --Source code: https://github.com/juj/RectangleBinPack
 
 
-WG.PackChiliWindows = function() end
+local PackChiliWindows = function() end
 local alignChoice,heuristicChoice = 2,1
 ------------------------------------------------------------------------
 options_path = 'Settings/HUD Panels/Docking'
@@ -28,7 +30,7 @@ options = {
 				"\n\nTips2: Press ESCAPE to exit GuiTweak mode",
 		type = 'button',
         OnChange= function()
-			WG.PackChiliWindows()
+			PackChiliWindows(alignChoice,heuristicChoice)
 		end,
 	},
 	packSpot = {
@@ -49,14 +51,14 @@ options = {
 		desc = "MinimizeSideSpace,MaximizeAdjacentWindow,BestAreaFit,CornerFirst",
 		value = 1,
 		min=1,max=4,step=1,
-		OnChange = function(self)
+		OnChange = function(self)	
 			heuristicChoice = math.modf(self.value)
 		end,
 	},	
 }
 
 ------------------------------------------------------------------------
-WG.PackChiliWindows = function()
+PackChiliWindows = function(align,heuristic)
 	Spring.SendCommands("luaui tweakgui")
 	local rectList = {}
 	local count= 1
@@ -72,23 +74,25 @@ WG.PackChiliWindows = function()
 	end
 	local choice = {"BestShortSideFit", "ContactPointRule","RectBestAreaFit","RectBottomLeftRule","RectBestLongSideFit"}
 	local xMult,yMult,xOffset,yOffset
-	local choiceMsg = "CHOICE : ".. choice[heuristicChoice]
-	if alignChoice==1 then
+	local heuristic = math.max(math.min(heuristic,5),1)
+	local align = math.max(math.min(align,4),1)
+	local choiceMsg = "CHOICE : ".. choice[heuristic]
+	if align==1 then
 		xMult,yMult,xOffset,yOffset = 1,1,0,0
 		choiceMsg = choiceMsg .. " TopLeft-Aligned"
-	elseif alignChoice==4 then
+	elseif align==4 then
 		xMult,yMult,xOffset,yOffset = -1,1,1,0
 		choiceMsg = choiceMsg .. " TopRight-Aligned"
-	elseif alignChoice==3 then
+	elseif align==3 then
 		xMult,yMult,xOffset,yOffset = -1,-1,1,1
 		choiceMsg = choiceMsg .. " BottomRight-Aligned"
-	elseif alignChoice==2 then
+	elseif align==2 then
 		xMult,yMult,xOffset,yOffset = 1,-1,0,1
 		choiceMsg = choiceMsg .. " BottomLeft-Aligned"
 	end
 	Spring.Echo(choiceMsg)
 	local scrW,scrH = widgetHandler:GetViewSizes()
-	rectList = PackMaxRectangleNow(rectList,scrW,scrH,choice[heuristicChoice])
+	rectList = PackMaxRectangleNow(rectList,scrW,scrH,choice[heuristic])
 	local set = {}
 	for i=1, #rectList do
 		local winName = rectList[i].name
