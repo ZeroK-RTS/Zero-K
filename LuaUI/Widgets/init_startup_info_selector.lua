@@ -32,6 +32,7 @@ local Echo	= Spring.Echo
 local spGetGameRulesParam = Spring.GetGameRulesParam
 
 local coop = (Spring.GetModOptions().coop == 1) or false
+local forcejunior = (Spring.GetModOptions().forcejunior == 1) or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
 local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 
@@ -192,8 +193,8 @@ function widget:Initialize()
 	if not (WG.Chili) then
 		widgetHandler:RemoveWidget()
 	end
-	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
-		Spring.Echo("<Startup Info and Selector> Spectator mode or replay. Widget removed.")
+	 if (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior) and (not Spring.IsCheatingEnabled()) then
+		Spring.Echo("<Startup Info and Selector> Spectator mode, Junior forced, or replay. Widget removed.")
 		widgetHandler:RemoveWidget()
 		return
 	end
