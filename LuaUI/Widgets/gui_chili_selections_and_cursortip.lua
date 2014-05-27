@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.094 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.095 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
@@ -82,6 +82,7 @@ local screen0
 --------------------------------------------------------------------------------
 
 local icon_size = 20
+local unitIcon_size = 50
 local stillCursorTime = 0
 
 local scrH, scrW = 0,0
@@ -191,7 +192,7 @@ options_order = {
 	'showDrawTools',
 	
 	--selected units
-	'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin', 'color_background', 
+	'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin', 'color_background', 
 }
 
 local function option_Deselect()
@@ -308,6 +309,15 @@ options = {
 		type='bool',
 		value= false,
 		desc = "Display current command on unit's icon (only for ungrouped unit selection)",
+		path = selPath,
+	},
+	uniticon_size = {
+		name = 'Icon size on selection list',
+		desc = 'Determines how small the icon in selection list need to be.',
+		type = 'number',
+		OnChange = function(self) unitIcon_size=math.modf(self.value)end,
+		min=36,max=50,step=2,
+		value = 50,
 		path = selPath,
 	},
 	manualWeaponReloadBar = {
@@ -526,14 +536,18 @@ local function UpdateDynamicGroupInfo()
 	gi_energydrain = 0
 	gi_usedbp = 0
 	
+	local id,defID,ud --micro optimization, avoiding repeated localization.
+	local name,hp,paradam,cap,build,mm,mu,em,eu
+	local stunned_or_inbuld
+	local tooltip,baseMetal,s,od
 	for i = 1, numSelectedUnits do
-		local id = selectedUnits[i][1]
-		local defID = selectedUnits[i][2]
-		local ud = UnitDefs[defID]
+		id = selectedUnits[i][1]
+		defID = selectedUnits[i][2]
+		ud = UnitDefs[defID]
 		if ud then
-			local name = ud.name 
-			local hp, _, paradam, cap, build = spGetUnitHealth(id)
-			local mm,mu,em,eu = spGetUnitResources(id)
+			name = ud.name 
+			hp, _, paradam, cap, build = spGetUnitHealth(id)
+			mm,mu,em,eu = spGetUnitResources(id)
 		
 			if name ~= "terraunit" then
 				if mm then--failsafe when switching spectator view.
@@ -541,19 +555,19 @@ local function UpdateDynamicGroupInfo()
 					gi_hp = gi_hp + hp
 				end
 				
-				local stunned_or_inbuld = spGetUnitIsStunned(id)
+				stunned_or_inbuld = spGetUnitIsStunned(id)
 				if not stunned_or_inbuld then 
 					if name == 'armmex' or name =='cormex' then -- mex case
-						local tooltip = spGetUnitTooltip(id) or '' --Note:spGetUnitTooltip(id) become NIL if spectator select enemy team's unit while Spectating allied team with limited LOS.
+						tooltip = spGetUnitTooltip(id) or '' --Note:spGetUnitTooltip(id) become NIL if spectator select enemy team's unit while Spectating allied team with limited LOS.
 						
-						local baseMetal = 0
-						local s = tooltip:match("Makes: ([^ ]+)")
+						baseMetal = 0
+						s = tooltip:match("Makes: ([^ ]+)")
 						if s ~= nil then 
 							baseMetal = tonumber(s) 
 						end 
 										
 						s = tooltip:match("Overdrive: %+([0-9]+)")
-						local od = 0
+						od = 0
 						if s ~= nil then 
 							od = tonumber(s) 
 						end
@@ -598,12 +612,12 @@ local function UpdateStaticGroupInfo()
 	gi_totalbp = 0
 	gi_maxhp = 0
 	
+	local defID, ud
 	for i = 1, numSelectedUnits do
-		local defID = selectedUnits[i][2]
-		local ud = UnitDefs[defID]
+		defID = selectedUnits[i][2]
+		ud = UnitDefs[defID]
 		if ud then
-			local name = ud.name 
-			if name ~= "terraunit" then
+			if ud.name ~= "terraunit" then
 				gi_totalbp = gi_totalbp + ud.buildSpeed
 				gi_maxhp = gi_maxhp + ud.health
 				gi_finishedcost = gi_finishedcost + ud.metalCost
@@ -727,8 +741,8 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 	local item = LayoutPanel:New{
 		name    = (counts==1 and unitids[1]) or defid; --identify button by UnitID if not grouped, else identify by UnitDefID
 		parent  = barGrid;
-		width   = 50;
-		height  = 62;
+		width   = unitIcon_size;
+		height  = unitIcon_size*1.24;
 		columns = 1;
 		padding     = {0,0,0,0};
 		itemPadding = {0,0,0,0};
@@ -744,9 +758,9 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 		file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 		file    = "#" .. defid;
 		keepAspect = false;
-		height  = 50 * (options.squarepics.value and 1 or (4/5));
+		height  = unitIcon_size * (options.squarepics.value and 1 or (4/5));
 		--height  = 50;
-		width   = 50;
+		width   = unitIcon_size;
 		padding = {0,0,0,0}; --FIXME something overrides the default in image.lua!!!!
 		OnClick = {function(_,_,_,button)
 			
@@ -807,10 +821,10 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 			parent = img;
 			align  = "right";
 			valign = "top";
-			x =  8;
+			x =  unitIcon_size*0.16;
 			--y = 30;
-			y = 20;
-			width = 40;
+			y = unitIcon_size*0.4;
+			width = unitIcon_size*0.8;
 			fontsize   = 20;
 			fontshadow = true;
 			fontOutline = true;
@@ -820,15 +834,15 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 	Progressbar:New{
 		parent  = item;
 		name    = 'health';
-		width   = 50;
-		height  = 10;
+		width   = unitIcon_size;
+		height  = unitIcon_size*0.2;
 		max     = 1;
 		color   = {0.0,0.99,0.0,1};
 	};
 end
 
 local function MakeUnitGroupSelectionToolTip()
-
+	local infoSection_size = 131
 	local barGrid = LayoutPanel:New{
 		name     = 'Bars';
 		resizeItems = false;
@@ -837,7 +851,7 @@ local function MakeUnitGroupSelectionToolTip()
 		height  = "100%";
 		x=0,
 		--width   = "100%";
-		right=options.showgroupinfo.value and 120 or 0, --expand to right
+		right=options.showgroupinfo.value and infoSection_size or 0, --expand to right
 		--columns = 5;
 		itemPadding = {0,0,0,0};
 		itemMargin  = {0,0,2,2};
@@ -845,11 +859,10 @@ local function MakeUnitGroupSelectionToolTip()
 	}
 	
 	--estimate how many picture can fit into the selection grid
-	local maxRight, maxBottom = barGrid:GetMinimumExtents() --Note: for a non-zero return, barGrid must be attached to the window_corner first 
-	maxRight = maxRight - (options.showgroupinfo.value and 120 or 0)
-	local horizontalFit = maxRight/50
-	local verticalFit = maxBottom/50
-	maxPicFit = horizontalFit*verticalFit --Note: maxPicFit not need to round to nearest integer.
+	local maxRight = window_corner.width - (options.showgroupinfo.value and infoSection_size or 0)
+	local horizontalFit =  math.modf(maxRight/(unitIcon_size+2))
+	local verticalFit = math.modf(window_corner.height/(unitIcon_size+2))
+	maxPicFit =horizontalFit*verticalFit
 	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
 
 	WriteGroupInfo() --write selection summary text on right side of the panel
@@ -870,22 +883,25 @@ local function MakeUnitGroupSelectionToolTip()
 			widget:SelectionChanged(selUnits) --this will recreate all buttons
 			end or function() end},
 		textColor = {1,1,1,0.75}, 
-		tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit group based on type" or "Unit not grouped") or "Bar is full, unit group based on type",
+		tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit grouped by type" or "Unit not grouped") or (#selectionSortOrder>maxPicFit and "Bar is really full" or "Bar is full, unit grouped by type"),
 	}
 
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
+		local unitid,defid,unitids
 		for i=1,numSelectedUnits do
-			local unitid = selectedUnits[i][1]
-			local defid  = selectedUnits[i][2]
-			local unitids = {unitid}
+			unitid = selectedUnits[i][1]
+			defid  = selectedUnits[i][2]
+			unitids = {unitid}
 
 			AddSelectionIcon(barGrid,unitid,defid,unitids)
 		end
 	else
-		for i=1,#selectionSortOrder do
-			local defid   = selectionSortOrder[i]
-			local unitids = selectedUnitsByDef[defid]
-			local counts  = selectedUnitsByDefCounts[defid]
+		local defid,unitids,counts
+		maxPicFit = math.min(#selectionSortOrder,maxPicFit)
+		for i=1,maxPicFit do
+			defid   = selectionSortOrder[i]
+			unitids = selectedUnitsByDef[defid]
+			counts  = selectedUnitsByDefCounts[defid]
 
 			AddSelectionIcon(barGrid,nil,defid,unitids,counts)
 		end
@@ -925,8 +941,8 @@ local function UpdateSelectedUnitsTooltip()
 									Progressbar:New{ --recreate original healthbar to avoid layout bug
 										parent  = unitIcon;
 										name    = 'health';
-										width   = 50;
-										height  = 10;
+										width   = unitIcon_size;
+										height  = unitIcon_size*0.2;
 										max     = 1;
 										value 	= (health/maxhealth);
 										color   = {0.0,0.99,0.0,1};
@@ -936,9 +952,9 @@ local function UpdateSelectedUnitsTooltip()
 										Progressbar:New{ --recreate new healthbar (this is to solve issue of bar not resizing when we just changed the "height" & do 'healthbar:Invalidate()').
 											parent  = unitIcon;
 											name    = 'health';
-											width   = 50;
-											height  = 8;
-											minHeight = 8;
+											width   = unitIcon_size;
+											height  = unitIcon_size*0.16;
+											minHeight = unitIcon_size*0.16;
 											max     = 1;
 											value 	= (health/maxhealth);
 											color   = {0.0,0.99,0.0,1}; --arbitrary color, will correct itself in next update
@@ -946,9 +962,9 @@ local function UpdateSelectedUnitsTooltip()
 										Progressbar:New{ --create mini reload bar
 											parent  = unitIcon;
 											name    = 'reloadMiniBar';
-											width   = 49;
-											height  = 2;
-											minHeight = 2;
+											width   = unitIcon_size*0.98;
+											height  = unitIcon_size*0.04;
+											minHeight = unitIcon_size*0.04;
 											max     = 1;
 											value = reloadFraction;
 											color   = {013, 245, 243,1}; --? 
@@ -2407,9 +2423,10 @@ function widget:SelectionChanged(newSelection)
 	--store selected unitID list in a table with unitDefID. This prevent NIL error if selecting using limited LOS spectator
 	if (spGetSelectedUnitsCount() > 0) then 
 		local count = 0
+		local unitID, defID
 		for i=1, #newSelection do
-			local unitID = newSelection[i]
-			local defID = spGetUnitDefID(unitID)
+			unitID = newSelection[i]
+			defID = spGetUnitDefID(unitID)
 			if defID then --in LOS/not enemy
 				count = count+1
 				selectedUnits[count] = {unitID,defID}
@@ -2431,11 +2448,14 @@ function widget:SelectionChanged(newSelection)
 		--// else the sort order would change each time we select a new unit or deselect one!
 		selectionSortOrder = {}
 		local alreadyInList = {}
+		local defid
+		local count = 1
 		for i=1,#selectedUnits do
-			local defid = selectedUnits[i][2]
+			defid = selectedUnits[i][2]
 			if (not alreadyInList[defid]) then
 				alreadyInList[defid] = true
-				selectionSortOrder[#selectionSortOrder+1] = defid
+				selectionSortOrder[count] = defid
+				count = count + 1
 			end
 		end
 
@@ -2485,22 +2505,3 @@ function widget:UpdateCallIns(enable)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---[[Stacktrace for TODO bug
-Chili-Error in `Chili Selections & CursorTip`:2435 : [string "LuaUI/Widgets/chili/controls/control.lua"]:897: attempt to index field 'parent' (a nil value)
-stacktrace:
-	[string "LuaUI/Widgets/chili/controls/control.lua"]:897
-	(tail call): in [?]
-	[string "LuaUI/Widgets/chili/controls/control.lua"]:773
-	(tail call): in [?]
-	[string "LuaUI/Widgets/chili/handlers/taskhandler.lu..."]:96: in Update
-	[string "LuaUI/Widgets/api_chili.lua"]:100
-	[C]: in pcall
-	[string "LuaUI/cawidgets.lua"]:724: in realFunc
-	[string "LuaUI/Widgets/dbg_widgetprofiler.lua"]:86: in Update
-	[string "LuaUI/cawidgets.lua"]:1177: in Update
-	[string "-- $Id: camain.lua 3171 2008-11-06 09:06:29..."]:103
-Removed widget: Chili Selections & CursorTip
---Note: line number may be different due to local widget tweak (adding echo and stuff).
---Note2: "2435" is identified to be the button name. Is unitID, is not dead unit, is most likely not selected.
---Note3: from chat, [LCC]jk says same error can happen when an element is disposed first before it have chance to redrawn/resize at next Update() cycle. So,does object is recommended to be unlink dependencies first (ClearChildren) before(RemoveChild)???
---]]

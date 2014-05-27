@@ -14,7 +14,8 @@ function widget:GetInfo()
     enabled   = false  --  loaded by default?
   }
 end
-
+--Do "/profilewidget <widget name> <second>" to count usage of a single widget for a defined amount of 'second'.
+--eg: "/profilewidget Chili Framework 10" count how much usage the Chili Framework use in 10 game second.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -255,6 +256,45 @@ local function SortFunc(a,b)
   --end
 end
 
+  local targetCumulSecond = 0
+  local targetCountdown = 0
+  local targetCallinCumul = {nil}
+  local targetWname = ''
+
+local function explode(div,str)
+  if (div=='') then return false end
+  local pos,arr = 0,{}
+  -- for each divider found
+  for st,sp in function() return string.find(str,div,pos,true) end do
+    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
+    pos = sp + 1 -- Jump past current divider
+  end
+  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
+  return arr
+end
+  
+  function widget:TextCommand(command)
+    if command:sub(1,13) == "profilewidget" then
+      command = command:sub(15)
+      if targetWname ~='' then
+        targetWname = ''
+        targetCallinCumul = {nil}
+        targetCountdown = 0
+      else
+        local words = explode(" ",command)	  
+        local countdown = tonumber(words[#words])
+        if countdown and #words>=2 then
+          local wname = table.concat(words,' ',1,#words-1)
+          Spring.Echo(wname)
+          targetWname = wname
+          targetCountdown = countdown
+        end
+      end
+      targetCumulSecond = 0
+      end
+    return false
+  end
+
   function widget:DrawScreen()
     if not (next(callinTimes)) then
       return --// nothing to do
@@ -273,11 +313,21 @@ end
         local total = 0
         local cmax  = 0
         local cmaxname = ""
+        local countdownt = false
         for cname,timeStats in pairs(callins) do
           total = total + timeStats[1]
           if (timeStats[2]>cmax) then
             cmax = timeStats[2]
             cmaxname = cname
+          end
+          if not looped and targetCountdown > 0 and targetWname == wname then
+            targetCumulSecond = targetCumulSecond + timeStats[1]
+            targetCallinCumul[cname] = targetCallinCumul[cname] or 0
+            targetCallinCumul[cname] = targetCallinCumul[cname] + timeStats[1]
+            if not countdownt then
+              targetCountdown = targetCountdown - deltaTime
+              countdownt = true
+            end
           end
           timeStats[1] = 0
         end
@@ -317,16 +367,30 @@ end
 
     gl.Color(1,1,1,1)
     gl.BeginText()
-    for i=1,#sortedList do
-      local v = sortedList[i]
-      local wname = v[1]
-      local tLoad = v[2]
-      if maximum > 0 then
-        gl.Rect(x+100-tLoad/maximum*100, y+1-(fSpacing)*i, x+100, y+9-(fSpacing)*i)
+    if targetWname=='' then	
+      for i=1,#sortedList do
+        local v = sortedList[i]
+        local wname = v[1]
+        local tLoad = v[2]
+        if maximum > 0 then
+          gl.Rect(x+100-tLoad/maximum*100, y+1-(fSpacing)*i, x+100, y+9-(fSpacing)*i)
+        end
+        gl.Text(wname, x+150, y+1-(fSpacing)*i, fSize)
+        gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(fSpacing)*i, fSize)
       end
-      gl.Text(wname, x+150, y+1-(fSpacing)*i, fSize)
-      gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(fSpacing)*i, fSize)
-    end
+    else
+      local index2 = 1
+      gl.Text(targetWname, x+200, y+1-(fSpacing*1.25)*(1+index2), fSize*1.5)
+      gl.Text(('%.4fs'):format(targetCumulSecond), x+100, y+1-(fSpacing*1.25)*(1+index2), fSize*1.25)
+      gl.Text('left', x+200, y+1-(fSpacing*1.25)*(1+index2+1), fSize*1.5)
+      gl.Text(('%.1fs'):format(targetCountdown), x+100, y+1-(fSpacing*1.25)*(1+index2+1), fSize*1.25)
+      index2 = index2 + 3
+      for cname, value in pairs(targetCallinCumul) do
+        gl.Text(cname, x+200, y+1-(fSpacing)*(1+index2), fSize)
+        gl.Text(('%.4fs'):format(value), x+100, y+1-(fSpacing)*(1+index2), fSize)          
+        index2 = index2 + 1
+      end
+    end	
     local i = #sortedList + 1    
     gl.Text("\255\255\064\064total time", x+150, y-1-(fSpacing)*i, fSize)
     gl.Text("\255\255\064\064"..('%.3fs'):format(allOverTimeSec), x+105, y-1-(fSpacing)*i, fSize)
