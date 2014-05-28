@@ -244,7 +244,7 @@ local function option_Deselect()
 	multiSelect = {
 		barGrid = nil,
 		unitSquare = {data = {}, count = 0},
-		healthbarByUnitID = {},
+		indexByUnitID = {},
 		healthbarByDefID = {},
 	}
 end
@@ -377,6 +377,7 @@ options = {
 		value= true,
 		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
 		path = selPath,
+		OnChange = option_Deselect,
 	},
 	color_background = {
 		name = "Background color",
@@ -842,10 +843,15 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		end
 		
 		if unitid then
-			multiSelect.healthbarByUnitID[unitid] = squareData.healthbar
+			multiSelect.indexByUnitID[unitid] = index
 		end
 		if defid then
 			multiSelect.healthbarByDefID[defid] = squareData.healthbar
+		end
+		
+		if squareData.reloadbarIsChild then
+			squareData.panel:RemoveChild(squareData.reloadbar)
+			squareData.reloadbarIsChild = false
 		end
 		
 		squareData.image:Invalidate()
@@ -955,10 +961,15 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		};
 		
 		if unitid then
-			multiSelect.healthbarByUnitID[unitid] = squareData.healthbar
+			multiSelect.indexByUnitID[unitid] = index
 		end
 		if defid then
 			multiSelect.healthbarByDefID[defid] = squareData.healthbar
+		end
+		
+		if squareData.reloadbarIsChild then
+			squareData.panel:RemoveChild(squareData.reloadbar)
+			squareData.reloadbarIsChild = false
 		end
 	end
 end
@@ -991,7 +1002,7 @@ local function MakeUnitGroupSelectionToolTip()
 	WriteGroupInfo() --write selection summary text on right side of the panel
 
 	local index = 1
-	multiSelect.healthbarByUnitID = {}
+	multiSelect.indexByUnitID = {}
 	multiSelect.healthbarByDefID = {}
 	
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
@@ -1048,12 +1059,46 @@ local function UpdateSelectedUnitsTooltip()
 			for i=1,numSelectedUnits do
 				local unitid = selectedUnits[i][1]
 				--Spring.Echo(unitid)
-				local healthbar = multiSelect.healthbarByUnitID[unitid]
+				local index = multiSelect.indexByUnitID[unitid]
+				local squareData = multiSelect.unitSquare.data[index]
+				local healthbar = squareData.healthbar
 				local health, maxhealth = spGetUnitHealth(unitid)
 				if health and healthbar then --safety against spectating in limited LOS
 					healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
 					healthbar.color = GetHealthColor(health/maxhealth)
 					healthbar:SetValue(health/maxhealth) --update the healthbar value
+				end
+				
+				if options.manualWeaponReloadBar.value then
+					local reloadFraction,remainingTime = GetWeaponReloadStatus(unitid, 3)
+					if squareData.reloadbar then
+						if reloadFraction and reloadFraction < 0.99 then
+							if not squareData.reloadbarIsChild then
+								squareData.panel:AddChild(squareData.reloadbar)
+								squareData.reloadbarIsChild = true
+							end
+							squareData.reloadbar:SetValue(reloadFraction)
+						else
+							if squareData.reloadbarIsChild then
+								squareData.panel:RemoveChild(squareData.reloadbar)
+								squareData.reloadbarIsChild = false
+							end
+						end	
+					else
+						if reloadFraction and reloadFraction < 0.99 then
+							squareData.reloadbarIsChild = true
+							squareData.reloadbar = Progressbar:New{
+								parent  = squareData.panel;
+								name    = 'reloadMiniBar';
+								width   = unitIcon_size*0.98;
+								height  = unitIcon_size*0.04;
+								minHeight = unitIcon_size*0.04;
+								max     = 1;
+								value = reloadFraction;
+								color   = {013, 245, 243,1}; --? 
+							};
+						end
+					end
 				end
 			end
 		else
