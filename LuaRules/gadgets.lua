@@ -1058,6 +1058,10 @@ end
 function gadgetHandler:RecvLuaMsg(msg, player)
   for _,g in ipairs(self.RecvLuaMsgList) do
     if (g:RecvLuaMsg(msg, player)) then
+		Spring.Echo("GADGET MESSAGE:")
+		Spring.Echo(msg)
+		Spring.Echo(player)
+		Spring.Echo(g:GetInfo().name)
       return true
     end
   end
