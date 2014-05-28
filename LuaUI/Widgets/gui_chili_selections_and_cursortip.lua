@@ -160,6 +160,41 @@ local terraTips = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Multiple units selected controls and data
+
+local multiSelect = {
+	barGrid = nil,
+	unitSquare = {data = {}, count = 0},
+	healthbarByUnitID = {},
+	healthbarByDefID = {},
+}
+--[[
+multiSelect = {
+	barGrid = layout panel which is the parent of the structure
+	unitSquare = {
+		data = {
+			[1] = {
+				defid
+			    unitid
+			    unitids
+				panel
+				image
+				label
+				labelIsChild
+				healthbar
+				isChild
+			}
+			...
+		},
+		count
+	},
+	healthbarByUnitID = {},
+	healthbarByDefID = {},
+}
+--]]
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- group info
 
 local numSelectedUnits = 0
@@ -203,9 +238,15 @@ options_order = {
 }
 
 local function option_Deselect()
-  -- unselect to prevent errors
-  Spring.SelectUnitMap({}, false)
-  window_height = options.squarepics.value and 140 or 115
+	-- unselect to prevent errors
+	Spring.SelectUnitMap({}, false)
+	window_height = options.squarepics.value and 140 or 115
+	multiSelect = {
+		barGrid = nil,
+		unitSquare = {data = {}, count = 0},
+		healthbarByUnitID = {},
+		healthbarByDefID = {},
+	}
 end
 
 local function Show(param) end
@@ -322,7 +363,10 @@ options = {
 		name = 'Icon size on selection list',
 		desc = 'Determines how small the icon in selection list need to be.',
 		type = 'number',
-		OnChange = function(self) unitIcon_size=math.modf(self.value)end,
+		OnChange = function(self) 
+			option_Deselect()
+			unitIcon_size=math.modf(self.value)
+		end,
 		min=36,max=50,step=2,
 		value = 50,
 		path = selPath,
@@ -694,10 +738,18 @@ Show = function(obj)
 end
 
 local function DisposeSelectionDisplay()
-	if globalitems["window_corner_direct_child"] then
-		globalitems["window_corner_direct_child"][1]:Dispose()
-		if globalitems["window_corner_direct_child"][2] then
-			globalitems["window_corner_direct_child"][2]:Dispose()
+	local windowCornerData = globalitems["window_corner_direct_child"]
+	if windowCornerData then
+		if windowCornerData.disposable then
+			windowCornerData[1]:Dispose()
+			if windowCornerData[2] then
+				windowCornerData[2]:Dispose()
+			end
+		else
+			window_corner:RemoveChild(windowCornerData[1])
+			if windowCornerData[2] then
+				window_corner:RemoveChild(windowCornerData[2])
+			end
 		end
 		globalitems["window_corner_direct_child"]=nil
 	end
@@ -744,128 +796,190 @@ local function GetUnitDesc(unitID, ud)
 	return desc
 end
 
-local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
+local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 	counts = counts or 1
 	local ud = UnitDefs[defid]
-	local item = LayoutPanel:New{
-		name    = (counts==1 and unitids[1]) or defid; --identify button by UnitID if not grouped, else identify by UnitDefID
-		parent  = barGrid;
-		width   = unitIcon_size;
-		height  = unitIcon_size*1.24;
-		columns = 1;
-		padding     = {0,0,0,0};
-		itemPadding = {0,0,0,0};
-		itemMargin  = {0,0,0,1};
-		resizeItems = false;
-		centerItems = false;
-		autosize    = true;		
-	}
-	local img = Image:New{
-		name = "selImage";
-		parent  = item;
-		tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Click: Select \nRightclick: Deselect \nAlt+Click: Select One \nCtrl+click: Select Type \nMiddle-click: Goto";
-		file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
-		file    = "#" .. defid;
-		keepAspect = false;
-		height  = unitIcon_size * (options.squarepics.value and 1 or (4/5));
-		--height  = 50;
-		width   = unitIcon_size;
-		padding = {0,0,0,0}; --FIXME something overrides the default in image.lua!!!!
-		OnClick = {function(_,_,_,button)
-			
-			local alt, ctrl, meta, shift = spGetModKeyState()
-			
-			if (button==3) then
-				if (unitid and not ctrl) then
-					--// deselect a single unit
-					for i=1,numSelectedUnits do
-						if (selectedUnits[i][1]==unitid) then
-							table.remove(selectedUnits,i)
-							break
+	
+	if multiSelect.unitSquare.data[index] then
+		local squareData = multiSelect.unitSquare.data[index]
+		squareData.defid = defid
+		squareData.unitid = unitid
+		squareData.unitids = unitids
+		
+		squareData.image.tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
+		squareData.image.file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]))
+		squareData.image.file = "#" .. defid
+		
+		if counts > 1 then
+			if squareData.label then
+				if not squareData.labelIsChild then
+					squareData.image:AddChild(squareData.label)
+					squareData.labelIsChild = true
+				end
+				squareData.label:SetCaption(counts)
+			else
+				squareData.labelIsChild = true
+				squareData.label = Label:New{
+					name = "selLabel";
+					parent = squareData.image;
+					align  = "right";
+					valign = "top";
+					x =  unitIcon_size*0.16;
+					--y = 30;
+					y = unitIcon_size*0.4;
+					width = unitIcon_size*0.8;
+					fontsize   = 20;
+					fontshadow = true;
+					fontOutline = true;
+					caption    = counts;
+				};
+			end
+		else
+			if squareData.label and squareData.labelIsChild then
+				squareData.image:RemoveChild(squareData.label)
+				squareData.labelIsChild = false
+			end
+		end
+		
+		if unitid then
+			multiSelect.healthbarByUnitID[unitid] = squareData.healthbar
+		end
+		if defid then
+			multiSelect.healthbarByDefID[defid] = squareData.healthbar
+		end
+		
+		squareData.image:Invalidate()
+	else
+		multiSelect.unitSquare.count = multiSelect.unitSquare.count + 1
+		multiSelect.unitSquare.data[index] = {
+			defid = defid,
+			unitid = unitid,
+			unitids = unitids,
+			isChild = true,
+		}
+		local squareData = multiSelect.unitSquare.data[index]
+		
+		squareData.panel = LayoutPanel:New{
+			name    = index;
+			parent  = multiSelect.barGrid;
+			width   = unitIcon_size;
+			height  = unitIcon_size*1.24;
+			columns = 1;
+			padding     = {0,0,0,0};
+			itemPadding = {0,0,0,0};
+			itemMargin  = {0,0,0,1};
+			resizeItems = false;
+			centerItems = false;
+			autosize    = true;		
+		}
+		squareData.image = Image:New{
+			name = "selImage";
+			parent  = squareData.panel;
+			tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
+			file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
+			file    = "#" .. defid;
+			keepAspect = false;
+			height  = unitIcon_size * (options.squarepics.value and 1 or (4/5));
+			--height  = 50;
+			width   = unitIcon_size;
+			padding = {0,0,0,0}; --FIXME something overrides the default in image.lua!!!!
+			OnClick = {function(_,_,_,button)
+				
+				local alt, ctrl, meta, shift = spGetModKeyState()
+				
+				if (button==3) then
+					if shift then
+						--// deselect a whole unitdef block
+						for i = numSelectedUnits,1,-1 do
+							if (selectedUnits[i][2] == squareData.defid) then
+								table.remove(selectedUnits,i)
+								if not shift then
+									break
+								end
+							end
 						end
-					end
-				else
-					--// deselect a whole unitdef block
-					for i=numSelectedUnits,1,-1 do
-						if (selectedUnits[i][2]==defid) then
-							table.remove(selectedUnits,i)
-							if (alt) then
+					else
+						--// deselect a single unit
+						for i = 1,numSelectedUnits do
+							if (selectedUnits[i][2] == squareData.defid) then
+								table.remove(selectedUnits,i)
 								break
 							end
 						end
+						
 					end
-				end
-				local selectedIds = {}
-				for i = 1, #selectedUnits do
-					selectedIds[i] = selectedUnits[i][1]
-				end
-				spSelectUnitArray(selectedIds)
-				--update selected units right now
-				local sel = spGetSelectedUnits()
-				widget:SelectionChanged(sel)
-			elseif button == 1 then
-				if not ctrl then 
-					if (alt) then
-						spSelectUnitArray({ selectedUnitsByDef[defid][1] })  -- only 1	
+					local selectedIds = {}
+					for i = 1, #selectedUnits do
+						selectedIds[i] = selectedUnits[i][1]
+					end
+					spSelectUnitArray(selectedIds)
+					--update selected units right now
+					local sel = spGetSelectedUnits()
+					widget:SelectionChanged(sel)
+				elseif button == 1 then
+					if shift then
+						spSelectUnitArray(selectedUnitsByDef[squareData.defid]) -- select all
 					else
-						spSelectUnitArray(unitids) -- no modifier - select all
+						spSelectUnitArray({ selectedUnitsByDef[squareData.defid][1] })  -- only 1	
 					end
-				else
-					-- select all units of the icon type
-					spSelectUnitArray(selectedUnitsByDef[defid])
-					
-					--local sorted = Spring.GetTeamUnitsSorted(Spring.GetMyTeamID())						
-					--local units = sorted[defid]
-					--if units then Spring.SelectUnitArray(units) end
+				else --button2 (middle)
+					local x,y,z = spGetUnitPosition( squareData.unitids[1] )
+					Spring.SetCameraTarget(x,y,z, 1)
 				end
-			else --button2 (middle)
-				local x,y,z = spGetUnitPosition( unitids[1] )
-				Spring.SetCameraTarget(x,y,z, 1)
-			end
-		end}
-	};
-	if (counts >1) then --//add unit count when units are grouped.
-		Label:New{
-			name = "selLabel";
-			parent = img;
-			align  = "right";
-			valign = "top";
-			x =  unitIcon_size*0.16;
-			--y = 30;
-			y = unitIcon_size*0.4;
-			width = unitIcon_size*0.8;
-			fontsize   = 20;
-			fontshadow = true;
-			fontOutline = true;
-			caption    = counts;
+			end}
 		};
+		if counts > 1 then
+			squareData.labelIsChild = true
+			squareData.label = Label:New{
+				name = "selLabel";
+				parent = squareData.image;
+				align  = "right";
+				valign = "top";
+				x =  unitIcon_size*0.16;
+				--y = 30;
+				y = unitIcon_size*0.4;
+				width = unitIcon_size*0.8;
+				fontsize   = 20;
+				fontshadow = true;
+				fontOutline = true;
+				caption    = counts;
+			};
+		end
+		squareData.healthbar = Progressbar:New{
+			parent  = squareData.panel;
+			name    = 'health';
+			width   = unitIcon_size;
+			height  = unitIcon_size*0.2;
+			max     = 1;
+			color   = {0.0,0.99,0.0,1};
+		};
+		
+		if unitid then
+			multiSelect.healthbarByUnitID[unitid] = squareData.healthbar
+		end
+		if defid then
+			multiSelect.healthbarByDefID[defid] = squareData.healthbar
+		end
 	end
-	Progressbar:New{
-		parent  = item;
-		name    = 'health';
-		width   = unitIcon_size;
-		height  = unitIcon_size*0.2;
-		max     = 1;
-		color   = {0.0,0.99,0.0,1};
-	};
 end
 
 local function MakeUnitGroupSelectionToolTip()
 	local infoSection_size = 131
-	local barGrid = LayoutPanel:New{
-		name     = 'Bars';
-		resizeItems = false;
-		centerItems = false;
-		parent  = window_corner;
-		height  = "100%";
-		x=0,
-		--width   = "100%";
-		right=options.showgroupinfo.value and infoSection_size or 0, --expand to right
-		--columns = 5;
-		itemPadding = {0,0,0,0};
-		itemMargin  = {0,0,2,2};
-		tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
-	}
+	if not multiSelect.barGrid then
+		multiSelect.barGrid = LayoutPanel:New{
+			name     = 'Bars';
+			resizeItems = false;
+			centerItems = false;
+			height  = "100%";
+			x=0,
+			--width   = "100%";
+			right = options.showgroupinfo.value and infoSection_size or 0, --expand to right
+			--columns = 5;
+			itemPadding = {0,0,0,0};
+			itemMargin  = {0,0,2,2};
+			tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
+		}
+	end
 	
 	--estimate how many picture can fit into the selection grid
 	local maxRight = window_corner.width - (options.showgroupinfo.value and infoSection_size or 0)
@@ -876,116 +990,91 @@ local function MakeUnitGroupSelectionToolTip()
 
 	WriteGroupInfo() --write selection summary text on right side of the panel
 
+	local index = 1
+	multiSelect.healthbarByUnitID = {}
+	multiSelect.healthbarByDefID = {}
+	
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		local unitid,defid,unitids
-		for i=1,numSelectedUnits do
-			unitid = selectedUnits[i][1]
-			defid  = selectedUnits[i][2]
+		while index <= numSelectedUnits do
+			unitid = selectedUnits[index][1]
+			defid  = selectedUnits[index][2]
 			unitids = {unitid}
 
-			AddSelectionIcon(barGrid,unitid,defid,unitids)
+			AddSelectionIcon(index,unitid,defid,unitids)
+			local squareData = multiSelect.unitSquare.data[index]
+			if not squareData.isChild then
+				multiSelect.barGrid:AddChild(squareData.panel)
+				squareData.isChild = true
+			end
+			index = index + 1
 		end
 	else
 		local defid,unitids,counts
 		maxPicFit = math.min(#selectionSortOrder,maxPicFit)
-		for i=1,maxPicFit do
-			defid   = selectionSortOrder[i]
+		while index <= maxPicFit do
+			defid   = selectionSortOrder[index]
 			unitids = selectedUnitsByDef[defid]
 			counts  = selectedUnitsByDefCounts[defid]
-
-			AddSelectionIcon(barGrid,nil,defid,unitids,counts)
+			AddSelectionIcon(index,nil,defid,unitids,counts)
+			local squareData = multiSelect.unitSquare.data[index]
+			if not squareData.isChild then
+				multiSelect.barGrid:AddChild(squareData.panel)
+				squareData.isChild = true
+			end
+			index = index + 1
 		end
 	end
 	
-	return barGrid
+	-- Remove the unneeded children
+	while index <= multiSelect.unitSquare.count do
+		local squareData = multiSelect.unitSquare.data[index]
+		if squareData.isChild then
+			multiSelect.barGrid:RemoveChild(squareData.panel)
+			squareData.isChild = false
+		end
+		index = index + 1
+	end
+	
+	return multiSelect.barGrid
 end
 
 
 local function UpdateSelectedUnitsTooltip()
 	if (numSelectedUnits>1) then
-			local barsContainer = window_corner.childrenByName['Bars']
+		local barsContainer = window_corner.childrenByName['Bars']
 
-			if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
-				for i=1,numSelectedUnits do
-					local unitid = selectedUnits[i][1]
-					--Spring.Echo(unitid)
-					local unitIcon = barsContainer.childrenByName[unitid]
-					local healthbar = unitIcon.childrenByName['health']
-					local health, maxhealth = spGetUnitHealth(unitid)
-					if (health) then --safety against spectating in limited LOS
-						healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
-						healthbar.color = GetHealthColor(health/maxhealth)
-						healthbar:SetValue(health/maxhealth) --update the healthbar value
-					
-						--RELOAD_BAR: start-- , by msafwan. Function: show tiny reload bar for clickable weapon in unit selection list
-						if options.manualWeaponReloadBar.value then
-							local reloadFraction,remainingTime = GetWeaponReloadStatus(unitid, 3)
-							if reloadFraction then
-								local reloadMiniBar = unitIcon.childrenByName['reloadMiniBar']
-								if reloadMiniBar and reloadFraction < 0.99 then --update value IF already have the miniBar & is reloading weapon
-									reloadMiniBar:SetValue(reloadFraction)
-									miniReloadBarPresent = true
-								elseif reloadMiniBar then --remove the minibar IF not reloading weapon
-									reloadMiniBar:Dispose();
-									healthbar:Dispose(); --delete modified healthbar 
-									Progressbar:New{ --recreate original healthbar to avoid layout bug
-										parent  = unitIcon;
-										name    = 'health';
-										width   = unitIcon_size;
-										height  = unitIcon_size*0.2;
-										max     = 1;
-										value 	= (health/maxhealth);
-										color   = {0.0,0.99,0.0,1};
-									};
-								elseif reloadFraction < 0.99 then --create the minibar IF doesn't have the minibar & is reloading weapon
-										healthbar:Dispose(); --delete original healthbar 
-										Progressbar:New{ --recreate new healthbar (this is to solve issue of bar not resizing when we just changed the "height" & do 'healthbar:Invalidate()').
-											parent  = unitIcon;
-											name    = 'health';
-											width   = unitIcon_size;
-											height  = unitIcon_size*0.16;
-											minHeight = unitIcon_size*0.16;
-											max     = 1;
-											value 	= (health/maxhealth);
-											color   = {0.0,0.99,0.0,1}; --arbitrary color, will correct itself in next update
-										};
-										Progressbar:New{ --create mini reload bar
-											parent  = unitIcon;
-											name    = 'reloadMiniBar';
-											width   = unitIcon_size*0.98;
-											height  = unitIcon_size*0.04;
-											minHeight = unitIcon_size*0.04;
-											max     = 1;
-											value = reloadFraction;
-											color   = {013, 245, 243,1}; --? 
-										};
-								end
-							end
-						end
-						--RELOAD_BAR: end--	
-					end
+		if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
+			for i=1,numSelectedUnits do
+				local unitid = selectedUnits[i][1]
+				--Spring.Echo(unitid)
+				local healthbar = multiSelect.healthbarByUnitID[unitid]
+				local health, maxhealth = spGetUnitHealth(unitid)
+				if health and healthbar then --safety against spectating in limited LOS
+					healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
+					healthbar.color = GetHealthColor(health/maxhealth)
+					healthbar:SetValue(health/maxhealth) --update the healthbar value
 				end
-			else
-				for defid,unitids in pairs(selectedUnitsByDef) do --when grouped by unitDef
-					local health = 0
-					local maxhealth = 0
-					for i=1,#unitids do
-						local uhealth, umaxhealth = spGetUnitHealth(unitids[i])
+			end
+		else
+			for defid,unitids in pairs(selectedUnitsByDef) do --when grouped by unitDef
+				local health = 0
+				local maxhealth = 0
+				for i=1,#unitids do
+					local uhealth, umaxhealth = spGetUnitHealth(unitids[i])
+					if (health) then
 						health = health + (uhealth or 0)
 						maxhealth = maxhealth + (umaxhealth or 0)
 					end
-
-					local unitGroup = barsContainer.childrenByName[defid]
-					if unitGroup then --failsafe when spectating and selecting enemy units without LOS
-						local healthbar = unitGroup.childrenByName['health']
-						healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
-						healthbar.color = GetHealthColor(health/maxhealth)
-						healthbar:SetValue(health/maxhealth)
-					end
+				end
+				local healthbar = multiSelect.healthbarByDefID[defid]
+				if healthbar then
+					healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
+					healthbar.color = GetHealthColor(health/maxhealth)
+					healthbar:SetValue(health/maxhealth)
 				end
 			end
-
-		
+		end
 	end
 end
 
@@ -2458,13 +2547,14 @@ function widget:SelectionChanged(newSelection)
 				DisposeSelectionDisplay()
 				window_corner:AddChild(cur1)
 				window_corner:AddChild(cur2)
-				globalitems["window_corner_direct_child"]= {cur1,cur2}
+				globalitems["window_corner_direct_child"]= {cur1,cur2, disposable = true}
 			end
 		else
 			stt_unitID = nil
 			DisposeSelectionDisplay()
 			local cur1 = MakeUnitGroupSelectionToolTip()
 			globalitems["window_corner_direct_child"]= {cur1}
+			window_corner:AddChild(cur1)
 		end
 		real_window_corner.caption = nil
 		real_window_corner:Invalidate()
