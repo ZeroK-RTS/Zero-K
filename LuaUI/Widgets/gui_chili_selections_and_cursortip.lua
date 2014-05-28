@@ -696,7 +696,9 @@ end
 local function DisposeSelectionDisplay()
 	if globalitems["window_corner_direct_child"] then
 		globalitems["window_corner_direct_child"][1]:Dispose()
-		globalitems["window_corner_direct_child"][2]:Dispose()
+		if globalitems["window_corner_direct_child"][2] then
+			globalitems["window_corner_direct_child"][2]:Dispose()
+		end
 		globalitems["window_corner_direct_child"]=nil
 	end
 end
@@ -874,25 +876,6 @@ local function MakeUnitGroupSelectionToolTip()
 
 	WriteGroupInfo() --write selection summary text on right side of the panel
 
-	local groupingButton = Button:New{ --add a button that allow you to change alwaysgroup value on the interface directly
-		name = 'AlwaysGroupButton';
-		parent = window_corner;
-		bottom= 1,
-		right = 110,
-		minHeight = 18,
-		width = 18,
-		backgroundColor = {0,0,0,0.1},
-		fontSize = 9,
-		caption = pictureWithinCapacity and (options.groupalways.value and "[---]" or "---") or "#", 
-		OnClick = {pictureWithinCapacity and function(self) 
-			options.groupalways.value = not options.groupalways.value
-			local selUnits = spGetSelectedUnits()
-			widget:SelectionChanged(selUnits) --this will recreate all buttons
-			end or function() end},
-		textColor = {1,1,1,0.75}, 
-		tooltip = pictureWithinCapacity and (options.groupalways.value and  "Unit grouped by type" or "Unit not grouped") or (#selectionSortOrder>maxPicFit and "Bar is really full" or "Bar is full, unit grouped by type"),
-	}
-
 	if ( pictureWithinCapacity and (not options.groupalways.value)) then
 		local unitid,defid,unitids
 		for i=1,numSelectedUnits do
@@ -914,7 +897,7 @@ local function MakeUnitGroupSelectionToolTip()
 		end
 	end
 	
-	return barGrid, groupingButton
+	return barGrid
 end
 
 
@@ -2480,8 +2463,8 @@ function widget:SelectionChanged(newSelection)
 		else
 			stt_unitID = nil
 			DisposeSelectionDisplay()
-			local cur1, cur2 = MakeUnitGroupSelectionToolTip()
-			globalitems["window_corner_direct_child"]= {cur1,cur2}
+			local cur1 = MakeUnitGroupSelectionToolTip()
+			globalitems["window_corner_direct_child"]= {cur1}
 		end
 		real_window_corner.caption = nil
 		real_window_corner:Invalidate()
