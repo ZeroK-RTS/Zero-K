@@ -165,20 +165,27 @@ local terraTips = {}
 local numSelectedUnits = 0
 local maxPicFit = 12
 
-local gi_count = 0
-local gi_cost = 0
-local gi_finishedcost = 0
-local gi_hp = 0
-local gi_maxhp = 0
-local gi_metalincome = 0
-local gi_metaldrain = 0
-local gi_energyincome = 0
-local gi_energydrain = 0
-local gi_usedbp = 0
-local gi_totalbp = 0
+local unitInfoSum = {
+	count = 0,
+	cost = 0,
+	finishedcost = 0,
+	hp = 0,
+	maxhp = 0,
+	metalincome = 0,
+	metaldrain = 0,
+	energyincome = 0,
+	energydrain = 0,
+	usedbp = 0,
+	totalbp = 0,
+}
 
-local gi_str	--group info string
-local gi_label	--group info Chili label
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- UI elements
+
+local label_unitInfo
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -528,13 +535,13 @@ end
 
 --updates cost, HP, and resourcing info for group info
 local function UpdateDynamicGroupInfo()
-	gi_cost = 0
-	gi_hp = 0
-	gi_metalincome = 0
-	gi_metaldrain = 0
-	gi_energyincome = 0
-	gi_energydrain = 0
-	gi_usedbp = 0
+	local total_cost = 0
+	local total_hp = 0
+	local total_metalincome = 0
+	local total_metaldrain = 0
+	local total_energyincome = 0
+	local total_energydrain = 0
+	local total_usedbp = 0
 	
 	local id,defID,ud --micro optimization, avoiding repeated localization.
 	local name,hp,paradam,cap,build,mm,mu,em,eu
@@ -551,8 +558,8 @@ local function UpdateDynamicGroupInfo()
 		
 			if name ~= "terraunit" then
 				if mm then--failsafe when switching spectator view.
-					gi_cost = gi_cost + ud.metalCost*build
-					gi_hp = gi_hp + hp
+					total_cost = total_cost + ud.metalCost*build
+					total_hp = total_hp + hp
 				end
 				
 				stunned_or_inbuld = spGetUnitIsStunned(id)
@@ -572,23 +579,23 @@ local function UpdateDynamicGroupInfo()
 							od = tonumber(s) 
 						end
 						
-						gi_metalincome = gi_metalincome + baseMetal + baseMetal * od / 100
+						total_metalincome = total_metalincome + baseMetal + baseMetal * od / 100
 							
 						s = tooltip:match("Energy: ([^ ]+)")
 						if s ~= nil then 
-							gi_energydrain = gi_energydrain - (tonumber(s) or 0)
+							total_energydrain = total_energydrain - (tonumber(s) or 0)
 						end 
 					else
 						if mm then --failsafe when switching spectator view.
-							gi_metalincome = gi_metalincome + mm
-							gi_metaldrain = gi_metaldrain + mu
-							gi_energyincome = gi_energyincome + em
-							gi_energydrain = gi_energydrain + eu
+							total_metalincome = total_metalincome + mm
+							total_metaldrain = total_metaldrain + mu
+							total_energyincome = total_energyincome + em
+							total_energydrain = total_energydrain + eu
 						end
 					end
 					
 					if ud.buildSpeed ~= 0 and mm then
-						gi_usedbp = gi_usedbp + mu
+						total_usedbp = total_usedbp + mu
 					end
 				end
 			end
@@ -596,21 +603,21 @@ local function UpdateDynamicGroupInfo()
 		
 	end
 	
-	gi_cost = numformat(gi_cost)
-	gi_hp = numformat(gi_hp)
-	gi_metalincome = numformat(gi_metalincome)
-	gi_metaldrain = numformat(gi_metaldrain)
-	gi_energyincome = numformat(gi_energyincome)
-	gi_energydrain = numformat(gi_energydrain)
-	gi_usedbp = numformat(gi_usedbp)
+	unitInfoSum.cost = numformat(total_cost)
+	unitInfoSum.hp = numformat(total_hp)
+	unitInfoSum.metalincome = numformat(total_metalincome)
+	unitInfoSum.metaldrain = numformat(total_metaldrain)
+	unitInfoSum.energyincome = numformat(total_energyincome)
+	unitInfoSum.energydrain = numformat(total_energydrain)
+	unitInfoSum.usedbp = numformat(total_usedbp)
 end
 
 --updates values that don't change over time for group info
 local function UpdateStaticGroupInfo()
-	gi_count = numSelectedUnits
-	gi_finishedcost = 0
-	gi_totalbp = 0
-	gi_maxhp = 0
+	local total_count = numSelectedUnits
+	local total_finishedcost = 0
+	local total_totalbp = 0
+	local total_maxhp = 0
 	
 	local defID, ud
 	for i = 1, numSelectedUnits do
@@ -618,22 +625,22 @@ local function UpdateStaticGroupInfo()
 		ud = UnitDefs[defID]
 		if ud then
 			if ud.name ~= "terraunit" then
-				gi_totalbp = gi_totalbp + ud.buildSpeed
-				gi_maxhp = gi_maxhp + ud.health
-				gi_finishedcost = gi_finishedcost + ud.metalCost
+				total_totalbp = total_totalbp + ud.buildSpeed
+				total_maxhp = total_maxhp + ud.health
+				total_finishedcost = total_finishedcost + ud.metalCost
 			end
 		end
 	end
-	gi_finishedcost = numformat(gi_finishedcost)
-	gi_totalbp = numformat(gi_totalbp)
-	gi_maxhp = numformat(gi_maxhp)
+	unitInfoSum.finishedcost = numformat(total_finishedcost)
+	unitInfoSum.totalbp = numformat(total_totalbp)
+	unitInfoSum.maxhp = numformat(total_maxhp)
 end
 
 --this is a separate function to allow group info to be regenerated without reloading the whole tooltip
 local function WriteGroupInfo()
-	if gi_label then
-		gi_label:Dispose(); --delete chili element
-		gi_label=nil;
+	if label_unitInfo then
+		label_unitInfo:Dispose(); --delete chili element
+		label_unitInfo=nil;
 	end
 	
 	if not options.showgroupinfo.value or numSelectedUnits==0 then
@@ -652,23 +659,23 @@ local function WriteGroupInfo()
 			end
 		end
 	end
-	local metal = (tonumber(gi_metalincome)>0 or tonumber(gi_metaldrain)>0) and ("\nMetal \255\0\255\0+" .. gi_metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  gi_metaldrain  .. "\255\255\255\255") or '' --have metal or ''
-	local energy = (tonumber(gi_energyincome)>0 or tonumber(gi_energydrain)>0) and ("\nEnergy \255\0\255\0+" .. gi_energyincome .. "\255\255\255\255 / \255\255\0\0-" .. gi_energydrain .. "\255\255\255\255") or '' --have energy or ''
-	local buildpower = (tonumber(gi_totalbp)>0) and ("\nBuild Power " .. gi_usedbp .. " / " ..  gi_totalbp) or ''  --have buildpower or ''
-	gi_str = 
-		"Selected Units " .. gi_count ..
-		"\nHealth " .. gi_hp .. " / " ..  gi_maxhp ..
-		"\nCost " .. gi_cost .. " / " ..  gi_finishedcost ..
+	local metal = (tonumber(unitInfoSum.metalincome)>0 or tonumber(unitInfoSum.metaldrain)>0) and ("\nMetal \255\0\255\0+" .. unitInfoSum.metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  unitInfoSum.metaldrain  .. "\255\255\255\255") or '' --have metal or ''
+	local energy = (tonumber(unitInfoSum.energyincome)>0 or tonumber(unitInfoSum.energydrain)>0) and ("\nEnergy \255\0\255\0+" .. unitInfoSum.energyincome .. "\255\255\255\255 / \255\255\0\0-" .. unitInfoSum.energydrain .. "\255\255\255\255") or '' --have energy or ''
+	local buildpower = (tonumber(unitInfoSum.totalbp)>0) and ("\nBuild Power " .. unitInfoSum.usedbp .. " / " ..  unitInfoSum.totalbp) or ''  --have buildpower or ''
+	local unitInfoString = 
+		"Selected Units " .. unitInfoSum.count ..
+		"\nHealth " .. unitInfoSum.hp .. " / " ..  unitInfoSum.maxhp ..
+		"\nCost " .. unitInfoSum.cost .. " / " ..  unitInfoSum.finishedcost ..
 		metal .. energy ..	buildpower .. dgunStatus
 	
-	gi_label = Label:New{ --recreate chili element (rather than just updating caption) to avoid color bug
+	label_unitInfo = Label:New{ --recreate chili element (rather than just updating caption) to avoid color bug
 		parent = window_corner;
 		y=5,
 		right=5,
 		x=window_corner.width-150,
 		height  = '100%';
 		width = 120,
-		caption = gi_str;
+		caption = unitInfoString;
 		valign  = 'top';
 		fontSize = 12;
 		fontShadow = true;
@@ -867,7 +874,7 @@ local function MakeUnitGroupSelectionToolTip()
 
 	WriteGroupInfo() --write selection summary text on right side of the panel
 
-	local gi_groupingbutton = Button:New{ --add a button that allow you to change alwaysgroup value on the interface directly
+	local groupingButton = Button:New{ --add a button that allow you to change alwaysgroup value on the interface directly
 		name = 'AlwaysGroupButton';
 		parent = window_corner;
 		bottom= 1,
@@ -907,7 +914,7 @@ local function MakeUnitGroupSelectionToolTip()
 		end
 	end
 	
-	return barGrid, gi_groupingbutton
+	return barGrid, groupingButton
 end
 
 
