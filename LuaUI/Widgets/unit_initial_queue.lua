@@ -1,4 +1,4 @@
-local version = "v1.543"
+local version = "v1.544"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -211,8 +211,8 @@ end
 ------------------------------------------------------------
 function widget:Initialize()
 	if (Game.startPosType == 1) or			-- Don't run if start positions are random
-	   (Spring.GetGameFrame() > 0) or		-- Don't run if game has already started
-	   (Spring.GetSpectatingState()) then	-- Don't run if we are a spec
+	   (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
+		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
 		widgetHandler:RemoveWidget(self)
 		return
 	end
@@ -652,8 +652,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			--msg = "IQ|4|404|648|2|3304|1" --example spoof. This will not work
 		end
 		if msg then
-			Spring.SendLuaUIMsg(msg,'a')
-			Spring.SendLuaUIMsg(msg,"s")
+			Spring.SendLuaUIMsg(msg)
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
