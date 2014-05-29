@@ -20,8 +20,15 @@ sparks.wav
 
 Xonotic:
 entire ctf & announcer folder contents
+
 Kmar:
 entire announcer/kmar folder contents
 
 Sunniterri:
 All zombie sounds (derived from http://www.freesound.org/people/sunnyterri/sounds/168204/)
+
+Klangfabrik:
+Sonic blaster shot sound (http://www.freesound.org/people/klangfabrik/sounds/232936/, sonic_blaster.wav)
+
+Unfa:
+Sonic blaster impact sound (unfa_blast_2)

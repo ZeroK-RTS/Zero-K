@@ -8,12 +8,13 @@ function gadget:GetInfo()
 		date = "2013-06-28",
 		license = "GNU GPL, v2 or later",
 		layer = 1,
-		enabled = false
+		enabled = true
 	}
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local weapons = include("LuaRules/Configs/lups_projectile_fxs.lua")	--{}
+
 --[[
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]

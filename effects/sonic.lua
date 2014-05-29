@@ -61,6 +61,25 @@ local fx = {
 },
 
 ['sonictrail'] = {
+    expand = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      unit				 = true,
+      underwater		 = true,
+      properties = {
+        heat               = 100,
+        heatfalloff        = 15,
+        maxheat            = 100,
+        pos                = [[0,0,0]],
+        size               = 20,
+        sizegrowth         = -5,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
     airpop = {
       air                = true,
       class              = [[heatcloud]],
