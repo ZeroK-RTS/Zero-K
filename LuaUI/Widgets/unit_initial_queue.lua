@@ -343,7 +343,7 @@ function widget:DrawWorld()
 
 	for teamID,playerXBuildQueue in pairs(othersBuildQueue)do
 		sx, sy, sz = Spring.GetTeamStartPosition(teamID) -- Returns -100, -100, -100 when none chosen
-		startChosen = (sx > 0)
+		startChosen = sx and (sx > 0)
 
 		-- Draw all the buildings
 		queueLineVerts = startChosen and {{v={sx, sy, sz}}} or {}
