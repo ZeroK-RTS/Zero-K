@@ -99,6 +99,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+	  leadlimit               = 0,
       model                   = [[wep_t_barracuda.s3o]],
       range                   = 1050,
       reloadtime              = 6,

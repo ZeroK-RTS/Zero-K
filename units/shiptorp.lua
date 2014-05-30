@@ -98,6 +98,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
 	  flightTime              = 6,
+	  leadlimit               = 0,
       model                   = [[wep_t_longbolt.s3o]],
       myGravity               = 0.8,
       numbounce               = 4,

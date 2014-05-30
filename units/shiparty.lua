@@ -101,6 +101,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+	  leadlimit               = 0,
       model                   = [[depthcharge.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,

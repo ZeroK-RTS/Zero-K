@@ -105,6 +105,7 @@ unitDef = {
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
       interceptedByShieldType = 2,
+	  leadlimit               = 0,
       model                   = [[wep_m_dragonsfang.s3o]],
       projectiles             = 2,
       range                   = 450,
