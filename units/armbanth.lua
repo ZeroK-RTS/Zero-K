@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armbanth]],
   name                   = [[Bantha]],
-  description            = [[Heavy Standoff Strider]],
+  description            = [[Ranged Support Strider]],
   acceleration           = 0.1047,
   brakeRate              = 0.2212,
   buildCostEnergy        = 10500,

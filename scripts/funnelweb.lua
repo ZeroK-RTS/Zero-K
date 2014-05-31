@@ -99,6 +99,8 @@ local function RestoreLegs()
 end
 
 function script.Create()
+	Move(gunL, y_axis, 1.5)
+	Move(gunR, y_axis, 1.5)
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -183,8 +185,10 @@ end
 
 function script.Shot(num)
 	if num == 1 then
-		EmitSfx(cannons[gun_1].flare, 1024)
+		--EmitSfx(cannons[gun_1].turret, 1024) -- there is no good place to emit this
 		EmitSfx(cannons[gun_1].flare, 1025)
+		Move(cannons[gun_1].turret, z_axis, -0.3)
+		Move(cannons[gun_1].turret, z_axis, 0, 3)
 		gun_1 = 1 - gun_1
 	end
 end

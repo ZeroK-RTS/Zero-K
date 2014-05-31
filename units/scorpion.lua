@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[scorpion]],
   name                   = [[Scorpion]],
-  description            = [[Heavy Ranged Support/Battle Spider]],
+  description            = [[Heavy Infiltration Strider]],
   acceleration           = 0.26,
   brakeRate              = 0.26,
   buildCostEnergy        = 3000,

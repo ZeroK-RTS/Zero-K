@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[funnelweb]],
   name                   = [[Funnelweb]],
-  description            = [[Very Heavy Support Spider]],
+  description            = [[Drone/Shield Support Strider]],
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   autoheal				 = 20,
@@ -19,7 +19,7 @@ unitDef = {
 
   customParams           = {
     description_pl = [[Ciezki pajak wsparcia]],
-    helptext       = [[The slow all-terrain Funnelweb is only (relatively) modestly armed and can only fire forwards, but features twin area shields and powerful drone complement.]],
+    helptext       = [[The slow all-terrain Funnelweb is barely armed and can only fire forwards, but features twin area shields and powerful drone complement.]],
     helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Mimo ze jego bron jest skromna i moze strzelac jedynie do przodu, posiada dwie tarcze obszarowe oraz produkuje zestaw dronow.]],
   },
 
@@ -47,8 +47,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:RAIDMUZZLE]],
-      [[custom:RAIDDUST]],
+      [[custom:emg_shells_l]],
+      [[custom:flashmuzzle1]],
     },
 
   },
@@ -66,10 +66,10 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[GAUSS]],
+      def                = [[EMG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-	  maxAngleDif		 = 60,
+	  maxAngleDif		 = 35,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -86,54 +86,45 @@ unitDef = {
 
   weaponDefs             = {
 
-    GAUSS = {
-      name                    = [[Gauss Cannon]],
-      alphaDecay              = 0.12,
-      areaOfEffect            = 16,
-      avoidFeature            = false,
-      bouncerebound           = 0.15,
-      bounceslip              = 1,
-      burst                   = 2,
-      burstrate               = 0.4,
-      cegTag                  = [[gauss_tag_h]],
-      
-      customParams = {
-        single_hit_multi = true,
-      },
-      
+    EMG = {
+      name                    = [[Pulse MG]],
+      alphaDecay              = 0.1,
+      areaOfEffect            = 8,
+      burst                   = 3,
+      burstrate               = 0.1,
+      colormap                = [[1 0.95 0.4 1   1 0.95 0.4 1    0 0 0 0.01    1 0.7 0.2 1]],
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 400,
-        planes  = 400,
-        subs    = 20,
+        default = 11.34,
+        planes  = 11.34,
+        subs    = 0.567,
       },
 
-      explosionGenerator      = [[custom:gauss_hit_h]],
-      groundbounce            = 1,
+      explosionGenerator      = [[custom:FLASHPLOSION]],
       impactOnly              = true,
       impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 0,
-      minbarrelangle          = [[-15]],
-      noExplode               = true,
-      numbounce               = 40,
-      range                   = 420,
-      reloadtime              = 3,
-      rgbColor                = [[0.5 1 1]],
-      separation              = 0.5,
-      size                    = 0.8,
-      sizeDecay               = -0.1,
-      soundHit                = [[weapon/gauss_hit]],
-      soundStart              = [[weapon/gauss_fire]],
-      sprayangle              = 800,
-      stages                  = 32,
-      startsmoke              = [[1]],
+      impulseFactor           = 0.4,
+      intensity               = 0.7,
+      interceptedByShieldType = 1,
+      noGap                   = false,
+      noSelfDamage            = true,
+      projectiles             = 2,
+      range                   = 220,
+      reloadtime              = 0.31,
+      rgbColor                = [[1 0.95 0.4]],
+      separation              = 1.5,
+      size                    = 1.75,
+      sizeDecay               = 0,
+      soundStart              = [[weapon/emg]],
+      soundStartVolume        = 4,
+      sprayAngle              = 1180,
+      stages                  = 10,
+      tolerance               = 5000,
       turret                  = true,
-      waterbounce             = 1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 2400,
+      weaponVelocity          = 500,
     },
 	
     SHIELD = {
