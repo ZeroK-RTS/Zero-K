@@ -648,6 +648,7 @@ local function UpdateDynamicGroupInfo()
 		
 	end
 	
+	unitInfoSum.count = numformat(numSelectedUnits)
 	unitInfoSum.cost = numformat(total_cost)
 	unitInfoSum.hp = numformat(total_hp)
 	unitInfoSum.metalincome = numformat(total_metalincome)

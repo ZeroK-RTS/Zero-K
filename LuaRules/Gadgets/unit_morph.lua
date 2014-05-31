@@ -640,6 +640,16 @@ local function FinishMorph(unitID, morphData)
     Spring.AddUnitImpulse(newUnit,0,-1,0) --negate dummy impulse
   end
   Spring.AddUnitImpulse(newUnit,velX,velY,velZ) --restore speed
+
+  -- script.StartMoving is not called if a unit is created and then given velocity via impulse.
+  local speed = math.sqrt(velX^2 + velY^2 + velZ^2)
+  if speed > 0.6 then
+    local env = Spring.UnitScript.GetScriptEnv(newUnit)
+	if env and env.script.StartMoving then
+      Spring.UnitScript.CallAsUnit(newUnit,env.script.StartMoving)
+	end
+  end
+  
   --// transfer facplop
   if facplop then GG.GiveFacplop(newUnit) end  
   --// transfer health
@@ -693,6 +703,8 @@ local function FinishMorph(unitID, morphData)
   })
   --//reassign assist commands to new unit
   ReAssignAssists(newUnit,unitID)
+  
+
   --//transfer command queue
   for i = 1, #cmds do
     local cmd = cmds[i]
@@ -715,6 +727,7 @@ local function FinishMorph(unitID, morphData)
 		Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
 	end
   end
+  
 end
 
 
