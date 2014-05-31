@@ -83,7 +83,6 @@ function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attacke
 		end
 		return damage 
 	end
-	
 	return damage;
 end
 

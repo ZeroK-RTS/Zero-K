@@ -43,15 +43,15 @@ local floatDefs = {
 	},
 
 	[UnitDefNames["amphraider2"].id] = {
-		initialRiseSpeed = 3,
-		riseAccel = 0.12,
-		riseUpDrag = 0.9,
+		initialRiseSpeed = 5,
+		riseAccel = 0.15,
+		riseUpDrag = 0.99,
 		riseDownDrag = 0.7,
 		sinkAccel = -0.12,
 		sinkUpDrag = 0.9,
 		sinkDownDrag = 0.9,
-		airAccel = -0.1, -- aka gravity, only effective out of water
-		airDrag = 0.995,
+		airAccel = -0.2, -- aka gravity, only effective out of water
+		airDrag = 0.92,
 		waterHitDrag = 0.5,
 		floatPoint = -12,
 		depthRequirement = -30,

@@ -381,6 +381,18 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 20,
 	},
+	["amphraider3"] = {
+		skirms = shortRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		maxSwarmLeeway = 35, 
+		swarmLeeway = 30, 
+		jinkTangentLength = 140, 
+		stoppingDistance = 25,
+		minCircleStrafeDistance = 10,
+		velocityPrediction = 20,
+	},
 	["corgator"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
