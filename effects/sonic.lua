@@ -3,7 +3,7 @@ Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 local fx = {
- ['sonic'] = {
+['sonic'] = {
     groundflash = {
       air                = false,
       underwater		 = true,

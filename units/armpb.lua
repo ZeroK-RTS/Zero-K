@@ -68,7 +68,7 @@ unitDef = {
     {
       def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
@@ -90,7 +90,6 @@ unitDef = {
       damage                  = {
         default = 200,
         planes  = 200,
-        subs    = 10,
       },
 
       customParams = {
@@ -118,7 +117,7 @@ unitDef = {
       soundStartVolume        = 2.5,
       stages                  = 32,
       turret                  = true,
-      waterbounce             = 1,
+      waterweapon			  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 2200,
     },

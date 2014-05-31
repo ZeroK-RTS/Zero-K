@@ -1,47 +1,5 @@
--- gauss_hit_h
--- gauss_tag_l
--- gauss_tag_snipe
--- gauss_ring_l
--- gauss_tag_m
--- gauss_tag_h
--- gauss_ring_h
--- gauss_hit_l
--- gauss_ring_m
--- gauss_hit_m
--- gauss_ring_snipe
--- gauss_hit_l_purple
--- gauss_hit_m_purple
 
-return {
-  ["gauss_hit_h"] = {
-    inner = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = 0,
-        dir                = [[dir]],
-        explosiongenerator = [[custom:GAUSS_HIT_M]],
-        pos                = [[0, 0, 0]],
-      },
-    },
-    sphere = {
-      air                = true,
-      class              = [[CSpherePartSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        alpha              = 0.5,
-        color              = [[0.5,1,1]],
-        expansionspeed     = 8,
-        ttl                = 8,
-      },
-    },
-  },
-
+local retEffects = {
   ["gauss_tag_l"] = {
     tealflash = {
       air                = true,
@@ -70,34 +28,60 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
-  },
-
-  ["gauss_tag_snipe"] = {
-    tealflash = {
-      air                = true,
-      class              = [[CSimpleGroundFlash]],
+	water_trail = {
+      air                = false,
+      class              = [[CExpGenSpawner]],
       count              = 1,
-      ground             = true,
+      ground             = false,
       water              = true,
+      unit				 = false,
+      underwater		 = true,
       properties = {
-        colormap           = [[0.5 1 1 0.01    0 0 0 0.01]],
-        size               = 320,
-        sizegrowth         = 0,
-        texture            = [[groundflash]],
+        dir                = [[dir]],
+        explosiongenerator = [[custom:GAUSS_BUBBLE_1]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+  },
+  
+  ["gauss_bubble_1"] = {
+    tealring = {
+      air                = false,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = false,
+      water              = true,
+      unit				 = false,
+      underwater		 = true,
+      properties = {
+        colormap           = [[0 1 0.5 0.03    0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[null]],
+        length             = 0.15,
+        sidetexture        = [[smoketrailthinner]],
+        size               = 1,
+        sizegrowth         = 15,
         ttl                = 15,
       },
     },
-    trail = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 1,
-      ground             = true,
+	waterpop = {
+      air                = false,
+      class              = [[heatcloud]],
+      count              = 3,
+      ground             = false,
       water              = true,
+      unit				 = false,
+      underwater		 = true,
       properties = {
-        delay              = 3,
-        dir                = [[dir]],
-        explosiongenerator = [[custom:GAUSS_RING_SNIPE]],
-        pos                = [[0, 0, 0]],
+        heat               = 18,
+        heatfalloff        = 0.4,
+        maxheat            = 15,
+        pos                = [[-5 r10, -5 r10, -5 r10]],
+        size               = 3,
+        sizegrowth         = 0.01,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
       },
     },
   },
@@ -122,37 +106,7 @@ return {
       },
     },
   },
-
-  ["gauss_tag_m"] = {
-    tealflash = {
-      air                = true,
-      class              = [[CSimpleGroundFlash]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        colormap           = [[0.5 1 1 0.05    0 0 0 0.01]],
-        size               = 120,
-        sizegrowth         = 0,
-        texture            = [[groundflash]],
-        ttl                = 10,
-      },
-    },
-    trail = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = 3,
-        dir                = [[dir]],
-        explosiongenerator = [[custom:GAUSS_RING_M]],
-        pos                = [[0, 0, 0]],
-      },
-    },
-  },
-
+  
   ["gauss_tag_h"] = {
     tealflash = {
       air                = true,
@@ -181,8 +135,64 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
+	water_trail = {
+      air                = false,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = false,
+      water              = true,
+      unit				 = false,
+      underwater		 = true,
+      properties = {
+        dir                = [[dir]],
+        explosiongenerator = [[custom:GAUSS_BUBBLE_1]],
+        pos                = [[0, 0, 0]],
+      },
+    },
   },
-
+  
+  ["gauss_bubble_h"] = {
+    tealring = {
+      air                = false,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = false,
+      water              = true,
+      unit				 = false,
+      underwater		 = true,
+       properties = {
+        colormap           = [[0 1 0.5 0.05    0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[null]],
+        length             = 0.15,
+        sidetexture        = [[smoketrailthinner]],
+        size               = 1,
+        sizegrowth         = 31,
+        ttl                = 31,
+      },
+    },
+	waterpop = {
+      air                = false,
+      class              = [[heatcloud]],
+      count              = 6,
+      ground             = false,
+      water              = true,
+      unit				 = false,
+      underwater		 = true,
+      properties = {
+        heat               = 36,
+        heatfalloff        = 0.4,
+        maxheat            = 40,
+        pos                = [[-5 r20, -5 r20, -5 r20]],
+        size               = 6,
+        sizegrowth         = 0.02,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+  },
+  
   ["gauss_ring_h"] = {
     tealring = {
       air                = true,
@@ -204,6 +214,7 @@ return {
     },
   },
 
+
   ["gauss_hit_l"] = {
     sphere = {
       air                = true,
@@ -218,29 +229,62 @@ return {
         ttl                = 8,
       },
     },
-  },
-
-  ["gauss_ring_m"] = {
-    tealring = {
-      air                = true,
-      class              = [[CBitmapMuzzleFlame]],
+	groundflash = {
+      air                = false,
+      underwater		 = true,
+      circlealpha        = 0.6,
+      circlegrowth       = 2,
+      flashalpha         = 0.9,
+      flashsize          = 20,
+      ground             = false,
+      ttl                = 10,
+      water              = false,
+      color = {
+        [1]  = 0,
+        [2]  = 0.60000001192093,
+        [3]  = 1,
+      },
+    },
+    expand = {
+      air                = false,
+      class              = [[heatcloud]],
       count              = 1,
-      ground             = true,
-      water              = true,
+      ground             = false,
+      water              = false,
+      unit				 = true,
+      underwater		 = true,
       properties = {
-        colormap           = [[0 1 0.5 0.03    0 0 0 0.01]],
-        dir                = [[dir]],
-        frontoffset        = 0,
-        fronttexture       = [[bluering]],
-        length             = 0.15,
-        sidetexture        = [[smoketrailthinner]],
-        size               = 1,
-        sizegrowth         = 23,
-        ttl                = 23,
+        heat               = 30,
+        heatfalloff        = 4,
+        maxheat            = 30,
+        pos                = [[0,0,0]],
+        size               = 20,
+        sizegrowth         = 6,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+    contract = {
+      air                = false,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = false,
+      water              = false,
+      unit				 = true,
+      underwater		 = true,
+      properties = {
+        heat               = 30,
+        heatfalloff        = 2,
+        maxheat            = 30,
+        pos                = [[0,0,0]],
+        size               = 20,
+        sizegrowth         = -6,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
       },
     },
   },
-
+  
   ["gauss_hit_m"] = {
     inner = {
       air                = true,
@@ -268,46 +312,63 @@ return {
         ttl                = 8,
       },
     },
-  },
-
-  ["gauss_ring_snipe"] = {
-    tealring = {
-      air                = true,
-      class              = [[CBitmapMuzzleFlame]],
+	groundflash = {
+      air                = false,
+      underwater		 = true,
+      circlealpha        = 0.6,
+      circlegrowth       = 2,
+      flashalpha         = 0.9,
+      flashsize          = 20,
+      ground             = false,
+      ttl                = 10,
+      water              = false,
+      color = {
+        [1]  = 0,
+        [2]  = 0.60000001192093,
+        [3]  = 1,
+      },
+    },
+    expand = {
+      air                = false,
+      class              = [[heatcloud]],
       count              = 1,
-      ground             = true,
-      water              = true,
+      ground             = false,
+      water              = false,
+      unit				 = true,
+      underwater		 = true,
       properties = {
-        colormap           = [[0 0.02 0.01 0.01    0 0 0 0.01]],
-        dir                = [[dir]],
-        frontoffset        = 0,
-        fronttexture       = [[bluering]],
-        length             = 0.05,
-        sidetexture        = [[smoketrailthinner]],
-        size               = 1,
-        sizegrowth         = 31,
-        ttl                = 31,
+        heat               = 30,
+        heatfalloff        = 4,
+        maxheat            = 30,
+        pos                = [[0,0,0]],
+        size               = 20,
+        sizegrowth         = 6,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+    contract = {
+      air                = false,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = false,
+      water              = false,
+      unit				 = true,
+      underwater		 = true,
+      properties = {
+        heat               = 30,
+        heatfalloff        = 2,
+        maxheat            = 30,
+        pos                = [[0,0,0]],
+        size               = 20,
+        sizegrowth         = -6,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
       },
     },
   },
-
-  ["gauss_hit_l_purple"] = {
-    sphere = {
-      air                = true,
-      class              = [[CSpherePartSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        alpha              = 0.5,
-        color              = [[0.9,0.1,0.9]],
-        expansionspeed     = 4,
-        ttl                = 8,
-      },
-    },
-  },  
   
-  ["gauss_hit_m_purple"] = {
+  ["gauss_hit_h"] = {
     inner = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -317,7 +378,7 @@ return {
       properties = {
         delay              = 0,
         dir                = [[dir]],
-        explosiongenerator = [[custom:GAUSS_HIT_L_PURPLE]],
+        explosiongenerator = [[custom:GAUSS_HIT_M]],
         pos                = [[0, 0, 0]],
       },
     },
@@ -329,12 +390,67 @@ return {
       water              = true,
       properties = {
         alpha              = 0.5,
-        color              = [[0.9,0.1,0.9]],
-        expansionspeed     = 6,
+        color              = [[0.5,1,1]],
+        expansionspeed     = 8,
         ttl                = 8,
       },
     },
-  },  
+	groundflash = {
+      air                = false,
+      underwater		 = true,
+      circlealpha        = 0.6,
+      circlegrowth       = 2,
+      flashalpha         = 0.9,
+      flashsize          = 20,
+      ground             = false,
+      ttl                = 10,
+      water              = false,
+      color = {
+        [1]  = 0,
+        [2]  = 0.60000001192093,
+        [3]  = 1,
+      },
+    },
+    expand = {
+      air                = false,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = false,
+      water              = false,
+      unit				 = true,
+      underwater		 = true,
+      properties = {
+        heat               = 30,
+        heatfalloff        = 4,
+        maxheat            = 30,
+        pos                = [[0,0,0]],
+        size               = 20,
+        sizegrowth         = 6,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+    contract = {
+      air                = false,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = false,
+      water              = false,
+      unit				 = true,
+      underwater		 = true,
+      properties = {
+        heat               = 30,
+        heatfalloff        = 2,
+        maxheat            = 30,
+        pos                = [[0,0,0]],
+        size               = 20,
+        sizegrowth         = -6,
+        speed              = [[0, 0, 0]],
+        texture            = [[sonic_glow]],
+      },
+    },
+  },
   
 }
 
+return retEffects

@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Scrubber]],
   description         = [[Fast Attack Hovercraft]],
   acceleration        = 0.066,
+  activateWhenBuilt   = true,
   brakeRate           = 0.0835,
   buildCostEnergy     = 85,
   buildCostMetal      = 85,
@@ -60,6 +61,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 450,
+  sonarDistance       = 350,
   smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 673,
@@ -70,7 +72,7 @@ unitDef = {
     {
       def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SUB SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
@@ -93,7 +95,6 @@ unitDef = {
       damage                  = {
         default = 110,
         planes  = 110,
-        subs    = 5.5,
       },
       
       customParams = {
@@ -123,7 +124,7 @@ unitDef = {
       sprayangle              = 400,
       stages                  = 32,
       turret                  = true,
-      waterbounce             = 1,
+      waterweapon			  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 2200,
     },
