@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.365 Integral Command Menu",
+    desc      = "v0.366 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
@@ -113,6 +113,7 @@ local spGetFullBuildQueue = Spring.GetFullBuildQueue
 local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitWeaponState 	= Spring.GetUnitWeaponState
+local spGetGameFrame 		= Spring.GetGameFrame
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 
 local push        = table.insert
@@ -1323,6 +1324,14 @@ function widget:Initialize()
 		y = 0;
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
+		OnMouseDown={ function(self) 
+			--// click+ space on integral-menu tab will open a Game-menu.
+			local _,_, meta,_ = Spring.GetModKeyState()
+			if not meta then return false end --allow button to continue its function
+			WG.crude.OpenPath(options_path)
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return false
+		end },		
 	}
 	
 	for i=1,6 do
@@ -1353,6 +1362,20 @@ function widget:Initialize()
 			itemMargin  = {0, 0, 0, 0},
 			index = i,
 			i_am_sp_commands = true,
+			--[[
+			hitTestAllowEmpty = true,
+			OnMouseDown={ function(self) --FIXME: how to check whether we are pressing on button or on the panel? 
+					--// click+ space on empty space on the integral-menu will open a Game-menu.
+					-- local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+					-- if not forwardSlash then return false end
+					local _,_, meta,_ = Spring.GetModKeyState()
+					if not meta then return false end --allow button to continue its function
+					WG.crude.OpenPath('Game/Commands')
+					WG.crude.ShowMenu() --make epic Chili menu appear.
+					return false
+				end
+			end },
+			--]]
 		}
 		--Spring.Echo("Command row "..i.." created")
 	end
@@ -1367,6 +1390,13 @@ function widget:Initialize()
 		y = "0%";
 		padding = {0, 4, 4, 4},
 		itemMargin  = {0, 0, 0, 0},
+		OnMouseDown={ function(self) --// click+ space on any unit-State button will open Unit-AI menu, it overrides similar function above.
+			local _,_, meta,_ = Spring.GetModKeyState()
+			if not meta then return false end --allow button to continue its function
+			WG.crude.OpenPath('Game/Unit AI')
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return true --stop the button's function, else unit-state button will look bugged. 
+		end },			
 	}
 	for i=1, numStateColumns do
 		sp_states[i] = StackPanel:New {
@@ -1378,7 +1408,7 @@ function widget:Initialize()
 			x = (100 - (math.floor(100/numStateColumns))*i).."%";
 			y = "0%";
 			padding = {0, 0, 0, 0},
-			itemMargin  = {0, 0, 0, 0},
+			itemMargin  = {0, 0, 0, 0},		
 		}
 	end
 	
