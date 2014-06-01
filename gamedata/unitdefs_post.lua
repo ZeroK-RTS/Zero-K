@@ -713,3 +713,31 @@ for name, ud in pairs(UnitDefs) do
 		ud.modelcenteroffset = "0 0 0"
     end   
 end
+
+-- Disable porc/air/specific units modoptions (see lockunits_modoption.lua)
+
+--[[
+local disabledunitsstring = modOptions and modOptions.disabledunits or ""
+local disabledunits = { }
+local defenceunits = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corrazor", "missiletower", "corflak", "armcir", "screamer", "corgrav", "turrettorp", "cordoom", "armanni", "corjamt" }
+
+--Different lock modoptions are compatible
+if modOptions and tobool(modOptions.noair) then
+  disabledunits[1]="factoryplane"
+  disabledunits[2]="factorygunship"
+end
+
+if modOptions and tobool(modOptions.nodef) then
+  for i in pairs(defenceunits) do
+    table.insert(disabledunits,defenceunits[i])
+  end
+end
+
+if disabledunitsstring ~= "" then
+  for i in string.gmatch(disabledunitsstring, '([^+]+)') do
+    disabledunits[#disabledunits+1] = i
+  end
+end
+
+disableunits(disabledunits)
+]]
