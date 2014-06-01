@@ -483,32 +483,6 @@ end
 ------------------------------------------------------------
 -- Mouse
 ------------------------------------------------------------
---[[
-function SetBuildFacing()
-	local wx,wy,_,_ = Spring.GetScreenGeometry()
-	local _, pos = Spring.TraceScreenRay(wx/2, wy/2, true)
-	if not pos then return end
-	local x = pos[1]
-	local z = pos[3]
-	
-	if math.abs(Game.mapSizeX - 2*x) > math.abs(Game.mapSizeZ - 2*z) then
-		if (2*x>Game.mapSizeX) then
-			facing=3
-		else
-			facing=1
-		end
-	else
-		if (2*z>Game.mapSizeZ) then
-			facing=2
-		else
-			facing=0
-		end
-	end
-	Spring.SetBuildFacing(facing)
-end
-
-needBuildFacing = true
---]]
 --[[ 
 --Task handled by CommandNotify()
 function widget:MousePress(mx, my, mButton)
@@ -652,7 +626,8 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 			--msg = "IQ|4|404|648|2|3304|1" --example spoof. This will not work
 		end
 		if msg then
-			Spring.SendLuaUIMsg(msg)
+			Spring.SendLuaUIMsg(msg,'a')
+			Spring.SendLuaUIMsg(msg,'s') --need 2 msg because since Spring 97 LuaUIMsg without parameter is send info to EVERYONE (including enemy)
 		end
 		
 		mCost, eCost, bCost = GetQueueCosts()
