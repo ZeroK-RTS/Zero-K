@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---[[
+
 function widget:GetInfo()
   return {
     name      = "Engine Setting Fix",
@@ -16,13 +16,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local isTest = Game.modVersion:find("test") or Game.modVersion:find("$VERSION")
-
 local tags = {
-  LogFlush = isTest and 1 or 0,
-  AllowDeferredMapRendering = 0,
-  AllowDeferredModelRendering = 0,
-  --WorkerThreadCount = 0,
+  WorkerThreadSpinTime = 0,
 }
 
 function widget:Initialize()
@@ -30,11 +25,11 @@ function widget:Initialize()
     for tag, value in pairs(tags) do
       Spring.SetConfigInt(tag, value)
     end
-    Spring.Log(widget:GetInfo().name, LOG.WARNING, "not Spring 91.0. Setting a safe LogFlush & DeferredRendering config tags...")
+    Spring.Log(widget:GetInfo().name, LOG.WARNING, "Setting WorkerThreadSpinTime = 0")
     --Spring.SendCommands("luaui disablewidget " .. widget:GetInfo().name)
     widgetHandler:RemoveWidget()
   end
 end
---]]
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

@@ -6,6 +6,8 @@ local dish2 = piece 'dish2'
 local dish3 = piece 'dish3' 
 local dish4 = piece 'dish4' 
 
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
+
 local bomberWeaponDefs = {
 	[WeaponDefNames["corshad_shield_check"].id] = true,
 }
@@ -65,7 +67,9 @@ local function DefensiveManeuver()
 	Signal(SIG_Defensive)
 	SetSignalMask(SIG_Defensive)
 	SetUnitValue(COB.ACTIVATION, 0)
+	spSetUnitRulesParam(unitID, "force_close", 1)
 	Sleep(8000)
+	spSetUnitRulesParam(unitID, "force_close", 0)
 	SetUnitValue(COB.ACTIVATION, 1)
 end
 
