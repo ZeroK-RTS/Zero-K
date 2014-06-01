@@ -136,9 +136,9 @@ upgrades = {
 	},
 	conversion_shockrifle = {
 		name = "Shock Rifle",
-		description = "Gauss Rifle: Convert to a long-range sniper rifle",
+		description = "Light Particle Beam: Convert to a long-range sniper rifle",
 		func = function(unitDef)
-				ReplaceWeapon(unitDef, "commweapon_gaussrifle", "commweapon_shockrifle")
+				ReplaceWeapon(unitDef, "commweapon_lparticlebeam", "commweapon_shockrifle")
 			end,	
 	},
 	conversion_partillery = {
