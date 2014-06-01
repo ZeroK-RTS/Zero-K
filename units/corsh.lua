@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[corsh]],
-  name                = [[Scrubber]],
+  name                = [[Dagger]],
   description         = [[Fast Attack Hovercraft]],
   acceleration        = 0.066,
   activateWhenBuilt   = true,
@@ -26,10 +26,10 @@ unitDef = {
     description_fr = [[Hovercraft d'Attaque Éclair]],
     description_de = [[Schnellangriff Luftkissenboot]],
     description_pl = [[Lekki poduszkowiec]],
-    helptext       = [[The Scrubber is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light Gauss gun can also hit underwater targets.]],
-    helptext_fr    = [[Le Scrubber est petit, maniable, rapide et n'a qu'une faible puissance de feu. Idéal pour les attaques surprises depuis la mer, il surprendra bien des ennemis. Son blindage est cependant trop faible pour faire face r une quelquonque résistance.]],
-    helptext_de    = [[Der Scrubber ist der Aufklärer unter den Luftkissenbooten. Es bietet dir eine kostengünstige, entbehrliche Möglichkeit deinen Feind frühzeitig um seine Rohstoffquellen zu bringen. Es kann auch U-Booten schiessen.]],
-    helptext_pl    = [[Scrubber to lekki poduszkowiec, ktory nadaje sie zarowno do zwiadu, jak i atakowania przeciwnika. Jest w stanie atakowac rowniez cele podwodne.]],
+    helptext       = [[The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light Gauss gun can also hit underwater targets.]],
+    helptext_fr    = [[Le Dagger est petit, maniable, rapide et n'a qu'une faible puissance de feu. Idéal pour les attaques surprises depuis la mer, il surprendra bien des ennemis. Son blindage est cependant trop faible pour faire face r une quelquonque résistance.]],
+    helptext_de    = [[Der Dagger ist der Aufklärer unter den Luftkissenbooten. Es bietet dir eine kostengünstige, entbehrliche Möglichkeit deinen Feind frühzeitig um seine Rohstoffquellen zu bringen. Es kann auch U-Booten schiessen.]],
+    helptext_pl    = [[Dagger to lekki poduszkowiec, ktory nadaje sie zarowno do zwiadu, jak i atakowania przeciwnika. Jest w stanie atakowac rowniez cele podwodne.]],
   },
 
   explodeAs           = [[SMALL_UNITEX]],
@@ -135,7 +135,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Scrubber]],
+      description      = [[Wreckage - Dagger]],
       blocking         = false,
       category         = [[corpses]],
       damage           = 300,
@@ -155,7 +155,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Scrubber]],
+      description      = [[Debris - Dagger]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 300,
@@ -175,7 +175,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Scrubber]],
+      description      = [[Debris - Dagger]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 300,
