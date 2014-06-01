@@ -78,10 +78,12 @@ local function WobbleUnit()
 	end
 end
 
+--[[
 function script.HitByWeapon(x, z, weaponID, damage)
 	StartThread(Rock, false, x*ROCK_DAMGE_MULT*damage, z_axis)
 	StartThread(Rock, false, -z*ROCK_DAMGE_MULT*damage, x_axis)
 end
+]]
 
 local function MoveScript()
 	while true do 
