@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.31 Chili Crude Player List.",
+    desc      = "v1.32 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -262,7 +262,7 @@ end
 -- not shown if they're in playerlist as well
 local function MakeSpecTooltip()
 	if options.showSpecs.value then
-		scroll_cpl.tooltip = nil
+		window_cpl.tooltip = nil
 		return
 	end
 	
@@ -288,7 +288,7 @@ local function MakeSpecTooltip()
 		local cpu = math.round(specsSorted[i].cpu*100)
 		windowTooltip = windowTooltip .. "\n\t"..specsSorted[i].name.."\t"..cpuCol..(cpu)..'%\008' .. "\t"..pingCol..PingTimeOut(specsSorted[i].ping).."\008"
 	end
-	scroll_cpl.tooltip = windowTooltip
+	window_cpl.tooltip = windowTooltip
 end
 
 -- updates ping and CPU for all players; name if needed
@@ -826,6 +826,12 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimizable = true,
 		minWidth = x_bound,
+		NCHitTest = function(self,x,y)
+			if self.tooltip and x> self.x and y>self.y and x<self.x+self.width and y<self.y+self.height then
+				return self --mouse over panel
+			end
+			return false
+		end,	
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
@@ -843,8 +849,7 @@ function widget:Initialize()
 		--padding = {0, 0, 0, 0},
 		--autosize = true,
 		scrollbarSize = 6,
-		horizontalScrollbar = false,
-		hitTestAllowEmpty = true
+		horizontalScrollbar = false,	
 	}
 
 	SetupPlayerNames()

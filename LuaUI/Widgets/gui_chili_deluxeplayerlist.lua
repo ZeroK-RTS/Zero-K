@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Deluxe Player List - Alpha 2.02",
-    desc      = "v0.203 Chili Deluxe Player List, Alpha Release",
+    desc      = "v0.204 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
@@ -520,7 +520,7 @@ end
 local function MakeSpecTooltip()
 
 	if (not options.show_tooltips.value) or list_size == 4 or (list_size == 3 and #specTeam.roster == 0) then
-		scroll_cpl.tooltip = nil
+		window_cpl.tooltip = nil
 		return
 	end
 	
@@ -567,7 +567,7 @@ local function MakeSpecTooltip()
 		end
 	end
 
-	scroll_cpl.tooltip = windowTooltip
+	window_cpl.tooltip = windowTooltip
 end
 
 --------------------------------------------------------------------------------
@@ -1294,7 +1294,6 @@ SetupScrollPanel = function ()
 		scrollbarSize = 6,
 		width = x_bound,
 		horizontalScrollbar = false,
-		hitTestAllowEmpty = true,
 		noMouseWheel = not options.mousewheel.value,
 	}
 	if options.alignToLeft.value then
@@ -1340,6 +1339,12 @@ SetupPanels = function ()
 		tweakResizable = true,
 		minimizable = false,
 		minWidth = x_windowbound,
+		NCHitTest = function(self,x,y)
+			if self.tooltip and x> self.x and y>self.y and x<self.x+self.width and y<self.y+self.height then
+				return self --mouse over panel
+			end
+			return false
+		end,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end

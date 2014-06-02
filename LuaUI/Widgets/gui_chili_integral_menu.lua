@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.366 Integral Command Menu",
+    desc      = "v0.367 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
@@ -321,6 +321,7 @@ local lastBuildChoice = 2
 
 -- command id indexed field of items - each item is button, label and image 
 local commandButtons = {} 
+local spaceClicked = false
 ----------------------------------- COMMAND COLORS  - from cmdcolors.txt - default coloring
 local cmdColors = {}
 
@@ -1325,10 +1326,9 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 		OnMouseDown={ function(self) 
-			--// click+ space on integral-menu tab will open a Game-menu.
 			local _,_, meta,_ = Spring.GetModKeyState()
 			if not meta then return false end --allow button to continue its function
-			WG.crude.OpenPath(options_path)
+			WG.crude.OpenPath(options_path) --// click+ space on integral-menu tab will open a integral options.
 			WG.crude.ShowMenu() --make epic Chili menu appear.
 			return false
 		end },		
@@ -1348,6 +1348,17 @@ function widget:Initialize()
 		y = "0%";
 		padding = {4, 4, 0, 4},
 		itemMargin  = {0, 0, 0, 0},
+		noSelfHitTest = true,
+		NCHitTest = function(self,x,y)
+			if not spaceClicked and x> self.x and y>self.y and x<self.x+self.width and y<self.y+self.height then
+				if select(3,Spring.GetMouseState()) and select(3,Spring.GetModKeyState()) then -- meta and mouse down
+					spaceClicked = true
+					WG.crude.OpenPath('Game/Commands')  -- click+ space on panel beside command button will open command-hotkey-binder
+					WG.crude.ShowMenu() --make epic Chili menu appear.
+				end
+			end
+			return false
+		end,	
 	}
 	for i=1,numRows do
 		sp_commands[i] = StackPanel:New{
@@ -1362,20 +1373,6 @@ function widget:Initialize()
 			itemMargin  = {0, 0, 0, 0},
 			index = i,
 			i_am_sp_commands = true,
-			--[[
-			hitTestAllowEmpty = true,
-			OnMouseDown={ function(self) --FIXME: how to check whether we are pressing on button or on the panel? 
-					--// click+ space on empty space on the integral-menu will open a Game-menu.
-					-- local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
-					-- if not forwardSlash then return false end
-					local _,_, meta,_ = Spring.GetModKeyState()
-					if not meta then return false end --allow button to continue its function
-					WG.crude.OpenPath('Game/Commands')
-					WG.crude.ShowMenu() --make epic Chili menu appear.
-					return false
-				end
-			end },
-			--]]
 		}
 		--Spring.Echo("Command row "..i.." created")
 	end
@@ -1390,7 +1387,7 @@ function widget:Initialize()
 		y = "0%";
 		padding = {0, 4, 4, 4},
 		itemMargin  = {0, 0, 0, 0},
-		OnMouseDown={ function(self) --// click+ space on any unit-State button will open Unit-AI menu, it overrides similar function above.
+		OnMouseDown={ function(self) --// click+ space on any unit-State button will open Unit-AI menu,
 			local _,_, meta,_ = Spring.GetModKeyState()
 			if not meta then return false end --allow button to continue its function
 			WG.crude.OpenPath('Game/Unit AI')
@@ -1483,6 +1480,11 @@ end
 
 --This function update construction progress bar and weapon reload progress bar
 function widget:GameFrame(n)
+	if n%5 == 0 then
+		if spaceClicked and not (select(3,Spring.GetMouseState()) and select(3,Spring.GetModKeyState())) then --not meta, not mouse down
+			spaceClicked = false
+		end
+	end
 	--set progress bar
 	if n%6 == 0 then
 		if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then
