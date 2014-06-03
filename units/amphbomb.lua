@@ -6,10 +6,10 @@ unitDef = {
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
   buildCostEnergy        = 100,
-  buildCostMetal         = 100,
+  buildCostMetal         = 60,
   builder                = false,
   buildPic               = [[AMPHBOMB.png]],
-  buildTime              = 100,
+  buildTime              = 60,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -36,9 +36,9 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 100,
-  maxDamage              = 300,
+  maxDamage              = 150,
   maxSlope               = 36,
-  maxVelocity            = 3,
+  maxVelocity            = 3.7,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
@@ -54,8 +54,6 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:RAIDMUZZLE]],
-      [[custom:VINDIBACK]],
       [[custom:digdig]],
     },
 
@@ -67,54 +65,34 @@ unitDef = {
   turnRate               = 3000,
   workerTime             = 0,
 
-  weapons             = {
-
-    {
-      def                = [[PLACEHOLDER]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-  },
-
-
-  weaponDefs          = {
-
-    PLACEHOLDER    = {
-      name                    = [[Disruptor Pulser]],
-      areaOfEffect            = 550,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 20,
-        planes  = 20,
-        subs    = 0.1,
-      },
-
-      customParams           = {
-	    lups_explodespeed = 1,
-	    lups_explodelife = 0.6,
-	    nofriendlyfire = 1,
-      },
-
-      edgeeffectiveness       = 1,
-      explosionGenerator      = [[custom:NONE]],
-      explosionSpeed          = 11,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      myGravity               = 10,
-      noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 0.95,
-      soundHitVolume          = 1,
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 230,
-    },
-
-  },
-  
 }
+
+--------------------------------------------------------------------------------
+
+local weaponDefs = {
+  AMPHBOMB_DEATH = {
+    areaOfEffect       = 550,
+    craterBoost        = 1,
+    craterMult         = 3.5,
+    edgeEffectiveness  = 0.4,
+    explosionGenerator      = [[custom:RIOTBALL]],
+    explosionSpeed          = 11,
+    impulseBoost       = 0,
+    impulseFactor      = 0.3,
+    name               = "Explosion",
+    damage = {
+      default          = 80,
+    },
+    customParams           = {
+	  lups_explodespeed = 1,
+	  lups_explodelife = 0.6,
+--	  nofriendlyfire = 1,
+	  timeslow_damagefactor = [[10]],
+    },
+  },
+}
+unitDef.weaponDefs = weaponDefs
+
+--------------------------------------------------------------------------------
 
 return lowerkeys({ amphbomb = unitDef })
