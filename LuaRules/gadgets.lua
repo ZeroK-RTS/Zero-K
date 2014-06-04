@@ -78,6 +78,7 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
+local reverseCompat = (Game.version:find('91.0') == 1)
 --------------------------------------------------------------------------------
 
 function pgl() -- (print gadget list)  FIXME: move this into a gadget
@@ -443,6 +444,8 @@ function gadgetHandler:NewGadget()
   gadget.gadgetHandler = {}
   local gh = gadget.gadgetHandler
   local self = self
+
+  gh.gadgetHandler = self	-- NOT IN BASE (required for api_subdir_gadgets)
 
   gadget.include  = function (f)
     return VFS.Include(f, gadget, VFSMODE)
@@ -1047,7 +1050,7 @@ function gadgetHandler:GotChatMsg(msg, player)
     end
   end
 
-  if (IsSyncedCode()) then
+  if (reverseCompat and IsSyncedCode()) then
     SendToUnsynced(player, msg)
   end
 
@@ -1408,7 +1411,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 								   a, b, c, d)
   local projectileID,attackerID
   local attackerDefID,attackerTeam
-  if (Game.version:find('91.0') == 1) then 
+  if reverseCompat then 
 	attackerID = a 
     attackerDefID = b
     attackerTeam = c
@@ -1443,7 +1446,7 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
 		
-  if (Game.version:find('91.0') == 1) then
+  if reverseCompat then
     attackerTeam = attackerDefID
     attackerDefID = attackerID
     attackerID = projectileID
@@ -1869,74 +1872,6 @@ end
 -- OVERRIDES
 --
 
-function gadgetHandler:NewGadget()
-  local gadget = {}
-  -- load the system calls into the gadget table
-  for k,v in pairs(System) do
-    gadget[k] = v
-  end
-  gadget._G = _G         -- the global table
-  gadget.GG = self.GG    -- the shared table
-  gadget.gadget = gadget -- easy self referencing
-
-  -- wrapped calls (closures)
-  gadget.gadgetHandler = {}
-  local gh = gadget.gadgetHandler
-  local self = self
-
-  gh.gadgetHandler = self	-- FIXME: not in base
-
-  gadget.include  = function (f)
-    return VFS.Include(f, gadget, VFSMODE)
-  end
-
-  gh.RaiseGadget  = function (_) self:RaiseGadget(gadget)      end
-  gh.LowerGadget  = function (_) self:LowerGadget(gadget)      end
-  gh.RemoveGadget = function (_) self:RemoveGadget(gadget)     end
-  gh.GetViewSizes = function (_) return self:GetViewSizes()    end
-  gh.GetHourTimer = function (_) return self:GetHourTimer()    end
-  gh.IsSyncedCode = function (_) return IsSyncedCode()         end
-
-  gh.UpdateCallIn = function (_, name)
-    self:UpdateGadgetCallIn(name, gadget)
-  end
-  gh.RemoveCallIn = function (_, name)
-    self:RemoveGadgetCallIn(name, gadget)
-  end
-
-  gh.RegisterCMDID = function(_, id)
-    self:RegisterCMDID(gadget, id)
-  end
-
-  gh.RegisterGlobal = function(_, name, value)
-    return self:RegisterGlobal(gadget, name, value)
-  end
-  gh.DeregisterGlobal = function(_, name)
-    return self:DeregisterGlobal(gadget, name)
-  end
-  gh.SetGlobal = function(_, name, value)
-    return self:SetGlobal(gadget, name, value)
-  end
-
-  gh.AddChatAction = function (_, cmd, func, help)
-    return actionHandler.AddChatAction(gadget, cmd, func, help)
-  end
-  gh.RemoveChatAction = function (_, cmd)
-    return actionHandler.RemoveChatAction(gadget, cmd)
-  end
-
-  if (not IsSyncedCode()) then
-    gh.AddSyncAction = function(_, cmd, func, help)
-      return actionHandler.AddSyncAction(gadget, cmd, func, help)
-    end
-    gh.RemoveSyncAction = function(_, cmd)
-      return actionHandler.RemoveSyncAction(gadget, cmd)
-    end
-  end
-
-  return gadget
-end
-
 function gadgetHandler:GetViewSizes()
   --FIXME remove
   return gl.GetViewSizes()	-- ours
@@ -2037,9 +1972,9 @@ function gadgetHandler:GotChatMsg(msg, player)
     end
   end
 
-  if (IsSyncedCode()) then
+  if (reverseCompat and IsSyncedCode()) then
     SendToUnsynced("proxy_ChatMsg", msg, player)	-- ours
-	--SendToUnsynced(player, msg)	-- base
+    --SendToUnsynced(player, msg)	-- base
   end
   return false
 end
@@ -2132,6 +2067,16 @@ function gadgetHandler:GameSetup(state, ready, playerStates)
   return false
 end
 
+--[[
+-- makes available to gadgets with handler = true
+function gadgetHandler:AddSyncAction(gadget, cmd, func, help)
+	return actionHandler.AddSyncAction(gadget, cmd, func, help)
+end
+
+function gadgetHandler:RemoveSyncAction(gadget, cmd)
+	return actionHandler.RemoveSyncAction(gadget, cmd)
+end
+]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
