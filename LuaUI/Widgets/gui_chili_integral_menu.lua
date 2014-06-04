@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.367 Integral Command Menu",
+    desc      = "v0.368 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
@@ -1357,6 +1357,9 @@ function widget:Initialize()
 					WG.crude.ShowMenu() --make epic Chili menu appear.
 				end
 			end
+			if spaceClicked and not (select(3,Spring.GetMouseState()) and select(3,Spring.GetModKeyState())) then --not meta, not mouse down
+				spaceClicked = false
+			end
 			return false
 		end,	
 	}
@@ -1480,11 +1483,6 @@ end
 
 --This function update construction progress bar and weapon reload progress bar
 function widget:GameFrame(n)
-	if n%5 == 0 then
-		if spaceClicked and not (select(3,Spring.GetMouseState()) and select(3,Spring.GetModKeyState())) then --not meta, not mouse down
-			spaceClicked = false
-		end
-	end
 	--set progress bar
 	if n%6 == 0 then
 		if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then

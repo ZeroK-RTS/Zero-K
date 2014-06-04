@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Deluxe Player List - Alpha 2.02",
-    desc      = "v0.204 Chili Deluxe Player List, Alpha Release",
+    desc      = "v0.205 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
@@ -1340,10 +1340,7 @@ SetupPanels = function ()
 		minimizable = false,
 		minWidth = x_windowbound,
 		NCHitTest = function(self,x,y)
-			if self.tooltip and x> self.x and y>self.y and x<self.x+self.width and y<self.y+self.height then
-				return self --mouse over panel
-			end
-			return false
+			return self --mouse over panel
 		end,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()

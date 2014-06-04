@@ -461,7 +461,7 @@ function CreateWindow()
 		tweakResizable = true,
 		minimizable = false,
 		
-		OnClick={ function(self)
+		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
 			WG.crude.OpenPath(options_path)

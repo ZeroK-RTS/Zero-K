@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.32 Chili Crude Player List.",
+    desc      = "v1.321 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -827,10 +827,7 @@ function widget:Initialize()
 		minimizable = true,
 		minWidth = x_bound,
 		NCHitTest = function(self,x,y)
-			if self.tooltip and x> self.x and y>self.y and x<self.x+self.width and y<self.y+self.height then
-				return self --mouse over panel
-			end
-			return false
+			return self --mouse over panel
 		end,	
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
