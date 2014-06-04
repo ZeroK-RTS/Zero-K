@@ -20,22 +20,22 @@ end
 --------------------------------------------------------------------------------
 function widget:Initialize()
 	if (Game.version:find('91.0') == 1) then
-		Spring.Echo("Removed 'GC at >300MB': not needed for Spring 91") 
+		Spring.Echo("Removed 'GC at >100MB': not needed for Spring 91") 
 		widgetHandler:RemoveWidget()
 	end
 end
 
 local sec = 0 --amount of second since last "collect garbage".
-local interval = 60 -- interval of 1 minute
-local memThreshold = 102400*3 --amount of memory usage (kilobyte) before calling LUA GC
+local interval = 20 -- interval of 20 seconds
+local memThreshold = 102400 --amount of memory usage (kilobyte) before calling LUA GC
 function widget:Update(dt)
 	sec = sec + dt
 	if (sec >= interval) then --if minimum interval reached:
 		sec = 0
 		local memusage = collectgarbage("count") --get total amount of memory usage for LUAUI
 		if (memusage > memThreshold) then
-			-- local memString = ('%.1f'):format(memusage/1024) .. " MB" --display current memory usage to player
-			-- Spring.Echo(memString)
+			local memString = "Calling Garbage Collector on excessive LuaUI memory usage: " .. ('%.1f'):format(memusage/1024) .. " MB" --display current memory usage to player
+			Spring.Echo(memString)
 			collectgarbage("collect") --collect garbage
 		end
 	end

@@ -14,7 +14,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local usingDevEngine = Game.version:find('96.0.1')
+local usingDevEngine = not ((Game.version:find('91.0') == 1))
 
 local function SetupCommandColors(state)
   local alpha = state and 1 or 0

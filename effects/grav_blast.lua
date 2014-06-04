@@ -255,6 +255,7 @@ return {
 	  ground             = true,
       water              = true,
 	  underwater         = true,
+	  unit               = true,
       class              = [[CSimpleParticleSystem]],
       properties = {
         airdrag            = 1,
