@@ -246,7 +246,7 @@ end
 function widget:GroupChanged(groupId)  
 	if groupId == myGroupId then
 --		local units = spGetGroupUnits(myGroupId)
---		Echo( spGetGameFrame() .. " Change detected in group." )
+--		Echo( Spring.GetGameFrame() .. " Change detected in group." )
 		groupHasChanged = true
 		nextFrame = currentFrame + ping()
 	end

@@ -19,7 +19,6 @@ end
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
 local GetUnitStates    = Spring.GetUnitStates
 local GetUnitDefID     = Spring.GetUnitDefID
-local GetGameFrame     = Spring.GetGameFrame
 local GetMyTeamID      = Spring.GetMyTeamID
 local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitIsCloaked = Spring.GetUnitIsCloaked

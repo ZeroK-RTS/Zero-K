@@ -48,7 +48,6 @@ local GetTeamList          = Spring.GetTeamList
 local GetTeamUnits         = Spring.GetTeamUnits
 local GetUnitViewPosition  = Spring.GetUnitViewPosition
 local IsSphereInView       = Spring.IsSphereInView
-local GetGameFrame         = Spring.GetGameFrame
 local GetUnitDefID         = Spring.GetUnitDefID
 local GetGroundHeight      = Spring.GetGroundHeight
 local GetCameraPosition    = Spring.GetCameraPosition

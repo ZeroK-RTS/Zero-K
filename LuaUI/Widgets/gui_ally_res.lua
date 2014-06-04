@@ -35,7 +35,6 @@ local GetSpectatingState = Spring.GetSpectatingState
 local IsReplay = Spring.IsReplay
 local IsGUIHidden = Spring.IsGUIHidden
 local ShareResources = Spring.ShareResources
-local GetGameFrame = Spring.GetGameFrame
 local mathMin = math.min
 local gl, GL = gl, GL
 local sF = string.format

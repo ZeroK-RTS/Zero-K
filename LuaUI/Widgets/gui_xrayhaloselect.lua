@@ -44,7 +44,6 @@ local ValidFeatureID          = Spring.ValidFeatureID
 
 
 local spGetCameraPosition	= Spring.GetCameraPosition
-local spGetGameFrame		= Spring.GetGameFrame
 local spGetSelectedUnits	= Spring.GetSelectedUnits
 local spGetVisibleUnits		= Spring.GetVisibleUnits
 local spIsUnitSelected		= Spring.IsUnitSelected

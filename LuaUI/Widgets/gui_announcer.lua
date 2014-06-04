@@ -97,7 +97,6 @@ local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitTeam	   	= Spring.GetUnitTeam
 local spGetMyAllyTeamID		= Spring.GetMyAllyTeamID
 local spGetTeamInfo		= Spring.GetTeamInfo
-local spGetGameFrame		= Spring.GetGameFrame
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local spGetGroundHeight     	= Spring.GetGroundHeight

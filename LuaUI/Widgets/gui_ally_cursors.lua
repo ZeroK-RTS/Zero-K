@@ -37,7 +37,6 @@ local pairs = pairs
 local GetMouseState   = Spring.GetMouseState
 local TraceScreenRay  = Spring.TraceScreenRay
 local SendLuaUIMsg    = Spring.SendLuaUIMsg
-local GetGameFrame    = Spring.GetGameFrame
 local GetGroundHeight = Spring.GetGroundHeight
 local GetPlayerInfo   = Spring.GetPlayerInfo
 local GetTeamColor    = Spring.GetTeamColor

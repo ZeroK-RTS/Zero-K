@@ -68,7 +68,6 @@ local spGetGameSeconds		= Spring.GetGameSeconds
 local spInView			= Spring.IsUnitInView
 local spGetTeamRes		= Spring.GetTeamResources
 local spGetLastAttacker		= Spring.GetUnitLastAttacker
-local spGetGameFrame		= Spring.GetGameFrame
 local spGetSpectatingState	= Spring.GetSpectatingState
 local spIsReplay		= Spring.IsReplay
 local spGetMyTeamID		= Spring.GetMyTeamID
