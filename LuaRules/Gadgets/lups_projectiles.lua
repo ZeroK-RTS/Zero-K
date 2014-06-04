@@ -58,7 +58,6 @@ end
 
 function gadget:Initialize()
 	for weaponID in pairs(weapons) do
-		Spring.Echo("bla", weaponID)
 		Script.SetWatchWeapon(weaponID, true)
 	end
 end
