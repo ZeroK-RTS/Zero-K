@@ -148,6 +148,7 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Mouse Cursor'] = imgPath..'epicmenu/input_mouse.png',
 	['Settings/Interface/Map'] = imgPath..'epicmenu/map.png',
 	['Settings/Interface/Healthbars'] = imgPath..'commands/Bold/health.png',
+	['Settings/Interface/Retreat Zones'] = imgPath..'commands/Bold/retreat.png',
 	['Settings/Interface/Spectating'] = imgPath..'epicmenu/find.png',
 }
 
