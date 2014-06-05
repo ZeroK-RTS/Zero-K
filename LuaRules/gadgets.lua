@@ -1424,7 +1424,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
   
   local rDam = damage
   local rImp = 1.0
---[[
+
   for _,g in ipairs(self.UnitPreDamagedList) do
     dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
                   rDam, paralyzer, weaponDefID,
@@ -1437,7 +1437,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
       rImp = math.min(imp, rImp)
     end
   end
---]]
+
   return rDam, rImp
 end
 
@@ -1451,13 +1451,12 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
     attackerDefID = attackerID
     attackerID = projectileID
   end
-  --[[
+  
   for _,g in ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,
                   damage, paralyzer, weaponID,
                   attackerID, attackerDefID, attackerTeam)
   end
-  --]]
   return
 end
 
@@ -1607,7 +1606,7 @@ end
 
 function gadgetHandler:ProjectileCreated(proID, proOwnerID, proWeaponDefID)
   for _,g in ipairs(self.ProjectileCreatedList) do
-    --g:ProjectileCreated(proID, proOwnerID, proWeaponDefID)
+    g:ProjectileCreated(proID, proOwnerID, proWeaponDefID)
   end
   return
 end
@@ -1615,7 +1614,7 @@ end
 
 function gadgetHandler:ProjectileDestroyed(proID)
   for _,g in ipairs(self.ProjectileDestroyedList) do
-    --g:ProjectileDestroyed(proID)
+    g:ProjectileDestroyed(proID)
   end
   return
 end
@@ -1647,7 +1646,7 @@ end
 function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
   local noGfx = false
   for _,g in ipairs(self.ExplosionList) do
-    --noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
+    noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
   end
   return noGfx
 end
