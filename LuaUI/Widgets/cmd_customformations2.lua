@@ -1,11 +1,11 @@
 function widget:GetInfo()
 	return {
 		name      = "CustomFormations2",
-		desc      = "Allows you to draw formation line:"..
+		desc      = "Allows you to draw a formation line:"..
 					"\n• mouse drag draw various command on ground."..
 					"\n• ALT+Attack draw attack command on the ground.",
-		author    = "Niobium", -- Based on 'Custom Formations' by jK and gunblob
-		version   = "v3.3", -- With dot drawing from v4.3
+		author    = "Niobium, modified by Skasi", -- Based on 'Custom Formations' by jK and gunblob
+		version   = "v3.4", -- With modified dot drawing from v4.3
 		date      = "Mar, 2010",
 		license   = "GNU GPL, v2 or later",
 		layer     = 1000000,
@@ -21,13 +21,35 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Command Visibility/Formations'
-options_order = { 'drawdots'}
+options_order = { 'drawmode', 'linewidth', 'dotsize' }
 options = {
-	drawdots = {
-		name = "Draw formation dots", 
-		desc = "Enable to draw dots at the expected unit locations, disable to draw a line.",
-		type = 'bool', 
-		value = false
+	drawmode = {
+		name = 'Draw mode',
+		-- desc is not supported here :(
+		-- desc = 'Change the formation display. Formations are drawn by moving the mouse while the mouse button is pressed. Supported commands are Move, Fight, Patrol, Manual attacks, Jump and with the ALT key held down Attack, Set target and Unload.'
+		-- (new) players might not even know about custom formations, so ultimately this should probably be displayed above these options
+		type = 'radioButton',
+		value = 'lines',
+		items={
+			{key='lines', name='Lines only', desc='Draw stippled lines along the drawn formation'},
+			{key='dots', name='Dots only', desc='Draw dots at command locations'},
+			{key='both', name='Draw both', desc='Draw lines and dots'},
+		},
+	},
+	
+	linewidth = {
+		name = 'Width of lines',
+		type = 'number',
+		value = 2,
+		min = 1, max = 2, step=1,
+		-- For some reason drawing lines fails for numbers higher than 2. 
+	},
+	
+	dotsize = {
+		name = 'Size of dots',
+		type = 'number',
+		value = 1,
+		min = 0.5, max = 2, step=0.1,
 	},
 }
 
@@ -726,15 +748,16 @@ local function DrawFilledCircleOutFading(pos, size, cornerCount)
 		end
 	end)
 	-- draw extra glow as base
-	glBeginEnd(GL.TRIANGLE_FAN, function()
-		SetColor(usingCmd, 1/15)
-		glVertex(0,0,0)
-		SetColor(usingCmd, 0)
-		local baseSize = size * 2.8
-		for t = 0, pi2, pi2 / 8 do
-			glVertex(sin(t) * baseSize, 0, cos(t) * baseSize)
-		end
-	end)
+	-- has hardly any effect but doubles gpuTime, so disabled for now
+	-- glBeginEnd(GL.TRIANGLE_FAN, function()
+		-- SetColor(usingCmd, 1/15)
+		-- glVertex(0,0,0)
+		-- SetColor(usingCmd, 0)
+		-- local baseSize = size * 2.8
+		-- for t = 0, pi2, pi2 / 8 do
+			-- glVertex(sin(t) * baseSize, 0, cos(t) * baseSize)
+		-- end
+	-- end)
 	glPopMatrix()
 end
 
@@ -742,12 +765,12 @@ local function DrawFormationDots(vertFunction, zoomY, unitCount)
 	local currentLength = 0
 	local lengthPerUnit = lineLength / (unitCount-1)
 	local lengthUnitNext = lengthPerUnit
-	local dotSize = sqrt(zoomY*0.075)
+	local dotSize = sqrt(zoomY*0.1)*options.dotsize.value
 	if (#fNodes > 1) and (unitCount > 1) then
-		SetColor(usingCmd, 0.6)
-		DrawFilledCircleOutFading(fNodes[1], dotSize, 11)
+		SetColor(usingCmd, 1)
+		DrawFilledCircleOutFading(fNodes[1], dotSize, 8)
 		if (#fNodes > 2) then
-			for i=1, #fNodes-1 do
+			for i=1, #fNodes-2 do -- first and last circle are drawn before and after the for loop
 				local x = fNodes[i][1]
 				local y = fNodes[i][3]
 				local x2 = fNodes[i+1][1]
@@ -761,20 +784,20 @@ local function DrawFormationDots(vertFunction, zoomY, unitCount)
 						{fNodes[i][1] + ((fNodes[i+1][1] - fNodes[i][1]) * factor),
 						fNodes[i][2] + ((fNodes[i+1][2] - fNodes[i][2]) * factor),
 						fNodes[i][3] + ((fNodes[i+1][3] - fNodes[i][3]) * factor)}
-					DrawFilledCircleOutFading(factorPos, dotSize, 11)
+					DrawFilledCircleOutFading(factorPos, dotSize, 8)
 					lengthUnitNext = lengthUnitNext + lengthPerUnit
 				end
 				currentLength = currentLength + length
 			end
 		end
-		DrawFilledCircleOutFading(fNodes[#fNodes], dotSize, 11)
+		DrawFilledCircleOutFading(fNodes[#fNodes], dotSize, 8)
 	end
 end
 
 local function DrawFormationLines(vertFunction, lineStipple)
 	
 	glLineStipple(lineStipple, 4095)
-	glLineWidth(2.0)
+	glLineWidth(options.linewidth.value)
 	
 	if #fNodes > 1 then
 		SetColor(usingCmd, 1.0)
@@ -800,10 +823,12 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 function widget:DrawWorld()
-	
-	if pathCandidate or not options.drawdots.value then
+	-- Draw lines when a path is drawn instead of a formation, OR when drawmode for formations is not "dots" only
+	if pathCandidate or options.drawmode.value ~= "dots" then
 		DrawFormationLines(tVerts, 2)
-	elseif #fNodes > 1 or #dimmNodes > 1 then
+	end
+	-- Draw dots when no path is drawn AND nodenumber is high enough AND drawmode for formations is not "lines" only
+	if not pathCandidate and (#fNodes > 1 or #dimmNodes > 1) and options.drawmode.value ~= "lines" then
 		local camX, camY, camZ = spGetCameraPosition()
 		local at, p = spTraceScreenRay(Xs,Ys,true,false,false)
 		if at == "ground" then 
