@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date = "14.01.2013",
 		license = "Public domain",
 		layer = -1, --before lups_shockwaves.lua (so that there's no shockwave after we block explosion effect)
-		enabled = true
+		enabled = false
 	}
 end
 

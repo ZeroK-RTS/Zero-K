@@ -8,7 +8,7 @@ function gadget:GetInfo()
 		date = "2013-06-28",
 		license = "GNU GPL, v2 or later",
 		layer = 1,
-		enabled = true
+		enabled = false
 	}
 end
 --------------------------------------------------------------------------------
