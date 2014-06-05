@@ -1647,7 +1647,7 @@ end
 function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
   local noGfx = false
   for _,g in ipairs(self.ExplosionList) do
-    noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
+    --noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
   end
   return noGfx
 end
