@@ -20,9 +20,19 @@ local spSendLuaRulesMsg = Spring.SendLuaRulesMsg
 local spIsGUIHidden = Spring.IsGUIHidden
 local spGetModKeyState = Spring.GetModKeyState
 local spIsUnitSelected = Spring.IsUnitSelected
+local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 
-local drawUnits = {}
+local drawUnit = {count = 0, data = {}}
+local drawUnitID = {}
+
 local commandLevel = 1 --default at start of widget is to be disabled!
+
+local myAllyTeamID = Spring.GetLocalAllyTeamID()
+local spectating = Spring.GetSpectatingState()
+local myPlayerID = Spring.GetLocalPlayerID()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Command Visibility'
 options_order = { 
@@ -68,23 +78,48 @@ options = {
 		value = false,
 	},
 }
------
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function AddUnit(unitID)
+	if not drawUnitID[unitID] then
+		if spectating or spGetUnitAllyTeam(unitID) == myAllyTeamID then
+			local list = drawUnit
+			list.count = list.count + 1
+			list.data[list.count] = unitID
+			drawUnitID[unitID] = list.count
+		end
+	end
+end
+
+local function RemoveUnit(unitID)
+	if drawUnitID[unitID] then
+		local index = drawUnitID[unitID]
+		local list = drawUnit
+		list.data[index] = list.data[list.count]
+		list.data[list.count] = nil
+		list.count = list.count - 1
+		drawUnitID[list.data[index]] = index
+		drawUnitID[unitID] = nil
+	end
+end
+
 function widget:Update()
 	if not spIsGUIHidden()  then
-		for i, v in pairs(drawUnits) do
-			if i then
-				local shift = select(4,spGetModKeyState())
-				
-				if
-				(commandLevel==4) or --all
-				(commandLevel==2 and shift) or --shift
-				(commandLevel==3 and (spIsUnitSelected(i) or (options.includeallies.value and WG.allySelUnits[i]) or shift )  ) or --selection/shift
-				(commandLevel==5 and (spIsUnitSelected(i) or (options.includeallies.value and WG.allySelUnits[i]) )           ) or --selection
-				(commandLevel==1 and (spIsUnitSelected(i) or (options.includeallies.value and WG.allySelUnits[i]) ) and shift )    --minimal, but with allies
-				then 
-					spDrawUnitCommands(i)
-				end
-				
+		local shift = select(4,spGetModKeyState())
+		local count = drawUnit.count
+		local units = drawUnit.data
+		for i = 1, count do
+			local unitID = units[i]
+			if
+			(commandLevel==4) or --all
+			(commandLevel==2 and shift) or --shift
+			(commandLevel==3 and (spIsUnitSelected(unitID) or (options.includeallies.value and WG.allySelUnits[unitID]) or shift )  ) or --selection/shift
+			(commandLevel==5 and (spIsUnitSelected(unitID) or (options.includeallies.value and WG.allySelUnits[unitID]) )           ) or --selection
+			(commandLevel==1 and (spIsUnitSelected(unitID) or (options.includeallies.value and WG.allySelUnits[unitID]) ) and shift )    --minimal, but with allies
+			then 
+				spDrawUnitCommands(unitID)
 			end
 		end
 	end
@@ -92,23 +127,30 @@ end
 
 function PoolUnit()
 	local units = spGetAllUnits()
-	for i, id in pairs(units) do
-		drawUnits[id] = true
+	for _, unitID in ipairs(units) do
+		AddUnit(unitID)
 	end
 end
+
 ------
-function widget:UnitCreated(unitID)
-	drawUnits[unitID] = true
+function widget:PlayerChanged(playerID) 
+	if myPlayerID == playerID then
+		spectating = Spring.GetSpectatingState()
+		allyTeamID = Spring.GetLocalAllyTeamID()
+		PoolUnit()
+	end
+end
+
+function widget:UnitCreated(unitID, unitDefID, unitTeam)
+	AddUnit(unitID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, oldTeam, newTeam)
-	drawUnits[unitID] = true
+	AddUnit(unitID)
 end
 
 function widget:UnitDestroyed(unitID)
-	if (drawUnits[unitID]) then
-		drawUnits[unitID] = nil
-	end
+	RemoveUnit(unitID)
 end
 -----
 function widget:GameFrame(n)
