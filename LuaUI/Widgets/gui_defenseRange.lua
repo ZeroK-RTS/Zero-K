@@ -140,7 +140,9 @@ options_order = {
 --Button display configuration
 --position only relevant if no saved config data found
 
+local defenceList = {count = 0, data = {}}
 local defences = {}
+
 local currentModConfig = {}
 local buttons = {}
 
@@ -244,67 +246,33 @@ local DrawRanges
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
-function widget:Initialize()
-	DetectMod()
-	
-	for uDefID, uDef in pairs(uDefs) do
-		wepRanges[uDefID] = {}
-		local weapons = uDef.weapons
-		local entryIndex = 0
-		for weaponIndex=1, #weapons do
-			local weaponRange = wDefs[weapons[weaponIndex].weaponDef].range -- take the value of 'range' in each 'weapons' in 'weaponDefs'
-			if (weaponRange > 32) then -- many 'fake' weapons have <= 16 range. ->Up to 32 for outlaw.
-				entryIndex = entryIndex + 1
-				wepRanges[uDefID][entryIndex] = weaponRange
-			end
-		end
-		--[[if ( weapNamTab[lower(udef["deathExplosion"])] == nil ) then
-			return
-		end
-		
-		local udef = uDefs[unitDefID]
-		if ( weapNamTab[lower(udef["deathExplosion"])] == nil ) then
-			return
-		end
-		local deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
-		local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
-		local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage]]--
-	end
-	
-	local myAllyTeam = Spring.GetMyAllyTeamID()
-	local units = Spring.GetAllUnits()
-	for i=1,#units do
-		local unitID = units[i]
-		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
-		UnitDetected(unitID, unitAllyTeam == myAllyTeam)
-	end
-end
-
-
-function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
-	UnitDetected( unitID, true )
-end
-
-function widget:UnitFinished( unitID,  unitDefID,  unitTeam)
+local function AddUnit(unitID, data)
 	if defences[unitID] then
-		defences[unitID].complete = true
-	end
-end
-
-function widget:UnitDestroyed(unitID)
-	defences[unitID] = nil
-end
-
-function widget:UnitEnteredLos(unitID, unitTeam)
-	if defences[unitID] and not defences[unitID].complete then
-		defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
+		local index = defences[unitID].index
+		defences[unitID] = data
+		defences[unitID].index = index
 	else
-		UnitDetected( unitID, false )
+		local list = defenceList
+		list.count = list.count + 1
+		list.data[list.count] = unitID
+		defences[unitID] = data
+		defences[unitID].index = list.count
 	end
 end
 
-function UnitDetected( unitID, allyTeam )
+local function RemoveUnit(unitID)
+	if defences[unitID] then
+		local index = defences[unitID].index
+		local list = defenceList
+		list.data[index] = list.data[list.count]
+		defences[list.data[index]].index = index
+		list.data[list.count] = nil
+		list.count = list.count - 1
+		defences[unitID] = nil
+	end
+end
+
+local function UnitDetected( unitID, allyTeam )
 	local tag
 	local tabValue = defences[unitID]
 	if tabValue then
@@ -402,8 +370,73 @@ function UnitDetected( unitID, allyTeam )
 	end
 
 	printDebug("Adding UnitID " .. unitID .. " WeaponCount: " .. #foundWeapons ) --.. "W1: " .. foundWeapons[1]["type"])
-	defences[unitID] = { allyState = ( allyTeam == false ), pos = {x, y, z}, complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1 }
-	defences[unitID]["weapons"] = foundWeapons
+	
+	
+	AddUnit(unitID, { 
+		allyState = ( allyTeam == false ), 
+		pos = {x, y, z}, 
+		complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1,
+		weapons = foundWeapons,
+	})
+end
+
+function widget:Initialize()
+	DetectMod()
+	
+	for uDefID, uDef in pairs(uDefs) do
+		wepRanges[uDefID] = {}
+		local weapons = uDef.weapons
+		local entryIndex = 0
+		for weaponIndex=1, #weapons do
+			local weaponRange = wDefs[weapons[weaponIndex].weaponDef].range -- take the value of 'range' in each 'weapons' in 'weaponDefs'
+			if (weaponRange > 32) then -- many 'fake' weapons have <= 16 range. ->Up to 32 for outlaw.
+				entryIndex = entryIndex + 1
+				wepRanges[uDefID][entryIndex] = weaponRange
+			end
+		end
+		--[[if ( weapNamTab[lower(udef["deathExplosion"])] == nil ) then
+			return
+		end
+		
+		local udef = uDefs[unitDefID]
+		if ( weapNamTab[lower(udef["deathExplosion"])] == nil ) then
+			return
+		end
+		local deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
+		local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
+		local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage]]--
+	end
+	
+	local myAllyTeam = Spring.GetMyAllyTeamID()
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local unitAllyTeam = Spring.GetUnitAllyTeam(unitID)
+		UnitDetected(unitID, unitAllyTeam == myAllyTeam)
+	end
+end
+
+
+function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
+	UnitDetected( unitID, true )
+end
+
+function widget:UnitFinished( unitID,  unitDefID,  unitTeam)
+	if defences[unitID] then
+		defences[unitID].complete = true
+	end
+end
+
+function widget:UnitDestroyed(unitID)
+	RemoveUnit(unitID)
+end
+
+function widget:UnitEnteredLos(unitID, unitTeam)
+	if defences[unitID] and not defences[unitID].complete then
+		defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
+	else
+		UnitDetected( unitID, false )
+	end
 end
 
 function GetColorsByTypeAndDps( dps, type, isEnemy )
@@ -508,19 +541,24 @@ function widget:Update()
 		--end
 
 		--remove dead units
-		for k, def in pairs(defences) do
-			local x, y, z = def["pos"][1], def["pos"][2], def["pos"][3]
+		local i = 1
+		while i <= defenceList.count do
+			local unitID = defenceList.data[i]
+			local def = defences[unitID]
+			local x, y, z = def.pos[1], def.pos[2], def.pos[3]
 			local a, b, c = spGetPositionLosState(x, y, z)
 			local losState = b
 
 			if (losState) then
-				if not spGetUnitDefID(k) then
+				if not spGetUnitDefID(unitID) then
 					printDebug("Unit killed.")
-					defences[k] = nil
+					RemoveUnit(unitID)
+					i = i - 1
 				elseif not def.complete then
-					def.complete = (select(5, Spring.GetUnitHealth(k)) or 0) == 1
+					def.complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
 				end
 			end
+			i = i + 1
 		end
 	end
 end
@@ -692,7 +730,8 @@ function DrawRanges()
 	local color
 	local range
 	local stipple = false
-	for _, def in pairs(defences) do
+	for i = 1, defenceList.count do
+		local def = defences[defenceList.data[i]]
 		if def.complete and stipple then
 			--glLineStipple(false)
 			stipple = false

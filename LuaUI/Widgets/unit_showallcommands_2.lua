@@ -98,9 +98,9 @@ local function RemoveUnit(unitID)
 		local index = drawUnitID[unitID]
 		local list = drawUnit
 		list.data[index] = list.data[list.count]
+		drawUnitID[list.data[index]] = index
 		list.data[list.count] = nil
 		list.count = list.count - 1
-		drawUnitID[list.data[index]] = index
 		drawUnitID[unitID] = nil
 	end
 end
