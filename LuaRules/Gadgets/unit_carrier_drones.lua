@@ -28,6 +28,8 @@ local TransferUnit      = Spring.TransferUnit
 local random            = math.random
 local CMD_ATTACK		= CMD.ATTACK
 
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
 -- thingsWhichAreDrones is an optimisation for AllowCommand
 local carrierDefs, thingsWhichAreDrones = include "LuaRules/Configs/drone_defs.lua"
 
@@ -260,7 +262,9 @@ function gadget:GameFrame(n)
 					local carrierDef = carrierDefs[carrier.unitDefID][i]
 					local set = carrier.droneSets[i]
 					if (set.reload > 0) then
-						set.reload = (set.reload - 1)
+						local reloadMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
+						set.reload = (set.reload - reloadMult)
+						
 					elseif (set.droneCount < set.maxDrones) then
 						for n=1,set.spawnSize do
 							if (set.droneCount >= set.maxDrones) then
