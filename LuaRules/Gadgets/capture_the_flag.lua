@@ -840,6 +840,10 @@ function UpgradeCenters()
   ME_CENTER_CURRENT_BONUS = extra
 end
 
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	return WeaponDefs
+end
+
 function gadget:UnitPreDamaged(unitID) --, unitDefID, unitTeam, damage, paralyzer)
   if (Godmode[unitID]) then --or (DroppedFlags[unitID]) then
     return 0

@@ -3063,19 +3063,15 @@ function gadget:GameFrame(n)
 	end
 end	
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
-                            weaponDefID, attackerID, attackerDefID, attackerTeam)
-							
-	if unitDefID == terraunitDefID then
-		return -0.0001 -- terraunit starts on 0 HP. If a unit is damaged and has 0 HP it dies
-	end
-	return damage
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	return WeaponDefs
 end
 
 --------------------------------------------------------------------------------
 -- Weapon Terraform
 --------------------------------------------------------------------------------
 
+local wantedList = {}
 local SeismicWeapon = {}
 local DEFAULT_SMOOTH = 0.5
 local HEIGHT_FUDGE_FACTOR = 10
@@ -3085,6 +3081,7 @@ local MIN_SMOOTH_RAD = 20
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.smoothradius or wd.customParams.smoothmult then
+		wantedList[#wantedList + 1] = wd.id
 		Script.SetWatchWeapon(wd.id,true)
 		SeismicWeapon[wd.id] = {
 			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
@@ -3126,6 +3123,10 @@ local function makeTerraChangedPointsPyramidAroundStructures(posX,posY,posZ,posC
 	--]]
 
 	return posY
+end
+
+function gadget:Explosion_GetWantedWeaponDef()
+	return wantedList
 end
 
 function gadget:Explosion(weaponID, x, y, z, owner)

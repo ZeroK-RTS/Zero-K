@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "1 April 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
@@ -26,7 +26,6 @@ local throwShooterID = {[UnitDefNames["gorg"].id] = true}
 
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
-	Script.SetWatchWeapon(wd.id,true)
 	
 	if wd.customParams and wd.customParams.massliftthrow then
 		Script.SetWatchWeapon(wd.id,true)

@@ -17,6 +17,8 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
 
+local wantedWeaponList = {}
+
 local singleHitWeapon = {}
 local singleHitUnitId = {}
 
@@ -29,10 +31,12 @@ function gadget:Initialize()
 		if wd.customParams then
 			if wd.customParams.single_hit then
 				singleHitWeapon[wd.id] = true;
+				wantedWeaponList[#wantedWeaponList + 1] = wdid
 			end
 			if isNewEngine and wd.customParams.single_hit_multi then
 				Script.SetWatchWeapon(wd.id, true)
 				singleHitMultiWeapon[wd.id] = true;
+				wantedWeaponList[#wantedWeaponList + 1] = wdid
 			end
 		end
 	end
@@ -51,6 +55,9 @@ function gadget:ProjectileDestroyed(proID)
 	end
 end
 
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	return wantedWeaponList
+end
 
 function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
 	if singleHitWeapon[weaponDefID] then

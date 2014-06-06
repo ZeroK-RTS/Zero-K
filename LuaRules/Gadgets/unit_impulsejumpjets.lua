@@ -493,6 +493,11 @@ end
 -- weaponDefID -4 --> fire damage
 -- weaponDefID -5 --> kill damage
 --Detect ground landing:
+
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	return {-2, -3}
+end
+
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision
 	if jumping[unitID] and (weaponDefID == -3) and attackerID == nil then

@@ -265,14 +265,6 @@ function gadget:UnitFinished(unitID, unitDefID)
 	end
 end
 
--- invulnerable facplopee
---[[
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if plop and facplopsrunning[unitID] then return 0 end
-	return damage	
-end
-]]--
-
 function disableBoost(unitID) 
 	boost[unitID] = nil
 	CheckForShutdown()

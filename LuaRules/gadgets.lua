@@ -1405,7 +1405,69 @@ function gadgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
   return
 end
 
+local UnitPreDamaged_GadgetMap = {}
+local UnitPreDamaged_first = true
 
+function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
+                                   damage, paralyzer, weaponDefID,
+								   a, b, c, d)
+	local projectileID,attackerID
+	local attackerDefID,attackerTeam
+	if reverseCompat then 
+		attackerID = a 
+		attackerDefID = b
+		attackerTeam = c
+	else
+		projectileID = a
+		attackerID = b
+		attackerDefID = c
+		attackerTeam = d
+	end
+	
+	if UnitPreDamaged_first then
+		for _,g in ipairs(self.UnitPreDamagedList) do
+			local weaponDefs = g:UnitPreDamaged_GetWantedWeaponDef()
+			for _,wdid in ipairs(weaponDefs) do
+				if UnitPreDamaged_GadgetMap[wdid] then
+					UnitPreDamaged_GadgetMap[wdid].count = UnitPreDamaged_GadgetMap[wdid].count + 1
+					UnitPreDamaged_GadgetMap[wdid].data[UnitPreDamaged_GadgetMap[wdid].count] = g
+				else
+					UnitPreDamaged_GadgetMap[wdid] = {
+						count = 1,
+						data = {g}
+					}
+				end
+			end
+		end
+		UnitPreDamaged_first = false
+	end
+	
+	local rDam = damage
+	local rImp = 1.0
+
+	local gadgets = UnitPreDamaged_GadgetMap[weaponDefID]
+	if gadgets then
+		local data = gadgets.data
+		local g
+		for i = 1, gadgets.count do
+			g = data[i]
+			dam, imp = g:UnitPreDamaged(unitID, unitDefID, unitTeam,
+					  rDam, paralyzer, weaponDefID,
+					  attackerID, attackerDefID, attackerTeam,
+					  projectileID)
+			if (dam ~= nil) then
+				rDam = dam
+			end
+			if (imp ~= nil) then
+				rImp = math.min(imp, rImp)
+			end
+		end
+	end
+
+	return rDam, rImp
+end
+
+--[[ Old
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   a, b, c, d)
@@ -1440,8 +1502,41 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 
   return rDam, rImp
 end
+--]]
 
+local UnitDamaged_first = true
+local UnitDamaged_count = 0
+local UnitDamaged_gadgets = {}
 
+function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
+                                   damage, paralyzer, weaponID, projectileID, 
+                                   attackerID, attackerDefID, attackerTeam)
+		
+	if reverseCompat then
+		attackerTeam = attackerDefID
+		attackerDefID = attackerID
+		attackerID = projectileID
+	end
+
+	if UnitDamaged_first then
+		for _,g in ipairs(self.UnitDamagedList) do
+			UnitDamaged_count = UnitDamaged_count + 1
+			UnitDamaged_gadgets[UnitDamaged_count] = g
+		end
+		UnitDamaged_first = false
+	end
+
+	local g
+	for i = 1, UnitDamaged_count do
+		g = UnitDamaged_gadgets[i]
+		g:UnitDamaged(unitID, unitDefID, unitTeam,
+				damage, paralyzer, weaponID,
+				attackerID, attackerDefID, attackerTeam)
+	end
+	return
+end
+
+--[[ Old
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
@@ -1459,6 +1554,7 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
   end
   return
 end
+--]]
 
 
 function gadgetHandler:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
@@ -1643,14 +1739,61 @@ end
 --  Misc call-ins
 --
 
+local Explosion_GadgetMap = {}
+local Explosion_GadgetSingle = {}
+
+local Explosion_first = true
+
+function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
+	if Explosion_first then
+		for _,g in ipairs(self.ExplosionList) do
+			local weaponDefs = g:Explosion_GetWantedWeaponDef()
+			for _,wdid in ipairs(weaponDefs) do
+				if Explosion_GadgetSingle[wdid] or Explosion_GadgetMap[wdid] then
+					if Explosion_GadgetMap[wdid] then
+						Explosion_GadgetMap[wdid].count = Explosion_GadgetMap[wdid].count + 1
+						Explosion_GadgetMap[wdid].data[Explosion_GadgetMap[wdid].count] = g
+					else
+						Explosion_GadgetMap[wdid] = {
+							count = 2,
+							data = {Explosion_GadgetSingle[wdid], g}
+						}
+						Explosion_GadgetSingle[wdid] = nil
+					end
+				else
+					Explosion_GadgetSingle[wdid] = g
+				end
+			end
+		end
+		Explosion_first = false
+	end
+	
+	local noGfx = false
+	local single = Explosion_GadgetSingle[weaponID]
+	local map = Explosion_GadgetMap[weaponID]
+	if single then
+		gfx = single:Explosion(weaponID, px, py, pz, ownerID)
+	elseif map then
+		local gadgets = map
+		local data = gadgets.data
+		local g
+		for i = 1, gadgets.count do
+			g = data[i]
+			noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
+		end
+	end
+	return noGfx
+end
+
+--[[ Base
 function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
   local noGfx = false
   for _,g in ipairs(self.ExplosionList) do
-    noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
+	noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
   end
   return noGfx
 end
-
+--]]
 
 --------------------------------------------------------------------------------
 --

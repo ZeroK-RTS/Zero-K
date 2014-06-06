@@ -63,7 +63,6 @@ local floatState = {}
 local aimWeapon = {}
 local GRAVITY = Game.gravity/30/30
 local RAD_PER_ROT = (math.pi/(2^15))
-local FLY_THRESHOLD = GRAVITY*8
 local buildTestUnitDefID = UnitDefNames["armdeva"].id --we use Stardust to check blockage on water surface because on Spring 96 onward amphibious are always buildable under factory.
 --------------------------------------------------------------------------------
 -- Communication to script
@@ -497,16 +496,4 @@ function gadget:Initialize()
 			return false
 		end
 	end
-end
----------------------------------------------------------------------
---Updates that check whether unit is flying
-
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-	if floatDefs[unitDefID] and not float[unitID] then
-		local _,dy = Spring.GetUnitVelocity(unitID)
-		if dy>= FLY_THRESHOLD then
-			addFloat(unitID, unitDefID, true)
-		end
-	end
-	return damage
 end

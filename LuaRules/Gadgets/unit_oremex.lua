@@ -203,6 +203,10 @@ local function disSQ(x1,y1,x2,y2)
 	return (x1 - x2)^2 + (y1 - y2)^2
 end
 
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	return WeaponDefs
+end
+
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam)
 	if (OreMex[unitID]) then
 		if (unitTeam ~= GaiaTeamID) then

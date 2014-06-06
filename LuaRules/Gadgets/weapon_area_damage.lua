@@ -16,18 +16,36 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local frameNum
 local explosionList = {}
-local DAMAGE_PERIOD ,weaponInfo = include("LuaRules/Configs/area_damage_defs.lua")
+local DAMAGE_PERIOD, weaponInfo = include("LuaRules/Configs/area_damage_defs.lua")
 
 --misc
 local rowCount = 0 --remember the lenght of explosionList table
 local emptyRow = {count=0} --remember empty position in explosionList table.
 --
 
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	local wantedWeaponList = {}
+	for wdid = 1, #WeaponDefs do
+		if weaponInfo[wdid] then
+			wantedWeaponList[#wantedWeaponList + 1] = wdid
+		end
+	end 
+	return wantedWeaponList
+end
+
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	if weaponInfo[weaponDefID] and weaponInfo[weaponDefID].impulse then
 		return 0
 	end
 	return damage
+end
+
+function gadget:Explosion_GetWantedWeaponDef()
+	local wantedList = {}
+	for wdid,_ in pairs(weaponInfo) do
+		wantedList[#wantedList + 1] = wdid
+	end
+	return wantedList
 end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)

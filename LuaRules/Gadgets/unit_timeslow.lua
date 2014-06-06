@@ -76,6 +76,15 @@ local function updateSlow(unitID, state)
 	end
 end
 
+function gadget:UnitPreDamaged_GetWantedWeaponDef()
+	local wantedWeaponList = {}
+	for wdid = 1, #WeaponDefs do
+		if attritionWeaponDefs[wdid] then
+			wantedWeaponList[#wantedWeaponList + 1] = wdid
+		end
+	end 
+	return wantedWeaponList
+end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
                             attackerID, attackerDefID, attackerTeam)

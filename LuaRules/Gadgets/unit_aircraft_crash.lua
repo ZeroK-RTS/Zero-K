@@ -49,7 +49,12 @@ function gadget:GameFrame(n)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if (not recentDamage[unitID]) or select(3, spGetUnitIsStunned(unitID)) then return end
+	if not aircraftDefIDs[unitDefID] then
+		return
+	end
+	if (not recentDamage[unitID]) or select(3, spGetUnitIsStunned(unitID)) then 
+		return
+	end
 	--Spring.Echo("Plane damaged")
 	recentDamage[unitID][gameFrame] = (recentDamage[unitID][gameFrame] or 0) + damage
 	
@@ -81,7 +86,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (not aircraftDefIDs[unitDefID]) or select(3, spGetUnitIsStunned(unitID)) then return end
+	if (not aircraftDefIDs[unitDefID]) or select(3, spGetUnitIsStunned(unitID)) then 
+		return 
+	end
 	recentDamage[unitID] = {}
 end
 
