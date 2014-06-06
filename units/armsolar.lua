@@ -25,6 +25,8 @@ unitDef = {
     helptext_de    = [[Solaranlagen sind von den Energiestrukturen die mit der geringsten Kosteneffizienz, aber sie sind auch die verlässlichsten und stabilsten unter ihnen. Sobald sie angegriffen werden ziehen sie sich in eine gepanzerte Form zurück, die als exzellenter Schutz gegen Raider fungiert.]],
     helptext_pl    = [[Choć panele słoneczne to najmniej efektywne spośród elektrowni, są jednak tanie, wytrzymałe i niezawodne. Świetną ochronę zapewnia im możliwość automatycznego zamknięcia się, co sprawia, że otrzymują tylko ćwierć obrażeń.]],
     pylonrange = 100,
+	aimposoffset   = [[0 16 0]],
+	midposoffset   = [[0 0 0]],
   },
 
   damageModifier                = 0.25,
