@@ -93,7 +93,6 @@ unitDef = {
 
 	  customParams            = {
 	    impulse = [[-300]],
-		impulseup = [[1200]],
 	  },
 
       damage                  = {

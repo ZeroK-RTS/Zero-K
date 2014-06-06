@@ -2,7 +2,7 @@ include "constants.lua"
 
 local base, pelvis, torso, aimpoint = piece('base', 'pelvis', 'torso', 'aimpoint')
 local rthigh, rcalf, rfoot, lthigh, lcalf, lfoot = piece('rthigh', 'rcalf', 'rfoot', 'lthigh', 'lcalf', 'lfoot')
-local rshoulder, rgun, rflare, lshoulder, lgun, lflare = piece('rshoulder', 'rgun', 'rflare', 'lshoulder', 'lgun', 'lflare')
+local rshoulder, rgun, rflare, lshoulder, lgun, lflare, forwards = piece('rshoulder', 'rgun', 'rflare', 'lshoulder', 'lgun', 'lflare', 'forwards')
 
 local firepoints = {[0] = lflare, [1] = rflare}
 
@@ -44,6 +44,19 @@ local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
 
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetGroundHeight = Spring.GetGroundHeight
+
+local wd = WeaponDefNames["amphraider2_watercannon"]
+
+local impulse = tonumber(wd.customParams.impulse)
+local maxProjectiles = 8
+
+local impulseMaxDepth = -tonumber(wd.customParams.impulsemaxdepth)
+local impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Weapon config
@@ -393,7 +406,27 @@ function script.FireWeapon(num)
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		Spring.PlaySoundFile("sounds/weapon/watershort.wav", 20+proportion*5, px, py, pz)
 	end
+	
+	-- Add Impulse
+	local projectiles = spGetUnitRulesParam(unitID, "water_projectiles") or 8
 
+	local ax, ay, az = Spring.GetUnitPiecePosDir(unitID, forwards)
+	local _,_,_,ux, uy, uz = Spring.GetUnitPosition(unitID, true)
+	local x,y,z = (ux-ax), (uy-ay), (uz-az)
+	
+	local magnitude = impulse
+	
+	local depth = spGetGroundHeight(ux,uz)
+	if depth < 0 then
+		if depth < impulseMaxDepth then
+			depth = impulseMaxDepth
+		end
+		magnitude = magnitude + depth*impulseDepthMult
+	end
+	
+	GG.AddGadgetImpulse(unitID, x, y, z, 30*projectiles, true, false, true, false, unitDefID) 
+	
+	-- Change Tank
 	GG.shotWaterWeapon(unitID)
 end
 

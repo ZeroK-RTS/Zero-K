@@ -88,6 +88,8 @@ unitDef = {
 	  
 	  customParams            = {
 	    impulse = [[30]],
+	    impulsemaxdepth = [[20]],
+	    impulsedepthmult = [[0.5]],
 		normaldamage = [[1]],
 	  },
 	  

@@ -62,8 +62,7 @@ local impulseMult = {
 	[2] = 0.0032, -- other
 }
 local impulseWeaponID = {}
-
-for i=1,#WeaponDefs do
+for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.impulse then
 		impulseWeaponID[wd.id] = {
@@ -71,8 +70,10 @@ for i=1,#WeaponDefs do
 			normalDamage = (wd.customParams.normaldamage and true or false),
 			checkLOS = true
 		}
-		if wd.customParams.impulseup then
-			impulseWeaponID[wd.id].impulseUp = tonumber(wd.customParams.impulseup)
+		
+		if wd.customParams.impulsemaxdepth and wd.customParams.impulsedepthmult then
+			impulseWeaponID[wd.id].impulseMaxDepth = -tonumber(wd.customParams.impulsemaxdepth)
+			impulseWeaponID[wd.id].impulseDepthMult = -tonumber(wd.customParams.impulsedepthmult)
 		end
 	end
 end
@@ -348,15 +349,26 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	--spAddUnitImpulse(unitID,0,3,0)
 	if impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) then
 		local defData = impulseWeaponID[weaponDefID]
-		local ux, uy, uz = spGetUnitPosition(unitID)
-		local ax, ay, az = spGetUnitPosition(attackerID)
+		local _,_,_,ux, uy, uz = spGetUnitPosition(unitID, true)
+		local_,_,_,ax, ay, az = spGetUnitPosition(attackerID, true)
 		
 		local x,y,z = (ux-ax), (uy-ay), (uz-az)
 		local magnitude = defData.impulse
 		
+		if defData.impulseMaxDepth then
+			local depth = spGetGroundHeight(ax,az)
+			if depth < 0 then
+				if depth < defData.impulseMaxDepth then
+					depth = defData.impulseMaxDepth
+				end
+				magnitude = magnitude + depth*defData.impulseDepthMult
+			end
+		end
+		
 		AddGadgetImpulse(unitID, x, y, z, magnitude, true, false, true, false, unitDefID) 
-		if defData.impulseUp then
-			AddGadgetImpulse(unitID, 0, 1, 0, defData.impulseUp, true, false, true, false, unitDefID) 
+		
+		if defData.selfImpulse then
+			AddGadgetImpulse(attackerID, x, y, z, -magnitude, true, false, true, false, unitDefID) 
 		end
 		
 		if defData.normalDamage then
