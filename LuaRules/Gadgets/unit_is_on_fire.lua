@@ -151,7 +151,7 @@ function gadget:GameFrame(n)
 	if (n%CHECK_INTERVAL<1)and(next(unitsOnFire)) then
 		local burningUnits = {}
 		local cnt = 1
-    inGameFrame = true
+		inGameFrame = true
 		for unitID, t in pairs(unitsOnFire) do
 			if (n > t.endFrame) or (inWater[unitID] and CheckImmersion(unitID)) then
 				SetUnitRulesParam(unitID, "on_fire", 0)
@@ -165,16 +165,16 @@ function gadget:GameFrame(n)
 				cnt=cnt+1
 			end
 		end
-    inGameFrame = false 
-		if (cnt>1) then
-			_G.burningUnits = burningUnits
-			SendToUnsynced("onFire")
-			_G.burningUnits = nil
-		end
+		inGameFrame = false 
+		--if (cnt>1) then
+		--	_G.burningUnits = burningUnits
+		--	SendToUnsynced("onFire")
+		--	_G.burningUnits = nil
+		--end
 	end
 end
 
-
+--[[
 --------------------------------------------------------------------------------
 -- END SYNCED
 --------------------------------------------------------------------------------
@@ -199,6 +199,6 @@ end
 function gadget:Initialize()
 	gadgetHandler:AddSyncAction('onFire',WrapToLuaUI)
 end
-
+--]]
 end
 
