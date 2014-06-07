@@ -1235,7 +1235,6 @@ local AddWorldText        = Spring.AddWorldText
 local IsUnitVisible       = Spring.IsUnitVisible
 local GetLocalTeamID      = Spring.GetLocalTeamID
 local spAreTeamsAllied    = Spring.AreTeamsAllied
-local spGetGameFrame      = Spring.GetGameFrame
 
 local glBillboard    = gl.Billboard
 local glColor        = gl.Color
@@ -1354,7 +1353,7 @@ function gadget:Shutdown()
 end
 
 function gadget:Update()
-  local frame = spGetGameFrame()
+  local frame = GetGameFrame()
   if (frame>oldFrame) then
     oldFrame = frame
     local morphUnitsSynced = SYNCED.morphUnits

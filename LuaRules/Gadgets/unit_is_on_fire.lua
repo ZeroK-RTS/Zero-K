@@ -55,7 +55,6 @@ local random = math.random
 local Spring = Spring
 local gadget = gadget
 local AreTeamsAllied    = Spring.AreTeamsAllied
-local GetGameFrame      = Spring.GetGameFrame
 local AddUnitDamage     = Spring.AddUnitDamage
 local SetUnitRulesParam = Spring.SetUnitRulesParam
 local SetUnitCloak      = Spring.SetUnitCloak

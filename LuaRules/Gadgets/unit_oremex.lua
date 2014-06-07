@@ -59,7 +59,6 @@ local spGetUnitsInRectangle				= Spring.GetUnitsInRectangle
 local spGetFeatureDefID					= Spring.GetFeatureDefID
 local spTransferUnit					= Spring.TransferUnit
 local spGetAllUnits						= Spring.GetAllUnits
-local spGetGameFrame					= Spring.GetGameFrame
 local spGetUnitAllyTeam					= Spring.GetUnitAllyTeam
 local spGetTeamList						= Spring.GetTeamList
 local spSetUnitNeutral					= Spring.SetUnitNeutral
@@ -100,6 +99,7 @@ local teamIDs
 local UnderAttack = {} -- holds frameID per mex so it goes neutral, if someone attacks it, for 5 seconds, it will not return to owner if no grid connected.
 local Ore = {} -- hold features should they emit harm they will ongameframe
 local OreIncome = GG.oreIncome
+local gameframe = Spring.GetGameFrame()
 
 local TiberiumProofDefs = {
 	[UnitDefNames["armestor"].id] = true,
@@ -193,7 +193,7 @@ local function TransferMexTo(unitID, unitTeam)
 -- 		spSetUnitRulesParam(unitID, "mexIncome", OreMex[unitID].income)
 -- 		spCallCOBScript(unitID, "SetSpeed", 0, OreMex[unitID].income * 500) 
 		-- ^ hacks?
-		UnderAttack[unitID] = spGetGameFrame()+160
+		UnderAttack[unitID] = gameframe+160
 		spTransferUnit(unitID, unitTeam, false)
 		spSetUnitNeutral(unitID, true)
 	end
@@ -222,7 +222,7 @@ local TransferLoop = function()
 		local z = data.z
 		local unitTeam = spGetUnitTeam(unitID)
 		local allyTeam = spGetUnitAllyTeam(unitID)
-		if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= spGetGameFrame()) then
+		if (x) and ((unitTeam==GaiaTeamID) or (INVULNERABLE_EXTRACTORS)) and (UnderAttack[unitID] <= gameframe) then
 			local units = spGetUnitsInCylinder(x, z, PylonRange)
 			local best_eff = -1 -- lel
 			local best_team
@@ -375,6 +375,7 @@ end
 -- if mex OD is off and it's godmode on, transfer mex to gaia team
 -- if mex is inside EnergyDefs transfer mex to ally team having most gridefficiency (if im correct team having most gridefficiency should produce most E for M?)
 function gadget:GameFrame(f)
+	gameframe = f
 	if ((f%32)==1) then
 		ShareMinedOre()
 		MineMoreOreLoop()
@@ -810,12 +811,15 @@ function gadget:Initialize()
 	if (ORE_DMG==0) then
 		InflictOreDamage = function() end
 	end
-	if (spGetGameFrame() > 1) then
+	if (gameframe > 1) then
 		ReInit(true)
 	end
 end
 
 function gadget:GameStart()
+	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
+		return
+	end
 	if (tonumber(modOptions.oremex) == 1) then
 		ReInit(false)
 	end
