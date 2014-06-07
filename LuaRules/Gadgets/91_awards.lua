@@ -1,12 +1,12 @@
 function gadget:GetInfo()
 	return {
-		name    = "Awards",
+		name    = "Awards 91",
 		desc    = "v1.002 Awards players at end of battle with shiny trophies.",
 		author  = "CarRepairer",
 		date    = "2008-10-15", --2013-09-05
 		license = "GNU GPL, v2 or later",
 		layer   = 1000000, -- Must be after all other build steps and before unit_spawner.lua for queen kill award.
-		enabled = not (Game.version:find('91.0') == 1),
+		enabled = (Game.version:find('91.0') == 1),
 	}
 end
 
@@ -764,6 +764,10 @@ function gadget:GameFrame(n)
 	end
 end --GameFrame
 
+function gadget:GameOver()
+	SendToUnsynced("aw_GameOver")
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 else -- UNSYNCED
@@ -800,6 +804,7 @@ function gadget:Initialize()
 		teamNames[team] = name
 	end
 	--spSendCommands({'endgraph 0'})
+	gadgetHandler:AddSyncAction("aw_GameOver", gadget.GameOver)
 	if TESTMODE then
 		gadget:GameOver()
 	end
