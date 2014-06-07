@@ -57,8 +57,12 @@ upgrades = {
 	},
 	commweapon_hparticlebeam = {
 		name = "Heavy Particle Beam",
-		description = "A ranged high-energy pulse weapon",
-	},		
+		description = "Ranged high-energy pulse weapon",
+	},
+	commweapon_massdriver = {
+		name = "Mass Driver",
+		description = "High-velocity hunting rifle",
+	},
 	commweapon_missilelauncher = {
 		name = "Missile Launcher",
 		description = "Fires light seeker missiles with good range",	
