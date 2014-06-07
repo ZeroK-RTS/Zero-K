@@ -2,8 +2,9 @@
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- local CMD_REARM = 33410 --get from customcmds.h.lua
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local emptyTable = {}
 
-local function ReloadQueue(queue, cmdTag, id)
+local function ReloadQueue(queue, cmdTag)
 	if (not queue) then
 		return
 	end
@@ -21,8 +22,8 @@ local function ReloadQueue(queue, cmdTag, id)
 	-- workaround for STOP not clearing attack order due to auto-attack
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local firestate = Spring.GetUnitStates(unitID).firestate
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
-	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.STOP, emptyTable, 0)
 	for i=start,#queue do
 		local cmd = queue[i]
 		local cmdOpt = cmd.options
@@ -37,41 +38,28 @@ local function ReloadQueue(queue, cmdTag, id)
 		local cmd = queue[1]
 		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"} )
 	end
-	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
 	
 	return re
 end
 
-local function ReinsertAttackOrder(cmd, param)
-	local queue = Spring.GetUnitCommands(unitID) or {}
-	local index = #queue + 1
-	for i=1, #queue do
-		if queue[i].id == CMD_REARM then
-			index = i
-			break
-		end
-	end
-	--spGiveOrderToUnit(unitID, CMD.INSERT, {index, cmd, 0, unpack(param)}, {"alt"})
-	GG.InsertCommand(unitID, index, cmd, param)
-end
-
 function Reload()
 	local queue = Spring.GetUnitCommands(unitID)
-	local id, target
+	local cmdID, target
 	local re = false
 	if queue and queue[1] then
 		local tag = queue[1].tag
-		id = queue[1].id
-		if id == CMD.AREA_ATTACK then
+		cmdID = queue[1].id
+		if cmdID == CMD.AREA_ATTACK then
 			target = queue[1].params
-		elseif id == CMD.ATTACK and #(queue[1].params) == 1 then
+		elseif cmdID == CMD.ATTACK and #(queue[1].params) == 1 then
 			--target = {queue[1].params[1]}
 		end
-		re = ReloadQueue(queue, tag, id)
+		re = ReloadQueue(queue, tag)
 	end
 	Spring.SetUnitRulesParam(unitID, "noammo", 1)
-	GG.RequestRearm(unitID)
-	if target and not re then
-		ReinsertAttackOrder(id, target)
+	local targetPad, index = GG.RequestRearm(unitID)
+	if target and index and not re then
+		GG.InsertCommand(unitID, index, cmdID, target)
 	end
 end

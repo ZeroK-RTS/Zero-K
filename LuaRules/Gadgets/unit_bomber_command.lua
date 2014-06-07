@@ -358,10 +358,10 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		elseif queue[i].id == CMD_REARM then -- already have set rearm point, we have nothing left to do here
 			detectedRearm = true
 			if (not replaceExisting) then
-				return false
+				return bomberToPad[unitID], index	-- FIXME
 			end
 		elseif queue[i].id == CMD_FIND_PAD then	-- already have find airpad command, we might be doing same work twice, skip
-			return false
+			return
 		end
 	end
 	if forceNow then
@@ -375,11 +375,11 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 		local replaceExistingRearm = (detectedRearm and replaceExisting) --replace existing Rearm (if available)
 		-- InsertCommand(unitID, index, CMD_REARM, {targetPad}, nil, replaceExistingRearm) --UnitID get RE-ARM commandID. airpadID as its Params[1]
 		if replaceExistingRearm then
-			spGiveOrderToUnit(unitID, CMD.REMOVE, {index,}, {""})
+			spGiveOrderToUnit(unitID, CMD.REMOVE, {index}, {""})
 		end
 		spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, CMD.OPT_SHIFT + CMD.OPT_INTERNAL, targetPad}, {"alt"}) --Internal to avoid repeat
 		cmdIgnoreSelf = false
-		return targetPad
+		return targetPad, index
 	end
 end
 
@@ -650,9 +650,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if (cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift then
 			return false --don't find new pad if already on the pad currently refueling or repairing.
 		end
-		if combatCommands[cmdID] then
-			return true --don't leave pad when given attack/fight command when refueling, allow command and skip CancelAirpadReservation
-		end
+		return (noAmmo ~= 2) or (cmdOptions.shift) --don't leave in the middle of rearming, else allow command and skip CancelAirpadReservation
 	elseif noAmmo == 1 then
 		if combatCommands[cmdID] then	-- don't fight without ammo, go get ammo first!
 			rearmRequest[unitID] = true
