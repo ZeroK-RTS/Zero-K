@@ -15,7 +15,6 @@ if (gadgetHandler:IsSyncedCode()) then
 	local spSetUnitHealth   = Spring.SetUnitHealth
 	local spSpawnCEG        = Spring.SpawnCEG
 
-	local SendToUnsync      = SendToUnsynced
 	local CMD_RESURRECT     = CMD.RESURRECT
 
 	local units = {}

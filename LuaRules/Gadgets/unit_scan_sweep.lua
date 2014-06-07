@@ -49,7 +49,6 @@ if (gadgetHandler:IsSyncedCode()) then
 	local spSetUnitNoMinimap           = Spring.SetUnitNoMinimap
 	local spSpawnCEG                   = Spring.SpawnCEG
 
-	local SendToUnsync = SendToUnsynced
 	local ceil = math.ceil
 
 	local ally_count = #Spring.GetAllyTeamList() - 1
