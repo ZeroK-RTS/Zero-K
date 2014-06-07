@@ -19,8 +19,11 @@ local spGetAllUnits = Spring.GetAllUnits
 local spSendLuaRulesMsg = Spring.SendLuaRulesMsg
 local spIsGUIHidden = Spring.IsGUIHidden
 local spGetModKeyState = Spring.GetModKeyState
-local spIsUnitSelected = Spring.IsUnitSelected
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
+local spGetSelectedUnits = Spring.GetSelectedUnits
+
+local selectedUnitCount = 0
+local selectedUnits 
 
 local drawUnit = {count = 0, data = {}}
 local drawUnitID = {}
@@ -33,6 +36,11 @@ local myPlayerID = Spring.GetLocalPlayerID()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function UpdateSelection(newSelectedUnits)
+	selectedUnitCount = #newSelectedUnits
+	selectedUnits = newSelectedUnits
+end
+
 
 options_path = 'Settings/Interface/Command Visibility'
 options_order = { 
@@ -52,21 +60,25 @@ options = {
 		value = 'showminimal',  --default at start of widget is to be disabled!
 		OnChange = function(self)
 			local key = self.value
-			if key == 'onlyselectionlow' then
+			if key == 'showallcommand' then
 				commandLevel = 5
-				spSendLuaRulesMsg("target_move_selectionlow")
-			elseif key == 'showallcommand' then
-				commandLevel = 4
 				spSendLuaRulesMsg("target_move_all")
 			elseif key == 'onlyselection' then
-				commandLevel = 3
+				commandLevel = 4
 				spSendLuaRulesMsg("target_move_selection")
+				UpdateSelection(spGetSelectedUnits())
+			elseif key == 'onlyselectionlow' then
+				commandLevel = 3
+				spSendLuaRulesMsg("target_move_selectionlow")
+				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'showallonshift' then
 				commandLevel = 2
 				spSendLuaRulesMsg("target_move_shift")
+				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'showminimal' then
 				commandLevel = 1
 				spSendLuaRulesMsg("target_move_minimal")
+				UpdateSelection(spGetSelectedUnits())
 			end
 		end,
 	},
@@ -105,23 +117,52 @@ local function RemoveUnit(unitID)
 	end
 end
 
+local function GetDrawLevel()
+	local shift = select(4,spGetModKeyState())
+	if commandLevel == 1 then
+		return shift, false
+	elseif commandLevel == 2 then
+		return false, shift
+	elseif commandLevel == 3 then
+		return true, false
+	elseif commandLevel == 4 then
+		return true, shift
+	else -- commandLevel == 5
+		return true, true
+	end
+end
+
+
 function widget:Update()
 	if not spIsGUIHidden()  then
-		local shift = select(4,spGetModKeyState())
-		local count = drawUnit.count
-		local units = drawUnit.data
-		for i = 1, count do
-			local unitID = units[i]
-			if
-			(commandLevel==4) or --all
-			(commandLevel==2 and shift) or --shift
-			(commandLevel==3 and (spIsUnitSelected(unitID) or (options.includeallies.value and WG.allySelUnits[unitID]) or shift )  ) or --selection/shift
-			(commandLevel==5 and (spIsUnitSelected(unitID) or (options.includeallies.value and WG.allySelUnits[unitID]) )           ) or --selection
-			(commandLevel==1 and (spIsUnitSelected(unitID) or (options.includeallies.value and WG.allySelUnits[unitID]) ) and shift )    --minimal, but with allies
-			then 
-				spDrawUnitCommands(unitID)
+		local drawSelected, drawAll = GetDrawLevel(commandLevel, shift)
+		if drawAll then
+			local count = drawUnit.count
+			local units = drawUnit.data
+			for i = 1, count do
+				spDrawUnitCommands(units[i])
+			end
+		elseif drawSelected then
+			local sel = selectedUnits
+			for i = 1, selectedUnitCount do
+				spDrawUnitCommands(sel[i])
+			end
+			if options.includeallies.value then
+				for i = 1, count do
+					local unitID = units[i]
+					if WG.allySelUnits[unitID] then
+						spDrawUnitCommands(unitID)
+					end
+				end
 			end
 		end
+	end
+end
+
+
+function widget:SelectionChanged(newSelection)
+	if commandLevel ~= 5 then
+		UpdateSelection(newSelection)
 	end
 end
 
