@@ -1772,7 +1772,7 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
 	local single = Explosion_GadgetSingle[weaponID]
 	local map = Explosion_GadgetMap[weaponID]
 	if single then
-		gfx = single:Explosion(weaponID, px, py, pz, ownerID)
+		noGfx = single:Explosion(weaponID, px, py, pz, ownerID)
 	elseif map then
 		local gadgets = map
 		local data = gadgets.data

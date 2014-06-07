@@ -18,7 +18,7 @@ end
 
 local tags = {
   WorkerThreadSpinTime = 0,
-  UseNetMessageSmoothingBuffer = 0,
+  UseNetMessageSmoothingBuffer = 1,
 }
 
 function widget:Initialize()
