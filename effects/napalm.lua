@@ -3,6 +3,31 @@ Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 local cegs = {
+  ["napalm_phoenix"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 108,
+      ttl                = 75,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 6,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:NAPALMFIREBALL_75]],
+        pos                = [[-20 r40, 30, -20 r40]],
+      },
+    },
+  },
   ["napalm_koda"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -355,11 +380,19 @@ local cegs = {
 }
 
 local altforms = {
+  napalmfireball_75 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {particlelife = 25, particlelifespread = 50},
+      },
+    },
+  },
   napalmfireball_450 = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-	properties = {particlelife = 100, particlelifespread = 250},
+	properties = {particlelife = 150, particlelifespread = 300},
       },
     },
   },

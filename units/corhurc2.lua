@@ -150,9 +150,8 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.7,
-      explosionGenerator      = [[custom:napalm_koda]],
+      explosionGenerator      = [[custom:napalm_phoenix]],
       fireStarter             = 250,
-      flameGfxTime            = 2,
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 1,
