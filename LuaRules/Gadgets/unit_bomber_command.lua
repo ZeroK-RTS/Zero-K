@@ -97,7 +97,6 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.PATROL] = true,
 	[CMD.GUARD] = true,
 	[CMD.MANUALFIRE] = true,
-	[CMD.STOP] = true,
 }
 
 local defaultCommands = { -- commands that is processed by gadget
@@ -112,7 +111,6 @@ local defaultCommands = { -- commands that is processed by gadget
 	[CMD.MOVE] = true,
 	[CMD.REMOVE] = true,
 	[CMD.INSERT] = true,
-	[CMD.STOP] = true,
 }
 
 --------------------------------------------------------------------------------
@@ -137,6 +135,8 @@ local findPadCMD = {
 	tooltip = "Search for nearest available airpad to return to for rearm",
 	hidden	= false,
 }
+
+local emptyTable = {}
 
 local airpadsData = {}	-- stores data
 local airpadsPerAllyteam = {}	-- [allyTeam] = {[pad1ID] = unitDefID1, [pad2ID] = unitDefID2, ..}
@@ -172,42 +172,6 @@ local function MakeOptsWithShift(cmdOpt)
 	return opts
 end
 
---[[
-local function InsertCommandAfter(unitID, afterCmd, cmdID, params, opts)
-	-- workaround for STOP not clearing attack order due to auto-attack
-	-- we set it to hold fire temporarily, revert once commands have been reset
-	local queue = spGetCommandQueue(unitID)
-	local firestate = Spring.GetUnitStates(unitID).firestate
-	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
-	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
-	if queue then
-		opts = opts or {}
-		local i = 1
-		local toInsert = nil
-		local commands = #queue
-		while i <= commands do
-			
-			if toInsert then
-				spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
-				toInsert = false
-			else
-				local cmd = queue[i]
-				spGiveOrderToUnit(unitID, cmd.id, cmd.params, MakeOptsWithShift(cmd.options))
-				if cmd.id == afterCmd and toInsert == nil then
-					toInsert = true
-				end
-				i = i + 1
-			end
-			--local cq = spGetCommandQueue(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
-		end
-		if toInsert then
-			spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
-		end
-	end
-	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
-end
---]]
-
 local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	--Note: 'toReplace==true' means command at 'index' is replaced with 'cmdID' instead of being sandwiched between old commands at 'index'
 	
@@ -215,10 +179,10 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 	-- we set it to hold fire temporarily, revert once commands have been reset
 	local queue = spGetCommandQueue(unitID, -1)
 	local firestate = Spring.GetUnitStates(unitID).firestate
-	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
-	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
+	spGiveOrderToUnit(unitID, CMD.STOP, emptyTable, 0)
 	if queue then
-		opts = opts or {}
+		opts = opts or emptyTable
 		local i = 1
 		local toInsert = (index >= 0)
 		local commands = #queue
@@ -240,7 +204,7 @@ local function InsertCommand(unitID, index, cmdID, params, opts, toReplace)
 			spGiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
 		end
 	end
-	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+	spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
 end
 GG.InsertCommand = InsertCommand
 
@@ -349,7 +313,7 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 	end
 	--Spring.Echo(unitID.." requesting rearm")
 	local detectedRearm = false
-	local queue = spGetCommandQueue(unitID, -1) or {}
+	local queue = spGetCommandQueue(unitID, -1) or emptyTable
 	local index = #queue + 1
 	for i=1, #queue do
 		if combatCommands[queue[i].id] then
@@ -562,8 +526,8 @@ function gadget:GameFrame(n)
 		
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!! <-- What this really mean?
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
-				local queue = spGetCommandQueue(unitID, 1)
-				if queue and #queue > 0 and combatCommands[queue[1].id] then --should never happen... (all should be catch by AllowCommand) 
+				local queue = spGetCommandQueue(unitID, 1) or emptyTable
+				if #queue == 0 or combatCommands[queue[1].id] then --should never happen... (all should be catch by AllowCommand) 
 					RequestRearm(unitID, nil, true)
 				end
 			end
@@ -577,8 +541,8 @@ end
 
 function GG.LandComplete(bomberID)
 	CancelAirpadReservation(bomberID) -- cancel reservation and mark bomber as free to fire
-	spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
-	spGiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+	spGiveOrderToUnit(bomberID,CMD.WAIT, emptyTable, 0)
+	spGiveOrderToUnit(bomberID,CMD.WAIT, emptyTable, 0)
 	local queue = spGetCommandQueue(bomberID, 1)
 	if queue and queue[1] and queue[1].id == CMD_REARM then
 		rearmRemove[bomberID] = true --remove current RE-ARM command
@@ -650,9 +614,11 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if (cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift then
 			return false --don't find new pad if already on the pad currently refueling or repairing.
 		end
-		return (noAmmo ~= 2) or (cmdOptions.shift) --don't leave in the middle of rearming, else allow command and skip CancelAirpadReservation
+		if noAmmo == 2 then --don't leave in the middle of rearming, allow command and skip CancelAirpadReservation
+			return true
+		end
 	elseif noAmmo == 1 then
-		if combatCommands[cmdID] then	-- don't fight without ammo, go get ammo first!
+		if combatCommands[cmdID] or cmdID == CMD.STOP then	-- don't fight without ammo, go get ammo first!
 			rearmRequest[unitID] = true
 		end
 	end
