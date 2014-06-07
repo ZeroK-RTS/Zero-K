@@ -4,6 +4,8 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local emptyTable = {}
 
+-- old crappy way
+--[[
 local function ReloadQueue(queue, cmdTag)
 	if (not queue) then
 		return
@@ -42,24 +44,44 @@ local function ReloadQueue(queue, cmdTag)
 	
 	return re
 end
+]]
+
+-- much better!
+local function ReloadQueue(queue, cmd)
+	if (not queue) then
+		return
+	end
+	local re = Spring.GetUnitStates(unitID)["repeat"]
+
+	-- workaround for RemoveCommand not clearing attack order due to auto-attack
+	-- we set it to hold fire temporarily, revert once commands have been reset
+	local firestate = Spring.GetUnitStates(unitID).firestate
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, 0)
+	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
+	
+	if re then
+		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"} )
+	end
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
+	
+	return re
+end
 
 function Reload()
-	local queue = Spring.GetUnitCommands(unitID)
-	local cmdID, target
+	local queue = Spring.GetUnitCommands(unitID, 1)
+	local cmdID, areaAttack
 	local re = false
 	if queue and queue[1] then
-		local tag = queue[1].tag
-		cmdID = queue[1].id
+		local cmd = queue[1]
+		cmdID = cmd.id
 		if cmdID == CMD.AREA_ATTACK then
-			target = queue[1].params
-		elseif cmdID == CMD.ATTACK and #(queue[1].params) == 1 then
-			--target = {queue[1].params[1]}
+			areaAttack = cmd.params
 		end
-		re = ReloadQueue(queue, tag)
+		re = ReloadQueue(queue, cmd)
 	end
 	Spring.SetUnitRulesParam(unitID, "noammo", 1)
 	local targetPad, index = GG.RequestRearm(unitID)
-	if target and index and not re then
-		GG.InsertCommand(unitID, index, cmdID, target)
+	if areaAttack and index and not re then
+		GG.InsertCommand(unitID, index, cmdID, areaAttack)
 	end
 end
