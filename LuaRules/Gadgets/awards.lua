@@ -74,8 +74,6 @@ local terraformCost  = UnitDefNames["terraunit"].metalCost
 local mexDefID = UnitDefNames["cormex"].id
 local mexCost  = UnitDefNames["cormex"].metalCost
 
-GG.Awards = GG.Awards or {}
-
 local reclaimListByFeature = {}
 local shareListTemp1 = {}
 local shareListTemp2 = {}
@@ -359,8 +357,6 @@ local function AddAwardPoints( awardType, teamID, amount )
 	end
 end
 
-GG.Awards.AddAwardPoints = AddAwardPoints
-
 local function AddFeatureReclaim(featureID)
 	local featureData = reclaimListByFeature[featureID]
 	local metal = featureData.metal
@@ -485,6 +481,9 @@ end
 
 function gadget:Initialize()
 
+	GG.Awards = GG.Awards or {}
+	GG.Awards.AddAwardPoints = AddAwardPoints
+	
 	_G.resourceInfo = resourceInfo
 
 	local tempTeamList = Spring.GetTeamList()
