@@ -706,7 +706,7 @@ end
 
 local lastMstor = 0
 local lastEstor = 0
-
+--[[
 function ReserveState(teamID, metalStorageReserve, energyStorageReserve)
     if (Spring.GetLocalTeamID() == teamID) then 
         local _, mStor = GetTeamResources(teamID, "metal")
@@ -725,16 +725,10 @@ function ReserveState(teamID, metalStorageReserve, energyStorageReserve)
         WG.energyStorageReserve = energyStorageReserve
     end
 end
-
+--]]
 --[[
 function SendWindProduction(teamID, value)
 	WG.windEnergy = value
-end
-
-
-function PriorityStats(teamID, highPriorityBP, lowPriorityBP)
-	WG.highPriorityBP = highPriorityBP
-	WG.lowPriorityBP = lowPriorityBP
 end
 --]]
 
