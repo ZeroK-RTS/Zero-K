@@ -53,7 +53,12 @@ local inlosTrueTable = {inlos = true}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-if (gadgetHandler:IsSyncedCode()) then
+if not (gadgetHandler:IsSyncedCode()) then
+	return
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 Spring.SetGameRulesParam("lowpower",1)
 
@@ -112,6 +117,7 @@ local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spSetUnitTooltip    = Spring.SetUnitTooltip
 local spCallCOBScript     = Spring.CallCOBScript
+local spSetTeamRulesParam = Spring.SetTeamRulesParam
 
 local spGetTeamResources  = Spring.GetTeamResources
 local spAddTeamResource   = Spring.AddTeamResource
@@ -249,6 +255,26 @@ end
 
 local function energyToExtraM(energy)  
 	return -1+sqrt(1+(energy*0.25))
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Information Sharin to Widget functions
+
+local privateTable = {private = true}
+
+local function SetTeamEconomyRulesParams(teamID, allies, energyWasted, energyForOverdrive, totalMetalIncome, 
+		baseMetal, overdriveMetal, myBase, myOverdrive, energyChange, teamEnergyIncome)
+	spSetTeamRulesParam(teamID, "OD_allies",  allies, privateTable)
+	spSetTeamRulesParam(teamID, "OD_energyWasted",  energyWasted, privateTable)
+	spSetTeamRulesParam(teamID, "OD_energyForOverdrive",  energyForOverdrive, privateTable)
+	--spSetTeamRulesParam(teamID, "OD_totalMetalIncome",  totalIncome, privateTable)
+	spSetTeamRulesParam(teamID, "OD_baseMetal",  baseMetal, privateTable)
+	spSetTeamRulesParam(teamID, "OD_overdriveMetal",  overdriveMetal, privateTable)
+	spSetTeamRulesParam(teamID, "OD_myBase",  myBase, privateTable)
+	spSetTeamRulesParam(teamID, "OD_myOverdrive",  myOverdrive, privateTable)
+	spSetTeamRulesParam(teamID, "OD_energyChange",  energyChange, privateTable)
+	spSetTeamRulesParam(teamID, "OD_teamEnergyIncome",  teamEnergyIncome, privateTable)
 end
 
 -------------------------------------------------------------------------------------
@@ -1221,7 +1247,7 @@ function gadget:GameFrame(n)
 						
 						spAddTeamResource(teamID, "m", odShare + baseShare)
 						--Spring.Echo(teamID .. " got odShare " .. odShare)
-						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, allyTeamEnergyIncome, allyTeamID) 
+						SetTeamEconomyRulesParams(teamID, activeCount, energyWasted, ODenergy, summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, allyTeamEnergyIncome) 
 					end
 				end 
 			else
@@ -1478,27 +1504,4 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	--end
 end
 
-
 -------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-else  -- UNSYNCED
--------------------------------------------------------------------------------------
-
-local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
-
-function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
-	if (allyTeamID ~= spGetLocalAllyTeamID()) then 
-		return 
-	end
-	if (Script.LuaUI('MexEnergyEvent')) then
-		Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
-	end
-end
-
-function gadget:Initialize()
-	gadgetHandler:AddSyncAction('MexEnergyEvent',WrapToLuaUI)
-end
-
--------------------------------------------------------------------------------------
-
-end

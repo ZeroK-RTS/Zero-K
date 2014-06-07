@@ -40,6 +40,8 @@ local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers
 local Chili
 
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -111,6 +113,47 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- 1 second lag as energy update will be included in next resource update, not this one
+local lastChange = 0
+local lastEnergyForOverdrive = 0
+local lastEnergyWasted = 0
+local lastMetalFromOverdrive = 0
+local lastMyMetalFromOverdrive = 0
+
+-- note works only in communism mode
+function UpdateEconomyDataFromRulesParams()
+	local teamID = Spring.GetLocalTeamID()
+  
+  	local allies = spGetTeamRulesParam(teamID, "OD_allies") or 1
+	local energyWasted = spGetTeamRulesParam(teamID, "OD_energyWasted") or 0
+	local energyForOverdrive = spGetTeamRulesParam(teamID, "OD_energyForOverdrive") or 0
+	--local totalMetalIncome = spGetTeamRulesParam(teamID, "OD_totalMetalIncome") or 0
+	local baseMetal = spGetTeamRulesParam(teamID, "OD_baseMetal") or 0
+	local overdriveMetal = spGetTeamRulesParam(teamID, "OD_overdriveMetal") or 0
+	local myBase = spGetTeamRulesParam(teamID, "OD_myBase") or 0
+	local myOverdrive = spGetTeamRulesParam(teamID, "OD_myOverdrive") or 0
+	local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
+	local teamEnergyIncome = spGetTeamRulesParam(teamID, "OD_teamEnergyIncome") or 0
+
+	WG.energyWasted = lastEnergyWasted
+	lastEnergyWasted = energyWasted
+	WG.energyForOverdrive = lastEnergyForOverdrive
+	lastEnergyForOverdrive = energyForOverdrive
+	WG.change = lastChange
+	lastChange = energyChange
+	WG.mexIncome = baseMetal
+	WG.metalFromOverdrive = lastMetalFromOverdrive
+	lastMetalFromOverdrive = overdriveMetal
+	WG.myMexIncome = myBase
+	WG.myMetalFromOverdrive = lastMyMetalFromOverdrive
+	lastMyMetalFromOverdrive = myOverdrive
+	WG.teamEnergyIncome = teamEnergyIncome
+	WG.allies = allies
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:Update(s)
 
 	blink = (blink+s)%blink_periode
@@ -163,6 +206,8 @@ function widget:GameFrame(n)
 	if (n%32 ~= 2) or not window then 
         return 
     end
+	
+	UpdateEconomyDataFromRulesParams()
 
 	local myTeamID = GetMyTeamID()
 	local myAllyTeamID = Spring.GetMyAllyTeamID()
@@ -261,7 +306,7 @@ function widget:GameFrame(n)
 	local energyShare =  Format(WG.change or 0)
 	local otherE = Format(-eExpe - math.min(0, (WG.change or 0)) + mExpe)
 	
-	local teamIncome = Format(WG.teamIncome or 0)
+	local teamEnergyIncome = Format(WG.teamEnergyIncome or 0)
 	local totalODE = Format(-(WG.energyForOverdrive or 0))
 	local totalODM = Format(WG.metalFromOverdrive or 0)
 	local totalWaste = Format(-(WG.energyWasted or 0))
@@ -294,7 +339,7 @@ function widget:GameFrame(n)
     "\nReserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
 	"\n" .. 
 	"\nTeam Energy Economy" ..
-	"\nIncome: " .. teamIncome .. 
+	"\nIncome: " .. teamEnergyIncome .. 
 	"\nOverdrive: " .. totalODE .. " -> " .. totalODM .. " metal" ..
 	"\nConstruction: " .. totalConstruction ..
 	"\nOther: " .. totalOtherE ..
@@ -395,8 +440,8 @@ function widget:Initialize()
 		return
 	end
 
-	widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
-    widgetHandler:RegisterGlobal("ReserveState", ReserveState)
+	--widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
+    --widgetHandler:RegisterGlobal("ReserveState", ReserveState)
 	--widgetHandler:RegisterGlobal("SendWindProduction", SendWindProduction)
 	--widgetHandler:RegisterGlobal("PriorityStats", PriorityStats)
 
@@ -677,36 +722,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- 1 second lag as energy update will be included in next resource update, not this one
-local lastChange = 0
-local lastEnergyForOverdrive = 0
-local lastEnergyWasted = 0
-local lastMetalFromOverdrive = 0
-local lastMyMetalFromOverdrive = 0
-
--- note works only in communism mode
-function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOverdrive, EnergyChange, teamIncome)
-  if (Spring.GetLocalTeamID() == teamID) then 
-  	WG.energyWasted = lastEnergyWasted
-    lastEnergyWasted = energyWasted
-	WG.energyForOverdrive = lastEnergyForOverdrive
-    lastEnergyForOverdrive = energyForOverdrive
-	WG.change = lastChange
-    lastChange = EnergyChange
-	WG.mexIncome = baseMetal
-	WG.metalFromOverdrive = lastMetalFromOverdrive
-    lastMetalFromOverdrive = overdriveMetal
-	WG.myMexIncome = myBase
-	WG.myMetalFromOverdrive = lastMyMetalFromOverdrive
-	lastMyMetalFromOverdrive = myOverdrive
-	WG.teamIncome = teamIncome
-	WG.allies = allies
-  end
-end
-
+--[[
 local lastMstor = 0
 local lastEstor = 0
---[[
+
 function ReserveState(teamID, metalStorageReserve, energyStorageReserve)
     if (Spring.GetLocalTeamID() == teamID) then 
         local _, mStor = GetTeamResources(teamID, "metal")
