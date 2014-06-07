@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "2013.06.25",
     license   = "Public Domain",
     layer     = 0,
-    enabled   = true,
+    enabled   = not (Game.version:find('91.0') == 1),
   }
 end
 
@@ -17,63 +17,7 @@ local UPDATE_PERIOD = 3
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-local units = {}
-local startup = true
-_G.units = units
-
---// Speed-ups
-local SendToUnsynced = SendToUnsynced
-local spGetUnitVelocity = Spring.GetUnitVelocity
-
-local function GetUnitSpeed(unitID)
-  if GG.GetUnitSpeed then
-    local speed = GG.GetUnitSpeed(unitID)
-    if speed then
-      return speed
-    end
-  end
-
-  local vx, vy, vz = spGetUnitVelocity(unitID)
-  return (vx^2 + vy^2 + vz^2)^0.5
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-  SendToUnsynced("thrusters_RemoveUnit", unitID)
-  units[unitID] = nil
-end
-
-function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-  if unitDefs[unitDefID] then
-    SendToUnsynced("thrusters_AddUnit", unitID, unitDefID)
-    units[unitID] = GetUnitSpeed(unitID) 
-  end
-end
-
-function gadget:GameFrame(n)
-  if startup then
-    local units = Spring.GetAllUnits()
-    for i=1,#units do
-      local unitID = units[i]
-      local unitDefID = Spring.GetUnitDefID(unitID)
-      gadget:UnitCreated(unitID, unitDefID)
-    end
-    startup = false
-  end
-  if n%UPDATE_PERIOD == 0 then
-    for unitID in pairs(units) do
-      units[unitID] = GetUnitSpeed(unitID)
-    end
-    SendToUnsynced("thrusters_GameFrame")
-  end
-end
-
-function gadget:Initialize()
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+	return
 else
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -83,13 +27,15 @@ local LupsAddParticles
 local SYNCED = SYNCED
 
 local units = {}
+local unitSpeeds = {}
+local startup = true
 
-local function AddUnit(_, unitID, unitDefID)
+local function AddUnit(unitID, unitDefID)
   if (not Lups) then Lups = GG['Lups']; LupsAddParticles = Lups.AddParticles end
   
   units[unitID] = {
     unitDefID = unitDefID,
-    speed = SYNCED.units[unitID],
+    speed = unitSpeeds[unitID],
     fx = {},
   }
   local def = unitDefs[unitDefID]
@@ -105,7 +51,7 @@ local function AddUnit(_, unitID, unitDefID)
   end
 end
 
-local function RemoveUnit(_, unitID)
+local function RemoveUnit(unitID)
   if units[unitID] then
     for i=1,#units[unitID].fx do
       local fx = units[unitID].fx[i]
@@ -115,13 +61,12 @@ local function RemoveUnit(_, unitID)
   end
 end
 
-local function GameFrame()
-  local thrusterUnits = SYNCED.units
+local function GameFrameUnitsCheck()
   for unitID, data in pairs(units) do
     local def = unitDefs[data.unitDefID]
     local maxDelta = def.maxDeltaSpeed*(UPDATE_PERIOD/30)
     local oldSpeed = data.speed or 0
-    local trueSpeed = thrusterUnits[unitID]
+    local trueSpeed = unitSpeeds[unitID]
     local delta = trueSpeed - oldSpeed
     if delta > maxDelta then
       delta = maxDelta
@@ -157,18 +102,53 @@ local function GameFrame()
   end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-function gadget:Initialize()
-  gadgetHandler:AddSyncAction("thrusters_AddUnit", AddUnit)
-  gadgetHandler:AddSyncAction("thrusters_RemoveUnit", RemoveUnit)
-  gadgetHandler:AddSyncAction("thrusters_GameFrame", GameFrame)
+--// Speed-ups
+local SendToUnsynced = SendToUnsynced
+local spGetUnitVelocity = Spring.GetUnitVelocity
+
+local function GetUnitSpeed(unitID)
+  if GG.GetUnitSpeed then
+    local speed = GG.GetUnitSpeed(unitID)
+    if speed then
+      return speed
+    end
+  end
+
+  local vx, vy, vz = spGetUnitVelocity(unitID)
+  return (vx^2 + vy^2 + vz^2)^0.5
 end
 
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+  RemoveUnit(unitID)
+  unitSpeeds[unitID] = nil
+end
 
-function gadget:Shutdown()
-  gadgetHandler.RemoveSyncAction("thrusters_AddUnit")
-  gadgetHandler.RemoveSyncAction("thrusters_RemoveUnit")
-  gadgetHandler.RemoveSyncAction("thrusters_GameFrame")
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+  if unitDefs[unitDefID] then
+    AddUnit(unitID, unitDefID)
+    unitSpeeds[unitID] = GetUnitSpeed(unitID) 
+  end
+end
+
+function gadget:GameFrame(n)
+  if startup then
+    local allUnits = Spring.GetAllUnits()
+    for i=1,#allUnits do
+      local unitID = allUnits[i]
+      local unitDefID = Spring.GetUnitDefID(unitID)
+      gadget:UnitCreated(unitID, unitDefID)
+    end
+    startup = false
+  end
+  if n%UPDATE_PERIOD == 0 then
+    for unitID in pairs(unitSpeeds) do
+      unitSpeeds[unitID] = GetUnitSpeed(unitID)
+    end
+    GameFrameUnitsCheck()
+  end
 end
 
 --------------------------------------------------------------------------------
