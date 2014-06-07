@@ -1,11 +1,11 @@
 function gadget:GetInfo() return {
-	name      = "Rezz Hp changer + effect",
+	name      = "Rezz Hp changer + effect 91",
 	desc      = "Sets rezzed units to full hp",
 	author    = "Google Frog, modified by Rafal & Meep",
 	date      = "Nov 30, 2008",
 	license   = "GNU GPL, v2 or later",
 	layer     = 0,
-	enabled   = not (Game.version:find('91.0') == 1),
+	enabled   = (Game.version:find('91.0') == 1)
 } end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -13,6 +13,7 @@ if (gadgetHandler:IsSyncedCode()) then
 	local spGetUnitHealth   = Spring.GetUnitHealth
 	local spGetUnitPosition = Spring.GetUnitPosition
 	local spSetUnitHealth   = Spring.SetUnitHealth
+	local spSendToUnsyncd   = SendToUnsynced
 	local spSpawnCEG        = Spring.SpawnCEG
 	local CMD_RESURRECT     = CMD.RESURRECT
 
@@ -42,6 +43,8 @@ if (gadgetHandler:IsSyncedCode()) then
 					local size = unitDef.xsize
 					local ux, uy, uz = spGetUnitPosition(unitID)
 					spSpawnCEG("resurrect", ux, uy, uz, 0, 0, 0, size)
+					--Spring.PlaySoundFile("sounds/misc/resurrect.wav", 15, ux, uy, uz)
+					spSendToUnsyncd("rez_sound", ux, uy, uz)
 				end
 			end
 		end
@@ -63,34 +66,22 @@ if (gadgetHandler:IsSyncedCode()) then
 	end
 
 else -- UNSYNCED
-	
+
 	local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 	local spGetSpectatingState = Spring.GetSpectatingState
 	local spIsPosInLos         = Spring.IsPosInLos
 	local spPlaySoundFile      = Spring.PlaySoundFile
-	local spGetUnitPosition    = Spring.GetUnitPosition
-	local CMD_RESURRECT        = CMD.RESURRECT
 
-	local function RezSound(x, y, z)
+	local function rez_sound(_, x, y, z)
 		local spec = select(2, spGetSpectatingState())
 		local myAllyTeam = spGetLocalAllyTeamID()
 		if (spec or spIsPosInLos(x, y, z, myAllyTeam)) then
 			spPlaySoundFile("sounds/misc/resurrect.wav", 15, x, y, z)
 		end
 	end
-	
-	function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-		if (builderID) then
-			local command = Spring.GetCommandQueue(builderID, 1)[1]
-			if (command and command.id == CMD_RESURRECT) then
-				local unitDef = unitDefID and UnitDefs[unitDefID]
-				-- add CEG and play sound
-				if unitDef then
-					local ux, uy, uz = spGetUnitPosition(unitID)
-					RezSound(ux, uy, uz)
-				end
-			end
-		end
+
+	function gadget:Initialize()
+		gadgetHandler:AddSyncAction("rez_sound", rez_sound)
 	end
 
 end

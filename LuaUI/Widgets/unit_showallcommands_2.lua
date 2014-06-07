@@ -148,6 +148,8 @@ function widget:Update()
 				spDrawUnitCommands(sel[i])
 			end
 			if options.includeallies.value then
+				local count = drawUnit.count
+				local units = drawUnit.data
 				for i = 1, count do
 					local unitID = units[i]
 					if WG.allySelUnits[unitID] then
