@@ -212,12 +212,11 @@ local function DrawQueue(unitID)
 end
 --]]
 
-	local function  DrawMouseArc(unitID, shift, groundPos, quality)
+local function  DrawMouseArc(unitID, shift, groundPos, quality)
 	local unitDefID = spGetUnitDefID(unitID)
 	if (not groundPos or not jumpDefs[unitDefID]) then
 		return
 	end
-	local queue = spGetCommandQueue(unitID)
 
 	local passIf
 	if reverseCompatibility then
@@ -225,7 +224,7 @@ end
 		passIf = (not queue or #queue == 0 or not shift)
 	else
 		local queueCount = spGetCommandQueue(unitID, 0)
-		passIf = (not queue or #queue == 0 or not shift)
+		passIf = (not queueCount or queueCount == 0 or not shift)
 	end
 
 	local range = jumpDefs[unitDefID].range
