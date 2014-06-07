@@ -240,7 +240,7 @@ function gadget:GameFrame(n)
 		local players = spGetPlayerList()
 		local recepientByAllyTeam = {}
 		local gameSecond = spGetGameSeconds()
-		local afkPlayers = "" -- remember which player is AFK/Lagg. Information will be sent to 'gui_take_remind.lua' as string
+		--local afkPlayers = "" -- remember which player is AFK/Lagg. Information will be sent to 'gui_take_remind.lua' as string
 
 		for i=1,#players do
 			local playerID = players[i]
@@ -293,7 +293,7 @@ function gadget:GameFrame(n)
 					end
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
-					afkPlayers = afkPlayers .. (10000 + playerID*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
+					--afkPlayers = afkPlayers .. (10000 + playerID*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
 					tickTockCounter[playerID] = (tickTockCounter[playerID] or 0) + 1 --tick tock counter ++. count-up 1
 					if tickTockCounter[playerID] >= 2 or justResigned then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
 						local units = spGetTeamUnits(team)
@@ -308,8 +308,8 @@ function gadget:GameFrame(n)
 				specList[playerID] = true --record spectator list in non-AI team
 			end
 		end
-		afkPlayers = afkPlayers .. "#".. players[#players] --cap the string with the largest playerID information. ie: (string)1010219899#98 can be read like this-> (1=dummy) id:01 ally:02, (1=dummy) id:98 ally:99, (#=dummy) highestID:98
-		SendToUnsynced("LagmonitorAFK",afkPlayers) --tell widget about AFK list (widget need to deserialize this string)
+		--afkPlayers = afkPlayers .. "#".. players[#players] --cap the string with the largest playerID information. ie: (string)1010219899#98 can be read like this-> (1=dummy) id:01 ally:02, (1=dummy) id:98 ally:99, (#=dummy) highestID:98
+		--SendToUnsynced("LagmonitorAFK",afkPlayers) --tell widget about AFK list (widget need to deserialize this string)
 
 		for playerID, lagger in pairs(laggers) do
 			-- FIRST! check if everyone else on the team is also lagging
@@ -377,7 +377,7 @@ end
 function gadget:GameOver()
 	gadgetHandler:RemoveGadget() --shutdown after game over, so that at end of a REPLAY Lagmonitor doesn't bounce unit among player
 end
-
+--[[
 else -- UNSYNCED ---
 
 	function WrapToLuaUI(_,afkPlayer)
@@ -389,5 +389,6 @@ else -- UNSYNCED ---
 	function gadget:Initialize() --Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
 		gadgetHandler:AddSyncAction('LagmonitorAFK',WrapToLuaUI)
 	end
+--]]
 
 end

@@ -106,7 +106,6 @@ end
 --------------------------------------------------------------------------------
 
 --// Speed-ups
-local SendToUnsynced = SendToUnsynced
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
 local function GetUnitSpeed(unitID)
