@@ -1782,7 +1782,7 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
 			noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
 		end
 	end
-	return noGfx
+	return noGfx or false
 end
 
 --[[ Base
