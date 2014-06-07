@@ -11,6 +11,7 @@ unitDef = {
   buildTime               = 30000000,
   canstop                 = [[1]],
   category                = [[SINK GUNSHIP]],
+  collisionVolumeTest     = 1,
   energyUse               = 0,
   footprintX              = 2,
   footprintZ              = 2,

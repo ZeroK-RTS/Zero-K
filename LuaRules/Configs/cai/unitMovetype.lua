@@ -42,9 +42,9 @@ for i = 1, #UnitDefs do
 		staticUnits[i] = true
 		movetypeDefID[i] = "static"
 	else
-		if ud.moveData then
-			if ud.moveData.name and movedefMap[ud.moveData.name] then
-				movetypeDefID[i] = movedefMap[ud.moveData.name]
+		if ud.moveDef then
+			if ud.moveDef.name and movedefMap[ud.moveDef.name] then
+				movetypeDefID[i] = movedefMap[ud.moveDef.name]
 			else
 				movetypeDefID[i] = "air"
 			end
