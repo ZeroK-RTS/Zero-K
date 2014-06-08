@@ -26,8 +26,8 @@ local singleHitMultiWeapon = {}
 local singleHitProjectile = {}
 
 function gadget:Initialize()
-	for i=1,#WeaponDefs do
-		local wd = WeaponDefs[i]
+	for wdid = 1, #WeaponDefs do
+		local wd = WeaponDefs[wdid]
 		if wd.customParams then
 			if wd.customParams.single_hit then
 				singleHitWeapon[wd.id] = true;
@@ -60,6 +60,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 end
 
 function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attackerID,_,_, projectileID)
+			Spring.Echo("bla")
 	if singleHitWeapon[weaponDefID] then
 		if attackerID then
 			local frame = spGetGameFrame()
@@ -75,7 +76,6 @@ function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attacke
 				end
 			end
 			return damage 
-	
 		end
 	end
 	

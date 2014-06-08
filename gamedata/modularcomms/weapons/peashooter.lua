@@ -13,8 +13,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 11,
-		planes  = 11,
+		default = 10.76,
+		planes  = 10.76,
 		subs    = 0.55,
 	},
 
