@@ -99,6 +99,16 @@ local comms = {
     name = "Peashooter Commander",
     modules = { "commweapon_peashooter"},
   }, 
+  comm_strike_hmg = {
+    chassis = "armcom1",
+    name = "Heavy Machine Gun Commander",
+    modules = { "commweapon_heavymachinegun"},
+  }, 
+  comm_strike_lpb = {
+    chassis = "armcom1",
+    name = "Light Particle Beam Commander",
+    modules = { "commweapon_lparticlebeam"},
+  }, 
   comm_battle_pea = {
     chassis = "corcom1",
     name = "Peashooter Commander",
