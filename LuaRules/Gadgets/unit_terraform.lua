@@ -3589,9 +3589,6 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	
-	_G.steepnessMarkers = steepnessMarkers
-	_G.drawPositions = drawPositions
-	
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
 		GG.Terraform_RaiseWater(modOptions.waterlevel)
 	end
@@ -3605,43 +3602,4 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-else -- UNSYNCED
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local lastMarkerFrame = 0
---[[
-function gadget:DrawWorldPreUnit()
-	local drawPositions = SYNCED.drawPositions
-	
-	--gl.DepthTest(true)
-	for i = 1, drawPositions.count do
-		local point = drawPositions.data[i]
-		--gl.Texture('Luaui/Images/energy.png' )
-		--gl.Texture('LuaRules/Images/trophy_kam.png' )
-		gl.Color(0.5,0,0,0.5)
-		--gl.DrawGroundQuad(point.x1,point.z1,point.x2,point.z2)
-		--gl.Utilities.DrawGroundRectangle(point.x1,point.z1,point.x2,point.z2)
-	end
-end
---]]
-
-
-function gadget:Update(n)
-	local steepnessMarkers = SYNCED.steepnessMarkers
-	if lastMarkerFrame ~= steepnessMarkers.inner.frame then
-		lastMarkerFrame = steepnessMarkers.inner.frame
-		for i = 1, steepnessMarkers.inner.count do
-			local data = steepnessMarkers.inner.data[i]
-			if Spring.GetMyTeamID() == data.team then
-				Spring.MarkerAddPoint(data.x, 0, data.z, "Terraform cancelled due to steepness", 1)
-			end
-		end
-	end
-
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 end

@@ -166,39 +166,8 @@ function gadget:GameFrame(n)
 			end
 		end
 		inGameFrame = false 
-		--if (cnt>1) then
-		--	_G.burningUnits = burningUnits
-		--	SendToUnsynced("onFire")
-		--	_G.burningUnits = nil
-		--end
 	end
 end
 
---[[
---------------------------------------------------------------------------------
--- END SYNCED
---------------------------------------------------------------------------------
-else
---------------------------------------------------------------------------------
--- BEGIN UNSYNCED
---------------------------------------------------------------------------------
-
-local scLuaUI = Script.LuaUI
-
-function WrapToLuaUI()
-	if (scLuaUI('onFire')) then
-		local burningUnits = {}
-		local burningUnitsSynced = SYNCED.burningUnits
-		for i,unitID in spairs(burningUnitsSynced) do
-			burningUnits[i] = unitID
-		end
-		scLuaUI.onFire(burningUnits)
-	end
-end
-
-function gadget:Initialize()
-	gadgetHandler:AddSyncAction('onFire',WrapToLuaUI)
-end
---]]
 end
 

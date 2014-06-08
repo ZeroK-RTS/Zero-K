@@ -11,16 +11,47 @@ function widget:GetInfo()
   }
 end
 
-function widget:Initialize()
-	widgetHandler:RegisterGlobal("SendMetalSpots", SendMetalSpots)
-	Spring.SendLuaRulesMsg("RequestMetalSpots")
-	Spring.Echo("Mexspot Fetcher fetching")
-	--Spring.MarkerAddPoint(0,0,0,"")
+local spGetGameRulesParam = Spring.GetGameRulesParam
+
+local function GetSpotsByPos(spots)
+	local spotPos = {}
+	for i = 1, #spots do
+		local spot = spots[i]
+		local x = spot.x
+		local z = spot.z
+		--Spring.MarkerAddPoint(x,0,z,x .. ", " .. z)
+		spotPos[x] = spotPos[x] or {}
+		spotPos[x][z] = i
+	end
+	return spotPos
 end
 
-function SendMetalSpots(playerID, metalSpots, metalSpotsByPos)
+local function GetMexSpotsFromGameRules()
+	local mexCount = spGetGameRulesParam("mex_count")
+	if (not mexCount) or mexCount == -1 then
+		WG.metalSpots = false
+		WG.metalSpotsByPos = false
+		return
+	end
+	
+	local metalSpots = {}
+	
+	for i = 1, mexCount do
+		metalSpots[i] = {
+			x = spGetGameRulesParam("mex_x" .. i),
+			y = spGetGameRulesParam("mex_y" .. i),
+			z = spGetGameRulesParam("mex_z" .. i),
+			metal = spGetGameRulesParam("mex_metal" .. i),
+		}
+	end
+	
+	local metalSpotsByPos = GetSpotsByPos(metalSpots)
+	
 	WG.metalSpots = metalSpots
 	WG.metalSpotsByPos = metalSpotsByPos
-	Spring.Echo("Mexspot Fetcher received")
-	widgetHandler:RemoveWidget(self)
+end
+
+function widget:Initialize()
+	Spring.Echo("Mexspot Fetcher fetching")
+	GetMexSpotsFromGameRules()
 end
