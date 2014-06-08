@@ -104,6 +104,7 @@ unitDef = {
 	    gatherradius = [[128]],
 	    smoothradius = [[96]],
 		smoothmult   = [[0.2]],
+		lups_noshockwave = [[1]],
 	  },
 	  
       damage                  = {
