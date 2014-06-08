@@ -1411,6 +1411,7 @@ local UnitPreDamaged_first = true
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   a, b, c, d)
+	
 	local projectileID,attackerID
 	local attackerDefID,attackerTeam
 	if reverseCompat then 
@@ -1511,7 +1512,7 @@ local UnitDamaged_gadgets = {}
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
-		
+	--[[
 	if reverseCompat then
 		attackerTeam = attackerDefID
 		attackerDefID = attackerID
@@ -1533,6 +1534,7 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
 				damage, paralyzer, weaponID,
 				attackerID, attackerDefID, attackerTeam)
 	end
+	--]]
 	return
 end
 
