@@ -97,13 +97,13 @@ unitDef = {
       areaOfEffect            = 160,
 	  avoidFeature            = false,
 	  avoidGround             = false,
-      craterBoost             = 0.25,
-      craterMult              = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 	  
 	  customParams            = {
-	    gatherradius = [[128]],
-	    smoothradius = [[96]],
-		smoothmult   = [[0.2]],
+	    gatherradius     = [[192]],
+	    smoothradius     = [[96]],
+		smoothmult       = [[0.25]],
 		lups_noshockwave = [[1]],
 	  },
 	  
