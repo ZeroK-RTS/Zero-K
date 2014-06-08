@@ -637,7 +637,7 @@ function gadget:FeatureDestroyed (featureID, allyTeam)
 		reclaimListByFeature[featureID] = nil
 	end
 end
-
+--[[
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
 		attackerID, attackerDefID, attackerTeam)
 	if (not attackerTeam)
@@ -701,7 +701,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 		end
 	end
 end
-
+--]]
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if unitDefID == mexDefID then
 		AddAwardPoints( 'mex', teamID, 1 )
