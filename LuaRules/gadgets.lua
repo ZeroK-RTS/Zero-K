@@ -1512,7 +1512,6 @@ local UnitDamaged_gadgets = {}
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
-	--[[
 	if reverseCompat then
 		attackerTeam = attackerDefID
 		attackerDefID = attackerID
@@ -1534,7 +1533,6 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
 				damage, paralyzer, weaponID,
 				attackerID, attackerDefID, attackerTeam)
 	end
-	--]]
 	return
 end
 
