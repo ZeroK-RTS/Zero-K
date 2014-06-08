@@ -38,9 +38,12 @@ function HitByWeaponThread(x, z)
 	Turn( base , z_axis, 0, math.rad(30))
 	Turn( base , x_axis, 0, math.rad(30))
 end
+
+--[[
 function script.HitByWeapon(x, z)
 	StartThread(HitByWeaponThread, x, z)
 end
+]]
 
 local function MoveScript()
 	while true do 

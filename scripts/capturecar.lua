@@ -49,9 +49,11 @@ local function ImpactTilt(x,z)
 	Turn( base , x_axis, 0, math.rad(300) )
 end
 
+--[[
 function script.HitByWeapon(x, z)
-	--StartThread(ImpactTilt, x, z)
+	StartThread(ImpactTilt, x, z)
 end
+]]
 
 local function AnimControl() 
 	Signal(SIG_ANIM)
