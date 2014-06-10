@@ -260,6 +260,7 @@ local morphDefs = {
     },
   },
   --//ships
+  --[[
   shipscout = {
     {
       into = 'shipraider',
@@ -295,6 +296,7 @@ local morphDefs = {
       rank = 3,   
     },
   },
+  ]]
 --[[
   cormls = {
     {
