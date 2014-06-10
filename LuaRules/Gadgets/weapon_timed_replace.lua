@@ -18,49 +18,48 @@ end
 -------------------------------------------------------------
 -------------------------------------------------------------
 
-local replaceDefs = {}
+local weaponLoseTrackingFrames = {}
 local projectiles = {}
 
 function gadget:Initialize()
-
-	replaceDefs[WeaponDefNames["bomberdive_bomb"].id] =	{
-		frames = 2,
-		replacement = WeaponDefNames["bomberdive_bombsabot"].id,
-	}
-
-	Script.SetWatchWeapon(WeaponDefNames["bomberdive_bomb"].id, true)
+	weaponLoseTrackingFrames[WeaponDefNames["bomberdive_bombsabot"].id] = 14
+	Script.SetWatchWeapon(WeaponDefNames["bomberdive_bombsabot"].id, true)
 end
 
 function gadget:GameFrame(n)
-	for proID, data in pairs(projectiles) do
-		if n == data.frame then
-			local x, y, z = Spring.GetProjectilePosition(proID)
+	for proID, frame in pairs(projectiles) do
+		if n == frame then
+			local x, _, z = Spring.GetProjectilePosition(proID)
+			local y = Spring.GetGroundHeight(x,z)
+			Spring.SetProjectileTarget(proID, x, y, z)
+			
+			projectiles[proID] = nil
+			--[[local x, y, z = Spring.GetProjectilePosition(proID)
 			local vx, vy, vz = Spring.GetProjectileVelocity(proID)
 			
 			-- Create new projectile
 			Spring.SpawnProjectile(data.replacement, {
 				pos = {x, y, z},
-				speed = {vx*0.04, -5.625, vz*0.04},
-				ttl = 300,
+				speed = {vx, vy, vz},
+				ttl = 180,
+				tracking = false
 			})
 			
 			-- Destroy old projectile
 			Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
 			Spring.SetProjectileCollision(proID)
+			--]]
 		end
+		
 	end
 end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
-	if replaceDefs[weaponID] then
+	if weaponLoseTrackingFrames[weaponID] then
 		local x, y, z = Spring.GetProjectilePosition(proID)
-		local def = replaceDefs[weaponID]
-		projectiles[proID] = {
-			frame = Spring.GetGameFrame() + def.frames,
-			replacement = def.replacement,
-		}
+		projectiles[proID] = Spring.GetGameFrame() + weaponLoseTrackingFrames[weaponID]
 	end
-end	
+end
 
 function gadget:ProjectileDestroyed(proID)
 	if projectiles[proID] then

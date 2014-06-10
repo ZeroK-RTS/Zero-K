@@ -73,14 +73,11 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	if num ~= 1 then
+	if num ~= 2 then
 		return false
 	end
 	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
-	if not (targetID and ableToFire) then
-		return not ableToFire
-	end
-	return false
+	return not ableToFire
 end
 
 local cegName = "kbotrockettrail"
@@ -97,12 +94,12 @@ local function MakeBombTrail()
 end
 
 function script.FireWeapon(num)
-	if num == 1 then
+	if num == 2 then
 		GG.Bomber_Dive_fired(unitID)
 		Sleep(33)	-- delay before clearing attack order; else bomb loses target and fails to home
 		--MakeBombTrail()
 		Reload()
-	elseif num == 2 then
+	elseif num == 3 then
 		GG.Bomber_Dive_fake_fired(unitID)
 	end
 end

@@ -46,10 +46,10 @@ unitDef = {
   maneuverleashlength = [[1380]],
   mass                = 234,
   maxAcc              = 0.5,
-  maxBank             = 0.6,
+  maxBank             = 0.54,
   maxDamage           = 1100,
   maxElevator         = 0.02,
-  maxRudder           = 0.01,
+  maxRudder           = 0.008,
   maxFuel             = 1000000,
   maxPitch            = 0.3,
   maxVelocity         = 7.8,
@@ -77,8 +77,16 @@ unitDef = {
 
   weapons             = {
 
+        {
+      def                = [[BOGUS_BOMB]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+    },
+
+
     {
-      def                = [[BOMB]],
+      def                = [[BOMBSABOT]],
+      mainDir            = [[0 -1 0]],
+      maxAngleDif        = 270,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 	
@@ -92,37 +100,28 @@ unitDef = {
 
   weaponDefs          = {
 	
-	BOMB = {
-      name                    = [[Fake Bomb (Which is actually fired)]],
-      areaOfEffect            = 32,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      collideFeature          = false,
-      collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
+	BOGUS_BOMB = {
+      name                    = [[Fake Bomb]],
+      areaOfEffect            = 80,
+      craterBoost             = 0,
+      craterMult              = 0,
 
-	  damage                  = {
-        default = 800,
-        planes  = 800,
-        subs    = 800,
+      damage                  = {
+        default = 0,
       },
 
       dropped                 = true,
-      explosionGenerator      = [[custom:xamelimpact]],
+      edgeEffectiveness       = 0,
+      explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
-      impulseFactor           = 0.4,
-	  intensity               = 0,
+      impulseFactor           = 0,
       interceptedByShieldType = 1,
       manualBombSettings      = true,
-      myGravity               = 70,
-      noSelfDamage            = true,
-      range                   = 300,
+      model                   = [[]],
+      myGravity               = 1000,
+      range                   = 10,
       reloadtime              = 10,
       scale                   = [[0]],
-      soundHit                = [[weapon/bomb_hit]],
-      soundStart              = [[weapon/bomb_drop]],
-      sprayangle              = 0,
       weaponType              = [[AircraftBomb]],
     },
 
@@ -136,7 +135,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-	  cylinderTargeting	  = 1,
+	  cylinderTargeting	      = 1,
 
       damage                  = {
         default = 800,
@@ -156,26 +155,25 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_b_paveway.s3o]],
-	  leadLimit               = 20,
-      range                   = 150,
+	  leadLimit               = 0,
+      range                   = 80,
       reloadtime              = 5,
-      selfprop                = false,
+      selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/bomb_drop]],
       startsmoke              = [[1]],
-      startVelocity           = 180,
+      startVelocity           = 200,
       targetMoveError         = 0,
-      tolerance               = 0,
-      tracks                  = false,
-      turnRate                = 0,
-      turret                  = false,
+      tolerance               = 8000,
+      tracks                  = true,
+      turnRate                = 65535,
+      turret                  = true,
       waterweapon             = true,
-      weaponAcceleration      = 50,
-      weaponTimer             = 0.1,
+      weaponAcceleration      = 100,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 180,
+      weaponVelocity          = 200,
     },
 	
 	SHIELD_CHECK = {
