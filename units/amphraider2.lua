@@ -51,7 +51,7 @@ unitDef = {
   },
 
   sightDistance          = 500,
-  sonarDistance          = 300,
+  sonarDistance          = 200,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -88,8 +88,6 @@ unitDef = {
 	  
 	  customParams            = {
 	    impulse = [[30]],
-	    impulsemaxdepth = [[20]],
-	    impulsedepthmult = [[0.5]],
 		normaldamage = [[1]],
 	  },
 	  

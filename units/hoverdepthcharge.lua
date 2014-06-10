@@ -59,9 +59,9 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 385,
-  sonarDistance       = 300,
+  sonarDistance       = 280,
   turninplace         = 0,
-  turnRate            = 300,
+  turnRate            = 360,
   workerTime          = 0,
 
   weapons             = {
@@ -92,7 +92,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 1150,
+        default = 900,
       },
 
       edgeEffectiveness       = 0.4,
@@ -109,7 +109,7 @@ unitDef = {
       noSelfDamage            = false,
       numbounce               = 4,
       predictBoost            = 0,
-      range                   = 250,
+      range                   = 260,
       reloadtime              = 8,
       soundHitDry             = [[explosion/mini_nuke]],
       soundHitWet             = [[explosion/wet/ex_underwater]],
@@ -121,9 +121,9 @@ unitDef = {
       turnRate                = 30000,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 40,
+      weaponAcceleration      = 20,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 180,
+      weaponVelocity          = 280,
     },
 	
 	FAKEGUN = {

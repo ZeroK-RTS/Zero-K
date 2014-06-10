@@ -69,7 +69,7 @@ unitDef = {
 
   side                = [[ARM]],
   sightDistance       = 484,
-  sonarDistance       = 484,
+  sonarDistance       = 300,
   smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 480,
@@ -80,7 +80,7 @@ unitDef = {
     {
       def                = [[MISSILE]],
 	  badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+      onlyTargetCategory = [[FIXEDWING LAND TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
@@ -97,6 +97,7 @@ unitDef = {
 
       damage                  = {
         default = 310,
+        subs    = 31,
       },
 
       fireStarter             = 70,
