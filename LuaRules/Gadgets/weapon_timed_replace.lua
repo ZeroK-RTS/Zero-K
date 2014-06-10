@@ -18,6 +18,9 @@ end
 -------------------------------------------------------------
 -------------------------------------------------------------
 
+local FEATURE = 102
+local UNIT = 117
+
 local weaponLoseTrackingFrames = {}
 local projectiles = {}
 
@@ -29,11 +32,20 @@ end
 function gadget:GameFrame(n)
 	for proID, frame in pairs(projectiles) do
 		if n == frame then
-			local x, _, z = Spring.GetProjectilePosition(proID)
-			local y = Spring.GetGroundHeight(x,z)
-			Spring.SetProjectileTarget(proID, x, y, z)
-			
+			local targetType, targetID = Spring.GetProjectileTarget(proID)
+			if targetType == UNIT then
+				local x,_,z = Spring.GetUnitPosition(targetID)
+				local y = Spring.GetGroundHeight(x,z)
+				Spring.SetProjectileTarget(proID, x, y, z)
+			elseif targetType == FEATURE then
+				local x,_,z = Spring.GetFeaturePosition(targetID)
+				local y = Spring.GetGroundHeight(x,z)
+				Spring.SetProjectileTarget(proID, x, y, z)
+			end
 			projectiles[proID] = nil
+			
+			--local x, _, z = Spring.GetProjectilePosition(proID)
+			
 			--[[local x, y, z = Spring.GetProjectilePosition(proID)
 			local vx, vy, vz = Spring.GetProjectileVelocity(proID)
 			
