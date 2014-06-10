@@ -260,37 +260,37 @@ local morphDefs = {
     },
   },
   --//ships
-  armpt = {
+  shipscout = {
     {
-      into = 'coresupp',
+      into = 'shipraider',
       time = 10,
       rank = 3,   
     },
   },
-  armroy = {
+  shiparty = {
     {
-      into = 'corroy',
+      into = 'shipskirm',
       time = 20,
       rank = 3,   
     },
   },
-  coresupp = {
+  shipraider = {
 	{
-      into = 'armroy',
+      into = 'shiparty',
       time = 10,
       rank = 3,   
     },
   },
-  corroy = {
+  shipskirm = {
     {
       into = 'corbats',
       time = 45,
       rank = 3,   
     },
   },
-  corsub = {
+  subraider = {
     {
-      into = 'serpent',
+      into = 'subarty',
       time = 45,
       rank = 3,   
     },
