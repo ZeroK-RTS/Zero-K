@@ -13,7 +13,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 360,
+		default = 500,
 		subs    = 18,
 	},
 
@@ -25,8 +25,8 @@ local weaponDef = {
 	laserFlareSize          = 10,
 	minIntensity            = 1,
 	pitchtolerance          = 8192,
-	range                   = 480,
-	reloadtime              = 3,
+	range                   = 350,
+	reloadtime              = 4,
 	rgbColor                = [[0 1 0]],
 	soundStart              = [[weapon/laser/small_laser_fire4]],
 	soundStartVolume        = 5,

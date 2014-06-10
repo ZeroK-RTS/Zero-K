@@ -22,6 +22,8 @@ factory job indexes:
 	5 = gunship
 --]]
 
+local reverseCompat = ((Game.version:find('91.0') == 1))
+
 factionBuildConfig = {
 	robots = {
 		airDefenceRange = {
@@ -540,7 +542,7 @@ factionBuildConfig = {
 				[4] = { -- bomber
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['corshad'].id, chance = 0.4},
+					[1] = {ID = UnitDefNames[reverseCompat and 'corshad' or 'bomberdive'].id, chance = 0.4},
 					[2] = {ID = UnitDefNames['corhurc2'].id, chance = 0.6},
 				},
 				

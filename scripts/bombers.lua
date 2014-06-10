@@ -77,7 +77,9 @@ function Reload()
 		if cmdID == CMD.AREA_ATTACK then
 			areaAttack = cmd.params
 		end
-		re = ReloadQueue(queue, cmd)
+		if cmdID == CMD.AREA_ATTACK or cmdID == CMD.ATTACK then
+			re = ReloadQueue(queue, cmd)
+		end
 	end
 	Spring.SetUnitRulesParam(unitID, "noammo", 1)
 	local targetPad, index = GG.RequestRearm(unitID)
