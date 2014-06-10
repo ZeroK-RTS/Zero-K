@@ -79,7 +79,7 @@ unitDef = {
   weaponDefs             = {
 
     TORPEDO = {
-      name                    = [[Underwater Shockwave Launcher]],
+      name                    = [[Submerged Blast Launcher]],
       areaOfEffect            = 64,
       burst		              = 4,
       burstRate		          = 0.15,
@@ -101,7 +101,7 @@ unitDef = {
       groundbounce            = 1,
       impactOnly              = false,
       impulseBoost            = 0,
-      impulseFactor           = 0.5,
+      impulseFactor           = 0.6,
       interceptedByShieldType = 1,
 	  leadlimit               = 0,
 	  myGravity               = 0.05,
@@ -115,12 +115,13 @@ unitDef = {
       --soundStart              = [[weapon/torpedo]],
       startVelocity           = 15,
       tracks                  = true,
-      turnRate                = 3000,
+      turnRate                = 4000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 160,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 960,
+	  wobble                  = 8000
     },
 
     FLECHETTE = {
