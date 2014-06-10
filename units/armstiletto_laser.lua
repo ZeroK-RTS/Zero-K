@@ -147,6 +147,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:NONE]],
       interceptedByShieldType = 1,
+	  intensity               = 0,
       manualBombSettings      = true,
       myGravity               = 0.8,
       noSelfDamage            = true,

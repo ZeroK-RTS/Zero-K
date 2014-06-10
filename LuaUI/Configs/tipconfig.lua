@@ -141,6 +141,7 @@ artyDefs = {
 }
 
 bomberDefs = {
+	"bomberdive",
 	"corshad",
 	"corhurc2",
 	"armstiletto_laser",

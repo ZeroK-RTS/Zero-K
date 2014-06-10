@@ -8,10 +8,6 @@ local dish4 = piece 'dish4'
 
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
-local bomberWeaponDefs = {
-	[WeaponDefNames["corshad_shield_check"].id] = true,
-}
-
 include "constants.lua"
 
 local smokePiece = {base}
@@ -80,7 +76,7 @@ end
 
 -- this happens before PreDamaged
 function script.HitByWeapon(x, z, weaponDefID, damage)
-	if damage > 1 and not bomberWeaponDefs[weaponDefID] then
+	if damage > 1 then
 		StartThread(DefensiveManeuver)
 	end
 end
