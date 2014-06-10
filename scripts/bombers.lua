@@ -77,7 +77,7 @@ function Reload()
 		if cmdID == CMD.AREA_ATTACK then
 			areaAttack = cmd.params
 		end
-		if cmdID == CMD.AREA_ATTACK or CMD.ATTACK then
+		if cmdID == CMD.AREA_ATTACK or cmdID == CMD.ATTACK then
 			re = ReloadQueue(queue, cmd)
 		end
 	end
