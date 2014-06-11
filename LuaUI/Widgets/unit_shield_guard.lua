@@ -398,7 +398,6 @@ function widget:CommandNotify(id, params, options)
   
   local units = spGetSelectedUnits()
   
-  
   for _,sid in ipairs(units) do
     if follower[sid] then
       local c = shields[follower[sid].fol]
@@ -426,7 +425,7 @@ function widget:CommandNotify(id, params, options)
 	  if (uid == cid) then
 		for _,sid in ipairs(units) do
 		  local ud = UnitDefs[spGetUnitDefID(sid)]
-		  if ud.canMove and not ud.isFactory then
+		  if ud.canMove and not ud.isFactory and ud.buildSpeed == 0 then
 			local speed = ud.speed/30
 			if speed < v.maxVel then
 			  v.maxVel = speed

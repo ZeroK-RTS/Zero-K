@@ -156,7 +156,7 @@ local flamerWeaponDefs = {}
 include("LuaRules/Configs/constants.lua")
 
 local allyTeamInfo = {}
-local resourceInfo = {count = 0, data = {}}
+--local resourceInfo = {count = 0, data = {}}
 
 do
 	local allyTeamList = Spring.GetAllyTeamList()
@@ -484,7 +484,7 @@ function gadget:Initialize()
 	GG.Awards = GG.Awards or {}
 	GG.Awards.AddAwardPoints = AddAwardPoints
 	
-	_G.resourceInfo = resourceInfo
+	--_G.resourceInfo = resourceInfo
 
 	local tempTeamList = Spring.GetTeamList()
 	for i=1, #tempTeamList do
@@ -710,9 +710,9 @@ end
 
 function gadget:GameFrame(n)
 
-	if n%32 == 2 then
-		UpdateResourceStats((n-2)/32)
-	end
+	--if n%32 == 2 then
+	--	UpdateResourceStats((n-2)/32)
+	--end
 
 	if n % shareList_update == 1 and not spIsGameOver() then
 		UpdateShareList()

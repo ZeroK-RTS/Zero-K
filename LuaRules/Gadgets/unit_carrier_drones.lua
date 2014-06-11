@@ -237,7 +237,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (carrierDefs[unitDefID]) then
+	if (carrierDefs[unitDefID]) and not carrierList[unitID] then
 		carrierList[unitID] = InitCarrier(unitID, unitDefID, unitTeam)
 	end
 end
