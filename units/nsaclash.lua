@@ -129,39 +129,7 @@ unitDef = {
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 200,
     },
-
 	
-	A_TORPEDO = {
-      name                    = [[Torpedo Missile For Bubble Effect]],
-      areaOfEffect            = 96,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 310,
-      },
-
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
-      fixedLauncher           = true,
-      flightTime              = 1.75,
-      impulseBoost            = 0.75,
-      impulseFactor           = 0.3,
-      interceptedByShieldType = 2,
-      model                   = [[wep_m_dragonsfang.s3o]],
-	  numbounce               = 4,
-      range                   = 220,
-      reloadtime              = 10,
-      soundHit                = [[explosion/wet/ex_underwater]],
-      soundStart              = [[weapon/torpedo]],
-      startVelocity           = 190,
-      tracks                  = true,
-      turnRate                = 12000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponAcceleration      = 90,
-      weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 200,
-    },
   },
 
 

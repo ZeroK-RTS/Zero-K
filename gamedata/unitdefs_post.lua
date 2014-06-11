@@ -289,6 +289,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Use old diving bomber for 91.0
+
+if reverseCompat then
+	for i, name in pairs(UnitDefs.factoryplane.buildoptions) do
+		if name == "bomberdive" then
+			UnitDefs.factoryplane.buildoptions[i] = "corshad"
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
 -- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
 

@@ -289,11 +289,12 @@ local shieldRangeSafety = 20 -- how close to the edge shields should wait at
 local shieldReactivateRange = 100 -- how far from the edge shields should reactivate at
 local shieldieeStopDis = 120 -- how far from the shield the shieldiees should stop
 
-local shieldRadius = {core_spectre = 300, corthud = 80}
-local shieldWait = {core_spectre = true, corthud = false}
+local shieldRadius = {core_spectre = 300, corthud = 80, cornecro = 80}
+local shieldWait = {core_spectre = true, corthud = false, cornecro = false}
 
 local shieldArray = { 
   "corthud",
+  "cornecro",
 }
 
 
@@ -397,7 +398,6 @@ function widget:CommandNotify(id, params, options)
   
   local units = spGetSelectedUnits()
   
-  
   for _,sid in ipairs(units) do
     if follower[sid] then
       local c = shields[follower[sid].fol]
@@ -425,7 +425,7 @@ function widget:CommandNotify(id, params, options)
 	  if (uid == cid) then
 		for _,sid in ipairs(units) do
 		  local ud = UnitDefs[spGetUnitDefID(sid)]
-		  if ud.canMove and not ud.isFactory then
+		  if ud.canMove and not ud.isFactory and ud.buildSpeed == 0 then
 			local speed = ud.speed/30
 			if speed < v.maxVel then
 			  v.maxVel = speed

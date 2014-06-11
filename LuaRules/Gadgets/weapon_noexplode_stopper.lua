@@ -57,8 +57,8 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 			local on, charge = Spring.GetUnitShieldState(shieldCarrierUnitID)	--FIXME figure out a way to get correct shield
 			if charge and wd.damages[0] < charge then
 				--Spring.MarkerAddPoint(x,y,z,"")
-				Spring.SetProjectileCollision(proID)
 				Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
+				Spring.SetProjectileCollision(proID)
 			else
 				passedProjectile[proID] = true
 			end

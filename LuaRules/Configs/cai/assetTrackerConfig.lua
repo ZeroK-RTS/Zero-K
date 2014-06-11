@@ -278,6 +278,7 @@ local antiAir = {
 local air = {
 	bomber = {
 		"corshad",
+		"bomberdive",
 		"corhurc2",
 		"armstiletto_laser",
 		"armcybr",

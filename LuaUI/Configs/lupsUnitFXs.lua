@@ -271,6 +271,14 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
   },
+  bomberdive = {
+    {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
+    {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
+    {class='Ribbon', options={width=1, piece="wingtipl"}},
+    {class='Ribbon', options={width=1, piece="wingtipr"}},
+	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
+	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
+  },
   fighter = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},

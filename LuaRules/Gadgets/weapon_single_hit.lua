@@ -10,10 +10,10 @@ function gadget:GetInfo()
 	}
 end
 
-local spGetGameFrame = Spring.GetGameFrame
-
 ------ SYNCED -------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then 
+
+local spGetGameFrame = Spring.GetGameFrame
 
 local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
 
