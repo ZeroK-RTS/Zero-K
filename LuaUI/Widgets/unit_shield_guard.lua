@@ -289,11 +289,12 @@ local shieldRangeSafety = 20 -- how close to the edge shields should wait at
 local shieldReactivateRange = 100 -- how far from the edge shields should reactivate at
 local shieldieeStopDis = 120 -- how far from the shield the shieldiees should stop
 
-local shieldRadius = {core_spectre = 300, corthud = 80}
-local shieldWait = {core_spectre = true, corthud = false}
+local shieldRadius = {core_spectre = 300, corthud = 80, cornecro = 80}
+local shieldWait = {core_spectre = true, corthud = false, cornecro = false}
 
 local shieldArray = { 
   "corthud",
+  "cornecro",
 }
 
 
