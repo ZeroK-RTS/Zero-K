@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.368 Integral Command Menu",
+    desc      = "v0.369 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
@@ -290,6 +290,7 @@ local sp_states = {}	--buttons
 local buildRow	--row of build queue buttons
 local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
 local buildProgress	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
+local buildRow_dragDrop = {nil,nil,nil} --current buildqueue that is being dragged by user.
 
 local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
@@ -482,7 +483,7 @@ local function MakeButton(container, cmd, insertItem, index)
 				y = 0;
 				x = 3;
 				bottom = 3;
-				autosize=false;
+				autosize=true; -- this (autosize=true) allow text to be truncated/cut off if button size is too small (prevent a wall-of-text on build icon if button is too small)
 				align="left";
 				valign="bottom";
 				caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
@@ -658,8 +659,10 @@ local function UpdateContainer(container, nl, columns)
 	end 
 end 
 
-local function BuildRowButtonFunc(num, cmdid, left, right)
-	buildQueue = spGetFullBuildQueue(selectedFac)
+local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,customUnitID)
+	local targetFactory = customUnitID or selectedFac
+	buildQueue = spGetFullBuildQueue(targetFactory)
+	num = num or (#buildQueue+1) -- insert build at "num" or at end of queue
 	local alt,ctrl,meta,shift = Spring.GetModKeyState()
 	local pos = 1
 	local numInput = 1	--number of times to send the order
@@ -679,31 +682,36 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 	--so we have to do it manually
 	if shift then numInput = numInput * 5 end
 	if ctrl then numInput = numInput * 20 end
+	numInput = numInput + (addInput or 0) -- to insert specific amount without SHIFT or CTRL modifier
 	
 	--local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta) + BooleanMult(CMD.OPT_RIGHT, right)
 	
 	--insertion position is by unit rather than batch, so we need to add up all the units in front of us to get the queue
 	
 	for i=1,num-1 do
-		for _,units in pairs(buildQueue[i]) do
-			pos = pos + units
+		for _,unitCount in pairs(buildQueue[i]) do
+			pos = pos + unitCount
 		end
 	end
 	
 	-- skip over the commands with an id of 0, left behind by removal
-	local commands = Spring.GetFactoryCommands(selectedFac)
+	local commands = Spring.GetFactoryCommands(targetFactory)
 	local i = 1
 	while i <= pos do
-		if commands[i].id == 0 then
+		if not commands[i] then --end of queue reached
+			break
+		end
+		if commands[i].id == 0 then 
 			pos = pos + 1
 		end
 		i = i + 1
 	end
 	
+	pos = pos- (insertMode and 1 or 0) -- to insert before this index (possibly replace active nanoframe) or after this index (default)
 	--Spring.Echo(cmdid)
 	if not right then
 		for i = 1, numInput do
-			Spring.GiveOrderToUnit(selectedFac, CMD.INSERT, {pos, cmdid, 0 }, {"alt", "ctrl"})
+			Spring.GiveOrderToUnit(targetFactory, CMD.INSERT, {pos, cmdid, 0 }, {"alt", "ctrl"})
 		end
 	else
 		-- delete from back so that the order is not canceled while under construction
@@ -714,7 +722,7 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 		i = i - 1
 		j = 0
 		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput do
-			Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+			Spring.GiveOrderToUnit(targetFactory, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
 			alreadyRemovedTag[commands[i+pos].tag] = true
 			j = j + 1
 			i = i - 1
@@ -765,13 +773,45 @@ local function ManageBuildRow()
 				y = 0,
 				width = (100/MAX_COLUMNS).."%",
 				height = "100%",
-				--caption = '',
+				caption = '', --remove "notext" behind button (which is visible if menu is downsized)
 				OnClick = {	function (self, x, y, mouse) 
 					local left, right = mouse == 1, mouse == 3
 					BuildRowButtonFunc(i, buildRowButtons[i].cmdid, left, right)
+					buildRow_dragDrop[1] = nil
 					end},
 				padding = {1,1,1,1},
 				--keepAspect = true,
+				
+				OnMouseDown = { function(self,x,y,mouse) --for drag_drop feature
+					if mouse == 1 then
+						buildRow_dragDrop[1] = i; 
+						buildRow_dragDrop[2] = -buildRowButtons[i].cmdid
+						buildRow_dragDrop[3] = count-1;
+						buildRow_dragDrop[4] = self.width/2
+					end
+					end},
+				OnMouseUp = { function(self,x,y,mouse) -- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to self
+					local px,py = self:LocalToParent(x,y) --get coordinate with respect to parent
+					if mouse == 1 and (x>self.width or x<0) and px> 0 and px< buildRow.width and py> 0 and py< buildRow.height then
+						local prevIndex = buildRow_dragDrop[1]
+						local currentIndex = math.ceil(px/(buildRow.width/MAX_COLUMNS)) --estimate on which button mouse was released
+						if not buildQueue[currentIndex] then --drag_dropped to the end of queue
+							currentIndex = #buildQueue
+							if currentIndex == prevIndex then --drag_dropped from end of queue to end of queue
+								return
+							end
+						end
+						local countTransfer = buildRow_dragDrop[3]
+						if buildRow_dragDrop[1] > currentIndex then --select remove & adding sequence that reduce complication from network delay
+							BuildRowButtonFunc(prevIndex, buildRowButtons[prevIndex].cmdid, false, true,countTransfer) --remove queue on the right, first
+							BuildRowButtonFunc(currentIndex, buildRowButtons[prevIndex].cmdid, true, false,countTransfer,true) --then, add queue to the left
+						else
+							BuildRowButtonFunc(currentIndex+1, buildRowButtons[prevIndex].cmdid, true, false,countTransfer,true) --add queue to the right, first
+							BuildRowButtonFunc(prevIndex, buildRowButtons[prevIndex].cmdid, false, true,countTransfer) --then, remove queue on the left
+						end
+						buildRow_dragDrop[1] = nil
+					end
+					end},
 			}
 			if overrun and i == MAX_COLUMNS then
 				buttonArray.button.caption = '...'
@@ -780,7 +820,8 @@ local function ManageBuildRow()
 			buttonArray.button.backgroundColor[4] = 0.3
 			
 			if not (overrun and i == MAX_COLUMNS) then
-				buttonArray.button.tooltip = 'Add to/subtract from queued batch'
+				buttonArray.button.tooltip = "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"..
+					"\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue"
 				buttonArray.image = Image:New {
 					parent = buttonArray.button,
 					width="90%";
@@ -1448,8 +1489,10 @@ local lastCmd = nil  -- last active command
 local lastColor = nil  -- original color of button with last active command
 local lastFocusColor = nil
 
--- this is needed to highlight active command
+-- widget:DrawScreen() is needed to highlight active command
+-- also draw build icon when drag_dropping queue to another factory
 function widget:DrawScreen()
+	-- highlight active command
 	local _,cmdid,_,cmdname = Spring.GetActiveCommand()
 	if cmdid ~= lastCmd then 
 		if cmdid and commandButtons[cmdid]  then 
@@ -1467,6 +1510,39 @@ function widget:DrawScreen()
 			but:Invalidate()
 		end 
 		lastCmd = cmdid
+	end
+	--draw build icon when drag_drop queue to another factory
+	if buildRow_dragDrop[1] then
+		local mx,my,lmb = Spring.GetMouseState()
+		if not lmb then
+			local pointingAt, gpos = Spring.TraceScreenRay(mx,my)
+			if gpos and pointingAt=='unit' and Spring.GetUnitTeam(gpos)==Spring.GetMyTeamID() then
+				local udid = spGetUnitDefID(gpos)
+				local ud = UnitDefs[udid]
+				for _, options in ipairs(ud.buildOptions) do --check if target unit can build this queue. Copied from unit_central_build_ai.lua
+					if ( options == buildRow_dragDrop[2] ) then 
+						local countTransfer = buildRow_dragDrop[3]
+						BuildRowButtonFunc(nil, -buildRow_dragDrop[2], true, false,countTransfer,false,gpos) --add to new factory
+						BuildRowButtonFunc(buildRow_dragDrop[1], -buildRow_dragDrop[2], false, true,countTransfer) --remove from source
+						break -- only one to find.
+					end	
+				end
+			end
+			buildRow_dragDrop[1] = nil
+		else
+			local size = buildRow_dragDrop[4]
+			local udid = buildRow_dragDrop[2]
+			gl.Color(1,1,1,0.5)
+			gl.Texture(WG.GetBuildIconFrame(UnitDefs[udid])) --draw build icon on screen. Copied from gui_chili_gesture_menu.lua
+			gl.TexRect(mx-size*0.2, my-size, mx+size*1.8, my+size)
+			gl.Texture("#"..udid)
+			gl.TexRect(mx-size*0.2, my-size, mx+size*1.8, my+size)
+			gl.Texture(false)
+			gl.Color(1,1,1,1)
+			if buildRow_dragDrop[3]>1 then
+				gl.Text(buildRow_dragDrop[3]+1,mx+size*1.5, my-size*0.57,14,"")
+			end
+		end
 	end
 end
 
