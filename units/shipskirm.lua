@@ -1,4 +1,4 @@
-unitDef = {
+ï»¿unitDef = {
   unitname               = [[shipskirm]],
   name                   = [[Enforcer]],
   description            = [[Missile Cruiser (Skirmisher/Riot Support)]],
@@ -29,7 +29,7 @@ unitDef = {
 	description_pl = [[Krazownik rakietowy]],
     helptext       = [[This cruiser packs a powerful, long-range missile, useful for bombarding sea and shore targets and destroying aircraft. Beware of subs and Corvettes.]],
     helptext_fr    = [[Le Enforcer embarque deux batteries de missiles: une lourde et longue port?e pour d?truire les navires et les installation c?ti?res, ainsi qu'un batterie longue port?e anti-air. Il est rapide mais peu solide.]],
-	helptext_de    = [[Dieser Kreuzer vereint schlagkräftige, weitreichende Raketen, die nützlich zur Bombardierung von See- oder Küstenzielen, sowie gegen Flugzeuge, sind. Achte aber auf U-Boote und Korvetten.]],
+	helptext_de    = [[Dieser Kreuzer vereint schlagkrÃ¤ftige, weitreichende Raketen, die nÃ¼tzlich zur Bombardierung von See- oder KÃ¼stenzielen, sowie gegen Flugzeuge, sind. Achte aber auf U-Boote und Korvetten.]],
 	helptext_pl    = [[Enforcer posiada potezne rakiety o dobrym zasiegu, ktore swietnie nadaja sie do niszczenia wszystkiego, co plywa po morzu lub znajduje sie na jego brzegu, a nawet zestrzeliwania lotnictwa. Nie jest jednak w stanie celowac w jednostki podwodne i ma dlugi czas przeladowania.]],
 	turnatfullspeed = [[1]],
   },
