@@ -51,7 +51,7 @@ unitDef = {
   },
 
   sightDistance          = 430,
-  sonarDistance          = 430,
+  sonarDistance          = 280,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -79,41 +79,49 @@ unitDef = {
   weaponDefs             = {
 
     TORPEDO = {
-      name                    = [[Torpedo Launcher]],
-      areaOfEffect            = 16,
+      name                    = [[Submerged Blast Launcher]],
+      areaOfEffect            = 64,
+      burst		              = 4,
+      burstRate		          = 0.15,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
-      bounceslip              = 0.5,
+      bounceslip              = 1.5,
+      canAttackGround		  = false,	-- also workaround for range hax
+      flighttime              = 3,
       burnblow                = true,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 140,
+        default = 55,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       groundbounce            = 1,
-      impactOnly              = true,
+      impactOnly              = false,
       impulseBoost            = 0,
-      impulseFactor           = 0,
+      impulseFactor           = 0.6,
       interceptedByShieldType = 1,
 	  leadlimit               = 0,
-      model                   = [[wep_t_longbolt.s3o]],
-      numbounce               = 4,
-      range                   = 460,
-      reloadtime              = 3.5,
+	  myGravity               = 0.05,
+      model                   = [[diskball.s3o]],
+      numbounce               = 2,
+      range                   = 430,
+      reloadtime              = 6,
+	  weaponTimer             = 3,
+
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
-      startVelocity           = 150,
+      startVelocity           = 15,
       tracks                  = true,
-      turnRate                = 22000,
+      turnRate                = 4000,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 25,
+      weaponAcceleration      = 160,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 160,
+      weaponVelocity          = 960,
+	  wobble                  = 8000
     },
 
     FLECHETTE = {
