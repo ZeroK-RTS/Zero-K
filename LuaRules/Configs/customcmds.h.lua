@@ -34,6 +34,7 @@ CMD_DISEMBARK = 31201 --unit_transport_ai_button.lua
 CMD_TRANSPORTTO = 31202 --unit_transport_ai_button.lua
 CMD_EXTENDED_LOAD = 31203 --unit_transport_pickup_floating_amphib.lua
 CMD_EXTENDED_UNLOAD = 31204 --unit_transport_pickup_floating_amphib.lua
+CMD_RAW_MOVE = 31205 --cmd_raw_move.lua
 CMD_MORPH = 31210 -- up to 32209
 CMD_MORPH_STOP = 32210 -- up to 33209
 CMD_REARM = 33410	-- bomber control
