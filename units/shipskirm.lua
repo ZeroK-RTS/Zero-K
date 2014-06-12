@@ -1,4 +1,4 @@
-unitDef = {
+﻿unitDef = {
   unitname               = [[shipskirm]],
   name                   = [[Enforcer]],
   description            = [[Missile Cruiser (Skirmisher/Riot Support)]],
