@@ -123,6 +123,11 @@ local buttons = {}
 
 local firstUpddateCount = 0
 
+local needRedraw = false
+local defenseRangeDrawList = false
+
+local REDRAW_TIME = 0.1 -- Time in seconds to batch redraws within
+
 local updateTimes = {}
 updateTimes["remove"] = 0
 updateTimes["line"] = 0
@@ -362,32 +367,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function AddUnit(unitID, data)
-	if defences[unitID] then
-		local index = defences[unitID].index
-		defences[unitID] = data
-		defences[unitID].index = index
-	else
-		local list = defenceList
-		list.count = list.count + 1
-		list.data[list.count] = unitID
-		defences[unitID] = data
-		defences[unitID].index = list.count
-	end
-end
-
-local function RemoveUnit(unitID)
-	if defences[unitID] then
-		local index = defences[unitID].index
-		local list = defenceList
-		list.data[index] = list.data[list.count]
-		defences[list.data[index]].index = index
-		list.data[list.count] = nil
-		list.count = list.count - 1
-		defences[unitID] = nil
-	end
-end
-
 local function UnitDetected( unitID, isAlly )
 	local tag
 	local tabValue = defences[unitID]
@@ -502,11 +481,12 @@ local function UnitDetected( unitID, isAlly )
 	if longestRange > 0 then
 		printDebug("Adding UnitID " .. unitID .. " WeaponCount: " .. #foundWeapons ) --.. "W1: " .. foundWeapons[1]["type"])
 		
-		AddUnit(unitID, { 
+		defences[unitID] ={ 
 			drawList = glCreateList(CreateDrawList, isAlly, foundWeapons),
 			pos = {x, y, z},
 			drawRange = longestRange,
-		})
+		}
+		needRedraw = needRedraw or REDRAW_TIME
 	end
 end
 
@@ -539,8 +519,8 @@ function widget:Initialize()
 end
 
 function RedoUnitList()
-	defenceList = {count = 0, data = {}}
 	defences = {}
+	needRedraw = needRedraw or REDRAW_TIME
 	
 	local myAllyTeam = Spring.GetMyAllyTeamID()
 	local units = Spring.GetAllUnits()
@@ -557,7 +537,10 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 end
 
 function widget:UnitDestroyed(unitID)
-	RemoveUnit(unitID)
+	if defences[unitID] then
+		defences[unitID] = nil
+		needRedraw = needRedraw or REDRAW_TIME
+	end
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
@@ -628,7 +611,13 @@ function CheckSpecState()
 	return true
 end
 
-function widget:Update()
+local function RedrawDrawRanges()
+	for _,def in pairs(defences) do
+		glCallList(def.drawList)
+	end
+end
+
+function widget:Update(dt)
 	local timef = spGetGameSeconds()
 	local time = floor(timef)
 	
@@ -637,6 +626,15 @@ function widget:Update()
 		if firstUpddateCount == 2 then
 			RedoUnitList()
 			firstUpddateCount = nil
+		end
+	end
+	
+	if needRedraw then
+		needRedraw = needRedraw - dt
+		if needRedraw < 0 then
+			--Spring.Echo("redraw")
+			defenseRangeDrawList = glCreateList(RedrawDrawRanges)
+			needRedraw = false
 		end
 	end
 	
@@ -665,10 +663,7 @@ function widget:Update()
 		--end
 
 		--remove dead units
-		local i = 1
-		while i <= defenceList.count do
-			local unitID = defenceList.data[i]
-			local def = defences[unitID]
+		for unitID, def in pairs(defences) do
 			local x, y, z = def.pos[1], def.pos[2], def.pos[3]
 			local a, b, c = spGetPositionLosState(x, y, z)
 			local losState = b
@@ -676,11 +671,10 @@ function widget:Update()
 			if (losState) then
 				if not spGetUnitDefID(unitID) then
 					printDebug("Unit killed.")
-					RemoveUnit(unitID)
-					i = i - 1
+					defences[unitID] = nil
+					needRedraw = needRedraw or REDRAW_TIME
 				end
 			end
-			i = i + 1
 		end
 	end
 end
@@ -811,14 +805,8 @@ end
 
 local function DrawRanges()
 	glDepthTest(true)
-	local color
-	local range
-
-	for i = 1, defenceList.count do
-		local def = defences[defenceList.data[i]]
-		--if ( spIsSphereInView( def.pos[1], def.pos[2], def.pos[3], def.drawRange ) ) then
-			glCallList(def.drawList)
-		--end
+	if defenseRangeDrawList then
+		glCallList(defenseRangeDrawList)
 	end
 	glDepthTest(false)
 end
