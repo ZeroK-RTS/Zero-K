@@ -71,7 +71,6 @@ modConfig["ZK"]["unitList"] =
 	turrettorp = { weapons = { 1 } },	--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
 	corgrav = { weapons = { 1 } },		--newton
-	
 }
 
 local unitDefIDRemap = {
@@ -324,23 +323,17 @@ local function BuildVertexList(verts)
 	end
 end
 
-local function CreateDrawList(def)
+local function CreateDrawList(isAlly, weapons)
 	
-	if def.complete then
-		--glLineStipple(false)
-	else
-		--glLineStipple(2, 4095)
-	end
-	
-	for i, weapon in pairs(def["weapons"]) do
+	for i, weapon in pairs(weapons) do
 			
 		color = weapon["color1"]
 		range = weapon["range"]
 		if ( weapon["type"] == 4 ) then
 			if (
-				( ( (not def.isAlly) and options.enemyair.value ) or ( def.isAlly and options.allyair.value ) )
+				( ( (not isAlly) and options.enemyair.value ) or ( isAlly and options.allyair.value ) )
 				and
-				( ( (not def.isAlly) and options.enemyground.value == false ) or ( def.isAlly and options.allyground.value == false ) )
+				( ( (not isAlly) and options.enemyground.value == false ) or ( isAlly and options.allyground.value == false ) )
 				) then
 				-- check if unit is combo unit, get secondary color if so
 				--if air only is selected
@@ -354,9 +347,9 @@ local function CreateDrawList(def)
 		--printDebug( "Drawing defence: range: " .. range .. " Color: " .. color[1] .. "/" .. color[2] .. "/" .. color[3] .. " a:" .. lineConfig["alphaValue"] )
 		if ( ( weapon["type"] == 4 )
 				and
-				( ( (not def.isAlly) and options.enemyair.value ) or ( def.isAlly and options.allyair.value ) )
+				( ( (not isAlly) and options.enemyair.value ) or ( isAlly and options.allyair.value ) )
 				and
-				( ( (not def.isAlly) and options.enemyground.value ) or ( def.isAlly and options.allyground.value ) )
+				( ( (not isAlly) and options.enemyground.value ) or ( isAlly and options.allyground.value ) )
 		) then
 			--air and ground: draw 2nd circle
 			printDebug("Drawing second range circle.")
@@ -413,18 +406,16 @@ local function UnitDetected( unitID, isAlly )
 	end
 	
 	local udef = UnitDefs[unitDefID]
-	local key = tostring(unitID)
-	local x, y, z = spGetUnitPosition(unitID)
 	
-	local longestRange = 0
-	
-	local weaponDef
-	
-	if (not udef) or (#udef.weapons == 0  ) then
+	if (not udef) or (#udef.weapons == 0) or not currentModConfig["unitList"][udef.name] then
 		--not interesting, has no weapons, lame
 		--printDebug("Unit ignored: weaponCount is 0")
 		return
 	end
+
+	local x, y, z = spGetUnitPosition(unitID)
+	local longestRange = 0
+	local weaponDef
 
 	printDebug( udef.name )
 	local foundWeapons = {}
@@ -512,14 +503,10 @@ local function UnitDetected( unitID, isAlly )
 		printDebug("Adding UnitID " .. unitID .. " WeaponCount: " .. #foundWeapons ) --.. "W1: " .. foundWeapons[1]["type"])
 		
 		AddUnit(unitID, { 
-			isAlly = isAlly, 
-			pos = {x, y, z}, 
-			complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1,
-			weapons = foundWeapons,
+			drawList = glCreateList(CreateDrawList, isAlly, foundWeapons),
+			pos = {x, y, z},
 			drawRange = longestRange,
 		})
-		
-		defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
 	end
 end
 
@@ -569,26 +556,12 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	UnitDetected( unitID, true )
 end
 
-function widget:UnitFinished( unitID,  unitDefID,  unitTeam)
-	if defences[unitID] and not defences[unitID].complete then
-		defences[unitID].complete = true
-		defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
-	end
-end
-
 function widget:UnitDestroyed(unitID)
 	RemoveUnit(unitID)
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	if defences[unitID] then
-		if not defences[unitID].complete then
-			defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
-			if defences[unitID].complete then
-				defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
-			end
-		end
-	else
+	if not defences[unitID] then
 		UnitDetected( unitID, false )
 	end
 end
@@ -667,7 +640,7 @@ function widget:Update()
 		end
 	end
 	
-	if ( (timef - updateTimes["line"]) > 0.2 and timef ~= updateTimes["line"] ) then
+	if ((timef - updateTimes["line"]) > 0.2 and timef ~= updateTimes["line"] ) then
 		updateTimes["line"] = timef
 		--adjust line width and alpha by camera height
 		_, camy, _ = spGetCameraPosition()
@@ -705,11 +678,6 @@ function widget:Update()
 					printDebug("Unit killed.")
 					RemoveUnit(unitID)
 					i = i - 1
-				elseif not def.complete then
-					def.complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
-					if def.complete then
-						defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
-					end
 				end
 			end
 			i = i + 1
