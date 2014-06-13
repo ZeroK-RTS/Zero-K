@@ -14,45 +14,23 @@ function widget:GetInfo()
 end
 
 -- CONFIGURATION
-local debug = false		--generates debug message
-local updateInt = 1 	--seconds for the ::update loop
+local debug = false    --generates debug message
+local updateInt = 1    --seconds for the ::update loop
 -- END OF CONFIG
 
-local lastTime
+local PARAM_DEFID   = 4
+local PARAM_TEAMID  = 5
+local PARAM_TEXTURE = 6
+local PARAM_RADIUS  = 7
+
+local updateTimer = 0
 local ghostSites = {}
 local ghostFeatures = {}
+local scanForRemovalUnits    = {}
+local scanForRemovalFeatures = {}
+local dontCheckFeatures = {}
 
 local gaiaTeamID = ((Game.version:find('91.0') == 1)) and -1 or Spring.GetGaiaTeamID()
-
-local floor                 = math.floor
-local udefTab				= UnitDefs
-local glColor               = gl.Color
-local glDepthTest           = gl.DepthTest
-local glTexture             = gl.Texture
-local glTexEnv				= gl.TexEnv
-local glLineWidth           = gl.LineWidth
-local glPopMatrix           = gl.PopMatrix
-local glPushMatrix          = gl.PushMatrix
-local glTranslate           = gl.Translate
-local glFeatureShape		= gl.FeatureShape
-local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetMyPlayerID       = Spring.GetMyPlayerID
-local spGetPlayerInfo       = Spring.GetPlayerInfo
-local spGetAllFeatures		= Spring.GetAllFeatures
-local spGetFeaturePosition  = Spring.GetFeaturePosition
-local spGetFeatureDefID		= Spring.GetFeatureDefID
-local spGetMyAllyTeamID		= Spring.GetMyAllyTeamID
-local spGetFeatureAllyTeam	= Spring.GetFeatureAllyTeam
-local spGetFeatureTeam		= Spring.GetFeatureTeam
-local spGetUnitHealth 		= Spring.GetUnitHealth
-local spGetFeatureHealth 	= Spring.GetFeatureHealth
-local spGetFeatureResurrect = Spring.GetFeatureResurrect
-local spGetPositionLosState = Spring.GetPositionLosState
-local spIsUnitAllied		= Spring.IsUnitAllied
-local spGetUnitPosition     = Spring.GetUnitPosition
-local spGetUnitHealth 	    = Spring.GetUnitHealth
-local spEcho                = Spring.Echo
-local spGetUnitDefID        = Spring.GetUnitDefID
 
 local DrawGhostFeatures
 local DrawGhostSites
@@ -64,202 +42,200 @@ local CheckSpecState
 local printDebug
 
 
-function widget:Update()
-	local timef = spGetGameSeconds()
-	local time = floor(timef)
-
-	-- update timers once every <updateInt> seconds
-	if (time % updateInt == 0 and time ~= lastTime) then	
-		lastTime = time
-		--do update stuff:
-		
-		if ( CheckSpecState() == false ) then
-			return false
-		end
-		
-		ScanFeatures()
-		
-		DeleteGhostSites()
-		DeleteGhostFeatures()
+function widget:Update(dt)
+	updateTimer = updateTimer + dt
+	if (updateTimer < updateInt) then
+		return
 	end
+	updateTimer = 0
+
+	if not CheckSpecState() then
+		return false
+	end
+
+	ScanFeatures()
+	DeleteGhostSites()
+	DeleteGhostFeatures()
 end
 
 function widget:DrawWorld()
 	DrawGhostSites()
-	
 	DrawGhostFeatures()
-	
 	ResetGl()
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	
-	if ( spIsUnitAllied( unitID ) ) then
+	if Spring.IsUnitAllied( unitID ) then
 		return
 	end
-	
-	local _,_,_,_,buildProgress = spGetUnitHealth( unitID )
-	local udef = udefTab[spGetUnitDefID(unitID)]
-		
+
+	local _,_,_,_,buildProgress = Spring.GetUnitHealth( unitID )
+	local udid = Spring.GetUnitDefID(unitID)
+	local udef = UnitDefs[udid]
+
 	if ( udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1  then
 		printDebug( "Ghost added")
-		local x, _, z = spGetUnitPosition(unitID)
+		local x, _, z = Spring.GetUnitPosition(unitID)
 		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
-		ghostSites[unitID] = { unitDefId = spGetUnitDefID(unitID), pos = {x, y, z}, teamId = unitTeam }
+		ghostSites[unitID] = { x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100 }
 	end
 end
 
 function DrawGhostFeatures()
-	glColor(1.0, 1.0, 1.0, 0.35 )
+	gl.Color(1.0, 1.0, 1.0, 0.35 )
   
-	--glTexture(0,"$units1") --.3do texture atlas for .3do model
-	--glTexture(1,"$units1")
+	--gl.Texture(0,"$units1") --.3do texture atlas for .3do model
+	--gl.Texture(1,"$units1")
 
-	glTexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 34160 ) --34160 = GL_COMBINE_RGB_ARB
+	gl.TexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 34160 ) --34160 = GL_COMBINE_RGB_ARB
 	--use the alpha given by glColor for the outgoing alpha, else it would interpret the teamcolor channel as alpha one and make model transparent.
-	glTexEnv( GL.TEXTURE_ENV, 34162, GL.REPLACE ) --34162 = GL_COMBINE_ALPHA
-	glTexEnv( GL.TEXTURE_ENV, 34184, 34167 ) --34184 = GL_SOURCE0_ALPHA_ARB, 34167 = GL_PRIMARY_COLOR_ARB
+	gl.TexEnv( GL.TEXTURE_ENV, 34162, GL.REPLACE ) --34162 = GL_COMBINE_ALPHA
+	gl.TexEnv( GL.TEXTURE_ENV, 34184, 34167 ) --34184 = GL_SOURCE0_ALPHA_ARB, 34167 = GL_PRIMARY_COLOR_ARB
 	
 	--------------------------Draw-------------------------------------------------------------
-	for unitID, ghost in pairs( ghostFeatures ) do
-		--	printDebugTable( weapon )
-		local x, y, z = ghost["pos"][1], ghost["pos"][2], ghost["pos"][3]
-		local a, b, c = spGetPositionLosState(x, y, z)
-		local losState = b
-	
-		if ( losState == false ) then
+	local lastTexture = ""
+	for featureID, ghost in pairs( ghostFeatures ) do
+		local x, y, z = ghost[1], ghost[2], ghost[3]
+		local _, losState = Spring.GetPositionLosState(x, y, z)
+
+		if not losState and Spring.IsSphereInView(x,y,z,ghost[PARAM_RADIUS]) then
 			--glow effect?
 			--gl.Blending(GL.SRC_ALPHA, GL.ONE)
-			glTexture(0,"%-"..ghost["featDefId"]..":0") -- .s3o texture for .s3o model
-			
-			glPushMatrix()
-			glTranslate( x, y, z)
+			if (lastTexture ~= ghost[PARAM_TEXTURE]) then
+				lastTexture = ghost[PARAM_TEXTURE]
+				gl.Texture(0, lastTexture) -- no 3do support!
+			end
 
-			glFeatureShape(ghost["featDefId"], ghost["teamId"] )
-			  
-			glPopMatrix()
+			gl.PushMatrix()
+			gl.Translate( x, y, z)
+
+			gl.FeatureShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID] )
+
+			gl.PopMatrix()
+		else
+			scanForRemovalFeatures[featureID] = true
 		end
 	end
 
 	--------------------------Clean up-------------------------------------------------------------
-	glTexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 8448 ) --8448 = GL_MODULATE
+	gl.TexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 8448 ) --8448 = GL_MODULATE
 	--use the alpha given by glColor for the outgoing alpha.
-	glTexEnv( GL.TEXTURE_ENV, 34162, 8448 ) --34162 = GL_COMBINE_ALPHA, 8448 = GL_MODULATE
+	gl.TexEnv( GL.TEXTURE_ENV, 34162, 8448 ) --34162 = GL_COMBINE_ALPHA, 8448 = GL_MODULATE
 	--gl.TexEnv( GL.TEXTURE_ENV, 34184, 5890 ) --34184 = GL_SOURCE0_ALPHA_ARB, 5890 = GL_TEXTURE
 end
 
 function DrawGhostSites()
-	glColor(0.3, 1.0, 0.3, 0.25)
-	glDepthTest(true)
+	gl.Color(0.3, 1.0, 0.3, 0.25)
+	gl.DepthTest(true)
 
 	for unitID, ghost in pairs( ghostSites ) do
-		--	printDebugTable( weapon )
-		local x, y, z = ghost["pos"][1], ghost["pos"][2], ghost["pos"][3]
-		local a, b, c = spGetPositionLosState(x, y, z)
-		local losState = b
-	
-		if ( losState == false) then
+		local x, y, z = ghost[1], ghost[2], ghost[3]
+		local _, losState = Spring.GetPositionLosState(x, y, z)
+
+		if not losState and Spring.IsSphereInView(x,y,z,ghost[PARAM_RADIUS]) then
 			--glow effect?
 			--gl.Blending(GL.SRC_ALPHA, GL.ONE)
-			    
-			glPushMatrix()
-			glTranslate( x, y - 17, z)
 
-			gl.UnitShape(ghost["unitDefId"], ghost["teamId"] )
-			      
-			glPopMatrix()
+			gl.PushMatrix()
+			gl.Translate( x, y - 17, z)
+
+			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID] )
+
+			gl.PopMatrix()
+		else
+			scanForRemovalUnits[unitID] = true
 		end
 	end
 end
 
-function ScanFeatures()	
-	local features = spGetAllFeatures()
+function ScanFeatures()
+	for _, fID in ipairs(Spring.GetAllFeatures()) do
+		if not (dontCheckFeatures[fID] or ghostFeatures[fID]) then
+			local fAllyID = Spring.GetFeatureAllyTeam(fID)
+			local fTeamID = Spring.GetFeatureTeam(fID)
 
-	for _, fID in ipairs(features) do
-		local fDefId = spGetFeatureDefID(fID)
-		local fName = FeatureDefs[fDefId].name
-	
-		local myAllyID = spGetMyAllyTeamID()
-		local fAllyID = spGetFeatureAllyTeam(fID)
-		local fTeamID = spGetFeatureTeam( fID )
-		local resName, _ = spGetFeatureResurrect(fID)
-
-		--printDebug( "FID: " .. fDefId .. " Name: " .. fName .. " Team: " .. fTeamID .. " Res: " .. resName )
-
-		if ( fTeamID ~= gaiaTeamID and fAllyID ~= nil and fAllyID >= 0 and ghostFeatures[fID] == nil ) then
-			--printDebug( FeatureDefs[fDefId] )
-			local x, y, z = spGetFeaturePosition(fID)
-			--printDebug("Feature added: " .. fName .. " ID: " .. fID .. " Pos: " .. x .. ":" .. y .. ":" .. z .. " Ally: " .. fAllyID .. " Team: " .. fTeamID  )
-			ghostFeatures[fID] = { featDefId = fDefId, pos = {x, y, z}, teamId = fTeamID }
+			if ( fTeamID ~= gaiaTeamID and fAllyID and fAllyID >= 0 ) then
+				local fDefId  = Spring.GetFeatureDefID(fID)
+				local x, y, z = Spring.GetFeaturePosition(fID)
+				ghostFeatures[fID] = { x, y, z, fDefId, fTeamID, "%-"..fDefId..":0", FeatureDefs[fDefId].radius + 100 }
+			else
+				dontCheckFeatures[fID] = true
+			end
 		end
 	end
 end
 
 function DeleteGhostFeatures()
-	for featureID, ghost in pairs(ghostFeatures) do
-		local x, y, z = ghost["pos"][1], ghost["pos"][2], ghost["pos"][3]
-		local a, b, c = spGetPositionLosState(x, y, z)
-		local losState = b
-		local featDefID = spGetFeatureDefID(featureID)
-			
-		--local health,_,_ = spGetFeatureHealth( unitID )
-	
-		if ( featDefID == nil and losState) then	
+	if not next(scanForRemovalFeatures) then
+		return
+	end
+
+	for featureID in pairs(scanForRemovalFeatures) do
+		local ghost   = ghostFeatures[featureID]
+		local x, y, z = ghost[1], ghost[2], ghost[3]
+		local _, losState = Spring.GetPositionLosState(x, y, z)
+
+		local featDefID = Spring.GetFeatureDefID(featureID)
+
+		if (not featDefID and losState) then
 			printDebug("Ghost Feature deleted: " .. featureID )
 			ghostFeatures[featureID] = nil
 		end
 	end
+	scanForRemovalFeatures = {}
 end
 
 function DeleteGhostSites()
-	for unitID, ghost in pairs(ghostSites) do
-		local x, y, z = ghost["pos"][1], ghost["pos"][2], ghost["pos"][3]
-		local a, b, c = spGetPositionLosState(x, y, z)
-		local losState = b
-		local udefID = spGetUnitDefID(unitID)
-			
-		local _,_,_,_,buildProgress = spGetUnitHealth( unitID )
+	if not next(scanForRemovalUnits) then
+		return
+	end
+
+	for unitID in pairs(scanForRemovalUnits) do
+		local ghost   = ghostFeatures[featureID]
+		local x, y, z = ghost[1], ghost[2], ghost[3]
+		local _, losState = Spring.GetPositionLosState(x, y, z)
+		local udefID = Spring.GetUnitDefID(unitID)
+		local _,_,_,_,buildProgress = Spring.GetUnitHealth( unitID )
 	
-		if ( ( udefID == nil or buildProgress == 1 ) and losState) then	
+		if losState and ((not udefID) or (buildProgress == 1)) then
 			printDebug("Ghost deleted: " .. unitID )
 			ghostSites[unitID] = nil
 		end
 	end
+	scanForRemovalUnits = {}
 end
 
 --Commons
-function ResetGl() 
-	glColor( { 1.0, 1.0, 1.0, 1.0 } )
-	glLineWidth( 1.0 )
-	glDepthTest(false)
-	glTexture(false)
+function ResetGl()
+	gl.Color(1.0, 1.0, 1.0, 1.0)
+	gl.Texture(false)
 end
 
 function CheckSpecState()
-	local playerID = spGetMyPlayerID()
-	local _, _, spec, _, _, _, _, _ = spGetPlayerInfo(playerID)
-		
-	if ( spec == true ) then
-		spEcho("<Ghost Site> Spectator mode. Widget removed.")
+	local playerID = Spring.GetMyPlayerID()
+	local _, _, spec = Spring.GetPlayerInfo(playerID)
+
+	if spec then
+		Spring.Echo("<Ghost Site> Spectator mode. Widget removed.")
 		widgetHandler:RemoveWidget()
 		return false
 	end
-	
-	return true	
+
+	return true
 end
 
 function printDebug( value )
 	if ( debug ) then
 		if ( type( value ) == "boolean" ) then
-			if ( value == true ) then spEcho( "true" )
-				else spEcho("false") end
+			if ( value == true ) then Spring.Echo( "true" )
+				else Spring.Echo("false") end
 		elseif ( type(value ) == "table" ) then
-			spEcho("Dumping table:")
+			Spring.Echo("Dumping table:")
 			for key,val in pairs(value) do 
-				spEcho(key,val) 
+				Spring.Echo(key,val) 
 			end
 		else
-			spEcho( value )
+			Spring.Echo( value )
 		end
 	end
 end
