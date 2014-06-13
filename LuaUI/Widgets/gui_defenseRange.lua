@@ -570,7 +570,7 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 end
 
 function widget:UnitFinished( unitID,  unitDefID,  unitTeam)
-	if defences[unitID] then
+	if defences[unitID] and not defences[unitID].complete then
 		defences[unitID].complete = true
 		defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
 	end
@@ -581,9 +581,13 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	if defences[unitID] and not defences[unitID].complete then
-		defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
-		defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
+	if defences[unitID] then
+		if not defences[unitID].complete then
+			defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
+			if defences[unitID].complete then
+				defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
+			end
+		end
 	else
 		UnitDetected( unitID, false )
 	end
