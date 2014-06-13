@@ -68,7 +68,7 @@ modConfig["ZK"]["unitList"] =
 	missiletower = { weapons = { 2 } },	--hacksaw
 	corbhmth = { weapons = { 1 } },		--behemoth
 	cortl = { weapons = { 1 } },		--torpedo launcher
-	turrettorp = { weapons = { 1 } },		--torpedo launcher
+	turrettorp = { weapons = { 1 } },	--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
 	corgrav = { weapons = { 1 } },		--newton
 	
@@ -113,30 +113,6 @@ colorConfig["enemy"]["nuke"] =  { 1.0, 1.0, 1.0 }
 
 colorConfig["ally"] = colorConfig["enemy"]
 --end of DEFAULT COLOR CONFIG
-
-local Chili
-options_path = 'Settings/Interface/Defense Ranges'
-
-options = { 
-	showselectedunitrange = {name = 'Show selected unit(s) range(s)', type = 'bool', value = false},
-	allyground = {name = 'Show Ally Ground Defence', type = 'bool', value = false},
-	allyair = {name = 'Show Ally Air Defence', type = 'bool', value = false},
-	allynuke = {name = 'Show Ally Nuke Defence', type = 'bool', value = true},
-	enemyground = {name = 'Show Enemy Ground Defence', type = 'bool', value = true},
-	enemyair = {name = 'Show Enemy Air Defence', type = 'bool', value = true},
-	enemynuke = {name = 'Show Enemy Nuke Defence', type = 'bool', value = true}
-}
-
-options_order = {
-	'showselectedunitrange',
-	'allyground',
-	'allyair',
-	'allynuke',
-	'enemyground',
-	'enemyair',
-	'enemynuke'
-}
-
 --Button display configuration
 --position only relevant if no saved config data found
 
@@ -145,6 +121,8 @@ local defences = {}
 
 local currentModConfig = {}
 local buttons = {}
+
+local firstUpddateCount = 0
 
 local updateTimes = {}
 updateTimes["remove"] = 0
@@ -179,7 +157,9 @@ local glUnitShape			= gl.UnitShape
 local glFeatureShape		= gl.FeatureShape
 local glBeginEnd            = gl.BeginEnd
 local glBillboard           = gl.Billboard
+local glCallList            = gl.CallList 
 local glColor               = gl.Color
+local glCreateList          = gl.CreateList
 local glDepthTest           = gl.DepthTest
 local glDrawGroundCircle    = gl.DrawGroundCircle
 local glDrawGroundQuad      = gl.DrawGroundQuad
@@ -241,8 +221,151 @@ local GetButton
 local GetColorsByTypeAndDps
 local UnitDetected
 local GetColorByDps
-local CheckDrawTodo
-local DrawRanges
+local RedoUnitList
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local Chili
+options_path = 'Settings/Interface/Defense Ranges'
+
+options = { 
+	showselectedunitrange = {
+		name = 'Show selected unit(s) range(s)', 
+		type = 'bool', 
+		value = false,
+	},
+	allyground = {
+		name = 'Show Ally Ground Defence', 
+		type = 'bool', 
+		value = false,
+		OnChange = function() RedoUnitList() end,
+	},
+	allyair = {
+		name = 'Show Ally Air Defence', 
+		type = 'bool', 
+		value = false,
+		OnChange = function() RedoUnitList() end,
+	},
+	allynuke = {
+		name = 'Show Ally Nuke Defence', 
+		type = 'bool',
+		value = true,
+		OnChange = function() RedoUnitList() end,
+	},
+	enemyground = {
+		name = 'Show Enemy Ground Defence', 
+		type = 'bool', 
+		value = true,
+		OnChange = function() RedoUnitList() end,
+	},
+	enemyair = {
+		name = 'Show Enemy Air Defence', 
+		type = 'bool', 
+		value = true,
+		OnChange = function() RedoUnitList() end,
+	},
+	enemynuke = {
+		name = 'Show Enemy Nuke Defence', 
+		type = 'bool',
+		value = true,
+		OnChange = function() RedoUnitList() end,
+	},
+}
+
+options_order = {
+	'showselectedunitrange',
+	'allyground',
+	'allyair',
+	'allynuke',
+	'enemyground',
+	'enemyair',
+	'enemynuke'
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function CheckWeaponInclusion(weaponType, isAlly )
+	if ( weaponType == 1 or weaponType == 4 ) then
+		if ( (not isAlly) and options.enemyground.value ) then
+			return true
+		elseif ( isAlly and options.allyground.value ) then
+			return true
+		end
+	end
+
+	if ( weaponType == 2 or weaponType == 4 ) then
+		if ( (not isAlly) and options.enemyair.value ) then
+			return true
+		elseif ( isAlly and options.allyair.value ) then
+			return true
+		end
+	end
+
+	if ( weaponType == 3 ) then
+		if ( (not isAlly) and options.enemynuke.value ) then
+			return true
+		elseif ( isAlly and options.allynuke.value ) then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function BuildVertexList(verts)
+	local count =  #verts
+	for i = 1, count do
+		glVertex(verts[i])
+	end
+	if count > 0 then
+		glVertex(verts[1])
+	end
+end
+
+local function CreateDrawList(def)
+	
+	if def.complete then
+		--glLineStipple(false)
+	else
+		--glLineStipple(2, 4095)
+	end
+	
+	for i, weapon in pairs(def["weapons"]) do
+			
+		color = weapon["color1"]
+		range = weapon["range"]
+		if ( weapon["type"] == 4 ) then
+			if (
+				( ( (not def.isAlly) and options.enemyair.value ) or ( def.isAlly and options.allyair.value ) )
+				and
+				( ( (not def.isAlly) and options.enemyground.value == false ) or ( def.isAlly and options.allyground.value == false ) )
+				) then
+				-- check if unit is combo unit, get secondary color if so
+				--if air only is selected
+				color = weapon["color2"]
+			end
+		end
+		printDebug("Drawing range circle.")
+		glColor( color[1], color[2], color[3], lineConfig["alphaValue"])
+		glLineWidth(lineConfig["lineWidth"])
+		glBeginEnd(GL_LINE_STRIP, BuildVertexList, weapon["rangeLines"] )
+		--printDebug( "Drawing defence: range: " .. range .. " Color: " .. color[1] .. "/" .. color[2] .. "/" .. color[3] .. " a:" .. lineConfig["alphaValue"] )
+		if ( ( weapon["type"] == 4 )
+				and
+				( ( (not def.isAlly) and options.enemyair.value ) or ( def.isAlly and options.allyair.value ) )
+				and
+				( ( (not def.isAlly) and options.enemyground.value ) or ( def.isAlly and options.allyground.value ) )
+		) then
+			--air and ground: draw 2nd circle
+			printDebug("Drawing second range circle.")
+			glColor( weapon["color2"][1], weapon["color2"][2], weapon["color2"][3], lineConfig["alphaValue"])
+			glBeginEnd(GL_LINE_STRIP, BuildVertexList, weapon["rangeLinesEx"] )
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -272,7 +395,7 @@ local function RemoveUnit(unitID)
 	end
 end
 
-local function UnitDetected( unitID, allyTeam )
+local function UnitDetected( unitID, isAlly )
 	local tag
 	local tabValue = defences[unitID]
 	if tabValue then
@@ -293,12 +416,11 @@ local function UnitDetected( unitID, allyTeam )
 	local key = tostring(unitID)
 	local x, y, z = spGetUnitPosition(unitID)
 	
-	local range = 0
-	local type = 0
-	local dps
+	local longestRange = 0
+	
 	local weaponDef
-
-	if (#udef.weapons == 0  ) then
+	
+	if (not udef) or (#udef.weapons == 0  ) then
 		--not interesting, has no weapons, lame
 		--printDebug("Unit ignored: weaponCount is 0")
 		return
@@ -314,70 +436,91 @@ local function UnitDetected( unitID, allyTeam )
 			--get definition from weapon table
 			weaponDef = weapTab[ udef.weapons[i].weaponDef ]
 
-			range = weaponDef.range --get normal weapon range
-			--printDebug("Weapon #" .. i .. " Range: " .. range .. " Type: " .. weaponDef.type )
-
-			type = currentModConfig["unitList"][udef.name]["weapons"][i]
-
+			printDebug("Weapon #" .. i .. " Type: " .. weaponDef.type )
+			
 			local dam = weaponDef.damages
-			local dps
-			local damage
+			local type = currentModConfig["unitList"][udef.name]["weapons"][i]
+			
+			if CheckWeaponInclusion(type, isAlly) then
+			
+				local dps
+				local damage
+				local color1
+				local color2
+				
+				local range = weaponDef.range --get normal weapon range
+			
+				--check if dps-depending colors should be used
+				if ( currentModConfig["armorTags"] ~= nil ) then
+					printDebug("DPS colors!")
+					if ( type == 1 or type == 4 ) then	 -- show combo units with ground-dps-colors
+						tag = currentModConfig["armorTags"] ["ground"]
+					elseif ( type == 2 ) then
+						tag = currentModConfig["armorTags"] ["air"]
+					elseif ( type == 3 ) then -- antinuke
+						range = weaponDef.coverageRange
+						dps = nil
+						tag = nil
+					end
 
-			--check if dps-depending colors should be used
-			if ( currentModConfig["armorTags"] ~= nil ) then
-				printDebug("DPS colors!")
-				if ( type == 1 or type == 4 ) then	 -- show combo units with ground-dps-colors
-					tag = currentModConfig["armorTags"] ["ground"]
-				elseif ( type == 2 ) then
-					tag = currentModConfig["armorTags"] ["air"]
-				elseif ( type == 3 ) then -- antinuke
-					range = weaponDef.coverageRange
-					dps = nil
-					tag = nil
-				end
+					if ( tag ~= nil ) then
+						--printDebug("Salvo: " .. weaponDef.salvoSize 	)
+						damage = dam[Game.armorTypes[tag]]
+						dps = damage * weaponDef.salvoSize / weaponDef.reload
+						--printDebug("DPS: " .. dps 	)
+					end
 
-				if ( tag ~= nil ) then
-					--printDebug("Salvo: " .. weaponDef.salvoSize 	)
-					damage = dam[Game.armorTypes[tag]]
-					dps = damage * weaponDef.salvoSize / weaponDef.reload
-					--printDebug("DPS: " .. dps 	)
-				end
+					color1, color2 = GetColorsByTypeAndDps( dps, type, isAlly )
+				else
+					printDebug("Default colors!")
+					local team = "ally"
+					if ( isAlly ) then
+						team = "enemy"
+					end
 
-				color1, color2 = GetColorsByTypeAndDps( dps, type, ( allyTeam == false ) )
-			else
-				printDebug("Default colors!")
-				local team = "ally"
-				if ( allyTeam ) then
-					team = "enemy"
+					if ( type == 1 or type == 4 ) then	 -- show combo units with ground-dps-colors
+						color1 = colorConfig[team]["ground"]["min"]
+						color2 = colorConfig[team]["air"]["min"]
+					elseif ( type == 2 ) then
+						color1 = colorConfig[team]["air"]["min"]
+					elseif ( type == 3 ) then -- antinuke
+						color1 = colorConfig[team]["nuke"]
+					end
 				end
-
-				if ( type == 1 or type == 4 ) then	 -- show combo units with ground-dps-colors
-					color1 = colorConfig[team]["ground"]["min"]
-					color2 = colorConfig[team]["air"]["min"]
-				elseif ( type == 2 ) then
-					color1 = colorConfig[team]["air"]["min"]
-				elseif ( type == 3 ) then -- antinuke
-					color1 = colorConfig[team]["nuke"]
+				
+				--add weapon to list
+				local rangeLines = CalcBallisticCircle(x,y,z,range, weaponDef )
+				local rangeLinesEx = CalcBallisticCircle(x,y,z,range + 3, weaponDef ) --calc a little bigger circle to display for combo-weapons (air and ground) to display both circles together (without overlapping)
+				
+				if longestRange < range then
+					longestRange = range
 				end
+				
+				foundWeapons[i] = {
+					type = type,
+					rangeLines = rangeLines,
+					rangeLinesEx = rangeLinesEx,
+					color1 = color1,
+					color2 = color2,
+				}
+				printDebug("Detected Weapon - Type: " .. type .. " Range: " .. range )
 			end
-
-			--add weapon to list
-			local rangeLines = CalcBallisticCircle(x,y,z,range, weaponDef )
-			local rangeLinesEx = CalcBallisticCircle(x,y,z,range + 3, weaponDef ) --calc a little bigger circle to display for combo-weapons (air and ground) to display both circles together (without overlapping)
-			foundWeapons[i] = { type = type, range = range, rangeLines = rangeLines, rangeLinesEx = rangeLinesEx, color1 = color1, color2 = color2 }
-			printDebug("Detected Weapon - Type: " .. type .. " Range: " .. range )
 		end
 	end
 
-	printDebug("Adding UnitID " .. unitID .. " WeaponCount: " .. #foundWeapons ) --.. "W1: " .. foundWeapons[1]["type"])
-	
-	
-	AddUnit(unitID, { 
-		allyState = ( allyTeam == false ), 
-		pos = {x, y, z}, 
-		complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1,
-		weapons = foundWeapons,
-	})
+	if longestRange > 0 then
+		printDebug("Adding UnitID " .. unitID .. " WeaponCount: " .. #foundWeapons ) --.. "W1: " .. foundWeapons[1]["type"])
+		
+		AddUnit(unitID, { 
+			isAlly = isAlly, 
+			pos = {x, y, z}, 
+			complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1,
+			weapons = foundWeapons,
+			drawRange = longestRange,
+		})
+		
+		defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
+	end
 end
 
 function widget:Initialize()
@@ -406,6 +549,11 @@ function widget:Initialize()
 		local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
 		local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage]]--
 	end
+end
+
+function RedoUnitList()
+	defenceList = {count = 0, data = {}}
+	defences = {}
 	
 	local myAllyTeam = Spring.GetMyAllyTeamID()
 	local units = Spring.GetAllUnits()
@@ -424,6 +572,7 @@ end
 function widget:UnitFinished( unitID,  unitDefID,  unitTeam)
 	if defences[unitID] then
 		defences[unitID].complete = true
+		defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
 	end
 end
 
@@ -434,42 +583,31 @@ end
 function widget:UnitEnteredLos(unitID, unitTeam)
 	if defences[unitID] and not defences[unitID].complete then
 		defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
+		defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
 	else
 		UnitDetected( unitID, false )
 	end
 end
 
-function GetColorsByTypeAndDps( dps, type, isEnemy )
+function GetColorsByTypeAndDps( dps, type, isAlly )
 	--BEWARE: dps can be nil here! when antinuke for example
  -- get alternative color for weapons ground AND air
 	local color1 = nil
 	local color2 = nil
 	if ( type == 4 ) then -- show combo units with "ground"-colors
-		if ( isEnemy ) then
-			color2 = GetColorByDps( dps, true, "air" )
-		else
-			color2 = GetColorByDps( dps, false, "air")
-		end
+		color2 = GetColorByDps( dps, isAlly, "air")
 	end
 
   --get standard colors
 	if ( type == 1 or type == 4 ) then
-	  if ( isEnemy ) then
-			color1 = GetColorByDps( dps, true, "ground" )
-		else
-			color1 = GetColorByDps( dps, false, "ground")
-		end
+		color1 = GetColorByDps( dps, isAlly, "ground" )
 	elseif ( type == 2 ) then
-		if ( isEnemy ) then
-			color1 = GetColorByDps( dps, true, "air" )
-		else
-			color1 = GetColorByDps( dps, false, "air")
-		end
+		color1 = GetColorByDps( dps, isAlly, "air" )
 	elseif ( type == 3 ) then
-		if ( isEnemy ) then
-			color1 = colorConfig["enemy"]["nuke"]
-		else
+		if ( isAlly ) then
 			color1 = colorConfig["ally"]["nuke"]
+		else
+			color1 = colorConfig["enemy"]["nuke"]
 		end
 	end
 
@@ -477,10 +615,10 @@ function GetColorsByTypeAndDps( dps, type, isEnemy )
 end
 
 --linear interpolates between min and max color
-function GetColorByDps( dps, isEnemy, typeStr )
+function GetColorByDps( dps, isAlly, typeStr )
 	local color = { 0.0, 0.0, 0.0 }
 	local team = "ally"
-	if ( isEnemy ) then team = "enemy" end
+	if ( not isAlly ) then team = "enemy" end
 
 	printDebug("GetColor typeStr : " .. typeStr  .. "Team: " .. team )
 	--printDebug( colorConfig[team][typeStr]["min"] )
@@ -516,6 +654,15 @@ end
 function widget:Update()
 	local timef = spGetGameSeconds()
 	local time = floor(timef)
+	
+	if firstUpddateCount then
+		firstUpddateCount = firstUpddateCount + 1
+		if firstUpddateCount == 2 then
+			RedoUnitList()
+			firstUpddateCount = nil
+		end
+	end
+	
 	if ( (timef - updateTimes["line"]) > 0.2 and timef ~= updateTimes["line"] ) then
 		updateTimes["line"] = timef
 		--adjust line width and alpha by camera height
@@ -556,6 +703,9 @@ function widget:Update()
 					i = i - 1
 				elseif not def.complete then
 					def.complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
+					if def.complete then
+						defences[unitID].drawList = glCreateList(CreateDrawList,defences[unitID])
+					end
 				end
 			end
 			i = i + 1
@@ -687,93 +837,16 @@ function CalcBallisticCircle( x, y, z, range, weaponDef )
 	return rangeLineStrip
 end
 
-function CheckDrawTodo( def, weaponIdx )
-	if ( def.weapons[weaponIdx]["type"] == 1 or def.weapons[weaponIdx]["type"] == 4 ) then
-		if ( def["allyState"] == true and options.enemyground.value ) then
-			return true
-		elseif ( def["allyState"] == false and options.allyground.value ) then
-			return true
-		end
-	end
-
-	if ( def.weapons[weaponIdx]["type"] == 2 or def.weapons[weaponIdx]["type"] == 4 ) then
-		if ( def["allyState"] == true and options.enemyair.value ) then
-			return true
-		elseif ( def["allyState"] == false and options.allyair.value ) then
-			return true
-		end
-	end
-
-	if ( def.weapons[weaponIdx]["type"] == 3 ) then
-		if ( def["allyState"] == true and options.enemynuke.value ) then
-			return true
-		elseif ( def["allyState"] == false and options.allynuke.value ) then
-			return true
-		end
-	end
-
-	return false
-end
-
-local function BuildVertexList(verts)
-	local count =  #verts
-	for i = 1, count do
-		glVertex(verts[i])
-	end
-	if count > 0 then
-		glVertex(verts[1])
-	end
-end
-
-function DrawRanges()
+local function DrawRanges()
 	glDepthTest(true)
 	local color
 	local range
-	local stipple = false
+
 	for i = 1, defenceList.count do
 		local def = defences[defenceList.data[i]]
-		if def.complete and stipple then
-			--glLineStipple(false)
-			stipple = false
-		elseif not (def.complete or stipple) then
-			--glLineStipple(2, 4095)
-			stipple = true
-		end
-		for i, weapon in pairs(def["weapons"]) do
-			local execDraw = false
-			if ( spIsSphereInView( def["pos"][1], def["pos"][2], def["pos"][3], weapon["range"] ) ) then
-				execDraw = CheckDrawTodo( def, i )
-			end
-			if ( execDraw ) then
-				color = weapon["color1"]
-				range = weapon["range"]
-				if ( weapon["type"] == 4 ) then
-					if (
-						( ( def["allyState"] == true and options.enemyair.value ) or ( def["allyState"] == false and options.allyair.value ) )
-						and
-						( ( def["allyState"] == true and options.enemyground.value == false ) or ( def["allyState"] == false and options.allyground.value == false ) )
-						) then
-						-- check if unit is combo unit, get secondary color if so
-						--if air only is selected
-						color = weapon["color2"]
-					end
-				end
-				glColor( color[1], color[2], color[3], lineConfig["alphaValue"])
-				glLineWidth(lineConfig["lineWidth"])
-				glBeginEnd(GL_LINE_STRIP, BuildVertexList, weapon["rangeLines"] )
-				--printDebug( "Drawing defence: range: " .. range .. " Color: " .. color[1] .. "/" .. color[2] .. "/" .. color[3] .. " a:" .. lineConfig["alphaValue"] )
-				if ( ( weapon["type"] == 4 )
-						and
-						( ( def["allyState"] == true and options.enemyair.value ) or ( def["allyState"] == false and options.allyair.value ) )
-						and
-						( ( def["allyState"] == true and options.enemyground.value ) or ( def["allyState"] == false and options.allyground.value ) )
-				) then
-					--air and ground: draw 2nd circle
-					glColor( weapon["color2"][1], weapon["color2"][2], weapon["color2"][3], lineConfig["alphaValue"])
-					glBeginEnd(GL_LINE_STRIP, BuildVertexList, weapon["rangeLinesEx"] )
-				end
-			end
-		end
+		--if ( spIsSphereInView( def.pos[1], def.pos[2], def.pos[3], def.drawRange ) ) then
+			glCallList(def.drawList)
+		--end
 	end
 	glDepthTest(false)
 end
