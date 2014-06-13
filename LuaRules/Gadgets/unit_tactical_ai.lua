@@ -34,7 +34,6 @@ local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetUnitLosState		= Spring.GetUnitLosState
 local spGetUnitStates		= Spring.GetUnitStates
 local spValidUnitID			= Spring.ValidUnitID
-local spGetUnitIsDead		= Spring.GetUnitIsDead
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local random 				= math.random
@@ -426,11 +425,7 @@ local function updateUnits(frame, start, increment)
 	local listData = unitList.data
 	while index <= unitList.count do
 		local unitID = listData[index]
-	
-		if spGetUnitIsDead(unitID) then 
-			--really tiny optimization that couldn't hurt:
-			--spGetUnitIsDead() is 1 frame earlier than spValidUnitID() in checking whether unit is out of action. So we can skip processing for 1 frame
-			--"unitID is dead at start of frame and invalidated/emptied at end of frame". Source: jK
+		if not spValidUnitID(unitID) then 
 			listData[index] = listData[unitList.count]
 			listData[unitList.count] = nil
 			unitList.count = unitList.count - 1
