@@ -191,7 +191,7 @@ function DeleteGhostSites()
 	end
 
 	for unitID in pairs(scanForRemovalUnits) do
-		local ghost   = ghostFeatures[featureID]
+		local ghost   = ghostSites[unitID]
 		local x, y, z = ghost[1], ghost[2], ghost[3]
 		local _, losState = Spring.GetPositionLosState(x, y, z)
 		local udefID = Spring.GetUnitDefID(unitID)

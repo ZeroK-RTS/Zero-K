@@ -87,7 +87,7 @@ function SetIcons(unitID)
 		
 		local retreat = Spring.GetUnitRulesParam(unitID, "retreat") 
 		if retreat then
-			if (not lastRetreat[unitID]) or lastRetreat[unitID] ~= lowpower then
+			if (not lastRetreat[unitID]) or lastRetreat[unitID] ~= retreat then
 				lastRetreat[unitID] = retreat
 				if retreat ~= 0 then
 					WG.icons.SetUnitIcon( unitID, {name='retreat', texture=retreatTexture} )
