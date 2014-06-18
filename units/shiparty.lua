@@ -58,7 +58,7 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 660,
   smoothAnim             = true,
-  sonarDistance          = 800,
+  sonarDistance          = 360,
   turninplace            = 0,
   turnRate               = 350,
   waterline              = 0,
@@ -93,7 +93,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 200,
+        default = 180,
       },
 
       edgeEffectiveness       = 0.4,
@@ -105,7 +105,7 @@ unitDef = {
       model                   = [[depthcharge.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
-      range                   = 200,
+      range                   = 260,
       reloadtime              = 3,
       soundHit                = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torpedo]],

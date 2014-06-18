@@ -42,8 +42,8 @@ unitDef = {
   iconType               = [[corvette]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 1750,
-  maxVelocity            = 2.8,
+  maxDamage              = 2200,
+  maxVelocity            = 2.5,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],
@@ -93,7 +93,7 @@ unitDef = {
 
     EMG = {
       name                    = [[Medium Pulse MG]],
-      areaOfEffect            = 96,
+      areaOfEffect            = 32,
       burst                   = 4,
       burstrate               = 0.1,
       burnblow                = true,
@@ -101,8 +101,8 @@ unitDef = {
       craterMult              = 0.3,
 
       damage                  = {
-        default = 9,
-        planes  = 9,
+        default = 12,
+        planes  = 12,
         subs    = 0.5,
       },
 
@@ -114,7 +114,7 @@ unitDef = {
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
-      range                   = 240,
+      range                   = 280,
       reloadtime              = 0.4,
       rgbColor                = [[1 0.95 0.4]],
       soundHit                = [[weapon/cannon/emg_hit]],
@@ -125,7 +125,7 @@ unitDef = {
       turret                  = true,
       weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 500,
+      weaponVelocity          = 240,
     },
 
   },
@@ -137,7 +137,7 @@ unitDef = {
       description      = [[Wreckage - Typhoon]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 1750,
+      damage           = 2200,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -158,7 +158,7 @@ unitDef = {
       description      = [[Debris - Typhoon]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 1750,
+      damage           = 2200,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
