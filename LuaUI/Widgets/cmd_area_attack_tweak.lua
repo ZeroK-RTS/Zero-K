@@ -1,4 +1,4 @@
-local version = "v1.11"
+local version = "v1.12"
 
 function widget:GetInfo()
   return {
@@ -252,13 +252,13 @@ function PrepareCommandArray (targetUnits, cmdID, options,indx,shuffle)
 	end
 	local attackCommandList = {}
 	local j = 1
-	attackCommandList[j] = {cmdID,{targetUnits[indx],},{"internal",((options.shift and "shift") or nil),}}
+	attackCommandList[j] = {cmdID,{targetUnits[indx],},{((options.shift and "shift") or nil),}}
 	if cmdID == CMD.ATTACK then
 		for i=1, #targetUnits-1, 1 do
 			j= j + 1
 			indx = indx + stepSkip --stepSkip>1 will shuffle the queue
 			indx = LoopAroundIndex(indx, #targetUnits)
-			attackCommandList[j] = {cmdID,{targetUnits[indx],},{"shift","internal"}} --every unit get to attack every target
+			attackCommandList[j] = {cmdID,{targetUnits[indx],},{"shift",}} --every unit get to attack every target
 		end
 	end
 	return attackCommandList
