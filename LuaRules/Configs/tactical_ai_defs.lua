@@ -67,6 +67,7 @@ merge(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 -- these are not strictly required they just help with inputting the units
 
 local veryShortRangeSkirmieeArray = {
+	["corclog"] = true,
 	["corcan"] = true,
 	["spherepole"] = true,
 	["armtick"] = true,
@@ -377,9 +378,9 @@ local behaviourConfig = {
 		maxSwarmLeeway = 35, 
 		swarmLeeway = 30, 
 		jinkTangentLength = 140, 
-		stoppingDistance = 25,
+		stoppingDistance = 10,
 		minCircleStrafeDistance = 10,
-		velocityPrediction = 20,
+		velocityPrediction = 30,
 	},
 	["amphraider3"] = {
 		skirms = shortRangeSkirmieeArray, 
@@ -391,7 +392,7 @@ local behaviourConfig = {
 		jinkTangentLength = 140, 
 		stoppingDistance = 25,
 		minCircleStrafeDistance = 10,
-		velocityPrediction = 20,
+		velocityPrediction = 30,
 	},
 	["corgator"] = {
 		skirms = shortRangeSkirmieeArray, 
@@ -439,7 +440,8 @@ local behaviourConfig = {
 		maxSwarmLeeway = 100, 
 		minSwarmLeeway = 200, 
 		swarmLeeway = 30, 
-		stoppingDistance = 8
+		stoppingDistance = 8,
+		velocityPrediction = 20
 	},
 	
 	["logkoda"] = {
@@ -482,6 +484,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 40,
 		skirmLeeway = 30, 
 		minCircleStrafeDistance = 10,
+		velocityPrediction = 20
 	},
 	
 	-- riots
@@ -491,6 +494,7 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 0, 
 		skirmLeeway = 0, 
+		velocityPrediction = 20
 	},
 	["spiderriot"] = {
 		skirms = lowMedRangeSkirmieeArray, 
@@ -498,6 +502,7 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 0, 
 		skirmLeeway = 0, 
+		velocityPrediction = 20
 	},
 	["arm_venom"] = {
 		skirms = riotRangeSkirmieeArray, 
@@ -507,6 +512,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 40,
 		skirmLeeway = 30, 
 		minCircleStrafeDistance = 10,
+		velocityPrediction = 20
 	},
 	["cormak"] = {
 		skirms = riotRangeSkirmieeArray, 
@@ -514,6 +520,7 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 0, 
 		skirmLeeway = 50, 
+		velocityPrediction = 20
 	},
 	["corlevlr"] = {
 		skirms = lowMedRangeSkirmieeArray, 

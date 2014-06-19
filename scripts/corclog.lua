@@ -1,10 +1,13 @@
 include 'constants.lua'
 
 local pelvis = piece 'pelvis'
+local pole = piece 'pole'
+local aimpitch = piece 'aimpitch'
+local aimyaw = piece 'aimyaw'
 local lthigh, lcalf, lfoot = piece('lthigh', 'lcalf', 'lfoot')
 local rthigh, rcalf, rfoot = piece('rthigh', 'rcalf', 'rfoot')
-local leftLeg = { thigh=piece'lthigh', calf=piece'lcalf', foot=piece'lfoot'}
-local rightLeg = { thigh=piece'rthigh', calf=piece'rcalf', foot=piece'rfoot'}
+local leftLeg = { thigh = piece'lthigh', calf = piece'lcalf', foot = piece'lfoot'}
+local rightLeg = { thigh = piece'rthigh', calf = piece'rcalf', foot = piece'rfoot'}
 local base = piece 'base' 
 local box = piece 'box'
 
@@ -12,6 +15,8 @@ local smokePiece = { box }
 
 -- signals
 local SIG_Walk = 1
+local SIG_AIM = 2
+local SIG_RESTORE = 4
 
 -- walk animation
 local function Step(front, back)
@@ -78,7 +83,9 @@ function script.Create()
 	--StartThread(SpinScienceThread)
 end
 
--- jump functions
+-----------------------------
+-- Jumping
+
 local doingSomersault = false
 
 local function jumpTuckInLegs(leg)
@@ -158,11 +165,8 @@ function endJump()
 	jumpLegLand(rightLeg)
 end
 
--- the usual things
-local function RestoreAfterDelay()
-	Sleep(2750)
-	Turn( box , y_axis, 0, math.rad(90.021978) )
-end
+-----------------------------
+-- Walking
 
 local function Stopping()
 	Signal( SIG_Walk )
@@ -184,6 +188,52 @@ end
 function script.StopMoving()
 	StartThread(Stopping)
 end
+
+-----------------------------
+-- Weapon
+
+function script.AimFromWeapon()
+	return pelvis
+end
+
+function script.QueryWeapon()
+	return pelvis
+end
+
+local function RestoreAfterDelay()
+	Signal( SIG_RESTORE)
+	SetSignalMask( SIG_RESTORE)
+	Sleep( 1000)
+	Turn( aimyaw , y_axis, 0, math.rad(135) )
+	Turn( aimpitch , x_axis, 0, math.rad(85) )
+end
+
+function script.AimWeapon(num, heading, pitch)
+	
+	StartThread(RestoreAfterDelay)
+	Signal( SIG_AIM)
+	SetSignalMask( SIG_AIM)
+	Turn( aimyaw , y_axis, heading, math.rad(360) ) -- left-right
+	Turn( aimpitch , x_axis, -pitch, math.rad(270) ) --up-down
+	WaitForTurn(aimyaw, y_axis)
+	WaitForTurn(aimpitch, x_axis)
+	gunHeading = heading
+	return true
+end
+
+function script.FireWeapon(num)
+	Turn( pole , x_axis, math.rad(90), math.rad(40000))
+	Turn( box , x_axis, -math.rad(50), math.rad(40000))
+	Move( box , y_axis, 15, 300)
+	Sleep(30)
+	Turn( pole , x_axis, math.rad(0), math.rad(80))
+	Turn( box , x_axis, math.rad(0), math.rad(40))
+	Move( box , y_axis, 0, 10)
+end
+
+
+-----------------------------
+-- Death
 
 function script.Killed(recentDamage, maxHealth)
     Explode(box, sfxShatter + sfxSmoke)
