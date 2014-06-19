@@ -1,4 +1,4 @@
-local version = "v1.1"
+local version = "v1.11"
 
 function widget:GetInfo()
   return {
@@ -19,85 +19,112 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1'))
+local defaultCommands = {
+	[CMD.ATTACK] = true,
+	[CMD.AREA_ATTACK] = true,
+	[CMD.FIGHT] = true,
+	[CMD.PATROL] = true,
+	[CMD.GUARD] = true,
+	[CMD.MANUALFIRE] = true,
+	[CMD_REARM] = true,
+	[CMD_FIND_PAD] = true,
+	[CMD.MOVE] = true,
+	[CMD_UNIT_SET_TARGET] = true,
+	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
+	-- [CMD.REMOVE] = true,
+	-- [CMD.INSERT] = true,
+}
 
-function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator.lua by msafwan, and central_build_AI.lua by Troy H. Creek
+local unitsSplitAttackQueue = {nil} --just in case user press SHIFT after doing split attack, we need to remove these queue
+local handledCount = 0
+
+function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator.lua by msafwan, and central_build_AI.lua by Troy H. Creek
+	if not defaultCommands[id] or options.internal then --only process user's command
+		return false
+	end
+	if Spring.GetSelectedUnitsCount() == 0 then --skip whole thing if no selection
+		return false
+	end
+	local units
+	if handledCount > 0 then
+		 --This remove all but 1st attack order from CTRL+Area_attack if user choose to append new order to unit (eg: SHIFT+move),
+		 --this is to be consistent with bomber_command (rearm-able bombers), which only shoot 1st target and move on to next order.
+		 
+		 --Known limitation: not able to remove order if user queued faster than network delay (it need to see unit's current command queue)
+		units = Spring.GetSelectedUnits()
+		local unitID,attackList
+		for i=1,#units do
+			unitID = units[i]
+			attackList = GetAndRemoveHandledHistory(unitID)
+			if attackList and options.shift then
+				RevertAllButOneAttackQueue(unitID,attackList)
+			end
+		end
+	end
+	
 	if (id == CMD.ATTACK or id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], params[4]
-		if (cr == nil) then 
+		if (cr == nil) then --not area command
 			return false 
-		end --skip the whole thing if player use a single-click (widget only accept area-attack)
-		if (cx == nil or cy == nil or cz == nil) then 
+		end
+		if (cx == nil or cy == nil or cz == nil) then --outside of map
 			return false 
-		end --skip whole thing if coordinate was nil (eg: issue command outside of map)
+		end
+		--The following code filter out ground unit from dedicated AA, and
+		--split target among selected unit if user press CTRL+Area_attack
 		local cx2, cy2, cz2 = params[4], params[5], params[6]
-		local units	= Spring.GetSelectedUnits()
-		local antiAirUnits = {}
-		local normalUnits = {}
-		if(units ~= nil) then
-			for i=1, #units,1 do  --catalog AA and non-AA
-				local unitID = units[i]
-				local unitDefID = Spring.GetUnitDefID(unitID)
-				local unitDef_primaryWeapon = UnitDefs[unitDefID].weapons[1]
-				if (unitDef_primaryWeapon~= nil) then
-					local primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
-					local exclusiveAA = (primaryWeapon_target["fixedwing"] and primaryWeapon_target["gunship"]) and 
-										not (primaryWeapon_target["sink"] or primaryWeapon_target["land"] or primaryWeapon_target["sub"])
-					--[[
-					Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
-					for name,content in pairs(UnitDefs[unitDefID].weapons[1].onlyTargets) do
-						Spring.Echo(name)
-						Spring.Echo(content)
-					end
-					--]]
-					if (exclusiveAA) then 
-						antiAirUnits[#antiAirUnits +1]= unitID 
-					else
-						normalUnits[#normalUnits +1]= unitID 
-					end
-				else
-					normalUnits[#normalUnits +1]= unitID
-				end
-			end
-			if #units >= 1 then --skip whole thing if no AA unit was selected (because player dont need widget to do normal attack command).
-				local selectedAlly = Spring.GetUnitAllyTeam(units[1]) -- remember the ID for own ally
-				local targetUnits
-				if cz2 then
-					targetUnits = Spring.GetUnitsInRectangle(math.min(cx,cx2), math.min(cz,cz2), math.max(cx,cx2), math.max(cz,cz2))
-				else
-					targetUnits = Spring.GetUnitsInCylinder(cx, cz, cr)
-				end
-				local airTargets, allTargets = ReturnAllAirTarget(targetUnits, selectedAlly,(#antiAirUnits>1)) -- get all air target for selected area-command
-				if #allTargets>1 then
-					if options.ctrl then
-						--split between AA and ground, and split target between units
-						IssueSplitedCommand(antiAirUnits,airTargets,id,options)
-						IssueSplitedCommand(normalUnits,allTargets,id,options)
-						return true --return true after widget issued a replacement command.
-					else
-						if #antiAirUnits>1 then
-							--split between AA and ground
-							IssueCommand(antiAirUnits,airTargets,id,options)
-							IssueCommand(normalUnits,allTargets,id,options)
-							return true
-						else 
-							-- See http://springrts.com/mantis/view.php?id=4351
-							if reverseCompatibility or id ~= CMD.ATTACK then
-								--let Spring handle
-								return false
-							else
-								IssueCommand(normalUnits,allTargets,id,options)
-								return true
-							end
-						end
-					end
-				end
-			end
+		units = units or Spring.GetSelectedUnits()
+		local targetUnits
+		if cz2 then
+			targetUnits = Spring.GetUnitsInRectangle(math.min(cx,cx2), math.min(cz,cz2), math.max(cx,cx2), math.max(cz,cz2))
+		else
+			targetUnits = Spring.GetUnitsInCylinder(cx, cz, cr)
+		end
+		local antiAirUnits,normalUnits = GetAAUnitList(units)
+		local airTargets, allTargets = ReturnAllAirTarget(targetUnits, Spring.GetUnitAllyTeam(units[1]),(#antiAirUnits>1)) -- get all air target for selected area-command
+		if #allTargets>1 then --skip if no target
+			return ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,id,options)
 		end
 	end
 	return false
 end
+
+function widget:UnitGiven(unitID)
+	GetAndRemoveHandledHistory(unitID)
+end
+
+function widget:UnitDestroyed(unitID)
+	GetAndRemoveHandledHistory(unitID)
+end
 --------------------------------------------------------------------------------
+function GetAndRemoveHandledHistory(unitID)
+	if unitsSplitAttackQueue[unitID] then
+		local attackList = unitsSplitAttackQueue[unitID]
+		unitsSplitAttackQueue[unitID] = nil
+		handledCount = handledCount - 1
+		return attackList
+	end
+	return nil
+end
+
+function RevertAllButOneAttackQueue(unitID,attackList)
+	local queue = Spring.GetUnitCommands(unitID, -1)
+	if queue then
+		local toRemoveCount = 0
+		local queueToRemove = {}
+		for j=1,#queue do
+			command = queue[j]
+			if command.id == CMD.ATTACK and  attackList[command.params[1] ] then
+				if toRemoveCount > 0 then --skip first queue
+					queueToRemove[toRemoveCount] = command.tag
+				end
+				toRemoveCount = toRemoveCount + 1
+			end
+		end
+		Spring.GiveOrderToUnit (unitID,CMD.REMOVE, queueToRemove,{})
+	end
+end
+
 function ReturnAllAirTarget(targetUnits, selectedAlly,checkAir)
 	local filteredTargets = {}
 	local nonFilteredTargets = {}
@@ -124,17 +151,78 @@ function ReturnAllAirTarget(targetUnits, selectedAlly,checkAir)
 	return filteredTargets, nonFilteredTargets
 end
 
+function GetAAUnitList(units)
+	local antiAirUnits = {nil}
+	local normalUnits = {nil}
+	for i=1, #units,1 do  --catalog AA and non-AA
+		local unitID = units[i]
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local unitDef_primaryWeapon = UnitDefs[unitDefID].weapons[1]
+		if (unitDef_primaryWeapon~= nil) then
+			local primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
+			local exclusiveAA = (primaryWeapon_target["fixedwing"] and primaryWeapon_target["gunship"]) and 
+								not (primaryWeapon_target["sink"] or primaryWeapon_target["land"] or primaryWeapon_target["sub"])
+			--[[
+			Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
+			for name,content in pairs(UnitDefs[unitDefID].weapons[1].onlyTargets) do
+				Spring.Echo(name)
+				Spring.Echo(content)
+			end
+			--]]
+			if (exclusiveAA) then 
+				antiAirUnits[#antiAirUnits +1]= unitID 
+			else
+				normalUnits[#normalUnits +1]= unitID 
+			end
+		else
+			normalUnits[#normalUnits +1]= unitID
+		end
+	end
+	return antiAirUnits, normalUnits
+end
+
+function ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,cmdID,options)
+	local isHandled = false
+	if options.ctrl then -- split attacks between units
+		--split between AA and ground,
+		IssueSplitedCommand(antiAirUnits,airTargets,cmdID,options)
+		IssueSplitedCommand(normalUnits,allTargets,cmdID,options)
+		isHandled = true
+	else -- normal queue
+		if #antiAirUnits>1 then
+			--split between AA and ground,
+			IssueCommand(antiAirUnits,airTargets,cmdID,options)
+			IssueCommand(normalUnits,allTargets,cmdID,options)
+			isHandled = true
+		else 
+			isHandled = false --nothing need to be done, let spring handle
+		end
+	end
+	return isHandled
+end
+--------------------------------------------------------------------------------
 function IssueCommand(selectedUnits,allTargets,cmdID,options)
-	if #selectedUnits>=1 and #allTargets>=1 then
-		local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,1)
+	if #allTargets>=1 then
+		local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,1) -- prepare a normal queue (like regular SHIFT)
 		Spring.GiveOrderArrayToUnitArray (selectedUnits, attackCommandListAll)
 	end
 end
 
 function IssueSplitedCommand(selectedUnits,allTargets,cmdID,options)
-	if #selectedUnits>=1 and #allTargets>=1 then
+	if #allTargets>=1 then
+		local targetsUnordered = {}
+		if cmdID==CMD.ATTACK then --in case needed to revert queued attack later if user do SHIFT+Move
+			for i=1,#allTargets do
+				targetsUnordered[allTargets[i] ] = true
+			end
+			for i=1, #selectedUnits do
+				unitsSplitAttackQueue[selectedUnits[i] ] = targetsUnordered --note: all units in this loop was refer to same table to avoid duplication
+				handledCount = handledCount + 1
+			end
+		end
 		for i=1, #selectedUnits do
-			local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,i,true)
+			-- local noAttackQueue = queueException[Spring.GetUnitDefID(selectedUnits[i])]
+			local attackCommandListAll = PrepareCommandArray(allTargets, cmdID, options,i,true,noAttackQueue) --prepare a shuffled queue for target splitting
 			Spring.GiveOrderArrayToUnitArray ({selectedUnits[i]}, attackCommandListAll)
 		end
 	end
@@ -164,13 +252,13 @@ function PrepareCommandArray (targetUnits, cmdID, options,indx,shuffle)
 	end
 	local attackCommandList = {}
 	local j = 1
-	attackCommandList[j] = {cmdID,{targetUnits[indx],},{((options.shift and "shift") or nil),}}
+	attackCommandList[j] = {cmdID,{targetUnits[indx],},{"internal",((options.shift and "shift") or nil),}}
 	if cmdID == CMD.ATTACK then
 		for i=1, #targetUnits-1, 1 do
 			j= j + 1
 			indx = indx + stepSkip --stepSkip>1 will shuffle the queue
 			indx = LoopAroundIndex(indx, #targetUnits)
-			attackCommandList[j] = {cmdID,{targetUnits[indx],},{"shift",}}
+			attackCommandList[j] = {cmdID,{targetUnits[indx],},{"shift","internal"}} --every unit get to attack every target
 		end
 	end
 	return attackCommandList
