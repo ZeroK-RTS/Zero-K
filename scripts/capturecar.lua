@@ -32,11 +32,11 @@ local TURRET_SPEED = math.rad(60)
 local TURRET_ACCEL = math.rad(2)
 
 local ANIM_PERIOD = 66
-local PIVOT_MOD = 1--appox. equal to MAX_PIVOT / turnrate
-local MAX_PIVOT = math.rad(15)
-local MIN_PIVOT = math.rad(-15)
+local PIVOT_MOD = 1.6 --appox. equal to MAX_PIVOT / turnrate
+local MAX_PIVOT = math.rad(20)
+local MIN_PIVOT = math.rad(-20)
 local PIVOT_SPEED = math.rad(60)
-local MIN_DIFF = 3
+local MIN_DIFF = math.rad(0.01)
 
 local smokePiece = {base, turret}
 
@@ -60,7 +60,7 @@ local function AnimControl()
 	SetSignalMask(SIG_ANIM)
 	
 	local lastHeading, currHeading, diffHeading, pivotAngle
-	lastHeading = GetUnitValue(COB.HEADING)
+	lastHeading = GetUnitValue(COB.HEADING)*headingToRad
 	while true do
 		tracks = tracks + 1
 		if tracks == 2 then 
@@ -88,17 +88,37 @@ local function AnimControl()
 		Spin( bigwheel , x_axis, WHEEL_SPIN_SPEED_L, WHEEL_SPIN_ACCEL_L )
 		
 		--pivot
-		currHeading = GetUnitValue(COB.HEADING)
-		diffHeading = (currHeading - lastHeading)/15
-		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then diffHeading = 0.01 end	--0.001 to prevent segfaulting perfect alignment
-		--hexadecimal wtf?
-		--if diffHeading > 0x7fff then diffHeading = diffHeading - 0x10000
-		--if diffHeading < -0x8000 then diffHeading = diffHeading + 0x10000
+		currHeading = GetUnitValue(COB.HEADING)*headingToRad
+		diffHeading = (currHeading - lastHeading)
+		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then 
+			diffHeading = MIN_DIFF -- to prevent segfaulting perfect alignment
+		end	
+		
+		-- Fix wrap location
+		if diffHeading > pi then
+			diffHeading = diffHeading - 2*pi
+		end
+		if diffHeading < -pi then
+			diffHeading = diffHeading + 2*pi
+		end
+		
+		-- Bound maximun pivot
 		pivotAngle = diffHeading * PIVOT_MOD
-		if pivotAngle > MAX_PIVOT then pivotAngle = MAX_PIVOT end
-		if pivotAngle < MIN_PIVOT then pivotAngle = MIN_PIVOT end
-		Turn( front , y_axis, pivotAngle, PIVOT_SPEED )
-		Turn( rear , y_axis, (0 - pivotAngle ), PIVOT_SPEED )
+		if pivotAngle > MAX_PIVOT then 
+			pivotAngle = MAX_PIVOT 
+		end
+		if pivotAngle < MIN_PIVOT then 
+			pivotAngle = MIN_PIVOT 
+		end
+		
+		-- Turn slowly for small course corrections
+		if math.abs(diffHeading) < 0.05 then
+			Turn( front , y_axis, pivotAngle, PIVOT_SPEED*0.2 )
+			Turn( rear , y_axis, (0 - pivotAngle ), PIVOT_SPEED*0.2)
+		else
+			Turn( front , y_axis, pivotAngle, PIVOT_SPEED )
+			Turn( rear , y_axis, (0 - pivotAngle ), PIVOT_SPEED)
+		end
 		
 		lastHeading = currHeading
 		Sleep( ANIM_PERIOD)
