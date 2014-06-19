@@ -1,130 +1,118 @@
 include "constants.lua"
 
-local 		base, body, turret, sleeve, barrel, firepoint,
-			rwheel1, rwheel2,
-			lwheel1, lwheel2,
-			lfender1, lfender2, rfender1, rfender2,
-			gs1r, gs2r,
-			gs1l, gs2l
-			=     
-			piece(
-			'base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint',
-			'rwheel1', 'rwheel2',
-			'lwheel1', 'lwheel2',
-			'lfender1', 'lfender2', 'rfender1', 'rfender2',
-			'gs1r', 'gs2r',
-			'gs1l', 'gs2l'
-			);
+local base, body, turret, sleeve, barrel, firepoint,
+	rwheel1, rwheel2,
+	lwheel1, lwheel2,
+	lfender1, lfender2, rfender1, rfender2,
+	gs1r, gs2r,
+	gs1l, gs2l
+= piece(
+	'base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint',
+	'rwheel1', 'rwheel2',
+	'lwheel1', 'lwheel2',
+	'lfender1', 'lfender2', 'rfender1', 'rfender2',
+	'gs1r', 'gs2r',
+	'gs1l', 'gs2l'
+)
 
-local	moving,
-			s1r, s2r,
-			s1l, s2l,
-			xtilt, xtiltv, xtilta, ztilt, ztilta, ztiltv, 
-			ya, yv, yp, runsp, reloading, mainHead, WHEEL_TURN_SPEED
-			
+local moving, runSpin, reloading, mainHead, wheelTurnSpeed
+
 local smokePiece = {turret, body}
 
-xtilt=0
-xtiltv=0
-xtilta=0
-ztilt=0
-ztilta=0
-ztiltv=0;
-
-ya=0;yv=0;yp=0;
-
 -- Signal definitions
-local SIG_AIM1 = 1
+local SIG_AIM = 1
 local ANIM_SPEED = 50
 local RESTORE_DELAY = 2000
 
 local TURRET_TURN_SPEED = 220
 local SLEEVE_TURN_SPEED = 70
 
+local SUSPENSION_BOUND = 6
+local WHEEL_TURN_MULT = 3
+local MAX_PIVOT = math.rad(30)
+
 local spGetGroundHeight = Spring.GetGroundHeight
-local spGetPiecePosition = Spring.GetUnitPiecePosition;
-local spGetUnitVelocity = Spring.GetUnitVelocity;
+local spGetPiecePosition = Spring.GetUnitPiecePosition
+local spGetUnitVelocity = Spring.GetUnitVelocity
+local spGetUnitPosition = Spring.GetUnitPosition
+
+
+local function GetWheelHeight(piece)
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID, piece)
+	local height = spGetGroundHeight(x,z) - y
+	if height < -SUSPENSION_BOUND then
+		height = -SUSPENSION_BOUND
+	end
+	if height > SUSPENSION_BOUND then
+		height = SUSPENSION_BOUND
+	end
+	return height
+end
 
 function Suspension()
-   while true do   
-	   while runsp do
-			local x, y, z;
-			
-			x,y,z = spGetPiecePosition(unitID,gs1r);
-			s1r = spGetGroundHeight(x,z)-y;
-			if s1r < -2 then
-				s1r = -2
-			end
-
-			if s1r > 2 then
-				s1r = 2
-			end
-			x,y,z = spGetPiecePosition(unitID,gs2r);
-			s2r = spGetGroundHeight(x,z)-y;
-			if s2r < -2 then
-				s2r = -2
-			end
-			if s2r > 2 then
-				s2r = 2
-			end
-
-			x,y,z = spGetPiecePosition(unitID,gs2r);
-			s1l = spGetGroundHeight(x,z)-y;
-			if s1l < -2 then
-				s1l = -2
-			end
-			if s1l > 2 then
-				s1l = 2
-			end
-
-			x,y,z = spGetPiecePosition(unitID,gs2l);
-			s2l = spGetGroundHeight(x,z)-y;
-			if s2l < -2 then
-				s2l = -2
-			end
-			if s2l > 2 then
-				s2l = 2
-			end
-
-			xtilta = 0 - (s1r - s2r + s1l - s2l)/58000 + xtiltv/7      
-			xtiltv = xtiltv + xtilta
-			xtilt = xtilt + xtiltv*4
-
-			ztilta = 0 + (s1r - s2r + s1l - s2l)/58000 - ztiltv/7
-			ztiltv = ztiltv + ztilta
-			ztilt = ztilt + ztiltv*4
-
-			ya = (s1r + s2r + s1l + s2l)/100 - yv/25
-			yv = yv + ya
-			yp = yp + yv/10
-
-			--Move( base , y_axis, yp , 9000 )
-			--Turn( base , x_axis, math.rad(xtilt ), math.rad(9000) )
-			--Turn( base , z_axis, math.rad(-(ztilt )), math.rad(9000) )
-
-			Move( rwheel1 , y_axis, s1r , 9000 )
-			Move( rwheel2 , y_axis, s2r , 9000 )
-
-			Move( lwheel1 , y_axis, s1l , 9000 )
-			Move( lwheel2 , y_axis, s2l , 9000 )
-
-			Move( rfender1 , y_axis, s1r , 9000 )
-			Move( rfender2 , y_axis, s2r , 9000 )
-
-			Move( lfender1 , y_axis, s1l , 9000 )
-			Move( lfender2 , y_axis, s2l , 9000 )
-
+	local x, y, z, height
+	local s1r, s2r = 0, 0
+	local s1l, s2l = 0, 0
+	local xtilt, xtiltv, xtilta = 0, 0, 0
+	local ztilt, ztiltv, ztilta = 0, 0, 0
+	local ya, yv, yp = 0, 0, 0
+	local speed = 0
+	local onGround = false
+	
+	while true do   
+		
+		x,y,z = spGetUnitPosition(unitID)
+		height = spGetGroundHeight(x,z)
+		
+		if y - height < 1 then -- If I am on the ground
+		
+			-- Moving check
 			x,y,z = spGetUnitVelocity(unitID)
-			WHEEL_TURN_SPEED = (math.sqrt(x*x+y*y+z*z)*10)
+			speed = math.sqrt(x*x+y*y+z*z)
+			wheelTurnSpeed = speed*WHEEL_TURN_MULT
+		
+			if not moving and speed > 0.06 then
+				runSpin = true
+				moving = true
+			end
 
-			Spin( rwheel1 , x_axis, WHEEL_TURN_SPEED)
-			Spin( rwheel2 , x_axis, WHEEL_TURN_SPEED)
-			Spin( lwheel1 , x_axis, WHEEL_TURN_SPEED)
-			Spin( lwheel2 , x_axis, WHEEL_TURN_SPEED)
+			s1r = GetWheelHeight(gs1r) 
+			s2r = GetWheelHeight(gs2r) 
+			s1l = GetWheelHeight(gs1l) 
+			s2l = GetWheelHeight(gs2l) 
+			
+			xtilta = (s2r + s2l - s1l - s1r)/6000   
+			xtiltv = xtiltv*0.99 + xtilta
+			xtilt = xtilt*0.98 + xtiltv
 
-			Sleep(10)
+			ztilta = (s1r + s2r - s1l - s2l)/10000
+			ztiltv = ztiltv*0.99 + ztilta
+			ztilt = ztilt*0.99 + ztiltv
+
+			ya = (s1r + s2r + s1l + s2l)/1000
+			yv = yv*0.99 + ya
+			yp = yp*0.98 + yv
+
+			Move( base , y_axis, yp, 9000 )
+			Turn( base , x_axis, xtilt, math.rad(9000) )
+			Turn( base , z_axis, -ztilt, math.rad(9000) )
+
+			Move( rwheel1, y_axis, s1r, 20)
+			Move( rwheel2, y_axis, s2r, 20)
+			Move( rfender1, y_axis, s1r, 20)
+			Move( rfender2, y_axis, s2r, 20)
+                                        
+			Move( lwheel1, y_axis, s1l, 20)
+			Move( lwheel2, y_axis, s2l, 20)
+			Move( lfender1, y_axis, s1l, 20)
+			Move( lfender2, y_axis, s2l, 20)
+
+			Spin( rwheel1, x_axis, wheelTurnSpeed)
+			Spin( rwheel2, x_axis, wheelTurnSpeed)
+			Spin( lwheel1, x_axis, wheelTurnSpeed)
+			Spin( lwheel2, x_axis, wheelTurnSpeed)
 		end
-		Sleep(10)
+		Sleep(50)
    end 
 end
 
@@ -146,21 +134,21 @@ function Roll()
 		StopSpin(lwheel1, x_axis)
 		StopSpin(lwheel2, x_axis)
 	
-		runsp = false
+		runSpin = false
 	end
 end
 
 function script.StartMoving()
 	moving = true
-	runsp = true
+	runSpin = true
 	
 	local x,y,z = spGetUnitVelocity(unitID)
-	WHEEL_TURN_SPEED =  math.sqrt(x*x+y*y+z*z)*10
+	wheelTurnSpeed =  math.sqrt(x*x+y*y+z*z)*10
 	
-	Spin( rwheel1 , x_axis, WHEEL_TURN_SPEED)
-	Spin( rwheel2 , x_axis, WHEEL_TURN_SPEED)
-	Spin( lwheel1 , x_axis, WHEEL_TURN_SPEED)
-	Spin( lwheel2 , x_axis, WHEEL_TURN_SPEED)
+	Spin( rwheel1 , x_axis, wheelTurnSpeed)
+	Spin( rwheel2 , x_axis, wheelTurnSpeed)
+	Spin( lwheel1 , x_axis, wheelTurnSpeed)
+	Spin( lwheel2 , x_axis, wheelTurnSpeed)
 end
 
 -- Weapons
@@ -173,8 +161,8 @@ function script.QueryWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM1)
-	SetSignalMask( SIG_AIM1)
+	Signal( SIG_AIM)
+	SetSignalMask( SIG_AIM)
 	
 	Turn( turret , y_axis, heading, math.rad(TURRET_TURN_SPEED) )
 	Turn( sleeve , x_axis, -pitch, math.rad(SLEEVE_TURN_SPEED) )
@@ -222,5 +210,6 @@ end
 function script.Create()
 	moving = false
 	StartThread(Suspension)
+	
 	StartThread(SmokeUnit, smokePiece)
 end
