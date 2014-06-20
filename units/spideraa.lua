@@ -81,7 +81,7 @@ unitDef = {
 
       damage                  = {
         default = 20,
-        planes  = 200,
+        planes  = 220,
         subs    = 10,
       },
 
@@ -95,7 +95,7 @@ unitDef = {
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
       range                   = 1000,
-      reloadtime              = 2,
+      reloadtime              = 1.9,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
