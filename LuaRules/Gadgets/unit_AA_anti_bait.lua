@@ -52,7 +52,7 @@ local AAescort           = {  -- points of how much each AA unit is worth
 
 ["corvamp"] = 100, 
 ["fighter"] = 80, 
-["corape"] = 100, 
+["gunshipsupport"] = 100, 
 
 ["armjeth"] = 60, 
 ["corcrash"] = 80, 
