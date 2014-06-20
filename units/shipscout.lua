@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipscout]],
   name                   = [[Skeeter]],
-  description            = [[Disarming Patrol Boat (Scout/Raider)]],
+  description            = [[Patrol Boat (Scout/Raider)]],
   acceleration           = 0.0984,
   activateWhenBuilt      = true,
   brakeRate              = 0.0475,
@@ -41,7 +41,7 @@ unitDef = {
   iconType               = [[scoutboat]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 240,
+  maxDamage              = 200,
   maxVelocity            = 5,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -64,7 +64,7 @@ unitDef = {
   
   side                   = [[ARM]],
   sightDistance          = 800,
-  sonarDistance          = 300,
+  sonarDistance          = 500,
   turninplace            = 0,
   turnRate               = 698,
   waterline              = 2,
@@ -129,26 +129,20 @@ unitDef = {
 
 
     MISSILE   = {
-      name                    = [[Pacification Missile]],
+      name                    = [[Light Missile]],
       areaOfEffect            = 8,
 	  --burst					  = 2,
 	  --burstRate				  = 0.4,
-	  cegTag                  = [[disarmtrail]],
+	  cegTag                  = [[missiletrailyellow]],
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 45,
-        planes  = 45,
+        default = 110,
+        planes  = 110,
         subs    = 5,
       },
-	  
-	  customParams        = {
-	    disarmDamageMult = 4,
-		disarmDamageOnly = 0,
-		disarmTimer      = 3.5, -- seconds
-	  },
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,

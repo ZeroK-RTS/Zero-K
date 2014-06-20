@@ -51,6 +51,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[cormist_512.s3o]],
+  script                 = [[cormist.lua]],
   pushResistant          = 0,
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],

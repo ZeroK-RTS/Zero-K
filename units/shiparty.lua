@@ -58,7 +58,7 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 660,
   smoothAnim             = true,
-  sonarDistance          = 350,
+  sonarDistance          = 800,
   turninplace            = 0,
   turnRate               = 350,
   waterline              = 0,
@@ -93,41 +93,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-  turninplace            = 0,
-  turnRate               = 350,
-  waterline              = 0,
-  workerTime             = 0,
-
-  weapons                = {
-
-    {
-      def                = [[PLASMA]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
-    },
-
-
-    {
-      def                = [[DEPTHCHARGE]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
-    },
-
-  },
-
-
-  weaponDefs             = {
-
-    DEPTHCHARGE = {
-      name                    = [[Depth Charge]],
-      areaOfEffect            = 128,
-      avoidFriendly           = false,
-      collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 180,
+        default = 200,
       },
 
       edgeEffectiveness       = 0.4,
@@ -139,7 +105,7 @@ unitDef = {
       model                   = [[depthcharge.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
-      range                   = 260,
+      range                   = 200,
       reloadtime              = 3,
       soundHit                = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torpedo]],

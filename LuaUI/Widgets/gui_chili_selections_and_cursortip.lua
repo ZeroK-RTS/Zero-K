@@ -907,13 +907,24 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 						end
 					else
 						--// deselect a single unit
-						for i = 1,numSelectedUnits do
-							if (selectedUnits[i][2] == squareData.defid) then
-								table.remove(selectedUnits,i)
-								break
+						local removed = false
+						if squareData.unitid then
+							for i = 1, numSelectedUnits do
+								if (selectedUnits[i][1] == squareData.unitid) then
+									table.remove(selectedUnits,i)
+									removed = true
+									break
+								end
 							end
 						end
-						
+						if not removed then
+							for i = 1, numSelectedUnits do
+								if (selectedUnits[i][2] == squareData.defid) then
+									table.remove(selectedUnits,i)
+									break
+								end
+							end
+						end
 					end
 					local selectedIds = {}
 					for i = 1, #selectedUnits do
@@ -927,7 +938,11 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 					if shift then
 						spSelectUnitArray(selectedUnitsByDef[squareData.defid]) -- select all
 					else
-						spSelectUnitArray({ selectedUnitsByDef[squareData.defid][1] })  -- only 1	
+						if squareData.unitid then
+							spSelectUnitArray({squareData.unitid})
+						else						
+							spSelectUnitArray({ selectedUnitsByDef[squareData.defid][1] })  -- only 1	
+						end
 					end
 				else --button2 (middle)
 					local x,y,z = spGetUnitPosition( squareData.unitids[1] )
