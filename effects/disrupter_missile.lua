@@ -1,6 +1,3 @@
--- heatray_ceg
--- heatray_hit
-
 return {
   ["disruptor_missile_hit"] = {
     usedefaultexplosions = false,
@@ -18,7 +15,7 @@ return {
         pos                = 0,
         size               = [[5]],
         sizegrowth         = 3,
-        speed              = 1,
+        speed              = [[1 r2]],
         texture            = [[pinknovaexplo]],
       },
     },
@@ -48,7 +45,7 @@ return {
         pos                = 0,
         size               = [[5]],
         sizegrowth         = -0.05,
-        speed              = 0.1,
+        speed              = [[0.1 r0.2]],
         texture            = [[pinknovaexplo]],
       },
     },
