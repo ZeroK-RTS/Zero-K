@@ -41,7 +41,7 @@ unitDef = {
   iconType               = [[scoutboat]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 240,
+  maxDamage              = 200,
   maxVelocity            = 5,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -64,7 +64,7 @@ unitDef = {
   
   side                   = [[ARM]],
   sightDistance          = 800,
-  sonarDistance          = 300,
+  sonarDistance          = 500,
   turninplace            = 0,
   turnRate               = 698,
   waterline              = 2,
@@ -129,26 +129,20 @@ unitDef = {
 
 
     MISSILE   = {
-      name                    = [[Light Disarm Missile]],
+      name                    = [[Light Missile]],
       areaOfEffect            = 8,
 	  --burst					  = 2,
 	  --burstRate				  = 0.4,
-	  cegTag                  = [[disarmtrail]],
+	  cegTag                  = [[missiletrailyellow]],
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 45,
-        planes  = 45,
+        default = 110,
+        planes  = 110,
         subs    = 5,
       },
-
-	  customParams        = {
-	    disarmDamageMult = 4,
-		disarmDamageOnly = 0,
-		disarmTimer      = 3, -- seconds
-	  },
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
@@ -188,7 +182,7 @@ unitDef = {
       description      = [[Wreckage - Skeeter]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 240,
+      damage           = 250,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -207,7 +201,7 @@ unitDef = {
       description      = [[Debris - Skeeter]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 240,
+      damage           = 250,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,

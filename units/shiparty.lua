@@ -58,7 +58,7 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 660,
   smoothAnim             = true,
-  sonarDistance          = 350,
+  sonarDistance          = 800,
   turninplace            = 0,
   turnRate               = 350,
   waterline              = 0,
@@ -93,10 +93,10 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 180,
+        default = 200,
       },
 
-      edgeEffectiveness       = 0.6,
+      edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDO_HIT_LARGE]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -105,7 +105,7 @@ unitDef = {
       model                   = [[depthcharge.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
-      range                   = 260,
+      range                   = 200,
       reloadtime              = 3,
       soundHit                = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torpedo]],
