@@ -156,7 +156,6 @@ function AutoAttack_Thread()
 			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame} )
 			GG.PokeDecloakUnit(unitID,100)
 			
-			lastWaveFrame = gameFrame
 			EmitSfx( emit,  UNIT_SFX1 )
 			EmitSfx( emit,  DETO_W2 )
 			FireAnim()
@@ -195,7 +194,6 @@ end
 
 function script.FireWeapon(num)
 	if num == 3 then
-		lastWaveFrame = spGetGameFrame()
 		EmitSfx( emit,  UNIT_SFX1 )
 		EmitSfx( emit,  DETO_W2 )
 		FireAnim()

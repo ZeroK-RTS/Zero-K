@@ -34,7 +34,7 @@ function script.BlockShot(num)
 end
 
 function script.FireWeapon(num)
-	Sleep(200)
+	Sleep(400)
 	Reload()
 end
 
