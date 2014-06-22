@@ -21,6 +21,7 @@ local weapons = {
 	slowmort_slowbeam = { slowDamage = 175, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	slowmort_disruptor_beam = { slowDamage = 1500, onlySlow = false, scaleSlow = true},
 	subraider_torpedo = { slowDamage = 500, onlySlow = false, scaleSlow = true},
+	gunshipsupport_vtol_rocket = { slowDamage = 570, onlySlow = false, scaleSlow = true},
 	corfast_slowbeam = { slowDamage = 180, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	corgol_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	cormak_blast = { slowDamage = 75, noDeathBlast = true, scaleSlow = true },

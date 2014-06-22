@@ -919,7 +919,7 @@ local sounds = {
 			[1] = "gunship_select",
 		},
 	},
-	corape = {
+	gunshipsupport = {
 		ok = {
 			[1] = "gunship_move",
 		},
