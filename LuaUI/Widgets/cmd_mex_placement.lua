@@ -573,7 +573,7 @@ function calcMainMexDrawList()
 			
 			glLineWidth(spot.metal*1.5)
 			glColor(mexColor)
-			glDepthTest(true)
+			glDepthTest(false)
 			glDrawGroundCircle(x, 1, z, 40, 32)
 			
 			if options.drawicons.value then
@@ -606,7 +606,7 @@ function calcMainMexDrawList()
 			
 			--glColor(0,1,1)
 			--glRect(x-width/2, z+18, x+width/2, z+20)
-			glDepthTest(false)
+			--glDepthTest(false)
 			glPopMatrix()
 		end
 

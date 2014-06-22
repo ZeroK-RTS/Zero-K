@@ -133,7 +133,7 @@ unitDef = {
       areaOfEffect            = 8,
 	  --burst					  = 2,
 	  --burstRate				  = 0.4,
-	  cegTag                  = [[disarmtrail]],
+	  cegTag                  = [[yellowdisarmtrail]],
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting      = 1,
@@ -150,7 +150,7 @@ unitDef = {
 		disarmTimer      = 3, -- seconds
 	  },
 
-      explosionGenerator      = [[custom:FLASH2]],
+      explosionGenerator      = [[custom:mixed_white_lightning_bomb_small]],
       fireStarter             = 70,
       fixedlauncher           = true,
       flightTime              = 4,
@@ -164,7 +164,7 @@ unitDef = {
       reloadtime              = 2,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
-      soundHit                = [[weapon/missile/rocket_hit]],
+      soundHit                = [[weapon/missile/small_lightning_missile]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startsmoke              = [[1]],
       startVelocity           = 100,
