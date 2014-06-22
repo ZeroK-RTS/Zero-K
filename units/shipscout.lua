@@ -41,7 +41,7 @@ unitDef = {
   iconType               = [[scoutboat]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 200,
+  maxDamage              = 240,
   maxVelocity            = 5,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -64,7 +64,7 @@ unitDef = {
   
   side                   = [[ARM]],
   sightDistance          = 800,
-  sonarDistance          = 500,
+  sonarDistance          = 300,
   turninplace            = 0,
   turnRate               = 698,
   waterline              = 2,
@@ -129,24 +129,26 @@ unitDef = {
 
 
     MISSILE   = {
-      name                    = [[Light Missile]],
+      name                    = [[Light Disarm Missile]],
       areaOfEffect            = 8,
 	  --burst					  = 2,
 	  --burstRate				  = 0.4,
-<<<<<<< HEAD
 	  cegTag                  = [[yellowdisarmtrail]],
-=======
-	  cegTag                  = [[missiletrailyellow]],
->>>>>>> 4cea56c1d347dcbe4856c96ebc71fc90f4532e33
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting      = 1,
 
       damage                  = {
-        default = 110,
-        planes  = 110,
+        default = 45,
+        planes  = 45,
         subs    = 5,
       },
+
+	  customParams        = {
+	    disarmDamageMult = 4,
+		disarmDamageOnly = 0,
+		disarmTimer      = 3, -- seconds
+	  },
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
@@ -186,7 +188,7 @@ unitDef = {
       description      = [[Wreckage - Skeeter]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 250,
+      damage           = 240,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -205,7 +207,7 @@ unitDef = {
       description      = [[Debris - Skeeter]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 250,
+      damage           = 240,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
