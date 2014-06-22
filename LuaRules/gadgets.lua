@@ -194,6 +194,7 @@ local callInLists = {
 	"AllowResourceLevel",
 	"AllowResourceTransfer",
 	"AllowDirectUnitControl",
+	"AllowBuilderHoldFire",
 	"MoveCtrlNotify",
 	"TerraformComplete",
 	"AllowWeaponTargetCheck",
@@ -1285,6 +1286,15 @@ function gadgetHandler:AllowDirectUnitControl(unitID, unitDefID, unitTeam,
     end
   end
   return true
+end
+
+function gadgetHandler:AllowBuilderHoldFire(unitID, unitDefID, action)
+	for _,g in ipairs(self.AllowBuilderHoldFireList) do
+		if (not g:AllowBuilderHoldFire(unitID, unitDefID, action)) then
+			return false
+		end
+	end
+	return true
 end
 
 
