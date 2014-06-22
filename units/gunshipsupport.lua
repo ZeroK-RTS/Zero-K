@@ -1,7 +1,7 @@
 unitDef = {
-  unitname               = [[corape]],
+  unitname               = [[gunshipsupport]],
   name                   = [[Rapier]],
-  description            = [[Multi-Role/AA Gunship]],
+  description            = [[Multi-Role Support Gunship]],
   acceleration           = 0.152,
   amphibious             = true,
   brakeRate              = 0.152,
@@ -31,11 +31,11 @@ unitDef = {
     description_fr = [[ADAV Pilleur]],
 	description_de = [[Skirmisher/Flugabwehr Hubschrauber]],
 	description_pl = [[Wielozadaniowy statek powietrzny]],
-    helptext       = [[The Rapier is a light combat gunship. Its missiles are accurate and hit air, and it is good against small targets and defending against other raiders.]],
-    helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
-    helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
-	helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
-	helptext_pl    = [[Rapier to lekki statek bojowy, ktorego rakiety sa na tyle celne, ze dobrze radzi sobie z lekkimi, szybkimi jednostkami, a nawet z lotnictwem.]],
+    helptext       = [[The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets.]],
+    --helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
+    --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
+	--helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
+	--helptext_pl    = [[Rapier to lekki statek bojowy, ktorego rakiety sa na tyle celne, ze dobrze radzi sobie z lekkimi, szybkimi jednostkami, a nawet z lotnictwem.]],
 	modelradius    = [[16]],
   },
 
@@ -54,7 +54,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[rapier.s3o]],
-  script                 = [[corape.lua]],
+  script                 = [[gunshipsupport.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -85,11 +85,11 @@ unitDef = {
   weaponDefs             = {
 
     VTOL_ROCKET = {
-      name                    = [[Light Homing Missiles]],
+      name                    = [[Disruptor Missiles]],
       areaOfEffect            = 16,
       avoidFeature            = false,
       burnblow                = true,
-      cegTag                  = [[missiletrailyellow]],
+      cegTag                  = [[missiletrailpurple]],
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
@@ -99,7 +99,7 @@ unitDef = {
         subs    = 9.5,
       },
 
-      explosionGenerator      = [[custom:DEFAULT]],
+      explosionGenerator      = [[custom:disruptor_missile_hit]],
       fireStarter             = 70,
       flightTime              = 2.2,
       impactOnly              = true,
@@ -108,13 +108,13 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_maverick.s3o]],
       range                   = 360,
-      reloadtime              = 4,
+      reloadtime              = 5,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
       soundStart              = [[weapon/missile/rocket_fire]],
       soundTrigger            = true,
       startVelocity           = 250,
-      texture2                = [[lightsmoketrail]],
+      texture2                = [[purpletrail]],
       tolerance               = 32767,
       tracks                  = true,
       turnRate                = 60000,
@@ -168,4 +168,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corape = unitDef })
+return lowerkeys({ gunshipsupport = unitDef })

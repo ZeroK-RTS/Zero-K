@@ -62,7 +62,7 @@ unitDef = {
   trackStretch        = 0.8,
   trackType           = [[ComTrack]],
   trackWidth          = 14,
-  turnRate            = 1500,
+  turnRate            = 2400,
   upright             = true,
   workerTime          = 0,
 
@@ -103,7 +103,7 @@ unitDef = {
 	  laserFlareSize          = 4.33,
 	  minIntensity            = 1,
 	  noSelfDamage            = true,
-	  range                   = 410,
+	  range                   = 420,
 	  reloadtime              = 10,
 	  rgbColor                = [[0.3 0 0.4]],
 	  soundStart              = [[weapon/laser/heavy_laser5]],
