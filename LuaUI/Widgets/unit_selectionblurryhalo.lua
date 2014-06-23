@@ -267,7 +267,7 @@ local function DrawHaloFunc()
 	glColor(selectColor)
 	for i=1,#visibleSelected do
 		local unitID = visibleSelected[i]
-		gl.Unit(unitID,true,-1)
+		glUnit(unitID,true,-1)
 	end
     
 	if not options.useteamcolors.value then glColor(allySelectColor) end
