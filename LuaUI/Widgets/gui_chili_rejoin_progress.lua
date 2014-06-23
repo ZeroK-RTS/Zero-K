@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.132 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.133 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
-    date      = "Oct 10, 2012",
+    date      = "Oct 10, 2012", --June 22, 2014
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -22,6 +22,7 @@ end
 --------------------------------------------------------------------------------
 --Localize Spring function------------------------------------------------------
 local spGetSpectatingState = Spring.GetSpectatingState
+local spGetPlayerInfo = Spring.GetPlayerInfo 
 --------------------------------------------------------------------------------
 --Chili Variable----------------------------------------------------------------- ref: gui_chili_vote.lua by KingRaptor
 local Chili
@@ -80,7 +81,7 @@ local function ActivateGUI_n_TTS (frameDistanceToFinish, ui_active, ttsControlEn
 			screen0:AddChild(window)
 			ui_active = true
 			if ttsControlEnabled then
-				Spring.Echo(Spring.GetPlayerInfo(myPlayerID_G) .. " DISABLE TTS") --eg: output "<playerName> DISABLE TTS"
+				Spring.Echo(spGetPlayerInfo(myPlayerID_G) .. " DISABLE TTS") --eg: output "<playerName> DISABLE TTS"
 			end
 		end
 	elseif frameDistanceToFinish < (altThreshold or 120) then
@@ -88,8 +89,8 @@ local function ActivateGUI_n_TTS (frameDistanceToFinish, ui_active, ttsControlEn
 			screen0:RemoveChild(window)
 			ui_active = false
 			if ttsControlEnabled then
-				Spring.Echo(Spring.GetPlayerInfo(myPlayerID_G) .. " ENABLE TTS")
-			end		
+				Spring.Echo(spGetPlayerInfo(myPlayerID_G) .. " ENABLE TTS")
+			end
 		end
 	end
 	return ui_active
@@ -121,8 +122,10 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			local oneSecondElapsed = oneSecondElapsed_G
 			local myLastFrameNum = myLastFrameNum_G
 			local serverFrameRate = serverFrameRate_G
-			local myGameFrame = myGameFrame_G		
+			local myGameFrame = myGameFrame_G
 			local simpleMovingAverageLocalSpeed = simpleMovingAverageLocalSpeed_G
+			local myPlayerID = myPlayerID_G
+			local ui_active = ui_active_G
 			-----localize
 			
 			local serverFrameNum = serverFrameNum1 or serverFrameNum2 --use FrameNum from GameProgress if available, else use FrameNum derived from LUA_msg.
@@ -154,7 +157,12 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			
 			if serverFrameNum1 then serverFrameNum1 = serverFrameNum --update serverFrameNum1 if value from GameProgress() is used,
 			else serverFrameNum2 = serverFrameNum end --update serverFrameNum2 if value from LuaRecvMsg() is used.
+			
+			if timeToComplete <= 0.5 then --have fast-forwarded to targeted frame.  
+				ui_active = ActivateGUI_n_TTS (0, true, CheckTTSwidget()) --close catchup bar.
+			end
 			-----return
+			ui_active_G = ui_active
 			serverFrameNum1_G = serverFrameNum1
 			serverFrameNum2_G = serverFrameNum2
 			oneSecondElapsed_G = oneSecondElapsed
