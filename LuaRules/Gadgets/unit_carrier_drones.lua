@@ -37,6 +37,7 @@ local DEFAULT_UPDATE_ORDER_FREQUENCY = 40 -- gameframes
 local DEFAULT_MAX_DRONE_RANGE = 1500
 
 local BUILD_UPDATE_INTERVAL = 15 --gameframe
+local DRONE_COLVOL_BUILD_OFFSET = 25 --elmo from carrier where drone's colvol will appear (model will still appear specified emit point. A config is a TODO)
 
 local carrierList = {}
 local droneList = {}
@@ -135,7 +136,7 @@ function AddUnitToEmptyPad(carrierID,carrierDefID,droneName, setNum)
 				droneList[unitIDAdded].defaultRadius = Spring.GetUnitRadius(unitIDAdded)
 				
 				--Move collision volume away from carrier to avoid collision
-				Spring.SetUnitMidAndAimPos(unitIDAdded,0,20,0,0,20,0,true) --offset whole colvol & aim point (red dot) above the carrier (use /debugcolvol to check)
+				Spring.SetUnitMidAndAimPos(unitIDAdded,0,DRONE_COLVOL_BUILD_OFFSET,0,0,DRONE_COLVOL_BUILD_OFFSET,0,true) --offset whole colvol & aim point (red dot) above the carrier (use /debugcolvol to check)
 				Spring.SetUnitRadiusAndHeight(unitIDAdded,10,nil)
 				break;
 			end
@@ -170,6 +171,38 @@ function UpdateCoroutines()
 	end 
 end
 
+local function GetPitchYawRoll(unitID) --This allow compatibility with Spring 91
+	--NOTE:
+	--angle measurement and direction setting is based on right-hand coordinate system, but Spring might rely on left-hand coordinate system.
+	--So, input for math.sin, math.cos and math.atan2 might be swapped with respect to the usual whenever convenient.
+
+	local front, top, right = Spring.GetUnitVectors(unitID)
+	--1) Processing FRONT's vector to get Pitch and Yaw
+	local x,y,z = front[1], front[2],front[3]
+	local xz = math.sqrt(x*x + z*z) --hypothenus
+	local yaw = math.atan2 (x/xz, z/xz) --So facing south is 0-degree, and west is negative degree
+	local pitch = math.atan2 (y,xz) --So facing forward is 0-degree, and downward is negative degree
+	
+	--2) Processing TOP's vector to get Roll
+	x,y,z = top[1], top[2],top[3]
+	--rotate coordinate around Y-axis until Yaw value is 0 (a reset) 
+	local newX = x* math.cos (-yaw) + z*  math.sin (-yaw)
+	local newY = y
+	local newZ = z* math.cos (-yaw) - x* math.sin (-yaw)
+	x,y,z = newX,newY,newZ
+	--rotate coordinate around X-axis until Pitch value is 0 (a reset) 
+	newX = x 
+	newY = y* math.cos (-pitch) + z* math.sin (-pitch)
+	newZ = z* math.cos (-pitch) - y* math.sin (-pitch)
+	x,y,z = newX,newY,newZ
+	local roll =  math.atan2 (x, y) --So lifting right wing is positive degree, and lowering right wing is negative degree
+	
+	-- Spring.Echo("Pitch:" .. pitch*180/math.pi)
+	-- Spring.Echo("Yaw:" .. yaw*180/math.pi)
+	-- Spring.Echo("Roll:" .. roll*180/math.pi)
+	return pitch, yaw, roll
+end
+
 local HEADING_TO_RAD = (math.pi*2/2^16)
 local RAD_TO_HEADING = 1/HEADING_TO_RAD
 local PI = math.pi
@@ -194,7 +227,7 @@ function SitOnPad(unitID,carrierID, padPieceID,rotation)
 	Spring.SetUnitHealth(unitID,{ build = 0 })
 	
 	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(carrierID, padPieceID)
-	local ury = rotation*PI/180
+	-- local ury = rotation*PI/180
 	
 	mcEnable(unitID)
 	Spring.SetUnitLeaveTracks(unitID, false)
@@ -208,12 +241,14 @@ function SitOnPad(unitID,carrierID, padPieceID,rotation)
 	
 	local function SitLoop()
 		local previousDir,currentDir
+		local pitch,yaw,roll
 		local px, py, pz, dx, dy, dz,vx,vy,vz
-		local magnitude, newPadHeading
+		-- local magnitude, newPadHeading
 		local landDuration = 0
 		local buildProgress,health
-		local build_step = carrierList[carrierID].droneSets[(droneList[unitID].set)].buildStep
-		local build_step_health = carrierList[carrierID].droneSets[(droneList[unitID].set)].buildStepHealth
+		local droneInfo = carrierList[carrierID].droneSets[(droneList[unitID].set)]
+		local build_step = droneInfo.buildStep
+		local build_step_health = droneInfo.buildStepHealth
 		while true do
 			if (not carrierList[carrierID]) or (not droneList[unitID]) then
 				if Spring.ValidUnitID(unitID) then
@@ -228,20 +263,22 @@ function SitOnPad(unitID,carrierID, padPieceID,rotation)
 			vx,vy,vz = Spring.GetUnitVelocity(carrierID)
 			px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(carrierID, padPieceID)
 			currentDir = dx + dy*100 + dz* 10000
-			if previousDir ~= currentDir then
+			if previousDir ~= currentDir then --refresh pitch/yaw/roll calculation when unit had slight turning
 				previousDir = currentDir
-				magnitude = math.sqrt(dx^2+dy^2+dz^2)
+				pitch,yaw,roll = GetPitchYawRoll(carrierID)
+				-- magnitude = math.sqrt(dx^2+dy^2+dz^2)
 				-- dx = dx/magnitude --todo: some trigonometry for pitch & yaw (not compatible with Spring91). It ensure colvol appear at same relative position
 				-- dy = dy/magnitude
-				dz = dz/magnitude --need to normalize or the output is skewed when unit pitch & yaw
-				newPadHeading = acos(dz)
-				if dx < 0 then
-					newPadHeading = 2*PI-newPadHeading
-				end
+				-- dz = dz/magnitude --need to normalize or the output is skewed when unit pitch & yaw
+				-- newPadHeading = acos(dz)
+				-- if dx < 0 then
+					-- newPadHeading = 2*PI-newPadHeading --for level unit only!
+				-- end
 			end
 			mcSetVelocity(unitID,vx,vy,vz)
 			mcSetPosition(unitID,px+vx, py+vy, pz+vz)
-			mcSetRotation(unitID,0,newPadHeading+ury,0)
+			-- mcSetRotation(unitID,0,newPadHeading+ury,0)
+			mcSetRotation(unitID,-pitch,yaw,-roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw,Pitch & Roll control.
 			
 			landDuration = landDuration + 1
 			if landDuration % BUILD_UPDATE_INTERVAL == 0 then
