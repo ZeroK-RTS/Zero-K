@@ -243,7 +243,7 @@ end
 
 local function GetVisibleUnits()
   local units = spGetVisibleUnits(-1, 30, false)
-    
+
 	local visibleAllySelUnits = {}
     local visibleSelected = {}
     
@@ -255,7 +255,7 @@ local function GetVisibleUnits()
 		    visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
 	    end
     end
-    
+
     return visibleAllySelUnits, visibleSelected
 
 end
@@ -267,7 +267,7 @@ local function DrawHaloFunc()
 	glColor(selectColor)
 	for i=1,#visibleSelected do
 		local unitID = visibleSelected[i]
-		glUnit(unitID,true)
+		glUnit(unitID,true,-1)
 	end
     
 	if not options.useteamcolors.value then glColor(allySelectColor) end
@@ -282,7 +282,7 @@ local function DrawHaloFunc()
 				glColor(allySelectColor)
 			end
 		end
-		glUnit(unitID,true)
+		glUnit(unitID,true,-1)
 	end
     
 	local mx, my = spGetMouseState()
@@ -297,7 +297,7 @@ local function DrawHaloFunc()
 			glColor(enemyHoverColor)
 		end
 		
-		glUnit(data, true)
+		glUnit(data, true,-1)
     elseif (pointedType == 'feature') and ValidFeatureID(data) then
 		glColor(featureHoverColor)
 		glFeature(data, true)
