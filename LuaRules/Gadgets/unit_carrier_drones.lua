@@ -27,10 +27,11 @@ local GiveOrderToUnit   = Spring.GiveOrderToUnit
 local SetUnitPosition   = Spring.SetUnitPosition
 local SetUnitNoSelect   = Spring.SetUnitNoSelect
 local TransferUnit      = Spring.TransferUnit
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local random            = math.random
 local CMD_ATTACK		= CMD.ATTACK
 
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local emptyTable = {}
 
 -- thingsWhichAreDrones is an optimisation for AllowCommand
 local carrierDefs, thingsWhichAreDrones = include "LuaRules/Configs/drone_defs.lua"
@@ -369,22 +370,26 @@ end
 
 local function UpdateCarrierTarget(carrierID)
 	local cQueueC = GetCommandQueue(carrierID, 1)
-	local droneSendDistance = false
+	local droneSendDistance = nil
 	local px,py,pz
+	local target
 	if cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
 		local ox,oy,oz = GetUnitPosition(carrierID)
 		local params = cQueueC[1].params
 		if #params == 1 then
+			target = {params[1]}
 			px,py,pz = GetUnitPosition(params[1])
 		else
 			px,py,pz = cQueueC[1].params[1], cQueueC[1].params[2], cQueueC[1].params[3]
 		end
-		if not px then
-			return
+		if px then
+			droneSendDistance = GetDistance(ox,px,oz,pz)
 		end
 		
-		droneSendDistance = GetDistance(ox,px,oz,pz)
 	end
+	
+	local states = Spring.GetUnitStates(carrierID) or emptyTable
+	local holdfire = states.firestate == 0
 	
 	for i=1,#carrierList[carrierID].droneSets do
 		local set = carrierList[carrierID].droneSets[i]
@@ -393,7 +398,11 @@ local function UpdateCarrierTarget(carrierID)
 			for droneID in pairs(set.drones) do
 				tempCONTAINER = droneList[droneID]
 				droneList[droneID] = nil -- to keep AllowCommand from blocking the order
-				GiveClampedOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,300) - 150)), (py+120), (pz + (random(0,300) - 150))} , {""})
+				if target then
+					GiveOrderToUnit(droneID, CMD.ATTACK, target, 0)
+				else
+					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,300) - 150)), (py+120), (pz + (random(0,300) - 150))} , 0)
+				end
 				--GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 				droneList[droneID] = tempCONTAINER --restore original table
 			end
@@ -412,7 +421,7 @@ local function UpdateCarrierTarget(carrierID)
 					px,py,pz = GetUnitPosition(carrierID)
 					tempCONTAINER = droneList[droneID]
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
+					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 					droneList[droneID] = tempCONTAINER
 				end
