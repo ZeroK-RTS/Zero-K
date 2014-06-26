@@ -407,7 +407,6 @@ local function UpdateCarrierTarget(carrierID)
 				droneList[droneID] = tempCONTAINER --restore original table
 			end
 		else
-			local tempCONTAINER
 			for droneID in pairs(set.drones) do
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
@@ -419,11 +418,12 @@ local function UpdateCarrierTarget(carrierID)
 				end
 				if not engaged then
 					px,py,pz = GetUnitPosition(carrierID)
-					tempCONTAINER = droneList[droneID]
+					
+					local temp = droneList[droneID]
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
 					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-					droneList[droneID] = tempCONTAINER
+					droneList[droneID] = temp
 				end
 			end
 		end	
