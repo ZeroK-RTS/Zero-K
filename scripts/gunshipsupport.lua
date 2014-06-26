@@ -20,7 +20,6 @@ function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 end
 
-
 function script.Activate()
 	Turn(lWing,z_axis, rad(-25),0.7)
 	Turn(rWing,z_axis, rad(25),0.7)
