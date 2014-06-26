@@ -39,7 +39,6 @@ local DEFAULT_UPDATE_ORDER_FREQUENCY = 40 -- gameframes
 local DEFAULT_MAX_DRONE_RANGE = 1500
 
 local BUILD_UPDATE_INTERVAL = 15 --gameframe
-local DRONE_COLVOL_BUILD_OFFSET = 25 --elmo from carrier where drone's colvol will appear (model will still appear specified emit point. A config is a TODO)
 
 local carrierList = {}
 local droneList = {}
@@ -63,8 +62,10 @@ local function InitCarrier(unitID, unitDefID, teamID)
 		toReturn.pieceIndex = 1
 	end
 	for i=1,#carrierData do
-		toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
-		toReturn.droneSets[i].reload = toReturn.droneSets[i].reloadTime
+		-- toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
+		toReturn.droneSets[i] = {nil}
+		toReturn.droneSets[i].config = carrierData[i] --same as above, but we assign reference to "carrierData[i]" in memory to avoid duplicates, also, we have no plan to change config value.
+		toReturn.droneSets[i].reload = carrierData[i].reloadTime
 		toReturn.droneSets[i].droneCount = 0
 		toReturn.droneSets[i].drones = {}
 		toReturn.droneSets[i].buildCount = 0
@@ -98,7 +99,7 @@ local function NewDrone(unitID, unitDefID, droneName, setNum, droneBuiltExternal
 	local droneID = CreateUnit(droneName,xS,yS,zS,1,carrierList[unitID].teamID, droneBuiltExternally and true,false,nil,unitID)
 	if droneID then
 		local droneSet = carrierEntry.droneSets[setNum]
-		droneSet.reload = carrierDefs[unitDefID][setNum].reloadTime
+		droneSet.reload = droneSet.config.reloadTime
 		droneSet.droneCount = droneSet.droneCount + 1
 		droneSet.drones[droneID] = true
 		
@@ -127,25 +128,32 @@ end
 function AddUnitToEmptyPad(carrierID,droneType)
 	local carrierData = carrierList[carrierID]
 	local unitIDAdded
-	for i=1, #carrierList[carrierID].spawnPieces do
-		local pieceNum = carrierList[carrierID].spawnPieces[i]
-		-- Note: We could do a strict checking of empty space (Spring.GetUnitInBox()) before spawning drone, but that require a loop to check if & when its empty.
-		if not carrierData.occupiedPieces[pieceNum] then
+	local CheckCreateStart = function(pieceNum)
+		if not carrierData.occupiedPieces[pieceNum] then -- Note: We could do a strict checking of empty space here (Spring.GetUnitInBox()) before spawning drone, but that require a loop to check if & when its empty.
 			local carrierDefID = carrierData.unitDefID
-			local droneDefID = carrierDefs[carrierDefID][droneType].drone
+			local droneDefID = carrierData.droneSets[droneType].config.drone
 			unitIDAdded = NewDrone(carrierID, carrierDefID, droneDefID, droneType, true)
 			if unitIDAdded then
-				SitOnPad(unitIDAdded,carrierID,pieceNum,rotation)
-			
+				local offsets = carrierData.droneSets[droneType].config.offsets
+				SitOnPad(unitIDAdded,carrierID,pieceNum,offsets)
 				carrierData.occupiedPieces[pieceNum] = true
-				-- droneList[unitIDAdded].defaultRadius = Spring.GetUnitRadius(unitIDAdded)
-				
-				--Move collision volume away from carrier to avoid collision
-				Spring.SetUnitMidAndAimPos(unitIDAdded,0,DRONE_COLVOL_BUILD_OFFSET,0,0,DRONE_COLVOL_BUILD_OFFSET,0,true) --offset whole colvol & aim point (red dot) above the carrier (use /debugcolvol to check)
-				-- Spring.SetUnitRadiusAndHeight(unitIDAdded,10,nil)
-				break;
+				if carrierData.droneSets[droneType].config.colvolTweaked then --can be used to move collision volume away from carrier to avoid collision
+					Spring.SetUnitMidAndAimPos(unitIDAdded,offsets.colvolMidX,offsets.colvolMidY,offsets.colvolMidZ,offsets.aimX,offsets.aimY,offsets.aimZ,true) --offset whole colvol & aim point (red dot) above the carrier (use /debugcolvol to check)
+				end
+				return true
 			end
 		end
+		return false
+	end
+	if carrierList[carrierID].spawnPieces then --have airpad or emit point
+		for i=1, #carrierList[carrierID].spawnPieces do
+			local pieceNum = carrierList[carrierID].spawnPieces[i]
+			if CheckCreateStart(pieceNum) then
+				break
+			end
+		end
+	else
+		CheckCreateStart(0) --use unit's body
 	end
 	return unitIDAdded
 end
@@ -176,12 +184,11 @@ function UpdateCoroutines()
 	end 
 end
 
-local function GetPitchYawRoll(unitID) --This allow compatibility with Spring 91
+local function GetPitchYawRoll(front, top) --This allow compatibility with Spring 91
 	--NOTE:
 	--angle measurement and direction setting is based on right-hand coordinate system, but Spring might rely on left-hand coordinate system.
 	--So, input for math.sin and math.cos, or positive/negative sign, or math.atan2 might be swapped with respect to the usual whenever convenient.
 
-	local front, top, right = Spring.GetUnitVectors(unitID)
 	--1) Processing FRONT's vector to get Pitch and Yaw
 	local x,y,z = front[1], front[2],front[3]
 	local xz = math.sqrt(x*x + z*z) --hypothenus
@@ -205,6 +212,13 @@ local function GetPitchYawRoll(unitID) --This allow compatibility with Spring 91
 	return pitch, yaw, roll
 end
 
+local function GetOffsetRotated(rx,ry,rz,front,top,right)
+	local offX = front[1]*rz + top[1]*ry - right[1]*rx
+	local offY = front[2]*rz + top[2]*ry - right[2]*rx
+	local offZ = front[3]*rz + top[3]*ry - right[3]*rx
+	return offX,offY,offZ
+end
+
 local HEADING_TO_RAD = (math.pi*2/2^16)
 local RAD_TO_HEADING = 1/HEADING_TO_RAD
 local PI = math.pi
@@ -222,35 +236,41 @@ local mcSetPosition			= Spring.MoveCtrl.SetPosition
 local mcSetRotation			= Spring.MoveCtrl.SetRotation
 local mcDisable				= Spring.MoveCtrl.Disable
 local mcEnable				= Spring.MoveCtrl.Enable
-function SitOnPad(unitID,carrierID, padPieceID)
+function SitOnPad(unitID,carrierID, padPieceID,offsets)
 	-- From unit_refuel_pad_handler.lua (author: GoogleFrog)
 	-- South is 0 radians and increases counter-clockwise
 	
 	Spring.SetUnitHealth(unitID,{ build = 0 })
 	
-	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(carrierID, padPieceID)
+	local GetPlacementPosition = function()
+		if (padPieceID==0) then
+			local _,_,_,mx,my,mz = Spring.GetUnitPosition(carrierID,true)
+			local dx,dy,dz = Spring.GetUnitDirection(carrierID)
+			return mx,my,mz,dx,dy,dz
+		else
+			return Spring.GetUnitPiecePosDir(carrierID, padPieceID)
+		end
+	end
 	
 	mcEnable(unitID)
 	Spring.SetUnitLeaveTracks(unitID, false)
-	
-	Spring.SetUnitVelocity(unitID, 0, 0, 0)
 	mcSetVelocity(unitID, 0, 0, 0)
-	mcSetPosition(unitID,px, py, pz)
+	mcSetPosition(unitID,GetPlacementPosition())
 	
 	-- deactivate unit to cause the lups jets away
 	Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 0)
 	
 	local function SitLoop()
 		local previousDir,currentDir
-		local pitch,yaw,roll
-		local px, py, pz, dx, dy, dz,vx,vy,vz
+		local pitch,yaw,roll,pitch,yaw,roll
+		local px, py, pz, dx, dy, dz,vx,vy,vz, offx,offy,offz
 		-- local magnitude, newPadHeading
 		local landDuration = 0
 		local buildProgress,health
 		local droneType = droneList[unitID].set
 		local droneInfo = carrierList[carrierID].droneSets[droneType]
-		local build_step = droneInfo.buildStep
-		local build_step_health = droneInfo.buildStepHealth
+		local build_step = droneInfo.config.buildStep
+		local build_step_health = droneInfo.config.buildStepHealth
 		while true do
 			if (not carrierList[carrierID]) or (not droneList[unitID]) then
 				if Spring.ValidUnitID(unitID) then
@@ -264,23 +284,16 @@ function SitOnPad(unitID,carrierID, padPieceID)
 			end
 			
 			vx,vy,vz = Spring.GetUnitVelocity(carrierID)
-			px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(carrierID, padPieceID)
+			px, py, pz, dx, dy, dz = GetPlacementPosition()
 			currentDir = dx + dy*100 + dz* 10000
 			if previousDir ~= currentDir then --refresh pitch/yaw/roll calculation when unit had slight turning
 				previousDir = currentDir
-				pitch,yaw,roll = GetPitchYawRoll(carrierID)
-				-- magnitude = math.sqrt(dx^2+dy^2+dz^2)
-				-- dx = dx/magnitude --todo: some trigonometry for pitch & yaw (not compatible with Spring91). It ensure colvol appear at same relative position
-				-- dy = dy/magnitude
-				-- dz = dz/magnitude --need to normalize or the output is skewed when unit pitch & yaw
-				-- newPadHeading = acos(dz)
-				-- if dx < 0 then
-					-- newPadHeading = 2*PI-newPadHeading --for level unit only!
-				-- end
+				front, top, right = Spring.GetUnitVectors(carrierID)
+				pitch,yaw,roll = GetPitchYawRoll(front, top)
+				offx,offy,offz = GetOffsetRotated(offsets[1],offsets[2],offsets[3],front,top,right)
 			end
 			mcSetVelocity(unitID,vx,vy,vz)
-			mcSetPosition(unitID,px+vx, py+vy, pz+vz)
-			-- mcSetRotation(unitID,0,newPadHeading+ury,0)
+			mcSetPosition(unitID,px+vx+offx, py+vy+offy, pz+vz+offz)
 			mcSetRotation(unitID,-pitch,yaw,-roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw,Pitch & Roll control.
 			
 			landDuration = landDuration + 1
@@ -296,15 +309,15 @@ function SitOnPad(unitID,carrierID, padPieceID)
 			Sleep()
 		end
 		droneInfo.buildCount = droneInfo.buildCount - 1
-		carrierList[carrierID].occupiedPieces[padPieceID] = false		
+		carrierList[carrierID].occupiedPieces[padPieceID] = false
 		Spring.SetUnitLeaveTracks(unitID, true)
 		Spring.SetUnitVelocity(unitID, 0, 0, 0)
 		mcDisable(unitID)
 		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available 
 		
-		Spring.SetUnitMidAndAimPos(unitID,0,0,0,0,0,0,true)
-		-- Spring.SetUnitRadiusAndHeight(unitID,droneList[unitID].defaultRadius,nil)
-		
+		if droneInfo.config.colvolTweaked then
+			Spring.SetUnitMidAndAimPos(unitID,0,0,0,0,0,0,true)
+		end
 		
 		-- activate unit and its jets
 		Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
@@ -375,14 +388,17 @@ local function UpdateCarrierTarget(carrierID)
 	
 	for i=1,#carrierList[carrierID].droneSets do
 		local set = carrierList[carrierID].droneSets[i]
-		if droneSendDistance and droneSendDistance < set.range then
+		if droneSendDistance and droneSendDistance < set.config.range then
+			local tempCONTAINER --temporarily keep table when "droneList[]" is emptied and restored.
 			for droneID in pairs(set.drones) do
-				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
+				tempCONTAINER = droneList[droneID]
+				droneList[droneID] = nil -- to keep AllowCommand from blocking the order
 				GiveClampedOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0,300) - 150)), (py+120), (pz + (random(0,300) - 150))} , {""})
 				--GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-				droneList[droneID] = {carrier = carrierID, set = i}
+				droneList[droneID] = tempCONTAINER --restore original table
 			end
 		else
+			local tempCONTAINER
 			for droneID in pairs(set.drones) do
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
@@ -394,10 +410,11 @@ local function UpdateCarrierTarget(carrierID)
 				end
 				if not engaged then
 					px,py,pz = GetUnitPosition(carrierID)
+					tempCONTAINER = droneList[droneID]
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
 					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {px + random(-100,100), (py+120), pz + random(-100,100)} , 0)
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-					droneList[droneID] = {carrier = carrierID, set = i}
+					droneList[droneID] = tempCONTAINER
 				end
 			end
 		end	
@@ -467,25 +484,24 @@ function gadget:GameFrame(n)
 		for carrierID, carrier in pairs(carrierList) do
 			if (not GetUnitIsStunned(carrierID)) then
 				for i=1,#carrier.droneSets do
-					local carrierDef = carrierDefs[carrier.unitDefID][i]
 					local set = carrier.droneSets[i]
 					if (set.reload > 0) then
 						local reloadMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
 						set.reload = (set.reload - reloadMult)
 						
-					elseif (set.droneCount < set.maxDrones) and set.buildCount==0 then --not reach max count and finished previous queue
-						for n=1,set.spawnSize do
-							if (set.droneCount >= set.maxDrones) then
+					elseif (set.droneCount < set.config.maxDrones) and set.buildCount==0 then --not reach max count and finished previous queue
+						for n=1,set.config.spawnSize do
+							if (set.droneCount >= set.config.maxDrones) then
 								break
 							end
 							-- Method1: Spawn instantly,
-							-- NewDrone(carrierID, carrier.unitDefID, carrierDef.drone, i )
+							-- NewDrone(carrierID, carrier.unitDefID, set.config.drone, i )
 							
 							-- Method2: Build nanoframe,
 							set.buildCount = n
-							carrier.droneInQueue[ #carrier.droneInQueue+ 1 ] = i
+							carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue+ 1 ] = i
 							if AddUnitToEmptyPad(carrierID, i ) then
-								table.remove(carrier.droneInQueue,1)
+								table.remove(carrierList[carrierID].droneInQueue,1)
 							end
 						end
 					end
@@ -510,13 +526,16 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Initialize()
-	--pre-calculate some buildtime related variable
+	--pre-calculate some buildtime related variable (this will be copied to carrierList[] table when carrier is initialized)
 	local buildUpProgress
 	for name,carrierData in pairs(carrierDefs) do
 		for i=1,#carrierData do
 			buildUpProgress = 1/(carrierData[i].buildTime)*(BUILD_UPDATE_INTERVAL/30) -- derived from: time_to_complete = (1.0/build_step_fraction)*build_interval
 			carrierDefs[name][i].buildStep = buildUpProgress
 			carrierDefs[name][i].buildStepHealth = buildUpProgress*UnitDefs[carrierData[i].drone].health
+			carrierDefs[name][i].colvolTweaked = carrierData[i].offsets.colvolMidX~=0 or carrierData[i].offsets.colvolMidY~=0
+											or carrierData[i].offsets.colvolMidZ~=0 or carrierData[i].offsets.aimX~=0
+											or carrierData[i].offsets.aimY~=0 or carrierData[i].offsets.aimZ~=0 
 		end
 	end
 
