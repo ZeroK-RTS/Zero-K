@@ -160,6 +160,7 @@ function gadget:Initialize()
 	
 	SetMexGameRulesParams(metalSpots)
 
+	_G.metalSpots = metalSpots
 	GG.metalSpots = metalSpots
 	GG.metalSpotsByPos = metalSpotsByPos
 	
@@ -455,6 +456,28 @@ function GetValidStrips(spot)
 	
 	spot.validLeft = validLeft
 	spot.validRight = validRight
+end
+
+--------------------------------------------------------------------------------
+else  -- UNSYNCED
+--------------------------------------------------------------------------------
+
+function gadget:GameStart()
+	Spring.Utilities = Spring.Utilities or {}
+	VFS.Include("LuaRules/Utilities/json.lua");
+
+	local teamlist = Spring.GetTeamList();
+	local localPlayer = Spring.GetLocalPlayerID();
+	local mexes = 'METAL_SPOTS:'..Spring.Utilities.json.encode(SYNCED.metalSpots);
+	for _, teamID in pairs(teamlist) do
+		local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			local aiid, ainame, aihost = Spring.GetAIInfo(teamID);
+			if (aihost == localPlayer) then
+				Spring.SendSkirmishAIMessage(teamID, mexes);
+			end
+		end
+	end
 end
 
 end

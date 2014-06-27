@@ -57,6 +57,8 @@ local spotData = {}
 local metalSpots = {}
 local metalSpotsByPos = {}
 
+local MEX_DISTANCE = 50
+
 --------------------------------------------------------------------------------
 -- Command Handling
 --------------------------------------------------------------------------------
@@ -75,8 +77,23 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID == -mexDefID or (cmdID == CMD.INSERT and cmdParams and cmdParams[2] == -mexDefID)) and metalSpots then
 		local x = cmdParams[1]
 		local z = cmdParams[3]
-		--Spring.MarkerAddPoint(x,0,z,x .. ", " .. z)
-		return x and z and metalSpotsByPos[x] and metalSpotsByPos[x][z]
+		if x and z then
+			if metalSpotsByPos[x] and metalSpotsByPos[x][z] then
+				return true
+			else
+				local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+				if not isAI then 
+					return false;
+				else
+					local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
+					if spotData[spotindex] == nil and dist < MEX_DISTANCE then
+						return true
+					else
+						return false
+					end
+				end
+			end
+		end
 	end
 	return true
 end
@@ -113,8 +130,11 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 				--GG.UnitEcho(unitID,spotID)
 			else
 		        local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
-				if spotData[spotindex] == nil and dist < 50 then
-				    Spring.SetUnitPosition(unitID, nearestspot.x, nearestspot.z)
+				if spotData[spotindex] == nil and dist < MEX_DISTANCE then
+				    local _,_,_,isAI = Spring.GetTeamInfo(unitTeam)
+				    if not isAI then 
+				        Spring.SetUnitPosition(unitID, nearestspot.x, nearestspot.z)
+				    end
 					spotByID[unitID] = spotindex
 					spotData[spotindex] = {unitID = unitID}
 					Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotindex].metal)
