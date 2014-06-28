@@ -77,6 +77,19 @@ local function SetDeploy(wantDeploy)
 	end
 end
 
+function Roll()
+	Sleep(500)
+	if not moving then
+		StopSpin(rwheel1, x_axis)
+		StopSpin(rwheel2, x_axis)
+		StopSpin(rwheel3, x_axis)
+		StopSpin(lwheel1, x_axis)
+		StopSpin(lwheel2, x_axis)
+		StopSpin(lwheel3, x_axis)
+	
+		runSpin = false
+	end
+end
 
 local function AnimControl() 
 	Signal(SIG_ANIM)
@@ -156,10 +169,18 @@ function Suspension()
 			speed = math.sqrt(x*x+y*y+z*z)
 			wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
-			if not moving and speed > 0.06 then
-				runSpin = true
-				moving = true
-				StartThread(SetDeploy,false)
+			if moving then
+				if speed <= 0.07 then
+					StartThread(SetDeploy,true)
+					moving = false
+					StartThread(Roll)
+				end
+			else
+				if speed > 0.07 then
+					runSpin = true
+					moving = true
+					StartThread(SetDeploy,false)
+				end
 			end
 
 			s1r = GetWheelHeight(gs1r)
@@ -202,20 +223,6 @@ function Suspension()
 		end
 		Sleep(ANIM_PERIOD)
    end 
-end
-
-function Roll()
-	Sleep(500)
-	if not moving then
-		StopSpin(rwheel1, x_axis)
-		StopSpin(rwheel2, x_axis)
-		StopSpin(rwheel3, x_axis)
-		StopSpin(lwheel1, x_axis)
-		StopSpin(lwheel2, x_axis)
-		StopSpin(lwheel3, x_axis)
-	
-		runSpin = false
-	end
 end
 
 function script.StopMoving()
