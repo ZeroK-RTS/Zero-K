@@ -19,6 +19,8 @@ local moving, runSpin, wheelTurnSpeed
 
 local deployed = false
 
+local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+
 local gunPieces = {
 	[1] = {firepoint = firepoint1, exhaust = exhaust1},
 	[2] = {firepoint = firepoint2, exhaust = exhaust2}
@@ -187,8 +189,12 @@ function Suspension()
 		
 		if y - height < 1 then -- If I am on the ground
 			
-			x,y,z = spGetUnitVelocity(unitID)
-			speed = math.sqrt(x*x+y*y+z*z)
+			if isNewEngine then
+				speed = select(4,spGetUnitVelocity(unitID))
+			else
+				x,y,z = spGetUnitVelocity(unitID)
+				speed = math.sqrt(x*x+y*y+z*z)
+			end
 			wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
 			if moving then
