@@ -194,10 +194,21 @@ end
 
 local function reload(num)
 	gun[num].loaded = false
-	Sleep(5000)
+	local adjustedDuration = 0
+	while adjustedDuration < 5 do
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		adjustedDuration = adjustedDuration + reloadMult
+		Sleep(1000)
+	end
 	Show(gun[num].missile)
 	Move(gun[num].rack, y_axis, -4, 2)
-	Sleep(5000)
+	while adjustedDuration < 10 do
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		adjustedDuration = adjustedDuration + reloadMult
+		Sleep(1000)
+	end
 	gun[num].loaded = true
 end
 

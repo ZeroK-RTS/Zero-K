@@ -51,7 +51,7 @@ unitDef = {
   maneuverleashlength = [[1280]],
   mass                = 322,
   maxDamage           = 2800,
-  maxVelocity         = 3.8,
+  maxVelocity         = 3.7,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
@@ -79,8 +79,8 @@ unitDef = {
 
     {
       def                = [[EMG]],
-      mainDir            = [[0 -0.3 1]],
-      maxAngleDif        = 100,
+      mainDir            = [[0 -0.32 1]],
+      maxAngleDif        = 140,
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
@@ -126,7 +126,7 @@ unitDef = {
       turret                  = true,
       weaponTimer             = 1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 430,
+      weaponVelocity          = 420,
     },
 
   },
