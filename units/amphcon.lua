@@ -5,8 +5,8 @@ unitDef = {
   acceleration        = 0.4,
   activateWhenBuilt	  = true,
   brakeRate           = 0.25,
-  buildCostEnergy     = 210,
-  buildCostMetal      = 210,
+  buildCostEnergy     = 180,
+  buildCostMetal      = 180,
   buildDistance       = 120,
   builder             = true,
 
@@ -14,7 +14,7 @@ unitDef = {
   },
 
   buildPic            = [[amphcon.png]],
-  buildTime           = 210,
+  buildTime           = 180,
   canAssist           = true,
   canBuild            = true,
   canMove             = true,
@@ -71,10 +71,10 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 84,
+      metal            = 72,
       object           = [[conbot_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 84,
+      reclaimTime      = 72,
     },
 
     HEAP  = {
@@ -84,10 +84,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 42,
+      metal            = 36,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
-      reclaimTime      = 42,
+      reclaimTime      = 36,
     },
 
   },
