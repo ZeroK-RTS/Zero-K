@@ -285,7 +285,7 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, piece="wingtip1"}},
     {class='Ribbon', options={width=1, piece="wingtip2"}},
   },
-  corape = {
+  gunshipsupport = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust1", onActive=true}},
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust2", onActive=true}},
   },

@@ -4,16 +4,16 @@ unitDef = {
   description            = [[Box of Dirt]],
   acceleration           = 0.2,
   brakeRate              = 0.2,
-  buildCostEnergy        = 35,
-  buildCostMetal         = 35,
+  buildCostEnergy        = 30,
+  buildCostMetal         = 30,
   buildPic               = [[corclog.png]],
-  buildTime              = 35,
+  buildTime              = 30,
   canAttack              = false,
   canFight               = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND UNARMED STUPIDTARGET]],
+  category               = [[LAND STUPIDTARGET]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[34 45 27]],
   collisionVolumeType    = [[box]],
@@ -44,14 +44,14 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
-  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
+  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName             = [[clogger.s3o]],
   ovradjust              = [[1]],
   script				 = [[corclog.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
-  sightDistance          = 200,
+  sightDistance          = 300,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -59,6 +59,62 @@ unitDef = {
   trackWidth             = 22,
   turnRate               = 2000,
   upright                = true,
+  
+  weapons             = {
+
+    {
+      def                = [[Headbutt]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
+    },
+
+  },
+  
+  weaponDefs          = {
+
+    Headbutt = {
+      name                    = [[Headbutt]],
+      beamTime                = 0.03,
+	  avoidFeature            = false,
+      avoidFriendly           = false,
+	  avoidGround             = false,
+      canattackground         = true,
+      collideFeature          = false,
+      collideFriendly         = false,
+	  collideGround           = false,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 40,
+        planes  = 40,
+        subs    = 2,
+      },
+
+      explosionGenerator      = [[custom:none]],
+      fireStarter             = 90,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 0,
+      lodDistance             = 10000,
+      noSelfDamage            = true,
+      range                   = 50,
+      reloadtime              = 1.6,
+      rgbColor                = [[1 0.25 0]],
+      soundStart              = [[explosion/ex_small4_2]],
+	  soundStartVolume        = 15,
+      targetborder            = 1,
+      targetMoveError         = 0,
+      thickness               = 0,
+      tolerance               = 1000000,
+      turret                  = true,
+      waterweapon             = true,
+      weaponType              = [[BeamLaser]],
+    },
+
+  },
+
 }
 
 return lowerkeys({ corclog = unitDef })

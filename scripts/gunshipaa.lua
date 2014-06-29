@@ -20,9 +20,9 @@ local isActive = false
 
 local shot = 0
 local gun = {
-	[0] = {query = mmissleflare, missile = rmissile, rack = rrack},
-	[1] = {query = rmissleflare, missile = lmissile, rack = lrack},
-	[2] = {query = lmissleflare, missile = mmissile, rack = mrack},
+	[0] = {query = mmissleflare, missile = rmissile, rack = rrack, loaded = true},
+	[1] = {query = rmissleflare, missile = lmissile, rack = lrack, loaded = true},
+	[2] = {query = lmissleflare, missile = mmissile, rack = mrack, loaded = true},
 }
 
 local function restoreWings()
@@ -120,9 +120,9 @@ local function activate()
 	Move(rhull, z_axis, -2, 1)
 	Move(lhull, z_axis, -2, 1)
 	
-	Move(mrack, y_axis, -2.5, 5)
-	Move(rrack, y_axis, -2.5, 5)
-	Move(lrack, y_axis, -2.5, 5)
+	--Move(mrack, y_axis, -2.5, 5)
+	--Move(rrack, y_axis, -2.5, 5)
+	--Move(lrack, y_axis, -2.5, 5)
 end
 
 local function deactivate()
@@ -135,9 +135,9 @@ local function deactivate()
 	Move(rhull, z_axis, 0, 1)
 	Move(lhull, z_axis, 0, 1)
 	
-	Move(mrack, y_axis, 5, 5)
-	Move(rrack, y_axis, 5, 5)
-	Move(lrack, y_axis, 5, 5)
+	--Move(mrack, y_axis, 5, 5)
+	--Move(rrack, y_axis, 5, 5)
+	--Move(lrack, y_axis, 5, 5)
 end
 
 function script.Activate()
@@ -168,9 +168,9 @@ end
 	Move(rhull, y_axis, -5)
 	Move(lhull, y_axis, -5)
 	
-	Move(mrack, y_axis, 5)
-	Move(rrack, y_axis, 5)
-	Move(lrack, y_axis, 5)
+	Move(mrack, y_axis, -4)
+	Move(rrack, y_axis, -4)
+	Move(lrack, y_axis, -4)
 	
 	Move(mrack, z_axis, -4)
 	Move(rrack, z_axis, -4)
@@ -193,16 +193,32 @@ function script.AimWeapon( num, heading, pitch )
 end
 
 local function reload(num)
-	Sleep(2000)
-	if isActive then
-		Show(gun[num].missile)
-		Move(gun[num].rack, y_axis, -2.5, 5)
+	gun[num].loaded = false
+	local adjustedDuration = 0
+	while adjustedDuration < 5 do
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		adjustedDuration = adjustedDuration + reloadMult
+		Sleep(1000)
 	end
+	Show(gun[num].missile)
+	Move(gun[num].rack, y_axis, -4, 2)
+	while adjustedDuration < 10 do
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		adjustedDuration = adjustedDuration + reloadMult
+		Sleep(1000)
+	end
+	gun[num].loaded = true
+end
+
+function script.BlockShot(num)
+	return not gun[shot].loaded
 end
 
 function script.Shot(num)
 	Hide(gun[shot].missile)
-	Move(gun[shot].rack, y_axis, 5, 5)
+	Move(gun[shot].rack, y_axis, 5, 2)
 	StartThread(reload,shot)
 	shot = (shot + 1)%3
 end

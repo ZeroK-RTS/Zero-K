@@ -95,6 +95,12 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 5,
 
+	  customParams        	  = {
+		isaa = [[1]],
+		script_reload = [[11]],
+		script_burst = [[3]],
+	  },
+
       damage                  = {
         default = 105,
         subs    = 7.5,

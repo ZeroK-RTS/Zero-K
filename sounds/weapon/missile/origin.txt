@@ -33,8 +33,9 @@ missile_fire12.wav
 
 Golgotha:
 missile_fire9.wav
+small_lightning_missile.wav
 
 emp_missile_hit.wav - Nanoblobs & Open LieroX
 vlaunch_emp_hit.wav - Nanoblobs & Open LieroX
 nalpalm_missile_hit.wav - Nanoblobs & Open LieroX
-heavymissile_launch.wav- Nanoblobs & Open LieroX
+heavymissile_launch.wav - Nanoblobs & Open LieroX
