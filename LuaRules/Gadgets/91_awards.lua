@@ -1,6 +1,6 @@
 function gadget:GetInfo()
 	return {
-		name    = "Awards 91",
+		name    = "Awards_91",
 		desc    = "v1.002 Awards players at end of battle with shiny trophies.",
 		author  = "CarRepairer",
 		date    = "2008-10-15", --2013-09-05

@@ -1,5 +1,5 @@
 function gadget:GetInfo() return {
-	name      = "Rezz Hp changer + effect 91",
+	name      = "Rezz Hp changer + effect_91",
 	desc      = "Sets rezzed units to full hp",
 	author    = "Google Frog, modified by Rafal & Meep",
 	date      = "Nov 30, 2008",
