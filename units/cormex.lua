@@ -38,7 +38,6 @@ unitDef = {
 
   energyUse              = 0,
   explodeAs              = [[SMALL_BUILDINGEX]],
-  extractsMetal          = 0.0000001,
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
