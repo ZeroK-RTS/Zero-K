@@ -1418,6 +1418,13 @@ end
 
 local UnitPreDamaged_GadgetMap = {}
 local UnitPreDamaged_first = true
+local allWeaponDefs = {}
+
+do
+	for i=1,#WeaponDefs do
+		allWeaponDefs[#allWeaponDefs+1] = i
+	end
+end
 
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
@@ -1438,7 +1445,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 	
 	if UnitPreDamaged_first then
 		for _,g in ipairs(self.UnitPreDamagedList) do
-			local weaponDefs = g:UnitPreDamaged_GetWantedWeaponDef()
+			local weaponDefs = (g.UnitPreDamaged_GetWantedWeaponDef and g:UnitPreDamaged_GetWantedWeaponDef()) or allWeaponDefs
 			for _,wdid in ipairs(weaponDefs) do
 				if UnitPreDamaged_GadgetMap[wdid] then
 					UnitPreDamaged_GadgetMap[wdid].count = UnitPreDamaged_GadgetMap[wdid].count + 1
