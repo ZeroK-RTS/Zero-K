@@ -885,6 +885,16 @@ local behaviourConfig = {
         skirmLeeway = 50,
 		skirmOrderDis = 200, 
 	},
+	["gunshipaa"] = {
+		skirms = skirmableAir, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+        skirmLeeway = 50,
+		skirmOrderDis = 200, 
+	},
 }
 
 return behaviourConfig, behaviourDefaults
