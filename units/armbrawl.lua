@@ -70,7 +70,7 @@ unitDef = {
   },
 
   side                = [[ARM]],
-  sightDistance       = 550,
+  sightDistance       = 600,
   smoothAnim          = true,
   turnRate            = 792,
   workerTime          = 0,
