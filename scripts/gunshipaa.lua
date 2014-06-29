@@ -194,7 +194,7 @@ end
 
 local function reload(num)
 	gun[num].loaded = false
-	Sleep(6000)
+	Sleep(5000)
 	Show(gun[num].missile)
 	Move(gun[num].rack, y_axis, -4, 2)
 	Sleep(5000)
