@@ -4038,6 +4038,7 @@ function gadget:Initialize()
 	
 	if not GG.metalSpots then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI: Fatal error, map not supported due to metal map.")
+		Spring.SetGameRulesParam("CAI_disabled", 1)
 		gadgetHandler:RemoveGadget()
 	end
 	
@@ -4062,6 +4063,7 @@ function gadget:Initialize()
 			end
 		end
 	else
+		Spring.SetGameRulesParam("CAI_disabled", 1)
 		gadgetHandler:RemoveGadget()
 		return 
 	end
@@ -4078,6 +4080,7 @@ function gadget:Initialize()
 	GG.metalSpots = GG.metalSpots
 	if not GG.metalSpots then
 		Spring.Echo("Mex spot detection failed, AI failed to initalise")
+		Spring.SetGameRulesParam("CAI_disabled", 1)
 		gadgetHandler:RemoveGadget()
 		return 
 	end
@@ -4197,6 +4200,10 @@ function gadget:DrawWorldPreUnit()
 end
 
 function gadget:Initialize()
+	if Spring.GetGameRulesParam("CAI_disabled") == 1 then
+		gadgetHandler:RemoveGadget() 
+		return
+	end
 	heatmapPosition = MakeRealTable(SYNCED.heatmapPosition)
 end
 

@@ -652,6 +652,7 @@ function gadgetHandler:RemoveGadget(gadget)
 
   local name = gadget.ghInfo.name
   self.knownGadgets[name].active = false
+  --Spring.Echo(name)
   if (gadget.Shutdown) then
 	gadget:Shutdown()
   end
@@ -1019,44 +1020,44 @@ function gadgetHandler:RecvFromSynced(...)
 end
 
 
-function gadgetHandler:GotChatMsg(msg, player)
-  if ((player == 0) and Spring.IsCheatingEnabled()) then
-    local sp = '^%s*'    -- start pattern
-    local ep = '%s+(.*)' -- end pattern
-    local s, e, match
-    s, e, match = string.find(msg, sp..'togglegadget'..ep)
-    if (match) then
-      self:ToggleGadget(match)
-      return true
-    end
-    s, e, match = string.find(msg, sp..'enablegadget'..ep)
-    if (match) then
-      self:EnableGadget(match)
-      return true
-    end
-    s, e, match = string.find(msg, sp..'disablegadget'..ep)
-    if (match) then
-      self:DisableGadget(match)
-      return true
-    end
-  end
-
-  if (actionHandler.GotChatMsg(msg, player)) then
-    return true
-  end
-
-  for _,g in ipairs(self.GotChatMsgList) do
-    if (g:GotChatMsg(msg, player)) then
-      return true
-    end
-  end
-
-  if (reverseCompat and IsSyncedCode()) then
-    SendToUnsynced(player, msg)
-  end
-
-  return false
-end
+--function gadgetHandler:GotChatMsg(msg, player)
+--  if ((player == 0) and Spring.IsCheatingEnabled()) then
+--    local sp = '^%s*'    -- start pattern
+--    local ep = '%s+(.*)' -- end pattern
+--    local s, e, match
+--    s, e, match = string.find(msg, sp..'togglegadget'..ep)
+--    if (match) then
+--      self:ToggleGadget(match)
+--      return true
+--    end
+--    s, e, match = string.find(msg, sp..'enablegadget'..ep)
+--    if (match) then
+--      self:EnableGadget(match)
+--      return true
+--    end
+--    s, e, match = string.find(msg, sp..'disablegadget'..ep)
+--	if (match) then
+--      self:DisableGadget(match)
+--      return true
+--    end
+--  end
+--
+--  if (actionHandler.GotChatMsg(msg, player)) then
+--    return true
+--  end
+--
+--  for _,g in ipairs(self.GotChatMsgList) do
+--    if (g:GotChatMsg(msg, player)) then
+--      return true
+--    end
+--  end
+--
+--  if (reverseCompat and IsSyncedCode()) then
+--    SendToUnsynced(player, msg)
+--  end
+--
+--  return false
+--end
 
 
 function gadgetHandler:RecvLuaMsg(msg, player)
@@ -2093,6 +2094,13 @@ end
 --]]
 
 function gadgetHandler:GotChatMsg(msg, player)
+    --local ki = self.knownGadgets[name]
+    --Spring.Echo("Check")
+    --if not IsSyncedCode() then
+	--  for i, v in pairs(self.knownGadgets) do
+	--	Spring.Echo(i .. "  " .. ((v.active and "active") or ""))
+	--  end
+	--end
   if (((player == 0) or (player == 255)) and Spring.IsCheatingEnabled()) then	-- ours
   --if ((player == 0) and Spring.IsCheatingEnabled()) then		-- base
     local sp = '^%s*'    -- start pattern
@@ -2111,7 +2119,7 @@ function gadgetHandler:GotChatMsg(msg, player)
     s, e, match = string.find(msg, sp..'disablegadget'..ep)
     if (match) then
       self:DisableGadget(match)
-      return true
+      return false
     end
   end
 
