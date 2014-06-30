@@ -38,7 +38,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maxDamage              = 650,
+  maxDamage              = 600,
   maxSlope               = 36,
   maxVelocity            = 2.5,
   maxWaterDepth          = 22,
@@ -86,8 +86,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 40,
-        planes  = 40,
+        default = 20,
+        planes  = 20,
         subs    = 2,
       },
 
@@ -100,7 +100,7 @@ unitDef = {
       lodDistance             = 10000,
       noSelfDamage            = true,
       range                   = 50,
-      reloadtime              = 1.6,
+      reloadtime              = 2,
       rgbColor                = [[1 0.25 0]],
       soundStart              = [[explosion/ex_small4_2]],
 	  soundStartVolume        = 25,

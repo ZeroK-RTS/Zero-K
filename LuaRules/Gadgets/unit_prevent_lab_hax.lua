@@ -92,6 +92,7 @@ function checkLabs()
 			  else
 				spSetUnitPosition(id, ux, Lv.maxz, true)
 			  end
+			 
 			
 			--[[
 			if (Lv.face == 1) then
@@ -285,7 +286,8 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 
 		local _,sizeY,_,_,offsetY = Spring.GetUnitCollisionVolumeData(unitID)
 		lab[unitID].miny = uy + offsetY - sizeY/2 --set the box bottom
-		lab[unitID].maxy = uy + offsetY + 20 --set the box height +20 elmo above the factory midpoint
+		lab[unitID].maxy = uy + offsetY + 150 --set the box height +200 elmo above the factory midpoint
+		
 	end
   end
   
