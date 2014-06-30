@@ -167,8 +167,23 @@ function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
 		Signal( SIG_AIM1)
 		SetSignalMask( SIG_AIM1)
-		if pitch < -math.rad(10) then pitch = -math.rad(10)
-		elseif pitch > math.rad(10) then pitch = math.rad(10) end
+		
+		Turn( torso , y_axis, heading, math.rad(360) )	
+		Turn( mainturret, x_axis, -pitch, math.rad(180) )
+		WaitForTurn(torso, y_axis)
+		WaitForTurn(mainturret, x_axis)
+		
+		return true
+	elseif num == 2 then
+	
+		Signal( SIG_AIM2)	
+		SetSignalMask( SIG_AIM2)
+		
+		if pitch < -math.rad(10) then 
+			pitch = -math.rad(10)
+		elseif pitch > math.rad(10) then 
+			pitch = math.rad(10) 
+		end
 		
 		Turn( torso , y_axis, heading, math.rad(360) )
 		Turn( lturret1 , x_axis, -pitch, math.rad(180) )
@@ -177,15 +192,8 @@ function script.AimWeapon(num, heading, pitch)
 		Turn( rturret2 , x_axis, -pitch, math.rad(180) )
 		WaitForTurn(lturret1, x_axis)
 		WaitForTurn(torso, y_axis)
-		StartThread(RestoreAfterDelay)
-		return true
-	elseif num == 2 then
-		Signal( SIG_AIM2)	
-		SetSignalMask( SIG_AIM2)
-		Turn( torso , y_axis, heading, math.rad(360) )	
-		Turn( mainturret, x_axis, -pitch, math.rad(180) )
-		WaitForTurn(torso, y_axis)
-		WaitForTurn(mainturret, x_axis)
+		StartThread(RestoreAfterDelay)	
+		
 		StartThread(RestoreAfterDelay)
 		return true
 	end
@@ -193,10 +201,8 @@ end
 
 function script.FireWeapon(num)
 	if num == 1 then
-		EmitSfx(flares[gun_1], 1024)
+		EmitSfx(flaremain, 1024)
 		EmitSfx(mainturret, 1025)
-		gun_1 = gun_1 + 1
-		if gun_1 > 4 then gun_1 = 1 end
 	elseif num == 2 then
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		if py < -8 then
@@ -207,13 +213,25 @@ function script.FireWeapon(num)
 	end
 end
 
+function script.Shot(num)
+	if num == 2 then
+		gun_1 = gun_1 + 1
+		if gun_1 > 4 then 
+			gun_1 = 1 
+		end
+	end
+end
+
 function script.AimFromWeapon(num)
 	return torso
 end
 
 function script.QueryWeapon(num)
-	if num == 2 then return flaremain
-	else return flares[gun_1] end
+	if num == 2 then 
+		return flares[gun_1] 
+	else 
+		return flaremain
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)

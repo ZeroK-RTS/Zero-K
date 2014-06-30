@@ -25,6 +25,8 @@ unitDef = {
     helptext_fr    = [[Ce lance torpille permet de torpiller les unit?s flottantes ou immerg?es. Attention, le Harpoon est inefficace contre les Hovercraft.]], -- Construisez un sonar afin de d?tecter le plus t?t possible les cibles potentielles du Harpoon. 
 	helptext_de    = [[Dieser Torpedowerfer dient zur Verteidigung gegen Schiffe und U-Boote. Luftkissenfahrzeuge können nicht getroffen werden.]], -- Achte darauf, dass du ein Sonar baust, damit der Torpedowerfer U-Boote lokalisieren kann. 
 	helptext_pl    = [[Torpedy sa w stanie trafic zarowno cele plywajace po powierzchni jak i pod woda, jednak nie moga atakowac poduszkowcow, ktore unosza sie nad powierzchnia.]], -- Pamietaj, ze do atakowania zanurzonych celow potrzebny jest sonar.
+	aimposoffset   = [[0 15 0]],
+	midposoffset   = [[0 15 0]],
   },
 
   explodeAs         = [[MEDIUM_BUILDINGEX]],
@@ -41,7 +43,7 @@ unitDef = {
   noAutoFire        = false,
   noChaseCategory   = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName        = [[torpedo launcher.s3o]],
-  script            = [[cortl.lua]],
+  script            = [[turrettorp.lua]],
   seismicSignature  = 4,
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
   side              = [[CORE]],
