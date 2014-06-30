@@ -100,6 +100,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
+      explosionGenerator      = [[custom:smallxamelimpact]],
       fireStarter             = 20,
       flightTime              = 12,
       impulseBoost            = 0,
@@ -112,7 +113,9 @@ unitDef = {
       reloadtime              = 6,
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
+      soundHitVolume          = 2.5,
       soundStart              = [[weapon/missile/banisher_fire]],
+      soundStartVolume        = 2.5,
       startsmoke              = [[1]],
       startVelocity           = 100,
       tolerance               = 9000,
