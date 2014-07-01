@@ -24,21 +24,22 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
   
 -- Speedups
-local spGetGroundHeight     = Spring.GetGroundHeight
-local spGetUnitBuildFacing  = Spring.GetUnitBuildFacing
-local spGetUnitAllyTeam  = Spring.GetUnitAllyTeam
-local spGetUnitsInBox  = Spring.GetUnitsInBox
-local spSetUnitPosition  = Spring.SetUnitPosition
-local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGetUnitDirection = Spring.GetUnitDirection
-local spGetUnitVelocity = Spring.GetUnitVelocity
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local spGetUnitTeam = Spring.GetUnitTeam
-local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetGroundHeight        = Spring.GetGroundHeight
+local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
+local spGetUnitAllyTeam        = Spring.GetUnitAllyTeam
+local spGetUnitsInBox          = Spring.GetUnitsInBox
+local spSetUnitPosition        = Spring.SetUnitPosition
+local spGetUnitDefID           = Spring.GetUnitDefID
+local spGetUnitPosition        = Spring.GetUnitPosition
+local spGetUnitDirection       = Spring.GetUnitDirection
+local spGetUnitVelocity        = Spring.GetUnitVelocity
+local spGiveOrderToUnit        = Spring.GiveOrderToUnit
+local spGetUnitTeam            = Spring.GetUnitTeam
+local spGetUnitIsStunned       = Spring.GetUnitIsStunned
 local spGetFeaturesInRectangle = Spring.GetFeaturesInRectangle
-local spGetFeaturePosition = Spring.GetFeaturePosition
-local spSetFeaturePosition = Spring.SetFeaturePosition
+local spGetFeaturePosition     = Spring.GetFeaturePosition
+local spSetFeaturePosition     = Spring.SetFeaturePosition
+local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 
 local abs = math.abs
 local min = math.min
@@ -61,21 +62,22 @@ local lab = {}
 --------------------------------------------------------------------------------
 function checkLabs()
   for Lid,Lv in pairs(lab) do  
-    local units = spGetUnitsInBox(Lv.minx, Lv.miny, Lv.minz, Lv.maxx, Lv.maxy, Lv.maxz)
+    local units = spGetUnitsInBox(Lv.minx-8, Lv.miny, Lv.minz-8, Lv.maxx+8, Lv.maxy, Lv.maxz+8)
     local features = spGetFeaturesInRectangle(Lv.minx, Lv.minz, Lv.maxx, Lv.maxz)
 	
     for i=1,#units do
-	  local id = units[i]
-	  local unitDefID = spGetUnitDefID(id)
+	  local unitID = units[i]
+	  local unitDefID = spGetUnitDefID(unitID)
 	  local ud = UnitDefs[unitDefID]
 	  local movetype = Spring.Utilities.getMovetype(ud)
 	  local fly = ud.canFly
-	  local ally = spGetUnitAllyTeam(id)
-	  local team = spGetUnitTeam(id)
-	  if not fly then
+	  local ally = spGetUnitAllyTeam(unitID)
+	  local team = spGetUnitTeam(unitID)
+	  if not fly and spMoveCtrlGetTag(unitID) == nil then
 		if (ally ~= Lv.ally) then --teleport unit away
-			local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(id, true, true)
-			if aimY > -15 then
+			local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(unitID, true, true)
+
+			if aimY > -12 then
 			  local l = abs(ux-Lv.minx)
 			  local r = abs(ux-Lv.maxx)
 			  local t = abs(uz-Lv.minz)
@@ -84,13 +86,13 @@ function checkLabs()
 			  local side = min(l,r,t,b)
 			  
 			  if (side == l) then
-				spSetUnitPosition(id, Lv.minx, uz, true)
+				spSetUnitPosition(unitID, Lv.minx-8, uz, true)
 			  elseif (side == r) then
-				spSetUnitPosition(id, Lv.maxx, uz, true)
+				spSetUnitPosition(unitID, Lv.maxx+8, uz, true)
 			  elseif (side == t) then
-				spSetUnitPosition(id, ux, Lv.minz, true)
+				spSetUnitPosition(unitID, ux, Lv.minz-8, true)
 			  else
-				spSetUnitPosition(id, ux, Lv.maxz, true)
+				spSetUnitPosition(unitID, ux, Lv.maxz+8, true)
 			  end
 			 
 			
@@ -100,39 +102,39 @@ function checkLabs()
 				local r = abs(ux-Lv.maxx)
 				
 				if (l < r) then
-				  spSetUnitPosition(id, Lv.minx, uz, true)
+				  spSetUnitPosition(unitID, Lv.minx, uz, true)
 				else
-				  spSetUnitPosition(id, Lv.maxx, uz, true)
+				  spSetUnitPosition(unitID, Lv.maxx, uz, true)
 				end
 			  else
 				local t = abs(uz-Lv.minz)
 				local b = abs(uz-Lv.maxz)
 				
 				if (t < b) then
-				  spSetUnitPosition(id, ux, Lv.minz, true)
+				  spSetUnitPosition(unitID, ux, Lv.minz, true)
 				else
-				  spSetUnitPosition(id, ux, Lv.maxz, true)
+				  spSetUnitPosition(unitID, ux, Lv.maxz, true)
 				end
 			  end
 			
 			--]]
 			end		
 		elseif (team ~= Lv.team) and movetype then --order unit blocking ally factory to move away (only if it is not a structure)
-			local xVel,_,zVel = spGetUnitVelocity(id)
-			local stunned_or_inbuild = spGetUnitIsStunned(id)
+			local xVel,_,zVel = spGetUnitVelocity(unitID)
+			local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 			if math.abs(xVel)<0.1 and math.abs(zVel)<0.1 and (not stunned_or_inbuild) then
-				local ux, uy, uz  = spGetUnitPosition(id)
-				local dx,_,dz = spGetUnitDirection(id)
+				local ux, uy, uz  = spGetUnitPosition(unitID)
+				local dx,_,dz = spGetUnitDirection(unitID)
 				dx = dx*100
 				dz = dz*100
-				spGiveOrderToUnit(id, CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, ux+dx,uy,uz+dz},{"alt"})
+				spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, ux+dx,uy,uz+dz},{"alt"})
 			end
 		end
 	  end
     end
     for i=1,#features do
-      local id = features[i]
-      local fx, fy, fz = spGetFeaturePosition(id)
+      local featureID = features[i]
+      local fx, fy, fz = spGetFeaturePosition(featureID)
       if fy > Lv.miny and fy < Lv.maxy then
 	local l = abs(fx-Lv.minx)
 	local r = abs(fx-Lv.maxx)
@@ -142,13 +144,13 @@ function checkLabs()
 	local side = min(l,r,t,b)
 	
 	if (side == l) then
-	      spSetFeaturePosition(id, Lv.minx, fy, fz, true)
+	      spSetFeaturePosition(featureID, Lv.minx, fy, fz, true)
 	elseif (side == r) then
-	      spSetFeaturePosition(id, Lv.maxx, fy, fz, true)
+	      spSetFeaturePosition(featureID, Lv.maxx, fy, fz, true)
 	elseif (side == t) then
-	      spSetFeaturePosition(id, fx, fy, Lv.minz, true)
+	      spSetFeaturePosition(featureID, fx, fy, Lv.minz, true)
 	else
-	      spSetFeaturePosition(id, fx, fy, Lv.maxz, true)
+	      spSetFeaturePosition(featureID, fx, fy, Lv.maxz, true)
 	end
       end
     end
@@ -237,7 +239,6 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
   local name = ud.name
   if (ud.isFactory == true) and not (EXCEPTION_LIST[name]) then
 	local ux,_,uz,_, uy, _  = spGetUnitPosition(unitID, true)
-	
 	if uy > -22 then
 		local face = spGetUnitBuildFacing(unitID)
 		local xsize = (ud.xsize)*4

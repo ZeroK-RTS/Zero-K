@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[cornukesub]],
   name                   = [[Leviathan]],
-  description            = [[Tactical Nuke/Anti Nuke Missile Sub, Drains 6.25 m/s, 90 second stockpile]],
+  description            = [[Tactical Nuke Missile Sub, Drains 6.25 m/s, 90 second stockpile]],
   acceleration           = 0.0372,
   activateWhenBuilt      = true,
   brakeRate              = 0.1942,
@@ -52,7 +52,6 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   objectName             = [[CORNUKESUB]],
-  radarDistance          = 1500,
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   side                   = [[CORE]],
@@ -66,11 +65,9 @@ unitDef = {
   workerTime             = 0,
 
   weapons                = {
-
-    {
-      def = [[SUB_AMD_ROCKET]],
-    },
-
+    --{
+    --  def = [[SUB_AMD_ROCKET]],
+    --},
 
     {
       def                = [[TACNUKE]],

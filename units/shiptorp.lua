@@ -79,15 +79,15 @@ unitDef = {
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
+	  burnblow                = 1,
       canAttackGround		  = false,	-- workaround for range hax
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-	  burnblow                = 1,
 
       damage                  = {
-        default = 30,
-        subs    = 30,
+        default = 32,
+        subs    = 32,
       },
 
       edgeEffectiveness       = 0.6,
@@ -105,11 +105,11 @@ unitDef = {
       numbounce               = 4,
       noSelfDamage            = true,
       propeller               = [[1]],
-      range                   = 330,
+      range                   = 340,
       reloadtime              = 0.4,
       renderType              = 1,
       selfprop                = true,
-	  soundHit                = [[explosion/wet/ex_underwater]],
+	  soundHit                = [[TorpedoHitVariable]],
       soundStart              = [[weapon/torp_land]],
       startVelocity           = 120,
       soundStartVolume        = 0.7,

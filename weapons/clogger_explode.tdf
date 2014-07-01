@@ -1,7 +1,7 @@
 [CLOGGER_EXPLODE]
 {
   name=CloggerExplode;
-  areaofeffect=60;
+  areaofeffect=8;
   craterboost=0;
   cratermult=0;
   explosiongenerator=custom:NONE;
@@ -13,6 +13,6 @@
   weaponvelocity=250;
   [DAMAGE]
   {
-    default=50;
+    default = 1;
   }
 }
