@@ -44,7 +44,7 @@ function widget:DrawWorld()
   gl.Blending(GL.SRC_ALPHA, GL.ONE)
 
   local timer = widgetHandler:GetHourTimer()
-  local alpha = 0.25 + (0.75 * math.abs(1 - (timer * 5) % 2))
+  local alpha = 0.25 + (0.75 * math.abs(1 - (timer * 2) % 2))
 
   local myAllyTeam = Spring.GetMyAllyTeamID()
 
