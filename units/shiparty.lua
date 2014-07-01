@@ -149,7 +149,7 @@ unitDef = {
       targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 250,
     },
 
   },
