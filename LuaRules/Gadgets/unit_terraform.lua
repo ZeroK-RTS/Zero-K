@@ -3373,7 +3373,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			for i = 1, #units do
 				local hitUnitID = units[i]
 				if hitUnitID ~= unitID then
-					GG.DetatchFromGround(hitUnitID)
+					GG.AddGadgetImpulseRaw(hitUnitID, 0, 0.3, 0, true, true)
 				end
 			end
 		end

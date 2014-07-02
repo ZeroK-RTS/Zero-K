@@ -24,14 +24,6 @@ local sounds = {
 			[1] = "light_gunship_select",
 		},
 	},
-	cortl = {
-		ok = {
-			[1] = "turret_move",
-		},
-		select = {
-			[1] = "light_turret_select",
-		},
-	},
 	turrettorp = {
 		ok = {
 			[1] = "turret_move",
@@ -919,7 +911,7 @@ local sounds = {
 			[1] = "gunship_select",
 		},
 	},
-	corape = {
+	gunshipsupport = {
 		ok = {
 			[1] = "gunship_move",
 		},

@@ -9,6 +9,51 @@
 -- yellow_lightning_stormbolt
 
 return {
+  ["mixed_white_lightning_bomb_small"] = {
+    usedefaultexplosions = true,
+    groundflash = {
+      circlealpha        = 1,
+      circlegrowth       = 2,
+      flashalpha         = 1.3,
+      flashsize          = 25,
+      ground             = true,
+      water              = true,
+      ttl                = 4,
+      color = {
+        [1]  = 1,
+        [2]  = 0.9,
+        [3]  = 0.65,
+      },
+    },
+    whitebolts = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 3,
+        explosiongenerator = [[custom:WHITE_LIGHTNING_BOMB_BOLTS_SMALL]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+    pikes = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 0.8,
+        alphadecay         = 0.1,
+        color              = [[1,1,1]],
+        dir                = [[-5 r10,-5 r10,-5 r10]],
+        length             = 10,
+        width              = 1.5,
+      },
+    },
+  },
+
   ["white_lightning_bomb"] = {
     whitebolts = {
       air                = true,
@@ -27,6 +72,8 @@ return {
       circlegrowth       = 0,
       flashalpha         = 0.3,
       flashsize          = 32,
+      ground             = true,
+      water              = true,
       ttl                = 12,
       color = {
         [1]  = 1,
@@ -51,6 +98,36 @@ return {
     },
   },
 
+  ["white_lightning_bomb_bolts_small"] = {
+    bluebolts = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.95,
+        colormap           = [[1 1 1 0.01  1 1 1 0.01 0.5 0.5 0.5 0.01  1 1 1 0.01   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 180,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 3,
+        particlelife       = 1.5,
+        particlelifespread = 3,
+        particlesize       = 20,
+        particlesizespread = 0,
+        particlespeed      = 2,
+        particlespeedspread = 0,
+        pos                = [[0, 1.0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[whitelightb]],
+      },
+    },
+  },
+  
   ["white_lightning_bomb_bolts"] = {
     bluebolts = {
       air                = true,

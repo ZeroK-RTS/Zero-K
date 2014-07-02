@@ -91,8 +91,8 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 65,
-        planes  = 650,
+        default = 59,
+        planes  = 590,
         subs    = 32.5,
       },
 

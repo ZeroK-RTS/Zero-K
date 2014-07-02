@@ -23,6 +23,7 @@ local UNIT = 117
 
 local weaponLoseTrackingFrames = {}
 local projectiles = {}
+local projectileAllyTeam = {}
 
 function gadget:Initialize()
 	weaponLoseTrackingFrames[WeaponDefNames["bomberdive_bombsabot"].id] = 14
@@ -34,15 +35,28 @@ function gadget:GameFrame(n)
 		if n == frame then
 			local targetType, targetID = Spring.GetProjectileTarget(proID)
 			if targetType == UNIT then
-				local x,_,z = Spring.GetUnitPosition(targetID)
-				local y = Spring.GetGroundHeight(x,z)
-				Spring.SetProjectileTarget(proID, x, y, z)
+				local allyTeam = projectileAllyTeam[proID]
+				los = Spring.GetUnitLosState(targetID,allyTeam,false)
+				if los and los.los then
+					-- If the unit is visible then target the ground beneath it.
+					local x,_,z = Spring.GetUnitPosition(targetID)
+					local y = Spring.GetGroundHeight(x,z)
+					Spring.SetProjectileTarget(proID, x, y, z)
+				else
+					-- If the unit is not visible we have been homing onto a radar 
+					-- dot. The radar dot position is unknown to lua so target 
+					-- ground beneath the projectile.
+					local x,_,z = Spring.GetProjectilePosition(proID)
+					local y = Spring.GetGroundHeight(x,z)
+					Spring.SetProjectileTarget(proID, x, y, z)
+				end
 			elseif targetType == FEATURE then
 				local x,_,z = Spring.GetFeaturePosition(targetID)
 				local y = Spring.GetGroundHeight(x,z)
 				Spring.SetProjectileTarget(proID, x, y, z)
 			end
 			projectiles[proID] = nil
+			projectileAllyTeam[proID] = nil
 			
 			--local x, _, z = Spring.GetProjectilePosition(proID)
 			
@@ -70,11 +84,15 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if weaponLoseTrackingFrames[weaponID] then
 		local x, y, z = Spring.GetProjectilePosition(proID)
 		projectiles[proID] = Spring.GetGameFrame() + weaponLoseTrackingFrames[weaponID]
+		if proOwnerID then
+			projectileAllyTeam[proID] = Spring.GetUnitAllyTeam(proOwnerID)
+		end
 	end
 end
 
 function gadget:ProjectileDestroyed(proID)
 	if projectiles[proID] then
 		projectiles[proID] = nil
+		projectileAllyTeam[proID] = nil
 	end
 end

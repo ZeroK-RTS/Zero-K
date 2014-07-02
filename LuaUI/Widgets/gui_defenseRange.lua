@@ -67,7 +67,6 @@ modConfig["ZK"]["unitList"] =
 	screamer = { weapons = { 2 } },		--screamer
 	missiletower = { weapons = { 2 } },	--hacksaw
 	corbhmth = { weapons = { 1 } },		--behemoth
-	cortl = { weapons = { 1 } },		--torpedo launcher
 	turrettorp = { weapons = { 1 } },	--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
 	corgrav = { weapons = { 1 } },		--newton
@@ -214,6 +213,10 @@ local spIsSphereInView  	= Spring.IsSphereInView
 local udefTab				= UnitDefs
 local weapTab				= WeaponDefs
 
+
+local spectating = spGetSpectatingState()
+local myPlayerID = Spring.GetLocalPlayerID()
+
 --functions
 local printDebug
 local AddButton
@@ -275,6 +278,24 @@ options = {
 		value = true,
 		OnChange = function() RedoUnitList() end,
 	},
+	specground = {
+		name = 'Show Ground Defence as Spectator', 
+		type = 'bool', 
+		value = false,
+		OnChange = function() RedoUnitList() end,
+	},
+	specair = {
+		name = 'Show Air Defence as Spectator', 
+		type = 'bool', 
+		value = false,
+		OnChange = function() RedoUnitList() end,
+	},
+	specnuke = {
+		name = 'Show Nuke Defence as Spectator', 
+		type = 'bool',
+		value = true,
+		OnChange = function() RedoUnitList() end,
+	},
 }
 
 options_order = {
@@ -284,7 +305,10 @@ options_order = {
 	'allynuke',
 	'enemyground',
 	'enemyair',
-	'enemynuke'
+	'enemynuke',
+	'specground',
+	'specair',
+	'specnuke',
 }
 
 --------------------------------------------------------------------------------
@@ -292,26 +316,38 @@ options_order = {
 
 local function CheckWeaponInclusion(weaponType, isAlly )
 	if ( weaponType == 1 or weaponType == 4 ) then
-		if ( (not isAlly) and options.enemyground.value ) then
-			return true
-		elseif ( isAlly and options.allyground.value ) then
-			return true
+		if spectating then
+			return options.specground.value
+		else
+			if ( (not isAlly) and options.enemyground.value ) then
+				return true
+			elseif ( isAlly and options.allyground.value ) then
+				return true
+			end
 		end
 	end
 
 	if ( weaponType == 2 or weaponType == 4 ) then
-		if ( (not isAlly) and options.enemyair.value ) then
-			return true
-		elseif ( isAlly and options.allyair.value ) then
-			return true
+		if spectating then
+			return options.specair.value
+		else
+			if ( (not isAlly) and options.enemyair.value ) then
+				return true
+			elseif ( isAlly and options.allyair.value ) then
+				return true
+			end
 		end
 	end
 
 	if ( weaponType == 3 ) then
-		if ( (not isAlly) and options.enemynuke.value ) then
-			return true
-		elseif ( isAlly and options.allynuke.value ) then
-			return true
+		if spectating then
+			return options.specnuke.value
+		else
+			if ( (not isAlly) and options.enemynuke.value ) then
+				return true
+			elseif ( isAlly and options.allynuke.value ) then
+				return true
+			end
 		end
 	end
 
@@ -328,34 +364,35 @@ local function BuildVertexList(verts)
 	end
 end
 
+local function CheckAirWithGround(isAlly, wantGround)
+	if spectating then 
+		return options.specair.value and (options.specground.value == wantGround)
+	else
+		if isAlly then
+			return options.allyair.value and (options.allyground.value == wantGround)
+		else
+			return options.enemyair.value and (options.enemyground.value == wantGround)
+		end
+	end
+end
+
 local function CreateDrawList(isAlly, weapons)
 	
 	for i, weapon in pairs(weapons) do
 			
 		color = weapon["color1"]
 		range = weapon["range"]
-		if ( weapon["type"] == 4 ) then
-			if (
-				( ( (not isAlly) and options.enemyair.value ) or ( isAlly and options.allyair.value ) )
-				and
-				( ( (not isAlly) and options.enemyground.value == false ) or ( isAlly and options.allyground.value == false ) )
-				) then
-				-- check if unit is combo unit, get secondary color if so
-				--if air only is selected
-				color = weapon["color2"]
-			end
+		if weapon["type"] == 4 and CheckAirWithGround(isAlly, false) then
+			-- check if unit is combo unit, get secondary color if so
+			--if air only is selected
+			color = weapon["color2"]
 		end
 		printDebug("Drawing range circle.")
 		glColor( color[1], color[2], color[3], lineConfig["alphaValue"])
 		glLineWidth(lineConfig["lineWidth"])
 		glBeginEnd(GL_LINE_STRIP, BuildVertexList, weapon["rangeLines"] )
 		--printDebug( "Drawing defence: range: " .. range .. " Color: " .. color[1] .. "/" .. color[2] .. "/" .. color[3] .. " a:" .. lineConfig["alphaValue"] )
-		if ( ( weapon["type"] == 4 )
-				and
-				( ( (not isAlly) and options.enemyair.value ) or ( isAlly and options.allyair.value ) )
-				and
-				( ( (not isAlly) and options.enemyground.value ) or ( isAlly and options.allyground.value ) )
-		) then
+		if weapon["type"] == 4 and CheckAirWithGround(isAlly, true) then
 			--air and ground: draw 2nd circle
 			printDebug("Drawing second range circle.")
 			glColor( weapon["color2"][1], weapon["color2"][2], weapon["color2"][3], lineConfig["alphaValue"])
@@ -374,6 +411,8 @@ local function UnitDetected( unitID, isAlly )
 		--unit already known
 		return
 	end
+	
+	isAlly = isAlly or spectating
 	
 	local unitDefID = spGetUnitDefID(unitID)
 	
@@ -600,17 +639,6 @@ function ResetGl()
 	glLineWidth( 1.0 )
 end
 
-function CheckSpecState()
-	local spec = spGetSpectatingState()
-
-	if ( spec == true ) then
-		spEcho("<DefenseRange>: Spectator mode. Widget removed.")
-		widgetHandler:RemoveWidget()
-		return false
-	end
-	return true
-end
-
 local function RedrawDrawRanges()
 	for _,def in pairs(defences) do
 		glCallList(def.drawList)
@@ -657,10 +685,6 @@ function widget:Update(dt)
 	-- update timers once every <updateInt> seconds
 	if (time % updateTimes["removeInterval"] == 0 and time ~= updateTimes["remove"] ) then
 		updateTimes["remove"] = time
-		--do update stuff:
-		--if ( CheckSpecState() == false ) then
-		--	return false
-		--end
 
 		--remove dead units
 		for unitID, def in pairs(defences) do
@@ -675,6 +699,16 @@ function widget:Update(dt)
 					needRedraw = needRedraw or REDRAW_TIME
 				end
 			end
+		end
+	end
+end
+
+function widget:PlayerChanged(playerID) 
+	if myPlayerID == playerID then
+		local newSpectating = spGetSpectatingState()
+		if spectating ~= newSpectating then
+			spectating = newSpectating
+			RedoUnitList()
 		end
 	end
 end

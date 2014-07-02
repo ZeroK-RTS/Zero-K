@@ -80,9 +80,9 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 22,
+        default = 20,
         planes  = 220,
-        subs    = 11,
+        subs    = 10,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -95,7 +95,7 @@ unitDef = {
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
       range                   = 1000,
-      reloadtime              = 2,
+      reloadtime              = 1.9,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],

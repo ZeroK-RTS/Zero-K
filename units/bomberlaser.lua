@@ -1,6 +1,6 @@
 unitDef = {
-  unitname            = [[corhurc2]],
-  name                = [[Phoenix]],
+  unitname            = [[bomberlaser]],
+  name                = [[Pheonix with mini-laser]],
   description         = [[Napalm Bomber]],
   amphibious          = true,
   buildCostEnergy     = 360,
@@ -46,7 +46,7 @@ unitDef = {
   idleTime            = 1800,
   mass                = 180,
   maxAcc              = 0.5,
-  maxDamage           = 650,
+  maxDamage           = 700,
   maxAileron          = 0.018,
   maxElevator         = 0.02,
   maxRudder           = 0.008,
@@ -56,7 +56,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[firestorm.s3o]],
-  script			  = [[corhurc2.lua]],
+  script			  = [[bomberlaser.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
@@ -82,11 +82,57 @@ unitDef = {
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
+	
+	{
+      def                = [[LASER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+    },
 
   },
 
 
   weaponDefs          = {
+
+    LASER  = {
+      name                    = [[Light Laser Blaster]],
+      areaOfEffect            = 8,
+      avoidFeature            = false,
+      beamWeapon              = true,
+      collideFriendly         = false,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 1,
+        subs    = 0.1,
+      },
+
+      duration                = 0.02,
+      explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
+      fireStarter             = 50,
+      impactOnly              = true,
+	  heightMod               = 1,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      lineOfSight             = true,
+      noSelfDamage            = true,
+      range                   = 1000,
+      reloadtime              = 0.2,
+      renderType              = 0,
+      rgbColor                = [[1 0 0]],
+      soundHit                = [[weapon/laser/lasercannon_hit]],
+      soundStart              = [[weapon/laser/lasercannon_fire]],
+      soundTrigger            = true,
+      targetMoveError         = 0.15,
+      thickness               = 2.4,
+      tolerance               = 10000,
+      turret                  = true,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 2400,
+    },
+
 
     NAPALM = {
       name                    = [[Napalm Bombs]],
@@ -137,7 +183,7 @@ unitDef = {
       description      = [[Wreckage - Phoenix]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 650,
+      damage           = 660,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -157,7 +203,7 @@ unitDef = {
       description      = [[Debris - Phoenix]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 650,
+      damage           = 660,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
@@ -176,4 +222,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corhurc2 = unitDef })
+return lowerkeys({ bomberlaser = unitDef })

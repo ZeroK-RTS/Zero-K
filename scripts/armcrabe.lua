@@ -1,4 +1,5 @@
 include 'constants.lua'
+include 'reliableStartMoving.lua'
 
 --------------------------------------------------------------------------------
 -- pieces
@@ -51,8 +52,6 @@ local legBackwardAngleMinor = math.rad(10)
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local bMoving = false
-local bCurled = false
 local bCurling = false
 local nocurl = true
 
@@ -148,7 +147,6 @@ local function Curl()
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
 	    
-   	bCurled = true
    	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
 end
@@ -179,7 +177,6 @@ end
 
 local function Uncurl()
 	--Spring.Echo("Initiating uncurl", Spring.GetGameFrame())
-	bCurled = false
 	bCurling = true
 	
 	ResetLegs()
@@ -220,6 +217,24 @@ local function CurlDelay()	--workaround for crabe getting stuck in fac
 	nocurl = false
 end
 
+local function Motion()
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
+	Sleep(30)
+	Uncurl()
+	Walk()
+end
+
+function StartMoving()
+	--Spring.Echo("Moving")
+	StartThread(Motion)
+end
+
+function StopMoving()
+	--Spring.Echo("Stopped moving")
+	StartThread(Curl)
+end
+
 function script.Create()
 	--set ARMORED to false
 	Hide( flare1)
@@ -230,30 +245,12 @@ function script.Create()
 	Hide( flare6)
 	Hide( flare7)
 	
+	StartThread(StartStopMovingControl, StartMoving, StopMoving)
+	
 	--StartThread(MotionControl)
 	StartThread(SmokeUnit, smokePiece)
 	--StartThread(BlinkingLight)
 	StartThread(CurlDelay)
-end
-
-local function Motion()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
-	bMoving = true
-	Sleep(66)
-	Uncurl()
-	Walk()
-end
-
-function script.StartMoving()
-	--Spring.Echo("Moving")
-	StartThread(Motion)
-end
-
-function script.StopMoving()
-	--Spring.Echo("Stopped moving")
-	bMoving = false
-	StartThread(Curl)
 end
 
 local function Rock(anglex, anglez)	

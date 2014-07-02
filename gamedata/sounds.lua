@@ -1,67 +1,72 @@
 -- see http://springrts.com/wiki/Sounds.lua for help
 local Sounds = {
-   SoundItems = {
-      --default = {
-      --pitchMod = 0.04,
-      --}
-      IncomingChat = {
-         --file = "sounds/talk.wav",
-		 file = nil,
-      },
-      --MultiSelect = {
-      --   file = "sounds/button9.wav",
-      --},
-      MapPoint = {
-         file = "sounds/beep4.wav", --"sounds/marker_place.wav",
-         --pitchMod = 0.01,
-         --pitch = 0.8,
-         maxconcurrent = 3,
-      },
---[[
-      MyAwesomeSounds = {
-         file = "sounds/booooom.wav",
-         gain = 2.0, --- for uber-loudness
-         pitch = 0.2, --- bass-test
-         priority = 15, --- very high
-         maxconcurrent = 1, ---only once
-         maxdist = 500, --- only when near
-         preload = true, --- you got it
-         in3d = true,
-         looptime = "1000", --- in miliseconds, can / will be stopped like regular items
- MapEntryValExtract(items, "dopplerscale", dopplerScale);
-  MapEntryValExtract(items, "rolloff", rolloff);
-      },
---]]	  
-	  BladeSwing = {
-			 file = "sounds/weapon/blade/blade_swing.wav",
-			 in3d = true,
-			 pitchMod = 0.2,
-			 gainMod = 0.2,
-	  },
-	  BladeHit = {
-		 file = "sounds/weapon/blade/blade_hit.wav",
-		 in3d = true,
-		 pitchMod = 0.5,
-		 gainMod = 0.2,
-	  },
-      DefaultsForSounds = { -- this are default settings
-         file = "ThisEntryMustBePresent.wav",
-         gain = 1.0,
-         pitch = 1.0,
-         priority = 0,
-         maxconcurrent = 4, --- some reasonable limits
-         maxdist = FLT_MAX, --- no cutoff at all
-      },
-      Sparks = {
-         file = "sounds/sparks.wav",
-         priority = -10,
-         maxconcurrent = 1,
-         maxdist = 1000,
-         preload = false,
-         in3d = true,
-         rolloff = 4,
-      },
-   },
+	SoundItems = {
+		--default = {
+		--pitchMod = 0.04,
+		--}
+		IncomingChat = {
+			--file = "sounds/talk.wav",
+			file = nil,
+		},
+		--MultiSelect = {
+		--   file = "sounds/button9.wav",
+		--},
+		MapPoint = {
+			file = "sounds/beep4.wav", --"sounds/marker_place.wav",
+			--pitchMod = 0.01,
+			--pitch = 0.8,
+			maxconcurrent = 3,
+		},
+		--[[
+		MyAwesomeSounds = {
+			file = "sounds/booooom.wav",
+			gain = 2.0, --- for uber-loudness
+			pitch = 0.2, --- bass-test
+			priority = 15, --- very high
+			maxconcurrent = 1, ---only once
+			maxdist = 500, --- only when near
+			preload = true, --- you got it
+			in3d = true,
+			looptime = "1000", --- in miliseconds, can / will be stopped like regular items
+			MapEntryValExtract(items, "dopplerscale", dopplerScale);
+			MapEntryValExtract(items, "rolloff", rolloff);
+		},
+		--]]	  
+		BladeSwing = {
+			file = "sounds/weapon/blade/blade_swing.wav",
+			in3d = true,
+			pitchMod = 0.2,
+			gainMod = 0.2,
+		},
+		BladeHit = {
+			file = "sounds/weapon/blade/blade_hit.wav",
+			in3d = true,
+			pitchMod = 0.5,
+			gainMod = 0.2,
+		},
+		DefaultsForSounds = { -- this are default settings
+			file = "ThisEntryMustBePresent.wav",
+			gain = 1.0,
+			pitch = 1.0,
+			priority = 0,
+			maxconcurrent = 4, --- some reasonable limits
+			maxdist = FLT_MAX, --- no cutoff at all
+		},
+		Sparks = {
+			file = "sounds/sparks.wav",
+			priority = -10,
+			maxconcurrent = 1,
+			maxdist = 1000,
+			preload = false,
+			in3d = true,
+			rolloff = 4,
+		},
+		TorpedoHitVariable = {
+			file = "sounds/explosion/wet/ex_underwater.wav",
+			pitchMod = 0.1,
+			gainMod = 0.05,
+		},
+	},
 }
 
 --------------------------------------------------------------------------------

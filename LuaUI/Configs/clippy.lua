@@ -103,7 +103,7 @@ local defenseDefs = {
 	"cordoom",
 	"armanni",
 	
-	"cortl",
+	"turrettorp",
 	
 	"armjamt",
 	"corjamt"

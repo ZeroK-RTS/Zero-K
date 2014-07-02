@@ -19,6 +19,8 @@ local moving, runSpin, wheelTurnSpeed
 
 local deployed = false
 
+local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+
 local gunPieces = {
 	[1] = {firepoint = firepoint1, exhaust = exhaust1},
 	[2] = {firepoint = firepoint2, exhaust = exhaust2}
@@ -77,6 +79,19 @@ local function SetDeploy(wantDeploy)
 	end
 end
 
+function Roll()
+	Sleep(500)
+	if not moving then
+		StopSpin(rwheel1, x_axis)
+		StopSpin(rwheel2, x_axis)
+		StopSpin(rwheel3, x_axis)
+		StopSpin(lwheel1, x_axis)
+		StopSpin(lwheel2, x_axis)
+		StopSpin(lwheel3, x_axis)
+	
+		runSpin = false
+	end
+end
 
 local function AnimControl() 
 	Signal(SIG_ANIM)
@@ -135,6 +150,28 @@ local function GetWheelHeight(piece)
 	return height
 end
 
+function StopMoving()
+	StartThread(SetDeploy,true)
+	moving = false
+	StartThread(Roll)
+end
+
+function StartMoving()
+	runSpin = true
+	moving = true
+	StartThread(SetDeploy,false)
+	
+	local x,y,z = spGetUnitVelocity(unitID)
+	wheelTurnSpeed = math.sqrt(x*x+y*y+z*z)*WHEEL_TURN_MULT
+	
+	Spin( rwheel1, x_axis, wheelTurnSpeed)
+	Spin( rwheel2, x_axis, wheelTurnSpeed)
+	Spin( rwheel3, x_axis, wheelTurnSpeed)
+	Spin( lwheel1, x_axis, wheelTurnSpeed)
+	Spin( lwheel2, x_axis, wheelTurnSpeed)
+	Spin( lwheel3, x_axis, wheelTurnSpeed)
+end
+
 function Suspension()
 	local x, y, z, height
 	local s1r, s2r, s3r = 0, 0, 0
@@ -152,14 +189,22 @@ function Suspension()
 		
 		if y - height < 1 then -- If I am on the ground
 			
-			x,y,z = spGetUnitVelocity(unitID)
-			speed = math.sqrt(x*x+y*y+z*z)
+			if isNewEngine then
+				speed = select(4,spGetUnitVelocity(unitID))
+			else
+				x,y,z = spGetUnitVelocity(unitID)
+				speed = math.sqrt(x*x+y*y+z*z)
+			end
 			wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
-			if not moving and speed > 0.06 then
-				runSpin = true
-				moving = true
-				StartThread(SetDeploy,false)
+			if moving then
+				if speed <= 0.05 then
+					StopMoving()
+				end
+			else
+				if speed > 0.05 then
+					StartMoving()
+				end
 			end
 
 			s1r = GetWheelHeight(gs1r)
@@ -202,42 +247,6 @@ function Suspension()
 		end
 		Sleep(ANIM_PERIOD)
    end 
-end
-
-function Roll()
-	Sleep(500)
-	if not moving then
-		StopSpin(rwheel1, x_axis)
-		StopSpin(rwheel2, x_axis)
-		StopSpin(rwheel3, x_axis)
-		StopSpin(lwheel1, x_axis)
-		StopSpin(lwheel2, x_axis)
-		StopSpin(lwheel3, x_axis)
-	
-		runSpin = false
-	end
-end
-
-function script.StopMoving()
-	StartThread(SetDeploy,true)
-	moving = false
-	StartThread(Roll)
-end
-
-function script.StartMoving()
-	runSpin = true
-	moving = true
-	StartThread(SetDeploy,false)
-	
-	local x,y,z = spGetUnitVelocity(unitID)
-	wheelTurnSpeed = math.sqrt(x*x+y*y+z*z)*WHEEL_TURN_MULT
-	
-	Spin( rwheel1, x_axis, wheelTurnSpeed)
-	Spin( rwheel2, x_axis, wheelTurnSpeed)
-	Spin( rwheel3, x_axis, wheelTurnSpeed)
-	Spin( lwheel1, x_axis, wheelTurnSpeed)
-	Spin( lwheel2, x_axis, wheelTurnSpeed)
-	Spin( lwheel3, x_axis, wheelTurnSpeed)
 end
 
 -- Weapons

@@ -17,7 +17,7 @@ unitDef = {
     [[blastwing]],
     [[bladew]],
     [[armkam]],
-    [[corape]],
+    [[gunshipsupport]],
     [[armbrawl]],
     [[blackdawn]],
     [[corcrw]],

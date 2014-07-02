@@ -59,7 +59,7 @@ unitDef = {
   noAutoFire             = false,
   objectName             = [[ARMCARRIER]],
   script                 = [[armcarry.lua]],
-  radarDistance          = 1500,
+  radarDistance          = 1200,
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   showNanoSpray          = false,
@@ -146,7 +146,7 @@ unitDef = {
       name                    = [[Anti-Nuke Missile]],
       areaOfEffect            = 420,
       collideFriendly         = false,
-      coverage                = 1500,
+      coverage                = 1200,
       craterBoost             = 1,
       craterMult              = 2,
 

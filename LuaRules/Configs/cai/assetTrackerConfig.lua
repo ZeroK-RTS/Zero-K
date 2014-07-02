@@ -288,7 +288,7 @@ local air = {
 		"bladew",
 		"blastwing",
 		"armkam",
-		"corape",
+		"gunshipsupport",
 		"blackdawn",
 		"armbrawl",
 		"corcrw",

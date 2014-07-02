@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
   return {
-    name      = "Thrusters 91",
+    name      = "Thrusters_91",
     desc      = "Da red ones go fasta",
     author    = "KingRaptor (L.J. Lim)",
     date      = "2013.06.25",

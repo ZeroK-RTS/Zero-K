@@ -63,8 +63,6 @@ local CMD_REMOVE 		= CMD.REMOVE
 
 include("LuaRules/Configs/customcmds.h.lua")
 
-CMD_MOVE = CMD_RAW_MOVE --Spring 98+ . Dont need version check, SetUnitMoveGoal() work regardless of old or new Spring, except that new Spring will use raw_move feature.
-
 local unitAICmdDesc = {
 	id      = CMD_UNIT_AI,
 	type    = CMDTYPE.ICON_MODE,
@@ -147,7 +145,7 @@ end
 
 local function clearOrder(unitID,data,cQueue)
 	-- removes move order
-	if receivedOrder then --Fixme: this always false (global variable never instantiated), never executed?
+	if data.receivedOrder then
 
 		if (#cQueue >= 1 and cQueue[1].id == CMD_MOVE) then -- if I am moving
 			local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
@@ -155,7 +153,7 @@ local function clearOrder(unitID,data,cQueue)
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 			end
 		end
-		receivedOrder = false
+		data.receivedOrder = false
 	end
 end
 
@@ -419,13 +417,13 @@ local function updateUnits(frame, start, increment)
 			Spring.Echo("stuff")
 		else
 	--]]
-
-	GG.AllowRawMove=true --for Spring 97.-27 and above
+		
 	local index = start
 	local listData = unitList.data
 	while index <= unitList.count do
 		local unitID = listData[index]
-		if not spValidUnitID(unitID) then 
+	
+		if not spValidUnitID(unitID) then
 			listData[index] = listData[unitList.count]
 			listData[unitList.count] = nil
 			unitList.count = unitList.count - 1
@@ -502,7 +500,6 @@ local function updateUnits(frame, start, increment)
 			end
 		end
 	end
-	GG.AllowRawMove=false
 end
 
 function gadget:GameFrame(n)
