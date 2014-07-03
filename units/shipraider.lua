@@ -51,7 +51,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB SINK TURRET]],
   objectName             = [[vette.s3o]],
   scale                  = [[0.5]],
-  script				 = [[shipraider.cob]],
+  script				 = [[shipraider.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
