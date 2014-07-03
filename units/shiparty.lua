@@ -140,7 +140,7 @@ unitDef = {
       interceptedByShieldType = 1,
 	  myGravity               = 0.11,
       noSelfDamage            = true,
-      range                   = 950,
+      range                   = 900,
       reloadtime              = 4,
 	  size                    = 3.8,
       soundHit                = [[weapon/cannon/cannon_hit2]],
@@ -149,7 +149,7 @@ unitDef = {
       targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 250,
+      weaponVelocity          = 300,
     },
 
   },
