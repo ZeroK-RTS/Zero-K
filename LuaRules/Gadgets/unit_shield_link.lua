@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		enabled	= true	--	loaded by default?
 	}
 end
-local version = 1.19
+local version = 1.20
 
 -- CHANGELOG
 --	2009-5-24: CarRepairer: Added graphic lines to show links of shields (also shows links of enemies' visible shields, can remove if desired).
@@ -89,7 +89,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 			}
 			shieldTeams[allyTeam][unitID] = shieldUnit
 		end
-		updateLink[allyTeam] = true
+		updateLink[allyTeam] = 2
 	end
 end
 
@@ -106,8 +106,10 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		if shieldUnit then
 			shieldUnit.link[unitID] = nil
 			shieldUnit.link = NO_LINK  --help GC by removing pointer to old table
+			if shieldUnit.numNeighbors ~= 0 then --shield unit was connected to other shield
+				updateLink[allyTeam] = 2
+			end
 		end
-		updateLink[allyTeam] = true
 	end
 end
 
@@ -143,17 +145,20 @@ local function isEnabled(unitID)
 	end
 end
 
-local function AdjustLinks(allyTeam, unitList, preLinkingShield, targetDefID)
+local function AdjustLinks(allyTeam, unitList, isPreLinkingPhase, targetDefID,isPartialLinkingState, targetUnitIDs)
         local sc = shieldConnections[allyTeam]
 		local cnt = #sc + 1
 
 		for ud1,shieldUnit1 in pairs(unitList) do
 			repeat --Is clever hax for making "break" behave like "continue"
-				if preLinkingShield then
+				if isPreLinkingPhase then
 					if shieldUnit1.unitDefID ~= targetDefID then break end --skip unprioritized units and other unitDefs
 					shieldUnit1.prelinked = true
 				else --not prelinking phase
 					if shieldUnit1.prelinked then break end --skip prioritized units
+				end
+				if  isPartialLinkingState then
+					if not (targetUnitIDs[ud1]) then break end --skip already linked units
 				end
 
 				if not shieldUnit1.linkable then break end -- continue to next unit
@@ -189,34 +194,38 @@ local function AdjustLinks(allyTeam, unitList, preLinkingShield, targetDefID)
 		end	-- for ud1
 end
 
-local function UpdateAllLinks(allyTeam,unitList)
+local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPartialLink)
 	for unitID,shieldUnit in pairs(unitList) do
-		local x,y,z = spGetUnitPosition(unitID)
-		local valid = x and y and z
-		shieldUnit.linkable = valid and isEnabled(unitID)
-		shieldUnit.online = shieldUnit.linkable
-		shieldUnit.enabled  = shieldUnit.linkable
+		if not isPartialLinkingState or unitsToPartialLink[unitID] then
+			local x,y,z = spGetUnitPosition(unitID)
+			local valid = x and y and z
+			shieldUnit.linkable = valid and isEnabled(unitID)
+			shieldUnit.online = shieldUnit.linkable
+			shieldUnit.enabled  = shieldUnit.linkable
 
-		if (shieldUnit.linkable) then
-			shieldUnit.x = x
-			shieldUnit.y = y
-			shieldUnit.z = z
-			shieldUnit.link = { [unitID] = shieldUnit }
-		else
-			shieldUnit.link = NO_LINK
+			if (shieldUnit.linkable) then
+				shieldUnit.x = x
+				shieldUnit.y = y
+				shieldUnit.z = z
+				shieldUnit.link = { [unitID] = shieldUnit }
+			else
+				shieldUnit.link = NO_LINK
+			end
+
+			shieldUnit.numNeighbors = 0
+			shieldUnit.prelinked = false
 		end
-
-		shieldUnit.numNeighbors = 0
-		shieldUnit.prelinked = false
 	end
 
-	shieldConnections[allyTeam] = {}
+	if not isPartialLinkingState then --we are to append link (to only few units that are deemed safe) so no need to re-check/create all link 
+		shieldConnections[allyTeam] = {}
+	end
 
-	for i=1, #linkSequence do
+	for i=1, #linkSequence do --unit that is to be linked first (to have most link)
 		local unitDefID = linkSequence[i]
-		AdjustLinks(allyTeam, unitList, true , unitDefID) --unit that is linked first (have most link)
+		AdjustLinks(allyTeam, unitList, true , unitDefID,isPartialLinkingState,unitsToPartialLink) 
 	end
-	AdjustLinks(allyTeam, unitList, false)
+	AdjustLinks(allyTeam, unitList, false,isPartialLinkingState,unitsToPartialLink)
 end
 
 local function UpdateEnabledState()
@@ -234,32 +243,43 @@ local listCount = 0
 function gadget:GameFrame(n)
 	if n%30 == 18 then  --update every 30 frames at the 18th frame
 		--note: only update link when unit moves reduce total consumption by 53% when unit idle.
+		local unitToPartialLink = {} --some unit that are safe to link without re-create/check all link
 		for allyTeam,unitList in pairs(shieldTeams) do
 			if not updateLink[allyTeam] then --skip positional & stun checks if re-linking is already ordered
 				for unitID,shieldUnit in pairs(unitList) do
 					if shieldUnit.linkable ~= shieldUnit.enabled then --check if unit was linked/unlinked but now stunned/unstunned
-						updateLink[allyTeam] = true
-						break;
+						if shieldUnit.numNeighbors == 0 then --lonely shield units
+							updateLink[allyTeam] = 1
+							unitToPartialLink[unitID] = true
+						else
+							updateLink[allyTeam] = 2
+							break; --escape, nothing else to check
+						end
 					elseif shieldUnit.linkable then
 						local x,y,z = shieldUnit.x,shieldUnit.y,shieldUnit.z
 						if x and y and z then
 							local ux,uy,uz = Spring.GetUnitPosition(unitID)
 							if ux-x > 10 or x-ux > 10 or uy-y > 10 or y-uy > 10 or  uz-z > 10 or z-uz > 10 then --check if any unit change position
-								updateLink[allyTeam] = true
-								break;
+								if shieldUnit.numNeighbors == 0 then --lonely shield units
+									updateLink[allyTeam] = 1
+									unitToPartialLink[unitID] = true
+								else
+									updateLink[allyTeam] = 2
+									break; --escape, nothing else to check
+								end
 							end
 						else
 							Spring.Echo("Warning: shieldUnitPosition for " .. unitID .. " is NIL") --should not happen, all ShieldUnit should've been subjected to linking check at least once
-							updateLink[allyTeam] = true
+							updateLink[allyTeam] = 2
 							break;
 						end
 					end
 				end
 			end
 		end
-		for allyTeam,_ in pairs(updateLink) do 
+		for allyTeam,type in pairs(updateLink) do 
+			UpdateAllLinks(allyTeam,shieldTeams[allyTeam],(type==1),unitToPartialLink) --adjust/create link
 			updateLink[allyTeam] = nil
-			UpdateAllLinks(allyTeam,shieldTeams[allyTeam]) --adjust/create link
 			listCount = -1 --trigger "shieldChargeList[]" to update too
 		end
 		
