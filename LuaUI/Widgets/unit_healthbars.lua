@@ -780,14 +780,14 @@ do
 	  --// Teleport progress
 	  local TeleportEnd = GetUnitRulesParam(unitID,"teleportend")
 	  local TeleportCost = GetUnitRulesParam(unitID,"teleportcost")
-      if TeleportEnd and TeleportCost and TeleportEnd ~= 0 then
+      if TeleportEnd and TeleportCost and TeleportEnd >= 0 then
         local prog
-		if TeleportEnd > TeleportCost then
+		if TeleportEnd > 1 then
 			-- End frame given
 			prog = 1 - (TeleportEnd - gameFrame)/TeleportCost
 		else 
 			-- Same parameters used to display a static progress
-			prog = 1 - TeleportEnd/TeleportCost
+			prog = 1 - TeleportEnd
 		end
 		if prog < 1 then
 			AddBar("teleport",prog,"tele",(fullText and floor(prog*100)..'%') or '')
