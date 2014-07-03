@@ -385,23 +385,6 @@ WG.crude.OpenPath = function() end
 --Allow other widget to toggle-up/show Epic-Menu remotely, defined in Initialize()
 WG.crude.ShowMenu = function() end --// allow other widget to toggle-up Epic-Menu which allow access to game settings' Menu via click on other GUI elements.
 
-
---[[
--- is this an improvement?
-WG.crude.GetHotkey = function(actionName)
-	local hotkey = keybounditems[actionName]
-	if not hotkey then
-		local fallback = Spring.GetActionHotKeys(actionName)
-		if fallback and fallback[1] then
-			return CapCase(fallback[1])
-		else
-			return ''
-		end
-	end
-	return GetReadableHotkey(hotkey) 
-end
---]]
-
 WG.crude.GetActionOption = function(actionName)
 	return actionToOption[actionName]
 end
@@ -458,19 +441,6 @@ local function LoadKeybinds()
 	
 end
 
---[[
-local function ReadUserUiKeys()
-	local fileName = 'Configs/uikeys.txt'
-	local file = io.open (fileName, "r")
-	while true do
-		local line = file:read()
-		if not line then 
-			break
-		end
-		if line:find()
-	end
-end
---]]
 ----------------------------------------------------------------
 --May not be needed with new chili functionality
 local function AdjustWindow(window)
@@ -859,12 +829,10 @@ local function CreateOptionAction(path, option)
 				Spring.Echo("Option name is "..option.wname..option.key)
 				if pathoptions[path] then --pathoptions[path] table still intact, but option table missing
 					Spring.Echo("case: option table was missing")
-					--pathoptions[path][option.wname..option.key] = option --re-add option table
 					otset( pathoptions[path], option.wname..option.key, option ) --re-add option table
 				else --both option table & pathoptions[path] was missing, probably was never initialized
 					Spring.Echo("case: whole path was never initialized")
 					pathoptions[path] = {}
-					--pathoptions[path][option.wname..option.key] = option
 					otset( pathoptions[path], option.wname..option.key, option )
 				end
 				-- [f=0088425] Error: LuaUI::RunCallIn: error = 2, ConfigureLayout, [string "LuaUI/Widgets/gui_epicmenu.lua"]:583: attempt to index field '?' (a nil value)
@@ -974,11 +942,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		
 		-- must be before path var is changed
 		local icon = subMenuIcons[path]
-		--[[
-		if subMenuIcons[path] then 
-			icon = subMenuIcons[path] 
-		end
-		--]]
+		
 		local pathexploded = explode('/',path)
 		local pathend = pathexploded[#pathexploded]
 		pathexploded[#pathexploded] = nil
@@ -1354,8 +1318,6 @@ local function IntegrateWidget(w, addoptions, index)
 		MakeSubWindow(curPath, false)
 	end
 	
-	
-	--ReApplyKeybinds() --reapply keybinds when widget load/removed (incase widget alter keybinds)
 	wantToReapplyBinding = true --request ReApplyKeybind() in widget:Update(). IntegrateWidget() will be called many time during LUA loading but ReApplyKeybind() will be done only once in widget:Update()
 end
 
@@ -1418,7 +1380,7 @@ end
 --Get hotkey action and readable hotkey string. Note: this is used in MakeHotkeyedControl() which make hotkey handled by Chili.
 local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
-	--local hotkey = keybounditems[actionName]
+	
 	local hotkey = otget( keybounditems, actionName )
 	if type(hotkey) == 'table' then
 		hotkey = hotkey[1]
@@ -1443,7 +1405,6 @@ local function MakeHotkeyedControl(control, path, option, icon)
 	local hotkeystring = GetHotkeyData(path, option)
 	local kbfunc = function() 
 			if not get_key then
-				--MakeKeybindWindow( path, option, hotkey ) 
 				MakeKeybindWindow( path, option ) 
 			end
 		end
@@ -2331,93 +2292,6 @@ local function MakeMenuBar()
 	
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	
-	--[[
-	window_exit = Window:New{
-		name='exitwindow',
-		x = screen_width/2 - exit_menu_width/2,  
-		y = screen_height/2 - exit_menu_height/2,  
-		dockable = false,
-		clientWidth = exit_menu_width,
-		clientHeight = exit_menu_height,
-		draggable = false,
-		tweakDraggable = true,
-		resizable = false,
-		minimizable = false,
-		backgroundColor = color.main_bg,
-		color = {0,0,0,0.5},
-		margin = {0,0,0,0},
-		padding = {0,0,0,0},
-		
-		children = {
-				
-			Label:New{ 
-				caption = 'Would you like to quit?', 
-				width = exit_menu_width,
-                x = 0,
-                y = 2*exit_menu_height/64,
-				align="center",
-				textColor = color.main_fg },
-			
-			Button:New{
-				name = 'voteResignButton';
-				caption = "Vote Resign",
-				OnClick = { function()
-						spSendCommands("say !voteresign") --after this gui_chili_vote.lua will handle vote GUI
-						screen0:RemoveChild(window_exit)
-						exitWindowVisible = false
-					end, },
-				tooltip = "Ask teammates to resign",
-				height=exit_menu_btn_height, 
-				width=exit_menu_btn_width,
-				x = exit_menu_width/2 - exit_menu_btn_width/2, 
-				y = 20*exit_menu_height/64 - exit_menu_btn_height/2, 
-			},
-			
-			Button:New{
-				name= 'resignButton',
-				caption = "Resign",
-				OnClick = { function()
-						spSendCommands{"spectator"}
-						screen0:RemoveChild(window_exit)
-						exitWindowVisible = false
-					end, },
-				tooltip = "Abandon team and become spectator",
-				height=exit_menu_btn_height, 
-				width=exit_menu_btn_width,
-				x = exit_menu_width/2 - exit_menu_btn_width/2, 
-				y = 30*exit_menu_height/64 - exit_menu_btn_height/2, 
-			},
-			
-			
-			Button:New{
-				name= 'exitGameButton',
-				caption = "Exit game", OnClick = { function() spSendCommands{"quit","quitforce"} end, },
-				tooltip = "Leave game completely.",
-				height=exit_menu_btn_height, 
-				width=exit_menu_btn_width,
-				x = exit_menu_width/2 - exit_menu_btn_width/2,  
-				y = 40*exit_menu_height/64 - exit_menu_btn_height/2,
-			},
-			
-			Button:New{
-				name= 'cancelExitGameButton',
-				caption = "Cancel", 
-				OnClick = { function() 
-						screen0:RemoveChild(window_exit) 
-						exitWindowVisible = false
-					end, }, 
-			
-				height=exit_menu_cancel_height, 
-				width=exit_menu_cancel_width,
-				x = 4*exit_menu_width/8, -- exit_menu_cancel_width,
-				y = 58*exit_menu_height/64 - exit_menu_cancel_height/2,
-			},
-		},
-	}
-	
-	screen0:RemoveChild(window_exit)
-	]]--
-		
 	window_crude = Window:New{
 		name='epicmenubar',
 		right = 0,  
@@ -2451,26 +2325,6 @@ local function MakeMenuBar()
 				children = {
 					--GAME LOGO GOES HERE
 					Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
-					
-					--[[
-					-- odd-number button width keeps image centered
-					Button:New{
-						name= 'gameSettingButton',
-						caption = "", OnClick = { function() MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions and Settings...',
-						children = {
-							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png', height=B_HEIGHT-2,width=B_HEIGHT-2},
-						},
-					},
-					Button:New{
-						name= 'settingButton',
-						caption = "", OnClick = { function() MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin,	tooltip = 'General Settings...', 
-						children = {
-							Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
-						},
-					},
-					--]]
 					
 					Button:New{
 						name= 'tweakGuiButton',
@@ -2551,60 +2405,6 @@ local function MakeMenuBar()
 					
 					},
 
-					--[[
-					--FPS, FLAG, GAME CLOCK, and REAL-LIFE CLOCK
-					Grid:New{
-						orientation = 'horizontal',
-						columns = 2,
-						rows = 2,
-						width = 150,
-						height = '100%',
-						-- height = 40,
-						resizeItems = true,
-						autoArrangeV = true,
-						autoArrangeH = true,
-						padding = {0,0,0,0},
-						itemPadding = {0,0,0,0},
-						itemMargin = {0,0,0,0},
-						
-						children = {
-							
-							lbl_fps,
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 60,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
-									lbl_gtime,
-								},
-							},
-							
-							
-							img_flag,
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 90,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
-									lbl_clock,
-								},
-							},
-							
-						},
-					},
-					--]]
 					--FPS & FLAG
 					Grid:New{
 						orientation = 'horizontal',
@@ -2671,26 +2471,7 @@ local function MakeMenuBar()
 							},
 							
 						},
-					},					
-					--[[
-					Button:New{
-						name= 'helpButton',
-						caption = "", OnClick = { function() MakeSubWindow('Help') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin, tooltip = 'Help...', 
-						children = {
-							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/questionmark.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  },
-						},
-					},
-					Button:New{
-						name= 'hideButton',
-						caption = "", OnClick = { ActionMenu }, 
-						textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin, tooltip = 'Hide menu',
-						children = {
-							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  }, 
-						},
-					},
-					]]--
+					},				
 				}
 			}
 		}
@@ -2808,8 +2589,6 @@ function widget:Initialize()
 	Colorbars = Chili.Colorbars
 	screen0 = Chili.Screen0
 
-	
-	
 	widget:ViewResize(Spring.GetViewGeometry())
 	
 	-- Set default positions of windows on first run
@@ -2817,13 +2596,7 @@ function widget:Initialize()
 		settings.sub_pos_x = scrW/2
 		settings.sub_pos_y = scrH/2
 	end
-	if not settings.wl_x then -- widget list
-		settings.wl_h = 0.7*scrH
-		settings.wl_w = 300
-		
-		settings.wl_x = (scrW - settings.wl_w)/2
-		settings.wl_y = (scrH - settings.wl_h)/2
-	end
+	
 	if not keybounditems then
 		keybounditems = {}
 	end
@@ -3041,7 +2814,6 @@ function widget:Initialize()
 	
 	--intialize remote option fetcher
 	WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
-		--return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
 		return (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) or {}
 	end 
 	
@@ -3078,13 +2850,6 @@ function widget:Shutdown()
   RemoveAction("crudemenu")
   RemoveAction("crudesubmenu")
  
-  -- restore key binds
-  --[[
-  spSendCommands({
-    "bind esc quitmessage",
-    "bind esc quitmenu", -- FIXME made for licho, removed after 0.82 release
-  })
-  --]]
   spSendCommands("unbind esc crudemenu")
 end
 
@@ -3177,15 +2942,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 end
 
 function ActionExitWindow()
-	--[[
-	if exitWindowVisible then
-		screen0:RemoveChild(window_exit) 
-		exitWindowVisible = false
-	else
-		screen0:AddChild(window_exit) 
-		exitWindowVisible = true
-	end
-	]]
 	WG.crude.ShowMenu()
 	MakeSubWindow(submenu or '')
 end
