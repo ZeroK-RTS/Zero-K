@@ -39,7 +39,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    landflystate   = [[1]],
+    landflystate   = [[0]],
 	description_de = [[Produziert Kampfhubschrauber, Baut mit 10 M/s]],
 	description_pl = [[Buduje statki powietrzne, moc 10 m/s]],
 	helptext       = [[The Gunship Plant is designed for close air support. It includes a selection of transports for hauling land units around, and combat gunships which can perform a variety of offensive or defensive roles.]],

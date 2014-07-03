@@ -78,17 +78,21 @@ local function RestoreAfterDelay()
 	Signal( SIG_RESTORE)
 	SetSignalMask( SIG_RESTORE)
 
-	Sleep(3000)
+	Sleep(1000)
+	Turn( rgun , y_axis, 0, math.rad(600))
+	Turn( lgun , y_axis, 0, math.rad(600))
 	attacking = false
 end
 
-function script.AimWeapon(num,heading,pitch)
+function script.AimWeapon(num, heading, pitch)
 
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
+	
+	Turn( rgun , y_axis, heading, math.rad(600))
+	Turn( lgun , y_axis, heading, math.rad(600))
 
 	attacking = true
-	Sleep(30)
 	
 	StartThread(RestoreAfterDelay)
 	return true
