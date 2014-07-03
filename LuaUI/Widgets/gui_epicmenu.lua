@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.431 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.432 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -152,58 +152,7 @@ local get_key = false
 local kb_path
 local kb_action
 
-local transkey = {
-	backquote 		= '`',
-	
-	leftbracket 	= '[',
-	rightbracket 	= ']',
-	--delete 			= 'del',
-	comma 			= ',',
-	period 			= '.',
-	slash 			= '/',
-	backslash 			= '\\',
-	equals 			= '=',
-	
-	quote 			= "'",
-	
-	kp_multiply		= 'numpad*',
-	kp_divide		= 'numpad/',
-	kp_plus			= 'numpad+',
-	kp_minus		= 'numpad-',
-	kp_period		= 'numpad.',
-	
-	kp0				= 'numpad0',
-	kp1				= 'numpad1',
-	kp2				= 'numpad2',
-	kp3				= 'numpad3',
-	kp4				= 'numpad4',
-	kp5				= 'numpad5',
-	kp6				= 'numpad6',
-	kp7				= 'numpad7',
-	kp8				= 'numpad8',
-	kp9				= 'numpad9',
-	
-
-    -- for french keyboard
-	--groupping
-		ampersand               = '&',
-		world_73                = '0x0e9',
-		quotedbl                = '"',
-		leftparen               = '(',
-		minus                   = '-',
-		world_72                = '0x0e8',
-		underscore              = '_',
-		world_71                = '0x0e7',
-		world_64                = '0x0e0',
-	
-	--other
-		leftparen               = ')', 
-		world_89				= '0x0f9',
-		dollar					= '$',
-		asterisk                = '*',
-
-
-}
+local transkey = include("Configs/transkey.lua")
 
 local wantToReapplyBinding = false
 
@@ -425,6 +374,7 @@ WG.crude.ResetKeys 		= function() end
 
 --Get hotkey by actionname, defined in Initialize()
 WG.crude.GetHotkey = function() end
+WG.crude.GetHotkeys = function() end
 
 --Set hotkey by actionname, defined in Initialize(). Is defined in Initialize() because trying to iterate pathoptions table here (at least if running epicmenu.lua in local copy) will return empty pathoptions table.
 WG.crude.SetHotkey =  function() end 
@@ -2948,18 +2898,34 @@ function widget:Initialize()
 	end
 	
 	-- get hotkey
-	WG.crude.GetHotkey = function(actionName) --Note: declared here because keybounditems must not be empty
+	WG.crude.GetHotkey = function(actionName, all) --Note: declared here because keybounditems must not be empty
 		local actionHotkey = GetActionHotkey(actionName)
 		--local hotkey = keybounditems[actionName] or actionHotkey
 		local hotkey = otget( keybounditems, actionName ) or actionHotkey
 		if not hotkey or hotkey == 'None' then
-			return ''
+			return all and {} or ''
 		end
-		if type(hotkey) == 'table' then
-			hotkey = hotkey[1]
+		if not all then
+			if type(hotkey) == 'table' then
+				hotkey = hotkey[1]
+			end
+			return GetReadableHotkey(hotkey)
+		else
+			local ret = {}
+			if type(hotkey) == 'table' then
+				for k, v in pairs( hotkey ) do
+					ret[#ret+1] = GetReadableHotkey(v)
+				end
+			else
+				ret[#ret+1] = GetReadableHotkey(hotkey)
+			end
+			return ret
 		end
-		return GetReadableHotkey(hotkey) 
 	end
+	WG.crude.GetHotkeys = function(actionName)
+		return WG.crude.GetHotkey(actionName, true)
+	end
+	
 	
 	-- set hotkey
 	WG.crude.SetHotkey =  function(actionName, hotkey, func) --Note: declared here because pathoptions must not be empty

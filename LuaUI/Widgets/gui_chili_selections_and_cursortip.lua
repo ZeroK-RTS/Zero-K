@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.095 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.096 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
@@ -58,6 +58,8 @@ local strFormat 				= string.format
 
 include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local transkey = include("Configs/transkey.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -141,6 +143,9 @@ local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local drawing, erasing, addingPoint
+local drawHotkeyBytes = {}
+local drawHotkeyBytesCount = 0
+local drawtoolKeyPressed
 
 local windTooltips = {
 	["armwin"] = true,
@@ -530,9 +535,9 @@ end
 --functions
 
 local function DrawScreenDrawTools()
-	if not Spring.GetKeyState(KEYSYMS.BACKQUOTE) then 
-		return 
-	end
+	
+	if not drawtoolKeyPressed then return end
+	
 	local x, y, lmb, mmb, rmb = Spring.GetMouseState()
 	drawing = lmb
 	erasing = rmb
@@ -2072,7 +2077,7 @@ local function MakeToolTip_Terra(cmdName)
 end
 
 local function MakeTooltip()
-	if options.showdrawtooltip.value and Spring.GetKeyState(KEYSYMS.BACKQUOTE) and not (drawing or erasing) then
+	if options.showdrawtooltip.value and drawtoolKeyPressed and not (drawing or erasing) then
 		MakeToolTip_Draw()
 		return
 	end
@@ -2267,6 +2272,16 @@ function widget:Update(dt)
 	
 	timer = timer + dt
 	if timer >= updateFrequency  then
+		
+		local hotkeys = WG.crude.GetHotkeys("drawinmap")
+		drawHotkeyBytes = {}
+		drawHotkeyBytesCount = 0
+		for k,v in pairs(hotkeys) do
+			drawHotkeyBytes[v:byte(-1)] = true
+			drawHotkeyBytesCount = drawHotkeyBytesCount+1
+		end
+		
+		
 		UpdateSelectedUnitsTooltip() --this has numSelectedUnits check. Will only run with numSelectedUnits > 1
 		UpdateDynamicGroupInfo()
 		WriteGroupInfo()
@@ -2302,6 +2317,18 @@ function widget:Update(dt)
 		changeNow = true
 		timer = 0
 	end
+	
+	drawtoolKeyPressed = false
+	if drawHotkeyBytesCount ~= 0 then
+		for k,v in pairs(drawHotkeyBytes) do
+			if Spring.GetKeyState(k) then
+				drawtoolKeyPressed = true
+				break
+			end
+		end
+	end
+	
+	
 	--UNIT.STATUS start (by msafwan), function: add/show units task whenever individual pic is shown.
 	timer2 = timer2 + dt
 	if timer2 >= updateFrequency2  then
@@ -2399,7 +2426,7 @@ function widget:Update(dt)
 		showExtendedTip = true
 	
 	else
-		if (options.tooltip_delay.value > 0) and not Spring.GetKeyState(KEYSYMS.BACKQUOTE) then
+		if (options.tooltip_delay.value > 0) and not drawtoolKeyPressed then
 			if not mousemoved then
 				stillCursorTime = stillCursorTime + dt
 			else
@@ -2416,7 +2443,7 @@ function widget:Update(dt)
 	end
 
 	if mousemoved or changeNow then
-		if not show_cursortip and not Spring.GetKeyState(KEYSYMS.BACKQUOTE) then
+		if not show_cursortip and not drawtoolKeyPressed then
 			KillTooltip()
 			return
 		end
