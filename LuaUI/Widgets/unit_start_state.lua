@@ -236,7 +236,7 @@ local function addUnit(defName, path)
     end
 	
 	if (ud.canFly) then
-		options[defName .. "_flylandstate"] = {
+		options[defName .. "_flylandstate_1"] = {
             name = "  Fly/Land State",
             desc = "Values: inherit from factory, fly, land",
             type = 'number',
@@ -246,7 +246,7 @@ local function addUnit(defName, path)
             step = 1,
             path = path,
         }
-		options_order[#options_order+1] = defName .. "_flylandstate"
+		options_order[#options_order+1] = defName .. "_flylandstate_1"
 		--[[
 		options[defName .. "_autorepairlevel1"] = {
             name = "  Auto Repair to airpad",
@@ -261,7 +261,7 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_autorepairlevel1"
 		--]]
 	elseif ud.customParams and ud.customParams.landflystate then
-		options[defName .. "_flylandstate_factory"] = {
+		options[defName .. "_flylandstate_1_factory"] = {
             name = "  Fly/Land State for factory",
             desc = "Values: fly, land",
             type = 'number',
@@ -271,7 +271,7 @@ local function addUnit(defName, path)
             step = 1,
             path = path,
         }
-		options_order[#options_order+1] = defName .. "_flylandstate_factory"
+		options_order[#options_order+1] = defName .. "_flylandstate_1_factory"
 		--[[
 		options[defName .. "_autorepairlevel_factory"] = {
             name = "  Auto Repair to airpad",
@@ -453,11 +453,12 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
-		local orderArray={}
+		local orderArray = {}
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-			if (tonumber(UnitDefs[unitDefID].customParams.level) ~= 0) then 
+			local morphed = Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1
+			if morphed then -- unit states are applied in unit_morph gadget
 				return 
-			end -- unit states are applied in unit_morph gadget
+			end 
 			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
             -- Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
 			-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
@@ -507,16 +508,16 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                 end
             end
 
-			if options[name .. "_flylandstate"] and options[name .. "_flylandstate"].value then
+			if options[name .. "_flylandstate_1"] and options[name .. "_flylandstate_1"].value then
 				--NOTE: The unit_air_plants gadget deals with inherit
-				if options[name .. "_flylandstate"].value ~= -1 then  --if not inherit 
-					--Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"})
-					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"}}
+				if options[name .. "_flylandstate_1"].value ~= -1 then  --if not inherit 
+					--Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate_1"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {options[name .. "_flylandstate_1"].value}, {"shift"}}
                 end
 			end
 			
-			if options[name .. "_flylandstate_factory"] and options[name .. "_flylandstate_factory"].value then
-				orderArray[#orderArray + 1] = {CMD_AP_FLY_STATE, {options[name .. "_flylandstate_factory"].value}, {"shift"}}
+			if options[name .. "_flylandstate_1_factory"] and options[name .. "_flylandstate_1_factory"].value then
+				orderArray[#orderArray + 1] = {CMD_AP_FLY_STATE, {options[name .. "_flylandstate_1_factory"].value}, {"shift"}}
 			end
 			
 			--[[

@@ -133,12 +133,6 @@ commDefs = {}	--holds precedurally generated comm defs
 
 local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then
-	
-		-- Hax for the wrong chassis being sent. See https://github.com/ZeroK-RTS/Zero-K-Infrastructure/issues/21
-		if config.name and string.sub(config.name, string.len(config.name)-1) == "0" then
-			config.chassis = string.sub(config.chassis, 1, -2) .. "0"
-		end
-		
 		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "debug", "\tModularComms: Processing comm: " .. name)
 		local name = name
 		commDefs[name] = CopyTable(UnitDefs[config.chassis], true)

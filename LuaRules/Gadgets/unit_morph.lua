@@ -171,6 +171,8 @@ local morphPenalty = 1.0
 local upgradingBuildSpeed = 250
 local XpScale = 0.50
 
+local PRIVATE = {private = true}
+
 local XpMorphUnits = {}
 
 local devolution = true            --// remove upgrade capabilities after factory destruction?
@@ -554,14 +556,18 @@ local function FinishMorph(unitID, morphData)
     if zsize/4 ~= math.floor(zsize/4) then
       z = z+8
     end
+	Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
     newUnit = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
+	Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
     if not newUnit then
        StopMorph(unitID, morphData)
        return
     end
     Spring.SetUnitPosition(newUnit, x, y, z)
   else
+	Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 1, PRIVATE)
     newUnit = Spring.CreateUnit(defName, px, py, pz, HeadingToFacing(h), unitTeam, isBeingBuilt)
+	Spring.SetTeamRulesParam(unitTeam, "morphUnitCreating", 0, PRIVATE)
     if not newUnit then
        StopMorph(unitID, morphData)
        return
