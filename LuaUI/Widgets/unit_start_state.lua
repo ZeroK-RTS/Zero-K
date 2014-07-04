@@ -36,7 +36,7 @@ local function IsGround(ud)
     return not ud.canFly
 end
 
-options_path = 'Game/Unit AI/Initial States'
+options_path = 'Game/New Unit States'
 options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
@@ -45,7 +45,7 @@ options = {
 		type='button',
 		name= "Hold Position",
 		desc = "Set all land units to hold position",
-		path = "Game/Unit AI/Initial States/Presets",
+		path = "Game/New Unit States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -67,7 +67,7 @@ options = {
 		type='button',
 		name= "Disable Tactical AI",
 		desc = "Disables tactical AI (jinking and skirming) for all units.",
-		path = "Game/Unit AI/Initial States/Presets",
+		path = "Game/New Unit States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -85,7 +85,7 @@ options = {
 		type='button',
 		name= "Enable Tactical AI",
 		desc = "Enables tactical AI (jinking and skirming) for all units.",
-		path = "Game/Unit AI/Initial States/Presets",
+		path = "Game/New Unit States/Presets",
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
@@ -104,7 +104,7 @@ options = {
         name = "label", 
         type = 'label', 
         value = "Commander",
-        path = "Game/Unit AI/Initial States/Misc",
+        path = "Game/New Unit States/Misc",
     },
 
     commander_firestate = {
@@ -115,7 +115,7 @@ options = {
         min = 0, -- most firestates are -1 but no factory/unit build comm (yet)
         max = 2,
         step = 1,
-        path = "Game/Unit AI/Initial States/Misc",
+        path = "Game/New Unit States/Misc",
     },
 
     commander_movestate1 = {
@@ -126,7 +126,7 @@ options = {
         min = 0,-- no factory/unit build comm (yet)
         max = 2,
         step = 1,
-        path = "Game/Unit AI/Initial States/Misc",
+        path = "Game/New Unit States/Misc",
     },
 --[[
 	commander_buildpriority_0 = {
@@ -137,7 +137,7 @@ options = {
         min = -1,
         max = 2,
         step = 1,
-        path = "Game/Unit AI/Initial States/Misc",
+        path = "Game/New Unit States/Misc",
     },
 --]]	
 	commander_constructor_buildpriority = {
@@ -148,7 +148,7 @@ options = {
 		min = 0,
 		max = 2,
 		step = 1,
-		path = "Game/Unit AI/Initial States/Misc",
+		path = "Game/New Unit States/Misc",
 	},
 	
 	commander_retreat = {
@@ -159,7 +159,7 @@ options = {
         min = 0,
         max = 3,
         step = 1,
-        path = "Game/Unit AI/Initial States/Misc",
+        path = "Game/New Unit States/Misc",
     },
 }
 
@@ -174,7 +174,7 @@ end
 local unitAlreadyAdded = {}
 
 local function addLabel(text, path) -- doesn't work with order
-    path = (path and "Game/Unit AI/Initial States/" .. path) or "Game/Unit AI/Initial States"
+    path = (path and "Game/New Unit States/" .. path) or "Game/New Unit States"
     options[text .. "_label"] = {
         name = "label", 
         type = 'label', 
@@ -192,7 +192,7 @@ local function addUnit(defName, path)
 
     unitAlreadyAdded[defName] = true
     
-    path = "Game/Unit AI/Initial States/" .. path
+    path = "Game/New Unit States/" .. path
     local ud = UnitDefNames[defName]
     if not ud then
 		Spring.Echo("Initial States invalid unit " .. defName)

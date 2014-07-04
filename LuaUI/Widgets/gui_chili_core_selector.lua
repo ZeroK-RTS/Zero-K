@@ -123,11 +123,11 @@ options = {
 		value = true,
 		OnChange = function() RefreshConsList() end,		
 	},
-	lblSelection = { type='label', name='Commander', path='Game/Selections', },
+	lblSelection = { type='label', name='Commander', path='Game/Selection Hotkeys', },
 	selectcomm = { type = 'button',
 		name = 'Select Commander',
 		action = 'selectcomm',
-		path = 'Game/Selections',
+		path = 'Game/Selection Hotkeys',
 	},
 }
 

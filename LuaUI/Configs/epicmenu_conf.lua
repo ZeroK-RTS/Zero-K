@@ -136,7 +136,7 @@ confdata.subMenuIcons = {
 	['Help'] = imgPath..'epicmenu/questionmark.png',
 	
 	['Game/Game Speed'] = imgPath..'epicmenu/speed-test-icon.png',
-	['Game/Unit AI'] = imgPath..'epicmenu/robot2.png',
+	['Game/New Unit States'] = imgPath..'epicmenu/robot2.png',
 	['Settings/Reset Settings'] = imgPath..'epicmenu/undo.png',
 	['Settings/Audio'] = imgPath..'epicmenu/vol.png',
 	['Settings/Camera'] = imgPath..'epicmenu/video_camera.png',

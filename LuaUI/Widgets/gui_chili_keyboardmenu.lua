@@ -165,7 +165,7 @@ options = {
 		name = 'Commands...',
 		type = 'button',
 		OnChange = function(self)
-			WG.crude.OpenPath('Game/Commands')
+			WG.crude.OpenPath('Game/Command Hotkeys')
 		end
 	},
 	goToSelections = {
@@ -228,9 +228,9 @@ local function AddHotkeyOptions()
 		end
 	end
 
-	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Game/Commands',}
-	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Game/Commands',}
-	options.lblstate	= { type='label', name='State Commands', path = 'Game/Commands',}
+	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Game/Command Hotkeys',}
+	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Game/Command Hotkeys',}
+	options.lblstate	= { type='label', name='State Commands', path = 'Game/Command Hotkeys',}
 	
 	
 	table.sort(options_order_tmp_cmd)

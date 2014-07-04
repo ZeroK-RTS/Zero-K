@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Game/Selections'
+options_path = 'Game/Selection Hotkeys'
 options_order = {
 	'lbl_main',
 	'select_all',

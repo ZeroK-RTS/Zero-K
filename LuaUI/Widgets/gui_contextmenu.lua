@@ -120,7 +120,7 @@ for i=1,#UnitDefsList do
 		type='button',
 		desc = "Build " .. unitName,
 		action = 'buildunit_' .. ud.name,
-		path = 'Game/Units/' .. unitName:sub(1,1):upper(),
+		path = 'Game/Construction Hotkeys/' .. unitName:sub(1,1):upper(),
 	}
 	options_order[#options_order + 1] = optionName
 end
