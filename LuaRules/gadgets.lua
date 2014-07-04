@@ -1765,7 +1765,7 @@ local Explosion_first = true
 function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
 	if Explosion_first then
 		for _,g in ipairs(self.ExplosionList) do
-			local weaponDefs = (g:Explosion_GetWantedWeaponDef and g:Explosion_GetWantedWeaponDef()) or allWeaponDefs
+			local weaponDefs = (g.Explosion_GetWantedWeaponDef and g:Explosion_GetWantedWeaponDef()) or allWeaponDefs
 			for _,wdid in ipairs(weaponDefs) do
 				if Explosion_GadgetSingle[wdid] or Explosion_GadgetMap[wdid] then
 					if Explosion_GadgetMap[wdid] then

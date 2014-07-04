@@ -938,7 +938,7 @@ local icontypes = {
   },
   mex = {
     bitmap='icons/mex.dds',
-    size = 1.2,
+    size = 1.1,
   },
   storage = {
     bitmap='icons/storage.dds',
