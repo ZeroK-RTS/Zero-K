@@ -361,11 +361,12 @@ effectUnitDefs = {
 effectUnitDefsXmas = {}
 
 local levelScale = {
-    1,
-    1.1,
-    1.2,
-    1.25,
-    1.3,
+    [0] = 1,
+    [1] = 1,
+    [2] = 1.1,
+    [3] = 1.2,
+    [4] = 1.25,
+    [5] = 1.3,
 }
 
 -- load presets from unitdefs

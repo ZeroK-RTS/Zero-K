@@ -40,6 +40,9 @@ local statsByLevel = {
 --stats here take precedence over statsByLevel
 local copy = {
 	armcom1 = {
+		armcom0 = {
+			level = 0,
+		},
 		armcom2 = {
 			level = 2,
 			mainstats = {maxdamage = 3000, autoheal = 12.5, objectname = "armcom2.3do", collisionvolumescales  = [[50 55 50]],},
@@ -66,6 +69,9 @@ local copy = {
 		},		
 	},
 	corcom1 = {
+		corcom0 = {
+			level = 0,
+		},
 		corcom2 = {
 			level = 2,
 			mainstats = {maxdamage = 3800, objectname = "corcomAlt2.s3o", },
@@ -92,6 +98,9 @@ local copy = {
 		},		
 	},
 	commrecon1 = {
+		commrecon0 = {
+			level = 0,
+		},
 		commrecon2 = {
 			level = 2,
 			mainstats = {maxdamage = 2100, objectname = "commrecon2.s3o"},
@@ -118,6 +127,9 @@ local copy = {
 		},		
 	},
 	commsupport1 = {
+		commsupport0 = {
+			level = 0,
+		},
 		commsupport2 = {
 			level = 2,
 			mainstats = {maxdamage = 2500, workertime = 14, description = "Econ/Support Commander, Builds at 12.5 m/s", objectname = "commsupport2.s3o"},
@@ -144,6 +156,9 @@ local copy = {
 		},		
 	},
 	cremcom1 = {
+		cremcom0 = {
+			level = 0,
+		},
 		cremcom2 = {
 			level = 2,
 			mainstats = {maxdamage = 3000, autoheal = 12.5, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
@@ -170,6 +185,9 @@ local copy = {
 		},			
 	},
 	benzcom1 = {
+		benzcom0 = {
+			level = 0,
+		},
 		benzcom2 = {
 			level = 2,
 			mainstats = {maxdamage = 2700, objectname = "benzcom2.s3o"},
@@ -203,29 +221,32 @@ for sourceName, copyTable in pairs(copy) do
 		UnitDefs[cloneName] = CopyTable(UnitDefs[sourceName], true)
 		UnitDefs[cloneName].unitname = cloneName
 		
-		-- copy from by-level table
-		for statName, value in pairs(statsByLevel.mainstats[stats.level]) do
-			UnitDefs[cloneName][statName] = value
-		end
-		--for statName, value in pairs(statsByLevel.customparams[stats.level]) do
-		--	UnitDefs[cloneName].customparams[statName] = value
-		--end		
+		if stats.level > 0 then
 		
-		-- copy from specific table
-		for statName, value in pairs(stats.mainstats or {}) do
-			UnitDefs[cloneName][statName] = value
+			-- copy from by-level table
+			for statName, value in pairs(statsByLevel.mainstats[stats.level]) do
+				UnitDefs[cloneName][statName] = value
+			end
+			--for statName, value in pairs(statsByLevel.customparams[stats.level]) do
+			--	UnitDefs[cloneName].customparams[statName] = value
+			--end		
+			
+			-- copy from specific table
+			for statName, value in pairs(stats.mainstats or {}) do
+				UnitDefs[cloneName][statName] = value
+			end
+			for statName, value in pairs(stats.customparams or {}) do
+				UnitDefs[cloneName].customparams[statName] = value
+			end
+			UnitDefs[cloneName].trackwidth = UnitDefs[cloneName].trackwidth * (0.9 + 0.1*(stats.level))
+			-- features
+			UnitDefs[cloneName].featuredefs.dead.object = stats.wreckmodel
+			UnitDefs[cloneName].featuredefs.dead.footprintx = UnitDefs[cloneName].footprintx
+			UnitDefs[cloneName].featuredefs.dead.footprintz = UnitDefs[cloneName].footprintz
+			UnitDefs[cloneName].featuredefs.heap.object = stats.heapmodel
+			UnitDefs[cloneName].featuredefs.heap.footprintx = UnitDefs[cloneName].footprintx
+			UnitDefs[cloneName].featuredefs.heap.footprintz = UnitDefs[cloneName].footprintz
 		end
-		for statName, value in pairs(stats.customparams or {}) do
-			UnitDefs[cloneName].customparams[statName] = value
-		end
-		UnitDefs[cloneName].trackwidth = UnitDefs[cloneName].trackwidth * (0.9 + 0.1*(stats.level))
-		-- features
-		UnitDefs[cloneName].featuredefs.dead.object = stats.wreckmodel
-		UnitDefs[cloneName].featuredefs.dead.footprintx = UnitDefs[cloneName].footprintx
-		UnitDefs[cloneName].featuredefs.dead.footprintz = UnitDefs[cloneName].footprintz
-		UnitDefs[cloneName].featuredefs.heap.object = stats.heapmodel
-		UnitDefs[cloneName].featuredefs.heap.footprintx = UnitDefs[cloneName].footprintx
-		UnitDefs[cloneName].featuredefs.heap.footprintz = UnitDefs[cloneName].footprintz
 		
 		UnitDefs[cloneName].customparams.level = stats.level
 		UnitDefs[cloneName].name = (UnitDefs[cloneName].name) .. " - Level " .. stats.level

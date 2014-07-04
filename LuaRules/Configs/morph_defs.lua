@@ -424,6 +424,7 @@ local morphDefs = {
 }
 
 local baseComMorph = {
+	[0] = {	time = 10, cost = 0},
 	[1] = {	time = 25, cost = 250},
 	[2] = {	time = 30, cost = 300},
 	[3] = {	time = 40, cost = 400},
@@ -436,9 +437,9 @@ local baseComMorph = {
 local comms = {"armcom", "corcom", "commrecon", "commsupport", "benzcom", "cremcom"}
 
 for i=1,#comms do
-  for j=1,4 do
-    local source = comms[i]..j
-    local destination = comms[i]..(j+1)
+  for j = 0,4 do
+    local source = comms[i] .. j
+    local destination = comms[i] .. (j+1)
     morphDefs[source] = {
       into = destination,
       time = baseComMorph[j].time,

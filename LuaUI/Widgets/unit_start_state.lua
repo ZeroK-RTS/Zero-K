@@ -455,13 +455,17 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
 		local orderArray={}
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-			if (UnitDefs[unitDefID].customParams.level ~= 0) then return end -- unit states are applied in unit_morph gadget
+			if (tonumber(UnitDefs[unitDefID].customParams.level) ~= 0) then 
+				return 
+			end -- unit states are applied in unit_morph gadget
 			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
             -- Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
 			-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
 			orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"}}
 			orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
-			if WG['retreat'] then WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value) end
+			if WG['retreat'] then 
+				WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value) 
+			end
         end
         
         local name = UnitDefs[unitDefID].name
