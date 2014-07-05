@@ -395,12 +395,20 @@ function gadget:UnitDestroyed(unitID)
 end	
 
 function gadget:RecvLuaMsg(msg, playerID)
+	local _,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID)
+	HandleLuaMessage(msg, teamID);
+end
+
+function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
+	HandleLuaMessage(dataStr, aiTeam);
+end
+
+function HandleLuaMessage(msg, teamID)
 	local msg_table = explode('|', msg)
 	if msg_table[1] ~= 'sethaven' then
 		return
 	end
 	
-	local _,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID)
 	local unitID = msg_table[2]+0
 	local x = msg_table[2]+0
 	local y = msg_table[3]+0
