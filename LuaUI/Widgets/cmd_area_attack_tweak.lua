@@ -1,4 +1,4 @@
-local version = "v1.12"
+local version = "v1.121"
 
 function widget:GetInfo()
   return {
@@ -82,7 +82,7 @@ function widget:CommandNotify(id, params, options) --ref: gui_tacticalCalculator
 		end
 		local antiAirUnits,normalUnits = GetAAUnitList(units)
 		local airTargets, allTargets = ReturnAllAirTarget(targetUnits, Spring.GetUnitAllyTeam(units[1]),(#antiAirUnits>1)) -- get all air target for selected area-command
-		if #allTargets>1 then --skip if no target
+		if #allTargets>0 then --skip if no target
 			return ReIssueCommandsToUnits(antiAirUnits,airTargets,normalUnits,allTargets,id,options)
 		end
 	end
@@ -211,7 +211,7 @@ end
 function IssueSplitedCommand(selectedUnits,allTargets,cmdID,options)
 	if #allTargets>=1 then
 		local targetsUnordered = {}
-		if cmdID==CMD.ATTACK then --in case needed to revert queued attack later if user do SHIFT+Move
+		if cmdID==CMD.ATTACK then --and not CMD_UNIT_SET_TARGET. Note: only CMD.ATTACK support split attack queue, and in such case we also need to remember the queue so we can revert later if user decided to do SHIFT+Move
 			for i=1,#allTargets do
 				targetsUnordered[allTargets[i] ] = true
 			end
