@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.923 Chili Chat Console.",
+    desc      = "v0.924 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -990,9 +990,9 @@ function widget:Initialize()
 	}
 	
 	function scrollpanel1:IsAboveVScrollbars(x, y)  -- this override default Scrollpanel's HitTest.
-		--It aim to: exclude any modifier key (shift,alt,ctrl,spacebar), and only allow left-click to reposition the vertical scrollbar, because it have a chance of stealing click when giving order (highest when in Low resolution and when ChiliChat2 is positioned to left of screen).
+		--It aim to: exclude any modifier key (shift,alt,ctrl, except spacebar which is used for Space+click shortcut), and only allow left-click to reposition the vertical scrollbar, because it have a chance of stealing click when giving order (highest when in Low resolution and when ChiliChat2 is positioned to left of screen).
 		local alt,ctrl, meta,shift = Spring.GetModKeyState()
-		if (x< self.width - self.scrollbarSize) or (shift or ctrl or meta or alt) or (not select(3,Spring.GetMouseState())) then 
+		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then 
 			return false 
 		end --skip modifier key since they meant player are using click to issue command. Try to not steal click
 		return self
