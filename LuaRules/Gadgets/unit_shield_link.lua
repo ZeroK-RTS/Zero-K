@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		enabled	= true	--	loaded by default?
 	}
 end
-local version = 1.22
+local version = 1.23
 
 -- CHANGELOG
 --	2009-5-24: CarRepairer: Added graphic lines to show links of shields (also shows links of enemies' visible shields, can remove if desired).
@@ -19,19 +19,20 @@ local version = 1.22
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+
+
+if gadgetHandler:IsSyncedCode() then
 local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitTeam			= Spring.GetUnitTeam
+local spGetTeamInfo			= Spring.GetTeamInfo
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitIsActive		= Spring.GetUnitIsActive
 local spGetUnitShieldState	= Spring.GetUnitShieldState
 local spSetUnitShieldState	= Spring.SetUnitShieldState
-local spGetTeamInfo			= Spring.GetTeamInfo
+local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 
-
-if gadgetHandler:IsSyncedCode() then
 ---CONFIG---
 local linkLimit = { --set maximum link desired, empty means "no limit"
 	[UnitDefNames["shieldfelon"].id] = 5,
@@ -49,8 +50,8 @@ local NO_LINK = {nil}
 
 local shieldTeams = {}
 
-shieldConnections = {}
-_G.shieldConnections = shieldConnections
+local shieldConnections = {}
+local unitRulesParamsSetting = {allied=true,} --Fixme: what is the losAccess setting that obey spec's limited LOS mode?
 
 local updateLink = {nil}
 
@@ -138,8 +139,18 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	end
 end
 
+function ClearAllShieldVFX(allyTeam)
+	if shieldConnections[allyTeam] then
+		for unitID,_ in pairs(shieldConnections[allyTeam]) do
+			spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
+		end
+		shieldConnections[allyTeam] = {}
+	end
+end
+
 function ClearShieldVFX(unitID,allyTeam)
 	if shieldConnections[allyTeam] then
+		spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
 		shieldConnections[allyTeam][unitID] = nil
 	end
 end
@@ -147,8 +158,10 @@ end
 function AddShieldVFX(unitID,allyTeam,conUnitID)
 	shieldConnections[allyTeam] = shieldConnections[allyTeam] or {}
 	if not shieldConnections[allyTeam][unitID] then
+		spSetUnitRulesParam(unitID,"shield_link",conUnitID,unitRulesParamsSetting)
 		shieldConnections[allyTeam][unitID] = conUnitID
 	else 
+		spSetUnitRulesParam(conUnitID,"shield_link",unitID,unitRulesParamsSetting)
 		shieldConnections[allyTeam][conUnitID] = unitID
 	end
 end
@@ -243,7 +256,7 @@ local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPa
 	end
 
 	if not isPartialLinkingState then
-		shieldConnections[allyTeam] = {} --this used for drawing. Reset all when we want to recreate all link
+		ClearAllShieldVFX() -- Reset all when we want to recreate all link
 	end
 
 	for i=1, #linkSequence do --unit that is to be linked first (to have most link)
@@ -422,15 +435,74 @@ local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
 local spGetSpectatingState = Spring.GetSpectatingState
 local spIsUnitInView       = Spring.IsUnitInView
 local spValidUnitID        = Spring.ValidUnitID
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spGetUnitViewPosition = Spring.GetUnitViewPosition
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+local shieldUnits = {}
+local shieldCount = 0
 
 function gadget:Initialize()
+	local spGetUnitDefID = Spring.GetUnitDefID
+	for _,unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = spGetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID)
+	end
 end
 
+function gadget:UnitCreated(unitID, unitDefID)
+	if UnitDefs[unitDefID].shieldWeaponDef then
+		shieldCount = shieldCount + 1
+		shieldUnits[shieldCount] = unitID
+	end
+end
 
+function gadget:UnitDestroyed(unitID, unitDefID)
+	if UnitDefs[unitDefID].shieldWeaponDef then
+		for i=1, #shieldUnits do
+			if shieldUnits[i] == unitID then
+				table.remove(shieldUnits,i)
+				shieldCount = shieldCount - 1
+				break;
+			end
+		end
+	end
+end
+
+local function DrawFunc2()
+	local unitID
+	local connectedToUnitID
+	local x1, y1, z1, x2, y2, z2
+	for i=1, #shieldUnits do
+		unitID =shieldUnits[i]
+		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
+		if (connectedToUnitID and (connectedToUnitID >= 0) and (spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID))) then
+			x1, y1, z1 = spGetUnitViewPosition(unitID, true)
+			x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
+			glVertex(x1, y1, z1)
+			glVertex(x2, y2, z2)
+		end
+	end
+end
+
+function gadget:DrawWorld()
+	if shieldCount > 1 then
+		glPushAttrib(GL_LINE_BITS)
+
+		glDepthTest(true)
+		glColor(1,0,1,math.random()*0.3+0.2)
+		glLineWidth(1)
+		glBeginEnd(GL_LINES, DrawFunc2)
+
+		glDepthTest(false)
+		glColor(1,1,1,1)
+
+		glPopAttrib()
+	end
+end
+
+--[[
 local function DrawFunc()
 	myAllyID = spGetMyAllyTeamID()
 	local spec, fullview = spGetSpectatingState()
@@ -457,9 +529,9 @@ local function DrawFunc()
 			end
 		end
 	end
-end 
+end
 
-	
+
 function gadget:DrawWorld()
 	if SYNCED.shieldConnections and snext(SYNCED.shieldConnections) then
 		glPushAttrib(GL_LINE_BITS)
@@ -467,7 +539,7 @@ function gadget:DrawWorld()
 		glDepthTest(true)
 		glColor(1,0,1,math.random()*0.3+0.2)
 		glLineWidth(1)
-		glBeginEnd(GL_LINES, DrawFunc)
+		glBeginEnd(GL_LINES, DrawFunc2)
 	
 		glDepthTest(false)
 		glColor(1,1,1,1)
@@ -475,7 +547,7 @@ function gadget:DrawWorld()
 		glPopAttrib()
 	end
 end
-
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
