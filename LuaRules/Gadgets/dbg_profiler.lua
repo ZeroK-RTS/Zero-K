@@ -209,6 +209,9 @@ else
   local targetCumulSecond = 0
   local targetCountdown = 0
   local targetCallinCumul = {nil}
+  local targetCallinCumul_unsynced = {nil}
+  local targetCumulSecond_unsynced = 0
+  local targetCountdown_unsynced = 0
   local targetWname = ''
 
   local function UpdateDrawCallin()
@@ -285,7 +288,9 @@ else
 		if targetWname ~='' then
 			targetWname = ''
 			targetCallinCumul = {nil}
+			targetCallinCumul_unsynced = {nil}
 			targetCountdown = 0
+			targetCountdown_unsynced = 0
 		else
 			local countdown = tonumber(words[#words])
 			if countdown and #words>=2 then
@@ -293,9 +298,11 @@ else
 				Spring.Echo(wname)
 				targetWname = wname
 				targetCountdown = countdown
+				targetCountdown_unsynced = countdown
 			end
 		end
 		targetCumulSecond = 0
+		targetCumulSecond_unsynced = 0
 	end
 
   function gadget:Initialize()
@@ -361,11 +368,21 @@ end
           local total = 0
           local cmax  = 0
           local cmaxname = ""
+          local countdownt = false
           for cname,timeStats in pairs(callins) do
             total = total + timeStats[1]
             if (timeStats[2]>cmax) then
               cmax = timeStats[2]
               cmaxname = cname
+            end
+            if targetCountdown_unsynced > 0 and targetWname == wname then
+              targetCumulSecond_unsynced = targetCumulSecond_unsynced + timeStats[1]
+              targetCallinCumul_unsynced[cname] = targetCallinCumul_unsynced[cname] or 0
+              targetCallinCumul_unsynced[cname] = targetCallinCumul_unsynced[cname] + timeStats[1]
+              if not countdownt then
+                targetCountdown_unsynced = targetCountdown_unsynced - deltaTime
+                countdownt = true
+              end
             end
             timeStats[1] = 0
           end
@@ -450,18 +467,31 @@ end
     gl.BeginText()
 	local index1 = 1
     if (profile_unsynced) then
-      for i=1,#sortedList do
-        local v = sortedList[i]
-        local wname = v[1]
-        local tLoad = v[2]
-		if displayLowValue or tLoad > 0.05 then
-			if maximum > 0 then
-			  gl.Rect(x+100-tLoad/maximum_*100, y+1-(fSpacing)*index1, x+100, y+9-(fSpacing)*index1)
-			end
-			gl.Text(wname, x+150, y+1-(fSpacing)*index1, fSize)
-			gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(fSpacing)*index1, fSize)
-			index1 = index1 + 1
-		end
+      if targetWname=='' then
+        for i=1,#sortedList do
+          local v = sortedList[i]
+          local wname = v[1]
+          local tLoad = v[2]
+          if displayLowValue or tLoad > 0.05 then
+            if maximum > 0 then
+              gl.Rect(x+100-tLoad/maximum_*100, y+1-(fSpacing)*index1, x+100, y+9-(fSpacing)*index1)
+            end
+            gl.Text(wname, x+150, y+1-(fSpacing)*index1, fSize)
+            gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(fSpacing)*index1, fSize)
+            index1 = index1 + 1
+          end
+        end
+      else
+        gl.Text(targetWname, x+200, y+1-(fSpacing*1.25)*index1, fSize*1.5)
+        gl.Text(('%.4fs'):format(targetCumulSecond_unsynced), x+100, y+1-(fSpacing*1.25)*index1, fSize*1.25)
+        gl.Text('left', x+200, y+1-(fSpacing*1.25)*(index1+1), fSize*1.5)
+        gl.Text(('%.1fs'):format(targetCountdown), x+100, y+1-(fSpacing*1.25)*(index1+1), fSize*1.25)
+        index1 = index1 + 3
+        for cname, value in pairs(targetCallinCumul_unsynced) do
+          gl.Text(cname, x+200, y+1-(fSpacing)*index1, fSize)
+          gl.Text(('%.4fs'):format(value), x+100, y+1-(fSpacing)*index1, fSize)       
+          index1 = index1 + 1
+        end
       end
     end
 	local index2 = 1
@@ -490,8 +520,8 @@ end
       else
         gl.Text(targetWname, sX+200, y+1-(fSpacing*1.25)*(j+index2), fSize*1.5)
         gl.Text(('%.4fs'):format(targetCumulSecond), sX+100, y+1-(fSpacing*1.25)*(j+index2), fSize*1.25)
-		gl.Text('left', sX+200, y+1-(fSpacing*1.25)*(j+index2+1), fSize*1.5)
-		gl.Text(('%.1fs'):format(targetCountdown), sX+100, y+1-(fSpacing*1.25)*(j+index2+1), fSize*1.25)
+        gl.Text('left', sX+200, y+1-(fSpacing*1.25)*(j+index2+1), fSize*1.5)
+        gl.Text(('%.1fs'):format(targetCountdown), sX+100, y+1-(fSpacing*1.25)*(j+index2+1), fSize*1.25)
         index2 = index2 + 3
         for cname, value in pairs(targetCallinCumul) do
           gl.Text(cname, sX+200, y+1-(fSpacing)*(j+index2), fSize)
