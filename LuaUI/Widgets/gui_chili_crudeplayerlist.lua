@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.321 Chili Crude Player List.",
+    desc      = "v1.322 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -848,6 +848,14 @@ function widget:Initialize()
 		scrollbarSize = 6,
 		horizontalScrollbar = false,	
 	}
+	
+	function scroll_cpl:IsAboveVScrollbars(x, y)  -- this override default Scrollpanel's HitTest. It aim to: reduce chance of click stealing. It exclude any modifier key (shift,alt,ctrl, except spacebar which is used for Space+click shortcut), and only allow left-click to reposition the vertical scrollbar
+		local alt,ctrl, meta,shift = Spring.GetModKeyState()
+		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then 
+			return false 
+		end
+		return self
+	end
 
 	SetupPlayerNames()
 	
