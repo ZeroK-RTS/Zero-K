@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.322 Chili Crude Player List.",
+    desc      = "v1.323 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -827,6 +827,11 @@ function widget:Initialize()
 		minimizable = true,
 		minWidth = x_bound,
 		NCHitTest = function(self,x,y)
+			local alt,ctrl, meta,shift = Spring.GetModKeyState()
+			local _,_,lmb,mmb,rmb = Spring.GetMouseState()
+			if (shift or ctrl or alt) or (mmb or rmb) then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
+				return false 
+			end
 			return self --mouse over panel
 		end,	
 		OnMouseDown={ function(self)

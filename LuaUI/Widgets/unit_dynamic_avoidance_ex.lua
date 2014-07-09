@@ -1,4 +1,4 @@
-local versionName = "v2.873"
+local versionName = "v2.875"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -56,6 +56,7 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitIsDead 	= Spring.GetUnitIsDead
 local spValidUnitID = Spring.ValidUnitID
 local spValidFeatureID = Spring.ValidFeatureID
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local CMD_STOP			= CMD.STOP
 local CMD_ATTACK 		= CMD.ATTACK
 local CMD_GUARD			= CMD.GUARD
@@ -150,7 +151,7 @@ local commandTTL_G = {} --for recording command's age. To check for expiration. 
 local iNotLagging_gbl = true --//variable: indicate if player(me) is lagging in current game. If lagging then do not process anything.
 local selectedCons_Meta_gbl = {} --//variable: remember which Constructor is selected by player.
 local waitForNetworkDelay_gbl = nil
-local issuedOrderTo = {}
+local issuedOrderTo_G = {}
 local allyClusterInfo_gbl = {coords={},age=0}
 
 --------------------------------------------------------------------------------
@@ -276,8 +277,8 @@ function widget:Update()
 			--check if under lockdown for overextended time
 			if waitForNetworkDelay then
 				if now - waitForNetworkDelay[1] > 4 then
-					for unitID,_ in pairs(issuedOrderTo) do
-						issuedOrderTo[unitID] = nil
+					for unitID,_ in pairs(issuedOrderTo_G) do
+						issuedOrderTo_G[unitID] = nil
 					end
 					waitForNetworkDelay = nil
 				end
@@ -292,7 +293,11 @@ function widget:Update()
 						skippingTimer, now, commandTTL,
 						waitForNetworkDelay,allyClusterInfo
 					}
-			commandIndexTable, commandTTL,isAvoiding,waitForNetworkDelay,allyClusterInfo =DoCalculation(infoForDoCalculation)
+			local outputTable,isAvoiding =DoCalculation(infoForDoCalculation)
+			commandIndexTable = outputTable["commandIndexTable"]
+			commandTTL = outputTable["commandTTL"]
+			waitForNetworkDelay = outputTable["waitForNetworkDelay"]
+			allyClusterInfo = outputTable["allyClusterInfo"]
 			
 			if isAvoiding then  
 				skippingTimer.echoTimestamp = now -- --prepare delay statistic to measure new delay (aka: reset stopwatch), --same as "CalculateNetworkDelay("restart", , )"^/
@@ -336,7 +341,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if commandIndexTableG[unitID] then
 		commandIndexTableG[unitID] = nil
 	end
-	if myTeamID_gbl==unitTeam and issuedOrderTo[unitID] then
+	if myTeamID_gbl==unitTeam and issuedOrderTo_G[unitID] then
 		CountdownNetworkDelayWait(unitID)
 	end
 end
@@ -350,17 +355,17 @@ function widget:UnitGiven(unitID, unitDefID, newTeam,oldTeam)
 			commandIndexTableG[unitID] = nil
 		end
 	end
-	if myTeamID_gbl==oldTeam and issuedOrderTo[unitID] then
+	if myTeamID_gbl==oldTeam and issuedOrderTo_G[unitID] then
 		CountdownNetworkDelayWait(unitID)
 	end
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
-	if myTeamID_gbl==unitTeam and issuedOrderTo[unitID] then
+	if myTeamID_gbl==unitTeam and issuedOrderTo_G[unitID] then
 		if (CMD.INSERT == cmdID and cmdParams[2] == CMD_MOVE) and
-		cmdParams[4] == issuedOrderTo[unitID][1] and 
-		cmdParams[5] == issuedOrderTo[unitID][2] and 
-		cmdParams[6] == issuedOrderTo[unitID][3] then 
+		cmdParams[4] == issuedOrderTo_G[unitID][1] and 
+		cmdParams[5] == issuedOrderTo_G[unitID][2] and 
+		cmdParams[6] == issuedOrderTo_G[unitID][3] then 
 			CountdownNetworkDelayWait(unitID)
 		end
 	end
@@ -375,7 +380,7 @@ function RefreshUnitList(attacker, commandTTL)
 	local maximumMeleeRange = maximumMeleeRangeG
 	----------------------------------------------------------
 	local allMyUnits = spGetTeamUnits(myTeamID_gbl)
-	local arrayIndex=1
+	local arrayIndex=0
 	local relevantUnit={}
 	local selectedUnits	= (spGetSelectedUnits()) or {}
 	local selectedUnits_Meta = {}
@@ -424,8 +429,8 @@ function RefreshUnitList(attacker, commandTTL)
 							unitType = 0
 						end
 					end
-				--elseif not unitDef["canFly"] and not unitDef["canSubmerge"] then --include all ground unit, but excluding com & amphibious
-				elseif not unitDef["canFly"] then --include all ground unit, including com
+				--elseif not (unitDef["canFly"] or unitDef["isAirUnit"]) and not unitDef["canSubmerge"] then --include all ground unit, but excluding com & amphibious
+				elseif not (unitDef["canFly"] or unitDef["isAirUnit"]) then --include all ground unit, including com
 					unitType =2 --//this unit type only have avoidance outside camera view & while reloading (in camera view)
 					if options.enableGround.value==false then --//if Ground unit epicmenu option is false then exclude Ground unit
 						unitType = 0
@@ -435,7 +440,7 @@ function RefreshUnitList(attacker, commandTTL)
 					if options.enableGunship.value==false then --//if Gunship epicmenu option is false then exclude Gunship
 						unitType = 0
 					end
-				-- elseif not unitDef["canFly"] and unitDef["canSubmerge"] then --include all amphibious unit & com
+				-- elseif not (unitDef["canFly"] or unitDef["isAirUnit"]) and unitDef["canSubmerge"] then --include all amphibious unit & com
 					-- unitType =4 --//this unit type only have avoidance outside camera view
 					-- if options.enableAmphibious.value==false then --//if Gunship epicmenu option is false then exclude Gunship
 						-- unitType = 0
@@ -452,7 +457,7 @@ function RefreshUnitList(attacker, commandTTL)
 					else 
 						weaponType = 2
 					end
-					relevantUnit[arrayIndex]={unitID, unitType, unitSpeed, fixedPointType, decloakScaling,{unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex,reloadTime = reloadTime,range=range}, isVisible = unitInView, weaponType = weaponType}
+					relevantUnit[arrayIndex]={unitID = unitID, unitType = unitType, unitSpeed = unitSpeed, fixedPointType = fixedPointType, decloakScaling = decloakScaling,weaponInfo = {unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex,reloadTime = reloadTime,range=range}, isVisible = unitInView, weaponType = weaponType}
 				end
 			end
 			if (turnOnEcho == 1) then --for debugging
@@ -463,11 +468,7 @@ function RefreshUnitList(attacker, commandTTL)
 			end
 		end
 	end
-	if arrayIndex>1 then 
-		relevantUnit[1]=arrayIndex -- store the array's lenght in the first row of the array
-	else 
-		relevantUnit[1] = nil 
-	end --send out nil if no unit is present
+	relevantUnit["count"]=arrayIndex -- store the array's lenght
 	if (turnOnEcho == 1) then
 		Spring.Echo("allMyUnits(RefreshUnitList): ")
 		Spring.Echo(allMyUnits)
@@ -480,94 +481,92 @@ end
 -- detect initial enemy separation to detect "fleeing enemy"  later
 function DoCalculation(passedInfo)
 	local unitInMotion = passedInfo[1]
-	local commandIndexTable = passedInfo[2]
 	local attacker = passedInfo[3]
 	local selectedCons_Meta = passedInfo[4]
-	local myTeamID = passedInfo[5]
-	local skippingTimer = passedInfo[6]
-	local now = passedInfo[7]
-	local commandTTL = passedInfo[8]
-	local waitForNetworkDelay = passedInfo[9]
-	local allyClusterInfo = passedInfo[10]
 	-----
 	local isAvoiding = nil
-	if unitInMotion[1]~=nil then --don't execute if no unit present
-		for i=2, unitInMotion[1], 1 do --array index 1 contain the array's lenght, start from 2
-			local unitID= unitInMotion[i][1] --get unitID for commandqueue
-			if not spGetUnitIsDead(unitID) and (spGetUnitTeam(unitID)==myTeamID) then --prevent execution if unit died during transit
-				local cQueue = spGetCommandQueue(unitID, -1)
-				local executionAllow, cQueueTemp,reloadAvoidance = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i],myTeamID) --filter/alter unwanted unit state by reading the command queue
-				if executionAllow then
+	local persistentData = {
+		commandIndexTable= passedInfo[2],
+		myTeamID= passedInfo[5],
+		skippingTimer = passedInfo[6],
+		now = passedInfo[7],
+		commandTTL=passedInfo[8],
+		waitForNetworkDelay=passedInfo[9],
+		allyClusterInfo= passedInfo[10],
+	}
+	local gateKeeperOutput = {
+		cQueueTemp=nil,
+		allowExecution=nil,
+		reloadAvoidance=nil,
+	}
+	local idTargetOutput = {
+		targetCoordinate = nil,
+		newCommand = nil,
+		boxSizeTrigger = nil,
+		graphCONSTANTtrigger = nil,
+		fixedPointCONSTANTtrigger = nil,
+		case = nil,
+		targetID = nil,
+	}
+	if unitInMotion["count"] and unitInMotion["count"]>0 then --don't execute if no unit present
+		for i=1, unitInMotion["count"], 1 do
+			local unitID= unitInMotion[i]["unitID"] --get unitID for commandqueue
+			if not spGetUnitIsDead(unitID) and (spGetUnitTeam(unitID)==persistentData["myTeamID"]) then --prevent execution if unit died during transit
+				local cQueue = spGetCommandQueue(unitID,-1)
+				gateKeeperOutput = GateKeeperOrCommandFilter(cQueue,persistentData, unitInMotion[i]) --filter/alter unwanted unit state by reading the command queue
+				if gateKeeperOutput["allowExecution"] then
 					--cQueue = cQueueTemp --cQueueTemp has been altered for identification, copy it to cQueue for use in DoCalculation() phase (note: command is not yet issued)
 					--local boxSizeTrigger= unitInMotion[i][2]
-					local fixedPointCONSTANTtrigger = unitInMotion[i][4] --//using fixedPointType to trigger different fixed point constant for each unit type
-					local unitVisible = (unitInMotion[i].isVisible == "yes")
-					local fastestWeapon = unitInMotion[i][6]
-					local infoToGetTargetOnCmdQueue = {
-						cQueue,cQueueTemp, unitID, commandIndexTable,
-						fixedPointCONSTANTtrigger,unitVisible,fastestWeapon["range"],unitInMotion[i].weaponType,
-						}
-					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case,targetID=IdentifyTargetOnCommandQueue(infoToGetTargetOnCmdQueue) --check old or new command
-					local currentX,_,currentZ = spGetUnitPosition(unitID)
-					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
-					if selectedCons_Meta[unitID] and boxSizeTrigger~= 4 then --if unitIsSelected and NOT using GUARD 'halfboxsize' (ie: is not guarding) then:
-						boxSizeTrigger = 1 -- override all reclaim/ressurect/repair's deactivation 'halfboxsize' with the one for MOVE command (give more tolerance when unit is selected)
+					idTargetOutput=IdentifyTargetOnCommandQueue(cQueue,persistentData,gateKeeperOutput,unitInMotion[i]) --check old or new command
+					if selectedCons_Meta[unitID] and idTargetOutput["boxSizeTrigger"]~= 4 then --if unitIsSelected and NOT using GUARD 'halfboxsize' (ie: is not guarding) then:
+						idTargetOutput["boxSizeTrigger"] = 1 -- override all reclaim/ressurect/repair's deactivation 'halfboxsize' with the one for MOVE command (give more tolerance when unit is selected)
 					end
-					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger) --check if widget should ignore command
-		
-					if ((newCommand and cQueueTemp[1].id==CMD_MOVE) or cQueueTemp[2].id==CMD_MOVE) and not unitVisible then --if unit is issued a move Command and is outside user's view. Note: is using cQueueTemp because cQueue can be NIL
+					local reachedTarget = TargetBoxReached(unitID, idTargetOutput) --check if widget should ignore command
+					if ((idTargetOutput["newCommand"] and gateKeeperOutput["cQueueTemp"][1].id==CMD_MOVE) or gateKeeperOutput["cQueueTemp"][2].id==CMD_MOVE) and (unitInMotion[i]["isVisible"]~= "yes") then --if unit is issued a move Command and is outside user's view. Note: is using cQueueTemp because cQueue can be NIL
 						reachedTarget = false --force unit to continue avoidance despite close to target (try to circle over target until seen by user)
-					elseif (case == "none") then
+					elseif (idTargetOutput["case"] == "none") then
 						reachedTarget = true --do not process unhandled command. This fix a case of unwanted behaviour when ZK's SmartAI issued a fight command on top of Avoidance's order and cause conflicting behaviour. 
-					elseif (not reloadAvoidance and case == 'attack') then
+					elseif (not gateKeeperOutput["reloadAvoidance"] and idTargetOutput["case"] == 'attack') then
 						reachedTarget = true --do not process direct attack command. Avoidance is not good enough for melee unit
 					end
 					if reachedTarget then --if reached target
-						if not newCommand then
+						if not idTargetOutput["newCommand"] then
 							spGiveOrderToUnit(unitID,CMD_REMOVE,{cQueue[1].tag,},{}) --remove previously given (avoidance) command if reached target
 						end
-						commandIndexTable[unitID]=nil --empty the commandIndex (command history)
+						persistentData["commandIndexTable"][unitID]=nil --empty the commandIndex (command history)
 					else --execute when target not reached yet	
 					
-						local losRadius	= GetUnitLOSRadius(unitID,case,fastestWeapon) --get LOS. also custom LOS for case=="attack" & weapon range >0
-						local isMeleeAttacks = (case == 'attack' and unitInMotion[i].weaponType == 0)
-						local excludedEnemyID = (isMeleeAttacks) and targetID
-						local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker,excludedEnemyID) --catalogue enemy
-						if surroundingUnits[1]~=nil then  --execute when enemy exist
-							--local unitType =unitInMotion[i][2]
+						local losRadius = GetUnitLOSRadius(idTargetOutput["case"],unitInMotion[i]) --get LOS. also custom LOS for case=="attack" & weapon range >0
+						local isMeleeAttacks = (idTargetOutput["case"] == 'attack' and unitInMotion[i]["weaponType"] == 0)
+						local excludedEnemyID = (isMeleeAttacks) and idTargetOutput["targetID"]
+						local surroundingUnits = GetAllUnitsInRectangle(unitID, losRadius, attacker,excludedEnemyID) --catalogue enemy
+						if surroundingUnits["count"]~=0 then  --execute when enemy exist
+							--local unitType =unitInMotion[i]["unitType"]
 							--local unitSSeparation, losRadius = CatalogueMovingObject(surroundingUnits, unitID, lastPosition, unitType, losRadius) --detect initial enemy separation & alter losRadius when unit submerged
 							local unitSSeparation, losRadius = CatalogueMovingObject(surroundingUnits, unitID, losRadius) --detect initial enemy separation & alter losRadius when unit submerged
-							local unitSpeed = unitInMotion[i][3]
-							local decloakScaling = unitInMotion[i][5]
-							local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
+							local impatienceTrigger = GetImpatience(idTargetOutput,unitID, persistentData)
 							if (turnOnEcho == 1) then
 								Spring.Echo("unitsSeparation(DoCalculation):")
 								Spring.Echo(unitsSeparation)
 							end
-							local avoidanceCommand = true
-							local orderArray = {nil}
-							local infoToInsertOnCmdQueue = {
-								cQueue,cQueueTemp, unitID, newCommand,
-								now,commandTTL,commandIndexTable,
-							}
-							commandTTL, avoidanceCommand,orderArray= InsertCommandQueue(infoToInsertOnCmdQueue)--delete old widget command, update commandTTL, and send constructor to base for retreat
+							local avoidanceCommand,orderArray= InsertCommandQueue(unitID,cQueue,gateKeeperOutput["cQueueTemp"],idTargetOutput["newCommand"],persistentData)--delete old widget command, update commandTTL, and send constructor to base for retreat
 							if avoidanceCommand or (not options.dbg_RemoveAvoidanceSplitSecond.value) then
-								if targetCoordinate[1] == -1 then --no target
-									targetCoordinate,allyClusterInfo = UseNearbyAllyAsTarget(unitID,allyClusterInfo,myTeamID)
+								if idTargetOutput["targetCoordinate"][1] == -1 then --no target
+									idTargetOutput["targetCoordinate"] = UseNearbyAllyAsTarget(unitID,persistentData) --eg: when retreating to nearby ally
 								end
-								local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,surroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand,decloakScaling) --calculate move solution
+								local newX, newZ = AvoidanceCalculator(losRadius,surroundingUnits,unitSSeparation,impatienceTrigger,persistentData,idTargetOutput,unitInMotion[i]) --calculate move solution
 								local newY=spGetGroundHeight(newX,newZ)
 								--Inserting command queue:--
-								if (cQueue==nil or #cQueue<2) and cQueueTemp[1].id == cMD_DummyG then --if #cQueueSyncTest is less than 2 mean unit has widget's mono-command, and cMD_DummyG mean its idle & out of view:
+								if (cQueue==nil or #cQueue<2) and gateKeeperOutput["cQueueTemp"][1].id == cMD_DummyG then --if #cQueueSyncTest is less than 2 mean unit has widget's mono-command, and cMD_DummyG mean its idle & out of view:
 									orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD.OPT_SHIFT, newX, newY, newZ}, {"alt"}} -- using SHIFT prevent unit from returning to old position. NOTE: we NEED to use insert here (rather than use direct move command) because in high-ping situation (where user's command do not register until last minute) user's command will get overriden if both widget's and user's command arrive at same time.
 								else
 									orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}),  insert new command (Note: CMD_OPT_INTERNAL is used to mark that this command is widget issued and need not special treatment. ie: It won't get repeated if Repeat state is used.)
 								end
-								local lastIndx = commandTTL[unitID][1] --commandTTL[unitID]'s table lenght
-								commandTTL[unitID][lastIndx+1] = {countDown = commandTimeoutG, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
-								commandTTL[unitID][1] = lastIndx+1 --refresh commandTTL[unitID]'s table lenght
-								commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
-								commandIndexTable[unitID]["widgetZ"]=newZ
+								local lastIndx = persistentData["commandTTL"][unitID][1] --commandTTL[unitID]'s table lenght
+								persistentData["commandTTL"][unitID][lastIndx+1] = {countDown = commandTimeoutG, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
+								persistentData["commandTTL"][unitID][1] = lastIndx+1 --refresh commandTTL[unitID]'s table lenght
+								persistentData["commandIndexTable"][unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
+								persistentData["commandIndexTable"][unitID]["widgetZ"]=newZ
 								--end--
 							end
 							local orderCount = #orderArray
@@ -575,13 +574,13 @@ function DoCalculation(passedInfo)
 								spGiveOrderArrayToUnitArray ({unitID},orderArray)
 								isAvoiding = true
 								
-								if waitForNetworkDelay then
-									waitForNetworkDelay[2] = waitForNetworkDelay[2] + 1
+								if persistentData["waitForNetworkDelay"] then
+									persistentData["waitForNetworkDelay"][2] = persistentData["waitForNetworkDelay"][2] + 1
 								else
-									waitForNetworkDelay = {spGetGameSeconds(),1}
+									persistentData["waitForNetworkDelay"] = {spGetGameSeconds(),1}
 								end
 								local moveOrderParams =  orderArray[orderCount][2]
-								issuedOrderTo[unitID] = {moveOrderParams[4], moveOrderParams[5], moveOrderParams[6]}
+								issuedOrderTo_G[unitID] = {moveOrderParams[4], moveOrderParams[5], moveOrderParams[6]}
 							end
 						end
 					end --reachedTarget
@@ -589,11 +588,11 @@ function DoCalculation(passedInfo)
 			end --if spGetUnitIsDead(unitID)==false
 		end
 	end --if unitInMotion[1]~=nil
-	return commandIndexTable, commandTTL, isAvoiding,waitForNetworkDelay,allyClusterInfo --send separation result away
+	return persistentData,isAvoiding --send separation result away
 end
 
 function CountdownNetworkDelayWait(unitID)
-	issuedOrderTo[unitID] = nil 
+	issuedOrderTo_G[unitID] = nil 
 	if waitForNetworkDelay_gbl then
 		waitForNetworkDelay_gbl[2] = waitForNetworkDelay_gbl[2] - 1 
 		if waitForNetworkDelay_gbl[2]==0 then 
@@ -734,18 +733,19 @@ function CheckWeaponsAndShield (unitDef)
 	return unitShieldPower, reloadableWeaponIndex,fastestReloadTime,fastReloadRange
 end
 
-function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit,myTeamID)
+function GateKeeperOrCommandFilter (cQueue,persistentData, unitInMotionSingleUnit)
 	local allowExecution = false
-	local returnReload = false -- indicate to way way downstream processes whether avoidance is based on weapon reload/shieldstate 
+	local reloadAvoidance = false -- indicate to way way downstream processes whether avoidance is based on weapon reload/shieldstate
 	if cQueue~=nil then --prevent ?. Forgot...
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
+		local unitID = unitInMotionSingleUnit["unitID"]
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
-		local unitType = unitInMotionSingleUnit[2]
+		local unitType = unitInMotionSingleUnit["unitType"]
 		local unitInView = unitInMotionSingleUnit["isVisible"]
 		local retreating = false
 		if options.retreatAvoidance.value and WG.retreatingUnits then
-			retreating = (WG.retreatingUnits[unitID]~=nil)
+			retreating = (WG.retreatingUnits[unitID]~=nil or spGetUnitRulesParam(unitID,"isRetreating")==1)
 		end
 		--if ((unitInView ~= "yes") or isReloading or (unitType == 1 and options.cloakyAlwaysFlee.value)) then --if unit is out of user's vision OR is reloading OR is cloaky, and: 
 			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
@@ -779,7 +779,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit,myTea
 				_2ndAttackSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)
 				_2ndGuardSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_GUARD)
 			end
-			local isAbundanceResource = (spGetTeamResources(myTeamID, "metal") > 10)
+			local isAbundanceResource = (spGetTeamResources(persistentData["myTeamID"], "metal") > 10)
 			local isReloadingAttack = (isReloading and (_1stAttackSignature or (cQueue[1].id == cMD_DummyG or cQueue[1].id == cMD_Dummy_atkG) or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (_1stGuardSignature or _2ndGuardSignature)
 			local isAttackingState = (_1stAttackSignature or _2ndAttackSignature)
@@ -798,33 +798,28 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit,myTea
 				if isReloadAvoidance or #cQueue>=2 then --check cQueue for lenght to prevent STOP command from short circuiting the system 
 					if isReloadAvoidance or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						allowExecution = true --allow execution
-						returnReload = isReloadAvoidance
+						reloadAvoidance = isReloadAvoidance
 					end --if cQueue[2].id~=false
 					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
 				end --if #cQueue>=2
 			end --if ((cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and (unitInMotion[i][2]==1 or unitInMotion[i].isVisible == nil)
 		end --if cQueue[1]~=nil
-	end --if cQueue~=nil	
-	return allowExecution, cQueue,returnReload --disallow/allow execution
+	end --if cQueue~=nil
+	local output = {
+		cQueueTemp = cQueue,
+		allowExecution = allowExecution,
+		reloadAvoidance = reloadAvoidance,
+	}
+	return output --disallow/allow execution
 end
 
 --check if widget's command or user's command
-function IdentifyTargetOnCommandQueue(passedInfo) --//used by DoCalculation()
-	local cQueueOri = passedInfo[1] 
-	local cQueueGKPed = passedInfo[2]
-	local unitID = passedInfo[3]
-	local commandIndexTable = passedInfo[4]
-	local fixedPointCONSTANTtrigger = passedInfo[5]
-	local unitVisible = passedInfo[6]
-	local weaponRange = passedInfo[7]
-	local weaponType = passedInfo[8]
+function IdentifyTargetOnCommandQueue(cQueueOri,persistentData,gateKeeperOutput,unitInMotionSingleUnit) --//used by DoCalculation()
+	local unitID = unitInMotionSingleUnit["unitID"]
+	local commandIndexTable = persistentData["commandIndexTable"]
 	
-	local targetCoordinate = {nil,nil,nil}
-	local boxSizeTrigger=0
-	local graphCONSTANTtrigger = {}
 	local newCommand=true -- immediately assume user's command
-	local case=''
-	local targetID=nil
+	local output
 	--------------------------------------------------
 	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros or non-significant number
 		commandIndexTable[unitID]={widgetX=-2, widgetZ=-2 , patienceIndexA=0}
@@ -855,24 +850,24 @@ function IdentifyTargetOnCommandQueue(passedInfo) --//used by DoCalculation()
 			end
 		end
 	end
-	local infoForExtractingTargetPosition = {
-		unitID,cQueueGKPed,targetCoordinate,
-		fixedPointCONSTANTtrigger,unitVisible,weaponRange,weaponType,
-		}
 	if newCommand then	--if user's new command
-		targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case,targetID = ExtractTarget (1,infoForExtractingTargetPosition)
+		output = ExtractTarget (1,gateKeeperOutput["cQueueTemp"],unitInMotionSingleUnit)
 		commandIndexTable[unitID]["patienceIndexA"]=0 --//reset impatience counter
 	else  --if widget's previous command
-		targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger,case,targetID = ExtractTarget (2,infoForExtractingTargetPosition)	
+		output = ExtractTarget (2,gateKeeperOutput["cQueueTemp"],unitInMotionSingleUnit)
 	end
-	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case,targetID --return target coordinate
+	output["newCommand"] = newCommand
+	persistentData["commandIndexTable"] = commandIndexTable --note: table is referenced by memory, so it will update even without return value
+	return output --return target coordinate
 end
 
 --ignore command set on this box
-function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger)
+function TargetBoxReached (unitID, idTargetOutput)
 	----Global Constant----
 	local halfTargetBoxSize = halfTargetBoxSize_g
 	-----------------------
+	local boxSizeTrigger = idTargetOutput["boxSizeTrigger"]
+	local targetCoordinate = idTargetOutput["targetCoordinate"]
 	local currentX,_,currentZ = spGetUnitPosition(unitID)
 	local targetX = dNil(targetCoordinate[1]) -- use dNil if target asynchronously/spontaneously disappear: in that case it will replace "nil" with -1 
 	local targetZ =targetCoordinate[3]
@@ -895,10 +890,12 @@ function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger)
 end
 
 -- get LOS
-function GetUnitLOSRadius(unitID,case,fastestWeapon)
+function GetUnitLOSRadius(case,unitInMotionSingleUnit)
 	----Global Constant----
 	local extraLOSRadiusCONSTANT = extraLOSRadiusCONSTANTg
 	-----------------------
+	local fastestWeapon = unitInMotionSingleUnit["weaponInfo"]
+	local unitID =unitInMotionSingleUnit["unitID"]
 	local unitDefID= spGetUnitDefID(unitID)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
@@ -950,7 +947,7 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker,excludedEnemyID)
 	
 	local unitsInRectangle = spGetUnitsInRectangle(x-losRadius, z-losRadius, x+losRadius, z+losRadius)
 	local relevantUnit={}
-	local arrayIndex=1
+	local arrayIndex=0
 	
 	--add attackerID into enemy list
 	relevantUnit, arrayIndex = AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
@@ -985,15 +982,14 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker,excludedEnemyID)
 			end
 		end
 	end
-	if arrayIndex>1 then relevantUnit[1]=arrayIndex --fill index 1 with array lenght
-	else relevantUnit[1]=nil end
+	relevantUnit["count"] = arrayIndex
 	return relevantUnit
 end
 
 --allow a unit to recognize fleeing enemy; so it doesn't need to avoid them
 function CatalogueMovingObject(surroundingUnits, unitID,losRadius)
 	local unitsSeparation={}
-	if (surroundingUnits[1]~=nil) then --don't catalogue anything if no enemy exist
+	if (surroundingUnits["count"] and surroundingUnits["count"]>0) then --don't catalogue anything if no enemy exist
 		local unitDepth = 99
 		local sonarDetected = false
 		local halfLosRadius = losRadius/2
@@ -1002,7 +998,7 @@ function CatalogueMovingObject(surroundingUnits, unitID,losRadius)
 		--end
 		local unitXvel,_,unitZvel = spGetUnitVelocity(unitID)
 		local unitSpeed = math.sqrt(unitXvel*unitXvel+unitZvel*unitZvel)
-		for i=2,surroundingUnits[1],1 do --//iterate over all enemy list.
+		for i=1,surroundingUnits["count"],1 do --//iterate over all enemy list.
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil) then
 				local recXvel,_,recZvel = spGetUnitVelocity(unitRectangleID)
@@ -1042,19 +1038,24 @@ function CatalogueMovingObject(surroundingUnits, unitID,losRadius)
 	return unitsSeparation, losRadius
 end
 
-function GetImpatience(newCommand, unitID, commandIndexTable)
+function GetImpatience(idTargetOutput,unitID, persistentData)
+	local newCommand = idTargetOutput["newCommand"]
+	local commandIndexTable = persistentData["commandIndexTable"]
 	local impatienceTrigger=1 --zero will de-activate auto reverse
 	if commandIndexTable[unitID]["patienceIndexA"]>=6 then impatienceTrigger=0 end --//if impatience index level 6 (after 6 time avoidance) then trigger impatience. Impatience will deactivate/change some values downstream
 	if not newCommand and activateImpatienceG==1 then
 		commandIndexTable[unitID]["patienceIndexA"]=commandIndexTable[unitID]["patienceIndexA"]+1 --increase impatience index if impatience system is activate
 	end
 	if (turnOnEcho == 1) then Spring.Echo("commandIndexTable[unitID][patienceIndexA] (GetImpatienceLevel) " .. commandIndexTable[unitID]["patienceIndexA"]) end
-	return impatienceTrigger, commandIndexTable
+	persistentData["commandIndexTable"] = commandIndexTable --Note: this will update since its referenced by memory
+	return impatienceTrigger
 end
 
-function UseNearbyAllyAsTarget(unitID, allyClusterInfo,myTeamID)
+function UseNearbyAllyAsTarget(unitID, persistentData)
 	local x,y,z = -1,-1,-1
 	if WG.OPTICS_cluster then
+		local allyClusterInfo = persistentData["allyClusterInfo"]
+		local myTeamID = persistentData["myTeamID"]
 		if (allyClusterInfo["age"]>= 3) then --//only update after 4 cycle:
 			allyClusterInfo["age"]= 0
 			allyClusterInfo["coords"] = {}
@@ -1072,7 +1073,7 @@ function UseNearbyAllyAsTarget(unitID, allyClusterInfo,myTeamID)
 							--intentionally empty. Not include builder.
 						elseif unitDef.customParams.commtype then --if COMMANDER,
 							unorderedUnitList[unitID_list] = {x,y,z} --//store
-						elseif not unitDef["canFly"] then --if all ground unit, amphibious, and ships (except commander)
+						elseif not (unitDef["canFly"] or unitDef["isAirUnit"]) then --if all ground unit, amphibious, and ships (except commander)
 							unorderedUnitList[unitID_list] = {x,y,z} --//store
 						elseif (unitDef.hoverAttack== true) then --if gunships
 							--intentionally empty. Not include gunships.
@@ -1113,6 +1114,7 @@ function UseNearbyAllyAsTarget(unitID, allyClusterInfo,myTeamID)
 		if nearestCluster > 0 then
 			x,y,z = coordinateList[nearestCluster][1],coordinateList[nearestCluster][2],coordinateList[nearestCluster][3]
 		end
+		persistentData["allyClusterInfo"] = allyClusterInfo --update content
 	end
 	if x == -1 then
 		local nearbyAllyUnitID = Spring.GetUnitNearestAlly (unitID, 600)
@@ -1120,10 +1122,19 @@ function UseNearbyAllyAsTarget(unitID, allyClusterInfo,myTeamID)
 			x,y,z = spGetUnitPosition(nearbyAllyUnitID)
 		end
 	end
-	return {x,y,z},allyClusterInfo
+	return {x,y,z}
 end
 
-function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand, decloakScaling)
+function AvoidanceCalculator(losRadius,surroundingUnits,unitsSeparation,impatienceTrigger,persistentData,idTargetOutput,unitInMotionSingleUnit)
+	local newCommand = idTargetOutput["newCommand"]
+	local skippingTimer = persistentData["skippingTimer"]
+	local unitID = unitInMotionSingleUnit["unitID"]
+	local unitSpeed = unitInMotionSingleUnit["unitSpeed"]
+	local graphCONSTANTtrigger = idTargetOutput["graphCONSTANTtrigger"]
+	local fixedPointCONSTANTtrigger = idTargetOutput["fixedPointCONSTANTtrigger"]
+	local targetCoordinate = idTargetOutput["targetCoordinate"]
+	local decloakScaling = unitInMotionSingleUnit["decloakScaling"]
+	
 	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 								= aCONSTANTg --attractor constant (amplitude multiplier)
 		local obsCONSTANT 								=obsCONSTANTg --repulsor constant (amplitude multiplier)
@@ -1143,20 +1154,21 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 			fTargetSlope			= GetFtargetSlope (aCONSTANT, targetAngle, unitDirection, fTarget)
 			--local targetSubtendedAngle 	= GetTargetSubtendedAngle(unitID, targetCoordinate) --get target 'size' as viewed by the unit
 		end
-
-		local wTotal=0
-		local fObstacleSum=0
-		local dFobstacle=0
-		local dSum=0
-		local nearestFrontObstacleRange =999
-		local normalizingFactor=0
-
+		
+		local sumAllUnitOutput = {
+			wTotal = nil,
+			dSum = nil,
+			fObstacleSum = nil,
+			dFobstacle = nil,
+			nearestFrontObstacleRange = nil,
+			normalizingFactor = nil,
+		}
 		--count every enemy unit and sum its contribution to the obstacle/repulsor variable
-		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius,obsCONSTANT,skippingTimer)
+		sumAllUnitOutput=SumAllUnitAroundUnitID (obsCONSTANT,unitDirection,losRadius,surroundingUnits,unitsSeparation,impatienceTrigger,graphCONSTANTtrigger,unitInMotionSingleUnit,skippingTimer)
 		--calculate appropriate behaviour based on the constant and above summation value
-		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
+		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, fTarget, fixedPointCONSTANTtrigger,sumAllUnitOutput)
 		--convert an angular command into a coordinate command
-		local newX, newZ= ToCoordinate(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, wasMoving, newCommand)
+		local newX, newZ= ToCoordinate(wTarget, wObstacle, fTarget, unitDirection, losRadius, impatienceTrigger, skippingTimer, wasMoving, newCommand,sumAllUnitOutput, unitInMotionSingleUnit)
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -1180,18 +1192,14 @@ end
 
 -- maintain the visibility of original command
 -- reference: "unit_tactical_ai.lua" -ZeroK gadget by Google Frog
-function InsertCommandQueue(passedInfo)
+function InsertCommandQueue(unitID,cQueue,cQueueGKPed,newCommand,persistentData)
 	------- localize global constant:
 	local consRetreatTimeout = consRetreatTimeoutG
 	local commandTimeout = commandTimeoutG
 	------- end global constant
-	local cQueue = passedInfo[1]
-	local cQueueGKPed = passedInfo[2]
-	local unitID = passedInfo[3]
-	local newCommand = passedInfo[4]
-	local now = passedInfo[5]
-	local commandTTL = passedInfo[6]
-	local commandIndexTable = passedInfo[7]	
+	local now = persistentData["now"]
+	local commandTTL = persistentData["commandTTL"]
+	local commandIndexTable = persistentData["commandIndexTable"]
 	-------
 	--Method 1: doesn't work online
 	--if not newCommand then spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) end --delete old command
@@ -1307,7 +1315,8 @@ function InsertCommandQueue(passedInfo)
 			Spring.Echo(cQueue[2].params[3])
 		end
 	end
-	return commandTTL, avoidanceCommand, orderArray --return updated memory tables. One for checking if new command is issued and another is to check for command's expiration age.
+	persistentData["commandTTL"] = commandTTL ----return updated memory tables used to check for command's expiration age.
+	return avoidanceCommand, orderArray --return whether new command is to be issued
 end
 ---------------------------------Level2
 ---------------------------------Level3 (low-level function)
@@ -1319,12 +1328,12 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 	local secondPerGameFrame =secondPerGameFrameG
 	local isOldSpring = isOldSpringG --for Spring < 95 compatibility
 	------
-	--local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
+	--local unitType = unitInMotionSingleUnitTable["unitType"] --retrieve stored unittype
 	local shieldIsCritical =false
 	local weaponIsEmpty = false
-	local fastestWeapon = unitInMotionSingleUnitTable[6]
+	local fastestWeapon = unitInMotionSingleUnitTable["weaponInfo"]
 	--if unitType ==2 or unitType == 1 then
-		local unitID = unitInMotionSingleUnitTable[1] --retrieve stored unitID
+		local unitID = unitInMotionSingleUnitTable["unitID"] --retrieve stored unitID
 		local unitShieldPower = fastestWeapon["unitShieldPower"] --retrieve registered full shield power
 		if unitShieldPower ~= -1 then
 			local _, currentPower = spGetUnitShieldState(unitID)
@@ -1337,7 +1346,7 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 		local unitFastestReloadableWeapon = fastestWeapon["reloadableWeaponIndex"] --retrieve the quickest reloadable weapon index
 		local fastestReloadTime = fastestWeapon["reloadTime"] --in second
 		if unitFastestReloadableWeapon ~= -1 then
-			-- local unitSpeed = unitInMotionSingleUnitTable[3]
+			-- local unitSpeed = unitInMotionSingleUnitTable["unitSpeed"]
 			-- local distancePerSecond = unitSpeed
 			-- local fastUnit_shortRange = unitSpeed > fastestWeapon["range"] --check if unit can exit range easily if *this widget* evasion is activated
 			-- local unitValidForReloadEvasion = true
@@ -1368,14 +1377,13 @@ function dNil(x)
 	return x
 end
 
-function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnCommandQueue()
-	local unitID = passedInfo[1]
-	local cQueue = passedInfo[2]
-	local targetCoordinate = passedInfo[3]
-	local fixedPointCONSTANTtrigger = passedInfo[4]
-	local unitVisible = passedInfo[5]
-	local weaponRange = passedInfo[6]
-	local weaponType = passedInfo[7]
+function ExtractTarget (queueIndex, cQueue,unitInMotionSingleUnit) --//used by IdentifyTargetOnCommandQueue()
+	local unitID = unitInMotionSingleUnit["unitID"]
+	local targetCoordinate = {nil,nil,nil}
+	local fixedPointCONSTANTtrigger = unitInMotionSingleUnit["fixedPointType"]
+	local unitVisible = (unitInMotionSingleUnit["isVisible"]== "yes")
+	local weaponRange = unitInMotionSingleUnit["weaponInfo"]["range"]
+	local weaponType = unitInMotionSingleUnit["weaponType"]
 	
 	local boxSizeTrigger=0 --an arbitrary constant/variable, which trigger some other action/choice way way downstream. The purpose is to control when avoidance must be cut-off using custom value (ie: 1,2,3,4) for specific cases.
 	local graphCONSTANTtrigger = {}
@@ -1556,7 +1564,15 @@ function ExtractTarget (queueIndex, passedInfo) --//used by IdentifyTargetOnComm
 		fixedPointCONSTANTtrigger = 3
 		case = 'none'
 	end
-	return targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger,case, targetID
+	local output = {
+		targetCoordinate = targetCoordinate,
+		boxSizeTrigger = boxSizeTrigger,
+		graphCONSTANTtrigger = graphCONSTANTtrigger,
+		fixedPointCONSTANTtrigger = fixedPointCONSTANTtrigger,
+		case = case,
+		targetID = targetID,
+	}
+	return output
 end
 
 function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
@@ -1625,17 +1641,26 @@ function GetTargetSubtendedAngle(unitID, targetCoordinate)
 end
 
 --sum the contribution from all enemy unit
-function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius, obsCONSTANT,skippingTimer)
+function SumAllUnitAroundUnitID (obsCONSTANT,unitDirection,losRadius,surroundingUnits,unitsSeparation,impatienceTrigger,graphCONSTANTtrigger,unitInMotionSingleUnit,skippingTimer)
+	local thisUnitID = unitInMotionSingleUnit["unitID"]
+	local unitType = unitInMotionSingleUnit["unitType"]
+	
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG -- make the slopes in the extremeties of obstacle graph more sloppy (refer to "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas)
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
 	local useLOS_distanceCONSTANT = useLOS_distanceCONSTANTunit_G
 	local normalizeObsGraph = normalizeObsGraphG
+	local cmd_then_DoCalculation_delay = cmd_then_DoCalculation_delayG
 	----
+	local wTotal=0
+	local fObstacleSum=0
+	local dFobstacle=0
+	local dSum=0
+	local nearestFrontObstacleRange =999
 	local normalizingFactor = 1
 	
 	if (turnOnEcho == 1) then Spring.Echo("unitID(SumAllUnitAroundUnitID)" .. thisUnitID) end
-	if (surroundingUnits[1]~=nil) then --don't execute if no enemy unit exist
+	if (surroundingUnits["count"] and surroundingUnits["count"]>0) then --don't execute if no enemy unit exist
 		local graphSample={}
 		if normalizeObsGraph then --an option (default OFF) allow the obstacle graph to be normalized for experimenting purposes 
 			for i=1, 180+1, 1 do
@@ -1644,29 +1669,22 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 		end
 		local thisXvel,_,thisZvel = spGetUnitVelocity(thisUnitID)
 		local thisX,_,thisZ = spGetUnitPosition(thisUnitID)
-		thisXvel = thisXvel*30*skippingTimer.averageDelay/2 --convert per-frame velocity into per-second velocity, then into elmo-per-averageNetworkDelay
-		thisZvel = thisZvel*30*skippingTimer.averageDelay/2
-		for i=2,surroundingUnits[1], 1 do
+		local delay_1 = skippingTimer.averageDelay/2
+		local delay_2 = cmd_then_DoCalculation_delay
+		local thisXvel_delay2,thisZvel_delay2 =  GetDistancePerDelay(thisXvel,thisZvel, delay_2)
+		local thisXvel_delay1,thisZvel_delay1 = GetDistancePerDelay(thisXvel,thisZvel,delay_1) --convert per-frame velocity into per-second velocity, then into elmo-per-averageNetworkDelay
+		for i=1,surroundingUnits["count"], 1 do
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil)then --excluded any nil entry
-				local recXvel,_,recZvel = spGetUnitVelocity(unitRectangleID)
-				local recX,_,recZ = spGetUnitPosition(unitRectangleID)
-				recXvel = recXvel or 0
-				recZvel = recZvel or 0
-				recXvel = recXvel*30*skippingTimer.averageDelay/2 - thisXvel --calculate relative elmo-per-averageNetworkDelay
-				recZvel = recZvel*30*skippingTimer.averageDelay/2 - thisZvel
-				recX = recX + recXvel --predict obstacle's offsetted position after network delay has passed
-				recZ = recZ + recZvel
-				local diffX, diffZ = (recX - thisX) , (recZ - thisZ)
-				local unitSeparation = math.sqrt(diffX*diffX+diffZ*diffZ) --spGetUnitSeparation (thisUnitID, unitRectangleID, true) --get 2D distance
+				local recX_delay1,recZ_delay1,unitSeparation_1,_,_,unitSeparation_2 = GetTargetPositionAfterDelay(unitRectangleID, delay_1,delay_2,thisXvel_delay1,thisZvel_delay1,thisXvel_delay2,thisZvel_delay2,thisX,thisZ)
 				if unitsSeparation[unitRectangleID]==nil then unitsSeparation[unitRectangleID]=9999 end --if enemy spontaneously appear then set the memorized separation distance to 9999; maybe previous polling missed it and to prevent nil
 				if (turnOnEcho == 1) then
 					Spring.Echo("unitSeparation <unitsSeparation[unitRectangleID](SumAllUnitAroundUnitID)")
 					Spring.Echo(unitSeparation <unitsSeparation[unitRectangleID])
 				end
-				if unitSeparation <unitsSeparation[unitRectangleID] then --see if the enemy in collision front is maintaining distance/fleeing or is closing in
-					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID,thisX,thisZ,recX,recZ) -- obstacle's angular position with respect to our coordinate
-					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius,unitSeparation) -- obstacle & our unit's angular size 
+				if unitSeparation_2 - unitsSeparation[unitRectangleID] < 30 then --see if the enemy in collision front is maintaining distance/fleeing or is closing in
+					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID,thisX,thisZ,recX_delay1,recZ_delay1) -- obstacle's angular position with respect to our coordinate
+					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius,unitSeparation_1,unitType) -- obstacle & our unit's angular size 
 
 					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
 					if useLOS_distanceCONSTANT then
@@ -1677,15 +1695,15 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					if impatienceTrigger==0 then --impatienceTrigger reach zero means that unit is impatient
 						distanceCONSTANT=distanceCONSTANT/2
 					end
-					local ri, wi, di,diff1 = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT)
+					local ri, wi, di,diff1 = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation_1, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT)
 					local fObstacle = ri*wi*di
 					
 					--get second obstacle/enemy/repulsor wave function to calculate slope
-					local ri2, wi2, di2, diff2= GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT, true)
+					local ri2, wi2, di2, diff2= GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation_1, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT, true)
 					local fObstacle2 = ri2*wi2*di2
 					
 					--create a snapshot of the entire graph. Resolution: 360 datapoint
-					local dI = math.exp(-1*unitSeparation/distanceCONSTANT) --distance multiplier
+					local dI = math.exp(-1*unitSeparation_1/distanceCONSTANT) --distance multiplier
 					local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
 					if normalizeObsGraph then
 						for i=-90, 90, 1 do --sample the entire 360 degree graph
@@ -1706,7 +1724,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					local fObstacleSlope = GetFObstacleSlope(fObstacle2, fObstacle, diff2, diff1)
 
 					--sum all repulsor's wavefunction from every enemy/obstacle within this loop
-					wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange= DoAllSummation (wi, fObstacle, fObstacleSlope, di,wTotal, unitDirection, unitSeparation, relativeAngle, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange)
+					wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange= DoAllSummation (wi, fObstacle, fObstacleSlope, di,wTotal, unitDirection, unitSeparation_1, relativeAngle, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange)
 				end
 			end
 		end
@@ -1724,11 +1742,24 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 			end
 		end
 	end
-	return wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, normalizingFactor --return obstacle's calculation result
+	local output = {
+		wTotal = wTotal,
+		dSum = dSum,
+		fObstacleSum = fObstacleSum,
+		dFobstacle = dFobstacle,
+		nearestFrontObstacleRange = nearestFrontObstacleRange,
+		normalizingFactor = normalizingFactor,
+	}
+	return output --return obstacle's calculation result
 end
 
 --determine appropriate behaviour
-function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
+function CheckWhichFixedPointIsStable (fTargetSlope, fTarget, fixedPointCONSTANTtrigger,sumAllUnitOutput)
+	local dFobstacle = sumAllUnitOutput["dFobstacle"]
+	local dSum = sumAllUnitOutput["dSum"]
+	local wTotal = sumAllUnitOutput["wTotal"]
+	local fObstacleSum = sumAllUnitOutput["fObstacleSum"]
+	
 	--local alphaCONSTANT1, alphaCONSTANT2, gammaCONSTANT1and2, gammaCONSTANT2and1 = ConstantInitialize(fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 	local cCONSTANT1 			=  cCONSTANT1g
 	local cCONSTANT2			= cCONSTANT2g
@@ -1829,11 +1860,17 @@ function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, 
 end
 
 --convert angular command into coordinate, plus other function
-function ToCoordinate(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, wasMoving, newCommand)
+function ToCoordinate(wTarget, wObstacle, fTarget, unitDirection, losRadius, impatienceTrigger, skippingTimer, wasMoving, newCommand,sumAllUnitOutput, unitInMotionSingleUnit)
 	local safetyDistanceCONSTANT=safetyDistanceCONSTANT_fG
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
 	---------
+	local thisUnitID = unitInMotionSingleUnit["unitID"]
+	local unitSpeed = unitInMotionSingleUnit["unitSpeed"]
+	local nearestFrontObstacleRange = sumAllUnitOutput["nearestFrontObstacleRange"]
+	local fObstacleSum = sumAllUnitOutput["fObstacleSum"]
+	local normalizingFactor = sumAllUnitOutput["normalizingFactor"]
+	
 	if (nearestFrontObstacleRange> losRadius) then nearestFrontObstacleRange = 999 end --if no obstacle infront of unit then set nearest obstacle as far as LOS to prevent infinite velocity.
 	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor) --derive a new angle from calculation for move solution
 
@@ -1898,7 +1935,7 @@ function FindSafeHavenForCons(unitID, now)
 					--intentionally empty. Not include cloakies and builder.
 				elseif unitDef.customParams.commtype then --if COMMANDER,
 					unorderedUnitList[unitID_list] = {x,y,z} --//store
-				elseif not unitDef["canFly"] then --if all ground unit, amphibious, and ships (except commander)
+				elseif not (unitDef["canFly"] or unitDef["isAirUnit"]) then --if all ground unit, amphibious, and ships (except commander)
 					--unorderedUnitList[unitID_list] = {x,y,z} --//store
 				elseif (unitDef.hoverAttack== true) then --if gunships
 					--intentionally empty. Not include gunships.
@@ -2006,17 +2043,43 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 	return newX, newZ
 end
 
+function GetTargetPositionAfterDelay(targetUnitID, delay1,delay2,thisXvel_delay1,thisZvel_delay1,thisXvel_delay2,thisZvel_delay2,thisX,thisZ)
+	local recXvel,_,recZvel = spGetUnitVelocity(targetUnitID)
+	local recX,_,recZ = spGetUnitPosition(targetUnitID)
+	recXvel = recXvel or 0
+	recZvel = recZvel or 0
+	local recXvel_delay2, recZvel_delay2 = GetDistancePerDelay(recXvel,recZvel, delay2)
+	recXvel_delay2 = recXvel_delay2 - thisXvel_delay2 --calculate relative elmo-per-delay
+	recZvel_delay2 = recZvel_delay2 - thisZvel_delay2
+	local recX_delay2 = recX + recXvel_delay2 --predict obstacle's offsetted position after a delay has passed
+	local recZ_delay2 = recZ + recZvel_delay2
+	local unitSeparation_2 = Distance(recX_delay2,recZ_delay2,thisX,thisZ)
+	local recXvel_delay1, recZvel_delay1 = GetDistancePerDelay(recXvel,recZvel,delay1)
+	recXvel_delay1 = recXvel_delay1 - thisXvel_delay1 --calculate relative elmo-per-averageNetworkDelay
+	recZvel_delay1 = recZvel_delay1 - thisZvel_delay1
+	local recX_delay1 = recX + recXvel_delay1 --predict obstacle's offsetted position after network delay has passed
+	local recZ_delay1 = recZ + recZvel_delay1
+	local unitSeparation_1 = Distance(recX_delay1,recZ_delay1,thisX,thisZ) --spGetUnitSeparation (thisUnitID, unitRectangleID, true) --get 2D distance
+	return recX_delay1,recZ_delay1,unitSeparation_1,recX_delay2,recZ_delay2,unitSeparation_2
+end
+
 --get enemy angular size with respect to unit's perspective
-function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius,unitSeparation)
+function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius,unitSeparation,main_unitType)
 	local unitSize2 =32 --a commander size for an unidentified enemy unit
 	local unitDefID2= spGetUnitDefID(unitID2)
 	local unitDef2= UnitDefs[unitDefID2]
-	if (unitDef2~=nil) then	unitSize2 = unitDef2.xsize*8 --8 unitDistance per each square times unitDef's square, a correct size for an identified unit
+	if (unitDef2~=nil) then 
+		unitSize2 = unitDef2.xsize*8 --8 unitDistance per each square times unitDef's square, a correct size for an identified unit\
 	end
-
+	
 	local unitDefID= spGetUnitDefID(unitIDmain)
 	local unitDef= UnitDefs[unitDefID]
 	local unitSize = unitDef.xsize*8 --8 is the actual Distance per square
+	
+	if (main_unitType~=1) then --non-cloaky unit view enemy size as its weapon range (this to make it avoid getting into range)
+		unitSize2 = math.min(unitDef2.maxWeaponRange,unitDef.maxWeaponRange)
+	end
+	
 	local separationDistance = unitSeparation
 	--if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2, true) --actual separation distance
 	--else separationDistance = losRadius -- GetUnitLOSRadius(unitIDmain) --as far as unit's reported LOSradius
@@ -2199,6 +2262,11 @@ function Distance(x1,z1,x2,z2)
   local dis = math.sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
   return dis
 end
+
+function GetDistancePerDelay(velocityX, velocityZ, delaySecond)
+	return velocityX*30*delaySecond,velocityZ*30*delaySecond --convert per-frame velocity into per-second velocity, then into elmo-per-delay
+end
+
 ---------------------------------Level5
 
 --REFERENCE:
