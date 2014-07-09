@@ -1,4 +1,4 @@
-local versionName = "v2.876"
+local versionName = "v2.877"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -1650,7 +1650,6 @@ end
 --sum the contribution from all enemy unit
 function SumAllUnitAroundUnitID (obsCONSTANT,unitDirection,losRadius,surroundingUnits,unitsSeparation,impatienceTrigger,graphCONSTANTtrigger,unitInMotionSingleUnit,skippingTimer)
 	local thisUnitID = unitInMotionSingleUnit["unitID"]
-	local unitType = unitInMotionSingleUnit["unitType"]
 	
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG -- make the slopes in the extremeties of obstacle graph more sloppy (refer to "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas)
 	local smCONSTANT = smCONSTANTunitG --?
@@ -1691,7 +1690,7 @@ function SumAllUnitAroundUnitID (obsCONSTANT,unitDirection,losRadius,surrounding
 				end
 				if unitSeparation_2 - unitsSeparation[unitRectangleID] < 30 then --see if the enemy in collision front is maintaining distance/fleeing or is closing in
 					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID,thisX,thisZ,recX_delay1,recZ_delay1) -- obstacle's angular position with respect to our coordinate
-					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius,unitSeparation_1,unitType) -- obstacle & our unit's angular size 
+					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius,unitSeparation_1) -- obstacle & our unit's angular size 
 
 					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
 					if useLOS_distanceCONSTANT then
@@ -2071,20 +2070,21 @@ function GetTargetPositionAfterDelay(targetUnitID, delay1,delay2,thisXvel_delay1
 end
 
 --get enemy angular size with respect to unit's perspective
-function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius,unitSeparation,main_unitType)
+function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius,unitSeparation)
 	local unitSize2 =32 --a commander size for an unidentified enemy unit
 	local unitDefID2= spGetUnitDefID(unitID2)
 	local unitDef2= UnitDefs[unitDefID2]
 	if (unitDef2~=nil) then 
 		unitSize2 = unitDef2.xsize*8 --8 unitDistance per each square times unitDef's square, a correct size for an identified unit
-		if (main_unitType~=1) then --non-cloaky unit view enemy size as its weapon range (this to make it avoid getting into range)
-			unitSize2 = unitDef2.maxWeaponRange
-		end
 	end
 	
 	local unitDefID= spGetUnitDefID(unitIDmain)
 	local unitDef= UnitDefs[unitDefID]
 	local unitSize = unitDef.xsize*8 --8 is the actual Distance per square
+	
+	if (not unitDef["canCloak"]) and (unitDef2~=nil) then --non-cloaky unit view enemy size as its weapon range (this to make it avoid getting into range)
+		unitSize2 = unitDef2.maxWeaponRange
+	end
 	
 	local separationDistance = unitSeparation
 	--if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2, true) --actual separation distance
