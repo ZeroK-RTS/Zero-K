@@ -1,4 +1,4 @@
-local versionName = "v2.875"
+local versionName = "v2.876"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -158,7 +158,7 @@ local allyClusterInfo_gbl = {coords={},age=0}
 --Methods:
 ---------------------------------Level 0
 options_path = 'Game/Unit AI/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
-options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'cloakyAlwaysFlee','retreatAvoidance','dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
+options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'cloakyAlwaysFlee','enableReloadAvoidance','retreatAvoidance','dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
 options = {
 	enableCons = {
 		name = 'Enable for constructors',
@@ -190,6 +190,12 @@ options = {
 		-- value = true,
 		-- desc = 'Enable amphibious unit\'s avoidance feature (including Commander, and submarine). Unit avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded..',
 	-- },
+	enableReloadAvoidance = {
+		name = "Jink during attack",
+		type = 'bool',
+		value = true,
+		desc = "Unit with slow reload will randomly jink to random direction when attacking. NOTE: This have no benefit and bad versus fast attacker or fast weapon but have high chance of dodging versus slow ballistic weapon. Default:On",
+	},
 	enableReturnToBase = {
 		name = "Find base",
 		type = 'bool',
@@ -780,7 +786,7 @@ function GateKeeperOrCommandFilter (cQueue,persistentData, unitInMotionSingleUni
 				_2ndGuardSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_GUARD)
 			end
 			local isAbundanceResource = (spGetTeamResources(persistentData["myTeamID"], "metal") > 10)
-			local isReloadingAttack = (isReloading and (_1stAttackSignature or (cQueue[1].id == cMD_DummyG or cQueue[1].id == cMD_Dummy_atkG) or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
+			local isReloadingAttack = (isReloading and (((_1stAttackSignature or _2ndAttackSignature) and options.enableReloadAvoidance.value) or (cQueue[1].id == cMD_DummyG or cQueue[1].id == cMD_Dummy_atkG))) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (_1stGuardSignature or _2ndGuardSignature)
 			local isAttackingState = (_1stAttackSignature or _2ndAttackSignature)
 			local isForceCloaked = spGetUnitIsCloaked(unitID) and (unitType==2 or unitType==3) --any unit with type 3 (gunship) or type 2 (ground units except cloaky) that is cloaked.
@@ -962,7 +968,8 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker,excludedEnemyID)
 				if recUnitDefID~=nil and (iAmConstructor and iAmNotCloaked) then --if enemy is in LOS & I am a visible constructor: then
 					local recUnitDef = UnitDefs[recUnitDefID] --retrieve enemy definition
 					local enemyParalyzed,_,_ = spGetUnitIsStunned (rectangleUnitID)
-					if recUnitDef["weapons"][1]~=nil and not enemyParalyzed then -- check enemy for weapons and paralyze effect
+					local disarmed = spGetUnitRulesParam(rectangleUnitID,"disarmed")
+					if recUnitDef["weapons"][1]~=nil and not enemyParalyzed and (not disarmed or disarmed ~= 1) then -- check enemy for weapons and paralyze effect
 						registerEnemy = true --register the enemy only if it armed & wasn't paralyzed
 					end
 				else --if enemy is detected (in LOS or RADAR), and iAm a generic units OR any cloaked constructor then:
@@ -2069,16 +2076,15 @@ function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius,unitSeparation,ma
 	local unitDefID2= spGetUnitDefID(unitID2)
 	local unitDef2= UnitDefs[unitDefID2]
 	if (unitDef2~=nil) then 
-		unitSize2 = unitDef2.xsize*8 --8 unitDistance per each square times unitDef's square, a correct size for an identified unit\
+		unitSize2 = unitDef2.xsize*8 --8 unitDistance per each square times unitDef's square, a correct size for an identified unit
+		if (main_unitType~=1) then --non-cloaky unit view enemy size as its weapon range (this to make it avoid getting into range)
+			unitSize2 = unitDef2.maxWeaponRange
+		end
 	end
 	
 	local unitDefID= spGetUnitDefID(unitIDmain)
 	local unitDef= UnitDefs[unitDefID]
 	local unitSize = unitDef.xsize*8 --8 is the actual Distance per square
-	
-	if (main_unitType~=1) then --non-cloaky unit view enemy size as its weapon range (this to make it avoid getting into range)
-		unitSize2 = math.min(unitDef2.maxWeaponRange,unitDef.maxWeaponRange)
-	end
 	
 	local separationDistance = unitSeparation
 	--if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2, true) --actual separation distance
