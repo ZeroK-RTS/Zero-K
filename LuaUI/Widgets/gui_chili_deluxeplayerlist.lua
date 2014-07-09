@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Deluxe Player List - Alpha 2.02",
-    desc      = "v0.207 Chili Deluxe Player List, Alpha Release",
+    desc      = "v0.208 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
@@ -162,7 +162,7 @@ options = {
 		name = "Show tooltips",
 		type = 'bool',
 		value = true,
-		desc = "Show tooltips where available (vs. hiding all tooltips)",
+		desc = "Show tooltips where available (vs. hiding all tooltips. Note: tooltip might block mouse click in some cases)",
 		OnChange = function() SetupPanels() end,
 	},
 	list_size = {
@@ -1351,7 +1351,7 @@ SetupPanels = function ()
 		NCHitTest = function(self,x,y)
 			local alt,ctrl, meta,shift = Spring.GetModKeyState()
 			local _,_,lmb,mmb,rmb = Spring.GetMouseState()
-			if (shift or ctrl or alt) or (mmb or rmb) then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
+			if (shift or ctrl or alt) or (mmb or rmb) or ((not self.tooltip or self.tooltip=="") and not (meta and lmb)) then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
 				return false 
 			end
 			return self --mouse over panel
