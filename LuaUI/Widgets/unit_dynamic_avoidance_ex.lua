@@ -1,4 +1,4 @@
-local versionName = "v2.877"
+local versionName = "v2.878"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -2084,6 +2084,10 @@ function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius,unitSeparation)
 	
 	if (not unitDef["canCloak"]) and (unitDef2~=nil) then --non-cloaky unit view enemy size as its weapon range (this to make it avoid getting into range)
 		unitSize2 = unitDef2.maxWeaponRange
+	end
+	
+	if (unitDef["canCloak"]) then --cloaky unit use decloak distance as body size (to avoid getting too close)
+		unitSize = unitDef["decloakDistance"]
 	end
 	
 	local separationDistance = unitSeparation
