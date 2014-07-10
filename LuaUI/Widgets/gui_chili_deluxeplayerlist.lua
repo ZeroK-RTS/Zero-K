@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Deluxe Player List - Alpha 2.02",
-    desc      = "v0.208 Chili Deluxe Player List, Alpha Release",
+    desc      = "v0.209 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
@@ -100,7 +100,9 @@ options = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
-		OnChange = function(self) scroll_cpl.noMouseWheel = not self.value; end,
+		OnChange = function(self) 
+				scroll_cpl.ignoreMouseWheel = (not self.value and scroll_cpl._vscrollbar); --steal mousewheel only when mousewheel option is TRUE and when vertical scrollbar actually exist. 
+			end,
 	},
 	alignToTop = {
 		name = "Align to top",
@@ -520,7 +522,7 @@ end
 local function MakeSpecTooltip()
 
 	if (not options.show_tooltips.value) or list_size == 4 or (list_size == 3 and #specTeam.roster == 0) then
-		window_cpl.tooltip = nil
+		scroll_cpl.tooltip = nil
 		return
 	end
 	
@@ -567,7 +569,7 @@ local function MakeSpecTooltip()
 		end
 	end
 
-	window_cpl.tooltip = windowTooltip
+	scroll_cpl.tooltip = windowTooltip --tooltip in display region only (window_cpl have soo much waste space)
 end
 
 --------------------------------------------------------------------------------
@@ -979,12 +981,13 @@ end
 
 local function AlignScrollPanel()
 	local height = math.ceil(row * (fontsize+1.5) + 8)
-	scroll_cpl.height = math.min(height, window_cpl.height)
+	scroll_cpl.height = math.min(height,window_cpl.height)
 	if not (options.alignToTop.value) then
 		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
 	else
 		scroll_cpl.y = 0
 	end
+	scroll_cpl.ignoreMouseWheel = (not options.mousewheel.value) and scroll_cpl._vscrollbar --steal mousewheel only when mousewheel option is TRUE and when vertical scrollbar actually exist. 
 end
 
 SetupPlayerNames = function()
@@ -1294,7 +1297,22 @@ SetupScrollPanel = function ()
 		scrollbarSize = 6,
 		width = x_bound,
 		horizontalScrollbar = false,
-		noMouseWheel = not options.mousewheel.value,
+		ignoreMouseWheel = not options.mousewheel.value,
+		NCHitTest = function(self,x,y)
+			local alt,ctrl, meta,shift = Spring.GetModKeyState()
+			local _,_,lmb,mmb,rmb = Spring.GetMouseState()
+			if (shift or ctrl or alt) or (mmb or rmb) or ((not self.tooltip or self.tooltip=="") and not (meta and lmb)) then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
+				return false 
+			end
+			return self --mouse over panel
+		end,
+		OnMouseDown={ function(self)
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return false end
+			WG.crude.OpenPath(options_path)
+			WG.crude.ShowMenu()
+			return true
+		end },
 	}
 	if options.alignToLeft.value then
 		scpl.left = 0
@@ -1348,21 +1366,6 @@ SetupPanels = function ()
 		tweakResizable = true,
 		minimizable = false,
 		minWidth = x_windowbound,
-		NCHitTest = function(self,x,y)
-			local alt,ctrl, meta,shift = Spring.GetModKeyState()
-			local _,_,lmb,mmb,rmb = Spring.GetMouseState()
-			if (shift or ctrl or alt) or (mmb or rmb) or ((not self.tooltip or self.tooltip=="") and not (meta and lmb)) then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
-				return false 
-			end
-			return self --mouse over panel
-		end,
-		OnMouseDown={ function(self)
-			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			if not meta then return false end
-			WG.crude.OpenPath(options_path)
-			WG.crude.ShowMenu()
-			return true
-		end },
 	}
 
 	SetupScrollPanel()
