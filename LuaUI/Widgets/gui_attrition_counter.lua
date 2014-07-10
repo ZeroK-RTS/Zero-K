@@ -1,3 +1,4 @@
+local version = 1.001
 function widget:GetInfo()
   return {
     name      = "1v1 Attrition Scoreboard",
@@ -192,6 +193,7 @@ function CreateWindow()
 		tweakDraggable = true,
 		tweakResizable = true,
         minimizable = true,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 	}
 	
  	killed_caption = Chili.Label:New{

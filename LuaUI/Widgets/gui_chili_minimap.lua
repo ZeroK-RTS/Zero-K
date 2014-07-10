@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.894 Chili Minimap",
+    desc      = "v0.895 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -478,6 +478,7 @@ MakeMinimapWindow = function()
 		resizable = options.alwaysResizable.value,
 	    tweakResizable   = true,
 		minimizable = true,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
 		dragUseGrip = false,
 		minWidth = iconsize*10,

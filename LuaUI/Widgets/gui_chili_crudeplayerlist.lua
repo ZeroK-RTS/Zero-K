@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.324 Chili Crude Player List.",
+    desc      = "v1.325 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -825,6 +825,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = x_bound,
 		NCHitTest = function(self,x,y)
 			local alt,ctrl, meta,shift = Spring.GetModKeyState()
