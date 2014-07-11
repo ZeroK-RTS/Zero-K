@@ -42,7 +42,7 @@ unitDef = {
     helptext       = [[A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher]],
     helptext_es    = [[Un favorito tradicional, la f?brica de veh?culos Logos es la f?brica "blitzkrieg" ideal con sus unidades r?pidas y agresivas. Las unidades que no son r?pidas lo compensan con poder de fuego copioso.]],
     helptext_it    = [[Un favorito tradizionale, la fabbrica de veicoli Logos ? la fabbrica "blitzkrieg" ideale con le sue unita veloci ed aggressive. Quelle unita a cui manca la velocita lo compensano con una potenza di fuoco copiosa.]],
-	helptext_de    = [[Der Traditionalist unter den Fabriken. Die Vehicle Plant ist ideal f�r den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher]],
+	helptext_de    = [[Der Traditionalist unter den Fabriken. Die Vehicle Plant ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher]],
 	helptext_pl    = [[Pojazdy to jednostki idealne do wojny blyskawicznej dzieki wysokiej predkosci i niesamowitej sile ognia.]],
     sortName       = [[2]],
   },
