@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.432 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.433 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -710,9 +710,6 @@ end
 local function MakeSubWindow(key)
 end
 
-local function MakeSubWindowSearch(key)
-end
-
 local function GetReadableHotkeyMod(mod)
 	local modlowercase = mod:lower()
 	return (modlowercase:find('a%+') and 'Alt+' or '') ..
@@ -1076,7 +1073,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 				option.value = key
 				settings.config[fullkey] = option.value
 				
-				if (path == curPath) or key.isSearchWindow then --search window always show options in wrong path, but we will refresh the window it anyway using "isSearchWindow" flag
+				if (path == curPath) or key.isSearchWindow then --search window will always need to show options in wrong path, but we will refresh the window it anyway using "isSearchWindow" flag
 					MakeSubWindow(curPath, false) --remake window to update the buttons' visuals when pressed
 				end
 			end			
@@ -1488,6 +1485,120 @@ WG.crude.MakeHotkey = function(path, optionkey)
 end
 --]]
 
+local function SearchElement(termToSearch,path)
+	local filtered_pathOptions = {}
+	local tree_children = {} --used for displaying buttons
+	local maximumResult = 18 --maximum result to display. Any more it will just say "too many"
+	
+	local DiggDeeper = function() end --must declare itself first before callin self within self
+	DiggDeeper = function(currentPath)
+		local virtualCategoryHit = false --category deduced from the text label preceding the option(s)
+		for _,elem in ipairs(pathoptions[currentPath]) do
+			local option = elem[2]
+			
+			local lowercase_name = option.name:lower()
+			local lowercase_text = option.text and option.text:lower() or ''
+			local lowercase_desc = option.desc and option.desc:lower() or ''
+			local found_name = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_text,termToSearch) or SearchInText(lowercase_desc,termToSearch) or virtualCategoryHit
+					
+			--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
+			if option.advanced and not settings.showAdvanced then
+				--do nothing
+			elseif option.type == 'button' then
+				local hide = false
+				
+				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
+					local menupath = option.desc
+					if pathoptions[menupath] then
+						if #pathoptions[menupath] >= 1 then
+							DiggDeeper(menupath) --travel into & search into this branch
+						else --dead end
+							hide = true
+						end
+					end
+				end
+				
+				if not hide then
+					local hotkeystring = GetHotkeyData(currentPath, option)
+					local lowercase_hotkey = hotkeystring:lower()
+					if found_name or lowercase_hotkey:find(termToSearch) then
+						filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}--remember this option and where it is found
+					end
+				end
+			elseif option.type == 'label' then
+				local virtualCategory = option.value or option.name
+				virtualCategory = virtualCategory:lower()
+				virtualCategoryHit = SearchInText(virtualCategory,termToSearch)
+				if virtualCategoryHit then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+				end
+			elseif option.type == 'text' then
+				if found_name then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+				end
+			elseif option.type == 'bool' then
+				local hotkeystring = GetHotkeyData(currentPath, option)
+				local lowercase_hotkey = hotkeystring:lower()		
+				if found_name or lowercase_hotkey:find(termToSearch) then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+				end
+			elseif option.type == 'number' then	
+				if found_name then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+				end
+			elseif option.type == 'list' then
+				if found_name then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+				else
+					for i=1, #option.items do
+						local item = option.items[i]
+						lowercase_name = item.name:lower()
+						lowercase_desc = item.desc and item.desc:lower() or ''
+						local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch)
+						if found then
+							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+						end
+					end
+				end
+			elseif option.type == 'radioButton' then
+				if found_name then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+				else
+					for i=1, #option.items do
+						local item = option.items[i]
+						item.wname = option.wname.."radioButton"
+						lowercase_name = item.name and item.name:lower() or ''
+						lowercase_desc = item.desc and item.desc:lower() or ''
+						local hotkeystring = GetHotkeyData(currentPath, item)
+						local lowercase_hotkey = hotkeystring:lower()
+						local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch) or lowercase_hotkey:find(termToSearch)
+						if found then
+							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+						end
+					end
+				end
+			elseif option.type == 'colors' then
+				if found_name then
+					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+				end
+			end
+		end
+	end
+	DiggDeeper(path)
+	
+	local roughNumberOfHit = #filtered_pathOptions
+	if roughNumberOfHit == 0 then
+		tree_children[1] = Label:New{ caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.sub_header, textColor = color.postit, }
+	elseif  roughNumberOfHit > maximumResult then
+		tree_children[1] = Label:New{ caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", textColor = color.postit,}
+		tree_children[2] = Label:New{ caption = "- please navigate the menu to see all options -",  textColor = color.postit, }
+		tree_children[3] = Label:New{ caption = "- (" .. roughNumberOfHit .. " match in total) -",  textColor = color.postit, }
+		filtered_pathOptions = {}
+	end
+	return filtered_pathOptions,tree_children
+end
+
+
 -- Make submenu window based on index from flat window list
 MakeSubWindow = function(path, pause)
 	if pause == nil then
@@ -1496,11 +1607,6 @@ MakeSubWindow = function(path, pause)
 	
 	if not pathoptions[path] then 
 		return 
-	end
-	
-	if filterUserInsertedTerm ~= "" then --this check whether window is remake during Searching or not.
-		MakeSubWindowSearch(path) --if Search term is being used then remake the Search window instead of normal window
-		return
 	end
 	
 	local explodedpath = explode('/', path)
@@ -1515,9 +1621,43 @@ MakeSubWindow = function(path, pause)
 	
 	local root = path == ''
 	
-	for _,elem in ipairs(pathoptions[path]) do
+	local searchedElement
+	if filterUserInsertedTerm ~= "" then --this check whether window is remake during Searching or not.
+		-- MakeSubWindowSearch(path) --if Search term is being used then remake the Search window instead of normal window
+		-- return 
+		parent_path = path --we go back to HERE if we go back after searching
+		searchedElement,tree_children = SearchElement(filterUserInsertedTerm,path)
+	end
+	
+	local listOfElements = searchedElement or pathoptions[path] --show search result or all
+	local pathLabeling = searchedElement and ""
+	for _,elem in ipairs(listOfElements) do
 		local option = elem[2]
-
+		local currentPath
+		if pathLabeling then
+			currentPath = elem[1] --since search has mixed path, the first entry in "listOfElements[index]" table will store path (in contrast: first entry in "pathoptions[path]" table only store indexes)
+			if pathLabeling ~= currentPath then --add label saying where this option is found
+				local sub_path = currentPath:gsub(path,"") --remove root
+				-- tree_children[#tree_children+1] = Label:New{ caption = "- Location: " .. sub_path,  textColor = color.tooltip_bg, }
+				tree_children[#tree_children+1] = Button:New{
+					name = sub_path .. #tree_children; --note: name must not be same as existing button or crash.
+					x=0,
+					width = settings_width,
+					minHeight = 20,
+					caption = "- Location: " .. sub_path, 
+					OnClick = {function() filterUserInsertedTerm = ''; end,function(self)
+						MakeSubWindow(sub_path, false)  --this made this "label" open another path when clicked
+					end,},
+					backgroundColor = color.transGray,
+					textColor = color.postit, 
+					tooltip = currentPath,
+					
+					padding={2,2,2,2},
+				}
+				pathLabeling = currentPath
+			end
+		end
+		
 		local optionkey = option.key
 		
 		--fixme: shouldn't be needed
@@ -1544,6 +1684,7 @@ MakeSubWindow = function(path, pause)
 			end
 			
 			if not hide then
+				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.name:find("...")--this type of button is a shortcut to somewhere else (defined in "AddOption(path,option,wname)")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
 				local button = Button:New{
@@ -1551,7 +1692,7 @@ MakeSubWindow = function(path, pause)
 					x=0,
 					minHeight = root and 36 or 30,
 					caption = option.name, 
-					OnClick = {option.OnChange},
+					OnClick = escapeSearch and {function() filterUserInsertedTerm = ''; end,option.OnChange} or {option.OnChange},
 					backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
 					textColor = disabled and color.disabled_fg or color.sub_button_fg, 
 					tooltip = option.desc,
@@ -1658,6 +1799,7 @@ MakeSubWindow = function(path, pause)
 				item.wname = option.wname.."radioButton"	-- wname is needed by Hotkey to 'AddAction'
 				item.name = option.items[i].name --is needed by checkbox caption
 				item.key = option.items[i].key --is needed to set checkbox status
+				item.isSearchWindow = (searchedElement~=nil) --this force a refresh (when pressed), even when the button is in wrong sub-window path
 				item.desc = option.items[i].desc --is needed for checkbox tooltip
 				item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item.key). Is needed for Hotkey
 				settings_height = settings_height + B_HEIGHT
@@ -1755,7 +1897,7 @@ MakeSubWindow = function(path, pause)
 	
 	--back button
 	if parent_path then
-		Button:New{ name= 'backButton', caption = '', OnClick = { KillSubWindow, function() MakeSubWindow(parent_path, false) end,  }, 
+		Button:New{ name= 'backButton', caption = '', OnClick = { KillSubWindow, function() filterUserInsertedTerm = ''; MakeSubWindow(parent_path, false) end,  }, 
 			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, height=B_HEIGHT,
 			padding= {2,2,2,2},
 			parent = buttonBar;
@@ -1777,20 +1919,22 @@ MakeSubWindow = function(path, pause)
 		}
 	}
 	
-	--reset button
-	Button:New{ name= 'resetButton', caption = '',
-		OnClick = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
-		padding= {2,2,2,2}, parent = buttonBar;
-		children = {
-			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=2,  },
-			Label:New{ caption = 'Reset',x=24,y=4, }
+	if not searchedElement then --do not display reset setting button when search is a bunch of mixed options
+		--reset button
+		Button:New{ name= 'resetButton', caption = '',
+			OnClick = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
+			textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+			padding= {2,2,2,2}, parent = buttonBar;
+			children = {
+				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=2,  },
+				Label:New{ caption = 'Reset',x=24,y=4, }
+			}
 		}
-	}
+	end
 	
 	--close button
 	Button:New{ name= 'menuCloseButton', caption = '',
-		OnClick = { function() KillSubWindow() end }, 
+		OnClick = { function() KillSubWindow(); filterUserInsertedTerm = '';  end }, 
 		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
 		padding= {2,2,2,2}, parent = buttonBar;
 		children = {
@@ -1802,7 +1946,7 @@ MakeSubWindow = function(path, pause)
 	KillSubWindow(true)
 	curPath = path -- must be done after KillSubWindow
 	window_sub_cur = Window:New{  
-		caption= (not root) and (path) or "MAIN MENU",
+		caption= (searchedElement and "Searching in: \"" .. path .. "...\"") or ((not root) and (path) or "MAIN MENU"),
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y, 
 		clientWidth = window_width,
@@ -1821,343 +1965,6 @@ MakeSubWindow = function(path, pause)
 			spSendCommands("pause")
 		end
 	end
-end
-
--- Make submenu window based on index from flat window list (This is exclusive for search result)
-MakeSubWindowSearch = function(path)
-	local settings_height = #(pathoptions[path]) * B_HEIGHT
-	local settings_width = 270
-	local maximumResult = 18 --maximum result to display. Any more it will just say "too many"
-	
-	local filtered_pathOptions = {}
-	
-	local DiggDeeper = function() end
-	DiggDeeper = function(currentPath)
-		local virtualCategoryHit = false --category deduced from the text label preceding the option(s)
-		for _,elem in ipairs(pathoptions[currentPath]) do
-			local option = elem[2]
-			
-			local lowercase_name = option.name:lower()
-			local lowercase_text = option.text and option.text:lower() or ''
-			local lowercase_desc = option.desc and option.desc:lower() or ''
-			local found_name = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_text,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm) or virtualCategoryHit
-					
-			--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
-			if option.advanced and not settings.showAdvanced then
-				--do nothing
-			elseif option.type == 'button' then
-				local hide = false
-				
-				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
-					local menupath = option.desc
-					if pathoptions[menupath] then
-						if #pathoptions[menupath] >= 1 then
-							DiggDeeper(menupath) --travel into & search into this branch
-						else --dead end
-							hide = true
-						end
-					end
-				end
-				
-				if not hide then
-					local hotkeystring = GetHotkeyData(currentPath, option)
-					local lowercase_hotkey = hotkeystring:lower()
-					if found_name or lowercase_hotkey:find(filterUserInsertedTerm) then
-						filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}--remember this option and where it is found
-					end
-				end
-			elseif option.type == 'label' then
-				local virtualCategory = option.value or option.name
-				virtualCategory = virtualCategory:lower()
-				virtualCategoryHit = SearchInText(virtualCategory,filterUserInsertedTerm)
-				if virtualCategoryHit then
-					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-				end
-			elseif option.type == 'text' then
-				if found_name then
-					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-				end
-			elseif option.type == 'bool' then
-				local hotkeystring = GetHotkeyData(currentPath, option)
-				local lowercase_hotkey = hotkeystring:lower()		
-				if found_name or lowercase_hotkey:find(filterUserInsertedTerm) then
-					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-				end
-			elseif option.type == 'number' then	
-				if found_name then
-					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-				end
-			elseif option.type == 'list' then
-				if found_name then
-					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-				else
-					for i=1, #option.items do
-						local item = option.items[i]
-						lowercase_name = item.name:lower()
-						lowercase_desc = item.desc and item.desc:lower() or ''
-						local found = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm)
-						if found then
-							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-						end
-					end
-				end
-			elseif option.type == 'radioButton' then
-				if found_name then
-					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-				else
-					for i=1, #option.items do
-						local item = option.items[i]
-						item.wname = option.wname.."radioButton"
-						lowercase_name = item.name and item.name:lower() or ''
-						lowercase_desc = item.desc and item.desc:lower() or ''
-						local hotkeystring = GetHotkeyData(currentPath, item)
-						local lowercase_hotkey = hotkeystring:lower()
-						local found = SearchInText(lowercase_name,filterUserInsertedTerm) or SearchInText(lowercase_desc,filterUserInsertedTerm) or lowercase_hotkey:find(filterUserInsertedTerm)
-						if found then
-							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-						end
-					end
-				end
-			elseif option.type == 'colors' then
-				if found_name then
-					filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
-				end
-			end
-		end
-	end
-	DiggDeeper(path)
-	
-	local tree_children = {}
-	local hotkeybuttons = {}
-	
-	local roughNumberOfHit = #filtered_pathOptions
-	if roughNumberOfHit == 0 then
-		tree_children[1] = Label:New{ caption = "- no match for \"" .. filterUserInsertedTerm .."\" -",  textColor = color.sub_header, textColor = color.tooltip_bg, }
-	elseif  roughNumberOfHit > maximumResult then
-		tree_children[1] = Label:New{ caption = "- the term \"" .. filterUserInsertedTerm .."\" had too many match -", textColor = color.tooltip_bg,}
-		tree_children[2] = Label:New{ caption = "- please navigate the menu to see all options -",  textColor = color.tooltip_bg, }
-		tree_children[3] = Label:New{ caption = "- (" .. roughNumberOfHit .. " match in total) -",  textColor = color.tooltip_bg, }
-		filtered_pathOptions = {}
-	end
-	
-	local previous_currentPath = ""
-	for _,elem in ipairs(filtered_pathOptions) do
-		local option = elem[2]
-		local currentPath = elem[1] --since our search has mixed path, we use the first entry in "elem" table to store path (in contrast: in MakeSubWindow() it only store indexes)
-		
-		if previous_currentPath ~= currentPath then --add label saying where this option is found
-			local sub_path = currentPath:gsub(path,"")
-			tree_children[#tree_children+1] = Label:New{ caption = "- Location: " .. sub_path,  textColor = color.tooltip_bg, }
-			previous_currentPath = currentPath
-		end
-		
-		local optionkey = option.key
-		
-		--fixme: shouldn't be needed
-		if not option.OnChange then
-			option.OnChange = function(self) end
-		end
-		if not option.desc then
-			option.desc = ''
-		end
-		
-		
-		--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
-		if option.advanced and not settings.showAdvanced then
-			--do nothing
-		elseif option.type == 'button' then
-			local hide = false
-			
-			if option.wname == 'epic' then --menu
-				local menupath = option.desc
-				if pathoptions[menupath] and #(pathoptions[menupath]) == 0 then
-					hide = true
-					settings_height = settings_height - B_HEIGHT
-				end
-			end
-			
-			if not hide then
-				local isNavButton = option.desc and option.desc:find(currentPath) and option.name:find("...")--this type of button is defined in AddOption(path,option,wname)
-				local button = Button:New{
-					name = option.wname .. " " .. option.name;
-					x=0,
-					--right = 30,
-					minHeight = 30,
-					caption = option.name, 
-					OnClick = isNavButton and {function() filterUserInsertedTerm = ''; end,option.OnChange} or {option.OnChange}, --clear search term if navButton is pressed but do standard stuff for regular button
-					backgroundColor = color.sub_button_bg,
-					textColor = color.sub_button_fg, 
-					tooltip = option.desc
-				}
-				tree_children[#tree_children+1] = MakeHotkeyedControl(button, currentPath, option)
-			end
-			
-		elseif option.type == 'label' then	
-			tree_children[#tree_children+1] = Label:New{ caption = option.value or option.name, textColor = color.sub_header, }
-			
-		elseif option.type == 'text' then	
-			tree_children[#tree_children+1] = 
-				Button:New{
-					name = option.wname .. " " .. option.name;
-					width = "100%",
-					minHeight = 30,
-					caption = option.name, 
-					OnClick = { function() MakeHelp(option.name, option.value) end },
-					backgroundColor = color.sub_button_bg,
-					textColor = color.sub_button_fg, 
-					tooltip=option.desc
-				}
-			
-		elseif option.type == 'bool' then				
-			local chbox = Checkbox:New{ 
-				x=0,
-				right = 35,
-				caption = option.name, 
-				checked = option.value or false, 
-				
-				OnClick = { option.OnChange, }, 
-				textColor = color.sub_fg, 
-				tooltip   = option.desc,
-			}
-			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  currentPath, option)
-			
-		elseif option.type == 'number' then	
-			settings_height = settings_height + B_HEIGHT
-			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
-			if option.valuelist then
-				option.value = GetIndex(option.valuelist, option.value)
-			end
-			tree_children[#tree_children+1] = 
-				Trackbar:New{ 
-					width = "100%",
-					caption = option.name, 
-					value = option.value, 
-					trackColor = color.sub_fg, 
-					min=option.min or 0, 
-					max=option.max or 100, 
-					step=option.step or 1, 
-					OnMouseup = { option.OnChange }, --using onchange triggers repeatedly during slide
-					tooltip=option.desc,
-					--useValueTooltip=true,
-				}
-			
-		elseif option.type == 'list' then	
-			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
-			local items = {};
-			for i=1, #option.items do
-				local item = option.items[i]
-				settings_height = settings_height + B_HEIGHT
-				tree_children[#tree_children+1] = Button:New{
-						name = option.wname .. " " .. item.name;
-						width = "100%",
-						caption = item.name, 
-						OnClick = { function(self) option.OnChange(item.key) end },
-						backgroundColor = color.sub_button_bg,
-						textColor = color.sub_button_fg, 
-						tooltip=item.desc,
-					}
-			end
-			--[[
-			tree_children[#tree_children+1] = ComboBox:New {
-				items = items;
-			}
-			]]--
-		elseif option.type == 'radioButton' then	
-			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
-			for i=1, #option.items do
-				local item = {} 
-				item.wname = option.wname.."radioButton"	-- wname is needed by Hotkey to 'AddAction'
-				item.name = option.items[i].name --is needed by checkbox caption
-				item.key = option.items[i].key --is needed to set checkbox status
-				item.isSearchWindow = true --this force MakeSubWindowSearch() to update even when the button's path is not same as the current window path
-				item.desc = option.items[i].desc --is needed for checkbox tooltip
-				item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item.key). Is needed for Hotkey
-				settings_height = settings_height + B_HEIGHT
-				tree_children[#tree_children+1] = MakeHotkeyedControl(
-					Checkbox:New{
-						x=0,
-						right = 35,
-						caption = item.name, 
-						checked = (option.value == item.key), 
-						OnClick = {function(self) option.OnChange(item.key) end},
-						textColor = color.sub_fg,
-						tooltip=item.desc,
-					}, currentPath, item)
-			end			
-		elseif option.type == 'colors' then
-			settings_height = settings_height + B_HEIGHT*2.5
-			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
-			tree_children[#tree_children+1] = 
-				Colorbars:New{
-					width = "100%",
-					height = B_HEIGHT*2,
-					tooltip=option.desc,
-					color = option.value or {1,1,1,1},
-					OnClick = { option.OnChange, },
-				}
-				
-		end
-	end
-	
-	local window_height = 400
-	if settings_height < window_height then
-		window_height = settings_height+10
-	end
-	local window_width = 300
-	
-		
-	local window_children = {}
-	window_children[#window_children+1] =
-		ScrollPanel:New{
-			x=0,y=15,
-			bottom=B_HEIGHT+20,
-			width = '100%',
-			children = {
-				StackPanel:New{
-					x=0,
-					y=0,
-					right=0,
-					orientation = "vertical",
-					--width  = "100%",
-					height = "100%",
-					backgroundColor = color.sub_bg,
-					children = tree_children,
-					itemMargin = {2,2,2,2},
-					resizeItems = false,
-					centerItems = false,
-					autosize = true,
-				},
-				
-			}
-		}
-	
-	window_height = window_height + B_HEIGHT
-
-	--back button
-	window_children[#window_children+1] = Button:New{ name= 'backButton', caption = 'Back', OnClick = { KillSubWindow, function() filterUserInsertedTerm = ''; MakeSubWindow(path, false) end,  }, 
-		backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
-
-	--close button
-	window_children[#window_children+1] = Button:New{ name= 'menuCloseButton', caption = 'Close', OnClick = { function() KillSubWindow(); filterUserInsertedTerm = '' end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT, }
-	
-	
-	KillSubWindow(true)
-	curPath = path -- must be done after KillSubWindow
-	window_sub_cur = Window:New{  
-		caption= "Searching in: \"" .. path .. "...\"",
-		x = settings.sub_pos_x,  
-		y = settings.sub_pos_y, 
-		clientWidth = window_width,
-		clientHeight = window_height+B_HEIGHT*4,
-		minWidth = 250,
-		minHeight = 350,		
-		--resizable = false,
-		parent = settings.show_crudemenu and screen0 or nil,
-		backgroundColor = color.sub_bg,
-		children = window_children,
-	}
-	AdjustWindow(window_sub_cur)
 end
 
 -- Show or hide menubar

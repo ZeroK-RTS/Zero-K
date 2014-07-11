@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.014 Chili Chat Pro Console.",
+    desc      = "v0.015 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -916,6 +916,7 @@ local function MakeMessageWindow(name, minimizable)
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = minimizable,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
 		color = { 0, 0, 0, 0 },

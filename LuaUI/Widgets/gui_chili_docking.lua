@@ -1,12 +1,15 @@
+local version = "v1.001"
+
 function widget:GetInfo()
   return {
     name      = "Chili Docking",
-    desc      = "Provides docking and position saving for chili windows",
+    desc      = version .." Provides docking and position saving for chili windows",
     author    = "Licho",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     experimental = false,
+    handler   = true, -- to read widget status. eg: "widgetHandler.knownWidget[name]"
     enabled   = true  --  loaded by default?
   }
 end
@@ -48,7 +51,7 @@ local buttons = {} -- "window name" indexed array of minimize buttons
 
 function widget:Initialize()
 	if (not WG.Chili) then
-		widgetHandler:RemoveWidget()
+		widgetHandler:RemoveWidget(widget) --"widget" as extra argument because "handler=true"
 		return
 	end
 
@@ -269,11 +272,12 @@ function widget:DrawScreen()
 				end 
 			elseif lastWinPos[1] ~= win.x or lastWinPos[2] ~= win.y or lastWinPos[3] ~= win.x+win.width or lastWinPos[4] ~= win.y + win.height then  -- window changed position
 				posChanged = true 
+				settings[win.name] = { win.x, win.y, win.x + win.width, win.y + win.height } --save data immediately (useful when docking is not enabled)
 			end 
 		end 
 	end 
 	
-	for win, _ in pairs(lastPos) do  -- delete those not present atm
+	for win, _ in pairs(lastPos) do  -- delete those not present atm (Redo/refresh docking when window un-minimized)
 		if not present[win] then lastPos[win] = nil end
 	end 
 
@@ -284,7 +288,8 @@ function widget:DrawScreen()
 			local button = buttons[name]
 			if not button then 
 				button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; 
-                    caption='';dockable=false,winName = win.name, tooltip='Minimize ' .. win.name, backgroundColor={0,1,0,1},
+					caption='';dockable=false,winName = win.name, tooltip='Minimize ' .. win.name, backgroundColor={0,1,0,1},
+					widgetName = win.parentWidgetName,
 					OnClick = {
 						function(self)
 							if button.winVisible then
@@ -319,7 +324,7 @@ function widget:DrawScreen()
 			if not button.winVisible then
 				button.winVisible = true 
 				win.hidden = false
-                button.tooltip = 'Minimize ' .. button.winName
+				button.tooltip = 'Minimize ' .. button.winName
 				button.backgroundColor={0,1,0,1}
 				button:Invalidate()
 			end
@@ -332,8 +337,13 @@ function widget:DrawScreen()
             button.tooltip = 'Expand ' .. button.winName
 			button.backgroundColor={1,0,0,1}
 			button:Invalidate()
-		end 
-	end 
+		end
+		local widgetInfo = button.widgetName and widgetHandler.knownWidgets[button.widgetName]
+		if widgetInfo and not widgetInfo.active then --check if widget was removed
+			button:Dispose();
+			buttons[name] = nil
+		end
+	end
 	
 	
 	if forceUpdate or (posChanged and options.dockEnabled.value) then 
