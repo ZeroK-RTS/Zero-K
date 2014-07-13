@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.326 Chili Crude Player List.",
+    desc      = "v1.327 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -175,7 +175,7 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = function(self) 
-				scroll_cpl.ignoreMouseWheel = (not self.value and scroll_cpl._vscrollbar); --steal mousewheel only when mousewheel option is TRUE and when vertical scrollbar actually exist. 
+				scroll_cpl.ignoreMouseWheel = not self.value;
 			end,
 	},
 }
@@ -625,7 +625,6 @@ local function AlignScrollPanel()
 	else
 		scroll_cpl.y = 0
 	end
-	scroll_cpl.ignoreMouseWheel = (not options.mousewheel.value) and scroll_cpl._vscrollbar --steal mousewheel only when mousewheel option is TRUE and when vertical scrollbar actually exist. 
 end
 
 SetupPlayerNames = function()

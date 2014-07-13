@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Deluxe Player List - Alpha 2.02",
-    desc      = "v0.209 Chili Deluxe Player List, Alpha Release",
+    desc      = "v0.210 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
@@ -101,7 +101,7 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = function(self) 
-				scroll_cpl.ignoreMouseWheel = (not self.value and scroll_cpl._vscrollbar); --steal mousewheel only when mousewheel option is TRUE and when vertical scrollbar actually exist. 
+				scroll_cpl.ignoreMouseWheel = not self.value;
 			end,
 	},
 	alignToTop = {
@@ -987,7 +987,6 @@ local function AlignScrollPanel()
 	else
 		scroll_cpl.y = 0
 	end
-	scroll_cpl.ignoreMouseWheel = (not options.mousewheel.value) and scroll_cpl._vscrollbar --steal mousewheel only when mousewheel option is TRUE and when vertical scrollbar actually exist. 
 end
 
 SetupPlayerNames = function()
