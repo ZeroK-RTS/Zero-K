@@ -154,34 +154,35 @@ function AddUnitToEmptyPad(carrierID,droneType)
 			end
 		end
 	else
-		CheckCreateStart(0) --use unit's body
+		CheckCreateStart(0) --use unit's body as emit point
 	end
 	return unitIDAdded
 end
 
 local coroutines = {}
+local coroutineCount = 0
 local coroutine = coroutine
 local Sleep	    = coroutine.yield
 local assert    = assert
 local function StartScript(fn)
 	local co = coroutine.create(fn)
-	coroutines[#coroutines + 1] = co
+	coroutineCount = coroutineCount + 1 --in case new co-routine is added in same frame
+	coroutines[coroutineCount] = co
 end
 
 function UpdateCoroutines() 
-	local coroutineCount = #coroutines
+	coroutineCount = #coroutines
 	local i=1
-	while (i<=coroutineCount) do 
+	while (i<=coroutineCount) do
 		local co = coroutines[i] 
 		if (coroutine.status(co) ~= "dead") then 
-			assert(coroutine.resume(coroutines[i]))
+			assert(coroutine.resume(co))
+			i = i + 1
 		else
 			coroutines[i] = coroutines[coroutineCount]
 			coroutines[coroutineCount] = nil
 			coroutineCount = coroutineCount -1
-			i = i - 1
 		end
-		i = i + 1
 	end 
 end
 
@@ -253,6 +254,14 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		end
 	end
 	
+	local AddNextDroneFromQueue = function()
+		if #carrierList[carrierID].droneInQueue > 0 then
+			if AddUnitToEmptyPad(carrierID,carrierList[carrierID].droneInQueue[1]) then --pad cleared, immediately add any unit from queue
+				table.remove(carrierList[carrierID].droneInQueue,1)
+			end
+		end
+	end
+	
 	mcEnable(unitID)
 	Spring.SetUnitLeaveTracks(unitID, false)
 	mcSetVelocity(unitID, 0, 0, 0)
@@ -273,15 +282,13 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		local build_step = droneInfo.config.buildStep
 		local build_step_health = droneInfo.config.buildStepHealth
 		while true do
-			if (not carrierList[carrierID]) or (not droneList[unitID]) then
-				if Spring.ValidUnitID(unitID) then
-					Spring.DestroyUnit(unitID, true, false) -- selfd = true, reclaim = false
-				end
+			if (not droneList[unitID]) then --droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
 				if carrierList[carrierID] then
 					droneInfo.buildCount = droneInfo.buildCount - 1
 					carrierList[carrierID].occupiedPieces[padPieceID] = false
+					AddNextDroneFromQueue() --add next drone in this vacant position
 				end
-				return
+				return --nothing else to do
 			end
 			
 			vx,vy,vz = Spring.GetUnitVelocity(carrierID)
@@ -323,11 +330,7 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		-- activate unit and its jets
 		Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		
-		if #carrierList[carrierID].droneInQueue > 0 then
-			if AddUnitToEmptyPad(carrierID,carrierList[carrierID].droneInQueue[1]) then
-				table.remove(carrierList[carrierID].droneInQueue,1)
-			end
-		end
+		AddNextDroneFromQueue() --this create next drone in this position (in this same GameFrame!), so it might look overlapped but that's just minor details
 	end
 	
 	StartScript(SitLoop)
