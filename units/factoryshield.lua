@@ -15,6 +15,7 @@ unitDef = {
 
   buildoptions                  = {
     [[cornecro]],
+	[[corclog]],
     [[corak]],
     [[corstorm]],
 	[[corthud]],
@@ -23,7 +24,6 @@ unitDef = {
 	[[shieldarty]],
 	[[corcrash]],
     [[corroach]],
-	[[corclog]],
     [[core_spectre]],
   },
 
