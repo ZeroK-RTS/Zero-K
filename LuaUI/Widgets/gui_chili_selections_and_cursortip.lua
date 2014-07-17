@@ -2517,7 +2517,7 @@ function widget:Initialize()
 	spSendCommands({"tooltip 0"})
 	
     real_window_corner = Window:New{
-		name   = 'real_window_corner';
+		name   = 'selections';
 		color = options.color_background.value,
 		x = 0; 
 		bottom = 180;
