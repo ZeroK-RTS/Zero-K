@@ -19,7 +19,7 @@ unitDef = {
 
   customParams           = {
     description_pl = [[Amfibijny bot wsparcia]],
-    helptext       = [[A flexible unit, the Scallop is armed with torpedoes for underwater use and a quadruple shotgun when on land. It is the closest thing there is to a mainline torpedo unit that can stand up to armed ships. That is not to say it is good against them.]],
+    helptext       = [[A flexible unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land. It acts as a stealthy underwater skirmisher, capable of killing outnumbered enemies with low attrition.]],
     helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz torped ma takze shotgun do walk na ladzie.]],
     extradrawrange = 460,
   },
@@ -100,7 +100,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       groundbounce            = 1,
-      impactOnly              = true,
+      impactOnly              = false,
       impulseBoost            = 0,
       impulseFactor           = 0.6,
       interceptedByShieldType = 1,
@@ -113,9 +113,9 @@ unitDef = {
       soundHit                = [[TorpedoHitVariable]],
 	  soundHitVolume          = 3.2,
       --soundStart              = [[weapon/torpedo]],
-      startVelocity           = 100,
+      startVelocity           = 90,
       tracks                  = true,
-      turnRate                = 4000,
+      turnRate                = 3000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 140,

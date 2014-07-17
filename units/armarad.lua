@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armarad]],
   name                          = [[Advanced Radar Tower]],
-  description                   = [[Long-Range Radar, halves radar wobble]],
+  description                   = [[Long-Range Radar and Sonar, halves radar wobble]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
@@ -58,6 +58,7 @@ unitDef = {
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   side                          = [[ARM]],
   sightDistance                 = 800,
+  sonarDistance                 = 2000,
   smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
