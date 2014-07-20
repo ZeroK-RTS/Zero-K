@@ -1,4 +1,4 @@
-local versionName = "v2.878"
+local versionName = "v2.879"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -754,29 +754,31 @@ function GateKeeperOrCommandFilter (cQueue,persistentData, unitInMotionSingleUni
 			retreating = (WG.retreatingUnits[unitID]~=nil or spGetUnitRulesParam(unitID,"isRetreating")==1)
 		end
 		--if ((unitInView ~= "yes") or isReloading or (unitType == 1 and options.cloakyAlwaysFlee.value)) then --if unit is out of user's vision OR is reloading OR is cloaky, and: 
-			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), and:
+			if (cQueue[1] == nil or #cQueue == 1) then --if unit is currently idle OR with-singular-mono-command (eg: automated move order or auto-attack), then:
 				--if (not holdPosition) then --if unit is not "hold position", then:
-					local idleOrIsDodging = (cQueue[1] == nil) or (#cQueue == 1 and cQueue[1].id == CMD_MOVE and (not cQueue[2] or cQueue[2].id~=false)) --is idle completely, or is given widget's CMD_MOVE and not spontaneous engagement signature (note: CMD_MOVE or any other command will not end with CMD_STOP when its widget issued)
+					local idleOrIsDodging = (cQueue[1] == nil) or (#cQueue == 1 and cQueue[1].id == CMD_MOVE and (not cQueue[2] or cQueue[2].id~=false)) --is idle completely, or is given widget's CMD_MOVE and not spontaneous engagement signature (note: CMD_MOVE or any other command will not end with CMD_STOP when issued by widget)
 					local dummyCmd
 					if idleOrIsDodging then
-						dummyCmd = cMD_DummyG  --select cMD_DummyG if unit is to flee without need to return to old position,
+						cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --select cMD_DummyG if unit is to flee without need to return to old position,
+					elseif cQueue[1].id < 0 then
+						cQueue[2] = {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}} --automated build (mono command issued by CentralBuildAI widget). We append CMD_STOP so it look like normal build command.
 					else
-						dummyCmd = cMD_Dummy_atkG --select cMD_Dummy_atkG if unit is auto-attack & reloading (as in: isReloading + (no command or mono command)) and doesn't mind being bound to old position 
-					end
-					cQueue={{id = dummyCmd, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --flag unit with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit. Note: this is not real command, its here just to trigger avoidance.
+						cQueue={{id = cMD_Dummy_atkG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --select cMD_Dummy_atkG if unit is auto-attack & reloading (as in: isReloading + (no command or mono command)) and doesn't mind being bound to old position 
+					end 
+					--flag unit with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit. Note: this is not real command, its here just to trigger avoidance.
 					--Note2: negative target only deactivate attraction function, but avoidance function is still active & output new coordinate if enemy is around
 				--end
 			end
 		--end
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
-			local isStealthUnit = (unitType == 1)
+			local isStealthOrConsUnit = (unitType == 1)
 			local isNotViewed = (unitInView ~= "yes")
 			local isCommonConstructorCmd = (cQueue[1].id == CMD_REPAIR or cQueue[1].id < 0 or cQueue[1].id == CMD_RESURRECT)
 			local isReclaimCmd = (cQueue[1].id == CMD_RECLAIM)
 			local isMoveCommand = (cQueue[1].id == CMD_MOVE)
 			local isNormCommand = (isCommonConstructorCmd or isMoveCommand) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10),
-			--local isStealthUnitTypeOrIsNotViewed = isStealthUnit or (unitInView ~= "yes" and unitType~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
-			local isStealthUnitTypeOrIsNotViewed = isStealthUnit or isNotViewed--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
+			--local isStealthOrConsUnitTypeOrIsNotViewed = isStealthOrConsUnit or (unitInView ~= "yes" and unitType~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
+			local isStealthOrConsUnitTypeOrIsNotViewed = isStealthOrConsUnit or isNotViewed--ALLOW unit of unitType=1 (cloaky, constructor) OR all unitTypes that is outside player's vision
 			local _1stAttackSignature = (cQueue[1].id == CMD_ATTACK)
 			local _1stGuardSignature = (cQueue[1].id == CMD_GUARD)
 			local _2ndAttackSignature = false --attack command signature
@@ -791,17 +793,17 @@ function GateKeeperOrCommandFilter (cQueue,persistentData, unitInMotionSingleUni
 			local isAttackingState = (_1stAttackSignature or _2ndAttackSignature)
 			local isForceCloaked = spGetUnitIsCloaked(unitID) and (unitType==2 or unitType==3) --any unit with type 3 (gunship) or type 2 (ground units except cloaky) that is cloaked.
 			local isRealIdle = cQueue[1].id == cMD_DummyG --FAKE (IDLE) COMMAND
-			local isStealthUnitAlwaysFlee = isStealthUnit and options.cloakyAlwaysFlee.value
-			if ((isNormCommand or (isReclaimCmd and isAbundanceResource)) and isStealthUnitTypeOrIsNotViewed and not holdPosition) or --execute on: unit with generic mobility command (or reclaiming during abundance resource): for UnitType==1 unit (cloaky, constructor) OR for any unit outside player view... & which is not holding position
-			(isRealIdle and (isNotViewed or isStealthUnitAlwaysFlee) and not holdPosition) or --execute on: any unit that is really idle and out of view... & is not hold position
+			local isStealthOrConsUnitAlwaysFlee = isStealthOrConsUnit and options.cloakyAlwaysFlee.value
+			if ((isNormCommand or (isReclaimCmd and isAbundanceResource)) and isStealthOrConsUnitTypeOrIsNotViewed and not holdPosition) or --execute on: unit with generic mobility command (or reclaiming during abundance resource): for UnitType==1 unit (cloaky, constructor) OR for any unit outside player view... & which is not holding position
+			(isRealIdle and (isNotViewed or isStealthOrConsUnitAlwaysFlee) and not holdPosition) or --execute on: any unit that is really idle and out of view... & is not hold position
 			(isReloadingAttack and not holdPosition) or --execute on: any unit which is reloading... & is not holding position
-			-- (isAttackingState and isStealthUnitAlwaysFlee and not holdPosition) or --execute on: always-fleeing cloaky unit that about to attack... & is not holding position
+			-- (isAttackingState and isStealthOrConsUnitAlwaysFlee and not holdPosition) or --execute on: always-fleeing cloaky unit that about to attack... & is not holding position
 			(isGuardState and not holdPosition) or --execute on: any unit which is guarding another unit...  & is not hold position
 			(isForceCloaked and isMoveCommand and not holdPosition) or --execute on: any normal unit being cloaked and is moving... & is not hold position.
 			(retreating and not holdPosition) --execute on: any retreating unit
 			then 
 				local isReloadAvoidance = (isReloadingAttack and not holdPosition)
-				if isReloadAvoidance or #cQueue>=2 then --check cQueue for lenght to prevent STOP command from short circuiting the system 
+				if isReloadAvoidance or #cQueue>=2 then --check cQueue for lenght to prevent STOP command from short circuiting the system (code downstream expect cQueue of length>=2)
 					if isReloadAvoidance or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						allowExecution = true --allow execution
 						reloadAvoidance = isReloadAvoidance
