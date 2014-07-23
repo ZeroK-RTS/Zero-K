@@ -48,7 +48,7 @@ unitDef = {
   minCloakDistance      = 75,
   movementClass         = [[KBOT2]],
   noAutoFire            = false,
-  noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB]],
+  noChaseCategory       = [[FIXEDWING GUNSHIP SUB]],
   objectName            = [[m-5.s3o]],
   script                = [[corpyro.lua]],
   seismicSignature      = 4,
@@ -68,7 +68,6 @@ unitDef = {
 
   side                  = [[CORE]],
   sightDistance         = 420,
-  smoothAnim            = true,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,
@@ -103,14 +102,17 @@ unitDef = {
       craterMult              = 0,
       cegTag                  = [[flamer]],
 
-	  customParams        	  = {
-		flamethrower = [[1]],
-	    setunitsonfire = "1",
-		burntime = [[450]],
-	  },
+      customParams            = {
+            flamethrower = [[1]],
+            setunitsonfire = "1",
+            burntime = [[450]], -- 15 seconds
+            burndamage = [[0.17]], -- 5 DPS
+            burntimerand = [[0]],
+            burnchance = [[1]],
+      },
 	  
       damage                  = {
-        default = 8.5,
+        default = 10,
         subs    = 0.01,
       },
 
@@ -145,40 +147,29 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Pyro]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 700,
+      damage           = 620,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 88,
       object           = [[m-5_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 	
     HEAP  = {
       description      = [[Debris - Pyro]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 700,
+      damage           = 620,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
       metal            = 44,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 44,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
