@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		enabled	= true	--	loaded by default?
 	}
 end
-local version = 1.23
+local version = 1.231
 
 -- CHANGELOG
 --	2009-5-24: CarRepairer: Added graphic lines to show links of shields (also shows links of enemies' visible shields, can remove if desired).
@@ -166,17 +166,21 @@ function AddShieldVFX(unitID,allyTeam,conUnitID)
 	end
 end
 
-function QueueLinkToUpdateAndResetVFX(allyTeam,link)
-	if (link == NO_LINK) then return end
-	updateLink[allyTeam] = updateLink[allyTeam] or {}
-	for id2,_ in pairs(link) do
-		ClearShieldVFX(id2,allyTeam)
-		updateLink[allyTeam][id2] = true
+function QueueLinkToUpdateAndResetVFX(allyTeam,link,unitID)
+	if (link == NO_LINK) then
+		updateLink[allyTeam] = updateLink[allyTeam] or {}
+		updateLink[allyTeam][unitID] = true
+	else
+		updateLink[allyTeam] = updateLink[allyTeam] or {}
+		for id2,_ in pairs(link) do
+			ClearShieldVFX(id2,allyTeam)
+			updateLink[allyTeam][id2] = true
+		end
 	end
 end
 
 -- check if working unit so it can be used for shield link
-local function isEnabled(unitID)
+local function IsEnabled(unitID)
 	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) then
 		return false
@@ -237,7 +241,7 @@ local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPa
 		if not isPartialLinkingState or unitsToPartialLink[unitID] then --reset link data for targeted UnitID or all units (this will force re-creation of links)
 			local x,y,z = spGetUnitPosition(unitID)
 			local valid = x and y and z
-			shieldUnit.linkable = valid and isEnabled(unitID)
+			shieldUnit.linkable = valid and IsEnabled(unitID)
 			shieldUnit.online = shieldUnit.linkable
 			shieldUnit.enabled  = shieldUnit.linkable
 
@@ -269,7 +273,7 @@ end
 local function UpdateEnabledState()
 	for allyTeam,unitList in pairs(shieldTeams) do
 		for unitID,shieldUnit in pairs(unitList) do
-			shieldUnit.enabled = isEnabled(unitID)
+			shieldUnit.enabled = IsEnabled(unitID)
 			shieldUnit.online = shieldUnit.linkable and shieldUnit.enabled --if linked, update 'online' state (for charge distribution)
 		end
 	end
@@ -286,7 +290,7 @@ function gadget:GameFrame(n)
 				if updateLink[allyTeam] and updateLink[allyTeam][unitID] then --already queued to update
 					--skip/do-nothing
 				elseif shieldUnit.linkable ~= shieldUnit.enabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
-					QueueLinkToUpdateAndResetVFX(allyTeam,shieldUnit.link)
+					QueueLinkToUpdateAndResetVFX(allyTeam,shieldUnit.link,unitID)
 				elseif shieldUnit.linkable then
 					local x,y,z = shieldUnit.x,shieldUnit.y,shieldUnit.z
 					if x and y and z then
