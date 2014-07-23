@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		enabled	= true	--	loaded by default?
 	}
 end
-local version = 1.23
+local version = 1.232
 
 -- CHANGELOG
 --	2009-5-24: CarRepairer: Added graphic lines to show links of shields (also shows links of enemies' visible shields, can remove if desired).
@@ -90,8 +90,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 			}
 			shieldTeams[allyTeam][unitID] = shieldUnit
 		end
-		updateLink[allyTeam] = updateLink[allyTeam] or {}
-		updateLink[allyTeam][unitID] = true
+		QueueLink(allyTeam,unitID)
 	end
 end
 
@@ -106,9 +105,8 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		local shieldUnit = shieldTeams[allyTeam][unitID]
 		shieldTeams[allyTeam][unitID] = nil
 		if shieldUnit then
-			shieldUnit.link[unitID] = nil
-			if shieldUnit.numNeighbors ~= 0 then --shield unit was connected to other shield
-				QueueLinkToUpdateAndResetVFX(allyTeam,shieldUnit.link)
+			if shieldUnit.numNeighbors > 0 then --shield unit was connected to other shield
+				QueueLinksAndResetVFXs(allyTeam,shieldUnit.link)
 			end
 			shieldUnit.link = NO_LINK  --help GC by removing pointer to old table
 		end
@@ -123,14 +121,11 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 		local allyTeam = spGetUnitAllyTeam(unitID)
 		if shieldTeams[oldAllyTeam] and shieldTeams[oldAllyTeam][unitID] then
 			shieldUnit = shieldTeams[oldAllyTeam][unitID]
-			shieldUnit.link[unitID] = nil
 			shieldTeams[oldAllyTeam][unitID] = nil
-			if shieldUnit.numNeighbors ~= 0 then --shield unit was connected to other shield
-				QueueLinkToUpdateAndResetVFX(oldAllyTeam,shieldUnit.link)
+			if shieldUnit.numNeighbors > 0 then --shield unit was connected to other shield
+				QueueLinksAndResetVFXs(oldAllyTeam,shieldUnit.link)
 			end
-			ClearShieldVFX(unitID,oldAllyTeam)
-			updateLink[allyTeam] = updateLink[allyTeam] or {}
-			updateLink[allyTeam][unitID] = true
+			QueueLink(allyTeam,unitID)
 			shieldUnit.link = NO_LINK --help GC by removing pointer to old table
 		end
 			
@@ -139,7 +134,7 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	end
 end
 
-function ClearAllShieldVFX(allyTeam)
+function RemoveAllVFX(allyTeam)
 	if shieldConnections[allyTeam] then
 		for unitID,_ in pairs(shieldConnections[allyTeam]) do
 			spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
@@ -148,35 +143,38 @@ function ClearAllShieldVFX(allyTeam)
 	end
 end
 
-function ClearShieldVFX(unitID,allyTeam)
+function RemoveVFX(allyTeam,unitID)
 	if shieldConnections[allyTeam] then
 		spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
 		shieldConnections[allyTeam][unitID] = nil
 	end
 end
 
-function AddShieldVFX(unitID,allyTeam,conUnitID)
+function AddVFX(allyTeam,unit1,unit2)
 	shieldConnections[allyTeam] = shieldConnections[allyTeam] or {}
-	if not shieldConnections[allyTeam][unitID] then
-		spSetUnitRulesParam(unitID,"shield_link",conUnitID,unitRulesParamsSetting)
-		shieldConnections[allyTeam][unitID] = conUnitID
+	if not shieldConnections[allyTeam][unit1] then
+		spSetUnitRulesParam(unit1,"shield_link",unit2,unitRulesParamsSetting)
+		shieldConnections[allyTeam][unit1] = unit2
 	else 
-		spSetUnitRulesParam(conUnitID,"shield_link",unitID,unitRulesParamsSetting)
-		shieldConnections[allyTeam][conUnitID] = unitID
+		spSetUnitRulesParam(unit2,"shield_link",unit1,unitRulesParamsSetting)
+		shieldConnections[allyTeam][unit2] = unit1
 	end
 end
 
-function QueueLinkToUpdateAndResetVFX(allyTeam,link)
-	if (link == NO_LINK) then return end
+function QueueLink(allyTeam,unitID)
 	updateLink[allyTeam] = updateLink[allyTeam] or {}
-	for id2,_ in pairs(link) do
-		ClearShieldVFX(id2,allyTeam)
-		updateLink[allyTeam][id2] = true
+	updateLink[allyTeam][unitID] = true
+end
+
+function QueueLinksAndResetVFXs(allyTeam,link)
+	for id2,_ in pairs(link) do --link always include self (current unitID)
+		RemoveVFX(allyTeam,id2)
+		QueueLink(allyTeam,id2)
 	end
 end
 
 -- check if working unit so it can be used for shield link
-local function isEnabled(unitID)
+local function IsEnabled(unitID)
 	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) then
 		return false
@@ -214,7 +212,7 @@ local function AdjustLinks(allyTeam, unitList, isPreLinkingPhase, targetDefID,is
 						local sumRadius = shieldUnit1.shieldRadius + shieldUnit2.shieldRadius
 
 						if xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius then --if this unit is in range of old unit:
-							AddShieldVFX(ud1,allyTeam,ud2)
+							AddVFX(allyTeam,ud1,ud2)
 		
 							shieldUnit1.numNeighbors = shieldUnit1.numNeighbors + 1
 							shieldUnit2.numNeighbors = shieldUnit2.numNeighbors + 1
@@ -237,7 +235,7 @@ local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPa
 		if not isPartialLinkingState or unitsToPartialLink[unitID] then --reset link data for targeted UnitID or all units (this will force re-creation of links)
 			local x,y,z = spGetUnitPosition(unitID)
 			local valid = x and y and z
-			shieldUnit.linkable = valid and isEnabled(unitID)
+			shieldUnit.linkable = valid and IsEnabled(unitID)
 			shieldUnit.online = shieldUnit.linkable
 			shieldUnit.enabled  = shieldUnit.linkable
 
@@ -256,7 +254,7 @@ local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPa
 	end
 
 	if not isPartialLinkingState then
-		ClearAllShieldVFX() -- Reset all when we want to recreate all link
+		RemoveAllVFX() -- Reset all when we want to recreate all link
 	end
 
 	for i=1, #linkSequence do --unit that is to be linked first (to have most link)
@@ -269,7 +267,7 @@ end
 local function UpdateEnabledState()
 	for allyTeam,unitList in pairs(shieldTeams) do
 		for unitID,shieldUnit in pairs(unitList) do
-			shieldUnit.enabled = isEnabled(unitID)
+			shieldUnit.enabled = IsEnabled(unitID)
 			shieldUnit.online = shieldUnit.linkable and shieldUnit.enabled --if linked, update 'online' state (for charge distribution)
 		end
 	end
@@ -283,27 +281,33 @@ function gadget:GameFrame(n)
 		--note: only update link when unit moves reduce total consumption by 53% when unit idle.
 		for allyTeam,unitList in pairs(shieldTeams) do
 			for unitID,shieldUnit in pairs(unitList) do
-				if updateLink[allyTeam] and updateLink[allyTeam][unitID] then --already queued to update
-					--skip/do-nothing
-				elseif shieldUnit.linkable ~= shieldUnit.enabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
-					QueueLinkToUpdateAndResetVFX(allyTeam,shieldUnit.link)
-				elseif shieldUnit.linkable then
-					local x,y,z = shieldUnit.x,shieldUnit.y,shieldUnit.z
-					if x and y and z then
-						local ux,uy,uz = Spring.GetUnitPosition(unitID)
-						if ux-x > 10 or x-ux > 10 or uy-y > 10 or y-uy > 10 or  uz-z > 10 or z-uz > 10 then --if unit change position
-							QueueLinkToUpdateAndResetVFX(allyTeam,shieldUnit.link)
+				if not (updateLink[allyTeam] and updateLink[allyTeam][unitID]) then --already queued to update?
+					local links = shieldUnit.link
+					if shieldUnit.linkable ~= shieldUnit.enabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
+						if (links == NO_LINK) then -- NO_LINK only happen if unit was EMP-ed
+							QueueLink(allyTeam,unitID)
+						else
+							QueueLinksAndResetVFXs(allyTeam,links)
 						end
-					else
-						Spring.Echo("Warning: shieldUnitPosition for " .. unitID .. " is NIL") --should not happen, all ShieldUnit should've been subjected to linking check at least once
-						updateLink[allyTeam] = true --re-create all link
-						break; --nothing else to do, escape loop
+					elseif shieldUnit.linkable then
+						local x,y,z = shieldUnit.x,shieldUnit.y,shieldUnit.z
+						if x and y and z then
+							local ux,uy,uz = Spring.GetUnitPosition(unitID)
+							if ux-x > 10 or x-ux > 10 or uy-y > 10 or y-uy > 10 or  uz-z > 10 or z-uz > 10 then --if unit change position
+								QueueLinksAndResetVFXs(allyTeam,links)
+							end
+						else
+							Spring.Echo("Warning: shieldUnitPosition for " .. unitID .. " is NIL") --should not happen, all ShieldUnit should've been subjected to linking check at least once
+							updateLink[allyTeam] = true --re-create all link
+							break; --nothing else to do, escape loop
+						end
 					end
 				end
 			end
 		end
-		for allyTeam,unitToPartialLink in pairs(updateLink) do 
-			UpdateAllLinks(allyTeam,shieldTeams[allyTeam],type(unitToPartialLink)=='table',unitToPartialLink) --adjust/create link
+		for allyTeam,unitToLink in pairs(updateLink) do
+			local isPartial = (type(unitToLink)=='table')
+			UpdateAllLinks(allyTeam,shieldTeams[allyTeam],isPartial,unitToLink) --adjust/create link
 			updateLink[allyTeam] = nil
 			listCount = -1 --trigger "shieldChargeList[]" to update too
 		end
