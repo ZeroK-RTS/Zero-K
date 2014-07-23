@@ -153,7 +153,10 @@ function comma_value(amount, displayPlusMinus)
 	-- amount is a string when ToSI is used before calling this function
 	if type(amount) == "number" then
 		if (amount ==0) then formatted = "0" else 
-			if (amount < 20 and (amount * 10)%10 ~=0) then 
+			if (amount < 2 and (amount * 100)%100 ~=0) then 
+				if displayPlusMinus then formatted = strFormat("%+.2f", amount)
+				else formatted = strFormat("%.2f", amount) end 
+			elseif (amount < 20 and (amount * 10)%10 ~=0) then 
 				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
 				else formatted = strFormat("%.1f", amount) end 
 			else 
