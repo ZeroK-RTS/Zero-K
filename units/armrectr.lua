@@ -88,10 +88,10 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 48,
+      metal            = 56,
       object           = [[spherejeth_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 48,
+      reclaimTime      = 56,
     },
 
     HEAP  = {
@@ -101,10 +101,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 24,
+      metal            = 28,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 24,
+      reclaimTime      = 28,
     },
 
   },
