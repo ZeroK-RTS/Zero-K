@@ -159,10 +159,10 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 60,
+      metal            = 32,
       object           = [[amphraider3_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 60,
+      reclaimTime      = 32,
     },
 
     HEAP      = {
@@ -172,10 +172,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 30,
+      metal            = 16,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 30,
+      reclaimTime      = 16,
     },
 
   },

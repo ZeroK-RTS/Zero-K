@@ -102,7 +102,7 @@ unitDef = {
       },
 
       fireStarter             = 70,
-      flightTime              = 2.15,
+      flightTime              = 2.45,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
