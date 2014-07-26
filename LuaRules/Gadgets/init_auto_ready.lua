@@ -1,3 +1,10 @@
+local singleplayer = false
+do
+	local playerlist = Spring.GetPlayerList() or {}
+	if (#playerlist <= 1) then
+		singleplayer = true
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
@@ -8,24 +15,15 @@ function gadget:GetInfo()
     date      = "15.4.2012",
     license   = "Nobody can do anything except me, Microsoft and Apple! Thieves hands off",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = not singleplayer  --  loaded by default?
   }
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if (not gadgetHandler:IsSyncedCode()) then
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-local singleplayer = false
-do
-	local playerlist = Spring.GetPlayerList() or {}
-	if (#playerlist <= 1) then
-		singleplayer = true
-	end
-end
 
--- local reverseCompat = (Game.version:find('91.'))
-local isMission = VFS.FileExists("mission.lua") and Game.startPosType == 2 and (not singleplayer)
+if (not gadgetHandler:IsSyncedCode()) then
+
+local reverseCompat = (Game.version:find('91.'))
 
 local MAX_TIME_DIFF = 75	-- wait this long for disconnected players
 
@@ -35,7 +33,6 @@ local readyTimer = nil
 local lastLabel = nil
 local waitingFor = {}
 local isReady = {}
-local yOffset = isMission and 50 or 150
 
 local glPopMatrix      = gl.PopMatrix
 local glPushMatrix     = gl.PushMatrix
@@ -47,7 +44,6 @@ local glTranslate      = gl.Translate
 local readyCount = 0 
 local waitingCount = 0 
 local missingCount = 0
-local missionReady = false
 
 local forceSent = false 
 
@@ -55,31 +51,8 @@ function gadget:Initialize()
 	startTimer = Spring.GetTimer()
 end 
 
-function gadget:KeyPress()
-	if isMission and missionReady == false then
-		missionReady = true
-		Spring.SendCommands("forcestart")
-		return true
-	end
-	return false
-end
-
-function gadget:MousePress()
-	if isMission and missionReady == false then
-		missionReady = true
-		Spring.SendCommands("forcestart")
-		return true
-	end
-	return false
-end
-
 function gadget:GameSetup(label, ready, playerStates)
-	lastLabel = label
-	
-	if isMission then
-		return true, missionReady
-	end
-	
+	lastLabel = label 
 	local timeDiff = Spring.DiffTimers(Spring.GetTimer(), startTimer)
 	local readyCount = 0 
 	local waitingCount = 0 
@@ -148,38 +121,34 @@ end
 
 function gadget:DrawScreen() 
 	local vsx, vsy = gl.GetViewSizes()
-	local text = lastLabel
-	if isMission and not missionReady then
-		text = "Press any key to begin"
-	else
-		if text == nil then 
-			text = "Waiting for people "
-		end 
-		if (next(waitingFor) ~= nil) then 
-			text = text .. "\n\255\255\255\255Waiting for "
-			
-			local cnt = 0 
-			for name, state in pairs(waitingFor) do 
-				if cnt % 6 == 5 then 
-					text = text .. "\n"
-				end
-				cnt = cnt + 1
-				if state == "missing" then 
-					text = text .. "\255\255\0\0"
-				else
-					text = text .. "\255\255\255\0"
-				end 
-				text = text .. name .. ", "
+	local text = lastLabel 
+	if text == nil then 
+		text = "Waiting for people "
+	end 
+	if (next(waitingFor) ~= nil) then 
+		text = text .. "\n\255\255\255\255Waiting for "
+		
+		local cnt = 0 
+		for name, state in pairs(waitingFor) do 
+			if cnt % 6 == 5 then 
+				text = text .. "\n"
+			end
+			cnt = cnt + 1
+			if state == "missing" then 
+				text = text .. "\255\255\0\0"
+			else
+				text = text .. "\255\255\255\0"
 			end 
-			text = text .. "\n\255\255\255\255 Say !force to start sooner"
-		end
-	end
+			text = text .. name .. ", "
+		end 
+		text = text .. "\n\255\255\255\255 Say !force to start sooner"
+	end 
 
-	glPushMatrix()
-	glTranslate((vsx * 0.5), (vsy * 0.5)+yOffset, 0)
-	glScale(1.5, 1.5, 1)
-	glText(text, 0, 0, 14, "oc")
-	glPopMatrix()
+    glPushMatrix()
+    glTranslate((vsx * 0.5), (vsy * 0.5)+150, 0)
+    glScale(1.5, 1.5, 1)
+    glText(text, 0, 0, 14, "oc")
+    glPopMatrix()
 end 
 
 function gadget:Update() 
@@ -188,6 +157,5 @@ function gadget:Update()
 	end 
 end 
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 end 
