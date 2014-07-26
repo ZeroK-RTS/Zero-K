@@ -15,7 +15,7 @@ function gadget:GetInfo()
     date      = "15.4.2012",
     license   = "Nobody can do anything except me, Microsoft and Apple! Thieves hands off",
     layer     = 0,
-    enabled   = not singleplayer  --  loaded by default?
+    enabled   = not (singleplayer and VFS.FileExists("mission.lua"))  --  loaded by default?
   }
 end
 --------------------------------------------------------------------------------
