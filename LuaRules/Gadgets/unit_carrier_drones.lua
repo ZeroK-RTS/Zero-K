@@ -12,7 +12,7 @@ function gadget:GetInfo()
 		enabled   = true
 	}
 end
---Version 1.002
+--Version 1.003
 --Changelog:
 --24/6/2014 added carrier building drone on emit point. 
 --------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ local function InitCarrier(unitID, unitDefID, teamID)
 	for i=1,#carrierData do
 		-- toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
 		toReturn.droneSets[i] = {nil}
-		toReturn.droneSets[i].config = carrierData[i] --same as above, but we assign reference to "carrierData[i]" in memory to avoid duplicates, also, we have no plan to change config value.
+		toReturn.droneSets[i].config = carrierData[i] --same as above, but we assign reference to "carrierDefs[i]" table in memory to avoid duplicates, DO NOT CHANGE ITS CONTENT (its constant & config value only).
 		toReturn.droneSets[i].reload = carrierData[i].reloadTime
 		toReturn.droneSets[i].droneCount = 0
 		toReturn.droneSets[i].drones = {}
@@ -279,7 +279,7 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		local landDuration = 0
 		local buildProgress,health
 		local droneType = droneList[unitID].set
-		local droneInfo = carrierList[carrierID].droneSets[droneType]
+		local droneInfo = carrierList[carrierID].droneSets[droneType] --may persist even after "carrierList[carrierID]" is emptied
 		local build_step = droneInfo.config.buildStep
 		local build_step_health = droneInfo.config.buildStepHealth
 		while true do
@@ -292,7 +292,6 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 				return --nothing else to do
 			elseif (not carrierList[carrierID]) then --carrierList[carrierID] is NIL because it was MORPHED.
 				carrierID = droneList[unitID].carrier
-				carrierList[carrierID].occupiedPieces[padPieceID] = false
 				padPieceID = (carrierList[carrierID].spawnPieces and carrierList[carrierID].spawnPieces[1]) or 0
 				carrierList[carrierID].occupiedPieces[padPieceID] = true --block pad
 			end
@@ -464,17 +463,26 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (carrierList[unitID]) then
 		local newUnitID = GG.wasMorphedTo and GG.wasMorphedTo[unitID]
 		local carrier = carrierList[unitID]
-		if newUnitID and carrierList[newUnitID] then
-			carrierList[newUnitID] = Spring.Utilities.CopyTable(carrierList[unitID], true) -- deep copy?
-			  -- old carrier data removal (transfering drones to new carrier, old will "die" (on morph) silently without taking drones together to the grave)...
+		if newUnitID and carrierList[newUnitID] then --MORPHED, and MORPHED to another carrier. Note: unit_morph.lua create unit first before destroying it, so "carrierList[]" is already initialized.
+			local newCarrier = carrierList[newUnitID]
 			for i=1,#carrier.droneSets do
 				local set = carrier.droneSets[i]
+				local newSetID = -1
+				for j=1,#newCarrier.droneSets do
+					if newCarrier.droneSets[j].config.drone == set.config.drone then --same droneType? copy old drone data
+						newCarrier.droneSets[j].droneCount = set.droneCount
+						newCarrier.droneSets[j].reload = set.reload
+						newCarrier.droneSets[j].drones = set.drones
+						newSetID = j
+					end
+				end
 				for droneID in pairs(set.drones) do
 					droneList[droneID].carrier = newUnitID
+					droneList[droneID].set = newSetID
 					GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , {"shift"})
 				end
 			end
-		else
+		else --Carried died
 			for i=1,#carrier.droneSets do
 				local set = carrier.droneSets[i]
 				for droneID in pairs(set.drones) do
@@ -487,9 +495,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	elseif (droneList[unitID]) then
 		local carrierID = droneList[unitID].carrier
 		local setID = droneList[unitID].set
-		local droneSet = carrierList[carrierID].droneSets[setID]
-		droneSet.droneCount = (droneSet.droneCount - 1)
-		droneSet.drones[unitID] = nil
+		if setID > -1 then --is -1 when carrier morphed and drone is incompatible with the carrier
+			local droneSet = carrierList[carrierID].droneSets[setID]
+			droneSet.droneCount = (droneSet.droneCount - 1)
+			droneSet.drones[unitID] = nil
+		end
 		droneList[unitID] = nil
 	end
 end
