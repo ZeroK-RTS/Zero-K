@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.433 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.434 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -1644,9 +1644,10 @@ MakeSubWindow = function(path, pause)
 					x=0,
 					width = settings_width,
 					minHeight = 20,
-					caption = "- Location: " .. sub_path, 
+					fontsize = 11,
+					caption = "- Location: " .. currentPath, 
 					OnClick = {function() filterUserInsertedTerm = ''; end,function(self)
-						MakeSubWindow(sub_path, false)  --this made this "label" open another path when clicked
+						MakeSubWindow(currentPath, false)  --this made this "label" open another path when clicked
 					end,},
 					backgroundColor = color.transGray,
 					textColor = color.postit, 
