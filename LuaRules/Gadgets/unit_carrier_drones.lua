@@ -12,7 +12,7 @@ function gadget:GetInfo()
 		enabled   = true
 	}
 end
---Version 1.001
+--Version 1.002
 --Changelog:
 --24/6/2014 added carrier building drone on emit point. 
 --------------------------------------------------------------------------------
@@ -345,6 +345,7 @@ end
 --END----------------------------------
 
 -- morph uses this
+--[[
 local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
 	-- UnitFinished (above) should already be called for this new unit.
 	if carrierList[newUnitID] then
@@ -361,6 +362,7 @@ local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
 		carrierList[unitID] = nil
 	end
 end
+--]]
 
 local function isCarrier(unitID)
 	if (carrierList[unitID]) then
@@ -371,7 +373,7 @@ end
 
 -- morph uses this
 GG.isCarrier = isCarrier
-GG.transferCarrierData = transferCarrierData
+--GG.transferCarrierData = transferCarrierData
 
 local function GetDistance(x1, x2, y1, y2)
 	return ((x1-x2)^2 + (y1-y2)^2)^0.5
@@ -460,12 +462,25 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (carrierList[unitID]) then
+		local newUnitID = GG.wasMorphedTo and GG.wasMorphedTo[unitID]
 		local carrier = carrierList[unitID]
-		for i=1,#carrier.droneSets do
-			local set = carrier.droneSets[i]
-			for droneID in pairs(set.drones) do
-				droneList[droneID] = nil
-				killList[droneID] = true
+		if newUnitID and carrierList[newUnitID] then
+			carrierList[newUnitID] = Spring.Utilities.CopyTable(carrierList[unitID], true) -- deep copy?
+			  -- old carrier data removal (transfering drones to new carrier, old will "die" (on morph) silently without taking drones together to the grave)...
+			for i=1,#carrier.droneSets do
+				local set = carrier.droneSets[i]
+				for droneID in pairs(set.drones) do
+					droneList[droneID].carrier = newUnitID
+					GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , {"shift"})
+				end
+			end
+		else
+			for i=1,#carrier.droneSets do
+				local set = carrier.droneSets[i]
+				for droneID in pairs(set.drones) do
+					droneList[droneID] = nil
+					killList[droneID] = true
+				end
 			end
 		end
 		carrierList[unitID] = nil
