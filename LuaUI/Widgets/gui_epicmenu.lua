@@ -122,7 +122,7 @@ local init = false
 local myCountry = 'wut'
 
 local pathoptions = {}	
-local alloptions = {}	
+--local alloptions = {}	
 local actionToOption = {}
 
 local exitWindowVisible = false
@@ -1125,12 +1125,12 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			
 			CreateOptionAction(path,item)
 			
-			alloptions[path..wname..item.key] = item --is used to store options but will not be used to make button. Is for random stuff now.
+			--alloptions[path..wname..item.key] = item --is used to store options but will not be used to make button. Is for random stuff now.
 		end			
 	end
 	
 	otset( pathoptions[path], wname..option.key, option )--is used for remake epicMenu's button(s)
-	alloptions[path..wname..option.key] = option --is used for random stuff now.
+	--alloptions[path..wname..option.key] = option --is used for random stuff now.
 	
 end
 
@@ -1143,11 +1143,11 @@ local function RemOption(path, option, wname )
 	end
 	RemoveOptionAction(path, option)	
 	otset( pathoptions[path], wname..option.key, nil )
-	alloptions[path..wname..option.key] = nil
+	--alloptions[path..wname..option.key] = nil
 	if option.type == 'radioButton' then
 		for i=1, #option.items do
 			local itemsKey = option.items[i].key
-			alloptions[path..wname..itemsKey] = nil
+			--alloptions[path..wname..itemsKey] = nil
 		end
 	end
 end
@@ -2628,8 +2628,15 @@ function widget:Initialize()
 	--intialize remote option setter
 	WG.SetWidgetOption = function(wname, path, key, value)  
 		if (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) then
-			local option = alloptions[path..wname .. key]
-			option.OnChange(value)
+			--local option = alloptions[path..wname .. key]
+			local option = otget( pathoptions[path], wname..key )
+			
+			--option.OnChange(value)
+			if option.type == 'radioButton' then
+				option.OnChange(value)
+			else
+				option.OnChange({checked=value, value=value, color=value})
+			end
 		end
 	end 
 end
@@ -2774,7 +2781,9 @@ do --Set our prefered camera mode when first screen frame is drawn. The engine a
 		local screenFrame = 0
 		function widget:DrawScreen() --game event: Draw Screen
 			if screenFrame >= 1 then --detect frame no.2
-				local option = alloptions["Settings/CameraSettings/CameraCamera Type"] --get camera option we saved earlier in gui_epicmenu.lua\AddOption()
+				--local option = alloptions["Settings/CameraSettings/CameraCamera Type"] --get camera option we saved earlier in gui_epicmenu.lua\AddOption()
+				local option = otget( pathoptions['Settings/Camera'], 'Settings/Camera'..'Camera Type' ) --get camera option we saved earlier in gui_epicmenu.lua\AddOption()
+				
 				option.OnChange(option.value) --re-apply our settings 
 				Spring.Echo("Epicmenu: Switching to " .. option.value .. " camera mode") --notify in log what happen.
 				widgetHandler:RemoveWidgetCallIn("DrawScreen", self) --stop updating "widget:DrawScreen()" event. Note: this is a special "widgetHandler:RemoveCallin" for widget that use "handler=true".
