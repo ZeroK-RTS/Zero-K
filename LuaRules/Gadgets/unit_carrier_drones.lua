@@ -12,6 +12,7 @@ function gadget:GetInfo()
 		enabled   = true
 	}
 end
+--Version 1.001
 --Changelog:
 --24/6/2014 added carrier building drone on emit point. 
 --------------------------------------------------------------------------------
@@ -244,20 +245,20 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 	
 	Spring.SetUnitHealth(unitID,{ build = 0 })
 	
-	local GetPlacementPosition = function()
-		if (padPieceID==0) then
-			local _,_,_,mx,my,mz = Spring.GetUnitPosition(carrierID,true)
-			local dx,dy,dz = Spring.GetUnitDirection(carrierID)
+	local GetPlacementPosition = function(inputID,pieceNum)
+		if (pieceNum==0) then
+			local _,_,_,mx,my,mz = Spring.GetUnitPosition(inputID,true)
+			local dx,dy,dz = Spring.GetUnitDirection(inputID)
 			return mx,my,mz,dx,dy,dz
 		else
-			return Spring.GetUnitPiecePosDir(carrierID, padPieceID)
+			return Spring.GetUnitPiecePosDir(inputID, pieceNum)
 		end
 	end
 	
-	local AddNextDroneFromQueue = function()
-		if #carrierList[carrierID].droneInQueue > 0 then
-			if AddUnitToEmptyPad(carrierID,carrierList[carrierID].droneInQueue[1]) then --pad cleared, immediately add any unit from queue
-				table.remove(carrierList[carrierID].droneInQueue,1)
+	local AddNextDroneFromQueue = function(inputID)
+		if #carrierList[inputID].droneInQueue > 0 then
+			if AddUnitToEmptyPad(inputID,carrierList[inputID].droneInQueue[1]) then --pad cleared, immediately add any unit from queue
+				table.remove(carrierList[inputID].droneInQueue,1)
 			end
 		end
 	end
@@ -265,7 +266,7 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 	mcEnable(unitID)
 	Spring.SetUnitLeaveTracks(unitID, false)
 	mcSetVelocity(unitID, 0, 0, 0)
-	mcSetPosition(unitID,GetPlacementPosition())
+	mcSetPosition(unitID,GetPlacementPosition(carrierID,padPieceID))
 	
 	-- deactivate unit to cause the lups jets away
 	Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 0)
@@ -286,13 +287,18 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 				if carrierList[carrierID] then
 					droneInfo.buildCount = droneInfo.buildCount - 1
 					carrierList[carrierID].occupiedPieces[padPieceID] = false
-					AddNextDroneFromQueue() --add next drone in this vacant position
+					AddNextDroneFromQueue(carrierID) --add next drone in this vacant position
 				end
 				return --nothing else to do
+			elseif (not carrierList[carrierID]) then --carrierList[carrierID] is NIL because it was MORPHED.
+				carrierID = droneList[unitID].carrier
+				carrierList[carrierID].occupiedPieces[padPieceID] = false
+				padPieceID = (carrierList[carrierID].spawnPieces and carrierList[carrierID].spawnPieces[1]) or 0
+				carrierList[carrierID].occupiedPieces[padPieceID] = true --block pad
 			end
 			
 			vx,vy,vz = Spring.GetUnitVelocity(carrierID)
-			px, py, pz, dx, dy, dz = GetPlacementPosition()
+			px, py, pz, dx, dy, dz = GetPlacementPosition(carrierID,padPieceID)
 			currentDir = dx + dy*100 + dz* 10000
 			if previousDir ~= currentDir then --refresh pitch/yaw/roll calculation when unit had slight turning
 				previousDir = currentDir
@@ -330,7 +336,7 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		-- activate unit and its jets
 		Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		
-		AddNextDroneFromQueue() --this create next drone in this position (in this same GameFrame!), so it might look overlapped but that's just minor details
+		AddNextDroneFromQueue(carrierID) --this create next drone in this position (in this same GameFrame!), so it might look overlapped but that's just minor details
 	end
 	
 	StartScript(SitLoop)
