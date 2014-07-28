@@ -9,6 +9,7 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local reverseCompat = (Game.version:find('91.0') == 1)
 
 local SCRIPT_DIR = Script.GetName() .. '/'
 local GADGETS_DIR = SCRIPT_DIR .. 'Gadgets/'
@@ -20,24 +21,26 @@ local gh = gadgetHandler.gadgetHandler
 local oldNewGadget = gh.NewGadget
 local curdir = ""
 gh.NewGadget = function(self,dir)
-  local gadget = oldNewGadget(self)
-  gadget.GADGET_DIR = curdir
-  return gadget
+    local gadget = oldNewGadget(self)
+    gadget.GADGET_DIR = curdir
+    return gadget
 end
 
 --// load all Gadgets/*/main.lua gadgets
 local subdirs = VFS.SubDirs(GADGETS_DIR)
 for i=1,#subdirs do
-  curdir = subdirs[i]
-  local gf = curdir .. "main.lua"
-  if (VFS.FileExists(gf)) then
-    local g = gh:LoadGadget(gf)
+    curdir = subdirs[i]
+    local gf = curdir .. (reverseCompat and "91_main.lua" or "main.lua")
+    if (VFS.FileExists(gf)) then
+	local g = gh:LoadGadget(gf)
 	if g then
-      gh:InsertGadget(g)
-      local name = g.ghInfo.name
-      print(string.format("Loaded gadget:  %-18s  <%s>", name, gf))
+	    gh:InsertGadget(g)
+	    local name = g.ghInfo.name
+	    print(string.format("Loaded gadget:  %-18s  <%s>", name, gf))
 	end
-  end
+    else
+    
+    end
 end
 
 --// reset
