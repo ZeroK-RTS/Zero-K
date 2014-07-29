@@ -38,16 +38,17 @@ local shieldTeams = {}
 
 local unitRulesParamsSetting = {inlos = true} -- Let enemies see links. It is information availible to them anyway
 
-local updateLink = {nil}
+local updateLink = {}
+local updateAllyTeamLinks = {}
 
 -- Double table is required to choose a random element from the list
-local function addThingToIterable(id, things, thingByID)
+local function AddThingToIterable(id, things, thingByID)
 	thingByID.count = thingByID.count + 1
 	thingByID.data[thingByID.count] = id
 	things[id] = thingByID.count
 end
 
-local function removeThingFromIterable(id, things, thingByID)
+local function RemoveThingFromIterable(id, things, thingByID)
 	if things[id] then
 		things[thingByID.data[thingByID.count]] = things[id]
 		thingByID.data[things[id]] = thingByID.data[thingByID.count]
@@ -91,7 +92,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 			}
 			shieldTeams[allyTeamID][unitID] = shieldUnit
 		end
-		QueueLink(allyTeamID,unitID)
+		QueueLinkUpdate(allyTeamID,unitID)
 	end
 end
 
@@ -101,13 +102,13 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
-	local allyTeam = spGetUnitAllyTeam(unitID)
-	if ud.shieldWeaponDef and shieldTeams[allyTeam] then
-		local shieldUnit = shieldTeams[allyTeam][unitID]
+	local allyTeamID = spGetUnitAllyTeam(unitID)
+	if ud.shieldWeaponDef and shieldTeams[allyTeamID] then
+		local shieldUnit = shieldTeams[allyTeamID][unitID]
 		if shieldUnit then
-			QueueLinks(allyTeam,shieldUnit.neighborList)
+			RemoveUnitFromNeighbors(allyTeamID, unitID, shieldUnit.neighborList)
 		end
-		shieldTeams[allyTeam][unitID] = nil
+		shieldTeams[allyTeamID][unitID] = nil
 	end
 end
 
@@ -116,29 +117,34 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
 	if ud.shieldWeaponDef then
 		local shieldUnit
-		local allyTeam = spGetUnitAllyTeam(unitID)
+		local allyTeamID = spGetUnitAllyTeam(unitID)
 		if shieldTeams[oldAllyTeam] and shieldTeams[oldAllyTeam][unitID] then
 			shieldUnit = shieldTeams[oldAllyTeam][unitID]
 			shieldTeams[oldAllyTeam][unitID] = nil
-			QueueLinks(oldAllyTeam,shieldUnit.neighborList)
-			QueueLink(allyTeam,unitID)
+			RemoveUnitFromNeighbors(oldAllyTeam, unitID, shieldUnit.neighborList)
+			QueueLinkUpdate(allyTeamID,unitID)
 			shieldUnit.neighbors = {}
 		end
 			
-		shieldTeams[allyTeam] = shieldTeams[allyTeam] or {}
-		shieldTeams[allyTeam][unitID] = shieldUnit --Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish 
+		shieldTeams[allyTeamID] = shieldTeams[allyTeamID] or {}
+		shieldTeams[allyTeamID][unitID] = shieldUnit --Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish 
 	end
 end
 
-function QueueLink(allyTeam,unitID)
-	updateLink[allyTeam] = updateLink[allyTeam] or {}
-	updateLink[allyTeam][unitID] = true
-end
-
-function QueueLinks(allyTeam,neighborList)
+function RemoveUnitFromNeighbors(allyTeamID, unitID, neighborList)
+	local otherID
+	local thisShieldTeam = shieldTeams[allyTeamID]
 	for i = 1, neighborList.count do
-		QueueLink(allyTeam,neighborList.data[i])
+		otherID = neighborList.data[i]
+		if thisShieldTeam[otherID] then
+			RemoveThingFromIterable(unitID, thisShieldTeam[otherID].neighbors, thisShieldTeam[otherID].neighborList)
+		end
 	end
+end
+
+function QueueLinkUpdate(allyTeamID,unitID)
+	updateLink[allyTeamID] = updateLink[allyTeamID] or {}
+	updateLink[allyTeamID][unitID] = true
 end
 
 -- check if working unit so it can be used for shield link
@@ -155,59 +161,70 @@ local function IsEnabled(unitID)
 	end
 end
 
-local function AdjustLinks(allyTeam, unitList,isPartialLinkingState, targetUnitIDs)
-	for unitID, unitData in pairs(unitList) do
-		if not (isPartialLinkingState and not targetUnitIDs[unitID]) and unitData.linkable then
-			for otherID, otherData in pairs(unitList) do --iterate over all shield unit, find anyone that's in range.
-				if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) then
-					local xDiff = unitData.x - otherData.x
-					local zDiff = unitData.z - otherData.z
-					local yDiff = unitData.y - otherData.y
-					local sumRadius = unitData.shieldRadius + otherData.shieldRadius
+local function ShieldsAreTouching(shield1, shield2)
+	local xDiff = shield1.x - shield2.x
+	local zDiff = shield1.z - shield2.z
+	local yDiff = shield1.y - shield2.y
+	local sumRadius = shield1.shieldRadius + shield2.shieldRadius
+	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius 
+end
 
-					if xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius then --if this unit is in range of old unit:
-						addThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
-						addThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
-					end
+local function AdjustLinks(allyTeamID, shieldList, unitUpdateList)
+	local unitData
+	for unitID,_ in pairs(unitUpdateList) do
+		unitData = shieldList[unitID]
+		if unitData.linkable then
+			for otherID, otherData in pairs(shieldList) do --iterate over all shield unit, find anyone that's in range.
+				if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) and 
+							otherData.linkable and ShieldsAreTouching(unitData, otherData) then
+					AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
+					AddThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
 				end
 			end -- for otherID
 		end
 	end	-- for unitID
 end
 
-local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPartialLink)
-	for unitID,shieldUnit in pairs(unitList) do
-		if not isPartialLinkingState or unitsToPartialLink[unitID] then --reset link data for targeted UnitID or all units (this will force re-creation of links)
+local function UpdateAllLinks(allyTeamID, shieldList, unitUpdateList)
+	local unitData
+	for unitID,_ in pairs(unitUpdateList) do
+		unitData = shieldTeams[allyTeamID][unitID]
+		if unitData then
 			local x,y,z = spGetUnitPosition(unitID)
 			local valid = x and y and z
-			shieldUnit.linkable = valid and IsEnabled(unitID)
-			shieldUnit.online = shieldUnit.linkable
-			shieldUnit.enabled = shieldUnit.linkable
+			unitData.linkable = valid and IsEnabled(unitID)
+			unitData.online = unitData.linkable
+			unitData.enabled = unitData.linkable
 
-			if (shieldUnit.linkable) then
-				shieldUnit.x = x
-				shieldUnit.y = y
-				shieldUnit.z = z
-			end
-			
-			local otherID
-			for i = 1, shieldUnit.neighborList.count do
-				otherID = shieldUnit.neighborList.data[i]
-				if shieldTeams[allyTeam][otherID] then
-					removeThingFromIterable(unitID, shieldTeams[allyTeam][otherID].neighbors, shieldTeams[allyTeam][otherID].neighborList)
+			if (unitData.linkable) then
+				unitData.x = x
+				unitData.y = y
+				unitData.z = z
+				
+				local otherID, otherData
+				for i = 1, unitData.neighborList.count do
+					otherID = unitData.neighborList.data[i]
+					if shieldTeams[allyTeamID][otherID] then
+						otherData = shieldTeams[allyTeamID][otherID]
+						if not (otherData.linkable and ShieldsAreTouching(unitData, otherData)) then
+							RemoveThingFromIterable(unitID, otherData.neighbors, otherData.neighborList)
+							RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList)
+						end
+					end
 				end
+			else
+				RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
+				unitData.neighbors = {}
+				unitData.neighborList = {data = {}, count = 0}
 			end
-			
-			shieldUnit.neighbors = {}
-			shieldUnit.neighborList = {data = {}, count = 0}
 		end
 	end
-
-	AdjustLinks(allyTeam, unitList,isPartialLinkingState,unitsToPartialLink)
+	
+	AdjustLinks(allyTeamID, shieldList,unitUpdateList)
 end
 
 local function UpdateEnabledState()
-	for allyTeam,unitList in pairs(shieldTeams) do
+	for allyTeamID,unitList in pairs(shieldTeams) do
 		for unitID,shieldUnit in pairs(unitList) do
 			shieldUnit.enabled = IsEnabled(unitID)
 			shieldUnit.online = shieldUnit.linkable and shieldUnit.enabled --if linked, update 'online' state (for charge distribution)
@@ -224,9 +241,12 @@ local function DoChargeTransfer(lowID, lowData, lowCharge, highID, highData, hig
 	--3)leave spaces for receiver to regen,
 	--charge flow is capable: to reverse flow (IS DISABLED!) when receiver have regen and is full,
 	local chargeFlow = math.min(RECHARGE_KOEF*(highCharge - lowCharge),highCharge, lowData.shieldMaxCharge - lowData.shieldRegen - lowCharge) --minimize positive flow
-	chargeFlow = math.max(0, chargeFlow) --minimize negative flow (DISABLED by setting max 0 flow, prevent cheap reservoir from charging expensive reservoir using overflow)
-	spSetUnitShieldState(highID, -1, highCharge - chargeFlow)
-	spSetUnitShieldState(lowID, -1, lowCharge + chargeFlow)
+	if chargeFlow > 0 then -- Disallow negative flow
+		spSetUnitShieldState(highID, -1, highCharge - chargeFlow)
+		spSetUnitShieldState(lowID, -1, lowCharge + chargeFlow)
+		return true
+	end
+	return false
 end
 
 
@@ -235,35 +255,37 @@ local listCount = 0
 function gadget:GameFrame(n)
 	if n%30 == 18 then  --update every 30 frames at the 18th frame
 		--note: only update link when unit moves reduce total consumption by 53% when unit idle.
-		for allyTeam,unitList in pairs(shieldTeams) do
-			for unitID,shieldUnit in pairs(unitList) do
-				if not (updateLink[allyTeam] and updateLink[allyTeam][unitID]) then --already queued to update?
-					if shieldUnit.linkable ~= shieldUnit.enabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
-						if not shieldUnit.linkable then -- NO_LINK only happen if unit was EMP-ed
-							QueueLink(allyTeam,unitID)
-						else
-							QueueLinks(allyTeam,shieldUnit.neighborList)
+		for allyTeamID,unitList in pairs(shieldTeams) do
+			for unitID, unitData in pairs(unitList) do
+				if unitData.linkable ~= unitData.enabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
+					if not unitData.linkable then -- NO_LINK only happen if unit was EMP-ed
+						QueueLinkUpdate(allyTeamID,unitID)
+					else
+						RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
+					end
+				elseif unitData.linkable then
+					local x,y,z = unitData.x, unitData.y, unitData.z
+					if x and y and z then
+						local ux,uy,uz = Spring.GetUnitPosition(unitID)
+						if ux-x > 10 or x-ux > 10 or uy-y > 10 or y-uy > 10 or  uz-z > 10 or z-uz > 10 then --if unit change position
+							QueueLinkUpdate(allyTeamID, unitID)
 						end
-					elseif shieldUnit.linkable then
-						local x,y,z = shieldUnit.x,shieldUnit.y,shieldUnit.z
-						if x and y and z then
-							local ux,uy,uz = Spring.GetUnitPosition(unitID)
-							if ux-x > 10 or x-ux > 10 or uy-y > 10 or y-uy > 10 or  uz-z > 10 or z-uz > 10 then --if unit change position
-								QueueLinks(allyTeam,shieldUnit.neighborList)
-							end
-						else
-							Spring.Echo("Warning: shieldUnitPosition for " .. unitID .. " is NIL") --should not happen, all ShieldUnit should've been subjected to linking check at least once
-							updateLink[allyTeam] = true --re-create all link
-							break; --nothing else to do, escape loop
-						end
+					else
+						Spring.Echo("Warning: shieldUnitPosition for " .. unitID .. " is NIL") --should not happen, all ShieldUnit should've been subjected to linking check at least once
+						updateAllyTeamLinks[allyTeamID] = true --re-create all link
+						break; --nothing else to do, escape loop
 					end
 				end
 			end
 		end
-		for allyTeam,unitToLink in pairs(updateLink) do
-			local isPartial = (type(unitToLink)=='table')
-			UpdateAllLinks(allyTeam,shieldTeams[allyTeam],isPartial,unitToLink) --adjust/create link
-			updateLink[allyTeam] = nil
+		for allyTeamID,_ in pairs(updateAllyTeamLinks) do
+			UpdateAllLinks(allyTeamID,shieldTeams[allyTeamID],shieldTeams[allyTeamID])
+			updateAllyTeamLinks[allyTeamID] = nil
+			listCount = -1
+		end
+		for allyTeamID,unitToLink in pairs(updateLink) do
+			UpdateAllLinks(allyTeamID,shieldTeams[allyTeamID],unitToLink) --adjust/create link
+			updateLink[allyTeamID] = nil
 			listCount = -1 --trigger "shieldUnitList[]" to update too
 		end
 		
@@ -275,7 +297,7 @@ function gadget:GameFrame(n)
 	-- Translate to ordered table every second. The units are iterated over every frame.
 	if n%30 == 18 and listCount == -1 then
 		listCount = 0
-		for allyTeam,unitList in pairs(shieldTeams) do
+		for allyTeamID,unitList in pairs(shieldTeams) do
 			for unitID,shieldUnit in pairs(unitList) do
 				if shieldUnit.linkable and shieldUnit.neighborList.count > 0 then
 					listCount = listCount + 1
@@ -316,12 +338,13 @@ function gadget:GameFrame(n)
 				if otherData then --shield dead?
 					on, otherCharge = spGetUnitShieldState(otherID, -1)
 					if on and otherCharge and otherData.online then
-						linkSuccessful = true
-						spSetUnitRulesParam(unitID,"shield_link",otherID,unitRulesParamsSetting)
 						if (unitCharge > otherCharge) then
-							DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)
+							linkSuccessful = DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)
 						else
-							DoChargeTransfer(unitID, unitData, unitCharge, otherID, otherData, otherCharge)
+							linkSuccessful = DoChargeTransfer(unitID, unitData, unitCharge, otherID, otherData, otherCharge)
+						end
+						if linkSuccessful then
+							spSetUnitRulesParam(unitID,"shield_link",otherID,unitRulesParamsSetting)
 						end
 					end
 				end
@@ -402,16 +425,16 @@ local function DrawFunc(spec)
 	for i=1, #shieldUnits do
 		unitID = shieldUnits[i]
 		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
-		local los1 = spGetUnitLosState(unitID, myTeam, false)
-		local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
-		if (spec or (los1 and los1.los) or (los2 and los2.los)) and 
-				(connectedToUnitID and (connectedToUnitID >= 0) and 
-				(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) and
-				(spValidUnitID(unitID) and spValidUnitID(connectedToUnitID))) then
-			x1, y1, z1 = spGetUnitViewPosition(unitID, true)
-			x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
-			glVertex(x1, y1, z1)
-			glVertex(x2, y2, z2)
+		if connectedToUnitID and connectedToUnitID >= 0 and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
+			local los1 = spGetUnitLosState(unitID, myTeam, false)
+			local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
+			if (spec or (los1 and los1.los) or (los2 and los2.los)) and 
+					(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
+				x1, y1, z1 = spGetUnitViewPosition(unitID, true)
+				x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
+				glVertex(x1, y1, z1)
+				glVertex(x2, y2, z2)
+			end
 		end
 	end
 end
@@ -419,15 +442,15 @@ end
 function gadget:DrawWorld()
 	if shieldCount > 1 then
 		glPushAttrib(GL_LINE_BITS)
-
+    
 		glDepthTest(true)
 		glColor(1,0,1,math.random()*0.2+0.15)
 		glLineWidth(1)
 		glBeginEnd(GL_LINES, DrawFunc)
-
+    
 		glDepthTest(false)
 		glColor(1,1,1,1)
-
+    
 		glPopAttrib()
 	end
 end
