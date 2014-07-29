@@ -111,10 +111,10 @@ unitDef = {
     TORPEDO = {
       name                    = [[Torpedo]],
       areaOfEffect            = 32,
-      avoidFriendly           = false,
+      avoidFriendly           = true,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
-      collideFriendly         = false,
+      collideFriendly         = true,
       craterBoost             = 1,
       craterMult              = 2,
 

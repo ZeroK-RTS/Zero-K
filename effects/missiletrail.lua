@@ -165,6 +165,46 @@ return {
     },
   },
 
+  ["torptrailpurple"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    largeflash = {
+      air                = false,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[0.9 0.1 0.9 0.01 0.5 0.1 0.8 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[muzzlefront]],
+        length             = -4,
+        sidetexture        = [[muzzleside]],
+        size               = -8,
+        sizegrowth         = 0.75,
+        ttl                = 1,
+      },
+    },
+
+    spikes = {
+      air                = false,
+      class              = [[explspike]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 0.8,
+        alphadecay         = 0.5,
+        color              = [[0.9, 0.5, 0.9]],
+        dir                = [[-6 r12,-6 r12,-6 r12]],
+        length             = 3,
+        width              = 5,
+      },
+    },
+  },
+
 
   ["missiletrailgreen"] = {
     alwaysvisible      = false,

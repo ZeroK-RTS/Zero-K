@@ -28,6 +28,7 @@ local longRangeSwarmieeArray = {
 	["corstorm"] = true,
 	["shiparty"] = true,
 	["armham"] = true,
+	["subraider"] = true,
 }
 
 local medRangeSwarmieeArray = { 
@@ -739,6 +740,17 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
+	},
+	["subraider"] = {
+		skirms = artyRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 80, 
+		skirmOrderDis = 250,
+		velocityPrediction = 40,
 	},
 	["shiparty"] = {
 		skirms = artyRangeSkirmieeArray, 
