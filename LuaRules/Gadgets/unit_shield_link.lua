@@ -20,8 +20,8 @@ local version = 1.232
 --------------------------------------------------------------------------------
 
 
-
 if gadgetHandler:IsSyncedCode() then
+
 local spGetUnitPosition		= Spring.GetUnitPosition
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitTeam			= Spring.GetUnitTeam
@@ -33,27 +33,29 @@ local spGetUnitShieldState	= Spring.GetUnitShieldState
 local spSetUnitShieldState	= Spring.SetUnitShieldState
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 
----CONFIG---
-local linkLimit = { --set maximum link desired, empty means "no limit"
-	[UnitDefNames["shieldfelon"].id] = 5,
-	[UnitDefNames["core_spectre"].id] = 5, --aspis
-	[UnitDefNames["corjamt"].id] = 5, --aegis
-}
-local linkSequence = { --set any unit to link first, first unit get more link but limited by linkLimit (if set)
-	[1] = UnitDefNames["shieldfelon"].id,
-	[2] = UnitDefNames["core_spectre"].id, --aspis
-	[3] = UnitDefNames["corjamt"].id, --aegis
-}
 ------------
-
-local NO_LINK = {nil}
-
 local shieldTeams = {}
 
-local shieldConnections = {}
-local unitRulesParamsSetting = {allied=true,} --Fixme: what is the losAccess setting that obey spec's limited LOS mode?
+local unitRulesParamsSetting = {inlos = true} -- Let enemies see links. It is information availible to them anyway
 
 local updateLink = {nil}
+
+-- Double table is required to choose a random element from the list
+local function addThingToIterable(id, things, thingByID)
+	thingByID.count = thingByID.count + 1
+	thingByID.data[thingByID.count] = id
+	things[id] = thingByID.count
+end
+
+local function removeThingFromIterable(id, things, thingByID)
+	if things[id] then
+		things[thingByID.data[thingByID.count]] = things[id]
+		thingByID.data[things[id]] = thingByID.data[thingByID.count]
+		thingByID.data[thingByID.count] = nil
+		things[id] = nil
+		thingByID.count = thingByID.count - 1
+	end
+end
 
 function gadget:Initialize()
 	for _,unitID in ipairs(Spring.GetAllUnits()) do
@@ -75,22 +77,21 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if ud.shieldWeaponDef then
 		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
 		--local x,y,z = spGetUnitPosition(unitID)
-		local allyTeam = spGetUnitAllyTeam(unitID)
-		if not (shieldTeams[allyTeam] and shieldTeams[allyTeam][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
-			shieldTeams[allyTeam] = shieldTeams[allyTeam] or {}
+		local allyTeamID = spGetUnitAllyTeam(unitID)
+		if not (shieldTeams[allyTeamID] and shieldTeams[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
+			shieldTeams[allyTeamID] = shieldTeams[allyTeamID] or {}
 			local shieldUnit = {
-				shieldPower  = shieldWep.shieldPower,
+				shieldMaxCharge  = shieldWep.shieldPower,
 				shieldRadius = shieldWep.shieldRadius,
 				shieldRegen  = shieldWep.shieldPowerRegen,
 				unitDefID    = unitDefID,
-				linkLimit    = linkLimit[unitDefID],
-				link         = NO_LINK,  --real table is created in each UpdateAllLinks() call
-				neighbor     = {},
-				numNeighbors = 0,
+				neighbors    = {},
+				neighborList = {data = {}, count = 0},
+				allyTeamID   = allyTeamID,
 			}
-			shieldTeams[allyTeam][unitID] = shieldUnit
+			shieldTeams[allyTeamID][unitID] = shieldUnit
 		end
-		QueueLink(allyTeam,unitID)
+		QueueLink(allyTeamID,unitID)
 	end
 end
 
@@ -103,13 +104,10 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	if ud.shieldWeaponDef and shieldTeams[allyTeam] then
 		local shieldUnit = shieldTeams[allyTeam][unitID]
-		shieldTeams[allyTeam][unitID] = nil
 		if shieldUnit then
-			if shieldUnit.numNeighbors > 0 then --shield unit was connected to other shield
-				QueueLinksAndResetVFXs(allyTeam,shieldUnit.link)
-			end
-			shieldUnit.link = NO_LINK  --help GC by removing pointer to old table
+			QueueLinks(allyTeam,shieldUnit.neighborList)
 		end
+		shieldTeams[allyTeam][unitID] = nil
 	end
 end
 
@@ -122,42 +120,13 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 		if shieldTeams[oldAllyTeam] and shieldTeams[oldAllyTeam][unitID] then
 			shieldUnit = shieldTeams[oldAllyTeam][unitID]
 			shieldTeams[oldAllyTeam][unitID] = nil
-			if shieldUnit.numNeighbors > 0 then --shield unit was connected to other shield
-				QueueLinksAndResetVFXs(oldAllyTeam,shieldUnit.link)
-			end
+			QueueLinks(oldAllyTeam,shieldUnit.neighborList)
 			QueueLink(allyTeam,unitID)
-			shieldUnit.link = NO_LINK --help GC by removing pointer to old table
+			shieldUnit.neighbors = {}
 		end
 			
 		shieldTeams[allyTeam] = shieldTeams[allyTeam] or {}
 		shieldTeams[allyTeam][unitID] = shieldUnit --Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish 
-	end
-end
-
-function RemoveAllVFX(allyTeam)
-	if shieldConnections[allyTeam] then
-		for unitID,_ in pairs(shieldConnections[allyTeam]) do
-			spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
-		end
-		shieldConnections[allyTeam] = {}
-	end
-end
-
-function RemoveVFX(allyTeam,unitID)
-	if shieldConnections[allyTeam] then
-		spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
-		shieldConnections[allyTeam][unitID] = nil
-	end
-end
-
-function AddVFX(allyTeam,unit1,unit2)
-	shieldConnections[allyTeam] = shieldConnections[allyTeam] or {}
-	if not shieldConnections[allyTeam][unit1] then
-		spSetUnitRulesParam(unit1,"shield_link",unit2,unitRulesParamsSetting)
-		shieldConnections[allyTeam][unit1] = unit2
-	else 
-		spSetUnitRulesParam(unit2,"shield_link",unit1,unitRulesParamsSetting)
-		shieldConnections[allyTeam][unit2] = unit1
 	end
 end
 
@@ -166,10 +135,9 @@ function QueueLink(allyTeam,unitID)
 	updateLink[allyTeam][unitID] = true
 end
 
-function QueueLinksAndResetVFXs(allyTeam,link)
-	for id2,_ in pairs(link) do --link always include self (current unitID)
-		RemoveVFX(allyTeam,id2)
-		QueueLink(allyTeam,id2)
+function QueueLinks(allyTeam,neighborList)
+	for i = 1, neighborList.count do
+		QueueLink(allyTeam,neighborList.data[i])
 	end
 end
 
@@ -187,47 +155,24 @@ local function IsEnabled(unitID)
 	end
 end
 
-local function AdjustLinks(allyTeam, unitList, isPreLinkingPhase, targetDefID,isPartialLinkingState, targetUnitIDs)
-		for ud1,shieldUnit1 in pairs(unitList) do
-			repeat --Is clever hax for making "break" behave like "continue"
-				if isPreLinkingPhase then
-					if shieldUnit1.unitDefID ~= targetDefID then break end --skip unprioritized units and other unitDefs
-					shieldUnit1.prelinked = true
-				else --not prelinking phase
-					if shieldUnit1.prelinked then break end --skip prioritized units
-				end
-				if  isPartialLinkingState then
-					if not (targetUnitIDs[ud1]) then break end --skip already linked units
-				end
+local function AdjustLinks(allyTeam, unitList,isPartialLinkingState, targetUnitIDs)
+	for unitID, unitData in pairs(unitList) do
+		if not (isPartialLinkingState and not targetUnitIDs[unitID]) and unitData.linkable then
+			for otherID, otherData in pairs(unitList) do --iterate over all shield unit, find anyone that's in range.
+				if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) then
+					local xDiff = unitData.x - otherData.x
+					local zDiff = unitData.z - otherData.z
+					local yDiff = unitData.y - otherData.y
+					local sumRadius = unitData.shieldRadius + otherData.shieldRadius
 
-				if not shieldUnit1.linkable then break end -- continue to next unit
-
-				for ud2,shieldUnit2 in pairs(unitList) do --iterate over all shield unit, find anyone that's in range.
-					if ((not shieldUnit1.linkLimit) or shieldUnit1.linkLimit > shieldUnit1.numNeighbors)
-                        and shieldUnit1.link ~= shieldUnit2.link and shieldUnit2.linkable then --if new link isn't existing link, and if this unit is linkable, then: 
-
-						local xDiff = shieldUnit1.x - shieldUnit2.x
-						local zDiff = shieldUnit1.z - shieldUnit2.z
-						local yDiff = shieldUnit1.y - shieldUnit2.y
-						local sumRadius = shieldUnit1.shieldRadius + shieldUnit2.shieldRadius
-
-						if xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius then --if this unit is in range of old unit:
-							AddVFX(allyTeam,ud1,ud2)
-		
-							shieldUnit1.numNeighbors = shieldUnit1.numNeighbors + 1
-							shieldUnit2.numNeighbors = shieldUnit2.numNeighbors + 1
-							shieldUnit1.neighbor[shieldUnit1.numNeighbors] = ud2
-							shieldUnit2.neighbor[shieldUnit2.numNeighbors] = ud1
-								
-							for unitID,shieldUnit3 in pairs(shieldUnit2.link) do
-								shieldUnit1.link[unitID] = shieldUnit3 --copy content from new link to existing link
-								shieldUnit3.link = shieldUnit1.link --assign existing link to new unit
-							end
-						end
+					if xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius then --if this unit is in range of old unit:
+						addThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
+						addThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
 					end
-				end -- for ud2
-			until true --exit repeat
-		end	-- for ud1
+				end
+			end -- for otherID
+		end
+	end	-- for unitID
 end
 
 local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPartialLink)
@@ -237,31 +182,28 @@ local function UpdateAllLinks(allyTeam,unitList,isPartialLinkingState, unitsToPa
 			local valid = x and y and z
 			shieldUnit.linkable = valid and IsEnabled(unitID)
 			shieldUnit.online = shieldUnit.linkable
-			shieldUnit.enabled  = shieldUnit.linkable
+			shieldUnit.enabled = shieldUnit.linkable
 
 			if (shieldUnit.linkable) then
 				shieldUnit.x = x
 				shieldUnit.y = y
 				shieldUnit.z = z
-				shieldUnit.link = { [unitID] = shieldUnit }
-			else
-				shieldUnit.link = NO_LINK
 			end
-
-			shieldUnit.numNeighbors = 0
-			shieldUnit.prelinked = false
+			
+			local otherID
+			for i = 1, shieldUnit.neighborList.count do
+				otherID = shieldUnit.neighborList.data[i]
+				if shieldTeams[allyTeam][otherID] then
+					removeThingFromIterable(unitID, shieldTeams[allyTeam][otherID].neighbors, shieldTeams[allyTeam][otherID].neighborList)
+				end
+			end
+			
+			shieldUnit.neighbors = {}
+			shieldUnit.neighborList = {data = {}, count = 0}
 		end
 	end
 
-	if not isPartialLinkingState then
-		RemoveAllVFX() -- Reset all when we want to recreate all link
-	end
-
-	for i=1, #linkSequence do --unit that is to be linked first (to have most link)
-		local unitDefID = linkSequence[i]
-		AdjustLinks(allyTeam, unitList, true , unitDefID,isPartialLinkingState,unitsToPartialLink) 
-	end
-	AdjustLinks(allyTeam, unitList, false,nil,isPartialLinkingState,unitsToPartialLink)
+	AdjustLinks(allyTeam, unitList,isPartialLinkingState,unitsToPartialLink)
 end
 
 local function UpdateEnabledState()
@@ -273,8 +215,22 @@ local function UpdateEnabledState()
 	end
 end
 
-local RECHARGE_KOEF = 0.01
-local shieldChargeList = {nil}
+local RECHARGE_KOEF = 0.005
+local function DoChargeTransfer(lowID, lowData, lowCharge, highID, highData, highCharge)
+	--charge flow is: based on the absolute difference in charge content,
+	--charge flow must:
+	--1)not be more than receiver's capacity, 
+	--2)not be more than donator's available charge,
+	--3)leave spaces for receiver to regen,
+	--charge flow is capable: to reverse flow (IS DISABLED!) when receiver have regen and is full,
+	local chargeFlow = math.min(RECHARGE_KOEF*(highCharge - lowCharge),highCharge, lowData.shieldMaxCharge - lowData.shieldRegen - lowCharge) --minimize positive flow
+	chargeFlow = math.max(0, chargeFlow) --minimize negative flow (DISABLED by setting max 0 flow, prevent cheap reservoir from charging expensive reservoir using overflow)
+	spSetUnitShieldState(highID, -1, highCharge - chargeFlow)
+	spSetUnitShieldState(lowID, -1, lowCharge + chargeFlow)
+end
+
+
+local shieldUnitList = {}
 local listCount = 0
 function gadget:GameFrame(n)
 	if n%30 == 18 then  --update every 30 frames at the 18th frame
@@ -282,19 +238,18 @@ function gadget:GameFrame(n)
 		for allyTeam,unitList in pairs(shieldTeams) do
 			for unitID,shieldUnit in pairs(unitList) do
 				if not (updateLink[allyTeam] and updateLink[allyTeam][unitID]) then --already queued to update?
-					local links = shieldUnit.link
 					if shieldUnit.linkable ~= shieldUnit.enabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
-						if (links == NO_LINK) then -- NO_LINK only happen if unit was EMP-ed
+						if not shieldUnit.linkable then -- NO_LINK only happen if unit was EMP-ed
 							QueueLink(allyTeam,unitID)
 						else
-							QueueLinksAndResetVFXs(allyTeam,links)
+							QueueLinks(allyTeam,shieldUnit.neighborList)
 						end
 					elseif shieldUnit.linkable then
 						local x,y,z = shieldUnit.x,shieldUnit.y,shieldUnit.z
 						if x and y and z then
 							local ux,uy,uz = Spring.GetUnitPosition(unitID)
 							if ux-x > 10 or x-ux > 10 or uy-y > 10 or y-uy > 10 or  uz-z > 10 or z-uz > 10 then --if unit change position
-								QueueLinksAndResetVFXs(allyTeam,links)
+								QueueLinks(allyTeam,shieldUnit.neighborList)
 							end
 						else
 							Spring.Echo("Warning: shieldUnitPosition for " .. unitID .. " is NIL") --should not happen, all ShieldUnit should've been subjected to linking check at least once
@@ -309,112 +264,73 @@ function gadget:GameFrame(n)
 			local isPartial = (type(unitToLink)=='table')
 			UpdateAllLinks(allyTeam,shieldTeams[allyTeam],isPartial,unitToLink) --adjust/create link
 			updateLink[allyTeam] = nil
-			listCount = -1 --trigger "shieldChargeList[]" to update too
+			listCount = -1 --trigger "shieldUnitList[]" to update too
 		end
 		
 	elseif n%5 == 3 then
 		UpdateEnabledState() --do stun checks at a bit faster rate for charge distribution algorithm (below)
 	end
 	
-	-- Distribution Method A: distribute shield charge to nearest neighbor
-	if n%30 == 18 and listCount == -1 then  -- translate pairs to ordered table
+	-- Charge Distribution
+	-- Translate to ordered table every second. The units are iterated over every frame.
+	if n%30 == 18 and listCount == -1 then
 		listCount = 0
 		for allyTeam,unitList in pairs(shieldTeams) do
 			for unitID,shieldUnit in pairs(unitList) do
-				if shieldUnit.link ~= NO_LINK then
+				if shieldUnit.linkable and shieldUnit.neighborList.count > 0 then
 					listCount = listCount + 1
-					shieldChargeList[listCount] = {unitID,shieldUnit} --Note: "shieldUnit" is a pointer
+					shieldUnitList[listCount] = {
+						unitID = unitID,
+						data = shieldUnit, --Note: "shieldUnit" is a pointer
+					} 
+					
+					--for otherID,_ in pairs(shieldUnit.neighbors) do
+					----for i = 1, shieldUnit.numNeighbors do
+					----	local otherID = shieldUnit.neighborList[i]
+					--	local otherShield = shieldTeams[shieldUnit.allyTeamID][otherID]
+					--	if otherShield then
+					--		Spring.MarkerAddLine(shieldUnit.x,0,shieldUnit.z,otherShield.x,0,otherShield.z)
+					--	end
+					--end
 				end
 			end
 		end
 	end
-	--Distribute charge to nearest neighbor
-	local unitID2,charger_On,charger_charge,charger_capacity --note: prevent repeated localization reduce consumption by 2%.
-	local unitID3,chargee_On,chargee_charge,chargee_capacity,chargee_regen
-	local chargeFlow, shieldUnit2,shieldUnit3
-	for i=1, listCount do --looping without pairs reduce consumption by 7%.
-		unitID2 = shieldChargeList[i][1]
-		shieldUnit2 = shieldChargeList[i][2]
-		charger_On,charger_charge = spGetUnitShieldState(unitID2, -1) --probably return NIL if unit is dead
-		if (charger_On and shieldUnit2.online) then
-			charger_capacity = shieldUnit2.shieldPower
-			for i=1, shieldUnit2.numNeighbors do
-				unitID3 = shieldUnit2.neighbor[i]
-				shieldUnit3 = shieldUnit2.link[unitID3]
-				if shieldUnit3~= nil then --shield dead? (NOTE! neighbor list is not updated when unit die, its only updated in AdjustLinks(), however "shieldUnit.link[unitID]" is emptied upon death)
-					chargee_On,chargee_charge = spGetUnitShieldState(unitID3, -1)
-					if chargee_On and shieldUnit3.online and (charger_charge>chargee_charge) then 
-						chargee_capacity = shieldUnit3.shieldPower
-						chargee_regen = shieldUnit3.shieldRegen
-						--charge flow is: based on the absolute difference in charge content,
-						--charge flow must:
-						--1)not be more than receiver's capacity, 
-						--2)not be more than donator's available charge,
-						--3)leave spaces for receiver to regen,
-						--charge flow is capable: to reverse flow (IS DISABLED!) when receiver have regen and is full,
-						chargeFlow = math.min(RECHARGE_KOEF*(charger_charge-chargee_charge),charger_charge, chargee_capacity-chargee_regen-chargee_charge) --minimize positive flow
-						chargeFlow = math.max(0, chargeFlow, charger_charge - charger_capacity) --minimize negative flow (DISABLED by setting max 0 flow, prevent cheap reservoir from charging expensive reservoir using overflow)
-						charger_charge = charger_charge - chargeFlow --deduct charge
-						spSetUnitShieldState(unitID3, -1, chargee_charge + chargeFlow)--add charge to receiver
-					end
-				end
-			end
-			spSetUnitShieldState(unitID2, -1, charger_charge)--deduct charge
-		end 
-	end
-	-- Distribution Method A - END
 	
-	--[[-- Distribution Method B: distribute to all linked shield based on total average
-	for allyTeam,unitList in pairs(shieldTeams) do
-		local processedLinks = { [NO_LINK] = true } --DO NOT USE PAIRS ON THIS
-		for unitID,shieldUnit in pairs(unitList) do
-			repeat --doesn't do loop but make "break" behave like "continue"
-				if not processedLinks[shieldUnit.link] then --check if this linked group have been processed before
-					processedLinks[shieldUnit.link] = true --mark this linked groupd as processed
-		
-					local totalCharge =	0
-					local linkUnits = 0
-					local udata = {}	-- unit data,	charge and chargeMax
-					for unitID2,shieldUnit2 in pairs(shieldUnit.link) do
-						local shieldOn,shieldCharge = spGetUnitShieldState(unitID2, -1)
-						if (shieldOn) then 
-							udata[unitID2] = {
-								charge = shieldCharge,
-								chargeMax = shieldUnit2.shieldPower
-							}
-							totalCharge = totalCharge + shieldCharge
-							linkUnits = linkUnits + 1
-						end 
-					end
-					local avg = totalCharge / linkUnits	-- calculate average charge of netwrok 
-					local overflow = 0
-					local slack = 0 
-
-					for uid,d in pairs(udata) do	-- equalize all sheilds to average by 1% of their difference from average 
-						local newCharge = d.charge + (avg - d.charge) * RECHARGE_KOEF
-						if (newCharge > d.chargeMax) then 
-							overflow = overflow + newCharge - d.chargeMax
-							newCharge = d.chargeMax
-						else 
-							slack = slack + d.chargeMax - newCharge
-						end 
-						d.charge = newCharge
-						spSetUnitShieldState(uid, -1, newCharge)
-					end
-		
-					if overflow > 0 and slack > 0 then	-- if there was overflow (above max charge) and	there is still some unused space for charge, transfer it there 
-						for uid,d in pairs(udata) do
-							if (d.charge < d.chargeMax) then 
-								local newCharge = d.charge + overflow * (d.chargeMax - d.charge) / slack 
-								spSetUnitShieldState(uid, -1, newCharge)
-							end 
+	--Distribute charge to random nearby neighbor
+	local unitID, unitData, unitCharge, allyTeamID --note: prevent repeated localization reduce consumption by 2%.
+	local otherID, otherData, otherCharge
+	local on, randomUnit, linkSuccessful
+	for i=1, listCount do --looping without pairs reduce consumption by 7%.
+		unitID = shieldUnitList[i].unitID
+		unitData = shieldUnitList[i].data
+		on, unitCharge = spGetUnitShieldState(unitID, -1)
+		linkSuccessful = false
+		if on and unitCharge and unitData.online and unitData.neighborList.count >= 1 then
+			allyTeamID = unitData.allyTeamID
+			unitFlow = 0
+			randomUnit = math.random(1,unitData.neighborList.count)
+			otherID = unitData.neighborList.data[randomUnit]
+			if otherID then
+				otherData = shieldTeams[allyTeamID][otherID]
+				if otherData then --shield dead?
+					on, otherCharge = spGetUnitShieldState(otherID, -1)
+					if on and otherCharge and otherData.online then
+						linkSuccessful = true
+						spSetUnitRulesParam(unitID,"shield_link",otherID,unitRulesParamsSetting)
+						if (unitCharge > otherCharge) then
+							DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)
+						else
+							DoChargeTransfer(unitID, unitData, unitCharge, otherID, otherData, otherCharge)
 						end
-					end 
+					end
 				end
-			until true --exit repeat
+			end
+		end 
+		if not linkSuccessful then
+			spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
 		end
 	end
-	--]]-- Distribution Method B - END
 end
 
 --------------------------------------------------------------------------------
@@ -441,6 +357,9 @@ local spIsUnitInView       = Spring.IsUnitInView
 local spValidUnitID        = Spring.ValidUnitID
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
+local spGetUnitLosState    = Spring.GetUnitLosState
+
+local myTeam = spGetMyAllyTeamID()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -474,14 +393,21 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
-local function DrawFunc2()
+local function DrawFunc(spec)
 	local unitID
 	local connectedToUnitID
 	local x1, y1, z1, x2, y2, z2
+	local spec, fullview = spGetSpectatingState()
+	spec = spec or fullview
 	for i=1, #shieldUnits do
-		unitID =shieldUnits[i]
+		unitID = shieldUnits[i]
 		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
-		if (connectedToUnitID and (connectedToUnitID >= 0) and (spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID))) then
+		local los1 = spGetUnitLosState(unitID, myTeam, false)
+		local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
+		if (spec or (los1 and los1.los) or (los2 and los2.los)) and 
+				(connectedToUnitID and (connectedToUnitID >= 0) and 
+				(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) and
+				(spValidUnitID(unitID) and spValidUnitID(connectedToUnitID))) then
 			x1, y1, z1 = spGetUnitViewPosition(unitID, true)
 			x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
 			glVertex(x1, y1, z1)
@@ -495,9 +421,9 @@ function gadget:DrawWorld()
 		glPushAttrib(GL_LINE_BITS)
 
 		glDepthTest(true)
-		glColor(1,0,1,math.random()*0.3+0.2)
+		glColor(1,0,1,math.random()*0.2+0.15)
 		glLineWidth(1)
-		glBeginEnd(GL_LINES, DrawFunc2)
+		glBeginEnd(GL_LINES, DrawFunc)
 
 		glDepthTest(false)
 		glColor(1,1,1,1)
@@ -505,53 +431,6 @@ function gadget:DrawWorld()
 		glPopAttrib()
 	end
 end
-
---[[
-local function DrawFunc()
-	myAllyID = spGetMyAllyTeamID()
-	local spec, fullview = spGetSpectatingState()
-	spec = spec or fullview
-	
-	local shieldConnections = SYNCED.shieldConnections
-	for allyID, connections in spairs(shieldConnections) do
-
-		-- for _,cons in sipairs(connections) do  -- ordered array contains u1,u2,u1,u2,... 
-		for u1,u2 in spairs(connections) do  --unordered array contains u1 u2,u1 u2,... pairs 
-			local l1
-			local l2
-		
-			if (spec or allyID == myAllyID) then
-				l1 = spIsUnitInView(u1)
-				l2 = spIsUnitInView(u2)
-			end
-
-			if ((l1 or l2) and (spValidUnitID(u1) and spValidUnitID(u2))) then
-				local x1, y1, z1 = spGetUnitViewPosition(u1, true)
-				local x2, y2, z2 = spGetUnitViewPosition(u2, true)
-				glVertex(x1, y1, z1)
-				glVertex(x2, y2, z2)
-			end
-		end
-	end
-end
-
-
-function gadget:DrawWorld()
-	if SYNCED.shieldConnections and snext(SYNCED.shieldConnections) then
-		glPushAttrib(GL_LINE_BITS)
-	
-		glDepthTest(true)
-		glColor(1,0,1,math.random()*0.3+0.2)
-		glLineWidth(1)
-		glBeginEnd(GL_LINES, DrawFunc2)
-	
-		glDepthTest(false)
-		glColor(1,1,1,1)
-	
-		glPopAttrib()
-	end
-end
---]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
