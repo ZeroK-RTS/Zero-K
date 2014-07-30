@@ -1333,6 +1333,7 @@ function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, att
 end
 
 function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
+	Spring.Echo("AllowWeaponTarget")
 	local allowed = true
 	local priority = defPriority
 
