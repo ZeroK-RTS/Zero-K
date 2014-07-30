@@ -32,7 +32,6 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 1250,
   maxVelocity            = 1.4,
-  maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
@@ -103,6 +102,7 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 340,
     },
+
     FAKE_CANNON = {
       name                    = [[Fake Disruption Cannon]],
       accuracy                = 200,
