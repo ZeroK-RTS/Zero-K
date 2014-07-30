@@ -13,16 +13,16 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
+  canStop                = true,
   category               = [[SINK]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-	helptext       = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units.]],
-	description_pl = [[Plywajacy bot wsparcia]],
-	helptext_pl    = [[Archer uzywa silnego strumienia wody do niszczenia przeciwnikow. W miare strzelania zbiornik oproznia sie, zmniejszajac sile i zasieg - Archer moze go ponownie napelnic, wchodzac do wody. Archer moze wynurzyc sie, aby prowadzic walke z jednostkami powierzchniowymi.]],
-	maxwatertank = [[180]],
-	floattoggle = [[1]],
+    helptext       = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units.]],
+    description_pl = [[Plywajacy bot wsparcia]],
+    helptext_pl    = [[Archer uzywa silnego strumienia wody do niszczenia przeciwnikow. W miare strzelania zbiornik oproznia sie, zmniejszajac sile i zasieg - Archer moze go ponownie napelnic, wchodzac do wody. Archer moze wynurzyc sie, aby prowadzic walke z jednostkami powierzchniowymi.]],
+    maxwatertank   = [[180]],
+    floattoggle    = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -33,12 +33,11 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 800,
-  maxSlope               = 36,
   maxVelocity            = 2.5,
   maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
-  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[amphraider2.s3o]],
   script                 = [[amphraider2.lua]],
   seismicSignature       = 4,
@@ -80,22 +79,21 @@ unitDef = {
       name                    = [[Water Cutter]],
       areaOfEffect            = 128,
       beamTime                = 0.01,
-	  beamTtl                 = 10,
-	  beamDecay               = 0.80,
+      beamTtl                 = 10,
+      beamDecay               = 0.80,
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
-	  
-	  customParams            = {
-	    impulse = [[30]],
-	    impulsemaxdepth = [[20]],
-	    impulsedepthmult = [[0.5]],
-		normaldamage = [[1]],
-	  },
+
+      customParams            = {
+        impulse = [[30]],
+        impulsemaxdepth = [[20]],
+        impulsedepthmult = [[0.5]],
+        normaldamage = [[1]],
+      },
 	  
       damage                  = {
         default = 1.3,
-        planes  = 1.3,
         subs    = 1,
       },
 
@@ -126,24 +124,23 @@ unitDef = {
       weaponVelocity          = 500,
     },
 	
-	FAKE_WATERCANNON = {
+    FAKE_WATERCANNON = {
       name                    = [[Fake Water Cutter]],
       areaOfEffect            = 128,
       beamTime                = 0.01,
-	  beamTtl                 = 10,
-	  beamDecay               = 0.80,
+      beamTtl                 = 10,
+      beamDecay               = 0.80,
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
 	  
-	  customParams            = {
-	    impulse = [[30]],
-		normaldamage = [[1]],
-	  },
-	  
+      customParams            = {
+        impulse = [[30]],
+        normaldamage = [[1]],
+      },
+
       damage                  = {
         default = 1.3,
-        planes  = 1.3,
         subs    = 1,
       },
 
@@ -170,7 +167,7 @@ unitDef = {
       tileLength              = 100,
       tolerance               = 5000,
       turret                  = true,
-	  waterWeapon             = true,
+      waterWeapon             = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
