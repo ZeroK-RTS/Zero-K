@@ -35,7 +35,6 @@ unitDef = {
   mass                   = 196,
   maxDamage              = 2600,
   maxVelocity            = 2.5,
-  maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT3]],
   moveState              = 0,
