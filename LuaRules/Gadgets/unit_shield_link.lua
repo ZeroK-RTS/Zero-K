@@ -413,8 +413,6 @@ local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spGetUnitLosState    = Spring.GetUnitLosState
 
-local myTeam = spGetMyAllyTeamID()
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local shieldUnits = {}
@@ -447,19 +445,19 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
-local function DrawFunc(spec)
+local function DrawFunc()
 	local unitID
 	local connectedToUnitID
 	local x1, y1, z1, x2, y2, z2
 	local spec, fullview = spGetSpectatingState()
-	spec = spec or fullview
+	local myTeam = spGetMyAllyTeamID()
 	for i=1, #shieldUnits do
 		unitID = shieldUnits[i]
 		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
 		if connectedToUnitID and connectedToUnitID >= 0 and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
 			local los1 = spGetUnitLosState(unitID, myTeam, false)
 			local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
-			if (spec or (los1 and los1.los) or (los2 and los2.los)) and 
+			if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
 					(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
 				x1, y1, z1 = spGetUnitViewPosition(unitID, true)
 				x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
