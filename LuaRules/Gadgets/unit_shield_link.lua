@@ -55,7 +55,9 @@ local function RemoveThingFromIterable(id, things, thingByID)
 		thingByID.data[thingByID.count] = nil
 		things[id] = nil
 		thingByID.count = thingByID.count - 1
+		return true
 	end
+	return false
 end
 
 function gadget:Initialize()
@@ -202,15 +204,19 @@ local function UpdateAllLinks(allyTeamID, shieldList, unitUpdateList)
 				unitData.z = z
 				
 				local otherID, otherData
-				for i = 1, unitData.neighborList.count do
+				local i = 1
+				while i <= unitData.neighborList.count do
 					otherID = unitData.neighborList.data[i]
 					if shieldTeams[allyTeamID][otherID] then
 						otherData = shieldTeams[allyTeamID][otherID]
 						if not (otherData.linkable and ShieldsAreTouching(unitData, otherData)) then
 							RemoveThingFromIterable(unitID, otherData.neighbors, otherData.neighborList)
-							RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList)
+							if RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList) then
+								i = i - 1
+							end
 						end
 					end
+					i = i + 1
 				end
 			else
 				RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
