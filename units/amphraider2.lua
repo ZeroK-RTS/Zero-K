@@ -34,7 +34,6 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 800,
   maxVelocity            = 2.5,
-  maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
