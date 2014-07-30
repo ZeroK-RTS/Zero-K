@@ -38,7 +38,6 @@ unitDef = {
   leaveTracks         = true,
   maxDamage           = 850,
   maxVelocity         = 1.7,
-  maxWaterDepth       = 5000,
   metalMake           = 0.225,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
