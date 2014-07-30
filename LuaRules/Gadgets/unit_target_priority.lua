@@ -17,6 +17,8 @@ if (gadgetHandler:IsSyncedCode()) then --SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local reverseCompat = (Game.version:find('91.0') == 1)
+
 local spGetUnitLosState = Spring.GetUnitLosState
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitHealth = Spring.GetUnitHealth
@@ -145,6 +147,13 @@ function gadget:Initialize()
 	for _, unitID in ipairs(spGetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
+	end
+	-- Hopefully not all weapon callins will need to be watched
+	-- http://springrts.com/mantis/view.php?id=4479
+	if not reverseCompat then
+		for weaponID,_ in pairs(WeaponDefs) do
+			Script.SetWatchWeapon(weaponID, true)
+		end
 	end
 end
 
