@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.434 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.435 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -122,7 +122,6 @@ local init = false
 local myCountry = 'wut'
 
 local pathoptions = {}	
---local alloptions = {}	
 local actionToOption = {}
 
 local exitWindowVisible = false
@@ -1063,20 +1062,20 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	
 	elseif option.type == 'list' then
 		controlfunc = 
-			function(key)
-				option.value = key
+			function(item)
+				option.value = item.value
 				settings.config[fullkey] = option.value
 			end
 	elseif option.type == 'radioButton' then
 		controlfunc = 
-			function(key)
-				option.value = key
+			function(item)
+				option.value = item.value
 				settings.config[fullkey] = option.value
 				
-				if (path == curPath) or key.isSearchWindow then --search window will always need to show options in wrong path, but we will refresh the window it anyway using "isSearchWindow" flag
+				if (path == curPath) or filterUserInsertedTerm~='' then --search window will always need to show options in wrong path and we have to refresh the window to show changes
 					MakeSubWindow(curPath, false) --remake window to update the buttons' visuals when pressed
 				end
-			end			
+			end
 	end
 	origOnChange = origOnChange or function() end
 	option.OnChange = function(self) 
@@ -1111,11 +1110,10 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	--Keybinds for radiobuttons
 	elseif option.type == 'radioButton' then --if its a list of checkboxes:
 		for i=1, #option.items do --prepare keybinds for each of radioButton's checkbox
-			local item = {} 
-			item.wname = wname.."radioButton" -- wname is needed by Hotkey to 'AddAction'
-			item.key = option.items[i].key
-			item.hotkey = option.items[i].hotkey
-			item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item's key). Is needed for Hotkey
+			local item = option.items[i] --note: referring by memory
+			item.wname = wname.."radioButton" -- unique wname for Hotkey
+			item.value = option.items[i].key --value of this item is this item's key 
+			item.OnChange = function() option.OnChange(item) end --OnChange() is an 'option.OnChange()' that feed on an input of 'item'(instead of 'self'). So that it always execute the 'value' of 'item' regardless of current 'value' of 'option'
 			local actionName = GetActionName(path, item)
 			if item.hotkey then
 			  local orig_hotkey = ''
@@ -1124,13 +1122,10 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 			end
 			
 			CreateOptionAction(path,item)
-			
-			--alloptions[path..wname..item.key] = item --is used to store options but will not be used to make button. Is for random stuff now.
-		end			
+		end
 	end
 	
 	otset( pathoptions[path], wname..option.key, option )--is used for remake epicMenu's button(s)
-	--alloptions[path..wname..option.key] = option --is used for random stuff now.
 	
 end
 
@@ -1143,13 +1138,6 @@ local function RemOption(path, option, wname )
 	end
 	RemoveOptionAction(path, option)	
 	otset( pathoptions[path], wname..option.key, nil )
-	--alloptions[path..wname..option.key] = nil
-	if option.type == 'radioButton' then
-		for i=1, #option.items do
-			local itemsKey = option.items[i].key
-			--alloptions[path..wname..itemsKey] = nil
-		end
-	end
 end
 
 
@@ -1462,7 +1450,7 @@ local function ResetWinSettings(path)
 					option.OnChange(option)
 				elseif option.type == 'list' or option.type == 'radioButton' then
 					option.value = option.default
-					option.OnChange(option.default)
+					option.OnChange(option)
 				elseif option.type == 'colors' then
 					option.color = option.default
 					option.OnChange(option)
@@ -1566,7 +1554,6 @@ local function SearchElement(termToSearch,path)
 				else
 					for i=1, #option.items do
 						local item = option.items[i]
-						item.wname = option.wname.."radioButton"
 						lowercase_name = item.name and item.name:lower() or ''
 						lowercase_desc = item.desc and item.desc:lower() or ''
 						local hotkeystring = GetHotkeyData(currentPath, item)
@@ -1574,6 +1561,7 @@ local function SearchElement(termToSearch,path)
 						local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch) or lowercase_hotkey:find(termToSearch)
 						if found then
 							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+							break
 						end
 					end
 				end
@@ -1777,12 +1765,13 @@ MakeSubWindow = function(path, pause)
 			local items = {};
 			for i=1, #option.items do
 				local item = option.items[i]
+				item.value = item.key --for 'OnClick'
 				settings_height = settings_height + B_HEIGHT
 				tree_children[#tree_children+1] = Button:New{
 						name = option.wname .. " " .. item.name;
 						width = "100%",
 						caption = item.name, 
-						OnClick = { function(self) option.OnChange(item.key) end },
+						OnClick = { function(self) option.OnChange(item) end },
 						backgroundColor = color.sub_button_bg,
 						textColor = color.sub_button_fg, 
 						tooltip=item.desc,
@@ -1793,31 +1782,25 @@ MakeSubWindow = function(path, pause)
 				items = items;
 			}
 			]]--
-		elseif option.type == 'radioButton' then	
+		elseif option.type == 'radioButton' then
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
 			for i=1, #option.items do
-				local item = {} 
-				item.wname = option.wname.."radioButton"	-- wname is needed by Hotkey to 'AddAction'
-				item.name = option.items[i].name --is needed by checkbox caption
-				item.key = option.items[i].key --is needed to set checkbox status
-				item.isSearchWindow = (searchedElement~=nil) --this force a refresh (when pressed), even when the button is in wrong sub-window path
-				item.desc = option.items[i].desc --is needed for checkbox tooltip
-				item.OnChange = function() option.OnChange(item.key) end --encapsulate OnChange() with a fixed input (item.key). Is needed for Hotkey
+				local item = option.items[i]
 				settings_height = settings_height + B_HEIGHT
 				
 				local cb = Checkbox:New{
 					--x=0,
 					right = 35,
-					caption = item.name, 
-					checked = (option.value == item.key), 
-					OnClick = {function(self) option.OnChange(item.key) end},
+					caption = item.name, --caption
+					checked = (option.value == item.value), --status
+					OnClick = {function(self) option.OnChange(item) end},
 					textColor = color.sub_fg,
-					tooltip=item.desc,
+					tooltip = item.desc, --tooltip
 				}
 				local icon = option.items[i].icon
 				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon)
 					
-			end			
+			end
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
@@ -2628,15 +2611,9 @@ function widget:Initialize()
 	--intialize remote option setter
 	WG.SetWidgetOption = function(wname, path, key, value)  
 		if (pathoptions and path and key and wname and pathoptions[path] and otget( pathoptions[path], wname..key ) ) then
-			--local option = alloptions[path..wname .. key]
 			local option = otget( pathoptions[path], wname..key )
 			
-			--option.OnChange(value)
-			if option.type == 'radioButton' then
-				option.OnChange(value)
-			else
-				option.OnChange({checked=value, value=value, color=value})
-			end
+			option.OnChange({checked=value, value=value, color=value})
 		end
 	end 
 end
@@ -2781,10 +2758,9 @@ do --Set our prefered camera mode when first screen frame is drawn. The engine a
 		local screenFrame = 0
 		function widget:DrawScreen() --game event: Draw Screen
 			if screenFrame >= 1 then --detect frame no.2
-				--local option = alloptions["Settings/CameraSettings/CameraCamera Type"] --get camera option we saved earlier in gui_epicmenu.lua\AddOption()
 				local option = otget( pathoptions['Settings/Camera'], 'Settings/Camera'..'Camera Type' ) --get camera option we saved earlier in gui_epicmenu.lua\AddOption()
 				
-				option.OnChange(option.value) --re-apply our settings 
+				option.OnChange(option) --re-apply our settings 
 				Spring.Echo("Epicmenu: Switching to " .. option.value .. " camera mode") --notify in log what happen.
 				widgetHandler:RemoveWidgetCallIn("DrawScreen", self) --stop updating "widget:DrawScreen()" event. Note: this is a special "widgetHandler:RemoveCallin" for widget that use "handler=true".
 			end
