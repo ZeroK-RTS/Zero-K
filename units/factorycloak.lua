@@ -56,6 +56,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[cremfactory.s3o]],
+  script                        = [[factorycloak.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
