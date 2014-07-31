@@ -34,12 +34,35 @@ local spSetUnitShieldState	= Spring.SetUnitShieldState
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 
 ------------
-local shieldTeams = {}
+local allyTeamShields = {}
+local allyTeamShieldList = {}
 
 local unitRulesParamsSetting = {inlos = true} -- Let enemies see links. It is information availible to them anyway
 
 local updateLink = {}
 local updateAllyTeamLinks = {}
+
+-- Double table with index in things
+local function AddDataThingToIterable(id, data, things, thingByID)
+	if id and data then
+		thingByID.count = thingByID.count + 1
+		thingByID.data[thingByID.count] = id
+		things[id] = data
+		things[id].index = thingByID.count
+	end
+end
+
+local function RemoveDataThingFromIterable(id, things, thingByID)
+	if things[id] then
+		things[thingByID.data[thingByID.count]].index = things[id].index
+		thingByID.data[things[id].index] = thingByID.data[thingByID.count]
+		thingByID.data[thingByID.count] = nil
+		things[id] = nil
+		thingByID.count = thingByID.count - 1
+		return true
+	end
+	return false
+end
 
 -- Double table is required to choose a random element from the list
 local function AddThingToIterable(id, things, thingByID)
@@ -81,8 +104,9 @@ function gadget:UnitCreated(unitID, unitDefID)
 		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
 		--local x,y,z = spGetUnitPosition(unitID)
 		local allyTeamID = spGetUnitAllyTeam(unitID)
-		if not (shieldTeams[allyTeamID] and shieldTeams[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
-			shieldTeams[allyTeamID] = shieldTeams[allyTeamID] or {}
+		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
+			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
+			allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0, data = {}}
 			local shieldUnit = {
 				shieldMaxCharge  = shieldWep.shieldPower,
 				shieldRadius = shieldWep.shieldRadius,
@@ -95,7 +119,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				oldEnabled   = false,
 				oldFastEnabled = false,
 			}
-			shieldTeams[allyTeamID][unitID] = shieldUnit
+			AddDataThingToIterable(unitID, shieldUnit, allyTeamShields[allyTeamID], allyTeamShieldList[allyTeamID])
 		end
 		QueueLinkUpdate(allyTeamID,unitID)
 	end
@@ -108,12 +132,12 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
 	local allyTeamID = spGetUnitAllyTeam(unitID)
-	if ud.shieldWeaponDef and shieldTeams[allyTeamID] then
-		local unitData = shieldTeams[allyTeamID][unitID]
+	if ud.shieldWeaponDef and allyTeamShields[allyTeamID] then
+		local unitData = allyTeamShields[allyTeamID][unitID]
 		if unitData then
 			RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
 		end
-		shieldTeams[allyTeamID][unitID] = nil
+		RemoveDataThingFromIterable(unitID, allyTeamShields[allyTeamID], allyTeamShieldList[allyTeamID])
 	end
 end
 
@@ -123,23 +147,27 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	if ud.shieldWeaponDef then
 		local unitData
 		local allyTeamID = spGetUnitAllyTeam(unitID)
-		if shieldTeams[oldAllyTeam] and shieldTeams[oldAllyTeam][unitID] then
-			unitData = shieldTeams[oldAllyTeam][unitID]
-			shieldTeams[oldAllyTeam][unitID] = nil
+		if allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam][unitID] then
+			unitData = allyTeamShields[oldAllyTeam][unitID]
+			
+			RemoveDataThingFromIterable(unitID, allyTeamShields[oldAllyTeam], allyTeamShieldList[oldAllyTeam])
 			RemoveUnitFromNeighbors(oldAllyTeam, unitID, unitData.neighborList)
-			QueueLinkUpdate(allyTeamID,unitID)
 			unitData.neighbors = {}
 			unitData.neighborList = {data = {}, count = 0}
+			unitData.allyTeamID = allyTeamID
 		end
+		allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
+		allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0, data = {}}
 			
-		shieldTeams[allyTeamID] = shieldTeams[allyTeamID] or {}
-		shieldTeams[allyTeamID][unitID] = unitData --Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish 
+		--Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish
+		AddDataThingToIterable(unitID, unitData, allyTeamShields[allyTeamID], allyTeamShieldList[allyTeamID])
+		QueueLinkUpdate(allyTeamID,unitID)
 	end
 end
 
 function RemoveUnitFromNeighbors(allyTeamID, unitID, neighborList)
 	local otherID
-	local thisShieldTeam = shieldTeams[allyTeamID]
+	local thisShieldTeam = allyTeamShields[allyTeamID]
 	for i = 1, neighborList.count do
 		otherID = neighborList.data[i]
 		if thisShieldTeam[otherID] then
@@ -175,12 +203,16 @@ local function ShieldsAreTouching(shield1, shield2)
 	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius 
 end
 
-local function AdjustLinks(allyTeamID, shieldList, unitUpdateList)
+local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 	local unitData
 	for unitID,_ in pairs(unitUpdateList) do
-		unitData = shieldList[unitID]
+		unitData = shieldUnits[unitID]
 		if unitData.enabled then
-			for otherID, otherData in pairs(shieldList) do --iterate over all shield unit, find anyone that's in range.
+			local otherID, otherData
+			local data = shieldList.data
+			for i = 1, shieldList.count do --iterate over all shield unit, find anyone that's in range.
+				otherID = data[i]
+				otherData = shieldUnits[otherID]
 				if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) and 
 							otherData.enabled and ShieldsAreTouching(unitData, otherData) then
 					AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
@@ -191,10 +223,10 @@ local function AdjustLinks(allyTeamID, shieldList, unitUpdateList)
 	end	-- for unitID
 end
 
-local function UpdateAllLinks(allyTeamID, shieldList, unitUpdateList)
+local function UpdateAllLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 	local unitData
 	for unitID,_ in pairs(unitUpdateList) do
-		unitData = shieldTeams[allyTeamID][unitID]
+		unitData = allyTeamShields[allyTeamID][unitID]
 		if unitData then
 			local x,y,z = spGetUnitPosition(unitID)
 			local valid = x and y and z
@@ -209,8 +241,8 @@ local function UpdateAllLinks(allyTeamID, shieldList, unitUpdateList)
 				--local i = 1
 				--while i <= unitData.neighborList.count do
 				--	otherID = unitData.neighborList.data[i]
-				--	if shieldTeams[allyTeamID][otherID] then
-				--		otherData = shieldTeams[allyTeamID][otherID]
+				--	if allyTeamShields[allyTeamID][otherID] then
+				--		otherData = allyTeamShields[allyTeamID][otherID]
 				--		if not (otherData.enabled and ShieldsAreTouching(unitData, otherData)) then
 				--			RemoveThingFromIterable(unitID, otherData.neighbors, otherData.neighborList)
 				--			if RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList) then
@@ -228,11 +260,11 @@ local function UpdateAllLinks(allyTeamID, shieldList, unitUpdateList)
 		end
 	end
 	
-	AdjustLinks(allyTeamID, shieldList,unitUpdateList)
+	AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 end
 
 local function UpdateEnabledState()
-	for allyTeamID,unitList in pairs(shieldTeams) do
+	for allyTeamID,unitList in pairs(allyTeamShields) do
 		for unitID,shieldUnit in pairs(unitList) do
 			shieldUnit.enabled = IsEnabled(unitID)
 			if shieldUnit.enabled ~= shieldUnit.oldFastEnabled then
@@ -262,14 +294,14 @@ local function DoChargeTransfer(lowID, lowData, lowCharge, highID, highData, hig
 	return false
 end
 
-
-local shieldUnitList = {}
-local listCount = 0
 function gadget:GameFrame(n)
 	if n%30 == 18 then  --update every 30 frames at the 18th frame
 		--note: only update link when unit moves reduce total consumption by 53% when unit idle.
-		for allyTeamID,unitList in pairs(shieldTeams) do
-			for unitID, unitData in pairs(unitList) do
+		for allyTeamID,unitList in pairs(allyTeamShieldList) do
+			local unitID, unitData
+			for i = 1, unitList.count do
+				unitID = unitList.data[i]
+				unitData = allyTeamShields[allyTeamID][unitID]
 				if unitData.enabled ~= unitData.oldEnabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
 					if unitData.oldEnabled then
 						--RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
@@ -293,14 +325,12 @@ function gadget:GameFrame(n)
 			end
 		end
 		for allyTeamID,_ in pairs(updateAllyTeamLinks) do
-			UpdateAllLinks(allyTeamID,shieldTeams[allyTeamID],shieldTeams[allyTeamID])
+			UpdateAllLinks(allyTeamID,allyTeamShields[allyTeamID],allyTeamShieldList[allyTeamID],allyTeamShields[allyTeamID])
 			updateAllyTeamLinks[allyTeamID] = nil
-			listCount = -1
 		end
 		for allyTeamID,unitToLink in pairs(updateLink) do
-			UpdateAllLinks(allyTeamID,shieldTeams[allyTeamID],unitToLink) --adjust/create link
+			UpdateAllLinks(allyTeamID,allyTeamShields[allyTeamID],allyTeamShieldList[allyTeamID],unitToLink) --adjust/create link
 			updateLink[allyTeamID] = nil
-			listCount = -1 --trigger "shieldUnitList[]" to update too
 		end
 		
 	elseif n%5 == 3 then
@@ -308,80 +338,58 @@ function gadget:GameFrame(n)
 	end
 	
 	-- Charge Distribution
-	-- Translate to ordered table every second. The units are iterated over every frame.
-	if n%30 == 18 and listCount == -1 then
-		listCount = 0
-		for allyTeamID,unitList in pairs(shieldTeams) do
-			for unitID,shieldUnit in pairs(unitList) do
-				if shieldUnit.enabled and shieldUnit.neighborList.count > 0 then
-					listCount = listCount + 1
-					shieldUnitList[listCount] = {
-						unitID = unitID,
-						data = shieldUnit, --Note: "shieldUnit" is a pointer
-					} 
-					
-					--for otherID,_ in pairs(shieldUnit.neighbors) do
-					----for i = 1, shieldUnit.numNeighbors do
-					----	local otherID = shieldUnit.neighborList[i]
-					--	local otherShield = shieldTeams[shieldUnit.allyTeamID][otherID]
-					--	if otherShield then
-					--		Spring.MarkerAddLine(shieldUnit.x,0,shieldUnit.z,otherShield.x,0,otherShield.z)
-					--	end
-					--end
-				end
-			end
-		end
-	end
-	
 	--Distribute charge to random nearby neighbor
 	if n%2 == 0 then
-		local unitID, unitData, unitCharge, allyTeamID --note: prevent repeated localization reduce consumption by 2%.
-		local otherID, otherData, otherCharge
-		local on, randomUnit, drawLink, attempt
-		for i=1, listCount do --looping without pairs reduce consumption by 7%.
-			unitID = shieldUnitList[i].unitID
-			unitData = shieldUnitList[i].data
-			on, unitCharge = spGetUnitShieldState(unitID, -1)
-			drawLink = false
-			attempt = 1
-			while attempt and attempt < 3 do
-				if on and unitCharge and unitData.enabled and unitData.neighborList.count >= 1 then
-					allyTeamID = unitData.allyTeamID
-					unitFlow = 0
-					randomUnit = math.random(1,unitData.neighborList.count)
-					otherID = unitData.neighborList.data[randomUnit]
-					if otherID then
-						otherData = shieldTeams[allyTeamID][otherID]
-						if otherData then
-							on, otherCharge = spGetUnitShieldState(otherID, -1)
-							if on and otherCharge and otherData.enabled and ShieldsAreTouching(unitData, otherData) then
-								if (unitCharge > otherCharge) then
-									drawLink = DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)
+		for allyTeamID,unitList in pairs(allyTeamShieldList) do
+			local shieldUnits = allyTeamShields[allyTeamID]
+			local unitID, unitData, unitCharge
+			local otherID, otherData, otherCharge
+			local on, randomUnit, drawLink, attempt
+			for i = 1, unitList.count do
+				unitID = unitList.data[i]
+				unitData = shieldUnits[unitID]
+				on, unitCharge = spGetUnitShieldState(unitID, -1)
+				drawLink = false
+				attempt = 1
+				while attempt and attempt < 3 do
+					if on and unitCharge and unitData.enabled and unitData.neighborList.count >= 1 then
+						allyTeamID = unitData.allyTeamID
+						unitFlow = 0
+						randomUnit = math.random(1,unitData.neighborList.count)
+						otherID = unitData.neighborList.data[randomUnit]
+						if otherID then
+							otherData = allyTeamShields[allyTeamID][otherID]
+							if otherData then
+								on, otherCharge = spGetUnitShieldState(otherID, -1)
+								if on and otherCharge and otherData.enabled and ShieldsAreTouching(unitData, otherData) then
+									if (unitCharge > otherCharge) then
+										drawLink = DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)
+									else
+										drawLink = DoChargeTransfer(unitID, unitData, unitCharge, otherID, otherData, otherCharge)
+									end
+									if drawLink then
+										spSetUnitRulesParam(unitID,"shield_link",otherID,unitRulesParamsSetting)
+									end
+									attempt = false
 								else
-									drawLink = DoChargeTransfer(unitID, unitData, unitCharge, otherID, otherData, otherCharge)
+									RemoveThingFromIterable(unitID, otherData.neighbors, otherData.neighborList)
+									RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList)
+									attempt = attempt + 1
 								end
-								if drawLink then
-									spSetUnitRulesParam(unitID,"shield_link",otherID,unitRulesParamsSetting)
-								end
-								attempt = false
 							else
-								RemoveThingFromIterable(unitID, otherData.neighbors, otherData.neighborList)
 								RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList)
 								attempt = attempt + 1
 							end
 						else
-							RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList)
 							attempt = attempt + 1
 						end
 					else
-						attempt = attempt + 1
+						attempt = false
 					end
-				else
-					attempt = false
+				end 
+				if not drawLink then
+					spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
 				end
-			end 
-			if not drawLink then
-				spSetUnitRulesParam(unitID,"shield_link",-1,unitRulesParamsSetting)
 			end
 		end
 	end
