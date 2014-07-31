@@ -46,7 +46,7 @@ local updateAllyTeamLinks = {}
 local function AddDataThingToIterable(id, data, things, thingByID)
 	if id and data then
 		thingByID.count = thingByID.count + 1
-		thingByID.data[thingByID.count] = id
+		thingByID[thingByID.count] = id
 		things[id] = data
 		things[id].index = thingByID.count
 	end
@@ -54,9 +54,9 @@ end
 
 local function RemoveDataThingFromIterable(id, things, thingByID)
 	if things[id] then
-		things[thingByID.data[thingByID.count]].index = things[id].index
-		thingByID.data[things[id].index] = thingByID.data[thingByID.count]
-		thingByID.data[thingByID.count] = nil
+		things[thingByID[thingByID.count]].index = things[id].index
+		thingByID[things[id].index] = thingByID[thingByID.count]
+		thingByID[thingByID.count] = nil
 		things[id] = nil
 		thingByID.count = thingByID.count - 1
 		return true
@@ -67,15 +67,15 @@ end
 -- Double table is required to choose a random element from the list
 local function AddThingToIterable(id, things, thingByID)
 	thingByID.count = thingByID.count + 1
-	thingByID.data[thingByID.count] = id
+	thingByID[thingByID.count] = id
 	things[id] = thingByID.count
 end
 
 local function RemoveThingFromIterable(id, things, thingByID)
 	if things[id] then
-		things[thingByID.data[thingByID.count]] = things[id]
-		thingByID.data[things[id]] = thingByID.data[thingByID.count]
-		thingByID.data[thingByID.count] = nil
+		things[thingByID[thingByID.count]] = things[id]
+		thingByID[things[id]] = thingByID[thingByID.count]
+		thingByID[thingByID.count] = nil
 		things[id] = nil
 		thingByID.count = thingByID.count - 1
 		return true
@@ -106,14 +106,14 @@ function gadget:UnitCreated(unitID, unitDefID)
 		local allyTeamID = spGetUnitAllyTeam(unitID)
 		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
-			allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0, data = {}}
+			allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
 			local shieldUnit = {
 				shieldMaxCharge  = shieldWep.shieldPower,
 				shieldRadius = shieldWep.shieldRadius,
 				shieldRegen  = shieldWep.shieldPowerRegen,
 				unitDefID    = unitDefID,
 				neighbors    = {},
-				neighborList = {data = {}, count = 0},
+				neighborList = {count = 0},
 				allyTeamID   = allyTeamID,
 				enabled      = false,
 				oldEnabled   = false,
@@ -153,11 +153,11 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 			RemoveDataThingFromIterable(unitID, allyTeamShields[oldAllyTeam], allyTeamShieldList[oldAllyTeam])
 			RemoveUnitFromNeighbors(oldAllyTeam, unitID, unitData.neighborList)
 			unitData.neighbors = {}
-			unitData.neighborList = {data = {}, count = 0}
+			unitData.neighborList = {count = 0}
 			unitData.allyTeamID = allyTeamID
 		end
 		allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
-		allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0, data = {}}
+		allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
 			
 		--Note: wont be problem when NIL when nanoframe is captured because is always filled with new value when unit finish
 		AddDataThingToIterable(unitID, unitData, allyTeamShields[allyTeamID], allyTeamShieldList[allyTeamID])
@@ -169,7 +169,7 @@ function RemoveUnitFromNeighbors(allyTeamID, unitID, neighborList)
 	local otherID
 	local thisShieldTeam = allyTeamShields[allyTeamID]
 	for i = 1, neighborList.count do
-		otherID = neighborList.data[i]
+		otherID = neighborList[i]
 		if thisShieldTeam[otherID] then
 			RemoveThingFromIterable(unitID, thisShieldTeam[otherID].neighbors, thisShieldTeam[otherID].neighborList)
 		end
@@ -209,9 +209,8 @@ local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 		unitData = shieldUnits[unitID]
 		if unitData.enabled then
 			local otherID, otherData
-			local data = shieldList.data
 			for i = 1, shieldList.count do --iterate over all shield unit, find anyone that's in range.
-				otherID = data[i]
+				otherID = shieldList[i]
 				otherData = shieldUnits[otherID]
 				if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) and 
 							otherData.enabled and ShieldsAreTouching(unitData, otherData) then
@@ -240,7 +239,7 @@ local function UpdateAllLinks(allyTeamID, shieldUnits, shieldList, unitUpdateLis
 				--local otherID, otherData
 				--local i = 1
 				--while i <= unitData.neighborList.count do
-				--	otherID = unitData.neighborList.data[i]
+				--	otherID = unitData.neighborList[i]
 				--	if allyTeamShields[allyTeamID][otherID] then
 				--		otherData = allyTeamShields[allyTeamID][otherID]
 				--		if not (otherData.enabled and ShieldsAreTouching(unitData, otherData)) then
@@ -255,7 +254,7 @@ local function UpdateAllLinks(allyTeamID, shieldUnits, shieldList, unitUpdateLis
 			else
 				--RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
 				--unitData.neighbors = {}
-				--unitData.neighborList = {data = {}, count = 0}
+				--unitData.neighborList = {count = 0}
 			end
 		end
 	end
@@ -300,7 +299,7 @@ function gadget:GameFrame(n)
 		for allyTeamID,unitList in pairs(allyTeamShieldList) do
 			local unitID, unitData
 			for i = 1, unitList.count do
-				unitID = unitList.data[i]
+				unitID = unitList[i]
 				unitData = allyTeamShields[allyTeamID][unitID]
 				if unitData.enabled ~= unitData.oldEnabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
 					if unitData.oldEnabled then
@@ -346,7 +345,7 @@ function gadget:GameFrame(n)
 			local otherID, otherData, otherCharge
 			local on, randomUnit, drawLink, attempt
 			for i = 1, unitList.count do
-				unitID = unitList.data[i]
+				unitID = unitList[i]
 				unitData = shieldUnits[unitID]
 				on, unitCharge = spGetUnitShieldState(unitID, -1)
 				drawLink = false
@@ -356,7 +355,7 @@ function gadget:GameFrame(n)
 						allyTeamID = unitData.allyTeamID
 						unitFlow = 0
 						randomUnit = math.random(1,unitData.neighborList.count)
-						otherID = unitData.neighborList.data[randomUnit]
+						otherID = unitData.neighborList[randomUnit]
 						if otherID then
 							otherData = allyTeamShields[allyTeamID][otherID]
 							if otherData then
