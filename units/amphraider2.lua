@@ -33,6 +33,7 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   maxDamage              = 800,
+  maxSlope               = 36,
   maxVelocity            = 2.5,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
