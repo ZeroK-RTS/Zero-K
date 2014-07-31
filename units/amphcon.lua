@@ -37,6 +37,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   maxDamage           = 850,
+  maxSlope            = 36,
   maxVelocity         = 1.7,
   metalMake           = 0.225,
   minCloakDistance    = 75,
