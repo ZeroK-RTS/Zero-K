@@ -207,7 +207,7 @@ local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 	local unitData
 	for unitID,_ in pairs(unitUpdateList) do
 		unitData = shieldUnits[unitID]
-		if unitData.enabled then
+		if unitData and unitData.enabled then
 			local otherID, otherData
 			for i = 1, shieldList.count do --iterate over all shield unit, find anyone that's in range.
 				otherID = shieldList[i]
@@ -235,26 +235,6 @@ local function UpdateAllLinks(allyTeamID, shieldUnits, shieldList, unitUpdateLis
 				unitData.x = x
 				unitData.y = y
 				unitData.z = z
-				
-				--local otherID, otherData
-				--local i = 1
-				--while i <= unitData.neighborList.count do
-				--	otherID = unitData.neighborList[i]
-				--	if allyTeamShields[allyTeamID][otherID] then
-				--		otherData = allyTeamShields[allyTeamID][otherID]
-				--		if not (otherData.enabled and ShieldsAreTouching(unitData, otherData)) then
-				--			RemoveThingFromIterable(unitID, otherData.neighbors, otherData.neighborList)
-				--			if RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList) then
-				--				i = i - 1
-				--			end
-				--		end
-				--	end
-				--	i = i + 1
-				--end
-			else
-				--RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
-				--unitData.neighbors = {}
-				--unitData.neighborList = {count = 0}
 			end
 		end
 	end
@@ -480,8 +460,8 @@ function gadget:DrawWorld()
 		glPushAttrib(GL_LINE_BITS)
     
 		glDepthTest(true)
-		glColor(1,0,1,math.random()*0.2+0.2)
-		glLineWidth(1.1)
+		glColor(1,0,1,math.random()*0.3+0.2)
+		glLineWidth(1.2)
 		glBeginEnd(GL_LINES, DrawFunc)
     
 		glDepthTest(false)
