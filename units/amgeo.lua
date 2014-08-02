@@ -16,7 +16,7 @@ unitDef = {
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[90 70 90]],
   collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
+  collisionVolumeType           = [[Box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -41,7 +41,6 @@ unitDef = {
   maxDamage                     = 3250,
   maxSlope                      = 255,
   maxVelocity                   = 0,
-  maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   objectName                    = [[amgeo.obj]],
   script                        = [[amgeo.lua]],
