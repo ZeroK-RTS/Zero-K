@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		enabled	= true	--	loaded by default?
 	}
 end
-local version = 1.232
+local version = 1.233
 
 -- CHANGELOG
 --	2009-5-24: CarRepairer: Added graphic lines to show links of shields (also shows links of enemies' visible shields, can remove if desired).
@@ -235,26 +235,6 @@ local function UpdateAllLinks(allyTeamID, shieldUnits, shieldList, unitUpdateLis
 				unitData.x = x
 				unitData.y = y
 				unitData.z = z
-				
-				--local otherID, otherData
-				--local i = 1
-				--while i <= unitData.neighborList.count do
-				--	otherID = unitData.neighborList[i]
-				--	if allyTeamShields[allyTeamID][otherID] then
-				--		otherData = allyTeamShields[allyTeamID][otherID]
-				--		if not (otherData.enabled and ShieldsAreTouching(unitData, otherData)) then
-				--			RemoveThingFromIterable(unitID, otherData.neighbors, otherData.neighborList)
-				--			if RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList) then
-				--				i = i - 1
-				--			end
-				--		end
-				--	end
-				--	i = i + 1
-				--end
-			else
-				--RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
-				--unitData.neighbors = {}
-				--unitData.neighborList = {count = 0}
 			end
 		end
 	end
@@ -311,7 +291,7 @@ function gadget:GameFrame(n)
 				elseif unitData.enabled then
 					local x,y,z = unitData.x, unitData.y, unitData.z
 					if x and y and z then
-						local ux,uy,uz = Spring.GetUnitPosition(unitID)
+						local ux,uy,uz = spGetUnitPosition(unitID)
 						if ux-x > 10 or x-ux > 10 or uy-y > 10 or y-uy > 10 or  uz-z > 10 or z-uz > 10 then --if unit change position
 							QueueLinkUpdate(allyTeamID, unitID)
 						end
@@ -424,6 +404,7 @@ local spGetUnitLosState    = Spring.GetUnitLosState
 --------------------------------------------------------------------------------
 local shieldUnits = {}
 local shieldCount = 0
+local links = {count=0}
 
 function gadget:Initialize()
 	local spGetUnitDefID = Spring.GetUnitDefID
@@ -452,25 +433,46 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
-local function DrawFunc()
-	local unitID
-	local connectedToUnitID
-	local x1, y1, z1, x2, y2, z2
-	local spec, fullview = spGetSpectatingState()
-	local myTeam = spGetMyAllyTeamID()
-	for i=1, #shieldUnits do
-		unitID = shieldUnits[i]
-		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
-		if connectedToUnitID and connectedToUnitID >= 0 and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
-			local los1 = spGetUnitLosState(unitID, myTeam, false)
-			local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
-			if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
-					(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
-				x1, y1, z1 = spGetUnitViewPosition(unitID, true)
-				x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
-				glVertex(x1, y1, z1)
-				glVertex(x2, y2, z2)
+function gadget:GameFrame(n)
+	if n%2==0 then
+		for i=1, links.count do
+			if n-links[i][3]>=6 then
+				links[i][1] = links[links.count][1]
+				links[i][2] = links[links.count][2]
+				links[i][3] = links[links.count][3]
+				links.count = links.count - 1 
 			end
+		end
+		local unitID,connectedToUnitID
+		local spec, fullview = spGetSpectatingState()
+		local myTeam = spGetMyAllyTeamID()
+		for i=1, #shieldUnits do
+			unitID = shieldUnits[i]
+			connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
+			if connectedToUnitID and connectedToUnitID >= 0 then --and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
+				local los1 = spGetUnitLosState(unitID, myTeam, false)
+				local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
+				if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
+						(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
+					links.count = links.count + 1
+					links[links.count]=links[links.count] or {0,0,0}
+					links[links.count][1] = unitID
+					links[links.count][2] = connectedToUnitID
+					links[links.count][3] = n
+				end
+			end
+		end
+	end
+end
+
+local function DrawFunc()
+	local x1, y1, z1, x2, y2, z2
+	for i=1, links.count do
+		x1, y1, z1 = spGetUnitViewPosition(links[i][1], true)
+		x2, y2, z2 = spGetUnitViewPosition(links[i][2], true)
+		if x1 and x2 then
+			glVertex(x1, y1, z1)
+			glVertex(x2, y2, z2)
 		end
 	end
 end
@@ -480,7 +482,7 @@ function gadget:DrawWorld()
 		glPushAttrib(GL_LINE_BITS)
     
 		glDepthTest(true)
-		glColor(1,0,1,math.random()*0.2+0.2)
+		glColor(1,0,1,0.4)
 		glLineWidth(1.1)
 		glBeginEnd(GL_LINES, DrawFunc)
     
