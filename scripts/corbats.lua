@@ -185,8 +185,8 @@ function script.Killed(recentDamage, maxHealth)
 				Explode(barrels[i][v], sfxFall + sfxSmoke + sfxExplode)
 			end
 		end
-		Explode(hull, sfxNone)
-		Explode(ground, sfxNone)
+		Explode(hull, sfxShatter)
+		Explode(ground, sfxShatter)
 		Explode(turret1, sfxShatter)
 		Explode(turret2, sfxShatter)
 		Explode(turret3, sfxShatter)
