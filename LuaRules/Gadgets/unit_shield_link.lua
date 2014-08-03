@@ -390,6 +390,9 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
+		if reverseCompat then
+			SendToUnsynced("unsynced_gameframe",nil)
+		end
 	end
 end
 
@@ -423,85 +426,97 @@ local spGetUnitLosState    = Spring.GetUnitLosState
 --------------------------------------------------------------------------------
 local shieldUnits = {}
 local shieldCount = 0
+local links = {count=0}
 
-if reverseCompat then
-	function UnitCreated(_,unitID, unitDefID)
-		if unitDefID and UnitDefs[unitDefID].shieldWeaponDef then
-			shieldCount = shieldCount + 1
-			shieldUnits[shieldCount] = unitID
-		end
+function UnitCreated2(_,unitID, unitDefID) --same name as gadget:UnitCreated will cause stack overflow error in Spring 97+, so named to UnitCreated2
+	if UnitDefs[unitDefID].shieldWeaponDef then
+		shieldCount = shieldCount + 1
+		shieldUnits[shieldCount] = unitID
 	end
+end
 
-	function UnitDestroyed(_,unitID, unitDefID)
-		if unitDefID and UnitDefs[unitDefID].shieldWeaponDef then
-			for i=1, #shieldUnits do
-				if shieldUnits[i] == unitID then
-					table.remove(shieldUnits,i)
-					shieldCount = shieldCount - 1
-					break;
-				end
+function UnitDestroyed2(_,unitID, unitDefID)
+	if UnitDefs[unitDefID].shieldWeaponDef then
+		for i=1, #shieldUnits do
+			if shieldUnits[i] == unitID then
+				table.remove(shieldUnits,i)
+				shieldCount = shieldCount - 1
+				break;
 			end
-		end
-	end
-	
-	function gadget:Initialize()
-		local spGetUnitDefID = Spring.GetUnitDefID
-		for _,unitID in ipairs(Spring.GetAllUnits()) do
-			local unitDefID = spGetUnitDefID(unitID)
-			UnitCreated(unitID, unitDefID)
-		end
-		gadgetHandler:AddSyncAction("shield_link_unit_created", UnitCreated)
-		gadgetHandler:AddSyncAction("shield_link_unit_destroyed", UnitDestroyed)
-	end
-else
-	function gadget:UnitCreated(unitID, unitDefID)
-		if UnitDefs[unitDefID].shieldWeaponDef then
-			shieldCount = shieldCount + 1
-			shieldUnits[shieldCount] = unitID
-		end
-	end
-
-	function gadget:UnitDestroyed(unitID, unitDefID)
-		if UnitDefs[unitDefID].shieldWeaponDef then
-			for i=1, #shieldUnits do
-				if shieldUnits[i] == unitID then
-					table.remove(shieldUnits,i)
-					shieldCount = shieldCount - 1
-					break;
-				end
-			end
-		end
-	end
-	
-	function gadget:Initialize()
-		local spGetUnitDefID = Spring.GetUnitDefID
-		for _,unitID in ipairs(Spring.GetAllUnits()) do
-			local unitDefID = spGetUnitDefID(unitID)
-			gadget:UnitCreated(unitID, unitDefID)
 		end
 	end
 end
 
-local function DrawFunc()
-	local unitID
-	local connectedToUnitID
-	local x1, y1, z1, x2, y2, z2
-	local spec, fullview = spGetSpectatingState()
-	local myTeam = spGetMyAllyTeamID()
-	for i=1, #shieldUnits do
-		unitID = shieldUnits[i]
-		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link_unit") or -1)
-		if connectedToUnitID and connectedToUnitID >= 0 and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
-			local los1 = spGetUnitLosState(unitID, myTeam, false)
-			local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
-			if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
-					(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
-				
-				x1, y1, z1 = spGetUnitViewPosition(unitID, true)
-				x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
-				glVertex(x1, y1, z1)
-				glVertex(x2, y2, z2)
+function Initialize2()
+	local spGetUnitDefID = Spring.GetUnitDefID
+	for _,unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = spGetUnitDefID(unitID)
+		UnitCreated(unitID, unitDefID)
+	end
+end
+
+function GameFrame2(_,n) --because Spring 91.0 do not have gadget:GameFrame() in unsynced.
+	n = n or Spring.GetGameFrame()
+	if n%2==0 then
+		for i=1, links.count do
+			if n-links[i][3]>=6 then
+				links[i][1] = links[links.count][1]
+				links[i][2] = links[links.count][2]
+				links[i][3] = links[links.count][3]
+				links.count = links.count - 1 
 			end
+		end
+		local unitID,connectedToUnitID
+		local spec, fullview = spGetSpectatingState()
+		local myTeam = spGetMyAllyTeamID()
+		for i=1, #shieldUnits do
+			unitID = shieldUnits[i]
+			connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link_unit") or -1)
+			if connectedToUnitID and connectedToUnitID >= 0 then --and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
+				local los1 = spGetUnitLosState(unitID, myTeam, false)
+				local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
+				if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
+						(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
+					links.count = links.count + 1
+					links[links.count]=links[links.count] or {0,0,0}
+					links[links.count][1] = unitID
+					links[links.count][2] = connectedToUnitID
+					links[links.count][3] = n
+				end
+			end
+		end
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID)
+	UnitCreated2(0,unitID, unitDefID)
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	UnitDestroyed2(0,unitID, unitDefID)
+end
+
+function gadget:Initialize()
+	Initialize2()
+	if reverseCompat then
+		gadgetHandler:AddSyncAction("shield_link_unit_created", UnitCreated2)
+		gadgetHandler:AddSyncAction("shield_link_unit_destroyed", UnitDestroyed2)
+		gadgetHandler:AddSyncAction("unsynced_gameframe", GameFrame2)
+	end
+end
+
+function gadget:GameFrame(n)
+	GameFrame2(0,n)
+end
+
+local function DrawFunc()
+	local x1, y1, z1, x2, y2, z2
+	for i=1, links.count do
+		x1, y1, z1 = spGetUnitViewPosition(links[i][1], true)
+		x2, y2, z2 = spGetUnitViewPosition(links[i][2], true)
+		if x1 and x2 then
+			glVertex(x1, y1, z1)
+			glVertex(x2, y2, z2)
 		end
 	end
 end
@@ -511,8 +526,8 @@ function gadget:DrawWorld()
 		glPushAttrib(GL_LINE_BITS)
     
 		glDepthTest(true)
-		glColor(1,0,1,math.random()*0.2+0.3)
-		glLineWidth(1.2)
+		glColor(1,0,1,0.4)
+		glLineWidth(1.1)
 		glBeginEnd(GL_LINES, DrawFunc)
     
 		glDepthTest(false)
