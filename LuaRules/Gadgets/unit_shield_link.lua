@@ -16,6 +16,8 @@ local version = 1.232
 --	2009-5-30: CarRepairer: Lups graphic lines, fix for 0.79.1 compatibility.
 --	2009-9-15: Licho: added simple fast graph lines
 
+local reverseCompat = (Game.version:find('91.0') == 1)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -97,6 +99,9 @@ function gadget:Initialize()
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
+	if reverseCompat then
+		SendToUnsynced("shield_link_unit_created", unitID, unitDefID)
+	end
 
 	-- only count finished buildings
 	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
@@ -135,6 +140,10 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
+	if reverseCompat then
+		SendToUnsynced("shield_link_unit_destroyed", unitID, unitDefID)
+	end
+	
 	local ud = UnitDefs[unitDefID]
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if ud.shieldWeaponDef and allyTeamShields[allyTeamID] then
@@ -415,29 +424,60 @@ local spGetUnitLosState    = Spring.GetUnitLosState
 local shieldUnits = {}
 local shieldCount = 0
 
-function gadget:Initialize()
-	local spGetUnitDefID = Spring.GetUnitDefID
-	for _,unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = spGetUnitDefID(unitID)
-		gadget:UnitCreated(unitID, unitDefID)
+if reverseCompat then
+	function UnitCreated(unitID, unitDefID)
+		if UnitDefs[unitDefID].shieldWeaponDef then
+			shieldCount = shieldCount + 1
+			shieldUnits[shieldCount] = unitID
+		end
 	end
-end
 
-function gadget:UnitCreated(unitID, unitDefID)
-	if UnitDefs[unitDefID].shieldWeaponDef then
-		shieldCount = shieldCount + 1
-		shieldUnits[shieldCount] = unitID
-	end
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID)
-	if UnitDefs[unitDefID].shieldWeaponDef then
-		for i=1, #shieldUnits do
-			if shieldUnits[i] == unitID then
-				table.remove(shieldUnits,i)
-				shieldCount = shieldCount - 1
-				break;
+	function UnitDestroyed(unitID, unitDefID)
+		if UnitDefs[unitDefID].shieldWeaponDef then
+			for i=1, #shieldUnits do
+				if shieldUnits[i] == unitID then
+					table.remove(shieldUnits,i)
+					shieldCount = shieldCount - 1
+					break;
+				end
 			end
+		end
+	end
+	
+	function gadget:Initialize()
+		local spGetUnitDefID = Spring.GetUnitDefID
+		for _,unitID in ipairs(Spring.GetAllUnits()) do
+			local unitDefID = spGetUnitDefID(unitID)
+			UnitCreated(unitID, unitDefID)
+		end
+		gadgetHandler:AddSyncAction("shield_link_unit_created", UnitCreated)
+		gadgetHandler:AddSyncAction("shield_link_unit_destroyed", UnitDestroyed)
+	end
+else
+	function gadget:UnitCreated(unitID, unitDefID)
+		if UnitDefs[unitDefID].shieldWeaponDef then
+			shieldCount = shieldCount + 1
+			shieldUnits[shieldCount] = unitID
+		end
+	end
+
+	function gadget:UnitDestroyed(unitID, unitDefID)
+		if UnitDefs[unitDefID].shieldWeaponDef then
+			for i=1, #shieldUnits do
+				if shieldUnits[i] == unitID then
+					table.remove(shieldUnits,i)
+					shieldCount = shieldCount - 1
+					break;
+				end
+			end
+		end
+	end
+	
+	function gadget:Initialize()
+		local spGetUnitDefID = Spring.GetUnitDefID
+		for _,unitID in ipairs(Spring.GetAllUnits()) do
+			local unitDefID = spGetUnitDefID(unitID)
+			gadget:UnitCreated(unitID, unitDefID)
 		end
 	end
 end
