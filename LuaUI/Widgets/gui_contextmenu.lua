@@ -308,7 +308,12 @@ end
 local function weapons2Table(cells, weaponStats, ws)
 	local cells = cells
 	if ws.isShield then
-		cells[#cells+1] = ws.wname
+		local name_str = ws.wname
+		if ws.count > 1 then
+			name_str = name_str .. " x " .. ws.count
+		end
+		
+		cells[#cells+1] = name_str
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Strength:'
 		cells[#cells+1] = ws.power
