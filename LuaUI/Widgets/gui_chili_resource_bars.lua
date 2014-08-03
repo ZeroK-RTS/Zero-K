@@ -568,8 +568,9 @@ function CreateWindow()
                 y      = p(100/bars),
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
-		OnMouseDown = {function() return true end},	-- this is needed for OnMouseUp to work
+		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
+			if widgetHandler:InTweakMode() then return end
 			local reserve = x / (self.width - self.padding[1] - self.padding[3])
 			updateReserveBars(true, mouse ~= 3, reserve)
 		end},
@@ -663,8 +664,9 @@ function CreateWindow()
                 y      = 1,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
-		OnMouseDown = {function() return true end},	-- this is needed for OnMouseUp to work
+		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
+			if widgetHandler:InTweakMode() then return end
 			local reserve = x / (self.width - self.padding[1] - self.padding[3])
 			updateReserveBars(mouse ~= 3, true, reserve)
 		end},
