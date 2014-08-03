@@ -371,6 +371,7 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
+		SendToUnsynced("unsynced_gameframe",n)
 	end
 end
 
@@ -404,6 +405,7 @@ local spGetUnitLosState    = Spring.GetUnitLosState
 --------------------------------------------------------------------------------
 local shieldUnits = {}
 local shieldCount = 0
+local links = {count=0}
 
 function gadget:Initialize()
 	local spGetUnitDefID = Spring.GetUnitDefID
@@ -411,6 +413,7 @@ function gadget:Initialize()
 		local unitDefID = spGetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
 	end
+	gadgetHandler:AddSyncAction("unsynced_gameframe", UnsyncedGameframe)
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
@@ -432,25 +435,47 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
-local function DrawFunc()
-	local unitID
-	local connectedToUnitID
-	local x1, y1, z1, x2, y2, z2
-	local spec, fullview = spGetSpectatingState()
-	local myTeam = spGetMyAllyTeamID()
-	for i=1, #shieldUnits do
-		unitID = shieldUnits[i]
-		connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
-		if connectedToUnitID and connectedToUnitID >= 0 and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
-			local los1 = spGetUnitLosState(unitID, myTeam, false)
-			local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
-			if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
-					(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
-				x1, y1, z1 = spGetUnitViewPosition(unitID, true)
-				x2, y2, z2 = spGetUnitViewPosition(connectedToUnitID, true)
-				glVertex(x1, y1, z1)
-				glVertex(x2, y2, z2)
+function UnsyncedGameframe(_,n) --because Spring 91.0 do not have gadget:GameFrame() in unsynced.
+	n = tonumber(n)
+	-- if n%2==0 then
+		for i=1, links.count do
+			if n-links[i][3]>=6 then
+				links[i][1] = links[links.count][1]
+				links[i][2] = links[links.count][2]
+				links[i][3] = links[links.count][3]
+				links.count = links.count - 1 
 			end
+		end
+		local unitID,connectedToUnitID
+		local spec, fullview = spGetSpectatingState()
+		local myTeam = spGetMyAllyTeamID()
+		for i=1, #shieldUnits do
+			unitID = shieldUnits[i]
+			connectedToUnitID = tonumber(spGetUnitRulesParam(unitID, "shield_link") or -1)
+			if connectedToUnitID and connectedToUnitID >= 0 then --and (spValidUnitID(unitID) and spValidUnitID(connectedToUnitID)) then
+				local los1 = spGetUnitLosState(unitID, myTeam, false)
+				local los2 = spGetUnitLosState(connectedToUnitID, myTeam, false)
+				if (fullview or (los1 and los1.los) or (los2 and los2.los)) and 
+						(spIsUnitInView(unitID) or spIsUnitInView(connectedToUnitID)) then
+					links.count = links.count + 1
+					links[links.count]=links[links.count] or {0,0,0}
+					links[links.count][1] = unitID
+					links[links.count][2] = connectedToUnitID
+					links[links.count][3] = n
+				end
+			end
+		end
+	-- end
+end
+
+local function DrawFunc()
+	local x1, y1, z1, x2, y2, z2
+	for i=1, links.count do
+		x1, y1, z1 = spGetUnitViewPosition(links[i][1], true)
+		x2, y2, z2 = spGetUnitViewPosition(links[i][2], true)
+		if x1 and x2 then
+			glVertex(x1, y1, z1)
+			glVertex(x2, y2, z2)
 		end
 	end
 end
@@ -460,8 +485,8 @@ function gadget:DrawWorld()
 		glPushAttrib(GL_LINE_BITS)
     
 		glDepthTest(true)
-		glColor(1,0,1,math.random()*0.3+0.2)
-		glLineWidth(1.2)
+		glColor(1,0,1,0.4)
+		glLineWidth(1.1)
 		glBeginEnd(GL_LINES, DrawFunc)
     
 		glDepthTest(false)
