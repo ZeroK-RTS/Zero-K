@@ -425,15 +425,15 @@ local shieldUnits = {}
 local shieldCount = 0
 
 if reverseCompat then
-	function UnitCreated(unitID, unitDefID)
-		if UnitDefs[unitDefID].shieldWeaponDef then
+	function UnitCreated(_,unitID, unitDefID)
+		if unitDefID and UnitDefs[unitDefID].shieldWeaponDef then
 			shieldCount = shieldCount + 1
 			shieldUnits[shieldCount] = unitID
 		end
 	end
 
-	function UnitDestroyed(unitID, unitDefID)
-		if UnitDefs[unitDefID].shieldWeaponDef then
+	function UnitDestroyed(_,unitID, unitDefID)
+		if unitDefID and UnitDefs[unitDefID].shieldWeaponDef then
 			for i=1, #shieldUnits do
 				if shieldUnits[i] == unitID then
 					table.remove(shieldUnits,i)
