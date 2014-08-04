@@ -1,4 +1,12 @@
 
+--by Chris Mackey
+
+--include "lua/test.lua"
+
+
+local SOUND_PERIOD = 2
+local soundIndex = SOUND_PERIOD
+local TANK_MAX = 100
 --pieces
 local body = piece "body"
 local firepoint = piece "firepoint"
@@ -7,9 +15,6 @@ local wheell1 = piece "wheell1"
 local wheell2 = piece "wheell2"
 local wheelr1 = piece "wheelr1"
 local wheelr2 = piece "wheelr2"
-
-
-include "constants.lua"
 
 --constants
 local PI = math.pi
@@ -27,12 +32,47 @@ local backward = 5
 local up = 8
 
 --signals
-local SIG_BURROW = 1
-local SIG_Walk = 2
+local aim = 1
+local Sig_move= 2
 
 --cob values
 local cloaked = COB.CLOAKED
 local stealth = COB.STEALTH
+
+local function Burrow()
+	Signal(Sig_move)
+	SetSignalMask(Sig_move)
+
+	burrowed = true
+	EmitSfx( digger, dirtfling )
+	
+	--burrow
+	Turn( body, 1, (-PI/6), 2 ) --butt into dirt
+	Move( body, 2, -4, 5 ) -- body down
+	Sleep( pause )
+	--pieces to resting positions
+	Turn( body, 3, 0, 1 )
+	Turn( body, 2, 0, 1 )
+	----[[ leg anim goes here
+	--]]
+	if( burrowed == true ) then
+		Spring.UnitScript.SetUnitValue( cloaked, 1 )
+		Spring.UnitScript.SetUnitValue( stealth, 1 )
+		--Spring.UnitScript.SetUnitValue() MAX_SPEED to maxSpeed/4
+		--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 2
+	end
+end
+
+local function UnBurrow()
+	burrowed = false
+	Spring.UnitScript.SetUnitValue( cloaked, 0 )
+	Spring.UnitScript.SetUnitValue( stealth, 0 )
+	--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 0
+	EmitSfx( digger, dirtfling )
+	Move( body, 2, 0, 3 )
+	Turn( body, 1, 0, 3 )
+end
+--]]
 
 local function Walk()
 	while (walking == true) do
@@ -56,6 +96,72 @@ function script.Create()
 	
 end
 
+local function Moving()
+	Signal(Sig_move)
+	SetSignalMask(Sig_move)
+	Spin(wheell1, x_axis, (12))
+	Spin(wheell2, x_axis, (12))
+	Spin(wheelr1, x_axis, (12))
+	Spin(wheelr2, x_axis, (12))
+	StartThread( UnBurrow )
+	walking = true
+	StartThread( Walk )
+end
+
+function script.StartMoving()
+	StartThread(Moving)
+	--StartThread( Talk )
+end
+
+function script.StopMoving()
+	walking = false
+	StopSpin(wheell1, x_axis, (10))
+	StopSpin(wheell2, x_axis, (10))
+	StopSpin(wheelr1, x_axis, (10))
+	StopSpin(wheelr2, x_axis, (10))
+	StartThread( Burrow )
+end
+
+function script.FireWeapon(num)
+	soundIndex = soundIndex - 1
+	if soundIndex <= 0 then
+		local proportion = 1
+		local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
+		if waterTank then
+			proportion = waterTank/TANK_MAX
+		end
+		soundIndex = math.floor(math.random()+1.5)
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		Spring.PlaySoundFile("sounds/weapon/watershort.wav", 20+proportion*5, px, py, pz)
+	end
+
+	GG.shotWaterWeapon(unitID)
+end
+
+function script.Shot(num)
+	GG.Floating_AimWeapon(unitID)
+    if math.random() < 0.2 then
+		EmitSfx(firepoints[gun_1], 1024)
+	end
+	--[[
+	local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
+	if waterTank then
+        local proportion = waterTank/TANK_MAX
+		if proportion > 0.4 then
+			EmitSfx(firepoints[gun_1], 1024)
+			if math.random() < (proportion-0.4)/0.6 then
+				EmitSfx(firepoints[gun_1], 1024)
+			end
+		else
+			if math.random() < (proportion + 0.2)/0.6 then
+				EmitSfx(firepoints[gun_1], 1024)
+			end
+		end
+	end--]]
+	--Spring.Echo(Spring.GetGameFrame())
+	gun_1 = 1 - gun_1
+end
+
 function script.QueryWeapon1()
 	return firepoint
 end
@@ -68,81 +174,9 @@ function script.AimWeapon1()
 	return true
 end
 
-local function Burrow()
-	Signal( SIG_BURROW )
-	SetSignalMask( SIG_BURROW )
-	Sleep(400)
-	
-	Signal( SIG_Walk )
-	burrowed = true
-	EmitSfx( digger, 1024 )
-	
-	--burrow
-	Move( body , y_axis, -1.500000 , 1.500000 )
-	Turn( body , x_axis, math.rad(-20.000000), math.rad(20.000000) )
-	
-	if( burrowed == true ) then
-		GG.SetWantedCloaked(unitID, 1)
-		Spring.UnitScript.SetUnitValue( stealth, 1 )
-	end
-end
-
-local function UnBurrow()
-	Signal( SIG_BURROW )
-	burrowed = false
-	GG.SetWantedCloaked(unitID, 0)
-	Spring.UnitScript.SetUnitValue( stealth, 0 )
-	Move( body , y_axis, 0.000000 , 2.000000 )
-	Turn( body , x_axis, 0, math.rad(60.000000) )
-	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0)
-	GG.attUnits[unitID] = true
-	GG.UpdateUnitAttributes(unitID)
-	
-	Sleep(600)
-	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	GG.UpdateUnitAttributes(unitID)
-	EmitSfx( digger, 1024)
-	
-	StartThread( Walk )
-end
-
-local function Moving()
-	Signal(Sig_Walk)
-	SetSignalMask(Sig_Walk)
-	Spin(wheell1, x_axis, (12))
-	Spin(wheell2, x_axis, (12))
-	Spin(wheelr1, x_axis, (12))
-	Spin(wheelr2, x_axis, (12))
-	StartThread( UnBurrow )
-	walking = true
-	StartThread( Walk )
-end
-
-
-function script.StartMoving()
-	Signal( SIG_BURROW )
-	if burrowed then
-		StartThread( UnBurrow )
-	else
-		StartThread( Moving )
-	end
-end
-
-function script.StopMoving()
-	walking = false
-	StopSpin(wheell1, x_axis, (10))
-	StopSpin(wheell2, x_axis, (10))
-	StopSpin(wheelr1, x_axis, (10))
-	StopSpin(wheelr2, x_axis, (10))
-	StartThread( Burrow )
-end
-
 function script.Killed()
-	Explode(body, sfxShatter)
-	Explode(wheell1, sfxSmoke + sfxFire)
-	Explode(wheell2, sfxSmoke + sfxFire)
-	Explode(wheelr1, sfxSmoke + sfxFire)
-	Explode(wheelr2, sfxSmoke + sfxFire)
+	--Spring.Echo("I am ded")
+	--[[ desync testing
+	Explode( body, SFX.EXPLODE )
+	--]]
 end
