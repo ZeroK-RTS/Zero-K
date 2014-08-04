@@ -103,7 +103,7 @@ local function Moving()
 	Spin(wheell2, x_axis, (12))
 	Spin(wheelr1, x_axis, (12))
 	Spin(wheelr2, x_axis, (12))
-	StartThread( UnBurrow )
+	--StartThread( UnBurrow ) --decloak
 	walking = true
 	StartThread( Walk )
 end
@@ -119,7 +119,7 @@ function script.StopMoving()
 	StopSpin(wheell2, x_axis, (10))
 	StopSpin(wheelr1, x_axis, (10))
 	StopSpin(wheelr2, x_axis, (10))
-	StartThread( Burrow )
+	--StartThread( Burrow ) --cloaked
 end
 
 function script.FireWeapon(num)
@@ -140,9 +140,9 @@ end
 
 function script.Shot(num)
 	GG.Floating_AimWeapon(unitID)
-    if math.random() < 0.2 then
-		EmitSfx(firepoints[gun_1], 1024)
-	end
+    -- if math.random() < 0.2 then
+		-- EmitSfx(firepoints[gun_1], 1024)
+	-- end
 	--[[
 	local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
 	if waterTank then
@@ -159,7 +159,7 @@ function script.Shot(num)
 		end
 	end--]]
 	--Spring.Echo(Spring.GetGameFrame())
-	gun_1 = 1 - gun_1
+	-- gun_1 = 1 - gun_1
 end
 
 function script.QueryWeapon1()
