@@ -13,7 +13,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2.1",
-    desc      = "v0.922 Chili Chat Console.",
+    desc      = "v0.925 Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
     date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
@@ -647,7 +647,7 @@ local function displayMessage(msg, remake)
 					children = { textbox, },
 					OnClick = {function(self, x, y, mouse)
 						local alt,ctrl, meta,shift = Spring.GetModKeyState()
-						if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
+						if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they meant player are using click to issue command.Try to not steal click
 						Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 					end}
 				}
@@ -989,6 +989,15 @@ function widget:Initialize()
 		},
 	}
 	
+	function scrollpanel1:IsAboveVScrollbars(x, y)  -- this override default Scrollpanel's HitTest.
+		--It aim to: exclude any modifier key (shift,alt,ctrl, except spacebar which is used for Space+click shortcut), and only allow left-click to reposition the vertical scrollbar, because it have a chance of stealing click when giving order (highest when in Low resolution and when ChiliChat2 is positioned to left of screen).
+		local alt,ctrl, meta,shift = Spring.GetModKeyState()
+		if (x< self.width - self.scrollbarSize) or (shift or ctrl or alt) or (not select(3,Spring.GetMouseState())) then 
+			return false 
+		end --skip modifier key since they meant player are using click to issue command. Try to not steal click
+		return self
+	end
+	
 	window_console = WG.Chili.Window:New{  
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
@@ -1006,6 +1015,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		selfImplementedMinimizable = 
 			function (show)
 				if show then

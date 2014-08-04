@@ -75,14 +75,16 @@ unitList["ZK"] = {} --initialize table, should contain ZK buildings currently us
 unitList["ZK"]["armamd"] =		{ markerText = "Anti Nuke" }
 unitList["ZK"]["corsilo"] =		{ markerText = "Nuke" }
 --unitList["ZK"]["missilesilo"] =	{ markerText = "Missile Silo" }
---unitList["ZK"]["armbrtha"] =		{ markerText = "Big Bertha" }
+unitList["ZK"]["armbrtha"] =		{ markerText = "Big Bertha" }
 --unitList["ZK"]["corbhmth"] =		{ markerText = "Behemoth" }
 --unitList["ZK"]["armanni"] =		{ markerText = "Annihilator" }
 --unitList["ZK"]["cordoom"] =		{ markerText = "Doomsday" }
 unitList["ZK"]["starlight"] =		{ markerText = "Starlight" }
+unitList["ZK"]["zenith"] =		{ markerText = "Zenith" }
+unitList["ZK"]["raveparty"] =		{ markerText = "Disco Rave Party" }
 unitList["ZK"]["cafus"] =			{ markerText = "Singularity Reactor" }
 --unitList["ZK"]["armfus"] =		{ markerText = "Fusion Reactor" }
---unitList["ZK"]["amgeo"] =			{ markerText = "Moho Geo" }
+unitList["ZK"]["amgeo"] =			{ markerText = "Moho Geo" }
 --unitList["ZK"]["geo"] =			{ markerText = "Geo" }
 --unitList["ZK"]["roost"] =				{ markerText = "Roost" }
 --unitList["ZK"]["chickenspire"] =		{ markerText = "Spire" }

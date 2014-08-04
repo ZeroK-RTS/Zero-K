@@ -11,7 +11,7 @@ local unitDefData = {
 		tankMax = 180,
 		shotCost = 1.2,
 		tankRegenRate = 14,
-		healthRegen = 20,
+		healthRegen = 40,
 		submergedAt = 40,
 		baseHeight = 5,
 	},

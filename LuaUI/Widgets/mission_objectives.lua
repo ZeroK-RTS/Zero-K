@@ -66,17 +66,22 @@ local function Minimize()
 	mainWindow:AddChild(expandButton)
 end
 
-local function ModifyObjective(id, title, details, pos, status, color)
+local function ModifyObjective(id, title, description, pos, status, color)
 	if not id then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "<Objectives> Error: Attempt to modify objective with no ID")
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Attempt to modify objective with no ID")
 		return
 	end
 	local obj = objectives[id]
+	if not obj then
+		Spring.Log(widget:GetInfo().name, LOG.WARNING, "Attempt to modify missing objective "..id)
+		return
+	end
+	
 	if title and title ~= '' then
 		obj.label:SetCaption(title)
 	end
-	if details and details ~= '' then
-		obj.panel.tooltip = details
+	if description and description ~= '' then
+		obj.panel.tooltip = description
 	end
 	if pos then
 		obj.panel.OnClick = {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end}
@@ -96,14 +101,14 @@ local function ModifyObjective(id, title, details, pos, status, color)
 	Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
 end
 
-local function AddObjective(id, title, details, pos, status, color)
+local function AddObjective(id, title, description, pos, status, color)
 	if not id then
-		Spring.Log(widget:GetInfo().name, LOG.WARNING, "Attempt to add objective with no ID")
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Attempt to add objective with no ID")
 		return
 	end
 	status = string.lower(status or '')
 	if objectives[id] then	-- duplicate objective
-		ModifyObjective(id, title, details, pos, status, color)
+		ModifyObjective(id, title, description, pos, status, color)
 	else
 		objectives[id] = {}
 		local obj = objectives[id]
@@ -113,7 +118,7 @@ local function AddObjective(id, title, details, pos, status, color)
 			x = 5,
 			width = stack.width - 5 - 5,
 			padding = {0, 0, 0, 0},
-			tooltip = details,
+			tooltip = description,
 			hitTestAllowEmpty = true,	-- for old ZK chili
 			noSelfHitTest = false,
 			--backgroundColor = {1, 1, 1, 0},
@@ -167,7 +172,7 @@ end
 
 local function RemoveObjective(id)
 	if not id then
-		Spring.Echo("<Objectives> Error: Attempt to delete objective with no ID")
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Attempt to remove objective with no ID")
 		return
 	end
 	local obj = objectives[id]
@@ -189,6 +194,15 @@ local function MakeTestObjectives()
 	AddObjective("pad3", "Padding 3.1", nil, nil, "failed")
 end
 
+function ReceiveMissionObjectives(newObjectives)
+	-- first remove all existing objectives
+	for id in pairs(objectives) do
+		RemoveObjective(id)
+	end
+	for index, obj in pairs(newObjectives) do
+		AddObjective(obj.id, obj.title, obj.description, obj.pos, obj.status, obj.color)
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:Initialize()
@@ -318,8 +332,14 @@ function widget:Initialize()
 	WG.ModifyObjective = ModifyObjective
 	WG.RemoveObjective = RemoveObjective
 	
+	widgetHandler:RegisterGlobal("MissionObjectivesFromSynced", ReceiveMissionObjectives)
+	
 	if debugMode then
 		MakeTestObjectives()
+	end
+	-- doesn't catch the case if widget is toggled before game start but meh
+	if Spring.GetGameFrame() > 0 then
+		Spring.SendLuaRulesMsg("sendMissionObjectives")
 	end
 end
 
@@ -327,6 +347,7 @@ function widget:Shutdown()
 	WG.AddObjective = nil
 	WG.ModifyObjective = nil
 	WG.RemoveObjective = nil
+	widgetHandler:DeregisterGlobal("MissionObjectivesFromSynced")
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

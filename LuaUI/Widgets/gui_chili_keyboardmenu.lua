@@ -172,7 +172,7 @@ options = {
 		name = 'Selections...',
 		type = 'button',
 		OnChange = function(self)
-			WG.crude.OpenPath('Game/Selections')
+			WG.crude.OpenPath('Game/Selection Hotkeys')
 		end
 	},
 	opacity = {
@@ -1097,7 +1097,7 @@ local function SetupCommands( modifier )
 	for i = 1, #selections do
 		local selection = selections[i]
 		--local option = options[selection]
-		local option = WG.GetWidgetOption( 'Select Keys','Game/Selections', selection ) --returns empty table if problem
+		local option = WG.GetWidgetOption( 'Select Keys','Game/Selection Hotkeys', selection ) --returns empty table if problem
 		if option.action then
 			local hotkey = WG.crude.GetHotkey(option.action) or ''
 			local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)

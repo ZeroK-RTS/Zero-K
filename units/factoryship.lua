@@ -11,11 +11,11 @@ unitDef = {
   buildoptions           = {
     [[shipcon]],
     [[shipscout]],
+    [[subraider]],
     [[shipraider]],
     [[shiptorp]],
-    [[subraider]],
-    [[shiparty]],
     [[shipskirm]],
+    [[shiparty]],
     [[subarty]],
     [[shipaa]],
     [[armtboat]],

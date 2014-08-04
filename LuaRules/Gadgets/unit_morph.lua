@@ -630,11 +630,6 @@ local function FinishMorph(unitID, morphData)
     GG.setMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
   end
   
-  -- move drones to new carrier (ownership data)
-  if (GG.isCarrier(unitID)) then
-    GG.transferCarrierData(unitID, ud, unitTeam, newUnit)
-  end
-  
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
   
   --//transfer lineage

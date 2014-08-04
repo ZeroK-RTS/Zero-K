@@ -106,7 +106,7 @@ function widget:CommandNotify(id, params, options)
       for i=1, #selUnits do
         local unitID = selUnits[i]
         local cQueue = GetCommandQueue(unitID, 1)
-        if (#cQueue > 0) and (params[1] == cQueue[1].params[1]) then
+        if cQueue and (#cQueue > 0) and (params[1] == cQueue[1].params[1]) then
           blockUnits[unitID] = true
         end
       end -- for

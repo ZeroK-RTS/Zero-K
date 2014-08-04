@@ -159,8 +159,13 @@ end
 
 function script.FireWeapon(num)
     local toChange = 3 - num
-	local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-    Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
+	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+	if reloadSpeedMult <= 0 then
+		-- Safety for div0. In theory a unit with reloadSpeedMult = 0 cannot fire because it never reloads.
+		reloadSpeedMult = 1
+	end
+	local reloadTimeMult = 1/reloadSpeedMult
+	Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime*reloadTimeMult)
 	if num == 2 then
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		if py < -8 then

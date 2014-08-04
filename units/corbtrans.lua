@@ -210,7 +210,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 200,
-      object           = [[heavytrans_d.3ds]],
+      object           = [[heavytrans_d.dae]],
       reclaimable      = true,
       reclaimTime      = 200,
     },

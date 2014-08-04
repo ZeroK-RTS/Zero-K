@@ -462,17 +462,22 @@ local myPlayerID = Spring.GetMyPlayerID()
 local defaultState = 1
 
 local function unitDraw(u1, u2)
-	glVertex(spGetUnitPosition(u1))
-	glVertex(CallAsTeam(myTeam, function () return spGetUnitPosition(u2) end))
+	local _,_,_,x1, y1, z1 = spGetUnitPosition(u1, true)
+	local _,_,_,x2, y2, z2 = CallAsTeam(myTeam, function () return spGetUnitPosition(u2, true) end)
+	glVertex(x1, y1, z1)
+	glVertex(x2, y2, z2)
 end
 
 local function unitDrawVisible(u1, u2)
-	glVertex(spGetUnitPosition(u1))
-	glVertex(spGetUnitPosition(u2))
+	local _,_,_,x1, y1, z1 = spGetUnitPosition(u1, true)
+	local _,_,_,x2, y2, z2 = spGetUnitPosition(u2, true)
+	glVertex(x1, y1, z1)
+	glVertex(x2, y2, z2)
 end
 
 local function terrainDraw(u, x, y, z)
-    glVertex(spGetUnitPosition(u))
+	local _,_,_,x1, y1, z1 = spGetUnitPosition(u, true)
+    glVertex(x1, y1, z1)
 	glVertex(x,y,z)
 end
 

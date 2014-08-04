@@ -96,10 +96,22 @@ local function option_workerUsageUpdate()
 	CreateWindow()
 end
 
+options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve'}
+ 
 options = { 
   eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
   onlyShowExpense = {name='Only Show Expense', type='bool', value=false},
-  enableReserveBar = {name='Enable Metal Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
+  enableReserveBar = {name='Enable Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
+  defaultEnergyReserve = {
+	name = "Initial Energy Reserve",
+	type = "number",
+	value = 0.05, min = 0, max = 1, step = 0.01,
+  },
+  defaultMetalReserve = {
+	name = "Initial Metal Reserve",
+	type = "number",
+	value = 0, min = 0, max = 1, step = 0.01,
+  },
   workerUsage = {name = "Show Worker Usage", type = "bool", value=false, OnChange = option_workerUsageUpdate},
   energyFlash = {name = "Energy Stall Flash", type = "number", value=0.1, min=0,max=1,step=0.02},
   opacity = {
@@ -151,6 +163,27 @@ function UpdateEconomyDataFromRulesParams()
 	WG.allies = allies
 end
 
+
+local function updateReserveBars(metal, energy, value, overrideOption)
+	if options.enableReserveBar.value or overrideOption then
+		if value < 0 then value = 0 end
+		if value > 1 then value = 1 end
+		if metal then
+			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
+			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
+			WG.metalStorageReserve = value*mStor
+			bar_metal_reserve_overlay:SetValue(value)
+		end
+		if energy then
+			local _, eStor = GetTeamResources(GetMyTeamID(), "energy")
+			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE)) 
+			WG.energyStorageReserve = value*(eStor - HIDDEN_STORAGE)
+			bar_energy_reserve_overlay:SetValue(value)
+		end
+	end
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -201,11 +234,18 @@ local function Format(input, override)
 	end
 end
 
+local initialReserveSet = false
 function widget:GameFrame(n)
 
 	if (n%32 ~= 2) or not window then 
         return 
     end
+	
+	if n > 5 and not initialReserveSet then
+		updateReserveBars(true, false, options.defaultMetalReserve.value, true)
+		updateReserveBars(false, true, options.defaultEnergyReserve.value, true)
+		initialReserveSet = true
+	end
 	
 	UpdateEconomyDataFromRulesParams()
 
@@ -432,6 +472,11 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function widget:Shutdown()
+	window:Dispose()
+	Spring.SendCommands("resbar 1")
+end
+
 function widget:Initialize()
 	Chili = WG.Chili
 
@@ -450,31 +495,6 @@ function widget:Initialize()
 	Spring.SendCommands("resbar 0")
 
 	CreateWindow()
-
-end
-
-function widget:Shutdown()
-	window:Dispose()
-	Spring.SendCommands("resbar 1")
-end
-
-local function updateReserveBars(metal, energy, value)
-	if options.enableReserveBar.value then
-		if value < 0 then value = 0 end
-		if value > 1 then value = 1 end
-		if metal then
-			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
-			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
-			WG.metalStorageReserve = value*mStor
-			bar_metal_reserve_overlay:SetValue(value)
-		end
-		if energy then
-			local _, eStor = GetTeamResources(GetMyTeamID(), "energy")
-			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE)) 
-			WG.energyStorageReserve = value*eStor
-			bar_energy_reserve_overlay:SetValue(value)
-		end
-	end
 end
 
 function CreateWindow()
@@ -548,8 +568,9 @@ function CreateWindow()
                 y      = p(100/bars),
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
-		OnMouseDown = {function() return true end},	-- this is needed for OnMouseUp to work
+		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
+			if widgetHandler:InTweakMode() then return end
 			local reserve = x / (self.width - self.padding[1] - self.padding[3])
 			updateReserveBars(true, mouse ~= 3, reserve)
 		end},
@@ -643,8 +664,9 @@ function CreateWindow()
                 y      = 1,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
-		OnMouseDown = {function() return true end},	-- this is needed for OnMouseUp to work
+		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
+			if widgetHandler:InTweakMode() then return end
 			local reserve = x / (self.width - self.padding[1] - self.padding[3])
 			updateReserveBars(mouse ~= 3, true, reserve)
 		end},

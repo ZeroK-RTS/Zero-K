@@ -7,7 +7,7 @@ function widget:GetInfo()
     desc      = "Automatically transports units going to factory waypoint.\n" ..
                 "Adds embark=call for transport and disembark=unload from transport command",
     author    = "Licho",
-    date      = "1.11.2007, 26.4.2014",
+    date      = "1.11.2007, 9.7.2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true
@@ -524,16 +524,21 @@ function AssignTransports(transportID, unitID)
   local best = {}
 --  Echo ("assigning " .. transportID .. " " ..unitID)
   if (transportID~=0) then
-     local transpeed = UnitDefs[GetUnitDefID(transportID)].speed
+     local unitDefID = GetUnitDefID(transportID)
+     local transpeed = UnitDefs[unitDefID].speed
+     local transMass = UnitDefs[unitDefID].mass 
+     local speedMod = 1
      for id, val in pairs(waitingUnits) do 
 	   local waitDefID = val[2]
        if CanTransport(transportID, id) and IsTransportable(waitDefID, id)  then
          local unitspeed = UnitDefs[waitDefID].speed
+         local unitmass = UnitDefs[waitDefID].mass
+         speedMod =  math.min(1, 3 * unitmass/(transMass +unitmass )) --see unit_transport_speed.lua gadget
 
          local ud = GetPathLength(id)
          local td = GetUnitSeparation(id, transportID, true)
 
-         local ttime = (td + ud) / transpeed + CONST_TRANSPORT_PICKUPTIME
+         local ttime = (td + ud) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
          local utime = (ud) / unitspeed
          local benefit = utime-ttime
          if (val[1]==ST_PRIORITY) then 
@@ -547,14 +552,19 @@ function AssignTransports(transportID, unitID)
   elseif (unitID ~=0) then
     local unitDefID = GetUnitDefID(unitID)
     local unitspeed = UnitDefs[unitDefID].speed
+    local unitmass = UnitDefs[unitDefID].mass
+    local speedMod = 1
     local state = waitingUnits[unitID][1]
     local ud = GetPathLength(unitID)
     for id, def in pairs(idleTransports) do 
       if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
         local transpeed = UnitDefs[def].speed
+        local transMass = UnitDefs[def].mass
+        speedMod =  math.min(1, 3 * unitmass/(transMass +unitmass )) --see unit_transport_speed.lua gadget
+
         local td = GetUnitSeparation(unitID, id, true)
 
-        local ttime = (td + ud) / transpeed + CONST_TRANSPORT_PICKUPTIME
+        local ttime = (td + ud) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
         local utime = (ud) / unitspeed
         local benefit = utime-ttime
         if (state==ST_PRIORITY) then 

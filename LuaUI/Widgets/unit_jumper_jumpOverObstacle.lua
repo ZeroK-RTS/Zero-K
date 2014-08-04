@@ -1,8 +1,8 @@
-local version = "v0.505"
+local version = "v0.506"
 function widget:GetInfo()
   return {
     name      = "Auto Jump Over Terrain",
-    desc      = version .. " Jumper automatically jump over terrain or buildings in its way.",
+    desc      = version .. " Jumper automatically jump over terrain or buildings if it shorten walk time.",
 	author    = "Msafwan",
     date      = "4 February 2014",
     license   = "GNU GPL, v2 or later",
@@ -42,9 +42,15 @@ local jumpersToJump_Count = 0
 local jumpersUnitID = {}
 
 local jumperDefs = {}
+local excludedJumper = { corsumo = true,} --because unit like sumo can jump into ally blob and kill them all
 local jumpNames = VFS.Include("LuaRules/Configs/jump_defs.lua") --list of unit able to jump
 for name, data in pairs(jumpNames) do --convert UnitName list into unitDefID list (copied from unit_bomber_command.lua by KingRaptor)
-	if UnitDefNames[name] then jumperDefs[UnitDefNames[name].id] = data end
+	if not excludedJumper[name] then
+		local unitDef = UnitDefNames[name]
+		if unitDef then 
+			jumperDefs[unitDef.id] = data
+		end
+	end
 end
 
 function widget:Initialize()
@@ -58,7 +64,7 @@ end
 
 function widget:GameFrame(n)
 	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: 
-		--check if any beacon-groups under lockdown for overextended time
+		--check if we were waiting for lag for too long
 		local currentSecond = spGetGameSeconds()
 		if waitForNetworkDelay then
 			if currentSecond - waitForNetworkDelay[1] > 4 then
