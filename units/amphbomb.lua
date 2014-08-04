@@ -58,7 +58,7 @@ unitDef = {
       [[custom:RAIDMUZZLE]],
       [[custom:VINDIBACK]],
       [[custom:RIOTBALL]],
-      [[custom:digdig]],
+      [[custom:digdig]], --EmitSfx(piece, 1024+3)
     },
 
   },
