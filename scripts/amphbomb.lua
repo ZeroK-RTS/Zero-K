@@ -22,7 +22,7 @@ local sa = math.rad(20)
 local ma = math.rad(60)
 local la = math.rad(100)
 local pause = 300
-local dirtfling = 1024+2
+local dirtfling = 1024 +3 --explosiongenerators=[[custom:digdig]]
 
 --variables
 local walking = false
@@ -103,7 +103,7 @@ local function Moving()
 	Spin(wheell2, x_axis, (12))
 	Spin(wheelr1, x_axis, (12))
 	Spin(wheelr2, x_axis, (12))
-	--StartThread( UnBurrow ) --decloak
+	StartThread( UnBurrow ) --decloak
 	walking = true
 	StartThread( Walk )
 end
@@ -119,7 +119,9 @@ function script.StopMoving()
 	StopSpin(wheell2, x_axis, (10))
 	StopSpin(wheelr1, x_axis, (10))
 	StopSpin(wheelr2, x_axis, (10))
-	--StartThread( Burrow ) --cloaked
+	if select(2,Spring.GetUnitPosition(unitID)) > 0 then
+		StartThread( Burrow ) --cloaked
+	end
 end
 
 function script.FireWeapon(num)
