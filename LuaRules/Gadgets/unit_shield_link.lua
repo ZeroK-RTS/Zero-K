@@ -121,6 +121,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				shieldMaxCharge  = shieldWep.shieldPower,
 				shieldRadius = shieldWep.shieldRadius,
 				shieldRegen  = shieldWep.shieldPowerRegen,
+				shieldRank   = ((shieldWep.shieldRadius > 200) and 2) or 1,
 				unitDefID    = unitDefID,
 				neighbors    = {},
 				neighborList = {count = 0},
@@ -228,9 +229,16 @@ local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 				if unitID ~= otherID then
 					otherData = shieldUnits[otherID]
 					if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) and 
-								otherData.enabled and ShieldsAreTouching(unitData, otherData) then
-						AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
-						AddThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
+							otherData.enabled and ShieldsAreTouching(unitData, otherData) then
+						if unitData.shieldRank == otherData.shieldRank then
+							AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
+							AddThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
+						elseif unitData.shieldRank < otherData.shieldRank then
+							-- The higher ranked shield does not initiate transfer with lower shields.
+							AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
+						else
+							AddThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
+						end
 					end
 				end
 			end -- for otherID
@@ -297,9 +305,7 @@ function gadget:GameFrame(n)
 				unitID = unitList[i]
 				unitData = allyTeamShields[allyTeamID][unitID]
 				if unitData.enabled ~= unitData.oldEnabled then --if unit was linked/unlinked but now stunned/unstunned (state changes)
-					if unitData.oldEnabled then
-						--RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
-					else
+					if not unitData.oldEnabled then
 						QueueLinkUpdate(allyTeamID,unitID)
 					end
 					unitData.oldEnabled = unitData.enabled
@@ -333,13 +339,14 @@ function gadget:GameFrame(n)
 	
 	-- Charge Distribution
 	--Distribute charge to random nearby neighbor
-	local drawChange = true --(n%6 == 0)
+	local drawChange = (n%10 == 0)
 	if n%2 == 0 then
 		for allyTeamID,unitList in pairs(allyTeamShieldList) do
 			local shieldUnits = allyTeamShields[allyTeamID]
 			local unitID, unitData, unitCharge
 			local otherID, otherData, otherCharge
-			local on, randomUnit, chargeFlow, attempt
+			local on, chargeFlow, attempt
+			local randomUnitIndex, randomNumberRange
 			for i = 1, unitList.count do
 				unitID = unitList[i]
 				unitData = shieldUnits[unitID]
@@ -353,8 +360,9 @@ function gadget:GameFrame(n)
 						-- The +1 is here intentionally to give units a chance to not link (because
 						-- otherID will be nil). This penalises the flow rate of units with few 
 						-- neighbors. 
-						randomUnit = math.random(1,unitData.neighborList.count + 1)
-						otherID = unitData.neighborList[randomUnit]
+						randomNumberRange = unitData.neighborList.count + 1
+						randomUnitIndex = math.random(1, randomNumberRange)
+						otherID = unitData.neighborList[randomUnitIndex]
 						if otherID then
 							otherData = allyTeamShields[allyTeamID][otherID]
 							if otherData then
@@ -378,6 +386,9 @@ function gadget:GameFrame(n)
 								RemoveThingFromIterable(otherID, unitData.neighbors, unitData.neighborList)
 								attempt = attempt + 1
 							end
+						elseif randomUnitIndex == randomNumberRange then
+							-- If I hit the end of the range I picked myself as a partner.
+							attempt = false
 						else
 							attempt = attempt + 1
 						end
@@ -385,7 +396,7 @@ function gadget:GameFrame(n)
 						attempt = false
 					end
 				end 
-				if chargeFlow < CHARGE_DRAW_THRESHOLD then
+				if chargeFlow < CHARGE_DRAW_THRESHOLD and drawChange then
 					spSetUnitRulesParam(unitID,"shield_link_unit",-1,unitRulesParamsSetting)
 				end
 			end
@@ -411,6 +422,8 @@ local glPopAttrib = gl.PopAttrib
 local GL_LINE_BITS = GL.LINE_BITS
 local GL_LINES     = GL.LINES
 
+local abs = math.abs
+
 local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
 local spGetSpectatingState = Spring.GetSpectatingState
 local spIsUnitInView       = Spring.IsUnitInView
@@ -418,6 +431,7 @@ local spValidUnitID        = Spring.ValidUnitID
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spGetUnitLosState    = Spring.GetUnitLosState
+local spGetGameFrame       = Spring.GetGameFrame
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -508,11 +522,14 @@ end
 
 function gadget:DrawWorld()
 	if shieldCount > 1 then
+		local frame = spGetGameFrame()
+		local alpha = 0.5-0.1*abs((frame%10) - 5)
+		
 		glPushAttrib(GL_LINE_BITS)
     
 		glDepthTest(true)
-		glColor(1,0,1,math.random()*0.2+0.3)
-		glLineWidth(1.2)
+		glColor(1,0,1,alpha)
+		glLineWidth(alpha+0.6)
 		glBeginEnd(GL_LINES, DrawFunc)
     
 		glDepthTest(false)
