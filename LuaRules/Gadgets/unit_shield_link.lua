@@ -37,7 +37,7 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 
 ------------
-local RECHARGE_KOEF = 0.01
+local RECHARGE_KOEF = 0.005
 local CHARGE_DRAW_THRESHOLD = 0.1
 
 ------------
@@ -217,8 +217,9 @@ local function ShieldsAreTouching(shield1, shield2)
 	return xDiff <= sumRadius and zDiff <= sumRadius and (xDiff*xDiff + yDiff*yDiff + zDiff*zDiff) < sumRadius*sumRadius 
 end
 
-local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
+local function AdjustLinks(allyTeamID, shieldList, unitUpdateList)
 	local unitData
+	local shieldUnits = allyTeamShields[allyTeamID]
 	for unitID,_ in pairs(unitUpdateList) do
 		unitData = shieldUnits[unitID]
 		if unitData and unitData.enabled then
@@ -227,10 +228,16 @@ local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 				otherID = shieldList[i]
 				if unitID ~= otherID then
 					otherData = shieldUnits[otherID]
-					if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) and 
-								otherData.enabled and ShieldsAreTouching(unitData, otherData) then
-						AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
-						AddThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
+					if not (otherData.neighbors[unitID] or unitData.neighbors[otherID]) then --not yet a neighbor
+						if otherData.enabled and ShieldsAreTouching(unitData, otherData) then
+							AddThingToIterable(otherID, unitData.neighbors, unitData.neighborList)
+							AddThingToIterable(unitID, otherData.neighbors, otherData.neighborList)
+						end
+					else
+						if not ShieldsAreTouching(unitData, otherData) then
+							RemoveThingFromIterable(otherID, unitData.neighbors,unitData.neighborList)
+							RemoveThingFromIterable(unitID, otherData.neighbors,otherData.neighborList)
+						end
 					end
 				end
 			end -- for otherID
@@ -238,7 +245,7 @@ local function AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
 	end	-- for unitID
 end
 
-local function UpdateAllLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
+local function UpdateAllLinks(allyTeamID, shieldList, unitUpdateList)
 	local unitData
 	for unitID,_ in pairs(unitUpdateList) do
 		unitData = allyTeamShields[allyTeamID][unitID]
@@ -255,7 +262,7 @@ local function UpdateAllLinks(allyTeamID, shieldUnits, shieldList, unitUpdateLis
 		end
 	end
 	
-	AdjustLinks(allyTeamID, shieldUnits, shieldList, unitUpdateList)
+	AdjustLinks(allyTeamID, shieldList, unitUpdateList)
 end
 
 local function UpdateEnabledState()
@@ -319,11 +326,11 @@ function gadget:GameFrame(n)
 			end
 		end
 		for allyTeamID,_ in pairs(updateAllyTeamLinks) do
-			UpdateAllLinks(allyTeamID,allyTeamShields[allyTeamID],allyTeamShieldList[allyTeamID],allyTeamShields[allyTeamID])
+			UpdateAllLinks(allyTeamID,allyTeamShieldList[allyTeamID],allyTeamShields[allyTeamID])
 			updateAllyTeamLinks[allyTeamID] = nil
 		end
 		for allyTeamID,unitToLink in pairs(updateLink) do
-			UpdateAllLinks(allyTeamID,allyTeamShields[allyTeamID],allyTeamShieldList[allyTeamID],unitToLink) --adjust/create link
+			UpdateAllLinks(allyTeamID,allyTeamShieldList[allyTeamID],unitToLink) --adjust/create link
 			updateLink[allyTeamID] = nil
 		end
 		
@@ -334,7 +341,7 @@ function gadget:GameFrame(n)
 	-- Charge Distribution
 	--Distribute charge to random nearby neighbor
 	local drawChange = true --(n%6 == 0)
-	if n%2 == 0 then
+	-- if n%2 == 0 then
 		for allyTeamID,unitList in pairs(allyTeamShieldList) do
 			local shieldUnits = allyTeamShields[allyTeamID]
 			local unitID, unitData, unitCharge
@@ -359,7 +366,7 @@ function gadget:GameFrame(n)
 							otherData = allyTeamShields[allyTeamID][otherID]
 							if otherData then
 								on, otherCharge = spGetUnitShieldState(otherID, -1)
-								if on and otherCharge and otherData.enabled and ShieldsAreTouching(unitData, otherData) then
+								if on and otherCharge and otherData.enabled  then --and ShieldsAreTouching(unitData, otherData) then
 									if (unitCharge > otherCharge) then
 										chargeFlow = DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)
 									else
@@ -390,7 +397,7 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
-	end
+	-- end
 end
 
 --------------------------------------------------------------------------------
