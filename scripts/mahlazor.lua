@@ -47,7 +47,7 @@ function TargetingLaser()
 				EmitSfx( flashpoint,  FIRE_W5 )
 			end
 		else
-				EmitSfx( flashpoint,  FIRE_W6 )
+			--EmitSfx( flashpoint,  FIRE_W6 )
 		end
 		
 		Sleep(30)
