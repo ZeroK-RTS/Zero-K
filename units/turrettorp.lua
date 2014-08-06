@@ -79,7 +79,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 180,
+        default = 190,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
