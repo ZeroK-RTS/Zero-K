@@ -1,4 +1,4 @@
-local version = "0.1.2"
+local version = "0.1.3"
 
 function gadget:GetInfo()
 	return {
@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		author		= "Tom Fyuri",		-- original gadget was mapmod for trololo by banana_Ai, this is revamped version as a zk anymap gamemode. Thanks Anarchid!
 		date		= "Mar 2014",
 		license		= "GPL v2 or later",
-		layer		= -3,
+		layer		= math.huge,
 		enabled	 	= true
 	}
 end
