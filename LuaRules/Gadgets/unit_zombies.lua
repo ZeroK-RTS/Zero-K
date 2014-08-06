@@ -15,6 +15,7 @@ end
 --SYNCED-------------------------------------------------------------------
 
 -- changelog
+-- 6 august 2014 - 0.1.3. Some magic which might fix crash. (At least it fixed the original zombie gadget)
 -- 7 april 2014 - 0.1.2. Added permaslow option. Default on. 50% is max slow for now.
 -- 5 april 2014 - 0.1.1. Sfx, gfx, factory orders added. Slow down upon reclaim added. Thanks Anarchid.
 -- 5 april 2014 - 0.1.0. Release.
