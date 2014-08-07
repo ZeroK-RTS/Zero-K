@@ -22,8 +22,8 @@ local function Open ()
 	SetSignalMask (1)
 
 	-- move the pieces
-	Turn (roofl, z_axis, math.rad(90), math.rad(90))
-	Turn (roofr, z_axis, math.rad(-90), math.rad(90))
+	Turn (roofl, z_axis, math.rad(-90), math.rad(90))
+	Turn (roofr, z_axis, math.rad(90), math.rad(90))
 	Turn (doorl, y_axis, math.rad(90), math.rad(150))
 	Turn (doorr, y_axis, math.rad(-90), math.rad(150))
 	
@@ -31,7 +31,7 @@ local function Open ()
 	Turn (arm2, x_axis, math.rad(-75), math.rad(50))
 		
 	Move (pipesl, x_axis, 7.4, 3.7)
-	Move (pipesr, x_axis, 7.4, 3.7)
+	Move (pipesr, x_axis, -7.4, 3.7)
 	Move (pipesl, y_axis, 8.8, 4.4)
 	Move (pipesr, y_axis, 8.8, 4.4)
 
@@ -80,8 +80,8 @@ local function Close()
 end
 
 function script.Create()
-	Turn (pipesl, z_axis, math.rad(-40))
-	Turn (pipesr, z_axis, math.rad(40))
+	Turn (pipesl, z_axis, math.rad(40))
+	Turn (pipesr, z_axis, math.rad(-40))
 
 	StartThread (SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces (unitID, nanoPieces)
