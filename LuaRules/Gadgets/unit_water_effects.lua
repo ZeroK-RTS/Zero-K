@@ -41,7 +41,7 @@ local function updateWeaponFromTank(unitID)
 
 	local proportion = unit[unitID].storage/effect.tankMax
 
-	local projectiles = math.floor(proportion*effect.bonusProjectiles)+1
+	local projectiles = math.floor(proportion*effect.bonusProjectiles)+2
 	
 	spSetUnitRulesParam(unitID, "water_projectiles", projectiles)
 	

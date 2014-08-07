@@ -16,7 +16,7 @@ local unitDefData = {
 		healthRegen = 40,
 		submergedAt = 40,
 		baseHeight = 5,
-		bonusProjectiles = 7.5,
+		bonusProjectiles = 6.5,
 		scalingRange = 200,
 		baseRange = 100,
 	},
@@ -27,16 +27,16 @@ local unitDefData = {
 		healthRegen = 10,
 		submergedAt = 40,
 		baseHeight = 20,
-		bonusProjectiles = 19,
+		bonusProjectiles = 5.5,
 		scalingRange = 0,
-		baseRange = 280,
+		baseRange = 250,
 	},
 	[UnitDefNames["amphcon"].id] = {
 		healthRegen = 10,
 		submergedAt = 40,
 	},
 	[UnitDefNames["amphraider3"].id] = {
-		healthRegen = 10,
+		healthRegen = 5,
 		submergedAt = 40,
 	},
 	[UnitDefNames["amphfloater"].id] = {
