@@ -131,18 +131,14 @@ unitDef = {
       numbounce               = 4,
       noSelfDamage            = true,
       predictBoost            = 1,
-<<<<<<< HEAD
       projectiles	      	  = 2,
-      range                   = 120,
+      range                   = 250,
 =======
       projectiles             = 2,
       range                   = 250,
->>>>>>> 1567badd3eb3de28663026d8b3e3532cd1c90e56
       reloadtime              = 4,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
-      soundStartVolume        = 0.7,
-      soundHitVolume        = 0.7,
       startVelocity           = 100,
       tolerance               = 1000,
       tracks                  = true,
