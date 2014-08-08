@@ -656,8 +656,11 @@ end
 -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 
 local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
+	if unitPaybackTeamID[unitID] then
+		-- Only add units to payback once.
+		return
+	end
 	local def = paybackDefs[unitDefID]
-
 	unitPaybackTeamID[unitID] = unitTeam
 	teamPayback[unitTeam] = teamPayback[unitTeam] or {count = 0, toRemove = {}, data = {}}
 	
