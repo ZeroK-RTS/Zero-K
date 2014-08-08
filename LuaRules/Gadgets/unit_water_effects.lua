@@ -41,13 +41,13 @@ local function updateWeaponFromTank(unitID)
 
 	local proportion = unit[unitID].storage/effect.tankMax
 
-	local projectiles = math.floor(proportion*6.5)+2
+	local projectiles = math.floor(proportion*effect.bonusProjectiles)+2
 	
 	spSetUnitRulesParam(unitID, "water_projectiles", projectiles)
 	
 	-- these numbers are configable too!!!
 	Spring.SetUnitWeaponState(unitID, 1, {
-		range = proportion*200 + 100,
+		range = proportion*effect.scalingRange + effect.baseRange,
 		projectileSpeed = proportion*10+8,
 		projectiles = projectiles,
 	})
