@@ -78,6 +78,9 @@ local function ProcessUnitDef(udName, ud)
     if (fd) then
       fd.resurrectable = 1
       ud.corpse = fullName
+	  --if fd.metal ~= ud.buildcostmetal*0.4 or fd.damage ~= ud.maxdamage then
+	  --  Spring.Echo(ud.name)
+	  --end
     end
   end
 

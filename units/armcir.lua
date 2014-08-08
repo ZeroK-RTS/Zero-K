@@ -151,10 +151,10 @@ unitDef = {
       footprintZ       = 4,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 320,
-      object           = [[chainsaw_d.3ds]],
+      metal            = 360,
+      object           = [[chainsaw_d.dae]],
       reclaimable      = true,
-      reclaimTime      = 320,
+      reclaimTime      = 360,
     },
 
     HEAP  = {
@@ -167,10 +167,10 @@ unitDef = {
       footprintZ       = 3,
       height           = [[4]],
       hitdensity       = [[100]],
-      metal            = 160,
+      metal            = 180,
       object           = [[debris3x3a.s3o]],
       reclaimable      = true,
-      reclaimTime      = 160,
+      reclaimTime      = 180,
     },
 
   },

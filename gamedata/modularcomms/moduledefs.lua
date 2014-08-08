@@ -198,7 +198,7 @@ upgrades = {
 	},
 	weaponmod_disruptor_ammo = {
 		name = "Disruptor Ammo",
-		description = "Shotgun/Gauss Rifle/Heavy Machine Gun/Shock Rifle: +40% slow damage",
+		description = "Shotgun/Heavy Machine Gun/Shock Rifle: +40% slow damage",
 		func = function(unitDef)
 				local permitted = {
 					commweapon_shotgun = true,
@@ -268,7 +268,7 @@ upgrades = {
 	},	
 	weaponmod_high_caliber_barrel = {
 		name = "High Caliber Barrel",
-		description = "Shotgun/Riot Cannon/Gauss Rifle/Assault Cannon/Plasma Artillery: +150% damage, +100% reload time",
+		description = "Shotgun/Riot Cannon/Assault Cannon/Plasma Artillery: +150% damage, +100% reload time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {

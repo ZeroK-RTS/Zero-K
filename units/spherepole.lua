@@ -139,7 +139,7 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       metal            = 100,
-      object           = [[scythe_d.3ds]],
+      object           = [[scythe_d.dae]],
       reclaimable      = true,
       reclaimTime      = 100,
     },

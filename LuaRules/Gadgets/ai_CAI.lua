@@ -2797,21 +2797,6 @@ local function initialiseFaction(team)
 	if true then	--if shortname == "ZK" then
 		a.buildDefs = a.buildConfig.robots
 		return true
-	else	-- CA reverse compatibility	-- remove?
-		local units = spGetTeamUnits(team)
-		for i = 1, #units do
-			local ud = UnitDefs[spGetUnitDefID(units[i])]
-			if ud.customParams then
-				local faction = ud.customParams.factionname
-				if faction == "arm" then
-					a.buildDefs = a.buildConfig.arm
-					return true
-				elseif faction == "core" then
-					a.buildDefs = a.buildConfig.core
-					return true
-				end
-			end
-		end
 	end
 	
 	return false
@@ -3353,7 +3338,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					controlledUnit.turretByID[unitID] = {index = controlledUnit.turret.count, ud = ud,x = x, y = y, z = z, cost = ud.metalCost, finished = false, air = not ud.weapons[1].onlyTargets.land }
 				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0 or (ud.customParams and ud.customParams.windgen)) then
 					local x,y,z = spGetUnitPosition(unitID)
-					if not built then
+					if econByDefId and econByDefId[unitDefID] and (not built) then
 						editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
 					end
 					controlledUnit.econ.cost = controlledUnit.econ.cost + ud.metalCost
@@ -3558,7 +3543,7 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 			activeBpToMetalRatio = 0,
 		},
 		
-		buildDefs = false,
+		buildDefs = nil,
 		
 		selfDefenceHeatmap = {},
 		
@@ -4106,7 +4091,7 @@ end
 
 function gadget:Load(zip)
 	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: CAI failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI failed to access save/load API")
 		return
 	end
 	local data = GG.SaveLoad.ReadFile(zip, "CAI", SAVE_FILE) or {}
@@ -4209,7 +4194,7 @@ end
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: CAI failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI failed to access save/load API")
 		return
 	end
 	local allyTeamData = MakeRealTable(SYNCED.allyTeamData)

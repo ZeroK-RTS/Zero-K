@@ -38,17 +38,17 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
         end
       end
     end
-	if(Spring.GetModOption("air_ploppable", true, "1")) then
-		for i, v in pairs(air_ploppables) do
-		  local name = UnitDefNames[v]
-		  if name then
-			local ud = name.id
-			if ud then
-			  ploppableDefs[ud] = true
-			end
-		  end
-		end
-	end
+    if(Spring.GetModOption("air_ploppable", true, true)) then
+	    for i, v in pairs(air_ploppables) do
+	      local name = UnitDefNames[v]
+	      if name then
+		    local ud = name.id
+		    if ud then
+		      ploppableDefs[ud] = true
+		    end
+	      end
+	    end
+    end
   end
   
   function GG.GiveFacplop(unitID)
@@ -358,17 +358,17 @@ function gadget:Initialize()
         end
       end
     end
-	if(Spring.GetModOption("air_ploppable", true, "1")) then
-		for i, v in pairs(air_ploppables) do
-		  local name = UnitDefNames[v]
-		  if name then
-			local ud = name.id
-			if ud then
-			  ploppableDefs[ud] = true
-			end
-		  end
-		end
-	end
+    if(Spring.GetModOption("air_ploppable", true, true)) then
+	    for i, v in pairs(air_ploppables) do
+	      local name = UnitDefNames[v]
+	      if name then
+		    local ud = name.id
+		    if ud then
+		      ploppableDefs[ud] = true
+		    end
+	      end
+	    end
+    end
   end
 
   -- needed if you reload luarules
@@ -404,7 +404,7 @@ function gadget:Initialize()
   ]]--
 end
 
-local forcejunior = Spring.GetModOption("forcejunior", true, "0")
+local forcejunior = Spring.GetModOption("forcejunior", true, false)
 
 local function GetStartUnit(teamID, playerID, isAI)
 
@@ -816,6 +816,9 @@ local function workAroundSpecsInTeamZero(playerlist, team)
 end
 
 function gadget:GameStart()
+	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
+		return
+	end
   gamestart = true
 
   -- shuffle start unit positions
@@ -983,7 +986,7 @@ end
 
 function gadget:Load(zip)
 	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Start Unit Setup failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
 		return
 	end
 	loadGame = true
@@ -997,7 +1000,10 @@ function gadget:Load(zip)
 	teamSidesAI = data.teamSidesAI or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
+	boost = data.boost
+	facplops = data.facplops
 	
+	--[[
 	-- these require special handling because they involve unitIDs
 	for oldID in pairs(data.boost) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
@@ -1006,7 +1012,8 @@ function gadget:Load(zip)
 	for oldID in pairs(data.facplops) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
 		GG.GiveFacplop(newID)
-	end	
+	end
+	]]
 end
 
 --------------------------------------------------------------------
@@ -1139,7 +1146,7 @@ end
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Start Unit Setup failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
 		return
 	end
 	local toSave = {

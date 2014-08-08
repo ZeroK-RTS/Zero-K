@@ -164,7 +164,7 @@ function WG.SaveTable(tab, fileName, tabName, params)
 	params = params or {}
 	local file,err = io.open(fileName, "w")
 	if (err) then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, err)
+		Spring.Log(widget:GetInfo().name, LOG.WARNING, err)
 		return
 	end
 	file:write(WriteTable(tab, tabName, params))
@@ -224,7 +224,7 @@ function WG.SavePythonDict(fileName, dict, dictName, params)
 	params = params or {}
 	local file,err = io.open (fileName, "w")
 	if (err) then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, err)
+		Spring.Log(widget:GetInfo().name, LOG.WARNING, err)
 		return
 	end
 	file:write(WritePythonDict(dict, dictName, params))

@@ -153,7 +153,10 @@ function comma_value(amount, displayPlusMinus)
 	-- amount is a string when ToSI is used before calling this function
 	if type(amount) == "number" then
 		if (amount ==0) then formatted = "0" else 
-			if (amount < 20 and (amount * 10)%10 ~=0) then 
+			if (amount < 2 and (amount * 100)%100 ~=0) then 
+				if displayPlusMinus then formatted = strFormat("%+.2f", amount)
+				else formatted = strFormat("%.2f", amount) end 
+			elseif (amount < 20 and (amount * 10)%10 ~=0) then 
 				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
 				else formatted = strFormat("%.1f", amount) end 
 			else 
@@ -305,7 +308,12 @@ end
 local function weapons2Table(cells, weaponStats, ws)
 	local cells = cells
 	if ws.isShield then
-		cells[#cells+1] = ws.wname
+		local name_str = ws.wname
+		if ws.count > 1 then
+			name_str = name_str .. " x " .. ws.count
+		end
+		
+		cells[#cells+1] = name_str
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Strength:'
 		cells[#cells+1] = ws.power

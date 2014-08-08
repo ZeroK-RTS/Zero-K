@@ -49,11 +49,15 @@ for i=1, #UnitDefs do
 	end
 end
 
+local unitHealthRatioOverride = {
+	[UnitDefNames["corfav"].id] = 4,
+}
+
 -- Pregenerate HP ratio
 local unitHealthRatio = {}
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
-	unitHealthRatio[i] = ud.health/ud.buildTime
+	unitHealthRatio[i] = unitHealthRatioOverride[i] or ud.health/ud.buildTime
 end
 
 -- Harcode the things which are too fast to hit
@@ -106,10 +110,19 @@ for i=1, #UnitDefs do
 end
 
 --[[
--- Sorting here makes the gadget fail, it is just good for looking at the priorities
+-- Check to output expected priority values.
+local baseUnitPriority = {}
+for i=1, #UnitDefs do
+	local ud = UnitDefs[i]
+	baseUnitPriority[i] = {
+		priority = unitHealthRatioOverride[i] or ud.health/ud.buildTime,
+		name = ud.name,
+	}
+end
+
 table.sort(baseUnitPriority, function(a,b) return (a.priority > b.priority) end)
 for i=1, #baseUnitPriority do
-	Spring.Echo(" UnitDefNames[\"" .. baseUnitPriority[i].name .. "\"] = " .. baseUnitPriority[i].priority .. ",")
+	Spring.Echo(baseUnitPriority[i].name .. " = " .. baseUnitPriority[i].priority .. ",")
 end
 --]]
 

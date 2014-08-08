@@ -20,7 +20,6 @@ end
 local mexDefs = {}
 --local energyDefs = {}
 local pylonDefs = {}
-local linkdefs = {}
 local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 
 local communismOverdrive = odSharingModOptions == "communism"
@@ -127,7 +126,6 @@ local spGetTeamInfo       = Spring.GetTeamInfo
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local takenMexId = {} -- mex ids that are taken by disabled pylons
 local notDestroyed = {}
 
 local mexes = {}   -- mexes[teamID][gridID][unitID] == mexMetal
@@ -259,7 +257,7 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- Information Sharin to Widget functions
+-- Information Sharing to Widget functions
 
 local privateTable = {private = true}
 
@@ -351,12 +349,15 @@ local function AddPylonToGrid(unitID)
 			for pid,_ in pairs(ai.grid[oldGridID].pylon) do
 				local pylonData = pylon[allyTeamID][pid]
 				pylonData.gridID = newGridID
-				for mid,_ in pairs(pylonData.mex) do
+				--NOTE: since mex became a pylon it no longer store list of mex, now only store itself as mex
+				if pylonData.mex then
+					local mid = pid
 					mexes[allyTeamID][newGridID][mid] = mexes[allyTeamID][oldGridID][mid]
 					mexByID[mid].gridID = newGridID
 					mexes[allyTeamID][oldGridID][mid] = nil
 				end
 				ai.grid[newGridID].pylon[pid] = true
+				spSetUnitRulesParam(pid,"gridNumber",newGridID,alliedTrueTable)
 			end
 			--[[for eid,_ in pairs(ai.grid[oldGridID].plant) do
 				ai.grid[newGridID].plant[eid] = true
@@ -369,10 +370,12 @@ local function AddPylonToGrid(unitID)
 	
 	ai.grid[newGridID].pylon[unitID] = true
 	pylon[allyTeamID][unitID].gridID = newGridID
+	spSetUnitRulesParam(unitID,"gridNumber",newGridID,alliedTrueTable)
 	
 	-- add econ to new grid
 	-- mexes
-	for mid,_ in pairs(pylon[allyTeamID][unitID].mex) do
+	if pylon[allyTeamID][unitID].mex then
+		local mid = unitID
 		local orgMetal = mexes[allyTeamID][0][mid]
 		ai.mexMetal = ai.mexMetal + orgMetal
 		ai.mexSquaredSum = ai.mexSquaredSum + (orgMetal * orgMetal)
@@ -410,7 +413,7 @@ local function RemovePylonsFromGridQueue(unitID)
 	end
 end
 
-local function AddPylon(unitID, unitDefID, unitOverdrive, range)
+local function AddPylon(unitID, unitDefID, isMex, range)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
@@ -422,7 +425,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	pylon[allyTeamID][unitID] = {
 		gridID = 0,
 		--mexes = 0,
-		mex = {},
+		mex = isMex,
 		nearPylon = {},
 		linkRange = range,
 		mexRange = 10,
@@ -430,7 +433,6 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 		x = pX,
 		z = pZ,
 		neededLink = pylonDefs[unitDefID].neededLink,
-		overdrive = unitOverdrive, 
 		active = true,
 	}
 	
@@ -446,6 +448,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	end
 	
 	-- check for mexes
+	--[[
 	if unitOverdrive then 
 		for mid, orgMetal in pairs(mexes[allyTeamID][0]) do
 			local mX,_,mZ = spGetUnitPosition(mid)
@@ -453,7 +456,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 			--if (pX-mX)^2 + (pZ-mZ)^2 <= range^2 and not takenMexId[mid] then
 			
 				--pylon[allyTeamID][unitID].mexes = pylon[allyTeamID][unitID].mexes + 1
-				pylon[allyTeamID][unitID].mex[mid] = true
+				pylon[allyTeamID][unitID].mex = true
 				--takenMexId[mid] = true
 				
 				--if pylon[allyTeamID][unitID].mexes >= PYLON_MEX_LIMIT then
@@ -462,6 +465,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 			end
 		end
 	end
+	--]]
 	
 	-- check for energy
 	--[[
@@ -479,18 +483,19 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	QueueAddPylonToGrid(unitID)
 end
 
-local function DestoryGrid(allyTeamID,oldGridID)
+local function DestroyGrid(allyTeamID,oldGridID)
 	local ai = allyTeamInfo[allyTeamID]
 	
 	if debugMode then
-		Spring.Echo("DestoryGrid " .. oldGridID)
+		Spring.Echo("DestroyGrid " .. oldGridID)
 	end
 	
 	for pid,_ in pairs(ai.grid[oldGridID].pylon) do
 		pylon[allyTeamID][pid].gridID = 0
 		pylon[allyTeamID][pid].nearPylon = {}
 		
-		for mid,_ in pairs(pylon[allyTeamID][pid].mex) do
+		if (pylon[allyTeamID][pid].mex) then
+			local mid = pid
 			local orgMetal = mexes[allyTeamID][oldGridID][mid]
 			mexes[allyTeamID][oldGridID][mid] = nil
 			mexes[allyTeamID][0][mid] = orgMetal
@@ -513,7 +518,7 @@ local function ReactivatePylon(unitID)
 		Spring.Echo("ReactivatePylon " .. unitID)
 	end
 	
-	local pX,_,pZ = spGetUnitPosition(unitID)
+	--local pX,_,pZ = spGetUnitPosition(unitID)
 	
 	pylon[allyTeamID][unitID].active = true
 
@@ -549,7 +554,7 @@ local function DeactivatePylon(unitID)
 		local pylonMap = ai.grid[oldGridID].pylon
 		local energyList = pylon[allyTeamID][unitID].nearEnergy
 		
-		DestoryGrid(allyTeamID,oldGridID)
+		DestroyGrid(allyTeamID,oldGridID)
 		
 		for pid,_ in pairs(pylonMap) do
 			if (pid ~= unitID) then
@@ -583,13 +588,13 @@ local function RemovePylon(unitID)
 	local oldGridID = pylon[allyTeamID][unitID].gridID
 	local activeState = pylon[allyTeamID][unitID].active
 	
-	local mexList = pylon[allyTeamID][unitID].mex
+	local isMex = pylon[allyTeamID][unitID].mex
 	
 	if activeState and oldGridID ~= 0 then
-		local pylonMap = ai.grid[oldGridID].pylon	
+		local pylonMap = ai.grid[oldGridID].pylon
 		local energyList = pylon[allyTeamID][unitID].nearEnergy
 	
-		DestoryGrid(allyTeamID,oldGridID)
+		DestroyGrid(allyTeamID,oldGridID)
 		
 		for pid,_ in pairs(pylonMap) do
 			if (pid ~= unitID) then
@@ -607,29 +612,13 @@ local function RemovePylon(unitID)
 	pylon[allyTeamID][unitID] = nil
 	
 	-- mexes
-	for mid,_ in pairs(mexList) do
+	if isMex then
+		local mid = unitID
 		local orgMetal = mexes[allyTeamID][0][mid]
 		mexes[allyTeamID][0][mid] = nil
 		mexByID[mid] = nil
-		local mexGridID = 0
-		takenMexId[mid] = false
-		
-		local mX, _, mZ = spGetUnitPosition(mid)
-		
-		local list = pylonList[allyTeamID]
-		for i = 1, list.count do
-			local pid = list.data[i]
-			local pylonData = pylon[allyTeamID][pid]
-			if pylonData then
-				if pid == mid then
-					pylonData.mex[mid] = true
-					mexGridID = pylonData.gridID
-					break
-				end
-			elseif not spammedError then
-				Spring.Echo("Pylon problem detected in RemovePylon.")
-			end
-		end
+		local mexGridID = oldGridID --Note: mexGridID is oldGridID of this pylon because mex is this pylon
+		-- takenMexId[mid] = false
 		
 		mexes[allyTeamID][mexGridID][mid] = orgMetal
 		mexByID[mid].gridID = mexGridID
@@ -834,9 +823,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 				
 				if reCalc then
 					break
-				end		
+				end
 			end
-		end			
+		end
 	end
 	
 	for unitID, value in pairs(mexBaseMetal) do
@@ -1122,7 +1111,7 @@ function gadget:GameFrame(n)
 					
 					spSetUnitRulesParam(unitID, "gridefficiency", gridEfficiency, alliedTrueTable)
 					
-					if not pylonData.overdrive then
+					if not pylonData.mex then
 						local unitDefID = spGetUnitDefID(unitID)
 						local unitDef = unitDefID and UnitDefs[unitDefID]
 						if not unitDef then
@@ -1279,22 +1268,10 @@ local function AddMex(unitID, teamID, metalMake)
 		
 		spCallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
 		local mexGridID = 0
-		local mX, _, mZ = spGetUnitPosition(unitID)
-		local list = pylonList[allyTeamID]
-		for i = 1, list.count do
-			local pid = list.data[i]
-			local pylonData = pylon[allyTeamID][pid]
-			if pylonData then
-				if unitID == pid then -- self OD mexes
-				--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2  then
-					--pylonData.mexes = pylonData.mexes+1
-					pylonData.mex[unitID] = true
-					mexGridID = pylonData.gridID
-					break
-				end
-			elseif not spammedError then
-				Spring.Echo("Pylon problem detected in AddMex.")
-			end
+		local pylonData = pylon[allyTeamID][unitID]
+		if pylonData then
+			pylonData.mex = true --in case some magical case where pylon was initialized as not mex, then became mex?
+			mexGridID = pylonData.gridID
 		end
 		mexes[allyTeamID][mexGridID][unitID] = metalMake
 		mexByID[unitID].gridID = mexGridID
@@ -1326,18 +1303,9 @@ local function RemoveMex(unitID)
 			ai.mexMetal = ai.mexMetal - orgMetal
 			ai.mexSquaredSum = ai.mexSquaredSum - (orgMetal * orgMetal)
 		end
-		local list = pylonList[mex.allyTeamID]
-		for i = 1, list.count do
-			local pid = list.data[i]
-			local pylonData = pylon[mex.allyTeamID][pid]
-			if pylonData then
-				if (pylonData.mex[unitID] ~= nil) then
-					--pylonData.mexes = pylonData.mexes - 1
-					pylonData.mex[unitID] = nil
-				end
-			elseif not spammedError then
-				Spring.Echo("Pylon problem detected in RemoveMex.")
-			end
+		local pylonData = pylon[mex.allyTeamID][unitID]
+		if pylonData then
+			pylonData.mex = nil --for some magical case where mex is to be removed but the pylon not?
 		end
 		mexes[mex.allyTeamID][mex.gridID][unitID] = nil
 		mexByID[unitID] = nil
@@ -1424,6 +1392,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		end
 	end
 	if pylonDefs[unitDefID] then
+		--Note: pylon was added in UnitFinished() when resurrected.
 		notDestroyed[unitID] = true
 	end
 end
