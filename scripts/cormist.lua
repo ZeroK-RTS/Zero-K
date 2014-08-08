@@ -1,12 +1,12 @@
 include "constants.lua"
 
-local base, body, turret, arms, firepoint1, firepoint2, exhaust1, exhaust2, gun, cab, connection,
+local base, aim, rockbase, body, turret, arms, firepoint1, firepoint2, exhaust1, exhaust2, gun, cab, connection,
 	rwheel1, rwheel2, rwheel3,
 	lwheel1, lwheel2, lwheel3,
 	gs1r, gs2r, gs3r,
 	gs1l, gs2l, gs3l 
 = piece(
-	"base", "body", "turret", "arms", "firepoint1", "firepoint2", "exhaust1", "exhaust2", "gun", "cab", "connection",
+	"base", "aim", "rockbase", "body", "turret", "arms", "firepoint1", "firepoint2", "exhaust1", "exhaust2", "gun", "cab", "connection",
 	"rwheel1", "rwheel2", "rwheel3",
 	"lwheel1", "lwheel2", "lwheel3", 
 	"gs1r", "gs2r", "gs3r",
@@ -25,7 +25,7 @@ local gunPieces = {
 	[1] = {firepoint = firepoint1, exhaust = exhaust1},
 	[2] = {firepoint = firepoint2, exhaust = exhaust2}
 }
-local gun = 1
+local shot = 1
 
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetPiecePosition = Spring.GetUnitPiecePosition
@@ -127,10 +127,10 @@ local function AnimControl()
 		-- Turn slowly for small course corrections
 		if math.abs(diffHeading) < 0.02 then
 			Turn( cab , y_axis, pivotAngle*2, PIVOT_SPEED*0.5)
-			Turn( base , y_axis, -pivotAngle*0.2, PIVOT_SPEED*0.5)
+			Turn( rockbase , y_axis, -pivotAngle*0.2, PIVOT_SPEED*0.5)
 		else
 			Turn( cab , y_axis, pivotAngle*2, PIVOT_SPEED )
-			Turn( base , y_axis, -pivotAngle*0.2, PIVOT_SPEED)
+			Turn( rockbase , y_axis, -pivotAngle*0.2, PIVOT_SPEED)
 		end
 		
 		lastHeading = currHeading
@@ -226,9 +226,9 @@ function Suspension()
 			yv = yv*0.99 + ya
 			yp = yp*0.98 + yv
 
-			Move( base , y_axis, yp , 9000 )
-			--Turn( base , x_axis, xtilt, math.rad(9000) )
-			Turn( base , z_axis, -ztilt, math.rad(9000) )
+			Move( rockbase , y_axis, yp , 9000 )
+			--Turn( rockbase , x_axis, xtilt, math.rad(9000) )
+			Turn( rockbase , z_axis, -ztilt, math.rad(9000) )
 
 			Move( rwheel1, y_axis, s1r, 20)
 			Move( rwheel2, y_axis, s2r, 20)
@@ -251,11 +251,11 @@ end
 
 -- Weapons
 function script.AimFromWeapon()
-	return gun
+	return aim
 end
 
 function script.QueryWeapon()
-	return gunPieces[gun].firepoint
+	return gunPieces[shot].firepoint
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -277,11 +277,11 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot()
-	EmitSfx( gunPieces[gun].firepoint,  UNIT_SFX1 )
-	EmitSfx( gunPieces[gun].exhaust,  UNIT_SFX2 )
-	gun = gun + 1
-	if gun == 3 then 
-		gun = 1
+	EmitSfx( gunPieces[shot].firepoint,  UNIT_SFX1 )
+	EmitSfx( gunPieces[shot].exhaust,  UNIT_SFX2 )
+	shot = shot + 1
+	if shot == 3 then 
+		shot = 1
 	end
 end
 
