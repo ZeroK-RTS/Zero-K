@@ -139,7 +139,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 36,
-      object           = [[gnat_d.3ds]],
+      object           = [[gnat_d.dae]],
       reclaimable      = true,
       reclaimTime      = 36,
     },

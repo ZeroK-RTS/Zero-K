@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.322 Chili Crude Player List.",
+    desc      = "v1.327 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -154,7 +154,7 @@ options = {
 		name = "Show spectators",
 		type = 'bool',
 		value = false,
-		desc = "Show spectators in main window (rather than confining them to tooltip)",
+		desc = "Show spectators in main window (rather than confining them to tooltip. Note: tooltip might block mouse click in some cases)",
 		OnChange = function() SetupPlayerNames() end,
 	},
 	allyTeamPerTeam = {
@@ -169,7 +169,15 @@ options = {
 		type = 'bool',
 		value = false,
 		desc = "Enables some debug messages (disable if it starts flooding console)",
-	},	
+	},
+	mousewheel = {
+		name = "Scroll with mousewheel",
+		type = 'bool',
+		value = true,
+		OnChange = function(self) 
+				scroll_cpl.ignoreMouseWheel = not self.value;
+			end,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -262,7 +270,7 @@ end
 -- not shown if they're in playerlist as well
 local function MakeSpecTooltip()
 	if options.showSpecs.value then
-		window_cpl.tooltip = nil
+		scroll_cpl.tooltip = nil
 		return
 	end
 	
@@ -288,7 +296,7 @@ local function MakeSpecTooltip()
 		local cpu = math.round(specsSorted[i].cpu*100)
 		windowTooltip = windowTooltip .. "\n\t"..specsSorted[i].name.."\t"..cpuCol..(cpu)..'%\008' .. "\t"..pingCol..PingTimeOut(specsSorted[i].ping).."\008"
 	end
-	window_cpl.tooltip = windowTooltip
+	scroll_cpl.tooltip = windowTooltip --tooltip in display region only (window_cpl have soo much waste space)
 end
 
 -- updates ping and CPU for all players; name if needed
@@ -825,8 +833,27 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = x_bound,
+	}
+	scroll_cpl = ScrollPanel:New{
+		parent = window_cpl,
+		width = "100%",
+		maxWidth = x_bound, --in case window_cpl is upsized to ridiculous size
+		--height = "100%",
+		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
+		borderColor = {1,1,1,options.backgroundOpacity.value},
+		--padding = {0, 0, 0, 0},
+		--autosize = true,
+		scrollbarSize = 6,
+		horizontalScrollbar = false,
+		ignoreMouseWheel = not options.mousewheel.value,
 		NCHitTest = function(self,x,y)
+			local alt,ctrl, meta,shift = Spring.GetModKeyState()
+			local _,_,lmb,mmb,rmb = Spring.GetMouseState()
+			if (shift or ctrl or alt) or (mmb or rmb) or ((not self.tooltip or self.tooltip=="") and not (meta and lmb))  then --hover over window will intercept mouse, pressing right-mouse or middle-mouse or shift or ctrl or alt will stop intercept
+				return false 
+			end
 			return self --mouse over panel
 		end,	
 		OnMouseDown={ function(self)
@@ -836,17 +863,6 @@ function widget:Initialize()
 			WG.crude.ShowMenu()
 			return true
 		end },
-	}
-	scroll_cpl = ScrollPanel:New{
-		parent = window_cpl,
-		width = "100%",
-		--height = "100%",
-		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
-		borderColor = {1,1,1,options.backgroundOpacity.value},
-		--padding = {0, 0, 0, 0},
-		--autosize = true,
-		scrollbarSize = 6,
-		horizontalScrollbar = false,	
 	}
 	
 	function scroll_cpl:IsAboveVScrollbars(x, y)  -- this override default Scrollpanel's HitTest. It aim to: reduce chance of click stealing. It exclude any modifier key (shift,alt,ctrl, except spacebar which is used for Space+click shortcut), and only allow left-click to reposition the vertical scrollbar

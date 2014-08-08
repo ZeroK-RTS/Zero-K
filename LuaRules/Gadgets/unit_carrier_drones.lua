@@ -12,6 +12,7 @@ function gadget:GetInfo()
 		enabled   = true
 	}
 end
+--Version 1.003
 --Changelog:
 --24/6/2014 added carrier building drone on emit point. 
 --------------------------------------------------------------------------------
@@ -65,7 +66,7 @@ local function InitCarrier(unitID, unitDefID, teamID)
 	for i=1,#carrierData do
 		-- toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
 		toReturn.droneSets[i] = {nil}
-		toReturn.droneSets[i].config = carrierData[i] --same as above, but we assign reference to "carrierData[i]" in memory to avoid duplicates, also, we have no plan to change config value.
+		toReturn.droneSets[i].config = carrierData[i] --same as above, but we assign reference to "carrierDefs[i]" table in memory to avoid duplicates, DO NOT CHANGE ITS CONTENT (its constant & config value only).
 		toReturn.droneSets[i].reload = carrierData[i].reloadTime
 		toReturn.droneSets[i].droneCount = 0
 		toReturn.droneSets[i].drones = {}
@@ -154,34 +155,35 @@ function AddUnitToEmptyPad(carrierID,droneType)
 			end
 		end
 	else
-		CheckCreateStart(0) --use unit's body
+		CheckCreateStart(0) --use unit's body as emit point
 	end
 	return unitIDAdded
 end
 
 local coroutines = {}
+local coroutineCount = 0
 local coroutine = coroutine
 local Sleep	    = coroutine.yield
 local assert    = assert
 local function StartScript(fn)
 	local co = coroutine.create(fn)
-	coroutines[#coroutines + 1] = co
+	coroutineCount = coroutineCount + 1 --in case new co-routine is added in same frame
+	coroutines[coroutineCount] = co
 end
 
 function UpdateCoroutines() 
-	local coroutineCount = #coroutines
+	coroutineCount = #coroutines
 	local i=1
-	while (i<=coroutineCount) do 
+	while (i<=coroutineCount) do
 		local co = coroutines[i] 
 		if (coroutine.status(co) ~= "dead") then 
-			assert(coroutine.resume(coroutines[i]))
+			assert(coroutine.resume(co))
+			i = i + 1
 		else
 			coroutines[i] = coroutines[coroutineCount]
 			coroutines[coroutineCount] = nil
 			coroutineCount = coroutineCount -1
-			i = i - 1
 		end
-		i = i + 1
 	end 
 end
 
@@ -243,20 +245,28 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 	
 	Spring.SetUnitHealth(unitID,{ build = 0 })
 	
-	local GetPlacementPosition = function()
-		if (padPieceID==0) then
-			local _,_,_,mx,my,mz = Spring.GetUnitPosition(carrierID,true)
-			local dx,dy,dz = Spring.GetUnitDirection(carrierID)
+	local GetPlacementPosition = function(inputID,pieceNum)
+		if (pieceNum==0) then
+			local _,_,_,mx,my,mz = Spring.GetUnitPosition(inputID,true)
+			local dx,dy,dz = Spring.GetUnitDirection(inputID)
 			return mx,my,mz,dx,dy,dz
 		else
-			return Spring.GetUnitPiecePosDir(carrierID, padPieceID)
+			return Spring.GetUnitPiecePosDir(inputID, pieceNum)
+		end
+	end
+	
+	local AddNextDroneFromQueue = function(inputID)
+		if #carrierList[inputID].droneInQueue > 0 then
+			if AddUnitToEmptyPad(inputID,carrierList[inputID].droneInQueue[1]) then --pad cleared, immediately add any unit from queue
+				table.remove(carrierList[inputID].droneInQueue,1)
+			end
 		end
 	end
 	
 	mcEnable(unitID)
 	Spring.SetUnitLeaveTracks(unitID, false)
 	mcSetVelocity(unitID, 0, 0, 0)
-	mcSetPosition(unitID,GetPlacementPosition())
+	mcSetPosition(unitID,GetPlacementPosition(carrierID,padPieceID))
 	
 	-- deactivate unit to cause the lups jets away
 	Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 0)
@@ -269,23 +279,25 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		local landDuration = 0
 		local buildProgress,health
 		local droneType = droneList[unitID].set
-		local droneInfo = carrierList[carrierID].droneSets[droneType]
+		local droneInfo = carrierList[carrierID].droneSets[droneType] --may persist even after "carrierList[carrierID]" is emptied
 		local build_step = droneInfo.config.buildStep
 		local build_step_health = droneInfo.config.buildStepHealth
 		while true do
-			if (not carrierList[carrierID]) or (not droneList[unitID]) then
-				if Spring.ValidUnitID(unitID) then
-					Spring.DestroyUnit(unitID, true, false) -- selfd = true, reclaim = false
-				end
+			if (not droneList[unitID]) then --droneList[unitID] became NIL when drone or carrier is destroyed (in UnitDestroyed()). Is NIL at beginning of frame and this piece of code run at end of frame
 				if carrierList[carrierID] then
 					droneInfo.buildCount = droneInfo.buildCount - 1
 					carrierList[carrierID].occupiedPieces[padPieceID] = false
+					AddNextDroneFromQueue(carrierID) --add next drone in this vacant position
 				end
-				return
+				return --nothing else to do
+			elseif (not carrierList[carrierID]) then --carrierList[carrierID] is NIL because it was MORPHED.
+				carrierID = droneList[unitID].carrier
+				padPieceID = (carrierList[carrierID].spawnPieces and carrierList[carrierID].spawnPieces[1]) or 0
+				carrierList[carrierID].occupiedPieces[padPieceID] = true --block pad
 			end
 			
 			vx,vy,vz = Spring.GetUnitVelocity(carrierID)
-			px, py, pz, dx, dy, dz = GetPlacementPosition()
+			px, py, pz, dx, dy, dz = GetPlacementPosition(carrierID,padPieceID)
 			currentDir = dx + dy*100 + dz* 10000
 			if previousDir ~= currentDir then --refresh pitch/yaw/roll calculation when unit had slight turning
 				previousDir = currentDir
@@ -323,11 +335,7 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		-- activate unit and its jets
 		Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 		
-		if #carrierList[carrierID].droneInQueue > 0 then
-			if AddUnitToEmptyPad(carrierID,carrierList[carrierID].droneInQueue[1]) then
-				table.remove(carrierList[carrierID].droneInQueue,1)
-			end
-		end
+		AddNextDroneFromQueue(carrierID) --this create next drone in this position (in this same GameFrame!), so it might look overlapped but that's just minor details
 	end
 	
 	StartScript(SitLoop)
@@ -336,6 +344,7 @@ end
 --END----------------------------------
 
 -- morph uses this
+--[[
 local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
 	-- UnitFinished (above) should already be called for this new unit.
 	if carrierList[newUnitID] then
@@ -352,6 +361,7 @@ local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
 		carrierList[unitID] = nil
 	end
 end
+--]]
 
 local function isCarrier(unitID)
 	if (carrierList[unitID]) then
@@ -362,7 +372,7 @@ end
 
 -- morph uses this
 GG.isCarrier = isCarrier
-GG.transferCarrierData = transferCarrierData
+--GG.transferCarrierData = transferCarrierData
 
 local function GetDistance(x1, x2, y1, y2)
 	return ((x1-x2)^2 + (y1-y2)^2)^0.5
@@ -451,21 +461,45 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (carrierList[unitID]) then
+		local newUnitID = GG.wasMorphedTo and GG.wasMorphedTo[unitID]
 		local carrier = carrierList[unitID]
-		for i=1,#carrier.droneSets do
-			local set = carrier.droneSets[i]
-			for droneID in pairs(set.drones) do
-				droneList[droneID] = nil
-				killList[droneID] = true
+		if newUnitID and carrierList[newUnitID] then --MORPHED, and MORPHED to another carrier. Note: unit_morph.lua create unit first before destroying it, so "carrierList[]" is already initialized.
+			local newCarrier = carrierList[newUnitID]
+			for i=1,#carrier.droneSets do
+				local set = carrier.droneSets[i]
+				local newSetID = -1
+				for j=1,#newCarrier.droneSets do
+					if newCarrier.droneSets[j].config.drone == set.config.drone then --same droneType? copy old drone data
+						newCarrier.droneSets[j].droneCount = set.droneCount
+						newCarrier.droneSets[j].reload = set.reload
+						newCarrier.droneSets[j].drones = set.drones
+						newSetID = j
+					end
+				end
+				for droneID in pairs(set.drones) do
+					droneList[droneID].carrier = newUnitID
+					droneList[droneID].set = newSetID
+					GiveOrderToUnit(droneID, CMD.GUARD, {newUnitID} , {"shift"})
+				end
+			end
+		else --Carried died
+			for i=1,#carrier.droneSets do
+				local set = carrier.droneSets[i]
+				for droneID in pairs(set.drones) do
+					droneList[droneID] = nil
+					killList[droneID] = true
+				end
 			end
 		end
 		carrierList[unitID] = nil
 	elseif (droneList[unitID]) then
 		local carrierID = droneList[unitID].carrier
 		local setID = droneList[unitID].set
-		local droneSet = carrierList[carrierID].droneSets[setID]
-		droneSet.droneCount = (droneSet.droneCount - 1)
-		droneSet.drones[unitID] = nil
+		if setID > -1 then --is -1 when carrier morphed and drone is incompatible with the carrier
+			local droneSet = carrierList[carrierID].droneSets[setID]
+			droneSet.droneCount = (droneSet.droneCount - 1)
+			droneSet.drones[unitID] = nil
+		end
 		droneList[unitID] = nil
 	end
 end

@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.014 Chili Chat Pro Console.",
+    desc      = "v0.015 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -916,8 +916,10 @@ local function MakeMessageWindow(name, minimizable)
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = minimizable,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
+		maxHeight = 500,
 		color = { 0, 0, 0, 0 },
 		OnMouseDown = {
 			function(self) --//click on scroll bar shortcut to "Settings/HUD Panels/Chat/Console".
@@ -1196,11 +1198,13 @@ function widget:Initialize()
 		verticalScrollbar = false,
 	}
 	
-	for i = 1, 20 do
-		AddMessage({dup=1, formatted=''}, 'chat', true )
-	end
-	
-	
+	--spacer that forces chat to be scrolled to bottom of chat window
+	WG.Chili.Panel:New{
+		width = '100%',
+		height = 500,
+		backgroundColor = {0,0,0,0},
+		parent = stack_chat,
+	}
 	
 	scrollpanel_backchat = WG.Chili.ScrollPanel:New{
 		--margin = {5,5,5,5},

@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "0.1.2" -- you may find changelog in capture_the_flag.lua gadget
+local version = "0.1.3" -- you may find changelog in capture_the_flag.lua gadget
 
 function widget:GetInfo()
 	return {
@@ -1046,6 +1046,7 @@ function widget:Initialize()
 		y = screenHeight/5-minHeight/2;
 		dockable = true;
 		minimizable = true,
+		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		draggable = true,
 		resizable = false,
 		tweakDraggable = true,

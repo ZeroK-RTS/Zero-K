@@ -90,6 +90,8 @@ local shortRangeSkirmieeArray = {
 	["logkoda"] = true,
 	["amphraider3"] = true,
 	["corsumo"] = true,
+	
+	["corsktl"] = true,
 }
 
 local riotRangeSkirmieeArray = {
@@ -102,6 +104,26 @@ local riotRangeSkirmieeArray = {
 	["amphriot"] = true,
 	["armcomdgun"] = true,
 	["dante"] = true,
+	
+	["armjeth"] = true,
+	["corcrash"] = true,
+	["armaak"] = true,
+	["hoveraa"] = true,
+	["spideraa"] = true,
+	["amphaa"] = true,
+	["shipaa"] = true,
+	
+	["armrectr"] = true,
+	["cornecro"] = true,
+	["corned"] = true,
+	["corch"] = true,
+	["coracv"] = true,
+	["arm_spider"] = true,
+	["corfast"] = true,
+	["amphcon"] = true,
+	
+	["spherecloaker"] = true,
+	["core_spectre"] = true,
 }
 
 local lowMedRangeSkirmieeArray = {

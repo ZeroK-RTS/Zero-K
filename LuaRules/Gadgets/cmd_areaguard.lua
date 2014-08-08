@@ -102,6 +102,14 @@ function gadget:UnitCreated(unitID, unitDefID, team)
     end
 end
 
+function gadget:AllowCommand_GetWantedCommand()	
+	return {[CMD_AREA_GUARD] = true}
+end
+	
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
+end
+
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
     if cmdID == CMD_AREA_GUARD then
         DoAreaGuard( unitID, unitTeam, unitTeam, cmdParams, cmdOptions )
