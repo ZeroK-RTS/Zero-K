@@ -48,7 +48,7 @@ unitDef = {
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
   side              = [[CORE]],
   sightDistance     = 660,
-  sonarDistance     = 300,
+  sonarDistance     = 320,
   turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
@@ -79,7 +79,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 180,
+        default = 190,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],

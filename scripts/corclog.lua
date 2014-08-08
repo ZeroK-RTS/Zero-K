@@ -237,5 +237,11 @@ end
 
 function script.Killed(recentDamage, maxHealth)
     Explode(box, sfxShatter + sfxSmoke)
-    return 4 --leave no wreckage
+    
+	local severity = recentDamage / maxHealth
+	if (severity <= 0.5) then
+		return 1 -- corpsetype
+	else
+		return 2 -- corpsetype
+	end
 end

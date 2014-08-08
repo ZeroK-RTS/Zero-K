@@ -28,6 +28,7 @@ local longRangeSwarmieeArray = {
 	["corstorm"] = true,
 	["shiparty"] = true,
 	["armham"] = true,
+	["subraider"] = true,
 }
 
 local medRangeSwarmieeArray = { 
@@ -405,6 +406,9 @@ local behaviourConfig = {
 		velocityPrediction = 30,
 	},
 	["amphraider3"] = {
+		waterline = -5,
+		land = {
+			weaponNum = 1,
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -415,6 +419,20 @@ local behaviourConfig = {
 		stoppingDistance = 25,
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 30,
+		},
+		sea = {
+			weaponNum = 2,
+		skirms = shortRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		maxSwarmLeeway = 35, 
+		swarmLeeway = 30, 
+		jinkTangentLength = 140, 
+		stoppingDistance = 25,
+		minCircleStrafeDistance = 10,
+		velocityPrediction = 30,
+		},
 	},
 	["corgator"] = {
 		skirms = shortRangeSkirmieeArray, 
@@ -761,6 +779,17 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
+	},
+	["subraider"] = {
+		skirms = artyRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 80, 
+		skirmOrderDis = 250,
+		velocityPrediction = 40,
 	},
 	["shiparty"] = {
 		skirms = artyRangeSkirmieeArray, 

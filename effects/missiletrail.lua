@@ -2,6 +2,7 @@
 -- missiletrailred
 -- missiletrailyellow
 -- missiletrailgreen
+-- torptrailpurple
 -- missiletrailblue
 -- missiletrailbluebig
 -- moderatortrail

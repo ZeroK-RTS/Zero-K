@@ -71,7 +71,7 @@ function script.StopMoving()
 	StartThread( Burrow )
 end
 
-function script.Killed()
+function script.Killed(recentDamage, maxHealth)
 	Explode( base, SFX.EXPLODE + SFX.FIRE + SFX.SMOKE )
 	Explode( l_wing, SFX.EXPLODE )
 	Explode( r_wing, SFX.EXPLODE )
@@ -90,4 +90,11 @@ function script.Killed()
 	Explode( r_fan, SFX.EXPLODE )
 	Explode( r_fan, SFX.EXPLODE )
 	Explode( r_fan, SFX.EXPLODE )
+	
+	local severity = recentDamage / maxHealth
+	if (severity <= 0.5) then
+		return 1 -- corpsetype
+	else
+		return 2 -- corpsetype
+	end
 end
