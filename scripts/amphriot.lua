@@ -115,7 +115,7 @@ local shotRange = WeaponDefNames["amphriot_flechette"].range
 local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -20 then
+		if height < -35 then
 			if not longRange then
 				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
 				longRange = true
