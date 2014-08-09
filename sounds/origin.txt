@@ -10,10 +10,6 @@ Open LieroX:
 something.wav
 something2.wav
 
-Nanoblobs:
-beep4.wav
-beep6.wav
-
 nexuiz:
 talk.wav
 sparks.wav
@@ -32,3 +28,6 @@ Sonic blaster shot sound (http://www.freesound.org/people/klangfabrik/sounds/232
 
 Unfa:
 Sonic blaster impact sound (unfa_blast_2)
+
+ikinz:
+place_beep.wav
