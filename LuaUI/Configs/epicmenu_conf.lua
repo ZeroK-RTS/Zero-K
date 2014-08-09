@@ -276,6 +276,7 @@ path='Settings/HUD Panels/HUD Skin'
 			{ key = 'Carbon', name = 'Carbon', },
 			{ key = 'Robocracy', name = 'Robocracy', },
 			{ key = 'DarkHive', name = 'DarkHive', },
+			{ key = 'DarkHiveSquare', name = 'DarkHive (square)', },
 			{ key = 'Twilight', name = 'Twilight', },
 		},
 	})

@@ -4,7 +4,7 @@
 -- torpedo_trail_big
 -- hydromissile
 
-return {
+return {  
   ["torpedo_hit"] = {
     usedefaultexplosions = false,
     droplets = {
@@ -148,6 +148,62 @@ return {
       },
     },
   },
+  
+  ["torpedo_hit_large_weak"] = {
+    usedefaultexplosions = false,
+    droplets = {
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      water              = true,
+      underwater		 = true,
+      properties = {
+        airdrag            = 0.95,
+        alwaysvisible      = false,
+        colormap           = [[0.75 0.75 1 0.5  0 0 0 0]],
+        directional        = false,
+        emitrot            = 85,
+        emitrotspread      = 5,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, -0.1, 0]],
+        numparticles       = 20,
+        particlelife       = 8,
+        particlelifespread = 0,
+        particlesize       = 16,
+        particlesizespread = 8,
+        particlespeed      = 5,
+        particlespeedspread = 6,
+        pos                = [[0, 15, 0]],
+        sizegrowth         = 0.8,
+        sizemod            = 1.1,
+        texture            = [[randdots]],
+      },
+    },
+    mainhit = {
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      water              = true,
+      underwater		 = true,
+      properties = {
+        delay              = 0,
+        dir                = [[dir]],
+        explosiongenerator = [[custom:torpedo_hit_main_large_weak]],
+        pos                = [[0, 15, 0]],
+      },
+    },
+    watersphere = {
+      class              = [[CSpherePartSpawner]],
+      count              = 1,
+      water              = true,
+      underwater         = true,
+      properties = {
+        alpha              = 0.2,
+        alwaysvisible      = false,
+        color              = [[0.8,0.8,0.8]],
+        expansionspeed     = 6,
+        ttl                = 10,
+      },
+    },
+  }, 
 
   ["torpedo_hit_large"] = {
     usedefaultexplosions = false,
@@ -408,6 +464,28 @@ return {
     },
   },
   
+  ["torpedo_hit_main_large_weak"] = {
+    mainhit = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+	  underwater		 = true,
+      properties = {
+        colormap           = [[0.45 0.45 0.5 0.35  0.045 0.045 0.05 0.05]],
+        dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
+        frontoffset        = 0,
+        fronttexture       = [[splashbase]],
+        length             = [[10 r20]],
+        sidetexture        = [[splashside]],
+        size               = [[20 r10]],
+        sizegrowth         = 1.4,
+        ttl                = 16,
+      },
+    },
+  },
+  
   ["torpedo_hit_main_large"] = {
     mainhit = {
       air                = true,
@@ -472,6 +550,46 @@ return {
         size               = 2,
         sizegrowth         = 0.4,
         ttl                = 20,
+      },
+    },
+  },
+    ["torptrailpurple"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    trail_water = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[0.9 0.5 0.9 0.5 0.8 0.4 0.8 0.05 0 0 0 0]],
+        dir                = [[dir]],
+        frontoffset        = 1,
+        fronttexture       = [[wake]],
+        length             = 1.3,
+        sidetexture        = [[wake]],
+        size               = 3,
+        sizegrowth         = 0.2,
+        ttl                = 15,
+      },
+    },
+
+    spikes = {
+      air                = false,
+      class              = [[explspike]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      underwater         = true,
+      properties = {
+        alpha              = 0.8,
+        alphadecay         = 0.5,
+        color              = [[0.9, 0.5, 0.9]],
+        dir                = [[-6 r12,-6 r12,-6 r12]],
+        length             = 1,
+        width              = 1,
       },
     },
   },

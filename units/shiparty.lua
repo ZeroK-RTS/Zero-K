@@ -91,6 +91,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+	  burnblow                = 1,
 
       damage                  = {
         default = 180,
@@ -112,7 +113,7 @@ unitDef = {
       startVelocity           = 50,
       tolerance               = 100000,
       tracks                  = true,
-      turnRate                = 20000,
+      turnRate                = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 30,

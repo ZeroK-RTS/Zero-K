@@ -21,7 +21,7 @@ unitDef = {
     description_pl = [[Amfibijny bot wsparcia]],
     helptext       = [[A flexible unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land. It acts as a stealthy underwater skirmisher, capable of killing outnumbered enemies with low attrition.]],
     helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz podwodnych pociskow ma takze shotgun do walk na ladzie.]],
-    extradrawrange = 460,
+    extradrawrange = 430,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -110,7 +110,7 @@ unitDef = {
       range                   = 430,
       reloadtime              = 6,
       soundHit                = [[TorpedoHitVariable]],
-      soundHitVolume          = 3.2,
+      soundHitVolume          = 2.6,
       --soundStart              = [[weapon/torpedo]],
       startVelocity           = 90,
       tracks                  = true,

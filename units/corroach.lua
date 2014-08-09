@@ -14,10 +14,11 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets  = [[0 0 0]],
-  collisionVolumeScales   = [[16 16 16]],
-  collisionVolumeType	  = [[ellipsoid]],
   cloakCost              = 0,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[16 16 16]],
+  collisionVolumeType	 = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
   customParams           = {
     description_bp = [[Bomba rastejante]],
@@ -72,6 +73,37 @@ unitDef = {
 
   sightDistance          = 240,
   turnRate               = 3000,
+  
+  featureDefs            = {
+
+    DEAD      = {
+      description      = [[Wreckage - Roach]],
+      blocking         = false,
+      damage           = 60,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      metal            = 64,
+      object           = [[wreck2x2b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 64,
+    },
+
+    HEAP      = {
+      description      = [[Debris - Roach]],
+      blocking         = false,
+      damage           = 60,
+      energy           = 0,
+      footprintX       = 2,
+      footprintZ       = 2,
+      metal            = 32,
+      object           = [[debris2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 32,
+    },
+
+  },
 }
 
 --------------------------------------------------------------------------------

@@ -1,9 +1,11 @@
 local waterCannonIterable = {
 	WeaponDefNames["amphraider2_watercannon"].id,
+	WeaponDefNames["amphbomb_watercannon"].id,
 }
 
 local waterCannonIndexable = {
 	[WeaponDefNames["amphraider2_watercannon"].id] = true,
+	[WeaponDefNames["amphbomb_watercannon"].id] = true,
 }
 
 local unitDefData = {
@@ -14,13 +16,27 @@ local unitDefData = {
 		healthRegen = 40,
 		submergedAt = 40,
 		baseHeight = 5,
+		bonusProjectiles = 6.5,
+		scalingRange = 200,
+		baseRange = 100,
+	},
+	[UnitDefNames["amphbomb"].id] = {
+		tankMax = 100,
+		shotCost = 10,
+		tankRegenRate = 5,
+		healthRegen = 10,
+		submergedAt = 40,
+		baseHeight = 20,
+		bonusProjectiles = 5.5,
+		scalingRange = 0,
+		baseRange = 250,
 	},
 	[UnitDefNames["amphcon"].id] = {
 		healthRegen = 10,
 		submergedAt = 40,
 	},
 	[UnitDefNames["amphraider3"].id] = {
-		healthRegen = 10,
+		healthRegen = 5,
 		submergedAt = 40,
 	},
 	[UnitDefNames["amphfloater"].id] = {
