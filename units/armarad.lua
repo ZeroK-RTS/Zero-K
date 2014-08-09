@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Advanced Radar Tower]],
   description                   = [[Long-Range Radar and Sonar, halves radar wobble]],
   activateWhenBuilt             = true,
-  buildAngle                    = 8192,
   buildCostEnergy               = 500,
   buildCostMetal                = 500,
   builder                       = false,
