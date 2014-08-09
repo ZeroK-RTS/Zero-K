@@ -2,10 +2,7 @@ unitDef = {
   unitname                      = [[armanni]],
   name                          = [[Annihilator]],
   description                   = [[Tachyon Projector - Requires 50 Power]],
-  acceleration                  = 0,
   activateWhenBuilt             = true,
-  brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 2200,
   buildCostMetal                = 2200,
   builder                       = false,
@@ -26,59 +23,55 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Acc?lerateur Tachyon]],
-    description_de = [[Tachyonen Beschleuniger - Benötigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu können.]],
-    description_pl = [[Projektor Tachyonów]],
-	helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter.]],
-    helptext_fr    = [[Protégé derri?re le blindage lourd de l'Annihilator se trouve le terrible Canon Accélerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantités colossales d'énergie sur un point précis, percant tous les blindages aisément, le tout ? une distance terrifiante. Son co?t et sa consommation d'énergie la rendent cependant difficile ? employer.]],
-    helptext_de    = [[Innerhalb der hart gepanzerten Hülle befindet sich ein verheerender Tachyonen Beschleuniger. Diese furchteinregende Waffe ist imstande in einem riesigen Umkreis punktgenaue Zerstörung nach sich zu ziehen, vorausgesetzt du verbindest es mit einer Energiequelle. Beachte aber, dass der Anniilator eine dezidierte Unterstützungswaffe ist; unbewacht wird er schnell von Angreifern überrumpelt.]],
-    helptext_pl    = [[Pod ciężkim pancerzem Annihilatora znajduje si�?niszczycielski Projektor Tachyonów. Ta straszliwa bro�?pozwala na zadawanie wysokich obraże�?oddalonym celom zakładaj�?, że masz doś�?energii, by j�?zasili�?- musi znajdowac sie w sieci energetycznej o mocy co najmniej 50 energii. Mimo swej mocy Annihilator nie jest odpowiedzi�?na wszystkie problemy - ma nisk�?szybkostrzelnoś�? co czyni go podatnym na ataki wielu małych jednostek. W razie ataku artylerii lub bombowców można schowa�?działo, co nie pozwala na strzelanie, ale zmniejsza otrzymane obrażenia czterokrotnie.]],
-	keeptooltip    = [[any string I want]],
+    description_de = [[Tachyonen Beschleuniger - BenÃ¶tigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu kÃ¶nnen.]],
+    description_pl = [[Projektor Tachyonow]],
+    helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter.]],
+    helptext_fr    = [[ProtÃ©gÃ© derri?re le blindage lourd de l'Annihilator se trouve le terrible Canon AccÃ©lerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantitÃ©s colossales d'Ã©nergie sur un point prÃ©cis, percant tous les blindages aisÃ©ment, le tout ? une distance terrifiante. Son co?t et sa consommation d'Ã©nergie la rendent cependant difficile ? employer.]],
+    helptext_de    = [[Innerhalb der hart gepanzerten HÃ¼lle befindet sich ein verheerender Tachyonen Beschleuniger. Diese furchteinregende Waffe ist imstande in einem riesigen Umkreis punktgenaue ZerstÃ¶rung nach sich zu ziehen, vorausgesetzt du verbindest es mit einer Energiequelle. Beachte aber, dass der Anniilator eine dezidierte UnterstÃ¼tzungswaffe ist; unbewacht wird er schnell von Angreifern Ã¼berrumpelt.]],
+    helptext_pl    = [[Pod ciezkim pancerzem Annihilatora znajduje sie niszczycielski Projektor Tachyonow. Ta straszliwa bron pozwala na zadawanie wysokich obrazen oddalonym celom zakladajac, ze masz dosc energii, by ja zasilic - musi znajdowac sie w sieci energetycznej o mocy co najmniej 50 energii. Mimo swej mocy Annihilator nie jest odpowiedzia na wszystkie problemy - ma niska szybkostrzelnosc, co czyni go podatnym na ataki wielu lekkich jednostek. W razie ostrzalu artylerii lub nalotu mozna schowac dzialo, co nie pozwala na strzelanie, ale zmniejsza otrzymywane obrazenia czterokrotnie.]],
+
+    keeptooltip    = [[any string I want]],
+
     neededlink     = 50,
     pylonrange     = 50,
-	aimposoffset   = [[0 32 0]],
-	midposoffset   = [[0 0 0]],
-	modelradius    = [[40]],
-	dontfireatradarcommand = '1',
+
+    aimposoffset   = [[0 32 0]],
+    midposoffset   = [[0 0 0]],
+    modelradius    = [[40]],
+
+    dontfireatradarcommand = '1',
   },
 
   damageModifier                = 0.25,
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[fixedtachyon]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 556,
   maxDamage                     = 6000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,
   script                        = [[armanni.lua]],
   seismicSignature              = 4,
   explodeAs                     = [[ESTOR_BUILDING]],
-  side                          = [[ARM]],
   sightDistance                 = 780,
-  smoothAnim                    = true,
-  turnRate                      = 0,
   useBuildingGroundDecal        = true,
-  workerTime                    = 0,
-  yardMap                       = [[oooooooooooooooo]],
+  yardMap                       = [[oooo oooo oooo oooo]],
 
   weapons                       = {
 
-	{
+    {
       def                = [[ATA]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
   },
-
 
   weaponDefs                    = {
 
@@ -96,9 +89,9 @@ unitDef = {
         statsprojectiles = 1,
         statsdamage = 4000,
       },
+
       damage                  = {
         default = 800,
-        planes  = 800,
         subs    = 40,
       },
 
@@ -131,20 +124,16 @@ unitDef = {
 
   },
 
-
   featureDefs                   = {
 
     DEAD = {
       description      = [[Wreckage - Annihilator]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 6000,
       energy           = 0,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
+      footprintX       = 4,
+      footprintZ       = 4,
       metal            = 880,
       object           = [[arm_annihilator_dead.s3o]],
       reclaimable      = true,
@@ -155,13 +144,10 @@ unitDef = {
     HEAP = {
       description      = [[Debris - Annihilator]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 6000,
       energy           = 0,
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
+      footprintX       = 4,
+      footprintZ       = 4,
       metal            = 440,
       object           = [[debris3x3a.s3o]],
       reclaimable      = true,
