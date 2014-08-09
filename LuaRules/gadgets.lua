@@ -1421,7 +1421,7 @@ local UnitPreDamaged_first = true
 local allWeaponDefs = {}
 
 do
-	for i=1,#WeaponDefs do
+	for i=-7,#WeaponDefs do
 		allWeaponDefs[#allWeaponDefs+1] = i
 	end
 end

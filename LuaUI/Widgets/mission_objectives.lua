@@ -36,6 +36,8 @@ local mainPanel
 local scroll
 local stack
 
+local colorGrey = {0.4, 0.4, 0.4, 1}
+local colorWhite = {1,1,1,1}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local statusImageWidth = 24
@@ -54,11 +56,19 @@ local statusColors = {
 }
 
 local objectives = {}	-- [objID] = {panel, label, image, status}
+local unread = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function Expand()
 	mainWindow:AddChild(mainPanel)
 	mainWindow:RemoveChild(expandButton)
+	if unread then
+		expandButton.backgroundColor = colorGrey
+		expandButtonImage.color = colorGrey
+		expandButtonImage:Invalidate()
+		expandButton:Invalidate()
+		unread = false
+	end
 end
 
 local function Minimize()
@@ -167,6 +177,13 @@ local function AddObjective(id, title, description, pos, status, color)
 		end
 		
 		Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
+		if not unread then
+			expandButtonImage.backgroundColor = colorWhite
+			expandButtonImage.color = colorWhite
+			expandButtonImage:Invalidate()
+			expandButton:Invalidate()
+			unread = true
+		end
 	end
 end
 

@@ -23,8 +23,6 @@ end
 
 if (not gadgetHandler:IsSyncedCode()) then
 
-local reverseCompat = (Game.version:find('91.'))
-
 local MAX_TIME_DIFF = 75	-- wait this long for disconnected players
 
 local allReady = false 
