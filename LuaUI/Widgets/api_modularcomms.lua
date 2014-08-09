@@ -23,6 +23,7 @@ local CopyTable = Spring.Utilities.CopyTable
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
+local standardCommDefs = VFS.Include("LuaRules/Configs/comm_trainer_defs.lua")
 local success, err
 
 -- global comm data (from the modoption)
@@ -55,7 +56,7 @@ WG.commDataGlobal = commDataGlobal
 
 -- player comm data (from customkeys)
 local myID = Spring.GetMyPlayerID()
-local commData
+local commData	-- [name] = {[1] = unitDefName, [2] = unitDefName, ...}
 local customKeys = select(10, Spring.GetPlayerInfo(myID))
 local commDataRaw = customKeys and customKeys.commanders
 if not (commDataRaw and type(commDataRaw) == 'string') then
@@ -78,6 +79,8 @@ end
 if err then 
 	--Spring.Echo('Modular Comm Info error: ' .. err)	-- ditto, except it's start_unit_setup that complained before
 end
+
+commData = Spring.Utilities.MergeTable(commData, standardCommDefs)
 WG.commData = commData
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua")

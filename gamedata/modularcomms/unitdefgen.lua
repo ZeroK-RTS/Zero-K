@@ -228,6 +228,12 @@ local function ProcessComm(name, config)
 		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
 		cp.cost = config.cost
 		
+		-- morph
+		if config.morphto then
+			cp.morphto = config.morphto
+			cp.combatmorph = 1
+		end
+		
 		-- apply decorations
 		if config.decorations then
 			for key,dec in pairs(config.decorations) do
