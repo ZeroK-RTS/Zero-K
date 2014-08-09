@@ -364,6 +364,7 @@ function widget:GameFrame(n)
 	"\nSharing: " .. shareM .. 
 	"\nConstruction: " .. constuction ..
     "\nReserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
+    "\nStored: " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n" .. 
 	"\nTeam Metal Economy" ..
 	"\nTotal Income: " .. totalMetalIncome ..
@@ -383,6 +384,7 @@ function widget:GameFrame(n)
 	"\nConstruction: " .. constuction .. 
 	"\nOther: " .. otherE ..
     "\nReserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
+    "\nStored: " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n" .. 
 	"\nTeam Energy Economy" ..
 	"\nIncome: " .. teamEnergyIncome .. 
@@ -561,7 +563,7 @@ function CreateWindow()
 	lbl_m_income = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 70,
+		width  = 75,
                 x      = 60,
                 y      = 5,
                 -- y      = p(60/bars),
@@ -569,13 +571,13 @@ function CreateWindow()
 		valign = "center",
  		align  = "left",
 		autosize = false,
-		font   = {size = 18, outline = true, color = {.1,1,.2,1}},
+		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2, color = {.1,1,.2,1}},
 		tooltip = "Your metal Income.\nGained primarilly from metal extractors, overdrive and reclaim",
 	}
 	lbl_m_expense = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 70,
+		width  = 75,
                 x      = 60,
                 y      = p(40),
                 -- y      = 0,
@@ -583,7 +585,7 @@ function CreateWindow()
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = 15, outline = true, color = {1,.3,.2,1}},
+		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3, color = {1,.3,.2,1}},
 		tooltip = "This is the metal demand of your construction",
 	}
 	lbl_metal = Chili.Label:New{
@@ -662,7 +664,7 @@ function CreateWindow()
 	lbl_e_income = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 70,
+		width  = 75,
                 x      = 165,
                 -- y      = p(60/bars),
                 y      = 5,
@@ -670,13 +672,13 @@ function CreateWindow()
 		valign  = "center",
 		align   = "left",
 		autosize = false,
-		font   = {size = 17, outline = true, color = {.1,1,.2,1}},
+		font   = {size = 18, outline = true, outlineWidth = 2, outlineWeight = 2, color = {.1,1,.2,1}},
 		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	lbl_e_expense = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 70,
+		width  = 75,
                 x      = 165,
                 y      = p(40),
                 -- y      = 0,
@@ -684,7 +686,7 @@ function CreateWindow()
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = 14, outline = true, color = {1,.3,.2,1}},
+		font   = {size = 15, outline = true, outlineWidth = 4, outlineWeight = 3, color = {1,.3,.2,1}},
 		tooltip = "This is the energy demand of your economy, cloakers, shields and overdrive",
 	}
 
@@ -712,7 +714,7 @@ function CreateWindow()
 		color  = {0,0,0,0},
 		-- right  = 36,
 		x      = 147,
-		y      = 5,
+		y      = 10,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 	}
@@ -729,7 +731,7 @@ function CreateWindow()
 		max = 1,
 		-- right  = 36,
 		x      = 147,
-		y      = 5,
+		y      = 10,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 	}
