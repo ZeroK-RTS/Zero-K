@@ -30,6 +30,6 @@ Colors.grey    = { 0.5, 0.5, 0.5, 1.0 }
 Colors.red     = { 1.0, 0.3, 0.2, 1.0 }
 Colors.green   = { 0.2, 1.0, 0.3, 1.0 }
 Colors.blue    = { 0.2, 0.3, 1.0, 1.0 }
-Colors.yellow  = { 1.0, 1.0, 0.0, 1.0 }
+Colors.yellow  = { 1.0, 1.0, 0.3, 1.0 }
 Colors.cyan    = { 0.2, 1.0, 1.0, 1.0 }
 Colors.magenta = { 1.0, 0.2, 1.0, 1.0 }

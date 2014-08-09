@@ -100,7 +100,7 @@ local function option_workerUsageUpdate()
 	CreateWindow()
 end
 
-options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve'}
+options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve','colourBlind'}
  
 options = { 
   eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
@@ -123,7 +123,8 @@ options = {
 	type = "number",
 	value = 0, min = 0, max = 1, step = 0.01,
 	OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,
-  }
+  },
+  colourBlind = {name = "Colourblind mode", type = "bool", value=false, OnChange = option_workerUsageUpdate, tooltip = "Uses Blue and Yellow instead of Red and Green for number display"}
 }
 
 --------------------------------------------------------------------------------
@@ -195,9 +196,10 @@ function widget:Update(s)
 
 	blink = (blink+s)%blink_periode
 	blink_alpha = math.abs(blink_periode/2 - blink)
+	blink_colourBlind = options.colourBlind.value and 1 or 0
 
 	if blinkM_status then
-		bar_metal:SetColor( 1 - 119/255*blink_alpha,214/255,251/255,0.65 + 0.3*blink_alpha )
+		bar_metal:SetColor( 1 - 119/255*blink_alpha*(1-blink_colourBlind),214/255 + 41/255*blink_alpha*blink_colourBlind,251/255 - 180/255*blink_alpha*blink_colourBlind,0.65 + 0.3*blink_alpha )
 	end
 
 	if blinkE_status then
@@ -215,8 +217,14 @@ end
 local function Format(input, override)
 	
 	local leadingString = GreenStr .. "+"
+	if options.colourBlind.value then
+		local leadingString = YellowStr .. "+"
+	end
 	if input < 0 then
 		leadingString = RedStr .. "-"
+		if options.colourBlind.value then
+			local leadingString = BlueStr .. "-"
+		end
 	end
 	leadingString = override or leadingString
 	input = math.abs(input)
@@ -297,9 +305,9 @@ function widget:GameFrame(n)
 
 	local wastingE = false
 	if options.eexcessflashalways.value then
-		wastingE = (WG.energyWasted > 0) or WG.metalFromOverdrive > 0
+		wastingE = (WG.energyWasted > 0) or WG.metalFromOverdrive > 0.1
 	else
-		wastingE = ((WG.energyWasted/WG.allies > eInco*0.05) and (WG.energyWasted/WG.allies > 15)) or WG.metalFromOverdrive > 0
+		wastingE = ((WG.energyWasted/WG.allies > eInco*0.05) and (WG.energyWasted/WG.allies > 15)) or WG.metalFromOverdrive > 0.1
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
 	if stallingE or wastingE then
@@ -316,9 +324,12 @@ function widget:GameFrame(n)
 	local mPercent = 100 * mCurr / mStor
 	local ePercent = 100 * eCurr / eStor
 
+	local positiveString = (options.colourBlind.value and YellowStr) or GreenStr
+	local negativeString = (options.colourBlind.value and BlueStr) or RedStr
+
 	bar_metal:SetValue( mPercent )
 	if wastingM then
-		lbl_metal:SetCaption( (RedStr.."%i"):format(mCurr, mStor) )
+		lbl_metal:SetCaption( (negativeString.."%i"):format(mCurr, mStor) )
 	else
 		lbl_metal:SetCaption( ("%i"):format(mCurr, mStor) )
 	end
@@ -326,9 +337,15 @@ function widget:GameFrame(n)
 	bar_energy:SetValue( ePercent )
     
 	if stallingE then
-		lbl_energy:SetCaption( (RedStr.."%i"):format(eCurr, eStor) )
+		lbl_energy:SetCaption( (negativeString.."%i"):format(eCurr, eStor) )
 	elseif wastingE then
-        lbl_energy:SetCaption( (GreenStr.."%i"):format(eCurr, eStor) )
+        -- local ODEfactor = math.min(1, WG.metalFromOverdrive or 0)
+        -- local textColor = {.8 - .6 * ODEfactor, .8 + .2 * ODEfactor, .8 - .5 * ODEfactor, .95 + .05 * ODEfactor}
+        -- local lblFont = lbl_energy.font
+        -- lblFont.font:SetTextColor(textColor)
+        -- lbl_energy.font = lblFont
+        lbl_energy:SetCaption( (positiveString.."%i"):format(eCurr, eStor) )
+        lbl_energy:UpdateLayout()
 	else
 		lbl_energy:SetCaption( ("%i"):format(eCurr, eStor) )
 	end
@@ -395,12 +412,12 @@ function widget:GameFrame(n)
 
 	image_energy.tooltip = bar_energy.tooltip
 
-	local mTotal
-	if options.onlyShowExpense.value then
-		mTotal = mInco - mExpe + mReci
-	else
-		mTotal = mInco - mPull + mReci
-	end
+	-- local mTotal
+	-- if options.onlyShowExpense.value then
+	-- 	mTotal = mInco - mExpe + mReci
+	-- else
+	-- 	mTotal = mInco - mPull + mReci
+	-- end
 
 	-- if (mTotal >= 2) then
 	-- 	lbl_metal.font:SetColor(0,1,0,1)
@@ -418,12 +435,12 @@ function widget:GameFrame(n)
 	-- 	lbl_metal:SetCaption( ("%+.1f"):format(mTotal) )
 	-- end
 
-	local eTotal
-	if options.onlyShowExpense.value then
-		eTotal = eInco - eExpe
-	else
-		eTotal = eInco - ePull
-	end
+	-- local eTotal
+	-- if options.onlyShowExpense.value then
+	-- 	eTotal = eInco - eExpe
+	-- else
+	-- 	eTotal = eInco - ePull
+	-- end
 	
 	-- if (eTotal >= 2) then
 	-- 	lbl_energy.font:SetColor(0,1,0,1)
@@ -470,7 +487,7 @@ function widget:GameFrame(n)
 		end
 		if bp_aval == 0 then
 			bar_buildpower:SetValue(0)
-			lbl_buildpower:SetCaption("none")
+			lbl_buildpower:SetCaption("no workers")
 		else
 			local buildpercent = bp_use/bp_aval * 100
 			bar_buildpower:SetValue(buildpercent)
@@ -528,7 +545,7 @@ function CreateWindow()
 		padding = {0,0,0,0},
 		right = 0,
 		y = 0,
-		clientWidth  = 240 + workerMult * 60,
+		clientWidth  = 250 + workerMult * 67,
 		clientHeight = 60,
 		draggable = false,
 		resizable = false,
@@ -560,32 +577,36 @@ function CreateWindow()
 	-- 	font   = {size = 19, outline = true, outlineWidth = 4, outlineWeight = 3,},
 	-- 	tooltip = "Your net metal income",
 	-- }
+
+	local col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
+	local col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
+
 	lbl_m_income = Chili.Label:New{
 		parent = window,
 		height = p(50),
 		width  = 75,
-                x      = 60,
-                y      = 5,
+                x      = 61,
+                y      = 4,
                 -- y      = p(60/bars),
 		caption = "10.0",
 		valign = "center",
  		align  = "left",
 		autosize = false,
-		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2, color = {.1,1,.2,1}},
+		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2, color = col_income},
 		tooltip = "Your metal Income.\nGained primarilly from metal extractors, overdrive and reclaim",
 	}
 	lbl_m_expense = Chili.Label:New{
 		parent = window,
 		height = p(50),
 		width  = 75,
-                x      = 60,
-                y      = p(40),
+                x      = 62,
+                y      = p(44),
                 -- y      = 0,
 		caption = "10.0",
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3, color = {1,.3,.2,1}},
+		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3, color = col_expense},
 		tooltip = "This is the metal demand of your construction",
 	}
 	lbl_metal = Chili.Label:New{
@@ -613,7 +634,7 @@ function CreateWindow()
 		max = 1,
 		value  = 0,
 		x      = 45,
-		y      = 10,
+		y      = 8,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 	}
@@ -626,7 +647,7 @@ function CreateWindow()
 		orientation = "vertical",
 		-- right  = 26,
                 x      = 45,
-                y      = 10,
+                y      = 8,
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
@@ -665,28 +686,28 @@ function CreateWindow()
 		parent = window,
 		height = p(50),
 		width  = 75,
-                x      = 165,
+                x      = 174,
                 -- y      = p(60/bars),
-                y      = 5,
+                y      = 4,
 		caption = "10.0",
 		valign  = "center",
 		align   = "left",
 		autosize = false,
-		font   = {size = 18, outline = true, outlineWidth = 2, outlineWeight = 2, color = {.1,1,.2,1}},
+		font   = {size = 18, outline = true, outlineWidth = 2, outlineWeight = 2, color = col_income},
 		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	lbl_e_expense = Chili.Label:New{
 		parent = window,
 		height = p(50),
 		width  = 75,
-                x      = 165,
-                y      = p(40),
+                x      = 175,
+                y      = p(44),
                 -- y      = 0,
 		caption = "10.0",
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = 15, outline = true, outlineWidth = 4, outlineWeight = 3, color = {1,.3,.2,1}},
+		font   = {size = 15, outline = true, outlineWidth = 4, outlineWeight = 3, color = col_expense},
 		tooltip = "This is the energy demand of your economy, cloakers, shields and overdrive",
 	}
 
@@ -694,7 +715,7 @@ function CreateWindow()
 		parent = window,
 		height = p(20),
 		width  = 45,
-                x      = 112,
+                x      = 118,
                 y      = 40,
 		-- valign = "center",
 		align  = "center",
@@ -713,8 +734,8 @@ function CreateWindow()
 		value  = 100,
 		color  = {0,0,0,0},
 		-- right  = 36,
-		x      = 147,
-		y      = 10,
+		x      = 156,
+		y      = 8,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 	}
@@ -730,8 +751,8 @@ function CreateWindow()
 		min = 0,
 		max = 1,
 		-- right  = 36,
-		x      = 147,
-		y      = 10,
+		x      = 156,
+		y      = 8,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 	}
@@ -743,8 +764,8 @@ function CreateWindow()
 		width  = 15,
 		orientation = "vertical",
 		-- right  = 36,
-                x      = 147,
-                y      = 10,
+                x      = 156,
+                y      = 8,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function() return (not widgetHandler:InTweakMode()) end},	-- this is needed for OnMouseUp to work
@@ -759,7 +780,7 @@ function CreateWindow()
 		parent = window,
 		height = p(50),
 		width  = 25,
-                x = 120,
+                x = 128,
                 y = 10,
 		file   = 'LuaUI/Images/energy.png',
 	}	
@@ -782,8 +803,8 @@ function CreateWindow()
 	lbl_buildpower = Chili.Label:New{
 		parent = window,
 		height = p(20),
-		width  = 45,
-                x      = 232,
+		width  = 75,
+                x      = 230,
                 y      = 40,
 		-- valign = "center",
 		align  = "center",
@@ -799,8 +820,8 @@ function CreateWindow()
 		orientation = "vertical",
 		-- right  = 6,
 		width  = 12,
-		x      = 270,
-		y      = 10,
+		x      = 287,
+		y      = 8,
 		tooltip = "Your current percentage of useful buildpower",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
@@ -808,7 +829,7 @@ function CreateWindow()
 		parent = window,
 		height = p(50),
 		width  = 25,
-                x = 240,
+                x = 253,
                 y = 10,
 		tooltip = "Your current percentage of useful buildpower",
 		file   = 'LuaUI/Images/commands/Bold/buildsmall.png',
