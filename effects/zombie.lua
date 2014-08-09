@@ -1,7 +1,3 @@
-Spring = Spring or {}
-Spring.Utilities = Spring.Utilities or {}
-VFS.Include("LuaRules/Utilities/tablefunctions.lua")
-
 return {
   ["zombie"] = {
     light = {
