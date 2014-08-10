@@ -70,6 +70,12 @@ local lbl_e_expense
 local lbl_m_income
 local lbl_e_income
 
+local positiveColourStr
+local negativeColourStr
+local col_income
+local col_expense
+local col_overdrive
+
 local blink = 0
 local blink_periode = 2
 local blink_alpha = 1
@@ -100,6 +106,14 @@ local function option_workerUsageUpdate()
 	CreateWindow()
 end
 
+local function option_colourBlindUpdate()
+	positiveColourStr = (options.colourBlind.value and YellowStr) or GreenStr
+	negativeColourStr = (options.colourBlind.value and BlueStr) or RedStr
+	col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
+	col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
+	col_overdrive = (options.colourBlind.value and {1,1,1,1}) or {.5,1,0,1}
+end
+
 options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve','colourBlind'}
  
 options = { 
@@ -121,10 +135,10 @@ options = {
   opacity = {
 	name = "Opacity",
 	type = "number",
-	value = 0, min = 0, max = 1, step = 0.01,
+	value = 0.6, min = 0, max = 1, step = 0.01,
 	OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,
   },
-  colourBlind = {name = "Colourblind mode", type = "bool", value=false, OnChange = option_workerUsageUpdate, tooltip = "Uses Blue and Yellow instead of Red and Green for number display"}
+  colourBlind = {name = "Colourblind mode", type = "bool", value=false, OnChange = option_colourBlindUpdate, tooltip = "Uses Blue and Yellow instead of Red and Green for number display"}
 }
 
 --------------------------------------------------------------------------------
@@ -192,6 +206,13 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function Mix(startColour, endColour, interpParam)
+	return {endColour[1] * interpParam + startColour[1] * (1 - interpParam), 
+	endColour[2] * interpParam + startColour[2] * (1 - interpParam), 
+	endColour[3] * interpParam + startColour[3] * (1 - interpParam), 
+	endColour[4] * interpParam + startColour[4] * (1 - interpParam), }
+end
+
 function widget:Update(s)
 
 	blink = (blink+s)%blink_periode
@@ -199,16 +220,16 @@ function widget:Update(s)
 	blink_colourBlind = options.colourBlind.value and 1 or 0
 
 	if blinkM_status then
-		bar_metal:SetColor( 1 - 119/255*blink_alpha*(1-blink_colourBlind),214/255 + 41/255*blink_alpha*blink_colourBlind,251/255 - 180/255*blink_alpha*blink_colourBlind,0.65 + 0.3*blink_alpha )
+		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
 	end
 
 	if blinkE_status then
 		if excessE then
 			bar_energy_overlay:SetColor({0,0,0,0})
-            bar_energy:SetColor(1-0.5*blink_alpha,1,0,0.65 + 0.35 *blink_alpha)
+            bar_energy:SetColor(Mix({col_energy[1], col_energy[2], col_energy[3], 0.65}, col_overdrive, blink_alpha))
 		else
 			-- flash red if stalling
-			bar_energy_overlay:SetColor(1,0,0,blink_alpha)
+			bar_energy_overlay:SetColor(col_expense[1], col_expense[2], col_expense[3] ,blink_alpha)
 		end
 	end
 
@@ -216,15 +237,9 @@ end
 
 local function Format(input, override)
 	
-	local leadingString = GreenStr .. "+"
-	if options.colourBlind.value then
-		local leadingString = YellowStr .. "+"
-	end
+	local leadingString = positiveColourStr .. "+"
 	if input < 0 then
-		leadingString = RedStr .. "-"
-		if options.colourBlind.value then
-			local leadingString = BlueStr .. "-"
-		end
+		leadingString = negativeColourStr .. "-"
 	end
 	leadingString = override or leadingString
 	input = math.abs(input)
@@ -303,17 +318,20 @@ function widget:GameFrame(n)
 		bar_metal:SetColor( col_metal )
 	end
 
+	local ODEFlashThreshold = 0.1
+
 	local wastingE = false
 	if options.eexcessflashalways.value then
-		wastingE = (WG.energyWasted > 0) or WG.metalFromOverdrive > 0.1
+		wastingE = (WG.energyWasted > 0) and WG.metalFromOverdrive <= ODEFlashThreshold
 	else
-		wastingE = ((WG.energyWasted/WG.allies > eInco*0.05) and (WG.energyWasted/WG.allies > 15)) or WG.metalFromOverdrive > 0.1
+		wastingE = ((WG.energyWasted/WG.allies > eInco*0.05) and (WG.energyWasted/WG.allies > 15)) and WG.metalFromOverdrive <= ODEFlashThreshold
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
-	if stallingE or wastingE then
+	local overdrivingE = WG.metalFromOverdrive > ODEFlashThreshold
+	if stallingE or wastingE or overdrivingE then
 		blinkE_status = true
 		bar_energy:SetValue( 100 )
-		excessE = wastingE
+		excessE = overdrivingE
 	elseif (blinkE_status) then
 		blinkE_status = false
 		bar_energy:SetColor( col_energy )
@@ -324,12 +342,9 @@ function widget:GameFrame(n)
 	local mPercent = 100 * mCurr / mStor
 	local ePercent = 100 * eCurr / eStor
 
-	local positiveString = (options.colourBlind.value and YellowStr) or GreenStr
-	local negativeString = (options.colourBlind.value and BlueStr) or RedStr
-
 	bar_metal:SetValue( mPercent )
 	if wastingM then
-		lbl_metal:SetCaption( (negativeString.."%i"):format(mCurr, mStor) )
+		lbl_metal:SetCaption( (negativeColourStr.."%i"):format(mCurr, mStor) )
 	else
 		lbl_metal:SetCaption( ("%i"):format(mCurr, mStor) )
 	end
@@ -337,15 +352,12 @@ function widget:GameFrame(n)
 	bar_energy:SetValue( ePercent )
     
 	if stallingE then
-		lbl_energy:SetCaption( (negativeString.."%i"):format(eCurr, eStor) )
+		lbl_energy:SetCaption( (negativeColourStr.."%i"):format(eCurr, eStor) )
 	elseif wastingE then
-        -- local ODEfactor = math.min(1, WG.metalFromOverdrive or 0)
-        -- local textColor = {.8 - .6 * ODEfactor, .8 + .2 * ODEfactor, .8 - .5 * ODEfactor, .95 + .05 * ODEfactor}
-        -- local lblFont = lbl_energy.font
-        -- lblFont.font:SetTextColor(textColor)
-        -- lbl_energy.font = lblFont
-        lbl_energy:SetCaption( (positiveString.."%i"):format(eCurr, eStor) )
-        lbl_energy:UpdateLayout()
+    lbl_energy:SetCaption( (negativeColourStr.."%i"):format(eCurr, eStor) )
+    lbl_energy:UpdateLayout()
+  elseif overdrivingE then
+    lbl_energy:SetCaption( (positiveColourStr.."%i"):format(eCurr, eStor) )
 	else
 		lbl_energy:SetCaption( ("%i"):format(eCurr, eStor) )
 	end
@@ -412,6 +424,7 @@ function widget:GameFrame(n)
 
 	image_energy.tooltip = bar_energy.tooltip
 
+--[[
 	-- local mTotal
 	-- if options.onlyShowExpense.value then
 	-- 	mTotal = mInco - mExpe + mReci
@@ -459,16 +472,17 @@ function widget:GameFrame(n)
 	-- else
 	-- 	lbl_energy:SetCaption( ("%+.1f"):format(eTotal) )
 	-- end
+--]]
 
 	if options.onlyShowExpense.value then
-		lbl_m_expense:SetCaption( "-"..("%.1f"):format(mExpe) )
-		lbl_e_expense:SetCaption( "-"..("%.1f"):format(eExpe - WG.energyForOverdrive) )
+		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(mExpe) )
+		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(eExpe - WG.energyForOverdrive) )
 	else
-		lbl_m_expense:SetCaption( "-"..("%.1f"):format(mPull) )
-		lbl_e_expense:SetCaption( "-"..("%.1f"):format(ePull) )
+		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(mPull) )
+		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(ePull) )
 	end
-	lbl_m_income:SetCaption( "+"..("%.1f"):format(mInco+mReci) )
-	lbl_e_income:SetCaption( "+"..("%.1f"):format(eInco) )
+	lbl_m_income:SetCaption( positiveColourStr.."+"..("%.1f"):format(mInco+mReci) )
+	lbl_e_income:SetCaption( positiveColourStr.."+"..("%.1f"):format(eInco) )
 
 
 	if options.workerUsage.value then
@@ -520,6 +534,7 @@ function widget:Initialize()
 	time_old = GetTimer()
 
 	Spring.SendCommands("resbar 0")
+	option_colourBlindUpdate()
 
 	CreateWindow()
 end
@@ -578,9 +593,6 @@ function CreateWindow()
 	-- 	tooltip = "Your net metal income",
 	-- }
 
-	local col_income = (options.colourBlind.value and {.9,.9,.2,1}) or {.1,1,.2,1}
-	local col_expense = (options.colourBlind.value and {.2,.3,1,1}) or {1,.3,.2,1}
-
 	lbl_m_income = Chili.Label:New{
 		parent = window,
 		height = p(50),
@@ -592,7 +604,7 @@ function CreateWindow()
 		valign = "center",
  		align  = "left",
 		autosize = false,
-		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2, color = col_income},
+		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your metal Income.\nGained primarilly from metal extractors, overdrive and reclaim",
 	}
 	lbl_m_expense = Chili.Label:New{
@@ -606,7 +618,7 @@ function CreateWindow()
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3, color = col_expense},
+		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3},
 		tooltip = "This is the metal demand of your construction",
 	}
 	lbl_metal = Chili.Label:New{
@@ -693,7 +705,7 @@ function CreateWindow()
 		valign  = "center",
 		align   = "left",
 		autosize = false,
-		font   = {size = 18, outline = true, outlineWidth = 2, outlineWeight = 2, color = col_income},
+		font   = {size = 18, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	lbl_e_expense = Chili.Label:New{
@@ -707,7 +719,7 @@ function CreateWindow()
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = 15, outline = true, outlineWidth = 4, outlineWeight = 3, color = col_expense},
+		font   = {size = 15, outline = true, outlineWidth = 4, outlineWeight = 3},
 		tooltip = "This is the energy demand of your economy, cloakers, shields and overdrive",
 	}
 

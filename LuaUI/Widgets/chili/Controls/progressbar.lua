@@ -106,14 +106,14 @@ function Progressbar:DrawControl()
   if (orientation == "horizontal") then
     gl.Rect(x+w*percent,y,x+w,y+h)
   else
-    gl.Rect(x,y+h*percent,x+w,y+h)
+    gl.Rect(x,y+(h-h*percent),x+w,y+h)
   end
 
   gl.Color(self.color)
   if (orientation == "horizontal") then
     gl.Rect(x,y,x+w*percent,y+h)
   else
-    gl.Rect(x,y,x+w,y+h*percent)
+    gl.Rect(x,y,x+w,y+(h-h*percent)
   end
 
   if (self.caption) then
