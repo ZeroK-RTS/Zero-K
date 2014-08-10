@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 
 local tags = {
-  WorkerThreadSpinTime = 0,
+  WorkerThreadSpinTime = 5,
   UseNetMessageSmoothingBuffer = 1,
 }
 
