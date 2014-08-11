@@ -201,6 +201,17 @@ end
 -------------------------------------------------------------------------------------
 -- Handle Teleportation
 
+local function isUnitFlying(unitID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	if x then
+		local height = Spring.GetGroundHeight(x,z)
+		if height == y then
+			return false
+		end
+	end
+	return true
+end
+
 local function isUnitDisabled(unitID)
 	return (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) or select(1, Spring.GetUnitIsStunned(unitID))
 end
@@ -350,8 +361,13 @@ function gadget:GameFrame(f)
 		local bid = tele[tid].link
 		if tele[tid].teleFrame then
 			-- Cannont teleport if Teleporter or Beacon are disarmed, stunned or nanoframes and cannot teleport a nanoframe.
-			local stunned_or_inbuild = isUnitDisabled(tid) or isUnitDisabled(bid) or select(3, Spring.GetUnitIsStunned(tele[tid].teleportiee))
+			local flying = isUnitFlying(tid)
+			local stunned_or_inbuild = isUnitDisabled(tid) or flying or isUnitDisabled(bid) or select(3, Spring.GetUnitIsStunned(tele[tid].teleportiee))
 
+			if flying then
+				interruptTeleport(tid) 
+			end
+			
 			if stunned_or_inbuild then
 				if not tele[tid].stunned then
 					tele[tid].stunned = true
@@ -478,7 +494,8 @@ function gadget:GameFrame(f)
 					if teleportiee then
 						local ud = Spring.GetUnitDefID(teleportiee)
 						ud = ud and UnitDefs[ud]
-						if ud then
+						local flying = isUnitFlying(tid)
+						if ud and not flying then
 
 							local mass = Spring.GetUnitRulesParam(teleportiee, "effectiveMass") or ud.mass
 
