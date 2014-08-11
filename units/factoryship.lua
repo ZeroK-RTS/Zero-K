@@ -41,9 +41,6 @@ unitDef = {
 	helptext_de    = [[Im Shipyard kannst du Schiffe jeder Art und für jeden Zweck bauen.]],
 	helptext_pl    = [[Stocznia produkuje statki i lodzie podwodne; poduszkowce i boty amfibijne maja osobne fabryki.]],
     sortName       = [[7]],
-	--aimposoffset   = [[-30 0 -5]],
-	--midposoffset   = [[0 0 0]],
-	--modelradius    = [[18]],
   },
 
   energyMake             = 0.25,
