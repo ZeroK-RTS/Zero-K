@@ -10,9 +10,7 @@ unitDef = {
   buildPic            = [[ARMMERL.png]],
   buildTime           = 700,
   canAttack           = true,
-  canGuard            = true,
   canMove             = true,
-  canPatrol           = true,
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 20 40]],
@@ -29,8 +27,9 @@ unitDef = {
     helptext_bp    = [[Impaler dispara verticalmente um míssel de grande precis?o, dano e alcançe. Seu alto ângulo disparo o faz capaz de atirar sobre qualquer obstáculo, mas como consequ?ncia o tempo de voo é t?o longo que é quase impossível acertar alvos móveis. Use-o para matar construç?es específicas. ]],
     helptext_de    = [[Der Impaler feuert seine Ballistgeschoss senkrecht ab. Ihn zeichnen seine hohe Präzision und die lange Reichweite seiner Flugkörper, sowie die Möglichkeit über Hindernisse zu schießen, aus. Die große Flugzeit macht ihn aber nutzlos gegenüber sich bewegenden Einheiten. Nutze den Impaler, um spezielle Einheiten/Gebäude zu zerstören.]],
     helptext_fr    = [[Le Impaler tire verticallement des missiles de croisi?res qui retombent exactement sur leur cible, causant de puissant dommages sur une tr?s petite zone. Cependant le temps de voyage des missiles le rends inefficace contre les unit?s mobiles. ]],
-    helptext_pl    = [[Impaler jest wyrzutnią ciężkich pocisków kinetycznych dużego zasięgu. Po wystrzeleniu pocisk wznosi się wysoko w powietrze, a następnie opada na wcześniej wyznaczony punkt. Pozwala to ominąć większość przeszkód i uderzyć z dużą mocą w konkretny budynek. Niestety, Impaler jest absolutnie bezużyteczny przeciwko mobilnym jednostkom.]],
-	dontfireatradarcommand = '1',
+    helptext_pl    = [[Impaler jest wyrzutnia ciezkich pociskow kinetycznych duzego zasiegu. Po wystrzeleniu pocisk wznosi sie wysoko w powietrze, a nastepnie opada na wczesniej wyznaczony punkt. Pozwala to ominac wiekszosc przeszkod i uderzyc z duza moca w konkretny budynek. Niestety, Impaler jest absolutnie bezuzyteczny przeciwko mobilnym jednostkom.]],
+
+    dontfireatradarcommand = '1',
   },
 
   explodeAs           = [[BIG_UNITEX_MERL]],
@@ -44,12 +43,9 @@ unitDef = {
   maxDamage           = 1100,
   maxSlope            = 18,
   maxVelocity         = 2.25,
-  maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SWIM LAND SHIP GUNSHIP HOVER]],
   objectName          = [[core_diplomat.s3o]],
   script              = [[armmerl.lua]],
   seismicSignature    = 4,
@@ -63,9 +59,7 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 660,
-  smoothAnim          = true,
   trackOffset         = 15,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -73,7 +67,6 @@ unitDef = {
   trackWidth          = 40,
   turninplace         = 0,
   turnRate            = 460,
-  workerTime          = 0,
 
   weapons             = {
 
@@ -84,7 +77,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs          = {
 
@@ -98,10 +90,9 @@ unitDef = {
 
       damage         = {
         default = 800,
-        planes  = 800,
         subs    = 4,
       },
-      
+
       --Want to remove engine's FX and rely on CEG??? NOTE: issues with CEG: http://springrts.com/mantis/view.php?id=3401 (invisible CEGs can block all visible CEGs if MaxParticles is low. Not cool...)
       customParams = {
 		--trail_burnout = 64, -- two seconds of vertical ascension
@@ -110,12 +101,12 @@ unitDef = {
       texture1=[[null]], --flare, reference: http://springrts.com/wiki/Weapon_Variables#Texture_Tags
       --texture2=[[null]], --smoketrail
       --texture3=[[null]], --flame
-	  
+
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:DOT_Merl_Explo]],
       fireStarter             = 100,
       flighttime              = 100,
-	  impactOnly              = true,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -124,11 +115,9 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 1500,
       reloadtime              = 10,
-      selfprop                = true,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_hit]],
       soundStart              = [[weapon/missile/missile_launch]],
-      startsmoke              = [[1]],
       tolerance               = 4000,
       turnrate                = 18000,
       weaponAcceleration      = 315,
@@ -139,68 +128,47 @@ unitDef = {
 
   },
 
-
   featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Impaler]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1100,
       energy           = 0,
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       metal            = 280,
       object           = [[core_diplomat_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 280,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     DEAD2 = {
       description      = [[Debris - Impaler]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1100,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 280,
       object           = [[debris3x3c.s3o]],
       reclaimable      = true,
       reclaimTime      = 280,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Impaler]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1100,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 140,
       object           = [[debris3x3c.s3o]],
       reclaimable      = true,
       reclaimTime      = 140,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
