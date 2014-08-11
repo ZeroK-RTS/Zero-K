@@ -10,6 +10,10 @@ Open LieroX:
 something.wav
 something2.wav
 
+Nanoblobs:
+beep4.wav
+beep6.wav
+
 nexuiz:
 talk.wav
 sparks.wav
