@@ -362,27 +362,26 @@ function gadget:GameFrame(f)
 		if tele[tid].teleFrame then
 			-- Cannont teleport if Teleporter or Beacon are disarmed, stunned or nanoframes and cannot teleport a nanoframe.
 			local flying = isUnitFlying(tid)
-			local stunned_or_inbuild = isUnitDisabled(tid) or flying or isUnitDisabled(bid) or select(3, Spring.GetUnitIsStunned(tele[tid].teleportiee))
-
 			if flying then
-				interruptTeleport(tid) 
-			end
-			
-			if stunned_or_inbuild then
-				if not tele[tid].stunned then
-					tele[tid].stunned = true
-					Spring.SetUnitRulesParam(tid,"teleportend",(tele[tid].teleFrame - f)/tele[tid].cost)
-					Spring.SetUnitRulesParam(bid,"teleportend",(tele[tid].teleFrame - f)/tele[tid].cost)
+				interruptTeleport(tid)
+			else
+				local stunned_or_inbuild = isUnitDisabled(tid) or flying or isUnitDisabled(bid) or select(3, Spring.GetUnitIsStunned(tele[tid].teleportiee))
+				if stunned_or_inbuild then
+					if not tele[tid].stunned then
+						tele[tid].stunned = true
+						Spring.SetUnitRulesParam(tid,"teleportend",(tele[tid].teleFrame - f)/tele[tid].cost)
+						Spring.SetUnitRulesParam(bid,"teleportend",(tele[tid].teleFrame - f)/tele[tid].cost)
+					end
+					
+					tele[tid].teleFrame = tele[tid].teleFrame + 1
+				elseif tele[tid].stunned then
+					checkFrame[tele[tid].teleFrame] = true
+					
+					Spring.SetUnitRulesParam(tid,"teleportend",tele[tid].teleFrame)
+					Spring.SetUnitRulesParam(bid,"teleportend",tele[tid].teleFrame)
+					
+					tele[tid].stunned = false
 				end
-			
-				tele[tid].teleFrame = tele[tid].teleFrame + 1
-			elseif tele[tid].stunned then
-				checkFrame[tele[tid].teleFrame] = true
-				
-				Spring.SetUnitRulesParam(tid,"teleportend",tele[tid].teleFrame)
-				Spring.SetUnitRulesParam(bid,"teleportend",tele[tid].teleFrame)
-				
-				tele[tid].stunned = false
 			end
 		end
 	end
