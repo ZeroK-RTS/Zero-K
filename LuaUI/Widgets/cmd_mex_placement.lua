@@ -662,6 +662,20 @@ local function DoLine(x1, y1, z1, x2, y2, z2)
     gl.Vertex(x2, y2, z2)
 end
 
+function widget:DrawWorldPreUnit()
+
+	-- Check command is to build a mex
+	local _, cmdID = spGetActiveCommand()
+	local showecoMode = WG.showeco
+	local peruse = spGetGameFrame() < 1 or showecoMode or spGetMapDrawMode() == 'metal'
+	
+	drawMexSpots = WG.metalSpots and (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
+
+	if drawMexSpots then
+		glCallList(mainMexDrawList)
+	end
+end
+
 function widget:DrawWorld()
 	
 	-- Check command is to build a mex
@@ -674,7 +688,6 @@ function widget:DrawWorld()
 	local _, pos = spTraceScreenRay(mx, my, true)
 	
 	mexSpotToDraw = false
-	drawMexSpots = WG.metalSpots and (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
 	
 	if WG.metalSpots and pos and (-mexDefID == cmdID or peruse or CMD_AREA_MEX == cmdID) then
 	
@@ -686,7 +699,6 @@ function widget:DrawWorld()
 		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and (not spotData[index]) then 
 		
 			mexSpotToDraw = closestSpot
-			gl.DepthTest(false)
 			
 			local height = spGetGroundHeight(closestSpot.x,closestSpot.z)
 			height = height > 0 and height or 0
@@ -709,10 +721,6 @@ function widget:DrawWorld()
 			gl.DepthTest(false)
 			gl.DepthMask(false)
 		end
-	end
-
-	if drawMexSpots then
-		glCallList(mainMexDrawList)
 	end
 	
 	gl.Color(1, 1, 1, 1)
