@@ -61,28 +61,14 @@ for i=1,#UnitDefs do
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	---[[
 	if offsets[unitDefID] then
-
-		mid = offsets[unitDefID].mid
-		aim = offsets[unitDefID].aim
-		
-		local bx, _, bz, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
-		local facing = spGetUnitBuildFacing(unitID)
-		-- Horizontal changes not supported because they are completely broken by rotation.
-		local mx, my, mz = ux, uy + mid[2], uz
-		local ax, ay, az = ux, uy + aim[2], uz
-		Spring.SetUnitMidAndAimPos(unitID, mx, my, mz, ax, ay, az)
+		local mid = offsets[unitDefID].mid
+		local aim = offsets[unitDefID].aim
+		Spring.SetUnitMidAndAimPos(unitID, mid[1], mid[2], mid[3], aim[1], aim[2], aim[3], true)
 	end
 	if modelRadii[unitDefID] then
 		Spring.SetUnitRadiusAndHeight(unitID,modelRadii[unitDefID])
 	end
-	--]]
-	--[[
-	local _,_,_, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
-	Spring.SetUnitMidAndAimPos(unitID, ux, uy, uz , ux, uy, uz)
-	Spring.SetUnitRadiusAndHeight(unitID,22)
-	--]]
 end
 
 --[[
