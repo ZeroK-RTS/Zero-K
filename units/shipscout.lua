@@ -60,7 +60,7 @@ unitDef = {
   sightDistance          = 800,
   sonarDistance          = 300,
   turninplace            = 0,
-  turnRate               = 698,
+  turnRate               = 740,
   waterline              = 2,
 
   weapons                = {
