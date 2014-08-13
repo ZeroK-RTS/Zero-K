@@ -20,6 +20,7 @@ local SIG_BEACON = 2
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Create beacon animation and delay
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local function Create_Beacon_Thread(x,z)
 	local y = Spring.GetGroundHeight(x,z) or 0
@@ -31,23 +32,22 @@ local function Create_Beacon_Thread(x,z)
 	
 	activity_mode(3)
 	
-	Turn( body , y_axis, math.rad(120), math.rad(40) )
 	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
-	for i = 1, 30 do
-		Sleep(100)
+	for i = 1, 90 do
+		local speedMult = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
+		Turn( body , y_axis, math.rad(i*4), math.rad(40*speedMult) )
+		Sleep(100/speedMult)
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
+		while stunnedOrInbuild or disarm do
+			Sleep(100)
+			stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+			disarm = spGetUnitRulesParam(unitID,"disarmed") == 1
+		end
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
-	end
-	Turn( body , y_axis, math.rad(240), math.rad(40) )
-	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
-	for i = 1, 30 do
-		Sleep(100)
-		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
-	end
-	Turn( body , y_axis, math.rad(0), math.rad(40) )
-	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
-	for i = 1, 30 do
-		Sleep(100)
-		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+		if i == 30 or i == 60 then
+			Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
+		end
 	end
 
 	Spring.MoveCtrl.Disable(unitID)
