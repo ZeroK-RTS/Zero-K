@@ -57,7 +57,7 @@ unitDef = {
   sightDistance          = 360,
   sonarDistance          = 360,
   turninplace            = 0,
-  turnRate               = 440,
+  turnRate               = 600,
   upright                = true,
   waterline              = 20,
   workerTime             = 0,
@@ -68,7 +68,7 @@ unitDef = {
       def                = [[FAKEWEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 30,
+      maxAngleDif        = 45,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -77,7 +77,7 @@ unitDef = {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 40,
+      maxAngleDif        = 55,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -97,8 +97,8 @@ unitDef = {
 	  cegTag                  = [[torptrailpurple]],
 
       damage                  = {
-        default = 250,
-        subs    = 250,
+        default = 350,
+        subs    = 350,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
@@ -114,7 +114,7 @@ unitDef = {
 	  numbounce               = 0,
       noSelfDamage            = true,
       range                   = 310,
-      reloadtime              = 3.8,
+      reloadtime              = 7.5,
       soundHit                = [[explosion/wet/ex_underwater]],
       soundHitVolume          = 0.8,
       soundStart              = [[weapon/torpedo]],
@@ -122,7 +122,7 @@ unitDef = {
       startVelocity           = 450,
       tolerance               = 200,
       tracks                  = true,
-      turnRate                = 12000,
+      turnRate                = 20000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 400,
