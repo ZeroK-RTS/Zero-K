@@ -32,6 +32,7 @@ unitDef = {
 	helptext_de    = [[Teuer, versteckt und gebrechlich ist dieses U-Boot. Es kann nicht nach hinten schießen und seine Ausrichtung dauert lange. Daher lieber gleich richtig positionieren. Achte auf alles mit Anti-U-Boot Ausrüstung, besonders 'Hunter' - Torpedofregatten.]],
 	helptext_pl    = [[Lodzie powolne, mimo ze sa drogie i delikatne, zadaja duze obrazenia i moga zostac wykryte tylko przez sonar. Wyrzutnie torped maja zamontowane tylko z przodu, zatem odpowienie ustawienie jest kluczem w bitwach, w ktorych uczestnicza. Torpedy to glowna kategoria broni, ktora moze atakowac lodzie podwodne, zatem nalezy ich unikac - szczegolnie fregat torpedowych.]],
 	modelradius    = [[15]],
+    turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -68,7 +69,7 @@ unitDef = {
       def                = [[FAKEWEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 45,
+      maxAngleDif        = 200,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -77,7 +78,7 @@ unitDef = {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 55,
+      maxAngleDif        = 200,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -90,7 +91,6 @@ unitDef = {
       name                    = [[Torpedo]],
       areaOfEffect            = 16,
       avoidFriendly           = false,
-      canAttackGround		  = false,	-- workaround for range hax
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
@@ -122,7 +122,7 @@ unitDef = {
       startVelocity           = 450,
       tolerance               = 200,
       tracks                  = true,
-      turnRate                = 20000,
+      turnRate                = 80000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 400,
