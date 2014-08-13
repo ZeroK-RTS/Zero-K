@@ -10,9 +10,7 @@ unitDef = {
   canAttack           = true,
   canDropFlare        = false,
   canFly              = true,
-  canGuard            = true,
   canMove             = true,
-  canPatrol           = true,
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
@@ -32,7 +30,7 @@ unitDef = {
     helptext_bp    = [[Bombardeiro rápido a radar equipado com um gerador de raios ao invés de bombas que dispara raios de PEM contra o inimigo ao atacar.]],
     helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
     helptext_fr    = [[Rapide, armé de canons EMP pouvant paralyser les unités dans une large bande.]],
-    helptext_pl    = [[Szybki bombowiec, który jest w stanie rozbroic jednostki w wyznaczonym obszarze.]],
+    helptext_pl    = [[Szybki bombowiec, ktory jest w stanie rozbroic jednostki w wyznaczonym obszarze.]],
     modelradius    = [[10]],
   },
 
@@ -43,19 +41,16 @@ unitDef = {
   iconType            = [[bomberriot]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 238,
   maxAcc              = 0.5,
   maxDamage           = 1000,
   maxFuel             = 1000000,
   maxVelocity         = 9,
   minCloakDistance    = 75,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName          = [[stiletto.s3o]],
   script              = [[armstiletto_laser.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
-  side                = [[ARM]],
   sightDistance       = 660,
   stealth             = false,
   turnRadius          = 130,
@@ -68,7 +63,6 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
-
     {
       def                = [[ARMBOMBLIGHTNING]],
       mainDir            = [[0 -1 0]],
@@ -78,7 +72,6 @@ unitDef = {
 
   },
 
-
   weaponDefs          = {
 
     ARMBOMBLIGHTNING = {
@@ -87,21 +80,20 @@ unitDef = {
       avoidFeature            = false,
       avoidFriendly           = false,
       beamTime                = 0.01,
-	  burst					  = 80,
-	  burstRate				  = 0.3,
+      burst                   = 80,
+      burstRate               = 0.3,
       canattackground         = false,
       collideFriendly         = false,
       coreThickness           = 0.6,
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        = {
-	    disarmDamageMult = 3,
-		disarmDamageOnly = 1,
-		disarmTimer      = 16, -- seconds
-	  
-	  },
-	  
+      customParams        = {
+        disarmDamageMult = 3,
+        disarmDamageOnly = 1,
+        disarmTimer      = 16, -- seconds
+      },
+ 
       damage                  = {
         default        = 225,
       },
@@ -147,60 +139,45 @@ unitDef = {
 
       explosionGenerator      = [[custom:NONE]],
       interceptedByShieldType = 1,
-	  intensity               = 0,
+      intensity               = 0,
       manualBombSettings      = true,
       myGravity               = 0.8,
       noSelfDamage            = true,
       range                   = 500,
       reloadtime              = 10,
-	  scale                   = [[0]],
       sprayangle              = 64000,
       weaponType              = [[AircraftBomb]],
     },
 
   },
 
-
   featureDefs         = {
 
     DEAD = {
       description      = [[Wreckage - Thunderbird]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1000,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
+      footprintX       = 3,
+      footprintZ       = 3,
       metal            = 220,
       object           = [[Stiletto_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 220,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP = {
       description      = [[Debris - Thunderbird]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1000,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
+      footprintX       = 3,
+      footprintZ       = 3,
       metal            = 110,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 110,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

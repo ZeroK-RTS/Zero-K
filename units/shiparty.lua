@@ -5,16 +5,13 @@ unitDef = {
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,
-  buildAngle             = 16384,
   buildCostEnergy        = 550,
   buildCostMetal         = 550,
   builder                = false,
   buildPic               = [[armroy.png]],
   buildTime              = 550,
   canAttack              = true,
-  canGuard               = true,
   canMove                = true,
-  canPatrol              = true,
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 1 3]],
   collisionVolumeScales  = [[35 35 132]],
@@ -23,16 +20,17 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    description_de = [[ZerstÃ¶rer (Artillerie/Semi-U-Boot-Abwehr]],
     description_fr = [[Destroyer Artillerie/Semi-Anti-Sous-Marins]],
-    description_pl = [[Niszczyciel (Artyleria/Przeciw £odziom Podwodnym)]],
-    description_de = [[Zerstörer (Artillerie/Semi-U-Boot-Abwehr]],
+    description_pl = [[Niszczyciel (artyleria / przeciwpodwodny)]],
     helptext       = [[This Destroyer packs a powerful, long-range main cannon, useful for bombarding fixed emplacements and shore targets, as well as a depth charge launcher for use against submarines. Beware of aircraft and Corvettes--the Destroyer's weapons have trouble hitting fast-moving targets.]],
+    helptext_de    = [[Der ZerstÃ¶rer kombiniert eine kraftvolle, weitreichende Hauptkanone, nÃ¼tzlich fÃ¼r das Bombadieren von festen Standorten und KÃ¼stenzielen, mit einem Torpedowerfer gegen U-Boote. HÃ¼te dich vor Flugzeugen und Korvetten - ZerstÃ¶rer haben einige Probleme damit, schnelle Ziele zu treffen.]],
     helptext_fr    = [[Ce Destroyer embarque un puissant canon longue port?e et un lance grenade sous marines. Utile pour se d?barrasser de menaces sous marines ou de positions fixes, son canon est cependant trop peu pr?cis pour d?truire des menaces rapides.]],
-    helptext_pl    = [[Crusader posiada potê¿n¹ armatê œredniego zasiêgu idealn¹ do bombardowania nieruchomych wie¿yczek broni¹cych wybrze¿y. Jego drug¹ broni¹ jest wyrzutnia ³adunków g³êbinowych. £atwo pada ofiar¹ jednostek lataj¹cych i korwet, gdy¿ nie posiada broni skutecznym przeciwko szybkim celom.]],
-    helptext_de    = [[Der Zerstörer kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Torpedowerfer gegen U-Boote. Hüte dich vor Flugzeugen und Korvetten - Zerstörer haben einige Probleme damit, schnelle Ziele zu treffen.]],
+    helptext_pl    = [[Crusader posiada potezna armate sredniego zasiegu idealna do bombardowania nieruchomych wiezyczek broniacych wybrzezy. Jego druga bronia jest wyrzutnia ladunkÃ³w glebinowych. Latwo pada ofiara jednostek latajacych i korwet, gdyz nie posiada broni skutecznym przeciwko szybkim celom.]],
+
     extradrawrange = 200,
-	modelradius    = [[17]],
-	turnatfullspeed = [[1]],
+    modelradius    = [[17]],
+    turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -42,27 +40,21 @@ unitDef = {
   iconType               = [[destroyer]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 320,
   maxDamage              = 1600,
   maxVelocity            = 1.9,
   minCloakDistance       = 75,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
-  moveState              = 0,
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING]],
   objectName             = [[armroy.s3o]],
-  script	    	     = [[shiparty.cob]],
+  script                 = [[shiparty.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[ARM]],
   sightDistance          = 660,
-  smoothAnim             = true,
   sonarDistance          = 350,
   turninplace            = 0,
   turnRate               = 350,
   waterline              = 0,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -72,7 +64,6 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
 
-
     {
       def                = [[DEPTHCHARGE]],
       badTargetCategory  = [[FIXEDWING]],
@@ -80,7 +71,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -91,6 +81,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      burnblow                = true,
 
       damage                  = {
         default = 180,
@@ -101,7 +92,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-	  leadlimit               = 0,
+      leadlimit               = 0,
       model                   = [[depthcharge.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
@@ -112,14 +103,13 @@ unitDef = {
       startVelocity           = 50,
       tolerance               = 100000,
       tracks                  = true,
-      turnRate                = 20000,
+      turnRate                = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 30,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 150,
     },
-
 
     PLASMA      = {
       name                    = [[Plasma Cannon]],
@@ -129,7 +119,6 @@ unitDef = {
 
       damage                  = {
         default = 600,
-        planes  = 600,
         subs    = 30,
       },
 
@@ -138,14 +127,13 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-	  myGravity               = 0.11,
+      myGravity               = 0.11,
       noSelfDamage            = true,
       range                   = 900,
       reloadtime              = 4,
-	  size                    = 3.8,
+      size                    = 3.8,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/heavy_cannon]],
-      startsmoke              = [[1]],
       targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
@@ -154,45 +142,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Crusader]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 1600,
       energy           = 0,
       featureDead      = [[HEAP]],
-      footprintX       = 5,
-      footprintZ       = 5,
-      height           = [[4]],
-      hitdensity       = [[100]],
+      footprintX       = 4,
+      footprintZ       = 4,
       metal            = 220,
       object           = [[armroy_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 220,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
-    
     HEAP  = {
       description      = [[Debris - Crusader]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1600,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      hitdensity       = [[100]],
       metal            = 110,
       object           = [[debris4x4b.s3o]],
       reclaimable      = true,
       reclaimTime      = 110,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

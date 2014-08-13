@@ -98,7 +98,7 @@ local function RefreshConsList() end	-- redefined later
 local function ClearData() end
 
 options_path = 'Settings/HUD Panels/Core Selector'
-options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm'}
+options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
 options = {
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-10)',
@@ -128,6 +128,21 @@ options = {
 		name = 'Select Commander',
 		action = 'selectcomm',
 		path = 'Game/Selection Hotkeys',
+	},
+	
+	hideWindow = { type = 'button',
+		name = 'Hide Window',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		OnChange = function(self)
+			if not self.value then
+				screen0:AddChild(window_selector)
+			else
+				screen0:RemoveChild(window_selector)
+			end
+			
+		end
 	},
 }
 

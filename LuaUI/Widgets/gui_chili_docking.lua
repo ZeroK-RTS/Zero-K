@@ -290,6 +290,7 @@ function widget:DrawScreen()
 				button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; 
 					caption='';dockable=false,winName = win.name, tooltip='Minimize ' .. win.name, backgroundColor={0,1,0,1},
 					widgetName = win.parentWidgetName,
+					win = win,
 					OnClick = {
 						function(self)
 							if button.winVisible then
@@ -340,6 +341,12 @@ function widget:DrawScreen()
 		end
 		local widgetInfo = button.widgetName and widgetHandler.knownWidgets[button.widgetName]
 		if widgetInfo and not widgetInfo.active then --check if widget was removed
+			button:Dispose();
+			buttons[name] = nil
+		end
+		
+		
+		if button.win.parent and button.win.parent.name ~= screen0.name then
 			button:Dispose();
 			buttons[name] = nil
 		end

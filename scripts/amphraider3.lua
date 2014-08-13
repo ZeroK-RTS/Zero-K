@@ -38,6 +38,9 @@ local SIG_RESTORE = 8
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
 local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
+local torpRange = WeaponDefNames["amphraider3_torpedo"].range
+local shotRange = WeaponDefNames["amphraider3_torpmissile"].range
+local longRange = true
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -123,8 +126,25 @@ function script.StopMoving()
 	StartThread(Stopping)
 end
 
+local function WeaponRangeUpdate()
+	while true do
+		local height = select(2, Spring.GetUnitPosition(unitID))
+		if height < -32 then
+			if longRange then
+				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
+				longRange = false
+			end
+		elseif not longRange then
+			Spring.SetUnitWeaponState(unitID, 1, {range = shotRange})
+			longRange = true
+		end
+		Sleep(200)
+	end
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)	
+	StartThread(WeaponRangeUpdate)
 end
 
 local function RestoreAfterDelay()

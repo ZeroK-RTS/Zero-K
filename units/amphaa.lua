@@ -17,14 +17,14 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
+  canStop                = true,
   category               = [[LAND SINK]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     description_pl = [[Amfibijny Bot Przeciwlotniczy]],
     helptext       = [[Angler is amphibious AA designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven.]],
-    helptext_pl    = [[Angler to amfibijna jednostka przeciwlotnicza zaprojektowana, by likwidowaæ g³ówne lotnicze zagro¿enie dla amfibii - bombowiec Raven. Dwa Anglery mog¹ wyp³yn¹æ na powierzchniê i zestrzeliæ pojedynczego Ravena.]],
+    helptext_pl    = [[Angler to amfibijna jednostka przeciwlotnicza zaprojektowana, by likwidowac glowne lotnicze zagrozenie dla amfibii - bombowiec Raven. Dwa Anglery moga wyplynac na powierzchnie i zestrzelic pojedynczego Ravena.]],
     floattoggle = [[1]],
   },
 
@@ -38,10 +38,9 @@ unitDef = {
   maxDamage              = 1100,
   maxSlope               = 36,
   maxVelocity            = 1.6,
-  maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
-  noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[amphaa.s3o]],
   script                 = [[amphaa.lua]],
   seismicSignature       = 4,
@@ -79,17 +78,17 @@ unitDef = {
     MISSILE = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
-      burst					  = 4,
-      burstRate				  = 0.7,
-      canattackground         = false,
+      burst                   = 4,
+      burstRate               = 0.7,
+      canAttackGround         = false,
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
       craterMult              = 2,
       cylinderTargeting       = 1,
 
-	  customParams        	  = {
-		isaa = [[1]],
-	  },
+      customParams            = {
+          isaa = [[1]],
+      },
 
       damage                  = {
         default = 14.5,
@@ -130,8 +129,8 @@ unitDef = {
       blocking         = true,
       damage           = 1100,
       energy           = 0,
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 2,
+      footprintZ       = 2,
       metal            = 88,
       object           = [[amphaa_dead.s3o]],
       reclaimable      = true,

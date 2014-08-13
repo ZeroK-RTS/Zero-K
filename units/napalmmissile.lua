@@ -2,11 +2,6 @@ unitDef = {
   unitname                      = [[napalmmissile]],
   name                          = [[Inferno]],
   description                   = [[Napalm Missile]],
-  acceleration                  = 1,
-  antiweapons                   = [[1]],
-  bmcode                        = [[0]],
-  brakeRate                     = 0,
-  buildAngle                    = 8192,
   buildCostEnergy               = 500,
   buildCostMetal                = 500,
   builder                       = false,
@@ -17,20 +12,18 @@ unitDef = {
   buildPic                      = [[napalmmissile.png]],
   buildTime                     = 500,
   canAttack                     = true,
-  canGuard                      = true,
-  canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets	    = [[0 15 0]],
-  collisionVolumeScales		    = [[20 60 20]],
+  collisionVolumeOffsets        = [[0 15 0]],
+  collisionVolumeScales         = [[20 60 20]],
   collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
     description_de = [[Napalm-Rakete]],
-    description_pl = [[Rakieta zapalająca]],
+    description_pl = [[Rakieta zapalajaca]],
     helptext       = [[The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time.]],
-	helptext_de    = [[Der Inferno ist eine große AoE Feuerwaffe. Sein direkter Schaden ist gering, aber die Flammenhölle erzeugt Verluste für längere Zeit.]],
-	helptext_pl    = [[Jednorazowa rakieta dalekiego zasięgu, która podpala na długi czas trafiony obszar, zadając znajdującym się w nim jednostkom obrażenia.]],
+    helptext_de    = [[Der Inferno ist eine große AoE Feuerwaffe. Sein direkter Schaden ist gering, aber die Flammenhölle erzeugt Verluste für längere Zeit.]],
+    helptext_pl    = [[Jednorazowa rakieta dalekiego zasięgu, ktora podpala na dlugi czas trafiony obszar, zadajac znajdujacym sie w nim jednostkom obrazenia.]],
   },
 
   explodeAs                     = [[WEAPON]],
@@ -39,13 +32,9 @@ unitDef = {
   iconType                      = [[cruisemissilesmall]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 226,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
-  maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  noAutoFire                    = false,
   objectName                    = [[wep_napalm.s3o]],
   script                        = [[cruisemissile.lua]],
   seismicSignature              = 4,
@@ -59,13 +48,8 @@ unitDef = {
 
   },
 
-  side                          = [[CORE]],
   sightDistance                 = 0,
-  smoothAnim                    = true,
-  TEDClass                      = [[SPECIAL]],
-  turnRate                      = 0,
   useBuildingGroundDecal        = false,
-  workerTime                    = 0,
   yardMap                       = [[o]],
 
   weapons                       = {
@@ -78,57 +62,45 @@ unitDef = {
 
   },
 
-
   weaponDefs                    = {
 
     WEAPON = {
       name                    = [[Napalm Missile]],
-	  cegTag                  = [[napalmtrail]],
+      cegTag                  = [[napalmtrail]],
       areaOfEffect            = 512,
       avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 4,
       craterMult              = 3.5,
 
-	  customParams        	  = {
-	    setunitsonfire = "1",
-		burntime = 90,
-	  },
-	  
+      customParams        	  = {
+        setunitsonfire = "1",
+        burntime = 90,
+      },
+
       damage                  = {
         default = 150,
-        planes  = 150,
         subs    = 7.5,
       },
 
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:napalm_missile]],
       fireStarter             = 220,
-      guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       levelGround             = false,
-      lineOfSight             = true,
       model                   = [[wep_napalm.s3o]],
-      noautorange             = [[1]],
       noSelfDamage            = true,
-      propeller               = [[1]],
       range                   = 3500,
       reloadtime              = 10,
-      renderType              = 1,
-      selfprop                = true,
       shakeduration           = [[1.5]],
       shakemagnitude          = [[32]],
-      smokedelay              = [[0.1]],
       smokeTrail              = false,
       soundHit                = [[weapon/missile/nalpalm_missile_hit]],
       soundStart              = [[weapon/missile/tacnuke_launch]],
-      startsmoke              = [[1]],
       tolerance               = 4000,
-      twoPhase                = true,
       turnrate                = 18000,
-      vlaunch                 = true,
       weaponAcceleration      = 180,
       weaponTimer             = 3,
       weaponType              = [[StarburstLauncher]],
@@ -136,7 +108,6 @@ unitDef = {
     },
 
   },
-
 
   featureDefs                   = {
   },

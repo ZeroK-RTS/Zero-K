@@ -152,7 +152,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 360,
-      object           = [[chainsaw_d.3ds]],
+      object           = [[chainsaw_d.dae]],
       reclaimable      = true,
       reclaimTime      = 360,
     },

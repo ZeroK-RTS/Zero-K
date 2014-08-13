@@ -656,8 +656,11 @@ end
 -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 
 local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
+	if unitPaybackTeamID[unitID] then
+		-- Only add units to payback once.
+		return
+	end
 	local def = paybackDefs[unitDefID]
-
 	unitPaybackTeamID[unitID] = unitTeam
 	teamPayback[unitTeam] = teamPayback[unitTeam] or {count = 0, toRemove = {}, data = {}}
 	
@@ -1257,6 +1260,7 @@ local function TransferMexRefund(unitID, newTeamID)
 end
 
 local function AddMex(unitID, teamID, metalMake)
+	metalMake = metalMake or 0
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
@@ -1356,9 +1360,7 @@ function gadget:Initialize()
 		local unitDefID = spGetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
 			local inc = spGetUnitRulesParam(unitID, "mexIncome")
-			if inc then
-				AddMex(unitID, false, inc)
-			end
+			AddMex(unitID, false, inc)
 		end
 		if (pylonDefs[unitDefID]) then
 			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
@@ -1387,9 +1389,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
 		local inc = spGetUnitRulesParam(unitID, "mexIncome")
-		if inc then
-			AddMex(unitID, unitTeam, inc)
-		end
+		AddMex(unitID, unitTeam, inc)
 	end
 	if pylonDefs[unitDefID] then
 		--Note: pylon was added in UnitFinished() when resurrected.

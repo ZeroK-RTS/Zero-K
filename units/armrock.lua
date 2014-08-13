@@ -138,7 +138,7 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       metal            = 36,
-      object           = [[rocko_d.3ds]],
+      object           = [[rocko_d.dae]],
       reclaimable      = true,
       reclaimTime      = 36,
     },

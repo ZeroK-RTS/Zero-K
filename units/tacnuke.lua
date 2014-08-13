@@ -2,10 +2,6 @@ unitDef = {
   unitname                      = [[tacnuke]],
   name                          = [[Eos]],
   description                   = [[Tactical Nuke]],
-  acceleration                  = 1,
-  antiweapons                   = [[1]],
-  brakeRate                     = 0,
-  buildAngle                    = 8192,
   buildCostEnergy               = 600,
   buildCostMetal                = 600,
   builder                       = false,
@@ -16,8 +12,6 @@ unitDef = {
   buildPic                      = [[tacnuke.png]],
   buildTime                     = 600,
   canAttack                     = true,
-  canGuard                      = true,
-  canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 25 0]],
   collisionVolumeScales         = [[20 60 20]],
@@ -26,12 +20,12 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Lance Missile Nucléaire Tactique]],
-	description_de = [[Taktische Rakete]],
-	description_pl = [[Rakieta Taktyczna]],
+    description_de = [[Taktische Rakete]],
+    description_pl = [[Rakieta taktyczna]],
     helptext       = [[A long-range precision strike weapon. The Eos' blast radius is small, but lethal.]],
     helptext_fr    = [[Le Eos est un lance missile nucléaire tactique. Les tetes nucléaires ne sont pas aussi lourdes que celles du Silencer et la portée moindre. Mais bien placé, il peut faire des ravages, et présente un rapport cout/efficacité plus qu'interressant.]],
-	helptext_de    = [[Eine weitreichende, präzise Waffe. Die Druckwelle ist zwar klein, aber tödlich.]],
-	helptext_pl    = [[Jednorazowa rakieta dalekiego zasięgu, której wybuch obejmuje mały obszar, lecz jest bardzo silny.]],
+    helptext_de    = [[Eine weitreichende, präzise Waffe. Die Druckwelle ist zwar klein, aber tödlich.]],
+    helptext_pl    = [[Jednorazowa rakieta dalekiego zasiegu, ktorej wybuch obejmuje maly obszar, lecz jest bardzo silny.]],
     mobilebuilding = [[1]],
   },
 
@@ -41,13 +35,9 @@ unitDef = {
   iconType                      = [[cruisemissilesmall]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 243,
   maxDamage                     = 1000,
   maxSlope                      = 18,
-  maxVelocity                   = 0,
-  maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  noAutoFire                    = false,
   objectName                    = [[wep_tacnuke.s3o]],
   script                        = [[cruisemissile.lua]],
   seismicSignature              = 4,
@@ -61,11 +51,8 @@ unitDef = {
 
   },
 
-  side                          = [[CORE]],
   sightDistance                 = 0,
-  turnRate                      = 0,
   useBuildingGroundDecal        = false,
-  workerTime                    = 0,
   yardMap                       = [[o]],
 
   weapons                       = {
@@ -78,14 +65,13 @@ unitDef = {
 
   },
 
-
   weaponDefs                    = {
 
     WEAPON = {
       name                    = [[Tactical Nuke]],
       areaOfEffect            = 192,
       avoidFriendly           = false,
-	  cegTag                  = [[tactrail]],
+      cegTag                  = [[tactrail]],
       collideFriendly         = false,
       craterBoost             = 4,
       craterMult              = 3.5,
@@ -103,22 +89,15 @@ unitDef = {
       interceptedByShieldType = 1,
       levelGround             = false,
       model                   = [[wep_tacnuke.s3o]],
-      noautorange             = [[1]],
-      propeller               = [[1]],
       range                   = 3500,
       reloadtime              = 10,
-      selfprop                = true,
       shakeduration           = [[1.5]],
       shakemagnitude          = [[32]],
-      smokedelay              = [[0.1]],
       smokeTrail              = false,
       soundHit                = [[explosion/mini_nuke]],
       soundStart              = [[weapon/missile/tacnuke_launch]],
-      startsmoke              = [[1]],
       tolerance               = 4000,
-      twoPhase                = true,
       turnrate                = 18000,
-      vlaunch                 = true,
       weaponAcceleration      = 180,
       weaponTimer             = 3,
       weaponType              = [[StarburstLauncher]],
@@ -126,7 +105,6 @@ unitDef = {
     },
 
   },
-
 
   featureDefs                   = {
   },

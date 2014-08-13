@@ -20,6 +20,7 @@ unitDef = {
   collisionVolumeScales  = [[20 20 20]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
   customParams           = {
     description_de = [[Wandernde Rakete]],
@@ -127,6 +128,51 @@ unitDef = {
       weaponTimer             = 3,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
+    },
+
+  },
+  
+  featureDefs            = {
+
+    DEAD      = {
+      description      = [[Wreckage - Puppy]],
+      blocking         = false,
+      damage           = 80,
+      energy           = 0,
+      featureDead      = [[DEAD2]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      metal            = 20,
+      object           = [[debris2x2a.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 20,
+    },
+	
+	DEAD2      = {
+      description      = [[Wreckage - Puppy]],
+      blocking         = false,
+      damage           = 80,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      metal            = 20,
+      object           = [[debris2x2b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 20,
+    },
+
+    HEAP      = {
+      description      = [[Debris - Puppy]],
+      blocking         = false,
+      damage           = 80,
+      energy           = 0,
+      footprintX       = 2,
+      footprintZ       = 2,
+      metal            = 10,
+      object           = [[debris2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 10,
     },
 
   },

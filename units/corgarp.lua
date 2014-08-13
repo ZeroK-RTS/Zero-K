@@ -77,8 +77,6 @@ unitDef = {
 
     {
       def                = [[MINE]],
-      mainDir            = [[0 0 1]],
-      maxAngleDif        = 180,
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -109,7 +107,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       model                   = [[logmine.s3o]],
-      myGravity               = 0.3,
+      myGravity               = 0.34,
       noSelfDamage            = true,
       range                   = 800,
       reloadtime              = 5,

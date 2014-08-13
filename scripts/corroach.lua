@@ -187,7 +187,7 @@ function script.StopMoving()
 	StartThread( Burrow )
 end
 
-function script.Killed()
+function script.Killed(recentDamage, maxHealth)
 	--Spring.Echo("I am ded")
 	Explode( lf_leg, SFX.EXPLODE )
 	Explode( lb_leg, SFX.EXPLODE )
@@ -197,4 +197,10 @@ function script.Killed()
 	Explode( lb_foot, SFX.EXPLODE )
 	Explode( rf_foot, SFX.EXPLODE )
 	Explode( rb_foot, SFX.EXPLODE )
+	local severity = recentDamage / maxHealth
+	if (severity <= 0.5) then
+		return 1 -- corpsetype
+	else
+		return 2 -- corpsetype
+	end
 end

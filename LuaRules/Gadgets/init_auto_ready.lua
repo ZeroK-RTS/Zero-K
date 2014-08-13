@@ -15,15 +15,13 @@ function gadget:GetInfo()
     date      = "15.4.2012",
     license   = "Nobody can do anything except me, Microsoft and Apple! Thieves hands off",
     layer     = 0,
-    enabled   = not singleplayer  --  loaded by default?
+    enabled   = not (singleplayer and VFS.FileExists("mission.lua"))  --  loaded by default?
   }
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 if (not gadgetHandler:IsSyncedCode()) then
-
-local reverseCompat = (Game.version:find('91.'))
 
 local MAX_TIME_DIFF = 75	-- wait this long for disconnected players
 

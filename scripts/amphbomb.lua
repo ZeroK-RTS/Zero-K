@@ -1,4 +1,4 @@
-
+local TANK_MAX = 100
 --pieces
 local body = piece "body"
 local firepoint = piece "firepoint"
@@ -17,7 +17,7 @@ local sa = math.rad(20)
 local ma = math.rad(60)
 local la = math.rad(100)
 local pause = 300
-local dirtfling = 1024+2
+local dirtfling = 1024 +3 --explosiongenerators=[[custom:digdig]]
 
 --variables
 local walking = false
@@ -75,7 +75,7 @@ local function Burrow()
 	
 	Signal( SIG_Walk )
 	burrowed = true
-	EmitSfx( digger, 1024 )
+	EmitSfx( digger, dirtfling )
 	
 	--burrow
 	Move( body , y_axis, -1.500000 , 1.500000 )
@@ -103,7 +103,7 @@ local function UnBurrow()
 	
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	GG.UpdateUnitAttributes(unitID)
-	EmitSfx( digger, 1024)
+	EmitSfx( digger, dirtfling)
 	
 	StartThread( Walk )
 end
@@ -136,7 +136,13 @@ function script.StopMoving()
 	StopSpin(wheell2, x_axis, (10))
 	StopSpin(wheelr1, x_axis, (10))
 	StopSpin(wheelr2, x_axis, (10))
-	StartThread( Burrow )
+	if select(2,Spring.GetUnitPosition(unitID)) > 0 then
+		StartThread( Burrow ) --cloaked
+	end
+end
+
+function script.FireWeapon(num)
+	GG.shotWaterWeapon(unitID)
 end
 
 function script.Killed()
