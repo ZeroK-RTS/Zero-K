@@ -22,7 +22,6 @@ local rim2 = piece 'rim2'
 include "constants.lua"
 include "RockPiece.lua"
 
-local closed = true
 local shootCycle = 0
 local gunHeading = 0
 
@@ -109,14 +108,6 @@ local function MoveScript()
 		EmitSfx( ground1,  1024)
 		Sleep( 150)
 	end
-end
-
-function script.Activate()
-	closed = true
-end
-
-function script.Deactivate()
-	closed = false
 end
 
 function script.Create()
