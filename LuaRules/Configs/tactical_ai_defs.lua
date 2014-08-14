@@ -28,7 +28,6 @@ local longRangeSwarmieeArray = {
 	["corstorm"] = true,
 	["shiparty"] = true,
 	["armham"] = true,
-	["subraider"] = true,
 }
 
 local medRangeSwarmieeArray = { 
@@ -101,6 +100,8 @@ local riotRangeSkirmieeArray = {
 	["hoverscout"] = true,
 	["shipscout"] = true,
 	["shipraider"] = true,
+	["shiptorp"] = true,
+	["subraider"] = true,
 	["amphriot"] = true,
 	["armcomdgun"] = true,
 	["dante"] = true,
@@ -121,6 +122,7 @@ local riotRangeSkirmieeArray = {
 	["arm_spider"] = true,
 	["corfast"] = true,
 	["amphcon"] = true,
+	["shipcon"] = true,
 	
 	["spherecloaker"] = true,
 	["core_spectre"] = true,
