@@ -429,8 +429,10 @@ function gadget:GameFrame(n)
 	-- check for last ally:
 	-- end condition: only 1 ally with human players, no AIs in other ones
 	if (n % 45 == 0) then
-		for u in pairs(toDestroy) do
-			spDestroyUnit(u, true)
+		if toDestroy then
+			for u in pairs(toDestroy) do
+				spDestroyUnit(u, true)
+			end
 		end
 		toDestroy = {}
 		if not gameover then
