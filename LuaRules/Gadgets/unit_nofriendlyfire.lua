@@ -41,6 +41,10 @@ local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetUnitHealth  = Spring.GetUnitHealth
 local spSetUnitHealth  = Spring.SetUnitHealth
 
+local DefensiveManeuverDefs = {
+	[UnitDefNames["armsolar"].id] = true
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -50,11 +54,15 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-	if (weaponID and
-		noFFWeaponDefs[weaponID] and
-		attackerID ~= unitID and
-		((not attackerTeam) or spAreTeamsAllied(unitTeam, attackerTeam))) then
-		return 0, 0
+	if weaponID and noFFWeaponDefs[weaponID] then
+		if attackerID ~= unitID and ((not attackerTeam) or spAreTeamsAllied(unitTeam, attackerTeam)) then
+			return 0, 0
+		elseif unitDefID and DefensiveManeuverDefs[unitDefID] then
+			local env = Spring.UnitScript.GetScriptEnv(unitID)
+			if env then
+				Spring.UnitScript.CallAsUnit(unitID,env.HitByWeaponGadget)
+			end
+		end
 	end
   
 	return damage

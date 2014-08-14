@@ -401,6 +401,17 @@ local function addUnit(defName, path)
         options_order[#options_order+1] = defName .. "_personal_cloak_0"
     end
 	
+	if ud.onOffable then
+		options[defName .. "_activateWhenBuilt"] = {
+            name = "  On/Off State",
+            desc = "Check box to set the unit to On when built.",
+            type = 'bool',
+            value = ud.activateWhenBuilt,
+            path = path,
+        }
+        options_order[#options_order+1] = defName .. "_activateWhenBuilt"
+	end
+	
 end
 
 local function AddFactoryOfUnits(defName)
@@ -453,8 +464,9 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+		local ud = UnitDefs[unitDefID]
 		local orderArray = {}
-        if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
+        if ud.customParams.commtype or ud.customParams.level then
 			local morphed = Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1
 			if morphed then -- unit states are applied in unit_morph gadget
 				return 
@@ -469,7 +481,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
         end
         
-        local name = UnitDefs[unitDefID].name
+        local name = ud.name
         if unitAlreadyAdded[name] then
             
             if options[name .. "_firestate"] and options[name .. "_firestate"].value then
@@ -591,6 +603,17 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                 -- Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"})
 				orderArray[#orderArray + 1] = {CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"}}
             end
+			
+			if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
+				-- Spring.GiveOrderToUnit(unitID, CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"}}
+			end
+			
+			if options[name .. "_activateWhenBuilt"] and options[name .. "_activateWhenBuilt"].value ~= nil then
+				if options[name .. "_activateWhenBuilt"].value ~= ud.activateWhenBuilt then
+					orderArray[#orderArray + 1] = {CMD.ONOFF, {options[name .. "_activateWhenBuilt"].value and 1 or 0}, {"shift"}}
+				end
+			end
         end
 		
 		if #orderArray>0 then
@@ -637,11 +660,6 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 				-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"})
 				orderArray[#orderArray + 1] = {CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"}}
 			end
-		end
-		
-		if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
-			-- Spring.GiveOrderToUnit(unitID, CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
-			orderArray[#orderArray + 1] = {CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"}}
 		end
 		
 		if #orderArray>0 then

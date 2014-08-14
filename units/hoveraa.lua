@@ -15,7 +15,7 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
-  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[40 40 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]], 
@@ -28,7 +28,7 @@ unitDef = {
 	helptext_de    = [[Der Flail verschieﬂt ein einzige, groﬂe SAM auf mittlerer Distanz, die wirklich groﬂen Schaden anrichtet.]],
 	helptext_pl    = [[Flail wystrzeliwuje rakiety przeciwlotnicze sredniego zasiegu, ktore zadaja wysokie obrazenia.]],
 	modelradius    = [[20]],
-	midposoffset   = [[0 8 -5]],
+	midposoffset   = [[0 8 0]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

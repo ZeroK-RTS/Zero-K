@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Halberd]],
   description         = [[Blockade Runner Hover]],
   acceleration        = 0.048,
-  activateWhenBuilt   = true,
   brakeRate           = 0.043,
   buildCostEnergy     = 240,
   buildCostMetal      = 240,
@@ -49,7 +48,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[hoverassault.s3o]],
   script              = [[hoverassault.lua]],
-  onoffable           = true,
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 

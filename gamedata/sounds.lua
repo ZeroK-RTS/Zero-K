@@ -13,8 +13,6 @@ local Sounds = {
 		--},
 		MapPoint = {
 			file = "sounds/beep4.wav", --"sounds/marker_place.wav",
-			--pitchMod = 0.01,
-			--pitch = 0.8,
 			maxconcurrent = 3,
 		},
 		--[[

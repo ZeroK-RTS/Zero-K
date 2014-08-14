@@ -838,18 +838,15 @@ function CalcBallisticCircle( x, y, z, range, weaponDef )
 end
 
 local function DrawRanges()
-	glDepthTest(true)
 	if defenseRangeDrawList then
 		glCallList(defenseRangeDrawList)
 	end
-	glDepthTest(false)
 end
 
 function DrawSelectedRanges()
 	if ( options.showselectedunitrange.value == true ) then
 		-- range OpenGL stuff
 		glLineWidth(1.49)
-		glDepthTest(true)
 			-- Get selected units, sorted for efficiency
 		local selUnits = spGetSelUnitsSorted()
 		selUnits.n = nil -- So our loop works
@@ -871,7 +868,7 @@ function DrawSelectedRanges()
 	end
 end
 
-function widget:DrawWorld()
+function widget:DrawWorldPreUnit()
 	if WG.Cutscene and WG.Cutscene.IsInCutscene() then
 		return
 	end

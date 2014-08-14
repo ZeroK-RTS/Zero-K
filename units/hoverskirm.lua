@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[hoverskirm]],
   name                = [[Trisula]],
-  description         = [[Light Assault/Battle Hover]],
+  description         = [[Light Assault/Battle Hovercraft]],
   acceleration        = 0.03,
   brakeRate           = 0.043,
   buildCostEnergy     = 180,
@@ -22,7 +22,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    description_pl = [[Poduszkowiec bojowy]],
     helptext       = [[The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one.]],
+    helptext_pl    = [[Trisula to w miare szybki, wytrzymaly poduszkowiec uzbrojony w rozszczepiany promien, ktory moze zniszczyc kilka mniejszych jednostek lub mocno uszkodzic jedna wieksza.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -31,14 +33,12 @@ unitDef = {
   iconType            = [[hoverskirm]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 110,
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 2.5,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[hoverskirm.s3o]],
   onoffable           = true,
   seismicSignature    = 4,
@@ -54,12 +54,9 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 450,
-  smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 500,
-  workerTime          = 0,
 
   weapons             = {
 
@@ -96,7 +93,6 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 7.5,
       minIntensity            = 1,
-      pitchtolerance          = 8192,
       projectiles             = 9,
       range                   = 360,
       reloadtime              = 4,
@@ -116,40 +112,29 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Trisula]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 1300,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
+      footprintX       = 2,
+      footprintZ       = 2,
       metal            = 72,
       object           = [[hoverskirm_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 72,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Blischpt]],
+      description      = [[Debris - Trisula]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1300,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      hitdensity       = [[100]],
+      footprintX       = 2,
+      footprintZ       = 2,
       metal            = 36,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 36,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

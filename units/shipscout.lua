@@ -11,10 +11,7 @@ unitDef = {
   buildPic               = [[ARMPT.png]],
   buildTime              = 70,
   canAttack              = true,
-  canGuard               = true,
   canMove                = true,
-  canPatrol              = true,
-  canstop                = [[1]],
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 3 0]],
   collisionVolumeScales  = [[24 24 65]],
@@ -25,13 +22,14 @@ unitDef = {
   customParams           = {
     description_de = [[Wachboot (Scout/Raider)]],
     description_fr = [[Navire de Patrouille Éclaireur et Anti-Air]],
-    description_pl = [[Łódź Patrolowa]],
+    description_pl = [[Lodz zwiadowcza]],
     helptext       = [[Cheap, fast, and fragile, this Patrol Boat is good as a raider and spotting for longer-ranged ships. It lacks the firepower or armor for brawling.]],
     helptext_de    = [[Günstig, schnell und gebrechlich. Dieses Wachboot eignet sich gut als Raider und zum Auskundschaften von Schiffen mit größerer Reichweite. Zum Kämpfen fehlt es ihm an Feuerkraft und der nötigen Panzerung.]],
     helptext_fr    = [[Pas cher, rapide et peu solide, voici venir le Skeeter et ses canons laser. Utile en début de conflit ou en tant qu'éclaireur son blindage le rends trcs vite obsolcte.]],
-    helptext_pl    = [[Lekki i szybki, Skeeter jest dobrym zwiadowcą dla większych okrętów. Nie ma jednak wytrzymałości ani siły ognia potrzebnych do dłuższej walki.]],
+    helptext_pl    = [[Lekki i szybki, Skeeter jest dobrym zwiadowca dla wiekszych okretow. Nie ma jednak wytrzymalosci ani sily ognia potrzebnych do dluzszej walki.]],
+
     modelradius    = [[12]],
-	turnatfullspeed = [[1]],
+    turnatfullspeed = [[1]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -44,13 +42,10 @@ unitDef = {
   maxDamage              = 240,
   maxVelocity            = 5.2,
   minCloakDistance       = 75,
-  minWaterDepth          = 5,
   movementClass          = [[BOAT3]],
-  moveState              = 0,
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[scoutboat.s3o]],
-  script				 = [[shipscout.lua]],
+  script                 = [[shipscout.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
@@ -62,13 +57,11 @@ unitDef = {
 
   },
   
-  side                   = [[ARM]],
   sightDistance          = 800,
-  sonarDistance          = 300,
+  sonarDistance          = 350,
   turninplace            = 0,
-  turnRate               = 698,
+  turnRate               = 740,
   waterline              = 2,
-  workerTime             = 0,
 
   weapons                = {
   
@@ -77,7 +70,7 @@ unitDef = {
       mainDir            = [[0 0 1]],
       maxAngleDif        = 60,
     },
-	
+
     {
       def                = [[MISSILE]],
       badTargetCategory  = [[FIXEDWING]],
@@ -86,7 +79,6 @@ unitDef = {
 
   },
 
-
   weaponDefs             = {
 
     FAKEWEAPON = {
@@ -94,7 +86,7 @@ unitDef = {
       areaOfEffect            = 8,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
 
       damage                  = {
         default = 0,
@@ -112,9 +104,7 @@ unitDef = {
       model                   = [[wep_m_fury.s3o]],
       range                   = 230,
       reloadtime              = 2,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
-      startsmoke              = [[1]],
       startVelocity           = 300,
       tolerance               = 10000,
       tracks                  = true,
@@ -127,28 +117,26 @@ unitDef = {
       weaponVelocity          = 750,
     },
 
-
     MISSILE   = {
       name                    = [[Light Disarm Missile]],
       areaOfEffect            = 8,
-	  --burst					  = 2,
-	  --burstRate				  = 0.4,
-	  cegTag                  = [[yellowdisarmtrail]],
+      --burst                 = 2,
+      --burstRate             = 0.4,
+      cegTag                  = [[yellowdisarmtrail]],
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
 
       damage                  = {
         default = 45,
-        planes  = 45,
         subs    = 5,
       },
 
-	  customParams        = {
-	    disarmDamageMult = 4,
-		disarmDamageOnly = 0,
-		disarmTimer      = 3, -- seconds
-	  },
+      customParams        = {
+        disarmDamageMult = 4,
+        disarmDamageOnly = 0,
+        disarmTimer      = 3, -- seconds
+      },
 
       explosionGenerator      = [[custom:mixed_white_lightning_bomb_small]],
       fireStarter             = 70,
@@ -162,13 +150,11 @@ unitDef = {
       model                   = [[wep_armpt.s3o]],
       range                   = 260,
       reloadtime              = 2,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/small_lightning_missile]],
       soundStart              = [[weapon/missile/missile_fire7]],
-      startsmoke              = [[1]],
       startVelocity           = 100,
-	  texture2                = [[lightsmoketrail]],
+      texture2                = [[lightsmoketrail]],
       tolerance               = 10000,
       tracks                  = true,
       turnRate                = 60000,
@@ -181,44 +167,34 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD = {
       description      = [[Wreckage - Skeeter]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 240,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 28,
       object           = [[scoutboat_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 28,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP = {
       description      = [[Debris - Skeeter]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 240,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      hitdensity       = [[100]],
+      footprintX       = 3,
+      footprintZ       = 3,
       metal            = 14,
       object           = [[debris4x4a.s3o]],
       reclaimable      = true,
       reclaimTime      = 14,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
