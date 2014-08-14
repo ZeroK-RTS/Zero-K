@@ -475,14 +475,14 @@ function widget:GameFrame(n)
 --]]
 
 	if options.onlyShowExpense.value then
-		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(mExpe) )
-		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(eExpe - WG.energyForOverdrive) )
+		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f/s"):format(mExpe) )
+		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f/s"):format(eExpe - WG.energyForOverdrive) )
 	else
-		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(mPull) )
-		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(ePull) )
+		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f/s"):format(mPull) )
+		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f/s"):format(ePull) )
 	end
-	lbl_m_income:SetCaption( positiveColourStr.."+"..("%.1f"):format(mInco+mReci) )
-	lbl_e_income:SetCaption( positiveColourStr.."+"..("%.1f"):format(eInco) )
+	lbl_m_income:SetCaption( positiveColourStr.."+"..("%.1f/s"):format(mInco+mReci) )
+	lbl_e_income:SetCaption( positiveColourStr.."+"..("%.1f/s"):format(eInco) )
 
 
 	if options.workerUsage.value then
@@ -560,7 +560,7 @@ function CreateWindow()
 		padding = {0,0,0,0},
 		right = 0,
 		y = 0,
-		clientWidth  = 250 + workerMult * 67,
+		clientWidth  = 319 + workerMult * 63,
 		clientHeight = 60,
 		draggable = false,
 		resizable = false,
@@ -596,7 +596,7 @@ function CreateWindow()
 	lbl_m_income = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 75,
+		width  = 100,
                 x      = 61,
                 y      = 4,
                 -- y      = p(60/bars),
@@ -610,7 +610,7 @@ function CreateWindow()
 	lbl_m_expense = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 75,
+		width  = 100,
                 x      = 62,
                 y      = p(44),
                 -- y      = 0,
@@ -698,8 +698,8 @@ function CreateWindow()
 	lbl_e_income = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 75,
-                x      = 174,
+		width  = 100,
+                x      = 209,
                 -- y      = p(60/bars),
                 y      = 4,
 		caption = positiveColourStr.."+0.0",
@@ -712,8 +712,8 @@ function CreateWindow()
 	lbl_e_expense = Chili.Label:New{
 		parent = window,
 		height = p(50),
-		width  = 75,
-                x      = 175,
+		width  = 100,
+                x      = 210,
                 y      = p(44),
                 -- y      = 0,
 		caption = negativeColourStr.."-0.0",
@@ -728,7 +728,7 @@ function CreateWindow()
 		parent = window,
 		height = p(20),
 		width  = 45,
-                x      = 118,
+                x      = 153,
                 y      = 40,
 		-- valign = "center",
 		align  = "center",
@@ -747,7 +747,7 @@ function CreateWindow()
 		value  = 0,
 		color  = {0,0,0,0},
 		-- right  = 36,
-		x      = 156,
+		x      = 191,
 		y      = 8,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
@@ -764,7 +764,7 @@ function CreateWindow()
 		min = 0,
 		max = 1,
 		-- right  = 36,
-		x      = 156,
+		x      = 191,
 		y      = 8,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
@@ -778,7 +778,7 @@ function CreateWindow()
 		value  = 0,
 		orientation = "vertical",
 		-- right  = 36,
-                x      = 156,
+                x      = 191,
                 y      = 8,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
@@ -794,7 +794,7 @@ function CreateWindow()
 		parent = window,
 		height = p(50),
 		width  = 25,
-                x = 128,
+                x = 163,
                 y = 10,
 		file   = 'LuaUI/Images/energy.png',
 	}	
@@ -818,7 +818,7 @@ function CreateWindow()
 		parent = window,
 		height = p(20),
 		width  = 75,
-                x      = 230,
+                x      = 295,
                 y      = 40,
 		-- valign = "center",
 		align  = "center",
@@ -835,7 +835,7 @@ function CreateWindow()
 		-- right  = 6,
 		value  = 0,
 		width  = 12,
-		x      = 287,
+		x      = 352,
 		y      = 8,
 		tooltip = "Your current percentage of useful buildpower",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
@@ -844,7 +844,7 @@ function CreateWindow()
 		parent = window,
 		height = p(50),
 		width  = 25,
-                x = 253,
+                x = 318,
                 y = 10,
 		tooltip = "Your current percentage of useful buildpower",
 		file   = 'LuaUI/Images/commands/Bold/buildsmall.png',
