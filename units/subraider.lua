@@ -42,7 +42,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 240,
-  maxDamage              = 600,
+  maxDamage              = 540,
   maxVelocity            = 4.0,
   minCloakDistance       = 75,
   minWaterDepth          = 15,
@@ -69,7 +69,7 @@ unitDef = {
       def                = [[FAKEWEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 200,
+      maxAngleDif        = 180,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -78,7 +78,7 @@ unitDef = {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 200,
+      maxAngleDif        = 190,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
