@@ -50,7 +50,7 @@ unitDef = {
   },
 
   sightDistance          = 430,
-  sonarDistance          = 280,
+  sonarDistance          = 300,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -114,7 +114,7 @@ unitDef = {
       --soundStart              = [[weapon/torpedo]],
       startVelocity           = 90,
       tracks                  = true,
-      turnRate                = 3000,
+      turnRate                = 3600,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 140,
