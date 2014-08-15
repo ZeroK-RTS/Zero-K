@@ -515,7 +515,7 @@ function widget:GameFrame(n)
 		local metal_proportion = (mInco+mReci)/(mInco+mReci+eInco)
 		if (mInco+mReci) > 0.5 then
 			metal_proportion = metal_proportion * (metal_proportion * (3 - 2 * metal_proportion))
-			metal_proportion = (12.5 + metal_proportion * 87.5) + 2
+			metal_proportion = (12.5 + metal_proportion * 75) + 2
 		elseif (eInco <= 0.5) then
 			metal_proportion = 100
 		else
