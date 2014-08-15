@@ -17,7 +17,7 @@ unitDef = {
   collisionVolumeOffsets        = [[0 -8 0]],
   collisionVolumeScales         = [[32 83 32]],
   collisionVolumeTest           = 1,
-  collisionVolumeType           = [[box]],
+  collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

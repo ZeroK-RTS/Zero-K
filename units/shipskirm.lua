@@ -17,10 +17,10 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[SHIP]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[50 50 130]],
+  collisionVolumeOffsets = [[0 10 0]],
+  collisionVolumeScales  = [[48 48 110]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[box]],
+  collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -32,6 +32,7 @@ unitDef = {
 	helptext_de    = [[Dieser Kreuzer vereint schlagkräftige, weitreichende Raketen, die nützlich zur Bombardierung von See- oder Küstenzielen, sowie gegen Flugzeuge, sind. Achte aber auf U-Boote und Korvetten.]],
 	helptext_pl    = [[Enforcer posiada potezne rakiety o dobrym zasiegu, ktore swietnie nadaja sie do niszczenia wszystkiego, co plywa po morzu lub znajduje sie na jego brzegu, a nawet zestrzeliwania lotnictwa. Nie jest jednak w stanie celowac w jednostki podwodne i ma dlugi czas przeladowania.]],
 	turnatfullspeed = [[1]],
+    modelradius     = [[24]],
   },
 
   explodeAs              = [[BIG_UNIT]],

@@ -61,24 +61,27 @@ for i=1,#UnitDefs do
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if offsets[unitDefID] then
+	local ud = UnitDefs[unitDefID]
+	if offsets[unitDefID] and ud then
 		local mid = offsets[unitDefID].mid
 		local aim = offsets[unitDefID].aim
-		Spring.SetUnitMidAndAimPos(unitID, mid[1], mid[2], mid[3], aim[1], aim[2], aim[3], true)
+		Spring.SetUnitMidAndAimPos(unitID, 
+			mid[1] + ud.midx, mid[2] + ud.midy, mid[3] + ud.midz, 
+			aim[1] + ud.midx, aim[2] + ud.midy, aim[3] + ud.midz, true)
 	end
 	if modelRadii[unitDefID] then
 		Spring.SetUnitRadiusAndHeight(unitID,modelRadii[unitDefID])
 	end
 end
 
---[[
+
 function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
 	end
 end
---]]
+
 
 ------------------------------------------------------
 
