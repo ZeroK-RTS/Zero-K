@@ -391,7 +391,7 @@ local function FormatElo(elo,full)
 	local bot = 1400
 	local tc = {1,1,1,1}
 	local mc = {1,1,0,1}
-	local bc = {1,.4,.3,1}
+	local bc = {1,.2,.2,1}
 	
 	if elo_out >= top then eloCol = tc
 	elseif elo_out >= mid then
