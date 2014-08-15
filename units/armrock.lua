@@ -36,6 +36,7 @@ unitDef = {
     helptext_it    = [[Il basso danno e la bassa velocita dei razzi non guidati del Rocko riscattati dal suo raggio. Sono al meglio in una linea, attaccando dal suo raggio massimo. Si contrastano attaccandoli con unita veloci, o mettendo le tue difese dietro di un muro di terraform.]],
     helptext_pl    = [[Rocko jest uzbrojony w powolne rakiety, ktore mimo niskich obrazen i braku samonaprowadzania maja duzy zasieg. Najlepiej sprawdzaja sie stojac w linii prostopadlej do celu, atakujac z maksymalnej odleglosci i nie dajac sie zlapac przeciwnikom. Mozna je pokonac lekkimi jednostkami, ktore sa w stanie unikac ich rakiet, dogonic je i zniszczyc.]],
 	modelradius    = [[13]],
+	midposoffset   = [[0 6 0]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -50,7 +51,6 @@ unitDef = {
   maxVelocity            = 2.2,
   maxWaterDepth          = 20,
   minCloakDistance       = 75,
-  modelCenterOffset      = [[0 6 0]],
   movementClass          = [[KBOT2]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],

@@ -62,7 +62,6 @@ unitDef = {
   maxWaterDepth       = 5000,
   metalMake           = 4,
   minCloakDistance    = 75,
-  modelCenterOffset   = [[0 -1 0]],  
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   norestrict          = [[1]],
