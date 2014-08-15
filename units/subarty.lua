@@ -83,6 +83,7 @@ unitDef = {
       areaOfEffect            = 16,
       avoidFriendly           = false,
       burnblow                = true,
+      canattackground         = false,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,

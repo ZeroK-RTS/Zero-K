@@ -78,7 +78,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   if AIRPLANT[unitDefID] then
-    if (cmdID == CMD_AP_FLY_STATE) then 
+    if (cmdID == CMD_AP_FLY_STATE) and unitID and plantList[unitID] then 
       local cmdDescID = FindUnitCmdDesc(unitID, CMD_AP_FLY_STATE)
       landCmd.params[1] = cmdParams[1]
       EditUnitCmdDesc(unitID, cmdDescID, landCmd)
