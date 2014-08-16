@@ -2323,7 +2323,7 @@ local function MakeQuitButtons()
 				if (paused) and AmIPlayingAlone() then
 					spSendCommands("pause")
 				end
-				spSendCommands{"quit","quitforce"} 
+				spSendCommands{"quit"} 
 			end)
 		end,
 		key='Exit to Desktop',
