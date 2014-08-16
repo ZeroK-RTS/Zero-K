@@ -21,9 +21,9 @@ unitDef = {
   canstop                = [[1]],
   category               = [[SHIP UNARMED]],
   collisionVolumeOffsets = [[0 8 0]],
-  collisionVolumeScales  = [[32 32 96]],
+  collisionVolumeScales  = [[25 25 96]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[box]],
+  collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {

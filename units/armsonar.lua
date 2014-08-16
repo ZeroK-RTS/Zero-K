@@ -10,6 +10,10 @@ unitDef = {
   buildTime         = 40,
   canAttack         = false,
   category          = [[UNARMED FLOAT]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[32 48 32]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
   corpse            = [[DEAD]],
   energyUse         = 0.5,
   explodeAs         = [[SMALL_BUILDINGEX]],
@@ -38,6 +42,7 @@ unitDef = {
     helptext       = [[The docile Sonar Station provides one of the few means of locating underwater targets.]],
     helptext_de    = [[Das Sonar ortet nach dem Echoprinzip von Radaranlagen feindliche Einheiten unter Wasser. Dazu strahlen sie selbst ein Signal aus und empfangen das entsprechende Echo, aus dessen Laufzeit auf die Entfernung zu den Einheiten geschlossen wird.]],
     helptext_pl    = [[Sonar jest odpowiednikiem radaru dzialajacym pod woda. Jest niezbedny do wykrywania (a zatem i niszczenia) okretow podwodnych i amfibii nieprzyjaciela.]],
+    modelradius    = [[16]],
   },
 
   featureDefs       = {

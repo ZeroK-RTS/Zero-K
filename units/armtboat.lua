@@ -43,7 +43,6 @@ unitDef = {
   maxDamage           = 1100,
   maxVelocity         = 3,
   minCloakDistance    = 75,
-  modelCenterOffset	  = [[0 -3 0]],
   movementClass       = [[BOAT4]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[ARMTBOAT]],

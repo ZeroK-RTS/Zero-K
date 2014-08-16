@@ -15,8 +15,10 @@ unitDef = {
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT UNARMED STUPIDTARGET]],
-  collisionVolumeTest           = 1,
-  corpse                        = [[DEAD]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[50 36 50]],
+  collisionVolumeTest	        = 1,
+  collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
     description_fr = [[Laser Anti-Air]],

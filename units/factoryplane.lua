@@ -42,6 +42,7 @@ unitDef = {
 	helptext_pl    = [[Lotnisko pozwala na budowe samolotow i oprocz samolotu konstrukcyjnego i zwiadowczego oferuje takze dwa rodzaje mysliwcow i cztery bombowcow, kazdy wyspecjalizowany do unikalnej roli. Posiada takze jedno stanowisko uzupelniania dla bombowcow.]],
     sortName = [[4]],
 	modelradius    = [[25]],
+	midposoffset   = [[0 20 0]],
   },
 
   energyMake                    = 0.25,
@@ -59,7 +60,6 @@ unitDef = {
   maxVelocity                   = 0,
   metalMake                     = 0.25,
   minCloakDistance              = 150,
-  modelCenterOffset				= [[0 20 0]],
   noAutoFire                    = false,
   objectName                    = [[CORAP.s3o]],
   script                        = [[factoryplane.lua]],
