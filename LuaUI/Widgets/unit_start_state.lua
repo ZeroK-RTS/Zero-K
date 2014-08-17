@@ -37,7 +37,7 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/New Unit States'
-options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
+options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
@@ -107,7 +107,7 @@ options = {
         path = "Game/New Unit States/Misc",
     },
 
-    commander_firestate = {
+    commander_firestate0 = {
         name = "  Firestate",
         desc = "Values: hold fire, return fire, fire at will",
         type = 'number',
@@ -208,7 +208,7 @@ local function addUnit(defName, path)
     options_order[#options_order+1] = defName .. "_label"
     
     if ud.canAttack or ud.isFactory then
-        options[defName .. "_firestate"] = {
+        options[defName .. "_firestate0"] = {
             name = "  Firestate",
             desc = "Values: inherit from factory, hold fire, return fire, fire at will",
             type = 'number',
@@ -218,7 +218,7 @@ local function addUnit(defName, path)
             step = 1,
             path = path,
         }
-        options_order[#options_order+1] = defName .. "_firestate"
+        options_order[#options_order+1] = defName .. "_firestate0"
     end
 
     if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
@@ -437,6 +437,7 @@ AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
 AddFactoryOfUnits("factoryship")
 AddFactoryOfUnits("striderhub")
+AddFactoryOfUnits("missilesilo")
 -- addUnit("striderhub","Mech")
 -- addUnit("armcsa","Mech")
 -- addUnit("armcomdgun","Mech")
@@ -471,10 +472,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			if morphed then -- unit states are applied in unit_morph gadget
 				return 
 			end 
-			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
+			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate0.value}, {"shift"})
             -- Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
 			-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
-			orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"}}
+			orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, {"shift"}}
 			orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
 			if WG['retreat'] then 
 				WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value) 
@@ -484,8 +485,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
         local name = ud.name
         if unitAlreadyAdded[name] then
             
-            if options[name .. "_firestate"] and options[name .. "_firestate"].value then
-                if options[name .. "_firestate"].value == -1 then
+            if options[name .. "_firestate0"] and options[name .. "_firestate0"].value then
+                if options[name .. "_firestate0"].value == -1 then
                     if builderID then
                         local bdid = Spring.GetUnitDefID(builderID)
                         if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
@@ -497,8 +498,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                         end
                     end
                 else
-                    --Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options[name .. "_firestate"].value}, {"shift"})
-					orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {options[name .. "_firestate"].value}, {"shift"}}
+                    --Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options[name .. "_firestate0"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {options[name .. "_firestate0"].value}, {"shift"}}
                 end
             end
             

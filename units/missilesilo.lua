@@ -38,6 +38,7 @@ unitDef = {
   energyMake                    = 0.3,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
+  fireState                     = 0,
   footprintX                    = 6,
   footprintZ                    = 6,
   iconType                      = [[cruisemissile]],

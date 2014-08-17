@@ -40,6 +40,7 @@ unitDef = {
   },
 
   explodeAs              = [[ARMTICK_DEATH]],
+  fireState              = 0,
   footprintX             = 1,
   footprintZ             = 1,
   iconType               = [[spiderbomb]],
