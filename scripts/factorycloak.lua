@@ -29,11 +29,11 @@ local function Open ()
 	
 	Turn (arm1, x_axis, math.rad(20), math.rad(50))
 	Turn (arm2, x_axis, math.rad(-75), math.rad(50))
-		
-	Move (pipesl, x_axis, 7.4, 3.7)
-	Move (pipesr, x_axis, -7.4, 3.7)
-	Move (pipesl, y_axis, 8.8, 4.4)
-	Move (pipesr, y_axis, 8.8, 4.4)
+
+	Move (pipesl, x_axis, -18.5, 18.5)
+	Move (pipesr, x_axis, 18.5, 18.5)
+	Move (pipesl, y_axis, 22, 22)
+	Move (pipesr, y_axis, 22, 22)
 
 	-- wait for them to move
 	WaitForTurn (roofl, z_axis)
