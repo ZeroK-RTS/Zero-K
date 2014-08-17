@@ -792,22 +792,18 @@ function CreateWindow()
 		mainDisplayRight = buildPowerBarSpacing
 	end
 	
-	window_main_display = Chili.Window:New{
-		color = {0, 0, 0, 0},
+	window_main_display = Chili.Panel:New{
+		backgroundColor = {0, 0, 0, 0},
 		parent = window,
-		dockable = false,
-		name="Main Display",
+		name = "Main Display",
 		padding = {0,0,0,0},
-		-- right = "50%",
 		y      = 0,
 		x      = 0,
 		right  = mainDisplayRight,
 		bottom = 0,
+		dockable = false;
 		draggable = false,
 		resizable = false,
-		tweakDraggable = false,
-		tweakResizable = false,
-		minimizable = false,
 		
 		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -873,7 +869,7 @@ function CreateWindow()
 	
 	bar_metal_reserve_overlay = Chili.Progressbar:New{
 		parent = window_main_display,
-		color  = {0.5,0.5,0.5,0.5},
+		color  = {0.7,0.7,0.7,0.5},
 		width  = barWidth,
 		orientation = "vertical",
 		min = 0,
@@ -972,6 +968,21 @@ function CreateWindow()
 		file   = 'LuaUI/Images/energy.png',
 	}	
 	
+	bar_energy_reserve_overlay = Chili.Progressbar:New{
+		parent = window_main_display,
+		color  = {0.7,0.7,0.7,0.5},
+		width  = barWidth,
+		orientation = "vertical",
+		 value = 0,
+		min = 0,
+		max = 1,
+		right  = barEdgeSpacing,
+		y      = 5,
+		bottom = 5,
+		noSkin = true,
+		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+	}
+	
 	bar_energy_overlay = Chili.Progressbar:New{
 		parent = window_main_display,
 		-- color  = col_energy,
@@ -987,32 +998,13 @@ function CreateWindow()
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 	}
-	
-	bar_energy_reserve_overlay = Chili.Progressbar:New{
-		parent = window_main_display,
-		color  = {0.5,0.5,0.5,0.5},
-		-- height = p(75),
-		width  = barWidth,
-		orientation = "vertical",
-		 value = 0,
-		min = 0,
-		max = 1,
-		-- x      = 264,
-		right  = barEdgeSpacing,
-		y      = 5,
-		bottom = 5,
-		noSkin = true,
-		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
-	}
     
 	bar_energy = Chili.Progressbar:New{
 		parent = window_main_display,
 		color  = col_energy,
-		-- height = p(75),
 		width  = barWidth,
 		value  = 0,
 		orientation = "vertical",
-    -- x      = 264,
 		right  = barEdgeSpacing,
 		y      = 5,
 		bottom = 5,
@@ -1043,8 +1035,8 @@ function CreateWindow()
 	--// Income Proportion Bar
 	local proportionTooltip = "Income balance bar. Displays metal and energy income ratio."
 	
-	window_metal_proportion = Chili.Window:New{
-		color = {0, 0, 0, 0},
+	window_metal_proportion = Chili.Panel:New{
+		backgroundColor = {0, 0, 0, 0},
 		parent = window_main_display,
 		dockable = false,
 		name="Proportion Bar",
@@ -1053,11 +1045,9 @@ function CreateWindow()
 		x      = '19%',
 		right  = '19%',
 		bottom = 0,
+		dockable = false;
 		draggable = false,
 		resizable = false,
-		tweakDraggable = false,
-		tweakResizable = false,
-		minimizable = false,
 		
 		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -1099,7 +1089,7 @@ function CreateWindow()
 
 	bar_metal_proportion = Chili.Progressbar:New{
 		parent = window_metal_proportion,
-		color  = {col_metal[1], col_metal[2], col_metal[3], 0.45},
+		color  = {col_metal[1], col_metal[2], col_metal[3], 0.55},
 		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
@@ -1125,7 +1115,6 @@ function CreateWindow()
 	}
 	
 	-- Activate tooltips for lables and bars, they do not have them in default chili
-	function metal_proportion_label:HitTest(x,y) return self end
 	function image_metal:HitTest(x,y) return self end
 	function bar_metal:HitTest(x,y) return self	end
 	function image_energy:HitTest(x,y) return self end
@@ -1136,10 +1125,9 @@ function CreateWindow()
 	function lbl_m_income:HitTest(x,y) return self end
 	function lbl_e_expense:HitTest(x,y) return self end
 	function lbl_m_expense:HitTest(x,y) return self end
+	function bar_metal_proportion:HitTest(x,y) return self end
+	function metal_proportion_label:HitTest(x,y) return self end
 	
-	-- Set the proportion bar to draw behind the income text.
-	window_main_display:RemoveChild(window_metal_proportion)
-	window_main_display:AddChild(window_metal_proportion)
 end
 
 function DestroyWindow()
