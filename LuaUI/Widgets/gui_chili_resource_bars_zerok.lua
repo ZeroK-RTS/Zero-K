@@ -600,9 +600,15 @@ function CreateWindow()
 		return tostring(a).."%"
 	end
 
-	local function SetReserveByMouse(self, x, y, mouse)
+	local function SetReserveByMouse(self, x, y, mouse, metal)
 		local reserve = ((self.height - self.padding[2] - self.padding[4]) - y) / (self.height - self.padding[2] - self.padding[4])
-		updateReserveBars(mouse ~= 3, true, reserve)
+		if mouse ~= 1 then
+			updateReserveBars(true, true, reserve)
+		elseif metal then
+			updateReserveBars(true, false, reserve)
+		else
+			updateReserveBars(false, true, reserve)
+		end
 	end
 	
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
@@ -723,18 +729,24 @@ function CreateWindow()
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function(self, x, y, mouse) 
-		mouseDownOnReserve = true
-		if not widgetHandler:InTweakMode() then SetReserveByMouse(self, x, y, mouse) end
-		return (not widgetHandler:InTweakMode()) 
+			mouseDownOnReserve = true
+			if not widgetHandler:InTweakMode() then 
+				SetReserveByMouse(self, x, y, mouse, true) 
+			end
+			return (not widgetHandler:InTweakMode()) 
 		end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
-		if widgetHandler:InTweakMode() or not mouseDownOnReserve then return end
-		SetReserveByMouse(self, x, y, mouse)
-		mouseDownOnReserve = false
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
+				return 
+			end
+			SetReserveByMouse(self, x, y, mouse, true)
+			mouseDownOnReserve = false
 		end},
 		OnMouseMove = {function(self, x, y, mouse)
-		if widgetHandler:InTweakMode() or not mouseDownOnReserve then return end
-		SetReserveByMouse(self, x, y, mouse)
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
+				return 
+			end
+			SetReserveByMouse(self, x, y, mouse, true)
 		end},
 	}
 
@@ -850,23 +862,29 @@ function CreateWindow()
 		orientation = "vertical",
     -- x      = 264,
 		right  = 40 + workerSpace,
-    y      = 5,
+		y      = 5,
 		bottom = 5,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function(self, x, y, mouse) 
-		mouseDownOnReserve = true
-		if not widgetHandler:InTweakMode() then SetReserveByMouse(self, x, y, mouse) end
-		return (not widgetHandler:InTweakMode()) 
+			mouseDownOnReserve = true
+			if not widgetHandler:InTweakMode() then 
+				SetReserveByMouse(self, x, y, mouse, false) 
+			end
+			return (not widgetHandler:InTweakMode()) 
 		end},	-- this is needed for OnMouseUp to work
 		OnMouseUp = {function(self, x, y, mouse)
-		if widgetHandler:InTweakMode() or not mouseDownOnReserve then return end
-		SetReserveByMouse(self, x, y, mouse)
-		mouseDownOnReserve = false
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
+				return 
+			end
+			SetReserveByMouse(self, x, y, mouse, false)
+			mouseDownOnReserve = false
 		end},
 		OnMouseMove = {function(self, x, y, mouse)
-		if widgetHandler:InTweakMode() or not mouseDownOnReserve then return end
-		SetReserveByMouse(self, x, y, mouse)
+			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
+				return 
+			end
+			SetReserveByMouse(self, x, y, mouse, false)
 		end},
 	}
 
