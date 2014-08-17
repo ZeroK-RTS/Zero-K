@@ -53,6 +53,8 @@ local col_buildpower = {0.8, 0.8, 0.2, 1}
 --------------------------------------------------------------------------------
 
 local window
+
+local window_main_display
 local image_metal
 local bar_metal
 local bar_metal_reserve_overlay
@@ -60,15 +62,16 @@ local image_energy
 local bar_energy
 local bar_energy_overlay
 local bar_energy_reserve_overlay
-local bar_buildpower
-local image_buildpower
-local lbl_buildpower
 local lbl_metal
 local lbl_energy
 local lbl_m_expense
 local lbl_e_expense
 local lbl_m_income
 local lbl_e_income
+
+local image_buildpower
+local lbl_buildpower
+local bar_buildpower
 
 local window_metal_proportion
 local bar_metal_proportion
@@ -592,8 +595,9 @@ end
 
 function CreateWindow()
 
+	local workerBar = options.workerUsage.value
 	local workerSpace = 0
-	if options.workerUsage.value then
+	if workerBar then
 		workerSpace = 63
 	end
 	local function p(a)
@@ -639,57 +643,89 @@ function CreateWindow()
 			return true
 		end },
 	}
-
-	--// METAL
 	
-	-- lbl_metal = Chili.Label:New{
-	-- 	parent = window,
-	-- 	height = p(100/bars),
-	-- 	width  = 60,
- --                x      = 10,
- --                y      = p(100/bars),
-	-- 	valign = "center",
-	-- 	align  = "right",
-	-- 	caption = "0",
-	-- 	autosize = false,
-	-- 	font   = {size = 19, outline = true, outlineWidth = 4, outlineWeight = 3,},
-	-- 	tooltip = "Your net metal income",
-	-- }
+	window_main_display = Chili.Window:New{
+		color = {0, 0, 0, 0},
+		parent = window,
+		dockable = false,
+		name="Main Display",
+		padding = {0,0,0,0},
+		-- right = "50%",
+		y      = 0,
+		x      = 0,
+		right  = 0,
+		bottom = 0,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = false,
+		tweakResizable = false,
+		minimizable = false,
+		
+		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return false end
+			WG.crude.OpenPath(options_path)
+			WG.crude.ShowMenu()
+			return true
+		end },
+	}
+	
+	--// Some (only some) Configuration for shared values
+
+	local incomeHeight = '42%'
+	local pullHeight = '42%'
+	local incomePullWidth = '30%'
+	local incomePullOffset = '21%'
+	local pullVertSpace = '14%'
+	local incomeVertSpace = '8%'
+	
+	local imageWidth ='10%'
+	local imageHorSpacing = '3%'
+	local imageVertSpacing = '10%'
+	local imageHeight = '60%'
+	local storageLabelHeight = '35%'
+	
+	local propBarHeight = '42%'
+	local proBarSpacing = '8%'
+	
+	local barWidth = '6.5%'
+	local barEdgeSpacing = '13%'
+	
+	--// METAL
 
 	lbl_m_income = Chili.Label:New{
-		parent = window,
-		height = 20,
-		width  = 100,
-                x      = 63,
-                y      = 10,
-                -- y      = p(60/bars),
+		parent = window_main_display,
+		height = incomeHeight,
+		width  = incomePullWidth,
+		x      = incomePullOffset,
+		y      = incomeVertSpace,
 		caption = positiveColourStr.."+0.0",
-		valign = "top",
+		valign = "center",
  		align  = "left",
 		autosize = false,
 		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your metal Income.\nGained from metal extractors, overdrive and reclaim",
 	}
 	lbl_m_expense = Chili.Label:New{
-		parent = window,
-		height = 20,
-		width  = 100,
-                x      = 64,
-                -- y      = p(44),
-                bottom = 5,
+		parent = window_main_display,
+		height = pullHeight,
+		width  = incomePullWidth,
+		x      = incomePullOffset,
+        bottom = pullVertSpace,
 		caption = negativeColourStr.."-0.0",
-		valign = "top",
+		valign = "center",
 		align  = "left",
 		autosize = false,
 		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3},
 		tooltip = "This is the total metal demand of your economy",
 	}
+	
 	lbl_metal = Chili.Label:New{
-		parent = window,
-		height = 10,
-		width  = 45,
-                x      = 5,
-                y      = 40,
+		parent = window_main_display,
+		height = storageLabelHeight,
+		width  = imageWidth,
+		x      = imageHorSpacing,
+		y      = imageHeight,
 		-- valign = "center",
 		align  = "center",
 		caption = "0",
@@ -698,17 +734,25 @@ function CreateWindow()
 		tooltip = "Your net metal income",
 	}
 	
+	image_metal = Chili.Image:New{
+		parent = window_main_display,
+		height = imageHeight,
+		width  = imageWidth,
+		y      = imageVertSpacing,
+		x      = imageHorSpacing,
+		keepAspect = false,
+		file   = 'LuaUI/Images/ibeam.png',
+	}
+	
 	bar_metal_reserve_overlay = Chili.Progressbar:New{
-		parent = window,
+		parent = window_main_display,
 		color  = {0.5,0.5,0.5,0.5},
-		-- height = p(75),
-		width  = 19,
+		width  = barWidth,
 		orientation = "vertical",
-		-- right  = 26,
 		min = 0,
 		max = 1,
 		value  = 0,
-		x      = 40,
+		x      = barEdgeSpacing,
 		y      = 5,
 		bottom = 5,
 		noSkin = true,
@@ -716,16 +760,14 @@ function CreateWindow()
 	}
 	
 	bar_metal = Chili.Progressbar:New{
-		parent = window,
+		parent = window_main_display,
 		color  = col_metal,
-		-- height = p(75),
-		width  = 19,
+		width  = barWidth,
 		value  = 0,
 		orientation = "vertical",
-		-- right  = 26,
-                x      = 40,
-                y      = 5,
-                bottom = 5,
+		x      = barEdgeSpacing,
+		y      = 5,
+		bottom = 5,
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function(self, x, y, mouse) 
@@ -750,86 +792,69 @@ function CreateWindow()
 		end},
 	}
 
-	image_metal = Chili.Image:New{
-		parent = window,
-		height = 25,
-		width  = 25,
-		y      = 10,
-		x      = 15,
-		file   = 'LuaUI/Images/ibeam.png',
-	}
-
 	--// ENERGY
 	
-	-- lbl_energy = Chili.Label:New{
-	-- 	parent = window,
-	-- 	height = p(100/bars),
-	-- 	width  = 60,
- --                x      = 0,
- --                y      = 1,
-	-- 	valign = "center",
-	-- 	align  = "right",
-	-- 	caption = "0",
-	-- 	autosize = false,
-	-- 	font   = {size = 19, outline = true, outlineWidth = 4, outlineWeight = 3,},
-	-- 	tooltip = "Your net energy income.",
-	-- }
 	lbl_e_income = Chili.Label:New{
-		parent = window,
-		height = 20,
-		width  = 100,
-                -- x      = 159,
-                right = 65 + workerSpace,
-                -- y      = p(60/bars),
-                y      = 10,
+		parent = window_main_display,
+		height = incomeHeight,
+		width  = incomePullWidth,
+		right = incomePullOffset,
+		y      = incomeVertSpace,
 		caption = positiveColourStr.."+0.0",
-		valign  = "top",
+		valign  = "center",
 		align   = "right",
 		autosize = false,
 		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	lbl_e_expense = Chili.Label:New{
-		parent = window,
-		height = 20,
-		width  = 100,
-                -- x      = 159,
-                right = 65 + workerSpace,
-                -- y      = p(60),
-                bottom = 5,
+		parent = window_main_display,
+		height = pullHeight,
+		width  = incomePullWidth,
+		right = incomePullOffset,
+		bottom = pullVertSpace,
 		caption = negativeColourStr.."-0.0",
-		valign = "top",
+		valign = "center",
 		align  = "right",
 		autosize = false,
 		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3},
 		tooltip = "This is this total energy demand of your economy and abilities which require energy upkeep",
 	}
-
+	
 	lbl_energy = Chili.Label:New{
-		parent = window,
-		height = 10,
-		width  = 45,
-                -- x      = 276,
-                right  = 4 + workerSpace,
-                y      = 40,
-		-- valign = "center",
+		parent = window_main_display,
+		height = storageLabelHeight,
+		width  = imageWidth,
+        right  = imageHorSpacing,
+        y      = imageHeight,
 		align  = "center",
+		valign = "center",
 		caption = "0",
 		autosize = false,
 		font   = {size = 12, outline = true, color = {.8,.8,.8,.95}},
 		tooltip = "Your current stored energy.",
 	}
-    
+	
+	image_energy = Chili.Image:New{
+		parent = window_main_display,
+		height = imageHeight,
+		width  = imageWidth,
+		right = imageHorSpacing,
+		y = imageVertSpacing,
+		keepAspect = false,
+		file   = 'LuaUI/Images/energy.png',
+	}	
+	
 	bar_energy_overlay = Chili.Progressbar:New{
-		parent = window,
+		parent = window_main_display,
 		-- color  = col_energy,
 		-- height = p(75),
-		width  = 20,
+		width  = barWidth,
 		orientation = "vertical",
 		value  = 100,
 		color  = {0,0,0,0},
 		-- x      = 264,
-		right  = 40 + workerSpace,
+		right  = barEdgeSpacing,
 		y      = 5,
 		bottom = 5,
 		noSkin = true,
@@ -837,16 +862,16 @@ function CreateWindow()
 	}
 	
 	bar_energy_reserve_overlay = Chili.Progressbar:New{
-		parent = window,
+		parent = window_main_display,
 		color  = {0.5,0.5,0.5,0.5},
 		-- height = p(75),
-		width  = 20,
+		width  = barWidth,
 		orientation = "vertical",
 		 value = 0,
 		min = 0,
 		max = 1,
 		-- x      = 264,
-		right  = 40 + workerSpace,
+		right  = barEdgeSpacing,
 		y      = 5,
 		bottom = 5,
 		noSkin = true,
@@ -854,14 +879,14 @@ function CreateWindow()
 	}
     
 	bar_energy = Chili.Progressbar:New{
-		parent = window,
+		parent = window_main_display,
 		color  = col_energy,
 		-- height = p(75),
-		width  = 20,
+		width  = barWidth,
 		value  = 0,
 		orientation = "vertical",
     -- x      = 264,
-		right  = 40 + workerSpace,
+		right  = barEdgeSpacing,
 		y      = 5,
 		bottom = 5,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
@@ -888,16 +913,6 @@ function CreateWindow()
 		end},
 	}
 
-	image_energy = Chili.Image:New{
-		parent = window,
-		height = 25,
-		width  = 25,
-                -- x = 285,
-                right = 15 + workerSpace,
-                y = 10,
-		file   = 'LuaUI/Images/energy.png',
-	}	
-
 	-- Activate tooltips for lables and bars, they do not have them in default chili
 	function image_metal:HitTest(x,y) return self end
 	function bar_metal:HitTest(x,y) return self	end
@@ -910,64 +925,16 @@ function CreateWindow()
 	function lbl_e_expense:HitTest(x,y) return self end
 	function lbl_m_expense:HitTest(x,y) return self end
 
-
-	if options.workerUsage.value then
-	-- worker usage
-
-		lbl_buildpower = Chili.Label:New{
-			parent = window,
-			height = 10,
-			width  = 75,
-	                -- x      = 295,
-	                right  = 2,
-	                y      = 40,
-			-- valign = "center",
-			align  = "center",
-			caption = "0",
-			autosize = false,
-			font   = {size = 12, outline = true, color = {.9,.9,.9,1}},
-			tooltip = "Your current percentage of useful buildpower",
-		}
-		bar_buildpower = Chili.Progressbar:New{
-			parent = window,
-			color  = col_buildpower,
-			-- height = "75%",
-			orientation = "vertical",
-			-- right  = 6,
-			value  = 0,
-			width  = 12,
-			-- x      = 352,
-			right  = 12,
-			y      = 8,
-			bottom = 8,
-			tooltip = "Your current percentage of useful buildpower",
-			font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
-		}
-	  image_buildpower = Chili.Image:New{
-			parent = window,
-			height = 25,
-			width  = 25,
-	    -- x = 318,
-	    right  = 27,
-	    y      = 10,
-			tooltip = "Your current percentage of useful buildpower",
-			file   = 'LuaUI/Images/commands/Bold/buildsmall.png',
-		}	
-		function lbl_buildpower:HitTest(x,y) return self end
-		function bar_buildpower:HitTest(x,y) return self end
-		function image_buildpower:HitTest(x,y) return self end
-	end
-
 	window_metal_proportion = Chili.Window:New{
 		color = {0, 0, 0, 0},
-		parent = window,
+		parent = window_main_display,
 		dockable = false,
-		name="",
+		name="Proportion Bar",
 		padding = {0,0,0,0},
-		-- right = "50%",
-		y      = 4,
-	  x      = 58,
-	  right  = 56 + workerSpace,
+		y      = 0,
+		x      = '19%',
+		right  = '19%',
+		bottom = 0,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = false,
@@ -984,30 +951,30 @@ function CreateWindow()
 	}
 
 	Chili.Label:New{
-			parent = window_metal_proportion,
-			height = 10,
-			width  = p(100),
-			x			 = 0,
-	    y      = 30,
-			-- valign = "center",
-			align  = "center",
-			valigh = "bottom",
-			caption = "^",
-			autosize = false,
-			font   = {size = 18, outline = true, color = {.9,.9,.9,1}},
-			tooltip = "Your current percentage of useful buildpower",
-		}
+		parent = window_metal_proportion,
+		height = 10,
+		width  = '100%',
+		x      = 0,
+		y      = '50%',
+		-- valign = "center",
+		align  = "center",
+		valigh = "bottom",
+		caption = "^",
+		autosize = false,
+		font   = {size = 18, outline = true, color = {.9,.9,.9,1}},
+		tooltip = "Your current percentage of useful buildpower",
+	}
 
 	bar_metal_proportion_overflow = Chili.Progressbar:New{
 		parent = window_metal_proportion,
 		color  = {0,0,0,0},
 		backgroundColor = {1, 1, 1, 0.0},
-		height = 30,
-		width  = p(100),
+		height = propBarHeight,
+		width  = '100%',
 		value  = 50,
 		-- orientation = "horizontal",
-    x      = p(50),
-    y      = 0,
+		x      = '50%',
+		y      = proBarSpacing,
 		--tooltip = "This shows your current metal reserves",		
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
@@ -1016,12 +983,12 @@ function CreateWindow()
 		parent = window_metal_proportion,
 		color  = {col_metal[1], col_metal[2], col_metal[3], 0.25},
 		backgroundColor = {1, 1, 1, 0.0},
-		height = 30,
-		width  = p(100),
+		height = propBarHeight,
+		width  = '100%',
 		value  = 50,
 		-- orientation = "horizontal",
-    x      = 0,
-    y      = 0,
+		x      = 0,
+		y      = proBarSpacing,
 		--tooltip = "This shows your current metal reserves",		
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
@@ -1030,13 +997,11 @@ function CreateWindow()
 		parent = window_metal_proportion,
 		color  = {col_energy[1], col_energy[2], col_energy[3], 0.2},
 		backgroundColor = {1, 1, 1, 0.0},
-		height = 30,
-		width  = p(100),
+		height = propBarHeight,
+		width  = '100%',
 		value  = 100,
-		-- orientation = "horizontal",
-		-- right  = 26,
-    x      = 0,
-    y      = 0,
+		x      = 0,
+		y      = proBarSpacing,
 		--tooltip = "This shows your current metal reserves",		
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
