@@ -432,6 +432,25 @@ local baseComMorph = {
 }
 
 --------------------------------------------------------------------------------
+-- customparams
+--------------------------------------------------------------------------------
+for i=1,#UnitDefs do
+  local ud = UnitDefs[i]
+  local cp = ud.customParams
+  local name = ud.name
+  local morphTo = cp.morphto
+  if morphTo then
+    local targetDef = UnitDefNames[morphTo]
+    morphDefs[name] = morphDefs[name] or {}
+    morphDefs[name][#morphDefs[name] + 1] = {
+      into = morphTo,
+      time = cp.morphtime or (cp.level and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp.level+1)))),	-- or 30,
+      combatMorph = cp.combatmorph == "1"
+    }
+  end
+end
+
+--------------------------------------------------------------------------------
 -- basic (non-modular) commander handling
 --------------------------------------------------------------------------------
 local comms = {"armcom", "corcom", "commrecon", "commsupport", "benzcom", "cremcom"}
