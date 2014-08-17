@@ -1,12 +1,17 @@
 startUnits = {
-	armcom = 'armcom1',
-	corcom = 'corcom1',
-	commsupport = 'commsupport1',
-	commrecon = 'commrecon1',
-	benzcom = 'benzcom1',
-	cremcom = 'cremcom1',
+	--armcom = 'armcom1',
+	--corcom = 'corcom1',
+	--commsupport = 'commsupport1',
+	--commrecon = 'commrecon1',
+	--benzcom = 'benzcom1',
+	--cremcom = 'cremcom1',
 	commbasic = 'commbasic',
 }
+
+local trainerComms = VFS.Include("LuaRules/Configs/comm_trainer_defs.lua")
+for name, def in pairs(trainerComms) do
+	startUnits[name] = def[1]
+end
 
 startUnitsAI = {
 	armcom1 = 'armcom1',
