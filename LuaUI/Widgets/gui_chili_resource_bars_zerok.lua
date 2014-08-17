@@ -494,17 +494,19 @@ function widget:GameFrame(n)
 	lbl_e_income:SetCaption( positiveColourStr.."+"..("%.1f"):format(eInco) )
 
 --Delta Storage indicators. These are for delta storage, so if they do not reflect the change in storage, there is a bug
-	if (mInco - mExpe + mReci > 0) and (mCurr < mStor * 0.98) then
+	local deltaStorageThreshold = 1 
+
+	if (mInco - mExpe + mReci > deltaStorageThreshold) and (mCurr < mStor * 0.98) then
 		bar_metal:SetCaption(positiveColourStr.."^")
-	elseif (mInco - mExpe + mReci < 0) and (mCurr > mStor * 0.02) then
+	elseif (mInco - mExpe + mReci < -deltaStorageThreshold) and (mCurr > mStor * 0.02) then
 		bar_metal:SetCaption(negativeColourStr.."v")
 	else
 		bar_metal:SetCaption("")
 	end
 
-	if (eInco - eExpe > 1) and not wastingE then
+	if (eInco - eExpe > deltaStorageThreshold) and not wastingE then
 		bar_energy:SetCaption(positiveColourStr.."^")
-	elseif (eInco - eExpe < -1) and (eCurr > eStor * 0.02) then --TODO: test interaction with reserves
+	elseif (eInco - eExpe < -deltaStorageThreshold) and (eCurr > eStor * 0.02) then --TODO: test interaction with reserves
 		bar_energy:SetCaption(negativeColourStr.."v")
 	else
 		bar_energy:SetCaption("")
