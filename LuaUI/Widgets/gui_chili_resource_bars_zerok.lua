@@ -555,11 +555,22 @@ function widget:GameFrame(n)
 		end
 		if bp_aval == 0 then
 			bar_buildpower:SetValue(0)
-			lbl_buildpower:SetCaption("no workers")
+			lbl_buildpower:SetCaption("0.0")
+			local tooltip = "Your current availible buildpower.\nNo workers." 
+			image_buildpower.tooltip = tooltip
+			lbl_buildpower.tooltip = tooltip
+			bar_buildpower.tooltip = tooltip
 		else
 			local buildpercent = bp_use/bp_aval * 100
 			bar_buildpower:SetValue(buildpercent)
-			lbl_buildpower:SetCaption(("%.1f%%"):format(buildpercent))
+			lbl_buildpower:SetCaption(("%.1f"):format(bp_aval))
+			--lbl_buildpower:SetCaption(("%.1f%%"):format(buildpercent))
+			local tooltip = "Your current availible buildpower." ..
+			"\nUsed: " ..("%.1f"):format(bp_use) ..  
+			"\nAvailable: " ..("%.1f"):format(bp_aval) 
+			image_buildpower.tooltip = tooltip
+			lbl_buildpower.tooltip = tooltip
+			bar_buildpower.tooltip = tooltip
 		end
 	end
 end
@@ -596,10 +607,6 @@ end
 function CreateWindow()
 
 	local workerBar = options.workerUsage.value
-	local workerSpace = 0
-	if workerBar then
-		workerSpace = 63
-	end
 	local function p(a)
 		return tostring(a).."%"
 	end
@@ -617,58 +624,6 @@ function CreateWindow()
 	
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local mouseDownOnReserve = false
-	
-	--// WINDOW
-	window = Chili.Window:New{
-		color = {1,1,1,options.opacity.value},
-		parent = Chili.Screen0,
-		dockable = true,
-		name="ResourceBars",
-		padding = {0,0,0,0},
-		-- right = "50%",
-		y = 0,
-		clientWidth  = 325 + workerSpace,
-		clientHeight = 65,
-		draggable = false,
-		resizable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		minimizable = false,
-		
-		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
-			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			if not meta then return false end
-			WG.crude.OpenPath(options_path)
-			WG.crude.ShowMenu()
-			return true
-		end },
-	}
-	
-	window_main_display = Chili.Window:New{
-		color = {0, 0, 0, 0},
-		parent = window,
-		dockable = false,
-		name="Main Display",
-		padding = {0,0,0,0},
-		-- right = "50%",
-		y      = 0,
-		x      = 0,
-		right  = 0,
-		bottom = 0,
-		draggable = false,
-		resizable = false,
-		tweakDraggable = false,
-		tweakResizable = false,
-		minimizable = false,
-		
-		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
-			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			if not meta then return false end
-			WG.crude.OpenPath(options_path)
-			WG.crude.ShowMenu()
-			return true
-		end },
-	}
 	
 	--// Some (only some) Configuration for shared values
 
@@ -690,6 +645,114 @@ function CreateWindow()
 	
 	local barWidth = '6.5%'
 	local barEdgeSpacing = '13%'
+	
+	local buildPowerBarSpacing = '15%'
+	
+	-- To make this bar the same set these values as:
+	-- correspondingValue * (100 - buildPowerBarSpacing)/100
+	local bpImageWidth = '8.5%'
+	local bpImageHorSpacing = '2%'
+	local bpBarWidth = '5.525%'
+	local bpBarEdgeSpacing = '11.05%'
+	
+	--// WINDOW
+	window = Chili.Window:New{
+		color = {1,1,1,options.opacity.value},
+		parent = Chili.Screen0,
+		dockable = true,
+		name="ResourceBars",
+		padding = {0,0,0,0},
+		-- right = "50%",
+		y = 0,
+		clientWidth  = 325,
+		clientHeight = 65,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		minimizable = false,
+		
+		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return false end
+			WG.crude.OpenPath(options_path)
+			WG.crude.ShowMenu()
+			return true
+		end },
+	}
+	
+	if workerBar then
+		
+		lbl_buildpower = Chili.Label:New{
+			parent = window,
+			height = storageLabelHeight,
+			width  = bpImageWidth,
+			right  = bpImageHorSpacing,
+			y      = imageHeight,
+			align  = "center",
+			valign  = "center",
+			caption = "0",
+			autosize = false,
+			font   = {size = 12, outline = true, color = {.9,.9,.9,1}},
+			tooltip = "Your current percentage of useful buildpower",
+		}
+		bar_buildpower = Chili.Progressbar:New{
+			parent = window,
+			color  = col_buildpower,
+			orientation = "vertical",
+			value  = 0,
+			width  = bpBarWidth,
+			right  = bpBarEdgeSpacing,
+			y      = 5,
+			bottom = 5,
+			tooltip = "Your current percentage of used buildpower",
+			font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+		}
+	  image_buildpower = Chili.Image:New{
+			parent = window,
+			height = imageHeight,
+			width  = bpImageWidth,
+			right  = bpImageHorSpacing,
+			y      = imageVertSpacing,
+			keepAspect = false,
+			tooltip = "Your current percentage of useful buildpower",
+			file   = 'LuaUI/Images/commands/Bold/buildsmall.png',
+		}	
+		function lbl_buildpower:HitTest(x,y) return self end
+		function bar_buildpower:HitTest(x,y) return self end
+		function image_buildpower:HitTest(x,y) return self end
+	end
+	
+	local mainDisplayRight = 0
+	if workerBar then
+		mainDisplayRight = buildPowerBarSpacing
+	end
+	
+	window_main_display = Chili.Window:New{
+		color = {0, 0, 0, 0},
+		parent = window,
+		dockable = false,
+		name="Main Display",
+		padding = {0,0,0,0},
+		-- right = "50%",
+		y      = 0,
+		x      = 0,
+		right  = mainDisplayRight,
+		bottom = 0,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = false,
+		tweakResizable = false,
+		minimizable = false,
+		
+		OnMouseDown={ function(self) --OnClick don't work here, probably because its children can steal click
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return false end
+			WG.crude.OpenPath(options_path)
+			WG.crude.ShowMenu()
+			return true
+		end },
+	}
 	
 	--// METAL
 
