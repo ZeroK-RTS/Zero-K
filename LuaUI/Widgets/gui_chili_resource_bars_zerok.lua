@@ -47,7 +47,7 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {1,1,0,1}
-local col_buildpower = {0.8, 0.8, 0.2, 1}
+local col_buildpower = {0.3, 0.8, 0.2, 1}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -76,6 +76,7 @@ local bar_buildpower
 local window_metal_proportion
 local bar_metal_proportion
 local bar_metal_proportion_overflow
+local metal_proportion_label
 
 local positiveColourStr
 local negativeColourStr
@@ -84,7 +85,7 @@ local col_expense
 local col_overdrive
 
 local blink = 0
-local blink_periode = 2
+local blink_periode = 1.4
 local blink_alpha = 1
 local blinkM_status = false
 local blinkE_status = false
@@ -109,7 +110,7 @@ end
 
 options_path = 'Settings/HUD Panels/Resource Bars'
 
-local function option_workerUsageUpdate()
+local function option_recreateWindow()
 	DestroyWindow()
 	CreateWindow()
 end
@@ -122,31 +123,87 @@ local function option_colourBlindUpdate()
 	col_overdrive = (options.colourBlind.value and {1,1,1,1}) or {.5,1,0,1}
 end
 
-options_order = {'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense','enableReserveBar','defaultEnergyReserve','defaultMetalReserve','colourBlind'}
+options_order = {
+	'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense',
+	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
+	'colourBlind','linearProportionBar',
+	'incomeFont','expenseFont','storageFont',}
  
 options = { 
-  eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
-  onlyShowExpense = {name='Only Show Expense', type='bool', value=false},
-  enableReserveBar = {name='Enable Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
-  defaultEnergyReserve = {
-	name = "Initial Energy Reserve",
-	type = "number",
-	value = 0.05, min = 0, max = 1, step = 0.01,
-  },
-  defaultMetalReserve = {
-	name = "Initial Metal Reserve",
-	type = "number",
-	value = 0, min = 0, max = 1, step = 0.01,
-  },
-  workerUsage = {name = "Show Worker Usage", type = "bool", value=false, OnChange = option_workerUsageUpdate},
-  energyFlash = {name = "Energy Stall Flash", type = "number", value=0.1, min=0,max=1,step=0.02},
-  opacity = {
-	name = "Opacity",
-	type = "number",
-	value = 0.6, min = 0, max = 1, step = 0.01,
-	OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,
-  },
-  colourBlind = {name = "Colourblind mode", type = "bool", value=false, OnChange = option_colourBlindUpdate, tooltip = "Uses Blue and Yellow instead of Red and Green for number display"}
+	eexcessflashalways = {
+		name  = 'Always Flash On Energy Excess', 
+		type  = 'bool', 
+		value = false
+	},
+	onlyShowExpense = {
+		name  = 'Only Show Expense', 
+		type  = 'bool', 
+		value = false
+	},
+	enableReserveBar = {
+		name  = 'Enable Reserve', 
+		type  = 'bool', 
+		value = false, 
+		tooltip = "Enables high priority reserve"
+	},
+	defaultEnergyReserve = {
+		name  = "Initial Energy Reserve",
+		type  = "number",
+		value = 0.05, min = 0, max = 1, step = 0.01,
+	},
+	defaultMetalReserve = {
+		name  = "Initial Metal Reserve",
+		type  = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+	},
+	workerUsage = {
+		name = "Show Worker Usage", 
+		type = "bool", 
+		value = false, 
+		OnChange = option_recreateWindow
+	},
+	energyFlash = {
+		name  = "Energy Stall Flash", 
+		type  = "number", 
+		value = 0.1, min=0,max=1,step=0.02
+	},
+	opacity = {
+		name  = "Opacity",
+		type  = "number",
+		value = 0.6, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,
+	},
+	colourBlind = {
+		name  = "Colourblind mode",
+		type  = "bool", 
+		value = false, 
+		OnChange = option_colourBlindUpdate, 
+		tooltip = "Uses Blue and Yellow instead of Red and Green for number display"
+	},
+	linearProportionBar = {
+		name  = "Linear Proportion Bar",
+		type  = "bool", 
+		value = false, 
+		tooltip = "Uses a true ratio for the Proportion Bar."
+	},
+	incomeFont = {
+		name  = "Income Font Size",
+		type  = "number",
+		value = 19, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
+	expenseFont = {
+		name  = "Expense Font Size",
+		type  = "number",
+		value = 16, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
+	storageFont = {
+		name  = "Storage Font Size",
+		type  = "number",
+		value = 12, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -224,7 +281,7 @@ end
 function widget:Update(s)
 
 	blink = (blink+s)%blink_periode
-	blink_alpha = math.abs(blink_periode/2 - blink)
+	blink_alpha = math.abs(blink_periode/2 - blink)*2/blink_periode*0.92
 	blink_colourBlind = options.colourBlind.value and 1 or 0
 
 	if blinkM_status then
@@ -243,7 +300,7 @@ function widget:Update(s)
 	end
 
 	if blinkProp_status then
-			bar_metal_proportion_overflow:SetColor(col_expense[1], col_expense[2], col_expense[3], 0.46 * blink_alpha)
+			bar_metal_proportion_overflow:SetColor(col_expense[1], col_expense[2], col_expense[3], 0.9 * blink_alpha)
 	end
 
 end
@@ -258,10 +315,11 @@ local function Format(input, override)
 	input = math.abs(input)
 	
 	if input < 0.01 then
+		if override then
+			return override .. "0.0"
+		end
 		return WhiteStr .. "0"
-	elseif input < 5 then
-		return leadingString .. ("%.2f"):format(input) .. WhiteStr
-	elseif input < 50 then
+	elseif input < 100 then
 		return leadingString .. ("%.1f"):format(input) .. WhiteStr
 	elseif input < 10^3 then
 		return leadingString .. ("%.0f"):format(input) .. WhiteStr
@@ -487,16 +545,16 @@ function widget:GameFrame(n)
 
 
 	if options.onlyShowExpense.value then
-		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(mExpe) )
-		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(eExpe - WG.energyForOverdrive) )
+		lbl_m_expense:SetCaption( Format(mExpe, negativeColourStr.." -") )
+		lbl_e_expense:SetCaption( negativeColourStr..Format(eExpe - WG.energyForOverdrive, negativeColourStr.." -") )
 	else
-		lbl_m_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(mPull) )
-		lbl_e_expense:SetCaption( negativeColourStr.."-"..("%.1f"):format(ePull) )
+		lbl_m_expense:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
+		lbl_e_expense:SetCaption( negativeColourStr..Format(ePull, negativeColourStr.." -") )
 	end
-	lbl_m_income:SetCaption( positiveColourStr.."+"..("%.1f"):format(mInco+mReci) )
-	lbl_e_income:SetCaption( positiveColourStr.."+"..("%.1f"):format(eInco) )
+	lbl_m_income:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )
+	lbl_e_income:SetCaption( Format(eInco, positiveColourStr.."+") )
 
---Delta Storage indicators. These are for delta storage, so if they do not reflect the change in storage, there is a bug
+	--Delta Storage indicators. These are for delta storage, so if they do not reflect the change in storage, there is a bug
 	local deltaStorageThreshold = 1 
 
 	if (mInco - mExpe + mReci > deltaStorageThreshold) and (mCurr < mStor * 0.98) then
@@ -514,21 +572,24 @@ function widget:GameFrame(n)
 	else
 		bar_energy:SetCaption("")
 	end
---
 
---Proportion background bars
+	--Proportion background bars
 	if (mInco+mReci+eInco > 0) then
-		local metal_proportion = (mInco+mReci)/(mInco+mReci+eInco)
-		if (mInco+mReci) > 0.5 then
-			metal_proportion = metal_proportion * (metal_proportion * (3 - 2 * metal_proportion))
-			metal_proportion = (12.5 + metal_proportion * 75) + 2
-		elseif (eInco <= 0.5) then
-			metal_proportion = 100
+		local metal_proportion  = (mInco+mReci)/(mInco+mReci+eInco)
+		if options.linearProportionBar.value then
+			metal_proportion = metal_proportion*100
 		else
-			metal_proportion = 0
+			if (mInco+mReci) > 0.5 then
+				metal_proportion = metal_proportion * (metal_proportion * (3 - 2 * metal_proportion))
+				metal_proportion = (12.5 + metal_proportion * 75) + 2
+			elseif (eInco <= 0.5) then
+				metal_proportion = 100
+			else
+				metal_proportion = 0
+			end
 		end
 		bar_metal_proportion:SetValue(metal_proportion)
-		if (metal_proportion > 57) then
+		if (metal_proportion > 50) then
 			bar_metal_proportion_overflow:SetValue((bar_metal_proportion.width/bar_metal_proportion_overflow.width) *
 			 (metal_proportion - 100 * (bar_metal_proportion_overflow.x - bar_metal_proportion.x)/bar_metal_proportion.width))
 			blinkProp_status = true
@@ -539,7 +600,6 @@ function widget:GameFrame(n)
 	else
 		bar_metal_proportion:SetValue(50)
 	end
---
 
 	if options.workerUsage.value then
 		local bp_aval = 0
@@ -549,10 +609,12 @@ function widget:GameFrame(n)
 			for i=1,#builderIDs do
 				local unit = builderIDs[i]
 				local ud = UnitDefs[Spring.GetUnitDefID(unit)]
-
-				local _, metalUse, _,energyUse = Spring.GetUnitResources(unit)
-				bp_use = bp_use + math.max(abs(metalUse), abs(energyUse))
-				bp_aval = bp_aval + ud.buildSpeed
+				local _,_,inbuild = Spring.GetUnitIsStunned(unit)
+				if not inbuild then
+					local _, metalUse, _,energyUse = Spring.GetUnitResources(unit)
+					bp_use = bp_use + math.max(abs(metalUse), abs(energyUse))
+					bp_aval = bp_aval + ud.buildSpeed
+				end
 			end
 		end
 		if bp_aval == 0 then
@@ -565,11 +627,11 @@ function widget:GameFrame(n)
 		else
 			local buildpercent = bp_use/bp_aval * 100
 			bar_buildpower:SetValue(buildpercent)
-			lbl_buildpower:SetCaption(("%.1f"):format(bp_aval))
+			lbl_buildpower:SetCaption(Format(bp_aval, ""))
 			--lbl_buildpower:SetCaption(("%.1f%%"):format(buildpercent))
 			local tooltip = "Your current availible buildpower." ..
-			"\nUsed: " ..("%.1f"):format(bp_use) ..  
-			"\nAvailable: " ..("%.1f"):format(bp_aval) 
+			"\nIn Use: " ..Format(bp_use, "") ..  
+			"\nAvailable: " ..Format(bp_aval, "") 
 			image_buildpower.tooltip = tooltip
 			lbl_buildpower.tooltip = tooltip
 			bar_buildpower.tooltip = tooltip
@@ -631,7 +693,7 @@ function CreateWindow()
 
 	local incomeHeight = '42%'
 	local pullHeight = '42%'
-	local incomePullWidth = '30%'
+	local incomePullWidth = '25%'
 	local incomePullOffset = '21%'
 	local pullVertSpace = '14%'
 	local incomeVertSpace = '8%'
@@ -695,7 +757,7 @@ function CreateWindow()
 			valign  = "center",
 			caption = "0",
 			autosize = false,
-			font   = {size = 12, outline = true, color = {.9,.9,.9,1}},
+			font   = {size = options.storageFont.value, outline = true, color = {.9,.9,.9,1}},
 			tooltip = "Your current percentage of useful buildpower",
 		}
 		bar_buildpower = Chili.Progressbar:New{
@@ -768,7 +830,7 @@ function CreateWindow()
 		valign = "center",
  		align  = "left",
 		autosize = false,
-		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.incomeFont.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your metal Income.\nGained from metal extractors, overdrive and reclaim",
 	}
 	lbl_m_expense = Chili.Label:New{
@@ -781,7 +843,7 @@ function CreateWindow()
 		valign = "center",
 		align  = "left",
 		autosize = false,
-		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3},
+		font   = {size = options.expenseFont.value, outline = true, outlineWidth = 4, outlineWeight = 3},
 		tooltip = "This is the total metal demand of your economy",
 	}
 	
@@ -795,7 +857,7 @@ function CreateWindow()
 		align  = "center",
 		caption = "0",
 		autosize = false,
-		font   = {size = 12, outline = true, color = {.8,.8,.8,.95}},
+		font   = {size = options.storageFont.value, outline = true, color = {.8,.8,.8,.95}},
 		tooltip = "Your net metal income",
 	}
 	
@@ -869,7 +931,7 @@ function CreateWindow()
 		valign  = "center",
 		align   = "right",
 		autosize = false,
-		font   = {size = 19, outline = true, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.incomeFont.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	lbl_e_expense = Chili.Label:New{
@@ -882,7 +944,7 @@ function CreateWindow()
 		valign = "center",
 		align  = "right",
 		autosize = false,
-		font   = {size = 16, outline = true, outlineWidth = 4, outlineWeight = 3},
+		font   = {size = options.expenseFont.value, outline = true, outlineWidth = 4, outlineWeight = 3},
 		tooltip = "This is this total energy demand of your economy and abilities which require energy upkeep",
 	}
 	
@@ -896,7 +958,7 @@ function CreateWindow()
 		valign = "center",
 		caption = "0",
 		autosize = false,
-		font   = {size = 12, outline = true, color = {.8,.8,.8,.95}},
+		font   = {size = options.storageFont.value, outline = true, color = {.8,.8,.8,.95}},
 		tooltip = "Your current stored energy.",
 	}
 	
@@ -978,18 +1040,9 @@ function CreateWindow()
 		end},
 	}
 
-	-- Activate tooltips for lables and bars, they do not have them in default chili
-	function image_metal:HitTest(x,y) return self end
-	function bar_metal:HitTest(x,y) return self	end
-	function image_energy:HitTest(x,y) return self end
-	function bar_energy:HitTest(x,y) return self end
-	-- function lbl_energy:HitTest(x,y) return self end
-	-- function lbl_metal:HitTest(x,y) return self end
-	function lbl_e_income:HitTest(x,y) return self end
-	function lbl_m_income:HitTest(x,y) return self end
-	function lbl_e_expense:HitTest(x,y) return self end
-	function lbl_m_expense:HitTest(x,y) return self end
-
+	--// Income Proportion Bar
+	local proportionTooltip = "Income balance bar. Displays metal and energy income ratio."
+	
 	window_metal_proportion = Chili.Window:New{
 		color = {0, 0, 0, 0},
 		parent = window_main_display,
@@ -1015,7 +1068,7 @@ function CreateWindow()
 		end },
 	}
 
-	Chili.Label:New{
+	metal_proportion_label = Chili.Label:New{
 		parent = window_metal_proportion,
 		height = 10,
 		width  = '100%',
@@ -1027,7 +1080,7 @@ function CreateWindow()
 		caption = "^",
 		autosize = false,
 		font   = {size = 18, outline = true, color = {.9,.9,.9,1}},
-		tooltip = "Your current percentage of useful buildpower",
+		tooltip = proportionTooltip,
 	}
 
 	bar_metal_proportion_overflow = Chili.Progressbar:New{
@@ -1040,13 +1093,13 @@ function CreateWindow()
 		-- orientation = "horizontal",
 		x      = '50%',
 		y      = proBarSpacing,
-		--tooltip = "This shows your current metal reserves",		
+		tooltip = proportionTooltip,	
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
 
 	bar_metal_proportion = Chili.Progressbar:New{
 		parent = window_metal_proportion,
-		color  = {col_metal[1], col_metal[2], col_metal[3], 0.25},
+		color  = {col_metal[1], col_metal[2], col_metal[3], 0.45},
 		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
@@ -1054,22 +1107,39 @@ function CreateWindow()
 		-- orientation = "horizontal",
 		x      = 0,
 		y      = proBarSpacing,
-		--tooltip = "This shows your current metal reserves",		
+		tooltip = proportionTooltip,	
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
 
 	Chili.Progressbar:New{
 		parent = window_metal_proportion,
-		color  = {col_energy[1], col_energy[2], col_energy[3], 0.2},
+		color  = {col_energy[1], col_energy[2], col_energy[3], 0.35},
 		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
 		value  = 100,
 		x      = 0,
 		y      = proBarSpacing,
-		--tooltip = "This shows your current metal reserves",		
+		tooltip = proportionTooltip,	
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
+	
+	-- Activate tooltips for lables and bars, they do not have them in default chili
+	function metal_proportion_label:HitTest(x,y) return self end
+	function image_metal:HitTest(x,y) return self end
+	function bar_metal:HitTest(x,y) return self	end
+	function image_energy:HitTest(x,y) return self end
+	function bar_energy:HitTest(x,y) return self end
+	-- function lbl_energy:HitTest(x,y) return self end
+	-- function lbl_metal:HitTest(x,y) return self end
+	function lbl_e_income:HitTest(x,y) return self end
+	function lbl_m_income:HitTest(x,y) return self end
+	function lbl_e_expense:HitTest(x,y) return self end
+	function lbl_m_expense:HitTest(x,y) return self end
+	
+	-- Set the proportion bar to draw behind the income text.
+	window_main_display:RemoveChild(window_metal_proportion)
+	window_main_display:AddChild(window_metal_proportion)
 end
 
 function DestroyWindow()
