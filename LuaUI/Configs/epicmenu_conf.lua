@@ -263,7 +263,7 @@ path='Settings/Camera/Old Camera Shortcuts'
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 path='Settings/HUD Panels'
-	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
+	ShButton( 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 
 path='Settings/HUD Panels/HUD Skin'
 	AddOption({

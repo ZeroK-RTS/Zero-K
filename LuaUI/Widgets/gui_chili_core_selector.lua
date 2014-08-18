@@ -97,7 +97,7 @@ local nano_name = UnitDefNames.armnanotc.humanName	-- HACK
 local function RefreshConsList() end	-- redefined later
 local function ClearData() end
 
-options_path = 'Settings/HUD Panels/Core Selector'
+options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
 options = {
 	maxbuttons = {

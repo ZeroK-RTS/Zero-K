@@ -123,7 +123,7 @@ include("keysym.h.lua")
 
 function SetupPlayerNames() end
 
-options_path = 'Settings/HUD Panels/PlayerList'
+options_path = 'Settings/HUD Panels/Player List'
 options = {
 	text_height = {
 		name = 'Font Size (10-18)',
