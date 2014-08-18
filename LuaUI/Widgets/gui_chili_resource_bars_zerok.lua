@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Zero-K Resource Bars",
+    name      = "Chili Economy Panel",
     desc      = "",
     author    = "jK, Shadowfury333",
     date      = "2014",
@@ -108,7 +108,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/HUD Panels/zero-K Resource Bars'
+options_path = 'Settings/HUD Panels/Economy Panel'
 
 local function option_recreateWindow()
 	DestroyWindow()
@@ -724,7 +724,7 @@ function CreateWindow()
 		color = {1,1,1,options.opacity.value},
 		parent = Chili.Screen0,
 		dockable = true,
-		name="ZeroKResourceBars",
+		name="EconomyPanel",
 		padding = {0,0,0,0},
 		-- right = "50%",
 		y = 0,
