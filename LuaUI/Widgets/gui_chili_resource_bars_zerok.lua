@@ -124,19 +124,14 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense',
+	'eExcessFlash', 'eStallFlash', 'workerUsage','opacity',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
 	'colourBlind','linearProportionBar',
 	'incomeFont','expenseFont','storageFont',}
  
 options = { 
-	eexcessflashalways = {
-		name  = 'Always Flash On Energy Excess', 
-		type  = 'bool', 
-		value = false
-	},
-	onlyShowExpense = {
-		name  = 'Only Show Expense', 
+	eExcessFlash = {
+		name  = 'Flash On Energy Excess', 
 		type  = 'bool', 
 		value = false
 	},
@@ -162,7 +157,7 @@ options = {
 		value = false, 
 		OnChange = option_recreateWindow
 	},
-	energyFlash = {
+	eStallFlash = {
 		name  = "Energy Stall Flash", 
 		type  = "number", 
 		value = 0.1, min=0,max=1,step=0.02
@@ -374,11 +369,11 @@ function widget:GameFrame(n)
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
 	if eCurr > eStor then eCurr = eStor end -- cap by storage
 
-	if options.onlyShowExpense.value then
-		eExpe = eExpe - WG.energyWasted/WG.allies -- if there is energy wastage, dont show it as used pull energy
-	else
+	-- if options.onlyShowExpense.value then
+	-- 	eExpe = eExpe - WG.energyWasted/WG.allies -- if there is energy wastage, dont show it as used pull energy
+	-- else
 		ePull = ePull - WG.energyWasted/WG.allies
-	end
+	-- end
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
 	local wastingM = mCurr >= mStor * 0.9
@@ -392,12 +387,12 @@ function widget:GameFrame(n)
 	local ODEFlashThreshold = 0.1
 
 	local wastingE = false
-	if options.eexcessflashalways.value then
+	if options.eExcessFlash.value then
 		wastingE = (WG.energyWasted > 0)
 	-- else
 		-- wastingE = ((WG.energyWasted/WG.allies > eInco*0.05) and (WG.energyWasted/WG.allies > 15))
 	end
-	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
+	local stallingE = (eCurr <= eStor * options.eStallFlash.value) and (eCurr < 1000) and (eCurr >= 0)
 	if stallingE or wastingE then
 		blinkE_status = true
 		bar_energy:SetValue( 100 )
@@ -544,13 +539,13 @@ function widget:GameFrame(n)
 	-- end
 
 
-	if options.onlyShowExpense.value then
-		lbl_m_expense:SetCaption( Format(mExpe, negativeColourStr.." -") )
-		lbl_e_expense:SetCaption( negativeColourStr..Format(eExpe - WG.energyForOverdrive, negativeColourStr.." -") )
-	else
+	-- if options.onlyShowExpense.value then
+	-- 	lbl_m_expense:SetCaption( Format(mExpe, negativeColourStr.." -") )
+	-- 	lbl_e_expense:SetCaption( negativeColourStr..Format(eExpe - WG.energyForOverdrive, negativeColourStr.." -") )
+	-- else
 		lbl_m_expense:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
 		lbl_e_expense:SetCaption( negativeColourStr..Format(ePull, negativeColourStr.." -") )
-	end
+	-- end
 	lbl_m_income:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )
 	lbl_e_income:SetCaption( Format(eInco, positiveColourStr.."+") )
 
