@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Zero-K Resource Bars",
+    name      = "Chili Economy Panel",
     desc      = "",
     author    = "jK, Shadowfury333",
     date      = "2014",
@@ -108,7 +108,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/HUD Panels/Resource Bars'
+options_path = 'Settings/HUD Panels/Economy Panel'
 
 local function option_recreateWindow()
 	DestroyWindow()
@@ -719,16 +719,21 @@ function CreateWindow()
 	local bpBarWidth = '5.525%'
 	local bpBarEdgeSpacing = '11.05%'
 	
+	local screenHorizCentre = screenWidth / 2
+
+	local economyPanelWidth = 355
+
 	--// WINDOW
 	window = Chili.Window:New{
 		color = {1,1,1,options.opacity.value},
 		parent = Chili.Screen0,
 		dockable = true,
-		name="ResourceBars",
+		name="EconomyPanel",
 		padding = {0,0,0,0},
 		-- right = "50%",
+		x = screenHorizCentre - economyPanelWidth/2,
 		y = 0,
-		clientWidth  = 355,
+		clientWidth  = economyPanelWidth,
 		clientHeight = 65,
 		draggable = false,
 		resizable = false,
