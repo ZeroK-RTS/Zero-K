@@ -719,6 +719,10 @@ function CreateWindow()
 	local bpBarWidth = '5.525%'
 	local bpBarEdgeSpacing = '11.05%'
 	
+	local screenHorizCentre = screenWidth / 2
+
+	local economyPanelWidth = 355
+
 	--// WINDOW
 	window = Chili.Window:New{
 		color = {1,1,1,options.opacity.value},
@@ -727,8 +731,9 @@ function CreateWindow()
 		name="EconomyPanel",
 		padding = {0,0,0,0},
 		-- right = "50%",
+		x = screenHorizCentre - economyPanelWidth/2,
 		y = 0,
-		clientWidth  = 355,
+		clientWidth  = economyPanelWidth,
 		clientHeight = 65,
 		draggable = false,
 		resizable = false,
