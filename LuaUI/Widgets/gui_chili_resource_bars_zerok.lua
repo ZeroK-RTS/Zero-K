@@ -728,7 +728,7 @@ function CreateWindow()
 		padding = {0,0,0,0},
 		-- right = "50%",
 		y = 0,
-		clientWidth  = 325,
+		clientWidth  = 355,
 		clientHeight = 65,
 		draggable = false,
 		resizable = false,
@@ -778,7 +778,7 @@ function CreateWindow()
 			width  = bpImageWidth,
 			right  = bpImageHorSpacing,
 			y      = imageVertSpacing,
-			keepAspect = false,
+			keepAspect = true,
 			tooltip = "Your current percentage of useful buildpower",
 			file   = 'LuaUI/Images/commands/Bold/buildsmall.png',
 		}	
@@ -863,7 +863,7 @@ function CreateWindow()
 		width  = imageWidth,
 		y      = imageVertSpacing,
 		x      = imageHorSpacing,
-		keepAspect = false,
+		keepAspect = true,
 		file   = 'LuaUI/Images/ibeam.png',
 	}
 	
@@ -964,7 +964,7 @@ function CreateWindow()
 		width  = imageWidth,
 		right = imageHorSpacing,
 		y = imageVertSpacing,
-		keepAspect = false,
+		keepAspect = true,
 		file   = 'LuaUI/Images/energy.png',
 	}	
 	
