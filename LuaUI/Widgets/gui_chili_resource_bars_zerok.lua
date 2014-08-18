@@ -108,7 +108,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/HUD Panels/Resource Bars'
+options_path = 'Settings/HUD Panels/zero-K Resource Bars'
 
 local function option_recreateWindow()
 	DestroyWindow()
@@ -724,7 +724,7 @@ function CreateWindow()
 		color = {1,1,1,options.opacity.value},
 		parent = Chili.Screen0,
 		dockable = true,
-		name="ResourceBars",
+		name="ZeroKResourceBars",
 		padding = {0,0,0,0},
 		-- right = "50%",
 		y = 0,
