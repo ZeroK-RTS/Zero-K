@@ -233,7 +233,8 @@ local label_unitInfo
 options_path = 'Settings/HUD Panels/Tooltip'
 options_order = {
 	--tooltip
-	'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'hide_position', 'hide_unit_text', 'showdrawtooltip','showterratooltip',
+	'tooltip_delay', 'hpshort', 'featurehp', 
+	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'show_position', 'show_unit_text', 'showdrawtooltip','showterratooltip',
 	
 	--mouse
 	'showDrawTools',
@@ -256,7 +257,7 @@ end
 
 local function Show(param) end
 
-local selPath = 'Settings/HUD Panels/Selected Units Window'
+local selPath = 'Settings/HUD Panels/Selected Units Panel'
 options = {
 	tooltip_delay = {
 		name = 'Tooltip display delay (0 - 4s)',
@@ -302,26 +303,38 @@ options = {
 			controls['corpse2']=nil; 
 		end,
 	},
-	hide_for_unreclaimable = {
-		name = "Hide Tooltip for Unreclaimables",
+	show_for_units = {
+		name = "Show Tooltip for Units",
+		type = 'bool',
+		value = true,
+		desc = 'Show the tooltip for units.',
+	},
+	show_for_wreckage = {
+		name = "Show Tooltip for Wreckage",
+		type = 'bool',
+		value = true,
+		desc = 'Show the tooltip for wreckage and map features.',
+	},
+	show_for_unreclaimable = {
+		name = "Show Tooltip for Unreclaimables",
+		type = 'bool',
+		advanced = true,
+		value = false,
+		desc = 'Show the tooltip for unreclaimable features.',
+	},
+	show_position = {
+		name = "Show Position Tooltip",
 		type = 'bool',
 		advanced = true,
 		value = true,
-		desc = 'Don\'t show the tooltip for unreclaimable features.',
+		desc = 'Show the position tooltip, even when showing extended tooltips.',
 	},
-	hide_position = {
-		name = "Hide Position Tooltip",
+	show_unit_text = {
+		name = "Show Unit Text Tooltips",
 		type = 'bool',
 		advanced = true,
-		value = false,
-		desc = 'Don\'t show the position tooltip, even when showing extended tooltips.',
-	},
-	hide_unit_text = {
-		name = "Hide Unit Text Tooltips",
-		type = 'bool',
-		advanced = true,
-		value = false,
-		desc = 'Don\'t show the text-only tooltips for units selected but not pointed at, even when showing extended tooltips.',
+		value = true,
+		desc = 'Show the text-only tooltips for units selected but not pointed at, even when showing extended tooltips.',
 	},
 	showdrawtooltip = {
 		name = "Show Map-drawing Tooltip",
@@ -1804,6 +1817,8 @@ end
 
 
 local function MakeToolTip_Unit(data, tooltip)
+	
+	
 	local unitID = data
 	local team, fullname
 	tt_unitID = unitID
@@ -1939,7 +1954,7 @@ local function MakeToolTip_Feature(data, tooltip)
 		return false
 	end
 	
-	if options.hide_for_unreclaimable.value and not tt_fd.reclaimable then
+	if (not options.show_for_unreclaimable.value) and (not tt_fd.reclaimable) then
 		return false
 	end
 	
@@ -2155,16 +2170,25 @@ local function MakeTooltip()
 	if unit_tooltip then
 		-- pointing at unit/feature
 		if type == 'unit' then
-			MakeToolTip_Unit(data, tooltip)
+			if options.show_for_units.value then
+				MakeToolTip_Unit(data, tooltip)
+			else
+				KillTooltip()
+			end
 			return
 		elseif type == 'feature' then
-			if MakeToolTip_Feature(data, tooltip) then
+			if options.show_for_wreckage.value then
+				if MakeToolTip_Feature(data, tooltip) then
+					return
+				end
+			else
+				KillTooltip()
 				return
 			end
 		end
 	
 		--holding meta or static tip
-		if (showExtendedTip and not options.hide_unit_text.value) then
+		if (showExtendedTip and options.show_unit_text.value) then
 			MakeToolTip_Text(tooltip)
 		else
 			KillTooltip()
@@ -2182,7 +2206,7 @@ local function MakeTooltip()
 	local pos_tooltip = tooltip:sub(1,4) == 'Pos '
 	
 	-- default tooltip
-	if not pos_tooltip or (showExtendedTip and not options.hide_position.value) then
+	if not pos_tooltip or (showExtendedTip and options.show_position.value) then
 		MakeToolTip_Text(tooltip)
 		return
 	end
