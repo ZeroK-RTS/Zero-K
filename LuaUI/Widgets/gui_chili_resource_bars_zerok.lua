@@ -124,27 +124,24 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'eexcessflashalways', 'energyFlash', 'workerUsage','opacity','onlyShowExpense',
+	'eExcessFlash', 'energyFlash', 'workerUsage','opacity',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
 	'colourBlind','linearProportionBar',
 	'incomeFont','expenseFont','storageFont',}
  
 options = { 
-	eexcessflashalways = {
-		name  = 'Always Flash On Energy Excess', 
+	eExcessFlash = {
+		name  = 'Flash On Energy Excess', 
 		type  = 'bool', 
-		value = false
-	},
-	onlyShowExpense = {
-		name  = 'Only Show Expense', 
-		type  = 'bool', 
-		value = false
+		value = false,
+		advanced = true,
+		desc = "When enabled energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
 	},
 	enableReserveBar = {
 		name  = 'Enable Reserve', 
 		type  = 'bool', 
 		value = false, 
-		tooltip = "Enables high priority reserve"
+		desc = "When enabled clicking on the resource bars will set reserve. Low and Normal priority constructors cannot use resources in reserve storage."
 	},
 	defaultEnergyReserve = {
 		name  = "Initial Energy Reserve",
@@ -160,12 +157,14 @@ options = {
 		name = "Show Worker Usage", 
 		type = "bool", 
 		value = false, 
-		OnChange = option_recreateWindow
+		OnChange = option_recreateWindow,
+		desc = "Displays an additional bar to show your total worker build power and its usage."
 	},
 	energyFlash = {
 		name  = "Energy Stall Flash", 
 		type  = "number", 
-		value = 0.1, min=0,max=1,step=0.02
+		value = 0.1, min=0,max=1,step=0.02,
+		desc = "Energy storage will flash when it drops below this fraction of your total storage."
 	},
 	opacity = {
 		name  = "Opacity",
@@ -178,13 +177,14 @@ options = {
 		type  = "bool", 
 		value = false, 
 		OnChange = option_colourBlindUpdate, 
-		tooltip = "Uses Blue and Yellow instead of Red and Green for number display"
+		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},
 	linearProportionBar = {
 		name  = "Linear Proportion Bar",
 		type  = "bool", 
 		value = false, 
-		tooltip = "Uses a true ratio for the Proportion Bar."
+		desc = "Uses a true ratio for the Proportion Bar.",
+		advanced = true,
 	},
 	incomeFont = {
 		name  = "Income Font Size",
@@ -372,13 +372,11 @@ function widget:GameFrame(n)
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
 	
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
-	if eCurr > eStor then eCurr = eStor end -- cap by storage
+	if eCurr > eStor then 
+		eCurr = eStor -- cap by storage
+	end 
 
-	if options.onlyShowExpense.value then
-		eExpe = eExpe - WG.energyWasted/WG.allies -- if there is energy wastage, dont show it as used pull energy
-	else
-		ePull = ePull - WG.energyWasted/WG.allies
-	end
+	ePull = ePull - WG.energyWasted/WG.allies
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
 	local wastingM = mCurr >= mStor * 0.9
@@ -392,10 +390,8 @@ function widget:GameFrame(n)
 	local ODEFlashThreshold = 0.1
 
 	local wastingE = false
-	if options.eexcessflashalways.value then
+	if options.eExcessFlash.value then
 		wastingE = (WG.energyWasted > 0)
-	-- else
-		-- wastingE = ((WG.energyWasted/WG.allies > eInco*0.05) and (WG.energyWasted/WG.allies > 15))
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
 	if stallingE or wastingE then
@@ -544,13 +540,8 @@ function widget:GameFrame(n)
 	-- end
 
 
-	if options.onlyShowExpense.value then
-		lbl_m_expense:SetCaption( Format(mExpe, negativeColourStr.." -") )
-		lbl_e_expense:SetCaption( negativeColourStr..Format(eExpe - WG.energyForOverdrive, negativeColourStr.." -") )
-	else
-		lbl_m_expense:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
-		lbl_e_expense:SetCaption( negativeColourStr..Format(ePull, negativeColourStr.." -") )
-	end
+	lbl_m_expense:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
+	lbl_e_expense:SetCaption( negativeColourStr..Format(ePull, negativeColourStr.." -") )
 	lbl_m_income:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )
 	lbl_e_income:SetCaption( Format(eInco, positiveColourStr.."+") )
 
@@ -899,9 +890,9 @@ function CreateWindow()
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function(self, x, y, mouse) 
-			mouseDownOnReserve = true
+			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
-				SetReserveByMouse(self, x, y, mouse, true) 
+				SetReserveByMouse(self, x, y, mouseDownOnReserve, true) 
 			end
 			return (not widgetHandler:InTweakMode()) 
 		end},	-- this is needed for OnMouseUp to work
@@ -909,14 +900,14 @@ function CreateWindow()
 			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
 				return 
 			end
-			SetReserveByMouse(self, x, y, mouse, true)
+			SetReserveByMouse(self, x, y, mouseDownOnReserve, true)
 			mouseDownOnReserve = false
 		end},
 		OnMouseMove = {function(self, x, y, mouse)
 			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
 				return 
 			end
-			SetReserveByMouse(self, x, y, mouse, true)
+			SetReserveByMouse(self, x, y, mouseDownOnReserve, true)
 		end},
 	}
 
@@ -1016,9 +1007,9 @@ function CreateWindow()
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
 		OnMouseDown = {function(self, x, y, mouse) 
-			mouseDownOnReserve = true
+			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
-				SetReserveByMouse(self, x, y, mouse, false) 
+				SetReserveByMouse(self, x, y, mouseDownOnReserve, false) 
 			end
 			return (not widgetHandler:InTweakMode()) 
 		end},	-- this is needed for OnMouseUp to work
@@ -1026,14 +1017,14 @@ function CreateWindow()
 			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
 				return 
 			end
-			SetReserveByMouse(self, x, y, mouse, false)
+			SetReserveByMouse(self, x, y, mouseDownOnReserve, false)
 			mouseDownOnReserve = false
 		end},
 		OnMouseMove = {function(self, x, y, mouse)
 			if widgetHandler:InTweakMode() or not mouseDownOnReserve then 
 				return 
 			end
-			SetReserveByMouse(self, x, y, mouse, false)
+			SetReserveByMouse(self, x, y, mouseDownOnReserve, false)
 		end},
 	}
 
