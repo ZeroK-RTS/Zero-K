@@ -43,7 +43,7 @@ modConfig["ZK"] = {}
 modConfig["ZK"]["unitList"] =
 {
 	--1FACTION
-	armamd = { weapons = { 3 } },		--antinuke
+	armamd = { weapons = { 3 }, differentInbuildDraw = true },		--antinuke
 	armartic = { weapons = { 1 } },		--faraday
 	armdeva = { weapons = { 1 } },		--stardust
 	armpb = { weapons = { 1 } },		--pitbull
@@ -107,14 +107,14 @@ colorConfig["enemy"]["ground"]["min"] = { 1.0, 0.0, 0.0 }
 colorConfig["enemy"]["ground"]["max"] = { 1.0, 1.0, 0.0 }
 colorConfig["enemy"]["air"]["min"] = { 0.0, 1.0, 0.0 }
 colorConfig["enemy"]["air"]["max"] = { 0.0, 0.0, 1.0 }
-colorConfig["enemy"]["nuke"] =  { 1.0, 1.0, 1.0 }
+colorConfig["enemy"]["nuke"]["complete"] =  { 1.0, 1.0, 1.0 }
+colorConfig["enemy"]["nuke"]["nanoframe"] =  { 0.0, 0.6, 0.8 }
 
 colorConfig["ally"] = colorConfig["enemy"]
 --end of DEFAULT COLOR CONFIG
 --Button display configuration
 --position only relevant if no saved config data found
 
-local defenceList = {count = 0, data = {}}
 local defences = {}
 
 local currentModConfig = {}
@@ -136,8 +136,8 @@ local state = {}
 state["curModID"] = nil
 
 local lineConfig = {}
-lineConfig["lineWidth"] = 1.0 -- calcs dynamic now
-lineConfig["alphaValue"] = 0.0 --> dynamic behavior can be found in the function "widget:Update"
+lineConfig["lineWidth"] = 1.0
+lineConfig["alphaValue"] = 0.35
 lineConfig["circleDivs"] = 40.0
 
 -- active range vars
@@ -405,16 +405,28 @@ end
 --------------------------------------------------------------------------------
 
 local function UnitDetected( unitID, isAlly )
-	local tag
-	local tabValue = defences[unitID]
-	if tabValue then
-		--unit already known
+	local unitDefID = spGetUnitDefID(unitID)
+	local udef = unitDefID and UnitDefs[unitDefID]
+	if not udef then
 		return
+	end
+	local configData = currentModConfig["unitList"][UnitDefs[unitDefID].name]
+	if not configData then
+		return
+	end
+	if defences[unitID] then
+		local defenceData = defences[unitID]
+		if configData.differentInbuildDraw then
+			local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
+			if inBuild == defenceData.isBuild then
+				return
+			end
+		else
+			return
+		end
 	end
 	
 	isAlly = isAlly or spectating
-	
-	local unitDefID = spGetUnitDefID(unitID)
 	
 	if unitDefIDRemap[unitDefID] then
 		unitDefID = unitDefIDRemap[unitDefID]
@@ -422,10 +434,9 @@ local function UnitDetected( unitID, isAlly )
 			return
 		end
 	end
+
 	
-	local udef = UnitDefs[unitDefID]
-	
-	if (not udef) or (#udef.weapons == 0) or not currentModConfig["unitList"][udef.name] then
+	if (not udef) or (#udef.weapons == 0) then
 		--not interesting, has no weapons, lame
 		--printDebug("Unit ignored: weaponCount is 0")
 		return
@@ -437,9 +448,13 @@ local function UnitDetected( unitID, isAlly )
 
 	printDebug( udef.name )
 	local foundWeapons = {}
+	
+	local _,_,inBuild = Spring.GetUnitIsStunned(unitID)
+	
+	local tag
 
 	for i=1, #udef.weapons do
-		if ( currentModConfig["unitList"][udef.name] == nil or currentModConfig["unitList"][udef.name]["weapons"][i] == nil ) then
+		if ( configData == nil or configData["weapons"][i] == nil ) then
 			printDebug("Weapon skipped! Name: "..  udef.name .. " weaponidx: " .. i )
 		else
 			--get definition from weapon table
@@ -448,7 +463,7 @@ local function UnitDetected( unitID, isAlly )
 			printDebug("Weapon #" .. i .. " Type: " .. weaponDef.type )
 			
 			local dam = weaponDef.damages
-			local type = currentModConfig["unitList"][udef.name]["weapons"][i]
+			local type = configData["weapons"][i]
 			
 			if CheckWeaponInclusion(type, isAlly) then
 			
@@ -479,7 +494,7 @@ local function UnitDetected( unitID, isAlly )
 						--printDebug("DPS: " .. dps 	)
 					end
 
-					color1, color2 = GetColorsByTypeAndDps( dps, type, isAlly )
+					color1, color2 = GetColorsByTypeAndDps( dps, type, isAlly, inBuild)
 				else
 					printDebug("Default colors!")
 					local team = "ally"
@@ -493,7 +508,11 @@ local function UnitDetected( unitID, isAlly )
 					elseif ( type == 2 ) then
 						color1 = colorConfig[team]["air"]["min"]
 					elseif ( type == 3 ) then -- antinuke
-						color1 = colorConfig[team]["nuke"]
+						if inBuild then
+							color1 = colorConfig[team]["nuke"]["nanoframe"]
+						else
+							color1 = colorConfig[team]["nuke"]["complete"]
+						end
 					end
 				end
 				
@@ -520,10 +539,12 @@ local function UnitDetected( unitID, isAlly )
 	if longestRange > 0 then
 		printDebug("Adding UnitID " .. unitID .. " WeaponCount: " .. #foundWeapons ) --.. "W1: " .. foundWeapons[1]["type"])
 		
-		defences[unitID] ={ 
+		defences[unitID] = { 
 			drawList = glCreateList(CreateDrawList, isAlly, foundWeapons),
 			pos = {x, y, z},
 			drawRange = longestRange,
+			inBuild = inBuild,
+			checkCompleteness = (not isAlly) and inBuild and configData.differentInbuildDraw,
 		}
 		needRedraw = needRedraw or REDRAW_TIME
 	end
@@ -570,6 +591,9 @@ function RedoUnitList()
 	end
 end
 
+function widget:UnitFinished( unitID,  unitDefID,  unitTeam)
+	UnitDetected( unitID, true )
+end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	UnitDetected( unitID, true )
@@ -583,12 +607,10 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	if not defences[unitID] then
-		UnitDetected( unitID, false )
-	end
+	UnitDetected( unitID, false )
 end
 
-function GetColorsByTypeAndDps( dps, type, isAlly )
+function GetColorsByTypeAndDps( dps, type, isAlly, inBuild)
 	--BEWARE: dps can be nil here! when antinuke for example
  -- get alternative color for weapons ground AND air
 	local color1 = nil
@@ -604,9 +626,17 @@ function GetColorsByTypeAndDps( dps, type, isAlly )
 		color1 = GetColorByDps( dps, isAlly, "air" )
 	elseif ( type == 3 ) then
 		if ( isAlly ) then
-			color1 = colorConfig["ally"]["nuke"]
+			if inBuild then
+				color1 = colorConfig["ally"]["nuke"]["nanoframe"]
+			else
+				color1 = colorConfig["ally"]["nuke"]["complete"]
+			end
 		else
-			color1 = colorConfig["enemy"]["nuke"]
+			if inBuild then
+				color1 = colorConfig["enemy"]["nuke"]["nanoframe"]
+			else
+				color1 = colorConfig["enemy"]["nuke"]["complete"]
+			end
 		end
 	end
 
@@ -640,7 +670,7 @@ function ResetGl()
 end
 
 local function RedrawDrawRanges()
-	for _,def in pairs(defences) do
+	for _, def in pairs(defences) do
 		glCallList(def.drawList)
 	end
 end
@@ -660,27 +690,28 @@ function widget:Update(dt)
 	if needRedraw then
 		needRedraw = needRedraw - dt
 		if needRedraw < 0 then
-			--Spring.Echo("redraw")
+			printDebug("Redrawing Ranges.")
 			defenseRangeDrawList = glCreateList(RedrawDrawRanges)
 			needRedraw = false
 		end
 	end
 	
-	if ((timef - updateTimes["line"]) > 0.2 and timef ~= updateTimes["line"] ) then
-		updateTimes["line"] = timef
-		--adjust line width and alpha by camera height
-		_, camy, _ = spGetCameraPosition()
-		if ( camy < 700 ) then
-			lineConfig["lineWidth"] = 2.0
-			lineConfig["alphaValue"] = 0.25
-		elseif ( camy < 1800 ) then
-			lineConfig["lineWidth"] = 1.5
-			lineConfig["alphaValue"] = 0.3
-		else
-			lineConfig["lineWidth"] = 1.0
-			lineConfig["alphaValue"] = 0.35
-		end
-	end
+	-- Does not make sense with the draw list.
+	--if ((timef - updateTimes["line"]) > 0.2 and timef ~= updateTimes["line"] ) then
+	--	updateTimes["line"] = timef
+	--	--adjust line width and alpha by camera height
+	--	_, camy, _ = spGetCameraPosition()
+	--	if ( camy < 700 ) then
+	--		lineConfig["lineWidth"] = 2.0
+	--		lineConfig["alphaValue"] = 0.25
+	--	elseif ( camy < 1800 ) then
+	--		lineConfig["lineWidth"] = 1.5
+	--		lineConfig["alphaValue"] = 0.3
+	--	else
+	--		lineConfig["lineWidth"] = 1.0
+	--		lineConfig["alphaValue"] = 0.35
+	--	end
+	--end
 
 	-- update timers once every <updateInt> seconds
 	if (time % updateTimes["removeInterval"] == 0 and time ~= updateTimes["remove"] ) then
@@ -691,9 +722,15 @@ function widget:Update(dt)
 			local x, y, z = def.pos[1], def.pos[2], def.pos[3]
 			local a, b, c = spGetPositionLosState(x, y, z)
 			local losState = b
-
-			if (losState) then
-				if not spGetUnitDefID(unitID) then
+			
+			if spGetUnitDefID(unitID) then
+				if defences[unitID].checkCompleteness then
+					-- Not allied because this check is only required for enemies.
+					-- Allied units are detected in UnitFinished.
+					UnitDetected( unitID, false )
+				end
+			else
+				if losState then
 					printDebug("Unit killed.")
 					defences[unitID] = nil
 					needRedraw = needRedraw or REDRAW_TIME
