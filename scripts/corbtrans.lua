@@ -475,21 +475,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if severity <= 0.25 then
-		Explode(body, sfxNone )
-		Explode(RUpperClaw1 , sfxShatter	)
-		Explode(RMidClaw1 	, sfxShatter	)
-		Explode(RLowClaw1 	, sfxShatter	)
-		Explode(RUpperClaw2 , sfxShatter	)
-		Explode(RMidClaw2 	, sfxShatter	)
-		Explode(RLowClaw2 	, sfxShatter	)
-		Explode(RUpperClaw3 , sfxShatter	)
-		Explode(RMidClaw3 	, sfxShatter	)
-		Explode(RLowClaw3 	, sfxShatter	)
-		Explode(RUpperClaw4 , sfxShatter	)
-		Explode(RMidClaw4 	, sfxShatter	)
-		return 1
-	elseif severity <= 0.50 then
+	if severity <= 0.50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
 		Explode(body, sfxShatter )
 		Explode(RUpperClaw1 , sfxShatter	)
 		Explode(RMidClaw1 	, sfxShatter	)
@@ -505,17 +491,17 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	else
 		Explode(body, sfxShatter )
-		Explode(RUpperClaw1 , sfxShatter	)
-		Explode(RMidClaw1 	, sfxShatter	)
-		Explode(RLowClaw1 	, sfxShatter	)
-		Explode(RUpperClaw2 , sfxShatter	)
-		Explode(RMidClaw2 	, sfxShatter	)
-		Explode(RLowClaw2 	, sfxShatter	)
-		Explode(RUpperClaw3 , sfxShatter	)
-		Explode(RMidClaw3 	, sfxShatter	)
-		Explode(RLowClaw3 	, sfxShatter	)
-		Explode(RUpperClaw4 , sfxShatter	)
-		Explode(RMidClaw4 	, sfxShatter	)
+		Explode(RUpperClaw1, sfxShatter)
+		Explode(RMidClaw1, sfxShatter)
+		Explode(RLowClaw1, sfxShatter)
+		Explode(RUpperClaw2, sfxShatter)
+		Explode(RMidClaw2, sfxFall + sfxSmoke + sfxFire)
+		Explode(RLowClaw2, sfxFall + sfxSmoke + sfxFire)
+		Explode(RUpperClaw3, sfxFall + sfxSmoke + sfxFire)
+		Explode(RMidClaw3, sfxFall + sfxSmoke + sfxFire)
+		Explode(RLowClaw3, sfxFall + sfxSmoke + sfxFire)
+		Explode(RUpperClaw4, sfxFall + sfxSmoke + sfxFire)
+		Explode(RMidClaw4, sfxFall + sfxSmoke + sfxFire)
 		return 2
 	end
 end
