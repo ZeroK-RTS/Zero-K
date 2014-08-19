@@ -108,6 +108,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Preserve crater sizes for new engine
+-- https://github.com/spring/spring/commit/77c8378b04907417a62c25218d69ff323ba74c8d
+
+if not reverseCompat then
+	for _, weaponDef in pairs(WeaponDefs) do
+		if (not weaponDef.craterareaofeffect) then
+			weaponDef.craterareaofeffect = tonumber(weaponDef.areaofeffect or 0) * 1.5
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Disable sweepfire until we know how to use it
 
 for _, weaponDef in pairs(WeaponDefs) do
