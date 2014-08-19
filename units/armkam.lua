@@ -136,8 +136,6 @@ unitDef = {
       object           = [[banshee_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
