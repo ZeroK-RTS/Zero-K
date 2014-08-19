@@ -203,7 +203,7 @@ multiSelect = {
 -- group info
 
 local numSelectedUnits = 0
-local maxPicFit = 12
+local maxPicFit = 10
 
 local unitInfoSum = {
 	count = 0,
@@ -1027,10 +1027,10 @@ local function MakeUnitGroupSelectionToolTip()
 	end
 	
 	--estimate how many picture can fit into the selection grid
-	local maxRight = window_corner.width - (options.showgroupinfo.value and infoSection_size or 0)
+	local maxRight = window_corner.width - (options.showgroupinfo.value and infoSection_size or 0) - 20
 	local horizontalFit =  math.modf(maxRight/(unitIcon_size+2))
-	local verticalFit = math.modf(window_corner.height/(unitIcon_size+2))
-	maxPicFit =horizontalFit*verticalFit
+	local verticalFit = math.modf((window_corner.height  - 20)/(unitIcon_size+2))
+	maxPicFit = horizontalFit*verticalFit
 	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
 
 	WriteGroupInfo() --write selection summary text on right side of the panel
