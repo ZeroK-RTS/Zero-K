@@ -91,15 +91,15 @@ function script.BlockShot1()
 end
 
 function script.Killed(recentDamage, maxHealth)
-	local severity = (recentDamage/maxHealth) * 100
-	if severity < 50 then
-		Explode(base, sfxNone)
+	local severity = recentDamage/maxHealth
+	if severity < .5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
+		Explode(base, sfxShatter)
 		Explode(jet1, sfxSmoke)
 		Explode(jet2, sfxSmoke)
-		Explode(Lwing, sfxNone)
-		Explode(Rwing, sfxNone)
+		Explode(Lwing, sfxFall)
+		Explode(Rwing, sfxFall)
 		return 1
-	elseif severity < 100 then
+	elseif severity < .99 then
 		Explode(base, sfxShatter)
 		Explode(jet1, sfxSmoke + sfxFire + sfxExplode)
 		Explode(jet2, sfxSmoke + sfxFire + sfxExplode)
