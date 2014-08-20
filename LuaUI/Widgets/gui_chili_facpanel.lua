@@ -348,7 +348,6 @@ local function MakeButton(unitDefID, facID, buttonId)
 					local alt, ctrl, meta, shift = Spring.GetModKeyState()
 					local rb = button == 3
 					local lb = button == 1
-					echo('button?', unitDefID)
 					if not (lb or rb) then return end
 					
 					local opt = {}
