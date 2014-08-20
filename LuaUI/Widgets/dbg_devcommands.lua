@@ -96,6 +96,16 @@ options = {
 			end
 		end,
 	},
-	
+	printunitnames = {
+		name = "Print Unit Names",
+		type = 'button',
+		OnChange = function(self)
+			for i=1,#UnitDefs do
+				local ud = UnitDefs[i]
+				local name = ud.humanName
+				Spring.Echo("'" .. name .. "',")
+			end
+		end,
+	},
 }
 
