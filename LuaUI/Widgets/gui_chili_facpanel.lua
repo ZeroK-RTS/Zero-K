@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.010"
+local version = "v0.011"
 
 function widget:GetInfo()
   return {
@@ -23,12 +23,14 @@ local GreyStr    = "\255\210\210\210"
 local GreenStr   = "\255\092\255\092"
 local magenta_table = {0.8, 0, 0, 1}
 
-local buttonColor = {0,0,0,0.5}
-local queueColor = {0.0,0.4,0.4,0.9}
-local progColor = {1,0.7,0,0.6}
+local buttonColor = {0,0,0,0.4}
+--local queueColor = {0.0,0.4,0.4,0.9}
+local queueColor = {1,1,1,1}
+local progColor = {1,0.9,0,0.6}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--chili
 
 local Chili
 local Button
@@ -40,14 +42,13 @@ local Image
 local Progressbar
 local Panel
 local screen0
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
 
 local window_facbar, stack_main, stack_build
 local echo = Spring.Echo
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--options
 
 local function RecreateFacbar() end
 
@@ -83,10 +84,10 @@ options = {
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-
-
 -- list and interface vars
+
 local facs = {}
+local facsByUnitId = {}
 local unfinished_facs = {}
 local pressedFac  = -1
 local waypointFac = -1
@@ -97,6 +98,7 @@ local inTweak  = false
 local leftTweak, enteredTweak = false, false
 local cycle_half_s = 1
 local cycle_2_s = 1
+local updateQSoon
 
 -------------------------------------------------------------------------------
 -- SOUNDS
@@ -111,15 +113,6 @@ local sound_queue_clear = LUAUI_DIRNAME .. 'Sounds/buildbar_hover.wav'
 -------------------------------------------------------------------------------
 
 local image_repeat    = LUAUI_DIRNAME .. 'Images/repeat.png'
-
-local teamColors = {}
-local GetTeamColor = Spring.GetTeamColor or function (teamID)
-  local color = teamColors[teamID]
-  if (color) then return unpack(color) end
-  local _,_,_,_,_,_,r,g,b = Spring.GetTeamInfo(teamID)
-  teamColors[teamID] = {r,g,b}
-  return r,g,b
-end
 
 -------------------------------------------------------------------------------
 -- SCREENSIZE FUNCTIONS
@@ -141,7 +134,9 @@ local GetSelectedUnits  = Spring.GetSelectedUnits
 local GetFullBuildQueue = Spring.GetFullBuildQueue
 local GetUnitIsBuilding = Spring.GetUnitIsBuilding
 
-local push        = table.insert
+local tts 	= Spring.Utilities.TableToString
+
+local push  = table.insert
 
 
 -------------------------------------------------------------------------------
@@ -170,6 +165,12 @@ local function GetBuildQueue(unitID)
 end
 
 
+local function RemoveChildren(container) 
+	for i = 1, #container.children do 
+		container:RemoveChild(container.children[1])
+	end
+end 
+
 
 local function UpdateFac(i, facInfo)
 	--local unitDefID = facInfo.unitDefID
@@ -194,6 +195,7 @@ local function UpdateFac(i, facInfo)
 		--]]
 	end
 
+	--echo 'UpdateFac'
 	local buildList   = facInfo.buildList
 	local buildQueue  = GetBuildQueue(facInfo.unitID)
 	for j,unitDefIDb in ipairs(buildList) do
@@ -203,24 +205,10 @@ local function UpdateFac(i, facInfo)
 		  echo('<Chili Facpanel> Strange error #1' )
 		else
 		  local boButton = facs[i].boStack.childrenByName[unitDefIDb]
-		  local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
-		  
-		  local boBar = boButton.childrenByName['bp'].childrenByName['prog']
-		  local qBar = qButton.childrenByName['bp'].childrenByName['prog']
-		  
+		  local boBar = boButton:GetChildByName('bp'):GetChildByName('prog')
 		  local amount = buildQueue[unitDefIDb] or 0
-		  local boCount = boButton.childrenByName['count']
-		  local qCount = qButton.childrenByName['count']			
-		  
-		  facs[i].qStack:RemoveChild(qButton)
-		  
+		  local boCount = boButton:GetChildByName('count')
 		  boBar:SetValue(0)
-		  qBar:SetValue(0)
-		  if unitDefIDb == unitBuildDefID then
-			  boBar:SetValue(progress)
-			  qBar:SetValue(progress)
-		  end
-		  
 		  if amount > 0 then
 			  boButton.backgroundColor = queueColor
 		  else
@@ -229,43 +217,10 @@ local function UpdateFac(i, facInfo)
 		  boButton:Invalidate()
 		  
 		  boCount:SetCaption(amount > 0 and amount or '')
-		  qCount:SetCaption(amount > 0 and amount or '')
+		  
 		end
 	end
 end
-local function UpdateFacQ(i, facInfo)
-	local unitBuildDefID = -1
-	local unitBuildID    = -1
-
-	-- building?
-	local progress = 0
-	unitBuildID      = GetUnitIsBuilding(facInfo.unitID)
-	if unitBuildID then
-		unitBuildDefID = GetUnitDefID(unitBuildID)
-		_, _, _, _, progress = GetUnitHealth(unitBuildID)
-	end
-	local buildQueue  = Spring.GetFullBuildQueue(facInfo.unitID, options.maxVisibleBuilds.value +1)
-				
-	if (buildQueue ~= nil) then
-		
-		local n,j = 1,options.maxVisibleBuilds.value
-		
-		while (buildQueue[n]) do
-			local unitDefIDb, count = next(buildQueue[n], nil)
-			
-			local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
-			
-			if not facs[i].qStack:GetChildByName(qButton.name) then
-				facs[i].qStack:AddChild(qButton)
-			end
-		
-			j = j-1
-			if j==0 then break end
-			n = n+1
-		end
-	end
-end				
-
 
 
 local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
@@ -371,14 +326,14 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 	return facButton, facStack, boStack, qStack, qStore
 end
 
-local function MakeButton(unitDefID, facID, facIndex)
+local function MakeButton(unitDefID, facID, buttonId)
 
 	local ud = UnitDefs[unitDefID]
 	local tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"
   
 	return
 		Button:New{
-			name = unitDefID,
+			name = buttonId,
 			tooltip=tooltip,
 			x=0,
 			caption='',
@@ -393,6 +348,7 @@ local function MakeButton(unitDefID, facID, facIndex)
 					local alt, ctrl, meta, shift = Spring.GetModKeyState()
 					local rb = button == 3
 					local lb = button == 1
+					echo('button?', unitDefID)
 					if not (lb or rb) then return end
 					
 					local opt = {}
@@ -404,7 +360,6 @@ local function MakeButton(unitDefID, facID, facIndex)
 					if rb then
 						push(opt,"right")
 					end
-					
 					Spring.GiveOrderToUnit(facID, -(unitDefID), {}, opt)
 					
 					if rb then
@@ -414,7 +369,7 @@ local function MakeButton(unitDefID, facID, facIndex)
 					end
 					
 					--UpdateFac(facIndex, facs[facIndex])
-					
+					updateQSoon = true
 				end
 			},
 			children = {
@@ -456,6 +411,57 @@ local function MakeButton(unitDefID, facID, facIndex)
 		}
 	
 end
+
+
+local function UpdateFacQ(i, facInfo)
+	local unitBuildDefID = -1
+	local unitBuildID    = -1
+
+	-- building?
+	local progress = 0
+	unitBuildID      = GetUnitIsBuilding(facInfo.unitID)
+	if unitBuildID then
+		unitBuildDefID = GetUnitDefID(unitBuildID)
+		_, _, _, _, progress = GetUnitHealth(unitBuildID)
+	end
+	local buildQueue  = Spring.GetFullBuildQueue(facInfo.unitID, options.maxVisibleBuilds.value +1)
+	RemoveChildren(facs[i].qStack)
+	
+	if not buildQueue  then return end
+	--echo'updating facq'
+	for j,v in ipairs(buildQueue) do
+		for id, num in pairs(v) do
+			unitDefIDb = id
+			count = num
+			break
+		end
+		local qButton = MakeButton(unitDefIDb, facInfo.unitID, j..'-'..unitDefIDb )
+		local qCount = qButton.childrenByName['count']
+		qCount:SetCaption(count > 1 and count or '')
+		facs[i].qStack:AddChild(qButton)
+	end
+end
+
+local function UpdateFacProg(i, facInfo)
+	local progress = 0
+	local unitBuildDefID
+	local unitBuildID = GetUnitIsBuilding(facInfo.unitID)
+	if unitBuildID then
+		unitBuildDefID = GetUnitDefID(unitBuildID)
+		_, _, _, _, progress = GetUnitHealth(unitBuildID)
+	end
+	
+	local firstButton = facs[i].qStack.children[1]
+	if not firstButton then return end
+	if not unitBuildDefID then return end
+	local qBar = firstButton.childrenByName['bp'].childrenByName['prog']
+	local boButton = facs[i].boStack:GetChildByName(unitBuildDefID)
+	local boBar = boButton:GetChildByName('bp'):GetChildByName('prog')
+	
+	qBar:SetValue(progress)
+	boBar:SetValue(progress)
+end
+
 
 
 -------------------------------------------------------------------------------
@@ -544,9 +550,6 @@ RecreateFacbar = function()
 		if unitBuildID then
 			unitBuildDefID = GetUnitDefID(unitBuildID)
 			_, _, _, _, progress = GetUnitHealth(unitBuildID)
-			
-			--unitDefID      = unitBuildDefID -- replaces factory with the icon of unit it's currently building?
-			 
 		elseif (unfinished_facs[facInfo.unitID]) then
 			_, _, _, _, progress = GetUnitHealth(facInfo.unitID)
 			if (progress>=1) then 
@@ -562,21 +565,19 @@ RecreateFacbar = function()
 		facs[i].qStack 		= qStack
 		facs[i].qStore 		= qStore
 		
+		facsByUnitId[facInfo.unitID] = i
+		
 		local buildList   = facInfo.buildList
 		local buildQueue  = GetBuildQueue(facInfo.unitID)
 		for j,unitDefIDb in ipairs(buildList) do
 			local unitDefIDb = unitDefIDb
-			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, i) )
-			qStore[i .. '|' .. unitDefIDb] = MakeButton(unitDefIDb, facInfo.unitID, i)
+			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, unitDefIDb) )
 		end
-		
 		boStack:AddChild( MakeClearButton( facInfo.unitID ) )
-		
 	end
 	
 	--stack_build:ClearChildren()
 	--stack_build.backgroundColor = {0,0,0,0}
-	
 	
 	--stack_build:SetPos(options.buttonsize.value*1.2 )
 	stack_build.x = options.buttonsize.value*1.2
@@ -585,11 +586,14 @@ RecreateFacbar = function()
 	stack_main:UpdateLayout()
 	
 	widget:SelectionChanged(Spring.GetSelectedUnits())
+	
+	updateQSoon = true
 end
 
 local function UpdateFactoryList()
 
   facs = {}
+  facsByUnitId = {}
 
   local teamUnits = Spring.GetTeamUnits(myTeamID)
   local totalUnits = #teamUnits
@@ -675,7 +679,6 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		--UpdateFactoryList()
 		RecreateFacbar()
 		
-		
         return
       end
     end
@@ -697,18 +700,25 @@ function widget:Update()
 	cycle_half_s = (cycle_half_s % 16) + 1
 	cycle_2_s = (cycle_2_s % (32*2)) + 1
 	
-	
 	if cycle_half_s == 1 then 
 		for i,facInfo in ipairs(facs) do
 			if Spring.ValidUnitID( facInfo.unitID ) then
 				if cycle_2_s == 1 then
 					UpdateFac(i, facInfo)
 				end
-				UpdateFacQ(i, facInfo)
+				if updateQSoon then
+					UpdateFacQ(i, facInfo)
+				end
 			end
+		end
+		if updateQSoon then
+			updateQSoon = false
 		end
 	end
 	
+	for i,facInfo in ipairs(facs) do
+		UpdateFacProg(i, facInfo)
+	end
 	
 	if inTweak and not enteredTweak then
 		enteredTweak = true
@@ -734,6 +744,14 @@ end
 -------------------------------------------------------------------------------
 
 
+function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
+	if unitTeam ~= myTeamID then
+		return
+	end
+	--local i = facsByUnitId[unitID]
+	updateQSoon = true
+end
+
 function widget:SelectionChanged(selectedUnits)
 	CheckRemoveFacStack()
 	
@@ -743,18 +761,18 @@ function widget:SelectionChanged(selectedUnits)
 		for cnt, f in ipairs(facs) do 
 			if f.unitID == selectedUnits[1] then 
 				pressedFac = cnt
-				
 				local qStack = facs[pressedFac].qStack
 				local boStack = facs[pressedFac].boStack
 				facs[pressedFac].facStack:RemoveChild(qStack)
-				--facs[pressedFac].facStack:AddChild(boStack)
 				stack_build:AddChild(boStack)
 				stack_build.backgroundColor = {1,1,1,1}
-				
 				facs[pressedFac].facButton.backgroundColor = magenta_table
 				facs[pressedFac].facButton:Invalidate()
 			end
 		end
+	end
+	if pressedFac ~= -1 then
+		updateQSoon = true
 	end
 end
 
