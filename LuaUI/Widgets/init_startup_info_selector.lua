@@ -23,9 +23,9 @@ _ Make a small (2-3 frames) animation when cursor hover comms' posters (like the
 local debug	= false --generates debug message
 local Echo	= Spring.Echo
 local spGetGameRulesParam = Spring.GetGameRulesParam
-
-local coop = (Spring.GetModOptions().coop == 1) or false
-local forcejunior = (Spring.GetModOptions().forcejunior == 1) or false
+-- FIXME use tobool instead of this string comparison silliness
+local coop = (Spring.GetModOptions().coop == "1") or false
+local forcejunior = (Spring.GetModOptions().forcejunior == "1") or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
 local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 
