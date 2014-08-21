@@ -233,7 +233,7 @@ local label_unitInfo
 options_path = 'Settings/HUD Panels/Tooltip'
 options_order = {
 	--tooltip
-	'tooltip_delay', 'hpshort', 'featurehp', 
+	'tooltip_delay', 'world_tooltip_delay', 'hpshort', 'featurehp', 
 	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'show_position', 'show_unit_text', 'showdrawtooltip','showterratooltip',
 	
 	--mouse
@@ -265,6 +265,13 @@ options = {
 		type = 'number',
 		min=0,max=4,step=0.1,
 		value = 0,
+	},
+	world_tooltip_delay = {
+		name = 'World tooltip display delay (0 - 4s)',
+		desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
+		type = 'number',
+		min=0,max=4,step=0.1,
+		value = 0.5,
 	},
 	--[[ This is causing it so playername is not always visible, too difficult to maintain.
 	fontsize = {
@@ -2165,19 +2172,21 @@ local function MakeTooltip()
 	local unit_tooltip = tooltip:find('Experience %d+.%d+ Cost ')  --shows on your units, not enemy's
 		or tooltip:find('TechLevel %d') --shows on units
 		or tooltip:find('Metal.*Energy') --shows on features
+		
+	local alt,_,meta,_ = spGetModKeyState()
 	
 	--unit(s) selected/pointed at
 	if unit_tooltip then
 		-- pointing at unit/feature
 		if type == 'unit' then
-			if options.show_for_units.value then
+			if options.show_for_units.value and (meta or stillCursorTime > options.world_tooltip_delay.value) then
 				MakeToolTip_Unit(data, tooltip)
 			else
 				KillTooltip()
 			end
 			return
 		elseif type == 'feature' then
-			if options.show_for_wreckage.value then
+			if options.show_for_wreckage.value and (meta or stillCursorTime > options.world_tooltip_delay.value) then
 				if MakeToolTip_Feature(data, tooltip) then
 					return
 				end
@@ -2450,13 +2459,13 @@ function widget:Update(dt)
 		showExtendedTip = true
 	
 	else
-		if (options.tooltip_delay.value > 0) and not drawtoolKeyPressed then
+		if not drawtoolKeyPressed then
 			if not mousemoved then
 				stillCursorTime = stillCursorTime + dt
 			else
 				stillCursorTime = 0 
 			end
-			show_cursortip = stillCursorTime > options.tooltip_delay.value
+			show_cursortip = (options.tooltip_delay.value == 0 or stillCursorTime > options.tooltip_delay.value)
 		end
 		
 		if showExtendedTip then 
