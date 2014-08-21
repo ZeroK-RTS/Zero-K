@@ -1028,6 +1028,13 @@ function widget:AddConsoleMessage(msg)
 	
 	local isChat = msg.msgtype ~= 'other'
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
+	
+	if not isChat then
+		if (msg.argument):find('unpaused the game') or (msg.argument):find('paused the game') then
+			isChat = true
+		end
+	end 
+	
 	local messages = isChat and chatMessages or consoleMessages
 	
 	if #messages > 0
