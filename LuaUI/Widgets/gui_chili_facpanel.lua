@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.011"
+local version = "v0.013"
 
 function widget:GetInfo()
   return {
@@ -41,9 +41,10 @@ local Grid
 local Image
 local Progressbar
 local Panel
+local ScrollPanel
 local screen0
 
-local window_facbar, stack_main, stack_build
+local window_facbar, stack_main, stack_build, window_icondrag, scrollpanel
 local echo = Spring.Echo
 
 -------------------------------------------------------------------------------
@@ -93,12 +94,15 @@ local pressedFac  = -1
 local waypointFac = -1
 local waypointMode = 0   -- 0 = off; 1=lazy; 2=greedy (greedy means: you have to left click once before leaving waypoint mode and you can have units selected)
 
+local alreadyRemovedTag = {}
+
 local myTeamID = 0
 local inTweak  = false
 local leftTweak, enteredTweak = false, false
 local cycle_half_s = 1
 local cycle_2_s = 1
 local updateQSoon
+local lmx,lmy=-1,-1
 
 -------------------------------------------------------------------------------
 -- SOUNDS
@@ -133,6 +137,9 @@ local DrawUnitCommands  = Spring.DrawUnitCommands
 local GetSelectedUnits  = Spring.GetSelectedUnits
 local GetFullBuildQueue = Spring.GetFullBuildQueue
 local GetUnitIsBuilding = Spring.GetUnitIsBuilding
+local spGetMouseState	= Spring.GetMouseState
+
+local spGetFullBuildQueue = Spring.GetFullBuildQueue
 
 local tts 	= Spring.Utilities.TableToString
 
@@ -326,11 +333,87 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 	return facButton, facStack, boStack, qStack, qStore
 end
 
-local function MakeButton(unitDefID, facID, buttonId)
+
+local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,customUnitID)
+	local targetFactory = customUnitID or selectedFac
+	local buildQueue = spGetFullBuildQueue(targetFactory)
+	num = num or (#buildQueue+1) -- insert build at "num" or at end of queue
+	local alt,ctrl,meta,shift = Spring.GetModKeyState()
+	local pos = 1
+	local numInput = 1	--number of times to send the order
+	
+	local function BooleanMult(int, bool)
+		if bool then return int
+		else return 0 end
+	end
+	
+	--CMD.OPT_META = 4
+	--CMD.OPT_RIGHT = 16
+	--CMD.OPT_SHIFT = 32
+	--CMD.OPT_CTRL = 64
+	--CMD.OPT_ALT = 128
+	
+	--it's not using the options, even though it's receiving them correctly
+	--so we have to do it manually
+	if shift then numInput = numInput * 5 end
+	if ctrl then numInput = numInput * 20 end
+	numInput = numInput + (addInput or 0) -- to insert specific amount without SHIFT or CTRL modifier
+	
+	--local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta) + BooleanMult(CMD.OPT_RIGHT, right)
+	
+	--insertion position is by unit rather than batch, so we need to add up all the units in front of us to get the queue
+	
+	for i=1,num-1 do
+		if buildQueue[i] then
+			for _,unitCount in pairs(buildQueue[i]) do
+				pos = pos + unitCount
+			end
+		end
+	end
+	
+	-- skip over the commands with an id of 0, left behind by removal
+	local commands = Spring.GetFactoryCommands(targetFactory)
+	local i = 1
+	while i <= pos do
+		if not commands[i] then --end of queue reached
+			break
+		end
+		if commands[i].id == 0 then 
+			pos = pos + 1
+		end
+		i = i + 1
+	end
+	
+	pos = pos- (insertMode and 1 or 0) -- to insert before this index (possibly replace active nanoframe) or after this index (default)
+	--Spring.Echo(cmdid)
+	if not right then
+		for i = 1, numInput do
+			Spring.GiveOrderToUnit(targetFactory, CMD.INSERT, {pos, cmdid, 0 }, {"alt", "ctrl"})
+		end
+	else
+		-- delete from back so that the order is not canceled while under construction
+		local i = 0
+		while commands[i+pos] and commands[i+pos].id == cmdid and not alreadyRemovedTag[commands[i+pos].tag] do
+			i = i + 1
+		end
+		i = i - 1
+		j = 0
+		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput do
+			Spring.GiveOrderToUnit(targetFactory, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+			alreadyRemovedTag[commands[i+pos].tag] = true
+			j = j + 1
+			i = i - 1
+		end 
+	end
+end
+
+local buildRow_dragDrop = {}
+local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 
 	local ud = UnitDefs[unitDefID]
 	local tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"
   
+	local cmdid = -(unitDefID)
 	return
 		Button:New{
 			name = buttonId,
@@ -343,34 +426,97 @@ local function MakeButton(unitDefID, facID, buttonId)
 			--padding = {0,0,0,0},
 			--margin={0, 0, 0, 0},
 			backgroundColor = queueColor,
-			OnClick = {
-				function(_,_,_,button)
-					local alt, ctrl, meta, shift = Spring.GetModKeyState()
-					local rb = button == 3
-					local lb = button == 1
-					if not (lb or rb) then return end
+			cmdid = cmdid;
+			OnClick = { function (self, x, y, button)
+				local alt, ctrl, meta, shift = Spring.GetModKeyState()
+				local rb = button == 3
+				local lb = button == 1
+				if not (lb or rb) then return end
+				
+				local opt = {}
+				if alt   then push(opt,"alt")   end
+				if ctrl  then push(opt,"ctrl")  end
+				if meta  then push(opt,"meta")  end
+				if shift then push(opt,"shift") end
+				
+				if rb then
+					push(opt,"right")
+				end
+				if bqPos and not alt then
+					BuildRowButtonFunc(bqPos, cmdid, lb, rb, nil, nil, facID)
+				else
+					Spring.GiveOrderToUnit(facID, cmdid, {}, opt)
+				end
+				
+				if rb then
+					Spring.PlaySoundFile(sound_queue_rem, 0.97, 'ui')
+				else
+					Spring.PlaySoundFile(sound_queue_add, 0.95, 'ui')
+				end
+				
+				buildRow_dragDrop[1] = nil
+				
+				--UpdateFac(facIndex, facs[facIndex])
+				updateQSoon = true
+			end},
+			OnMouseDown = { function(self,x,y,mouse) --for drag_drop feature
+				
+				if not bqPos then return end
+				
+				if mouse == 1 then
+					buildRow_dragDrop[1] = bqPos; 
+					--buildRow_dragDrop[2] = -buildRowButtons[i].cmdid
+					buildRow_dragDrop[2] = cmdid
+					buildRow_dragDrop[3] = count-1;
+					buildRow_dragDrop[4] = self.width/2
 					
-					local opt = {}
-					if alt   then push(opt,"alt")   end
-					if ctrl  then push(opt,"ctrl")  end
-					if meta  then push(opt,"meta")  end
-					if shift then push(opt,"shift") end
+					screen0:AddChild(window_icondrag)
+					local dragImg = window_icondrag:GetChildByName('icon')
+					dragImg.file = "#"..unitDefID -- do not remove this line
+					dragImg.file2 = WG.GetBuildIconFrame(ud)
+					dragImg:Invalidate()
+					lmx,lmy = spGetMouseState()
+				end
+			end},
+			OnMouseUp = { function(self,x,y,mouse) -- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to self
+				
+				if not bqPos then return end
+				
+				screen0:RemoveChild(window_icondrag)
+				
+				local i = facIndex
+				local buildRow = facs[i].qStack
+				local MAX_COLUMNS = 5
+				
+				local px,py = self:LocalToParent(x,y) --get coordinate with respect to parent
+				if mouse == 1 and (x>self.width or x<0) and px> 0 and px< buildRow.width and py> 0 and py< buildRow.height then
 					
-					if rb then
-						push(opt,"right")
+					local prevIndex = buildRow_dragDrop[1]
+					--local currentIndex = math.ceil(px/(buildRow.width/MAX_COLUMNS)) --estimate on which button mouse was released
+					local currentIndex = math.ceil(px/options.buttonsize.value) --estimate on which button mouse was released
+					
+					--[[
+					if not buildQueue[currentIndex] then --drag_dropped to the end of queue
+						currentIndex = #buildQueue
+						if currentIndex == prevIndex then --drag_dropped from end of queue to end of queue
+							return
+						end
 					end
-					Spring.GiveOrderToUnit(facID, -(unitDefID), {}, opt)
+					--]]
 					
-					if rb then
-						Spring.PlaySoundFile(sound_queue_rem, 0.97, 'ui')
+					local countTransfer = buildRow_dragDrop[3]
+					if buildRow_dragDrop[1] > currentIndex then --select remove & adding sequence that reduce complication from network delay
+						BuildRowButtonFunc(prevIndex, facs[i].qStack.children[prevIndex].cmdid, false, true,countTransfer, nil,facID) --remove queue on the right, first
+						BuildRowButtonFunc(currentIndex, facs[i].qStack.children[prevIndex].cmdid, true, false,countTransfer,true, facID) --then, add queue to the left
 					else
-						Spring.PlaySoundFile(sound_queue_add, 0.95, 'ui')
+						BuildRowButtonFunc(currentIndex+1, facs[i].qStack.children[prevIndex].cmdid, true, false,countTransfer,true, facID) --add queue to the right, first
+						BuildRowButtonFunc(prevIndex, facs[i].qStack.children[prevIndex].cmdid, false, true,countTransfer, nil,facID) --then, remove queue on the left
 					end
-					
-					--UpdateFac(facIndex, facs[facIndex])
+					buildRow_dragDrop[1] = nil
 					updateQSoon = true
 				end
-			},
+			end},
+			
 			children = {
 				Label:New {
 					name='count',
@@ -434,7 +580,7 @@ local function UpdateFacQ(i, facInfo)
 			count = num
 			break
 		end
-		local qButton = MakeButton(unitDefIDb, facInfo.unitID, j..'-'..unitDefIDb )
+		local qButton = MakeButton(unitDefIDb, facInfo.unitID, j..'-'..unitDefIDb, i, j )
 		local qCount = qButton.childrenByName['count']
 		qCount:SetCaption(count > 1 and count or '')
 		facs[i].qStack:AddChild(qButton)
@@ -735,6 +881,19 @@ function widget:Update()
 		leftTweak = false
 		RecreateFacbar()
 	end
+	
+	if buildRow_dragDrop[1] then
+		local buttonSizeHalf = window_icondrag.width/2
+		local mx,my = spGetMouseState()
+		
+		window_icondrag:SetPos(mx-buttonSizeHalf ,vsy-my-buttonSizeHalf )
+		
+		if mx ~= lmx or my ~= lmy then
+			window_icondrag:BringToFront()
+		end
+		lmx,lmy = mx,my
+		
+	end
 end
 
 
@@ -767,6 +926,8 @@ function widget:SelectionChanged(selectedUnits)
 				stack_build.backgroundColor = {1,1,1,1}
 				facs[pressedFac].facButton.backgroundColor = magenta_table
 				facs[pressedFac].facButton:Invalidate()
+				
+				alreadyRemovedTag = {}
 			end
 		end
 	end
@@ -813,6 +974,7 @@ function widget:Initialize()
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
 	Panel = Chili.Panel
+	ScrollPanel = Chili.ScrollPanel
 	screen0 = Chili.Screen0
 
 	stack_main = Grid:New{
@@ -821,7 +983,8 @@ function widget:Initialize()
 		itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
 		width='100%',
-		height = '100%',
+		--height = '100%',
+		height=500;
 		resizeItems = false,
 		orientation = 'horizontal',
 		centerItems = false,
@@ -832,7 +995,8 @@ function widget:Initialize()
 		y=0,
 		x=options.buttonsize.value*1.2 + 0, 
 		right=0,
-		bottom=0,
+		--bottom=0,
+		height=500;
 		
 		padding = {4, 4, 4, 4},
 		backgroundColor = {0,0,0,0},
@@ -842,6 +1006,49 @@ function widget:Initialize()
 		centerItems = false,
 	}
 	
+	window_icondrag = Window:New{
+		padding = {0,0,0,0},
+		name = "buildicon drag",
+		width  = 65,
+		height = 45,
+		--parent = Chili.Screen0,
+		--draggable = false,
+		--tweakDraggable = true,
+		--tweakResizable = true,
+		resizable = false,
+		
+		--color = {0,0,0,1},
+		--caption='Factories',
+		children = {
+			
+			Image:New {
+				name="icon";
+				--file = "#"..unitDefID, -- do not remove this line
+				--file2 = WG.GetBuildIconFrame(UnitDefs[unitDefID]),
+				
+				keepAspect = false;
+				x = '5%',
+				y = '5%',
+				width = '90%',
+				height = '90%',
+			}
+			
+		},
+	}
+	
+	scrollpanel = ScrollPanel:New{
+		x=0;y=0;
+		width="100%";
+		height="100%";
+		horizontalScrollbar=false;
+		children = {
+			stack_build, --must be first so it's always above of the others (like frontmost layer)
+			--Label:New{ caption='Factories', fontShadow = true, },
+			stack_main,
+		},
+		
+	}
+					
 	window_facbar = Window:New{
 		padding = {3,3,3,3,},
 		dockable = true,
@@ -860,9 +1067,12 @@ function widget:Initialize()
 --		color = {0,0,0,1},
 		caption='Factories',
 		children = {
+			scrollpanel
+			--[[
 			stack_build, --must be first so it's always above of the others (like frontmost layer)
 			--Label:New{ caption='Factories', fontShadow = true, },
 			stack_main,
+			--]]
 		},
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
