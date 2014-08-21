@@ -12,7 +12,8 @@ function widget:GetInfo()
   }
 end
 
-local window_minimap
+local window
+local fakewindow
 local map_panel 
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
@@ -34,24 +35,24 @@ local function toggleTeamColors()
 	end
 end 
 
-local ar = Game.mapX/Game.mapY
+local mapRatio = Game.mapX/Game.mapY
 local mapIsWider = Game.mapX > Game.mapY
 local function AdjustToMapAspectRatio(w,h)
 	if mapIsWider then
-		return w, w/ar +iconsize
+		return w, w/mapRatio +iconsize
 	end
-	return h*ar, h+iconsize
+	return h*mapRatio, h+iconsize
 end
 
 local function AdjustMapAspectRatioToWindow(x,y,w,h)
 	local newW, newH = w,h
 	local newX, newY = x,y
-	if w/h > ar then
-		newW = ar*h
-		newX = (w-newW)/2
+	if w/h > mapRatio then
+		newW = mapRatio*h
+		newX = x + (w-newW)/2
 	else
-		newH = w/ar
-		newY = (h-newH)/2
+		newH = w/mapRatio
+		newY = y + (h-newH)/2
 	end
 	return newX, newY, newW, newH
 end
@@ -63,7 +64,7 @@ options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks', 'opacity',
+options_order = { 'use_map_ratio', 'opacity', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks',  'minimizable',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap'}
@@ -90,10 +91,10 @@ options = {
 		},
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
-			window_minimap.fixedRatio = arwindow
+			window.fixedRatio = arwindow
 			if arwindow then 
 				local w,h = AdjustToMapAspectRatio(328,308+iconsize)
-				window_minimap:Resize(w,h,false,false)
+				window:Resize(w,h,false,false)
 			end 
 			
 		end,
@@ -128,6 +129,13 @@ options = {
 	},
 	alwaysResizable = {
 		name = 'Resizable',
+		type = 'bool',
+		value = false,
+		OnChange= function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+	},
+	minimizable = {
+		name = 'Minimizable',
 		type = 'bool',
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
@@ -267,7 +275,7 @@ options = {
 	opacity = {
 		name = "Opacity",
 		type = "number",
-		value = 0, min = 0, max = 1, step = 0.01,
+		value = 0.8, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			if self.value == 0 then
 				bgColor_panel = {nil, nil, nil, 1}
@@ -275,8 +283,7 @@ options = {
 				bgColor_panel = {nil, nil, nil, 0}
 			end
 			MakeMinimapWindow()
-			
-			window_minimap:Invalidate()
+			window:Invalidate()
 		end,
 		path = minimap_path,
 	},
@@ -365,8 +372,8 @@ local function MakeMinimapButton(file, params)
 end
 
 MakeMinimapWindow = function()
-	if (window_minimap) then
-		window_minimap:Dispose()
+	if (window) then
+		window:Dispose()
 	end
 	
 	--init = true
@@ -400,13 +407,13 @@ MakeMinimapWindow = function()
 	end
 	
 	map_panel = Chili.Panel:New {
-		bottom = map_panel_bottom,
 		x = 0,
 		y = 0,
+		bottom = map_panel_bottom,
 		right = map_panel_right,
 		
-		margin={0,0,0,0},
-		padding = {8,5,8,8},
+		margin = {0,0,0,0},
+		padding = {8,8,8,8},
 		backgroundColor = bgColor_panel
 		}
 	
@@ -462,28 +469,39 @@ MakeMinimapWindow = function()
 		},
 	}
 	
-	window_minimap = Chili.Window:New{  
-		dockable = true,
-		name = "Minimap",
-		x = 0,  
-		y = 0,
-		color = {1,1,1, options.opacity.value},
-		padding = {0,0,0,0},
-		margin = {0,0,0,0},
-		width  = w,
-		height = h,
+	window = Chili.Window:New{
 		parent = Chili.Screen0,
+		name   = 'Minimap Window',
+		color = {0, 0, 0, 0},
+		padding = {0, 0, 0, 0},
+		width = w,
+		height = h,
+		x = 0,
+		bottom = 0,
+		dockable = true,
 		draggable = false,
-		tweakDraggable = true,
 		resizable = options.alwaysResizable.value,
-	    tweakResizable   = true,
-		minimizable = true,
-		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function
-		fixedRatio = options.use_map_ratio.value == 'arwindow',
+		minimizable = options.minimizable.value,
+		tweakDraggable = true,
+		tweakResizable = true,
 		dragUseGrip = false,
 		minWidth = iconsize*10,
 		maxWidth = screenWidth*0.8,
 		maxHeight = screenHeight*0.8,
+		fixedRatio = options.use_map_ratio.value == 'arwindow',
+	}
+	
+	fakewindow = Chili.Panel:New{
+		backgroundColor = {1,1,1, options.opacity.value},
+		parent = window,
+		x = 0,
+		y = 0,
+		width = "100%",
+		height = "100%",
+		dockable = false;
+		draggable = false,
+		resizable = false,
+		padding = {0, 0, 0, 0},
 		children = {
 			map_panel,
 			buttons_panel,
@@ -553,29 +571,16 @@ function widget:MouseRelease(x, y, button)
 	leftClickDraggingCamera = false
 end
 
---[[function widget:Update(dt) 
-	local mode = Spring.GetCameraState()["mode"]
-	if mode == 7 and not tabbedMode then
-		tabbedMode = true
-		Chili.Screen0:RemoveChild(window_minimap)
-	end
-	if mode ~= 7 and tabbedMode then
-		Chili.Screen0:AddChild(window_minimap)
-		tabbedMode = false
-	end
-end
---]]
-
  --// similar properties to "widget:Update(dt)" above but update less often.
 function widget:KeyRelease(key, mods, label, unicode)
 	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
 		local mode = Spring.GetCameraState()["mode"]
 		if mode == 7 and not tabbedMode then
-			Chili.Screen0:RemoveChild(window_minimap)
+			Chili.Screen0:RemoveChild(window)
 			tabbedMode = true
 		end
 		if mode ~= 7 and tabbedMode then
-			Chili.Screen0:AddChild(window_minimap)
+			Chili.Screen0:AddChild(window)
 			tabbedMode = false
 		end
 	end
@@ -606,8 +611,8 @@ function widget:Shutdown()
 	Spring.SendCommands("minimap geo " .. Spring.GetConfigString("MiniMapGeometry"))
 
 	--// free the chili window
-	if (window_minimap) then
-		window_minimap:Dispose()
+	if (window) then
+		window:Dispose()
 	end
 end 
 
@@ -615,7 +620,7 @@ end
 local lx, ly, lw, lh
 
 function widget:DrawScreen() 
-	if (window_minimap.hidden) then 
+	if (window.hidden) then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0
@@ -629,25 +634,15 @@ function widget:DrawScreen()
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
 	
-	--if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) or init then
 	if (lw ~= cx or lh ~= ch or lx ~= cx or ly ~= cy) then
-		--[[
-		if init then
-			window_minimap:Update() --required otherwise size stackpanel is calculated wrong when first loaded
-			init = false
-		end
-		--]]
-			
 		lx = cx
 		ly = cy
 		lh = ch
 		lw = cw
 		
-		cx,cy = window_minimap:LocalToScreen(cx,cy)
+		cx,cy = map_panel:LocalToScreen(cx,cy)
 		local vsx,vsy = gl.GetViewSizes()
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
-
-		
 	end
 
 	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
