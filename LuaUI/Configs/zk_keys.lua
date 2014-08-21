@@ -165,6 +165,6 @@ return {
 		{	"epic_chili_gesture_menu_markingmenu",	"b",},
 		{	"exitwindow",	"s+escape",},
 		{	"crudesubmenu",	"f10"},
-		{"epic_chili_pro_console_enableConsole", "f8"}, 
+		{	"epic_chili_pro_console_enableconsole", "f8"}, 
 	},
 }

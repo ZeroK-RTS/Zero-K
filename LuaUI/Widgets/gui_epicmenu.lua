@@ -2383,9 +2383,10 @@ function widget:Initialize()
 	widget:ViewResize(Spring.GetViewGeometry())
 	
 	-- Set default positions of windows on first run
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	if not settings.sub_pos_x then
-		settings.sub_pos_x = scrW/2
-		settings.sub_pos_y = scrH/2
+		settings.sub_pos_x = screenWidth/2 - 150
+		settings.sub_pos_y = screenHeight/2 - 200
 	end
 	
 	if not keybounditems then

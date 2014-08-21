@@ -11,7 +11,6 @@ function widget:GetInfo()
     layer     = 50,
     experimental = false,
     enabled   = true,
-    --detailsDefault = 1
   }
 end
 
@@ -200,7 +199,6 @@ options = {
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
 	},
-	
 	
 	enableConsole = {
 		name = "Enable the debug console",
@@ -888,11 +886,13 @@ function RemakeConsole()
 end
 
 local function ShowInputSpace()
+	WG.enteringText = true
 	inputspace.backgroundColor = {1,1,1,1}
 	inputspace.borderColor = {0,0,0,1}
 	inputspace:Invalidate()
 end
 local function HideInputSpace()
+	WG.enteringText = false
 	inputspace.backgroundColor = {0,0,0,0}
 	inputspace.borderColor = {0,0,0,0}
 	inputspace:Invalidate()
@@ -921,16 +921,23 @@ local function MakeMessageWindow(name, enabled)
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	if name == "ProChat" then
 		local screenWidth, screenHeight = Spring.GetWindowGeometry()
-		width = math.min(450, screenWidth/3)
-		x = screenWidth/6 + 20 + width
-		height = 200*width/450*0.84
-		bottom = 200*width/450*0.84
+		local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+		local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+		width = 450
+		x = screenWidth/6 + 20 + integralWidth
+		height = integralHeight*0.84
+		bottom = integralHeight*0.84
 	else
+		local resourceBarWidth = 430
+		local maxWidth = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - 400 - resourceBarWidth)
 		x = 0
 		y = 0
 		bottom = nil
 		width  = screenWidth * 0.30
 		height = screenHeight * 0.20
+		if maxWidth < width then
+			y = 50 -- resource bar height
+		end
 	end
 
 	
@@ -1000,11 +1007,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 			end
 			firstEnter = false
 		end
-		WG.enteringText = true
 		
 		ShowInputSpace()
 	else
-		WG.enteringText = false
 		HideInputSpace()
 	end 
 end
@@ -1100,7 +1105,6 @@ function widget:AddConsoleMessage(msg)
 	
 	-- if playername == myName then
 		if WG.enteringText then
-			WG.enteringText = false
 			HideInputSpace()
 		end 		
 	-- end
@@ -1293,6 +1297,8 @@ function widget:Initialize()
 	Spring.SendCommands({"console 0"})
 	
 	SetInputFontSize(15)
+	
+	HideInputSpace()
  	
 	self:LocalColorRegister()
 end

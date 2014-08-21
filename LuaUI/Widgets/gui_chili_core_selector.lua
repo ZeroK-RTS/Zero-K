@@ -96,9 +96,9 @@ options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
 options = {
 	maxbuttons = {
-		name = 'Maximum number of buttons (3-10)',
+		name = 'Maximum number of buttons (3-16)',
 		type = 'number',
-		value = 7,
+		value = 6,
 		min=3,max=16,step=1,
 		OnChange = function() 
 			ClearData()
@@ -871,10 +871,12 @@ function widget:Initialize()
 
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	local BUTTON_WIDTH = math.min(60, screenWidth/20)
+	local BUTTON_WIDTH = math.min(60, screenHeight/16)
 	local BUTTON_HEIGHT = 55*BUTTON_WIDTH/60
-	local x = screenWidth/6 + 20
-	local bottom = 180*math.min(450, screenWidth/3)/450
+	local x = screenWidth/6 + 20 
+	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local bottom = integralHeight
 	
 	stack_main = Panel:New{
 		padding = {0,0,0,0},
@@ -904,8 +906,8 @@ function widget:Initialize()
 		tweakResizable = true,
 		resizable = false,
 		dragUseGrip = false,
-		--minWidth = 300,
-		--minHeight = 64,
+		minWidth = 32,
+		minHeight = 32,
 		color = {0,0,0,0},
 		children = {
 			stack_main,

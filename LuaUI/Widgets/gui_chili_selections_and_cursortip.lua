@@ -2541,16 +2541,17 @@ function widget:Initialize()
 	
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	local width = math.min(450, screenWidth/3)
-	local x = screenWidth/6 + 20 + width
-	local height = 200*width/450*0.84
+	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local x = screenWidth/6 + 20 + integralWidth
+	local height = integralHeight*0.84
 	
     real_window_corner = Window:New{
 		name   = 'selections',
 		color = {0, 0, 0, 0},
 		x = x,
 		bottom = 0,
-        width = width,
+        width = 450,
 		height = height,
 		dockable = true,
 		draggable = false,
@@ -2559,8 +2560,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		padding = {0, 0, 0, 0},
         minWidth = 450, 
-		minHeight = 130,
-		
+		minHeight = 120,
 	}
     
 	window_corner = Panel:New{

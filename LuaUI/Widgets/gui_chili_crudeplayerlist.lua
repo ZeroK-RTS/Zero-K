@@ -10,7 +10,6 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     enabled   = true,
-    detailsDefault = 1
   }
 end
 
@@ -818,7 +817,7 @@ function widget:Initialize()
 
 	-- Set the size for the default settings.
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local bottom = screenWidth/6
+	local bottom = math.max(screenWidth/6, 220)
 	
 	window_cpl = Window:New{  
 		dockable = true,

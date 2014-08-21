@@ -6,9 +6,7 @@ function widget:GetInfo()
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
     layer     = -100000,
-    experimental = false,
-    enabled   = true, --  loaded by default?
-	detailsDefault = 1
+    enabled   = true,
   }
 end
 
@@ -385,8 +383,7 @@ MakeMinimapWindow = function()
 	else
 		height = height + iconsize
 	end
-	Spring.Echo(width)
-	Spring.Echo(height)
+	
 	if (options.use_map_ratio.value == 'arwindow') then
 		width,height = AdjustToMapAspectRatio(width,height)
 	end
@@ -398,6 +395,8 @@ MakeMinimapWindow = function()
 			screenWidth = width*screenHeight/height
 		end
 	end
+	
+	height = math.max(height, 220)
 	
 	local map_panel_bottom = iconsize*1.3
 	local map_panel_right = 0
@@ -490,7 +489,8 @@ MakeMinimapWindow = function()
 		tweakDraggable = true,
 		tweakResizable = true,
 		dragUseGrip = false,
-		minWidth = iconsize*10,
+		minWidth = 170,
+		minHeight = 170,
 		maxWidth = screenWidth*0.8,
 		maxHeight = screenHeight*0.8,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',

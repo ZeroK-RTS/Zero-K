@@ -510,7 +510,7 @@ function CreateWindow()
 	-- Set the size for the default settings.
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local width = 430
-	local x = screenWidth/2 - width/2
+	local x = math.min(screenWidth/2 - width/2, screenWidth - 400 - width)
 	
 	--// WINDOW
 	window = Chili.Window:New{
