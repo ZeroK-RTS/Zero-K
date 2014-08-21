@@ -130,14 +130,14 @@ options = {
 	alwaysResizable = {
 		name = 'Resizable',
 		type = 'bool',
-		value = false,
+		value = true,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
 	minimizable = {
 		name = 'Minimizable',
 		type = 'bool',
-		value = false,
+		value = true,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
@@ -275,7 +275,7 @@ options = {
 	opacity = {
 		name = "Opacity",
 		type = "number",
-		value = 0.8, min = 0, max = 1, step = 0.01,
+		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			if self.value == 0 then
 				bgColor_panel = {nil, nil, nil, 1}
@@ -477,7 +477,7 @@ MakeMinimapWindow = function()
 		width = w,
 		height = h,
 		x = 0,
-		bottom = 0,
+		y = 0,
 		dockable = true,
 		draggable = false,
 		resizable = options.alwaysResizable.value,
