@@ -1351,7 +1351,7 @@ function widget:Initialize()
 		draggable = false,
 		resizable = false,
 		padding = {0, 0, 0, 0},
-		--backgroundColor = {0.1, 0.1, 0.1, 1},
+		backgroundColor = {1, 1, 1, 0.8},
 --		skinName  = "DarkGlass",
 	}
 
