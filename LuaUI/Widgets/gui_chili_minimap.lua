@@ -129,7 +129,7 @@ options = {
 	alwaysResizable = {
 		name = 'Resizable',
 		type = 'bool',
-		value = true,
+		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
