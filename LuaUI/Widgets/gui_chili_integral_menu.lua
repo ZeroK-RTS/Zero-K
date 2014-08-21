@@ -1312,22 +1312,21 @@ function widget:Initialize()
 	Control = Chili.Control
 	screen0 = Chili.Screen0
 	
+	-- Set the size for the default settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local x = screenWidth/6 + 20
+	local width = math.min(450, screenWidth/3)
+	local height = 200*width/450
+	
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
-	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
-	
-	--Spring.Echo(height)
-	--Spring.Echo(y)
-	
 	window = Window:New{
 		parent = screen0,
 		name   = 'integralwindow';
 		color = {0, 0, 0, 0},
-		width = 450;
-		height = 180; -- keep an aspect ratio regardless of screen ratio
-		x = 0; 
-		bottom = 0;
+		width = width,
+		height = height,
+		x = x, 
+		bottom = 0,
 		dockable = true;
 		draggable = false,
 		resizable = false,

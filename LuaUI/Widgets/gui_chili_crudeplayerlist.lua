@@ -83,7 +83,7 @@ local x_cpu				= x_share + 16
 local x_ping			= x_cpu + 16
 local x_postping		= x_ping + 16
 
-local x_bound	= x_postping + 20
+local x_bound = x_postping + 20
 
 local UPDATE_FREQUENCY = 0.8	-- seconds
 
@@ -816,13 +816,16 @@ function widget:Initialize()
 	cyan 	= color2incolor(0,1,1,1)
 	white 	= color2incolor(1,1,1,1)
 
+	-- Set the size for the default settings.
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local bottom = screenWidth/6
 	
 	window_cpl = Window:New{  
 		dockable = true,
 		name = "Player List",
 		color = {0,0,0,0},
-		right = 0,  
-		bottom = 0,
+		x = 0,  
+		bottom = bottom,
 		width  = x_bound,
 		height = 150,
 		padding = {8, 2, 8, 2};

@@ -71,11 +71,6 @@ local commButton = {}	-- unused
 
 local echo = Spring.Echo
 
-local BUTTON_WIDTH = 64
-local BUTTON_HEIGHT = 52
---local BASE_COLUMNS = 6
---local NUM_FAC_COLUMNS = BASE_COLUMNS - 1	-- unused
-
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 local UPDATE_FREQUENCY = 0.25
@@ -103,8 +98,8 @@ options = {
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-10)',
 		type = 'number',
-		value = 6,
-		min=3,max=10,step=1,
+		value = 7,
+		min=3,max=16,step=1,
 		OnChange = function() 
 			ClearData()
 			window_selector:Dispose()
@@ -874,6 +869,13 @@ function widget:Initialize()
 	Progressbar = Chili.Progressbar
 	screen0 = Chili.Screen0
 
+	-- Set the size for the default settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local BUTTON_WIDTH = math.min(60, screenWidth/20)
+	local BUTTON_HEIGHT = 55*BUTTON_WIDTH/60
+	local x = screenWidth/6 + 20
+	local bottom = 180*math.min(450, screenWidth/3)/450
+	
 	stack_main = Panel:New{
 		padding = {0,0,0,0},
 		--itemPadding = {0, 0, 0, 0},
@@ -892,8 +894,8 @@ function widget:Initialize()
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
-		x = 450,	-- integral width 
-		bottom = 0,
+		x = x, 
+		bottom = bottom,
 		width  = BUTTON_WIDTH * options.maxbuttons.value,
 		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,

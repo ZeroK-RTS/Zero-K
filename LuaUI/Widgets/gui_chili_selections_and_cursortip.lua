@@ -240,7 +240,7 @@ options_order = {
 	'showDrawTools',
 	
 	--selected units
-	'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin', 'color_background', 
+	'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
 }
 
 local function option_Deselect()
@@ -403,16 +403,6 @@ options = {
 		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
 		path = selPath,
 		OnChange = option_Deselect,
-	},
-	color_background = {
-		name = "Background color",
-		type = "colors",
-		value = { 0, 0, 0, 0},
-		path = selPath,
-		OnChange = function(self) 
-			real_window_corner.color = self.value
-			real_window_corner:Invalidate()
-		end,
 	},
 	alwaysShowSelectionWin = {
 		name="Always Show Selection Window",
@@ -2549,14 +2539,20 @@ function widget:Initialize()
 	--FontChanged()
 	spSendCommands({"tooltip 0"})
 	
+	-- Set the size for the default settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local width = math.min(450, screenWidth/3)
+	local x = screenWidth/6 + 20 + width
+	local height = 200*width/450*0.84
+	
     real_window_corner = Window:New{
-		name   = 'selections';
-		color = options.color_background.value,
-		x = 0; 
-		bottom = 180;
-        width = 450;
-		height = 130;
-		dockable = true;
+		name   = 'selections',
+		color = {0, 0, 0, 0},
+		x = x,
+		bottom = 0,
+        width = width,
+		height = height,
+		dockable = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -2572,7 +2568,7 @@ function widget:Initialize()
         name   = 'unitinfo2';
 		x = 0,
 		y = 0,
-		--backgroundColor = {0,0,0,1},
+		backgroundColor = {1, 1, 1, 0.8},
 		width = "100%";
 		height = "100%";
 		dockable = false,

@@ -22,7 +22,7 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local bgColor_panel = {nil, nil, nil, 1}
+local bgColor_panel = {nil, nil, nil, 0}
 
 local tabbedMode = false
 --local init = true
@@ -83,7 +83,7 @@ options = {
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
-		value = 'arwindow',
+		value = 'armap',
 		items={
 			{key='arwindow', 	name='Aspect Ratio Window'},
 			{key='armap', 		name='Aspect Ratio Map'},
@@ -122,7 +122,7 @@ options = {
 	buttonsOnRight = {
 		name = 'Map buttons on the right',
 		type = 'bool',
-		value = false,
+		value = true,
 		OnChange= function(self) MakeMinimapWindow() end,
 		
 		path = minimap_path,
@@ -130,14 +130,14 @@ options = {
 	alwaysResizable = {
 		name = 'Resizable',
 		type = 'bool',
-		value = true,
+		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
 	minimizable = {
 		name = 'Minimizable',
 		type = 'bool',
-		value = true,
+		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
@@ -275,7 +275,7 @@ options = {
 	opacity = {
 		name = "Opacity",
 		type = "number",
-		value = 0, min = 0, max = 1, step = 0.01,
+		value = 0.8, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			if self.value == 0 then
 				bgColor_panel = {nil, nil, nil, 1}
@@ -376,21 +376,26 @@ MakeMinimapWindow = function()
 		window:Dispose()
 	end
 	
-	--init = true
-	
+	-- Set the size for the default settings.
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local width, height = screenWidth/6, screenWidth/6
 	
-	--local w,h = screenWidth*0.32,screenHeight*0.4+iconsize
-	local w,h = 328,308+iconsize
+	if options.buttonsOnRight.value then
+		width = width + iconsize
+	else
+		height = height + iconsize
+	end
+	Spring.Echo(width)
+	Spring.Echo(height)
 	if (options.use_map_ratio.value == 'arwindow') then
-		w,h = AdjustToMapAspectRatio(w,h)
+		width,height = AdjustToMapAspectRatio(width,height)
 	end
 	
-	if h > 0 and w > 0 and screenHeight > 0 and screenWidth > 0 then
-		if w/h > screenWidth/screenHeight then
-			screenHeight = h*screenWidth/w
+	if height > 0 and width > 0 and screenHeight > 0 and screenWidth > 0 then
+		if width/height > screenWidth/screenHeight then
+			screenHeight = height*screenWidth/width
 		else
-			screenWidth = w*screenHeight/h
+			screenWidth = width*screenHeight/height
 		end
 	end
 	
@@ -474,10 +479,10 @@ MakeMinimapWindow = function()
 		name   = 'Minimap Window',
 		color = {0, 0, 0, 0},
 		padding = {0, 0, 0, 0},
-		width = w,
-		height = h,
+		width = width,
+		height = height,
 		x = 0,
-		y = 0,
+		bottom = 0,
 		dockable = true,
 		draggable = false,
 		resizable = options.alwaysResizable.value,
