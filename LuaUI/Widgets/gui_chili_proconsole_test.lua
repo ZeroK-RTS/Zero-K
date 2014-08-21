@@ -3,14 +3,14 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Pro Console Test",
+    name      = "Chili Pro Console",
     desc      = "v0.016 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    experimental = true,
-    enabled   = false,
+    experimental = false,
+    enabled   = true,
     --detailsDefault = 1
   }
 end
@@ -140,7 +140,7 @@ local lastMsgChat, lastMsgBackChat, lastMsgConsole
 ------------------------------------------------------------
 -- options
 
-options_path = "Settings/HUD Panels/Chat/Pro Console"
+options_path = "Settings/HUD Panels/Chat"
 
 local dedupe_path = options_path .. '/De-Duplication'
 local hilite_path = options_path .. '/Highlighting'
@@ -917,7 +917,23 @@ end
 
 local function MakeMessageWindow(name, enabled)
 
+	local x,y,bottom,width,height
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	if name == "ProChat" then
+		local screenWidth, screenHeight = Spring.GetWindowGeometry()
+		width = math.min(450, screenWidth/3)
+		x = screenWidth/6 + 20 + width
+		height = 200*width/450*0.84
+		bottom = 200*width/450*0.84
+	else
+		x = 0
+		y = 0
+		bottom = nil
+		width  = screenWidth * 0.30
+		height = screenHeight * 0.20
+	end
+
+	
 	
 	return WG.Chili.Window:New{
 		parent = (enabled and screen0) or nil,
@@ -925,10 +941,11 @@ local function MakeMessageWindow(name, enabled)
 		padding = { 0, 0, 0, 0 },
 		dockable = true,
 		name = name,
-		y = 0,
-		right = 425, -- epic/resbar width
-		width  = screenWidth * 0.30,
-		height = screenHeight * 0.20,
+		x = x,
+		y = y,
+		bottom = bottom,
+		width  = width,
+		height = height,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
