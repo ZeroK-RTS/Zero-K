@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.012"
+local version = "v0.013"
 
 function widget:GetInfo()
   return {
@@ -41,9 +41,10 @@ local Grid
 local Image
 local Progressbar
 local Panel
+local ScrollPanel
 local screen0
 
-local window_facbar, stack_main, stack_build, window_icondrag
+local window_facbar, stack_main, stack_build, window_icondrag, scrollpanel
 local echo = Spring.Echo
 
 -------------------------------------------------------------------------------
@@ -973,6 +974,7 @@ function widget:Initialize()
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
 	Panel = Chili.Panel
+	ScrollPanel = Chili.ScrollPanel
 	screen0 = Chili.Screen0
 
 	stack_main = Grid:New{
@@ -981,7 +983,8 @@ function widget:Initialize()
 		itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
 		width='100%',
-		height = '100%',
+		--height = '100%',
+		height=500;
 		resizeItems = false,
 		orientation = 'horizontal',
 		centerItems = false,
@@ -992,7 +995,8 @@ function widget:Initialize()
 		y=0,
 		x=options.buttonsize.value*1.2 + 0, 
 		right=0,
-		bottom=0,
+		--bottom=0,
+		height=500;
 		
 		padding = {4, 4, 4, 4},
 		backgroundColor = {0,0,0,0},
@@ -1005,8 +1009,8 @@ function widget:Initialize()
 	window_icondrag = Window:New{
 		padding = {0,0,0,0},
 		name = "buildicon drag",
-		width  = 60,
-		height = 60,
+		width  = 65,
+		height = 45,
 		--parent = Chili.Screen0,
 		--draggable = false,
 		--tweakDraggable = true,
@@ -1031,6 +1035,19 @@ function widget:Initialize()
 			
 		},
 	}
+	
+	scrollpanel = ScrollPanel:New{
+		x=0;y=0;
+		width="100%";
+		height="100%";
+		horizontalScrollbar=false;
+		children = {
+			stack_build, --must be first so it's always above of the others (like frontmost layer)
+			--Label:New{ caption='Factories', fontShadow = true, },
+			stack_main,
+		},
+		
+	}
 					
 	window_facbar = Window:New{
 		padding = {3,3,3,3,},
@@ -1050,9 +1067,12 @@ function widget:Initialize()
 --		color = {0,0,0,1},
 		caption='Factories',
 		children = {
+			scrollpanel
+			--[[
 			stack_build, --must be first so it's always above of the others (like frontmost layer)
 			--Label:New{ caption='Factories', fontShadow = true, },
 			stack_main,
+			--]]
 		},
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
