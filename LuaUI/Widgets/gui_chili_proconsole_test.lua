@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console Test",
-    desc      = "v0.015 Chili Chat Pro Console.",
+    desc      = "v0.016 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -151,6 +151,8 @@ options_order = {
 	
 	'lblGeneral',
 	
+	'enableConsole',
+	
 	--'mousewheel', 
 	'defaultAllyChat',
 	'text_height_chat', 'text_height_console',
@@ -197,6 +199,22 @@ options = {
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
+	},
+	
+	
+	enableConsole = {
+		name = "Enable the debug console",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			if window_console then
+				if self.value then
+					screen0:AddChild(window_console)
+				else
+					screen0:RemoveChild(window_console)
+				end
+			end
+		end
 	},
 	
 	text_height_chat = {
@@ -897,12 +915,12 @@ local function MakeMessageStack()
 	}
 end
 
-local function MakeMessageWindow(name, minimizable)
+local function MakeMessageWindow(name, enabled)
 
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	return WG.Chili.Window:New{
-		parent = screen0,
+		parent = (enabled and screen0) or nil,
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
 		dockable = true,
@@ -915,7 +933,7 @@ local function MakeMessageWindow(name, minimizable)
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		minimizable = minimizable,
+		minimizable = false,
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
@@ -1008,7 +1026,7 @@ function widget:AddConsoleMessage(msg)
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
-	local isChat = msg.msgtype ~= 'other'
+	local isChat = msg.msgtype ~= 'other' or msg.text:find('paused the game')
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
 	local messages = isChat and chatMessages or consoleMessages
 	
@@ -1241,12 +1259,12 @@ function widget:Initialize()
 		},
 	}
 	
-	window_chat = MakeMessageWindow("ProChat")
+	window_chat = MakeMessageWindow("ProChat", true)
 	window_chat:AddChild(scrollpanel_chat)
 	window_chat:AddChild(backlogButton)
 	window_chat:AddChild(inputspace)
 	
-	window_console = MakeMessageWindow("ProConsole", true)
+	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value)
 	window_console:AddChild(scrollpanel_console)
 	
 	RemakeConsole()

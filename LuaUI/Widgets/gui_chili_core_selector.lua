@@ -996,8 +996,10 @@ function widget:Initialize()
 	}
 	conButton.image = Image:New {
 		parent = conButton.button,
-		height="91%";
-		y="6%";
+		x = "2%",
+		y = "6%",
+		right = "2%",
+		bottom = "6%",
 		file = buildIcon,	--'#'..idleBuilderDefID,
 		--file2 = "bitmaps/icons/frame_cons.png",
 		keepAspect = false,
