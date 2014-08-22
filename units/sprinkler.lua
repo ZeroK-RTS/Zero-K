@@ -24,9 +24,11 @@ unitDef = {
 
   customParams                  = {
     --description_de = [[Versteckter Gaussturm]],
-    helptext 	   = [[The Sprinkler is an indispensable agriculture utility agreed for some sorts cleansing.]],
-	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
-	modelradius    = [[15]],
+    description_pl = [[Zraszacz]],
+    helptext       = [[The Sprinkler is an indispensable agriculture utility agreed for some sorts cleansing.]],
+    helptext_pl    = [[Dla podlewania kaktusa.]],
+    --helptext_de  = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurÃ¼ckgezogen hat, ist es sehr schwer ihn zu zerstÃ¶ren, was ihn effektive gegen gegnerische Artillerie macht.]],
+    modelradius    = [[15]],
   },
 
   damageModifier                = 0.25,
