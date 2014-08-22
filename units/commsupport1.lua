@@ -154,7 +154,7 @@ unitDef = {
     },
 	
     GAUSS = {
-      name                    = [[Gauss Rifle]],
+      name                    = [[Phase Rifle]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
       avoidfeature            = false,

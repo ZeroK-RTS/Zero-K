@@ -23,7 +23,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Versteckter Gaussturm]],
+    --description_de = [[Versteckter Gaussturm]],
     helptext 	   = [[The Sprinkler is an indispensable agriculture utility agreed for some sorts cleansing.]],
 	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
 	modelradius    = [[15]],
