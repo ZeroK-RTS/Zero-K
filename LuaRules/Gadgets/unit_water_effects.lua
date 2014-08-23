@@ -2,7 +2,7 @@
 function gadget:GetInfo()
   return {
     name      = "Water Effects",
-    desc      = "Umbrela (;Ãž) gadget for dealing with units that do things in the water. Water tank weapons and extra regen.",
+    desc      = "Umbrela (;Þ) gadget for dealing with units that do things in the water. Water tank weapons and extra regen.",
     author    = "Google Frog",
     date      = "24 Feb 2012",
     license   = "GNU GPL, v2 or later",
@@ -117,8 +117,7 @@ function gadget:GameFrame(n)
 					end
 					if height < 0 then
 						local hp, maxHp = Spring.GetUnitHealth(unitID)
-						local slowMult = 1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-						local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*slowMult*SECOND_MULT/effect.submergedAt
+						local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*SECOND_MULT/effect.submergedAt
 						Spring.SetUnitHealth(unitID, newHp) 
 					end
 				end
