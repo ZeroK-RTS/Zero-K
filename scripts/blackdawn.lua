@@ -89,7 +89,7 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	elseif severity <= .75 then
 		Explode(base, sfxShatter)
-		Explode(base, sfxShatter)
+		Explode(body, sfxShatter)
 		return 2
 	else
 		Explode(base, sfxShatter)
