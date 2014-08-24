@@ -32,7 +32,6 @@ options = {
 			forceUpdate = true
 		end },
 	},
-	
 	dockEnabled = {
 		name = 'Use docking',
 		advanced = false,
@@ -42,12 +41,9 @@ options = {
 	},
 }
 
-
-
 local lastPos = {} -- "windows" indexed array of {x,y,x2,y2}
 local settings = {} -- "window name" indexed array of {x,y,x2,y,2}
 local buttons = {} -- "window name" indexed array of minimize buttons
-
 
 function widget:Initialize()
 	if (not WG.Chili) then
@@ -56,14 +52,12 @@ function widget:Initialize()
 	end
 
 	-- setup Chili
-	 Chili = WG.Chili
-	 Window = Chili.Window
-	 screen0 = Chili.Screen0
+	Chili = WG.Chili
+	Window = Chili.Window
+	screen0 = Chili.Screen0
 end 
 
 local frameCounter = 0
-
-
 
 -- returns snap orientation of box A compared to box B and distance of their edges  - orientation = L/R/T/D and distance of snap
 local function GetBoxRelation(boxa, boxb) 
@@ -71,7 +65,7 @@ local function GetBoxRelation(boxa, boxb)
 	local mpbh = 0
 	local mpav = 0
 	local mpbv = 0
-
+	
 	local snaph, snapv
 	
 	if not (boxa[2] > boxb[4] or boxa[4] < boxb[2]) then  -- "vertical collision" they are either to left or to right
@@ -85,7 +79,6 @@ local function GetBoxRelation(boxa, boxb)
 		mpbv = (boxb[4] + boxb[2])/2 
 		snapv = true
 	end 
-	
 	
 	local axis = nil
 	local dist = 99999
@@ -116,12 +109,12 @@ local function GetBoxRelation(boxa, boxb)
 		end 
 	end 
 	
-	if axis ~= nil then return axis, dist 
-	else return nil, nil end
+	if axis ~= nil then 
+		return axis, dist 
+	else 
+		return nil, nil 
+	end
 end
-
- 
-
 
 -- returns closest axis to snap to existing windows or screen edges - first parameter is axis (L/R/T/D) second is snap distance 
 local function GetClosestAxis(winPos, dockWindows, win)
@@ -165,7 +158,6 @@ local function GetClosestAxis(winPos, dockWindows, win)
 	end 
 end 
 
-
 -- snaps box data with axis and distance 
 local function SnapBox(wp, a,d) 
 	if a == 'L' then 
@@ -182,7 +174,6 @@ local function SnapBox(wp, a,d)
 		wp[4] = wp[4] + d 
 	end 
 end 
-
 
 local lastCount = 0
 local lastWidth = 0
@@ -211,7 +202,6 @@ local function GetButtonPos(win)
 		mode = 'B'
 	end
 	
-	
 	if mode == 'L' then
 		return {x=win.x-3, y= win.y, width = size, height = win.height}
 	elseif mode =='T' then
@@ -223,9 +213,11 @@ local function GetButtonPos(win)
 	end 
 end 
 
-function widget:DrawScreen() 
+function widget:Update() 
 	frameCounter = frameCounter +1
-	if (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then return end 
+	if (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then 
+		return 
+	end 
 	lastCount = #screen0.children
 	
 	local posChanged = false -- has position changed since last check
@@ -243,7 +235,7 @@ function widget:DrawScreen()
 			names[win.name] = win
 			present[win] = true
 			local lastWinPos = lastPos[win]
-			if lastWinPos==nil then  -- new window appeared
+			if lastWinPos == nil then  -- new window appeared
 				posChanged = true 
 				local settingsPos = settings[win.name]
 				if settingsPos ~= nil then  -- and we have setings stored for new window, apply it
@@ -278,7 +270,9 @@ function widget:DrawScreen()
 	end 
 	
 	for win, _ in pairs(lastPos) do  -- delete those not present atm (Redo/refresh docking when window un-minimized)
-		if not present[win] then lastPos[win] = nil end
+		if not present[win] then
+			lastPos[win] = nil 
+		end
 	end 
 
 	-- BUTTONS to minimize stuff
@@ -344,14 +338,11 @@ function widget:DrawScreen()
 			button:Dispose();
 			buttons[name] = nil
 		end
-		
-		
 		if button.win.parent and button.win.parent.name ~= screen0.name then
 			button:Dispose();
 			buttons[name] = nil
 		end
 	end
-	
 	
 	if forceUpdate or (posChanged and options.dockEnabled.value) then 
 		forceUpdate = false
@@ -362,7 +353,7 @@ function widget:DrawScreen()
 				dockWindows[win] = {win.x, win.y, win.x + win.width, win.y + win.height}
 			end 
 		end 
-			
+		
 		-- dock windows 
 		local mc = 2
 		repeat 
@@ -390,16 +381,10 @@ function widget:DrawScreen()
 	end 
 end 
 
-
-
-
 function widget:ViewResize(vsx, vsy)
 	scrW = vsx
 	scrH = vsy
 end
-
-
-
 
 function widget:SetConfigData(data)
 	settings = data
@@ -408,6 +393,3 @@ end
 function widget:GetConfigData()
 	return settings
 end
-
-
-
