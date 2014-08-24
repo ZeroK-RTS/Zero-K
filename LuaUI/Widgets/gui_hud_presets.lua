@@ -60,7 +60,7 @@ local function SetupDefaultPreset()
 	)
 
 	-- Integral Menu
-	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
+	local integralWidth = math.max(350, math.min(480, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	WG.SetWindowPosAndSize("integralwindow",
 		0,
@@ -72,7 +72,8 @@ local function SetupDefaultPreset()
 	-- Selection Bar
 	local selectorButtonWidth = math.min(60, screenHeight/16)
 	local selectorHeight = 55*selectorButtonWidth/60
-	local selectorWidth = selectorButtonWidth*6
+	local selectionButtonCount = math.min(12,math.max(4,math.floor(minimapWidth/selectorButtonWidth)))
+	local selectorWidth = selectorButtonWidth*selectionButtonCount
 	WG.CoreSelector_SetOptions(6)
 	WG.SetWindowPosAndSize("selector_window", 
 		0, 
@@ -191,8 +192,9 @@ local function SetupCraftyPreset()
 	-- Quick Selection Bar
 	local selectorButtonWidth = math.min(60, screenHeight/16)
 	local selectorHeight = 55*selectorButtonWidth/60
-	local selectorWidth = selectorButtonWidth*6
-	WG.CoreSelector_SetOptions(6)
+	local selectionButtonCount = math.min(12,math.max(4,math.floor(minimapWidth/selectorButtonWidth)))
+	local selectorWidth = selectorButtonWidth*selectionButtonCount
+	WG.CoreSelector_SetOptions(selectionButtonCount)
 	WG.SetWindowPosAndSize("selector_window", 
 		0, 
 		screenHeight - minimapHeight - selectorHeight, 
