@@ -141,6 +141,11 @@ options = {
 	},
 }
 
+function WG.CoreSelector_SetOptions(maxbuttons)
+	options.maxbuttons.value = maxbuttons
+	options.maxbuttons.OnChange(options.maxbuttons)
+end
+
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
 local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, ["repeat"] = boolean, button, image, repeatImage, ["buildProgress"] = ProgressBar,}
