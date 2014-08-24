@@ -95,6 +95,7 @@ local function SetupCraftyPreset()
 	-- Selections
 	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth
+	WG.Selections_SetOptions(false, true, false, 50, false, true, true)
 	SetPosAndSize("selections",
 		minimapWidth,
 		screenHeight - selectionsHeight,
