@@ -101,9 +101,9 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 
     spSetUnitBuildSpeed(unitID, 
         state.buildSpeed*speedFactor, -- build
-        state.buildSpeed*speedFactor, -- repair
+        2*state.buildSpeed*speedFactor, -- repair
         state.buildSpeed*speedFactor, -- reclaim
-        state.buildSpeed*speedFactor) -- rezz
+        0.8*state.buildSpeed*speedFactor) -- rezz
     
 end
 

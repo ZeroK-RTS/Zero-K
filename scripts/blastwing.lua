@@ -92,7 +92,7 @@ function script.Killed(recentDamage, maxHealth)
 	Explode( r_fan, SFX.EXPLODE )
 	
 	local severity = recentDamage / maxHealth
-	if (severity <= 0.5) then
+	if (severity <= 0.5) or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
 		return 1 -- corpsetype
 	else
 		return 2 -- corpsetype
