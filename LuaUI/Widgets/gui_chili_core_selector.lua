@@ -90,7 +90,7 @@ end
 local nano_name = UnitDefNames.armnanotc.humanName	-- HACK
 
 local function RefreshConsList() end	-- redefined later
-local function ClearData() end
+local function ClearData(reinitialize) end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
@@ -101,7 +101,7 @@ options = {
 		value = 6,
 		min=3,max=16,step=1,
 		OnChange = function() 
-			ClearData()
+			ClearData(true)
 			window_selector:Dispose()
 			widget:Initialize()
 		end,	
@@ -140,6 +140,11 @@ options = {
 		end
 	},
 }
+
+function WG.CoreSelector_SetOptions(maxbuttons)
+	options.maxbuttons.value = maxbuttons
+	options.maxbuttons.OnChange(options.maxbuttons)
+end
 
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
@@ -659,7 +664,7 @@ local function InitializeUnits()
 	end
 end
 
-ClearData = function()
+ClearData = function(goingToReintializeSoDoNotBotherWithUpdate)
 	while facs[1] do
 		RemoveFac(facs[1].facID)
 	end
@@ -667,7 +672,9 @@ ClearData = function()
 		RemoveComm(comms[1].commID)
 	end
 	idleCons = {}
-	UpdateConsButton()
+	if not goingToReintializeSoDoNotBotherWithUpdate then
+		UpdateConsButton()
+	end
 end
 
 -- FIXME: donut work?
@@ -806,7 +813,7 @@ function widget:Update(dt)
 		--widgetHandler:RemoveWidget()
 		--return false
 		myTeamID = Spring.GetMyTeamID()
-		ClearData()
+		ClearData(false)
 		InitializeUnits()
 	end
 	if wantUpdateCons then
@@ -954,8 +961,6 @@ function widget:Initialize()
 	}	
 	UpdateCommButton()
 	]]--
-
-	
 	
 	conButton.button = Button:New{
 		parent = stack_main;
@@ -1013,7 +1018,6 @@ function widget:Initialize()
 	UpdateConsButton()
 
 	myTeamID = Spring.GetMyTeamID()
-
 
 	local viewSizeX, viewSizeY = widgetHandler:GetViewSizes()
 	self:ViewResize(viewSizeX, viewSizeY)

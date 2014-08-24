@@ -2419,6 +2419,7 @@ function widget:Initialize()
 	AddOption('Settings/Camera')
 	AddOption('Settings/Graphics')
 	AddOption('Settings/HUD Panels')
+	AddOption('Settings/HUD Presets')
 	AddOption('Settings/Interface')
 	AddOption('Settings/Misc')
 

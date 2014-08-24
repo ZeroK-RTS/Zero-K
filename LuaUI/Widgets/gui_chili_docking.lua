@@ -9,7 +9,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     experimental = false,
-    handler   = true, -- to read widget status. eg: "widgetHandler.knownWidget[name]"
+    handler   = true, -- to read widget status. eg: "widgetHandler.knownWidgets[name]"
     enabled   = true  --  loaded by default?
   }
 end
@@ -18,9 +18,21 @@ local Chili
 local Window
 local screen0
 
+local lastPos = {} -- "windows" indexed array of {x,y,x2,y2}
+local settings = {} -- "window name" indexed array of {x,y,x2,y,2}
+local buttons = {} -- "window name" indexed array of minimize buttons
 local forceUpdate = false 
+local frameCounter = 0
+
+local lastCount = 0
+local lastWidth = 0
+local lastHeight = 0
+
+----------------------------------------------------
+-- Options
+----------------------------------------------------
 options_path = 'Settings/HUD Panels/Docking'
-options_order = { 'dockEnabled', 'dockThreshold', }
+options_order = { 'dockEnabled', 'minimizeEnabled', 'dockThreshold'}
 options = {
 	dockThreshold = {
 		name = "Docking distance",
@@ -39,11 +51,22 @@ options = {
 		value = true,
 		desc = 'Dock windows to screen edges and each other to prevent overlaps',
 	},
+	minimizeEnabled = {
+		name = 'Minimizable windows',
+		advanced = false,
+		type = 'bool',
+		value = true,
+		desc = 'When enabled certain windows will have minimization tabs.',
+	},
 }
 
-local lastPos = {} -- "windows" indexed array of {x,y,x2,y2}
-local settings = {} -- "window name" indexed array of {x,y,x2,y,2}
-local buttons = {} -- "window name" indexed array of minimize buttons
+----------------------------------------------------
+----------------------------------------------------
+
+function WG.SetWindowPosAndSize(window,x,y,w,h)
+	lastPos[window] = nil
+	settings[window] = {x,y,x+w,y+h}
+end
 
 function widget:Initialize()
 	if (not WG.Chili) then
@@ -56,8 +79,6 @@ function widget:Initialize()
 	Window = Chili.Window
 	screen0 = Chili.Screen0
 end 
-
-local frameCounter = 0
 
 -- returns snap orientation of box A compared to box B and distance of their edges  - orientation = L/R/T/D and distance of snap
 local function GetBoxRelation(boxa, boxb) 
@@ -175,10 +196,6 @@ local function SnapBox(wp, a,d)
 	end 
 end 
 
-local lastCount = 0
-local lastWidth = 0
-local lastHeight= 0
-
 local function GetButtonPos(win)
 	local size = 5 -- button thickness
 	local mindist = win.x*5000 + win.height
@@ -233,8 +250,8 @@ function widget:Update()
 	for _, win in ipairs(screen0.children) do  -- NEEDED FOR MINIMIZE BUTTONS: table.shallowcopy( 
 		if (win.dockable) then 
 			names[win.name] = win
-			present[win] = true
-			local lastWinPos = lastPos[win]
+			present[win.name] = true
+			local lastWinPos = lastPos[win.name]
 			if lastWinPos == nil then  -- new window appeared
 				posChanged = true 
 				local settingsPos = settings[win.name]
@@ -259,7 +276,7 @@ function widget:Update()
 					end
 					win:SetPos(settingsPos[1], settingsPos[2])
 					if not options.dockEnabled.value then 
-						lastPos[win] = { win.x, win.y, win.x + win.width, win.y + win.height }
+						lastPos[win.name] = { win.x, win.y, win.x + win.width, win.y + win.height }
 					end 
 				end 
 			elseif lastWinPos[1] ~= win.x or lastWinPos[2] ~= win.y or lastWinPos[3] ~= win.x+win.width or lastWinPos[4] ~= win.y + win.height then  -- window changed position
@@ -269,20 +286,28 @@ function widget:Update()
 		end 
 	end 
 	
-	for win, _ in pairs(lastPos) do  -- delete those not present atm (Redo/refresh docking when window un-minimized)
-		if not present[win] then
-			lastPos[win] = nil 
+	for winName, _ in pairs(lastPos) do  -- delete those not present atm (Redo/refresh docking when window un-minimized)
+		if not present[winName] then
+			lastPos[winName] = nil 
 		end
 	end 
 
 	-- BUTTONS to minimize stuff
 	-- FIXME HACK use object:IsDescendantOf(screen0) from chili to detect visibility, not this silly hack stuff with button.winVisible
 	for name, win in pairs(names) do 
-		if win.minimizable then
+		if win.minimizable and options.minimizeEnabled.value then
 			local button = buttons[name]
 			if not button then 
-				button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; 
-					caption='';dockable=false,winName = win.name, tooltip='Minimize ' .. win.name, backgroundColor={0,1,0,1},
+				button = Chili.Button:New{
+					x = win.x, 
+					y = win.y, 
+					width = 50,
+					height = 20,
+					caption = '',
+					dockable = false,
+					winName = win.name,
+					tooltip = 'Minimize ' .. win.name,
+					backgroundColor={0,1,0,1},
 					widgetName = win.parentWidgetName,
 					win = win,
 					OnClick = {
@@ -322,6 +347,12 @@ function widget:Update()
 				button.tooltip = 'Minimize ' .. button.winName
 				button.backgroundColor={0,1,0,1}
 				button:Invalidate()
+			end
+		else
+			local button = buttons[name]
+			if button then
+				screen0:RemoveChild(button)
+				buttons[name] = nil
 			end
 		end
 	end 
@@ -371,7 +402,7 @@ function widget:Update()
 				
 				win:SetPos(wp[1], wp[2])
 				local winPos = { win.x, win.y, win.x + win.width, win.y + win.height }
-				lastPos[win] = winPos
+				lastPos[win.name] = winPos
 				settings[win.name] = winPos
 			end 
 

@@ -82,10 +82,10 @@ options = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
 		value = 'armap',
-		items={
-			{key='arwindow', 	name='Aspect Ratio Window'},
-			{key='armap', 		name='Aspect Ratio Map'},
-			{key='arnone', 		name='Map Fills Window'},
+		items = {
+			{key = 'arwindow', 	name='Aspect Ratio Window'},
+			{key ='armap', 		name='Aspect Ratio Map'},
+			{key ='arnone', 		name='Map Fills Window'},
 		},
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
@@ -94,7 +94,6 @@ options = {
 				local w,h = AdjustToMapAspectRatio(328,308+iconsize)
 				window:Resize(w,h,false,false)
 			end 
-			
 		end,
 		path = minimap_path,
 	},
@@ -121,8 +120,7 @@ options = {
 		name = 'Map buttons on the right',
 		type = 'bool',
 		value = true,
-		OnChange= function(self) MakeMinimapWindow() end,
-		
+		OnChange = function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
 	alwaysResizable = {
@@ -296,8 +294,21 @@ options = {
 		},
 		path = minimap_path,
 	},
-
 }
+
+function WG.Minimap_SetOptions(aspect, opacity, resizable, buttonRight, minimizable)
+	if aspect == 'arwindow' or aspect == 'armap' or aspect == 'arnone' then 
+		options.use_map_ratio.value = aspect
+	end
+	options.opacity.value = opacity
+	options.alwaysResizable.value = resizable
+	options.buttonsOnRight.value = buttonRight
+	options.minimizable.value = minimizable
+	
+	options.opacity.OnChange(options.opacity)
+	options.use_map_ratio.OnChange(options.use_map_ratio)
+	options.alwaysResizable.OnChange(options.alwaysResizable)
+end
 
 function updateRadarColors()
 	local fog = options.radar_fog_color.value

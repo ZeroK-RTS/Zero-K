@@ -386,13 +386,13 @@ options = {
 	},
 	uniticon_size = {
 		name = 'Icon size on selection list',
-		desc = 'Determines how small the icon in selection list need to be.',
+		--desc = 'Determines how small the icon in selection list need to be.',
 		type = 'number',
 		OnChange = function(self) 
 			option_Deselect()
-			unitIcon_size=math.modf(self.value)
+			unitIcon_size = math.modf(self.value)
 		end,
-		min=36,max=50,step=2,
+		min=30,max=50,step=1,
 		value = 50,
 		path = selPath,
 	},
@@ -418,6 +418,20 @@ options = {
 		end,
 	},
 }
+
+function WG.Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
+
+	options.groupalways.value = group
+	options.showgroupinfo.value = showInfo
+	options.squarepics.value = square
+	options.uniticon_size.value = iconSize
+	options.manualWeaponReloadBar.value = showDgun
+	options.unitCommand.value = showCommand
+	options.alwaysShowSelectionWin.value = alwaysShow
+	
+	options.uniticon_size.OnChange(options.uniticon_size)
+	options.alwaysShowSelectionWin.OnChange(options.alwaysShowSelectionWin)
+end
 
 --[[
 local function FontChanged() 
@@ -2682,7 +2696,7 @@ function widget:SelectionChanged(newSelection)
 		if not options.alwaysShowSelectionWin.value then
 			screen0:RemoveChild(real_window_corner)
 		else
-			real_window_corner.caption = 'No Units Selected'
+			--real_window_corner.caption = 'No Units Selected'
 			real_window_corner:Invalidate()
 		end
 	end
