@@ -1314,7 +1314,6 @@ function widget:Initialize()
 	
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	local x = screenWidth/6 + 20
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)
 	
@@ -1325,7 +1324,7 @@ function widget:Initialize()
 		color = {0, 0, 0, 0},
 		width = width,
 		height = height,
-		x = x, 
+		x = 0, 
 		bottom = 0,
 		dockable = true;
 		draggable = false,

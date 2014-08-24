@@ -817,14 +817,13 @@ function widget:Initialize()
 
 	-- Set the size for the default settings.
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local bottom = math.max(screenWidth/6, 220)
 	
 	window_cpl = Window:New{  
 		dockable = true,
 		name = "Player List",
 		color = {0,0,0,0},
-		x = 0,  
-		bottom = bottom,
+		right = 0,  
+		bottom = 0,
 		width  = x_bound,
 		height = 150,
 		padding = {8, 2, 8, 2};

@@ -880,7 +880,6 @@ function widget:Initialize()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local BUTTON_WIDTH = math.min(60, screenHeight/16)
 	local BUTTON_HEIGHT = 55*BUTTON_WIDTH/60
-	local x = screenWidth/6 + 20 
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
@@ -903,7 +902,7 @@ function widget:Initialize()
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
-		x = x, 
+		x = 0, 
 		bottom = bottom,
 		width  = BUTTON_WIDTH * options.maxbuttons.value,
 		height = BUTTON_HEIGHT,

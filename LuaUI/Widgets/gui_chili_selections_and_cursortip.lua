@@ -2557,14 +2557,14 @@ function widget:Initialize()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
-	local x = screenWidth/6 + 20 + integralWidth
+	local x = integralWidth
 	local height = integralHeight*0.84
 	
     real_window_corner = Window:New{
-		name   = 'selections',
+		name  = 'selections',
 		color = {0, 0, 0, 0},
 		x = x,
-		bottom = 0,
+		y = screenHeight-height,
         width = 450,
 		height = height,
 		dockable = true,

@@ -924,23 +924,21 @@ local function MakeMessageWindow(name, enabled)
 		local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 		local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 		width = 450
-		x = screenWidth/6 + 20 + integralWidth
+		x = integralWidth
 		height = integralHeight*0.84
 		bottom = integralHeight*0.84
 	else
 		local resourceBarWidth = 430
 		local maxWidth = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - 400 - resourceBarWidth)
-		x = 0
-		y = 0
 		bottom = nil
 		width  = screenWidth * 0.30
 		height = screenHeight * 0.20
+		x = screenWidth - width
+		y = 50
 		if maxWidth < width then
 			y = 50 -- resource bar height
 		end
 	end
-
-	
 	
 	return WG.Chili.Window:New{
 		parent = (enabled and screen0) or nil,

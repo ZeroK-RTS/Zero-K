@@ -20,7 +20,7 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local bgColor_panel = {nil, nil, nil, 0}
+local bgColor_panel = {nil, nil, nil, 1}
 
 local tabbedMode = false
 --local init = true
@@ -81,7 +81,7 @@ options = {
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
-		value = 'armap',
+		value = 'arwindow',
 		items = {
 			{key = 'arwindow', 	name='Aspect Ratio Window'},
 			{key ='armap', 		name='Aspect Ratio Map'},
@@ -119,7 +119,7 @@ options = {
 	buttonsOnRight = {
 		name = 'Map buttons on the right',
 		type = 'bool',
-		value = true,
+		value = false,
 		OnChange = function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
@@ -271,7 +271,7 @@ options = {
 	opacity = {
 		name = "Opacity",
 		type = "number",
-		value = 0.8, min = 0, max = 1, step = 0.01,
+		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			if self.value == 0 then
 				bgColor_panel = {nil, nil, nil, 1}
@@ -492,7 +492,7 @@ MakeMinimapWindow = function()
 		width = width,
 		height = height,
 		x = 0,
-		bottom = 0,
+		y = 0,
 		dockable = true,
 		draggable = false,
 		resizable = options.alwaysResizable.value,
