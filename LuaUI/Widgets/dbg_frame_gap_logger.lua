@@ -35,3 +35,7 @@ function widget:GameFrame(n)
 		lastTime = thisTime
 	end
 end
+
+function widget:Initialize()
+	widgetHandler:RemoveWidget()
+end
