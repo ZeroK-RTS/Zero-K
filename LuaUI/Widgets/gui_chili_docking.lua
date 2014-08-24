@@ -29,137 +29,10 @@ local lastWidth = 0
 local lastHeight = 0
 
 ----------------------------------------------------
--- Preset Functions
-----------------------------------------------------
-local function SetPosAndSize(window,x,y,w,h)
-	lastPos[window] = nil
-	settings[window] = {x,y,x+w,y+h}
-end
-
-local function SetupCraftyPreset()
-	-- Disable
-	widgetHandler:DisableWidget("Chili Chat 2.1")
-	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
-	widgetHandler:DisableWidget("Chili FactoryBar")
-	widgetHandler:DisableWidget("Chili FactoryPanel")
-	widgetHandler:DisableWidget("Chili Gesture Menu")
-	widgetHandler:DisableWidget("Chili Chat Bubbles")
-	widgetHandler:DisableWidget("Chili Keyboard Menu")
-	widgetHandler:DisableWidget("Chili Radial Build Menu")
-	
-	-- Enable
-	widgetHandler:EnableWidget("Chili Minimap")
-	widgetHandler:EnableWidget("Chili Crude Player List")
-	widgetHandler:EnableWidget("Chili Integral Menu")
-	widgetHandler:EnableWidget("Chili Pro Console")
-	widgetHandler:EnableWidget("Chili Resource Bars")
-	widgetHandler:EnableWidget("Chili Core Selector")
-	widgetHandler:EnableWidget("Chili Selections & CursorTip")
-	
-	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	
-	-- Minimap
-	local minimapWidth = screenWidth*2/11 + 20
-	local minimapHeight = screenWidth*2/11
-	WG.Minimap_SetOptions("armap", 0.8, false, true, false)
-	SetPosAndSize("Minimap Window", 
-		0, 
-		screenHeight - minimapHeight, 
-		minimapWidth,
-		minimapHeight
-	)
-	
-	-- Selection Bar
-	local selectorButtonWidth = math.min(60, screenHeight/16)
-	local selectorHeight = 55*selectorButtonWidth/60
-	local selectorWidth = selectorButtonWidth*6
-	WG.CoreSelector_SetOptions(6)
-	SetPosAndSize("selector_window", 
-		0, 
-		screenHeight - minimapHeight - selectorHeight, 
-		selectorWidth, 
-		selectorHeight
-	)
-	
-	-- Integral Menu
-	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
-	SetPosAndSize("integralwindow",
-		screenWidth - integralWidth,
-		screenHeight - integralHeight,
-		integralWidth,
-		integralHeight
-	)
-	
-	-- Selections
-	local selectionsHeight = integralHeight*0.85
-	local selectionsWidth = screenWidth - integralWidth - minimapWidth
-	WG.Selections_SetOptions(false, true, false, 50, false, true, true)
-	SetPosAndSize("selections",
-		minimapWidth,
-		screenHeight - selectionsHeight,
-		selectionsWidth,
-		selectionsHeight
-	)
-	
-	-- Player List
-	local playerlistWidth = 296
-	local playerlistHeight = 150
-	SetPosAndSize("Player List",
-		screenWidth - playerlistWidth,
-		screenHeight - integralHeight - playerlistHeight,
-		playerlistWidth,
-		playerlistHeight
-	)
-	
-	-- Chat
-	local chatWidth = math.min(screenWidth*0.25, selectionsWidth)
-	local chatX = math.max(minimapWidth, math.min(screenWidth/2 - chatWidth/2, screenWidth - integralWidth - chatWidth))
-	SetPosAndSize("ProChat",
-		chatX,
-		screenHeight - 2*selectionsHeight,
-		chatWidth,
-		selectionsHeight
-	)
-	
-	-- Menu
-	local menuWidth = 400
-	local menuHeight = 50
-	SetPosAndSize("epicmenubar",
-		screenWidth - menuWidth,
-		0,
-		menuWidth,
-		menuHeight
-	)
-	
-	-- Resource Bar
-	local resourceBarWidth = 430
-	local resourceBarHeight = 50
-	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	SetPosAndSize("ResourceBars",
-		resourceBarX,
-		0,
-		resourceBarWidth,
-		resourceBarHeight
-	)
-	
-	-- Console
-	local consoleWidth = math.min(screenWidth * 0.30, screenWidth - menuWidth - resourceBarWidth)
-	local consoleHeight = screenHeight * 0.20
-	SetPosAndSize("ProConsole",
-		0,
-		0,
-		consoleWidth,
-		consoleHeight
-	)
-end
-
-----------------------------------------------------
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Panels/Docking'
-options_order = { 'dockEnabled', 'minimizeEnabled', 'dockThreshold', 'presetlabel', 'interfacePresetCrafy'}
+options_order = { 'dockEnabled', 'minimizeEnabled', 'dockThreshold'}
 options = {
 	dockThreshold = {
 		name = "Docking distance",
@@ -185,21 +58,16 @@ options = {
 		value = true,
 		desc = 'When enabled certain windows will have minimization tabs.',
 	},
-	presetlabel = {
-		name = "presetlabel",
-		type = 'label', 
-		value = "Presets", 
-	},
-	interfacePresetCrafy = {
-		name = "Crafty",
-		desc = "Interface reminiscent of the crafts of war and stars.",
-		type = 'button',
-		OnChange = SetupCraftyPreset,
-	},
 }
 
 ----------------------------------------------------
 ----------------------------------------------------
+
+function WG.SetWindowPosAndSize(window,x,y,w,h)
+	lastPos[window] = nil
+	settings[window] = {x,y,x+w,y+h}
+end
+
 function widget:Initialize()
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget) --"widget" as extra argument because "handler=true"

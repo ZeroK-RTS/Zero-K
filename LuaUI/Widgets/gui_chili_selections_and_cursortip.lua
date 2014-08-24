@@ -386,13 +386,13 @@ options = {
 	},
 	uniticon_size = {
 		name = 'Icon size on selection list',
-		desc = 'Determines how small the icon in selection list need to be.',
+		--desc = 'Determines how small the icon in selection list need to be.',
 		type = 'number',
 		OnChange = function(self) 
 			option_Deselect()
 			unitIcon_size = math.modf(self.value)
 		end,
-		min=36,max=50,step=2,
+		min=30,max=50,step=1,
 		value = 50,
 		path = selPath,
 	},
