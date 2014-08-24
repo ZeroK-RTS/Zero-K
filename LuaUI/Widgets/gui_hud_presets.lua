@@ -72,9 +72,9 @@ local function SetupDefaultPreset()
 	-- Selection Bar
 	local selectorButtonWidth = math.min(60, screenHeight/16)
 	local selectorHeight = 55*selectorButtonWidth/60
-	local selectionButtonCount = math.min(12,math.max(4,math.floor(minimapWidth/selectorButtonWidth)))
+	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
 	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(6)
+	WG.CoreSelector_SetOptions(selectionButtonCount)
 	WG.SetWindowPosAndSize("selector_window", 
 		0, 
 		screenHeight - selectorHeight - integralHeight, 
