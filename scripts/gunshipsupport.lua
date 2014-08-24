@@ -14,7 +14,6 @@ local smokePiece = {base}
 include "constants.lua"
 
 local gun_1 = false
-local firestate = Spring.GetUnitStates(unitID).firestate
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
@@ -52,23 +51,20 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
-		
+	if severity <= 0.25  then	
 		Explode(base, sfxNone)
 		Explode(lWing, sfxNone)
 		Explode(rWing, sfxNone)
 		return 1
-	elseif  severity <= .5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
+	elseif severity <= 0.5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
 		Explode(base, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
 		Explode(lWing, sfxFall)
 		Explode(rWing, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-
 		return 1
-	elseif  severity <= .75  then
+	elseif  severity <= 0.75  then
 		Explode(base, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
 		Explode(lWing, sfxFall)
 		Explode(rWing, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-
 		return 2
 	else
 		Explode(base, sfxShatter)
@@ -76,5 +72,4 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rWing, sfxShatter)
 		return 2
 	end
-end
 end
