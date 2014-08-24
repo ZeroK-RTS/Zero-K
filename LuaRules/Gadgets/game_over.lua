@@ -190,7 +190,7 @@ local function DestroyAlliance(allianceID)
 		local teamList = spGetTeamList(allianceID)
 		if teamList == nil then return end	-- empty allyteam, don't bother
 		
-		if destroy_type == 'debug' then
+		if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
 			Spring.Echo("Game Over: DEBUG")
 			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			Spring.Echo("Game Over: If this is true, then please resign.")
