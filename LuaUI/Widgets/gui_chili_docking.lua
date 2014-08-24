@@ -20,7 +20,7 @@ local screen0
 
 local forceUpdate = false 
 options_path = 'Settings/HUD Panels/Docking'
-options_order = { 'dockEnabled', 'dockThreshold', }
+options_order = { 'dockEnabled', 'minimizeEnabled', 'dockThreshold', }
 options = {
 	dockThreshold = {
 		name = "Docking distance",
@@ -38,6 +38,13 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Dock windows to screen edges and each other to prevent overlaps',
+	},
+	minimizeEnabled = {
+		name = 'Minimizable windows',
+		advanced = false,
+		type = 'bool',
+		value = true,
+		desc = 'When enabled certain windows will have minimization tabs.',
 	},
 }
 
@@ -278,11 +285,19 @@ function widget:Update()
 	-- BUTTONS to minimize stuff
 	-- FIXME HACK use object:IsDescendantOf(screen0) from chili to detect visibility, not this silly hack stuff with button.winVisible
 	for name, win in pairs(names) do 
-		if win.minimizable then
+		if win.minimizable and options.minimizeEnabled.value then
 			local button = buttons[name]
 			if not button then 
-				button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; 
-					caption='';dockable=false,winName = win.name, tooltip='Minimize ' .. win.name, backgroundColor={0,1,0,1},
+				button = Chili.Button:New{
+					x = win.x, 
+					y = win.y, 
+					width = 50,
+					height = 20,
+					caption = '',
+					dockable = false,
+					winName = win.name,
+					tooltip = 'Minimize ' .. win.name,
+					backgroundColor={0,1,0,1},
 					widgetName = win.parentWidgetName,
 					win = win,
 					OnClick = {
@@ -322,6 +337,12 @@ function widget:Update()
 				button.tooltip = 'Minimize ' .. button.winName
 				button.backgroundColor={0,1,0,1}
 				button:Invalidate()
+			end
+		else
+			local button = buttons[name]
+			if button then
+				screen0:RemoveChild(button)
+				buttons[name] = nil
 			end
 		end
 	end 
