@@ -128,8 +128,10 @@ local function temporaryDive(unitID, duration, height)
 end
 
 function Bomber_Dive_fired(unitID)
-	setFlyHigh(unitID)
-	bombers[unitID].resetTime = false
+	if bombers[unitID].diveState ~= 3 then
+		setFlyHigh(unitID)
+		bombers[unitID].resetTime = false
+	end
 end
 GG.Bomber_Dive_fired = Bomber_Dive_fired
 
