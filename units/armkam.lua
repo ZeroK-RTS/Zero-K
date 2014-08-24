@@ -3,8 +3,6 @@ unitDef = {
   name                   = [[Banshee]],
   description            = [[Raider Gunship]],
   acceleration           = 0.18,
-  amphibious             = true,
-  bankscale              = [[1]],
   brakeRate              = 0.2,
   buildCostEnergy        = 220,
   buildCostMetal         = 220,
@@ -16,11 +14,10 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
+  canStop                = true,
   canSubmerge            = false,
   category               = [[GUNSHIP]],
   collide                = true,
-  collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
   cruiseAlt              = 100,
 
@@ -46,14 +43,12 @@ unitDef = {
   iconType               = [[gunship]],
   idleAutoHeal           = 10,
   idleTime               = 150,
-  mass                   = 164,
   maxDamage              = 860,
   maxVelocity            = 6.5,
   minCloakDistance       = 75,
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
-  scale                  = [[1]],
+  script                 = [[armkam.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -65,12 +60,9 @@ unitDef = {
 
   },
 
-  side                   = [[ARM]],
   sightDistance          = 500,
-  smoothAnim             = true,
   --stealth                = true,
   turnRate               = 693,
-  workerTime             = 0,
 
   weapons                = {
 
@@ -117,7 +109,6 @@ unitDef = {
       reloadtime              = 0.11,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/laser_burn9]],
-      startsmoke              = [[0]],
       sweepfire               = false,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
@@ -131,46 +122,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Banshee]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 860,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       metal            = 88,
       object           = [[banshee_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
       description      = [[Debris - Banshee]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 860,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 44,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
       reclaimTime      = 44,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

@@ -282,7 +282,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .5 then
+	if severity <= .5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
 		Explode( Base, sfxNone )
 		Explode( RightTurret, sfxNone )
 		Explode( LeftTurret, sfxNone )
