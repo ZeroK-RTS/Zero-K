@@ -726,6 +726,17 @@ for name, ud in pairs(UnitDefs) do
     end   
 end
 
+-- Set default out of combat autorepair
+for name, ud in pairs(UnitDefs) do
+	if not ud.idletime then
+		ud.idletime = 1800 -- frames, = 60s
+	end
+	if not ud.idleautoheal then
+		ud.idleautoheal = 5 -- HP/s
+	end
+end
+
+
 -- Disable porc/air/specific units modoptions (see lockunits_modoption.lua)
 
 --[[
