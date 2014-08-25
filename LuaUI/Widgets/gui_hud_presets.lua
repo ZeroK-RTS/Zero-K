@@ -13,6 +13,21 @@ function widget:GetInfo()
 end
 
 ----------------------------------------------------
+-- widget option functions
+
+local function Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
+	local widgetName, path = "Chili Selections & CursorTip","Settings/HUD Panels/Selected Units Window"
+	WG.SetWidgetOption(widgetName, path, "groupalways",group)
+	WG.SetWidgetOption(widgetName, path, "showgroupinfo",showInfo)
+	WG.SetWidgetOption(widgetName, path, "squarepics",square)
+	WG.SetWidgetOption(widgetName, path, "uniticon_size",iconSize)
+	WG.SetWidgetOption(widgetName, path, "manualWeaponReloadBar",showDgun)
+	WG.SetWidgetOption(widgetName, path, "unitCommand",showCommand)
+	WG.SetWidgetOption(widgetName, path, "alwaysShowSelectionWin",alwaysShow)
+end
+
+----------------------------------------------------
+----------------------------------------------------
 -- Useful Functions
 ----------------------------------------------------
 local function GetSelectionIconSize(height)
@@ -85,7 +100,7 @@ local function SetupDefaultPreset()
 	-- Selections
 	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = 450
-	WG.Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
+	Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
 	WG.SetWindowPosAndSize("selections",
 		integralWidth,
 		screenHeight - selectionsHeight,
@@ -215,7 +230,7 @@ local function SetupCraftyPreset()
 	-- Selections
 	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth
-	WG.Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
+	Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
 	WG.SetWindowPosAndSize("selections",
 		minimapWidth,
 		screenHeight - selectionsHeight,
@@ -328,7 +343,7 @@ local function SetupEnsemblePreset()
 	-- Selections
 	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth
-	WG.Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
+	Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
 	WG.SetWindowPosAndSize("selections",
 		integralWidth,
 		screenHeight - selectionsHeight,
@@ -463,7 +478,7 @@ local function SetupWestwoodPreset()
 	-- Selections
 	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = resourceBarWidth
-	WG.Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
+	Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
 	WG.SetWindowPosAndSize("selections",
 		screenWidth - selectionsWidth,
 		screenHeight - selectionsHeight,

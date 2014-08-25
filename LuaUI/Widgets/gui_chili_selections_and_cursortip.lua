@@ -419,19 +419,6 @@ options = {
 	},
 }
 
-function WG.Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
-
-	options.groupalways.value = group
-	options.showgroupinfo.value = showInfo
-	options.squarepics.value = square
-	options.uniticon_size.value = iconSize
-	options.manualWeaponReloadBar.value = showDgun
-	options.unitCommand.value = showCommand
-	options.alwaysShowSelectionWin.value = alwaysShow
-	
-	options.uniticon_size.OnChange(options.uniticon_size)
-	options.alwaysShowSelectionWin.OnChange(options.alwaysShowSelectionWin)
-end
 
 --[[
 local function FontChanged() 
