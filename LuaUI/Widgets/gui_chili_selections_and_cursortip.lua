@@ -271,7 +271,7 @@ options = {
 		desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
 		type = 'number',
 		min=0,max=4,step=0.1,
-		value = 0.5,
+		value = 0.1,
 	},
 	--[[ This is causing it so playername is not always visible, too difficult to maintain.
 	fontsize = {
