@@ -179,8 +179,8 @@ local function SetupCraftyPreset()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	-- Minimap
-	local minimapWidth = screenWidth*2/11 + 20
-	local minimapHeight = screenWidth*2/11
+	local minimapWidth = screenWidth*9/44 + 20
+	local minimapHeight = screenWidth*9/44
 	WG.Minimap_SetOptions("armap", 0.8, false, true, false)
 	WG.SetWindowPosAndSize("Minimap Window", 
 		0, 
@@ -247,7 +247,7 @@ local function SetupCraftyPreset()
 	local menuWidth = 400
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
-		screenWidth - menuWidth,
+		0,
 		0,
 		menuWidth,
 		menuHeight
@@ -277,10 +277,259 @@ end
 
 
 ----------------------------------------------------
+-- Ensemble Preset
+----------------------------------------------------
+local function SetupEnsemblePreset()
+	-- Disable
+	widgetHandler:DisableWidget("Chili Chat 2.1")
+	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
+	widgetHandler:DisableWidget("Chili FactoryBar")
+	widgetHandler:DisableWidget("Chili FactoryPanel")
+	widgetHandler:DisableWidget("Chili Gesture Menu")
+	widgetHandler:DisableWidget("Chili Chat Bubbles")
+	widgetHandler:DisableWidget("Chili Keyboard Menu")
+	widgetHandler:DisableWidget("Chili Radial Build Menu")
+	widgetHandler:DisableWidget("Chili Economy Panel")
+	
+	-- Enable
+	widgetHandler:EnableWidget("Chili Minimap")
+	widgetHandler:EnableWidget("Chili Crude Player List")
+	widgetHandler:EnableWidget("Chili Integral Menu")
+	widgetHandler:EnableWidget("Chili Pro Console")
+	widgetHandler:EnableWidget("Chili Resource Bars")
+	widgetHandler:EnableWidget("Chili Core Selector")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	
+	-- Settings for window positions and settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	
+	-- Integral Menu
+	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	WG.SetWindowPosAndSize("integralwindow",
+		0,
+		screenHeight - integralHeight,
+		integralWidth,
+		integralHeight
+	)
+	
+	-- Minimap
+	local minimapWidth = screenWidth*9/44 + 20
+	local minimapHeight = screenWidth*9/44
+	WG.Minimap_SetOptions("armap", 0.8, false, true, false)
+	WG.SetWindowPosAndSize("Minimap Window", 
+		screenWidth - minimapWidth, 
+		screenHeight - minimapHeight, 
+		minimapWidth,
+		minimapHeight
+	)
+	
+	-- Selections
+	local selectionsHeight = integralHeight*0.85
+	local selectionsWidth = screenWidth - integralWidth - minimapWidth
+	WG.Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
+	WG.SetWindowPosAndSize("selections",
+		integralWidth,
+		screenHeight - selectionsHeight,
+		selectionsWidth,
+		selectionsHeight
+	)
+
+	-- Quick Selection Bar
+	local selectorButtonWidth = math.min(60, screenHeight/16)
+	local selectorHeight = 55*selectorButtonWidth/60
+	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
+	local selectorWidth = selectorButtonWidth*selectionButtonCount
+	WG.CoreSelector_SetOptions(selectionButtonCount)
+	WG.SetWindowPosAndSize("selector_window", 
+		integralWidth, 
+		screenHeight - selectionsHeight - selectorHeight, 
+		selectorWidth, 
+		selectorHeight
+	)
+	
+	-- Player List
+	local playerlistWidth = 296
+	local playerlistHeight = 150
+	WG.SetWindowPosAndSize("Player List",
+		screenWidth - playerlistWidth,
+		screenHeight - integralHeight - playerlistHeight,
+		playerlistWidth,
+		playerlistHeight
+	)
+	
+	-- Chat
+	local chatWidth = math.min(screenWidth*0.25, selectionsWidth)
+	local chatX = 0
+	WG.SetWindowPosAndSize("ProChat",
+		chatX,
+		screenHeight - integralHeight,
+		chatWidth,
+		selectionsHeight
+	)
+	
+	-- Menu
+	local menuWidth = 400
+	local menuHeight = 50
+	WG.SetWindowPosAndSize("epicmenubar",
+		screenWidth - menuWidth,
+		0,
+		menuWidth,
+		menuHeight
+	)
+	
+	-- Resource Bar
+	local resourceBarWidth = 430
+	local resourceBarHeight = 50
+	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
+	WG.SetWindowPosAndSize("ResourceBars",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		resourceBarHeight
+	)
+	
+	-- Console
+	local consoleWidth = math.min(screenWidth * 0.30, screenWidth - menuWidth - resourceBarWidth)
+	local consoleHeight = screenHeight * 0.20
+	WG.SetWindowPosAndSize("ProConsole",
+		0,
+		0,
+		consoleWidth,
+		consoleHeight
+	)
+end
+
+----------------------------------------------------
+-- Westwood Preset
+----------------------------------------------------
+local function SetupWestwoodPreset()
+	-- Disable
+	widgetHandler:DisableWidget("Chili Chat 2.1")
+	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
+	widgetHandler:DisableWidget("Chili FactoryBar")
+	widgetHandler:DisableWidget("Chili FactoryPanel")
+	widgetHandler:DisableWidget("Chili Gesture Menu")
+	widgetHandler:DisableWidget("Chili Chat Bubbles")
+	widgetHandler:DisableWidget("Chili Keyboard Menu")
+	widgetHandler:DisableWidget("Chili Radial Build Menu")
+	widgetHandler:DisableWidget("Chili Economy Panel")
+	
+	-- Enable
+	widgetHandler:EnableWidget("Chili Minimap")
+	widgetHandler:EnableWidget("Chili Crude Player List")
+	widgetHandler:EnableWidget("Chili Integral Menu")
+	widgetHandler:EnableWidget("Chili Pro Console")
+	widgetHandler:EnableWidget("Chili Resource Bars")
+	widgetHandler:EnableWidget("Chili Core Selector")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	
+	-- Settings for window positions and settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	-- Resource Bar
+	local resourceBarWidth = screenWidth*5/22 + 20
+	local resourceBarHeight = 50
+	local resourceBarX = screenWidth - resourceBarWidth
+	WG.SetWindowPosAndSize("ResourceBars",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		resourceBarHeight
+	)
+	
+	-- Minimap
+	local minimapWidth = resourceBarWidth
+	local minimapHeight = screenWidth*1/4
+	WG.Minimap_SetOptions("armap", 0.8, false, true, false)
+	WG.SetWindowPosAndSize("Minimap Window", 
+		screenWidth - minimapWidth, 
+		resourceBarHeight, 
+		minimapWidth,
+		minimapHeight
+	)
+	
+	-- Integral Menu
+	local integralWidth = math.max(350, math.min(500, resourceBarWidth))
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	WG.SetWindowPosAndSize("integralwindow",
+		screenWidth - integralWidth,
+		resourceBarHeight + minimapHeight,
+		integralWidth,
+		integralHeight
+	)
+	
+	-- Selections
+	local selectionsHeight = integralHeight*0.85
+	local selectionsWidth = resourceBarWidth
+	WG.Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, true)
+	WG.SetWindowPosAndSize("selections",
+		screenWidth - selectionsWidth,
+		screenHeight - selectionsHeight,
+		selectionsWidth,
+		selectionsHeight
+	)
+	
+	-- Quick Selection Bar
+	local selectorButtonWidth = math.min(60, screenHeight/16)
+	local selectorHeight = 55*selectorButtonWidth/60
+	local selectionButtonCount = math.min(12,math.max(4,math.floor(resourceBarWidth/selectorButtonWidth)))
+	local selectorWidth = selectorButtonWidth*selectionButtonCount
+	WG.CoreSelector_SetOptions(selectionButtonCount)
+	WG.SetWindowPosAndSize("selector_window", 
+		screenWidth - selectionsWidth, 
+		screenHeight - selectionsHeight - selectorHeight, 
+		selectorWidth, 
+		selectorHeight
+	)
+	
+	-- Player List
+	local playerlistWidth = 296
+	local playerlistHeight = 150
+	WG.SetWindowPosAndSize("Player List",
+		screenWidth - playerlistWidth - selectionsWidth,
+		screenHeight - playerlistHeight,
+		playerlistWidth,
+		playerlistHeight
+	)
+	
+	-- Chat
+	local chatWidth = math.min(screenWidth*0.25, selectionsWidth)
+	local chatX = 0
+	WG.SetWindowPosAndSize("ProChat",
+		chatX,
+		screenHeight,
+		chatWidth,
+		selectionsHeight
+	)
+	
+	-- Menu
+	local menuWidth = 400
+	local menuHeight = 50
+	WG.SetWindowPosAndSize("epicmenubar",
+		0,
+		0,
+		menuWidth,
+		menuHeight
+	)
+	
+	-- Console
+	local consoleWidth = math.min(screenWidth * 0.30, screenWidth - menuWidth - resourceBarWidth)
+	local consoleHeight = screenHeight * 0.20
+	WG.SetWindowPosAndSize("ProConsole",
+		0,
+		0,
+		consoleWidth,
+		consoleHeight
+	)
+end
+
+----------------------------------------------------
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'setToDefault', 'presetlabel', 'interfacePresetDefault', 'interfacePresetCrafy'}
+options_order = {'setToDefault', 'presetlabel', 'interfacePresetDefault', 'interfacePresetCrafty', 'interfacePresetEnsemble', 'interfacePresetWestwood'}
 options = {
 	setToDefault = {
 		name  = "Set To Default Once",
@@ -300,11 +549,23 @@ options = {
 		type = 'button',
 		OnChange = SetupDefaultPreset,
 	},
-	interfacePresetCrafy = {
+	interfacePresetCrafty = {
 		name = "Crafty",
 		desc = "Interface reminiscent of the crafts of war and stars.",
 		type = 'button',
 		OnChange = SetupCraftyPreset,
+	},
+	interfacePresetEnsemble = {
+		name = "Ensemble",
+		desc = "Interface reminiscent of the imperial ages.",
+		type = 'button',
+		OnChange = SetupEnsemblePreset,
+	},
+	interfacePresetWestwood = {
+		name = "Westwood",
+		desc = "Interface reminiscent of the conquest of dunes.",
+		type = 'button',
+		OnChange = SetupWestwoodPreset,
 	},
 }
 
