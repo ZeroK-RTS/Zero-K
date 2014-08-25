@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GPL",
     layer     = 0,
     enabled   = true,
-    detailsDefault = 3
+    --detailsDefault = 3
   }
 end
 --------------------------------------------------------------------------------
@@ -45,8 +45,10 @@ local island = false
 --------------------------------------------------------------------------------
 
 local function ResetWidget()
-  gl.DeleteList(dList)
-  widget:Initialize()
+	if dList then
+		gl.DeleteList(dList)
+		widget:Initialize()
+	end
 end
 
 options_path = 'Settings/Graphics/Map/Map Extension'

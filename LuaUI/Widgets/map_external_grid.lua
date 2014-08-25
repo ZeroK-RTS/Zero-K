@@ -55,8 +55,10 @@ options = {
 		value = true,
 		desc = 'Mirrors heightmap on the grid',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 		
 	},
 	res = {
@@ -69,8 +71,10 @@ options = {
 		value = 512,
 		desc = 'Sets tile size (lower = more detail)\nStepsize is 64; recommend powers of 2',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 
 	},
 	range = {
@@ -83,8 +87,10 @@ options = {
 		value = 3072,
 		desc = 'How far outside the map to draw',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 
 	},	
 	northSouthText = {
@@ -93,8 +99,10 @@ options = {
 		value = false,
 		desc = 'Help you identify map direction under rotation by placing a "North/South/East/West" text on the map edges',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 		
 	},	
 }
@@ -300,14 +308,8 @@ local function DrawTiles()
 	gl.PopAttrib()
 end
 
-local readyToGo = false
-function widget:GameFrame()
-	readyToGo = true
-	widgetHandler:RemoveCallIn("GameFrame")
-end
-
 function widget:DrawWorldPreUnit()
-	if DspLst and readyToGo then
+	if DspLst then
 		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 		-- Maybe you want Spring.SetDrawGround(false) somewhere
 	end	
