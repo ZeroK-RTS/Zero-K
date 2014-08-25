@@ -47,7 +47,7 @@ local noFeatureRange = 0
 ]]--
 
 options_path = 'Settings/Graphics/Map/VR Grid'
-options_order = {"mirrorHeightMap","drawForIslands","res","range","northSouthText"}
+options_order = {"mirrorHeightMap","res","range","northSouthText"}
 options = {
 	mirrorHeightMap = {
 		name = "Mirror heightmap",
@@ -59,12 +59,6 @@ options = {
 			widget:Initialize()
 		end, 		
 	},
-	drawForIslands = {
-		name = "Draw for islands",
-		type = 'bool',
-		value = Spring.GetConfigInt("ReflectiveWater", 0) ~= 4,
-		desc = "Draws mirror grid when map is an island",		
-	},	
 	res = {
 		name = "Tile size (64-512)",
 		advanced = true,
@@ -307,7 +301,7 @@ local function DrawTiles()
 end
 
 function widget:DrawWorldPreUnit()
-	if (not island) or options.drawForIslands.value then
+	if DspLst then
 		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 		-- Maybe you want Spring.SetDrawGround(false) somewhere
 	end	
