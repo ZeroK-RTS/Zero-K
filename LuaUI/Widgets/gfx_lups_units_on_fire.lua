@@ -16,17 +16,22 @@ end
 --------------------------------------------------------------------------------
 
 function MergeTable(outtable,intable)
-  for i,v in pairs(intable) do 
-    if (outtable[i]==nil) then
-      if (type(v)=='table') then
-        if (type(outtable[i])~='table') then outtable[i] = {} end
-        MergeTable(outtable[i],v)
-      else
-        outtable[i] = v
-      end
-    end
-  end
+	for i,v in pairs(intable) do 
+		if (outtable[i]==nil) then
+			if (type(v)=='table') then
+				if (type(outtable[i])~='table') then 
+					outtable[i] = {} 
+				end
+				MergeTable(outtable[i],v)
+			else
+				outtable[i] = v
+			end
+		end
+	end
 end
+
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetAllUnits = Spring.GetAllUnits
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -85,63 +90,86 @@ local spGetUnitRadius   = Spring.GetUnitRadius
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local initialized = false
 function widget:Initialize()
-  widgetHandler:RegisterGlobal('onFire', onFire)
+	initialized = true
 end
 
 function widget:Shutdown()
-  widgetHandler:DeregisterGlobal('onFire', onFire)
-  if (initialized) then
-    Lups  = WG['Lups']
-    for _,particleID in pairs(particleIDs) do
-      Lups.RemoveParticles(particleID)
-    end
-  end
+	if (initialized) then
+		Lups  = WG['Lups']
+		for _,particleID in pairs(particleIDs) do
+			Lups.RemoveParticles(particleID)
+		end
+	end
 end
 
 local t = 1
 local totalFxCount = 0 --// total lups effects
 function widget:Update()
-  if (t>2) then
-    Lups  = WG['Lups']
-    if (Lups) then
-      totalFxCount = Lups.GetStats()
-      AddParticles = Lups.AddParticles
-    end
-    t=1
-  end
-  t=t+1
+	if (t>2) then
+		Lups  = WG['Lups']
+		if (Lups) then
+			totalFxCount = Lups.GetStats()
+			AddParticles = Lups.AddParticles
+		end
+		t=1
+	end
+	t=t+1
+end
+
+local CHECK_INTERVAL = 6
+
+function widget:GameFrame(n)
+	if n%CHECK_INTERVAL == 1 then
+		local units = spGetAllUnits()
+		local burningUnits = {count = 0}
+		local unitID
+		for i = 1, #units do
+			unitID = units[i]
+			if spGetUnitRulesParam(unitID, "on_fire") == 1 then
+				burningUnits.count = burningUnits.count + 1
+				burningUnits[burningUnits.count] = unitID
+			end
+		end
+		
+		if #burningUnits > 0 then
+			onFire(burningUnits)
+		end
+	end
 end
 
 
 function onFire(burningUnits)
-  if (Lups==nil)or(totalFxCount>175) then return end
+	if (Lups==nil)or(totalFxCount>175) then 
+		return 
+	end
 
-  --// get wind and random values
-  local alpha = 2*pi*random()
-  local r = 20*random()
-  local wx, wy, wz = GetWind()
-  wx, wy, wz = wx*0.09, wy*0.09, wz*0.09
-  flameFX.force       = {wx,wy+3,wz}
-  smokeFX.force       = flameFX.force
+	--// get wind and random values
+	local alpha = 2*pi*random()
+	local r = 20*random()
+	local wx, wy, wz = GetWind()
+	wx, wy, wz = wx*0.09, wy*0.09, wz*0.09
+	flameFX.force       = {wx,wy+3,wz}
+	smokeFX.force       = flameFX.force
 
-  for i=1,#burningUnits do
-    local unitID = burningUnits[i]
+	for i = 1, burningUnits.count do
+		local unitID = burningUnits[i]
 
-    --// send particles to LUPS
-    local x, y, z = spGetUnitPosition(unitID)
-    local r = spGetUnitRadius(unitID)
-    if (r and x) then
-      flameFX.pos     = {x,y,z}
-      flameFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*0.6*" .. r
-      flameFX.size    = r * 0.35
-      particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',flameFX)
+		--// send particles to LUPS
+		local x, y, z = spGetUnitPosition(unitID)
+		local r = spGetUnitRadius(unitID)
+		if (r and x) then
+			flameFX.pos     = {x,y,z}
+			flameFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*0.6*" .. r
+			flameFX.size    = r * 0.35
+			particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',flameFX)
 
-      --smokeFX.pos     = flameFX.pos 
-      --smokeFX.partpos = flameFX.partpos
-      --smokeFX.size    = flameFX.size
-      --particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',smokeFX)
-    end
+			--smokeFX.pos     = flameFX.pos 
+			--smokeFX.partpos = flameFX.partpos
+			--smokeFX.size    = flameFX.size
+			--particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',smokeFX)
+		end
 
-  end
+	end
 end
