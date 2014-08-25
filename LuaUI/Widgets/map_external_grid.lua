@@ -300,8 +300,14 @@ local function DrawTiles()
 	gl.PopAttrib()
 end
 
+local readyToGo = false
+function widget:GameFrame()
+	readyToGo = true
+	widgetHandler:RemoveCallIn("GameFrame")
+end
+
 function widget:DrawWorldPreUnit()
-	if DspLst then
+	if DspLst and readyToGo then
 		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 		-- Maybe you want Spring.SetDrawGround(false) somewhere
 	end	
