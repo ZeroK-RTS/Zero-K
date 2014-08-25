@@ -551,7 +551,7 @@ options = {
 	},
 	interfacePresetCrafty = {
 		name = "Crafty",
-		desc = "Interface reminiscent of the crafts of war and stars.",
+		desc = "Interface reminiscent of the craft of war and stars.",
 		type = 'button',
 		OnChange = SetupCraftyPreset,
 	},
@@ -577,7 +577,12 @@ local firstUpdate = true
 function widget:Update()
 	if firstUpdate then
 		if options.setToDefault.value then
-			SetupDefaultPreset()
+			-- Default presets are not set. This lets current players
+			-- a set "Set To Default Once" to false without resetting 
+			-- their UI. After a week or so the set to default presets
+			-- should be enabled to make this widget the central point
+			-- for UI configuration, including default.
+			--SetupDefaultPreset()
 			options.setToDefault.value = false
 		end
 		firstUpdate = false
