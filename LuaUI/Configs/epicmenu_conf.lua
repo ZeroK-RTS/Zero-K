@@ -467,7 +467,7 @@ path='Settings/Graphics/Unit Visibility'
 		name = 'Draw Distance',
 		type = 'number',
 		min = 1, 
-		max = 1000,
+		max = 10000,
 		springsetting = 'UnitLodDist',
 		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
 	} )
