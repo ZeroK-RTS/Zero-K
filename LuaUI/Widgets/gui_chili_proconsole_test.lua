@@ -743,7 +743,22 @@ local function AddMessage(msg, target, remake)
 				},
 				
 			}
-			
+		elseif target == 'chat' then
+			-- Make a panel for each chat line because this removes the message jitter upon fade.
+			textbox:SetPos( 3, 3, stack.width - 3 )
+			textbox:Update()
+			local tbheight = textbox.height + 2 -- not perfect
+			--echo('tbheight', tbheight)
+			control = WG.Chili.Panel:New{
+				width = '100%',
+				height = tbheight,
+				padding = { 0,0,0,0 },
+				backgroundColor = {0,0,0,0},
+				caption = '',
+				children = {
+					textbox,
+				},
+			}
 		elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
 			local cur = WG.alliedCursorsPos[msg.player.id]
 			if cur then
