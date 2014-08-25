@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Pro Console test",
+    name      = "Chili Pro Console",
     desc      = "v0.016 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
