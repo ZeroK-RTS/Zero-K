@@ -233,7 +233,7 @@ local label_unitInfo
 options_path = 'Settings/HUD Panels/Tooltip'
 options_order = {
 	--tooltip
-	'tooltip_delay', 'world_tooltip_delay', 'hpshort', 'featurehp', 
+	'tooltip_delay', 'independant_world_tooltip_delay', 'hpshort', 'featurehp', 
 	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'show_position', 'show_unit_text', 'showdrawtooltip','showterratooltip',
 	
 	--mouse
@@ -266,7 +266,7 @@ options = {
 		min=0,max=4,step=0.1,
 		value = 0,
 	},
-	world_tooltip_delay = {
+	independant_world_tooltip_delay = {
 		name = 'World tooltip display delay (0 - 4s)',
 		desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
 		type = 'number',
@@ -2183,14 +2183,14 @@ local function MakeTooltip()
 	if unit_tooltip then
 		-- pointing at unit/feature
 		if type == 'unit' then
-			if options.show_for_units.value and (meta or stillCursorTime > options.world_tooltip_delay.value) then
+			if options.show_for_units.value and (meta or stillCursorTime > options.independant_world_tooltip_delay.value) then
 				MakeToolTip_Unit(data, tooltip)
 			else
 				KillTooltip()
 			end
 			return
 		elseif type == 'feature' then
-			if options.show_for_wreckage.value and (meta or stillCursorTime > options.world_tooltip_delay.value) then
+			if options.show_for_wreckage.value and (meta or stillCursorTime > options.independant_world_tooltip_delay.value) then
 				if MakeToolTip_Feature(data, tooltip) then
 					return
 				end
