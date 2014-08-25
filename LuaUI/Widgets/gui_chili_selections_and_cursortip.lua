@@ -263,15 +263,15 @@ options = {
 		name = 'Tooltip display delay (0 - 4s)',
 		desc = 'Determines how long you can leave the mouse idle until the tooltip is displayed.',
 		type = 'number',
-		min=0,max=4,step=0.1,
+		min=0,max=4,step=0.05,
 		value = 0,
 	},
 	independant_world_tooltip_delay = {
 		name = 'World tooltip display delay (0 - 4s)',
 		desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
 		type = 'number',
-		min=0,max=4,step=0.1,
-		value = 0.1,
+		min=0,max=4,step=0.05,
+		value = 0.05,
 	},
 	--[[ This is causing it so playername is not always visible, too difficult to maintain.
 	fontsize = {
@@ -2170,14 +2170,18 @@ local function MakeTooltip()
 	if unit_tooltip then
 		-- pointing at unit/feature
 		if type == 'unit' then
-			if options.show_for_units.value and (meta or stillCursorTime > options.independant_world_tooltip_delay.value) then
+			if options.show_for_units.value and 
+					(meta or options.independant_world_tooltip_delay.value == 0 or 
+					stillCursorTime > options.independant_world_tooltip_delay.value) then
 				MakeToolTip_Unit(data, tooltip)
 			else
 				KillTooltip()
 			end
 			return
 		elseif type == 'feature' then
-			if options.show_for_wreckage.value and (meta or stillCursorTime > options.independant_world_tooltip_delay.value) then
+			if options.show_for_wreckage.value and
+					(meta or options.independant_world_tooltip_delay.value == 0 or 
+					stillCursorTime > options.independant_world_tooltip_delay.value) then
 				if MakeToolTip_Feature(data, tooltip) then
 					return
 				end
