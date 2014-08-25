@@ -57,25 +57,10 @@ local WINDOW_HEIGHT = 480
 local BUTTON_WIDTH = 128
 local BUTTON_HEIGHT = 128
 
-local wantLabelUpdate = false
+--local wantLabelUpdate = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- wait for next screenframe so Grid can resize its elements first	-- doesn't actually work
-local function UpdateLabelPositions()
-	for index, label in pairs(buttonLabels) do
-		label.x = (buttons[index].width - label.width)*0.3
-		label.align = "center"
-		label:UpdateLayout()
-		label:Invalidate()
-	end
-	for index, label in pairs(trainerLabels) do
-		label.x = (buttons[index].width - label.width)*0.5
-		label.align = "center"
-		label:UpdateLayout()
-		label:Invalidate()
-	end	
-end
-
 local function ToggleTrainerButtons(bool)
 	for i=1,#buttons do
 		if buttons[i].trainer then
@@ -86,7 +71,6 @@ local function ToggleTrainerButtons(bool)
 			end
 		end
 	end
-	wantLabelUpdate = true
 end
 
 options_path = 'Settings/HUD Panels/Commander Selector'
@@ -161,7 +145,7 @@ local function CreateWindow()
 	--}
 	grid = Grid:New{
 		parent = mainWindow,
-		autosize = true,
+		autosize = false,
 		resizeItems = true,
 		x=0, right=0,
 		y=0, bottom=36,
@@ -200,7 +184,7 @@ local function CreateWindow()
 		}
 		local label = Label:New{
 			parent = button,
-			x = 64,
+			x = "15%",
 			bottom = 4,
 			caption = option.name,
 			align = "center",
@@ -210,8 +194,8 @@ local function CreateWindow()
 		if option.trainer then
 			local trainerLabel = Label:New{
 				parent = image,
-				x = 42,
-				y = BUTTON_HEIGHT * 0.45,
+				x = "25%",
+				y = "50%",
 				caption = "TRAINER",
 				align = "center",
 				font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
@@ -243,7 +227,6 @@ local function CreateWindow()
 		end },
 	}
 	]]
-	wantLabelUpdate = true
 	grid:Invalidate()
 end
 --------------------------------------------------------------------------------
@@ -333,10 +316,6 @@ function widget:Update(dt)
 				mainWindow:Dispose()
 			end
 		end
-	end
-	if wantLabelUpdate then
-		UpdateLabelPositions()
-		wantLabelUpdate = false
 	end
 end
 
