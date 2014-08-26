@@ -310,9 +310,9 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 			mcSetRotation(unitID,-pitch,yaw,-roll) --Spring conveniently rotate Y-axis first, X-axis 2nd, and Z-axis 3rd which allow Yaw,Pitch & Roll control.
 			
 			landDuration = landDuration + 1
-			local stunned_or_inbuild = GetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
+			local stunned_or_inbuild = GetUnitIsStunned(carrierID) or (spGetUnitRulesParam(carrierID,"disarmed") == 1)
 			if (landDuration % BUILD_UPDATE_INTERVAL == 0) and (not stunned_or_inbuild) then
-				local slowMult = spGetUnitRulesParam(unitID,"totalReloadSpeedChange") or 1
+				local slowMult = spGetUnitRulesParam(carrierID,"totalReloadSpeedChange") or 1
 				health,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
 				buildProgress = buildProgress+(build_step*slowMult) --progress
 				Spring.SetUnitHealth(unitID,{health=health+(build_step_health*slowMult), build = buildProgress }) 
