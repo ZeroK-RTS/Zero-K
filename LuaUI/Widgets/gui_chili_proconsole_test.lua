@@ -773,6 +773,12 @@ local function AddMessage(msg, target, remake)
 	if options.clickable_points.value then
 		local control = textbox
 		if msg.point then --message is a marker, make obvious looking button
+			local padding
+			if target == 'chat' then
+				padding = { 3,3,1,1 }
+			else
+				padding = { 1,1,1,1 }
+			end
 			textbox:SetPos( 35, 3, stack.width - 40 )
 			textbox:Update()
 			local tbheight = textbox.height -- not perfect
@@ -781,7 +787,8 @@ local function AddMessage(msg, target, remake)
 			control = WG.Chili.Panel:New{
 				width = '100%',
 				height = tbheight + 8,
-				padding = { 1,1,1,1 },
+				padding = padding,
+				margin = {0,0,0,0},
 				backgroundColor = {0,0,0,0},
 				caption = '',
 				children = {
