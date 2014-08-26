@@ -214,7 +214,7 @@ local function AddHotkeyOptions()
 			name = cmdname_disp,
 			type = 'button',
 			action = cmdnamel,
-			path = 'Game/Commands',
+			path = 'Game/Command Hotkeys',
 		}
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
