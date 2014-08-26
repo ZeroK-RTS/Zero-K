@@ -1394,7 +1394,6 @@ function widget:Initialize()
 	HideInputSpace()
  	
 	self:LocalColorRegister()
-		Spring.Echo("bla")
 end
 
 function widget:GameStart()
