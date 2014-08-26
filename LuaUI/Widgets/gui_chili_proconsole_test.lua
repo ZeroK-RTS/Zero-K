@@ -100,6 +100,8 @@ local DEDUPE_SUFFIX = 'x '
 local MIN_HEIGHT = 50
 local MIN_WIDTH = 300
 local MAX_STORED_MESSAGES = 300
+	
+local inputsize = 25
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -154,7 +156,12 @@ options_order = {
 	
 	--'mousewheel', 
 	'defaultAllyChat',
-	'text_height_chat', 'text_height_console',
+	'defaultBacklogEnabled',
+	'mousewheelBacklog',
+	'enableSwap',
+	'text_height_chat', 
+	'text_height_console',
+	'backchatOpacity',
 	'autohide_text_time',
 	'max_lines',
 	'clickable_points',
@@ -466,7 +473,69 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
-	},	
+	},
+	defaultBacklogEnabled = {
+		name = "Enable backlog at start",
+		desc = "Starts with the backlog chat enabled.",
+		type = 'bool',
+		value = false,
+	},
+	mousewheelBacklog = {
+		name = "Mousewheel Backlog",
+		desc = "Scroll the backlog chat with the mousewheel.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			scrollpanel_backchat.ignoreMouseWheel = not options.mousewheelBacklog.value
+			scrollpanel_backchat:Invalidate()
+		end,
+	},
+	enableSwap = {
+		name = "Backlog Arrow",
+		desc = "Enable the button to swap between chat and backlog chat.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			if self.value then
+				window_chat:AddChild(backlogButton)
+				window_chat:RemoveChild(inputspace)
+				inputspace = WG.Chili.ScrollPanel:New{
+					x = 0,
+					bottom = 0,
+					right = inputsize,
+					height = inputsize,
+					backgroundColor = {1,1,1,1},
+					borderColor = {0,0,0,1},
+					--backgroundColor = {1,1,1,1},
+				}
+				window_chat:AddChild(inputspace)
+			else
+				window_chat:RemoveChild(backlogButton)
+				window_chat:RemoveChild(inputspace)
+				inputspace = WG.Chili.ScrollPanel:New{
+					x = 0,
+					bottom = 0,
+					right = 0,
+					height = inputsize,
+					backgroundColor = {1,1,1,1},
+					borderColor = {0,0,0,1},
+					--backgroundColor = {1,1,1,1},
+				}
+				window_chat:AddChild(inputspace)
+			end
+			window_chat:Invalidate()
+		end,
+	},
+	backchatOpacity = {
+		name = "Backlog Border Opacity",
+		type = 'number',
+		value = 0.5,
+		min = 0, max = 1, step = 0.05,
+		OnChange = function(self)
+			scrollpanel_backchat.borderColor = {0,0,0,self.value}
+			scrollpanel_backchat:Invalidate()
+		end,
+	},
 	autohide_text_time = {
 		name = "Text decay time",
 		type = 'number',
@@ -913,7 +982,7 @@ local function HideInputSpace()
 	inputspace:Invalidate()
 end
 
-local function MakeMessageStack()
+local function MakeMessageStack(margin)
 	return WG.Chili.StackPanel:New{
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
@@ -924,7 +993,7 @@ local function MakeMessageStack()
 		height = 10,
 		resizeItems = false,
 		itemPadding  = { 1, 1, 1, 1 },
-		itemMargin  = { 1, 1, 1, 1 },
+		itemMargin  = { margin, margin, margin, margin },
 		autosize = true,
 		preserveChildrenOrder = true,
 	}
@@ -1124,7 +1193,7 @@ function widget:AddConsoleMessage(msg)
 end
 
 -----------------------------------------------------------------------
-
+local firstUpdate = true
 local timer = 0
 
 -- FIXME wtf is this obsessive function?
@@ -1149,6 +1218,13 @@ function widget:Update(s)
 				fadeTracker[k] = nil
 			end
 		end
+	end
+	
+	if firstUpdate then
+		if options.defaultBacklogEnabled.value then
+			SwapBacklog()
+		end
+		firstUpdate = false
 	end
 end
 
@@ -1194,13 +1270,11 @@ function widget:Initialize()
 	
 	Spring.SendCommands("bind Any+enter  chat")
 	
-	local inputsize = 25
+	stack_console = MakeMessageStack(1)
 	
-	stack_console = MakeMessageStack()
+	stack_chat = MakeMessageStack(0)
 	
-	stack_chat = MakeMessageStack()
-	
-	stack_backchat = MakeMessageStack()
+	stack_backchat = MakeMessageStack(1)
 	
 	inputspace = WG.Chili.ScrollPanel:New{
 		x = 0,
@@ -1233,7 +1307,7 @@ function widget:Initialize()
 	
 	scrollpanel_chat = WG.Chili.ScrollPanel:New{
 		--margin = {5,5,5,5},
-		padding = { 1,1,1,1 },
+		padding = { 1,1,1,4 },
 		x = 0,
 		y = 0,
 		width = '100%',
@@ -1246,8 +1320,8 @@ function widget:Initialize()
 		children = {
 			stack_chat,
 		},
-		
 		verticalScrollbar = false,
+		horizontalScrollbar = false,
 	}
 	
 	--spacer that forces chat to be scrolled to bottom of chat window
@@ -1267,10 +1341,9 @@ function widget:Initialize()
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
 		backgroundColor = options.color_chat_background.value,
-		borderColor = {0,0,0,0.5},
-		
-		horizontalScrollbar=false,
-
+		borderColor = {0,0,0,options.backchatOpacity.value},
+		horizontalScrollbar = false,
+		ignoreMouseWheel = not options.mousewheelBacklog.value,
 		children = {
 			stack_backchat,
 		},
@@ -1314,6 +1387,7 @@ function widget:Initialize()
 	HideInputSpace()
  	
 	self:LocalColorRegister()
+		Spring.Echo("bla")
 end
 
 function widget:GameStart()
