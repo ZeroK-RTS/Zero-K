@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.014"
+local version = "v0.015"
 
 function widget:GetInfo()
   return {
@@ -625,6 +625,7 @@ local function UpdateFacQ(i, facInfo)
 	
 	if not buildQueue  then return end
 	--echo'updating facq'
+	
 	for j,v in ipairs(buildQueue) do
 		for id, num in pairs(v) do
 			unitDefIDb = id
@@ -633,7 +634,23 @@ local function UpdateFacQ(i, facInfo)
 		end
 		local qButton = MakeButton(unitDefIDb, facInfo.unitID, j..'-'..unitDefIDb, i, j )
 		local qCount = qButton.childrenByName['count']
-		qCount:SetCaption(count > 1 and count or '')
+		
+		local altCheck = ''
+		local count2 = 0
+		if j==1 then
+			local commands = Spring.GetFactoryCommands(facInfo.unitID, count)
+			for k, command in ipairs(commands) do
+				if command.options.alt then
+					count2 = count2 + 1
+					count = count - 1
+				end
+			end
+		end
+		if count2 > 0 then
+			altCheck = altCheck .. '\255\255\150\0' .. (count > 1 and '|' or '') .. count2
+		end
+		
+		qCount:SetCaption(count > 1 and count .. altCheck or altCheck)
 		facs[i].qStack:AddChild(qButton)
 	end
 end
