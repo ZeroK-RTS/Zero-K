@@ -134,6 +134,7 @@ unitDef = {
       customparams = {
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
+        timeslow_smartretarget = 0.33,
       },
 
       damage                  = {
