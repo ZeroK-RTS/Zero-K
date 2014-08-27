@@ -80,7 +80,6 @@ end
 
 local padSnapRangeSqr = 80^2
 local REFUEL_TIME = 5*30
-local HEAL_PER_HALF_SECOND = 15
 local PAD_ENERGY_DRAIN = 2.5
 
 --------------------------------------------------------------------------------
@@ -108,7 +107,7 @@ local function SitOnPad(unitID)
 	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 	local cost = ud.metalCost
 	local maxHP = ud.health
-	local healPerHalfSecond = 3*PAD_ENERGY_DRAIN*maxHP/(cost*2)
+	local healPerHalfSecond = 2*PAD_ENERGY_DRAIN*maxHP/(cost*2)
 	local healing = true
 	
 	if not unitMovectrled[unitID] then
