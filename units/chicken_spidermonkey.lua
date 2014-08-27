@@ -148,6 +148,7 @@ unitDef = {
         impulse = [[-200]],
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
+        timeslow_smartretarget = 0.33,
       },
       
       craterBoost             = 0,
