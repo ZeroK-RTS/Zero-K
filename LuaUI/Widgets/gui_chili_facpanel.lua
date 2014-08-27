@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.013"
+local version = "v0.014"
 
 function widget:GetInfo()
   return {
@@ -55,13 +55,6 @@ local function RecreateFacbar() end
 
 options_path = 'Settings/HUD Panels/FactoryPanel'
 options = {
-	maxVisibleBuilds = {
-		type = 'number',
-		name = 'Visible Units in Que',
-		desc = "The maximum units to show in the factory's queue",
-		min = 2, max = 14,
-		value = 5,
-	},	
 	
 	buttonsize = {
 		type = 'number',
@@ -141,7 +134,43 @@ local spGetMouseState	= Spring.GetMouseState
 
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
 
-local tts 	= Spring.Utilities.TableToString
+local tts 	= function (data)
+	 local str = ""
+
+    if(indent == nil) then
+        indent = 0
+    end
+	local indenter = "    "
+    -- Check the type
+    if(type(data) == "string") then
+        str = str .. (indenter):rep(indent) .. data .. "\n"
+    elseif(type(data) == "number") then
+        str = str .. (indenter):rep(indent) .. data .. "\n"
+    elseif(type(data) == "boolean") then
+        if(data == true) then
+            str = str .. "true"
+        else
+            str = str .. "false"
+        end
+    elseif(type(data) == "table") then
+        local i, v
+        for i, v in pairs(data) do
+            -- Check for a table in a table
+            if(type(v) == "table") then
+                str = str .. (indenter):rep(indent) .. i .. ":\n"
+                str = str .. Spring.Utilities.TableToString(v, indent + 2)
+            else
+                str = str .. (indenter):rep(indent) .. i .. ": " .. Spring.Utilities.TableToString(v, 0)
+            end
+        end
+	elseif(type(data) == "function") then
+		str = str .. (indenter):rep(indent) .. 'function' .. "\n"
+    else
+        echo(1, "Error: unknown data type: %s", type(data))
+    end
+
+    return str
+end
 
 local push  = table.insert
 
@@ -279,7 +308,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		},
 	}
 	
-	tocontrol:AddChild(facButton)
+	--tocontrol:AddChild(facButton)
 
 	local boStack = StackPanel:New{
 		name = stackname .. '_bo',
@@ -305,7 +334,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		padding={0,0,0,0},
 		--margin={0, 0, 0, 0},
 		x=0,
-		width=700,
+		width='100%',
 		height = options.buttonsize.value,
 		resizeItems = false,
 		orientation = 'horizontal',
@@ -328,8 +357,30 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		centerItems = false,
 	}
 	
+	
 	facStack:AddChild( qStack )
-	tocontrol:AddChild( facStack )
+	
+	
+	local fullFacStack = StackPanel:New{
+		name = stackname,
+		itemMargin={0,0,0,0},
+		itemPadding={0,0,0,0},
+		padding={0,0,0,0},
+		width=900,
+		height = options.buttonsize.value*1.0,
+		resizeItems = false,
+		centerItems = false,
+		children = {
+			facButton,
+			facStack,
+		},
+		orientation = 'horizontal',
+	}
+	
+	
+	--tocontrol:AddChild( facStack )
+	tocontrol:AddChild( fullFacStack )
+	
 	return facButton, facStack, boStack, qStack, qStore
 end
 
@@ -569,7 +620,7 @@ local function UpdateFacQ(i, facInfo)
 		unitBuildDefID = GetUnitDefID(unitBuildID)
 		_, _, _, _, progress = GetUnitHealth(unitBuildID)
 	end
-	local buildQueue  = Spring.GetFullBuildQueue(facInfo.unitID, options.maxVisibleBuilds.value +1)
+	local buildQueue  = Spring.GetFullBuildQueue(facInfo.unitID, 10)
 	RemoveChildren(facs[i].qStack)
 	
 	if not buildQueue  then return end
@@ -977,18 +1028,20 @@ function widget:Initialize()
 	ScrollPanel = Chili.ScrollPanel
 	screen0 = Chili.Screen0
 
-	stack_main = Grid:New{
+	stack_main = StackPanel:New{
 		y=0,
 		padding = {0,0,0,0},
 		itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
-		width='100%',
+		width=800,
 		--height = '100%',
-		height=500;
+		height=20;
 		resizeItems = false,
-		orientation = 'horizontal',
+		orientation = 'vertical',
 		centerItems = false,
 		columns=2,
+		
+		autosize=true,
 	}
 	
 	stack_build = Panel:New{
@@ -996,7 +1049,7 @@ function widget:Initialize()
 		x=options.buttonsize.value*1.2 + 0, 
 		right=0,
 		--bottom=0,
-		height=500;
+		height='100%';
 		
 		padding = {4, 4, 4, 4},
 		backgroundColor = {0,0,0,0},
@@ -1041,8 +1094,11 @@ function widget:Initialize()
 		width="100%";
 		height="100%";
 		horizontalScrollbar=false;
+		--color = {0,0,0,0},
+		backgroundColor = {0,0,0,0},
+		borderColor = {0,0,0,0},
 		children = {
-			stack_build, --must be first so it's always above of the others (like frontmost layer)
+			--stack_build, --must be first so it's always above of the others (like frontmost layer)
 			--Label:New{ caption='Factories', fontShadow = true, },
 			stack_main,
 		},
@@ -1067,6 +1123,7 @@ function widget:Initialize()
 --		color = {0,0,0,1},
 		caption='Factories',
 		children = {
+			stack_build,
 			scrollpanel
 			--[[
 			stack_build, --must be first so it's always above of the others (like frontmost layer)
