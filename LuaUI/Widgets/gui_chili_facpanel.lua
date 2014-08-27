@@ -647,7 +647,7 @@ local function UpdateFacProg(i, facInfo)
 		_, _, _, _, progress = GetUnitHealth(unitBuildID)
 	end
 	
-	local firstButton = facs[i].qStack.children[1]
+	local firstButton = facs[i].qStack and facs[i].qStack.children[1]
 	if not firstButton then return end
 	if not unitBuildDefID then return end
 	local qBar = firstButton.childrenByName['bp'].childrenByName['prog']
@@ -712,6 +712,7 @@ local function MakeClearButton(unitID)
 					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
 				end
 				Spring.PlaySoundFile(sound_queue_clear, 0.97, 'ui')
+				updateQSoon = true
 			end
 		},
 		children = {
