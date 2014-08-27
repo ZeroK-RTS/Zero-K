@@ -268,7 +268,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	end
 	local turn = goalHeading - startHeading
 	
-	jumping[unitID] = true
+	jumping[unitID] = {vector[1]*step, vector[2]*step, vector[3]*step}
 
 	mcEnable(unitID)
 	Spring.SetUnitVelocity(unitID,0,0,0)
@@ -347,8 +347,10 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 					mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0) --resume unit rotation mid air
 				end
 			end
-			if ((not spGetUnitTeam(unitID)) and fakeUnitID) then
-				spDestroyUnit(fakeUnitID, false, true)
+			if (not Spring.ValidUnitID(unitID)) then
+				if (fakeUnitID) then
+					spDestroyUnit(fakeUnitID, false, true)
+				end
 				return -- unit died
 			end
 			local x0, y0, z0 = spGetUnitPosition(unitID)
@@ -357,9 +359,10 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			local z = start[3] + vector[3]*i
 			mcSetPosition(unitID, x, y, z)
 			if x0 then
+				jumping[unitID] = {x - x0, y - y0, z - z0}
 				spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
 			end
-		
+
 			if cob then
 				spCallCOBScript(unitID, "Jumping", 1, i * 100)
 			else
@@ -378,7 +381,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				halfJump = true
 			end
 			Sleep()
-			i = i + step
+			local slowMult = 1-(Spring.GetUnitRulesParam(unitID, "slowState") or 0)
+			i = i + (step*slowMult)
 		end
 
 		if (fakeUnitID) then 
@@ -393,7 +397,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		local jumpEndTime = spGetGameSeconds()
 		lastJump[unitID] = jumpEndTime
 		lastJumpPosition[unitID] = origCmdParams
-		jumping[unitID] = false
+		jumping[unitID] = nil
 		SetLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
 		mcDisable(unitID)
@@ -410,7 +414,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		if GG.wasMorphedTo[unitID] then
 			unitID,reloadTime = CopyJumpData(unitID,lineDist,flightDist )
 			lastJump[unitID] = jumpEndTime
-			jumping[unitID] = false
+			jumping[unitID] = nil
 			SetLeaveTracks(unitID, true)
 			mcDisable(unitID)
 			if unitID == nil then 
@@ -478,6 +482,15 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	--local t = spGetGameSeconds()
 	lastJump[unitID] = -200
 	spInsertUnitCmdDesc(unitID, jumpCmdDesc)
+end
+
+-- Makes wrecks continue inertially instead of falling straight down
+function gadget:UnitDamaged(unitID)
+	local jump_dir = jumping[unitID]
+	if (Spring.GetUnitHealth(unitID) < 0) and jump_dir then
+		mcDisable(unitID)
+		Spring.AddUnitImpulse(unitID,jump_dir[1],jump_dir[2],jump_dir[3])
+	end
 end
 
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
