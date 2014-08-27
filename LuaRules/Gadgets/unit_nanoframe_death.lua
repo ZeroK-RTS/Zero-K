@@ -92,7 +92,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 
 	local health, _,_,_,progress = spGetUnitHealth(unitID)
 
-	if (progress == 1) or (health > 0 and unitFromFactory[unitID]) then
+	if (progress == 1) or (health > 0 and unitFromFactory[unitID]) or GG.wasMorphedTo[unitID] then
 		isAFactory[unitID] = nil
 		unitFromFactory[unitID] = nil
 		return
@@ -130,6 +130,8 @@ function gadget:Initialize()
 		local team = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, team)
 	end
+	
+	GG.wasMorphedTo = GG.wasMorphedTo or {}
 end
 
 --------------------------------------------------------------------------------
