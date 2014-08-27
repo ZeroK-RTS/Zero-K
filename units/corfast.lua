@@ -110,6 +110,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customparams = {
+        timeslow_damagefactor = 1,
+        timeslow_onlyslow = 1,
+      },
+
       damage                  = {
         default = 180,
       },
