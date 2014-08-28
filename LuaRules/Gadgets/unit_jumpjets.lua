@@ -381,8 +381,11 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				halfJump = true
 			end
 			Sleep()
+			--[[ Slow damage
 			local slowMult = 1-(Spring.GetUnitRulesParam(unitID, "slowState") or 0)
 			i = i + (step*slowMult)
+			]]
+			i = i + step
 		end
 
 		if (fakeUnitID) then 
