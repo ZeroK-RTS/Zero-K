@@ -6,15 +6,15 @@ unitDef = {
   activateWhenBuilt             = true,
   brakeRate                     = 0,
   buildAngle                    = 32700,
-  buildCostEnergy               = 35000,
-  buildCostMetal                = 35000,
+  buildCostEnergy               = 40000,
+  buildCostMetal                = 40000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
   buildingGroundDecalSizeY      = 11,
   buildingGroundDecalType       = [[mahlazer_aoplane.dds]],
   buildPic                      = [[mahlazer.png]],
-  buildTime                     = 35000,
+  buildTime                     = 40000,
   canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
@@ -41,7 +41,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   mass                          = 2013,
-  maxDamage                     = 12000,
+  maxDamage                     = 10000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
@@ -122,7 +122,7 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 200,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -204,7 +204,7 @@ unitDef = {
       craterMult              = 4,
 
       damage                  = {
-        default = 100,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -244,7 +244,7 @@ unitDef = {
       craterMult              = 4,
 
       damage                  = {
-        default = 100,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -285,7 +285,7 @@ unitDef = {
       craterMult              = 0.01,
 
       damage                  = {
-        default = 100,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -395,7 +395,7 @@ unitDef = {
       description      = [[Wreckage - Starlight]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 12000,
+      damage           = 10000,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -403,10 +403,10 @@ unitDef = {
       footprintZ       = 3,
       height           = [[40]],
       hitdensity       = [[100]],
-      metal            = 14000,
+      metal            = 16000,
       object           = [[starlight_d.dae]],
       reclaimable      = true,
-      reclaimTime      = 14000,
+      reclaimTime      = 16000,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -416,17 +416,17 @@ unitDef = {
       description      = [[Debris - Starlight]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 12000,
+      damage           = 10000,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
       height           = [[4]],
       hitdensity       = [[100]],
-      metal            = 7000,
+      metal            = 8000,
       object           = [[debris3x3c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 7000,
+      reclaimTime      = 8000,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
