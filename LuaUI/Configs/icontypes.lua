@@ -954,7 +954,7 @@ local icontypes = {
   mine = {
     bitmap='icons/mine.dds',
 	distance=0.75,
-    size=1.5,
+    size=1.4,
   },
 
   --facs
