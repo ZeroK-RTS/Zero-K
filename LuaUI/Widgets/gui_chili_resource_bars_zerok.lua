@@ -727,7 +727,7 @@ function CreateWindow()
 	local incomeHeight = '42%'
 	local pullHeight = '42%'
 	local incomePullWidth = '25%'
-	local incomePullOffset = p(14.5 + options.barWidth.value)--'21%'
+	local incomePullOffset = p(14.5 + options.barWidth.value) -- Default '21%'
 	local pullVertSpace = '14%'
 	local incomeVertSpace = '8%'
 	
@@ -739,6 +739,7 @@ function CreateWindow()
 	
 	local propBarHeight = '42%'
 	local proBarSpacing = '8%'
+	local proportionWindowSpacing = p(12.5 + options.barWidth.value) -- Default '19%'
 	
 	local barWidth = p(options.barWidth.value) --'6.5%'
 	local barEdgeSpacing = '13%'
@@ -1077,11 +1078,11 @@ function CreateWindow()
 		backgroundColor = {0, 0, 0, 0},
 		parent = window_main_display,
 		dockable = false,
-		name="Proportion Bar",
+		name = "Proportion Bar",
 		padding = {0,0,0,0},
 		y      = 0,
-		x      = '19%',
-		right  = '19%',
+		x      = proportionWindowSpacing,
+		right  = proportionWindowSpacing,
 		bottom = 0,
 		dockable = false;
 		draggable = false,
