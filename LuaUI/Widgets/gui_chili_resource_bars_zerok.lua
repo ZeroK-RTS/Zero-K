@@ -46,7 +46,7 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 --------------------------------------------------------------------------------
 
 local col_metal = {136/255,214/255,251/255,1}
-local col_energy = {1,1,0,1}
+local col_energy = {.93,.93,0,1}
 local col_buildpower = {0.3, 0.8, 0.2, 1}
 
 --------------------------------------------------------------------------------
@@ -467,11 +467,10 @@ function widget:GameFrame(n)
 	"\nOverdrive: " .. teamODInc ..
 	"\nReclaim and Cons: " .. teamOtherM ..
 	"\nConstruction: " .. totalConstruction ..
-	"\nWaste: " .. teamWasteM ..
-	"\n" .. 
-	"\nTotal Stored: " .. totalMetalStored
+	"\nWaste: " .. teamWasteM
 
 	image_metal.tooltip = bar_metal.tooltip
+	lbl_metal.tooltip = bar_metal.tooltip
 	
 	bar_energy.tooltip = "Local Energy Economy" ..
 	"\nIncome: " .. energyInc ..
@@ -489,13 +488,14 @@ function widget:GameFrame(n)
 	"\nWaste: " .. totalWaste
 
 	image_energy.tooltip = bar_energy.tooltip
+	lbl_energy.tooltip = bar_energy.tooltip
 
 
-	-- local mTotal
+	local mTotal
 	-- if options.onlyShowExpense.value then
-	-- 	mTotal = mInco - mExpe + mReci
+		-- mTotal = mInco - mExpe + mReci
 	-- else
-	-- 	mTotal = mInco - mPull + mReci
+		mTotal = mInco - mPull + mReci
 	-- end
 
 	-- if (mTotal >= 2) then
@@ -505,20 +505,20 @@ function widget:GameFrame(n)
 	-- else
 	-- 	lbl_metal.font:SetColor(1,0,0,1)
 	-- end
-	-- local abs_mTotal = abs(mTotal)
-	-- if (abs_mTotal <0.1) then
-	-- 	lbl_metal:SetCaption( "\1770" )
-	-- elseif (abs_mTotal >=10)and((abs(mTotal%1)<0.1)or(abs_mTotal>99)) then
-	-- 	lbl_metal:SetCaption( ("%+.0f"):format(mTotal) )
-	-- else
-	-- 	lbl_metal:SetCaption( ("%+.1f"):format(mTotal) )
-	-- end
+	local abs_mTotal = abs(mTotal)
+	if (abs_mTotal <0.1) then
+		lbl_metal:SetCaption( "\1770" )
+	elseif (abs_mTotal >=10)and((abs(mTotal%1)<0.1)or(abs_mTotal>99)) then
+		lbl_metal:SetCaption( Format(mTotal) )
+	else
+		lbl_metal:SetCaption( Format(mTotal) )
+	end
 
-	-- local eTotal
+	local eTotal
 	-- if options.onlyShowExpense.value then
-	-- 	eTotal = eInco - eExpe
+		-- eTotal = eInco - eExpe
 	-- else
-	-- 	eTotal = eInco - ePull
+		eTotal = eInco - ePull
 	-- end
 	
 	-- if (eTotal >= 2) then
@@ -530,14 +530,14 @@ function widget:GameFrame(n)
 	-- else		
 	-- 	lbl_energy.font:SetColor(1,0,0,1)
 	-- end
-	-- local abs_eTotal = abs(eTotal)
-	-- if (abs_eTotal<0.1) then
-	-- 	lbl_energy:SetCaption( "\1770" )
-	-- elseif (abs_eTotal>=10)and((abs(eTotal%1)<0.1)or(abs_eTotal>99)) then
-	-- 	lbl_energy:SetCaption( ("%+.0f"):format(eTotal) )
-	-- else
-	-- 	lbl_energy:SetCaption( ("%+.1f"):format(eTotal) )
-	-- end
+	local abs_eTotal = abs(eTotal)
+	if (abs_eTotal<0.1) then
+		lbl_energy:SetCaption( "\1770" )
+	elseif (abs_eTotal>=10)and((abs(eTotal%1)<0.1)or(abs_eTotal>99)) then
+		lbl_energy:SetCaption( Format(eTotal) )
+	else
+		lbl_energy:SetCaption( Format(eTotal) )
+	end
 
 
 	lbl_m_expense:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
@@ -545,24 +545,54 @@ function widget:GameFrame(n)
 	lbl_m_income:SetCaption( Format(mInco+mReci, positiveColourStr.."+") )
 	lbl_e_income:SetCaption( Format(eInco, positiveColourStr.."+") )
 
-	--Delta Storage indicators. These are for delta storage, so if they do not reflect the change in storage, there is a bug
-	local deltaStorageThreshold = 1 
+	-- Delta Storage indicators. These are for delta storage, so if they do not reflect the change in storage, there is a bug
+	-- local deltaStorageThreshold = 0.1
 
-	if (mInco - mExpe + mReci > deltaStorageThreshold) and (mCurr < mStor * 0.98) then
-		bar_metal:SetCaption(positiveColourStr.."^")
-	elseif (mInco - mExpe + mReci < -deltaStorageThreshold) and (mCurr > mStor * 0.02) then
-		bar_metal:SetCaption(negativeColourStr.."v")
-	else
-		bar_metal:SetCaption("")
-	end
+	-- local mStorDelta = mInco - mExpe + mReci
+	-- local eStorDelta = eInco - eExpe
 
-	if (eInco - eExpe > deltaStorageThreshold) and not wastingE then
-		bar_energy:SetCaption(positiveColourStr.."^")
-	elseif (eInco - eExpe < -deltaStorageThreshold) and (eCurr > eStor * 0.02) then --TODO: test interaction with reserves
-		bar_energy:SetCaption(negativeColourStr.."v")
-	else
-		bar_energy:SetCaption("")
-	end
+	bar_energy:SetCaption(("%.0f"):format(eCurr))
+	bar_metal:SetCaption(("%.0f"):format(mCurr))
+
+	-- if (mStorDelta > deltaStorageThreshold) and (mCurr < mStor * 0.98) then
+		-- if (mStorDelta > 10.0) then
+		-- 	bar_metal:SetCaption(positiveColourStr.."^^^")
+		-- elseif (mStorDelta > 5.0) then
+		-- 	bar_metal:SetCaption(positiveColourStr.."^^")
+		-- else
+			-- bar_metal:SetCaption(positiveColourStr.."+"..("%.0f"):format(mStorDelta))
+		-- end
+	-- elseif (mStorDelta < -deltaStorageThreshold) and (mCurr > mStor * 0.02) then
+		-- if (mStorDelta < -10.0) then
+		-- 	bar_metal:SetCaption(negativeColourStr.."vvv")
+		-- elseif (mStorDelta < -5.0) then
+		-- 	bar_metal:SetCaption(negativeColourStr.."vv")
+		-- else
+			-- bar_metal:SetCaption(negativeColourStr..("%.0f"):format(mStorDelta))
+		-- end
+	-- else
+		-- bar_metal:SetCaption("")
+	-- end
+
+	-- if (eStorDelta > deltaStorageThreshold) and (eCurr < eStor * 0.98) then
+		-- if (eStorDelta > 10.0) then
+		-- 	bar_energy:SetCaption(positiveColourStr.."^^^")
+		-- elseif (eStorDelta > 5.0) then
+		-- 	bar_energy:SetCaption(positiveColourStr.."^^")
+		-- else
+			-- bar_energy:SetCaption(positiveColourStr.."+"..("%.0f"):format(eStorDelta))
+		-- end
+	-- elseif (eStorDelta < -deltaStorageThreshold) and (eCurr > eStor * 0.02) then --TODO: test interaction with reserves
+		-- if (eStorDelta < -10.0) then
+		-- 	bar_energy:SetCaption(negativeColourStr.."vvv")
+		-- elseif (eStorDelta < -5.0) then
+		-- 	bar_energy:SetCaption(negativeColourStr.."vv")
+		-- else
+			-- bar_energy:SetCaption(negativeColourStr..("%.0f"):format(eStorDelta))
+		-- end
+	-- else
+		-- bar_energy:SetCaption("")
+	-- end
 
 	--Proportion background bars
 	if (mInco+mReci+eInco > 0) then
@@ -689,8 +719,8 @@ function CreateWindow()
 	local pullVertSpace = '14%'
 	local incomeVertSpace = '8%'
 	
-	local imageWidth ='10%'
-	local imageHorSpacing = '3%'
+	local imageWidth ='13%'
+	local imageHorSpacing = '1%'
 	local imageVertSpacing = '10%'
 	local imageHeight = '60%'
 	local storageLabelHeight = '35%'
@@ -888,7 +918,7 @@ function CreateWindow()
 		y      = 5,
 		bottom = 5,
 		tooltip = "This shows your current metal reserves",
-		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+		font   = {color = {.8,.8,.8,.95}, outlineColor = {0.1,0,0,0.8}, },
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
@@ -1005,7 +1035,7 @@ function CreateWindow()
 		y      = 5,
 		bottom = 5,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
-		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+		font   = {color = {.8,.8,.9,.95}, outlineColor = {0.05,0,0.15,0.95}, },
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
@@ -1085,7 +1115,7 @@ function CreateWindow()
 
 	bar_metal_proportion = Chili.Progressbar:New{
 		parent = window_metal_proportion,
-		color  = {col_metal[1], col_metal[2], col_metal[3], 0.55},
+		color  = {col_metal[1], col_metal[2], col_metal[3], 0.30},
 		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
@@ -1099,7 +1129,7 @@ function CreateWindow()
 
 	Chili.Progressbar:New{
 		parent = window_metal_proportion,
-		color  = {col_energy[1], col_energy[2], col_energy[3], 0.35},
+		color  = {col_energy[1], col_energy[2], col_energy[3], 0.17},
 		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
@@ -1115,8 +1145,8 @@ function CreateWindow()
 	function bar_metal:HitTest(x,y) return self	end
 	function image_energy:HitTest(x,y) return self end
 	function bar_energy:HitTest(x,y) return self end
-	-- function lbl_energy:HitTest(x,y) return self end
-	-- function lbl_metal:HitTest(x,y) return self end
+	function lbl_energy:HitTest(x,y) return self end
+	function lbl_metal:HitTest(x,y) return self end
 	function lbl_e_income:HitTest(x,y) return self end
 	function lbl_m_income:HitTest(x,y) return self end
 	function lbl_e_expense:HitTest(x,y) return self end
