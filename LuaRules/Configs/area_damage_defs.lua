@@ -40,7 +40,7 @@ local weapons = {
 		timeFall = 0.5 
 	},
 	raveparty_orange_roaster = { 
-		radius = 256, 
+		radius = 320, 
 		damage = 40, 
 		duration = 450, 
 		rangeFall = 0.6, 

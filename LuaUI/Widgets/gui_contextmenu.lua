@@ -74,6 +74,7 @@ local window_unitcontext, window_unitstats
 local statswindows = {}
 
 local colorCyan = {0.2, 0.7, 1, 1}
+local colorPurple = {0.9, 0.2, 1, 1}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -335,7 +336,7 @@ local function weapons2Table(cells, weaponStats, ws)
 		if ws.count > 1 then
 			name_str = name_str .. " x " .. ws.count
 		end
-		
+
 		local dps_str, dam_str = '', ''
 		if ws.dps > 0 then
 			dam_str = dam_str .. numformat(ws.dam,2)
@@ -349,10 +350,18 @@ local function weapons2Table(cells, weaponStats, ws)
 			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(ws.damw,2) .. " (P)\008"
 			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(ws.dpsw*ws.mult,2) .. " (P)\008"
 		end
+		if ws.dpss > 0 then
+			if dps_str ~= '' then
+				dps_str = dps_str .. ' + '
+				dam_str = dam_str .. ' + '
+			end
+			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(ws.dams,2) .. " (S)\008"
+			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(ws.dpss*ws.mult,2) .. " (S)\008"
+		end
 		if ws.mult > 1 then
 			dam_str = dam_str .. " x " .. ws.mult
 		end
-		
+
 		local reload_str
 		if ws.reloadtime < 1 then
 			reload_str = string.format("%.2f", ws.reloadtime)
@@ -384,7 +393,7 @@ local function printWeapons(unitDef)
 
 	local wd = WeaponDefs
 	if not wd then return false end	
-	
+
 	for i=1, #unitDef.weapons do
 		local weapon = unitDef.weapons[i]
 		local weaponID = weapon.weaponDef
@@ -426,7 +435,8 @@ local function printWeapons(unitDef)
 				wsTemp.projectiles = weaponDef.projectiles or 1
 				wsTemp.dam = 0
 				wsTemp.damw = 0
-				
+				wsTemp.dams = 0
+
 				wsTemp.mult = tonumber(cp.statsprojectiles) or wsTemp.burst * wsTemp.projectiles
 				if wsTemp.paralyzer then
 					wsTemp.damw = wsTemp.bestTypeDamagew
@@ -439,6 +449,7 @@ local function printWeapons(unitDef)
 				wsTemp.wname = weaponDef.description or 'NoName Weapon'
 				wsTemp.dps = 0
 				wsTemp.dpsw = 0
+				wsTemp.dpss = 0
 				if  wsTemp.reloadtime ~= '' and wsTemp.reloadtime > 0 then
 					if wsTemp.paralyzer then
 						wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
@@ -456,17 +467,32 @@ local function printWeapons(unitDef)
 					bestDamageIndex = i
 				end
 			end
-			
+
 			if weaponDef.customParams.extra_damage then
 				wsTemp.dam = weaponDef.customParams.extra_damage * wsTemp.burst * wsTemp.projectiles -- is it right?
 				wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
 			elseif weaponDef.customParams.stats_damage then
 				wsTemp.dam = weaponDef.customParams.stats_damage
 			end
-			
+
 			if weaponDef.customParams.stats_empdamage then
 				wsTemp.damw = weaponDef.customParams.stats_empdamage
 			end
+
+			if cp.timeslow_damagefactor then
+				wsTemp.dams = (wsTemp.paralyzer and wsTemp.damw or wsTemp.dam) * cp.timeslow_damagefactor
+				wsTemp.dpss = (wsTemp.paralyzer and wsTemp.dpsw or wsTemp.dps) * cp.timeslow_damagefactor
+				if cp.timeslow_onlyslow then
+					if wsTemp.paralyzer then
+						wsTemp.damw = 0
+						wsTemp.dpsw = 0
+					else
+						wsTemp.dam = 0
+						wsTemp.dps = 0
+					end
+				end
+			end
+
 			weaponStats[#weaponStats+1] = wsTemp
 		end
 	end

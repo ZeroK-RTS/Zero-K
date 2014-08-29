@@ -18,19 +18,8 @@ local UPDATE_PERIOD = 15 -- I'd prefer if this was not changed
 
 
 local weapons = {
-	slowmort_slowbeam = { slowDamage = 175, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	slowmort_disruptor_beam = { slowDamage = 1500, onlySlow = false, scaleSlow = true},
-	subraider_torpedo = { slowDamage = 700, onlySlow = false, scaleSlow = true},
-	gunshipsupport_vtol_rocket = { slowDamage = 570, onlySlow = false, scaleSlow = true},
-	corfast_slowbeam = { slowDamage = 180, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	corgol_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	cormak_blast = { slowDamage = 75, noDeathBlast = true, scaleSlow = true },
 	corcrw_timedistort = { slowDamage = 100, onlySlow = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },
-	raveparty_violet_slugger = { slowDamage = 2500, noDeathBlast = true, scaleSlow = true },
-	chicken_spidermonkey_web = { slowDamage = 30, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
-	amphfloater_cannon = { slowDamage = 250, scaleSlow = true},
-	corsumo_disruptor = { slowDamage = 500, scaleSlow = true },
 	vehdisable_disableray = { slowDamage = 30, scaleSlow = false },
 }
 
