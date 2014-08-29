@@ -124,10 +124,10 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'eExcessFlash', 'energyFlash', 'workerUsage','opacity',
+	'eExcessFlash', 'energyFlash', 'workerUsage','opacity', 'barWidth',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
 	'colourBlind','linearProportionBar',
-	'incomeFont','expenseFont','storageFont',}
+	'incomeFont','expenseFont','storageFont', 'netFont'}
  
 options = { 
 	eExcessFlash = {
@@ -195,13 +195,25 @@ options = {
 	expenseFont = {
 		name  = "Expense Font Size",
 		type  = "number",
-		value = 16, min = 8, max = 40, step = 1,
+		value = 17, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 	storageFont = {
 		name  = "Storage Font Size",
 		type  = "number",
 		value = 12, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
+	netFont = {
+		name  = "Net Font Size",
+		type  = "number",
+		value = 13, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
+	barWidth = {
+		name  = "Storage Bar Width (%)",
+		type  = "number",
+		value = 7.5, min = 4, max = 12, step = 0.5,
 		OnChange = option_recreateWindow
 	},
 }
@@ -715,7 +727,7 @@ function CreateWindow()
 	local incomeHeight = '42%'
 	local pullHeight = '42%'
 	local incomePullWidth = '25%'
-	local incomePullOffset = '21%'
+	local incomePullOffset = p(14.5 + options.barWidth.value)--'21%'
 	local pullVertSpace = '14%'
 	local incomeVertSpace = '8%'
 	
@@ -728,7 +740,7 @@ function CreateWindow()
 	local propBarHeight = '42%'
 	local proBarSpacing = '8%'
 	
-	local barWidth = '6.5%'
+	local barWidth = p(options.barWidth.value) --'6.5%'
 	local barEdgeSpacing = '13%'
 	
 	local buildPowerBarSpacing = '15%'
@@ -879,7 +891,7 @@ function CreateWindow()
 		align  = "center",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.storageFont.value, outline = true, color = {.8,.8,.8,.95}},
+		font   = {size = options.netFont.value, outline = true, color = {.8,.8,.8,.95}},
 		tooltip = "Your net metal income",
 	}
 	
@@ -918,7 +930,7 @@ function CreateWindow()
 		y      = 5,
 		bottom = 5,
 		tooltip = "This shows your current metal reserves",
-		font   = {color = {.8,.8,.8,.95}, outlineColor = {0.1,0,0,0.8}, },
+		font   = {size = options.storageFont.value, color = {.8,.8,.8,.95}, outlineColor = {0.1,0,0,0.8}, },
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
@@ -980,7 +992,7 @@ function CreateWindow()
 		valign = "center",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.storageFont.value, outline = true, color = {.8,.8,.8,.95}},
+		font   = {size = options.netFont.value, outline = true, color = {.8,.8,.8,.95}},
 		tooltip = "Your current stored energy.",
 	}
 	
@@ -1035,7 +1047,7 @@ function CreateWindow()
 		y      = 5,
 		bottom = 5,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
-		font   = {color = {.8,.8,.9,.95}, outlineColor = {0.05,0,0.15,0.95}, },
+		font   = {size = options.storageFont.value, color = {.8,.8,.9,.95}, outlineColor = {0.05,0,0.15,0.95}, },
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
