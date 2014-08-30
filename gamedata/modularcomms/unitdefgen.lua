@@ -253,6 +253,11 @@ local function ProcessComm(name, config)
 				end
 			end
 		end
+		
+		-- apply misc. defs
+		if config.miscDefs then
+			commDefs[name] = MergeTable(commDefs[name], config.miscDefs, true)
+		end
 	end
 end
 
