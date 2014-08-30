@@ -955,7 +955,7 @@ function gadget:GameFrame(n)
   if n == (COMM_SELECT_TIMEOUT) then
 	for team in pairs(waitingForComm) do
 		local _,playerID = spGetTeamInfo(team)
-		teamSides[team] = "commbasic"
+		teamSides[team] = DEFAULT_UNIT_TEAMSIDES
 		--playerSides[playerID] = "basiccomm"
 		scheduledSpawn[n] = scheduledSpawn[n] or {}
 		scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team, playerID} -- playerID is needed here so the player can't spawn coms 2 times in coop mode

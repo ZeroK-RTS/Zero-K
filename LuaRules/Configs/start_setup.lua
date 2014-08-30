@@ -58,12 +58,13 @@ OVERDRIVE_BUFFER=10000
 
 BASE_COMM_COST = UnitDefNames.armcom1.metalCost or 1200
 
-COMM_SELECT_TIMEOUT = 30 * 60 * 0.5 -- half a minute
+COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
 EXCLUDED_UNITS = {
   [ UnitDefNames['terraunit'].id ] = true,
 }
 
-DEFAULT_UNIT = "commbasic"		--FIXME: hardcodey until I cba to identify precise source of problem
+DEFAULT_UNIT = "comm_trainer_strike"		--FIXME: hardcodey until I cba to identify precise source of problem
+DEFAULT_UNIT_TEAMSIDES = "Strike Trainer"
 
 JOKE_UNIT = "neebcomm"

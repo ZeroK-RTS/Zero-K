@@ -111,7 +111,7 @@ end
 function Close(commPicked)
 	if not commPicked then
 		--Spring.Echo("Requesting baseline comm")
-		--Spring.SendLuaRulesMsg("faction:commbasic")
+		--Spring.SendLuaRulesMsg("faction:comm_trainer_strike")
 	end
 	--Spring_SendCommands("say: a:I chose " .. option.button})
 	if mainWindow then mainWindow:Dispose() end
@@ -155,8 +155,9 @@ local function CreateWindow()
 	local i = 0
 	for index,option in ipairs(optionData) do
 		i = i + 1
+		local hideButton = options.hideTrainers.value and option.trainer
 		local button = Button:New {
-			parent = grid,
+			parent = (not hideButton) and grid or nil,
 			caption = "",	--option.name,	--option.trainer and "TRAINER" or "",
 			valign = "bottom",
 			tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
