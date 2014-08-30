@@ -17,11 +17,11 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Lanceur de filet tout terrain]],
-	description_de = [[Gelandeg‰ngige Luftabwehr]],
+	description_de = [[Gelandeg√§ngige Luftabwehr]],
 	description_pl = [[Terenowe wsparcie]],
     helptext       = [[The Spidermonkey is a very unusual support chicken. As the name suggests, it can climb walls, however it can also spin a silk line that slows and yanks enemies.]],
     helptext_fr    = [[Le spidermonkey est une unit? de soutien tr?s inhabituelle parmis les poulets. Comme le nom l'indique il peut grimper les parois les plus escarp?es mais peut en plus projetter comme une fronde un filet pour bloquer au sol les unit?s a?riennes, ? la mani?re d'une araign?e attrappant des insectes.]],
-	helptext_de    = [[Der Spidermonkey ist ein sehr ungewˆhnliches Chicken. Wie der Name verr‰t, kann er W‰nde hochklettern und schlieﬂlich auch wie eine Spinne per Netz seine Fliegen, bzw. Flugzeuge Luft fangen.]],
+	helptext_de    = [[Der Spidermonkey ist ein sehr ungew√∂hnliches Chicken. Wie der Name verr√§t, kann er W√§nde hochklettern und schlie√ülich auch wie eine Spinne per Netz seine Fliegen, bzw. Flugzeuge Luft fangen.]],
 	helptext_pl    = [[Spidermonkey wije i wypluwa siec, ktora utrudnia ruch i atak trafionym jednostkom; moze takze wspinac sie na strome wzniesienia.]],
   },
 
@@ -145,14 +145,17 @@ unitDef = {
       accuracy                = 800,
       
       customParams            = {
-	impulse = [[-200]],
+        impulse = [[-200]],
+        timeslow_damagefactor = 1,
+        timeslow_onlyslow = 1,
+        timeslow_smartretarget = 0.33,
       },
       
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 15,
+        default = 30,
         subs    = 0.75,
       },
 

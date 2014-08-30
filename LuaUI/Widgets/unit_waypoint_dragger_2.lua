@@ -49,12 +49,29 @@ local cmdColorsTbl = {
 	[CMD_JUMP]         = {0.0, 1.0, 0.0, 0.7},
 }
 
+local POINT_COMMAND = {
+	[CMD.MOVE] = true,
+	[CMD.PATROL] = true,
+	[CMD_JUMP] = true,
+	[CMD.FIGHT] = true,
+}
+
+local AREA_COMMAND = {
+	[CMD.RECLAIM] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RESURRECT] = true,
+	[CMD.LOAD_UNITS] = true,
+	[CMD.UNLOAD_UNITS] = true,
+	[CMD.AREA_ATTACK] = true,
+	[CMD.RESTORE] = true,
+}
+
 local wayPtSelDist = 30
 local selWayPtsTbl = {}
 
 function widget:GetInfo()
 	return {
-		name      = "unit_waypoint_dragger",
+		name      = "Waypoint Dragger",
 		desc      = "Enables Waypoint Dragging",
 		author    = "Kloot",
 		date      = "Aug. 8, 2007 [updated Aug. 14, 2009]",
@@ -69,8 +86,6 @@ end
 
 function widget:Shutdown()
 end
-
-
 
 local function GetCommandColor(cmdID)
 	if (cmdID < 0) then
@@ -105,73 +120,41 @@ end
 local function GetCommandWorldPosition(cmd)
 	local cmdID   = cmd.id
 	local cmdPars = cmd.params
+	local x, y, z, radius
 
-	if (cmdID == CMD.MOVE) then
-		return cmdPars[1], cmdPars[2], cmdPars[3], 0
-	end
-	if (cmdID == CMD.PATROL) then
-		return cmdPars[1], cmdPars[2], cmdPars[3], 0
-	end
-
-	if (cmdID == CMD_JUMP) then
-		return cmdPars[1], cmdPars[2], cmdPars[3], 0
+	if POINT_COMMAND[cmdID] then
+		x, z, radius = cmdPars[1], cmdPars[3], 0
 	end
 	
-	if (cmdID == CMD.RECLAIM) then
+	if AREA_COMMAND[cmdID] then
 		if (#cmdPars >= 4) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], cmdPars[4]
+			x, z, radius = cmdPars[1], cmdPars[3], cmdPars[4]
 		end
 	end
-	if (cmdID == CMD.REPAIR) then
-		if (#cmdPars >= 4) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], cmdPars[4]
-		end
-	end
-	if (cmdID == CMD.RESURRECT) then
-		if (#cmdPars >= 4) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], cmdPars[4]
-		end
-	end
-
-	if (cmdID == CMD.LOAD_UNITS) then
-		if (#cmdPars >= 4) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], cmdPars[4]
-		end
-	end
-	if (cmdID == CMD.UNLOAD_UNITS) then
-		if (#cmdPars >= 4) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], cmdPars[4]
-		end
-	end
-
-	if (cmdID == CMD.AREA_ATTACK) then
-		if (#cmdPars >= 4) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], cmdPars[4]
-		end
-	end
-
-	if (cmdID == CMD.RESTORE) then
-		if (#cmdPars >= 4) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], cmdPars[4]
-		end
-	end
-
 
 	if (cmdID == CMD.ATTACK) then
 		if (#cmdPars >= 3) then
-			return cmdPars[1], cmdPars[2], cmdPars[3], 0
+		x, z, radius = cmdPars[1], cmdPars[3], 0
 		end
-	end
-	if (cmdID == CMD.FIGHT) then
-		return cmdPars[1], cmdPars[2], cmdPars[3], 0
 	end
 
 	if (cmdID < 0) then
 		-- include the build facing (if non-default)
-		return cmdPars[1], cmdPars[2], cmdPars[3], (cmdPars[4] or 0)
+		x, z, radius = cmdPars[1], cmdPars[3], (cmdPars[4] or 0)
+		local ud = UnitDefs[-cmdID]
+		if ud then
+			local evenX = ((ud.xsize/2)%2)*8
+			local evenZ = ((ud.zsize/2)%2)*8
+			x = math.floor((x + 8 - evenX)/16)*16 + evenX
+			z = math.floor((z + 8 - evenZ)/16)*16 + evenZ
+		end
+	end
+	
+	if x then
+		y = Spring.GetGroundHeight(x,z)
 	end
 
-	return nil, nil, nil, nil
+	return x,y,z,radius
 end
 
 -- measure distance from waypoint to cursor in screen-space coordinates

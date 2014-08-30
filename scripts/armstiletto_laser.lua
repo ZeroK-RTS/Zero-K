@@ -41,32 +41,35 @@ function script.FireWeapon1()
 	end
 	
 	for i = 1, 80 do
-		local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
-		local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
-		local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
-		local xdx = xx - bx
-		local xdy = xy - by
-		local xdz = xz - bz
-		local zdx = zx - bx
-		local zdy = zy - by
-		local zdz = zz - bz
-		local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
-		local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
-
-		Turn( preDrop , x_axis, angle_x)
-		Turn( preDrop , z_axis, -angle_z)
-		
-		EmitSfx( drop,  FIRE_W2 )
-		if sound_index == 0 then
-			local px, py, pz = Spring.GetUnitPosition(unitID)
-			Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
+		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
+		if not stunned_or_inbuild then
+			local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
+			local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
+			local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
+			local xdx = xx - bx
+			local xdy = xy - by
+			local xdz = xz - bz
+			local zdx = zx - bx
+			local zdy = zy - by
+			local zdz = zz - bz
+			local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
+			local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
+	
+			Turn( preDrop , x_axis, angle_x)
+			Turn( preDrop , z_axis, -angle_z)
+			
+			EmitSfx( drop,  FIRE_W2 )
+			if sound_index == 0 then
+				local px, py, pz = Spring.GetUnitPosition(unitID)
+				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
+			end
+			sound_index = sound_index + 1
+			if sound_index >= 6 then
+				sound_index = 0
+			end
 		end
-		sound_index = sound_index + 1
-		if sound_index >= 6 then
-			sound_index = 0
-		end
-		
-		Sleep(35) -- fire density
+		local slowMult = 1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		Sleep(35/slowMult) -- fire density
 	end
 	
 	Reload()

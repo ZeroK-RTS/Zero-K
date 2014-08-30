@@ -592,12 +592,8 @@ local firstUpdate = true
 function widget:Update()
 	if firstUpdate then
 		if options.setToDefault.value then
-			-- Default presets are not set. This lets current players
-			-- a set "Set To Default Once" to false without resetting 
-			-- their UI. After a week or so the set to default presets
-			-- should be enabled to make this widget the central point
-			-- for UI configuration, including default.
-			--SetupDefaultPreset()
+			-- This is where the defaults are set.
+			SetupDefaultPreset()
 			options.setToDefault.value = false
 		end
 		firstUpdate = false

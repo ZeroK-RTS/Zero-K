@@ -96,7 +96,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-	  cegTag                  = [[torptrailpurple]],
+      cegTag                  = [[torptrailpurple]],
+
+      customparams = {
+        timeslow_damagefactor = 2,
+      },
 
       damage                  = {
         default = 350,

@@ -68,6 +68,7 @@ unitDef = {
       name                    = [[Napalm Missile]],
       cegTag                  = [[napalmtrail]],
       areaOfEffect            = 512,
+	  craterAreaOfEffect      = 64,
       avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 4,

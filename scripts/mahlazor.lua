@@ -35,7 +35,7 @@ function TargetingLaser()
 			oldHeight = newHeight
 		end
 		
-		awake = not spGetUnitIsStunned(unitID);
+		awake = (not spGetUnitIsStunned(unitID)) and (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1);
 		
 		if awake then		
 			if shooting ~= 0 then
