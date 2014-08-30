@@ -988,6 +988,16 @@ local function AlignScrollPanel()
 	end
 end
 
+function ToggleVisibility()
+	if window_cpl and scroll_cpl then
+		if options.visible.value then
+			window_cpl:AddChild(scroll_cpl)
+		else
+			window_cpl:RemoveChild(scroll_cpl)
+		end
+	end
+end
+
 SetupPlayerNames = function()
 	entities = {}
 	teams = {}
@@ -1368,16 +1378,7 @@ SetupPanels = function ()
 
 	SetupScrollPanel()
 
-end
-
-function ToggleVisibility()
-	if window_cpl and scroll_cpl then
-		if options.visible.value then
-			window_cpl:AddChild(scroll_cpl)
-		else
-			window_cpl:RemoveChild(scroll_cpl)
-		end
-	end
+	ToggleVisibility()
 end
 
 function PlayersChanged()
