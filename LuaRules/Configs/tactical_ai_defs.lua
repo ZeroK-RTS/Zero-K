@@ -222,6 +222,12 @@ local skirmableAir = {
 	["corcrw"] = true,
 }
 
+-- Brawler, for AA to swarm.
+local brawler = {
+	["armbrawl"] = true,
+}
+
+brawler = NameTableToUnitDefID(brawler)
 skirmableAir = NameTableToUnitDefID(skirmableAir)
 
 -- Things that are fled by some things
@@ -864,8 +870,9 @@ local behaviourConfig = {
 	-- mobile AA
 	["armjeth"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -873,8 +880,20 @@ local behaviourConfig = {
 	},
 	["corcrash"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+        skirmLeeway = 50, 
+	},
+	["vehaa"] = {
+		skirms = skirmableAir, 
+		swarms = brawler, 
+		flees = armedLand,
+		minSwarmLeeway = 100,
+		strafeOrderLength = 180,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -882,8 +901,9 @@ local behaviourConfig = {
 	},
 	["armaak"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -891,8 +911,9 @@ local behaviourConfig = {
 	},
 	["hoveraa"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -901,8 +922,9 @@ local behaviourConfig = {
 	},
 	["spideraa"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -910,8 +932,9 @@ local behaviourConfig = {
 	},
 	["corsent"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -919,9 +942,10 @@ local behaviourConfig = {
 		skirmOrderDis = 200, 
 	},
 	["amphaa"] = {
-		skirms = skirmableAir, 
-		swarms = {}, 
+		skirms = skirmableAir,
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -930,8 +954,9 @@ local behaviourConfig = {
 	},
 	["shipaa"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
@@ -940,8 +965,9 @@ local behaviourConfig = {
 	},
 	["gunshipaa"] = {
 		skirms = skirmableAir, 
-		swarms = {}, 
+		swarms = brawler, 
 		flees = armedLand,
+		minSwarmLeeway = 100,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
