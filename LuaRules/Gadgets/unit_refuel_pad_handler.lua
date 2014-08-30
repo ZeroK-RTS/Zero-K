@@ -146,6 +146,7 @@ local function SitOnPad(unitID)
 				if not spGetUnitIsDead(unitID) then
 					spSetUnitLeaveTracks(unitID, true)
 					spSetUnitVelocity(unitID, 0, 0, 0)
+					Spring.SetUnitResourcing(unitID, "uue" ,0)
 					mcDisable(unitID)
 					GG.UpdateUnitAttributes(unitID)
 				end
@@ -200,6 +201,7 @@ local function SitOnPad(unitID)
 		
 		spSetUnitLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
+		Spring.SetUnitResourcing(unitID, "uue" ,0)
 		mcDisable(unitID)
 		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available 
 		unitMovectrled[unitID] = nil
