@@ -497,8 +497,13 @@ local function WidgetEnabled(wname)
 	return order and (order > 0)
 end
 
-local function AmIPlayingAlone() --I am playing and playing alone with no other player existing
+-- by default it allows if player is not spectating and there are no other players
+
+local function AllowPauseOnMenuChange()
 	if Spring.GetSpectatingState() then
+		return false
+	end
+	if settings.config['epic_Settings/Misc_Menu_pauses_in_SP'] == false then
 		return false
 	end
 	local playerlist = Spring.GetPlayerList() or {}
@@ -535,7 +540,7 @@ local function KillSubWindow(makingNew)
 		window_sub_cur:Dispose()
 		window_sub_cur = nil
 		curPath = ''
-		if not makingNew and AmIPlayingAlone() then
+		if not makingNew and AllowPauseOnMenuChange() then
 			local paused = select(3, Spring.GetGameSpeed())
 			if paused then
 				spSendCommands("pause")
@@ -1943,7 +1948,7 @@ MakeSubWindow = function(path, pause)
 		children = window_children,
 	}
 	AdjustWindow(window_sub_cur)
-	if pause and AmIPlayingAlone() then
+	if pause and AllowPauseOnMenuChange() then
 		local paused = select(3, Spring.GetGameSpeed())
 		if not paused then
 			spSendCommands("pause")
@@ -1962,7 +1967,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:AddChild(window_sub_cur)
-			if (not dontChangePause) and AmIPlayingAlone() then
+			if (not dontChangePause) and AllowPauseOnMenuChange() then
 				local paused = select(3, Spring.GetGameSpeed())
 				if (not paused) and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -1976,7 +1981,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:RemoveChild(window_sub_cur)
-			if (not dontChangePause) and AmIPlayingAlone() then
+			if (not dontChangePause) and AllowPauseOnMenuChange() then
 				local paused = select(3, Spring.GetGameSpeed())
 				if paused and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -2301,7 +2306,7 @@ local function MakeQuitButtons()
 				if not (isMission or Spring.GetSpectatingState()) then
 					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
 						local paused = select(3, Spring.GetGameSpeed())
-						if (paused) and AmIPlayingAlone() then
+						if (paused) and AllowPauseOnMenuChange() then
 							spSendCommands("pause")
 						end
 						spSendCommands{"spectator"} 
@@ -2320,7 +2325,7 @@ local function MakeQuitButtons()
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
 				local paused = select(3, Spring.GetGameSpeed())
-				if (paused) and AmIPlayingAlone() then
+				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
 				end
 				spSendCommands{"quit","quitforce"} 

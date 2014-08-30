@@ -315,6 +315,12 @@ path='Settings/Misc'
 	ShButton( 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true )
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
 	AddOption({
+		name = 'Menu pauses in SP',
+		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
+		type = 'bool',
+		value = true,
+	})
+	AddOption({
 		name = 'Use uikeys.txt',
 		desc = 'NOT RECOMMENDED! Enable this to use the engine\'s keybind file. This can break existing functionality. Requires restart.',
 		type = 'bool',
