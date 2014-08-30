@@ -408,7 +408,7 @@ local forcejunior = Spring.GetModOption("forcejunior", true, false)
 
 local function GetStartUnit(teamID, playerID, isAI)
 
-  if forcejunior then return "commbasic" end
+  if forcejunior then return "comm_trainer_strike_0" end
   
   local startUnit
 
