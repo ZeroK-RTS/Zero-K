@@ -34,12 +34,21 @@ local function toggleTeamColors()
 end 
 
 local mapRatio = Game.mapX/Game.mapY
-local mapIsWider = Game.mapX > Game.mapY
-local function AdjustToMapAspectRatio(w,h)
-	if mapIsWider then
-		return w, w/mapRatio +iconsize
+local mapIsWider = mapRatio > 1
+local function AdjustToMapAspectRatio(w, h, buttonRight)
+	local wPad = 16
+	local hPad = 16
+	if buttonRight then
+		wPad = wPad + iconsize*1.3
+	else
+		hPad = hPad + iconsize*1.3
 	end
-	return h*mapRatio, h+iconsize
+	w = w - wPad
+	h = h - hPad
+	if mapIsWider then
+		return w + wPad, w/mapRatio + hPad
+	end
+	return h*mapRatio + wPad, h + hPad
 end
 
 local function AdjustMapAspectRatioToWindow(x,y,w,h)
@@ -90,8 +99,9 @@ options = {
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
 			window.fixedRatio = arwindow
-			if arwindow then 
-				local w,h = AdjustToMapAspectRatio(328,308+iconsize)
+			if arwindow then
+				local maxSize = math.max(window.width, window.height)
+				local w,h = AdjustToMapAspectRatio(maxSize, maxSize, options.buttonsOnRight.value)
 				window:Resize(w,h,false,false)
 			end 
 		end,
@@ -264,7 +274,10 @@ options = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
-		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end,
+		OnChange= function(self) 
+			iconsize = self.value and 0 or 20 
+			MakeMinimapWindow() 
+		end,
 		value = false,
 		path = minimap_path,
 	},
@@ -332,6 +345,7 @@ end
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
 	setSensorState(options.initialSensorState.value)
 	updateRadarColors()
+	options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
 	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
@@ -395,10 +409,6 @@ MakeMinimapWindow = function()
 		height = height + iconsize
 	end
 	
-	if (options.use_map_ratio.value == 'arwindow') then
-		width,height = AdjustToMapAspectRatio(width,height)
-	end
-	
 	if height > 0 and width > 0 and screenHeight > 0 and screenWidth > 0 then
 		if width/height > screenWidth/screenHeight then
 			screenHeight = height*screenWidth/width
@@ -406,8 +416,6 @@ MakeMinimapWindow = function()
 			screenWidth = width*screenHeight/height
 		end
 	end
-	
-	height = math.max(height, 220)
 	
 	local map_panel_bottom = iconsize*1.3
 	local map_panel_right = 0
@@ -489,8 +497,8 @@ MakeMinimapWindow = function()
 		name   = 'Minimap Window',
 		color = {0, 0, 0, 0},
 		padding = {0, 0, 0, 0},
-		width = width,
-		height = height,
+		width = (window and window.width) or width,
+		height = (window and window.height) or height,
 		x = 0,
 		y = 0,
 		dockable = true,
@@ -506,6 +514,8 @@ MakeMinimapWindow = function()
 		maxHeight = screenHeight*0.8,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
 	}
+	
+	options.use_map_ratio.OnChange(options.use_map_ratio)
 	
 	fakewindow = Chili.Panel:New{
 		backgroundColor = {1,1,1, options.opacity.value},
