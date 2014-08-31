@@ -410,7 +410,7 @@ local function printWeapons(unitDef)
 				break
 			end
 		end
-		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('NoWeapon')) then 
+		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
 			local wsTemp = {weaponID = weaponID, count = 1}
 			if weaponDef.isShield then
 				wsTemp.wname = weaponName
