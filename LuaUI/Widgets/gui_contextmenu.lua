@@ -596,8 +596,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 		
 		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
 		
-		statschildren[#statschildren+1] = Label:New{ caption = 'Range: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.range,2), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Area of effect: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.areaofeffect,2), textColor = color.stats_fg, }
 		
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1],2), textColor = color.stats_fg, }
