@@ -768,9 +768,9 @@ local function UpdatePlayerInfo()
 					if teamID then
 						local s = GetPlayerTeamStats(teamID)
 						AccumulatePlayerTeamStats(r,s)
-						local _,leader = GetTeamInfo(teamID)
-						local name = GetPlayerInfo(leader)
-						if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil and v.winsLabel then 
+						local _,leader = Spring.GetTeamInfo(teamID)
+						local name = Spring.GetPlayerInfo(leader)
+						if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil and v.winsLabel then 
 							v.winsLabel:SetCaption(WG.WinCounter_currentWinTable[name].wins) 
 						end
 					end
@@ -989,6 +989,13 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				if elo then MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
 				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
+
+				local _,leader = Spring.GetTeamInfo(allyTeams[allyTeamID][1])
+				local leaderName = Spring.GetPlayerInfo(leader);
+
+				local wins = 0
+				if leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then wins = WG.WinCounter_currentWinTable[leaderName].wins end
+				MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=x_wins,width=40,caption = wins,textColor = allyTeamColor,align = "right"})
 				row = row + 1
 			end
 		end

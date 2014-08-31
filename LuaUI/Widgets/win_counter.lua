@@ -32,15 +32,29 @@ end
 
 local function Reset()
     Spring.Echo("Resetting win data")
-    local players = Spring.GetPlayerList()
-    local teams = Spring.GetTeamList()
+    -- local players = Spring.GetPlayerList()
+    local allyTeams = Spring.GetAllyTeamList()
+    local playerCount = 0
     currentWinTable = {}
-    for i=1, #players do
-        local name,_,_,teamID = Spring.GetPlayerInfo(players[i])
-        currentWinTable[name] = {team = teamID, wins = 0}
+    Spring.Echo("#allyTeams: "..#allyTeams)
+    for i=1, #allyTeams do
+        local playerTeams = Spring.GetTeamList(allyTeams[i])
+        Spring.Echo("#playerTeams on allyTeam "..allyTeams[i]..": "..#playerTeams)
+
+        for j=1, #playerTeams do
+            local players = Spring.GetPlayerList(playerTeams[j])
+            Spring.Echo("#players on team "..playerTeams[j]..": "..#players)
+            for k=1, #players do
+                local name,_,isSpec = Spring.GetPlayerInfo(players[k])
+                if k == 1 or not isSpec then
+                    playerCount = playerCount + 1
+                    currentWinTable[name] = {allyTeam = allyTeams[i], wins = 0}
+                end
+            end
+        end
     end
-    currentWinTable.count = #players
-    currentWinTable.teamCount = #teams
+    currentWinTable.count = playerCount
+    currentWinTable.allyTeamCount = #allyTeams
     Spring.Echo("Player Count: "..currentWinTable.count)
     WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
@@ -59,16 +73,27 @@ function widget:Shutdown()
 end
 
 function widget:GameOver()
-    local players = Spring.GetPlayerList();
-    for i=1, #players do
-        local playerName = Spring.GetPlayerInfo(players[i])
-        if currentWinTable[playerName] ~= nil then
-            local _,_,isDead = Spring.GetTeamInfo(currentWinTable[playerName].team or 0)
-            if not isDead then
+    local allyTeams = Spring.GetAllyTeamList()
+    local winningAllyTeam
+    for i=1, #allyTeams do
+        local allyTeamAlive = false
+        local playerTeams = Spring.GetTeamList(allyTeams[i])
+        for j=1, #playerTeams do
+            local _,_,isDead = Spring.GetTeamInfo(playerTeams[j])
+            if not isDead then allyTeamAlive = true; break end
+        end
+        if allyTeamAlive then winningAllyTeam = allyTeams[i]; break end
+    end
+
+    local winningPlayerTeams = Spring.GetTeamList(winningAllyTeam)
+    for i=1, #winningPlayerTeams do
+        local players = Spring.GetPlayerList(winningPlayerTeams[i])
+        -- for j=1, #players do
+            local playerName = Spring.GetPlayerInfo(players[1])
+            if currentWinTable[playerName] ~= nil then
                 currentWinTable[playerName].wins = (currentWinTable[playerName].wins or 0) + 1
             end
-        end
-        Spring.Echo(playerName.."'s current win count: "..currentWinTable[playerName].wins)
+        -- end
     end
     WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
@@ -86,8 +111,8 @@ function widget:SetConfigData(data)
     lastWinTable = data
     Reset() --Pre-emptively resetting scores, in case last game and this game have different teams
     Spring.Echo("Last game player count: "..(lastWinTable.count or 0)..", This game player count: "..currentWinTable.count )
-    Spring.Echo("Last game team count: "..(lastWinTable.teamCount or 0)..", This game team count: "..currentWinTable.teamCount )
-    if lastWinTable ~= nil and lastWinTable ~= {} and lastWinTable.count == currentWinTable.count and lastWinTable.teamCount == currentWinTable.teamCount then --If the player or team count changed, reset scores
+    Spring.Echo("Last game allyTeam count: "..(lastWinTable.allyTeamCount or 0)..", This game allyTeam count: "..currentWinTable.allyTeamCount )
+    if lastWinTable ~= nil and next(lastWinTable) ~= nil and lastWinTable.count == currentWinTable.count and lastWinTable.allyTeamCount == currentWinTable.allyTeamCount then --If the player or team count changed, reset scores
         Spring.Echo("Player counts match, continuing")
         --Map for verifying what teams from last game map to this game, if all players and teams remained the same. Assumes team and player counts remained the same
         local lastToCurrentTeamMap = {}
@@ -98,11 +123,11 @@ function widget:SetConfigData(data)
                     teamPlayerMatch = false
                     break
                 elseif lastGameTeamAndWins ~= nil then
-                    local lastGameTeam = lastGameTeamAndWins.team
+                    local lastGameTeam = lastGameTeamAndWins.allyTeam
                     if lastToCurrentTeamMap[lastGameTeam] == nil then --If this player's team is not in the map, add it. Otherwise, check that the team map is consistent
-                        lastToCurrentTeamMap[lastGameTeam] = currentWinTable[lastGamePlayerName].team
-                        Spring.Echo("Testing last game's team "..lastGameTeam.." mapped to this game's team "..(currentWinTable[lastGamePlayerName].team))
-                    elseif lastToCurrentTeamMap[lastGameTeam] ~= currentWinTable[lastGamePlayerName].team then 
+                        lastToCurrentTeamMap[lastGameTeam] = currentWinTable[lastGamePlayerName].allyTeam
+                        Spring.Echo("Testing last game's team "..lastGameTeam.." mapped to this game's team "..(currentWinTable[lastGamePlayerName].allyTeam))
+                    elseif lastToCurrentTeamMap[lastGameTeam] ~= currentWinTable[lastGamePlayerName].allyTeam then 
                         Spring.Echo(lastGamePlayerName.." changed team since last game, resetting scores")
                         teamPlayerMatch = false
                         break --If a player from last game changed who their teammates are, this check will fail. Reset scores
