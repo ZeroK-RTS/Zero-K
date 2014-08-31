@@ -36,14 +36,14 @@ local function Reset()
     local allyTeams = Spring.GetAllyTeamList()
     local playerCount = 0
     currentWinTable = {}
-    Spring.Echo("#allyTeams: "..#allyTeams)
+    -- Spring.Echo("#allyTeams: "..#allyTeams)
     for i=1, #allyTeams do
         local playerTeams = Spring.GetTeamList(allyTeams[i])
-        Spring.Echo("#playerTeams on allyTeam "..allyTeams[i]..": "..#playerTeams)
+        -- Spring.Echo("#playerTeams on allyTeam "..allyTeams[i]..": "..#playerTeams)
 
         for j=1, #playerTeams do
             local players = Spring.GetPlayerList(playerTeams[j])
-            Spring.Echo("#players on team "..playerTeams[j]..": "..#players)
+            -- Spring.Echo("#players on team "..playerTeams[j]..": "..#players)
             for k=1, #players do
                 local name,_,isSpec = Spring.GetPlayerInfo(players[k])
                 if k == 1 or not isSpec then
@@ -88,12 +88,12 @@ function widget:GameOver()
     local winningPlayerTeams = Spring.GetTeamList(winningAllyTeam)
     for i=1, #winningPlayerTeams do
         local players = Spring.GetPlayerList(winningPlayerTeams[i])
-        -- for j=1, #players do
-            local playerName = Spring.GetPlayerInfo(players[1])
+        for j=1, #players do
+            local playerName = Spring.GetPlayerInfo(players[j])
             if currentWinTable[playerName] ~= nil then
                 currentWinTable[playerName].wins = (currentWinTable[playerName].wins or 0) + 1
             end
-        -- end
+        end
     end
     WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
@@ -142,6 +142,13 @@ function widget:SetConfigData(data)
         if teamPlayerMatch then
             Spring.Echo("All players and teams match from last game, using last game's scores as base")
             currentWinTable = lastWinTable
+            -- for k,v in pairs(currentWinTable) do
+            --     if type(v) == "table" then
+            --         Spring.Echo(k.." has "..v.wins.." wins for team ", v.allyTeam)
+            --     else
+            --         Spring.Echo(k..": "..v)
+            --     end
+            -- end
         end
     end
 
