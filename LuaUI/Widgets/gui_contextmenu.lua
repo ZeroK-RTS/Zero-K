@@ -75,6 +75,7 @@ local statswindows = {}
 
 local colorCyan = {0.2, 0.7, 1, 1}
 local colorPurple = {0.9, 0.2, 1, 1}
+local colorDisarm = {0.5, 0.5, 0.5, 1}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -361,6 +362,15 @@ local function weapons2Table(cells, weaponStats, ws)
 			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(ws.dams,2) .. " (S)\008"
 			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(ws.dpss*ws.mult,2) .. " (S)\008"
 		end
+		
+		if ws.dpsd > 0 then
+			if dps_str ~= '' then
+				dps_str = dps_str .. ' + '
+				dam_str = dam_str .. ' + '
+			end
+			dam_str = dam_str .. color2incolor(colorDisarm) .. numformat(ws.damd,2) .. " (D)\008"
+			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(ws.dpsd*ws.mult,2) .. " (D)\008"
+		end
 		if ws.mult > 1 then
 			dam_str = dam_str .. " x " .. ws.mult
 		end
@@ -439,6 +449,7 @@ local function printWeapons(unitDef)
 				wsTemp.dam = 0
 				wsTemp.damw = 0
 				wsTemp.dams = 0
+				wsTemp.damd = 0
 
 				wsTemp.mult = tonumber(cp.statsprojectiles) or wsTemp.burst * wsTemp.projectiles
 				if wsTemp.paralyzer then
@@ -453,6 +464,7 @@ local function printWeapons(unitDef)
 				wsTemp.dps = 0
 				wsTemp.dpsw = 0
 				wsTemp.dpss = 0
+				wsTemp.dpsd = 0
 				if  wsTemp.reloadtime ~= '' and wsTemp.reloadtime > 0 then
 					if wsTemp.paralyzer then
 						wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
@@ -488,7 +500,21 @@ local function printWeapons(unitDef)
 			if cp.timeslow_damagefactor then
 				wsTemp.dams = (wsTemp.paralyzer and wsTemp.damw or wsTemp.dam) * cp.timeslow_damagefactor
 				wsTemp.dpss = (wsTemp.paralyzer and wsTemp.dpsw or wsTemp.dps) * cp.timeslow_damagefactor
-				if cp.timeslow_onlyslow then
+				if (cp.timeslow_onlyslow == "1") then
+					if wsTemp.paralyzer then
+						wsTemp.damw = 0
+						wsTemp.dpsw = 0
+					else
+						wsTemp.dam = 0
+						wsTemp.dps = 0
+					end
+				end
+			end
+			
+			if cp.disarmdamagemult then
+				wsTemp.damd = (wsTemp.paralyzer and wsTemp.damw or wsTemp.dam) * cp.disarmdamagemult
+				wsTemp.dpsd = (wsTemp.paralyzer and wsTemp.dpsw or wsTemp.dps) * cp.disarmdamagemult
+				if (cp.disarmdamageonly == "1") then
 					if wsTemp.paralyzer then
 						wsTemp.damw = 0
 						wsTemp.dpsw = 0
