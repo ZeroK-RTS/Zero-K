@@ -52,7 +52,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'text_height', 'name_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'text_height', 'name_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -178,6 +178,14 @@ options = {
 				{ key = 4, name = "All players and spectators" },
 		},
 		OnChange = function() SetupPlayerNames() end,
+	},
+	reset_wins = {
+		name = "Reset Wins",
+		desc = "Reset the win counts of all players",
+		type = 'button',
+		OnChange = function() 
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
+		end,
 	},
 }
 
