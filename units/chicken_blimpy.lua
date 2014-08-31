@@ -128,7 +128,7 @@ unitDef = {
 
 
     BOMBTRIGGER = {
-      name                    = [[BOMBTRIGGER]],
+      name                    = [[Bogus BOMBTRIGGER]],
       accuracy                = 12000,
       areaOfEffect            = 1,
       beamTime                = 0.1,
