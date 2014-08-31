@@ -251,6 +251,7 @@ local x_e_fill
 local x_cpu
 local x_ping
 local x_postping
+local x_wins
 local x_bound
 local x_windowbound
 
@@ -272,7 +273,8 @@ local function CalculateWidths()
 	x_e_fill		= x_m_fill + 30
 	x_cpu			= x_e_fill + (options.cpu_ping_as_text.value and 52 or 30)
 	x_ping			= x_cpu + (options.cpu_ping_as_text.value and 46 or 16)
-	x_bound			= x_ping + 28
+	x_wins			= x_ping + 50
+	x_bound			= x_wins + 28
 	x_windowbound	= x_bound + 0
 end
 CalculateWidths()
@@ -725,6 +727,9 @@ local function UpdatePlayerInfo()
 
 			if entities[i].nameLabel then entities[i].nameLabel:SetCaption(displayname) end
 			if entities[i].statusLabel then entities[i].statusLabel:SetCaption(tstatus) ; entities[i].statusLabel.font:SetColor(tstatuscolor) end
+			if entities[i].winsLabel and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then 
+				entities[i].winsLabel:SetCaption(WG.WinCounter_currentWinTable[entities[i].name].wins) 
+			end
 
 			UpdatePingCpu(entities[i],pingTime,cpuUsage,pstatus)
 		end	-- if not isAI
@@ -763,6 +768,11 @@ local function UpdatePlayerInfo()
 					if teamID then
 						local s = GetPlayerTeamStats(teamID)
 						AccumulatePlayerTeamStats(r,s)
+						local _,leader = GetTeamInfo(teamID)
+						local name = GetPlayerInfo(leader)
+						if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil and v.winsLabel then 
+							v.winsLabel:SetCaption(WG.WinCounter_currentWinTable[name].wins) 
+						end
 					end
 				end
 			end
@@ -787,6 +797,7 @@ local function AddTableHeaders()
 	end
 	scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_ping, y=(fontsize+1) * row,	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	scroll_cpl:AddChild( Label:New{ x=x_wins - 30, y=(fontsize+1) * row,	caption = 'Wins', 	fontShadow = true,  fontsize = fontsize,} )
 end
 
 local function AddCfCheckbox(allyTeam)
@@ -900,6 +911,11 @@ local function AddEntity(entity, teamID, allyTeamID)
 			function entity.pingImg:HitTest(x,y) return self end
 		end
 
+		local wins = 0
+		if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then wins = WG.WinCounter_currentWinTable[entity.name].wins end
+
+		MakeNewLabel(entity,"winsLabel",{x=x_wins,width=50,caption = wins,textColor = teamcolor,})
+
 	end -- if not isAI
 
 	-- share button
@@ -937,6 +953,7 @@ end
 
 local function AddAllAllyTeamSummaries(allyTeamsSorted)
 	local allyTeamResources
+	local allyTeamWins
 	for i=1,#allyTeamsSorted do
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
@@ -1051,7 +1068,7 @@ SetupPlayerNames = function()
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank,customKeys = Spring.GetPlayerInfo(playerID)
-		local clan, faction, level, elo
+		local clan, faction, level, elo, wins
 		if customKeys then
 			clan = customKeys.clan
 			faction = customKeys.faction
@@ -1078,6 +1095,7 @@ SetupPlayerNames = function()
 				faction = faction,
 				level = level,
 				elo = elo,
+				wins = wins,
 			}
 			local index = #teams[teamID].roster + 1
 			teams[teamID].roster[index] = entities[entityID]
