@@ -419,6 +419,14 @@ local function FormatElo(elo,full)
 	return elo_out, eloCol
 end
 
+local function FormatWins(name) --Assumes Win Counter is on and all tables are valid, and the given name is in the wins table
+	local winCount = WG.WinCounter_currentWinTable[name].wins
+	if WG.WinCounter_currentWinTable[name].wonLastGame then
+		return "*"..winCount.."*"
+	end
+	return winCount
+end
+
 local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	local stats = playerTeamStatsCache[unitTeam]
 	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
@@ -736,7 +744,7 @@ local function UpdatePlayerInfo()
 			if entities[i].nameLabel then entities[i].nameLabel:SetCaption(displayname) end
 			if entities[i].statusLabel then entities[i].statusLabel:SetCaption(tstatus) ; entities[i].statusLabel.font:SetColor(tstatuscolor) end
 			if entities[i].winsLabel and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then 
-				entities[i].winsLabel:SetCaption(WG.WinCounter_currentWinTable[entities[i].name].wins) 
+				entities[i].winsLabel:SetCaption(FormatWins(name)) 
 			end
 
 			UpdatePingCpu(entities[i],pingTime,cpuUsage,pstatus)
@@ -778,8 +786,8 @@ local function UpdatePlayerInfo()
 						AccumulatePlayerTeamStats(r,s)
 						local _,leader = Spring.GetTeamInfo(teamID)
 						local name = Spring.GetPlayerInfo(leader)
-						if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil and v.winsLabel then 
-							v.winsLabel:SetCaption(WG.WinCounter_currentWinTable[name].wins) 
+						if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil and v.winsLabel then
+							v.winsLabel:SetCaption(FormatWins(name)) 
 						end
 					end
 				end
@@ -920,8 +928,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 		end
 
 		if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then 
-			local wins = WG.WinCounter_currentWinTable[entity.name].wins
-			MakeNewLabel(entity,"winsLabel",{x=x_wins,width=40,caption = wins,textColor = teamcolor,align = 'right',})
+			MakeNewLabel(entity,"winsLabel",{x=x_wins,width=40,caption = FormatWins(entity.name),textColor = teamcolor,align = 'right',})
 		end
 
 	end -- if not isAI
@@ -1002,8 +1009,7 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				local leaderName = Spring.GetPlayerInfo(leader);
 
 				if leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then 
-					local wins = WG.WinCounter_currentWinTable[leaderName].wins
-					MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=x_wins,width=40,caption = wins,textColor = allyTeamColor,align = "right"})
+					MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=x_wins,width=40,caption = FormatWins(leaderName),textColor = allyTeamColor,align = "right"})
 				end
 				row = row + 1
 			end
