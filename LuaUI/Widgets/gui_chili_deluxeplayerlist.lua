@@ -71,6 +71,14 @@ options = {
 			scroll_cpl:Invalidate()
 		end,
 	},
+	reset_wins = {
+		name = "Reset Wins",
+		desc = "Reset the win counts of all players",
+		type = 'button',
+		OnChange = function() 
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
+		end,
+	},
 	text_height = {
 		name = 'Font Size (10-18)',
 		type = 'number',
@@ -178,14 +186,6 @@ options = {
 				{ key = 4, name = "All players and spectators" },
 		},
 		OnChange = function() SetupPlayerNames() end,
-	},
-	reset_wins = {
-		name = "Reset Wins",
-		desc = "Reset the win counts of all players",
-		type = 'button',
-		OnChange = function() 
-		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
-		end,
 	},
 }
 

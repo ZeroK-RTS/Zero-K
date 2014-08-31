@@ -143,6 +143,14 @@ options = {
 			scroll_cpl:Invalidate()
 		end,
 	},
+	reset_wins = {
+		name = "Reset Wins",
+		desc = "Reset the win counts of all players",
+		type = 'button',
+		OnChange = function() 
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
+		end,
+	},
 	alignToTop = {
 		name = "Align to top",
 		type = 'bool',
