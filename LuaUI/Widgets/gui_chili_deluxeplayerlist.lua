@@ -273,8 +273,8 @@ local function CalculateWidths()
 	x_e_fill		= x_m_fill + 30
 	x_cpu			= x_e_fill + (options.cpu_ping_as_text.value and 52 or 30)
 	x_ping			= x_cpu + (options.cpu_ping_as_text.value and 46 or 16)
-	x_wins			= x_ping + 50
-	x_bound			= x_wins + 28
+	x_wins			= x_ping + 20
+	x_bound			= x_wins + 58
 	x_windowbound	= x_bound + 0
 end
 CalculateWidths()
@@ -797,7 +797,7 @@ local function AddTableHeaders()
 	end
 	scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_ping, y=(fontsize+1) * row,	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
-	scroll_cpl:AddChild( Label:New{ x=x_wins - 30, y=(fontsize+1) * row,	caption = 'Wins', 	fontShadow = true,  fontsize = fontsize,} )
+	scroll_cpl:AddChild( Label:New{ x=x_wins - 30, y=(fontsize+1) * row,	caption = 'Wins', 	fontShadow = true,  fontsize = fontsize, align = 'right'} )
 end
 
 local function AddCfCheckbox(allyTeam)
@@ -914,7 +914,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 		local wins = 0
 		if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then wins = WG.WinCounter_currentWinTable[entity.name].wins end
 
-		MakeNewLabel(entity,"winsLabel",{x=x_wins,width=50,caption = wins,textColor = teamcolor,})
+		MakeNewLabel(entity,"winsLabel",{x=x_wins,width=40,caption = wins,textColor = teamcolor,align = 'right',})
 
 	end -- if not isAI
 
