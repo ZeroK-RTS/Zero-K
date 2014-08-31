@@ -911,10 +911,10 @@ local function AddEntity(entity, teamID, allyTeamID)
 			function entity.pingImg:HitTest(x,y) return self end
 		end
 
-		local wins = 0
-		if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then wins = WG.WinCounter_currentWinTable[entity.name].wins end
-
-		MakeNewLabel(entity,"winsLabel",{x=x_wins,width=40,caption = wins,textColor = teamcolor,align = 'right',})
+		if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then 
+			local wins = WG.WinCounter_currentWinTable[entity.name].wins
+			MakeNewLabel(entity,"winsLabel",{x=x_wins,width=40,caption = wins,textColor = teamcolor,align = 'right',})
+		end
 
 	end -- if not isAI
 
@@ -993,9 +993,10 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				local _,leader = Spring.GetTeamInfo(allyTeams[allyTeamID][1])
 				local leaderName = Spring.GetPlayerInfo(leader);
 
-				local wins = 0
-				if leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then wins = WG.WinCounter_currentWinTable[leaderName].wins end
-				MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=x_wins,width=40,caption = wins,textColor = allyTeamColor,align = "right"})
+				if leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then 
+					local wins = WG.WinCounter_currentWinTable[leaderName].wins
+					MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=x_wins,width=40,caption = wins,textColor = allyTeamColor,align = "right"})
+				end
 				row = row + 1
 			end
 		end
