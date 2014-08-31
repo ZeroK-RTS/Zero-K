@@ -86,6 +86,9 @@ options_path = 'Help/Unit Descriptions'
 options = {}
 local ignoreList = {
 	['firebug']=1,
+	['corpre']=1,
+	['vehdisable']=1,
+	['hoverscout']=1,
 }
 local UnitDefsList = {}
 for i=1,#UnitDefs do
