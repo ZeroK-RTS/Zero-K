@@ -474,6 +474,9 @@ local function printWeapons(unitDef)
 			if weaponDef.customParams.extra_damage then
 				wsTemp.dam = weaponDef.customParams.extra_damage * wsTemp.burst * wsTemp.projectiles -- is it right?
 				wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
+
+				wsTemp.damw = wsTemp.damw - wsTemp.dam
+				wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
 			elseif weaponDef.customParams.stats_damage then
 				wsTemp.dam = weaponDef.customParams.stats_damage
 			end
