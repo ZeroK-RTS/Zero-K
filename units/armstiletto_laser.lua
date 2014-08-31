@@ -75,7 +75,7 @@ unitDef = {
   weaponDefs          = {
 
     ARMBOMBLIGHTNING = {
-      name                    = [[BombLightning]],
+      name                    = [[Lightning]],
       areaOfEffect            = 192,
       avoidFeature            = false,
       avoidFriendly           = false,
