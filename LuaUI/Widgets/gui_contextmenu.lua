@@ -86,6 +86,9 @@ options_path = 'Help/Unit Descriptions'
 options = {}
 local ignoreList = {
 	['firebug']=1,
+	['corpre']=1,
+	['vehdisable']=1,
+	['hoverscout']=1,
 }
 local UnitDefsList = {}
 for i=1,#UnitDefs do
@@ -410,7 +413,7 @@ local function printWeapons(unitDef)
 				break
 			end
 		end
-		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('NoWeapon')) then 
+		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
 			local wsTemp = {weaponID = weaponID, count = 1}
 			if weaponDef.isShield then
 				wsTemp.wname = weaponName
@@ -471,6 +474,9 @@ local function printWeapons(unitDef)
 			if weaponDef.customParams.extra_damage then
 				wsTemp.dam = weaponDef.customParams.extra_damage * wsTemp.burst * wsTemp.projectiles -- is it right?
 				wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
+
+				wsTemp.damw = wsTemp.damw - wsTemp.dam
+				wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
 			elseif weaponDef.customParams.stats_damage then
 				wsTemp.dam = weaponDef.customParams.stats_damage
 			end
@@ -593,8 +599,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 		
 		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
 		
-		statschildren[#statschildren+1] = Label:New{ caption = 'Range: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.range,2), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Area of effect: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.areaofeffect,2), textColor = color.stats_fg, }
 		
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1],2), textColor = color.stats_fg, }
