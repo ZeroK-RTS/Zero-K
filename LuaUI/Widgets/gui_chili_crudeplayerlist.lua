@@ -80,9 +80,10 @@ local x_name			= x_team + 16
 local x_share			= x_name + 140 
 local x_cpu				= x_share + 16
 local x_ping			= x_cpu + 16
-local x_postping		= x_ping + 16
+local x_wins			= x_ping + 20
+local x_postwins		= x_wins + 16
 
-local x_bound = x_postping + 20
+local x_bound = x_postwins + 20
 
 local UPDATE_FREQUENCY = 0.8	-- seconds
 
@@ -140,6 +141,14 @@ options = {
 			scroll_cpl.backgroundColor = {1,1,1,self.value}
 			scroll_cpl.borderColor = {1,1,1,self.value}
 			scroll_cpl:Invalidate()
+		end,
+	},
+	reset_wins = {
+		name = "Reset Wins",
+		desc = "Reset the win counts of all players",
+		type = 'button',
+		OnChange = function() 
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
 		end,
 	},
 	alignToTop = {
@@ -347,6 +356,10 @@ local function UpdatePlayerInfo()
 					pingImg:Invalidate()
 				end
 			end
+
+			local wins = 0
+			if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then wins = WG.WinCounter_currentWinTable[name].wins end
+			if entities[i].winsLabel then entities[i].winsLabel:SetCaption(wins) end
 		end	-- if not isAI
 	end	-- for entities
 	MakeSpecTooltip()
@@ -462,6 +475,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 	local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 	local pingTime_readable = PingTimeOut(pingTime)
 
+	local wins = 0
+	if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then wins = WG.WinCounter_currentWinTable[name].wins end
+
 	if not entity.isAI then 
 		-- flag
 		if icCountry ~= nil  then 
@@ -570,7 +586,24 @@ local function AddEntity(entity, teamID, allyTeamID)
 		function pingImg:HitTest(x,y) return self end
 		entity.pingImg = pingImg
 		scroll_cpl:AddChild(pingImg)
+
+		if WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
+			local winsLabel = Label:New{
+				x=x_wins,
+				y=(fontsize+1) * row,
+				width=20,
+				autosize=false,
+				--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
+				caption = wins,
+				realText = wins,
+				textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
+				fontsize = fontsize,
+				fontShadow = true,
+			}
+			scroll_cpl:AddChild(winsLabel)
+		end
 	end
+
 	row = row + 1
 end
 
@@ -646,6 +679,7 @@ SetupPlayerNames = function()
 	scroll_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	scroll_cpl:AddChild( Label:New{ x=x_wins, 	caption = 'W', 	fontShadow = true,  fontsize = fontsize,} )
 	
 	local playerlist = Spring.GetPlayerList()
 	local teamsSorted = Spring.GetTeamList()
