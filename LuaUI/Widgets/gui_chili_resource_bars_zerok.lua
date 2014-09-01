@@ -1128,7 +1128,7 @@ function CreateWindow()
 
 	bar_metal_proportion = Chili.Progressbar:New{
 		parent = window_metal_proportion,
-		color  = {col_metal[1], col_metal[2], col_metal[3], 0.30},
+		color  = {col_metal[1], col_metal[2], col_metal[3], 0.35},
 		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
@@ -1142,7 +1142,7 @@ function CreateWindow()
 
 	Chili.Progressbar:New{
 		parent = window_metal_proportion,
-		color  = {col_energy[1], col_energy[2], col_energy[3], 0.17},
+		color  = {col_energy[1], col_energy[2], col_energy[3], 0.22},
 		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
