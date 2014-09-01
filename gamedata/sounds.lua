@@ -34,8 +34,9 @@ local Sounds = {
 			file = "sounds/weapon/blade/blade_swing.wav",
 			pitchMod = 0.1,
 			gainMod = 0.1,
-			pitch = 0.9,
-			gain = 1,
+			pitch = 0.8,
+			gain = 0.9,
+			priority = 1,
 		},
 		BladeHit = {
 			file = "sounds/weapon/blade/blade_hit.wav",
