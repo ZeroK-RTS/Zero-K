@@ -124,6 +124,7 @@ include("keysym.h.lua")
 function SetupPlayerNames() end
 
 options_path = 'Settings/HUD Panels/Player List'
+options_order = {'text_height', 'backgroundOpacity', 'reset_wins','alignToTop','showSpecs','allyTeamPerTeam','debugMessages','mousewheel','win_show_condition'}
 options = {
 	text_height = {
 		name = 'Font Size (10-18)',
