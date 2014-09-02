@@ -32,7 +32,7 @@ local function Set(player, winCount, forAllyTeam) --TODO: Test this with a playe
         name = player
     end
 
-    if name ~= nil and currentWinTable[name] ~= nil and type(currentWinTable[name]) == "table" then
+    if type(winCount) == "number" and winCount >= 0 and name ~= nil and currentWinTable[name] ~= nil and type(currentWinTable[name]) == "table" then
         if forAllyTeam then
             local alliedTeams = Spring.GetTeamList(currentWinTable[name].allyTeam)
             for i=1, #alliedTeams do
@@ -47,6 +47,18 @@ local function Set(player, winCount, forAllyTeam) --TODO: Test this with a playe
         else
             currentWinTable[name].wins = winCount
         end
+
+
+        if winCount > 0 then currentWinTable.hasWins = true
+        else
+            currentWinTable.hasWins = false
+            for k,v in pairs(currentWinTable) do
+                if type(v) == "table" then
+                    if v.wins > 0 then currentWinTable.hasWins = true; break end
+                end
+            end
+        end
+
         WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
     end
 end
@@ -81,6 +93,7 @@ local function Reset()
     end
     currentWinTable.count = playerCount
     currentWinTable.allyTeamCount = allyTeamCount
+    currentWinTable.hasWins = false
     WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
 
@@ -128,6 +141,7 @@ function widget:GameOver()
             end
         end
     end
+    currentWinTable.hasWins = true
     WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
 
@@ -182,6 +196,7 @@ function widget:SetConfigData(data)
             --  else
             --      Spring.Echo(k..": "..v)
                 end
+                currentWinTable.hasWins = lastWinTable.hasWins --This gets updated on GameOver
             end
         end
     end
