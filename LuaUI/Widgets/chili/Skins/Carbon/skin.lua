@@ -100,6 +100,7 @@ skin.progressbar = {
   TileImageFG = ":cl:tech_progressbar_full.png",
   TileImageBK = ":cl:tech_progressbar_empty.png",
   tiles       = {16, 16, 16, 16},
+  fillPadding     = {4, 3, 4, 3},
 
   font = {
     shadow = true,
