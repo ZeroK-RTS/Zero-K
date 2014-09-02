@@ -159,6 +159,7 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
+	'toggleBacklog',
 	'text_height_chat', 
 	'text_height_console',
 	'backchatOpacity',
@@ -479,6 +480,11 @@ options = {
 		desc = "Starts with the backlog chat enabled.",
 		type = 'bool',
 		value = false,
+	},
+	toggleBacklog = {
+		name = "Toggle backlog",
+		desc = "The toggle backlog button is here to let you hotkey this action.",
+		type = 'button',
 	},
 	mousewheelBacklog = {
 		name = "Mousewheel Backlog",
@@ -1079,6 +1085,9 @@ local function SwapBacklog()
 	end
 	showingBackchat = not showingBackchat
 end
+
+options.toggleBacklog.OnChange = SwapBacklog
+
 -----------------------------------------------------------------------
 -- callins
 -----------------------------------------------------------------------
