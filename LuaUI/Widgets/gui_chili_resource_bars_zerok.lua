@@ -739,7 +739,7 @@ function CreateWindow()
 	
 	local propBarHeight = '42%'
 	local proBarSpacing = '8%'
-	local proportionWindowSpacing = p(12.5 + options.barWidth.value) -- Default '19%'
+	local proportionWindowSpacing = p(12.7 + options.barWidth.value) -- Default '19.2%'
 	
 	local barWidth = p(options.barWidth.value) --'6.5%'
 	local barEdgeSpacing = '13%'
