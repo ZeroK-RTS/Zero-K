@@ -55,12 +55,16 @@ local function Reset()
     Spring.Echo("Resetting win data")
     -- local players = Spring.GetPlayerList()
     local allyTeams = Spring.GetAllyTeamList()
+    local allyTeamCount = 0
     local playerCount = 0
     currentWinTable = {}
     -- Spring.Echo("#allyTeams: "..#allyTeams)
     for i=1, #allyTeams do
         local playerTeams = Spring.GetTeamList(allyTeams[i])
         -- Spring.Echo("#playerTeams on allyTeam "..allyTeams[i]..": "..#playerTeams)
+        if #playerTeams > 0 then                --Spring counts all startboxes as ally teams, even if they are not used by any players. 
+            allyTeamCount = allyTeamCount + 1   --This needs to be worked around, as maps may be set up with more startboxes than necessary.
+        end
 
         for j=1, #playerTeams do
             local players = Spring.GetPlayerList(playerTeams[j]) --Drill down to player level, in case there are multiple non-spec players on one team, they should all be noted
@@ -76,7 +80,7 @@ local function Reset()
         end
     end
     currentWinTable.count = playerCount
-    currentWinTable.allyTeamCount = #allyTeams
+    currentWinTable.allyTeamCount = allyTeamCount
     WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
 
@@ -138,8 +142,8 @@ function widget:SetConfigData(data)
     Spring.Echo("Loading last game win data")
     lastWinTable = data
     Reset() --Pre-emptively resetting scores, in case last game and this game have different allyTeams
-    -- Spring.Echo("Last game player count: "..(lastWinTable.count or 0)..", This game player count: "..currentWinTable.count )
-    -- Spring.Echo("Last game allyTeam count: "..(lastWinTable.allyTeamCount or 0)..", This game allyTeam count: "..currentWinTable.allyTeamCount )
+    Spring.Echo("Last game player count: "..(lastWinTable.count or 0)..", This game player count: "..currentWinTable.count )
+    Spring.Echo("Last game allyTeam count: "..(lastWinTable.allyTeamCount or 0)..", This game allyTeam count: "..currentWinTable.allyTeamCount )
     --If the player or allyTeam count changed, or this widget has broken config data, reset scores
     if lastWinTable ~= nil and next(lastWinTable) ~= nil and lastWinTable.count == currentWinTable.count and lastWinTable.allyTeamCount == currentWinTable.allyTeamCount then 
         Spring.Echo("Player and team counts match, continuing")
