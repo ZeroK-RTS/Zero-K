@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.015"
+local version = "v0.016"
 
 function widget:GetInfo()
   return {
@@ -52,6 +52,7 @@ local echo = Spring.Echo
 --options
 
 local function RecreateFacbar() end
+local function UpdateFactoryList () end
 
 options_path = 'Settings/HUD Panels/FactoryPanel'
 options = {
@@ -74,6 +75,13 @@ options = {
 			window_facbar:Invalidate()
 		end,
 	},
+	showAllPlayers = {
+		name = "Show All Players",
+		type = 'bool',
+		desc = 'When spectating, show the factory queues of all players. When disabled, only shows the factory queue of the currently spectated player.',
+		value = false,
+		OnChange = function() UpdateFactoryList() end,
+	}
 }
 
 -------------------------------------------------------------------------------
@@ -81,7 +89,7 @@ options = {
 -- list and interface vars
 
 local facs = {}
-local facsByUnitId = {}
+--local facsByUnitId = {}
 local unfinished_facs = {}
 local pressedFac  = -1
 local waypointFac = -1
@@ -96,6 +104,7 @@ local cycle_half_s = 1
 local cycle_2_s = 1
 local updateQSoon
 local lmx,lmy=-1,-1
+local showAllPlayers
 
 -------------------------------------------------------------------------------
 -- SOUNDS
@@ -747,11 +756,25 @@ local function MakeClearButton(unitID)
 	
 end
 
+function AddPlayerName(teamID)
+	local _, player,_,isAI = Spring.GetTeamInfo(teamID)
+	local playerName
+	if isAI then
+		local _, aiName, _, shortName = Spring.GetAIInfo(teamID)
+		playerName = aiName ..' ('.. shortName .. ')'
+	else
+		playerName = player and Spring.GetPlayerInfo(player) or 'noname'
+	end
+	local teamColor		= {Spring.GetTeamColor(teamID)}
+	stack_main:AddChild( Label:New{ caption = playerName, font = {outline = true; color = teamColor; } } )
+end
+
 RecreateFacbar = function()
 	enteredTweak = false
 	if inTweak then return end
 	
 	stack_main:ClearChildren()
+	local curTeam = -1
 	for i,facInfo in ipairs(facs) do
 		local unitDefID = facInfo.unitDefID
 		
@@ -771,7 +794,10 @@ RecreateFacbar = function()
 				unfinished_facs[facInfo.unitID] = nil
 			end
 		end
-
+		if showAllPlayers and facInfo.teamID ~= curTeam then
+			curTeam = facInfo.teamID 
+			AddPlayerName(curTeam)
+		end
 		local facButton, facStack, boStack, qStack, qStore = AddFacButton(facInfo.unitID, unitDefID, stack_main, i)
 		facs[i].facButton 	= facButton
 		facs[i].facStack 	= facStack
@@ -779,7 +805,7 @@ RecreateFacbar = function()
 		facs[i].qStack 		= qStack
 		facs[i].qStore 		= qStore
 		
-		facsByUnitId[facInfo.unitID] = i
+		--facsByUnitId[facInfo.unitID] = i
 		
 		local buildList   = facInfo.buildList
 		local buildQueue  = GetBuildQueue(facInfo.unitID)
@@ -804,30 +830,37 @@ RecreateFacbar = function()
 	updateQSoon = true
 end
 
-local function UpdateFactoryList()
 
-  facs = {}
-  facsByUnitId = {}
+UpdateFactoryList = function()
 
-  local teamUnits = Spring.GetTeamUnits(myTeamID)
-  local totalUnits = #teamUnits
-
-  for num = 1, totalUnits do
-    local unitID = teamUnits[num]
-    local unitDefID = GetUnitDefID(unitID)
-    if UnitDefs[unitDefID].isFactory then
-		local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
-		if bo and #bo > 0 then	
-		  push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions })
-		  local _, _, _, _, buildProgress = GetUnitHealth(unitID)
-		  if (buildProgress)and(buildProgress<1) then
-			unfinished_facs[unitID] = true
-		  end
-		end
-    end
-  end
-  
+	facs = {}
+	showAllPlayers = options.showAllPlayers.value and Spring.GetSpectatingState()
 	
+	--facsByUnitId = {}
+  
+	local teamUnits = showAllPlayers and Spring.GetAllUnits() or Spring.GetTeamUnits(myTeamID)
+	local totalUnits = #teamUnits
+  
+	for num = 1, totalUnits do
+		local unitID = teamUnits[num]
+		local unitDefID = GetUnitDefID(unitID)
+		if UnitDefs[unitDefID].isFactory then
+			local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
+			if bo and #bo > 0 then
+				local teamID = Spring.GetUnitTeam(unitID)
+				push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions, teamID=teamID })
+				local _, _, _, _, buildProgress = GetUnitHealth(unitID)
+				if (buildProgress)and(buildProgress<1) then
+					unfinished_facs[unitID] = true
+				end
+			end
+		end
+	end
+	table.sort(facs, function(t1,t2)
+		return t1.teamID < t2.teamID
+	end)
+	
+	  
 	RecreateFacbar()
 end
 
@@ -858,20 +891,26 @@ function widget:DrawWorld()
 	end
 end
 
-function widget:UnitCreated(unitID, unitDefID, unitTeam)
-  if (unitTeam ~= myTeamID) then
-    return
-  end
-
-  if UnitDefs[unitDefID].isFactory then
-	local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
-	if bo and #bo > 0 then
-		push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions })
-		--UpdateFactoryList()
-		RecreateFacbar()
+function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	if (unitTeam ~= myTeamID) and not showAllPlayers then
+		return
 	end
-  end
-  unfinished_facs[unitID] = true
+
+	if UnitDefs[unitDefID].isFactory then
+		local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
+		if bo and #bo > 0 then
+			push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions, teamID=unitTeam })
+			--UpdateFactoryList()
+			RecreateFacbar()
+		end
+		unfinished_facs[unitID] = true
+	end
+	
+	
+	local bdid = builderID and Spring.GetUnitDefID(builderID)
+    if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
+		updateQSoon = true
+	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
@@ -972,7 +1011,7 @@ end
 
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
-	if unitTeam ~= myTeamID then
+	if unitTeam ~= myTeamID and not showAllPlayers then
 		return
 	end
 	--local i = facsByUnitId[unitID]
