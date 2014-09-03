@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.016"
+local version = "v0.017"
 
 function widget:GetInfo()
   return {
@@ -81,7 +81,15 @@ options = {
 		desc = 'When spectating, show the factory queues of all players. When disabled, only shows the factory queue of the currently spectated player.',
 		value = false,
 		OnChange = function() UpdateFactoryList() end,
-	}
+	};
+	
+	showETA = {
+		name = "Show ETA",
+		type = 'bool',
+		desc = 'Show ETA for the unit currently being built.',
+		value = false,
+		OnChange = function() RecreateFacbar() end,
+	};
 }
 
 -------------------------------------------------------------------------------
@@ -304,6 +312,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		children = {
 			unitID ~= 0 and
 				Image:New {
+					name='facIcon';
 					file = "#"..unitDefID, -- do not remove this line
 					--file = GetUnitPic(unitDefID),
 					file2 = WG.GetBuildIconFrame(UnitDefs[unitDefID]),
@@ -312,6 +321,20 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 					y = '5%',
 					width = '90%',
 					height = '90%',
+					children = {
+						Label:New {
+							name='etaLabel',
+							caption='';
+							autosize=false;
+							width="100%";
+							height="100%";
+							align="right";
+							valign="bottom";
+							
+							fontSize = 16;
+							fontShadow = true;
+						},
+					};
 				}
 			or nil,
 		},
@@ -671,6 +694,18 @@ local function UpdateFacProg(i, facInfo)
 	if unitBuildID then
 		unitBuildDefID = GetUnitDefID(unitBuildID)
 		_, _, _, _, progress = GetUnitHealth(unitBuildID)
+		
+		if options.showETA.value then
+			local etaLabel = facInfo.facButton:GetChildByName('facIcon'):GetChildByName('etaLabel')
+			local timeLeft = WG.etaTable and WG.etaTable[unitBuildID] and WG.etaTable[unitBuildID].timeLeft
+			local etaStr = ''
+			if timeLeft then
+				local color = timeLeft > 0 and '\255\1\255\1' or '\255\255\1\1'
+				--etaStr = "\255\255\255\1ETA: " .. string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
+				etaStr = string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
+			end
+			etaLabel:SetCaption(etaStr)
+		end
 	end
 	
 	local firstButton = facs[i].qStack and facs[i].qStack.children[1]

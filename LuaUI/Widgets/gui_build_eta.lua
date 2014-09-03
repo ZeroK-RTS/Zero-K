@@ -100,6 +100,7 @@ function widget:Initialize()
 			etaTable[unitID] = MakeETA(unitID,Spring.GetUnitDefID(unitID))
 		end
 	end
+	WG.etaTable = etaTable
 end
 
 
