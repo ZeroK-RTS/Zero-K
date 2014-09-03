@@ -62,6 +62,8 @@ local image_energy
 local bar_energy
 local bar_energy_overlay
 local bar_energy_reserve_overlay
+local lbl_net_help_metal
+local lbl_net_help_energy
 local lbl_metal
 local lbl_energy
 local lbl_m_expense
@@ -482,7 +484,7 @@ function widget:GameFrame(n)
 	"\nWaste: " .. teamWasteM
 
 	image_metal.tooltip = bar_metal.tooltip
-	lbl_metal.tooltip = bar_metal.tooltip
+	-- lbl_metal.tooltip = bar_metal.tooltip
 	
 	bar_energy.tooltip = "Local Energy Economy" ..
 	"\nIncome: " .. energyInc ..
@@ -500,7 +502,7 @@ function widget:GameFrame(n)
 	"\nWaste: " .. totalWaste
 
 	image_energy.tooltip = bar_energy.tooltip
-	lbl_energy.tooltip = bar_energy.tooltip
+	-- lbl_energy.tooltip = bar_energy.tooltip
 
 
 	local mTotal
@@ -734,7 +736,9 @@ function CreateWindow()
 	local imageWidth ='13%'
 	local imageHorSpacing = '1%'
 	local imageVertSpacing = '10%'
-	local imageHeight = '60%'
+	local imageHeight = '45%'
+	local netHelpLabelHeight = '20%'
+	local storageLabelOffset = '65%'
 	local storageLabelHeight = '35%'
 	
 	local propBarHeight = '42%'
@@ -882,14 +886,30 @@ function CreateWindow()
 		tooltip = "This is the total metal demand of your economy",
 	}
 	
-	lbl_metal = Chili.Label:New{
+	lbl_net_help_metal = Chili.Label:New{
 		parent = window_main_display,
-		height = storageLabelHeight,
+		height = netHelpLabelHeight,
 		width  = imageWidth,
 		x      = imageHorSpacing,
 		y      = imageHeight,
 		-- valign = "center",
 		align  = "center",
+		valign = "bottom",
+		caption = "NET",
+		autosize = false,
+		font   = {size = options.netFont.value - 2, outline = true, color = {.8,.8,.8,.65}},
+		tooltip = "Your net metal income",
+	}
+	
+	lbl_metal = Chili.Label:New{
+		parent = window_main_display,
+		height = storageLabelHeight,
+		width  = imageWidth,
+		x      = imageHorSpacing,
+		y      = storageLabelOffset,
+		-- valign = "center",
+		align  = "center",
+		valign = "top",
 		caption = "0",
 		autosize = false,
 		font   = {size = options.netFont.value, outline = true, color = {.8,.8,.8,.95}},
@@ -983,18 +1003,33 @@ function CreateWindow()
 		tooltip = "This is this total energy demand of your economy and abilities which require energy upkeep",
 	}
 	
+	lbl_net_help_energy = Chili.Label:New{
+		parent = window_main_display,
+		height = netHelpLabelHeight,
+		width  = imageWidth,
+		right  = imageHorSpacing,
+		y      = imageHeight,
+		-- valign = "center",
+		align  = "center",
+		valign = "bottom",
+		caption = "NET",
+		autosize = false,
+		font   = {size = options.netFont.value - 2, outline = true, color = {.8,.8,.8,.65}},
+		tooltip = "Your net energy income",
+	}
+	
 	lbl_energy = Chili.Label:New{
 		parent = window_main_display,
 		height = storageLabelHeight,
 		width  = imageWidth,
         right  = imageHorSpacing,
-        y      = imageHeight,
+        y      = storageLabelOffset,
 		align  = "center",
-		valign = "center",
+		valign = "top",
 		caption = "0",
 		autosize = false,
 		font   = {size = options.netFont.value, outline = true, color = {.8,.8,.8,.95}},
-		tooltip = "Your current stored energy.",
+		tooltip = "Your net energy income.",
 	}
 	
 	image_energy = Chili.Image:New{
@@ -1158,7 +1193,9 @@ function CreateWindow()
 	function bar_metal:HitTest(x,y) return self	end
 	function image_energy:HitTest(x,y) return self end
 	function bar_energy:HitTest(x,y) return self end
+	function lbl_net_help_energy:HitTest(x,y) return self end
 	function lbl_energy:HitTest(x,y) return self end
+	function lbl_net_help_metal:HitTest(x,y) return self end
 	function lbl_metal:HitTest(x,y) return self end
 	function lbl_e_income:HitTest(x,y) return self end
 	function lbl_m_income:HitTest(x,y) return self end
