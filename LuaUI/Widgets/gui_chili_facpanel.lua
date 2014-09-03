@@ -98,7 +98,7 @@ options = {
 
 local facs = {}
 --local facsByUnitId = {}
-local unfinished_facs = {}
+--local unfinished_facs = {}
 local pressedFac  = -1
 local waypointFac = -1
 local waypointMode = 0   -- 0 = off; 1=lazy; 2=greedy (greedy means: you have to left click once before leaving waypoint mode and you can have units selected)
@@ -228,6 +228,7 @@ end
 local function UpdateFac(i, facInfo)
 	--local unitDefID = facInfo.unitDefID
 	
+	--[[
 	local unitBuildDefID = -1
 	local unitBuildID    = -1
 
@@ -238,15 +239,16 @@ local function UpdateFac(i, facInfo)
 		unitBuildDefID = GetUnitDefID(unitBuildID)
 		_, _, _, _, progress = GetUnitHealth(unitBuildID)
 		--unitDefID      = unitBuildDefID
-		--[[
+		
 	elseif (unfinished_facs[facInfo.unitID]) then
 		_, _, _, _, progress = GetUnitHealth(facInfo.unitID)
 		if (progress>=1) then 
 			progress = -1
 			unfinished_facs[facInfo.unitID] = nil
 		end
-		--]]
+		
 	end
+	--]]
 
 	--echo 'UpdateFac'
 	local buildList   = facInfo.buildList
@@ -813,12 +815,14 @@ RecreateFacbar = function()
 	for i,facInfo in ipairs(facs) do
 		local unitDefID = facInfo.unitDefID
 		
+		--[[
 		local unitBuildDefID = -1
 		local unitBuildID    = -1
 		local progress
 
 		-- building?
-		unitBuildID      = GetUnitIsBuilding(facInfo.unitID)
+		--unitBuildID      = GetUnitIsBuilding(facInfo.unitID)
+		
 		if unitBuildID then
 			unitBuildDefID = GetUnitDefID(unitBuildID)
 			_, _, _, _, progress = GetUnitHealth(unitBuildID)
@@ -829,6 +833,7 @@ RecreateFacbar = function()
 				unfinished_facs[facInfo.unitID] = nil
 			end
 		end
+		--]]
 		if showAllPlayers and facInfo.teamID ~= curTeam then
 			curTeam = facInfo.teamID 
 			AddPlayerName(curTeam)
@@ -884,10 +889,12 @@ UpdateFactoryList = function()
 			if bo and #bo > 0 then
 				local teamID = Spring.GetUnitTeam(unitID)
 				push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions, teamID=teamID })
+				--[[
 				local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 				if (buildProgress)and(buildProgress<1) then
 					unfinished_facs[unitID] = true
 				end
+				--]]
 			end
 		end
 	end
@@ -938,7 +945,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			--UpdateFactoryList()
 			RecreateFacbar()
 		end
-		unfinished_facs[unitID] = true
+		--unfinished_facs[unitID] = true
 	end
 	
 	
@@ -963,7 +970,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		CheckRemoveFacStack()
 		
 		table.remove(facs,i)
-        unfinished_facs[unitID] = nil
+        --unfinished_facs[unitID] = nil
 		--UpdateFactoryList()
 		RecreateFacbar()
 		
