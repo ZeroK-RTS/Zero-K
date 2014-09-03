@@ -2261,8 +2261,11 @@ function GroupRecallFix(key, modifier, isRepeat)
 					SetCameraTarget(meanX, meanY, meanZ,0.5)
 				else
 					local unitID = lonely[currentIteration-#cluster]
-					local x,y,z= slctUnitUnordered[unitID][1],slctUnitUnordered[unitID][2],slctUnitUnordered[unitID][3] --// get stored unit position
-					SetCameraTarget(x,y,z,0.5)
+					local slctUnit = slctUnitUnordered[unitID]
+					if slctUnit ~= nil then --nil check. There seems to be a race condition or something which causes this unit to be nil sometimes
+						local x,y,z= slctUnit[1],slctUnit[2],slctUnit[3] --// get stored unit position
+						SetCameraTarget(x,y,z,0.5)
+					end
 				end
 				cluster=nil
 				slctUnitUnordered = nil
