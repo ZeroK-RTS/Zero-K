@@ -39,6 +39,8 @@ local window_cpl, scroll_cpl
 local colorNames = {}
 local colors = {}
 
+local showWins = false
+local wins_width = 0
 
 local green		= ''
 local red		= ''
@@ -71,7 +73,8 @@ if not WG.rzones then
 	}
 end
 
-local x_icon_country	= 0
+local x_wins			= 0
+local x_icon_country	= x_wins + 20
 local x_icon_rank		= x_icon_country + 20
 local x_icon_clan		= x_icon_rank + 16
 local x_cf				= x_icon_clan + 16
@@ -80,9 +83,7 @@ local x_name			= x_team + 16
 local x_share			= x_name + 140 
 local x_cpu				= x_share + 16
 local x_ping			= x_cpu + 16
-local x_postping		= x_ping + 16
-
-local x_bound = x_postping + 20
+local x_postwins		= x_ping + 16
 
 local UPDATE_FREQUENCY = 0.8	-- seconds
 
@@ -123,6 +124,7 @@ include("keysym.h.lua")
 function SetupPlayerNames() end
 
 options_path = 'Settings/HUD Panels/Player List'
+options_order = {'text_height', 'backgroundOpacity', 'reset_wins','alignToTop','showSpecs','allyTeamPerTeam','debugMessages','mousewheel','win_show_condition'}
 options = {
 	text_height = {
 		name = 'Font Size (10-18)',
@@ -141,6 +143,25 @@ options = {
 			scroll_cpl.borderColor = {1,1,1,self.value}
 			scroll_cpl:Invalidate()
 		end,
+	},
+	reset_wins = {
+		name = "Reset Wins",
+		desc = "Reset the win counts of all players",
+		type = 'button',
+		OnChange = function() 
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
+		end,
+	},
+	win_show_condition = {
+		name = 'Show Wins',
+		type = 'radioButton',
+		value = 'whenRelevant',
+		items = {
+			{key ='always', 	name='Always'},
+			{key ='whenRelevant', 		name='When someone has wins'},
+			{key ='never', 		name='Never'},
+		},
+		OnChange = function() SetupPlayerNames() end,
 	},
 	alignToTop = {
 		name = "Align to top",
@@ -181,6 +202,11 @@ options = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function CheckShowWins()
+	return (WG.WinCounter_currentWinTable.hasWins and options.win_show_condition.value == "whenRelevant") or options.win_show_condition.value == "always"
+end
+
 local function ShareUnits(playername, team)
 	local selcnt = Spring.GetSelectedUnitsCount()
 	if selcnt > 0 then
@@ -347,6 +373,10 @@ local function UpdatePlayerInfo()
 					pingImg:Invalidate()
 				end
 			end
+
+			local wins = 0
+			if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then wins = WG.WinCounter_currentWinTable[name].wins end
+			if entities[i].winsLabel then entities[i].winsLabel:SetCaption(wins) end
 		end	-- if not isAI
 	end	-- for entities
 	MakeSpecTooltip()
@@ -425,9 +455,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 
 	pingTime = pingTime or 0
 	cpuUsage = cpuUsage or 0
-	
+
 	local name_out = entity.name or ''
-	if (name_out == '' or deadTeam) and not entity.isAI then
+	if (name_out == '' or deadTeam or (spectator and teamID >= 0)) and not entity.isAI then
 		if Spring.GetGameSeconds() < 0.1 or cpuUsage > 1 then
 			name_out = "<Waiting> " ..(name or '')
 		elseif Spring.GetTeamUnitCount(teamID) > 0  then
@@ -461,6 +491,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 	local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ] 
 	local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 	local pingTime_readable = PingTimeOut(pingTime)
+
+	local wins = 0
+	if name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then wins = WG.WinCounter_currentWinTable[name].wins end
 
 	if not entity.isAI then 
 		-- flag
@@ -570,7 +603,24 @@ local function AddEntity(entity, teamID, allyTeamID)
 		function pingImg:HitTest(x,y) return self end
 		entity.pingImg = pingImg
 		scroll_cpl:AddChild(pingImg)
+
+		if showWins and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
+			local winsLabel = Label:New{
+				x=x_wins,
+				y=(fontsize+1) * row,
+				width=20,
+				autosize=false,
+				--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
+				caption = wins,
+				realText = wins,
+				textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
+				fontsize = fontsize,
+				fontShadow = true,
+			}
+			scroll_cpl:AddChild(winsLabel)
+		end
 	end
+
 	row = row + 1
 end
 
@@ -627,6 +677,8 @@ local function AlignScrollPanel()
 end
 
 SetupPlayerNames = function()
+	showWins = CheckShowWins()
+
 	if options.debugMessages.value then
 		Spring.Echo("Generating playerlist")
 	end
@@ -646,6 +698,7 @@ SetupPlayerNames = function()
 	scroll_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	if showWins then scroll_cpl:AddChild( Label:New{ x=x_wins, 	caption = 'W', 	fontShadow = true,  fontsize = fontsize,} ) end
 	
 	local playerlist = Spring.GetPlayerList()
 	local teamsSorted = Spring.GetTeamList()
@@ -681,11 +734,12 @@ SetupPlayerNames = function()
 		local playerID = playerlist[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
 		local entityID = #entities + 1
-		entities[entityID] = {name = name, isSpec = spectator, playerID = playerID, teamID = (not spectator) and teamID or nil}
-		if not spectator then
+		entities[entityID] = {name = name, isSpec = spectator, playerID = playerID, teamID = teamID}--(not spectator) and teamID or nil}
+		if teamID == 0 and not spectator or teamID ~= 0 then
 			local index = #teams[teamID].roster + 1
 			teams[teamID].roster[index] = entities[entityID]
-		elseif active then
+		end
+		if active and spectator then
 			specTeam.roster[#(specTeam.roster) + 1] = entities[entityID]
 		end
 	end
@@ -758,6 +812,9 @@ function widget:Update(s)
 			lastSizeX = window_cpl.width
 			lastSizeY = window_cpl.height
 		else
+			if showWins ~= CheckShowWins() then
+				SetupPlayerNames()
+			end
 			UpdatePlayerInfo()
 		end
 	end
