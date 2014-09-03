@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.017"
+local version = "v0.018"
 
 function widget:GetInfo()
   return {
@@ -810,6 +810,10 @@ RecreateFacbar = function()
 	enteredTweak = false
 	if inTweak then return end
 	
+	table.sort(facs, function(t1,t2)
+		return (t1.teamID == t2.teamID) and (t1.unitID < t2.unitID) or (t1.teamID < t2.teamID)
+	end)
+	
 	stack_main:ClearChildren()
 	local curTeam = -1
 	for i,facInfo in ipairs(facs) do
@@ -898,9 +902,6 @@ UpdateFactoryList = function()
 			end
 		end
 	end
-	table.sort(facs, function(t1,t2)
-		return t1.teamID < t2.teamID
-	end)
 	
 	  
 	RecreateFacbar()
