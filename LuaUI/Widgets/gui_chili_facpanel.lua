@@ -97,7 +97,7 @@ options = {
 -- list and interface vars
 
 local facs = {}
---local facsByUnitId = {}
+local facsByUnitId = {}
 --local unfinished_facs = {}
 local pressedFac  = -1
 local waypointFac = -1
@@ -110,7 +110,7 @@ local inTweak  = false
 local leftTweak, enteredTweak = false, false
 local cycle_half_s = 1
 local cycle_2_s = 1
-local updateQSoon
+local updateQSoon={}
 local lmx,lmy=-1,-1
 local showAllPlayers
 
@@ -368,31 +368,13 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		padding={0,0,0,0},
 		--margin={0, 0, 0, 0},
 		x=0,
-		width='100%',
+		width=800,
 		height = options.buttonsize.value,
 		resizeItems = false,
 		orientation = 'horizontal',
 		centerItems = false,
 	}
 	local qStore = {}
-	
-	local facStack = StackPanel:New{
-		name = stackname,
-		itemMargin={0,0,0,0},
-		itemPadding={0,0,0,0},
-		padding={0,0,0,0},
-		--margin={0, 0, 0, 0},
-		
-		width=800,
-		--right=0,height='100%',
-		
-		height = options.buttonsize.value*1.0,
-		resizeItems = false,
-		centerItems = false,
-	}
-	
-	
-	facStack:AddChild( qStack )
 	
 	
 	local fullFacStack = StackPanel:New{
@@ -406,16 +388,15 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		centerItems = false,
 		children = {
 			facButton,
-			facStack,
+			qStack,
 		},
 		orientation = 'horizontal',
 	}
 	
 	
-	--tocontrol:AddChild( facStack )
 	tocontrol:AddChild( fullFacStack )
 	
-	return facButton, facStack, boStack, qStack, qStore
+	return facButton, boStack, qStack, qStore
 end
 
 
@@ -542,7 +523,7 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 				buildRow_dragDrop[1] = nil
 				
 				--UpdateFac(facIndex, facs[facIndex])
-				updateQSoon = true
+				updateQSoon[facIndex] = true
 			end},
 			OnMouseDown = { function(self,x,y,mouse) --for drag_drop feature
 				
@@ -598,7 +579,7 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 						BuildRowButtonFunc(prevIndex, facs[i].qStack.children[prevIndex].cmdid, false, true,countTransfer, nil,facID) --then, remove queue on the left
 					end
 					buildRow_dragDrop[1] = nil
-					updateQSoon = true
+					updateQSoon[facIndex] = true
 				end
 			end},
 			
@@ -758,7 +739,7 @@ local function WaypointHandler(x,y,button)
   --if not shift then waypointMode = 0; return true end
 end
 
-local function MakeClearButton(unitID)
+local function MakeClearButton(unitID, i)
 	return Button:New{
 		name = 'clearfac-' .. unitID,
 		tooltip='Clear Factory Queue',
@@ -775,7 +756,7 @@ local function MakeClearButton(unitID)
 					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
 				end
 				Spring.PlaySoundFile(sound_queue_clear, 0.97, 'ui')
-				updateQSoon = true
+				updateQSoon[i] = true
 			end
 		},
 		children = {
@@ -842,28 +823,27 @@ RecreateFacbar = function()
 			curTeam = facInfo.teamID 
 			AddPlayerName(curTeam)
 		end
-		local facButton, facStack, boStack, qStack, qStore = AddFacButton(facInfo.unitID, unitDefID, stack_main, i)
+		local facButton,boStack, qStack, qStore = AddFacButton(facInfo.unitID, unitDefID, stack_main, i)
 		facs[i].facButton 	= facButton
-		facs[i].facStack 	= facStack
+		--facs[i].facStack 	= facStack
 		facs[i].boStack 	= boStack
 		facs[i].qStack 		= qStack
 		facs[i].qStore 		= qStore
 		
-		--facsByUnitId[facInfo.unitID] = i
+		facsByUnitId[facInfo.unitID] = i
 		
 		local buildList   = facInfo.buildList
 		local buildQueue  = GetBuildQueue(facInfo.unitID)
 		for j,unitDefIDb in ipairs(buildList) do
 			local unitDefIDb = unitDefIDb
-			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, unitDefIDb) )
+			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, unitDefIDb, i) )
 		end
-		boStack:AddChild( MakeClearButton( facInfo.unitID ) )
+		boStack:AddChild( MakeClearButton( facInfo.unitID, i ) )
+		
+		updateQSoon[i] = true
+
 	end
 	
-	--stack_build:ClearChildren()
-	--stack_build.backgroundColor = {0,0,0,0}
-	
-	--stack_build:SetPos(options.buttonsize.value*1.2 )
 	stack_build.x = options.buttonsize.value*1.2
 
 	stack_main:Invalidate()
@@ -871,7 +851,6 @@ RecreateFacbar = function()
 	
 	widget:SelectionChanged(Spring.GetSelectedUnits())
 	
-	updateQSoon = true
 end
 
 
@@ -912,7 +891,7 @@ local function CheckRemoveFacStack()
 		local qStack = facs[pressedFac].qStack
 		stack_build:ClearChildren()
 		stack_build.backgroundColor = {0,0,0,0}
-		facs[pressedFac].facStack:AddChild(qStack)
+		--facs[pressedFac].facStack:AddChild(qStack)
 		
 		facs[pressedFac].facButton.backgroundColor = {1,1,1,1}
 		facs[pressedFac].facButton:Invalidate()
@@ -952,7 +931,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	
 	local bdid = builderID and Spring.GetUnitDefID(builderID)
     if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
-		updateQSoon = true
+		local i = facsByUnitId[builderID]
+		updateQSoon[i] = true
 	end
 end
 
@@ -1002,14 +982,17 @@ function widget:Update()
 				if cycle_2_s == 1 then
 					UpdateFac(i, facInfo)
 				end
-				if updateQSoon then
+				if updateQSoon[i] then
 					UpdateFacQ(i, facInfo)
 				end
 			end
 		end
+		--[[
 		if updateQSoon then
 			updateQSoon = false
 		end
+		--]]
+		updateQSoon={}
 	end
 	
 	for i,facInfo in ipairs(facs) do
@@ -1020,7 +1003,7 @@ function widget:Update()
 		enteredTweak = true
 		stack_main:ClearChildren()
 		for i = 1,5 do
-			local facButton, facStack, boStack, qStack, qStore = AddFacButton(0, 0, stack_main, i)
+			local facButton, boStack, qStack, qStore = AddFacButton(0, 0, stack_main, i)
 		end
 		stack_main:Invalidate()
 		stack_main:UpdateLayout()
@@ -1057,8 +1040,10 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	if unitTeam ~= myTeamID and not showAllPlayers then
 		return
 	end
-	--local i = facsByUnitId[unitID]
-	updateQSoon = true
+	local i = facsByUnitId[unitID]
+	if i then
+		updateQSoon[i] = true
+	end
 end
 
 function widget:SelectionChanged(selectedUnits)
@@ -1070,9 +1055,9 @@ function widget:SelectionChanged(selectedUnits)
 		for cnt, f in ipairs(facs) do 
 			if f.unitID == selectedUnits[1] then 
 				pressedFac = cnt
-				local qStack = facs[pressedFac].qStack
+				--local qStack = facs[pressedFac].qStack
 				local boStack = facs[pressedFac].boStack
-				facs[pressedFac].facStack:RemoveChild(qStack)
+				--facs[pressedFac].facStack:RemoveChild(qStack)
 				stack_build:AddChild(boStack)
 				stack_build.backgroundColor = {1,1,1,1}
 				facs[pressedFac].facButton.backgroundColor = magenta_table
@@ -1083,7 +1068,7 @@ function widget:SelectionChanged(selectedUnits)
 		end
 	end
 	if pressedFac ~= -1 then
-		updateQSoon = true
+		updateQSoon[pressedFac] = true
 	end
 end
 
