@@ -45,7 +45,7 @@ local function AdjustToMapAspectRatio(w, h, buttonRight)
 	end
 	w = w - wPad
 	h = h - hPad
-	if mapIsWider then
+	if w/h < mapRatio then
 		return w + wPad, w/mapRatio + hPad
 	end
 	return h*mapRatio + wPad, h + hPad
@@ -342,7 +342,13 @@ function setSensorState(newState)
 	end
 end
 
+local firstUpdate = true
+
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
+	if firstUpdate then
+		firstUpdate = false
+		return
+	end
 	setSensorState(options.initialSensorState.value)
 	updateRadarColors()
 	options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
@@ -508,8 +514,8 @@ MakeMinimapWindow = function()
 		tweakDraggable = true,
 		tweakResizable = true,
 		dragUseGrip = false,
-		minWidth = 170,
-		minHeight = 170,
+		minWidth = 100,
+		minHeight = 100,
 		maxWidth = screenWidth*0.8,
 		maxHeight = screenHeight*0.8,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
