@@ -535,6 +535,10 @@ function gadget:GameFrame(n)
 	end
 end
 
+function GG.RequireRefuel(bomberID)
+	return (spGetUnitRulesParam(bomberID, "noammo") == 2) 
+end
+
 function GG.RefuelComplete(bomberID)
 	spSetUnitRulesParam(bomberID, "noammo", 3)	-- mark bomber as repairing/ not refueling anymore
 end

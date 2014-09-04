@@ -59,7 +59,7 @@ for unitDefID,data in pairs(bomberUnitDefs) do
 		turnRadius = ud.turnRadius,
 		maxAileron = ud.maxAileron,
 		maxElevator = ud.maxElevator,
-		maxRudder = ud.maxRudder
+		maxRudder = ud.maxRudder,
 	}
 	lowBehaviour[unitDefID] = {
 		maxPitch = 0.5,

@@ -82,6 +82,8 @@ local padSnapRangeSqr = 80^2
 local REFUEL_TIME = 5*30
 local PAD_ENERGY_DRAIN = 2.5
 
+local REFUEL_HALF_SECONDS = REFUEL_TIME/15
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -108,7 +110,6 @@ local function SitOnPad(unitID)
 	local cost = ud.metalCost
 	local maxHP = ud.health
 	local healPerHalfSecond = 2*PAD_ENERGY_DRAIN*maxHP/(cost*2)
-	local healing = true
 	
 	if not unitMovectrled[unitID] then
 		mcEnable(unitID)
@@ -138,8 +139,8 @@ local function SitOnPad(unitID)
 	
 	local function SitLoop()
 		local landDuration = 0
-		local refuelComplete = false
-		Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN)
+		local refuelProgress = GG.RequireRefuel(unitID) and 0
+		local drainingEnergy = false
 		
 		while true do
 			if (not landingUnit[unitID]) or landingUnit[unitID].abort or (not landingUnit[unitID].landed) then
@@ -168,28 +169,38 @@ local function SitOnPad(unitID)
 			landDuration = landDuration + 1
 			
 			if landDuration%15 == 0 then
-				local stunned_or_inbuild = spGetUnitIsStunned(landData.padID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
+				local stunned_or_inbuild = spGetUnitIsStunned(landData.padID) or (spGetUnitRulesParam(landData.padID,"disarmed") == 1)
 				if stunned_or_inbuild then
-					landDuration = landDuration - 15
-				else
-					if not refuelComplete and REFUEL_TIME <= landDuration then
-						refuelComplete = true
-						GG.RefuelComplete(unitID)
+					if drainingEnergy then
+						Spring.SetUnitResourcing(unitID, "uue" ,0)
+						drainingEnergy = false
 					end
-					local hp = spGetUnitHealth(unitID)
-					if hp < maxHP then
-						if not healing then
-							Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN)
-							healing = true
+				else
+					local slowState = 1 - (spGetUnitRulesParam(landData.padID,"slowState") or 0)
+					if refuelProgress then
+						refuelProgress = refuelProgress + slowState
+						if refuelProgress >= REFUEL_HALF_SECONDS then
+							refuelProgress = false
+							GG.RefuelComplete(unitID)
 						end
-						local _,_,_,energyUse = Spring.GetUnitResources(unitID)
-						spSetUnitHealth(unitID, min(maxHP, hp + healPerHalfSecond*energyUse/PAD_ENERGY_DRAIN))
-					else
-						if healing then
-							Spring.SetUnitResourcing(unitID, "uue" ,0)
-							healing = false
+					end
+					if not refuelProgress then
+						if GG.HasCombatRepairPenalty(unitID) then
+							slowState = slowState/4
 						end
-						if refuelComplete then
+						local hp = spGetUnitHealth(unitID)
+						if hp < maxHP then
+							if drainingEnergy ~= slowState then
+								Spring.SetUnitResourcing(unitID, "uue" ,PAD_ENERGY_DRAIN*slowState)
+								drainingEnergy = slowState
+							end
+							local _,_,_,energyUse = Spring.GetUnitResources(unitID)
+							spSetUnitHealth(unitID, min(maxHP, hp + healPerHalfSecond*energyUse/PAD_ENERGY_DRAIN))
+						else
+							if drainingEnergy then
+								Spring.SetUnitResourcing(unitID, "uue" ,0)
+								drainingEnergy = false
+							end
 							break
 						end
 					end
