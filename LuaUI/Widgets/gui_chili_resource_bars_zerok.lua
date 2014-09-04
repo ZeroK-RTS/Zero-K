@@ -627,18 +627,18 @@ function widget:GameFrame(n)
 	if (mInco+mReci+eInco > 0) then
 		local metal_proportion  = (mInco+mReci)/(mInco+mReci+eInco)
 		if options.linearProportionBar.value then
-			metal_proportion = metal_proportion*100
+			metal_proportion = metal_proportion
 		else
 			if (mInco+mReci) > 0.5 then
 				metal_proportion = metal_proportion * (metal_proportion * (3 - 2 * metal_proportion))
-				metal_proportion = (12.5 + metal_proportion * 75) + 2
+				metal_proportion = (0.125 + metal_proportion * 0.75)
 			elseif (eInco <= 0.5) then
-				metal_proportion = 100
+				metal_proportion = 1
 			else
 				metal_proportion = 0
 			end
 		end
-		metal_proportion = metal_proportion/100
+		metal_proportion = metal_proportion
 		bar_proportion.bars[1].percent = math.min(0.5, metal_proportion)
 		bar_proportion.bars[3].percent = 1 - metal_proportion
 		if (metal_proportion > 0.5) then
