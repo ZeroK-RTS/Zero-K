@@ -87,7 +87,7 @@ options = {
 		name = "Show ETA",
 		type = 'bool',
 		desc = 'Show ETA for the unit currently being built.',
-		value = false,
+		value = true,
 		OnChange = function() RecreateFacbar() end,
 	};
 }
