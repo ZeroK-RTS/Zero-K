@@ -77,6 +77,7 @@ local bar_buildpower
 
 local window_metal_proportion
 local bar_proportion
+local metal_proportion_warn_label
 local metal_proportion_label
 
 local positiveColourStr
@@ -91,6 +92,7 @@ local blink_alpha = 1
 local blinkM_status = false
 local blinkE_status = false
 local blinkProp_status = false
+local blinkProp_cleaningUp = false 
 local time_old = 0
 local excessE = false
 
@@ -317,12 +319,17 @@ function widget:Update(s)
 	end
 
 	if blinkProp_status then
+		blinkProp_cleaningUp = true
+		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build Energy")
 		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
 		bar_proportion.bars[2].color2 = Mix(
 			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5}, 
 			{col_expense[1]*multiColorMult, col_expense[2]*multiColorMult, col_expense[3]*multiColorMult, 1}, 
 			sawtooth)
 		bar_proportion:Invalidate()
+	elseif blinkProp_cleaningUp then
+		blinkProp_cleaningUp = false
+		metal_proportion_warn_label:SetCaption("")
 	end
 
 end
@@ -1156,6 +1163,21 @@ function CreateWindow()
 		caption = "^",
 		autosize = false,
 		font   = {size = 18, outline = true, color = {.9,.9,.9,1}},
+		tooltip = proportionTooltip,
+	}
+
+	metal_proportion_warn_label = Chili.Label:New{
+		parent = window_metal_proportion,
+		height = 30,
+		width  = '100%',
+		x      = 0,
+		y      = '50%',
+		-- valign = "center",
+		align  = "center",
+		valigh = "bottom",
+		caption = "",
+		autosize = false,
+		font   = {size = 13, outline = true, color = {.9,.9,.9,.5}},
 		tooltip = proportionTooltip,
 	}
 
