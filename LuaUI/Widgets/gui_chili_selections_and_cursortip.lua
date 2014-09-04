@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.096 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.097 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
@@ -460,7 +460,7 @@ function round(num, idp)
 end
 
 --from rooms widget by quantum
-local function ToSI(num)
+local function ToSI(num, displaySign)
   if type(num) ~= 'number' then
 	return 'Tooltip wacky error #55'
   end
@@ -469,25 +469,24 @@ local function ToSI(num)
   else
     local absNum = abs(num)
     if (absNum < 0.001) then
-      return strFormat("%.1fu", 1000000 * num)
+      return displaySign and strFormat("%+.1fu", 1000000 * num) or strFormat("%.1fu", 1000000 * num)
     elseif (absNum < 1) then
-      return strFormat("%.1f", num)
+      return displaySign and strFormat("%+.1f", num) or strFormat("%.1f", num) 
     elseif (absNum < 1000) then
-	  return strFormat("%.0f", num)
+	  return displaySign and strFormat("%+.0f", num) or strFormat("%.0f", num) 
     elseif (absNum < 1000000) then
-      return strFormat("%.1fk", 0.001 * num)
+      return displaySign and strFormat("%+.1fk", 0.001 * num) or strFormat("%.1fk", 0.001 * num) 
     else
-      return strFormat("%.1fM", 0.000001 * num)
+      return displaySign and strFormat("%+.1fM", 0.000001 * num) or strFormat("%.1fM", 0.000001 * num) 
     end
   end
 end
+--[[
 local function ToSIPrec(num) -- more presise
   if type(num) ~= 'number' then
 	return 'Tooltip wacky error #56'
   end
-  if not options.hpshort.value then 
-	return num
-  end 
+ 
   if (num == 0) then
     return "0"
   else
@@ -498,6 +497,7 @@ local function ToSIPrec(num) -- more presise
       return strFormat("%.2f", num)
     elseif (absNum < 1000) then
       return strFormat("%.1f", num)
+	  --return num
     elseif (absNum < 1000000) then
       return strFormat("%.2fk", 0.001 * num)
     else
@@ -505,41 +505,46 @@ local function ToSIPrec(num) -- more presise
     end
   end
 end
+--]]
 
-local function numformat(num, displayPlusMinus)
-	return comma_value(ToSIPrec(num), displayPlusMinus)
+local function numformat(num, displaySign)
+	return options.hpshort.value and ToSI(num, displaySign) or numformat2(num, displaySign)
 end
 
-
-function comma_value(amount, displayPlusMinus)
+function numformat2(amount, displaySign)
 	local formatted
 
-	-- amount is a string when ToSI is used before calling this function
 	if type(amount) == "number" then
 		if (amount ==0) then formatted = "0" else 
 			if (amount < 20 and (amount * 10)%10 ~=0) then 
-				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
+				if displaySign then formatted = strFormat("%+.1f", amount)
 				else formatted = strFormat("%.1f", amount) end 
 			else 
-				if displayPlusMinus then formatted = strFormat("%+d", amount)
+				if displaySign then formatted = strFormat("%+d", amount)
 				else formatted = strFormat("%d", amount) end 
 			end 
 		end
 	else
 		formatted = amount .. ""
 	end
+	return formatted
+end
 
-	if options.hpshort.value then 
-		local k
-		while true do  
-			formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
-			if (k==0) then
-				break
-			end
+--[[
+function comma_value(amount, displaySign)
+	local formatted
+
+	local k
+	while true do  
+		formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
+		if (k==0) then
+			break
 		end
-	end 
+	end
+	
   	return formatted
 end
+--]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -664,14 +669,14 @@ local function UpdateDynamicGroupInfo()
 		
 	end
 	
-	unitInfoSum.count = numformat(numSelectedUnits)
-	unitInfoSum.cost = numformat(total_cost)
-	unitInfoSum.hp = numformat(total_hp)
-	unitInfoSum.metalincome = numformat(total_metalincome)
-	unitInfoSum.metaldrain = numformat(total_metaldrain)
-	unitInfoSum.energyincome = numformat(total_energyincome)
-	unitInfoSum.energydrain = numformat(total_energydrain)
-	unitInfoSum.usedbp = numformat(total_usedbp)
+	unitInfoSum.count = numSelectedUnits
+	unitInfoSum.cost = total_cost
+	unitInfoSum.hp = total_hp
+	unitInfoSum.metalincome = total_metalincome
+	unitInfoSum.metaldrain = total_metaldrain
+	unitInfoSum.energyincome = total_energyincome
+	unitInfoSum.energydrain = total_energydrain
+	unitInfoSum.usedbp = total_usedbp
 end
 
 --updates values that don't change over time for group info
@@ -693,9 +698,9 @@ local function UpdateStaticGroupInfo()
 			end
 		end
 	end
-	unitInfoSum.finishedcost = numformat(total_finishedcost)
-	unitInfoSum.totalbp = numformat(total_totalbp)
-	unitInfoSum.maxhp = numformat(total_maxhp)
+	unitInfoSum.finishedcost = total_finishedcost
+	unitInfoSum.totalbp = total_totalbp
+	unitInfoSum.maxhp = total_maxhp
 end
 
 --this is a separate function to allow group info to be regenerated without reloading the whole tooltip
@@ -721,13 +726,13 @@ local function WriteGroupInfo()
 			end
 		end
 	end
-	local metal = (tonumber(unitInfoSum.metalincome)>0 or tonumber(unitInfoSum.metaldrain)>0) and ("\nMetal \255\0\255\0+" .. unitInfoSum.metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  unitInfoSum.metaldrain  .. "\255\255\255\255") or '' --have metal or ''
-	local energy = (tonumber(unitInfoSum.energyincome)>0 or tonumber(unitInfoSum.energydrain)>0) and ("\nEnergy \255\0\255\0+" .. unitInfoSum.energyincome .. "\255\255\255\255 / \255\255\0\0-" .. unitInfoSum.energydrain .. "\255\255\255\255") or '' --have energy or ''
-	local buildpower = (tonumber(unitInfoSum.totalbp)>0) and ("\nBuild Power " .. unitInfoSum.usedbp .. " / " ..  unitInfoSum.totalbp) or ''  --have buildpower or ''
+	local metal = (tonumber(unitInfoSum.metalincome)>0 or tonumber(unitInfoSum.metaldrain)>0) and ("\nMetal \255\0\255\0" .. numformat(unitInfoSum.metalincome, true) .. "\255\255\255\255 / \255\255\0\0" ..  numformat(-unitInfoSum.metaldrain, true)  .. "\255\255\255\255") or '' --have metal or ''
+	local energy = (tonumber(unitInfoSum.energyincome)>0 or tonumber(unitInfoSum.energydrain)>0) and ("\nEnergy \255\0\255\0" .. numformat(unitInfoSum.energyincome, true) .. "\255\255\255\255 / \255\255\0\0" .. numformat(-unitInfoSum.energydrain, true) .. "\255\255\255\255") or '' --have energy or ''
+	local buildpower = (tonumber(unitInfoSum.totalbp)>0) and ("\nBuild Power " .. numformat(unitInfoSum.usedbp) .. " / " ..  numformat(unitInfoSum.totalbp)) or ''  --have buildpower or ''
 	local unitInfoString = 
-		"Selected Units " .. unitInfoSum.count ..
-		"\nHealth " .. unitInfoSum.hp .. " / " ..  unitInfoSum.maxhp ..
-		"\nCost " .. unitInfoSum.cost .. " / " ..  unitInfoSum.finishedcost ..
+		"Selected Units " .. numformat(unitInfoSum.count) ..
+		"\nHealth " .. numformat(unitInfoSum.hp) .. " / " ..  numformat(unitInfoSum.maxhp) ..
+		"\nCost " .. numformat(unitInfoSum.cost) .. " / " ..  numformat(unitInfoSum.finishedcost) ..
 		metal .. energy ..	buildpower .. dgunStatus
 	
 	label_unitInfo = Label:New{ --recreate chili element (rather than just updating caption) to avoid color bug
