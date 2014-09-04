@@ -70,7 +70,7 @@ options = {
 		type = "number",
 		value = 1, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			window_facbar.color = {0,0,0,self.value}
+			window_facbar.color = {1,1,1,self.value}
 			window_facbar.caption = self.value == 0 and '' or 'Factories'
 			window_facbar:Invalidate()
 		end,
