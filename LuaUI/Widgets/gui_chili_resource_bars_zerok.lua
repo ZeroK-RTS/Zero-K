@@ -76,8 +76,7 @@ local lbl_buildpower
 local bar_buildpower
 
 local window_metal_proportion
-local bar_metal_proportion
-local bar_metal_proportion_overflow
+local bar_proportion
 local metal_proportion_label
 
 local positiveColourStr
@@ -94,6 +93,8 @@ local blinkE_status = false
 local blinkProp_status = false
 local time_old = 0
 local excessE = false
+
+local multiColorMult = 0.6
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -295,7 +296,9 @@ end
 function widget:Update(s)
 
 	blink = (blink+s)%blink_periode
-	blink_alpha = math.abs(blink_periode/2 - blink)*2/blink_periode*0.92
+	local sawtooth = math.abs(blink/blink_periode - 0.5)*2
+	blink_alpha = sawtooth*0.92
+	
 	blink_colourBlind = options.colourBlind.value and 1 or 0
 
 	if blinkM_status then
@@ -314,7 +317,12 @@ function widget:Update(s)
 	end
 
 	if blinkProp_status then
-			bar_metal_proportion_overflow:SetColor(col_expense[1], col_expense[2], col_expense[3], 0.9 * blink_alpha)
+		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
+		bar_proportion.bars[2].color2 = Mix(
+			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5}, 
+			{col_expense[1]*multiColorMult, col_expense[2]*multiColorMult, col_expense[3]*multiColorMult, 1}, 
+			sawtooth)
+		bar_proportion:Invalidate()
 	end
 
 end
@@ -623,18 +631,22 @@ function widget:GameFrame(n)
 				metal_proportion = 0
 			end
 		end
-		bar_metal_proportion:SetValue(metal_proportion)
-		if (metal_proportion > 50) then
-			bar_metal_proportion_overflow:SetValue((bar_metal_proportion.width/bar_metal_proportion_overflow.width) *
-			 (metal_proportion - 100 * (bar_metal_proportion_overflow.x - bar_metal_proportion.x)/bar_metal_proportion.width))
+		metal_proportion = metal_proportion/100
+		bar_proportion.bars[1].percent = math.min(0.5, metal_proportion)
+		bar_proportion.bars[3].percent = 1 - metal_proportion
+		if (metal_proportion > 0.5) then
+			bar_proportion.bars[2].percent = metal_proportion - 0.5
 			blinkProp_status = true
 		elseif (blinkProp_status) then
+			bar_proportion.bars[2].percent = 0
 			blinkProp_status = false
-			bar_metal_proportion_overflow:SetValue(0);
 		end
 	else
-		bar_metal_proportion:SetValue(50)
+		bar_proportion.bars[1].percent = 0
+		bar_proportion.bars[2].percent = 0
+		bar_proportion.bars[3].percent = 1
 	end
+	bar_proportion:Invalidate()
 
 	if options.workerUsage.value then
 		local bp_aval = 0
@@ -738,12 +750,12 @@ function CreateWindow()
 	local imageVertSpacing = '10%'
 	local imageHeight = '45%'
 	local netHelpLabelHeight = '20%'
-	local storageLabelOffset = '65%'
+	local storageLabelOffset = '70%'
 	local storageLabelHeight = '35%'
 	
-	local propBarHeight = '42%'
-	local proBarSpacing = '8%'
-	local proportionWindowSpacing = p(12.7 + options.barWidth.value) -- Default '19.2%'
+	local propBarHeight = '36%'
+	local proBarSpacing = '11.5%'
+	local proportionWindowSpacing = p(13.5 + options.barWidth.value) -- Default '21%'
 	
 	local barWidth = p(options.barWidth.value) --'6.5%'
 	local barEdgeSpacing = '13%'
@@ -1147,45 +1159,44 @@ function CreateWindow()
 		tooltip = proportionTooltip,
 	}
 
-	bar_metal_proportion_overflow = Chili.Progressbar:New{
+	bar_proportion = Chili.Multiprogressbar:New{
 		parent = window_metal_proportion,
-		color  = {0,0,0,0},
-		backgroundColor = {1, 1, 1, 0.0},
 		height = propBarHeight,
 		width  = '100%',
-		value  = 50,
-		-- orientation = "horizontal",
-		x      = '50%',
-		y      = proBarSpacing,
-		tooltip = proportionTooltip,	
-		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
-	}
-
-	bar_metal_proportion = Chili.Progressbar:New{
-		parent = window_metal_proportion,
-		color  = {col_metal[1], col_metal[2], col_metal[3], 0.35},
-		backgroundColor = {1, 1, 1, 0.0},
-		height = propBarHeight,
-		width  = '100%',
-		value  = 50,
-		-- orientation = "horizontal",
 		x      = 0,
 		y      = proBarSpacing,
+		orientation = "horizontal", 
 		tooltip = proportionTooltip,	
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
-	}
-
-	Chili.Progressbar:New{
-		parent = window_metal_proportion,
-		color  = {col_energy[1], col_energy[2], col_energy[3], 0.22},
-		backgroundColor = {1, 1, 1, 0.0},
-		height = propBarHeight,
-		width  = '100%',
-		value  = 100,
-		x      = 0,
-		y      = proBarSpacing,
-		tooltip = proportionTooltip,	
-		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+		bars = {  
+			{
+				color1 = {col_metal[1], col_metal[2], col_metal[3], 0.5},
+				color2 = {col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5},
+				percent = 0.5,
+				texture = nil, -- texture file name
+				s = 1, -- tex coords
+				t = 1,
+				tileSize = nil, --  if set then main axis texture coord = width / tileSize
+			}, 
+			{
+				color1 = {0,0,0,0},
+				color2 = {0,0,0,0},
+				percent = 0,
+				texture = nil, -- texture file name
+				s = 1, -- tex coords
+				t = 1,
+				tileSize = nil, --  if set then main axis texture coord = width / tileSize
+			}, 
+			{
+				color1 = {col_energy[1], col_energy[2], col_energy[3], 0.5},
+				color2 = {col_energy[1]*multiColorMult, col_energy[2]*multiColorMult, col_energy[3]*multiColorMult, 0.5},
+				percent = 0.5,
+				texture = nil, -- texture file name
+				s = 1, -- tex coords
+				t = 1,
+				tileSize = nil, --  if set then main axis texture coord = width / tileSize
+			},
+		}
 	}
 	
 	-- Activate tooltips for lables and bars, they do not have them in default chili
@@ -1201,7 +1212,7 @@ function CreateWindow()
 	function lbl_m_income:HitTest(x,y) return self end
 	function lbl_e_expense:HitTest(x,y) return self end
 	function lbl_m_expense:HitTest(x,y) return self end
-	function bar_metal_proportion:HitTest(x,y) return self end
+	function bar_proportion:HitTest(x,y) return self end
 	function metal_proportion_label:HitTest(x,y) return self end
 	
 end
