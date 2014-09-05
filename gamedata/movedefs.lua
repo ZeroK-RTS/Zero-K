@@ -8,6 +8,10 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local common_depthmodparams = {
+	minHeight = 7,
+}
+
 local moveDefs = {
 
 	KBOT1 = {
@@ -16,6 +20,7 @@ local moveDefs = {
 		maxwaterdepth = 16,
 		maxslope = 36,
 		crushstrength = 5,
+		depthmodparams = common_depthmodparams,
 	},
 
 	KBOT2 = {
@@ -24,6 +29,7 @@ local moveDefs = {
 		maxwaterdepth = 22,
 		maxslope = 36,
 		crushstrength = 50,
+		depthmodparams = common_depthmodparams,
 	},
 
 	KBOT3 = {
@@ -32,6 +38,7 @@ local moveDefs = {
 		maxwaterdepth = 22,
 		maxslope = 36,
 		crushstrength = 150,
+		depthmodparams = common_depthmodparams,
 	},
 	
 	KBOT4 = {
@@ -40,6 +47,7 @@ local moveDefs = {
 		maxwaterdepth = 22,
 		maxslope = 36,
 		crushstrength = 500,
+		depthmodparams = common_depthmodparams,
 	},
 	
 	AKBOT2 = {		--amphib
@@ -84,6 +92,7 @@ local moveDefs = {
 		maxwaterdepth = 16,
 		maxslope = 70,
 		crushstrength = 5,
+		depthmodparams = common_depthmodparams,
 	},
 
 	TKBOT3 = {		--allterrain
@@ -92,6 +101,7 @@ local moveDefs = {
 		maxwaterdepth = 22,
 		maxslope = 70,
 		crushstrength = 150,
+		depthmodparams = common_depthmodparams,
 	},
 	
 	TKBOT4 = {		--allterrain
@@ -100,6 +110,7 @@ local moveDefs = {
 		maxwaterdepth = 22,
 		maxslope = 70,
 		crushstrength = 500,
+		depthmodparams = common_depthmodparams,
 	},
 
 	ATKBOT3 = {		--amphib + allterrain
@@ -117,6 +128,7 @@ local moveDefs = {
 		maxslope = 18,
 		slopemod = 20,
 		crushstrength = 50,
+		depthmodparams = common_depthmodparams,
 	},
 	
 	TANK3 = {
@@ -126,6 +138,7 @@ local moveDefs = {
 		maxslope = 18,
 		slopemod = 20,
 		crushstrength = 150,
+		depthmodparams = common_depthmodparams,
 	},
 
 	TANK4 = {
@@ -135,6 +148,7 @@ local moveDefs = {
 		maxslope = 18,
 		slopemod = 20,
 		crushstrength = 500,
+		depthmodparams = common_depthmodparams,
 	},
 	
 	HOVER3 = {
