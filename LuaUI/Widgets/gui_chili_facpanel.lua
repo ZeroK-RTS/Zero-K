@@ -941,7 +941,7 @@ function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-  if (unitTeam ~= myTeamID) then
+  if (unitTeam ~= myTeamID) and not showAllPlayers then
     return
   end
   if UnitDefs[unitDefID].isFactory then
