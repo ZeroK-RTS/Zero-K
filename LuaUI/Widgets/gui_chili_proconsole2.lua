@@ -778,7 +778,23 @@ local function AddControlToFadeTracker(control, fadeType)
 	control.fadeType = fadeType or ''
 	fadeTracker[control_id] = control
 	control_id = control_id + 1
-end	
+end
+
+local msgTypeColors = {
+	player_to_allies 	= 'color_ally';
+	spec_to_allies		= 'color_ally';
+	player_to_specs		= 'color_spec';
+	spec_to_specs		= 'color_spec';
+	other				= 'color_other';
+	autohost			= 'color_other';
+}
+
+local function GetColor(msg)
+	if msg.highlight then
+		return options.color_highlight.value
+	end
+	return options[ msgTypeColors[msg.msgtype] or 'color_chat' ].value
+end
 
 local function AddMessage(msg, target, remake)
 	if hideMessage(msg)	or (not WG.Chili) then
@@ -839,15 +855,7 @@ local function AddMessage(msg, target, remake)
 	end
 	
 	--colors
-	local messageColor = options.color_chat.value
-	if msg.msgtype == 'player_to_allies' or msg.msgtype == 'spec_to_allies' then
-		messageColor = options.color_ally.value
-	elseif msg.msgtype == 'player_to_specs' or msg.msgtype == 'spec_to_specs' then
-		messageColor = options.color_spec.value
-	end
-	if msg.highlight then
-		messageColor = options.color_highlight.value
-	end
+	local messageColor = GetColor(msg)
 	
 	local nameColor = teamColors[msg.source2] or {1,1,1,1}
 	
