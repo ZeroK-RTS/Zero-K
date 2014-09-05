@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 
-local version = "v0.018"
+local version = "v0.019"
 
 function widget:GetInfo()
   return {
@@ -867,7 +867,7 @@ UpdateFactoryList = function()
 	for num = 1, totalUnits do
 		local unitID = teamUnits[num]
 		local unitDefID = GetUnitDefID(unitID)
-		if UnitDefs[unitDefID].isFactory then
+		if UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory then --failsafe in case using specfullview 0 and unitDefID becomes unavailable
 			local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
 			if bo and #bo > 0 then
 				local teamID = Spring.GetUnitTeam(unitID)
