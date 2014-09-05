@@ -1133,7 +1133,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
 		if firstEnter then
-			SetInputFontSize(15)
 			if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
 				Spring.SendCommands("chatally")
 			end
@@ -1275,6 +1274,7 @@ function widget:Update(s)
 			SwapBacklog()
 		end
 		firstUpdate = false
+		SetInputFontSize(15)
 	end
 end
 
