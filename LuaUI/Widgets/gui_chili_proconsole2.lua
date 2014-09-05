@@ -163,6 +163,10 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
+	
+	'changeFont',
+	'enableChatBackground',
+	
 	'toggleBacklog',
 	'text_height_chat', 
 	'text_height_console',
@@ -499,7 +503,9 @@ options = {
 		OnChange = function(self)
 			if self.value then
 				window_chat:AddChild(backlogButton)
-				window_chat:RemoveChild(inputspace)
+				if options.enableChatBackground.value then
+					window_chat:RemoveChild(inputspace)
+				end
 				inputspace = WG.Chili.ScrollPanel:New{
 					x = 0,
 					bottom = 0,
@@ -509,10 +515,14 @@ options = {
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
 				}
-				window_chat:AddChild(inputspace)
+				if options.enableChatBackground.value then
+					window_chat:AddChild(inputspace)
+				end
 			else
 				window_chat:RemoveChild(backlogButton)
-				window_chat:RemoveChild(inputspace)
+				if options.enableChatBackground.value then
+					window_chat:RemoveChild(inputspace)
+				end
 				inputspace = WG.Chili.ScrollPanel:New{
 					x = 0,
 					bottom = 0,
@@ -522,9 +532,33 @@ options = {
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
 				}
-				window_chat:AddChild(inputspace)
+				if options.enableChatBackground.value then
+					window_chat:AddChild(inputspace)
+				end
 			end
 			window_chat:Invalidate()
+		end,
+	},
+	changeFont = {
+		name = "Change message entering font.",
+		desc = "With this enabled the text-entering font will be changed to match the chat. May cause Spring to competely lock up intermittently on load. Requires reload to update.",
+		type = 'bool',
+		value = false,
+		advanced = true,
+	},
+	enableChatBackground = {
+		name = "Enable chat background.",
+		desc = "Enables a background for the text-entering box.",
+		type = 'bool',
+		value = false,
+		advanced = true,
+		OnChange = function(self)
+			if self.value then
+				window_chat:AddChild(inputspace)
+			else
+				window_chat:RemoveChild(inputspace)
+			end
+			scrollpanel_console:Invalidate()
 		end,
 	},
 	backchatOpacity = {
@@ -551,8 +585,10 @@ options = {
 --functions
 
 local function SetInputFontSize(size)
-	Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
-	Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
+	if options.changeFont.value then
+		Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
+		Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
+	end
 end	
 
 --------------------------------------------------------------------------------
@@ -1320,6 +1356,7 @@ function widget:Update(s)
 			SwapBacklog()
 		end
 		firstUpdate = false
+		SetInputFontSize(15)
 	end
 end
 
@@ -1464,7 +1501,9 @@ function widget:Initialize()
 	window_chat = MakeMessageWindow("ProChat", true)
 	window_chat:AddChild(scrollpanel_chat)
 	window_chat:AddChild(backlogButton)
-	window_chat:AddChild(inputspace)
+	if options.enableChatBackground.value then
+		window_chat:AddChild(inputspace)
+	end
 	
 	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value)
 	window_console:AddChild(scrollpanel_console)
@@ -1476,8 +1515,6 @@ function widget:Initialize()
 	end
 	
 	Spring.SendCommands({"console 0"})
-	
-	SetInputFontSize(15)
 	
 	HideInputSpace()
  	
