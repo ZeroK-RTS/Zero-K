@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console2",
-    desc      = "v2.001 Chili Chat Pro Console.",
+    desc      = "v2.002 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -697,6 +697,29 @@ local function detectHighlight(msg)
 	end
 end
 
+local function escape_lua_pattern(s)
+
+	local matches =
+	{
+		["^"] = "%^";
+		["$"] = "%$";
+		["("] = "%(";
+		[")"] = "%)";
+		["%"] = "%%";
+		["."] = "%.";
+		["["] = "%[";
+		["]"] = "%]";
+		["*"] = "%*";
+		["+"] = "%+";
+		["-"] = "%-";
+		["?"] = "%?";
+		["\0"] = "%z";
+	}
+
+  
+	return (s:gsub(".", matches))
+end
+
 local function formatMessage(msg)
 --[[
 	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
@@ -720,8 +743,9 @@ local function formatMessage(msg)
 	msg.textFormatted = msg.text
 	if msg.playername then
 		local out = msg.text
-		out = out:gsub( '^<' .. msg.playername ..'>', '' )
-		out = out:gsub( '^%[' .. msg.playername ..'%]', '' )
+		local playerName = escape_lua_pattern(msg.playername)
+		out = out:gsub( '^<' .. playerName ..'>', '' )
+		out = out:gsub( '^%[' .. playerName ..'%]', '' )
 		msg.textFormatted = out
 	end
 	msg.source2 = msg.playername or ''
