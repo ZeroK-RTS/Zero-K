@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console",
-    desc      = "v0.016 Chili Chat Pro Console.",
+    desc      = "v2.001 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -18,7 +18,10 @@ include("keysym.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+--[[
+	Version 2: Fading
+	
+]]
 -- message rules - widget stuff
 --[[
 each message definition can have:
@@ -100,7 +103,9 @@ local DEDUPE_SUFFIX = 'x '
 local MIN_HEIGHT = 50
 local MIN_WIDTH = 300
 local MAX_STORED_MESSAGES = 300
-	
+
+local LEFTCOLWIDTH = 120
+
 local inputsize = 25
 
 --------------------------------------------------------------------------------
@@ -117,6 +122,7 @@ local control_id = 0
 local stack_console, stack_chat, stack_backchat
 local window_console, window_chat
 local fadeTracker = {}
+local killTracker = {}
 local scrollpanel_chat, scrollpanel_console, scrollpanel_backchat
 local inputspace
 local backlogButton
@@ -127,7 +133,8 @@ local echo = Spring.Echo
 
 local incolor_dup
 local incolor_highlight
-local incolors = {} -- incolors indexed by playername + special #a/#e/#o/#s/#h colors based on config
+--local incolors = {} -- incolors indexed by playername + special #a/#e/#o/#s/#h colors based on config--
+local teamColors = {} -- incolors indexed by playername + special #a/#e/#o/#s/#h colors based on config
 
 local consoleMessages = {} -- message buffer
 local chatMessages = {} -- message buffer
@@ -159,8 +166,6 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
-	'changeFont',
-	'enableChatBackground',
 	'toggleBacklog',
 	'text_height_chat', 
 	'text_height_console',
@@ -177,14 +182,14 @@ options_order = {
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'hideLog',
 	'error_opengl_source',	
 	
-	--'pointButtonOpacity',
 	
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
-	'highlight_surround', 'highlight_sound', 'color_highlight',
+	--'highlight_surround',
+	'highlight_sound', 'color_highlight',
 	
 	--'highlighted_text_height', 
 	
-	'dedupe_messages', 'dedupe_points','color_dup',
+	'dedupe_messages', 'dedupe_points', --'color_dup',
 }
 
 local function onOptionsChanged()
@@ -192,12 +197,7 @@ local function onOptionsChanged()
 end
 
 options = {
-	
-	--lblFilter = {name='Filtering', type='label', advanced = false},
-	--lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
-	--lblHilite = {name='Highlighting', type='label'},
-	--lblDedupe = {name='De-Duplication', type='label'},
 	lblGeneral = {name='General Settings', type='label'},
 	lblMisc = {name='Misc. Settings', type='label'},
 	
@@ -254,15 +254,7 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
-	--[[
-	pointButtonOpacity = {
-		name = "Point button opacity",
-		type = 'number',
-		value = 0.25,
-		min = 0, max = 1, step = 0.05,
-		advanced = true,
-	},
-	--]]
+	
 	-- TODO work in progress
 	dedupe_messages = {
 		name = "Dedupe messages",
@@ -330,6 +322,7 @@ options = {
 	},
 --]]
 	
+	--[[
 	highlight_surround = {
 		name = "Surround highlighted messages",
 		type = 'bool',
@@ -338,6 +331,7 @@ options = {
 		advanced = true,
 		path = hilite_path,
 	},
+	--]]
 	highlight_sound = {
 		name = "Sound for highlighted messages",
 		type = 'bool',
@@ -422,6 +416,7 @@ options = {
 		OnChange = onOptionsChanged,
 		path = color_path,
 	},
+	--[[
 	color_dup = {
 		name = 'Duplicate message mark',
 		type = 'colors',
@@ -429,6 +424,7 @@ options = {
 		OnChange = onOptionsChanged,
 		path = dedupe_path,
 	},
+	--]]
 	color_highlight = {
 		name = 'Highlight mark',
 		type = 'colors',
@@ -506,9 +502,7 @@ options = {
 		OnChange = function(self)
 			if self.value then
 				window_chat:AddChild(backlogButton)
-				if options.enableChatBackground.value then
-					window_chat:RemoveChild(inputspace)
-				end
+				window_chat:RemoveChild(inputspace)
 				inputspace = WG.Chili.ScrollPanel:New{
 					x = 0,
 					bottom = 0,
@@ -518,14 +512,10 @@ options = {
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
 				}
-				if options.enableChatBackground.value then
-					window_chat:AddChild(inputspace)
-				end
+				window_chat:AddChild(inputspace)
 			else
 				window_chat:RemoveChild(backlogButton)
-				if options.enableChatBackground.value then
-					window_chat:RemoveChild(inputspace)
-				end
+				window_chat:RemoveChild(inputspace)
 				inputspace = WG.Chili.ScrollPanel:New{
 					x = 0,
 					bottom = 0,
@@ -535,33 +525,9 @@ options = {
 					borderColor = {0,0,0,1},
 					--backgroundColor = {1,1,1,1},
 				}
-				if options.enableChatBackground.value then
-					window_chat:AddChild(inputspace)
-				end
+				window_chat:AddChild(inputspace)
 			end
 			window_chat:Invalidate()
-		end,
-	},
-	changeFont = {
-		name = "Change message entering font.",
-		desc = "With this enabled the text-entering font will be changed to match the chat. May cause Spring to competely lock up intermittently on load. Requires reload to update.",
-		type = 'bool',
-		value = false,
-		advanced = true,
-	},
-	enableChatBackground = {
-		name = "Enable chat background.",
-		desc = "Enables a background for the text-entering box.",
-		type = 'bool',
-		value = false,
-		advanced = true,
-		OnChange = function(self)
-			if self.value then
-				window_chat:AddChild(inputspace)
-			else
-				window_chat:RemoveChild(inputspace)
-			end
-			scrollpanel_console:Invalidate()
 		end,
 	},
 	backchatOpacity = {
@@ -588,10 +554,8 @@ options = {
 --functions
 
 local function SetInputFontSize(size)
-	if options.changeFont.value then
-		Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
-		Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
-	end
+	Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
+	Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
 end	
 
 --------------------------------------------------------------------------------
@@ -617,6 +581,7 @@ function getMessageRuleOptionName(msgtype, suboption)
   return msgtype .. "_" .. suboption
 end
 
+--[[
 for msgtype,rule in pairs(MESSAGE_RULES) do
 	if rule.output and rule.name then -- if definition has multiple output formats, make associated config option
 		local option_name = getMessageRuleOptionName(msgtype, "output_format")
@@ -656,6 +621,7 @@ local function getOutputFormat(msgtype)
 	return rule.format
   end
 end
+--]]
 
 local function getSource(spec, allyTeamId)
 	return (spec and 'spec')
@@ -699,6 +665,7 @@ local function detectHighlight(msg)
 end
 
 local function formatMessage(msg)
+--[[
 	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
 	
 	-- insert/sandwich colour string into text
@@ -716,6 +683,15 @@ local function formatMessage(msg)
 			end
 		end)
 	msg.formatted = formatted
+	--]]
+	msg.textFormatted = msg.text
+	if msg.playername then
+		local out = msg.text
+		out = out:gsub( '^<' .. msg.playername ..'>', '' )
+		out = out:gsub( '^%[' .. msg.playername ..'%]', '' )
+		msg.textFormatted = out
+	end
+	msg.source2 = msg.playername or ''
 end
 
 local function hideMessage(msg)
@@ -739,6 +715,13 @@ local function hideMessage(msg)
 		(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
 		string.find(msg.argument,'Team') or string.find(msg.argument,'AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
 end
+
+local function AddControlToFadeTracker(control, fadeType)
+	control.fade = 1
+	control.fadeType = fadeType or ''
+	fadeTracker[control_id] = control
+	control_id = control_id + 1
+end	
 
 local function AddMessage(msg, target, remake)
 	if hideMessage(msg)	or (not WG.Chili) then
@@ -767,16 +750,16 @@ local function AddMessage(msg, target, remake)
 		lastMsg = lastMsgBackChat
 	end	
 	
-	--if msg.highlight and options.highlighted_text_height.value
-	
 	-- TODO betterify this / make configurable
+	--[[
 	local highlight_sequence1 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_1) or '')
 	local highlight_sequence2 = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE_2) or '')
-	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.formatted .. highlight_sequence2
+	--local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.textFormatted .. highlight_sequence2
+	local text = (msg.dup > 1 and (msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence1 .. msg.textFormatted .. highlight_sequence2
+	--]]
+	local text = (msg.dup > 1 and (msg.dup .. DEDUPE_SUFFIX) or '') .. msg.textFormatted
 
 	if msg.dup > 1 and not remake then
-		--local last = stack.children[#(stack.children)]
-		
 		if lastMsg then
 			if lastMsg.SetText then
 				lastMsg:SetText(text)
@@ -787,94 +770,157 @@ local function AddMessage(msg, target, remake)
 		return
 	end
 	
-	local textbox = WG.Chili.TextBox:New{
+	local control 
+	local sourceTextBox
+	local message
+	local messageTextBox
+	local flagButton
+	
+	local messageText = msg.text
+	if target == 'chat' or target == 'backchat' then
+		messageText = msg.textFormatted
+	end
+	
+	--colors
+	local messageColor = options.color_chat.value
+	if msg.msgtype == 'player_to_allies' or msg.msgtype == 'spec_to_allies' then
+		messageColor = options.color_ally.value
+	elseif msg.msgtype == 'player_to_specs' or msg.msgtype == 'spec_to_specs' then
+		messageColor = options.color_spec.value
+	end
+	if msg.highlight then
+		messageColor = options.color_highlight.value
+	end
+	
+	local nameColor = teamColors[msg.source2] or {1,1,1,1}
+	
+	messageTextBox = WG.Chili.TextBox:New{
 		width = '100%',
 		align = "left",
 		fontsize = size,
 		valign = "ascender",
-		lineSpacing = 0,
-		padding = { 0, 0, 0, 0 },
-		text = text,
-		
+		lineSpacing = 1,
+		padding = { 2,2,2,2 },
+		text = messageText,
+		fontShadow=false,
+		autoHeight=true,
 		--[[
 		autoHeight=true,
 		autoObeyLineHeight=true,
 		--]]
-
+		font = {
+			-- [[
+			outlineWidth = 3,
+			outlineWeight = 10,
+			outline = true,
+			--]]
+			--color         = {1,0,0,1},
+			color         = messageColor,
+		}
+	}
+	
+	local messageTextBoxCont = WG.Chili.StackPanel:New{
+		--width = '100%',
+		orientation='horizontal';
+		right=0;
+		x=LEFTCOLWIDTH +10 + (msg.point and 30 or 0);
+		autosize = true,
+		resizeItems = false,
+		centerItems = false,
+		padding={0,0,0,0};
+		itemMargin  = {0,0,0,0},
+		children = {messageTextBox};
+	}
+	
+	
+	sourceTextBox = WG.Chili.Label:New{
+		caption = msg.source2,
+		width = LEFTCOLWIDTH ,
+		align = "right",
+		fontsize = size,
+		--valign = "ascender",
+		lineSpacing = 0,
+		padding = { 0, 0, 0, 0 },
+		
+		fontShadow=false,
+		autoHeight=true,
+		--autoObeyLineHeight=true,
+		
 		font = {
 			outlineWidth = 3,
 			outlineWeight = 10,
 			outline = true,
-			
-			--color         = {0,0,0,0},
+			color         = nameColor,
 		}
 	}
 	
-	if options.clickable_points.value then
-		local control = textbox
-		if msg.point then --message is a marker, make obvious looking button
-			local padding
-			if target == 'chat' then
-				padding = { 3,3,1,1 }
-			else
-				padding = { 1,1,1,1 }
-			end
-			textbox:SetPos( 35, 3, stack.width - 40 )
-			textbox:Update()
-			local tbheight = textbox.height -- not perfect
-			tbheight = math.max( tbheight, 15 ) --hack
-			--echo('tbheight', tbheight)
-			control = WG.Chili.Panel:New{
-				width = '100%',
-				height = tbheight + 8,
-				padding = padding,
-				margin = {0,0,0,0},
-				backgroundColor = {0,0,0,0},
-				caption = '',
-				children = {
-					WG.Chili.Button:New{
-						caption='',
-						x=0;y=0;
-						width = 30,
-						height = 20,
-						--backgroundColor = {1,1,1,options.pointButtonOpacity.value},
-						backgroundColor = {1,1,1,1},
-						padding = {2,2,2,2},
-						children = {
-							WG.Chili.Image:New {
-								x=7;y=2;
-								width = 14,
-								height = 14,
-								keepAspect = true,
-								file = 'LuaUI/Images/Crystal_Clear_action_flag.png',
-							}
-						},
-						OnClick = {function(self, x, y, mouse)
-							local alt,ctrl, meta,shift = Spring.GetModKeyState()
-							if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
-							Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
-						end}
-					},
-					textbox,
-				},
-				
-			}
-		elseif target == 'chat' then
-			-- Make a panel for each chat line because this removes the message jitter upon fade.
-			textbox:SetPos( 3, 3, stack.width - 3 )
-			textbox:Update()
-			local tbheight = textbox.height + 2 -- not perfect
-			--echo('tbheight', tbheight)
-			control = WG.Chili.Panel:New{
-				width = '100%',
-				height = tbheight,
-				padding = { 0,0,0,0 },
-				backgroundColor = {0,0,0,0},
-				caption = '',
-				children = {
-					textbox,
-				},
-			}
+	local tbheight = 20
+	
+	local controlChildren = {sourceTextBox, messageTextBoxCont}
+	if msg.point then
+		flagButton = WG.Chili.Button:New{
+			caption='',
+			x=LEFTCOLWIDTH + 10;
+			--y=0;
+			width = 30,
+			--height = 18,
+			height = '100%',
+			
+			backgroundColor = {1,1,1,1},
+			padding = {2,2,2,2},
+			children = {
+				WG.Chili.Image:New {
+					x=7;y=1;
+					width = 12,
+					height = '100%',
+					keepAspect = true,
+					file = 'LuaUI/Images/Crystal_Clear_action_flag.png',
+				}
+			},
+			OnClick = {function(self, x, y, mouse)
+				if not options.clickable_points.value then
+					return
+				end
+				local alt,ctrl, meta,shift = Spring.GetModKeyState()
+				if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
+				Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+			end}
+		}
+		controlChildren = {sourceTextBox, flagButton, messageTextBoxCont}
+	end
+	--control = WG.Chili.Grid:New{
+	control = WG.Chili.Panel:New{
+		--columns=2,
+		width = '100%',
+		orientation = "horizontal",
+		padding =  {0,0,0,0},
+		margin = {0,0,0,0},
+		--itemPadding = {5,5,5,5};
+		--backgroundColor = {0,0,0,0.5};
+		backgroundColor = {0,0,0,0};
+		autosize = true,
+		resizeItems = false,
+		centerItems = false,
+		children = controlChildren;		
+	}
+	
+	if target == 'chat' or target == 'backchat' then
+		stack:AddChild(control, false)
+	else
+		stack:AddChild(messageTextBox, false)
+	end
+	
+	if fade then
+		AddControlToFadeTracker(control)
+		AddControlToFadeTracker(messageTextBox, 'text')
+		AddControlToFadeTracker(sourceTextBox, 'text')
+		if msg.point then
+			AddControlToFadeTracker(flagButton, 'button')
+		end
+	end
+	
+	--[[
+	
 		elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
 			local cur = WG.alliedCursorsPos[msg.player.id]
 			if cur then
@@ -891,37 +937,23 @@ local function AddMessage(msg, target, remake)
 				end
 			end
 		end
-		stack:AddChild(control, false)
-		if fade then
-			control.fade = 1
-			fadeTracker[control_id] = control
-			control_id = control_id + 1
-		end
-		--]]
-	else
-		stack:AddChild(textbox, false)
-		if fade then
-			textbox.fade = 1
-			fadeTracker[control_id] = textbox
-			control_id = control_id + 1
-		end
-	end
+	--]]
 	
 	if target == 'chat' then
-		lastMsgChat = textbox
+		lastMsgChat = messageTextBox
 	elseif target == 'backchat' then
-		lastMsgBackChat = textbox
+		lastMsgBackChat = messageTextBox
 	else
-		lastMsgConsole = textbox
+		lastMsgConsole = messageTextBox
 	end
 
 	stack:UpdateClientArea()
 		
 end 
 
-
+--[[
 local function setupColors()
-	incolor_dup			= color2incolor(options.color_dup.value)
+	--incolor_dup			= color2incolor(options.color_dup.value)
 	incolor_highlight	= color2incolor(options.color_highlight.value)
 	incolors['#h']		= incolor_highlight
 	incolors['#a'] 		= color2incolor(options.color_ally.value)
@@ -929,18 +961,21 @@ local function setupColors()
 	incolors['#o'] 		= color2incolor(options.color_other.value)
 	incolors['#s'] 		= color2incolor(options.color_spec.value)
 end
+--]]
 
 local function setupPlayers(playerID)
 	if playerID then
 		local name, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerID)
 		--lobby: grey chat, spec: white chat, player: color chat
-		incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
+		--incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
+		teamColors[name] = (spec and {1,1,1,1}) or {Spring.GetTeamColor(teamId)}
 	else
 		local playerroster = Spring.GetPlayerList()
 		for i, id in ipairs(playerroster) do
 			local name,active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
 			--lobby: grey chat, spec: white chat, player: color chat
-			incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
+			--incolors[name] = (spec and incolors['#s']) or color2incolor(Spring.GetTeamColor(teamId))
+			teamColors[name] = (spec and {1,1,1,1}) or {Spring.GetTeamColor(teamId)}
 		end
 	end
 end
@@ -955,7 +990,8 @@ local function SetupAITeamColor() --Copied from gui_chili_chat2_1.lua
 			local isAI = select(4,Spring.GetTeamInfo(teamID))
 			if isAI then
 				local name = select(2,Spring.GetAIInfo(teamID))
-				incolors[name] = color2incolor(Spring.GetTeamColor(teamID))
+				--incolors[name] = color2incolor(Spring.GetTeamColor(teamID))
+				teamColors[name] = {Spring.GetTeamColor(teamID)}
 			end
 		end --if teamID ~= Spring.GetGaiaTeamID() 
 	end --for each team		
@@ -968,7 +1004,7 @@ end
 
 local function setup()
 	setupMyself()
-	setupColors()
+	--setupColors()
 	setupPlayers()
 	SetupAITeamColor()
 end
@@ -1129,11 +1165,11 @@ options.toggleBacklog.OnChange = SwapBacklog
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) then
+
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
 		if firstEnter then
-			SetInputFontSize(15)
 			if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
 				Spring.SendCommands("chatally")
 			end
@@ -1165,7 +1201,8 @@ function widget:AddMapPoint(playerId, px, py, pz, caption)
 		msgtype = ((caption:len() > 0) and 'label' or 'point'),
 		playername = playerName,
 		source = getSource(spec, allyTeamId),
-		text = 'MapDrawCmd ' .. caption,
+		--text = 'MapDrawCmd ' .. caption, --removed for proconsole 2
+		text = caption,
 		argument = caption,
 		priority = 0, -- just in case ... probably useless
 		point = { x = px, y = py, z = pz }
@@ -1245,22 +1282,33 @@ end
 -----------------------------------------------------------------------
 local firstUpdate = true
 local timer = 0
+local freq = 0.5
 
--- FIXME wtf is this obsessive function?
+
 function widget:Update(s)
 
 	timer = timer + s
-	if timer > 2 then
+	if timer > freq then
 		timer = 0
-		local sub = 2 / options.autohide_text_time.value
+		local sub = freq / options.autohide_text_time.value
 		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
 			window_chat.x / screen0.width + 0.003, 
 			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
 			window_chat.width / screen0.width)})
 	
 		for k,control in pairs(fadeTracker) do
-			
 			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
+			local fade = control.fade * 2
+			if control.fadeType == 'text' then
+				local c = control.font.color
+				local o = control.font.outlineColor
+				control.font:SetColor(c[1],c[2],c[3], fade)
+				control.font:SetOutlineColor(o[1],o[2],o[3], fade)
+				control:Invalidate()
+			elseif control.fadeType == 'button' then
+				control.backgroundColor = {1,1,1, fade}
+				control:Invalidate()
+			end
 			
 			if control.fade == 0 then
 				--control.parent:RemoveChild(control)
@@ -1419,9 +1467,7 @@ function widget:Initialize()
 	window_chat = MakeMessageWindow("ProChat", true)
 	window_chat:AddChild(scrollpanel_chat)
 	window_chat:AddChild(backlogButton)
-	if options.enableChatBackground.value then
-		window_chat:AddChild(inputspace)
-	end
+	window_chat:AddChild(inputspace)
 	
 	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value)
 	window_console:AddChild(scrollpanel_console)
@@ -1433,6 +1479,8 @@ function widget:Initialize()
 	end
 	
 	Spring.SendCommands({"console 0"})
+	
+	SetInputFontSize(15)
 	
 	HideInputSpace()
  	
