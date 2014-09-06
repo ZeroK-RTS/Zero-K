@@ -119,6 +119,13 @@ if not reverseCompat then
 	end
 end
 
+-- https://github.com/spring/spring/commit/dd7d1f79c3a9b579f874c210eb4c2a8ae7b72a16
+for _, weaponDef in pairs(WeaponDefs) do
+	if ((weaponDef.weapontype == "LightningCannon") and (not weaponDef.beamttl)) then
+		weaponDef.beamttl = 10
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
