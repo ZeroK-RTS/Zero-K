@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console2",
-    desc      = "v2.002 Chili Chat Pro Console.",
+    desc      = "v2.003 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -119,7 +119,6 @@ local control_id = 0
 local stack_console, stack_chat, stack_backchat
 local window_console, window_chat
 local fadeTracker = {}
-local killTracker = {}
 local scrollpanel_chat, scrollpanel_console, scrollpanel_backchat
 local inputspace
 local backlogButton
@@ -139,6 +138,8 @@ local highlightPattern -- currently based on player name -- TODO add configurabl
 
 local firstEnter = true --used to activate ally-chat at game start. To run once
 local noAlly = false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
+
+local decayTime  = 20 
 
 local lastMsgChat, lastMsgBackChat, lastMsgConsole
 
@@ -576,7 +577,7 @@ options = {
 		type = 'number',
 		value = 20,
 		min = 10, max = 60, step = 5,
-		--OnChange = onOptionsChanged,
+		OnChange = function() decayTime = options.autohide_text_time.value end,
 	},
 	
 }
@@ -744,8 +745,8 @@ local function formatMessage(msg)
 	if msg.playername then
 		local out = msg.text
 		local playerName = escape_lua_pattern(msg.playername)
-		out = out:gsub( '^<' .. playerName ..'>', '' )
-		out = out:gsub( '^%[' .. playerName ..'%]', '' )
+		out = out:gsub( '^<' .. playerName ..'> ', '' )
+		out = out:gsub( '^%[' .. playerName ..'%] ', '' )
 		msg.textFormatted = out
 	end
 	msg.source2 = msg.playername or ''
@@ -1347,39 +1348,47 @@ end
 -----------------------------------------------------------------------
 local firstUpdate = true
 local timer = 0
-local freq = 0.5
+local fadeTimer = 0
+local freq = 2
+local fadeFreq = 0.2
 
 
 function widget:Update(s)
 
 	timer = timer + s
+	fadeTimer = fadeTimer + s
+	
 	if timer > freq then
 		timer = 0
-		local sub = freq / options.autohide_text_time.value
 		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
 			window_chat.x / screen0.width + 0.003, 
 			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
 			window_chat.width / screen0.width)})
-	
+	end
+	if fadeTimer > fadeFreq then
+		fadeTimer = 0
+		local sub = fadeFreq / decayTime
+		
 		for k,control in pairs(fadeTracker) do
-			fadeTracker[k].fade = math.max( control.fade - sub, 0 ) --removes old lines
-			local fade = control.fade * 2
-			if control.fadeType == 'text' then
-				local c = control.font.color
-				local o = control.font.outlineColor
-				control.font:SetColor(c[1],c[2],c[3], fade)
-				control.font:SetOutlineColor(o[1],o[2],o[3], fade)
+			control.fade = math.max( control.fade - sub, 0 )
+			local alpha = control.fade * 2
+			
+			if control.fade == 0 then
+				control:Dispose()
+				fadeTracker[k] = nil
+			elseif alpha < 1 and control.fadeType == 'text' then
+				local f = control.font
+				local c = f.color
+				local o = f.outlineColor
+				f:SetColor(c[1],c[2],c[3], alpha)
+				f:SetOutlineColor(o[1],o[2],o[3], alpha)
 				control:Invalidate()
-			elseif control.fadeType == 'button' then
-				control.backgroundColor = {1,1,1, fade}
+			elseif alpha < 1 and control.fadeType == 'button' then
+				control.backgroundColor = {1,1,1, alpha}
 				control:Invalidate()
 			end
 			
-			if control.fade == 0 then
-				--control.parent:RemoveChild(control)
-				control:Dispose()
-				fadeTracker[k] = nil
-			end
+			
 		end
 	end
 	
