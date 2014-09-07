@@ -92,7 +92,7 @@ local blink_alpha = 1
 local blinkM_status = false
 local blinkE_status = false
 local blinkProp_status = false
-local blinkProp_cleaningUp = false 
+local blink_caption = false 
 local time_old = 0
 local excessE = false
 
@@ -303,7 +303,19 @@ function widget:Update(s)
 	
 	blink_colourBlind = options.colourBlind.value and 1 or 0
 
+	if blinkProp_status then
+		blink_caption = true
+		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build Energy")
+		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
+		bar_proportion.bars[2].color2 = Mix(
+			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5}, 
+			{col_expense[1]*multiColorMult, col_expense[2]*multiColorMult, col_expense[3]*multiColorMult, 1}, 
+			sawtooth)
+		bar_proportion:Invalidate()
+	end
+
 	if blinkM_status then
+		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build More Units")
 		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
 	end
 
@@ -314,21 +326,13 @@ function widget:Update(s)
 		-- else
 			-- flash red if stalling
 			--Spring.Echo("{"..col_expense[1]..", "..col_expense[2]..", "..col_expense[3]..", "..blink_alpha.."}")
+			metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build Energy")
 			bar_energy_overlay:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
 		-- end
 	end
 
-	if blinkProp_status then
-		blinkProp_cleaningUp = true
-		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build Energy")
-		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
-		bar_proportion.bars[2].color2 = Mix(
-			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5}, 
-			{col_expense[1]*multiColorMult, col_expense[2]*multiColorMult, col_expense[3]*multiColorMult, 1}, 
-			sawtooth)
-		bar_proportion:Invalidate()
-	elseif blinkProp_cleaningUp then
-		blinkProp_cleaningUp = false
+	if blink_caption and (not blinkProp_status) and (not blinkE_status) and (not blinkM_status) then
+		blink_caption = false
 		metal_proportion_warn_label:SetCaption("")
 	end
 
