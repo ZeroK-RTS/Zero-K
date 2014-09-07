@@ -103,7 +103,6 @@ unitDef = {
     SHIELDGUN = {
       name                    = [[Shield Gun]],
       areaOfEffect            = 8,
-      beamttl                 = 6,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting       = 0,
