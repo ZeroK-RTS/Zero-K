@@ -305,7 +305,7 @@ function widget:Update(s)
 
 	if blinkProp_status then
 		blink_caption = true
-		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build Energy")
+		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 0.5}, blink_alpha)).."Build Energy")
 		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
 		bar_proportion.bars[2].color2 = Mix(
 			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5}, 
@@ -1181,7 +1181,7 @@ function CreateWindow()
 		valigh = "bottom",
 		caption = "",
 		autosize = false,
-		font   = {size = 13, outline = true, color = {.9,.9,.9,.5}},
+		font   = {size = 13, outline = true, color = {.9,.9,.9,1}},
 		tooltip = proportionTooltip,
 	}
 
