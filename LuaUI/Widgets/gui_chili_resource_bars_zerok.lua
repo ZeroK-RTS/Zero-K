@@ -303,6 +303,9 @@ function widget:Update(s)
 	
 	blink_colourBlind = options.colourBlind.value and 1 or 0
 
+	--Colour strings are only used for the flashing captions because engine 91.0 has a bug that keeps the string showing when the colour is changed to {0,0,0,0}
+	--Once engine 97+ is adopted officially, the captions should use SetColor (followed by Invalidate if that remains necessary)
+
 	if blinkProp_status then
 		blink_caption = true
 		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 0.5}, blink_alpha)).."Build Energy")
