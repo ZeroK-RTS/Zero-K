@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Pro Console2",
-    desc      = "v2.003 Chili Chat Pro Console.",
+    desc      = "v2.004 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
@@ -118,6 +118,7 @@ local myAllyTeamId
 local control_id = 0
 local stack_console, stack_chat, stack_backchat
 local window_console, window_chat
+local killTracker = {}
 local fadeTracker = {}
 local scrollpanel_chat, scrollpanel_console, scrollpanel_backchat
 local inputspace
@@ -774,10 +775,11 @@ local function hideMessage(msg)
 		string.find(msg.argument,'Team') or string.find(msg.argument,'AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
 end
 
+
 local function AddControlToFadeTracker(control, fadeType)
-	control.fade = 1
+	control.life = decayTime
 	control.fadeType = fadeType or ''
-	fadeTracker[control_id] = control
+	killTracker[control_id] = control
 	control_id = control_id + 1
 end
 
@@ -1349,45 +1351,54 @@ end
 local firstUpdate = true
 local timer = 0
 local fadeTimer = 0
-local freq = 2
-local fadeFreq = 0.2
-
+local period = 1
+local fadePeriod = 0.1
+local fadeLength = 4
 
 function widget:Update(s)
 
 	timer = timer + s
 	fadeTimer = fadeTimer + s
 	
-	if timer > freq then
+	if timer > period then
 		timer = 0
 		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
 			window_chat.x / screen0.width + 0.003, 
 			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
 			window_chat.width / screen0.width)})
-	end
-	if fadeTimer > fadeFreq then
-		fadeTimer = 0
-		local sub = fadeFreq / decayTime
 		
-		for k,control in pairs(fadeTracker) do
-			control.fade = math.max( control.fade - sub, 0 )
-			local alpha = control.fade * 2
-			
-			if control.fade == 0 then
-				control:Dispose()
-				fadeTracker[k] = nil
-			elseif alpha < 1 and control.fadeType == 'text' then
-				local f = control.font
-				local c = f.color
-				local o = f.outlineColor
-				f:SetColor(c[1],c[2],c[3], alpha)
-				f:SetOutlineColor(o[1],o[2],o[3], alpha)
-				control:Invalidate()
-			elseif alpha < 1 and control.fadeType == 'button' then
-				control.backgroundColor = {1,1,1, alpha}
-				control:Invalidate()
+		for k,control in pairs(killTracker) do
+			control.life = control.life - 1
+			if control.life <= fadeLength and not fadeTracker[k] then
+				control.fade = 1
+				fadeTracker[k] = control
 			end
+			if control.life <= 0 then
+				control:Dispose()
+				killTracker[k] = nil
+				fadeTracker[k] = nil
+			end
+		end
+	end
+	if fadeTimer > fadePeriod then
+		fadeTimer = 0
+		for k,control in pairs(fadeTracker) do
+			control.fade = control.fade - (fadePeriod / fadeLength )
+			local alpha = control.fade 
 			
+			if alpha < 1 then
+				if control.fadeType == 'text' then
+					local f = control.font
+					local c = f.color
+					local o = f.outlineColor
+					f:SetColor(c[1],c[2],c[3], alpha)
+					f:SetOutlineColor(o[1],o[2],o[3], alpha)
+					control:Invalidate()
+				elseif control.fadeType == 'button' then
+					control.backgroundColor = {1,1,1, alpha}
+					control:Invalidate()
+				end
+			end
 			
 		end
 	end
