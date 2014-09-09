@@ -145,11 +145,6 @@ local morphDefs = {
     time = 20,
     rank = 3,
   },
-  shieldarty = {
-    into = 'firewalker',
-    time = 20,
-    rank = 3,
-  },
   corcan = {
     into = 'corsumo',
     time = 20,
@@ -165,11 +160,6 @@ local morphDefs = {
   dante = {
     into = 'armbanth',
     time = 90,
-    rank = 3,
-  },  
-  gorg = {
-    into = 'armorco',
-    time = 180,
     rank = 3,
   },
 
