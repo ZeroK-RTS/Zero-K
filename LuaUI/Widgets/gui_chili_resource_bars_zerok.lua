@@ -32,6 +32,8 @@ WG.lowPriorityBP = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1'))
+
 local abs = math.abs
 local echo = Spring.Echo
 local GetMyTeamID = Spring.GetMyTeamID
@@ -318,7 +320,7 @@ function widget:Update(s)
 	end
 
 	if blinkM_status then
-		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build More Units")
+		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Make Workers")
 		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
 	end
 
@@ -334,7 +336,7 @@ function widget:Update(s)
 		-- end
 	end
 
-	if blink_caption and (not blinkProp_status) and (not blinkE_status) and (not blinkM_status) then
+	if (blink_caption or reverseCompatibility) and (not blinkProp_status) and (not blinkE_status) and (not blinkM_status) then
 		blink_caption = false
 		metal_proportion_warn_label:SetCaption("")
 	end
