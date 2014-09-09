@@ -143,7 +143,11 @@ function PopScissor()
     gl.Scissor(false)
   else
     local x,y, right,bottom = unpack4(curScissor)
-    gl.Scissor(x,y,right - x,bottom - y)
+	local w = right  - x
+	local h = bottom - y
+	if w >= 0 and h >= 0 then
+      gl.Scissor(x,y,w,h)
+	end
   end
 end
 
