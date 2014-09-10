@@ -53,11 +53,12 @@ local glTexture 	= gl.Texture
 local glTexRect 	= gl.TexRect
 
 
-local abs						= math.abs
+--local abs						= math.abs
 local strFormat 				= string.format
 
 include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+VFS.Include("LuaRules/Utilities/numberfunctions.lua")
 
 local transkey = include("Configs/transkey.lua")
 
@@ -459,28 +460,6 @@ function round(num, idp)
   end
 end
 
---from rooms widget by quantum
-local function ToSI(num, displaySign)
-  if type(num) ~= 'number' then
-	return 'Tooltip wacky error #55'
-  end
-  if (num == 0) then
-    return "0"
-  else
-    local absNum = abs(num)
-    if (absNum < 0.001) then
-      return displaySign and strFormat("%+.1fu", 1000000 * num) or strFormat("%.1fu", 1000000 * num)
-    elseif (absNum < 1) then
-      return displaySign and strFormat("%+.1f", num) or strFormat("%.1f", num) 
-    elseif (absNum < 1000) then
-	  return displaySign and strFormat("%+.0f", num) or strFormat("%.0f", num) 
-    elseif (absNum < 1000000) then
-      return displaySign and strFormat("%+.1fk", 0.001 * num) or strFormat("%.1fk", 0.001 * num) 
-    else
-      return displaySign and strFormat("%+.1fM", 0.000001 * num) or strFormat("%.1fM", 0.000001 * num) 
-    end
-  end
-end
 --[[
 local function ToSIPrec(num) -- more presise
   if type(num) ~= 'number' then
