@@ -189,7 +189,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
 end
 
 local function AllowMiscBuildStep(unitID,teamID)
-	if ((spGetUnitRulesParam(unitID, "disarmed" == 1)) or (random() < (spGetUnitRulesParam(unitID, "slowState") or 0))) then
+	if ((spGetUnitRulesParam(unitID, "disarmed") == 1) or (random() < (spGetUnitRulesParam(unitID, "slowState") or 0))) then
 		return false
 	end
 
