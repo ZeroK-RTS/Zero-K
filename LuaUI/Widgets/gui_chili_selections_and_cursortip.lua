@@ -285,10 +285,10 @@ options = {
 	},
 	--]]
 	hpshort = {
-		name = "HP Short Notation",
+		name = "Short Number Notation",
 		type = 'bool',
 		value = false,
-		desc = 'Shows short number for HP.',
+		desc = 'Shows short number notation for HP and other values.',
 	},
 	featurehp = {
 		name = "Show HP on Features",
@@ -460,31 +460,6 @@ function round(num, idp)
   end
 end
 
---[[
-local function ToSIPrec(num) -- more presise
-  if type(num) ~= 'number' then
-	return 'Tooltip wacky error #56'
-  end
- 
-  if (num == 0) then
-    return "0"
-  else
-    local absNum = abs(num)
-    if (absNum < 0.001) then
-      return strFormat("%.2fu", 1000000 * num)
-    elseif (absNum < 1) then
-      return strFormat("%.2f", num)
-    elseif (absNum < 1000) then
-      return strFormat("%.1f", num)
-	  --return num
-    elseif (absNum < 1000000) then
-      return strFormat("%.2fk", 0.001 * num)
-    else
-      return strFormat("%.2fM", 0.000001 * num)
-    end
-  end
-end
---]]
 
 local function numformat(num, displaySign)
 	return options.hpshort.value and ToSI(num, displaySign) or numformat2(num, displaySign)

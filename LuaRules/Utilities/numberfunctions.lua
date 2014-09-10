@@ -35,10 +35,10 @@ function ToSI(num, displaySign)
 end
 
 
---[[
-local function ToSIPrec(num) -- more presise
+
+function ToSIPrec(num) -- more presise
   if type(num) ~= 'number' then
-	return 'Tooltip wacky error #56'
+	return 'ToSI wacky error #56'
   end
  
   if (num == 0) then
@@ -49,14 +49,17 @@ local function ToSIPrec(num) -- more presise
       return strFormat("%.2fu", 1000000 * num)
     elseif (absNum < 1) then
       return strFormat("%.2f", num)
-    elseif (absNum < 1000) then
-      return strFormat("%.1f", num)
+    elseif (absNum < 10) then
+      return strFormat("%.2f", num)
+	
+	elseif (absNum < 1000) then
+      return strFormat("%.0f", num)
 	  --return num
+	  
     elseif (absNum < 1000000) then
-      return strFormat("%.2fk", 0.001 * num)
+      return strFormat("%.1fk", 0.001 * num)
     else
-      return strFormat("%.2fM", 0.000001 * num)
+      return strFormat("%.1fM", 0.000001 * num)
     end
   end
 end
---]]
