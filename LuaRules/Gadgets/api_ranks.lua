@@ -59,7 +59,8 @@ end
 
 function gadget:Initialize()
   for udid, ud in pairs(UnitDefs) do
-    ud.power_xp_coeffient  = ((ud.power / 1000) ^ -0.2) / 6  -- dark magic
+    --ud.power_xp_coeffient  = ((ud.power / 1000) ^ -0.2) / 6  -- dark magic
+    ud.power_xp_coeffient = 0.2 -- making cost once per rank
   end
 
   GG['rankHandler'] = {}
