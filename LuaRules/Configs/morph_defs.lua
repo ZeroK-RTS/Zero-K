@@ -63,6 +63,7 @@ local morphDefs = {
   --// KR: No longer consistently following tech time requirements, instead it's more correlated to cost difference (since there are no tech levels).
 
   --// cloakybots
+  --[[
   armflea = {
     { 
       into = 'armpw',
@@ -248,7 +249,7 @@ local morphDefs = {
       time = 20,
       rank = 3,   
     },
-  },
+  },]]
   --//ships
   --[[
   shipscout = {
@@ -297,6 +298,7 @@ local morphDefs = {
   },
 --]]
   --// land turrets
+  --[[
   armdeva = {
     into = 'armpb',
     time = 60,
@@ -366,7 +368,7 @@ local morphDefs = {
     into = 'screamer',
     time = 75,
     rank = 3,
-  },
+  },]]
   
   --// sea turrets
   
