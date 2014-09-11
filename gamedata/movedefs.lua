@@ -9,7 +9,10 @@
 --------------------------------------------------------------------------------
 
 local common_depthmodparams = {
-	minHeight = 7,
+	minHeight = 5,
+	quadraticCoeff = 0,
+	linearCoeff = 0.15,
+	constantCoeff = 0.25,
 }
 
 local moveDefs = {
