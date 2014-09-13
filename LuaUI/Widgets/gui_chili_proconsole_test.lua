@@ -716,6 +716,35 @@ local function formatMessage(msg)
 			end
 		end)
 	msg.formatted = formatted
+	--]]
+	msg.textFormatted = msg.text
+	if msg.playername then
+		local out = msg.text
+		local playerName = escape_lua_pattern(msg.playername)
+		out = out:gsub( '^<' .. playerName ..'> ', '' )
+		out = out:gsub( '^%[' .. playerName ..'%] ', '' )
+		msg.textFormatted = out
+	end
+	msg.source2 = msg.playername or ''
+end
+
+local function MessageIsChatInfo(msg)
+	return string.find(msg.argument,'enabled!') or
+	string.find(msg.argument,'disabled!') or 
+	string.find(msg.argument,'Wind Range') or
+	string.find(msg.argument,'utogroup') or
+	string.find(msg.argument,'Speed set to') or
+	string.find(msg.argument,'following') or
+	string.find(msg.argument,'Connection attempted') or
+	string.find(msg.argument,'wins!') or 
+	string.find(msg.argument,'resigned') or 
+	string.find(msg.argument,'exited') or 
+	string.find(msg.argument,'is no more') or 
+	string.find(msg.argument,'paused the game') or
+	string.find(msg.argument,'Sync error for') or
+	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
+	string.find(msg.argument,'Team') or --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else)
+	string.find(msg.argument,'AFK')     --& AFK/lagmonitor message
 end
 
 local function hideMessage(msg)
@@ -723,25 +752,11 @@ local function hideMessage(msg)
 		or (msg.msgtype == "player_to_allies" and options.hideAlly.value)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
-		or (msg.msgtype == 'other' and options.hideLog.value and not (string.find(msg.argument,'enabled!') or
-		string.find(msg.argument,'disabled!') or 
-		string.find(msg.argument,'Wind Range') or
-		string.find(msg.argument,'utogroup') or
-		string.find(msg.argument,'Speed set to') or
-		string.find(msg.argument,'following') or
-		string.find(msg.argument,'Connection attempted') or
-		string.find(msg.argument,'wins!') or 
-		string.find(msg.argument,'resigned') or 
-		string.find(msg.argument,'exited') or 
-		string.find(msg.argument,'is no more') or 
-		string.find(msg.argument,'paused the game') or
-		string.find(msg.argument,'Sync error for') or
-		(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
-		string.find(msg.argument,'Team') or string.find(msg.argument,'AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
+		or (msg.msgtype == 'other' and options.hideLog.value and not MessageIsChatInfo(msg))
 end
 
 local function AddMessage(msg, target, remake)
-	if hideMessage(msg)	or (not WG.Chili) then
+	if hideMessage(msg) or target == "console" or (not WG.Chili) then
 		return
 	end
 	
@@ -1173,16 +1188,15 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local function isChat(msg)
-	return msg.msgtype ~= 'other' or 
-		msg.text:find('paused the game') or
-		msg.text:find('Speed set to') or
-		msg.text:find('Cheating is') or
-		msg.text:find('resigned and is now spectating') or
-		msg.text:find('Sync')
-end
-
++local function isChat(msg)
++	return msg.msgtype ~= 'other' or 
++		msg.text:find('paused the game') or
++		msg.text:find('Speed set to') or
++		msg.text:find('Cheating is') or
++		msg.text:find('resigned and is now spectating') or
++		msg.text:find('Sync')
++end
++
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
@@ -1210,7 +1224,7 @@ function widget:AddConsoleMessage(msg)
 		else
 			AddMessage(messages[#messages], 'console')
 		end
-		
+				
 		return
 	
 	end
