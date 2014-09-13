@@ -196,7 +196,6 @@ local function spawnStructures(left, top, right, bottom, team)
 	local xRand = mapWidth*(right-left)
 	local zBase = mapHeight*top
 	local zRand = mapHeight*(bottom-top)
-	
 	for _,info in pairs(unitData) do
 		if type(info) == "table" then
 			Spring.Echo("Processing PW structure: "..info.unitname)
@@ -241,7 +240,7 @@ local function spawnStructures(left, top, right, bottom, team)
 					giveUp = giveUp + 1
 				end
 				
-				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID)
+				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
 				Spring.SetUnitNeutral(unitID,true)
 				Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
 				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
