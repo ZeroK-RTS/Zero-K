@@ -1178,7 +1178,9 @@ local function isChat(msg)
 	return msg.msgtype ~= 'other' or 
 		msg.text:find('paused the game') or
 		msg.text:find('Speed set to') or
-		msg.text:find('Sync error for')
+		msg.text:find('Cheating is') or
+		msg.text:find('resigned and is now spectating') or
+		msg.text:find('Sync')
 end
 
 -- new callin! will remain in widget
