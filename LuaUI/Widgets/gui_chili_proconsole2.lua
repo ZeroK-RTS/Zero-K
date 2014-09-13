@@ -807,7 +807,7 @@ local function GetColor(msg)
 end
 
 local function AddMessage(msg, target, remake)
-	if hideMessage(msg) or target == "console" or (not WG.Chili) then
+	if hideMessage(msg) or (not WG.Chili) then
 		return
 	end
 	
