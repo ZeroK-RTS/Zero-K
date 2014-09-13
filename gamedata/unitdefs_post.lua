@@ -301,6 +301,33 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Different aircraft turn radius in new engine
+
+if reverseCompat then
+	for name, ud in pairs(UnitDefs) do
+		if name == "fighter" then
+			ud.turnRadius = 200
+			ud.maxRudder = 0.001
+		elseif name == "corvamp" then
+			ud.turnRadius = 80
+			ud.maxRudder = 0.001
+		elseif name == "bomberdive" then
+			ud.turnRadius = 40
+		elseif name == "corhurc2" then
+			ud.turnRadius = 20
+		elseif name == "armstiletto_laser" then
+			ud.turnRadius = 20
+		elseif name == "armcybr" then
+			ud.turnRadius = 20
+		elseif "corawac" then
+			ud.turnRadius = 60
+		end
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
 -- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
 
