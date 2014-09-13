@@ -1174,12 +1174,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function isChat(msg)
+	return msg.msgtype ~= 'other' or 
+		msg.text:find('paused the game') or
+		msg.text:find('Speed set to') or
+		msg.text:find('Sync error for')
+end
+
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
-	local isChat = msg.msgtype ~= 'other' or msg.text:find('paused the game')
+	local isChat = isChat(msg) 
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
 	local messages = isChat and chatMessages or consoleMessages
 	
@@ -1201,7 +1208,7 @@ function widget:AddConsoleMessage(msg)
 		else
 			AddMessage(messages[#messages], 'console')
 		end
-				
+		
 		return
 	
 	end
