@@ -564,27 +564,33 @@ local function formatMessage(msg)
 	msg.formatted = formatted
 end
 
+local function MessageIsChatInfo(msg)
+	return string.find(msg.argument,'enabled!') or
+	string.find(msg.argument,'disabled!') or 
+	string.find(msg.argument,'Wind Range') or
+	string.find(msg.argument,'utogroup') or
+	string.find(msg.argument,'Speed set to') or
+	string.find(msg.argument,'following') or
+	string.find(msg.argument,'Connection attempted') or
+	string.find(msg.argument,'wins!') or 
+	string.find(msg.argument,'resigned') or 
+	string.find(msg.argument,'exited') or 
+	string.find(msg.argument,'is no more') or 
+	string.find(msg.argument,'paused the game') or
+	string.find(msg.argument,'Sync error for') or
+	string.find(msg.argument,'Cheating is') or
+	string.find(msg.argument,'resigned and is now spectating') or
+	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
+	string.find(msg.argument,'Team') or --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else)
+	string.find(msg.argument,'AFK')     --& AFK/lagmonitor message
+end
+
 local function hideMessage(msg)
 	return (msg.msgtype == "spec_to_everyone" and options.hideSpec.value) -- can only hide spec when playing
 		or (msg.msgtype == "player_to_allies" and options.hideAlly.value)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
-		or (msg.msgtype == 'other' and options.hideLog.value and not (string.find(msg.argument,'enabled!') or
-		string.find(msg.argument,'disabled!') or 
-		string.find(msg.argument,'Wind Range') or
-		string.find(msg.argument,'utogroup') or
-		string.find(msg.argument,'Speed set to') or
-		string.find(msg.argument,'following') or
-		string.find(msg.argument,'Connection attempted') or
-		string.find(msg.argument,'wins!') or 
-		string.find(msg.argument,'resigned') or 
-		string.find(msg.argument,'exited') or 
-		string.find(msg.argument,'is no more') or 
-		string.find(msg.argument,'paused the game') or
-		string.find(msg.argument,'Sync error for') or
-		(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
-		string.find(msg.argument,'Team') or string.find(msg.argument,'AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
-
+		or (msg.msgtype == 'other' and options.hideLog.value and not MessageIsChatInfo(msg))
 end
 
 local function displayMessage(msg, remake)

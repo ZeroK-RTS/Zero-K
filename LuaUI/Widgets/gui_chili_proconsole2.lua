@@ -767,6 +767,8 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'is no more') or 
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
+	string.find(msg.argument,'Cheating is') or
+	string.find(msg.argument,'resigned and is now spectating') or
 	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
 	string.find(msg.argument,'Team') or --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else)
 	string.find(msg.argument,'AFK')     --& AFK/lagmonitor message
@@ -1284,13 +1286,16 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function isChat(msg)
+	return msg.msgtype ~= 'other' or MessageIsChatInfo(msg)
+end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
-	local isChat = msg.msgtype ~= 'other' or MessageIsChatInfo(msg)
+	local isChat = isChat(msg)
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
 	local messages = isChat and chatMessages or consoleMessages
 	
