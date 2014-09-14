@@ -15,6 +15,7 @@ end
 --------------------------------------------------------------------------------
 
 include("keysym.h.lua")
+VFS.Include("LuaRules/Utilities/numberfunctions.lua")
 
 local spSendLuaRulesMsg			= Spring.SendLuaRulesMsg
 local spGetCurrentTooltip		= Spring.GetCurrentTooltip
@@ -82,9 +83,20 @@ local colorDisarm = {0.5, 0.5, 0.5, 1}
 
 
 local function MakeStatsWindow() end
-options_order = {}
+options_order = {'shortNotation'}
 options_path = 'Help/Unit Descriptions'
-options = {}
+options = {
+		
+	shortNotation = {
+		name = "Short Number Notation",
+		type = 'bool',
+		value = false,
+		desc = 'Shows short number notation for HP and other values.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	
+	
+}
 local ignoreList = {
 	['firebug']=1,
 	['corpre']=1,
@@ -176,31 +188,10 @@ function comma_value(amount, displayPlusMinus)
   	return formatted
 end
 
---from rooms widget by quantum
-local function ToSI(num)
-  if type(num) ~= 'number' then
-	return 'Tooltip wacky error #55'
-  end
-  if (num == 0) then
-    return "0"
-  else
-    local absNum = abs(num)
-    if (absNum < 0.001) then
-      return strFormat("%.1fu", 1000000 * num)
-    elseif (absNum < 1) then
-      return strFormat("%.1f", num)
-    elseif (absNum < 1000) then
-      return strFormat("%.0f", num)
-    elseif (absNum < 1000000) then
-      return strFormat("%.1fk", 0.001 * num)
-    else
-      return strFormat("%.1fM", 0.000001 * num)
-    end
-  end
-end
+
 
 local function numformat(num)
-	return comma_value(num)
+	return options.shortNotation.value and ToSIPrec(num) or comma_value(num)
 end
 
 local function AdjustWindow(window)
@@ -582,6 +573,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 	if ud.customParams.commtype then
 		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
 		commCost = ud.customParams.cost or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
+		commCost = commCost +0
 	end
 	local cost = numformat(ud.metalCost)
 	if commCost then

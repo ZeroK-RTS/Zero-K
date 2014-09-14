@@ -93,6 +93,7 @@ unitList["ZK"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen Aerial" }
 unitList["ZK"]["chickenlandqueen"] =	{ markerText = "Chicken Queen Grounded" }
 unitList["ZK"]["chickenqueenlite"] =	{ markerText = "Chicken Queen Junior" }
 unitList["ZK"]["spherepole"] =	{ markerText = "Scythe", delayedRefresh = 0 }
+unitList["ZK"]["pw_hq"] =		{ markerText = "Command Center" }
 
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms

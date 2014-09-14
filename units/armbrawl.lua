@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.2,
   amphibious          = true,
   bankscale           = [[1]],
-  brakeRate           = 0.24,
+  brakeRate           = 0.2,
   buildCostEnergy     = 760,
   buildCostMetal      = 760,
   builder             = false,
@@ -79,8 +79,8 @@ unitDef = {
 
     {
       def                = [[EMG]],
-      mainDir            = [[0 -0.32 1]],
-      maxAngleDif        = 140,
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 70,
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
@@ -101,8 +101,8 @@ unitDef = {
       craterMult              = 0.3,
 
       damage                  = {
-        default = 21.5,
-        subs    = 0.5,
+        default = 15,
+        subs    = 0.3,
       },
 
       edgeEffectiveness       = 0.5,

@@ -169,7 +169,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local stopPenalty  = 0.667
 local morphPenalty = 1.0
 local upgradingBuildSpeed = 250
-local XpScale = 0.50
+local XpScale = 1
 
 local PRIVATE = {private = true}
 
@@ -514,7 +514,7 @@ end
 local function FinishMorph(unitID, morphData)
 
   local udDst = UnitDefs[morphData.def.into]
-  local ud = UnitDefs[unitID]
+  local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
   local defName = udDst.name
   local unitTeam = morphData.teamID
   -- copy dominatrix stuff
@@ -672,22 +672,7 @@ local function FinishMorph(unitID, morphData)
   Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
   
   --//transfer experience
-  local nextMorph = morphDefs[morphData.def.into]
-  if nextMorph~= nil and nextMorph.into ~= nil then nextMorph = {morphDefs[morphData.def.into]} end
-  if (nextMorph) then --//determine the lowest xp req. of all next possible morphs
-    local maxXp = math.huge
-    for _, nm in pairs(nextMorph) do
-      local rankXpInto = RankToXp(nm.into,nm.rank)
-      if (rankXpInto>0)and(rankXpInto<maxXp) then
-        maxXp=rankXpInto
-      end
-      local xpInto     = nm.xp
-      if (xpInto>0)and(xpInto<maxXp) then
-        maxXp=xpInto
-      end
-    end
-    newXp = math.min( newXp, maxXp*0.9)
-  end
+  newXp = newXp * (ud.buildTime / udDst.buildTime)
   Spring.SetUnitExperience(newUnit, newXp)
   --// transfer shield power
   if oldShieldState and Spring.GetUnitShieldState(newUnit) then
