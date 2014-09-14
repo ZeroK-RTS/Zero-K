@@ -224,11 +224,80 @@ structureConfig = {
 			unitDef.collisionvolumescales = [[100 80 100]]
 			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[Box]]					
-		end,		
+		end,
+	pw_mstorage2 = function(unitDef)
+			unitDef.maxdamage = 15000
+			unitDef.name = "Dual Metal Storage"
+			unitDef.description = "Stores metal"
+			unitDef.objectname = "pw_mstorage2.obj"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 7
+			unitDef.footprintz = 5
+			
+			unitDef.customparams.soundselect = "building_select1"
+			unitDef.customparams.helptext = "Stores resources for use in war machines."
+			
+			unitDef.collisionvolumescales = [[80 25 60]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[Box]]					
+		end,
+	pw_estorage = function(unitDef)
+			unitDef.maxdamage = 10000
+			unitDef.name = "Energy Storage"
+			unitDef.description = "Stores energy"
+			unitDef.objectname = "pw_estorage.obj"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 3
+			unitDef.footprintz = 3
+			
+			unitDef.customparams.soundselect = "fusion_select"
+			unitDef.customparams.helptext = "A large capacitor bank."
+			
+			unitDef.collisionvolumescales = [[40 45 40]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]					
+		end,
+	pw_estorage2 = function(unitDef)
+			unitDef.maxdamage = 15000
+			unitDef.name = "Double Energy Storage"
+			unitDef.description = "Stores energy"
+			unitDef.objectname = "pw_estorage2.obj"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 5
+			unitDef.footprintz = 3
+			
+			unitDef.customparams.soundselect = "fusion_select"
+			unitDef.customparams.helptext = "A large double capacitor bank."
+			
+			unitDef.collisionvolumescales = [[60 45 40]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[Box]]					
+		end,
+	pw_gaspowerstation = function(unitDef)
+			unitDef.maxdamage = 15000
+			unitDef.name = "Gas Power Station"
+			unitDef.description = "Small power producer"
+			unitDef.objectname = "pw_gaspowerstation.obj"
+			unitDef.script = "pw_gaspowerstation.lua"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 6
+			unitDef.footprintz = 6
+			
+			unitDef.customparams.soundselect = "fusion_select"
+			unitDef.customparams.helptext = "A small power generation unit."
+			
+			unitDef.collisionvolumescales = [[70 60 70]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]					
+		end,
 }
 
 -- test data here
-TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHMxMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lIiwNCiAgICBuYW1lID0gIlBvd2VyIEdlbmVyYXRvciBVbml0IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaWdodCBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMiIsDQogICAgbmFtZSA9ICJBbm5paGlsYXRpb24gUGxhbnQiLA0KICAgIGRlc2NyaXB0aW9uID0gIk1lZGl1bSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMyIsDQogICAgbmFtZSA9ICJQbGFuZXRhcnkgR2VvdGhlcm1hbCBUYXAiLA0KICAgIGRlc2NyaXB0aW9uID0gIkhlYXZ5IEVuZXJneSBQcm9kdWNlciINCiAgfSwgIA0KICBzOTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYXJ0ZWZhY3QiLA0KICAgIG5hbWUgPSAiQW5jaWVudCBBcnRlZmFjdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTXlzdGVyaW91cyBSZWxpYyINCiAgfSwgIA0KfQ=="
+TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHM4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dhc3Bvd2Vyc3RhdGlvbiIsDQogICAgbmFtZSA9ICJHYXMgUG93ZXIgU3RhdGlvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiU21hbGwgUG93ZXIgUHJvZHVjZXIiICAgIA0KICB9LA0KICBzMTAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZSIsDQogICAgbmFtZSA9ICJQb3dlciBHZW5lcmF0b3IgVW5pdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlnaHQgRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTIiLA0KICAgIG5hbWUgPSAiQW5uaWhpbGF0aW9uIFBsYW50IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNZWRpdW0gRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTIgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IEdlb3RoZXJtYWwgVGFwIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJIZWF2eSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19tc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBNZXRhbCBTdG9yYWdlIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTdG9yZXMgTWV0YWwiICAgIA0KICB9LA0KICBzMTQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UiLA0KICAgIG5hbWUgPSAiRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UyIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzOTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYXJ0ZWZhY3QiLA0KICAgIG5hbWUgPSAiQW5jaWVudCBBcnRlZmFjdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTXlzdGVyaW91cyBSZWxpYyINCiAgfSwgIA0KfQ=="
 --[[
 {
   s0 = {
@@ -271,6 +340,11 @@ TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsD
     name = "Warp Jammer",
     description = "Blocks Warp Attacks"
   },
+  s8 = {
+    unitname = "pw_gaspowerstation",
+    name = "Gas Power Station",
+    description = "Small Power Producer"    
+  },
   s10 = {
     unitname = "pw_mine",
     name = "Power Generator Unit",
@@ -285,7 +359,22 @@ TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsD
     unitname = "pw_mine3",
     name = "Planetary Geothermal Tap",
     description = "Heavy Energy Producer"
-  },  
+  },
+  s13 = {
+    unitname = "pw_mstorage2",
+    name = "Dual Metal Storage",
+    description = "Stores Metal"    
+  },
+  s14 = {
+    unitname = "pw_estorage",
+    name = "Energy Storage",
+    description = "Stores Energy"    
+  },
+  s15 = {
+    unitname = "pw_estorage2",
+    name = "Dual Energy Storage",
+    description = "Stores Energy"    
+  },
   s99 = {
     unitname = "pw_artefact",
     name = "Ancient Artefact",
