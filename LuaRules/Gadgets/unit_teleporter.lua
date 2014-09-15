@@ -128,6 +128,7 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 	if tele[unitID].teleportiee then
 		teleportingUnit[tele[unitID].teleportiee] = nil
 		tele[unitID].teleportiee = false
+		Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
 	end
 	tele[unitID].teleFrame = false
 	tele[unitID].cost = false
@@ -429,6 +430,7 @@ function gadget:GameFrame(f)
 							
 							teleportingUnit[teleportiee] = nil
 							tele[tid].teleportiee = nil
+							Spring.SetUnitRulesParam(tid, "teleportiee", -1)
 							
 							if not callScript(teleportiee, "unit_teleported", {dx, dy, dz}) then
 								Spring.SetUnitPosition(teleportiee, dx, dz)
@@ -501,6 +503,7 @@ function gadget:GameFrame(f)
 							local cost = math.floor(mass*COST_FACTOR + math.random())
 							--Spring.Echo(cost/30)
 							tele[tid].teleportiee = teleportiee
+							Spring.SetUnitRulesParam(tid, "teleportiee", teleportiee)
 							tele[tid].teleFrame = f + cost
 							tele[tid].offsetIndex = teleTarget
 							tele[tid].cost = cost
@@ -536,7 +539,8 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if teleDef[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, placeBeaconCmdDesc)
-		
+		Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
+		Spring.SetUnitRulesParam(unitID, "deploy", 0)
 		teleID.count = teleID.count + 1
 		teleID.data[teleID.count] = unitID
 		tele[unitID] = {
@@ -590,7 +594,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
-	-- _G.tele = tele
+	_G.tele = tele
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -626,8 +630,68 @@ local spGetMyTeamID	    = Spring.GetMyTeamID
 local spGetMyAllyTeamID = Spring.GetMyAllyTeamID 	
 local spGetModKeyState	= Spring.GetModKeyState
 local spAreTeamsAllied	= Spring.AreTeamsAllied
+local spGetUnitVectors  = Spring.GetUnitVectors
 
 local myTeam = spGetMyTeamID()
+
+local beaconDef = UnitDefNames["tele_beacon"].id
+local beacons = {}
+
+local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
+	local step = 1/amountOfPoints
+	glVertex (pointA[1]+3, pointA[2]+3, pointA[3]+3)
+	for i=0, 1, step do
+		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
+		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
+		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
+		glVertex(x,y,z)
+	end
+	glVertex(pointD[1]+3,pointD[2]+3,pointD[3]+3)
+end
+
+local function GetUnitTop (unitID, x,y,z)
+	local height = Spring.GetUnitHeight(unitID) -- previously hardcoded to 50
+	local top = select (2, spGetUnitVectors(unitID))
+	local offX = top[1]*height
+	local offY = top[2]*height
+	local offZ = top[3]*height
+	return x+offX, y+offY, z+offZ
+end
+
+local function DrawWire(spec)
+	for i=1, #beacons do
+		local bid = beacons[i]
+		local tid = Spring.GetUnitRulesParam(bid, "connectto")
+
+		if (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
+			local point = {nil, nil, nil, nil}
+			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
+			local teleportiee = Spring.GetUnitRulesParam(tid, "teleportiee")
+			if (teleportiee >= 0) and spValidUnitID(teleportiee) and spValidUnitID(bid) then
+				local los1 = spGetUnitLosState(teleportiee, myTeam, false)
+				local los2 = spGetUnitLosState(bid, myTeam, false)
+				if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(teleportiee) or spIsUnitInView(bid)) then
+					_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
+					local topX, topY, topZ = GetUnitTop(bid, xxx, yyy, zzz)
+					point[1] = {xxx, yyy, zzz}
+					point[2] = {topX, topY, topZ}
+					_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(teleportiee, true)
+					topX, topY, topZ = GetUnitTop(teleportiee, xxx, yyy, zzz)
+					point[3] = {topX,topY,topZ}
+					point[4] = {xxx,yyy,zzz}
+					gl.PushAttrib(GL.LINE_BITS)
+					gl.DepthTest(true)
+					gl.Color (0, 0.75, 1, math.random()*0.3+0.2)
+					gl.LineWidth(3)
+					gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
+					gl.DepthTest(false)
+					gl.Color (1,1,1,1)
+					gl.PopAttrib()
+				end
+			end
+		end	
+	end
+end
 
 local function DrawFunc(u1, u2)
 	local _,_,_,x1,y1,z1 = spGetUnitPosition(u1,true)
@@ -635,9 +699,6 @@ local function DrawFunc(u1, u2)
 	glVertex(x1,y1,z1)
 	glVertex(x2,y2,z2)
 end
-
-local beaconDef = UnitDefNames["tele_beacon"].id
-local beacons = {}
 
 function gadget:UnitCreated(unitID, unitDefID)
 	if (unitDefID == beaconDef) then
@@ -661,6 +722,8 @@ function gadget:DrawWorld()
 	local spec, fullview = Spring.GetSpectatingState()
 	spec = spec or fullview
 
+	DrawWire(spec)
+	
 	gl.PushAttrib(GL.LINE_BITS)
 	
 	gl.DepthTest(true)
