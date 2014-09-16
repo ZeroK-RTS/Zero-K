@@ -146,11 +146,11 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 	end
 end
 
-function GG.tele_ableToDeploy(unitID)
+function tele_ableToDeploy(unitID)
 	return tele[unitID] and tele[unitID].link and not tele[unitID].deployed
 end
 
-function GG.tele_deployTeleport(unitID)
+function tele_deployTeleport(unitID)
 	tele[unitID].deployed = true
 	checkFrame[Spring.GetGameFrame() + 1] = true
 	
@@ -158,7 +158,7 @@ function GG.tele_deployTeleport(unitID)
 	Spring.SetUnitRulesParam(unitID, "deploy", 1)
 end
 
-function GG.tele_undeployTeleport(unitID)
+function tele_undeployTeleport(unitID)
 	if tele[unitID].deployed then
 		interruptTeleport(unitID)
 	end
@@ -167,7 +167,7 @@ function GG.tele_undeployTeleport(unitID)
 	Spring.SetUnitRulesParam(unitID, "deploy", 0)
 end
 
-function GG.tele_createBeacon(unitID,x,z)
+function tele_createBeacon(unitID,x,z)
 	isPlacingBeacon[unitID]=nil
 	local y = Spring.GetGroundHeight(x,z)
 	local place, feature = Spring.TestBuildOrder(beaconDef, x, y, z, 1)
@@ -193,7 +193,7 @@ local function undeployTeleport(unitID)
 	if tele[unitID].deployed then 
 		local func = Spring.UnitScript.GetScriptEnv(unitID).UndeployTeleport
 		Spring.UnitScript.CallAsUnit(unitID,func)
-		GG.tele_undeployTeleport(unitID)
+		tele_undeployTeleport(unitID)
 	end
 end
 
@@ -594,6 +594,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
+	GG.tele_ableToDeploy = tele_ableToDeploy
+	GG.tele_deployTeleport = tele_deployTeleport
+	GG.tele_undeployTeleport = tele_undeployTeleport
+	GG.tele_createBeacon = tele_createBeacon
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)

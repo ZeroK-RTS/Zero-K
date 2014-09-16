@@ -49,8 +49,8 @@ structureConfig = {
 			unitDef.customparams.soundselect = "building_select1"
 			unitDef.customparams.helptext = "Produces space bombers for attacking hostile planets."
 			
-			unitDef.collisionvolumescales = [[315 130 244]]
-			unitDef.modelcenteroffset = [[0 10 0]]	
+			unitDef.collisionvolumescales = [[275 120 215]]
+			unitDef.modelcenteroffset = [[0 00 0]]	
 		end,
 		
 	pw_dropdepot = function(unitDef)
@@ -85,8 +85,8 @@ structureConfig = {
 			unitDef.customparams.soundselect = "building_select1"
 			unitDef.customparams.helptext = "Increases the number of bombers that can be deployed to a single planet."
 			
-			unitDef.collisionvolumescales = [[245 220 145]]
-			unitDef.modelcenteroffset = [[15 40 0]]
+			unitDef.collisionvolumescales = [[230 210 130]]
+			unitDef.modelcenteroffset = [[15 30 0]]
 			
 			unitDef.buildpic = "pw_dropdepot.png"
 		end,		
@@ -108,7 +108,7 @@ structureConfig = {
 			unitDef.customparams.soundselect = "building_select2"
 			unitDef.customparams.helptext = "A small, efficient power generator."
 			
-			unitDef.collisionvolumescales = [[65 120 65]]
+			unitDef.collisionvolumescales = [[56 120 56]]
 			unitDef.modelcenteroffset = [[0 10 0]]
 			unitDef.collisionvolumetype	= [[CylY]]		
 		end,
@@ -131,7 +131,7 @@ structureConfig = {
 		end,
 		
 	pw_mine3 = function(unitDef)
-			unitDef.maxdamage = 22500
+			unitDef.maxdamage = 24000
 			unitDef.name = "Planetary Geothermal Tap"
 			unitDef.description = "Produces 250 credits/turn" 
 			unitDef.objectname = "pw_mine3.obj"
@@ -151,66 +151,44 @@ structureConfig = {
 			unitDef.modelcenteroffset = [[0 10 0]]					
 		end,
 		
-	pw_wormhole = function(unitDef)
-			unitDef.maxdamage = 12500
-			unitDef.name = "Wormhole Generator"
-			unitDef.description = "Links this planet to nearby planets"
+	pw_garrison = function(unitDef)
+			unitDef.maxdamage = 16000
+			unitDef.name = "Field Garrison"
+			unitDef.description = "Reduces Influence gain"
 			unitDef.objectname = "pw_wormhole.obj"
 			unitDef.selfdestructcountdown = 90
 			
 			unitDef.footprintx = 11
 			unitDef.footprintz = 6
 			
-			unitDef.customparams.soundselect = "shield_select"
-			unitDef.customparams.helptext = "Allows ships to leave this planet for its connected neighbours, and projects influence spread to connected planets."
+			unitDef.customparams.soundselect = "factory_select"
+			unitDef.customparams.helptext = "This structure maintains an army which reduces the Influence gained from battles."
 			
 			unitDef.collisionvolumescales = [[160 65 80]]
 			unitDef.modelcenteroffset = [[0 30 0]]					
 		end,
 		
-	pw_wormhole2 = function(unitDef)
-			unitDef.maxdamage = 17500
-			unitDef.name = "Improved Wormhole Stabilizer"
-			unitDef.description = "Improved link to nearby planets"
+	pw_interception = function(unitDef)
+			unitDef.maxdamage = 16000
+			unitDef.name = "Interception Network"
+			unitDef.description = "Intercepts approaching bombrs"
 			unitDef.objectname = "pw_wormhole2.obj"
 			
 			unitDef.footprintx = 8
 			unitDef.footprintz = 8
 			
-			unitDef.customparams.soundselect = "shield_select"
-			unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
+			unitDef.customparams.soundselect = "turret_select"
+			unitDef.customparams.helptext = "This structure interceptions incoming bombers."
 			
 			unitDef.collisionvolumescales = [[100 90 100]]
 			unitDef.modelcenteroffset = [[0 20 0]]
 			unitDef.collisionvolumetype	= [[CylY]]				
 		end,
 		
-	pw_warpgate = function(unitDef)
-			unitDef.maxdamage = 15000
-			unitDef.name = "Warp Core Fabricator"
-			unitDef.description = "Produces warp cores"
-			unitDef.objectname = "pw_warpgate.obj"
-			unitDef.script = "pw_warpgate.lua"
-			unitDef.selfdestructcountdown = 180
-			
-			unitDef.footprintx = 8
-			unitDef.footprintz = 8
-			
-			unitDef.explodeas = "GRAV_BLAST"
-			unitDef.selfdestructas = "GRAV_BLAST"
-			
-			unitDef.customparams.soundselect = "cloaker_select"
-			unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."
-			
-			unitDef.collisionvolumescales = [[120 100 120]]
-			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]					
-		end,
-		
-	pw_warpjammer = function(unitDef)
-			unitDef.maxdamage = 12000
-			unitDef.name = "Warp Jammer"
-			unitDef.description = "Prevents warp attacks"
+	pw_grid = function(unitDef)
+			unitDef.maxdamage = 20000
+			unitDef.name = "Planetary Defense Grid"
+			unitDef.description = "Defends against everything"
 			unitDef.objectname = "pw_warpjammer.s3o"
 			unitDef.script = "pw_warpjammer.lua"
 			unitDef.selfdestructcountdown = 150
@@ -219,24 +197,97 @@ structureConfig = {
 			unitDef.footprintz = 6
 			
 			unitDef.customparams.soundselect = "radar_select"
-			unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
+			unitDef.customparams.helptext = "This structure reduces Influence gains as well as intercepting incoming bombers."
 			
 			unitDef.collisionvolumescales = [[100 80 100]]
 			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[Box]]					
 		end,
-	pw_mstorage2 = function(unitDef)
+		
+	pw_wormhole = function(unitDef)
+			unitDef.maxdamage = 12500
+			unitDef.name = "Wormhole Generator Beacon"
+			unitDef.description = "Links this planet to nearby planets"
+			unitDef.objectname = "pw_estorage.obj"
+			unitDef.selfdestructcountdown = 90
+			
+			unitDef.footprintx = 3
+			unitDef.footprintz = 3
+			
+			unitDef.customparams.soundselect = "shield_select"
+			unitDef.customparams.helptext = "Allows ships to leave this planet for its connected neighbours, and projects influence spread to connected planets."
+			
+			unitDef.collisionvolumescales = [[40 45 40]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]			
+		end,
+		
+	pw_wormhole2 = function(unitDef)
+			unitDef.maxdamage = 17500
+			unitDef.name = "Improved Wormhole Stabilizer"
+			unitDef.description = "Improved link to nearby planets"
+			unitDef.objectname = "pw_estorage2.obj"
+			
+			unitDef.footprintx = 3
+			unitDef.footprintz = 5
+			
+			unitDef.customparams.soundselect = "shield_select"
+			unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
+			
+			unitDef.collisionvolumescales = [[64 25 45]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[Box]]				
+		end,
+		
+	pw_warpgate = function(unitDef)
 			unitDef.maxdamage = 15000
-			unitDef.name = "Dual Metal Storage"
-			unitDef.description = "Stores metal"
+			unitDef.name = "Warp Core Fabricator"
+			unitDef.description = "Produces warp cores"
+			unitDef.objectname = "pw_techlab.obj"
+			unitDef.script = "pw_techlab.lua"
+			unitDef.selfdestructcountdown = 180
+			
+			unitDef.footprintx = 8		
+			unitDef.footprintz = 9
+			
+			unitDef.explodeas = "GRAV_BLAST"
+			unitDef.selfdestructas = "GRAV_BLAST"
+			
+			unitDef.customparams.soundselect = "cloaker_select"
+			unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."				
+		end,
+		
+	pw_warpjammer = function(unitDef)
+			unitDef.maxdamage = 12000
+			unitDef.name = "Warp Jammer"
+			unitDef.description = "Prevents warp attacks"
+			unitDef.objectname = "pw_warpgate.obj"
+			unitDef.script = "pw_warpgate.lua"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 8
+			unitDef.footprintz = 8
+			
+			unitDef.customparams.soundselect = "radar_select"
+			unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
+			
+			unitDef.collisionvolumescales = [[120 100 120]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]					
+		end,
+	
+	pw_inhibitor = function(unitDef)
+			unitDef.maxdamage = 15000
+			unitDef.name = "Wormhole Inhibitor"
+			unitDef.description = "Wormhole Inhibitor"
 			unitDef.objectname = "pw_mstorage2.obj"
 			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 7
 			unitDef.footprintz = 5
 			
-			unitDef.customparams.soundselect = "building_select1"
-			unitDef.customparams.helptext = "Stores resources for use in war machines."
+			unitDef.customparams.soundselect = "shield_select"
+			unitDef.customparams.helptext = "Inhibits Influence spread from enemy planets."
 			
 			unitDef.collisionvolumescales = [[80 25 60]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -276,10 +327,10 @@ structureConfig = {
 			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[Box]]					
 		end,
-	pw_gaspowerstation = function(unitDef)
+	pw_guerilla = function(unitDef)
 			unitDef.maxdamage = 15000
-			unitDef.name = "Gas Power Station"
-			unitDef.description = "Small power producer"
+			unitDef.name = "Guerilla Jumpgate"
+			unitDef.description = "Guerilla Jumpgate"
 			unitDef.objectname = "pw_gaspowerstation.obj"
 			unitDef.script = "pw_gaspowerstation.lua"
 			unitDef.selfdestructcountdown = 150
@@ -287,8 +338,8 @@ structureConfig = {
 			unitDef.footprintx = 6
 			unitDef.footprintz = 6
 			
-			unitDef.customparams.soundselect = "fusion_select"
-			unitDef.customparams.helptext = "A small power generation unit."
+			unitDef.customparams.soundselect = "shield_select"
+			unitDef.customparams.helptext = "A jumpgate capable of sending Influence to any planet."
 			
 			unitDef.collisionvolumescales = [[70 60 70]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -297,7 +348,7 @@ structureConfig = {
 }
 
 -- test data here
-TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHM4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dhc3Bvd2Vyc3RhdGlvbiIsDQogICAgbmFtZSA9ICJHYXMgUG93ZXIgU3RhdGlvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiU21hbGwgUG93ZXIgUHJvZHVjZXIiICAgIA0KICB9LA0KICBzMTAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZSIsDQogICAgbmFtZSA9ICJQb3dlciBHZW5lcmF0b3IgVW5pdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlnaHQgRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTIiLA0KICAgIG5hbWUgPSAiQW5uaWhpbGF0aW9uIFBsYW50IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNZWRpdW0gRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTIgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IEdlb3RoZXJtYWwgVGFwIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJIZWF2eSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19tc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBNZXRhbCBTdG9yYWdlIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTdG9yZXMgTWV0YWwiICAgIA0KICB9LA0KICBzMTQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UiLA0KICAgIG5hbWUgPSAiRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UyIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzOTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYXJ0ZWZhY3QiLA0KICAgIG5hbWUgPSAiQW5jaWVudCBBcnRlZmFjdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTXlzdGVyaW91cyBSZWxpYyINCiAgfSwgIA0KfQ=="
+TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHM4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dhc3Bvd2Vyc3RhdGlvbiIsDQogICAgbmFtZSA9ICJHYXMgUG93ZXIgU3RhdGlvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiU21hbGwgUG93ZXIgUHJvZHVjZXIiICAgIA0KICB9LA0KICBzMTAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZSIsDQogICAgbmFtZSA9ICJQb3dlciBHZW5lcmF0b3IgVW5pdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlnaHQgRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTIiLA0KICAgIG5hbWUgPSAiQW5uaWhpbGF0aW9uIFBsYW50IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNZWRpdW0gRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTIgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IEdlb3RoZXJtYWwgVGFwIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJIZWF2eSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19tc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBNZXRhbCBTdG9yYWdlIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTdG9yZXMgTWV0YWwiICAgIA0KICB9LA0KICBzMTQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UiLA0KICAgIG5hbWUgPSAiRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UyIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ3VlcmlsbGEiLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxNyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19pbmhpYml0b3IiLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxOCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19ncmlkIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2Fycmlzb24iLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMyMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19pbnRlcmNlcHRpb24iLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHM5OSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19hcnRlZmFjdCIsDQogICAgbmFtZSA9ICJBbmNpZW50IEFydGVmYWN0IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNeXN0ZXJpb3VzIFJlbGljIg0KICB9LCAgDQp9DQo="
 --[[
 {
   s0 = {
@@ -372,6 +423,31 @@ TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsD
   },
   s15 = {
     unitname = "pw_estorage2",
+    name = "Dual Energy Storage",
+    description = "Stores Energy"    
+  },
+  s16 = {
+    unitname = "pw_guerilla",
+    name = "Dual Energy Storage",
+    description = "Stores Energy"    
+  },
+  s17 = {
+    unitname = "pw_inhibitor",
+    name = "Dual Energy Storage",
+    description = "Stores Energy"    
+  },
+  s18 = {
+    unitname = "pw_grid",
+    name = "Dual Energy Storage",
+    description = "Stores Energy"    
+  },
+  s19 = {
+    unitname = "pw_garrison",
+    name = "Dual Energy Storage",
+    description = "Stores Energy"    
+  },
+  s20 = {
+    unitname = "pw_interception",
     name = "Dual Energy Storage",
     description = "Stores Energy"    
   },
