@@ -303,7 +303,7 @@ end
 --------------------------------------------------------------------------------
 -- Different aircraft turn radius in new engine
 
-if reverseCompat then
+if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if name == "fighter" then
 			ud.turnRadius = 200
