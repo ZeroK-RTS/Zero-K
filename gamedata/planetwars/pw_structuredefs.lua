@@ -16,6 +16,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "radar_select"
 			unitDef.customparams.helptext = "This structure unlocks a specific tech for its owning faction."
+			unitDef.customparams.description_pl = "Stacja badawcza"
+			unitDef.customparams.helptext_pl = "Ten budynek odblokowuje konkretna technologie dla swojej frakcji."
 		end,
 
 	pw_artefact = function(unitDef)
@@ -31,6 +33,9 @@ structureConfig = {
 			unitDef.customparams.soundselect = "cloaker_select"
 			unitDef.customparams.helptext = "This mysterious alien device houses unimaginable powers. Although it remains poorly understood by our scientists, "
 							.."it could potentially be harnessed as a galaxy-dominating superweapon. The artefact is invulnerable to all known weapons."
+			unitDef.customparams.helptext_pl = "Te tajemnicze artefakty obcych skrywaja niesamowita moc. Chociaz naukowcy nie rozumieja do konca zasady ich dzialania, to uwaza sie, "
+							.."ze moga posluzyc za bron zdolna do dominacji nad galaktyka. Artefakt jest niewrazliwy na wszystkie znane rodzaje broni."
+			unitDef.customparams.description_pl = "Artefakt obcych"
 			
 			unitDef.collisionvolumescales = [[60 70 60]]
 			unitDef.collisionvolumetype	= [[CylY]]			
@@ -48,6 +53,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "building_select1"
 			unitDef.customparams.helptext = "Produces space bombers for attacking hostile planets."
+			unitDef.customparams.helptext_pl = "Produkuje bombowce orbitalne do atakow na wrogie planety."
+			unitDef.customparams.description_pl = "Produkuje bombowce"
 			
 			unitDef.collisionvolumescales = [[275 120 215]]
 			unitDef.modelcenteroffset = [[0 00 0]]	
@@ -55,8 +62,8 @@ structureConfig = {
 		
 	pw_dropdepot = function(unitDef)
 			unitDef.maxdamage = 20000
-			unitDef.name = "Fleet Command"
-			unitDef.description = "Increases ship capacity"
+			unitDef.name = "Dropship Factory"
+			unitDef.description = "Produces dropships"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
 			unitDef.selfdestructcountdown = 180
@@ -65,7 +72,9 @@ structureConfig = {
 			unitDef.footprintz = 11
 			
 			unitDef.customparams.soundselect = "building_select1"
-			unitDef.customparams.helptext = "Increases the number of dropships that can be deployed to a single planet."
+			unitDef.customparams.helptext = "Produces space dropships for invading hostile planets."
+			unitDef.customparams.helptext_pl = "Produkuje desantowce orbitalne do inwazji na wrogie planety."
+			unitDef.customparams.description_pl = "Produkuje desantowce"
 			
 			unitDef.collisionvolumescales = [[245 220 145]]
 			unitDef.modelcenteroffset = [[15 40 0]]			
@@ -107,6 +116,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "building_select2"
 			unitDef.customparams.helptext = "A small, efficient power generator."
+			unitDef.customparams.helptext_pl = "Maly, efektywny generator planetarny."
+			unitDef.customparams.description_pl = "Wytwarza 50 energii/ture"
 			
 			unitDef.collisionvolumescales = [[56 120 56]]
 			unitDef.modelcenteroffset = [[0 10 0]]
@@ -125,6 +136,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "building_select2"
 			unitDef.customparams.helptext = "A larger power generator with increased output."
+			unitDef.customparams.helptext_pl = "Sredni generator planetarny."
+			unitDef.customparams.description_pl = "Wytwarza 100 energii/ture"
 			
 			unitDef.collisionvolumescales = [[90 125 90]]
 			unitDef.modelcenteroffset = [[0 10 0]]			
@@ -133,7 +146,7 @@ structureConfig = {
 	pw_mine3 = function(unitDef)
 			unitDef.maxdamage = 24000
 			unitDef.name = "Planetary Geothermal Tap"
-			unitDef.description = "Produces 250 credits/turn" 
+			unitDef.description = "Produces 250 energy/turn" 
 			unitDef.objectname = "pw_mine3.obj"
 			unitDef.script = "pw_mine3.lua"
 			unitDef.selfdestructcountdown = 240
@@ -146,6 +159,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "building_select2"
 			unitDef.customparams.helptext = "This massive complex draws energy directly from the planet's mantle. It goes up in a nuclear explosion if destroyed."
+			unitDef.customparams.helptext_pl = "Planetarny kompleks energetyczny. Uzywa glownie mocy geotermicznych, ale takze nuklearnych, co powoduje niebezpieczenstwo wybuchu w razie zniszczenia."
+			unitDef.customparams.description_pl = "Wytwarza 250 energii/ture."
 			
 			unitDef.collisionvolumescales = [[130 130 130]]
 			unitDef.modelcenteroffset = [[0 10 0]]					
@@ -163,6 +178,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "factory_select"
 			unitDef.customparams.helptext = "This structure maintains an army which reduces the Influence gained from battles."
+			unitDef.customparams.helptext_pl = "Garnizon sprawuje piecze nad planeta, ograniczajac wrogie wplywy zyskane z bitew."
+			unitDef.customparams.description_pl = "Garnizon - ogranicza wplywy"
 			
 			unitDef.collisionvolumescales = [[160 65 80]]
 			unitDef.modelcenteroffset = [[0 30 0]]					
@@ -171,14 +188,16 @@ structureConfig = {
 	pw_interception = function(unitDef)
 			unitDef.maxdamage = 16000
 			unitDef.name = "Interception Network"
-			unitDef.description = "Intercepts approaching bombrs"
+			unitDef.description = "Intercepts approaching bombers"
 			unitDef.objectname = "pw_wormhole2.obj"
 			
 			unitDef.footprintx = 8
 			unitDef.footprintz = 8
 			
 			unitDef.customparams.soundselect = "turret_select"
-			unitDef.customparams.helptext = "This structure interceptions incoming bombers."
+			unitDef.customparams.helptext = "This structure intercepts incoming bombers."
+			unitDef.customparams.helptext_pl = "Ten budynek przechwytuje nadlatujace bombowce orbitalne."
+			unitDef.customparams.description_pl = "Przechwytuje bombowce orbitalne."
 			
 			unitDef.collisionvolumescales = [[100 90 100]]
 			unitDef.modelcenteroffset = [[0 20 0]]
@@ -198,6 +217,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "radar_select"
 			unitDef.customparams.helptext = "This structure reduces Influence gains as well as intercepting incoming bombers."
+			unitDef.customparams.helptext_pl = "Ten budynek zmniejsza wrogie wplywy z bitew i przechwytuje bombowce orbitalne."
+			unitDef.customparams.description_pl = "Kompleks ochrony planetarnej"
 			
 			unitDef.collisionvolumescales = [[100 80 100]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -216,6 +237,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "Allows ships to leave this planet for its connected neighbours, and projects influence spread to connected planets."
+			unitDef.customparams.helptext_pl = "Tunel czasoprzestrzenny laczy planete z sasiadami - pozwala statkom orbitalnym opuszczac planete i szerzy wplywy."
+			unitDef.customparams.description_pl = "Tunel czasoprzestrzenny"
 			
 			unitDef.collisionvolumescales = [[40 45 40]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -233,6 +256,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
+			unitDef.customparams.helptext_pl = "Ulepszony tunel czasoprzestrzenny zwieksza wplywy na polaczonych planetach."
+			unitDef.customparams.description_pl = "Ulepszony tunel czasoprzestrzenny"
 			
 			unitDef.collisionvolumescales = [[64 25 45]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -250,11 +275,10 @@ structureConfig = {
 			unitDef.footprintx = 8		
 			unitDef.footprintz = 9
 			
-			unitDef.explodeas = "GRAV_BLAST"
-			unitDef.selfdestructas = "GRAV_BLAST"
-			
 			unitDef.customparams.soundselect = "cloaker_select"
-			unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."				
+			unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."	
+			unitDef.customparams.helptext_pl = "Tutaj produkowane sa Rdzenie Czasoprzestrzenne, ktore pozwalaja wysylac statki w dowolne miejsce w galaktyce w mgnieniu oka."	
+			unitDef.customparams.description_pl = "Produkuje Rdzenie Czasoprzestrzenne"				
 		end,
 		
 	pw_warpjammer = function(unitDef)
@@ -268,8 +292,13 @@ structureConfig = {
 			unitDef.footprintx = 8
 			unitDef.footprintz = 8
 			
+			unitDef.explodeas = "GRAV_BLAST"
+			unitDef.selfdestructas = "GRAV_BLAST"
+			
 			unitDef.customparams.soundselect = "radar_select"
 			unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
+			unitDef.customparams.helptext_pl = "Zagluszacz czasoprzestrzenny nie pozwala na skok czasoprzestrzenny przy uzyciu Rdzeni na ta planete."
+			unitDef.customparams.description_pl = "Zagluszacz czasoprzestrzenny"
 			
 			unitDef.collisionvolumescales = [[120 100 120]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -288,6 +317,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "Inhibits Influence spread from enemy planets."
+			unitDef.customparams.helptext_pl = "Nie pozwala wrogim planetom szerzyc wplywow przez tunel czasoprzestrzenny."
+			unitDef.customparams.description_pl = "Inhibitor tunelu czasoprzestrzennego"
 			
 			unitDef.collisionvolumescales = [[80 25 60]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -330,7 +361,7 @@ structureConfig = {
 	pw_guerilla = function(unitDef)
 			unitDef.maxdamage = 15000
 			unitDef.name = "Guerilla Jumpgate"
-			unitDef.description = "Guerilla Jumpgate"
+			unitDef.description = "Spreads Influence remotely"
 			unitDef.objectname = "pw_gaspowerstation.obj"
 			unitDef.script = "pw_gaspowerstation.lua"
 			unitDef.selfdestructcountdown = 150
@@ -340,6 +371,8 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "A jumpgate capable of sending Influence to any planet."
+			unitDef.customparams.helptext_pl = "Ten budynek pozwala szerzyc wplywy na dowolnej innej planecie."
+			unitDef.customparams.description_pl = "Zdalnie szerzy wplywy"
 			
 			unitDef.collisionvolumescales = [[70 60 70]]
 			unitDef.modelcenteroffset = [[0 0 0]]
