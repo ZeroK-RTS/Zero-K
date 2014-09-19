@@ -54,7 +54,7 @@ structureConfig = {
 			unitDef.customparams.soundselect = "building_select1"
 			unitDef.customparams.helptext = "Produces space bombers for attacking hostile planets."
 			unitDef.customparams.helptext_pl = "Produkuje bombowce orbitalne do atakow na wrogie planety."
-			unitDef.customparams.description_pl = "Produkuje bombowce."
+			unitDef.customparams.description_pl = "Produkuje bombowce"
 			
 			unitDef.collisionvolumescales = [[275 120 215]]
 			unitDef.modelcenteroffset = [[0 00 0]]	
@@ -62,8 +62,8 @@ structureConfig = {
 		
 	pw_dropdepot = function(unitDef)
 			unitDef.maxdamage = 20000
-			unitDef.name = "Fleet Command"
-			unitDef.description = "Increases ship capacity"
+			unitDef.name = "Dropship Factory"
+			unitDef.description = "Produces dropships"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
 			unitDef.selfdestructcountdown = 180
@@ -72,7 +72,9 @@ structureConfig = {
 			unitDef.footprintz = 11
 			
 			unitDef.customparams.soundselect = "building_select1"
-			unitDef.customparams.helptext = "Increases the number of dropships that can be deployed to a single planet."
+			unitDef.customparams.helptext = "Produces space dropships for invading hostile planets."
+			unitDef.customparams.helptext_pl = "Produkuje desantowce orbitalne do inwazji na wrogie planety."
+			unitDef.customparams.description_pl = "Produkuje desantowce"
 			
 			unitDef.collisionvolumescales = [[245 220 145]]
 			unitDef.modelcenteroffset = [[15 40 0]]			
