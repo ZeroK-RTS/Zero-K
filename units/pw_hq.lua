@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[pw_hq]],
   name                          = [[Command Center]],
-  description                   = [[PlanetWars Field HQ (doubles influence gain)]],
+  description                   = [[PlanetWars Field HQ (changes influence gain)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
@@ -16,11 +16,11 @@ unitDef = {
   --corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[PlanetWars Hauptquartier (verdoppelt Einflussgewinn)]],
-    description_pl = [[Kwatera Glowna PlanetWars (podwaja wplywy)]],
-    helptext       = [[This building is integral to strategic control of the planet. If the winning team has lost their Command Center, their influence gains are halved and the losing team steals a portion of their metal bounty.]],
+    description_de = [[PlanetWars Hauptquartier (verandert Einflussgewinn)]],
+    description_pl = [[Kwatera Glowna PlanetWars (zwieksza wplywy)]],
+    helptext       = [[This building is integral to strategic control of the planet. If the winning team is an attacker and has lost their Command Center, their influence gains are halved. If the defender wins, their loss of the CC causes the attacker to keep 20% of the influence gain.]],
     helptext_de    = [[Dieses Gebäude ist für die strategische Kontrolle des Planeten unerlässlich. Wenn das Gewinnerteam seine Kommandozentrale verloren hat, erhält es nur die Hälfte der Einflusspunkte.]],
-    helptext_pl    = [[Utrata kwatery glownej przez zwycieska druzyne powoduje, ze zdobyte wplywy sa dwukrotnie mniejsze. Ponadto przegrana druzyna kradnie czesc ich zyskow metalu.]],
+    helptext_pl    = [[Utrata kwatery glownej przez zwycieska druzyne powoduje, ze zdobyte wplywy sa dwukrotnie mniejsze, jezeli byli to najezdzcy - w wypadku zwyciestwa obroncow powoduje, ze na planete wywierane jest 20% wplywow.]],
   	dontcount = [[1]],
 	soundselect = "building_select1",
   },
