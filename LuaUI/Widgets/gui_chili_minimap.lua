@@ -554,31 +554,33 @@ function widget:MousePress(x, y, button)
 			WG.crude.ShowMenu() --make epic Chili menu appear.
 			return true
 		end
-		if options.leftClickOnMinimap.value ~= 'unitselection' then
-			if button == 1 then
-				local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
-				local coord 
-				if traceType == "ground" then
-					coord = traceValue
-				end
-				if options.leftClickOnMinimap.value == 'camera' then
-					if traceType == "unit" then
-						local x,y,z = Spring.GetUnitPosition(traceValue)
-						if x and y and z then
-							coord = {x,y,z}
-						end
-					elseif traceType == "feature" then
-						local x,y,z = Spring.GetFeaturePosition(traceValue)
-						if x and y and z then
-							coord = {x,y,z}
-						end
+		if (options.leftClickOnMinimap.value ~= 'unitselection' and button == 1) or button == 2 then
+			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
+			local coord 
+			if traceType == "ground" then
+				coord = traceValue
+			end
+			if (options.leftClickOnMinimap.value == 'camera' and button == 1) or button == 2 then
+				if traceType == "unit" then
+					local x,y,z = Spring.GetUnitPosition(traceValue)
+					if x and y and z then
+						coord = {x,y,z}
+					end
+				elseif traceType == "feature" then
+					local x,y,z = Spring.GetFeaturePosition(traceValue)
+					if x and y and z then
+						coord = {x,y,z}
 					end
 				end
-				if coord then
-					Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
-					leftClickDraggingCamera = true
-					return true
+			end
+			if coord then
+				if (WG.COFC_SetCameraTarget) then
+					WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0)
+				else
+			 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
 				end
+				leftClickDraggingCamera = true
+				return true
 			end
 		end
 	end
@@ -592,7 +594,11 @@ function widget:MouseMove(x, y, dx, dy, button)
 			coord = traceValue
 		end
 		if coord then
-			Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
+			if (WG.COFC_SetCameraTarget) then
+				WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0)
+			else
+		 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
+			end
 			leftClickDraggingCamera = true
 			return true
 		end
