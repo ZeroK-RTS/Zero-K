@@ -2091,6 +2091,8 @@ function widget:Initialize()
 			WG.crude.SetHotkey("mousestate",nil)
 		end
 	end
+
+	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that minimap click works with COFC
 	
 	spSendCommands("luaui disablewidget SmoothScroll")
 	if WG.SetWidgetOption then
@@ -2112,6 +2114,8 @@ function widget:Shutdown()
 		WG.crude.SetHotkey("track",epicmenuHkeyComp[3])
 		WG.crude.SetHotkey("mousestate",epicmenuHkeyComp[4])
 	end
+
+	WG.COFC_SetCameraTarget = nil
 end
 
 function widget:TextCommand(command)
