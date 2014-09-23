@@ -3,14 +3,14 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Pro Console",
+    name      = "Chili Pro Console Old",
     desc      = "v0.016 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     experimental = false,
-    enabled   = true,
+    enabled   = false,
   }
 end
 
