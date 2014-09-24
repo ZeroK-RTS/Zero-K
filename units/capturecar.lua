@@ -47,7 +47,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName          = [[corvrad_big.s3o]],
-  radarDistance       = 1200,
   script              = [[capturecar.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
