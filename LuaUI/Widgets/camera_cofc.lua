@@ -957,6 +957,9 @@ local function Zoom(zoomin, shift, forceCenter)
 	((zoomin and options.zoomintocursor.value) or ((not zoomin) and options.zoomoutfromcursor.value))
 	then
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
+
+		local refgx,refgy,refgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
+
 	
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
@@ -998,8 +1001,28 @@ local function Zoom(zoomin, shift, forceCenter)
 		cs.px = new_px
 		cs.py = new_py
 		cs.pz = new_pz
-		
+
+		local skyProportion = math.min(math.max((cs.py - spGetGroundHeight(cs.px, cs.pz)+5)/((maxDistY) - spGetGroundHeight(cs.px, cs.pz)+5), 0.0), 1.0)
+		cs.rx = sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3
+
+		if (cs.py > spGetGroundHeight(cs.px, cs.pz)+100) then
+			local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
+
+			-- Correct so that mouse cursor is hovering over the same point. 
+			-- Since we are using a projection to a sphere, ensure that both points have the same y value by scaling.
+			local yCorrectScaleFactor = 1
+			if math.abs(testgy) > 0.0001 then
+				yCorrectScaleFactor = refgy / testgy
+			else 
+				yCorrectScaleFactor = refgy / math.sign(testgy) * 0.0001
+			end
+			-- Spring.Echo("Ref X: "..refgx..", Test X: "..testgx..", Ref Z: "..refgz..", Test Z: "..testgz..", Ref Y: "..refgy..", Test Y: "..testgy..", Correction Factor: "..yCorrectScaleFactor)
+			cs.px = cs.px + (refgx - testgx * yCorrectScaleFactor)
+			cs.pz = cs.pz + (refgz - testgz * yCorrectScaleFactor)
+		end
+
 		spSetCameraState(cs, options.smoothness.value)
+
 		ls_have = false
 		return
 		
@@ -1044,6 +1067,10 @@ local function Zoom(zoomin, shift, forceCenter)
 	end
 	
 	ls_dist = ls_dist_new
+
+		local skyProportion = math.min(math.max((cs.py - spGetGroundHeight(cs.px, cs.pz)+5)/((maxDistY) - spGetGroundHeight(cs.px, cs.pz)+5), 0.0), 1.0)
+	-- Spring.Echo("Proportion to sky: "..skyProportion)
+	cs.rx = sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3
 
 	local cstemp = UpdateCam(cs)
 	if cstemp then cs = cstemp; end
