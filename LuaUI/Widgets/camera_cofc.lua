@@ -957,7 +957,7 @@ local function ZoomTiltCorrection(cs, zoomin, refg)
 	if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
 	elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
 	elseif targetRx < cs.rx and not zoomin then 
-		if skyProportion < 1.0 then cs.rx = cs.rx - angleCorrectionMaximum
+		if skyProportion < 1.0 and ls_dist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
 		else cs.rx = targetRx
 		end
 	end
@@ -965,10 +965,11 @@ local function ZoomTiltCorrection(cs, zoomin, refg)
 	-- The buffer on groundHeight is to avoid the horizon bug with the trace function. The required value likely depends on minAngle, so test this if minAngle changes
 	if refg ~= nil and refg.x ~= nil and refg.y ~= nil and refg.z ~= nil then
 		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
-		if testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
+		if refg.y > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
 
 			-- Correct so that mouse cursor is hovering over the same point. 
 			-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
+			-- Spring.Echo("Ref {"..refg.x..", "..refg.y..", "..refg.z.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
 			cs.px = cs.px + (refg.x - testgx)
 			cs.pz = cs.pz + (refg.z - testgz)
 		end
@@ -1101,6 +1102,7 @@ local function Zoom(zoomin, shift, forceCenter)
 	
 	local ls_dist_new = ls_dist + ls_dist*sp -- a zoom in that get faster the further away from target
 	ls_dist_new = max(ls_dist_new, 20)
+
 	if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
 		return
 	end
