@@ -203,7 +203,9 @@ function gadget:UnitDecloaked(unitID,unitDefID,teamID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	gadget:UnitCloaked(unitID,unitDefID,teamID)
+	if (Spring.GetUnitIsCloaked(unitID)) then
+		gadget:UnitCloaked(unitID,unitDefID,teamID)
+	end
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
