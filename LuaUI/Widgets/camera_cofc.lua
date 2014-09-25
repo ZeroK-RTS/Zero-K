@@ -884,7 +884,7 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
-	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,(spGetGroundHeight(cs.px, cs.pz) or averageEdgeHeight),2000,true) --use override if spTraceScreenRay() do not have results
+	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,averageEdgeHeight,2000,true) --use override if spTraceScreenRay() do not have results
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
@@ -976,7 +976,7 @@ local function ZoomTiltCorrection(cs, zoomin, refg)
 	end
 
 	if refg ~= nil and refg.x ~= nil and refg.y ~= nil and refg.z ~= nil then
-		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, (spGetGroundHeight(cs.px, cs.pz) or averageEdgeHeight),2000,true)
+		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
 		if refg.y > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
 
 			-- Correct so that mouse cursor is hovering over the same point. 
@@ -1023,7 +1023,7 @@ local function Zoom(zoomin, shift, forceCenter)
 	then
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
 		scrnRay_cache.previous.fov = -999 --force reset cache (because mouse cursor is at same position when we call last time but camera changed!)
-		local refgx,refgy,refgz = OverrideTraceScreenRay(mx, my, cs, (spGetGroundHeight(cs.px, cs.pz) or averageEdgeHeight),2000,true) --for SUPCOM camera zoom
+		local refgx,refgy,refgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true) --for SUPCOM camera zoom
 
 	
 		if gx and not options.freemode.value then
