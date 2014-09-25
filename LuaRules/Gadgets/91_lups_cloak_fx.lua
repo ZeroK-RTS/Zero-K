@@ -54,7 +54,9 @@ if (gadgetHandler:IsSyncedCode()) then
   end
 
   function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-    SendToUnsynced("lups_unit_cloaked", unitID,unitDefID,teamID)
+    if (spGetUnitIsCloaked(unitID)) then
+    	SendToUnsynced("lups_unit_cloaked", unitID,unitDefID,teamID)
+    end
   end
 
   function gadget:PlayerChanged(playerID)
