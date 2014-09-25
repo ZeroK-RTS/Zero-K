@@ -52,6 +52,7 @@ options_order = {
 	'zoomintocursor', 
 	'zoomoutfromcursor', 
 	'zoomouttocenter', 
+	'tiltedzoom',
 	'zoominfactor', 
 	'zoomoutfactor',
 	
@@ -216,6 +217,12 @@ options = {
 	zoomouttocenter = {
 		name = 'Zoom out to center',
 		desc = 'Center the map as you zoom out.',
+		type = 'bool',
+		value = false,
+	},
+	tiltedzoom = {
+		name = 'Tilt camera while zooming',
+		desc = 'Have the camera tilt while zooming. Camera faces ground when zoomed out, and looks out nearly parallel to ground when fully zoomed in',
 		type = 'bool',
 		value = false,
 	},
@@ -920,6 +927,44 @@ local function UpdateCam(cs)
 	return cs
 end
 
+local function ZoomTiltCorrection(cs, refg)
+	local groundHeight = spGetGroundHeight(cs.px, cs.pz)
+	local skyProportion = math.min(math.max((cs.py - groundHeight+5)/((maxDistY - 2000) - groundHeight+5), 0.0), 1.0)
+	cs.rx = sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3
+		--[[
+		--FOR REFERENCE
+		--plot of "sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3"
+		         O - - - - - - - - - - - - - - - - ->1 +skyProportion
+		     -18 |
+		         |x
+		     -36 | x
+		         |    x
+		     -54 |        x
+		         |            x
+		     -72 |                  x
+		         |                         x
+		     -90 v -cam angle                       x
+		--]]
+
+	if refg ~= nil and refg.x ~= nil and refg.y ~= nil and refg.z ~= nil and (cs.py > groundHeight+100) then
+		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
+		-- Correct so that mouse cursor is hovering over the same point. 
+		-- Since we are using a projection to a sphere, ensure that both points have the same y value by scaling.
+		local yCorrectScaleFactor = 1
+		if math.abs(testgy) > 0.0001 then
+			yCorrectScaleFactor = refg.y / testgy
+		else 
+			local sign = math.abs(testgy)/testgy
+			yCorrectScaleFactor = refg.y / sign * 0.0001
+		end
+		-- Spring.Echo("Ref X: "..refgx..", Test X: "..testgx..", Ref Z: "..refgz..", Test Z: "..testgz..", Ref Y: "..refgy..", Test Y: "..testgy..", Correction Factor: "..yCorrectScaleFactor)
+		cs.px = cs.px + (refg.x - testgx * yCorrectScaleFactor)
+		cs.pz = cs.pz + (refg.z - testgz * yCorrectScaleFactor)
+	end
+
+	return cs
+end
+
 local function SetCameraTarget(gx,gy,gz,smoothness)
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
@@ -997,41 +1042,11 @@ local function Zoom(zoomin, shift, forceCenter)
 		cs.py = new_py
 		cs.pz = new_pz
 
-		--//SUPCOM camera zoom by Shadowfurry333(Dominic Renaud):
-		local groundHeight = spGetGroundHeight(cs.px, cs.pz)
-		local skyProportion = math.min(math.max((cs.py - groundHeight+5)/((maxDistY) - groundHeight+5), 0.0), 1.0)
-		cs.rx = sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3
-			--[[
-			--FOR REFERENCE
-			--plot of "sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3"
-			         O - - - - - - - - - - - - - - - - ->1 +skyProportion
-			     -18 |
-			         |x
-			     -36 | x
-			         |    x
-			     -54 |        x
-			         |            x
-			     -72 |                  x
-			         |                         x
-			     -90 v -cam angle                       x
-			--]]
-
-		if (cs.py > groundHeight+100) then
-			local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
-			-- Correct so that mouse cursor is hovering over the same point. 
-			-- Since we are using a projection to a sphere, ensure that both points have the same y value by scaling.
-			local yCorrectScaleFactor = 1
-			if math.abs(testgy) > 0.0001 then
-				yCorrectScaleFactor = refgy / testgy
-			else 
-				local sign = math.abs(testgy)/testgy
-				yCorrectScaleFactor = refgy / sign * 0.0001
-			end
-			-- Spring.Echo("Ref X: "..refgx..", Test X: "..testgx..", Ref Z: "..refgz..", Test Z: "..testgz..", Ref Y: "..refgy..", Test Y: "..testgy..", Correction Factor: "..yCorrectScaleFactor)
-			cs.px = cs.px + (refgx - testgx * yCorrectScaleFactor)
-			cs.pz = cs.pz + (refgz - testgz * yCorrectScaleFactor)
+		--//SUPCOM camera zoom by Shadowfury333(Dominic Renaud):
+		if options.tiltedzoom.value then
+			cs = ZoomTiltCorrection(cs, {x = refgx, y = refgy, z = refgz})
 		end
-		--//
+			--//
 
 		spSetCameraState(cs, options.smoothness.value)
 
@@ -1080,9 +1095,9 @@ local function Zoom(zoomin, shift, forceCenter)
 	
 	ls_dist = ls_dist_new
 
-		local skyProportion = math.min(math.max((cs.py - spGetGroundHeight(cs.px, cs.pz)+5)/((maxDistY) - spGetGroundHeight(cs.px, cs.pz)+5), 0.0), 1.0)
-	-- Spring.Echo("Proportion to sky: "..skyProportion)
-	cs.rx = sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3
+	if options.tiltedzoom.value then
+		cs = ZoomTiltCorrection(cs, nil)
+	end
 
 	local cstemp = UpdateCam(cs)
 	if cstemp then cs = cstemp; end
@@ -1253,6 +1268,11 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		ls_y = y
 		ls_z = z
 		ls_have = true --lock lockspot
+
+		if options.tiltedzoom.value then
+			cs = ZoomTiltCorrection(cs, nil)
+		end
+
 		local cstemp = UpdateCam(cs)
 		if cstemp then cs = cstemp; end
 		spSetCameraState(cs, smoothness) --track & zoom
