@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.137 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.138 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
     date      = "2011-03-16", --2014-Sept-25
     license   = "GNU GPL, v2 or later",
@@ -578,17 +578,10 @@ local hideCursor = false
 
 
 local MWIDTH, MHEIGHT = Game.mapSizeX, Game.mapSizeZ
-local AVERAGE_EDGE_HEIGHT = 0
 local mcx, mcz 	= MWIDTH / 2, MHEIGHT / 2
 local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(MHEIGHT, MWIDTH) * 2
 do
-	local northEdge = spGetGroundHeight(MWIDTH/2,0)
-	local eastEdge = spGetGroundHeight(0,MHEIGHT/2)
-	local southEdge = spGetGroundHeight(MWIDTH/2,MHEIGHT)
-	local westEdge = spGetGroundHeight(MWIDTH,MHEIGHT/2)
-	AVERAGE_EDGE_HEIGHT =(northEdge+eastEdge+southEdge+westEdge)/4 --is used for estimating coordinate in null space
-	
 	local currentFOVhalf_rad = (Spring.GetCameraFOV()/2)*PI/180
 	local mapLenght = (max(MHEIGHT, MWIDTH)+4000)/2
 	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust TAB/Overview distance based on camera FOV
@@ -632,6 +625,15 @@ local function LimitZoom(a,b,c,sp,limit)
 	zox,zoy,zoz = zox/total,zoy/total,zoz/total
 	--Reapply speed
 	return zox*maxZoom,zoy*maxZoom,zoz*maxZoom
+end
+
+local function ExtendedGetGroundHeight(x,z)
+	--out of map. Bound coordinate to within map
+	if x < 0 then x = 0; end
+	if x > MWIDTH then x=MWIDTH; end
+	if z < 0 then z = 0; end 
+	if z > MHEIGHT then z = MHEIGHT; end 
+	return spGetGroundHeight(x,z)
 end
 
 --------------------------------------------------------------------------------
@@ -764,17 +766,17 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 			gx, gy, gz = cs.px+cursorxDist,planeHeight,cs.pz+cursorzDist --estimated ground position infront of camera
 			
 			if findPlaneToIntercept then
-				local currentGrndH = spGetGroundHeight(gx,gz)
+				local currentGrndH = ExtendedGetGroundHeight(gx,gz)
 				local intercepted = false
 				local searchDirection = 0
 				local SearchCriteria = nil
 				if currentGrndH > 0 then
-					searchDirection = -25
+					searchDirection = -10
 					SearchCriteria = function(grndHeight,currHeight)
 										return grndHeight <= currHeight
 									end
 				else
-					searchDirection = 25
+					searchDirection = 10
 					SearchCriteria = function(grndHeight,currHeight)
 										return grndHeight >= currHeight
 									end
@@ -787,7 +789,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 					gx, gz = cs.px+cursorxDist,cs.pz+cursorzDist --estimated ground position infront of camera
 					gy = (cursorxzDist/xz_GrndDistRatio) - vertGroundDist 
 					-- Spring.Echo((cursorxzDist/xz_GrndDistRatio) .. "   " .. vertGroundDist .. "  " .. gy)
-					currentGrndH = spGetGroundHeight(gx,gz) or AVERAGE_EDGE_HEIGHT
+					currentGrndH = ExtendedGetGroundHeight(gx,gz)
 					-- Spring.Echo(currentGrndH <= gy)
 					intercepted = SearchCriteria(currentGrndH,gy)
 					safetyCounter = safetyCounter + 1
@@ -921,7 +923,7 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
-	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,(spGetGroundHeight(cs.px, cs.pz) or AVERAGE_EDGE_HEIGHT),2000,true) --use override if spTraceScreenRay() do not have results
+	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,ExtendedGetGroundHeight(cs.px, cs.pz),2000,true) --use override if spTraceScreenRay() do not have results
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
@@ -986,18 +988,18 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	if (mouseX==nil) then
 		mouseX,mouseY = mouseX or vsx/2,mouseY or vsy/2 --if NIL, revert to center of screen
 	end
-	scrnRay_cache.previous.fov = -999 --force reset cache (because if mouse cursor is at same position then it might have cache issue!)
+	scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
 	local gx,gy,gz = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true)
 	
 	if gx and not options.freemode.value then
-		--out of map. Bound zooming to within map
+		-- out of map. Bound zooming to within map
 		if gx < 0 then gx = 0; end
 		if gx > MWIDTH then gx=MWIDTH; end
 		if gz < 0 then gz = 0; end 
 		if gz > MHEIGHT then gz = MHEIGHT; end  
 	end
 	
-	local groundHeight = spGetGroundHeight(gx, gz) + groundBufferZone
+	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
 	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
 	local targetRx = sqrt(skyProportion) * (minAngle - HALFPI) - minAngle
 		--[[
@@ -1028,14 +1030,6 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 
 	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true)
 	-- if gy > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
-	
-	if testgx and not options.freemode.value then
-		--out of map. Bound zooming to within map
-		if testgx < 0 then testgx = 0; end
-		if testgx > MWIDTH then testgx=MWIDTH; end
-		if testgz < 0 then testgz = 0; end 
-		if testgz > MHEIGHT then testgz = MHEIGHT; end  
-	end
 
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
