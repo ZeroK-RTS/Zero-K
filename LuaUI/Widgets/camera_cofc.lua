@@ -928,10 +928,10 @@ local function UpdateCam(cs)
 end
 
 local function ZoomTiltCorrection(cs, zoomin, refg)
-	local topDownBufferZone = 3000
+	local topDownBufferZone = 1500
 	local groundBufferZone = 20
 	local minAngle = 30 * RADperDEGREE
-	local angleCorrectionMaximum = 7.5 * RADperDEGREE
+	local angleCorrectionMaximum = 5 * RADperDEGREE
 
 	local groundHeight = spGetGroundHeight(cs.px, cs.pz) + groundBufferZone
 	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
@@ -962,7 +962,6 @@ local function ZoomTiltCorrection(cs, zoomin, refg)
 		end
 	end
 
-	-- The buffer on groundHeight is to avoid the horizon bug with the trace function. The required value likely depends on minAngle, so test this if minAngle changes
 	if refg ~= nil and refg.x ~= nil and refg.y ~= nil and refg.z ~= nil then
 		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
 		if refg.y > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
@@ -1070,6 +1069,7 @@ local function Zoom(zoomin, shift, forceCenter)
 
 	--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
 	local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs)
+	local refgx,refgy,refgz = OverrideTraceScreenRay(cx, cy, cs, averageEdgeHeight,2000,true) --for SUPCOM camera zoom
 	
 	if gx and not options.freemode.value then
 		--out of map. Bound zooming to within map
