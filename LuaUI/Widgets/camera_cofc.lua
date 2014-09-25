@@ -927,10 +927,15 @@ local function UpdateCam(cs)
 	return cs
 end
 
-local function ZoomTiltCorrection(cs, refg)
-	local groundHeight = spGetGroundHeight(cs.px, cs.pz)
-	local skyProportion = math.min(math.max((cs.py - groundHeight+5)/((maxDistY - 2000) - groundHeight+5), 0.0), 1.0)
-	cs.rx = sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3
+local function ZoomTiltCorrection(cs, zoomin, refg)
+	local topDownBufferZone = 3000
+	local groundBufferZone = 20
+	local minAngle = 30 * RADperDEGREE
+	local angleCorrectionMaximum = 7.5 * RADperDEGREE
+
+	local groundHeight = spGetGroundHeight(cs.px, cs.pz) + groundBufferZone
+	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
+	local targetRx = sqrt(skyProportion) * (minAngle - HALFPI) - minAngle
 		--[[
 		--FOR REFERENCE
 		--plot of "sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3"
@@ -946,20 +951,27 @@ local function ZoomTiltCorrection(cs, refg)
 		     -90 v -cam angle                       x
 		--]]
 
-	if refg ~= nil and refg.x ~= nil and refg.y ~= nil and refg.z ~= nil and (cs.py > groundHeight+100) then
-		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
-		-- Correct so that mouse cursor is hovering over the same point. 
-		-- Since we are using a projection to a sphere, ensure that both points have the same y value by scaling.
-		local yCorrectScaleFactor = 1
-		if math.abs(testgy) > 0.0001 then
-			yCorrectScaleFactor = refg.y / testgy
-		else 
-			local sign = math.abs(testgy)/testgy
-			yCorrectScaleFactor = refg.y / sign * 0.0001
+	-- Ensure angle correction only happens by parts if the angle doesn't match the target, unless it is within a threshold
+	-- If it isn't, make sure the correction only happens in the direction of the curve. 
+	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
+	if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
+	elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
+	elseif targetRx < cs.rx and not zoomin then 
+		if skyProportion < 1.0 then cs.rx = cs.rx - angleCorrectionMaximum
+		else cs.rx = targetRx
 		end
-		-- Spring.Echo("Ref X: "..refgx..", Test X: "..testgx..", Ref Z: "..refgz..", Test Z: "..testgz..", Ref Y: "..refgy..", Test Y: "..testgy..", Correction Factor: "..yCorrectScaleFactor)
-		cs.px = cs.px + (refg.x - testgx * yCorrectScaleFactor)
-		cs.pz = cs.pz + (refg.z - testgz * yCorrectScaleFactor)
+	end
+
+	-- The buffer on groundHeight is to avoid the horizon bug with the trace function. The required value likely depends on minAngle, so test this if minAngle changes
+	if refg ~= nil and refg.x ~= nil and refg.y ~= nil and refg.z ~= nil then
+		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
+		if testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
+
+			-- Correct so that mouse cursor is hovering over the same point. 
+			-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
+			cs.px = cs.px + (refg.x - testgx)
+			cs.pz = cs.pz + (refg.z - testgz)
+		end
 	end
 
 	return cs
@@ -1044,7 +1056,7 @@ local function Zoom(zoomin, shift, forceCenter)
 
 		--//SUPCOM camera zoom by Shadowfury333(Dominic Renaud):
 		if options.tiltedzoom.value then
-			cs = ZoomTiltCorrection(cs, {x = refgx, y = refgy, z = refgz})
+			cs = ZoomTiltCorrection(cs, zoomin, {x = refgx, y = refgy, z = refgz})
 		end
 			--//
 
@@ -1096,7 +1108,7 @@ local function Zoom(zoomin, shift, forceCenter)
 	ls_dist = ls_dist_new
 
 	if options.tiltedzoom.value then
-		cs = ZoomTiltCorrection(cs, nil)
+		cs = ZoomTiltCorrection(cs, zoomin, nil)
 	end
 
 	local cstemp = UpdateCam(cs)
@@ -1270,7 +1282,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		ls_have = true --lock lockspot
 
 		if options.tiltedzoom.value then
-			cs = ZoomTiltCorrection(cs, nil)
+			cs = ZoomTiltCorrection(cs, zoomin, nil)
 		end
 
 		local cstemp = UpdateCam(cs)
