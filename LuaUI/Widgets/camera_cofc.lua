@@ -4,9 +4,9 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.135 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.136 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer, msafwan",
-    date      = "2011-03-16", --2013-April-9
+    date      = "2011-03-16", --2014-Sept-25
     license   = "GNU GPL, v2 or later",
     layer     = 1002,
 	handler   = true,
@@ -617,12 +617,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local scrnRay_previousFov=-1
-local scrnRay_prevInclination =99
-local scrnRay_prevAzimuth = 299
-local scrnRay_prevX = 9999
-local scrnRay_prevY = 9999
-local scrnRay_cachedResult = {0,0,0,0,0,0}
+local scrnRay_cache = {result={0,0,0,0,0,0}, previous={fov=1,inclination=99,azimuth=299,x=9999,y=9999}}
 local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeIntercept) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
 	local viewSizeY = vsy
 	local viewSizeX = vsx
@@ -635,8 +630,8 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 	x = x- halfViewSizeX
 	local currentFov = cs.fov/2 --in Spring: 0 degree is directly ahead and +FOV/2 degree to the left and -FOV/2 degree to the right
 	--//Speedup//--
-	if scrnRay_previousFov==currentFov and scrnRay_prevInclination == cs.rx and scrnRay_prevAzimuth == cs.ry and scrnRay_prevX ==x and scrnRay_prevY == y then --if camera Sphere coordinate & mouse position not change then use cached value
-		return scrnRay_cachedResult[1],scrnRay_cachedResult[2],scrnRay_cachedResult[3],scrnRay_cachedResult[4],scrnRay_cachedResult[5],scrnRay_cachedResult[6]  
+	if scrnRay_cache.previous.fov==currentFov and scrnRay_cache.previous.inclination == cs.rx and scrnRay_cache.previous.azimuth == cs.ry and scrnRay_cache.previous.x ==x and scrnRay_cache.previous.y == y then --if camera Sphere coordinate & mouse position not change then use cached value
+		return scrnRay_cache.result[1],scrnRay_cache.result[2],scrnRay_cache.result[3],scrnRay_cache.result[4],scrnRay_cache.result[5],scrnRay_cache.result[6]  
 	end
 	--[[
 	--Opengl screen FOV scaling logic:
@@ -775,17 +770,17 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 	end
 	--//caching for efficiency
 	if not cancelCache then
-		scrnRay_cachedResult[1] = gx
-		scrnRay_cachedResult[2] = gy
-		scrnRay_cachedResult[3] = gz
-		scrnRay_cachedResult[4] = rx
-		scrnRay_cachedResult[5] = ry
-		scrnRay_cachedResult[6] = rz
-		scrnRay_prevInclination =cs.rx
-		scrnRay_prevAzimuth = cs.ry
-		scrnRay_prevX = x
-		scrnRay_prevY = y
-		scrnRay_previousFov = currentFov
+		scrnRay_cache.result[1] = gx
+		scrnRay_cache.result[2] = gy
+		scrnRay_cache.result[3] = gz
+		scrnRay_cache.result[4] = rx
+		scrnRay_cache.result[5] = ry
+		scrnRay_cache.result[6] = rz
+		scrnRay_cache.previous.inclination =cs.rx
+		scrnRay_cache.previous.azimuth = cs.ry
+		scrnRay_cache.previous.x = x
+		scrnRay_cache.previous.y = y
+		scrnRay_cache.previous.fov = currentFov
 	end
 
 	return gx,gy,gz,rx,ry,rz
@@ -957,8 +952,8 @@ local function Zoom(zoomin, shift, forceCenter)
 	((zoomin and options.zoomintocursor.value) or ((not zoomin) and options.zoomoutfromcursor.value))
 	then
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
-
-		local refgx,refgy,refgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
+		scrnRay_cache.previous.fov = -999 --force reset cache (because mouse cursor is at same position when we call last time but camera changed!)
+		local refgx,refgy,refgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true) --for SUPCOM camera zoom
 
 	
 		if gx and not options.freemode.value then
@@ -1002,24 +997,41 @@ local function Zoom(zoomin, shift, forceCenter)
 		cs.py = new_py
 		cs.pz = new_pz
 
-		local skyProportion = math.min(math.max((cs.py - spGetGroundHeight(cs.px, cs.pz)+5)/((maxDistY) - spGetGroundHeight(cs.px, cs.pz)+5), 0.0), 1.0)
+		--//SUPCOM camera zoom by Shadowfurry333(Dominic Renaud):
+		local groundHeight = spGetGroundHeight(cs.px, cs.pz)
+		local skyProportion = math.min(math.max((cs.py - groundHeight+5)/((maxDistY) - groundHeight+5), 0.0), 1.0)
 		cs.rx = sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3
+			--[[
+			--FOR REFERENCE
+			--plot of "sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3"
+			         O - - - - - - - - - - - - - - - - ->1 +skyProportion
+			     -18 |
+			         |x
+			     -36 | x
+			         |    x
+			     -54 |        x
+			         |            x
+			     -72 |                  x
+			         |                         x
+			     -90 v -cam angle                       x
+			--]]
 
-		if (cs.py > spGetGroundHeight(cs.px, cs.pz)+100) then
+		if (cs.py > groundHeight+100) then
 			local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
-
 			-- Correct so that mouse cursor is hovering over the same point. 
 			-- Since we are using a projection to a sphere, ensure that both points have the same y value by scaling.
 			local yCorrectScaleFactor = 1
 			if math.abs(testgy) > 0.0001 then
 				yCorrectScaleFactor = refgy / testgy
 			else 
-				yCorrectScaleFactor = refgy / math.sign(testgy) * 0.0001
+				local sign = math.abs(testgy)/testgy
+				yCorrectScaleFactor = refgy / sign * 0.0001
 			end
 			-- Spring.Echo("Ref X: "..refgx..", Test X: "..testgx..", Ref Z: "..refgz..", Test Z: "..testgz..", Ref Y: "..refgy..", Test Y: "..testgy..", Correction Factor: "..yCorrectScaleFactor)
 			cs.px = cs.px + (refgx - testgx * yCorrectScaleFactor)
 			cs.pz = cs.pz + (refgz - testgz * yCorrectScaleFactor)
 		end
+		--//
 
 		spSetCameraState(cs, options.smoothness.value)
 
@@ -1435,7 +1447,7 @@ local function Tilt(s, dir)
 end
 
 local function ScrollCam(cs, mxm, mym, smoothlevel)
-	scrnRay_prevX=9999 --force reset of offmap traceScreenRay cache. Reason: because offmap traceScreenRay use cursor position for calculation & scrollcam always have cursor at midscreen
+	scrnRay_cache.previous.fov = -999 --force reset of offmap traceScreenRay cache. Reason: because offmap traceScreenRay use cursor position for calculation but scrollcam always have cursor at midscreen
 	SetLockSpot2(cs)
 	if not cs.dy or not ls_have then
 		--echo "<COFC> scrollcam fcn fail"
