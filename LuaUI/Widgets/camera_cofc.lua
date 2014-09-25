@@ -621,6 +621,19 @@ local function explode(div,str)
   return arr
 end
 
+local function LimitZoom(a,b,c,sp,limit)
+	--Check if anyone reach max speed
+	local zox,zoy,zoz = a*sp,b*sp,c*sp
+	local maxZoom = math.max(math.abs(zox),math.abs(zoy),math.abs(zoz))
+	--Limit speed
+	maxZoom = math.min(maxZoom,limit)
+	--Normalize
+	local total = math.sqrt(zox^2+zoy^2+zoz^2)
+	zox,zoy,zoz = zox/total,zoy/total,zoz/total
+	--Reapply speed
+	return zox*maxZoom,zoy*maxZoom,zoz*maxZoom
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -871,7 +884,7 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
 	--]]
-	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,averageEdgeHeight,1000,true) --use override if spTraceScreenRay() do not have results
+	local gx,gy,gz = OverrideTraceScreenRay(x,y,cs,(spGetGroundHeight(cs.px, cs.pz) or averageEdgeHeight),2000,true) --use override if spTraceScreenRay() do not have results
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
@@ -963,7 +976,7 @@ local function ZoomTiltCorrection(cs, zoomin, refg)
 	end
 
 	if refg ~= nil and refg.x ~= nil and refg.y ~= nil and refg.z ~= nil then
-		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true)
+		local testgx,testgy,testgz = OverrideTraceScreenRay(mx, my, cs, (spGetGroundHeight(cs.px, cs.pz) or averageEdgeHeight),2000,true)
 		if refg.y > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
 
 			-- Correct so that mouse cursor is hovering over the same point. 
@@ -1010,7 +1023,7 @@ local function Zoom(zoomin, shift, forceCenter)
 	then
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
 		scrnRay_cache.previous.fov = -999 --force reset cache (because mouse cursor is at same position when we call last time but camera changed!)
-		local refgx,refgy,refgz = OverrideTraceScreenRay(mx, my, cs, averageEdgeHeight,2000,true) --for SUPCOM camera zoom
+		local refgx,refgy,refgz = OverrideTraceScreenRay(mx, my, cs, (spGetGroundHeight(cs.px, cs.pz) or averageEdgeHeight),2000,true) --for SUPCOM camera zoom
 
 	
 		if gx and not options.freemode.value then
@@ -1031,21 +1044,26 @@ local function Zoom(zoomin, shift, forceCenter)
 		
 		local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
 		
-		local new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the target.
-		local new_py = cs.py + dy * sp
-		local new_pz = cs.pz + dz * sp
+		local zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
+		local new_px = cs.px + zox --a zooming that get slower the closer you are to the target.
+		local new_py = cs.py + zoy
+		local new_pz = cs.pz + zoz
 		
 		if not options.freemode.value then
 			if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then --zooming underground?
 				sp = (spGetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
-				new_px = cs.px + dx * sp --a zooming that get slower the closer you are to the ground.
-				new_py = cs.py + dy * sp
-				new_pz = cs.pz + dz * sp
+				
+				zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
+				new_px = cs.px + zox --a zooming that get slower the closer you are to the ground.
+				new_py = cs.py + zoy
+				new_pz = cs.pz + zoz
 			elseif (not zoomin) and new_py > maxDistY then --zoom out to space?
 				sp = (maxDistY - cs.py) / dy
-				new_px = cs.px + dx * sp --a zoom-out that get slower the closer you are to the ceiling?
-				new_py = cs.py + dy * sp
-				new_pz = cs.pz + dz * sp
+
+				zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
+				new_px = cs.px + zox --a zoom-out that get slower the closer you are to the ceiling?
+				new_py = cs.py + zoy
+				new_pz = cs.pz + zoz
 			end
 			
 		end
@@ -1100,9 +1118,9 @@ local function Zoom(zoomin, shift, forceCenter)
     
 	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
 	
-	local ls_dist_new = ls_dist + ls_dist*sp -- a zoom in that get faster the further away from target
+	local ls_dist_new = ls_dist + math.max(math.min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
 	ls_dist_new = max(ls_dist_new, 20)
-
+	
 	if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
 		return
 	end
