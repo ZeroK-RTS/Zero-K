@@ -16,48 +16,12 @@ local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 local armorDefs = {
   
   SUBS = {
-    "armsub",
-    "corsub",
-    "armsubk",
-    "corshark",
-    "tawf009",
-    "corssub",
-    "armacsub",
-    "coracsub",
-    "armrecl",
-    "correcl",
+    "subarty",
+    "subraider",
+    "subscout",
     "cornukesub",
-    "serpent",
-    "lancelet",
   },
 
-  EMPRESISTANT99 = {
-  },
-  
-  EMPRESISTANT75 = {
-    "corcomlite",
-    "armcomlite",
-  },
-
-  --automatically populated
-  COMMANDERS = {	
-    "cordecom",
-    "armdecom",
-  },
-
-  BURROWED = {	
-    "chicken_digger_b",
-	"chicken_listener_b",
-	--[[
-	"armmine1",
-	"armmine2",
-	"armmine3",
-	"cormine1",
-	"cormine2",
-	"cormine3",
-	--]]
-  },
-  
   CHICKEN = {
     "nest",
 	"chicken_drone",
@@ -80,7 +44,7 @@ local armorDefs = {
 	"chicken_tiamat",
 	"chicken_dragon",
   },
-  
+
   -- populated automatically
   PLANES = {
 	"empiricaldpser",
