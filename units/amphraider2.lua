@@ -90,6 +90,7 @@ unitDef = {
         impulsemaxdepth = [[20]],
         impulsedepthmult = [[0.5]],
         normaldamage = [[1]],
+        statsdamage = 10.4,
       },
 	  
       damage                  = {
