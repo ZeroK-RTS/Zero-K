@@ -34,6 +34,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    pad_count = 1,
     landflystate   = [[0]],
     description_de = [[Produziert Flugzeuge, Baut mit 10 M/s]],
     description_pl = [[Buduje samoloty, moc 10 m/s]],
