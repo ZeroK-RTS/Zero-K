@@ -85,8 +85,6 @@ for name, ud in pairs(DEFS.unitDefs) do
   if (not found) then
     if (tobool(ud.canfly)) then
       table.insert(armorDefs.PLANES, name)
-	elseif (tobool(ud.commander)) then
-	  table.insert(armorDefs.COMMANDERS, name)
     else
       table.insert(armorDefs.ELSE, name)
     end
