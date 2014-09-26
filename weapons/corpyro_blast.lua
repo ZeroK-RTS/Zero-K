@@ -6,7 +6,7 @@ return {
     craterboost             = 1,
     cratermult              = 3.5,
     
-	customParams        	  = {
+	customparams        	  = {
 	  setunitsonfire = "1",
 	  burnchance     = "1",
 	},
