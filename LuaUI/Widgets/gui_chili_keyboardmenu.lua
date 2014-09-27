@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.034 Chili Keyboard Menu",
+    desc      = "v0.035 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -125,7 +125,7 @@ local function SetupKeybuttons() end
 
 options_path = 'Settings/HUD Panels/KB Menu'
 options_order = {
-	'qwertz',
+	'layout',
 	'sevenperrow',
 	'showGlobalCommands',
 	'goToCommands',
@@ -135,14 +135,20 @@ options_order = {
 }
 options = {
 
-	qwertz = {
-		name = 'QWERTZ layout',
-		type = 'bool',
+	layout = {
+		name = 'Keyboard Layout',
+		type = 'radioButton',
 		OnChange = function(self)
 			SetupKeybuttons()
 			UpdateButtons()
 		end,
-		value = false,
+		value = 'qwerty',
+		items={
+			{key='qwerty', name='QWERTY', },
+			{key='qwertz', name='QWERTZ', },
+			{key='azerty', name='AZERTY', },
+			
+		},
 	},
 	sevenperrow = {
 		name = 'Rows of 7 keys',
@@ -808,10 +814,14 @@ SetupKeybuttons = function()
 	key_buttons = {}
 	key_button_images = {}
 	
-	if options.qwertz.value then
+	if options.layout.value == 'qwertz' then
 		keyRows = options.sevenperrow.value
 			and	{ 'QWERTZU', 'ASDFGHJ', 'YXCVBNM' }
 			or 	{ 'QWERTZ', 'ASDFGH', 'YXCVBN' }
+	elseif options.layout.value == 'azerty' then
+		keyRows = options.sevenperrow.value
+			and	{ 'AZERTYU', 'QSDFGHJ', 'WXCVBN,' }
+			or 	{ 'AZERTY', 'QSDFGH', 'WXCVBN' }
 	else
 		keyRows = options.sevenperrow.value
 			and	{ 'QWERTYU', 'ASDFGHJ', 'ZXCVBNM' }
