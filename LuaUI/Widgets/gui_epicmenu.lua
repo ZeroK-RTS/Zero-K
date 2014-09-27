@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.435 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.436 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -1796,7 +1796,7 @@ MakeSubWindow = function(path, pause)
 				local cb = Checkbox:New{
 					--x=0,
 					right = 35,
-					caption = item.name, --caption
+					caption = '  ' .. item.name, --caption
 					checked = (option.value == item.value), --status
 					OnClick = {function(self) option.OnChange(item) end},
 					textColor = color.sub_fg,
@@ -1806,6 +1806,7 @@ MakeSubWindow = function(path, pause)
 				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon)
 					
 			end
+			tree_children[#tree_children+1] = Label:New{ caption = '', }
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
