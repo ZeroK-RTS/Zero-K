@@ -1040,7 +1040,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	if unitTeam ~= myTeamID and not showAllPlayers then
 		return
 	end
-	local i = facsByUnitId[unitID]
+	local i = facsByUnitId[factID]
 	if i then
 		updateQSoon[i] = true
 	end
