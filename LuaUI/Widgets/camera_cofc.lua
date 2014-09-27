@@ -982,7 +982,7 @@ end
 local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	local topDownBufferZone = 1500
 	local groundBufferZone = 20
-	local minAngle = 30 * RADperDEGREE
+	local minAngle = 40 * RADperDEGREE
 	local angleCorrectionMaximum = 5 * RADperDEGREE
 
 	if (mouseX==nil) then
