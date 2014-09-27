@@ -538,6 +538,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	vsy = viewSizeY
 	cx = vsx * 0.5
 	cy = vsy * 0.5
+	SetFOV(Spring.GetCameraFOV())
 end
 
 local PI 			= 3.1415
@@ -581,11 +582,23 @@ local MWIDTH, MHEIGHT = Game.mapSizeX, Game.mapSizeZ
 local mcx, mcz 	= MWIDTH / 2, MHEIGHT / 2
 local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(MHEIGHT, MWIDTH) * 2
-do
-	local currentFOVhalf_rad = (Spring.GetCameraFOV()/2)*PI/180
-	local mapLenght = (max(MHEIGHT, MWIDTH)+4000)/2
-	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust TAB/Overview distance based on camera FOV
+
+SetFOV = function(fov)
+	local cs = spGetCameraState()
+	-- Spring.Echo(fov .. " degree")
+	
+	local currentFOVhalf_rad = (fov/2)*PI/180
+	local mapEdgeBuffer = 1000
+	local mapLength = MHEIGHT/2 + mapEdgeBuffer
+	if vsy/vsx > MHEIGHT/MWIDTH then mapLength = (MWIDTH * vsy/vsx)/2 + mapEdgeBuffer end
+	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
+
+	cs.fov = fov
+	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
+    spSetCameraState(cs,0)
 end
+
+do SetFOV(Spring.GetCameraFOV()) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
@@ -980,7 +993,8 @@ local function UpdateCam(cs)
 end
 
 local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
-	local topDownBufferZone = 1500
+	local topDownBufferZonePercent = 0.20
+	local topDownBufferZone = maxDistY * topDownBufferZonePercent
 	local groundBufferZone = 20
 	local minAngle = 40 * RADperDEGREE
 	local angleCorrectionMaximum = 5 * RADperDEGREE
@@ -1029,14 +1043,12 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	end
 
 	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true)
-	-- if gy > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
 
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
 	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
 	cs.px = cs.px + (gx - testgx)
 	cs.pz = cs.pz + (gz - testgz)
-	-- end
 
 	return cs
 end
@@ -1221,17 +1233,6 @@ local function Altitude(up, s)
 end
 --==End camera utility function^^ (a frequently used function. Function often used for controlling camera).
 
-
-SetFOV = function(fov)
-	local cs = spGetCameraState()
-	cs.fov = fov
-    spSetCameraState(cs,0)
-	Spring.Echo(fov .. " degree")
-	
-	local currentFOVhalf_rad = (fov/2)*PI/180
-	local mapLenght = (max(MHEIGHT, MWIDTH)+4000)/2
-	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
-end
 
 local function ResetCam()
 	local cs = spGetCameraState()
