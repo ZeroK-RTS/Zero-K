@@ -132,19 +132,19 @@ local copy = {
 		},
 		commsupport2 = {
 			level = 2,
-			mainstats = {maxdamage = 2500, workertime = 14, description = "Econ/Support Commander, Builds at 12.5 m/s", objectname = "commsupport2.s3o"},
+			mainstats = {maxdamage = 2500, workertime = 14, description = "Econ/Support Commander, Builds at 14 m/s", objectname = "commsupport2.s3o"},
 			customparams = {},
 			wreckmodel = "commsupport2_dead.s3o",
 		},
 		commsupport3 = {
 			level = 3,
-			mainstats = {maxdamage = 3000, workertime = 16, description = "Econ/Support Commander, Builds at 15 m/s", objectname = "commsupport3.s3o",},
+			mainstats = {maxdamage = 3000, workertime = 16, description = "Econ/Support Commander, Builds at 16 m/s", objectname = "commsupport3.s3o",},
 			customparams = {},
 			wreckmodel = "commsupport3_dead.s3o",
 		},
 		commsupport4 = {
 			level = 4,
-			mainstats = {maxdamage = 3700, workertime = 18, description = "Econ/Support Commander, Builds at 17.5 m/s", objectname = "commsupport4.s3o",},
+			mainstats = {maxdamage = 3700, workertime = 18, description = "Econ/Support Commander, Builds at 18 m/s", objectname = "commsupport4.s3o",},
 			customparams = {},
 			wreckmodel = "commsupport4_dead.s3o",
 		},
