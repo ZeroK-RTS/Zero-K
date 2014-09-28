@@ -582,13 +582,15 @@ local MWIDTH, MHEIGHT = Game.mapSizeX, Game.mapSizeZ
 local mcx, mcz 	= MWIDTH / 2, MHEIGHT / 2
 local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(MHEIGHT, MWIDTH) * 2
+local mapEdgeBuffer = 1000
 
 SetFOV = function(fov)
 	local cs = spGetCameraState()
 	-- Spring.Echo(fov .. " degree")
 	
 	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
-	local mapEdgeBuffer = 1000
+	_,mapEdgeBuffer = Spring.GetGroundExtremes()
+	mapEdgeBuffer = math.max(mapEdgeBuffer, 1000)
 	local mapLength = MHEIGHT/2 + mapEdgeBuffer
 	if vsy/vsx > MHEIGHT/MWIDTH then mapLength = (MWIDTH * vsy/vsx)/2 + mapEdgeBuffer end
 	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
@@ -1012,7 +1014,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	
 	if gx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
-		gx,gz = GetBoundedCoords(gx,gz)  
+		-- gx,gz = GetBoundedCoords(gx,gz)  
 	end
 	
 	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
@@ -1048,14 +1050,16 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 
 	if testgx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
-		testgx,testgz = GetBoundedCoords(testgx, testgz)
+		-- testgx,testgz = GetBoundedCoords(testgx, testgz)
 	end
 
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
 	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
-	cs.px = cs.px + (gx - testgx)
-	cs.pz = cs.pz + (gz - testgz)
+	local centerWardDriftFactor = (mouseY - vsy/2)/(vsy/2) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
+	cs.px = cs.px + (gx - testgx) - math.abs(math.sin(cs.ry)) * centerWardDriftFactor * (gx - testgx)
+	cs.pz = cs.pz + (gz - testgz) - math.abs(math.cos(cs.ry)) * centerWardDriftFactor * (gz - testgz)
+	-- Spring.Echo("Cos(RY): "..math.cos(cs.ry)..", Sin(RY): "..math.sin(cs.ry))
 
 	return cs
 end
@@ -1209,9 +1213,9 @@ local function Zoom(zoomin, shift, forceCenter)
 		ls_x,ls_y,ls_z = OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true)
 
 		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
-		local maxDcx = math.max((maxDistY - cs.py) * math.tan(currentFOVhalf_rad), 0)
-		local maxDcz = math.max((maxDistY - cs.py) * math.tan(currentFOVhalf_rad), 0)
-		local minX, minZ, maxX, maxZ = mcx - maxDcx, mcz - maxDcz, mcx + maxDcx, mcz + maxDcz
+		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer)
+		-- Spring.Echo("MaxDC: "..maxDc)
+		local minX, minZ, maxX, maxZ = mcx - MWIDTH/2 * maxDc, mcz - MHEIGHT/2 * maxDc, mcx + MWIDTH/2 * maxDc, mcz + MHEIGHT/2 * maxDc
 		-- local dcx = mcx - cs.px
 		-- local sign_dcx = math.abs(dcx) > 0 and math.abs(dcx)/dcx or 0
 		-- local dcz = mcz - cs.pz
