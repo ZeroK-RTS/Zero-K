@@ -587,7 +587,7 @@ SetFOV = function(fov)
 	local cs = spGetCameraState()
 	-- Spring.Echo(fov .. " degree")
 	
-	local currentFOVhalf_rad = (fov/2)*PI/180
+	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
 	local mapEdgeBuffer = 1000
 	local mapLength = MHEIGHT/2 + mapEdgeBuffer
 	if vsy/vsx > MHEIGHT/MWIDTH then mapLength = (MWIDTH * vsy/vsx)/2 + mapEdgeBuffer end
@@ -1044,6 +1044,14 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 
 	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true)
 
+	if testgx and not options.freemode.value then
+		-- out of map. Bound zooming to within map
+		if testgx < 0 then testgx = 0; end
+		if testgx > MWIDTH then testgx=MWIDTH; end
+		if testgz < 0 then testgz = 0; end 
+		if testgz > MHEIGHT then testgz = MHEIGHT; end  
+	end
+
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
 	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
@@ -1101,6 +1109,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		else
 			return false
 		end
+
 		
 		local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
 		
@@ -1127,7 +1136,7 @@ local function Zoom(zoomin, shift, forceCenter)
 			end
 			
 		end
-		
+
 		cs.px = new_px
 		cs.py = new_py
 		cs.pz = new_pz
@@ -1138,68 +1147,94 @@ local function Zoom(zoomin, shift, forceCenter)
 		end
 		--//
 
+		ls_dist = cs.py
+
 		spSetCameraState(cs, options.smoothness.value)
 
 		ls_have = false
-		return
-		
-	end
-
-	--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
-	local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs)
-	
-	if gx and not options.freemode.value then
-		--out of map. Bound zooming to within map
-		if gx < 0 then gx = 0; end
-		if gx > MWIDTH then gx=MWIDTH; end
-		if gz < 0 then gz = 0; end 
-		if gz > MHEIGHT then gz = MHEIGHT; end  
-	end
-	
-	ls_have = false --unlock lockspot 
-	-- SetLockSpot2(cs) --set lockspot
-	if gx then --set lockspot
-		ls_x,ls_y,ls_z = gx,gy,gz
-		local px,py,pz = cs.px,cs.py,cs.pz
-		local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
-		ls_onmap = onmap
-		ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
-		ls_have = true
-	end
-	
-	if not ls_have then
-		return
-	end
-    
-	-- if zoomin and not ls_onmap then --prevent zooming into null area (outside map)
 		-- return
-	-- end
-    
-	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
-	
-	local ls_dist_new = ls_dist + math.max(math.min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
-	ls_dist_new = max(ls_dist_new, 20)
-	
-	if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
-		return
-	end
-	
-	ls_dist = ls_dist_new
+		
+	else
 
-	if options.tiltedzoom.value then
-		cs = ZoomTiltCorrection(cs, zoomin, nil)
+		--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
+		local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs)
+		
+		if gx and not options.freemode.value then
+			--out of map. Bound zooming to within map
+			if gx < 0 then gx = 0; end
+			if gx > MWIDTH then gx=MWIDTH; end
+			if gz < 0 then gz = 0; end 
+			if gz > MHEIGHT then gz = MHEIGHT; end  
+		end
+		
+		ls_have = false --unlock lockspot 
+		-- SetLockSpot2(cs) --set lockspot
+		if gx then --set lockspot
+			ls_x,ls_y,ls_z = gx,gy,gz
+			local px,py,pz = cs.px,cs.py,cs.pz
+			local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+			ls_onmap = onmap
+			ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
+			ls_have = true
+		end
+
+		if not ls_have then
+			return
+		end
+	    
+		-- if zoomin and not ls_onmap then --prevent zooming into null area (outside map)
+			-- return
+		-- end
+
+		-- if not options.freemode.value and ls_dist >= maxDistY then 
+			-- return 
+		-- end
+	    
+		local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
+		
+		local ls_dist_new = ls_dist + math.max(math.min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
+		ls_dist_new = max(ls_dist_new, 20)
+		
+		if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
+			-- return
+			ls_dist_new = maxDistY
+		end
+		
+		ls_dist = ls_dist_new
+
+		if options.tiltedzoom.value then
+			cs = ZoomTiltCorrection(cs, zoomin, nil)
+		end
+
+		local cstemp = UpdateCam(cs)
+		if cstemp then cs = cstemp; end
 	end
 
-	local cstemp = UpdateCam(cs)
-	if cstemp then cs = cstemp; end
-	if (not zoomin and options.zoomouttocenter.value) then --move camera toward center
-		local dcx = mcx - ls_x -- distance in x-z plane from center of map to center of view (x-axis)
-		local dcz = mcz - ls_z -- distance in x-z plane from center of map to center of view (z-axis)
---		Spring.Echo ("maxDistY: " .. maxDistY .. " cs.py: " .. cs.py .. " dcx: " .. dcx .. " dcz: " .. dcz)
-		local csp = math.min((cs.py/(maxDistY*2/3)),1) ^ 2
---		Spring.Echo ("csp: " .. csp)
-		cs.px = cs.px + dcx * csp
-		cs.pz = cs.pz + dcz * csp
+	if (options.zoomouttocenter.value) then --move camera toward center
+
+		scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
+		ls_x,ls_y,ls_z = OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true)
+
+		-- local dcx = mcx - ls_x -- distance in x-z plane from center of map to center of view (x-axis)
+		-- local dcz = mcz - ls_z -- distance in x-z plane from center of map to center of view (z-axis)
+-- --		Spring.Echo ("maxDistY: " .. maxDistY .. " cs.py: " .. cs.py .. " dcx: " .. dcx .. " dcz: " .. dcz)
+-- 		local csp = math.min((cs.py/(maxDistY*2/3)),1) ^ 2
+-- --		Spring.Echo ("csp: " .. csp)
+-- 		cs.px = cs.px + dcx * csp
+-- 		cs.pz = cs.pz + dcz * csp
+		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
+		local maxDcx = math.max((maxDistY - ls_dist) * math.tan(currentFOVhalf_rad), 0)
+		local maxDcz = math.max((maxDistY - ls_dist) * math.tan(currentFOVhalf_rad), 0)
+		local minX, minZ, maxX, maxZ = mcx - maxDcx, mcz - maxDcz, mcx + maxDcx, mcz + maxDcz
+		-- local dcx = mcx - cs.px
+		-- local sign_dcx = math.abs(dcx) > 0 and math.abs(dcx)/dcx or 0
+		-- local dcz = mcz - cs.pz
+		-- local sign_dcz = math.abs(dcz) > 0 and math.abs(dcz)/dcz or 0
+		if ls_x < minX then cs.px = cs.px + (minX - ls_x) end
+		if ls_x > maxX then cs.px = cs.px + (maxX - ls_x) end
+		if ls_z < minZ then cs.pz = cs.pz + (minZ - ls_z) end
+		if ls_z > maxZ then cs.pz = cs.pz + (maxZ - ls_z) end
+		-- Spring.Echo("Bounds: "..minX..", "..minZ..", "..maxX..", "..maxZ..", LS: {"..ls_x..", "..ls_z.."}, CS: {"..cs.px..", "..cs.pz.."}")
 	end
 
 	spSetCameraState(cs, options.smoothness.value)
