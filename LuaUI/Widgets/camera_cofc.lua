@@ -639,8 +639,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local scrnRay_cache = {result={0,0,0,0,0,0}, previous={fov=1,inclination=99,azimuth=299,x=9999,y=9999}}
-local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeIntercept,findPlaneToIntercept) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
+local scrnRay_cache = {result={0,0,0,0,0,0,0}, previous={fov=1,inclination=99,azimuth=299,x=9999,y=9999}}
+local function OverrideTraceScreenRay(x,y,cs,groundHeight,sphereRadius,planeIntercept,hitScanMethod,planeToHit,returnRayDistance) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
 	local viewSizeY = vsy
 	local viewSizeX = vsx
 	if not vsy or not vsx then
@@ -653,7 +653,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 	local currentFov = cs.fov/2 --in Spring: 0 degree is directly ahead and +FOV/2 degree to the left and -FOV/2 degree to the right
 	--//Speedup//--
 	if scrnRay_cache.previous.fov==currentFov and scrnRay_cache.previous.inclination == cs.rx and scrnRay_cache.previous.azimuth == cs.ry and scrnRay_cache.previous.x ==x and scrnRay_cache.previous.y == y then --if camera Sphere coordinate & mouse position not change then use cached value
-		return scrnRay_cache.result[1],scrnRay_cache.result[2],scrnRay_cache.result[3],scrnRay_cache.result[4],scrnRay_cache.result[5],scrnRay_cache.result[6]  
+		return scrnRay_cache.result[1],scrnRay_cache.result[2],scrnRay_cache.result[3],scrnRay_cache.result[4],scrnRay_cache.result[5],scrnRay_cache.result[6],scrnRay_cache.result[7] 
 	end
 	--[[
 	--Opengl screen FOV scaling logic:
@@ -717,19 +717,19 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 	local cursorTilt = math.atan2(new_y,sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate. See: http://en.wikipedia.org/wiki/Spherical_coordinate_system for conversion formula.
 	local cursorHeading = math.atan2(new_x,new_z) --Sphere's azimuth
 	
-	local gx, gy, gz,rx,ry,rz = -1,-1,-1,-1,-1,-1
+	local gx, gy, gz,rx,ry,rz,rayDist = -1,-1,-1,-1,-1,-1,-1
 	local cancelCache = false
 	if planeIntercept then
-		planeHeight = planeHeight or 0
-		if findPlaneToIntercept then
-			planeHeight = 0 --we going to find it ourselves!
+		groundHeight = groundHeight or 0
+		if hitScanMethod then
+			groundHeight = 0 --we going to find it ourselves using Hit Scan method!
 		end
 		--//Sphere-to-groundPosition translation (part1)//--
 		--(calculate intercept of ray from mouse to a flat ground)
 		local tiltSign = abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
 		local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt. Note: we use 0 degree when look down, and 90 degree when facing the horizon. This simplify the problem conceptually. (actual case is 0 degree horizon and +-90 degree up/down)
 		cursorTiltComplement = min(1.5550425,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
-		local vertGroundDist = planeHeight-cs.py --distance to ground
+		local vertGroundDist = groundHeight-cs.py --distance to ground
 		local groundDistSign = abs(vertGroundDist)/vertGroundDist --negative when ground is below, positive when ground is above
 		local xz_GrndDistRatio = math.tan(cursorTiltComplement)
 		local cursorxzDist = xz_GrndDistRatio*(vertGroundDist) --calculate how far does the camera angle look pass the ground beneath
@@ -740,6 +740,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 			local xzDist = sqrt(new_x*new_x + new_z*new_z)
 			local xDist = sin(effectiveHeading)*xzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
 			local zDist = cos(effectiveHeading)*xzDist
+			rayDist = sphereRadius
 			rx,ry,rz = xDist,new_y,zDist --relative 3d coordinate with respect to screen (sphere's edge)
 			gx, gy, gz = cs.px+xDist,cs.py+new_y,cs.pz+zDist --estimated ground position infront of camera (sphere's edge)
 			cancelCache = true --force cache update next run (because zooming the sky will end when cam reach the edge of the sphere, so we must always calculate next sphere)
@@ -762,39 +763,43 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 			--]]
 			local cursorxDist = sin(effectiveHeading)*cursorxzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
 			local cursorzDist = cos(effectiveHeading)*cursorxzDist
-			rx,ry,rz = cursorxDist,planeHeight-cs.py,cursorzDist --relative 3d coordinate with respect to screen
-			gx, gy, gz = cs.px+cursorxDist,planeHeight,cs.pz+cursorzDist --estimated ground position infront of camera
+			rx,ry,rz = cursorxDist,groundHeight-cs.py,cursorzDist --relative 3d coordinate with respect to screen
+			gx, gy, gz = cs.px+cursorxDist,groundHeight,cs.pz+cursorzDist --estimated ground position infront of camera
+			if returnRayDistance then
+				rayDist = math.sqrt(cursorxzDist^2+ry^2)
+			end
 			
-			if findPlaneToIntercept then
-				local currentGrndH = ExtendedGetGroundHeight(gx,gz)
-				local intercepted = false
-				local searchDirection = 0
-				local SearchCriteria = nil
-				if currentGrndH > 0 then
-					searchDirection = -10
-					SearchCriteria = function(grndHeight,currHeight)
-										return grndHeight <= currHeight
-									end
-				else
-					searchDirection = 10
-					SearchCriteria = function(grndHeight,currHeight)
+			if hitScanMethod then
+				local searchDirection = 100
+				local SearchCriteria = function(grndHeight,currHeight)
 										return grndHeight >= currHeight
 									end
-				end
+
 				local safetyCounter = 0
-				while(not intercepted and safetyCounter<1000 and cursorxzDist>0 and cursorxzDist<100000) do
-					cursorxzDist = cursorxzDist + searchDirection
-					cursorxDist = sin(effectiveHeading)*cursorxzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
-					cursorzDist = cos(effectiveHeading)*cursorxzDist
-					gx, gz = cs.px+cursorxDist,cs.pz+cursorzDist --estimated ground position infront of camera
-					gy = (cursorxzDist/xz_GrndDistRatio) - vertGroundDist 
-					-- Spring.Echo((cursorxzDist/xz_GrndDistRatio) .. "   " .. vertGroundDist .. "  " .. gy)
-					currentGrndH = ExtendedGetGroundHeight(gx,gz)
-					-- Spring.Echo(currentGrndH <= gy)
-					intercepted = SearchCriteria(currentGrndH,gy)
+				local tx,tz,ty,cxzd  = 0,0,0,10
+				while(safetyCounter<1000 and cxzd>0 and cxzd<100000) do
+					cxzd = cxzd + searchDirection
 					safetyCounter = safetyCounter + 1
+					cursorxDist = sin(effectiveHeading)*cxzd --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
+					cursorzDist = cos(effectiveHeading)*cxzd
+					tx, tz = cs.px+cursorxDist,cs.pz+cursorzDist --estimated ground position infront of camera
+					ty = (cxzd/xz_GrndDistRatio) - vertGroundDist 
+					currentGrndH = planeToHit or ExtendedGetGroundHeight(tx,tz)
+					if SearchCriteria(currentGrndH,ty) then
+						if searchDirection >1 then --condition meet but search is too coarse
+							cxzd = cursorxzDist --go back
+							searchDirection = searchDirection/10 --increase search accuracy
+						else
+							gx,gy,gz,cursorxzDist = tx,ty,tz,cxzd
+							break --finish!
+						end
+					end
+					gx,gy,gz,cursorxzDist = tx,ty,tz,cxzd
 				end
 				rx,ry,rz = cursorxDist,currentGrndH-cs.py,cursorzDist --relative to camera
+				if returnRayDistance then
+					rayDist = math.sqrt(cursorxzDist^2+ry^2)
+				end
 			end
 		end
 	else
@@ -803,6 +808,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 		local xzDist = sqrt(new_x*new_x + new_z*new_z)
 		local xDist = sin(cs.ry+cursorHeading)*xzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed (?)
 		local zDist = cos(cs.ry+cursorHeading)*xzDist
+		rayDist = sphereRadius
 		rx,ry,rz = xDist,new_y,zDist --(sphere's edge)
 		gx, gy, gz = cs.px+xDist,cs.py+new_y,cs.pz+zDist --estimated ground position infront of camera (sphere's edge))
 	end
@@ -835,6 +841,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 		scrnRay_cache.result[4] = rx
 		scrnRay_cache.result[5] = ry
 		scrnRay_cache.result[6] = rz
+		scrnRay_cache.result[7] = rayDist
 		scrnRay_cache.previous.inclination =cs.rx
 		scrnRay_cache.previous.azimuth = cs.ry
 		scrnRay_cache.previous.x = x
@@ -842,7 +849,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 		scrnRay_cache.previous.fov = currentFov
 	end
 
-	return gx,gy,gz,rx,ry,rz
+	return gx,gy,gz,rx,ry,rz,rayDist
 	--Most important credit to!:
 	--0: Google search service
 	--1: "Perspective Projection: The Wrong Imaging Model" by Margaret M. Fleck (http://www.cs.illinois.edu/~mfleck/my-papers/stereographic-TR.pdf)
@@ -989,7 +996,12 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 		mouseX,mouseY = mouseX or vsx/2,mouseY or vsy/2 --if NIL, revert to center of screen
 	end
 	scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
-	local gx,gy,gz = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true)
+
+	--fixme: proper handling of nil ls_dist.
+	--How to replicate: position camera to outside the map (looking at null space)
+	--then attempt zoom. "ls_dist" is nil here (currently not using "ls_dist" but using "rayDist")
+	--(unexpected nil might indicate some COFC's flaw somewhere else). a todo..
+	local gx,gy,gz,_,_,_,rayDist = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true,nil,true)
 	
 	if gx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
@@ -1023,12 +1035,12 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
 	elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
 	elseif targetRx < cs.rx and not zoomin then 
-		if skyProportion < 1.0 and ls_dist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
+		if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
 		else cs.rx = targetRx
 		end
 	end
 
-	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true)
+	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true,gy)
 	-- if gy > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
 
 	-- Correct so that mouse cursor is hovering over the same point. 
@@ -1348,7 +1360,10 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		ls_z = z
 		ls_have = true --lock lockspot
 
-		if options.tiltedzoom.value then
+		if options.tiltedzoom.value and cs.name == "free" then 
+			--fixme: proper handling of a case where cam is not "free cam". 
+			--How to replicate: join a running game with autozoom & autotilt on, but DO NOT OPEN THE SPRING WINDOW,
+			--allow for some catchup then open the Spring window to look at the game, the camera definitely already crashed.
 			cs = ZoomTiltCorrection(cs, zoomin, nil)
 		end
 
