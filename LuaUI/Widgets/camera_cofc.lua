@@ -996,7 +996,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	local topDownBufferZonePercent = 0.20
 	local topDownBufferZone = maxDistY * topDownBufferZonePercent
 	local groundBufferZone = 20
-	local minAngle = 40 * RADperDEGREE
+	local minAngle = 35 * RADperDEGREE
 	local angleCorrectionMaximum = 5 * RADperDEGREE
 
 	if (mouseX==nil) then
@@ -1147,7 +1147,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		end
 		--//
 
-		ls_dist = cs.py
+		-- ls_dist = cs.py
 
 		spSetCameraState(cs, options.smoothness.value)
 
@@ -1215,16 +1215,9 @@ local function Zoom(zoomin, shift, forceCenter)
 		scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
 		ls_x,ls_y,ls_z = OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true)
 
-		-- local dcx = mcx - ls_x -- distance in x-z plane from center of map to center of view (x-axis)
-		-- local dcz = mcz - ls_z -- distance in x-z plane from center of map to center of view (z-axis)
--- --		Spring.Echo ("maxDistY: " .. maxDistY .. " cs.py: " .. cs.py .. " dcx: " .. dcx .. " dcz: " .. dcz)
--- 		local csp = math.min((cs.py/(maxDistY*2/3)),1) ^ 2
--- --		Spring.Echo ("csp: " .. csp)
--- 		cs.px = cs.px + dcx * csp
--- 		cs.pz = cs.pz + dcz * csp
 		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
-		local maxDcx = math.max((maxDistY - ls_dist) * math.tan(currentFOVhalf_rad), 0)
-		local maxDcz = math.max((maxDistY - ls_dist) * math.tan(currentFOVhalf_rad), 0)
+		local maxDcx = math.max((maxDistY - cs.py) * math.tan(currentFOVhalf_rad), 0)
+		local maxDcz = math.max((maxDistY - cs.py) * math.tan(currentFOVhalf_rad), 0)
 		local minX, minZ, maxX, maxZ = mcx - maxDcx, mcz - maxDcz, mcx + maxDcx, mcz + maxDcz
 		-- local dcx = mcx - cs.px
 		-- local sign_dcx = math.abs(dcx) > 0 and math.abs(dcx)/dcx or 0
