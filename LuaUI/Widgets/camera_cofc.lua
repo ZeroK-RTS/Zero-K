@@ -1213,7 +1213,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		ls_x,ls_y,ls_z = OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true)
 
 		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
-		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer)
+		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer * math.tan(currentFOVhalf_rad))
 		-- Spring.Echo("MaxDC: "..maxDc)
 		local minX, minZ, maxX, maxZ = mcx - MWIDTH/2 * maxDc, mcz - MHEIGHT/2 * maxDc, mcx + MWIDTH/2 * maxDc, mcz + MHEIGHT/2 * maxDc
 		-- local dcx = mcx - cs.px
