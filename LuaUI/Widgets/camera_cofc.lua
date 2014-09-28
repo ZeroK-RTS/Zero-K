@@ -607,6 +607,14 @@ local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trac
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function GetBoundedCoords(x,z)
+	if x < 0 then x = 0; end
+	if x > MWIDTH then x=MWIDTH; end
+	if z < 0 then z = 0; end 
+	if z > MHEIGHT then z = MHEIGHT; end 
+	return x,z
+end
+
 local function GetDist(x1,y1,z1, x2,y2,z2)
 	local d1 = x2-x1
 	local d2 = y2-y1
@@ -642,10 +650,7 @@ end
 
 local function ExtendedGetGroundHeight(x,z)
 	--out of map. Bound coordinate to within map
-	if x < 0 then x = 0; end
-	if x > MWIDTH then x=MWIDTH; end
-	if z < 0 then z = 0; end 
-	if z > MHEIGHT then z = MHEIGHT; end 
+	x,z = GetBoundedCoords(x,z)
 	return spGetGroundHeight(x,z)
 end
 
@@ -1007,10 +1012,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	
 	if gx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
-		if gx < 0 then gx = 0; end
-		if gx > MWIDTH then gx=MWIDTH; end
-		if gz < 0 then gz = 0; end 
-		if gz > MHEIGHT then gz = MHEIGHT; end  
+		gx,gz = GetBoundedCoords(gx,gz)  
 	end
 	
 	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
@@ -1046,10 +1048,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 
 	if testgx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
-		if testgx < 0 then testgx = 0; end
-		if testgx > MWIDTH then testgx=MWIDTH; end
-		if testgz < 0 then testgz = 0; end 
-		if testgz > MHEIGHT then testgz = MHEIGHT; end  
+		testgx,testgz = GetBoundedCoords(testgx, testgz)
 	end
 
 	-- Correct so that mouse cursor is hovering over the same point. 
@@ -1096,10 +1095,7 @@ local function Zoom(zoomin, shift, forceCenter)
 	
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
-			if gx < 0 then gx = 0; end
-			if gx > MWIDTH then gx=MWIDTH; end
-			if gz < 0 then gz = 0; end 
-			if gz > MHEIGHT then gz = MHEIGHT; end  
+			gx,gz = GetBoundedCoords(gx,gz)  
 		end
 		
 		if gx then
@@ -1161,10 +1157,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
-			if gx < 0 then gx = 0; end
-			if gx > MWIDTH then gx=MWIDTH; end
-			if gz < 0 then gz = 0; end 
-			if gz > MHEIGHT then gz = MHEIGHT; end  
+			gx,gz = GetBoundedCoords(gx,gz)   
 		end
 		
 		ls_have = false --unlock lockspot 
