@@ -1109,11 +1109,11 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
 	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
-	local centerwardHDriftFactor = (mouseY - vsy/2)/(vsy/2) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
-	local centerwardVDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.12
+	local centerwardVDriftFactor = (mouseY - vsy/2)/(vsy/2) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
+	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.12
 	local dx, dz = (gx - testgx), (gz - testgz)
-	cs.px = cs.px + dx - math.abs(math.sin(cs.ry)) * centerwardHDriftFactor * dx + math.abs(math.cos(cs.ry)) * centerwardVDriftFactor * dz
-	cs.pz = cs.pz + dz - math.abs(math.cos(cs.ry)) * centerwardHDriftFactor * dz - math.abs(math.sin(cs.ry)) * centerwardVDriftFactor * dx
+	cs.px = cs.px + dx - math.abs(math.sin(cs.ry)) * centerwardVDriftFactor * dx + math.abs(math.cos(cs.ry)) * centerwardHDriftFactor * dz
+	cs.pz = cs.pz + dz - math.abs(math.cos(cs.ry)) * centerwardVDriftFactor * dz - math.abs(math.sin(cs.ry)) * centerwardHDriftFactor * dx
 	-- Spring.Echo("Cos(RY): "..math.cos(cs.ry)..", Sin(RY): "..math.sin(cs.ry))
 
 	return cs
