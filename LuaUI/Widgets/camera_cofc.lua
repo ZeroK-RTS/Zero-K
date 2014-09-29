@@ -1036,32 +1036,13 @@ local function UpdateCam(cs)
 	return cs
 end
 
-local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
-	local topDownBufferZonePercent = 0.20
-	local topDownBufferZone = maxDistY * topDownBufferZonePercent
-	local groundBufferZone = 20
-	local minAngle = 35 * RADperDEGREE
-	local angleCorrectionMaximum = 5 * RADperDEGREE
+local topDownBufferZonePercent = 0.20
+local topDownBufferZone = maxDistY * topDownBufferZonePercent
+local groundBufferZone = 20
+local minZoomTiltAngle = 35 * RADperDEGREE
+local angleCorrectionMaximum = 5 * RADperDEGREE
 
-	if (mouseX==nil) then
-		mouseX,mouseY = mouseX or vsx/2,mouseY or vsy/2 --if NIL, revert to center of screen
-	end
-	scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
-
-	--fixme: proper handling of nil ls_dist.
-	--How to replicate: position camera to outside the map (looking at null space)
-	--do /luaui reload, then attempt zoom. "ls_dist" will be nil here (currently not using "ls_dist" but using "rayDist")
-	--(unexpected nil might indicate some COFC's flaw somewhere else). a todo..
-	local gx,gy,gz,_,_,_,rayDist = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true,nil,true)
-	
-	if gx and not options.freemode.value then
-		-- out of map. Bound zooming to within map
-		-- gx,gz = GetMapBoundedCoords(gx,gz)  
-	end
-	
-	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
-	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
-	local targetRx = sqrt(skyProportion) * (minAngle - HALFPI) - minAngle
+local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 		--[[
 		--FOR REFERENCE
 		--plot of "sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3"
@@ -1080,20 +1061,50 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- Ensure angle correction only happens by parts if the angle doesn't match the target, unless it is within a threshold
 	-- If it isn't, make sure the correction only happens in the direction of the curve. 
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
-	if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
-	elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
-	elseif targetRx < cs.rx and not zoomin then 
-		if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
-		else cs.rx = targetRx
+
+	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
+	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
+	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
+
+	if zoomin ~= nil and rayDist then
+		if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
+		elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
+		elseif targetRx < cs.rx and not zoomin then 
+			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
+			else cs.rx = targetRx
+			end
 		end
 	end
 
+	return targetRx
+end
+
+local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
+
+	if (mouseX==nil) then
+		mouseX,mouseY = mouseX or vsx/2,mouseY or vsy/2 --if NIL, revert to center of screen
+	end
+	scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
+
+	--fixme: proper handling of nil ls_dist.
+	--How to replicate: position camera to outside the map (looking at null space)
+	--do /luaui reload, then attempt zoom. "ls_dist" will be nil here (currently not using "ls_dist" but using "rayDist")
+	--(unexpected nil might indicate some COFC's flaw somewhere else). a todo..
+	local gx,gy,gz,_,_,_,rayDist = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true,nil,true)
+	
+	-- if gx and not options.freemode.value then
+		-- out of map. Bound zooming to within map
+		-- gx,gz = GetMapBoundedCoords(gx,gz)  
+	-- end
+
+	local targetRx, skyProportion = GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
+
 	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true,gy)
 
-	if testgx and not options.freemode.value then
+	-- if testgx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
 		-- testgx,testgz = GetMapBoundedCoords(testgx, testgz)
-	end
+	-- end
 
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
@@ -1106,26 +1117,35 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	return cs
 end
 
-local function SetCameraTarget(gx,gy,gz,smoothness)
+local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
-	if gx and gy and gz and smoothness then --just in case
+	if gx and gy and gz then --just in case
+		if smoothness == nil then smoothness = options.smoothness.value or 0 end
 		local cs = spGetCameraState()
 		SetLockSpot2(cs) --get lockspot at mid screen if there's none present
 		if not ls_have then
 			return
 		end
-		ls_x = math.min(math.max(gx, minX), maxX) --update lockpot to target destination
-		ls_z = math.min(math.max(gz, minZ), maxZ)
-		ls_y = ExtendedGetGroundHeight(ls_x, ls_z) --gy
+		if dist then -- if a distance is specified, loosen bounds at first. They will be checked at the end
+			ls_dist = dist 
+			ls_x, ls_y, ls_z = gx, gy, gz
+		else -- otherwise, enforce bounds here to avoid the camera jumping around when moved with MMB or minimap over hilly terrain
+			ls_x = math.min(math.max(gx, minX), maxX) --update lockpot to target destination
+			ls_z = math.min(math.max(gz, minZ), maxZ)
+			ls_y = ExtendedGetGroundHeight(ls_x, ls_z)
+		end
+		if options.tiltedzoom.value then
+			local cstemp = UpdateCam(cs)
+			if cstemp then cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp) end
+		end
 
 		local oldPy = cs.py
-		
+
 		local cstemp = UpdateCam(cs)
-		if cstemp then 
-			SetCenterBounds(cstemp)
-			cs = cstemp
-		end
+		if cstemp then cs = cstemp end
+
+		SetCenterBounds(cs) 
 
 		spSetCameraState(cs, smoothness) --move
 	end
@@ -1202,7 +1222,7 @@ local function Zoom(zoomin, shift, forceCenter)
 
 		-- ls_dist = cs.py
 
-		spSetCameraState(cs, options.smoothness.value)
+		-- spSetCameraState(cs, options.smoothness.value)
 
 		ls_have = false
 		-- return
@@ -1344,6 +1364,7 @@ OverviewAction = function()
 			cs.pz = Game.mapSizeZ/2
 			cs.rx = -HALFPI
 		end
+		SetCenterBounds(cs)
 		spSetCameraState(cs, 1)
 	else --if in overview mode
 		local cs = spGetCameraState()
@@ -1360,6 +1381,7 @@ OverviewAction = function()
 			ls_have = true
 			local cstemp = UpdateCam(cs) --set camera position & orientation based on lockstop point
 			if cstemp then cs = cstemp; end
+			SetCenterBounds(cs)
 			spSetCameraState(cs, 1)
 		end
 		
@@ -1950,7 +1972,7 @@ function widget:Update(dt)
 	
 	if not initialBoundsSet then
 		initialBoundsSet = true
-		ResetCam()
+		if options.tiltedzoom.value then ResetCam() end
 	end
 end
 
