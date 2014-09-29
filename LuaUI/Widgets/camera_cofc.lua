@@ -1166,10 +1166,12 @@ local function Zoom(zoomin, shift, forceCenter)
 		local new_px = cs.px + zox --a zooming that get slower the closer you are to the target.
 		local new_py = cs.py + zoy
 		local new_pz = cs.pz + zoz
+
+		local groundMinimum = ExtendedGetGroundHeight(new_px, new_pz) + 20
 		
 		if not options.freemode.value then
-			if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then --zooming underground?
-				sp = (spGetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
+			if new_py < groundMinimum then --zooming underground?
+				sp = (groundMinimum - cs.py) / dy
 				
 				zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
 				new_px = cs.px + zox --a zooming that get slower the closer you are to the ground.
@@ -1186,11 +1188,11 @@ local function Zoom(zoomin, shift, forceCenter)
 			
 		end
 
-		if (new_py < maxDistY and new_py > ExtendedGetGroundHeight(new_px, new_pz) + 20) then
-			cs.px = new_px
-			cs.py = new_py
-			cs.pz = new_pz
-		end
+
+		local boundedPy = math.min(math.max(new_py, groundMinimum), maxDistY - 10)
+		cs.px = new_px * (boundedPy/new_py)
+		cs.py = boundedPy
+		cs.pz = new_pz * (boundedPy/new_py)
 
 		--//SUPCOM camera zoom by Shadowfury333(Dominic Renaud):
 		if options.tiltedzoom.value then
