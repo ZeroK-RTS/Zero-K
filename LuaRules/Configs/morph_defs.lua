@@ -297,52 +297,6 @@ local morphDefs = {
   },
 --]]
   --// land turrets
-  armdeva = {
-    into = 'armpb',
-    time = 60,
-    rank = 3,
-  },
-  corllt = {
-    {
-      into = 'armdeva',
-      time = 30,
-      rank = 3,
-    },
-    {
-      into = 'corgrav',
-      time = 30,
-      rank = 3,
-    },
-  }, 
-  corhlt = {
-  {
-    into = 'armanni',
-    time = 90,
-    rank = 3,
-	},
-	{
-    into = 'cordoom',
-    time = 90,
-    rank = 3,
-	}
-  },
-  armpb = {
-    into = 'cordoom',
-    time = 75,
-    rank = 3,
-  },
-  corrl = {
-	{
-		into = 'corrazor',
-		time = 30,
-		rank = 3,
-	},
-	{
-		into = 'missiletower',
-		time = 30,
-		rank = 3,
-	},
-  },
   corrazor = {
 	{
 		into = 'corflak',
@@ -350,24 +304,6 @@ local morphDefs = {
 		rank = 3,
 	},
   },
-  missiletower = {
-	{
-		into = 'armcir',
-		time = 75,
-		rank = 3,
-	},
-  },
-  armcir = {
-    into = 'screamer',
-    time = 60,
-    rank = 3,
-  },
-  corflak = {
-    into = 'screamer',
-    time = 75,
-    rank = 3,
-  },
-  
   --// sea turrets
   
   --// concept
