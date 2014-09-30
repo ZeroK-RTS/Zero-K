@@ -594,6 +594,13 @@ local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(MHEIGHT, MWIDTH) * 2
 local mapEdgeBuffer = 1000
 
+--Tilt Zoom constants
+local topDownBufferZonePercent = 0.20
+local groundBufferZone = 20
+local topDownBufferZone = maxDistY * topDownBufferZonePercent
+local minZoomTiltAngle = 35--(15 + 30 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+local angleCorrectionMaximum = 5 * RADperDEGREE
+
 SetFOV = function(fov)
 	local cs = spGetCameraState()
 	-- Spring.Echo(fov .. " degree")
@@ -607,6 +614,11 @@ SetFOV = function(fov)
 
 	cs.fov = fov
 	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
+
+	--Update Tilt Zoom Constants
+	topDownBufferZone = maxDistY * topDownBufferZonePercent
+	minZoomTiltAngle = (15 + 30 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+
   spSetCameraState(cs,0)
 end
 
@@ -1035,12 +1047,6 @@ local function UpdateCam(cs)
 	
 	return cs
 end
-
-local topDownBufferZonePercent = 0.20
-local topDownBufferZone = maxDistY * topDownBufferZonePercent
-local groundBufferZone = 20
-local minZoomTiltAngle = 35 * RADperDEGREE
-local angleCorrectionMaximum = 5 * RADperDEGREE
 
 local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 		--[[
