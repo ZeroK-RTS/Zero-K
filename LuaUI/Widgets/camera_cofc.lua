@@ -598,7 +598,7 @@ local mapEdgeBuffer = 1000
 local topDownBufferZonePercent = 0.20
 local groundBufferZone = 20
 local topDownBufferZone = maxDistY * topDownBufferZonePercent
-local minZoomTiltAngle = 35--(15 + 30 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+local minZoomTiltAngle = 35
 local angleCorrectionMaximum = 5 * RADperDEGREE
 
 SetFOV = function(fov)
@@ -1977,7 +1977,14 @@ function widget:Update(dt)
 			missedMouseRelease = false
 		end
 	end
-	
+
+	if not initialBoundsSet then
+		initialBoundsSet = true
+		if options.tiltedzoom.value then ResetCam() end
+	end
+end
+
+function widget:GamePreload()
 	if not initialBoundsSet then
 		initialBoundsSet = true
 		if options.tiltedzoom.value then ResetCam() end
