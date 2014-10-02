@@ -43,7 +43,7 @@ unitDef = {
   script		        = [[jumpriot.lua]],
   seismicSignature      = 4,
   selfDestructAs        = [[BIG_UNITEX]],
-  selfDestructCountdown = 1,
+  selfDestructCountdown = 5,
 
   sfxtypes              = {
 
