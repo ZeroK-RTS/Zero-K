@@ -17,6 +17,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    amph_regen = 60,
+    amph_submerged_at = 30,
     description_pl = [[Amfibijny bot plywak]],
     helptext       = [[The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating.]],
     helptext_pl    = [[Buoy nie moze strzelac pod woda, ale radzi sobie z tym poprzez wyplywanie na powierzchnie. Wtedy moze atakowac przy uzyciu dzialka o dobrym zasiegu, zadajac dodatkowo obrazenia spowalniajace. Bedac na powierzchni nie moze sie poruszac.]],
