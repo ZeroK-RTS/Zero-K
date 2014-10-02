@@ -27,6 +27,7 @@ unitDef = {
     pylonrange = 100,
 	aimposoffset   = [[0 16 0]],
 	midposoffset   = [[0 0 0]],
+	force_close = 8, -- time in seconds of forced turnoff
   },
 
   damageModifier                = 0.25,
