@@ -96,6 +96,7 @@ local OverviewAction = function() end
 local OverviewSetAction = function() end
 local SetFOV = function(fov) end
 local SelectNextPlayer = function() end
+local SetCenterBounds = function(cs) end
 
 options = {
 	
@@ -219,6 +220,13 @@ options = {
 		desc = 'Center the map as you zoom out.',
 		type = 'bool',
 		value = false,
+		OnChange = function(self) 
+			local cs = Spring.GetCameraState()
+			if cs.rx then
+				SetCenterBounds(cs) 
+				Spring.SetCameraState(cs, options.smoothness.value) 
+			end
+		end,
 	},
 	tiltedzoom = {
 		name = 'Tilt camera while zooming',
@@ -527,6 +535,7 @@ local tilting
 local overview_mode, last_rx, last_ry, last_ls_dist, ov_cs --overview_mode's variable
 local follow_timer = 0
 local epicmenuHkeyComp = {} --for saving & reapply hotkey system handled by epicmenu.lua
+local initialBoundsSet = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -538,6 +547,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	vsy = viewSizeY
 	cx = vsx * 0.5
 	cy = vsy * 0.5
+	SetFOV(Spring.GetCameraFOV())
 end
 
 local PI 			= 3.1415
@@ -578,14 +588,41 @@ local hideCursor = false
 
 
 local MWIDTH, MHEIGHT = Game.mapSizeX, Game.mapSizeZ
+local minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
 local mcx, mcz 	= MWIDTH / 2, MHEIGHT / 2
 local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(MHEIGHT, MWIDTH) * 2
-do
-	local currentFOVhalf_rad = (Spring.GetCameraFOV()/2)*PI/180
-	local mapLenght = (max(MHEIGHT, MWIDTH)+4000)/2
-	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust TAB/Overview distance based on camera FOV
+local mapEdgeBuffer = 1000
+
+--Tilt Zoom constants
+local topDownBufferZonePercent = 0.20
+local groundBufferZone = 20
+local topDownBufferZone = maxDistY * topDownBufferZonePercent
+local minZoomTiltAngle = 35
+local angleCorrectionMaximum = 5 * RADperDEGREE
+
+SetFOV = function(fov)
+	local cs = spGetCameraState()
+	-- Spring.Echo(fov .. " degree")
+	
+	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
+	_,mapEdgeBuffer = Spring.GetGroundExtremes()
+	mapEdgeBuffer = math.max(mapEdgeBuffer, 1000)
+	local mapLength = MHEIGHT/2 + mapEdgeBuffer
+	if vsy/vsx > MHEIGHT/MWIDTH then mapLength = (MWIDTH * vsy/vsx)/2 + mapEdgeBuffer end
+	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
+
+	cs.fov = fov
+	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
+
+	--Update Tilt Zoom Constants
+	topDownBufferZone = maxDistY * topDownBufferZonePercent
+	minZoomTiltAngle = (15 + 30 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+
+  spSetCameraState(cs,0)
 end
+
+do SetFOV(Spring.GetCameraFOV()) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
@@ -593,6 +630,14 @@ local last_move = spGetTimer() --switch for reseting lockspot for Edgescroll
 local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trackmode edge screen scroll"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function GetMapBoundedCoords(x,z) --This should not use minX,minZ,maxX,maxZ bounds, as this is used specifically to keep things on the map
+	if x < 0 then x = 0; end
+	if x > MWIDTH then x=MWIDTH; end
+	if z < 0 then z = 0; end 
+	if z > MHEIGHT then z = MHEIGHT; end 
+	return x,z
+end
 
 local function GetDist(x1,y1,z1, x2,y2,z2)
 	local d1 = x2-x1
@@ -629,18 +674,15 @@ end
 
 local function ExtendedGetGroundHeight(x,z)
 	--out of map. Bound coordinate to within map
-	if x < 0 then x = 0; end
-	if x > MWIDTH then x=MWIDTH; end
-	if z < 0 then z = 0; end 
-	if z > MHEIGHT then z = MHEIGHT; end 
+	x,z = GetMapBoundedCoords(x,z)
 	return spGetGroundHeight(x,z)
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local scrnRay_cache = {result={0,0,0,0,0,0}, previous={fov=1,inclination=99,azimuth=299,x=9999,y=9999}}
-local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeIntercept,findPlaneToIntercept) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
+local scrnRay_cache = {result={0,0,0,0,0,0,0}, previous={fov=1,inclination=99,azimuth=299,x=9999,y=9999}}
+local function OverrideTraceScreenRay(x,y,cs,groundHeight,sphereRadius,planeIntercept,hitScanMethod,planeToHit,returnRayDistance) --this function provide an adjusted TraceScreenRay for null-space outside of the map (by msafwan)
 	local viewSizeY = vsy
 	local viewSizeX = vsx
 	if not vsy or not vsx then
@@ -653,7 +695,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 	local currentFov = cs.fov/2 --in Spring: 0 degree is directly ahead and +FOV/2 degree to the left and -FOV/2 degree to the right
 	--//Speedup//--
 	if scrnRay_cache.previous.fov==currentFov and scrnRay_cache.previous.inclination == cs.rx and scrnRay_cache.previous.azimuth == cs.ry and scrnRay_cache.previous.x ==x and scrnRay_cache.previous.y == y then --if camera Sphere coordinate & mouse position not change then use cached value
-		return scrnRay_cache.result[1],scrnRay_cache.result[2],scrnRay_cache.result[3],scrnRay_cache.result[4],scrnRay_cache.result[5],scrnRay_cache.result[6]  
+		return scrnRay_cache.result[1],scrnRay_cache.result[2],scrnRay_cache.result[3],scrnRay_cache.result[4],scrnRay_cache.result[5],scrnRay_cache.result[6],scrnRay_cache.result[7] 
 	end
 	--[[
 	--Opengl screen FOV scaling logic:
@@ -717,19 +759,19 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 	local cursorTilt = math.atan2(new_y,sqrt(new_z*new_z+new_x*new_x)) --convert back to Sphere coordinate. See: http://en.wikipedia.org/wiki/Spherical_coordinate_system for conversion formula.
 	local cursorHeading = math.atan2(new_x,new_z) --Sphere's azimuth
 	
-	local gx, gy, gz,rx,ry,rz = -1,-1,-1,-1,-1,-1
+	local gx, gy, gz,rx,ry,rz,rayDist = -1,-1,-1,-1,-1,-1,-1
 	local cancelCache = false
 	if planeIntercept then
-		planeHeight = planeHeight or 0
-		if findPlaneToIntercept then
-			planeHeight = 0 --we going to find it ourselves!
+		groundHeight = groundHeight or 0
+		if hitScanMethod then
+			groundHeight = 0 --we going to find it ourselves using Hit Scan method!
 		end
 		--//Sphere-to-groundPosition translation (part1)//--
 		--(calculate intercept of ray from mouse to a flat ground)
 		local tiltSign = abs(cursorTilt)/cursorTilt --Sphere's inclination direction (positive upward or negative downward)
 		local cursorTiltComplement = (PI/2-abs(cursorTilt))*tiltSign --return complement angle for cursorTilt. Note: we use 0 degree when look down, and 90 degree when facing the horizon. This simplify the problem conceptually. (actual case is 0 degree horizon and +-90 degree up/down)
 		cursorTiltComplement = min(1.5550425,abs(cursorTiltComplement))*tiltSign --limit to 89 degree to prevent infinity in math.tan() 
-		local vertGroundDist = planeHeight-cs.py --distance to ground
+		local vertGroundDist = groundHeight-cs.py --distance to ground
 		local groundDistSign = abs(vertGroundDist)/vertGroundDist --negative when ground is below, positive when ground is above
 		local xz_GrndDistRatio = math.tan(cursorTiltComplement)
 		local cursorxzDist = xz_GrndDistRatio*(vertGroundDist) --calculate how far does the camera angle look pass the ground beneath
@@ -740,6 +782,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 			local xzDist = sqrt(new_x*new_x + new_z*new_z)
 			local xDist = sin(effectiveHeading)*xzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
 			local zDist = cos(effectiveHeading)*xzDist
+			rayDist = sphereRadius
 			rx,ry,rz = xDist,new_y,zDist --relative 3d coordinate with respect to screen (sphere's edge)
 			gx, gy, gz = cs.px+xDist,cs.py+new_y,cs.pz+zDist --estimated ground position infront of camera (sphere's edge)
 			cancelCache = true --force cache update next run (because zooming the sky will end when cam reach the edge of the sphere, so we must always calculate next sphere)
@@ -762,39 +805,43 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 			--]]
 			local cursorxDist = sin(effectiveHeading)*cursorxzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
 			local cursorzDist = cos(effectiveHeading)*cursorxzDist
-			rx,ry,rz = cursorxDist,planeHeight-cs.py,cursorzDist --relative 3d coordinate with respect to screen
-			gx, gy, gz = cs.px+cursorxDist,planeHeight,cs.pz+cursorzDist --estimated ground position infront of camera
+			rx,ry,rz = cursorxDist,groundHeight-cs.py,cursorzDist --relative 3d coordinate with respect to screen
+			gx, gy, gz = cs.px+cursorxDist,groundHeight,cs.pz+cursorzDist --estimated ground position infront of camera
+			if returnRayDistance then
+				rayDist = math.sqrt(cursorxzDist^2+ry^2)
+			end
 			
-			if findPlaneToIntercept then
-				local currentGrndH = ExtendedGetGroundHeight(gx,gz)
-				local intercepted = false
-				local searchDirection = 0
-				local SearchCriteria = nil
-				if currentGrndH > 0 then
-					searchDirection = -10
-					SearchCriteria = function(grndHeight,currHeight)
-										return grndHeight <= currHeight
-									end
-				else
-					searchDirection = 10
-					SearchCriteria = function(grndHeight,currHeight)
+			if hitScanMethod then
+				local searchDirection = 100
+				local SearchCriteria = function(grndHeight,currHeight)
 										return grndHeight >= currHeight
 									end
-				end
+
 				local safetyCounter = 0
-				while(not intercepted and safetyCounter<1000 and cursorxzDist>0 and cursorxzDist<100000) do
-					cursorxzDist = cursorxzDist + searchDirection
-					cursorxDist = sin(effectiveHeading)*cursorxzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
-					cursorzDist = cos(effectiveHeading)*cursorxzDist
-					gx, gz = cs.px+cursorxDist,cs.pz+cursorzDist --estimated ground position infront of camera
-					gy = (cursorxzDist/xz_GrndDistRatio) - vertGroundDist 
-					-- Spring.Echo((cursorxzDist/xz_GrndDistRatio) .. "   " .. vertGroundDist .. "  " .. gy)
-					currentGrndH = ExtendedGetGroundHeight(gx,gz)
-					-- Spring.Echo(currentGrndH <= gy)
-					intercepted = SearchCriteria(currentGrndH,gy)
+				local tx,tz,ty,cxzd  = 0,0,0,10
+				while(safetyCounter<1000 and cxzd>0 and cxzd<100000) do
+					cxzd = cxzd + searchDirection
 					safetyCounter = safetyCounter + 1
+					cursorxDist = sin(effectiveHeading)*cxzd --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
+					cursorzDist = cos(effectiveHeading)*cxzd
+					tx, tz = cs.px+cursorxDist,cs.pz+cursorzDist --estimated ground position infront of camera
+					ty = (cxzd/xz_GrndDistRatio) - vertGroundDist 
+					currentGrndH = planeToHit or ExtendedGetGroundHeight(tx,tz)
+					if SearchCriteria(currentGrndH,ty) then
+						if searchDirection >1 then --condition meet but search is too coarse
+							cxzd = cursorxzDist --go back
+							searchDirection = searchDirection/10 --increase search accuracy
+						else
+							gx,gy,gz,cursorxzDist = tx,ty,tz,cxzd
+							break --finish!
+						end
+					end
+					gx,gy,gz,cursorxzDist = tx,ty,tz,cxzd
 				end
 				rx,ry,rz = cursorxDist,currentGrndH-cs.py,cursorzDist --relative to camera
+				if returnRayDistance then
+					rayDist = math.sqrt(cursorxzDist^2+ry^2)
+				end
 			end
 		end
 	else
@@ -803,6 +850,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 		local xzDist = sqrt(new_x*new_x + new_z*new_z)
 		local xDist = sin(cs.ry+cursorHeading)*xzDist --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed (?)
 		local zDist = cos(cs.ry+cursorHeading)*xzDist
+		rayDist = sphereRadius
 		rx,ry,rz = xDist,new_y,zDist --(sphere's edge)
 		gx, gy, gz = cs.px+xDist,cs.py+new_y,cs.pz+zDist --estimated ground position infront of camera (sphere's edge))
 	end
@@ -835,6 +883,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 		scrnRay_cache.result[4] = rx
 		scrnRay_cache.result[5] = ry
 		scrnRay_cache.result[6] = rz
+		scrnRay_cache.result[7] = rayDist
 		scrnRay_cache.previous.inclination =cs.rx
 		scrnRay_cache.previous.azimuth = cs.ry
 		scrnRay_cache.previous.x = x
@@ -842,7 +891,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 		scrnRay_cache.previous.fov = currentFov
 	end
 
-	return gx,gy,gz,rx,ry,rz
+	return gx,gy,gz,rx,ry,rz,rayDist
 	--Most important credit to!:
 	--0: Google search service
 	--1: "Perspective Projection: The Wrong Imaging Model" by Margaret M. Fleck (http://www.cs.illinois.edu/~mfleck/my-papers/stereographic-TR.pdf)
@@ -851,6 +900,26 @@ local function OverrideTraceScreenRay(x,y,cs,planeHeight,sphereRadius,planeInter
 	--4: http://en.wikipedia.org/wiki/Spherical_coordinate_system
 end
 
+SetCenterBounds = function(cs)
+	-- if options.zoomouttocenter then Spring.Echo("zoomouttocenter.value: "..options.zoomouttocenter.value) end
+	if options.zoomouttocenter.value then --move camera toward center
+
+		scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
+		ls_x,ls_y,ls_z = OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true,false)
+
+		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
+		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer * math.tan(currentFOVhalf_rad))
+		-- Spring.Echo("MaxDC: "..maxDc)
+		minX, minZ, maxX, maxZ = math.max(mcx - MWIDTH/2 * maxDc, 0), math.max(mcz - MHEIGHT/2 * maxDc, 0), math.min(mcx + MWIDTH/2 * maxDc, MWIDTH), math.min(mcz + MHEIGHT/2 * maxDc, MHEIGHT)
+		if ls_x < minX then cs.px = cs.px + (minX - ls_x) end
+		if ls_x > maxX then cs.px = cs.px + (maxX - ls_x) end
+		if ls_z < minZ then cs.pz = cs.pz + (minZ - ls_z) end
+		if ls_z > maxZ then cs.pz = cs.pz + (maxZ - ls_z) end
+	else
+		minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
+	end
+	-- Spring.Echo("Bounds: "..minX..", "..minZ..", "..maxX..", "..maxZ)
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -979,29 +1048,7 @@ local function UpdateCam(cs)
 	return cs
 end
 
-local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
-	local topDownBufferZone = 1500
-	local groundBufferZone = 20
-	local minAngle = 40 * RADperDEGREE
-	local angleCorrectionMaximum = 5 * RADperDEGREE
-
-	if (mouseX==nil) then
-		mouseX,mouseY = mouseX or vsx/2,mouseY or vsy/2 --if NIL, revert to center of screen
-	end
-	scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
-	local gx,gy,gz = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true)
-	
-	if gx and not options.freemode.value then
-		-- out of map. Bound zooming to within map
-		if gx < 0 then gx = 0; end
-		if gx > MWIDTH then gx=MWIDTH; end
-		if gz < 0 then gz = 0; end 
-		if gz > MHEIGHT then gz = MHEIGHT; end  
-	end
-	
-	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
-	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
-	local targetRx = sqrt(skyProportion) * (minAngle - HALFPI) - minAngle
+local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 		--[[
 		--FOR REFERENCE
 		--plot of "sqrt(skyProportion) * (-2 * HALFPI / 3) - HALFPI / 3"
@@ -1020,41 +1067,94 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- Ensure angle correction only happens by parts if the angle doesn't match the target, unless it is within a threshold
 	-- If it isn't, make sure the correction only happens in the direction of the curve. 
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
-	if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
-	elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
-	elseif targetRx < cs.rx and not zoomin then 
-		if skyProportion < 1.0 and ls_dist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
-		else cs.rx = targetRx
+
+	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
+	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
+	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
+
+	if zoomin ~= nil and rayDist then
+		if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
+		elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
+		elseif targetRx < cs.rx and not zoomin then 
+			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
+			else cs.rx = targetRx
+			end
 		end
 	end
 
-	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true)
-	-- if gy > 0 and testgy > 0 then --Check if it is trying to test to horizon/infinity, return value seems to be negative in that case. This will mask extreme overcorrection bugs
+	return targetRx
+end
+
+local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
+
+	if (mouseX==nil) then
+		mouseX,mouseY = mouseX or vsx/2,mouseY or vsy/2 --if NIL, revert to center of screen
+	end
+	scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
+
+	--fixme: proper handling of nil ls_dist.
+	--How to replicate: position camera to outside the map (looking at null space)
+	--do /luaui reload, then attempt zoom. "ls_dist" will be nil here (currently not using "ls_dist" but using "rayDist")
+	--(unexpected nil might indicate some COFC's flaw somewhere else). a todo..
+	local gx,gy,gz,_,_,_,rayDist = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true,nil,true)
+	
+	-- if gx and not options.freemode.value then
+		-- out of map. Bound zooming to within map
+		-- gx,gz = GetMapBoundedCoords(gx,gz)  
+	-- end
+
+	local targetRx, skyProportion = GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
+
+	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true,gy)
+
+	-- if testgx and not options.freemode.value then
+		-- out of map. Bound zooming to within map
+		-- testgx,testgz = GetMapBoundedCoords(testgx, testgz)
+	-- end
 
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
 	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
-	cs.px = cs.px + (gx - testgx)
-	cs.pz = cs.pz + (gz - testgz)
-	-- end
+	local centerwardVDriftFactor = (mouseY - vsy/2)/(vsy/2) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
+	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.12
+	local dx, dz = (gx - testgx), (gz - testgz)
+	cs.px = cs.px + dx - math.abs(math.sin(cs.ry)) * centerwardVDriftFactor * dx + math.abs(math.cos(cs.ry)) * centerwardHDriftFactor * dz
+	cs.pz = cs.pz + dz - math.abs(math.cos(cs.ry)) * centerwardVDriftFactor * dz - math.abs(math.sin(cs.ry)) * centerwardHDriftFactor * dx
+	-- Spring.Echo("Cos(RY): "..math.cos(cs.ry)..", Sin(RY): "..math.sin(cs.ry))
 
 	return cs
 end
 
-local function SetCameraTarget(gx,gy,gz,smoothness)
+local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
-	if gx and gy and gz and smoothness then --just in case
+	if gx and gy and gz then --just in case
+		if smoothness == nil then smoothness = options.smoothness.value or 0 end
 		local cs = spGetCameraState()
 		SetLockSpot2(cs) --get lockspot at mid screen if there's none present
 		if not ls_have then
 			return
 		end
-		ls_x = gx --update lockpot to target destination
-		ls_y = gy
-		ls_z = gz
+		if dist then -- if a distance is specified, loosen bounds at first. They will be checked at the end
+			ls_dist = dist 
+			ls_x, ls_y, ls_z = gx, gy, gz
+		else -- otherwise, enforce bounds here to avoid the camera jumping around when moved with MMB or minimap over hilly terrain
+			ls_x = math.min(math.max(gx, minX), maxX) --update lockpot to target destination
+			ls_z = math.min(math.max(gz, minZ), maxZ)
+			ls_y = ExtendedGetGroundHeight(ls_x, ls_z)
+		end
+		if options.tiltedzoom.value then
+			local cstemp = UpdateCam(cs)
+			if cstemp then cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp) end
+		end
+
+		local oldPy = cs.py
+
 		local cstemp = UpdateCam(cs)
-		if cstemp then cs = cstemp; end
+		if cstemp then cs = cstemp end
+
+		SetCenterBounds(cs) 
+
 		spSetCameraState(cs, smoothness) --move
 	end
 end
@@ -1076,10 +1176,7 @@ local function Zoom(zoomin, shift, forceCenter)
 	
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
-			if gx < 0 then gx = 0; end
-			if gx > MWIDTH then gx=MWIDTH; end
-			if gz < 0 then gz = 0; end 
-			if gz > MHEIGHT then gz = MHEIGHT; end  
+			gx,gz = GetMapBoundedCoords(gx,gz)  
 		end
 		
 		if gx then
@@ -1089,6 +1186,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		else
 			return false
 		end
+
 		
 		local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
 		
@@ -1096,10 +1194,12 @@ local function Zoom(zoomin, shift, forceCenter)
 		local new_px = cs.px + zox --a zooming that get slower the closer you are to the target.
 		local new_py = cs.py + zoy
 		local new_pz = cs.pz + zoz
+
+		local groundMinimum = ExtendedGetGroundHeight(new_px, new_pz) + 20
 		
 		if not options.freemode.value then
-			if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then --zooming underground?
-				sp = (spGetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
+			if new_py < groundMinimum then --zooming underground?
+				sp = (groundMinimum - cs.py) / dy
 				
 				zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
 				new_px = cs.px + zox --a zooming that get slower the closer you are to the ground.
@@ -1115,10 +1215,12 @@ local function Zoom(zoomin, shift, forceCenter)
 			end
 			
 		end
-		
-		cs.px = new_px
-		cs.py = new_py
-		cs.pz = new_pz
+
+
+		local boundedPy = math.min(math.max(new_py, groundMinimum), maxDistY - 10)
+		cs.px = new_px * (boundedPy/new_py)
+		cs.py = boundedPy
+		cs.pz = new_pz * (boundedPy/new_py)
 
 		--//SUPCOM camera zoom by Shadowfury333(Dominic Renaud):
 		if options.tiltedzoom.value then
@@ -1126,69 +1228,67 @@ local function Zoom(zoomin, shift, forceCenter)
 		end
 		--//
 
-		spSetCameraState(cs, options.smoothness.value)
+		-- ls_dist = cs.py
+
+		-- spSetCameraState(cs, options.smoothness.value)
 
 		ls_have = false
-		return
-		
-	end
-
-	--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
-	local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs)
-	
-	if gx and not options.freemode.value then
-		--out of map. Bound zooming to within map
-		if gx < 0 then gx = 0; end
-		if gx > MWIDTH then gx=MWIDTH; end
-		if gz < 0 then gz = 0; end 
-		if gz > MHEIGHT then gz = MHEIGHT; end  
-	end
-	
-	ls_have = false --unlock lockspot 
-	-- SetLockSpot2(cs) --set lockspot
-	if gx then --set lockspot
-		ls_x,ls_y,ls_z = gx,gy,gz
-		local px,py,pz = cs.px,cs.py,cs.pz
-		local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
-		ls_onmap = onmap
-		ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
-		ls_have = true
-	end
-	
-	if not ls_have then
-		return
-	end
-    
-	-- if zoomin and not ls_onmap then --prevent zooming into null area (outside map)
 		-- return
-	-- end
-    
-	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
-	
-	local ls_dist_new = ls_dist + math.max(math.min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
-	ls_dist_new = max(ls_dist_new, 20)
-	
-	if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
-		return
-	end
-	
-	ls_dist = ls_dist_new
+		
+	else
 
-	if options.tiltedzoom.value then
-		cs = ZoomTiltCorrection(cs, zoomin, nil)
+		--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
+		local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs)
+		
+		if gx and not options.freemode.value then
+			--out of map. Bound zooming to within map
+			gx,gz = GetMapBoundedCoords(gx,gz)   
+		end
+		
+		ls_have = false --unlock lockspot 
+		-- SetLockSpot2(cs) --set lockspot
+		if gx then --set lockspot
+			ls_x,ls_y,ls_z = gx,gy,gz
+			local px,py,pz = cs.px,cs.py,cs.pz
+			local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+			ls_onmap = onmap
+			ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
+			ls_have = true
+		end
+
+		if not ls_have then
+			return
+		end
+	    
+		-- if zoomin and not ls_onmap then --prevent zooming into null area (outside map)
+			-- return
+		-- end
+
+		-- if not options.freemode.value and ls_dist >= maxDistY then 
+			-- return 
+		-- end
+	    
+		local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (shift and 3 or 1)
+		
+		local ls_dist_new = ls_dist + math.max(math.min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
+		ls_dist_new = max(ls_dist_new, 20)
+		
+		if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
+			-- return
+			ls_dist_new = maxDistY
+		end
+		
+		ls_dist = ls_dist_new
+
+		if options.tiltedzoom.value then
+			cs = ZoomTiltCorrection(cs, zoomin, nil)
+		end
+
+		local cstemp = UpdateCam(cs)
+		if cstemp then cs = cstemp; end
 	end
 
-	local cstemp = UpdateCam(cs)
-	if cstemp then cs = cstemp; end
-	if (not zoomin and options.zoomouttocenter.value) then --move camera toward center
-		local dcx = mcx - ls_x -- distance in x-z plane from center of map to center of view (x-axis)
-		local dcz = mcz - ls_z -- distance in x-z plane from center of map to center of view (z-axis)
---		Spring.Echo ("maxDistY: " .. maxDistY .. " cs.py: " .. cs.py .. " dcx: " .. dcx .. " dcz: " .. dcz)
-		local csp = math.min((cs.py/(maxDistY*2/3)),1) ^ 2
---		Spring.Echo ("csp: " .. csp)
-		cs.px = cs.px + dcx * csp
-		cs.pz = cs.pz + dcz * csp
-	end
+	SetCenterBounds(cs)
 
 	spSetCameraState(cs, options.smoothness.value)
 
@@ -1216,31 +1316,24 @@ local function Altitude(up, s)
         end
 	end
     cs.py = new_py
+
+	SetCenterBounds(cs)
+
 	spSetCameraState(cs, options.smoothness.value)
 	return true
 end
 --==End camera utility function^^ (a frequently used function. Function often used for controlling camera).
 
 
-SetFOV = function(fov)
-	local cs = spGetCameraState()
-	cs.fov = fov
-    spSetCameraState(cs,0)
-	Spring.Echo(fov .. " degree")
-	
-	local currentFOVhalf_rad = (fov/2)*PI/180
-	local mapLenght = (max(MHEIGHT, MWIDTH)+4000)/2
-	maxDistY =  mapLenght/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
-end
-
 local function ResetCam()
 	local cs = spGetCameraState()
 	cs.px = Game.mapSizeX/2
-	cs.py = maxDistY
+	cs.py = maxDistY - 5 --Avoids flying off into nothingness when zooming out from cursor
 	cs.pz = Game.mapSizeZ/2
 	cs.rx = -HALFPI
 	cs.ry = PI
-	spSetCameraState(cs, 1)
+	SetCenterBounds(cs)
+	spSetCameraState(cs, 0)
 	ov_cs = nil
 end
 options.resetcam.OnChange = ResetCam
@@ -1279,6 +1372,7 @@ OverviewAction = function()
 			cs.pz = Game.mapSizeZ/2
 			cs.rx = -HALFPI
 		end
+		SetCenterBounds(cs)
 		spSetCameraState(cs, 1)
 	else --if in overview mode
 		local cs = spGetCameraState()
@@ -1295,6 +1389,7 @@ OverviewAction = function()
 			ls_have = true
 			local cstemp = UpdateCam(cs) --set camera position & orientation based on lockstop point
 			if cstemp then cs = cstemp; end
+			SetCenterBounds(cs)
 			spSetCameraState(cs, 1)
 		end
 		
@@ -1348,7 +1443,10 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		ls_z = z
 		ls_have = true --lock lockspot
 
-		if options.tiltedzoom.value then
+		if options.tiltedzoom.value and cs.name == "free" then 
+			--fixme: proper handling of a case where cam is not "free cam". 
+			--How to replicate: join a running game with autozoom & autotilt on, but DO NOT OPEN THE SPRING WINDOW,
+			--allow for some catchup then open the Spring window to look at the game, the camera definitely already crashed.
 			cs = ZoomTiltCorrection(cs, zoomin, nil)
 		end
 
@@ -1576,11 +1674,11 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_z = ls_z + ddz
 	
 	if not options.freemode.value then
-		ls_x = min(ls_x, MWIDTH-3) --limit camera movement to map area
-		ls_x = max(ls_x, 3)
+		ls_x = min(ls_x, maxX-3) --limit camera movement to map area
+		ls_x = max(ls_x, minX+3)
 		
-		ls_z = min(ls_z, MHEIGHT-3)
-		ls_z = max(ls_z, 3)
+		ls_z = min(ls_z, maxZ-3)
+		ls_z = max(ls_z, minZ+3)
 	end
 	
 	if options.smoothmeshscroll.value then
@@ -1879,7 +1977,18 @@ function widget:Update(dt)
 			missedMouseRelease = false
 		end
 	end
-	
+
+	if not initialBoundsSet then
+		initialBoundsSet = true
+		if options.tiltedzoom.value then ResetCam() end
+	end
+end
+
+function widget:GamePreload()
+	if not initialBoundsSet then
+		initialBoundsSet = true
+		if options.tiltedzoom.value then ResetCam() end
+	end
 end
 
 function widget:MouseMove(x, y, dx, dy, button)
@@ -2236,6 +2345,7 @@ function widget:Initialize()
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
+
 end
 
 function widget:Shutdown()
