@@ -25,6 +25,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    pad_count = 9,
     description_de = [[Flugzeugträger (Bomber) & Anti-Nuke]],
     description_fr = [[Porte-Avion Bombardier & Anti-Nuke]],
     description_pl = [[Lotniskowiec z tarcza antyrakietowa]],
