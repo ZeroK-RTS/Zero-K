@@ -57,7 +57,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 			if extraNormalDamageFalloffList[weaponDefID] then
 				local armored, mult = Spring.GetUnitArmored(unitID)
 				if armored then
-					damage = damage/mult
+					extraDamage = extraDamage/mult
 				end
 				extraDamage = extraDamage*damage*extraNormalDamageFalloffList[weaponDefID]
 			end
