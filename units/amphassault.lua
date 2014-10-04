@@ -19,6 +19,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    amph_regen = 40,
+    amph_submerged_at = 40,
     floattoggle    = [[1]],
     description_pl = [[Ciezki amfibijny bot szturmowy]],
     helptext       = [[The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a high power laser beam with high range and damage, ineffective against swarmers and fast aircraft but not much else. While its weapon cannot fire underwater, the Grizzly can float to surface in order to shoot.]],

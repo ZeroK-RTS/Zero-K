@@ -23,6 +23,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    amph_regen = 10,
+    amph_submerged_at = 40,
     description_pl = [[Amfibijny konstruktor, moc 7.5 m/s]],
     helptext       = [[The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land.]],
     helptext_pl    = [[Conch to wytrzymaly konstruktor, ktory moze wykonywac swoje obowiazki zarowno na ladzie, jak i gleboko pod woda.]],

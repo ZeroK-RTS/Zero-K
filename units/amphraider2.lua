@@ -18,6 +18,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    amph_regen = 40,
+    amph_submerged_at = 40,
     helptext       = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units.]],
     description_pl = [[Plywajacy bot wsparcia]],
     helptext_pl    = [[Archer uzywa silnego strumienia wody do niszczenia przeciwnikow. W miare strzelania zbiornik oproznia sie, zmniejszajac sile i zasieg - Archer moze go ponownie napelnic, wchodzac do wody. Archer moze wynurzyc sie, aby prowadzic walke z jednostkami powierzchniowymi.]],

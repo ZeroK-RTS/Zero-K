@@ -13,8 +13,6 @@ local unitDefData = {
 		tankMax = 180,
 		shotCost = 1.2,
 		tankRegenRate = 14,
-		healthRegen = 40,
-		submergedAt = 40,
 		baseHeight = 5,
 		bonusProjectiles = 6.5,
 		scalingRange = 200,
@@ -24,40 +22,10 @@ local unitDefData = {
 		tankMax = 100,
 		shotCost = 10,
 		tankRegenRate = 5,
-		healthRegen = 10,
-		submergedAt = 40,
 		baseHeight = 20,
 		bonusProjectiles = 5.5,
 		scalingRange = 0,
 		baseRange = 250,
-	},
-	[UnitDefNames["amphcon"].id] = {
-		healthRegen = 10,
-		submergedAt = 40,
-	},
-	[UnitDefNames["amphraider3"].id] = {
-		healthRegen = 5,
-		submergedAt = 40,
-	},
-	[UnitDefNames["amphfloater"].id] = {
-		healthRegen = 60,
-		submergedAt = 30,
-	},
-	[UnitDefNames["amphriot"].id] = {
-		healthRegen = 10,
-		submergedAt = 40,
-	},
-	[UnitDefNames["amphassault"].id] = {
-		healthRegen = 40,
-		submergedAt = 40,
-	},
-	[UnitDefNames["amphaa"].id] = {
-		healthRegen = 20,
-		submergedAt = 40,
-	},
-	[UnitDefNames["amphtele"].id] = {
-		healthRegen = 30,
-		submergedAt = 40,
 	},
 }
 

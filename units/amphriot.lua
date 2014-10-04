@@ -18,6 +18,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    amph_regen = 10,
+    amph_submerged_at = 40,
     description_pl = [[Amfibijny bot wsparcia]],
     helptext       = [[A flexible unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land. It acts as a stealthy underwater skirmisher, capable of killing outnumbered enemies with low attrition.]],
     helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz podwodnych pociskow ma takze shotgun do walk na ladzie.]],
