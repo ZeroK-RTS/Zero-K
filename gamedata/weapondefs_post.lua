@@ -201,6 +201,11 @@ end
     weaponDef.noselfdamage = (weaponDef.noselfdamage ~= false)
  end
  
+-- remove experience bonuses
+for _, weaponDef in pairs(WeaponDefs) do
+	weaponDef.ownerExpAccWeight = 0
+end
+ 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
