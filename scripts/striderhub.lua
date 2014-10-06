@@ -52,8 +52,21 @@ end
 
 
 function script.Killed(recentDamage, maxHealth)
-	--Explode( body, SFX.EXPLODE )
-	Explode( aim, SFX.EXPLODE )
+	local severity = recentDamage/maxHealth
+
+	if severity <= 0.25 then
+		return 1
+	elseif severity <= 0.50 then
+		Explode( aim, SFX.EXPLODE )
+		return 1
+	elseif severity <= 0.75 then
+		Explode( aim, SFX.EXPLODE )
+		return 2
+	else
+		Explode( aim, SFX.EXPLODE )
+		Explode( body, SFX.SHATTER )
+		return 2
+	end
 --[[
 	if( severity <= 25 )
 	{
