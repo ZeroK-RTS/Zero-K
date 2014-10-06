@@ -1,5 +1,6 @@
 include "constants.lua"
 include "nanoaim.h.lua"
+include "pieceControl.lua"
 
 --pieces
 local body = piece "body"
@@ -19,9 +20,20 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, {emitnano})
 end
 
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
+function script.HitByWeapon()
+	if spGetUnitRulesParam(unitID,"disarmed") == 1 then
+		StopTurn (aim, y_axis)
+		StopTurn (aim, x_axis)
+		StopTurn (aim, z_axis)
+	end
+end
 
 function script.StartBuilding()
-	UpdateNanoDirection(nanoPieces, nanoTurnSpeedHori, nanoTurnSpeedVert)
+	if spGetUnitRulesParam(unitID,"disarmed") ~= 1 then
+		UpdateNanoDirection(nanoPieces, nanoTurnSpeedHori, nanoTurnSpeedVert)
+	end
 	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 1);
 end
 
@@ -40,8 +52,21 @@ end
 
 
 function script.Killed(recentDamage, maxHealth)
-	Explode( body, SFX.EXPLODE )
-	Explode( aim, SFX.EXPLODE )
+	local severity = recentDamage/maxHealth
+
+	if severity <= 0.25 then
+		return 1
+	elseif severity <= 0.50 then
+		Explode( aim, SFX.EXPLODE )
+		return 1
+	elseif severity <= 0.75 then
+		Explode( aim, SFX.EXPLODE )
+		return 2
+	else
+		Explode( aim, SFX.EXPLODE )
+		Explode( body, SFX.SHATTER )
+		return 2
+	end
 --[[
 	if( severity <= 25 )
 	{
