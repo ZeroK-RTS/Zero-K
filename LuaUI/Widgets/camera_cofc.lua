@@ -607,9 +607,11 @@ SetFOV = function(fov)
 	
 	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
 	_,mapEdgeBuffer = Spring.GetGroundExtremes()
-	mapEdgeBuffer = math.max(mapEdgeBuffer, 1000)
-	local mapLength = MHEIGHT/2 + mapEdgeBuffer
-	if vsy/vsx > MHEIGHT/MWIDTH then mapLength = (MWIDTH * vsy/vsx)/2 + mapEdgeBuffer end
+	local mapFittingDistance = MHEIGHT/2
+	if vsy/vsx > MHEIGHT/MWIDTH then mapFittingDistance = (MWIDTH * vsy/vsx)/2 end
+	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingDistance/3) -- map edge buffer should be 1/8th of the length of the dimension fitted to screen
+
+	local mapLength = mapFittingDistance + mapEdgeBuffer
 	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
 
 	cs.fov = fov
