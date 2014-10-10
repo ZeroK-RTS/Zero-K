@@ -37,7 +37,7 @@ unitDef = {
     modelradius    = [[30]],
   },
 
-  energyUse              = 1.5,
+  energyUse              = 0,
   explodeAs              = [[ATOMIC_BLASTSML]],
   floater                = true,
   footprintX             = 6,
@@ -51,7 +51,6 @@ unitDef = {
   movementClass          = [[BOAT6]],
   objectName             = [[ARMCARRIER]],
   script                 = [[armcarry.lua]],
-  radarDistance          = 1200,
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   showNanoSpray          = false,
