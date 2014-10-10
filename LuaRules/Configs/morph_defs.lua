@@ -6,11 +6,13 @@ local devolution = false
 
 local morphDefs = {
   --// geos
+  --[[
   geo = {
     {
       into = 'amgeo',
       time = 90,
     },
+    ]]
 --    {
 --      into = 'armgmm',
 --      time = 120,
@@ -18,6 +20,7 @@ local morphDefs = {
   },
 	-- //support units
    -- jammer
+   --[[
    armjamt = {
       into = 'spherecloaker',
       time = 30,
@@ -36,6 +39,7 @@ local morphDefs = {
       into = 'corjamt',
       time = 30,
     }, 
+    ]]
 
 	-- radar
 --[[
