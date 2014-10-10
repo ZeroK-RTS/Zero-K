@@ -12,12 +12,12 @@ local morphDefs = {
       into = 'amgeo',
       time = 90,
     },
-    ]]
 --    {
 --      into = 'armgmm',
 --      time = 120,
 --    },
   },
+  ]]
 	-- //support units
    -- jammer
    --[[
