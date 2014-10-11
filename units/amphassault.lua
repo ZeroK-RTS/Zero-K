@@ -56,7 +56,7 @@ unitDef = {
 
   },
 
-  sightDistance       = 605,
+  sightDistance       = 660,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
