@@ -1119,6 +1119,10 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
 	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.35) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
 	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.18 * (vsx/vsy)
+
+	-- TODO: Correct dx & dz values to ensure the same y-axis distance from camera. 
+	--			 This will be a bigger issue if this function is re-written to use WorldToScreenCoordinates and any hypothetical inverse, 
+	--			 	as OverrideTraceScreenRay ensures this 95% of the time
 	local dx, dz = (gx - testgx), (gz - testgz)
 	cs.px = cs.px + dx - math.abs(math.sin(cs.ry)) * centerwardVDriftFactor * dx + math.abs(math.cos(cs.ry)) * centerwardHDriftFactor * dz
 	cs.pz = cs.pz + dz - math.abs(math.cos(cs.ry)) * centerwardVDriftFactor * dz - math.abs(math.sin(cs.ry)) * centerwardHDriftFactor * dx
