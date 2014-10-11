@@ -153,6 +153,7 @@ options = {
 			{key = 'rotate', 		name='Rotate Camera'},
 			{key = 'off', 			name='Off'},
 		},
+		advanced = true,
 	},
 	
 	
@@ -1890,7 +1891,7 @@ function widget:Update(dt)
 			RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, ls_have)
 		end
 		
-		if not ls_have and (rot.up or rot.down) and options.topBottomEdge.value == 'orbit' then
+		if (rot.up or rot.down) and options.topBottomEdge.value == 'orbit' then
 			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
 		elseif options.topBottomEdge.value == 'rotate' then
 			ls_have = false
