@@ -31,41 +31,49 @@ local cameraFollowPath = 'Settings/Camera/Camera Following'
 options_order = { 
 	'helpwindow', 
 	
-	'lblRotate',
-	'targetmouse', 
-	'rotateonedge', 
-	'rotfactor',
-    'inverttilt',
-    'groundrot',
-	
-	'lblScroll',
-	'edgemove', 
-	'smoothscroll',
-	'speedFactor', 
-	'speedFactor_k', 
-	'invertscroll', 
-	'smoothmeshscroll', 
+	'topBottomEdge',
+
+	'leftRightEdge',
+
+	'middleMouseButton',
 	
 	'lblZoom',
+	-- 'zoomintocursor', 
+	-- 'zoomoutfromcursor', 
+	'zoominfactor', 
+	'zoomin',
+	'zoomoutfactor',
+	'zoomout',
 	'invertzoom', 
 	'invertalt', 
-	'zoomintocursor', 
-	'zoomoutfromcursor', 
-	'zoomouttocenter', 
 	'tiltedzoom',
-	'zoominfactor', 
-	'zoomoutfactor',
+	'zoomouttocenter', 
+
+	'lblRotate',
+	'rotfactor',
+	'targetmouse', 
+	-- 'rotateonedge', 
+  'inverttilt',
+  'groundrot',
+	
+	'lblScroll',
+	'speedFactor', 
+	'speedFactor_k', 
+	-- 'edgemove', 
+	'invertscroll', 
+	'smoothscroll',
+	'smoothmeshscroll', 
 	
 	'lblMisc',
+	'smoothness',
+	'fov',
 	'overviewmode', 
 	'overviewset',
 	'rotatebackfromov',
-	'smoothness',
-	'fov',
 	--'restrictangle',
 	--'mingrounddist',
-	'freemode',
 	'resetcam',
+	'freemode',
 	
 	--following:
 	
@@ -101,15 +109,51 @@ local SetCenterBounds = function(cs) end
 options = {
 	
 	lblblank1 = {name='', type='label'},
-	lblRotate = {name='Rotation', type='label'},
-	lblScroll = {name='Scrolling', type='label'},
-	lblZoom = {name='Zooming', type='label'},
+	lblRotate = {name='Rotation Behaviour', type='label'},
+	lblScroll = {name='Scroll Behaviour', type='label'},
+	lblZoom = {name='Zoom Behaviour', type='label'},
 	lblMisc = {name='Misc.', type='label'},
 	
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
 	lblFollowCursorZoom = {name='Auto-Zooming', type='label', path=cameraFollowPath},
 	lblFollowUnit = {name='Unit Following', type='label', path=cameraFollowPath},
 	lblMisc2 = {name='Misc.', type='label', path = cameraFollowPath},
+
+	topBottomEdge = {
+		name = 'Top/Bottom Edge Behaviour',
+		type = 'radioButton',
+		value = 'pan',
+		items = {
+			{key = 'pan', 			name='Pan'},
+			{key = 'orbit', 		name='Rotate World'},
+			{key = 'rotate', 		name='Rotate Camera'},
+			{key = 'off', 			name='Off'},
+		},
+	},
+
+	leftRightEdge = {
+		name = 'Left/Right Edge Behaviour',
+		type = 'radioButton',
+		value = 'pan',
+		items = {
+			{key = 'pan', 			name='Pan'},
+			{key = 'orbit', 		name='Rotate World'},
+			{key = 'rotate', 		name='Rotate Camera'},
+			{key = 'off', 			name='Off'},
+		},
+	},
+
+	middleMouseButton = {
+		name = 'Middle Mouse Button Behaviour',
+		type = 'radioButton',
+		value = 'pan',
+		items = {
+			{key = 'pan', 			name='Pan'},
+			{key = 'orbit', 		name='Rotate World'},
+			{key = 'rotate', 		name='Rotate Camera'},
+			{key = 'off', 			name='Off'},
+		},
+	},
 	
 	
 	helpwindow = {
@@ -141,7 +185,7 @@ options = {
 		name = 'Smooth Mesh Scrolling',
 		desc = 'A smoother way to scroll. Applies to all types of mouse/keyboard scrolling.',
 		type = 'bool',
-		value = false,
+		value = true,
 	},
 	
 	targetmouse = {
@@ -150,14 +194,14 @@ options = {
 		type = 'bool',
 		value = true,
 	},
-	edgemove = {
-		name = 'Scroll camera at edge',
-		desc = 'Scroll camera when the cursor is at the edge of the screen.',
-		springsetting = 'WindowedEdgeMove',
-		type = 'bool',
-		value = true,
+	-- edgemove = {
+	-- 	name = 'Scroll camera at edge',
+	-- 	desc = 'Scroll camera when the cursor is at the edge of the screen.',
+	-- 	springsetting = 'WindowedEdgeMove',
+	-- 	type = 'bool',
+	-- 	value = true,
 		
-	},
+	-- },
 	speedFactor = {
 		name = 'Mouse scroll speed',
 		desc = 'This speed applies to scrolling with the middle button.',
@@ -170,19 +214,19 @@ options = {
 		desc = 'This speed applies to edge scrolling and keyboard keys.',
 		type = 'number',
 		min = 1, max = 50,
-		value = 20,
+		value = 40,
 	},
 	zoominfactor = {
 		name = 'Zoom-in speed',
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.2,
+		value = 0.3,
 	},
 	zoomoutfactor = {
 		name = 'Zoom-out speed',
 		type = 'number',
 		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.2,
+		value = 0.3,
 	},
 	invertzoom = {
 		name = 'Invert zoom',
@@ -196,30 +240,51 @@ options = {
 		type = 'bool',
 		value = false,
 	},
-    inverttilt = {
+  inverttilt = {
 		name = 'Invert tilt',
 		desc = 'Invert the tilt direction when using ctrl+mousewheel.',
 		type = 'bool',
 		value = false,
 	},
     
-	zoomoutfromcursor = {
-		name = 'Zoom out from cursor',
-		desc = 'Zoom out from the cursor rather than center of the screen.',
-		type = 'bool',
-		value = false,
+	-- zoomoutfromcursor = {
+	-- 	name = 'Zoom out from cursor',
+	-- 	desc = 'Zoom out from the cursor rather than center of the screen.',
+	-- 	type = 'bool',
+	-- 	value = false,
+	-- },
+	-- zoomintocursor = {
+	-- 	name = 'Zoom in to cursor',
+	-- 	desc = 'Zoom in to the cursor rather than the center of the screen.',
+	-- 	type = 'bool',
+	-- 	value = true,
+	-- },
+
+	zoomin = {
+		name = 'Zoom In',
+		type = 'radioButton',
+		value = 'toCursor',
+		items = {
+			{key = 'toCursor', 		name='To Cursor'},
+			{key = 'toCenter', 		name='To Screen Center'},
+		},
 	},
-	zoomintocursor = {
-		name = 'Zoom in to cursor',
-		desc = 'Zoom in to the cursor rather than the center of the screen.',
-		type = 'bool',
-		value = true,
+
+	zoomout = {
+		name = 'Zoom Out',
+		type = 'radioButton',
+		value = 'fromCenter',
+		items = {
+			{key = 'fromCursor', 		name='From Cursor'},
+			{key = 'fromCenter', 		name='From Screen Center'},
+		},
 	},
+
 	zoomouttocenter = {
 		name = 'Zoom out to center',
 		desc = 'Center the map as you zoom out.',
 		type = 'bool',
-		value = false,
+		value = true,
 		OnChange = function(self) 
 			local cs = Spring.GetCameraState()
 			if cs.rx then
@@ -232,7 +297,7 @@ options = {
 		name = 'Tilt camera while zooming',
 		desc = 'Have the camera tilt while zooming. Camera faces ground when zoomed out, and looks out nearly parallel to ground when fully zoomed in',
 		type = 'bool',
-		value = false,
+		value = true,
 	},
 
 	rotfactor = {
@@ -241,19 +306,19 @@ options = {
 		min = 0.001, max = 0.020, step = 0.001,
 		value = 0.005,
 	},	
-	rotateonedge = {
-		name = "Rotate camera at edge",
-		desc = "Rotate camera when the cursor is at the edge of the screen (edge scroll must be off).",
-		type = 'bool',
-		value = false,
-	},
+	-- rotateonedge = {
+	-- 	name = "Rotate camera at edge",
+	-- 	desc = "Rotate camera when the cursor is at the edge of the screen (edge scroll must be off).",
+	-- 	type = 'bool',
+	-- 	value = false,
+	-- },
     
 	smoothness = {
 		name = 'Smoothness',
 		desc = "Controls how smooth the camera moves.",
 		type = 'number',
 		min = 0.0, max = 0.8, step = 0.1,
-		value = 0.2,
+		value = 0.3,
 	},
 	fov = {
 		name = 'Field of View (Degrees)',
@@ -313,7 +378,7 @@ options = {
 		name = "Rotate Back From Overview",
 		desc = "When returning from overview mode, rotate the camera to its original position (only applies when you have set an overview viewpoint).",
 		type = 'bool',
-		value = false,
+		value = true,
 	},
 	resetcam = {
 		name = "Reset Camera",
@@ -326,6 +391,7 @@ options = {
 		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
 		type = 'bool',
 		value = false,
+		advanced = true,
 	},
 	
 	
@@ -1176,7 +1242,7 @@ local function Zoom(zoomin, shift, forceCenter)
 	--//ZOOMOUT FROM CURSOR, ZOOMIN TO CURSOR//--
 	if
 	(not forceCenter) and
-	((zoomin and options.zoomintocursor.value) or ((not zoomin) and options.zoomoutfromcursor.value))
+	((zoomin and options.zoomin.value == 'toCursor') or ((not zoomin) and options.zoomout.value == 'fromCursor'))
 	then
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
 	
@@ -1812,15 +1878,23 @@ function widget:Update(dt)
 	if 	(not thirdperson_trackunit and  --block 3rd Person 
 	(rot.right or rot.left or rot.up or rot.down))
 	then
-		SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
 		
 		local speed = options.rotfactor.value * (s and 500 or 250)
+
+		if (rot.right or rot.left) and options.leftRightEdge.value == 'orbit' then
+			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
+		end
 		if rot.right then
 			RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, ls_have)
 		elseif rot.left then
 			RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, ls_have)
 		end
 		
+		if not ls_have and (rot.up or rot.down) and options.topBottomEdge.value == 'orbit' then
+			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
+		elseif options.topBottomEdge.value == 'rotate' then
+			ls_have = false
+		end
 		if rot.up then
 			RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, ls_have)
 		elseif rot.down then
@@ -1897,30 +1971,37 @@ function widget:Update(dt)
 	
 	--//HANDLE MOUSE'S SCREEN-EDGE SCROLL/ROTATION
 	if not (WG.IsGUIHidden and WG.IsGUIHidden()) then --not in mission or (in mission but) not GuiHidden()
-		if options.edgemove.value then
+		if options.leftRightEdge.value == 'pan' then
 			move2.right = false --reset mouse move state
 			move2.left = false
-			move2.up = false
-			move2.down = false
-			
 			if mx > vsx-2 then 
 				move2.right = true
 			elseif mx < 2 then
 				move2.left = true
 			end
-			if my > vsy-2 then
-				move2.up = true
-			elseif my < 2 then
-				move2.down = true
-			end
 			
-		elseif options.rotateonedge.value then
-			rot = {}
+		elseif options.leftRightEdge.value == 'rotate' or options.leftRightEdge.value == 'orbit' then
+			rot.right = false 
+			rot.left = false
 			if mx > vsx-2 then 
 				rot.right = true 
 			elseif mx < 2 then
 				rot.left = true
 			end
+		end
+
+		if options.topBottomEdge.value == 'pan' then
+			move2.up = false
+			move2.down = false
+			if my > vsy-2 then
+				move2.up = true
+			elseif my < 2 then
+				move2.down = true
+			end
+
+		elseif options.topBottomEdge.value == 'rotate' or options.topBottomEdge.value == 'orbit' then
+			rot.up = false
+			rot.down = false
 			if my > vsy-2 then
 				rot.up = true
 			elseif my < 2 then
@@ -2037,6 +2118,9 @@ end
 
 function widget:MousePress(x, y, button) --called once when pressed, not repeated
 	ls_have = false
+	if (button == 2 and options.middleMouseButton.value == 'off') then 
+		return true 
+	end
 	--overview_mode = false
     --if fpsmode then return end
 	if lockspringscroll then
@@ -2084,14 +2168,14 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	
 	rotate = false
 	-- Rotate --
-	if a then
+	if a or options.middleMouseButton.value == 'rotate' then
 		spWarpMouse(cx, cy)
 		ls_have = false
 		rotate = true
 		return true
 	end
 	-- Rotate World --
-	if ctrl then
+	if ctrl or options.middleMouseButton.value == 'orbit' then
 		rotate_transit = nil
 		if options.targetmouse.value then --if rotate world at mouse cursor: 
 			
@@ -2279,10 +2363,11 @@ function widget:DrawScreen()
 	end
 	
 	local filefound	
-	if smoothscroll or (rotate and ls_have) then
-		filefound = glTexture(LUAUI_DIRNAME .. 'Images/ccc/arrows-dot.png')
-	elseif rotate or lockspringscroll or springscroll then
+	if smoothscroll then --or (rotate and ls_have) then
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/ccc/arrows.png')
+		hideCursor = true
+	--elseif rotate or lockspringscroll or springscroll then
+		--filefound = glTexture(LUAUI_DIRNAME .. 'Images/ccc/arrows.png')
 	end
 	
 	if filefound then
@@ -2305,9 +2390,9 @@ function widget:DrawScreen()
 		
 		glAlphaTest(GL_GREATER, 0)
 		
-		if not (springscroll and not lockspringscroll) then
-		    hideCursor = true
-		end
+		-- if not (springscroll and not lockspringscroll) then
+		    -- hideCursor = true
+		-- end
 		if smoothscroll then
 			local icon_size2 = icon_size
 			glTexRect(x-icon_size, y-icon_size2, x+icon_size, y+icon_size2)
