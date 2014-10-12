@@ -1,4 +1,5 @@
 include "constants.lua"
+include "pieceControl.lua"
 
 local base = piece 'base' 
 local arm1 = piece 'arm1' 
@@ -12,6 +13,15 @@ local smokePiece = {base}
 
 -- Signal definitions
 local SIG_AIM = 2
+
+
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
+function script.HitByWeapon()
+	if spGetUnitRulesParam(unitID,"disarmed") == 1 then
+		StopTurn (turret, y_axis)
+	end
+end
 
 local function Bob(rot)
 	while true do
@@ -53,13 +63,21 @@ end
 function script.AimWeapon1(heading, pitch)
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
-	if waterFire then
-		Turn( turret , y_axis, -heading + math.pi, math.rad(120) )
-	else
-		Turn( turret , y_axis, heading, math.rad(120) )
+
+	while spGetUnitRulesParam(unitID,"disarmed") == 1 do
+		Sleep(10)
 	end
+
+	local slowMult = (1-(spGetUnitRulesParam(unitID,"slowState") or 0))
+
+	if waterFire then
+		Turn( turret , y_axis, -heading + math.pi, math.rad(120)*slowMult )
+	else
+		Turn( turret , y_axis, heading, math.rad(120)*slowMult )
+	end
+
 	WaitForTurn(turret, y_axis)
-	return true
+	return spGetUnitRulesParam(unitID,"disarmed") ~= 1
 end
 
 function script.FireWeapon(num)
@@ -80,7 +98,7 @@ function script.QueryWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
-        local severity = recentDamage/maxHealth
+	local severity = recentDamage/maxHealth
 	if  severity <= .25  then
 		Explode(base, sfxNone)
 		Explode(firepoint, sfxNone)
@@ -100,10 +118,10 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		return 2
 	else
-            Explode(base, sfxNone)
-            Explode(firepoint, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-            Explode(arm2, sfxShatter + sfxExplode )
-            Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-            return 2
-        end
+		Explode(base, sfxNone)
+		Explode(firepoint, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(arm2, sfxShatter + sfxExplode )
+		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		return 2
+	end
 end

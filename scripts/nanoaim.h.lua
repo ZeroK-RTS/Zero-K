@@ -15,6 +15,7 @@
 -------------------------------------------------------------------------------------
 
 local Utils_GetUnitNanoTarget = Spring.Utilities.GetUnitNanoTarget
+local SpringGetUnitRulesParam = Spring.GetUnitRulesParam
 
 function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 	local type, target, isFeature = Utils_GetUnitNanoTarget(unitID)
@@ -40,34 +41,27 @@ function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 		local p  = math.asin(select(2,Spring.GetUnitDirection(unitID)))
 		local pitch = p - tp
 
-		turnSpeed     = turnSpeed or (0.75*math.pi)
-		turnSpeedVert = turnSpeedVert or turnSpeed
+		local slowMult = (1-(SpringGetUnitRulesParam(unitID,"slowState") or 0))
+		turnSpeed     = (turnSpeed or (0.75*math.pi)) * slowMult
+		turnSpeedVert = (turnSpeedVert or turnSpeed)  * slowMult
 
-		local turned = false
 		for i=1,#nanopieces do
 			local nano = nanopieces[i]
 			local cur_head,cur_pitch = Spring.UnitScript.GetPieceRotation(nano)
 			if (cur_head ~= heading)or(cur_pitch ~= pitch) then
 				Turn(nano, y_axis, heading, turnSpeed)
 				Turn(nano, x_axis, pitch, turnSpeedVert)
-				turned = true
 			end
-		end
-
-		if (turned) then
-			WaitForTurn(nanopieces[1], y_axis)
 		end
 	end
 end
-
 
 function UpdateNanoDirectionThread(nanopieces, updateInterval, turnSpeed,turnSpeedVert)
 	updateInterval = updateInterval or 1000
 	while true do
-		UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+		if SpringGetUnitRulesParam(unitID,"disarmed") ~= 1 then
+			UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
+		end
 		Sleep(updateInterval)
 	end
 end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 include "constants.lua"
-
+include "pieceControl.lua"
 ----------------------------------------------------------------------------------------------
 -- Model Pieces
 
@@ -38,6 +38,17 @@ end
 ----------------------------------------------------------------------------------------------
 -- Script Functions
 
+
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
+function script.HitByWeapon()
+	if spGetUnitRulesParam(unitID,"disarmed") == 1 then
+		StopTurn (basetop, y_axis)
+		StopTurn (basemid, y_axis)
+		StopTurn (housing, x_axis)
+	end
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 end
@@ -52,23 +63,33 @@ function script.AimFromWeapon(num) return holder end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	if not firing then
-		Turn(basetop, y_axis, 2  * heading, BASETOP_TURN_SPEED )
-		Turn(basemid, y_axis, -1 * heading, BASEMID_TURN_SPEED )
-		Turn(housing, x_axis, -pitch, HOUSING_TURN_SPEED )
-		WaitForTurn(basetop, y_axis)
-		WaitForTurn(basemid, y_axis)
-		WaitForTurn(housing, x_axis)
-		return true
+	
+	while firing or spGetUnitRulesParam(unitID,"disarmed") == 1 do
+		Sleep(10)
 	end
+	
+	local slowMult = (1-(spGetUnitRulesParam(unitID,"slowState") or 0))
+	
+	Turn(basetop, y_axis, 2  * heading, BASETOP_TURN_SPEED*slowMult )
+	Turn(basemid, y_axis, -1 * heading, BASEMID_TURN_SPEED*slowMult )
+	Turn(housing, x_axis, -pitch, HOUSING_TURN_SPEED*slowMult )
+	WaitForTurn(basetop, y_axis)
+	WaitForTurn(basemid, y_axis)
+	WaitForTurn(housing, x_axis)
+
+	return (spGetUnitRulesParam(unitID,"disarmed") ~= 1)
 end
 
 function script.FireWeapon(num)
 	firing = true
 	EmitSfx(flares[index], UNIT_SFX2)
-	Sleep(1200)
-	rx,ry,rz = GetPieceRotation(spindle)
-	Turn(spindle, z_axis, rz + rad(120),SPINDLE_TURN_SPEED)
+	Sleep(800) -- fixme: read beamtime from WeaponDefs instead of hardcoded
+
+	local slowMult = (1-(spGetUnitRulesParam(unitID,"slowState") or 0))
+	local rz = select(3, GetPieceRotation(spindle))
+	Turn(spindle, z_axis, rz + rad(120),SPINDLE_TURN_SPEED*slowMult)
+	-- WaitForTurn(spindle, z_axis)
+
 	firing = false
 	index = index - 1
 	if index == 0 then index = 3 end
