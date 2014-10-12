@@ -257,7 +257,8 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.customparams.idstring == "commweapon_gaussrifle" then
+					local id = v.customparams.idstring
+					if id == "commweapon_gaussrifle" or id == "commweapon_massdriver" then
 						v.range = v.range * 1.2
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.1
