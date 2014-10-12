@@ -607,9 +607,11 @@ SetFOV = function(fov)
 	
 	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
 	_,mapEdgeBuffer = Spring.GetGroundExtremes()
-	mapEdgeBuffer = math.max(mapEdgeBuffer, 1000)
-	local mapLength = MHEIGHT/2 + mapEdgeBuffer
-	if vsy/vsx > MHEIGHT/MWIDTH then mapLength = (MWIDTH * vsy/vsx)/2 + mapEdgeBuffer end
+	local mapFittingDistance = MHEIGHT/2
+	if vsy/vsx > MHEIGHT/MWIDTH then mapFittingDistance = (MWIDTH * vsy/vsx)/2 end
+	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingDistance/3) -- map edge buffer should be 1/8th of the length of the dimension fitted to screen
+
+	local mapLength = mapFittingDistance + mapEdgeBuffer
 	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
 
 	cs.fov = fov
@@ -1115,8 +1117,12 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- Correct so that mouse cursor is hovering over the same point. 
 	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
 	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
-	local centerwardVDriftFactor = (mouseY - vsy/2)/(vsy/2) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
-	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.12
+	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.35) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
+	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.18 * (vsx/vsy)
+
+	-- TODO: Correct dx & dz values to ensure the same y-axis distance from camera. 
+	--			 This will be a bigger issue if this function is re-written to use WorldToScreenCoordinates and any hypothetical inverse, 
+	--			 	as OverrideTraceScreenRay ensures this 95% of the time
 	local dx, dz = (gx - testgx), (gz - testgz)
 	cs.px = cs.px + dx - math.abs(math.sin(cs.ry)) * centerwardVDriftFactor * dx + math.abs(math.cos(cs.ry)) * centerwardHDriftFactor * dz
 	cs.pz = cs.pz + dz - math.abs(math.cos(cs.ry)) * centerwardVDriftFactor * dz - math.abs(math.sin(cs.ry)) * centerwardHDriftFactor * dx
@@ -1806,19 +1812,21 @@ function widget:Update(dt)
 	if 	(not thirdperson_trackunit and  --block 3rd Person 
 	(rot.right or rot.left or rot.up or rot.down))
 	then
+		SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
 		
-		local speed = options.rotfactor.value * (s and 400 or 150)
+		local speed = options.rotfactor.value * (s and 500 or 250)
 		if rot.right then
-			RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true)
+			RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, ls_have)
 		elseif rot.left then
-			RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true)
+			RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, ls_have)
 		end
 		
 		if rot.up then
-			RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true)
+			RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, ls_have)
 		elseif rot.down then
-			RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true)
+			RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, ls_have)
 		end
+		ls_have = false
 		
 	end
 	
