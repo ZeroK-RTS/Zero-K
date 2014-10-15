@@ -37,6 +37,7 @@ unitDef = {
 
     modelradius    = [[7]],
     instantselfd   = [[1]],
+    idle_cloak = 1,
   },
 
   explodeAs              = [[ARMTICK_DEATH]],
