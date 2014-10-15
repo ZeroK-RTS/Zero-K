@@ -146,6 +146,7 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burntime = 240,
+		burnchance = 1,
 	  },
 
       damage                  = {
