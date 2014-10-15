@@ -1198,7 +1198,12 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- TODO: Correct dx & dz values to ensure the same y-axis distance from camera. 
 	--			 This will be a bigger issue if this function is re-written to use WorldToScreenCoordinates and any hypothetical inverse, 
 	--			 	as OverrideTraceScreenRay ensures this 95% of the time
-	local dx, dz = (gx - testgx), (gz - testgz)
+	local dgx, dgz, dtestx, dtestz = gx - cs.px, gz - cs.pz, testgx - cs.px, testgz - cs.pz
+	-- Spring.Echo("Ref dg {"..dgx..", "..(cs.py - gy)..", "..dgz.."}, Test dg {"..dtestx..", "..(cs.py - testgy)..", "..dtestz.."}")
+	dyCorrection = (cs.py - gy)/math.max(cs.py - testgy, 0.001)
+	dtestx, dtestz = dtestx * dyCorrection, dtestz * dyCorrection 
+	local dx, dz = (dgx - dtestx), (dgz - dtestz)
+	-- Spring.Echo("d {"..dx..", "..dz.."}")
 	if zoomin or cs.py < topDownBufferZone then
 		cs.px = cs.px + dx - math.abs(math.sin(cs.ry)) * centerwardVDriftFactor * dx + math.abs(math.cos(cs.ry)) * centerwardHDriftFactor * dz
 		cs.pz = cs.pz + dz - math.abs(math.cos(cs.ry)) * centerwardVDriftFactor * dz - math.abs(math.sin(cs.ry)) * centerwardHDriftFactor * dx
@@ -1272,7 +1277,6 @@ local function Zoom(zoomin, shift, forceCenter)
 		else
 			return false
 		end
-
 		
 		local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
 		
@@ -1303,14 +1307,16 @@ local function Zoom(zoomin, shift, forceCenter)
 		end
 
 
-		local boundedPy = math.min(math.max(new_py, groundMinimum), maxDistY - 10)
-		cs.px = new_px * (boundedPy/new_py)
-		cs.py = boundedPy
-		cs.pz = new_pz * (boundedPy/new_py)
+		if new_py == new_py then
+			local boundedPy = math.min(math.max(new_py, groundMinimum), maxDistY - 10)
+			cs.px = new_px * (boundedPy/math.max(new_py, 0.0001))
+			cs.py = boundedPy
+			cs.pz = new_pz * (boundedPy/math.max(new_py, 0.0001))
 
-		--//SUPCOM camera zoom by Shadowfury333(Dominic Renaud):
-		if options.tiltedzoom.value then
-			cs = ZoomTiltCorrection(cs, zoomin, mx,my)
+			--//SUPCOM camera zoom by Shadowfury333(Dominic Renaud):
+			if options.tiltedzoom.value then
+				cs = ZoomTiltCorrection(cs, zoomin, mx,my)
+			end
 		end
 		--//
 
