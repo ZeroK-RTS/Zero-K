@@ -1174,6 +1174,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	--do /luaui reload, then attempt zoom. "ls_dist" will be nil here (currently not using "ls_dist" but using "rayDist")
 	--(unexpected nil might indicate some COFC's flaw somewhere else). a todo..
 	local gx,gy,gz,_,_,_,rayDist = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true,nil,true)
+	if gy == -math.huge then return cs end -- Avoids any possible issues when fully zooming out
 	
 	-- if gx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
@@ -1183,6 +1184,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	local targetRx, skyProportion = GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 
 	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true,gy)
+	if testgy == -math.huge then return cs end -- Avoids any possible issues when fully zooming out
 
 	-- if testgx and not options.freemode.value then
 		-- out of map. Bound zooming to within map
@@ -1190,20 +1192,14 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- end
 
 	-- Correct so that mouse cursor is hovering over the same point. 
-	-- Since we are using a projection to a plane (planeIntercept is true), both points are on the same plane
-	-- Spring.Echo("Ref {"..gx..", "..gy..", "..gz.."}, Test {"..testgx..", "..testgy..", "..testgz.."}")
 	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.35) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
 	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.18 * (vsx/vsy)
 
-	-- TODO: Correct dx & dz values to ensure the same y-axis distance from camera. 
-	--			 This will be a bigger issue if this function is re-written to use WorldToScreenCoordinates and any hypothetical inverse, 
-	--			 	as OverrideTraceScreenRay ensures this 95% of the time
+	-- Ensure that both points are on the same plane by testing them from camera. This way the y value will always be positive, making div/0 checks possible
 	local dgx, dgz, dtestx, dtestz = gx - cs.px, gz - cs.pz, testgx - cs.px, testgz - cs.pz
-	-- Spring.Echo("Ref dg {"..dgx..", "..(cs.py - gy)..", "..dgz.."}, Test dg {"..dtestx..", "..(cs.py - testgy)..", "..dtestz.."}")
 	dyCorrection = (cs.py - gy)/math.max(cs.py - testgy, 0.001)
 	dtestx, dtestz = dtestx * dyCorrection, dtestz * dyCorrection 
 	local dx, dz = (dgx - dtestx), (dgz - dtestz)
-	-- Spring.Echo("d {"..dx..", "..dz.."}")
 	if zoomin or cs.py < topDownBufferZone then
 		cs.px = cs.px + dx - math.abs(math.sin(cs.ry)) * centerwardVDriftFactor * dx + math.abs(math.cos(cs.ry)) * centerwardHDriftFactor * dz
 		cs.pz = cs.pz + dz - math.abs(math.cos(cs.ry)) * centerwardVDriftFactor * dz - math.abs(math.sin(cs.ry)) * centerwardHDriftFactor * dx
