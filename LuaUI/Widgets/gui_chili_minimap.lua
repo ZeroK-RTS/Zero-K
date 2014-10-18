@@ -672,7 +672,7 @@ function widget:DrawScreen()
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
 	
-	if (lw ~= cx or lh ~= ch or lx ~= cx or ly ~= cy) then
+	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy) then
 		lx = cx
 		ly = cy
 		lh = ch
