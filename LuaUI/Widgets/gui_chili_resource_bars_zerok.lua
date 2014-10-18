@@ -81,6 +81,7 @@ local window_metal_proportion
 local bar_proportion
 local metal_proportion_warn_label
 local metal_proportion_label
+local image_proportion_center
 
 local positiveColourStr
 local negativeColourStr
@@ -311,9 +312,9 @@ function widget:Update(s)
 	if blinkProp_status then
 		blink_caption = true
 		metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 0.5}, blink_alpha)).."Build Energy")
-		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
+		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.35}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
 		bar_proportion.bars[2].color2 = Mix(
-			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5}, 
+			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.35}, 
 			{col_expense[1]*multiColorMult, col_expense[2]*multiColorMult, col_expense[3]*multiColorMult, 1}, 
 			sawtooth)
 		bar_proportion:Invalidate()
@@ -769,8 +770,10 @@ function CreateWindow()
 	local storageLabelOffset = '70%'
 	local storageLabelHeight = '35%'
 	
+	local propBarHeightBuffered = '40%'
 	local propBarHeight = '36%'
 	local proBarSpacing = '11.5%'
+	local proBarSpacingBuffered = '9.5%'
 	local proportionWindowSpacing = p(13.5 + options.barWidth.value) -- Default '21%'
 	
 	local barWidth = p(options.barWidth.value) --'6.5%'
@@ -800,7 +803,7 @@ function CreateWindow()
 		x = screenHorizCentre - economyPanelWidth/2,
 		y = 0,
 		clientWidth  = economyPanelWidth,
-		clientHeight = 65,
+		clientHeight = 75,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -1160,20 +1163,20 @@ function CreateWindow()
 		end },
 	}
 
-	metal_proportion_label = Chili.Label:New{
-		parent = window_metal_proportion,
-		height = 10,
-		width  = '100%',
-		x      = 0,
-		y      = '50%',
-		-- valign = "center",
-		align  = "center",
-		valigh = "bottom",
-		caption = "^",
-		autosize = false,
-		font   = {size = 18, outline = true, color = {.9,.9,.9,1}},
-		tooltip = proportionTooltip,
-	}
+	-- metal_proportion_label = Chili.Label:New{
+	-- 	parent = window_metal_proportion,
+	-- 	height = 10,
+	-- 	width  = '100%',
+	-- 	x      = 0,
+	-- 	y      = '50%',
+	-- 	-- valign = "center",
+	-- 	align  = "center",
+	-- 	valigh = "bottom",
+	-- 	caption = "^",
+	-- 	autosize = false,
+	-- 	font   = {size = 18, outline = true, color = {.9,.9,.9,1}},
+	-- 	tooltip = proportionTooltip,
+	-- }
 
 	metal_proportion_warn_label = Chili.Label:New{
 		parent = window_metal_proportion,
@@ -1190,6 +1193,17 @@ function CreateWindow()
 		tooltip = proportionTooltip,
 	}
 
+	image_proportion_center = Chili.Image:New{
+		parent = window_metal_proportion,
+		height = propBarHeightBuffered,
+		right  = "48%",
+		x      = "48%",
+		y      = proBarSpacingBuffered,
+		align	 = "center",
+		keepAspect = false,
+		file	 = "LuaUI/Widgets/chili/Skins/DarkHive/trackbar_thumb.png",
+	}
+
 	bar_proportion = Chili.Multiprogressbar:New{
 		parent = window_metal_proportion,
 		height = propBarHeight,
@@ -1201,8 +1215,8 @@ function CreateWindow()
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 		bars = {  
 			{
-				color1 = {col_metal[1], col_metal[2], col_metal[3], 0.5},
-				color2 = {col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.5},
+				color1 = {col_metal[1], col_metal[2], col_metal[3], 0.3},
+				color2 = {col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.4},
 				percent = 0.5,
 				texture = nil, -- texture file name
 				s = 1, -- tex coords
@@ -1219,8 +1233,8 @@ function CreateWindow()
 				tileSize = nil, --  if set then main axis texture coord = width / tileSize
 			}, 
 			{
-				color1 = {col_energy[1], col_energy[2], col_energy[3], 0.5},
-				color2 = {col_energy[1]*multiColorMult, col_energy[2]*multiColorMult, col_energy[3]*multiColorMult, 0.5},
+				color1 = {col_energy[1], col_energy[2], col_energy[3], 0.3},
+				color2 = {col_energy[1]*multiColorMult, col_energy[2]*multiColorMult, col_energy[3]*multiColorMult, 0.4},
 				percent = 0.5,
 				texture = nil, -- texture file name
 				s = 1, -- tex coords
@@ -1244,7 +1258,7 @@ function CreateWindow()
 	function lbl_e_expense:HitTest(x,y) return self end
 	function lbl_m_expense:HitTest(x,y) return self end
 	function bar_proportion:HitTest(x,y) return self end
-	function metal_proportion_label:HitTest(x,y) return self end
+	-- function metal_proportion_label:HitTest(x,y) return self end
 	
 end
 
