@@ -130,7 +130,6 @@ local gAlpha = 0.8
 
 local offscreentex
 local outlinemasktex
-local depthtex
 local blurtex
 local fbo
 
@@ -345,9 +344,8 @@ function widget:DrawWorldPreUnit()
     glUniformInt(uniformScreenY,  vsy )
   end
 
-  glDepthTest(GL.GEQUAL)
-  glActiveFBO(fbo,MyDrawVisibleUnits)
   glDepthTest(false)
+  glActiveFBO(fbo,MyDrawVisibleUnits)
 
   glTexture(offscreentex)
   glRenderToTexture(outlinemasktex, maskGen)
@@ -549,17 +547,9 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 
   fbo.color0 = nil
 
-  gl.DeleteTexture(depthtex or 0)
   gl.DeleteTextureFBO(offscreentex or 0)
   gl.DeleteTextureFBO(blurtex or 0)
   gl.DeleteTextureFBO(outlinemasktex or 0)
-
-  depthtex = gl.CreateTexture(vsx,vsy, {
-    border = false,
-    format = GL_DEPTH_COMPONENT24,
-    min_filter = GL.NEAREST,
-    mag_filter = GL.NEAREST,
-  })
 
   offscreentex = gl.CreateTexture(vsx,vsy, {
     border = false,
@@ -588,7 +578,6 @@ function widget:ViewResize(viewSizeX, viewSizeY)
     fbo = true,
   })
 
-  fbo.depth  = depthtex
   fbo.color0 = offscreentex
   fbo.drawbuffers = GL_COLOR_ATTACHMENT0_EXT
 
@@ -597,7 +586,6 @@ end
 
 
 function widget:Shutdown()
-  gl.DeleteTexture(depthtex)
   if (gl.DeleteTextureFBO) then
     gl.DeleteTextureFBO(offscreentex)
     gl.DeleteTextureFBO(blurtex)
