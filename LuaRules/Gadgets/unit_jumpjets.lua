@@ -68,7 +68,6 @@ local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
-local spCallCOBScript      = Spring.CallCOBScript
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
 local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitDefID       = Spring.GetUnitDefID
@@ -97,18 +96,15 @@ local goalSet = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local jumpDefNames = VFS.Include"LuaRules/Configs/jump_defs.lua"
+
+local jumpDefs = VFS.Include ("LuaRules/Configs/jump_defs.lua")
 
 local JumpSpreadException = {}
-local jumpDefs = {}
-for name, data in pairs(jumpDefNames) do
-	jumpDefs[UnitDefNames[name].id] = data
-	if data.JumpSpreadException then
-		JumpSpreadException[UnitDefNames[name].id] = true
+for id, data in pairs (jumpDefs) do
+	if (data.JumpSpreadException) then
+		JumpSpreadException[id] = true
 	end
 end
-
-GG.jumpDefs = jumpDefs
 
 local jumpCmdDesc = {
 	id			= CMD_JUMP,
@@ -189,13 +185,10 @@ local function CopyJumpData(unitID,lineDist,flightDist )
 		lastJump[unitID] = nil
 		return --exit JumpLoop() if unit can't jump
 	end
-	local cob = jumpDefs[unitDefID].cobscript --script type 
 	local speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
 	local reloadTime = (jumpDefs[unitDefID].reload or 0)*30 --jump reload time
 	local env
-	if not cob then
-		env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
-	end
+	env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
 	local step = speed/lineDist --resolution of JumpLoop() update
 	mcEnable(unitID) --enable MoveCtrl for new unit
 	SetLeaveTracks(unitID, false) --set no track
@@ -205,7 +198,7 @@ local function CopyJumpData(unitID,lineDist,flightDist )
 	local delay = jumpDefs[unitDefID].delay --prejump delay
 	local height = jumpDefs[unitDefID].height --max height
 	
-	return unitID,reloadTime,env,cob,speed,step,rotateMidAir,delay,height
+	return unitID,reloadTime,env,speed,step,rotateMidAir,delay,height
 end
 
 local function Jump(unitID, goal, cmdTag, origCmdParams)
@@ -227,7 +220,6 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	end
 	
 	local rotateMidAir	= jumpDef.rotateMidAir
-	local cob 	 		= jumpDef.cobscript
 	local env
 
 	local vector = {goal[1] - start[1],
@@ -274,26 +266,16 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	Spring.SetUnitVelocity(unitID,0,0,0)
 	SetLeaveTracks(unitID, false)
 
-	if not cob then
-		env = Spring.UnitScript.GetScriptEnv(unitID)
-	end
+	env = Spring.UnitScript.GetScriptEnv(unitID)
 	
 	if (delay == 0) then
-		if cob then
-				spCallCOBScript( unitID, "BeginJump", 0)
-			else
-				Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
-			end
+		Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
 		if rotateMidAir then
 			mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
 			mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
 		end
 	else
-		if cob then
-			spCallCOBScript( unitID, "PreJump", 0)
-		else
-			Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist,duration)
-		end
+		Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist,duration)
 	end
 	spSetUnitRulesParam(unitID,"jumpReload",0)
 
@@ -303,7 +285,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			for i=delay, 1, -1 do
 				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 				if GG.wasMorphedTo[unitID] then
-					unitID,reloadTime,env,cob,speed,step,rotateMidAir,delay,height = CopyJumpData(unitID,lineDist,flightDist )
+					unitID,reloadTime,env,speed,step,rotateMidAir,delay,height = CopyJumpData(unitID,lineDist,flightDist )
 					if unitID == nil then 
 						return
 					end
@@ -311,11 +293,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				Sleep()
 			end
 		
-			if cob then
-				spCallCOBScript( unitID, "BeginJump", 0)
-			else
-				Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
-			end
+			Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
 
 			if rotateMidAir then
 				mcSetRotation(unitID, 0, (startHeading - 2^15)/rotUnit, 0) -- keep current heading
@@ -336,7 +314,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		while i <= 1 do
 			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
 			if GG.wasMorphedTo[unitID] then
-				unitID,reloadTime,env,cob,speed,step = CopyJumpData(unitID,lineDist,flightDist )
+				unitID,reloadTime,env,speed,step = CopyJumpData(unitID,lineDist,flightDist )
 				if unitID == nil then 
 					return
 				end
@@ -363,21 +341,13 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
 			end
 
-			if cob then
-				spCallCOBScript(unitID, "Jumping", 1, i * 100)
-			else
-				Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i * 100)
-			end
+			Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i * 100)
 		
 			if (fakeUnitID) then 
 				mcSetPosition(fakeUnitID, x, y, z) 
 			end
 			if (not halfJump and i > 0.5) then
-				if cob then
-					spCallCOBScript( unitID, "HalfJump", 0)
-				else
-					Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
-				end
+				Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
 				halfJump = true
 			end
 			Sleep()
@@ -392,11 +362,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			spDestroyUnit(fakeUnitID, false, true) 
 		end
 		
-		if cob then
-			spCallCOBScript( unitID, "EndJump", 0)
-		else
-			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
-		end
+		Spring.UnitScript.CallAsUnit(unitID,env.endJump)
 		local jumpEndTime = spGetGameSeconds()
 		lastJump[unitID] = jumpEndTime
 		lastJumpPosition[unitID] = origCmdParams
@@ -514,11 +480,13 @@ function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
-	boolDef = {}
-	for udid,_ in pairs(jumpDefs) do
-		boolDef[udid] = true
-	end
+
+local boolDef = {}
+for udid,_ in pairs(jumpDefs) do
+	boolDef[udid] = true
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return boolDef
 end
 

@@ -24,7 +24,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    canjump        = [[1]],
+    canjump          = 1,
+    jump_range       = 400,
+    jump_height      = 120,
+    jump_speed       = 5.2,
+    jump_reload      = 10,
+    jump_from_midair = 0,
+
     description_bp = [[Bomba rastejante avançada e camuflável]],
     description_fr = [[Bombe Rampante Avancée Camouflable]],
 	description_de = [[Fortgeschrittene, verschleierbare Crawling Bombe]],
