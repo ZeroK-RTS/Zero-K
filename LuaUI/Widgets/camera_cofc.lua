@@ -1197,7 +1197,10 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 
 	-- Ensure that both points are on the same plane by testing them from camera. This way the y value will always be positive, making div/0 checks possible
 	local dgx, dgz, dtestx, dtestz = gx - cs.px, gz - cs.pz, testgx - cs.px, testgz - cs.pz
-	dyCorrection = (cs.py - gy)/math.max(cs.py - testgy, 0.001)
+	local dyCorrection = 1
+	if cs.py > 0 then
+		dyCorrection = (cs.py - gy)/math.max(cs.py - testgy, 0.001)
+	end
 	dtestx, dtestz = dtestx * dyCorrection, dtestz * dyCorrection 
 	local dx, dz = (dgx - dtestx), (dgz - dtestz)
 	if zoomin or cs.py < topDownBufferZone then
@@ -1305,9 +1308,9 @@ local function Zoom(zoomin, shift, forceCenter)
 
 		if new_py == new_py then
 			local boundedPy = math.min(math.max(new_py, groundMinimum), maxDistY - 10)
-			cs.px = new_px * (boundedPy/math.max(new_py, 0.0001))
+			cs.px = new_px-- * (boundedPy/math.max(new_py, 0.0001))
 			cs.py = boundedPy
-			cs.pz = new_pz * (boundedPy/math.max(new_py, 0.0001))
+			cs.pz = new_pz-- * (boundedPy/math.max(new_py, 0.0001))
 
 			--//SUPCOM camera zoom by Shadowfury333(Dominic Renaud):
 			if options.tiltedzoom.value then
