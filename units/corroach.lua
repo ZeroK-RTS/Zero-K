@@ -35,6 +35,7 @@ unitDef = {
 	helptext_de    = [[Diese flinke Kamikazeeinheit ist effektiv gegen größere Einheiten, besonderns Sturmpanzer. Sie besitzt eine Tarnvorrichting welche automatisch aktiviert wird sobald diese Einheit still steht. Bewahre Abstand zwischen diesen Einheiten, da sie in einer Kettenreaktion explodieren. Der Defender oder Raketenlaster sind effektiv gegen sie. Außerdem auch billige einzelne Einheiten, um eine frühzeitige Explosion zu erwirken.]],
 	helptext_pl    = [[Ta szybka jednostka samobojcza swietnie niszczy jednostki w grupach, przede wszystim jednostki szturmowe. Gdy nie porusza sie, wlacza maskowanie, dzieki czemu dziala jak mina. Mozna ja skutecznie zniszczyc celnymi jednostkami lub poswiecic lekka jednostke, aby przedwczesnie sie zdetonowala.]],
 	modelradius    = [[7]],
+	idle_cloak = 1,
   },
 
   explodeAs              = [[CORROACH_DEATH]],
