@@ -96,15 +96,7 @@ local goalSet = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
 local jumpDefs = VFS.Include ("LuaRules/Configs/jump_defs.lua")
-
-local JumpSpreadException = {}
-for id, data in pairs (jumpDefs) do
-	if (data.JumpSpreadException) then
-		JumpSpreadException[id] = true
-	end
-end
 
 local jumpCmdDesc = {
 	id			= CMD_JUMP,
@@ -115,7 +107,6 @@ local jumpCmdDesc = {
 	tooltip = 'Jump to selected position.',
 }
 
-	
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -124,17 +115,14 @@ local function GetDist3(a, b)
 	return (x*x + y*y + z*z)^0.5
 end
 
-
 local function GetDist2Sqr(a, b)
 	local x, z = (a[1] - b[1]), (a[3] - b[3])
 	return (x*x + z*z)
 end
 
-
 local function Approach(unitID, cmdParams, range)
 	spSetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], range)
 end
-
 
 local function StartScript(fn)
 	local co = coroutine.create(fn)
@@ -560,7 +548,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				end
 				jumps[coords] = {1, currFrame}
 				return true, false -- command was used but don't remove it (unit have not finish jump yet)
-			elseif JumpSpreadException[unitDefID] then
+			elseif jumpDefs[unitDefID].JumpSpreadException then
 				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
