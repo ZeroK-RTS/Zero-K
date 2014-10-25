@@ -1144,8 +1144,8 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 	-- Ensure angle correction only happens by parts if the angle doesn't match the target, unless it is within a threshold
 	-- If it isn't, make sure the correction only happens in the direction of the curve. 
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
-
-	local groundHeight = ExtendedGetGroundHeight(gx, gz) + groundBufferZone
+	local groundMin, groundMax = Spring.GetGroundExtremes()
+	local groundHeight = groundMin--ExtendedGetGroundHeight(gx, gz) + groundBufferZone
 	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
 	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
 
@@ -1782,8 +1782,12 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	
 	local csnew = UpdateCam(cs)
 	if csnew then
-        spSetCameraState(csnew, smoothlevel)
+		csnew.rx = GetZoomTiltAngle(ls_x, ls_z, csnew)
+		csnew = UpdateCam(csnew)
+		if csnew then
+      spSetCameraState(csnew, smoothlevel)
     end
+  end
 	
 end
 
