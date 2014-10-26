@@ -116,14 +116,14 @@ options = {
 	drawicons = {
 		name = 'Show Income as Icon',
 		type = 'bool',
-		value = true,
+		value = false,
 		tooltip = "When enabled income is shown pictorially. When disabled income is shown as a number.",
 		OnChange = function() updateMexDrawList() end
 	},
 	size = {
 		name = "Income Display Size", 
 		type = "number", 
-		value = 30, 
+		value = 40, 
 		min = 10,
 		max = 150,
 		step = 5,
@@ -601,7 +601,7 @@ function calcMainMexDrawList()
 				glRotate(-90,1,0,0)		
 				glTranslate(x,-z-20-options.size.value, y+2)
 				glColor(1,1,1)
-				glText( ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+				glText("+" .. ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 			end	
 			
 			--glColor(0,1,1)
