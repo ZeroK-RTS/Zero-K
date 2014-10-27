@@ -662,18 +662,20 @@ local maxDistY = max(MHEIGHT, MWIDTH) * 2
 local mapEdgeBuffer = 1000
 
 --Tilt Zoom constants
+local groundMin, groundMax = Spring.GetGroundExtremes()
 local topDownBufferZonePercent = 0.20
 local groundBufferZone = 20
 local topDownBufferZone = maxDistY * topDownBufferZonePercent
 local minZoomTiltAngle = 35
 local angleCorrectionMaximum = 5 * RADperDEGREE
+local targetCenteringHeight = 1200
 
 SetFOV = function(fov)
 	local cs = spGetCameraState()
 	-- Spring.Echo(fov .. " degree")
 	
 	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
-	_,mapEdgeBuffer = Spring.GetGroundExtremes()
+	mapEdgeBuffer = groundMax
 	local mapFittingDistance = MHEIGHT/2
 	if vsy/vsx > MHEIGHT/MWIDTH then mapFittingDistance = (MWIDTH * vsy/vsx)/2 end
 	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingDistance/2) -- map edge buffer should be 1/6th of the length of the dimension fitted to screen
@@ -1140,15 +1142,13 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 		         |                         x
 		     -90 v -cam angle                       x
 		--]]
+	local groundHeight = groundMin --ExtendedGetGroundHeight(gx, gz) + groundBufferZone
+	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
+	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
 
 	-- Ensure angle correction only happens by parts if the angle doesn't match the target, unless it is within a threshold
 	-- If it isn't, make sure the correction only happens in the direction of the curve. 
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
-	local groundMin, groundMax = Spring.GetGroundExtremes()
-	local groundHeight = groundMin--ExtendedGetGroundHeight(gx, gz) + groundBufferZone
-	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
-	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
-
 	if zoomin ~= nil and rayDist then
 		if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
 		elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
@@ -1192,8 +1192,13 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- end
 
 	-- Correct so that mouse cursor is hovering over the same point. 
-	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.35) * 0.18 -- Slight intentional overcorrection, helps the rotating camera keep the target in view
-	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * 0.18 * (vsx/vsy)
+
+	-- Slight intentional overcorrection, helps the rotating camera keep the target in view
+	-- Get proportion needed so that target location is centered in the view around when cs.py is targetCenteringHeight elmos above target, when zoomed from overview
+	local centerwardDriftBase = (maxDistY - groundMin)/((maxDistY - groundMin) - (gy + targetCenteringHeight)) - 1
+	Spring.Echo(centerwardDriftBase)
+	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.3) * centerwardDriftBase --Shift vertical overcorrection down, to compensate for camera tilt
+	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * centerwardDriftBase * (vsx/vsy) --Adjust horizontal overcorrection for aspect ratio
 
 	-- Ensure that both points are on the same plane by testing them from camera. This way the y value will always be positive, making div/0 checks possible
 	local dgx, dgz, dtestx, dtestz = gx - cs.px, gz - cs.pz, testgx - cs.px, testgz - cs.pz
