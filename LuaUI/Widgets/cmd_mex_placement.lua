@@ -598,9 +598,15 @@ function calcMainMexDrawList()
 				glTexRect(x-width/2, z+20, x+width/2, z+20+size,0,0,metal,1)
 				glTexture(false)
 			else
-				glRotate(-90,1,0,0)		
-				glTranslate(x,-z-20-options.size.value, y+2)
+				glRotate(90,1,0,0)	
+				glTranslate(0,0,-y)
 				glColor(1,1,1)
+				glTexture("LuaUI/Images/ibeam.png")
+				glTexRect(x-25, z-25, x+25, z+25,0,0,1,1)
+				glTexture(false)
+				
+				glRotate(180,1,0,0)		
+				glTranslate(x,-z-20-options.size.value, 0)
 				glText("+" .. ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 			end	
 			
