@@ -1196,7 +1196,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- Slight intentional overcorrection, helps the rotating camera keep the target in view
 	-- Get proportion needed so that target location is centered in the view around when cs.py is targetCenteringHeight elmos above target, when zoomed from overview
 	local centerwardDriftBase = (maxDistY - groundMin)/((maxDistY - groundMin) - (gy + targetCenteringHeight)) - 1
-	Spring.Echo(centerwardDriftBase)
+	-- Spring.Echo(centerwardDriftBase)
 	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.3) * centerwardDriftBase --Shift vertical overcorrection down, to compensate for camera tilt
 	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * centerwardDriftBase * (vsx/vsy) --Adjust horizontal overcorrection for aspect ratio
 
@@ -2102,7 +2102,7 @@ function widget:Update(dt)
 end
 
 function widget:GamePreload()
-	if not initialBoundsSet then
+	if not initialBoundsSet then --Tilt zoom initial overhead view (Engine 91)
 		initialBoundsSet = true
 		if options.tiltedzoom.value then ResetCam() end
 	end
@@ -2371,8 +2371,17 @@ local function DrawPoint(x, y, c, s)
   glBeginEnd(GL_POINTS, glVertex, x, y)
 end
 
+local screenFrame = 0
 function widget:DrawScreen()
-    hideCursor = false
+
+	--Reset Camera for tiltzoom at game start (Engine 92+)
+	if screenFrame == 3 then --detect frame no.2
+		if options.tiltedzoom.value then ResetCam() end
+		initialBoundsSet = true
+	end
+	screenFrame = screenFrame+1
+
+  hideCursor = false
 	if not cx then return end
     
 	local x, y
