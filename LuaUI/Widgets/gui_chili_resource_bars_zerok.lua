@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -135,7 +135,7 @@ options_order = {
 	'eExcessFlash', 'energyFlash', 'workerUsage','opacity', 'barWidth',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
 	'colourBlind','linearProportionBar',
-	'incomeFont','expenseFont','storageFont', 'netFont'}
+	'incomeFont','expenseFont','storageFont', 'netFont', 'warnFont'}
  
 options = { 
 	eExcessFlash = {
@@ -216,6 +216,12 @@ options = {
 		name  = "Net Font Size",
 		type  = "number",
 		value = 14, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
+	warnFont = {
+		name  = "Warning Font Size",
+		type  = "number",
+		value = 15, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 	barWidth = {
@@ -803,7 +809,7 @@ function CreateWindow()
 		x = screenHorizCentre - economyPanelWidth/2,
 		y = 0,
 		clientWidth  = economyPanelWidth,
-		clientHeight = 85,
+		clientHeight = 70,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -1189,7 +1195,7 @@ function CreateWindow()
 		valigh = "bottom",
 		caption = "",
 		autosize = false,
-		font   = {size = 13, outline = true, color = {.9,.9,.9,1}},
+		font   = {size = options.warnFont.value, outline = true, color = {.9,.9,.9,1}},
 		tooltip = proportionTooltip,
 	}
 

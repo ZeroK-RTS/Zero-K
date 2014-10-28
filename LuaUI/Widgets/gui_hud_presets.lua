@@ -49,14 +49,14 @@ local function SetupDefaultPreset()
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
-	widgetHandler:DisableWidget("Chili Economy Panel")
+	widgetHandler:DisableWidget("Chili Resource Bars")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
 	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console test")
-	widgetHandler:EnableWidget("Chili Resource Bars")
+	widgetHandler:EnableWidget("Chili Economy Panel")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	
@@ -145,10 +145,10 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Resource Bar
-	local resourceBarWidth = 430
-	local resourceBarHeight = 50
+	local resourceBarWidth = 390
+	local resourceBarHeight = 70
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("ResourceBars",
+	WG.SetWindowPosAndSize("EconomyPanel",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -179,14 +179,14 @@ local function SetupCraftyPreset()
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
-	widgetHandler:DisableWidget("Chili Economy Panel")
+	widgetHandler:DisableWidget("Chili Resource Bars")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
 	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console test")
-	widgetHandler:EnableWidget("Chili Resource Bars")
+	widgetHandler:EnableWidget("Chili Economy Panel")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	
@@ -269,10 +269,10 @@ local function SetupCraftyPreset()
 	)
 	
 	-- Resource Bar
-	local resourceBarWidth = 430
-	local resourceBarHeight = 50
+	local resourceBarWidth = 390
+	local resourceBarHeight = 70
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("ResourceBars",
+	WG.SetWindowPosAndSize("EconomyPanel",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -304,14 +304,14 @@ local function SetupEnsemblePreset()
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
-	widgetHandler:DisableWidget("Chili Economy Panel")
+	widgetHandler:DisableWidget("Chili Resource Bars")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
 	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console test")
-	widgetHandler:EnableWidget("Chili Resource Bars")
+	widgetHandler:EnableWidget("Chili Economy Panel")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	
@@ -395,10 +395,10 @@ local function SetupEnsemblePreset()
 	)
 	
 	-- Resource Bar
-	local resourceBarWidth = 430
-	local resourceBarHeight = 50
+	local resourceBarWidth = 390
+	local resourceBarHeight = 70
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("ResourceBars",
+	WG.SetWindowPosAndSize("EconomyPanel",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -429,14 +429,14 @@ local function SetupWestwoodPreset()
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
-	widgetHandler:DisableWidget("Chili Economy Panel")
+	widgetHandler:DisableWidget("Chili Resource Bars")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
 	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console test")
-	widgetHandler:EnableWidget("Chili Resource Bars")
+	widgetHandler:EnableWidget("Chili Economy Panel")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	
@@ -445,9 +445,9 @@ local function SetupWestwoodPreset()
 	
 	-- Resource Bar
 	local resourceBarWidth = screenWidth*5/22 + 20
-	local resourceBarHeight = 50
+	local resourceBarHeight = 65
 	local resourceBarX = screenWidth - resourceBarWidth
-	WG.SetWindowPosAndSize("ResourceBars",
+	WG.SetWindowPosAndSize("EconomyPanel",
 		resourceBarX,
 		0,
 		resourceBarWidth,
