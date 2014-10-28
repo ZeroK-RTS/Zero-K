@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -135,7 +135,7 @@ options_order = {
 	'eExcessFlash', 'energyFlash', 'workerUsage','opacity', 'barWidth',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
 	'colourBlind','linearProportionBar',
-	'incomeFont','expenseFont','storageFont', 'netFont'}
+	'incomeFont','expenseFont','storageFont', 'netFont', 'warnFont'}
  
 options = { 
 	eExcessFlash = {
@@ -197,13 +197,13 @@ options = {
 	incomeFont = {
 		name  = "Income Font Size",
 		type  = "number",
-		value = 19, min = 8, max = 40, step = 1,
+		value = 21, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 	expenseFont = {
 		name  = "Expense Font Size",
 		type  = "number",
-		value = 17, min = 8, max = 40, step = 1,
+		value = 19, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 	storageFont = {
@@ -215,13 +215,19 @@ options = {
 	netFont = {
 		name  = "Net Font Size",
 		type  = "number",
-		value = 13, min = 8, max = 40, step = 1,
+		value = 14, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
+	warnFont = {
+		name  = "Warning Font Size",
+		type  = "number",
+		value = 15, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 	barWidth = {
 		name  = "Storage Bar Width (%)",
 		type  = "number",
-		value = 7.5, min = 4, max = 12, step = 0.5,
+		value = 8.0, min = 4, max = 12, step = 0.5,
 		OnChange = option_recreateWindow
 	},
 }
@@ -790,7 +796,7 @@ function CreateWindow()
 	
 	local screenHorizCentre = screenWidth / 2
 
-	local economyPanelWidth = 355
+	local economyPanelWidth = 390
 
 	--// WINDOW
 	window = Chili.Window:New{
@@ -803,7 +809,7 @@ function CreateWindow()
 		x = screenHorizCentre - economyPanelWidth/2,
 		y = 0,
 		clientWidth  = economyPanelWidth,
-		clientHeight = 75,
+		clientHeight = 70,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -1114,7 +1120,7 @@ function CreateWindow()
 		y      = 5,
 		bottom = 5,
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
-		font   = {size = options.storageFont.value, color = {.8,.8,.9,.95}, outlineColor = {0.05,0,0.15,0.95}, },
+		font   = {size = options.storageFont.value, color = {.9,.9,.95,.95}, outlineColor = {0.05,0.03,0.08,0.95}, outlineWidth = 3, outlineWeight = 3 },
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
@@ -1189,7 +1195,7 @@ function CreateWindow()
 		valigh = "bottom",
 		caption = "",
 		autosize = false,
-		font   = {size = 13, outline = true, color = {.9,.9,.9,1}},
+		font   = {size = options.warnFont.value, outline = true, color = {.9,.9,.9,1}},
 		tooltip = proportionTooltip,
 	}
 

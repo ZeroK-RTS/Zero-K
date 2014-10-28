@@ -180,6 +180,7 @@ function tele_createBeacon(unitID,x,z)
 		local beaconID = Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
 		if beaconID then
 			Spring.SetUnitPosition(beaconID, x, y, z)
+			Spring.SetUnitNeutral(beaconID,true)
 			tele[unitID].link = beaconID
 			beacon[beaconID] = {link = unitID, x = x, z = z}
 			Spring.SetUnitRulesParam(beaconID, "connectto", unitID)
