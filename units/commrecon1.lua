@@ -31,13 +31,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    canjump            = 1,
-    jump_range         = 400,
-    jump_speed         = 6,
-    jump_reload        = 20,
-    jump_from_midair   = 1,
-
+    canjump   = [[1]],
 	cloakstealth = [[1]],
+	jumpclass = [[commrecon1]],
 	description_de = [[Hochmobiler Kommandant, Baut mit 10 M/s]],
 	description_pl = [[Mobilny Dowodca, moc 10 m/s]],
 	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules and comes pre-equipped with jumpjets.]],

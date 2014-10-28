@@ -18,12 +18,7 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
-    canjump            = 1,
-    jump_range         = 400,
-    jump_speed         = 6,
-    jump_reload        = 10,
-    jump_from_midair   = 1,
-
+    canjump        = [[1]],
     description_es = [[Invasor Caminante Jumpjet]],
     description_fr = [[Marcheur Pilleur r Jetpack]],
     description_it = [[Invasore Camminatore Jumpjet]],
