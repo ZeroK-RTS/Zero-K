@@ -20,13 +20,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    canjump            = 1,
-    jump_range         = 400,
-    jump_speed         = 6,
-    jump_reload        = 10,
-    jump_from_midair   = 0,
-    jump_spread_exception = 1,
-
+    canjump        = [[1]],
     description_es = [[Caja de tierra]],
     description_fr = [[]],
     description_it = [[Scatola di terra]],

@@ -763,22 +763,6 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
--- Set defaults for jump
-local jump_defaults = VFS.Include("gamedata/unitdef_defaults.lua")
-for name, ud in pairs (UnitDefs) do
-	local cp = ud.customparams
-	if cp.canjump == "1" then
-		if not cp.jump_range then cp.jump_range = tostring(jump_defaults.range) end
-		if not cp.jump_height then cp.jump_height = tostring(jump_defaults.height) end
-		if not cp.jump_speed then cp.jump_speed = tostring(jump_defaults.speed) end
-		if not cp.jump_reload then cp.jump_reload = tostring(jump_defaults.reload) end
-		if not cp.jump_delay then cp.jump_delay = tostring(jump_defaults.delay) end
-
-		if not cp.jump_from_midair then cp.jump_from_midair = tostring(jump_defaults.from_midair) end
-		if not cp.jump_rotate_midair then cp.jump_rotate_midair = tostring(jump_defaults.rotate_midair) end
-		if not cp.jump_spread_exception then cp.jump_spread_exception = tostring(jump_defaults.spread_exception) end
-	end
-end
 
 -- Disable porc/air/specific units modoptions (see lockunits_modoption.lua)
 

@@ -29,7 +29,8 @@ local gridSize = math.floor(350/2)
 local leapersCommand
 local noRecursion = false
 
-gridSize = tonumber(UnitDefNames["chicken_leaper"].customParams.jump_range)
+local jumpNames = VFS.Include("LuaRules/Configs/jump_defs.lua")
+gridSize = jumpNames["chicken_leaper"].range
 
 function Dist(x,y,z, x2, y2, z2) 
 	local xd = x2-x

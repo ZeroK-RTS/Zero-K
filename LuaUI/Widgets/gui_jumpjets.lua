@@ -61,12 +61,20 @@ local orange   = {	1, 0.5,   0,   1}
 local pink     = {  1, 0.5, 0.5,   1}
 local red      = {  1,   0,   0,   1}
 
+local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
+
 local function ListToSet(t)
   local new = {}
   for i=1,#t do
     new[ t[i] ] = true
   end 
   return new
+end
+
+
+local jumpDefs = {}
+for name, data in pairs(jumpDefNames) do
+  jumpDefs[UnitDefNames[name].id] = data
 end
 
 local ignore = {
@@ -122,7 +130,7 @@ local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimat
   local vector       = {}
   
   local unitDefID    = spGetUnitDefID(unitID)
-  local height       = tonumber(UnitDefs[unitDefID].customParams.jump_height)
+  local height       = jumpDefs[unitDefID].height
   
   for i=1, 3 do
     vector[i]        = finish[i] - start[i]
@@ -144,7 +152,7 @@ local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimat
     local lineDist   = GetDist3(start, finish)
     local flightDist = GetDist2(start, vertex) + GetDist3(vertex, finish)
     
-    local speed      = tonumber(UnitDefs[unitDefID].customParams.jump_speed) * lineDist/flightDist
+    local speed      = jumpDefs[unitDefID].speed * lineDist/flightDist
     step             = speed/lineDist
     
     local frame      = spGetGameFrame()
@@ -180,7 +188,7 @@ end
 --[[
 local function DrawQueue(unitID)
   local queue = spGetCommandQueue(unitID)
-  if (not queue or not UnitDefs[spGetUnitDefID(unitID)].customParams.canjump == "1") then
+  if (not queue or not jumpDefs[spGetUnitDefID(unitID)]) then
     return
   end
   for i=1, #queue do
@@ -206,7 +214,7 @@ end
 
 local function  DrawMouseArc(unitID, shift, groundPos, quality)
 	local unitDefID = spGetUnitDefID(unitID)
-	if (not groundPos or not UnitDefs[unitDefID].customParams.canjump == "1") then
+	if (not groundPos or not jumpDefs[unitDefID]) then
 		return
 	end
 
@@ -219,7 +227,7 @@ local function  DrawMouseArc(unitID, shift, groundPos, quality)
 		passIf = (not queueCount or queueCount == 0 or not shift)
 	end
 
-	local range = tonumber(UnitDefs[unitDefID].customParams.jump_range)
+	local range = jumpDefs[unitDefID].range
 	if passIf then
 		local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
 		local unitPos = {ux,uy,uz}
@@ -268,7 +276,7 @@ end
 
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
-  if UnitDefs[unitDefID].customParams.canjump == "1" then
+  if jumpDefs[unitDefID] then
     local cmd = spGetCommandQueue(unitID, 2)[2] 
     if (cmd and cmd.id == CMD_JUMP) then
         local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
