@@ -41,16 +41,14 @@ local jumpersToWatch = {}
 local jumpersToJump_Count = 0
 local jumpersUnitID = {}
 
-local jumperDefs = {}
-local excludedJumper = { corsumo = true,} --because unit like sumo can jump into ally blob and kill them all
-local jumpNames = VFS.Include("LuaRules/Configs/jump_defs.lua") --list of unit able to jump
-for name, data in pairs(jumpNames) do --convert UnitName list into unitDefID list (copied from unit_bomber_command.lua by KingRaptor)
-	if not excludedJumper[name] then
-		local unitDef = UnitDefNames[name]
-		if unitDef then 
-			jumperDefs[unitDef.id] = data
-		end
-	end
+local jumperDefs = VFS.Include("LuaRules/Configs/jump_defs.lua")
+
+local exclusions = {
+	UnitDefNames["corsumo"].id, -- has AoE damage on jump, could harm allies
+}
+
+for i = 1, #exclusions do
+	jumperDefs[exclusions[i]] = nil
 end
 
 function widget:Initialize()
