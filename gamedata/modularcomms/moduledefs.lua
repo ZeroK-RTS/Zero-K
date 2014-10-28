@@ -452,9 +452,14 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 HP/s when out of combat",
+		description = "Self-repairs 20 HP/s when out of combat for 10 seconds",
 		func = function(unitDef)
-				unitDef.idleautoheal = (unitDef.idleautoheal or 5) + 20
+				-- First module replaces the base 5 hp/s because that occurs after a minute
+				if (not unitDef.idleautoheal) or unitDef.idleautoheal == 5 then
+					unitDef.idleautoheal = 0
+				end
+				unitDef.idleautoheal = unitDef.idleautoheal + 20
+				unitDef.idleTime = 300
 			end,
 	},
 	module_companion_drone = {
