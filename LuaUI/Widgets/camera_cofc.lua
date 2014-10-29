@@ -1377,11 +1377,12 @@ local function Zoom(zoomin, shift, forceCenter)
 		end
 		ls_dist = ls_dist_new
 
-		if options.tiltedzoom.value then
-			cs = ZoomTiltCorrection(cs, zoomin, nil)
-		end
-
 		local cstemp = UpdateCam(cs)
+
+		if options.tiltedzoom.value then
+			cstemp = ZoomTiltCorrection(cstemp, zoomin, nil)
+			cstemp = UpdateCam(cstemp)
+		end
 		
 		if cstemp then cs = cstemp; end
 	end
