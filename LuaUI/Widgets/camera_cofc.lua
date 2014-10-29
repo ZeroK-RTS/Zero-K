@@ -1248,6 +1248,8 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 		local cstemp = UpdateCam(cs)
 		if cstemp then cs = cstemp end
 
+		if not options.freemode.value then cs.py = min(cs.py, maxDistY) end --Ensure camera never goes higher than maxY
+
 		SetCenterBounds(cs) 
 
 		spSetCameraState(cs, smoothness) --move
@@ -1369,11 +1371,10 @@ local function Zoom(zoomin, shift, forceCenter)
 		local ls_dist_new = ls_dist + math.max(math.min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
 		ls_dist_new = max(ls_dist_new, 20)
 		
-		if not options.freemode.value and ls_dist_new > maxDistY then --limit camera distance to maximum distance
+		if not options.freemode.value and ls_dist_new > maxDistY - gy then --limit camera distance to maximum distance
 			-- return
-			ls_dist_new = maxDistY
+			ls_dist_new = maxDistY - gy
 		end
-		
 		ls_dist = ls_dist_new
 
 		if options.tiltedzoom.value then
@@ -1381,6 +1382,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		end
 
 		local cstemp = UpdateCam(cs)
+		
 		if cstemp then cs = cstemp; end
 	end
 
@@ -1786,12 +1788,14 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	end
 	
 	local csnew = UpdateCam(cs)
-	if csnew then
-		csnew.rx = GetZoomTiltAngle(ls_x, ls_z, csnew)
+	if csnew and options.tiltedzoom.value then
+	  csnew.rx = GetZoomTiltAngle(ls_x, ls_z, csnew)
 		csnew = UpdateCam(csnew)
-		if csnew then
-      spSetCameraState(csnew, smoothlevel)
-    end
+	end
+	if csnew then
+		if not options.freemode.value then csnew.py = min(csnew.py, maxDistY) end --Ensure camera never goes higher than maxY
+		-- SetCenterBounds(csnew) --Should be done since cs.py changes, but stops camera movement southwards. TODO: Investigate this.
+    spSetCameraState(csnew, smoothlevel)
   end
 	
 end
