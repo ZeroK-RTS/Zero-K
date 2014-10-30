@@ -56,7 +56,7 @@ local function IsFFA()
 	local numAllyTeams = 0
 	for i=1,#allyteams do
 		if allyteams[i] ~= gaiaAT then
-			local teams = Spring.GetTeamList()
+			local teams = Spring.GetTeamList(allyteams[i])
 			if #teams > 0  then
 				numAllyTeams = numAllyTeams + 1
 			end
