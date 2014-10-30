@@ -666,8 +666,22 @@ function widget:DrawScreen()
 		lw = 0
 		return 
 	end
+
+	-- if WG.COFC_SkyBufferProportion ~= nil then
+	-- 	local vsx,vsy = gl.GetViewSizes()
+	-- 	local prop = WG.COFC_SkyBufferProportion
+	-- 	local smallsize = vsy < vsx and vsy / 8 or vsx / 8
+
+	-- 	window:Resize( 
+	-- 		window.x,
+	-- 		window.y, 
+	-- 		smallsize * prop + (1 - prop) * 400,
+	-- 		smallsize * prop + (1 - prop) * 400
+	-- 	)
+	-- end
+
 	local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
-	
+
 	if (options.use_map_ratio.value == 'armap') then
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end

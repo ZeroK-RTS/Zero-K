@@ -2379,6 +2379,8 @@ end
 local screenFrame = 0
 function widget:DrawScreen()
 
+	cs = Spring.GetCameraState()
+	WG.COFC_SkyBufferProportion = cs.rx < -HALFPI + 0.1 and min(max((cs.py - topDownBufferZone)/(maxDistY - topDownBufferZone), 0.0), 1.0) or 0
 	--Reset Camera for tiltzoom at game start (Engine 92+)
 	if screenFrame == 3 then --detect frame no.2
 		if options.tiltedzoom.value then ResetCam() end
@@ -2475,6 +2477,9 @@ function widget:Initialize()
 	end
 
 	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that minimap click works with COFC
+
+	--for external use, so that minimap can scale when zoomed out
+	WG.COFC_SkyBufferProportion = 0 
 	
 	spSendCommands("luaui disablewidget SmoothScroll")
 	if WG.SetWidgetOption then
@@ -2499,6 +2504,7 @@ function widget:Shutdown()
 	end
 
 	WG.COFC_SetCameraTarget = nil
+	WG.COFC_SkyBufferProportion = nil
 end
 
 function widget:TextCommand(command)
