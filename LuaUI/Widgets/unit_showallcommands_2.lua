@@ -21,6 +21,26 @@ local spIsGUIHidden = Spring.IsGUIHidden
 local spGetModKeyState = Spring.GetModKeyState
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spGetSelectedUnits = Spring.GetSelectedUnits
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
+local glVertex = gl.Vertex
+local glPushAttrib = gl.PushAttrib
+local glLineStipple = gl.LineStipple
+local glDepthTest = gl.DepthTest
+local glLineWidth = gl.LineWidth
+local glColor = gl.Color
+local glBeginEnd = gl.BeginEnd
+local glPopAttrib = gl.PopAttrib
+local glCreateList = gl.CreateList
+local glCallList = gl.CallList
+local glDeleteList = gl.DeleteList
+local GL_LINES = GL.LINES
+
+-- Constans
+local TARGET_NONE = 0
+local TARGET_GROUND = 1
+local TARGET_UNIT= 2
 
 local selectedUnitCount = 0
 local selectedUnits 
@@ -132,32 +152,92 @@ local function GetDrawLevel()
 	end
 end
 
+local drawList = 0
 
-function widget:Update()
-	if not spIsGUIHidden()  then
-		local drawSelected, drawAll = GetDrawLevel(commandLevel, shift)
-		if drawAll then
+local function getTragetPosition(unitID)
+	local target_type=spGetUnitRulesParam(unitID,"target_type") or TARGET_NONE
+	
+	local tx,ty,tz
+	
+	if target_type==TARGET_GROUND then
+		tx=spGetUnitRulesParam(unitID,"target_x")
+		ty=spGetUnitRulesParam(unitID,"target_y")
+		tz=spGetUnitRulesParam(unitID,"target_z")
+	elseif target_type==TARGET_UNIT then
+		local target=spGetUnitRulesParam(unitID,"target_id")
+		if target and target~=0 and Spring.ValidUnitID(target) then
+			tx,ty,tz=spGetUnitPosition(target,true)
+		else
+			return nil
+		end
+	else
+		return nil
+	end
+	return tx,ty,tz
+end
+
+local function drawUnitCommands(unitID)
+	spDrawUnitCommands(unitID)
+	
+	local tx,ty,tz=getTragetPosition(unitID)
+	if tx then
+		local x,y,z=spGetUnitPosition(unitID,true)
+		glBeginEnd(GL.LINES,
+			function() 
+				glVertex(x,y,z);
+				glVertex(tx,ty,tz);
+			end)
+	end
+end
+
+local function updateDrawing()
+	local drawSelected, drawAll = GetDrawLevel(commandLevel, shift)
+	if drawAll then
+		local count = drawUnit.count
+		local units = drawUnit.data
+		for i = 1, count do
+			drawUnitCommands(units[i])
+		end
+	elseif drawSelected then
+		local sel = selectedUnits
+		for i = 1, selectedUnitCount do
+			drawUnitCommands(sel[i])
+		end
+		if options.includeallies.value then
 			local count = drawUnit.count
 			local units = drawUnit.data
 			for i = 1, count do
-				spDrawUnitCommands(units[i])
-			end
-		elseif drawSelected then
-			local sel = selectedUnits
-			for i = 1, selectedUnitCount do
-				spDrawUnitCommands(sel[i])
-			end
-			if options.includeallies.value then
-				local count = drawUnit.count
-				local units = drawUnit.data
-				for i = 1, count do
-					local unitID = units[i]
-					if WG.allySelUnits[unitID] then
-						spDrawUnitCommands(unitID)
-					end
+				local unitID = units[i]
+				if WG.allySelUnits[unitID] then
+					drawUnitCommands(unitID)
 				end
 			end
 		end
+	end
+end
+
+function widget:Update()
+	if drawList~=0 then
+		glDeleteList(drawList)
+		drawList=0
+	end
+	
+	if not spIsGUIHidden()  then
+		drawList = glCreateList(updateDrawing)
+	end
+end
+
+function widget:DrawWorld()
+	if drawList~=0 then
+		glPushAttrib(GL.LINE_BITS)
+		glLineStipple(true)
+		glDepthTest(false)
+		glLineWidth(1.4)
+		glColor(1, 0.75, 0, 1)
+		glCallList(drawList)
+		glColor(1,1,1,1)
+		glLineStipple(false)
+		glPopAttrib()
 	end
 end
 
