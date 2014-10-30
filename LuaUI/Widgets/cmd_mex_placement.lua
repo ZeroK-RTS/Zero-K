@@ -123,7 +123,7 @@ options = {
 	size = {
 		name = "Income Display Size", 
 		type = "number", 
-		value = 30, 
+		value = 40, 
 		min = 10,
 		max = 150,
 		step = 5,
@@ -598,10 +598,18 @@ function calcMainMexDrawList()
 				glTexRect(x-width/2, z+20, x+width/2, z+20+size,0,0,metal,1)
 				glTexture(false)
 			else
-				glRotate(-90,1,0,0)		
-				glTranslate(x,-z-20-options.size.value, y+2)
+				-- Draws a metal bar at the center of the metal spot
+				glRotate(90,1,0,0)
+				glTranslate(0,0,-y)
 				glColor(1,1,1)
-				glText( ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+				glTexture("LuaUI/Images/ibeam.png")
+				glTexRect(x-25, z-25, x+25, z+25,0,0,1,1)
+				glTexture(false)
+				
+				-- Draws the metal spot's base income "south" of the metal spot
+				glRotate(180,1,0,0)
+				glTranslate(x,-z-20-options.size.value, 0)
+				glText("+" .. ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 			end	
 			
 			--glColor(0,1,1)
