@@ -9,6 +9,18 @@ local carrierDefNames = {
 		{drone = UnitDefNames.carrydrone.id, reloadTime = 15, maxDrones = 8, spawnSize = 2, range = 1600, buildTime=3,
 		 offsets = {0,60,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
 	},
+	
+	reef = {
+		spawnPieces = {"BayAft", "BayFore", "BayLower","BayUpper"},
+		{drone = UnitDefNames.carrydrone.id, reloadTime = 7, maxDrones = 2, spawnSize = 1, range = 1600, buildTime=10,
+		 offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
+		{drone = UnitDefNames.carrydrone.id, reloadTime = 7, maxDrones = 2, spawnSize = 1, range = 1600, buildTime=10,
+		 offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
+		{drone = UnitDefNames.carrydrone.id, reloadTime = 7, maxDrones = 2, spawnSize = 1, range = 1600, buildTime=10,
+		 offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
+		{drone = UnitDefNames.carrydrone.id, reloadTime = 7, maxDrones = 2, spawnSize = 1, range = 1600, buildTime=10,
+		 offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
+	},
 	--corcrw = { {drone = UnitDefNames.attackdrone.id, reloadTime = 15, maxDrones = 6, spawnSize = 2, range = 900, buildTime=3,
 			-- offsets = {0,0,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
 	funnelweb = {
