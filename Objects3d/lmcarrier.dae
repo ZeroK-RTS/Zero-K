@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.71.0 commit date:2014-06-16, commit time:09:48, hash:a19c1be</authoring_tool>
     </contributor>
-    <created>2014-10-29T23:33:50</created>
-    <modified>2014-10-29T23:33:50</modified>
+    <created>2014-10-30T00:09:19</created>
+    <modified>2014-10-30T00:09:19</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -4285,6 +4285,15 @@
               </technique_common>
             </bind_material>
           </instance_geometry>
+        </node>
+        <node id="Launcher" name="Launcher" type="NODE">
+          <matrix sid="transform">37.842 0 0 -49.6909 0 -3.3232e-5 37.842 70.89143 0 -37.842 -3.3232e-5 -17.07242 0 0 0 1</matrix>
+        </node>
+        <node id="Wake1" name="Wake1" type="NODE">
+          <matrix sid="transform">1 0 0 2.624397 0 -8.78176e-7 1 0.4776432 0 -1 -8.78176e-7 -105.1374 0 0 0 1</matrix>
+        </node>
+        <node id="Wake2" name="Wake2" type="NODE">
+          <matrix sid="transform">1 0 0 2.624397 0 -8.78176e-7 1 0.4778318 0 -1 -8.78176e-7 96.53493 0 0 0 1</matrix>
         </node>
       </node>
     </visual_scene>
