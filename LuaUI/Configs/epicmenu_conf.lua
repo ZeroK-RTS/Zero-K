@@ -242,6 +242,7 @@ path='Settings/Camera'
 	ShButton( 'Flip the TA Camera', 'viewtaflip' )
 	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
+	ShButton( 'Toggle Smooth Camera', 'luaui togglewidget SmoothCam' )
 	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
 path='Settings/Camera/Old Camera Shortcuts'	
