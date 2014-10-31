@@ -32,6 +32,7 @@ local offscreentex
 
 local fadeShader
 local alphaLoc
+local boundsLoc
 
 --//
 
@@ -700,11 +701,22 @@ function widget:Initialize()
 		    fragment = [[
 		      uniform sampler2D tex0;
 		      uniform float alpha;
+		      uniform vec4 bounds;
 
 		      void main(void) {
 		        vec4 color = texture2D(tex0, gl_TexCoord[0].st);
-		        if (color.a == 0.0) discard;
-		        gl_FragColor = vec4(color.r, color.g, color.b, alpha);
+		        float tex_s = gl_TexCoord[0].s;
+		        float tex_t = gl_TexCoord[0].t;
+		        if (tex_s < bounds.x || tex_s > bounds.z || tex_t < bounds.y || tex_t > bounds.w) discard;
+		       	float width = bounds.z - bounds.x;
+		       	float height = bounds.w - bounds.y;
+		       	float cutoffFactor = 32.0; 						//TODO: Make edge fade a fixed size regardless of bounds
+		       	float cutoffFactor_x = width > height ? cutoffFactor : cutoffFactor * width/height;
+		       	float cutoffFactor_y = height > width ? cutoffFactor : cutoffFactor * height/width;
+		       	float alpha_x = clamp(1.0 - abs((tex_s - bounds.x)/width - 0.5) * 2.0, 0.0, 1.0/cutoffFactor_x) * cutoffFactor_x;
+		       	float alpha_y = clamp(1.0 - abs((tex_t - bounds.y)/height - 0.5) * 2.0, 0.0, 1.0/cutoffFactor_y) * cutoffFactor_y;
+		       	float final_alpha = alpha_x * alpha_y * alpha;
+		        gl_FragColor = vec4(color.r, color.g, color.b, final_alpha);
 		      }
 		    ]],
 		    uniformInt = {
@@ -712,6 +724,7 @@ function widget:Initialize()
 		    },
 		    uniform = {
 		    	alpha = 1,
+		    	bounds = 2,
 		  	},
 		  })
 
@@ -720,6 +733,7 @@ function widget:Initialize()
 			  CleanUpFBO()
 		  else
 			  alphaLoc = gl.GetUniformLocation(fadeShader, 'alpha')
+				boundsLoc = gl.GetUniformLocation(fadeShader, 'bounds')
 		  end
 		else --Shader Generation impossible, clean up FBO
 		  CleanUpFBO()
@@ -746,7 +760,7 @@ function widget:Shutdown()
 	end
 end 
 
-local lx, ly, lw, lh
+local lx, ly, lw, lh, last_window_x, last_window_y
 
 local function DrawMiniMap()
   gl.Clear(GL.COLOR_BUFFER_BIT,0,0,0,0)
@@ -770,11 +784,13 @@ function widget:DrawScreen()
 	end
 	
 	local vsx,vsy = gl.GetViewSizes()
-	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy) then
+	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy or last_window_x ~= window.x or last_window_y ~= window.y) then
 		lx = cx
 		ly = cy
 		lh = ch
 		lw = cw
+		last_window_x = window.x
+		last_window_y = window.y
 		
 		cx,cy = map_panel:LocalToScreen(cx,cy)
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
@@ -787,9 +803,8 @@ function widget:DrawScreen()
 	gl.PushMatrix()
 
 	if fbo ~= nil and fadeShader ~= nil then
-		local alpha = 0.25
+		local alpha = 1
 		if WG.COFC_SkyBufferProportion ~= nil then
-			-- if WG.COFC_SkyBufferProportion > 0.7 then return end
 			alpha = 1 - (WG.COFC_SkyBufferProportion * 0.7)
 		end
 
@@ -805,6 +820,9 @@ function widget:DrawScreen()
 	  gl.Texture(0, offscreentex)
 	  gl.UseShader(fadeShader)
 	  gl.Uniform(alphaLoc, alpha)
+	  local px, py = (window.x + lx), vsy - window.y - ly
+	  gl.Uniform(boundsLoc, px/vsx, (py - lh)/vsy, (px + lw)/vsx, py/vsy)
+	  -- Spring.Echo("Bounds: "..(window.x + lx)/vsx..", "..(window.y + ly)/vsy..", "..((window.x + lx) + lw)/vsx..", "..((window.y + ly) + lh)/vsy)
 	  gl.TexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
 
 	  gl.Texture(0, false)
