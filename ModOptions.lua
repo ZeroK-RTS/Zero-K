@@ -217,7 +217,7 @@ local options = {
     desc   = "All features self-resurrect.",
     type   = 'bool',
     section= 'zombie',
-    def    = true, -- was: false
+    def    = true, --  was: false
   },
   {
     key    = 'zombies_delay',
