@@ -10,6 +10,31 @@ function widget:GetInfo()
   }
 end
 
+
+--// gl const
+
+local GL_DEPTH_BITS = 0x0D56
+
+local GL_DEPTH_COMPONENT   = 0x1902
+local GL_DEPTH_COMPONENT16 = 0x81A5
+local GL_DEPTH_COMPONENT24 = 0x81A6
+local GL_DEPTH_COMPONENT32 = 0x81A7
+
+local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
+local GL_COLOR_ATTACHMENT1_EXT = 0x8CE1
+local GL_COLOR_ATTACHMENT2_EXT = 0x8CE2
+local GL_COLOR_ATTACHMENT3_EXT = 0x8CE3
+
+--// gl vars
+ 
+local fbo
+local offscreentex
+
+local fadeShader
+local alphaLoc
+
+--//
+
 local window
 local fakewindow
 local map_panel 
@@ -539,6 +564,7 @@ MakeMinimapWindow = function()
 			buttons_panel,
 		},
 	}
+
 end
 
 local leftClickDraggingCamera = false
@@ -624,6 +650,13 @@ function widget:KeyRelease(key, mods, label, unicode)
 	end
 end
 
+local function CleanUpFBO()
+  if (gl.DeleteFBO) and fbo ~= nil then
+    gl.DeleteFBO(fbo or 0)
+    fbo = nil
+  end
+end
+
 function widget:Initialize()
 	if (Spring.GetMiniMapDualScreen()) then
 		Spring.Echo("ChiliMinimap: auto disabled (DualScreen is enabled).")
@@ -637,9 +670,62 @@ function widget:Initialize()
 	end
 	
 	Chili = WG.Chili
-	
+
 	MakeMinimapWindow()
-	
+
+	if (gl.CreateFBO) then
+	  fbo = gl.CreateFBO()
+
+		fbo.color0 = nil;
+
+	  gl.DeleteTextureFBO(offscreentex or 0)
+
+		local vsx,vsy = gl.GetViewSizes()
+	  if vsx > 0 and vsy > 0 then
+		  offscreentex = gl.CreateTexture(vsx,vsy, {
+		    border = false,
+		    min_filter = GL.LINEAR,
+		    mag_filter = GL.LINEAR,
+		    wrap_s = GL.CLAMP,
+		    wrap_t = GL.CLAMP,
+		    fbo = true,
+		  })
+
+		  fbo.color0 = offscreentex
+		  fbo.drawbuffers = GL_COLOR_ATTACHMENT0_EXT
+		end
+
+		if (gl.CreateShader) then
+		  fadeShader = gl.CreateShader({
+		    fragment = [[
+		      uniform sampler2D tex0;
+		      uniform float alpha;
+
+		      void main(void) {
+		        vec4 color = texture2D(tex0, gl_TexCoord[0].st);
+		        if (color.a == 0.0) discard;
+		        gl_FragColor = vec4(color.r, color.g, color.b, alpha);
+		      }
+		    ]],
+		    uniformInt = {
+		      tex0 = 0,
+		    },
+		    uniform = {
+		    	alpha = 1,
+		  	},
+		  })
+
+		  if (fadeShader == nil) then
+		    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Minimap widget: fade shader error: "..gl.GetShaderLog())
+			  CleanUpFBO()
+		  else
+			  alphaLoc = gl.GetUniformLocation(fadeShader, 'alpha')
+		  end
+		else --Shader Generation impossible, clean up FBO
+		  CleanUpFBO()
+		end
+	end
+
 	gl.SlaveMiniMap(true)
 end
 
@@ -648,14 +734,24 @@ function widget:Shutdown()
 	gl.SlaveMiniMap(false)
 	Spring.SendCommands("minimap geo " .. Spring.GetConfigString("MiniMapGeometry"))
 
+  if (gl.DeleteTextureFBO) then
+    gl.DeleteTextureFBO(offscreentex)
+  end
+
+  CleanUpFBO()
+
 	--// free the chili window
 	if (window) then
 		window:Dispose()
 	end
 end 
 
-
 local lx, ly, lw, lh
+
+local function DrawMiniMap()
+  gl.Clear(GL.COLOR_BUFFER_BIT,0,0,0,0)
+  glDrawMiniMap()
+end
 
 function widget:DrawScreen() 
 	if (window.hidden) then 
@@ -667,25 +763,13 @@ function widget:DrawScreen()
 		return 
 	end
 
-	-- if WG.COFC_SkyBufferProportion ~= nil then
-	-- 	local vsx,vsy = gl.GetViewSizes()
-	-- 	local prop = WG.COFC_SkyBufferProportion
-	-- 	local smallsize = vsy < vsx and vsy / 8 or vsx / 8
-
-	-- 	window:Resize( 
-	-- 		window.x,
-	-- 		window.y, 
-	-- 		smallsize * prop + (1 - prop) * 400,
-	-- 		smallsize * prop + (1 - prop) * 400
-	-- 	)
-	-- end
-
 	local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
 
 	if (options.use_map_ratio.value == 'armap') then
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
 	
+	local vsx,vsy = gl.GetViewSizes()
 	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy) then
 		lx = cx
 		ly = cy
@@ -693,7 +777,6 @@ function widget:DrawScreen()
 		lw = cw
 		
 		cx,cy = map_panel:LocalToScreen(cx,cy)
-		local vsx,vsy = gl.GetViewSizes()
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
 	end
 
@@ -703,7 +786,33 @@ function widget:DrawScreen()
 	gl.MatrixMode(GL.MODELVIEW)
 	gl.PushMatrix()
 
-	glDrawMiniMap()
+	if fbo ~= nil and fadeShader ~= nil then
+		local alpha = 0.25
+		if WG.COFC_SkyBufferProportion ~= nil then
+			-- if WG.COFC_SkyBufferProportion > 0.7 then return end
+			alpha = 1 - (WG.COFC_SkyBufferProportion * 0.7)
+		end
+
+		gl.ActiveFBO(fbo, DrawMiniMap)
+
+	  gl.Blending(true)
+		gl.MatrixMode(GL.PROJECTION)
+		gl.LoadIdentity()
+		gl.MatrixMode(GL.MODELVIEW)
+		gl.LoadIdentity()
+
+	  -- gl.Color(1,1,1,alpha)
+	  gl.Texture(0, offscreentex)
+	  gl.UseShader(fadeShader)
+	  gl.Uniform(alphaLoc, alpha)
+	  gl.TexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
+
+	  gl.Texture(0, false)
+	  gl.Blending(false)
+	  gl.UseShader(0)
+	else
+		glDrawMiniMap()
+	end
 
 	gl.MatrixMode(GL.PROJECTION)
 	gl.PopMatrix()
