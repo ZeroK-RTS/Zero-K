@@ -762,7 +762,7 @@ for name, ud in pairs(UnitDefs) do
 		ud.idleautoheal = 5 -- HP/s
 	end
 end
-
+ 
 
 -- Disable porc/air/specific units modoptions (see lockunits_modoption.lua)
 
