@@ -58,6 +58,7 @@ local min = math.min
 
 local mobilePadDefs = {
 	[UnitDefNames["armcarry"].id] = true,
+	[UnitDefNames["reef"].id] = true,
 }
 
 local turnRadius = {}

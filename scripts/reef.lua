@@ -22,30 +22,37 @@ local PadFrontNanoL = piece('PadFrontNanoL');
 local PadFrontNanoR = piece('PadFrontNanoR');
 local Radar = piece('Radar'); 
 local Launcher = piece('Launcher');
-local Wake1 = piece('Wake1');
-local Wake2 = piece('Wake2');
+local WakeForeRight = piece('WakeForeRight');
+local WakeForeLeft = piece('WakeForeLeft');
+local WakeAftRight = piece('WakeAftRight');
+local WakeAftLeft = piece('WakeAftLeft');
 
+local DroneAft = piece('DroneAft');
+local DroneFore = piece('DroneFore');
+local DroneUpper = piece('DroneUpper');
+local DroneLower = piece('DroneLower');
+
+local LandingAft = piece('LandingAft');
+local LandingFore = piece('LandingFore');
 
 local droneBays = {};
 
-droneBays[BayAft] = {
-		slider=BayAftSlider,
-		hatch=BayAftHatch
+droneBays[DroneAft] = {
+	slider=BayAftSlider,
+	hatch=BayAftHatch
 }
-droneBays[BayFore] = {
+droneBays[DroneFore] = {
 	slider=BayForeSlider,
 	hatch=BayForeHatch
 }
-droneBays[BayUpper] = {
+droneBays[DroneUpper] = {
 	slider=BayUpperSlider,
 	hatch=BayUpperHatch
 }
-droneBays[BayLower] = {
+droneBays[DroneLower] = {
 	slider=BayLowerSlider,
 	hatch=BayLowerHatch
 }
-
-
 
 include "constants.lua"
 
@@ -58,8 +65,10 @@ local SIG_RESTORE = 2
 
 function script.Create()
 	Hide(Launcher)
-	Hide(Wake1)
-	Hide(Wake2)
+	Hide(WakeForeLeft)
+	Hide(WakeForeRight)
+	Hide(WakeAftLeft)
+	Hide(WakeAftRight)
 	StartThread(SmokeUnit, smokePiece)
 	
 	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
@@ -72,8 +81,10 @@ local function StartMoving()
 	Signal( SIG_MOVE)
 	SetSignalMask( SIG_MOVE)
 	while  true  do
-		EmitSfx( Wake1,  2 )
-		EmitSfx( Wake2,  2 )
+		EmitSfx( WakeForeLeft,  2 )
+		EmitSfx( WakeForeRight,  2 )
+		EmitSfx( WakeAftLeft,  2 )
+		EmitSfx( WakeAftRight,  2 )
 		Sleep(150)
 	end
 end
@@ -90,19 +101,14 @@ local function RestoreAfterDelay()
 	Signal( SIG_RESTORE)
 	SetSignalMask( SIG_RESTORE)
 	Sleep(3000)
-	Turn( hatch1 , x_axis, 0, rad(35) )
-	Turn( hatch2 , x_axis, 0, rad(35) )
-	Turn( hatch3 , x_axis, 0, rad(35) )
-	Turn( hatch4 , x_axis, 0, rad(35) )
-	Turn( hatch5 , x_axis, 0, rad(35) )
 end
 
 function script.AimWeapon(num, heading, pitch)
-		return true
+	return true
 end
 
 function script.FireWeapon(num)
-
+	return true;
 end
 
 function script.AimFromWeapon(num)
@@ -113,9 +119,8 @@ function script.QueryWeapon(num)
 	return Launcher;
 end
 
-
 function script.QueryLandingPads()
-	return {PadFront, PadAft}
+	return {LandingFore, LandingAft}
 end
 
 function Carrier_droneStarted(piece)
@@ -123,7 +128,7 @@ function Carrier_droneStarted(piece)
 		local bay = droneBays[piece];
 		if(bay) then
 			Signal("bay"..piece)
-			Move(bay.slider,x_axis,-7,4);
+			Move(bay.slider,x_axis,-7,3);
 			Turn(bay.hatch, z_axis, math.rad(-100),math.rad(60));
 		end
 	end
@@ -136,7 +141,7 @@ local function closeBay(piece)
 			Signal("bay"..piece)
 			SetSignalMask( "bay"..piece)
 			Sleep(1000);
-			Move(bay.slider,x_axis,0,4);
+			Move(bay.slider,x_axis,0,3);
 			Turn(bay.hatch, z_axis, math.rad(0),math.rad(40));
 		end
 	end
