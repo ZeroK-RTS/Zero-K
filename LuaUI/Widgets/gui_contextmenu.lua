@@ -262,12 +262,11 @@ end
 
 
 local function getHelpText(unitDef)
+	local data = WG.langData
 	local lang = WG.lang
-	local font = WG.langFont
-	
 	local helpText
-	if font then
-		local unitConf = WG.langFontConf.units[unitDef.name] 
+	if data then
+		local unitConf = data[unitDef.name] 
 		helpText = unitConf and unitConf.helptext
 	end
 	if not helpText then
@@ -283,12 +282,11 @@ end
 
 
 local function getDescription(unitDef)
+	local data = WG.langData
 	local lang = WG.lang
-	local font = WG.langFont
-	
 	local desc
-	if font then
-		local unitConf = WG.langFontConf.units[unitDef.name] 
+	if data then
+		local unitConf = data[unitDef.name] 
 		desc = unitConf and unitConf.description
 	end
 	if not desc then
