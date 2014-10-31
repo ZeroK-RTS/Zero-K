@@ -2,8 +2,6 @@ local IsInTurn = Spring.UnitScript.IsInTurn
 local IsInMove  = Spring.UnitScript.IsInMove 
 local GetPieceRotation = Spring.UnitScript.GetPieceRotation
 local GetPieceTranslation  = Spring.UnitScript.GetPieceTranslation 
-local SpringGetUnitRulesParam  = Spring.GetUnitRulesParam
-local SpringGetUnitIsStunned = Spring.GetUnitIsStunned
 
 -- for some reason a 4th argument is required
 local ROTATION_STOP = math.rad(3)
@@ -25,12 +23,4 @@ function StopMove(piece, axis)
 		return true
 	end
 	return false
-end
-
-function IsDisarmed ()
-	if ((SpringGetUnitRulesParam (unitID, "disarmed") == 1) or SpringGetUnitIsStunned (unitID)) then
-		return true
-	else
-		return false
-	end
 end
