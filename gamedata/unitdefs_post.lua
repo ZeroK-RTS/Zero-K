@@ -306,11 +306,11 @@ end
 if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if name == "fighter" then
-			ud.turnRadius = 200
-			ud.maxRudder = 0.001
+			ud.turnRadius = 150
+			ud.maxRudder = 0.005
 		elseif name == "corvamp" then
 			ud.turnRadius = 80
-			ud.maxRudder = 0.001
+			ud.maxRudder = 0.004
 		elseif name == "bomberdive" then
 			ud.turnRadius = 40
 		elseif name == "corhurc2" then
