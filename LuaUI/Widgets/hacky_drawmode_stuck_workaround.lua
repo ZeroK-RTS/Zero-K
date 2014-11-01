@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
-		name      = "Drawmove Stuck Workaround",
-		desc      = "Fixes most cases of the 'stuck in drawing move' bug.",
+		name      = "Drawmode Stuck Workaround",
+		desc      = "Fixes most cases of the 'stuck in drawing mode' bug.",
 		author    = "silentwings",
 		date      = "11 October 2014",
 		license   = "Public Domain",
