@@ -28,6 +28,7 @@ local thirdperson_trackunit = false
 
 options_path = 'Settings/Camera/Camera Controls'
 local cameraFollowPath = 'Settings/Camera/Camera Following'
+local minimap_path = 'Settings/HUD Panels/Minimap'
 options_order = { 
 	'helpwindow', 
 	
@@ -97,6 +98,10 @@ options_order = {
 	'lblMisc2',
 	'enableCycleView',
 	'groupSelectionTapTimeout',
+
+	--Minimap Fade:
+
+	'fadeMinimapOnZoomOut'
 
 }
 
@@ -319,7 +324,7 @@ options = {
 		desc = "Controls how smooth the camera moves.",
 		type = 'number',
 		min = 0.0, max = 0.8, step = 0.1,
-		value = 0.3,
+		value = 0.2,
 	},
 	fov = {
 		name = 'Field of View (Degrees)',
@@ -539,6 +544,13 @@ options = {
 	},
 	-- end follow unit
 	
+	fadeMinimapOnZoomOut = {
+		name = "Fade Minimap when zoomed out",
+		type = 'bool',
+		value = true,
+		path = minimap_path,
+	},
+
 }
 
 --------------------------------------------------------------------------------
@@ -694,9 +706,13 @@ SetFOV = function(fov)
 end
 
 local function SetSkyBufferProportion(cs)
-	local _,cs_py,_ = Spring.GetCameraPosition()
-	local topDownBufferZoneBottom = maxDistY - topDownBufferZone
-	WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone, 0.0), 1.0)
+	if options.fadeMinimapOnZoomOut.value then
+		local _,cs_py,_ = Spring.GetCameraPosition()
+		local topDownBufferZoneBottom = maxDistY - topDownBufferZone
+		WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone, 0.0), 1.0)
+	else
+		WG.COFC_SkyBufferProportion = nil
+  end
 end
 
 do SetFOV(Spring.GetCameraFOV()) end
