@@ -698,25 +698,35 @@ function widget:Initialize()
 
 		if (gl.CreateShader) then
 		  fadeShader = gl.CreateShader({
+		  	vertex = [[
+		  		varying vec2 texCoord;
+
+          void main() {
+            texCoord = gl_Vertex.xy * 0.5 + 0.5;
+            gl_Position = vec4(gl_Vertex.xyz, 1.0);
+          }
+		  	]],
 		    fragment = [[
 		      uniform sampler2D tex0;
 		      uniform float alpha;
 		      uniform vec4 bounds;
+		      uniform vec2 screen;
+
+		      varying vec2 texCoord;
+
+		      const float edgeFadePixels = 16.0;
 
 		      void main(void) {
-		        vec4 color = texture2D(tex0, gl_TexCoord[0].st);
-		        float tex_s = gl_TexCoord[0].s;
-		        float tex_t = gl_TexCoord[0].t;
-		        if (tex_s < bounds.x || tex_s > bounds.z || tex_t < bounds.y || tex_t > bounds.w) discard;
-		       	float width = bounds.z - bounds.x;
-		       	float height = bounds.w - bounds.y;
-		       	float cutoffFactor = 32.0; 						//TODO: Make edge fade a fixed size regardless of bounds
-		       	float cutoffFactor_x = width > height ? cutoffFactor : cutoffFactor * width/height;
-		       	float cutoffFactor_y = height > width ? cutoffFactor : cutoffFactor * height/width;
-		       	float alpha_x = clamp(1.0 - abs((tex_s - bounds.x)/width - 0.5) * 2.0, 0.0, 1.0/cutoffFactor_x) * cutoffFactor_x;
-		       	float alpha_y = clamp(1.0 - abs((tex_t - bounds.y)/height - 0.5) * 2.0, 0.0, 1.0/cutoffFactor_y) * cutoffFactor_y;
-		       	float final_alpha = alpha_x * alpha_y * alpha;
-		        gl_FragColor = vec4(color.r, color.g, color.b, final_alpha);
+		        vec4 color = texture2D(tex0, texCoord.st);
+		       	//float width = bounds.z;
+		       	//float height = bounds.w;
+		        float edgeFadeScaledPixels = edgeFadePixels/1080.0 * screen.y;
+		       	vec2 edgeFadeBase = vec2(edgeFadeScaledPixels / screen.x, edgeFadeScaledPixels / screen.y);
+		       	vec2 edgeFade = vec2((2.0 * bounds.z) / edgeFadeBase.x, (2.0 * bounds.w) / edgeFadeBase.y);
+		       	vec2 edgeAlpha = vec2(clamp(1.0 - abs((texCoord.x - bounds.x)/bounds.z - 0.5) * 2.0, 0.0, 1.0/edgeFade.x) * edgeFade.x,
+		       												clamp(1.0 - abs((texCoord.y - bounds.y)/bounds.w - 0.5) * 2.0, 0.0, 1.0/edgeFade.y) * edgeFade.y);
+		       	float final_alpha = edgeAlpha.x * edgeAlpha.y * alpha;
+		        gl_FragColor = vec4(color.rgb, final_alpha);
 		      }
 		    ]],
 		    uniformInt = {
@@ -725,6 +735,7 @@ function widget:Initialize()
 		    uniform = {
 		    	alpha = 1,
 		    	bounds = 2,
+		    	screen = 3,
 		  	},
 		  })
 
@@ -734,6 +745,7 @@ function widget:Initialize()
 		  else
 			  alphaLoc = gl.GetUniformLocation(fadeShader, 'alpha')
 				boundsLoc = gl.GetUniformLocation(fadeShader, 'bounds')
+				screenLoc = gl.GetUniformLocation(fadeShader, 'screen')
 		  end
 		else --Shader Generation impossible, clean up FBO
 		  CleanUpFBO()
@@ -811,17 +823,14 @@ function widget:DrawScreen()
 		gl.ActiveFBO(fbo, DrawMiniMap)
 
 	  gl.Blending(true)
-		gl.MatrixMode(GL.PROJECTION)
-		gl.LoadIdentity()
-		gl.MatrixMode(GL.MODELVIEW)
-		gl.LoadIdentity()
 
 	  -- gl.Color(1,1,1,alpha)
 	  gl.Texture(0, offscreentex)
 	  gl.UseShader(fadeShader)
 	  gl.Uniform(alphaLoc, alpha)
-	  local px, py = (window.x + lx), vsy - window.y - ly
-	  gl.Uniform(boundsLoc, px/vsx, (py - lh)/vsy, (px + lw)/vsx, py/vsy)
+	  local px, py = window.x + lx, vsy - window.y - ly
+	  gl.Uniform(boundsLoc, px/vsx, (py - lh)/vsy, lw/vsx, lh/vsy)
+	  gl.Uniform(screenLoc, vsx, vsy)
 	  -- Spring.Echo("Bounds: "..(window.x + lx)/vsx..", "..(window.y + ly)/vsy..", "..((window.x + lx) + lw)/vsx..", "..((window.y + ly) + lh)/vsy)
 	  gl.TexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
 
