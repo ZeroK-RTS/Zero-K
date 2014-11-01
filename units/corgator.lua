@@ -98,6 +98,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customparams = {
+        heatray = 1,
+      },
+
       damage                  = {
         default = 31.4,
         planes  = 31.4,
