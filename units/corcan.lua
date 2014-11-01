@@ -17,7 +17,12 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    canjump        = [[1]],
+    canjump            = 1,
+    jump_range         = 400,
+    jump_speed         = 4,
+    jump_reload        = 10,
+    jump_from_midair   = 1,
+
     description_bp = [[Robô de assaulto]],
     description_fr = [[Robot d'Assaut]],
 	description_de = [[Melee Sturmangriff Springer]],

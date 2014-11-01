@@ -51,11 +51,7 @@ local spGetTeamUnits		= Spring.GetTeamUnits
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
-local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
-local jumpDefs = {}
-for name, data in pairs(jumpDefNames) do
-	jumpDefs[UnitDefNames[name].id] = data
-end
+local jumpDefs = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
 local SAVE_FILE = "Gadgets/ai_cai.lua"
 

@@ -95,12 +95,7 @@ local defFallGravity =Game.gravity/30/30
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local jumpDefNames = VFS.Include"LuaRules/Configs/jump_defs.lua"
-
-local jumpDefs = {}
-for name, data in pairs(jumpDefNames) do
-	jumpDefs[UnitDefNames[name].id] = data
-end
+local jumpDefs = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
 local jumpCmdDesc = {
 	id			= CMD_JUMP,
