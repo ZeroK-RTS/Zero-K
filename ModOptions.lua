@@ -217,7 +217,7 @@ local options = {
     desc   = "All features self-resurrect.",
     type   = 'bool',
     section= 'zombie',
-    def    = true, --  was: false
+    def    = false,
   },
   {
     key    = 'zombies_delay',
@@ -225,7 +225,7 @@ local options = {
     desc   = "In seconds, unit will resurrection no faster than this.",
     type   = 'number',
     section= 'zombie',
-    def=20, -- was: 10
+    def=10,
     min=1,
     max=600,
     step=1,
@@ -236,7 +236,7 @@ local options = {
     desc   = "In metal per second.",
     type   = 'number',
     section= 'zombie',
-    def=4, -- was: 12
+    def=12,
     min=1,
     max=10000,
     step=1,
