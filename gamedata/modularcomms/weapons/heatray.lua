@@ -10,6 +10,7 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
+		heatray = 1,
 	},		  
 
 	damage                  = {
