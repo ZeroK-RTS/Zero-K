@@ -18,7 +18,6 @@ if (not gadgetHandler:IsSyncedCode()) then
    return false
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -154,7 +153,8 @@ function gadget:GameFrame(f)
 					   0,0,0,
 					   30, 30
 					);
-					metal = featureMetal[feature] or spGetFeatureResources(feature)
+					local _, maxMetal, _,_, reclaim = spGetFeatureResources(feature)
+					metal = featureMetal[feature] or maxMetal*reclaim
 					if metal >= quota then
 						unit.progress = unit.progress + quota
 						featureMetal[feature] = metal-quota
