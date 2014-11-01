@@ -16,13 +16,13 @@ end
 
 local spDrawUnitCommands = Spring.DrawUnitCommands
 local spGetAllUnits = Spring.GetAllUnits
-local spSendLuaRulesMsg = Spring.SendLuaRulesMsg
 local spIsGUIHidden = Spring.IsGUIHidden
 local spGetModKeyState = Spring.GetModKeyState
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetUnitTeam = Spring.GetUnitTeam
 
 local glVertex = gl.Vertex
 local glPushAttrib = gl.PushAttrib
@@ -54,6 +54,8 @@ local myAllyTeamID = Spring.GetLocalAllyTeamID()
 local spectating = Spring.GetSpectatingState()
 local myPlayerID = Spring.GetLocalPlayerID()
 
+local gaiaTeamID = Spring.GetGaiaTeamID()
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function UpdateSelection(newSelectedUnits)
@@ -64,7 +66,7 @@ end
 
 options_path = 'Settings/Interface/Command Visibility'
 options_order = { 
-'showallcommandselection','lblincludeallies','includeallies', 
+'showallcommandselection','lbl_filters','includeallies', 'includeneutral'
 }
 options = {
 	showallcommandselection = {
@@ -82,38 +84,42 @@ options = {
 			local key = self.value
 			if key == 'showallcommand' then
 				commandLevel = 5
-				spSendLuaRulesMsg("target_move_all")
 			elseif key == 'onlyselection' then
 				commandLevel = 4
-				spSendLuaRulesMsg("target_move_selection")
 				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'onlyselectionlow' then
 				commandLevel = 3
-				spSendLuaRulesMsg("target_move_selectionlow")
 				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'showallonshift' then
 				commandLevel = 2
-				spSendLuaRulesMsg("target_move_shift")
 				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'showminimal' then
 				commandLevel = 1
-				spSendLuaRulesMsg("target_move_minimal")
 				UpdateSelection(spGetSelectedUnits())
 			end
 		end,
 	},
-	lblincludeallies = {name='Allies', type='label'},
+	lbl_filters = {name='Filters', type='label'},
 	includeallies = {
 		name = 'Include ally selections',
 		desc = 'When showing commands for selected units, show them for both your own and your allies\' selections.',
 		type = 'bool',
 		value = false,
 	},
+	includeneutral = {
+		name = 'Include Neutral Units',
+		desc = 'Toggle whether to show commands for neutral units (relevant while spectating).',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			PoolUnit()
+		end,
+	},
 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+-- Unit Handling
 local function AddUnit(unitID)
 	if not drawUnitID[unitID] then
 		if spectating or spGetUnitAllyTeam(unitID) == myAllyTeamID then
@@ -137,6 +143,23 @@ local function RemoveUnit(unitID)
 	end
 end
 
+function PoolUnit()
+	local units = spGetAllUnits()
+	for _, unitID in ipairs(units) do
+		local teamID = spGetUnitTeam(unitID)
+		if options.includeneutral.value or teamID ~= gaiaTeamID then
+			AddUnit(unitID)
+		else
+			RemoveUnit(unitID)
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Drawing
+local drawList = 0
+
 local function GetDrawLevel()
 	local shift = select(4,spGetModKeyState())
 	if commandLevel == 1 then
@@ -152,21 +175,19 @@ local function GetDrawLevel()
 	end
 end
 
-local drawList = 0
-
-local function getTragetPosition(unitID)
+local function getTargetPosition(unitID)
 	local target_type=spGetUnitRulesParam(unitID,"target_type") or TARGET_NONE
 	
 	local tx,ty,tz
 	
-	if target_type==TARGET_GROUND then
-		tx=spGetUnitRulesParam(unitID,"target_x")
-		ty=spGetUnitRulesParam(unitID,"target_y")
-		tz=spGetUnitRulesParam(unitID,"target_z")
-	elseif target_type==TARGET_UNIT then
-		local target=spGetUnitRulesParam(unitID,"target_id")
-		if target and target~=0 and Spring.ValidUnitID(target) then
-			tx,ty,tz=spGetUnitPosition(target,true)
+	if target_type == TARGET_GROUND then
+		tx = spGetUnitRulesParam(unitID,"target_x")
+		ty = spGetUnitRulesParam(unitID,"target_y")
+		tz = spGetUnitRulesParam(unitID,"target_z")
+	elseif target_type == TARGET_UNIT then
+		local target = spGetUnitRulesParam(unitID,"target_id")
+		if target and target ~= 0 and Spring.ValidUnitID(target) then
+			tx,ty,tz = spGetUnitPosition(target,true)
 		else
 			return nil
 		end
@@ -179,9 +200,9 @@ end
 local function drawUnitCommands(unitID)
 	spDrawUnitCommands(unitID)
 	
-	local tx,ty,tz=getTragetPosition(unitID)
+	local tx,ty,tz = getTargetPosition(unitID)
 	if tx then
-		local x,y,z=spGetUnitPosition(unitID,true)
+		local _,_,_,x,y,z=spGetUnitPosition(unitID,true)
 		glBeginEnd(GL.LINES,
 			function() 
 				glVertex(x,y,z);
@@ -217,45 +238,39 @@ local function updateDrawing()
 end
 
 function widget:Update()
-	if drawList~=0 then
+	if drawList ~= 0 then
 		glDeleteList(drawList)
-		drawList=0
+		drawList = 0
 	end
 	
-	if not spIsGUIHidden()  then
+	if not spIsGUIHidden() then
 		drawList = glCreateList(updateDrawing)
 	end
 end
 
 function widget:DrawWorld()
-	if drawList~=0 then
+	if drawList ~= 0 then
 		glPushAttrib(GL.LINE_BITS)
 		glLineStipple(true)
 		glDepthTest(false)
 		glLineWidth(1.4)
 		glColor(1, 0.75, 0, 1)
 		glCallList(drawList)
-		glColor(1,1,1,1)
+		glColor(1, 1, 1, 1)
 		glLineStipple(false)
 		glPopAttrib()
 	end
 end
 
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Callins
 function widget:SelectionChanged(newSelection)
 	if commandLevel ~= 5 then
 		UpdateSelection(newSelection)
 	end
 end
 
-function PoolUnit()
-	local units = spGetAllUnits()
-	for _, unitID in ipairs(units) do
-		AddUnit(unitID)
-	end
-end
-
-------
 function widget:PlayerChanged(playerID) 
 	if myPlayerID == playerID then
 		spectating = Spring.GetSpectatingState()
@@ -265,28 +280,26 @@ function widget:PlayerChanged(playerID)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	AddUnit(unitID)
+	if options.includeneutral.value or unitTeam ~= gaiaTeamID then
+		AddUnit(unitID)
+	end
 end
 
-function widget:UnitGiven(unitID, unitDefID, oldTeam, newTeam)
-	AddUnit(unitID)
+function widget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
+	if options.includeneutral.value or newTeam ~= gaiaTeamID then
+		AddUnit(unitID)
+	else
+		RemoveUnit(unitID)
+	end
 end
 
 function widget:UnitDestroyed(unitID)
 	RemoveUnit(unitID)
 end
------
+
 function widget:GameFrame(n)
 	if (n > 0) then
 		PoolUnit()
 		widgetHandler:RemoveCallIn("GameFrame") 
 	end
-end
-
--- function widget:Initialize()
-    -- spSendLuaRulesMsg("target_on_the_move_all")
--- end
-
-function widget:Shutdown()
-    spSendLuaRulesMsg("target_move_minimal")
 end

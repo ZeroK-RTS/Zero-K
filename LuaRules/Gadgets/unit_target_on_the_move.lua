@@ -127,22 +127,26 @@ local function clearTarget(unitID)
 	spSetUnitRulesParam(unitID,"target_type",TARGET_NONE)
 end
 
-local function setTarget(data)
+local function setTarget(data, sendToWidget)
     if spValidUnitID(data.id) then
         if not data.targetID then
             if locationInRange(data.id, data.x, data.y, data.z, data.range) then
                 spSetUnitTarget(data.id, data.x, data.y, data.z)
-                spSetUnitRulesParam(data.id,"target_type",TARGET_GROUND)
-                spSetUnitRulesParam(data.id,"target_x",data.x)
-                spSetUnitRulesParam(data.id,"target_y",data.y)
-                spSetUnitRulesParam(data.id,"target_z",data.z)
             end
+			if sendToWidget then
+				spSetUnitRulesParam(data.id,"target_type",TARGET_GROUND)
+				spSetUnitRulesParam(data.id,"target_x",data.x)
+				spSetUnitRulesParam(data.id,"target_y",data.y)
+				spSetUnitRulesParam(data.id,"target_z",data.z)
+			end
         elseif spValidUnitID(data.targetID) and spGetUnitAllyTeam(data.targetID) ~= data.allyTeam then
             if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) then
                 spSetUnitTarget(data.id, data.targetID)
-                spSetUnitRulesParam(data.id,"target_type",TARGET_UNIT)
-				spSetUnitRulesParam(data.id,"target_id",data.targetID)
             end
+			if sendToWidget then
+				spSetUnitRulesParam(data.id,"target_type",TARGET_UNIT)
+				spSetUnitRulesParam(data.id,"target_id",data.targetID)
+			end
         else
             return false
         end
@@ -174,7 +178,7 @@ local function addUnit(unitID, data)
 	if spValidUnitID(unitID) then
 		-- clear current traget
         clearTarget(unitID)
-        if setTarget(data) then
+        if setTarget(data, true) then
             if unitById[unitID] then
                 unit.data[unitById[unitID]] = data
             else
@@ -394,7 +398,7 @@ function gadget:GameFrame(n)
         
         local toRemove = {count = 0, data = {}}
         for i = 1, unit.count do
-            if not setTarget(unit.data[i]) then
+            if not setTarget(unit.data[i], false) then
                 toRemove.count = toRemove.count + 1
                 toRemove.data[toRemove.count] = unit.data[i].id
             end
