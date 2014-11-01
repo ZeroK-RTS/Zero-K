@@ -91,9 +91,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 10,
-        planes  = 10,
-        subs    = 10,
+        default = 2.6,
       },
 
       explosionGenerator      = [[custom:NONE]],
