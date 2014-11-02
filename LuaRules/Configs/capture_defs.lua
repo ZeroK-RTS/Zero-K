@@ -1,35 +1,20 @@
 local weaponArray = {}
 local unitArray = {}
 
--- various weapons on a unit can deal different damages
-local weapons = {
-	capturecar_captureray = {captureDamage = 2.6, scaleDamage = false},
-}
-
--- capture damage	- how much damage capture damage is dealt to the unit per hit
--- scaleDamage		- if true scales capture damage to take into account range falloff, armour etc..
-
--- all units with capture weapons must have a unit entry
-local units = {
-	capturecar = { 
-		postCaptureReload = 360, 
-	},
-}
--- postCaptureReload 	- reload time after capturing
-
-for i=1,#WeaponDefs do
-	for weapon, data in pairs(weapons) do
-		if WeaponDefs[i].name == weapon then 
-			weaponArray[i] = data 
-		end
+for i=1, #WeaponDefs do
+	if WeaponDefs[i].customParams.is_capture == '1' then
+		weaponArray[i] = {
+			captureDamage = WeaponDefs[i].damages[0],
+			scaleDamage = (WeaponDefs[i].customParams.capture_scaling == '1'), -- falloff, armor, etc
+		}
 	end
 end
 
-for i=1,#UnitDefs do
-	for unit, data in pairs(units) do
-		if UnitDefs[i].name == unit then 
-			unitArray[i] = data 
-		end
+for i=1, #UnitDefs do
+	if UnitDefs[i].customParams.post_capture_reload then
+		unitArray[i] = {
+			postCaptureReload = tonumber(UnitDefs[i].customParams.post_capture_reload), -- in frames
+		}
 	end
 end
 
