@@ -67,10 +67,22 @@ local paraUnitID = {}
 
 local f = 0 -- frame, set in game frame
 
+local function callScript (unitID, funcName, args)
+	local func = Spring.UnitScript.GetScriptEnv(unitID)
+	if func then
+		func = func[funcName]
+		if func then
+			return Spring.UnitScript.CallAsUnit(unitID,func, args)
+		end
+	end
+	return false
+end
+
 local function applyEffect(unitID)
 	Spring.SetUnitRulesParam(unitID, "disarmed", 1, LOS_ACCESS)
 	GG.attUnits[unitID] = true
 	GG.UpdateUnitAttributes(unitID)
+	callScript (unitID, "Stunned", false)
 end
 
 local function removeEffect(unitID)
@@ -176,6 +188,17 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+
+local already_stunned
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+                            weaponDefID, attackerID, attackerDefID, attackerTeam)
+	if paraWeapons[weaponDefID] and spGetUnitIsStunned(unitID) and not already_stunned then
+		callScript (unitID, "Stunned", true)
+	end
+end
+
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponDefID, attackerID, attackerDefID, attackerTeam)
 	
@@ -185,9 +208,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		return damage*def.normalDamage
 	end
 	
-	if paraWeapons[weaponDefID] and (partialUnitID[unitID] or paraUnitID[unitID]) then
-		local def = paraWeapons[weaponDefID]
-		addParalysisDamageToUnit(unitID, damage, def.paraTime)
+	if paraWeapons[weaponDefID] then
+		already_stunned = spGetUnitIsStunned(unitID)
+		if (partialUnitID[unitID] or paraUnitID[unitID]) then
+			local def = paraWeapons[weaponDefID]
+			addParalysisDamageToUnit(unitID, damage, def.paraTime)
+		end
 	end
 	return damage
 end
