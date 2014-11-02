@@ -408,7 +408,7 @@ local function FormatMetalStats(stat,k)
 end
 
 local function FormatElo(elo,full)
-	local mult = full and 1 or 50
+	local mult = full and 1 or 10
 	local elo_out = mult * math.floor((elo/mult) + .5)
 	local eloCol = {}
 
