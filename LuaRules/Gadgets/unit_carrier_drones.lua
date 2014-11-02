@@ -548,7 +548,7 @@ function gadget:GameFrame(n)
 						local reloadMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
 						set.reload = (set.reload - reloadMult)
 						
-					elseif (set.droneCount < set.config.maxDrones) and set.buildCount==0 then --not reach max count and finished previous queue
+					elseif (set.droneCount < set.config.maxDrones) and set.buildCount < set.config.maxBuild then --not reach max count and finished previous queue
 						for n=1,set.config.spawnSize do
 							if (set.droneCount >= set.config.maxDrones) then
 								break
@@ -557,9 +557,9 @@ function gadget:GameFrame(n)
 							-- NewDrone(carrierID, carrier.unitDefID, set.config.drone, i )
 							
 							-- Method2: Build nanoframe,
-							set.buildCount = n
 							carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue+ 1 ] = i
 							if AddUnitToEmptyPad(carrierID, i ) then
+								set.buildCount = set.buildCount + 1;
 								table.remove(carrierList[carrierID].droneInQueue,1)
 							end
 						end
