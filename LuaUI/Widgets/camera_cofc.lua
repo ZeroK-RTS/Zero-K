@@ -700,7 +700,7 @@ SetFOV = function(fov)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (20 + 30 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (30 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
 end
