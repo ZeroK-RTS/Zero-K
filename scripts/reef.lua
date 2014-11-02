@@ -112,7 +112,7 @@ function script.FireWeapon(num)
 end
 
 function script.AimFromWeapon(num)
-	return Launcher;
+	return Radar;
 end
 
 function script.QueryWeapon(num)
