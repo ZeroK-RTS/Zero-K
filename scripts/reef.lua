@@ -156,13 +156,57 @@ function Carrier_droneCompleted(piece)
 	end
 end
 
+local function ExplodeBay(piece)
+	Explode(droneBays[piece].slider, SFX.FIRE)
+	Explode(droneBays[piece].hatch, SFX.FIRE)
+	EmitSfx(piece, 1024)
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if severity <= 0.25 then
-		return 1
-	elseif severity <= 0.50 then
+	if severity <= 0.50 then
+		EmitSfx(DroneFore, 1024)
+		Turn(BayForeHatch, z_axis, math.rad(-100),math.rad(200));
+
+		Sleep(120)
+		
+		EmitSfx(DroneAft, 1024)
+		Explode(BayAftSlider, SFX.FIRE)
+		Explode(BayAftHatch, SFX.FIRE)
+		
+		Sleep(120)
+		
+		Explode(PadFrontNanoL, SFX.FIRE)
+		Explode(PadFrontNanoR, SFX.FIRE)
+		Hide(PadFrontNanoL);
+		Hide(PadFrontNanoR);
+		
+		Sleep(120)
+
+		EmitSfx(PadFront, 1024)
+		Explode(PadFront, SFX.FIRE)
+		Hide(PadFront)
+		
+		Sleep(120)
+		
+		Explode(PadAftNanoR, SFX.FIRE)
+		Hide(PadAftNanoR);
+		
+		Sleep(120)
+		ExplodeBay(DroneAft)
+		Sleep(180)
+		Explode(BayInnerSlider, SFX.FIRE)
+		Explode(BayInnerHatch, SFX.FIRE)
+		EmitSfx(BayInner, 1024)
+		Sleep(100)
+		ExplodeBay(DroneLower)
+		Sleep(150)
+		EmitSfx(DroneUpper, 1024)
+		Turn(BayUpperHatch, z_axis, math.rad(-100),math.rad(200));
 		return 1
 	else
 		return 2
 	end
 end
+
+		
