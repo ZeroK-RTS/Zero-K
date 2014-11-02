@@ -690,7 +690,7 @@ SetFOV = function(fov)
 	mapEdgeBuffer = groundMax
 	local mapFittingDistance = MHEIGHT/2
 	if vsy/vsx > MHEIGHT/MWIDTH then mapFittingDistance = (MWIDTH * vsy/vsx)/2 end
-	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingDistance/2) -- map edge buffer should be 1/6th of the length of the dimension fitted to screen
+	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingDistance/1.7) -- map edge buffer should be 1/6th of the length of the dimension fitted to screen
 
 	local mapLength = mapFittingDistance + mapEdgeBuffer
 	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
@@ -700,7 +700,7 @@ SetFOV = function(fov)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (15 + 30 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (20 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
 end
@@ -1000,7 +1000,7 @@ SetCenterBounds = function(cs)
 		scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
 
 		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
-		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer * math.tan(currentFOVhalf_rad))
+		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer)-- * math.tan(currentFOVhalf_rad) * 1.5)
 		-- Spring.Echo("MaxDC: "..maxDc)
 		minX, minZ, maxX, maxZ = math.max(mcx - MWIDTH/2 * maxDc, 0), math.max(mcz - MHEIGHT/2 * maxDc, 0), math.min(mcx + MWIDTH/2 * maxDc, MWIDTH), math.min(mcz + MHEIGHT/2 * maxDc, MHEIGHT)
 
