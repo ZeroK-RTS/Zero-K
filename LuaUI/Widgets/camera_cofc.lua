@@ -28,6 +28,7 @@ local thirdperson_trackunit = false
 
 options_path = 'Settings/Camera/Camera Controls'
 local cameraFollowPath = 'Settings/Camera/Camera Following'
+local minimap_path = 'Settings/HUD Panels/Minimap'
 options_order = { 
 	'helpwindow', 
 	
@@ -97,6 +98,10 @@ options_order = {
 	'lblMisc2',
 	'enableCycleView',
 	'groupSelectionTapTimeout',
+
+	--Minimap Fade:
+
+	'fadeMinimapOnZoomOut'
 
 }
 
@@ -319,7 +324,7 @@ options = {
 		desc = "Controls how smooth the camera moves.",
 		type = 'number',
 		min = 0.0, max = 0.8, step = 0.1,
-		value = 0.3,
+		value = 0.2,
 	},
 	fov = {
 		name = 'Field of View (Degrees)',
@@ -539,6 +544,13 @@ options = {
 	},
 	-- end follow unit
 	
+	fadeMinimapOnZoomOut = {
+		name = "Fade Minimap when zoomed out",
+		type = 'bool',
+		value = true,
+		path = minimap_path,
+	},
+
 }
 
 --------------------------------------------------------------------------------
@@ -691,6 +703,16 @@ SetFOV = function(fov)
 	minZoomTiltAngle = (15 + 30 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
+end
+
+local function SetSkyBufferProportion(cs)
+	if options.fadeMinimapOnZoomOut.value then
+		local _,cs_py,_ = Spring.GetCameraPosition()
+		local topDownBufferZoneBottom = maxDistY - topDownBufferZone
+		WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone, 0.0), 1.0)
+	else
+		WG.COFC_SkyBufferProportion = nil
+  end
 end
 
 do SetFOV(Spring.GetCameraFOV()) end
@@ -2378,6 +2400,7 @@ end
 
 local screenFrame = 0
 function widget:DrawScreen()
+	SetSkyBufferProportion(Spring.GetCameraState())
 
 	--Reset Camera for tiltzoom at game start (Engine 92+)
 	if screenFrame == 3 then --detect frame no.2
@@ -2475,6 +2498,9 @@ function widget:Initialize()
 	end
 
 	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that minimap click works with COFC
+
+	--for external use, so that minimap can scale when zoomed out
+	WG.COFC_SkyBufferProportion = 0 
 	
 	spSendCommands("luaui disablewidget SmoothScroll")
 	if WG.SetWidgetOption then
@@ -2499,6 +2525,7 @@ function widget:Shutdown()
 	end
 
 	WG.COFC_SetCameraTarget = nil
+	WG.COFC_SkyBufferProportion = nil
 end
 
 function widget:TextCommand(command)
