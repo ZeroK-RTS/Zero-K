@@ -78,7 +78,8 @@ for i=1,#UnitDefs do
     morphDefs[name][#morphDefs[name] + 1] = {
       into = morphTo,
       time = cp.morphtime or (cp.level and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp.level+1)))),	-- or 30,
-      combatMorph = cp.combatmorph == "1"
+      combatMorph = cp.combatmorph == "1",
+	  rank = cp.morphrank and tonumber(cp.morphrank) or 0,
     }
   end
 end
