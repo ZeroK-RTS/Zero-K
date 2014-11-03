@@ -241,7 +241,7 @@ options_order = {
 	'showDrawTools',
 	
 	--selected units
-	'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
+	'selection_opacity', 'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
 }
 
 local function option_Deselect()
@@ -369,6 +369,16 @@ options = {
 		end
 	},
 
+	selection_opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0.8, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			window_corner.backgroundColor = {1,1,1,self.value}
+			window_corner:Invalidate()
+		end,
+		path = selPath,
+	},
 	groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
 		path = selPath,
 	},
@@ -2532,7 +2542,7 @@ function widget:Initialize()
         name   = 'unitinfo2';
 		x = 0,
 		y = 0,
-		backgroundColor = {1, 1, 1, 0.8},
+		backgroundColor = {1, 1, 1, options.selection_opacity.value},
 		width = "100%";
 		height = "100%";
 		dockable = false,
