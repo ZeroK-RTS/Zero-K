@@ -93,7 +93,7 @@ options = {
 		min = 0, 
 		max = 1, 
 		step = 0.01,
-		value = 0.42,
+		value = 0.27,
 		desc = 'Sets the brightness of the realistic texture (doesn\'t affect the grid)',
 		OnChange = ResetWidget,
 	},
@@ -161,21 +161,21 @@ local function SetupShaderTable()
 		
 		float alpha = 1.0;
 		#ifdef curvature
-		  if(mirrorX)gl_Vertex.y -= pow(abs(gl_Vertex.x-left*mirrorX)/150, 2);
-		  if(mirrorZ)gl_Vertex.y -= pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2);
+		  if(mirrorX)gl_Vertex.y -= pow(abs(gl_Vertex.x-left*mirrorX)/150.0, 2.0);
+		  if(mirrorZ)gl_Vertex.y -= pow(abs(gl_Vertex.z-up*mirrorZ)/150.0, 2.0);
 		  alpha = 0.0;
-			if(mirrorX) alpha -= pow(abs(gl_Vertex.x-left*mirrorX)/lengthX, 2);
-			if(mirrorZ) alpha -= pow(abs(gl_Vertex.z-up*mirrorZ)/lengthZ, 2);
+			if(mirrorX) alpha -= pow(abs(gl_Vertex.x-left*mirrorX)/lengthX, 2.0);
+			if(mirrorZ) alpha -= pow(abs(gl_Vertex.z-up*mirrorZ)/lengthZ, 2.0);
 			alpha = 1.0 + (6.0 * (alpha + 0.18));
 		#endif
   
-		float ff = 20000;
+		float ff = 20000.0;
 		if((mirrorZ && mirrorX))
-		  ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
+		  ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150.0, 2.0)+pow(abs(gl_Vertex.x-left*mirrorX)/150.0, 2.0)+2.0);
 		else if(mirrorX)
-		  ff=ff/(pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
+		  ff=ff/(pow(abs(gl_Vertex.x-left*mirrorX)/150.0, 2.0)+2.0);
 		else if(mirrorZ)
-		  ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+2);
+		  ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150.0, 2.0)+2.0);
   
 		gl_Position  = gl_ModelViewProjectionMatrix*gl_Vertex;
 		//gl_Position.z+ff;
