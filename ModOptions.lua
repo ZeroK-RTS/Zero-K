@@ -740,14 +740,14 @@ local options = {
     section= "startconds",
     def    = false,
   },
-  {
-    key		= "enableunlocks",
-    name	= "Enable unlock system",
-    desc	= "Enables the unlock system (disabling will enable all units by default)",
-    type	= "bool",
-    def		= true,
-    section	= "experimental",
-  },  
+  --{
+  --  key		= "enableunlocks",
+  --  name	= "Enable unlock system",
+  --  desc	= "Enables the unlock system (disabling will enable all units by default)",
+  --  type	= "bool",
+  --  def		= true,
+  --  section	= "experimental",
+  --},  
   {
     key		= "impulsejump",
     name	= "Impulses Jump",
