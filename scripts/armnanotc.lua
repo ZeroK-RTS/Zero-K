@@ -38,34 +38,20 @@ function script.QueryNanoPiece()
 	return emitnano
 end
 
-
 function script.Killed(recentDamage, maxHealth)
-	Explode( body, SFX.EXPLODE )
-	Explode( aim, SFX.EXPLODE )
---[[
-	if( severity <= 25 )
-	{
-		corpsetype = 1;
-		explode body type BITMAPONLY | BITMAP1;
-		explode aim type BITMAPONLY | BITMAP3;
-		return (0);
-	}
-	if( severity <= 50 )
-	{
-		corpsetype = 2;
-		explode body type FALL | BITMAP1;
-		explode aim type FALL | BITMAP3;
-		return (0);
-	}
-	if( severity <= 99 )
-	{
-		corpsetype = 3;
-		explode body type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode aim type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-		return (0);
-	}
-	corpsetype = 3;
-	explode body type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-	explode aim type SHATTER | EXPLODE_ON_HIT | BITMAP3;
---]]
+	local severity = recentDamage / maxHealth
+
+	if severity < 0.25 then
+		return 1
+	elseif severity < 0.50 then
+		Explode (aim, SFX.FALL)
+		return 1
+	elseif severity < 0.75 then
+		Explode (aim, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		return 2
+	else
+		Explode (body, SFX.SHATTER)
+		Explode (aim, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		return 2
+	end
 end
