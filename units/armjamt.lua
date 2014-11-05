@@ -30,6 +30,10 @@ unitDef = {
 
     morphto = [[spherecloaker]],
     morphtime = 30,
+
+    area_cloak = 1,
+    area_cloak_upkeep = 12,
+    area_cloak_radius = 550,
   },
 
   energyUse                     = 1.5,
