@@ -29,6 +29,10 @@ unitDef = {
 
     morphto = [[armjamt]],
     morphtime = 30,
+
+    area_cloak = 1,
+    area_cloak_upkeep = 15,
+    area_cloak_radius = 440,
   },
 
   energyUse              = 1.5,
