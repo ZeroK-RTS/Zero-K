@@ -771,7 +771,7 @@ end
 local area_cloak_defaults = VFS.Include("gamedata/unitdef_defaults/area_cloak_defs.lua")
 for name, ud in pairs(UnitDefs) do
 	local cp = ud.customparams
-	if cp.area_cloak ~= "0" then
+	if cp.area_cloak and (cp.area_cloak ~= "0") then
 		if not cp.area_cloak_upkeep then cp.area_cloak_upkeep = tostring(area_cloak_defaults.upkeep) end
 		if not cp.area_cloak_radius then cp.area_cloak_radius = tostring(area_cloak_defaults.radius) end
 
