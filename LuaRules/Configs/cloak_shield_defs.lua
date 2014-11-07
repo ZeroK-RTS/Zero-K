@@ -10,7 +10,7 @@ local cloakShieldDefs = {}
 
 for name, ud in pairs (UnitDefNames) do
 	local cp = ud.customParams
-	if (cp.area_cloak ~= "0") then
+	if cp.area_cloak and (cp.area_cloak ~= "0") then
 		cloakShieldDefs[name] = {}
 
 		cloakShieldDefs[name].energy = tonumber (cp.area_cloak_upkeep)
