@@ -185,6 +185,7 @@ local artyRangeSkirmieeArray = {
 	["shipskirm"] = true,
 	["armsptk"] = true,
 	["corstorm"] = true,
+	["cormist"] = true,
 	["amphassault"] = true,
 	["chicken_sporeshooter"] = true,
 	["corrl"] = true,
