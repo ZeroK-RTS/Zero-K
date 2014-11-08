@@ -296,7 +296,7 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
 end
 
 
-local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
+local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n)
 
 	local data = unit[unitID]
 	
@@ -308,7 +308,7 @@ local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
 	local cx,cy,cz -- command position	
 	
 	if not (ex and vx) then
-		return false
+		return behaviour.skirmKeepOrder
 	end
 	
 	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
@@ -317,6 +317,13 @@ local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
 	local skirmRange = GetEffectiveWeaponRange(data.udID,(uy-ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) - behaviour.skirmLeeway
 	
 	if skirmRange > pointDis then
+	
+		if behaviour.skirmOnlyNearEnemyRange then
+			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef,(uy-ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
+			if enemyRange < pointDis then
+				return behaviour.skirmKeepOrder
+			end
+		end
 
 		local dis = behaviour.skirmOrderDis 
 		local f = dis/pointDis
@@ -341,7 +348,7 @@ local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
-	return false
+	return behaviour.skirmKeepOrder
 end
 
 local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue,n)
@@ -489,7 +496,7 @@ local function updateUnits(frame, start, increment)
 				if checkSkirm then
 					if enemy and ((los and behaviour.skirms[enemyUnitDef]) or ((not los) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 						--Spring.Echo("unit checking skirm")
-						if not skirmEnemy(unitID, behaviour, enemy, move, cQueue, frame) then
+						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame) then
 							clearOrder(unitID,data,cQueue)
 						end
 					else
@@ -574,6 +581,8 @@ local function GetBehaviourTable(behaviourData, ud)
 		minCircleStrafeDistance = weaponRange - (behaviourData.minCircleStrafeDistance or behaviourDefaults.defaultMinCircleStrafeDistance),
 		skirmRange = weaponRange,
 		skirmLeeway = (behaviourData.skirmLeeway or 0),
+		skirmOnlyNearEnemyRange = (behaviourData.skirmOnlyNearEnemyRange or false),
+		skirmKeepOrder = (behaviourData.skirmKeepOrder or false),
 		jinkTangentLength = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength),
 		jinkParallelLength =  (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength),
 		alwaysJinkFight = (behaviourData.alwaysJinkFight or false),

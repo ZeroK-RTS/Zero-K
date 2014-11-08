@@ -195,6 +195,23 @@ local artyRangeSkirmieeArray = {
 	["armorco"] = true,
 }
 
+local slasherSkirmieeArray = {
+	["corsumo"] = true,
+	["dante"] = true,
+	["armwar"] = true,
+	["hoverassault"] = true,
+	["cormak"] = true,
+	["corthud"] = true,
+	["spiderriot"] = true,
+	["armzeus"] = true,
+	["spiderassault"] = true,
+	["corlevlr"] = true,
+	["hoverriot"] = true,
+    ["shieldfelon"] = true,
+	["correap"] = true,
+	["armrock"] = true,
+}
+
 veryShortRangeSkirmieeArray = NameTableToUnitDefID(veryShortRangeSkirmieeArray)
 shortRangeSkirmieeArray = NameTableToUnitDefID(shortRangeSkirmieeArray)
 riotRangeSkirmieeArray = NameTableToUnitDefID(riotRangeSkirmieeArray)
@@ -202,6 +219,8 @@ lowMedRangeSkirmieeArray = NameTableToUnitDefID(lowMedRangeSkirmieeArray)
 medRangeSkirmieeArray = NameTableToUnitDefID(medRangeSkirmieeArray)
 longRangeSkirmieeArray = NameTableToUnitDefID(longRangeSkirmieeArray)
 artyRangeSkirmieeArray = NameTableToUnitDefID(artyRangeSkirmieeArray)
+
+slasherSkirmieeArray = NameTableToUnitDefID(slasherSkirmieeArray)
 
 merge(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
 merge(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
@@ -284,7 +303,9 @@ armedLand = NameTableToUnitDefID(armedLand)
 -- skirmLeeway: (Weapon range - skirmLeeway) = distance that the unit will try to keep from units while skirming
 -- stoppingDistance (defaults to 0): (skirmLeeway - stoppingDistance) = max distance from target unit that move commands can be given while skirming
 -- skirmRadar (defaults to false): Skirms radar dots
+-- skirmOnlyNearEnemyRange (defaults to false): If true, skirms only when the enemy unit is withing enemyRange + skirmOnlyNearEnemyRange
 -- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
+-- skirmKeepOrder (defaults to false): If true the unit does not clear its move order when too far away from the unit it is skirming.
 -- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
@@ -753,6 +774,19 @@ local behaviourConfig = {
 		skirmLeeway = 30,
 		skirmOrderDis = 200,
 		velocityPrediction = 60,
+	},
+	
+	-- weird stuff
+	["cormist"] = {
+		defaultAIState = 0,
+		skirms = slasherSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmLeeway = -400, 
+		skirmOrderDis = 700,
+		skirmKeepOrder = true,
+		velocityPrediction = 10,
+		skirmOnlyNearEnemyRange = 80
 	},
 	
 	-- arty range skirms
