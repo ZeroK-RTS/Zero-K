@@ -209,9 +209,8 @@ local morphCmdDesc = {
   action = 'morph',
 }
 
---// will be replaced in Initialize()
-local RankToXp    = function() return 0 end
-local GetUnitRank = function() return 0 end
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local GetUnitRank = function(unitID) return spGetUnitRulesParam(unitID, "rank") end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -351,7 +350,7 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef, teamTech, un
     tt = tt .. RedStr .. 'needs'
     if (morphDef.tech>teamTech) then tt = tt .. ' level: ' .. morphDef.tech end
     if (morphDef.xp>unitXP)     then tt = tt .. ' xp: '    .. string.format('%.2f',morphDef.xp) end
-    if (morphDef.rank>unitRank) then tt = tt .. ' rank: '  .. morphDef.rank .. ' (' .. string.format('%.2f',RankToXp(unitDefID,morphDef.rank)) .. 'xp)' end
+    if (morphDef.rank>unitRank) then tt = tt .. ' rank: '  .. morphDef.rank end
     if (not teamOwnsReqUnit)    then tt = tt .. ' unit: '  .. UnitDefs[morphDef.require].humanName end
   end
   return tt
@@ -738,12 +737,6 @@ end
 
 
 function gadget:Initialize()
-  --// RankApi linking
-  if (GG.rankHandler) then
-    GetUnitRank = GG.rankHandler.GetUnitRank
-    RankToXp    = GG.rankHandler.RankToXp
-  end
-
   -- self linking for planetwars
   GG['morphHandler'] = {}
   GG['morphHandler'].AddExtraUnitMorph = AddExtraUnitMorph
