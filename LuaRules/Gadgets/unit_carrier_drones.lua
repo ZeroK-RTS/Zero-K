@@ -75,14 +75,25 @@ local function InitCarrier(unitID, unitDefID, teamID)
 	return toReturn
 end
 
+-- communicates to unitscript, copied from unit_float_toggle; should be extracted to utility 
+-- preferably that before i PR this
+local function callScript(unitID, funcName, args)
+	local func = Spring.UnitScript.GetScriptEnv(unitID)[funcName]
+	if func then
+		Spring.UnitScript.CallAsUnit(unitID,func, args)
+	end
+end
+
 local function NewDrone(unitID, unitDefID, droneName, setNum, droneBuiltExternally)
 	local carrierEntry = carrierList[unitID]
 	local _, _, _, x, y, z = GetUnitPosition(unitID, true)
 	local xS, yS, zS = x, y, z
 	local rot = 0
+	local piece = nil
 	if carrierEntry.spawnPieces and not droneBuiltExternally then
 		local index = carrierEntry.pieceIndex
-		local px, py, pz, pdx, pdy, pdz = GetUnitPiecePosDir(unitID, carrierEntry.spawnPieces[index])
+		piece = carrierEntry.spawnPieces[index];
+		local px, py, pz, pdx, pdy, pdz = GetUnitPiecePosDir(unitID, piece)
 		xS, yS, zS = px, py, pz
 		rot = Spring.GetHeadingFromVector(pdx, pdz)/65536*2*math.pi + math.pi
 		
@@ -97,6 +108,7 @@ local function NewDrone(unitID, unitDefID, droneName, setNum, droneBuiltExternal
 		zS = (z + (math.cos(angle) * 20))
 		rot = angle
 	end
+	
 	--Note: create unit argument: (unitDefID|unitDefName,x,y,z,facing,teamID,build,flattenGround,targetID,builderID)
 	local droneID = CreateUnit(droneName,xS,yS,zS,1,carrierList[unitID].teamID, droneBuiltExternally and true,false,nil,unitID)
 	if droneID then
@@ -119,7 +131,7 @@ local function NewDrone(unitID, unitDefID, droneName, setNum, droneBuiltExternal
 
 		SetUnitNoSelect(droneID,true)
 
-		droneList[droneID] = {carrier = unitID, set = setNum}
+		droneList[droneID] = {carrier = unitID, set = setNum}		
 	end
 	return droneID,rot
 end
@@ -151,6 +163,8 @@ function AddUnitToEmptyPad(carrierID,droneType)
 		for i=1, #carrierList[carrierID].spawnPieces do
 			local pieceNum = carrierList[carrierID].spawnPieces[i]
 			if CheckCreateStart(pieceNum) then
+				--- notify carrier that it should start a drone building animation
+				callScript(carrierID, "Carrier_droneStarted", pieceNum)
 				break
 			end
 		end
@@ -317,6 +331,7 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 				buildProgress = buildProgress+(build_step*slowMult) --progress
 				Spring.SetUnitHealth(unitID,{health=health+(build_step_health*slowMult), build = buildProgress }) 
 				if buildProgress >= 1 then 
+					callScript(carrierID, "Carrier_droneCompleted", padPieceID)
 					break
 				end
 			end
@@ -336,7 +351,6 @@ function SitOnPad(unitID,carrierID, padPieceID,offsets)
 		
 		-- activate unit and its jets
 		Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
-		
 		AddNextDroneFromQueue(carrierID) --this create next drone in this position (in this same GameFrame!), so it might look overlapped but that's just minor details
 	end
 	
@@ -534,7 +548,7 @@ function gadget:GameFrame(n)
 						local reloadMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
 						set.reload = (set.reload - reloadMult)
 						
-					elseif (set.droneCount < set.config.maxDrones) and set.buildCount==0 then --not reach max count and finished previous queue
+					elseif (set.droneCount < set.config.maxDrones) and set.buildCount < set.config.maxBuild then --not reach max count and finished previous queue
 						for n=1,set.config.spawnSize do
 							if (set.droneCount >= set.config.maxDrones) then
 								break
@@ -543,9 +557,9 @@ function gadget:GameFrame(n)
 							-- NewDrone(carrierID, carrier.unitDefID, set.config.drone, i )
 							
 							-- Method2: Build nanoframe,
-							set.buildCount = n
 							carrierList[carrierID].droneInQueue[ #carrierList[carrierID].droneInQueue+ 1 ] = i
 							if AddUnitToEmptyPad(carrierID, i ) then
+								set.buildCount = set.buildCount + 1;
 								table.remove(carrierList[carrierID].droneInQueue,1)
 							end
 						end

@@ -564,16 +564,20 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 
 			if options[name .. "_retreatpercent"] and options[name .. "_retreatpercent"].value then
-				if options[name .. "_retreatpercent"].value == -1 then --if inherit
+				local retreat = options[name .. "_retreatpercent"].value
+				if retreat == -1 then --if inherit
 					if builderID then
-						local retreat = Spring.GetUnitRulesParam(builderID,"retreatState")
-						if retreat then
-							-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, {"shift"})
-							orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, {"shift"}}
-						end
+						retreat = Spring.GetUnitRulesParam(builderID,"retreatState")
+					else
+						retreat = nil
 					end
-				else --if not inherit
-					orderArray[#orderArray + 1] = {CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"}}
+				end
+				if retreat then
+					if retreat == 0 then
+						orderArray[#orderArray + 1] = {CMD_RETREAT, {0}, {"shift", "right"}}  -- to set retreat to 0, "right" option must be used
+					else
+						orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, {"shift"}}
+					end
 				end
 			end
 

@@ -21,6 +21,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    post_capture_reload = 360,
     description_de = [[Kaperungsfahrzeug]],
     description_pl = [[Pojazd do przejmowania jednostek]],
     helptext       = [[The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed.]],
@@ -84,10 +85,13 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customparams = {
+        capture_scaling = 0,
+        is_capture = 1,
+      },
+
       damage                  = {
-        default = 10,
-        planes  = 10,
-        subs    = 10,
+        default = 2.6,
       },
 
       explosionGenerator      = [[custom:NONE]],

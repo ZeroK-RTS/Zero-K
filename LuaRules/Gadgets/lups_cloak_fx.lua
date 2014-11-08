@@ -55,7 +55,7 @@ local tryloading  = 1     --// try to activate lups if it isn't found
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« some basic functions »»
+--  Â«Â« some basic functions Â»Â»
 --
 
 local supportedFxs = {}
@@ -72,7 +72,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« cloaked unit handling »»
+--  Â«Â« cloaked unit handling Â»Â»
 --
 
 local CloakedHitEffect = { class='UnitJitter',options={ life=50, pos={0,0,0}, enemyHit=true, repeatEffect=false} }
@@ -202,10 +202,15 @@ function gadget:UnitDecloaked(unitID,unitDefID,teamID)
   end
 end
 
+function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+	if (Spring.GetUnitIsCloaked(unitID)) then
+		gadget:UnitCloaked(unitID,unitDefID,teamID)
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« Unit Destroyed handling »»
+--  Â«Â« Unit Destroyed handling Â»Â»
 --
 
 function gadget:UnitDestroyed(unitID,unitDefID)

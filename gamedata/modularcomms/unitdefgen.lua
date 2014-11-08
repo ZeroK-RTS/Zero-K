@@ -401,6 +401,12 @@ for name, data in pairs(commDefs) do
 			end
 		end
 	end
+
+	-- set morph time
+	if data.customparams.morphto then
+		local morph_time = (commDefs[data.customparams.morphto].buildtime - data.buildtime) / (5 * (data.customparams.level + 1))
+		data.customparams.morphtime = tostring(math.floor(morph_time))
+	end
 end
 
 -- remove stress test defs

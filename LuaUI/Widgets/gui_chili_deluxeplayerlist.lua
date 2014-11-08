@@ -276,7 +276,7 @@ local x_bound
 local x_windowbound
 
 local function CheckShowWins()
-	return (WG.WinCounter_currentWinTable.hasWins and options.win_show_condition.value == "whenRelevant") or options.win_show_condition.value == "always"
+	return WG.WinCounter_currentWinTable ~= nil and (WG.WinCounter_currentWinTable.hasWins and options.win_show_condition.value == "whenRelevant") or options.win_show_condition.value == "always"
 end
 
 local function CalculateWidths()
@@ -408,7 +408,7 @@ local function FormatMetalStats(stat,k)
 end
 
 local function FormatElo(elo,full)
-	local mult = full and 1 or 50
+	local mult = full and 1 or 10
 	local elo_out = mult * math.floor((elo/mult) + .5)
 	local eloCol = {}
 
@@ -1356,7 +1356,7 @@ SetupScrollPanel = function ()
 		--height = "100%",
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
 		borderColor = {1,1,1,options.backgroundOpacity.value},
-		padding = {0, 5, 0, 5},
+		padding = {0, 0, 0, 0},
 		--autosize = true,
 		--right = 0,
 		scrollbarSize = 6,

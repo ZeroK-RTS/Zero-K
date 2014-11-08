@@ -22,7 +22,7 @@ unitDef = {
     [[armbanth]],
     [[armorco]],
     [[cornukesub]],
-    [[armcarry]],
+    [[reef]],
     [[corbats]],
   },
 

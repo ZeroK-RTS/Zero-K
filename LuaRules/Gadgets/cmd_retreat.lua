@@ -355,7 +355,7 @@ function RetreatCommand(unitID, cmdID, cmdParams, cmdOptions)
 	local state = cmdParams[1]
 	if cmdOptions.right then 
 		state = 0
-	elseif state == 0 then
+	elseif state == 0 then  --note: this means that to set "Retreat Off" (state = 0) you need to use the "right" modifier, whether the command is given by the player using an ui button or by Lua
 		state = 1
 	end
 	retreatables[unitID] = state ~= 0 or wantRetreat[unitID] or isRetreating[unitID]

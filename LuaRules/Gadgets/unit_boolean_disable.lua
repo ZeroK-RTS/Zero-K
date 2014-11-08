@@ -105,7 +105,7 @@ local function moveUnitID(unitID, byFrame, byUnitID, frame, extraParamFrames)
 end
 
 local function addParalysisDamageToUnit(unitID, damage, pTime)
-	local health,_,paralyzeDamage = Spring.GetUnitHealth(unitID)
+	local health,maxHealth,paralyzeDamage = Spring.GetUnitHealth(unitID)
 	local extraTime = math.floor(damage/health*DECAY_FRAMES) -- time that the damage would add
 	if partialUnitID[unitID] then -- if the unit is partially paralysed
 		local newPara = partialUnitID[unitID].frameID+extraTime
@@ -131,8 +131,7 @@ local function addParalysisDamageToUnit(unitID, damage, pTime)
 		end
 	else -- unit is not paralysed at all
 		if paralyzeDamage > 0 then
-			damage = damage + paralyzeDamage
-			extraTime = math.floor(damage/health*DECAY_FRAMES)
+			extraTime = math.floor((damage/health + paralyzeDamage/maxHealth)*DECAY_FRAMES)
 		end
 		if extraTime > DECAY_FRAMES then -- if the new paralysis puts it over 100%
 			local newPara = extraTime + f

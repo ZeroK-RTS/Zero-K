@@ -306,11 +306,11 @@ end
 if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if name == "fighter" then
-			ud.turnRadius = 200
-			ud.maxRudder = 0.001
+			ud.turnRadius = 150
+			ud.maxRudder = 0.005
 		elseif name == "corvamp" then
 			ud.turnRadius = 80
-			ud.maxRudder = 0.001
+			ud.maxRudder = 0.004
 		elseif name == "bomberdive" then
 			ud.turnRadius = 40
 		elseif name == "corhurc2" then
@@ -754,15 +754,53 @@ for name, ud in pairs(UnitDefs) do
 end
 
 -- Set default out of combat autorepair
+local autoheal_defaults = VFS.Include("gamedata/unitdef_defaults/autoheal_defs.lua")
 for name, ud in pairs(UnitDefs) do
+	if not ud.autoheal then
+		ud.autoheal = autoheal_defaults.autoheal
+	end
 	if not ud.idletime then
-		ud.idletime = 1800 -- frames, = 60s
+		ud.idletime = autoheal_defaults.idletime
 	end
 	if not ud.idleautoheal then
-		ud.idleautoheal = 5 -- HP/s
+		ud.idleautoheal = autoheal_defaults.idleautoheal
 	end
 end
 
+-- Set defaults for area cloak
+local area_cloak_defaults = VFS.Include("gamedata/unitdef_defaults/area_cloak_defs.lua")
+for name, ud in pairs(UnitDefs) do
+	local cp = ud.customparams
+	if cp.area_cloak and (cp.area_cloak ~= "0") then
+		if not cp.area_cloak_upkeep then cp.area_cloak_upkeep = tostring(area_cloak_defaults.upkeep) end
+		if not cp.area_cloak_radius then cp.area_cloak_radius = tostring(area_cloak_defaults.radius) end
+
+		if not cp.area_cloak_grow_rate then cp.area_cloak_grow_rate = tostring(area_cloak_defaults.grow_rate) end
+		if not cp.area_cloak_shrink_rate then cp.area_cloak_shrink_rate = tostring(area_cloak_defaults.shrink_rate) end
+		if not cp.area_cloak_decloak_distance then cp.area_cloak_decloak_distance = tostring(area_cloak_defaults.decloak_distance) end
+
+		if not cp.area_cloak_init then cp.area_cloak_init = tostring(area_cloak_defaults.init) end
+		if not cp.area_cloak_draw then cp.area_cloak_draw = tostring(area_cloak_defaults.draw) end
+		if not cp.area_cloak_self then cp.area_cloak_self = tostring(area_cloak_defaults.self) end
+	end
+end
+
+-- Set defaults for jump
+local jump_defaults = VFS.Include("gamedata/unitdef_defaults/jump_defs.lua")
+for name, ud in pairs (UnitDefs) do
+	local cp = ud.customparams
+	if cp.canjump == "1" then
+		if not cp.jump_range then cp.jump_range = tostring(jump_defaults.range) end
+		if not cp.jump_height then cp.jump_height = tostring(jump_defaults.height) end
+		if not cp.jump_speed then cp.jump_speed = tostring(jump_defaults.speed) end
+		if not cp.jump_reload then cp.jump_reload = tostring(jump_defaults.reload) end
+		if not cp.jump_delay then cp.jump_delay = tostring(jump_defaults.delay) end
+
+		if not cp.jump_from_midair then cp.jump_from_midair = tostring(jump_defaults.from_midair) end
+		if not cp.jump_rotate_midair then cp.jump_rotate_midair = tostring(jump_defaults.rotate_midair) end
+		if not cp.jump_spread_exception then cp.jump_spread_exception = tostring(jump_defaults.spread_exception) end
+	end
+end
 
 -- Disable porc/air/specific units modoptions (see lockunits_modoption.lua)
 

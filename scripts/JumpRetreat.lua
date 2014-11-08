@@ -1,6 +1,6 @@
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
-local jumpRange = GG.jumpDefs[unitDefID].range
+local jumpRange = tonumber(UnitDefs[unitDefID].customParams.jump_range)
 
 local firstTime = true
 

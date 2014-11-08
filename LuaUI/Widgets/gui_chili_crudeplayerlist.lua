@@ -56,7 +56,7 @@ local function IsFFA()
 	local numAllyTeams = 0
 	for i=1,#allyteams do
 		if allyteams[i] ~= gaiaAT then
-			local teams = Spring.GetTeamList()
+			local teams = Spring.GetTeamList(allyteams[i])
 			if #teams > 0  then
 				numAllyTeams = numAllyTeams + 1
 			end
@@ -204,7 +204,7 @@ options = {
 --------------------------------------------------------------------------------
 
 local function CheckShowWins()
-	return (WG.WinCounter_currentWinTable.hasWins and options.win_show_condition.value == "whenRelevant") or options.win_show_condition.value == "always"
+	return WG.WinCounter_currentWinTable ~= nil and (WG.WinCounter_currentWinTable.hasWins and options.win_show_condition.value == "whenRelevant") or options.win_show_condition.value == "always"
 end
 
 local function ShareUnits(playername, team)

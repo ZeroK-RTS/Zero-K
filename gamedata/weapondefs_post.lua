@@ -190,6 +190,9 @@ end
 	if weaponDef.weaponvelocity then
 		weaponDef.customparams.weaponvelocity = weaponDef.weaponvelocity -- For attack AOE widget
 	end
+	if weaponDef.dyndamageexp and (weaponDef.dyndamageexp > 0) then
+		weaponDef.customparams.dyndamageexp = weaponDef.dyndamageexp
+	end
  end
 
 --------------------------------------------------------------------------------
@@ -200,6 +203,11 @@ end
  for _, weaponDef in pairs(WeaponDefs) do
     weaponDef.noselfdamage = (weaponDef.noselfdamage ~= false)
  end
+ 
+-- remove experience bonuses
+for _, weaponDef in pairs(WeaponDefs) do
+	weaponDef.ownerExpAccWeight = 0
+end
  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

@@ -18,7 +18,6 @@ if (not gadgetHandler:IsSyncedCode()) then
    return false
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -38,6 +37,7 @@ local spDestroyFeature         = Spring.DestroyFeature
 local spCreateUnit             = Spring.CreateUnit
 local spGiveOrderToUnit        = Spring.GiveOrderToUnit
 local spSetUnitRulesParam      = Spring.SetUnitRulesParam
+local spGetUnitRulesParam      = Spring.GetUnitRulesParam
 local spGetFeatureDefID        = Spring.GetFeatureDefID
 
 local CMD_FIRE_STATE = CMD.FIRE_STATE
@@ -137,7 +137,8 @@ function gadget:GameFrame(f)
 		
 			local unitID = unitIndex[i]
 			local unit = units[unitID]
-			local quota = unit.defs.drain
+			local slowMult = 1 - (spGetUnitRulesParam(unitID, "slowState") or 0)
+			local quota = unit.defs.drain * slowMult
 			local x,y,z = spGetUnitPosition(unitID)
 			local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 			-- drain metal while quote not fulfilled
@@ -152,7 +153,8 @@ function gadget:GameFrame(f)
 					   0,0,0,
 					   30, 30
 					);
-					metal = featureMetal[feature] or spGetFeatureResources(feature)
+					local _, maxMetal, _,_, reclaim = spGetFeatureResources(feature)
+					metal = featureMetal[feature] or maxMetal*reclaim
 					if metal >= quota then
 						unit.progress = unit.progress + quota
 						featureMetal[feature] = metal-quota

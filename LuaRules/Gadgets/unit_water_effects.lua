@@ -29,6 +29,23 @@ local unitByID = {data = {}, count = 0}
 
 local unitDefData, waterCannonIterable, waterCannonIndexable = include("LuaRules/Configs/water_effect_defs.lua")
 
+for id, data in pairs(UnitDefs) do
+	if data.customParams then
+		if data.customParams.amph_regen then
+			if not unitDefData[id] then
+				unitDefData[id] = {}
+			end
+			unitDefData[id].healthRegen = tonumber(data.customParams.amph_regen)
+		end
+		if data.customParams.amph_submerged_at then
+			if not unitDefData[id] then
+				unitDefData[id] = {}
+			end
+			unitDefData[id].submergedAt = tonumber(data.customParams.amph_submerged_at)
+		end
+	end
+end
+
 local REGEN_PERIOD = 13
 local SECOND_MULT = REGEN_PERIOD/30
 
