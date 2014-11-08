@@ -586,6 +586,9 @@ local function printunitinfo(ud, lang, buttonWidth)
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'Max HP: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.health), textColor = color.stats_fg, }
+	
+	statschildren[#statschildren+1] = Label:New{ caption = 'Sight Distance: ', textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*64,2), textColor = color.stats_fg, } -- losRadius is multiplied by 64 because Spring does not return it in elmos
 		
 	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
