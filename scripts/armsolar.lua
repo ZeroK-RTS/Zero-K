@@ -59,24 +59,34 @@ function script.Create()
 	Turn( base , y_axis, math.rad(45) )	
 end
 
+local force_close_time = tonumber(UnitDef.customParams.force_close) * 1000
+
 local function DefensiveManeuver()
 	Signal(SIG_Defensive)
 	SetSignalMask(SIG_Defensive)
 	SetUnitValue(COB.ACTIVATION, 0)
 	spSetUnitRulesParam(unitID, "force_close", 1)
-	Sleep(8000)
+	Sleep(force_close_time)
 	spSetUnitRulesParam(unitID, "force_close", 0)
 	SetUnitValue(COB.ACTIVATION, 1)
 end
---[[
+
 function HitByWeaponGadget()
 	StartThread(DefensiveManeuver)
 end
---]]
 
--- this happens before PreDamaged
+
+local noFFWeaponDefs = {}
+for wdid = 1, #WeaponDefs do
+	local wd = WeaponDefs[wdid]
+	if wd.customParams and wd.customParams.nofriendlyfire then
+		noFFWeaponDefs[wdid] = true
+	end
+end
+
+-- this happens before PreDamaged but only in 97.0+
 function script.HitByWeapon(x, z, weaponDefID, damage)
-	if damage > 1 then
+	if damage > 1 and not (weaponDefID and noFFWeaponDefs[weaponDefID]) then
 		StartThread(DefensiveManeuver)
 	end
 end

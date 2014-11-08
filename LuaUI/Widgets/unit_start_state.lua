@@ -37,7 +37,7 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/New Unit States'
-options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
+options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
@@ -107,7 +107,7 @@ options = {
         path = "Game/New Unit States/Misc",
     },
 
-    commander_firestate = {
+    commander_firestate0 = {
         name = "  Firestate",
         desc = "Values: hold fire, return fire, fire at will",
         type = 'number',
@@ -208,7 +208,7 @@ local function addUnit(defName, path)
     options_order[#options_order+1] = defName .. "_label"
     
     if ud.canAttack or ud.isFactory then
-        options[defName .. "_firestate"] = {
+        options[defName .. "_firestate0"] = {
             name = "  Firestate",
             desc = "Values: inherit from factory, hold fire, return fire, fire at will",
             type = 'number',
@@ -218,7 +218,7 @@ local function addUnit(defName, path)
             step = 1,
             path = path,
         }
-        options_order[#options_order+1] = defName .. "_firestate"
+        options_order[#options_order+1] = defName .. "_firestate0"
     end
 
     if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
@@ -401,6 +401,17 @@ local function addUnit(defName, path)
         options_order[#options_order+1] = defName .. "_personal_cloak_0"
     end
 	
+	if ud.onOffable then
+		options[defName .. "_activateWhenBuilt"] = {
+            name = "  On/Off State",
+            desc = "Check box to set the unit to On when built.",
+            type = 'bool',
+            value = ud.activateWhenBuilt,
+            path = path,
+        }
+        options_order[#options_order+1] = defName .. "_activateWhenBuilt"
+	end
+	
 end
 
 local function AddFactoryOfUnits(defName)
@@ -426,6 +437,7 @@ AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
 AddFactoryOfUnits("factoryship")
 AddFactoryOfUnits("striderhub")
+AddFactoryOfUnits("missilesilo")
 -- addUnit("striderhub","Mech")
 -- addUnit("armcsa","Mech")
 -- addUnit("armcomdgun","Mech")
@@ -453,27 +465,28 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+		local ud = UnitDefs[unitDefID]
 		local orderArray = {}
-        if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
+        if ud.customParams.commtype or ud.customParams.level then
 			local morphed = Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1
 			if morphed then -- unit states are applied in unit_morph gadget
 				return 
 			end 
-			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
+			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate0.value}, {"shift"})
             -- Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
 			-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
-			orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"}}
+			orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, {"shift"}}
 			orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
 			if WG['retreat'] then 
 				WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value) 
 			end
         end
         
-        local name = UnitDefs[unitDefID].name
+        local name = ud.name
         if unitAlreadyAdded[name] then
             
-            if options[name .. "_firestate"] and options[name .. "_firestate"].value then
-                if options[name .. "_firestate"].value == -1 then
+            if options[name .. "_firestate0"] and options[name .. "_firestate0"].value then
+                if options[name .. "_firestate0"].value == -1 then
                     if builderID then
                         local bdid = Spring.GetUnitDefID(builderID)
                         if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
@@ -485,8 +498,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                         end
                     end
                 else
-                    --Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options[name .. "_firestate"].value}, {"shift"})
-					orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {options[name .. "_firestate"].value}, {"shift"}}
+                    --Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options[name .. "_firestate0"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {options[name .. "_firestate0"].value}, {"shift"}}
                 end
             end
             
@@ -551,16 +564,20 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 
 			if options[name .. "_retreatpercent"] and options[name .. "_retreatpercent"].value then
-				if options[name .. "_retreatpercent"].value == -1 then --if inherit
+				local retreat = options[name .. "_retreatpercent"].value
+				if retreat == -1 then --if inherit
 					if builderID then
-						local retreat = Spring.GetUnitRulesParam(builderID,"retreatState")
-						if retreat then
-							-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, {"shift"})
-							orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, {"shift"}}
-						end
+						retreat = Spring.GetUnitRulesParam(builderID,"retreatState")
+					else
+						retreat = nil
 					end
-				else --if not inherit
-					orderArray[#orderArray + 1] = {CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"}}
+				end
+				if retreat then
+					if retreat == 0 then
+						orderArray[#orderArray + 1] = {CMD_RETREAT, {0}, {"shift", "right"}}  -- to set retreat to 0, "right" option must be used
+					else
+						orderArray[#orderArray + 1] = {CMD_RETREAT, {retreat}, {"shift"}}
+					end
 				end
 			end
 
@@ -591,6 +608,17 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                 -- Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"})
 				orderArray[#orderArray + 1] = {CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"}}
             end
+			
+			if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
+				-- Spring.GiveOrderToUnit(unitID, CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"}}
+			end
+			
+			if options[name .. "_activateWhenBuilt"] and options[name .. "_activateWhenBuilt"].value ~= nil then
+				if options[name .. "_activateWhenBuilt"].value ~= ud.activateWhenBuilt then
+					orderArray[#orderArray + 1] = {CMD.ONOFF, {options[name .. "_activateWhenBuilt"].value and 1 or 0}, {"shift"}}
+				end
+			end
         end
 		
 		if #orderArray>0 then
@@ -637,11 +665,6 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 				-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"})
 				orderArray[#orderArray + 1] = {CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"}}
 			end
-		end
-		
-		if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
-			-- Spring.GiveOrderToUnit(unitID, CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
-			orderArray[#orderArray + 1] = {CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"}}
 		end
 		
 		if #orderArray>0 then

@@ -47,7 +47,7 @@ local noFeatureRange = 0
 ]]--
 
 options_path = 'Settings/Graphics/Map/VR Grid'
-options_order = {"mirrorHeightMap","drawForIslands","res","range","northSouthText"}
+options_order = {"mirrorHeightMap","res","range","northSouthText"}
 options = {
 	mirrorHeightMap = {
 		name = "Mirror heightmap",
@@ -55,16 +55,12 @@ options = {
 		value = true,
 		desc = 'Mirrors heightmap on the grid',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 		
 	},
-	drawForIslands = {
-		name = "Draw for islands",
-		type = 'bool',
-		value = Spring.GetConfigInt("ReflectiveWater", 0) ~= 4,
-		desc = "Draws mirror grid when map is an island",		
-	},	
 	res = {
 		name = "Tile size (64-512)",
 		advanced = true,
@@ -75,8 +71,10 @@ options = {
 		value = 512,
 		desc = 'Sets tile size (lower = more detail)\nStepsize is 64; recommend powers of 2',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 
 	},
 	range = {
@@ -89,8 +87,10 @@ options = {
 		value = 3072,
 		desc = 'How far outside the map to draw',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 
 	},	
 	northSouthText = {
@@ -99,8 +99,10 @@ options = {
 		value = false,
 		desc = 'Help you identify map direction under rotation by placing a "North/South/East/West" text on the map edges',
 		OnChange = function(self)
-			gl.DeleteList(DspLst)
-			widget:Initialize()
+			if DspLst then
+				gl.DeleteList(DspLst)
+				widget:Initialize()
+			end
 		end, 		
 	},	
 }
@@ -307,7 +309,7 @@ local function DrawTiles()
 end
 
 function widget:DrawWorldPreUnit()
-	if (not island) or options.drawForIslands.value then
+	if DspLst then
 		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 		-- Maybe you want Spring.SetDrawGround(false) somewhere
 	end	

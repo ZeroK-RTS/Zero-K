@@ -12,7 +12,7 @@ local Sounds = {
 		--   file = "sounds/button9.wav",
 		--},
 		MapPoint = {
-			file = "sounds/beep4.wav", --"sounds/marker_place.wav",
+			file = "sounds/beep4_decrackled.wav",
 			maxconcurrent = 3,
 		},
 		--[[
@@ -32,13 +32,14 @@ local Sounds = {
 		--]]	  
 		BladeSwing = {
 			file = "sounds/weapon/blade/blade_swing.wav",
-			in3d = true,
-			pitchMod = 0.2,
-			gainMod = 0.2,
+			pitchMod = 0.1,
+			gainMod = 0.1,
+			pitch = 0.8,
+			gain = 0.9,
+			priority = 1,
 		},
 		BladeHit = {
 			file = "sounds/weapon/blade/blade_hit.wav",
-			in3d = true,
 			pitchMod = 0.5,
 			gainMod = 0.2,
 		},

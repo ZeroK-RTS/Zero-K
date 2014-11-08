@@ -18,13 +18,14 @@ unitDef = {
   cantBeTransported      = true,
   category               = [[SHIP]],
   CollisionSphereScale   = 0.6,
-  collisionVolumeOffsets = [[-1 -10 20]],
-  collisionVolumeScales  = [[80 60 260]],
+  collisionVolumeOffsets = [[-1 20 20]],
+  collisionVolumeScales  = [[80 70 260]],
   collisionVolumeTest	 = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
+    pad_count = 9,
     description_de = [[Flugzeugträger (Bomber) & Anti-Nuke]],
     description_fr = [[Porte-Avion Bombardier & Anti-Nuke]],
     description_pl = [[Lotniskowiec z tarcza antyrakietowa]],
@@ -32,6 +33,7 @@ unitDef = {
     helptext_de    = [[Das vielseitigste Schiff auf hoher See, der Träger bietet verschiedenste Funktionen. Er ist mit Marschflugkörpern für weitreichendes Bombardement ausgerüstet. Sein antinukleares System schützt die Flotte vor Atomraketen. Außerdem dient es auch als mobile Reperaturbasis für befreundete Flugzeuge. Vielleicht am nenenswertesten: der Träger besitzt sein eigenes Geschwader an Kampfdrohnen.]],
     helptext_fr    = [[C'est le plus polyvalent des Navires possibles, le Reef peut tirer des missiles de croisicre longue portée pour des frappes chirurgicales, tirer des antimissiles pour contrer tout missile nucléaire, servir de station de réparation et de rechargement pour les planeurs alliés ou encore utiliser ses nombreux drones.]],
     helptext_pl    = [[Najbardziej wielozadaniowy sposrod okretow. Posiada rakiety dalekiego zasiegu i tarcze antyrakietowa, a jego pokład sluzy jako stacja naprawy i dozbrajania samolotow. Ponadto jest w stanie automatycznie produkowac wlasne drony bojowe.]],
+	midposoffset   = [[0 -10 0]],
     modelradius    = [[30]],
   },
 
@@ -46,7 +48,6 @@ unitDef = {
   maxDamage              = 7500,
   maxVelocity            = 2.75,
   minCloakDistance       = 75,
-  modelCenterOffset      = [[0 -10 0]],
   movementClass          = [[BOAT6]],
   objectName             = [[ARMCARRIER]],
   script                 = [[armcarry.lua]],

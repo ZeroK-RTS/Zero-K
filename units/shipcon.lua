@@ -21,9 +21,9 @@ unitDef = {
   canstop                = [[1]],
   category               = [[SHIP UNARMED]],
   collisionVolumeOffsets = [[0 8 0]],
-  collisionVolumeScales  = [[32 32 96]],
+  collisionVolumeScales  = [[25 25 96]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[box]],
+  collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -38,7 +38,7 @@ unitDef = {
 	turnatfullspeed = [[1]],
   },
 
-  energyMake             = 0.3,
+  energyMake             = 0.225,
   energyUse              = 0,
   explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
@@ -50,7 +50,7 @@ unitDef = {
   mass                   = 184,
   maxDamage              = 1400,
   maxVelocity            = 2.5,
-  metalMake              = 0.3,
+  metalMake              = 0.225,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],

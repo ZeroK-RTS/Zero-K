@@ -19,7 +19,9 @@ end
 if gadgetHandler:IsSyncedCode() then
 
 
-local spGetUnitBuildFacing = Spring.GetUnitBuildFacing
+local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
+local spSetUnitMidAndAimPos    = Spring.SetUnitMidAndAimPos
+local spSetUnitRadiusAndHeight = Spring.SetUnitRadiusAndHeight
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -27,8 +29,6 @@ local spGetUnitBuildFacing = Spring.GetUnitBuildFacing
 if not Spring.SetUnitMidAndAimPos then
 	return
 end
-
-local armwarDefID = UnitDefNames["armwar"].id
 
 local offsets = {}
 local modelRadii = {}
@@ -44,9 +44,11 @@ local function UnpackInt3(str)
 end
 
 for i=1,#UnitDefs do
-	local midPosOffset = UnitDefs[i].customParams.midposoffset
-	local aimPosOffset = UnitDefs[i].customParams.aimposoffset
-	local modelRadius = UnitDefs[i].customParams.modelradius
+	local ud = UnitDefs[i]
+	local midPosOffset = ud.customParams.midposoffset
+	local aimPosOffset = ud.customParams.aimposoffset
+	local modelRadius  = ud.customParams.modelradius
+	local modelHeight  = ud.customParams.modelheight
 	if midPosOffset or aimPosOffset then
 		local mid = (midPosOffset and UnpackInt3(midPosOffset)) or {0,0,0}
 		local aim = (aimPosOffset and UnpackInt3(aimPosOffset)) or mid
@@ -55,30 +57,36 @@ for i=1,#UnitDefs do
 			aim = aim,
 		}
 	end
-	if modelRadius then
-		modelRadii[i] = tonumber(modelRadius)
+	if modelRadius or modelHeight then
+		modelRadii[i] = {
+			radius = ( modelRadius and tonumber(modelRadius) or ud.radius ),
+			height = ( modelHeight and tonumber(modelHeight) or ud.height ),
+		}
 	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if offsets[unitDefID] then
+	local ud = UnitDefs[unitDefID]
+	if offsets[unitDefID] and ud then
 		local mid = offsets[unitDefID].mid
 		local aim = offsets[unitDefID].aim
-		Spring.SetUnitMidAndAimPos(unitID, mid[1], mid[2], mid[3], aim[1], aim[2], aim[3], true)
+		spSetUnitMidAndAimPos(unitID, 
+			mid[1] + ud.midx, mid[2] + ud.midy, mid[3] + ud.midz, 
+			aim[1] + ud.midx, aim[2] + ud.midy, aim[3] + ud.midz, true)
 	end
 	if modelRadii[unitDefID] then
-		Spring.SetUnitRadiusAndHeight(unitID,modelRadii[unitDefID])
+		spSetUnitRadiusAndHeight(unitID, modelRadii[unitDefID].radius, modelRadii[unitDefID].height)
 	end
 end
 
---[[
+
 function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
 	end
 end
---]]
+
 
 ------------------------------------------------------
 

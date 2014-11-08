@@ -15,6 +15,7 @@ end
 --------------------------------------------------------------------------------
 
 include("keysym.h.lua")
+VFS.Include("LuaRules/Utilities/numberfunctions.lua")
 
 local spSendLuaRulesMsg			= Spring.SendLuaRulesMsg
 local spGetCurrentTooltip		= Spring.GetCurrentTooltip
@@ -74,17 +75,33 @@ local window_unitcontext, window_unitstats
 local statswindows = {}
 
 local colorCyan = {0.2, 0.7, 1, 1}
+local colorPurple = {0.9, 0.2, 1, 1}
+local colorDisarm = {0.5, 0.5, 0.5, 1}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 
 local function MakeStatsWindow() end
-options_order = {}
+options_order = {'shortNotation'}
 options_path = 'Help/Unit Descriptions'
-options = {}
+options = {
+		
+	shortNotation = {
+		name = "Short Number Notation",
+		type = 'bool',
+		value = false,
+		desc = 'Shows short number notation for HP and other values.',
+		path = 'Settings/HUD Panels/Unit Stats Help Window'
+	},
+	
+	
+}
 local ignoreList = {
 	['firebug']=1,
+	['corpre']=1,
+	['vehdisable']=1,
+	['hoverscout']=1,
 }
 local UnitDefsList = {}
 for i=1,#UnitDefs do
@@ -171,31 +188,10 @@ function comma_value(amount, displayPlusMinus)
   	return formatted
 end
 
---from rooms widget by quantum
-local function ToSI(num)
-  if type(num) ~= 'number' then
-	return 'Tooltip wacky error #55'
-  end
-  if (num == 0) then
-    return "0"
-  else
-    local absNum = abs(num)
-    if (absNum < 0.001) then
-      return strFormat("%.1fu", 1000000 * num)
-    elseif (absNum < 1) then
-      return strFormat("%.1f", num)
-    elseif (absNum < 1000) then
-      return strFormat("%.0f", num)
-    elseif (absNum < 1000000) then
-      return strFormat("%.1fk", 0.001 * num)
-    else
-      return strFormat("%.1fM", 0.000001 * num)
-    end
-  end
-end
+
 
 local function numformat(num)
-	return comma_value(num)
+	return options.shortNotation.value and ToSIPrec(num) or comma_value(num)
 end
 
 local function AdjustWindow(window)
@@ -266,12 +262,11 @@ end
 
 
 local function getHelpText(unitDef)
+	local data = WG.langData
 	local lang = WG.lang
-	local font = WG.langFont
-	
 	local helpText
-	if font then
-		local unitConf = WG.langFontConf.units[unitDef.name] 
+	if data then
+		local unitConf = data[unitDef.name] 
 		helpText = unitConf and unitConf.helptext
 	end
 	if not helpText then
@@ -287,12 +282,11 @@ end
 
 
 local function getDescription(unitDef)
+	local data = WG.langData
 	local lang = WG.lang
-	local font = WG.langFont
-	
 	local desc
-	if font then
-		local unitConf = WG.langFontConf.units[unitDef.name] 
+	if data then
+		local unitConf = data[unitDef.name] 
 		desc = unitConf and unitConf.description
 	end
 	if not desc then
@@ -335,7 +329,7 @@ local function weapons2Table(cells, weaponStats, ws)
 		if ws.count > 1 then
 			name_str = name_str .. " x " .. ws.count
 		end
-		
+
 		local dps_str, dam_str = '', ''
 		if ws.dps > 0 then
 			dam_str = dam_str .. numformat(ws.dam,2)
@@ -349,10 +343,27 @@ local function weapons2Table(cells, weaponStats, ws)
 			dam_str = dam_str .. color2incolor(colorCyan) .. numformat(ws.damw,2) .. " (P)\008"
 			dps_str = dps_str .. color2incolor(colorCyan) .. numformat(ws.dpsw*ws.mult,2) .. " (P)\008"
 		end
+		if ws.dpss > 0 then
+			if dps_str ~= '' then
+				dps_str = dps_str .. ' + '
+				dam_str = dam_str .. ' + '
+			end
+			dam_str = dam_str .. color2incolor(colorPurple) .. numformat(ws.dams,2) .. " (S)\008"
+			dps_str = dps_str .. color2incolor(colorPurple) .. numformat(ws.dpss*ws.mult,2) .. " (S)\008"
+		end
+		
+		if ws.dpsd > 0 then
+			if dps_str ~= '' then
+				dps_str = dps_str .. ' + '
+				dam_str = dam_str .. ' + '
+			end
+			dam_str = dam_str .. color2incolor(colorDisarm) .. numformat(ws.damd,2) .. " (D)\008"
+			dps_str = dps_str .. color2incolor(colorDisarm) .. numformat(ws.dpsd*ws.mult,2) .. " (D)\008"
+		end
 		if ws.mult > 1 then
 			dam_str = dam_str .. " x " .. ws.mult
 		end
-		
+
 		local reload_str
 		if ws.reloadtime < 1 then
 			reload_str = string.format("%.2f", ws.reloadtime)
@@ -384,7 +395,7 @@ local function printWeapons(unitDef)
 
 	local wd = WeaponDefs
 	if not wd then return false end	
-	
+
 	for i=1, #unitDef.weapons do
 		local weapon = unitDef.weapons[i]
 		local weaponID = weapon.weaponDef
@@ -401,7 +412,7 @@ local function printWeapons(unitDef)
 				break
 			end
 		end
-		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('NoWeapon')) then 
+		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
 			local wsTemp = {weaponID = weaponID, count = 1}
 			if weaponDef.isShield then
 				wsTemp.wname = weaponName
@@ -426,7 +437,9 @@ local function printWeapons(unitDef)
 				wsTemp.projectiles = weaponDef.projectiles or 1
 				wsTemp.dam = 0
 				wsTemp.damw = 0
-				
+				wsTemp.dams = 0
+				wsTemp.damd = 0
+
 				wsTemp.mult = tonumber(cp.statsprojectiles) or wsTemp.burst * wsTemp.projectiles
 				if wsTemp.paralyzer then
 					wsTemp.damw = wsTemp.bestTypeDamagew
@@ -439,6 +452,8 @@ local function printWeapons(unitDef)
 				wsTemp.wname = weaponDef.description or 'NoName Weapon'
 				wsTemp.dps = 0
 				wsTemp.dpsw = 0
+				wsTemp.dpss = 0
+				wsTemp.dpsd = 0
 				if  wsTemp.reloadtime ~= '' and wsTemp.reloadtime > 0 then
 					if wsTemp.paralyzer then
 						wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
@@ -456,17 +471,49 @@ local function printWeapons(unitDef)
 					bestDamageIndex = i
 				end
 			end
-			
+
 			if weaponDef.customParams.extra_damage then
 				wsTemp.dam = weaponDef.customParams.extra_damage * wsTemp.burst * wsTemp.projectiles -- is it right?
 				wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
+
+				wsTemp.damw = wsTemp.damw - wsTemp.dam
+				wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
 			elseif weaponDef.customParams.stats_damage then
 				wsTemp.dam = weaponDef.customParams.stats_damage
 			end
-			
+
 			if weaponDef.customParams.stats_empdamage then
 				wsTemp.damw = weaponDef.customParams.stats_empdamage
 			end
+
+			if cp.timeslow_damagefactor then
+				wsTemp.dams = (wsTemp.paralyzer and wsTemp.damw or wsTemp.dam) * cp.timeslow_damagefactor
+				wsTemp.dpss = (wsTemp.paralyzer and wsTemp.dpsw or wsTemp.dps) * cp.timeslow_damagefactor
+				if (cp.timeslow_onlyslow == "1") then
+					if wsTemp.paralyzer then
+						wsTemp.damw = 0
+						wsTemp.dpsw = 0
+					else
+						wsTemp.dam = 0
+						wsTemp.dps = 0
+					end
+				end
+			end
+			
+			if cp.disarmdamagemult then
+				wsTemp.damd = (wsTemp.paralyzer and wsTemp.damw or wsTemp.dam) * cp.disarmdamagemult
+				wsTemp.dpsd = (wsTemp.paralyzer and wsTemp.dpsw or wsTemp.dps) * cp.disarmdamagemult
+				if (cp.disarmdamageonly == "1") then
+					if wsTemp.paralyzer then
+						wsTemp.damw = 0
+						wsTemp.dpsw = 0
+					else
+						wsTemp.dam = 0
+						wsTemp.dps = 0
+					end
+				end
+			end
+
 			weaponStats[#weaponStats+1] = wsTemp
 		end
 	end
@@ -524,6 +571,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 	if ud.customParams.commtype then
 		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
 		commCost = ud.customParams.cost or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
+		commCost = commCost +0
 	end
 	local cost = numformat(ud.metalCost)
 	if commCost then
@@ -567,8 +615,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 		
 		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
 		
-		statschildren[#statschildren+1] = Label:New{ caption = 'Range: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.range,2), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Area of effect: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damageAreaOfEffect,2), textColor = color.stats_fg, }
 		
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1],2), textColor = color.stats_fg, }

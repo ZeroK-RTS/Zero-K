@@ -242,6 +242,7 @@ path='Settings/Camera'
 	ShButton( 'Flip the TA Camera', 'viewtaflip' )
 	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
 	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
+	ShButton( 'Toggle Smooth Camera', 'luaui togglewidget SmoothCam' )
 	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
 path='Settings/Camera/Old Camera Shortcuts'	
@@ -263,7 +264,7 @@ path='Settings/Camera/Old Camera Shortcuts'
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 path='Settings/HUD Panels'
-	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
+	ShButton( 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 
 path='Settings/HUD Panels/HUD Skin'
 	AddOption({
@@ -314,6 +315,12 @@ path='Settings/Misc'
 	ShButton( 'Share Dialog...', 'sharedialog', '', true )
 	ShButton( 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true )
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
+	AddOption({
+		name = 'Menu pauses in SP',
+		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
+		type = 'bool',
+		value = true,
+	})
 	AddOption({
 		name = 'Use uikeys.txt',
 		desc = 'NOT RECOMMENDED! Enable this to use the engine\'s keybind file. This can break existing functionality. Requires restart.',
@@ -467,7 +474,7 @@ path='Settings/Graphics/Unit Visibility'
 		name = 'Draw Distance',
 		type = 'number',
 		min = 1, 
-		max = 1000,
+		max = 10000,
 		springsetting = 'UnitLodDist',
 		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
 	} )

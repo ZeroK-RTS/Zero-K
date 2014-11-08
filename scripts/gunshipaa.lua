@@ -224,14 +224,14 @@ function script.Shot(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	local severity = (recentDamage/maxHealth) * 100
-	if severity <= 25 then
+	local severity = recentDamage/maxHealth
+	if severity <= .25 then
 		Explode(middle, sfxExplode)
 		Explode(mhull, sfxNone)
 		Explode(rhull, sfxNone)
 		Explode(lhull, sfxNone)
 		return 1
-	elseif severity <= 50 then
+	elseif severity <= .5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
 		Explode(middle, sfxExplode)
 		Explode(mhull, sfxExplode)
 		Explode(rhull, sfxExplode)
@@ -240,7 +240,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rwing, sfxExplode + sfxFall)
 		Explode(lwing, sfxExplode + sfxFall)
 		return 1
-	elseif severity <= 100 then
+	elseif severity <= .75 then
 		Explode(middle, sfxExplode)
 		Explode(mhull, sfxExplode + sfxFall)
 		Explode(rhull, sfxExplode + sfxFall)

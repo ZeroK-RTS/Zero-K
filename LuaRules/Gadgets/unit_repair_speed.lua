@@ -29,6 +29,7 @@ local spGetGameFrame = Spring.GetGameFrame
 local spGetUnitHealth = Spring.GetUnitHealth
 local spSetUnitCosts = Spring.SetUnitCosts
 local spValidUnitID = Spring.ValidUnitID
+local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -89,6 +90,10 @@ function gadget:GameFrame(n)
 			end
 		end
 	end
+end
+
+function GG.HasCombatRepairPenalty(unitID)
+	return (damagedUnits[unitID] and true) or false
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)

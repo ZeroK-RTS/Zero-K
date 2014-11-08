@@ -53,6 +53,12 @@ if (gadgetHandler:IsSyncedCode()) then
     SendToUnsynced("lups_unit_decloaked", unitID,unitDefID,teamID)
   end
 
+  function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+    if (spGetUnitIsCloaked(unitID)) then
+    	SendToUnsynced("lups_unit_cloaked", unitID,unitDefID,teamID)
+    end
+  end
+
   function gadget:PlayerChanged(playerID)
     SendToUnsynced("lups_player_changed", playerID)
   end
@@ -90,7 +96,7 @@ local tryloading  = 1     --// try to activate lups if it isn't found
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« some basic functions »»
+--  Â«Â« some basic functions Â»Â»
 --
 
 local supportedFxs = {}
@@ -107,7 +113,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« cloaked unit handling »»
+--  Â«Â« cloaked unit handling Â»Â»
 --
 
 local CloakedHitEffect = { class='UnitJitter',options={ life=50, pos={0,0,0}, enemyHit=true, repeatEffect=false} }
@@ -241,7 +247,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---  «« Unit Destroyed handling »»
+--  Â«Â« Unit Destroyed handling Â»Â»
 --
 
 local function UnitDestroyed(_,unitID,unitDefID)

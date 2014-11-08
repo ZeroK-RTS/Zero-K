@@ -29,10 +29,13 @@ local extraNormalDamageFalloffList = {}
 local wantedWeaponList = {}
 
 for wdid = 1, #WeaponDefs do
-	if WeaponDefs[wdid].customParams and WeaponDefs[wdid].customParams.extra_damage then 
-		extraNormalDamageList[wdid] = WeaponDefs[wdid].customParams.extra_damage
-		if WeaponDefs[wdid].customParams.extra_damage_falloff_max then
-			extraNormalDamageFalloffList[wdid] = 1/WeaponDefs[wdid].customParams.extra_damage_falloff_max
+	local wd = WeaponDefs[wdid]
+	if wd.paralyzer then
+		if wd.customParams and wd.customParams.extra_damage then 
+			extraNormalDamageList[wdid] = wd.customParams.extra_damage
+			if wd.customParams.extra_damage_falloff_max then
+				extraNormalDamageFalloffList[wdid] = 1/wd.customParams.extra_damage_falloff_max
+			end
 		end
 		wantedWeaponList[#wantedWeaponList + 1] = wdid
 	end
@@ -44,7 +47,7 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponDefID, attackerID, attackerDefID, attackerTeam)
-	
+							
 	if paralyzer then -- the weapon deals paralysis damage
 		
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
@@ -54,7 +57,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 			if extraNormalDamageFalloffList[weaponDefID] then
 				local armored, mult = Spring.GetUnitArmored(unitID)
 				if armored then
-					damage = damage/mult
+					extraDamage = extraDamage/mult
 				end
 				extraDamage = extraDamage*damage*extraNormalDamageFalloffList[weaponDefID]
 			end

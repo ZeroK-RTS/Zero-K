@@ -23,7 +23,7 @@ end
 
 if (not gadgetHandler:IsSyncedCode()) then
 
-local MAX_TIME_DIFF = 75	-- wait this long for disconnected players
+local MAX_TIME_DIFF = 150	-- wait this long for disconnected players
 
 local allReady = false 
 local startTimer = nil

@@ -1,6 +1,8 @@
+include "pieceControl.lua"
+
 local base, turret, spindle, fakespindle = piece('base', 'turret', 'spindle', 'fakespindle')
 
-local guns = {} 
+local guns = {}
 for i=1,6 do
 	guns[i] = {
 		center = piece('center'..i),
@@ -17,7 +19,7 @@ local pi = math.pi
 local hpi = math.pi*0.5
 
 local headingSpeed = math.rad(4)
-local pitchSpeed = math.rad(140)
+local pitchSpeed = math.rad(60)
 
 local spindleOffset = math.rad(60)
 local spindlePitch = 0
@@ -26,7 +28,7 @@ guns[5].y = 11
 guns[5].z = 7
 
 local dis = math.sqrt(guns[5].y^2 + guns[5].z)
-local ratio = math.tan(math.rad(60))*dis/dis
+local ratio = math.tan(math.rad(60))
 
 guns[6].y = guns[5].y + ratio*guns[5].z
 guns[6].z = guns[5].z - ratio*guns[5].y
@@ -64,8 +66,6 @@ local SIG_AIM = 2
 local gunNum = 1
 local weaponNum = 1
 local randomize = false
-local reloading = false
-
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
@@ -83,34 +83,55 @@ function script.Deactivate()
 	randomize = false
 end
 
-function script.AimWeapon(num, heading, pitch)
-	if weaponNum ~= num then 
-		return false 
+function script.HitByWeapon()
+	if Spring.GetUnitRulesParam(unitID,"disarmed") == 1 then
+		StopTurn (turret, y_axis)
+		StopTurn (spindle, x_axis)
 	end
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
-	
-	local _,curHead, _ = Spring.UnitScript.GetPieceRotation(turret)
+end
+
+local sleeper = {}
+for i = 1, 6 do
+	sleeper[i] = false
+end
+
+function script.AimWeapon(num, heading, pitch)
+	if (sleeper[num]) then
+		return false
+	end
+
+	sleeper[num] = true
+	while weaponNum ~= num do 
+		Sleep(10)
+	end
+	sleeper[num] = false
+
+	Signal (SIG_AIM)
+	SetSignalMask (SIG_AIM)
+
+	while Spring.GetUnitRulesParam(unitID,"disarmed") == 1 do
+		Sleep(10)
+	end
+
+	local curHead = select (2, Spring.UnitScript.GetPieceRotation(turret))
 	local headDiff = heading-curHead
 	if math.abs(headDiff) > pi then
 		headDiff = headDiff - math.abs(headDiff)/headDiff*2*pi
 	end
 	--Spring.Echo(headDiff*180/math.pi)
-	
+
 	if math.abs(headDiff) > hpi then
 		heading = (heading+pi)%tau
 		pitch = -pitch+pi
 	end
 	spindlePitch = -pitch
-	
-	Turn( turret , y_axis, heading,  headingSpeed)
-	Turn( spindle , x_axis, spindlePitch+spindleOffset, pitchSpeed )
+
+	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	Turn( turret , y_axis, heading, headingSpeed*slowMult)
+	Turn( spindle , x_axis, spindlePitch+spindleOffset, pitchSpeed*slowMult)
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(spindle, x_axis)
-	while reloading do 
-		Sleep(10) 
-	end
-	return true
+	return (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1)
 end
 
 function script.AimFromWeapon(num)
@@ -138,12 +159,9 @@ function script.Shot(num)
 end
 
 function script.FireWeapon(num)
-	reloading = true
 	gunNum = gunNum + 1
 	if gunNum > 6 then gunNum = 1 end
-	Sleep(120)
 	spindleOffset = math.rad(60)*(gunNum)
-	reloading = false
 	if randomize then
 		weaponNum = math.random(1,6)
 	else

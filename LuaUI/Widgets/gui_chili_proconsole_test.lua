@@ -3,15 +3,14 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Pro Console Test",
-    desc      = "v0.015 Chili Chat Pro Console.",
+    name      = "Chili Pro Console",
+    desc      = "v0.016 Chili Chat Pro Console.",
     author    = "CarRepairer",
     date      = "2014-04-20",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    experimental = true,
-    enabled   = false,
-    --detailsDefault = 1
+    experimental = false,
+    enabled   = true,
   }
 end
 
@@ -101,6 +100,8 @@ local DEDUPE_SUFFIX = 'x '
 local MIN_HEIGHT = 50
 local MIN_WIDTH = 300
 local MAX_STORED_MESSAGES = 300
+	
+local inputsize = 25
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -140,7 +141,7 @@ local lastMsgChat, lastMsgBackChat, lastMsgConsole
 ------------------------------------------------------------
 -- options
 
-options_path = "Settings/HUD Panels/Chat/Pro Console"
+options_path = "Settings/HUD Panels/Chat"
 
 local dedupe_path = options_path .. '/De-Duplication'
 local hilite_path = options_path .. '/Highlighting'
@@ -151,9 +152,19 @@ options_order = {
 	
 	'lblGeneral',
 	
+	'enableConsole',
+	
 	--'mousewheel', 
 	'defaultAllyChat',
-	'text_height_chat', 'text_height_console',
+	'defaultBacklogEnabled',
+	'mousewheelBacklog',
+	'enableSwap',
+	'changeFont',
+	'enableChatBackground',
+	'toggleBacklog',
+	'text_height_chat', 
+	'text_height_console',
+	'backchatOpacity',
 	'autohide_text_time',
 	'max_lines',
 	'clickable_points',
@@ -197,6 +208,21 @@ options = {
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
+	},
+	
+	enableConsole = {
+		name = "Enable the debug console",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			if window_console then
+				if self.value then
+					screen0:AddChild(window_console)
+				else
+					screen0:RemoveChild(window_console)
+				end
+			end
+		end
 	},
 	
 	text_height_chat = {
@@ -450,7 +476,104 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
-	},	
+	},
+	defaultBacklogEnabled = {
+		name = "Enable backlog at start",
+		desc = "Starts with the backlog chat enabled.",
+		type = 'bool',
+		value = false,
+	},
+	toggleBacklog = {
+		name = "Toggle backlog",
+		desc = "The toggle backlog button is here to let you hotkey this action.",
+		type = 'button',
+	},
+	mousewheelBacklog = {
+		name = "Mousewheel Backlog",
+		desc = "Scroll the backlog chat with the mousewheel.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			scrollpanel_backchat.ignoreMouseWheel = not options.mousewheelBacklog.value
+			scrollpanel_backchat:Invalidate()
+		end,
+	},
+	enableSwap = {
+		name = "Backlog Arrow",
+		desc = "Enable the button to swap between chat and backlog chat.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			if self.value then
+				window_chat:AddChild(backlogButton)
+				if options.enableChatBackground.value then
+					window_chat:RemoveChild(inputspace)
+				end
+				inputspace = WG.Chili.ScrollPanel:New{
+					x = 0,
+					bottom = 0,
+					right = inputsize,
+					height = inputsize,
+					backgroundColor = {1,1,1,1},
+					borderColor = {0,0,0,1},
+					--backgroundColor = {1,1,1,1},
+				}
+				if options.enableChatBackground.value then
+					window_chat:AddChild(inputspace)
+				end
+			else
+				window_chat:RemoveChild(backlogButton)
+				if options.enableChatBackground.value then
+					window_chat:RemoveChild(inputspace)
+				end
+				inputspace = WG.Chili.ScrollPanel:New{
+					x = 0,
+					bottom = 0,
+					right = 0,
+					height = inputsize,
+					backgroundColor = {1,1,1,1},
+					borderColor = {0,0,0,1},
+					--backgroundColor = {1,1,1,1},
+				}
+				if options.enableChatBackground.value then
+					window_chat:AddChild(inputspace)
+				end
+			end
+			window_chat:Invalidate()
+		end,
+	},
+	changeFont = {
+		name = "Change message entering font.",
+		desc = "With this enabled the text-entering font will be changed to match the chat. May cause Spring to competely lock up intermittently on load. Requires reload to update.",
+		type = 'bool',
+		value = false,
+		advanced = true,
+	},
+	enableChatBackground = {
+		name = "Enable chat background.",
+		desc = "Enables a background for the text-entering box.",
+		type = 'bool',
+		value = false,
+		advanced = true,
+		OnChange = function(self)
+			if self.value then
+				window_chat:AddChild(inputspace)
+			else
+				window_chat:RemoveChild(inputspace)
+			end
+			scrollpanel_console:Invalidate()
+		end,
+	},
+	backchatOpacity = {
+		name = "Backlog Border Opacity",
+		type = 'number',
+		value = 0.5,
+		min = 0, max = 1, step = 0.05,
+		OnChange = function(self)
+			scrollpanel_backchat.borderColor = {0,0,0,self.value}
+			scrollpanel_backchat:Invalidate()
+		end,
+	},
 	autohide_text_time = {
 		name = "Text decay time",
 		type = 'number',
@@ -465,8 +588,10 @@ options = {
 --functions
 
 local function SetInputFontSize(size)
-	Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
-	Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
+	if options.changeFont.value then
+		Spring.SetConfigInt("FontSize", size, true) --3rd param true is "this game only"
+		Spring.SendCommands('font ' .. WG.Chili.EditBox.font.font)
+	end
 end	
 
 --------------------------------------------------------------------------------
@@ -541,6 +666,29 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function escape_lua_pattern(s)
+
+	local matches =
+	{
+		["^"] = "%^";
+		["$"] = "%$";
+		["("] = "%(";
+		[")"] = "%)";
+		["%"] = "%%";
+		["."] = "%.";
+		["["] = "%[";
+		["]"] = "%]";
+		["*"] = "%*";
+		["+"] = "%+";
+		["-"] = "%-";
+		["?"] = "%?";
+		["\0"] = "%z";
+	}
+
+  
+	return (s:gsub(".", matches))
+end
+
 local function PlaySound(id, condition)
 	if condition ~= nil and not condition then
 		return
@@ -591,6 +739,37 @@ local function formatMessage(msg)
 			end
 		end)
 	msg.formatted = formatted
+	--]]
+	msg.textFormatted = msg.text
+	if msg.playername then
+		local out = msg.text
+		local playerName = escape_lua_pattern(msg.playername)
+		out = out:gsub( '^<' .. playerName ..'> ', '' )
+		out = out:gsub( '^%[' .. playerName ..'%] ', '' )
+		msg.textFormatted = out
+	end
+	msg.source2 = msg.playername or ''
+end
+
+local function MessageIsChatInfo(msg)
+	return string.find(msg.argument,'enabled!') or
+	string.find(msg.argument,'disabled!') or 
+	string.find(msg.argument,'Wind Range') or
+	string.find(msg.argument,'utogroup') or
+	string.find(msg.argument,'Speed set to') or
+	string.find(msg.argument,'following') or
+	string.find(msg.argument,'Connection attempted') or
+	string.find(msg.argument,'wins!') or 
+	string.find(msg.argument,'resigned') or 
+	string.find(msg.argument,'exited') or 
+	string.find(msg.argument,'is no more') or 
+	string.find(msg.argument,'paused the game') or
+	string.find(msg.argument,'Sync error for') or
+	string.find(msg.argument,'Cheating is') or
+	string.find(msg.argument,'resigned and is now spectating') or
+	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
+	string.find(msg.argument,'Team') or --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else)
+	string.find(msg.argument,'AFK')     --& AFK/lagmonitor message
 end
 
 local function hideMessage(msg)
@@ -598,25 +777,11 @@ local function hideMessage(msg)
 		or (msg.msgtype == "player_to_allies" and options.hideAlly.value)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
-		or (msg.msgtype == 'other' and options.hideLog.value and not (string.find(msg.argument,'enabled!') or
-		string.find(msg.argument,'disabled!') or 
-		string.find(msg.argument,'Wind Range') or
-		string.find(msg.argument,'utogroup') or
-		string.find(msg.argument,'Speed set to') or
-		string.find(msg.argument,'following') or
-		string.find(msg.argument,'Connection attempted') or
-		string.find(msg.argument,'wins!') or 
-		string.find(msg.argument,'resigned') or 
-		string.find(msg.argument,'exited') or 
-		string.find(msg.argument,'is no more') or 
-		string.find(msg.argument,'paused the game') or
-		string.find(msg.argument,'Sync error for') or
-		(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
-		string.find(msg.argument,'Team') or string.find(msg.argument,'AFK'))) --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else) & AFK/lagmonitor message
+		or (msg.msgtype == 'other' and options.hideLog.value and not MessageIsChatInfo(msg))
 end
 
 local function AddMessage(msg, target, remake)
-	if hideMessage(msg)	or (not WG.Chili) then
+	if hideMessage(msg) or (not WG.Chili) then
 		return
 	end
 	
@@ -688,6 +853,12 @@ local function AddMessage(msg, target, remake)
 	if options.clickable_points.value then
 		local control = textbox
 		if msg.point then --message is a marker, make obvious looking button
+			local padding
+			if target == 'chat' then
+				padding = { 3,3,1,1 }
+			else
+				padding = { 1,1,1,1 }
+			end
 			textbox:SetPos( 35, 3, stack.width - 40 )
 			textbox:Update()
 			local tbheight = textbox.height -- not perfect
@@ -696,7 +867,8 @@ local function AddMessage(msg, target, remake)
 			control = WG.Chili.Panel:New{
 				width = '100%',
 				height = tbheight + 8,
-				padding = { 1,1,1,1 },
+				padding = padding,
+				margin = {0,0,0,0},
 				backgroundColor = {0,0,0,0},
 				caption = '',
 				children = {
@@ -727,7 +899,22 @@ local function AddMessage(msg, target, remake)
 				},
 				
 			}
-			
+		elseif target == 'chat' then
+			-- Make a panel for each chat line because this removes the message jitter upon fade.
+			textbox:SetPos( 3, 3, stack.width - 3 )
+			textbox:Update()
+			local tbheight = textbox.height + 2 -- not perfect
+			--echo('tbheight', tbheight)
+			control = WG.Chili.Panel:New{
+				width = '100%',
+				height = tbheight,
+				padding = { 0,0,0,0 },
+				backgroundColor = {0,0,0,0},
+				caption = '',
+				children = {
+					textbox,
+				},
+			}
 		elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
 			local cur = WG.alliedCursorsPos[msg.player.id]
 			if cur then
@@ -870,17 +1057,19 @@ function RemakeConsole()
 end
 
 local function ShowInputSpace()
+	WG.enteringText = true
 	inputspace.backgroundColor = {1,1,1,1}
 	inputspace.borderColor = {0,0,0,1}
 	inputspace:Invalidate()
 end
 local function HideInputSpace()
+	WG.enteringText = false
 	inputspace.backgroundColor = {0,0,0,0}
 	inputspace.borderColor = {0,0,0,0}
 	inputspace:Invalidate()
 end
 
-local function MakeMessageStack()
+local function MakeMessageStack(margin)
 	return WG.Chili.StackPanel:New{
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
@@ -891,31 +1080,53 @@ local function MakeMessageStack()
 		height = 10,
 		resizeItems = false,
 		itemPadding  = { 1, 1, 1, 1 },
-		itemMargin  = { 1, 1, 1, 1 },
+		itemMargin  = { margin, margin, margin, margin },
 		autosize = true,
 		preserveChildrenOrder = true,
 	}
 end
 
-local function MakeMessageWindow(name, minimizable)
+local function MakeMessageWindow(name, enabled)
 
+	local x,y,bottom,width,height
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	if name == "ProChat" then
+		local screenWidth, screenHeight = Spring.GetWindowGeometry()
+		local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+		local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+		width = 450
+		x = integralWidth
+		height = integralHeight*0.84
+		bottom = integralHeight*0.84
+	else
+		local resourceBarWidth = 430
+		local maxWidth = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - 400 - resourceBarWidth)
+		bottom = nil
+		width  = screenWidth * 0.30
+		height = screenHeight * 0.20
+		x = screenWidth - width
+		y = 50
+		if maxWidth < width then
+			y = 50 -- resource bar height
+		end
+	end
 	
 	return WG.Chili.Window:New{
-		parent = screen0,
+		parent = (enabled and screen0) or nil,
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
 		dockable = true,
 		name = name,
-		y = 0,
-		right = 425, -- epic/resbar width
-		width  = screenWidth * 0.30,
-		height = screenHeight * 0.20,
+		x = x,
+		y = y,
+		bottom = bottom,
+		width  = width,
+		height = height,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		minimizable = minimizable,
+		minimizable = false,
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = MIN_WIDTH,
 		minHeight = MIN_HEIGHT,
@@ -948,6 +1159,9 @@ local function SwapBacklog()
 	end
 	showingBackchat = not showingBackchat
 end
+
+options.toggleBacklog.OnChange = SwapBacklog
+
 -----------------------------------------------------------------------
 -- callins
 -----------------------------------------------------------------------
@@ -955,7 +1169,6 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) then
-
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
@@ -965,11 +1178,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 			end
 			firstEnter = false
 		end
-		WG.enteringText = true
 		
 		ShowInputSpace()
 	else
-		WG.enteringText = false
 		HideInputSpace()
 	end 
 end
@@ -1002,13 +1213,16 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function isChat(msg)
+	return msg.msgtype ~= 'other' or MessageIsChatInfo(msg)
+end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
 	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
 	
-	local isChat = msg.msgtype ~= 'other'
+	local isChat = isChat(msg) 
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
 	local messages = isChat and chatMessages or consoleMessages
 	
@@ -1065,14 +1279,13 @@ function widget:AddConsoleMessage(msg)
 	
 	-- if playername == myName then
 		if WG.enteringText then
-			WG.enteringText = false
 			HideInputSpace()
 		end 		
 	-- end
 end
 
 -----------------------------------------------------------------------
-
+local firstUpdate = true
 local timer = 0
 
 -- FIXME wtf is this obsessive function?
@@ -1097,6 +1310,14 @@ function widget:Update(s)
 				fadeTracker[k] = nil
 			end
 		end
+	end
+	
+	if firstUpdate then
+		if options.defaultBacklogEnabled.value then
+			SwapBacklog()
+		end
+		firstUpdate = false
+		SetInputFontSize(15)
 	end
 end
 
@@ -1142,13 +1363,11 @@ function widget:Initialize()
 	
 	Spring.SendCommands("bind Any+enter  chat")
 	
-	local inputsize = 25
+	stack_console = MakeMessageStack(1)
 	
-	stack_console = MakeMessageStack()
+	stack_chat = MakeMessageStack(0)
 	
-	stack_chat = MakeMessageStack()
-	
-	stack_backchat = MakeMessageStack()
+	stack_backchat = MakeMessageStack(1)
 	
 	inputspace = WG.Chili.ScrollPanel:New{
 		x = 0,
@@ -1181,7 +1400,7 @@ function widget:Initialize()
 	
 	scrollpanel_chat = WG.Chili.ScrollPanel:New{
 		--margin = {5,5,5,5},
-		padding = { 1,1,1,1 },
+		padding = { 1,1,1,4 },
 		x = 0,
 		y = 0,
 		width = '100%',
@@ -1194,8 +1413,8 @@ function widget:Initialize()
 		children = {
 			stack_chat,
 		},
-		
 		verticalScrollbar = false,
+		horizontalScrollbar = false,
 	}
 	
 	--spacer that forces chat to be scrolled to bottom of chat window
@@ -1215,10 +1434,9 @@ function widget:Initialize()
 		bottom = inputsize + 2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times! -- TODO is it still required??
 		verticalSmartScroll = true,
 		backgroundColor = options.color_chat_background.value,
-		borderColor = {0,0,0,0.5},
-		
-		horizontalScrollbar=false,
-
+		borderColor = {0,0,0,options.backchatOpacity.value},
+		horizontalScrollbar = false,
+		ignoreMouseWheel = not options.mousewheelBacklog.value,
 		children = {
 			stack_backchat,
 		},
@@ -1241,12 +1459,14 @@ function widget:Initialize()
 		},
 	}
 	
-	window_chat = MakeMessageWindow("ProChat")
+	window_chat = MakeMessageWindow("ProChat", true)
 	window_chat:AddChild(scrollpanel_chat)
 	window_chat:AddChild(backlogButton)
-	window_chat:AddChild(inputspace)
+	if options.enableChatBackground.value then
+		window_chat:AddChild(inputspace)
+	end
 	
-	window_console = MakeMessageWindow("ProConsole", true)
+	window_console = MakeMessageWindow("ProConsole", options.enableConsole.value)
 	window_console:AddChild(scrollpanel_console)
 	
 	RemakeConsole()
@@ -1257,7 +1477,7 @@ function widget:Initialize()
 	
 	Spring.SendCommands({"console 0"})
 	
-	SetInputFontSize(15)
+	HideInputSpace()
  	
 	self:LocalColorRegister()
 end

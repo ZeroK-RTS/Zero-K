@@ -163,19 +163,16 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
 
 	if enemy and los then
 	
-		local pointDis = spGetUnitSeparation (enemy,unitID,true)
+		local pointDis = spGetUnitSeparation(enemy,unitID,true)
 		
 		if pointDis then
-
-			if behaviour.maxSwarmRange < pointDis then -- if I cannot shoot at the enemy
-				
-				local enemyRange = behaviour.swarmEnemyDefaultRange
-				if enemyUnitDef and los then
-					enemyRange = UnitDefs[enemyUnitDef].maxWeaponRange
-				end
-				
-				if pointDis < enemyRange+behaviour.swarmLeeway then -- if I am within enemy range
-
+			local enemyRange = behaviour.swarmEnemyDefaultRange
+			if enemyUnitDef and los then
+				enemyRange = UnitDefs[enemyUnitDef].maxWeaponRange
+			end
+			if pointDis < enemyRange+behaviour.swarmLeeway then -- if I am within enemy range
+				if behaviour.maxSwarmRange < pointDis then -- if I cannot shoot at the enemy
+					
 					local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 					local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 					local cx,cy,cz -- command position
@@ -204,53 +201,52 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
 					
 					data.receivedOrder = true
 					return true
-				end
-			else -- if I can shoot at the enemy
+				else -- if I can shoot at the enemy
 
-				local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-				local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-				local cx,cy,cz -- command position
-				
-				if behaviour.circleStrafe then
+					local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
+					local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+					local cx,cy,cz -- command position
 					
-					-- jink around the enemy
-					local up = 0
-					local ep = 1
-					if pointDis < behaviour.minCircleStrafeDistance then
-						up = 1
-						ep = 0
-					end
-					
-					cx = ux*up+ex*ep+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
-					cy = uy
-					cz = uz*up+ez*ep-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
-					
-				else
-					if pointDis > behaviour.minSwarmRange then
-						-- jink at max range
-						cx = ux+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
+					if behaviour.circleStrafe then
+						
+						-- jink around the enemy
+						local up = 0
+						local ep = 1
+						if pointDis < behaviour.minCircleStrafeDistance then
+							up = 1
+							ep = 0
+						end
+						
+						cx = ux*up+ex*ep+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
 						cy = uy
-						cz = uz-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
-						data.rot = data.rot*-1
+						cz = uz*up+ez*ep-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
+						
 					else
-						data.jinkDir = data.jinkDir*-1					-- jink away
-						cx = ux-(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-						cy = uy
-						cz = uz-(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+						if pointDis > behaviour.minSwarmRange then
+							-- jink at max range
+							cx = ux+data.rot*(uz-ez)*behaviour.strafeOrderLength/pointDis
+							cy = uy
+							cz = uz-data.rot*(ux-ex)*behaviour.strafeOrderLength/pointDis
+							data.rot = data.rot*-1
+						else
+							data.jinkDir = data.jinkDir*-1					-- jink away
+							cx = ux-(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+							cy = uy
+							cz = uz-(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+						end
 					end
+					
+					if move then
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+					else
+						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+					end
+					data.cx,data.cy,data.cz = cx,cy,cz
+					data.receivedOrder = true
 				end
-				
-				if move then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-					GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
-				else
-					GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
-				end
-				data.cx,data.cy,data.cz = cx,cy,cz
-				data.receivedOrder = true
 				return true
 			end
-			
 		end
 		
 	else
@@ -300,7 +296,7 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
 end
 
 
-local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
+local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n)
 
 	local data = unit[unitID]
 	
@@ -312,7 +308,7 @@ local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
 	local cx,cy,cz -- command position	
 	
 	if not (ex and vx) then
-		return false
+		return behaviour.skirmKeepOrder
 	end
 	
 	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
@@ -321,6 +317,13 @@ local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
 	local skirmRange = GetEffectiveWeaponRange(data.udID,(uy-ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) - behaviour.skirmLeeway
 	
 	if skirmRange > pointDis then
+	
+		if behaviour.skirmOnlyNearEnemyRange then
+			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef,(uy-ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
+			if enemyRange < pointDis then
+				return behaviour.skirmKeepOrder
+			end
+		end
 
 		local dis = behaviour.skirmOrderDis 
 		local f = dis/pointDis
@@ -345,7 +348,7 @@ local function skirmEnemy(unitID, behaviour, enemy, move, cQueue,n)
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
-	return false
+	return behaviour.skirmKeepOrder
 end
 
 local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue,n)
@@ -479,24 +482,30 @@ local function updateUnits(frame, start, increment)
 						enemyUnitDef = spGetUnitDefID(enemy)
 					end
 				end
+				
+				local checkSkirm = true
 
 				if alwaysJink or (enemy and los and behaviour.swarms[enemyUnitDef]) then
 					--Spring.Echo("unit checking swarm")
-					if not swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue, frame) then
-						clearOrder(unitID,data,cQueue)
-					end
-				elseif enemy and ((los and behaviour.skirms[enemyUnitDef]) or ((not los) and behaviour.skirmRadar) or behaviour.skirmEverything) then
-					--Spring.Echo("unit checking skirm")
-					if not skirmEnemy(unitID, behaviour, enemy, move, cQueue, frame) then
-						clearOrder(unitID,data,cQueue)
-					end
-				else
-					--Spring.Echo("unit checking flee")
-					if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los,move, cQueue, frame) then
+					if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue, frame) then
+						checkSkirm = false
+					else
 						clearOrder(unitID,data,cQueue)
 					end
 				end
-				
+				if checkSkirm then
+					if enemy and ((los and behaviour.skirms[enemyUnitDef]) or ((not los) and behaviour.skirmRadar) or behaviour.skirmEverything) then
+						--Spring.Echo("unit checking skirm")
+						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame) then
+							clearOrder(unitID,data,cQueue)
+						end
+					else
+						--Spring.Echo("unit checking flee")
+						if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los,move, cQueue, frame) then
+							clearOrder(unitID,data,cQueue)
+						end
+					end
+				end
 			end
 		end
 	end
@@ -572,6 +581,8 @@ local function GetBehaviourTable(behaviourData, ud)
 		minCircleStrafeDistance = weaponRange - (behaviourData.minCircleStrafeDistance or behaviourDefaults.defaultMinCircleStrafeDistance),
 		skirmRange = weaponRange,
 		skirmLeeway = (behaviourData.skirmLeeway or 0),
+		skirmOnlyNearEnemyRange = (behaviourData.skirmOnlyNearEnemyRange or false),
+		skirmKeepOrder = (behaviourData.skirmKeepOrder or false),
 		jinkTangentLength = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength),
 		jinkParallelLength =  (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength),
 		alwaysJinkFight = (behaviourData.alwaysJinkFight or false),

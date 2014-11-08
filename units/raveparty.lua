@@ -24,9 +24,9 @@ unitDef = {
 
   customParams                  = {
     helptext       = [[The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!]],
-    helptext_de    = [[Der Disco Rave Party verschießt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Überraschung darstellt. Ein Spa�?für die ganze Familie!]],
+    helptext_de    = [[Der Disco Rave Party verschieÃŸt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Ãœberraschung darstellt. Ein SpaÃ?fÃ¼r die ganze Familie!]],
     helptext_pl    = [[Disco Rave Party wystrzeliwuje kolorowe bomby, z ktorych kazda ma inny efekt. Swietna zabawa dla calej rodziny!]],
-	description_de = [[Regenbogen-Überraschungs Superwaffe]],
+	description_de = [[Regenbogen-Ãœberraschungs Superwaffe]],
     description_pl = [[Teczowa Niespodzianka!]],
     modelradius    = [[35]],
   },
@@ -118,6 +118,7 @@ unitDef = {
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,
+	  myGravity               = 0.18,
       range                   = 7500,
 	  rgbColor                = [[1 0.1 0.1]],
       reloadtime              = 1,
@@ -135,7 +136,8 @@ unitDef = {
     ORANGE_ROASTER = {
       name                    = [[Orange Roaster]],
       accuracy                = 750,
-      areaOfEffect            = 512,
+      areaOfEffect            = 640,
+	  craterAreaOfEffect      = 80,
       avoidFeature            = false,
 	  avoidGround             = false,
       craterBoost             = 0.25,
@@ -144,6 +146,7 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burntime = 240,
+		burnchance = 1,
 	  },
 
       damage                  = {
@@ -157,6 +160,7 @@ unitDef = {
       impulseBoost            = 0.2,
       impulseFactor           = 0.1,
       interceptedByShieldType = 1,
+	  myGravity               = 0.18,
       range                   = 7500,
 	  rgbColor                = [[0.9 0.3 0]],
       reloadtime              = 1,
@@ -174,6 +178,7 @@ unitDef = {
       name                    = [[Yellow Slammer]],
       accuracy                = 750,
       areaOfEffect            = 384,
+	  craterAreaOfEffect      = 96,
       avoidFeature            = false,
 	  avoidGround             = false,
       craterBoost             = 0.5,
@@ -187,9 +192,11 @@ unitDef = {
 
       edgeeffectiveness       = 0.5,
       explosionGenerator      = [[custom:330rlexplode]],
+	  explosionSpeed          = 500,
       impulseBoost            = 400,
-      impulseFactor           = 4,
+      impulseFactor           = 5,
       interceptedByShieldType = 1,
+	  myGravity               = 0.18,
       range                   = 7500,
 	  rgbColor                = [[0.7 0.7 0]],
       reloadtime              = 1,
@@ -206,15 +213,15 @@ unitDef = {
     GREEN_STAMPER = {
       name                    = [[Green Stamper]],
       accuracy                = 750,
-      areaOfEffect            = 300,
+      areaOfEffect            = 384,
       avoidFeature            = false,
 	  avoidGround             = false,
       craterBoost             = 32,
       craterMult              = 1,
 
 	  customParams            = {
-	    gatherradius = [[225]],
-	    smoothradius = [[150]],
+	    gatherradius = [[384]],
+	    smoothradius = [[192]],
 		smoothmult   = [[0.7]],
 	  },
 	  
@@ -228,6 +235,7 @@ unitDef = {
       impulseBoost            = 0.7,
       impulseFactor           = 0.5,
       interceptedByShieldType = 1,
+	  myGravity               = 0.18,
       range                   = 7500,
 	  rgbColor                = [[0.1 1 0.1]],
       reloadtime              = 1,
@@ -251,9 +259,7 @@ unitDef = {
       craterMult              = 0.5,
 
       damage                  = {
-        default        = 7000,
-        empresistant75 = 1750,
-        empresistant99 = 70,
+        default        = 12000,
       },
 
 	  edgeEffectiveness       = 0.75,
@@ -262,8 +268,9 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
+	  myGravity               = 0.18,
       paralyzer               = true,
-      paralyzeTime            = 10,
+      paralyzeTime            = 25,
       range                   = 7500,
 	  rgbColor                = [[0.1 0.1 1]],
       reloadtime              = 1,
@@ -281,11 +288,16 @@ unitDef = {
       name                    = [[Violet Slugger]],
       accuracy                = 750,
       areaOfEffect            = 720,
+	  craterAreaOfEffect      = 90,
       avoidFeature            = false,
 	  avoidGround             = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
+      customparams = {
+        timeslow_damagefactor = 10,
+      },
+      
       damage                  = {
         default = 450,
         planes  = 450,
@@ -298,6 +310,7 @@ unitDef = {
       impulseBoost            = 0.2,
       impulseFactor           = 0.1,
       interceptedByShieldType = 1,
+	  myGravity               = 0.18,
       range                   = 7500,
 	  rgbColor                = [[0.7 0 0.7]],
       reloadtime              = 1,

@@ -34,6 +34,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    pad_count = 1,
     landflystate   = [[0]],
     description_de = [[Produziert Flugzeuge, Baut mit 10 M/s]],
     description_pl = [[Buduje samoloty, moc 10 m/s]],
@@ -42,9 +43,10 @@ unitDef = {
 	helptext_pl    = [[Lotnisko pozwala na budowe samolotow i oprocz samolotu konstrukcyjnego i zwiadowczego oferuje takze dwa rodzaje mysliwcow i cztery bombowcow, kazdy wyspecjalizowany do unikalnej roli. Posiada takze jedno stanowisko uzupelniania dla bombowcow.]],
     sortName = [[4]],
 	modelradius    = [[25]],
+	midposoffset   = [[0 20 0]],
   },
 
-  energyMake                    = 0.25,
+  energyMake                    = 0.3,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
@@ -57,9 +59,8 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  metalMake                     = 0.25,
+  metalMake                     = 0.3,
   minCloakDistance              = 150,
-  modelCenterOffset				= [[0 20 0]],
   noAutoFire                    = false,
   objectName                    = [[CORAP.s3o]],
   script                        = [[factoryplane.lua]],

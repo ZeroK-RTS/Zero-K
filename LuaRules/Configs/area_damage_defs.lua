@@ -40,7 +40,7 @@ local weapons = {
 		timeFall = 0.5 
 	},
 	raveparty_orange_roaster = { 
-		radius = 256, 
+		radius = 320, 
 		damage = 40, 
 		duration = 450, 
 		rangeFall = 0.6, 
@@ -78,7 +78,7 @@ local weapons = {
 local presets = {
 	module_napalmgrenade = { radius = 128, damage = 20, duration = 1400, rangeFall = 0.6, timeFall = 0.5 },
 	module_napalmarty = { radius = 128, damage = 20, duration = 600, rangeFall = 0.6, timeFall = 0.5 },
-	module_napalmarty_long = { radius = 128, damage = 20, duration = 750, rangeFall = 0.6, timeFall = 0.5 },
+	module_napalmarty_long = { radius = 128, damage = 20, duration = 840, rangeFall = 0.6, timeFall = 0.5 },
 }
 
 ------------------------

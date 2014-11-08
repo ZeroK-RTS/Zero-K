@@ -108,6 +108,27 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Preserve crater sizes for new engine
+-- https://github.com/spring/spring/commit/77c8378b04907417a62c25218d69ff323ba74c8d
+
+if not reverseCompat then
+	for _, weaponDef in pairs(WeaponDefs) do
+		if (not weaponDef.craterareaofeffect) then
+			weaponDef.craterareaofeffect = tonumber(weaponDef.areaofeffect or 0) * 1.5
+		end
+	end
+end
+
+-- https://github.com/spring/spring/commit/dd7d1f79c3a9b579f874c210eb4c2a8ae7b72a16
+for _, weaponDef in pairs(WeaponDefs) do
+	if ((weaponDef.weapontype == "LightningCannon") and (not weaponDef.beamttl)) then
+		weaponDef.beamttl = 10
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Disable sweepfire until we know how to use it
 
 for _, weaponDef in pairs(WeaponDefs) do
@@ -169,6 +190,9 @@ end
 	if weaponDef.weaponvelocity then
 		weaponDef.customparams.weaponvelocity = weaponDef.weaponvelocity -- For attack AOE widget
 	end
+	if weaponDef.dyndamageexp and (weaponDef.dyndamageexp > 0) then
+		weaponDef.customparams.dyndamageexp = weaponDef.dyndamageexp
+	end
  end
 
 --------------------------------------------------------------------------------
@@ -179,6 +203,11 @@ end
  for _, weaponDef in pairs(WeaponDefs) do
     weaponDef.noselfdamage = (weaponDef.noselfdamage ~= false)
  end
+ 
+-- remove experience bonuses
+for _, weaponDef in pairs(WeaponDefs) do
+	weaponDef.ownerExpAccWeight = 0
+end
  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

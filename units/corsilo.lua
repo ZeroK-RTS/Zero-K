@@ -75,6 +75,7 @@ unitDef = {
       areaOfEffect            = 1920,
       cegTag                  = [[NUCKLEARMINI]],
       collideFriendly         = false,
+      collideFeature          = false,
       commandfire             = true,
       craterBoost             = 6,
       craterMult              = 6,

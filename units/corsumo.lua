@@ -21,7 +21,15 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    canjump        = [[1]],
+    canjump            = 1,
+    jump_range         = 360,
+    jump_height        = 110,
+    jump_speed         = 6,
+    jump_delay         = 30,
+    jump_reload        = 15,
+    jump_from_midair   = 0,
+    jump_rotate_midair = 0,
+
     --description_bp = [[Robô dispersador]],
     description_fr = [[Robot Émeutier]],
     description_de = [[Springender Sturm Roboter]],
@@ -240,6 +248,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
   
+      customparams = {
+        timeslow_damagefactor = 2,
+      },
+ 
       damage                  = {
 		default = 250,
       },

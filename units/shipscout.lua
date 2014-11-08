@@ -13,10 +13,10 @@ unitDef = {
   canAttack              = true,
   canMove                = true,
   category               = [[SHIP]],
-  collisionVolumeOffsets = [[0 3 0]],
-  collisionVolumeScales  = [[24 24 65]],
+  collisionVolumeOffsets = [[0 5 0]],
+  collisionVolumeScales  = [[20 20 60]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -58,9 +58,9 @@ unitDef = {
   },
   
   sightDistance          = 800,
-  sonarDistance          = 300,
+  sonarDistance          = 350,
   turninplace            = 0,
-  turnRate               = 698,
+  turnRate               = 740,
   waterline              = 2,
 
   weapons                = {

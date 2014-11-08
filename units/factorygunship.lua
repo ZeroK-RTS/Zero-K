@@ -49,7 +49,7 @@ unitDef = {
 	modelradius    = [[43]],
   },
 
-  energyMake                    = 0.25,
+  energyMake                    = 0.3,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 7,
@@ -61,7 +61,7 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  metalMake                     = 0.25,
+  metalMake                     = 0.3,
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[CORPLAS.s3o]],

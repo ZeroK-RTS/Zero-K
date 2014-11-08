@@ -2,7 +2,7 @@
 function gadget:GetInfo()
   return {
     name      = "Water Effects",
-    desc      = "Umbrela (;Þ) gadget for dealing with units that do things in the water. Water tank weapons and extra regen.",
+    desc      = "Umbrela (;Ãž) gadget for dealing with units that do things in the water. Water tank weapons and extra regen.",
     author    = "Google Frog",
     date      = "24 Feb 2012",
     license   = "GNU GPL, v2 or later",
@@ -28,6 +28,23 @@ local unit = {}
 local unitByID = {data = {}, count = 0}
 
 local unitDefData, waterCannonIterable, waterCannonIndexable = include("LuaRules/Configs/water_effect_defs.lua")
+
+for id, data in pairs(UnitDefs) do
+	if data.customParams then
+		if data.customParams.amph_regen then
+			if not unitDefData[id] then
+				unitDefData[id] = {}
+			end
+			unitDefData[id].healthRegen = tonumber(data.customParams.amph_regen)
+		end
+		if data.customParams.amph_submerged_at then
+			if not unitDefData[id] then
+				unitDefData[id] = {}
+			end
+			unitDefData[id].submergedAt = tonumber(data.customParams.amph_submerged_at)
+		end
+	end
+end
 
 local REGEN_PERIOD = 13
 local SECOND_MULT = REGEN_PERIOD/30
@@ -117,7 +134,8 @@ function gadget:GameFrame(n)
 					end
 					if height < 0 then
 						local hp, maxHp = Spring.GetUnitHealth(unitID)
-						local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*SECOND_MULT/effect.submergedAt
+						local slowMult = 1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+						local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*slowMult*SECOND_MULT/effect.submergedAt
 						Spring.SetUnitHealth(unitID, newHp) 
 					end
 				end

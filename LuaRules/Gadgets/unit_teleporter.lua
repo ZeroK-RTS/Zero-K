@@ -7,7 +7,7 @@ function gadget:GetInfo()
     date      = "29 Feb 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = not (Game.version:find('91.0') == 1)  --  loaded by default?
   }
 end
 
@@ -128,6 +128,7 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 	if tele[unitID].teleportiee then
 		teleportingUnit[tele[unitID].teleportiee] = nil
 		tele[unitID].teleportiee = false
+		Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
 	end
 	tele[unitID].teleFrame = false
 	tele[unitID].cost = false
@@ -145,11 +146,11 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 	end
 end
 
-function GG.tele_ableToDeploy(unitID)
+function tele_ableToDeploy(unitID)
 	return tele[unitID] and tele[unitID].link and not tele[unitID].deployed
 end
 
-function GG.tele_deployTeleport(unitID)
+function tele_deployTeleport(unitID)
 	tele[unitID].deployed = true
 	checkFrame[Spring.GetGameFrame() + 1] = true
 	
@@ -157,7 +158,7 @@ function GG.tele_deployTeleport(unitID)
 	Spring.SetUnitRulesParam(unitID, "deploy", 1)
 end
 
-function GG.tele_undeployTeleport(unitID)
+function tele_undeployTeleport(unitID)
 	if tele[unitID].deployed then
 		interruptTeleport(unitID)
 	end
@@ -166,7 +167,7 @@ function GG.tele_undeployTeleport(unitID)
 	Spring.SetUnitRulesParam(unitID, "deploy", 0)
 end
 
-function GG.tele_createBeacon(unitID,x,z)
+function tele_createBeacon(unitID,x,z)
 	isPlacingBeacon[unitID]=nil
 	local y = Spring.GetGroundHeight(x,z)
 	local place, feature = Spring.TestBuildOrder(beaconDef, x, y, z, 1)
@@ -179,6 +180,7 @@ function GG.tele_createBeacon(unitID,x,z)
 		local beaconID = Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
 		if beaconID then
 			Spring.SetUnitPosition(beaconID, x, y, z)
+			Spring.SetUnitNeutral(beaconID,true)
 			tele[unitID].link = beaconID
 			beacon[beaconID] = {link = unitID, x = x, z = z}
 			Spring.SetUnitRulesParam(beaconID, "connectto", unitID)
@@ -192,7 +194,7 @@ local function undeployTeleport(unitID)
 	if tele[unitID].deployed then 
 		local func = Spring.UnitScript.GetScriptEnv(unitID).UndeployTeleport
 		Spring.UnitScript.CallAsUnit(unitID,func)
-		GG.tele_undeployTeleport(unitID)
+		tele_undeployTeleport(unitID)
 	end
 end
 
@@ -429,6 +431,7 @@ function gadget:GameFrame(f)
 							
 							teleportingUnit[teleportiee] = nil
 							tele[tid].teleportiee = nil
+							Spring.SetUnitRulesParam(tid, "teleportiee", -1)
 							
 							if not callScript(teleportiee, "unit_teleported", {dx, dy, dz}) then
 								Spring.SetUnitPosition(teleportiee, dx, dz)
@@ -501,6 +504,7 @@ function gadget:GameFrame(f)
 							local cost = math.floor(mass*COST_FACTOR + math.random())
 							--Spring.Echo(cost/30)
 							tele[tid].teleportiee = teleportiee
+							Spring.SetUnitRulesParam(tid, "teleportiee", teleportiee)
 							tele[tid].teleFrame = f + cost
 							tele[tid].offsetIndex = teleTarget
 							tele[tid].cost = cost
@@ -536,7 +540,8 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if teleDef[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, placeBeaconCmdDesc)
-		
+		Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
+		Spring.SetUnitRulesParam(unitID, "deploy", 0)
 		teleID.count = teleID.count + 1
 		teleID.data[teleID.count] = unitID
 		tele[unitID] = {
@@ -590,7 +595,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
-	_G.tele = tele
+	GG.tele_ableToDeploy = tele_ableToDeploy
+	GG.tele_deployTeleport = tele_deployTeleport
+	GG.tele_undeployTeleport = tele_undeployTeleport
+	GG.tele_createBeacon = tele_createBeacon
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -626,18 +634,17 @@ local spGetMyTeamID	    = Spring.GetMyTeamID
 local spGetMyAllyTeamID = Spring.GetMyAllyTeamID 	
 local spGetModKeyState	= Spring.GetModKeyState
 local spAreTeamsAllied	= Spring.AreTeamsAllied
+local spGetUnitVectors  = Spring.GetUnitVectors
 
 local myTeam = spGetMyTeamID()
 
+local beaconDef = UnitDefNames["tele_beacon"].id
+local beacons = {}
+
 local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
-	--//REFERENCE: 
-	-- http://www.codeproject.com/Articles/31859/Draw-a-Smooth-Curve-through-a-Set-of-2D-Points-wit
-	-- Dr Thomas Sederberg, BYU Bézier curves, http://www.tsplines.com/resources/class_notes/Bezier_curves.pdf
-	-- http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-	--// allow us to dynamically create smooth curve in realtime.
 	local step = 1/amountOfPoints
-	glVertex(pointA[1]+3,pointA[2]+3,pointA[3]+3) --redundant vertex to make polygon looks thicker
-	for i=0, 1, step do --generate 10 points of a curve
+	glVertex (pointA[1]+3, pointA[2]+3, pointA[3]+3)
+	for i=0, 1, step do
 		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
 		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
 		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
@@ -646,46 +653,43 @@ local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
 	glVertex(pointD[1]+3,pointD[2]+3,pointD[3]+3)
 end
 
-local function GetUnitTop(unitID, x,y,z,height)
-	--//Translate something that's meant for unit's coordinate into real-world coordinate. This case only implement top of unit.
-	-- Reference: unit_aa_shoot_flying_groundunit.lua by msafwan
-	local _, top,_ = Spring.GetUnitVectors(unitID)
+local function GetUnitTop (unitID, x,y,z)
+	local height = Spring.GetUnitHeight(unitID) -- previously hardcoded to 50
+	local top = select (2, spGetUnitVectors(unitID))
 	local offX = top[1]*height
 	local offY = top[2]*height
 	local offZ = top[3]*height
-	return x+offX,y+offY,z+offZ
+	return x+offX, y+offY, z+offZ
 end
 
 local function DrawWire(spec)
-	local tele = SYNCED.tele
-	for tid, data in spairs(tele) do
-		--//draw reference: unit_shield_link.lua by lurker, minimap_events.lua by Dave Rodgers, http://springrts.com/wiki/Lua_ConstGL
-		local bid = data.link
-		if data.deployed then --if teleport link is deployed & teleporter is visible: then draw beam wing
-			local point={nil,nil,nil,nil} --this store 4 points at which a curve will drawn from
+	for i=1, #beacons do
+		local bid = beacons[i]
+		local tid = Spring.GetUnitRulesParam(bid, "connectto")
+
+		if (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
+			local point = {nil, nil, nil, nil}
 			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
-			
-			if data.teleportiee and spValidUnitID(data.teleportiee) and spValidUnitID(bid) then
-				local los1 = spGetUnitLosState(data.teleportiee, myTeam, false)
+			local teleportiee = Spring.GetUnitRulesParam(tid, "teleportiee")
+			if (teleportiee >= 0) and spValidUnitID(teleportiee) and spValidUnitID(bid) then
+				local los1 = spGetUnitLosState(teleportiee, myTeam, false)
 				local los2 = spGetUnitLosState(bid, myTeam, false)
-				if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(data.teleportiee) or spIsUnitInView(bid)) then
-					--if teleport beacon is visible & is processing draw beam wire
+				if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(teleportiee) or spIsUnitInView(bid)) then
 					_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
-					local topX, topY, topZ = GetUnitTop(bid, xxx,yyy,zzz, 50)
-					point[1] = {xxx,yyy,zzz}--points at teleporter's body
-					point[2] = {topX,topY,topZ}--points at teleporter's head
-					_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(data.teleportiee, true)
-					topX, topY, topZ = GetUnitTop(data.teleportiee,xxx,yyy,zzz,50) 
-					point[3] = {topX,topY,topZ} --points at unit's head
-					point[4] = {xxx,yyy,zzz}--points at unit's body
-					
+					local topX, topY, topZ = GetUnitTop(bid, xxx, yyy, zzz)
+					point[1] = {xxx, yyy, zzz}
+					point[2] = {topX, topY, topZ}
+					_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(teleportiee, true)
+					topX, topY, topZ = GetUnitTop(teleportiee, xxx, yyy, zzz)
+					point[3] = {topX,topY,topZ}
+					point[4] = {xxx,yyy,zzz}
 					gl.PushAttrib(GL.LINE_BITS)
 					gl.DepthTest(true)
-					gl.Color(0,0.75,1,math.random()*0.3+0.2) --draw flickering blueish beam
+					gl.Color (0, 0.75, 1, math.random()*0.3+0.2)
 					gl.LineWidth(3)
-					gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1],point[2],point[3],point[4],10)
+					gl.BeginEnd(GL.LINE_STRIP, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
 					gl.DepthTest(false)
-					gl.Color(1,1,1,1)
+					gl.Color (1,1,1,1)
 					gl.PopAttrib()
 				end
 			end
@@ -700,43 +704,59 @@ local function DrawFunc(u1, u2)
 	glVertex(x2,y2,z2)
 end
 
+function gadget:UnitCreated(unitID, unitDefID)
+	if (unitDefID == beaconDef) then
+		beacons[#beacons + 1] = unitID
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	if (unitDefID == beaconDef) then
+		for i=1, #beacons do
+			if beacons[i] == unitID then
+				beacons[i] = beacons[#beacons]
+				table.remove(beacons)
+				break;
+			end
+		end
+	end
+end
+
 function gadget:DrawWorld()
 	local spec, fullview = Spring.GetSpectatingState()
 	spec = spec or fullview
-	local tele = SYNCED.tele
 
-	if tele and snext(tele) then
-		DrawWire(spec)
-		
-		gl.PushAttrib(GL.LINE_BITS)
-		
-		gl.DepthTest(true)
-		
-		gl.LineWidth(2)
-		gl.LineStipple('')
-		local tele = SYNCED.tele
-		local alt,ctrl,meta,shift = spGetModKeyState()
-		for tid, data in spairs(tele) do
-			local bid = data.link
-			local team = Spring.GetUnitTeam(tid)
-			if spValidUnitID(tid) and spValidUnitID(bid) and (spec or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
-				
-				gl.Color(0.1, 0.3, 1, 0.9)
-				gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
-				
-				local x,y,z = spGetUnitPosition(bid)
-				
-				gl.DrawGroundCircle(x,y,z, BEACON_TELEPORT_RADIUS, 32)
-			end
+	DrawWire(spec)
 	
+	gl.PushAttrib(GL.LINE_BITS)
+	
+	gl.DepthTest(true)
+	
+	gl.LineWidth(2)
+	gl.LineStipple('')
+
+	local shift = select (4, spGetModKeyState())
+	for i=1, #beacons do
+		local bid = beacons[i]
+		local tid = Spring.GetUnitRulesParam(bid, "connectto")
+		local team = Spring.GetUnitTeam(tid)
+		if spValidUnitID(tid) and spValidUnitID(bid) and (spec or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
+			
+			gl.Color(0.1, 0.3, 1, 0.9)
+			gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
+			
+			local x,y,z = spGetUnitPosition(bid)
+			
+			gl.DrawGroundCircle(x,y,z, BEACON_TELEPORT_RADIUS, 32)
 		end
-		
-		gl.DepthTest(false)
-		gl.Color(1,1,1,1)
-		gl.LineStipple(false)
-		
-		gl.PopAttrib()
+
 	end
+
+	gl.DepthTest(false)
+	gl.Color(1,1,1,1)
+	gl.LineStipple(false)
+	
+	gl.PopAttrib()
 	
 end
 

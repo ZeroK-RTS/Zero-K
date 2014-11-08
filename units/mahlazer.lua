@@ -6,15 +6,15 @@ unitDef = {
   activateWhenBuilt             = true,
   brakeRate                     = 0,
   buildAngle                    = 32700,
-  buildCostEnergy               = 35000,
-  buildCostMetal                = 35000,
+  buildCostEnergy               = 40000,
+  buildCostMetal                = 40000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
   buildingGroundDecalSizeY      = 11,
   buildingGroundDecalType       = [[mahlazer_aoplane.dds]],
   buildPic                      = [[mahlazer.png]],
-  buildTime                     = 35000,
+  buildTime                     = 40000,
   canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
@@ -25,11 +25,11 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Lazer ? Charge ?liptique]],
-	description_de = [[Planetarischer Energiemeißel]],
+	description_de = [[Planetarischer EnergiemeiÃŸel]],
 	description_pl = [[Laser Orbitalny]],
     helptext       = [[This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
-    helptext_fr    = [[Le MAH Lazer est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
-	helptext_de    = [[Diese gigantische Waffe nutzt ihren energetischen Strahl, um große Gräben im Terrain zu hinterlassen und dabei alles, was sich ihr in den Weg stellt, auszulöschen. Ebenfalls als Auslöscher von störenden Hindernissen, wie zum Beispiel nervtötende feindliche Enheiten und Basen, sehr nützlich.]],
+    helptext_fr    = [[Le Starlight est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
+	helptext_de    = [[Diese gigantische Waffe nutzt ihren energetischen Strahl, um groÃŸe GrÃ¤ben im Terrain zu hinterlassen und dabei alles, was sich ihr in den Weg stellt, auszulÃ¶schen. Ebenfalls als AuslÃ¶scher von stÃ¶renden Hindernissen, wie zum Beispiel nervtÃ¶tende feindliche Enheiten und Basen, sehr nÃ¼tzlich.]],
 	helptext_pl    = [[Starlight to precyzyjne narzedzie przeznaczone do szybkiego niszczenia celow w dowolnym miejscu na mapie.]],
 	modelradius    = [[60]],
   },
@@ -41,7 +41,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   mass                          = 2013,
-  maxDamage                     = 12000,
+  maxDamage                     = 10000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
@@ -122,7 +122,7 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 200,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -204,7 +204,7 @@ unitDef = {
       craterMult              = 4,
 
       damage                  = {
-        default = 100,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -244,7 +244,7 @@ unitDef = {
       craterMult              = 4,
 
       damage                  = {
-        default = 100,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -285,7 +285,7 @@ unitDef = {
       craterMult              = 0.01,
 
       damage                  = {
-        default = 100,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
@@ -395,7 +395,7 @@ unitDef = {
       description      = [[Wreckage - Starlight]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 12000,
+      damage           = 10000,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -403,10 +403,10 @@ unitDef = {
       footprintZ       = 3,
       height           = [[40]],
       hitdensity       = [[100]],
-      metal            = 14000,
+      metal            = 16000,
       object           = [[starlight_d.dae]],
       reclaimable      = true,
-      reclaimTime      = 14000,
+      reclaimTime      = 16000,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -416,17 +416,17 @@ unitDef = {
       description      = [[Debris - Starlight]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 12000,
+      damage           = 10000,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
       height           = [[4]],
       hitdensity       = [[100]],
-      metal            = 7000,
+      metal            = 8000,
       object           = [[debris3x3c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 7000,
+      reclaimTime      = 8000,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

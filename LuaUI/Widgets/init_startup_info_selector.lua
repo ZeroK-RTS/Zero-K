@@ -1,5 +1,6 @@
 local versionNumber = "1.21"
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function widget:GetInfo()
 	return {
 	name	= "Startup Info and Selector",
@@ -11,33 +12,26 @@ function widget:GetInfo()
 	enabled	= true
 	}
 end
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --[[
 -- Features:
 _ Show a windows at game start with pictures to choose commander type.
-
--- To do:
-_ Make a small (2-3 frames) animation when cursor hover comms' posters (like the unit highlight widget)and an highlight of the buttons hovered on. Can chili do that yet ?
-_ Make each player broadcast their choice to their team in a way it can be used by chili_chatbubbles, I had issues with that, left it for later. Use Spring.SendCommands( ?
-
----- CHANGELOG -----
--- versus666, 		v1.2	(30oct2010)	:	Placed CreateWindow() @ _DrawScreen() to avoid showing commander selection after game start when DEBUG is FALSE and doing /luaui reload.
---											Thanks to [LCC]Quantum[0K] for spotting the little mistake which was blocking me for 1 complete day.
--- versus666,		v1.1	(28oct2010)	:	Corrected typos, cosmetic changes and added comments & infos about comm choices.
--- SirMaverick,		v1.0				:	Creation.
---]]
-----------------------------------------------
-local debug	= false --generates debug message
-local Echo	= Spring.Echo
+]]--
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local spGetGameRulesParam = Spring.GetGameRulesParam
-
-local coop = (Spring.GetModOptions().coop == 1) or false
-local forcejunior = (Spring.GetModOptions().forcejunior == 1) or false
+-- FIXME use tobool instead of this string comparison silliness
+local coop = (Spring.GetModOptions().coop == "1") or false
+local forcejunior = (Spring.GetModOptions().forcejunior == "1") or false
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
 local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 
 local Chili
 local Window
+local ScrollPanel
+local Grid
+local Label
 local screen0
 local Image
 local Button
@@ -46,12 +40,58 @@ local vsx, vsy
 local modoptions = Spring.GetModOptions() --used in LuaUI\Configs\startup_info_selector.lua for planetwars
 local selectorShown = false
 local mainWindow
+local scroll
+local grid
+local trainerCheckbox
+local buttons = {}
+local buttonLabels = {}
+local trainerLabels = {}
 local actionShow = "showstartupinfoselector"
 local optionData = include("Configs/startup_info_selector.lua")
 
 local noComm = false
 local gameframe = Spring.GetGameFrame()
----------------------------------------------
+
+local WINDOW_WIDTH = 720
+local WINDOW_HEIGHT = 480
+local BUTTON_WIDTH = 128
+local BUTTON_HEIGHT = 128
+
+--local wantLabelUpdate = false
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- wait for next screenframe so Grid can resize its elements first	-- doesn't actually work
+local function ToggleTrainerButtons(bool)
+	for i=1,#buttons do
+		if buttons[i].trainer then
+			if bool then
+				grid:AddChild(buttons[i])
+			else
+				grid:RemoveChild(buttons[i])
+			end
+		end
+	end
+end
+
+options_path = 'Settings/HUD Panels/Commander Selector'
+options = {
+	hideTrainers = {
+		name = 'Hide Trainer Commanders',
+		--desc = '',
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			--if trainerCheckbox then
+			--	trainerCheckbox:Toggle()
+			--end
+			ToggleTrainerButtons(not self.value)
+		end
+	},
+}
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
 local function PlaySound(filename, ...)
 	local path = filename..".WAV"
 	if (VFS.FileExists(path)) then
@@ -67,42 +107,11 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   vsy = viewSizeY
 end
 
---local gameDate = os.date(t)
---if (gameDate.month == 4) and (gameDate.day == 1) then optionData.communism.sound = "LuaUI/Sounds/communism/tetris.wav" end
-
--- set poster size (3/4 ratio)
-local function posterSize(num)
-	if num < 2 then
-		local a,b = 450, 600
-	-- for those who play with 800x600; but consider card upgrade!
-			if b > 0.8*vsy then
-				local scale = 0.8*vsy/b
-				a = scale * a
-				b = scale * b
-			end
-			return a, b, 60
-	else
-	-- scale to 80% of screen width
-		local spacex = vsx * 0.8 / num
-		if spacex < 300 then
-			return spacex, spacex*4/3, 60
-		else
-		return 300, 400, 60
-		end
-	end
-end
-
--- needs to be a global so chili can reach out and call it?
-function printDebug( value )
-	if ( debug ) then Echo( value )
-	end
-end
 
 function Close(commPicked)
-	printDebug("<gui_startup_info_selector DEBUG >: closing")
 	if not commPicked then
-		Spring.Echo("Requesting baseline comm")
-		Spring.SendLuaRulesMsg("faction:commbasic")
+		--Spring.Echo("Requesting baseline comm")
+		--Spring.SendLuaRulesMsg("faction:comm_trainer_strike")
 	end
 	--Spring_SendCommands("say: a:I chose " .. option.button})
 	if mainWindow then mainWindow:Dispose() end
@@ -113,82 +122,116 @@ local function CreateWindow()
 		mainWindow:Dispose()
 	end
 	
-	printDebug("<gui_startup_info_selector DEBUG >: create window.")
-	-- count options
-	local active = 0
-	for index,option in pairs(optionData) do
-		if option:enabled() then
-			active = active + 1
-		end
-	end
+	local numColumns = math.floor(WINDOW_WIDTH/BUTTON_WIDTH)
+	local numRows = math.ceil(#optionData/numColumns)
 
-	local posterx, postery, buttonspace = posterSize(active)
-
-	-- create window if necessary
-	if active > 0 then
-		mainWindow = Window:New{
-			resizable = false,
-			draggable = false,
-			clientWidth  = posterx*active,
-			clientHeight = postery + buttonspace +12 ,--there is a title (caption below), height is not just poster+buttons
-			x = (vsx - posterx*active)/2,
-			y = ((vsy - postery - buttonspace)/2),
-			parent = screen0,
-			caption = "STARTUP SELECTOR",
-			}
-		
-		-- add posters
-		local i = 0
-		for index,option in ipairs(optionData) do
-			if option:enabled() then
-				local image = Image:New{
-					parent = mainWindow,
-					file = option.poster,--lookup Configs/startup_info_selector.lua to get optiondata
-					file2 = option.poster2,
-					tooltip = option.tooltip,
-					caption = option.selector,
-					width = posterx,
-					height = postery,
-					x = (i*posterx),
-					padding = {1,1,1,1},
-					OnClick = {option.button},
-					y = 9 
-					}
-				local buttonWidth = posterx*2/3
-					if (option.button ~= nil) then 
-						local button = Button:New {
-							parent = mainWindow,
-							x = i*posterx + (posterx - buttonWidth)/2, --placement of comms names' buttons @ the middle of each poster
-							y = postery+12,
-							caption = option.selector,
-							tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
-							width = buttonWidth,
-							height = 30,
-							padding={1,1,1,1},
-							OnClick = {option.button},-- used onclick in case people change their mind, mouseup register the option you were when pressed on, even if you moved somewhere else while still hold mouse button. onclick register it only if you're still on it (even if you moved to another part of the comm button).
-							}
-					end 
-				i = i + 1
-			end
-		end
-		local cbWidth = posterx*active*0.75-- calculate width of close button depending of number or posters
-		local closeButton = Button:New{
-			parent = mainWindow,
-			caption = "CLOSE  (defaults to baseline commander)",
-			tooltip = "CLOSE\nNo commander selection made, will use a basic Strike Commander",
-			--caption = "CLOSE  (make no selection)",
-			--tooltip = "CLOSE\nNo commander selection made\nTo choose your commander later, open the Esc menu and go to Game Actions -> Select Comm",
-			width = cbWidth,
-			height = 30,
-			x = (posterx*active - cbWidth)/2,
-			y = postery + (buttonspace)/2+14,
-			OnClick = {function() Close(false) end}
+	mainWindow = Window:New{
+		resizable = false,
+		draggable = false,
+		clientWidth  = WINDOW_WIDTH,
+		clientHeight = WINDOW_HEIGHT,
+		x = (vsx - WINDOW_WIDTH)/2,
+		y = ((vsy - WINDOW_HEIGHT)/2),
+		parent = screen0,
+		caption = "COMMANDER SELECTOR",
 		}
-	else
-		Close(false)
+	--scroll = ScrollPanel:New{
+	--	parent = mainWindow,
+	--	horizontalScrollbar = false,
+	--	bottom = 36,
+	--	x = 2,
+	--	y = 12,
+	--	right = 2,
+	--}
+	grid = Grid:New{
+		parent = mainWindow,
+		autosize = false,
+		resizeItems = true,
+		x=0, right=0,
+		y=0, bottom=36,
+		centerItems = false,
+	}
+	-- add posters
+	local i = 0
+	for index,option in ipairs(optionData) do
+		i = i + 1
+		local hideButton = options.hideTrainers.value and option.trainer
+		local button = Button:New {
+			parent = (not hideButton) and grid or nil,
+			caption = "",	--option.name,	--option.trainer and "TRAINER" or "",
+			valign = "bottom",
+			tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
+			width = BUTTON_WIDTH,
+			height = BUTTON_HEIGHT,
+			padding = {5,5,5,5},
+			OnClick = {function()
+				local prefix = option.trainer and "faction:" or "customcomm:"
+				Spring.SendLuaRulesMsg(prefix..option.name)
+				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
+				Close(true)
+			end},
+			trainer = option.trainer,
+		}
+		buttons[i] = button
+		
+		local image = Image:New{
+			parent = button,
+			file = option.image,--lookup Configs/startup_info_selector.lua to get optiondata
+			tooltip = option.tooltip,
+			x = 2,
+			y = 2,
+			right = 2,
+			bottom = 12,
+		}
+		local label = Label:New{
+			parent = button,
+			x = "15%",
+			bottom = 4,
+			caption = option.name,
+			align = "center",
+			font = {size = 14},
+		}
+		buttonLabels[i] = label
+		if option.trainer then
+			local trainerLabel = Label:New{
+				parent = image,
+				x = "25%",
+				y = "50%",
+				caption = "TRAINER",
+				align = "center",
+				font = {color = {1,0.2,0.2,1}, size=16, outline=true, outlineColor={1,1,1,0.8}},
+			}
+			trainerLabels[i] = trainerLabel
+		end
 	end
+	local cbWidth = WINDOW_WIDTH*0.75
+	local closeButton = Button:New{
+		parent = mainWindow,
+		caption = "CLOSE",
+		width = cbWidth,
+		x = (WINDOW_WIDTH - cbWidth)/2,
+		height = 30,
+		bottom = 2,
+		OnClick = {function() Close(false) end}
+	}
+	--[[	-- FIXME: EPIC doesn't remember the setting if you change it with this checkbox
+	trainerCheckbox = Chili.Checkbox:New{
+		parent = mainWindow,
+		x = 4,
+		bottom = 2,
+		width = 160,
+		caption = "Hide Trainer Comms",
+		checked = options.hideTrainers.value,
+		OnChange = { function(self)
+			options.hideTrainers.value = self.checked
+			ToggleTrainerButtons(self.checked)
+		end },
+	}
+	]]
+	grid:Invalidate()
 end
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function widget:Initialize()
 	if not (WG.Chili) then
 		widgetHandler:RemoveWidget()
@@ -201,6 +244,9 @@ function widget:Initialize()
 	-- chili setup
 	Chili = WG.Chili
 	Window = Chili.Window
+	ScrollPanel = Chili.ScrollPanel
+	Grid = Chili.Grid
+	Label = Chili.Label
 	screen0 = Chili.Screen0
 	Image = Chili.Image
 	Button = Chili.Button
@@ -245,7 +291,7 @@ function widget:Initialize()
 			height = "100%",
 			x = 0,
 			y = 0,
-			OnClick = {function() Spring.SendCommands({"luaui "..actionShow}) end}	
+			OnClick = {function() Spring.SendCommands({"luaui "..actionShow}) end}
 		}
 		
 		buttonImage = Image:New{
@@ -291,5 +337,5 @@ function widget:GameStart()
 	end
 end
 
------
------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------

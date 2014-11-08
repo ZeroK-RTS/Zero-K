@@ -71,11 +71,6 @@ local commButton = {}	-- unused
 
 local echo = Spring.Echo
 
-local BUTTON_WIDTH = 64
-local BUTTON_HEIGHT = 52
---local BASE_COLUMNS = 6
---local NUM_FAC_COLUMNS = BASE_COLUMNS - 1	-- unused
-
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 local UPDATE_FREQUENCY = 0.25
@@ -95,18 +90,18 @@ end
 local nano_name = UnitDefNames.armnanotc.humanName	-- HACK
 
 local function RefreshConsList() end	-- redefined later
-local function ClearData() end
+local function ClearData(reinitialize) end
 
-options_path = 'Settings/HUD Panels/Core Selector'
+options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
 options = {
 	maxbuttons = {
-		name = 'Maximum number of buttons (3-10)',
+		name = 'Maximum number of buttons (3-16)',
 		type = 'number',
 		value = 6,
-		min=3,max=10,step=1,
+		min=3,max=16,step=1,
 		OnChange = function() 
-			ClearData()
+			ClearData(true)
 			window_selector:Dispose()
 			widget:Initialize()
 		end,	
@@ -145,6 +140,11 @@ options = {
 		end
 	},
 }
+
+function WG.CoreSelector_SetOptions(maxbuttons)
+	options.maxbuttons.value = maxbuttons
+	options.maxbuttons.OnChange(options.maxbuttons)
+end
 
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
@@ -664,7 +664,7 @@ local function InitializeUnits()
 	end
 end
 
-ClearData = function()
+ClearData = function(goingToReintializeSoDoNotBotherWithUpdate)
 	while facs[1] do
 		RemoveFac(facs[1].facID)
 	end
@@ -672,7 +672,9 @@ ClearData = function()
 		RemoveComm(comms[1].commID)
 	end
 	idleCons = {}
-	UpdateConsButton()
+	if not goingToReintializeSoDoNotBotherWithUpdate then
+		UpdateConsButton()
+	end
 end
 
 -- FIXME: donut work?
@@ -811,7 +813,7 @@ function widget:Update(dt)
 		--widgetHandler:RemoveWidget()
 		--return false
 		myTeamID = Spring.GetMyTeamID()
-		ClearData()
+		ClearData(false)
 		InitializeUnits()
 	end
 	if wantUpdateCons then
@@ -874,6 +876,14 @@ function widget:Initialize()
 	Progressbar = Chili.Progressbar
 	screen0 = Chili.Screen0
 
+	-- Set the size for the default settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local BUTTON_WIDTH = math.min(60, screenHeight/16)
+	local BUTTON_HEIGHT = 55*BUTTON_WIDTH/60
+	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local bottom = integralHeight
+	
 	stack_main = Panel:New{
 		padding = {0,0,0,0},
 		--itemPadding = {0, 0, 0, 0},
@@ -892,8 +902,8 @@ function widget:Initialize()
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
-		x = 450,	-- integral width 
-		bottom = 0,
+		x = 0, 
+		bottom = bottom,
 		width  = BUTTON_WIDTH * options.maxbuttons.value,
 		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,
@@ -902,8 +912,8 @@ function widget:Initialize()
 		tweakResizable = true,
 		resizable = false,
 		dragUseGrip = false,
-		--minWidth = 300,
-		--minHeight = 64,
+		minWidth = 32,
+		minHeight = 32,
 		color = {0,0,0,0},
 		children = {
 			stack_main,
@@ -950,8 +960,6 @@ function widget:Initialize()
 	}	
 	UpdateCommButton()
 	]]--
-
-	
 	
 	conButton.button = Button:New{
 		parent = stack_main;
@@ -996,8 +1004,10 @@ function widget:Initialize()
 	}
 	conButton.image = Image:New {
 		parent = conButton.button,
-		height="91%";
-		y="6%";
+		x = "2%",
+		y = "6%",
+		right = "2%",
+		bottom = "6%",
 		file = buildIcon,	--'#'..idleBuilderDefID,
 		--file2 = "bitmaps/icons/frame_cons.png",
 		keepAspect = false,
@@ -1007,7 +1017,6 @@ function widget:Initialize()
 	UpdateConsButton()
 
 	myTeamID = Spring.GetMyTeamID()
-
 
 	local viewSizeX, viewSizeY = widgetHandler:GetViewSizes()
 	self:ViewResize(viewSizeX, viewSizeY)

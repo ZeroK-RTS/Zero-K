@@ -257,7 +257,8 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.customparams.idstring == "commweapon_gaussrifle" then
+					local id = v.customparams.idstring
+					if id == "commweapon_gaussrifle" or id == "commweapon_massdriver" then
 						v.range = v.range * 1.2
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.1
@@ -451,9 +452,14 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 HP/s",
+		description = "Self-repairs 20 HP/s when out of combat for 10 seconds",
 		func = function(unitDef)
-				unitDef.autoheal = (unitDef.autoheal or 0) + 20
+				-- First module replaces the base 5 hp/s because that occurs after a minute
+				if (not unitDef.idleautoheal) or unitDef.idleautoheal == 5 then
+					unitDef.idleautoheal = 0
+				end
+				unitDef.idleautoheal = unitDef.idleautoheal + 20
+				unitDef.idletime = 300
 			end,
 	},
 	module_companion_drone = {
@@ -590,7 +596,9 @@ upgrades = {
 				unitDef.mincloakdistance = math.max(150, unitDef.mincloakdistance or 0)
 				unitDef.onoffable = true
 				unitDef.radarDistanceJam = (unitDef.radarDistanceJam and unitDef.radarDistanceJam > 350 and unitDef.radarDistanceJam) or 350
-				unitDef.customparams.cloakshield_preset = "module_cloakfield"
+				unitDef.customparams.area_cloak = "1"
+				unitDef.customparams.area_cloak_upkeep = "15"
+				unitDef.customparams.area_cloak_radius = "350"
 			end,
 	},
 	module_jammer = {

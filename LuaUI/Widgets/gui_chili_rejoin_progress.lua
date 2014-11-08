@@ -236,10 +236,10 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	
 	--create main Chili elements
-	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	-- local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
 	-- local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
-	
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local y = screenWidth*2/11 + 32
 	-- local labelHeight = 24
 	-- local fontSize = 16
 
@@ -250,7 +250,7 @@ function widget:Initialize()
 		width = 260,
 		height = 60,
 		left = 2, --dock left?
-		y = "40%", --halfway on screen?
+		y = y, --halfway on screen?
 		dockable = true,
 		draggable = false, --disallow drag to avoid capturing mouse click
 		resizable = false,

@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.435 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.436 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -497,8 +497,13 @@ local function WidgetEnabled(wname)
 	return order and (order > 0)
 end
 
-local function AmIPlayingAlone() --I am playing and playing alone with no other player existing
+-- by default it allows if player is not spectating and there are no other players
+
+local function AllowPauseOnMenuChange()
 	if Spring.GetSpectatingState() then
+		return false
+	end
+	if settings.config['epic_Settings/Misc_Menu_pauses_in_SP'] == false then
 		return false
 	end
 	local playerlist = Spring.GetPlayerList() or {}
@@ -535,7 +540,7 @@ local function KillSubWindow(makingNew)
 		window_sub_cur:Dispose()
 		window_sub_cur = nil
 		curPath = ''
-		if not makingNew and AmIPlayingAlone() then
+		if not makingNew and AllowPauseOnMenuChange() then
 			local paused = select(3, Spring.GetGameSpeed())
 			if paused then
 				spSendCommands("pause")
@@ -551,12 +556,24 @@ local function checkWidget(widget)
 	end
 end
 
+VFS.Include("LuaUI/Utilities/json.lua");
+
+local function UTF8SupportCheck()
+	local version=Game.version
+	local first_dot=string.find(version,"%.")
+	local major_version = (first_dot and string.sub(version,0,first_dot-1)) or version
+	local major_version_number = tonumber(major_version)
+	return major_version_number>=98
+end
+local UTF8SUPPORT = UTF8SupportCheck()
 
 local function SetLangFontConf()
-	if VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang..".lua", VFS.ZIP) then
-		WG.langFontConf = include("Configs/nonlatin/"..WG.lang..".lua")
-		WG.langFont = WG.langFontConf.font
+	if UTF8SUPPORT and VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang..".json", VFS.ZIP) then
+		WG.langData = Spring.Utilities.json.decode(VFS.LoadFile("Luaui/Configs/nonlatin/"..WG.lang..".json", VFS.ZIP))
+		WG.langFont = nil
+		WG.langFontConf = nil
 	else
+		WG.langData = nil
 		WG.langFont = nil
 		WG.langFontConf = nil
 	end
@@ -1791,7 +1808,7 @@ MakeSubWindow = function(path, pause)
 				local cb = Checkbox:New{
 					--x=0,
 					right = 35,
-					caption = item.name, --caption
+					caption = '  ' .. item.name, --caption
 					checked = (option.value == item.value), --status
 					OnClick = {function(self) option.OnChange(item) end},
 					textColor = color.sub_fg,
@@ -1801,6 +1818,7 @@ MakeSubWindow = function(path, pause)
 				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon)
 					
 			end
+			tree_children[#tree_children+1] = Label:New{ caption = '', }
 		elseif option.type == 'colors' then
 			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_fg, }
@@ -1943,7 +1961,7 @@ MakeSubWindow = function(path, pause)
 		children = window_children,
 	}
 	AdjustWindow(window_sub_cur)
-	if pause and AmIPlayingAlone() then
+	if pause and AllowPauseOnMenuChange() then
 		local paused = select(3, Spring.GetGameSpeed())
 		if not paused then
 			spSendCommands("pause")
@@ -1962,7 +1980,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:AddChild(window_sub_cur)
-			if (not dontChangePause) and AmIPlayingAlone() then
+			if (not dontChangePause) and AllowPauseOnMenuChange() then
 				local paused = select(3, Spring.GetGameSpeed())
 				if (not paused) and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -1976,7 +1994,7 @@ local function ShowHideCrudeMenu(dontChangePause)
 		end
 		if window_sub_cur then
 			screen0:RemoveChild(window_sub_cur)
-			if (not dontChangePause) and AmIPlayingAlone() then
+			if (not dontChangePause) and AllowPauseOnMenuChange() then
 				local paused = select(3, Spring.GetGameSpeed())
 				if paused and (not window_exit_confirm) then
 					spSendCommands("pause")
@@ -2086,7 +2104,7 @@ local function MakeMenuBar()
 	window_crude = Window:New{
 		name='epicmenubar',
 		right = 0,  
-		y = 50, -- resbar height
+		y = 0,
 		dockable = true,
 		clientWidth = crude_width,
 		clientHeight = crude_height,
@@ -2301,7 +2319,7 @@ local function MakeQuitButtons()
 				if not (isMission or Spring.GetSpectatingState()) then
 					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
 						local paused = select(3, Spring.GetGameSpeed())
-						if (paused) and AmIPlayingAlone() then
+						if (paused) and AllowPauseOnMenuChange() then
 							spSendCommands("pause")
 						end
 						spSendCommands{"spectator"} 
@@ -2320,7 +2338,7 @@ local function MakeQuitButtons()
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
 				local paused = select(3, Spring.GetGameSpeed())
-				if (paused) and AmIPlayingAlone() then
+				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
 				end
 				spSendCommands{"quit","quitforce"} 
@@ -2383,9 +2401,10 @@ function widget:Initialize()
 	widget:ViewResize(Spring.GetViewGeometry())
 	
 	-- Set default positions of windows on first run
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	if not settings.sub_pos_x then
-		settings.sub_pos_x = scrW/2
-		settings.sub_pos_y = scrH/2
+		settings.sub_pos_x = screenWidth/2 - 150
+		settings.sub_pos_y = screenHeight/2 - 200
 	end
 	
 	if not keybounditems then
@@ -2418,6 +2437,7 @@ function widget:Initialize()
 	AddOption('Settings/Camera')
 	AddOption('Settings/Graphics')
 	AddOption('Settings/HUD Panels')
+	AddOption('Settings/HUD Presets')
 	AddOption('Settings/Interface')
 	AddOption('Settings/Misc')
 

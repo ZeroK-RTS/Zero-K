@@ -12,96 +12,7 @@ local function ReturnNoCustomComms()
 	return noCustomComms
 end
 
-local optionData = {
-	{	--armcom
-		enabled = ReturnNoCustomComms, --function() return (not Spring.GetSpectatingState()) end, -- enabled = true is not spec
-		poster = "LuaUI/Images/startup_info_selector/armcom.jpg",--will be used as option.poster
-		selector = "Strike Comm",--will be used as option.selector
-		tooltip = "Strike Commander\nUses beam laser, well-balanced with good speed and health.",--will be used as option.tooltip
-		button = function()
-			Spring.SendLuaRulesMsg("faction:armcom")
-			Spring.SendCommands({'say a:I choose: Strike Commander!'})
-			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/move_arm_m_17.wav", 0.7, 'ui')
-			Close(true)
-		end 
-	},
-	{	--corcom
-		enabled = ReturnNoCustomComms,	-- function() return (not Spring.GetSpectatingState()) end,
-		poster = "LuaUI/Images/startup_info_selector/corcom.jpg",
-		selector ="Battle Comm",
-		tooltip = "Battle Commander\nUses a riot cannon; good firepower and high health but mediocre speed.",
-		button = function() 
-			Spring.SendLuaRulesMsg("faction:corcom")
-			Spring.SendCommands({'say a:I choose: Battle Commander!'})
-			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/attack_arm_m_13.wav", 0.7, 'ui')
-			Close(true)
-		end 
-	},
-	{	-- commrecon
-		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
-		poster = "LuaUI/Images/startup_info_selector/commrecon.jpg",
-		selector ="Recon Comm",
-		tooltip = "Recon Commander\nUses a slow-ray, has high mobility but with lower income and reduced health.",
-		button = function() 
-			Spring.SendLuaRulesMsg("faction:commrecon")
-			Spring.SendCommands({'say a:I choose: Recon Commander!'})
-			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/move_arm_m_11.wav", 0.7, 'ui')
-			Close(true)
-		end 
-	},
-
-	{	-- commsupport
-		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
-		poster = "LuaUI/Images/startup_info_selector/commsupport.jpg",
-		selector = "Support Comm",--because of the way spring handle font this text ("pp") is a shown few pixels higher than expected, nothing lethal.
-		tooltip = "Support Commander\nUses a gauss rifle (pierces units), has increased income and build range but low health and speed.",
-		button = function() 
-			Spring.SendLuaRulesMsg("faction:commsupport")
-			Spring.SendCommands({'say a:I choose: Support Commander!'})
-			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
-			Close(true)
-		end 
-	},
-
-	{	-- benzcom
-		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
-		poster = "LuaUI/Images/startup_info_selector/benzcom.jpg",
-		selector = "Siege Comm",
-		tooltip = "Siege Commander\nUses an assault cannon; extended range and diminished speed with otherwise average stats.",
-		button = function() 
-			Spring.SendLuaRulesMsg("faction:benzcom")
-			Spring.SendCommands({'say a:I choose: Siege Commander!'})
-			--Spring.PlaySoundFile("LuaUI/Sounds/Voices/select_arm_m_8.wav", 0.7, 'ui')
-			Close(true)
-		end 
-	},	
-	
-	{	-- communism
-		enabled = ReturnFalse, -- always enabled - so we hide it
-		poster = "LuaUI/Images/startup_info_selector/communism.jpg",
-		selector = "Communism Mode",-- set here for future modifications, even is unused at the moment
-		tooltip = "Communism Mode",
-		sound = "LuaUI/Sounds/communism/sovnat1.wav" -- only for communism -- effective sound play in LuaUI\Widgets\gui_startup_info_selector.lua
-	},
-	{	-- shuffle
-		enabled = ReturnFalse, -- Reminder panel now dedicated to commander selection.
-		poster = "LuaUI/Images/startup_info_selector/shuffle.png",
-		selector = "Commander Shuffle",-- set here for future modifications, even if unused at the moment
-		tooltip = "Commander Shuffle",
-	},
-	{	-- planetwars
-		enabled = ReturnFalse,
-		poster = "LuaUI/Images/startup_info_selector/planetwars.png",
-		selector = "PlanetWars",-- set here for future modifications, even if unused at the moment
-		tooltip = "PlanetWars",
-	},
-	{	-- chickens
-		enabled = ReturnFalse,-- ReturnFalse = disabled. must use same ways as DOTA
-		poster = "LuaUI/Images/startup_info_selector/chickens.png",
-		selector = "Chickens",-- set here for future modifications, even if unused at the moment
-		tooltip = "Chickens tips",
-	},
-}
+local optionData = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -156,21 +67,18 @@ local function WriteTooltip(seriesName)
 	return str
 end
 
-local function CommSelectTemplate(num, seriesName, comm1Name)
+local function CommSelectTemplate(num, data)
+	local seriesName = data.seriesName
+	local comm1Name = data[1]
 	if not UnitDefNames[comm1Name] then return end
 	
 	local option = {
-		enabled = function() return true end,
-		poster = chassisImages[UnitDefNames[comm1Name].customParams.statsname],
-		poster2 = "LuaUI/Images/startup_info_selector/customcomm"..num..".png",
-		selector = seriesName,
-		tooltip = "Select comm config number "..num.." ("..seriesName..")"..WriteTooltip(seriesName),
-		button = function()
-			Spring.SendLuaRulesMsg("customcomm:"..seriesName)
-			Spring.SendCommands({'say a:I choose: '..seriesName..'!'})
-			--Spring.Echo ([UnitDefNames[comm1Name].customParams.statsname)
-			Close(true)
-		end
+		name = seriesName,
+		image = chassisImages[UnitDefNames[comm1Name].customParams.statsname],
+		tooltip = "Select "..seriesName..WriteTooltip(seriesName),
+		--cmd = "customcomm:"..seriesName,
+		unitname = comm1Name,
+		trainer = data.trainer,
 	}
 	
 	return option
@@ -181,7 +89,7 @@ end
 
 local i = 0
 for i = 1, numComms do
-	local option = CommSelectTemplate(i, commDataOrdered[i].seriesName, commDataOrdered[i][1])
+	local option = CommSelectTemplate(i, commDataOrdered[i])
 	optionData[#optionData+1] = option
 end
 

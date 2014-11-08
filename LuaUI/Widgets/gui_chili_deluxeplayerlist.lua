@@ -10,7 +10,6 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     enabled   = false,
-    --detailsDefault = 1
     -- based on v1.31 Chili Crude Player List by CarRepairer, KingRaptor, et al
   }
 end
@@ -52,8 +51,8 @@ local incolor2color
 
 local window_cpl, scroll_cpl
 
-options_path = 'Settings/HUD Panels/PlayerList'
-options_order = { 'visible', 'backgroundOpacity', 'text_height', 'name_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_path = 'Settings/HUD Panels/Player List'
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins','win_show_condition', 'text_height', 'name_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -71,6 +70,25 @@ options = {
 			scroll_cpl.borderColor = {1,1,1,self.value}
 			scroll_cpl:Invalidate()
 		end,
+	},
+	reset_wins = {
+		name = "Reset Wins",
+		desc = "Reset the win counts of all players",
+		type = 'button',
+		OnChange = function() 
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
+		end,
+	},
+	win_show_condition = {
+		name = 'Show Wins',
+		type = 'radioButton',
+		value = 'whenRelevant',
+		items = {
+			{key ='always', 	name='Always'},
+			{key ='whenRelevant', 		name='When someone has wins'},
+			{key ='never', 		name='Never'},
+		},
+		OnChange = function() SetupPanels() end,
 	},
 	text_height = {
 		name = 'Font Size (10-18)',
@@ -183,6 +201,8 @@ options = {
 }
 
 local name_width
+local showWins = false
+local wins_width
 
 local green		= ''
 local red		= ''
@@ -205,7 +225,7 @@ local function IsFFA()
 	local numAllyTeams = 0
 	for i=1,#allyteams do
 		if allyteams[i] ~= gaiaAT then
-			local teams = Spring.GetTeamList()
+			local teams = Spring.GetTeamList(allyteams[i])
 			if #teams > 0  then
 				numAllyTeams = numAllyTeams + 1
 			end
@@ -255,9 +275,15 @@ local x_postping
 local x_bound
 local x_windowbound
 
+local function CheckShowWins()
+	return WG.WinCounter_currentWinTable ~= nil and (WG.WinCounter_currentWinTable.hasWins and options.win_show_condition.value == "whenRelevant") or options.win_show_condition.value == "always"
+end
+
 local function CalculateWidths()
+	wins_width = 0
+	if showWins then wins_width = (options.text_height.value * 3 + 10) end
 	name_width = options.name_width.value or 120
-	x_icon_clan		= 10
+	x_icon_clan		= wins_width + 10
 	x_icon_country	= x_icon_clan + 18
 	x_icon_rank		= x_icon_country + 20
 	x_elo			= options.show_ccr.value and x_icon_rank + 16 or x_icon_clan
@@ -382,7 +408,7 @@ local function FormatMetalStats(stat,k)
 end
 
 local function FormatElo(elo,full)
-	local mult = full and 1 or 50
+	local mult = full and 1 or 10
 	local elo_out = mult * math.floor((elo/mult) + .5)
 	local eloCol = {}
 
@@ -390,8 +416,8 @@ local function FormatElo(elo,full)
 	local mid = 1600
 	local bot = 1400
 	local tc = {1,1,1,1}
-	local mc = {1,1,0,1}
-	local bc = {1,.2,.2,1}
+	local mc = {1,1,.2,1}
+	local bc = {1,.4,.3,1}
 	
 	if elo_out >= top then eloCol = tc
 	elseif elo_out >= mid then
@@ -408,6 +434,14 @@ local function FormatElo(elo,full)
 	end
 
 	return elo_out, eloCol
+end
+
+local function FormatWins(name) --Assumes Win Counter is on and all tables are valid, and the given name is in the wins table
+	local winCount = WG.WinCounter_currentWinTable[name].wins
+	if WG.WinCounter_currentWinTable[name].wonLastGame then
+		return "*"..winCount.."*"
+	end
+	return winCount
 end
 
 local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
@@ -726,6 +760,9 @@ local function UpdatePlayerInfo()
 
 			if entities[i].nameLabel then entities[i].nameLabel:SetCaption(displayname) end
 			if entities[i].statusLabel then entities[i].statusLabel:SetCaption(tstatus) ; entities[i].statusLabel.font:SetColor(tstatuscolor) end
+			if entities[i].winsLabel and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then 
+				entities[i].winsLabel:SetCaption(FormatWins(name)) 
+			end
 
 			UpdatePingCpu(entities[i],pingTime,cpuUsage,pstatus)
 		end	-- if not isAI
@@ -764,6 +801,11 @@ local function UpdatePlayerInfo()
 					if teamID then
 						local s = GetPlayerTeamStats(teamID)
 						AccumulatePlayerTeamStats(r,s)
+						local _,leader = Spring.GetTeamInfo(teamID)
+						local name = Spring.GetPlayerInfo(leader)
+						if v.winsLabel and name ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[name] ~= nil then
+							v.winsLabel:SetCaption(FormatWins(name)) 
+						end
 					end
 				end
 			end
@@ -788,6 +830,7 @@ local function AddTableHeaders()
 	end
 	scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_ping, y=(fontsize+1) * row,	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	if showWins then scroll_cpl:AddChild( Label:New{ x=0, width = wins_width, y=(fontsize+1) * row,	caption = 'Wins', 	fontShadow = true,  fontsize = fontsize, align = "right"} ) end
 end
 
 local function AddCfCheckbox(allyTeam)
@@ -901,6 +944,10 @@ local function AddEntity(entity, teamID, allyTeamID)
 			function entity.pingImg:HitTest(x,y) return self end
 		end
 
+		if showWins and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then 
+			MakeNewLabel(entity,"winsLabel",{x=0,width=wins_width,caption = FormatWins(entity.name),textColor = teamcolor, align = "right"})
+		end
+
 	end -- if not isAI
 
 	-- share button
@@ -938,6 +985,7 @@ end
 
 local function AddAllAllyTeamSummaries(allyTeamsSorted)
 	local allyTeamResources
+	local allyTeamWins
 	for i=1,#allyTeamsSorted do
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
@@ -973,6 +1021,13 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				if elo then MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
 				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
+
+				local _,leader = Spring.GetTeamInfo(allyTeams[allyTeamID][1])
+				local leaderName = Spring.GetPlayerInfo(leader);
+
+				if showWins and leaderName ~= nil and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[leaderName] ~= nil then 
+					MakeNewLabel(allyTeamEntities[allyTeamID],"winsLabel",{x=0,width=wins_width,caption = FormatWins(leaderName),textColor = allyTeamColor, align = "right"})
+				end
 				row = row + 1
 			end
 		end
@@ -986,6 +1041,16 @@ local function AlignScrollPanel()
 		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
 	else
 		scroll_cpl.y = 0
+	end
+end
+
+function ToggleVisibility()
+	if window_cpl and scroll_cpl then
+		if options.visible.value then
+			window_cpl:AddChild(scroll_cpl)
+		else
+			window_cpl:RemoveChild(scroll_cpl)
+		end
 	end
 end
 
@@ -1042,7 +1107,7 @@ SetupPlayerNames = function()
 	for i=1, #playerlist do
 		local playerID = playerlist[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank,customKeys = Spring.GetPlayerInfo(playerID)
-		local clan, faction, level, elo
+		local clan, faction, level, elo, wins
 		if customKeys then
 			clan = customKeys.clan
 			faction = customKeys.faction
@@ -1069,6 +1134,7 @@ SetupPlayerNames = function()
 				faction = faction,
 				level = level,
 				elo = elo,
+				wins = wins,
 			}
 			local index = #teams[teamID].roster + 1
 			teams[teamID].roster[index] = entities[entityID]
@@ -1290,7 +1356,7 @@ SetupScrollPanel = function ()
 		--height = "100%",
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
 		borderColor = {1,1,1,options.backgroundOpacity.value},
-		padding = {0, 5, 0, 5},
+		padding = {0, 0, 0, 0},
 		--autosize = true,
 		--right = 0,
 		scrollbarSize = 6,
@@ -1333,6 +1399,8 @@ end
 
 SetupPanels = function ()
 
+	showWins = CheckShowWins()
+
 	CalculateWidths()
 	local x,y,height,width
 	if window_cpl then
@@ -1369,16 +1437,7 @@ SetupPanels = function ()
 
 	SetupScrollPanel()
 
-end
-
-function ToggleVisibility()
-	if window_cpl and scroll_cpl then
-		if options.visible.value then
-			window_cpl:AddChild(scroll_cpl)
-		else
-			window_cpl:RemoveChild(scroll_cpl)
-		end
-	end
+	ToggleVisibility()
 end
 
 function PlayersChanged()
@@ -1421,6 +1480,9 @@ function widget:Update(s)
 --			end
 --			updateCount = (updateCount + 1) % updateModulus
 			if (not scroll_cpl.parent) then return end --//don't update when window is hidden
+			if showWins ~= CheckShowWins() then
+				SetupPanels()
+			end
 			UpdatePlayerInfo()
 		end
 

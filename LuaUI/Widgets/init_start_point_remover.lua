@@ -35,7 +35,11 @@ function widget:GameFrame(f)
 			if (unitDef.customParams.commtype) then
 				local x, y, z = Spring.GetUnitPosition(unitID)
 				Spring.MarkerErasePosition(x, y, z)
-				Spring.SetCameraTarget(x, y, z)
+				if WG.COFC_SetCameraTarget then
+					WG.COFC_SetCameraTarget(x, y, z, 1, 1000)
+				else 
+					Spring.SetCameraTarget(x, y, z)
+				end
 				Spring.SelectUnitArray{teamUnits[n]}
 			end
 			n=n+1

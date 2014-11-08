@@ -22,7 +22,12 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    canjump        = [[1]],
+    canjump            = 1,
+    jump_range         = 400,
+    jump_speed         = 6,
+    jump_reload        = 10,
+    jump_from_midair   = 1,
+
     description_bp = [[Construtor saltador, produz a 5 m/s]],
     description_es = [[Constructor jumpjet, construye a 5 m/s]],
     description_fr = [[Constructeur r Jetpack, Construit r 5 m/s]],
@@ -109,6 +114,12 @@ unitDef = {
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customparams = {
+        timeslow_damagefactor = 1,
+        timeslow_onlyslow = 1,
+        timeslow_smartretarget = 0.33,
+      },
 
       damage                  = {
         default = 180,

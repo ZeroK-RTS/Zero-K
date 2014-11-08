@@ -46,7 +46,7 @@ NOTE FOR OTHER GAME DEVS:
 --  CONFIG
 ------------------------
 ------------------------
-options_path = 'Settings/HUD Panels/Integral Menu'
+options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown'}
 options = {
 	disablesmartselect = {
@@ -1312,22 +1312,20 @@ function widget:Initialize()
 	Control = Chili.Control
 	screen0 = Chili.Screen0
 	
+	-- Set the size for the default settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+	local height = math.min(screenHeight/4.5, 200*width/450)
+	
 	--create main Chili elements
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
-	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
-	
-	--Spring.Echo(height)
-	--Spring.Echo(y)
-	
 	window = Window:New{
 		parent = screen0,
 		name   = 'integralwindow';
 		color = {0, 0, 0, 0},
-		width = 450;
-		height = 180; -- keep an aspect ratio regardless of screen ratio
-		x = 0; 
-		bottom = 0;
+		width = width,
+		height = height,
+		x = 0, 
+		bottom = 0,
 		dockable = true;
 		draggable = false,
 		resizable = false,
@@ -1351,7 +1349,7 @@ function widget:Initialize()
 		draggable = false,
 		resizable = false,
 		padding = {0, 0, 0, 0},
-		--backgroundColor = {0.1, 0.1, 0.1, 1},
+		backgroundColor = {1, 1, 1, 0.8},
 --		skinName  = "DarkGlass",
 	}
 

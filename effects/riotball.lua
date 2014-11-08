@@ -24,7 +24,7 @@ return {
         alpha              = 0.6,
         color              = [[0.3,0,0.4]],
         expansionspeed     = 13.2,
-        ttl                = 24,
+        ttl                = 20,
       },
     },
     muzzleflash = {

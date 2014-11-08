@@ -54,10 +54,12 @@ options = {
 		type = 'bool',
 		value = false,
 		desc = "Map wall is visible from the outside (e.g. when it's between camera and main map)",
-                OnChange = function(self)
-                        gl.DeleteList(dListWall)
-                        widget:Initialize()
-                end
+		OnChange = function(self)
+			if dListWall then
+				gl.DeleteList(dListWall)
+				widget:Initialize()
+			end
+		end
 	},
 	northSouthText = {
 		name = "North, East, South, & West text",
@@ -65,8 +67,10 @@ options = {
 		value = false,
 		desc = 'Help you identify map direction under rotation by placing a "North/South/East/West" text on the map edges',
 		OnChange = function(self)
-			gl.DeleteList(dListWall)
-			widget:Initialize()
+			if dListWall then
+				gl.DeleteList(dListWall)
+				widget:Initialize()
+			end
 		end, 		
 	},		
 }

@@ -683,7 +683,7 @@ function DrawProgressbar(obj)
   local y = obj.y
   local w = obj.width
   local h = obj.height
-
+  
   local percent = (obj.value-obj.min)/(obj.max-obj.min)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
@@ -706,7 +706,17 @@ function DrawProgressbar(obj)
     -- workaround for catalyst >12.6 drivers: do the "clipping" by multiplying width by percentage in glBeginEnd instead of using glClipPlane
     -- fuck AMD
     --gl.ClipPlane(1, -1,0,0, x+w*percent)
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+	if obj.fillPadding then
+		x, y = x + obj.fillPadding[1], y + obj.fillPadding[2]
+		w, h = w - (obj.fillPadding[1] + obj.fillPadding[3]), h - (obj.fillPadding[2] + obj.fillPadding[4])
+	end
+	
+    if (obj.orientation == "horizontal") then
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w*percent,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    else
+      gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y + (h - h*percent),w,h*percent, skLeft,skTop,skRight,skBottom, tw,th, 0)
+    end
+
     --gl.ClipPlane(1, false)
   gl.Texture(0,false)
 

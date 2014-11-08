@@ -129,7 +129,8 @@ local function SetupUnit(unitID)
 	Spring.SetUnitResourcing(unitID, "cme", 1.2)
 	Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 	Spring.SetUnitMaxHealth(unitID, 400)
-	Spring.SetUnitCollisionVolumeData(unitID, 56, 46, 54, 0, -14, 0, 0, 1, 0)
+	Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
+	Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
 	return false
   end
   

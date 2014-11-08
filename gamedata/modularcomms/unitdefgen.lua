@@ -228,6 +228,12 @@ local function ProcessComm(name, config)
 		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
 		cp.cost = config.cost
 		
+		-- morph
+		if config.morphto then
+			cp.morphto = config.morphto
+			cp.combatmorph = 1
+		end
+		
 		-- apply decorations
 		if config.decorations then
 			for key,dec in pairs(config.decorations) do
@@ -246,6 +252,11 @@ local function ProcessComm(name, config)
 					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", "\tDecoration "..decName.." not found")
 				end
 			end
+		end
+		
+		-- apply misc. defs
+		if config.miscDefs then
+			commDefs[name] = MergeTable(commDefs[name], config.miscDefs, true)
 		end
 	end
 end
@@ -389,6 +400,12 @@ for name, data in pairs(commDefs) do
 				weaponData.weaponvelocity = math.max(weaponData.weaponvelocity, math.sqrt(weaponData.range * (weaponData.mygravity or 0.14)*1000))
 			end
 		end
+	end
+
+	-- set morph time
+	if data.customparams.morphto then
+		local morph_time = (commDefs[data.customparams.morphto].buildtime - data.buildtime) / (5 * (data.customparams.level + 1))
+		data.customparams.morphtime = tostring(math.floor(morph_time))
 	end
 end
 

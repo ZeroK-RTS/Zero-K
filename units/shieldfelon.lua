@@ -105,7 +105,7 @@ unitDef = {
       areaOfEffect            = 8,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 0,
+      cylinderTargeting       = 0,
 
       damage                  = {
         default        = 108.4,

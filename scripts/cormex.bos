@@ -4,7 +4,7 @@
 
 piece  base, bottom, tamper, furnace, door_l, door_r, drill1, drill2, drill3, posts;
 
-static-var  OPEN, animSpeed, acceleration, decceleration, statechg_DesiredState, statechg_StateChanging;
+static-var  OPEN, height, animSpeed, acceleration, decceleration, statechg_DesiredState, statechg_StateChanging;
 
 
 SmokeUnit(healthpercent, sleeptime, smoketype)
@@ -36,20 +36,23 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 
 Animation()
 {
+	height = [40];
 	while (TRUE)
 	{		
-	        if(animSpeed >= 0 AND OPEN == TRUE)
+	        if(animSpeed > 0 AND OPEN == TRUE)
  			{ 
  				spin furnace around y-axis speed animSpeed accelerate acceleration;
  				spin drill1 around y-axis speed animSpeed accelerate acceleration;
-				move tamper to y-axis [20] speed animSpeed*13;	
+				move tamper to y-axis height speed animSpeed*13;
 				wait-for-move tamper along y-axis;
-				move tamper to y-axis [40] speed animSpeed*13;
-				wait-for-move tamper along y-axis;
-            }   
-    stop-spin tamper around y-axis decelerate decceleration;
-    stop-spin drill1 around y-axis decelerate decceleration;
-    sleep 1;
+				height = [60] - height;
+            }
+            else
+            {
+			    stop-spin furnace around y-axis decelerate decceleration;
+			    stop-spin drill1 around y-axis decelerate decceleration;
+			    sleep 30;
+		    }
     }
 }
 
@@ -61,7 +64,7 @@ Go()
 	wait-for-turn door_l around z-axis;	
 	wait-for-turn door_r around z-axis;		
 	move tamper to y-axis [15] speed [3];
-	wait-for-move furnace along y-axis;
+	wait-for-move tamper along y-axis;
 	OPEN = TRUE;
 }
 
@@ -69,9 +72,7 @@ Stop()
 {
 	OPEN = FALSE;
 	move tamper to y-axis [0] speed [7.000000];
-	move furnace to y-axis [0] speed [7.000000];
 	wait-for-move tamper along y-axis;	
-	wait-for-move furnace along y-axis;	
 	turn door_r to z-axis <0.000000> speed <60.000000>;
 	turn door_l to z-axis <0.000000> speed <60.000000>;
 	wait-for-turn door_l around z-axis;	

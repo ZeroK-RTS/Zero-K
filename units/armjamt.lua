@@ -27,6 +27,13 @@ unitDef = {
     helptext       = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
     helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
     helptext_pl    = [[Wieze zaklocajace sprawiaja, ze radary nie sa w stanie wylapac sygnalu okolicznych jednostek. Ponadto pole maskujace moze zapewnic im maskowanie.]],
+
+    morphto = [[spherecloaker]],
+    morphtime = 30,
+
+    area_cloak = 1,
+    area_cloak_upkeep = 12,
+    area_cloak_radius = 550,
   },
 
   energyUse                     = 1.5,
@@ -39,7 +46,7 @@ unitDef = {
   idleTime                      = 1800,
   initCloaked                   = true,
   levelGround                   = false,
-  maxDamage                     = 712,
+  maxDamage                     = 700,
   maxSlope                      = 36,
   minCloakDistance              = 100,
   noAutoFire                    = false,
@@ -58,7 +65,7 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Sneaky Pete]],
       blocking         = true,
-      damage           = 712,
+      damage           = 700,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -72,7 +79,7 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Sneaky Pete]],
       blocking         = false,
-      damage           = 712,
+      damage           = 700,
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,

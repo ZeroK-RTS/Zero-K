@@ -53,6 +53,11 @@ local airpadDefs = {
 		cap = 9, 
 		padPieceName={"landpad1","landpad2","landpad3","landpad4","landpad5","landpad6","landpad7","landpad8","landpad9"}
 	},
+	[UnitDefNames["reef"].id] = {
+		mobile = true, 
+		cap = 2, 
+		padPieceName={"LandingFore","LandingAft"}
+	},
 }
 
  -- land if pad is within this range
@@ -533,6 +538,10 @@ function gadget:GameFrame(n)
 			end
 		end
 	end
+end
+
+function GG.RequireRefuel(bomberID)
+	return (spGetUnitRulesParam(bomberID, "noammo") == 2) 
 end
 
 function GG.RefuelComplete(bomberID)

@@ -160,7 +160,7 @@ local function CheckForVictory()
 		end
 	end
 	if count < 2 then
-		Spring.Echo(( (lastAllyTeam and ("Team " .. lastAllyTeam)) or "Nobody") .. " wins!")
+		Spring.Echo(( (lastAllyTeam and ("Alliance " .. lastAllyTeam)) or "Nobody") .. " wins!")
 		spGameOver({lastAllyTeam})
 	end
 end
@@ -190,7 +190,7 @@ local function DestroyAlliance(allianceID)
 		local teamList = spGetTeamList(allianceID)
 		if teamList == nil then return end	-- empty allyteam, don't bother
 		
-		if destroy_type == 'debug' then
+		if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
 			Spring.Echo("Game Over: DEBUG")
 			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			Spring.Echo("Game Over: If this is true, then please resign.")
@@ -429,8 +429,10 @@ function gadget:GameFrame(n)
 	-- check for last ally:
 	-- end condition: only 1 ally with human players, no AIs in other ones
 	if (n % 45 == 0) then
-		for u in pairs(toDestroy) do
-			spDestroyUnit(u, true)
+		if toDestroy then
+			for u in pairs(toDestroy) do
+				spDestroyUnit(u, true)
+			end
 		end
 		toDestroy = {}
 		if not gameover then
