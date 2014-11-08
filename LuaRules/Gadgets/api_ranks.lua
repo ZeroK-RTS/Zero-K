@@ -37,6 +37,8 @@ if gadgetHandler:IsSyncedCode() then
 			for _,f in pairs (GG.UnitRankUp) do
 				f (unitID, unitDefID, unitTeam, newxp, oldxp)
 			end
+
+			SendToUnsynced ("UnitRankUp", unitID)
 		end
 	end
 
@@ -46,16 +48,15 @@ else
 	local spGetMyAllyTeamID = Spring.GetMyAllyTeamID
 	local spGetSpectatingState = Spring.GetSpectatingState
 
-	function gadget:UnitExperience (unitID, unitDefID, unitTeam, newxp, oldxp)
-		newxp = floor (newxp / XP_PER_RANK)
-		oldxp = floor (oldxp / XP_PER_RANK)
-
-		if (newxp ~= oldxp) then
-			local spec, specFullView = spGetSpectatingState()
-			local isInLos = spGetUnitLosState (unitID, spGetMyAllyTeamID()).los
-			if (Script.LuaUI.UnitRankUp and ((spec and specFullView) or isInLos)) then
-				Script.LuaUI.UnitRankUp (unitID)
-			end
+	function UnitRankUp (_, unitID)
+		local spec, specFullView = spGetSpectatingState()
+		local isInLos = spGetUnitLosState (unitID, spGetMyAllyTeamID()).los
+		if (Script.LuaUI.UnitRankUp and ((spec and specFullView) or isInLos)) then
+			Script.LuaUI.UnitRankUp (unitID)
 		end
+	end
+
+	function gadget:Initialize ()
+		gadgetHandler:AddSyncAction("UnitRankUp", UnitRankUp)
 	end
 end
