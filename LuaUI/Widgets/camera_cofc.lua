@@ -674,6 +674,8 @@ local maxDistY = max(MHEIGHT, MWIDTH) * 2
 local mapEdgeBuffer = 1000
 
 --Tilt Zoom constants
+local onTiltZoomTrack = true
+
 local groundMin, groundMax = Spring.GetGroundExtremes()
 local topDownBufferZonePercent = 0.20
 local groundBufferZone = 20
@@ -700,7 +702,7 @@ SetFOV = function(fov)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (30 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (27 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
 end
@@ -1172,16 +1174,30 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 	-- If it isn't, make sure the correction only happens in the direction of the curve. 
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
 	if zoomin ~= nil and rayDist then
-		if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then cs.rx = targetRx
-		elseif targetRx > cs.rx and zoomin then cs.rx = cs.rx + angleCorrectionMaximum
+		if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then
+			-- Spring.Echo("Within Bounds")
+			onTiltZoomTrack = true
+			return targetRx
+		elseif targetRx > cs.rx and zoomin then 
+			-- Spring.Echo("Pulling on track for Zoomin")
+			onTiltZoomTrack = true
+			return cs.rx + angleCorrectionMaximum
 		elseif targetRx < cs.rx and not zoomin then 
-			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then cs.rx = cs.rx - angleCorrectionMaximum
-			else cs.rx = targetRx
+			-- Spring.Echo("Pulling on track for Zoomout")
+			onTiltZoomTrack = true
+			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then return cs.rx - angleCorrectionMaximum
+			else return targetRx
 			end
 		end
 	end
 
-	return targetRx
+	-- Spring.Echo((onTiltZoomTrack and "On" or "Off").." tiltzoom track")
+
+	if onTiltZoomTrack then
+		return targetRx
+	else
+		return cs.rx
+	end
 end
 
 local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
@@ -1195,6 +1211,8 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	--How to replicate: position camera to outside the map (looking at null space)
 	--do /luaui reload, then attempt zoom. "ls_dist" will be nil here (currently not using "ls_dist" but using "rayDist")
 	--(unexpected nil might indicate some COFC's flaw somewhere else). a todo..
+	--
+	-- 2014-11-08: This may have been fixed by checking that the result from UpdateCam exists before calling this from Zoom. Not entirely sure on that
 	local gx,gy,gz,_,_,_,rayDist = OverrideTraceScreenRay(mouseX,mouseY, cs, nil,2000,true,true,nil,true)
 	if gy == -math.huge then return cs end -- Avoids any possible issues when fully zooming out
 	
@@ -1203,7 +1221,8 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 		-- gx,gz = GetMapBoundedCoords(gx,gz)  
 	-- end
 
-	local targetRx, skyProportion = GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
+	local targetRx = GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
+	cs.rx = targetRx
 
 	local testgx,testgy,testgz = OverrideTraceScreenRay(mouseX, mouseY, cs, nil,2000,true,true,gy)
 	if testgy == -math.huge then return cs end -- Avoids any possible issues when fully zooming out
@@ -1401,7 +1420,7 @@ local function Zoom(zoomin, shift, forceCenter)
 
 		local cstemp = UpdateCam(cs)
 
-		if options.tiltedzoom.value then
+		if cstemp and options.tiltedzoom.value then
 			cstemp = ZoomTiltCorrection(cstemp, zoomin, nil)
 			cstemp = UpdateCam(cstemp)
 		end
@@ -1419,6 +1438,7 @@ end
 
 local function Altitude(up, s)
 	ls_have = false
+	onTiltZoomTrack = false
 	
 	local up = up
 	if options.invertalt.value then
@@ -1456,6 +1476,7 @@ local function ResetCam()
 	SetCenterBounds(cs)
 	spSetCameraState(cs, 0)
 	ov_cs = nil
+	onTiltZoomTrack = true
 end
 options.resetcam.OnChange = ResetCam
 
@@ -1750,6 +1771,8 @@ local function Tilt(s, dir)
 		ls_have = false	
 	end
 	tilting = true
+	onTiltZoomTrack = false
+
 	local cs = spGetCameraState()
 	SetLockSpot2(cs)
 	if not ls_have then
@@ -2226,12 +2249,14 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 	if a or options.middleMouseButton.value == 'rotate' then
 		spWarpMouse(cx, cy)
 		ls_have = false
+		onTiltZoomTrack = false
 		rotate = true
 		return true
 	end
 	-- Rotate World --
 	if ctrl or options.middleMouseButton.value == 'orbit' then
 		rotate_transit = nil
+		onTiltZoomTrack = false
 		if options.targetmouse.value then --if rotate world at mouse cursor: 
 			
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
@@ -2340,13 +2365,14 @@ function widget:KeyPress(key, modifier, isRepeat)
 				return
 			end
 			
+
 		
 			local speed = modifier.shift and 30 or 10 
 			
 			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not modifier.alt)
 			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not modifier.alt)
-			elseif key == key_code.down then 	RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt)
-			elseif key == key_code.up then 		RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not modifier.alt)
+			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt)
+			elseif key == key_code.up then 		onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, not modifier.alt)
 			end
 			return
 		else
