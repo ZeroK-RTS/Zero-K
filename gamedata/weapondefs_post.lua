@@ -193,6 +193,9 @@ end
 	if weaponDef.dyndamageexp and (weaponDef.dyndamageexp > 0) then
 		weaponDef.customparams.dyndamageexp = weaponDef.dyndamageexp
 	end
+	if weaponDef.flighttime and (weaponDef.flighttime > 0) then
+		weaponDef.customparams.flighttime = weaponDef.flighttime
+	end
  end
 
 --------------------------------------------------------------------------------
