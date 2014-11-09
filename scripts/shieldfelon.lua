@@ -38,11 +38,11 @@ local gun_1 = 0
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-local DRAIN = 75
+local DRAIN = tonumber (WeaponDefs[UnitDef.weapons[1].weaponDef].customParams.shield_drain)
 local SHIELD_RADIUS = 100
-local SPEED = 1.4
-local AIM_DELAY = 300
-local RESTORE_DELAY = 4000
+local SPEED = UnitDef.speed / 30
+local AIM_DELAY = tonumber (WeaponDefs[UnitDef.weapons[1].weaponDef].customParams.aim_delay)
+local RESTORE_DELAY = tonumber (WeaponDefs[UnitDef.weapons[1].weaponDef].customParams.aim_restore)
 
 --signals
 local SIG_WALK = 1
