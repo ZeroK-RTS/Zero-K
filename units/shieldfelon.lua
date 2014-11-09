@@ -107,6 +107,13 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 0,
 
+      customParams            = {
+        shield_drain = 75,
+
+        aim_delay = 300, -- ms
+        aim_restore = 4000,
+      },
+
       damage                  = {
         default        = 108.4,
       },
