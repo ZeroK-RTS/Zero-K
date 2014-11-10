@@ -13,8 +13,8 @@ local flare = {
 	[1] = flare2,
 }
 
-local SPEEDUP_FACTOR = 5
-local BOOSTUP_FACTOR = 6
+local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
+local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
 		
 ----------------------------------------------------------
 
