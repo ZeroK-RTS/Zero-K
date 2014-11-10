@@ -38,6 +38,7 @@ unitDef = {
 	specialreloadtime = [[850]],
 	boost_speed_mult = 5,
 	boost_accel_mult = 6,
+	boost_duration = 30, -- frames
 
 	midposoffset   = [[0 3 0]],
 	modelradius    = [[5]],
