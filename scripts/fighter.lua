@@ -15,6 +15,7 @@ local flare = {
 
 local SPEEDUP_FACTOR = tonumber (UnitDef.customParams.boost_speed_mult)
 local BOOSTUP_FACTOR = tonumber (UnitDef.customParams.boost_accel_mult)
+local SPEEDUP_DURATION = tonumber (UnitDef.customParams.boost_duration)
 		
 ----------------------------------------------------------
 
@@ -35,7 +36,7 @@ end
 ----------------------------------------------------------
 
 function SprintThread()
-	for i=1,30 do
+	for i=1, SPEEDUP_DURATION do
 		EmitSfx(ljet, 1027)
 		EmitSfx(rjet, 1027)
 		Sleep(33)
