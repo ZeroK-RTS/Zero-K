@@ -52,14 +52,7 @@ local waitAtBeaconCmdDesc = {
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local teleDef = {
-	[UnitDefNames["amphtele"].id] = true,
-}
-
 local beaconDef = UnitDefNames["tele_beacon"].id
-
--- frames to teleport = unit mass * COST_FACTOR
-local COST_FACTOR = 0.25
 
 local offset = {
 	[0] = {x = 1, z = 0},
@@ -501,7 +494,7 @@ function gadget:GameFrame(f)
 
 							local mass = Spring.GetUnitRulesParam(teleportiee, "effectiveMass") or ud.mass
 
-							local cost = math.floor(mass*COST_FACTOR + math.random())
+							local cost = math.floor(mass*tele[tid].throughput)
 							--Spring.Echo(cost/30)
 							tele[tid].teleportiee = teleportiee
 							Spring.SetUnitRulesParam(tid, "teleportiee", teleportiee)
@@ -538,7 +531,7 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if teleDef[unitDefID] then
+	if UnitDefs[unitDefID].customParams.teleporter then
 		Spring.InsertUnitCmdDesc(unitID, placeBeaconCmdDesc)
 		Spring.SetUnitRulesParam(unitID, "teleportiee", -1)
 		Spring.SetUnitRulesParam(unitID, "deploy", 0)
@@ -554,6 +547,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			deployed = false,
 			cost = false,
 			stunned = isUnitDisabled(unitID),
+			throughput = tonumber(UnitDefs[unitDefID].customParams.teleporter_throughput) / 30,
 		}
 	end
 end
