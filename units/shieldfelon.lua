@@ -109,9 +109,6 @@ unitDef = {
 
       customParams            = {
         shield_drain = 75,
-
-        aim_delay = 300, -- ms
-        aim_restore = 4000,
       },
 
       damage                  = {
