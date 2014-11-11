@@ -45,8 +45,10 @@ unitDef = {
 	description_pl  = [[Dron bojowy]],
 	helptext        = [[The Firefly is an attack drone with a weak high precision pulse laser. They can protect their parent unit from light enemy units. They do not share stealth with it though, so they can also betray the presence of a cloaked commander.]],
 	helptext_de	    = [[Der Firefly ist eine Kampfdrohne, die seinen Besitzer schutzt.]],
-	helptext_fr	    = [[La Luciole est un drone miniature d'attaque autonome équipé d'un faible laser pulsé. Un commandant en possède deux qui patrouillent autour de lui et le protêge efficacement des petites unités adverses. Néanmoins leur présence peut trahir un commandant invisible.]],
+	helptext_fr	    = [[La Luciole est un drone miniature d'attaque autonome Ã©quipÃ© d'un faible laser pulsÃ©. Un commandant en possÃ¨de deux qui patrouillent autour de lui et le protÃªge efficacement des petites unitÃ©s adverses. NÃ©anmoins leur prÃ©sence peut trahir un commandant invisible.]],
 	helptext_pl     = [[Firefly to dron bojowy, ktory chroni wlasciciela przed lekkimi jednostkami swoim laserem pulsacyjnym.]],
+
+	is_drone = 1,
   },
   
   
