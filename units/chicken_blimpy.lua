@@ -178,6 +178,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customparams            = {
+      	spawns_name = "chicken_dodo",
+      	spawns_expire = 30,
+      },
 
       damage                  = {
         default = 1,
