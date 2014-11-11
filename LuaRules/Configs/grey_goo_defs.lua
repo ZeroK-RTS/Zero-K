@@ -1,25 +1,15 @@
 local unitArray = {}
 local UPDATE_FREQUNECY = 30
 
-local units = {
-
-	puppy = { 
-		drain = 5, 
-		cost = 75, 
-		spawns = "puppy",
-		range = 120
-	},
-}
-
-for unit, data in pairs(units) do
-	data.drain = data.drain*UPDATE_FREQUNECY/30
-end
-
 for i=1,#UnitDefs do
-	for unit, data in pairs(units) do
-		if UnitDefs[i].name == unit then 
-			unitArray[i] = data 
-		end
+	local cp = UnitDefs[i].customParams
+	if cp.grey_goo then
+		unitArray[i] = {
+			drain = tonumber (cp.grey_goo_drain)*UPDATE_FREQUNECY/30,
+			cost = tonumber (cp.grey_goo_cost),
+			range = tonumber (cp.grey_goo_range),
+			spawns = cp.grey_goo_spawn,
+		}
 	end
 end
 

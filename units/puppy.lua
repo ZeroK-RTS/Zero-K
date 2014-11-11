@@ -25,9 +25,15 @@ unitDef = {
     description_de = [[Wandernde Rakete]],
     description_pl = [[Chodzaca rakieta]],
     helptext       = [[This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style.]],
-	helptext_de    = [[Diese flinke Kamikazeinheit ist ideal, um schlecht gepanzerte Ziele zu überfallen. Sobald sie neben Wracks steht, zieht sie automatisch Metall aus diesen, um sich selbst zu vervielfältigen.]],
+	helptext_de    = [[Diese flinke Kamikazeinheit ist ideal, um schlecht gepanzerte Ziele zu Ã¼berfallen. Sobald sie neben Wracks steht, zieht sie automatisch Metall aus diesen, um sich selbst zu vervielfÃ¤ltigen.]],
 	helptext_pl    = [[Ta samobojcza jednostka dobrze nadaje sie do najazdow na przeciwnika i niszczeniu lekkich celow. Gdy stoi w poblizu zlomu, samoczynnie pobiera metal i replikuje sie.]],
 	modelradius    = [[10]],
+
+	grey_goo = 1,
+	grey_goo_spawn = "puppy",
+	grey_goo_drain = 5,
+	grey_goo_cost = 75,
+	grey_goo_range = 120,
   },
 
   explodeAs              = [[TINY_BUILDINGEX]],
