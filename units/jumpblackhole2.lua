@@ -4,10 +4,10 @@ unitDef = {
   description            = [[Assault/Riot Bot]],
   acceleration           = 0.35,
   brakeRate              = 0.35,
-  buildCostEnergy        = 500,
-  buildCostMetal         = 500,
+  buildCostEnergy        = 100,
+  buildCostMetal         = 100,
   buildPic               = [[cormak.png]],
-  buildTime              = 500,
+  buildTime              = 100,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -94,14 +94,14 @@ unitDef = {
 
     BLAST    = {
       name                    = [[Disruptor Pulser]],
-      areaOfEffect            = 240,
+      areaOfEffect            = 220,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 8,
-        planes  = 8,
+        default = 400,
+        planes  = 400,
         subs    = 0.1,
       },
 
@@ -110,15 +110,15 @@ unitDef = {
       },
 
       edgeeffectiveness       = 1,
-      explosionGenerator      = [[custom:NONE]],
+      explosionGenerator      = [[custom:beamerray]],
       explosionSpeed          = 11,
       impulseBoost            = 0,
-      impulseFactor           = -15,
+      impulseFactor           = -0,
       interceptedByShieldType = 1,
       myGravity               = 10,
       noSelfDamage            = true,
-      range                   = 50,
-      reloadtime              = 0.2,
+      range                   = 200,
+      reloadtime              = 4,
       soundHitVolume          = 1,
       turret                  = true,
       weaponType              = [[Cannon]],
@@ -133,24 +133,23 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 4,
-        planes  = 4,
-        subs    = 5E-08,
+        default = 0,
+        planes  = 0,
+        subs    = 0,
       },
 
       customParams           = {
 	    nofriendlyfire = 1,
-	    falldamageimmunity = [[30]],
       },
 
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       impactOnly              = false,
       impulseBoost            = 0,
-      impulseFactor           = -30,
+      impulseFactor           = -0,
       interceptedByShieldType = 1,
-      range                   = 300,
-      reloadtime              = 0.2,
+      range                   = 400,
+      reloadtime              = 4,
       size                    = 1E-06,
       smokeTrail              = false,
 
@@ -177,9 +176,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 4,
-        planes  = 4,
-        subs    = 5E-08,
+        default = 0,
+        planes  = 0,
+        subs    = 0,
       },
 
       customParams           = {
@@ -191,10 +190,10 @@ unitDef = {
       fireStarter             = 0,
       impactOnly              = false,
       interceptedByShieldType = 1,
-      range                   = 300,
+      range                   = 400,
       impulseBoost            = 0,
-      impulseFactor           = -30,
-      reloadtime              = 0.2,
+      impulseFactor           = -0,
+      reloadtime              = 4,
       size                    = 1E-06,
       smokeTrail              = false,
 
