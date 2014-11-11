@@ -21,6 +21,7 @@ local SIG_BEACON = 2
 --------------------------------------------------------------------------------------
 -- Create beacon animation and delay
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local BEACON_SPAWN_SPEED = 9 / tonumber(UnitDef.customParams.teleporter_beacon_spawn_time)
 
 local function Create_Beacon_Thread(x,z)
 	local y = Spring.GetGroundHeight(x,z) or 0
@@ -34,7 +35,7 @@ local function Create_Beacon_Thread(x,z)
 	
 	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 90 do
-		local speedMult = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
+		local speedMult = (1 - (spGetUnitRulesParam(unitID,"slowState") or 0)) * BEACON_SPAWN_SPEED
 		Turn( body , y_axis, math.rad(i*4), math.rad(40*speedMult) )
 		Sleep(100/speedMult)
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
