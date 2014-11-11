@@ -26,11 +26,11 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Le mal incarn?!]],
-	description_de = [[Lachende Höllenbrut!]],
+	description_de = [[Lachende HÃ¶llenbrut!]],
 	description_pl = [[Krolowa Kurnika]],
     helptext       = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit fiery napalm, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks.]],
     helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa col?re attis?e elle est presque indestructible. Elle crache un acide extr?mement corrosif, largue des poulets et envoie des spores aux unit?s volantes. Seulement les assauts les plus brutaux et coordonn?s peuvent esp?rer venir ? bout de cette monstruosit?.]],
-	helptext_de    = [[Zwei Worte: LAUF WEG! Die Chicken Queen ist die Matriarchin der Thunderbirdkolonie und sobald verärgert ist es eigentlich unmöglich sie noch zu stoppen. Sie kann kraftvolle Säure spucken, Landchicken abwerfen und Sporen gegen Lufteinheiten versprühen. Nur der entschlossenste und konzentrierteste Angriff kann es ermöglichen dieses Biest eventuell doch noch zu stoppen.]],
+	helptext_de    = [[Zwei Worte: LAUF WEG! Die Chicken Queen ist die Matriarchin der Thunderbirdkolonie und sobald verÃ¤rgert ist es eigentlich unmÃ¶glich sie noch zu stoppen. Sie kann kraftvolle SÃ¤ure spucken, Landchicken abwerfen und Sporen gegen Lufteinheiten versprÃ¼hen. Nur der entschlossenste und konzentrierteste Angriff kann es ermÃ¶glichen dieses Biest eventuell doch noch zu stoppen.]],
 	helptext_pl    = [[Dwa slowa: W NOGI! Krolowa kolonii kurczakow moze zostac powstrzymana tylko dzieki pelnej determinacji i przy udziale wielkiej sily ognia; pluje plonacym kwasem, wystrzeliwuje mase zarodnikow, rozdeptuje mniejsze jednostki i jest w stanie rozszarpac nawet ciezkie roboty szturmowe.]],
   },
 
@@ -149,6 +149,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      
+      customparams            = {
+      	spawns_name = "chickenc",
+      	spawns_expire = 0,
+      },
 
       damage                  = {
         default = 180,
@@ -192,6 +197,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customparams            = {
+      	spawns_name = "chicken_dodo",
+      	spawns_expire = 30,
+      },
 
       damage                  = {
         default = 1,
@@ -235,6 +245,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      
+      customparams            = {
+      	spawns_name = "chicken_tiamat",
+      	spawns_expire = 0,
+      },
 
       damage                  = {
         default = 350,
