@@ -53,7 +53,7 @@ function gadget: UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attacker
 	end
 end 
 
-function GameFrame (frame)
+function gadget: GameFrame (frame)
 
 	for attackerID, xpLoss in pairs(delayedXPLossTable) do		
 		local prevXP = Spring.GetUnitExperience(attackerID)		
