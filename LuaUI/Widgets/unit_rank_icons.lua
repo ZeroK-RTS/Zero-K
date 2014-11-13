@@ -8,15 +8,7 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
-local min   = math.min
-local floor = math.floor
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-
-local clearing_table = {
-	name = 'rank',
-	texture = nil
-}
-
+local FLASH_DURATION = 10
 local rankTexBase = 'LuaUI/Images/Ranks/'
 local rankTextures = {
 	[0] = nil,
@@ -27,12 +19,42 @@ local rankTextures = {
 	-- [5] = rankTexBase .. 'gold_star.png',
 }
 
+local min   = math.min
+local floor = math.floor
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spValidUnitID = Spring.ValidUnitID
+
+local flashing_units = {}
+local current_frame = 0
+
+local function clear_icons (unitID)
+	flashing_units [unitID] = nil
+	WG.icons.SetUnitIcon (unitID, {
+		name = 'rank',
+		texture = nil,
+	})
+	WG.icons.SetUnitIcon (unitID, {
+		name = 'rank_flashing',
+		texture = nil,
+	})
+end
+
 local function UnitRankUp (unitID)
-	UpdateUnitRank (unitID)
+	local rank = spGetUnitRulesParam (unitID, "rank")
+	rank = min (#rankTextures, rank)
+	clear_icons (unitID)
+
+	WG.icons.SetUnitIcon (unitID, {
+		name = 'rank_flashing',
+		texture = rankTextures[rank]
+	})
+	flashing_units [unitID] = current_frame + 30*FLASH_DURATION
 end
 
 function widget:Initialize ()
 	WG.icons.SetOrder ('rank', 1)
+	WG.icons.SetOrder ('rank_flashing', 2)
+	WG.icons.SetPulse( 'rank_flashing', true )
 	widgetHandler:RegisterGlobal ('UnitRankUp', UnitRankUp)
 
 	local allUnits = Spring.GetAllUnits()
@@ -44,10 +66,34 @@ end
 function UpdateUnitRank (unitID)
 	local rank = spGetUnitRulesParam (unitID, "rank")
 	rank = min (#rankTextures, rank)
+	clear_icons (unitID)
+
 	WG.icons.SetUnitIcon (unitID, {
 		name = 'rank',
 		texture = rankTextures[rank]
 	})
+end
+
+function widget:GameFrame (frame)
+	if ((frame % 30) == 0) then
+		current_frame = frame
+		for unitID, timer in pairs (flashing_units) do
+			if not spValidUnitID(unitID) then
+				flashing_units [unitID] = nil
+			elseif timer < frame then
+				local rank = spGetUnitRulesParam (unitID, "rank")
+				rank = min (#rankTextures, rank)
+				WG.icons.SetUnitIcon (unitID, {
+					name = 'rank',
+					texture = rankTextures[rank],
+				})
+				WG.icons.SetUnitIcon (unitID, {
+					name = 'rank_flashing',
+					texture = nil,
+				})
+			end
+		end
+	end
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
