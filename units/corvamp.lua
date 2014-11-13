@@ -39,6 +39,8 @@ unitDef = {
     aimposoffset   = [[0 3 0]],
 	modelradius    = [[10]],
 	refuelturnradius = [[120]],
+
+	combat_slowdown = 0.5,
   },
 
   explodeAs              = [[GUNSHIPEX]],
