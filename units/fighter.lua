@@ -34,7 +34,12 @@ unitDef = {
     helptext_fr    = [[Capable de tirer en l'air ou au sol le Swift n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
 	helptext_de    = [[Der Swift kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
 	helptext_pl    = [[Swift to wielozadaniowy mysliwiec szybkiego reagowania, ktory moze atakowac zarowno cele powietrzne, jak i naziemne. Jest bardzo zwinny i swietnie sobie radzi z wrogim lotnictwem dzieki samonaprowadzajacym rakietom i laserom, jednak jest bardzo lekki i latwo go zestrzelic. Posiada pasywny zaklocacz radaru oraz aktywny dopalacz.]],
+
 	specialreloadtime = [[850]],
+	boost_speed_mult = 5,
+	boost_accel_mult = 6,
+	boost_duration = 30, -- frames
+
 	midposoffset   = [[0 3 0]],
 	modelradius    = [[5]],
 	refuelturnradius = [[80]],
