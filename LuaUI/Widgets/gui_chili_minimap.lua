@@ -244,13 +244,14 @@ options = {
 		path = radar_path,
 	},
 	
+	-- NB: The sum of fog color and los color on each channel needs to be 0.4 in order for the area in los to be the same colour as if fog of war was off (i.e. by hitting 'L')
 	radar_preset_blue_line = {
 		name = 'Blue Outline Radar (default)',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.4, 0.4, 0.4, 1}
-			options.radar_los_color.value = { 0.15, 0.15, 0.15, 1}
-			options.radar_radar_color.value = { 0, 0, 1, 1}
+			options.radar_fog_color.value = { 0.2, 0.2, 0.2, 1}
+			options.radar_los_color.value = { 0.2, 0.2, 0.2, 1}
+			options.radar_radar_color.value = { 0.016, 0.02, 0.2, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			updateRadarColors()
 		end,
@@ -261,9 +262,9 @@ options = {
 		name = 'Blue Outline Radar with dark fog',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.05, 0.05, 0.05, 1}
-			options.radar_los_color.value = { 0.5, 0.5, 0.5, 1}
-			options.radar_radar_color.value = { 0, 0, 1, 1}
+			options.radar_fog_color.value = { 0.09, 0.09, 0.09, 1}
+			options.radar_los_color.value = { 0.31, 0.31, 0.31, 1}
+			options.radar_radar_color.value = { 0.03, 0.05, 0.3, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			updateRadarColors()
 		end,
@@ -274,8 +275,8 @@ options = {
 		name = 'Green Area Radar',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.25, 0.2, 0.25, 0}
-			options.radar_los_color.value = { 0.2, 0.13, 0.2, 0}
+			options.radar_fog_color.value = { 0.2, 0.2, 0.2, 1}
+			options.radar_los_color.value = { 0.2, 0.2, 0.2, 1}
 			options.radar_radar_color.value = { 0, 0.17, 0, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
 			updateRadarColors()
@@ -287,8 +288,8 @@ options = {
 		name = 'Only LOS',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.40, 0.40, 0.40, 0}
-			options.radar_los_color.value = { 0.15, 0.15, 0.15, 0}
+			options.radar_fog_color.value = { 0.2, 0.2, 0.2, 1}
+			options.radar_los_color.value = { 0.2, 0.2, 0.2, 1}
 			options.radar_radar_color.value = { 0, 0, 0, 0}
 			options.radar_jammer_color.value = { 0, 0, 0, 0}
 			updateRadarColors()
