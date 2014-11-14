@@ -29,8 +29,8 @@ function gadget: UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attacker
 	if (attackerID == nil) then
 		return
 	end
-
-	if not (unitTeam == attackerTeam) then 
+	
+	if not (Spring.AreTeamsAllied(unitTeam, attackerTeam)) then 
 	
 		local xpKillValue = (1 * 0.1 * (UnitDefs[unitDefID].power / UnitDefs[attackerDefID].power))			
 		local prevXP = Spring.GetUnitExperience(attackerID)
