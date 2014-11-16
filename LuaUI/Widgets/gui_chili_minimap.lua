@@ -49,6 +49,8 @@ local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
 
 local tabbedMode = false
+
+local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 --local init = true
 
 local function toggleTeamColors()
@@ -99,7 +101,8 @@ local minimap_path = 'Settings/HUD Panels/Minimap'
 local radar_path = 'Settings/Interface/Map'
 options_order = { 'use_map_ratio', 'opacity', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks',  'minimizable',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
-'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 
+'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_brightness', --'radar_fog_color', 'radar_los_color', 
+'radar_radar_color', 'radar_jammer_color', 
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap'}
 options = {
 	start_with_showeco = {
@@ -215,20 +218,20 @@ options = {
 	radar_view_colors_label1 = { type = 'label', name = 'Radar View Colors', path = radar_path,},
 	radar_view_colors_label2 = { type = 'label', name = '* Note: These colors are additive.', path = radar_path,},
 	
-	radar_fog_color = {
-		name = "Fog Color",
-		type = "colors",
-		value = { 0.4, 0.4, 0.4, 1},
+	radar_fog_brightness = {
+		name = "Fog Brightness",
+		type = "number",
+		value = 0.5, min = 0, max = 1, step = 0.01,
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
-	radar_los_color = {
-		name = "LOS Color",
-		type = "colors",
-		value = { 0.15, 0.15, 0.15, 1},
-		OnChange =  function() updateRadarColors() end,
-		path = radar_path,
-	},
+	-- radar_los_color = {
+	-- 	name = "LOS Color",
+	-- 	type = "colors",
+	-- 	value = 0.25, min = 0, max = 1,
+	-- 	OnChange =  function() updateRadarColors() end,
+	-- 	path = radar_path,
+	-- },
 	radar_radar_color = {
 		name = "Radar Color",
 		type = "colors",
@@ -249,9 +252,10 @@ options = {
 		name = 'Blue Outline Radar (default)',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_radar_color.value = { 0.016, 0.02, 0.2, 1}
+			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
+			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			options.radar_fog_brightness.value = 0.5
+			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			updateRadarColors()
 		end,
@@ -262,9 +266,10 @@ options = {
 		name = 'Blue Outline Radar with dark fog',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.09, 0.09, 0.09, 1}
-			options.radar_los_color.value = { 0.41, 0.41, 0.41, 1}
-			options.radar_radar_color.value = { 0.03, 0.05, 0.3, 1}
+			-- options.radar_fog_color.value = { 0.09, 0.09, 0.09, 1}
+			-- options.radar_los_color.value = { 0.41, 0.41, 0.41, 1}
+			options.radar_fog_brightness.value = 0.18
+			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			updateRadarColors()
 		end,
@@ -275,8 +280,9 @@ options = {
 		name = 'Green Area Radar',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
+			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			options.radar_fog_brightness.value = 0.5
 			options.radar_radar_color.value = { 0, 0.17, 0, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
 			updateRadarColors()
@@ -288,8 +294,9 @@ options = {
 		name = 'Only LOS',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
+			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			options.radar_fog_brightness.value = 0.5
 			options.radar_radar_color.value = { 0, 0, 0, 0}
 			options.radar_jammer_color.value = { 0, 0, 0, 0}
 			updateRadarColors()
@@ -351,8 +358,14 @@ function WG.Minimap_SetOptions(aspect, opacity, resizable, buttonRight, minimiza
 end
 
 function updateRadarColors()
-	local fog = options.radar_fog_color.value
-	local los = options.radar_los_color.value
+	local losViewOffBrightness = reverseCompat and 0.5 or 0.45
+
+	-- local fog = options.radar_fog_color.value
+	-- local los = options.radar_los_color.value
+	local fog_value = options.radar_fog_brightness.value * losViewOffBrightness
+	local los_value = (losViewOffBrightness - fog_value)
+	local fog = {fog_value, fog_value, fog_value, 1}
+	local los = {los_value, los_value, los_value, 1}
 	local radar = options.radar_radar_color.value
 	local jam = options.radar_jammer_color.value
 	Spring.SetLosViewColors(
