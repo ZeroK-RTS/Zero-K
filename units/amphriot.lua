@@ -20,9 +20,11 @@ unitDef = {
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 40,
+	description_de = [[Amphibischer Riot(Land) / Skirmisher(Wasser)]],
     description_pl = [[Amfibijny bot wsparcia]],
     helptext       = [[A flexible unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land. It acts as a stealthy underwater skirmisher, capable of killing outnumbered enemies with low attrition.]],
-    helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz podwodnych pociskow ma takze shotgun do walk na ladzie.]],
+    helptext_de    = [[Der Scallop ist eine sehr flexible Einheit, ausgerüstet mit Granaten für den Unterwasserkampf, und einer vierfach-Schrotflinte für den Kampf an Land. Unterwasser kann er an der Grenze des gegnerischen Sichtfeldes agieren und so mit nur geringen Verlusten einzelne Gegner zerstören.]],
+	helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz podwodnych pociskow ma takze shotgun do walk na ladzie.]],
     extradrawrange = 430,
   },
 

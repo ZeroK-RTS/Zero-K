@@ -22,9 +22,11 @@ unitDef = {
   customParams           = {
     amph_regen = 30,
     amph_submerged_at = 40,
+	description_de = [[Amphibischer Teleporter]],
     description_pl = [[Amfibijny teleporter]],
     helptext       = [[Djinn excels at moving large land based armies across bodies of water. When deployed it teleports units from around its pre-placed static beacon to its present location. The teleportation is one-way, so ensure the destination is safe.]],
-    helptext_pl    = [[Djinn sluzy do przenoszenia duzych armii ladowych przez wieksze akweny. Moze on ustawic wezel przesylowy w dowolnym miejscu na mapie; jednostki moga uzywac tego wezla do jednokierunkowej teleportacji w kierunku Djinna pod warunkiem, ze Djinn stoi nieruchomo.]],
+    helptext_de    = [[Der Djinn kann blitzschnell Armeen über große Entfernungen transportieren, ob über Land oder über Wasser. Wenn er aktiviert ist, kann er Einheiten von seinem im Voraus aufgestellten Leuchtfeuer zu seiner eigenen Position teleportieren. Das funktioniert nur in dieser Richtung, man sollte also sicherstellen, dass der Zielort sicher ist.]],
+	helptext_pl    = [[Djinn sluzy do przenoszenia duzych armii ladowych przez wieksze akweny. Moze on ustawic wezel przesylowy w dowolnym miejscu na mapie; jednostki moga uzywac tego wezla do jednokierunkowej teleportacji w kierunku Djinna pod warunkiem, ze Djinn stoi nieruchomo.]],
   },
 
   explodeAs              = [[BIG_UNIT]],

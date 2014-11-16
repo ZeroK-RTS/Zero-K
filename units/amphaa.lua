@@ -24,9 +24,11 @@ unitDef = {
   customParams           = {
     amph_regen = 20,
     amph_submerged_at = 40,
+	description_de = [[Amphibischer Luftabwehrbot]],
     description_pl = [[Amfibijny Bot Przeciwlotniczy]],
     helptext       = [[Angler is amphibious AA designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven.]],
-    helptext_pl    = [[Angler to amfibijna jednostka przeciwlotnicza zaprojektowana, by likwidowac glowne lotnicze zagrozenie dla amfibii - bombowiec Raven. Dwa Anglery moga wyplynac na powierzchnie i zestrzelic pojedynczego Ravena.]],
+    helptext_de    = [[Der Angler ist dafür konzipiert, Raven-Bomber vom Himmel zu holen, die eine besondere Gefahr für amphibische Einheiten darstellen. Je zwei von ihnen können zur Wasseroberfläche schwimmen und einen Raven mit einer Salve ausschalten.]],
+	helptext_pl    = [[Angler to amfibijna jednostka przeciwlotnicza zaprojektowana, by likwidowac glowne lotnicze zagrozenie dla amfibii - bombowiec Raven. Dwa Anglery moga wyplynac na powierzchnie i zestrzelic pojedynczego Ravena.]],
     floattoggle = [[1]],
   },
 

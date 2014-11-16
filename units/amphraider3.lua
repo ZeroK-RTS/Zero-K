@@ -21,8 +21,10 @@ unitDef = {
     amph_regen = 5,
     amph_submerged_at = 40,
     helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon.]],
-    helptext_pl    = [[Duck to lekki bot amfibijny ze specjalnymi torpedami krotkiego zasiegu, ktore moze odpalic takze na ladzie. Jest szybki i tani, lecz delikatny.]],
-    description_pl = [[Lekki bot amfibijny]],
+    helptext_de    = [[Der Duck ist ein einfacher Unterwasser-Raider. Ausgerüstet mit Kurzstreckentorpedos, kann er seine (relativ) hohe Geschwindigkeit nutzen, um Seeziele zu schikanieren, die nicht zurückschießen können - mit ernsthaftem Widerstand konfrontiert, stirbt er allerdings schnell. An Land kann er die Torpedos ebenfalls abfeuern, die hier eine passable Waffe gegen schwere Einheiten abgeben.]],
+	helptext_pl    = [[Duck to lekki bot amfibijny ze specjalnymi torpedami krotkiego zasiegu, ktore moze odpalic takze na ladzie. Jest szybki i tani, lecz delikatny.]],
+    description_de = [[Amphibischer Raider]],
+	description_pl = [[Lekki bot amfibijny]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
