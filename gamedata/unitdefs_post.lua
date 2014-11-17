@@ -306,21 +306,35 @@ end
 if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if name == "fighter" then
-			ud.turnRadius = 150
-			ud.maxRudder = 0.005
+			ud.turnradius = 150
+			ud.maxrudder = 0.007
 		elseif name == "corvamp" then
-			ud.turnRadius = 80
-			ud.maxRudder = 0.004
+			ud.turnradius = 80
+			ud.maxrudder = 0.006
 		elseif name == "bomberdive" then
-			ud.turnRadius = 40
+			ud.turnradius = 40
 		elseif name == "corhurc2" then
-			ud.turnRadius = 20
+			ud.turnradius = 20
 		elseif name == "armstiletto_laser" then
-			ud.turnRadius = 20
+			ud.turnradius = 20
 		elseif name == "armcybr" then
-			ud.turnRadius = 20
+			ud.turnradius = 20
 		elseif "corawac" then
-			ud.turnRadius = 60
+			ud.turnradius = 60
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Increase pathable areas of yardmaps for new engine as a test.
+
+if not reverseCompat then
+	for name, ud in pairs(UnitDefs) do
+		if name == "factorytank" then
+			ud.yardmap = "oooooooooo oooooooooo oooooooooo oocccccccoo oocccccccoo yoccccccoy yoccccccoy yyccccccyy"
+		elseif name == "factoryveh" then
+			ud.yardmap = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco"
 		end
 	end
 end
