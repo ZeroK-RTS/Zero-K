@@ -50,7 +50,7 @@ local bgColor_panel = {nil, nil, nil, 1}
 
 local tabbedMode = false
 
-local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
+local reverseCompat = (Game.version:find('91.0') == 1)
 --local init = true
 
 local function toggleTeamColors()
