@@ -335,6 +335,8 @@ if not reverseCompat then
 			ud.yardmap = "oooooooooo oooooooooo oooooooooo oocccccccoo oocccccccoo yoccccccoy yoccccccoy yyccccccyy"
 		elseif name == "factoryveh" then
 			ud.yardmap = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco"
+		elseif name == "factorycloak" then
+			ud.yardmap = "ooooooo ooooooo ooooooo occccco occccco occccco occccco"
 		end
 	end
 end
