@@ -600,7 +600,7 @@ local function ProcessCommand(cmd)
 			n_defense[#n_defense+1] = cmd
 		elseif special_commands[cmd.id] then
 			n_special[#n_special+1] = cmd
-		elseif UnitDefs[-(cmd.id)] then
+		elseif cmd.id and UnitDefs[-(cmd.id)] then
 			n_units[#n_units+1] = cmd
 		else
 			n_common[#n_common+1] = cmd	--shove unclassified stuff in common
