@@ -447,6 +447,8 @@ function gadget:UnitDamaged(unitID)
 	if (Spring.GetUnitHealth(unitID) < 0) and jump_dir then
 		mcDisable(unitID)
 		Spring.AddUnitImpulse(unitID,jump_dir[1],jump_dir[2],jump_dir[3])
+		jumping[unitID] = nil
+		lastJump[unitID] = nil
 	end
 end
 
