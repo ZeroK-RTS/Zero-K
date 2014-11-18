@@ -120,7 +120,6 @@ local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 
 local function SetMetalReserved(teamID, value)
@@ -189,9 +188,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
 end
 
 local function AllowMiscBuildStep(unitID,teamID)
-	if ((spGetUnitRulesParam(unitID, "disarmed") == 1) or (random() < (spGetUnitRulesParam(unitID, "slowState") or 0))) then
-		return false
-	end
 
 	if (UnitMiscPriority[unitID] == 0) then -- priority none/low
 		if (teamMiscPriorityUnits[teamID] == nil) then 
