@@ -49,8 +49,6 @@ local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
 
 local tabbedMode = false
-
-local reverseCompat = (Game.version:find('91.0') == 1)
 --local init = true
 
 local function toggleTeamColors()
@@ -358,7 +356,7 @@ function WG.Minimap_SetOptions(aspect, opacity, resizable, buttonRight, minimiza
 end
 
 function updateRadarColors()
-	local losViewOffBrightness = reverseCompat and 0.5 or 0.42
+	local losViewOffBrightness = 0.5
 
 	-- local fog = options.radar_fog_color.value
 	-- local los = options.radar_los_color.value
