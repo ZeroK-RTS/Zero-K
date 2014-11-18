@@ -49,8 +49,6 @@ local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
 
 local tabbedMode = false
-
-local reverseCompat = (Game.version:find('91.0') == 1)
 --local init = true
 
 local function toggleTeamColors()
