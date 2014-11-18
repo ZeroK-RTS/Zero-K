@@ -358,7 +358,7 @@ function WG.Minimap_SetOptions(aspect, opacity, resizable, buttonRight, minimiza
 end
 
 function updateRadarColors()
-	local losViewOffBrightness = reverseCompat and 0.5 or 0.45
+	local losViewOffBrightness = reverseCompat and 0.5 or 0.42
 
 	-- local fog = options.radar_fog_color.value
 	-- local los = options.radar_los_color.value
