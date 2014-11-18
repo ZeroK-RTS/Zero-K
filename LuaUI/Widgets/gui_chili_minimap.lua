@@ -359,13 +359,11 @@ end
 
 function updateRadarColors()
 	local losViewOffBrightness = 0.5
-	local losSplitFactor = reverseCompat and 1 or 2 --Engine 98.0.1+162 and later applies the given los colour for airlos and los, meaning the los colour is added twice.
-                                                  --Older engines halved los colour first internally, we need to do it here now
 
 	-- local fog = options.radar_fog_color.value
 	-- local los = options.radar_los_color.value
 	local fog_value = options.radar_fog_brightness.value * losViewOffBrightness
-	local los_value = (losViewOffBrightness - fog_value) / losSplitFactor
+	local los_value = (losViewOffBrightness - fog_value)
 	local fog = {fog_value, fog_value, fog_value, 1}
 	local los = {los_value, los_value, los_value, 1}
 	local radar = options.radar_radar_color.value
