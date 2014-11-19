@@ -21,7 +21,7 @@ if not gadgetHandler:IsSyncedCode() then
 	return
 end
 
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+local isNewEngine = Spring.Utilities.IsCurrentVersionNewerThan(96, 300)
 
 local UPDATE_PERIOD = 3 -- see http://springrts.com/mantis/view.php?id=3048
 
