@@ -9,7 +9,7 @@ function gadget:GetInfo()
       date      = "3 Nov 2013",
       license   = "GNU GPL, v2 or later",
       layer     = 0,
-      enabled   = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+      enabled   = Spring.Utilities.IsCurrentVersionNewerThan(94, 698)
    }
 end
 
