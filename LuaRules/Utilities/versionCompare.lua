@@ -23,12 +23,7 @@ function Spring.Utilities.IsCurrentVersionNewerThan(rel, dev)
 		elseif i == 2 then
 			thisDev = tonumber(word)
 			if thisDev then
-				if thisDev < dev then
-					return false
-				end
-				if thisDev > dev then
-					return true
-				end
+				return thisDev > dev
 			end
 		end
 		i = i + 1

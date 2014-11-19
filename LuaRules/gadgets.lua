@@ -79,6 +79,7 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
 local reverseCompat = (Game.version:find('91.0') == 1)
+local unitDamagedOrderChange = not Spring.Utilities.IsCurrentVersionNewerThan(94, 698)
 --------------------------------------------------------------------------------
 
 function pgl() -- (print gadget list)  FIXME: move this into a gadget
@@ -1432,7 +1433,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 	
 	local projectileID,attackerID
 	local attackerDefID,attackerTeam
-	if reverseCompat then 
+	if unitDamagedOrderChange then 
 		attackerID = a 
 		attackerDefID = b
 		attackerTeam = c
@@ -1492,7 +1493,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 								   a, b, c, d)
   local projectileID,attackerID
   local attackerDefID,attackerTeam
-  if reverseCompat then 
+  if unitDamagedOrderChange then 
 	attackerID = a 
     attackerDefID = b
     attackerTeam = c
@@ -1530,7 +1531,7 @@ local UnitDamaged_gadgets = {}
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
-	if reverseCompat then
+	if unitDamagedOrderChange then
 		attackerTeam = attackerDefID
 		attackerDefID = attackerID
 		attackerID = projectileID
@@ -1559,7 +1560,7 @@ function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
 		
-  if reverseCompat then
+  if unitDamagedOrderChange then
     attackerTeam = attackerDefID
     attackerDefID = attackerID
     attackerID = projectileID
