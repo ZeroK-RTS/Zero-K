@@ -118,7 +118,6 @@ local aa = {
 }
 
 local sea = { --not used yet
-	"corcrus", --executioner
 	"corbats", --warlord
 	"corarch", --Shredder
 	"armroy", --crusader
