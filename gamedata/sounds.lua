@@ -110,9 +110,4 @@ AutoAdd("explosion", defaultOpts)
 AutoAdd("reply", replyOpts)
 AutoAdd("music", noVariation)
 
--- Preload all sounds as an experiment in lag when a new unit type is selected or song is played.
-for i, v in pairs(Sounds.SoundItems) do
-	v.preload = true
-end
-
 return Sounds
