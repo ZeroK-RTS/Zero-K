@@ -45,6 +45,10 @@ local menu = {
 					angle = -135,
 					unit = "armcarry"
 				},
+				{
+					angle = -135,
+					unit = "reef"
+				},
 			}
 		},
 		{

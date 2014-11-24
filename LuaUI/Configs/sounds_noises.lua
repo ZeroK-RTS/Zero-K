@@ -1062,6 +1062,16 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
+	reef = {
+		ok = {
+			[1] = "rumble2",
+			volume = 1.6,
+		},
+		select = {
+			[1] = "rumble1",
+			volume = 1.6,
+		},
+	},
 	corbats = {
 		ok = {
 			[1] = "rumble2",

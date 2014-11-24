@@ -204,6 +204,7 @@ local corclogDefID = UnitDefNames["corclog"].id
 
 local exceptionArray = {
 	[UnitDefNames["armcarry"].id] = true,
+	[UnitDefNames["reef"].id] = true,
 }
 
 --------------------------------------------------------------------------------
