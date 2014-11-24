@@ -127,7 +127,9 @@ local function InitUnsafe()
 		local customKeys = select(10, Spring.GetPlayerInfo(id))
 		local commDataRaw = customKeys and customKeys.commanders
 		if not (commDataRaw and type(commDataRaw) == 'string') then
-			err = "Comm data entry for player "..id.." is empty or in invalid format"
+			if commDataRaw then
+				err = "Comm data entry for player "..id.." is in invalid format"
+			end
 			commData = {}
 		else
 			commDataRaw = string.gsub(commDataRaw, '_', '=')
