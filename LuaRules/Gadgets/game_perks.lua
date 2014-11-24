@@ -167,7 +167,9 @@ local function InitUnsafe()
 		local customKeys = select(10, Spring.GetPlayerInfo(id))
 		local unlocksRaw = customKeys and customKeys.unlocks
 		if not (unlocksRaw and type(unlocksRaw) == 'string') then
-			err = "Unlock data entry for player "..id.." is empty or in invalid format"
+			if unlocksRaw then
+				err = "Unlock data entry for player "..id.." is in invalid format"
+			end
 			unlockData = {}
 		else
 			unlocksRaw = string.gsub(unlocksRaw, '_', '=')
