@@ -7,7 +7,7 @@ unitDef = {
   brakeRate              = 0.0466,
   buildCostEnergy        = 3500,
   buildCostMetal         = 3500,
-  builder                = true,
+  builder                = false,
   buildPic               = [[reef.png]],
   buildTime              = 3500,
   canAssist              = false,
@@ -47,6 +47,7 @@ unitDef = {
   maxDamage              = 7500,
   maxVelocity            = 2.75,
   minCloakDistance       = 75,
+  minWaterDepth          = 10,
   movementClass          = [[BOAT6]],
   objectName             = [[lmcarrier.dae]],
   script                 = [[reef.lua]],
@@ -64,7 +65,7 @@ unitDef = {
   sightDistance          = 1105,
   turninplace            = 0,
   turnRate               = 233,
-  waterline              = 10,
+  waterline              = 4,
 
   weapons                = {
 
