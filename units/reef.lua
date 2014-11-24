@@ -18,10 +18,10 @@ unitDef = {
   cantBeTransported      = true,
   category               = [[SHIP]],
   CollisionSphereScale   = 0.6,
-  collisionVolumeOffsets = [[10 -10 0]],
-  collisionVolumeScales  = [[90 70 240]],
+  collisionVolumeOffsets = [[-5 -10 0]],
+  collisionVolumeScales  = [[80 80 240]],
   collisionVolumeTest	 = 1,
-  collisionVolumeType    = [[box]],
+  collisionVolumeType    = [[CylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
