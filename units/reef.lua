@@ -200,6 +200,11 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
+      CollisionSphereScale   = 0.6,
+      collisionVolumeOffsets = [[-5 -10 0]],
+	  collisionVolumeScales  = [[80 80 240]],
+	  collisionVolumeTest	 = 1,
+	  collisionVolumeType    = [[CylZ]],
       description      = [[Wreckage - Reef]],
       blocking         = false,
       damage           = 7500,
