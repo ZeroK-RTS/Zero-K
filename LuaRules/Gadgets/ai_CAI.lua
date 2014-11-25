@@ -4160,6 +4160,7 @@ local heatmapPosition
 
 -- draw scoutmap
 -- FIXME: could use some big time optimizations
+--[[
 function gadget:DrawWorldPreUnit()
 	if Spring.IsCheatingEnabled() then
 		if SYNCED and SYNCED.debugData and SYNCED.debugData.drawScoutmap then
@@ -4181,6 +4182,7 @@ function gadget:DrawWorldPreUnit()
 		end
 	end
 end
+--]]
 
 function gadget:Initialize()
 	local usingAI = false
@@ -4202,7 +4204,7 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget() 
 		return
 	end
-	heatmapPosition = MakeRealTable(SYNCED.heatmapPosition)
+	--heatmapPosition = MakeRealTable(SYNCED.heatmapPosition)
 end
 
 function gadget:Save(zip)
