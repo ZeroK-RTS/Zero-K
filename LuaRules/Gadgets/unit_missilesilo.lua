@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local spGetUnitDefID = Spring.GetUnitDefID
 
 ------------------------------------------------------------------------------
@@ -15,8 +22,6 @@ local spGetUnitDefID = Spring.GetUnitDefID
 --			If no slots are free, block construction.
 --		missile destroyed (including launch):
 --			gadget instructs parent silo to check all slots and remove missile if found
-
-if (gadgetHandler:IsSyncedCode()) then
 
 function gadget:GetInfo()
   return {
@@ -117,6 +122,4 @@ function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
 		Spring.UnitScript.CallAsUnit(facID, env.AddMissile, unitID)
 		missileParents[unitID] = facID
 	end
-end
-
 end

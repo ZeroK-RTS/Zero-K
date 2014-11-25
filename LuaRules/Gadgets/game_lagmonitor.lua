@@ -1,4 +1,8 @@
--- $Id: unit_noselfpwn.lua 3171 2008-11-06 09:06:29Z det $
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -26,11 +30,6 @@ end
 --3) wait 3 strike (3 time AFK & Ping) before --> mark player as AFK/Lagging
 
 --Everything else: anti-bug, syntax, methods, ect
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then -- SYNCED ---
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 local lineage = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner.
 local afkTeams = {}
 local tickTockCounter = {} --remember how many second a player is in AFK mode. To add a delay before unit transfer commence.
@@ -376,19 +375,4 @@ end
 
 function gadget:GameOver()
 	gadgetHandler:RemoveGadget() --shutdown after game over, so that at end of a REPLAY Lagmonitor doesn't bounce unit among player
-end
---[[
-else -- UNSYNCED ---
-
-	function WrapToLuaUI(_,afkPlayer)
-		if (Script.LuaUI('LagmonitorAFK')) then
-			Script.LuaUI.LagmonitorAFK(afkPlayer)
-		end
-	end
-
-	function gadget:Initialize() --Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
-		gadgetHandler:AddSyncAction('LagmonitorAFK',WrapToLuaUI)
-	end
---]]
-
 end

@@ -77,6 +77,12 @@ local CMD_REMOVE 		= CMD.REMOVE
 
 local twoPi = math.pi*2
 
+--------------------------------------------------------------------------------
+-- *** Config
+
+include "LuaRules/Configs/cai/general.lua"
+
+
 if (gadgetHandler:IsSyncedCode()) then
 
 --------------------------------------------------------------------------------
@@ -108,10 +114,6 @@ local function ModifyTable(original, modify)   -- Warning: circular table refere
 		end
 	end
 end
---------------------------------------------------------------------------------
--- *** Config
-
-include "LuaRules/Configs/cai/general.lua"
 --------------------------------------------------------------------------------
 -- *** 'Globals'
 
@@ -4181,6 +4183,21 @@ function gadget:DrawWorldPreUnit()
 end
 
 function gadget:Initialize()
+	local usingAI = false
+	for _,team in ipairs(spGetTeamList()) do
+		--local _,_,_,isAI,side = spGetTeamInfo(team)
+		if aiConfigByName[spGetTeamLuaAI(team)] then
+			local _,_,_,_,_,_,CustomTeamOptions = spGetTeamInfo(team)
+			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?
+				usingAI = true
+			end
+		end
+	end
+	if not usingAI then
+		gadgetHandler:RemoveGadget()
+		return 
+	end
+	
 	if Spring.GetGameRulesParam("CAI_disabled") == 1 then
 		gadgetHandler:RemoveGadget() 
 		return

@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
@@ -13,10 +20,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then --SYNCED
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spSetUnitTarget       = Spring.SetUnitTarget
@@ -422,23 +425,4 @@ function gadget:GameFrame(n)
         end
 	end
 	
-end
-
---------------------------------------------------------------------------------
--- Drawing toggle goes through synced for no good reason
---[[
-function gadget:RecvLuaMsg(msg, playerID)
-    if msg == "target_move_selectionlow" then
-        drawPlayerAlways[playerID] = 5 --"Hide commands except if you select unit(s)"
-	elseif msg == "target_move_all" then
-        drawPlayerAlways[playerID] = 4 --"Always display commands for all units at all time."
-    elseif msg == "target_move_selection" then
-        drawPlayerAlways[playerID] = 3 --"Always display commands for selected units only, but if you press SHIFT it display commands for all units."
-	elseif msg == "target_move_shift" then
-        drawPlayerAlways[playerID] = 2 --"Hide commands of all units, but if you press SHIFT it display them again."
-    elseif msg == "target_move_minimal" then
-        drawPlayerAlways[playerID] = 1 --"Hide commands except if you select unit(s) and pressing SHIFT."
-    end
-end
-]]--
 end

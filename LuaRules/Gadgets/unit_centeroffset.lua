@@ -1,5 +1,10 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
    return {
@@ -13,10 +18,6 @@ function gadget:GetInfo()
    }
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---SYNCED
-if gadgetHandler:IsSyncedCode() then
 
 
 local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
@@ -85,9 +86,4 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
 	end
-end
-
-
-------------------------------------------------------
-
 end

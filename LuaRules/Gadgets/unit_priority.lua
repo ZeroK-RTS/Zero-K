@@ -9,6 +9,13 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+if (not gadgetHandler:IsSyncedCode()) then
+	return
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:GetInfo()
   return {
     name      = "UnitPriority",
@@ -100,12 +107,6 @@ local function isFactory(UnitDefID)
 end
 
 --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-
-if (gadgetHandler:IsSyncedCode()) then
---------------------------------------------------------------------------------
---  SYNCED
 --------------------------------------------------------------------------------
 
 local random = math.random
@@ -524,45 +525,3 @@ function gadget:UnitDestroyed(UnitID, unitDefID, teamID)
 		end
     end
 end
-
---------------------------------------------------------------------------------
---  END SYNCED
---------------------------------------------------------------------------------
-else
---------------------------------------------------------------------------------
---  UNSYNCED
---------------------------------------------------------------------------------
---[[
-local spGetLocalTeamID = Spring.GetLocalTeamID
-
-local last_sent_in_frame = 0
-
-function gadget:Initialize()
-    gadgetHandler:AddSyncAction('ReserveState',WrapReserveStateToLuaUI)
-    gadgetHandler:AddSyncAction('PriorityStats',WrapPriorityStatsToLuaUI)
-end
-
-function WrapPriorityStatsToLuaUI(_,teamID, highPriorityBP, lowPriorityBP, gameFrame)
-    if (teamID == spGetLocalTeamID() and Script.LuaUI('PriorityStats')) then
-        if last_sent_in_frame ~= gameFrame then
-            Script.LuaUI.PriorityStats(spGetLocalTeamID(), 0, 0)
-            last_sent_in_frame = gameFrame
-        else
-            Script.LuaUI.PriorityStats(teamID, highPriorityBP, lowPriorityBP)
-        end
-    end
-end
-
-function WrapReserveStateToLuaUI(_,teamID, metalReserve, energyReserve)
-    if (teamID == spGetLocalTeamID() and Script.LuaUI('ReserveState')) then
-        Script.LuaUI.ReserveState(teamID, metalReserve, energyReserve)
-    end
-end
---]]
---------------------------------------------------------------------------------
---  UNSYNCED
---------------------------------------------------------------------------------
-end
---------------------------------------------------------------------------------
---  COMMON
---------------------------------------------------------------------------------

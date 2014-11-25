@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local version = "0.1.3"
 
 function gadget:GetInfo()
@@ -21,7 +29,6 @@ end
 -- 5 april 2014 - 0.1.0. Release.
 
 local modOptions = Spring.GetModOptions()
-if (gadgetHandler:IsSyncedCode()) then
 
 local getMovetype = Spring.Utilities.getMovetype
   
@@ -221,7 +228,7 @@ function gadget:GameFrame(f)
 					);
 					
 					if steps_to_spawn == WARNING_TIME then
-						SendToUnsynced("zombie_sound", x, y, z);
+						--SendToUnsynced("zombie_sound", x, y, z);
 					end
 				end
 			end 
@@ -343,32 +350,4 @@ function gadget:GameStart()
 -- 	if (tonumber(modOptions.zombies) == 1) then
 		ReInit(true) -- anything it does doesnt mess with existing zombies
 -- 	end
-end
-
-else -- UNSYNCED
-
-	Spring.Echo("zombies: unsynced mode");
-	local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
-	local spGetSpectatingState = Spring.GetSpectatingState
-	local spIsPosInLos         = Spring.IsPosInLos
-	local spPlaySoundFile      = Spring.PlaySoundFile
-	local ZOMBIE_SOUNDS = {
-		"sounds/misc/zombie_1.wav",
-		"sounds/misc/zombie_2.wav",
-		"sounds/misc/zombie_3.wav",
-	}
-
-	local function zombie_sound(_, x, y, z)
-		local spec = select(2, spGetSpectatingState())
-		local myAllyTeam = spGetLocalAllyTeamID()
-		if (spec or spIsPosInLos(x, y, z, myAllyTeam)) then
-			local sound = ZOMBIE_SOUNDS[math.random(#ZOMBIE_SOUNDS)]
-			spPlaySoundFile(sound, 10, x, y, z);
-		end
-	end
-
-	function gadget:Initialize()
-		gadgetHandler:AddSyncAction("zombie_sound", zombie_sound)
-	end
-
 end

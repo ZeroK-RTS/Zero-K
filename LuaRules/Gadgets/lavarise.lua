@@ -1,3 +1,7 @@
+if not (gadgetHandler:IsSyncedCode()) then
+	return
+end
+
 function gadget:GetInfo()
   return {
     name      = "lavarise",
@@ -15,7 +19,6 @@ if (modOptions.zkmode ~= "lavarise") then
   return
 end
 
-if (gadgetHandler:IsSyncedCode()) then
 --- SYNCED:
 
 local sin    = math.sin
@@ -144,10 +147,8 @@ function gadget:GameFrame (f)
 end
 
 
-else
---- UNSYNCED:
-
-
+-- Unsynced part should be moved to widget
+--[[
 local sin          = math.sin
 local glTexCoord   = gl.TexCoord
 local glVertex     = gl.Vertex
@@ -197,7 +198,7 @@ local function DrawGroundHuggingSquare(red,green,blue,alpha, x1,z1,x2,z2, HoverH
 end
 
 function gadget:DrawWorld ()
-  if (SYNCED.lavaLevel) then
+  if (SYNCED.lavaLevel) then -- Make this a GameRulesParam
     --glColor(1-cm1,1-cm1-cm2,0.5,1)
 
     --DrawGroundHuggingSquare(1-cm1,1-cm1-cm2,0.5,1, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
@@ -205,5 +206,4 @@ function gadget:DrawWorld ()
     --DrawGroundHuggingSquare(0,0.5,0.8,0.8, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
   end
 end
-
-end  --UNSYNCED
+--]]

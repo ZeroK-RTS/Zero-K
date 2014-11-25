@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "Feb-Apr 2014",
     license   = "GPL v2 or later",
     layer     = -1,
-    enabled   = true	-- don't disable me please
+    enabled   = false	-- don't disable me please
   }
 end
 

@@ -93,17 +93,17 @@ end
 function gadget:AllowCommand_GetWantedUnitDefID()	
 	return boolDef
 end
-
+-----------------------------------------------
+--UNSYNCED--
+-----------------------------------------------
 else 
---UNSYNCED--
---UNSYNCED--
---UNSYNCED--
- 
+
 	include("LuaRules/Configs/customcmds.h.lua")
 	function gadget:Initialize()
 		--Note: IMO we must *allow* LUAUI to draw this command. We already used to seeing skirm command, and it is informative to players. 
 		--Also, its informative to widget coder and allow player to decide when to manually micro units (like seeing unit stuck on cliff with jink command)
 		gadgetHandler:RegisterCMDID(CMD_RAW_MOVE)
 		Spring.SetCustomCommandDrawData(CMD_RAW_MOVE, "", {0.2,0.8,0.2,1}) -- "" mean there's no MOVE cursor if the command is drawn.
+		gadgetHandler:RemoveGadget()
 	end
 end

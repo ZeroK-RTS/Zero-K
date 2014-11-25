@@ -2,9 +2,15 @@
 -- ZK Version
 
 -- King of the Hill for ModOptions -------------------------------------
--- Set up an empty box on Spring Lobby (other clients might crash) ------
+-- Set up an empty box on Spring Lobby (other clients might crash) -----
 -- Set up the time to control the box in ModOptions --------------------
---------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
 	return {
@@ -112,120 +118,113 @@ if(not gadgetHandler:IsSyncedCode()) then
 	
 end
 ---------------------------------------------------------------------------------
+local actualTeam = -1
+local control = -1
+local goalTime = 0
+local timer = -1
+local lastControl = nil
+local lastHolder = nil
+local grace = 0
+local lG = 0
 
---SYNCED-----------------------------------------------------------------------
-if(gadgetHandler:IsSyncedCode()) then
 
-	local actualTeam = -1
-	local control = -1
-	local goalTime = 0
-	local timer = -1
-	local lastControl = nil
-	local lastHolder = nil
-	local grace = 0
-	local lG = 0
-
-	
-	function gadget:Initialize()
-		if(Spring.GetModOptions().zkmode ~= "kingofthehill") then
-			gadgetHandler:RemoveGadget()
-		end
-		goalTime = (Spring.GetModOptions().hilltime or 0) * 60
-		lG = Spring.GetModOptions().gracetime
-		if lG then
-			grace = lG * 60
-		else
-			grace = 0
-		end
-		timer = goalTime
+function gadget:Initialize()
+	if(Spring.GetModOptions().zkmode ~= "kingofthehill") then
+		gadgetHandler:RemoveGadget()
 	end
-	
-	function gadget:GameStart()
-		Spring.Echo("Goal time is " .. goalTime / 60 .. " minutes.")
+	goalTime = (Spring.GetModOptions().hilltime or 0) * 60
+	lG = Spring.GetModOptions().gracetime
+	if lG then
+		grace = lG * 60
+	else
+		grace = 0
 	end
-
-	function gadget:GameFrame(f)
-		if(f%30 == 0 and f < grace * 30 + lG*30*60) then
-			grace = grace - 1
-			SendToUnsynced("changeTime", nil, nil, grace)
-		end
-		if(f == grace*30 + lG*30*60) then
-			SendToUnsynced("changeTime", nil, nil, grace)
-			Spring.Echo("Grace period is over. GET THE HILL!")
-		end
-		if(f % 32 == 15 and f > grace*30 + lG*30*60) then
-			local control = -2 
-			local team = nil 
-			local present = false 
-			
-			for _, box in ipairs(teamBoxes) do 
-				for _, u in ipairs(Spring.GetUnitsInRectangle(box[1], box[2], box[3], box[4])) do
-					local ally = Spring.GetUnitAllyTeam(u)
-					if (lastControl == ally) then
-						present = true
-					end
-				
-					if (control == -2)  then 
-						if (not blockedDefs[Spring.GetUnitDefID(u)]) then 
-							control = ally
-							team = Spring.GetUnitTeam(u)
-						end 
-					else 
-						if (control ~= ally) then 
-							control = -1
-							break
-						end 
-					end
-				end 
-			end 
-			
-			if(control ~= lastControl) then
-				if (control == -1) then
-					Spring.Echo("Control contested.")
-					SendToUnsynced("changeColor", -1)
-				else
-					if (control == -2) then 
-						Spring.Echo("Team " .. control + 1 .. " lost control.")
-						SendToUnsynced("changeColor", -1)
-						timer = goalTime
-						SendToUnsynced("changeTime", control, timer)
-					else 
-						actualTeam = team
-						if (lastHolder ~= control) then 
-							timer = goalTime
-							lastHolder = control
-						end 
-						
-						Spring.Echo("Team " .. control + 1 .. " is now in control.")
-						SendToUnsynced("changeColor", actualTeam)
-						lastHolder = control
-					end
-				end 
-			end
-			
-			if (control >= 0) then 
-				timer = timer - 1  
-				SendToUnsynced("changeTime", control, timer)				
-			end
-
-			if(control >= 0 and timer == 0) then
-				Spring.Echo("Team " .. control + 1 .. " has won!")
-				gameOver(actualTeam)
-			end 
-			
-			lastControl = control						
-
-		end
-	end
-	
-	
-	function gameOver(team)
-		for _, u in ipairs(Spring.GetAllUnits()) do
-			if(not Spring.AreTeamsAllied(Spring.GetUnitTeam(u), team)) then
-				Spring.DestroyUnit(u, true)
-			end
-		end
-	end
-
+	timer = goalTime
 end
 
+function gadget:GameStart()
+	Spring.Echo("Goal time is " .. goalTime / 60 .. " minutes.")
+end
+
+function gadget:GameFrame(f)
+	if(f%30 == 0 and f < grace * 30 + lG*30*60) then
+		grace = grace - 1
+		SendToUnsynced("changeTime", nil, nil, grace)
+	end
+	if(f == grace*30 + lG*30*60) then
+		SendToUnsynced("changeTime", nil, nil, grace)
+		Spring.Echo("Grace period is over. GET THE HILL!")
+	end
+	if(f % 32 == 15 and f > grace*30 + lG*30*60) then
+		local control = -2 
+		local team = nil 
+		local present = false 
+		
+		for _, box in ipairs(teamBoxes) do 
+			for _, u in ipairs(Spring.GetUnitsInRectangle(box[1], box[2], box[3], box[4])) do
+				local ally = Spring.GetUnitAllyTeam(u)
+				if (lastControl == ally) then
+					present = true
+				end
+			
+				if (control == -2)  then 
+					if (not blockedDefs[Spring.GetUnitDefID(u)]) then 
+						control = ally
+						team = Spring.GetUnitTeam(u)
+					end 
+				else 
+					if (control ~= ally) then 
+						control = -1
+						break
+					end 
+				end
+			end 
+		end 
+		
+		if(control ~= lastControl) then
+			if (control == -1) then
+				Spring.Echo("Control contested.")
+				SendToUnsynced("changeColor", -1)
+			else
+				if (control == -2) then 
+					Spring.Echo("Team " .. control + 1 .. " lost control.")
+					SendToUnsynced("changeColor", -1)
+					timer = goalTime
+					SendToUnsynced("changeTime", control, timer)
+				else 
+					actualTeam = team
+					if (lastHolder ~= control) then 
+						timer = goalTime
+						lastHolder = control
+					end 
+					
+					Spring.Echo("Team " .. control + 1 .. " is now in control.")
+					SendToUnsynced("changeColor", actualTeam)
+					lastHolder = control
+				end
+			end 
+		end
+		
+		if (control >= 0) then 
+			timer = timer - 1  
+			SendToUnsynced("changeTime", control, timer)				
+		end
+
+		if(control >= 0 and timer == 0) then
+			Spring.Echo("Team " .. control + 1 .. " has won!")
+			gameOver(actualTeam)
+		end 
+		
+		lastControl = control						
+
+	end
+end
+
+
+function gameOver(team)
+	for _, u in ipairs(Spring.GetAllUnits()) do
+		if(not Spring.AreTeamsAllied(Spring.GetUnitTeam(u), team)) then
+			Spring.DestroyUnit(u, true)
+		end
+	end
+end

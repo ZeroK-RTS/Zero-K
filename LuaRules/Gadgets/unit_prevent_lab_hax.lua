@@ -1,4 +1,8 @@
--- $Id: unit_terraform.lua 3524 2008-12-23 13:21:12Z google frog $
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -14,15 +18,6 @@ function gadget:GetInfo()
   }
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-if (gadgetHandler:IsSyncedCode()) then
-
---------------------------------------------------------------------------------
--- SYNCED
---------------------------------------------------------------------------------
-  
 -- Speedups
 local spGetGroundHeight        = Spring.GetGroundHeight
 local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
@@ -323,25 +318,4 @@ function gadget:Initialize()
 		local udid = Spring.GetUnitDefID(units[i])
 		gadget:UnitCreated(units[i], udid)
 	end
-end
-
---[[
-else
---------------------------------------------------------------------------------
--- UNSYNCED
---------------------------------------------------------------------------------
-local debugMode = false
-
-local lab = SYNCED.lab
-
-function gadget:DrawWorld()
-	if not debugMode then return end
-	gl.Color(1,0,0,0.75)
-	for i,v in spairs(lab) do
-		gl.DrawGroundQuad(v.minx, v.minz, v.maxx, v.maxz )
-	end
-	gl.Color(1,1,1,1)
-end
---]]
-
 end

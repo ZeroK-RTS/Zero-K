@@ -1,6 +1,11 @@
 -- $Id: unit_windmill_control.lua 4120 2009-03-20 01:05:01Z carrepairer $
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
@@ -16,13 +21,6 @@ end
 
 -- Changelog:
 -- 		CarRepairer: Enhanced to allow overriding map's min/max wind values in mod options. Negative values (default) will use map's values.
-
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
--- 
-if (gadgetHandler:IsSyncedCode()) then
-	
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -98,9 +96,6 @@ function gadget:GameFrame(n)
 					AddUnitResource(unitID, "e", de)
 				end
 			end
-			--for teamID, energy in pairs(teamEnergy) do 
-			--	SendToUnsynced("SendWindProduction", teamID, energy)   
-			--end 
 		end
 	end
   
@@ -226,26 +221,4 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     windmills[unitID] = nil
   end
 end
-
---[[
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
--- UNSYNCED SHIT 
--------------------------------------------------------------------------------------
-else 	
-
-function gadget:Initialize() 
-	gadgetHandler:AddSyncAction("SendWindProduction",SendWindProduction)
-end 
-
-function SendWindProduction(_, teamID, wind) 
-  if (teamID ~= Spring.GetLocalTeamID()) then return end
-  if (Script.LuaUI('SendWindProduction')) then
-    Script.LuaUI.SendWindProduction(teamID, wind)
-  end
-end
---]]
-
-end
-
 

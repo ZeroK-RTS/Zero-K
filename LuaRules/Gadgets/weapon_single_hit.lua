@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name = "Single-Hit Weapon",
@@ -9,9 +16,6 @@ function gadget:GetInfo()
 		enabled = true
 	}
 end
-
------- SYNCED -------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then 
 
 local spGetGameFrame = Spring.GetGameFrame
 
@@ -91,7 +95,3 @@ function gadget:UnitPreDamaged(unitID,unitDefID,_, damage,_, weaponDefID,attacke
 	end
 	return damage;
 end
-
-	
-end 
------ END SYNCED ---------------------------------------------------

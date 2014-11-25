@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
   return {
     name      = "Turn Without Interia",
@@ -8,10 +15,6 @@ function gadget:GetInfo()
     layer     = 0,
     enabled   = Spring.Utilities.IsCurrentVersionNewerThan(96, 300)
   }
-end
-
-if not gadgetHandler:IsSyncedCode() then
-	return
 end
 
 local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData

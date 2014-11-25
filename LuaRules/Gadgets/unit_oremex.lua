@@ -1,3 +1,6 @@
+
+if (gadgetHandler:IsSyncedCode()) then
+
 local version = "1.0.6"
 
 function gadget:GetInfo()
@@ -35,7 +38,6 @@ end
 -- 10 march 2014 - 1.0.2. Could be considered first working version.
 
 local modOptions = Spring.GetModOptions()
-if (gadgetHandler:IsSyncedCode()) then
 
 local getMovetype = Spring.Utilities.getMovetype
 
@@ -592,7 +594,7 @@ local function notifyPlayers(unitID, spawn_amount)
 	for i=1,#AllyTeams do
 		local allyTeam = AllyTeams[i]
 		if (isUnitVisible(unitID, allyTeam)) then
-			SendToUnsynced("oremexIncomeAdd", allyTeam, unitID, spawn_amount)
+			--SendToUnsynced("oremexIncomeAdd", allyTeam, unitID, spawn_amount)
 		end
 	end
 end
@@ -849,9 +851,11 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 
------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------
+-- UNSYNCED
+----------------------------------------------------------------
 else
-
+--[[
 local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 local spGetMyPlayerID	   = Spring.GetMyPlayerID
 
@@ -870,5 +874,5 @@ end
 function gadget:Shutdown()
 	gadgetHandler:RemoveSyncAction("oremexIncomeAdd")
 end
-
+--]]
 end

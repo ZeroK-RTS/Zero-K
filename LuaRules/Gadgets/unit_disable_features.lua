@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
 return {
   name      = "Disable Features",
@@ -10,21 +17,15 @@ return {
   }
 end
 
-if (gadgetHandler:IsSyncedCode()) then
 
 function gadget:Initialize()
-  local modOptions = Spring.GetModOptions()
-  if modOptions and tobool(modOptions.disablefeatures) then
-  else
-    gadgetHandler:RemoveGadget()
-  end
+	local modOptions = Spring.GetModOptions()
+	if not (modOptions and tobool(modOptions.disablefeatures)) then
+		gadgetHandler:RemoveGadget()
+	end
 end
 
 function gadget:AllowFeatureCreation(featureDefID, teamID, x, y, z)
-  return false
-end
-
-else -- UNSYNCED
-
+	return false
 end
 

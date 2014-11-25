@@ -9,7 +9,7 @@ function gadget:GetInfo()
     date      = "2010-03-05",
     license   = "raubkopierer sind verbrecher",
     layer     = 0,
-    enabled   = true,
+    enabled   = false,
   }
 end
 

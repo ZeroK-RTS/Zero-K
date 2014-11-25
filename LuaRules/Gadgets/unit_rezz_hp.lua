@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo() return {
 	name      = "Rezz Hp changer + effect",
 	desc      = "Sets rezzed units to full hp",
@@ -7,8 +14,6 @@ function gadget:GetInfo() return {
 	layer     = 0,
 	enabled   = not (Game.version:find('91.0') == 1),
 } end
-
-if (gadgetHandler:IsSyncedCode()) then
 
 	local spGetUnitHealth   = Spring.GetUnitHealth
 	local spGetUnitPosition = Spring.GetUnitPosition
@@ -62,8 +67,8 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 	end
 
-else -- UNSYNCED
-	
+ -- UNSYNCED
+--[[	
 	local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 	local spGetSpectatingState = Spring.GetSpectatingState
 	local spIsPosInLos         = Spring.IsPosInLos
@@ -92,5 +97,4 @@ else -- UNSYNCED
 			end
 		end
 	end
-
-end
+--]]

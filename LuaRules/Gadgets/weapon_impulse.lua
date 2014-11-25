@@ -1,7 +1,14 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
-    name      = "Weapon Impulse ",
+    name      = "Weapon Impulse",
     desc      = "Implements impulse relaint weapons because engine impelementation is prettymuch broken.",
     author    = "Google Frog",
     date      = "1 April 2012",
@@ -9,13 +16,6 @@ function gadget:GetInfo()
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-if (not gadgetHandler:IsSyncedCode()) then
-    return
 end
 
 -------------------------------------------------------------------------------------

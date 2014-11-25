@@ -1,5 +1,10 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
@@ -22,13 +27,6 @@ end
 include "LuaRules/Configs/customcmds.h.lua"
 
 local echo = Spring.Echo
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-if gadgetHandler:IsSyncedCode() then -- SYNCED
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 
 --------------------------------------------------------------------------------
@@ -126,65 +124,3 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, unitDefID, team)
     end
 end
-
-
-
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-else  -- UNSYNCED
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-
-local function SelectedUnitCanRepair() -- cache this?
-	local selUnits = Spring.GetSelectedUnits()
-	if not selUnits[1] then
-		return nil -- no selected units
-	end
-	local unitID, unitDefID
-	local canRepair
-	for i = 1, #selUnits do
-		unitID    = selUnits[i]
-		unitDefID = Spring.GetUnitDefID(unitID)
-		if not unitDefID then
-			return
-		end
-		local ud = UnitDefs[unitDefID]
-		if ud.canRepair then
-			return true
-		end
-	end
-	return false
-end
-
-
-
---------------------------------------------------------------------------------
--- callins
-
---[[
-function gadget:DefaultCommand(type,id)
-	--echo 'DefaultCommand'
-	if type == 'unit' then
-		
-		local target_team = Spring.GetUnitTeam(id)
-		if Spring.AreTeamsAllied( target_team, Spring.GetLocalTeamID() ) then
-			if SelectedUnitCanRepair() then
-				local hp, maxHp,_,_,buildProgress = Spring.GetUnitHealth(id)
-				if not buildProgress or buildProgress < 1 or hp < maxHp then
-					return -- let the default command be repair
-				end
-			end
-			
-			return CMD_AREA_GUARD
-		end
-	end
-end	
---]]
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-end
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------

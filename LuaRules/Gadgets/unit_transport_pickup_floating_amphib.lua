@@ -393,8 +393,9 @@ else
 include("LuaRules/Configs/customcmds.h.lua")
 
 function gadget:Initialize()
-  Spring.SetCustomCommandDrawData(CMD_EXTENDED_LOAD, CMD.LOAD_UNITS, {0,0.6,0.6,1},true)
-  Spring.SetCustomCommandDrawData(CMD_EXTENDED_UNLOAD, CMD.UNLOAD_UNITS, {0.6,0.6,0,1})
+	Spring.SetCustomCommandDrawData(CMD_EXTENDED_LOAD, CMD.LOAD_UNITS, {0,0.6,0.6,1},true)
+	Spring.SetCustomCommandDrawData(CMD_EXTENDED_UNLOAD, CMD.UNLOAD_UNITS, {0.6,0.6,0,1})
+	gadgetHandler:RemoveGadget()
 end
 
 --------------------------------------------------------------------------------

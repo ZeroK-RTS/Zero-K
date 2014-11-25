@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name      = "Game Over",
@@ -15,8 +22,6 @@ end
 --	An allyteam is counted as dead if none of
 --	its active players have units left.
 --------------------------------------------------------------------------------
-
-if (gadgetHandler:IsSyncedCode()) then
 
 --if Spring.GetModOption("zkmode",false,nil) == nil then
 --	Spring.Echo("<Game Over> Testing mode. Gadget removed.")
@@ -447,8 +452,4 @@ function gadget:GameOver()
 		Spring.SendCommands("wbynum 255 SPRINGIE:noElo")
 	end
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "GAME OVER!!")
-end
-
-else -- UNSYNCED
-
 end

@@ -12,6 +12,12 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+if (not gadgetHandler:IsSyncedCode()) then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:GetInfo()
   return {
     name      = "ShareControl",
@@ -178,10 +184,6 @@ end
 
 
 function gadget:Initialize()
-  if (not gadgetHandler:IsSyncedCode()) then
-    gadgetHandler:RemoveGadget()
-    return
-  end
   
   if( Spring.GetModOptions() ) then
 	unitShareEnemy = Spring.GetModOptions().sharemode == 'anyone'

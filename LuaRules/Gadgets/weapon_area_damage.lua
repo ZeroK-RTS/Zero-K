@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name = "Area Denial",
@@ -9,10 +16,6 @@ function gadget:GetInfo()
 		enabled = true
 	}
 end
-
-if (gadgetHandler:IsSyncedCode()) then
-
---SYNCED
 
 local frameNum
 local explosionList = {}
@@ -115,6 +118,4 @@ function gadget:Initialize()
 	for w,_ in pairs(weaponInfo) do
 		Script.SetWatchWeapon(w, true)
 	end
-end
-
 end

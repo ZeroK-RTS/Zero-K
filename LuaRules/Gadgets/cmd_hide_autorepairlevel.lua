@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
   return {
     name      = "Hide Autorepairlevel Command",
@@ -10,19 +17,9 @@ function gadget:GetInfo()
   }
 end
 
-if (gadgetHandler:IsSyncedCode()) then
---------------------------------------------------------------------------------
--- SYNCED
---------------------------------------------------------------------------------
-
 function gadget:UnitCreated(unitID, unitDefID, team)
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD.AUTOREPAIRLEVEL)
 	if cmdDescID then
 		Spring.EditUnitCmdDesc(unitID, cmdDescID, {hidden=true,})
 	end
-end
-else
---------------------------------------------------------------------------------
--- UNSYNCED
---------------------------------------------------------------------------------
 end

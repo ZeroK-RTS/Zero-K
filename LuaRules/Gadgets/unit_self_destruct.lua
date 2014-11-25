@@ -1,4 +1,11 @@
--- $Id$
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:GetInfo()
 return {
 	name      = "Self destruct blocker",
@@ -10,8 +17,6 @@ return {
 	enabled   = true  --  loaded by default?
 	}
 end
-
-if (gadgetHandler:IsSyncedCode()) then
 
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 
@@ -98,21 +103,3 @@ function gadget:GameFrame(n)
   end
 
 end
-
-else
-
--- UNSYNCED
-
-function gadget:Initialize() 
-  gadgetHandler:AddSyncAction('resignteam',
-    function(_,teamID)
-      local spec = Spring.GetSpectatingState()
-      if (Spring.GetLocalTeamID() == teamID) and (not spec) then
-        Spring.SendCommands('spectator')
-      end
-    end
-  )
-end 
-
-end
-

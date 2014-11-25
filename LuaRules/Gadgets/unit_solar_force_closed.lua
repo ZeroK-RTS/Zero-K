@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
@@ -12,10 +19,6 @@ function gadget:GetInfo()
 end
 
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
-
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
 
 local forceClosableUnitDefs = {}
 

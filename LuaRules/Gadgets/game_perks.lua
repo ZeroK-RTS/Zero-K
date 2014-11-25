@@ -1,3 +1,7 @@
+if (not gadgetHandler:IsSyncedCode()) then
+	return
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -29,11 +33,6 @@ if (tobool(Spring.GetModOptions().enableunlocks) == false) then
 	return
 end
 
-if (gadgetHandler:IsSyncedCode()) then
-
---------------------------------------------------------------------------------
---SYNCED
---------------------------------------------------------------------------------
 local perks = {}
 local playerIDsByName = {}
 
@@ -227,79 +226,4 @@ function gadget:Initialize()
 			gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
 		end
 	end
-end
---[[
-function gadget:RecvLuaMsg(msg, playerID)
-	if (msg:find("<perks>playername:",1,true)) then
-		local name = msg:gsub('.*:([^=]*)=.*', '%1')
-		local id = msg:gsub('.*:.*=(.*)', '%1')
-		playerIDsByName[name] = tonumber(id)
-	elseif (msg:find("<perks>playernames",1,true)) then
-		InitUnsafe()
-		local allUnits = Spring.GetAllUnits()
-		for _, unitID in pairs(allUnits) do
-			local udid = Spring.GetUnitDefID(unitID)
-			if udid then
-				gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
-			end
-		end
-	end	
-end
-]]--
-else
-
---UNSYNCED
---[[
-local GL_ONE                 = GL.ONE
-local GL_ONE_MINUS_SRC_ALPHA = GL.ONE_MINUS_SRC_ALPHA
-local glBlending             = gl.Blending
-local glTexRect              = gl.TexRect
-local glTexture              = gl.Texture
-
-function gadget:Update()
-        if Script.LuaUI("PerkState") then
-                Script.LuaUI.PerkState(SYNCED.perks[spGetLocalTeamID()].left)
-        end
-end
-
-
-local panelTop=60
-local panelRight=0
-local panelWidth=128
-local panelHeight=128
-
-local top = panelTop + 64
-local right = panelRight + 16
-local height = 32
-local width = 32
-
-function gadget:DrawScreen(vsx, vsy)
-        --glBlending(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-        glTexture("bitmaps/ui/money_perks.png")
-        glTexRect(vsx - panelRight - panelWidth, vsy - panelTop - panelHeight, vsx - panelRight, vsy - panelTop, false, false)
-        local n = 0
-        for p,_ in spairs(SYNCED.perks[spGetLocalTeamID()].have) do
-                glTexture(perkList[p][3])
-                glTexRect(vsx - right - n*width - width, vsy - top, vsx - right - n*width, vsy - top - height, false, true)
-                n=n+1
-        end
-        glTexture(false)
-end
-]]--
-
---[[
-function gadget:Initialize()
---  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
---  gadgetHandler:AddSyncAction("whisper", whisper)
-  
-	local playerroster = Spring.GetPlayerList()
-	local playercount = #playerroster
-	for i=1,playercount do
-		local name = Spring.GetPlayerInfo(playerroster[i])
-		Spring.SendLuaRulesMsg('<perks>playername:'..name..'='..playerroster[i])
-	end
-	Spring.SendLuaRulesMsg('<perks>playernames')
-end
-]]--
-
 end

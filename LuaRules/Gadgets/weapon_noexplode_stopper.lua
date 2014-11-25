@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name = "Noexplode Stopper",
@@ -9,10 +16,6 @@ function gadget:GetInfo()
 		enabled = true
 	}
 end
-
-if (gadgetHandler:IsSyncedCode()) then
-
---SYNCED
 
 local passedProjectile = {}
 
@@ -67,6 +70,4 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 
 	return false
 	
-end
-
 end

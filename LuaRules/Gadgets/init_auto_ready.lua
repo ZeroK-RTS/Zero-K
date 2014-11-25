@@ -1,3 +1,12 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- UNSYNCED ONLY
+if (gadgetHandler:IsSyncedCode()) then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local singleplayer = false
 do
 	local playerlist = Spring.GetPlayerList() or {}
@@ -20,8 +29,6 @@ function gadget:GetInfo()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-if (not gadgetHandler:IsSyncedCode()) then
 
 local MAX_TIME_DIFF = 150	-- wait this long for disconnected players
 
@@ -153,7 +160,4 @@ function gadget:Update()
 	if (Spring.GetGameFrame() > 1) then 
 		gadgetHandler:RemoveGadget()
 	end 
-end 
-
-
 end 

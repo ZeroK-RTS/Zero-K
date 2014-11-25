@@ -1,3 +1,10 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if not gadgetHandler:IsSyncedCode() then
+	return
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:GetInfo()
   return {
     name      = "DroppedStartPos",
@@ -9,9 +16,6 @@ function gadget:GetInfo()
     enabled   = true
   }
 end
-
--- SYNCED
-if gadgetHandler:IsSyncedCode() then
 
 local modOptions = Spring.GetModOptions()
 local fudgeFactor = 128 -- added to max to solve edge-of-startpos problem
@@ -58,10 +62,5 @@ function gadget:GameFrame(n)
     return
 
   end
-end
-
-else
--- UNSYNCED
-
 end
 
