@@ -74,6 +74,7 @@ local canRetreatDefs = {
 	
 	"corbats",
 	"armcarry",
+	"reef",
 	"corroy",
 	"serpent",
 }

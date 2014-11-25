@@ -78,6 +78,7 @@ local UPDATE_FREQUENCY = 0.25
 local exceptionList = {
 	armasp = true,
 	armcarry = true,
+	reef = true,
 }
 
 local exceptionArray = {}
