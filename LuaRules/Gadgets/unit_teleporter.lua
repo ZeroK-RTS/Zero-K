@@ -634,6 +634,7 @@ local myTeam = spGetMyTeamID()
 
 local beaconDef = UnitDefNames["tele_beacon"].id
 local beacons = {}
+local beaconCount = 0
 
 local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
 	local step = 1/amountOfPoints
@@ -657,7 +658,7 @@ local function GetUnitTop (unitID, x,y,z)
 end
 
 local function DrawWire(spec)
-	for i=1, #beacons do
+	for i=1, beaconCount do
 		local bid = beacons[i]
 		local tid = Spring.GetUnitRulesParam(bid, "connectto")
 
@@ -700,7 +701,8 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	if (unitDefID == beaconDef) then
-		beacons[#beacons + 1] = unitID
+		beacons[beaconCount + 1] = unitID
+		beaconCount = beaconCount + 1
 	end
 end
 
@@ -708,7 +710,8 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	if (unitDefID == beaconDef) then
 		for i=1, #beacons do
 			if beacons[i] == unitID then
-				beacons[i] = beacons[#beacons]
+				beacons[i] = beacons[beaconCount]
+				beaconCount = beaconCount - 1
 				table.remove(beacons)
 				break;
 			end
@@ -717,41 +720,48 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 end
 
 function gadget:DrawWorld()
-	local spec, fullview = Spring.GetSpectatingState()
-	spec = spec or fullview
+	if beaconCount > 0 then
+		local spec, fullview = Spring.GetSpectatingState()
+		spec = spec or fullview
 
-	DrawWire(spec)
-	
-	gl.PushAttrib(GL.LINE_BITS)
-	
-	gl.DepthTest(true)
-	
-	gl.LineWidth(2)
-	gl.LineStipple('')
+		DrawWire(spec)
+		
+		local shift = select (4, spGetModKeyState())
+		local drawnSomethingYet = false
+		for i=1, beaconCount do
+			local bid = beacons[i]
+			local tid = Spring.GetUnitRulesParam(bid, "connectto")
+			local team = Spring.GetUnitTeam(tid)
+			if spValidUnitID(tid) and spValidUnitID(bid) and (spec or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
+				
+				if not drawnSomethingYet then
+					gl.PushAttrib(GL.LINE_BITS)
+		
+					gl.DepthTest(true)
+					
+					gl.LineWidth(2)
+					gl.LineStipple('')
+					drawnSomethingYet = true
+				end
+				
+				gl.Color(0.1, 0.3, 1, 0.9)
+				gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
+				
+				local x,y,z = spGetUnitPosition(bid)
+				
+				gl.DrawGroundCircle(x,y,z, BEACON_TELEPORT_RADIUS, 32)
+			end
 
-	local shift = select (4, spGetModKeyState())
-	for i=1, #beacons do
-		local bid = beacons[i]
-		local tid = Spring.GetUnitRulesParam(bid, "connectto")
-		local team = Spring.GetUnitTeam(tid)
-		if spValidUnitID(tid) and spValidUnitID(bid) and (spec or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
-			
-			gl.Color(0.1, 0.3, 1, 0.9)
-			gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
-			
-			local x,y,z = spGetUnitPosition(bid)
-			
-			gl.DrawGroundCircle(x,y,z, BEACON_TELEPORT_RADIUS, 32)
 		end
 
+		if drawnSomethingYet then
+			gl.DepthTest(false)
+			gl.Color(1,1,1,1)
+			gl.LineStipple(false)
+			
+			gl.PopAttrib()
+		end
 	end
-
-	gl.DepthTest(false)
-	gl.Color(1,1,1,1)
-	gl.LineStipple(false)
-	
-	gl.PopAttrib()
-	
 end
 
 

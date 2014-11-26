@@ -1,13 +1,13 @@
 
 function gadget:GetInfo()
   return {
-	name 	= "Tactical Unit AI",
+	name 	= "91 Tactical Unit AI",
 	desc	= "Implements tactial AI for some units",
 	author	= "Google Frog",
 	date	= "April 20 2010",
 	license	= "GNU GPL, v2 or later",
 	layer	= 0,
-	enabled = not (Game.version:find('91.0') == 1),
+	enabled = (Game.version:find('91.0') == 1) ,
   }
 end
 
@@ -39,7 +39,7 @@ local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local random 				= math.random
 local sqrt 					= math.sqrt
 
-local ClampPosition = Spring.Utilities.ClampPosition
+local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
 
 --------------------------------------------------------------------------------
@@ -72,30 +72,13 @@ local unitAICmdDesc = {
 	params 	= {0, 'AI Off','AI On'}
 }
 --------------------------
----- Move Goal Handling
+---- Unit AI
 --------------------------
+
 local function distance(x1,y1,x2,y2)
 	return sqrt((x1-x2)^2 + (y1-y2)^2)
 end
 
-local function ClampedRawMove(unitID, x, y, z, data)
-	x, z = ClampPosition(x, z)
-	Spring.SetUnitMoveGoal(unitID, x, y, z, 8, nil, true)
-	data.moveGoalSet = true
-end
-
-local function ClearMoveGoal(unitID, data)
-	-- removes move order
-	if data.moveGoalSet then
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {} )
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {} )
-		data.moveGoalSet = false
-	end
-end
-
---------------------------
----- Unit AI
---------------------------
 local function getUnitOrderState(unitID,data,cQueue)
 	-- ret 1: enemy ID, value of -1 means not target and one should be found. Return false means the unit does not want orders from tactical ai.
 	-- ret 2: true if there is a move command at the start of queue which will need removal.
@@ -131,11 +114,48 @@ local function getUnitOrderState(unitID,data,cQueue)
 		elseif (cQueue[1].id == 16) then --  if I target the ground and have fight or patrol command
 			return -1,false
 		end
+	  
+    elseif (cQueue[1].id == CMD_MOVE) and #cQueue > 1 then -- if I am moving
+	
+		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
+		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
+			local fightThree = (#cQueue > 2 and cQueue[3].id == CMD_FIGHT)
+			if fightTwo or (cQueue[2].id == CMD_ATTACK and (movestate ~= 0 or fightThree)) then -- if the next command is attack, patrol or fight
+				local target,check = cQueue[2].params[1],cQueue[2].params[2]
+				if not check then -- if I target a unit
+					local los = spGetUnitLosState(target,data.allyTeam,false)
+					if los then 
+						los = los.los
+					end
+					if not (cQueue[2].id == CMD_FIGHT or fightThree) then -- only skirm single target when given the order manually
+						return target,true
+					else
+						return -1,true
+					end
+				elseif (cQueue[2].id == 16) then -- if I target the ground and have fight or patrol command
+					return -1,true
+				end
+			end
+		end
+
 	end
 
 	return false
 end
 
+local function clearOrder(unitID,data,cQueue)
+	-- removes move order
+	if data.receivedOrder then
+
+		if (#cQueue >= 1 and cQueue[1].id == CMD_MOVE) then -- if I am moving
+			local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
+			if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+			end
+		end
+		data.receivedOrder = false
+	end
+end
 
 local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue,n)
 
@@ -171,7 +191,15 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
                         cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
                     end
                     
-					ClampedRawMove(unitID, cx,cy,cz, data)
+					if move then
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+					else
+						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+					end
+					data.cx,data.cy,data.cz = cx,cy,cz
+					
+					data.receivedOrder = true
 					return true
 				else -- if I can shoot at the enemy
 
@@ -208,7 +236,14 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
 						end
 					end
 					
-					ClampedRawMove(unitID, cx,cy,cz, data)
+					if move then
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+					else
+						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+					end
+					data.cx,data.cy,data.cz = cx,cy,cz
+					data.receivedOrder = true
 				end
 				return true
 			end
@@ -242,7 +277,16 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
                 cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
             end
             
-			ClampedRawMove(unitID, cx,cy,cz, data)
+			if move then
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			else
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			end
+			--Spring.SetUnitMoveGoal(unitID, cx,cy,cz)
+			data.cx,data.cy,data.cz = cx,cy,cz
+				
+			data.receivedOrder = true
 			return true
 		end
 	end
@@ -290,10 +334,18 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 		local cy = uy
 		local cz = uz+(uz-ez)*f
 		
-		ClampedRawMove(unitID, cx,cy,cz, data)
+		if move then
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+		else
+			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+		end
+		
+		data.cx,data.cy,data.cz = cx,cy,cz
+		data.receivedOrder = true
 		return true
-	else
-		ClearMoveGoal(unitID, data)
+	elseif #cQueue > 0 and move then
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
 	return behaviour.skirmKeepOrder
@@ -340,10 +392,22 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQue
 		local cy = uy
 		local cz = uz+(uz-ez)*f
 
-		ClampedRawMove(unitID, cx,cy,cz, data)
+		if #cQueue > 0 then
+			if move then
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+				GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			else
+				GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			end
+		else
+			GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
+		end
+		
+		data.cx,data.cy,data.cz = cx,cy,cz
+		data.receivedOrder = true
 		return true
-	else
-		ClearMoveGoal(unitID, data)
+	elseif #cQueue > 0 and move then
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
 	return false
@@ -373,8 +437,9 @@ local function updateUnits(frame, start, increment)
 			
 			--Spring.Echo("unit parsed")
 			if (not data.active) or spGetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
-				if data.moveGoalSet then
-					ClearMoveGoal(unitID, data)
+				if data.receivedOrder then
+					local cQueue = spGetCommandQueue(unitID,3)
+					clearOrder(unitID,data,cQueue)
 				end
 				break
 			end
@@ -425,19 +490,19 @@ local function updateUnits(frame, start, increment)
 					if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue, frame) then
 						checkSkirm = false
 					else
-						ClearMoveGoal(unitID, data)
+						clearOrder(unitID,data,cQueue)
 					end
 				end
 				if checkSkirm then
 					if enemy and ((los and behaviour.skirms[enemyUnitDef]) or ((not los) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 						--Spring.Echo("unit checking skirm")
 						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame) then
-							ClearMoveGoal(unitID, data)
+							clearOrder(unitID,data,cQueue)
 						end
 					else
 						--Spring.Echo("unit checking flee")
 						if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los,move, cQueue, frame) then
-							ClearMoveGoal(unitID, data)
+							clearOrder(unitID,data,cQueue)
 						end
 					end
 				end
@@ -602,11 +667,12 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		unit[unitID] = {
+			cx = 0, cy = 0, cz = 0,
 			udID = unitDefID,
 			jinkDir = random(0,1)*2-1, 
 			rot = random(0,1)*2-1,
 			active = false,
-			moveGoalSet = false,
+			receivedOrder = false,
 			allyTeam = spGetUnitAllyTeam(unitID),
 		}
 		
