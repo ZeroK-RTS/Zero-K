@@ -602,7 +602,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 		
 		unit[unitID] = {
-			cx = 0, cy = 0, cz = 0,
 			udID = unitDefID,
 			jinkDir = random(0,1)*2-1, 
 			rot = random(0,1)*2-1,
