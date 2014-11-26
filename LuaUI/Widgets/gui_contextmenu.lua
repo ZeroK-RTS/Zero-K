@@ -571,7 +571,6 @@ local function printunitinfo(ud, lang, buttonWidth)
 	if ud.customParams.commtype then
 		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
 		commCost = ud.customParams.cost or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
-		commCost = commCost +0
 	end
 	local cost = numformat(ud.metalCost)
 	if commCost then
