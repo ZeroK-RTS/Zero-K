@@ -104,7 +104,6 @@ function script.BlockShot(num)
 	else
 		if Spring.GetUnitRulesParam(unitID, "selfMoveSpeedChange") ~= FIRE_SLOWDOWN then
 			Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", FIRE_SLOWDOWN)
-			GG.attUnits[unitID] = true
 			GG.UpdateUnitAttributes(unitID)
 		end
 		StartThread(RestoreAfterDelay)

@@ -61,7 +61,6 @@ function Sprint()
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)	
 	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", BOOSTUP_FACTOR)	
 	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 3)
-	GG.attUnits[unitID] = true
 	GG.UpdateUnitAttributes(unitID)
 end
 

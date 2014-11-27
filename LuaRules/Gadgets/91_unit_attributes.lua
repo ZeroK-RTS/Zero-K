@@ -7,13 +7,13 @@ end
 
 function gadget:GetInfo()
    return {
-      name      = "Attributes",
+      name      = "Attributes_91",
       desc      = "Handles UnitRulesParam attributes.",
       author    = "CarRepairer & Google Frog",
       date      = "2009-11-27", --last update 2014-2-19
       license   = "GNU GPL, v2 or later",
       layer     = -1,
-      enabled   = not (Game.version:find('91.0') == 1), 
+      enabled   = (Game.version:find('91.0') == 1), 
    }
 end
 
@@ -72,6 +72,8 @@ local unitForcedOff = {}
 local unitSlowed = {}
 local unitShieldDisabled = {}
 local unitCannotCloak = {}
+
+local attUnits = {}
 
 if not GG.att_reload then
 	GG.att_reload = {}
@@ -264,6 +266,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 end
 
 local function removeUnit(unitID)
+	attUnits[unitID] = nil
 	unitForcedOff[unitID] = nil
 	unitSlowed[unitID] = nil
 	unitShieldDisabled[unitID] = nil
@@ -274,6 +277,10 @@ function GG.UpdateUnitAttributes(unitID, frame)
 	if not spValidUnitID(unitID) then
 		removeUnit(unitID)
 		return
+	end
+	
+	if not attUnits[unitID] then
+		attUnits[unitID] = true
 	end
 	
 	local udid = spGetUnitDefID(unitID)
@@ -372,6 +379,14 @@ function GG.UpdateUnitAttributes(unitID, frame)
 	end
 end
 
+function gadget:GameFrame(f)
+	if f % UPDATE_PERIOD == 1 then
+		for unitID,_ in pairs(attUnits) do
+			GG.UpdateUnitAttributes(unitID, f)
+		end
+	end
+end
+
 function gadget:AllowCommand_GetWantedCommand()
 	return true --{[CMD.ONOFF] = true, [70] = true}
 end
@@ -381,7 +396,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == CMD.ONOFF and unitForcedOff[unitID] ~= nil) then --or (cmdID == 70 and unitSlowed[unitID]) then
+	if (cmdID == CMD.ONOFF and unitForcedOff[unitID] ~= nil) or (cmdID == 70 and unitSlowed[unitID]) then
 		return false
 	else 
 		return true

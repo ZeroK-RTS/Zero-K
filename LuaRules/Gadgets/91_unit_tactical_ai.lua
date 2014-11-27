@@ -1,7 +1,7 @@
 
 function gadget:GetInfo()
   return {
-	name 	= "91 Tactical Unit AI",
+	name 	= "Tactical Unit AI_91",
 	desc	= "Implements tactial AI for some units",
 	author	= "Google Frog",
 	date	= "April 20 2010",

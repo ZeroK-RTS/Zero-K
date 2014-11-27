@@ -378,7 +378,6 @@ function script.FireWeapon(num)
 		Spring.SetUnitWeaponState(unitID, 1, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 		dgunning = true
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
-		GG.attUnits[unitID] = true
 		GG.UpdateUnitAttributes(unitID)
 		Sleep(SALVO_TIME)
 		dgunning = false

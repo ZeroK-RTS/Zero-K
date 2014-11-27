@@ -1,7 +1,7 @@
 
 function gadget:GetInfo()
   return {
-    name      = "91 Teleporter",
+    name      = "Teleporter_91",
     desc      = "Implements mass teleporter",
     author    = "Google Frog",
     date      = "29 Feb 2012",

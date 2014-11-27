@@ -237,7 +237,6 @@ end
 function ClusterBomb()
 	StartThread(ClusterBombThread)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SLOWDOWN_FACTOR)
-	GG.attUnits[unitID] = true
 	GG.UpdateUnitAttributes(unitID)
 	--local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	--local hSpeed = math.sqrt(vx^2 + vz^2)

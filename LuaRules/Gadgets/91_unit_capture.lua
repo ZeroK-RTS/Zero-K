@@ -268,7 +268,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			reloading[frame] = reloading[frame] or {count = 0, data = {}}
 			reloading[frame].count = reloading[frame].count + 1
 			reloading[frame].data[reloading[frame].count] = attackerID
-			GG.attUnits[attackerID] = true
 		end
 		
 		-- destroy the unit if the controller is set to destroy units
