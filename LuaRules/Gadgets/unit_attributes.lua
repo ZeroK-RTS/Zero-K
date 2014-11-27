@@ -37,6 +37,7 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spSetUnitBuildSpeed   = Spring.SetUnitBuildSpeed
 local spSetUnitWeaponState  = Spring.SetUnitWeaponState
 local spGetUnitWeaponState  = Spring.GetUnitWeaponState
+local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 
 local spGetUnitMoveTypeData    = Spring.GetUnitMoveTypeData
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
@@ -49,6 +50,7 @@ local getMovetype = Spring.Utilities.getMovetype
 local spSetUnitCOBValue = Spring.SetUnitCOBValue
 local COB_MAX_SPEED = COB.MAX_SPEED
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
+local CMD_WAIT = CMD.WAIT
 
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
@@ -67,6 +69,12 @@ local ableToForceOff = {
 local origUnitSpeed = {}
 local origUnitReload = {}
 local origUnitBuildSpeed = {}
+
+local currentEcon = {}
+local currentReload = {}
+local currentMovement = {}
+local currentTurn = {}
+local currentAcc = {}
 
 local unitForcedOff = {}
 local unitSlowed = {}
@@ -222,7 +230,6 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 				maxAcc          = state.origMaxAcc      *maxAccelerationFactor, --(speedFactor > 0.001 and speedFactor or 0.001)
 			}
 			spSetAirMoveTypeData (unitID, attribute)
-			spSetAirMoveTypeData (unitID, attribute)
 		elseif state.movetype == 1 then
 			local attribute =  {
 				maxSpeed        = state.origSpeed       *speedFactor,
@@ -231,7 +238,6 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 				accRate         = state.origMaxAcc      *(speedFactor > 0.001 and speedFactor or 0.001),
 				--decRate         = state.origMaxDec      *(speedFactor > 0.01  and speedFactor or 0.01)
 			}
-			spSetGunshipMoveTypeData (unitID, attribute)
 			spSetGunshipMoveTypeData (unitID, attribute)
 		elseif state.movetype == 2 then
 			if workingGroundMoveType then
@@ -252,7 +258,6 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 					attribute.turnAccel = state.origTurnRate*turnAccelFactor
 				end
 				spSetGroundMoveTypeData (unitID, attribute)
-				spSetGroundMoveTypeData (unitID, attribute)
 			else
 				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
 				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB_MAX_SPEED))
@@ -268,6 +273,11 @@ local function removeUnit(unitID)
 	unitSlowed[unitID] = nil
 	unitShieldDisabled[unitID] = nil
 	unitCannotCloak[unitID] = nil 
+	currentEcon[unitID] = nil 
+	currentReload[unitID] = nil 
+	currentMovement[unitID] = nil 
+	currentTurn[unitID] = nil 
+	currentAcc[unitID] = nil 
 end
 
 function GG.UpdateUnitAttributes(unitID, frame)
@@ -313,11 +323,23 @@ function GG.UpdateUnitAttributes(unitID, frame)
 		
 		GG.att_reload[unitID] = reloadMult
 		unitSlowed[unitID] = moveMult < 1
-	
-		updateReloadSpeed(unitID, ud, reloadMult, frame)
-		updateMovementSpeed(unitID,ud, moveMult, turnMult,maxAccMult)
-		updateBuildSpeed(unitID, ud, econMult)
-		updateEconomy(unitID, ud, econMult)
+		if reloadMult ~= currentReload[unitID] then
+			updateReloadSpeed(unitID, ud, reloadMult, frame)
+			currentReload[unitID] = reloadMult
+		end
+		
+		if currentMovement[unitID] ~= moveMult or currentTurn[unitID] ~= turnMult or currentAcc[unitID] ~= maxAccMult then
+			updateMovementSpeed(unitID,ud, moveMult, turnMult,maxAccMult)
+			currentMovement[unitID] = moveMult
+			currentTurn[unitID] = turnMult
+			currentAcc[unitID] = maxAccMult
+		end
+		
+		if econMult ~= currentEcon[unitID] then
+			updateBuildSpeed(unitID, ud, econMult)
+			updateEconomy(unitID, ud, econMult)
+			currentEcon[unitID] = econMult
+		end
 		if econMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 or turnMult ~= 1 or maxAccMult ~= 1 then
 			changedAtt = true
 		end
@@ -381,7 +403,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == CMD.ONOFF and unitForcedOff[unitID] ~= nil) then --or (cmdID == 70 and unitSlowed[unitID]) then
+	if (cmdID == CMD.ONOFF and unitForcedOff[unitID] ~= nil) or (cmdID == 70 and unitSlowed[unitID]) then
 		return false
 	else 
 		return true
