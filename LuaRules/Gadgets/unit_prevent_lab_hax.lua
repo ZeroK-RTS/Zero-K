@@ -22,12 +22,13 @@ end
 local spGetGroundHeight        = Spring.GetGroundHeight
 local spGetUnitBuildFacing     = Spring.GetUnitBuildFacing
 local spGetUnitAllyTeam        = Spring.GetUnitAllyTeam
-local spGetUnitsInBox          = Spring.GetUnitsInBox
+local spGetUnitsInRectangle    = Spring.GetUnitsInRectangle
 local spSetUnitPosition        = Spring.SetUnitPosition
 local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
 local spGetUnitDirection       = Spring.GetUnitDirection
 local spGetUnitVelocity        = Spring.GetUnitVelocity
+local spSetUnitVelocity        = Spring.SetUnitVelocity
 local spGiveOrderToUnit        = Spring.GiveOrderToUnit
 local spGetUnitTeam            = Spring.GetUnitTeam
 local spGetUnitIsStunned       = Spring.GetUnitIsStunned
@@ -70,7 +71,7 @@ function checkLabs(checkFeatures)
 	local data, units, features
 	for i = 1, labList.count do
 		data = labData[i]
-		units = spGetUnitsInBox(data.minx-8, data.miny, data.minz-8, data.maxx+8, data.maxy, data.maxz+8)
+		units = spGetUnitsInRectangle(data.minx-8, data.minz-8, data.maxx+8, data.maxz+8)
 		features = spGetFeaturesInRectangle(data.minx, data.minz, data.maxx, data.maxz)
 
 		for i=1,#units do
@@ -84,8 +85,9 @@ function checkLabs(checkFeatures)
 			if not fly and spMoveCtrlGetTag(unitID) == nil then
 				if (ally ~= data.ally) then --teleport unit away
 					local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(unitID, true, true)
+					local vx, vy, vz = spGetUnitVelocity(unitID)
 
-					if aimY > -12 then
+					if aimY > -12 and aimY >= data.miny and aimY <= data.maxy then
 						local l = abs(ux-data.minx)
 						local r = abs(ux-data.maxx)
 						local t = abs(uz-data.minz)
@@ -95,12 +97,16 @@ function checkLabs(checkFeatures)
 
 						if (side == l) then
 							spSetUnitPosition(unitID, data.minx-8, uz, true)
+							spSetUnitVelocity(unitID, 0, vy, vz)
 						elseif (side == r) then
 							spSetUnitPosition(unitID, data.maxx+8, uz, true)
+							spSetUnitVelocity(unitID, vx, vy, 0)
 						elseif (side == t) then
 							spSetUnitPosition(unitID, ux, data.minz-8, true)
+							spSetUnitVelocity(unitID, 0, vy, vz)
 						else
 							spSetUnitPosition(unitID, ux, data.maxz+8, true)
+							spSetUnitVelocity(unitID, vx, vy, 0)
 						end
 
 					end		
@@ -235,8 +241,8 @@ function gadget:UnitGiven(unitID, unitDefID,unitTeam)
 end
 
 function gadget:GameFrame(n)
-	if n%2 == 0 then
-		checkLabs(n%30 == 0)
+	if n%5 == 0 then
+		checkLabs(n%60 == 0)
 	end
 end
 
