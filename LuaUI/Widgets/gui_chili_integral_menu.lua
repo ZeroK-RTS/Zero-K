@@ -42,13 +42,57 @@ NOTE FOR OTHER GAME DEVS:
 	If you're not using them (likely), remove all lines containing that function.
 --]]
 
+-- Chili classes
+local Chili
+local Button
+local Label
+local Colorbars
+local Checkbox
+local Window
+local Panel
+local StackPanel
+local TextBox
+local Image
+local Progressbar
+local Control
+
+-- Chili instances
+local screen0
+local window		--main window (invisible)
+local fakewindow	--visible Panel
+local menuTabRow	--parent row of tabs
+local menuTabs = {}		--buttons
+local commands_main	--parent column of command buttons
+local sp_commands = {}	--buttons
+local states_main	--parent row of state buttons
+local sp_states = {}	--buttons
+local buildRow	--row of build queue buttons
+local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
+local buildProgress	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
+local buildRow_dragDrop = {nil,nil,nil} --current buildqueue that is being dragged by user.
+
+local buildRow_visible = false
+local buildQueue = {}	--build order table of selectedFac
+local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
+
+local gridLocation = {}
+
 ------------------------
 --  CONFIG
 ------------------------
 ------------------------
 options_path = 'Settings/HUD Panels/Command Panel'
-options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown'}
+options_order = { 'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown'}
 options = {
+	background_opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0.8, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			fakewindow.backgroundColor = {1,1,1,self.value}
+			fakewindow:Invalidate()
+		end,
+	},
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
 		type = 'bool',
@@ -262,41 +306,6 @@ local reloadableButton = {
 	[CMD_ONECLICK_WEAPON] = {progress=0,status=nil},
 	[CMD_JUMP] = {progress=0,status=nil},
 }
-
--- Chili classes
-local Chili
-local Button
-local Label
-local Colorbars
-local Checkbox
-local Window
-local Panel
-local StackPanel
-local TextBox
-local Image
-local Progressbar
-local Control
-
--- Chili instances
-local screen0
-local window		--main window (invisible)
-local fakewindow	--visible Panel
-local menuTabRow	--parent row of tabs
-local menuTabs = {}		--buttons
-local commands_main	--parent column of command buttons
-local sp_commands = {}	--buttons
-local states_main	--parent row of state buttons
-local sp_states = {}	--buttons
-local buildRow	--row of build queue buttons
-local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
-local buildProgress	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
-local buildRow_dragDrop = {nil,nil,nil} --current buildqueue that is being dragged by user.
-
-local buildRow_visible = false
-local buildQueue = {}	--build order table of selectedFac
-local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
-
-local gridLocation = {}
 
 -- arrays with commands to be displayed 
 local n_common = {}
@@ -1349,7 +1358,7 @@ function widget:Initialize()
 		draggable = false,
 		resizable = false,
 		padding = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, 0.8},
+		backgroundColor = {1, 1, 1, options.background_opacity.value},
 --		skinName  = "DarkGlass",
 	}
 
