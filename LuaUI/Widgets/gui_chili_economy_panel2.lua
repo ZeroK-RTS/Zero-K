@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = true
+    enabled   = false
   }
 end
 
@@ -536,7 +536,7 @@ function CreateWindow()
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
-		name="EconomyPanel",
+		name="EconomyPanel2",
 		padding = {0,0,0,0},
 		-- right = "50%",
 		x = screenHorizCentre - economyPanelWidth/2,
