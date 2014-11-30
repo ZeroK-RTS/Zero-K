@@ -83,7 +83,6 @@ local function setFlyLow(unitID, height)
 		Spring.MoveCtrl.SetAirMoveTypeData(unitID, bombers[unitID].lowBehaviour)
 	end
 	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.8)	
-	--GG.attUnits[unitID] = true
 	--GG.UpdateUnitAttributes(unitID)
 	--GG.UpdateUnitAttributes(unitID)
 end

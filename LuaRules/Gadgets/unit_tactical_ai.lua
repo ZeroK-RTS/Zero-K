@@ -252,7 +252,7 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
 end
 
 
-local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n)
+local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move,n)
 
 	local data = unit[unitID]
 	
@@ -378,7 +378,7 @@ local function updateUnits(frame, start, increment)
 				end
 				break
 			end
-			local cQueue = spGetCommandQueue(unitID,3)
+			local cQueue = spGetCommandQueue(unitID,2)
 			local enemy,move = getUnitOrderState(unitID,data,cQueue) -- returns target enemy and movement state
 			--local ux,uy,uz = spGetUnitPosition(unitID)
 			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")
@@ -431,7 +431,7 @@ local function updateUnits(frame, start, increment)
 				if checkSkirm then
 					if enemy and ((los and behaviour.skirms[enemyUnitDef]) or ((not los) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 						--Spring.Echo("unit checking skirm")
-						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame) then
+						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, frame) then
 							ClearMoveGoal(unitID, data)
 						end
 					else

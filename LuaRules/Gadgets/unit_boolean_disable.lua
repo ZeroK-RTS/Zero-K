@@ -69,7 +69,6 @@ local f = 0 -- frame, set in game frame
 
 local function applyEffect(unitID)
 	Spring.SetUnitRulesParam(unitID, "disarmed", 1, LOS_ACCESS)
-	GG.attUnits[unitID] = true
 	GG.UpdateUnitAttributes(unitID)
 end
 

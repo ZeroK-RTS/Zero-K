@@ -73,6 +73,7 @@ local function updateSlow(unitID, state)
 		local percentSlow = state.slowDamage/health
 
 		spSetUnitRulesParam(unitID,"slowState",percentSlow, LOS_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
 	end
 end
 
@@ -101,7 +102,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			degradeTimer = DEGRADE_TIMER,
 			perma = false,
 		}
-		GG.attUnits[unitID] = true -- unit with attribute change to be handled by unit_attributes
 	end
 
 	-- add slow damage
@@ -190,7 +190,6 @@ local function addSlowDamage(unitID, damage)
 			degradeTimer = DEGRADE_TIMER,
 			perma = false,
 		}
-		GG.attUnits[unitID] = true -- unit with attribute change to be handled by unit_attributes
 	end
 
 	-- add slow damage

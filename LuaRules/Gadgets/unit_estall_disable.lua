@@ -138,7 +138,6 @@ function gadget:GameFrame(n)
 							data.changeStateTime = gameSeconds
 							disabledUnits[unitID] = energyUpkeep
 							Spring.SetUnitRulesParam(unitID,"forcedoff", 1)
-							GG.attUnits[unitID] = true
 							GG.UpdateUnitAttributes(unitID)
 						end
 					end

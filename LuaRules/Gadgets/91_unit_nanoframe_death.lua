@@ -4,7 +4,7 @@
 
 function gadget:GetInfo()
 	return {
-		name     = "Nano Frame Death Handeling91",
+		name     = "Nano Frame Death Handeling_91",
 		desc     = "Makes nanoframes explode if above X% completetion and makes dying nanoframes leave wrecks.",
 		author	 = "Google Frog",
 		date     = "Mar 29, 2009",

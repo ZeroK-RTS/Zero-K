@@ -4,7 +4,7 @@
 
 function gadget:GetInfo()
   return {
-    name      = "LupsNanoSpray91",
+    name      = "LupsNanoSpray_91",
     desc      = "Wraps the nano spray to LUPS",
     author    = "jK",
     date      = "2008-2010",

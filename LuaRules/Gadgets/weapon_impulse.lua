@@ -240,7 +240,6 @@ local function CheckSpaceGunships(f)
 			if (uy-groundHeight) > BALLISTIC_GUNSHIP_HEIGHT then
 				if not data.inSpace then
 					--Spring.SetUnitRulesParam(unitID, "inSpace", 1)
-					GG.attUnits[unitID] = true
 					GG.UpdateUnitAttributes(unitID)
 					data.inSpace = true
 				end
@@ -248,7 +247,6 @@ local function CheckSpaceGunships(f)
 			else
 				if data.inSpace then
 					--Spring.SetUnitRulesParam(unitID, "inSpace", 0)
-					GG.attUnits[unitID] = true
 					GG.UpdateUnitAttributes(unitID)
 					data.inSpace = false
 				end
