@@ -49,7 +49,6 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
-local col_buildpower = {0.3, 0.8, 0.2, 1}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -71,16 +70,6 @@ local lbl_expense_energy
 local lbl_income_metal
 local lbl_income_energy
 
-local image_buildpower
-local lbl_buildpower
-local bar_buildpower
-
-local window_metal_proportion
-local bar_proportion
-local metal_proportion_warn_label
-local metal_proportion_label
-local image_proportion_center
-
 local positiveColourStr
 local negativeColourStr
 local col_income
@@ -92,24 +81,8 @@ local blink_periode = 1.4
 local blink_alpha = 1
 local blinkM_status = false
 local blinkE_status = false
-local blinkProp_status = false
-local blink_caption = false 
 local time_old = 0
 local excessE = false
-
-local multiColorMult = 0.6
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local builderDefs = {}
-for id,ud in pairs(UnitDefs) do
-	if (ud.isBuilder) then
-		builderDefs[#builderDefs+1] = id
-	elseif (ud.buildSpeed > 0) then
-		builderDefs[#builderDefs+1] = id
-	end
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -226,7 +199,6 @@ function UpdateEconomyDataFromRulesParams()
 	WG.allies = allies
 end
 
-
 local function updateReserveBars(metal, energy, value, overrideOption)
 	if options.enableReserveBar.value or overrideOption then
 		if value < 0 then value = 0 end
@@ -245,7 +217,6 @@ local function updateReserveBars(metal, energy, value, overrideOption)
 		end
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -268,39 +239,13 @@ function widget:Update(s)
 	--Colour strings are only used for the flashing captions because engine 91.0 has a bug that keeps the string showing when the colour is changed to {0,0,0,0}
 	--Once engine 97+ is adopted officially, the captions should use SetColor (followed by Invalidate if that remains necessary)
 
-	if blinkProp_status then
-		blink_caption = true
-		-- metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.5}, {col_expense[1], col_expense[2], col_expense[3], 0.5}, blink_alpha)).."Build Energy")
-		bar_proportion.bars[2].color1 = Mix({col_metal[1], col_metal[2], col_metal[3], 0.35}, {col_expense[1], col_expense[2], col_expense[3], 1}, sawtooth)
-		bar_proportion.bars[2].color2 = Mix(
-			{col_metal[1]*multiColorMult, col_metal[2]*multiColorMult, col_metal[3]*multiColorMult, 0.35}, 
-			{col_expense[1]*multiColorMult, col_expense[2]*multiColorMult, col_expense[3]*multiColorMult, 1}, 
-			sawtooth)
-		bar_proportion:Invalidate()
-	end
-
-	if blinkM_status then
-		-- metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Make Workers")
+	if blinkM_status then\
 		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
 	end
 
 	if blinkE_status then
-		-- if excessE then
-			-- bar_overlay_energy:SetColor({0,0,0,0})
-            -- bar_energy:SetColor(Mix({col_energy[1], col_energy[2], col_energy[3], 0.65}, col_overdrive, blink_alpha))
-		-- else
-			-- flash red if stalling
-			--Spring.Echo("{"..col_expense[1]..", "..col_expense[2]..", "..col_expense[3]..", "..blink_alpha.."}")
-			-- metal_proportion_warn_label:SetCaption(Chili.color2incolor(Mix(col_metal, col_expense, blink_alpha)).."Build Energy")
-			bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
-		-- end
+		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
 	end
-
-	if (blink_caption or reverseCompatibility) and (not blinkProp_status) and (not blinkE_status) and (not blinkM_status) then
-		blink_caption = false
-		-- metal_proportion_warn_label:SetCaption("")
-	end
-
 end
 
 local function Format(input, override)
@@ -565,11 +510,6 @@ function widget:Initialize()
 end
 
 function CreateWindow()
-
-	local function p(a)
-		return tostring(a).."%"
-	end
-
 	local function SetReserveByMouse(self, x, y, mouse, metal)
 		local reserve = (x) / (self.width - self.padding[1] - self.padding[3])
 		if mouse ~= 1 then
@@ -944,9 +884,6 @@ function CreateWindow()
 	function lbl_income_metal:HitTest(x,y) return self end
 	function lbl_expense_energy:HitTest(x,y) return self end
 	function lbl_expense_metal:HitTest(x,y) return self end
-	-- function bar_proportion:HitTest(x,y) return self end
-	-- function metal_proportion_label:HitTest(x,y) return self end
-	
 end
 
 function DestroyWindow()
