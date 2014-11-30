@@ -81,7 +81,7 @@ local function GameFrameUnitsCheck()
       speed = def.minSpeed
     end
     
-    if delta > 0.01 or delta < 0.01 then
+    if delta > 0.01 or delta < -0.01 then
       data.speed = speed
       local modDelta = delta + delta*def.accelMod -- give bigger thrust when accelerating then when at constant speed
       local modSpeed = speed + modDelta
