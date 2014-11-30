@@ -239,7 +239,7 @@ function widget:Update(s)
 	--Colour strings are only used for the flashing captions because engine 91.0 has a bug that keeps the string showing when the colour is changed to {0,0,0,0}
 	--Once engine 97+ is adopted officially, the captions should use SetColor (followed by Invalidate if that remains necessary)
 
-	if blinkM_status then\
+	if blinkM_status then
 		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
 	end
 
