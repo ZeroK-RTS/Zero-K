@@ -60,7 +60,9 @@ local weaponPieces = {
 	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye},
 	[2] = {turret = l_turret, sleeve = l_pivot, flare = l_flare, normal = {1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), -1/math.sqrt(2), 0} },
 	[3] = {turret = r_turret, sleeve = r_pivot, flare = r_flare, normal = {-1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), 1/math.sqrt(2), 0}},
-	[4] = {turret = b_eye, sleeve = b_eye, flare = b_eye}
+	[4] = {turret = l_turret, sleeve = l_pivot, flare = l_flare, normal = {1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), -1/math.sqrt(2), 0} },
+	[5] = {turret = r_turret, sleeve = r_pivot, flare = r_flare, normal = {-1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), 1/math.sqrt(2), 0}},
+	[6] = {turret = b_eye, sleeve = b_eye, flare = b_eye}
 }
 
 --constants
@@ -80,13 +82,13 @@ local drop = .8
 
 local dirtfling = 1024
 local muzzle_flash = 1025
-local crater = 4099
+local crater = 4101
 
 --variables
 
 --signals
 local walk = 2
-local SIG_Aim = { [2] = 4, [3] = 8 }
+local SIG_Aim = { [2] = 4, [3] = 8, [4] = 16, [5] = 32  }
 
 local function Walk()
 	Signal( walk )
@@ -427,7 +429,14 @@ function script.AimWeapon(num, heading, pitch )
 	Signal( SIG_Aim[num] )
 	SetSignalMask( SIG_Aim[num])
 	
-	if num == 2 or num == 3 then
+	if num == 2 or num == 3 or num == 4 or num == 5 then
+	
+		local states = Spring.GetUnitStates(unitID)
+		
+		if (states.active and (num == 2 or num == 3)) or (not states.active and (num == 4 or num == 5)) then
+			return false
+		end
+		
 		local theta, phi = getTheActuallyCorrectHeadingAndPitch(heading, pitch, weaponPieces[num].normal, weaponPieces[num].radial, weaponPieces[num].right)
 		
 		Turn( weaponPieces[num].turret, y_axis, theta, 12 )
@@ -440,7 +449,7 @@ function script.AimWeapon(num, heading, pitch )
 end
 
 function script.BlockShot(num)
-	return (num == 1) or (num == 4)	-- don't allow weapon 1 or 4 to fire
+	return (num == 1) or (num == 6)
 end
 
 --function script.FireWeapon(num)
