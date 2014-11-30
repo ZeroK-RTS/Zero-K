@@ -280,7 +280,7 @@ local function removeUnit(unitID)
 	currentAcc[unitID] = nil 
 end
 
-function GG.UpdateUnitAttributes(unitID, frame)
+function UpdateUnitAttributes(unitID, frame)
 	if not spValidUnitID(unitID) then
 		removeUnit(unitID)
 		return
@@ -392,6 +392,10 @@ function GG.UpdateUnitAttributes(unitID, frame)
 	if not changedAtt then
 		removeUnit(unitID)
 	end
+end
+
+function gadget:Initialize()
+	GG.UpdateUnitAttributes = UpdateUnitAttributes
 end
 
 function gadget:AllowCommand_GetWantedCommand()

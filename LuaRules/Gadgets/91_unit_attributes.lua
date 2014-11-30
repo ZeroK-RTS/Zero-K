@@ -75,10 +75,6 @@ local unitCannotCloak = {}
 
 local attUnits = {}
 
-if not GG.att_reload then
-	GG.att_reload = {}
-end
-
 local function updateBuildSpeed(unitID, ud, speedFactor)	
 
     if ud.buildSpeed == 0 then
@@ -273,7 +269,7 @@ local function removeUnit(unitID)
 	unitCannotCloak[unitID] = nil 
 end
 
-function GG.UpdateUnitAttributes(unitID, frame)
+local function UpdateUnitAttributes(unitID, frame)
 	if not spValidUnitID(unitID) then
 		removeUnit(unitID)
 		return
@@ -372,10 +368,16 @@ function GG.UpdateUnitAttributes(unitID, frame)
 		Spring.SetUnitCloak(unitID, false, false)
 		unitCannotCloak[unitID] = nil
 	end
-
 	-- remove the attributes if nothing is being changed
 	if not changedAtt then
 		removeUnit(unitID)
+	end
+end
+
+function gadget:Initialize()
+	GG.UpdateUnitAttributes = UpdateUnitAttributes
+	if not GG.att_reload then
+		GG.att_reload = {}
 	end
 end
 

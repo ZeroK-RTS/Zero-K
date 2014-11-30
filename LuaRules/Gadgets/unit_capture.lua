@@ -395,10 +395,6 @@ local function getMastermind(unitID)
   end
 end
 
--- morph uses this
-GG.getMastermind = getMastermind
-GG.setMastermind = setMastermind
-
 --------------------------------------------------------------------------------
 -- Unit Handling
 
@@ -460,6 +456,10 @@ end
 ------------------------------------------------------
 
 function gadget:Initialize()
+	-- morph uses this
+	GG.getMastermind = getMastermind
+	GG.setMastermind = setMastermind
+
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_KILL_SUBORDINATES)
 	
