@@ -34,6 +34,9 @@ local spSetCameraState          = Spring.SetCameraState
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:Update(dt)
+	if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+		return
+	end
 	local cs = spGetCameraState()
 	spSetCameraState(cs, options.camSpeed.value)
 end 
