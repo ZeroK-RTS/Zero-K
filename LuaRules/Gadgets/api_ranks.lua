@@ -21,9 +21,6 @@ if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
-Spring.SetExperienceGrade (0.0005) -- UnitExperience call frequency (less = more often)
-Spring.SetGameRulesParam ("xp_per_rank", XP_PER_RANK)
-
 GG.UnitRankUp = {}
 
 local access_table = { inlos = true }
@@ -43,6 +40,11 @@ function gadget:UnitExperience (unitID, unitDefID, unitTeam, newxp, oldxp)
 			f (unitID, unitDefID, unitTeam, newxp, oldxp)
 		end
 	end
+end
+
+function gadget:Initialize()
+	Spring.SetExperienceGrade (0.0005) -- UnitExperience call frequency (less = more often)
+	Spring.SetGameRulesParam ("xp_per_rank", XP_PER_RANK)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
