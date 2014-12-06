@@ -67,6 +67,8 @@ WG.LocalColor.listeners = WG.LocalColor.listeners or {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local is_speccing
+
 local function SetNewTeamColors() 
 	local gaia = Spring.GetGaiaTeamID()
 	Spring.SetTeamColor(gaia, unpack(gaiaColor))
@@ -85,7 +87,9 @@ local function SetNewTeamColors()
 			Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
 		end
 	end
-	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+	if not is_speccing then
+		Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+	end
 end
 
 local function SetNewSimpleTeamColors() 
@@ -103,7 +107,9 @@ local function SetNewSimpleTeamColors()
 			Spring.SetTeamColor(teamID, unpack(enemyColors[1]))
 		end
 	end
-	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+	if not is_speccing then
+		Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+	end
 end
 
 local function ResetOldTeamColors()
@@ -139,6 +145,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
+	is_speccing = Spring.GetSpectatingState()
 	if options.simpleColors.value then
 		SetNewSimpleTeamColors()
 	else
