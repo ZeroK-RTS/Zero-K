@@ -86,7 +86,8 @@ local MESSAGE_RULES = {
 	label = { format = '#p *** $playername added label \'$argument\'' },
 	point = { format = '#p *** $playername added point' },
 	autohost = { format = '#o> $argument', noplayername = true },
-	other = { format = '#o$text' } -- no pattern... will match anything else
+	other = { format = '#o$text' }, -- no pattern... will match anything else
+	game_message = { format = '#o$text' } -- no pattern...
 }
 
 --------------------------------------------------------------------------------
@@ -567,8 +568,6 @@ end
 local function MessageIsChatInfo(msg)
 	return string.find(msg.argument,'enabled!') or
 	string.find(msg.argument,'disabled!') or 
-	string.find(msg.argument,'Wind Range') or
-	string.find(msg.argument,'utogroup') or
 	string.find(msg.argument,'Speed set to') or
 	string.find(msg.argument,'following') or
 	string.find(msg.argument,'Connection attempted') or
@@ -581,8 +580,7 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'Cheating is') or
 	string.find(msg.argument,'resigned and is now spectating') or
 	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
-	string.find(msg.argument,'Team') or --endgame comedic message (hopefully 'Team' with capital 'T' is not used anywhere else)
-	string.find(msg.argument,'AFK')     --& AFK/lagmonitor message
+	string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
 end
 
 local function hideMessage(msg)
