@@ -206,7 +206,7 @@ end
 
 local function  DrawMouseArc(unitID, shift, groundPos, quality)
 	local unitDefID = spGetUnitDefID(unitID)
-	if (not groundPos or not UnitDefs[unitDefID].customParams.canjump == "1") then
+	if not(groundPos and UnitDefs[unitDefID].customParams.canjump == "1") then
 		return
 	end
 
