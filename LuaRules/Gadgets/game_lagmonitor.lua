@@ -266,7 +266,7 @@ function gadget:GameFrame(n)
 			if not (spec or isAI) then
 				if (afkTeams[team] == true) then  -- team was AFK
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
-						spEcho("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
+						spEcho("game_message: Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
 						
 						for unitID, teamList in pairs(lineage) do --Return unit to the oldest inheritor (or to original owner if possible)
@@ -362,9 +362,9 @@ function gadget:GameFrame(n)
 
 						-- Send message
 						if lagger.resigned then
-							spEcho(lagger.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name .. " (ally #".. allyTeam ..")")
+							spEcho("game_message: " .. lagger.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name .. " (ally #".. allyTeam ..")")
 						else
-							spEcho("Giving all units of "..lagger.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
+							spEcho("game_message: Giving all units of "..lagger.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
 						end
 					end
 				end	-- if
