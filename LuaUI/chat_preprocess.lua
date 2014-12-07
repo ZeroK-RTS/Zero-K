@@ -58,6 +58,7 @@ MessageProcessor.MESSAGE_DEFINITIONS = {
 	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', discard = true }, -- NOTE : these messages are discarded -- points and labels are provided through MapDrawCmd() callin
 	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', discard = true },
 	{ msgtype = 'autohost', pattern = '^> (.+)', noplayername = true },
+	{ msgtype = 'game_message', pattern = '^game_message:(.)(.*)', isgamemessage = true },
 	{ msgtype = 'other' } -- no pattern... will match anything else
 }
 
@@ -90,23 +91,27 @@ end
 
 local function SetupPlayers()
 	local playerroster = Spring.GetPlayerList()
+	local spGetPlayerInfo = Spring.GetPlayerInfo
 	
 	for i, id in ipairs(playerroster) do
-		local name,active, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(id)
+		local name,active, spec, teamId, allyTeamId, _,_,_,_,customkeys = spGetPlayerInfo(id)
 		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
 	end
 	
 	-- register any AIs
 	-- Copied from gui_chili_crudeplayerlist.lua
 	local teamsSorted = Spring.GetTeamList()
+	local gaiaTeamID = Spring.GetGaiaTeamID()
+	local spGetTeamInfo = Spring.GetTeamInfo
+	local spGetAIInfo = Spring.GetAIInfo
 	for i=1,#teamsSorted do
 		local teamID = teamsSorted[i]
-		if teamID ~= Spring.GetGaiaTeamID() then
-			local _,_,_,isAI,_,allyTeamId = Spring.GetTeamInfo(teamID)
+		if teamID ~= gaiaTeamID then
+			local _,_,_,isAI,_,allyTeamId = spGetTeamInfo(teamID)
 			if isAI then
-				local skirmishAIID, name = Spring.GetAIInfo(teamID)
-				--Note: compared to botnames in crude playerlist, we did not include shortname. eg: crudes_playerlist_botname = '<'.. name ..'> '.. shortName
-				--Note2: to make AI appears like doing an ally chat, include string "Allies: " in echo, like: Spring.Echo("<botname> Allies: bot_say_something")
+				local skirmishAIID, name = spGetAIInfo(teamID)
+				--Note: to make AI appears like its doing an ally chat, do: Spring.Echo("<botname> Allies: bot_say_something")
+				--Note2: <botname> only use name and not shortname. For comparison, crude playerlist botname is: '<'.. name ..'> '.. shortName
 				players[name] = { id = skirmishAIID, allyTeamId = allyTeamId, isAI = true}
 			end
 		end --if teamID ~= Spring.GetGaiaTeamID() 
@@ -115,7 +120,7 @@ end
 
 local function getSource(spec, allyTeamId)
 	return (spec and 'spec')
-		or ((Spring.GetMyAllyTeamID () == allyTeamId) and 'ally')
+		or ((Spring.GetMyAllyTeamID() == allyTeamId) and 'ally')
 		or 'enemy'
 end
 
@@ -129,13 +134,23 @@ function MessageProcessor:ParseMessage(msg)
 	  msg.source = 'other'
       return
     end
+	--else
     local capture1, capture2 = msg.text:match(candidate.pattern)
     if capture1 then
       msg.msgtype = candidate.msgtype
       if candidate.noplayername then
         msg.argument = capture1
-	    msg.source = 'other'
-	    return
+        msg.source = 'other'
+        return
+      elseif candidate.isgamemessage then
+        local message = capture2
+        if (capture1 ~= " ") then --skip any whitespace 1st char after "game_message:" (for display tidyness!)
+            message = capture1 .. message
+        end
+        msg.text = message
+        msg.argument = message
+        msg.source = 'widget/gadget'
+        return
       else
         local playername = capture1
 		local player = players[playername]
