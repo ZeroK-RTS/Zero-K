@@ -72,7 +72,7 @@ function gadget:GameFrame(n)
 		if (n==48) then
 			local windMinStr = windMin .. ''
 			local windMaxStr = windMax .. ''
-			Spring.SendMessage('Wind Range: '.. windMinStr:sub(1,5) ..' - '.. windMaxStr:sub(1,5) ..'. Max Windmill altitude bonus is: ' .. string.format('%.2f',slope)*100 .. '%' )
+			Spring.SendMessage('game_message: Wind Range: '.. windMinStr:sub(1,5) ..' - '.. windMaxStr:sub(1,5) ..'. Max Windmill altitude bonus is: ' .. string.format('%.2f',slope)*100 .. '%' )
 		end
 		if (next(windmills)) then
       

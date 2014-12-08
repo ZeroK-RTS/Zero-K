@@ -81,8 +81,9 @@ function widget:SelectionChanged(selection)
   end
 end
 ----------------------------------------------------
---SelectNextPlayer button (7.3.2013 by msafwan)----
---note: Spring 91's PlayerRoster return isSpec as number 1 or 0, in Spring 93.2 it return boolean.
+--code for "SelectNextPlayer" button----
+--pressing the button will cycle view thru available teams flawlessly--
+--code compatibility note: Spring 91's PlayerRoster return "isSpec" as number 1 or 0, but in Spring 93.2 it return it as boolean.
 
 SelectNextPlayer = function ()
 	local currentTeam = Spring.GetLocalTeamID()
@@ -123,7 +124,7 @@ SelectNextPlayer = function ()
 			end
 		end
 		spSendCommands("specteam "..playerTableSortTeamID[teamIndexGoto][3])
-		Spring.Echo("Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
+		Spring.Echo("game_message:Spectating team: " .. playerTableSortTeamID[teamIndexGoto][1]) --player's name
 		local teamsUnit = Spring.GetTeamUnits(playerTableSortTeamID[teamIndexGoto][3])
 		if teamsUnit and teamsUnit[1] then
 			Spring.SelectUnitArray({teamsUnit[math.random(1,#teamsUnit)],}) --select this player's unit

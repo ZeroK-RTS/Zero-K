@@ -67,7 +67,7 @@ options = {
 		OnChange = function(self)
 			if not self.value then
 				unit2group = {}
-				Spring.Echo('Cleared Autogroups.')
+				Spring.Echo('game_message: Cleared Autogroups.')
 			end
 		end
 	},
@@ -105,7 +105,7 @@ options = {
 		type = 'button',
 		OnChange = function() 
 			unit2group = {} 
-			Spring.Echo('Cleared Autogroups.')
+			Spring.Echo('game_message: Cleared Autogroups.')
 		end,
 	},
 }
@@ -275,9 +275,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 				for udid,_ in pairs(selUnitDefIDs) do
 					if options.verbose.value then
 						if gr then
-							Echo('Added '..  UnitDefs[udid].humanName ..' to autogroup #'.. gr ..'.')
+							Echo('game_message: Added '..  UnitDefs[udid].humanName ..' to autogroup #'.. gr ..'.')
 						else
-							Echo('Removed '..  UnitDefs[udid].humanName ..' from autogroups.')
+							Echo('game_message: Removed '..  UnitDefs[udid].humanName ..' from autogroups.')
 						end
 					end
 				end

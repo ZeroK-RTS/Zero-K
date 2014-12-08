@@ -24,7 +24,7 @@ end
 --------------------------------------------------------------------------------
 
 --if Spring.GetModOption("zkmode",false,nil) == nil then
---	Spring.Echo("<Game Over> Testing mode. Gadget removed.")
+--	Spring.Echo("game_message: <Game Over> Testing mode. Gadget removed.")
 --	return
 --end
 --------------------------------------------------------------------------------
@@ -46,6 +46,7 @@ local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spTransferUnit	= Spring.TransferUnit
 local spKillTeam	= Spring.KillTeam
 local spGameOver	= Spring.GameOver
+local spEcho       = Spring.Echo
 
 local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
 local ECON_SUPREMACY_MULT = 25
@@ -147,6 +148,10 @@ local function HasNoComms(allianceID)
 	return true
 end
 
+local function EchoUIMessage(message)
+	spEcho("game_message: " .. message)
+end
+
 local function UnitWithinBounds(unitID)
 	local x, y, z = Spring.GetUnitPosition(unitID)
 	return (x > -500) and (x < Game.mapSizeX + 500) and (y > -1000) and (z > -500) and (z < Game.mapSizeZ + 500)
@@ -165,7 +170,7 @@ local function CheckForVictory()
 		end
 	end
 	if count < 2 then
-		Spring.Echo(( (lastAllyTeam and ("Alliance " .. lastAllyTeam)) or "Nobody") .. " wins!")
+		EchoUIMessage(( (lastAllyTeam and ("Alliance " .. lastAllyTeam)) or "Nobody") .. " wins!")
 		spGameOver({lastAllyTeam})
 	end
 end
@@ -196,12 +201,12 @@ local function DestroyAlliance(allianceID)
 		if teamList == nil then return end	-- empty allyteam, don't bother
 		
 		if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
-			Spring.Echo("Game Over: DEBUG")
-			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
-			Spring.Echo("Game Over: If this is true, then please resign.")
+			EchoUIMessage("Game Over: DEBUG")
+			EchoUIMessage("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
+			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return	-- don't perform victory check
 		elseif destroy_type == 'destroy' then	-- kaboom
-			Spring.Echo("Game Over: Destroying alliance " .. allianceID)
+			EchoUIMessage("Game Over: Destroying alliance " .. allianceID)
 			for i=1,#teamList do
 				local t = teamList[i]
 				local teamUnits = spGetTeamUnits(t) 
@@ -217,7 +222,7 @@ local function DestroyAlliance(allianceID)
 				spKillTeam(t)
 			end
 		elseif destroy_type == 'losecontrol' then	-- no orders can be issued to team
-			Spring.Echo("Game Over: Destroying alliance " .. allianceID)
+			EchoUIMessage("Game Over: Destroying alliance " .. allianceID)
 			for i=1,#teamList do
 				spKillTeam(teamList[i])
 			end
@@ -341,7 +346,7 @@ local function ProcessLastAlly()
 		-- run value comparison
 		local supreme = CompareArmyValues(activeAllies[1], activeAllies[2])
 		if supreme then
-			Spring.Echo("AllyTeam " .. supreme .. " has an overwhelming numerical advantage!")
+			EchoUIMessage("AllyTeam " .. supreme .. " has an overwhelming numerical advantage!")
 			for i=1, #allylist do
 				local a = allylist[i]
 				if (a ~= supreme) and (a ~= gaiaAllyTeamID) then
