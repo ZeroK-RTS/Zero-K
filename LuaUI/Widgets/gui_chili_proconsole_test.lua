@@ -758,8 +758,6 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'Speed set to') or
 	string.find(msg.argument,'following') or
 	string.find(msg.argument,'Connection attempted') or
-	string.find(msg.argument,'wins!') or 
-	string.find(msg.argument,'resigned') or 
 	string.find(msg.argument,'exited') or 
 	string.find(msg.argument,'is no more') or 
 	string.find(msg.argument,'paused the game') or

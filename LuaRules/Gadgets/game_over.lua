@@ -164,7 +164,7 @@ local function CheckForVictory()
 	local lastAllyTeam
 	for _,a in pairs(allylist) do
 		if not destroyedAlliances[a] and (a ~= gaiaAllyTeamID) then
-			--EchoUIMessage("Alliance " .. a .. " remains in the running")
+			--Spring.Echo("Alliance " .. a .. " remains in the running")
 			count = count + 1
 			lastAllyTeam = a
 		end
@@ -238,7 +238,7 @@ local function AddAllianceUnit(u, ud, teamID)
 	
 	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[ud].metalCost
 	
-	--EchoUIMessage("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
+	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
 	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = true
 	end	
@@ -253,7 +253,7 @@ local function RemoveAllianceUnit(u, ud, teamID)
 		aliveValue[teamID] = 0
 	end
 	
-	--EchoUIMessage("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
+	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
 	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = nil
 	end
