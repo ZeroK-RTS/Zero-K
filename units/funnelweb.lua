@@ -77,9 +77,9 @@ unitDef = {
       def                = [[SHIELD]],
     },
 
-    {
-      def                = [[SHIELD]],
-    },
+   -- {
+   --   def                = [[SHIELD]],
+   -- },
 
   },
 
