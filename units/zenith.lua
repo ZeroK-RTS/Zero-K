@@ -122,12 +122,6 @@ unitDef = {
       avoidGround             = false,
       cegTag                  = [[METEOR_TAG]],
       collideFriendly         = true,
-
-      customparams            = {
-        spawns_name = "asteroid_dead",
-        spawns_feature = 1,
-      },
-
       craterBoost             = 0,
       craterMult              = 6,
 

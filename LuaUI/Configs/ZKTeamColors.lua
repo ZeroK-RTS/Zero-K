@@ -3,10 +3,10 @@ colors = {
 --	myColor		= { 008, 192, 016 },
 	gaiaColor	= { 200, 200, 200 },	-- can only be 1 color
 	
-	allyColors = {	
-	  { 050, 250, 050 },					-- as many as needed
-	  { 020, 105, 255 },
+	allyColors = {						-- as many as needed
 	  { 010, 100, 040 },
+	  { 020, 105, 255 },
+	  { 050, 250, 050 },
 	  { 040, 190, 240 },
 	  { 030, 230, 150 },
 	  
