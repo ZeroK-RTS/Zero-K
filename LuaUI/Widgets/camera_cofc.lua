@@ -1180,11 +1180,11 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 			return targetRx
 		elseif targetRx > cs.rx and zoomin then 
 			-- Spring.Echo("Pulling on track for Zoomin")
-			onTiltZoomTrack = true
+			-- onTiltZoomTrack = true
 			return cs.rx + angleCorrectionMaximum
 		elseif targetRx < cs.rx and not zoomin then 
 			-- Spring.Echo("Pulling on track for Zoomout")
-			onTiltZoomTrack = true
+			-- onTiltZoomTrack = true
 			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then return cs.rx - angleCorrectionMaximum
 			else return targetRx
 			end
