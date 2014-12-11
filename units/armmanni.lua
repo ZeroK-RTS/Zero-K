@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[armmanni]],
-  name                = [[Penetrator]],
+  name                = [[Lance]],
   description         = [[Mobile Tachyon Projector (Artillery/Anti-Heavy)]],
   acceleration        = 0.016,
   brakeRate           = 0.148,
@@ -26,11 +26,11 @@ unitDef = {
     description_de = [[Mobiler Tachyonen Beschleuniger (Artillerie/Anti-Heavy)]],
     description_fr = [[Accelerateur Tachyon Mobile]],
     description_pl = [[Mobilny Akcelerator Tachionow]],
-    helptext       = [[The Penetrator's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger.]],
-    helptext_bp    = [[A arma do Penetrator, apelidada de "O laser azul da morte", tem o poder e a precis?o para destruir a maioria das unidades com um único tiro. Use-o contra unidades muito resistentes, mas mantenha-o atras da linha de frente: Sua armadura é fina e ele é lento demais para fugir do perigo.]],
+    helptext       = [[The Lance's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger.]],
+    helptext_bp    = [[A arma do Lance, apelidada de "O laser azul da morte", tem o poder e a precis?o para destruir a maioria das unidades com um único tiro. Use-o contra unidades muito resistentes, mas mantenha-o atras da linha de frente: Sua armadura é fina e ele é lento demais para fugir do perigo.]],
     helptext_de    = [[Penetrators Waffe, genannt "der Blaue Laser des Todes", hat die Macht und Präzision die meisten Einheiten mit einem einzigen Schuss zu vernichten. Nutze ihn gegen gut gepanzerte Einheiten, aber halte ihn hinter den Frontlinien - er besitzt nur wenig Durchhaltevermögen und kann nicht ruckartig weglaufen.]],
-    helptext_fr    = [[Le surnon du Penetrator est 'le rayon bleu de la mort'. Le Penetrator est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindages ? grande distance. Il est cependant peu protégé et peu maniable.]],
-    helptext_pl    = [[Bron Penetratora ma wystarczajaca sile i celnosc, by jednym strzalem zniszczyc lub powaznie uszkodzic wiekszosc jednostek. Jest jednak wolny i ma niska wytrzymalosc, a zatem warto trzymac go za linia frontu - ma wystarczajaco duzy zasieg, by nadal prowadzic ostrzal.]],
+    helptext_fr    = [[Le surnon du Lance est 'le rayon bleu de la mort'. Le Lance est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindages ? grande distance. Il est cependant peu protégé et peu maniable.]],
+    helptext_pl    = [[Bron Lacy ma wystarczajaca sile i celnosc, by jednym strzalem zniszczyc lub powaznie uszkodzic wiekszosc jednostek. Jest jednak wolny i ma niska wytrzymalosc, a zatem warto trzymac go za linia frontu - ma wystarczajaco duzy zasieg, by nadal prowadzic ostrzal.]],
 	dontfireatradarcommand = '1',
   },
 
