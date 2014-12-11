@@ -30,7 +30,7 @@ unitDef = {
     helptext_bp    = [[A arma do Lance, apelidada de "O laser azul da morte", tem o poder e a precis?o para destruir a maioria das unidades com um único tiro. Use-o contra unidades muito resistentes, mas mantenha-o atras da linha de frente: Sua armadura é fina e ele é lento demais para fugir do perigo.]],
     helptext_de    = [[Penetrators Waffe, genannt "der Blaue Laser des Todes", hat die Macht und Präzision die meisten Einheiten mit einem einzigen Schuss zu vernichten. Nutze ihn gegen gut gepanzerte Einheiten, aber halte ihn hinter den Frontlinien - er besitzt nur wenig Durchhaltevermögen und kann nicht ruckartig weglaufen.]],
     helptext_fr    = [[Le surnon du Lance est 'le rayon bleu de la mort'. Le Lance est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindages ? grande distance. Il est cependant peu protégé et peu maniable.]],
-    helptext_pl    = [[Bron Lacy ma wystarczajaca sile i celnosc, by jednym strzalem zniszczyc lub powaznie uszkodzic wiekszosc jednostek. Jest jednak wolny i ma niska wytrzymalosc, a zatem warto trzymac go za linia frontu - ma wystarczajaco duzy zasieg, by nadal prowadzic ostrzal.]],
+    helptext_pl    = [[Bron Lancy ma wystarczajaca sile i celnosc, by jednym strzalem zniszczyc lub powaznie uszkodzic wiekszosc jednostek. Jest jednak wolny i ma niska wytrzymalosc, a zatem warto trzymac go za linia frontu - ma wystarczajaco duzy zasieg, by nadal prowadzic ostrzal.]],
 	dontfireatradarcommand = '1',
   },
 
