@@ -7,6 +7,7 @@ local dish3 = piece 'dish3'
 local dish4 = piece 'dish4' 
 
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spGetUnitHealth = Spring.GetUnitHealth
 
 include "constants.lua"
 
@@ -72,9 +73,11 @@ local function DefensiveManeuver()
 end
 
 function HitByWeaponGadget()
-	StartThread(DefensiveManeuver)
+	local buildProgress = select(5, spGetUnitHealth(unitID))
+	if (buildProgress == 1) then
+		StartThread(DefensiveManeuver)
+	end
 end
-
 
 local noFFWeaponDefs = {}
 for wdid = 1, #WeaponDefs do
