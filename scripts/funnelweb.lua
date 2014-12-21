@@ -82,6 +82,11 @@ function script.QueryWeapon (num)
 	return aimpoint
 end
 
+function script.AimWeapon (num)
+	if num == 1 then return false -- fake targeter
+	else return true end
+end
+
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25  then
