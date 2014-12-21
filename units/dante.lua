@@ -24,7 +24,7 @@ unitDef = {
 	description_pl = [[Robot szturmowo-bojowy]],
     helptext       = [[The Dante is a heavy combat unit that specializes in getting close and melting its target. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain.]],
     helptext_fr    = [[]],
-	helptext_de    = [[Der Dante ist eine schwere Sturmeinheit f? den Fronteinsatz, wenn herkömmliche Mittel versagen. Sein Flammenwerfer und doppelläufiger Heat Ray sind zwar nichts besonderes, doch seine Brandraketen können in 20-Schuss Salven breite Schneisen in das Gelände schlagen.]],
+	helptext_de    = [[Der Dante ist eine schwere Sturmeinheit f? den Fronteinsatz, wenn herkÃ¶mmliche Mittel versagen. Sein Flammenwerfer und doppellÃ¤ufiger Heat Ray sind zwar nichts besonderes, doch seine Brandraketen kÃ¶nnen in 20-Schuss Salven breite Schneisen in das GelÃ¤nde schlagen.]],
 	helptext_pl    = [[Dante to ciezka jednostka bojowa, ktora specjalizuje sie w zadawaniu ciezkich obrazen w bezposredniej walce. Posiada promien cieplny, miotacz ognia i rakiety podpalajace, ktore moze wystrzelic w salwie.]],
   },
 
@@ -193,10 +193,8 @@ unitDef = {
       weaponVelocity          = 500,
     },
 
-
     NAPALM_ROCKETS       = {
       name                    = [[Napalm Rockets]],
-      accuracy                = 1500,
       areaOfEffect            = 228,
       burst                   = 2,
       burstrate               = 0.1,
@@ -247,7 +245,6 @@ unitDef = {
 
     NAPALM_ROCKETS_SALVO = {
       name                    = [[Napalm Rocket Salvo]],
-      accuracy                = 1500,
       areaOfEffect            = 228,
       avoidFeature            = false,
       avoidFriendly           = false,
