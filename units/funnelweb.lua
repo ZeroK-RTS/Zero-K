@@ -119,7 +119,7 @@ unitDef = {
       stages                  = 10,
       tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[Cannon]],
+      weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 500,
     },
 	
