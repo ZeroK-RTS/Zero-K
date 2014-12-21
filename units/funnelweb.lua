@@ -63,13 +63,11 @@ unitDef = {
 
   weapons                = {
 
-    --[[{
-      def                = "EMG",
+    {
+      def                = "BOGUS_FAKE_TARGETER",
       badTargetCategory  = "FIXEDWING",
-      mainDir            = "0 0 1",
-      maxAngleDif        = 35,
       onlyTargetCategory = "FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER",
-    },]]
+    },
 
     {
       def                = [[SHIELD]],
@@ -80,8 +78,8 @@ unitDef = {
 
   weaponDefs             = {
 
-    EMG = {
-      name                    = [[Pulse MG]],
+    BOGUS_FAKE_TARGETER = {
+      name                    = [[Bogus Fake Targeter]],
       alphaDecay              = 0.1,
       areaOfEffect            = 8,
       burst                   = 3,
@@ -105,7 +103,7 @@ unitDef = {
       noGap                   = false,
       noSelfDamage            = true,
       projectiles             = 2,
-      range                   = 220,
+      range                   = 800,
       reloadtime              = 0.31,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
