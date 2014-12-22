@@ -37,7 +37,6 @@ local floatDefs = {
 		waterHitDrag = 0.5,
 		floatPoint = -20,
 		depthRequirement = -30,
-		sinkOnPara = true,
 		stopSpeedLeeway = 0.05, 
 		stopPositionLeeway = 0.1,
 	},
@@ -55,7 +54,6 @@ local floatDefs = {
 		waterHitDrag = 0.5,
 		floatPoint = -12,
 		depthRequirement = -30,
-		sinkOnPara = true,
 		sinkTankRequirement = false,
 		stopSpeedLeeway = 0.05, 
 		stopPositionLeeway = 0.1,
@@ -77,7 +75,6 @@ local floatDefs = {
 		waterHitDrag = 0.8,
 		floatPoint = -15,
 		depthRequirement = -15,
-		sinkOnPara = false,
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
@@ -96,10 +93,13 @@ local floatDefs = {
 		waterHitDrag = 0.5,
 		floatPoint = -40,
 		depthRequirement = -40,
-		sinkOnPara = false,
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
 }
+
+for id, def in pairs (floatDefs) do
+	def.sinkOnPara = (UnitDefs[id].customParams.sink_on_emp ~= '0')
+end
 
 return floatDefs
