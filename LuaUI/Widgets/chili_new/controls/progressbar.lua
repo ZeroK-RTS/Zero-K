@@ -22,7 +22,7 @@ Progressbar = Control:Inherit{
   min       = 0,
   max       = 100,
   value     = 100,
-  orientation = "horizontal"
+  orientation = "horizontal",
 
   caption   = "",
 
