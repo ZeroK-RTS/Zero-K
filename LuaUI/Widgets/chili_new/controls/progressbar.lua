@@ -124,7 +124,7 @@ function Progressbar:DrawControl()
 
   gl.Color(self.backgroundColor)
   if (self.orientation == "horizontal") then
-    gl.rect(w*percent,y,w,h) 
+    gl.Rect(w*percent,y,w,h) 
   else
     gl.Rect(x,h - h*percent,w,h) 
   end
