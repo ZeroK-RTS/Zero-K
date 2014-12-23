@@ -102,8 +102,10 @@ effectUnitDefs = {
   
   funnelweb = {
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4}},
-	{class='Bursts', options=MergeTable(corjamtBursts, {piece="aimpoint"})},
-	{class='ShieldSphere', options={piece="aimpoint", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
+	{class='Bursts', options=MergeTable(corjamtBursts, {piece="emitl"})},
+		{class='Bursts', options=MergeTable(corjamtBursts, {piece="emitr"})},
+    {class='ShieldSphere', options={piece="emitl", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
+    {class='ShieldSphere', options={piece="emitr", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
   },
 
   --// ENERGY STORAGE //--------------------
