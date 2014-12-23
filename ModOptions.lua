@@ -410,7 +410,7 @@ local options = {
     desc = "Different scheme designed for distributing overdrive share.",
     type = "list",
     section= 'modifiers',
-    def = "investmentreturn",
+    def = "communism",
     items = {
       {
         key  = "investmentreturn",
