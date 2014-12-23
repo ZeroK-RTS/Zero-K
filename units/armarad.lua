@@ -50,7 +50,6 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 800,
-  sonarDistance                 = 0,
   useBuildingGroundDecal        = true,
   yardMap                       = [[oooo]],
 
