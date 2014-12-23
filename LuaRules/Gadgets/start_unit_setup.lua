@@ -232,7 +232,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
-		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
+		Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z)
 		
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		--facplopsrunning[unitID] = true
@@ -561,7 +561,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	--end
 	if Spring.GetGameFrame() <= 1 then
 		Spring.SpawnCEG("gate", x, y, z)
-		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
+		Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z)
 	end
 	
 	if not bonusSpawn then

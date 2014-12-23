@@ -118,6 +118,7 @@ local function NewDrone(unitID, unitDefID, droneName, setNum, droneBuiltExternal
 	local droneID = CreateUnit(droneName,xS,yS,zS,1,carrierList[unitID].teamID, droneBuiltExternally and true,false,nil,unitID)
 	if droneID then
 		local droneSet = carrierEntry.droneSets[setNum]
+		droneSet.reload = droneSet.config.reloadTime
 		droneSet.droneCount = droneSet.droneCount + 1
 		droneSet.drones[droneID] = true
 		
@@ -567,7 +568,6 @@ function gadget:GameFrame(n)
 								table.remove(carrierList[carrierID].droneInQueue,1)
 							end
 						end
-						set.reload = set.config.reloadTime -- apply reloadtime when queuing construction (not when it actually happens) - helps keep a constant creation rate over time
 					end
 				end
 			end

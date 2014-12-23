@@ -1,4 +1,4 @@
-local version = "v0.845"
+local version = "v0.843"
 function widget:GetInfo()
   return {
     name      = "Teleport AI (experimental) v2",
@@ -47,8 +47,7 @@ local groupLoopedUnit={}
 local groupBeaconQueue={}
 local groupBeaconFinish={}
 --end spread job stuff
-local IgnoreUnit = {} --list of uninteresting/irrelevant unit to be excluded until their command changes (an Optimization)
-local teleportedUnit = {}
+local IgnoreUnit = {} --list of uninteresting/irrelevant unit to be excluded until their command changes
 local beaconDefID = UnitDefNames["tele_beacon"].id
 --Network lag hax stuff: (wait until unit receive command before processing 2nd time)
 local waitForNetworkDelay = {}
@@ -96,7 +95,6 @@ end
 function widget:UnitDestroyed(unitID, unitDefID)
 	listOfBeacon[unitID] = nil
 	IgnoreUnit[unitID] = nil
-	teleportedUnit[unitID] = nil
 	if issuedOrderTo[unitID] then 
 		local group = issuedOrderTo[unitID]
 		issuedOrderTo[unitID] = nil 
@@ -224,7 +222,6 @@ function widget:GameFrame(n)
 			beaconData["djinID"] = djinnID
 			GetNearbyBeacon(ex,ez,beaconData)
 		end
-		IgnoreUnit = {} --recheck ignored unit in case "CmdDone()" do not work as expected
 	end
 	if n%30==14 then --every 30 frame period (1 second) at the 14th frame: 
 		--update deploy state
@@ -245,7 +242,9 @@ function widget:GameFrame(n)
 		end
 	end
 	for i=1, #groupBeacon,1 do
-		if ( n%15==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 15 frame (0.5 second) if empty. 29 frame (1 second) if full. 5 second if disconnected
+		--if ( n%30==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 30 frame period (1 second). 30 frame if full. Not considering network delay (may go up to 2 second period)
+		--if ( n%18==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then  --every 18 frame period (0.6 second) if empty. 36 frame (1.2 second) if full. Not considering network delay
+		if ( n%15==0 and not waitForNetworkDelay[i]) or groupSpreadJobs[i] then 
 			--GROUP: i
 			local numberOfUnitToProcess = 29 --NUMBER OF UNIT PER BEACON PER SECOND. minimum: 29 per second
 			local numberOfUnitToProcessPerFrame = math.ceil(numberOfUnitToProcess/29) --spread looping to entire 1 second
@@ -294,8 +293,7 @@ function widget:GameFrame(n)
 							end
 							local isFixedWing = listOfMobile[unitDefID][4]
 							local isStatic = listOfMobile[unitDefID][6]
-							repeat --note: "repeat" is to be used with "break" as method of escaping code, not looping
-								--IS IMMOBILE/AIRPLANE/INBUILD UNIT? skip--
+							repeat --note: not looping, only for using "break" as method of escaping code
 								local _,_,inBuild = spGetUnitIsStunned(unitID)
 								if isStatic or isFixedWing or inBuild then
 									loopedUnits[unitID]=true
@@ -306,26 +304,16 @@ function widget:GameFrame(n)
 								local unitInfo = unitToEffect[unitID] --note: copy table reference (this mean changes to unitInfo saves into unitToEffect)
 								if not unitInfo["cmd"] then
 									local px,py,pz= spGetUnitPosition(unitID)
-									local cmd_queue = spGetCommandQueue(unitID,2); --note: unitToEffect[] (or unitInfo[]) is emptied every second, this mean new command is read every second
+									local cmd_queue = spGetCommandQueue(unitID,1);
 									unitInfo["attckng"] = (cmd_queue and cmd_queue[1] and cmd_queue[1].id == CMD.ATTACK)
-									unitInfo["cmd"] = ConvertCMDToMOVE(cmd_queue[1])
+									cmd_queue = ConvertCMDToMOVE(cmd_queue)
 									unitInfo["pos"] = {px,py,pz}
+									unitInfo["cmd"] = cmd_queue
+								end
 								--IS UNIT IDLE? skip--
-									if not unitInfo["cmd"] then
-										loopedUnits[unitID]=true
-										break; --a.k.a: Continue
-									end
-								--IS UNIT EXITING TELEPORT? redirect--
-									if (teleportedUnit[unitID] and teleportedUnit[unitID]["x"] == unitInfo["cmd"].params[1] and teleportedUnit[unitID]["z"] == unitInfo["cmd"].params[3]) then --just teleported!
-										--set next move goal, remove exit point added from previous teleporting
-										spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}}})
-										unitInfo["attckng"] = (cmd_queue and cmd_queue[2] and cmd_queue[2].id == CMD.ATTACK)
-										unitInfo["cmd"] = ConvertCMDToMOVE(cmd_queue[2])
-										if not unitInfo["cmd"] then --invalid command
-											loopedUnits[unitID]=true
-											break; --a.k.a: Continue
-										end
-									end
+								if not unitInfo["cmd"] then
+									loopedUnits[unitID]=true
+									break; --a.k.a: Continue
 								end
 								--MODIFY CHARGETIME & SPEED FOR TRANSPORT--
 								local transportSpeedMod = 1
@@ -349,8 +337,9 @@ function widget:GameFrame(n)
 										if cmd_queue[2] and cmd_queue[3] then --in case previous teleport AI teleport order make unit stuck to non-existent beacon
 											spGiveOrderArrayToUnitArray({unitID},{{CMD.REMOVE, {cmd_queue[1].tag}, {}},{CMD.REMOVE, {cmd_queue[2].tag}, {}}})
 											unitInfo["attckng"] = (cmd_queue[3].id == CMD.ATTACK)
-											unitInfo["cmd"] = ConvertCMDToMOVE(cmd_queue[3])
-											if not unitInfo["cmd"] then --invalid command
+											cmd_queue = ConvertCMDToMOVE({cmd_queue[3]})
+											unitInfo["cmd"] = cmd_queue
+											if not cmd_queue then --invalid command
 												loopedUnits[unitID]=true
 												break; --a.k.a: Continue
 											end
@@ -459,12 +448,9 @@ function widget:GameFrame(n)
 							issuedOrderTo[unitID] = i
 							waitForNetworkDelay[i] = waitForNetworkDelay[i] or {spGetGameSeconds(),0}
 							waitForNetworkDelay[i][2] = waitForNetworkDelay[i][2] + 1
-							--end network delay
-							--save exit coordinate:--
-							teleportedUnit[unitID] = { x = dx*50+ex ,y = ey, z = dz*50+ez } --(a coordinate of a command that we going to give)
-							--end fix
+							--end wait for network delay
 							--method A: give GUARD order--
-							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_INTERNAL, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
+							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_SHIFT, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
 							local defID = unitInfo["defID"]
 							local chargeTime = transportChargetime[unitID] or listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime
@@ -510,6 +496,10 @@ function GetUnitFastestWeaponRange(unitDef)
 end
 
 function ConvertCMDToMOVE(command)
+	if (command == nil) then 
+		return nil
+	end
+	command = command[1]
 	if (command == nil) then 
 		return nil
 	end
@@ -632,7 +622,7 @@ end
 ------------------------------------------------------------
 
 function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
-	IgnoreUnit[unitID]=nil
+	 IgnoreUnit[unitID]=nil
 end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) 

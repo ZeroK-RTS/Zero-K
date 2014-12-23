@@ -22,7 +22,7 @@ Progressbar = Control:Inherit{
   min       = 0,
   max       = 100,
   value     = 100,
-  orientation = "horizontal",
+  orientation = "horizontal"
 
   caption   = "",
 
@@ -124,7 +124,7 @@ function Progressbar:DrawControl()
 
   gl.Color(self.backgroundColor)
   if (self.orientation == "horizontal") then
-    gl.Rect(w*percent,y,w,h) 
+    gl.rect(w*percent,y,w,h) 
   else
     gl.Rect(x,h - h*percent,w,h) 
   end
