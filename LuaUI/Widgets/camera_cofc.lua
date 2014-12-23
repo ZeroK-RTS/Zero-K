@@ -994,35 +994,6 @@ local function OverrideTraceScreenRay(x,y,cs,groundHeight,sphereRadius,planeInte
 	--3: http://stackoverflow.com/questions/5278417/rotating-body-from-spherical-coordinates
 	--4: http://en.wikipedia.org/wiki/Spherical_coordinate_system
 end
-
-SetCenterBounds = function(cs)
-	-- if options.zoomouttocenter then Spring.Echo("zoomouttocenter.value: "..options.zoomouttocenter.value) end
-	if options.zoomouttocenter.value then --move camera toward center
-
-		scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
-
-		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
-		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer)-- * math.tan(currentFOVhalf_rad) * 1.5)
-		-- Spring.Echo("MaxDC: "..maxDc)
-		minX, minZ, maxX, maxZ = math.max(mcx - MWIDTH/2 * maxDc, 0), math.max(mcz - MHEIGHT/2 * maxDc, 0), math.min(mcx + MWIDTH/2 * maxDc, MWIDTH), math.min(mcz + MHEIGHT/2 * maxDc, MHEIGHT)
-
-		if cs.rx > -HALFPI + 0.002 then
-			ls_x,ls_y,ls_z = OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true,false)
-			if ls_x < minX then cs.px = cs.px + (minX - ls_x) end
-			if ls_x > maxX then cs.px = cs.px + (maxX - ls_x) end
-			if ls_z < minZ then cs.pz = cs.pz + (minZ - ls_z) end
-			if ls_z > maxZ then cs.pz = cs.pz + (maxZ - ls_z) end
-		else --We can use camera x & z location in place of a raycast to find center when camera is pointed towards ground, as this is faster and more numerically stable
-			if cs.px < minX then cs.px = minX end
-			if cs.px > maxX then cs.px = maxX end
-			if cs.pz < minZ then cs.pz = minZ end
-			if cs.pz > maxZ then cs.pz = maxZ end
-		end
-	else
-		minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
-	end
-	-- Spring.Echo("Bounds: "..minX..", "..minZ..", "..maxX..", "..maxZ)
-end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -1099,6 +1070,35 @@ local function VirtTraceRay(x,y, cs)
 	
 	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
+end
+
+SetCenterBounds = function(cs)
+	-- if options.zoomouttocenter then Spring.Echo("zoomouttocenter.value: "..options.zoomouttocenter.value) end
+	if options.zoomouttocenter.value then --move camera toward center
+
+		scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
+
+		local currentFOVhalf_rad = (cs.fov/2) * RADperDEGREE
+		local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer)-- * math.tan(currentFOVhalf_rad) * 1.5)
+		-- Spring.Echo("MaxDC: "..maxDc)
+		minX, minZ, maxX, maxZ = math.max(mcx - MWIDTH/2 * maxDc, 0), math.max(mcz - MHEIGHT/2 * maxDc, 0), math.min(mcx + MWIDTH/2 * maxDc, MWIDTH), math.min(mcz + MHEIGHT/2 * maxDc, MHEIGHT)
+
+		if cs.rx > -HALFPI + 0.002 then
+			_,ls_x,ls_y,ls_z = VirtTraceRay(cx, cy, cs)--OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true,false)
+			if ls_x < minX then cs.px = cs.px + (minX - ls_x) end
+			if ls_x > maxX then cs.px = cs.px + (maxX - ls_x) end
+			if ls_z < minZ then cs.pz = cs.pz + (minZ - ls_z) end
+			if ls_z > maxZ then cs.pz = cs.pz + (maxZ - ls_z) end
+		else --We can use camera x & z location in place of a raycast to find center when camera is pointed towards ground, as this is faster and more numerically stable
+			if cs.px < minX then cs.px = minX end
+			if cs.px > maxX then cs.px = maxX end
+			if cs.pz < minZ then cs.pz = minZ end
+			if cs.pz > maxZ then cs.pz = maxZ end
+		end
+	else
+		minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
+	end
+	-- Spring.Echo("Bounds: "..minX..", "..minZ..", "..maxX..", "..maxZ)
 end
 
 local function SetLockSpot2(cs, x, y) --set an anchor on the ground for camera rotation 
@@ -1180,11 +1180,11 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 			return targetRx
 		elseif targetRx > cs.rx and zoomin then 
 			-- Spring.Echo("Pulling on track for Zoomin")
-			onTiltZoomTrack = true
+			-- onTiltZoomTrack = true
 			return cs.rx + angleCorrectionMaximum
 		elseif targetRx < cs.rx and not zoomin then 
 			-- Spring.Echo("Pulling on track for Zoomout")
-			onTiltZoomTrack = true
+			-- onTiltZoomTrack = true
 			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then return cs.rx - angleCorrectionMaximum
 			else return targetRx
 			end

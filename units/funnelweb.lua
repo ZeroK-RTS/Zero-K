@@ -4,7 +4,7 @@ unitDef = {
   description            = [[Drone/Shield Support Strider]],
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
-  autoheal				 = 20,
+  autoheal               = 20,
   brakeRate              = 0.1375,
   buildCostEnergy        = 4500,
   buildCostMetal         = 4500,
@@ -19,11 +19,11 @@ unitDef = {
 
   customParams           = {
     description_pl = [[Ciezki pajak wsparcia]],
-    helptext       = [[The slow all-terrain Funnelweb is barely armed and can only fire forwards, but features twin area shields and powerful drone complement.]],
-    helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Mimo ze jego bron jest skromna i moze strzelac jedynie do przodu, posiada dwie tarcze obszarowe oraz produkuje zestaw dronow.]],
+    helptext       = [[The slow all-terrain Funnelweb features an area shield and a powerful drone complement.]],
+    helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Posiada tarcze obszarowa oraz produkuje zestaw dronow.]],
   },
 
-  energyUse                     = 1.5,
+  energyUse              = 1.5,
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 4,
   footprintZ             = 4,
@@ -31,7 +31,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 1848,
   maxDamage              = 11000,
   maxSlope               = 36,
   maxVelocity            = 1.5,
@@ -52,8 +51,7 @@ unitDef = {
     },
 
   },
-  script				 = [[funnelweb.lua]],
-  side                   = [[CORE]],
+  script                 = [[funnelweb.lua]],
   sightDistance          = 650,
   trackOffset            = 0,
   trackStrength          = 8,
@@ -66,15 +64,9 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[EMG]],
-      badTargetCategory  = [[FIXEDWING]],
-      mainDir            = [[0 0 1]],
-	  maxAngleDif		 = 35,
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-    {
-      def                = [[SHIELD]],
+      def                = "BOGUS_FAKE_TARGETER",
+      badTargetCategory  = "FIXEDWING",
+      onlyTargetCategory = "FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER",
     },
 
     {
@@ -86,10 +78,14 @@ unitDef = {
 
   weaponDefs             = {
 
-    EMG = {
-      name                    = [[Pulse MG]],
+    BOGUS_FAKE_TARGETER = {
+      name                    = [[Bogus Fake Targeter]],
       alphaDecay              = 0.1,
       areaOfEffect            = 8,
+      avoidGround             = false, -- avoid nothing, else attempts to move out to clear line of fine
+      avoidFriendly           = false,
+      avoidFeature            = false,
+      avoidNeutral            = false,
       burst                   = 3,
       burstrate               = 0.1,
       colormap                = [[1 0.95 0.4 1   1 0.95 0.4 1    0 0 0 0.01    1 0.7 0.2 1]],
@@ -111,7 +107,7 @@ unitDef = {
       noGap                   = false,
       noSelfDamage            = true,
       projectiles             = 2,
-      range                   = 220,
+      range                   = 800,
       reloadtime              = 0.31,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,
@@ -123,7 +119,7 @@ unitDef = {
       stages                  = 10,
       tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[Cannon]],
+      weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 500,
     },
 	
@@ -160,41 +156,28 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Funnelweb]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 11000,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[8]],
-      hitdensity       = [[100]],
       metal            = 1800,
       object           = [[funnelweb_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 1800,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Funnelweb]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 11000,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[2]],
-      hitdensity       = [[100]],
       metal            = 900,
       object           = [[debris4x4a.s3o]],
       reclaimable      = true,
       reclaimTime      = 900,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
