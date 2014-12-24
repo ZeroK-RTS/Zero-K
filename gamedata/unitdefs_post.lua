@@ -687,16 +687,6 @@ if (modOptions and tobool(modOptions.xmas)) then
   end --for
 end
 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Special Power plants
--- 
-if (modOptions and not tobool(modOptions.specialpower)) then
-	UnitDefs.cafus.explodeas 		= "NUCLEAR_MISSILE"
-	UnitDefs.cafus.selfdestructas 	= "NUCLEAR_MISSILE"
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Special Decloak
