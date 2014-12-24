@@ -321,7 +321,7 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 3 then
-		--dgunning = true
+		dgunning = true
 		Signal( SIG_AIM)
 		Signal( SIG_AIM_2)
 		Signal( SIG_AIM_3)
@@ -339,7 +339,7 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		Signal( SIG_AIM)
 		Signal( SIG_AIM_2)
-		--dgunning = false
+		dgunning = false
 		return true
 	elseif num == 4 then
 		if dgunning  then return false end
