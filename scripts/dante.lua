@@ -326,6 +326,8 @@ function script.AimWeapon(num, heading, pitch)
 		Signal( SIG_AIM_2)
 		Signal( SIG_AIM_3)
 		SetSignalMask( SIG_AIM_3)
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
+		GG.UpdateUnitAttributes(unitID)
 		armsFree = false
 		
 		Turn( ruparm , x_axis, -pitch - math.rad(20), math.rad(250) )
@@ -339,6 +341,8 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		Signal( SIG_AIM)
 		Signal( SIG_AIM_2)
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+		GG.UpdateUnitAttributes(unitID)
 		dgunning = false
 		return true
 	elseif num == 4 then
