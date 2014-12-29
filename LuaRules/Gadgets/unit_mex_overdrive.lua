@@ -1411,6 +1411,7 @@ function gadget:Initialize()
 			toRemove = {},
 			data = {},
 		}
+		SetTeamEconomyRulesParams(teamList[i], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 	end
 	
 	
