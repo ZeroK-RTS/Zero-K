@@ -274,6 +274,7 @@ local function SetTeamEconomyRulesParams(teamID, allies, energyWasted, energyFor
 	spSetTeamRulesParam(teamID, "OD_myOverdrive",  myOverdrive, privateTable)
 	spSetTeamRulesParam(teamID, "OD_energyChange",  energyChange, privateTable)
 	spSetTeamRulesParam(teamID, "OD_teamEnergyIncome",  teamEnergyIncome, privateTable)
+	spSetTeamRulesParam(teamID, "OD_RoI_metalDue",  teamPayback[teamID] and teamPayback[teamID].metalDue or 0, privateTable)
 end
 
 -------------------------------------------------------------------------------------
@@ -663,7 +664,7 @@ local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
 	end
 	local def = paybackDefs[unitDefID]
 	unitPaybackTeamID[unitID] = unitTeam
-	teamPayback[unitTeam] = teamPayback[unitTeam] or {count = 0, toRemove = {}, data = {}}
+	teamPayback[unitTeam] = teamPayback[unitTeam] or {metalDue = 0, count = 0, toRemove = {}, data = {}}
 	
 	local teamData = teamPayback[unitTeam]
 	teamData.count = teamData.count + 1
@@ -672,6 +673,7 @@ local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
 		cost = def.cost,
 		repaid = 0,
 	}
+	teamData.metalDue = teamData.metalDue + def.cost
 end
 
 local function RemoveEnergyToPayback(unitID, unitDefID)
@@ -1193,6 +1195,7 @@ function gadget:GameFrame(n)
 													data[j].repaid = data[j].repaid + repayMetal
 													summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
 													teamPacybackOD[teamID] = teamPacybackOD[teamID] + repayMetal
+													paybackInfo.metalDue = paybackInfo.metalDue - repayMetal
 													--Spring.Echo("Repaid " .. data[j].repaid)
 												else
 													removeNow = true
@@ -1205,6 +1208,7 @@ function gadget:GameFrame(n)
 									end
 									
 									if removeNow then
+										paybackInfo.metalDue = paybackInfo.metalDue + data[j].repaid - data[j].cost
 										data[j] = data[paybackInfo.count]
 										if toRemove[unitID] then
 											toRemove[unitID] = nil
