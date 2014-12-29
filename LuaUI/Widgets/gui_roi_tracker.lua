@@ -5,7 +5,7 @@ function widget:GetInfo() return {
 	date      = "Dec 2012",
 	license   = "GPL",
 	layer     = -10,
-	enabled   = true,
+	enabled   = false,
 } end
 
 local Chili
@@ -16,6 +16,7 @@ local allied_teams
 local window, fake_window
 local name_labels = {}
 local roi_labels = {}
+local base_labels = {}
 
 function widget:Initialize()
 	if (Spring.GetModOptions().overdrivesharingscheme ~= "investmentreturn") then
@@ -61,12 +62,13 @@ end
 local timer = 0
 function widget:Update(s)
 	timer = timer + s
-	if timer > 0.5 then
+	if timer > 0.2 then
 		timer = 0
 		window.height = fake_window.height - 45
 		window.width = fake_window.width - 15
 		for i = 1, #allied_teams do
 			roi_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_RoI_metalDue")))
+			base_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_base_metalDue")))
 		end
 	end
 end
@@ -81,9 +83,9 @@ function CreateWindow()
 		name = "RoI Tracker",
 		padding = {5,5,5,5},
 		right = 0,
-		y = 50,
-		clientWidth  = 220,
-		minWidth = 220,
+		y = 150,
+		clientWidth  = 320,
+		minWidth = 320,
 		clientHeight = 100,
 		minHeight = 50,
 		draggable = true,
@@ -116,7 +118,7 @@ function CreateWindow()
  		y = 5,
  		width = 10,
  		parent = window,
- 		caption = "Payback due:",
+ 		caption = "Payback due:           Overdrive           Base",
  		fontsize = 13,
  		textColor = {1,1,1,1},
 	}
@@ -142,7 +144,16 @@ function CreateWindow()
 			parent = window,
 			caption = "0 m",
 			fontsize = 13,
-			textColor = {1, 1, 1, 1},
+			textColor = {1, 0.8, 0, 1},
+		}
+		base_labels[i] = Chili.Label:New{
+			x = 250,
+			y = 16*i - 10,
+			width = 50,
+			parent = window,
+			caption = "0 m",
+			fontsize = 13,
+			textColor = {0.65, 0.65, 0.65, 1},
 		}
 	end
 end
