@@ -5,7 +5,7 @@ function widget:GetInfo() return {
 	date      = "Dec 2012",
 	license   = "GPL",
 	layer     = -10,
-	enabled   = false,
+	enabled   = true,
 } end
 
 local Chili
@@ -62,7 +62,7 @@ end
 local timer = 0
 function widget:Update(s)
 	timer = timer + s
-	if timer > 0.2 then
+	if timer > 0.5 then
 		timer = 0
 		window.height = fake_window.height - 45
 		window.width = fake_window.width - 15
@@ -118,7 +118,7 @@ function CreateWindow()
  		y = 5,
  		width = 10,
  		parent = window,
- 		caption = "Payback due:           Overdrive           Base",
+ 		caption = "Payback due:             Overdrive:            Base:",
  		fontsize = 13,
  		textColor = {1,1,1,1},
 	}
