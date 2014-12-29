@@ -8,11 +8,7 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
-local abs = math.abs
-local GetUnitRulesParam = Spring.GetUnitRulesParam
-local floor = math.floor;
 local Chili
-local myTeam
 
 local spectating = Spring.GetSpectatingState()
 local allied_teams
@@ -65,7 +61,7 @@ end
 local timer = 0
 function widget:Update(s)
 	timer = timer + s
-	if timer > 0.2 then
+	if timer > 0.5 then
 		timer = 0
 		window.height = fake_window.height - 45
 		window.width = fake_window.width - 15
@@ -114,8 +110,6 @@ function CreateWindow()
 		smoothScroll     = false,
 		ignoreMouseWheel = true,
 	}
-
-	fake_window:AddChild(window)
 
 	title_caption = Chili.Label:New {
  		x = 5,
