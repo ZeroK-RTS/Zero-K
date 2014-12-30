@@ -589,7 +589,8 @@ local function GetClosestMetalSpot(x, z) --is used by single mex placement, not 
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	if cmdID > 0 or not(cmdParams[1] and cmdParams[2] and cmdParams[3]) then --can't handle other command.
+	local areSpec = Spring.GetSpectatingState()
+	if areSpec or cmdID > 0 or not(cmdParams[1] and cmdParams[2] and cmdParams[3]) then --can't handle other command.
 		return false
 	end
 	SetSelDefID(-1*cmdID)
