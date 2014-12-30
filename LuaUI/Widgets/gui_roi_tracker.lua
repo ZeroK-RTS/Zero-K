@@ -5,7 +5,7 @@ function widget:GetInfo() return {
 	date      = "Dec 2012",
 	license   = "GPL",
 	layer     = -10,
-	enabled   = true,
+	enabled   = false,
 } end
 
 local Chili
