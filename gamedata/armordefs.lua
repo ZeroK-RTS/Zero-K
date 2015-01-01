@@ -54,9 +54,6 @@ local armorDefs = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local EMP_DAMAGE_MOD = 1/3
-local FLAMER_DAMAGE_MOD = 3
-local GAUSS_DAMAGE_MOD = 1.5
 
 local function tobool(val)
   local t = type(val)
@@ -91,6 +88,13 @@ for name, ud in pairs(DEFS.unitDefs) do
   end
 end
 
+-- damage to shields modifiers
+local EMP_DAMAGE_MOD = 1/3
+local SLOW_DAMAGE_MOD = 1/3
+local DISARM_DAMAGE_MOD = 1/3
+local FLAMER_DAMAGE_MOD = 3
+local GAUSS_DAMAGE_MOD = 1.5
+
 -- use categories to set default weapon damages
 for name, wd in pairs(DEFS.weaponDefs) do
 	local weaponNameLower = wd.name:lower()
@@ -102,26 +106,44 @@ for name, wd in pairs(DEFS.weaponDefs) do
 		wd.damage[categoryName] = wd.damage[categoryName] or wd.damage.default
 	end
 	wd.damage.default = max
-  
+
 	-- damage vs shields
+	wd.customparams.statsdamage = wd.customparams.statsdamage or max
 	if wd.customparams and wd.customparams.damage_vs_shield then
 		wd.damage.default = tonumber(wd.customparams.damage_vs_shield)
 	else
+		local cp = wd.customparams or {}
+
 		if wd.paralyzer then
-			wd.damage.default =  max*EMP_DAMAGE_MOD
-			-- add extra damage vs shields for mixed damage units
-			if wd.customparams and wd.customparams.extra_damage then
-				wd.damage.default = wd.damage.default + tonumber(wd.customparams.extra_damage)
+			wd.damage.default = max * EMP_DAMAGE_MOD
+
+			-- add extra damage vs shields for mixed EMP damage units
+			if cp.extra_damage then
+				wd.damage.default = wd.damage.default + tonumber(cp.extra_damage)
 			end
-		elseif weaponNameLower:find("flamethrower") or weaponNameLower:find("flame thrower") then
-			wd.damage.default =  max*FLAMER_DAMAGE_MOD
-			wd.customparams.stats_damage = max
+		end
+
+		if (cp.timeslow_damagefactor) then
+			if (tobool(cp.timeslow_onlyslow)) then
+				wd.damage.default = 0
+			end
+			wd.damage.default = wd.damage.default + (tonumber(wd.customparams.timeslow_damagefactor) * max * SLOW_DAMAGE_MOD)
+		end
+
+		if (cp.disarmdamagemult) then
+			if (tobool(cp.disarmdamageonly)) then
+				wd.damage.default = 0
+			end
+			wd.damage.default = wd.damage.default + (tonumber(wd.customparams.disarmdamagemult) * max * DISARM_DAMAGE_MOD)
+		end
+
+		-- weapon type bonuses
+		if weaponNameLower:find("flamethrower") or weaponNameLower:find("flame thrower") then
+			wd.damage.default = wd.damage.default * FLAMER_DAMAGE_MOD
 		elseif weaponNameLower:find("gauss") then
-			wd.damage.default =  max*GAUSS_DAMAGE_MOD
-			wd.customparams.stats_damage = max
+			wd.damage.default = wd.damage.default * GAUSS_DAMAGE_MOD
 		end
 	end
-	
 end
 
 --------------------------------------------------------------------------------
