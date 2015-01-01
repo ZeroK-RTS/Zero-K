@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Transport Platform]],
   acceleration        = 0.102,
   brakeRate           = 0.115,
-  buildAngle          = 16384,
   buildCostEnergy     = 220,
   buildCostMetal      = 220,
   builder             = false,
@@ -53,7 +52,8 @@ unitDef = {
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 325,
   transportCapacity   = 1,
-  transportSize       = 3,
+  transportMass       = 350,
+  transportSize       = 4,
   turnRate            = 590,
 
   featureDefs         = {
