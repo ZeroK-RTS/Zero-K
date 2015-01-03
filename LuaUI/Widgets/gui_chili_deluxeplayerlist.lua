@@ -52,7 +52,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'reset_wins','win_show_condition', 'text_height', 'name_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -103,6 +103,22 @@ options = {
 		type = 'number',
 		value = 120,
 		min=50,max=200,step=10,
+		OnChange = function() SetupPanels() end,
+		advanced = true
+	},
+	stats_width = {
+		name = 'Metal worth stats width (2-5)',
+		type = 'number',
+		value = 4,
+		min=2,max=5,step=1,
+		OnChange = function() SetupPanels() end,
+		advanced = true
+	},
+	income_width = {
+		name = 'Income width (2-5)',
+		type = 'number',
+		value = 3,
+		min=2,max=5,step=1,
 		OnChange = function() SetupPanels() end,
 		advanced = true
 	},
@@ -275,6 +291,11 @@ local x_postping
 local x_bound
 local x_windowbound
 
+local x_m_mobiles_width
+local x_m_defense_width
+local x_m_income_width
+local x_e_income_width
+
 local function CheckShowWins()
 	return WG.WinCounter_currentWinTable ~= nil and (WG.WinCounter_currentWinTable.hasWins and options.win_show_condition.value == "whenRelevant") or options.win_show_condition.value == "always"
 end
@@ -292,10 +313,14 @@ local function CalculateWidths()
 	x_name			= x_status + 12
 	x_share			= x_name + name_width
 	x_m_mobiles		= not amSpec and x_share + 12 or x_share
-	x_m_defense		= x_m_mobiles + 34
-	x_m_income		= x_m_defense + 40
-	x_e_income		= x_m_income + 30
-	x_m_fill		= options.show_stats.value and x_e_income + 26 or x_m_mobiles
+	x_m_mobiles_width = options.stats_width.value * options.text_height.value / 2 + 10
+	x_m_defense		= x_m_mobiles + x_m_mobiles_width -- + 34
+	x_m_defense_width = options.stats_width.value * options.text_height.value / 2 + 10
+	x_m_income		= x_m_defense + x_m_defense_width
+	x_m_income_width = options.income_width.value * options.text_height.value / 2 + 10
+	x_e_income		= x_m_income + x_m_income_width
+	x_e_income_width = options.income_width.value * options.text_height.value / 2 + 10
+	x_m_fill		= options.show_stats.value and x_e_income + x_e_income_width or x_m_mobiles
 	x_e_fill		= x_m_fill + 30
 	x_cpu			= x_e_fill + (options.cpu_ping_as_text.value and 52 or 30)
 	x_ping			= x_cpu + (options.cpu_ping_as_text.value and 46 or 16)
@@ -665,10 +690,10 @@ end
 local function DrawPlayerTeamStats(entity,teamcolor,s)
 	if not options.colorResourceStats.value then teamcolor = {.85,.85,.85,1} end
 	if options.show_stats.value then
-		MakeNewLabel(entity,"m_mobilesLabel",{x=x_m_mobiles,width=36,caption = FormatMetalStats(s.mMobs,true),textColor = teamcolor,align = 'right',})
-		MakeNewLabel(entity,"m_defenseLabel",{x=x_m_defense,width=36,caption = FormatMetalStats(s.mDefs),textColor = teamcolor,align = 'right',})
-		MakeNewLabel(entity,"m_incomeLabel",{x=x_m_income,width=24,caption = string.format("%." .. (0) .. "f", s.mInco),textColor = teamcolor,align = 'right',})
-		MakeNewLabel(entity,"e_incomeLabel",{x=x_e_income,width=24,caption = string.format("%." .. (0) .. "f", s.eInco),textColor = teamcolor,align = 'right',})
+		MakeNewLabel(entity,"m_mobilesLabel",{x=x_m_mobiles,width=x_m_mobiles_width,caption = FormatMetalStats(s.mMobs,true),textColor = teamcolor,align = 'right',})
+		MakeNewLabel(entity,"m_defenseLabel",{x=x_m_defense,width=x_m_defense_width,caption = FormatMetalStats(s.mDefs),textColor = teamcolor,align = 'right',})
+		MakeNewLabel(entity,"m_incomeLabel",{x=x_m_income,width=x_m_income_width,caption = string.format("%." .. (0) .. "f", s.mInco),textColor = teamcolor,align = 'right',})
+		MakeNewLabel(entity,"e_incomeLabel",{x=x_e_income,width=x_e_income_width,caption = string.format("%." .. (0) .. "f", s.eInco),textColor = teamcolor,align = 'right',})
 	end
 	MakeNewBar(entity,"m_fillBar",{x=x_m_fill + 6,width=24,color = {.7,.75,.9,1},value = s.mCurr/s.mStor,})
 	MakeNewBar(entity,"e_fillBar",{x=x_e_fill + 2,width=24,color = {1,1,0,1},    value = s.eCurr/s.eStor,})
