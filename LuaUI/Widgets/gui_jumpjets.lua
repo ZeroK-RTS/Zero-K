@@ -61,7 +61,7 @@ local orange   = {	1, 0.5,   0,   1}
 local pink     = {  1, 0.5, 0.5,   1}
 local red      = {  1,   0,   0,   1}
 
-local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
+local jumpDefs  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
 local function ListToSet(t)
   local new = {}
@@ -69,12 +69,6 @@ local function ListToSet(t)
     new[ t[i] ] = true
   end 
   return new
-end
-
-
-local jumpDefs = {}
-for name, data in pairs(jumpDefNames) do
-  jumpDefs[UnitDefNames[name].id] = data
 end
 
 local ignore = {

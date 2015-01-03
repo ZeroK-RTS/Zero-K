@@ -470,7 +470,6 @@ function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
 
-
 local boolDef = {}
 for udid,_ in pairs(jumpDefs) do
 	boolDef[udid] = true
@@ -481,6 +480,10 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if (jumpDefs[unitDefID].noJumpHandling) then 
+		return true
+	end
+	
 	if (cmdID == CMD_JUMP and 
 		spTestBuildOrder(
 			unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 1) == 0) then
@@ -506,6 +509,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return false
 	end
 
+	if (jumpDefs[unitDefID].noJumpHandling) then
+		return true, false
+	end
+	
 	if (cmdID ~= CMD_JUMP) then
 		return false
 	end

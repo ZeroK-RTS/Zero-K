@@ -45,6 +45,7 @@ unitDef = {
     helptext_de    = [[Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Sumo]],
     helptext_pl    = [[W tej fabryce produkowane sa specjalistyczne jednostki, z ktorych wiekszosc posiada mozliwosc skoku, co pozwala im na szybkie zblizenie sie do przeciwnika, ucieczke lub ominiecie trudnego terenu.]],
     canjump  = [[1]],
+	no_jump_handling = [[1]],
     sortName = [[5]],
 	modelradius    = [[56]],
   },
