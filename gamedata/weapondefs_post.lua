@@ -198,21 +198,6 @@ end
 	end
  end
 
--- Set defaults for napalm (area damage)
-local area_damage_defaults = VFS.Include("gamedata/unitdef_defaults/area_damage_defs.lua")
-for name, wd in pairs (WeaponDefs) do
-	local cp = wd.customparams
-	if cp.area_damage then
-		if not cp.area_damage_dps then cp.area_damage_dps = area_damage_defaults.dps end
-		if not cp.area_damage_radius then cp.area_damage_radius = area_damage_defaults.radius end
-		if not cp.area_damage_duration then cp.area_damage_duration = area_damage_defaults.duration end
-
-		if not cp.area_damage_is_impulse then cp.area_damage_is_impulse = area_damage_defaults.is_impulse end
-		if not cp.area_damage_range_falloff then cp.area_damage_range_falloff = area_damage_defaults.range_falloff end
-		if not cp.area_damage_time_falloff then cp.area_damage_time_falloff = area_damage_defaults.time_falloff end
-	end
-end
- 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
