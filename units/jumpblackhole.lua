@@ -95,14 +95,6 @@ unitDef = {
 
 	  customParams            = {
 	    falldamageimmunity = [[120]],
-
-		area_damage = 1,
-		area_damage_radius = 70,
-		area_damage_dps = 5600,
-		area_damage_is_impulse = 1,
-		area_damage_duration = 13.3,
-		area_damage_range_falloff = 0.4,
-		area_damage_time_falloff = 0.6,
 	  },
 	  
       damage                  = {

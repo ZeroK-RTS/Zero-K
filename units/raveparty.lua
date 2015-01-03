@@ -147,11 +147,6 @@ unitDef = {
 	    setunitsonfire = "1",
 		burntime = 240,
 		burnchance = 1,
-
-		area_damage = 1,
-		area_damage_radius = 320,
-		area_damage_dps = 40,
-		area_damage_duration = 15,
 	  },
 
       damage                  = {
