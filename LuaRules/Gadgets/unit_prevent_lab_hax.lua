@@ -109,17 +109,7 @@ function checkLabs(checkFeatures)
 							spSetUnitVelocity(unitID, vx, vy, 0)
 						end
 
-					end		
-				elseif (team ~= data.team) and movetype then --order unit blocking ally factory to move away (only if it is not a structure)
-					local xVel,_,zVel = spGetUnitVelocity(unitID)
-					local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-					if math.abs(xVel)<0.1 and math.abs(zVel)<0.1 and (not stunned_or_inbuild) then
-						local ux, uy, uz  = spGetUnitPosition(unitID)
-						local dx,_,dz = spGetUnitDirection(unitID)
-						dx = dx*100
-						dz = dz*100
-						spGiveOrderToUnit(unitID, CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, ux+dx,uy,uz+dz},{"alt"})
-					end
+					end	
 				end
 			end
 		end
