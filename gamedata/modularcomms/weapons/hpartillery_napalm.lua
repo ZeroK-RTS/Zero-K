@@ -8,13 +8,9 @@ local weaponDef = {
 
 	customParams            = {
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
+		areadamage_preset = [[module_napalmgrenade]],
 		burntime = [[60]],
 		setunitsonfire = [[1]],
-
-		area_damage = 1,
-		area_damage_radius = 128,
-		area_damage_dps = 20,
-		area_damage_duration = 20,
 	},
 
 	damage                  = {

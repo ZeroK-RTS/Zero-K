@@ -10,14 +10,10 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[3]],
+		areadamage_preset = [[module_napalmgrenade]],
 		setunitsonfire = "1",
 		burntime = [[90]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
-
-		area_damage = 1,
-		area_damage_radius = 128,
-		area_damage_dps = 20,
-		area_damage_duration = 45,
 	},
 
 	damage                  = {

@@ -92,12 +92,6 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burntime = 60,
-
-		area_damage = 1,
-		area_damage_radius = 128,
-		area_damage_dps = 20,
-		area_damage_duration = 20,
-
 		--lups_heat_fx = [[firewalker]],
 	  },
 	  
