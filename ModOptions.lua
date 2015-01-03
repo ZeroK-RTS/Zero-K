@@ -32,11 +32,23 @@
 local options = {
 -- do deployment and tactics even work?
   {
+    key    = 'a_important',
+    name   = 'Important',
+    desc   = 'Commonly used options.',
+    type   = 'section',
+  },
+  {
+    key    = 'silly', -- koth, lava, ctf, oremex, fun, zombies
+    name   = 'Silly',
+    desc   = 'Silly options for trolling.',
+    type   = 'section',
+  },
+  {
     key    = 'zkmode',
     name   = 'Game Mode',
     desc   = 'Change the game mode.',
     type   = 'list',
-    section= 'modifiers',
+    section= 'silly',
     def    = 'normal',
     items  = {
       {
@@ -69,7 +81,7 @@ local options = {
     name = "No Elo",
     desc = "Prevent battle from affecting Elo rankings",
     type = "bool",
-    section= 'modifiers',
+    section= 'a_important',
     def = false,
   },
   --{
@@ -80,12 +92,6 @@ local options = {
   --  section= 'modifiers',
   --  def = false,
   --},
-  {
-    key    = 'koth',
-    name   = 'King of the Hill Settings',
-    desc   = 'Settings for King of the Hill mode.',
-    type   = 'section',
-  },
     {
         key='hilltime',
         name='Hill control time',
@@ -95,7 +101,7 @@ local options = {
         min=1,
         max=30,
         step=1.0,
-        section='koth',
+        section='silly',
     },
 
     {
@@ -107,15 +113,9 @@ local options = {
         min=0,
         max=5,
         step=0.5,
-        section='koth',
+        section='silly',
     },
 	
-	{
-    key    = 'lava',
-    name   = 'Lava Rise Settings',
-    desc   = 'Settings for lava rise mode.',
-    type   = 'section',
-    },
     {
         key='lavarisecycles',
         name='Number of cycles',
@@ -125,7 +125,7 @@ local options = {
         min=1,
         max=2000,
         step=1.0,
-        section='lava',
+        section='silly',
     },
 
     {
@@ -137,21 +137,15 @@ local options = {
         min=1,
         max=6000,
         step=1,
-        section='lava',
+        section='silly',
     },
-  {
-    key    = 'ctf',
-    name   = 'Capture The Flag Settings',
-    desc   = 'Settings for Capture The Flag mode.',
-    type   = 'section',
-  },
   {
       key='ctf_enabled',
       name='Enable CTF Mode',
       desc='Tick to enable Capture the Flag mode.',
       type='bool',
       def = false,
-      section='ctf',
+      section='silly',
   },
   {
       key='ctf_flags',
@@ -162,7 +156,7 @@ local options = {
       min=1,
       max=10,
       step=1,
-      section='ctf',
+      section='silly',
   },
   {
       key='ctf_inc_mult',
@@ -173,7 +167,7 @@ local options = {
       min=0.0,
       max=100.0,
       step=0.05,
-      section='ctf',
+      section='silly',
   },
   {
       key='ctf_orbit_drop',
@@ -181,7 +175,7 @@ local options = {
       desc='Allow players to orbit drop their commander into battle again, should it die.',
       type='bool',
       def = false,
-      section='ctf',
+      section='silly',
   },
   {
       key='ctf_resp_time',
@@ -192,7 +186,7 @@ local options = {
       min=10,
       max=600,
       step=1,
-      section='ctf',
+      section='silly',
   },
   {
       key='ctf_death_time',
@@ -203,20 +197,14 @@ local options = {
       min=0,
       max=300,
       step=1,
-      section='ctf',
-  },
-  {
-    key    = 'zombie',
-    name   = 'Zombie Settings',
-    desc   = 'Settings for Zombies mutator.',
-    type   = 'section',
+      section='silly',
   },
   {
     key    = 'zombies',
     name   = 'Enable zombies',
     desc   = "All features self-resurrect.",
     type   = 'bool',
-    section= 'zombie',
+    section= 'silly',
     def    = false,
   },
   {
@@ -224,7 +212,7 @@ local options = {
     name   = 'Zombie min spawn time',
     desc   = "In seconds, unit will resurrection no faster than this.",
     type   = 'number',
-    section= 'zombie',
+    section= 'silly',
     def=10,
     min=1,
     max=600,
@@ -235,7 +223,7 @@ local options = {
     name   = 'Zombie resurrection speed',
     desc   = "In metal per second.",
     type   = 'number',
-    section= 'zombie',
+    section= 'silly',
     def=12,
     min=1,
     max=10000,
@@ -246,24 +234,18 @@ local options = {
     name   = 'Zombie permaslow modifier',
     desc   = "If more than 0 zombies are permaslowed to half of that amount, so 1 means 50% slow.",
     type   = 'number',
-    section= 'zombie',
+    section= 'silly',
     def=1,
     min=0,
     max=1,
     step=0.01,
   },
   {
-    key    = 'cncmex',
-    name   = 'Ore Mex Settings',
-    desc   = 'Settings for Ore Mex mutator.',
-    type   = 'section',
-  },
-  {
     key    = 'oremex',
     name   = 'Enable CNC style mexes',
     desc   = "You have to reclaim ore with this option being enabled.",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = false,
   },
   {
@@ -271,7 +253,7 @@ local options = {
     name   = 'Ore mex prespawn',
     desc   = "With this you get prespawned ore extractors.",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = true,
   },
   {
@@ -283,14 +265,14 @@ local options = {
     min=0,
     max=10000,
     step=1,
-    section='cncmex',
+    section='silly',
   },
   {
     key    = 'oremex_invul',
     name   = 'Ore mex invulnerability',
     desc   = "With this you can't damage ore extractors.",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = true,
   },
   {
@@ -298,7 +280,7 @@ local options = {
     name   = 'Ore mex overdrive',
     desc   = "Overdrive ore extractors to produce more ore.",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = true,
   },
   {
@@ -306,7 +288,7 @@ local options = {
     name   = 'Ore mex infinite growth',
     desc   = "With this you can have crystal apocalypse should it hurt units...",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = false,
   },
   {
@@ -314,7 +296,7 @@ local options = {
     name   = 'Ore mex slower uphill growth',
     desc   = "With this you can try to use terraform to slow growth.",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = true,
   },
   {
@@ -322,7 +304,7 @@ local options = {
     name   = 'Ore mex crystal models',
     desc   = "If true, ore will look like crystal, otherwise will look like metal chunks.",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = true,
   },
   {
@@ -330,7 +312,7 @@ local options = {
     name   = 'Ore mex communism',
     desc   = "If true, ore income will be fully equally shared between active&alive players.",
     type   = 'bool',
-    section= 'cncmex',
+    section= 'silly',
     def    = true,
   },
   {
@@ -342,7 +324,7 @@ local options = {
     min=0,
     max=10000,
     step=0.01,
-    section='cncmex',
+    section='silly',
   },
   {
     key = "startingresourcetype",
@@ -409,7 +391,7 @@ local options = {
     name = "Overdrive Resource Distribution Scheme",
     desc = "Different scheme designed for distributing overdrive share.",
     type = "list",
-    section= 'modifiers',
+    section= 'a_important',
     def = "investmentreturn",
     items = {
       {
@@ -681,17 +663,11 @@ local options = {
     def    = false,
   },
   {
-    key    = 'fun',
-    name   = 'Fun Stuff',
-    desc   = 'Fun stuff.',
-    type   = 'section',
-  },
-  {
     key    = 'xmas',
     name   = 'Enable festive units',
     desc   = "Zero K units get into the spirit of the season with a festive new look.",
     type   = 'bool',
-    section= 'fun',
+    section= 'silly',
     def    = false,
   },
   {
@@ -699,7 +675,7 @@ local options = {
     name   = 'Enable giant expensive "I Win" button',
     desc   = "For speed games. Race to build it!",
     type   = 'bool',
-    section= 'fun',
+    section= 'silly',
     def    = false,
   },
   {
