@@ -308,7 +308,7 @@ structureConfig = {
 	pw_inhibitor = function(unitDef)
 			unitDef.maxdamage = 15000
 			unitDef.name = "Wormhole Inhibitor"
-			unitDef.description = "Wormhole Inhibitor"
+			unitDef.description = "Blocks Influence Spread"
 			unitDef.objectname = "pw_mstorage2.obj"
 			unitDef.selfdestructcountdown = 150
 			
@@ -319,6 +319,65 @@ structureConfig = {
 			unitDef.customparams.helptext = "Inhibits Influence spread from enemy planets."
 			unitDef.customparams.helptext_pl = "Nie pozwala wrogim planetom szerzyc wplywow przez tunel czasoprzestrzenny."
 			unitDef.customparams.description_pl = "Inhibitor tunelu czasoprzestrzennego"
+			
+			unitDef.collisionvolumescales = [[80 25 60]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[Box]]					
+		end,
+	pw_guerilla = function(unitDef)
+			unitDef.maxdamage = 15000
+			unitDef.name = "Guerilla Jumpgate"
+			unitDef.description = "Spreads Influence remotely"
+			unitDef.objectname = "pw_gaspowerstation.obj"
+			unitDef.script = "pw_gaspowerstation.lua"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 6
+			unitDef.footprintz = 6
+			
+			unitDef.customparams.soundselect = "shield_select"
+			unitDef.customparams.helptext = "A jumpgate capable of sending Influence to any planet."
+			unitDef.customparams.helptext_pl = "Ten budynek pozwala szerzyc wplywy na dowolnej innej planecie."
+			unitDef.customparams.description_pl = "Zdalnie szerzy wplywy"
+			
+			unitDef.collisionvolumescales = [[70 60 70]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]					
+		end,
+		
+	------------------------------------------------------------------------
+	-- the following are presently just for missions
+	------------------------------------------------------------------------
+	pw_gaspowerstation = function(unitDef)
+			unitDef.maxdamage = 15000
+			unitDef.name = "Gas Power Station"
+			unitDef.description = "Produces Energy"
+			unitDef.objectname = "pw_gaspowerstation.obj"
+			unitDef.script = "pw_gaspowerstation.lua"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 6
+			unitDef.footprintz = 6
+			
+			unitDef.customparams.soundselect = "geo_select"
+			unitDef.customparams.helptext = "A gas-fired power generator."
+			
+			unitDef.collisionvolumescales = [[70 60 70]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]					
+		end,
+	pw_mstorage2 = function(unitDef)
+			unitDef.maxdamage = 15000
+			unitDef.name = "Metal Storage"
+			unitDef.description = "Stores metal"
+			unitDef.objectname = "pw_mstorage2.obj"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 7
+			unitDef.footprintz = 5
+			
+			--unitDef.customparams.soundselect = "shield_select"
+			unitDef.customparams.helptext = "Stores a large quantity of metal for planetary use."
 			
 			unitDef.collisionvolumescales = [[80 25 60]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -358,30 +417,33 @@ structureConfig = {
 			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[Box]]					
 		end,
-	pw_guerilla = function(unitDef)
+	pw_warpgatealt = function(unitDef)
 			unitDef.maxdamage = 15000
-			unitDef.name = "Guerilla Jumpgate"
-			unitDef.description = "Spreads Influence remotely"
-			unitDef.objectname = "pw_gaspowerstation.obj"
-			unitDef.script = "pw_gaspowerstation.lua"
+			unitDef.name = "Warp Core Fabricator"
+			unitDef.description = "Produces warp cores"
+			unitDef.objectname = "pw_warpgate.obj"
+			unitDef.script = "pw_warpgate.lua"
 			unitDef.selfdestructcountdown = 150
 			
-			unitDef.footprintx = 6
-			unitDef.footprintz = 6
+			unitDef.footprintx = 8
+			unitDef.footprintz = 8
 			
-			unitDef.customparams.soundselect = "shield_select"
-			unitDef.customparams.helptext = "A jumpgate capable of sending Influence to any planet."
-			unitDef.customparams.helptext_pl = "Ten budynek pozwala szerzyc wplywy na dowolnej innej planecie."
-			unitDef.customparams.description_pl = "Zdalnie szerzy wplywy"
+			unitDef.explodeas = "GRAV_BLAST"
+			unitDef.selfdestructas = "GRAV_BLAST"
 			
-			unitDef.collisionvolumescales = [[70 60 70]]
+			unitDef.customparams.soundselect = "cloaker_select"
+			unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."	
+			unitDef.customparams.helptext_pl = "Tutaj produkowane sa Rdzenie Czasoprzestrzenne, ktore pozwalaja wysylac statki w dowolne miejsce w galaktyce w mgnieniu oka."	
+			unitDef.customparams.description_pl = "Produkuje Rdzenie Czasoprzestrzenne"
+			
+			unitDef.collisionvolumescales = [[120 100 120]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]					
+			unitDef.collisionvolumetype	= [[CylY]]	
 		end,
 }
 
 -- test data here
-TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHM4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dhc3Bvd2Vyc3RhdGlvbiIsDQogICAgbmFtZSA9ICJHYXMgUG93ZXIgU3RhdGlvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiU21hbGwgUG93ZXIgUHJvZHVjZXIiICAgIA0KICB9LA0KICBzMTAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZSIsDQogICAgbmFtZSA9ICJQb3dlciBHZW5lcmF0b3IgVW5pdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlnaHQgRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTIiLA0KICAgIG5hbWUgPSAiQW5uaWhpbGF0aW9uIFBsYW50IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNZWRpdW0gRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTIgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IEdlb3RoZXJtYWwgVGFwIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJIZWF2eSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19tc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBNZXRhbCBTdG9yYWdlIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTdG9yZXMgTWV0YWwiICAgIA0KICB9LA0KICBzMTQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UiLA0KICAgIG5hbWUgPSAiRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UyIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ3VlcmlsbGEiLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxNyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19pbmhpYml0b3IiLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxOCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19ncmlkIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2Fycmlzb24iLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMyMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19pbnRlcmNlcHRpb24iLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHM5OSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19hcnRlZmFjdCIsDQogICAgbmFtZSA9ICJBbmNpZW50IEFydGVmYWN0IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNeXN0ZXJpb3VzIFJlbGljIg0KICB9LCAgDQp9DQo="
+TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHM4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dhc3Bvd2Vyc3RhdGlvbiIsDQogICAgbmFtZSA9ICJHYXMgUG93ZXIgU3RhdGlvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiU21hbGwgUG93ZXIgUHJvZHVjZXIiICAgIA0KICB9LA0KICBzMTAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZSIsDQogICAgbmFtZSA9ICJQb3dlciBHZW5lcmF0b3IgVW5pdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlnaHQgRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTIiLA0KICAgIG5hbWUgPSAiQW5uaWhpbGF0aW9uIFBsYW50IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNZWRpdW0gRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTIgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IEdlb3RoZXJtYWwgVGFwIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJIZWF2eSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19tc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBNZXRhbCBTdG9yYWdlIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTdG9yZXMgTWV0YWwiICAgIA0KICB9LA0KICBzMTQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UiLA0KICAgIG5hbWUgPSAiRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UyIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ3VlcmlsbGEiLA0KICAgIG5hbWUgPSAiR3VlcmlsbGEgSnVtcGdhdGUiLA0KICAgIGRlc2NyaXB0aW9uID0gIlNwcmVhZHMgSW5mbHVlbmNlIFJlbW90ZWx5IiAgICANCiAgfSwNCiAgczE3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2luaGliaXRvciIsDQogICAgbmFtZSA9ICJXb3JtaG9sZSBJbmhpYml0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBJbmZsdWVuY2UgU3ByZWFkIiAgICANCiAgfSwNCiAgczE4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dyaWQiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IERlZmVuc2UgR3JpZCIsDQogICAgZGVzY3JpcHRpb24gPSAiRGVmZW5kcyBhZ2FpbnN0IGV2ZXJ5dGhpbmciICAgIA0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2Fycmlzb24iLA0KICAgIG5hbWUgPSAiRmllbGQgR2Fycmlzb24iLA0KICAgIGRlc2NyaXB0aW9uID0gIlJlZHVjZXMgSW5mbHVlbmNlIGdhaW4iICAgIA0KICB9LA0KICBzMjAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfaW50ZXJjZXB0aW9uIiwNCiAgICBuYW1lID0gIkludGVyY2VwdGlvbiBOZXR3b3JrIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJJbnRlcmNlcHRzIGFwcHJvYWNoaW5nIGJvbWJlcnMiICAgIA0KICB9LA0KICBzMjEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd2FycGdhdGVhbHQiLA0KICAgIG5hbWUgPSAiV2FycCBDb3JlIEZhYnJpY2F0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFdhcnAgQ29yZXMiDQogIH0sICANCiAgczk5ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2FydGVmYWN0IiwNCiAgICBuYW1lID0gIkFuY2llbnQgQXJ0ZWZhY3QiLA0KICAgIGRlc2NyaXB0aW9uID0gIk15c3RlcmlvdXMgUmVsaWMiDQogIH0sICANCn0="
 --[[
 {
   s0 = {
@@ -461,29 +523,34 @@ TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsD
   },
   s16 = {
     unitname = "pw_guerilla",
-    name = "Dual Energy Storage",
-    description = "Stores Energy"    
+    name = "Guerilla Jumpgate",
+    description = "Spreads Influence Remotely"    
   },
   s17 = {
     unitname = "pw_inhibitor",
-    name = "Dual Energy Storage",
-    description = "Stores Energy"    
+    name = "Wormhole Inhibitor",
+    description = "Blocks Influence Spread"    
   },
   s18 = {
     unitname = "pw_grid",
-    name = "Dual Energy Storage",
-    description = "Stores Energy"    
+    name = "Planetary Defense Grid",
+    description = "Defends against everything"    
   },
   s19 = {
     unitname = "pw_garrison",
-    name = "Dual Energy Storage",
-    description = "Stores Energy"    
+    name = "Field Garrison",
+    description = "Reduces Influence gain"    
   },
   s20 = {
     unitname = "pw_interception",
-    name = "Dual Energy Storage",
-    description = "Stores Energy"    
+    name = "Interception Network",
+    description = "Intercepts approaching bombers"    
   },
+  s21 = {
+    unitname = "pw_warpgatealt",
+    name = "Warp Core Fabricator",
+    description = "Produces Warp Cores"
+  },  
   s99 = {
     unitname = "pw_artefact",
     name = "Ancient Artefact",
