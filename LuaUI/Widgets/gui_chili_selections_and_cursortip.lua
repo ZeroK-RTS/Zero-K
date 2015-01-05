@@ -73,7 +73,6 @@ local Window
 local StackPanel
 local Panel
 local Grid
-local TextBox
 local Image
 local Progressbar
 local LayoutPanel
@@ -1497,11 +1496,11 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 			end
 			
 			if item.wrap then
-				local font = WG.langFont and { font= WG.langFont } or { size=curFontSize } --setting size breaks with cyrillic font
-				controls[ttname][item.name] = TextBox:New{
+				local font = WG.langFont and { font = WG.langFont } or { size = curFontSize } --setting size breaks with cyrillic font
+				controls[ttname][item.name] = Label:New{
 					name=item.name, 				
 					autosize=false,
-					text = itemtext , 
+					caption = itemtext, 
 					width='100%',
 					valign="ascender", 
 					font= font,
@@ -1575,7 +1574,7 @@ local function UpdateStack(ttname, stack)
 			end
 			if controls[ttname][name] then			
 				if item.wrap then	
-					controls[ttname][name]:SetText( item.text )
+					controls[ttname][name]:SetCaption( item.text )
 					controls[ttname][name]:Invalidate()
 				else
 					controls[ttname][name]:SetCaption( item.text )
@@ -1827,12 +1826,8 @@ local function MakeToolTip_Unit(data, tooltip)
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
 			{ name='utt', text = unittooltip .. '\n', wrap=true },
-			
-			
 			{ name='hp', directcontrol = 'hp_unit', },
-			
 			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
-			
 			{ name='help', text = green .. 'Space+click: Show unit stats', },
 		},
 	}
@@ -2478,7 +2473,6 @@ function widget:Initialize()
 	Panel = Chili.Panel
 	StackPanel = Chili.StackPanel
 	Grid = Chili.Grid
-	TextBox = Chili.TextBox
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
 	LayoutPanel = Chili.LayoutPanel
