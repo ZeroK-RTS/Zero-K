@@ -31,6 +31,7 @@ local damages = {}     -- damages[attacker][victim] = { damage, emp}
 local unitCounts = {}  -- unitCounts[defID] = { created, destroyed}
 local lastPara = {}
 
+local plops = {}
 
 local Echo = Spring.Echo
 local spGameOver = Spring.IsGameOver
@@ -76,7 +77,17 @@ for weapon,unit in pairs(weaponIDToUnitDefIDRaw) do
   end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Factory Plop
 
+local function AddFactoryPlop(teamID, plopUnitDefID)
+	plops[#plops + 1] = {
+		teamID = teamID,
+		plopUnitDefID = plopUnitDefID,
+	}
+end
+GG.mod_stats_AddFactoryPlop = AddFactoryPlop
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
@@ -225,6 +236,10 @@ function gadget:GameOver()
 
 	for unit, counts in pairs(unitCounts) do
 		SendData("unit,"..UnitDefs[unit].name .. ",".. UnitDefs[unit].metalCost ..",".. counts[1] .. "," .. counts[2] .. "," .. UnitDefs[unit].health)
+	end
+	
+	for _, data in ipairs(plops) do
+		-- Send Data here
 	end
 
 	local teams = Spring.GetTeamList()
