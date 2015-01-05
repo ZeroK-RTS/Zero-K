@@ -90,11 +90,11 @@ unitDef = {
       craterMult              = 0,
   
       customParams			= {
-	timeslow_damagefactor = [[2]],
+	    timeslow_damagefactor = [[2]],
       },
 	  
       damage                  = {
-	default = 200,
+	    default = 200,
       },
   
       explosionGenerator      = [[custom:flash2purple]],
@@ -107,7 +107,7 @@ unitDef = {
       laserFlareSize          = 4.33,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 450,
+      range                   = 350,
       reloadtime              = 2,
       rgbColor                = [[0.3 0 0.4]],
       soundStart              = [[weapon/laser/heavy_laser5]],

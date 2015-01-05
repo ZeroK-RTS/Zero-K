@@ -9,6 +9,8 @@ local aimProxy = piece("AimProxy");
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetUnitHealth = Spring.GetUnitHealth
+local spSetUnitHealth = Spring.SetUnitHealth
 
 local unpackSpeed = 5;
 
@@ -66,6 +68,7 @@ end
 --closing animation of the factory
 local function Close()
 	Signal( aim )
+	Signal( close )
 	Signal(open) --kill the opening animation if it is in process
 	SetSignalMask(close) --set the signal to kill the closing animation
 	is_open = false;
@@ -95,6 +98,16 @@ local function Close()
 
 	Spring.SetUnitArmored(unitID,true);
 
+	while true do
+		local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+		if not stunned_or_inbuild then
+			local hp = spGetUnitHealth(unitID)
+			local slowMult = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
+			local newHp = hp + slowMult*10
+			spSetUnitHealth(unitID, newHp)
+		end
+		Sleep(500)
+	end
 end
 
 function RestoreAfterDelay()

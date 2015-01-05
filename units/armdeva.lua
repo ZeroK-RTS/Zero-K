@@ -77,6 +77,7 @@ unitDef = {
       accuracy                = 2300,
       alphaDecay              = 0.7,
       areaOfEffect            = 96,
+      avoidFeature            = false,
       burnblow                = true,
       craterBoost             = 0.15,
       craterMult              = 0.3,

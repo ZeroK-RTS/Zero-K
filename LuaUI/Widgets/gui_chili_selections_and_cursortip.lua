@@ -73,7 +73,6 @@ local Window
 local StackPanel
 local Panel
 local Grid
-local TextBox
 local Image
 local Progressbar
 local LayoutPanel
@@ -1492,7 +1491,13 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 			local stackchildren = {}
 
 			if item.icon then
-				controls_icons[ttname][item.name] = Image:New{ file = item.icon, height= icon_size,width= icon_size, fontSize=curFontSize,}
+				controls_icons[ttname][item.name] = Image:New{ 
+					file = item.icon,
+					height = icon_size+6,
+					width= icon_size, 
+					fontSize = curFontSize,
+					valign='center',
+				}
 				stack_children[#stack_children+1] = controls_icons[ttname][item.name]
 			end
 			
@@ -1509,23 +1514,34 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 				}
 				stack_children[#stack_children+1] = controls[ttname][item.name]
 			else
-				local rightmargin = item.icon and icon_size or 0
-				local width = (leftbar and 50 or 230) - rightmargin
+				if item.description then
+					local font = WG.langFont and { font= WG.langFont } or { size=curFontSize } --setting size breaks with cyrillic font
+					controls[ttname][item.name] = Label:New{
+						name=item.name, 				
+						autosize=false,
+						caption = itemtext , 
+						width='100%',
+						valign="ascender", 
+						font= font,
+						--fontShadow=true,
+					}
+				else
+					controls[ttname][item.name] = Label:New{
+						margin = {(leftbar and 1) or 4, 1, 1, 1},
+						fontShadow=true,
+						defaultHeight=0,
+						autosize=false,
+						name=item.name,
+						caption = itemtext,
+						fontSize=curFontSize,
+						align= item.center and 'center' or 'left',
+						valign='center',
+						height=icon_size+6,
+						x=icon_size+50,
+						right=1,
+					}
 				
-				--controls[ttname][item.name] = Label:New{ autosize=false, name=item.name, caption = itemtext, fontSize=curFontSize, valign='center', height=icon_size+5, width = width }
-				controls[ttname][item.name] = Label:New{
-					fontShadow=true,
-					defaultHeight=0,
-					autosize=false,
-					name=item.name,
-					caption = itemtext,
-					fontSize=curFontSize,
-					align= item.center and 'center' or nil,
-					valign='center',
-					height=icon_size+5,
-					x=icon_size+5,
-					right=1,
-				}
+				end
 				stack_children[#stack_children+1] = controls[ttname][item.name]
 			end
 			
@@ -1827,12 +1843,8 @@ local function MakeToolTip_Unit(data, tooltip)
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
 			{ name='utt', text = unittooltip .. '\n', wrap=true },
-			
-			
 			{ name='hp', directcontrol = 'hp_unit', },
-			
 			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
-			
 			{ name='help', text = green .. 'Space+click: Show unit stats', },
 		},
 	}
@@ -1877,7 +1889,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		},
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, }, --name in window
-			{ name='utt', text = unittooltip .. '\n', wrap=true },
+			{ name='utt', text = unittooltip .. '\n', wrap=false, description = true },
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
 			

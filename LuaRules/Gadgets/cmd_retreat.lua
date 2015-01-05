@@ -396,6 +396,7 @@ end
 
 function gadget:RecvLuaMsg(msg, playerID)
 	local _,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID)
+	if spec then return end
 	HandleLuaMessage(msg, teamID);
 end
 

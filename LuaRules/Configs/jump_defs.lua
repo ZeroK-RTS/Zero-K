@@ -9,7 +9,8 @@ for id, ud in pairs (UnitDefs) do
 			reload = tonumber(cp.jump_reload),
 			delay = tonumber(cp.jump_delay),
 			height = tonumber(cp.jump_height),
-
+			
+			noJumpHandling =  (tonumber(cp.no_jump_handling) == 1),
 			rotateMidAir = (tonumber(cp.jump_rotate_midair) == 1),
 			cannotJumpMidair = (tonumber(cp.jump_from_midair) == 0),
 			JumpSpreadException = (tonumber(cp.jump_spread_exception) == 1),

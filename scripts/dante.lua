@@ -153,19 +153,21 @@ end
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
-	Turn(torso, y_axis, 0, math.rad(90))
-	Turn(larm, y_axis, 0, math.rad(120))
-	Turn(rarm, y_axis, 0, math.rad(120))
-	Turn(luparm, x_axis, 0, math.rad(240))
-	Turn(ruparm, x_axis, 0, math.rad(240))
+	if armsFree then
+		Turn(torso, y_axis, 0, math.rad(90))
+		Turn(larm, y_axis, 0, math.rad(120))
+		Turn(rarm, y_axis, 0, math.rad(120))
+		Turn(luparm, x_axis, 0, math.rad(240))
+		Turn(ruparm, x_axis, 0, math.rad(240))
+	end
 	while true do
 		Turn( lupleg , x_axis, math.rad(20), math.rad(50.010989) )
 		Turn( rupleg , x_axis, math.rad(-20), math.rad(50.010989) )
 		Turn( lfoot , x_axis, math.rad(-15.016484), math.rad(70.016484) )
 		Turn( rfoot , x_axis, math.rad(5), math.rad(50.010989) )
 		Turn( rleg , x_axis, math.rad(-10), math.rad(70.016484) )
-		Turn( torso , x_axis, math.rad(-1), math.rad(5) )
 		if armsFree then
+			Turn( torso , x_axis, math.rad(-1), math.rad(5) )
 			Turn( ruparm , y_axis, math.rad(-2.50), math.rad(25) )
 			Turn( luparm , y_axis, math.rad(-2.50), math.rad(25) )
 		end
@@ -203,9 +205,9 @@ local function Walk()
 		Turn( rupleg , x_axis, math.rad(-20), math.rad(50.010989) )
 		Turn( lfoot , x_axis, math.rad(-20), math.rad(130.027473) )
 		Turn( rleg , x_axis, math.rad(-20), math.rad(100) )
-		Turn( torso , y_axis, math.rad(2.5), math.rad(12) )
-		Turn( torso , x_axis, math.rad(1), math.rad(6) )
 		if armsFree then
+			Turn( torso , y_axis, math.rad(2.5), math.rad(12) )
+			Turn( torso , x_axis, math.rad(1), math.rad(6) )
 			Turn( ruparm , y_axis, math.rad(2.5), math.rad(25) )
 			Turn( luparm , y_axis, math.rad(2.5), math.rad(25) )
 		end
@@ -228,10 +230,10 @@ local function Walk()
 		Turn( rfoot , x_axis, math.rad(-20), math.rad(130.027473) )
 		Turn( lleg , x_axis, math.rad(-20), math.rad(100) )
 		
-		Turn( torso , y_axis, math.rad(-2.5), math.rad(12) )
-		Turn( torso , x_axis, math.rad(-1), math.rad(6) )
 		
 		if armsFree then
+			Turn( torso , y_axis, math.rad(-2.5), math.rad(12) )
+			Turn( torso , x_axis, math.rad(-1), math.rad(6) )
 			Turn( ruparm , y_axis, math.rad(5), math.rad(25) )
 			Turn( luparm , y_axis, math.rad(5), math.rad(25) )
 		end
@@ -319,11 +321,13 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 3 then
-		--dgunning = true
+		dgunning = true
 		Signal( SIG_AIM)
 		Signal( SIG_AIM_2)
 		Signal( SIG_AIM_3)
 		SetSignalMask( SIG_AIM_3)
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
+		GG.UpdateUnitAttributes(unitID)
 		armsFree = false
 		
 		Turn( ruparm , x_axis, -pitch - math.rad(20), math.rad(250) )
@@ -337,7 +341,9 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		Signal( SIG_AIM)
 		Signal( SIG_AIM_2)
-		--dgunning = false
+		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+		GG.UpdateUnitAttributes(unitID)
+		dgunning = false
 		return true
 	elseif num == 4 then
 		if dgunning  then return false end

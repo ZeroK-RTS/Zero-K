@@ -401,7 +401,7 @@ upgrades = {
 						v.customparams.burntime = v.customparams.burntime * 1.4
 					end
 					if v.customparams.idstring == "commweapon_hpartillery_napalm" then
-						v.customparams.areadamage_preset = "module_napalmarty_long"
+						v.customparams.area_damage_duration = v.customparams.area_damage_duration * 1.4
 						v.explosiongenerator = "custom:napalm_firewalker_long"
 					end
 				end
@@ -599,6 +599,7 @@ upgrades = {
 				unitDef.customparams.area_cloak = "1"
 				unitDef.customparams.area_cloak_upkeep = "15"
 				unitDef.customparams.area_cloak_radius = "350"
+				unitDef.customparams.area_cloak_decloak_distance = "75"
 			end,
 	},
 	module_jammer = {
@@ -656,7 +657,7 @@ upgrades = {
 				unitDef.autoheal = (unitDef.autoheal or 0) + 20
 		end,
 		useWeaponSlot = true,
-	},	
+	},
 
 	module_superspeed = {
 		name = "Marathon Motion Control",
