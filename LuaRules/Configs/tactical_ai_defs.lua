@@ -18,6 +18,20 @@ local function NameTableToUnitDefID(nameTable)
 	return defTable
 end
 
+local function SetMinus(set, exclusion)
+	local copy = {}
+	for i,v in pairs(set) do
+		copy[i] = v
+	end
+	for _, unitName in ipairs(exclusion) do
+		local ud = UnitDefNames[unitName]
+		if ud and ud.id then
+			copy[ud.id] = nil
+		end
+	end
+	return copy
+end
+
 -- swarm arrays
 -- these are not strictly required they just help with inputting the units
 
@@ -807,7 +821,7 @@ local behaviourConfig = {
 	},
 	
 	["corgarp"] = {
-		skirms = artyRangeSkirmieeArray, 
+		skirms = SetMinus(artyRangeSkirmieeArray, {"corhlt"}), 
 		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 10, 
