@@ -361,7 +361,7 @@ local function UpdateUnitAttributes(unitID, frame)
 	if cloakBlocked then
 		changedAtt = true
 		if not unitCannotCloak[unitID] then
-			Spring.SetUnitCloak(unitID, false, 10000)
+			Spring.SetUnitCloak(unitID, false)
 			unitCannotCloak[unitID] = true
 		end
 	elseif unitCannotCloak[unitID] then

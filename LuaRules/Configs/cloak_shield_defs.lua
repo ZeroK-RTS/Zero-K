@@ -6,6 +6,14 @@
 --  3:  enabled, unless stunned
 --  4:  always enabled
 
+local uncloakables = {}
+
+for k, v in pairs(UnitDefNames) do
+	if (v.customParams.cannotcloak) then
+		uncloakables[k] = true
+	end
+end
+
 local cloakShieldDefs = {}
 
 for name, ud in pairs (UnitDefNames) do
@@ -23,15 +31,19 @@ for name, ud in pairs (UnitDefNames) do
 		cloakShieldDefs[name].init = (cp.area_cloak_init ~= "0")
 		cloakShieldDefs[name].draw = (cp.area_cloak_draw ~= "0")
 		cloakShieldDefs[name].selfCloak = (cp.area_cloak_self ~= "0")
+		
+		local exception = {}
+		if cloakShieldDefs[name].decloakDistance then	
+			for _, eud in pairs (UnitDefs) do
+				if eud.decloakDistance < cloakShieldDefs[name].decloakDistance then
+					exception[eud.id] = true
+				end
+			end
+		end
+		cloakShieldDefs[name].radiusException = exception
 	end
 end
 
-local uncloakables = {}
 
-for k, v in pairs(UnitDefNames) do
-	if (v.customParams.cannotcloak) then
-		uncloakables[k] = true
-	end
-end
 
 return cloakShieldDefs, uncloakables

@@ -33,6 +33,7 @@ unitDef = {
     area_cloak = 1,
     area_cloak_upkeep = 15,
     area_cloak_radius = 440,
+    area_cloak_decloak_distance = 75,
   },
 
   energyUse              = 1.5,

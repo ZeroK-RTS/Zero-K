@@ -599,6 +599,7 @@ upgrades = {
 				unitDef.customparams.area_cloak = "1"
 				unitDef.customparams.area_cloak_upkeep = "15"
 				unitDef.customparams.area_cloak_radius = "350"
+				unitDef.customparams.area_cloak_decloak_distance = "75"
 			end,
 	},
 	module_jammer = {
