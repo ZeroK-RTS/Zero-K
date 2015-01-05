@@ -67,15 +67,15 @@ local MEX_DIAMETER = Game.extractorRadius*2
 local function paybackFactorFunction(repayRatio)
 	-- Must map [0,1) to (0,1]
 	-- Must not have any sequences on the domain that converge to 0 in the codomain.
-	local repay =  0.8 - repayRatio*0.6
-	if repay > 0.5 then
-		return 0.5
+	local repay =  0.35 - repayRatio*0.25
+	if repay > 0.33 then
+		return 0.33
 	else
 		return repay
 	end
 end
 
-local PAYBACK_FACTOR = 1
+local PAYBACK_FACTOR = 0.5
 
 local paybackDefs = { -- cost is how much to pay back
 	[UnitDefNames["armwin"].id] = {cost = UnitDefNames["armwin"].metalCost*PAYBACK_FACTOR},
@@ -841,7 +841,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 	
 	for unitID, value in pairs(mexBaseMetal) do
 		local teamID = mexByID[unitID].refundTeamID
-		local private_share = value*mexByID[unitID].refundTime*MEX_REFUND_SHARE/MEX_REFUND_TIME
+		local private_share = value*MEX_REFUND_SHARE*mexByID[unitID].refundTime/mexByID[unitID].refundTimeTotal
 		privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + private_share
 		teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - private_share
 
@@ -1085,7 +1085,7 @@ function gadget:GameFrame(n)
 				
 				if mexByID[unitID].refundTeamID then
 					local teamID = mexByID[unitID].refundTeamID
-					local private_share = orgMetal*mexByID[unitID].refundTime*MEX_REFUND_SHARE/MEX_REFUND_TIME
+					local private_share = orgMetal*MEX_REFUND_SHARE*mexByID[unitID].refundTime/mexByID[unitID].refundTimeTotal
 					privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + private_share
 					teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase - private_share
 					mexByID[unitID].refundTime = mexByID[unitID].refundTime - 1
@@ -1289,9 +1289,11 @@ local function AddMex(unitID, teamID, metalMake)
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 		
 		if teamID then
+			local refundTime = 400/metalMake
 			mexByID[unitID].refundTeamID = teamID
-			mexByID[unitID].refundTime = MEX_REFUND_TIME
-			mexByID[unitID].refundTotal = metalMake*MEX_REFUND_TIME*MEX_REFUND_SHARE*0.5
+			mexByID[unitID].refundTime = refundTime
+			mexByID[unitID].refundTimeTotal = refundTime
+			mexByID[unitID].refundTotal = metalMake*refundTime*MEX_REFUND_SHARE*0.5
 			mexByID[unitID].refundSoFar = 0
 			teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase + mexByID[unitID].refundTotal
 		end

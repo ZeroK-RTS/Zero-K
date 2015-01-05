@@ -17,6 +17,8 @@ local window, fake_window
 local name_labels = {}
 local roi_labels = {}
 local base_labels = {}
+local base_income_labels = {}
+local od_income_labels = {}
 
 function widget:Initialize()
 	if (Spring.GetModOptions().overdrivesharingscheme ~= "investmentreturn") then
@@ -67,8 +69,10 @@ function widget:Update(s)
 		window.height = fake_window.height - 45
 		window.width = fake_window.width - 15
 		for i = 1, #allied_teams do
-			roi_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_RoI_metalDue")))
-			base_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_base_metalDue")))
+			roi_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_RoI_metalDue") or "#"))
+			base_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_base_metalDue") or "#"))
+			base_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_myBase") or "#"))
+			od_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_myOverdrive") or "#"))
 		end
 	end
 end
@@ -103,7 +107,7 @@ function CreateWindow()
 		height = 220,
 		x = 0,
 		y = 20,
-		width = 220,
+		width = 350,
 		padding = {0, 0, 0, 0},
 		scrollbarSize = 10,
 		scrollPosY    = 0,
@@ -118,7 +122,7 @@ function CreateWindow()
  		y = 5,
  		width = 10,
  		parent = window,
- 		caption = "Payback due:             Overdrive:            Base:",
+ 		caption = "Player     Due:  OD       Base     Income:  OD      Base",
  		fontsize = 13,
  		textColor = {1,1,1,1},
 	}
@@ -138,7 +142,7 @@ function CreateWindow()
 			textColor = {r, g, b, 1},
 		}
 		roi_labels[i] = Chili.Label:New{
-			x = 150,
+			x = 100,
 			y = 16*i - 10,
 			width = 50,
 			parent = window,
@@ -147,13 +151,31 @@ function CreateWindow()
 			textColor = {1, 0.8, 0, 1},
 		}
 		base_labels[i] = Chili.Label:New{
-			x = 250,
+			x = 170,
 			y = 16*i - 10,
 			width = 50,
 			parent = window,
 			caption = "0 m",
 			fontsize = 13,
 			textColor = {0.65, 0.65, 0.65, 1},
+		}
+		od_income_labels[i] = Chili.Label:New{
+			x = 250,
+			y = 16*i - 10,
+			width = 50,
+			parent = window,
+			caption = "0 m",
+			fontsize = 13,
+			textColor = {0.1, 0.8, 0.1, 1},
+		}
+		base_income_labels[i] = Chili.Label:New{
+			x = 300,
+			y = 16*i - 10,
+			width = 50,
+			parent = window,
+			caption = "0 m",
+			fontsize = 13,
+			textColor = {0.1, 0.8, 0.1, 1},
 		}
 	end
 end
