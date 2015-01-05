@@ -95,7 +95,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = [[220]],
+        extra_damage = [[190]],
       },
 
       cylinderTargeting      = 0,
