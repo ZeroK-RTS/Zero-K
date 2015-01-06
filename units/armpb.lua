@@ -29,6 +29,7 @@ unitDef = {
     helptext_pl	   = [[Dzialo Gaussa to wszechstronna wiezyczka, ktora otrzymuje tylko cwierc obrazen, gdy sama nie prowadzi ostrzalu. Jest w stanie atakowac cele podwodne.]],
     modelradius    = [[15]],
 	aimposoffset   = [[0 25 0]],
+    armored_regen = 20,
   },
 
   damageModifier                = 0.25,
