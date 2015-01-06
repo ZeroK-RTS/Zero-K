@@ -834,7 +834,7 @@ local function printAbilities(ud)
 	end
 
 	-- multipliers are 30/16 because given per slowupdate
-	if (ud.idleTime < 1800) or (ud.idleAutoHeal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) then
+	if (ud.idleTime < 1800) or (ud.idleAutoHeal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
 		cells[#cells+1] = 'Improved regeneration'
 		cells[#cells+1] = ''
 		if ud.idleTime < 1800 or ud.idleAutoHeal > 5 then
@@ -852,6 +852,10 @@ local function printAbilities(ud)
 			cells[#cells+1] = cp.amph_regen .. ' HP/s'
 			cells[#cells+1] = ' - At depth: '
 			cells[#cells+1] = cp.amph_submerged_at
+		end
+		if cp.armored_regen then
+			cells[#cells+1] = ' - Closed regen: '
+			cells[#cells+1] = numformat(tonumber(cp.armored_regen)) .. ' HP/s'
 		end
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
