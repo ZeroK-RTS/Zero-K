@@ -61,6 +61,8 @@ local function SetupDefaultPreset()
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	
+	Spring.SendCommands("resbar 0")
+	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
@@ -149,7 +151,7 @@ local function SetupDefaultPreset()
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanel v2",
+	WG.SetWindowPosAndSize("EconomyPanel2",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -191,6 +193,8 @@ local function SetupCraftyPreset()
 	widgetHandler:EnableWidget("Chili Economy Panel v2")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	
+	Spring.SendCommands("resbar 0")
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
@@ -274,7 +278,7 @@ local function SetupCraftyPreset()
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanel v2",
+	WG.SetWindowPosAndSize("EconomyPanel2",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -317,6 +321,8 @@ local function SetupEnsemblePreset()
 	widgetHandler:EnableWidget("Chili Economy Panel v2")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	
+	Spring.SendCommands("resbar 0")
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
@@ -401,7 +407,7 @@ local function SetupEnsemblePreset()
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanel",
+	WG.SetWindowPosAndSize("EconomyPanel2",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -443,6 +449,8 @@ local function SetupWestwoodPreset()
 	widgetHandler:EnableWidget("Chili Economy Panel")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	
+	Spring.SendCommands("resbar 0")
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
