@@ -253,7 +253,7 @@ end
 -- local functions
 
 local function energyToExtraM(energy)  
-	return -1+sqrt(1+(energy*0.25))
+	return sqrt(energy)*0.25
 end
 
 -------------------------------------------------------------------------------------

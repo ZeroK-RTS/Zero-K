@@ -25,6 +25,8 @@ local aim  = 2
 local open = 8
 local close = 16
 
+local BUNKERED_AUTOHEAL = tonumber (UnitDef.customParams.armored_regen) / 2 -- applied every 0.5s
+
 -- private functions
 
 local function Open()
@@ -103,7 +105,7 @@ local function Close()
 		if not stunned_or_inbuild then
 			local hp = spGetUnitHealth(unitID)
 			local slowMult = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
-			local newHp = hp + slowMult*10
+			local newHp = hp + slowMult*BUNKERED_AUTOHEAL
 			spSetUnitHealth(unitID, newHp)
 		end
 		Sleep(500)
