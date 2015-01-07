@@ -523,7 +523,7 @@ local function weapons2Table(cells, ws, ud)
 				cells[#cells+1] = ' - Missile speed:'
 				cells[#cells+1] = numformat(wd.startvelocity*30) .. " - " .. numformat(wd.projectilespeed*30) .. " /s"
 				cells[#cells+1] = ' - Acceleration:'
-				cells[#cells+1] = numformat(wd.weaponAcceleration*900) .. " /s²"
+				cells[#cells+1] = numformat(wd.weaponAcceleration*900) .. " /s^2"
 			else
 				cells[#cells+1] = ' - Missile speed:'
 				cells[#cells+1] = numformat(wd.projectilespeed*30) .. " /s"
@@ -552,19 +552,19 @@ local function weapons2Table(cells, ws, ud)
 		if wd.tracks and wd.turnRate > 0 then
 			cells[#cells+1] = ' - Homing:'
 			local turnrate = wd.turnRate * 30 * 180 / math.pi
-			cells[#cells+1] = numformat(turnrate, 1) .. "°/s"
+			cells[#cells+1] = numformat(turnrate, 1) .. " deg/s"
 		end
 
 		if wd.wobble > 0 then
 			cells[#cells+1] = ' - Wobbly:'
 			local wobble = wd.wobble * 30 * 180 / math.pi
-			cells[#cells+1] = "up to " .. numformat(wobble, 1) .. "°/s"
+			cells[#cells+1] = "up to " .. numformat(wobble, 1) .. " deg/s"
 		end
 
 		if wd.sprayAngle > 0 then
 			cells[#cells+1] = ' - Inaccuracy:'
 			local accuracy = math.asin(wd.sprayAngle) * 90 / math.pi
-			cells[#cells+1] = numformat(accuracy, 1) .. "°"
+			cells[#cells+1] = numformat(accuracy, 1) .. " deg"
 		end
 
 		if wd.type == "BeamLaser" and wd.beamtime > 0.2 then
@@ -599,7 +599,7 @@ local function weapons2Table(cells, ws, ud)
 
 		if wd.trajectoryHeight > 0 then
 			cells[#cells+1] = ' - Arcing shot:'
-			cells[#cells+1] = numformat(math.atan(wd.trajectoryHeight) * 180 / math.pi) .. "°"
+			cells[#cells+1] = numformat(math.atan(wd.trajectoryHeight) * 180 / math.pi) .. " deg"
 		end
 
 		if wd.stockpile then
@@ -613,7 +613,7 @@ local function weapons2Table(cells, ws, ud)
 
 		if ws.firing_arc and (ws.firing_arc > -1) then
 			cells[#cells+1] = ' - Firing arc:'
-			cells[#cells+1] = numformat(360*math.acos(ws.firing_arc)/math.pi) .. '°'
+			cells[#cells+1] = numformat(360*math.acos(ws.firing_arc)/math.pi) .. ' deg'
 		end
 
 		if cp.needs_link then
@@ -1164,17 +1164,17 @@ local function printunitinfo(ud, lang, buttonWidth)
 
 	if (ud.maxAcc) > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Acceleration: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxAcc * gameSpeed2) .. " /s²", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxAcc * gameSpeed2) .. " /s^2", textColor = color.stats_fg, }
 	end
 	if (ud.maxDec) > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Brake rate: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxDec * gameSpeed2) .. " /s²", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxDec * gameSpeed2) .. " /s^2", textColor = color.stats_fg, }
 	end ]]
 
 	local COB_angle_to_degree = 360 / 65536
 	if ud.turnRate > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Turn rate: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " °/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
 	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0)
