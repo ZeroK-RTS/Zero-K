@@ -318,6 +318,7 @@ return {
       count              = 3,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alpha              = 1,
         alphadecay         = 0.1,
@@ -335,6 +336,7 @@ return {
       count              = 25,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = "i2",
         dir                = [[dir]],
@@ -348,6 +350,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         alpha              = 0.3,
         color              = [[1, 0.7, 0.2]],
@@ -360,6 +363,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+      underwater         = true,
       properties = {
         delay              = 1,
         dir                = [[dir]],
