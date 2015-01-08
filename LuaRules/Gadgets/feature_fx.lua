@@ -9,7 +9,7 @@ end
 function gadget:GetInfo()
   return {
     name      = "Feature Effects",
-    desc      = "Spawns and plays various effects related to feature life and death",
+    desc      = "Does effects related to feature life and death",
     author    = "Anarchid",
     date      = "January 2015",
     license   = "GNU GPL, v2 or later",
@@ -23,7 +23,7 @@ local spGetFeaturePosition     = Spring.GetFeaturePosition;
 local spGetFeatureResources    = Spring.GetFeatureResources;
 local spGetFeatureRadius       = Spring.GetFeatureRadius;
 
-local CEG_SPAWN = [[feature_poof]];
+local CEG_SPAWN = [[feature_poof_spawner]];
 
 function gadget:FeatureDestroyed(id, allyTeam)
 	local x,y,z = spGetFeaturePosition(id);
@@ -35,5 +35,6 @@ function gadget:FeatureDestroyed(id, allyTeam)
 		1+r, 1+r
 	);
 
+	--This could be used to later play sounds without betraying events or positions of destroyed features
 	--SendToUnsynced("feature_destroyed", x, y, z);
 end

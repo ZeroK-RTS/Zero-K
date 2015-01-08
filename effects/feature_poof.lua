@@ -1,14 +1,27 @@
 -- feature_poof
 
 return {
+  ["feature_poof_spawner"] = {
+    poof01 = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = [[10]],
+      ground             = true,
+      properties = {
+        delay              = [[i1 x0.1d]],
+        damage             = [[d1]],
+        explosionGenerator = [[custom:feature_poof]],
+      },
+    },
+  },
   ["feature_poof"] = {
     poof01 = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
-      count              = [[10]],
+      count              = [[1]],
       ground             = true,
       properties = {
-        airdrag            = 0.98,
+        airdrag            = 0.975,
         alwaysvisible      = false,
         colormap           = [[0.8 0.65 0.55 1.0	0 0 0 0.0]],
         directional        = true,
