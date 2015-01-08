@@ -20,7 +20,7 @@ local smokePiece = { lidLeft, lidRight, wheel}
 local is_open = false
 local restore_delay = 2000;
 
-local BUNKERED_AUTOHEAL = tonumber (UnitDef.customParams.armored_regen) / 2 -- applied every 0.5s
+local BUNKERED_AUTOHEAL = tonumber (UnitDef.customParams.armored_regen or 20) / 2 -- applied every 0.5s
 
 --signals
 local aim  = 2
