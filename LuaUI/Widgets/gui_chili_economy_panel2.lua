@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Economy Panel v2",
+    name      = "Chili Economy Panel Default",
     desc      = "",
     author    = "jK, Shadowfury333, GoogleFrog",
     date      = "2014",
@@ -535,7 +535,7 @@ function CreateWindow()
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
-		name="EconomyPanel2",
+		name="EconomyPanelDefault",
 		padding = {0,0,0,0},
 		-- right = "50%",
 		x = screenHorizCentre - economyPanelWidth/2,
