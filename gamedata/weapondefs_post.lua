@@ -108,6 +108,17 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Remove special stuff for empirical DPS purposes
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.impactonly then
+		weaponDef.edgeeffectiveness = 1
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Preserve crater sizes for new engine
 -- https://github.com/spring/spring/commit/77c8378b04907417a62c25218d69ff323ba74c8d
 
@@ -243,6 +254,17 @@ end
 		weaponDef.tilelength = (weaponDef.tilelength and weaponDef.tilelength*4) or 800
 	end
  end
+ 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Reduce rounding error in damage
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.impactonly then
+		weaponDef.edgeeffectiveness = 1
+	end
+end
  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

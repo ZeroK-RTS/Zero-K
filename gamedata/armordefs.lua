@@ -98,24 +98,34 @@ local GAUSS_DAMAGE_MOD = 1.5
 -- use categories to set default weapon damages
 for name, wd in pairs(DEFS.weaponDefs) do
 	local weaponNameLower = wd.name:lower()
-	local max = -0.000001
+	local maxDamage = -0.000001
 	for _, dAmount in pairs(wd.damage) do
-		max = math.max(max, dAmount)
+		maxDamage = math.max(maxDamage, dAmount)
 	end
 	for categoryName, _ in pairs(armorDefs) do
 		wd.damage[categoryName] = wd.damage[categoryName] or wd.damage.default
 	end
-	wd.damage.default = max
+	wd.damage.default = maxDamage
 
+	-- Stats
+	if wd.impactonly then
+		wd.customparams.statsdamage = wd.customparams.statsdamage or maxDamage
+	else
+		local aoe = (wd.areaofeffect or 8)/2
+		local dist = 0.09
+		local edgeEff = wd.edgeeffectiveness or 0
+		local theoryDamage = maxDamage*(aoe-dist)/(aoe + 0.01 - dist*edgeEff)
+		wd.customparams.statsdamage = theoryDamage
+	end
+	
 	-- damage vs shields
-	wd.customparams.statsdamage = wd.customparams.statsdamage or max
 	if wd.customparams and wd.customparams.damage_vs_shield then
 		wd.damage.default = tonumber(wd.customparams.damage_vs_shield)
 	else
 		local cp = wd.customparams or {}
 
 		if wd.paralyzer then
-			wd.damage.default = max * EMP_DAMAGE_MOD
+			wd.damage.default = maxDamage * EMP_DAMAGE_MOD
 
 			-- add extra damage vs shields for mixed EMP damage units
 			if cp.extra_damage then
@@ -127,14 +137,14 @@ for name, wd in pairs(DEFS.weaponDefs) do
 			if (tobool(cp.timeslow_onlyslow)) then
 				wd.damage.default = 0
 			end
-			wd.damage.default = wd.damage.default + (tonumber(wd.customparams.timeslow_damagefactor) * max * SLOW_DAMAGE_MOD)
+			wd.damage.default = wd.damage.default + (tonumber(wd.customparams.timeslow_damagefactor) * maxDamage * SLOW_DAMAGE_MOD)
 		end
 
 		if (cp.disarmdamagemult) then
 			if (tobool(cp.disarmdamageonly)) then
 				wd.damage.default = 0
 			end
-			wd.damage.default = wd.damage.default + (tonumber(wd.customparams.disarmdamagemult) * max * DISARM_DAMAGE_MOD)
+			wd.damage.default = wd.damage.default + (tonumber(wd.customparams.disarmdamagemult) * maxDamage * DISARM_DAMAGE_MOD)
 		end
 
 		-- weapon type bonuses

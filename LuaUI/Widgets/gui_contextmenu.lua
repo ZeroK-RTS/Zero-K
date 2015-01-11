@@ -1277,14 +1277,15 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 
 		local weaponStats = GetWeapon( ud.deathExplosion:lower() )
+		local damageValue = tonumber(weaponStats.customParams.statsdamage) or weaponStats.damages[1] or 0
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'Damage: ', textColor = color.stats_fg, }
 		if (weaponStats.paralyzer) then
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1],2) .. " (P)", textColor = colorCyan, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue,2) .. " (P)", textColor = colorCyan, }
 			statschildren[#statschildren+1] = Label:New{ caption = 'Max EMP time: ', textColor = color.stats_fg, }
 			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages.paralyzeDamageTime,2) .. "s", textColor = color.stats_fg, }
 		else
-			statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1],2), textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue,2), textColor = color.stats_fg, }
 		end
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'Area of effect: ', textColor = color.stats_fg, }
@@ -1296,7 +1297,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		end
 
 		-- statschildren[#statschildren+1] = Label:New{ caption = 'Edge Damage: ', textColor = color.stats_fg, }
-		-- statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damages[1] * weaponStats.edgeEffectiveness,2), textColor = color.stats_fg, }
+		-- statschildren[#statschildren+1] = Label:New{ caption = numformat(damageValue * weaponStats.edgeEffectiveness,2), textColor = color.stats_fg, }
 		-- edge damage is always 0, see http://springrts.com/mediawiki/images/1/1c/EdgeEffectiveness.png
 
 	end

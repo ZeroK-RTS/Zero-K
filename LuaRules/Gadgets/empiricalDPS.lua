@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "12 Sep 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -24,12 +24,23 @@ end
 local last
 local start, damage
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, unitDamage, paralyzer, 
+function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-    local wd = WeaponDefs[weaponID]
-	if wd then
-		Spring.Echo(unitDamage/wd.damages[0])
-	end
+    --local wd = WeaponDefs[weaponID]
+	--if wd then
+	--	local aoe = wd.damageAreaOfEffect
+	--	local dist = 0.09
+	--	local edgeEff = wd.edgeEffectiveness
+	--	local writeDamage = wd.damages[0]
+	--	local theoryDamage = writeDamage*(aoe-dist)/(aoe + 0.01 - dist*edgeEff)
+	--	local theoryDist = -unitDamage/writeDamage*(aoe + 0.01)+aoe
+	--	Spring.Echo(wd.customParams.statsdamage)
+	--	Spring.Echo(unitDamage)
+	--	Spring.Echo(theoryDamage)
+	--	Spring.Echo(aoe)
+	--	Spring.Echo(edgeEff)
+	--	Spring.Echo(theoryDist)
+	--end
 	
 	--Spring.SetUnitExperience(attackerID,0.001)
     local frame = Spring.GetGameFrame()
@@ -52,7 +63,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     local frame = Spring.GetGameFrame()
     if start then
-        --Spring.Echo("Total DPS: " .. UnitDefs[unitDefID].health/(frame - start)*30)
+        Spring.Echo("Total DPS: " .. UnitDefs[unitDefID].health/(frame - start)*30)
         start = nil
     end
 end

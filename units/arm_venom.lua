@@ -102,7 +102,7 @@ unitDef = {
       },
 
       damage                  = {
-        default        = 600,
+        default        = 600.5,
       },
 
       duration                = 8,

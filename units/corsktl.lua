@@ -131,7 +131,7 @@ local weaponDefs = {
     shakemagnitude     = 0,
     soundHit           = "explosion/mini_nuke",
     damage = {
-      default          = 8000,
+      default          = 8007.1,
     },
   },
 }

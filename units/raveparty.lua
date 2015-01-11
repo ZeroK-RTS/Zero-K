@@ -110,7 +110,7 @@ unitDef = {
       craterMult              = 3,
 
       damage                  = {
-        default = 3000,
+        default = 3002.1,
       },
 
       edgeeffectiveness       = 0.5,
@@ -155,7 +155,7 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 300,
+        default = 301.1,
         planes  = 300,
         subs    = 15,
       },
@@ -190,7 +190,7 @@ unitDef = {
       craterMult              = 1,
 
       damage                  = {
-        default = 800,
+        default = 801.1,
         planes  = 800,
         subs    = 800,
       },
@@ -231,7 +231,7 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 400,
+        default = 401.1,
         planes  = 400,
         subs    = 20,
       },
@@ -264,7 +264,7 @@ unitDef = {
       craterMult              = 0.5,
 
       damage                  = {
-        default        = 12000,
+        default        = 12003.1,
       },
 
 	  edgeEffectiveness       = 0.75,

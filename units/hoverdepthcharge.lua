@@ -93,7 +93,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 900,
+        default = 900.5,
       },
 
       edgeEffectiveness       = 0.4,

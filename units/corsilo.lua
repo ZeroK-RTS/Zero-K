@@ -82,7 +82,7 @@ unitDef = {
       cruise                  = [[1]],
 
       damage                  = {
-        default = 11500,
+        default = 11501.1,
       },
 
       edgeEffectiveness       = 0.3,
