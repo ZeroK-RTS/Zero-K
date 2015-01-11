@@ -111,13 +111,16 @@ local function MoveScript()
 end
 
 function script.Create()
-	Spring.SetUnitArmored(unitID,true)
 	Hide( ground1)
 	StartThread(SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
 	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_X, x_axis)
 	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_Z, z_axis)
+	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
+		Sleep (100)
+	end
+	Spring.SetUnitArmored(unitID,true)
 end
 
 local function RestoreAfterDelay()
