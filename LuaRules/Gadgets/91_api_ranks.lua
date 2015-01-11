@@ -2,23 +2,24 @@
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
-		name      = "Ranks API",
+		name      = "Ranks API_91",
 		desc      = "Handles unit ranks",
 		author    = "jK, rewritten by Sprung",
 		date      = "Nov 2014", -- original: Dec 19, 2007
 		license   = "GNU GPL, v2 or later",
 		layer     = -math.huge,
-		enabled   = not (Game.version:find('91.0') == 1),
+		enabled   = (Game.version:find('91.0') == 1),
 	}
 end
-
-local XP_PER_RANK = 0.2 -- change to 0.1 once lasthit bonus gets removed
-local floor = math.floor
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local XP_PER_RANK = 0.2 -- change to 0.1 once lasthit bonus gets removed
+
+local floor = math.floor
+
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 GG.UnitRankUp = {}
@@ -39,6 +40,8 @@ function gadget:UnitExperience (unitID, unitDefID, unitTeam, newxp, oldxp)
 		for _,f in pairs (GG.UnitRankUp) do
 			f (unitID, unitDefID, unitTeam, newxp, oldxp)
 		end
+
+		SendToUnsynced ("UnitRankUp", unitID)
 	end
 end
 
@@ -55,7 +58,7 @@ else
 	local spGetMyAllyTeamID = Spring.GetMyAllyTeamID
 	local spGetSpectatingState = Spring.GetSpectatingState
 
-	local function UnitRankUp (unitID)
+	function UnitRankUp (_, unitID)
 		local spec, specFullView = spGetSpectatingState()
 		local isInLos = spGetUnitLosState (unitID, spGetMyAllyTeamID()).los
 		if (Script.LuaUI.UnitRankUp and ((spec and specFullView) or isInLos)) then
@@ -63,15 +66,6 @@ else
 		end
 	end
 
-	function gadget:UnitExperience (unitID, unitDefID, unitTeam, newxp, oldxp)
-		newxp = floor (newxp / XP_PER_RANK)
-		oldxp = floor (oldxp / XP_PER_RANK)
-	
-		if (newxp ~= oldxp) then
-			UnitRankUp(unitID)
-		end
-	end
-	
 	function gadget:Initialize ()
 		gadgetHandler:AddSyncAction("UnitRankUp", UnitRankUp)
 	end
