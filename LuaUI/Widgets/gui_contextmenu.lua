@@ -351,13 +351,13 @@ local function weapons2Table(cells, ws, ud)
 
 	if wd.isShield then
 		cells[#cells+1] = ' - Strength:'
-		cells[#cells+1] = wd.shieldPower
+		cells[#cells+1] = wd.shieldPower .. " HP"
 		cells[#cells+1] = ' - Regen:'
-		cells[#cells+1] = wd.shieldPowerRegen
+		cells[#cells+1] = wd.shieldPowerRegen .. " HP/s"
 		cells[#cells+1] = ' - Regen cost:'
 		cells[#cells+1] = wd.shieldPowerRegenEnergy .. " E/s"
 		cells[#cells+1] = ' - Radius:'
-		cells[#cells+1] = wd.shieldRadius
+		cells[#cells+1] = wd.shieldRadius .. " elmo"
 	else
 		-- calculate damages
 
@@ -500,18 +500,18 @@ local function weapons2Table(cells, ws, ud)
 
 		if show_range then
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(wd.range,2)
+			cells[#cells+1] = numformat(wd.range,2) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
 		if aoe > 15 and show_aoe then
 			cells[#cells+1] = ' - Area of effect:'
-			cells[#cells+1] = numformat(aoe)
+			cells[#cells+1] = numformat(aoe) .. " elmo"
 		end
 
 		if show_projectile_speed then
 			cells[#cells+1] = ' - Projectile speed:'
-			cells[#cells+1] = numformat(wd.projectilespeed*30) .. " /s"
+			cells[#cells+1] = numformat(wd.projectilespeed*30) .. " elmo/s"
 		elseif hitscan[wd.type] then
 			cells[#cells+1] = ' - Instantly hits'
 			cells[#cells+1] = ''
@@ -521,12 +521,12 @@ local function weapons2Table(cells, ws, ud)
 		if (wd.type == "MissileLauncher") then
 			if ((wd.startvelocity < wd.projectilespeed) and (wd.weaponAcceleration > 0)) then
 				cells[#cells+1] = ' - Missile speed:'
-				cells[#cells+1] = numformat(wd.startvelocity*30) .. " - " .. numformat(wd.projectilespeed*30) .. " /s"
+				cells[#cells+1] = numformat(wd.startvelocity*30) .. " - " .. numformat(wd.projectilespeed*30) .. " elmo/s"
 				cells[#cells+1] = ' - Acceleration:'
-				cells[#cells+1] = numformat(wd.weaponAcceleration*900) .. " /s^2"
+				cells[#cells+1] = numformat(wd.weaponAcceleration*900) .. " elmo/s^2"
 			else
 				cells[#cells+1] = ' - Missile speed:'
-				cells[#cells+1] = numformat(wd.projectilespeed*30) .. " /s"
+				cells[#cells+1] = numformat(wd.projectilespeed*30) .. " elmo/s"
 			end
 			cells[#cells+1] = ' - Flight time:'
 			if cp.flighttime then
@@ -592,7 +592,7 @@ local function weapons2Table(cells, ws, ud)
 				cells[#cells+1] = cp.area_damage_dps
 			end
 			cells[#cells+1] = '   * Radius:'
-			cells[#cells+1] = cp.area_damage_radius
+			cells[#cells+1] = numformat(tonumber(cp.area_damage_radius)) .. " elmo"
 			cells[#cells+1] = '   * Duration:'
 			cells[#cells+1] = numformat(tonumber(cp.area_damage_duration)) .. " s"
 		end
@@ -607,7 +607,7 @@ local function weapons2Table(cells, ws, ud)
 			cells[#cells+1] = (((tonumber(ws.stockpile_time) or 0) > 0) and tonumber(ws.stockpile_time) or wd.stockpileTime) .. 's'
 			if ((not ws.free_stockpile) and (ws.stockpile_cost or (wd.metalCost > 0))) then
 				cells[#cells+1] = ' - Stockpile cost:'
-				cells[#cells+1] = ws.stockpile_cost or wd.metalCost
+				cells[#cells+1] = ws.stockpile_cost or wd.metalCost .. " M"
 			end
 		end
 
@@ -675,7 +675,7 @@ local function weapons2Table(cells, ws, ud)
 
 		if cp.shield_drain then
 			cells[#cells+1] = ' - Shield drain:'
-			cells[#cells+1] = cp.shield_drain
+			cells[#cells+1] = cp.shield_drain .. " HP/shot"
 		end
 
 		if cp.aim_delay then
@@ -737,7 +737,7 @@ local function printAbilities(ud)
 		cells[#cells+1] = ' - Upkeep:'
 		cells[#cells+1] = cp.area_cloak_upkeep .. " E/s"
 		cells[#cells+1] = ' - Radius:'
-		cells[#cells+1] = cp.area_cloak_radius
+		cells[#cells+1] = cp.area_cloak_radius .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
@@ -754,7 +754,7 @@ local function printAbilities(ud)
 		end
 		cells[#cells+1] = numformat(ud.cloakCost) .. " E/s"
 		cells[#cells+1] = ' - Decloak radius: '
-		cells[#cells+1] = numformat(ud.decloakDistance)
+		cells[#cells+1] = numformat(ud.decloakDistance) .. " elmo"
 		if not ud.decloakOnFire then
 			cells[#cells+1] = ' - No decloak while shooting'
 			cells[#cells+1] = ''
@@ -771,7 +771,7 @@ local function printAbilities(ud)
 		cells[#cells+1] = ' - Free and automated'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Decloak radius: '
-		cells[#cells+1] = numformat(ud.decloakDistance)
+		cells[#cells+1] = numformat(ud.decloakDistance) .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
@@ -781,11 +781,11 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 		if (ud.radarRadius > 0) then
 			cells[#cells+1] = ' - Radar:'
-			cells[#cells+1] = numformat(ud.radarRadius)
+			cells[#cells+1] = numformat(ud.radarRadius) .. " elmo"
 		end
 		if (ud.jammerRadius > 0) then
 			cells[#cells+1] = ' - Radar jamming:'
-			cells[#cells+1] = numformat(ud.jammerRadius)
+			cells[#cells+1] = numformat(ud.jammerRadius) .. " elmo"
 		end
 		if ud.targfac then
 			cells[#cells+1] = ' - Improves radar accuracy'
@@ -799,11 +799,11 @@ local function printAbilities(ud)
 		cells[#cells+1] = 'Jumping'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Range:'
-		cells[#cells+1] = cp.jump_range
+		cells[#cells+1] = cp.jump_range .. " elmo"
 		cells[#cells+1] = ' - Reload: '
 		cells[#cells+1] = cp.jump_reload .. 's'
 		cells[#cells+1] = ' - Speed:'
-		cells[#cells+1] = numformat(tonumber(cp.jump_speed))
+		cells[#cells+1] = numformat(30*tonumber(cp.jump_speed)) .. " elmo/s"
 		cells[#cells+1] = ' - Midair jump:'
 		cells[#cells+1] = (tonumber(cp.jump_from_midair) == 0) and "No" or "Yes"
 		cells[#cells+1] = ''
@@ -816,7 +816,7 @@ local function printAbilities(ud)
 		cells[#cells+1] = ' - To: '
 		cells[#cells+1] = UnitDefNames[cp.morphto].humanName
 		cells[#cells+1] = ' - Cost: '
-		cells[#cells+1] = math.max(0, (UnitDefNames[cp.morphto].buildTime - ud.buildTime))
+		cells[#cells+1] = math.max(0, (UnitDefNames[cp.morphto].buildTime - ud.buildTime)) .. " M"
 		if cp.morphrank and (tonumber(cp.morphrank) > 0) then
 			cells[#cells+1] = ' - Rank:'
 			cells[#cells+1] = cp.morphrank
@@ -851,7 +851,7 @@ local function printAbilities(ud)
 			cells[#cells+1] = ' - Water regen: '
 			cells[#cells+1] = cp.amph_regen .. ' HP/s'
 			cells[#cells+1] = ' - At depth: '
-			cells[#cells+1] = cp.amph_submerged_at
+			cells[#cells+1] = cp.amph_submerged_at .. " elmo"
 		end
 		if cp.armored_regen then
 			cells[#cells+1] = ' - Closed regen: '
@@ -936,11 +936,11 @@ local function printAbilities(ud)
 		cells[#cells+1] = ' - Eats nearby wreckage to spawn units'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Spawns:'
-		cells[#cells+1] = cp.grey_goo_spawn
+		cells[#cells+1] = UnitDefNames[cp.grey_goo_spawn].humanName
 		cells[#cells+1] = ' - BP:'
 		cells[#cells+1] = cp.grey_goo_drain
 		cells[#cells+1] = ' - Cost:'
-		cells[#cells+1] = cp.grey_goo_cost
+		cells[#cells+1] = cp.grey_goo_cost .. " M"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
@@ -977,7 +977,7 @@ local function printAbilities(ud)
 		cells[#cells+1] = 'Can intercept strategic nukes'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Coverage:'
-		cells[#cells+1] = anti_coverage
+		cells[#cells+1] = anti_coverage .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
@@ -1019,7 +1019,7 @@ local function printAbilities(ud)
 
 	if ud.metalStorage > 0 then
 		cells[#cells+1] = 'Stores: '
-		cells[#cells+1] = ud.metalStorage .. " metal and energy"
+		cells[#cells+1] = ud.metalStorage .. " M"
 	end
 
 	if (#cells > 2 and cells[#cells-1] == '') then
@@ -1146,7 +1146,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Cost: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = cost, textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = cost .. " M", textColor = color.stats_fg, }
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'Max HP: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.health), textColor = color.stats_fg, }
@@ -1156,7 +1156,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 	
 	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.speed) .. " /s (" .. numformat(ud.speed/Game.gameSpeed) .. ")", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.speed) .. " elmo/s", textColor = color.stats_fg, }
 	end
 
 	--[[ Enable through some option perhaps
@@ -1164,11 +1164,11 @@ local function printunitinfo(ud, lang, buttonWidth)
 
 	if (ud.maxAcc) > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Acceleration: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxAcc * gameSpeed2) .. " /s^2", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxAcc * gameSpeed2) .. " elmo/s^2", textColor = color.stats_fg, }
 	end
 	if (ud.maxDec) > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Brake rate: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxDec * gameSpeed2) .. " /s^2", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.maxDec * gameSpeed2) .. " elmo/s^2", textColor = color.stats_fg, }
 	end ]]
 
 	local COB_angle_to_degree = 360 / 65536
@@ -1181,29 +1181,29 @@ local function printunitinfo(ud, lang, buttonWidth)
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy,2), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy,2) .. " E/s", textColor = color.stats_fg, }
 	end
 
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*64), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*64) .. " elmo", textColor = color.stats_fg, }
 		-- 64 is to offset the engine multiplier, which is
 		-- (modInfo.losMul / (SQUARE_SIZE * (1 << modInfo.losMipLevel)))
 	end
 
 	if (ud.sonarRadius > 0) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sonar: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarRadius), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.sonarRadius) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.wantedHeight > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Altitude: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.wantedHeight) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	if ud.customParams.pylonrange then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Grid link range: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.pylonrange), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.customParams.pylonrange) .. " elmo", textColor = color.stats_fg, }
 	end
 
 	-- transportability by light or heavy airtrans
@@ -1289,11 +1289,11 @@ local function printunitinfo(ud, lang, buttonWidth)
 		end
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'Area of effect: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damageAreaOfEffect,2), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(weaponStats.damageAreaOfEffect,2) .. " elmo", textColor = color.stats_fg, }
 		
 		if (weaponStats.customParams.setunitsonfire) then
 			statschildren[#statschildren+1] = Label:New{ caption = 'Afterburn: ', textColor = color.stats_fg, }
-			statschildren[#statschildren+1] = Label:New{ caption = numformat((weaponStats.customParams.burntime or 450)/30,2) .. "s", textColor = colorFire, }
+			statschildren[#statschildren+1] = Label:New{ caption = numformat((weaponStats.customParams.burntime or 450)/30) .. "s (15 DPS)", textColor = colorFire, }
 		end
 
 		-- statschildren[#statschildren+1] = Label:New{ caption = 'Edge Damage: ', textColor = color.stats_fg, }
