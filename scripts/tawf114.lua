@@ -32,7 +32,7 @@ local currentTracks = 1
 
 local smokePiece = {base, turret}
 
-local function RestoreAfterDelay ()
+local function RestoreAfterDelay()
 	Signal (SIG_Restore)
 	SetSignalMask (SIG_Restore)
 
@@ -44,7 +44,7 @@ local function RestoreAfterDelay ()
 	StartThread (IdleAnim)
 end
 
-function TracksControl ()
+function TracksControl()
 	Signal (SIG_Move)
 	SetSignalMask (SIG_Move)
 
@@ -73,9 +73,10 @@ function TracksControl ()
 end
 
 function IdleAnim ()
-	if (isAiming or isMoving) then return end
-	SetSignalMask (SIG_Aim)
-	SetSignalMask (SIG_Move)
+	if (isAiming or isMoving) then 
+		return 
+	end
+	SetSignalMask(SIG_Aim + SIG_Move)
 
 	while true do
 		Turn (turret, y_axis, math.rad(math.random(-20, 20)), math.rad(5))
@@ -84,7 +85,7 @@ function IdleAnim ()
 	end
 end
 
-function Stunned (isFull) -- future disarm/EMP obedience
+function Stunned(isFull) -- future disarm/EMP obedience
 	StopTurn (turret, y_axis)
 	StopTurn (sleeve, x_axis)
 end
@@ -118,7 +119,7 @@ function script.Shot ()
 	Move (missiles[currentMissile], z_axis, 0, 2.5)
 end
 
-function script.AimWeapon (num, heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal (SIG_Aim)
 	SetSignalMask (SIG_Aim)
 
@@ -143,11 +144,11 @@ end
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity < 0.5) then
-		if (math.random() < 2*severity) then Explode (missiles[1], sfxFall + sfxFire) end
-		if (math.random() < 2*severity) then Explode (missiles[2], sfxFall + sfxSmoke) end
+		Explode (missiles[1], sfxFall + sfxFire)
+		Explode (missiles[2], sfxFall + sfxSmoke)
 		return 1
-	elseif (severity < 0.75)
-		if (math.random() < severity) then Explode (turret, sfxFall) end
+	elseif (severity < 0.75) then
+		Explode (turret, sfxFall) 
 		Explode (sleeve, sfxFall)
 		Explode (tracks[1], sfxShatter)
 		Explode (missiles[1], sfxFall + sfxSmoke)
