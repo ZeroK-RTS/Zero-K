@@ -46,6 +46,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[corbanish.s3o]],
+  script              = [[tawf114.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[CORE]],
