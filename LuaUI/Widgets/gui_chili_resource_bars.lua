@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Resource Bars",
+    name      = "Chili Resource Bars Classic",
     desc      = "",
     author    = "jK",
     date      = "2010",

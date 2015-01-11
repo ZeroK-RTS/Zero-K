@@ -231,7 +231,7 @@ upgrades = {
 	},
 	weaponmod_high_frequency_beam = {
 		name = "High Frequency Beam",
-		description = "Beam Laser/Slow Beam/Disruptor Beam/Particle Beam: +15% damage and range",
+		description = " +15% damage and range to Beam Laser/Slow Beam/Disruptor Beam/Light Particle Beam/Heavy Particle Beam",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {

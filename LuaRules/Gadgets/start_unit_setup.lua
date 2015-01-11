@@ -232,6 +232,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
+		if GG.mod_stats_AddFactoryPlop then
+			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
+		end
 		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
 		
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated

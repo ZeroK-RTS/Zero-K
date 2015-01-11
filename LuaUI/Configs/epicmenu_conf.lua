@@ -73,15 +73,13 @@ confdata.color = color
 
 local spSendCommands = Spring.SendCommands
 
-
 confdata.eopt = {}
-local path = ''
 
 local function nullFunc()
 end
 
-local function AddOption(option)
-	option.path=path
+local function AddOption(path, option)
+	option.path = path or "Settings\Broken Paths"
 	if not option.key then
 		option.key = option.name
 	end
@@ -89,8 +87,9 @@ local function AddOption(option)
 end
 
 --ShortHand for adding a button
-local function ShButton( caption, action2, tooltip, advanced, icon, DisableFunc )
-	AddOption({
+local function ShButton(path, caption, action2, tooltip, advanced, icon, DisableFunc)
+	AddOption(path,
+	{
 		type='button',
 		name=caption,
 		desc = tooltip or '',
@@ -105,8 +104,9 @@ end
 
 
 --ShortHand for adding radiobuttons
-local function ShRadio( caption, items,defValue, action2, advanced) 
-	AddOption({
+local function ShRadio(path, caption, items,defValue, action2, advanced) 
+	AddOption(path,
+	{
 		type='radioButton', 
 		name=caption,
 		key=caption,
@@ -119,8 +119,9 @@ local function ShRadio( caption, items,defValue, action2, advanced)
 end
 
 --ShortHand for adding a label
-local function ShLabel( caption )
-	AddOption({
+local function ShLabel(path, caption)
+	AddOption(path,
+	{
 		type='label',
 		name=caption,
 		value = caption,
@@ -155,9 +156,9 @@ confdata.subMenuIcons = {
 -- SETUP MENU HERE
 
 --- GENERAL SETTINGS --- settings about settings
-path='Settings/Reset Settings'
-	ShLabel( 'Reset graphic settings to minimum.')
-	ShButton( 'Reset graphic settings',function()
+local generalPath = 'Settings/Reset Settings'
+	ShLabel(generalPath, 'Reset graphic settings to minimum.')
+	ShButton(generalPath, 'Reset graphic settings',function()
 					spSendCommands{"water 0",
 						"Shadows 0",
 						"maxparticles 100",
@@ -174,15 +175,16 @@ path='Settings/Reset Settings'
 				end,
 				'Use this if your performance is poor'
 			)
-	ShLabel( 'Reset custom settings to default.')
-	ShButton( 'Reset custom settings', function() WG.crude.ResetSettings() end )
-	ShLabel( 'Reset hotkeys.')
-	ShButton( 'Reset hotkeys',function() WG.crude.ResetKeys() end )
+	ShLabel(generalPath, 'Reset custom settings to default.')
+	ShButton(generalPath, 'Reset custom settings', function() WG.crude.ResetSettings() end)
+	ShLabel(generalPath, 'Reset hotkeys.')
+	ShButton(generalPath, 'Reset hotkeys',function() WG.crude.ResetKeys() end)
 
 
-path='Settings'
+local settingsPath = 'Settings'
 	--[[
-	AddOption({
+	AddOption(settingsPath,
+	{
 		name = 'Show Advanced Settings',
 		type = 'bool',
 		value = false,
@@ -191,21 +193,20 @@ path='Settings'
 
 
 --- GAME --- Stuff for gameplay only. Spectator would never need to open this
-path='Game' 
+local gamePath = 'Game' 
+local gameSpeedPath = 'Game/Game Speed'
 
-	ShButton( 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png' )
-	path='Game/Game Speed' 
-		ShButton( 'Increase Speed', 'speedup' )
-		ShButton( 'Decrease Speed', 'slowdown' )
+	ShButton(gamePath, 'Pause/Unpause', 'pause', nil, nil, imgPath .. 'epicmenu/media_playback_pause.png')
+		ShButton(gameSpeedPath, 'Increase Speed', 'speedup')
+		ShButton(gameSpeedPath, 'Decrease Speed', 'slowdown')
 		
-path='Game' 
-	ShLabel('')
-	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
---	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end )
+	ShLabel(gamePath, '')
+	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end)) 
+--	ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
 
 --- CAMERA ---
-path='Settings/Camera'
+local cameraPath = 'Settings/Camera'
 	--[[
 		the problem is "radioButton" is not fully implemented to recognize the item "viewta" as an existing action,
 		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound. A proposed solution is to enable both "radioButton" 
@@ -213,7 +214,8 @@ path='Settings/Camera'
 	--]]
 
 	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
-	ShRadio( 'Camera Type', {
+	ShRadio( cameraPath,
+		'Camera Type', {
 			{name = 'Total Annihilation',key='Total Annihilation', desc='TA camera', hotkey=nil},
 			{name = 'FPS',key='FPS', desc='FPS camera', hotkey=nil},
 			{name = 'Free',key='Free', desc='Freestyle camera', hotkey=nil},
@@ -239,35 +241,36 @@ path='Settings/Camera'
 		end
 		)
 	
-	ShButton( 'Flip the TA Camera', 'viewtaflip' )
-	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
-	ShButton( 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll' )
-	ShButton( 'Toggle Smooth Camera', 'luaui togglewidget SmoothCam' )
-	--ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
+	ShButton(cameraPath, 'Flip the TA Camera', 'viewtaflip')
+	ShButton(cameraPath, 'Toggle Camera Shake', 'luaui togglewidget CameraShake')
+	ShButton(cameraPath, 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll')
+	ShButton(cameraPath, 'Toggle Smooth Camera', 'luaui togglewidget SmoothCam')
+	--ShButton(cameraPath, 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
-path='Settings/Camera/Old Camera Shortcuts'	
-	ShButton( 'Total Annihilation', 'viewta' )
-	ShButton( 'FPS', 'viewfps' )
-	ShButton( 'Free', 'viewfree' )
-	ShButton( 'Rotatable Overhead', 'viewrot' )
-	ShButton( 'Total War', 'viewtw' )
-	ShLabel('')
-	ShButton( 'Move Forward', 'moveforward' )	
-	ShButton( 'Move Back', 'moveback' )	
-	ShButton( 'Move Left', 'moveleft' )	
-	ShButton( 'Move Right', 'moveright' )
-	ShLabel(' ')
-	ShButton( 'TA camera track unit', 'track' )
-	ShButton( 'Overview mode', 'toggleoverview' )
-	ShButton( 'Panning mode','mousestate', 'Note: must be bound to a key for use')
+local oldCameraPath = 'Settings/Camera/Old Camera Shortcuts'	
+	ShButton(oldCameraPath, 'Total Annihilation', 'viewta')
+	ShButton(oldCameraPath, 'FPS', 'viewfps')
+	ShButton(oldCameraPath, 'Free', 'viewfree')
+	ShButton(oldCameraPath, 'Rotatable Overhead', 'viewrot')
+	ShButton(oldCameraPath, 'Total War', 'viewtw')
+	ShLabel(oldCameraPath, '')
+	ShButton(oldCameraPath, 'Move Forward', 'moveforward')	
+	ShButton(oldCameraPath, 'Move Back', 'moveback')	
+	ShButton(oldCameraPath, 'Move Left', 'moveleft')	
+	ShButton(oldCameraPath, 'Move Right', 'moveright')
+	ShLabel(oldCameraPath, ' ')
+	ShButton(oldCameraPath, 'TA camera track unit', 'track')
+	ShButton(oldCameraPath, 'Overview mode', 'toggleoverview')
+	ShButton(oldCameraPath, 'Panning mode','mousestate', 'Note: must be bound to a key for use')
 	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
-path='Settings/HUD Panels'
-	ShButton( 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)' )
+local HUDPath = 'Settings/HUD Panels'
+	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
 
-path='Settings/HUD Panels/HUD Skin'
-	AddOption({
+local HUDSkinPath = 'Settings/HUD Panels/HUD Skin'
+	AddOption(HUDSkinPath,
+	{
 		name = 'Skin Sets (Requires LuaUI Reload)',
 		type = 'list',
 		OnChange = function (self)
@@ -281,54 +284,58 @@ path='Settings/HUD Panels/HUD Skin'
 			{ key = 'Twilight', name = 'Twilight', },
 		},
 	})
-	ShButton('Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.' )
+	ShButton(HUDSkinPath, 'Reload LuaUI', 'luaui reload', 'Reloads the entire UI. NOTE: This button will not work. You must bind a hotkey to this command and use the hotkey.')
 
 
 --- Interface --- anything that's an interface but not a HUD Panel
-path='Settings/Interface'
-	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
-path='Settings/Interface/Map'
-	ShButton( 'Map Draw Key', "drawinmap", nil, true )
-path='Settings/Interface/Mouse Cursor'
-	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
-	AddOption({ 	
+local pathInterface = 'Settings/Interface'
+local pathMap = 'Settings/Interface/Map'
+local pathMouse = 'Settings/Interface/Mouse Cursor'
+	ShButton(pathInterface, 'Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage')
+	ShButton(pathMap, 'Map Draw Key', "drawinmap", nil, true)
+	ShButton(pathMouse, 'Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.')
+	AddOption(pathMouse,
+	{ 	
 		name = 'Hardware Cursor',
 		type = 'bool',
 		springsetting = 'HardwareCursor',
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
-	} )	
-path='Settings/Interface/Selection'
-	path='Settings/Interface/Selection/Selection Shapes'
-		ShButton('Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
-	path='Settings/Interface/Selection/Selection XRay&Halo'
-		ShButton('Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")	
-	path='Settings/Interface/Selection/Team Platters'
-		ShButton('Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
-	path='Settings/Interface/Selection/Blurry Halo Selections'
-		ShButton('Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
+	})	
+	
+local pathSelectionShapes = 'Settings/Interface/Selection/Selection Shapes'
+local pathSelectionXrayHalo = 'Settings/Interface/Selection/Selection XRay&Halo'
+local pathSelectionPlatters = 'Settings/Interface/Selection/Blurry Halo Selections'
+local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selections'
+	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
+	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")	
+	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
+	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
-path='Settings/Misc'
-	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
-	ShButton( 'Game Info', "gameinfo", '', true )
-	ShButton( 'Share Dialog...', 'sharedialog', '', true )
-	ShButton( 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true )
+local pathMisc = 'Settings/Misc'
+	ShButton(pathMisc, 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true)
+	ShButton(pathMisc, 'Game Info', "gameinfo", '', true)
+	ShButton(pathMisc, 'Share Dialog...', 'sharedialog', '', true)
+	ShButton(pathMisc, 'FPS Control', "controlunit", 'Control a unit directly in FPS mode.', true)
 	--ShButton( 'Exit Game...', "exitwindow", '', false ) --this breaks the exitwindow, fixme
-	AddOption({
+	AddOption(pathMisc,
+	{
 		name = 'Menu pauses in SP',
 		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
 		type = 'bool',
 		value = true,
 	})
-	AddOption({
+	AddOption(pathMisc,
+	{
 		name = 'Use uikeys.txt',
 		desc = 'NOT RECOMMENDED! Enable this to use the engine\'s keybind file. This can break existing functionality. Requires restart.',
 		type = 'bool',
 		advanced = true,
 		value = false,
 	})
-	AddOption({
+	AddOption(pathMisc,
+	{
 		name = 'Use Old Chili',
 		desc = 'Enable this if menu element is missing or does not render properly in Spring 96+. '..
 				'Do NOT enable if you see nothing wrong with the menu (it is slower).'..
@@ -347,39 +354,41 @@ path='Settings/Misc'
 	})	
 
 
-path='Settings/Misc/Screenshots'	
-	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
-	ShButton( 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots' )
-	ShButton( 'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
-				..'Creates a smooth video framerate without ingame stutter. '
-				..'Caution: It\'s safer to use this in windowed mode because the encoder pop-up menu appears in the foreground window, and could crash the game with a "Fatal Error" after a long recording. '
-				..'\n\nRecommendation (especially for low-end PCs): After activating the video recording select the fastest encoder such as Microsoft Video and record the video in segments. '
-				..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.' ) 
+local pathMiscScreenshots = 'Settings/Misc/Screenshots'	
+	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots') 
+	ShButton(pathMiscScreenshots, 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots')
+	ShButton(pathMiscScreenshots, 
+			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
+			..'Creates a smooth video framerate without ingame stutter. '
+			..'Caution: It\'s safer to use this in windowed mode because the encoder pop-up menu appears in the foreground window, and could crash the game with a "Fatal Error" after a long recording. '
+			..'\n\nRecommendation (especially for low-end PCs): After activating the video recording select the fastest encoder such as Microsoft Video and record the video in segments. '
+			..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.') 
 	
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
-path='Settings/Graphics'
-	ShLabel('View Radius')
+local pathGraphics = 'Settings/Graphics'
+	ShLabel(pathGraphics, 'View Radius')
 	
-	ShButton('Increase Radius', "increaseviewradius" )
-	ShButton('Decrease Radius', "decreaseviewradius" )
+	ShButton(pathGraphics, 'Increase Radius', "increaseviewradius")
+	ShButton(pathGraphics, 'Decrease Radius', "decreaseviewradius")
 
 
-	ShLabel('Trees')
-	ShButton('Toggle View', 'drawtrees', nil, nil, imgPath..'epicmenu/tree_1.png' )
-	ShButton('See More Trees', 'moretrees', nil, nil, imgPath..'epicmenu/tree_1.png' )
-	ShButton('See Less Trees', 'lesstrees', nil, nil, imgPath..'epicmenu/tree_1.png' )
+	ShLabel(pathGraphics, 'Trees')
+	ShButton(pathGraphics, 'Toggle View', 'drawtrees', nil, nil, imgPath..'epicmenu/tree_1.png')
+	ShButton(pathGraphics, 'See More Trees', 'moretrees', nil, nil, imgPath..'epicmenu/tree_1.png')
+	ShButton(pathGraphics, 'See Less Trees', 'lesstrees', nil, nil, imgPath..'epicmenu/tree_1.png')
 	--{'Toggle Dynamic Sky', function(self) spSendCommands{'dynamicsky'} end },
 	
-	ShLabel('Water Settings')
-	ShButton('Basic', function() spSendCommands{"water 0"} end, nil, nil, imgPath..'epicmenu/water.png' )
-	ShButton('Reflective', function() spSendCommands{"water 1"} end, nil, nil, imgPath..'epicmenu/water.png' )
-	ShButton('Reflective and Refractive', function() spSendCommands{"water 3"} end, nil, nil, imgPath..'epicmenu/water.png' )
-	ShButton('Dynamic', function() spSendCommands{"water 2"} end, nil, nil, imgPath..'epicmenu/water.png' )
-	ShButton('Bumpmapped', function() spSendCommands{"water 4"} end, nil, nil, imgPath..'epicmenu/water.png' )
+	ShLabel(pathGraphics, 'Water Settings')
+	ShButton(pathGraphics, 'Basic', function() spSendCommands{"water 0"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphics, 'Reflective', function() spSendCommands{"water 1"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphics, 'Reflective and Refractive', function() spSendCommands{"water 3"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphics, 'Dynamic', function() spSendCommands{"water 2"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphics, 'Bumpmapped', function() spSendCommands{"water 4"} end, nil, nil, imgPath..'epicmenu/water.png')
 
-	ShLabel('Shadow Settings')
+	ShLabel(pathGraphics, 'Shadow Settings')
 	
-	AddOption({
+	AddOption(pathGraphics, 
+	{
 		name = 'Shadow Detail (Slide left for off)',
 		type = 'number',
 		valuelist = {512, 1024, 2048, 4096},
@@ -392,9 +401,10 @@ path='Settings/Graphics'
 			curShadow=math.max(1,curShadow)
 			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
 		end, 
-	} )
+	})
 	
-	ShButton('Toggle Shadows',
+	ShButton(pathGraphics, 
+	'Toggle Shadows',
 		function()
 			local curShadow = Spring.GetConfigInt("Shadows") or 0
 			if curShadow == 0 then
@@ -407,7 +417,7 @@ path='Settings/Graphics'
 		end
 	)
 
-	ShButton('Toggle Terrain Shadows',
+	ShButton(pathGraphics, 'Toggle Terrain Shadows',
 		function()
 			local curShadow=Spring.GetConfigInt("Shadows") or 0
 			if curShadow == 0 then
@@ -423,8 +433,9 @@ path='Settings/Graphics'
 		end
 	)
 	
-	ShLabel('Various')
-	AddOption({
+	ShLabel(pathGraphics, 'Various')
+	AddOption(pathGraphics, 
+	{
 		name = 'Brightness',
 		type = 'number',
 		min = 0, 
@@ -436,41 +447,44 @@ path='Settings/Graphics'
 	} )
 	
 	
-	AddOption({ 	
+	AddOption(pathGraphics, 
+	{ 	
 		name = 'Ground Decals',
 		type = 'bool',
 		springsetting = 'GroundDecals',
 		OnChange=function(self) spSendCommands{"grounddecals " .. (self.value and 1 or 0) } end, 
 	} )
 
-	AddOption({
+	AddOption(pathGraphics, 
+	{
 		name = 'Maximum Particles (100 - 20,000)',
 		type = 'number',
 		valuelist = {100,500,1000,2000,5000,10000,20000},
 		springsetting = 'MaxParticles',
 		OnChange=function(self) Spring.SendCommands{"maxparticles " .. self.value } end, 
 	} )
-	ShButton('Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager','luaui togglewidget Lups'} end )
-	ShButton('Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
+	ShButton(pathGraphics, 'Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager','luaui togglewidget Lups'} end )
+	ShButton(pathGraphics, 'Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
 	
-path='Settings/Graphics/Effects'
-	ShButton('Toggle Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen' )
-	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )
-	path='Settings/Graphics/Effects/Night View'
-		ShButton('Toggle Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
+local pathGraphicsExtras = 'Settings/Graphics/Effects'
+	ShButton(pathGraphicsExtras, 'Toggle Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen')
+	ShButton(pathGraphicsExtras, 'Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )
+local pathGraphicsExtrasNight = 'Settings/Graphics/Effects/Night View'
+	ShButton(pathGraphicsExtrasNight, 'Toggle Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
 	
 
-path='Settings/Graphics/Map'	
-	path='Settings/Graphics/Map/VR Grid'
-		ShButton('Toggle VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
-	path='Settings/Graphics/Map/Map Extension'
-		ShButton('Toggle Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
-	path='Settings/Graphics/Map/Edge Barrier'
-		ShButton('Toggle Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')
+
+local pathVR = 'Settings/Graphics/Map/VR Grid'
+	ShButton(pathVR, 'Toggle VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
+local pathMapExtension = 'Settings/Graphics/Map/Map Extension'
+	ShButton(pathMapExtension, 'Toggle Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
+local pathEdgeBarrier = 'Settings/Graphics/Map/Edge Barrier'
+	ShButton(pathEdgeBarrier, 'Toggle Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')
 	
-path='Settings/Graphics/Unit Visibility'
-	ShLabel( 'Unit Visibility Options')
-	AddOption({
+local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
+	ShLabel(pathUnitVisiblity, 'Unit Visibility Options')
+	AddOption(pathUnitVisiblity,
+	{
 		name = 'Draw Distance',
 		type = 'number',
 		min = 1, 
@@ -478,7 +492,8 @@ path='Settings/Graphics/Unit Visibility'
 		springsetting = 'UnitLodDist',
 		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
 	} )
-	AddOption({
+	AddOption(pathUnitVisiblity,
+	{
 	  name = 'Icon Distance',
 	  type = 'number',
 	  min = 1, 
@@ -486,21 +501,22 @@ path='Settings/Graphics/Unit Visibility'
 	  springsetting = 'UnitIconDist',
 	  OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
 	  } )
-	AddOption({
+	AddOption(pathUnitVisiblity,
+	{
 		name = 'Shiny Units',
 		type = 'bool',
 		springsetting = 'AdvUnitShading',
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
-	ShLabel( 'Unit Visibility Widgets')
-	ShButton('Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
+	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')
+	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
 	
-	path='Settings/Graphics/Unit Visibility/Spotter'
-		ShButton('Toggle Unit Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
-	path='Settings/Graphics/Unit Visibility/XRay Shader'
-		ShButton('Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
-	path='Settings/Graphics/Unit Visibility/Outline'
-		ShButton('Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
+	local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
+		ShButton(pathSpotter, 'Toggle Unit Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
+	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
+		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
+	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
+		ShButton(pathUnitOutline, 'Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
 
 --[[
 path='Settings/Audio'
@@ -535,18 +551,19 @@ path='Settings/Audio'
 ]]
 		
 --- HELP ---
-path='Help'
-	AddOption({
+local pathHelp = 'Help'
+	AddOption(pathHelp,
+	{
 		type='text',
 		name='Tips',
 		value=[[Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options. 
 			You can also space-click on menu elements to see context settings. 
 			]]
 	})
-	ShButton('Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
-	ShButton('Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
-	path='Help/Clippy Comments'
-		ShButton('Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
+	ShButton(pathHelp,'Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
+	ShButton(pathHelp,'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
+local pathClippy = 'Help/Clippy Comments'
+	ShButton(pathClippy, 'Toggle Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 --- MISC
 --

@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Economy Panel",
+    name      = "Chili Economy Panel with Balance Bar",
     desc      = "",
     author    = "jK, Shadowfury333",
     date      = "2014",

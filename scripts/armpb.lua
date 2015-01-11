@@ -25,7 +25,7 @@ local aim  = 2
 local open = 8
 local close = 16
 
-local BUNKERED_AUTOHEAL = tonumber (UnitDef.customParams.armored_regen) / 2 -- applied every 0.5s
+local BUNKERED_AUTOHEAL = tonumber (UnitDef.customParams.armored_regen or 20) / 2 -- applied every 0.5s
 
 -- private functions
 

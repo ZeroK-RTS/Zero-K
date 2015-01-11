@@ -144,7 +144,7 @@ end
 
 function PriorityCommand(unitID, cmdID, cmdParams, cmdOptions)
 	local state = cmdParams[1]
-	if (cmdOptions.right) then 
+	if cmdOptions and (cmdOptions.right) then 
 		state = state - 2
 	end
 	state = state % StateCount
