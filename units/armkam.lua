@@ -91,7 +91,7 @@ unitDef = {
 	  --cylinderTargeting	  = 1,
 
       damage                  = {
-        default = 6.83,
+        default = 6.83, -- 6.15
         subs    = 0.315,
       },
 

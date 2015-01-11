@@ -78,7 +78,7 @@ unitDef = {
       name                    = [[Energy Shield]],
 
       damage                  = {
-        default = 10,
+        default = 9.79,
       },
 
       exteriorShield          = true,
