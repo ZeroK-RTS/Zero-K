@@ -122,7 +122,7 @@ local weaponDefs = {
     name               = "Explosion",
     soundHit           = "explosion/mini_nuke",
     damage = {
-      default          = 1200,
+      default          = 1200.8,
     },
   },
 }
