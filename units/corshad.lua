@@ -139,9 +139,9 @@ unitDef = {
 	  cylinderTargeting	  = 1,
 
       damage                  = {
-        default = 800,
-        planes  = 800,
-        subs    = 800,
+        default = 810,
+        planes  = 810,
+        subs    = 810,
       },
 	  
 	  customParams            = {

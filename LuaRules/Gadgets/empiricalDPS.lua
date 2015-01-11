@@ -26,7 +26,12 @@ local start, damage
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, unitDamage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-    --Spring.SetUnitExperience(attackerID,0.001)
+    local wd = WeaponDefs[weaponID]
+	if wd then
+		Spring.Echo(unitDamage/wd.damages[0])
+	end
+	
+	--Spring.SetUnitExperience(attackerID,0.001)
     local frame = Spring.GetGameFrame()
     -- delay
     if last then
@@ -41,13 +46,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, unitDamage, paralyzer,
         start = frame
         damage = unitDamage
     end
-	Spring.Echo("Damage: " .. damage)
+	--Spring.Echo("Damage: " .. damage)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     local frame = Spring.GetGameFrame()
     if start then
-        Spring.Echo("Total DPS: " .. UnitDefs[unitDefID].health/(frame - start)*30)
+        --Spring.Echo("Total DPS: " .. UnitDefs[unitDefID].health/(frame - start)*30)
         start = nil
     end
 end
