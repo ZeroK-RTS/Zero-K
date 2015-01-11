@@ -1,4 +1,5 @@
 include "constants.lua"
+include "RockPiece.lua"
 include "pieceControl.lua"
 
 local base, turret, sleeve = piece ('base', 'turret', 'sleeve')
@@ -7,6 +8,18 @@ local missiles = {
 	piece ('dummy1'),
 	piece ('dummy2'),
 }
+
+local SIG_ROCK_X = 8
+local SIG_ROCK_Z = 16
+
+local ROCK_FIRE_FORCE = 0.06
+local ROCK_SPEED = 18		--Number of half-cycles per second around x-axis.
+local ROCK_DECAY = -0.25	--Rocking around axis is reduced by this factor each time = piece 'to rock.
+local ROCK_PIECE = base	-- should be negative to alternate rocking direction.
+local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
+local ROCK_MAX = 1.5
+
+local gunHeading = 0
 
 local tracks = {}
 for i = 1, 4 do
@@ -32,18 +45,6 @@ local currentTracks = 1
 
 local smokePiece = {base, turret}
 
-local function RestoreAfterDelay()
-	Signal (SIG_Restore)
-	SetSignalMask (SIG_Restore)
-
-	Sleep (8000)
-
-	isAiming = false
-	Turn (turret, y_axis, 0, math.rad (10))
-	Turn (sleeve, x_axis, 0, math.rad (10))
-	StartThread (IdleAnim)
-end
-
 function TracksControl()
 	Signal (SIG_Move)
 	SetSignalMask (SIG_Move)
@@ -68,55 +69,41 @@ function TracksControl()
 	for i = 1, #wheels.small do
 		StopSpin (wheels.small[i], x_axis, math.rad(45))
 	end
-
-	StartThread (IdleAnim)
-end
-
-function IdleAnim ()
-	if (isAiming or isMoving) then 
-		return 
-	end
-	SetSignalMask(SIG_Aim + SIG_Move)
-
-	while true do
-		Turn (turret, y_axis, math.rad(math.random(-20, 20)), math.rad(5))
-		WaitForTurn (turret, y_axis)
-		Sleep (math.random(2000, 6000))
-	end
 end
 
 function Stunned(isFull) -- future disarm/EMP obedience
-	StopTurn (turret, y_axis)
-	StopTurn (sleeve, x_axis)
+	Signal (SIG_Restore)
+	StopTurn(turret, y_axis)
+	StopTurn(sleeve, x_axis)
 end
 
-function script.StartMoving ()
+function script.StartMoving()
 	isMoving = true
-	StartThread (TracksControl)
+	StartThread(TracksControl)
 end
 
-function script.StopMoving ()
+function script.StopMoving()
 	isMoving = false
 end
 
-function script.AimFromWeapon ()
+local function RestoreAfterDelay()
+	Signal (SIG_Restore)
+	SetSignalMask (SIG_Restore)
+
+	Sleep (8000)
+
+	isAiming = false
+	Turn (turret, y_axis, 0, math.rad (50))
+	Turn (sleeve, x_axis, 0, math.rad (50))
+end
+
+
+function script.AimFromWeapon()
 	return sleeve
 end
 
-function script.QueryWeapon ()
+function script.QueryWeapon()
 	return missiles[currentMissile]
-end
-
-function script.FireWeapon ()
-	currentMissile = 3 - currentMissile
-end
-
-function script.Shot ()
-	Hide (missiles[currentMissile])
-	Move (missiles[currentMissile], z_axis, -7.5)
-	Sleep (500)
-	Show (missiles[currentMissile])
-	Move (missiles[currentMissile], z_axis, 0, 2.5)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -137,18 +124,56 @@ function script.AimWeapon(num, heading, pitch)
 	WaitForTurn (sleeve, x_axis)
 
 	StartThread (RestoreAfterDelay)
+	gunHeading = heading
 
 	return (Spring.GetUnitRulesParam (unitID, "disarmed") ~= 1)
+end
+
+
+local function ReloadThread(missile)
+	Hide (missiles[missile])
+	Move (missiles[missile], z_axis, -3)
+	Sleep (4000)
+	Show (missiles[missile])
+	Move (missiles[missile], z_axis, 0.5, 1)
+end
+
+function script.FireWeapon()
+	StartThread(ReloadThread, currentMissile)
+	StartThread(Rock, gunHeading, ROCK_FIRE_FORCE, z_axis)
+	StartThread(Rock, gunHeading - hpi, ROCK_FIRE_FORCE, x_axis)
+	currentMissile = 3 - currentMissile
+end
+
+function script.Create()
+
+	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_X, x_axis)
+	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_Z, z_axis)
+	
+	for i = 2, 4 do
+		Hide (tracks[i])
+	end
+
+	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
+		Sleep (250)
+	end
+
+	Move (missiles[1], z_axis, 0.5)
+	Move (missiles[2], z_axis, 0.5)
+	
+	StartThread (SmokeUnit, smokePiece)
 end
 
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity < 0.5) then
-		Explode (missiles[1], sfxFall + sfxFire)
-		Explode (missiles[2], sfxFall + sfxSmoke)
+		if (math.random() < 2*severity) then Explode (missiles[1], sfxFall + sfxFire) end
+		if (math.random() < 2*severity) then Explode (missiles[2], sfxFall + sfxSmoke) end
 		return 1
 	elseif (severity < 0.75) then
-		Explode (turret, sfxFall) 
+		if (math.random() < severity) then 
+			Explode (turret, sfxFall) 
+		end
 		Explode (sleeve, sfxFall)
 		Explode (tracks[1], sfxShatter)
 		Explode (missiles[1], sfxFall + sfxSmoke)
@@ -163,16 +188,4 @@ function script.Killed (recentDamage, maxHealth)
 		Explode (missiles[2], sfxFall + sfxSmoke + sfxFire)
 		return 2
 	end
-end
-
-function script.Create()
-	for i = 2, 4 do
-		Hide (tracks[i])
-	end
-
-	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
-		Sleep (250)
-	end
-
-	StartThread (SmokeUnit, smokePiece)
 end
