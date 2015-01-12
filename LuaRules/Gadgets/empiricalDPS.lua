@@ -26,21 +26,21 @@ local start, damage
 
 function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-    --local wd = WeaponDefs[weaponID]
-	--if wd then
+    local wd = WeaponDefs[weaponID]
+	if wd then
 	--	local aoe = wd.damageAreaOfEffect
 	--	local dist = 0.09
 	--	local edgeEff = wd.edgeEffectiveness
 	--	local writeDamage = wd.damages[0]
 	--	local theoryDamage = writeDamage*(aoe-dist)/(aoe + 0.01 - dist*edgeEff)
 	--	local theoryDist = -unitDamage/writeDamage*(aoe + 0.01)+aoe
-	--	Spring.Echo(wd.customParams.statsdamage)
-	--	Spring.Echo(unitDamage)
+		Spring.Echo(wd.customParams.statsdamage)
+		Spring.Echo(unitDamage)
 	--	Spring.Echo(theoryDamage)
 	--	Spring.Echo(aoe)
 	--	Spring.Echo(edgeEff)
 	--	Spring.Echo(theoryDist)
-	--end
+	end
 	
 	--Spring.SetUnitExperience(attackerID,0.001)
     local frame = Spring.GetGameFrame()
