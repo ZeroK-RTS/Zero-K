@@ -117,6 +117,18 @@ unitDef = {
       weaponType              = [[BeamLaser]],
     },
 
+    CLOGGER_EXPLODE = {
+      areaOfEffect       = 8,
+      craterMult         = 0,
+      edgeEffectiveness  = 0,
+      explosionGenerator = "custom:dirt2",
+      impulseFactor      = 0,
+      name               = "Dirt Spill",
+      soundHit           = "explosion/clogger_death",
+      damage = {
+        default = 0.1,
+      },
+    },
   },
   
   featureDefs            = {
