@@ -42,7 +42,6 @@ local weaponDef = {
 	soundStart              = [[weapon/sd_emgv7]],
 	soundStartVolume        = 7,
 	stages                  = 10,
-	targetMoveError         = 0.3,
 	turret                  = true,
 	weaponType              = [[Cannon]],
 	weaponVelocity          = 550,

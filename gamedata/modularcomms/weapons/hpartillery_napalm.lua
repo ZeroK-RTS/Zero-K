@@ -36,7 +36,6 @@ local weaponDef = {
 	size                    = 8,
 	soundHit                = [[weapon/cannon/wolverine_hit]],
 	soundStart              = [[weapon/cannon/wolverine_fire]],
-	targetMoveError         = 0.3,
 	turret                  = true,
 	weaponType              = [[Cannon]],
 	weaponVelocity          = 320,

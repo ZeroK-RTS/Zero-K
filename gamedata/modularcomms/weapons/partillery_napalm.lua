@@ -33,7 +33,6 @@ local weaponDef = {
 	size                    = 4,
 	soundHit                = [[weapon/burn_mixed]],
 	soundStart              = [[weapon/cannon/cannon_fire1]],
-	targetMoveError         = 0.3,
 	turret                  = true,
 	weaponType              = [[Cannon]],
 	weaponVelocity          = 300,

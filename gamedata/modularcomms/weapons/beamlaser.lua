@@ -56,7 +56,6 @@ local weaponDef = {
 	rgbColor                = [[0 1 1]],
 	soundStart              = [[weapon/laser/pulse_laser3]],
 	soundTrigger            = true,
-	targetMoveError         = 0.05,
 	texture1                = [[largelaser]],
 	texture2                = [[flare]],
 	texture3                = [[flare]],

@@ -27,7 +27,6 @@ local weaponDef = {
 	reloadtime              = 8,
 	soundHit                = [[weapon/cannon/arty_hit]],
 	soundStart              = [[weapon/cannon/pillager_fire]],
-	targetMoveError         = 0.3,
 	turret                  = true,
 	weaponType              = [[Cannon]],
 	weaponVelocity          = 320,

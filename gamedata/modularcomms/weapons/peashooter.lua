@@ -34,7 +34,6 @@ local weaponDef = {
 	soundHit                = [[weapon/laser/lasercannon_hit]],
 	soundStart              = [[weapon/laser/small_laser_fire2]],
 	soundTrigger            = true,
-	targetMoveError         = 0.15,
 	thickness               = 2.55,
 	tolerance               = 10000,
 	turret                  = true,

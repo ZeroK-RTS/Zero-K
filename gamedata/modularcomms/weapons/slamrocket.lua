@@ -43,7 +43,6 @@ local weaponDef = {
 	startVelocity           = 0,
  	texture1                = [[flare]],
 	targetBorder            = 1,
-	targetMoveError         = 0.9,
 	tolerance               = 4000,
 	turret                  = true,
 	weaponTimer             = 4.4,
