@@ -1,30 +1,22 @@
 function widget:GetInfo()
    return {
       name      = "UnitShapes",
-      desc      = "0.5.8.zk.03 Draws blended shapes around units and buildings",
-      author    = "Lelousius and aegis, modded Licho, CarRepairer",
+      desc      = "0.5.8.zk.02 Draws blended shapes around units and buildings",
+      author    = "Lelousius and aegis, modded Licho, CarRepairer, jK",
       date      = "30.07.2010",
       license   = "GNU GPL, v2 or later",
       layer     = 2,
       enabled   = true,
-	  --detailsDefault = 1
+	  detailsDefault = 1
    }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local usingDevEngine = not ((Game.version:find('91.0') == 1))
-
 local function SetupCommandColors(state)
-  local alpha = state and 1 or 0
-  local f = io.open('cmdcolors.tmp', 'w+')
-  if (f) then
-    f:write('unitBox  0 1 0 ' .. alpha)
-    f:close()
-    Spring.SendCommands({'cmdcolors cmdcolors.tmp'})
-  end
-  os.remove('cmdcolors.tmp')
+	local alpha = state and 1 or 0
+	Spring.LoadCmdColorsConfig('unitBox  0 1 0 ' .. alpha)
 end
 
 --------------------------------------------------------------------------------
@@ -36,64 +28,15 @@ local math_sin				= math.sin
 local math_abs				= math.abs
 local rad_con				= 180 / math_pi
 
-local GL_ONE_MINUS_SRC_ALPHA = GL.ONE_MINUS_SRC_ALPHA
-local GL_ONE_MINUS_DST_ALPHA = GL.ONE_MINUS_DST_ALPHA
-local GL_SRC_ALPHA = GL.SRC_ALPHA
-local GL_DST_ALPHA = GL.DST_ALPHA
-local GL_DST_COLOR = GL.DST_COLOR
-local GL_SRC_COLOR = GL.SRC_COLOR
-local GL_ZERO = GL.ZERO
-local GL_ONE = GL.ONE
+local GL_KEEP      = 0x1E00
+local GL_REPLACE   = 0x1E01
 
-local GL_QUADS = GL.QUADS
-local GL_QUAD_STRIP = GL.QUAD_STRIP
-local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
-local GL_TRIANGLE_STRIP = GL.TRIANGLE_STRIP
-local GL_LINE_LOOP = GL.LINE_LOOP
-local GL_TRIANGLES = GL.TRIANGLES
-local GL_POLYGON = GL.POLYGON
+local spGetUnitDirection     = Spring.GetUnitDirection
 
-local GL_COLOR_BUFFER_BIT = GL.COLOR_BUFFER_BIT
-local glPushAttrib = gl.PushAttrib
-local glPopAttrib = gl.PopAttrib
-
-local gl_DepthTest =			gl.DepthTest
-local gl_BlendFunc = 			gl.BlendFunc
-local gl_ColorMask =			gl.ColorMask
-local gl_DrawList =				gl.CallList
-
-local spGetUnitHeading       = Spring.GetUnitHeading
-local spGetUnitDirection	 = Spring.GetUnitDirection
-local spGetHeadingFromVector = Spring.GetHeadingFromVector
-local spIsUnitIcon           = Spring.IsUnitIcon
-
-local UnitDs				 = UnitDefs
-
--- Automatically generated local definitions
-
-local glBeginEnd             = gl.BeginEnd
-local glColor                = gl.Color
-local glCreateList           = gl.CreateList
-local glDeleteList           = gl.DeleteList
-local glDepthTest            = gl.DepthTest
-local glDrawListAtUnit       = gl.DrawListAtUnit
-local glLineWidth            = gl.LineWidth
-local glPolygonOffset        = gl.PolygonOffset
-local glVertex               = gl.Vertex
-local spDiffTimers           = Spring.DiffTimers
-local spGetVisibleUnits		 = Spring.GetVisibleUnits
-local spGetGroundNormal      = Spring.GetGroundNormal
+local spGetVisibleUnits      = Spring.GetVisibleUnits
 local spGetSelectedUnits     = Spring.GetSelectedUnits
-local spGetTeamColor         = Spring.GetTeamColor
-local spGetTimer             = Spring.GetTimer
-local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 local spGetUnitDefID         = Spring.GetUnitDefID
-local spGetUnitRadius        = Spring.GetUnitRadius
-local spGetUnitTeam          = Spring.GetUnitTeam
-local spGetUnitViewPosition  = Spring.GetUnitViewPosition
 local spIsUnitSelected       = Spring.IsUnitSelected
-local spIsUnitVisible        = Spring.IsUnitVisible
-local spSendCommands         = Spring.SendCommands
 
 local spGetCameraPosition	 = Spring.GetCameraPosition
 local spGetGameFrame		 = Spring.GetGameFrame
@@ -107,17 +50,21 @@ local clearquad
 local shapes = {}
 
 local myTeamID = Spring.GetLocalTeamID()
+--local r,g,b = Spring.GetTeamColor(myTeamID)
+local r,g,b = 0, 1, 0
+local rgba = {r,g,b,1}
+local yellow = {1,1,0,1}
 
 local circleDivs = 32 -- how precise circle? octagon by default
 local innersize = 0.9 -- circle scale compared to unit radius
 local selectinner = 1.5
-local outersize = 1.9 -- outer fade size compared to circle scale (1 = no outer fade)
+local outersize = 1.8 -- outer fade size compared to circle scale (1 = no outer fade)
 local scalefaktor = 2.8
 local rectangleFactor = 3.5
-local CAlpha = 0.5
+local CAlpha = 0.2
 
 local colorout = {   1,   1,   1,   0 } -- outer color
-local colorin  = {   1,   1,   1,   1 } -- inner color
+local colorin  = {   r,   g,   b,   1 } -- inner color
 
 local teamColors = {}
 local unitConf = {}
@@ -129,44 +76,15 @@ local visibleAllySelUnits = {}
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'showally','useteamcolors','debugMode', 'disableWithNewEngine'}
+options_order = {'showally'} 
 options = {
 	showally = {
 		name = 'Show Ally Selections',
-		desc = 'Highlight the units your allies currently have selected.',
+		desc = 'Highlight the units your allies currently have selected.', 
 		type = 'bool',
 		value = false,
 		OnChange = function(self) 
 			visibleAllySelUnits = {}
-		end,
-	},
-	useteamcolors = {
-		name = 'Use Team Colors',
-		type = 'bool',
-		desc = 'Highlight your allies\' selections with their team colors instead of the default yellow.',
-		value = false,
-	},
-	debugMode = {
-		name = 'Debug Mode',
-		type = 'bool',
-		value = false,
-		advanced = true,
-		desc = 'Pings visible or selected units',
-	},
-	disableWithNewEngine = {
-		name = 'Disable for 96.0+',
-		type = 'bool',
-		value = true,
-		advanced = not usingDevEngine,
-		desc = 'Disable Selection Shapes with the development engine by default due to some graphics issues.',
-		OnChange = function(self)
-			if usingDevEngine then
-				if self.value then
-					widget:Shutdown()
-				else
-					widget:Initialize()
-				end
-			end
 		end,
 	},
 }
@@ -196,7 +114,6 @@ end
 
 local function GetVisibleUnits()
 	if (HasVisibilityChanged()) then
-		
 		local units = spGetVisibleUnits(-1, 30, true)
 		--local visibleUnits = {}
 		local visibleAllySelUnits = {}
@@ -225,19 +142,6 @@ local function GetVisibleUnits()
 end
 
 
-local function GetTeamColorSet(teamID)
-  local colors = teamColors[teamID]
-  if (colors) then
-    return colors
-  end
-  local r,g,b = spGetTeamColor(teamID)
-  
-  colors = { r, g, b, 0 }
-	-- Alpha = 0 as it is drawn with DST_ALPHA and should Clear it afterwards
-  
-  teamColors[teamID] = colors
-  return colors
-end
 
 
 --------------------------------------------------------------------------------
@@ -246,10 +150,10 @@ end
 -- Creating polygons:
 local function CreateDisplayLists(callback)
 	local displayLists = {}
-	
+
 	local zeroColor = {0, 0, 0, 0}
 	local CAlphaColor = {0, 0, 0, CAlpha}
-	
+
 	displayLists.select = callback.fading(colorin, colorout, outersize, selectinner)
 	displayLists.invertedSelect = callback.fading(colorout, colorin, outersize, selectinner)
 	displayLists.inner = callback.solid(zeroColor, innersize)
@@ -264,35 +168,35 @@ local function CreateCircleLists()
 	local callback = {}
 	
 	function callback.fading(colorin, colorout, innersize, outersize)
-		return glCreateList(function()
-			glBeginEnd(GL.QUAD_STRIP, function()
+		return gl.CreateList(function()
+			gl.BeginEnd(GL.QUAD_STRIP, function()
 				local radstep = (2.0 * math_pi) / circleDivs
 				for i = 0, circleDivs do
 					local a1 = (i * radstep)
 					if (colorin) then
-						glColor(colorin)
+						gl.Color(colorin)
 					end
-					glVertex(math_sin(a1)*innersize, 0, math_cos(a1)*innersize)
+					gl.Vertex(math_sin(a1)*innersize, 0, math_cos(a1)*innersize)
 					if (colorout) then
-						glColor(colorout)
+						gl.Color(colorout)
 					end
-					glVertex(math_sin(a1)*outersize, 0, math_cos(a1)*outersize)
+					gl.Vertex(math_sin(a1)*outersize, 0, math_cos(a1)*outersize)
 				end
 			end)
 		end)
 	end
 	
 	function callback.solid(color, size)
-		return glCreateList(function()
-			glBeginEnd(GL.TRIANGLE_FAN, function()
+		return gl.CreateList(function()
+			gl.BeginEnd(GL.TRIANGLE_FAN, function()
 				local radstep = (2.0 * math_pi) / circleDivs
 				if (color) then
-					glColor(color)
+					gl.Color(color)
 				end
-				glVertex(0, 0, 0)
+				gl.Vertex(0, 0, 0)
 				for i = 0, circleDivs do
 					local a1 = (i * radstep)
-					glVertex(math_sin(a1)*size, 0, math_cos(a1)*size)
+					gl.Vertex(math_sin(a1)*size, 0, math_cos(a1)*size)
 				end
 			end)
 		end)
@@ -302,7 +206,7 @@ local function CreateCircleLists()
 end
 
 local function CreatePolygonCallback(points, immediate)
-	immediate = immediate or GL_POLYGON
+	immediate = immediate or GL.POLYGON
 	local callback = {}
 	
 	function callback.fading(colorin, colorout, innersize, outersize)
@@ -316,37 +220,37 @@ local function CreatePolygonCallback(points, immediate)
 			steps[i] = {x, z, xs, zs}
 		end
 		
-		return glCreateList(function()
-			glBeginEnd(GL_TRIANGLE_STRIP, function()
+		return gl.CreateList(function()
+			gl.BeginEnd(GL.TRIANGLE_STRIP, function()
 				for i=1, #steps do
 					local step = steps[i] or steps[i-#steps]
 					local nexts = steps[i+1] or steps[i-#steps+1]
 					
-					glColor(colorout)
-					glVertex(step[1], 0, step[2])
+					gl.Color(colorout)
+					gl.Vertex(step[1], 0, step[2])
 					
-					glColor(colorin)
-					glVertex(step[1] - diff*step[3], 0, step[2] - diff*step[4])
+					gl.Color(colorin)
+					gl.Vertex(step[1] - diff*step[3], 0, step[2] - diff*step[4])
 					
-					glColor(colorout)
-					glVertex(step[1] + (nexts[1]-step[1]), 0, step[2] + (nexts[2]-step[2]))
+					gl.Color(colorout)
+					gl.Vertex(step[1] + (nexts[1]-step[1]), 0, step[2] + (nexts[2]-step[2]))
 					
-					glColor(colorin)
-					glVertex(nexts[1] - diff*nexts[3], 0, nexts[2] - diff*nexts[4])
+					gl.Color(colorin)
+					gl.Vertex(nexts[1] - diff*nexts[3], 0, nexts[2] - diff*nexts[4])
 				end
 			end)
 		end)
 	end
 	
 	function callback.solid(color, size)
-		return glCreateList(function()
-			glBeginEnd(immediate, function()
+		return gl.CreateList(function()
+			gl.BeginEnd(immediate, function()
 				if (color) then
-					glColor(color)
+					gl.Color(color)
 				end
 				for i=1, #points do
 					local p = points[i]
-					glVertex(size*p[1], 0, size*p[2])
+					gl.Vertex(size*p[1], 0, size*p[2])
 				end
 			end)
 		end)
@@ -363,7 +267,7 @@ local function CreateSquareLists()
 			{-1, -1}
 		}
 
-	local callback = CreatePolygonCallback(points, GL_QUADS)
+	local callback = CreatePolygonCallback(points, GL.QUADS)
 	shapes.square = CreateDisplayLists(callback)
 end
 
@@ -374,33 +278,29 @@ local function CreateTriangleLists()
 		{-1, 1}
 	}
 	
-	local callback = CreatePolygonCallback(points, GL_TRIANGLES)
+	local callback = CreatePolygonCallback(points, GL.TRIANGLES)
 	shapes.triangle = CreateDisplayLists(callback)
 end
 
 local function DestroyShape(shape)
-	glDeleteList(shape.select)
-	glDeleteList(shape.invertedSelect)
-	glDeleteList(shape.inner)
-	glDeleteList(shape.large)
-	glDeleteList(shape.kill)
-	glDeleteList(shape.shape)
+	gl.DeleteList(shape.select)
+	gl.DeleteList(shape.invertedSelect)
+	gl.DeleteList(shape.inner)
+	gl.DeleteList(shape.large)
+	gl.DeleteList(shape.kill)
+	gl.DeleteList(shape.shape)
 end
 
 function widget:Initialize()
-	if (usingDevEngine and options.disableWithNewEngine.value) then
-		return
-	end
-	
-	if not WG.allySelUnits then 
-		WG.allySelUnits = {} 
+	if not WG.allySelUnits then
+		WG.allySelUnits = {}
 	end
 	
 	CreateCircleLists()
 	CreateSquareLists()
 	CreateTriangleLists()
 	
-	for udid, unitDef in pairs(UnitDs) do
+	for udid, unitDef in pairs(UnitDefs) do
 		local xsize, zsize = unitDef.xsize, unitDef.zsize
 		local scale = scalefaktor*( xsize^2 + zsize^2 )^0.5
 		local shape, xscale, zscale
@@ -420,13 +320,13 @@ function widget:Initialize()
 		unitConf[udid] = {shape=shape, xscale=xscale, zscale=zscale}
 	end
 
-	clearquad = glCreateList(function()
+	clearquad = gl.CreateList(function()
 		local size = 1000
-		glBeginEnd(GL.QUADS, function()
-			glVertex( -size,0,  			-size)
-			glVertex( Game.mapSizeX+size,0, -size)
-			glVertex( Game.mapSizeX+size,0, Game.mapSizeZ+size)
-			glVertex( -size,0, 				Game.mapSizeZ+size)
+		gl.BeginEnd(GL.QUADS, function()
+			gl.Vertex( -size,0,              -size)
+			gl.Vertex( Game.mapSizeX+size,0, -size)
+			gl.Vertex( Game.mapSizeX+size,0, Game.mapSizeZ+size)
+			gl.Vertex( -size,0,              Game.mapSizeZ+size)
 		end)
 	end)
 	SetupCommandColors(false)
@@ -435,7 +335,7 @@ end
 function widget:Shutdown()
 	SetupCommandColors(true)
 	
-	glDeleteList(clearquad)
+	gl.DeleteList(clearquad)
 	
 	for _, shape in pairs(shapes) do
 		DestroyShape(shape)
@@ -447,12 +347,7 @@ end
 --------------------------------------------------------------------------------
 local visibleUnits, visibleSelected = {}, {}
 local degrot = {}
-local lastFrame = 0
 function widget:Update()
-	if (usingDevEngine and options.disableWithNewEngine.value) then
-		return
-	end
-	
 	-- [[
 	local mx, my = spGetMouseState()
 	local ct, id = spTraceScreenRay(mx, my)
@@ -464,36 +359,16 @@ function widget:Update()
 	--]]
 	--visibleUnits, visibleSelected = GetVisibleUnits()
 	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
-	heading = {}
-	
-	if options.debugMode.value then
-		local frame = Spring.GetGameFrame()
-		if frame ~= lastFrame and frame%10 == 0 then
-			local vis = spGetVisibleUnits(-1, 30, true)
-			for i = 1, #vis do
-				local unitID = vis[i]
-				local x,y,z = Spring.GetUnitPosition(unitID)
-				Spring.MarkerAddPoint(x,y,z,"")
-			end
-			for i = 1, #visibleSelected do
-				local unitID = visibleSelected[i]
-				local x,y,z = Spring.GetUnitPosition(unitID)
-				Spring.MarkerAddPoint(x,y,z,"v")
-			end
-			lastFrame = frame
-		end
-	end
-	
 	for i=1, #visibleUnits do
 		local unitID = visibleUnits[i]
-		dirx, _, dirz = spGetUnitDirection(unitID)
+		local dirx, _, dirz = spGetUnitDirection(unitID)
 		if (dirz ~= nil) then
 			degrot[unitID] = 180 - math_acos(dirz) * rad_con
 		end
 	end
 	for i=1, #visibleSelected do
 		local unitID = visibleSelected[i]
-		dirx, _, dirz = spGetUnitDirection(unitID)
+		local dirx, _, dirz = spGetUnitDirection(unitID)
 		if (dirz ~= nil) then
 			if dirx < 0 then
 				degrot[unitID] = 180 - math_acos(dirz) * rad_con
@@ -504,156 +379,81 @@ function widget:Update()
 	end
 end
 
---Funktion-vars for later use
-	local teamID	= 0
-	local unitID	= 0
-	local udid 		= 0
-	local dirx 		= 0
-	local diry 		= 0
-	local dirz 		= 0
-	local unit
--- Drawing:
 
-local function DrawUnitShapes(allies)
-
-	local unitcount
-	local shapecolor
-	local shapecolor_noalpha
-	local teams = {}
-
-	if allies then
-		unitcount = #visibleAllySelUnits
-		shapecolor = {1,1,0,1}
-		shapecolor_noalpha = {1,1,0,0}
-	else
-		unitcount = #visibleSelected
-		shapecolor = {0,1,0,1}
-		shapecolor_noalpha = {0,1,0,0}
+function DrawUnitShapes(unitList, color)
+	if not unitList[1] then
+		return
 	end
-	for i=1, unitcount do
-		if allies then
-			unitID = visibleAllySelUnits[i]
-		else
-			unitID = visibleSelected[i]
-		end
-		local teamID = spGetUnitTeam(unitID)
-		if teamID then
-			if not teams[teamID] then teams[teamID] = {} end
-			local team = teams[teamID]
-			team[#team+1] = unitID
+
+	-- To fix Water
+	--gl_ColorMask(false,false,false,true)
+	--gl_BlendFunc(GL_ONE, GL_ONE)
+	--glColor(r,g,b,1)
+	-- Does not need to be drawn per Unit .. it covers the whole map
+	--gl_DrawList(clearquad)
+
+	--  Draw selection circles
+	gl.Color(1,1,1,1)
+	gl.Blending(true)
+	gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.SRC_ALPHA)
+	gl.ColorMask(false,false,false,true)
+	gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
+	for i=1, #unitList do
+		local unitID = unitList[i]
+		local udid = spGetUnitDefID(unitID)
+		local unit = unitConf[udid]
+
+		if (unit) then
+			gl.DrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 		end
 	end
 
-	for teamID, team in pairs(teams) do
+	--  Here The inner of the selected circles are removed
+	gl.Blending(false)
+	gl.ColorMask(false,false,false,false)
+	gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
+	for i=1, #unitList do
+		local unitID = unitList[i]
+		local udid = spGetUnitDefID(unitID)
+		local unit = unitConf[udid]
 
-		if allies and options.useteamcolors.value then
-			local tcolors = GetTeamColorSet(teamID)
-			shapecolor = {tcolors[1], tcolors[2], tcolors[3], 1}
-			shapecolor_noalpha = {tcolors[1], tcolors[2], tcolors[3], 0}
+		if (unit) then
+			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 		end
-
-		-- To fix Water
-		gl_ColorMask(false,false,false,true)
-		gl_BlendFunc(GL_ONE, GL_ONE)
-		glColor(shapecolor)
-		-- Does not need to be drawn per Unit .. it covers the whole map
-		gl_DrawList(clearquad)
-
-		--  Draw selection circles
-		gl_BlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA)
-		for i=1, #team do
-			unitID = team[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				if ally then
-					glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
-				else
-					glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-				end
-			end
-		end
-
-		--  Here The inner of the selected circles are removed
-		gl_BlendFunc(GL_ONE, GL_ZERO)
-		glColor(0,0,0,1)
-		
-		for i=1, #team do
-			unitID = team[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				if ally then
-					glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale,  0, 0, 0, 0)
-				else
-					glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-				end
-			end
-		end	
-		
-		--  Really draw the Circles now  (This could be optimised if we could say Draw as much as DST_ALPHA * SRC_ALPHA is)
-		-- (without protecting form drawing them twice)
-		gl_ColorMask(true,true,true,true)
-		gl_BlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA)
-		glColor(shapecolor)
-
-		-- Does not need to be drawn per Unit anymore
-		gl_DrawList(clearquad)
-
-		--  Draw Circles to AlphaBuffer
-		gl_ColorMask(false, false, false, true)
-		gl_BlendFunc(GL_DST_ALPHA, GL_ZERO)
-
-		for i=1, #team do
-			unitID = team[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				if ally then
-					glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
-				else
-					glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-				end
-				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end
-		
-		glColor(shapecolor_noalpha)
-		for i=1, #team do
-			unitID = team[i]
-			udid = spGetUnitDefID(unitID)
-			unit = unitConf[udid]
-			
-			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			end
-		end
-
 	end
+
+	--  Really draw the Circles now
+	gl.Color(color)
+	gl.ColorMask(true,true,true,true)
+	gl.Blending(true)
+	gl.BlendFuncSeparate(GL.ONE_MINUS_DST_ALPHA, GL.DST_ALPHA, GL.ONE, GL.ONE)
+	gl.StencilFunc(GL.EQUAL, 0x01, 0xFF)
+	gl.StencilOp(GL_KEEP, GL_KEEP, GL.ZERO)
+	gl.CallList(clearquad)
 end
+
+
 
 function widget:DrawWorldPreUnit()
-	if Spring.IsGUIHidden() or (#visibleAllySelUnits + #visibleSelected == 0) or (usingDevEngine and options.disableWithNewEngine.value) then 
-		return 
-	end
+	--if Spring.IsGUIHidden() then return end
+	if (#visibleAllySelUnits + #visibleSelected == 0) then return end
 	
-	glPushAttrib(GL_COLOR_BUFFER_BIT)
+	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
+		gl.DepthTest(false)
+		gl.StencilTest(true)
 
-	glDepthTest(false)
+			DrawUnitShapes(visibleSelected, rgba)
+			DrawUnitShapes(visibleAllySelUnits, yellow)
 
-	if #visibleSelected > 0 then
-		DrawUnitShapes(false)
-	end
-	if #visibleAllySelUnits > 0 then
-		DrawUnitShapes(true)
-	end
-	
-	glColor(1,1,1,1)
-	glPopAttrib()
+		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
+		gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+		gl.Blending("reset")
+		gl.Color(1,1,1,1)
+	gl.PopAttrib()
 end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
