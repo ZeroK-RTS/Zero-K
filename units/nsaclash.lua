@@ -92,7 +92,7 @@ unitDef = {
       areaOfEffect            = 96,
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
-      craterMult              = 2,
+      craterMult              = 1.4,
 
       damage                  = {
         default = 311,
