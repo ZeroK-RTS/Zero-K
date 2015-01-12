@@ -416,7 +416,7 @@ local function setupTerraunit(unitID, team, x, y, z)
 	end
 
 	spSetUnitHealth(unitID, {
-		health = 0,
+		health = 0.01,
 		build  = 0
 	})
 end
@@ -791,7 +791,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
-            
+			spSetUnitHealth(id, 0.01)
+			
 			if id then
 				
 				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
@@ -1284,7 +1285,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
-            
+			spSetUnitHealth(id, 0.01)
+			
             if id then
 			
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
@@ -1841,6 +1843,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			
             local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
+			spSetUnitHealth(id, 0.01)
 			
             if id then
 				unitIdGrid[segment[i].grid.x] = unitIdGrid[segment[i].grid.x] or {}
@@ -3066,8 +3069,13 @@ function gadget:GameFrame(n)
 	end
 end	
 
-function gadget:UnitPreDamaged_GetWantedWeaponDef()
-	return WeaponDefs
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+                            weaponID, attackerID, attackerDefID, attackerTeam)
+							
+	if unitDefID == terraunitDefID then
+		return 0 -- terraunit starts on 0 HP. If a unit is damaged and has 0 HP it dies
+	end
+	return damage
 end
 
 --------------------------------------------------------------------------------
