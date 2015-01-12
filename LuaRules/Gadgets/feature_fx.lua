@@ -26,7 +26,7 @@ local spGetFeatureRadius       = Spring.GetFeatureRadius;
 local CEG_SPAWN = [[feature_poof_spawner]];
 
 function gadget:FeatureDestroyed(id, allyTeam)
-	local x,y,z = spGetFeaturePosition(id);
+	local _,_,_,x,y,z = spGetFeaturePosition(id, true);
 	local r = spGetFeatureRadius(id);
 	
 	spSpawnCEG( CEG_SPAWN,
