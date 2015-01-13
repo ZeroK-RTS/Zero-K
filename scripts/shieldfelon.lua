@@ -38,7 +38,7 @@ local gun_1 = 0
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-local DRAIN = 0--tonumber (WeaponDefs[UnitDef.weapons[1].weaponDef].customParams.shield_drain)
+local DRAIN = tonumber (WeaponDefs[UnitDef.weapons[1].weaponDef].customParams.shield_drain)
 local SHIELD_RADIUS = 100
 local SPEED = UnitDef.speed / 30
 local AIM_DELAY = 300
