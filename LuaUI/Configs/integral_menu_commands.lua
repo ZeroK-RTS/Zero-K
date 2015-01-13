@@ -58,8 +58,8 @@ local defense = {
 --	armanni = {order = 7, row = 1},
 
 --	corrl = {order = 8, row = 2},
-	corrazor = {order = 9, row = 2},
-	missiletower = {order = 10, row = 2},
+	missiletower = {order = 9, row = 2},
+	corrazor = {order = 10, row = 2},
 	corflak = {order = 11, row = 2},
 	armcir = {order = 12, row = 2},
 	screamer = {order = 13, row = 2},
