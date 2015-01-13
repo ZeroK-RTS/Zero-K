@@ -90,8 +90,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 190.1,
-        subs    = 9.5,
+        default = 200.1,
+        subs    = 10,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
