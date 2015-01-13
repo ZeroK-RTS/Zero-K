@@ -36,7 +36,7 @@ return {
         particlesizespread = [[d0.4]],
         particlespeed      = [[d0.05 r1]],
         particlespeedspread = 1,
-        pos                = [[r-1d r10d, r-5d r10d, r-5d r10d]],
+        pos                = [[r-5d r10d, r-5d r10d, r-5d r10d]],
         sizegrowth         = 1.2,
         sizemod            = 0.995,
         texture            = [[dirt]],
