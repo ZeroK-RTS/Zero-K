@@ -44,6 +44,7 @@ local remStunned = {}
 local remAllyTeam = {}
 local remUnitDefID = {}
 local remVisible = {}
+local remPreventOverkill = {}
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 
@@ -58,6 +59,20 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if (not allyTeam) then
 		return true, 5
 	end
+	
+	local overkillEffect = 0
+	if remPreventOverkill[allyTeam] and remPreventOverkill[allyTeam][targetID] then
+		overkillEffect = 20*remPreventOverkill[allyTeam][targetID] 
+	else
+		if not remPreventOverkill[allyTeam] then
+			remPreventOverkill[allyTeam] = {}
+		end
+		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
+		overkill = (overkill and 1) or 0
+		remPreventOverkill[allyTeam][targetID] = overkill
+		overkillEffect = 20*overkill
+	end
+	
 	
 	local los
 	if remVisible[allyTeam] and remVisible[allyTeam][targetID] then
@@ -117,7 +132,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range)*0.1*WeaponDefs[attackerWeaponDefID].proximityPriority --0.0 to 0.1 multiplied by proximityPriority
 	end
 	
-	local newPriority = hpAdd + defPrio + miscAdd + distAdd
+	local newPriority = hpAdd + defPrio + miscAdd + distAdd + overkillEffect
 	
 	--GG.UnitEcho(targetID, newPriority)
 	
@@ -129,6 +144,7 @@ function gadget:GameFrame(f)
 		remHealth = {}
 		remVisible = {}
 		remStunned = {}
+		remPreventOverkill = {}
 	end
 end
 

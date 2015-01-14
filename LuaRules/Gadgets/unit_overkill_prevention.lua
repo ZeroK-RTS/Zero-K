@@ -20,37 +20,34 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spValidUnitID         = Spring.ValidUnitID
-local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
-local spGetUnitTeam         = Spring.GetUnitTeam
-local spGiveOrderToUnit     = Spring.GiveOrderToUnit
-local spSetUnitRulesParam   = Spring.SetUnitRulesParam
-local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
-local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
-local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
-local spGetUnitLosState     = Spring.GetUnitLosState
-local spGetCommandQueue     = Spring.GetCommandQueue
-local spSetUnitTarget       = Spring.SetUnitTarget
-local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitPosition     = Spring.GetUnitPosition
-local spGetUnitStates       = Spring.GetUnitStates
-
-local CMD_ATTACK		= CMD.ATTACK
-local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
-local CMD_FIRE_STATE 	= CMD.FIRE_STATE
-local CMD_INSERT 		= CMD.INSERT
-local CMD_REMOVE 		= CMD.REMOVE
+local spValidUnitID    = Spring.ValidUnitID
+local spSetUnitTarget = Spring.SetUnitTarget
+local spGetUnitHealth = Spring.GetUnitHealth
+local spGetGameFrame  = Spring.GetGameFrame
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 local incomingDamage = {}
 
+function GG.OverkillPrevention_IsDoomed(targetID)
+	local frame = spGetGameFrame()
+	if incomingDamage[targetID] then
+		local health = spGetUnitHealth(targetID)
+		if health < incomingDamage[targetID].damage then
+			if incomingDamage[targetID].timeout > frame then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout)
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
-		local frame = Spring.GetGameFrame()
+		local frame = spGetGameFrame()
 		if incomingDamage[targetID] then
-			local health = Spring.GetUnitHealth(targetID)
+			local health = spGetUnitHealth(targetID)
 			if health < incomingDamage[targetID].damage then
 				if incomingDamage[targetID].timeout > frame then
 					spSetUnitTarget(unitID,0)
