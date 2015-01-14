@@ -74,6 +74,10 @@ local deadUnitID = 0
 --------------------------------------------------------------------------------
 -- Commands
 
+local allyTargetUnits = {
+	[UnitDefNames["corsumo"].id] = true,
+}
+
 include("LuaRules/Configs/customcmds.h.lua")
 
 local unitSetTargetCmdDesc = {
@@ -142,7 +146,7 @@ local function setTarget(data, sendToWidget)
 				spSetUnitRulesParam(data.id,"target_y",data.y)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
 			end
-        elseif spValidUnitID(data.targetID) and spGetUnitAllyTeam(data.targetID) ~= data.allyTeam then
+        elseif spValidUnitID(data.targetID) and (data.allyAllowed or (spGetUnitAllyTeam(data.targetID) ~= data.allyTeam)) then
             if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) then
                 spSetUnitTarget(data.id, data.targetID)
             end
@@ -376,6 +380,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
                     id = unitID, 
                     targetID = cmdParams[1], 
                     allyTeam = spGetUnitAllyTeam(unitID), 
+					allyAllowed = allyTargetUnits[unitDefID],
                     range = UnitDefs[unitDefID].maxWeaponRange,
 					alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
                 })
