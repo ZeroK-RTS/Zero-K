@@ -24,6 +24,9 @@ local spValidUnitID    = Spring.ValidUnitID
 local spSetUnitTarget = Spring.SetUnitTarget
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetGameFrame  = Spring.GetGameFrame
+local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -32,6 +35,32 @@ for i, ud in pairs(UnitDefs) do
 		fastUnitDefs[i] = true
 	end
 end
+
+local canHandleUnit = {}
+local units = {}
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local HandledUnitDefIDs = {
+	[UnitDefNames["corrl"].id] = true,
+	[UnitDefNames["armcir"].id] = true,
+	[UnitDefNames["nsaclash"].id] = true,
+	[UnitDefNames["missiletower"].id] = true,
+	[UnitDefNames["screamer"].id] = true,
+	[UnitDefNames["amphaa"].id] = true,
+}
+
+include("LuaRules/Configs/customcmds.h.lua")
+
+local preventOverkillCmdDesc = {
+	id      = CMD_PREVENT_OVERKILL,
+	type    = CMDTYPE.ICON_MODE,
+	name    = "Prevent Overkill.",
+	action  = 'preventoverkill',
+	tooltip	= 'Enable to prevent units shooting at units which are already going to die.',
+	params 	= {0, "Prevent Overkill", "Fire at anything"}
+}
 
 
 -------------------------------------------------------------------------------------
@@ -53,6 +82,9 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
+	if not units[unitID] then
+		return false
+	end
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		if troubleVsFast then
 			local unitDefID = Spring.GetUnitDefID(targetID)
@@ -88,5 +120,77 @@ end
 function gadget:UnitDestroyed(unitID)
 	if incomingDamage[unitID] then
 		incomingDamage[unitID] = nil
+	end
+end
+
+--------------------------------------------------------------------------------
+-- Command Handling
+local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
+	if canHandleUnit[unitID] then
+		local state = cmdParams[1]
+		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
+		
+		if (cmdDescID) then
+			preventOverkillCmdDesc.params[1] = state
+			spEditUnitCmdDesc(unitID, cmdDescID, { params = preventOverkillCmdDesc.params})
+		end
+		if state == 1 then
+			if not units[unitID] then
+				units[unitID] = true
+			end
+		else
+			if units[unitID] then
+				units[unitID] = nil
+			end
+		end
+	end
+	
+end
+
+function gadget:AllowCommand_GetWantedCommand()	
+	return {[CMD_PREVENT_OVERKILL] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if (cmdID ~= CMD_PREVENT_OVERKILL) then
+		return true  -- command was not used
+	end
+	PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
+	return false  -- command was used
+end
+
+--------------------------------------------------------------------------------
+-- Unit Handling
+
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if HandledUnitDefIDs[unitDefID] then
+		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
+		canHandleUnit[unitID] = true
+		PreventOverkillToggleCommand(unitID, {1})
+	end
+end
+
+function gadget:UnitDestroyed(unitID)
+	if canHandleUnit[unitID] then
+		if units[unitID] then
+			units[unitID] = nil
+		end
+		canHandleUnit[unitID] = nil
+	end
+end
+
+function gadget:Initialize()
+	-- register command
+	gadgetHandler:RegisterCMDID(CMD_PREVENT_OVERKILL)
+	
+	-- load active units
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end
