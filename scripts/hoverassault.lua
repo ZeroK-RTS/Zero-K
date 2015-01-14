@@ -85,6 +85,9 @@ end
 ]]
 
 local function MoveScript()
+	while Spring.GetUnitIsStunned(unitID) do
+		Sleep(2000)
+	end
 	while true do 
 		if math.random() < 0.5  then
 			EmitSfx( wake1,  5 )
