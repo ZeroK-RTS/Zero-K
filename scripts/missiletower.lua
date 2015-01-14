@@ -85,6 +85,10 @@ function script.QueryWeapon(piecenum)
 	return firepoint[shotNum]
 end
 
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 1050.2, 40)
+end
+
 function script.Create()
 	StartThread(SmokeUnit, {base})
 	StartThread(RestoreAfterDelay)
