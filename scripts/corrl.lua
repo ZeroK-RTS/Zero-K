@@ -42,6 +42,7 @@ include "constants.lua"
 local ammo, missile, missilespeed, mfront
 
 local SIG_AIM = 1
+local SIG_RESTORE = 2
 
 local ammo = 3
 local lights = 3
@@ -66,6 +67,14 @@ function script.Create()
 	Hide(base2)
 	Move(l_poddoor, x_axis, 4, 5)
 	Move(r_poddoor, x_axis, -4, 5)
+end
+
+local function RestoreAfterDelay()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
+	Sleep(5000)
+	Turn(turret, y_axis, 0, math.rad(150))
+	Turn(pod, x_axis, 0, math.rad(150))
 end
 
 local function FireAndReload(num)
@@ -104,6 +113,7 @@ local function FireAndReload(num)
 	if lights == 3 then
 		Move(l_poddoor, x_axis, 4, 5)
 		Move(r_poddoor, x_axis, -4, 5)
+		StartThread(RestoreAfterDelay)
 	end
 	Sleep(2500)
 	
@@ -120,6 +130,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if ammo >= 1 then
+		Signal(SIG_RESTORE)
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		Turn(turret, y_axis, heading, math.rad(450) ) -- left-right
@@ -127,8 +138,6 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(turret, y_axis)
 		WaitForTurn(pod, x_axis)
 		return true
-	else
-		Sleep(100)
 	end
 end
 
