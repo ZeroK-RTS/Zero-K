@@ -132,6 +132,10 @@ function script.AimWeapon(num, heading, pitch)
 	end
 end
 
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 103, 30, true)
+end
+
 function script.FireWeapon()
 	ammo = ammo - 1
 	lights = lights - 1

@@ -25,6 +25,15 @@ local spSetUnitTarget = Spring.SetUnitTarget
 local spGetUnitHealth = Spring.GetUnitHealth
 local spGetGameFrame  = Spring.GetGameFrame
 
+local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
+local fastUnitDefs = {}
+for i, ud in pairs(UnitDefs) do
+	if ud.speed > FAST_SPEED then
+		fastUnitDefs[i] = true
+	end
+end
+
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -43,8 +52,15 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 	return false
 end
 
-function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout)
+function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
+		if troubleVsFast then
+			local unitDefID = Spring.GetUnitDefID(targetID)
+			if fastUnitDefs[unitDefID] then
+				damage = 0
+			end
+		end
+		
 		local frame = spGetGameFrame()
 		if incomingDamage[targetID] then
 			local health = spGetUnitHealth(targetID)
