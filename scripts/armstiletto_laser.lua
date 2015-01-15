@@ -1,12 +1,16 @@
 include "constants.lua"
 include "fakeUpright.lua"
 include "bombers.lua"
+include "fixedwingTakeOff.lua"
 
 local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","x","z","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
 
 local sound_index = 0
 local BOMB_DELAY = 1
+
+local SIG_TAKEOFF = 1
+local takeoffHeight = UnitDefNames["armstiletto_laser"].wantedHeight
 
 function script.Create()
 	Hide( preDrop)
@@ -18,6 +22,7 @@ function script.Create()
 	Turn(Rwing, z_axis, math.rad(-90))	
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.Activate()
@@ -33,6 +38,7 @@ function script.Deactivate()
 	Turn(Rwing, z_axis, math.rad(-10), 2)
 	Turn(LwingTip, z_axis, math.rad(-30), 2) -- -30
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.FireWeapon1()

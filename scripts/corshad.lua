@@ -27,6 +27,10 @@ local bombs = 1
 include "bombers.lua"
 include "fakeUpright.lua"
 include "constants.lua"
+include "fixedwingTakeOff.lua"
+
+local SIG_TAKEOFF = 1
+local takeoffHeight = UnitDefNames["corshad"].wantedHeight
 
 function script.StartMoving()
 	--Turn( fins , z_axis, math.rad(-(-30)), math.rad(50) )
@@ -42,7 +46,7 @@ function script.StopMoving()
 	Move( wingr2 , x_axis, 5, 30)
 	Move( wingl1 , x_axis, -5, 30)
 	Move( wingl2 , x_axis, -5, 30)
-	
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 local function Lights()
@@ -58,6 +62,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	FakeUprightInit(xp, zp, drop) 
 	--StartThread(Lights)
 end

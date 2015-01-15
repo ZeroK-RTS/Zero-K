@@ -1,5 +1,7 @@
 include "constants.lua"
 include "bombers.lua"
+include "fixedwingTakeOff.lua"
+
 
 local flare1 = piece 'flare1' 
 local flare2 = piece 'flare2' 
@@ -21,6 +23,8 @@ local smokePiece = {base}
 
 --Signal
 local SIG_move = 1
+local SIG_TAKEOFF = 2
+local takeoffHeight = UnitDefNames["armcybr"].wantedHeight
 
 local gun_1 = false
 
@@ -52,6 +56,7 @@ end
 
 function script.StopMoving()
 	StartThread(Stopping)
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.MoveRate(rate)
@@ -67,6 +72,7 @@ function script.MoveRate(rate)
 end
 
 function script.Create()
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	StartThread(SmokeUnit, smokePiece)
 	Hide( rearthrust)
 	Hide( wingthrust1)

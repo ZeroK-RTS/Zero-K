@@ -8,6 +8,10 @@ local smokePiece = {body, jet}
 
 include "constants.lua"
 include "bombers.lua"
+include "fixedwingTakeOff.lua"
+
+local SIG_TAKEOFF = 1
+local takeoffHeight = UnitDefNames["corhurc2"].wantedHeight
 
 local function Lights()
 	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
@@ -20,8 +24,13 @@ local function Lights()
 	end
 end
 
+function script.StopMoving()
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	--StartThread(Lights)
 end
 
