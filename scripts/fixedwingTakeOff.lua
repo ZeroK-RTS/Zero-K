@@ -1,17 +1,18 @@
 local FUDGE_FACTOR = 1.5
 
+local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
+local spSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
+
 function TakeOffThread(height, signal)
 	Signal(signal)
 	SetSignalMask(signal)
-	local state = Spring.GetUnitMoveTypeData(unitID).aircraftState
-	while state ~= "takeoff" do
-		Sleep(500)
-		state = Spring.GetUnitMoveTypeData(unitID).aircraftState
+	while spGetUnitMoveTypeData(unitID).aircraftState ~= "takeoff" do
+		Sleep(1000)
 	end
 	for i = 1, 5 do
 		Sleep(100)
-		Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", 10)
+		spSetAirMoveTypeData(unitID, "wantedHeight", 10)
 		Sleep(33)
-		Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", height*FUDGE_FACTOR)
+		spSetAirMoveTypeData(unitID, "wantedHeight", height*FUDGE_FACTOR)
 	end
 end
