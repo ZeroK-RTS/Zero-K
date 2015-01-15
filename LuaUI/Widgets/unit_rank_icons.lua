@@ -42,8 +42,8 @@ function widget:Initialize ()
 end
 
 function UpdateUnitRank (unitID)
-	local rank = spGetUnitRulesParam (unitID, "rank")
-	rank = min (#rankTextures, rank)
+	local rank = spGetUnitRulesParam (unitID, "rank") or 0
+	rank = min(#rankTextures, rank)
 	WG.icons.SetUnitIcon (unitID, {
 		name = 'rank',
 		texture = rankTextures[rank]
