@@ -49,6 +49,8 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["missiletower"].id] = true,
 	[UnitDefNames["screamer"].id] = true,
 	[UnitDefNames["amphaa"].id] = true,
+	[UnitDefNames["puppy"].id] = true,
+	[UnitDefNames["fighter"].id] = true,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -71,7 +73,8 @@ local incomingDamage = {}
 function GG.OverkillPrevention_IsDoomed(targetID)
 	local frame = spGetGameFrame()
 	if incomingDamage[targetID] then
-		local health = spGetUnitHealth(targetID)
+		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+		local health = spGetUnitHealth(targetID)/armor
 		if health < incomingDamage[targetID].damage then
 			if incomingDamage[targetID].timeout > frame then
 				return true
@@ -95,7 +98,8 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		
 		local frame = spGetGameFrame()
 		if incomingDamage[targetID] then
-			local health = spGetUnitHealth(targetID)
+			local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+			local health = spGetUnitHealth(targetID)/armor
 			if health < incomingDamage[targetID].damage then
 				if incomingDamage[targetID].timeout > frame then
 					spSetUnitTarget(unitID,0)
