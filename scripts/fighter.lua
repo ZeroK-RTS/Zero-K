@@ -121,11 +121,6 @@ function script.FireWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	return 
-end
-
-
-function script.BlockShot(num, targetID)
 	if (GetUnitValue(COB.CRASHING) == 1) then
 		return true
 	end

@@ -71,14 +71,10 @@ local preventOverkillCmdDesc = {
 local incomingDamage = {}
 
 function GG.OverkillPrevention_IsDoomed(targetID)
-	local frame = spGetGameFrame()
 	if incomingDamage[targetID] then
-		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-		local health = spGetUnitHealth(targetID)/armor
-		if health < incomingDamage[targetID].damage then
-			if incomingDamage[targetID].timeout > frame then
-				return true
-			end
+		local frame = spGetGameFrame()
+		if incomingDamage[targetID].timeout > frame then
+			return incomingDamage[targetID].doomed
 		end
 	end
 	return false
@@ -98,14 +94,13 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		
 		local frame = spGetGameFrame()
 		if incomingDamage[targetID] then
-			local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-			local health = spGetUnitHealth(targetID)/armor
-			if health < incomingDamage[targetID].damage then
+			if incomingDamage[targetID].doomed then
 				if incomingDamage[targetID].timeout > frame then
 					spSetUnitTarget(unitID,0)
 					return true
 				else
 					incomingDamage[targetID].damage = damage
+					incomingDamage[targetID].doomed = false
 				end
 			else
 				incomingDamage[targetID].damage = incomingDamage[targetID].damage + damage
@@ -117,7 +112,14 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 				timeout = frame + timeout,
 			}
 		end
+		
+		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+		local health = spGetUnitHealth(targetID)/armor
+		if incomingDamage[targetID].damage > health/armor then
+			incomingDamage[targetID].doomed = true
+		end
 	end
+	
 	return false
 end
 
