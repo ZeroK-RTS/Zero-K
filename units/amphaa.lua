@@ -5,14 +5,14 @@ unitDef = {
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
-  buildCostEnergy        = 350,
-  buildCostMetal         = 350,
+  buildCostEnergy        = 200,
+  buildCostMetal         = 200,
 
   buildoptions           = {
   },
 
   buildPic               = [[amphaa.png]],
-  buildTime              = 350,
+  buildTime              = 200,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -94,8 +94,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 25.01,
-        planes  = 250.1,
+        default = 15.01,
+        planes  = 150.1,
         subs    = 8,
       },
 
@@ -135,10 +135,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 140,
+      metal            = 80,
       object           = [[amphaa_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 140,
+      reclaimTime      = 80,
     },
 
     HEAP      = {
@@ -148,10 +148,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 70,
+      metal            = 40,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 70,
+      reclaimTime      = 40,
     },
 
   },

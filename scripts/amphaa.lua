@@ -350,7 +350,7 @@ function script.Shot(num)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 1000.1, 70)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 70)
 end
 
 function script.Killed(recentDamage, maxHealth)
