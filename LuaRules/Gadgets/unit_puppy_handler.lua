@@ -120,7 +120,7 @@ local function RestorePuppy(unitID, x, y, z)
 	--spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
 end
 
-local function PuppyShot(unitID, unitDefID)
+function GG.PuppyHandler_Shot(unitID)
   -- the puppy fired its weapon, hide it
   HidePuppy(unitID)
 end
@@ -132,11 +132,9 @@ function gadget:Initialize()
   puppyLosRadius = puppyDef.losRadius
   wantedList = {puppyWeaponID}
   Script.SetWatchWeapon(puppyWeaponID, true)
-  gadgetHandler:RegisterGlobal("PuppyShot", PuppyShot)
 end
 
 function gadget:Shutdown()
-  gadgetHandler:DeregisterGlobal("PuppyShot")
   Script.SetWatchWeapon(puppyWeaponID, false)
 end
 
