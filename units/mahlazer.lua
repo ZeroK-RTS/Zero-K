@@ -112,6 +112,7 @@ unitDef = {
       areaOfEffect            = 140,
       avoidFeature            = false,
       avoidNeutral            = false,
+      avoidGround             = false,
       beamTime                = 0.001,
       coreThickness           = 0.5,
       craterBoost             = 4,
