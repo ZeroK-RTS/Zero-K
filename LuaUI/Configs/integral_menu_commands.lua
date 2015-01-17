@@ -58,8 +58,8 @@ local defense = {
 --	armanni = {order = 7, row = 1},
 
 --	corrl = {order = 8, row = 2},
-	corrazor = {order = 9, row = 2},
-	missiletower = {order = 10, row = 2},
+	missiletower = {order = 9, row = 2},
+	corrazor = {order = 10, row = 2},
 	corflak = {order = 11, row = 2},
 	armcir = {order = 12, row = 2},
 	screamer = {order = 13, row = 2},
@@ -263,6 +263,7 @@ local overrides = {
 		text = '', tooltip = tooltips.diveBomb},
 	[CMD_UNIT_KILL_SUBORDINATES] = {texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'}, text=''},
 	[CMD_DONT_FIRE_AT_RADAR] = {texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'}, text=''},
+	[CMD_PREVENT_OVERKILL] = {texture = {imageDir .. 'states/landat_off.png', imageDir .. 'states/landat_80.png'}, text=''},
 	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, text=''},
 	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, text=''},
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},

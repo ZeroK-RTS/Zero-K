@@ -54,6 +54,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[nsaclash.s3o]],
+  script              = [[nsaclash.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 

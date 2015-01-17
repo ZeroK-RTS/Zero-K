@@ -45,10 +45,10 @@ local ROCK_MAX = {}
 local SIG_ROCK = {}
 local rockAngle = {}
 
-function InitializeRock(rockPiece, rockSpeed, rockDelay, rockMin, rockMax, sigRock, axis)
+function InitializeRock(rockPiece, rockSpeed, rockDecay, rockMin, rockMax, sigRock, axis)
 	ROCK_PIECE[axis] = rockPiece
 	ROCK_SPEED[axis] = rockSpeed or 1
-	ROCK_DECAY[axis] = rockDelay or -0.5
+	ROCK_DECAY[axis] = rockDecay or -0.5
 	ROCK_MIN[axis] = rockMin or math.rad(0.5)
 	ROCK_MAX[axis] = rockMax or math.rad(20)
 	SIG_ROCK[axis] = sigRock

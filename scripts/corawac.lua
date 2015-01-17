@@ -1,4 +1,5 @@
 include 'constants.lua'
+include "fixedwingTakeOff.lua"
 
 --------------------------------------------------------------------
 -- constants/vars
@@ -8,6 +9,9 @@ local smokePiece = {base}
 
 local SIG_CLOAK = 1
 local CLOAK_TIME = 5000
+
+local SIG_TAKEOFF = 2
+local takeoffHeight = UnitDefNames["corawac"].wantedHeight
 --------------------------------------------------------------------
 -- functions
 --------------------------------------------------------------------
@@ -23,7 +27,13 @@ function Cloak()
     StartThread(Decloak)
 end
 
+function script.StopMoving()
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+end
+
+
 function script.Create()
+	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
     StartThread(SmokeUnit, smokePiece)
 end
 

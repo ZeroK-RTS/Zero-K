@@ -40,7 +40,7 @@ local SIG_PACK = 4
 local SIG_WALK = 8
 local SIG_IDLE = 1
 
-local PACE = 2.5
+local PACE = 1.9
 
 local THIGH_FRONT_ANGLE = -math.rad(50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE

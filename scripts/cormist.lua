@@ -31,6 +31,7 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local spGetPiecePosition = Spring.GetUnitPiecePosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 
 -- Signal definitions
 local SIG_AIM = 1
@@ -139,7 +140,7 @@ local function AnimControl()
 end
 
 local function GetWheelHeight(piece)
-	local x,y,z = Spring.GetUnitPiecePosDir(unitID, piece)
+	local x,y,z = spGetUnitPiecePosDir(unitID, piece)
 	local height = spGetGroundHeight(x,z) - y
 	if height < -SUSPENSION_BOUND then
 		height = -SUSPENSION_BOUND
@@ -249,6 +250,15 @@ function Suspension()
    end 
 end
 
+function script.Create()
+	moving = false
+	runSpin = false
+	StartThread(SetDeploy,true)
+	StartThread(Suspension)
+	StartThread(AnimControl)
+	StartThread(SmokeUnit, smokePiece)
+end
+
 -- Weapons
 function script.AimFromWeapon()
 	return aim
@@ -279,25 +289,22 @@ end
 function script.Shot()
 	EmitSfx( gunPieces[shot].firepoint,  UNIT_SFX1 )
 	EmitSfx( gunPieces[shot].exhaust,  UNIT_SFX2 )
-	shot = shot + 1
-	if shot == 3 then 
-		shot = 1
-	end
+	shot = 3 - shot
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if severity >= 0 and severity < 0.25 then
+	if  severity <= 0.25 then
 		Explode( gun, sfxNone)
 		Explode( turret, sfxNone)
 		Explode( body, sfxNone)
 		return 1
-	elseif severity < 0.50 then
+	elseif severity <= 0.50 then
 		Explode( gun, sfxFall)
 		Explode( turret, sfxShatter)
 		Explode( body, sfxNone)
 		return 1
-	elseif severity < 1 then
+	elseif severity <= 1 then
 		Explode( gun, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode( turret, sfxShatter)
 		Explode( body, sfxNone)
@@ -308,13 +315,4 @@ function script.Killed(recentDamage, maxHealth)
 		Explode( body, sfxShatter)
 		return 2
 	end
-end
-
-function script.Create()
-	moving = false
-	runSpin = false
-	StartThread(SetDeploy,true)
-	StartThread(Suspension)
-	StartThread(AnimControl)
-	StartThread(SmokeUnit, smokePiece)
 end

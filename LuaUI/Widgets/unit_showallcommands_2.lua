@@ -187,7 +187,7 @@ local function getTargetPosition(unitID)
 	elseif target_type == TARGET_UNIT then
 		local target = spGetUnitRulesParam(unitID,"target_id")
 		if target and target ~= 0 and Spring.ValidUnitID(target) then
-			tx,ty,tz = spGetUnitPosition(target,true)
+			_,_,_,tx,ty,tz = spGetUnitPosition(target,true)
 		else
 			return nil
 		end
@@ -202,7 +202,7 @@ local function drawUnitCommands(unitID)
 	
 	local tx,ty,tz = getTargetPosition(unitID)
 	if tx then
-		local _,_,_,x,y,z=spGetUnitPosition(unitID,true)
+		local _,_,_,x,y,z = spGetUnitPosition(unitID,true)
 		glBeginEnd(GL.LINES,
 			function() 
 				glVertex(x,y,z);

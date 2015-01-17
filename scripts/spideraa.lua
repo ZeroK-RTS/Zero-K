@@ -105,6 +105,10 @@ function script.AimFromWeapon(num)
 	return turret
 end
 
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 220.1, 75)
+end
+
 function script.QueryWeapon(num)
 	return flare
 end

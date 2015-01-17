@@ -40,7 +40,7 @@ local targetTable = include("LuaRules/Configs/target_priority_defs.lua")
 -- Callin occurs every 16 frames
 
 local remHealth = {}
-local remStunned = {}
+local remStunnedOrOverkill = {}
 local remAllyTeam = {}
 local remUnitDefID = {}
 local remVisible = {}
@@ -85,12 +85,13 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	
 	local defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
 	
-	if not remStunned[targetID] then
+	if not remStunnedOrOverkill[targetID] then
 		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
-		remStunned[targetID] = (stunnedOrInbuild and 1) or 0
+		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
+		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill) and 1) or 0
 	end
 
-	if remStunned[targetID] == 1 then
+	if remStunnedOrOverkill[targetID] == 1 then
 		defPrio = defPrio + 25
 	end
 	
@@ -98,7 +99,9 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if remHealth[targetID] then
 		hpAdd = remHealth[targetID]
 	else
+		local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
 		local hp, maxHP = spGetUnitHealth(targetID)
+		hp = hp/armor
 		if hp and maxHP then
 			hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
 		else
@@ -128,7 +131,7 @@ function gadget:GameFrame(f)
 	if f%16 == 8 then -- f%16 == 0 happens just before AllowWeaponTarget
 		remHealth = {}
 		remVisible = {}
-		remStunned = {}
+		remStunnedOrOverkill = {}
 	end
 end
 

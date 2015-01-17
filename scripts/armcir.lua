@@ -404,6 +404,9 @@ function script.AimFromWeapon()
 	return mc_rocket_ho
 end
 
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 225.01, 70)
+end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth

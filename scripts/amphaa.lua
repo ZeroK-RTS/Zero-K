@@ -7,7 +7,12 @@ local rthigh, rcalf, rfoot, lthigh, lcalf, lfoot = piece('rthigh', 'rcalf', 'rfo
 local lgun, lbarrel1, lbarrel2, rgun, rbarrel1, rbarrel2 = piece('lgun', 'lbarrel1', 'lbarrel2', 'rgun', 'rbarrel1', 'rbarrel2')
 
 
-local firepoints = {lbarrel1, rbarrel1, lbarrel2, rbarrel2}
+local firepoints = {
+	rbarrel1,
+	lbarrel1, 
+	rbarrel2,
+	lbarrel2,
+}
 
 local smokePiece = {torso}
 --------------------------------------------------------------------------------------
@@ -335,9 +340,6 @@ function script.QueryWeapon(num)
     return firepoints[gun_1]
 end
 
-function script.FireWeapon(num)
-end
-
 function script.Shot(num)
 	EmitSfx(firepoints[gun_1], 1024)
 	GG.Floating_AimWeapon(unitID)
@@ -345,6 +347,10 @@ function script.Shot(num)
 		gun_1 = gun_1 + 1
 		if gun_1 > 4 then gun_1 = 1 end
 	end
+end
+
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 70)
 end
 
 function script.Killed(recentDamage, maxHealth)

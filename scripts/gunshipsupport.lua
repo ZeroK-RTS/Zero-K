@@ -45,6 +45,10 @@ end
 function script.FireWeapon(num)
 end
 
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 200.1, 35)
+end
+
 function script.Shot(num) 
 	gun_1 = not gun_1
 end

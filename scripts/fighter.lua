@@ -120,8 +120,14 @@ function script.FireWeapon(num)
 	end
 end
 
-function script.BlockShot(num)
-	return (GetUnitValue(COB.CRASHING) == 1)
+function script.BlockShot(num, targetID)
+	if (GetUnitValue(COB.CRASHING) == 1) then
+		return true
+	end
+	if num == 2 then
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 133, 35)
+	end
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)

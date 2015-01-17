@@ -76,24 +76,20 @@ end
  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+	
 local function setFlyLow(unitID, height)
-	if spMoveCtrlGetTag(unitID) == nil then
-		bombers[unitID].lowBehaviour.wantedHeight = math.min(bombers[unitID].lowHeight + height, bombers[unitID].highBehaviour.wantedHeight)
-		Spring.MoveCtrl.SetAirMoveTypeData(unitID, bombers[unitID].lowBehaviour)
+	local wantedHeight = math.min(bombers[unitID].lowHeight + height, bombers[unitID].highBehaviour.wantedHeight)
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	if env then
+		Spring.UnitScript.CallAsUnit(unitID, env.BomberDive_FlyLow, wantedHeight)
 	end
-	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.8)	
-	--GG.UpdateUnitAttributes(unitID)
-	--GG.UpdateUnitAttributes(unitID)
 end
 
 local function setFlyHigh(unitID)
-	if spMoveCtrlGetTag(unitID) == nil then
-		Spring.MoveCtrl.SetAirMoveTypeData(unitID, bombers[unitID].highBehaviour)
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	if env then
+		Spring.UnitScript.CallAsUnit(unitID, env.BomberDive_FlyHigh)
 	end
-	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	--GG.UpdateUnitAttributes(unitID)
-	--GG.UpdateUnitAttributes(unitID)
 end
 
 local function isAttackingMobile(unitID)
@@ -261,16 +257,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		resetTime = false,
 	}
 	
-	local highBehaviour = {
-
-
-}
-	
-	setFlyHigh(unitID)
-	
 	Spring.InsertUnitCmdDesc(unitID, unitBomberDiveState)
 	ToggleDiveCommand(unitID, {DEFAULT_COMMAND_STATE}, {})
-
 end
 
 function gadget:UnitDestroyed(unitID)
