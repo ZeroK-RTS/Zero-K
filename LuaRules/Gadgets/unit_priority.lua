@@ -114,7 +114,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local random = math.random
+local max = math.max
 
 local spGetTeamList       = Spring.GetTeamList
 local spGetTeamResources  = Spring.GetTeamResources
@@ -346,7 +346,7 @@ function gadget:GameFrame(n)
 			--	Spring.Echo("lowPrioSpending " .. lowPrioSpending)
 			--	Spring.Echo("normalSpending " .. normalSpending)
 			--	Spring.Echo("prioSpending " .. prioSpending)
-			--	Spring.Echo("miscTeamPull " .. miscTeamPull[teamID])
+			--	Spring.Echo("misc Pull " .. miscTeamPull[teamID])
 			--end
 			
 			local levelWithInc = (income + recieved + level)
@@ -393,14 +393,14 @@ function gadget:GameFrame(n)
 			else --normal situation, or no reserve in effect.
 				if pull > expense and level < expense and prioSpending < pull then 
 					TeamScale[teamID] = {
-						(income + recieved - prioSpending) / (pull - prioSpending - lowPrioSpending),  -- m stall  scale . spareNormal/normal-priority-spending
-						(income + recieved - normalSpending) / (lowPrioSpending)  -- m stall low scale . spareLow/low-priority-spending
+						max(0,(level + income + recieved - prioSpending) / (normalSpending)),  -- m stall  scale . spareNormal/normal-priority-spending
+						max(0,(level + income + recieved - normalSpending) / (lowPrioSpending))  -- m stall low scale . spareLow/low-priority-spending
 					} 
 					--Spring.Echo ("m_stall" .. TeamScale[teamID])
 				elseif epull > eexpense and elevel < eexpense and prioSpending < epull then 
 					TeamScale[teamID] = {				
-						(eincome + erecieved - prioSpending) / (epull - prioSpending - lowPrioSpending),  -- e stall  scale
-						(eincome + erecieved - normalSpending) / (lowPrioSpending)  -- e stall low scale
+						max(0,(elevel + eincome + erecieved - prioSpending) / (normalSpending)),  -- e stall  scale
+						max(0,(elevel +eincome + erecieved - normalSpending) / (lowPrioSpending))  -- e stall low scale
 					}
 				end 
 			end
