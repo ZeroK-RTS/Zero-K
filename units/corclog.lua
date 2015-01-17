@@ -126,7 +126,7 @@ unitDef = {
       name               = "Dirt Spill",
       soundHit           = "explosion/clogger_death",
       damage = {
-        default = 0.1,
+        default = 1,
       },
     },
   },
