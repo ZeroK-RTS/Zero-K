@@ -90,14 +90,14 @@ function script.Deactivate()
 end
 
 local function EmitDust()
-  while true do
-    if not isLanded then
-      local x, _, z = GetUnitPosition(unitID)
-      local y = GetGroundHeight(x, z) + 30
-      SpawnCEG("krowdust", x, y, z, 0, 0, 0, 1, 1)
-    end
-    Sleep(33)
-  end
+	while true do
+		if not (isLanded or Spring.GetUnitIsStunned(unitID)) then
+			local x, _, z = GetUnitPosition(unitID)
+			local y = GetGroundHeight(x, z) + 30
+			SpawnCEG("krowdust", x, y, z, 0, 0, 0, 1, 1)
+		end
+		Sleep(33)
+	end
 end
 
 --[[
