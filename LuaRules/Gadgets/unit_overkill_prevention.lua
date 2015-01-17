@@ -54,6 +54,8 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["hoveraa"].id] = true,
 	[UnitDefNames["spideraa"].id] = true,
 	[UnitDefNames["vehaa"].id] = true,
+	[UnitDefNames["gunshipaa"].id] = true,
+	[UnitDefNames["gunshipsupport"].id] = true,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -103,7 +105,6 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 					return true
 				else
 					incomingDamage[targetID].damage = damage
-					incomingDamage[targetID].doomed = false
 				end
 			else
 				incomingDamage[targetID].damage = incomingDamage[targetID].damage + damage
@@ -118,9 +119,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
 		local health = spGetUnitHealth(targetID)/armor
-		if incomingDamage[targetID].damage > health/armor then
-			incomingDamage[targetID].doomed = true
-		end
+		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= health/armor)
 	end
 	
 	return false
