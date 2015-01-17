@@ -526,7 +526,7 @@ function CreateWindow()
 	--// Some (only some) Configuration for shared values
 	local subWindowWidth = '50%'
 	local screenHorizCentre = screenWidth / 2
-	local economyPanelWidth = 660
+	local economyPanelWidth = math.min(660,screenWidth-10)
 
 	--// WINDOW
 	window = Chili.Window:New{
