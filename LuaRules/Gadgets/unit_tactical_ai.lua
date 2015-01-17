@@ -87,8 +87,8 @@ end
 local function ClearMoveGoal(unitID, data)
 	-- removes move order
 	if data.moveGoalSet then
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {} )
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {} )
+		local x,y,z = spGetUnitPosition(unitID)
+		Spring.SetUnitMoveGoal(unitID, x, y, z, 8, nil, false)
 		data.moveGoalSet = false
 	end
 end
