@@ -4,11 +4,11 @@ unitDef = {
   description            = [[Fast AA Vehicle]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
-  buildCostEnergy        = 260,
-  buildCostMetal         = 260,
+  buildCostEnergy        = 220,
+  buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[vehaa.png]],
-  buildTime              = 260,
+  buildTime              = 220,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -48,6 +48,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[vehaa.s3o]],
+  script                 = [[vehaa.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   
@@ -99,8 +100,8 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 29,
-        planes  = 290,
+        default = 29.01,
+        planes  = 290.1,
         subs    = 16,
       },
 
@@ -151,10 +152,10 @@ unitDef = {
       footprintZ       = 2,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 104,
+      metal            = 88,
       object           = [[vehaa_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 104,
+      reclaimTime      = 88,
     },
 
 
@@ -167,10 +168,10 @@ unitDef = {
       footprintZ       = 2,
       height           = [[4]],
       hitdensity       = [[100]],
-      metal            = 52,
+      metal            = 44,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
-      reclaimTime      = 52,
+      reclaimTime      = 44,
     },
 
   },

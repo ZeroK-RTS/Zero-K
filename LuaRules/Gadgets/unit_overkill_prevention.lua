@@ -53,6 +53,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["fighter"].id] = true,
 	[UnitDefNames["hoveraa"].id] = true,
 	[UnitDefNames["spideraa"].id] = true,
+	[UnitDefNames["vehaa"].id] = true,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
