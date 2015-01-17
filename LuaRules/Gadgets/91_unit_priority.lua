@@ -18,7 +18,7 @@ end
 
 function gadget:GetInfo()
   return {
-    name      = "UnitPriority",
+    name      = "UnitPriority_91",
     desc      = "Adds controls to change spending priority on constructions/repairs etc",
     author    = "Licho",
     date      = "19.4.2009", --24.2.2013
