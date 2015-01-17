@@ -163,6 +163,10 @@ local energyStructureDefs = {
 	[UnitDefNames["cafus"].id] = {cost = 4000, income = 225},
 }
 
+local metalStructureDefs = {
+	[UnitDefNames["cormex"].id] = {cost = 75},
+}
+
 local terraCmds = {
 	Ramp=1,
 	Level=1,
@@ -1762,6 +1766,12 @@ local function MakeToolTip_UD(tt_table)
 	local extraText = ""
 	if mexDefID == tt_table.unitDef.id then
 		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
+		if WG.mouseoverMexIncome > 0 then
+			local cost = metalStructureDefs[tt_table.unitDef.id].cost
+			extraText = extraText .. "\nBase Payback: " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
+		else
+			extraText = extraText .. "\nBase Payback: Never"
+		end
 	end
 	if energyStructureDefs[tt_table.unitDef.id] then
 		local income = energyStructureDefs[tt_table.unitDef.id].income
@@ -1831,9 +1841,9 @@ local function MakeToolTip_UD(tt_table)
 			--.. "\n extraMetal: " .. extraMetalza
 			--.. "\n unitformCasePayback: " .. unitformCasePayback 
 			--.. "\n worstCasePayback: " .. worstCasePayback 
-			extraText = extraText .. "\nPayback Time " .. SecondsToMinutesSeconds(worstCasePayback)
+			extraText = extraText .. "\nOverdrive Payback: " .. SecondsToMinutesSeconds(worstCasePayback)
 		else
-			extraText = extraText .. "\nPayback Time Unknown"
+			extraText = extraText .. "\nOverdrive Payback: Unknown"
 		end
 	end
 		

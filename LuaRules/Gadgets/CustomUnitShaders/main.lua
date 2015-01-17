@@ -38,7 +38,7 @@ if (gadgetHandler:IsSyncedCode()) then
     if (part < 0) then
       local inbuild = select(3,Spring.GetUnitIsStunned(unitID))
       if (not inbuild) then
-	    SendToUnsynced("unitshaders_reverse", unitID,unitDefID,Spring.GetUnitTeam(unitID)
+	    SendToUnsynced("unitshaders_reverse", unitID,unitDefID,Spring.GetUnitTeam(unitID))
         if (not blockFirst[unitID]) then
           blockFirst[unitID] = true
           return false

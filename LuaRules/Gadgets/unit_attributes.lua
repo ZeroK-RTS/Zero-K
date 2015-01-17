@@ -22,7 +22,7 @@ end
 
 local isNewEngine = Spring.Utilities.IsCurrentVersionNewerThan(96, 300)
 
-local UPDATE_PERIOD = 3 -- see http://springrts.com/mantis/view.php?id=3048
+local UPDATE_PERIOD = 3
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -44,6 +44,8 @@ local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 local spSetAirMoveTypeData     = Spring.MoveCtrl.SetAirMoveTypeData
 local spSetGunshipMoveTypeData = Spring.MoveCtrl.SetGunshipMoveTypeData
 local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData
+
+local ALLY_ACCESS = {allied = true}
 
 local getMovetype = Spring.Utilities.getMovetype
 
@@ -80,6 +82,8 @@ local unitForcedOff = {}
 local unitSlowed = {}
 local unitShieldDisabled = {}
 local unitCannotCloak = {}
+
+local unitReloadPaused = {}
 
 if not GG.att_reload then
 	GG.att_reload = {}
@@ -128,6 +132,23 @@ local function updateEconomy(unitID, ud, factor)
 	end
 end
 
+local function updatePausedReload(unitID, unitDefID, gameFrame)
+	local state = origUnitReload[unitDefID]
+	
+	for i = 1, state.weaponCount do
+		local w = state.weapon[i]
+		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
+		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
+		local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
+		if reloadState < 0 then -- unit is already reloaded, so set unit to almost reloaded
+			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
+		else
+			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+		end
+	end
+end
+
 local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	local unitDefID = ud.id
 	
@@ -161,15 +182,22 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
 		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
 		if speedFactor <= 0 then
-			local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
-			if reloadState < 0 then -- unit is already reloaded, so set unit to almost reloaded
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
-			else
-				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+			if not unitReloadPaused[unitID] then
+				local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
+				unitReloadPaused[unitID] = unitDefID
+				if reloadState < gameFrame then -- unit is already reloaded, so set unit to almost reloaded
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
+				else
+					local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+					spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+				end
+				-- add UPDATE_PERIOD so that the reload time never advances past what it is now
 			end
-			-- add UPDATE_PERIOD so that the reload time never advances past what it is now
 		else
+			if unitReloadPaused[unitID] then
+				unitReloadPaused[unitID] = nil
+				spSetUnitRulesParam(unitID, "reloadPaused", -1, ALLY_ACCESS)
+			end
 			local newReload = w.reload/speedFactor
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 			if w.burstRate then
@@ -274,11 +302,13 @@ local function removeUnit(unitID)
 	unitSlowed[unitID] = nil
 	unitShieldDisabled[unitID] = nil
 	unitCannotCloak[unitID] = nil 
+	unitReloadPaused[unitID] = nil
+	
 	currentEcon[unitID] = nil 
 	currentReload[unitID] = nil 
 	currentMovement[unitID] = nil 
 	currentTurn[unitID] = nil 
-	currentAcc[unitID] = nil 
+	currentAcc[unitID] = nil
 end
 
 function UpdateUnitAttributes(unitID, frame)
@@ -320,7 +350,7 @@ function UpdateUnitAttributes(unitID, frame)
 
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
-		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult)
+		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, ALLY_ACCESS)
 		
 		GG.att_reload[unitID] = reloadMult
 		unitSlowed[unitID] = moveMult < 1
@@ -397,6 +427,14 @@ end
 
 function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
+end
+
+function gadget:GameFrame(f)
+	if f % UPDATE_PERIOD == 1 then
+		for unitID, unitDefID in pairs(unitReloadPaused) do
+			updatePausedReload(unitID, unitDefID, f)
+		end
+	end
 end
 
 function gadget:AllowCommand_GetWantedCommand()
