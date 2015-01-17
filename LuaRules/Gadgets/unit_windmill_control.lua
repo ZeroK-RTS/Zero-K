@@ -52,6 +52,7 @@ local GetHeadingFromVector = Spring.GetHeadingFromVector
 local AddUnitResource      = Spring.AddUnitResource
 local GetUnitBasePosition  = Spring.GetUnitBasePosition
 local GetUnitIsStunned     = Spring.GetUnitIsStunned
+local GetUnitRulesParam    = Spring.GetUnitRulesParam
 local SetUnitTooltip       = Spring.SetUnitTooltip
 local sformat = string.format
 local pi_2  = math.pi * 2
@@ -92,6 +93,8 @@ function gadget:GameFrame(n)
 				local paralyzed = GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
 				if (not paralyzed) then
 					local tid = entry[2]
+					local slowMult = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
+					de = de*slowMult
 					teamEnergy[tid] = (teamEnergy[tid] or 0) + de -- monitor team energy
 					AddUnitResource(unitID, "e", de)
 				end
