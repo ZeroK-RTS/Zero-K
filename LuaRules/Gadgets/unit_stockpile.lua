@@ -56,7 +56,7 @@ function gadget:GameFrame(n)
 				GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
 				data.active = true
 			end
-
+			
 			local allow = GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m)
 			if allow and (Spring.UseUnitResource(unitID, def.resTable)) then
 				data.progress = data.progress - 1

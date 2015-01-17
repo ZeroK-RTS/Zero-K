@@ -273,6 +273,10 @@ function widget:GameFrame(n)
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
 	
+	local extraPull = spGetTeamRulesParam(myTeamID, "extraPull") or 0
+	mPull = mPull + extraPull
+	ePull = ePull + extraPull
+	
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
 	if eCurr > eStor then eCurr = eStor end -- cap by storage
 
