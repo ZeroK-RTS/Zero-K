@@ -35,7 +35,7 @@ for i=1,#UnitDefs do
 		stockpileUnitDefID[i] = {
 			stockTime = stockTime,
 			stockCost = stockCost,
-			stockDrain = stockCost/stockTime*32,
+			stockDrain = 30*stockCost/stockTime,
 			resTable = {
 				m = stockCost/stockTime,
 				e = stockCost/stockTime
@@ -56,7 +56,7 @@ function gadget:GameFrame(n)
 				GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
 				data.active = true
 			end
-
+		
 			local allow = GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m)
 			if allow and (Spring.UseUnitResource(unitID, def.resTable)) then
 				data.progress = data.progress - 1
