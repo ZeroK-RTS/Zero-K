@@ -316,6 +316,10 @@ unitConfigs = {
   [UnitDefNames.fakeunit_los.id] = {
     empty  = true,
   },
+  [UnitDefNames.wolverine_mine.id] = {
+    unfold  = true,
+    wait = 60,
+  },
 }
 
 for i=1,#UnitDefs do
