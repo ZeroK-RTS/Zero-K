@@ -154,6 +154,19 @@ local windTooltips = {
 local mexDefID = UnitDefNames["cormex"] and UnitDefNames["cormex"].id or ''
 local windgenDefID = UnitDefNames["armwin"] and UnitDefNames["armwin"].id or ''
 
+local energyStructureDefs = {
+	[UnitDefNames["armwin"].id] = {cost = 35, income = 1.25},
+	[UnitDefNames["armsolar"].id] = {cost = 70, income = 2},
+	[UnitDefNames["geo"].id] = {cost = 500, income = 25},
+	[UnitDefNames["amgeo"].id] = {cost = 1000, income = 75},
+	[UnitDefNames["armfus"].id] = {cost = 1000, income = 35},
+	[UnitDefNames["cafus"].id] = {cost = 4000, income = 225},
+}
+
+local metalStructureDefs = {
+	[UnitDefNames["cormex"].id] = {cost = 75},
+}
+
 local terraCmds = {
 	Ramp=1,
 	Level=1,
@@ -1737,6 +1750,14 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 	globalitems[globalitem_name]:Invalidate()
 end
 
+local function SecondsToMinutesSeconds(seconds)
+	if seconds%60 < 10 then
+		return math.floor(seconds/60) ..":0" .. math.floor(seconds%60)
+	else
+		return math.floor(seconds/60) ..":" .. math.floor(seconds%60)
+	end
+end
+
 local function MakeToolTip_UD(tt_table)
 	
 	local helptext = GetHelpText(tt_table.buildType)
@@ -1745,25 +1766,87 @@ local function MakeToolTip_UD(tt_table)
 	local extraText = ""
 	if mexDefID == tt_table.unitDef.id then
 		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
+		if WG.mouseoverMexIncome > 0 then
+			local cost = metalStructureDefs[tt_table.unitDef.id].cost
+			extraText = extraText .. "\nBase Payback: " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
+		else
+			extraText = extraText .. "\nBase Payback: Never"
+		end
 	end
-	
-	if windgenDefID == tt_table.unitDef.id and mx and my then
-		local _, pos = spTraceScreenRay(mx,my, true)
-		if pos and pos[1] and pos[3] then
-			local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
-			local y = spGetGroundHeight(x,z)
+	if energyStructureDefs[tt_table.unitDef.id] then
+		local income = energyStructureDefs[tt_table.unitDef.id].income
+		local cost = energyStructureDefs[tt_table.unitDef.id].cost
+		if windgenDefID == tt_table.unitDef.id and mx and my then
+			local _, pos = spTraceScreenRay(mx,my, true)
+			if pos and pos[1] and pos[3] then
+				local x,z = math.floor(pos[1]/16)*16,  math.floor(pos[3]/16)*16
+				local y = spGetGroundHeight(x,z)
 
-			if y then
-				if y <= windTidalThreashold then
-					extraText = ", Tidal Income +1.2"
-				else
-					local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
-					extraText = ", Wind Range " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+				if y then
+					if y <= windTidalThreashold then
+						extraText = ", Tidal Income +1.2"
+						income = 1.2
+					else
+						local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
+						extraText = ", Wind Range " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+						income = (minWindIncome+2.5)/2
+					end
 				end
 			end
 		end
+		
+		local metalOD = WG.metalFromOverdrive
+		local energyOD = WG.energyForOverdrive
+		
+		if metalOD and metalOD > 0 and energyOD and energyOD > 0 then 
+			-- Best case payback assumes that extra energy will make
+			-- metal at the current energy:metal ratio. Note that if
+			-- grids are linked better then better payback may be
+			-- achieved.
+			--local bestCasePayback = cost/(income*metalOD/energyOD)
+			
+			-- Uniform case payback assumes that all mexes are being
+			-- overdriven equally and figures out their multiplier
+			-- from the base mex income. It then figures out how many
+			-- mexes there are and adds a portion of the new enginer to
+			-- them.
+			--local totalMexIncome = WG.mexIncome
+			--if not totalMexIncome then
+			--	local singleMexMult = math.sqrt(energyOD)/4
+			--	totalMexIncome = metalOD/singleMexMult
+			--end
+			--local overdriveMult = metalOD/totalMexIncome
+			--local energyPerMex = 16*overdriveMult^2
+			--local mexCount = energyOD/energyPerMex
+			--local incomePerMex = income/mexCount
+			--local overdrivePerMex = metalOD/mexCount
+			--local extraMetalPerMex = totalMexIncome/mexCount*math.sqrt(energyPerMex+incomePerMex)/4 - overdrivePerMex
+			--local extraMetal = extraMetalPerMex*mexCount
+			--local unitformCasePayback = cost/extraMetal
+			
+			-- Worst case payback assumes that all your OD metal is from
+			-- a single mex and you are going to link your new energy to it.
+			-- It seems to be equal to Uniform case payback and quite accurate.
+			local singleMexMult = math.sqrt(energyOD)/4
+			local mexIncome = metalOD/singleMexMult
+			local worstCasePayback = cost/(mexIncome*math.sqrt(energyOD+income)/4 - metalOD)
+			
+			--extraText = extraText 
+			--.. "\n overdriveMult: " .. overdriveMult 
+			--.. "\n energyPerMex: " .. energyPerMex 
+			--.. "\n mexCount: " .. mexCount 
+			--.. "\n incomePerMex: " .. incomePerMex 
+			--.. "\n overdrivePerMex: " .. overdrivePerMex 
+			--.. "\n extraMetalPerMex: " .. extraMetalPerMex
+			--.. "\n extraMetal: " .. extraMetalza
+			--.. "\n unitformCasePayback: " .. unitformCasePayback 
+			--.. "\n worstCasePayback: " .. worstCasePayback 
+			extraText = extraText .. "\nOverdrive Payback: " .. SecondsToMinutesSeconds(worstCasePayback)
+		else
+			extraText = extraText .. "\nOverdrive Payback: Unknown"
+		end
 	end
-	
+		
 	local tt_structure = {
 		leftbar = {
 			tt_table.morph_data 

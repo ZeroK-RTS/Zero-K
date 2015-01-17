@@ -1,4 +1,4 @@
-local versionNumber = "1.21"
+local versionNumber = "1.22"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
@@ -36,7 +36,7 @@ local screen0
 local Image
 local Button
 
-local vsx, vsy
+local vsx, vsy = widgetHandler:GetViewSizes()
 local modoptions = Spring.GetModOptions() --used in LuaUI\Configs\startup_info_selector.lua for planetwars
 local selectorShown = false
 local mainWindow
@@ -56,6 +56,14 @@ local WINDOW_WIDTH = 720
 local WINDOW_HEIGHT = 480
 local BUTTON_WIDTH = 128
 local BUTTON_HEIGHT = 128
+
+if (vsx < 1024 or vsy < 768) then 
+	--shrinker
+	WINDOW_WIDTH = vsx* (WINDOW_WIDTH/1024)
+	WINDOW_HEIGHT = vsy* (WINDOW_HEIGHT/768)
+	BUTTON_WIDTH = vsx* (BUTTON_WIDTH/1024)
+	BUTTON_HEIGHT = vsy* (BUTTON_HEIGHT/768)
+end
 
 --local wantLabelUpdate = false
 --------------------------------------------------------------------------------

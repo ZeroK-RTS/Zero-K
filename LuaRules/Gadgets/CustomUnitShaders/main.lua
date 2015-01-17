@@ -30,6 +30,26 @@ end
 
 
 if (gadgetHandler:IsSyncedCode()) then
+  
+  --// block first try, so we have enough time to disable the lua UnitRendering
+  --// else the model would be invisible for 1 gameframe
+  local blockFirst = {}
+  function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, part)
+    if (part < 0) then
+      local inbuild = select(3,Spring.GetUnitIsStunned(unitID))
+      if (not inbuild) then
+	    SendToUnsynced("unitshaders_reverse", unitID,unitDefID,Spring.GetUnitTeam(unitID))
+        if (not blockFirst[unitID]) then
+          blockFirst[unitID] = true
+          return false
+        end
+      end
+    else
+      blockFirst[unitID] = nil
+    end
+    return true
+  end
+  
   return
 end
 
@@ -340,25 +360,6 @@ function gadget:UnitGiven(...)
   gadget:UnitFinished(...)
 end
 
---// block first try, so we have enough time to disable the lua UnitRendering
---// else the model would be invisible for 1 gameframe
-local blockFirst = {}
-function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, part)
-  if (part < 0) then
-    local inbuild = select(3,Spring.GetUnitIsStunned(unitID))
-    if (not inbuild) then
-      gadget:UnitReverseBuild(unitID,unitDefID,Spring.GetUnitTeam(unitID))
-      if (not blockFirst[unitID]) then
-        blockFirst[unitID] = true
-        return false
-      end
-    end
-  else
-    blockFirst[unitID] = nil
-  end
-  return true
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -425,6 +426,7 @@ function gadget:Initialize()
     end
   end
 
+  gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuild)
   gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
 end
 

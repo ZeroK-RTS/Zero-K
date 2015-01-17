@@ -7,7 +7,7 @@ function gadget:GetInfo()
 	date	= "April 20 2010",
 	license	= "GNU GPL, v2 or later",
 	layer	= 0,
-	enabled = not (Game.version:find('91.0') == 1),
+	enabled = false --not (Game.version:find('91.0') == 1),
   }
 end
 
@@ -87,8 +87,8 @@ end
 local function ClearMoveGoal(unitID, data)
 	-- removes move order
 	if data.moveGoalSet then
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {} )
-		spGiveOrderToUnit(unitID, CMD_WAIT, {}, {} )
+		local x,y,z = spGetUnitPosition(unitID)
+		Spring.SetUnitMoveGoal(unitID, x, y, z, 8, nil, false)
 		data.moveGoalSet = false
 	end
 end

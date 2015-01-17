@@ -45,8 +45,9 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local units = {}
 local disabledUnits = {}
+local disabledSensor = {}
 local changeStateDelay = 3 -- delay in seconds before state of unit can be changed. Do not set it below 2 seconds, because it takes 2 seconds before enabled unit reaches full energy use
-local radarDefs = {
+local onOffDefs = {
 	[ UnitDefNames['armarad'].id ] = true,
 	[ UnitDefNames['spherecloaker'].id ] = true,
 	[ UnitDefNames['armjamt'].id ] = true,
@@ -55,7 +56,22 @@ local radarDefs = {
 	[ UnitDefNames['corawac'].id ] = true,
 	[ UnitDefNames['corvrad'].id ] = true,
 }
+local radarUnit = {}
+local sonarUnit = {}
+local jammerUnit = {}
 
+for unitDefID,_ in pairs(onOffDefs) do
+	local ud = UnitDefs[unitDefID]
+	if ud.radarRadius > 0 then
+		radarUnit[unitDefID] = ud.radarRadius
+	end
+	if ud.sonarRadius > 0 then
+		sonarUnit[unitDefID] = ud.sonarRadius
+	end
+	if ud.jammerRadius > 0 then
+		jammerUnit[unitDefID] = ud.jammerRadius
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -69,7 +85,7 @@ end
 
 
 function AddUnit(unitID, unitDefID) 
-	if (radarDefs[unitDefID]) then
+	if (onOffDefs[unitDefID]) then
 		units[unitID] = { defID = unitDefID, changeStateTime = spGetGameSeconds() } 
 	end
 end
@@ -78,6 +94,7 @@ end
 function RemoveUnit(unitID) 
 	units[unitID] = nil
 	disabledUnits[unitID] = nil
+	disabledSensor[unitID] = nil
 end
 
 
@@ -113,16 +130,44 @@ function gadget:GameFrame(n)
 		for _,teamID in ipairs(temp) do 
 			local eCur, eMax, ePull, eInc, _, _, _, eRec = Spring.GetTeamResources(teamID, "energy")
 			teamEnergy[teamID] = eCur - ePull + eInc
-		end 
+		end
 
 		for unitID,data in pairs(units) do
+			local stunned, _, inbuild = spGetUnitIsStunned(unitID)
+			--GG.UnitEcho(unitID, radarUnit[defID])
+			if inbuild then
+				if not disabledSensor[unitID] then
+					if radarUnit[data.defID] then 
+						Spring.SetUnitSensorRadius(unitID, "radar", 0)
+					end
+					if sonarUnit[data.defID] then 
+						Spring.SetUnitSensorRadius(unitID, "sonar", 0)
+					end
+					if jammerUnit[data.defID] then 
+						Spring.SetUnitSensorRadius(unitID, "radarJammer", 0)
+					end
+					disabledSensor[unitID] = true
+				end
+			elseif disabledSensor[unitID] then
+				if radarUnit[data.defID] then 
+					Spring.SetUnitSensorRadius(unitID, "radar", radarUnit[data.defID])
+				end
+				if sonarUnit[data.defID] then 
+					Spring.SetUnitSensorRadius(unitID, "sonar", sonarUnit[data.defID])
+				end
+				if jammerUnit[data.defID] then 
+					Spring.SetUnitSensorRadius(unitID, "radarJammer", jammerUnit[data.defID])
+				end
+				disabledSensor[unitID] = false
+			end
+			
 			if (gameSeconds - data.changeStateTime > changeStateDelay) then
 				local disabledUnitEnergyUse = disabledUnits[unitID] 
 				if (disabledUnitEnergyUse~=nil) then -- we have disabled unit
 					local unitTeamID = spGetUnitTeam(unitID)
-					if (disabledUnitEnergyUse < teamEnergy[unitTeamID] and not spGetUnitIsStunned(unitID)) then	-- we still have enough energy to reenable unit
-						disabledUnits[unitID]=nil
-						Spring.SetUnitRulesParam(unitID,"forcedoff", 0)
+					if (disabledUnitEnergyUse < teamEnergy[unitTeamID] and not stunned) then	-- we still have enough energy to reenable unit
+						disabledUnits[unitID] = nil
+						Spring.SetUnitRulesParam(unitID,"forcedOff", 0)
 						GG.UpdateUnitAttributes(unitID)
 						data.changeStateTime = gameSeconds
 						teamEnergy[unitTeamID] = teamEnergy[unitTeamID] - disabledUnitEnergyUse
@@ -137,7 +182,7 @@ function gadget:GameFrame(n)
 						if (spGetUnitStates(unitID).active) then	-- only disable "active" unit
 							data.changeStateTime = gameSeconds
 							disabledUnits[unitID] = energyUpkeep
-							Spring.SetUnitRulesParam(unitID,"forcedoff", 1)
+							Spring.SetUnitRulesParam(unitID,"forcedOff", 1)
 							GG.UpdateUnitAttributes(unitID)
 						end
 					end
