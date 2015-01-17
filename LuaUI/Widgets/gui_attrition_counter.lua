@@ -51,7 +51,6 @@ function widget:Initialize()
 	for i = 1, #teams do
 		local teamId,_,_,_,_,ally = Spring.GetTeamInfo(teams[i])
 		if teamId~=myTeam and ally == allyTeam then
-			echo('<Attrition>: You are strictly prohibited by Authority from using Attrition Scoreboard in team games, and will be punished by strict spanking.');
 			widgetHandler:RemoveWidget();
 			return;
 		end
@@ -238,7 +237,7 @@ function CreateWindow()
  	
  	attrition_counter = Chili.Label:New{
  		y = '5%',
- 		right = '0%',
+ 		right = '1%',
  		width = 24,
  		parent = window,
  		caption = "N/A",
