@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.437 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.438 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -110,7 +110,7 @@ local explodeSearchTerm = {text="", terms={}} -- store exploded "filterUserInser
 --------------------------------------------------------------------------------
 -- Misc
 local B_HEIGHT = 26
-local B_WIDTH_TOMAINMENU = 80 --100 --160
+local B_WIDTH_TOMAINMENU = 80
 local C_HEIGHT = 16
 
 local scrH, scrW = 0,0
@@ -1850,7 +1850,7 @@ MakeSubWindow = function(path, pause)
 		end
 	end
 	
-	local window_height = 400
+	local window_height = min(400, scrH - B_HEIGHT*6)
 	if settings_height < window_height then
 		window_height = settings_height+10
 	end
