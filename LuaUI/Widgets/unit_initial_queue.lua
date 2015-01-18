@@ -254,14 +254,6 @@ local updateFreq = 0.15
 function widget:Update(dt)
 	timer = timer + dt
 	if timer > updateFreq then
-		-- Don't run if we are a spec
-		local areSpec = Spring.GetSpectatingState()
-		if areSpec then
-			Spring.Echo("<Initial Queue>: Spectator mode. Widget removed.")
-			widgetHandler:RemoveWidget(self)
-			return
-		end
-		
 		local defID = Spring.GetTeamRulesParam(myTeamID, "commChoice")
 		if defID and defID ~= sDefID then
 			local def = UnitDefs[defID]
@@ -439,6 +431,12 @@ function widget:GameFrame(n)
 		gameStarted = true
 	end
 
+	-- Don't run if we are a spec
+	local areSpec = Spring.GetSpectatingState()
+	if areSpec then
+		widgetHandler:RemoveWidget(self)
+		return
+	end
 	
 	-- Don't run if we didn't queue anything
 	if (#buildQueue == 0) then
