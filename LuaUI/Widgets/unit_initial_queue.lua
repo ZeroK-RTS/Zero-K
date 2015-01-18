@@ -1,4 +1,4 @@
-local version = "v1.545"
+local version = "v1.544"
 function widget:GetInfo()
 	return {
 		name      = "Initial Queue ZK",
@@ -212,7 +212,7 @@ end
 function widget:Initialize()
 	if (Game.startPosType == 1) or			-- Don't run if start positions are random
 	   (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
-		Spring.Echo("<Initial Queue>: Game already started or Start Position is randomized. Widget removed.") --added this message because widget removed message might not appear (make debugging harder)
+		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
 		widgetHandler:RemoveWidget(self)
 		return
 	end
@@ -254,14 +254,6 @@ local updateFreq = 0.15
 function widget:Update(dt)
 	timer = timer + dt
 	if timer > updateFreq then
-		-- Don't run if we are a spec
-		local areSpec = Spring.GetSpectatingState()
-		if areSpec then
-			Spring.Echo("<Initial Queue>: Spectator mode. Widget removed.")
-			widgetHandler:RemoveWidget(self)
-			return
-		end
-		
 		local defID = Spring.GetTeamRulesParam(myTeamID, "commChoice")
 		if defID and defID ~= sDefID then
 			local def = UnitDefs[defID]
@@ -439,6 +431,12 @@ function widget:GameFrame(n)
 		gameStarted = true
 	end
 
+	-- Don't run if we are a spec
+	local areSpec = Spring.GetSpectatingState()
+	if areSpec then
+		widgetHandler:RemoveWidget(self)
+		return
+	end
 	
 	-- Don't run if we didn't queue anything
 	if (#buildQueue == 0) then

@@ -224,7 +224,7 @@ function script.AimWeapon(num, heading, pitch)
 
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
-	Turn( head , y_axis, heading , math.rad(90) )
+	Turn( head , y_axis, heading , math.rad(180) )
 	if gun_1 then
 	
 		Turn( l_tube , x_axis, -pitch , math.rad(45) )
