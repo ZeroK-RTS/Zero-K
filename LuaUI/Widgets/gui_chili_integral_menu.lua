@@ -1595,7 +1595,7 @@ function widget:GameFrame(n)
 			if not manualfireweapon.status then
 				local _,_, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, 3-reverseCompat) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
 				local isManualFire, reloadTime = IsWeaponManualFire(unitID, 3)
-				if isManualFire then
+				if isManualFire and weaponReloadFrame then
 					if weaponReloadFrame > currentFrame then
 						manualfireweapon.status = false
 						local remainingTime = (weaponReloadFrame - currentFrame)*1/30

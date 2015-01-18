@@ -563,10 +563,12 @@ local function GetWeaponReloadStatus(unitID, weapNum)
 	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
 		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
 		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum-reverseCompat) --select weapon no.X
-		local currentFrame, _ = spGetGameFrame() 
-		local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
-		local reloadFraction =1 - remainingTime/reloadTime
-		return reloadFraction, remainingTime
+		if weaponReloadFrame then
+			local currentFrame, _ = spGetGameFrame() 
+			local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
+			local reloadFraction =1 - remainingTime/reloadTime
+			return reloadFraction, remainingTime
+		end
 	end
 	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
 end
