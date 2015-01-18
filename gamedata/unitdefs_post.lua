@@ -289,15 +289,15 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Use old diving bomber for 91.0
---
---if reverseCompat then
---	for i, name in pairs(UnitDefs.factoryplane.buildoptions) do
---		if name == "bomberdive" then
---			UnitDefs.factoryplane.buildoptions[i] = "corshad"
---		end
---	end
---end
+ Use old diving bomber for 91.0
+
+if reverseCompat then
+	for i, name in pairs(UnitDefs.factoryplane.buildoptions) do
+		if name == "bomberdive" then
+			UnitDefs.factoryplane.buildoptions[i] = "corshad"
+		end
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

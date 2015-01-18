@@ -17,7 +17,7 @@ unitDef = {
     [[armca]],
     [[fighter]],
     [[corvamp]],
-	[[bomberdive]],
+	[[corshad]],
 	[[corhurc2]],
     [[armstiletto_laser]],
     [[armcybr]],
