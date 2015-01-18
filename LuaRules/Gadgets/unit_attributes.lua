@@ -138,13 +138,15 @@ local function updatePausedReload(unitID, unitDefID, gameFrame)
 	for i = 1, state.weaponCount do
 		local w = state.weapon[i]
 		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
-		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
-		local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
-		if reloadState < 0 then -- unit is already reloaded, so set unit to almost reloaded
-			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
-		else
-			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+		if reloadState then
+			local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
+			local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
+			if reloadState < 0 then -- unit is already reloaded, so set unit to almost reloaded
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
+			else
+				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+			end
 		end
 	end
 end
@@ -435,6 +437,10 @@ function gadget:GameFrame(f)
 			updatePausedReload(unitID, unitDefID, f)
 		end
 	end
+end
+
+function gadget:UnitDestroyed(unitID)
+	removeUnit(unitID)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
