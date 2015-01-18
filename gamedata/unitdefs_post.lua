@@ -289,7 +289,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
- Use old diving bomber for 91.0
+-- Use old diving bomber for 91.0
 
 if reverseCompat then
 	for i, name in pairs(UnitDefs.factoryplane.buildoptions) do
