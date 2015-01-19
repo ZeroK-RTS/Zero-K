@@ -330,7 +330,7 @@ function widget:Update(s)
 					caption = GetTimeFormatted(spawn_time);
 					height = 10,
 					width = "100%";
-					fontsize = 10;
+					fontsize = 10.1; --floating point value, just in case integer 9&10 could trigger memory leak
 					textColor = green;
 				}
 				mid_stack:AddChild(respawn_timer)
