@@ -38,6 +38,12 @@ local options = {
     type   = 'section',
   },
   {
+    key    = 'other',
+    name   = 'Other',
+    desc   = 'Other options.',
+    type   = 'section',
+  },
+  {
     key    = 'silly', -- koth, lava, ctf, oremex, fun, zombies
     name   = 'Silly',
     desc   = 'Silly options for trolling.',
@@ -84,14 +90,32 @@ local options = {
     section= 'a_important',
     def = false,
   },
-  --{
-  --  key = "mutespec",
-  --  name = "Mute Spectators",
-  --  desc = "Prevent spectators from communcating with players",
-  --  type = "bool",
-  --  section= 'modifiers',
-  --  def = false,
-  --},
+	{
+		key     = 'mutespec',
+		name    = 'Mute Spectators',
+		desc    = 'Determines whether spectators can talk to players.',
+		type    = 'list',
+		section = 'other',
+		def     = 'autodetect',
+		items   = {
+			{ key='mute', name = "Mute", desc = 'Mutes spectators.' },
+			{ key='autodetect', name = "Autodetect", desc = 'Mutes spectators in FFA (more than two teams).' },
+			{ key='nomute', name = "No Mute", desc = 'Does not mute spectators.' },
+		},
+	},
+	{
+		key     = 'mutelobby',
+		name    = 'Mute Lobby',
+		desc    = 'Determines whether chat in the lobby is visible ingame.',
+		type    = 'list',
+		section = 'other',
+		def     = 'autodetect',
+		items   = {
+			{ key='mute', name = "Mute", desc = 'Mutes the lobby.' },
+			{ key='autodetect', name = "Autodetect", desc = 'Mutes the lobby in FFA (more than two teams).' },
+			{ key='nomute', name = "No Mute", desc = 'Does not mute the lobby.' },
+		},
+	},
     {
         key='hilltime',
         name='Hill control time',
