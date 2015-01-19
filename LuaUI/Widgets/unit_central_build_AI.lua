@@ -11,11 +11,13 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local version = "v1.352"
+local version = "v1.354"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
-    desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group 0 (use \255\90\255\90Auto Group\255\255\255\255 widget or manually), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
+    desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group 0 "..
+"(\255\200\200\200Ctrl+0\255\255\255\255, or \255\200\200\200Alt+0\255\255\255\255 if using \255\90\255\90Auto Group\255\255\255\255 widget), "..
+"then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
     date      = "July 20, 2009, 8 March 2014",
     license   = "GNU GPL, v2 or later",
@@ -121,14 +123,42 @@ local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
 local enemyRange = 600 --range (in elmo) around build site to check for enemy
 local enemyThreshold = 0.49--fraction of enemy around build site w.r.t. ally unit for it to be marked as unsafe
+local dangerThreshold = 2 --amount of constructor death that force the build site to be removed if constructor had no other job to do
 
 --	"global" for this widget.  This is probably not a recommended practice.
 local myUnits = {}	--  list of units in the Central Build group
 local myQueue = {}  --  list of commands for Central Build group
 local groupHasChanged	--	Flag if group members have changed.
+
 local myQueueUnreachable = {} -- list of queue which units can't reach
 
 local cachedValue = {} --cached results for "EnemyControlBuildSite()" function to reduce cost for repeated call
+local cachedValue2 = {} --cached metalcost for "GetWorkFor()" function
+local cachedValue3 = {} --cached first command for "GetWorkFor{}" function
+local reassignedUnits = {} --list of units that had its task re-checked (to be re-tasked or remained with current task).
+
+--------------------------------------------
+--List of prefix used as value for myUnits[]
+local queueType = {
+	idle = 'idle',
+	busy = 'busy', --indicate user command
+	assist = 'asst', --appended with: unitID. Indicate assist using GUARD command
+	buildAssist = 'bass', --appended with: queueType.build (can be empty string, see GetWorkFor() for detail). Indicate an assist without GUARD command
+	build = 'buil',--appended with: cmdId .. "@" .. x .. "x" .. z. Indicate unit have task. Its also a Key to myQueue[], if no longer a Key to myQueue[] then it meant the construction has already begun  
+}
+--List of value used for myQueueUnreachable[]
+local blockageType = {
+	blocked = 2,
+	enemy = 1,
+	clear = 0,
+}
+--List of type of work, used in GetWorkFor() & GiveWorkToUnits()
+local assistType = {
+	none = 0,
+	guard = 1,
+	copy = 2,
+	copyExternal = 3,
+}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -164,9 +194,9 @@ if not Spring.IsGUIHidden() then
 			glBillboard()
 			glColor(textColor)
 --			glText("cb "..myCmd, -10.0, -15.0, textSize, "con")
-			if myCmd == "idle" then
+			if myCmd == queueType.idle then
 				glText("idl", -10.0, -15.0, textSize, "con")
-			elseif myCmd == "busy" then
+			elseif myCmd == queueType.busy then
 				glText("bsy", -10.0, -15.0, textSize, "con")
 			else
 				glText("cb", -10.0, -15.0, textSize, "con")
@@ -227,7 +257,14 @@ function widget:GameFrame(thisFrame)
 	if ( thisFrame > nextPathCheck ) then
 		cachedValue = {}
 		UpdateUnitsPathability()
-		nextPathCheck = thisFrame + 300
+		
+		for key,myCmd in pairs(myQueue) do
+			if myCmd.danger >0 then
+				myQueue[key].danger = myCmd.danger -1/12 --decay by 1 every 2 minute
+			end
+		end
+		
+		nextPathCheck = thisFrame + 300 --10 second
 	end
 	if ( thisFrame < nextFrame ) then 
 		return
@@ -236,7 +273,7 @@ function widget:GameFrame(thisFrame)
 		UpdateOneGroupsDetails(myGroupId)
 	end
 	nextFrame = thisFrame + 60	-- try again in 2 second if nothing else triggers
-	FindIdleUnits(myUnits,thisFrame)		-- locate idle units not found otherwise
+	FindEligibleWorker()	-- compile list of eligible idle units for work
 end
 
 --	This function detects that a new group has been defined or changed.  Use it to set a flag
@@ -262,7 +299,7 @@ function UpdateOneGroupsDetails(myGroupId)
 			local udid = spGetUnitDefID(unitID)
 			local ud = UnitDefs[udid]
 			if (ud.isBuilder and ud.canMove) then
-				myUnits[unitID] = "idle"
+				myUnits[unitID] = queueType.idle
 				myQueueUnreachable[unitID]= {}
 				UpdateOneUnitPathability(unitID)
 			end
@@ -308,7 +345,7 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 			if ( options.shift ) then -- used shift for:.
 				if ( id < 0 ) then --for: building
 					local x, y, z, h = params[1], params[2], params[3], params[4]
-					local myCmd = { id=id, x=x, y=y, z=z, h=h }
+					local myCmd = { id=id, x=x, y=y, z=z, h=h, danger=0 }
 					local isOverlap = CleanOrders(myCmd) -- check if current queue overlap with existing queue, and clear up any invalid queue 
 					if not isOverlap then
 						local hash = hash(myCmd)
@@ -326,8 +363,8 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					nextFrame = currentFrame + 30 --wait 1 more second before distribute work, so user can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
 				else --for: moving/attacking/repairing, ect
-					if myUnits[unitID] == "idle" then --unit is not doing anything
-						myUnits[unitID] = "busy" --is doing irrelevant thing
+					if myUnits[unitID] == queueType.idle then --unit is not doing anything
+						myUnits[unitID] = queueType.busy --is doing irrelevant thing
 					end
 					-- do NOT return here because there may be more units.  Let Spring handle.
 				end
@@ -339,7 +376,7 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 					myUnits[unitID] = hash --remember what command this unit is having
 					UpdateUnitsPathabilityForOneQueue(hash,myCmd) --take note of build site reachability
 				else
-					myUnits[unitID] = "busy"	-- direct command of something else.
+					myUnits[unitID] = queueType.busy	-- direct command of something else.
 				end
 				-- do NOT return here because there may be more units.  Let Spring handle.
 			end
@@ -359,20 +396,20 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if ( myCmd == hash ) then --check if others is using same command as this unit (note: myCmd == "cmdID@x@z", if true:
 			local cmd2 = GetFirstCommand(unit2)
 			if ( cmd2 == nil ) then	-- no orders?  Must be idle.
-				myUnits[unit2]="idle"
+				myUnits[unit2]= queueType.idle
 			else
 				if (cmd2.params[1] == ux and cmd2.params[3] == uz) then
 					spGiveOrderToUnit(unit2, CMD_REMOVE, {cmd2.tag}, {""} ) --remove
 				end
 				spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
-				myUnits[unit2]="busy" -- command done but still busy. Example scenario: unit attempt to assist a construction while user SHIFT queued a reclaim command, however the construction finishes first before this unit arrives, so this unit continue finishing the RECLAIM command with "busy" tag.
+				myUnits[unit2]= queueType.busy -- command done but still busy. Example scenario: unit attempt to assist a construction while user SHIFT queued a reclaim command, however the construction finishes first before this unit arrives, so this unit continue finishing the RECLAIM command with "busy" tag.
 			end
 			for unit3,myCmd2 in pairs(myUnits) do
-				if ( myCmd2 == "asst "..unit2 ) then  --check if this unit is being GUARDed
+				if ( myCmd2 == queueType.assist.. unit2 ) then  --check if this unit is being GUARDed
 					spGiveOrderToUnit(unit3, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
 					spGiveOrderToUnit(unit3, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
-					--myUnits[unit2] = "idle" --set as "idle"
-					myUnits[unit2]="busy" --busy until really idle
+					--myUnits[unit2] = queueType.idle --set as "idle"
+					myUnits[unit2]= queueType.busy --busy until really idle
 				end
 			end
 		end
@@ -385,49 +422,77 @@ end
 function widget:UnitIdle(unitID, unitDefID, teamID)
 	if ( myUnits[unitID] ) then
 		for unit2,myCmd in pairs(myUnits) do
-			if ( myCmd == "asst "..unitID ) then  --check if this unit is being GUARDed
+			if ( myCmd == queueType.assist ..unitID ) then  --check if this unit is being GUARDed
 				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
 				spGiveOrderToUnit(unit2, CMD_INSERT, {0,CMD_STOP}, {"alt"} ) --stop current motion
-				--myUnits[unit2] = "idle" --set as "idle"
-				myUnits[unit2]="busy" --busy until really idle
+				--myUnits[unit2] = queueType.idle --set as "idle"
+				myUnits[unit2]= queueType.busy --busy until really idle
 			end
 		end
-		myUnits[unitID] = "idle"
+		myUnits[unitID] = queueType.idle
 		nextFrame = currentFrame + ping() --find new work
 	end
 end
 
---  One at a time, assign idle builders new tasks.
+--select 10 worker from a pool of idle constructor or reuse some of the non-idle constructor as new worker
 
-function FindIdleUnits(myUnits, thisFrame)
-	local idle_myUnits = {}
-	local idle_assigned = {}
-	local numberOfIdle = 0
+function FindEligibleWorker()
+	local unitToWork = {}
 	for unitID,myCmd in pairs(myUnits) do --check if unit really idle or is actually busy, because UnitIdle() can be triggered by other widget and is overriden with new command afterward, thus making unit look idle but is busy (ie: cmd_mex_placement.lua, area mex widget)
-		if myCmd == "idle" then --if unit is marked as idle, then double check it
-			local cmd1 = GetFirstCommand(unitID)
+		if myCmd == queueType.idle then --if unit is marked as idle, then double check it
+			local cmd1 = GetFirstCommand(unitID,true)
 			if ( cmd1 ) then
 				if ( cmd1.id < 0 ) then --is build (any) stuff
-					if ( cmd1.params[3] ) then --is not build unit command (build unit command has nil parameter (only for factory))
+					if ( cmd1.params[3] ) then --is not build unit command (build unit command has NIL parameter (because its only for factory))
 						local unitCmd = {id=cmd1.id,x=cmd1.params[1],y=cmd1.params[2],z=cmd1.params[3],h=cmd1.params[4]}
 						local hash = hash(unitCmd)
 						myUnits[unitID] = hash
 					end
 				else
-					myUnits[unitID] = 'busy'
+					myUnits[unitID] = queueType.busy
 				end
 			else
-				if numberOfIdle <= 10 then
-					numberOfIdle = numberOfIdle +1
+				if #unitToWork <= 10 then
 					--NOTE: only allow up to 10 idler to be processed to prevent super lag.
 					--The amount of external loop will be (numberOfmyunit^2+numberOfQueue)*numberOfIdle^2.
 					--ie: if all variable were 50, then the amount of loop in total is 6375000 loop (6 million).
-					idle_myUnits[numberOfIdle] = unitID
+					unitToWork[#unitToWork+1] = unitID
 				end
 			end
 		end
 	end
+	if #unitToWork < 10 then
+		local gaveWork = false
+		for unitID,myCmd in pairs(myUnits) do
+			if (not reassignedUnits[unitID]) then
+				local workType = myCmd:sub(1,4)
+				if (workType == queueType.build and myQueue[workType]) or (workType == queueType.buildAssist or workType == queueType.assist) then
+					unitToWork[#unitToWork+1] = unitID
+					gaveWork = true
+					reassignedUnits[unitID] = true
+					if (#unitToWork == 10) then
+						break
+					end
+				end
+			end
+		end
+		if not gaveWork then --no more unit to be reassigned? then reset list 
+			reassignedUnits = {}
+		end
+	end
 
+	CleanOrders()	-- check build site(s) for blockage (also remove the build queue if construction have started).
+
+	if (#unitToWork > 0) then
+		GiveWorkToUnits(unitToWork)
+		cachedValue2 = {}
+		cachedValue3 = {}
+	end
+end
+
+--  One at a time, assign builders new tasks.
+
+function GiveWorkToUnits(unitToWork)
 	--HOW THIS WORK:
 	--*loopA for all idle CBA unit,
 	--	*loopB for all idle CBA unit,
@@ -442,19 +507,20 @@ function FindIdleUnits(myUnits, thisFrame)
 	--	>register that constructor as working constructor
 	--*loopA return command to be given to that constructor
 	-->send all command to all CBA units.
-	CleanOrders()	-- check build site(s) for blockage (also remove the build queue if construction have started).
+
 	local orderArray={}
 	local unitArray={}
-	for i=1,numberOfIdle do
+	local assignedAJob = {}
+	for i=1,#unitToWork do
 		local nearestOrders = {}
-		for i=1,numberOfIdle do
+		for i=1,#unitToWork do
 			--[[
-			local cmd1 = GetFirstCommand(unitID)
+			local cmd1 = GetFirstCommand(unitID,true)
 			if ( cmd1 == nil ) then		-- no orders?  Must be idle.
-				myUnits[unitID] = "idle"
+				myUnits[unitID] = queueType.idle
 			--]]
-			local unitID = idle_myUnits[i] --if unit is marked as idle, then use it.
-			if (not idle_assigned[unitID] ) then --unit not yet assigned in previous iteration? find work
+			local unitID = unitToWork[i] --if unit is marked as idle, then use it.
+			if (not assignedAJob[unitID] ) then --unit not yet assigned in previous iteration? find work
 				local tmp = GetWorkFor(unitID)
 				if ( tmp ~= nil ) then
 					table.insert( nearestOrders, tmp )	-- indexed okay here
@@ -475,16 +541,22 @@ function FindIdleUnits(myUnits, thisFrame)
 		--spGiveOrderToUnit( close[1], close[2], close[3], { "" } )
 		local assignUnitID = close[1]
 		if not EnemyAtBuildSiteCleanOrder(assignUnitID,close[3],close[5]) then --skip this job? is too dangerous?
-			unitArray[#unitArray+1]= assignUnitID
-			orderArray[#orderArray+1]={close[2], close[3], { "" }}
-			if ( close[5] == 0 ) then --if GUARD command: then,
-				myUnits[assignUnitID] = "asst "..unpack(close[3])	--  unitID we're assisting
-				--Echo(close[3])
-			else --if regular assisting: then,
-				myUnits[assignUnitID] = close[5]	--  hash of command we're executing
-				--Echo(close[5])
+			local myQueueHash
+			if ( close[6] == assistType.guard ) then --if GUARD command,
+				myQueueHash = queueType.assist .. unpack(close[3])	--  unitID we're assisting
+			elseif ( close[6] == assistType.copy ) then --if build assist without GUARD command,
+				myQueueHash = queueType.buildAssist .. close[5] --hash from unitID we're assisting
+			elseif ( close[6] == assistType.copyExternal ) then --assist of build no longer in myQueue[] (either under construction or is from manual order)
+				myQueueHash = queueType.buildAssist .. assistType.copyExternal
+			else --if new build,
+				myQueueHash = close[5]	--  hash of command we're executing
 			end
-			idle_assigned[assignUnitID] = true
+			if ( myUnits[assignUnitID] ~= myQueueHash ) then --a new command
+				unitArray[#unitArray+1]= assignUnitID
+				orderArray[#orderArray+1]={close[2], close[3], { "" }}
+				myUnits[assignUnitID] = myQueueHash
+			end
+			assignedAJob[assignUnitID] = true
 		end
 	end
 	if #orderArray > 0 then --we should not give empty command else it will delete all unit's existing queue
@@ -492,7 +564,8 @@ function FindIdleUnits(myUnits, thisFrame)
 	end
 	unitArray = nil
 	orderArray = nil
-	--nextFrame = thisFrame + ping()
+	assignedAJob = nil
+	--nextFrame = currentFrame + ping()
 end
 
 --	Borrowed distance calculation from Google Frog's Area Mex
@@ -504,7 +577,15 @@ end
 
 --	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
 
-function GetFirstCommand(unitID)
+function GetFirstCommand(unitID, useCache)
+	if (useCache) then
+		if (not cachedValue3[unitID]) then
+			local value = spGetCommandQueue(unitID, 1)
+			cachedValue3[unitID] = value and value[1]
+		end
+		return cachedValue3[unitID]
+	end
+
 	local queue = spGetCommandQueue(unitID, 1)
 	return queue and queue[1]
 end
@@ -533,12 +614,20 @@ function CleanOrders(newCmd)
 			end
 		end
 	end
+
 	for key,myCmd in pairs(myQueue) do
 		local cmdID = abs( myCmd.id )
 		local x, y, z, facing = myCmd.x, myCmd.y, myCmd.z, myCmd.h
 		local canBuildThisThere,featureID = spTestBuildOrder(cmdID,x,y,z,facing) --check if build site is blocked by buildings & terrain
 		
-		if (canBuildThisThere == 1) or (newCmd and xSize and canBuildThisThere > 0) then --if unit blocking OR new build site was added
+		local blockageType = {
+			removal = -1,
+			terrain = 0,
+			units = 1,
+			free = 2,
+		}
+
+		if (canBuildThisThere == blockageType.units) or (newCmd and xSize and canBuildThisThere ~= blockageType.terrain) then --if unit blocking OR new build site was added
 			if facing == 0 or facing == 2 then --check the size of the queued building
 				xSize_queue = UnitDefs[cmdID].xsize*4
 				zSize_queue = UnitDefs[cmdID].zsize*4
@@ -548,14 +637,14 @@ function CleanOrders(newCmd)
 			end	
 		end
 		
-		if newCmd and xSize and (canBuildThisThere > 0) then --check if build site overlap new queue
+		if newCmd and xSize and (canBuildThisThere ~= blockageType.terrain) then --check if build site overlap new queue
 			local minTolerance = xSize_queue + xSize --check minimum tolerance in x direction
 			local axisDist = abs (x - x_newCmd) --check actual separation in x direction
 			if axisDist < minTolerance then --if too close in x direction
 				minTolerance = zSize_queue + zSize --check minimum tolerance in z direction
 				axisDist = abs (z - z_newCmd) -- check actual separation in z direction
 				if axisDist < minTolerance then --if too close in z direction
-					canBuildThisThere = 0 --flag this queue for removal
+					canBuildThisThere = blockageType.removal --flag this queue for removal
 					isOverlap = true --return true
 					
 					-- stop any constructor constructing this queue
@@ -570,18 +659,18 @@ function CleanOrders(newCmd)
 			end
 		end
 		
-		if ( canBuildThisThere==1 ) then --check if blocking unit can move away from our build site
+		if ( canBuildThisThere==blockageType.units ) then --check if blocking unit can move away from our build site
 			local blockingUnits = spGetUnitsInRectangle(x-xSize_queue, z-zSize_queue, x+xSize_queue, z+zSize_queue)
 			for i=1, #blockingUnits do
 				local blockerDefID = spGetUnitDefID(blockingUnits[i])
 				if math.modf(UnitDefs[blockerDefID].speed*10) == 0 then -- ie: modf(0.01*10) == 00 (fractional speed is ignored)
-					canBuildThisThere = 0 --blocking unit can't move away, cancel this queue
+					canBuildThisThere = blockageType.removal --blocking unit can't move away, cancel this queue
 					break;
 				end
 				if blockerDefID == cmdID then
 					local _,_,inBuild = spGetUnitIsStunned(blockingUnits[i])
 					if inBuild then
-						canBuildThisThere = 0 --unit that we wanted to build is already being build, cancel this queue
+						canBuildThisThere = blockageType.removal --unit that we wanted to build is already being build, cancel this queue
 						break;
 					end
 				end
@@ -591,12 +680,12 @@ function CleanOrders(newCmd)
 		--prevent build queue on ally feature
 		if ( checkFeatures ) and ( featureID ) then --check if build site is blocked by feature
 			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't reclaim or build there. (ie: dragon-teeth's wall)
-				canBuildThisThere = 0
+				canBuildThisThere = blockageType.removal
 			end
 		end
 		--end feature check
 		
-		if (canBuildThisThere == 0) then --if queue is flagged for removal
+		if (canBuildThisThere == blockageType.removal or canBuildThisThere == blockageType.terrain) then --if queue is flagged for removal
 			myQueue[key] = nil  --remove queue
 		end
 	end
@@ -614,35 +703,17 @@ function GetWorkFor(unitID)
 	local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
 
 	for busyUnitID,busyCmd1 in pairs(myUnits) do	-- see if any busy units need help.
-		if ( busyUnitID ~= unitID ) then --if not observing ourself
-			local cmd1 = GetFirstCommand(busyUnitID)
+		if ( busyUnitID ~= unitID and ( busyCmd1 == queueType.busy or busyCmd1:sub(1,4)== queueType.build)) then --if not observing ourself
+			local cmd1 = GetFirstCommand(busyUnitID,true)
 			local myCmd = myQueue[busyCmd1]
 			if ( myCmd ) then --when busy unit has CentralBuild command (is using SHIFT)
 				local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
 				if ( cmd  and cmd < 0 ) then
 					local x2, y2, z2 = spGetUnitPosition( busyUnitID)	-- location of busy unit
-					local numOfAssistant = 0.0
-					for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
-						if ( busyUnitID ~= assistantUnitID ) then --if busyUnit not observing itself
-							local prefix = assistantCmd1:sub(1,4)
-							if prefix ~= "asst" then
-								if (assistantCmd1 == busyCmd1) then
-									numOfAssistant = numOfAssistant + 0.11
-								end
-							else
-								-- assistantCmd1:sub(1,5) == "asst "
-								local assisting = tonumber(assistantCmd1:sub(6))
-								if (assisting == busyUnitID) then
-									numOfAssistant = numOfAssistant + 0.11
-								end
-							end
-						end
-					end
-					local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2 --distance btwn busy unit & self,and btwn structure & self, and btwn structure & busy unit. A distance that is no less than btwn structure & busy unit but is 1.5 when opposite to the structure & the busy unit OR when is further away than btwn structure & busy unit
-					local notaccessible = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][busyCmd1] or 0 --check if I can reach this location
-					dist = dist + notaccessible*4500 --increase perceived distance arbitrarity if cannot reach
-					--local dist = Distance(ux,uz,x,z) --distance btwn structure & self
-					dist = dist + dist*numOfAssistant --make the distance look further away than it actually is if there's too many assistance
+					-- local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2 --distance btwn busy unit & self,and btwn structure & self, and btwn structure & busy unit. A distance that is no less than btwn structure & busy unit but is 1.5 when opposite to the structure & the busy unit OR when is further away than btwn structure & busy unit
+					local dist = Distance(ux,uz,x,z) --distance btwn structure & self
+					dist = dist + SituationalPenalty(unitID,busyCmd1,myCmd) --cost penalty for any danger
+					dist = dist + AssistantBenefit(busyUnitID,busyCmd1)
 					if ( dist < busyDist ) then
 						busyClosestID = busyUnitID	-- busy unit who needs help
 						busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
@@ -651,29 +722,10 @@ function GetWorkFor(unitID)
 			elseif ( cmd1 and cmd1.id < 0) then --when busy unit is currently building a structure, is "busy" and not using SHIFT
 				local x2, y2, z2 = spGetUnitPosition(busyUnitID)	-- location of busy unit
 				--local x, z = cmd1.params[1], cmd1.params[3]
-				local numOfAssistant = 0.0
-				for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
-					if ( busyUnitID ~= assistantUnitID ) then --if busyUnit not observing itself
-						local prefix = assistantCmd1:sub(1,4)
-						if prefix ~= "asst" then
-							local cmd2 = GetFirstCommand(assistantUnitID) --check using unit's command queue when we dont have its command stored
-							if (cmd2 and (cmd2 == cmd1)) then
-								numOfAssistant = numOfAssistant + 0.11
-							end
-						else
-							-- assistantCmd1:sub(1,5) == "asst "
-							local assisting = tonumber(assistantCmd1:sub(6))
-							if (assisting == busyUnitID) then
-								numOfAssistant = numOfAssistant + 0.11
-							end
-						end
-					end
-				end
-				local dist = Distance(ux,uz,x2,z2) * 1.5 --distance between busy unit & self
-				local notaccessible = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][busyCmd1] or 0 --check if I can reach this location
-				dist = dist + notaccessible*4500 --increase perceived distance arbitrarity if cannot reach
-				--local dist = Distance(ux,uz,x,z) --distance btwn structure & self
-				dist = dist + dist*numOfAssistant
+				--local dist = Distance(ux,uz,x2,z2) * 1.5 --distance between busy unit & self
+				local dist = Distance(ux,uz,x,z) --distance btwn structure & self
+				dist = dist + SituationalPenalty(unitID,busyCmd1,nil) --cost penalty for any danger
+				dist = dist + AssistantBenefit(busyUnitID,busyCmd1)
 				if ( dist < busyDist ) then
 					busyClosestID = busyUnitID	-- busy unit who needs help
 					busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
@@ -686,32 +738,36 @@ function GetWorkFor(unitID)
 		local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
 		local alreadyWorkingOnIt = false	-- is some other unit already assigned this?
 		for unit2,cmd2 in pairs(myUnits) do
-			if ( index == cmd2 ) then
-				alreadyWorkingOnIt = true
-				break
+			if ( unitID ~= unit2) then
+				local prefix = cmd2:sub(1,4)
+				if (prefix==queueType.build) then
+					if ( index == cmd2 ) then
+						alreadyWorkingOnIt = true --a constructor is already on the job
+						break
+					end
+				elseif (prefix==queueType.busy) then
+					local cmd1 = GetFirstCommand(unit2,true)
+					if (cmd1 and cmd1.id == cmd and cmd1.x == x and cmd1.z == z) then
+						alreadyWorkingOnIt = true --someone already assigned to do this job manually
+						break
+					end
+				end
 			end
 		end
 		if ( not alreadyWorkingOnIt ) then
-			local acmd = abs(cmd)
 			local udid = spGetUnitDefID(unitID)
 			local ud = UnitDefs[udid]
-			local canBuild = false	-- if this unit can't build it, skip it.
-			for _, options in ipairs(ud.buildOptions) do
-				if ( options == acmd ) then canBuild = true break end	-- only one to find.
-			end
 			local dist = Distance(ux,uz,x,z) --distance btwn current unit & project to be started
-			local notaccessible = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][index] or 0 --check if I can reach this location
-			dist = dist + notaccessible*4500 --increase perceived distance arbitrarity if cannot reach
-			if ( dist < queueDist and canBuild ) then
+			dist = dist + SituationalPenalty(unitID,index,myCmd) --account for any danger
+			if ( dist < queueDist and CanBuildThis(cmd, ud) ) then
 				queueClose = index	-- # of the project we'll be starting
 				queueDist = dist
 			end	
 		end
-		
 	end
 	
-	-- removed canHover tag since it's deprecated
-	-- also, @special handling: why?
+	--anonymous note 1: removed canHover tag since it's deprecated
+	--anonymous note 2: also, @special handling: why?
 	if ( busyDist < huge or queueDist < huge ) then --there is work nearby
 		local udid = spGetUnitDefID(unitID)
 		local ud = UnitDefs[udid]
@@ -720,27 +776,18 @@ function GetWorkFor(unitID)
 			--if ( ud.canHover ) then busyDist = busyDist * 0.75 end
 			local theCmd = myUnits[busyClosestID]
 			local myCmd = myQueue[theCmd] --get orders stored in CBA's queue
-			local canBuild = false	-- this flag determine if unit can assist by copying order instead of GUARD.
-			if myCmd then
-				local acmd = abs(myCmd.id)
-				for _, options in ipairs(ud.buildOptions) do --check buildoptions for buildable
-					if ( options == acmd ) then canBuild = true break end	-- if found, escape loop and mark as "canBuild=true".
+			if (myCmd) then
+				if (CanBuildThis(myCmd.id, ud)) then --if myCmd is not empty and unit can build that building: use the same build queue from myCmd (CBA's queue)
+					return { unitID, myCmd.id, { myCmd.x, myCmd.y, myCmd.z, myCmd.h }, busyDist, theCmd,assistType.copy} --assist the busy unit by copying order.
+				else --simply GUARD the unit to be assisted when copy command failed
+					return { unitID, CMD_GUARD, { busyClosestID }, busyDist, nil, assistType.guard} --assist the busy unit by GUARDING it.
 				end
-			end
-			if canBuild then --if myCmd is not empty and unit can build that building: use the same build queue from myCmd (CBA's queue)
-				return { unitID, myCmd.id, { myCmd.x, myCmd.y, myCmd.z, myCmd.h }, busyDist, theCmd } --assist the busy unit by copying order.
 			else
-				local cmd1 = GetFirstCommand(busyClosestID) --get orders stored in unit's queue
-				if cmd1 then
-					local acmd = abs(cmd1.id)
-					for _, options in ipairs(ud.buildOptions) do
-						if ( options == acmd ) then canBuild = true break end	-- if found, escape loop and mark as "canBuild=true".
-					end
-				end
-				if canBuild then --see if unit can use the same exact queue from the unit to be assisted
-					return { unitID, cmd1.id, { cmd1.params[1], cmd1.params[2], cmd1.params[3], cmd1.params[4] }, busyDist, theCmd } --assist the busy unit by copying order.
-				else --simply GUARD the unit to be assisted when all fail
-					return { unitID, CMD_GUARD, { busyClosestID }, busyDist, 0 } --assist the busy unit by GUARDING it.
+				local cmd1 = GetFirstCommand(busyClosestID,true) --get orders stored in unit's queue
+				if (cmd1 and CanBuildThis(cmd1.id, ud)) then --see if unit can use same queue from the unit to be assisted
+					return { unitID, cmd1.id, { cmd1.params[1], cmd1.params[2], cmd1.params[3], cmd1.params[4] }, busyDist, nil ,assistType.copyExternal } --assist the busy unit by copying order.
+				else
+					return { unitID, CMD_GUARD, { busyClosestID }, busyDist, nil,assistType.guard } --assist the busy unit by GUARDING it.
 				end
 			end
 		else	-- new project is closer
@@ -748,9 +795,78 @@ function GetWorkFor(unitID)
 			--if ( ud.canHover ) then queueDist = queueDist * 0.75 end
 			myCmd = myQueue[queueClose]
 			local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
-			return { unitID, cmd, { x, y, z, h }, queueDist, queueClose }
+			return { unitID, cmd, { x, y, z, h }, queueDist, queueClose,assistType.none }
 		end
 	end
+end
+
+--return some value to represent the benefit of being assistant to this UnitID
+function AssistantBenefit(unitID,cmdHash)
+	
+	local readMetalCost = function(id) 
+		if (not cachedValue2[id]) then
+			cachedValue2[id] = UnitDefs[spGetUnitDefID(id)].metalCost
+		end
+		return cachedValue2[id]
+	end
+	
+	local numOfAssistant = 1
+	local totalWorkerCost = readMetalCost(unitID)
+	local plusPlusAssistant = function(assistantID)
+		numOfAssistant = numOfAssistant + 1
+		totalWorkerCost = totalWorkerCost + readMetalCost(assistantID)
+	end
+	
+	for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
+		if ( unitID ~= assistantUnitID and assistantCmd1 ~= queueType.idle) then --if not observing ownself
+			local prefix = assistantCmd1:sub(1,4)
+			if prefix == queueType.build then
+				if (cmdHash == assistantCmd1) then
+					plusPlusAssistant(assistantUnitID)
+				end
+			elseif prefix == queueType.buildAssist then
+				if (cmdHash == assistantCmd1:sub(5)) then
+					plusPlusAssistant(assistantUnitID)
+				end
+			elseif assistantCmd1 == queueType.busy then
+				local cmd2 = GetFirstCommand(assistantUnitID,true) --check using unit's command queue when we dont have its command stored
+				if (cmd2 and (cmd2 == GetFirstCommand(unitID,true))) then
+					plusPlusAssistant(assistantUnitID)
+				end
+			elseif prefix == queueType.assist then
+				-- assistantCmd1:sub(1,4) == queueType.assist
+				local assisting = tonumber(assistantCmd1:sub(5))
+				if (assisting == unitID) then
+					plusPlusAssistant(assistantUnitID)
+				end
+			end
+		end
+	end
+	
+	local projectID = (myQueue[cmdHash] and -myQueue[cmdHash].id) or (-GetFirstCommand(unitID,true).id)
+	local projectCost = UnitDefs[projectID].metalCost
+	local fractionOfWorker = ((totalWorkerCost - projectCost)/(totalWorkerCost + projectCost)) + 1 -- zero (0) when no Worker, 1 when adequate, 2 when project is too big
+	return -1125*numOfAssistant + 1125*numOfAssistant*fractionOfWorker --lower when add some assistance, bigger when too much assistance
+end
+
+--return some value to represent danger
+function SituationalPenalty(unitID, myQueueIndex, myCmd)
+	local notaccessible = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][myQueueIndex] or blockageType.clear --check if I can reach this location
+	local dist = notaccessible*4500 --increases cost arbitrarily if cannot reach
+	if (myCmd) then
+		dist = dist + myCmd.danger*2250 --increases cost arbitrarily if any unit had died trying to execute this command
+	end
+	return dist --bigger when too much danger
+end
+
+function CanBuildThis(cmdID, unitDef)
+	local acmd = abs(cmdID)
+	for _, options in ipairs(unitDef.buildOptions) do
+		if ( options == acmd ) then 
+			return true 
+		end
+	end
+	return false
 end
 
 --  Detect when player enters spectator mode (thanks to SeanHeron).
@@ -774,15 +890,36 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 end
 
 --  If unit in our group is destroyed, captured, dropped from group, cancel any
---  GUARD order from rest of group.  Probably not necessary for destroyed units.
+--  GUARD order from rest of group.
 
 function UnitGoByeBye(unitID)
 	if ( myUnits[unitID] ) then
+	
+		--dead unit, increase danger level!
+		local cmdIndex = myUnits[unitID]
+		if (myQueue[cmdIndex]) then
+			local prefix = cmdIndex:sub(1,4)
+			if prefix == queueType.build then
+				myQueue[cmdIndex].danger = myQueue[cmdIndex].danger + 1
+			elseif prefix == queueType.buildAssist then
+				local hash = cmdIndex:sub(5)
+				if (hash ~= assistType.copyExternal) then --copied order that no longer exist in myQueue[] (probably construction already begun or is manually assigned build)
+					myQueue[cmdIndex].danger = myQueue[cmdIndex].danger + 1
+				end
+			elseif prefix == queueType.assist then
+				local assistedID = tonumber(cmdIndex:sub(5))
+				local cmdIndex2 = myUnits[assistedID]
+				if (myQueue[cmdIndex2]) then
+					myQueue[cmdIndex2].danger = myQueue[cmdIndex2].danger + 1
+				end
+			end
+		end
+	
 		myUnits[unitID] = nil
 		for unit2,myCmd in pairs(myUnits) do
-			if ( myCmd == "asst "..unitID ) then
+			if ( myCmd == queueType.assist .. unitID ) then
 				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
-				myUnits[unit2] = "idle"
+				myUnits[unit2] = queueType.idle
 			end
 		end
 		myQueueUnreachable[unitID] = nil --clear unit's accessibility list
@@ -804,7 +941,7 @@ end
 --  Much easier than expected once I learned Lua can use *anything* for a key.
 
 function hash(myCmd)
-	local hash = myCmd.id .. "@" .. myCmd.x .. "x" .. myCmd.z
+	local hash = queueType.build .. myCmd.id .. "@" .. myCmd.x .. "x" .. myCmd.z
 	return hash
 end
 
@@ -820,7 +957,7 @@ function widget:KeyPress(key, mods, isRepeat)
 				local udid = spGetUnitDefID(unitID)
 				local ud = UnitDefs[udid]
 				if (ud.isBuilder and ud.canMove) then
-					myUnits[unitID] = "idle"
+					myUnits[unitID] = queueType.idle
 				end
 			end
 		end
@@ -909,7 +1046,7 @@ function UpdateOneUnitPathability(unitID)
 	end
 	--check for build site NOT in queue list (such as order given without SHIFT)
 	for unitID2, queueKey in pairs(myUnits) do
-		if not myQueue[queueKey] and queueKey~='idle' and queueKey~='busy' then
+		if not myQueue[queueKey] and queueKey~=queueType.idle and queueKey~=queueType.busy then
 			local cmd1 = GetFirstCommand(unitID2) --get orders stored in unit2's queue
 			if cmd1 and cmd1.params[3] then
 				local x, y, z = cmd1.params[1],cmd1.params[2],cmd1.params[3]
@@ -920,7 +1057,7 @@ function UpdateOneUnitPathability(unitID)
 	--send STOP to units en-route to build site surrounded by enemy
 	local unitArray = {}
 	for unitID2, queueKey in pairs(myUnits) do
-		local enemy = myQueueUnreachable[unitID2][queueKey]==1
+		local enemy = ( myQueueUnreachable[unitID2][queueKey] == blockageType.enemy )
 		if enemy and myQueue[queueKey] then --was checked to contain enemy, and is a queue (not build assist or build order without SHIFT)
 			unitArray[#unitArray+1] = unitID2
 		end
@@ -941,7 +1078,7 @@ function UpdateUnitsPathabilityForOneQueue(queueKey,customCoord)
 	end
 end
 
---This function determine what to fill into the "myQueueUnreachable" table based on input
+--This function determine what to fill into the "myQueueUnreachable" table (whether a constructor can reach build site or not)
 function SetQueueUnreachableValue(unitID,moveID,ux,uy,uz,x,y,z,queueKey)
 	local reach = true --Note: first assume unit is flying and/or target always reachable
 	if moveID then --Note: crane/air-constructor do not have moveID!
@@ -950,14 +1087,14 @@ function SetQueueUnreachableValue(unitID,moveID,ux,uy,uz,x,y,z,queueKey)
 			reach = false --target is unreachable
 		else -- Spring.PathRequest() must be non-functional. (unsynced blocked?)
 		end
-		--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, may change in different version)
+		--Technical note: Spring.PathRequest() will return NIL(noreturn) if either origin is too close to target or when pathing is not functional (this is valid for Spring91, might change in different version)
 	end
 	if not reach then
-		myQueueUnreachable[unitID][queueKey]=2
+		myQueueUnreachable[unitID][queueKey]= blockageType.blocked
 	elseif EnemyControlBuildSite({x,y,z}) then
-		myQueueUnreachable[unitID][queueKey]=1
+		myQueueUnreachable[unitID][queueKey]= blockageType.enemy
 	else
-		myQueueUnreachable[unitID][queueKey]=0
+		myQueueUnreachable[unitID][queueKey]= blockageType.clear
 	end
 end
 
@@ -1013,13 +1150,13 @@ end
 function EnemyControlBuildSite(order)
 	local coordString = order[1].." " .. order[3]
 	if cachedValue[coordString] and cachedValue[coordString].frame == currentFrame then
-		return cachedValue[coordString].enemy
+		return cachedValue[coordString].haveEnemies
 	end
-	
+
 	local unitList = spGetUnitsInCylinder(order[1], order[3], enemyRange)
 	local enemyCount = 0
 	local totalCount = #unitList
-	local returnValue = false
+	local haveEnemies = false
 	for i=1, totalCount do
 		local unitID = unitList[i]
 		local unitAlly = spGetUnitAllyTeam(unitID)
@@ -1028,30 +1165,30 @@ function EnemyControlBuildSite(order)
 		end
 	end
 	if enemyCount/totalCount > enemyThreshold then
-		returnValue = true
+		haveEnemies = true
 	end
 	
 	cachedValue[coordString] = cachedValue[coordString] or {}
-	cachedValue[coordString].enemy = returnValue
+	cachedValue[coordString].haveEnemies = haveEnemies
 	cachedValue[coordString].frame = currentFrame
-	return returnValue
+	return haveEnemies
 end
 
 --  Detect if enemy is present at build site, and cancel queue if there is.
---  this make sure constructor don't suicide into enemy if unattended.
+--  this make sure constructor don't suicide into enemy if left unattended.
  
 function EnemyAtBuildSiteCleanOrder(unitID, order, queueKey)
 	if queueKey ~= 0 then --can't handle GUARD assist yet if queueKey==0
-		local enemyPresent = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][queueKey]==1
-		if enemyPresent or EnemyControlBuildSite(order) then
-			if myQueue[queueKey] then				
-				local unitArray = {}
+		local enemyPresent = myQueueUnreachable[unitID] and ( myQueueUnreachable[unitID][queueKey] == blockageType.enemy )
+		if enemyPresent or EnemyControlBuildSite(order) or myQueue[queueKey].danger >= dangerThreshold then
+			if myQueue[queueKey] then
+				local unitToStop = {}
 				for unitID2, queueKey2 in pairs(myUnits) do
 					if queueKey2 == queueKey then
-						unitArray[#unitArray+1] = unitID2
+						unitToStop[#unitArray+1] = unitID2
 					end
 				end
-				Spring.GiveOrderToUnitArray (unitArray,CMD_STOP, {}, {}) --send STOP to all units already assigned to this queue. A scenario: a newly built constructor decide to assist another old constructor (which is en-route toward an enemy infested build site), this stop the old constructor
+				Spring.GiveOrderToUnitArray (unitToStop,CMD_STOP, {}, {}) --send STOP to all units already assigned to this queue. A scenario: a newly built constructor decide to assist another old constructor (which is en-route toward an enemy infested build site), this stop the old constructor
 				myQueue[queueKey] = nil  --remove queue
 				return true --cancel order assignment
 			else --can't handle build-assist without queue yet (myQueue[queueKey] == nil). A scenario: user directly order a build without SHIFT
