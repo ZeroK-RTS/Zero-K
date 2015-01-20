@@ -38,12 +38,6 @@ local options = {
     type   = 'section',
   },
   {
-    key    = 'other',
-    name   = 'Other',
-    desc   = 'Other options.',
-    type   = 'section',
-  },
-  {
     key    = 'silly', -- koth, lava, ctf, oremex, fun, zombies
     name   = 'Silly',
     desc   = 'Silly options for trolling.',
@@ -95,7 +89,7 @@ local options = {
 		name    = 'Mute Spectators',
 		desc    = 'Determines whether spectators can talk to players.',
 		type    = 'list',
-		section = 'other',
+		section = 'a_important',
 		def     = 'autodetect',
 		items   = {
 			{ key='mute', name = "Mute", desc = 'Mutes spectators.' },
@@ -108,7 +102,7 @@ local options = {
 		name    = 'Mute Lobby',
 		desc    = 'Determines whether chat in the lobby is visible ingame.',
 		type    = 'list',
-		section = 'other',
+		section = 'a_important',
 		def     = 'autodetect',
 		items   = {
 			{ key='mute', name = "Mute", desc = 'Mutes the lobby.' },
