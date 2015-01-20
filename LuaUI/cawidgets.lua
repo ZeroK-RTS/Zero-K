@@ -1311,7 +1311,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		local spectating = select(1, Spring.GetSpectatingState())
 		if (not spectating) and newMsg.argument then
 			-- Chat from lobby seems to always start with a '<'. Come up with a better way.
-			if string.strsub(newMsg.argument, 1, 1) == "[" or string.strsub(newMsg.argument, 1, 1) == "<" then
+			if string.sub(newMsg.argument, 1, 1) == "<" then
 				return
 			end
 		end
