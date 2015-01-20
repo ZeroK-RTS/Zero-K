@@ -2899,10 +2899,6 @@ function gadget:GameFrame(n)
 	--	GG.Terraform_RaiseWater(-20)
 	--end
 	
-	if n == 60 and costMult ~= 1 then
-		Spring.Echo("Terraform cost multipler = " .. costMult)
-	end
-	
 	local i = 1
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
