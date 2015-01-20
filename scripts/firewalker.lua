@@ -43,7 +43,7 @@ local SIG_MOVE = 16
 
 local RESTORE_DELAY = 6000
 
-local pace = 30
+local WALK_RATE = 55
 
 --------------------------------------------------------------------------------
 -- variables
@@ -58,7 +58,10 @@ local gun_1 = 0
 local function Walk()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
+	local pace = WALK_RATE
 	while true do
+		pace = WALK_RATE*(1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+		
 		Turn( rupleg 	, y_axis, 0, math.rad(pace))
 		Turn( lupleg 	, y_axis, 0, math.rad(pace))
 		
@@ -218,18 +221,21 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
+	
+	local aimMult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	
 	bAiming = true
-	Turn( rflap1 , x_axis, 0, math.rad(168) )
-	Turn( rflap2 , x_axis, 0, math.rad(168) )
-	Turn( rflap3 , y_axis, 0, math.rad(168) )
-	Turn( rflap4 , y_axis, 0, math.rad(168) )
-	Turn( lflap1 , x_axis, 0, math.rad(168) )
-	Turn( lflap2 , x_axis, 0, math.rad(168) )
-	Turn( lflap3 , y_axis, 0, math.rad(168) )
-	Turn( lflap4 , y_axis, 0, math.rad(168) )
-	Turn( rgun , x_axis, - pitch, math.rad(168) )
-	Turn( lgun , x_axis, - pitch, math.rad(168) )
-	Turn( torso , y_axis, heading, math.rad(65) )
+	Turn( rflap1 , x_axis, 0, math.rad(168)*aimMult )
+	Turn( rflap2 , x_axis, 0, math.rad(168)*aimMult )
+	Turn( rflap3 , y_axis, 0, math.rad(168)*aimMult )
+	Turn( rflap4 , y_axis, 0, math.rad(168)*aimMult )
+	Turn( lflap1 , x_axis, 0, math.rad(168)*aimMult )
+	Turn( lflap2 , x_axis, 0, math.rad(168)*aimMult )
+	Turn( lflap3 , y_axis, 0, math.rad(168)*aimMult )
+	Turn( lflap4 , y_axis, 0, math.rad(168)*aimMult )
+	Turn( rgun , x_axis, - pitch, math.rad(168)*aimMult )
+	Turn( lgun , x_axis, - pitch, math.rad(168)*aimMult )
+	Turn( torso , y_axis, heading, math.rad(65)*aimMult )
 	WaitForTurn(torso, y_axis)
 	WaitForTurn(lgun, x_axis)
 	StartThread(RestoreAfterDelay)	
