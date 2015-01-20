@@ -390,7 +390,7 @@ end
 --------------------------------------------------------------------------------
 
 local function AddCfCheckbox(allyTeam)
-	local fontsize = options.text_height.value
+	local fontsize = options.text_height.value + 0.1
 	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
 		local cfCheck = Checkbox:New{
 			x=x_cf,y=(fontsize+1) * row + 3,width=20,
@@ -409,7 +409,7 @@ end
 
 
 local function	WriteAllyTeamNumbers(allyTeam)
-	local fontsize = options.text_height.value
+	local fontsize = options.text_height.value + 0.1
 	local aCol = {1,0,0,1}
 	if allyTeam == -1 then
 		aCol = {1,1,1,1}
@@ -437,7 +437,7 @@ end
 
 -- adds all the entity information
 local function AddEntity(entity, teamID, allyTeamID)
-	local fontsize = options.text_height.value
+	local fontsize = options.text_height.value + 0.1
 
 	local deadTeam = false
 	if entity == nil then
@@ -688,7 +688,7 @@ SetupPlayerNames = function()
 	
 	local specTeam = {roster = {}}
 
-	local fontsize = options.text_height.value
+	local fontsize = options.text_height.value + 0.1
 	scroll_cpl:ClearChildren()
 	
 	scroll_cpl:AddChild( Label:New{ x=x_team, 		caption = 'T', 		fontShadow = true, 	fontsize = fontsize, } )

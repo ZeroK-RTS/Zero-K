@@ -110,7 +110,7 @@ local TEXT_CORRECT_Y = 1.25
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
 options_path = 'Settings/Interface/Metal Spots'
-options_order = { 'drawicons', 'size'}
+options_order = { 'drawicons', 'size', 'rounding'}
 options = {
 	
 	drawicons = {
@@ -129,6 +129,15 @@ options = {
 		step = 5,
 		OnChange = function() updateMexDrawList() end
 	},
+	rounding = {
+		name = "Display digits",
+		type = "number",
+		value = 1,
+		min = 1,
+		max = 4,
+		advanced = true,
+		OnChange = function() updateMexDrawList() end
+	}
 }
 
 -------------------------------------------------------------------------------------
@@ -609,7 +618,7 @@ function calcMainMexDrawList()
 				-- Draws the metal spot's base income "south" of the metal spot
 				glRotate(180,1,0,0)
 				glTranslate(x,-z-20-options.size.value, 0)
-				glText("+" .. ("%.2f"):format(metal), 0.0, 0.0, options.size.value , "cno")
+				glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 			end	
 			
 			--glColor(0,1,1)

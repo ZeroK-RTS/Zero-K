@@ -612,7 +612,7 @@ local function displayMessage(msg, remake)
 		local textbox = WG.Chili.TextBox:New{
 			width = '100%',
 			align = "left",
-			fontsize = (msg.highlight and options.highlighted_text_height.value or options.text_height.value),
+			fontsize = (msg.highlight and options.highlighted_text_height.value or options.text_height.value) + 0.1,   --note: use floating point, to avoid memory leak when set to magic number 9 & 10 
 			valign = "ascender",
 			lineSpacing = 0,
 			padding = { 0, 0, 0, 0 },
