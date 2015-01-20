@@ -475,7 +475,7 @@ local function SetupNubtronWindow()
 		align="left";
 		valign="top";
 		caption = 'Tip';
-		fontSize = 10;
+		fontSize = 10.1; --floating point, just in case integer 10 & 9 could trigger memory leak
 		fontShadow = true;
 		parent = button;
 	}
