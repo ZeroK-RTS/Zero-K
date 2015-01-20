@@ -607,6 +607,17 @@ end
 --  end
 --end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Set drones to take forever to build such that normal constructors do not complete them.
+-- 
+for name, ud in pairs(UnitDefs) do
+	if ud.customparams.is_drone then
+		ud.customparams.real_buildtime = ud.buildtime
+		ud.buildtime = ud.buildtime*1000000000
+	end
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
