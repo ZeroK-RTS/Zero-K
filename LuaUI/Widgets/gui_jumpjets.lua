@@ -46,6 +46,7 @@ local spGetSelectedUnits       = Spring.GetSelectedUnits
 local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
 local spTraceScreenRay         = Spring.TraceScreenRay
+local spTestBuildOrder         = Spring.TestBuildOrder
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -206,7 +207,7 @@ local function DrawQueue(unitID)
 end
 --]]
 
-local function  DrawMouseArc(unitID, shift, groundPos, quality)
+local function DrawMouseArc(unitID, shift, groundPos, quality)
 	local unitDefID = spGetUnitDefID(unitID)
 	if (not groundPos or not jumpDefs[unitDefID]) then
 		return
@@ -221,12 +222,14 @@ local function  DrawMouseArc(unitID, shift, groundPos, quality)
 		passIf = (not queueCount or queueCount == 0 or not shift)
 	end
 
+	local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
+	
 	local range = jumpDefs[unitDefID].range
 	if passIf then
 		local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
 		local unitPos = {ux,uy,uz}
 		local dist = GetDist2(unitPos, groundPos)
-		local color = range > dist and green or pink
+		local color = canJumpThere and (range > dist and green or pink) or red
 		DrawArc(unitID, unitPos, groundPos, color, nil, range, false, quality)
 	elseif (shift) then
 		local queue = spGetCommandQueue(unitID, -1)
@@ -239,7 +242,7 @@ local function  DrawMouseArc(unitID, shift, groundPos, quality)
 			local dist  = GetDist2(queue[i].params, groundPos)
 			local cGood = isEstimate and yellow or green
 			local cBad = isEstimate and orange or pink
-			local color = range > dist and cGood or cBad
+			local color = canJumpThere and ((range > dist and cGood) or cBad) or red
 			DrawArc(unitID, queue[i].params, groundPos, color, nil, range, isEstimate, quality)
 		end
 	end
