@@ -702,7 +702,7 @@ SetFOV = function(fov)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (27 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (30 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
 end
@@ -1083,18 +1083,20 @@ SetCenterBounds = function(cs)
 		-- Spring.Echo("MaxDC: "..maxDc)
 		minX, minZ, maxX, maxZ = math.max(mcx - MWIDTH/2 * maxDc, 0), math.max(mcz - MHEIGHT/2 * maxDc, 0), math.min(mcx + MWIDTH/2 * maxDc, MWIDTH), math.min(mcz + MHEIGHT/2 * maxDc, MHEIGHT)
 
-		if cs.rx > -HALFPI + 0.002 then
-			_,ls_x,ls_y,ls_z = VirtTraceRay(cx, cy, cs)--OverrideTraceScreenRay(cx,cy, cs, nil,2000,true,true,false)
-			if ls_x < minX then cs.px = cs.px + (minX - ls_x) end
-			if ls_x > maxX then cs.px = cs.px + (maxX - ls_x) end
-			if ls_z < minZ then cs.pz = cs.pz + (minZ - ls_z) end
-			if ls_z > maxZ then cs.pz = cs.pz + (maxZ - ls_z) end
+		local outOfBounds = false;
+		if cs.rx > -HALFPI + 0.002 then --If we are not facing stright down, do a full raycast
+			local _,gx,gy,gz = VirtTraceRay(cx, cy, cs)
+			if gx < minX then cs.px = cs.px + (minX - gx); ls_x = ls_x + (minX - gx); outOfBounds = true end
+			if gx > maxX then cs.px = cs.px + (maxX - gx); ls_x = ls_x + (maxX - gx); outOfBounds = true end
+			if gz < minZ then cs.pz = cs.pz + (minZ - gz); ls_z = ls_z + (minZ - gz); outOfBounds = true end
+			if gz > maxZ then cs.pz = cs.pz + (maxZ - gz); ls_z = ls_z + (maxZ - gz); outOfBounds = true end
 		else --We can use camera x & z location in place of a raycast to find center when camera is pointed towards ground, as this is faster and more numerically stable
-			if cs.px < minX then cs.px = minX end
-			if cs.px > maxX then cs.px = maxX end
-			if cs.pz < minZ then cs.pz = minZ end
-			if cs.pz > maxZ then cs.pz = maxZ end
+			if cs.px < minX then cs.px = minX; ls_x = minX; outOfBounds = true end
+			if cs.px > maxX then cs.px = maxX; ls_x = maxX; outOfBounds = true end
+			if cs.pz < minZ then cs.pz = minZ; ls_z = minZ; outOfBounds = true end
+			if cs.pz > maxZ then cs.pz = maxZ; ls_z = maxZ; outOfBounds = true end
 		end
+		if outOfBounds then ls_y = ExtendedGetGroundHeight(ls_x, ls_z) end
 	else
 		minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
 	end
