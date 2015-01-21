@@ -1442,6 +1442,10 @@ SetupPanels = function ()
 	end
 	lastSizeX = width
 
+	if WG.Docking_GetWindowSettings and WG.Docking_GetWindowSettings("Player List") then
+		x, y, width, height = WG.Docking_GetWindowSettings("Player List")
+	end
+	
 	window_cpl = Window:New{  
 		dockable = true,
 		name = "Player List",

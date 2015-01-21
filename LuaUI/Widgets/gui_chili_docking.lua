@@ -230,6 +230,18 @@ local function GetButtonPos(win)
 	end 
 end 
 
+local function Docking_GetWindowSettings(name)
+	if name and settings and settings[name] then
+		local settingsPos = settings[name]
+		
+		local x = settingsPos[1]
+		local y = settingsPos[2]
+		local w = settingsPos[3] - x
+		local h = settingsPos[4] - y
+		return x,y,w,h
+	end
+end
+
 function widget:Update() 
 	frameCounter = frameCounter +1
 	if (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then 
@@ -411,6 +423,10 @@ function widget:Update()
 
 	end 
 end 
+
+function widget:Initialize()
+	WG.Docking_GetWindowSettings = Docking_GetWindowSettings
+end
 
 function widget:ViewResize(vsx, vsy)
 	scrW = vsx
