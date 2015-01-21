@@ -150,6 +150,8 @@ local volumeSelection = 0
 
 local mouseBuilding = false
 
+local buildToGive = false
+
 local terraformHeight = 0
 local orHeight = 0 -- store ground height
 local storedHeight = 0 -- for snap to height
@@ -827,6 +829,7 @@ function widget:MousePress(mx, my, button)
 		local x2, z2 = point[3].x-1, point[3].z-1
 		
 		buildToGive = {
+			facing = Spring.GetBuildFacing(),
 			cmdID = activeid,
 			x = (x1 + x2)/2,
 			z = (z1 + z2)/2,
@@ -1579,7 +1582,7 @@ function widget:GameFrame(f)
 		local constructor = buildToGive.constructor
 		
 		for i = 1, #constructor do
-			Spring.GiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z}, {"shift"})
+			Spring.GiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
 			i = i + 1
 		end
 		buildToGive = false
