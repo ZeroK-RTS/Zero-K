@@ -405,6 +405,10 @@ local function Shutdown()
 end
 
 function gadget:Initialize()
+	if (not gl.RenderToTexture) then --super bad graphic driver
+		return
+	end
+
 	--for x = 0, Game.mapSizeX-8, 8 do
 	--	for z = 0, Game.mapSizeZ-8, 8 do
 	--		ChangeTextureBlock(x,z,math.ceil(math.random(3)))
