@@ -42,6 +42,7 @@ unitDef = {
   iconType               = [[corvette]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  losEmitHeight          = 25,
   maxDamage              = 2200,
   maxVelocity            = 2.5,
   minCloakDistance       = 75,

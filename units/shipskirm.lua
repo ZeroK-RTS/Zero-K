@@ -42,6 +42,7 @@ unitDef = {
   iconType               = [[enforcer]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  losEmitHeight          = 30,
   maxDamage              = 2800,
   maxVelocity            = 2.4,
   minCloakDistance       = 350,

@@ -40,6 +40,7 @@ unitDef = {
   iconType               = [[destroyer]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  losEmitHeight          = 25,
   maxDamage              = 1600,
   maxVelocity            = 1.7,
   minCloakDistance       = 75,
