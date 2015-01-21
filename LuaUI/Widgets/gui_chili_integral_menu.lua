@@ -352,6 +352,9 @@ local function ClickFunc(button, x, y, mouse)
 		local index = Spring.GetCmdDescIndex(button.cmdid)
 		if index then
 			Spring.SetActiveCommand(index,mb,left,right,alt,ctrl,meta,shift)
+			if alt and button.isStructure then
+				WG.Terraform_SetPlacingRectangle(-button.cmdid)
+			end
 		end
 	end
 end
@@ -362,6 +365,7 @@ end
 local function MakeButton(container, cmd, insertItem, index)
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
+	local isStructure = (cmd.id < 0) and menuChoice ~= 1 and menuChoice ~= 6 
 	local gridHotkeyed = not isState and menuChoice ~= 1 and menuChoice ~= 6 
 	local text
 	local texture
@@ -460,6 +464,7 @@ local function MakeButton(container, cmd, insertItem, index)
 			isDisabled = cmd.disabled;
 			tooltip = tooltip;
 			cmdid = cmd.id;
+			isStructure = isStructure;
 			OnClick = {function(self, x, y, mouse) ClickFunc(self, x, y, mouse) end}
 		}
 		if (isState) then 
