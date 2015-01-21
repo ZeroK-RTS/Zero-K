@@ -143,15 +143,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished 
 	unitAlreadyFinished[unitID] = true --for reverse build
 end
 
-GG.allowTransfer = false
---FIXME block transfers for /take but allow manual H/crude list gives
---[[
-function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
-	if capture then return true end
-	return GG.allowTransfer
-end
-]]--
-
 local pActivity = {}
 
 function gadget:RecvLuaMsg(msg, playerID)
@@ -218,7 +209,9 @@ local function TransferUnitAndKeepProduction(unitID, newTeamID, given)
 			end
 		end
 	end
+	GG.allowTransfer = true
 	spTransferUnit(unitID, newTeamID, given)
+	GG.allowTransfer = false
 end
 
 function gadget:GameFrame(n)
@@ -267,7 +260,6 @@ function gadget:GameFrame(n)
 				if (afkTeams[team] == true) then  -- team was AFK
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
 						spEcho("game_message: Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
-						GG.allowTransfer = true
 						
 						for unitID, teamList in pairs(lineage) do --Return unit to the oldest inheritor (or to original owner if possible)
 							local delete = false;
@@ -285,7 +277,7 @@ function gadget:GameFrame(n)
 								end
 							end
 						end
-						GG.allowTransfer = false
+
 						afkTeams[team] = nil
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count + 1
 						GG.Lagmonitor_activeTeams[allyTeam][team] = true
@@ -330,8 +322,8 @@ function gadget:GameFrame(n)
 
 				-- okay, we have someone to give to, prep transfer
 				if recepientByAllyTeam[allyTeam] then
-					if (afkTeams[team] == nil) then -- if team was not an AFK-er (but now is an AFK-er) then process the following... else do nothing for the same AFK-er.
-						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[playerID]" will be filled twice for the same player (line 161) & normally unit will be sent (redirected) to the non-AFK-er (line 198), but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will also run twice for the AFK ally (line 193) and it will effect 'unit_mex_overdrive.lua on line 999'.
+					if (afkTeams[team] == nil) then -- if team was not an AFK-er (but now is an AFK-er) then process the following, but do nothing for the same AFK-er.
+						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[playerID]" will be filled twice for the same player & normally unit will be sent (redirected back) to the non-AFK-er, but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will can also run twice for the AFK-er ally and it will effect 'unit_mex_overdrive.lua'.
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
 						GG.Lagmonitor_activeTeams[allyTeam][team] = false
 					end
