@@ -214,7 +214,9 @@ local function DestroyAlliance(allianceID)
 					local u = teamUnits[j]
 					local pwUnits = (GG.PlanetWars or {}).unitsByID
 					if pwUnits and pwUnits[u] then
+						GG.allowTransfer = true
 						spTransferUnit(u, gaiaTeamID, true)		-- don't blow up PW buildings
+						GG.allowTransfer = false
 					else
 						toDestroy[u] = true
 					end
