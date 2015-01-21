@@ -148,6 +148,7 @@ local terraform_type = 0 -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = rest
 
 local volumeSelection = 0
 
+local currentlyActiveCommand = false
 local mouseBuilding = false
 
 local buildToGive = false
@@ -176,6 +177,7 @@ local mouseX, mouseY
 --------------------------------------------------------------------------------
 
 local function stopCommand()
+	currentlyActiveCommand = false
 	drawingLasso = false
 	drawingRectangle = false
 	setHeight = false
@@ -197,6 +199,7 @@ local function stopCommand()
 end
 
 local function completelyStopCommand()
+	currentlyActiveCommand = false
 	spSetActiveCommand(-1)
 	originalCommandGiven = false
 	drawingLasso = false
@@ -293,10 +296,23 @@ local function SendCommand()
 		end
 	end
 	
-	if buildToGive and (#constructor > 0) then
-		buildToGive.constructor = constructor
-		buildToGive.waitFrame = 30
-		buildToGive.needGameFrame = true
+	if buildToGive then
+		if currentlyActiveCommand == CMD_LEVEL then
+			if (#constructor > 0) then
+				local myPlayerID = Spring.GetMyPlayerID()
+				buildToGive.needGameFrame = true
+				buildToGive.constructor = constructor
+				if myPlayerID then
+					-- ping is in seconds
+					local myPing = select(6, Spring.GetPlayerInfo(myPlayerID))
+					buildToGive.waitFrame = 30*ceil(myPing) + 5
+				else
+					buildToGive.waitFrame = 30
+				end
+			end
+		else
+			buildToGive = false
+		end
 	end
 	points = 0		
 end
@@ -815,6 +831,7 @@ function widget:MousePress(mx, my, button)
 		
 		local index = Spring.GetCmdDescIndex(CMD_LEVEL)
 		spSetActiveCommand(index)
+		currentlyActiveCommand = CMD_LEVEL
 		
 		local mx,my = Spring.GetMouseState()
 		
@@ -864,7 +881,7 @@ function widget:MousePress(mx, my, button)
 	end
 	
 	local toolTip = Spring.GetCurrentTooltip()
-	if not (placingRectangle or toolTip == "" or st_find(toolTip, "TechLevel") or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
+	if not (toolTip == "" or st_find(toolTip, "TechLevel") or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
 		return false
 	end
 	
@@ -919,6 +936,8 @@ function widget:MousePress(mx, my, button)
 						terraform_type = 6
 					end
 					
+					currentlyActiveCommand = activeid
+					
 					return true
 				end
 			end
@@ -948,7 +967,6 @@ function widget:MousePress(mx, my, button)
 					mouseX = mx
 					mouseY = my
 					return true
-					
 				end
 			end
 		end
@@ -1100,7 +1118,14 @@ function widget:Update(n)
 		widgetHandler:UpdateWidgetCallIn("GameFrame", self)
 		buildToGive.needGameFrame = false
 	end
-
+	
+	if currentlyActiveCommand then
+		local activeCmdIndex, activeid = spGetActiveCommand()
+		if activeid ~= currentlyActiveCommand then
+			stopCommand()
+		end
+	end
+	
 	if setHeight then
 		local mx,my = Spring.GetMouseState()
 			
@@ -1214,7 +1239,6 @@ function widget:MouseRelease(mx, my, button)
 	
 	if drawingLasso then
 		if button == 1 then
-			--spSetActiveCommand(-1)
 			
 			local _, pos = spTraceScreenRay(mx, my, true)
 			if legalPos(pos) then
@@ -1513,8 +1537,6 @@ function widget:MouseRelease(mx, my, button)
 	return false
 end
 
-local keyCtrl = 306 
-
 function widget:KeyRelease(key)
 	if (key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT) and originalCommandGiven then
 		completelyStopCommand()
@@ -1617,6 +1639,7 @@ function WG.Terraform_SetPlacingRectangle(unitDefID)
 		offFacing = offFacing
 	}
 	
+	currentlyActiveCommand = -unitDefID
 	terraform_type = 1
 	point[1] = {x = 0, y = 0, z = 0}
 	point[2] = {x = 0, y = 0, z = 0}
