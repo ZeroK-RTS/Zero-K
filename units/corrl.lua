@@ -44,6 +44,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
+  losEmitHeight                 = 40,
   mass                          = 94,
   maxDamage                     = 300,
   maxSlope                      = 36,

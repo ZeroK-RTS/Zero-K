@@ -49,6 +49,7 @@ unitDef = {
   iconType                      = [[fixedtachyon]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
+  losEmitHeight                 = 65,
   maxDamage                     = 6000,
   maxSlope                      = 18,
   maxWaterDepth                 = 0,

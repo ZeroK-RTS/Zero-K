@@ -40,6 +40,7 @@ unitDef = {
   footprintZ             = 6,
   iconType               = [[krogoth]],
   leaveTracks            = true,
+  losEmitHeight          = 100,
   mass                   = 2233,
   maxDamage              = 85800,
   maxSlope               = 37,
