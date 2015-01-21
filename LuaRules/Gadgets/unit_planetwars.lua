@@ -439,7 +439,9 @@ end
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if unitsByID[unitID] and cmdID == CMD_ABANDON_PW then
 		local gaiaTeam = Spring.GetGaiaTeamID()
+		GG.allowTransfer = true
 		Spring.TransferUnit(unitID, gaiaTeam, true)
+		GG.allowTransfer = false
 		Spring.SetUnitNeutral(unitID, true)
 		return false
 	elseif cmdID == CMD.ATTACK and #cmdParams == 1 then

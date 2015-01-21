@@ -90,7 +90,9 @@ local function CheckOffers()
 			market[unitID] = nil
 			GG.AddDebt(customer, teamID, saleprice)
 			GG.shareunits[unitID] = true
+			GG.allowTransfer = true
 			Spring.TransferUnit(unitID, customer, true)
+			GG.allowTransfer = false
 			Spring.SetUnitRulesParam( unitID, 'buy'..teamID, 0, {allied=true} )
 			Spring.SetUnitRulesParam( unitID, 'sell'..teamID, 0, {allied=true} )
 		end
