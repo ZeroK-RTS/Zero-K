@@ -352,7 +352,7 @@ local function ClickFunc(button, x, y, mouse)
 		local index = Spring.GetCmdDescIndex(button.cmdid)
 		if index then
 			Spring.SetActiveCommand(index,mb,left,right,alt,ctrl,meta,shift)
-			if alt and button.isStructure then
+			if alt and button.isStructure and WG.Terraform_SetPlacingRectangle then
 				WG.Terraform_SetPlacingRectangle(-button.cmdid)
 			end
 		end
