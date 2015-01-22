@@ -135,6 +135,11 @@ function script.StopBuilding()
 	end
 end
 
+function script.QueryNanoPiece()
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),flare)
+	return flare
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25  then
