@@ -1251,7 +1251,7 @@ if MUTE_SPECTATORS == 'autodetect' then
 		end
 	end
 	
-	if #humanAlly > 3 then -- 2 player teams and 1 gaia team
+	if #humanAlly > 2 then -- 2 player teams and 1 gaia team
 		MUTE_SPECTATORS = true
 	else
 		MUTE_SPECTATORS = false
