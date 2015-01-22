@@ -63,6 +63,18 @@ options = {
 ----------------------------------------------------
 ----------------------------------------------------
 
+local function Docking_GetWindowSettings(name)
+	if name and settings and settings[name] then
+		local settingsPos = settings[name]
+		
+		local x = settingsPos[1]
+		local y = settingsPos[2]
+		local w = settingsPos[3] - x
+		local h = settingsPos[4] - y
+		return x,y,w,h
+	end
+end
+
 function WG.SetWindowPosAndSize(window,x,y,w,h)
 	lastPos[window] = nil
 	settings[window] = {x,y,x+w,y+h}
@@ -73,6 +85,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(widget) --"widget" as extra argument because "handler=true"
 		return
 	end
+	WG.Docking_GetWindowSettings = Docking_GetWindowSettings
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -230,21 +243,9 @@ local function GetButtonPos(win)
 	end 
 end 
 
-local function Docking_GetWindowSettings(name)
-	if name and settings and settings[name] then
-		local settingsPos = settings[name]
-		
-		local x = settingsPos[1]
-		local y = settingsPos[2]
-		local w = settingsPos[3] - x
-		local h = settingsPos[4] - y
-		return x,y,w,h
-	end
-end
-
 function widget:Update() 
 	frameCounter = frameCounter +1
-	if (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then 
+	if (not screen0) or (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then 
 		return 
 	end 
 	lastCount = #screen0.children
@@ -423,10 +424,6 @@ function widget:Update()
 
 	end 
 end 
-
-function widget:Initialize()
-	WG.Docking_GetWindowSettings = Docking_GetWindowSettings
-end
 
 function widget:ViewResize(vsx, vsy)
 	scrW = vsx
