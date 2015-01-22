@@ -11,10 +11,13 @@ local leg3 = piece 'leg3' 	-- front right
 local leg4 = piece 'leg4' 	-- back left
 local leg5 = piece 'leg5' 	-- middle left
 local leg6 = piece 'leg6' 	-- front left
-local platform, gun, elevator, elevator2, panel_r, panel_l, cover_r, cover_l, flare = piece('platform', 'gun', 'elevator', 'elevator2', 'panel_r', 'panel_l', 'cover_r', 'cover_l', 'flare')
+local platform, emitnano, gun, elevator, elevator2, panel_r, panel_l, cover_r, cover_l  = piece('platform', 'emitnano', 'gun', 'elevator', 'elevator2', 'panel_r', 'panel_l', 'cover_r', 'cover_l')
+
+local testempty = piece 'testempty'
+local emitnano2 = piece 'emitnano2'
 
 local smokePiece = {base, gun}
-local nanoPieces = {flare}
+local nanoPiece = gun
 
 --------------------------------------------------------------------------------
 -- constants
@@ -75,9 +78,14 @@ local function RestoreLegs()
 		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)		
 end
 
+function script.QueryNanoPiece()
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID), nanoPiece)
+	return nanoPiece
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
-	Spring.SetUnitNanoPieces(unitID, nanoPieces)
+	Spring.SetUnitNanoPieces(unitID, {nanoPiece})
 end
 
 function script.StartMoving()
@@ -95,8 +103,9 @@ function script.StartBuilding(heading, pitch)
 		SetSignalMask(SIG_BUILD)
 		
 		Move(elevator,y_axis, 4.5, 15)
-		Move(elevator2,y_axis, 4.5, 15)
+		Move(elevator2,y_axis, 9, 30)
 		Move(gun,y_axis, 4.5, 15)
+		Move(emitnano,y_axis, 4.5, 15)
 		Turn(cover_r,z_axis,-math.rad(120), math.rad(250))
 		Turn(cover_l,z_axis,math.rad(120), math.rad(250))
 		Turn(panel_r,y_axis,math.rad(80), math.rad(250))
@@ -117,17 +126,13 @@ function script.StopBuilding()
 		Turn(panel_l,y_axis,0, math.rad(250))
 		WaitForTurn(platform,y_axis)
 		Move(elevator,y_axis, 0, 15)
-		Move(elevator2,y_axis, 0, 15)
+		Move(elevator2,y_axis, 0, 30)
 		Move(gun,y_axis, 0, 15)
+		Move(emitnano,y_axis, 0, 15)
 		WaitForMove(gun, y_axis)
 		Turn(cover_r,z_axis,0, math.rad(250))
 		Turn(cover_l,z_axis,0, math.rad(250))
 	end
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gun)
-	return gun
 end
 
 function script.Killed(recentDamage, maxHealth)
