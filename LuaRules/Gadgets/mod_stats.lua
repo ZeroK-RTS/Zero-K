@@ -232,7 +232,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function SendData(name, data) 
-	Spring.SendCommands("wbynum 255 SPRINGIE_STATS:"..tostring(name).."="..encode(data));
+	Spring.SendCommands("wbynum 255 SPRINGIE:stats:"..tostring(name).."="..encode(data));
 end 
 
 function gadget:GameOver()
