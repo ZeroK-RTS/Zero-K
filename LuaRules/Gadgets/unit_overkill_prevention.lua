@@ -27,6 +27,8 @@ local spGetGameFrame  = Spring.GetGameFrame
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetUnitDefID        = Spring.GetUnitDefID
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -56,6 +58,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["vehaa"].id] = true,
 	[UnitDefNames["gunshipaa"].id] = true,
 	[UnitDefNames["gunshipsupport"].id] = true,
+	[UnitDefNames["armsnipe"].id] = true,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -101,11 +104,14 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		if incomingDamage[targetID] then
 			if incomingDamage[targetID].doomed then
 				if incomingDamage[targetID].timeout > frame then
-					spSetUnitTarget(unitID,0)
-					return true
-				else
-					incomingDamage[targetID].damage = damage
+					local teamID = spGetUnitTeam(unitID)
+					local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
+					if unitDefID then
+						spSetUnitTarget(unitID,0)
+						return true
+					end
 				end
+				incomingDamage[targetID].damage = damage
 			else
 				incomingDamage[targetID].damage = incomingDamage[targetID].damage + damage
 			end

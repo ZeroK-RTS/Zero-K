@@ -257,7 +257,7 @@ function script.AimWeapon(num, heading,pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
+	return ((targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and GG.OverkillPrevention_CheckBlock(unitID, targetID, 1500.1, 28, true)) or false
 end
 
 function script.FireWeapon(num)
