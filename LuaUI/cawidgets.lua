@@ -1262,8 +1262,19 @@ end
 
 local MUTE_LOBBY = Spring.GetModOptions().mutelobby
 if MUTE_LOBBY == 'autodetect' then
-	local allyTeams = Spring.GetAllyTeamList()
-	if #allyTeams > 3 then -- 2 player teams and 1 gaia team
+	local humanAlly = {}
+	gaiaTeam = Spring.GetGaiaTeamID()
+	for _, teamID in ipairs(teams) do
+		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
+		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
+			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
+			if (not ai) then 
+				humanAlly[ally] = 1
+			end	
+		end
+	end
+	
+	if #humanAlly > 2 then -- 2 player teams and 1 gaia team
 		MUTE_LOBBY = true
 	else
 		MUTE_LOBBY = false
