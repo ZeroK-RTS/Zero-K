@@ -1237,6 +1237,8 @@ function widgetHandler:CommandNotify(id, params, options)
   return false
 end
 
+
+local teams = Spring.GetTeamList();
 local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
 if MUTE_SPECTATORS == 'autodetect' then
 	local humanAlly = {}
@@ -1251,7 +1253,7 @@ if MUTE_SPECTATORS == 'autodetect' then
 		end
 	end
 	
-	if #humanAlly > 2 then -- 2 player teams and 1 gaia team
+	if #humanAlly > 2 then
 		MUTE_SPECTATORS = true
 	else
 		MUTE_SPECTATORS = false
@@ -1274,7 +1276,7 @@ if MUTE_LOBBY == 'autodetect' then
 		end
 	end
 	
-	if #humanAlly > 2 then -- 2 player teams and 1 gaia team
+	if #humanAlly > 2 then 
 		MUTE_LOBBY = true
 	else
 		MUTE_LOBBY = false
