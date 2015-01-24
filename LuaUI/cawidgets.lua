@@ -1237,10 +1237,11 @@ function widgetHandler:CommandNotify(id, params, options)
   return false
 end
 
-
-local teams = Spring.GetTeamList();
 local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
-if MUTE_SPECTATORS == 'autodetect' then
+local MUTE_LOBBY = Spring.GetModOptions().mutelobby
+
+do
+	local teams = Spring.GetTeamList();
 	local humanAlly = {}
 	gaiaTeam = Spring.GetGaiaTeamID()
 	for _, teamID in ipairs(teams) do
@@ -1253,37 +1254,27 @@ if MUTE_SPECTATORS == 'autodetect' then
 		end
 	end
 	
-	if #humanAlly > 2 then
-		MUTE_SPECTATORS = true
+	if MUTE_SPECTATORS == 'autodetect' then
+		if #humanAlly > 2 then
+			MUTE_SPECTATORS = true
+		else
+			MUTE_SPECTATORS = false
+		end
 	else
-		MUTE_SPECTATORS = false
+		MUTE_SPECTATORS = (MUTE_SPECTATORS == 'mute')
 	end
-else
-	MUTE_SPECTATORS = (MUTE_SPECTATORS == 'mute')
+	
+	if MUTE_LOBBY == 'autodetect' then
+		if #humanAlly > 2 then 
+			MUTE_LOBBY = true
+		else
+			MUTE_LOBBY = false
+		end
+	else
+		MUTE_LOBBY = (MUTE_LOBBY == 'mute')
+	end
 end
 
-local MUTE_LOBBY = Spring.GetModOptions().mutelobby
-if MUTE_LOBBY == 'autodetect' then
-	local humanAlly = {}
-	gaiaTeam = Spring.GetGaiaTeamID()
-	for _, teamID in ipairs(teams) do
-		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
-			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
-			if (not ai) then 
-				humanAlly[ally] = 1
-			end	
-		end
-	end
-	
-	if #humanAlly > 2 then 
-		MUTE_LOBBY = true
-	else
-		MUTE_LOBBY = false
-	end
-else
-	MUTE_LOBBY = (MUTE_LOBBY == 'mute')
-end
 
 --NOTE: StringStarts() and MessageProcessor is included in "chat_preprocess.lua"
 function widgetHandler:AddConsoleLine(msg, priority)
