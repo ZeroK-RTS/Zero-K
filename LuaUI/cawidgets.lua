@@ -1243,19 +1243,21 @@ local MUTE_LOBBY = Spring.GetModOptions().mutelobby
 do
 	local teams = Spring.GetTeamList();
 	local humanAlly = {}
+	local humanAllyCount = 0
 	gaiaTeam = Spring.GetGaiaTeamID()
 	for _, teamID in ipairs(teams) do
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
 			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
-			if (not ai) then 
-				humanAlly[ally] = 1
+			if (not ai) and (not humanAlly[ally]) then 
+				humanAlly[ally] = true
+				humanAllyCount = humanAllyCount + 1
 			end	
 		end
 	end
 	
 	if MUTE_SPECTATORS == 'autodetect' then
-		if #humanAlly > 2 then
+		if humanAllyCount > 2 then
 			MUTE_SPECTATORS = true
 		else
 			MUTE_SPECTATORS = false
@@ -1265,7 +1267,7 @@ do
 	end
 	
 	if MUTE_LOBBY == 'autodetect' then
-		if #humanAlly > 2 then 
+		if humanAllyCount > 2 then 
 			MUTE_LOBBY = true
 		else
 			MUTE_LOBBY = false

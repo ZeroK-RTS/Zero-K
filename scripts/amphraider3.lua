@@ -196,6 +196,13 @@ function script.FireWeapon(num)
 	end
 end
 
+function script.BlockShot(num, targetID)
+	if num == 1 then -- surface missiles
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 229, 40, true)
+	end
+	return false
+end
+
 function script.Shot(num)
 	gun_1 = 1 - gun_1
 end

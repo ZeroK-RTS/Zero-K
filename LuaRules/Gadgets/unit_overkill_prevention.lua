@@ -59,6 +59,9 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["gunshipaa"].id] = true,
 	[UnitDefNames["gunshipsupport"].id] = true,
 	[UnitDefNames["armsnipe"].id] = true,
+	[UnitDefNames["amphraider3"].id] = true,
+	[UnitDefNames["subarty"].id] = true,
+	[UnitDefNames["subraider"].id] = true,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
