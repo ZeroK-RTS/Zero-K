@@ -9,7 +9,7 @@ function gadget:GetInfo()
     author    = "Licho",
     date      = "29.3.2009",
     license   = "GNU GPL, v2 or later",
-    layer     = 1,
+    layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
@@ -23,9 +23,12 @@ if VFS.FileExists("mission.lua") then
 end
 
   
-if (not gadgetHandler:IsSyncedCode()) then
-  return false  --  silent removal
-end
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+if (gadgetHandler:IsSyncedCode()) then
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+local sentToUnsync = false;
 
 local damages = {}     -- damages[attacker][victim] = { damage, emp} 
 local unitCounts = {}  -- unitCounts[defID] = { created, destroyed}
@@ -38,7 +41,6 @@ local spIsGameOver      = Spring.IsGameOver
 local spGetUnitHealth = Spring.GetUnitHealth
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetUnitDefID = Spring.GetUnitDefID;
-local encode = Spring.Utilities.json.encode;
 
 local gaiaTeamID = Spring.GetGaiaTeamID()
   
@@ -195,7 +197,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	lastPara[unitID] = nil
 	local unitDefName = UnitDefs[unitDefID].name
@@ -231,20 +232,65 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	tab[2] = tab[2] + 1
 end
 
+function gadget:GameFrame(n)
+	if not (spIsGameOver() or sentToUnsync) then return end
+	sentToUnsync = true;
+	_G.modstats = {damages=damages,units=unitCounts,plops=plops};
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+else -- UNSYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local encode = Spring.Utilities.json.encode;
+local spIsGameOver      = Spring.IsGameOver
+
+local doSend = true;
+
 function SendData(name, data) 
 	Spring.SendCommands("wbynum 255 SPRINGIE:stats:"..tostring(name).."="..encode(data));
 end 
 
-function gadget:GameOver()
+function UploadStats()
 	if GG.Chicken then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "modstats: Chicken game, unit stats disabled")
 		return	-- don't report stats in chicken
 	end	
 	
-	SendData("damages",damages);
-	SendData("units",unitCounts);
-	SendData("facplops",plops);
+	SendData("damages",stats.damages);
+	SendData("units",stats.units);
+	SendData("facplops",stats.plops);
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+-- function to convert SYNCED table to regular table. assumes no self referential loops
+local function ConvertToRegularTable(stable)
+	local ret = {}
+	local stableLocal = stable
+	for k,v in spairs(stableLocal) do
+		if type(v) == 'table' then
+			v = ConvertToRegularTable(v)
+		end
+		ret[k] = v
+	end
+	return ret
+end
+
+function gadget:Update()
+	if not spIsGameOver() then
+		return
+	end
+	if (not stats) and SYNCED.modstats then
+		stats = ConvertToRegularTable( SYNCED.modstats )
+	end
+	if stats and doSend then
+		UploadStats();
+		doSend = false;
+	end
+end
+
+--unsynced
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+end
