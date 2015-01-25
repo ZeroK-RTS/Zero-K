@@ -1340,7 +1340,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 	if MUTE_LOBBY and newMsg.msgtype == 'autohost' then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if (not spectating) and newMsg.argument then
-			-- Chat from lobby has format '<PlayerName> message'
+			-- Chat from lobby has format '<PlayerName>message'
 			if string.sub(newMsg.argument, 1, 1) == "<" then
 				local endChar = string.find(newMsg.argument, ">")
 				if endChar then
