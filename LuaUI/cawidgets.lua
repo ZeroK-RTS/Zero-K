@@ -1239,6 +1239,7 @@ end
 
 local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
 local MUTE_LOBBY = Spring.GetModOptions().mutelobby
+local playerNameToID 
 
 do
 	local teams = Spring.GetTeamList();
@@ -1274,6 +1275,18 @@ do
 		end
 	else
 		MUTE_LOBBY = (MUTE_LOBBY == 'mute')
+	end
+
+	if MUTE_LOBBY then
+		playerNameToID = {}
+		local playerList = Spring.GetPlayerList()
+		for i = 1, #playerList do
+			local playerID = playerList[i]
+			local name, _, spectating = Spring.GetPlayerInfo(playerID)
+			if not spectating then
+				playerNameToID[name] = playerID
+			end
+		end
 	end
 end
 
@@ -1327,9 +1340,23 @@ function widgetHandler:AddConsoleLine(msg, priority)
 	if MUTE_LOBBY and newMsg.msgtype == 'autohost' then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if (not spectating) and newMsg.argument then
-			-- Chat from lobby seems to always start with a '<'. Come up with a better way.
+			-- Chat from lobby has format '<PlayerName> message'
 			if string.sub(newMsg.argument, 1, 1) == "<" then
-				return
+				local endChar = string.find(newMsg.argument, ">")
+				if endChar then
+					local name = string.sub(newMsg.argument, 2, endChar-1)
+					if playerNameToID[name] then
+						local spectating = select(3, Spring.GetPlayerInfo(playerNameToID[name]))
+						if spectating then
+							playerNameToID[name] = nil
+							return
+						end
+					else
+						return
+					end
+				else
+					return
+				end
 			end
 		end
 	end
