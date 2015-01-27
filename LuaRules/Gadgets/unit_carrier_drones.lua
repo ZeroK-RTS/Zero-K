@@ -383,6 +383,7 @@ local function transferCarrierData(unitID, unitDefID, unitTeam, newUnitID)
 end
 --]]
 
+-- returns whether this unitID is a carrier
 local function isCarrier(unitID)
 	if (carrierList[unitID]) then
 		return true
@@ -390,8 +391,16 @@ local function isCarrier(unitID)
 	return false
 end
 
--- morph uses this
+-- retrieves unitID of this drone's carrier
+local function getCarrierByDrone(droneId)
+	if (droneList[droneId]) then
+		return droneList[droneId].carrier
+	end
+	return false
+end
+
 GG.isCarrier = isCarrier
+GG.getCarrierByDrone = getCarrierByDrone
 --GG.transferCarrierData = transferCarrierData
 
 local function GetDistance(x1, x2, y1, y2)
