@@ -16,7 +16,7 @@
 -- (due to undocumented use-case & apparent complexity of this widget)
 
 
-local version = "v1.355"
+local version = "v1.356"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -143,7 +143,7 @@ local myQueueUnreachable = {} -- list of queue which units can't reach
 local myQueueDanger = {} --list of queue which lead to dead constructors
 
 local cachedValue = {} --cached results for "EnemyControlBuildSite()" function to reduce cost for repeated call
-local cachedValue2 = {} --cached metalcost for "GetWorkFor()" function
+local cachedMetalCost = {} --cached metalcost for "GetWorkFor()" function
 local cachedCommand = {} --cached first command for "GetWorkFor{}" function
 local reassignedUnits = {} --list of units that had its task re-checked (to be re-tasked or remained with current task).
 
@@ -473,9 +473,9 @@ function FindEligibleWorker()
 
 	if (#unitToWork > 0) then
 		GiveWorkToUnits(unitToWork)
-		cachedValue2 = {}
-		cachedCommand = {}
+		cachedMetalCost = {}
 	end
+	cachedCommand = {}
 end
 
 --  One at a time, assign builders new tasks.
@@ -788,10 +788,10 @@ end
 function AssistantBenefit(unitID,cmdHash)
 	
 	local readMetalCost = function(id) 
-		if (not cachedValue2[id]) then
-			cachedValue2[id] = UnitDefs[spGetUnitDefID(id)].metalCost
+		if (not cachedMetalCost[id]) then
+			cachedMetalCost[id] = UnitDefs[spGetUnitDefID(id)].metalCost
 		end
-		return cachedValue2[id]
+		return cachedMetalCost[id]
 	end
 	
 	local numOfAssistant = 1
@@ -868,8 +868,8 @@ function UnitGoByeBye(unitID,unitDefID)
 		--dead unit
 		local cmdIndex = myUnits[unitID]
 		local prefix = cmdIndex:sub(1,4)
-		if prefix == queueType.buildNew then --is direct command
-			if not myQueue[cmdIndex].isStarted then
+		if prefix == queueType.buildNew then --stop assisting leader which execute direct command (non-SHIFT) because by default it disappear when unit died
+			if myQueue[cmdIndex] and not myQueue[cmdIndex].isStarted then
 				StopAnyAssistant(cmdIndex) --building not yet started and leader died, stop!
 			end
 			myQueue[cmdIndex] = nil
