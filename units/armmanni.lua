@@ -15,8 +15,8 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
-  collisionVolumeOffsets = [[0 -10 0]],
-  collisionVolumeScales  = [[48 54 48]],
+  collisionVolumeOffsets = [[0 -2 0]],
+  collisionVolumeScales  = [[48 58 48]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]], 
   corpse              = [[DEAD]],
@@ -32,6 +32,7 @@ unitDef = {
     helptext_fr    = [[Le surnon du Penetrator est 'le rayon bleu de la mort'. Le Penetrator est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindages ? grande distance. Il est cependant peu protégé et peu maniable.]],
     helptext_pl    = [[Bron Penetratora ma wystarczajaca sile i celnosc, by jednym strzalem zniszczyc lub powaznie uszkodzic wiekszosc jednostek. Jest jednak wolny i ma niska wytrzymalosc, a zatem warto trzymac go za linia frontu - ma wystarczajaco duzy zasieg, by nadal prowadzic ostrzal.]],
 	dontfireatradarcommand = '1',
+    aimposoffset   = [[0 15 0]],
   },
 
   explodeAs           = [[MEDIUM_BUILDINGEX]],

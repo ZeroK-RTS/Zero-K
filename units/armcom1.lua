@@ -45,6 +45,7 @@ unitDef = {
 	soundbuild = [[builder_start]],
 	commtype = [[1]],
 	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
+    aimposoffset   = [[0 5 0]],
   },
 
   energyMake             = 6,
