@@ -91,7 +91,9 @@ local replyOpts = {
 	gainMod = 0,
 }
 
-local noVariation = {}
+local noVariation = {
+	dopplerscale  = 0,
+}
 
 local ignoredExtensions = {
 	["svn-base"] = true,
