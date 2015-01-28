@@ -97,6 +97,10 @@ local unitIsBadAgainstFastStuff = {
 	[UnitDefNames["corstorm"].id] = true,
 }
 
+local captureWeaponDefs = {
+	[WeaponDefNames["capturecar_captureray"].id] = true
+}
+
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if unitIsBadAgainstFastStuff[i] then
@@ -148,5 +152,4 @@ for uid = 1, #UnitDefs do
 	end
 end
 
-return targetTable
-
+return targetTable, captureWeaponDefs
