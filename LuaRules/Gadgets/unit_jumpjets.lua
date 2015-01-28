@@ -165,18 +165,20 @@ end
 --]]
 
 local function CopyJumpData(unitID,lineDist,flightDist )
+	--NOTE: jumping & lastJump table is refreshed with info for morphed unit in UnitDestroyed(). It is important for it to run first before GameFrame() loop is run 
+	--because at GameFrame() we update the loop which call this function, and we expect all morph information to be present.
+
 	local oldUnitID = unitID --previous unitID
 	unitID = GG.wasMorphedTo[unitID] --new unitID. NOTE: UnitDestroyed() already updated jumping & lastJump table with new value
 	local unitDefID = spGetUnitDefID(unitID)
-	if (not jumpDefs[unitDefID]) then --check if new unit can jump
+	if not (unitDefID and jumpDefs[unitDefID]) then --check if new unit can jump
 		jumping[unitID] = nil
 		lastJump[unitID] = nil
 		return --exit JumpLoop() if unit can't jump
 	end
 	local speed = jumpDefs[unitDefID].speed  * lineDist/flightDist --speed from A to B
 	local reloadTime = (jumpDefs[unitDefID].reload or 0)*30 --jump reload time
-	local env
-	env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
+	local env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
 	local step = speed/lineDist --resolution of JumpLoop() update
 	mcEnable(unitID) --enable MoveCtrl for new unit
 	SetLeaveTracks(unitID, false) --set no track
@@ -271,8 +273,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 
 		if delay > 0 then
 			for i=delay, 1, -1 do
-				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
-				if GG.wasMorphedTo[unitID] then
+				if GG.wasMorphedTo[unitID] then --morphed during pre-jump animation
 					unitID,reloadTime,env,speed,step,rotateMidAir,delay,height = CopyJumpData(unitID,lineDist,flightDist )
 					if unitID == nil then 
 						return
@@ -297,11 +298,19 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			--spSetUnitNoMinimap(fakeUnitID, true)
 		end
 	
+		--detach from transport
+		local attachedTransport = Spring.GetUnitTransporter(unitID)
+		if (attachedTransport) then
+			local envTrans = Spring.UnitScript.GetScriptEnv(attachedTransport)
+			if (envTrans.ForceDropUnit) then
+				Spring.UnitScript.CallAsUnit(attachedTransport,envTrans.ForceDropUnit)
+			end
+		end
+	
 		local halfJump
 		local i = 0
 		while i <= 1 do
-			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
-			if GG.wasMorphedTo[unitID] then
+			if GG.wasMorphedTo[unitID] then --morphed during jump
 				unitID,reloadTime,env,speed,step = CopyJumpData(unitID,lineDist,flightDist )
 				if unitID == nil then 
 					return
@@ -314,9 +323,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				end
 			end
 			if (not Spring.ValidUnitID(unitID)) then
-				if (fakeUnitID) then
-					spDestroyUnit(fakeUnitID, false, true)
-				end
+				-- if (fakeUnitID) then
+					-- spDestroyUnit(fakeUnitID, false, true)
+				-- end
 				return -- unit died
 			end
 			local x0, y0, z0 = spGetUnitPosition(unitID)
@@ -331,9 +340,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 
 			Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i * 100)
 		
-			if (fakeUnitID) then 
-				mcSetPosition(fakeUnitID, x, y, z) 
-			end
+			-- if (fakeUnitID) then 
+				-- mcSetPosition(fakeUnitID, x, y, z) 
+			-- end
 			if (not halfJump and i > 0.5) then
 				Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
 				halfJump = true
@@ -346,9 +355,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			i = i + step
 		end
 
-		if (fakeUnitID) then 
-			spDestroyUnit(fakeUnitID, false, true) 
-		end
+		-- if (fakeUnitID) then 
+			-- spDestroyUnit(fakeUnitID, false, true) 
+		-- end
 		
 		Spring.UnitScript.CallAsUnit(unitID,env.endJump)
 		local jumpEndTime = spGetGameSeconds()
@@ -368,15 +377,16 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		-- local oldQueue = spGetCommandQueue(unitID)
 		-- ReloadQueue(unitID, oldQueue, cmdTag)
 		
-		if GG.wasMorphedTo[unitID] then
+		if GG.wasMorphedTo[unitID] then --morphed at end of jump
 			unitID,reloadTime = CopyJumpData(unitID,lineDist,flightDist )
-			lastJump[unitID] = jumpEndTime
-			jumping[unitID] = nil
-			SetLeaveTracks(unitID, true)
-			mcDisable(unitID)
 			if unitID == nil then 
 				return
 			end
+			lastJump[unitID] = jumpEndTime
+			lastJumpPosition[unitID] = origCmdParams
+			jumping[unitID] = nil
+			SetLeaveTracks(unitID, true)
+			mcDisable(unitID)
 		end
 		
 		Sleep()
@@ -388,6 +398,16 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		local reloadAmount = reloadSpeed -- Start here because we just did a sleep for impulse capacitor fix
 		
 		while reloadAmount < 1 do
+			if GG.wasMorphedTo[unitID] then --morphed while reloading jump
+				unitID,reloadTime = CopyJumpData(unitID,lineDist,flightDist )
+				if unitID == nil then
+					return
+				end
+				SetLeaveTracks(unitID, true)
+				mcDisable(unitID)
+				--resume reload from previous progress but use new speed
+				reloadSpeed = 1/reloadTime
+			end
 			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
 			local reloadFactor = (stunnedOrInbuild and 0) or spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
 			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
@@ -454,7 +474,8 @@ end
 
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	--NOTE: its really important to map old table to new id ASAP to prevent CommandFallback() from executing jump twice for morphed unit. 
-	--UnitDestroyed() is called before CommandFallback() when unit is morphed (unit_morph.lua must destroy unit before issuing command) 
+	--make sure unit_morph.lua destroys unit first before issuing any command, this ensure UnitDestroyed() is called before CommandFallback() 
+	
 	if jumping[oldUnitID] and GG.wasMorphedTo[oldUnitID] then
 		local newUnitID = GG.wasMorphedTo[oldUnitID]
 		jumping[newUnitID] = jumping[oldUnitID] --copy last jump state to new unit
@@ -550,18 +571,12 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 					jumps[allCoords] = nil --empty jump table (used for randomization) after 5 second. Use case: If infinite wave of unit has same jump coordinate then jump coordinate won't get infinitely random
 				end
 			end
-			if (not jumps[coords]) then
+			if (not jumps[coords]) or jumpDefs[unitDefID].JumpSpreadException then
 				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag, cmdParams)
 				if not didJump then
 					return true, removeCommand -- command was used
 				end
-				jumps[coords] = {1, currFrame}
-				return true, false -- command was used but don't remove it (unit have not finish jump yet)
-			elseif jumpDefs[unitDefID].JumpSpreadException then
-				local didJump, removeCommand = Jump(unitID, cmdParams, cmdTag, cmdParams)
-				if not didJump then
-					return true, removeCommand -- command was used
-				end
+				jumps[coords] = {1, currFrame} --memorize coordinate so that next unit can choose different landing site
 				return true, false -- command was used but don't remove it (unit have not finish jump yet)
 			else
 				local r = landBoxSize*jumps[coords][1]^0.5/2
