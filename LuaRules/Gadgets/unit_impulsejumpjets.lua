@@ -306,15 +306,16 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			local countUp = 1
 			while (countUp <= delay ) do
 				if GG.wasMorphedTo[unitID] then --morphed during pre-jump animation
-					local newApexHeight
-					unitID,reloadTime,env,speed,rotateMidAir,delay,newApexHeight,limitHeight = CopyJumpData(unitID)
+					local newApexHeight,newSpeed
+					unitID,reloadTime,env,newSpeed,rotateMidAir,delay,newApexHeight,limitHeight = CopyJumpData(unitID)
 					if unitID == nil then 
 						return
 					end
 					if not limitHeight then
 						newApexHeight = math.max(newApexHeight, vector[2]+newApexHeight) --is always higher than the target location
 					end
-					if apexHeight ~= newApexHeight then
+					if speed ~= newSpeed or apexHeight ~= newApexHeight  then
+						speed = newSpeed
 						apexHeight = newApexHeight
 						vertex[2]= start[2]+apexHeight
 						flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
