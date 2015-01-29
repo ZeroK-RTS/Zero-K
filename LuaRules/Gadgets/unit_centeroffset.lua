@@ -130,7 +130,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
 	
 	local volumeBelow = -((midY - baseY) + offsetY - scaleY/2)	
-	local aimAbove = (midY - baseY) + aim[2]
+	local aimAbove = (midY - baseY) + aim[2] - mid[2]
 	
 	if volumeBelow < 0 then
 		aimAbove = aimAbove + volumeBelow
