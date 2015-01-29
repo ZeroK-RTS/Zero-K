@@ -32,6 +32,7 @@ unitDef = {
 	helptext_de    = [[Der Panther ist ein hoch entwickelter Raider, dessen Waffe, eine Blitzkanone, hauptsächlich paralysierenden Schaden austeilt. Auf diesem Wege kann der Panther Türme ausschalten und sich so durch die feindlichen Verteidigungslinien walzen, bis zur Egalisierung der feindlichen, ökonimischen Grundversorgung.]],
 	helptext_pl    = [[Panther jest szybki i zadaje mieszane obrazenia EMP, co pozwala mu paralizowac i omijac wrogie jednostki, aby niszczyc wroga ekonomie.]],
 	modelradius    = [[10]],
+	stats_show_death_explosion = 1,
   },
 
   explodeAs              = [[PANTHER_DEATH]],
