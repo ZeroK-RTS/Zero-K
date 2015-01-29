@@ -90,6 +90,11 @@ unitDef = {
       craterMult              = 0,
 	  --cylinderTargeting	  = 1,
 
+	  customparams = {
+		stats_hide_damage = 1, -- continuous laser
+		stats_hide_reload = 1,
+	  },
+
       damage                  = {
         default = 6.83, -- 6.15
         subs    = 0.315,
