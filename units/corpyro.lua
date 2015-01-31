@@ -36,6 +36,7 @@ unitDef = {
     helptext_it    = [[Il Pyro é un camminatore veloce ed economico con un lanciafiamme. Il lanciafiamme fa un danno incredibile alle unita grandi, ma poco a quelle piccole. Puo colpire molte cose alla stessa volta. Il Pyro esplode violentamente quando é distrutto. Le armi del Pyro bruciano i nemici. Il Pyro viene con jumpjets, che gli permettono di saltare sopra gli ostacoli e atterrare vicino ai nemici.]],
 	helptext_de    = [[Der Pyro ist ein günstiger und schneller Roboter, der mit einem Flammenwerfer ausgestattet ist. Dieser fügt großen Zielen erheblichen Schaden zu und kleineren entsprechend weniger. Außerdem können mehrere Ziele gleichzeitig getroffen werden, welche auch im Feuer aufgehen können. Der Pyro explodiert brutalst, sobald er zerstört wird. Zusätzlich besitzt er noch ein Jetpack, welches ihm zum Beispiel das Springen über Hindernisse ermöglicht.]],
 	helptext_pl    = [[Pyro to tani i w miare szybki robot z miotaczem ognia, ktory zadaje obrazenia wszystkim jednostkom na linii strzalu i podpala je, zajac dodatkowe obrazenia w czasie. Pyro posiada mozliwosc skoku, co daje mu wysoka mobilnosc. Zniszczony Pyro detonuje sie, podpalajac okoliczne jednostki.]],
+	stats_show_death_explosion = 1,
   },
 
   explodeAs             = [[CORPYRO_NAPALM]],
