@@ -859,7 +859,7 @@ local function AddTableHeaders()
 end
 
 local function AddCfCheckbox(allyTeam)
-	local fontsize = options.text_height.value + 0.1
+	local fontsize = options.text_height.value
 	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
 		local cfCheck = Checkbox:New{
 			x=x_cf,y=(fontsize+1) * row + 3,width=20,
@@ -1088,7 +1088,7 @@ SetupPlayerNames = function()
 	specTeam = {roster = {}}
 	playerTeamStatsCache = {}
 
-	fontsize = options.text_height.value + 0.1
+	fontsize = options.text_height.value
 	scroll_cpl:ClearChildren()
 	
 	local playerlist = Spring.GetPlayerList()

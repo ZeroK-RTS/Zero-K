@@ -788,17 +788,17 @@ local function AddMessage(msg, target, remake)
 	local size
 	if target == 'chat' then
 		stack = stack_chat
-		size = options.text_height_chat.value + 0.1  --note: use floating point, to avoid memory leak when set to magic number 9 & 10 
+		size = options.text_height_chat.value
 		if not remake then
 			fade = true
 		end
 		lastMsg = lastMsgChat
 	elseif target == 'console' then
 		stack = stack_console
-		size = options.text_height_console.value + 0.1 
+		size = options.text_height_console.value
 		lastMsg = lastMsgConsole
 	elseif target == 'backchat' then
-		size = options.text_height_chat.value + 0.1
+		size = options.text_height_chat.value
 		stack = stack_backchat
 		lastMsg = lastMsgBackChat
 	end	
