@@ -381,7 +381,7 @@ function widget:AddChatMessage(msg)
 		valign  = "ascender";
 		align   = "left";
 		font    = {
-			size   = options.text_height.value + 0.1;  --note: floating point, just in case magic number 9 & 10 trigger memory leak
+			size   = options.text_height.value;
 			shadow = true;
 		}
 	}
@@ -479,7 +479,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		valign   = "ascender";
 		align    = "left";
 		font    = {
-			size   = options.text_height.value + 0.1;
+			size   = options.text_height.value;
 			shadow = true;
 		}
 	}
@@ -534,7 +534,7 @@ function widget:AddWarning(text)
 		align   = "left";
 		font    = {
 			color = {1, 0.5, 0, 1},
-			size   = options.text_height.value + 0.1;
+			size   = options.text_height.value;
 			shadow = true;
 		}
 	}
