@@ -88,6 +88,9 @@ unitDef = {
       customparams = {
         capture_scaling = 0,
         is_capture = 1,
+
+		stats_hide_damage = 1, -- continuous laser
+		stats_hide_reload = 1,
       },
 
       damage                  = {
