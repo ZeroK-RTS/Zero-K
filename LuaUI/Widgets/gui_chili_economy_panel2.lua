@@ -39,6 +39,7 @@ local GetMyTeamID = Spring.GetMyTeamID
 local GetTeamResources = Spring.GetTeamResources
 local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers
+local spGetModKeyState = Spring.GetModKeyState
 local Chili
 
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
@@ -47,6 +48,7 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 --------------------------------------------------------------------------------
 
 local col_metal = {136/255,214/255,251/255,1}
+local col_reserve = {0.7, 0.7, 0.7, 0.6}
 local col_energy = {.93,.93,0,1}
 
 --------------------------------------------------------------------------------
@@ -117,8 +119,8 @@ options = {
 	enableReserveBar = {
 		name  = 'Enable Reserve', 
 		type  = 'bool', 
-		value = false, 
-		desc = "When enabled clicking on the resource bars will set reserve. Low and Normal priority constructors cannot use resources in reserve storage."
+		value = true, 
+		desc = "Ctrl+Click on the resource bars will set reserve when enabled. Low and Normal priority constructors cannot use resources in reserve storage."
 	},
 	defaultEnergyReserve = {
 		name  = "Initial Energy Reserve",
@@ -240,6 +242,9 @@ function widget:Update(s)
 
 	if blinkM_status then
 		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
+		bar_reserve_metal:SetColor({1,0,0,1})
+	else
+		bar_reserve_metal:SetColor(col_reserve)
 	end
 
 	if blinkE_status then
@@ -514,6 +519,11 @@ end
 
 function CreateWindow()
 	local function SetReserveByMouse(self, x, y, mouse, metal)
+		local a,c,m,s = spGetModKeyState()
+		if not c then
+			return
+		end
+		
 		local reserve = (x) / (self.width - self.padding[1] - self.padding[3])
 		if mouse ~= 1 then
 			updateReserveBars(true, true, reserve)
@@ -679,7 +689,7 @@ function CreateWindow()
 	
 	bar_reserve_metal = Chili.Progressbar:New{
 		parent = window_metal,
-		color  = {0.7,0.7,0.7,0.5},
+		color  = col_reserve,
 		orientation = "horizontal",
 		value  = 0,
 		x      = barX,
@@ -810,7 +820,7 @@ function CreateWindow()
 	
 	bar_reserve_energy = Chili.Progressbar:New{
 		parent = window_energy,
-		color  = {0.7,0.7,0.7,0.5},
+		color  = col_reserve,
 		orientation = "horizontal",
 		value  = 0,
 		x      = barX,
