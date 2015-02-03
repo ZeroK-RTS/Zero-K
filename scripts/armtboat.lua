@@ -17,7 +17,7 @@ local LOAD_SPEED_Y = 80
 
 -- local vars
 local smokePiece = { base }
-local loaded = false
+local loadedUnitID = nil
 local emptyTable = {}
 
 local function Wake()
@@ -30,6 +30,23 @@ local function Wake()
 	end
 end
 
+function ForceDropUnit()
+	if not loadedUnitID then return end
+	
+	local x,y,z = Spring.GetUnitPosition(loadedUnitID) --cargo position
+	local _,ty = Spring.GetUnitPosition(unitID) --transport position
+	local vx,vy,vz = Spring.GetUnitVelocity(unitID) --transport speed
+	DropUnit(loadedUnitID) --detach cargo
+	local transRadius = Spring.GetUnitRadius(unitID)
+	Spring.SetUnitPosition(loadedUnitID, x,math.min(y, ty-transRadius),z) --set cargo position below transport
+	Spring.AddUnitImpulse(loadedUnitID,0,4,0) --hax to prevent teleport to ground
+	Spring.AddUnitImpulse(loadedUnitID,0,-4,0) --hax to prevent teleport to ground
+	Spring.SetUnitVelocity(loadedUnitID,0,0,0) --remove any random velocity caused by collision with transport (especially Spring 91)
+	Spring.AddUnitImpulse(loadedUnitID,vx,vy,vz) --readd transport momentum
+		
+	loadedUnitID = nil
+end
+
 function script.TransportPickup(passengerID)
 	-- no napping!
 	local passengerTeam = Spring.GetUnitTeam(passengerID)
@@ -38,7 +55,7 @@ function script.TransportPickup(passengerID)
 		return
 	end
 	
-	if loaded then return end
+	if loadedUnitID then return end
 	SetUnitValue(COB.BUSY, 1)
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local px2, py2, pz2 = Spring.GetUnitBasePosition(passengerID)
@@ -63,13 +80,13 @@ function script.TransportPickup(passengerID)
 	WaitForMove(load_arm, z_axis)
 	WaitForMove(load_shoulder, y_axis)
 	AttachUnit(slot1, passengerID)
-	loaded = true
+	loadedUnitID = passengerID
 	SetUnitValue(COB.BUSY, 0)
 end
 
 -- note x, y z is in worldspace
 function script.TransportDrop(passengerID, x, y, z)
-	if not loaded then return end
+	if not loadedUnitID then return end
 	
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local surfaceY = math.max(0, Spring.GetGroundHeight(px1, pz1) )
@@ -97,7 +114,7 @@ function script.TransportDrop(passengerID, x, y, z)
 	end
 	
 	DropUnit(passengerID)
-	loaded = false
+	loadedUnitID = nil
 	Move(load_arm, z_axis, 0)
 	Move(load_shoulder, y_axis, 0)
 	
