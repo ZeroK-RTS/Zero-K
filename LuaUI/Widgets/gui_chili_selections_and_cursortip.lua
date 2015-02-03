@@ -1975,6 +1975,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, }, --name in window
 			{ name='utt', text = unittooltip .. '\n', wrap=false, description = true },
+			stt_ud.shieldWeaponDef and { name='shield', directcontrol = 'shield_selunit', } or {},
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
 			
@@ -2129,6 +2130,35 @@ local function CreateBpBar(name)
 	}
 end
 
+local function CreateShieldBar(name)
+	globalitems[name] = Panel:New {
+		orientation='horizontal',
+		name = name,
+		width = '100%',
+		height = icon_size+2,
+		itemMargin    = {0,0,0,0},
+		itemPadding   = {0,0,0,0},	
+		padding = {0,0,0,0},
+		backgroundColor = {0,0,0,0},
+		
+		children = {
+			Image:New{file='LuaUI/Images/commands/Bold/guard.png',height= icon_size,width= icon_size,  x=0,y=0},
+			Progressbar:New {
+				name = 'bar',
+				x=icon_size,
+				right=0,
+				--width = '100%',
+				height = icon_size+2,
+				itemMargin    = {0,0,0,0},
+				itemPadding   = {0,0,0,0},	
+				padding = {0,0,0,0},
+				color = {0.3,0,0.9,1};
+				max=1,
+				caption = 'a',
+			},
+		},
+	}
+end
 
 local function MakeToolTip_Draw()
 	local tt_structure = {
@@ -2406,7 +2436,19 @@ function widget:Update(dt)
 					nanobar:SetCaption('??? / ' .. numformat(stt_ud.buildSpeed))
 				end
 			end
-			
+
+			local shieldbar_stack = globalitems['shield_selunit']
+			local shieldbar = shieldbar_stack:GetChildByName('bar')
+			if shieldbar then
+				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID)
+				
+				shieldbar:SetValue((shieldCurrentPower or 0) / stt_ud.shieldPower,true)
+				if shieldEnabled then
+					shieldbar:SetCaption(round(shieldCurrentPower) .. ' / ' .. stt_ud.shieldPower)
+				else
+					shieldbar:SetCaption('Shield offline')
+				end
+			end
 		end
 		changeNow = true
 		timer = 0
@@ -2589,6 +2631,9 @@ function widget:Initialize()
 	CreateHpBar('hp_corpse')
 	
 	CreateBpBar('bp_selunit')
+
+	CreateShieldBar('shield_unit')
+	CreateShieldBar('shield_selunit')
 	
 	stack_main = StackPanel:New{
 		width=300, -- needed for initial tooltip
@@ -2667,6 +2712,9 @@ function widget:Initialize()
 		then
 			ud.chili_selections_useStaticTooltip = true
 		end
+
+		local shieldDefID = ud.shieldWeaponDef
+		ud.shieldPower = ((shieldDefID)and(WeaponDefs[shieldDefID].shieldPower))or(-1)
 	end
 	
 	option_Deselect()
