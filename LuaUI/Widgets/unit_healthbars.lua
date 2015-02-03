@@ -830,7 +830,7 @@ do
 	  --// SLOW
       local slowState = GetUnitRulesParam(unitID,"slowState")
       if (slowState and (slowState>0)) then
-        AddBar("slow",slowState,"slow",(fullText and floor(slowState*100)..'%') or '')
+        AddBar("slow",slowState*2,"slow",(fullText and floor(slowState*100)..'%') or '')
       end
 	  
 	  --// GOO
