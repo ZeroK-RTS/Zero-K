@@ -48,8 +48,8 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 --------------------------------------------------------------------------------
 
 local col_metal = {136/255,214/255,251/255,1}
-local col_reserve = {0.7, 0.7, 0.7, 0.6}
 local col_energy = {.93,.93,0,1}
+local col_reserve = {1, 1, 1, 0}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -208,13 +208,15 @@ local function updateReserveBars(metal, energy, value, overrideOption)
 			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
 			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
 			WG.metalStorageReserve = value*mStor
-			bar_reserve_metal:SetValue(value)
+			bar_reserve_metal.bars[1].percent = value
+			bar_reserve_metal:Invalidate()
 		end
 		if energy then
 			local _, eStor = GetTeamResources(GetMyTeamID(), "energy")
 			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE)) 
 			WG.energyStorageReserve = value*(eStor - HIDDEN_STORAGE)
-			bar_reserve_energy:SetValue(value)
+			bar_reserve_energy.bars[1].percent = value
+			bar_reserve_energy:Invalidate()
 		end
 	end
 end
@@ -242,9 +244,6 @@ function widget:Update(s)
 
 	if blinkM_status then
 		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
-		bar_reserve_metal:SetColor({1,0,0,1})
-	else
-		bar_reserve_metal:SetColor(col_reserve)
 	end
 
 	if blinkE_status then
@@ -687,9 +686,8 @@ function CreateWindow()
 		tooltip = "Your metal demand. Construction and morph demand metal.",
 	}
 	
-	bar_reserve_metal = Chili.Progressbar:New{
+	bar_reserve_metal = Chili.Multiprogressbar:New{
 		parent = window_metal,
-		color  = col_reserve,
 		orientation = "horizontal",
 		value  = 0,
 		x      = barX,
@@ -700,6 +698,17 @@ function CreateWindow()
 		max = 1,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+		bars = { 
+			{
+				color1 = col_reserve,
+				color2 = col_reserve,
+				percent = 0,
+				texture = 'LuaUI/Images/stripes.png', -- texture file name
+				s = 1, -- tex coords
+				t = 1,
+				tileSize = 16, --  if set then main axis texture coord = width / tileSize
+			}, 
+		}
 	}
 	
 	bar_metal = Chili.Progressbar:New{
@@ -818,9 +827,8 @@ function CreateWindow()
 		tooltip = "This is this total energy demand of your economy and abilities which require energy upkeep",
 	}
 	
-	bar_reserve_energy = Chili.Progressbar:New{
+	bar_reserve_energy = Chili.Multiprogressbar:New{
 		parent = window_energy,
-		color  = col_reserve,
 		orientation = "horizontal",
 		value  = 0,
 		x      = barX,
@@ -831,6 +839,17 @@ function CreateWindow()
 		max = 1,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+		bars = { 
+			{
+				color1 = col_reserve,
+				color2 = col_reserve,
+				percent = 0,
+				texture = 'LuaUI/Images/stripes.png', -- texture file name
+				s = 1, -- tex coords
+				t = 1,
+				tileSize = 16, --  if set then main axis texture coord = width / tileSize
+			}, 
+		}
 	}
 	
 	bar_overlay_energy = Chili.Progressbar:New{
