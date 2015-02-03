@@ -27,6 +27,8 @@ local spGetGameFrame  = Spring.GetGameFrame
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetUnitDefID        = Spring.GetUnitDefID
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -56,6 +58,11 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["vehaa"].id] = true,
 	[UnitDefNames["gunshipaa"].id] = true,
 	[UnitDefNames["gunshipsupport"].id] = true,
+	[UnitDefNames["armsnipe"].id] = true,
+	[UnitDefNames["amphraider3"].id] = true,
+	[UnitDefNames["subarty"].id] = true,
+	[UnitDefNames["subraider"].id] = true,
+	[UnitDefNames["corcrash"].id] = true,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -69,7 +76,6 @@ local preventOverkillCmdDesc = {
 	params 	= {0, "Prevent Overkill", "Fire at anything"}
 }
 
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -78,7 +84,7 @@ local incomingDamage = {}
 function GG.OverkillPrevention_IsDoomed(targetID)
 	if incomingDamage[targetID] then
 		local frame = spGetGameFrame()
-		if incomingDamage[targetID].timeout > frame then
+		if incomingDamage[targetID].fullTimeout > frame then
 			return incomingDamage[targetID].doomed
 		end
 	end
@@ -97,29 +103,59 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 			end
 		end
 		
-		local frame = spGetGameFrame()
-		if incomingDamage[targetID] then
-			if incomingDamage[targetID].doomed then
-				if incomingDamage[targetID].timeout > frame then
-					spSetUnitTarget(unitID,0)
-					return true
+		local incData = incomingDamage[targetID]
+		local addDamage = true
+		
+		local gameFrame = spGetGameFrame()
+		local newTimeoutFrame = gameFrame + timeout
+		if incData then
+			if incData.doomed then
+				if incData.fullTimeout > gameFrame then
+					-- Not yet timed out
+					local incDamage = incData.damage
+					for frame, shotDamage in pairs(incData.damageTimeout) do
+						if frame < gameFrame then
+							incDamage = incDamage - shotDamage
+							incData.damageTimeout[frame] = nil
+						end
+					end
+					incData.damage = incDamage
+					incData.doomed = (incData.damage >= incData.health)
+					
+					if incData.doomed then
+						local teamID = spGetUnitTeam(unitID)
+						local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
+						if unitDefID then
+							spSetUnitTarget(unitID,0)
+							return true
+						end
+					end
 				else
-					incomingDamage[targetID].damage = damage
+					-- Timout so make a new shooting instance
+					addDamage = false
+					incData.damage = damage
+					incData.damageTimeout = {[newTimeoutFrame] = damage}
+					incData.fullTimeout = newTimeoutFrame
 				end
-			else
-				incomingDamage[targetID].damage = incomingDamage[targetID].damage + damage
 			end
-			incomingDamage[targetID].timeout = math.max(incomingDamage[targetID].timeout, frame + timeout)
+			
+			if addDamage then
+				incData.damage = incData.damage + damage
+				incData.damageTimeout[newTimeoutFrame] = (incData.damageTimeout[newTimeoutFrame] or 0) + damage
+				incData.fullTimeout = math.max(incData.fullTimeout, newTimeoutFrame)
+			end
 		else
 			incomingDamage[targetID] = {
 				damage = damage,
-				timeout = frame + timeout,
+				damageTimeout = {[newTimeoutFrame] = damage},
+				fullTimeout = newTimeoutFrame,
 			}
 		end
 		
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
 		local health = spGetUnitHealth(targetID)/armor
 		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= health/armor)
+		incomingDamage[targetID].health = health/armor
 	end
 	
 	return false

@@ -108,7 +108,7 @@ local colorCapture = {0.6, 1, 0.6, 1}
 
 local function MakeStatsWindow() end
 options_order = {'shortNotation'}
-options_path = 'Help/Unit Descriptions'
+options_path = 'Help/Unit Guide'
 options = {
 		
 	shortNotation = {
@@ -121,51 +121,100 @@ options = {
 	
 	
 }
-local ignoreList = {
-	['firebug']=1,
-	['corpre']=1,
-	['vehdisable']=1,
-	['hoverscout']=1,
-}
-local UnitDefsList = {}
-for i=1,#UnitDefs do
-	local ud = UnitDefs[i]
-	local unitName = ud.humanName
-	local unitNameL = unitName:lower()
-	if not (unitNameL:find('test') or unitNameL:find('fake')) and not ignoreList[unitName] then
-		UnitDefsList[#UnitDefsList+1] = {unitName=unitName, ud=ud}
+
+local alreadyAdded = {}
+
+local function addUnit (unitDefID, path, buildable)
+	if (alreadyAdded[unitDefID]) then
+		return
 	end
-end
-table.sort(UnitDefsList, function(t1,t2)
-	return t1.unitName < t2.unitName
-end)
-for i=1,#UnitDefsList do
-	local item = UnitDefsList[i]
-	local unitName = item.unitName
-	local ud = item.ud
+	alreadyAdded[unitDefID] = true
+	local ud = UnitDefs[unitDefID]
+	local unitName = ud.humanName
 	local optionName = unitName .. 'help'
 	options[optionName] = {
-		name=unitName,
-		type='button',
+		name = unitName,
+		type = 'button',
 		desc = "Description For " .. unitName,
 		OnChange = function(self)
 			MakeStatsWindow(ud)
 		end,
-		path = options_path ..'/' .. unitName:sub(1,1):upper(),
+		path = options_path ..'/' .. path,
 	}
 	options_order[#options_order + 1] = optionName
 	
-	optionName = unitName .. 'build'
-	options[optionName] = {
-		name=unitName,
-		type='button',
-		desc = "Build " .. unitName,
-		action = 'buildunit_' .. ud.name,
-		path = 'Game/Construction Hotkeys/' .. unitName:sub(1,1):upper(),
-	}
-	options_order[#options_order + 1] = optionName
+	if (buildable) then
+		optionName = unitName .. 'build'
+		options[unitName .. 'build'] = {
+			name=unitName,
+			type='button',
+			desc = "Build " .. unitName,
+			action = 'buildunit_' .. ud.name,
+			path = 'Game/Construction Hotkeys/' .. path,
+		}
+		options_order[#options_order + 1] = optionName
+	end
 end
-UnitDefsList = nil
+
+local function AddFactoryOfUnits(defName)
+	local ud = UnitDefNames[defName]
+    local name = "Units/" .. string.gsub(ud.humanName, "/", "-")
+	addUnit(ud.id, name, true)
+	for i = 1, #ud.buildOptions do
+		addUnit(ud.buildOptions[i], name, true)
+    end
+end
+
+AddFactoryOfUnits("factoryshield")
+AddFactoryOfUnits("factorycloak")
+AddFactoryOfUnits("factoryveh")
+AddFactoryOfUnits("factoryplane")
+AddFactoryOfUnits("factorygunship")
+AddFactoryOfUnits("factoryhover")
+AddFactoryOfUnits("factoryamph")
+AddFactoryOfUnits("factoryspider")
+AddFactoryOfUnits("factoryjump")
+AddFactoryOfUnits("factorytank")
+AddFactoryOfUnits("factoryship")
+AddFactoryOfUnits("striderhub")
+AddFactoryOfUnits("missilesilo")
+
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+local _, _, factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+
+for i = 1, #buildOpts do
+	local udid = UnitDefNames[buildOpts[i]].id
+	if econ_commands[-udid] then
+		addUnit(udid,"Buildings/Economy", true)
+	elseif defense_commands[-udid] then
+		addUnit(udid,"Buildings/Defence", true)
+	elseif special_commands[-udid] then
+		addUnit(udid,"Buildings/Special", true)
+	end
+end
+
+-- Misc stuff without direct buildability
+addUnit(UnitDefNames["amgeo"].id, "Buildings/Economy", true) -- moho geo
+addUnit(UnitDefNames["armcsa"].id, "Units/Misc", true) -- athena
+addUnit(UnitDefNames["wolverine_mine"].id, "Units/Misc", false) -- maybe should go under LV fac, like wolverine? to consider.
+addUnit(UnitDefNames["tele_beacon"].id, "Units/Misc", false)
+addUnit(UnitDefNames["asteroid"].id, "Units/Misc", false)
+
+for i = 1, #UnitDefs do
+	if not alreadyAdded[i] then
+		local ud = UnitDefs[i]
+		if ud.name:lower():find('pw_') and (Spring.GetGameRulesParam("planetwars_structures") == 1) then
+			addUnit(i,"Misc/Planet Wars", false)
+		elseif ud.name:lower():find('chicken') and Spring.GetGameRulesParam("difficulty") then -- fixme: not all of these are actually used
+			addUnit(i,"Misc/Chickens", false)
+		elseif ud.customParams.is_drone then
+			addUnit(i,"Units/Misc", false)
+		elseif (ud.customParams.commtype or ud.customParams.level) then
+			addUnit(i,"Misc/Commanders", false) -- branch for each user and then each type? everyone generates 30 entries, will get super cramped
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -1684,7 +1733,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 
 function widget:MousePress(x,y,button)
 	

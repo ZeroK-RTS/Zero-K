@@ -7,6 +7,7 @@ Multiprogressbar = Control:Inherit{
   defaultHeight    = 20,
   
   padding = {0,0,0,0},	
+  fillPadding = {0, 0, 0, 0},
   drawBorder = false,
   borderColor = {1,0,0,1},
   orientation = "horizontal", 
@@ -65,9 +66,14 @@ end
 
 
 function Multiprogressbar:DrawControl()
-  local percentDone = 0
-  local efp 
-  
+	local percentDone = 0
+	local efp 
+	local fillPadding = self.fillPadding
+
+	local x,y,w,h = self.x + fillPadding[1], self.y + fillPadding[2], 
+			self.width - fillPadding[1] - fillPadding[3], 
+			self.height  - fillPadding[2] - fillPadding[4]
+	
 
 	if (self.scaleFunction ~= nil) then  -- if using non linear scale fix the bar
 		local totalPercent = 0
@@ -94,7 +100,7 @@ function Multiprogressbar:DrawControl()
 			else 
 				efp = percentDone
 			end 
-			if (b.color1 ~= nil) then glBeginEnd(GL.QUADS, drawBarH, self.x + efp * self.width,self.y, self.width * b._drawPercent, self.height, b.color1, b.color2) end
+			if (b.color1 ~= nil) then glBeginEnd(GL.QUADS, drawBarH, x + efp * w,y, w * b._drawPercent, h, b.color1, b.color2) end
 			percentDone = percentDone + b._drawPercent
 		
 			if b.texture then 
@@ -103,9 +109,9 @@ function Multiprogressbar:DrawControl()
 			
 				local bs = b.s
 				if (b.tileSize) then 
-					bs = self.width * b._drawPercent / b.tileSize
+					bs = w * b._drawPercent / b.tileSize
 				end 
-				gl.TexRect(self.x + efp * self.width,self.y, self.x + (efp + b._drawPercent) * self.width, self.y + self.height, 0,0,bs,b.t)
+				gl.TexRect(x + efp * w, y, x + (efp + b._drawPercent) * w, y + h, 0,0,bs,b.t)
 				gl.Texture(false)  	
 			end 
 		end 
@@ -120,7 +126,7 @@ function Multiprogressbar:DrawControl()
 				efp = percentDone
 			end 
 			
-			if (b.color1 ~= nil) then glBeginEnd(GL.QUADS, drawBarV, self.x,self.y + efp * self.height, self.width, self.height * b._drawPercent, b.color1, b.color2) end 
+			if (b.color1 ~= nil) then glBeginEnd(GL.QUADS, drawBarV, x,y + efp * h, w, h * b._drawPercent, b.color1, b.color2) end 
 			
 			percentDone = percentDone + b._drawPercent
 		
@@ -130,9 +136,9 @@ function Multiprogressbar:DrawControl()
 			
 				local bt = b.t
 				if (b.tileSize) then 
-					bt = self.height * b._drawPercent / b.tileSize
+					bt = h * b._drawPercent / b.tileSize
 				end 
-				gl.TexRect(self.x, self.y + efp * self.height, self.x + self.width, self.y + (efp + b._drawPercent) * self.height, 0,0,b.s,bt)
+				gl.TexRect(x, y + efp * h, x + w, y + (efp + b._drawPercent) * h, 0,0,b.s,bt)
 				gl.Texture(false)
 			end 
 		end
@@ -143,7 +149,7 @@ function Multiprogressbar:DrawControl()
   
   if self.drawBorder then
 	glColor(self.borderColor)
-	glBeginEnd(GL.LINE_LOOP, drawBox, self.x, self.y, self.width, self.height)
+	glBeginEnd(GL.LINE_LOOP, drawBox, x, y, w, h)
   end 
 
 end

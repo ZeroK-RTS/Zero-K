@@ -1137,7 +1137,6 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if (hotkeyMode) and not isRepeat then 
-		local thingsDone = false
 		local pos = gridKeyMap[key]
 		if pos and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
@@ -1147,16 +1146,14 @@ function widget:KeyPress(key, modifier, isRepeat)
 					local index = Spring.GetCmdDescIndex(cmdid)
 					if index then
 						Spring.SetActiveCommand(index,1,true,false,false,false,false,false)
-						thingsDone = true
 					end
 				end
 			end
 		end
-		hotkeyMode = false
 		menuChoice = 1 -- auto-return to orders to make it clear hotkey time is over
 		Update(true)
 		ColorTabs()
-		return thingsDone 
+		return (pos and true) or false 
 	elseif menuChoice == 6 and options.unitstabhotkey.value and selectedFac then
 		local pos = gridKeyMap[key]
 		if pos and pos[1] ~= 3 and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then

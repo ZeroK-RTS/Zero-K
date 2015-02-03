@@ -1615,6 +1615,11 @@ end
 
 function WG.Terraform_SetPlacingRectangle(unitDefID)
 	
+	-- Do no terraform with pregame placement.
+	if Spring.GetGameFrame() < 1 then
+		return false
+	end
+	
 	if not unitDefID or not UnitDefs[unitDefID] then
 		return false
 	end

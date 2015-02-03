@@ -109,6 +109,10 @@ skin.progressbar = {
   DrawControl = DrawProgressbar,
 }
 
+skin.multiprogressbar = {
+  fillPadding     = {4, 3, 4, 3},
+}
+
 skin.scrollpanel = {
   BorderTileImage = ":cl:panel2_border.png",
   bordertiles = {16,16,16,16},

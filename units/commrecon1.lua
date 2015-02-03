@@ -49,6 +49,7 @@ unitDef = {
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
     commtype = [[3]],
+    aimposoffset   = [[0 10 0]],
   },
 
   energyMake          = 6,

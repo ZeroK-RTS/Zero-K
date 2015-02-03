@@ -557,6 +557,42 @@ local icontypes = {
     bitmap='icons/builder.dds',
     size=1.8,
   },
+  amphbuilder = {
+    bitmap='icons/amphbuilder.png',
+    size=1.8,
+  },
+  hoverbuilder = {
+    bitmap='icons/hoverbuilder.png',
+    size=1.8,
+  },
+  jumpjetbuilder = {
+    bitmap='icons/jumpjetbuilder.png',
+    size=1.8,
+  },
+  kbotbuilder = {
+    bitmap='icons/kbotbuilder.png',
+    size=1.8,
+  },
+  shipbuilder = {
+    bitmap='icons/shipbuilder.png',
+    size=1.8,
+  },
+  spiderbuilder = {
+    bitmap='icons/spiderbuilder.png',
+    size=1.8,
+  },
+  tankbuilder = {
+    bitmap='icons/tankbuilder.png',
+    size=1.8,
+  },
+  vehiclebuilder = {
+    bitmap='icons/vehiclebuilder.png',
+    size=1.8,
+  },
+  walkerbuilder = {
+    bitmap='icons/walkerbuilder.png',
+    size=1.8,
+  },
   builderair = {
     bitmap='icons/builderair.dds',
     size=1.8,

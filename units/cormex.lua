@@ -32,6 +32,7 @@ unitDef = {
     occupationStrength = 1,
     pylonrange         = 50,
 	ismex              = 1,
+	aimposoffset       = [[0 -4 0]],
 	midposoffset       = [[0 -10 0]],
 	modelradius        = [[15]],
   },

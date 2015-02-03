@@ -39,6 +39,7 @@ local GetMyTeamID = Spring.GetMyTeamID
 local GetTeamResources = Spring.GetTeamResources
 local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers
+local spGetModKeyState = Spring.GetModKeyState
 local Chili
 
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
@@ -48,6 +49,7 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
+local col_reserve = {0, 0, 0, 0}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -117,8 +119,8 @@ options = {
 	enableReserveBar = {
 		name  = 'Enable Reserve', 
 		type  = 'bool', 
-		value = false, 
-		desc = "When enabled clicking on the resource bars will set reserve. Low and Normal priority constructors cannot use resources in reserve storage."
+		value = true, 
+		desc = "Ctrl+Click on the resource bars will set reserve when enabled. Low and Normal priority constructors cannot use resources in reserve storage."
 	},
 	defaultEnergyReserve = {
 		name  = "Initial Energy Reserve",
@@ -206,13 +208,15 @@ local function updateReserveBars(metal, energy, value, overrideOption)
 			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
 			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
 			WG.metalStorageReserve = value*mStor
-			bar_reserve_metal:SetValue(value)
+			bar_reserve_metal.bars[1].percent = value
+			bar_reserve_metal:Invalidate()
 		end
 		if energy then
 			local _, eStor = GetTeamResources(GetMyTeamID(), "energy")
 			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE)) 
 			WG.energyStorageReserve = value*(eStor - HIDDEN_STORAGE)
-			bar_reserve_energy:SetValue(value)
+			bar_reserve_energy.bars[1].percent = value
+			bar_reserve_energy:Invalidate()
 		end
 	end
 end
@@ -514,6 +518,11 @@ end
 
 function CreateWindow()
 	local function SetReserveByMouse(self, x, y, mouse, metal)
+		local a,c,m,s = spGetModKeyState()
+		if not c then
+			return
+		end
+		
 		local reserve = (x) / (self.width - self.padding[1] - self.padding[3])
 		if mouse ~= 1 then
 			updateReserveBars(true, true, reserve)
@@ -677,9 +686,8 @@ function CreateWindow()
 		tooltip = "Your metal demand. Construction and morph demand metal.",
 	}
 	
-	bar_reserve_metal = Chili.Progressbar:New{
+	bar_reserve_metal = Chili.Multiprogressbar:New{
 		parent = window_metal,
-		color  = {0.7,0.7,0.7,0.5},
 		orientation = "horizontal",
 		value  = 0,
 		x      = barX,
@@ -690,6 +698,17 @@ function CreateWindow()
 		max = 1,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+		bars = { 
+			{
+				color1 = col_reserve,
+				color2 = col_reserve,
+				percent = 0,
+				texture = 'LuaUI/Images/whiteStripes.png', -- texture file name
+				s = 1, -- tex coords
+				t = 1,
+				tileSize = 16, --  if set then main axis texture coord = width / tileSize
+			}, 
+		}
 	}
 	
 	bar_metal = Chili.Progressbar:New{
@@ -808,9 +827,8 @@ function CreateWindow()
 		tooltip = "This is this total energy demand of your economy and abilities which require energy upkeep",
 	}
 	
-	bar_reserve_energy = Chili.Progressbar:New{
+	bar_reserve_energy = Chili.Multiprogressbar:New{
 		parent = window_energy,
-		color  = {0.7,0.7,0.7,0.5},
 		orientation = "horizontal",
 		value  = 0,
 		x      = barX,
@@ -821,6 +839,17 @@ function CreateWindow()
 		max = 1,
 		noSkin = true,
 		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+		bars = { 
+			{
+				color1 = col_reserve,
+				color2 = col_reserve,
+				percent = 0,
+				texture = 'LuaUI/Images/whiteStripes.png', -- texture file name
+				s = 1, -- tex coords
+				t = 1,
+				tileSize = 16, --  if set then main axis texture coord = width / tileSize
+			}, 
+		}
 	}
 	
 	bar_overlay_energy = Chili.Progressbar:New{

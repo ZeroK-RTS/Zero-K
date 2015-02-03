@@ -175,6 +175,11 @@ function script.FireWeapon1()
 	missile = missile + 1
 	if missile > 3 then missile = 1 end
 end
+
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 71, 30)
+end
+
 --]]
 
 --[[ why are there two weapons???

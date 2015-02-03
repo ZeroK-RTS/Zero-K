@@ -36,6 +36,7 @@ unitDef = {
     helptext_pl    = [[Spicula to szybki wielozadaniowy dron mysliwiec, ktorego bron jest skuteczna przeciwko celom zarowno ladowym, jak i powietrznym.]],
     modelradius    = [[5]],
     refuelturnradius = [[80]],
+    is_drone = 1,
   },
 
   defaultmissiontype     = [[VTOL_standby]],

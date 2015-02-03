@@ -45,6 +45,10 @@ function script.AimWeapon( num, heading, pitch )
 	return num == 2
 end
 
+function script.BlockShot(num, targetID)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 350.1, 25, true)
+end
+
 function script.FireWeapon(num)
 -- FX goes here
 end

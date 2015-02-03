@@ -1238,28 +1238,58 @@ function widgetHandler:CommandNotify(id, params, options)
 end
 
 local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
-if MUTE_SPECTATORS == 'autodetect' then
-	local allyTeams = Spring.GetAllyTeamList()
-	if #allyTeams > 3 then -- 2 player teams and 1 gaia team
-		MUTE_SPECTATORS = true
-	else
-		MUTE_SPECTATORS = false
+local MUTE_LOBBY = Spring.GetModOptions().mutelobby
+local playerNameToID 
+
+do
+	local teams = Spring.GetTeamList();
+	local humanAlly = {}
+	local humanAllyCount = 0
+	gaiaTeam = Spring.GetGaiaTeamID()
+	for _, teamID in ipairs(teams) do
+		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
+		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
+			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
+			if (not ai) and (not humanAlly[ally]) then 
+				humanAlly[ally] = true
+				humanAllyCount = humanAllyCount + 1
+			end	
+		end
 	end
-else
-	MUTE_SPECTATORS = (MUTE_SPECTATORS == 'mute')
+	
+	if MUTE_SPECTATORS == 'autodetect' then
+		if humanAllyCount > 2 then
+			MUTE_SPECTATORS = true
+		else
+			MUTE_SPECTATORS = false
+		end
+	else
+		MUTE_SPECTATORS = (MUTE_SPECTATORS == 'mute')
+	end
+	
+	if MUTE_LOBBY == 'autodetect' then
+		if humanAllyCount > 2 then 
+			MUTE_LOBBY = true
+		else
+			MUTE_LOBBY = false
+		end
+	else
+		MUTE_LOBBY = (MUTE_LOBBY == 'mute')
+	end
+
+	if MUTE_LOBBY then
+		playerNameToID = {}
+		local playerList = Spring.GetPlayerList()
+		for i = 1, #playerList do
+			local playerID = playerList[i]
+			local name, _, spectating = Spring.GetPlayerInfo(playerID)
+			if not spectating then
+				playerNameToID[name] = playerID
+			end
+		end
+	end
 end
 
-local MUTE_LOBBY = Spring.GetModOptions().mutelobby
-if MUTE_LOBBY == 'autodetect' then
-	local allyTeams = Spring.GetAllyTeamList()
-	if #allyTeams > 3 then -- 2 player teams and 1 gaia team
-		MUTE_LOBBY = true
-	else
-		MUTE_LOBBY = false
-	end
-else
-	MUTE_LOBBY = (MUTE_LOBBY == 'mute')
-end
 
 --NOTE: StringStarts() and MessageProcessor is included in "chat_preprocess.lua"
 function widgetHandler:AddConsoleLine(msg, priority)
@@ -1310,9 +1340,23 @@ function widgetHandler:AddConsoleLine(msg, priority)
 	if MUTE_LOBBY and newMsg.msgtype == 'autohost' then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if (not spectating) and newMsg.argument then
-			-- Chat from lobby seems to always start with a '<'. Come up with a better way.
+			-- Chat from lobby has format '<PlayerName>message'
 			if string.sub(newMsg.argument, 1, 1) == "<" then
-				return
+				local endChar = string.find(newMsg.argument, ">")
+				if endChar then
+					local name = string.sub(newMsg.argument, 2, endChar-1)
+					if playerNameToID[name] then
+						local spectating = select(3, Spring.GetPlayerInfo(playerNameToID[name]))
+						if spectating then
+							playerNameToID[name] = nil
+							return
+						end
+					else
+						return
+					end
+				else
+					return
+				end
 			end
 		end
 	end

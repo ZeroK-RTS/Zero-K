@@ -208,6 +208,17 @@ local function SitOnPad(unitID)
 				end
 			end
 			
+			-- Check crashing every 10s as safety for a rare bug. Otherwise the pad will be oocupied forever.
+			if landDuration%300 == 0 then
+				if Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing" then
+					if drainingEnergy then
+						Spring.SetUnitResourcing(unitID, "uue" ,0)
+						drainingEnergy = false
+					end
+					break
+				end
+			end
+			
 			Sleep()
 		end
 		

@@ -73,6 +73,15 @@ local Sounds = {
 --------------------------------------------------------------------------------
 local VFSUtils = VFS.Include('gamedata/VFSUtils.lua')
 
+local optionOverrides = {
+	["weapon/missile/icbm_launch9"] = {
+		pitchMod = 0,
+		gainMod = 0,
+		priority  = 1
+	}
+
+}
+
 local defaultOpts = {
 	pitchMod = 0, --0.02,
 	gainMod = 0,
@@ -82,14 +91,17 @@ local replyOpts = {
 	gainMod = 0,
 }
 
-local noVariation = {}
+local noVariation = {
+	dopplerscale  = 0,
+}
 
 local ignoredExtensions = {
 	["svn-base"] = true,
 }
 
-local function AutoAdd(subDir, opts)
-	opts = opts or {}
+local function AutoAdd(subDir, generalOpts)
+	generalOpts = generalOpts or {}
+	local opts
 	local dirList = RecursiveFileSearch("sounds/" .. subDir)
 	--local dirList = RecursiveFileSearch("sounds/")
 	for _, fullPath in ipairs(dirList) do
@@ -97,8 +109,25 @@ local function AutoAdd(subDir, opts)
 		local pathPart = fullPath:match("(.*)[.]")
 		pathPart = pathPart:sub(8, -1)	-- truncates extension fullstop and "sounds/" part of path
 		if path ~= nil and (not ignoredExtensions[ext]) then
+			if optionOverrides[pathPart] then
+				opts = optionOverrides[pathPart]
+				--Spring.Echo("optionOverrides for " .. pathPart)
+			else
+				opts = generalOpts
+			end
 			--Spring.Echo(path,key,ext, pathPart)
-			Sounds.SoundItems[pathPart] = {file = tostring('sounds/'..path), rolloff = opts.rollOff, dopplerscale = opts.dopplerScale, maxdist = opts.maxDist, maxconcurrent = opts.maxConcurrent, priority = opts.priority, gain = opts.gain, gainmod = opts.gainMod, pitch = opts.pitch, pitchmod = opts.pitchMod}
+			Sounds.SoundItems[pathPart] = {
+				file = tostring('sounds/'..path), 
+				rolloff = opts.rollOff, 
+				dopplerscale = opts.dopplerScale, 
+				maxdist = opts.maxDist, 
+				maxconcurrent = opts.maxConcurrent, 
+				priority = opts.priority, 
+				gain = opts.gain, 
+				gainmod = opts.gainMod, 
+				pitch = opts.pitch, 
+				pitchmod = opts.pitchMod
+			}
 			--Spring.Echo(Sounds.SoundItems[key].file)
 		end
 	end

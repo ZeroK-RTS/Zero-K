@@ -31,7 +31,10 @@ local weaponDef = {
 				customParams = { muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_WHITE]] },
 				rgbColor = [[1 1 1]],
 			},
-		}
+		},
+
+		stats_hide_damage = 1, -- continuous laser
+		stats_hide_reload = 1,
 	},
 
 	damage                  = {
