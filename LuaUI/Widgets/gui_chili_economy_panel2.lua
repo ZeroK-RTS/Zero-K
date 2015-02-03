@@ -49,7 +49,7 @@ local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local col_metal = {136/255,214/255,251/255,1}
 local col_energy = {.93,.93,0,1}
-local col_reserve = {1, 1, 1, 0}
+local col_reserve = {0, 0, 0, 0}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -703,7 +703,7 @@ function CreateWindow()
 				color1 = col_reserve,
 				color2 = col_reserve,
 				percent = 0,
-				texture = 'LuaUI/Images/stripes.png', -- texture file name
+				texture = 'LuaUI/Images/whiteStripes.png', -- texture file name
 				s = 1, -- tex coords
 				t = 1,
 				tileSize = 16, --  if set then main axis texture coord = width / tileSize
@@ -844,7 +844,7 @@ function CreateWindow()
 				color1 = col_reserve,
 				color2 = col_reserve,
 				percent = 0,
-				texture = 'LuaUI/Images/stripes.png', -- texture file name
+				texture = 'LuaUI/Images/whiteStripes.png', -- texture file name
 				s = 1, -- tex coords
 				t = 1,
 				tileSize = 16, --  if set then main axis texture coord = width / tileSize
