@@ -654,7 +654,7 @@ function CreateWindow()
 		align  = "left",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.fontSize.value + 0.1, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your metal storage.",
 	}
 	
@@ -668,7 +668,7 @@ function CreateWindow()
 		valign = "bottom",
  		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value + 0.1, outline = true, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your metal Income.\nGained from metal extractors, overdrive and reclaim",
 	}
 	
@@ -682,7 +682,7 @@ function CreateWindow()
 		valign = "bottom",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value + 0.1, outline = true, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your metal demand. Construction and morph demand metal.",
 	}
 	
@@ -795,7 +795,7 @@ function CreateWindow()
 		align  = "left",
 		caption = "0",
 		autosize = false,
-		font   = {size = options.fontSize.value + 0.1, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your energy storage.",
 	}
 	
@@ -809,7 +809,7 @@ function CreateWindow()
 		valign = "bottom",
  		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value + 0.1, outline = true, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	
@@ -823,7 +823,7 @@ function CreateWindow()
 		valign = "bottom",
 		align  = "left",
 		autosize = false,
-		font   = {size = options.fontSize.value + 0.1, outline = true, outlineWidth = 2, outlineWeight = 2},
+		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 		tooltip = "This is this total energy demand of your economy and abilities which require energy upkeep",
 	}
 	
