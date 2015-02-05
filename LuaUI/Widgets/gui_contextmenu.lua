@@ -200,6 +200,16 @@ addUnit(UnitDefNames["wolverine_mine"].id, "Units/Misc", false) -- maybe should 
 addUnit(UnitDefNames["tele_beacon"].id, "Units/Misc", false)
 addUnit(UnitDefNames["asteroid"].id, "Units/Misc", false)
 
+
+local lobbyIDs = {} -- stores peoples names by lobbyID to match commanders to owners 
+local players = Spring.GetPlayerList()
+for i = 1, #players do
+	local customkeys = select(10, Spring.GetPlayerInfo(players[i]))
+	if customkeys.lobbyid then
+		lobbyIDs[customkeys.lobbyid] = select(1, Spring.GetPlayerInfo(players[i]))
+	end
+end
+
 for i = 1, #UnitDefs do
 	if not alreadyAdded[i] then
 		local ud = UnitDefs[i]
@@ -210,7 +220,21 @@ for i = 1, #UnitDefs do
 		elseif ud.customParams.is_drone then
 			addUnit(i,"Units/Misc", false)
 		elseif (ud.customParams.commtype or ud.customParams.level) then
-			addUnit(i,"Misc/Commanders", false) -- branch for each user and then each type? everyone generates 30 entries, will get super cramped
+			local unitName = ud.name
+			if unitName:sub(6, 8) == "cai" then
+				-- addUnit(i,"Misc/Commanders/CAI", false)
+			elseif unitName:sub(6, 13) == "campaign" then
+				addUnit(i,"Misc/Commanders/Campaign", false)
+			elseif unitName:sub(6, 12) == "trainer" then
+				local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
+				addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
+			elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
+				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)]
+				local designation = ud.humanName:sub(1, ud.humanName:find(" level ")-1)
+				addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. designation, false)
+			else
+				-- addUnit(i,"Misc/Commanders/Other", false) -- mostly chassis templates and testing stuff
+			end
 		end
 	end
 end
