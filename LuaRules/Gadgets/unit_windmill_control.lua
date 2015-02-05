@@ -133,6 +133,9 @@ local function SetupUnit(unitID)
   
   local altitude = (y - groundMin)/groundExtreme
   scriptIDs.alt = altitude*slope
+  if (scriptIDs.alt > 1) then
+  	scriptIDs.alt = 1
+  end
 
   local unitDef = UnitDefs[unitDefID]
   Spring.SetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, {inlos = true})
