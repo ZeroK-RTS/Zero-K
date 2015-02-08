@@ -94,7 +94,7 @@ local function RefreshConsList() end	-- redefined later
 local function ClearData(reinitialize) end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
+options_order = { 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
 options = {
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-16)',
@@ -118,6 +118,12 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = function() RefreshConsList() end,		
+	},
+	leftMouseCenter = {
+		name = 'Swap Camera Center Button',
+		desc = 'When enabled left click a commander or factory to center the camera on it. When disabled right click centers.',
+		type = 'bool',
+		value = true,		
 	},
 	lblSelection = { type='label', name='Commander', path='Game/Selection Hotkeys', },
 	selectcomm = { type = 'button',
@@ -281,8 +287,8 @@ local function UpdateFac(unitID, index)
 		local buildeeDef = UnitDefs[buildeeDefID]
 		tooltip = tooltip .. "\nCurrent project: "..buildeeDef.humanName.." ("..math.floor(progress*100).."% done)"
 	end
-	tooltip = tooltip .. "\n\255\0\255\0Left-click: Select and go to"..
-										"\nRight-click: Select"..
+	tooltip = tooltip .. "\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
+										"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
 										"\nShift: Append to current selection\008"
 	local tooltipOld = facs[index].button.tooltip
 	if tooltipOld ~= tooltip then
@@ -321,7 +327,7 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 		OnClick = {	function (self, x, y, mouse) 
 				local shift = select(4, GetModKeyState())
 				SelectUnitArray({unitID}, shift)
-				if mouse == 1 then
+				if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 					local x, y, z = Spring.GetUnitPosition(unitID)
 					Spring.SetCameraTarget(x, y, z)
 				end
@@ -493,8 +499,8 @@ local function UpdateComm(unitID, index)
 	
 	comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
 							"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-							"\n\255\0\255\0Left-click: Select and go to"..
-							"\nRight-click: Select"..
+							"\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
+							"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
 							"\nShift: Append to current selection\008"
 	
 end
@@ -617,7 +623,7 @@ local function UpdateConsButton()
 		--idleBuilderDefID = maxDefID
 	end
 	conButton.button.tooltip = "You have ".. total .. " idle con(s), of "..numTypes.." different type(s)."..
-								"\n\255\0\255\0Left-click: Select one and go to"..
+								"\n\255\0\255\0Left-click: Select"..
 								"\nRight-click: Select all\008"
 	idleCons.count = total
 	total = (total > 0 and tostring(total)) or ''
