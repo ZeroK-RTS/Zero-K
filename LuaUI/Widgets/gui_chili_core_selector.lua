@@ -123,7 +123,7 @@ options = {
 		name = 'Swap Camera Center Button',
 		desc = 'When enabled left click a commander or factory to center the camera on it. When disabled right click centers.',
 		type = 'bool',
-		value = true,		
+		value = false,		
 	},
 	lblSelection = { type='label', name='Commander', path='Game/Selection Hotkeys', },
 	selectcomm = { type = 'button',
