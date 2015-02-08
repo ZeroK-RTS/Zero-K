@@ -55,6 +55,7 @@ local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spSetUnitNoMinimap   = Spring.SetUnitNoMinimap
+local spGetUnitIsStunned   = Spring.GetUnitIsStunned
 local spGetCommandQueue    = Spring.GetCommandQueue
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
 local spSetUnitVelocity    = Spring.SetUnitVelocity
@@ -64,11 +65,10 @@ local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
 local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
-local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
-local spCallCOBScript      = Spring.CallCOBScript
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
+local spGetGameFrame       = Spring.GetGameFrame
 local spGetUnitDefID       = Spring.GetUnitDefID
 local spGetUnitTeam        = Spring.GetUnitTeam
 local spDestroyUnit        = Spring.DestroyUnit
@@ -89,13 +89,13 @@ local landBoxSize = 60
 local jumps = {}
 local jumping = {}
 local goalSet = {}
-local impulseQueue = {} --used by impulse jump to queue unit impulses outside coroutine. Note: Doing impulses inside coroutine cause Newton to be nonfunctional toward jumping unit.
+local impulseQueue = {} --to queue unit impulses outside coroutine. Note: Doing impulses inside coroutine cause Newton to be nonfunctional toward jumping unit (which defeat the purpose of using impulse in first place).
 local defFallGravity =Game.gravity/30/30
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local jumpDefs = VFS.Include"LuaRules/Configs/jump_defs.lua"
+local jumpDefs = VFS.Include ("LuaRules/Configs/jump_defs.lua")
 
 local jumpCmdDesc = {
 	id			= CMD_JUMP,
@@ -115,17 +115,14 @@ local function GetDist3(a, b)
 	return (x*x + y*y + z*z)^0.5
 end
 
-
 local function GetDist2Sqr(a, b)
 	local x, z = (a[1] - b[1]), (a[3] - b[3])
 	return (x*x + z*z)
 end
 
-
 local function Approach(unitID, cmdParams, range)
 	spSetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], range)
 end
-
 
 local function StartScript(fn)
 	local co = coroutine.create(fn)
@@ -167,13 +164,13 @@ local function ReloadQueue(unitID, queue, cmdTag)
 end
 --]]
 
-local function FindLaunchSpeedAndAcceleration(flightTime, vectorY, jumpHeight,groundDistance, vectorX, vectorZ)
+local function FindLaunchSpeedAndAcceleration(flightTime, vector, jumpHeight,groundDistance)
 	--Given value:
 	local wantedTime = flightTime
-	local diffHeight = vectorY
+	local diffHeight = vector[2]
 	local apexHeight = jumpHeight
-	local dx = vectorX
-	local dz = vectorZ
+	local dx = vector[1]
+	local dz = vector[3]
 	local unitID = unitID
 	--Input conversion
 	apexHeight = math.max(apexHeight, diffHeight) --safety, if apexHeight too small it cause negative sqrt
@@ -193,22 +190,21 @@ local function FindLaunchSpeedAndAcceleration(flightTime, vectorY, jumpHeight,gr
 	return verticalLaunchVel, gravity, xVelocity, zVelocity
 end
 
-local function CopyJumpData(unitID, endHeight)
+local function CopyJumpData(unitID)
+	--NOTE: jumping & lastJump table is refreshed with info for morphed unit in UnitDestroyed(). It is important for it to run first before GameFrame() loop is run 
+	--because at GameFrame() we update the loop which call this function, and we expect all morph information to be present.
+
 	local oldUnitID = unitID --previous unitID
-	unitID = GG.wasMorphedTo[unitID] --new unitID
+	unitID = GG.wasMorphedTo[unitID] --new unitID. NOTE: UnitDestroyed() already updated jumping & lastJump table with new value
 	local unitDefID = spGetUnitDefID(unitID)
-	if (not jumpDefs[unitDefID]) then --check if new unit can jump
+	if not (unitDefID and jumpDefs[unitDefID]) then --check if new unit can jump
 		jumping[unitID] = nil
 		lastJump[unitID] = nil
 		return --exit JumpLoop() if unit can't jump
 	end
-	local cob = jumpDefs[unitDefID].cobscript --script type 
-	local speed = jumpDefs[unitDefID].speed --speed from point A to B to C
+	local speed = jumpDefs[unitDefID].speed --speed from A to B
 	local reloadTime = (jumpDefs[unitDefID].reload or 0)*30 --jump reload time
-	local env
-	if not cob then
-		env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
-	end
+	local env = Spring.UnitScript.GetScriptEnv(unitID) --get new unit's script
 	SetLeaveTracks(unitID, false) --set no track
 	spSetUnitRulesParam(unitID,"jumpReload",0)
 	
@@ -216,24 +212,22 @@ local function CopyJumpData(unitID, endHeight)
 	local delay = jumpDefs[unitDefID].delay --prejump delay
 	local height = jumpDefs[unitDefID].height --max height
 	local limitHeight = jumpDefs[unitDefID].limitHeight --limit height to height?
-	if not limitHeight then
-		height = math.max(height, endHeight+height) --is always higher than the present or the target location
-	end
 	
-	return unitID,reloadTime,env,cob,speed,rotateMidAir,delay,height,limitHeight
+	return unitID,reloadTime,env,speed,rotateMidAir,delay,height,limitHeight
 end
 
 --local speedProfile = {0,}
 local function Jump(unitID, goal, cmdTag, origCmdParams)
 	goal[2]						 = spGetGroundHeight(goal[1],goal[3])
 	local start				 = {spGetUnitPosition(unitID)}
+	
 	start[2] = math.max(0,start[2]) --always use the case for surface launch (no underwater launch)
 	local fakeUnitID
 	local unitDefID		 = spGetUnitDefID(unitID)
 	local jumpDef			 = jumpDefs[unitDefID]
-	local speed				 = jumpDef.speed
+	local speed				 = jumpDef.speed --2D speed
 	local delay				= jumpDef.delay
-	local height				= jumpDef.height
+	local apexHeight		= jumpDef.height
 	local limitHeight		= jumpDef.limitHeight
 	local cannotJumpMidair		= jumpDef.cannotJumpMidair
 	local reloadTime		= (jumpDef.reload or 0)*30
@@ -244,27 +238,26 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	end
 	
 	local rotateMidAir	= jumpDef.rotateMidAir
-	local cob 	 		= jumpDef.cobscript
 	local env
 
 	local vector = {goal[1] - start[1],
 					goal[2] - start[2],
 					goal[3] - start[3]}
-					
+	
 	if not limitHeight then
-		height = math.max(height, vector[2]+height) --is always higher than the present or the target location
+		apexHeight = math.max(apexHeight, vector[2]+apexHeight) --is always higher than the target location
 	end
 
 	-- vertex of a parabola. This is for flightDist estimate, not need to be too accurate
 	local vertex = {start[1] + vector[1]*0.5,
-					start[2] + height,
+					start[2] + apexHeight,
 					start[3] + vector[3]*0.5}
 					
 	local lineDist = GetDist3({start[1],0,start[3]}, {goal[1],0,goal[3]})
 	local flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
 	local duration = flightDist/speed
 	
-	local verticalLaunchVel, gravity, xVelocity, zVelocity = FindLaunchSpeedAndAcceleration(duration, vector[2],height,lineDist,vector[1],vector[3])
+	local verticalLaunchVel, gravity, xVelocity, zVelocity = FindLaunchSpeedAndAcceleration(duration, vector,apexHeight,lineDist)
 
 	-- check if there is no wall in between
 	local x,z
@@ -293,27 +286,17 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		turn = goalHeadingB - startHeadingB
 	end
 	
-	jumping[unitID] = true
+	jumping[unitID] = 'prelaunch'
 	SetLeaveTracks(unitID, false)
-	if not cob then
-		env = Spring.UnitScript.GetScriptEnv(unitID)
-	end
+	env = Spring.UnitScript.GetScriptEnv(unitID)
 	
 	if (delay == 0) then
-		if cob then
-				spCallCOBScript( unitID, "BeginJump", 0)
-			else
-				Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
-			end
+		Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
 		if rotateMidAir then
 			spSetUnitRotation(unitID, 0, -1*startHeading*RADperROT, 0) -- keep current heading. Note: need to be negative because of bug? not needed for MoveCtrl.SetUnitRotation() apparently
 		end
 	else
-		if cob then
-			spCallCOBScript( unitID, "PreJump", 0)
-		else
-			Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist,duration)
-		end
+		Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist,duration)
 	end
 	spSetUnitRulesParam(unitID,"jumpReload",0)
 
@@ -322,43 +305,52 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		if delay > 0 then
 			local countUp = 1
 			while (countUp <= delay ) do
-				--NOTE: UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
-				if GG.wasMorphedTo[unitID] then
-					unitID,reloadTime,env,cob,speed,rotateMidAir,delay,height,limitHeight = CopyJumpData(unitID, vector[2])
+				if GG.wasMorphedTo[unitID] then --morphed during pre-jump animation
+					local newApexHeight,newSpeed
+					unitID,reloadTime,env,newSpeed,rotateMidAir,delay,newApexHeight,limitHeight = CopyJumpData(unitID)
 					if unitID == nil then 
 						return
-					end					
-					vertex[2] = (start[2] + height)
-					flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
-					local newDuration = flightDist/speed
-					if newDuration ~= duration then
-						verticalLaunchVel, gravity, xVelocity, zVelocity = FindLaunchSpeedAndAcceleration(duration, vector[2],height,lineDist,vector[1],vector[3])
-						duration = newDuration
+					end
+					if not limitHeight then
+						newApexHeight = math.max(newApexHeight, vector[2]+newApexHeight) --is always higher than the target location
+					end
+					if speed ~= newSpeed or apexHeight ~= newApexHeight  then
+						speed = newSpeed
+						apexHeight = newApexHeight
+						vertex[2]= start[2]+apexHeight
+						flightDist = GetDist3(start, vertex) + GetDist3(vertex, goal)
+						duration = flightDist/speed --new speed
+						verticalLaunchVel, gravity, xVelocity, zVelocity = FindLaunchSpeedAndAcceleration(duration, vector,apexHeight,lineDist)
 					end
 				end
 				Sleep()
 				countUp = countUp +1
 			end
 		
-			if cob then
-				spCallCOBScript( unitID, "BeginJump", 0)
-			else
-				Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
-			end
+			Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
 
 			if rotateMidAir then
 				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0) -- keep current heading.. Note: need to be negative because of bug? not needed for MoveCtrl.SetUnitRotation() apparently
 			end
 		end
+	
+		--detach from transport
+		local attachedTransport = Spring.GetUnitTransporter(unitID)
+		if (attachedTransport) then
+			local envTrans = Spring.UnitScript.GetScriptEnv(attachedTransport)
+			if (envTrans.ForceDropUnit) then
+				Spring.UnitScript.CallAsUnit(attachedTransport,envTrans.ForceDropUnit)
+			end
+		end
 		
-		
+		jumping[unitID]='launch'
+
 		local halfJump
 		local jumped
 		local i = 0
 		while i <= duration*1.5 do
-			--NOTE: Its really important for UnitDestroyed() to run before GameFrame(). UnitDestroyed() must run first to update jumping & lastJump table for morphed unit.
-			if GG.wasMorphedTo[unitID] then
-				unitID,reloadTime,env,cob,speed = CopyJumpData(unitID, vector[2])
+			if GG.wasMorphedTo[unitID] then --morphed during jump
+				unitID,reloadTime,env,speed = CopyJumpData(unitID, vector[2])
 				if unitID == nil then 
 					return
 				end
@@ -367,7 +359,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then
 				return --unit died
 			end
-			if (not jumping[unitID] ) or ( jumping[unitID]=="landed" ) then
+			if (not jumping[unitID] ) or ( jumping[unitID]=='landed' ) then
 				break --jump aborted (skip to refreshing reload bar)
 			end
 			
@@ -384,23 +376,24 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 					jumped = true
 				end
 				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
-				local currFallSpeed = verticalLaunchVel - defFallGravity*(i) 
+				local currVertSpeed = verticalLaunchVel - defFallGravity*(i) 
 				local vx,vy,vz= spGetUnitVelocity(unitID)
-				local collide = type(jumping[unitID])== 'number'
-				jumping[unitID] = true
-				local jumpDiffer =desiredVerticalSpeed - vy --calculate correction
-				local nominalDiffer = currFallSpeed - vy
-				if collide and halfJump and nominalDiffer < 0 then --collide while going down
+				local collide = (jumping[unitID] == 'collide')
+				jumping[unitID]= 'airborne'
+				local vertSpeedDiff =desiredVerticalSpeed - vy --calculate correction
+				local fallOnFeet = halfJump and (currVertSpeed - vy < 0.01) -- negative of expected speed when going down
+				if collide and fallOnFeet then
 					--spSetUnitVelocity(unitID,0,0,0) --stop unit
 					impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0}
-					impulseQueue[#impulseQueue+1] = {unitID, -vx*0.9, -vy*0.9-4, -vz*0.9} --slowdown to stop
+					impulseQueue[#impulseQueue+1] = {unitID, -vx*0.5, -vy*0.5-4, -vz*0.5} --slowdown by half
 					break --jump aborted (skip to refreshing reload bar)
+				else --fix vertical velocity difference (fight Newton from pushing unit into space)
+					local sign = math.abs(vertSpeedDiff)/vertSpeedDiff
+					vertSpeedDiff = sign*math.min(math.abs(vertSpeedDiff),verticalLaunchVel) --cap maximum correction to launch impulse (safety against 'physic glitch': violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
+					impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
+					impulseQueue[#impulseQueue+1] = {unitID, 0, vertSpeedDiff-4, 0} --add correction impulse
+					----Spring.Echo("----"); speedProfile[#speedProfile+1]=vy; Spring.Echo(vertSpeedDiff)
 				end
-				local sign = math.abs(jumpDiffer)/jumpDiffer
-				jumpDiffer = sign*math.min(math.abs(jumpDiffer),verticalLaunchVel) --cap maximum correction to launch impulse (safety against 'physic glitch': violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
-				impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
-				impulseQueue[#impulseQueue+1] = {unitID, 0, jumpDiffer-4, 0} --add correction impulse
-				----Spring.Echo("----"); speedProfile[#speedProfile+1]=vy; Spring.Echo(jumpDiffer)
 			end
 		
 			if rotateMidAir then -- allow unit to maintain posture in the air
@@ -409,17 +402,10 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0)-- keep current heading .
 			end
 			
-			if cob then
-				spCallCOBScript(unitID, "Jumping", 1, i/duration * 100)
-			else
-				Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i/duration * 100)
-			end
+			Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i/duration * 100)
+			
 			if (not halfJump and i/duration > 0.5) then
-				if cob then
-					spCallCOBScript( unitID, "HalfJump", 0)
-				else
-					Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
-				end
+				Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
 				halfJump = true
 			end
 			Sleep()
@@ -428,33 +414,41 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			end
 		end
 		
-		if cob then
-			spCallCOBScript( unitID, "EndJump", 0)
-		else
-			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
-		end
+		Spring.UnitScript.CallAsUnit(unitID,env.endJump)
+		
 		local jumpEndTime = spGetGameSeconds()
 		lastJump[unitID] = jumpEndTime
 		lastJumpPosition[unitID] = origCmdParams
-		jumping[unitID] = false
+		jumping[unitID] = nil
 		SetLeaveTracks(unitID, true)
 		
 		if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
 			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
 			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
 		end
+
 		spSetUnitRulesParam(unitID,"jumpReloadStart",jumpEndTime)
-		for j=1, reloadTime do
-			if GG.wasMorphedTo[unitID] then
+		
+		local reloadSpeed = 1/reloadTime
+		local reloadAmount = reloadSpeed
+		
+		while reloadAmount < 1 do
+			if GG.wasMorphedTo[unitID] then --morphed while reloading jump
 				unitID,reloadTime = CopyJumpData (unitID, vector[2])
-				lastJump[unitID] = jumpEndTime
-				jumping[unitID] = false
-				SetLeaveTracks(unitID, true)
 				if unitID == nil then 
 					return
-				end			
+				end
+				lastJump[unitID] = jumpEndTime
+				lastJumpPosition[unitID] = origCmdParams
+				jumping[unitID] = nil
+				SetLeaveTracks(unitID, true)
+				--resume reload from previous progress but use new speed
+				reloadSpeed = 1/reloadTime
 			end
-			spSetUnitRulesParam(unitID,"jumpReload",j/reloadTime)
+			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
+			local reloadFactor = (stunnedOrInbuild and 0) or spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
+			spSetUnitRulesParam(unitID,"jumpReload",reloadAmount)
 			Sleep()
 		end
 	end
@@ -496,7 +490,7 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision
 	if jumping[unitID] and (weaponDefID == -3) and attackerID == nil then
-		jumping[unitID] = 1 --signal to jump loop that a collision is occurring (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
+		jumping[unitID] = 'collide' --signal to jump loop (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
 		if GG.SetUnitFallDamageImmunity then
 			local immunityPeriod = spGetGameFrame()+30
 			GG.SetUnitFallDamageImmunity(unitID, immunityPeriod) --this unit immune to unit-to-unit collision damage
@@ -508,7 +502,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- ground collision
 	if jumping[unitID] and weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
 		spSetUnitVelocity(unitID,0,Game.gravity*3/30/30,0) --add some bounce upward to escape 'physic glitch'
-		jumping[unitID] = "landed" --abort jump. Note: we do not assign NIL because jump is not yet completed and we do not want a 2nd mid-air jump just because CommandFallback() sees NIL.
+		jumping[unitID] = 'landed' --abort jump. Note: we do not assign NIL because jump is not yet completed and we do not want a 2nd mid-air jump just because CommandFallback() sees NIL.
 		return 0  -- no collision damage.
 	end
 	return damage
@@ -553,15 +547,20 @@ function gadget:AllowCommand_GetWantedCommand()
 	return true
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
-	boolDef = {}
-	for udid,_ in pairs(jumpDefs) do
-		boolDef[udid] = true
-	end
+local boolDef = {}
+for udid,_ in pairs(jumpDefs) do
+	boolDef[udid] = true
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return boolDef
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if (jumpDefs[unitDefID].noJumpHandling) then 
+		return true
+	end
+	
 	if goalSet[unitID] then
 		goalSet[unitID] = nil
 	end	
@@ -581,6 +580,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if (not jumpDefs[unitDefID]) then --ignore non-jumpable unit
 		return false
 	end
+
+	if (jumpDefs[unitDefID].noJumpHandling) then
+		return true, false
+	end
 	
 	if (cmdID ~= CMD_JUMP) then
 		return false
@@ -596,7 +599,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 
 	if lastJumpPosition[unitID] then
 		if abs(lastJumpPosition[unitID][1] - cmdParams[1]) < 1 and 
-				abs(lastJumpPosition[unitID][2] - cmdParams[2]) < 1 and 
 				abs(lastJumpPosition[unitID][3] - cmdParams[3]) < 1 then
 			return true, true -- command was used, remove it (unit finished jump)
 		end
