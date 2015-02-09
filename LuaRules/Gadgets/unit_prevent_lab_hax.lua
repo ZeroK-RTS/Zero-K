@@ -225,8 +225,8 @@ end
 
 function gadget:UnitGiven(unitID, unitDefID,unitTeam)
 	if (labs[unitID]) then
-		labList.data[lab[unitID]].ally = spGetUnitAllyTeam(unitID)
-		labList.data[lab[unitID]].team = unitTeam
+		labList.data[labs[unitID]].ally = spGetUnitAllyTeam(unitID)
+		labList.data[labs[unitID]].team = unitTeam
 	end
 end
 
