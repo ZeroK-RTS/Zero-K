@@ -889,7 +889,7 @@ end
 
 local lastTeamNe = {}
 function gadget:GameFrame(n)
-	if (n%32 == 1) then
+	if (n%TEAM_SLOWUPDATE_RATE == 1) then
 		lowPowerUnits.inner = {count = 0, units = {}}
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
 			
