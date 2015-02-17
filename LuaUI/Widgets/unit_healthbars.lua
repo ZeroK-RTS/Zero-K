@@ -619,7 +619,7 @@ do
 	if not stunned then
       local slowMult = GetUnitRulesParam(unitID,"slowState")
       if slowMult and slowMult > 0 then
-        slowedUnits[#disarmUnits+1] = {unitID, slowMult}
+        slowedUnits[#slowedUnits+1] = {unitID, slowMult}
       end
 	end
   end
