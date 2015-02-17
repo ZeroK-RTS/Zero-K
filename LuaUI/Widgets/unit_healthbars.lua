@@ -191,6 +191,7 @@ local cx, cy, cz = 0,0,0;  --// camera pos
 
 local paraUnits   = {};
 local disarmUnits = {};
+local slowedUnits = {};
 local onFireUnits = {};
 local UnitMorphs  = {};
 
@@ -613,6 +614,14 @@ do
         disarmUnits[#disarmUnits+1]=unitID
       end
 	end
+
+	--// SLOW
+	if not stunned then
+      local slowMult = GetUnitRulesParam(unitID,"slowState")
+      if slowMult and slowMult > 0 then
+        slowedUnits[#slowedUnits+1] = {unitID, slowMult}
+      end
+	end
   end
 
   function DrawUnitInfos(unitID,unitDefID, ud)
@@ -764,7 +773,7 @@ do
 	  --// CAPTURE RECHARGE
 	  local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
       if (captureReloadState and captureReloadState > 0) then
-		local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
+		local capture = 1-(captureReloadState-gameFrame)/360
         AddBar("capture reload",capture,"reload",(fullText and floor(capture*100)..'%') or '')
       end
 	  
@@ -830,6 +839,9 @@ do
 	  --// SLOW
       local slowState = GetUnitRulesParam(unitID,"slowState")
       if (slowState and (slowState>0)) then
+		if not stunned then
+			slowedUnits[#slowedUnits+1]={unitID, slowState}
+		end
         AddBar("slow",slowState*2,"slow",(fullText and floor(slowState*100)..'%') or '')
       end
 	  
@@ -979,7 +991,7 @@ do
 
   function DrawOverlays()
     --// draw an overlay for stunned or disarmed units
-    if (drawStunnedOverlay) and ((#paraUnits>0) or (#disarmUnits>0)) then
+    if (drawStunnedOverlay) and ((#paraUnits>0) or (#disarmUnits>0) or (#slowedUnits>0)) then
       glDepthTest(true)
       glPolygonOffset(-2, -2)
       glBlending(GL_SRC_ALPHA, GL_ONE)
@@ -997,7 +1009,14 @@ do
           glUnit(disarmUnits[i],true)
         end
 	  end
-      local shift = widgetHandler:GetHourTimer() / 20
+      if (#slowedUnits>0) then
+        for i=1,#slowedUnits do
+		  local slowData = slowedUnits[i]
+          glColor(0.5,0.1,0.7,alpha*slowData[2])
+          glUnit(slowData[1],true)
+        end
+	  end
+	  local shift = widgetHandler:GetHourTimer() / 20
 
       glTexCoord(0,0)
       glTexGen(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR)
@@ -1032,6 +1051,7 @@ do
 
       paraUnits = {}
 	  disarmUnits = {}
+	  slowedUnits = {}
     end
 
     --// overlay for units on fire
