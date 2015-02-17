@@ -1041,14 +1041,6 @@ do
           glUnit(disarmUnits[i],true)
         end
 	  end
-	  if (#slowedUnits>0) then
-	    glTexture("LuaUI/Images/disarmed.png")
-        for i=1,#disarmUnits do
-		  local slowData = slowedUnits[i]
-          glColor(0.5,0.1,0.7,alpha*slowData[2])
-          glUnit(slowData[1],true)
-        end
-	  end
 	  
       glTexture(false)
       glTexGen(GL_T, false)
