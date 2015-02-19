@@ -332,7 +332,7 @@ end
 if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if name == "factorytank" then
-			ud.yardmap = "oooooooooo oooooooooo oooooooooo oocccccccoo oocccccccoo yoccccccoy yoccccccoy yyccccccyy"
+			ud.yardmap = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo yoccccccoy yoccccccoy yyccccccyy"
 		elseif name == "factoryveh" then
 			ud.yardmap = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco"
 		elseif name == "factorycloak" then
