@@ -73,6 +73,9 @@ local Sounds = {
 --------------------------------------------------------------------------------
 local VFSUtils = VFS.Include('gamedata/VFSUtils.lua')
 
+local optionOverrides = {
+}
+
 local defaultOpts = {
 	pitchMod = 0, --0.02,
 	gainMod = 0,
