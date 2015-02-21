@@ -14,7 +14,7 @@ function gadget:GetInfo()
     date      = "21 January 2015",
     license   = "ZK's default license",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
