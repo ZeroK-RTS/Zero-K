@@ -56,7 +56,7 @@ local labs = {}
 local labList = {count = 0, data = {}}
 
 local function removeLab(unitID)
-	labs[labList.data[labList.count] ] = labs[unitID]
+	labs[labList.data[labList.count].unitID ] = labs[unitID]
 	labList.data[labs[unitID] ] = labList.data[labList.count]
 	labList.data[labList.count] = nil
 	labs[unitID] = nil
@@ -192,7 +192,8 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 			end
 			
 			labList.count = labList.count + 1
-			labList.data[labList.count] = { 
+			labList.data[labList.count] = {
+				unitID = unitID,
 				ally = ally, 
 				team = teamID, 
 				face = 0,
