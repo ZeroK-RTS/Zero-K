@@ -57,7 +57,7 @@ local labList = {count = 0, data = {}}
 
 local function removeLab(unitID)
 	labs[labList.data[labList.count] ] = labs[unitID]
-	labList.data[labs[unitID]] = labList.data[labList.count]
+	labList.data[labs[unitID] ] = labList.data[labList.count]
 	labList.data[labList.count] = nil
 	labs[unitID] = nil
 	labList.count = labList.count - 1
@@ -74,7 +74,7 @@ function checkLabs(checkFeatures)
 		units = spGetUnitsInRectangle(data.minx-8, data.minz-8, data.maxx+8, data.maxz+8)
 		features = spGetFeaturesInRectangle(data.minx, data.minz, data.maxx, data.maxz)
 
-		for i=1,#units do
+		for i=1, #units do
 			local unitID = units[i]
 			local unitDefID = spGetUnitDefID(unitID)
 			local ud = UnitDefs[unitDefID]
@@ -143,7 +143,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID,teamID)
 	local ud = UnitDefs[unitDefID]
 	if (ud.isFactory == true) and not (EXCEPTION_LIST[ud.name]) then
-		local ux,_,uz,_, uy, _  = spGetUnitPosition(unitID, true)
+		local ux,_,uz,_,uy,_ = spGetUnitPosition(unitID, true)
 		if uy > -22 then
 			local face = spGetUnitBuildFacing(unitID)
 			local xsize = (ud.xsize)*4
@@ -155,7 +155,7 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 			local miny = uy + offsetY - sizeY/2 --set the box bottom
 			local maxy = uy + offsetY + 150 --set the box height +200 elmo above the factory midpoint
 			
-			if ((face == 0) or (face == 2))  then
+			if ((face == 0) or (face == 2)) then
 				if xsize%16 == 0 then
 					ux = math.floor((ux+8)/16)*16
 				else
@@ -194,7 +194,7 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 			labList.count = labList.count + 1
 			labList.data[labList.count] = { 
 				ally = ally, 
-				team=teamID, 
+				team = teamID, 
 				face = 0,
 				minx = minx,
 				miny = miny,
@@ -225,8 +225,8 @@ end
 
 function gadget:UnitGiven(unitID, unitDefID,unitTeam)
 	if (labs[unitID]) then
-		labList.data[labs[unitID]].ally = spGetUnitAllyTeam(unitID)
-		labList.data[labs[unitID]].team = unitTeam
+		labList.data[labs[unitID] ].ally = spGetUnitAllyTeam(unitID)
+		labList.data[labs[unitID] ].team = unitTeam
 	end
 end
 
