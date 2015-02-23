@@ -845,9 +845,20 @@ function gadget:GameStart()
 		Spring.SetTeamResource(team, "metal", 0)
 	end
 	
-    local _,playerID,isDead,isAI = spGetTeamInfo(team)
-
-    if team ~= gaiateam and not isDead then
+	local _,playerID,isDead,isAI = spGetTeamInfo(team)
+	if (isDead) then Spring.Echo("game_message: isdead " .. team) end
+	isDead = true
+	local playersInTeam = spGetPlayerList(team)
+	for j=1,#playersInTeam do
+		local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
+		if not spec then
+			isDead = false -- someone on this team is a player!
+			break
+		end
+	end
+	if (isDead) then Spring.Echo("game_message: isdead2 " .. team) end
+	
+	if team ~= gaiateam and not isDead then
 	  local luaAI = Spring.GetTeamLuaAI(team)
 	  if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
 		waitingForComm[team] = true
@@ -858,7 +869,7 @@ function gadget:GameStart()
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
         if playerlist and (#playerlist > 0) then
           for i=1,#playerlist do
-          	local _,_,spec = spGetPlayerInfo(playerlist[i])
+            local _,_,spec = spGetPlayerInfo(playerlist[i])
             if (not spec) then
               SpawnStartUnit(team, playerlist[i])
             end
