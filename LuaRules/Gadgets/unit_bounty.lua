@@ -10,6 +10,8 @@ function gadget:GetInfo()
   }
 end
 
+include("LuaRules/Configs/constants.lua")
+
 local TESTMODE = false
 local BOUNTYTIME = 60*5
 
@@ -150,7 +152,7 @@ local timerPeriod = 5
 
 function gadget:GameFrame(f)
 	
-	if f % (32*timerPeriod) == 0 then
+	if f % (TEAM_SLOWUPDATE_RATE*timerPeriod) == 0 then
 		for unitID, teamData in pairs(bounty) do
 			local bountiesLeft = false
 			for teamID, bData in pairs(teamData) do

@@ -3,6 +3,7 @@ banisher_fire.wav
 
 Open LieroX:
 large_missile_fire.wav
+heavy_missile_fire.wav
 missile2_fire.wav
 missile2_fire_bass.wav
 missile2_hit.wav

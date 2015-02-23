@@ -294,7 +294,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 end
 
 function gadget:GameFrame(n)
-	if n % 32 == 1 then 
+	if n % TEAM_SLOWUPDATE_RATE == 1 then 
 		TeamScale = {}
 		local teams = spGetTeamList()
 		for i=1,#teams do
