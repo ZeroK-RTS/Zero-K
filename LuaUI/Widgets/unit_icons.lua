@@ -279,8 +279,8 @@ function widget:DrawWorld()
 	local fade = min( abs((gameFrame % 60) - 20) / 20, 1 )
 	
 	gl.Color(1,1,1,1)
-	glDepthMask(true)
-	glDepthTest(true)
+	-- glDepthMask(true)
+	-- glDepthTest(true)
 	glAlphaTest(GL_GREATER, 0.001)
 	
 	--for texture, units in pairs(textureUnitsXshift) do
@@ -322,7 +322,7 @@ function widget:DrawWorld()
 	
 	glAlphaTest(false)
 	glDepthTest(false)
-	glDepthMask(false)
+	-- glDepthMask(false)
 end
 
 -- drawscreen method

@@ -213,6 +213,7 @@ function widget:DrawWorld()
 			end
 		end
 	--draw hovering text that mention player's name.
+	glDepthTest(false)
 	for unitID, attributes in pairs(comms) do
 		local heading = GetUnitHeading(unitID)
 		if (not heading) then
@@ -229,7 +230,7 @@ function widget:DrawWorld()
 	glAlphaTest(false)
 	glColor(1,1,1,1)
 	glTexture(false)
-	glDepthTest(false)
+	-- glDepthTest(false)
 	end
 end
 
