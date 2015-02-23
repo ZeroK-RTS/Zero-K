@@ -82,6 +82,7 @@ end
 local spGetTeamInfo 		= Spring.GetTeamInfo
 local spGetPlayerInfo 		= Spring.GetPlayerInfo
 local spGetSpectatingState 	= Spring.GetSpectatingState
+local spGetPlayerList		= Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
 local startMode = Spring.GetModOption("startingresourcetype",false,"facplop")
