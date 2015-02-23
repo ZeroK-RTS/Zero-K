@@ -846,13 +846,15 @@ function gadget:GameStart()
 		Spring.SetTeamResource(team, "metal", 0)
 	end
 	
+	--check if team resigned before game started
 	local _,playerID,isDead,isAI = spGetTeamInfo(team)
 	Spring.Echo("game_message: playerID " .. playerID .. " team " .. team)
 	if (isAI) then Spring.Echo("game_message: isAI ") end
 	if (isDead) then Spring.Echo("game_message: isdead ") end
-	isDead = true
+	isDead = false
 	local playersInTeam = spGetPlayerList(team)
 	if (not isAI) then
+		isDead = true
 		for j=1,#playersInTeam do
 			local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
 			if not spec then
