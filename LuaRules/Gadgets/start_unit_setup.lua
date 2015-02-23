@@ -825,6 +825,23 @@ local function workAroundSpecsInTeamZero(playerlist, team)
   return playerlist
 end
 
+--[[
+   This function return true if everyone in the team resigned.
+   This function is alternative to "isDead" from: "_,_,isDead,isAI = spGetTeamInfo(team)"
+   because "isDead" failed to return true when human team resigned before GameStart() event.
+--]]
+local function IsTeamResigned(team)
+	local playersInTeam = spGetPlayerList(team)
+	for j=1,#playersInTeam do
+		local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
+		if not spec then
+			return false
+			break
+		end
+	end
+	return true
+end
+
 function gadget:GameStart()
 	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
 		return
@@ -846,26 +863,11 @@ function gadget:GameStart()
 		Spring.SetTeamResource(team, "metal", 0)
 	end
 	
-	--check if team resigned before game started
-	local _,playerID,isDead,isAI = spGetTeamInfo(team)
-	Spring.Echo("game_message: playerID " .. playerID .. " team " .. team)
-	if (isAI) then Spring.Echo("game_message: isAI ") end
-	if (isDead) then Spring.Echo("game_message: isdead ") end
-	isDead = false
-	local playersInTeam = spGetPlayerList(team)
-	if (not isAI) then
-		isDead = true
-		for j=1,#playersInTeam do
-			local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
-			if not spec then
-				isDead = false -- someone on this team is a player!
-				break
-			end
-		end
-	end
-	if (isDead) then Spring.Echo("game_message: isdead2 " .. team) end
+	--check if player resigned before game started
+	local _,playerID,_,isAI = spGetTeamInfo(team)
+	local deadPlayer = (not isAI) and IsTeamResigned(team)
 	
-	if team ~= gaiateam and not isDead then
+	if team ~= gaiateam and not deadPlayer then
 	  local luaAI = Spring.GetTeamLuaAI(team)
 	  if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
 		waitingForComm[team] = true
