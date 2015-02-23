@@ -845,11 +845,11 @@ function gadget:GameStart()
 		Spring.SetTeamResource(team, "metal", 0)
 	end
 	
+    local _,playerID,isDead,isAI = spGetTeamInfo(team)
 
-    if team ~= gaiateam then
+    if team ~= gaiateam and not isDead then
 	  local luaAI = Spring.GetTeamLuaAI(team)
-	  if luaAI and string.find(string.lower(luaAI), "chicken") then
-	  else
+	  if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
 		waitingForComm[team] = true
 	  end
       if coop then
@@ -868,7 +868,6 @@ function gadget:GameStart()
           SpawnStartUnit(team, nil, true)
         end
       else -- no coop
-        local _,playerID,_,isAI = spGetTeamInfo(team)
         if (playerID) then
           local _,_,spec,teamID = spGetPlayerInfo(playerID)
           if (teamID == team and not spec) then
