@@ -847,14 +847,18 @@ function gadget:GameStart()
 	end
 	
 	local _,playerID,isDead,isAI = spGetTeamInfo(team)
-	if (isDead) then Spring.Echo("game_message: isdead " .. team) end
+	Spring.Echo("game_message: playerID " .. playerID .. " team " .. team)
+	if (isAI) then Spring.Echo("game_message: isAI ") end
+	if (isDead) then Spring.Echo("game_message: isdead ") end
 	isDead = true
 	local playersInTeam = spGetPlayerList(team)
-	for j=1,#playersInTeam do
-		local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
-		if not spec then
-			isDead = false -- someone on this team is a player!
-			break
+	if (not isAI) then
+		for j=1,#playersInTeam do
+			local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
+			if not spec then
+				isDead = false -- someone on this team is a player!
+				break
+			end
 		end
 	end
 	if (isDead) then Spring.Echo("game_message: isdead2 " .. team) end
