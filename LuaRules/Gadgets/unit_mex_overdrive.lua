@@ -1288,7 +1288,7 @@ local function AddMex(unitID, teamID, metalMake)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 		
-		if teamID then
+		if teamID and not communismOverdrive then
 			local refundTime = 400/metalMake
 			mexByID[unitID].refundTeamID = teamID
 			mexByID[unitID].refundTime = refundTime
