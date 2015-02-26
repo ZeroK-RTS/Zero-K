@@ -68,7 +68,7 @@ unitDef = {
   turnRate         = 0,
   waterline        = 1,
   workerTime       = 10,
-  yardMap          = [[xoccccoxooccccooooccccooooccccooooccccooooccccooooccccooxoccccox]],
+  yardMap          = [[xooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox]],
 
   featureDefs      = {
 

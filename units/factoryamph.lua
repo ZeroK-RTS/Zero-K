@@ -62,7 +62,7 @@ unitDef = {
   showNanoSpray    = false,
   sightDistance    = 273,
   workerTime       = 10,
-  yardMap          = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],
+  yardMap          = [[ooooooo ooooooo ooooooo occccco occccco occccco ccccccc]],
 
   featureDefs      = {
 

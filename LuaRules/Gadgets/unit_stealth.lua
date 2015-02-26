@@ -41,6 +41,7 @@ end
 --------------------------------------------------------------------------------
 
 include("LuaRules/Configs/customcmds.h.lua")
+include("LuaRules/Configs/constants.lua")
 
 local SetUnitStealth    = Spring.SetUnitStealth
 local UseUnitResource   = Spring.UseUnitResource
@@ -93,7 +94,7 @@ local function AddStealthUnit(unitID, stealthDef)
     def     = stealthDef,
     draw    = stealthDef.draw,
     active  = stealthDef.init,
-    energy  = stealthDef.energy / 32,
+    energy  = stealthDef.energy / TEAM_SLOWUPDATE_RATE,
 	tieToCloak = stealthDef.tieToCloak
   }
   stealthUnits[unitID] = stealthData
