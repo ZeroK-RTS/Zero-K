@@ -512,7 +512,7 @@ local options = {
     step   = 1,
   },
   {
-    key    = 'MetalMult',
+    key    = 'metalmult',
     name   = 'Metal Extraction Multiplier',
     desc   = 'Multiplies metal extraction rate. For use in large team games when there are fewer mexes per player.',
     type   = 'number',
@@ -524,7 +524,7 @@ local options = {
                     -- (step <= 0) means that there is no quantization
   },
   {
-    key    = 'EnergyMult',
+    key    = 'energymult',
     name   = 'Energy Production Multiplier',
     desc   = 'Useful for speed games without relying on map units.',
     type   = 'number',
