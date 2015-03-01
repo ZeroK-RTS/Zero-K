@@ -50,7 +50,8 @@ function gadget:GameFrame(n)
 		local data = unitsByID[unitID]
 		local stocked, queued = Spring.GetUnitStockpile(unitID)
 		local stunned_or_inbuild, stunned, inbuild = Spring.GetUnitIsStunned(unitID)
-		if (not stunned_or_inbuild) and queued > stocked then
+		local disarmed = (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
+		if (not (stunned_or_inbuild or disarmed)) and queued > stocked then
 			local def = stockpileUnitDefID[data.unitDefID]
 			if not data.active then
 				GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
