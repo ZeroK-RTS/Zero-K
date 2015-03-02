@@ -836,7 +836,6 @@ local function IsTeamResigned(team)
 		local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
 		if not spec then
 			return false
-			break
 		end
 	end
 	return true
