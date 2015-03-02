@@ -2097,7 +2097,7 @@ local function CreateHpBar(name)
 				padding = {0,0,0,0},
 				color = {0,1,0,1},
 				max=1,
-				caption = 'a',
+				caption = '',
 			},
 		},
 	}
@@ -2128,7 +2128,7 @@ local function CreateBpBar(name)
 				padding = {0,0,0,0},
 				color = {0.8,0.8,0.2,1};
 				max=1,
-				caption = 'a',
+				caption = '',
 			},
 		},
 	}
@@ -2158,7 +2158,7 @@ local function CreateShieldBar(name)
 				padding = {0,0,0,0},
 				color = {0.3,0,0.9,1};
 				max=1,
-				caption = 'a',
+				caption = '',
 			},
 		},
 	}
