@@ -582,9 +582,11 @@ upgrades = {
 	
 	module_areashield = {
 		name = "Area Shield",
-		description = "Bubble shield that protects surrounding units within 300 m",
+		description = "A bubble shield that protects surrounding units within 350 m",
 		func = function(unitDef)
-				ApplyWeapon(unitDef, "commweapon_areashield", 2)
+				--ApplyWeapon(unitDef, "commweapon_areashield", 2)
+				ReplaceWeapon(unitDef, "commweapon_personal_shield", "commweapon_areashield")
+
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
 				table.insert(unitDef.customparams.lups_unit_fxs, "commAreaShield")
 			end,
