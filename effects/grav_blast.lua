@@ -331,6 +331,20 @@ return {
   },
 
   ["grav_danger_spikes"] = {
+    nuke_600 = {
+      air                = true,
+      ground             = true,
+      water              = true,
+      underwater         = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      properties = {
+        delay              = 0.5,
+        dir                = [[dir]],
+        explosiongenerator = [[custom:NUKE_600]],
+        pos                = [[0, 20, 0]],
+      },
+    },
     spikes = {
       class              = [[CExpGenSpawner]],
       count              = 25,
@@ -371,18 +385,18 @@ return {
         pos                = [[0, 75, 0]],
       },
     },
-    smoke = {
-      class              = [[CExpGenSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = 50,
-        dir                = [[dir]],
-        explosiongenerator = [[custom:leveler_clouds_large]],
-        pos                = [[0, 75, 0]],
-      },
-    },
+    --smoke = {
+    --  class              = [[CExpGenSpawner]],
+    --  count              = 1,
+    --  ground             = true,
+    --  water              = true,
+    --  properties = {
+    --    delay              = 50,
+    --    dir                = [[dir]],
+    --    explosiongenerator = [[custom:leveler_clouds_large]],
+    --    pos                = [[0, 75, 0]],
+    --  },
+    --},
   },
 
   ["leveler_clouds_large"] = {
