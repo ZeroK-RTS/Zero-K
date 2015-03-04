@@ -20,6 +20,8 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  no unsynced code
 end
 
+include("LuaRules/Configs/constants.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -30,12 +32,12 @@ local unitsByID = {}
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
 	if (udef.customParams.stockpiletime) then
-		local stockTime = tonumber(udef.customParams.stockpiletime)*30
+		local stockTime = tonumber(udef.customParams.stockpiletime)*TEAM_SLOWUPDATE_RATE
 		local stockCost = tonumber(udef.customParams.stockpilecost)
 		stockpileUnitDefID[i] = {
 			stockTime = stockTime,
 			stockCost = stockCost,
-			stockDrain = 30*stockCost/stockTime,
+			stockDrain = TEAM_SLOWUPDATE_RATE*stockCost/stockTime,
 			resTable = {
 				m = stockCost/stockTime,
 				e = stockCost/stockTime
@@ -49,17 +51,18 @@ function gadget:GameFrame(n)
 		local unitID = units.data[i]
 		local data = unitsByID[unitID]
 		local stocked, queued = Spring.GetUnitStockpile(unitID)
-		local stunned_or_inbuild, stunned, inbuild = Spring.GetUnitIsStunned(unitID)
+		local stunned_or_inbuild, stunned, inbuild = Spring.GetUnitIsStunned(unitID) 
 		local disarmed = (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)
-		if (not (stunned_or_inbuild or disarmed)) and queued > stocked then
-			local def = stockpileUnitDefID[data.unitDefID]
+		local def = stockpileUnitDefID[data.unitDefID]
+		if (not (stunned_or_inbuild or disarmed)) and queued > stocked  then
 			if not data.active then
-				GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
+				if def.stockCost > 0 then
+					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
+				end
 				data.active = true
 			end
-		
-			local allow = GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m)
-			if allow and (Spring.UseUnitResource(unitID, def.resTable)) then
+
+			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m) and Spring.UseUnitResource(unitID, def.resTable)) then
 				data.progress = data.progress - 1
 				if data.progress == 0 then
 					Spring.SetUnitStockpile(unitID, stocked + 1)
@@ -69,7 +72,9 @@ function gadget:GameFrame(n)
 			end
 		else
 			if data.active then
-				GG.StopMiscPriorityResourcing(unitID,data.teamID)
+				if def.stockCost > 0 then
+					GG.StopMiscPriorityResourcing(unitID,data.teamID)
+				end
 				data.active = false
 			end
 		end
@@ -88,7 +93,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 			teamID = teamID, 
 			active = false
 		}
-		GG.AddMiscPriorityUnit(unitID, teamID)
+		if def.stockCost > 0 then
+			GG.AddMiscPriorityUnit(unitID, teamID)
+		end
 	end
 end
 
