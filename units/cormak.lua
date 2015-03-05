@@ -142,6 +142,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
+      flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 32,
@@ -179,6 +180,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
+      flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 300,
