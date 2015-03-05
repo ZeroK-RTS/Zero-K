@@ -2,7 +2,7 @@ function widget:GetInfo()
 	return {
 		name      = "Lasso Terraform GUI",
 		desc      = "Interface for lasso terraform.",
-		author    = "Google Frog",
+		author    = "Google Frog", --also tweaked by xponen
 		version   = "v1",
 		date      = "Nov, 2009",
 		license   = "GNU GPL, v2 or later",
@@ -1536,6 +1536,7 @@ end
 
 function widget:Initialize()
 	widgetHandler:RegisterGlobal(self,"CommandNotifyMex", CommandNotifyMex) --an event which is called everytime "cmd_mex_placement.lua" widget handle a mex command. Note that "self" is added because this widget is tagged "handler=true"
+	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle --MUST Initialize like this! or else the very act of putting the file in Widget folder will add these function into WG.
 end
 
 --	receive broadcasted event from "cmd_mex_placement.lua"
@@ -1663,7 +1664,7 @@ function widget:CommandNotify(id,pos,options)
 	--]]
 end
 
-function WG.Terraform_SetPlacingRectangle(unitDefID)
+function Terraform_SetPlacingRectangle(unitDefID)
 	
 	-- Do no terraform with pregame placement.
 	if Spring.GetGameFrame() < 1 then
