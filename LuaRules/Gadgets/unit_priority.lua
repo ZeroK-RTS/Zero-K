@@ -71,10 +71,15 @@ local UnitPriority = {}  --  UnitPriority[unitID] = 0,1,2     priority of the un
 local UnitMiscPriority = {}  --  UnitMiscPriority[unitID] = 0,1,2     priority of the unit
 local TeamPriorityUnits = {}  -- TeamPriorityUnits[TeamID][UnitID] = 0,2    which units are low/high priority builders
 local teamMiscPriorityUnits = {} -- teamMiscPriorityUnits[TeamID][UnitID] = 0,2    which units are low/high priority builders
-local TeamScale = {}  -- TeamScale[TeamID]= {0.1, 0.4}   how much to scale down production of lnormal and low prirotity units
+local TeamScale = {}  -- TeamScale[TeamID] = {0, 0.4, 1} how much to scale resourcing at different incomes
+local TeamScaleEnergy = {} -- TeamScaleEnergy[TeamID] = {0, 0.4, 1} how much to scale energy only resourcing
 local TeamMetalReserved = {} -- how much metal is reserved for high priority in each team
 local TeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
+local UnitOnlyEnergy = {} -- UnitOnlyEnergy[unitID] = true if the unit does not try to drain metal
+local MiscUnitOnlyEnergy = {} -- MiscUnitOnlyEnergy[unitID] for misc drain
+
+local checkOnlyEnergy = false -- becomes true onces every second to check for repairers
 
 -- Derandomization of resource allocation. Remembers the portion of resources allocated to the unit and gives access
 -- when they have a full chunk.
@@ -126,7 +131,9 @@ local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
+local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 
 
 local function SetMetalReserved(teamID, value)
@@ -193,7 +200,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   return true, true  -- command was used, remove it
 end
 
-local function AllowMiscBuildStep(unitID,teamID)
+local function AllowMiscBuildStep(unitID,teamID,onlyEnergy)
 
 	local conAmount = UnitMiscPortion[unitID] or 0
 
@@ -201,32 +208,22 @@ local function AllowMiscBuildStep(unitID,teamID)
 		teamMiscPriorityUnits[teamID] = {} 
 	end
 	
-	if (UnitMiscPriority[unitID] == 0) then -- priority none/low
-		teamMiscPriorityUnits[teamID][unitID] = 0
-		local scale = TeamScale[teamID]
-		if scale and scale[2] then 
-			conAmount = conAmount + scale[2]
-			if conAmount >= 1 then  
-				UnitMiscPortion[unitID] = conAmount - 1
-				return true
-			else 
-				UnitMiscPortion[unitID] = conAmount
-				return false
-			end		
-		end
-		return true
+	local scale
+	if MiscUnitOnlyEnergy[unitID] then
+		scale = TeamScaleEnergy[teamID]
+	else
+		scale = TeamScale[teamID]
 	end
-
-	if (UnitMiscPriority[unitID] == 2) then  -- priority high
-		teamMiscPriorityUnits[teamID][unitID] = 2
-		return true
-	end 
 	
-	teamMiscPriorityUnits[teamID][unitID] = 1
+	if checkOnlyEnergy then
+		MiscUnitOnlyEnergy[unitID] = onlyEnergy
+	end
 	
-	local scale = TeamScale[teamID]
-	if scale and scale[1] then 
-		conAmount = conAmount + scale[1]
+	local priorityLevel = (UnitMiscPriority[unitID] or 1) + 1
+	
+	teamMiscPriorityUnits[teamID][unitID] = priorityLevel
+	if scale and scale[priorityLevel] then 
+		conAmount = conAmount + scale[priorityLevel]
 		if conAmount >= 1 then  
 			UnitMiscPortion[unitID] = conAmount - 1
 			return true
@@ -248,39 +245,41 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		--// Reclaiming isn't prioritized
 		return true
 	end
-
+	
 	local conAmount = UnitConPortion[builderID] or 0
 	if (TeamPriorityUnits[teamID] == nil) then 
 		TeamPriorityUnits[teamID] = {} 
 	end
 	
-	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then -- priority none/low
-		TeamPriorityUnits[teamID][builderID] = 0
-		local scale = TeamScale[teamID]
-		if scale and scale[2] then 
-			--if scale[2] is less than 1 then it has less chance of success. scale[2] is a ratio between available-resource and desired-spending.  scale[2] is less than 1 when desired-spending is bigger than available-resources.
-			conAmount = conAmount + scale[2]
-			if conAmount >= 1 then  
-				UnitConPortion[builderID] = conAmount - 1
-				return true
-			else 
-				UnitConPortion[builderID] = conAmount
-				return false
-			end		
-		end
-		return true
+	local scale
+	if UnitOnlyEnergy[builderID] then
+		scale = TeamScaleEnergy[teamID]
+	else
+		scale = TeamScale[teamID]
 	end
-
-	if (UnitPriority[unitID] == 2 or (UnitPriority[builderID] == 2 and (UnitPriority[unitID] or 1) == 1)) then  -- priority high
-		TeamPriorityUnits[teamID][builderID] = 2
-		return true
-	end 
 	
-	TeamPriorityUnits[teamID][builderID] = 1
+	if checkOnlyEnergy then
+		local _,_,inBuild = spGetUnitIsStunned(unitID)
+		if inBuild then
+			UnitOnlyEnergy[builderID] = false
+		else
+			UnitOnlyEnergy[builderID] = (spGetUnitRulesParam(unitID, "repairRate") or 1)
+		end
+	end
 	
-	local scale = TeamScale[teamID]
-	if scale and scale[1] then 
-		conAmount = conAmount + scale[1]
+	local priorityLevel 
+	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then
+		priorityLevel = 1
+	elseif (UnitPriority[unitID] == 2 or (UnitPriority[builderID] == 2 and (UnitPriority[unitID] or 1) == 1))  then
+		priorityLevel = 3
+	else
+		priorityLevel = 2
+	end
+	
+	TeamPriorityUnits[teamID][builderID] = priorityLevel
+	if scale and scale[priorityLevel] then 
+		-- scale is a ratio between available-resource and desired-spending.
+		conAmount = conAmount + scale[priorityLevel]
 		if conAmount >= 1 then  
 			UnitConPortion[builderID] = conAmount - 1
 			return true
@@ -288,128 +287,146 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 			UnitConPortion[builderID] = conAmount
 			return false
 		end		
-	end 
-	
+	end
 	return true
 end
 
 function gadget:GameFrame(n)
 	if n % TEAM_SLOWUPDATE_RATE == 1 then 
-		TeamScale = {}
+		local prioUnits, miscPrioUnits
+		
 		local teams = spGetTeamList()
 		for i=1,#teams do
 			local teamID = teams[i]
 			prioUnits = TeamPriorityUnits[teamID] or {}
-			local prioSpending = 0
-			local normalSpending = 0
-			local lowPrioSpending = 0
+			miscPrioUnits = teamMiscPriorityUnits[teamID] or {}
+			
+			local spending = {0,0,0}
+			local energySpending = {0,0,0}
+			
+			local realEnergyOnlyPull = 0
+			local scaleEnergy = TeamScaleEnergy[teamID]
+			
 			for unitID, pri in pairs(prioUnits) do  --add construction priority spending
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
-					if pri == 2 then 
-						prioSpending = prioSpending + UnitDefs[unitDefID].buildSpeed
-					elseif pri == 1 then
-						normalSpending = normalSpending + UnitDefs[unitDefID].buildSpeed
-					else 
-						lowPrioSpending = lowPrioSpending + UnitDefs[unitDefID].buildSpeed
-					end 
+					if UnitOnlyEnergy[unitID] then
+						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
+						energySpending[pri] = energySpending[pri] + buildSpeed*UnitOnlyEnergy[unitID]
+						if scaleEnergy and scaleEnergy[pri] then
+							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
+						end
+					else
+						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
+						spending[pri] = spending[pri] + buildSpeed
+					end
 				end 
 			end
 			
 			for unitID, drain in pairs(miscMetalDrain) do --add misc priority spending
 				local unitDefID = spGetUnitDefID(unitID)
-				local pri = teamMiscPriorityUnits[teamID] and teamMiscPriorityUnits[teamID][unitID]
+				local pri = miscPrioUnits[unitID]
 				if unitDefID ~= nil and pri then
-					if pri == 2 then 
-						prioSpending = prioSpending + drain
-					elseif pri == 1 then
-						normalSpending = normalSpending + drain
+					if MiscUnitOnlyEnergy[unitID] then
+						energySpending[pri] = energySpending[pri] + drain
+						if scaleEnergy and scaleEnergy[pri] then
+							realEnergyOnlyPull = realEnergyOnlyPull + drain*scaleEnergy[pri]
+						end
 					else
-						lowPrioSpending = lowPrioSpending + drain
-					end 
+						spending[pri] = spending[pri] + drain
+					end
 				end 
 			end 
 			
 			--SendToUnsynced("PriorityStats", teamID,  prioSpending, lowPrioSpending, n)   
 
-			local level, _, fakePull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
-			local elevel, _, epull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
+			local level, _, fakeMetalPull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
+			local elevel, _, fakeEnergyPull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
 			
 			-- Make sure the misc resoucing is constantly pulling the same value regardless of whether resources are spent
-			local pull = prioSpending + normalSpending + lowPrioSpending
-			epull = epull + pull - fakePull
+			local metalPull = spending[1] + spending[2] + spending[3]
+			local energyPull = fakeEnergyPull + metalPull - fakeMetalPull + energySpending[1] + energySpending[2] + energySpending[3] - realEnergyOnlyPull
 
-			spSetTeamRulesParam(teamID, "extraPull", pull - fakePull, ALLY_ACCESS)
+			spSetTeamRulesParam(teamID, "extraMetalPull", metalPull - fakeMetalPull, ALLY_ACCESS)
+			spSetTeamRulesParam(teamID, "extraEnergyPull", energyPull - fakeEnergyPull, ALLY_ACCESS)
 			
-			--if i == 1 then
-			--	Spring.Echo("pull " .. pull)
-			--	Spring.Echo("lowPrioSpending " .. lowPrioSpending)
-			--	Spring.Echo("normalSpending " .. normalSpending)
-			--	Spring.Echo("prioSpending " .. prioSpending)
-			--	Spring.Echo("misc Pull " .. miscTeamPull[teamID])
-			--end
-			
-			local levelWithInc = (income + recieved + level)
-			local elevelWithInc = (eincome + erecieved + elevel)
-			
-			if (TeamMetalReserved[teamID] and levelWithInc < TeamMetalReserved[teamID]) or (TeamEnergyReserved [teamID] and elevelWithInc < TeamEnergyReserved[teamID]) then 
-				-- below reserved level, low and normal no spending
-				TeamScale[teamID] = {0,0}
-			elseif (TeamMetalReserved[teamID] and TeamMetalReserved[teamID] > 0 and level <= TeamMetalReserved[teamID] + pull) or 
-					(TeamEnergyReserved[teamID] and TeamEnergyReserved[teamID] > 0 and elevel <= TeamEnergyReserved[teamID] + epull) then -- approach reserved level, less low and normal spending
-                    
-                -- both these values are positive and at least one is less than 1
-				local mRatio = (level - (TeamMetalReserved[teamID] or 0))/pull
-				local eRatio = (elevel - (TeamEnergyReserved[teamID] or 0))/epull
-				  
-				local spare
-				if mRatio < eRatio then 
-					spare = levelWithInc - (TeamMetalReserved[teamID] or 0) - prioSpending
-				else
-					spare = elevelWithInc - (TeamEnergyReserved[teamID] or 0) - prioSpending
-				end
-
-				--Spring.Echo(spare)
-				if spare > 0 then
-					if normalSpending <= 0 then
-						if lowPrioSpending ~= 0 then
-							TeamScale[teamID] = {0,spare/lowPrioSpending} --no normal spending, but mixed chance for low priority spending
-						else
-							TeamScale[teamID] = {0,0} --no normal spending, and no low priority spending, only hi-priority spending
-						end
-					elseif spare > normalSpending then
-						spare = spare - normalSpending
-						if spare > 0 and lowPrioSpending ~= 0 then
-							TeamScale[teamID] = {1,spare/lowPrioSpending} --full normal spending, and mixed chance low-priority spending
-						else
-							TeamScale[teamID] = {1,0} --full normal spending, but no low-priority spending
-						end
-					elseif spare > 0 then
-						TeamScale[teamID] = {spare/normalSpending,0} --mixed chance normal spending, and no low-priority spending
-					end
-				else
-					TeamScale[teamID] = {0,0} --no  normal spending, no low-Priority spending
-				end
-			else --normal situation, or no reserve in effect.
-				if pull > expense and level < expense and prioSpending < pull then 
-					TeamScale[teamID] = {
-						max(0,(level + income + recieved - prioSpending) / (normalSpending)),  -- m stall  scale . spareNormal/normal-priority-spending
-						max(0,(level + income + recieved - normalSpending) / (lowPrioSpending))  -- m stall low scale . spareLow/low-priority-spending
-					} 
-					--Spring.Echo ("m_stall" .. TeamScale[teamID])
-				elseif epull > eexpense and elevel < eexpense and prioSpending < epull then 
-					TeamScale[teamID] = {				
-						max(0,(elevel + eincome + erecieved - prioSpending) / (normalSpending)),  -- e stall  scale
-						max(0,(elevel +eincome + erecieved - normalSpending) / (lowPrioSpending))  -- e stall low scale
-					}
-				end 
+			if i == 1 then
+				Spring.Echo("pull " .. metalPull)
+				Spring.Echo("lowPrioSpending " .. spending[1])
+				Spring.Echo("normalSpending " .. spending[2])
+				Spring.Echo("prioSpending " .. spending[3])
 			end
-
-			--SendToUnsynced("ReserveState", teamID, TeamMetalReserved[teamID] or 0, TeamEnergyReserved[teamID] or 0) 
+			
+			local nextMetalLevel = (income + recieved + level)
+			local nextEnergyLevel = (eincome + erecieved + elevel)
+			
+			TeamScale[teamID] = {}
+			TeamScaleEnergy[teamID] = {}
+			
+			for pri = 3, 1, -1 do
+				local metalDrain = spending[pri]
+				local energyDrain = spending[pri] + energySpending[pri]
+				--if i == 1 then
+				--	Spring.Echo(pri .. " energyDrain " .. energyDrain)
+				--	Spring.Echo(pri .. " nextEnergyLevel " .. nextEnergyLevel)
+				--end
+				
+				if metalDrain > 0 and energyDrain > 0 and (nextMetalLevel <= metalDrain or nextEnergyLevel <= energyDrain) then
+					-- both these values are positive and at least one is less than 1
+					local mRatio = max(0,nextMetalLevel)/metalDrain
+					local eRatio = max(0,nextEnergyLevel)/energyDrain
+				
+					local spare
+					if mRatio < eRatio then 
+						-- mRatio is lower so we are stalling metal harder.
+						-- Set construction scale limited by metal.
+						TeamScale[teamID][pri] = mRatio
+						
+						nextEnergyLevel = nextEnergyLevel - nextMetalLevel
+						nextMetalLevel = 0
+						
+						-- Use leftover energy for energy-only tasks.
+						energyDrain = energySpending[pri]
+						if energyDrain > 0 and nextEnergyLevel <= energyDrain then
+							eRatio = nextEnergyLevel/energyDrain
+							TeamScaleEnergy[teamID][pri] = eRatio
+							nextEnergyLevel = 0
+						else
+							TeamScaleEnergy[teamID][pri] = 1
+							nextEnergyLevel = nextEnergyLevel - energyDrain
+						end
+					else
+						-- eRatio is lower so we are stalling energy harder.
+						-- Set scale for build and repair equally and limit by energy.
+						TeamScale[teamID][pri] = eRatio
+						TeamScaleEnergy[teamID][pri] = eRatio
+						
+						nextMetalLevel = nextMetalLevel - nextEnergyLevel
+						nextEnergyLevel = 0
+					end
+				
+				else
+					TeamScale[teamID][pri] = 1
+					TeamScaleEnergy[teamID][pri] = 1
+					
+					nextMetalLevel = nextMetalLevel - metalDrain
+					nextEnergyLevel = nextEnergyLevel - energyDrain
+				end
+			
+				if pri == 3 then
+					nextMetalLevel = nextMetalLevel - (TeamMetalReserved[teamID] or 0)
+					nextEnergyLevel = nextEnergyLevel - (TeamEnergyReserved[teamID] or 0)
+				end
+			end
 		end
 		teamMiscPriorityUnits = {} --reset priority list
-		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame)
-		--SendToUnsynced("PriorityStats", nil,  0, 0, n)   
+		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame) 
+		
+		checkOnlyEnergy = false
+	end
+	
+	if n % TEAM_SLOWUPDATE_RATE == 0 then
+		checkOnlyEnergy = true
 	end
 end
 

@@ -106,6 +106,8 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 
     local state = origUnitBuildSpeed[unitDefID]
 
+	spSetUnitRulesParam(unitID, "buildSpeed", state.buildSpeed*speedFactor, ALLY_ACCESS)
+	
     spSetUnitBuildSpeed(unitID, 
         state.buildSpeed*speedFactor, -- build
         2*state.buildSpeed*speedFactor, -- repair
