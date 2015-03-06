@@ -350,12 +350,12 @@ function gadget:GameFrame(n)
 			spSetTeamRulesParam(teamID, "extraMetalPull", metalPull - fakeMetalPull, ALLY_ACCESS)
 			spSetTeamRulesParam(teamID, "extraEnergyPull", energyPull - fakeEnergyPull, ALLY_ACCESS)
 			
-			if i == 1 then
-				Spring.Echo("pull " .. metalPull)
-				Spring.Echo("lowPrioSpending " .. spending[1])
-				Spring.Echo("normalSpending " .. spending[2])
-				Spring.Echo("prioSpending " .. spending[3])
-			end
+			--if i == 1 then
+			--	Spring.Echo("pull " .. metalPull)
+			--	Spring.Echo("lowPrioSpending " .. spending[1])
+			--	Spring.Echo("normalSpending " .. spending[2])
+			--	Spring.Echo("prioSpending " .. spending[3])
+			--end
 			
 			local nextMetalLevel = (income + recieved + level)
 			local nextEnergyLevel = (eincome + erecieved + elevel)
