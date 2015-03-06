@@ -250,6 +250,10 @@ local function LoadUnits()
 				buildeeData.unitID = GetNewUnitID(buildeeData.unitID)
 				buildeeData.factoryID =  GetNewUnitID(buildeeData.factoryID)
 				factoryBuildeesToDelete[index] = buildeeData
+				
+				Spring.SetUnitCOBValue(data.newID, COB.YARD_OPEN, 1)
+				Spring.SetUnitCOBValue(data.newID, COB.INBUILDSTANCE, 1)
+				Spring.SetUnitCOBValue(data.newID, COB.BUGGER_OFF, 1)
 			end
 		end
 	end
@@ -261,7 +265,7 @@ local function LoadUnits()
 		toCleanupFactory[#toCleanupFactory + 1] = buildeeData
 		--Spring.GiveOrderToUnit(buildeeData.factoryID, CMD.INSERT, {0, -buildeeData.unitDefID, CMD.OPT_ALT}, {"alt", "ctrl"})
 	end
-	cleanupFrame = Spring.GetGameFrame() + 75	-- needs to be some time to allow for factory opening animations
+	cleanupFrame = Spring.GetGameFrame() + 2	-- needs to be some time to allow for factory opening animations
 end
 
 local function LoadFeatures()
@@ -346,6 +350,7 @@ function gadget:GameFrame(n)
 			local data = toCleanupFactory[i]
 			local factoryID = data.factoryID
 			if factoryID and (not Spring.GetUnitIsDead(factoryID)) then
+				Spring.SetUnitRulesParam(data.unitID, "noWreck", 1)
 				Spring.DestroyUnit(data.unitID, false, true)	-- clear the existing unit so factory can build it again
 				local producedUnitID = spGetUnitIsBuilding(factoryID)
 				if (producedUnitID) then

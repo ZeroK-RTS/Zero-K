@@ -116,7 +116,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 	
-	if (progress > 0.05) then
+	if (progress > 0.05 and not Spring.GetUnitRulesParams(unitID, "noWreck") then
 		ScrapUnit(unitID, unitDefID, unitTeam, progress, face)
 	end
 	
