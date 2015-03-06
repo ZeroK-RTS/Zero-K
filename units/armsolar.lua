@@ -31,8 +31,7 @@ unitDef = {
   },
 
   damageModifier                = 0.25,
-  energyMake                    = 0,
-  energyUse                     = -2,
+  energyMake                    = 2,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 5,
   footprintZ                    = 5,

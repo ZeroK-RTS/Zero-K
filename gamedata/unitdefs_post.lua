@@ -629,6 +629,29 @@ for name, ud in pairs(UnitDefs) do
 		ud.mass = ud.mass*ud.customparams.massmult
 	end
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Set incomes
+--
+if not reverseCompat then 
+	for name, ud in pairs(UnitDefs) do
+		if ud.metalmake and ud.metalmake > 0 then
+			ud.customparams.income_metal = ud.metalmake
+			ud.metalmake = 0
+		end
+		if ud.energymake and ud.energymake > 0 then
+			ud.customparams.income_energy = ud.energymake
+			ud.energymake = 0
+		end
+	end
+else
+	for name, ud in pairs(UnitDefs) do
+		if name == "armsolar" then
+			ud.energymake = 0
+			ud.energyuse = -2
+		end
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
