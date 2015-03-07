@@ -90,7 +90,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 200.1,
+        default = 200.4,
         subs    = 10,
       },
 
