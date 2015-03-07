@@ -2,7 +2,7 @@ function widget:GetInfo()
 	return {
 		name      = "Lasso Terraform GUI",
 		desc      = "Interface for lasso terraform.",
-		author    = "Google Frog",
+		author    = "Google Frog", --also tweaked by xponen
 		version   = "v1",
 		date      = "Nov, 2009",
 		license   = "GNU GPL, v2 or later",
@@ -791,23 +791,6 @@ local function calculateAreaPoints(mPoint, mPoints)
 	
 end
 
-local function SetFixedRectanglePoints(pos)	
-	if legalPos(pos) then
-		local x = floor((pos[1] + 8 - placingRectangle.oddX)/16)*16 + placingRectangle.oddX
-		local z = floor((pos[3] + 8 - placingRectangle.oddZ)/16)*16 + placingRectangle.oddZ
-		
-		point[1].y = spGetGroundHeight(x, z)
-		point[2].x = x - placingRectangle.halfX
-		point[2].z = z - placingRectangle.halfZ
-		point[3].x = x + placingRectangle.halfX
-		point[3].z = z + placingRectangle.halfZ
-		
-		placingRectangle.legalPos = true
-	else
-		placingRectangle.legalPos = false
-	end
-end
-
 --------------------------------------------------------------------------------
 -- Mouse/keyboard Callins
 --------------------------------------------------------------------------------
@@ -826,60 +809,7 @@ local function snapToHeight(heightArray, snapHeight, arrayCount)
 end
 
 function widget:MousePress(mx, my, button)
-	if button == 1 and placingRectangle and placingRectangle.legalPos then
-		local activeCmdIndex, activeid = spGetActiveCommand()
-		
-		local index = Spring.GetCmdDescIndex(CMD_LEVEL)
-		spSetActiveCommand(index)
-		currentlyActiveCommand = CMD_LEVEL
-		
-		local mx,my = Spring.GetMouseState()
-		
-		setHeight = true
-		drawingRectangle = false
-		placingRectangle = false
-		
-		mouseX = mx
-		mouseY = my
-		
-		local x1, z1 = point[2].x, point[2].z
-		local x2, z2 = point[3].x-1, point[3].z-1
-		
-		buildToGive = {
-			facing = Spring.GetBuildFacing(),
-			cmdID = activeid,
-			x = (x1 + x2)/2,
-			z = (z1 + z2)/2,
-		}
 
-		terraformHeight = point[1].y
-		storedHeight = point[1].y
-		
-		points = 5
-		point[1] = {x = x1, z = z1}
-		point[2] = {x = x1, z = z2}
-		point[3] = {x = x2, z = z2}
-		point[4] = {x = x2, z = z1}
-		point[5] = {x = x1, z = z1}
-
-		loop = 1
-		calculateAreaPoints(point,points)
-		
-		if (groundGridDraw) then 
-			gl.DeleteList(groundGridDraw);
-			groundGridDraw = nil 
-		end
-		groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
-	
-		if (volumeDraw) then
-			gl.DeleteList(volumeDraw); volumeDraw=nil
-			gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
-		end
-		volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
-		mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
-		return true
-	end
-	
 	local toolTip = Spring.GetCurrentTooltip()
 	if not (toolTip == "" or st_find(toolTip, "TechLevel") or st_find(toolTip, "Terrain type") or st_find(toolTip, "Metal:")) then
 		return false
@@ -991,6 +921,11 @@ function widget:MousePress(mx, my, button)
 			completelyStopCommand()
 			return true
 		end
+	end
+	
+	--cancel structure terraform
+	if currentlyActiveCommand and currentlyActiveCommand < 0 and not button==1 then
+		stopCommand()
 	end
 	
 	return false
@@ -1216,21 +1151,6 @@ function widget:Update(n)
 				end
 			end
 		end
-	elseif placingRectangle then
-		local mx,my = Spring.GetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
-		
-		local facing = Spring.GetBuildFacing()
-		local offFacing = (facing == 1 or facing == 3)
-		if offFacing ~= placingRectangle.offFacing then
-			placingRectangle.halfX, placingRectangle.halfZ = placingRectangle.halfZ, placingRectangle.halfX
-			placingRectangle.oddX, placingRectangle.oddZ = placingRectangle.oddZ, placingRectangle.oddX
-			placingRectangle.offFacing = offFacing
-		end
-		
-		SetFixedRectanglePoints(pos)
-		
-		return true
 	end
 
 end
@@ -1562,7 +1482,7 @@ end
 function widget:KeyPress(key)
 	
 	if key == KEYSYMS.ESCAPE then
-		if drawingLasso or setHeight or drawingRamp or drawingRectangle or placingRectangle then
+		if drawingLasso or setHeight or drawingRamp or drawingRectangle or placingRectangle or (currentlyActiveCommand and currentlyActiveCommand<0) then
 			completelyStopCommand()
 			return true
 		end
@@ -1613,7 +1533,138 @@ function widget:GameFrame(f)
 	
 end
 
-function WG.Terraform_SetPlacingRectangle(unitDefID)
+
+function widget:Initialize()
+	widgetHandler:RegisterGlobal(self,"CommandNotifyMex", CommandNotifyMex) --an event which is called everytime "cmd_mex_placement.lua" widget handle a mex command. Note that "self" is added because this widget is tagged "handler=true"
+	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle --MUST Initialize like this! or else the very act of putting the file in Widget folder will add these function into WG.
+end
+
+--	receive broadcasted event from "cmd_mex_placement.lua"
+function CommandNotifyMex(id,params,options, isAreaMex)
+	return widget:CommandNotify(id,params,options)
+end
+
+function widget:CommandNotify(id,pos,options)
+	if id < 0 and pos[1]==nil and pos[2]==nil and pos[3]==nil then --unit-build command for factory.
+		return false
+	end
+
+	if (currentlyActiveCommand ~= id) then
+		return false
+	end
+
+	if options.meta then --skip special insert command (spacebar, Handled by CommandInsert() widget). Probably can't be handled properly
+		currentlyActiveCommand = false
+		return false
+	end
+
+	local facing = Spring.GetBuildFacing()
+
+	buildToGive = {
+		facing = facing,
+		cmdID = id,
+		x = pos[1], --note: for placing mex, accurate coordinate must be ensured (don't preprocess it) because cmd_mex_placement.lua widget have 0 tolerance to deviation.
+		z = pos[3],
+	}
+
+	local ud = UnitDefs[-id]
+	local footX = ud.xsize/2
+	local footZ = ud.zsize/2
+
+	local offFacing = (facing == 1 or facing == 3)
+	if offFacing then
+		footX, footZ = footZ, footX
+	end
+
+	placingRectangle = {
+		oddX = (footX%2)*8,
+		oddZ = (footZ%2)*8,
+		halfX = footX/2*16,
+		halfZ = footZ/2*16,
+	}
+
+	terraform_type = 1
+	point[1] = {x = 0, y = 0, z = 0}
+	point[2] = {x = 0, y = 0, z = 0}
+	point[3] = {x = 0, y = 0, z = 0}
+
+	if legalPos(pos) then
+		local x = floor((pos[1] + 8 - placingRectangle.oddX)/16)*16 + placingRectangle.oddX
+		local z = floor((pos[3] + 8 - placingRectangle.oddZ)/16)*16 + placingRectangle.oddZ
+
+		point[1].y = spGetGroundHeight(x, z)
+		point[2].x = x - placingRectangle.halfX
+		point[2].z = z - placingRectangle.halfZ
+		point[3].x = x + placingRectangle.halfX
+		point[3].z = z + placingRectangle.halfZ
+
+		placingRectangle.legalPos = true
+	else
+		placingRectangle.legalPos = false
+	end
+
+	local index = Spring.GetCmdDescIndex(CMD_LEVEL)
+	spSetActiveCommand(index)
+	currentlyActiveCommand = CMD_LEVEL
+
+	local mx,my = Spring.GetMouseState()
+	mouseX = mx
+	mouseY = my
+
+	setHeight = true
+	drawingRectangle = false
+	--placingRectangle = false
+
+	terraformHeight = point[1].y
+	storedHeight = point[1].y
+
+	points = 5
+	local x1, z1 = point[2].x, point[2].z
+	local x2, z2 = point[3].x-1, point[3].z-1
+	point[1] = {x = x1, z = z1}
+	point[2] = {x = x1, z = z2}
+	point[3] = {x = x2, z = z2}
+	point[4] = {x = x2, z = z1}
+	point[5] = {x = x1, z = z1}
+
+	loop = 1
+	calculateAreaPoints(point,points)
+
+	if (groundGridDraw) then 
+		gl.DeleteList(groundGridDraw);
+		groundGridDraw = nil 
+	end
+	groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
+
+	if (volumeDraw) then
+		gl.DeleteList(volumeDraw); volumeDraw=nil
+		gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+	end
+	volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
+	mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
+		
+	return true  -- have to return true or Spring still handles command itself.
+	--[[
+	List of global variable set:
+	- point
+	- placingRectangle
+	- volumeDraw
+	- groundGridDraw
+	- mouseGridDraw
+	- loop
+	- terraformHeight
+	- storedHeight
+	- setHeight
+	- drawingRectangle
+	- points
+	- buildToGive
+	- currentlyActiveCommand
+	- mouseX
+	- mouseY	
+	--]]
+end
+
+function Terraform_SetPlacingRectangle(unitDefID)
 	
 	-- Do no terraform with pregame placement.
 	if Spring.GetGameFrame() < 1 then
@@ -1624,38 +1675,14 @@ function WG.Terraform_SetPlacingRectangle(unitDefID)
 		return false
 	end
 	
-	local ud = UnitDefs[unitDefID]
-		
-	local facing = Spring.GetBuildFacing()
-	local offFacing = (facing == 1 or facing == 3)
-	
-	local footX = ud.xsize/2
-	local footZ = ud.zsize/2
-	
-	if offFacing then
-		footX, footZ = footZ, footX
-	end
-	
-	placingRectangle = {
-		oddX = (footX%2)*8,
-		oddZ = (footZ%2)*8,
-		halfX = footX/2*16,
-		halfZ = footZ/2*16,
-		offFacing = offFacing
-	}
-	
 	currentlyActiveCommand = -unitDefID
-	terraform_type = 1
-	point[1] = {x = 0, y = 0, z = 0}
-	point[2] = {x = 0, y = 0, z = 0}
-	point[3] = {x = 0, y = 0, z = 0}
-	
-	local mx,my = Spring.GetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
-	
-	SetFixedRectanglePoints(pos)
 	
 	return true
+	
+	--[[
+	List of global variable set:
+	- currentlyActiveCommand
+	--]]
 end
 
 --------------------------------------------------------------------------------
