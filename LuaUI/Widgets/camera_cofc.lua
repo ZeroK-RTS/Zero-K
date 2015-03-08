@@ -711,7 +711,7 @@ local function SetSkyBufferProportion(cs)
 	if options.fadeMinimapOnZoomOut.value then
 		local _,cs_py,_ = Spring.GetCameraPosition()
 		local topDownBufferZoneBottom = maxDistY - topDownBufferZone
-		WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone, 0.0), 1.0)
+		WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone + 0.2, 0.0), 1.0) --add 0.2 to start fading little before the straight-down zoomout
 	else
 		WG.COFC_SkyBufferProportion = nil
   end

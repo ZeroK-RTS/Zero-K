@@ -773,7 +773,7 @@ function Shuffle()
           local zmid = (zmax + zmin) / 2
           local ymid = Spring.GetGroundHeight(xmid, zmid)
           local i = #boxPosition + 1
-          boxPosition[i] = {xmid, ymid, zmid}
+          boxPosition[i] = {x = xmid, y = ymid, z = zmid}
           --teamList[i] = i - 1 -- team number starts at 0
         end
       end

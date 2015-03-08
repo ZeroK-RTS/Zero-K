@@ -47,6 +47,8 @@ local echo = Spring.Echo
 
 local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
+local final_opacity = 1
+local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
 
 local tabbedMode = false
 --local init = true
@@ -323,6 +325,7 @@ options = {
 			else
 				bgColor_panel = {nil, nil, nil, 0}
 			end
+			final_opacity = self.value
 			MakeMinimapWindow()
 			window:Invalidate()
 		end,
@@ -543,8 +546,8 @@ MakeMinimapWindow = function()
 		padding = {0, 0, 0, 0},
 		width = (window and window.width) or width,
 		height = (window and window.height) or height,
-		x = 0,
-		y = 0,
+		x = (window and window.x) or 0,
+		y = (window and window.y) or 0,
 		dockable = true,
 		draggable = false,
 		resizable = options.alwaysResizable.value,
@@ -562,7 +565,7 @@ MakeMinimapWindow = function()
 	options.use_map_ratio.OnChange(options.use_map_ratio)
 	
 	fakewindow = Chili.Panel:New{
-		backgroundColor = {1,1,1, options.opacity.value},
+		backgroundColor = {1,1,1, final_opacity},
 		parent = window,
 		x = 0,
 		y = 0,
@@ -583,6 +586,9 @@ end
 local leftClickDraggingCamera = false
 
 function widget:MousePress(x, y, button)
+	if last_alpha < 0.01 then
+		return false
+	end
 	if not Spring.IsAboveMiniMap(x, y) then
 		return false
 	end
@@ -829,7 +835,18 @@ function widget:DrawScreen()
 	if fbo ~= nil and fadeShader ~= nil then
 		local alpha = 1
 		if WG.COFC_SkyBufferProportion ~= nil then
-			alpha = 1 - (WG.COFC_SkyBufferProportion * 0.7)
+			alpha = 1 - (WG.COFC_SkyBufferProportion)-- * 0.7)
+		end
+		--TODO: Add engine camera alpha management here, need to know engine camera max zoom distance Get() function
+
+		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
+		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
+
+		if math.abs(last_alpha - alpha) > 0.0001 then
+			final_opacity = options.opacity.value * alpha
+			MakeMinimapWindow()
+			window:Invalidate()
+			last_alpha = alpha
 		end
 
 		gl.ActiveFBO(fbo, DrawMiniMap)
