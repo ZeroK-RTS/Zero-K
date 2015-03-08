@@ -107,10 +107,6 @@ local function Curl()
 	if nocurl then return end
 	--Spring.Echo("Initiating curl")
 	
-	while (Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)) do
-		Sleep (100)
-	end
-	
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
