@@ -11,6 +11,7 @@ function gadget:GetInfo()
 end
 
 --local TESTMODE = true
+include("LuaRules/Configs/constants.lua")
 
 local spGetAllyTeamList = Spring.GetAllyTeamList
 local spIsGameOver      = Spring.IsGameOver
@@ -124,7 +125,7 @@ local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 local awardList = {}
 local sentAwards = false
 
-local shareList_update = 32*60*5 -- five minute frames
+local shareList_update = TEAM_SLOWUPDATE_RATE*60*5 -- five minute frames
 
 local boats, t3Units, comms = {}, {}, {}
 

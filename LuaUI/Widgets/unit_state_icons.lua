@@ -258,7 +258,7 @@ end
 --needed if icon widget gets disabled/enabled after this one. find a better way?
 function widget:GameFrame(f)
 
-	if f%(32) == 0 then --1 second
+	if f%(30) == 0 then --1 second
 		UpdateAllUnits()
 	end
 end
