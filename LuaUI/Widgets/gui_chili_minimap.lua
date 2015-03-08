@@ -487,57 +487,60 @@ MakeMinimapWindow = function()
 		backgroundColor = bgColor_panel
 		}
 	
-	local buttons_panel = Chili.StackPanel:New{
-		orientation = 'horizontal',
-		height=buttons_height,
-		width=buttons_width,
-		bottom = 5,
-		right=5,
-		
-		padding={1,1,1,1},
-		--margin={0,0,0,0},
-		itemMargin={0,0,0,0},
-		
-		autosize = false,
-		resizeItems = false,
-		autoArrangeH = false,
-		autoArrangeV = false,
-		centerItems = false,
-		
-		children = {
-			Chili.Button:New{ 
-				height=iconsize, width=iconsize, 
-				caption="",
-				margin={0,0,0,0},
-				padding={2,2,2,2},
-				tooltip = "Toggle simplified teamcolours",
-				OnClick = {toggleTeamColors},
-				children={
-					Chili.Image:New{
-						file='LuaUI/images/map/minimap_colors_simple.png',
-						width="100%";
-						height="100%";
-						x="0%";
-						y="0%";
-					}
+	local buttons_panel = nil
+	if (last_alpha > 0.1) then
+		buttons_panel = Chili.StackPanel:New{
+			orientation = 'horizontal',
+			height=buttons_height,
+			width=buttons_width,
+			bottom = 5,
+			right=5,
+			
+			padding={1,1,1,1},
+			--margin={0,0,0,0},
+			itemMargin={0,0,0,0},
+			
+			autosize = false,
+			resizeItems = false,
+			autoArrangeH = false,
+			autoArrangeV = false,
+			centerItems = false,
+			
+			children = {
+				Chili.Button:New{ 
+					height=iconsize, width=iconsize, 
+					caption="",
+					margin={0,0,0,0},
+					padding={2,2,2,2},
+					tooltip = "Toggle simplified teamcolours",
+					OnClick = {toggleTeamColors},
+					children={
+						Chili.Image:New{
+							file='LuaUI/images/map/minimap_colors_simple.png',
+							width="100%";
+							height="100%";
+							x="0%";
+							y="0%";
+						}
+					},
 				},
+				
+				MakeMinimapButton( 'LuaUI/images/map/fow.png', {option = 'viewfow'} ),
+				
+				Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+				
+				MakeMinimapButton( nil, {option = 'viewstandard'} ),
+				MakeMinimapButton( 'LuaUI/images/map/heightmap.png', {option = 'viewheightmap'} ),
+				MakeMinimapButton( 'LuaUI/images/map/blockmap.png', {option = 'viewblockmap'} ),
+				MakeMinimapButton( 'LuaUI/images/map/metalmap.png', {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
+				
+				Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+				
+				MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
+				MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
 			},
-			
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', {option = 'viewfow'} ),
-			
-			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-			
-			MakeMinimapButton( nil, {option = 'viewstandard'} ),
-			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', {option = 'viewheightmap'} ),
-			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', {option = 'viewblockmap'} ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
-			
-			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-			
-			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
-			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
-		},
-	}
+		}
+	end
 	
 	window = Chili.Window:New{
 		parent = Chili.Screen0,
@@ -657,12 +660,12 @@ end
  --// similar properties to "widget:Update(dt)" above but update less often.
 function widget:KeyRelease(key, mods, label, unicode)
 	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
-		local mode = Spring.GetCameraState()["mode"]
-		if mode == 7 and not tabbedMode then
+		local name = Spring.GetCameraState()["name"]
+		if name == "ov" and not tabbedMode then
 			Chili.Screen0:RemoveChild(window)
 			tabbedMode = true
 		end
-		if mode ~= 7 and tabbedMode then
+		if name ~= "ov" and tabbedMode then
 			Chili.Screen0:AddChild(window)
 			tabbedMode = false
 		end
@@ -798,7 +801,8 @@ local function DrawMiniMap()
 end
 
 function widget:DrawScreen() 
-	if (window.hidden) then 
+	local cs = Spring.GetCameraState()
+	if (window.hidden or cs.name == "ov") then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0
@@ -834,8 +838,14 @@ function widget:DrawScreen()
 
 	if fbo ~= nil and fadeShader ~= nil then
 		local alpha = 1
-		if WG.COFC_SkyBufferProportion ~= nil then
+		if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
 			alpha = 1 - (WG.COFC_SkyBufferProportion)-- * 0.7)
+		else
+			local height = cs.py
+			if cs.height ~= null then height = cs.height end
+			--NB: Value based on engine 98.0.1-403 source for OverheadController maxHeight member variable calculation.
+			local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
+			alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
 		end
 		--TODO: Add engine camera alpha management here, need to know engine camera max zoom distance Get() function
 
@@ -844,9 +854,9 @@ function widget:DrawScreen()
 
 		if math.abs(last_alpha - alpha) > 0.0001 then
 			final_opacity = options.opacity.value * alpha
+			last_alpha = alpha
 			MakeMinimapWindow()
 			window:Invalidate()
-			last_alpha = alpha
 		end
 
 		gl.ActiveFBO(fbo, DrawMiniMap)
