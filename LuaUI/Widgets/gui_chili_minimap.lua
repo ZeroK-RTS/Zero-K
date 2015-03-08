@@ -47,7 +47,7 @@ local glResetMatrices = gl.ResetMatrices
 local echo = Spring.Echo
 
 local iconsize = 20
-local bgColor_panel = {nil, nil, nil, 1}
+local bgColor_panel = {nil, nil, nil, 0}
 local final_opacity = 1
 local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
 
@@ -321,12 +321,13 @@ options = {
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			if self.value == 0 then
-				bgColor_panel = {nil, nil, nil, 1}
-			else
+		--Unsure why this conditional is here. If the opacity is 0 it should actually be 0.
+			-- if self.value == 0 then
+			-- 	bgColor_panel = {nil, nil, nil, 1}
+			-- else
 				bgColor_panel = {nil, nil, nil, 0}
-			end
-			final_opacity = self.value
+			-- end
+			final_opacity = self.value * last_alpha
 			MakeMinimapWindow()
 			window:Invalidate()
 		end,
@@ -866,7 +867,7 @@ function widget:DrawScreen()
 		if math.abs(last_alpha - alpha) > 0.0001 then
 			final_opacity = options.opacity.value * alpha
 			last_alpha = alpha
-			
+
 			fakewindow.backgroundColor = {1,1,1, final_opacity}
 			if alpha < 0.1 then fakewindow.children = {map_panel} else fakewindow.children = {map_panel, buttons_panel} end 
 			fakewindow:Invalidate()
