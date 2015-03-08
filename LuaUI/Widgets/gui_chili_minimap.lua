@@ -650,16 +650,13 @@ end
 
  --// similar properties to "widget:Update(dt)" above but update less often.
 function widget:KeyRelease(key, mods, label, unicode)
-	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
-		local mode = Spring.GetCameraState()["mode"]
-		if mode == 7 and not tabbedMode then
-			Chili.Screen0:RemoveChild(window)
-			tabbedMode = true
-		end
-		if mode ~= 7 and tabbedMode then
-			Chili.Screen0:AddChild(window)
-			tabbedMode = false
-		end
+	if key ~= 0x009 then return end --// "0x009" is equal to "tab". Reference: uikeys.txt
+
+	tabbedMode = not tabbedMode
+	if tabbedMode then
+		Chili.Screen0:RemoveChild(window)
+	else
+		Chili.Screen0:AddChild(window)
 	end
 end
 
@@ -792,6 +789,8 @@ local function DrawMiniMap()
 end
 
 function widget:DrawScreen() 
+	if tabbedMode then return end -- nothing to do in tabbed mode
+
 	if (window.hidden) then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
