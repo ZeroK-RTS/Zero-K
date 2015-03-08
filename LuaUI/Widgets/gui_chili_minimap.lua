@@ -658,19 +658,11 @@ function widget:MouseRelease(x, y, button)
 end
 
  --// similar properties to "widget:Update(dt)" above but update less often.
-function widget:KeyRelease(key, mods, label, unicode)
-	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
-		local name = Spring.GetCameraState()["name"]
-		if name == "ov" and not tabbedMode then
-			Chili.Screen0:RemoveChild(window)
-			tabbedMode = true
-		end
-		if name ~= "ov" and tabbedMode then
-			Chili.Screen0:AddChild(window)
-			tabbedMode = false
-		end
-	end
-end
+-- function widget:KeyRelease(key, mods, label, unicode)
+-- 	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
+
+-- 	end
+-- end
 
 local function CleanUpFBO()
   if (gl.DeleteFBO) and fbo ~= nil then
@@ -802,6 +794,15 @@ end
 
 function widget:DrawScreen() 
 	local cs = Spring.GetCameraState()
+	-- Probably should be in update, except update is a run-once thing here
+	if cs.name == "ov" and not tabbedMode then
+		Chili.Screen0:RemoveChild(window)
+		tabbedMode = true
+	end
+	if cs.name ~= "ov" and tabbedMode then
+		Chili.Screen0:AddChild(window)
+		tabbedMode = false
+	end
 	if (window.hidden or cs.name == "ov") then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
