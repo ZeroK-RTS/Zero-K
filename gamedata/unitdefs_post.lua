@@ -637,10 +637,12 @@ if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if ud.metalmake and ud.metalmake > 0 then
 			ud.customparams.income_metal = ud.metalmake
+			ud.activatewhenbuilt = true
 			ud.metalmake = 0
 		end
 		if ud.energymake and ud.energymake > 0 then
 			ud.customparams.income_energy = ud.energymake
+			ud.activatewhenbuilt = true
 			ud.energymake = 0
 		end
 	end
