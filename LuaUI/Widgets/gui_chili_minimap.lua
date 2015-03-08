@@ -863,15 +863,15 @@ function widget:DrawScreen()
 
 		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
 		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
+	end
 
-		if math.abs(last_alpha - alpha) > 0.0001 then
-			final_opacity = options.opacity.value * alpha
-			last_alpha = alpha
+	if math.abs(last_alpha - alpha) > 0.0001 then
+		final_opacity = options.opacity.value * alpha
+		last_alpha = alpha
 
-			fakewindow.backgroundColor = {1,1,1, final_opacity}
-			if alpha < 0.1 then fakewindow.children = {map_panel} else fakewindow.children = {map_panel, buttons_panel} end 
-			fakewindow:Invalidate()
-		end
+		fakewindow.backgroundColor = {1,1,1, final_opacity}
+		if alpha < 0.1 then fakewindow.children = {map_panel} else fakewindow.children = {map_panel, buttons_panel} end 
+		fakewindow:Invalidate()
 	end
 
 	if fbo ~= nil and fadeShader ~= nil then
