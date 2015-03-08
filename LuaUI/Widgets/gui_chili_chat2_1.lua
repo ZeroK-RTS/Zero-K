@@ -242,7 +242,7 @@ options = {
 		OnChange = onOptionsChanged,
 	},
 	clickable_points = {
-		name = "Clickable points and labels",
+		name = "Clickable name and points",
 		type = 'bool',
 		value = true,
 		OnChange = onOptionsChanged,
@@ -609,10 +609,14 @@ local function displayMessage(msg, remake)
 			end
 		end
 	else
+		local fontsize = (msg.highlight and options.highlighted_text_height.value or options.text_height.value);
+		if (fontsize==9 or fontsize==10) then --note: magic number 9 & 10 trigger memory leak, but float might cause lag (?)
+			fontsize = fontsize + 0.1
+		end
 		local textbox = WG.Chili.TextBox:New{
 			width = '100%',
 			align = "left",
-			fontsize = (msg.highlight and options.highlighted_text_height.value or options.text_height.value),
+			fontsize = fontsize,
 			valign = "ascender",
 			lineSpacing = 0,
 			padding = { 0, 0, 0, 0 },
@@ -629,6 +633,24 @@ local function displayMessage(msg, remake)
 				outline = true
 			}
 		}
+		
+		if options.clickable_points.value and WG.alliedCursorsPos and msg.player and msg.player.id then --make hidden button (on player name) for regular say
+			local cur = WG.alliedCursorsPos[msg.player.id]
+			if cur then
+				textbox.OnMouseDown = {function(self, x, y, mouse)
+						local alt,ctrl, meta,shift = Spring.GetModKeyState()
+						if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
+						--local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
+						local click_on_name = x <= textbox.font:GetTextWidth(msg.playername)+10;
+						if (mouse == 1 and click_on_name) then
+							Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+						end
+				end}
+				function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+					return self
+				end
+			end
+		end
 		
 		if options.clickable_points.value then
 			local button = textbox
@@ -651,22 +673,6 @@ local function displayMessage(msg, remake)
 						Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 					end}
 				}
-				
-			elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
-				local cur = WG.alliedCursorsPos[msg.player.id]
-				if cur then
-					textbox.OnMouseDown = {function(self, x, y, mouse)
-							local alt,ctrl, meta,shift = Spring.GetModKeyState()
-							if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
-							local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
-							if (mouse == 1 and click_on_text) then
-								Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
-							end
-					end}
-					function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
-						return self
-					end
-				end
 			end
 			stack_console:AddChild(button, false)
 		else

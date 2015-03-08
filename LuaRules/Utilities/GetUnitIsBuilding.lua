@@ -99,7 +99,7 @@ function Spring.Utilities.GetUnitNanoTarget(unitID)
           target    = rezzID
           isFeature = true
           type      = "resurrect"
-	      inRange	= IsFeatureInRange(unitID, featureID, buildRange)
+	      inRange	= IsFeatureInRange(unitID, rezzID, buildRange)
         end
 
       end

@@ -103,7 +103,7 @@ function LoadUnitsNow()
 		local weapon = Spring.GetUnitWeaponState(unitID, 1, "reloadTime")
 		local num = 1
 		while weapon do
-			Spring.SetUnitWeaponState(unitID, num, "reloadState", frame + PFSwait*32 + math.floor(math.random(100)))
+			Spring.SetUnitWeaponState(unitID, num, "reloadState", frame + PFSwait*30 + math.floor(math.random(100)))
 			num = num + 1
 			weapon = Spring.GetUnitWeaponState(unitID, num)
 		end

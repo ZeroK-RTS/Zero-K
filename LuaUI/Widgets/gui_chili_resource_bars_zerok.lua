@@ -379,7 +379,7 @@ end
 local initialReserveSet = false
 function widget:GameFrame(n)
 
-	if (n%32 ~= 2) or not window then 
+	if (n%TEAM_SLOWUPDATE_RATE ~= 2) or not window then 
         return 
     end
 	
