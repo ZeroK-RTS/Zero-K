@@ -415,7 +415,17 @@ local options = {
       {
         key  = "investmentreturn",
         name = "Investment Return",
+        desc = "Extra income is given to active players who built economy structure until the cost of the structure is paid.",
+      },
+      {
+        key  = "investmentreturn_od",
+        name = "Overdrive Return",
         desc = "Extra overdrive is given to active players who built energy structure until the cost of the structure is paid.",
+      },
+      {
+        key  = "investmentreturn_base",
+        name = "Extractor Return",
+        desc = "Extra income is given to active players who built metal extractor until the cost of the structure is paid.",
       },
       {
         key  = "communism",
