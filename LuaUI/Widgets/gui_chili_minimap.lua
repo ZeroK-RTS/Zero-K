@@ -39,6 +39,7 @@ local boundsLoc
 local window
 local fakewindow
 local map_panel 
+local buttons_panel
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
 local glResetState = gl.ResetState
@@ -103,7 +104,7 @@ options_order = { 'use_map_ratio', 'opacity', 'alwaysResizable', 'buttonsOnRight
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_brightness', --'radar_fog_color', 'radar_los_color', 
 'radar_radar_color', 'radar_jammer_color', 
-'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap'}
+'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap', 'fadeMinimapOnZoomOut'}
 options = {
 	start_with_showeco = {
 		name = "Initial Showeco state",
@@ -341,6 +342,12 @@ options = {
 			{key='camera', name='Camera Movement'},
 		},
 		path = minimap_path,
+	},	
+	fadeMinimapOnZoomOut = {
+		name = "Fade Minimap when zoomed out",
+		type = 'bool',
+		value = true,
+		path = minimap_path,
 	},
 }
 
@@ -395,6 +402,7 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		setSensorState(options.initialSensorState.value)
 		updateRadarColors()
 		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
+		updateRunOnceRan = true
 	end
 
 	local cs = Spring.GetCameraState()
@@ -500,60 +508,57 @@ MakeMinimapWindow = function()
 		backgroundColor = bgColor_panel
 		}
 	
-	local buttons_panel = nil
-	if (last_alpha > 0.1) then
-		buttons_panel = Chili.StackPanel:New{
-			orientation = 'horizontal',
-			height=buttons_height,
-			width=buttons_width,
-			bottom = 5,
-			right=5,
-			
-			padding={1,1,1,1},
-			--margin={0,0,0,0},
-			itemMargin={0,0,0,0},
-			
-			autosize = false,
-			resizeItems = false,
-			autoArrangeH = false,
-			autoArrangeV = false,
-			centerItems = false,
-			
-			children = {
-				Chili.Button:New{ 
-					height=iconsize, width=iconsize, 
-					caption="",
-					margin={0,0,0,0},
-					padding={2,2,2,2},
-					tooltip = "Toggle simplified teamcolours",
-					OnClick = {toggleTeamColors},
-					children={
-						Chili.Image:New{
-							file='LuaUI/images/map/minimap_colors_simple.png',
-							width="100%";
-							height="100%";
-							x="0%";
-							y="0%";
-						}
-					},
+	buttons_panel = Chili.StackPanel:New{
+		orientation = 'horizontal',
+		height=buttons_height,
+		width=buttons_width,
+		bottom = 5,
+		right=5,
+		
+		padding={1,1,1,1},
+		--margin={0,0,0,0},
+		itemMargin={0,0,0,0},
+		
+		autosize = false,
+		resizeItems = false,
+		autoArrangeH = false,
+		autoArrangeV = false,
+		centerItems = false,
+		
+		children = {
+			Chili.Button:New{ 
+				height=iconsize, width=iconsize, 
+				caption="",
+				margin={0,0,0,0},
+				padding={2,2,2,2},
+				tooltip = "Toggle simplified teamcolours",
+				OnClick = {toggleTeamColors},
+				children={
+					Chili.Image:New{
+						file='LuaUI/images/map/minimap_colors_simple.png',
+						width="100%";
+						height="100%";
+						x="0%";
+						y="0%";
+					}
 				},
-				
-				MakeMinimapButton( 'LuaUI/images/map/fow.png', {option = 'viewfow'} ),
-				
-				Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-				
-				MakeMinimapButton( nil, {option = 'viewstandard'} ),
-				MakeMinimapButton( 'LuaUI/images/map/heightmap.png', {option = 'viewheightmap'} ),
-				MakeMinimapButton( 'LuaUI/images/map/blockmap.png', {option = 'viewblockmap'} ),
-				MakeMinimapButton( 'LuaUI/images/map/metalmap.png', {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
-				
-				Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-				
-				MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
-				MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
 			},
-		}
-	end
+			
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', {option = 'viewfow'} ),
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
+			MakeMinimapButton( nil, {option = 'viewstandard'} ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', {option = 'viewheightmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', {option = 'viewblockmap'} ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
+			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
+			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
+		},
+	}
 	
 	window = Chili.Window:New{
 		parent = Chili.Screen0,
@@ -843,25 +848,29 @@ function widget:DrawScreen()
 
 	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
 	local alpha = 1
-	if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
-		alpha = 1 - (WG.COFC_SkyBufferProportion)-- * 0.7)
-	else
-		local height = cs.py
-		if cs.height ~= null then height = cs.height end
-		--NB: Value based on engine 98.0.1-403 source for OverheadController maxHeight member variable calculation.
-		local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
-		alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
-	end
-	--TODO: Add engine camera alpha management here, need to know engine camera max zoom distance Get() function
+	if options.fadeMinimapOnZoomOut.value == true then
+		if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
+			alpha = 1 - (WG.COFC_SkyBufferProportion)-- * 0.7)
+		else
+			local height = cs.py
+			if cs.height ~= null then height = cs.height end
+			--NB: Value based on engine 98.0.1-403 source for OverheadController maxHeight member variable calculation.
+			local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
+			alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
+		end
+		--TODO: Add engine camera alpha management here, need to know engine camera max zoom distance Get() function
 
-	--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
-	if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
+		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
+		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
 
-	if math.abs(last_alpha - alpha) > 0.0001 then
-		final_opacity = options.opacity.value * alpha
-		last_alpha = alpha
-		MakeMinimapWindow()
-		window:Invalidate()
+		if math.abs(last_alpha - alpha) > 0.0001 then
+			final_opacity = options.opacity.value * alpha
+			last_alpha = alpha
+			
+			fakewindow.backgroundColor = {1,1,1, final_opacity}
+			if alpha < 0.1 then fakewindow.children = {map_panel} else fakewindow.children = {map_panel, buttons_panel} end 
+			fakewindow:Invalidate()
+		end
 	end
 
 	if fbo ~= nil and fadeShader ~= nil then

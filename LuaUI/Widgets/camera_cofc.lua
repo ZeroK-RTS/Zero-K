@@ -99,10 +99,6 @@ options_order = {
 	'enableCycleView',
 	'groupSelectionTapTimeout',
 
-	--Minimap Fade:
-
-	'fadeMinimapOnZoomOut'
-
 }
 
 local OverviewAction = function() end
@@ -543,13 +539,6 @@ options = {
 		path = cameraFollowPath,
 	},
 	-- end follow unit
-	
-	fadeMinimapOnZoomOut = {
-		name = "Fade Minimap when zoomed out",
-		type = 'bool',
-		value = true,
-		path = minimap_path,
-	},
 
 }
 
@@ -708,13 +697,9 @@ SetFOV = function(fov)
 end
 
 local function SetSkyBufferProportion(cs)
-	if options.fadeMinimapOnZoomOut.value then
-		local _,cs_py,_ = Spring.GetCameraPosition()
-		local topDownBufferZoneBottom = maxDistY - topDownBufferZone
-		WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone + 0.2, 0.0), 1.0) --add 0.2 to start fading little before the straight-down zoomout
-	else
-		WG.COFC_SkyBufferProportion = nil
-  end
+	local _,cs_py,_ = Spring.GetCameraPosition()
+	local topDownBufferZoneBottom = maxDistY - topDownBufferZone
+	WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone + 0.2, 0.0), 1.0) --add 0.2 to start fading little before the straight-down zoomout
 end
 
 do SetFOV(Spring.GetCameraFOV()) end
