@@ -384,16 +384,29 @@ function setSensorState(newState)
 end
 
 local firstUpdate = true
+local updateRunOnceRan = false
 
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
 	if firstUpdate then
 		firstUpdate = false
 		return
 	end
-	setSensorState(options.initialSensorState.value)
-	updateRadarColors()
-	options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
-	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
+	if not updateRunOnceRan then
+		setSensorState(options.initialSensorState.value)
+		updateRadarColors()
+		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
+	end
+
+	local cs = Spring.GetCameraState()
+	if cs.name == "ov" and not tabbedMode then
+		Chili.Screen0:RemoveChild(window)
+		tabbedMode = true
+	end
+	if cs.name ~= "ov" and tabbedMode then
+		Chili.Screen0:AddChild(window)
+		tabbedMode = false
+	end
+	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
 local function MakeMinimapButton(file, params)
@@ -794,15 +807,6 @@ end
 
 function widget:DrawScreen() 
 	local cs = Spring.GetCameraState()
-	-- Probably should be in update, except update is a run-once thing here
-	if cs.name == "ov" and not tabbedMode then
-		Chili.Screen0:RemoveChild(window)
-		tabbedMode = true
-	end
-	if cs.name ~= "ov" and tabbedMode then
-		Chili.Screen0:AddChild(window)
-		tabbedMode = false
-	end
 	if (window.hidden or cs.name == "ov") then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
@@ -837,28 +841,30 @@ function widget:DrawScreen()
 	gl.MatrixMode(GL.MODELVIEW)
 	gl.PushMatrix()
 
+	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
+	local alpha = 1
+	if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
+		alpha = 1 - (WG.COFC_SkyBufferProportion)-- * 0.7)
+	else
+		local height = cs.py
+		if cs.height ~= null then height = cs.height end
+		--NB: Value based on engine 98.0.1-403 source for OverheadController maxHeight member variable calculation.
+		local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
+		alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
+	end
+	--TODO: Add engine camera alpha management here, need to know engine camera max zoom distance Get() function
+
+	--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
+	if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
+
+	if math.abs(last_alpha - alpha) > 0.0001 then
+		final_opacity = options.opacity.value * alpha
+		last_alpha = alpha
+		MakeMinimapWindow()
+		window:Invalidate()
+	end
+
 	if fbo ~= nil and fadeShader ~= nil then
-		local alpha = 1
-		if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
-			alpha = 1 - (WG.COFC_SkyBufferProportion)-- * 0.7)
-		else
-			local height = cs.py
-			if cs.height ~= null then height = cs.height end
-			--NB: Value based on engine 98.0.1-403 source for OverheadController maxHeight member variable calculation.
-			local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
-			alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
-		end
-		--TODO: Add engine camera alpha management here, need to know engine camera max zoom distance Get() function
-
-		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
-		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
-
-		if math.abs(last_alpha - alpha) > 0.0001 then
-			final_opacity = options.opacity.value * alpha
-			last_alpha = alpha
-			MakeMinimapWindow()
-			window:Invalidate()
-		end
 
 		gl.ActiveFBO(fbo, DrawMiniMap)
 
@@ -877,7 +883,7 @@ function widget:DrawScreen()
 	  gl.Texture(0, false)
 	  gl.Blending(false)
 	  gl.UseShader(0)
-	else
+	elseif (alpha > 0.01) then
 		glDrawMiniMap()
 	end
 
