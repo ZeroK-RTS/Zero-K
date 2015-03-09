@@ -249,7 +249,7 @@ options = {
 		OnChange = onOptionsChanged,
 	},
 	clickable_points = {
-		name = "Clickable name and points",
+		name = "Clickable points and labels",
 		type = 'bool',
 		value = true,
 		OnChange = onOptionsChanged,
@@ -802,9 +802,6 @@ local function AddMessage(msg, target, remake)
 		stack = stack_backchat
 		lastMsg = lastMsgBackChat
 	end	
-	if (size==9 or size==10) then --note: magic number 9 & 10 trigger memory leak
-		size = size + 0.1
-	end
 	
 	--if msg.highlight and options.highlighted_text_height.value
 	
@@ -848,26 +845,10 @@ local function AddMessage(msg, target, remake)
 			--color         = {0,0,0,0},
 		}
 	}
-	if WG.alliedCursorsPos and msg.player and msg.player.id then --make hidden button (on player name) for regular say
-		local cur = WG.alliedCursorsPos[msg.player.id]
-		if cur then
-			textbox.OnMouseDown = {function(self, x, y, mouse)
-					local alt,ctrl, meta,shift = Spring.GetModKeyState()
-					if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
-					local click_on_name = x <= textbox.font:GetTextWidth(msg.playername)+10;
-					if (mouse == 1 and click_on_name) then
-						Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
-					end
-			end}
-			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
-				return self
-			end
-		end
-	end
 	
 	if options.clickable_points.value then
 		local control = textbox
-		if msg.point then --message is a marker
+		if msg.point then --message is a marker, make obvious looking button
 			local padding
 			if target == 'chat' then
 				padding = { 3,3,1,1 }
@@ -887,7 +868,7 @@ local function AddMessage(msg, target, remake)
 				backgroundColor = {0,0,0,0},
 				caption = '',
 				children = {
-					WG.Chili.Button:New{  --make obvious looking button for marker
+					WG.Chili.Button:New{
 						caption='',
 						x=0;y=0;
 						width = 30,
@@ -914,7 +895,7 @@ local function AddMessage(msg, target, remake)
 				},
 				
 			}
-		elseif target == 'chat' then --message is regular chat
+		elseif target == 'chat' then
 			-- Make a panel for each chat line because this removes the message jitter upon fade.
 			textbox:SetPos( 3, 3, stack.width - 3 )
 			textbox:Update()
@@ -930,6 +911,21 @@ local function AddMessage(msg, target, remake)
 					textbox,
 				},
 			}
+		elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
+			local cur = WG.alliedCursorsPos[msg.player.id]
+			if cur then
+				textbox.OnMouseDown = {function(self, x, y, mouse)
+						local alt,ctrl, meta,shift = Spring.GetModKeyState()
+						if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
+						local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
+						if (mouse == 1 and click_on_text) then
+							Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+						end
+				end}
+				function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+					return self
+				end
+			end
 		end
 		stack:AddChild(control, false)
 		if fade then

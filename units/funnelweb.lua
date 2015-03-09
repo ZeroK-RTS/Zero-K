@@ -99,6 +99,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],
+      flightTime              = 1,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

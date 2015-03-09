@@ -101,7 +101,7 @@ unitDef = {
       name               = "Naked Singularity",
       soundHit           = "explosion/ex_ultra1",
       damage = {
-        default = 8000,
+        default = 9500,
       },
     },
   },

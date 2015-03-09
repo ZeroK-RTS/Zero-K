@@ -89,6 +89,7 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:bull_fade]],
       fireStarter             = 0,
+      flightTime              = 100,
       interceptedByShieldType = 1,
       levelGround             = false,
       model                   = [[wep_seismic.s3o]],

@@ -371,10 +371,7 @@ function widget:AddChatMessage(msg)
 		}
 	}
 	]]--
-	local fontsize = options.text_height.value;
-	if (fontsize==9 or fontsize==10) then --note: magic number 9 & 10 trigger memory leak
-		fontsize = fontsize + 0.1
-	end
+
 	Chili.TextBox:New{
 		parent  = w;
 		text    = textColor .. playerName .. ":\008 " .. color2incolor(bubbleColor) .. text .. "\008";
@@ -384,7 +381,7 @@ function widget:AddChatMessage(msg)
 		valign  = "ascender";
 		align   = "left";
 		font    = {
-			size   = fontsize;
+			size   = options.text_height.value;
 			shadow = true;
 		}
 	}
@@ -473,10 +470,6 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 	}
 	local text = color2incolor(teamcolor) .. playerName .. "\008 added point" .. (caption and (": " .. caption) or '')
 	
-	local fontsize = options.text_height.value;
-	if (fontsize==9 or fontsize==10) then
-		fontsize = fontsize + 0.1
-	end
 	local l = Chili.TextBox:New{
 		parent   = w;
 		text  = text;
@@ -486,7 +479,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		valign   = "ascender";
 		align    = "left";
 		font    = {
-			size   = fontsize;
+			size   = options.text_height.value;
 			shadow = true;
 		}
 	}

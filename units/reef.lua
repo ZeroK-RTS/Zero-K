@@ -104,6 +104,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -138,7 +139,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
-      flighttime              = 100,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -174,6 +175,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
+      flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 1600,

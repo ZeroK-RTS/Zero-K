@@ -1250,7 +1250,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0)
+	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0) + (ud.customParams.income_energy or 0) 
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
