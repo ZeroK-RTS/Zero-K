@@ -34,6 +34,8 @@ unitDef = {
     helptext_pl    = [[Screamer to ostatecznosc w broni przeciwlotniczej - jego ciezkie rakiety o bardzo dalekim zasiegu sa w stanie zniszczyc wiekszosc jednostek powietrznych jednym lub dwoma strzalami. Screamer wytwarza i skladuje jedna rakiete co 20 sekund.]],
 	modelradius    = [[37]],
 	freestockpile  = [[1]],
+	stockpilecost  = [[0]],
+	stockpiletime  = [[20]],
   },
 
   explodeAs                     = [[BIG_UNITEX]],
@@ -111,7 +113,7 @@ unitDef = {
       soundStart              = [[weapon/missile/heavy_aa_fire2]],
       startVelocity           = 1000,
       stockpile               = true,
-      stockpileTime           = 20,
+      stockpileTime           = 10000,
       tolerance               = 10000,
       tracks                  = true,
       trajectoryHeight        = 0.55,
