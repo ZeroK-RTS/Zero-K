@@ -29,7 +29,8 @@ local mexDefs = {}
 local pylonDefs = {}
 local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 
-local communismOverdrive = odSharingModOptions == "communism"
+local RoIoverdrive = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_od"))
+local RoIbase = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_base"))
 
 -- this is "fun" mod
 local OreMexModOption = tonumber((Spring.GetModOptions()).oremex) or 0 -- Red Annihilation mexes, no harvesters though, use cons/coms to reclaim ore.
@@ -1182,7 +1183,7 @@ function gadget:GameFrame(n)
 				
 				local summedOverdriveMetalAfterPayback = summedOverdrive
 				local teamPacybackOD = {}
-				if not communismOverdrive then
+				if RoIoverdrive then
 					for i = 1, allyTeamData.teams do 
 						local teamID = allyTeamData.team[i]
 						if activeTeams[teamID] then
@@ -1288,7 +1289,7 @@ local function AddMex(unitID, teamID, metalMake)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 		
-		if teamID then
+		if teamID and RoIbase then
 			local refundTime = 400/metalMake
 			mexByID[unitID].refundTeamID = teamID
 			mexByID[unitID].refundTime = refundTime
@@ -1424,7 +1425,7 @@ function gadget:Initialize()
 		setOreIncome = function(unitID, oreAmount)
 			 GG.oreIncome[unitID] = oreAmount -- this is set to nil, if unitID is destroyed in unit_oremex.lua anyway
 		end
-		communismOverdrive = false -- because OD communism is handled within oremex. -- or does oremex communism need seperate modoption?
+		RoIoverdrive = false -- because OD communism is handled within oremex. -- or does oremex communism need seperate modoption?
 	end
 	
 	gadgetHandler:AddChatAction("odb",OverdriveDebugToggle,"Toggles debug mode for overdrive.")
@@ -1448,7 +1449,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
 	end
-	if paybackDefs[unitDefID] and not communismOverdrive then
+	if paybackDefs[unitDefID] and RoIoverdrive then
 		AddEnergyToPayback(unitID, unitDefID, unitTeam)
 	end
 end
@@ -1494,7 +1495,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 			RemovePylon(unitID)
 		end
 		
-		if paybackDefs[unitDefID] and not communismOverdrive then
+		if paybackDefs[unitDefID] and RoIoverdrive then
 			RemoveEnergyToPayback(unitID, unitDefID)
 		end
 		--if (energyDefs[unitDefID]) then
@@ -1512,7 +1513,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		notDestroyed[unitID] = nil
 		RemovePylon(unitID)
 	end
-	if paybackDefs[unitDefID] and not communismOverdrive then
+	if paybackDefs[unitDefID] and RoIoverdrive then
 		RemoveEnergyToPayback(unitID, unitDefID)
 	end
 	--if (energyDefs[unitDefID]) then
