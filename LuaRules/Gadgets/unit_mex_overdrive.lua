@@ -29,8 +29,8 @@ local mexDefs = {}
 local pylonDefs = {}
 local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 
-local enableEnergyPayback = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_energy_od"))
-local enableMexPayback = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_mex_base"))
+local RoIoverdrive = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_od"))
+local RoIbase = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_base"))
 
 -- this is "fun" mod
 local OreMexModOption = tonumber((Spring.GetModOptions()).oremex) or 0 -- Red Annihilation mexes, no harvesters though, use cons/coms to reclaim ore.
@@ -1183,7 +1183,7 @@ function gadget:GameFrame(n)
 				
 				local summedOverdriveMetalAfterPayback = summedOverdrive
 				local teamPacybackOD = {}
-				if enableEnergyPayback then
+				if RoIoverdrive then
 					for i = 1, allyTeamData.teams do 
 						local teamID = allyTeamData.team[i]
 						if activeTeams[teamID] then
@@ -1289,7 +1289,7 @@ local function AddMex(unitID, teamID, metalMake)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 		
-		if teamID and enableMexPayback then
+		if teamID and RoIbase then
 			local refundTime = 400/metalMake
 			mexByID[unitID].refundTeamID = teamID
 			mexByID[unitID].refundTime = refundTime
@@ -1421,14 +1421,11 @@ function gadget:Initialize()
 	-- "oremex" modoption, instead of modyfing overdrive code integrity and decreasing readability, this will do
 	-- check unit_oremex.lua for oremex code.
 	if (OreMexModOption == 1) then
-		spAddTeamResource = function(a,b,c) 
-			if b~="m" then Spring.AddTeamResource(a,b,c) end  --disable metal distribution issued by *this* gadget.
-		end
+		spAddTeamResource = function(a,b,c) if b~="m" then Spring.AddTeamResource(a,b,c) end end
 		setOreIncome = function(unitID, oreAmount)
-			 GG.oreIncome[unitID] = oreAmount -- this spawn the rocks. It don't need to reset to empty value, because this is set to NIL when unitID is destroyed in unit_oremex.lua anyway
+			 GG.oreIncome[unitID] = oreAmount -- this is set to nil, if unitID is destroyed in unit_oremex.lua anyway
 		end
-		enableEnergyPayback = false -- because metal/rocks is reclaimable by anyone, so payback can't work. Also resource distribution is handled within oremex (currently communism). -- or does oremex need a communism modoption?
-		enableMexPayback = false
+		RoIoverdrive = false -- because OD communism is handled within oremex. -- or does oremex communism need seperate modoption?
 	end
 	
 	gadgetHandler:AddChatAction("odb",OverdriveDebugToggle,"Toggles debug mode for overdrive.")
@@ -1452,7 +1449,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
 	end
-	if paybackDefs[unitDefID] and enableEnergyPayback then
+	if paybackDefs[unitDefID] and RoIoverdrive then
 		AddEnergyToPayback(unitID, unitDefID, unitTeam)
 	end
 end
@@ -1498,7 +1495,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 			RemovePylon(unitID)
 		end
 		
-		if paybackDefs[unitDefID] and enableEnergyPayback then
+		if paybackDefs[unitDefID] and RoIoverdrive then
 			RemoveEnergyToPayback(unitID, unitDefID)
 		end
 		--if (energyDefs[unitDefID]) then
@@ -1516,7 +1513,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		notDestroyed[unitID] = nil
 		RemovePylon(unitID)
 	end
-	if paybackDefs[unitDefID] and enableEnergyPayback then
+	if paybackDefs[unitDefID] and RoIoverdrive then
 		RemoveEnergyToPayback(unitID, unitDefID)
 	end
 	--if (energyDefs[unitDefID]) then

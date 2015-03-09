@@ -100,7 +100,7 @@ local mapHeight
 local teamIDs
 local UnderAttack = {} -- holds frameID per mex so it goes neutral, if someone attacks it, for 5 seconds, it will not return to owner if no grid connected.
 local Ore = {} -- hold features should they emit harm they will ongameframe
-local OreIncome = GG.oreIncome --is set by unit_mex_overdrive.lua every 32th frame
+local OreIncome = GG.oreIncome
 local gameframe = Spring.GetGameFrame()
 
 local TiberiumProofDefs = {
@@ -218,7 +218,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam)
 	end
 end
 
-local TransferLoop = function() --transfer mex to nearest team that deliver energy
+local TransferLoop = function()
 	for unitID, data in pairs(OreMex) do
 		local x = data.x
 		local z = data.z
@@ -302,12 +302,12 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 	if not(OreDefs[featureDefID]) or not(MinedOre[builderTeam]) or (builderTeam == GaiaTeamID) then
 		return true
 	end
- 	MinedOre[builderTeam] = MinedOre[builderTeam] + (-part/FeatureDefs[featureDefID].metal) --reclaiming ore
+ 	MinedOre[builderTeam] = MinedOre[builderTeam] + (-part/FeatureDefs[featureDefID].metal)
 	return true
 end
 
 function gadget:AllowUnitBuildStep(builderID, builderTeam, step) -- was not documented in spring wiki
-	if (OwnsOreToTeam[builderTeam]) and (MinedOre[builderTeam] >= 10) then -- (halt construction until reclaimed ore is shared with teams,) You owe your team some metal, until you repay the amount you can't build, i'm so sorry
+	if (OwnsOreToTeam[builderTeam]) and (MinedOre[builderTeam] >= 10) then -- you own your team some metal, until you repay the amount you can't build, i'm so sorry
 		return false
 	end
 	return true
@@ -338,7 +338,7 @@ local function AlliesNeedM(teamIDs)
 	return needs
 end
 
-local ShareMinedOre = function() --perform communism/resource-sharing and allocation
+local ShareMinedOre = function()
 	for teamID, allies in pairs(TeamData) do
 		if (MinedOre[teamID] > 1) then
 			MinedOre[teamID] = floor(MinedOre[teamID]) -- keep the change!
@@ -379,10 +379,10 @@ end
 function gadget:GameFrame(f)
 	gameframe = f
 	if ((f%32)==1) then
-		ShareMinedOre() --distribute metal from reclaimed ores to ally
-		MineMoreOreLoop() --spawn a reclaimable ore around mex
-		InflictOreDamage() --damage units walking on the ore, like tiberium
-		TransferLoop() --transfer mex to team which connect energy to it
+		ShareMinedOre()
+		MineMoreOreLoop()
+		InflictOreDamage()
+		TransferLoop()
 	end
 end
 
