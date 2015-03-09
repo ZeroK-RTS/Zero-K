@@ -252,7 +252,7 @@ options = {
 		OnChange = onOptionsChanged,
 	},
 	clickable_points = {
-		name = "Clickable name and points",
+		name = "Clickable points and labels",
 		type = 'bool',
 		value = true,
 		OnChange = onOptionsChanged,
@@ -828,9 +828,6 @@ local function AddMessage(msg, target, remake)
 		stack = stack_backchat
 		lastMsg = lastMsgBackChat
 	end	
-	if (size==9 or size==10) then --note: magic number 9 & 10 trigger memory leak
-		size = size + 0.1
-	end
 	
 	-- TODO betterify this / make configurable
 	--[[
@@ -928,23 +925,6 @@ local function AddMessage(msg, target, remake)
 		}
 	}
 	
-	if options.clickable_points.value and WG.alliedCursorsPos and msg.player and msg.player.id then --make hidden button (on player name) for regular say
-		local cur = WG.alliedCursorsPos[msg.player.id]
-		if cur then
-			sourceTextBox.OnMouseDown = {function(self, x, y, mouse)
-					local alt,ctrl, meta,shift = Spring.GetModKeyState()
-					if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
-					local click_on_name = x <= sourceTextBox.font:GetTextWidth(msg.playername)+10;
-					if (mouse == 1 and click_on_name) then
-						Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
-					end
-			end}
-			function sourceTextBox:HitTest(x, y)  -- copied this hack from chili bubbles
-				return self
-			end
-		end
-	end
-	
 	local tbheight = 20
 	
 	local controlChildren = {sourceTextBox, messageTextBoxCont}
@@ -1009,6 +989,26 @@ local function AddMessage(msg, target, remake)
 			AddControlToFadeTracker(flagButton, 'button')
 		end
 	end
+	
+	--[[
+	
+		elseif WG.alliedCursorsPos and msg.player and msg.player.id then --message is regular chat, make hidden button
+			local cur = WG.alliedCursorsPos[msg.player.id]
+			if cur then
+				textbox.OnMouseDown = {function(self, x, y, mouse)
+						local alt,ctrl, meta,shift = Spring.GetModKeyState()
+						if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
+						local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
+						if (mouse == 1 and click_on_text) then
+							Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+						end
+				end}
+				function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
+					return self
+				end
+			end
+		end
+	--]]
 	
 	if target == 'chat' then
 		lastMsgChat = messageTextBox
