@@ -145,6 +145,7 @@ local resources = {
       plasma2= "gpl/plasma.tga",
       plasma3= "gpl/plasmashot.png",
       purpletrail= "purpletrail.tga",
+      razorbolt= "razorbolt.png",
       redexplo= "cc/redexplo.tga",
       redlight= "other/light_red.png",
       sakexplo= "saktoths/sakexplo.tga",
