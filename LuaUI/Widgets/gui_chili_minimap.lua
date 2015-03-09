@@ -849,11 +849,10 @@ function widget:DrawScreen()
 		else
 			local height = cs.py
 			if cs.height ~= null then height = cs.height end
-			--NB: Value based on engine 98.0.1-403 source for OverheadController maxHeight member variable calculation.
+			--NB: Value based on engine 98.0.1-403 source for OverheadController's maxHeight member variable calculation.
 			local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
 			alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
 		end
-		--TODO: Add engine camera alpha management here, need to know engine camera max zoom distance Get() function
 
 		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
 		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
