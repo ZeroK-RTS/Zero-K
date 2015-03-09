@@ -841,12 +841,6 @@ function widget:DrawScreen()
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
 	end
 
-	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
-	gl.MatrixMode(GL.PROJECTION)
-	gl.PushMatrix()
-	gl.MatrixMode(GL.MODELVIEW)
-	gl.PushMatrix()
-
 	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
 	local alpha = 1
 	if options.fadeMinimapOnZoomOut.value == true then
@@ -873,6 +867,12 @@ function widget:DrawScreen()
 		if alpha < 0.1 then fakewindow.children = {map_panel} else fakewindow.children = {map_panel, buttons_panel} end 
 		fakewindow:Invalidate()
 	end
+
+	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
+	gl.MatrixMode(GL.PROJECTION)
+	gl.PushMatrix()
+	gl.MatrixMode(GL.MODELVIEW)
+	gl.PushMatrix()
 
 	if fbo ~= nil and fadeShader ~= nil then
 
