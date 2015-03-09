@@ -845,7 +845,7 @@ function widget:DrawScreen()
 	local alpha = 1
 	if options.fadeMinimapOnZoomOut.value == true then
 		if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
-			alpha = 1 - (WG.COFC_SkyBufferProportion)-- * 0.7)
+			alpha = 1 - (WG.COFC_SkyBufferProportion)
 		else
 			local height = cs.py
 			if cs.height ~= null then height = cs.height end
