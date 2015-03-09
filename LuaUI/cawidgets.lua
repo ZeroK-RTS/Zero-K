@@ -135,7 +135,7 @@ widgetHandler = {
   
   WG = {}, -- shared table for widgets
 
-  globals = {ownerToNameToFunc={},indexToOwner={},ownerOrdered={}}, -- global vars/funcs
+  globals = {}, -- global vars/funcs
 
   mouseOwner = nil,
   ownedButton = 0,
@@ -1079,70 +1079,47 @@ end
 --
 
 function widgetHandler:RegisterGlobal(owner, name, value)
-	if (not name or CallInsMap[name]) then
-		return false
-	end
-	widgetHandler:SetGlobal(owner, name, value)
-	return true
+  if ((name == nil)        or
+      (_G[name])           or
+      (self.globals[name]) or
+      (CallInsMap[name])) then
+    return false
+  end
+  _G[name] = value
+  self.globals[name] = owner
+  return true
 end
 
 
 function widgetHandler:DeregisterGlobal(owner, name)
-  if not (name and self.globals.ownerToNameToFunc[owner] and self.globals.ownerToNameToFunc[owner][name]) then
+  if ((name == nil) or (self.globals[name] and (self.globals[name] ~= owner))) then
     return false
   end
-  self.globals.ownerToNameToFunc[owner][name] = nil
+  _G[name] = nil
+  self.globals[name] = nil
   return true
 end
 
 
 function widgetHandler:SetGlobal(owner, name, value)
-	if not name then
-		return false
-	end
-	--self.globals contain: 
-	--ownerToNameToFunc --store the global function ready to be called
-	--indexToOwner --store the widget's ordering, this effect which function would be called first
-	--ownerOrdered --list of widgets which had been registered according to first-come-first-served scheme.
-	if not _G[name] then
-		_G[name] = function(a,b,c,d,e)
-			local _owner;
-			local _ownerToNameToFunc;
-			--first to register, first to execute
-			for i=0,#self.globals.indexToOwner do
-				_owner = self.globals.indexToOwner[i]
-				_ownerToNameToFunc = self.globals.ownerToNameToFunc[_owner]
-				if _ownerToNameToFunc and _ownerToNameToFunc[name] and _ownerToNameToFunc[name](a,b,c,d,e) then
-					return true --this would indicate that the widget stole the event by returning true.
-				end
-			end
-			return false
-		end
-	end
-	if not self.globals.ownerToNameToFunc[owner] then
-		self.globals.ownerToNameToFunc[owner] = {}
-	end
-	if not self.globals.ownerOrdered[owner] then
-		--register widget ordering:
-		local index = #self.globals.indexToOwner+1
-		self.globals.indexToOwner[index] = owner
-		self.globals.ownerOrdered[owner] = true
-	end
-	self.globals.ownerToNameToFunc[owner][name] = value
-	return true
+  if ((name == nil) or (self.globals[name] ~= owner)) then
+    return false
+  end
+  _G[name] = value
+  return true
 end
 
 
 function widgetHandler:RemoveWidgetGlobals(owner)
-	if not (owner and self.globals.ownerToNameToFunc[owner]) then
-		return 0
-	end
-	local count = 0
-	for name, _ in pairs(self.globals.ownerToNameToFunc[owner]) do
-		count = count + 1
-	end
-	self.globals.ownerToNameToFunc[owner] = nil
-	return count
+  local count = 0
+  for name, o in pairs(self.globals) do
+    if (o == owner) then
+      _G[name] = nil
+      self.globals[name] = nil
+      count = count + 1
+    end
+  end
+  return count
 end
 
 
