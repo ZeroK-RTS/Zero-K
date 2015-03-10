@@ -22,17 +22,6 @@ function gadget:GetInfo()
   }
 end
 
-function UnitEcho(unitID, st)
-	st = st or unitID
-	if Spring.ValidUnitID(unitID) then
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		Spring.MarkerAddPoint(x,y,z, st)
-	else
-		Spring.Echo("Invalid unitID")
-		Spring.Echo(unitID)
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Synced
@@ -214,7 +203,6 @@ function GetUnitMaterial(unitDefID)
     gl.DeleteList(texdl)
   end
 
-  Spring.Echo("GetMaterial")
   local luaMat = Spring.UnitRendering.GetMaterial("opaque",{
                    shader          = mat.shader,
                    cameraposloc    = mat.cameraPosLoc,
@@ -249,7 +237,6 @@ function ToggleShadows()
     local unitDefID = Spring.GetUnitDefID(unitID)
     local teamID    = Spring.GetUnitTeam(unitID)
     UnitDestroyed(nil,unitID)
-	UnitEcho(unitID, "DeactivateMaterial")
     Spring.UnitRendering.DeactivateMaterial(unitID,3)
     if not select(3,Spring.GetUnitIsStunned(unitID)) then --// inbuild?
       UnitFinished(nil,unitID,unitDefID,teamID)
@@ -267,7 +254,6 @@ function ToggleAdvShading()
 
     local units = Spring.GetAllUnits()
     for _,unitID in pairs(units) do
-	  UnitEcho(unitID, "DeactivateMaterial")
       Spring.UnitRendering.DeactivateMaterial(unitID,3)
     end
   elseif (normalmapping) then
@@ -327,16 +313,13 @@ function gadget:UnitFinished(unitID,unitDefID,teamID)
   if (unitMat) then
     local mat = materialDefs[unitMat[1]]
     if (normalmapping or mat.force) then
-	  UnitEcho(unitID, "ActivateMaterial, SetMaterial")
       Spring.UnitRendering.ActivateMaterial(unitID,3)
       Spring.UnitRendering.SetMaterial(unitID,3,"opaque",GetUnitMaterial(unitDefID))
       for pieceID in ipairs(Spring.GetUnitPieceList(unitID) or {}) do
-        UnitEcho(unitID, "SetPieceList")
-		Spring.UnitRendering.SetPieceList(unitID,3,pieceID)
+        Spring.UnitRendering.SetPieceList(unitID,3,pieceID)
       end
 
       if (mat.DrawUnit) then
-        UnitEcho(unitID, "SetUnitLuaDraw true")
         Spring.UnitRendering.SetUnitLuaDraw(unitID,true)
         drawUnitList[unitID] = mat
       end
@@ -349,7 +332,6 @@ function gadget:UnitFinished(unitID,unitDefID,teamID)
 end
 
 function gadget:UnitDestroyed(unitID,unitDefID)
-  UnitEcho(unitID, "DeactivateMaterial")
   Spring.UnitRendering.DeactivateMaterial(unitID,3)
 
   local mat = drawUnitList[unitID]
@@ -373,9 +355,12 @@ gadget.UnitReverseBuild = gadget.UnitDestroyed
 gadget.UnitCloaked   = gadget.UnitDestroyed
 gadget.UnitDecloaked = gadget.UnitFinished
 
-function gadget:UnitGiven(...)
-  gadget:UnitDestroyed(...)
-  gadget:UnitFinished(...)
+function gadget:UnitGiven(unitID, ...)
+  if not select(3, Spring.GetUnitIsStunned(unitID)) then
+    -- Do not do this for nanoframe, causes bug with obj rendering.
+    gadget:UnitDestroyed(unitID, ...)
+    gadget:UnitFinished(unitID, ...)
+  end
 end
 
 --------------------------------------------------------------------------------
