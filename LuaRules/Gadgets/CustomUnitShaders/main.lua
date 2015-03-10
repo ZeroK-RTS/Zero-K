@@ -18,7 +18,7 @@ function gadget:GetInfo()
     date      = "2008,2009,2010",
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = not (Game.version:find('91.0') == 1)  --  loaded by default?
+    enabled   = false --not (Game.version:find('91.0') == 1)  --  loaded by default?
   }
 end
 
