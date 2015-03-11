@@ -25,9 +25,10 @@ include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local spGetUnitStockpile = Spring.GetUnitStockpile
-local spSetUnitStockpile = Spring.SetUnitStockpile
-local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetUnitStockpile  = Spring.GetUnitStockpile
+local spSetUnitStockpile  = Spring.SetUnitStockpile
+local spGetUnitIsStunned  = Spring.GetUnitIsStunned
+local spUseUnitResource   = Spring.UseUnitResource
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
@@ -68,7 +69,7 @@ function gadget:GameFrame(n)
 				data.active = true
 			end
 
-			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m) and Spring.UseUnitResource(unitID, def.resTable)) then
+			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m) and spUseUnitResource(unitID, def.resTable)) then
 				data.progress = data.progress - 1
 				if data.progress == 0 then
 					spSetUnitStockpile(unitID, stocked + 1)
