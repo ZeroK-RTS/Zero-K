@@ -202,7 +202,7 @@ end
 
 local function AllowMiscBuildStep(unitID,teamID,onlyEnergy)
 
-	local conAmount = UnitMiscPortion[unitID] or 0
+	local conAmount = UnitMiscPortion[unitID] or math.random()
 
 	if (teamMiscPriorityUnits[teamID] == nil) then 
 		teamMiscPriorityUnits[teamID] = {} 
@@ -246,7 +246,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		return true
 	end
 	
-	local conAmount = UnitConPortion[builderID] or 0
+	local conAmount = UnitConPortion[builderID] or math.random()
 	if (TeamPriorityUnits[teamID] == nil) then 
 		TeamPriorityUnits[teamID] = {} 
 	end
