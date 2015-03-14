@@ -326,7 +326,8 @@ options = {
 			else
 				bgColor_panel = {nil, nil, nil, 0}
 			end
-			final_opacity = self.value * last_alpha
+			-- final_opacity = self.value * last_alpha
+			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed
 			MakeMinimapWindow()
 			window:Invalidate()
 		end,
@@ -344,9 +345,17 @@ options = {
 		path = minimap_path,
 	},	
 	fadeMinimapOnZoomOut = {
-		name = "Fade Minimap when zoomed out",
-		type = 'bool',
-		value = true,
+		name = "Minimap fading when zoomed out",
+		type = 'radioButton',
+		value = 'full',
+		items={
+			{key='full', name='Full'},
+			{key='partial', name='Semi-transparent'},
+			{key='none', name='None'},
+		},
+		OnChange = function(self)
+			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed, for the background opacity
+			end,
 		path = minimap_path,
 	},
 }
@@ -842,7 +851,8 @@ function widget:DrawScreen()
 
 	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
 	local alpha = 1
-	if options.fadeMinimapOnZoomOut.value == true then
+	local alphaMin = options.fadeMinimapOnZoomOut.value == 'full' and 0.0 or 0.3
+	if options.fadeMinimapOnZoomOut.value ~= 'none' then
 		if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
 			alpha = 1 - (WG.COFC_SkyBufferProportion)
 		else
@@ -850,19 +860,24 @@ function widget:DrawScreen()
 			if cs.height ~= null then height = cs.height end
 			--NB: Value based on engine 98.0.1-403 source for OverheadController's maxHeight member variable calculation.
 			local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
-			alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
+			if options.fadeMinimapOnZoomOut.value == 'full' then
+				alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3)) -- 0 to 1
+			else
+				alpha = 1 - (height - (maxHeight * 0.7)) -- 0.3 to 1
+			end
 		end
 
 		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
-		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
+		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, alphaMin), 1.0) end 
 	end
 
 	if math.abs(last_alpha - alpha) > 0.0001 then
-		final_opacity = options.opacity.value * alpha
+		final_opacity = options.fadeMinimapOnZoomOut.value == 'full' and options.opacity.value * alpha or options.opacity.value
 		last_alpha = alpha
 
 		fakewindow.backgroundColor = {1,1,1, final_opacity}
-		map_panel.backgroundColor = {1,1,1, bgColor_panel[4]*alpha}
+		local final_map_bg_color = options.fadeMinimapOnZoomOut.value == 'full' and bgColor_panel[4]*alpha or bgColor_panel[4]
+		map_panel.backgroundColor = {1,1,1, final_map_bg_color}
 		if alpha < 0.1 then 
 			fakewindow.children = {map_panel} 
 		else 
