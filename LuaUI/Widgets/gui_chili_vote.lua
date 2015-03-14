@@ -35,6 +35,7 @@ local button_end, button_end_image
 --------------------------------------------------------------------------------
 local voteCount, voteMax = {}, {}
 local pollActive = false
+local hidePoll = false
 local votingForceStart = false
 
 local string_success = "END:SUCCESS"
@@ -119,22 +120,25 @@ function widget:AddConsoleMessage(msg)
 		--	RemoveWindow()
 		--	votingForceStart = false
 		--end
-		if not pollActive then
+		if not pollActive then -- new poll was called
 			pollActive = true
+			hidePoll = false
 			screen0:AddChild(window)
 		end
-		local indexStart = select(2, line:find(string_titleStart))
-		local indexEnd = line:find(string_titleEnd)
-		if not (indexStart and indexEnd) then
-			-- malformed poll line
-			Spring.Log(widget:GetInfo().name, LOG.ERROR, "malformed poll notification text")
-			return
-		end
-		local title = line:sub(indexStart, indexEnd - 1)
-		votingForceStart = ((title:find("force game"))~=nil)
-		label_title:SetCaption("Poll: "..title)
+		if not hidePoll then -- only draw when X button was not pressed
+			local indexStart = select(2, line:find(string_titleStart))
+			local indexEnd = line:find(string_titleEnd)
+			if not (indexStart and indexEnd) then
+				-- malformed poll line
+				Spring.Log(widget:GetInfo().name, LOG.ERROR, "malformed poll notification text")
+				return
+			end
+			local title = line:sub(indexStart, indexEnd - 1)
+			votingForceStart = ((title:find("force game"))~=nil)
+			label_title:SetCaption("Poll: "..title)
 	--elseif line:find(string_vote1) or line:find(string_vote2) then	--apply a vote
-		GetVotes(line)
+			GetVotes(line)
+		end
 	end
 	return false
 end
@@ -277,14 +281,10 @@ function widget:Initialize()
 		margin = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, 0.4},
 		caption="";
-		tooltip = "End vote (requires server admin)";
+		tooltip = "Hide this vote";
 		OnClick = {function() 
-				--if voteAntiSpam then return end
-				--voteAntiSpam = true
-				local notSpam = CheckForVoteSpam (os.clock())
-					if notSpam then
-					Spring.SendCommands("say !endvote")
-				end
+				screen0:RemoveChild(window)
+				hidePoll = true
 			end}
 	}
 	button_end_image = Image:New {
