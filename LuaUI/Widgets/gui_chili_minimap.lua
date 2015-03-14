@@ -344,9 +344,14 @@ options = {
 		path = minimap_path,
 	},	
 	fadeMinimapOnZoomOut = {
-		name = "Fade Minimap when zoomed out",
-		type = 'bool',
-		value = true,
+		name = "Minimap fading when zoomed out",
+		type = 'radioButton',
+		value = 'full',
+		items={
+			{key='full', name='Full'},
+			{key='partial', name='Semi-transparent'},
+			{key='none', name='None'},
+		},
 		path = minimap_path,
 	},
 }
@@ -842,7 +847,7 @@ function widget:DrawScreen()
 
 	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
 	local alpha = 1
-	if options.fadeMinimapOnZoomOut.value == true then
+	if options.fadeMinimapOnZoomOut.value ~= 'none' then
 		if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
 			alpha = 1 - (WG.COFC_SkyBufferProportion)
 		else
@@ -850,15 +855,20 @@ function widget:DrawScreen()
 			if cs.height ~= null then height = cs.height end
 			--NB: Value based on engine 98.0.1-403 source for OverheadController's maxHeight member variable calculation.
 			local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
-			alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
+			if options.fadeMinimapOnZoomOut.value == 'full' then
+				alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3))
+			else
+				alpha = 1 - (height - (maxHeight * 0.7))
+			end
 		end
 
 		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
-		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, 0.0), 1.0) end 
+		local alphaMin = options.fadeMinimapOnZoomOut.value == 'partial' and 0.3 or 0.0
+		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, alphaMin), 1.0) end 
 	end
 
 	if math.abs(last_alpha - alpha) > 0.0001 then
-		final_opacity = options.opacity.value * alpha
+		final_opacity = math.min(options.opacity.value * alpha, math.min(alphaMin * 2.5, 1.0))
 		last_alpha = alpha
 
 		fakewindow.backgroundColor = {1,1,1, final_opacity}
