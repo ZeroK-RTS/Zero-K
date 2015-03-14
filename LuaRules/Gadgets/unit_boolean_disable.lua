@@ -70,6 +70,7 @@ local f = 0 -- frame, set in game frame
 local function applyEffect(unitID)
 	Spring.SetUnitRulesParam(unitID, "disarmed", 1, LOS_ACCESS)
 	GG.UpdateUnitAttributes(unitID)
+	GG.ScriptNotifyDisarmed(unitID)
 end
 
 local function removeEffect(unitID)
