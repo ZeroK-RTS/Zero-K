@@ -48,7 +48,7 @@ local echo = Spring.Echo
 
 local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
-local final_opacity = 1
+local final_opacity = 0
 local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
 
 local tabbedMode = false
@@ -326,7 +326,7 @@ options = {
 			else
 				bgColor_panel = {nil, nil, nil, 0}
 			end
-			-- final_opacity = self.value * last_alpha
+			final_opacity = self.value * last_alpha
 			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed
 			MakeMinimapWindow()
 			window:Invalidate()
@@ -347,7 +347,7 @@ options = {
 	fadeMinimapOnZoomOut = {
 		name = "Minimap fading when zoomed out",
 		type = 'radioButton',
-		value = 'full',
+		value = 'none',
 		items={
 			{key='full', name='Full'},
 			{key='partial', name='Semi-transparent'},
