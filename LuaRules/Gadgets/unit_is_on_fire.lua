@@ -122,8 +122,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		local fwd = flamerWeaponDefs[weaponID]
 		if (UnitDefs[unitDefID].customParams.fireproof~="1") then
 			if (random() < fwd.burnChance) then
-				if (not unitsOnFire[unitID]) or unitsOnFire[unitID].damageLeft < fwd.maxDamage then
-					local burnLength = fwd.burnTime*(random()*fwd.burnTimeRand + fwd.burnTimeBase)
+				local burnLength = fwd.burnTime*(random()*fwd.burnTimeRand + fwd.burnTimeBase)
+				if (not unitsOnFire[unitID]) or unitsOnFire[unitID].damageLeft < (burnLength*fwd.burnDamage) then
 					unitsOnFire[unitID] = {
 						endFrame    = gameFrame + burnLength, 
 						damageLeft  = burnLength*fwd.burnDamage,
