@@ -87,6 +87,10 @@ local icon_size = 20
 local unitIcon_size = 50
 local stillCursorTime = 0
 
+local makeTooltipGap = 0
+local oldObjectID = 0
+local sameObjectIDTime = 0
+
 local scrH, scrW = 0,0
 local old_ttstr, old_data
 local old_mx, old_my = -1,-1
@@ -280,11 +284,11 @@ options = {
 		value = 0,
 	},
 	independant_world_tooltip_delay = {
-		name = 'World tooltip display delay (0 - 4s)',
-		desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
+		name = 'Unit and Feature tooltip delay (0 - 4s)',
+		--desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
 		type = 'number',
 		min=0,max=4,step=0.05,
-		value = 0.05,
+		value = 0.2,
 	},
 	--[[ This is causing it so playername is not always visible, too difficult to maintain.
 	fontsize = {
@@ -2093,7 +2097,7 @@ local function CreateHpBar(name)
 				padding = {0,0,0,0},
 				color = {0,1,0,1},
 				max=1,
-				caption = 'a',
+				caption = '',
 			},
 		},
 	}
@@ -2124,7 +2128,7 @@ local function CreateBpBar(name)
 				padding = {0,0,0,0},
 				color = {0.8,0.8,0.2,1};
 				max=1,
-				caption = 'a',
+				caption = '',
 			},
 		},
 	}
@@ -2154,7 +2158,7 @@ local function CreateShieldBar(name)
 				padding = {0,0,0,0},
 				color = {0.3,0,0.9,1};
 				max=1,
-				caption = 'a',
+				caption = '',
 			},
 		},
 	}
@@ -2185,7 +2189,7 @@ local function MakeToolTip_Terra(cmdName)
 	BuildTooltip2('terra', tt_structure)
 end
 
-local function MakeTooltip()
+local function MakeTooltip(dt)
 	if options.showdrawtooltip.value and drawtoolKeyPressed and not (drawing or erasing) then
 		MakeToolTip_Draw()
 		return
@@ -2264,11 +2268,18 @@ local function MakeTooltip()
 	
 	--unit(s) selected/pointed at
 	if unit_tooltip then
+		if oldObjectID ~= data then
+			sameObjectIDTime = 0
+			oldObjectID = data
+		else
+			sameObjectIDTime = sameObjectIDTime + dt
+		end
+		
 		-- pointing at unit/feature
 		if type == 'unit' then
 			if options.show_for_units.value and 
 					(meta or options.independant_world_tooltip_delay.value == 0 or 
-					stillCursorTime > options.independant_world_tooltip_delay.value) then
+					sameObjectIDTime > options.independant_world_tooltip_delay.value) then
 				MakeToolTip_Unit(data, tooltip)
 			else
 				KillTooltip()
@@ -2277,7 +2288,7 @@ local function MakeTooltip()
 		elseif type == 'feature' then
 			if options.show_for_wreckage.value and
 					(meta or options.independant_world_tooltip_delay.value == 0 or 
-					stillCursorTime > options.independant_world_tooltip_delay.value) then
+					sameObjectIDTime > options.independant_world_tooltip_delay.value) then
 				if MakeToolTip_Feature(data, tooltip) then
 					return
 				end
@@ -2300,6 +2311,8 @@ local function MakeTooltip()
 		end
 		
 		return
+	else
+		oldObjectID = 0
 	end
 	
 	--tooltip that shows position
@@ -2583,8 +2596,11 @@ function widget:Update(dt)
 			KillTooltip()
 			return
 		end
-		MakeTooltip()
+		MakeTooltip(makeTooltipGap)
 		changeNow = false
+		makeTooltipGap = dt
+	else
+		makeTooltipGap = makeTooltipGap + dt
 	end
 	--TOOLTIP end
 end

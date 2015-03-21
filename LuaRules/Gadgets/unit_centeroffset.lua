@@ -13,7 +13,7 @@ function gadget:GetInfo()
       author    = "KingRaptor (L.J. Lim) and GoogleFrog",
       date      = "12.7.2012",
       license   = "Public Domain",
-      layer     = 0,
+      layer     = 1, -- After unit_script (hitvolume changes can occur when units are created).
       enabled   = true
    }
 end

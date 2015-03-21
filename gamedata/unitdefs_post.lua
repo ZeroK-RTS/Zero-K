@@ -332,7 +332,7 @@ end
 if not reverseCompat then
 	for name, ud in pairs(UnitDefs) do
 		if name == "factorytank" then
-			ud.yardmap = "oooooooooo oooooooooo oooooooooo oocccccccoo oocccccccoo yoccccccoy yoccccccoy yyccccccyy"
+			ud.yardmap = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo yoccccccoy yoccccccoy yyccccccyy"
 		elseif name == "factoryveh" then
 			ud.yardmap = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco"
 		elseif name == "factorycloak" then
@@ -627,6 +627,31 @@ for name, ud in pairs(UnitDefs) do
 	ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
 	if ud.customparams.massmult then
 		ud.mass = ud.mass*ud.customparams.massmult
+	end
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Set incomes
+--
+if not reverseCompat then 
+	for name, ud in pairs(UnitDefs) do
+		if ud.metalmake and ud.metalmake > 0 then
+			ud.customparams.income_metal = ud.metalmake
+			ud.activatewhenbuilt = true
+			ud.metalmake = 0
+		end
+		if ud.energymake and ud.energymake > 0 then
+			ud.customparams.income_energy = ud.energymake
+			ud.activatewhenbuilt = true
+			ud.energymake = 0
+		end
+	end
+else
+	for name, ud in pairs(UnitDefs) do
+		if name == "armsolar" then
+			ud.energymake = 0
+			ud.energyuse = -2
+		end
 	end
 end
 

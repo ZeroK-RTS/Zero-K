@@ -379,7 +379,7 @@ end
 local initialReserveSet = false
 function widget:GameFrame(n)
 
-	if (n%32 ~= 2) or not window then 
+	if (n%TEAM_SLOWUPDATE_RATE ~= 2) or not window then 
         return 
     end
 	
@@ -415,9 +415,10 @@ function widget:GameFrame(n)
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
 	
-	local extraPull = spGetTeamRulesParam(myTeamID, "extraPull") or 0
-	mPull = mPull + extraPull
-	ePull = ePull + extraPull
+	local extraMetalPull = spGetTeamRulesParam(myTeamID, "extraMetalPull") or 0
+	local extraEnergyPull = spGetTeamRulesParam(myTeamID, "extraEnergyPull") or 0
+	mPull = mPull + extraMetalPull
+	ePull = ePull + extraEnergyPull
 	
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
 	if eCurr > eStor then 

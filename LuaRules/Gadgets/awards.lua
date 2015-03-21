@@ -11,6 +11,7 @@ function gadget:GetInfo()
 end
 
 --local TESTMODE = true
+include("LuaRules/Configs/constants.lua")
 
 local spGetAllyTeamList = Spring.GetAllyTeamList
 local spIsGameOver      = Spring.IsGameOver
@@ -122,7 +123,7 @@ local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 local awardList = {}
 local sentAwards = false
 
-local shareList_update = 32*60*5 -- five minute frames
+local shareList_update = TEAM_SLOWUPDATE_RATE*60*5 -- five minute frames
 
 local boats, t3Units, comms = {}, {}, {}
 
@@ -153,7 +154,6 @@ local flamerWeaponDefs = {}
 -------------------
 -- Resource tracking
 
-include("LuaRules/Configs/constants.lua")
 
 local allyTeamInfo = {}
 --local resourceInfo = {count = 0, data = {}}
@@ -710,8 +710,8 @@ end
 
 function gadget:GameFrame(n)
 
-	--if n%32 == 2 then
-	--	UpdateResourceStats((n-2)/32)
+	--if n%TEAM_SLOWUPDATE_RATE == 2 then
+	--	UpdateResourceStats((n-2)/TEAM_SLOWUPDATE_RATE)
 	--end
 
 	if n % shareList_update == 1 and not spIsGameOver() then

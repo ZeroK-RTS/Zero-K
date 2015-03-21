@@ -22,6 +22,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+include("LuaRules/Configs/constants.lua")
+
 local windDefs = {
   [ UnitDefNames['armwin'].id ] = true,
 }
@@ -69,7 +71,7 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:GameFrame(n)
-	if (((n+16) % 32) < 0.1) then
+	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
 		if (next(windmills)) then
       
 			if step_count > 0 then

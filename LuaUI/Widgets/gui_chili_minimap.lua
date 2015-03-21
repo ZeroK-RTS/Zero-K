@@ -39,6 +39,7 @@ local boundsLoc
 local window
 local fakewindow
 local map_panel 
+local buttons_panel
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
 local glResetState = gl.ResetState
@@ -47,6 +48,8 @@ local echo = Spring.Echo
 
 local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
+local final_opacity = 0
+local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
 
 local tabbedMode = false
 --local init = true
@@ -101,7 +104,7 @@ options_order = { 'use_map_ratio', 'opacity', 'alwaysResizable', 'buttonsOnRight
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_brightness', --'radar_fog_color', 'radar_los_color', 
 'radar_radar_color', 'radar_jammer_color', 
-'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap'}
+'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap', 'fadeMinimapOnZoomOut'}
 options = {
 	start_with_showeco = {
 		name = "Initial Showeco state",
@@ -323,6 +326,8 @@ options = {
 			else
 				bgColor_panel = {nil, nil, nil, 0}
 			end
+			final_opacity = self.value * last_alpha
+			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed
 			MakeMinimapWindow()
 			window:Invalidate()
 		end,
@@ -337,6 +342,20 @@ options = {
 			{key='situational', name='Context Dependant'},
 			{key='camera', name='Camera Movement'},
 		},
+		path = minimap_path,
+	},	
+	fadeMinimapOnZoomOut = {
+		name = "Minimap fading when zoomed out",
+		type = 'radioButton',
+		value = 'none',
+		items={
+			{key='full', name='Full'},
+			{key='partial', name='Semi-transparent'},
+			{key='none', name='None'},
+		},
+		OnChange = function(self)
+			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed, for the background opacity
+			end,
 		path = minimap_path,
 	},
 }
@@ -381,16 +400,30 @@ function setSensorState(newState)
 end
 
 local firstUpdate = true
+local updateRunOnceRan = false
 
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
 	if firstUpdate then
 		firstUpdate = false
 		return
 	end
-	setSensorState(options.initialSensorState.value)
-	updateRadarColors()
-	options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
-	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
+	if not updateRunOnceRan then
+		setSensorState(options.initialSensorState.value)
+		updateRadarColors()
+		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
+		updateRunOnceRan = true
+	end
+
+	local cs = Spring.GetCameraState()
+	if cs.name == "ov" and not tabbedMode then
+		Chili.Screen0:RemoveChild(window)
+		tabbedMode = true
+	end
+	if cs.name ~= "ov" and tabbedMode then
+		Chili.Screen0:AddChild(window)
+		tabbedMode = false
+	end
+	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
 local function MakeMinimapButton(file, params)
@@ -484,7 +517,7 @@ MakeMinimapWindow = function()
 		backgroundColor = bgColor_panel
 		}
 	
-	local buttons_panel = Chili.StackPanel:New{
+	buttons_panel = Chili.StackPanel:New{
 		orientation = 'horizontal',
 		height=buttons_height,
 		width=buttons_width,
@@ -543,8 +576,8 @@ MakeMinimapWindow = function()
 		padding = {0, 0, 0, 0},
 		width = (window and window.width) or width,
 		height = (window and window.height) or height,
-		x = 0,
-		y = 0,
+		x = (window and window.x) or 0,
+		y = (window and window.y) or 0,
 		dockable = true,
 		draggable = false,
 		resizable = options.alwaysResizable.value,
@@ -562,7 +595,7 @@ MakeMinimapWindow = function()
 	options.use_map_ratio.OnChange(options.use_map_ratio)
 	
 	fakewindow = Chili.Panel:New{
-		backgroundColor = {1,1,1, options.opacity.value},
+		backgroundColor = {1,1,1, final_opacity},
 		parent = window,
 		x = 0,
 		y = 0,
@@ -583,6 +616,9 @@ end
 local leftClickDraggingCamera = false
 
 function widget:MousePress(x, y, button)
+	if last_alpha < 0.01 then
+		return false
+	end
 	if not Spring.IsAboveMiniMap(x, y) then
 		return false
 	end
@@ -649,19 +685,11 @@ function widget:MouseRelease(x, y, button)
 end
 
  --// similar properties to "widget:Update(dt)" above but update less often.
-function widget:KeyRelease(key, mods, label, unicode)
-	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
-		local mode = Spring.GetCameraState()["mode"]
-		if mode == 7 and not tabbedMode then
-			Chili.Screen0:RemoveChild(window)
-			tabbedMode = true
-		end
-		if mode ~= 7 and tabbedMode then
-			Chili.Screen0:AddChild(window)
-			tabbedMode = false
-		end
-	end
-end
+-- function widget:KeyRelease(key, mods, label, unicode)
+-- 	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
+
+-- 	end
+-- end
 
 local function CleanUpFBO()
   if (gl.DeleteFBO) and fbo ~= nil then
@@ -792,7 +820,8 @@ local function DrawMiniMap()
 end
 
 function widget:DrawScreen() 
-	if (window.hidden) then 
+	local cs = Spring.GetCameraState()
+	if (window.hidden or cs.name == "ov") then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0
@@ -820,6 +849,44 @@ function widget:DrawScreen()
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
 	end
 
+	-- Do this even if the fadeShader can't exist, just so that all hiding code still behaves properly
+	local alpha = 1
+	local alphaMin = options.fadeMinimapOnZoomOut.value == 'full' and 0.0 or 0.3
+	if options.fadeMinimapOnZoomOut.value ~= 'none' then
+		if WG.COFC_SkyBufferProportion ~= nil then --if nil, COFC is not enabled
+			alpha = 1 - (WG.COFC_SkyBufferProportion)
+		else
+			local height = cs.py
+			if cs.height ~= null then height = cs.height end
+			--NB: Value based on engine 98.0.1-403 source for OverheadController's maxHeight member variable calculation.
+			local maxHeight = 9.5 * math.max(Game.mapSizeX, Game.mapSizeZ)/Game.squareSize
+			if options.fadeMinimapOnZoomOut.value == 'full' then
+				alpha = 1 - ((height - (maxHeight * 0.7)) / (maxHeight * 0.3)) -- 0 to 1
+			else
+				alpha = 1 - (height - (maxHeight * 0.7)) -- 0.3 to 1
+			end
+		end
+
+		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
+		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, alphaMin), 1.0) end 
+	end
+
+	if math.abs(last_alpha - alpha) > 0.0001 then
+		final_opacity = options.fadeMinimapOnZoomOut.value == 'full' and options.opacity.value * alpha or options.opacity.value
+		last_alpha = alpha
+
+		fakewindow.backgroundColor = {1,1,1, final_opacity}
+		local final_map_bg_color = options.fadeMinimapOnZoomOut.value == 'full' and bgColor_panel[4]*alpha or bgColor_panel[4]
+		map_panel.backgroundColor = {1,1,1, final_map_bg_color}
+		if alpha < 0.1 then 
+			fakewindow.children = {map_panel} 
+		else 
+			fakewindow.children = {map_panel, buttons_panel} 
+		end 
+		fakewindow:Invalidate()
+		map_panel:Invalidate()
+	end
+
 	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
 	gl.MatrixMode(GL.PROJECTION)
 	gl.PushMatrix()
@@ -827,10 +894,6 @@ function widget:DrawScreen()
 	gl.PushMatrix()
 
 	if fbo ~= nil and fadeShader ~= nil then
-		local alpha = 1
-		if WG.COFC_SkyBufferProportion ~= nil then
-			alpha = 1 - (WG.COFC_SkyBufferProportion * 0.7)
-		end
 
 		gl.ActiveFBO(fbo, DrawMiniMap)
 
@@ -849,7 +912,7 @@ function widget:DrawScreen()
 	  gl.Texture(0, false)
 	  gl.Blending(false)
 	  gl.UseShader(0)
-	else
+	elseif (alpha > 0.01) then
 		glDrawMiniMap()
 	end
 

@@ -74,12 +74,6 @@ local Sounds = {
 local VFSUtils = VFS.Include('gamedata/VFSUtils.lua')
 
 local optionOverrides = {
-	["weapon/missile/icbm_launch9"] = {
-		pitchMod = 0,
-		gainMod = 0,
-		priority  = 1
-	}
-
 }
 
 local defaultOpts = {

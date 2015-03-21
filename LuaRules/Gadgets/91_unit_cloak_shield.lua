@@ -84,6 +84,7 @@ local cloakShieldCmdDesc = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+include("LuaRules/Configs/constants.lua")
 
 local function ValidateCloakShieldDefs(mds)
   local newDefs = {}
@@ -185,7 +186,7 @@ local function AddCloakShieldUnit(unitID, cloakShieldDef)
     radius  = 0,
     minrad  = cloakShieldDef.minrad,
     maxrad  = cloakShieldDef.maxrad,
-    energy  = cloakShieldDef.energy / 32,
+    energy  = cloakShieldDef.energy / TEAM_SLOWUPDATE_RATE,
     isTransport = cloakShieldDef.isTransport,
     unitRadius  = Spring.GetUnitRadius(unitID),
     

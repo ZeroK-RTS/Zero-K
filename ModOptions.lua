@@ -415,7 +415,17 @@ local options = {
       {
         key  = "investmentreturn",
         name = "Investment Return",
+        desc = "Extra income is given to active players who built economy structure until the cost of the structure is paid.",
+      },
+      {
+        key  = "investmentreturn_od",
+        name = "Overdrive Return",
         desc = "Extra overdrive is given to active players who built energy structure until the cost of the structure is paid.",
+      },
+      {
+        key  = "investmentreturn_base",
+        name = "Extractor Return",
+        desc = "Extra income is given to active players who built metal extractor until the cost of the structure is paid.",
       },
       {
         key  = "communism",
@@ -512,7 +522,7 @@ local options = {
     step   = 1,
   },
   {
-    key    = 'MetalMult',
+    key    = 'metalmult',
     name   = 'Metal Extraction Multiplier',
     desc   = 'Multiplies metal extraction rate. For use in large team games when there are fewer mexes per player.',
     type   = 'number',
@@ -524,7 +534,7 @@ local options = {
                     -- (step <= 0) means that there is no quantization
   },
   {
-    key    = 'EnergyMult',
+    key    = 'energymult',
     name   = 'Energy Production Multiplier',
     desc   = 'Useful for speed games without relying on map units.',
     type   = 'number',

@@ -34,6 +34,7 @@ end
 --------------------------------------------------------------------------------
 
 include("LuaRules/Configs/customcmds.h.lua")
+include("LuaRules/Configs/constants.lua")
 
 local SYNCSTR = "unit_cloak_shield"
 
@@ -185,7 +186,7 @@ local function AddCloakShieldUnit(unitID, cloakShieldDef)
     radius  = 0,
     minrad  = cloakShieldDef.minrad,
     maxrad  = cloakShieldDef.maxrad,
-    energy  = cloakShieldDef.energy / 32,
+    energy  = cloakShieldDef.energy / TEAM_SLOWUPDATE_RATE,
     isTransport = cloakShieldDef.isTransport,
     unitRadius  = Spring.GetUnitRadius(unitID),
     

@@ -86,7 +86,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
-      flighttime              = 100,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

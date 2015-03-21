@@ -77,6 +77,7 @@ unitDef = {
       edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:EMPMISSILE_EXPLOSION]],
       fireStarter             = 0,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
