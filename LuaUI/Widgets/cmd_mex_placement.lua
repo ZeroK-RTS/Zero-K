@@ -110,7 +110,7 @@ local TEXT_CORRECT_Y = 1.25
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
 options_path = 'Settings/Interface/Metal Spots'
-options_order = { 'drawicons', 'size', 'rounding'}
+options_order = { 'drawicons', 'size', 'syncTeamColorSpec', 'rounding'}
 options = {
 	
 	drawicons = {
@@ -136,6 +136,12 @@ options = {
 		min = 1,
 		max = 4,
 		advanced = true,
+		OnChange = function() updateMexDrawList() end
+	},
+	syncTeamColorSpec = {
+		name = "Sync Team Color when Spectating",
+		type = "bool",
+		value = true,
 		OnChange = function() updateMexDrawList() end
 	}
 }
@@ -429,7 +435,7 @@ function widget:UnitFinished(unitID, unitDefID, teamID)
 			local spotID = WG.metalSpotsByPos[x] and WG.metalSpotsByPos[x][z]
 			if spotID then
 				spotByID[unitID] = spotID
-				spotData[spotID] = {unitID = unitID, allyTeam = spGetUnitAllyTeam(unitID)}
+				spotData[spotID] = {unitID = unitID, team = Spring.GetUnitTeam(unitID), allyTeam = spGetUnitAllyTeam(unitID)}
 				updateMexDrawList()
 			end
 		elseif spGetUnitAllyTeam(unitID) == myAllyTeam then
@@ -543,10 +549,16 @@ local miniMexDrawList = 0
 local function getSpotColor(x,y,z,id, specatate, t)
 	if specatate then
 		if spotData[id] then
-			if spotData[id].allyTeam == spGetMyAllyTeamID() then
-				return allyMexColor[t]
+			if options.syncTeamColorSpec.value then
+				local r, g, b = Spring.GetTeamColor(spotData[id].team)
+				local alpha = t == 1 and 0.7 or 1.0 --Judging by colours set up top
+				return {r, g, b, alpha}
 			else
-				return enemyMexColor[t]
+				if spotData[id].allyTeam == spGetMyAllyTeamID() then
+					return allyMexColor[t]
+				else
+					return enemyMexColor[t]
+				end
 			end
 		else
 			return neutralMexColor[t]
