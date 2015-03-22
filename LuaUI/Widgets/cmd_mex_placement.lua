@@ -100,6 +100,8 @@ local allyMexColor = {[1] = {0, 1, 1, 0.7}, [2] = {0, 1, 1, 1}}
 local neutralMexColor = {[1] = {1.0, 1.0, 1.0, 0.7}, [2] = {1.0, 1.0, 1.0, 1}}
 local enemyMexColor = {[1] = {1, 0, 0, 0.7}, [2] = {1, 0, 0, 1}}
 
+local allyTeams = {}	-- [id] = {team1, team2, ...}
+
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
@@ -138,10 +140,10 @@ options = {
 		advanced = true,
 		OnChange = function() updateMexDrawList() end
 	},
-	syncTeamColorSpec = {
-		name = "Sync Team Color when Spectating",
+	specPlayerColours = {
+		name = "Use player colours when spectating",
 		type = "bool",
-		value = true,
+		value = false,
 		OnChange = function() updateMexDrawList() end
 	}
 }
@@ -549,16 +551,20 @@ local miniMexDrawList = 0
 local function getSpotColor(x,y,z,id, specatate, t)
 	if specatate then
 		if spotData[id] then
-			if options.syncTeamColorSpec.value then
+			if options.specPlayerColours.value then
 				local r, g, b = Spring.GetTeamColor(spotData[id].team)
 				local alpha = t == 1 and 0.7 or 1.0 --Judging by colours set up top
 				return {r, g, b, alpha}
 			else
-				if spotData[id].allyTeam == spGetMyAllyTeamID() then
-					return allyMexColor[t]
-				else
-					return enemyMexColor[t]
-				end
+				-- local r, g, b = Spring.GetTeamColor(allyTeams[spotData[id].allyTeam][1])
+				local r, g, b = Spring.GetTeamColor(Spring.GetTeamList(spotData[id].allyTeam)[1])
+				local alpha = t == 1 and 0.7 or 1.0 --Judging by colours set up top
+				return {r, g, b, alpha}
+				-- if spotData[id].allyTeam == spGetMyAllyTeamID() then
+				-- 	return allyMexColor[t]
+				-- else
+				-- 	return enemyMexColor[t]
+				-- end
 			end
 		else
 			return neutralMexColor[t]
