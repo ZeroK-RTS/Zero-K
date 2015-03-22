@@ -2101,14 +2101,28 @@ function gadgetHandler:RecvFromSynced(...)
 end
 --]]
 
+local limited_commands = {
+	"resignteam",
+}
+
 function gadgetHandler:GotChatMsg(msg, player)
-    --local ki = self.knownGadgets[name]
-    --Spring.Echo("Check")
-    --if not IsSyncedCode() then
-	--  for i, v in pairs(self.knownGadgets) do
-	--	Spring.Echo(i .. "  " .. ((v.active and "active") or ""))
-	--  end
-	--end
+
+	local elevated = false
+	if player == 255 then
+		elevated = true
+	else
+		local playerkeys = select(10, Spring.GetPlayerInfo(player))
+		if (playerkeys and playerkeys.admin and (playerkeys.admin == "1")) then
+			elevated = true
+		end
+	end
+
+	for i=1, #limited_commands do
+		if (string.find(msg, limited_commands[i]) == 1) and not elevated then
+			return true
+		end
+	end
+
   if (((player == 0) or (player == 255)) and Spring.IsCheatingEnabled()) then	-- ours
   --if ((player == 0) and Spring.IsCheatingEnabled()) then		-- base
     local sp = '^%s*'    -- start pattern

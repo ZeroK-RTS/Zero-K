@@ -106,6 +106,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:flash1bluedark]],
       fireStarter             = 90,
+	  fireTolerance           = 8192, -- 45 degrees
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
