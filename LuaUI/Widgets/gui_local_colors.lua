@@ -156,8 +156,10 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	ResetOldTeamColors()
-	NotifyColorChange()
-	WG.LocalColor.localTeamColorToggle = nil
+	if not Spring.IsGameOver() then
+		ResetOldTeamColors()
+		NotifyColorChange()
+		WG.LocalColor.localTeamColorToggle = nil
+	end
 end
 
