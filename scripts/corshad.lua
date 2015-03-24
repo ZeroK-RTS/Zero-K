@@ -22,6 +22,9 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 local spSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
+local spGetGroundHeight = Spring.GetGroundHeight
+
+local min, max = math.min, math.max
 
 local smokePiece = {fuselage, thrustr, thrustl}
 
@@ -53,7 +56,10 @@ local lowBehaviour = {
 
 local SIG_TAKEOFF = 1
 local SIG_CHANGE_FLY_HEIGHT = 2
+local SIG_SPEED_CONTROL = 4
 local takeoffHeight = UnitDefNames["corshad"].wantedHeight
+local fullHeight = UnitDefNames["corshad"].wantedHeight/1.5
+local minSpeedMult = 0.44
 
 local function BehaviourChangeThread(behaviour)
 	Signal(SIG_CHANGE_FLY_HEIGHT)
@@ -88,12 +94,27 @@ function BomberDive_FlyLow(height)
 	StartThread(BehaviourChangeThread, lowBehaviour)
 end
 
+local function SpeedControl()
+	Signal(SIG_SPEED_CONTROL)
+	SetSignalMask(SIG_SPEED_CONTROL)
+	while true do
+		local x,y,z = spGetUnitPosition(unitID)
+		local terrain = spGetGroundHeight(x,z)
+		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain-50)/(fullHeight-60)))
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedMult)
+		GG.UpdateUnitAttributes(unitID)
+		GG.UpdateUnitAttributes(unitID)
+		Sleep(250)
+	end
+end
+
 function script.StartMoving()
 	--Turn( fins , z_axis, math.rad(-(-30)), math.rad(50) )
 	Move( wingr1 , x_axis, 0, 50)
 	Move( wingr2 , x_axis, 0, 50)
 	Move( wingl1 , x_axis, 0, 50)
 	Move( wingl2 , x_axis, 0, 50)
+	StartThread(SpeedControl)
 end
 
 function script.StopMoving()
