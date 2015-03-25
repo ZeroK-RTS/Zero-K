@@ -20,6 +20,7 @@ include("Widgets/COFCtools/Interpolate.lua")
 --Transition issues: 
 --1) "TAB" Overview have slight jump at finish, reason unknown!
 --2) holding "CTRL+Arrow" to rotate have jump when first initiated, reason is because of delay in "repeat" status for KeyPress() (and probably because added drift :))
+--3) vibration at max-zoomout when follow cursor active, reason: probably drift/interpolation interaction with COFC ceiling height, pyramid ect.
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -295,8 +296,9 @@ options = {
 		OnChange = function(self) 
 			local cs = Spring.GetCameraState()
 			if cs.rx then
-				SetCenterBounds(cs) 
-				Spring.SetCameraState(cs, options.smoothness.value) 
+				SetCenterBounds(cs)
+				-- Spring.SetCameraState(cs, options.smoothness.value)
+				OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
 			end
 		end,
 	},
@@ -519,7 +521,9 @@ options = {
 				local cs = Spring.GetCameraState()
 				cs.px,cs.py,cs.pz =Spring.GetUnitPosition(selUnits[1]) --place FPS camera on the ground (prevent out of LOD case)
 				cs.py = cs.py + 25
-				Spring.SetCameraState(cs,0)
+
+				-- Spring.SetCameraState(cs,0)
+				OverrideSetCameraStateInterpolate(cs,0)
 			else
 				Spring.SendCommands('trackoff')
 				Spring.SendCommands('viewfree')
@@ -1255,6 +1259,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 end
 
 local function SetCameraTarget(gx,gy,gz,smoothness,dist)
+	Spring.Echo("game_message: smooth " .. smoothness) 
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
 	if gx and gy and gz then --just in case
