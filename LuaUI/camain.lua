@@ -136,6 +136,10 @@ function KeyRelease(key, mods)
   return widgetHandler:KeyRelease(key, mods)
 end
 
+function TextInput(utf8, ...)
+  return widgetHandler:TextInput(utf8, ...)
+end
+
 function MouseMove(x, y, dx, dy, button)
   return widgetHandler:MouseMove(x, y, dx, dy, button)
 end
