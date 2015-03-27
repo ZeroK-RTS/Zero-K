@@ -4,7 +4,7 @@
 Example:
 local tr
 function widget:Initialize()
-	tr=WG.initializeTranslation(GetInfo().name,WG.lang)
+	tr=WG.initializeTranslation(GetInfo().name)
 end
 
 ...
@@ -42,21 +42,25 @@ local function loadLocale(i18n,widget_name,locale)
 		local t={}
 		t[locale]=lang
 		i18n.load(t)
-		i18n.setLocale(locale)
 		return true
 	end
 	Spring.Echo("Cannot load locale \""..locale.."\" for "..widget_name)
 	return false
 end
 
-local function initializeTranslation(widget_name,locale)
+local function initializeTranslation(widget_name)
 	local i18n = VFS.Include("LuaUI/i18nlib/i18n/init.lua", nil, VFS.DEF_MODE)
+	loadLocale(i18n,widget_name,"en") 
 	
-	if not loadLocale(i18n,widget_name,locale) then
-		loadLocale(i18n,widget_name,"en") 
-	end
-	
-	return i18n
+	local localsList={en=true}
+	return 	function(key,data)
+				local lang=WG.lang
+				if not localsList[lang] then
+					loadLocale(i18n,widget_name,lang)
+					localsList[lang]=true
+				end
+				return i18n(key,data,WG.lang)
+			end
 end
 
 WG.initializeTranslation=initializeTranslation

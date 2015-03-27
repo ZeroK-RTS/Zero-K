@@ -130,11 +130,11 @@ function i18n.set(key, value)
 end
 
 local missingTranslations = {}
-function i18n.translate(key, data)
+function i18n.translate(key, data, newLocale)
   assertPresent('translate', 'key', key)
 
   data = data or {}
-  local usedLocale = data.locale or locale
+  local usedLocale = newLocale or locale
 
   local fallbacks = variants.fallbacks(usedLocale, fallbackLocale)
   for i=1, #fallbacks do
