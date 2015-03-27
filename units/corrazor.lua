@@ -97,7 +97,7 @@ unitDef = {
         subs    = 0.8,
       },
 
-      duration                = 0.06,
+      duration                = 0.04,
       edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:flash1orange]],
       fireStarter             = 10,
@@ -118,7 +118,7 @@ unitDef = {
       startsmoke              = [[1]],
 	  texture1                = "razorbolt",
 	  texture2                = "null",
-      thickness               = 2.75,
+      thickness               = 2,
       tolerance               = 1000,
       turnRate                = 48000,
       turret                  = true,
