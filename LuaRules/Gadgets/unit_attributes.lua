@@ -404,7 +404,7 @@ function UpdateUnitAttributes(unitID, frame)
 			Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { oldVal }, { })
 		end
 	end
-	spGetUnitRulesParam(unitID,"disarmed")
+
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1)
 	if cloakBlocked then
 		GG.PokeDecloakUnit(unitID, 1)
