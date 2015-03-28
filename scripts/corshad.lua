@@ -61,7 +61,6 @@ local takeoffHeight = UnitDefNames["corshad"].wantedHeight
 local fullHeight = UnitDefNames["corshad"].wantedHeight/1.5
 
 local minSpeedMult = 0.44
-local speedUpdateRate = 400
 
 local function BehaviourChangeThread(behaviour)
 	Signal(SIG_CHANGE_FLY_HEIGHT)
@@ -87,17 +86,6 @@ local function BehaviourChangeThread(behaviour)
 	--GG.UpdateUnitAttributes(unitID)
 end
 
-function BomberDive_FlyHigh()
-	StartThread(BehaviourChangeThread, highBehaviour)
-	speedUpdateRate = 400
-end
-
-function BomberDive_FlyLow(height)
-	lowBehaviour.wantedHeight = height
-	StartThread(BehaviourChangeThread, lowBehaviour)
-	speedUpdateRate = 200
-end
-
 local function SpeedControl()
 	Signal(SIG_SPEED_CONTROL)
 	SetSignalMask(SIG_SPEED_CONTROL)
@@ -108,8 +96,19 @@ local function SpeedControl()
 		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedMult)
 		GG.UpdateUnitAttributes(unitID)
 		GG.UpdateUnitAttributes(unitID)
-		Sleep(speedUpdateRate)
+		Sleep(50 + 2*max(0, y - terrain - 80))
 	end
+end
+
+function BomberDive_FlyHigh()
+	StartThread(BehaviourChangeThread, highBehaviour)
+end
+
+function BomberDive_FlyLow(height)
+	height = math.min(height, highBehaviour.wantedHeight)
+	StartThread(SpeedControl)
+	lowBehaviour.wantedHeight = height
+	StartThread(BehaviourChangeThread, lowBehaviour)
 end
 
 function script.StartMoving()

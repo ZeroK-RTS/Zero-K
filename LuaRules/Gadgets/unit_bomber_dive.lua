@@ -43,34 +43,11 @@ local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 
 local bomberWeaponNamesDefs, bomberWeaponDefs, bomberUnitDefs = include("LuaRules/Configs/bomber_dive_defs.lua")
 
-local UPDATE_FREQUENCY = 60
-
+local UPDATE_FREQUENCY = 20
 local bombers = {}
-
-local lowBehaviour = {}
-local highBehaviour = {}
-
 local lowHeight = {}
 
 for unitDefID,data in pairs(bomberUnitDefs) do
-	local ud = UnitDefs[unitDefID]
-	highBehaviour[unitDefID] = {
-		wantedHeight = data.orgHeight,
-		maxPitch = ud.maxPitch,
-		maxBank = ud.maxBank,
-		turnRadius = ud.turnRadius,
-		maxAileron = ud.maxAileron,
-		maxElevator = ud.maxElevator,
-		maxRudder = ud.maxRudder,
-	}
-	lowBehaviour[unitDefID] = {
-		maxPitch = 0.5,
-		maxBank = 0.5,
-		turnRadius = 100,
-		maxAileron = 0.004,
-		maxElevator = 0.026,
-		maxRudder = 0.015,
-	}
 	lowHeight[unitDefID] = data.diveHeight
 end
  
@@ -78,7 +55,7 @@ end
 --------------------------------------------------------------------------------
 	
 local function setFlyLow(unitID, height)
-	local wantedHeight = math.min(bombers[unitID].lowHeight + height, bombers[unitID].highBehaviour.wantedHeight)
+	local wantedHeight = bombers[unitID].lowHeight + height
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	if env then
 		Spring.UnitScript.CallAsUnit(unitID, env.BomberDive_FlyLow, wantedHeight)
@@ -139,7 +116,7 @@ function Bomber_Dive_fake_fired(unitID)
 			local mobileID = isAttackingMobile(unitID)
 			if mobileID then
 				local height = GetUnitHeight(mobileID)
-				temporaryDive(unitID, 150, height)
+				temporaryDive(unitID, 20, height)
 			end
 		end
 	end
@@ -251,8 +228,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	bombers[unitID] = {
 		diveState = DEFAULT_COMMAND_STATE, -- 0 = off, 1 = with shield, 2 = when attacking, 3 = always
 		diveDamage = bomberUnitDefs[unitDefID].diveDamage,
-		highBehaviour = highBehaviour[unitDefID],
-		lowBehaviour = lowBehaviour[unitDefID],
 		lowHeight = lowHeight[unitDefID],
 		resetTime = false,
 	}

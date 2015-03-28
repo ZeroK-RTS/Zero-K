@@ -84,6 +84,7 @@ function BomberDive_FlyHigh()
 end
 
 function BomberDive_FlyLow(height)
+	height = math.min(height, highBehaviour.wantedHeight)
 	lowBehaviour.wantedHeight = height
 	StartThread(BehaviourChangeThread, lowBehaviour)
 end
