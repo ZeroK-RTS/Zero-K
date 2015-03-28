@@ -46,11 +46,11 @@ local highBehaviour = {
 	maxRudder = ud.maxRudder,
 }
 local lowBehaviour = {
-	maxPitch = 0.5,
+	maxPitch = 0.72,
 	maxBank = 0.5,
 	turnRadius = 100,
 	maxAileron = 0.004,
-	maxElevator = 0.026,
+	maxElevator = 0.016,
 	maxRudder = 0.015,
 }
 
