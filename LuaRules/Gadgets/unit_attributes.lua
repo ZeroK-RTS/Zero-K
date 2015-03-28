@@ -81,7 +81,6 @@ local currentAcc = {}
 local unitForcedOff = {}
 local unitSlowed = {}
 local unitShieldDisabled = {}
-local unitCannotCloak = {}
 
 local unitReloadPaused = {}
 
@@ -301,7 +300,6 @@ local function removeUnit(unitID)
 	unitForcedOff[unitID] = nil
 	unitSlowed[unitID] = nil
 	unitShieldDisabled[unitID] = nil
-	unitCannotCloak[unitID] = nil 
 	unitReloadPaused[unitID] = nil
 	
 	currentEcon[unitID] = nil 
@@ -406,17 +404,10 @@ function UpdateUnitAttributes(unitID, frame)
 			Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { oldVal }, { })
 		end
 	end
-	
+	spGetUnitRulesParam(unitID,"disarmed")
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1)
 	if cloakBlocked then
-		changedAtt = true
-		if not unitCannotCloak[unitID] then
-			Spring.SetUnitCloak(unitID, false)
-			unitCannotCloak[unitID] = true
-		end
-	elseif unitCannotCloak[unitID] then
-		Spring.SetUnitCloak(unitID, false, false)
-		unitCannotCloak[unitID] = nil
+		GG.PokeDecloakUnit(unitID, 1)
 	end
 
 	-- remove the attributes if nothing is being changed

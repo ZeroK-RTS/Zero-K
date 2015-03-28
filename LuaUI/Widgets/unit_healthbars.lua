@@ -812,7 +812,7 @@ do
 		  ci.reloadTime = reloadTime
 		  -- When weapon is disabled the reload time is constantly set to be almost complete. 
 		  -- It results in a bunch of units walking around with 99% reload bars.
-		  if reloadFrame > gameFrame + 4 then -- UPDATE_PERIOD in unit_attributes.lua.
+		  if reloadFrame > gameFrame + 6 then -- UPDATE_PERIOD in unit_attributes.lua.
             reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
 		    if (reload >= 0) then
               AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
