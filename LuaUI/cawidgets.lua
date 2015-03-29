@@ -92,7 +92,7 @@ VFSMODE = localWidgetsFirst and VFS.RAW_FIRST
 VFSMODE = VFSMODE or localWidgets and VFS.ZIP_FIRST
 VFSMODE = VFSMODE or VFS.ZIP
 
-local detailLevel = 2 -- Spring.GetConfigInt("widgetDetailLevel", 3)
+local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 3)
 
 --------------------------------------------------------------------------------
 
@@ -218,6 +218,7 @@ local callInLists = {
   'DrawScreen',
   'KeyPress',
   'KeyRelease',
+  'TextInput',
   'MousePress',
   'MouseWheel',
   'JoyAxis',
@@ -303,11 +304,11 @@ function widgetHandler:LoadOrderList()
 		self.orderList = {}
 		self.orderList.version = ORDER_VERSION
 	end 
-	local detailLevel = 2 -- Spring.GetConfigInt("widgetDetailLevel", 2)
-	--if (self.orderList.lastWidgetDetailLevel ~= detailLevel) then
-	--	resetWidgetDetailLevel = true
-	--	self.orderList.lastWidgetDetailLevel = detailLevel
-	--end 
+	local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 2)
+	if (self.orderList.lastWidgetDetailLevel ~= detailLevel) then
+		resetWidgetDetailLevel = true
+		self.orderList.lastWidgetDetailLevel = detailLevel
+	end 
   end
 end
 
@@ -531,15 +532,15 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
     enabled = false
   end
 
-  --if resetWidgetDetailLevel and info.detailsDefault ~= nil then
-  --  if type(info.detailsDefault) == "table" then
-  --    enabled = info.detailsDefault[detailLevel] and true
-  --  elseif type(info.detailsDefault) == "number" then
-  --    enabled = detailLevel >= info.detailsDefault
-  --  elseif tonumber(info.detailsDefault) then
-  --    enabled = detailLevel >= tonumber(info.detailsDefault)
-  --  end
-  --end
+  if resetWidgetDetailLevel and info.detailsDefault ~= nil then
+	if type(info.detailsDefault) == "table" then
+		enabled = info.detailsDefault[detailLevel] and true
+	elseif type(info.detailsDefault) == "number" then
+		enabled = detailLevel >= info.detailsDefault
+	elseif tonumber(info.detailsDefault) then
+		enabled = detailLevel >= tonumber(info.detailsDefault)
+	end
+  end
 			 
   if (enabled) then
 	-- this will be an active widget
@@ -1541,6 +1542,19 @@ function widgetHandler:KeyRelease(key, mods, label, unicode)
 
   for _,w in ipairs(self.KeyReleaseList) do
     if (w:KeyRelease(key, mods, label, unicode)) then
+      return true
+    end
+  end
+  return false
+end
+
+function widgetHandler:TextInput(utf8, ...)
+  if (self.tweakMode) then
+    return true
+  end
+
+  for _,w in ipairs(self.TextInputList) do
+    if (w:TextInput(utf8, ...)) then
       return true
     end
   end

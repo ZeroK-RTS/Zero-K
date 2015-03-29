@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "Jan. 2008",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -39,7 +39,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		hasShockwave[wd.id] = {special = 1}
         Script.SetWatchWeapon(wd.id,true)
 	    wantedList[#wantedList + 1] = wd.id
-      elseif (wd.damageAreaOfEffect>70 and not wd.paralyzer) then
+      elseif (wd.damageAreaOfEffect>70 and not wd.paralyzer and not customParams.disarmdamageonly) then
 	    hasShockwave[wd.id] = {
 			life = 23*life, 
 			speed = speed,

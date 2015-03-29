@@ -15,6 +15,12 @@ function widget:GetInfo()
 end
 
 include("keysym.h.lua")
+include("Widgets/COFCtools/Interpolate.lua")
+--Noticeable bugs that is clearly attributable to introduction of Interpolate():
+--Transition issues: 
+--1) "TAB" Overview have slight jump at finish, reason unknown!
+--2) holding "CTRL+Arrow" to rotate have jump when first initiated, reason is because of delay in "repeat" status for KeyPress() (and probably because added drift :))
+--3) vibration at max-zoomout when follow cursor active, reason: probably drift/interpolation interaction with COFC ceiling height, pyramid ect.
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -218,17 +224,17 @@ options = {
 		min = 1, max = 50,
 		value = 40,
 	},
-	zoominfactor = {
+	zoominfactor = { --should be lower than zoom-out-speed to help user aim tiny units
 		name = 'Zoom-in speed',
 		type = 'number',
-		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.3,
+		min = 0.1, max = 1, step = 0.05,
+		value = 0.5,
 	},
-	zoomoutfactor = {
+	zoomoutfactor = { --should be higher than zoom-in-speed to help user escape to bigger picture
 		name = 'Zoom-out speed',
 		type = 'number',
-		min = 0.1, max = 0.5, step = 0.05,
-		value = 0.3,
+		min = 0.3, max = 1.3, step = 0.05,
+		value = 0.8,
 	},
 	invertzoom = {
 		name = 'Invert zoom',
@@ -290,8 +296,9 @@ options = {
 		OnChange = function(self) 
 			local cs = Spring.GetCameraState()
 			if cs.rx then
-				SetCenterBounds(cs) 
-				Spring.SetCameraState(cs, options.smoothness.value) 
+				SetCenterBounds(cs)
+				-- Spring.SetCameraState(cs, options.smoothness.value)
+				OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
 			end
 		end,
 	},
@@ -514,7 +521,9 @@ options = {
 				local cs = Spring.GetCameraState()
 				cs.px,cs.py,cs.pz =Spring.GetUnitPosition(selUnits[1]) --place FPS camera on the ground (prevent out of LOD case)
 				cs.py = cs.py + 25
-				Spring.SetCameraState(cs,0)
+
+				-- Spring.SetCameraState(cs,0)
+				OverrideSetCameraStateInterpolate(cs,0)
 			else
 				Spring.SendCommands('trackoff')
 				Spring.SendCommands('viewfree')
@@ -694,6 +703,7 @@ SetFOV = function(fov)
 	minZoomTiltAngle = (30 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
+  -- OverrideSetCameraStateInterpolate(cs,smoothness.value)
 end
 
 local function SetSkyBufferProportion(cs)
@@ -1249,6 +1259,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 end
 
 local function SetCameraTarget(gx,gy,gz,smoothness,dist)
+	Spring.Echo("game_message: smooth " .. smoothness) 
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
 	if gx and gy and gz then --just in case
@@ -1280,7 +1291,8 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 
 		SetCenterBounds(cs) 
 
-		spSetCameraState(cs, smoothness) --move
+		-- spSetCameraState(cs, smoothness) --move
+		OverrideSetCameraStateInterpolate(cs,smoothness)
 	end
 end
 
@@ -1417,7 +1429,8 @@ local function Zoom(zoomin, shift, forceCenter)
 
 	SetCenterBounds(cs)
 
-	spSetCameraState(cs, options.smoothness.value)
+	-- spSetCameraState(cs, options.smoothness.value)
+	OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
 
 	return true
 end
@@ -1447,7 +1460,8 @@ local function Altitude(up, s)
 
 	SetCenterBounds(cs)
 
-	spSetCameraState(cs, options.smoothness.value)
+	-- spSetCameraState(cs, options.smoothness.value)
+	OverrideSetCameraStateInterpolate(cs, options.smoothness.value)
 	return true
 end
 --==End camera utility function^^ (a frequently used function. Function often used for controlling camera).
@@ -1461,7 +1475,8 @@ local function ResetCam()
 	cs.rx = -HALFPI
 	cs.ry = PI
 	SetCenterBounds(cs)
-	spSetCameraState(cs, 0)
+	-- spSetCameraState(cs, 0)
+	OverrideSetCameraStateInterpolate(cs,0)
 	ov_cs = nil
 	onTiltZoomTrack = true
 end
@@ -1502,7 +1517,8 @@ OverviewAction = function()
 			cs.rx = -HALFPI
 		end
 		SetCenterBounds(cs)
-		spSetCameraState(cs, 1)
+		-- spSetCameraState(cs, 1)
+		OverrideSetCameraStateInterpolate(cs,1)
 	else --if in overview mode
 		local cs = spGetCameraState()
 		mx, my = spGetMouseState()
@@ -1519,7 +1535,8 @@ OverviewAction = function()
 			local cstemp = UpdateCam(cs) --set camera position & orientation based on lockstop point
 			if cstemp then cs = cstemp; end
 			SetCenterBounds(cs)
-			spSetCameraState(cs, 1)
+			-- spSetCameraState(cs, 1)
+			OverrideSetCameraStateInterpolate(cs,1)
 		end
 		
 		if thirdperson_trackunit then
@@ -1536,7 +1553,8 @@ OverviewAction = function()
 				local cs = spGetCameraState()	
 				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1]) --move camera to unit position so no "out of LOD" case
 				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
-				spSetCameraState(cs,0)
+				-- spSetCameraState(cs,0)
+				OverrideSetCameraStateInterpolate(cs,0)
 			end
 		end
 	end
@@ -1581,7 +1599,8 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 
 		local cstemp = UpdateCam(cs)
 		if cstemp then cs = cstemp; end
-		spSetCameraState(cs, smoothness) --track & zoom
+		-- spSetCameraState(cs, smoothness) --track & zoom
+		OverrideSetCameraStateInterpolate(cs,0)
 	end
 	local teamID = Spring.GetLocalTeamID()
 	local _, playerID = Spring.GetTeamInfo(teamID)
@@ -1668,7 +1687,8 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
 		else
 			ls_have = false
 		end
-		spSetCameraState(cs, smooth and options.smoothness.value or 0)
+		-- spSetCameraState(cs, smooth and options.smoothness.value or 0)
+		OverrideSetCameraStateInterpolate(cs,smooth and options.smoothness.value or 0)
 	end
 end
 
@@ -1749,7 +1769,8 @@ local function ThirdPersonScrollCam(cs) --3rd person mode that allow you to jump
 	thirdperson_trackunit = foundUnit --remember current unitID
 	cs.px,cs.py,cs.pz=spGetUnitPosition(foundUnit) --move FPS camera to ground level (prevent out of LOD problem where unit turn into icons)
 	cs.py = cs.py+25
-	spSetCameraState(cs,0)
+	-- spSetCameraState(cs,0)
+	OverrideSetCameraStateInterpolate(cs,0)
 	thirdPerson_transit = spGetTimer() --block access to edge scroll until camera focus on unit
 end
 
@@ -1828,7 +1849,8 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	if csnew then
 		if not options.freemode.value then csnew.py = min(csnew.py, maxDistY) end --Ensure camera never goes higher than maxY
 		-- SetCenterBounds(csnew) --Should be done since cs.py changes, but stops camera movement southwards. TODO: Investigate this.
-    spSetCameraState(csnew, smoothlevel)
+    -- spSetCameraState(csnew, smoothlevel)
+	OverrideSetCameraStateInterpolate(cs,smoothlevel)
   end
 	
 end
@@ -2095,7 +2117,8 @@ function widget:Update(dt)
 				if x and y and z then --unit position can be NIL if spectating with limited LOS
 					cs.px,cs.py,cs.pz=x,y,z
 					cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
-					spSetCameraState(cs,0)
+					-- spSetCameraState(cs,0)
+					OverrideSetCameraStateInterpolate(cs,0)
 				end
 			else --no unit selected: return to freeStyle camera
 				spSendCommands('trackoff')
@@ -2115,7 +2138,8 @@ function widget:Update(dt)
 		cs.scrollSpeed = 0
 		--cs.gndOffset = options.mingrounddist.value
 		cs.gndOffset = options.freemode.value and 0 or 1
-		spSetCameraState(cs,0)
+		-- spSetCameraState(cs,0)
+		OverrideSetCameraStateInterpolate(cs,0)
 	end
 	
 	if missedMouseRelease and camcycle==0 then 
@@ -2413,7 +2437,8 @@ end
 
 local screenFrame = 0
 function widget:DrawScreen()
-	SetSkyBufferProportion(Spring.GetCameraState())
+	SetSkyBufferProportion()
+	Interpolate()
 
 	--Reset Camera for tiltzoom at game start (Engine 92+)
 	if screenFrame == 3 then --detect frame no.2
@@ -2584,7 +2609,8 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			local cs = spGetCameraState()
 			cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
 			cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
-			spSetCameraState(cs,0)
+			-- spSetCameraState(cs,0)
+			OverrideSetCameraStateInterpolate(cs,0)
 		else
 			spSendCommands('trackoff')
 			spSendCommands('viewfree')
