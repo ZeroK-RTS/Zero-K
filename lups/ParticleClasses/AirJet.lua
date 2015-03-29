@@ -358,7 +358,7 @@ function AirJet:Visible()
   local posX,posY,posZ = self.pos[1],self.pos[2],self.pos[3]
   local losState
   if (self.unit and not self.worldspace) then
-    losState = (spGetUnitLosState(self.unit, LocalAllyTeamID) or {}).los or false
+    losState = (LocalAllyTeamID < 0) or (spGetUnitLosState(self.unit, LocalAllyTeamID) or {}).los or false
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
 	if ux then
       posX,posY,posZ = posX+ux,posY+uy,posZ+uz
@@ -375,6 +375,7 @@ function AirJet:Visible()
     if ((not losState) and self.los) then
       losState = IsPosInLos(posX,posY,posZ, LocalAllyTeamID)
     end
+	losState = losState or (LocalAllyTeamID < 0)
   end
   return (losState)and(spIsSphereInView(posX,posY,posZ,radius))
 end
