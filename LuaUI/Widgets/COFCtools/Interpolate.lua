@@ -1,3 +1,5 @@
+--a workaround for https://springrts.com/mantis/view.php?id=4650
+
 local osClock			= os.clock;
 local spGetCameraState	= Spring.GetCameraState
 local spSetCameraState	= Spring.SetCameraState
@@ -111,6 +113,12 @@ local function AddSpeed(cs,delta, tweenFact)
 	cs.velTime = delta.time
 end
 
+local function DisableEngineTilt(cs)
+	--Disable engine's tilt when we press arrow key and move mouse
+	cs.tiltSpeed = 0
+	cs.scrollSpeed = 0
+end
+
 --All algorithm is from "Spring/rts/game/CameraHandler.cpp"
 function Interpolate()
 	if not (targetCam.px) then
@@ -121,7 +129,8 @@ function Interpolate()
 	if ( lapsedTime >= deltaEnd.period) then
 		local cs = spGetCameraState()
 		CopyState(cs, targetCam)
-		AddSpeed(cs,deltaEnd,0.5) 
+		-- AddSpeed(cs,deltaEnd,0.5) 
+		DisableEngineTilt(cs)
 		spSetCameraState(cs,0)
 		targetCam.px = nil
 	else
@@ -132,7 +141,8 @@ function Interpolate()
 			local newState = Add(beginCam,deltaEnd,tweenFact) --add changes to camera state in gradual manner
 			local cs = spGetCameraState()
 			CopyState(cs, newState)
-			AddSpeed(cs,deltaEnd,tweenFact) --possibly make it look real/have drift effect
+			-- AddSpeed(cs,deltaEnd,tweenFact) --possibly make it look real/have drift effect
+			DisableEngineTilt(cs)
 			spSetCameraState(cs,0)
 		end
 	end
