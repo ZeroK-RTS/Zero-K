@@ -232,7 +232,7 @@ options = {
 	zoomoutfactor = { --should be higher than zoom-in-speed to help user escape to bigger picture
 		name = 'Zoom-out speed',
 		type = 'number',
-		min = 0.3, max = 1.3, step = 0.05,
+		min = 0.1, max = 1, step = 0.05,
 		value = 0.8,
 	},
 	invertzoom = {
@@ -572,7 +572,14 @@ local black = { 0, 0, 0 }
 local white = { 1, 1, 1 }
 
 
-local spGetCameraState		= Spring.GetCameraState
+local spGetCameraState		= 
+	function() 
+		if targetCam ~= nil then
+			return targetCam
+		else
+			return Spring.GetCameraState()
+		end
+	end
 local spGetCameraVectors	= Spring.GetCameraVectors
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spGetSmoothMeshHeight	= Spring.GetSmoothMeshHeight
