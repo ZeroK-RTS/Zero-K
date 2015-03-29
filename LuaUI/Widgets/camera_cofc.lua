@@ -18,9 +18,8 @@ include("keysym.h.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 --Noticeable bugs that is clearly attributable to introduction of Interpolate():
 --Transition issues: 
---1) "TAB" Overview have slight jump at finish, reason unknown!
---2) holding "CTRL+Arrow" to rotate have jump when first initiated, reason is because of delay in "repeat" status for KeyPress() (and probably because added drift :))
 --3) vibration at max-zoomout when follow cursor active, reason: probably drift/interpolation interaction with COFC ceiling height, pyramid ect.
+--Todo: remove Interpolate() and OverrideSetCameraStateInterpolate() when https://springrts.com/mantis/view.php?id=4650 is fixed
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1069,7 +1068,9 @@ end
 
 SetCenterBounds = function(cs)
 	-- if options.zoomouttocenter then Spring.Echo("zoomouttocenter.value: "..options.zoomouttocenter.value) end
-	if options.zoomouttocenter.value then --move camera toward center
+	if options.zoomouttocenter.value --move camera toward center
+	and ls_x --lockspot exist
+	then
 
 		scrnRay_cache.previous.fov = -999 --force reset cache (somehow cache value is used. Don't make sense at all...)
 
@@ -1259,7 +1260,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 end
 
 local function SetCameraTarget(gx,gy,gz,smoothness,dist)
-	Spring.Echo("game_message: smooth " .. smoothness) 
+
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
 	if gx and gy and gz then --just in case
@@ -1848,9 +1849,9 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	end
 	if csnew then
 		if not options.freemode.value then csnew.py = min(csnew.py, maxDistY) end --Ensure camera never goes higher than maxY
-		-- SetCenterBounds(csnew) --Should be done since cs.py changes, but stops camera movement southwards. TODO: Investigate this.
+		SetCenterBounds(csnew) --Should be done since cs.py changes, but stops camera movement southwards. TODO: Investigate this.
     -- spSetCameraState(csnew, smoothlevel)
-	OverrideSetCameraStateInterpolate(cs,smoothlevel)
+	OverrideSetCameraStateInterpolate(csnew,smoothlevel)
   end
 	
 end
@@ -2435,10 +2436,14 @@ local function DrawPoint(x, y, c, s)
   glBeginEnd(GL_POINTS, glVertex, x, y)
 end
 
+function widget:DrawScreenEffects(vsx, vsy)
+	--placed here so that its always called even when GUI is hidden
+	Interpolate()
+end
+
 local screenFrame = 0
 function widget:DrawScreen()
 	SetSkyBufferProportion()
-	Interpolate()
 
 	--Reset Camera for tiltzoom at game start (Engine 92+)
 	if screenFrame == 3 then --detect frame no.2
