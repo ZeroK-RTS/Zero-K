@@ -1579,6 +1579,7 @@ local function SearchElement(termToSearch,path)
 						local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch)
 						if found then
 							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+							break;
 						end
 					end
 				end
