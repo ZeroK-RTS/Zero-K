@@ -596,7 +596,9 @@ local function SetCountry(self)
 	WG.country = self.country
 	settings.country = self.country
 	
-	WG.lang(self.countryLang)
+	if WG.lang then
+		WG.lang(self.countryLang)
+	end
 	SetLangFontConf()
 	
 	settings.lang = self.countryLang

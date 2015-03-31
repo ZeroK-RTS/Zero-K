@@ -763,7 +763,7 @@ end
 local function GetUnitDesc(unitID, ud)
 	if not (unitID or ud) then return '' end
 	
-	local lang = WG.lang or 'en'
+	local lang = (WG.lang and WG.lang()) or 'en'
 	local font = WG.langFont
 	
 	
