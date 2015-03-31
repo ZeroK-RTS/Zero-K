@@ -1260,11 +1260,13 @@ function widget:Update(n)
 		local _, pos = spTraceScreenRay(mx, my, true)
 		if buildingPress then
 			if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
-				buildingPress.frame = spGetGameFrame() + options.staticMouseTime.value*32
+				buildingPress.frame = spGetGameFrame() + options.staticMouseTime.value*30
+				buildingPress.pos[1] = pos[1]
+				buildingPress.pos[3] = pos[3]
 			end
 		else
 			if legalPos(pos) then
-				buildingPress = {pos = pos, frame = spGetGameFrame() + options.staticMouseTime.value*32, unitDefID = -activeid}
+				buildingPress = {pos = pos, frame = spGetGameFrame() + options.staticMouseTime.value*30, unitDefID = -activeid}
 			end
 		end
 	else
