@@ -36,6 +36,10 @@ local table  = table
 -- Module declaration
 -----------------------------------------------------------------------------
 
+if not Spring.Utilities then
+	Spring.Utilities={}
+end
+
 Spring.Utilities.json = {}
 
 -- Public functions
