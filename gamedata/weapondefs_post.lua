@@ -198,6 +198,12 @@ end
 	if weaponDef.mygravity then
 		weaponDef.customparams.mygravity = weaponDef.mygravity -- For attack AOE widget
     end
+	if weaponDef.flighttime then
+		weaponDef.customparams.flighttime = weaponDef.flighttime
+    end
+	if weaponDef.weapontimer then
+		weaponDef.customparams.weapontimer = weaponDef.weapontimer
+    end
 	if weaponDef.weaponvelocity then
 		weaponDef.customparams.weaponvelocity = weaponDef.weaponvelocity -- For attack AOE widget
 	end
