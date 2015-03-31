@@ -28,6 +28,17 @@ include("utility_two.lua") --contain file backup function
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+if not WG.lang then
+	local lang
+	WG.lang=function(l)
+				if not l then
+					return lang
+				else
+					lang=l
+				end
+			end
+end
+
 
 local spGetConfigInt    		= Spring.GetConfigInt
 local spSendCommands			= Spring.SendCommands
@@ -568,8 +579,8 @@ end
 local UTF8SUPPORT = UTF8SupportCheck()
 
 local function SetLangFontConf()
-	if UTF8SUPPORT and VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang..".json", VFS.ZIP) then
-		WG.langData = Spring.Utilities.json.decode(VFS.LoadFile("Luaui/Configs/nonlatin/"..WG.lang..".json", VFS.ZIP))
+	if UTF8SUPPORT and VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang()..".json", VFS.ZIP) then
+		WG.langData = Spring.Utilities.json.decode(VFS.LoadFile("Luaui/Configs/nonlatin/"..WG.lang()..".json", VFS.ZIP))
 		WG.langFont = nil
 		WG.langFontConf = nil
 	else
@@ -585,7 +596,7 @@ local function SetCountry(self)
 	WG.country = self.country
 	settings.country = self.country
 	
-	WG.lang = self.countryLang 
+	WG.lang(self.countryLang)
 	SetLangFontConf()
 	
 	settings.lang = self.countryLang
@@ -1579,6 +1590,7 @@ local function SearchElement(termToSearch,path)
 						local found = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_desc,termToSearch)
 						if found then
 							filtered_pathOptions[#filtered_pathOptions+1] = {currentPath,option}
+							break;
 						end
 					end
 				end
@@ -2439,7 +2451,7 @@ function widget:Initialize()
 	end
 	
 	WG.country = settings.country	
-	WG.lang = settings.lang
+	WG.lang(settings.lang)
 	SetLangFontConf()
 	
 		-- add custom widget settings to crudemenu

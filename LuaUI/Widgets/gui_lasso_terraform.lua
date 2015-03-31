@@ -1659,7 +1659,7 @@ function widget:GameFrame(f)
 	
 end
 
-function WG.Terraform_SetPlacingRectangle(unitDefID)
+function Terraform_SetPlacingRectangle(unitDefID)
 	
 	-- Do no terraform with pregame placement.
 	if Spring.GetGameFrame() < 1 then
@@ -1702,6 +1702,10 @@ function WG.Terraform_SetPlacingRectangle(unitDefID)
 	SetFixedRectanglePoints(pos)
 	
 	return true
+end
+
+function widget:Initialize()
+	WG.Terraform_SetPlacingRectangle = Terraform_SetPlacingRectangle --set WG content at initialize rather than during file read to avoid conflict with local copy (for dev/experimentation)
 end
 
 --------------------------------------------------------------------------------
