@@ -598,10 +598,13 @@ function calcMainMexDrawList()
 			
 			glPushMatrix()
 			
-			glLineWidth(spot.metal*1.5)
-			glColor(mexColor)
+			glColor(0,0,0,0.7)
 			glDepthTest(false)
-			glDrawGroundCircle(x, 1, z, 40, 32)
+			glLineWidth(spot.metal*2.4)
+			glDrawGroundCircle(x, 1, z, 40, 21)
+			glColor(mexColor)
+			glLineWidth(spot.metal*1.5)
+			glDrawGroundCircle(x, 1, z, 40, 21)
 			
 			if options.drawicons.value then
 				local size = 1
