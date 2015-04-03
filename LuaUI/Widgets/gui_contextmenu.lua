@@ -380,7 +380,7 @@ end
 
 local function getDescription(unitDef)
 	local data = WG.langData
-	local lang = WG.lang
+	local lang = (WG.lang and WG.lang()) or "en"
 	local desc
 	if data then
 		local unitConf = data[unitDef.name] 
