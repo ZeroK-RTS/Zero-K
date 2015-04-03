@@ -75,7 +75,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 4,
       craterMult              = 3.5,
-
+	  
+      customParams            = {
+      lups_explodelife = 1.5,
+	  },
+	  
       damage                  = {
         default = 3502.5,
         subs    = 175,
