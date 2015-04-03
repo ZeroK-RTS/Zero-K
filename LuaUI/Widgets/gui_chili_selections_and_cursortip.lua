@@ -702,7 +702,12 @@ local function WriteGroupInfo()
 		if reloadFraction then
 			if reloadFraction < 0.99 then
 				remainingTime = math.floor(remainingTime)
-				dgunStatus = "\nDGun\255\255\90\90 Reloading\255\255\255\255(" .. remainingTime .. "s)"  --red and white
+				if remainingTime > 1000 then
+					remainingTime = "Never"
+				else
+					remainingTime = remainingTime .. "s"
+				end
+				dgunStatus = "\nDGun\255\255\90\90 Reloading\255\255\255\255(" .. remainingTime .. ")"  --red and white
 			else
 				dgunStatus = "\nDGun\255\90\255\90 Ready\255\255\255\255"
 			end
