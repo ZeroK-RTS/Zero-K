@@ -27,10 +27,10 @@ unitDef = {
     helptext       = [[Energy Transmission Pylons help one extend one's energy grid and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defenses that rely on the energy grid.]],
     helptext_de    = [[Durch das Energy Pylon wird es dir ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
     helptext_pl    = [[Ten wezel pozwala tanio rozszerzyc siec energetyczna, aby zapewnic kopalniom dodatkowa moc lub zasilic niektore potezniejsze wieze.]],
-
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
     modelradius    = [[24]],
+	removewait     = 1,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

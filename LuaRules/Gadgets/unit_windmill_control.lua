@@ -119,6 +119,9 @@ local function SetupUnit(unitID)
   end
   
   local unitDefID = Spring.GetUnitDefID(unitID)
+  local midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].midy) or 18
+  
+  local unitDefID = Spring.GetUnitDefID(unitID)
   
   local scriptIDs = {}
 
@@ -130,6 +133,8 @@ local function SetupUnit(unitID)
 	Spring.SetUnitMaxHealth(unitID, 400)
 	Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
 	Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
+	Spring.SetUnitRulesParam(unitID, "midpos_override", -5 - midy)
+	Spring.SetUnitRulesParam(unitID, "aimpos_override", 2 - midy)
 	return false
   end
   

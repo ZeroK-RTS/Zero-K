@@ -106,13 +106,17 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if offsets[unitDefID] and ud then
 		mid = offsets[unitDefID].mid
 		aim = offsets[unitDefID].aim
+		mid[2] = Spring.GetUnitRulesParam(unitID, "midpos_override") or mid[2]
+		aim[2] = Spring.GetUnitRulesParam(unitID, "aimpos_override") or aim[2]
+		
 		spSetUnitMidAndAimPos(unitID, 
 			mid[1] + ud.midx, mid[2] + ud.midy, mid[3] + ud.midz, 
 			aim[1] + ud.midx, aim[2] + ud.midy, aim[3] + ud.midz, true)
 	else
-		mid = {0, 0, 0}
-		aim = {0, 0, 0}
+		mid = {0, Spring.GetUnitRulesParam(unitID, "midpos_override") or 0, 0}
+		aim = {0, Spring.GetUnitRulesParam(unitID, "aimpos_override") or 0, 0}
 	end
+	
 	if modelRadii[unitDefID] then
 		spSetUnitRadiusAndHeight(unitID, modelRadii[unitDefID].radius, modelRadii[unitDefID].height)
 	end
