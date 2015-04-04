@@ -130,6 +130,10 @@ local weaponDefs = {
     shakeduration      = 0,
     shakemagnitude     = 0,
     soundHit           = "explosion/mini_nuke",
+	
+	customParams       = {
+      lups_explodelife = 1.5,
+	},
     damage = {
       default          = 8007.1,
     },

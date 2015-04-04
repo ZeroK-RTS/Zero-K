@@ -27,7 +27,7 @@ function gadget:GetInfo()
     date      = "25 September 2011",
     license   = "GNU LGPL, v2 or later",
     layer     = -math.huge,	-- we want this to go first
-    enabled   = true  --  loaded by default?
+    enabled   = Spring.Utilities.IsCurrentVersionNewerThan(98, 450)
   }
 end
 
@@ -36,6 +36,7 @@ end
 local generalFile = "general.lua"
 local unitFile = "units.lua"
 local featureFile = "features.lua"
+local projectileFile = "projectiles.lua"
 
 local AUTOSAVE_FREQUENCY = 30*60*5	-- 5 minutes
 local FEATURE_ID_CONSTANT = 32000	-- when featureID is x, param of command issued on feature is x + this
@@ -62,10 +63,6 @@ local spSetUnitStockpile	= Spring.SetUnitStockpile
 local spSetUnitNeutral		= Spring.SetUnitNeutral
 local spGetUnitIsBuilding	= Spring.GetUnitIsBuilding
 local spGiveOrderToUnit		= Spring.GiveOrderToUnit
-local spCreateFeature		= Spring.CreateFeature
-local spSetFeatureDirection	= Spring.SetFeatureDirection
-local spSetFeatureHealth	= Spring.SetFeatureHealth
-local spSetFeatureReclaim	= Spring.SetFeatureReclaim
 
 local cmdTypeIconModeOrNumber = {
 	[CMD.AUTOREPAIRLEVEL] = true,
@@ -77,10 +74,11 @@ local savedata = {
 	general = {},
 	unit = {},
 	feature = {},
+	projectile = {},
 	gadgets = {}
 }
 
-local toCleanupFactory = {}
+local toCleanupFactory
 local cleanupFrame
 local autosave = false
 -----------------------------------------------------------------------------------
@@ -116,7 +114,8 @@ local function boolToNum(bool)
 	else return 0 end
 end
 
--- FIXME: obsolete in >92.0
+-- The unitID/featureID parameter in creation does not make these remapping functions obselete.
+-- That parameter is unreliable.
 local function GetNewUnitID(oldUnitID)
 	return savedata.unit[oldUnitID] and savedata.unit[oldUnitID].newID
 end
@@ -126,6 +125,11 @@ local function GetNewFeatureID(oldFeatureID)
 	return savedata.feature[oldFeatureID] and savedata.feature[oldFeatureID].newID
 end
 GG.SaveLoad.GetNewFeatureID = GetNewFeatureID
+
+local function GetNewProjectileID(oldProjectileID)
+	return savedata.projectile[oldProjectileID] and savedata.projectile[oldProjectileID].newID
+end
+GG.SaveLoad.GetNewProjectileID = GetNewProjectileID
 
 local function GetSavedGameFrame()
 	return savedata.general.gameFrame
@@ -156,7 +160,11 @@ local function LoadUnits()
 			py = Spring.GetGroundHeight(px, pz)
 		end
 		local isNanoFrame = data.buildProgress < 1
-		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, true, oldID)
+		-- The 9th argument for unitID cannot be used here. If there is already a unit
+		-- with that unitID then the new unit will fail to be created. The old unit
+		-- do not immediately de-allocate their ID on Spring.DestroyUnit so some blocking
+		-- can occur with explicitly set IDs.
+		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, true)
 		if newID then
 			data.newID = newID
 			-- position and velocity
@@ -269,16 +277,102 @@ local function LoadUnits()
 end
 
 local function LoadFeatures()
+	local spCreateFeature		= Spring.CreateFeature
+	local spSetFeatureDirection	= Spring.SetFeatureDirection
+	local spSetFeatureHealth	= Spring.SetFeatureHealth
+	local spSetFeatureReclaim	= Spring.SetFeatureReclaim
+
 	for oldID, data in pairs(savedata.feature) do
 		local px, py, pz = unpack(data.pos)
 		local featureDefID = FeatureDefNames[data.featureDefName].id
-		local newID = spCreateFeature(data.featureDefName, px, py, pz, data.heading, data.allyTeam, oldID)
+		-- The 7th argument for featureID cannot be used here. If there is already a feature
+		-- with that featureID then the new feature will fail to be created. The old features
+		-- do not immediately de-allocate their ID on Spring.DestroyFeature so some blocking
+		-- can occur with explicitly set IDs.
+		local newID = spCreateFeature(data.featureDefName, px, py, pz, data.heading, data.allyTeam)
 		data.newID = newID
+		
 		spSetFeatureDirection(newID, unpack(data.dir))
 		-- health
 		spSetFeatureHealth(newID, data.health)
 		-- resources
 		spSetFeatureReclaim(newID, data.reclaimLeft)
+	end
+end
+
+local function LoadProjectiles()
+	local spSpawnProjectile            = Spring.SpawnProjectile
+	local spSetProjectileTarget        = Spring.SetProjectileTarget
+	local spSetProjectileIsIntercepted = Spring.SetProjectileIsIntercepted
+	local spGetProjectileIsIntercepted = Spring.GetProjectileIsIntercepted
+
+	local PROJECTILE_TARGET_PROJECTILE = 112
+	local PROJECTILE_TARGET_FEATURE = 102
+	local PROJECTILE_TARGET_GROUND = 103
+	local PROJECTILE_TARGET_UNIT = 117
+	
+	-- Create projectiles
+	for oldID, data in pairs(savedata.projectile) do
+		
+		local weaponDefID = data.projectileDefID
+	
+		local params = {
+			pos = data.pos,
+			speed = data.velocity,
+			spread = {0, 0, 0},
+			error = {0, 0, 0},
+			owner = data.ownerID,
+			team = data.teamID,
+			ttl = data.timeToLive,
+			upTime = data.upTime,
+		}
+		
+		if WeaponDefs[weaponDefID] then
+			local wd = WeaponDefs[weaponDefID]
+			params.tracking = wd.turnRate
+			params.maxRange = wd.range
+		end
+	
+		local newID = spSpawnProjectile(weaponDefID, params)
+		data.newID = newID
+	end
+	
+	-- Set projectile targets
+	for oldID, data in pairs(savedata.projectile) do
+		if data.targetType and data.target then
+			Spring.Echo(data.targetType)
+			if data.targetType == PROJECTILE_TARGET_GROUND then
+				local t = data.target
+				spSetProjectileTarget(data.newID, t[1], t[2], t[3])
+			elseif data.targetType == PROJECTILE_TARGET_UNIT then
+				local targetID = GetNewUnitID(data.target)
+				if targetID then
+					spSetProjectileTarget(data.newID, targetID, data.targetType)
+				end
+			elseif data.targetType == PROJECTILE_TARGET_FEATURE then
+				local targetID = GetNewFeatureID(data.target)
+				if targetID then
+					spSetProjectileTarget(data.newID, targetID, data.targetType)
+				end
+			elseif data.targetType == PROJECTILE_TARGET_PROJECTILE then
+				Spring.Echo("Projectile Target")
+				local targetID = GetNewProjectileID(data.target)
+				if targetID then
+					Spring.Echo("Projectile TargetID " .. targetID)
+					spSetProjectileTarget(data.newID, targetID, data.targetType)
+					spSetProjectileIsIntercepted(targetID, true)
+				end
+			end
+		end
+	end
+	
+	-- Check intercept
+	for oldID, data in pairs(savedata.projectile) do
+		local newIntercept = spGetProjectileIsIntercepted(data.newID) or false
+		local oldIntercept = data.isIntercepted
+		if oldIntercept ~= newIntercept then
+			Spring.Echo("Projectile intercept mismatch")
+		end
 	end
 end
 
@@ -317,6 +411,15 @@ end
 -----------------------------------------------------------------------------------
 -- callins
 function gadget:Load(zip)
+	savedata = {
+		general = {},
+		unit = {},
+		feature = {},
+		projectile = {},
+		gadgets = {}
+	}
+
+	toCleanupFactory = {}
 	-- get save data
 	savedata.unit = ReadFile(zip, "Unit", unitFile) 
 	local units = Spring.GetAllUnits()
@@ -330,11 +433,13 @@ function gadget:Load(zip)
 		Spring.DestroyFeature(features[i])
 	end
 	
+	savedata.projectile = ReadFile(zip, "Projectile", projectileFile) or {}
 	savedata.general = ReadFile(zip, "General", generalFile)
 	
 	LoadGeneralInfo()
 	LoadFeatures()	-- do features before units so we can change unit orders involving features to point to new ID
 	LoadUnits()
+	LoadProjectiles() -- do projectiles after units so they can home onto units.
 	SetStorage()
 	
 	Spring.SetGameRulesParam("loadedGame", 1)
@@ -387,6 +492,7 @@ local spGetUnitVelocity		= Spring.GetUnitVelocity
 local spGetUnitExperience	= Spring.GetUnitExperience
 local spGetUnitWeaponState	= Spring.GetUnitWeaponState
 local spGetUnitIsBuilding	= Spring.GetUnitIsBuilding
+
 local spGetFeatureDefID		= Spring.GetFeatureDefID
 local spGetFeatureAllyTeam	= Spring.GetFeatureAllyTeam
 local spGetFeatureHealth	= Spring.GetFeatureHealth
@@ -396,6 +502,15 @@ local spGetFeatureHeading	= Spring.GetFeatureHeading
 local spGetFeatureVelocity	= Spring.GetFeatureVelocity
 local spGetFeatureResources	= Spring.GetFeatureResources
 local spGetFeatureNoSelect	= Spring.GetFeatureNoSelect
+
+local spGetProjectileDefID         = Spring.GetProjectileDefID
+local spGetProjectileTeamID        = Spring.GetProjectileTeamID
+local spGetProjectileOwnerID       = Spring.GetProjectileOwnerID
+local spGetProjectileTimeToLive    = Spring.GetProjectileTimeToLive
+local spGetProjectilePosition      = Spring.GetProjectilePosition
+local spGetProjectileVelocity      = Spring.GetProjectileVelocity
+local spGetProjectileTarget        = Spring.GetProjectileTarget
+local spGetProjectileIsIntercepted = Spring.GetProjectileIsIntercepted
 
 
 -- vars
@@ -631,6 +746,44 @@ local function SaveFeatures()
 	savedata.feature = data
 end
 
+
+local function SaveProjectiles()
+	local data = {}
+	local projectiles = Spring.GetProjectilesInRectangle(-600, -600, Game.mapSizeX + 600, Game.mapSizeZ + 600)
+	-- Collect projectiles for 600 outside the map to get wobbly ones or those chasing flying units.
+	for i = 1, #projectiles do
+		local projectileID = projectiles[i]
+		data[projectileID] = {}
+		local projectileInfo = data[projectileID]
+		
+		-- basic projectile information
+		local projectileDefID = spGetProjectileDefID(projectileID)
+		projectileInfo.projectileDefID = projectileDefID
+		projectileInfo.teamID = spGetProjectileTeamID(projectileID)
+		projectileInfo.ownerID = spGetProjectileOwnerID(projectileID)
+		local timeToLive = spGetProjectileTimeToLive(projectileID)
+		projectileInfo.timeToLive = timeToLive
+		-- save position/velocity
+		projectileInfo.pos = {spGetProjectilePosition(projectileID)}
+		projectileInfo.velocity = {spGetProjectileVelocity(projectileID)}
+		-- save tracking and interception
+		local targetType, target = spGetProjectileTarget(projectileID)
+		projectileInfo.targetType = targetType
+		projectileInfo.target = target
+		projectileInfo.isIntercepted = spGetProjectileIsIntercepted(projectileID)
+		
+		local wd = WeaponDefs[projectileDefID]
+		if wd and wd.type == "StarburstLauncher" and wd.customParams then
+			local cp = wd.customParams
+			-- Some crazyness with how these values are interpreted:
+			-- flightTime (ttl) is multiplied by 32 when weaponDefs are loaded. 
+			-- weaponTimer (upTime) is multiplied by 30 when the weapon is loaded.
+			projectileInfo.upTime = math.max(0, cp.weapontimer*30 - math.max(0, cp.flighttime*32 - timeToLive))
+		end
+	end
+	savedata.projectile = data
+end
+
 local function SaveGeneralInfo()
 	local data = {}
 	
@@ -677,9 +830,11 @@ function gadget:Save(zip)
 	SaveGeneralInfo()
 	SaveUnits()
 	SaveFeatures()
+	SaveProjectiles()
 	WriteSaveData(zip, generalFile, savedata.general)
 	WriteSaveData(zip, unitFile, savedata.unit)
 	WriteSaveData(zip, featureFile, savedata.feature)
+	WriteSaveData(zip, projectileFile, savedata.projectile)
 	
 	for _,entry in pairs(savedata.gadgets) do
 		WriteSaveData(zip, entry.filename, entry.data)

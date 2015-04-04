@@ -46,7 +46,7 @@ local spGetSelectedUnits       = Spring.GetSelectedUnits
 local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
 local spTraceScreenRay         = Spring.TraceScreenRay
-local spTestBuildOrder         = Spring.TestBuildOrder
+local spTestMoveOrder          = Spring.TestMoveOrder
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -222,7 +222,8 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 		passIf = (not queueCount or queueCount == 0 or not shift)
 	end
 
-	local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
+	--local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
+	local canJumpThere = spTestMoveOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 0, 0, 0, true, true, true)
 	
 	local range = jumpDefs[unitDefID].range
 	if passIf then
@@ -306,7 +307,7 @@ function widget:DrawWorld()
   local _, activeCommand = spGetActiveCommand()
   if (activeCommand == CMD_JUMP) then
     local mouseX, mouseY   = spGetMouseState()
-    local category, arg    = spTraceScreenRay(mouseX, mouseY)
+    local category, arg    = spTraceScreenRay(mouseX, mouseY, true)
     local _, _, _, shift   = spGetModKeyState()
     local units = spGetSelectedUnits()
 	local quality = 1

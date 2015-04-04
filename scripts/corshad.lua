@@ -50,7 +50,7 @@ local lowBehaviour = {
 	maxBank = 0.5,
 	turnRadius = 100,
 	maxAileron = 0.004,
-	maxElevator = 0.016,
+	maxElevator = 0.018,
 	maxRudder = 0.015,
 }
 

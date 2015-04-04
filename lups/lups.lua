@@ -661,15 +661,19 @@ local DrawScreenEffectsVisibleFx
 local DrawInMiniMapVisibleFx
 
 function IsPosInLos(x,y,z)
-	return Spring.IsPosInLos(x,y,z, LocalAllyTeamID)
+	return LocalAllyTeamID == -2 or Spring.IsPosInLos(x,y,z, LocalAllyTeamID)
 end
 
 function IsPosInRadar(x,y,z)
-	return Spring.IsPosInRadar(x,y,z, LocalAllyTeamID)
+	return LocalAllyTeamID == -2 or Spring.IsPosInRadar(x,y,z, LocalAllyTeamID)
 end
 
 function IsPosInAirLos(x,y,z)
-	return Spring.IsPosInAirLos(x,y,z, LocalAllyTeamID)
+	return LocalAllyTeamID == -2 or Spring.IsPosInAirLos(x,y,z, LocalAllyTeamID)
+end
+
+function GetUnitLosState(unitID)
+	return LocalAllyTeamID == -2 or (Spring.GetUnitLosState(unitID, LocalAllyTeamID) or {}).los or false
 end
 
 local function IsUnitFXVisible(fx)
@@ -821,7 +825,6 @@ local function GameFrame(_,n)
   else
     LocalAllyTeamID = spGetLocalAllyTeamID()
   end
-
   --// create delayed FXs
   if (effectsInDelay[1]) then
     local remaingFXs,cnt={},1

@@ -42,8 +42,8 @@ unitDef = {
     helptext       = [[Storages act as a buffer when one expects a big influx of metal, such as reclaiming a vast wreckage field. However, longer periods of increased metal income are better dealt with by acquiring more buildpower.]],
     helptext_de    = [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
     helptext_pl    = [[Magazyn pozwala na przechowywanie surowcow na wypadek, gdy nie masz wystarczajaco duzo budowniczych, by je wykorzystac. Lepiej jest jednak zbudowac wiecej budowniczych, a magazynu uzywac bardziej jako bufora na wypadek duzych, niespodziewanych zyskow, na przyklad zbierania duzego zlomowiska.]],
-
     modelradius    = [[30]],
+	removewait     = 1,
   },
 
   featureDefs                   = {

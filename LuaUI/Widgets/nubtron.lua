@@ -825,8 +825,8 @@ end
 function widget:Update()
 	cycle = (cycle + 1) % 100
 	if cycle == 1 then
-		if WG.lang and (lang ~= WG.lang) then
-			lang = WG.lang
+		if WG.lang and (lang ~= WG.lang()) then
+			lang = (WG.lang and WG.lang()) or "en"
 			SetupText(lang)
 		end
 	end

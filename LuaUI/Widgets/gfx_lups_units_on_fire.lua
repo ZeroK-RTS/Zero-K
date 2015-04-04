@@ -159,7 +159,7 @@ function onFire(burningUnits)
 		--// send particles to LUPS
 		local x, y, z = spGetUnitPosition(unitID)
 		local r = spGetUnitRadius(unitID)
-		if (r and x) then
+		if (r and x) and math.random(400) < (400 - 2*totalFxCount - burningUnits.count) then
 			flameFX.pos     = {x,y,z}
 			flameFX.partpos = "r*sin(alpha),0,r*cos(alpha) | alpha=rand()*2*pi, r=rand()*0.6*" .. r
 			flameFX.size    = r * 0.35

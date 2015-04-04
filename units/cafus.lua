@@ -31,6 +31,7 @@ unitDef = {
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 12 0]],
     modelradius    = [[60]],
+	removewait     = 1,
   },
 
   energyMake                    = 225,
