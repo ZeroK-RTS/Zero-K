@@ -1258,14 +1258,19 @@ function widget:Update(n)
 	
 	if lmb and activeid and activeid < 0 then
 		local _, pos = spTraceScreenRay(mx, my, true)
-		if buildingPress then
-			if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
-				buildingPress.frame = spGetGameFrame() + options.staticMouseTime.value*30
-				buildingPress.pos[1] = pos[1]
-				buildingPress.pos[3] = pos[3]
-			end
-		else
-			if legalPos(pos) then
+		if pos and legalPos(pos) then
+			if buildingPress then
+				if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
+					local a,c,m,s = spGetModKeyState()
+					if s then
+						buildingPress.frame = false
+					else
+						buildingPress.frame = spGetGameFrame() + options.staticMouseTime.value*30
+						buildingPress.pos[1] = pos[1]
+						buildingPress.pos[3] = pos[3]
+					end
+				end
+			else
 				buildingPress = {pos = pos, frame = spGetGameFrame() + options.staticMouseTime.value*30, unitDefID = -activeid}
 			end
 		end
@@ -1273,7 +1278,7 @@ function widget:Update(n)
 		buildingPress = false
 	end
 	
-	if buildingPress and buildingPress.frame < spGetGameFrame() then
+	if buildingPress and buildingPress.frame and buildingPress.frame < spGetGameFrame() then
 		if buildingPress.unitDefID == -activeid then
 			WG.Terraform_SetPlacingRectangle(buildingPress.unitDefID)
 			CheckPlacingRectangle(self)
