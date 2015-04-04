@@ -706,7 +706,7 @@ SetFOV = function(fov)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (30 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (30 + 17 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
   -- OverrideSetCameraStateInterpolate(cs,smoothness.value)
@@ -1179,16 +1179,16 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 	-- If it isn't, make sure the correction only happens in the direction of the curve. 
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
 	if zoomin ~= nil and rayDist then
-		if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then
-			-- Spring.Echo("Within Bounds")
+		if onTiltZoomTrack or math.abs(targetRx - cs.rx) < angleCorrectionMaximum then
+			Spring.Echo("Within Bounds")
 			onTiltZoomTrack = true
 			return targetRx
 		elseif targetRx > cs.rx and zoomin then 
-			-- Spring.Echo("Pulling on track for Zoomin")
+			Spring.Echo("Pulling on track for Zoomin")
 			-- onTiltZoomTrack = true
 			return cs.rx + angleCorrectionMaximum
 		elseif targetRx < cs.rx and not zoomin then 
-			-- Spring.Echo("Pulling on track for Zoomout")
+			Spring.Echo("Pulling on track for Zoomout")
 			-- onTiltZoomTrack = true
 			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then return cs.rx - angleCorrectionMaximum
 			else return targetRx
