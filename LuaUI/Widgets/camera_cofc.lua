@@ -232,7 +232,7 @@ options = {
 	zoomoutfactor = { --should be higher than zoom-in-speed to help user escape to bigger picture
 		name = 'Zoom-out speed',
 		type = 'number',
-		min = 0.3, max = 1.3, step = 0.05,
+		min = 0.1, max = 1, step = 0.05,
 		value = 0.8,
 	},
 	invertzoom = {
@@ -572,7 +572,14 @@ local black = { 0, 0, 0 }
 local white = { 1, 1, 1 }
 
 
-local spGetCameraState		= Spring.GetCameraState
+local spGetCameraState		= 
+	function() 
+		if targetCam ~= nil then
+			return targetCam
+		else
+			return Spring.GetCameraState()
+		end
+	end
 local spGetCameraVectors	= Spring.GetCameraVectors
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spGetSmoothMeshHeight	= Spring.GetSmoothMeshHeight
@@ -699,7 +706,7 @@ SetFOV = function(fov)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (30 + 25 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (30 + 17 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
   spSetCameraState(cs,0)
   -- OverrideSetCameraStateInterpolate(cs,smoothness.value)
@@ -1172,16 +1179,16 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 	-- If it isn't, make sure the correction only happens in the direction of the curve. 
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
 	if zoomin ~= nil and rayDist then
-		if math.abs(targetRx - cs.rx) < angleCorrectionMaximum then
-			-- Spring.Echo("Within Bounds")
+		if onTiltZoomTrack or math.abs(targetRx - cs.rx) < angleCorrectionMaximum then
+			Spring.Echo("Within Bounds")
 			onTiltZoomTrack = true
 			return targetRx
 		elseif targetRx > cs.rx and zoomin then 
-			-- Spring.Echo("Pulling on track for Zoomin")
+			Spring.Echo("Pulling on track for Zoomin")
 			-- onTiltZoomTrack = true
 			return cs.rx + angleCorrectionMaximum
 		elseif targetRx < cs.rx and not zoomin then 
-			-- Spring.Echo("Pulling on track for Zoomout")
+			Spring.Echo("Pulling on track for Zoomout")
 			-- onTiltZoomTrack = true
 			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then return cs.rx - angleCorrectionMaximum
 			else return targetRx
