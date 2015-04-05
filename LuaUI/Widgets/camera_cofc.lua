@@ -572,14 +572,7 @@ local black = { 0, 0, 0 }
 local white = { 1, 1, 1 }
 
 
-local spGetCameraState		= 
-	function() 
-		if targetCam ~= nil then
-			return targetCam
-		else
-			return Spring.GetCameraState()
-		end
-	end
+local GetTargetCameraState		= Spring.GetCameraState 
 local spGetCameraVectors	= Spring.GetCameraVectors
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spGetSmoothMeshHeight	= Spring.GetSmoothMeshHeight
@@ -622,6 +615,14 @@ local initialBoundsSet = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local GetTargetCameraState = function()
+		if targetCam ~= nil then
+			return targetCam
+		else
+			return Spring.GetCameraState()
+		end
+	end
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 local cx,cy = vsx * 0.5,vsy * 0.5
@@ -689,7 +690,7 @@ local angleCorrectionMaximum = 5 * RADperDEGREE
 local targetCenteringHeight = 1200
 
 SetFOV = function(fov)
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	-- Spring.Echo(fov .. " degree")
 	
 	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
@@ -1180,15 +1181,15 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 	-- Zooming in shouldn't make the camera face the ground more, and zooming out shouldn't focus more on the horizon
 	if zoomin ~= nil and rayDist then
 		if onTiltZoomTrack or math.abs(targetRx - cs.rx) < angleCorrectionMaximum then
-			Spring.Echo("Within Bounds")
+			-- Spring.Echo("Within Bounds")
 			onTiltZoomTrack = true
 			return targetRx
 		elseif targetRx > cs.rx and zoomin then 
-			Spring.Echo("Pulling on track for Zoomin")
+			-- Spring.Echo("Pulling on track for Zoomin")
 			-- onTiltZoomTrack = true
 			return cs.rx + angleCorrectionMaximum
 		elseif targetRx < cs.rx and not zoomin then 
-			Spring.Echo("Pulling on track for Zoomout")
+			-- Spring.Echo("Pulling on track for Zoomout")
 			-- onTiltZoomTrack = true
 			if skyProportion < 1.0 and rayDist < (maxDistY - topDownBufferZone) then return cs.rx - angleCorrectionMaximum
 			else return targetRx
@@ -1272,7 +1273,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
 	if gx and gy and gz then --just in case
 		if smoothness == nil then smoothness = options.smoothness.value or 0 end
-		local cs = spGetCameraState()
+		local cs = GetTargetCameraState()
 		SetLockSpot2(cs) --get lockspot at mid screen if there's none present
 		if not ls_have then
 			return
@@ -1310,7 +1311,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		zoomin = not zoomin
 	end
 
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	
 	--//ZOOMOUT FROM CURSOR, ZOOMIN TO CURSOR//--
 	if
@@ -1453,7 +1454,7 @@ local function Altitude(up, s)
 		up = not up
 	end
 	
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	local py = max(1, abs(cs.py) )
 	local dy = py * (up and 1 or -1) * (s and 0.3 or 0.1)
 	local new_py = py + dy
@@ -1476,7 +1477,7 @@ end
 
 
 local function ResetCam()
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	cs.px = Game.mapSizeX/2
 	cs.py = maxDistY - 5 --Avoids flying off into nothingness when zooming out from cursor
 	cs.pz = Game.mapSizeZ/2
@@ -1491,7 +1492,7 @@ end
 options.resetcam.OnChange = ResetCam
 
 OverviewSetAction = function()
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	ov_cs = {}
 	ov_cs.px = cs.px
 	ov_cs.py = cs.py
@@ -1507,7 +1508,7 @@ OverviewAction = function()
 			spSendCommands('viewfree')
 		end
 		
-		local cs = spGetCameraState()
+		local cs = GetTargetCameraState()
 		SetLockSpot2(cs)
 		last_ls_dist = ls_dist
 		last_rx = cs.rx
@@ -1528,11 +1529,11 @@ OverviewAction = function()
 		-- spSetCameraState(cs, 1)
 		OverrideSetCameraStateInterpolate(cs,1)
 	else --if in overview mode
-		local cs = spGetCameraState()
+		local cs = GetTargetCameraState()
 		mx, my = spGetMouseState()
 		local onmap, gx, gy, gz = VirtTraceRay(mx,my,cs) --create a lockstop point.
 		if gx then --Note:  Now VirtTraceRay can extrapolate coordinate in null space (no need to check for onmap)
-			local cs = spGetCameraState()			
+			local cs = GetTargetCameraState()			
 			cs.rx = last_rx
 			if ov_cs and last_ry and options.rotatebackfromov.value then cs.ry = last_ry end
 			ls_dist = last_ls_dist 
@@ -1558,7 +1559,7 @@ OverviewAction = function()
 				spSendCommands('viewfps')
 				spSendCommands('track') -- re-issue 3rd person for selected unit
 				thirdperson_trackunit = selUnits[1]
-				local cs = spGetCameraState()	
+				local cs = GetTargetCameraState()	
 				cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1]) --move camera to unit position so no "out of LOD" case
 				cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 				-- spSetCameraState(cs,0)
@@ -1581,7 +1582,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 			SetCameraTarget(x,y,z, smoothness) --track only
 			return
 		end
-		local cs = spGetCameraState()
+		local cs = GetTargetCameraState()
 		ls_have = false --unlock lockspot 
         SetLockSpot2(cs) --set lockspot
         if not ls_have then
@@ -1650,7 +1651,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 end
 
 local function RotateCamera(x, y, dx, dy, smooth, lock)
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	local cs1 = cs
 	if cs.rx then
 		
@@ -1789,7 +1790,7 @@ local function Tilt(s, dir)
 	tilting = true
 	onTiltZoomTrack = false
 
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	SetLockSpot2(cs)
 	if not ls_have then
 		return
@@ -1963,7 +1964,7 @@ function widget:Update(dt)
 		PeriodicWarning()
 	end
 
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
@@ -2141,7 +2142,7 @@ function widget:Update(dt)
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
 		init = false
 		spSendCommands("viewfree") 
-		local cs = spGetCameraState()
+		local cs = GetTargetCameraState()
 		cs.tiltSpeed = 0
 		cs.scrollSpeed = 0
 		--cs.gndOffset = options.mingrounddist.value
@@ -2201,7 +2202,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 		end
 		local dir = options.invertscroll.value and -1 or 1
 					
-		local cs = spGetCameraState()
+		local cs = GetTargetCameraState()
 		
 		local speed = options.speedFactor.value * cs.py/1000 / 10
 		local mxm = speed * dx * dir
@@ -2256,7 +2257,7 @@ function widget:MousePress(x, y, button) --called once when pressed, not repeate
 		return false
 	end
 	
-	local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	
 	msx = x
 	msy = y
@@ -2378,7 +2379,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if keys[key] then
 		if modifier.ctrl or modifier.alt then
 		
-			local cs = spGetCameraState()
+			local cs = GetTargetCameraState()
 			SetLockSpot2(cs)
 			if not ls_have then
 				return
@@ -2618,7 +2619,7 @@ function widget:UnitDestroyed(unitID) --transfer 3rd person trackmode to other u
 			spSendCommands('viewfps')
 			spSendCommands('track')
 			thirdperson_trackunit = selUnits[1]
-			local cs = spGetCameraState()
+			local cs = GetTargetCameraState()
 			cs.px,cs.py,cs.pz=spGetUnitPosition(selUnits[1])
 			cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 			-- spSetCameraState(cs,0)
