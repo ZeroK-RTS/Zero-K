@@ -20,6 +20,7 @@ unitDef = {
   customParams           = {
     dontcount      = [[1]],
     mobilebuilding = [[1]],
+	cannotcloak    = [[1]],
   },
 
   footprintX             = 2,
