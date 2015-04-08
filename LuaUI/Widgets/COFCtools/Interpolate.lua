@@ -9,7 +9,7 @@ local mathPi 				= math.pi
 
 local beginCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
 local deltaEnd = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
-local targetCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0}
+local targetCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0}
 
 function OverrideSetCameraStateInterpolate(cs,smoothness)
 		Interpolate()
@@ -31,6 +31,9 @@ function OverrideSetCameraStateInterpolate(cs,smoothness)
 	targetCam.rx = cs.rx
 	targetCam.ry = cs.ry
 	targetCam.rz = cs.rz
+	targetCam.dx = cs.dx
+	targetCam.dy = cs.dy
+	targetCam.dz = cs.dz
 	targetCam.fov = cs.fov
 	
 	deltaEnd.px = cs.px - now.px
