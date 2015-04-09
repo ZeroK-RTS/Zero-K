@@ -653,7 +653,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 
 	if spAreTeamsAllied(attackerTeam, unitTeam) then
 		if not paralyzer then
-			AddAwardPoints( 'friend', attackerTeam, costdamage )
+			-- AddAwardPoints( 'friend', attackerTeam, costdamage )
 		end
 	else
 		if paralyzer then
