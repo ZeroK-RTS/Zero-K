@@ -77,7 +77,7 @@ unitList["ZK"]["factoryship"] =		{ markerText = "Shipyard", show_owner = true }
 unitList["ZK"]["factoryspider"] =		{ markerText = "Spider Factory", show_owner = true }
 unitList["ZK"]["factorytank"] =		{ markerText = "Heavy Tank Factory", show_owner = true }
 unitList["ZK"]["factoryveh"] =		{ markerText = "Light Vehicle Factory", show_owner = true }
-unitList["ZK"]["armcsa"] =		{ markerText = "Athena", show_owner = true }
+unitList["ZK"]["armcsa"] =		{ markerText = "Athena", show_owner = true, delayedRefresh = 0 }
 unitList["ZK"]["striderhub"] =		{ markerText = "Strider Hub", show_owner = true }
 
 --END OF MARKER LIST---------------------------------------
