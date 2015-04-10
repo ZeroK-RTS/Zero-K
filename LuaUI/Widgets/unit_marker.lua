@@ -32,7 +32,7 @@ function widget:UnitEnteredLos (unitID, unitTeam, allyTeam, unitDefID)
 	if Spring.IsUnitAllied(unitID) then return end
 
 	if unitList[unitDefID] and ((not knownUnits[unitID]) or (knownUnits[unitID] ~= unitDefID)) then
-		local x, y, z = spGetUnitPosition(unitID)
+		local x, y, z = Spring.GetUnitPosition(unitID)
 		local markerText = unitList[unitDefID].markerText or UnitDefs[unitDefID].humanName
 		if not unitList[unitDefID].mark_each_appearance then
 			knownUnits[unitID] = unitDefID
