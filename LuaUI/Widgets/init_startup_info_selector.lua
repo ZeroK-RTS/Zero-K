@@ -268,7 +268,6 @@ function widget:Initialize()
 	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)	then 
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
-	-- PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
 
 
 	vsx, vsy = widgetHandler:GetViewSizes()
