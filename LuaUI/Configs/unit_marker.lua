@@ -8,7 +8,6 @@ local unitlistNames = {
 	chicken_dragon = {},
 	chickenflyerqueen = {},
 	chickenlandqueen = {},
-	chickenqueenlite = {},
 	corsilo = {},
 	factoryamph = { show_owner = true, },
 	factorycloak = { show_owner = true, },
