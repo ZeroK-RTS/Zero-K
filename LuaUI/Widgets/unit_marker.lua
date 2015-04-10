@@ -24,8 +24,12 @@ function widget:Initialize()
 	end
 end
 
-function widget:PlayerChanged (changerID)
-	widget:Initialize()
+function widget:PlayerChanged ()
+	widget:Initialize ()
+end
+
+function widget:TeamDied ()
+	widget:Initialize ()
 end
 
 function widget:UnitEnteredLos (unitID, unitTeam)
