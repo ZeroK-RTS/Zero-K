@@ -344,7 +344,7 @@ local function HighlightPlacement(unitDefID)
 	if coords then 
 		local radius = pylonDefs[unitDefID].range
 		if (radius ~= 0) then
-			x, _, z = Spring.Pos2BuildPos( unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
+			local x, _, z = spPos2BuildPos( unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
 			glColor(disabledColor)
 			gl.Utilities.DrawGroundCircle(x,z, radius)
 		end
