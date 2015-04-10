@@ -106,6 +106,7 @@ unitList["ZK"]["factoryship"] =		{ markerText = "Shipyard", show_owner = true }
 unitList["ZK"]["factoryspider"] =		{ markerText = "Spider Factory", show_owner = true }
 unitList["ZK"]["factorytank"] =		{ markerText = "Heavy Tank Factory", show_owner = true }
 unitList["ZK"]["factoryveh"] =		{ markerText = "Light Vehicle Factory", show_owner = true }
+unitList["ZK"]["armcsa"] =		{ markerText = "Athena", show_owner = true }
 
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms
@@ -228,7 +229,10 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	end
 end
 function setMarkerForUnit( unitId, udef, pos )
-	local ownerName = (unitList[curModID][udef.name]["show_owner"] and ("(" .. select(1, Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(Spring.GetUnitTeam(unitId))))) .. ")")) or ""
+	local unitTeam = Spring.GetUnitTeam(unitId)
+	local teamData = select(2, Spring.GetTeamInfo(unitTeam))
+	local playerName = Spring.GetPlayerInfo(player)
+	local ownerName = (unitList[curModID][udef.name]["show_owner"] and ("(" .. playerName .. ")")) or ""
 	local markerText = unitList[curModID][udef.name]["markerText"] .. ownerName
 	spSendLuaUIMsg("dfT" .. unitId, "allies")
 	printDebug("<Unit Marker DEBUG>: storing to markerQueue. UnitId #" .. unitId )
