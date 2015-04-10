@@ -56,6 +56,8 @@ local spGetUnitPosition    = Spring.GetUnitPosition
 local spValidUnitID        = Spring.ValidUnitID
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spGetSpectatingState = Spring.GetSpectatingState
+local spGetBuildFacing	   = Spring.GetBuildFacing
+local spPos2BuildPos       = Spring.Pos2BuildPos
 
 local glVertex        = gl.Vertex
 local glCallList      = gl.CallList
@@ -341,10 +343,8 @@ local function HighlightPlacement(unitDefID)
 	local _, coords = spTraceScreenRay(mx, my, true, true)
 	if coords then 
 		local radius = pylonDefs[unitDefID].range
-		if (radius == 0) then
-		else
-			local x = floor((coords[1])/16)*16 +8
-			local z = floor((coords[3])/16)*16 +8
+		if (radius ~= 0) then
+			x, _, z = Spring.Pos2BuildPos( unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
 			glColor(disabledColor)
 			gl.Utilities.DrawGroundCircle(x,z, radius)
 		end
