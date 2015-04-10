@@ -41,40 +41,11 @@ local firstUnitID --for 1rst check when comm die
 local secondUnitID -- for 2nd check when comm die
 
 local unitList = {}
---MARKER LIST ------------------------------------
-unitList["BA"] = {} --initialize table
-unitList["BA"]["armamd"] = { markerText = "Anti Nuke" }
-unitList["BA"]["corfmd"] = { markerText = "Anti Nuke" }
-unitList["BA"]["armsilo"] = { markerText = "Nuke" }
-unitList["BA"]["corsilo"] = { markerText = "Nuke" }
-
-unitList["CA"] = {} --initialize table
-unitList["CA"]["armamd"] =		{ markerText = "Anti Nuke" }
-unitList["CA"]["corfmd"] =		{ markerText = "Anti Nuke" }
-unitList["CA"]["armsilo"] =		{ markerText = "Nuke" }
-unitList["CA"]["corsilo"] =		{ markerText = "Nuke" }
-unitList["CA"]["nest"] =		{ markerText = "Nest" }
-unitList["CA"]["thicket"] =		{ markerText = "Thicket" }
-unitList["CA"]["corint"] =		{ markerText = "Intimidator" }
-unitList["CA"]["corbhmth"] =	{ markerText = "Behemoth" }
-unitList["CA"]["armbrtha"] =	{ markerText = "Big Bertha" }
-unitList["CA"]["kettle"] =		{ markerText = "Kettle" }
-unitList["CA"]["starlight"] =	{ markerText = "Starlight" }
-unitList["CA"]["corebeac"] =	{ markerText = "Zenith" }
-unitList["CA"]["corfus"] =		{ markerText = "Graviton Power Gen" }
-unitList["CA"]["cafus"] =		{ markerText = "Singularity Reactor" }
-unitList["CA"]["armfus"] =		{ markerText = "Fusion Reactor" }
-unitList["CA"]["aafus"] =		{ markerText = "Tachyon Collider" }
-unitList["CA"]["cmgeo"] =		{ markerText = "MOHO GEO" }
-unitList["CA"]["amgeo"] =		{ markerText = "MOHO GEO" }
-unitList["CA"]["armgmm"] =		{ markerText = "Prude" }
-unitList["CA"]["armgeo"] =		{ markerText = "Geo" }
-unitList["CA"]["corgeo"] =		{ markerText = "Geo" }
 
 unitList["ZK"] = {} --initialize table, should contain ZK buildings currently used.
 unitList["ZK"]["armamd"] =		{ markerText = "Anti Nuke" }
 unitList["ZK"]["corsilo"] =		{ markerText = "Nuke" }
---unitList["ZK"]["missilesilo"] =	{ markerText = "Missile Silo" }
+unitList["ZK"]["missilesilo"] =	 	{ markerText = "Missile Silo" }
 unitList["ZK"]["armbrtha"] =		{ markerText = "Big Bertha" }
 --unitList["ZK"]["corbhmth"] =		{ markerText = "Behemoth" }
 --unitList["ZK"]["armanni"] =		{ markerText = "Annihilator" }
@@ -94,6 +65,20 @@ unitList["ZK"]["chickenlandqueen"] =	{ markerText = "Chicken Queen Grounded" }
 unitList["ZK"]["chickenqueenlite"] =	{ markerText = "Chicken Queen Junior" }
 unitList["ZK"]["spherepole"] =	{ markerText = "Scythe", delayedRefresh = 0 }
 unitList["ZK"]["pw_hq"] =		{ markerText = "Command Center" }
+
+unitList["ZK"]["factoryamph"] =		{ markerText = "Amphibious Operations Plant", show_owner = true }
+unitList["ZK"]["factorycloak"] =		{ markerText = "Cloaky But Factory", show_owner = true }
+unitList["ZK"]["factorygunship"] =		{ markerText = "Gunship Plant", show_owner = true }
+unitList["ZK"]["factoryhover"] =		{ markerText = "Hovercraft Platform", show_owner = true }
+unitList["ZK"]["factoryjump"] =		{ markerText = "Jumpjet/Specialist Plant", show_owner = true }
+unitList["ZK"]["factoryplane"] =		{ markerText = "Aircraft Plant", show_owner = true }
+unitList["ZK"]["factoryshield"] =		{ markerText = "Shield Bot Factory", show_owner = true }
+unitList["ZK"]["factoryship"] =		{ markerText = "Shipyard", show_owner = true }
+unitList["ZK"]["factoryspider"] =		{ markerText = "Spider Factory", show_owner = true }
+unitList["ZK"]["factorytank"] =		{ markerText = "Heavy Tank Factory", show_owner = true }
+unitList["ZK"]["factoryveh"] =		{ markerText = "Light Vehicle Factory", show_owner = true }
+unitList["ZK"]["armcsa"] =		{ markerText = "Athena", show_owner = true, delayedRefresh = 0 }
+unitList["ZK"]["striderhub"] =		{ markerText = "Strider Hub", show_owner = true }
 
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms
@@ -216,7 +201,11 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	end
 end
 function setMarkerForUnit( unitId, udef, pos )
-	local markerText = unitList[curModID][udef.name]["markerText"]
+	local unitTeam = Spring.GetUnitTeam(unitId)
+	local playerID = select(2, Spring.GetTeamInfo(unitTeam))
+	local playerName = Spring.GetPlayerInfo(playerID)
+	local ownerName = (unitList[curModID][udef.name]["show_owner"] and ("(" .. playerName .. ")")) or ""
+	local markerText = unitList[curModID][udef.name]["markerText"] .. ownerName
 	spSendLuaUIMsg("dfT" .. unitId, "allies")
 	printDebug("<Unit Marker DEBUG>: storing to markerQueue. UnitId #" .. unitId )
 	markersToSet[unitId] = { time = spGetGameSeconds(), pos = pos, text = markerText }
