@@ -38,21 +38,9 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
         end
       end
     end
-    if(Spring.GetModOption("air_ploppable", true, true)) then
-	    for i, v in pairs(air_ploppables) do
-	      local name = UnitDefNames[v]
-	      if name then
-		    local ud = name.id
-		    if ud then
-		      ploppableDefs[ud] = true
-		    end
-	      end
-	    end
-    end
   end
   
   function GG.GiveFacplop(unitID)
-    if dotaMode then return end
     facplops[unitID] = 1
     Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
   end
@@ -104,9 +92,6 @@ end
 local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
 local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
-local dotaMode = Spring.GetModOptions().zkmode == "dota"
-local ctfMode = Spring.GetModOptions().zkmode == "ctf"
-local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
 
 --Spring.Echo(coop == 1, coop == 0)
 
@@ -184,16 +169,11 @@ function GG.HasFacplop(unitID)
 end
 
 function GG.GiveFacplop(unitID)
-	if dotaMode then return end
 	facplops[unitID] = 1
 	Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
 end
 
-local function CheckForShutdown()
-	if dotaMode or ctfMode then
-	    return
-	end
-	
+local function CheckForShutdown()	
 	local cnt = 0
 	--for _,_ in pairs(boost) do
 	--	cnt = cnt+1
@@ -365,17 +345,6 @@ function gadget:Initialize()
         end
       end
     end
-    if(Spring.GetModOption("air_ploppable", true, true)) then
-	    for i, v in pairs(air_ploppables) do
-	      local name = UnitDefNames[v]
-	      if name then
-		    local ud = name.id
-		    if ud then
-		      ploppableDefs[ud] = true
-		    end
-	      end
-	    end
-    end
   end
 
   -- needed if you reload luarules
@@ -509,19 +478,6 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
   local luaAI = Spring.GetTeamLuaAI(teamID)
   if luaAI and string.find(string.lower(luaAI), "chicken") then
     return false
-  elseif playerChickens then
-    -- allied to latest chicken team? no com for you
-    local chickenTeamID = -1
-    for _,t in pairs(Spring.GetTeamList()) do
-      local luaAI = Spring.GetTeamLuaAI(t)
-      if luaAI and string.find(string.lower(luaAI), "chicken") then
-	chickenTeamID = t
-      end
-    end
-    if (chickenTeamID > -1) and (Spring.AreTeamsAllied(teamID,chickenTeamID)) then
-      --Spring.Echo("chicken_control detected no com for "..playerID)
-      return false
-    end
   end
   
   -- get start unit
