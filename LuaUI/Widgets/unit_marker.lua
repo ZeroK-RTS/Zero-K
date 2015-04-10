@@ -28,8 +28,11 @@ function widget:PlayerChanged (changerID)
 	widget:Initialize()
 end
 
-function widget:UnitEnteredLos (unitID, unitTeam, allyTeam, unitDefID)
+function widget:UnitEnteredLos (unitID, unitTeam)
 	if Spring.IsUnitAllied(unitID) then return end
+
+	local unitDefID = Spring.GetUnitDefID (unitID)
+	if not unitDefID then return end -- safety just in case
 
 	if unitList[unitDefID] and ((not knownUnits[unitID]) or (knownUnits[unitID] ~= unitDefID)) then
 		local x, y, z = Spring.GetUnitPosition(unitID)
