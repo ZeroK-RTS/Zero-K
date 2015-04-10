@@ -202,8 +202,8 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 end
 function setMarkerForUnit( unitId, udef, pos )
 	local unitTeam = Spring.GetUnitTeam(unitId)
-	local teamData = select(2, Spring.GetTeamInfo(unitTeam))
-	local playerName = Spring.GetPlayerInfo(player)
+	local playerID = select(2, Spring.GetTeamInfo(unitTeam))
+	local playerName = Spring.GetPlayerInfo(playerID)
 	local ownerName = (unitList[curModID][udef.name]["show_owner"] and ("(" .. playerName .. ")")) or ""
 	local markerText = unitList[curModID][udef.name]["markerText"] .. ownerName
 	spSendLuaUIMsg("dfT" .. unitId, "allies")
