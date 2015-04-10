@@ -41,35 +41,6 @@ local firstUnitID --for 1rst check when comm die
 local secondUnitID -- for 2nd check when comm die
 
 local unitList = {}
---MARKER LIST ------------------------------------
-unitList["BA"] = {} --initialize table
-unitList["BA"]["armamd"] = { markerText = "Anti Nuke" }
-unitList["BA"]["corfmd"] = { markerText = "Anti Nuke" }
-unitList["BA"]["armsilo"] = { markerText = "Nuke" }
-unitList["BA"]["corsilo"] = { markerText = "Nuke" }
-
-unitList["CA"] = {} --initialize table
-unitList["CA"]["armamd"] =		{ markerText = "Anti Nuke" }
-unitList["CA"]["corfmd"] =		{ markerText = "Anti Nuke" }
-unitList["CA"]["armsilo"] =		{ markerText = "Nuke" }
-unitList["CA"]["corsilo"] =		{ markerText = "Nuke" }
-unitList["CA"]["nest"] =		{ markerText = "Nest" }
-unitList["CA"]["thicket"] =		{ markerText = "Thicket" }
-unitList["CA"]["corint"] =		{ markerText = "Intimidator" }
-unitList["CA"]["corbhmth"] =	{ markerText = "Behemoth" }
-unitList["CA"]["armbrtha"] =	{ markerText = "Big Bertha" }
-unitList["CA"]["kettle"] =		{ markerText = "Kettle" }
-unitList["CA"]["starlight"] =	{ markerText = "Starlight" }
-unitList["CA"]["corebeac"] =	{ markerText = "Zenith" }
-unitList["CA"]["corfus"] =		{ markerText = "Graviton Power Gen" }
-unitList["CA"]["cafus"] =		{ markerText = "Singularity Reactor" }
-unitList["CA"]["armfus"] =		{ markerText = "Fusion Reactor" }
-unitList["CA"]["aafus"] =		{ markerText = "Tachyon Collider" }
-unitList["CA"]["cmgeo"] =		{ markerText = "MOHO GEO" }
-unitList["CA"]["amgeo"] =		{ markerText = "MOHO GEO" }
-unitList["CA"]["armgmm"] =		{ markerText = "Prude" }
-unitList["CA"]["armgeo"] =		{ markerText = "Geo" }
-unitList["CA"]["corgeo"] =		{ markerText = "Geo" }
 
 unitList["ZK"] = {} --initialize table, should contain ZK buildings currently used.
 unitList["ZK"]["armamd"] =		{ markerText = "Anti Nuke" }
@@ -107,6 +78,7 @@ unitList["ZK"]["factoryspider"] =		{ markerText = "Spider Factory", show_owner =
 unitList["ZK"]["factorytank"] =		{ markerText = "Heavy Tank Factory", show_owner = true }
 unitList["ZK"]["factoryveh"] =		{ markerText = "Light Vehicle Factory", show_owner = true }
 unitList["ZK"]["armcsa"] =		{ markerText = "Athena", show_owner = true }
+unitList["ZK"]["striderhub"] =		{ markerText = "Strider Hub", show_owner = true }
 
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms
