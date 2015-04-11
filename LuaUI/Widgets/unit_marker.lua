@@ -1,8 +1,8 @@
 function widget:GetInfo() return {
 	name	= "Unit Marker Zero-K",
 	desc	= "[v1.3.10] Marks spotted buildings of interest and commander corpse.",
-	author	= "very_bad_soldier",
-	date	= "October 21, 2007 / September 08, 2010",
+	author	= "Sprung",
+	date	= "2015-04-11",
 	license	= "GNU GPL v2",
 	layer	= 0,
 	enabled	= true,
