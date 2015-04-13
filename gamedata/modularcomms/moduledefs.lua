@@ -566,6 +566,7 @@ upgrades = {
 	},
 	module_personal_shield = {
 		name = "Personal Shield",
+		order = 1,
 		description = "Generates a small bubble shield",
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
@@ -582,6 +583,7 @@ upgrades = {
 	
 	module_areashield = {
 		name = "Area Shield",
+		order = 2, -- conversion
 		description = "A bubble shield that protects surrounding units within 350 m",
 		func = function(unitDef)
 				--ApplyWeapon(unitDef, "commweapon_areashield", 2)
@@ -725,25 +727,6 @@ upgrades = {
 				ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_hparticlebeam")
 			end,	
 	}
-}
-
-upgrades_dota = {
-	module_personal_cloak = {
-		name = "Stealth System",
-		description = "Makes the commander invisible to radar",
-		func = function(unitDef)
-				unitDef.stealth = true
-			end,
-	},
-	module_cloak_field = upgrades.module_jammer,
-	
-	module_resurrect = {
-		name = "Lazarus Nanolathe",
-		description = "Adds +7.5 metal/s build speed",
-		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 7.5 end
-			end,
-	},
 }
 
 decorations = {
@@ -899,15 +882,7 @@ for name,data in pairs(upgrades) do
 		data.order = order
 	end
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-if Spring and Spring.GetModOptions and Spring.GetModOptions().zkmode == "dota" then
-	for name,data in pairs(upgrades_dota) do
-		upgrades[name] = data
-	end
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
 for i=1,#weaponsList do
 	local name, array = VFS.Include(weaponsList[i])
