@@ -16,7 +16,7 @@
 -- (due to undocumented use-case & apparent complexity of this widget)
 
 
-local version = "v1.356"
+local version = "v1.357"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -123,6 +123,7 @@ local floor	= math.floor
 local huge	= math.huge
 local sqrt 	= math.sqrt
 local max	= math.max
+local modf = math.modf
 
 local currentFrame = Spring.GetGameFrame()
 local nextFrame	= currentFrame +30
@@ -612,16 +613,12 @@ function CleanOrders(newCmd)
 	for key,myCmd in pairs(myQueue) do
 		local cmdID = abs( myCmd.id )
 		local x, y, z, facing = myCmd.x, myCmd.y, myCmd.z, myCmd.h
-		local canBuildThisThere,featureID = spTestBuildOrder(cmdID,x,y,z,facing) --check if build site is blocked by buildings & terrain
+		local blockage,featureID = spTestBuildOrder(cmdID,x,y,z,facing) --check if build site is blocked by buildings & terrain
 
-		local newFree = (newCmd and xSize and canBuildThisThere ~= blockageType.obstructed)
-		local blocked = (canBuildThisThere == blockageType.mobiles or canBuildThisThere == blockageType.obstructed)
-		local structureBlockage = false
-		local overlappingQueue = false
-		local featureBlockage = false
-		local isNanoframe = false
+		local newFree = (newCmd and xSize and blockage ~= blockageType.obstructed)
+		local blocked = (blockage ~= blockageType.free)
 		
-		if blocked or newFree then
+		if (newCmd and xSize) or blocked then --is processing new command or blockage detected
 			if facing == 0 or facing == 2 then --check the size of the queued building
 				xSize_queue = UnitDefs[cmdID].xsize*4
 				zSize_queue = UnitDefs[cmdID].zsize*4
@@ -631,25 +628,35 @@ function CleanOrders(newCmd)
 			end	
 		end
 		
-		if blocked then
+		repeat --for emulating "continue", isn't looping
+
+		if blocked then --unfeasible queue?
+			local nonMobile = false
+			local stillBuilding = false
 			local blockingUnits = spGetUnitsInRectangle(x-xSize_queue, z-zSize_queue, x+xSize_queue, z+zSize_queue)
 			for i=1, #blockingUnits do
 				local blockerDefID = spGetUnitDefID(blockingUnits[i])
 				if blockerDefID == cmdID then
 					local _,_,nanoframe = spGetUnitIsStunned(blockingUnits[i])
-					if not nanoframe then
-						structureBlockage= true --unit that we wanted to build is already being build, cancel this queue
-					else
-						isNanoframe = true
+					if nanoframe then
+						stillBuilding = true
 					end
 					break;
-				elseif math.modf(UnitDefs[blockerDefID].speed*10) == 0 then -- immobile unit is blocking. ie: modf(0.01*10) == 00 (fractional speed is ignored)
-					structureBlockage= true --blocking unit can't move away, cancel this queue
+				elseif modf(UnitDefs[blockerDefID].speed*10) == 0 then -- immobile unit is blocking. ie: modf(0.01*10) == 00 (assume fractional speed as immobile)
+					nonMobile = true --blocking unit can't move away, cancel this queue
 					break;
 				end
 			end
+			if (stillBuilding) then
+				myQueue[key].isStarted = true --keep queue
+				break;
+			end
+			if blockage == blockageType.obstructed or (blockage == blockageType.mobile and nonMobile) then --terrain or static unit
+				myQueue[key] = nil  --remove queue
+				break;
+			end
 		end	
-		
+
 		if newFree then --check if build site overlap new queue
 			local minTolerance = xSize_queue + xSize --check minimum tolerance in x direction
 			local axisDist = abs (x - x_newCmd) --check actual separation in x direction
@@ -657,32 +664,24 @@ function CleanOrders(newCmd)
 				minTolerance = zSize_queue + zSize --check minimum tolerance in z direction
 				axisDist = abs (z - z_newCmd) -- check actual separation in z direction
 				if axisDist < minTolerance then --if too close in z direction
-					overlappingQueue = true --flag this queue for removal
+					myQueue[key] = nil  --remove queue
 					isOverlap = true --return true
 					
 					StopAnyLeader(key) --send STOP to units assigned to this queue. A scenario: user deleted this queue by overlapping old queue with new queue and it automatically stop any unit trying to build this queue
 					StopAnyAssistant(key)
+					break;
 				end
 			end
-		end
-		
-		--prevent build queue on ally feature
-		if ( checkFeatures ) and ( featureID ) then --check if build site is blocked by feature
+		end --end overlap check
+
+		if ( checkFeatures ) and ( featureID ) then --build queue on ally feature? check if build site is blocked by feature
 			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't reclaim or build there. (ie: dragon-teeth's wall)
-				featureBlockage= true
+				myQueue[key] = nil  --remove queue
+				break;
 			end
-		end
-		--end feature check
-		
-		if (canBuildThere==blockageType.obstructed and not structureBlockage) --terrain issue
-		or (structureBlockage) --queue on existing building (not nanoframe of intended building)
-		or (featureBlockage) --(optional) queue on allies feature (eg: dragon teeth wall)
-		or (overlappingQueue) -- queue on another queue
-		then --if queue is flagged for removal
-			myQueue[key] = nil  --remove queue
-		elseif isNanoframe then
-			myQueue[key].isStarted = true
-		end
+		end	--end feature check
+
+		until true
 	end
 	
 	return isOverlap --return a value for "widget:CommandNotify()" to handle user's command.
@@ -928,7 +927,7 @@ function ConstructionFinishedEvent(unitID,unitDefID) --unitID & defID of buildin
 		myQueueDanger[typeNew] = nil
 	end
 	
-	--Random Note1: ideally there would be only 1 instance of Shift order in myQueuedue to collision check in CleanOrders()
+	--Random Note1: there would be only 1 instance of Shift order in myQueued because collision check in CleanOrders() remove duplicate
 	--Random Note2: non-Shift order doesn't have collision check and can have duplicate
 	
 	--Construction finished, leader must continue for repair or other order, Set them to "busy". (UnitIdle() will be called later if Constructor is really idle)
