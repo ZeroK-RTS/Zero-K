@@ -23,7 +23,7 @@ function widget:GetInfo()
     desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group 0 "..
 "(\255\200\200\200Ctrl+0\255\255\255\255, or \255\200\200\200Alt+0\255\255\255\255 if using \255\90\255\90Auto Group\255\255\255\255 widget), "..
 "then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
-    author    = "Troy H. Cheek, modified by msafwan",
+    author    = "Troy H. Cheek, modified by xponen",
     date      = "July 20, 2009, 8 March 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
@@ -425,7 +425,23 @@ end
 --select 10 worker from a pool of idle constructor or reuse some of the non-idle constructor as new worker
 
 function FindEligibleWorker()
-	local unitToWork = {}
+	--Fix conflict with other widgets--
+	--gui_lasso_terraform.lua --
+	for unitID,myCmd in pairs(myUnits) do --check if busy unit actually have recognizable command. This could happen if unit was doing other stuff then is programmatically queued to build stuff (eg: gui_lasso_terraform.lua added terraform then reissue build order).
+		if myCmd == queueType.busy then
+			local cmd1 = GetFirstCommand(unitID,true)
+			if ( cmd1 and cmd1.id and cmd1.id<0) then
+				--record build site so that other CBA units can help
+				local x, y, z, h = cmd1.params[1], cmd1.params[2], cmd1.params[3], cmd1.params[4]
+				local myCmd = { id=cmd1.id, x=x, y=y, z=z, h=h }
+				local newDirectCmdHash = queueType.buildNew .. BuildHash(myCmd)
+				myQueue[newDirectCmdHash] = myCmd
+				UpdateUnitsPathabilityForOneQueue(newDirectCmdHash,myCmd) --take note of build site reachability
+				myUnits[unitID] = newDirectCmdHash
+			end
+		end
+	end
+	--cmd_mex_placement.lua --
 	for unitID,myCmd in pairs(myUnits) do --check if unit really idle or is actually busy, because UnitIdle() can be triggered by other widget and is overriden with new command afterward, thus making unit look idle but is busy (ie: cmd_mex_placement.lua, area mex widget)
 		if myCmd == queueType.idle then --if unit is marked as idle, then double check it
 			local cmd1 = GetFirstCommand(unitID,true)
@@ -439,16 +455,24 @@ function FindEligibleWorker()
 				-- else
 				myUnits[unitID] = queueType.busy
 				-- end
-			else
+			end
+		end
+	end
+	--Collect idle worker for work--
+	local unitToWork = {}
+	for unitID,myCmd in pairs(myUnits) do
+		if myCmd == queueType.idle then
 				if #unitToWork < 10 then
 					--NOTE: only allow up to 10 idler to be processed to prevent super lag.
 					--The amount of external loop will be (numberOfmyunit^2+numberOfQueue)*numberOfIdle^2.
 					--ie: if all variable were 50, then the amount of loop in total is 6375000 loop (6 million).
 					unitToWork[#unitToWork+1] = unitID
+				else
+					break;
 				end
 			end
-		end
 	end
+	--Collect busy worker for reassignment--
 	if #unitToWork < 10 then
 		local gaveWork = false
 		local matchAssistOrBuildQueueType = {queueType.buildQueue,queueType.assistBuild,queueType.assistGuard}
@@ -458,7 +482,7 @@ function FindEligibleWorker()
 				if MatchAny(workType,matchAssistOrBuildQueueType) then
 					unitToWork[#unitToWork+1] = unitID
 					gaveWork = true
-					reassignedUnits[unitID] = true
+					reassignedUnits[unitID] = true --skip reassign in next loop
 					if (#unitToWork == 10) then
 						break
 					end
