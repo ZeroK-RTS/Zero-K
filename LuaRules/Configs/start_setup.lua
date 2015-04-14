@@ -36,9 +36,6 @@ ploppables = {
   "factoryjump",
   "factoryspider",
   "factoryship",
-}
-
-air_ploppables = {
   "factoryplane",
   "factorygunship",
 }
