@@ -572,7 +572,7 @@ local black = { 0, 0, 0 }
 local white = { 1, 1, 1 }
 
 
-local GetTargetCameraState		= Spring.GetCameraState 
+local spGetCameraState		= Spring.GetCameraState 
 local spGetCameraVectors	= Spring.GetCameraVectors
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spGetSmoothMeshHeight	= Spring.GetSmoothMeshHeight
@@ -615,14 +615,6 @@ local initialBoundsSet = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local GetTargetCameraState = function()
-		if targetCam ~= nil then
-			return targetCam
-		else
-			return Spring.GetCameraState()
-		end
-	end
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 local cx,cy = vsx * 0.5,vsy * 0.5
@@ -1273,7 +1265,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
 	if gx and gy and gz then --just in case
 		if smoothness == nil then smoothness = options.smoothness.value or 0 end
-		local cs = GetTargetCameraState()
+		local cs = spGetCameraState()--GetTargetCameraState()
 		SetLockSpot2(cs) --get lockspot at mid screen if there's none present
 		if not ls_have then
 			return
@@ -1324,7 +1316,7 @@ local function Zoom(zoomin, shift, forceCenter)
 			--out of map. Bound zooming to within map
 			gx,gz = GetMapBoundedCoords(gx,gz)  
 		end
-		
+
 		if gx then
 			dx = gx - cs.px
 			dy = gy - cs.py
@@ -1334,29 +1326,35 @@ local function Zoom(zoomin, shift, forceCenter)
 		end
 		
 		local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (shift and 3 or 1)
+		-- Spring.Echo("Zoom Speed: "..sp)
 		
 		local zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
 		local new_px = cs.px + zox --a zooming that get slower the closer you are to the target.
 		local new_py = cs.py + zoy
 		local new_pz = cs.pz + zoz
+		-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 
 		local groundMinimum = ExtendedGetGroundHeight(new_px, new_pz) + 20
 		
 		if not options.freemode.value then
 			if new_py < groundMinimum then --zooming underground?
 				sp = (groundMinimum - cs.py) / dy
+				-- Spring.Echo("Zoom Speed at ground: "..sp)
 				
 				zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
 				new_px = cs.px + zox --a zooming that get slower the closer you are to the ground.
 				new_py = cs.py + zoy
 				new_pz = cs.pz + zoz
+				-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 			elseif (not zoomin) and new_py > maxDistY then --zoom out to space?
 				sp = (maxDistY - cs.py) / dy
+				-- Spring.Echo("Zoom Speed at sky: "..sp)
 
 				zox,zoy,zoz = LimitZoom(dx,dy,dz,sp,2000)
 				new_px = cs.px + zox --a zoom-out that get slower the closer you are to the ceiling?
 				new_py = cs.py + zoy
 				new_pz = cs.pz + zoz
+				-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 			end
 			
 		end
@@ -1391,7 +1389,7 @@ local function Zoom(zoomin, shift, forceCenter)
 			--out of map. Bound zooming to within map
 			gx,gz = GetMapBoundedCoords(gx,gz)   
 		end
-		
+
 		ls_have = false --unlock lockspot 
 		-- SetLockSpot2(cs) --set lockspot
 		if gx then --set lockspot
@@ -1477,7 +1475,7 @@ end
 
 
 local function ResetCam()
-	local cs = GetTargetCameraState()
+	local cs = spGetCameraState()
 	cs.px = Game.mapSizeX/2
 	cs.py = maxDistY - 5 --Avoids flying off into nothingness when zooming out from cursor
 	cs.pz = Game.mapSizeZ/2
@@ -1964,7 +1962,7 @@ function widget:Update(dt)
 		PeriodicWarning()
 	end
 
-	local cs = GetTargetCameraState()
+	-- local cs = spGetCameraState()
 	
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
@@ -1975,6 +1973,8 @@ function widget:Update(dt)
 	(rot.right or rot.left or rot.up or rot.down))
 	then
 		
+		local cs = GetTargetCameraState()
+
 		local speed = options.rotfactor.value * (s and 500 or 250)
 
 		if (rot.right or rot.left) and options.leftRightEdge.value == 'orbit' then
@@ -2007,6 +2007,7 @@ function widget:Update(dt)
 	move2.right or move2.left or move2.up or move2.down or
 	use_lockspringscroll))
 	then
+		local cs = GetTargetCameraState()
 		
 		local x, y, lmb, mmb, rmb = spGetMouseState()
 		
@@ -2114,6 +2115,8 @@ function widget:Update(dt)
 	rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
 	then
 		
+		local cs = GetTargetCameraState()
+		
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
 		else --not using movekey for 3rdPerson-edge-Scroll (ie:is using mouse, "move2" and "rot"): re-issue 3rd person
@@ -2138,6 +2141,7 @@ function widget:Update(dt)
 	end
 	
 	--//MISC
+	local cs = spGetCameraState()
 	fpsmode = cs.name == "fps"
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
 		init = false
