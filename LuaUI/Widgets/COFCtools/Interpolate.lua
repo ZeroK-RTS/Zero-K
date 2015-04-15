@@ -9,23 +9,25 @@ local mathPi 				= math.pi
 
 local beginCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
 local deltaEnd = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
-local targetCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0}
+local targetCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0,name=""}
 
 function GetTargetCameraState()
 	if targetCam.px then
-		-- Spring.Echo("targetCam")
+		-- Copy targetCam, as race conditions can otherwise occur that break LuaUI completely
 		local cs = {px=0,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0}
 		cs.px = targetCam.px
-		cs.py = targetCam.py
-		cs.pz = targetCam.pz
-		cs.rx = targetCam.rx
-		cs.ry = targetCam.ry
-		cs.rz = targetCam.rz
-		cs.dx = targetCam.dx
-		cs.dy = targetCam.dy
-		cs.dz = targetCam.dz
-		cs.fov = targetCam.fov
+		-- Race condition double-check, make sure copy worked
 		if cs.px then
+			cs.py = targetCam.py
+			cs.pz = targetCam.pz
+			cs.rx = targetCam.rx
+			cs.ry = targetCam.ry
+			cs.rz = targetCam.rz
+			cs.dx = targetCam.dx
+			cs.dy = targetCam.dy
+			cs.dz = targetCam.dz
+			cs.fov = targetCam.fov
+			cs.name = targetCam.name
 			return cs
 		end
 	end
@@ -56,6 +58,7 @@ function OverrideSetCameraStateInterpolate(cs,smoothness)
 	targetCam.dy = cs.dy
 	targetCam.dz = cs.dz
 	targetCam.fov = cs.fov
+	targetCam.name = cs.name
 	
 	deltaEnd.px = cs.px - now.px
 	deltaEnd.py = cs.py - now.py

@@ -1962,7 +1962,7 @@ function widget:Update(dt)
 		PeriodicWarning()
 	end
 
-	-- local cs = spGetCameraState()
+	local cs = GetTargetCameraState()
 	
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
@@ -2007,7 +2007,6 @@ function widget:Update(dt)
 	move2.right or move2.left or move2.up or move2.down or
 	use_lockspringscroll))
 	then
-		local cs = GetTargetCameraState()
 		
 		local x, y, lmb, mmb, rmb = spGetMouseState()
 		
@@ -2114,9 +2113,7 @@ function widget:Update(dt)
 	move2.right or move2.left or move2.up or move2.down or
 	rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
 	then
-		
-		local cs = GetTargetCameraState()
-		
+
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
 		else --not using movekey for 3rdPerson-edge-Scroll (ie:is using mouse, "move2" and "rot"): re-issue 3rd person
@@ -2141,7 +2138,6 @@ function widget:Update(dt)
 	end
 	
 	--//MISC
-	local cs = spGetCameraState()
 	fpsmode = cs.name == "fps"
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
 		init = false
