@@ -9,56 +9,59 @@ local mathPi 				= math.pi
 
 local beginCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
 local deltaEnd = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
-local targetCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0,name=""}
+local targetCam = {px=0,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0,name="",active=false}
 
 function GetTargetCameraState()
-	if targetCam.px then
-		-- Copy targetCam, as race conditions can otherwise occur that break LuaUI completely
-		local cs = {px=0,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0}
-		cs.px = targetCam.px
-		-- Race condition double-check, make sure copy worked
-		if cs.px then
-			cs.py = targetCam.py
-			cs.pz = targetCam.pz
-			cs.rx = targetCam.rx
-			cs.ry = targetCam.ry
-			cs.rz = targetCam.rz
-			cs.dx = targetCam.dx
-			cs.dy = targetCam.dy
-			cs.dz = targetCam.dz
-			cs.fov = targetCam.fov
-			cs.name = targetCam.name
-			return cs
-		end
+	return targetCam
+end
+
+local function CopyState(cs, newState)
+	cs.px = newState.px
+	cs.py = newState.py
+	cs.pz = newState.pz
+	cs.rx = newState.rx
+	cs.ry = newState.ry
+	cs.rz = newState.rz
+	cs.dx = newState.dx
+	cs.dy = newState.dy
+	cs.dz = newState.dz
+	cs.fov = newState.fov
+	cs.name = newState.name
+end
+
+local function NormalizeRotation(cs)
+	--Note: Spring angle is between -mathPi to +mathPi
+	-- so its not from 0 to 2*mathPi
+
+	local fullCircle = 2*mathPi
+	if cs.rx > mathPi then
+		cs.rx = cs.rx - fullCircle
+	elseif cs.rx < -mathPi then
+		cs.rx = cs.rx + fullCircle
 	end
-	return Spring.GetCameraState()
+	if cs.ry > mathPi then
+		cs.ry = cs.ry - fullCircle
+	elseif cs.ry < -mathPi then
+		cs.ry = cs.ry + fullCircle
+	end
+	if cs.rz > mathPi then
+		cs.rz = cs.rz - fullCircle
+	elseif cs.rz < -mathPi then
+		cs.rz = cs.rz + fullCircle
+	end
 end
 
 function OverrideSetCameraStateInterpolate(cs,smoothness)
-		Interpolate()
+	Interpolate()
 	beginCam.time = spGetTimer()
 	deltaEnd.period = smoothness
 	
 	local now = Spring.GetCameraState()
-	beginCam.px = now.px
-	beginCam.py = now.py
-	beginCam.pz = now.pz
-	beginCam.rx = now.rx
-	beginCam.ry = now.ry
-	beginCam.rz = now.rz
-	beginCam.fov = now.fov
-	
-	targetCam.px = cs.px
-	targetCam.py = cs.py
-	targetCam.pz = cs.pz
-	targetCam.rx = cs.rx
-	targetCam.ry = cs.ry
-	targetCam.rz = cs.rz
-	targetCam.dx = cs.dx
-	targetCam.dy = cs.dy
-	targetCam.dz = cs.dz
-	targetCam.fov = cs.fov
-	targetCam.name = cs.name
+	CopyState(beginCam, now)
+
+	CopyState(targetCam, cs)
+	NormalizeRotation(targetCam)
+	targetCam.active = true
 	
 	deltaEnd.px = cs.px - now.px
 	deltaEnd.py = cs.py - now.py
@@ -68,22 +71,7 @@ function OverrideSetCameraStateInterpolate(cs,smoothness)
 	deltaEnd.rz = cs.rz - now.rz
 	deltaEnd.fov = cs.fov - now.fov
 	
-	local fullCircle = 2*mathPi
-	if deltaEnd.rx > mathPi then
-		deltaEnd.rx = deltaEnd.rx - fullCircle
-	elseif deltaEnd.rx < -mathPi then
-		deltaEnd.rx = deltaEnd.rx + fullCircle
-	end
-	if deltaEnd.ry > mathPi then
-		deltaEnd.ry = deltaEnd.ry - fullCircle
-	elseif deltaEnd.ry < -mathPi then
-		deltaEnd.ry = deltaEnd.ry + fullCircle
-	end
-	if deltaEnd.rz > mathPi then
-		deltaEnd.rz = deltaEnd.rz - fullCircle
-	elseif deltaEnd.rz < -mathPi then
-		deltaEnd.rz = deltaEnd.rz + fullCircle
-	end
+	NormalizeRotation(deltaEnd)
 end
 
 local function Add(vector1,vector2,factor)
@@ -95,38 +83,10 @@ local function Add(vector1,vector2,factor)
 	newVector.ry = vector1.ry + vector2.ry * factor
 	newVector.rz = vector1.rz + vector2.rz * factor
 	newVector.fov = vector1.fov + vector2.fov * factor
-	
-	--Note: Spring angle is between -mathPi to +mathPi
-	-- so its not from 0 to 2*mathPi
-	
-	local fullCircle = 2*mathPi
-	if newVector.rx > mathPi then
-		newVector.rx = newVector.rx - fullCircle
-	elseif newVector.rx < -mathPi then
-		newVector.rx = newVector.rx + fullCircle
-	end
-	if newVector.ry > mathPi then
-		newVector.ry = newVector.ry - fullCircle
-	elseif newVector.ry < -mathPi then
-		newVector.ry = newVector.ry + fullCircle
-	end
-	if newVector.rz > mathPi then
-		newVector.rz = newVector.rz - fullCircle
-	elseif newVector.rz < -mathPi then
-		newVector.rz = newVector.rz + fullCircle
-	end
+
+	NormalizeRotation(newVector)
 
 	return newVector
-end
-
-local function CopyState(cs, newState)
-	cs.px = newState.px
-	cs.py = newState.py
-	cs.pz = newState.pz
-	cs.rx = newState.rx
-	cs.ry = newState.ry
-	cs.rz = newState.rz
-	cs.fov = newState.fov
 end
 
 local function AddSpeed(cs,delta, tweenFact)
@@ -148,9 +108,8 @@ end
 
 --All algorithm is from "Spring/rts/game/CameraHandler.cpp"
 function Interpolate()
-	if not (targetCam.px) then
-		return
-	end
+	if not (targetCam.active) then return end
+
 	local lapsedTime = spDiffTimers(spGetTimer(),beginCam.time);
 
 	if ( lapsedTime >= deltaEnd.period) then
@@ -159,7 +118,7 @@ function Interpolate()
 		-- AddSpeed(cs,deltaEnd,0.5) 
 		DisableEngineTilt(cs)
 		spSetCameraState(cs,0)
-		targetCam.px = nil
+		targetCam.active = false
 	else
 		if (deltaEnd.period > 0) then
 			local timeRatio = (deltaEnd.period - lapsedTime) / (deltaEnd.period);

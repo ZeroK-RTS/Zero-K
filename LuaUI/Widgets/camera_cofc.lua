@@ -2191,7 +2191,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 			end
 		end
 		if abs(dx) > 0 or abs(dy) > 0 then
-			RotateCamera(x, y, dx, dy, smoothed, ls_have)
+			RotateCamera(x, y, dx, dy, true, ls_have)
 		end
 		
 		spWarpMouse(msx, msy)
