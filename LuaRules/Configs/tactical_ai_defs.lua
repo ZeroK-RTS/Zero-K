@@ -213,7 +213,7 @@ local slasherSkirmieeArray = {
 	["corsumo"] = true,
 	["dante"] = true,
 	["armwar"] = true,
-	["hoverassault"] = true,
+
 	["cormak"] = true,
 	["corthud"] = true,
 	["spiderriot"] = true,
@@ -796,11 +796,11 @@ local behaviourConfig = {
 		skirms = slasherSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = -400, 
-		skirmOrderDis = 700,
+		skirmLeeway = 0, 
+		skirmOrderDis = 300,
 		skirmKeepOrder = true,
-		velocityPrediction = 10,
-		skirmOnlyNearEnemyRange = 80
+		velocityPrediction = 30,
+		skirmOnlyNearEnemyRange = 20
 	},
 	
 	-- arty range skirms
