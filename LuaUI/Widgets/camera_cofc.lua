@@ -680,6 +680,7 @@ local topDownBufferZone = maxDistY * topDownBufferZonePercent
 local minZoomTiltAngle = 35
 local angleCorrectionMaximum = 5 * RADperDEGREE
 local targetCenteringHeight = 1200
+local mapEdgeProportion = 1.0/5.9
 
 SetFOV = function(fov)
 	local cs = GetTargetCameraState()
@@ -689,7 +690,8 @@ SetFOV = function(fov)
 	mapEdgeBuffer = groundMax
 	local mapFittingDistance = MHEIGHT/2
 	if vsy/vsx > MHEIGHT/MWIDTH then mapFittingDistance = (MWIDTH * vsy/vsx)/2 end
-	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingDistance/1.7) -- map edge buffer should be 1/6th of the length of the dimension fitted to screen
+	local mapFittingEdge = mapFittingDistance/(1/(2 * mapEdgeProportion) - 1) -- map edge buffer is 1/5.9 of the length of the dimension fitted to screen
+	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingEdge)
 
 	local mapLength = mapFittingDistance + mapEdgeBuffer
 	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
