@@ -16,7 +16,7 @@
 -- (due to undocumented use-case & apparent complexity of this widget)
 
 
-local version = "v1.359"
+local version = "v1.360"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -132,8 +132,7 @@ local modf = math.modf
 local pow = math.pow
 
 local currentFrame = Spring.GetGameFrame()
-local nextFrame	= currentFrame +30
-local nextPathCheck = currentFrame + 400 --is used to check whether constructor can go to construction site
+local turboUpdate = nil
 local myAllyID = Spring.GetMyAllyTeamID()
 local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
@@ -269,23 +268,22 @@ end
 
 function widget:GameFrame(thisFrame)
 	currentFrame = thisFrame
-	if ( thisFrame > nextPathCheck ) then
+	if ( thisFrame %300 == 0 ) then  --every 10 second
 		cachedValue = {}
 		UpdateUnitsPathability()
 		DecayDangerousQueue()
 		AddDangerousQueue()
 		StopDangerousQueue()
-		
-		nextPathCheck = thisFrame + 300 --10 second
 	end
-	if ( thisFrame < nextFrame ) then 
-		return
+	if ( thisFrame %60 == 0 ) 
+	or ( turboUpdate and thisFrame % turboUpdate == 0 ) 
+	then --every 2 second or less
+		if ( groupHasChanged == true ) then 
+			UpdateOneGroupsDetails(myGroupId)
+		end
+		turboUpdate = nil
+		FindEligibleWorker()	-- compile list of eligible idle units for work
 	end
-	if ( groupHasChanged == true ) then 
-		UpdateOneGroupsDetails(myGroupId)
-	end
-	nextFrame = thisFrame + 60	-- try again in 2 second if nothing else triggers
-	FindEligibleWorker()	-- compile list of eligible idle units for work
 end
 
 --	This function detects that a new group has been defined or changed.  Use it to set a flag
@@ -297,7 +295,7 @@ function widget:GroupChanged(groupId)
 --		local units = spGetGroupUnits(myGroupId)
 --		Echo( Spring.GetGameFrame() .. " Change detected in group." )
 		groupHasChanged = true
-		nextFrame = currentFrame + ping()
+		turboUpdate = ping()
 	end
 end
 
@@ -369,7 +367,7 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 						myQueue[hash] = myCmd	-- add to CB queue
 						UpdateUnitsPathabilityForOneQueue(hash,myCmd) --take note of build site reachability
 					end
-					nextFrame = currentFrame + 30 --wait 1 more second before distribute work, so user can queue more stuff
+					turboUpdate = 30 --wait 1 more second before distribute work, so user can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
 				else --for: moving/attacking/repairing, ect
 					if myUnits[unitID] == queueType.idle then --unit is not doing anything
@@ -418,7 +416,7 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	ConstructionFinishedEvent(unitID,unitDefID)
-	nextFrame = currentFrame + ping() --find new work
+	turboUpdate = ping() --find new work
 end
 
 --	If unit detected as idle (probably finished work) and it's one of ours, time to find it some work.
@@ -427,7 +425,7 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 	if ( myUnits[unitID] ) then
 		StopAnyAssistant(myUnits[unitID])
 		myUnits[unitID] = queueType.idle
-		nextFrame = currentFrame + ping() --find new work
+		turboUpdate = ping() --find new work
 	end
 end
 
@@ -589,7 +587,7 @@ function GiveWorkToUnits(unitToWork)
 	unitArray = nil
 	orderArray = nil
 	assignedAJob = nil
-	--nextFrame = currentFrame + ping()
+	--turboUpdate = ping()
 end
 
 --	Borrowed distance calculation from Google Frog's Area Mex
@@ -701,11 +699,12 @@ function CleanOrders(newCmd)
 				minTolerance = zSize_queue + zSize --check minimum tolerance in z direction
 				axisDist = abs (z - z_newCmd) -- check actual separation in z direction
 				if axisDist < minTolerance then --if too close in z direction
-					myQueue[key] = nil  --remove queue
 					isOverlap = true --return true
 					
 					StopAnyLeader(key) --send STOP to units assigned to this queue. A scenario: user deleted this queue by overlapping old queue with new queue and it automatically stop any unit trying to build this queue
 					StopAnyAssistant(key)
+
+					myQueue[key] = nil  --remove queue
 					break;
 				end
 			end
