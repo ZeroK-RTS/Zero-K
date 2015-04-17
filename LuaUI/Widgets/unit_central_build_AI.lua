@@ -16,7 +16,7 @@
 -- (due to undocumented use-case & apparent complexity of this widget)
 
 
-local version = "v1.357"
+local version = "v1.358"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -63,11 +63,13 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+-------------CONFIG--------------------
+-------------------------------------------
 local myGroupId = 0	--//Constant: a group number (0 to 9) will be controlled by Central Build AI. NOTE: put "-1" to use a custom group instead (use the hotkey to add units;ie: ctrl+hotkey).
 local hotkey = string.byte( "g" )	--//Constant: a custom hotkey to add unit to custom group. NOTE: set myGroupId to "-1" to use this hotkey.
 local checkFeatures = false --//Constant: if true, Central Build will reject any build queue on top of allied features (eg: ally's wreck & dragon teeth).
-
+-------------Speedup--------------------
+-------------------------------------------
 local Echo					= Spring.Echo
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetGroupList		= Spring.GetGroupList
@@ -94,6 +96,7 @@ local spGetUnitsInCylinder 	= Spring.GetUnitsInCylinder
 local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetUnitAllyTeam 	= Spring.GetUnitAllyTeam
 local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
+local spValidUnitID = Spring.ValidUnitID
 
 local glPushMatrix	= gl.PushMatrix
 local glPopMatrix	= gl.PopMatrix
@@ -124,6 +127,7 @@ local huge	= math.huge
 local sqrt 	= math.sqrt
 local max	= math.max
 local modf = math.modf
+local pow = math.pow
 
 local currentFrame = Spring.GetGameFrame()
 local nextFrame	= currentFrame +30
@@ -143,10 +147,13 @@ local groupHasChanged	--	Flag if group members have changed.
 local myQueueUnreachable = {} -- list of queue which units can't reach
 local myQueueDanger = {} --list of queue which lead to dead constructors
 
+local reassignedUnits = {} --list of units that had its task re-checked (to be re-tasked or remained with current task).
+-----------Speedup2--------------------
+----------optimization------------------
 local cachedValue = {} --cached results for "EnemyControlBuildSite()" function to reduce cost for repeated call
 local cachedMetalCost = {} --cached metalcost for "GetWorkFor()" function
 local cachedCommand = {} --cached first command for "GetWorkFor{}" function
-local reassignedUnits = {} --list of units that had its task re-checked (to be re-tasked or remained with current task).
+local cachedProgress = {} --cached build progress for "GetWorkFor()" function 
 
 --------------------------------------------
 --List of prefix used as value for myUnits[]
@@ -498,7 +505,9 @@ function FindEligibleWorker()
 
 	if (#unitToWork > 0) then
 		GiveWorkToUnits(unitToWork)
+		--clear cached item for next loop--
 		cachedMetalCost = {}
+		cachedProgress = {}
 	end
 	cachedCommand = {}
 end
@@ -654,16 +663,17 @@ function CleanOrders(newCmd)
 		
 		repeat --for emulating "continue", isn't looping
 
+		myQueue[key].isStarted = false 
 		if blocked then --unfeasible queue?
 			local nonMobile = false
-			local stillBuilding = false
+			local stillBuilding = nil
 			local blockingUnits = spGetUnitsInRectangle(x-xSize_queue, z-zSize_queue, x+xSize_queue, z+zSize_queue)
 			for i=1, #blockingUnits do
 				local blockerDefID = spGetUnitDefID(blockingUnits[i])
 				if blockerDefID == cmdID then
 					local _,_,nanoframe = spGetUnitIsStunned(blockingUnits[i])
 					if nanoframe then
-						stillBuilding = true
+						stillBuilding = blockingUnits[i]
 					end
 					break;
 				elseif modf(UnitDefs[blockerDefID].speed*10) == 0 then -- immobile unit is blocking. ie: modf(0.01*10) == 00 (assume fractional speed as immobile)
@@ -672,7 +682,8 @@ function CleanOrders(newCmd)
 				end
 			end
 			if (stillBuilding) then
-				myQueue[key].isStarted = true --keep queue
+				myQueue[key].isStarted = true --state it as nanoframe, and keep queue
+				myQueue[key].unitID = stillBuilding
 				break;
 			end
 			if blockage == blockageType.obstructed or (blockage == blockageType.mobile and nonMobile) then --terrain or static unit
@@ -732,6 +743,7 @@ function GetWorkFor(unitID)
 					local dist = Distance(ux,uz,x,z) --distance btwn structure & self
 					dist = dist + SituationalPenalty(unitID,busyCmd1) --cost penalty for any danger
 					dist = dist + AssistantBenefit(busyUnitID,busyCmd1)
+					dist = dist + ProgressBonus(busyCmd1)
 					if ( dist < busyDist ) then
 						busyClosestID = busyUnitID	-- busy unit who needs help
 						busyDist = dist		-- dist to construction site
@@ -765,6 +777,7 @@ function GetWorkFor(unitID)
 				local ud = UnitDefs[udid]
 				local dist = Distance(ux,uz,x,z) --distance btwn current unit & project to be started
 				dist = dist + SituationalPenalty(unitID,index) --account for any danger
+				dist = dist + ProgressBonus(index)
 				if ( dist < queueDist and CanBuildThis(cmd, ud) ) then
 					queueClose = index	-- # of the project we'll be starting
 					queueDist = dist
@@ -851,6 +864,35 @@ function SituationalPenalty(unitID, myQueueIndex)
 	dist = dist + notaccessible*4500 --increases cost arbitrarily if cannot reach
 	dist = dist + fatality*2250 --increases cost arbitrarily if any unit had died trying to execute this command
 	return dist --bigger when too much danger
+end
+
+--return some value to represent favourism toward build progress
+function ProgressBonus( myQueueIndex)
+	if not myQueue[myQueueIndex] .isStarted then 
+		return 0 
+	end
+	local unitID = myQueue[myQueueIndex].unitID
+	if cachedProgress[unitID] then 
+		return cachedProgress[unitID] 
+	end
+	if not spValidUnitID(unitID) then
+		cachedProgress[unitID] = 0
+		return 0
+	end
+	local _,_,_,_,build = spGetUnitHealth(unitID)
+	local dist =  max(-500*(pow(build, 6)),-500) --more bonus when building is almost finish. Source of math: "Spring/rts/game/CameraHandler.cpp"
+	--shape:
+	-- 0%                         100%
+	-- /----------------------------> Percent complete
+	-- |xxxxxxxxx                     0
+	-- |         xxx xx xx
+	-- |                 xxxxx
+	-- |                      xxx
+	-- |                         xx
+	-- v                           x  -500
+	-- distBonus
+	cachedProgress[unitID] = dist
+	return dist
 end
 
 function CanBuildThis(cmdID, unitDef)
@@ -1295,7 +1337,7 @@ end
 -- Helper function (detect enemy at build site)
 function EnemyControlBuildSite(order)
 	local coordString = order[1].." " .. order[3]
-	if cachedValue[coordString] and cachedValue[coordString].frame == currentFrame then
+	if cachedValue[coordString] and cachedValue[coordString].frame == currentFrame then --for spammy check in 1 frame
 		return cachedValue[coordString].haveEnemies
 	end
 
