@@ -16,7 +16,7 @@
 -- (due to undocumented use-case & apparent complexity of this widget)
 
 
-local version = "v1.360"
+local version = "v1.361"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -701,7 +701,7 @@ function CleanOrders(newCmd)
 				if axisDist < minTolerance then --if too close in z direction
 					isOverlap = true --return true
 					
-					StopAnyLeader(key) --send STOP to units assigned to this queue. A scenario: user deleted this queue by overlapping old queue with new queue and it automatically stop any unit trying to build this queue
+					StopAnyLeader(key,true) --send STOP to units assigned to this queue. A scenario: user deleted this queue by overlapping old queue with new queue and it automatically stop any unit trying to build this queue
 					StopAnyAssistant(key)
 
 					myQueue[key] = nil  --remove queue
@@ -1161,8 +1161,9 @@ end
 
 -- Tell any leader for construction of "myQueue[key]" to stop the job immediately
 
-function StopAnyLeader(key,onlyOne)
-	if key:sub(1,4) ~= queueType.buildQueue then --only order with SHIFT order should be stopped
+function StopAnyLeader(key,includeDirect)
+	local queueToCheck = {queueType.buildQueue, (includeDirect and queueType.buildNew)}
+	if not MatchAny(key:sub(1,4), queueToCheck) then --skip Idle or busy or assist
 		return
 	end
 
@@ -1172,9 +1173,6 @@ function StopAnyLeader(key,onlyOne)
 		if queueKey == key then
 			builderArray[#builderArray+1] = unitID
 			myUnits[unitID]= queueType.busy --busy until really idle.
-			if onlyOne then
-				break
-			end
 		end
 	end
 	if #builderArray>0 then
