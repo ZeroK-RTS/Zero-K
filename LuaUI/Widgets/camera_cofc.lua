@@ -1238,7 +1238,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	-- Get proportion needed so that target location is centered in the view around when cs.py is targetCenteringHeight elmos above target, when zoomed from overview
 	local centerwardDriftBase = (maxDistY - groundMin)/((maxDistY - groundMin) - (gy + targetCenteringHeight)) - 1
 	-- Spring.Echo(centerwardDriftBase)
-	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.3) * centerwardDriftBase --Shift vertical overcorrection down, to compensate for camera tilt
+	local centerwardVDriftFactor = ((mouseY - vsy/2)/(vsy/2) - 0.45) * centerwardDriftBase --Shift vertical overcorrection down, to compensate for camera tilt
 	local centerwardHDriftFactor = (mouseX - vsx/2)/(vsx/2) * centerwardDriftBase * (vsx/vsy) --Adjust horizontal overcorrection for aspect ratio
 
 	-- Ensure that both points are on the same plane by testing them from camera. This way the y value will always be positive, making div/0 checks possible
