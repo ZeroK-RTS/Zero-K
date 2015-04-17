@@ -16,7 +16,7 @@
 -- (due to undocumented use-case & apparent complexity of this widget)
 
 
-local version = "v1.357"
+local version = "v1.361"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
@@ -42,6 +42,8 @@ end
 -- _ orders with shift+ctrl have higher priority ( insert in queue -> cons won't interrupt their current actions)
 
 ---- CHANGELOG -----
+-- xponen			v1.360	(17Apr2015)	:	improve reassignment and enemy avoidance. Thanks to aeonios (mtroyka) for feedback.
+
 -- msafwan(xponen)	v1.355	(26Jan2015)	:	1) all builder re-assign job every 4 second (even if already assigned a job)
 --											2) keep queue for unfinished building
 --											3) lower priority (and/or removal) for queue at enemy infested area
@@ -63,11 +65,13 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+-------------CONFIG--------------------
+-------------------------------------------
 local myGroupId = 0	--//Constant: a group number (0 to 9) will be controlled by Central Build AI. NOTE: put "-1" to use a custom group instead (use the hotkey to add units;ie: ctrl+hotkey).
 local hotkey = string.byte( "g" )	--//Constant: a custom hotkey to add unit to custom group. NOTE: set myGroupId to "-1" to use this hotkey.
 local checkFeatures = false --//Constant: if true, Central Build will reject any build queue on top of allied features (eg: ally's wreck & dragon teeth).
-
+-------------Speedup--------------------
+-------------------------------------------
 local Echo					= Spring.Echo
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetGroupList		= Spring.GetGroupList
@@ -94,6 +98,7 @@ local spGetUnitsInCylinder 	= Spring.GetUnitsInCylinder
 local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
 local spGetUnitAllyTeam 	= Spring.GetUnitAllyTeam
 local spGetUnitIsStunned 	= Spring.GetUnitIsStunned
+local spValidUnitID = Spring.ValidUnitID
 
 local glPushMatrix	= gl.PushMatrix
 local glPopMatrix	= gl.PopMatrix
@@ -124,16 +129,16 @@ local huge	= math.huge
 local sqrt 	= math.sqrt
 local max	= math.max
 local modf = math.modf
+local pow = math.pow
 
 local currentFrame = Spring.GetGameFrame()
-local nextFrame	= currentFrame +30
-local nextPathCheck = currentFrame + 400 --is used to check whether constructor can go to construction site
+local turboUpdate = nil
 local myAllyID = Spring.GetMyAllyTeamID()
 local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
 local enemyRange = 600 --range (in elmo) around build site to check for enemy
 local enemyThreshold = 0.49--fraction of enemy around build site w.r.t. ally unit for it to be marked as unsafe
-local dangerThreshold = 2 --amount of constructor death that force the build site to be removed if constructor had no other job to do
+local dangerThreshold = 3 --amount of constructor death that force the build site to be removed if constructor had no other job to do
 
 --	"global" for this widget.  This is probably not a recommended practice.
 local myUnits = {}	--  list of units in the Central Build group
@@ -143,10 +148,13 @@ local groupHasChanged	--	Flag if group members have changed.
 local myQueueUnreachable = {} -- list of queue which units can't reach
 local myQueueDanger = {} --list of queue which lead to dead constructors
 
+local reassignedUnits = {} --list of units that had its task re-checked (to be re-tasked or remained with current task).
+-----------Speedup2--------------------
+----------optimization------------------
 local cachedValue = {} --cached results for "EnemyControlBuildSite()" function to reduce cost for repeated call
 local cachedMetalCost = {} --cached metalcost for "GetWorkFor()" function
 local cachedCommand = {} --cached first command for "GetWorkFor{}" function
-local reassignedUnits = {} --list of units that had its task re-checked (to be re-tasked or remained with current task).
+local cachedProgress = {} --cached build progress for "GetWorkFor()" function 
 
 --------------------------------------------
 --List of prefix used as value for myUnits[]
@@ -162,8 +170,7 @@ local queueType = {
 }
 --List of value used for myQueueUnreachable[]
 local blockageType = {
-	blocked = 2,
-	enemy = 1,
+	blocked = 1,
 	clear = 0,
 }
 --List of type of work, used in GetWorkFor() & GiveWorkToUnits()
@@ -261,21 +268,22 @@ end
 
 function widget:GameFrame(thisFrame)
 	currentFrame = thisFrame
-	if ( thisFrame > nextPathCheck ) then
+	if ( thisFrame %300 == 0 ) then  --every 10 second
 		cachedValue = {}
 		UpdateUnitsPathability()
 		DecayDangerousQueue()
-		
-		nextPathCheck = thisFrame + 300 --10 second
+		AddDangerousQueue()
+		StopDangerousQueue()
 	end
-	if ( thisFrame < nextFrame ) then 
-		return
+	if ( thisFrame %60 == 0 ) 
+	or ( turboUpdate and thisFrame % turboUpdate == 0 ) 
+	then --every 2 second or less
+		if ( groupHasChanged == true ) then 
+			UpdateOneGroupsDetails(myGroupId)
+		end
+		turboUpdate = nil
+		FindEligibleWorker()	-- compile list of eligible idle units for work
 	end
-	if ( groupHasChanged == true ) then 
-		UpdateOneGroupsDetails(myGroupId)
-	end
-	nextFrame = thisFrame + 60	-- try again in 2 second if nothing else triggers
-	FindEligibleWorker()	-- compile list of eligible idle units for work
 end
 
 --	This function detects that a new group has been defined or changed.  Use it to set a flag
@@ -287,7 +295,7 @@ function widget:GroupChanged(groupId)
 --		local units = spGetGroupUnits(myGroupId)
 --		Echo( Spring.GetGameFrame() .. " Change detected in group." )
 		groupHasChanged = true
-		nextFrame = currentFrame + ping()
+		turboUpdate = ping()
 	end
 end
 
@@ -307,7 +315,6 @@ function UpdateOneGroupsDetails(myGroupId)
 			end
 		end
 	end
-	StopDangerousQueue()
 	
 	for unitID,_ in pairs(myUnits) do	--  remove any old units
 		local isInThere = false
@@ -360,7 +367,7 @@ function widget:CommandNotify(id, params, options, isZkMex,isAreaMex)
 						myQueue[hash] = myCmd	-- add to CB queue
 						UpdateUnitsPathabilityForOneQueue(hash,myCmd) --take note of build site reachability
 					end
-					nextFrame = currentFrame + 30 --wait 1 more second before distribute work, so user can queue more stuff
+					turboUpdate = 30 --wait 1 more second before distribute work, so user can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
 				else --for: moving/attacking/repairing, ect
 					if myUnits[unitID] == queueType.idle then --unit is not doing anything
@@ -409,7 +416,7 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	ConstructionFinishedEvent(unitID,unitDefID)
-	nextFrame = currentFrame + ping() --find new work
+	turboUpdate = ping() --find new work
 end
 
 --	If unit detected as idle (probably finished work) and it's one of ours, time to find it some work.
@@ -418,7 +425,7 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 	if ( myUnits[unitID] ) then
 		StopAnyAssistant(myUnits[unitID])
 		myUnits[unitID] = queueType.idle
-		nextFrame = currentFrame + ping() --find new work
+		turboUpdate = ping() --find new work
 	end
 end
 
@@ -498,7 +505,9 @@ function FindEligibleWorker()
 
 	if (#unitToWork > 0) then
 		GiveWorkToUnits(unitToWork)
+		--clear cached item for next loop--
 		cachedMetalCost = {}
+		cachedProgress = {}
 	end
 	cachedCommand = {}
 end
@@ -507,19 +516,19 @@ end
 
 function GiveWorkToUnits(unitToWork)
 	--HOW THIS WORK:
-	--*loopA for all idle CBA unit,
-	--	*loopB for all idle CBA unit,
-	--		*for each idle CBA unit: find nearest job (forA)
-	--			>check nearest job for assisting other working constructor
-	--			>check nearest job for building-stuff that not yet done by any working constructor
-	--			>check whether assisting or construction is nearest
-	--		*forA return nearest job for each idle CBA unit
-	--	*loopB return all nearest jobs for all idle CBA units
-	--	>check how many constructor has job order
-	--	>check which constructor is most nearest to its job
-	--	>register that constructor as working constructor
-	--*loopA return command to be given to that constructor
-	-->send all command to all CBA units.
+	--*loopA, for all Workers, task: collect commands,
+	--	*loopB, for idle Workers, task: get all work for all Workers,
+	--		(In GetWorkFor)
+	--			*loopC, for CBA Queue, task: find nearest job for one Worker,
+	--				>check whether job for assist or building-new-stuff is nearest
+	--			*endC (return: nearest job for one Worker)
+	--		(Exit GetWorkFor)
+	--		>collect works
+	--	*endB (return: all works)
+	--	>find which Worker is nearest to its job, remove from idle pool, and translate it into command
+	--	>collect commands
+	--*endA (return: all commands)
+	-->send commands to Workers.
 
 	local orderArray={}
 	local unitArray={}
@@ -578,7 +587,7 @@ function GiveWorkToUnits(unitToWork)
 	unitArray = nil
 	orderArray = nil
 	assignedAJob = nil
-	--nextFrame = currentFrame + ping()
+	--turboUpdate = ping()
 end
 
 --	Borrowed distance calculation from Google Frog's Area Mex
@@ -654,16 +663,17 @@ function CleanOrders(newCmd)
 		
 		repeat --for emulating "continue", isn't looping
 
+		myQueue[key].isStarted = false 
 		if blocked then --unfeasible queue?
 			local nonMobile = false
-			local stillBuilding = false
+			local stillBuilding = nil
 			local blockingUnits = spGetUnitsInRectangle(x-xSize_queue, z-zSize_queue, x+xSize_queue, z+zSize_queue)
 			for i=1, #blockingUnits do
 				local blockerDefID = spGetUnitDefID(blockingUnits[i])
 				if blockerDefID == cmdID then
 					local _,_,nanoframe = spGetUnitIsStunned(blockingUnits[i])
 					if nanoframe then
-						stillBuilding = true
+						stillBuilding = blockingUnits[i]
 					end
 					break;
 				elseif modf(UnitDefs[blockerDefID].speed*10) == 0 then -- immobile unit is blocking. ie: modf(0.01*10) == 00 (assume fractional speed as immobile)
@@ -672,7 +682,8 @@ function CleanOrders(newCmd)
 				end
 			end
 			if (stillBuilding) then
-				myQueue[key].isStarted = true --keep queue
+				myQueue[key].isStarted = true --state it as nanoframe, and keep queue
+				myQueue[key].unitID = stillBuilding
 				break;
 			end
 			if blockage == blockageType.obstructed or (blockage == blockageType.mobile and nonMobile) then --terrain or static unit
@@ -688,11 +699,12 @@ function CleanOrders(newCmd)
 				minTolerance = zSize_queue + zSize --check minimum tolerance in z direction
 				axisDist = abs (z - z_newCmd) -- check actual separation in z direction
 				if axisDist < minTolerance then --if too close in z direction
-					myQueue[key] = nil  --remove queue
 					isOverlap = true --return true
 					
-					StopAnyLeader(key) --send STOP to units assigned to this queue. A scenario: user deleted this queue by overlapping old queue with new queue and it automatically stop any unit trying to build this queue
+					StopAnyLeader(key,true) --send STOP to units assigned to this queue. A scenario: user deleted this queue by overlapping old queue with new queue and it automatically stop any unit trying to build this queue
 					StopAnyAssistant(key)
+
+					myQueue[key] = nil  --remove queue
 					break;
 				end
 			end
@@ -732,6 +744,7 @@ function GetWorkFor(unitID)
 					local dist = Distance(ux,uz,x,z) --distance btwn structure & self
 					dist = dist + SituationalPenalty(unitID,busyCmd1) --cost penalty for any danger
 					dist = dist + AssistantBenefit(busyUnitID,busyCmd1)
+					dist = dist + ProgressBonus(busyCmd1)
 					if ( dist < busyDist ) then
 						busyClosestID = busyUnitID	-- busy unit who needs help
 						busyDist = dist		-- dist to construction site
@@ -765,6 +778,7 @@ function GetWorkFor(unitID)
 				local ud = UnitDefs[udid]
 				local dist = Distance(ux,uz,x,z) --distance btwn current unit & project to be started
 				dist = dist + SituationalPenalty(unitID,index) --account for any danger
+				dist = dist + ProgressBonus(index)
 				if ( dist < queueDist and CanBuildThis(cmd, ud) ) then
 					queueClose = index	-- # of the project we'll be starting
 					queueDist = dist
@@ -848,9 +862,38 @@ function SituationalPenalty(unitID, myQueueIndex)
 	local notaccessible = myQueueUnreachable[unitID] and myQueueUnreachable[unitID][myQueueIndex] or blockageType.clear --check if I can reach this location
 	local fatality = myQueueDanger[myQueueIndex] or 0
 	local dist = 0
-	dist = dist + notaccessible*4500 --increases cost arbitrarily if cannot reach
+	dist = dist + notaccessible*9000 --increases cost arbitrarily if cannot reach
 	dist = dist + fatality*2250 --increases cost arbitrarily if any unit had died trying to execute this command
 	return dist --bigger when too much danger
+end
+
+--return some value to represent favourism toward build progress
+function ProgressBonus( myQueueIndex)
+	if not myQueue[myQueueIndex] .isStarted then 
+		return 0 
+	end
+	local unitID = myQueue[myQueueIndex].unitID
+	if cachedProgress[unitID] then 
+		return cachedProgress[unitID] 
+	end
+	if not spValidUnitID(unitID) then
+		cachedProgress[unitID] = 0
+		return 0
+	end
+	local _,_,_,_,build = spGetUnitHealth(unitID)
+	local dist =  max(-500*(pow(build, 6)),-500) --more bonus when building is almost finish. Source of math: "Spring/rts/game/CameraHandler.cpp"
+	--shape:
+	-- 0%                         100%
+	-- /----------------------------> Percent complete
+	-- |xxxxxxxxx                     0
+	-- |         xxx xx xx
+	-- |                 xxxxx
+	-- |                      xxx
+	-- |                         xx
+	-- v                           x  -500
+	-- distBonus
+	cachedProgress[unitID] = dist
+	return dist
 end
 
 function CanBuildThis(cmdID, unitDef)
@@ -896,7 +939,6 @@ function UnitGoByeBye(unitID,unitDefID)
 				StopAnyAssistant(cmdIndex) --building not yet started and leader died, stop!
 			end
 			myQueue[cmdIndex] = nil
-			myQueueDanger[cmdIndex] = nil
 		end
 		
 		myUnits[unitID] = nil
@@ -943,12 +985,10 @@ function ConstructionFinishedEvent(unitID,unitDefID) --unitID & defID of buildin
 	if myQueue[typeQueue] then
 		StopAnyAssistant(typeQueue)
 		myQueue[typeQueue] = nil
-		myQueueDanger[typeQueue] = nil
 	end
 	if myQueue[typeNew] then 
 		StopAnyAssistant(typeNew)
 		myQueue[typeNew] = nil
-		myQueueDanger[typeNew] = nil
 	end
 	
 	--Random Note1: there would be only 1 instance of Shift order in myQueued because collision check in CleanOrders() remove duplicate
@@ -1121,8 +1161,9 @@ end
 
 -- Tell any leader for construction of "myQueue[key]" to stop the job immediately
 
-function StopAnyLeader(key,onlyOne)
-	if key:sub(1,4) ~= queueType.buildQueue then --only order with SHIFT order should be stopped
+function StopAnyLeader(key,includeDirect)
+	local queueToCheck = {queueType.buildQueue, (includeDirect and queueType.buildNew)}
+	if not MatchAny(key:sub(1,4), queueToCheck) then --skip Idle or busy or assist
 		return
 	end
 
@@ -1132,9 +1173,6 @@ function StopAnyLeader(key,onlyOne)
 		if queueKey == key then
 			builderArray[#builderArray+1] = unitID
 			myUnits[unitID]= queueType.busy --busy until really idle.
-			if onlyOne then
-				break
-			end
 		end
 	end
 	if #builderArray>0 then
@@ -1146,6 +1184,14 @@ end
 -- The following functions is grouped here for easy debugging
 -- It add behaviour like path checking and enemy checks
 -------------------------------------------------------------
+
+function AddDangerousQueue()
+	for queueKey,details in pairs(myQueue) do
+		if EnemyControlBuildSite({details.x,0,details.z}) then
+			myQueueDanger[queueKey] = max(1,myQueueDanger[queueKey] or 1)
+		end
+	end
+end
 
 function DecayDangerousQueue()
 	for key,value in pairs(myQueueDanger) do
@@ -1165,7 +1211,6 @@ function UpdateUnitsPathability()
 		myQueueUnreachable[unitID] = {} --CLEAN. note: unitID entry is also cleared when unit die or exit CBA group
 		UpdateOneUnitPathability(unitID)
 	end
-	StopDangerousQueue()
 end
 
 -- This function check ALL build site whether it is accessible to 1 constructor. Reference: http://springrts.com/phpbb/viewtopic.php?t&t=22953&start=2
@@ -1193,23 +1238,16 @@ end
 -- Stop any construction on queue with dangerous status, but dont remove it yet (is removed later by EnemyAtBuildSiteCleanOrder() when someone tried to use it)
 
 function StopDangerousQueue()
-	--send STOP to units en-route to build site surrounded by enemy or one with bad reputation
-	local badQueue = {}
-	for unitID2, _ in pairs(myQueueUnreachable) do
-		local queueKey = myUnits[unitID2]
-		if myQueue[queueKey] and not myQueue[queueKey].isStarted then --only remove order for queue that not yet started
-			if myQueueUnreachable[unitID2][queueKey] == blockageType.enemy 
-			or (myQueueDanger[queueKey] or 0) >= dangerThreshold
-			then
-				badQueue[queueKey] = true
+	--send STOP to units en-route to build site surrounded by enemy
+	for queueKey,danger in pairs(myQueueDanger) do
+		if not myQueue[queueKey] then
+			myQueueDanger[queueKey] = nil -- clear
+		else
+			if danger >= dangerThreshold then
+				StopAnyLeader(queueKey)
+				StopAnyAssistant(queueKey)
 			end
 		end
-	end
-	
-	--send STOP to units en-route to build site surrounded by enemy
-	for queueKey,_ in pairs(badQueue) do
-		StopAnyLeader(queueKey)
-		StopAnyAssistant(queueKey)
 	end
 end
 
@@ -1237,8 +1275,6 @@ function SetQueueUnreachableValue(unitID,moveID,ux,uy,uz,x,y,z,hash)
 	end
 	if not reach then
 		myQueueUnreachable[unitID][hash]= blockageType.blocked
-	elseif EnemyControlBuildSite({x,y,z}) then
-		myQueueUnreachable[unitID][hash]= blockageType.enemy
 	else
 		myQueueUnreachable[unitID][hash]= blockageType.clear
 	end
@@ -1295,7 +1331,7 @@ end
 -- Helper function (detect enemy at build site)
 function EnemyControlBuildSite(order)
 	local coordString = order[1].." " .. order[3]
-	if cachedValue[coordString] and cachedValue[coordString].frame == currentFrame then
+	if cachedValue[coordString] and cachedValue[coordString].frame == currentFrame then --for spammy check in 1 frame
 		return cachedValue[coordString].haveEnemies
 	end
 
@@ -1320,14 +1356,15 @@ function EnemyControlBuildSite(order)
 	return haveEnemies
 end
 
---  Detect if enemy is present at build site, and cancel queue if there is.
+--  Detect if enemy is present at build site, and REMOVE queue if there is.
 --  this make sure constructor don't suicide into enemy if left unattended.
+--  (Typically constructor don't bother with this build-site unless its
+--  the last one left.)
  
 function EnemyAtBuildSiteCleanOrder(unitID, order, queueKey)
 	if queueKey ~= 0 then --can't handle GUARD assist yet if queueKey==0
-		local enemyPresent = myQueueUnreachable[unitID] and ( myQueueUnreachable[unitID][queueKey] == blockageType.enemy )
-		local fatality = myQueueDanger[queueKey] or 0
-		if enemyPresent or EnemyControlBuildSite(order) or fatality >= dangerThreshold then
+		local tooDangerous = (myQueueDanger[queueKey] or 0) >= dangerThreshold
+		if tooDangerous or EnemyControlBuildSite(order) then
 			if myQueue[queueKey] then
 				-- local unitToStop = {}
 				-- for unitID2, queueKey2 in pairs(myUnits) do
@@ -1336,14 +1373,14 @@ function EnemyAtBuildSiteCleanOrder(unitID, order, queueKey)
 					-- end
 				-- end
 				-- Spring.GiveOrderToUnitArray (unitToStop,CMD_STOP, {}, {}) --send STOP to all units already assigned to this queue. A scenario: a newly built constructor decide to assist another old constructor (which is en-route toward an enemy infested build site), this stop the old constructor
-				if not myQueue[queueKey].isStarted then --not being constructed yet
+				if (tooDangerous or not myQueue[queueKey].isStarted) 
+				and not spIsAABBInView(order[1]-1,order[2]-1,order[3]-1,order[1]+1,order[2]+1,order[3]+1) 
+				then --not being constructed yet and not visible
 					StopAnyLeader(queueKey)
 					StopAnyAssistant(queueKey)
 					myQueue[queueKey] = nil  --remove queue
+					return true --cancel order assignment
 				end
-				return true --cancel order assignment
-			else --can't handle build-assist without queue yet (myQueue[queueKey] == nil). A scenario: user directly order a build without SHIFT
-				return nil
 			end
 		end
 	end
