@@ -63,7 +63,6 @@ local impulseMult = {
 }
 local impulseWeaponID = {}
 for i, wd in pairs(WeaponDefs) do
-	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.impulse then
 		impulseWeaponID[wd.id] = {
 			impulse = tonumber(wd.customParams.impulse), 
