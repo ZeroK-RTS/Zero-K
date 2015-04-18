@@ -62,7 +62,7 @@ local impulseMult = {
 	[2] = 0.0032, -- other
 }
 local impulseWeaponID = {}
-for i = 1, #WeaponDefs do
+for i, wd in pairs(WeaponDefs) do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.impulse then
 		impulseWeaponID[wd.id] = {
