@@ -61,7 +61,7 @@ local chickenAllyTeamID
 local aliveCount = {}
 local aliveValue = {}
 local destroyedAlliances = {}
-local allianceToReveal
+local allianceToReveal = {}
 
 local finishedUnits = {}	-- this stores a list of all units that have ever been completed, so it can distinguish between incomplete and partly reclaimed units
 local toDestroy = {}
@@ -176,7 +176,7 @@ local function CheckForVictory()
 end
 
 local function RevealAllianceUnits(allianceID)
-	allianceToReveal = allianceID
+	allianceToReveal[allianceID] = true
 	local teamList = spGetTeamList(allianceID)
 	for i=1,#teamList do
 		local t = teamList[i]
@@ -265,12 +265,19 @@ local function RemoveAllianceUnit(u, ud, teamID)
 	end
 end
 
-local function CompareArmyValues(ally1, ally2)
-	local value1, value2 = CountAllianceValue(ally1), CountAllianceValue(ally2)
-	if value1 > ECON_SUPREMACY_MULT*value2 then
-		return ally1
-	elseif value2 > ECON_SUPREMACY_MULT*value1 then
-		return ally2
+local function CompareArmyValues(activeAllies)
+	local values = {}
+	local totalValue = 0
+	for i = 1, #activeAllies do
+		local currentValue = CountAllianceValue(activeAllies[i])
+		totalValue = totalValue + currentValue
+		values[activeAllies[i]] = currentValue
+	end
+	for i = 1, #activeAllies do
+		local currentValue = values[activeAllies[i]]
+		if (currentValue > (ECON_SUPREMACY_MULT * (totalValue - currentValue))) then
+			return activeAllies[i]
+		end
 	end
 	return nil
 end
@@ -340,15 +347,18 @@ local function ProcessLastAlly()
 		until true
 	end -- for
 
-	if #activeAllies == 2 then
+	if #activeAllies >= 2 then
 		if revealed then return end
-		if activeAllies[1] == chickenAllyTeamID or activeAllies[2] == chickenAllyTeamID then
-			return
+		for i = 1, #activeAllies do
+			if activeAllies[i] == chickenAllyTeamID then
+				return
+			end
 		end
 		-- run value comparison
-		local supreme = CompareArmyValues(activeAllies[1], activeAllies[2])
+		local supreme = CompareArmyValues(activeAllies)
 		if supreme then
-			EchoUIMessage("AllyTeam " .. supreme .. " has an overwhelming numerical advantage!")
+			EchoUIMessage("Alliance " .. supreme .. " has an overwhelming numerical advantage!")
+			EchoUIMessage("Revealing all units of their enemies.")
 			for i=1, #allylist do
 				local a = allylist[i]
 				if (a ~= supreme) and (a ~= gaiaAllyTeamID) then
@@ -357,7 +367,7 @@ local function ProcessLastAlly()
 				end
 			end
 		end
-	elseif #activeAllies < 2 then
+	else
 		-- remove every unit except for last active alliance
 		for i=1, #allylist do
 			local a = allylist[i]
@@ -385,7 +395,7 @@ end
 function gadget:UnitCreated(u, ud, team)
 	if revealed then
 		local allyTeam = select(6, spGetTeamInfo(team))
-		if allyTeam == allianceToReveal then
+		if allianceToReveal[allyTeam] then
 			Spring.SetUnitAlwaysVisible(u, true)
 		end
 	end
