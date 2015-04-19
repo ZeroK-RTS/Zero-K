@@ -115,6 +115,7 @@ local resources = {
       flashside1= "cc/flashside1.tga",
       flashside2= "cc/flashside2.tga",
       flowerflash= "pd/flowerflash.tga",
+      green_glowing_ball="green_glowing_ball.png",
 	  greenlight= "other/light_green.png",
       greennovaexplo= "cc/greennovaexplo.tga",
       gunshot= "cc/gunshot.tga",
