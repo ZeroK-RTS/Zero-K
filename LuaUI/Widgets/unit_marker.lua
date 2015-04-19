@@ -4,12 +4,14 @@ function widget:GetInfo() return {
 	author	= "Sprung",
 	date	= "2015-04-11",
 	license	= "GNU GPL v2",
-	layer	= 0,
+	layer	= -1,
 	enabled	= true,
 } end
 
 local knownUnits = {}
 local unitList = {}
+
+local markingActive = false
 
 if VFS.FileExists("LuaUI/Configs/unit_marker_local.lua") then
 	unitList = VFS.Include("LuaUI/Configs/unit_marker_local.lua")
@@ -17,7 +19,84 @@ else
 	unitList = VFS.Include("LuaUI/Configs/unit_marker.lua")
 end
 
+options_path = 'Game/Unit Marker'
+options_order = { 'enableAll', 'disableAll', 'unitslabel'}
+options = {
+	enableAll = {
+		type='button',
+		name= "Enable All",
+		desc = "Marks all listed units.",
+		path = options_path .. "/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_mark")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = true
+				end
+			end
+			for unitDefID,_ in pairs(unitList) do
+				unitList[unitDefID].active = true
+			end
+			if not markingActive then
+				widgetHandler:UpdateCallIn('UnitEnteredLos')
+				markingActive = true
+			end
+        end,
+	},
+	disableAll = {
+		type='button',
+		name= "Disable All",
+		desc = "Mark nothing.",
+		path = options_path .. "/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_mark")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = false
+				end
+			end
+			for unitDefID,_ in pairs(unitList) do
+				unitList[unitDefID].active = false
+			end
+			if markingActive then
+				widgetHandler:RemoveCallIn('UnitEnteredLos')
+				markingActive = false
+			end
+        end,
+	},
+	
+	unitslabel = {name = "unitslabel", type = 'label', value = "Individual Toggles", path = options_path},
+}
+
+for unitDefID,_ in pairs(unitList) do
+	local ud = (not unitDefID) or UnitDefs[unitDefID]
+	if ud then
+		options[ud.name .. "_mark"] = {
+			name = "  " .. ud.humanName or "",
+			type = 'bool',
+			value = false,
+			OnChange = function (self)
+				unitList[unitDefID].active = self.value
+				if self.value and not markingActive then
+					widgetHandler:UpdateCallIn('UnitEnteredLos')
+					markingActive = true
+				end
+			end,
+		}
+		options_order[#options_order+1] = ud.name .. "_mark"
+	end
+end
+
 function widget:Initialize()
+	if not markingActive then
+		widgetHandler:RemoveCallIn("UnitEnteredLos")
+	end
 	if Spring.GetSpectatingState() then
 		widgetHandler:RemoveWidget()
 		return
@@ -38,14 +117,14 @@ function widget:UnitEnteredLos (unitID, unitTeam)
 	local unitDefID = Spring.GetUnitDefID (unitID)
 	if not unitDefID then return end -- safety just in case
 
-	if unitList[unitDefID] and ((not knownUnits[unitID]) or (knownUnits[unitID] ~= unitDefID)) then
+	if unitList[unitDefID] and unitList[unitDefID].active and ((not knownUnits[unitID]) or (knownUnits[unitID] ~= unitDefID)) then
 		local x, y, z = Spring.GetUnitPosition(unitID)
 		local markerText = unitList[unitDefID].markerText or UnitDefs[unitDefID].humanName
 		if not unitList[unitDefID].mark_each_appearance then
 			knownUnits[unitID] = unitDefID
 		end
 		if unitList[unitDefID].show_owner then
-			local owner_name = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(Spring.GetUnitTeam(unitID))))
+			local owner_name = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(Spring.GetUnitTeam(unitID)))) or "noname"
 			markerText = markerText .. " (" .. owner_name .. ")"
 		end
 		Spring.MarkerAddPoint (x, y, z, markerText, true)
