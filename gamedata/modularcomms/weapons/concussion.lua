@@ -2,30 +2,35 @@ local name = "commweapon_concussion"
 local weaponDef = {
 	name                    = [[Concussion Shell]],
 	alphaDecay              = 0.12,
-	areaOfEffect            = 192,
+	areaOfEffect            = 256,
+    avoidGround             = false,
 	--cegTag                  = [[gauss_tag_m]],
 	commandfire             = true,
-	craterBoost             = 1,
-	craterMult              = 2,
+	craterBoost             = 0,
+	craterMult              = 0,
 
 	customParams            = {
 		slot = [[3]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
+        gatherradius = [[208]],
+        smoothradius = [[128]],
+        detachmentradius = [[128]],
+        smoothmult   = [[0.5]],
 	},
 
 	damage                  = {
-		default = 750,
-		planes  = 750,
-		subs    = 37.5,
+		default = 180,
+		planes  = 180,
+		subs    = 9,
 	},
 
 	edgeEffectiveness       = 0.5,
-	explosionGenerator      = [[custom:100rlexplode]],
-	impulseBoost            = 250,
-	impulseFactor           = 0.5,
+	explosionGenerator      = [[custom:bull_fade_concussion]],
+	impulseBoost            = 0,
+	impulseFactor           = 22.5,
 	interceptedByShieldType = 1,
 	range                   = 450,
-	reloadtime              = 15,
+	reloadtime              = 12,
 	rgbColor                = [[1 0.6 0]],
 	separation              = 0.5,
 	size                    = 0.8,
@@ -36,7 +41,7 @@ local weaponDef = {
 	turret                  = true,
 	waterbounce             = 1,
 	weaponType              = [[Cannon]],
-	weaponVelocity          = 1000,
+	weaponVelocity          = 2000,
 }
 
 return name, weaponDef
