@@ -119,6 +119,12 @@ function widget:Initialize()
   vsx, vsy = widgetHandler:GetViewSizes()
 
   depthShader = gl.CreateShader({
+    vertex = [[
+    void main(void)
+    {
+      gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    }
+    ]],
     fragment = [[
       uniform sampler2D tex0;
       uniform vec2 screenXY;
@@ -153,21 +159,14 @@ function widget:Initialize()
         vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
         gl_FragColor = vec4(0.0);
 
-        int i;
-        int n = 1;
         float pixelsize = 1.0/float(screenX);
-        for(i = 1; i < 3; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s + i*pixelsize,texCoord.t) );
-          --n;
-        }
+        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
+        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        n = 0;
-        for(i = -2; i < 0; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s + i*pixelsize,texCoord.t) );
-          ++n;
-        }
+        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s + -1.0*pixelsize,texCoord.t) );
+        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s + -2.0*pixelsize,texCoord.t) );
       }
     ]],
     uniformInt = {
@@ -187,21 +186,14 @@ function widget:Initialize()
         vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
         gl_FragColor = vec4(0.0);
 
-        int i;
-        int n = 1;
         float pixelsize = 1.0/float(screenY);
-        for(i = 0; i < 2; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s,texCoord.t + i*pixelsize) );
-          --n;
-        }
+        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
+        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
 
         gl_FragColor += texture2D(tex0, texCoord );
 
-        n = 0;
-        for(i = -2; i < 0; ++i){
-          gl_FragColor += kernel[n] * texture2D(tex0, vec2(texCoord.s,texCoord.t + i*pixelsize) );
-          ++n;
-        }
+        gl_FragColor += kernel[1] * texture2D(tex0, vec2(texCoord.s,texCoord.t + -1.0*pixelsize) );
+        gl_FragColor += kernel[0] * texture2D(tex0, vec2(texCoord.s,texCoord.t + -2.0*pixelsize) );
       }
     ]],
     uniformInt = {
@@ -367,9 +359,9 @@ function widget:DrawWorldPreUnit()
   glRenderToTexture(offscreentex,MyDrawVisibleUnits)
 
   glTexture(offscreentex)
-  glRenderToTexture(blurtex, blur_h)
+  glRenderToTexture(blurtex, blur_v)
   glTexture(blurtex)
-  glRenderToTexture(offscreentex, blur_v)
+  glRenderToTexture(offscreentex, blur_h)
 
   glCallList(enter2d)
   glTexture(offscreentex)
