@@ -262,7 +262,8 @@ function widget:CommandNotify(id, params, options)
   for i=1,#units do
     unitID = units[i]
     local _, _, _, shift   = spGetModKeyState()
-    if (#spGetCommandQueue(unitID, 1) == 0 or not shift) then
+	local queue = spGetCommandQueue(unitID, 1)
+    if queue and (#queue == 0 or not shift) then
       local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
 	  lastJump[unitID] = {
         pos   = {ux,uy,uz},
