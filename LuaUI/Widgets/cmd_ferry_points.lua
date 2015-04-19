@@ -500,7 +500,8 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	removeUnit(unitID, unitDefID, unitTeam)
 end
 
-function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+function widget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
+	Spring.Echo(unitID)
 	addUnit(unitID, unitDefID, newTeam)
 end
 
