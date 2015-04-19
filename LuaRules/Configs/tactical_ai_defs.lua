@@ -219,6 +219,7 @@ local slasherSkirmieeArray = {
 	["spiderriot"] = true,
 	["armzeus"] = true,
 	["spiderassault"] = true,
+	["corraid"] = true,
 	["corlevlr"] = true,
 	["hoverriot"] = true,
     ["shieldfelon"] = true,
