@@ -24,7 +24,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    usetacai       = [[1]],
     description_fr = [[Tourelle Lance Missile Anti-Air Longue Portée]],
 	description_de = [[Extrem weitreichender Flugabwehrraketenturm, 20s zum Bevorraten]],
 	description_pl = [[Ciezka wieza przeciwlotnicza dalekiego zasiegu]],

@@ -108,7 +108,7 @@ local colorCapture = {0.6, 1, 0.6, 1}
 
 local function MakeStatsWindow() end
 options_order = {'shortNotation'}
-options_path = 'Help/Unit Guide'
+options_path = 'Help/Guide/Unit List'
 options = {
 		
 	shortNotation = {

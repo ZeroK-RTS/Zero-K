@@ -31,7 +31,7 @@ local myAllyTeamID = 666
 local powerTexture = 'Luaui/Images/visible_energy.png'
 local facplopTexture = 'Luaui/Images/factory.png'
 local rearmTexture = 'LuaUI/Images/noammo.png'
-local retreatTexture = 'Anims/cursorrepair_old.png'
+local retreatTexture = 'LuaUI/Images/unit_retreat.png'
 
 local lastLowPower = {}
 local lastFacPlop = {}
