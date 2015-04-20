@@ -21,6 +21,9 @@ include("Widgets/COFCtools/Interpolate.lua")
 --3) vibration at max-zoomout when follow cursor active, reason: probably drift/interpolation interaction with COFC ceiling height, pyramid ect.
 --Todo: remove Interpolate() and OverrideSetCameraStateInterpolate() when https://springrts.com/mantis/view.php?id=4650 is fixed
 
+--WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(, number dist))} -> {}, Set Camera target, ensures camera state caching works
+--							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -683,7 +686,7 @@ local targetCenteringHeight = 1200
 local mapEdgeProportion = 1.0/5.9
 
 SetFOV = function(fov)
-	local cs = GetTargetCameraState()
+	local cs = spGetCameraState()
 	-- Spring.Echo(fov .. " degree")
 	
 	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
@@ -721,6 +724,27 @@ local last_move = spGetTimer() --switch for reseting lockspot for Edgescroll
 local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trackmode edge screen scroll"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function DetermineInitCameraState()
+	local csOldpx, csOldpy, csOldpz = Spring.GetCameraPosition()
+	local csOlddx, csOlddy, csOlddz = Spring.GetCameraDirection()
+	local csOldrx = PI/2 - math.acos(csOlddy)
+	local csOldry = math.atan2(csOlddx, -csOlddz) - PI
+	spSendCommands("viewfree") 
+	local cs = spGetCameraState()
+	-- if csOldpx == 0.0 * csOldpz == 0.0 then
+	-- 	cs.px = MWIDTH/2
+	-- 	cs.pz = MHEIGHT/2
+	-- else
+		cs.px = csOldpx
+		cs.pz = csOldpz
+	-- end
+	cs.py = csOldpy
+	cs.rx = csOldrx
+	cs.ry = csOldry
+	cs.rz = 0
+	return cs
+end
 
 local function GetMapBoundedCoords(x,z) --This should not use minX,minZ,maxX,maxZ bounds, as this is used specifically to keep things on the map
 	if x < 0 then x = 0; end
@@ -1265,9 +1289,9 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
-	if gx and gy and gz then --just in case
+	if gx and gy and gz and not init then --just in case
 		if smoothness == nil then smoothness = options.smoothness.value or 0 end
-		local cs = spGetCameraState()--GetTargetCameraState()
+		local cs = GetTargetCameraState()
 		SetLockSpot2(cs) --get lockspot at mid screen if there's none present
 		if not ls_have then
 			return
@@ -1306,12 +1330,13 @@ local function Zoom(zoomin, shift, forceCenter)
 	end
 
 	local cs = GetTargetCameraState()
-	
+
 	--//ZOOMOUT FROM CURSOR, ZOOMIN TO CURSOR//--
 	if
 	(not forceCenter) and
 	((zoomin and options.zoomin.value == 'toCursor') or ((not zoomin) and options.zoomout.value == 'fromCursor'))
 	then
+
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
 	
 		if gx and not options.freemode.value then
@@ -1895,7 +1920,22 @@ function widget:Update(dt)
 	if hideCursor then
 		spSetMouseCursor('%none%')
 	end
-	
+
+	local cs = spGetCameraState() --GetTargetCameraState()
+	--//MISC
+	fpsmode = cs.name == "fps"
+	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
+		spSendCommands("viewfree") 
+		cs = DetermineInitCameraState()
+		init = false
+		cs.tiltSpeed = 0
+		cs.scrollSpeed = 0
+		--cs.gndOffset = options.mingrounddist.value
+		cs.gndOffset = options.freemode.value and 0 or 1
+		-- spSetCameraState(cs,0)
+		OverrideSetCameraStateInterpolate(cs,0)
+	end
+
 	--//HANDLE TIMER FOR VARIOUS SECTION
 	--timer to block tracking when using mouse
 	if follow_timer > 0  then 
@@ -1964,7 +2004,7 @@ function widget:Update(dt)
 		PeriodicWarning()
 	end
 
-	local cs = GetTargetCameraState()
+	cs = GetTargetCameraState()
 	
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
@@ -1975,7 +2015,7 @@ function widget:Update(dt)
 	(rot.right or rot.left or rot.up or rot.down))
 	then
 		
-		local cs = GetTargetCameraState()
+		cs = GetTargetCameraState()
 
 		local speed = options.rotfactor.value * (s and 500 or 250)
 
@@ -2009,6 +2049,7 @@ function widget:Update(dt)
 	move2.right or move2.left or move2.up or move2.down or
 	use_lockspringscroll))
 	then
+		cs = GetTargetCameraState()
 		
 		local x, y, lmb, mmb, rmb = spGetMouseState()
 		
@@ -2115,6 +2156,8 @@ function widget:Update(dt)
 	move2.right or move2.left or move2.up or move2.down or
 	rot.right or rot.left or rot.up or rot.down)) --NOTE: engine exit 3rd-person trackmode if it detect edge-screen scroll, so we handle 3rd person trackmode scrolling here.
 	then
+		
+		cs = GetTargetCameraState()
 
 		if movekey and spDiffTimers(spGetTimer(),thirdPerson_transit)>=1 then --wait at least 1 second before 3rd Person to nearby unit, and only allow edge scroll for keyboard press
 			ThirdPersonScrollCam(cs) --edge scroll to nearby unit
@@ -2129,6 +2172,7 @@ function widget:Update(dt)
 					cs.px,cs.py,cs.pz=x,y,z
 					cs.py= cs.py+25 --move up 25-elmo incase FPS camera stuck to unit's feet instead of tracking it (aesthetic)
 					-- spSetCameraState(cs,0)
+					Spring.Echo("track retarget")
 					OverrideSetCameraStateInterpolate(cs,0)
 				end
 			else --no unit selected: return to freeStyle camera
@@ -2137,20 +2181,6 @@ function widget:Update(dt)
 				thirdperson_trackunit = false
 			end
 		end
-	end
-	
-	--//MISC
-	fpsmode = cs.name == "fps"
-	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
-		init = false
-		spSendCommands("viewfree") 
-		local cs = GetTargetCameraState()
-		cs.tiltSpeed = 0
-		cs.scrollSpeed = 0
-		--cs.gndOffset = options.mingrounddist.value
-		cs.gndOffset = options.freemode.value and 0 or 1
-		-- spSetCameraState(cs,0)
-		OverrideSetCameraStateInterpolate(cs,0)
 	end
 	
 	if missedMouseRelease and camcycle==0 then 
@@ -2550,12 +2580,27 @@ function widget:Initialize()
 		end
 	end
 
+	--//MISC
+	if init then
+		init = false
+		Spring.Echo("Initialize")
+		local cs = DetermineInitCameraState()
+
+		cs.tiltSpeed = 0
+		cs.scrollSpeed = 0
+		--cs.gndOffset = options.mingrounddist.value
+		cs.gndOffset = options.freemode.value and 0 or 1
+		spSetCameraState(cs,0)
+		OverrideSetCameraStateInterpolate(cs,0) --For internal caching
+	end
+
 	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that minimap click works with COFC
 
 	--for external use, so that minimap can scale when zoomed out
 	WG.COFC_SkyBufferProportion = 0 
 	
 	spSendCommands("luaui disablewidget SmoothScroll")
+	spSendCommands("luaui disablewidget SmoothCam")
 	if WG.SetWidgetOption then
 		WG.SetWidgetOption("Settings/Camera","Settings/Camera","Camera Type","COFC") --tell epicmenu.lua that we select COFC as our default camera (since we enabled it!)
 	end
