@@ -1,11 +1,11 @@
 --a workaround for https://springrts.com/mantis/view.php?id=4650
 
-local osClock			= os.clock;
 local spGetCameraState	= Spring.GetCameraState
 local spSetCameraState	= Spring.SetCameraState
 local spGetTimer		= Spring.GetTimer
 local spDiffTimers		= Spring.DiffTimers
 local mathPi 				= math.pi
+local pow = math.pow
 
 local beginCam = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
 local deltaEnd = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
@@ -130,7 +130,7 @@ function Interpolate()
 	else
 		if (deltaEnd.period > 0) then
 			local timeRatio = (deltaEnd.period - lapsedTime) / (deltaEnd.period);
-			local tweenFact = 1.0 - math.pow(timeRatio, 4);
+			local tweenFact = 1.0 - pow(timeRatio, 4);
 
 			local newState = Add(beginCam,deltaEnd,tweenFact) --add changes to camera state in gradual manner
 			local cs = spGetCameraState()
