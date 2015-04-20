@@ -21,6 +21,9 @@ include("Widgets/COFCtools/Interpolate.lua")
 --3) vibration at max-zoomout when follow cursor active, reason: probably drift/interpolation interaction with COFC ceiling height, pyramid ect.
 --Todo: remove Interpolate() and OverrideSetCameraStateInterpolate() when https://springrts.com/mantis/view.php?id=4650 is fixed
 
+--WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(, number dist))} -> {}, Set Camera target, ensures camera state caching works
+--							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -723,7 +726,6 @@ local thirdPerson_transit = spGetTimer() --switch for smoothing "3rd person trac
 --------------------------------------------------------------------------------
 
 local function DetermineInitCameraState()
-	Spring.Echo("DetermineInitCameraState")
 	local csOldpx, csOldpy, csOldpz = Spring.GetCameraPosition()
 	local csOlddx, csOlddy, csOlddz = Spring.GetCameraDirection()
 	local csOldrx = PI/2 - math.acos(csOlddy)
@@ -1289,7 +1291,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
 	if gx and gy and gz and not init then --just in case
 		if smoothness == nil then smoothness = options.smoothness.value or 0 end
-		local cs = spGetCameraState()--GetTargetCameraState()
+		local cs = GetTargetCameraState()
 		SetLockSpot2(cs) --get lockspot at mid screen if there's none present
 		if not ls_have then
 			return
@@ -1328,12 +1330,13 @@ local function Zoom(zoomin, shift, forceCenter)
 	end
 
 	local cs = GetTargetCameraState()
-	
+
 	--//ZOOMOUT FROM CURSOR, ZOOMIN TO CURSOR//--
 	if
 	(not forceCenter) and
 	((zoomin and options.zoomin.value == 'toCursor') or ((not zoomin) and options.zoomout.value == 'fromCursor'))
 	then
+
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
 	
 		if gx and not options.freemode.value then

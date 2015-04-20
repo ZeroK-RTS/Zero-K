@@ -12,6 +12,14 @@ local deltaEnd = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
 local targetCam = {px=0,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0,name="",active=false}
 
 function GetTargetCameraState()
+	--//Double-check no outside SetCameraTarget happened//--
+	if not targetCam.active then
+		local curr_px, curr_py, curr_pz = Spring.GetCameraPosition()
+		targetCam.px = curr_px
+		targetCam.py = curr_py
+		targetCam.pz = curr_pz
+	end
+
 	return targetCam
 end
 
