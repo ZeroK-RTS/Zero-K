@@ -22,7 +22,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    usetacai       = [[1]],
     description_de = [[Flugabwehrraketenturm]],
     description_pl = [[Wieza przeciwlotnicza]],
     helptext       = [[The Hacksaw's twin missiles can drop even the most heavily armored bomber in one pair of hits, but take a considerable amount of time to reload, making them less than ideal against light targets.]],
