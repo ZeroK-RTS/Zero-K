@@ -105,6 +105,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:ataalaser]],
+	  fireTolerance           = 8192, -- 45 degrees
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -142,6 +143,9 @@ unitDef = {
       description      = [[Wreckage - Penetrator]],
       blocking         = true,
       category         = [[corpses]],
+	  collisionVolumeScales  = [[40 40 60]],
+	  collisionVolumeTest	 = 1,
+	  collisionVolumeType    = [[CylZ]],
       damage           = 1000,
       energy           = 0,
       featureDead      = [[DEAD2]],

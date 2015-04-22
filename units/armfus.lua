@@ -23,6 +23,7 @@ unitDef = {
     helptext_de    = [[Der Fusionsreaktor liefert eine gute Menge an konstanter Energie zu einem fairen Preis. Sie sind aber attraktive Ziele und schlecht gepanzert, also beschütze sie gut. Sobald ein Reaktor zerstört wird, werden Einheiten in der Nähe beschädigt.]],
     helptext_pl    = [[Reaktory fuzyjne pozwalaja osiagnac wysoka produkcje energii za niewygorowana cene. Sa jednak dobrym celem dla przeciwnikow i nie sa zbyt wytrzymale. Wybuch reaktora zadaje wysokie obrazenia okolicznym jednostkom, totez nie warto stawiac ich jeden obok drugiego.]],
     pylonrange = 150,
+	removewait = 1,
   },
 
   energyMake                    = 35,

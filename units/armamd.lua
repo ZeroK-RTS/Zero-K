@@ -32,6 +32,7 @@ unitDef = {
     helptext_de    = [[Der Protector fängt automatisch gegnerische, atomare Interkontinentalraketen, welche in den, vom System abgedeckten, Bereich zielen, ab.]],
     helptext_fr    = [[Le Protector est un b?timent indispensable dans tout conflit qui dure. Il est toujours malvenu de voir sa base r?duite en cendres ? cause d'un missile nucl?aire. Le Protector est un syst?me de contre mesure capable de faire exploser en vol les missiles nucl?aires ennemis.]],
 	helptext_pl    = [[Protector automatycznie wysy³a przeciwrakiety, aby zniszczyæ przelatuj¹ce nad jego obszarem ochrony g³owice nuklearne przeciwników.]],
+	removewait     = 1,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -86,7 +87,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
-      flighttime              = 100,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

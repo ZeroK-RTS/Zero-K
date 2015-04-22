@@ -27,6 +27,7 @@ unitDef = {
     helptext       = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
     helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
     helptext_pl    = [[Wieze zaklocajace sprawiaja, ze radary nie sa w stanie wylapac sygnalu okolicznych jednostek. Ponadto pole maskujace moze zapewnic im maskowanie.]],
+	removewait     = 1,
 
     morphto = [[spherecloaker]],
     morphtime = 30,

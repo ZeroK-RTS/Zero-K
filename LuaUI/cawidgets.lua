@@ -92,7 +92,7 @@ VFSMODE = localWidgetsFirst and VFS.RAW_FIRST
 VFSMODE = VFSMODE or localWidgets and VFS.ZIP_FIRST
 VFSMODE = VFSMODE or VFS.ZIP
 
-local detailLevel = 2 -- Spring.GetConfigInt("widgetDetailLevel", 3)
+local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 3)
 
 --------------------------------------------------------------------------------
 
@@ -135,7 +135,7 @@ widgetHandler = {
   
   WG = {}, -- shared table for widgets
 
-  globals = {ownerToNameToFunc={},indexToOwner={},ownerOrdered={}}, -- global vars/funcs
+  globals = {}, -- global vars/funcs
 
   mouseOwner = nil,
   ownedButton = 0,
@@ -218,6 +218,7 @@ local callInLists = {
   'DrawScreen',
   'KeyPress',
   'KeyRelease',
+  'TextInput',
   'MousePress',
   'MouseWheel',
   'JoyAxis',
@@ -303,11 +304,11 @@ function widgetHandler:LoadOrderList()
 		self.orderList = {}
 		self.orderList.version = ORDER_VERSION
 	end 
-	local detailLevel = 2 -- Spring.GetConfigInt("widgetDetailLevel", 2)
-	--if (self.orderList.lastWidgetDetailLevel ~= detailLevel) then
-	--	resetWidgetDetailLevel = true
-	--	self.orderList.lastWidgetDetailLevel = detailLevel
-	--end 
+	local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 2)
+	if (self.orderList.lastWidgetDetailLevel ~= detailLevel) then
+		resetWidgetDetailLevel = true
+		self.orderList.lastWidgetDetailLevel = detailLevel
+	end 
   end
 end
 
@@ -531,15 +532,15 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
     enabled = false
   end
 
-  --if resetWidgetDetailLevel and info.detailsDefault ~= nil then
-  --  if type(info.detailsDefault) == "table" then
-  --    enabled = info.detailsDefault[detailLevel] and true
-  --  elseif type(info.detailsDefault) == "number" then
-  --    enabled = detailLevel >= info.detailsDefault
-  --  elseif tonumber(info.detailsDefault) then
-  --    enabled = detailLevel >= tonumber(info.detailsDefault)
-  --  end
-  --end
+  if resetWidgetDetailLevel and info.detailsDefault ~= nil then
+	if type(info.detailsDefault) == "table" then
+		enabled = info.detailsDefault[detailLevel] and true
+	elseif type(info.detailsDefault) == "number" then
+		enabled = detailLevel >= info.detailsDefault
+	elseif tonumber(info.detailsDefault) then
+		enabled = detailLevel >= tonumber(info.detailsDefault)
+	end
+  end
 			 
   if (enabled) then
 	-- this will be an active widget
@@ -1079,70 +1080,47 @@ end
 --
 
 function widgetHandler:RegisterGlobal(owner, name, value)
-	if (not name or CallInsMap[name]) then
-		return false
-	end
-	widgetHandler:SetGlobal(owner, name, value)
-	return true
+  if ((name == nil)        or
+      (_G[name])           or
+      (self.globals[name]) or
+      (CallInsMap[name])) then
+    return false
+  end
+  _G[name] = value
+  self.globals[name] = owner
+  return true
 end
 
 
 function widgetHandler:DeregisterGlobal(owner, name)
-  if not (name and self.globals.ownerToNameToFunc[owner] and self.globals.ownerToNameToFunc[owner][name]) then
+  if ((name == nil) or (self.globals[name] and (self.globals[name] ~= owner))) then
     return false
   end
-  self.globals.ownerToNameToFunc[owner][name] = nil
+  _G[name] = nil
+  self.globals[name] = nil
   return true
 end
 
 
 function widgetHandler:SetGlobal(owner, name, value)
-	if not name then
-		return false
-	end
-	--self.globals contain: 
-	--ownerToNameToFunc --store the global function ready to be called
-	--indexToOwner --store the widget's ordering, this effect which function would be called first
-	--ownerOrdered --list of widgets which had been registered according to first-come-first-served scheme.
-	if not _G[name] then
-		_G[name] = function(a,b,c,d,e)
-			local _owner;
-			local _ownerToNameToFunc;
-			--first to register, first to execute
-			for i=0,#self.globals.indexToOwner do
-				_owner = self.globals.indexToOwner[i]
-				_ownerToNameToFunc = self.globals.ownerToNameToFunc[_owner]
-				if _ownerToNameToFunc and _ownerToNameToFunc[name] and _ownerToNameToFunc[name](a,b,c,d,e) then
-					return true --this would indicate that the widget stole the event by returning true.
-				end
-			end
-			return false
-		end
-	end
-	if not self.globals.ownerToNameToFunc[owner] then
-		self.globals.ownerToNameToFunc[owner] = {}
-	end
-	if not self.globals.ownerOrdered[owner] then
-		--register widget ordering:
-		local index = #self.globals.indexToOwner+1
-		self.globals.indexToOwner[index] = owner
-		self.globals.ownerOrdered[owner] = true
-	end
-	self.globals.ownerToNameToFunc[owner][name] = value
-	return true
+  if ((name == nil) or (self.globals[name] ~= owner)) then
+    return false
+  end
+  _G[name] = value
+  return true
 end
 
 
 function widgetHandler:RemoveWidgetGlobals(owner)
-	if not (owner and self.globals.ownerToNameToFunc[owner]) then
-		return 0
-	end
-	local count = 0
-	for name, _ in pairs(self.globals.ownerToNameToFunc[owner]) do
-		count = count + 1
-	end
-	self.globals.ownerToNameToFunc[owner] = nil
-	return count
+  local count = 0
+  for name, o in pairs(self.globals) do
+    if (o == owner) then
+      _G[name] = nil
+      self.globals[name] = nil
+      count = count + 1
+    end
+  end
+  return count
 end
 
 
@@ -1564,6 +1542,19 @@ function widgetHandler:KeyRelease(key, mods, label, unicode)
 
   for _,w in ipairs(self.KeyReleaseList) do
     if (w:KeyRelease(key, mods, label, unicode)) then
+      return true
+    end
+  end
+  return false
+end
+
+function widgetHandler:TextInput(utf8, ...)
+  if (self.tweakMode) then
+    return true
+  end
+
+  for _,w in ipairs(self.TextInputList) do
+    if (w:TextInput(utf8, ...)) then
       return true
     end
   end

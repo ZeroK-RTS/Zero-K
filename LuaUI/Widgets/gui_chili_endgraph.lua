@@ -92,8 +92,8 @@ local function numFormat(label)
 	return string
 end
 local function formatTime(seconds)
-	local minutes = math.floor(seconds/60)
-	local hours = math.floor(minutes/60)
+	local hours = math.floor(seconds/3600)
+	local minutes = math.floor(seconds/60) % 60
 	local seconds = seconds % 60
 	if minutes < 10 then minutes = "0" .. minutes end
 	if seconds < 10 then seconds = "0" .. seconds end

@@ -98,6 +98,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:lrpc_expl]],
+	  fireTolerance           = 1820, -- 10 degrees
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 1,

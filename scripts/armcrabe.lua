@@ -110,6 +110,10 @@ local function Curl()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
+	while Spring.GetUnitIsStunned(unitID) do
+		Sleep (100)
+	end
+	
 	Sleep(100)
 	bCurling = true
 	--Spring.Echo("slowing down", Spring.GetGameFrame())

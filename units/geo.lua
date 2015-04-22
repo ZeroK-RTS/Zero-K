@@ -33,6 +33,7 @@ unitDef = {
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -10 0]],
     modelradius    = [[42]],
+	removewait     = 1,
     
     morphto = [[amgeo]],
     morphtime = [[90]],

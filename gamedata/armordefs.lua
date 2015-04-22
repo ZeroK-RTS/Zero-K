@@ -108,15 +108,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 	wd.damage.default = maxDamage
 
 	-- Stats
-	if wd.impactonly then
-		wd.customparams.statsdamage = wd.customparams.statsdamage or maxDamage
-	else
-		local aoe = (wd.areaofeffect or 8)/2
-		local dist = 0.09
-		local edgeEff = wd.edgeeffectiveness or 0
-		local theoryDamage = maxDamage*(aoe-dist)/(aoe + 0.01 - dist*edgeEff)
-		wd.customparams.statsdamage = theoryDamage
-	end
+	wd.customparams.statsdamage = wd.customparams.statsdamage or maxDamage
 	
 	-- damage vs shields
 	if wd.customparams and wd.customparams.damage_vs_shield then

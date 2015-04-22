@@ -20,8 +20,17 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  no unsynced code
 end
 
+include("LuaRules/Configs/constants.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local spGetUnitStockpile  = Spring.GetUnitStockpile
+local spSetUnitStockpile  = Spring.SetUnitStockpile
+local spGetUnitIsStunned  = Spring.GetUnitIsStunned
+local spUseUnitResource   = Spring.UseUnitResource
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 local stockpileUnitDefID = {}
 local units = {data = {}, count = 0}
@@ -30,12 +39,12 @@ local unitsByID = {}
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
 	if (udef.customParams.stockpiletime) then
-		local stockTime = tonumber(udef.customParams.stockpiletime)*30
+		local stockTime = tonumber(udef.customParams.stockpiletime)*TEAM_SLOWUPDATE_RATE
 		local stockCost = tonumber(udef.customParams.stockpilecost)
 		stockpileUnitDefID[i] = {
 			stockTime = stockTime,
 			stockCost = stockCost,
-			stockDrain = 30*stockCost/stockTime,
+			stockDrain = TEAM_SLOWUPDATE_RATE*stockCost/stockTime,
 			resTable = {
 				m = stockCost/stockTime,
 				e = stockCost/stockTime
@@ -48,35 +57,39 @@ function gadget:GameFrame(n)
 	for i = 1, units.count do
 		local unitID = units.data[i]
 		local data = unitsByID[unitID]
-		local stocked, queued = Spring.GetUnitStockpile(unitID)
-		local stunned_or_inbuild, stunned, inbuild = Spring.GetUnitIsStunned(unitID)
-		if (not stunned_or_inbuild) and queued > stocked then
-			local def = stockpileUnitDefID[data.unitDefID]
+		local stocked, queued = spGetUnitStockpile(unitID)
+		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
+		local def = stockpileUnitDefID[data.unitDefID]
+		if (not (stunned_or_inbuild or disarmed)) and queued > stocked  then
 			if not data.active then
-				GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
+				if def.stockCost > 0 then
+					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
+				end
 				data.active = true
 			end
-		
-			local allow = GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m)
-			if allow and (Spring.UseUnitResource(unitID, def.resTable)) then
+
+			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m) and spUseUnitResource(unitID, def.resTable)) then
 				data.progress = data.progress - 1
 				if data.progress == 0 then
-					Spring.SetUnitStockpile(unitID, stocked + 1)
+					spSetUnitStockpile(unitID, stocked + 1)
 					data.progress = def.stockTime
 				end
-				Spring.SetUnitRulesParam(unitID, "gadgetStockpile", (def.stockTime-data.progress)/def.stockTime)
+				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockTime-data.progress)/def.stockTime)
 			end
 		else
 			if data.active then
-				GG.StopMiscPriorityResourcing(unitID,data.teamID)
+				if def.stockCost > 0 then
+					GG.StopMiscPriorityResourcing(unitID,data.teamID)
+				end
 				data.active = false
 			end
 		end
 	end
 end
 
-function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if stockpileUnitDefID[unitDefID] then
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
 		local def = stockpileUnitDefID[unitDefID]
 		units.count = units.count + 1
 		units.data[units.count] = unitID
@@ -87,7 +100,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 			teamID = teamID, 
 			active = false
 		}
-		GG.AddMiscPriorityUnit(unitID, teamID)
+		if def.stockCost > 0 then
+			GG.AddMiscPriorityUnit(unitID, teamID)
+		end
 	end
 end
 
@@ -113,6 +128,6 @@ function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
-		gadget:UnitCreated(unitID, unitDefID, teamID)
+		gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end

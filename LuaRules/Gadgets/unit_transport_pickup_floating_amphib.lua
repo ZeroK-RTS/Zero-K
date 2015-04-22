@@ -91,6 +91,12 @@ if UnitDefNames["factoryamph"] then
 	end
 end
 
+for i=1, #UnitDefs do
+	if (UnitDefs[i].customParams.level) then
+		dropableUnits[i] = true
+	end
+end
+
 local transportPhase = {}
 local giveLOAD_order = {}
 local giveDROP_order = {}

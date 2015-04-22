@@ -75,7 +75,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 4,
       craterMult              = 3.5,
-
+	  
+      customParams            = {
+      lups_explodelife = 1.5,
+	  },
+	  
       damage                  = {
         default = 3502.5,
         subs    = 175,
@@ -84,6 +88,7 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 0,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

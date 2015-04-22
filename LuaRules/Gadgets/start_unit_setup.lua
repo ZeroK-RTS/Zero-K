@@ -82,6 +82,7 @@ end
 local spGetTeamInfo 		= Spring.GetTeamInfo
 local spGetPlayerInfo 		= Spring.GetPlayerInfo
 local spGetSpectatingState 	= Spring.GetSpectatingState
+local spGetPlayerList		= Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
 local startMode = Spring.GetModOption("startingresourcetype",false,"facplop")
@@ -545,7 +546,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	local startPosition = luaSetStartPositions[teamID] or shuffledStartPosition[teamID]
 	local x,y,z = startPosition.x, startPosition.y, startPosition.z
 
-	if notAtTheStartOfTheGame and Game.startPosType == 2 then
+	if notAtTheStartOfTheGame and Game.startPosType == 2 and not (shuffleMode and (shuffleMode == "allboxes")) then
 		x, y, z = getMiddleOfStartBox(teamID)
 	end
 	
@@ -768,12 +769,16 @@ function Shuffle()
       for _,a in ipairs(Spring.GetAllyTeamList()) do
         if a ~= gaiaally then
           local xmin, zmin, xmax, zmax = Spring.GetAllyTeamStartBox(a)
-          local xmid = (xmax + xmin) / 2
-          local zmid = (zmax + zmin) / 2
-          local ymid = Spring.GetGroundHeight(xmid, zmid)
-          local i = #boxPosition + 1
-          boxPosition[i] = {x = xmid, y = ymid, z = zmid}
-          --teamList[i] = i - 1 -- team number starts at 0
+          if xmin and zmin and xmax and zmax then
+            local xmid = (xmax + xmin) / 2
+            local zmid = (zmax + zmin) / 2
+            local ymid = Spring.GetGroundHeight(xmid, zmid)
+            local i = #boxPosition + 1
+            boxPosition[i] = {x = xmid, y = ymid, z = zmid}
+            --teamList[i] = i - 1 -- team number starts at 0
+          else
+            Spring.Echo("Shuffle warning: non-gaia allyteam " .. a .. " has no startbox.")
+          end
         end
       end
 
@@ -785,14 +790,7 @@ function Shuffle()
         end
         local shuffledNums = ShuffleSequence(nums)
         for i=1,#teamList do
-          startPosition[teamList[i]] = boxPosition[shuffledNums[nums[i]]]
-        end
-
-        -- shuffle
-        local shuffled = ShuffleSequence(teamList)
-        teamList = GetAllTeamsList()
-        for _, team in ipairs(teamList) do
-          shuffledStartPosition[team] = startPosition[shuffled[team]]
+          shuffledStartPosition[teamList[i]] = boxPosition[shuffledNums[i]]
         end
       else
         Spring.Echo("Not enough boxes. Teams not shuffled.")
@@ -824,6 +822,22 @@ local function workAroundSpecsInTeamZero(playerlist, team)
   return playerlist
 end
 
+--[[
+   This function return true if everyone in the team resigned.
+   This function is alternative to "isDead" from: "_,_,isDead,isAI = spGetTeamInfo(team)"
+   because "isDead" failed to return true when human team resigned before GameStart() event.
+--]]
+local function IsTeamResigned(team)
+	local playersInTeam = spGetPlayerList(team)
+	for j=1,#playersInTeam do
+		local spec = select(3,spGetPlayerInfo(playersInTeam[j]))
+		if not spec then
+			return false
+		end
+	end
+	return true
+end
+
 function gadget:GameStart()
 	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
 		return
@@ -845,9 +859,11 @@ function gadget:GameStart()
 		Spring.SetTeamResource(team, "metal", 0)
 	end
 	
-    local _,playerID,isDead,isAI = spGetTeamInfo(team)
-
-    if team ~= gaiateam and not isDead then
+	--check if player resigned before game started
+	local _,playerID,_,isAI = spGetTeamInfo(team)
+	local deadPlayer = (not isAI) and IsTeamResigned(team)
+	
+	if team ~= gaiateam and not deadPlayer then
 	  local luaAI = Spring.GetTeamLuaAI(team)
 	  if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
 		waitingForComm[team] = true
@@ -858,7 +874,7 @@ function gadget:GameStart()
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
         if playerlist and (#playerlist > 0) then
           for i=1,#playerlist do
-          	local _,_,spec = spGetPlayerInfo(playerlist[i])
+            local _,_,spec = spGetPlayerInfo(playerlist[i])
             if (not spec) then
               SpawnStartUnit(team, playerlist[i])
             end

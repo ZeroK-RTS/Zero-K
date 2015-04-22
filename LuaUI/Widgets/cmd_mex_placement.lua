@@ -97,8 +97,10 @@ local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
 local allyMexColor = {[1] = {0, 1, 1, 0.7}, [2] = {0, 1, 1, 1}}
-local neutralMexColor = {[1] = {1, 1, 0, 0.7}, [2] = {1, 1, 0,1}}
+local neutralMexColor = {[1] = {1.0, 1.0, 1.0, 0.7}, [2] = {1.0, 1.0, 1.0, 1}}
 local enemyMexColor = {[1] = {1, 0, 0, 0.7}, [2] = {1, 0, 0, 1}}
+
+local allyTeams = {}	-- [id] = {team1, team2, ...}
 
 ------------------------------------------------------------
 -- Config
@@ -110,7 +112,7 @@ local TEXT_CORRECT_Y = 1.25
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
 options_path = 'Settings/Interface/Metal Spots'
-options_order = { 'drawicons', 'size', 'rounding'}
+options_order = { 'drawicons', 'size', 'specPlayerColours', 'rounding'}
 options = {
 	
 	drawicons = {
@@ -136,6 +138,12 @@ options = {
 		min = 1,
 		max = 4,
 		advanced = true,
+		OnChange = function() updateMexDrawList() end
+	},
+	specPlayerColours = {
+		name = "Use player colours when spectating",
+		type = "bool",
+		value = false,
 		OnChange = function() updateMexDrawList() end
 	}
 }
@@ -429,7 +437,7 @@ function widget:UnitFinished(unitID, unitDefID, teamID)
 			local spotID = WG.metalSpotsByPos[x] and WG.metalSpotsByPos[x][z]
 			if spotID then
 				spotByID[unitID] = spotID
-				spotData[spotID] = {unitID = unitID, allyTeam = spGetUnitAllyTeam(unitID)}
+				spotData[spotID] = {unitID = unitID, team = Spring.GetUnitTeam(unitID), allyTeam = spGetUnitAllyTeam(unitID)}
 				updateMexDrawList()
 			end
 		elseif spGetUnitAllyTeam(unitID) == myAllyTeam then
@@ -543,10 +551,20 @@ local miniMexDrawList = 0
 local function getSpotColor(x,y,z,id, specatate, t)
 	if specatate then
 		if spotData[id] then
-			if spotData[id].allyTeam == spGetMyAllyTeamID() then
-				return allyMexColor[t]
+			if options.specPlayerColours.value then
+				local r, g, b = Spring.GetTeamColor(spotData[id].team)
+				local alpha = t == 1 and 0.7 or 1.0 --Judging by colours set up top
+				return {r, g, b, alpha}
 			else
-				return enemyMexColor[t]
+				-- local r, g, b = Spring.GetTeamColor(allyTeams[spotData[id].allyTeam][1])
+				local r, g, b = Spring.GetTeamColor(Spring.GetTeamList(spotData[id].allyTeam)[1])
+				local alpha = t == 1 and 0.7 or 1.0 --Judging by colours set up top
+				return {r, g, b, alpha}
+				-- if spotData[id].allyTeam == spGetMyAllyTeamID() then
+				-- 	return allyMexColor[t]
+				-- else
+				-- 	return enemyMexColor[t]
+				-- end
 			end
 		else
 			return neutralMexColor[t]
@@ -580,10 +598,13 @@ function calcMainMexDrawList()
 			
 			glPushMatrix()
 			
-			glLineWidth(spot.metal*1.5)
-			glColor(mexColor)
+			glColor(0,0,0,0.7)
 			glDepthTest(false)
-			glDrawGroundCircle(x, 1, z, 40, 32)
+			glLineWidth(spot.metal*2.4)
+			glDrawGroundCircle(x, 1, z, 40, 21)
+			glColor(mexColor)
+			glLineWidth(spot.metal*1.5)
+			glDrawGroundCircle(x, 1, z, 40, 21)
 			
 			if options.drawicons.value then
 				local size = 1

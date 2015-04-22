@@ -88,6 +88,7 @@ unitDef = {
       edgeEffectiveness       = 0.3,
       explosionGenerator      = [[custom:LONDON]],
       fireStarter             = 0,
+      flightTime              = 100,
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 65,

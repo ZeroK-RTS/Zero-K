@@ -214,8 +214,8 @@ local function SitOnPad(unitID)
 					if drainingEnergy then
 						Spring.SetUnitResourcing(unitID, "uue" ,0)
 						drainingEnergy = false
+						Spring.DestroyUnit(unitID)
 					end
-					break
 				end
 			end
 			

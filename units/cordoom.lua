@@ -83,8 +83,8 @@ unitDef = {
 
     {
       def                = [[PLASMA]],
-	  badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
+	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
 

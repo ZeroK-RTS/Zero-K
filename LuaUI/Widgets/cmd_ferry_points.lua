@@ -500,6 +500,9 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	removeUnit(unitID, unitDefID, unitTeam)
 end
 
+function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+	addUnit(unitID, unitDefID, newTeam)
+end
 
 function widget:Initialize()
 	local myUnits = Spring.GetTeamUnits(myTeam)

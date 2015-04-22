@@ -19,6 +19,10 @@ unitDef = {
   canPatrol           = true,
   canSubmerge         = false,
   category            = [[GUNSHIP]],
+  collisionVolumeOffsets   = [[0 0 0]],
+  collisionVolumeScales    = [[26 26 26]],
+  collisionVolumeTest      = 1,
+  collisionVolumeType      = [[ellipsoid]],
   collide             = false,
   cruiseAlt           = 100,
   explodeAs           = [[TINY_BUILDINGEX]],
@@ -49,6 +53,7 @@ unitDef = {
 	helptext_pl    = [[Drony bronia swojego lotniskowca i dziela z nim cele, jednak nie moga sie od niego zbytnio oddalac na wlasna reke. Lotniskowiec produkuje drony w parach co 15 sekund i moze kontrolowac do 8.]],
 
 	is_drone = 1,
+	modelradius    = [[13]],
   },
   
   

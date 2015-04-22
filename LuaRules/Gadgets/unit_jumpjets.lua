@@ -64,7 +64,7 @@ local spSetUnitNoSelect    = Spring.SetUnitNoSelect
 local spSetUnitBlocking    = Spring.SetUnitBlocking
 local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
-local spTestBuildOrder     = Spring.TestBuildOrder
+local spTestMoveOrder      = Spring.TestMoveOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
@@ -505,9 +505,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return true
 	end
 	
-	if (cmdID == CMD_JUMP and 
-		spTestBuildOrder(
-			unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 1) == 0) then
+	if cmdID == CMD_JUMP and 
+			not spTestMoveOrder(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 0, 0, 0, true, true, true) then
 		return false
 	end
 	if goalSet[unitID] then

@@ -127,6 +127,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
+	  fireTolerance           = 910, -- 5 degrees
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

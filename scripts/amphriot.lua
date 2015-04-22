@@ -223,7 +223,7 @@ function script.Shot(num)
 end
 
 function script.AimFromWeapon(num)
-	return torso
+	return flaremain
 end
 
 function script.QueryWeapon(num)

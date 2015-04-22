@@ -19,9 +19,12 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  no unsynced code
 end
 
-local spGetUnitHealth = Spring.GetUnitHealth
-local spSetUnitHealth = Spring.SetUnitHealth
-local spGetUnitDefID  = Spring.GetUnitDefID
+local spGetUnitHealth    = Spring.GetUnitHealth
+local spSetUnitHealth    = Spring.SetUnitHealth
+local spGetUnitDefID     = Spring.GetUnitDefID
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetUnitArmored   = Spring.GetUnitArmored
+local spAddUnitDamage    = Spring.AddUnitDamage
 
 local extraNormalDamageList = {}
 local extraNormalDamageFalloffList = {}
@@ -45,24 +48,29 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
+function gadget:UnitDamaged_GetWantedWeaponDef()
+	return wantedWeaponList
+end
+
+local already_stunned = false
+
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponDefID, attackerID, attackerDefID, attackerTeam)
-							
 	if paralyzer then -- the weapon deals paralysis damage
-		
-		local health, maxHealth = Spring.GetUnitHealth(unitID)
+		already_stunned = spGetUnitIsStunned(unitID)
+		local health, maxHealth = spGetUnitHealth(unitID)
 		if extraNormalDamageList[weaponDefID] then
 			attackerID = attackerID or -1
 			local extraDamage = extraNormalDamageList[weaponDefID]
 			if extraNormalDamageFalloffList[weaponDefID] then
-				local armored, mult = Spring.GetUnitArmored(unitID)
+				local armored, mult = spGetUnitArmored(unitID)
 				if armored then
 					extraDamage = extraDamage/mult
 				end
 				extraDamage = extraDamage*damage*extraNormalDamageFalloffList[weaponDefID]
 			end
 			-- be careful; this line can cause recursion! don't make it do paralyzer damage
-			Spring.AddUnitDamage(unitID, extraDamage, 0, attackerID, weaponDefID)
+			spAddUnitDamage(unitID, extraDamage, 0, attackerID, weaponDefID)
 		end
 		if health and maxHealth and health ~= 0 then -- taking no chances.
 			return damage*maxHealth/health
@@ -70,4 +78,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	end
 	
 	return damage
+end
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
+	if paralyzer and (not already_stunned) and spGetUnitIsStunned(unitID) then
+		GG.ScriptNotifyEMPed(unitID)
+	end
 end

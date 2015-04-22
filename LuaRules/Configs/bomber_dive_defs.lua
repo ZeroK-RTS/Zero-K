@@ -5,7 +5,9 @@ local unitArray = {}
 
 -- weapons to track
 local weapons = {
+	corshad_bogus_bomb = true,
 	corshad_shield_check = true,
+	bomberdive_bogus_bomb = true,
 	bomberdive_shield_check = true,
 }
 

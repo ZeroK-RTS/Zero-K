@@ -360,7 +360,7 @@ end
 
 local function getHelpText(unitDef)
 	local data = WG.langData
-	local lang = WG.lang
+	local lang = (WG.lang and WG.lang()) or "en"
 	local helpText
 	if data then
 		local unitConf = data[unitDef.name] 
@@ -380,7 +380,7 @@ end
 
 local function getDescription(unitDef)
 	local data = WG.langData
-	local lang = WG.lang
+	local lang = (WG.lang and WG.lang()) or "en"
 	local desc
 	if data then
 		local unitConf = data[unitDef.name] 
@@ -906,19 +906,18 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	-- multipliers are 30/16 because given per slowupdate
 	if (ud.idleTime < 1800) or (ud.idleAutoHeal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
 		cells[#cells+1] = 'Improved regeneration'
 		cells[#cells+1] = ''
 		if ud.idleTime < 1800 or ud.idleAutoHeal > 5 then
 			cells[#cells+1] = ' - Idle regen: '
-			cells[#cells+1] = numformat(ud.idleAutoHeal * (30/16)) .. ' HP/s'
+			cells[#cells+1] = numformat(ud.idleAutoHeal * 2) .. ' HP/s'
 			cells[#cells+1] = ' - Time to enable: '
-			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's' .. ((ud.wantedHeight > 0) and ' landed' or '')
+			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's' -- .. ((ud.wantedHeight > 0) and ' landed' or '')
 		end
 		if ud.autoHeal > 0 then
 			cells[#cells+1] = ' - Combat regen: '
-			cells[#cells+1] = numformat(ud.autoHeal * (30/16)) .. ' HP/s'
+			cells[#cells+1] = numformat(ud.autoHeal * 2) .. ' HP/s'
 		end
 		if cp.amph_regen then
 			cells[#cells+1] = ' - Water regen: '
@@ -1250,7 +1249,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0)
+	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0) + (ud.customParams.income_energy or 0) 
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }

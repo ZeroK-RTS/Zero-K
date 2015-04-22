@@ -140,6 +140,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Workaround impact only beam vs shield bug 
+-- https://github.com/ZeroK-RTS/Zero-K/issues/663
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if ((weaponDef.weapontype == "LightningCannon") or (weaponDef.weapontype == "BeamLaser")) and weaponDef.impactonly then
+		weaponDef.impactonly = false
+		weaponDef.areaofeffect = 2
+		weaponDef.craterareaofeffect = 3
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Disable sweepfire until we know how to use it
 
 for _, weaponDef in pairs(WeaponDefs) do
@@ -197,6 +211,12 @@ end
 	end
 	if weaponDef.mygravity then
 		weaponDef.customparams.mygravity = weaponDef.mygravity -- For attack AOE widget
+    end
+	if weaponDef.flighttime then
+		weaponDef.customparams.flighttime = weaponDef.flighttime
+    end
+	if weaponDef.weapontimer then
+		weaponDef.customparams.weapontimer = weaponDef.weapontimer
     end
 	if weaponDef.weaponvelocity then
 		weaponDef.customparams.weaponvelocity = weaponDef.weaponvelocity -- For attack AOE widget
