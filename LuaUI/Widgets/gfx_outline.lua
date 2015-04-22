@@ -57,7 +57,7 @@ local blurtex
 local depthShader
 local blurShader_h
 local blurShader_v
-local uniformScreenXY, uniformScreenX, uniformScreenY
+local uniformUseEqualityTest, uniformScreenXY, uniformScreenX, uniformScreenY
 
 --// geometric
 local vsx, vsy = 0,0
@@ -121,6 +121,7 @@ function widget:Initialize()
   depthShader = gl.CreateShader({
     fragment = [[
       uniform sampler2D tex0;
+      uniform int useEqualityTest;
       uniform vec2 screenXY;
 
       void main(void)
@@ -128,7 +129,7 @@ function widget:Initialize()
         vec2 texCoord = vec2( gl_FragCoord.x/screenXY.x , gl_FragCoord.y/screenXY.y );
         float depth  = texture2D(tex0, texCoord ).z;
 
-        if (depth <= gl_FragCoord.z) {
+        if (depth < gl_FragCoord.z) {
           discard;
         }
         gl_FragColor = gl_Color;
@@ -136,6 +137,7 @@ function widget:Initialize()
     ]],
     uniformInt = {
       tex0 = 0,
+      useEqualityTest = 1,
     },
     uniform = {
       screenXY = {vsx,vsy},
@@ -212,9 +214,9 @@ function widget:Initialize()
     return false
   end
 
-  uniformScreenXY = gl.GetUniformLocation(depthShader,  'screenXY')
-  uniformScreenX  = gl.GetUniformLocation(blurShader_h, 'screenX')
-  uniformScreenY  = gl.GetUniformLocation(blurShader_v, 'screenY')
+  uniformScreenXY        = gl.GetUniformLocation(depthShader,  'screenXY')
+  uniformScreenX         = gl.GetUniformLocation(blurShader_h, 'screenX')
+  uniformScreenY         = gl.GetUniformLocation(blurShader_v, 'screenY')
 
   self:ViewResize(widgetHandler:GetViewSizes())
 
@@ -290,7 +292,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function DrawVisibleUnits()
+local function DrawVisibleUnits(overrideEngineDraw)
   if (Spring.GetGameFrame() % 15 == 0) then
         checknow = true
   end
@@ -307,7 +309,7 @@ local function DrawVisibleUnits()
     end
  
     if not unbuiltUnits[visibleUnits[i]] then
-      glUnit(visibleUnits[i],true)
+      glUnit(visibleUnits[i],overrideEngineDraw)
     end
   end
 end
@@ -317,8 +319,27 @@ local MyDrawVisibleUnits = function()
   glPushMatrix()
   glResetMatrices()
   glColor(0,0,0,thickness)
-  DrawVisibleUnits()
+  DrawVisibleUnits(true)
   glColor(1,1,1,1)
+  glPopMatrix()
+end
+
+local DrawVisibleUnitsLines = function()
+  glPushMatrix()
+  glResetMatrices()
+  glColor(0,0,0,1)
+  gl.DepthMask(false)
+  gl.DepthTest(GL.LESS)
+  gl.LineWidth(4.0 * thickness)
+  gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+  gl.Culling(GL.FRONT)
+  DrawVisibleUnits(true)
+  glColor(1,1,1,1)
+  gl.DepthTest(GL.EQUAL)
+  gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+  gl.Culling(GL.BACK)
+  DrawVisibleUnits(false)
+  gl.LineWidth(1.0)
   glPopMatrix()
 end
 
@@ -362,6 +383,10 @@ function widget:DrawWorldPreUnit()
   glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
   glCallList(leave2d)
 end
+
+function widget:DrawWorldRefraction()
+  DrawVisibleUnitsLines()
+end 
 
 function widget:UnitCreated(unitID)
   unbuiltUnits[unitID] = true
