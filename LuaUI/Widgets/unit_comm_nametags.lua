@@ -171,9 +171,8 @@ function spGetUnitPieceMap(unitID,piecename)
   return pieceMap
 end
 
-
-function widget:DrawWorld()
-	if not Spring.IsGUIHidden() then
+local function DrawWorldFunc()
+		if not Spring.IsGUIHidden() then
 		glDepthTest(true)
 		glTexture('LuaUI/Images/hellomynameis.png')
 		glAlphaTest(GL_GREATER, 0)
@@ -213,7 +212,6 @@ function widget:DrawWorld()
 			end
 		end
 	--draw hovering text that mention player's name.
-	glDepthTest(false)
 	for unitID, attributes in pairs(comms) do
 		local heading = GetUnitHeading(unitID)
 		if (not heading) then
@@ -230,8 +228,16 @@ function widget:DrawWorld()
 	glAlphaTest(false)
 	glColor(1,1,1,1)
 	glTexture(false)
-	-- glDepthTest(false)
+	glDepthTest(false)
 	end
+end
+
+function widget:DrawWorld()
+	DrawWorldFunc()
+end
+
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)

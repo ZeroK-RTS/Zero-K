@@ -189,8 +189,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:DrawWorld()
-  if (smoothPolys) then
+local function DrawWorldFunc()
+    if (smoothPolys) then
     glSmoothing(nil, nil, true)
   end
 
@@ -237,7 +237,14 @@ function widget:DrawWorld()
     glSmoothing(nil, nil, false)
   end
 end
+
+function widget:DrawWorld()
+  DrawWorldFunc()
+end
               
+function widget:DrawWorldRefraction()
+  DrawWorldFunc()
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
