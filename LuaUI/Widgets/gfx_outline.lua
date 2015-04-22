@@ -119,12 +119,6 @@ function widget:Initialize()
   vsx, vsy = widgetHandler:GetViewSizes()
 
   depthShader = gl.CreateShader({
-    vertex = [[
-    void main(void)
-    {
-      gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    }
-    ]],
     fragment = [[
       uniform sampler2D tex0;
       uniform vec2 screenXY;
