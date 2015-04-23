@@ -346,7 +346,7 @@ local DrawVisibleUnitsLines = function()
   gl.LineWidth(4.0 * thickness)
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
   gl.Culling(GL.FRONT)
-  -- gl.DepthMask(false)
+  gl.DepthMask(false)
   glColor(0,0,0,1)
 
   glPushMatrix()
