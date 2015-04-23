@@ -325,22 +325,44 @@ local MyDrawVisibleUnits = function()
 end
 
 local DrawVisibleUnitsLines = function()
-  glPushMatrix()
-  glResetMatrices()
-  glColor(0,0,0,1)
-  gl.DepthMask(false)
+
+  -- gl.StencilTest(true)
+
+  -- gl.ColorMask(false,false,false,false)
+  -- gl.DepthMask(false)
+  -- gl.StencilMask(0xFF)
+  -- glClear(GL.STENCIL_BUFFER_BIT, 0x0)
+  -- gl.StencilFunc(GL.NEVER, 0x01, 0xFF)
+  -- gl.StencilOp(GL.REPLACE, GL.KEEP, GL.KEEP)
+  -- gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+  -- gl.Culling(false)
+  -- DrawVisibleUnits(true)
+  -- gl.StencilMask(0x00)
+
+  -- gl.StencilFunc(GL.EQUAL, 0x0, 0xFF)
+  -- gl.ColorMask(true,true,true,true)
+
   gl.DepthTest(GL.LESS)
   gl.LineWidth(4.0 * thickness)
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
   gl.Culling(GL.FRONT)
+  -- gl.DepthMask(false)
+  glColor(0,0,0,1)
+
+  glPushMatrix()
+  glResetMatrices()
   DrawVisibleUnits(true)
-  glColor(1,1,1,1)
   gl.DepthTest(GL.EQUAL)
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
   gl.Culling(GL.BACK)
   DrawVisibleUnits(false)
-  gl.LineWidth(1.0)
   glPopMatrix()
+
+  gl.LineWidth(1.0)
+  glColor(1,1,1,1)
+  -- gl.StencilTest(false)
+  -- gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
+  -- gl.StencilOp(GL.KEEP, GL.KEEP, GL.KEEP)
 end
 
 local blur_h = function()
