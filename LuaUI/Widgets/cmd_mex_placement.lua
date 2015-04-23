@@ -600,11 +600,11 @@ function calcMainMexDrawList()
 			
 			glColor(0,0,0,0.7)
 			glDepthTest(false)
-			glLineWidth(spot.metal*2.4)
-			glDrawGroundCircle(x, 1, z, 40, 21)
+			glLineWidth(spot.metal*3.3)
+			glDrawGroundCircle(x, 1, z, 50, 21)
 			glColor(mexColor)
 			glLineWidth(spot.metal*1.5)
-			glDrawGroundCircle(x, 1, z, 40, 21)
+			glDrawGroundCircle(x, 1, z, 50, 21)
 			
 			if options.drawicons.value then
 				local size = 1
@@ -791,8 +791,11 @@ function widget:DrawInMiniMap()
 
 			local mexColor = getSpotColor(x,y,z,i,specatate,2)
 			
-			glLineWidth((spot.metal > 0 and spot.metal) or 0.1)
 			glLighting(false)
+			glColor(0,0,0,1)
+			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*2.0)
+			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
+			glLineWidth((spot.metal > 0 and spot.metal) or 0.1)
 			glColor(mexColor)
 			
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
