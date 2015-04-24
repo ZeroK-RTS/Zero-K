@@ -20,9 +20,9 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 180,
-		planes  = 180,
-		subs    = 9,
+		default = 120,
+		planes  = 120,
+		subs    = 6,
 	},
 
 	edgeEffectiveness       = 0.5,
@@ -30,10 +30,10 @@ local weaponDef = {
     flightTime              = 0,
     fallOffRate             = 0,
 	impulseBoost            = 0,
-	impulseFactor           = 22.5,
+	impulseFactor           = 30,
 	interceptedByShieldType = 1,
     model                   = [[wep_merl]],
-	range                   = 450,
+	range                   = 360,
 	reloadtime              = 12,
 	rgbColor                = [[1 0.6 0]],
 	separation              = 0.5,
