@@ -119,6 +119,17 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Set lenient fire tolerance
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if not weaponDef.firetolerance then
+		weaponDef.firetolerance = 32768 -- Full 180 degrees on either side.
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Preserve crater sizes for new engine
 -- https://github.com/spring/spring/commit/77c8378b04907417a62c25218d69ff323ba74c8d
 

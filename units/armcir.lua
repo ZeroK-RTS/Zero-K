@@ -24,7 +24,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    usetacai       = [[1]],
     description_fr = [[Batterie de Missiles Anti-Air ? Moyenne Port?e]],
 	description_de = [[Weitreichende Anti-Air Raketenbatterie]],
 	description_pl = [[Bateria rakiet przeciwlotniczych]],
