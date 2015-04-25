@@ -343,7 +343,7 @@ local DrawVisibleUnitsLines = function()
   -- gl.ColorMask(true,true,true,true)
 
   gl.DepthTest(GL.LESS)
-  gl.LineWidth(1.0 * thickness)
+  gl.LineWidth(1.2 * thickness)
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
   gl.Culling(GL.FRONT)
   gl.DepthMask(false)
