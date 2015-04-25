@@ -2020,12 +2020,12 @@ function widget:Update(dt)
 	end
 end
 
--- function widget:GamePreload()
--- 	if not initialBoundsSet then --Tilt zoom initial overhead view (Engine 91)
--- 		initialBoundsSet = true
--- 		if options.tiltedzoom.value then ResetCam() end
--- 	end
--- end
+function widget:GamePreload()
+	if not initialBoundsSet then --Tilt zoom initial overhead view (Engine 91)
+		initialBoundsSet = true
+		if options.tiltedzoom.value then ResetCam() end
+	end
+end
 
 function widget:MouseMove(x, y, dx, dy, button)
 	if rotate then
