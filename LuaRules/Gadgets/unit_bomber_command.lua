@@ -497,7 +497,7 @@ function gadget:GameFrame(n)
 			local unitDefID = data.unitDefID
 			local queue = spGetCommandQueue(bomberID, 1)
 			if (queue and queue[1] and queue[1].id == CMD_REARM) and 
-					(Spring.GetUnitSeparation(bomberID, padID, true) < ((unitDefID and bomberDefs[unitDefID] and bomberDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
+					((Spring.GetUnitSeparation(bomberID, padID, true) or 1000) < ((unitDefID and bomberDefs[unitDefID] and bomberDefs[unitDefID].padRadius) or DEFAULT_PAD_RADIUS)) then
 				if not airpadRefreshEmptyspot then
 					RefreshEmptyspot_minusBomberLanding() --initialize empty pad count once
 					airpadRefreshEmptyspot = true
