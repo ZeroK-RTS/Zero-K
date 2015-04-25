@@ -162,7 +162,7 @@ end
 -------------------
 -- Drawing
 
-function widget:DrawWorld()
+local function DrawWorldFunc()
 	glDepthTest(true)
 	glAlphaTest(GL_GREATER, 0)
 	
@@ -188,4 +188,11 @@ function widget:DrawWorld()
 	glColor(1,1,1,1)
 	glTexture(false)
 	glDepthTest(false)
+end
+
+function widget:DrawWorld()
+	DrawWorldFunc()
+end
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
