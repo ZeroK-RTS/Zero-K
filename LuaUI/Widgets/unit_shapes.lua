@@ -386,11 +386,11 @@ function DrawUnitShapes(unitList, color)
 	end
 
 	-- To fix Water
-	--gl_ColorMask(false,false,false,true)
-	--gl_BlendFunc(GL_ONE, GL_ONE)
-	--glColor(r,g,b,1)
+	gl.ColorMask(false,false,false,true)
+	gl.BlendFunc(GL.ONE, GL.ONE)
+	gl.Color(0,0,0,1)
 	-- Does not need to be drawn per Unit .. it covers the whole map
-	--gl_DrawList(clearquad)
+	gl.CallList(clearquad)
 
 	--  Draw selection circles
 	gl.Color(1,1,1,1)
@@ -421,6 +421,7 @@ function DrawUnitShapes(unitList, color)
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+			gl.Unit(unitID, true)
 		end
 	end
 
@@ -434,10 +435,8 @@ function DrawUnitShapes(unitList, color)
 	gl.CallList(clearquad)
 end
 
-
-
 function widget:DrawWorldPreUnit()
-	--if Spring.IsGUIHidden() then return end
+		--if Spring.IsGUIHidden() then return end
 	if (#visibleAllySelUnits + #visibleSelected == 0) then return end
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)

@@ -265,8 +265,7 @@ local function DrawUnitFunc(xshift, yshift)
 	glTexRect(xshift - iconsize*0.5, -9, xshift + iconsize*0.5, iconsize-9)
 end
 
-
-function widget:DrawWorld()
+local function DrawWorldFunc()
 	if Spring.IsGUIHidden() then return end
 	
 	if (next(unitHeights) == nil) then

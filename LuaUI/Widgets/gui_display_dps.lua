@@ -239,7 +239,7 @@ local function DrawUnitFunc2(unitID, yshift, xshift, damage, textSize, alpha, pa
 	glPopMatrix()
 end
 
-function widget:DrawWorld()
+local function DrawWorldFunc()
 		local theTime = GetGameSeconds()
 
 		if (theTime ~= lastTime) then
@@ -303,6 +303,13 @@ function widget:DrawWorld()
   glAlphaTest(false)
   glDepthTest(false)
   glDepthMask(false)
+end
+
+function widget:DrawWorld()
+  DrawWorldFunc()
+end
+function widget:DrawWorldRefraction()
+  DrawWorldFunc()
 end
 
 --------------------------------------------------------------------------------
