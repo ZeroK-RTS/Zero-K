@@ -4,41 +4,7 @@ local wake = piece "wake"
 local base = piece "base"
 local firepoint = piece "firepoint"
 
-local SIG_MOVE = 1
-
-local function Rise()
-	Move( base, y_axis, 20 )
-	Sleep( 1000 )
-	Move( base, y_axis, 0, 5 )
-end
-
---[[
-local function Swim()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
-	while( TRUE )
-	while true do
-		Sleep(250)
-	end
-end
-
-function script.StartMoving()
-	StartThread(Swim)
-end
-
-function script.StopMoving()
-	Signal(SIG_MOVE)
-end
---]]
-function script.Create()
-	--StartThread( Rise )
-end
-
-function script.QueryWeapon(num) 
---	return base
-	return firepoint
-end
-
+function script.QueryWeapon(num) return firepoint end
 function script.AimFromWeapon(num) return base end
 
 function script.AimWeapon( num, heading, pitch )
@@ -49,19 +15,25 @@ function script.BlockShot(num, targetID)
 	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 350.1, 25, true)
 end
 
-function script.FireWeapon(num)
--- FX goes here
+local submerged = true
+local subArmorClass = Game.armorTypes.subs
+local elseArmorClass = Game.armorTypes["else"]
+
+function script.setSFXoccupy(num)
+	if (num == 4) or (num == 0) then
+		submerged = false
+	else
+		submerged = true
+	end
 end
 
---[[
-function script.BlockShot(num)
-	local targID = GetUnitValue(COB.TARGET_ID, 1)
-	if targID < 0 then return false end	--attacking ground
-	local ux,uy,uz = Spring.GetUnitBasePosition(targID)
-	local y = Spring.GetGroundHeight(ux, uz)
-	return (y > -3)		--bit of leeway for just being toe deep
+function script.HitByWeapon (x, z, weaponDefID, damage)  
+	if not submerged then
+		local damages = WeaponDefs[weaponDefID].damages
+		return damage * (damages[elseArmorClass] / damages[subArmorClass])
+	end
+	return damage
 end
---]]
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
@@ -70,9 +42,9 @@ function script.Killed(recentDamage, maxHealth)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		Explode(base, SFX.SHATTER)
-		return 1 -- corpsetype
+		return 1
 	else	
 		Explode(base, SFX.SHATTER)
-		return 2 -- corpsetype
+		return 2
 	end
 end
