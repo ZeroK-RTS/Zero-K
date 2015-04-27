@@ -58,6 +58,7 @@ local glColor          = gl.Color
 local GL_GREATER       = GL.GREATER
 
 local min	= math.min
+local max = math.max
 local floor = math.floor
 local abs 	= math.abs
 
@@ -154,7 +155,7 @@ function widget:GameFrame(f)
 	end
 end
 	
-function widget:DrawWorld()
+local function DrawWorldFunc()
 	local fade = abs((spGetGameFrame() % 40) - 20) / 20
 	--Draw ambulance on havens.
 	if #havens == 0 or Spring.IsGUIHidden() then 
@@ -183,7 +184,7 @@ function widget:DrawWorld()
 	
 	for i = 1, havenCount do
 		local havenPosition = havens[i]
-		local x, y, z = havenPosition.x, havenPosition.y, havenPosition.z
+		local x, y, z = havenPosition.x, max(havenPosition.y, 0.0), havenPosition.z
 		gl.PushMatrix()
 		glTranslate(x, y, z)
 		glBillboard()
@@ -194,6 +195,12 @@ function widget:DrawWorld()
 	glTexture(false)
 	glAlphaTest(false)
 	glDepthTest(false)
+end
 	
-	
+function widget:DrawWorld()
+	DrawWorldFunc()
 end --DrawWorld
+
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
+end

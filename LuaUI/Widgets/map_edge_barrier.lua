@@ -206,12 +206,18 @@ function widget:Shutdown()
         gl.DeleteList(dListWall)
 end
 
+local function DrawWorldFunc()
+  if (not island) or options.drawForIslands.value then
+      gl.DepthTest(GL.LEQUAL)
+      gl.CallList(dListWall)
+      gl.DepthTest(false)
+  end
+end
 function widget:DrawWorldPreUnit()
-    if (not island) or options.drawForIslands.value then
-        gl.DepthTest(GL.LEQUAL)
-        gl.CallList(dListWall)
-        gl.DepthTest(false)
-    end
+	DrawWorldFunc()
+end
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
 
 function widget:MousePress(x, y, button)

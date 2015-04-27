@@ -64,6 +64,12 @@ function widget:DrawWorld()
 	ResetGl()
 end
 
+function widget:DrawWorldRefraction()
+	DrawGhostSites()
+	DrawGhostFeatures()
+	ResetGl()
+end
+
 function widget:UnitEnteredLos(unitID, unitTeam)
 	if Spring.IsUnitAllied( unitID ) then
 		return

@@ -719,7 +719,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
-function gadget:DrawWorld()
+local function DrawWorldFunc()
 	if beaconCount > 0 then
 		local spec, fullview = Spring.GetSpectatingState()
 		spec = spec or fullview
@@ -762,6 +762,13 @@ function gadget:DrawWorld()
 			gl.PopAttrib()
 		end
 	end
+end
+
+function gadget:DrawWorld()
+	DrawWorldFunc()
+end
+function gadget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
 
 

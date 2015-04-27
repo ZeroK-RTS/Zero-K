@@ -1742,7 +1742,7 @@ function widget:Update(dt)
 	--//MISC
 	fpsmode = cs.name == "fps"
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
-		spSendCommands("viewfree") 
+		-- spSendCommands("viewfree") 
 		cs = DetermineInitCameraState()
 		init = false
 		cs.tiltSpeed = 0
@@ -2395,20 +2395,6 @@ function widget:Initialize()
 			WG.crude.SetHotkey("track",nil)
 			WG.crude.SetHotkey("mousestate",nil)
 		end
-	end
-
-	--//MISC
-	if init then
-		init = false
-		Spring.Echo("Initialize")
-		local cs = DetermineInitCameraState()
-
-		cs.tiltSpeed = 0
-		cs.scrollSpeed = 0
-		--cs.gndOffset = options.mingrounddist.value
-		cs.gndOffset = options.freemode.value and 0 or 1 --this tell Engine to block underground motion, ref: Spring\rts\Game\Camera\FreeController.cpp
-		spSetCameraState(cs,0)
-		OverrideSetCameraStateInterpolate(cs,0) --For internal caching
 	end
 
 	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that minimap click works with COFC

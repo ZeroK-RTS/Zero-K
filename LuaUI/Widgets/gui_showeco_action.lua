@@ -340,7 +340,7 @@ end
 
 local function HighlightPlacement(unitDefID)
 	local mx, my = spGetMouseState()
-	local _, coords = spTraceScreenRay(mx, my, true, true)
+	local _, coords = spTraceScreenRay(mx, my, true, true, false, true)
 	if coords then 
 		local radius = pylonDefs[unitDefID].range
 		if (radius ~= 0) then
