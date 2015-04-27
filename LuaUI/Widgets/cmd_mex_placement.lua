@@ -598,7 +598,14 @@ function calcMainMexDrawList()
 			
 			glPushMatrix()
 			
+			glColor(0,0,0,0.7)
 			glDepthTest(false)
+			glLineWidth(spot.metal*2.4)
+			glDrawGroundCircle(x, 1, z, 40, 21)
+			glColor(mexColor)
+			glLineWidth(spot.metal*1.5)
+			glDrawGroundCircle(x, 1, z, 40, 21)
+			
 			if options.drawicons.value then
 				local size = 1
 				if metal > 10 then
@@ -634,20 +641,7 @@ function calcMainMexDrawList()
 				glTranslate(x,-z-20-options.size.value, 0)
 				glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 			end	
-	
-			glPopMatrix()	
-
-			glPushMatrix()	
 			
-			gl.DepthTest(true)
-
-			glColor(0,0,0,0.7)
-			-- glDepthTest(false)
-			glLineWidth(spot.metal*2.7)
-			glDrawGroundCircle(x, 1, z, 30, 21)
-			glColor(mexColor)
-			glLineWidth(spot.metal*1.1)
-			glDrawGroundCircle(x, 1, z, 30, 21)	
 			--glColor(0,1,1)
 			--glRect(x-width/2, z+18, x+width/2, z+20)
 			--glDepthTest(false)
@@ -716,13 +710,7 @@ function widget:DrawWorldPreUnit()
 	drawMexSpots = WG.metalSpots and (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
 
 	if drawMexSpots then
-			
-			gl.DepthTest(true)
-			gl.DepthMask(true)
 		glCallList(mainMexDrawList)
-			
-			gl.DepthTest(false)
-			gl.DepthMask(false)
 	end
 end
 
@@ -803,11 +791,8 @@ function widget:DrawInMiniMap()
 
 			local mexColor = getSpotColor(x,y,z,i,specatate,2)
 			
-			glLighting(false)
-			glColor(0,0,0,1)
-			glLineWidth(((spot.metal > 0 and spot.metal) or 0.1)*2.0)
-			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
 			glLineWidth((spot.metal > 0 and spot.metal) or 0.1)
+			glLighting(false)
 			glColor(mexColor)
 			
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
