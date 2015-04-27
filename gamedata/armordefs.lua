@@ -16,10 +16,6 @@ local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 local armorDefs = {
   
   SUBS = {
-    "subarty",
-    "subraider",
-    "subscout",
-    "cornukesub",
   },
 
   CHICKEN = {
