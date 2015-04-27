@@ -15,6 +15,7 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   canstop                = [[1]],
+  cantBeTransported      = true,
   category               = [[SUB FIREPROOF]],
   collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[30 25 110]],
