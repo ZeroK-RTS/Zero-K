@@ -273,9 +273,9 @@ end
 
 local function CreateTriangleLists()
 	local points = {
-		{0, -1},
-		{1, 1},
-		{-1, 1}
+		{0, -1.3},
+		{1, 0.7},
+		{-1, 0.7}
 	}
 	
 	local callback = CreatePolygonCallback(points, GL.TRIANGLES)
