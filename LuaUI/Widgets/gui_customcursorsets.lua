@@ -38,6 +38,7 @@ options = {
 		items = {
 			{ key = 'zk', name = 'Animated', 		icon='anims/cursornormal_0.png' },
 			{ key = 'zk_static', name = 'Static', 	icon='anims/cursornormal_0.png' },
+			{ key = 'zk_large', name = 'Large Animated', icon='anims/cursornormal_0.png' },
 			{ key = 'ca', name = 'CA Classic', 		icon='anims/ca/cursornormal_0.png' },
 			{ key = 'ca_static', name = 'CA Static', 		icon='anims/ca/cursornormal_0.png' },
 			{ key = 'erom', name = 'Erom', 			icon='anims/erom/cursornormal_0.png' },

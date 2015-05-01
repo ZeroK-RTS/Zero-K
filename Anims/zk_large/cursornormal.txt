@@ -1,0 +1,24 @@
+hotspot topleft
+frame  cursornormal_0.png  5
+frame  cursornormal_1.png  0.05
+frame  cursornormal_2.png  0.05
+frame  cursornormal_3.png  0.05
+frame  cursornormal_4.png  0.05
+frame  cursornormal_5.png  0.05
+frame  cursornormal_6.png  0.05
+frame  cursornormal_7.png  0.05
+frame  cursornormal_8.png  0.05
+frame  cursornormal_9.png  0.05
+frame  cursornormal_10.png  0.05
+frame  cursornormal_11.png  0.05
+frame  cursornormal_12.png  0.05
+frame  cursornormal_13.png  0.05
+frame  cursornormal_14.png  0.05
+frame  cursornormal_15.png  0.05
+frame  cursornormal_16.png  0.05
+frame  cursornormal_17.png  0.05
+frame  cursornormal_18.png  0.05
+frame  cursornormal_19.png  0.05
+frame  cursornormal_20.png  0.05
+frame  cursornormal_21.png  0.05
+frame  cursornormal_22.png  0.05

@@ -1,0 +1,17 @@
+hotspot center
+frame  cursordgun_0.png  0.2
+frame  cursordgun_1.png  0.05
+frame  cursordgun_2.png  0.05
+frame  cursordgun_3.png  0.05
+frame  cursordgun_4.png  0.05
+frame  cursordgun_5.png  0.05
+frame  cursordgun_6.png  0.05
+frame  cursordgun_7.png  0.05
+frame  cursordgun_8.png  0.2
+frame  cursordgun_7.png  0.05
+frame  cursordgun_6.png  0.05
+frame  cursordgun_5.png  0.05
+frame  cursordgun_4.png  0.05
+frame  cursordgun_3.png  0.05
+frame  cursordgun_2.png  0.05
+frame  cursordgun_1.png  0.05

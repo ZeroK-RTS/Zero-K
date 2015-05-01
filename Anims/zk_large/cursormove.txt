@@ -1,0 +1,13 @@
+hotspot topleft
+frame  cursormove_0.png  0.2
+frame  cursormove_1.png  0.1
+frame  cursormove_2.png  0.1
+frame  cursormove_3.png  0.1
+frame  anims//cursormove_4.png  0.1
+frame  cursormove_5.png  0.1
+frame  cursormove_6.png  0.1
+frame  cursormove_7.png  0.1
+frame  cursormove_8.png  0.1
+frame  cursormove_9.png  0.1
+frame  cursormove_10.png  0.1
+frame  cursormove_11.png  0.4

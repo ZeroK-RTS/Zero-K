@@ -1,0 +1,22 @@
+hotspot center
+frame  cursorunload_0.png 0.1
+frame  cursorunload_1.png 0.1
+frame  cursorunload_2.png 0.1
+frame  cursorunload_3.png 0.1
+frame  cursorunload_4.png 0.1
+frame  cursorunload_5.png 0.1
+frame  cursorunload_6.png 0.1
+frame  cursorunload_7.png 0.1
+frame  cursorunload_8.png 0.1
+frame  cursorunload_9.png 0.1
+frame  cursorunload_10.png 0.1
+frame  cursorunload_9.png 0.1
+frame  cursorunload_8.png 0.1
+frame  cursorunload_7.png 0.1
+frame  cursorunload_6.png 0.1
+frame  cursorunload_5.png 0.1
+frame  cursorunload_4.png 0.1
+frame  cursorunload_3.png 0.1
+frame  cursorunload_2.png 0.1
+frame  cursorunload_1.png 0.1
+frame  cursorunload_0.png 0.1

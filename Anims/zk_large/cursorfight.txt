@@ -1,0 +1,13 @@
+hotspot topleft
+frame  cursorfight_0.png  0.2
+frame  cursorfight_1.png  0.1
+frame  cursorfight_2.png  0.1
+frame  cursorfight_3.png  0.1
+frame  cursorfight_4.png  0.1
+frame  cursorfight_5.png  0.1
+frame  cursorfight_6.png  0.1
+frame  cursorfight_7.png  0.1
+frame  cursorfight_8.png  0.1
+frame  cursorfight_9.png  0.1
+frame  cursorfight_10.png  0.1
+frame  cursorfight_11.png  0.4

@@ -1,0 +1,3 @@
+hotspot center
+frame  cursorselfd_0.png  0.1
+frame  cursorselfd_1.png  0.1
