@@ -169,6 +169,7 @@ local spGetSelectedUnits	= Spring.GetSelectedUnits
 local spIsUnitInView 		= Spring.IsUnitInView
 local spIsAABBInView		= Spring.IsAABBInView
 local spIsSphereInView		= Spring.IsSphereInView
+local spGetTeamUnits		= Spring.GetTeamUnits
 local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
 local spGetUnitViewPosition = Spring.GetUnitViewPosition
 local spGetCommandQueue    	= Spring.GetCommandQueue
@@ -234,6 +235,7 @@ local CMD_REMOVE    = CMD.REMOVE
 local CMD_RECLAIM	= CMD.RECLAIM
 local CMD_GUARD		= CMD.GUARD
 local CMD_STOP		= CMD.STOP
+local CMD_TERRAFORM_INTERNAL = 39801
 
 local abs	= math.abs
 local floor	= math.floor
@@ -308,7 +310,9 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called everytime "cmd_mex_placement.lua" widget handle a mex command. Reference : http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
+	-- ZK compatability stuff
+	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
+	widgetHandler:RegisterGlobal("CommandNotifyTF", CommandNotifyTF) -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
 end
 
 --	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
@@ -339,7 +343,7 @@ function widget:GameFrame(thisFrame)
 		CleanWrecks() -- capture all non-map-feature targets in LOS
 	end
 	
-	CaptureComboTF() -- ZK-Specific: captures the build half of combination terraform/build commands.
+	CaptureTF() -- ZK-Specific: captures "terraunits" from ZK terraform, and adds repair jobs for them.
 	
 	local unitsToWork = FindEligibleWorker()	-- compile list of eligible units and assign them jobs.
 	if (#unitsToWork > 0) then
@@ -732,6 +736,16 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	end
 end
 
+-- ZK-Specific: This function detects and captures terraform jobs when they're started
+function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	local unitDef = UnitDefs[unitDefID]
+	if string.match(unitDef["tooltip"], "erraform") ~= nil and unitTeam == myTeamID then
+		local myCmd = {id=40, target=unitID, assignedUnits={}}
+		local hash = BuildHash(myCmd)
+		myQueue[hash] = myCmd
+	end
+end
+
 --	If unit detected as idle and it's one of ours, mark it as idle so that it can be assigned work. Note: some ZK gadgets cause false positives for this, which is why we use deferred checks.
 function widget:UnitIdle(unitID, unitDefID, teamID)
 	if myUnits[unitID] then -- if it's one of ours
@@ -741,12 +755,33 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 	end
 end
 
---	A compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue
+--	A ZK compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue
 function CommandNotifyMex(id,params,options, isAreaMex)
 	local groundHeight = spGetGroundHeight(params[1],params[3])
 	params[2] = math.max(0, groundHeight)
 	local returnValue = widget:CommandNotify(id, params, options, true, isAreaMex)
 	return returnValue
+end
+
+-- A ZK compatibility function: recieves command events broadcast from "gui_lasso_terraform.lua"
+function CommandNotifyTF(unitID, params, shift)
+	if myUnits[unitID] then -- if it's one of our units
+		if busyUnits[unitID] then -- if the worker is also still on our busy list
+			local key = busyUnits[unitID]
+			myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
+			busyUnits[unitID] = nil -- and from busy units
+		end
+		
+		if shift then -- if the command was given with shift
+			spGiveOrderToUnit(unitID, CMD_TERRAFORM_INTERNAL, params, {""}) -- give the unit the TF order immediately so that it creates the 'terraunits'
+			myUnits[unitID].cmdtype = commandType.idle -- mark it as idle so that it gets reassigned
+			reassignedUnits[unitID] = nil -- ensure that it gets reassigned as soon as it creates the terraunits
+			return true -- return true to tell gui_lasso_terraform that we handled the command externally
+		else -- if the command was not given with shift
+		myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
+		return false
+		end
+	end
 end
 
 --  This function captures build-related commands given to units in our group and adds them to the queue, and also tracks unit state (ie direct orders vs queued).
@@ -761,7 +796,7 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	
 	local selectedUnits = spGetSelectedUnits()
 	for _, unitID in pairs(selectedUnits) do	-- check selected units...
-		if ( myUnits[unitID] ) then	--  was issued to one of our units.
+		if myUnits[unitID] then	--  was issued to one of our units.
 			if ( id < 0 ) then --if the order is for building something
 				local x, y, z, h = params[1], params[2], params[3], params[4]
 				local myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}}
@@ -955,9 +990,8 @@ HOW THIS WORKS:
 	CheckIdlers()
 		Processes units that had UnitIdle called on them to ensure that they were really idle, and does cleanup for jobs such as
 		area commands where there's no other way to tell if the job is done.
-	CaptureComboTF()
-		ZK-Specific, captures the build half of combo terraform/build commands.
-		Note: Only functions as a guard, not actually implemented yet.
+	CaptureTF()
+		ZK-Specific, locates 'terraunits' that mark terraform points and adds repair jobs for them.
 	CleanOrders()
 		Takes a build command as input, and checks the build site for blockage or overlap with existing jobs,
 		then removes any jobs that are blocked, finished, invalid or conflicting.
@@ -1300,15 +1334,19 @@ function CleanWrecks()
 	end
 end
 
--- ZK-Specific: This function captures the build part of combination build/terraform commands.
--- Note: this was not actually doable, so now it simply captures the units and sets them to drec so that
--- the widget will not interfere with those commands. This would probably require
--- full terraform support to work, which is not presently implemented.
-function CaptureComboTF()
-	for unitID,unitData in pairs(myUnits) do
-		local thisCmd = GetFirstCommand(unitID)
-		if thisCmd and unitData.cmdtype ~= commandType.drec and not busyUnits[unitID] then
-			myUnits[unitID].cmdtype = commandType.drec -- combo TF operations don't trigger normal events, so we have to detect them here
+-- ZK-Specific: Adds repair commands for 'terraunits'
+function CaptureTF()
+	local teamUnits = spGetTeamUnits(myTeamID) -- get all of the player's units
+	for i=1, #teamUnits do
+		unitID = teamUnits[i]
+		unitDID = spGetUnitDefID(unitID)
+		unitDef = UnitDefs[unitDID]
+		if string.match(unitDef.humanName, "erraform") ~= nil then -- identify 'terraunits'
+			local myCmd = {id=40, target=unitID, assignedUnits={}}
+			local hash = BuildHash(myCmd)
+			if not myQueue[hash] then -- add repair jobs for them if they're not already on the queue
+				myQueue[hash] = myCmd
+			end
 		end
 	end
 end
@@ -1703,6 +1741,11 @@ function RemoveJobs(x, z, r)
 				jdist = Distance(x, z, jx, jz)
 				if jdist < r then
 					inRadius = true
+					local udid = spGetUnitDefID(target)
+					local unitDef = UnitDefs[udid]
+					if string.match(unitDef.humanName, "erraform") ~= nil then -- if the target was a 'terraunit', self-destruct it
+						spGiveOrderToUnit(target, 65, {}, {""})
+					end
 				end
 			end
 		end
