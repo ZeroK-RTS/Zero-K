@@ -665,6 +665,8 @@ HOW THIS WORKS:
 		during build jobs, for unknown reasons.
 	CommandNotifyMex()
 		Captures mex commands from ZK-specific gadgets.
+	CommandNotifyTF()
+		Captures terraform commands from ZK-Specific gadgets/widgets
 	widget:CommandNotify()
 		This captures all the build-related commands from units in our group,
 		and adds them to the global queue.
