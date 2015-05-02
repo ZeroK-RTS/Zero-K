@@ -269,7 +269,7 @@ local function SendCommand()
 			
 			local handledExternally = false
 			if (Script.LuaUI('CommandNotifyTF')) then --send away new mex queue in an event called CommandNotifyTF. Used by "unit_global_build_command.lua" and potentially by other widgets.
-				handledExternally = Script.LuaUI.CommandNotifyTF(constructor[1], params, s)
+				handledExternally = Script.LuaUI.CommandNotifyTF(constructor, params, s)
 			end
 			
 			if not handledExternally then
@@ -309,7 +309,7 @@ local function SendCommand()
 		
 		local handledExternally = false
 		if (Script.LuaUI('CommandNotifyTF')) then --send away new mex queue in an event called CommandNotifyTF. Used by "unit_global_build_command.lua" and potentially by other widgets.
-			handledExternally = Script.LuaUI.CommandNotifyTF(constructor[1], params, s)
+			handledExternally = Script.LuaUI.CommandNotifyTF(constructor, params, s)
 		end
 		
 		if not handledExternally then

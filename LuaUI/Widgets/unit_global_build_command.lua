@@ -764,24 +764,30 @@ function CommandNotifyMex(id,params,options, isAreaMex)
 end
 
 -- A ZK compatibility function: recieves command events broadcast from "gui_lasso_terraform.lua"
-function CommandNotifyTF(unitID, params, shift)
-	if myUnits[unitID] then -- if it's one of our units
-		if busyUnits[unitID] then -- if the worker is also still on our busy list
-			local key = busyUnits[unitID]
-			myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
-			busyUnits[unitID] = nil -- and from busy units
-		end
+function CommandNotifyTF(unitArray, params, shift)
+	local captureThis = false
+	for i=1, #unitArray do
+		local unitID = unitArray[i]
+		if myUnits[unitID] then -- if it's one of our units
+			if busyUnits[unitID] then -- if the worker is also still on our busy list
+				local key = busyUnits[unitID]
+				myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
+				busyUnits[unitID] = nil -- and from busy units
+			end
 		
-		if shift then -- if the command was given with shift
-			spGiveOrderToUnit(unitID, CMD_TERRAFORM_INTERNAL, params, {""}) -- give the unit the TF order immediately so that it creates the 'terraunits'
-			myUnits[unitID].cmdtype = commandType.idle -- mark it as idle so that it gets reassigned
-			reassignedUnits[unitID] = nil -- ensure that it gets reassigned as soon as it creates the terraunits
-			return true -- return true to tell gui_lasso_terraform that we handled the command externally
-		else -- if the command was not given with shift
-		myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
-		return false
+			if shift then -- if the command was given with shift
+				spGiveOrderToUnit(unitID, CMD_TERRAFORM_INTERNAL, params, {""}) -- give the unit the TF order immediately so that it creates the 'terraunits'
+				myUnits[unitID].cmdtype = commandType.idle -- mark it as idle so that it gets reassigned
+				reassignedUnits[unitID] = nil -- ensure that it gets reassigned as soon as it creates the terraunits
+				captureThis = true -- return true to tell gui_lasso_terraform that we handled the command externally
+				break -- we don't need to process more than one unit if shift was held
+			else -- if the command was not given with shift
+			myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
+			captureThis = false
+			end
 		end
 	end
+	return captureThis
 end
 
 --  This function captures build-related commands given to units in our group and adds them to the queue, and also tracks unit state (ie direct orders vs queued).
