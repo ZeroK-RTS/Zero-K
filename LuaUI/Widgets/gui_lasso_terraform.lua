@@ -267,40 +267,52 @@ local function SendCommand()
 			
 			local a,c,m,s = spGetModKeyState()
 			
-			if s then
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
-				originalCommandGiven = true
-			else
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-				spSetActiveCommand(-1)
-				originalCommandGiven = false
+			local handledExternally = false
+			if (Script.LuaUI('CommandNotifyTF')) then --send away new mex queue in an event called CommandNotifyTF. Used by "unit_global_build_command.lua" and potentially by other widgets.
+				handledExternally = Script.LuaUI.CommandNotifyTF(constructor[1], params, s)
+			end
+			
+			if not handledExternally then
+				if s then
+					Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
+					originalCommandGiven = true
+				else
+					Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+					spSetActiveCommand(-1)
+					originalCommandGiven = false
+				end
 			end
 		end
-	else
-		if (#constructor > 0) then 
-			local params = {}
-			params[1] = terraform_type
-			params[2] = team
-			params[3] = loop
-			params[4] = terraformHeight 
-			params[5] = points
-			params[6] = #constructor
-			params[7] = volumeSelection
-			local i = 8
-			for j = 1, points do
-				params[i] = point[j].x
-				params[i + 1] = point[j].z
-				i = i + 2
-			end
-			
+	elseif (#constructor > 0) then 
+		local params = {}
+		params[1] = terraform_type
+		params[2] = team
+		params[3] = loop
+		params[4] = terraformHeight 
+		params[5] = points
+		params[6] = #constructor
+		params[7] = volumeSelection
+		local i = 8
+		for j = 1, points do
+			params[i] = point[j].x
+			params[i + 1] = point[j].z
 			i = i + 2
-			for j = 1, #constructor do
-				params[i] = constructor[j]
-				i = i + 1
-			end
-			
-			local a,c,m,s = spGetModKeyState()
-			
+		end
+		
+		i = i + 2
+		for j = 1, #constructor do
+			params[i] = constructor[j]
+			i = i + 1
+		end
+		
+		local a,c,m,s = spGetModKeyState()
+		
+		local handledExternally = false
+		if (Script.LuaUI('CommandNotifyTF')) then --send away new mex queue in an event called CommandNotifyTF. Used by "unit_global_build_command.lua" and potentially by other widgets.
+			handledExternally = Script.LuaUI.CommandNotifyTF(constructor[1], params, s)
+		end
+		
+		if not handledExternally then
 			if s then
 				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
 				originalCommandGiven = true
