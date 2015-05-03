@@ -246,7 +246,6 @@ local max	= math.max
 local min	= math.min
 local modf	= math.modf
 
-local visFrame = 15
 local nextFrame	= 15
 local myTeamID = spGetMyTeamID()
 local textColor = {0.7, 1.0, 0.7, 1.0}
@@ -315,6 +314,7 @@ function widget:Initialize()
 	-- ZK compatability stuff
 	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
 	widgetHandler:RegisterGlobal("CommandNotifyTF", CommandNotifyTF) -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
+	widgetHandler:RegisterGlobal("CommandNotifyRaiseAndBuild", CommandNotifyRaiseAndBuild) -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
 end
 
 --	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
@@ -334,7 +334,9 @@ function widget:GameFrame(thisFrame)
 	CheckForRes() -- check if our group includes any units with resurrect, update the global flag
 	
 	for _, cmd in pairs(myQueue) do -- perform validity checks for all the jobs in the queue, and remove any which are no longer valid
-		CleanOrders(cmd, false) -- note: also marks workers whose jobs are invalidated as idle, so that they can be reassigned immediately.
+		if not cmd.tfparams then -- ZK-Specific guard, to stop commands from being removed early due to incomplete terraform
+			CleanOrders(cmd, false) -- note: also marks workers whose jobs are invalidated as idle, so that they can be reassigned immediately.
+		end
 	end
 	
 	if options.splitArea.value then -- if splitting area jobs is enabled
@@ -666,6 +668,8 @@ HOW THIS WORKS:
 	widget:UnitCreated()
 		Detects when new non-factory units are started, and if the builder is one of ours
 		it records the association between the started unit and the job it represents.
+		It also removes jobs when start-nanoframe-only mode is used, and updates ZK-specific
+		raise-and-build commands to normal commands after the terraform finishes.
 	widget:UnitFinished()
 		Detects when a finished unit is from one of our jobs, and performs necessary cleanup.
 	widget:UnitIdle()
@@ -673,9 +677,11 @@ HOW THIS WORKS:
 		deferred processing. This is necessary because UnitIdle sometimes misfires
 		during build jobs, for unknown reasons.
 	CommandNotifyMex()
-		Captures mex commands from ZK-specific gadgets.
+		ZK-Specific: Captures mex commands from the cmd_mex_placement widget.
 	CommandNotifyTF()
-		Captures terraform commands from ZK-Specific gadgets/widgets
+		ZK-Specific: Captures terraform commands from gui_lasso_terraform widget.
+	CommandNotifyRaiseAndBuild()
+		ZK-Specific: Captures raise-and-build commands from gui_lasso_terraform widget.
 	widget:CommandNotify()
 		This captures all the build-related commands from units in our group,
 		and adds them to the global queue.
@@ -720,11 +726,17 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if busyUnits[builderID] then -- if the builder is one of our busy workers
 		local key = busyUnits[builderID]
 		local myCmd = myQueue[key]
+		
+		if myCmd.tfparams then -- ZK-Specific: For combo terraform-build commands, convert to normal build commands once the building has started
+			myQueue[key].tfparams = nil
+			UpdateOneJobPathing(key) -- update pathing, since terraform can change the results
+		end
+			
 		if myCmd.q then -- if given with 'start-only', then cancel the job as soon as it's started
 			StopAnyWorker(key)
 			myQueue[key] = nil
 		else -- otherwise track the unitID in activeJobs so that UnitFinished can remove it from the queue
-		activeJobs[unitID] = key
+			activeJobs[unitID] = key
 		end
 	end
 end
@@ -805,6 +817,63 @@ function CommandNotifyTF(unitArray, params, shift)
 				myUnits[unitID].cmdtype = commandType.idle -- mark it as idle so that it gets reassigned
 				reassignedUnits[unitID] = nil -- ensure that it gets reassigned as soon as it creates the terraunits
 				captureThis = true -- return true to tell gui_lasso_terraform that we handled the command externally
+				nextFrame = nextFrame + 5 -- delay the next assignment frame slightly to ensure that the terraunit is created properly
+				break -- we don't need to process more than one unit if shift was held
+			else -- if the command was not given with shift
+			myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
+			captureThis = false
+			end
+		end
+	end
+	return captureThis
+end
+
+-- ZK-Specific: This function captures combination raise-and-build commands
+function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, tfparams, shift)
+	local notOurs = true -- ensure that the order was given to at least one unit that's in our group
+	for i=1, #unitArray do
+		local unitID = unitArray[i]
+		if myUnits[unitID] then
+			notOurs = false
+			break
+		end
+	end
+	if notOurs then
+	return false -- and stop here if not
+	end
+	
+	local captureThis = false
+	local hotkey = string.byte("q")
+	local isQ = spGetKeyState(hotkey)
+	local myCmd
+	if isQ then
+		myCmd = {id=cmdID, x=x, y=y, z=z, h=h, tfparams=true, assignedUnits={}, q=true}
+	else
+		myCmd = {id=cmdID, x=x, y=y, z=z, h=h, tfparams=true, assignedUnits={}}
+	end
+	
+	local hash = BuildHash(myCmd)
+	
+	if CleanOrders(myCmd, true) or not shift then
+		myQueue[hash] = myCmd
+		UpdateOneJobPathing(hash)
+	end
+	
+	for i=1, #unitArray do
+		local unitID = unitArray[i]
+		if myUnits[unitID] then -- if it's one of our units
+			if busyUnits[unitID] then -- if the worker is also still on our busy list
+				local key = busyUnits[unitID]
+				myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
+				busyUnits[unitID] = nil -- and from busy units
+			end
+		
+			if shift then -- if the command was given with shift
+				spGiveOrderToUnit(unitID, CMD_TERRAFORM_INTERNAL, tfparams, {""}) -- give the unit the TF order immediately so that it creates the 'terraunits'
+				myUnits[unitID].cmdtype = commandType.idle -- mark it as idle so that it gets reassigned
+				reassignedUnits[unitID] = nil -- ensure that it gets reassigned as soon as it creates the terraunits
+				captureThis = true -- return true to tell gui_lasso_terraform that we handled the command externally
+				nextFrame = nextFrame + 5 -- delay the next assignment frame slightly to ensure that the terraunit is created properly
 				break -- we don't need to process more than one unit if shift was held
 			else -- if the command was not given with shift
 			myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
@@ -839,12 +908,9 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}}
 				end
 				local hash = BuildHash(myCmd)
-				if CleanOrders(myCmd, true) then -- check if the job site is obstructed, and clear up any other jobs that overlap.
-						myQueue[hash] = myCmd	-- add it to queue if clear
-						UpdateOneJobPathing(hash)
-				elseif not options.shift then -- if shift was not held, we add the job to the queue anyway and let obstruction checks clean it up later if necessary.
-					myQueue[hash] = myCmd -- note, this means that when shift is held, older overlapping jobs are cancelled along with the new job, but if not then the new job replaces them.
-					UpdateOneJobPathing(hash) -- note: except for repair jobs, we only calculate pathing when a new worker is created and when a new job is added to the list.
+				if CleanOrders(myCmd, true) or not options.shift then -- check if the job site is obstructed, and clear up any other jobs that overlap.
+					myQueue[hash] = myCmd	-- add it to queue if clear
+					UpdateOneJobPathing(hash)
 				end
 
 				if ( options.shift ) then -- if the command was given with shift
@@ -1091,10 +1157,27 @@ function GiveWorkToUnits(unitsToWork)
 					myQueue[key].assignedUnits[unitID] = nil
 				end
 				if myJob.id < 0 then -- for build jobs
-					spGiveOrderToUnit(unitID, myJob.id, { myJob.x, myJob.y, myJob.z, myJob.h }, { "" }) -- issue the cheapest job as an order to the unit
-					busyUnits[unitID] = hash -- save the command info for bookkeeping
-					myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-					myQueue[hash].assignedUnits[unitID] = true
+					if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
+						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {""}) -- issue the cheapest job as an order to the unit
+						busyUnits[unitID] = hash -- save the command info for bookkeeping
+						myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+						myQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
+					else -- ZK-Specific: for combination raise-and-build jobs
+						local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 400)
+						for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
+							local target = localUnits[i]
+							local udid = spGetUnitDefID(target)
+							local unitDef = UnitDefs[udid]
+							if string.match(unitDef.humanName, "erraform") ~= nil and spGetUnitTeam(target) == myTeamID then
+								spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, {""})
+								break
+							end
+						end
+						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {"shift"}) -- add the build part of the command to the end of the queue with options shift
+						busyUnits[unitID] = hash -- save the command info for bookkeeping
+						myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+						myQueue[hash].assignedUnits[unitID] = true
+					end -- end zk-specific guard
 				else -- for repair/reclaim/resurrect
 					if not myJob.target then -- for area commands
 						if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
@@ -1851,7 +1934,7 @@ function StopAnyWorker(key)
 		if myUnits[unit].cmdtype == commandType.buildQueue then -- for units that are under GBC control
 			spGiveOrderToUnit(unit, CMD_REMOVE, {myCmd.id}, {"alt"}) -- remove the current order
 			-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
-			spGiveOrderToUnit(unit, CMD_INSERT, {0,CMD_STOP},{""}) -- and replace it with a stop order
+			spGiveOrderToUnit(unit, CMD_STOP, {}, {""}) -- and replace it with a stop order
 			-- note: giving a unit a stop order does not automatically cancel other orders as it does when a player uses it, which is why we also have to use CMD_REMOVE here.
 			myUnits[unit].cmdtype = commandType.idle -- mark them as idle
 			busyUnits[unit] = nil -- remove their entries from busyUnits, since the job is done

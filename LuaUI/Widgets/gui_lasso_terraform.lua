@@ -240,6 +240,7 @@ end
 
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
+	local handledExternally = false
 
 	if terraform_type == 4 then
 		if (#constructor > 0) then 
@@ -267,8 +268,8 @@ local function SendCommand()
 			
 			local a,c,m,s = spGetModKeyState()
 			
-			local handledExternally = false
-			if (Script.LuaUI('CommandNotifyTF')) then --send away new mex queue in an event called CommandNotifyTF. Used by "unit_global_build_command.lua" and potentially by other widgets.
+			-- send notifications to other widgets, which may want to handle the command instead.
+			if (Script.LuaUI('CommandNotifyTF')) then
 				handledExternally = Script.LuaUI.CommandNotifyTF(constructor, params, s)
 			end
 			
@@ -307,8 +308,11 @@ local function SendCommand()
 		
 		local a,c,m,s = spGetModKeyState()
 		
-		local handledExternally = false
-		if (Script.LuaUI('CommandNotifyTF')) then --send away new mex queue in an event called CommandNotifyTF. Used by "unit_global_build_command.lua" and potentially by other widgets.
+		-- send notifications to other widgets, which may want to handle the command instead.
+		if Script.LuaUI('CommandNotifyRaiseAndBuild') and buildToGive then
+			local cmdid, x, z, h = buildToGive.cmdID, buildToGive.x, buildToGive.z, buildToGive.facing
+			handledExternally = Script.LuaUI.CommandNotifyRaiseAndBuild(constructor, cmdid, x, terraformHeight, z, h, params, s)
+		elseif Script.LuaUI('CommandNotifyTF') then
 			handledExternally = Script.LuaUI.CommandNotifyTF(constructor, params, s)
 		end
 		
@@ -324,23 +328,21 @@ local function SendCommand()
 		end
 	end
 	
-	if buildToGive then
-		if currentlyActiveCommand == CMD_LEVEL then
-			if (#constructor > 0) then
-				local myPlayerID = Spring.GetMyPlayerID()
-				buildToGive.needGameFrame = true
-				buildToGive.constructor = constructor
-				if myPlayerID then
-					-- ping is in seconds
-					local myPing = select(6, Spring.GetPlayerInfo(myPlayerID))
-					buildToGive.waitFrame = 30*ceil(myPing) + 5
-				else
-					buildToGive.waitFrame = 30
-				end
+	if buildToGive and currentlyActiveCommand == CMD_LEVEL and not handledExternally then
+		if (#constructor > 0) then
+			local myPlayerID = Spring.GetMyPlayerID()
+			buildToGive.needGameFrame = true
+			buildToGive.constructor = constructor
+			if myPlayerID then
+				-- ping is in seconds
+				local myPing = select(6, Spring.GetPlayerInfo(myPlayerID))
+				buildToGive.waitFrame = 30*ceil(myPing) + 5
+			else
+				buildToGive.waitFrame = 30
 			end
-		else
-			buildToGive = false
 		end
+	else
+		buildToGive = false
 	end
 	points = 0		
 end
