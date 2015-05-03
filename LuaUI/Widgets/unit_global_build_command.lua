@@ -190,6 +190,7 @@ local spGetLocalPlayerID	= Spring.GetLocalPlayerID
 local spGetPlayerInfo		= Spring.GetPlayerInfo
 local spGetSpectatingState	= Spring.GetSpectatingState
 local spGetModKeyState		= Spring.GetModKeyState
+local spGetKeyState			= Spring.GetKeyState
 local spTestBuildOrder		= Spring.TestBuildOrder
 local spSelectUnitMap		= Spring.SelectUnitMap
 local spGetUnitsInCylinder 	= Spring.GetUnitsInCylinder
@@ -264,6 +265,7 @@ local myUnits = {}	--  list of units in the Central Build group, of the form myU
 local myQueue = {}  --  list of commands for Central Build group, of the form myQueue[BuildHash(cmd)] = cmd
 local busyUnits = {} -- list of units that are currently assigned jobs, of the form busyUnits[unitID] = BuildHash(cmd)
 local idlers = {} -- list of units marked idle by widget:UnitIdle, which need to be double checked due to gadget conflicts. Form is idlers[index] = unitID
+local activeJobs = {} -- list of jobs that have been started, using the UnitID of the building so that we can check completeness via UnitFinished
 local idleCheck = false -- flag if any units went idle
 local areaCmdList = {} -- a list of area commands, for persistently capturing individual reclaim/repair/resurrect jobs from LOS-limited areas. Same form as myQueue.
 local reassignedUnits = {} -- list of units that have already been assigned/reassigned jobs and which don't need to be reassigned until we've cycled through all workers.
@@ -344,6 +346,8 @@ function widget:GameFrame(thisFrame)
 	end
 	
 	CaptureTF() -- ZK-Specific: captures "terraunits" from ZK terraform, and adds repair jobs for them.
+	
+	CleanActiveJobs() -- remove unitIDs for nanoframe-job associations if nanoframes were killed during construction
 	
 	local unitsToWork = FindEligibleWorker()	-- compile list of eligible units and assign them jobs.
 	if (#unitsToWork > 0) then
@@ -659,6 +663,11 @@ HOW THIS WORKS:
 	widget:UnitFromFactory()
 		Separates constructors from the factory stream, if enabled. Uses ZK-specific,
 		factory-dependent values for clearing distance.
+	widget:UnitCreated()
+		Detects when new non-factory units are started, and if the builder is one of ours
+		it records the association between the started unit and the job it represents.
+	widget:UnitFinished()
+		Detects when a finished unit is from one of our jobs, and performs necessary cleanup.
 	widget:UnitIdle()
 		This catches units from our group as they go idle, and marks them for
 		deferred processing. This is necessary because UnitIdle sometimes misfires
@@ -706,6 +715,30 @@ function widget:GroupChanged(groupId)
 	end
 end
 
+-- This function detects when our workers have started a job
+function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	if busyUnits[builderID] then -- if the builder is one of our busy workers
+		local key = busyUnits[builderID]
+		local myCmd = myQueue[key]
+		if myCmd.q then -- if given with 'start-only', then cancel the job as soon as it's started
+			StopAnyWorker(key)
+			myQueue[key] = nil
+		else -- otherwise track the unitID in activeJobs so that UnitFinished can remove it from the queue
+		activeJobs[unitID] = key
+		end
+	end
+end
+
+-- This function detects when a unit was finished and it was from a job on the queue, and does necessary cleanup
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	if activeJobs[unitID] then
+		local key = activeJobs[unitID]
+		StopAnyWorker(key)
+		myQueue[key] = nil
+		activeJobs[unitID] = nil
+	end
+end
+
 -- This function implements auto-repair
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
 	if unitTeam == myTeamID and options.autoRepair.value then
@@ -735,16 +768,6 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		dx = dx*facScale
 		dz = dz*facScale
 		spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
-	end
-end
-
--- ZK-Specific: This function detects and captures terraform jobs when they're started
-function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	local unitDef = UnitDefs[unitDefID]
-	if string.match(unitDef["tooltip"], "erraform") ~= nil and unitTeam == myTeamID then
-		local myCmd = {id=40, target=unitID, assignedUnits={}}
-		local hash = BuildHash(myCmd)
-		myQueue[hash] = myCmd
 	end
 end
 
@@ -806,8 +829,15 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	for _, unitID in pairs(selectedUnits) do	-- check selected units...
 		if myUnits[unitID] then	--  was issued to one of our units.
 			if ( id < 0 ) then --if the order is for building something
+				local hotkey = string.byte("q")
+				local isQ = spGetKeyState(hotkey)
 				local x, y, z, h = params[1], params[2], params[3], params[4]
-				local myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}}
+				local myCmd
+				if isQ then
+					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}, q=true}
+				else
+					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}}
+				end
 				local hash = BuildHash(myCmd)
 				if CleanOrders(myCmd, true) then -- check if the job site is obstructed, and clear up any other jobs that overlap.
 						myQueue[hash] = myCmd	-- add it to queue if clear
@@ -842,9 +872,12 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					if options.shift then -- for queued jobs
 						return true -- capture the command
 					else -- for direct orders
+						if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
+							myQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
+						end
 						busyUnits[unitID] = hash -- add the worker to our busy list
 						myUnits[unitID].cmdtype = commandType.drec -- and mark it as under direct orders
-						myQueue[hash].assignedUnits[unitID] = true
+						myQueue[hash].assignedUnits[unitID] = true -- add it to the assignment list for its new job
 					end
 				else --otherwise if it was single-target
 					local target = params[1]
@@ -874,6 +907,9 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 					if options.shift then --and if the command was given with shift
 						return true -- return true to capture it
 					else
+						if busyUnits[unitID] then -- if our unit was interrupted by a direct order while performing a job
+							myQueue[busyUnits[unitID]].assignedUnits[unitID] = nil -- remove it from the list of workers assigned to its previous job
+						end
 						myUnits[unitID].cmdtype = commandType.drec -- otherwise mark it as under user direction
 						busyUnits[unitID] = hash -- and add it to our busy list for cost calculations
 						myQueue[hash].assignedUnits[unitID] = true
@@ -896,7 +932,7 @@ end
 -------------------------------------------------------------------
 -- This function gets the hotkey event for triggering the area job remove tool.
 function widget:KeyPress(key, mods, isRepeat)
-	local hotkey = string.byte( "x" )
+	local hotkey = string.byte("x")
 	if key == hotkey and mods.ctrl then
 		removeToolIsActive = true
 	elseif key == KEYSYMS.ESCAPE and removeToolIsActive then
@@ -1272,19 +1308,17 @@ function CheckIdlers()
 			-- if there's a command on the queue, do nothing and let it be removed from the idle list.
 			else -- otherwise if the unit is really idle
 				myUnits[unitID].cmdtype = commandType.idle -- then mark it as idle
+				reassignedUnits[unitID] = nil
 				if busyUnits[unitID] then -- if the worker is also still on our busy list
 					local key = busyUnits[unitID]
-					local cmd = myQueue[key]
-				
 					if areaCmdList[key] then -- if it was an area command
 						areaCmdList[key] = nil -- remove it from the area update list
 						StopAnyWorker(key)
-						myQueue[key] = nil -- and from the queue, since UnitIdle is the only way to tell if area commands are finished
-					elseif cmd.id < 0 and UnitDefs[abs(cmd.id)].canMove then -- for mobile unit jobs such as building an athena, or athena's units, since CleanOrders sucks at clearing them
-						StopAnyWorker(key) -- this is to prevent units from 'unintentionally' duplicating orders for mobile units in the same spot
-						myQueue[key] = nil -- remove it from the queue, since UnitIdle means the job was finished
-					end -- otherwise take the worker off of busyUnits and let CleanOrders handle the rest.
+						myQueue[key] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
+						busyUnits[unitID] = nil
+					else
 					busyUnits[unitID] = nil
+					end
 				end
 			end
 		end
@@ -1546,6 +1580,8 @@ HOW THIS WORKS:
 		job is added to the queue, and does basically the same thing as UpdateOneWorkerPathing().
 	CleanPathing()
 		Performs garbage collection for unreachable caches, removing jobs that are no longer on the queue.
+	CleanActiveJobs()
+		Performs garbage collection for the activeJobs list, in case any nanoframes were killed during construction.
 	RemoveJobs()
 		Takes an area select as input, and removes any job from the queue that falls within it. Used by the job
 		removal tool.
@@ -1701,6 +1737,15 @@ function CleanPathing(iUnits)
 	end
 end
 
+-- This function performs garbage collection for started jobs, in case nanoframes were killed during the building process
+function CleanActiveJobs()
+	for unitID, key in pairs(activeJobs) do
+		if not myQueue[key] or not spValidUnitID(unitID) then
+			activeJobs[unitID] = nil
+		end
+	end
+end
+
 -- This function implements area removal for GBC jobs.
 function RemoveJobs(x, z, r)
 	for key, cmd in pairs(myQueue) do
@@ -1801,11 +1846,13 @@ end
 -- Tell any worker for construction of "myQueue[key]" to stop the job immediately
 -- Used only when jobs are known to be finished or cancelled
 function StopAnyWorker(key)
-	for unit,_ in pairs(myQueue[key].assignedUnits) do
+	local myCmd = myQueue[key]
+	for unit,_ in pairs(myCmd.assignedUnits) do
 		if myUnits[unit].cmdtype == commandType.buildQueue then -- for units that are under GBC control
-			spGiveOrderToUnit(unit, CMD_REMOVE, {myQueue[key].id}, {""}) -- remove the current order
+			spGiveOrderToUnit(unit, CMD_REMOVE, {myCmd.id}, {"alt"}) -- remove the current order
+			-- note: options "alt" with CMD_REMOVE tells it to use params as command ids, which is what we want.
 			spGiveOrderToUnit(unit, CMD_INSERT, {0,CMD_STOP},{""}) -- and replace it with a stop order
-			-- note: giving a unit a stop order does not automatically cancel other orders as it does when a player uses it, which is why we have to use CMD_REMOVE here.
+			-- note: giving a unit a stop order does not automatically cancel other orders as it does when a player uses it, which is why we also have to use CMD_REMOVE here.
 			myUnits[unit].cmdtype = commandType.idle -- mark them as idle
 			busyUnits[unit] = nil -- remove their entries from busyUnits, since the job is done
 			reassignedUnits[unit] = nil -- and remove them from our reassigned units list, so that they will be immediately processed

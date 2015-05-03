@@ -19,88 +19,50 @@ function widget:GetInfo()
     author    = "TheFatController",
     date      = "Mar 20, 2007",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = 11,
     enabled   = false  --  loaded by default?
   }
 end
 
 --------------------------------------------------------------------------------
 
-local GetCommandQueue = Spring.GetCommandQueue
-local GetPlayerInfo = Spring.GetPlayerInfo
-local GetUnitPosition = Spring.GetUnitPosition
-local GiveOrderToUnit = Spring.GiveOrderToUnit
-local GetMyTeamID = Spring.GetMyTeamID
+local Echo = Spring.Echo
+local spGetSpectatingState = Spring.GetSpectatingState
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitDirection = Spring.GetUnitDirection
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetMyTeamID = Spring.GetMyTeamID
+local CMD_MOVE = CMD.MOVE
 
 --------------------------------------------------------------------------------
 
-local countDown = -1
-local DELAY = 0.2
-local moveUnits = {}
-local myID = 0
 
-local function checkSpec()
-  local _, _, spec = GetPlayerInfo(myID)
-  if spec then
-    widgetHandler:RemoveWidget()
-  end
+local myTeamID = spGetMyTeamID()
+
+function widget:PlayerChanged(playerID)
+	if spGetSpectatingState() then -- remove widget if the player switches to spec
+		widgetHandler:RemoveWidget()
+	end
 end
 
 function widget:Initialize()
- myID = Spring.GetMyPlayerID()
- checkSpec()
-end
-
-function widget:Update(deltaTime)
- if (countDown == -1) then
-   return
- else
-   countDown = countDown + deltaTime
- end
-
- if (countDown > DELAY) then
-   for unitID,_ in pairs(moveUnits) do
-     local cQueue = GetCommandQueue(unitID, 1)
-     if (table.getn(cQueue) == 0) then
-       local x, y, z = GetUnitPosition(unitID)
-       if (math.random(1,2) == 1) then
-         x = x + math.random(50,100)
-       else
-         x = x - math.random(50,100)
-       end
-       if (math.random(1,2) == 1) then
-         z = z + math.random(50,100)
-       else
-         z = z - math.random(50,100)
-       end
-       GiveOrderToUnit(unitID, CMD.FIGHT,  { x, y, z}, { "" })
-     end
-   end
-   moveUnits = {}
-   countDown = -1
- end
-end
-
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)                          
-  for uID,_ in pairs(moveUnits) do
-    if (uID == unitID) then
-      table.remove(moveUnits,uID)
-      break
-    end
-  end
+	if spGetSpectatingState() then
+		widgetHandler:RemoveWidget()
+	end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
- if (unitTeam ~= GetMyTeamID()) then
-   return
- end
-   
- local ud = UnitDefs[unitDefID]
- if (ud and (not ud.customParams.commtype) and (ud.speed > 0)) then
-   checkSpec()
-   moveUnits[unitID] = true
-   countDown = 0
- end
+	if unitTeam == myTeamID then
+		local unitDef = UnitDefs[unitDefID]
+		if unitDef.canMove then
+			local dx,_,dz = spGetUnitDirection(unitID)
+			local x,y,z = spGetUnitPosition(unitID)
+			-- convert dimensionless direction into a distance of 200 elmos, then add it to the location to get the destination
+			dx = dx*200
+			dz = dz*200
+			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""})
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
