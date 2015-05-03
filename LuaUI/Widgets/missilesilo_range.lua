@@ -4,7 +4,7 @@ function widget:GetInfo()
 		name      = "Missile Silo Range",
 		desc      = "Displays the ranges of the missiles that the missile silo can produce",
 		author    = "Google Frog",
-		date      = "Dec 10, 2009",
+		date      = "Dec 10, 2009", --updated May 3, 2015
 		license   = "GNU GPL v2",
 		layer     = 0,
 		enabled   = true
@@ -18,13 +18,14 @@ local radiusCount = 5
 
 local drawRadius = {}
 
+--large textSize & opacity for large radius/tiny text & opacity for small radius, help increase text visibility during zoom-out/zoom-in
 drawRadius[1] = {
 	range = 3500,
 	color = {1,0.2,0.2,1},
 	text = "Tacnuke and EMP",
 	width = 1,
 	miniWidth = 1,
-	textSize = 90,
+	textSize = 180,
 	}
 
 drawRadius[2] = {
@@ -33,7 +34,7 @@ drawRadius[2] = {
 	text = "EMP AOE",
 	width = 1,
 	miniWidth = 1,
-	textSize = 90,
+	textSize = 180,
 	}	
 	
 drawRadius[3] = {
@@ -42,16 +43,16 @@ drawRadius[3] = {
 	text = "Seismic",
 	width = 1,
 	miniWidth = 1,
-	textSize = 90,
+	textSize = 260,
 	}
 	
 drawRadius[4] = {
 	range = 1500,
-	color = {0.2,0.2,1,0.5},
+	color = {0.2,0.2,1,0.75},
 	text = "EMP vertical",
 	width = 1,
 	miniWidth = 1,
-	textSize = 60,
+	textSize = 120,
 	--stipple = {4,1000},
 	}
 	
@@ -74,10 +75,13 @@ local spTraceScreenRay		= Spring.TraceScreenRay
 local spGetMouseState		= Spring.GetMouseState
 local spTraceScreenRay		= Spring.TraceScreenRay
 local spGetGroundHeight		= Spring.GetGroundHeight
-	
+local spGetCameraState 		= Spring.GetCameraState
+
 local siloDefID = -UnitDefNames["missilesilo"].id
 
 local floor = math.floor
+local cos = math.cos
+local sin = math.sin
 local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ
 
@@ -100,7 +104,7 @@ local glLineStipple			= gl.LineStipple
 
 local function DrawActiveCommandRanges()
 
-	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
+	local _, cmd_id = spGetActiveCommand()
 	
 	if not (cmd_id and cmd_id == siloDefID) then
 		return
@@ -118,6 +122,15 @@ local function DrawActiveCommandRanges()
 	
 	local height = spGetGroundHeight(mouse[1],mouse[3])
 	
+	--handle COFC rotation
+	local cs = spGetCameraState()
+	local dx,dz = 0, 1
+	if cs.ry then
+		local rotY = cs.ry - 1.5707
+		dx = cos(rotY)
+		dz = sin(rotY)
+	end
+	
 	for i = 1, radiusCount do
 		local radius = drawRadius[i]
 		
@@ -132,7 +145,7 @@ local function DrawActiveCommandRanges()
 		glDrawGroundCircle(mouse[1], 0, mouse[3], radius.range, circleDivs )
 		
 		glPushMatrix()
-		glTranslate(mouse[1] ,  height ,mouse[3]-radius.range-10)
+		glTranslate(mouse[1] + radius.range*dx,  height ,mouse[3]-(radius.range*dz)-5 )
 		glBillboard()
 		glText( radius.text, 0, 0, radius.textSize, "cn")
 		glPopMatrix()  
@@ -147,7 +160,7 @@ end
 
 local function DrawActiveCommandRangesMinimap()
 
-	local idx, cmd_id, cmd_type, cmd_name = spGetActiveCommand()
+	local _, cmd_id = spGetActiveCommand()
 	
 	if not (cmd_id and cmd_id == siloDefID) then
 		return
