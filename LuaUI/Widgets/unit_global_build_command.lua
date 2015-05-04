@@ -270,6 +270,7 @@ local areaCmdList = {} -- a list of area commands, for persistently capturing in
 local reassignedUnits = {} -- list of units that have already been assigned/reassigned jobs and which don't need to be reassigned until we've cycled through all workers.
 local groupHasChanged = true	--	Flag if group members have changed.
 local hasRes = false
+local queueCount = 0 -- the number of jobs currently on the queue, which must be updated every assignment frame since #aTable only works for arrays
 
 -- variables used by the area job remove feature
 local removeToolIsActive = false
@@ -284,13 +285,6 @@ local areaList = {}
 local stRepList = {}
 local stRecList = {}
 local stResList = {}
-local buildLinesDrawList
-local areaLinesDrawList
-local buildDrawList
-local areaDrawList
-local stRepDrawList
-local stRecDrawList
-local stResDrawList
 --------------------------------------------
 --List of prefix used as value for myUnits[]
 local commandType = {
@@ -333,8 +327,10 @@ function widget:GameFrame(thisFrame)
 	
 	CheckForRes() -- check if our group includes any units with resurrect, update the global flag
 	
+	queueCount = 0 -- reset the queue count
 	for _, cmd in pairs(myQueue) do -- perform validity checks for all the jobs in the queue, and remove any which are no longer valid
-		if not cmd.tfparams then -- ZK-Specific guard, to stop commands from being removed early due to incomplete terraform
+		queueCount = queueCount + 1 -- count the jobs on the queue while checking them, for the constructor separator
+		if not cmd.tfparams and not cmd.isStarted then -- prevents CleanOrders from clobbering UnitFinished and causing a nil error. tfparams is ZK-specific, remove it if porting.
 			CleanOrders(cmd, false) -- note: also marks workers whose jobs are invalidated as idle, so that they can be reassigned immediately.
 		end
 	end
@@ -365,28 +361,26 @@ end
 --[[
 HOW THIS WORKS:
 	widget:Update()
-		Sorts myQueue by visibility and compiles gl.Lists for drawing.
+		Pre-sorts myQueue by visibility and type for drawing.
 	widget:DrawWorldPreUnit()
-		Calls the lists for drawing building outlines for build jobs, area circles for area commands,
-		and the circle for the area job remove tool. These have to be drawn pre-unit or else they clobber
-		one another for whatever obscure reasons.
+		Calls the functions for drawing building outlines and area command circles, since these need to be drawn first.
 	widget:DrawWorld()
-		Draws status tags on units, calls the lists for drawing building "ghosts" for build jobs, and
+		Draws status tags on units, calls the functions for drawing building "ghosts" for build jobs, and
 		command icons for other jobs.
 	widget:DrawScreen()
 		Changes the cursor if the area job remove tool is active.
 	DrawBuildLines()
-		Produces the gl code for drawing building outlines, using DrawOutline().
+		Draws building outlines for build jobs, using DrawOutline().
 	DrawAreaLines()
-		Produces the gl code for drawing ground circles for area commands.
+		Draws ground circles for area commands.
 	DrawBuildingGhosts()
 		Produces the gl code for drawing building ghosts for build jobs.
 	DrawSTIcons()
-		Produces the gl code for drawing command icons, takes a list as input rather than globals
-		since it's used to create 3 different lists for 3 different icon types.
+		Draws command icons for single-target commands, takes a list as input rather than globals
+		directly, since it's used to draw 3 different icon types.
 ]]--
 
--- Run pre-draw visibility checks, sort myQueue and create gl Lists for efficient drawing
+-- Run pre-draw visibility checks, and sort myQueue for drawing.
 function widget:Update(dt)
 	if spIsGUIHidden() then
 		return
@@ -397,13 +391,7 @@ function widget:Update(dt)
 	stRepList = {}
 	stRecList = {}
 	stResList = {}
-	glDeleteList(buildLinesDrawList)
-	glDeleteList(areaLinesDrawList)
-	glDeleteList(buildDrawList)
-	glDeleteList(areaDrawList)
-	glDeleteList(stRepDrawList)
-	glDeleteList(stRecDrawList)
-	glDeleteList(stResDrawList)
+	
 	local alt, ctrl, meta, shift = spGetModKeyState()
 	if shift or options.alwaysShow.value then
 		for _, myCmd in pairs(myQueue) do
@@ -439,13 +427,6 @@ function widget:Update(dt)
 				end
 			end
 		end
-		buildLinesDrawList = glCreateList(DrawBuildLines)
-		areaLinesDrawList = glCreateList(DrawAreaLines)
-		buildDrawList = glCreateList(DrawBuildingGhosts)
-		areaDrawList = glCreateList(DrawAreaIcons)
-		stRepDrawList = glCreateList(DrawSTIcons, stRepList)
-		stRecDrawList = glCreateList(DrawSTIcons, stRecList)
-		stResDrawList = glCreateList(DrawSTIcons, stResList)
 	end
 end
 
@@ -473,7 +454,7 @@ function widget:DrawWorldPreUnit()
 			glLineWidth(1)
 		end
 		
-		glCallList(buildLinesDrawList) -- draw building outlines
+		DrawBuildLines() -- draw building outlines
 		
 		if shift and options.alwaysShow.value then
 			glLineWidth(4)
@@ -481,7 +462,7 @@ function widget:DrawWorldPreUnit()
 			glLineWidth(2)
 		end
 		
-		glCallList(areaLinesDrawList) -- draw circles for area repair/reclaim/res
+		DrawAreaLines() -- draw circles for area repair/reclaim/res
 		
 		glColor(1, 1, 1, 1)
 		glLineWidth(1)
@@ -522,7 +503,7 @@ function widget:DrawWorld()
 		end
 		
 		glDepthTest(true)
-		glCallList(buildDrawList) -- draw building ghosts
+		DrawBuildingGhosts() -- draw building ghosts
 		glDepthTest(false)
 		
 		if shift and options.alwaysShow.value then -- increase the opacity of command icons when shift is held
@@ -531,7 +512,7 @@ function widget:DrawWorld()
 			glColor(1, 1, 1, 0.6)
 		end
 		
-		glCallList(areaDrawList) -- draw icons for area commands
+		DrawAreaIcons() -- draw icons for area commands
 		
 		if shift and options.alwaysShow.value then -- increase the opacity of command icons when shift is held
 			glColor(1, 1, 1, 0.7)
@@ -542,14 +523,14 @@ function widget:DrawWorld()
 		-- draw icons for single-target commands
 		if not (options.autoRepair.value and not shift) then -- don't draw repair icons if autorepair is enabled, unless shift is held
 			glTexture(rep_icon)
-			glCallList(stRepDrawList)
+			DrawSTIcons(stRepList)
 		end
 		
 		glTexture(rec_icon)
-		glCallList(stRecDrawList)
+		DrawSTIcons(stRecList)
 		
 		glTexture(res_icon)
-		glCallList(stResDrawList)
+		DrawSTIcons(stResList)
 		
 		glColor(1, 1, 1, 1)
 	end
@@ -739,6 +720,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			myQueue[key] = nil
 		else -- otherwise track the unitID in activeJobs so that UnitFinished can remove it from the queue
 			activeJobs[unitID] = key
+			myQueue[key].isStarted = true -- prevents CleanOrders from clobbering UnitFinished and UnitTaken
 		end
 	end
 end
@@ -747,8 +729,10 @@ end
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if activeJobs[unitID] then
 		local key = activeJobs[unitID]
-		StopAnyWorker(key)
-		myQueue[key] = nil
+		if myQueue[key] then
+			StopAnyWorker(key)
+			myQueue[key] = nil
+		end
 		activeJobs[unitID] = nil
 	end
 end
@@ -763,6 +747,10 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 			busyUnits[unitID] = nil
 		end
 	elseif activeJobs[unitID] then
+		local key = activeJobs[unitID]
+		if myQueue[key] then
+			myQueue[key].isStarted = false
+		end
 		activeJobs[unitID] = nil
 	end
 end
@@ -773,13 +761,17 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 		myUnits[unitID] = nil
 		if busyUnits[unitID] then
 			local key = busyUnits[unitID]
-			myQueue[key].assignedUnits[unitID] = nil
+			if myQueue[key] then
+				myQueue[key].assignedUnits[unitID] = nil
+			end
 			busyUnits[unitID] = nil
 		end
 	elseif activeJobs[unitID] then
 		local key = activeJobs[unitID]
-		StopAnyWorker(key)
-		myQueue[key] = nil -- remove jobs from the queue when nanoframes are captured, since the job will be obstructed anyway
+		if myQueue[key] then
+			StopAnyWorker(key)
+			myQueue[key] = nil -- remove jobs from the queue when nanoframes are captured, since the job will be obstructed anyway
+		end
 		activeJobs[unitID] = nil
 	end
 end
@@ -799,8 +791,10 @@ end
 -- Note: Zero-K specific factDefIDs, customize if porting to another game!
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if unitTeam == spGetMyTeamID() and UnitDefs[unitDefID].isBuilder and options.separateConstructors.value then -- if it's our unit, and is a builder, and constructor separator is enabled
-		local facScale = 0 -- how far our unit will be told to move
-		if factDefID == 299 then -- boatfac, needs a huge clearance
+		local facScale -- how far our unit will be told to move
+		if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
+			facScale = 500
+		elseif factDefID == 299 then -- boatfac, needs a huge clearance
 			facScale = 250
 		elseif factDefID == 295 then -- hoverfac, needs extra clearance
 			facScale = 140
@@ -948,9 +942,9 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				local x, y, z, h = params[1], params[2], params[3], params[4]
 				local myCmd
 				if isQ then
-					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}, q=true}
+					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}, q=true, isStarted=false}
 				else
-					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}}
+					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}, isStarted=false}
 				end
 				local hash = BuildHash(myCmd)
 				if CleanOrders(myCmd, true) or not options.shift then -- check if the job site is obstructed, and clear up any other jobs that overlap.
@@ -1321,8 +1315,12 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	local job = myQueue[hash]
     local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
     
-    local costMod = 1 -- our cost modifier
+    local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
     
+    -- note we only count workers that are roughly closer/equal distance to the job,
+    -- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
+    -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
+    -- but does not directly determine the behavior.
 	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
 		if ( unitID ~= unit) then -- excluding our current worker.
 			local ix, _, iz = spGetUnitPosition(unit)
@@ -1349,16 +1347,27 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	-- This is due to high rates of worker (and com) suicide from following combat units if repair is prioritized higher.
 	-- Resurrect is given the highest overall priority due to its exclusive nature.
 	
+	-- If you want to change the assignment behavior, the stuff below is what you should edit.
+	-- Note that cost represents a distance, which is why cost modifiers use addition,
+	-- and the 'magic constants' for that were chosen based on typical map scaling.
+	-- Metal cost for "expensive" jobs is also based on Zero-K scaling, so you may want to adjust that if porting.
+	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
+	
 	local cost
+	local metalCost = false
+	
+	if job.id < 0 then -- for build jobs, get the metal cost
+		metalCost = UnitDefs[abs(job.id)].metalCost
+	end
 	
 	if costMod == 1 then -- for starting new jobs
-		if job.id == 40 or job.id == 90 or (job.id < 0 and UnitDefs[abs(job.id)].metalCost > 300) then
+		if job.id == 40 or job.id == 90 or (metalCost and metalCost > 300) then
 			cost = distance + 600 -- #3
 		else
 			cost = distance -- #1
 		end
 	else -- for assisting other workers
-		if (job.id < 0 and UnitDefs[abs(job.id)].metalCost > 300) or job.id == 125 then
+		if (metalCost and metalCost > 300) or job.id == 125 then
 			cost = distance + (100 * costMod) -- #2
 		elseif job.id == 40 or job.id == 90 then
 			cost = distance + (300 * costMod) -- #4
@@ -1609,11 +1618,11 @@ function CleanOrders(cmd, isNew)
 			end
 		
 			if isObstructed and not isNano then -- note, we need to wait until ALL obstructions have been accounted for before cleaning up blocked jobs, or else we may not correctly identify the nanoframe if it's the main obstructor.
-					if myQueue[hash] then
-						StopAnyWorker(hash)
-						myQueue[hash] = nil
-					end
-					isClear = false
+				if myQueue[hash] then
+					StopAnyWorker(hash)
+					myQueue[hash] = nil
+				end
+				isClear = false
 			end
 		end
 		
@@ -1728,8 +1737,6 @@ HOW THIS WORKS:
 		job is added to the queue, and does basically the same thing as UpdateOneWorkerPathing().
 	CleanPathing()
 		Performs garbage collection for unreachable caches, removing jobs that are no longer on the queue.
-	CleanActiveJobs()
-		Performs garbage collection for the activeJobs list, in case any nanoframes were killed during construction.
 	RemoveJobs()
 		Takes an area select as input, and removes any job from the queue that falls within it. Used by the job
 		removal tool.
