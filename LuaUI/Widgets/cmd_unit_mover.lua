@@ -31,8 +31,11 @@ local spGetSpectatingState = Spring.GetSpectatingState
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDirection = Spring.GetUnitDirection
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetCommandQueue = Spring.GetCommandQueue
 local spGetMyTeamID = Spring.GetMyTeamID
 local CMD_MOVE = CMD.MOVE
+local currentFrame = 15
+local myUnits = {}
 
 --------------------------------------------------------------------------------
 
@@ -51,18 +54,37 @@ function widget:Initialize()
 	end
 end
 
+function widget:GameFrame(thisFrame)
+	for unitID, frame in pairs(myUnits) do
+		if thisFrame >= frame then
+			local cmd = GetFirstCommand(unitID)
+			if not cmd then -- if the unit already has a command, we should leave it alone
+				local dx,_,dz = spGetUnitDirection(unitID)
+				local x,y,z = spGetUnitPosition(unitID)
+				-- convert dimensionless direction into a distance of 400 elmos, then add it to the location to get the destination
+				dx = dx*400
+				dz = dz*400
+				spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""})
+			end
+			myUnits[unitID] = nil
+		end
+	end
+	currentFrame = thisFrame
+end
+
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if unitTeam == myTeamID then
 		local unitDef = UnitDefs[unitDefID]
 		if unitDef.canMove then
-			local dx,_,dz = spGetUnitDirection(unitID)
-			local x,y,z = spGetUnitPosition(unitID)
-			-- convert dimensionless direction into a distance of 200 elmos, then add it to the location to get the destination
-			dx = dx*200
-			dz = dz*200
-			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""})
+			myUnits[unitID] = currentFrame + 5 -- wait 5 frames before checking the unit to see if it has a command
 		end
 	end
+end
+
+--	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
+function GetFirstCommand(unitID)
+	local queue = spGetCommandQueue(unitID, 1)
+	return queue[1]
 end
 
 --------------------------------------------------------------------------------
