@@ -27,7 +27,8 @@ function script.setSFXoccupy(num)
 	end
 end
 
-function script.HitByWeapon (x, z, weaponDefID, damage)  
+function script.HitByWeapon (x, z, weaponDefID, damage)
+	if weaponDefID < 0 then return damage end
 	if not submerged then
 		local damages = WeaponDefs[weaponDefID].damages
 		return damage * (damages[elseArmorClass] / damages[subArmorClass])
@@ -43,7 +44,7 @@ function script.Killed(recentDamage, maxHealth)
 	elseif (severity <= .5) then
 		Explode(base, SFX.SHATTER)
 		return 1
-	else	
+	else
 		Explode(base, SFX.SHATTER)
 		return 2
 	end
