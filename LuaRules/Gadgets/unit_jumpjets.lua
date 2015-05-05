@@ -69,6 +69,8 @@ local jumps = {}
 local jumping = {}
 local goalSet = {}
 
+local quiteNew = not Spring.Utilities.IsCurrentVersionNewerThan(95, 0)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -85,6 +87,15 @@ local jumpCmdDesc = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function spTestMoveOrderX(unitDefID, x, y, z)
+	if quiteNew then
+		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
+	else
+		return spTestMoveOrder(unitDefID, x, y, z)
+	end
+end
+
 
 local function GetDist3(a, b)
 	local x, y, z = (a[1] - b[1]), (a[2] - b[2]), (a[3] - b[3])
@@ -352,7 +363,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 	
 	if cmdID == CMD_JUMP and 
-			not spTestMoveOrder(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 0, 0, 0, true, true, true) then
+			not spTestMoveOrderX(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3]) then
 		return false
 	end
 	if goalSet[unitID] then
