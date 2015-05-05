@@ -60,7 +60,7 @@ local innersize = 0.9 -- circle scale compared to unit radius
 local selectinner = 1.5
 local outersize = 1.8 -- outer fade size compared to circle scale (1 = no outer fade)
 local scalefaktor = 2.8
-local rectangleFactor = 3.5
+local rectangleFactor = 2.7
 local CAlpha = 0.2
 
 local colorout = {   1,   1,   1,   0 } -- outer color
@@ -342,11 +342,10 @@ end
 --------------------------------------------------------------------------------
 local visibleSelected = {}
 local degrot = {}
-function widget:Update()
-	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
-	
-	for i=1, #visibleSelected do
-		local unitID = visibleSelected[i]
+
+local function UpdateUnitListRotation(unitList)
+	for i=1, #unitList do
+		local unitID = unitList[i]
 		local dirx, _, dirz = spGetUnitDirection(unitID)
 		if (dirz ~= nil) then
 			if dirx < 0 then
@@ -356,6 +355,13 @@ function widget:Update()
 			end
 		end
 	end
+end
+
+function widget:Update()
+	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
+	
+	UpdateUnitListRotation(visibleSelected)
+	UpdateUnitListRotation(visibleAllySelUnits)
 end
 
 
