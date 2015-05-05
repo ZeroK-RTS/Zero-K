@@ -1357,12 +1357,14 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = UnitDefs[abs(job.id)].metalCost
+		metalCost = UnitDefs[abs(job.id)].cost
 	end
 	
 	if costMod == 1 then -- for starting new jobs
 		if job.id == 40 or job.id == 90 or (metalCost and metalCost > 300) then
 			cost = distance + 600 -- #3
+		elseif metalCost and string.match(UnitDefs[abs(job.id)].humanName, "Extractor") then
+			cost = distance - 200  -- #1.5: mexes get a somewhat higher priority, depending on their output
 		else
 			cost = distance -- #1
 		end
@@ -1587,7 +1589,7 @@ function CleanOrders(cmd, isNew)
 		if canBuildThisThere == blockageType.free then -- if our job is not obstructed by anything
 		-- do nothing, leave isClear set to true.
 		else -- otherwise if our job is blocked by something
-			local r = ( sqrt(xSize^2+zSize^2) /2 )+30 -- convert the rectangular diagonal into a radius, buffer it for increased reliability with small buildings.
+			local r = ( sqrt(xSize^2+zSize^2) /2 )+75 -- convert the rectangular diagonal into a radius, buffer it for increased reliability with small buildings.
 			local blockingUnits = spGetUnitsInCylinder(cx+(xSize/2), cz+(zSize/2), r)
 			for i=1, #blockingUnits do
 				local blockerID = blockingUnits[i]

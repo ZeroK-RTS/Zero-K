@@ -75,7 +75,7 @@ end
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if unitTeam == myTeamID then
 		local unitDef = UnitDefs[unitDefID]
-		if unitDef.canMove then
+		if unitDef.canMove and unitDef.cost < 600 then -- only target mobile units that aren't commanders
 			myUnits[unitID] = currentFrame + 5 -- wait 5 frames before checking the unit to see if it has a command
 		end
 	end
