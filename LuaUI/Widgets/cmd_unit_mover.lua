@@ -31,11 +31,9 @@ local spGetSpectatingState = Spring.GetSpectatingState
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitDirection = Spring.GetUnitDirection
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local spGetCommandQueue = Spring.GetCommandQueue
+local spGetUnitDefID = Spring.GetUnitDefID
 local spGetMyTeamID = Spring.GetMyTeamID
 local CMD_MOVE = CMD.MOVE
-local currentFrame = 15
-local myUnits = {}
 
 --------------------------------------------------------------------------------
 
@@ -54,37 +52,23 @@ function widget:Initialize()
 	end
 end
 
-function widget:GameFrame(thisFrame)
-	for unitID, frame in pairs(myUnits) do
-		if thisFrame >= frame then
-			local cmd = GetFirstCommand(unitID)
-			if not cmd then -- if the unit already has a command, we should leave it alone
-				local dx,_,dz = spGetUnitDirection(unitID)
-				local x,y,z = spGetUnitPosition(unitID)
-				-- convert dimensionless direction into a distance of 400 elmos, then add it to the location to get the destination
-				dx = dx*400
-				dz = dz*400
-				spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""})
-			end
-			myUnits[unitID] = nil
-		end
-	end
-	currentFrame = thisFrame
-end
-
-function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if unitTeam == myTeamID then
+function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	if unitTeam == myTeamID and builderID then -- commanders spawn with nil builderID
 		local unitDef = UnitDefs[unitDefID]
-		if unitDef.canMove and unitDef.cost < 600 then -- only target mobile units that aren't commanders
-			myUnits[unitID] = currentFrame + 5 -- wait 5 frames before checking the unit to see if it has a command
+		local builderDefID = spGetUnitDefID(builderID)
+		local builderDef = UnitDefs[builderDefID]
+		if (string.match(unitDef.humanName, "Athena")
+		or string.match(builderDef.humanName, "Athena")
+		or string.match(builderDef.humanName, "Strider"))
+		and unitDef.canMove then
+			Echo("Unit mover gave a move order!")
+			local dx,_,dz = spGetUnitDirection(unitID)
+			local x,y,z = spGetUnitPosition(unitID)
+			-- convert dimensionless direction into a distance of 400 elmos, then add it to the location to get the destination
+			dx = dx*400
+			dz = dz*400
+			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""})
 		end
 	end
 end
-
---	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
-function GetFirstCommand(unitID)
-	local queue = spGetCommandQueue(unitID, 1)
-	return queue[1]
-end
-
 --------------------------------------------------------------------------------

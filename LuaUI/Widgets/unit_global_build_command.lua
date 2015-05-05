@@ -330,7 +330,7 @@ function widget:GameFrame(thisFrame)
 	queueCount = 0 -- reset the queue count
 	for _, cmd in pairs(myQueue) do -- perform validity checks for all the jobs in the queue, and remove any which are no longer valid
 		queueCount = queueCount + 1 -- count the jobs on the queue while checking them, for the constructor separator
-		if not cmd.tfparams and not cmd.isStarted then -- prevents CleanOrders from clobbering UnitFinished and causing a nil error. tfparams is ZK-specific, remove it if porting.
+		if not cmd.tfparams then -- prevents CleanOrders from clobbering UnitFinished and causing a nil error. tfparams is ZK-specific, remove it if porting.
 			CleanOrders(cmd, false) -- note: also marks workers whose jobs are invalidated as idle, so that they can be reassigned immediately.
 		end
 	end
@@ -720,7 +720,6 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			myQueue[key] = nil
 		else -- otherwise track the unitID in activeJobs so that UnitFinished can remove it from the queue
 			activeJobs[unitID] = key
-			myQueue[key].isStarted = true -- prevents CleanOrders from clobbering UnitFinished and UnitTaken
 		end
 	end
 end
@@ -747,10 +746,6 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 			busyUnits[unitID] = nil
 		end
 	elseif activeJobs[unitID] then
-		local key = activeJobs[unitID]
-		if myQueue[key] then
-			myQueue[key].isStarted = false
-		end
 		activeJobs[unitID] = nil
 	end
 end
@@ -942,9 +937,9 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 				local x, y, z, h = params[1], params[2], params[3], params[4]
 				local myCmd
 				if isQ then
-					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}, q=true, isStarted=false}
+					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}, q=true}
 				else
-					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}, isStarted=false}
+					myCmd = {id=id, x=x, y=y, z=z, h=h, assignedUnits={}}
 				end
 				local hash = BuildHash(myCmd)
 				if CleanOrders(myCmd, true) or not options.shift then -- check if the job site is obstructed, and clear up any other jobs that overlap.
