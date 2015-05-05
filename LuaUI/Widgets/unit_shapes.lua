@@ -123,20 +123,15 @@ local function GetVisibleUnits()
 			local unitID = units[i]
 			if (spIsUnitSelected(unitID)) then
 				visibleSelected[#visibleSelected+1] = unitID
-			--else
-				--visibleUnits[#visibleUnits+1] = unitID
 			elseif options.showally.value and WG.allySelUnits[unitID] then
 				visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
 			end
 		end
 		
-		--lastVisibleUnits = visibleUnits
 		lastvisibleAllySelUnits = visibleAllySelUnits
 		lastVisibleSelected = visibleSelected
-		--return visibleUnits, visibleSelected
 		return visibleAllySelUnits, visibleSelected
 	else
-		--return lastVisibleUnits, lastVisibleSelected
 		return lastvisibleAllySelUnits, lastVisibleSelected
 	end
 end
@@ -345,27 +340,11 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local visibleUnits, visibleSelected = {}, {}
+local visibleSelected = {}
 local degrot = {}
 function widget:Update()
-	-- [[
-	local mx, my = spGetMouseState()
-	local ct, id = spTraceScreenRay(mx, my)
-	if (ct == "unit") then
-		hoveredUnit = id
-	else
-		hoveredUnit = nil
-	end
-	--]]
-	--visibleUnits, visibleSelected = GetVisibleUnits()
 	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
-	for i=1, #visibleUnits do
-		local unitID = visibleUnits[i]
-		local dirx, _, dirz = spGetUnitDirection(unitID)
-		if (dirz ~= nil) then
-			degrot[unitID] = 180 - math_acos(dirz) * rad_con
-		end
-	end
+	
 	for i=1, #visibleSelected do
 		local unitID = visibleSelected[i]
 		local dirx, _, dirz = spGetUnitDirection(unitID)
