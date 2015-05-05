@@ -21,7 +21,6 @@ function widget:GetInfo()
 end
 
 local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1'))
-local quiteNew = not Spring.Utilities.IsCurrentVersionNewerThan(95, 0)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -66,10 +65,10 @@ local red      = {  1,   0,   0,   1}
 local jumpDefs  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
 local function spTestMoveOrderX(unitDefID, x, y, z)
-	if quiteNew then
-		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
-	else
+	if reverseCompatibility then
 		return spTestMoveOrder(unitDefID, x, y, z)
+	else
+		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)		
 	end
 end
 
@@ -232,7 +231,8 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 	end
 
 	--local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
-	local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3])
+	--local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3])
+	local canJumpThere = spTestMoveOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 0, 0, 0, true, true, true)
 	
 	local range = jumpDefs[unitDefID].range
 	if passIf then
