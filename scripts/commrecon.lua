@@ -71,7 +71,7 @@ local bAiming = false
 local armsFree = true
 local shieldOn = true
 local dgunning = false
-bJumping = false
+local inJumpMode = false
 
 --------------------------------------------------------------------------------
 -- funcs
@@ -454,7 +454,7 @@ function script.Shot(num)
 end
 
 local function JumpExhaust()
-	while bJumping do 
+	while inJumpMode do 
 		EmitSfx( jx1,  1028 )
 		EmitSfx( jx2,  1028 )
 		Sleep(33)
@@ -465,8 +465,8 @@ function preJump(turn, distance)
 end
 
 function beginJump() 
+	inJumpMode = true
 	--[[
-	bJumping = true
 	StartThread(JumpExhaust)
 	--]]
 end
@@ -480,7 +480,7 @@ function halfJump()
 end
 
 function endJump() 
-	--bJumping = false
+	inJumpMode = false
 	EmitSfx( base,  1029 )
 end
 
@@ -509,7 +509,8 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true
 --	Turn( turret , y_axis, 0, math.rad(500) )
-	if  severity <= .5  then
+	if severity <= 0.5 and not inJumpMode then
+	Spring.Echo("BLA")
 		Turn( base , x_axis, math.rad(80), math.rad(80) )
 		Turn( turret , x_axis, math.rad(-16), math.rad(50) )
 		Turn( turret , y_axis, 0, math.rad(90) )
@@ -530,6 +531,20 @@ function script.Killed(recentDamage, maxHealth)
 		--StartThread(burn)
     	--Sleep((1000 * rand (2 , 5))) 
 		Sleep(100)
+		return 1
+	elseif severity <= 0.5 then
+		Explode(gun,    sfxFall + sfxSmoke  + sfxExplode )
+		Explode(head,   sfxFire + sfxExplode )
+		Explode(pelvis, sfxFire + sfxExplode )
+		Explode(lloarm, sfxFire + sfxExplode )
+		Explode(luparm, sfxFire + sfxExplode )
+		Explode(lloleg, sfxFire + sfxExplode )
+		Explode(lupleg, sfxFire + sfxExplode )
+		Explode(rloarm, sfxFire + sfxExplode )
+		Explode(rloleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode )
+		Explode(ruparm, sfxFall + sfxFire  + sfxSmoke  + sfxExplode )
+		Explode(rupleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode )
+		Explode(torso, sfxShatter + sfxExplode )
 		return 1
 	else
 		Explode(gun, sfxFall + sfxFire  + sfxSmoke  + sfxExplode )
