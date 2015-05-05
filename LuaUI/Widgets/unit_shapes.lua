@@ -322,6 +322,10 @@ function widget:Initialize()
 		end
 
 		unitConf[udid] = {shape=shape, xscale=xscale, zscale=zscale}
+		
+		if unitDef.customParams and unitDef.customParams.selection_velocity_heading then
+			unitConf[udid].velocityHeading = true
+		end
 	end
 
 	clearquad = gl.CreateList(function()
@@ -352,13 +356,24 @@ end
 local visibleSelected = {}
 local degrot = {}
 
+local HEADING_TO_RAD = 1/32768*math.pi
 local RADIANS_PER_COBANGLE = math.pi / 32768
 
 local function UpdateUnitListRotation(unitList)
 	for i=1, #unitList do
 		local unitID = unitList[i]
-		local heading = (not (spGetUnitIsDead(unitID)) and spGetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE
-		degrot[unitID] = 180 + heading * rad_con
+		local udid = spGetUnitDefID(unitID)
+		if unitConf[udid].velocityHeading then
+			local vx,_,vz = Spring.GetUnitVelocity(unitID)
+			local speed = vx*vx + vz*vz
+			if speed > 0 then
+				local velHeading = Spring.GetHeadingFromVector(vx, vz)*HEADING_TO_RAD
+				degrot[unitID] = 180 + velHeading * rad_con	
+			end
+		else		
+			local heading = (not (spGetUnitIsDead(unitID)) and spGetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE
+			degrot[unitID] = 180 + heading * rad_con	
+		end
 	end
 end
 

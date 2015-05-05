@@ -39,6 +39,7 @@ unitDef = {
 	helptext_pl    = [[Trident to wolny statek powietrzny, ktory niszczy lotnictwo silnymi rakietami. Jego szybkosc i niski pulap sprawiaja jednak, ze mozna go latwo zniszczyc jednostkami naziemnymi.]],
 	modelradius    = [[18]],
 	midposoffset   = [[0 15 0]],
+	selection_velocity_heading = 1,
   },
 
   explodeAs              = [[GUNSHIPEX]],
