@@ -510,7 +510,6 @@ function script.Killed(recentDamage, maxHealth)
 	dead = true
 --	Turn( turret , y_axis, 0, math.rad(500) )
 	if severity <= 0.5 and not inJumpMode then
-	Spring.Echo("BLA")
 		Turn( base , x_axis, math.rad(80), math.rad(80) )
 		Turn( turret , x_axis, math.rad(-16), math.rad(50) )
 		Turn( turret , y_axis, 0, math.rad(90) )
