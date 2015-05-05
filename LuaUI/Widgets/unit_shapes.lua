@@ -31,7 +31,8 @@ local rad_con				= 180 / math_pi
 local GL_KEEP      = 0x1E00
 local GL_REPLACE   = 0x1E01
 
-local spGetUnitDirection     = Spring.GetUnitDirection
+local spGetUnitIsDead        = Spring.GetUnitIsDead
+local spGetUnitHeading       = Spring.GetUnitHeading
 
 local spGetVisibleUnits      = Spring.GetVisibleUnits
 local spGetSelectedUnits     = Spring.GetSelectedUnits
@@ -296,9 +297,17 @@ function widget:Initialize()
 	CreateTriangleLists()
 	
 	for udid, unitDef in pairs(UnitDefs) do
+	
 		local xsize, zsize = unitDef.xsize, unitDef.zsize
 		local scale = scalefaktor*( xsize^2 + zsize^2 )^0.5
 		local shape, xscale, zscale
+		
+		if unitDef.customParams and unitDef.customParams.selection_scale then
+			local factor = (tonumber(unitDef.customParams.selection_scale) or 1)
+			scale = scale*factor
+			xsize = xsize*factor
+			zsize = zsize*factor
+		end
 		
 		
 		if (unitDef.isBuilding or unitDef.isFactory or unitDef.speed==0) then
@@ -343,17 +352,13 @@ end
 local visibleSelected = {}
 local degrot = {}
 
+local RADIANS_PER_COBANGLE = math.pi / 32768
+
 local function UpdateUnitListRotation(unitList)
 	for i=1, #unitList do
 		local unitID = unitList[i]
-		local dirx, _, dirz = spGetUnitDirection(unitID)
-		if (dirz ~= nil) then
-			if dirx < 0 then
-				degrot[unitID] = 180 - math_acos(dirz) * rad_con
-			else
-				degrot[unitID] = 180 + math_acos(dirz) * rad_con
-			end
-		end
+		local heading = (not (spGetUnitIsDead(unitID)) and spGetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE
+		degrot[unitID] = 180 + heading * rad_con
 	end
 end
 
