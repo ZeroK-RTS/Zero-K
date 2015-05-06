@@ -330,7 +330,7 @@ function widget:GameFrame(thisFrame)
 	queueCount = 0 -- reset the queue count
 	for _, cmd in pairs(myQueue) do -- perform validity checks for all the jobs in the queue, and remove any which are no longer valid
 		queueCount = queueCount + 1 -- count the jobs on the queue while checking them, for the constructor separator
-		if not cmd.tfparams then -- prevents CleanOrders from clobbering UnitFinished and causing a nil error. tfparams is ZK-specific, remove it if porting.
+		if not cmd.tfparams then -- ZK-specific: prevents combo TF-build operations from being removed by CleanOrders until the terraform is finished.
 			CleanOrders(cmd, false) -- note: also marks workers whose jobs are invalidated as idle, so that they can be reassigned immediately.
 		end
 	end
@@ -786,22 +786,26 @@ end
 -- Note: Zero-K specific factDefIDs, customize if porting to another game!
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if unitTeam == spGetMyTeamID() and UnitDefs[unitDefID].isBuilder and options.separateConstructors.value then -- if it's our unit, and is a builder, and constructor separator is enabled
-		local facScale -- how far our unit will be told to move
-		if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
-			facScale = 500
-		elseif factDefID == 299 then -- boatfac, needs a huge clearance
-			facScale = 250
-		elseif factDefID == 295 then -- hoverfac, needs extra clearance
-			facScale = 140
-		else -- other facs
-			facScale = 100
-		end
+		if not UnitDefs[unitDefID].moveDef.id then -- stop flying constructors rather than moving them, since they don't obstruct anything anyway
+			spGiveOrderToUnit(unitID, CMD_STOP, {}, {""})
+		else -- for all other constructors
+			local facScale -- how far our unit will be told to move
+			if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
+				facScale = 500
+			elseif factDefID == 299 then -- boatfac, needs a huge clearance
+				facScale = 250
+			elseif factDefID == 295 then -- hoverfac, needs extra clearance
+				facScale = 140
+			else -- other facs
+				facScale = 100
+			end
 		
-		local dx,_,dz = spGetUnitDirection(unitID)
-		local x,y,z = spGetUnitPosition(unitID)
-		dx = dx*facScale
-		dz = dz*facScale
-		spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
+			local dx,_,dz = spGetUnitDirection(unitID)
+			local x,y,z = spGetUnitPosition(unitID)
+			dx = dx*facScale
+			dz = dz*facScale
+			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
+		end
 	end
 end
 
@@ -1330,9 +1334,9 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	
 	-- The following implements an ordinal cost model, based on the distance to the job and the number of other workers assigned to the same job.
 	-- The general order of priorities for choosing jobs is as follows:
-	-- #1 Start a new cheap build job, or a new resurrect job
+	-- #1 Start a new cheap build job, or resurrect job
 	-- #2 Assist on an expensive job, or resurrect job
-	-- #3 Repair, reclaim, or start an expensive job
+	-- #3 Start an expensive job, repair, or reclaim
 	-- #4 Assist on repair or reclaim
 	-- #5 Assist on a cheap build job
 	
@@ -1340,7 +1344,8 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	-- while ensuring that large jobs will have sufficient build power to be completed quickly once started.
 	-- Repair and reclaim are prioritized equally, even though repair is technically twice as energy efficient.
 	-- This is due to high rates of worker (and com) suicide from following combat units if repair is prioritized higher.
-	-- Resurrect is given the highest overall priority due to its exclusive nature.
+	-- Resurrect is given the highest overall priority due to its exclusive nature. Metal extractors and defences are given a moderately higher
+	-- priority so that they will tend to be the first things started when expanding.
 	
 	-- If you want to change the assignment behavior, the stuff below is what you should edit.
 	-- Note that cost represents a distance, which is why cost modifiers use addition,
@@ -1349,17 +1354,16 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
 	
 	local cost
+	local unitDef = UnitDefs[abs(job.id)]
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
-		metalCost = UnitDefs[abs(job.id)].cost
+		metalCost = unitDef.cost
 	end
 	
 	if costMod == 1 then -- for starting new jobs
-		if job.id == 40 or job.id == 90 or (metalCost and metalCost > 300) then
-			cost = distance + 600 -- #3
-		elseif metalCost and string.match(UnitDefs[abs(job.id)].humanName, "Extractor") then
-			cost = distance - 200  -- #1.5: mexes get a somewhat higher priority, depending on their output
+		if (metalCost and metalCost > 300) or job.id == 40 or job.id == 90 then
+			cost = distance + 400 -- #3
 		else
 			cost = distance -- #1
 		end
@@ -1367,7 +1371,7 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 		if (metalCost and metalCost > 300) or job.id == 125 then
 			cost = distance + (100 * costMod) -- #2
 		elseif job.id == 40 or job.id == 90 then
-			cost = distance + (300 * costMod) -- #4
+			cost = distance + (200 * costMod) -- #4
 		else 
 			cost = distance + (600 * costMod) -- #5
 		end
@@ -1432,7 +1436,7 @@ function SplitAreaCommand(id, x, z, r)
 			local featureID = featureList[i]
 			local fdef = spGetFeatureDefID(featureID)
 			local thisfeature = FeatureDefs[fdef]
-			if string.match(thisfeature["tooltip"], "reck") ~= nil then -- if it's resurrectable
+			if string.match(thisfeature["tooltip"], "reck") then -- if it's resurrectable
 				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
 				local tx, ty, tz = spGetFeaturePosition(featureID)
 				local myCmd = {id=id, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
@@ -1491,7 +1495,7 @@ function CleanWrecks()
 			local featureID = featureList[i]
 			local fdef = spGetFeatureDefID(featureID)
 			local thisfeature = FeatureDefs[fdef]
-			if string.match(thisfeature["tooltip"], "reck") ~= nil then -- if it's resurrectable
+			if string.match(thisfeature["tooltip"], "reck") then -- if it's resurrectable
 				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
 				local tx, ty, tz = spGetFeaturePosition(featureID)
 				local myCmd = {id=125, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
@@ -1500,7 +1504,7 @@ function CleanWrecks()
 					myQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
 					UpdateOneJobPathing(hash) -- and to prevent redundant pathing calculations
 				end
-			elseif string.match(thisfeature["tooltip"], "ebris") ~= nil or string.match(thisfeature["tooltip"], "Egg") ~= nil then -- otherwise if it's a reclaimable wreck
+			elseif string.match(thisfeature["tooltip"], "ebris") or string.match(thisfeature["tooltip"], "Egg") then -- otherwise if it's a reclaimable wreck
 				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
 				local tx, ty, tz = spGetFeaturePosition(featureID)
 				local myCmd = {id=90, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
@@ -1517,7 +1521,7 @@ function CleanWrecks()
 			local fdef = spGetFeatureDefID(featureID)
 			local thisfeature = FeatureDefs[fdef]
 		
-			if string.match(thisfeature["tooltip"], "ebris") ~= nil or string.match(thisfeature["tooltip"], "Egg") ~= nil or string.match(thisfeature["tooltip"], "reck") ~= nil then -- if it's a non-map-feature reclaimable
+			if string.match(thisfeature["tooltip"], "ebris") or string.match(thisfeature["tooltip"], "Egg") or string.match(thisfeature["tooltip"], "reck") then -- if it's a non-map-feature reclaimable
 				local target = featureID + Game.maxUnits -- convert featureID to absoluteID for spGiveOrderToUnit
 				local tx, ty, tz = spGetFeaturePosition(featureID)
 				local myCmd = {id=90, target=target, x=tx, y=ty, z=tz, assignedUnits={}} -- construct a new command
@@ -1538,7 +1542,7 @@ function CaptureTF()
 		unitID = teamUnits[i]
 		unitDID = spGetUnitDefID(unitID)
 		unitDef = UnitDefs[unitDID]
-		if string.match(unitDef.humanName, "erraform") ~= nil then -- identify 'terraunits'
+		if string.match(unitDef.humanName, "erraform") then -- identify 'terraunits'
 			local myCmd = {id=40, target=unitID, assignedUnits={}}
 			local hash = BuildHash(myCmd)
 			if not myQueue[hash] then -- add repair jobs for them if they're not already on the queue
@@ -1590,9 +1594,12 @@ function CleanOrders(cmd, isNew)
 				local blockerID = blockingUnits[i]
 				local blockerDefID = spGetUnitDefID(blockerID)
 				if blockerDefID == cmdID and myTeamID == spGetUnitTeam(blockerID) then -- if the blocker matches the building we're trying to build, and is ours
-					local _,_,nanoframe = spGetUnitIsStunned(blockingUnits[i]) -- determine if it's still under construction
+					local _,_,nanoframe = spGetUnitIsStunned(blockerID) -- determine if it's still under construction
 					if nanoframe then
 						isNano = true -- set isNano to true so that it will not be removed.
+					else -- otherwise the job is finished, and we should garbage collect activeJobs
+						activeJobs[blockerID] = nil -- note this only stops a tiny space leak should a free starting fac be added to the queue
+						-- but it was cheap, so whatever.
 					end
 				elseif canBuildThisThere == blockageType.mobiles and myUnits[blockerID] and UnitDefs[blockerDefID].moveDef.id and myUnits[blockerID].cmdtype ~= commandType.drec then
 				-- if blocked by a mobile unit, and it's one of our constructors, and not a flying unit, and it's not under direct orders...
