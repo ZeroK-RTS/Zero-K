@@ -1364,12 +1364,18 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	if costMod == 1 then -- for starting new jobs
 		if (metalCost and metalCost > 300) or job.id == 40 or job.id == 90 then
 			cost = distance + 400 -- #3
+		elseif unitDef.reloadTime > 0 then -- for small defences
+			cost = distance - 150
+		elseif string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind") then
+			cost = distance + 100
 		else
 			cost = distance -- #1
 		end
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == 125 then
-			cost = distance + (100 * costMod) -- #2
+			cost = distance -- #2
+		elseif unitDef.reloadTime > 0 then
+			cost = distance - 150 + (800 * (costMod - 2))
 		elseif job.id == 40 or job.id == 90 then
 			cost = distance + (200 * costMod) -- #4
 		else 
@@ -1828,14 +1834,14 @@ function IsTargetReachable(unitID, tx,ty,tz)
     local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
     if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
 	    local result,lastcoordinate, waypoints
-	    local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, buildDist)
+	    local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
 	    if path then
 		    local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
 		    local finalCoord = waypoint[#waypoint]
 		    if finalCoord then -- unknown why sometimes NIL
 			    local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
 			    local dist = sqrt(dx*dx + dz*dz)
-			    if dist <= buildDist + 20 then -- is within radius?
+			    if dist < buildDist + 40 then -- is within radius?
 				    return true -- within reach
 			    else
 				    return false -- not within reach
