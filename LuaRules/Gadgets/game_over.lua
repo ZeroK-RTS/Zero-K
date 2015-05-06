@@ -406,7 +406,7 @@ end
 function gadget:UnitGiven(u, ud, newTeam, oldTeam)
 	if (newTeam ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
-	  and(not select(3,spGetUnitIsStunned(u)))
+	  and finishedUnits[u]
 	then
 		AddAllianceUnit(u, ud, newTeam)
 	end
@@ -415,7 +415,7 @@ end
 function gadget:UnitTaken(u, ud, oldTeam, newTeam)
 	if (oldTeam ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
-	  and(select(5,spGetUnitHealth(u))>=1)
+	  and finishedUnits[u]
 	then
 		RemoveAllianceUnit(u, ud, oldTeam)	
 	end
