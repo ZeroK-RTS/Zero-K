@@ -420,8 +420,8 @@ function DrawUnitShapes(unitList, color)
 		local unit = unitConf[udid]
 
 		if (unit) then
-			-- gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			gl.Unit(unitID, true)
+			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+			-- gl.Unit(unitID, true)
 		end
 	end
 
@@ -441,6 +441,7 @@ function widget:DrawWorldPreUnit()
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
+		gl.DepthMask(true)
 		gl.StencilTest(true)
 
 			DrawUnitShapes(visibleSelected, rgba)
@@ -449,6 +450,8 @@ function widget:DrawWorldPreUnit()
 		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 		gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
 		gl.Blending("reset")
+		gl.DepthMask(false)
+		gl.DepthTest(false)
 		gl.Color(1,1,1,1)
 	gl.PopAttrib()
 end
