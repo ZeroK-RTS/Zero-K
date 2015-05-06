@@ -441,7 +441,6 @@ function widget:DrawWorldPreUnit()
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
-		gl.DepthMask(true)
 		gl.StencilTest(true)
 
 			DrawUnitShapes(visibleSelected, rgba)
@@ -450,8 +449,6 @@ function widget:DrawWorldPreUnit()
 		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 		gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
 		gl.Blending("reset")
-		gl.DepthMask(false)
-		gl.DepthTest(false)
 		gl.Color(1,1,1,1)
 	gl.PopAttrib()
 end
