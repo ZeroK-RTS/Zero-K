@@ -426,7 +426,7 @@ function DrawUnitShapes(unitList, color)
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
-			gl.Unit(unitID, true)
+			-- gl.Unit(unitID, true)
 		end
 	end
 
